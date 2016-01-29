@@ -25,13 +25,14 @@ var Plate = Plate || {
   deletePlate: function (plateId, successfunc) {
     if (confirm("Are you sure you really want to delete plate " + plateId + "? This operation is permanent!")) {
       Fluxion.doAjax(
-              'plateControllerHelperService',
-              'deletePlate',
-              {'plateId': plateId, 'url': ajaxurl},
-              {'doOnSuccess': function (json) {
-                successfunc();
-              }
-              }
+        'plateControllerHelperService',
+        'deletePlate',
+        {'plateId': plateId, 'url': ajaxurl},
+        {
+          'doOnSuccess': function (json) {
+            successfunc();
+          }
+        }
       );
     }
   },
@@ -167,16 +168,16 @@ Plate.barcode = {
 
   changePlateLocation: function (plateId, barcode) {
     Fluxion.doAjax(
-            'plateControllerHelperService',
-            'changePlateLocation',
-            {
-              'plateId': plateId,
-              'locationBarcode': barcode,
-              'url': ajaxurl
-            },
-            {
-              'doOnSuccess': Utils.page.pageReload
-            }
+      'plateControllerHelperService',
+      'changePlateLocation',
+      {
+        'plateId': plateId,
+        'locationBarcode': barcode,
+        'url': ajaxurl
+      },
+      {
+        'doOnSuccess': Utils.page.pageReload
+      }
     );
   }
 };
@@ -184,13 +185,17 @@ Plate.barcode = {
 Plate.tagbarcode = {
   getPlateBarcodesByMaterialType: function (form) {
     Fluxion.doAjax(
-            'plateControllerHelperService',
-            'getTagBarcodesForMaterialType',
-            {'materialType': form.value, 'url': ajaxurl},
-            {'doOnSuccess': function (json) {
-              jQuery('#plateBarcodeSelect').html(json.plateBarcodes);
-            }
-            }
+      'plateControllerHelperService',
+      'getTagBarcodesForMaterialType',
+      {
+        'materialType': form.value, 
+        'url': ajaxurl
+      },
+      {
+        'doOnSuccess': function (json) {
+          jQuery('#plateBarcodeSelect').html(json.plateBarcodes);
+        }
+      }
     );
   }
 };
@@ -259,16 +264,17 @@ Plate.ui = {
 
   downloadPlateInputForm: function (documentFormat) {
     Fluxion.doAjax(
-            'plateControllerHelperService',
-            'downloadPlateInputForm',
-            {
-              'documentFormat': documentFormat,
-              'url': ajaxurl
-            },
-            {'doOnSuccess': function (json) {
-              Utils.page.pageRedirect('/miso/download/plate/forms/' + json.response);
-            }
-            }
+      'plateControllerHelperService',
+      'downloadPlateInputForm',
+      {
+        'documentFormat': documentFormat,
+        'url': ajaxurl
+      },
+      {
+        'doOnSuccess': function (json) {
+          Utils.page.pageRedirect('/miso/download/plate/forms/' + json.response);
+        }
+      }
     );
   },
 
@@ -350,21 +356,21 @@ Plate.ui = {
     if (!Utils.validation.isNullCheck(response)) {
       var json = jQuery.parseJSON(response);
       Fluxion.doAjax(
-              'plateControllerHelperService',
-              'saveImportedElements',
-              {
-                'description': jQuery('#description').val(),
-                'creationDate': jQuery('#creationdatepicker').val(),
-                'plateMaterialType': jQuery("input[name='plateMaterialType']:checked").val(),
-                'tagBarcode': jQuery("input[name='tagBarcode']:selected").val(),
-                'elements': json,
-                'url': ajaxurl
-              },
-              {
-                'doOnSuccess': function (json) {
-                  Plate.ui.createMultiPlateElementsTable(json);
-                }
-              }
+        'plateControllerHelperService',
+        'saveImportedElements',
+        {
+          'description': jQuery('#description').val(),
+          'creationDate': jQuery('#creationdatepicker').val(),
+          'plateMaterialType': jQuery("input[name='plateMaterialType']:checked").val(),
+          'tagBarcode': jQuery("input[name='tagBarcode']:selected").val(),
+          'elements': json,
+          'url': ajaxurl
+        },
+        {
+          'doOnSuccess': function (json) {
+            Plate.ui.createMultiPlateElementsTable(json);
+          }
+        }
       );
     }
   },
@@ -396,72 +402,74 @@ Plate.ui = {
       return ((a < b) ? 1 : ((a > b) ? -1 : 0));
     };
     Fluxion.doAjax(
-            'plateControllerHelperService',
-            'plateElementsDataTable',
-            {
-              'url': ajaxurl,
-              'plateId': plateId
-            },
-            {'doOnSuccess': function (json) {
-              jQuery('#plateElementsTable').html('');
-              jQuery('#plateElementsTable').dataTable({
-                                                        "aaData": json.elementsArray,
-                                                        "aoColumns": [
-                                                          { "sTitle": "Name", "sType": "no-pla"},
-                                                          { "sTitle": "Alias"},
-                                                          { "sTitle": "Barcode Kit"},
-                                                          { "sTitle": "Barcode Sequence"},
-                                                          { "sTitle": "Edit"}
-                                                        ],
-                                                        "bJQueryUI": true,
-                                                        "iDisplayLength": 25,
-                                                        "aaSorting": [
-                                                          [0, "desc"]
-                                                        ],
-                                                        "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>'
-                                                        /*
-                                                         ,
+      'plateControllerHelperService',
+      'plateElementsDataTable',
+      {
+        'url': ajaxurl,
+        'plateId': plateId
+      },
+      {
+        'doOnSuccess': function (json) {
+          jQuery('#plateElementsTable').html('');
+          jQuery('#plateElementsTable').dataTable({
+            "aaData": json.elementsArray,
+            "aoColumns": [
+              { "sTitle": "Name", "sType": "no-pla"},
+              { "sTitle": "Alias"},
+              { "sTitle": "Barcode Kit"},
+              { "sTitle": "Barcode Sequence"},
+              { "sTitle": "Edit"}
+            ],
+            "bJQueryUI": true,
+            "iDisplayLength": 25,
+            "aaSorting": [
+              [0, "desc"]
+            ],
+            "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>'
+            /*
+             ,
 
-                                                         "fnRowCallback": function(nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-                                                         Fluxion.doAjax(
-                                                         'projectControllerHelperService',
-                                                         'checkOverviewByProjectId',
-                                                         {
-                                                         'projectId':aData[4],
-                                                         'url':ajaxurl
-                                                         },
-                                                         {'doOnSuccess': function(json) {
-                                                         jQuery('td:eq(4)', nRow).html(json.response);
-                                                         }
-                                                         }
-                                                         );
-                                                         }
-                                                         */
-                                                      });
-              jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
-            }
-            }
+             "fnRowCallback": function(nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+             Fluxion.doAjax(
+             'projectControllerHelperService',
+             'checkOverviewByProjectId',
+             {
+             'projectId':aData[4],
+             'url':ajaxurl
+             },
+             {'doOnSuccess': function(json) {
+             jQuery('td:eq(4)', nRow).html(json.response);
+             }
+             }
+             );
+             }
+             */
+          });
+          jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
+        }
+      }
     );
   },
   searchSamples: function (text) {
     jQuery('#sampleList').html("<img src='/styles/images/ajax-loader.gif'/>");
     Fluxion.doAjax(
-            'plateControllerHelperService',
-            'searchSamples',
-            {  'str': text,
-              'url': ajaxurl
-            },
-            {'doOnSuccess': function (json) {
-              jQuery('#sampleList').html(json.html);
-              jQuery('#sampleList .dashboard').each(function () {
-                var inp = jQuery(this);
-                inp.dblclick(function () {
-                  Plate.ui.insertSampleNextAvailable(inp);
-                });
-              });
-            }
+      'plateControllerHelperService',
+      'searchSamples',
+      {  'str': text,
+        'url': ajaxurl
+      },
+      {
+        'doOnSuccess': function (json) {
+          jQuery('#sampleList').html(json.html);
+          jQuery('#sampleList .dashboard').each(function () {
+            var inp = jQuery(this);
+            inp.dblclick(function () {
+              Plate.ui.insertSampleNextAvailable(inp);
             });
-
+          });
+        }
+      }
+    );
   },
 
   selectSampleElement: function (elementId, elementName) {
@@ -496,19 +504,19 @@ Plate.ui = {
   exportSampleForm: function (){
     Utils.ui.disableButton("exportSampleForm");
     Fluxion.doAjax(
-            'plateControllerHelperService',
-            'exportSampleForm',
-            {
-              'form':jQuery('#plateExportForm').serializeArray(),
-             // 'documentFormat':documentFormat,
-              'url':ajaxurl
-            },
-            {'doOnSuccess':function (json) {
-              Utils.page.pageRedirect('/miso/download/plate/forms/' + json.response );
-            }
-            }
+      'plateControllerHelperService',
+      'exportSampleForm',
+      {
+        'form':jQuery('#plateExportForm').serializeArray(),
+       // 'documentFormat':documentFormat,
+        'url':ajaxurl
+      },
+      {
+        'doOnSuccess':function (json) {
+          Utils.page.pageRedirect('/miso/download/plate/forms/' + json.response );
+        }
+      }
     );
     Utils.ui.reenableButton("exportSampleForm", "Export Excel");
   }
-
 };

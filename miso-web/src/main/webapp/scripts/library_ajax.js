@@ -31,7 +31,8 @@ var Library = Library || {
         {'doOnSuccess': function (json) {
           successfunc();
         }
-        });
+        }
+      );
     }
   },
   
@@ -148,10 +149,11 @@ Library.qc = {
         'libraryControllerHelperService',
         'getLibraryQcTypes',
         {'url': ajaxurl},
-        {'doOnSuccess': function (json) {
-          jQuery('#libraryQcType').html(json.types);
-          jQuery('#units').html(jQuery('#libraryQcType option:first').attr("units"));
-        }
+        {
+          'doOnSuccess': function (json) {
+            jQuery('#libraryQcType').html(json.types);
+            jQuery('#units').html(jQuery('#libraryQcType option:first').attr("units"));
+          }
         }
       );
     }
@@ -178,11 +180,13 @@ Library.qc = {
         'insertSize': f.libraryQcInsertSize,
         'url': ajaxurl
       },
-      {'updateElement': 'libraryQcTable',
-      'doOnSuccess': function (json) {
-        jQuery('#libraryQcTable').removeAttr("qcInProgress");
+      {
+        'updateElement': 'libraryQcTable',
+        'doOnSuccess': function (json) {
+          jQuery('#libraryQcTable').removeAttr("qcInProgress");
+        }
       }
-    });
+    );
   },
 
   changeLibraryQCRow: function (qcId, libraryId) {
@@ -194,12 +198,14 @@ Library.qc = {
         'qcId': qcId,
         'url': ajaxurl
       },
-      {'doOnSuccess': function (json) {
-        jQuery('#result' + qcId).html(json.results);
-        jQuery('#insert' + qcId).html(json.insertSize);
-        jQuery('#edit' + qcId).html(json.edit);
+      {
+        'doOnSuccess': function (json) {
+          jQuery('#result' + qcId).html(json.results);
+          jQuery('#insert' + qcId).html(json.insertSize);
+          jQuery('#edit' + qcId).html(json.edit);
+        }
       }
-    });
+    );
   },
 
   editLibraryQC: function (qcId, libraryId) {
@@ -213,7 +219,8 @@ Library.qc = {
         'insertSize': jQuery('#insertSize' + qcId).val(),
         'url': ajaxurl
       },
-      {'doOnSuccess': Utils.page.pageReload
+      {
+        'doOnSuccess': Utils.page.pageReload
       }
     );
   }
@@ -274,10 +281,11 @@ Library.dilution = {
         'dilutionId': dilutionId,
         'url': ajaxurl
       },
-      {'doOnSuccess': function (json) {
-        jQuery('#results' + dilutionId).html(json.results);
-        jQuery('#edit' + dilutionId).html(json.edit);
-      }
+      {
+        'doOnSuccess': function (json) {
+          jQuery('#results' + dilutionId).html(json.results);
+          jQuery('#edit' + dilutionId).html(json.edit);
+        }
       }
     );
   },
@@ -291,7 +299,8 @@ Library.dilution = {
         'result': jQuery('#' + dilutionId).val(),
         'url': ajaxurl
       },
-      {'doOnSuccess': Utils.page.pageReload
+      {
+        'doOnSuccess': Utils.page.pageReload
       }
     );
   },
@@ -302,10 +311,12 @@ Library.dilution = {
         'libraryControllerHelperService',
         'deleteLibraryDilution',
         {'libraryDilutionId': libraryDilutionId, 'url': ajaxurl},
-        {'doOnSuccess': function (json) {
-          successfunc();
+        {
+          'doOnSuccess': function (json) {
+            successfunc();
+          }
         }
-      });
+      );
     }
   }
 };
@@ -404,10 +415,12 @@ Library.empcr = {
         'libraryControllerHelperService',
         'deleteEmPCR',
         {'empcrId': empcrId, 'url': ajaxurl},
-        {'doOnSuccess': function (json) {
-          successfunc();
+        {
+          'doOnSuccess': function (json) {
+            successfunc();
+          }
         }
-      });
+      );
     }
   },
 
@@ -417,10 +430,12 @@ Library.empcr = {
         'libraryControllerHelperService',
         'deleteEmPCRDilution',
         {'empcrDilutionId': empcrDilutionId, 'url': ajaxurl},
-        {'doOnSuccess': function (json) {
-          successfunc();
+        {
+          'doOnSuccess': function (json) {
+            successfunc();
+          }
         }
-      });
+      );
     }
   }
 };
@@ -643,7 +658,9 @@ Library.ui = {
       'libraryControllerHelperService',
       'changePlatformName',
       {'platform': platform, 'url': ajaxurl},
-      {'doOnSuccess': self.processPlatformChange}
+      {
+        'doOnSuccess': self.processPlatformChange
+      }
     );
   },
   changePlatformNameWithLibraryType: function (input, librarytype) {
@@ -653,10 +670,11 @@ Library.ui = {
       'libraryControllerHelperService',
       'changePlatformName',
       {'platform': platform, 'url': ajaxurl},
-      {'doOnSuccess': function (json) {
-        jQuery('#libraryTypes').html(json.libraryTypes);
-        jQuery('#libraryTypes').val(librarytype);
-      }
+      {
+        'doOnSuccess': function (json) {
+          jQuery('#libraryTypes').html(json.libraryTypes);
+          jQuery('#libraryTypes').val(librarytype);
+        }
       }
     );
   },
@@ -667,10 +685,11 @@ Library.ui = {
       'libraryControllerHelperService',
       'changePlatformName',
       {'platform': platform, 'url': ajaxurl},
-      {'doOnSuccess': function (json) {
-        jQuery('#tagBarcodeStrategies').html(json.tagBarcodeStrategies);
-        jQuery('#tagBarcodeStrategies').val(tagBarcodeStrategy);
-      }
+      {
+        'doOnSuccess': function (json) {
+          jQuery('#tagBarcodeStrategies').html(json.tagBarcodeStrategies);
+          jQuery('#tagBarcodeStrategies').val(tagBarcodeStrategy);
+        }
       }
     );
   },
@@ -712,49 +731,51 @@ Library.ui = {
         {'strategy': tdtext,
           'url': ajaxurl
         },
-        {'doOnSuccess': function (json) {
-          tableObj.find("tr:gt(" + frId + ")").each(function () {
-            var c = this.cells[col + 1];
-            jQuery(c).html("");
-            for (var i = 0; i < json.numApplicableBarcodes; i++) {
-              jQuery(c).append("<span class='tagBarcodeSelectDiv' position='" + (i + 1) + "' id='tagbarcodes" + (i + 1) + "'>- <i>Select...</i></span>");
-              if (json.numApplicableBarcodes > 1 && i == 0) {
-                jQuery(c).append("|");
+        {
+          'doOnSuccess': function (json) {
+            tableObj.find("tr:gt(" + frId + ")").each(function () {
+              var c = this.cells[col + 1];
+              jQuery(c).html("");
+              for (var i = 0; i < json.numApplicableBarcodes; i++) {
+                jQuery(c).append("<span class='tagBarcodeSelectDiv' position='" + (i + 1) + "' id='tagbarcodes" + (i + 1) + "'>- <i>Select...</i></span>");
+                if (json.numApplicableBarcodes > 1 && i == 0) {
+                  jQuery(c).append("|");
+                }
               }
-            }
-
-            //bind editable to selects
-            jQuery("#cinput .tagBarcodeSelectDiv").editable(function (value, settings) {
-              return value;
-            },
-            {
-              loadurl: '../../library/barcodesForPosition',
-              loaddata: function (value, settings) {
-                var ret = {};
-                ret["position"] = jQuery(this).attr("position");
-                if (!Utils.validation.isNullCheck(tdtext)) {
-                  ret['barcodeStrategy'] = tdtext;
-                }
-                else {
-                  ret['barcodeStrategy'] = '';
-                }
-
-                return ret;
+  
+              //bind editable to selects
+              jQuery("#cinput .tagBarcodeSelectDiv").editable(function (value, settings) {
+                return value;
               },
-              type: 'select',
-              onblur: 'submit',
-              placeholder: '',
-              style: 'inherit',
-              submitdata: function (tvalue, tsettings) {
-                return {
-                  "row_id": this.parentNode.getAttribute('id'),
-                  "column": table.fnGetPosition(this)[2]
-                };
-              }
+              {
+                loadurl: '../../library/barcodesForPosition',
+                loaddata: function (value, settings) {
+                  var ret = {};
+                  ret["position"] = jQuery(this).attr("position");
+                  if (!Utils.validation.isNullCheck(tdtext)) {
+                    ret['barcodeStrategy'] = tdtext;
+                  }
+                  else {
+                    ret['barcodeStrategy'] = '';
+                  }
+  
+                  return ret;
+                },
+                type: 'select',
+                onblur: 'submit',
+                placeholder: '',
+                style: 'inherit',
+                submitdata: function (tvalue, tsettings) {
+                  return {
+                    "row_id": this.parentNode.getAttribute('id'),
+                    "column": table.fnGetPosition(this)[2]
+                  };
+                }
+              });
             });
-          });
+          }
         }
-        });
+      );
     }
     else {
       alert("Please select a row to use as the Fill Down template by clicking in the Select column for that row.");
@@ -890,7 +911,9 @@ Library.ui = {
       'libraryControllerHelperService',
       'addLibraryNote',
       {'libraryId': libraryId, 'internalOnly': internalOnly, 'text': text, 'url': ajaxurl},
-      {'doOnSuccess': Utils.page.pageReload}
+      {
+        'doOnSuccess': Utils.page.pageReload
+      }
     );
   },
 
@@ -900,7 +923,9 @@ Library.ui = {
         'libraryControllerHelperService',
         'deleteLibraryNote',
         {'libraryId': libraryId, 'noteId': noteId, 'url': ajaxurl},
-        {'doOnSuccess': Utils.page.pageReload}
+        {
+          'doOnSuccess': Utils.page.pageReload
+        }
       );
     }
   },
@@ -933,27 +958,28 @@ Library.ui = {
       {
         'url': ajaxurl
       },
-      {'doOnSuccess': function (json) {
-        jQuery('#listingLibrariesTable').html('');
-        jQuery('#listingLibrariesTable').dataTable({
-          "aaData": json.array,
-          "aoColumns": [
-            { "sTitle": "Library Name", "sType": "no-lib"},
-            { "sTitle": "Alias"},
-            { "sTitle": "Type"},
-            { "sTitle": "Sample Name", "sType": "no-sam"},
-            { "sTitle": "QC Passed"},
-            { "sTitle": "Edit"},
-            { "sTitle": "ID", "bVisible": false}
-          ],
-          "bJQueryUI": true,
-          "bAutoWidth": false,
-          "iDisplayLength": 25,
-          "aaSorting": [
-            [0, "desc"]
-          ]
-        });
-      }
+      {
+        'doOnSuccess': function (json) {
+          jQuery('#listingLibrariesTable').html('');
+          jQuery('#listingLibrariesTable').dataTable({
+            "aaData": json.array,
+            "aoColumns": [
+              { "sTitle": "Library Name", "sType": "no-lib"},
+              { "sTitle": "Alias"},
+              { "sTitle": "Type"},
+              { "sTitle": "Sample Name", "sType": "no-sam"},
+              { "sTitle": "QC Passed"},
+              { "sTitle": "Edit"},
+              { "sTitle": "ID", "bVisible": false}
+            ],
+            "bJQueryUI": true,
+            "bAutoWidth": false,
+            "iDisplayLength": 25,
+            "aaSorting": [
+              [0, "desc"]
+            ]
+          });
+        }
       }
     );
   }
