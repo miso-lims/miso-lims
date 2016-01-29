@@ -34,6 +34,37 @@ var Plate = Plate || {
               }
       );
     }
+  },
+
+  validatePlate: function () {
+    Validate.cleanFields('#plate-form');
+    jQuery('#plate-form').parsley().destroy();
+    
+    // Description input field validation
+    jQuery('#description').attr('class', 'form-control');
+    jQuery('#description').attr('data-parsley-required', 'true');
+    jQuery('#description').attr('data-parsley-maxlength', '100');
+    jQuery('#description').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+    
+    // Creation Date input field validation
+    jQuery('#creationdatepicker').attr('class', 'form-control');
+    jQuery('#creationdatepicker').attr('required', 'true');
+    jQuery('#creationdatepicker').attr('data-parsley-pattern', Utils.validation.dateRegex);
+    jQuery('#creationdatepicker').attr('data-date-format', 'DD/MM/YYYY');
+    jQuery('#creationdatepicker').attr('data-parsley-error-message', 'Date must be of form DD/MM/YYYY');
+    
+    // Plate Material Type radio button validation
+    jQuery('#plateMaterialType').attr('class', 'form-control');
+    jQuery('#plateMaterialType1').attr('required', 'true');
+    jQuery('#plateMaterialType').attr('data-parsley-error-message', 'You must select a Plate Material Type');
+    jQuery('#plateMaterialType1').attr('data-parsley-errors-container', '#plateMaterialError');
+    jQuery('#plateMaterialType').attr('data-parsley-class-handler', '#plateMaterialButtons');
+    
+    jQuery('#plate-form').parsley();
+    jQuery('#plate-form').parsley().validate();
+    
+    Validate.updateWarningOrSubmit('#plate-form');
+    return false;
   }
 };
 
