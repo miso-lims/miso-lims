@@ -31,18 +31,24 @@
 <script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.checkbox.js'/>" type="text/javascript"></script>
 <link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" type="text/css">
 
+<script type="text/javascript" src="<c:url value='/scripts/parsley/parsley.min.js'/>"></script>
+
 <div id="maincontent">
 <div id="contentcolumn">
-<form:form action="/miso/plate" method="POST" commandName="plate" autocomplete="off"
-           onsubmit="return validate_plate(this);">
+<form:form id="plate-form" data-parsley-validate="" action="/miso/plate" method="POST" commandName="plate" autocomplete="off">
 <sessionConversation:insertSessionConversationId attributeName="plate"/>
 <h1>
   <c:choose>
     <c:when test="${plate.id != 0}">Edit</c:when>
     <c:otherwise>Create</c:otherwise>
   </c:choose> Plate
-  <button type="submit" class="fg-button ui-state-default ui-corner-all">Save</button>
+  <button type="button" onclick="return Plate.validatePlate();" class="fg-button ui-state-default ui-corner-all">Save</button>
 </h1>
+
+<div class="bs-callout bs-callout-warning hidden">
+  <h2>Oh snap!</h2>
+  <p>This form seems to be invalid!</p>
+</div>
 
 <h2>Plate Information</h2>
 
@@ -162,8 +168,10 @@
         <c:when test="${plate.id == 0 or empty plate.plateMaterialType}">
           <td>Plate Material Type:</td>
           <td>
-            <form:radiobuttons id="plateMaterialType" path="plateMaterialType"
-                               onchange="Plate.tagbarcode.getPlateBarcodesByMaterialType(this);"/>
+            <div id="plateMaterialButtons">
+              <form:radiobuttons id="plateMaterialType" path="plateMaterialType"
+                                 onchange="Plate.tagbarcode.getPlateBarcodesByMaterialType(this);"/>
+            </div>
           </td>
         </c:when>
         <c:otherwise>
@@ -171,6 +179,14 @@
           <td>${plate.plateMaterialType}</td>
         </c:otherwise>
       </c:choose>
+    </tr>
+    <tr>
+      <td></td>
+      <td>
+        <div class="parsley-errors-list filled" id="plateMaterialError">
+          <div class="parsley-required"></div>
+        </div>
+      </td>
     </tr>
     <tr>
       <td id="plateBarcodeSelect">
@@ -239,6 +255,12 @@
     </c:if>
   --%>
   </form:form>
+  
+  <script type="text/javascript">
+    jQuery(document).ready(function () {
+      Validate.attachParsley('#plate-form');
+    });
+  </script>
 
   <a name="plate_elements"></a>
 

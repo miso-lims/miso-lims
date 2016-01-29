@@ -64,11 +64,11 @@ var Pool = Pool || {
     jQuery('#concentration').attr('data-parsley-type', 'number');
 
     // Creation Date input field validation
-    jQuery('creationDate').attr('class', 'form-control');
-    jQuery('creationDate').attr('required', 'true');
-    jQuery('creationDate').attr('data-parsley-pattern', Utils.validation.dateRegex);
-    jQuery('creationDate').attr('data-date-format', 'DD/MM/YYYY');
-    jQuery('creationDate').attr('data-parsley-error-message', 'Date must be of form DD/MM/YYYY');
+    jQuery('#creationDate').attr('class', 'form-control');
+    jQuery('#creationDate').attr('required', 'true');
+    jQuery('#creationDate').attr('data-parsley-pattern', Utils.validation.dateRegex);
+    jQuery('#creationDate').attr('data-date-format', 'DD/MM/YYYY');
+    jQuery('#creationDate').attr('data-parsley-error-message', 'Date must be of form DD/MM/YYYY');
 
     jQuery('#pool-form').parsley();
     jQuery('#pool-form').parsley().validate();
