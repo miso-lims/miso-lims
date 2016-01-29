@@ -259,7 +259,6 @@ Box.ui = {
               { "sTitle" : "Location" },
               { "sTitle" : "Items/Capacity" },
               { "sTitle" : "Size" },
-              { "sTitle" : "Barcode" },
               { "sTitle" : "Box Use" },
               { "sTitle" : "ID", "bVisible": false }
             ],

@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
@@ -95,16 +97,17 @@ public class BoxControllerHelperService {
       JSONObject j = new JSONObject();
       JSONArray jsonArray = new JSONArray();
       for (Box box : requestManager.listAllBoxes()) {
-        jsonArray.add("['" +
-          TableUtils.hyperLinkify("/miso/box/" + box.getId(), box.getName(), true) + "','" +
-          TableUtils.hyperLinkify("/miso/box/" + box.getId(), box.getAlias()) + "','" +
-          box.getLocationBarcode() + "','" + 
-          (box.getSize().getRows() * box.getSize().getColumns() - box.getFree()) + "/" + 
-          box.getSize().getRows() * box.getSize().getColumns() + "','" +
-          box.getSize().getRows() + "x" + box.getSize().getColumns() + "','" +
-          (box.getIdentificationBarcode() != null ? box.getIdentificationBarcode() : "") + "','" +
-          box.getUse().getAlias() + "','" +
-          (box.getIdentificationBarcode() != null ? box.getIdentificationBarcode() : "") + "']");
+        JSONArray inner = new JSONArray();
+        inner.add(TableUtils.hyperLinkify("/miso/box/" + box.getId(), box.getName()));
+        inner.add(TableUtils.hyperLinkify("/miso/box/" + box.getId(), box.getAlias()));
+        inner.add(box.getLocationBarcode());
+        inner.add(box.getSize().getRows() * box.getSize().getColumns() - box.getFree() + "/" +
+                  box.getSize().getRows() * box.getSize().getColumns());
+        inner.add(box.getSize());
+        inner.add(box.getUse());
+        inner.add(isStringEmptyOrNull(box.getIdentificationBarcode()) ? "" : box.getIdentificationBarcode());
+        
+        jsonArray.add(inner);
       }
       j.put("array", jsonArray);
       return j;

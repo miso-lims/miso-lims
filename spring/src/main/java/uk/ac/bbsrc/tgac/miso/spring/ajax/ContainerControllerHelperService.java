@@ -907,17 +907,16 @@ public class ContainerControllerHelperService {
                 + sequencePartitionContainer.getRun().getSequencerReference().getPlatform().getNameAndModel() + "</a>";
           }
         }
-
-        jsonArray
-            .add("['"
-                + (sequencePartitionContainer.getIdentificationBarcode() != null ? sequencePartitionContainer.getIdentificationBarcode()
-                    : "")
-                + "','"
-                + (sequencePartitionContainer.getPlatform() != null && sequencePartitionContainer.getPlatform().getPlatformType() != null
-                    ? sequencePartitionContainer.getPlatform().getPlatformType().getKey() : "")
-                + "','" + run + "','" + sequencer + "','" + "<a href=\"/miso/container/" + sequencePartitionContainer.getId()
-                + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']");
-
+        
+        JSONArray inner = new JSONArray();
+        inner.add((sequencePartitionContainer.getIdentificationBarcode() != null ? sequencePartitionContainer.getIdentificationBarcode() : ""));
+        inner.add((sequencePartitionContainer.getPlatform() != null && sequencePartitionContainer.getPlatform().getPlatformType() != null ?
+                   sequencePartitionContainer.getPlatform().getPlatformType().getKey() : ""));
+        inner.add(run);
+        inner.add(sequencer);
+        inner.add("<a href=\"/miso/container/" + sequencePartitionContainer.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>");
+        
+        jsonArray.add(inner);
       }
       j.put("array", jsonArray);
       return j;
