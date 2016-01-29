@@ -471,7 +471,6 @@ Library.barcode = {
             "</fieldset></form>");
 
     jQuery('#changeLibraryIdBarcodeDialog').dialog({
-      autoOpen: false,
       width: 400,
       modal: true,
       resizable: false,
@@ -484,7 +483,7 @@ Library.barcode = {
           jQuery(this).dialog('close');
         }
       }
-    }).dialog('open');
+    });
   },
 
   changeLibraryIdBarcode: function (libraryId, idBarcode) {

@@ -616,7 +616,6 @@ Pool.barcode = {
             "</fieldset></form>");
 
     jQuery('#changePoolIdBarcodeDialog').dialog({
-      autoOpen: false,
       width: 400,
       modal: true,
       resizable: false,
@@ -629,7 +628,7 @@ Pool.barcode = {
           jQuery(this).dialog('close');
         }
       }
-    }).dialog('open');
+    });
   },
 
   changePoolIdBarcode: function (poolId, idBarcode) {

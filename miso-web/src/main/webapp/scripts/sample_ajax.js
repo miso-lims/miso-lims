@@ -555,24 +555,21 @@ Sample.ui = {
             "<input type='text' name='idBarcodeInput' id='idBarcodeInput' class='text ui-widget-content ui-corner-all' />" +
             "</fieldset></form>");
 
-    jQuery(function () {
-      jQuery('#changeSampleIdBarcodeDialog').dialog({
-        autoOpen: false,
-        width: 400,
-        modal: true,
-        resizable: false,
-        buttons: {
-          "Save": function () {
-            self.changeSampleIdBarcode(sampleId, jQuery('#idBarcodeInput').val());
-            jQuery(this).dialog('close');
-          },
-          "Cancel": function () {
-            jQuery(this).dialog('close');
-          }
+
+    jQuery('#changeSampleIdBarcodeDialog').dialog({
+      width: 400,
+      modal: true,
+      resizable: false,
+      buttons: {
+        "Save": function () {
+          self.changeSampleIdBarcode(sampleId, jQuery('#idBarcodeInput').val());
+          jQuery(this).dialog('close');
+        },
+        "Cancel": function () {
+          jQuery(this).dialog('close');
         }
-      });
+      }
     });
-    jQuery('#changeSampleIdBarcodeDialog').dialog('open');
   },
 
   changeSampleIdBarcode: function (sampleId, idBarcode) {
