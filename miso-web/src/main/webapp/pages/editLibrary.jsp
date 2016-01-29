@@ -213,7 +213,7 @@
         <i>Unassigned</i>
       </c:when>
       <c:otherwise>
-        <a href='<c:url value="/miso/sample/${library.sample.id}"/>'>${library.sample.name}</a>
+        <a href='<c:url value="/miso/sample/${library.sample.id}"/>'>${library.sample.name} (${library.sample.alias})</a>
       </c:otherwise>
     </c:choose>
   </td>
@@ -441,7 +441,7 @@
     <tr>
       <td>Permissions</td>
       <td><i>Inherited from sample </i>
-        <a href='<c:url value="/miso/sample/${library.sample.id}"/>'>${library.sample.name}</a>
+        <a href='<c:url value="/miso/sample/${library.sample.id}"/>'>${library.sample.name} (${library.sample.alias})</a>
         <input type="hidden" value="${library.sample.securityProfile.profileId}"
                name="securityProfile" id="securityProfile"/>
       </td>
