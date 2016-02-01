@@ -1,3 +1,4 @@
+DROP TRIGGER IF EXISTS SampleChange;
 CREATE TRIGGER SampleChange BEFORE UPDATE ON Sample
 FOR EACH ROW
   INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message) VALUES (
@@ -38,10 +39,12 @@ FOR EACH ROW
         CASE WHEN NEW.emptied <> OLD.emptied THEN CONCAT('emptied: ', OLD.emptied, ' → ', NEW.emptied) END,
         CASE WHEN (NEW.volume IS NULL) <> (OLD.volume IS NULL) OR NEW.volume <> OLD.volume THEN CONCAT('volume: ', COALESCE(OLD.volume, 'n/a'), ' → ', COALESCE(NEW.volume, 'n/a')) END)));
 
+DROP TRIGGER IF EXISTS BeforeInsertSample;
 CREATE TRIGGER BeforeInsertSample BEFORE INSERT ON Sample
   FOR EACH ROW
   SET NEW.boxPositionId = nextval('box_position_seq');
 
+DROP TRIGGER IF EXISTS SampleInsert;
 CREATE TRIGGER SampleInsert AFTER INSERT ON Sample
 FOR EACH ROW
   INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message) VALUES (
@@ -52,6 +55,7 @@ FOR EACH ROW
       (SELECT fullname FROM User WHERE userId = NEW.lastModifier),
       ' created sample.'));
 
+DROP TRIGGER IF EXISTS PlateChange;
 CREATE TRIGGER PlateChange BEFORE UPDATE ON Plate
 FOR EACH ROW
   INSERT INTO PlateChangeLog(plateId, columnsChanged, userId, message) VALUES (
@@ -73,6 +77,7 @@ FOR EACH ROW
         CASE WHEN (NEW.tagBarcodeId IS NULL) <> (OLD.tagBarcodeId IS NULL) OR NEW.tagBarcodeId <> OLD.tagBarcodeId THEN CONCAT('tag barcode: ', COALESCE(OLD.tagBarcodeId, 'n/a'), ' → ', COALESCE(NEW.tagBarcodeId, 'n/a')) END,
         CASE WHEN NEW.description <> OLD.description THEN CONCAT('description: ', OLD.description, ' → ', NEW.description) END)));
 
+DROP TRIGGER IF EXISTS PlateInsert;
 CREATE TRIGGER PlateInsert AFTER INSERT ON Plate
 FOR EACH ROW
   INSERT INTO PlateChangeLog(sampleId, columnsChanged, userId, message) VALUES (
@@ -83,6 +88,7 @@ FOR EACH ROW
       (SELECT fullname FROM User WHERE userId = NEW.lastModifier),
       ' created plate.'));
 
+DROP TRIGGER IF EXISTS RunChange;
 CREATE TRIGGER RunChange BEFORE UPDATE ON Run
 FOR EACH ROW
   INSERT INTO RunChangeLog(runId, columnsChanged, userId, message) VALUES (
@@ -115,6 +121,7 @@ FOR EACH ROW
         CASE WHEN (NEW.sequencerReference_sequencerReferenceId IS NULL) <> (OLD.sequencerReference_sequencerReferenceId IS NULL) OR NEW.sequencerReference_sequencerReferenceId <> OLD.sequencerReference_sequencerReferenceId THEN CONCAT('sequencer: ', COALESCE((SELECT name FROM SequencerReference WHERE referenceId = OLD.sequencerReference_sequencerReferenceId), 'n/a'), ' → ', COALESCE((SELECT name FROM SequencerReference WHERE referenceId = NEW.sequencerReference_sequencerReferenceId), 'n/a')) END,
         CASE WHEN (NEW.status_statusId IS NULL) <> (OLD.status_statusId IS NULL) OR NEW.status_statusId <> OLD.status_statusId THEN 'status' END)));
 
+DROP TRIGGER IF EXISTS RunInsert;
 CREATE TRIGGER RunInsert AFTER INSERT ON Run
 FOR EACH ROW
   INSERT INTO RunChangeLog(runId, columnsChanged, userId, message) VALUES (
@@ -125,6 +132,7 @@ FOR EACH ROW
       (SELECT fullname FROM User WHERE userId = NEW.lastModifier),
       ' created run.'));
 
+DROP TRIGGER IF EXISTS PoolChange;
 CREATE TRIGGER PoolChange BEFORE UPDATE ON Pool
 FOR EACH ROW
   INSERT INTO PoolChangeLog(poolId, columnsChanged, userId, message) VALUES (
@@ -152,6 +160,7 @@ FOR EACH ROW
         CASE WHEN (NEW.qcPassed IS NULL) <> (OLD.qcPassed IS NULL) OR (NEW.qcPassed IS NULL) <> (OLD.qcPassed IS NULL) OR NEW.qcPassed <> OLD.qcPassed THEN CONCAT('QC passed: ', COALESCE(OLD.qcPassed, 'n/a'), ' → ', COALESCE(NEW.qcPassed, 'n/a')) END,
         CASE WHEN NEW.ready <> OLD.ready THEN CONCAT('ready: ', OLD.ready, ' → ', NEW.ready) END)));
 
+DROP TRIGGER IF EXISTS PoolInsert;
 CREATE TRIGGER PoolInsert AFTER INSERT ON Pool
 FOR EACH ROW
   INSERT INTO PoolChangeLog(poolId, columnsChanged, userId, message) VALUES (
@@ -162,6 +171,7 @@ FOR EACH ROW
       (SELECT fullname FROM User WHERE userId = NEW.lastModifier),
       ' created pool.'));
 
+DROP TRIGGER IF EXISTS ExperimentChange;
 CREATE TRIGGER ExperimentChange BEFORE UPDATE ON Experiment
 FOR EACH ROW
   INSERT INTO ExperimentChangeLog(experimentId, columnsChanged, userId, message) VALUES (
@@ -187,6 +197,7 @@ FOR EACH ROW
         CASE WHEN (NEW.study_studyId IS NULL) <> (OLD.study_studyId IS NULL) OR NEW.study_studyId <> OLD.study_studyId THEN CONCAT('study: ', COALESCE((SELECT name FROM Study WHERE studyId = OLD.study_studyId), 'n/a'), ' → ', COALESCE((SELECT name FROM Study WHERE studyId = NEW.study_studyId), 'n/a')) END,
         CASE WHEN NEW.title <> OLD.title THEN CONCAT('title: ', OLD.title, ' → ', NEW.title) END)));
 
+DROP TRIGGER IF EXISTS ExperimentInsert;
 CREATE TRIGGER ExperimentInsert AFTER INSERT ON Experiment
 FOR EACH ROW
   INSERT INTO ExperimentChangeLog(experimentId, columnsChanged, userId, message) VALUES (
@@ -197,6 +208,7 @@ FOR EACH ROW
       (SELECT fullname FROM User WHERE userId = NEW.lastModifier),
       ' created experiment.'));
 
+DROP TRIGGER IF EXISTS LibraryChange;
 CREATE TRIGGER LibraryChange BEFORE UPDATE ON Library
 FOR EACH ROW
   INSERT INTO LibraryChangeLog(libraryId, columnsChanged, userId, message) VALUES (
@@ -240,11 +252,13 @@ FOR EACH ROW
         CASE WHEN NEW.emptied <> OLD.emptied THEN CONCAT('emptied: ', OLD.emptied, ' → ', NEW.emptied) END,
         CASE WHEN (NEW.volume IS NULL) <> (OLD.volume IS NULL) OR NEW.volume <> OLD.volume THEN CONCAT('volume: ', COALESCE(OLD.volume, 'n/a'), ' → ', COALESCE(NEW.volume, 'n/a')) END)));
 
+DROP TRIGGER IF EXISTS BeforeInsertLibrary;
 CREATE TRIGGER BeforeInsertLibrary BEFORE INSERT ON Library
   FOR EACH ROW
   SET NEW.boxPositionId = nextval('box_position_seq');
 
 
+DROP TRIGGER IF EXISTS LibraryInsert;
 CREATE TRIGGER LibraryInsert AFTER INSERT ON Library
 FOR EACH ROW
   INSERT INTO LibraryChangeLog(libraryId, columnsChanged, userId, message) VALUES (
@@ -255,6 +269,7 @@ FOR EACH ROW
       (SELECT fullname FROM User WHERE userId = NEW.lastModifier),
       ' created library.'));
 
+DROP TRIGGER IF EXISTS StudyChange;
 CREATE TRIGGER StudyChange BEFORE UPDATE ON Study
 FOR EACH ROW
   INSERT INTO StudyChangeLog(studyId, columnsChanged, userId, message) VALUES (
@@ -278,6 +293,7 @@ FOR EACH ROW
         CASE WHEN NEW.project_projectId <> OLD.project_projectId THEN CONCAT('project: ', COALESCE((SELECT name FROM Project WHERE projectId = OLD.project_projectId), 'n/a'), ' → ', COALESCE((SELECT name FROM Project WHERE projectId = NEW.project_projectId), 'n/a')) END,
         CASE WHEN NEW.studyType <> OLD.studyType THEN CONCAT('type: ', COALESCE((SELECT name FROM StudyType WHERE typeId = OLD.studyType), 'n/a'), ' → ', COALESCE((SELECT name FROM StudyType WHERE typeId = NEW.studyType), 'n/a')) END)));
 
+DROP TRIGGER IF EXISTS StudyInsert;
 CREATE TRIGGER StudyInsert AFTER INSERT ON Study
 FOR EACH ROW
   INSERT INTO StudyChangeLog(studyId, columnsChanged, userId, message) VALUES (
@@ -289,6 +305,7 @@ FOR EACH ROW
       ' created study.'));
 
 
+DROP TRIGGER IF EXISTS SequencerPartitionContainerChange;
 CREATE TRIGGER SequencerPartitionContainerChange BEFORE UPDATE ON SequencerPartitionContainer
 FOR EACH ROW
   INSERT INTO SequencerPartitionContainerChangeLog(containerId, columnsChanged, userId, message) VALUES (
@@ -308,6 +325,7 @@ FOR EACH ROW
         CASE WHEN (NEW.platform IS NULL) <> (OLD.platform IS NULL) OR NEW.platform <> OLD.platform THEN CONCAT('platform: ', COALESCE(OLD.platform, 'n/a'), ' → ', COALESCE(NEW.platform, 'n/a')) END,
         CASE WHEN (NEW.validationBarcode IS NULL) <> (OLD.validationBarcode IS NULL) OR NEW.validationBarcode <> OLD.validationBarcode THEN CONCAT('validation barcode: ', COALESCE(OLD.validationBarcode, 'n/a'), ' → ', COALESCE(NEW.validationBarcode, 'n/a')) END)));
 
+DROP TRIGGER IF EXISTS SequencerPartitionContainerInsert;
 CREATE TRIGGER SequencerPartitionContainerInsert AFTER INSERT ON SequencerPartitionContainer
 FOR EACH ROW
   INSERT INTO SequencerPartitionContainerChangeLog(containerId, columnsChanged, userId, message) VALUES (
@@ -318,6 +336,7 @@ FOR EACH ROW
       (SELECT fullname FROM User WHERE userId = NEW.lastModifier),
       ' created container.'));
 
+DROP TRIGGER IF EXISTS BoxChange;
 DELIMITER //
 CREATE TRIGGER BoxChange BEFORE UPDATE ON Box
 FOR EACH ROW
@@ -348,6 +367,7 @@ FOR EACH ROW
   END//
 DELIMITER ;
 
+DROP TRIGGER IF EXISTS BoxInsert ;
 CREATE TRIGGER BoxInsert AFTER INSERT ON Box
 FOR EACH ROW
   INSERT INTO BoxChangeLog(boxId, columnsChanged, userId, message) VALUES (
