@@ -11,17 +11,16 @@ INSERT INTO BoxUse (alias) VALUES
   ('Sequencing'),
   ('Plate');
 
-DELETE FROM `LibraryDesignType`;
-INSERT INTO LibraryDesignType (name, description) VALUES
-  ('WG', 'Whole genome'),
-  ('EX', 'Exome'),
-  ('TS', 'Targeted sequencing'),
-  ('TR', 'Total RNA library (no selection)'),
-  ('WT', 'Whole transcriptome'),
-  ('SM', 'smRNA'),
-  ('MR', 'mRNA'),
-  ('CH', 'ChIP'),
-  ('BS', 'Bisulphite');
+--INSERT INTO LibraryDesignType (name, description) VALUES
+--  ('WG', 'Whole genome'),
+--  ('EX', 'Exome'),
+--  ('TS', 'Targeted sequencing'),
+--  ('TR', 'Total RNA library (no selection)'),
+--  ('WT', 'Whole transcriptome'),
+--  ('SM', 'smRNA'),
+--  ('MR', 'mRNA'),
+--  ('CH', 'ChIP'),
+--  ('BS', 'Bisulphite');
 
 INSERT INTO `LibraryType` (description, platformType) VALUES
   ('cDNA', 'PacBio'),
@@ -494,54 +493,54 @@ INSERT INTO TagBarcodes (name, sequence, platformName, strategyName) VALUES
   ('H10', 'ACAGATTC', 'Illumina', 'SureSelect XT2'),
   ('H11', 'AATCCGTC', 'Illumina', 'SureSelect XT2'),
   ('H12', 'ACAAGCTA', 'Illumina', 'SureSelect XT2'),
-  ("01", "CGATGT", "Illumina", "NEXTflex 6bp"),
-  ("02", "TGACCA", "Illumina", "NEXTflex 6bp"),
-  ("03", "ACAGTG", "Illumina", "NEXTflex 6bp"),
-  ("04", "GCCAAT", "Illumina", "NEXTflex 6bp"),
-  ("05", "CAGATC", "Illumina", "NEXTflex 6bp"),
-  ("06", "CTTGTA", "Illumina", "NEXTflex 6bp"),
-  ("07", "ATCACG", "Illumina", "NEXTflex 6bp"),
-  ("08", "TTAGGC", "Illumina", "NEXTflex 6bp"),
-  ("09", "ACTTGA", "Illumina", "NEXTflex 6bp"),
-  ("10", "GATCAG", "Illumina", "NEXTflex 6bp"),
-  ("11", "TAGCTT", "Illumina", "NEXTflex 6bp"),
-  ("12", "GGCTAC", "Illumina", "NEXTflex 6bp"),
-  ("13", "AGTCAA", "Illumina", "NEXTflex 6bp"),
-  ("14", "AGTTCC", "Illumina", "NEXTflex 6bp"),
-  ("15", "ATGTCA", "Illumina", "NEXTflex 6bp"),
-  ("16", "CCGTCC", "Illumina", "NEXTflex 6bp"),
-  ("17", "GTAGAG", "Illumina", "NEXTflex 6bp"),
-  ("18", "GTCCGC", "Illumina", "NEXTflex 6bp"),
-  ("19", "GTGAAA", "Illumina", "NEXTflex 6bp"),
-  ("20", "GTGGCC", "Illumina", "NEXTflex 6bp"),
-  ("21", "GTTTCG", "Illumina", "NEXTflex 6bp"),
-  ("22", "CGTACG", "Illumina", "NEXTflex 6bp"),
-  ("23", "GAGTGG", "Illumina", "NEXTflex 6bp"),
-  ("24", "GGTAGC", "Illumina", "NEXTflex 6bp"),
-  ("25", "ACTGAT", "Illumina", "NEXTflex 6bp"),
-  ("26", "ATGAGC", "Illumina", "NEXTflex 6bp"),
-  ("27", "ATTCCT", "Illumina", "NEXTflex 6bp"),
-  ("28", "CAAAAG", "Illumina", "NEXTflex 6bp"),
-  ("29", "CAACTA", "Illumina", "NEXTflex 6bp"),
-  ("30", "CACCGG", "Illumina", "NEXTflex 6bp"),
-  ("31", "CACGAT", "Illumina", "NEXTflex 6bp"),
-  ("32", "CACTCA", "Illumina", "NEXTflex 6bp"),
-  ("33", "CAGGCG", "Illumina", "NEXTflex 6bp"),
-  ("34", "CATGGC", "Illumina", "NEXTflex 6bp"),
-  ("35", "CATTTT", "Illumina", "NEXTflex 6bp"),
-  ("36", "CCAACA", "Illumina", "NEXTflex 6bp"),
-  ("37", "CGGAAT", "Illumina", "NEXTflex 6bp"),
-  ("38", "CTAGCT", "Illumina", "NEXTflex 6bp"),
-  ("39", "CTATAC", "Illumina", "NEXTflex 6bp"),
-  ("40", "CTCAGA", "Illumina", "NEXTflex 6bp"),
-  ("41", "GCGCTA", "Illumina", "NEXTflex 6bp"),
-  ("42", "TAATCG", "Illumina", "NEXTflex 6bp"),
-  ("43", "TACAGC", "Illumina", "NEXTflex 6bp"),
-  ("44", "TATAAT", "Illumina", "NEXTflex 6bp"),
-  ("45", "TCATTC", "Illumina", "NEXTflex 6bp"),
-  ("46", "TCCCGA", "Illumina", "NEXTflex 6bp"),
-  ("47", "TCGAAG", "Illumina", "NEXTflex 6bp"),
-  ("48", "TCGGCA", "Illumina", "NEXTflex 6bp");
+  ('01', 'CGATGT', 'Illumina', 'NEXTflex 6bp'),
+  ('02', 'TGACCA', 'Illumina', 'NEXTflex 6bp'),
+  ('03', 'ACAGTG', 'Illumina', 'NEXTflex 6bp'),
+  ('04', 'GCCAAT', 'Illumina', 'NEXTflex 6bp'),
+  ('05', 'CAGATC', 'Illumina', 'NEXTflex 6bp'),
+  ('06', 'CTTGTA', 'Illumina', 'NEXTflex 6bp'),
+  ('07', 'ATCACG', 'Illumina', 'NEXTflex 6bp'),
+  ('08', 'TTAGGC', 'Illumina', 'NEXTflex 6bp'),
+  ('09', 'ACTTGA', 'Illumina', 'NEXTflex 6bp'),
+  ('10', 'GATCAG', 'Illumina', 'NEXTflex 6bp'),
+  ('11', 'TAGCTT', 'Illumina', 'NEXTflex 6bp'),
+  ('12', 'GGCTAC', 'Illumina', 'NEXTflex 6bp'),
+  ('13', 'AGTCAA', 'Illumina', 'NEXTflex 6bp'),
+  ('14', 'AGTTCC', 'Illumina', 'NEXTflex 6bp'),
+  ('15', 'ATGTCA', 'Illumina', 'NEXTflex 6bp'),
+  ('16', 'CCGTCC', 'Illumina', 'NEXTflex 6bp'),
+  ('17', 'GTAGAG', 'Illumina', 'NEXTflex 6bp'),
+  ('18', 'GTCCGC', 'Illumina', 'NEXTflex 6bp'),
+  ('19', 'GTGAAA', 'Illumina', 'NEXTflex 6bp'),
+  ('20', 'GTGGCC', 'Illumina', 'NEXTflex 6bp'),
+  ('21', 'GTTTCG', 'Illumina', 'NEXTflex 6bp'),
+  ('22', 'CGTACG', 'Illumina', 'NEXTflex 6bp'),
+  ('23', 'GAGTGG', 'Illumina', 'NEXTflex 6bp'),
+  ('24', 'GGTAGC', 'Illumina', 'NEXTflex 6bp'),
+  ('25', 'ACTGAT', 'Illumina', 'NEXTflex 6bp'),
+  ('26', 'ATGAGC', 'Illumina', 'NEXTflex 6bp'),
+  ('27', 'ATTCCT', 'Illumina', 'NEXTflex 6bp'),
+  ('28', 'CAAAAG', 'Illumina', 'NEXTflex 6bp'),
+  ('29', 'CAACTA', 'Illumina', 'NEXTflex 6bp'),
+  ('30', 'CACCGG', 'Illumina', 'NEXTflex 6bp'),
+  ('31', 'CACGAT', 'Illumina', 'NEXTflex 6bp'),
+  ('32', 'CACTCA', 'Illumina', 'NEXTflex 6bp'),
+  ('33', 'CAGGCG', 'Illumina', 'NEXTflex 6bp'),
+  ('34', 'CATGGC', 'Illumina', 'NEXTflex 6bp'),
+  ('35', 'CATTTT', 'Illumina', 'NEXTflex 6bp'),
+  ('36', 'CCAACA', 'Illumina', 'NEXTflex 6bp'),
+  ('37', 'CGGAAT', 'Illumina', 'NEXTflex 6bp'),
+  ('38', 'CTAGCT', 'Illumina', 'NEXTflex 6bp'),
+  ('39', 'CTATAC', 'Illumina', 'NEXTflex 6bp'),
+  ('40', 'CTCAGA', 'Illumina', 'NEXTflex 6bp'),
+  ('41', 'GCGCTA', 'Illumina', 'NEXTflex 6bp'),
+  ('42', 'TAATCG', 'Illumina', 'NEXTflex 6bp'),
+  ('43', 'TACAGC', 'Illumina', 'NEXTflex 6bp'),
+  ('44', 'TATAAT', 'Illumina', 'NEXTflex 6bp'),
+  ('45', 'TCATTC', 'Illumina', 'NEXTflex 6bp'),
+  ('46', 'TCCCGA', 'Illumina', 'NEXTflex 6bp'),
+  ('47', 'TCGAAG', 'Illumina', 'NEXTflex 6bp'),
+  ('48', 'TCGGCA', 'Illumina', 'NEXTflex 6bp');
 
 INSERT INTO QCType (name, description, qcTarget, units) VALUES
   ('Bioanalyzer', 'Measures size of library, including adapters', 'Pool', 'bp'),
@@ -618,7 +617,7 @@ INSERT INTO TissueType (alias, description, createdBy, creationDate, updatedBy, 
   ('A','Cells taken from Ascites fluid',1,NOW(),1,NOW()),
   ('O','Organoid',1,NOW(),1,NOW());
 
-INSERT INTO TissueType (alias, description, createdBy, creationDate, updatedBy, lastUpdated) VALUES
+INSERT INTO TissueMaterial (alias, description, createdBy, creationDate, updatedBy, lastUpdated) VALUES
   ('Fresh Frozen','Fresh Frozen',1,NOW(),1,NOW()),
   ('FFPE','FFPE',1,NOW(),1,NOW()),
   ('Blood','Blood',1,NOW(),1,NOW());
@@ -647,27 +646,27 @@ INSERT INTO QcPassedDetail (status, description, noteRequired, createdBy, creati
   ('false','Reference Required',false,1,NOW(),1,NOW()),
   ('false','Refused Consent',false,1,NOW(),1,NOW());
 
-INSERT INTO Institute (alias) VALUES
-  ('BioBank','Ontario Institute for Cancer Research');
-  ('BioBank','University Health Network');
-  ('Brad Wouters','University Health Network');
-  ('Catherine OBrien','University Health Network');
-  ('John Bell','Ontario Institute for Cancer Research');
-  ('Ming Tsao','University Health Network');
-  ('Not Specified','Kingston General Hospital');
-  ('Not Specified','Massachusetts General Hospital');
-  ('Not Specified','Mayo Clinic');
-  ('Not Specified','Ontario Institute for Cancer Research');
-  ('Not Specified','OPCS');
-  ('Not Specified','Ottawa Hospital Research Institute');
-  ('Not Specified','Sheba Medical Center');
-  ('Not Specified','St Josephs Healthcare Hamilton');
-  ('Not Specified','St Josephs Health Centre (Toronto)');
-  ('Not Specified','Sunnybrook Health Sciences Centre');
-  ('Not Specified','UHN McGill');
-  ('Not Specified','University Health Network');
-  ('Not Specified','University of Nebraska Medical Center');
-  ('Pathology','Ontario Institute for Cancer Research');
-  ('Steve Gallinger','Sunnybrook Health Sciences Centre');
-  ('Steve Gallinger','University Health Network');
+INSERT INTO Institute (alias, lab, createdBy, creationDate, updatedBy, lastUpdated) VALUES
+  ('BioBank','Ontario Institute for Cancer Research',1,NOW(),1,NOW()),
+  ('BioBank','University Health Network',1,NOW(),1,NOW()),
+  ('Brad Wouters','University Health Network',1,NOW(),1,NOW()),
+  ('Catherine OBrien','University Health Network',1,NOW(),1,NOW()),
+  ('John Bell','Ontario Institute for Cancer Research',1,NOW(),1,NOW()),
+  ('Ming Tsao','University Health Network',1,NOW(),1,NOW()),
+  ('Not Specified','Kingston General Hospital',1,NOW(),1,NOW()),
+  ('Not Specified','Massachusetts General Hospital',1,NOW(),1,NOW()),
+  ('Not Specified','Mayo Clinic',1,NOW(),1,NOW()),
+  ('Not Specified','Ontario Institute for Cancer Research',1,NOW(),1,NOW()),
+  ('Not Specified','OPCS',1,NOW(),1,NOW()),
+  ('Not Specified','Ottawa Hospital Research Institute',1,NOW(),1,NOW()),
+  ('Not Specified','Sheba Medical Center',1,NOW(),1,NOW()),
+  ('Not Specified','St Josephs Healthcare Hamilton',1,NOW(),1,NOW()),
+  ('Not Specified','St Josephs Health Centre (Toronto)',1,NOW(),1,NOW()),
+  ('Not Specified','Sunnybrook Health Sciences Centre',1,NOW(),1,NOW()),
+  ('Not Specified','UHN McGill',1,NOW(),1,NOW()),
+  ('Not Specified','University Health Network',1,NOW(),1,NOW()),
+  ('Not Specified','University of Nebraska Medical Center',1,NOW(),1,NOW()),
+  ('Pathology','Ontario Institute for Cancer Research',1,NOW(),1,NOW()),
+  ('Steve Gallinger','Sunnybrook Health Sciences Centre',1,NOW(),1,NOW()),
+  ('Steve Gallinger','University Health Network',1,NOW(),1,NOW());
 
