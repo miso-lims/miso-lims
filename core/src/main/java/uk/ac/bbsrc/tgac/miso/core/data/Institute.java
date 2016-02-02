@@ -13,6 +13,10 @@ public interface Institute {
   String getAlias();
 
   void setAlias(String alias);
+  
+  String getLab();
+  
+  void setLab(String lab);
 
   User getCreatedBy();
 

@@ -292,11 +292,13 @@ CREATE TABLE `SampleValidRelationship` (
 
 CREATE TABLE `Institute` (
   `instituteId` bigint(20) PRIMARY KEY AUTO_INCREMENT,
-  `alias` varchar(255) NOT NULL UNIQUE,
+  `alias` varchar(255) NOT NULL,
+  `lab` varchar(255) NOT NULL,
   `createdBy` bigint(20) NOT NULL,
   `creationDate` datetime NOT NULL,
   `updatedBy` bigint(20) NOT NULL,
   `lastUpdated` datetime NOT NULL,
+  UNIQUE KEY `institute_alias_lab` (`alias`,`lab`),
   CONSTRAINT `institute_createUser_fkey` FOREIGN KEY (`createdBy`) REFERENCES `User` (`userId`),
   CONSTRAINT `institute_updateUser_fkey` FOREIGN KEY (`updatedBy`) REFERENCES `User` (`userId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

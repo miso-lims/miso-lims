@@ -543,6 +543,7 @@ public class Dtos {
     InstituteDto dto = new InstituteDto();
     dto.setId(from.getId());
     dto.setAlias(from.getAlias());
+    dto.setLab(from.getLab());
     dto.setCreatedById(from.getCreatedBy().getUserId());
     dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
     dto.setUpdatedById(from.getUpdatedBy().getUserId());
@@ -561,6 +562,7 @@ public class Dtos {
   public static Institute to(InstituteDto from) {
     Institute to = new InstituteImpl();
     to.setAlias(from.getAlias());
+    to.setLab(from.getLab());
     return to;
   }
 

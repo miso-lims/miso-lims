@@ -36,6 +36,7 @@ public class HibernateInstituteDaoTest extends AbstractDAOTest {
     assertNotNull(i);
     assertEquals(Long.valueOf(1L), i.getId());
     assertEquals("Institute A", i.getAlias());
+    assertEquals("Lab A", i.getLab());
   }
   
   @Test
@@ -46,17 +47,18 @@ public class HibernateInstituteDaoTest extends AbstractDAOTest {
 
   @Test
   public void testAddInstitute() {
-    Institute i = makeInstitute("Test Institute");
+    Institute i = makeInstitute("Test Institute", "Test Lab");
     final Long newId = dao.addInstitute(i);
     Institute saved = dao.getInstitute(newId);
     assertEquals(i.getAlias(), saved.getAlias());
+    assertEquals(i.getLab(), saved.getLab());
     assertNotNull(i.getCreationDate());
     assertNotNull(i.getLastUpdated());
   }
 
   @Test
   public void testDeleteInstitute() {
-    Institute i = makeInstitute("Test Institute");
+    Institute i = makeInstitute("Test Institute", "Test Lab");
     final Long newId = dao.addInstitute(i);
     Institute saved = dao.getInstitute(newId);
     assertNotNull(saved);
@@ -69,17 +71,21 @@ public class HibernateInstituteDaoTest extends AbstractDAOTest {
     Institute i = dao.getInstitute(1L);
     final Date oldDate = i.getLastUpdated();
     final String newAlias = "Changed Alias";
+    final String newLab = "Changed Lab";
     i.setAlias(newAlias);
+    i.setLab(newLab);
     
     dao.update(i);
     Institute updated = dao.getInstitute(1L);
     assertEquals(newAlias, updated.getAlias());
+    assertEquals(newLab, updated.getLab());
     assertFalse(oldDate.equals(updated.getLastUpdated()));
   }
   
-  private Institute makeInstitute(String alias) {
+  private Institute makeInstitute(String alias, String lab) {
     Institute i = new InstituteImpl();
     i.setAlias(alias);
+    i.setLab(lab);
     User user = new UserImpl();
     user.setUserId(1L);
     i.setCreatedBy(user);

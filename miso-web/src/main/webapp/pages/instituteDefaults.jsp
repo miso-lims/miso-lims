@@ -132,7 +132,7 @@
     <table id="allInstitutesTable" class="clear default-table" data-sortable>
       <thead>
         <tr>
-          <th>Name</th>
+          <th>Alias</th><th>Lab</th>
         </tr>
       </thead>
       <tbody id="allInstitutes" class="In"></tbody>
@@ -168,6 +168,7 @@
     Tissue.getSamplePurposes();
     QC.getQcDetails();
     Subproject.getProjects();
+    Institute.getInstitutes();
     Hierarchy.getSampleCategories(); // callback within this creates Relationships table as well
   });
 </script>

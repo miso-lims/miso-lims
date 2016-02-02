@@ -27,6 +27,9 @@ public class InstituteImpl implements Institute {
   @Column(nullable = false)
   private String alias;
   
+  @Column(nullable = false)
+  private String lab;
+  
   @OneToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "createdBy", nullable = false)
   private User createdBy;
@@ -59,6 +62,16 @@ public class InstituteImpl implements Institute {
   @Override
   public void setAlias(String alias) {
     this.alias = alias;
+  }
+  
+  @Override
+  public String getLab() {
+    return lab;
+  }
+  
+  @Override
+  public void setLab(String lab) {
+    this.lab = lab;
   }
 
   @Override

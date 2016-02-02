@@ -46,6 +46,7 @@ public class DefaultInstituteService implements InstituteService {
   public void update(Institute institute) throws IOException {
     Institute updatedInstitute = get(institute.getId());
     updatedInstitute.setAlias(institute.getAlias());
+    updatedInstitute.setLab(institute.getLab());
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     updatedInstitute.setUpdatedBy(user);
     instituteDao.update(updatedInstitute);
