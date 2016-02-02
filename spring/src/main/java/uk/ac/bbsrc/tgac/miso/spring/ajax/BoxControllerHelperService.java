@@ -98,11 +98,12 @@ public class BoxControllerHelperService {
       JSONArray jsonArray = new JSONArray();
       for (Box box : requestManager.listAllBoxes()) {
         JSONArray inner = new JSONArray();
+        int filledPositions = box.getSize().getRows() * box.getSize().getColumns() - box.getFree();
+        int numPositions = box.getSize().getRows() * box.getSize().getColumns();
         inner.add(TableUtils.hyperLinkify("/miso/box/" + box.getId(), box.getName()));
         inner.add(TableUtils.hyperLinkify("/miso/box/" + box.getId(), box.getAlias()));
         inner.add(box.getLocationBarcode());
-        inner.add(box.getSize().getRows() * box.getSize().getColumns() - box.getFree() + "/" +
-                  box.getSize().getRows() * box.getSize().getColumns());
+        inner.add(filledPositions + "/" + numPositions);
         inner.add(box.getSize());
         inner.add(box.getUse());
         inner.add(isStringEmptyOrNull(box.getIdentificationBarcode()) ? "" : box.getIdentificationBarcode());
