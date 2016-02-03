@@ -84,26 +84,26 @@ public class SampleAdditionalInfoController extends RestController {
         .buildAndExpand(sampleAdditionalInfoDto.getCreatedById()).toUriString());
     sampleAdditionalInfoDto.setUpdatedByUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}")
         .buildAndExpand(sampleAdditionalInfoDto.getUpdatedById()).toUriString());
-    sampleAdditionalInfoDto.setSampleUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/sample/{id}")
+    sampleAdditionalInfoDto.setSampleUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/sample/{id}")
         .buildAndExpand(sampleAdditionalInfoDto.getSampleId()).toUriString());
     if (sampleAdditionalInfoDto.getSampleClassId() != null) {
-      sampleAdditionalInfoDto.setSampleClassUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/sampleclass/{id}")
+      sampleAdditionalInfoDto.setSampleClassUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/sampleclass/{id}")
           .buildAndExpand(sampleAdditionalInfoDto.getSampleClassId()).toUriString());
     }
     if (sampleAdditionalInfoDto.getTissueOriginId() != null) {
-      sampleAdditionalInfoDto.setTissueOriginUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/tissueorigin/{id}")
+      sampleAdditionalInfoDto.setTissueOriginUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/tissueorigin/{id}")
           .buildAndExpand(sampleAdditionalInfoDto.getTissueOriginId()).toUriString());
     }
     if (sampleAdditionalInfoDto.getTissueTypeId() != null) {
-      sampleAdditionalInfoDto.setTissueTypeUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/tissuetype/{id}")
+      sampleAdditionalInfoDto.setTissueTypeUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/tissuetype/{id}")
           .buildAndExpand(sampleAdditionalInfoDto.getTissueTypeId()).toUriString());
     }
     if (sampleAdditionalInfoDto.getQcPassedDetailId() != null) {
-      sampleAdditionalInfoDto.setQcPassedDetailUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/qcpasseddetail/{id}")
+      sampleAdditionalInfoDto.setQcPassedDetailUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/qcpasseddetail/{id}")
           .buildAndExpand(sampleAdditionalInfoDto.getQcPassedDetailId()).toUriString());
     }
     if (sampleAdditionalInfoDto.getSubprojectId() != null) {
-      sampleAdditionalInfoDto.setSubprojectUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/subproject/{id}")
+      sampleAdditionalInfoDto.setSubprojectUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/subproject/{id}")
           .buildAndExpand(sampleAdditionalInfoDto.getSubprojectId()).toUriString());
     }
     return sampleAdditionalInfoDto;

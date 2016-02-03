@@ -82,13 +82,13 @@ public class SampleAnalyteController extends RestController {
         .buildAndExpand(sampleAnalyteDto.getCreatedById()).toUriString());
     sampleAnalyteDto.setUpdatedByUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}")
         .buildAndExpand(sampleAnalyteDto.getUpdatedById()).toUriString());
-    sampleAnalyteDto.setSampleUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/sample/{id}")
+    sampleAnalyteDto.setSampleUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/sample/{id}")
         .buildAndExpand(sampleAnalyteDto.getSampleId()).toUriString());
-    sampleAnalyteDto.setSamplePurposeUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/samplepurpose/{id}")
+    sampleAnalyteDto.setSamplePurposeUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/samplepurpose/{id}")
         .buildAndExpand(sampleAnalyteDto.getSamplePurposeId()).toUriString());
-    sampleAnalyteDto.setSampleGroupUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/samplegroup/{id}")
+    sampleAnalyteDto.setSampleGroupUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/samplegroup/{id}")
         .buildAndExpand(sampleAnalyteDto.getSampleGroupId()).toUriString());
-    sampleAnalyteDto.setTissueMaterialUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/tissuematerial/{id}")
+    sampleAnalyteDto.setTissueMaterialUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/tissuematerial/{id}")
         .buildAndExpand(sampleAnalyteDto.getTissueMaterialId()).toUriString());
     return sampleAnalyteDto;
   }

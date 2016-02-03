@@ -77,8 +77,8 @@ public class SampleController extends RestController {
   private static SampleDto writeUrls(SampleDto sampleDto, UriComponentsBuilder uriBuilder) {
     URI baseUri = uriBuilder.build().toUri();
     sampleDto.setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/fred/sample/{id}").buildAndExpand(sampleDto.getId()).toUriString());
-    // sampleDto.setCreatedByUrl(uriBuilder.replacePath("/rest/user/{id}").buildAndExpand(sampleDto.getCreatedById()).toUriString());
-    // sampleDto.setUpdatedByUrl(uriBuilder.replacePath("/rest/user/{id}").buildAndExpand(sampleDto.getUpdatedById()).toUriString());
+    // sampleDto.setCreatedByUrl(uriBuilder.path("/rest/user/{id}").buildAndExpand(sampleDto.getCreatedById()).toUriString());
+    // sampleDto.setUpdatedByUrl(uriBuilder.path("/rest/user/{id}").buildAndExpand(sampleDto.getUpdatedById()).toUriString());
     if (sampleDto.getParentId() != null) {
       sampleDto.setParentUrl(
           UriComponentsBuilder.fromUri(baseUri).path("/rest/fred/sample/{id}").buildAndExpand(sampleDto.getParentId()).toUriString());
