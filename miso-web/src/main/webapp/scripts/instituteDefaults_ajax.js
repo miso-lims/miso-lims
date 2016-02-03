@@ -626,21 +626,22 @@ var Hierarchy = Hierarchy || {
     // add the table itself
     table.push('<table id="allRelationshipsTable" class="clear default-table" data-sortable>');
     table.push('<thead><tr class="relationship">');
-    table.push('<th colspan="2">Parent</th><th colspan="2">Child</th>');
-    table.push('</tr><tr>');
-    table.push('<th>Category</th><th>Class</th><th>Category</th><th>Class</th>');
+    table.push('<th>Parent Category</th><th>Parent Class</th><th>Child Category</th><th>Child Class</th>');
     table.push('</tr></thead>');
     table.push('<tbody id="allRelationships">');
     // add any existing relationships to the table
-    for (var i=0; i<Hierarchy.allRelationships.length; i++) {
-      id = Hierarchy.allRelationships[i].id;
+    for (var i=1; i<=Hierarchy.allRelationships.length; i++) {
+      var relationship = Hierarchy.allRelationships.filter(function (ship) {
+        return ship.id == i;
+      })[0];
+      id = relationship.id;
       parentClass = Hierarchy.allClasses.filter(function (sampleClass) {
-        return sampleClass.id == Hierarchy.allRelationships[i].parentId;
+        return sampleClass.id == relationship.parentId;
       })[0];
       childClass = Hierarchy.allClasses.filter(function (sampleClass) {
-        return sampleClass.id == Hierarchy.allRelationships[i].childId;
+        return sampleClass.id == relationship.childId;
       })[0];
-      endpoint = Hierarchy.allRelationships[i].url;
+      endpoint = relationship.url;
 
       table.push('<tr class="relationship" data-id="'+ id +'"><td>');
       table.push(parentClass.sampleCategory);

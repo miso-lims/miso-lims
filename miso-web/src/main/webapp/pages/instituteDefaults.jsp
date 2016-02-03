@@ -154,7 +154,7 @@
   
   <div class="sectionDivider"></div>
   <div class="corner-padding">
-    <h2 id="relationships">Relationships between Sample Classes</h2>
+    <h2 id="relationships" class="clear default-table" data-sortable>Relationships between Sample Classes</h2>
   </div>
 
 </div>
