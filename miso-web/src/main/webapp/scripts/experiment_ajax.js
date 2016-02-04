@@ -101,8 +101,7 @@ Experiment.ui = {
             { "sTitle": "Experiment Name", "sType": "no-exp"},
             { "sTitle": "Alias"},
             { "sTitle": "Description"},
-            { "sTitle": "Platform"},
-            { "sTitle": "Edit"}
+            { "sTitle": "Platform"}
           ],
           "bJQueryUI": true,
           "iDisplayLength": 25,

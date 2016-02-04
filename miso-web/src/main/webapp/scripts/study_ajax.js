@@ -87,8 +87,7 @@ Study.ui = {
             { "sTitle": "Study Name", "sType":"no-stu"},
             { "sTitle": "Alias"},
             { "sTitle": "Description"},
-            { "sTitle": "Type"},
-            { "sTitle": "Edit"}
+            { "sTitle": "Type"}
           ],
           "bJQueryUI": true,
           "iDisplayLength":  25,

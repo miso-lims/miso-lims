@@ -48,7 +48,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
-import com.google.json.JsonSanitizer;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -365,10 +364,15 @@ public class ProjectControllerHelperService {
       final JSONObject j = new JSONObject();
       final JSONArray jsonArray = new JSONArray();
       for (Project project : requestManager.listAllProjects()) {
-        jsonArray.add(JsonSanitizer.sanitize("[\"" + project.getName() + "\",\"" + project.getAlias() + "\",\"" + project.getDescription()
-            + "\",\"" + project.getProgress().getKey() + "\",\"" + project.getProjectId() + "\",'" + "<a href=\"/miso/project/"
-            + project.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']"));
+        JSONArray inner = new JSONArray();
 
+        inner.add(TableHelper.hyperLinkify("/miso/project/" + project.getId(), project.getName()));
+        inner.add(TableHelper.hyperLinkify("/miso/project/" + project.getId(), project.getAlias()));
+        inner.add(project.getDescription());
+        inner.add(project.getProgress().getKey());
+        inner.add(project.getProjectId());
+
+        jsonArray.add(inner);
       }
       j.put("projectsArray", jsonArray);
       return j;

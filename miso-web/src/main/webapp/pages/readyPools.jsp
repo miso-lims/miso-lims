@@ -70,7 +70,8 @@
       <tbody>
       <c:forEach items="${pools[pt]}" var="ipool">
         <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-          <td>${ipool.name}</td>
+          <td class="misoicon" onclick="window.location.href='<c:url value="/miso/pool/${ipool.id}"/>'">
+              ${ipool.name}</td> 
           <td>${ipool.alias}</td>
           <td>${ipool.identificationBarcode}</td>
           <td>${ipool.creationDate}</td>
@@ -101,7 +102,8 @@
         <tbody>
         <c:forEach items="${usedpools[pt]}" var="ipool">
           <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-            <td>${ipool.name}</td>
+            <td class="misoicon" onclick="window.location.href='<c:url value="/miso/pool/${ipool.id}"/>'">
+                ${ipool.name}</td> 
             <td>${ipool.alias}</td>
             <td>${ipool.identificationBarcode}</td>
             <td>${ipool.creationDate}</td>

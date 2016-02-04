@@ -74,7 +74,10 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 /**
- * Created by IntelliJ IDEA. User: davey Date: 25-May-2010 Time: 16:39:52
+ * Created by IntelliJ IDEA.
+ * User: davey
+ * Date: 25-May-2010
+ * Time: 16:39:52
  */
 @Ajaxified
 public class ContainerControllerHelperService {
@@ -895,29 +898,24 @@ public class ContainerControllerHelperService {
     try {
       JSONObject j = new JSONObject();
       JSONArray jsonArray = new JSONArray();
-      for (SequencerPartitionContainer<SequencerPoolPartition> sequencePartitionContainer : requestManager
-          .listAllSequencerPartitionContainers()) {
+      for (SequencerPartitionContainer<SequencerPoolPartition> spc : requestManager.listAllSequencerPartitionContainers()) {
         String run = "";
         String sequencer = "";
-        if (sequencePartitionContainer.getRun() != null) {
-          run = "<a href=\"/miso/run/" + sequencePartitionContainer.getRun().getId() + "\">"
-              + sequencePartitionContainer.getRun().getAlias() + "</a>";
-          if (sequencePartitionContainer.getRun().getSequencerReference() != null) {
-            sequencer = "<a href=\"/miso/sequencer/" + sequencePartitionContainer.getRun().getSequencerReference().getId() + "\">"
-                + sequencePartitionContainer.getRun().getSequencerReference().getPlatform().getNameAndModel() + "</a>";
+        if (spc.getRun() != null) {
+          run = TableHelper.hyperLinkify("/miso/run/" + spc.getRun().getId(), spc.getRun().getAlias());
+          if (spc.getRun().getSequencerReference() != null) {
+            sequencer = TableHelper.hyperLinkify("/miso/sequencer/" + spc.getRun().getSequencerReference().getId(), 
+                                     spc.getRun().getSequencerReference().getPlatform().getNameAndModel());
           }
         }
-
-        jsonArray
-            .add("['"
-                + (sequencePartitionContainer.getIdentificationBarcode() != null ? sequencePartitionContainer.getIdentificationBarcode()
-                    : "")
-                + "','"
-                + (sequencePartitionContainer.getPlatform() != null && sequencePartitionContainer.getPlatform().getPlatformType() != null
-                    ? sequencePartitionContainer.getPlatform().getPlatformType().getKey() : "")
-                + "','" + run + "','" + sequencer + "','" + "<a href=\"/miso/container/" + sequencePartitionContainer.getId()
-                + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']");
-
+        
+        JSONArray inner = new JSONArray();
+        inner.add(TableHelper.hyperLinkify("/miso/container/" + spc.getId(), spc.getIdentificationBarcode()));
+        inner.add(spc.getPlatform().getPlatformType().getKey());
+        inner.add(run);
+        inner.add(sequencer);
+        
+        jsonArray.add(inner);
       }
       j.put("array", jsonArray);
       return j;
