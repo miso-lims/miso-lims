@@ -106,15 +106,15 @@
         <div class="portlet">
           <div class="portlet-header">Institute Defaults</div>
           <div class="portlet-content">
-            <a href="<c:url value='/miso/instituteDefaults#origins'/>">Tissue Origins</a><br/>
-            <a href="<c:url value='/miso/instituteDefaults#conditions'/>">Tissue Types</a><br/>
-            <a href="<c:url value='/miso/instituteDefaults#materials'/>">Tissue Materials</a><br/>
-            <a href="<c:url value='/miso/instituteDefaults#purposes'/>">Sample Purposes</a><br/>
-            <a href="<c:url value='/miso/instituteDefaults#qcDetails'/>">QC Details</a><br/>
-            <a href="<c:url value='/miso/instituteDefaults#subprojects'/>">Subprojects</a><br/>
-            <a href="<c:url value='/miso/instituteDefaults#institutes'/>">Institutes</a><br/>
-            <a href="<c:url value='/miso/instituteDefaults#classes'/>">Sample Classes</a><br/>
-            <a href="<c:url value='/miso/instituteDefaults#relationships'/>">Relationships between Sample Classes</a>
+            <a href="<c:url value='/miso/admin/instituteDefaults#origins'/>">Tissue Origins</a><br/>
+            <a href="<c:url value='/miso/admin/instituteDefaults#conditions'/>">Tissue Types</a><br/>
+            <a href="<c:url value='/miso/admin/instituteDefaults#materials'/>">Tissue Materials</a><br/>
+            <a href="<c:url value='/miso/admin/instituteDefaults#purposes'/>">Sample Purposes</a><br/>
+            <a href="<c:url value='/miso/admin/instituteDefaults#qcDetails'/>">QC Details</a><br/>
+            <a href="<c:url value='/miso/admin/instituteDefaults#subprojects'/>">Subprojects</a><br/>
+            <a href="<c:url value='/miso/admin/instituteDefaults#institutes'/>">Institutes</a><br/>
+            <a href="<c:url value='/miso/admin/instituteDefaults#classes'/>">Sample Classes</a><br/>
+            <a href="<c:url value='/miso/admin/instituteDefaults#relationships'/>">Relationships between Sample Classes</a>
           </div>
         </div>
       </sec:authorize>
