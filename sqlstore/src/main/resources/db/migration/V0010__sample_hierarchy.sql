@@ -124,6 +124,7 @@ CREATE TABLE `SampleAdditionalInfo` (
   `subprojectId` bigint(20) DEFAULT NULL,
   `passageNumber` int(11) DEFAULT NULL,
   `timesReceived` int(11) DEFAULT NULL,
+  `pieces` int(11) DEFAULT NULL,
   `tubeNumber` int(11) DEFAULT NULL,
   `volume` double DEFAULT NULL,
   `concentration` double DEFAULT NULL,

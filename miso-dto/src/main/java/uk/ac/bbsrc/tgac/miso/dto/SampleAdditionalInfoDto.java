@@ -23,6 +23,7 @@ public class SampleAdditionalInfoDto {
   private String prepKitUrl;
   private Integer passageNumber;
   private Integer timesReceived;
+  private Integer pieces;
   private Integer tubeNumber;
   private Double volume;
   private Double concentration;
@@ -143,6 +144,14 @@ public class SampleAdditionalInfoDto {
 
   public void setTimesReceived(Integer timesReceived) {
     this.timesReceived = timesReceived;
+  }
+
+  public Integer getPieces() {
+    return pieces;
+  }
+
+  public void setPieces(Integer pieces) {
+    this.pieces = pieces;
   }
 
   public Integer getTubeNumber() {

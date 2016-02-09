@@ -64,6 +64,8 @@ public class SampleAdditionalInfoImpl implements SampleAdditionalInfo {
 
   private Integer timesReceived;
 
+  private Integer pieces;
+
   private Integer tubeNumber;
 
   private Double volume;
@@ -160,6 +162,16 @@ public class SampleAdditionalInfoImpl implements SampleAdditionalInfo {
   @Override
   public Integer getTimesReceived() {
     return timesReceived;
+  }
+
+  @Override
+  public Integer getPieces() {
+    return pieces;
+  }
+
+  @Override
+  public void setPieces(Integer pieces) {
+    this.pieces = pieces;
   }
 
   @Override

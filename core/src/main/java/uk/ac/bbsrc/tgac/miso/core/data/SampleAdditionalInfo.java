@@ -40,6 +40,10 @@ public interface SampleAdditionalInfo {
 
   void setTimesReceived(Integer timesReceived);
 
+  Integer getPieces();
+
+  void setPieces(Integer pieces);
+
   Integer getTubeNumber();
 
   void setTubeNumber(Integer tubeNumber);
