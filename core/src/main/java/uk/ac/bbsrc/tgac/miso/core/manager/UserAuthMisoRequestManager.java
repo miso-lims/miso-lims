@@ -122,14 +122,34 @@ public class UserAuthMisoRequestManager implements RequestManager {
 
   private User getCurrentUser() throws IOException {
     Authentication auth = securityContextHolderStrategy.getContext().getAuthentication();
-    User user = securityManager.getUserByLoginName(securityContextHolderStrategy.getContext().getAuthentication().getName());
+    if (auth == null) {
+      return null;
+    }
+    User user = securityManager.getUserByLoginName(auth.getName());
     if (user == null && auth.isAuthenticated()) {
       user = new UserImpl();
       user.setAdmin(true);
       user.setActive(true);
-      return user;
     }
-    return securityManager.getUserByLoginName(securityContextHolderStrategy.getContext().getAuthentication().getName());
+    return user;
+  }
+  
+  /**
+   * @return the current user's full name, or "Unknown" if the current user cannot be determined
+   */
+  private String getCurrentUsername() {
+    User user = null;
+    try {
+      user = getCurrentUser();
+    } catch (IOException e) {
+      user = null;
+    }
+    if (user == null) {
+      return "Unknown";
+    }
+    else {
+      return user.getFullName();
+    }
   }
 
   private boolean readCheck(SecurableByProfile s) throws IOException {
@@ -140,7 +160,7 @@ public class UserAuthMisoRequestManager implements RequestManager {
         log.error("Cannot resolve a currently logged in user", e);
       }
     } else {
-      return true;
+      throw new IOException("Cannot check read permissions for null object. Does this object really exist?");
     }
     return false;
   }
@@ -217,7 +237,7 @@ public class UserAuthMisoRequestManager implements RequestManager {
     if (writeCheck(sampleQC.getSample())) {
       return backingManager.saveSampleQC(sampleQC);
     } else {
-      throw new IOException("User " + getCurrentUser().getFullName() + " cannot write to the parent Sample ");
+      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot write to the parent Sample ");
     }
   }
 
