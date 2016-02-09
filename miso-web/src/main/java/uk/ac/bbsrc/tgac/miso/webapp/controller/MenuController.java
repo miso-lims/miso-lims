@@ -66,6 +66,18 @@ public class MenuController implements ServletContextAware {
         && Boolean.parseBoolean(misoProperties.get("miso.autoGenerateIdentificationBarcodes"));
   }
 
+  public Boolean getMisoPropertyBoolean(String property) {
+    MisoPropertyExporter exporter = (MisoPropertyExporter) ApplicationContextProvider.getApplicationContext().getBean("propertyConfigurer");
+    Map<String, String> misoProperties = exporter.getResolvedProperties();
+    return misoProperties.containsKey(property)
+        && Boolean.parseBoolean(misoProperties.get(property));
+  }
+  
+  @ModelAttribute("detailedSample")
+  public Boolean isDetailedSampleEnabled() { 
+    return getMisoPropertyBoolean("miso.detailed.sample.enabled");
+  }
+
   @RequestMapping("/tech/menu")
   public String techMenu() {
     return "/pages/techMenu.jsp";
@@ -134,6 +146,11 @@ public class MenuController implements ServletContextAware {
   @RequestMapping("/activity/menu")
   public String activityMenu() {
     return "/pages/activityMenu.jsp";
+  }
+  
+  @RequestMapping("/tissueOptions")
+  public String tissueOptions() {
+    return "/pages/tissueOptions.jsp";
   }
 
   @Override

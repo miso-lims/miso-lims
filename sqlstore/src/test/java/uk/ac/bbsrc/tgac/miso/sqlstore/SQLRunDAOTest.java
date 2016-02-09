@@ -43,6 +43,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
 import uk.ac.bbsrc.tgac.miso.core.store.RunQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
@@ -78,6 +79,8 @@ public class SQLRunDAOTest extends AbstractDAOTest {
   private NoteStore noteDAO;
   @Mock
   private WatcherStore watcherDAO;
+  @Mock
+  private ChangeLogStore changeLogDAO;
 
   @InjectMocks
   private SQLRunDAO dao;
