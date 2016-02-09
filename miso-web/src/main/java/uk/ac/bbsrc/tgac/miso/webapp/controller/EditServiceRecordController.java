@@ -60,6 +60,21 @@ public class EditServiceRecordController {
   
   protected static final Logger log = LoggerFactory.getLogger(EditServiceRecordController.class);
   
+  private enum ModelKeys {
+    RECORD("serviceRecord"),
+    FILES("serviceRecordFiles");
+    
+    private final String key;
+    
+    ModelKeys(String key) {
+      this.key = key;
+    }
+
+    public String getKey() {
+      return key;
+    }
+  }
+  
   @Autowired
   private RequestManager requestManager;
 
@@ -101,10 +116,10 @@ public class EditServiceRecordController {
   public ModelAndView viewServiceRecord(@PathVariable(value = "recordId") Long recordId, ModelMap model) throws IOException {
     SequencerServiceRecord sr = requestManager.getSequencerServiceRecordById(recordId);
     if (sr != null) {
-      model.put("serviceRecord", sr);
-      model.put("serviceRecordFiles", populateServiceRecordFiles(sr));
+      model.put(ModelKeys.RECORD.getKey(), sr);
+      model.put(ModelKeys.FILES.getKey(), populateServiceRecordFiles(sr));
     } else {
-      throw new IOException("Cannot retrieve the requested Service Record");
+      throw new IOException("No such Service Record");
     }
     return new ModelAndView("/pages/editServiceRecord.jsp", model);
   }
@@ -113,26 +128,21 @@ public class EditServiceRecordController {
   public ModelAndView newServiceRecord(@PathVariable(value = "sequencerReferenceId") Long sequencerReferenceId, ModelMap model) throws IOException {
     SequencerReference sequencer = requestManager.getSequencerReferenceById(sequencerReferenceId);
     if (sequencer == null) {
-      throw new IOException("Cannot retrieve the requested Sequencer Reference");
+      throw new IOException("No such Sequencer Reference");
     }
     SequencerServiceRecord record = dataObjectFactory.getSequencerServiceRecord();
     record.setSequencerReference(sequencer);
-    model.put("serviceRecord", record);
+    model.put(ModelKeys.RECORD.getKey(), record);
     return new ModelAndView("/pages/editServiceRecord.jsp", model);
   }
   
   @RequestMapping(method = RequestMethod.POST)
   public String processSubmit(@ModelAttribute("serviceRecord") SequencerServiceRecord record, ModelMap model, SessionStatus session)
       throws IOException {
-    try {
-      requestManager.saveSequencerServiceRecord(record);
-      session.setComplete();
-      model.clear();
-      return "redirect:/miso/stats/sequencer/servicerecord/" + record.getId();
-    } catch (IOException ex) {
-      log.debug("Failed to save Sequencer Service Record", ex);
-      throw ex;
-    }
+    requestManager.saveSequencerServiceRecord(record);
+    session.setComplete();
+    model.clear();
+    return "redirect:/miso/stats/sequencer/servicerecord/" + record.getId();
   }
   
   @InitBinder

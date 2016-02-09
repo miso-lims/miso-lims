@@ -50,6 +50,25 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 @RequestMapping("/sequencer")
 public class ViewSequencerReferenceController {
 
+  private enum ModelKeys {
+    
+    SEQUENCER("sequencerReference"),
+    RUNS("sequencerRuns"),
+    RECORDS("sequencerServiceRecords"),
+    TRIMMED_IP("trimmedIpAddress");
+    
+    private final String key;
+    
+    ModelKeys(String key) {
+      this.key = key;
+    }
+    
+    public String getKey() {
+      return key;
+    }
+    
+  }
+  
   @Autowired
   private SecurityManager securityManager;
   
@@ -83,14 +102,14 @@ public class ViewSequencerReferenceController {
       Collection<SequencerServiceRecord> serviceRecords = requestManager.listSequencerServiceRecordsBySequencerId(referenceId);
       
       if (sr != null) {
-        model.put("sequencerReference", sr);
-        model.put("sequencerRuns", runs);
-        model.put("sequencerServiceRecords", serviceRecords);
+        model.put(ModelKeys.SEQUENCER.getKey(), sr);
+        model.put(ModelKeys.RUNS.getKey(), runs);
+        model.put(ModelKeys.RECORDS.getKey(), serviceRecords);
         String ip = sr.getIpAddress() == null ? "" : sr.getIpAddress().toString();
         if (ip.startsWith("/")) {
-          model.put("trimmedIpAddress", ip.substring(1));
+          model.put(ModelKeys.TRIMMED_IP.getKey(), ip.substring(1));
         } else {
-          model.put("trimmedIpAddress", ip);
+          model.put(ModelKeys.TRIMMED_IP.getKey(), ip);
         }
       } else {
         throw new IOException("Cannot retrieve the requested sequencer reference");

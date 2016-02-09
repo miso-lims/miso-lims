@@ -48,7 +48,7 @@ public abstract class AbstractSequencerReference implements SequencerReference {
   private InetAddress ip;
   private String serialNumber;
   private Date dateCommissioned;
-  private Date dateDecommissioned;
+  private Date dateDecommissioned = null;
   private SequencerReference upgradedSequencerReference;
   private SequencerReference preUpgradeSequencerReference;
   private Date lastServicedDate;
@@ -171,11 +171,11 @@ public abstract class AbstractSequencerReference implements SequencerReference {
   @Override
   public String toString() {
     return "AbstractSequencerReference [id=" + id + ", name=" + name
-        + ", platform=" + (platform == null ? null : platform.getPlatformId()) + ", available=" + available
-        + ", ip=" + (ip == null ? null : ip.toString())
+        + ", platform=" + String.valueOf(platform.getPlatformId()) + ", available=" + available
+        + ", ip=" + String.valueOf(ip)
         + ", serialNumber=" + serialNumber
-        + ", dateCommissioned=" + (dateCommissioned == null ? null : dateCommissioned.toString())
-        + ", dateDecommissioned=" + (dateDecommissioned == null ? null : dateDecommissioned.toString())
+        + ", dateCommissioned=" + String.valueOf(dateCommissioned)
+        + ", dateDecommissioned=" + String.valueOf(dateDecommissioned)
         + ", upgradedSequencerReference=" + (upgradedSequencerReference == null ? null : upgradedSequencerReference.getId()) + "]";
   }
   

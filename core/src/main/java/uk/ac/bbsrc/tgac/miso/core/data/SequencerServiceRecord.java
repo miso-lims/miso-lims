@@ -65,7 +65,7 @@ public interface SequencerServiceRecord extends Deletable {
    * Sets the service reference number, which may indicate an external service id, a phone number, or other source of 
    * additional information
    * 
-   * @param phone
+   * @param referenceNumber
    */
   public void setReferenceNumber(String referenceNumber);
   
