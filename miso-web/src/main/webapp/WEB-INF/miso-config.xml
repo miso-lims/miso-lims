@@ -41,6 +41,8 @@
     <constructor-arg index="1" ref="securityManager" />
     <property name="backingManager" ref="backingRequestManager" />
   </bean>
+  
+  <bean id="authorizationManager" class="uk.ac.bbsrc.tgac.miso.service.security.DefaultAuthorizationManager" />
 
   <bean id="backingRequestManager" class="uk.ac.bbsrc.tgac.miso.core.manager.MisoRequestManager" />
 

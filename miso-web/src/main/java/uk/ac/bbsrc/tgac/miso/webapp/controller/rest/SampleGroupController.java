@@ -63,7 +63,8 @@ public class SampleGroupController extends RestController {
 
   @RequestMapping(value = "/samplegroup/{id}", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public SampleGroupDto getSampleGroup(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder, HttpServletResponse response) {
+  public SampleGroupDto getSampleGroup(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder, HttpServletResponse response) 
+      throws IOException {
     SampleGroupId sampleGroup = sampleGroupService.get(id);
     if (sampleGroup == null) {
       throw new RestException("No sample group found with ID: " + id, Status.NOT_FOUND);
@@ -87,7 +88,7 @@ public class SampleGroupController extends RestController {
 
   @RequestMapping(value = "/samplegroups", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public Set<SampleGroupDto> getSampleGroups(UriComponentsBuilder uriBuilder, HttpServletResponse response) {
+  public Set<SampleGroupDto> getSampleGroups(UriComponentsBuilder uriBuilder, HttpServletResponse response) throws IOException {
     Set<SampleGroupId> sampleGroups = sampleGroupService.getAll();
     if (sampleGroups.isEmpty()) {
       throw new RestException("No sample groups found", Status.NOT_FOUND);

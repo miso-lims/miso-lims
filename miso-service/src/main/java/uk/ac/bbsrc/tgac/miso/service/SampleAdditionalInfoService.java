@@ -7,7 +7,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
 
 public interface SampleAdditionalInfoService {
 
-  SampleAdditionalInfo get(Long sampleAdditionalInfoId);
+  SampleAdditionalInfo get(Long sampleAdditionalInfoId) throws IOException;
 
   Long create(SampleAdditionalInfo sampleAdditionalInfo, Long sampleId, Long tissueOriginId, Long tissueTypeId, Long qcPassedDetailId,
       Long subprojectId, Long prepKitId, Long sampleClassId) throws IOException;
@@ -15,8 +15,8 @@ public interface SampleAdditionalInfoService {
   void update(SampleAdditionalInfo sampleAdditionalInfo, Long tissueOriginId, Long tissueTypeId, Long qcPassedDetailId, Long prepKitId,
       Long sampleClassId) throws IOException;
 
-  Set<SampleAdditionalInfo> getAll();
+  Set<SampleAdditionalInfo> getAll() throws IOException;
 
-  void delete(Long sampleAdditionalInfoId);
+  void delete(Long sampleAdditionalInfoId) throws IOException;
 
 }

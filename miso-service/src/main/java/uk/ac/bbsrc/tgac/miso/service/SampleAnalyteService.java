@@ -7,15 +7,15 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleAnalyte;
 
 public interface SampleAnalyteService {
 
-  SampleAnalyte get(Long sampleAnalyteId);
+  SampleAnalyte get(Long sampleAnalyteId) throws IOException;
 
   Long create(SampleAnalyte sampleAnalyte, Long sampleId, Long samplePurposeId, Long sampleGroupId, Long tissueMaterialId)
       throws IOException;
 
   void update(SampleAnalyte sampleAnalyte, Long samplePurposeId, Long sampleGroupId, Long tissueMaterialId) throws IOException;
 
-  Set<SampleAnalyte> getAll();
+  Set<SampleAnalyte> getAll() throws IOException;
 
-  void delete(Long sampleAnalyteId);
+  void delete(Long sampleAnalyteId) throws IOException;
 
 }

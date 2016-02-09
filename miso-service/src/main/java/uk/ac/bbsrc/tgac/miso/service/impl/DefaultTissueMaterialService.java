@@ -6,7 +6,6 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +15,7 @@ import com.google.common.collect.Sets;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueMaterialDao;
 import uk.ac.bbsrc.tgac.miso.service.TissueMaterialService;
+import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 @Transactional
 @Service
@@ -27,16 +27,18 @@ public class DefaultTissueMaterialService implements TissueMaterialService {
   private TissueMaterialDao tissueMaterialDao;
 
   @Autowired
-  private com.eaglegenomics.simlims.core.manager.SecurityManager securityManager;
+  private AuthorizationManager authorizationManager;
 
   @Override
-  public TissueMaterial get(Long tissueMaterialId) {
+  public TissueMaterial get(Long tissueMaterialId) throws IOException {
+    authorizationManager.throwIfUnauthenticated();
     return tissueMaterialDao.getTissueMaterial(tissueMaterialId);
   }
 
   @Override
   public Long create(TissueMaterial tissueMaterial) throws IOException {
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    authorizationManager.throwIfNonAdmin();
+    User user = authorizationManager.getCurrentUser();
     tissueMaterial.setCreatedBy(user);
     tissueMaterial.setUpdatedBy(user);
     return tissueMaterialDao.addTissueMaterial(tissueMaterial);
@@ -44,21 +46,24 @@ public class DefaultTissueMaterialService implements TissueMaterialService {
 
   @Override
   public void update(TissueMaterial tissueMaterial) throws IOException {
+    authorizationManager.throwIfNonAdmin();
     TissueMaterial updatedTissueMaterial = get(tissueMaterial.getTissueMaterialId());
     updatedTissueMaterial.setAlias(tissueMaterial.getAlias());
     updatedTissueMaterial.setDescription(tissueMaterial.getDescription());
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    User user = authorizationManager.getCurrentUser();
     updatedTissueMaterial.setUpdatedBy(user);
     tissueMaterialDao.update(updatedTissueMaterial);
   }
 
   @Override
-  public Set<TissueMaterial> getAll() {
+  public Set<TissueMaterial> getAll() throws IOException {
+    authorizationManager.throwIfUnauthenticated();
     return Sets.newHashSet(tissueMaterialDao.getTissueMaterial());
   }
 
   @Override
-  public void delete(Long tissueMaterialId) {
+  public void delete(Long tissueMaterialId) throws IOException {
+    authorizationManager.throwIfNonAdmin();
     TissueMaterial tissueMaterial = get(tissueMaterialId);
     tissueMaterialDao.deleteTissueMaterial(tissueMaterial);
   }

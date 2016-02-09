@@ -63,7 +63,8 @@ public class SampleAnalyteController extends RestController {
 
   @RequestMapping(value = "/sampleanalyte/{id}", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public SampleAnalyteDto getSampleAnalyte(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder, HttpServletResponse response) {
+  public SampleAnalyteDto getSampleAnalyte(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder, HttpServletResponse response) 
+      throws IOException {
     SampleAnalyte sampleAnalyte = sampleAnalyteService.get(id);
     if (sampleAnalyte == null) {
       throw new RestException("No sample analyte found with ID: " + id, Status.NOT_FOUND);
@@ -95,7 +96,7 @@ public class SampleAnalyteController extends RestController {
 
   @RequestMapping(value = "/sampleanalytes", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public Set<SampleAnalyteDto> getSampleAnalytes(UriComponentsBuilder uriBuilder, HttpServletResponse response) {
+  public Set<SampleAnalyteDto> getSampleAnalytes(UriComponentsBuilder uriBuilder, HttpServletResponse response) throws IOException {
     Set<SampleAnalyte> sampleAnalytes = sampleAnalyteService.getAll();
     if (sampleAnalytes.isEmpty()) {
       throw new RestException("No sample analytes found", Status.NOT_FOUND);

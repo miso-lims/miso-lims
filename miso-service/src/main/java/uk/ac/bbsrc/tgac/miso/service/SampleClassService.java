@@ -7,14 +7,14 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 
 public interface SampleClassService {
 
-  SampleClass get(Long sampleClassId);
+  SampleClass get(Long sampleClassId) throws IOException;
 
   Long create(SampleClass sampleClass) throws IOException;
 
   void update(SampleClass sampleClass) throws IOException;
 
-  Set<SampleClass> getAll();
+  Set<SampleClass> getAll() throws IOException;
 
-  void delete(Long sampleClassId);
+  void delete(Long sampleClassId) throws IOException;
 
 }

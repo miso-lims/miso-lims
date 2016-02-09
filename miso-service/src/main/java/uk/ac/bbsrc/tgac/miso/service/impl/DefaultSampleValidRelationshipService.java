@@ -6,7 +6,6 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +17,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleClassDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleValidRelationshipDao;
 import uk.ac.bbsrc.tgac.miso.service.SampleValidRelationshipService;
+import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 @Transactional
 @Service
@@ -32,17 +32,19 @@ public class DefaultSampleValidRelationshipService implements SampleValidRelatio
   private SampleClassDao sampleClassDao;
 
   @Autowired
-  private com.eaglegenomics.simlims.core.manager.SecurityManager securityManager;
+  private AuthorizationManager authorizationManager;
 
   @Override
-  public SampleValidRelationship get(Long sampleValidRelationshipId) {
+  public SampleValidRelationship get(Long sampleValidRelationshipId) throws IOException {
+    authorizationManager.throwIfUnauthenticated();
     return sampleValidRelationshipDao.getSampleValidRelationship(sampleValidRelationshipId);
   }
 
   @Override
   public Long create(SampleValidRelationship sampleValidRelationship, Long parentSampleClassId, Long childSampleClassId)
       throws IOException {
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    authorizationManager.throwIfNonAdmin();
+    User user = authorizationManager.getCurrentUser();
     SampleClass parent = sampleClassDao.getSampleClass(parentSampleClassId);
     SampleClass child = sampleClassDao.getSampleClass(childSampleClassId);
     sampleValidRelationship.setCreatedBy(user);
@@ -55,23 +57,26 @@ public class DefaultSampleValidRelationshipService implements SampleValidRelatio
   @Override
   public void update(SampleValidRelationship sampleValidRelationship, Long parentSampleClassId, Long childSampleClassId)
       throws IOException {
+    authorizationManager.throwIfNonAdmin();
     SampleValidRelationship updatedSampleValidRelationship = get(sampleValidRelationship.getSampleValidRelationshipId());
     SampleClass parent = sampleClassDao.getSampleClass(parentSampleClassId);
     SampleClass child = sampleClassDao.getSampleClass(childSampleClassId);
     updatedSampleValidRelationship.setParent(parent);
     updatedSampleValidRelationship.setChild(child);
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    User user = authorizationManager.getCurrentUser();
     updatedSampleValidRelationship.setUpdatedBy(user);
     sampleValidRelationshipDao.update(updatedSampleValidRelationship);
   }
 
   @Override
-  public Set<SampleValidRelationship> getAll() {
+  public Set<SampleValidRelationship> getAll() throws IOException {
+    authorizationManager.throwIfUnauthenticated();
     return Sets.newHashSet(sampleValidRelationshipDao.getSampleValidRelationship());
   }
 
   @Override
-  public void delete(Long sampleValidRelationshipId) {
+  public void delete(Long sampleValidRelationshipId) throws IOException {
+    authorizationManager.throwIfNonAdmin();
     SampleValidRelationship sampleValidRelationship = get(sampleValidRelationshipId);
     sampleValidRelationshipDao.deleteSampleValidRelationship(sampleValidRelationship);
   }

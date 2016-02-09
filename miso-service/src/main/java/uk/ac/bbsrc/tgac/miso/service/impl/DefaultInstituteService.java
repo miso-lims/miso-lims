@@ -6,16 +6,16 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.eaglegenomics.simlims.core.User;
+import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Institute;
 import uk.ac.bbsrc.tgac.miso.persistence.InstituteDao;
 import uk.ac.bbsrc.tgac.miso.service.InstituteService;
-
-import com.eaglegenomics.simlims.core.User;
-import com.google.common.collect.Sets;
+import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 @Transactional
 @Service
@@ -27,16 +27,18 @@ public class DefaultInstituteService implements InstituteService {
   private InstituteDao instituteDao;
   
   @Autowired
-  private com.eaglegenomics.simlims.core.manager.SecurityManager securityManager;
+  private AuthorizationManager authorizationManager;
 
   @Override
-  public Institute get(Long id) {
+  public Institute get(Long id) throws IOException {
+    authorizationManager.throwIfUnauthenticated();
     return instituteDao.getInstitute(id);
   }
 
   @Override
   public Long create(Institute institute) throws IOException {
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    authorizationManager.throwIfNonAdmin();
+    User user = authorizationManager.getCurrentUser();
     institute.setCreatedBy(user);
     institute.setUpdatedBy(user);
     return instituteDao.addInstitute(institute);
@@ -44,21 +46,24 @@ public class DefaultInstituteService implements InstituteService {
 
   @Override
   public void update(Institute institute) throws IOException {
+    authorizationManager.throwIfNonAdmin();
     Institute updatedInstitute = get(institute.getId());
     updatedInstitute.setAlias(institute.getAlias());
     updatedInstitute.setLab(institute.getLab());
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    User user = authorizationManager.getCurrentUser();
     updatedInstitute.setUpdatedBy(user);
     instituteDao.update(updatedInstitute);
   }
 
   @Override
-  public Set<Institute> getAll() {
+  public Set<Institute> getAll() throws IOException {
+    authorizationManager.throwIfUnauthenticated();
     return Sets.newHashSet(instituteDao.getInstitute());
   }
 
   @Override
-  public void delete(Long instituteId) {
+  public void delete(Long instituteId) throws IOException {
+    authorizationManager.throwIfNonAdmin();
     Institute institute = get(instituteId);
     instituteDao.deleteInstitute(institute);
   }

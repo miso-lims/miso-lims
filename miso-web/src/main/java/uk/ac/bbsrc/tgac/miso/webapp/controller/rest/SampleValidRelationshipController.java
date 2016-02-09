@@ -64,7 +64,7 @@ public class SampleValidRelationshipController extends RestController {
   @RequestMapping(value = "/samplevalidrelationship/{id}", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
   public SampleValidRelationshipDto getSampleValidRelationship(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
-      HttpServletResponse response) {
+      HttpServletResponse response) throws IOException {
     SampleValidRelationship sampleValidRelationship = sampleValidRelationshipService.get(id);
     if (sampleValidRelationship == null) {
       throw new RestException("No sample valid relationship found with ID: " + id, Status.NOT_FOUND);
@@ -93,7 +93,8 @@ public class SampleValidRelationshipController extends RestController {
 
   @RequestMapping(value = "/samplevalidrelationships", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public Set<SampleValidRelationshipDto> getSampleValidRelationships(UriComponentsBuilder uriBuilder, HttpServletResponse response) {
+  public Set<SampleValidRelationshipDto> getSampleValidRelationships(UriComponentsBuilder uriBuilder, HttpServletResponse response) 
+      throws IOException {
     Set<SampleValidRelationship> sampleValidRelationships = sampleValidRelationshipService.getAll();
     if (sampleValidRelationships.isEmpty()) {
       throw new RestException("No sample valid relationships found", Status.NOT_FOUND);

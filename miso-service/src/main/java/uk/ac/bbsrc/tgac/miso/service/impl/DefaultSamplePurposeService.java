@@ -6,7 +6,6 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +15,7 @@ import com.google.common.collect.Sets;
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
 import uk.ac.bbsrc.tgac.miso.persistence.SamplePurposeDao;
 import uk.ac.bbsrc.tgac.miso.service.SamplePurposeService;
+import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 @Transactional
 @Service
@@ -27,16 +27,18 @@ public class DefaultSamplePurposeService implements SamplePurposeService {
   private SamplePurposeDao samplePurposeDao;
 
   @Autowired
-  private com.eaglegenomics.simlims.core.manager.SecurityManager securityManager;
+  private AuthorizationManager authorizationManager;
 
   @Override
-  public SamplePurpose get(Long samplePurposeId) {
+  public SamplePurpose get(Long samplePurposeId) throws IOException {
+    authorizationManager.throwIfUnauthenticated();
     return samplePurposeDao.getSamplePurpose(samplePurposeId);
   }
 
   @Override
   public Long create(SamplePurpose samplePurpose) throws IOException {
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    authorizationManager.throwIfNonAdmin();
+    User user = authorizationManager.getCurrentUser();
     samplePurpose.setCreatedBy(user);
     samplePurpose.setUpdatedBy(user);
     return samplePurposeDao.addSamplePurpose(samplePurpose);
@@ -44,21 +46,24 @@ public class DefaultSamplePurposeService implements SamplePurposeService {
 
   @Override
   public void update(SamplePurpose samplePurpose) throws IOException {
+    authorizationManager.throwIfNonAdmin();
     SamplePurpose updatedSamplePurpose = get(samplePurpose.getSamplePurposeId());
     updatedSamplePurpose.setAlias(samplePurpose.getAlias());
     updatedSamplePurpose.setDescription(samplePurpose.getDescription());
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    User user = authorizationManager.getCurrentUser();
     updatedSamplePurpose.setUpdatedBy(user);
     samplePurposeDao.update(updatedSamplePurpose);
   }
 
   @Override
-  public Set<SamplePurpose> getAll() {
+  public Set<SamplePurpose> getAll() throws IOException {
+    authorizationManager.throwIfUnauthenticated();
     return Sets.newHashSet(samplePurposeDao.getSamplePurpose());
   }
 
   @Override
-  public void delete(Long samplePurposeId) {
+  public void delete(Long samplePurposeId) throws IOException {
+    authorizationManager.throwIfNonAdmin();
     SamplePurpose samplePurpose = get(samplePurposeId);
     samplePurposeDao.deleteSamplePurpose(samplePurpose);
   }
