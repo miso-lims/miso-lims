@@ -38,6 +38,13 @@ public class HibernateSampleAdditionalInfoDao implements SampleAdditionalInfoDao
   }
 
   @Override
+  public SampleAdditionalInfo getSampleAdditionalInfoBySampleId(Long id) {
+    Query query = currentSession().createQuery("from SampleAdditionalInfoImpl where sampleId = :id");
+    query.setLong("id", id);
+    return (SampleAdditionalInfo) query.uniqueResult();
+  }
+
+  @Override
   public SampleAdditionalInfo getSampleAdditionalInfo(Long id) {
     return (SampleAdditionalInfo) currentSession().get(SampleAdditionalInfoImpl.class, id);
   }
