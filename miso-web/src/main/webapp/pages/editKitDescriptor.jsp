@@ -69,6 +69,10 @@
           <td><form:input path="stockLevel"/></td>
         </tr>
         <tr>
+          <td class="h">Description:</td>
+          <td><form:input path="description"/><span id="descriptionCounter" class="counter"></span></td>
+        </tr>
+        <tr>
           <c:choose>
             <c:when test="${kitDescriptor.kitDescriptorId == 0 or empty kitDescriptor.kitType}">
               <td>Kit Type:</td>
@@ -121,6 +125,12 @@
       counter: '#partNumberCounter',
       countType: 'characters',
       maxCount: ${maxLengths['partNumber']},
+      countDirection: 'down'
+    });
+    jQuery('#description').simplyCountable({
+      counter: '#descriptionCounter',
+      countType: 'characters',
+      maxCount: ${maxLengths['description']},
       countDirection: 'down'
     });
   });

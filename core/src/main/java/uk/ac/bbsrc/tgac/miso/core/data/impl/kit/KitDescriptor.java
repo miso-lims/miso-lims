@@ -56,6 +56,7 @@ public class KitDescriptor implements Serializable {
   private String manufacturer = "";
   private String partNumber = "";
   private Integer stockLevel = 0;
+  private String description = "";
 
   @Enumerated(EnumType.STRING)
   private KitType kitType;
@@ -178,6 +179,25 @@ public class KitDescriptor implements Serializable {
   }
 
   /**
+   * Sets the description of this KitDescriptor object.
+   *
+   * @param description
+   *          description.
+   */
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+  /**
+   * Returns the description of this KitDescriptor object.
+   *
+   * @return String description.
+   */
+  public String getDescription() {
+    return description;
+  }
+
+  /**
    * Returns the kitType of this KitDescriptor object.
    * 
    * @return KitType kitType.
@@ -235,6 +255,8 @@ public class KitDescriptor implements Serializable {
     sb.append(getPlatformType());
     sb.append(" : ");
     sb.append(getStockLevel());
+    sb.append(" : ");
+    sb.append(getDescription());
     return sb.toString();
   }
 }

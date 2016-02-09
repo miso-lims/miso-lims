@@ -96,7 +96,7 @@ public class SQLKitDAO implements KitStore {
       + "SET identificationBarcode=:identificationBarcode, locationBarcode=:locationBarcode, lotNumber=:lotNumber, kitDate=:kitDate, kitDescriptorId=:kitDescriptorId "
       + "WHERE kitId=:kitId";
 
-  public static final String KIT_DESCRIPTORS_SELECT = "SELECT kitDescriptorId, name, version, manufacturer, partNumber, stockLevel, kitType, platformType "
+  public static final String KIT_DESCRIPTORS_SELECT = "SELECT kitDescriptorId, name, version, manufacturer, partNumber, stockLevel, kitType, platformType, description "
       + "FROM KitDescriptor";
 
   public static final String KIT_DESCRIPTOR_SELECT_BY_ID = KIT_DESCRIPTORS_SELECT + " WHERE kitDescriptorId=?";
@@ -108,7 +108,7 @@ public class SQLKitDAO implements KitStore {
   public static final String KIT_DESCRIPTORS_SELECT_BY_PLATFORM = KIT_DESCRIPTORS_SELECT + " WHERE platformType = ?";
 
   public static final String KIT_DESCRIPTOR_UPDATE = "UPDATE KitDescriptor "
-      + "SET name=:name, version=:version, manufacturer=:manufacturer, partNumber=:partNumber, stockLevel=:stockLevel, kitType=:kitType, platformType=:platformType "
+      + "SET name=:name, version=:version, manufacturer=:manufacturer, partNumber=:partNumber, stockLevel=:stockLevel, kitType=:kitType, platformType=:platformType, description=:description "
       + "WHERE kitDescriptorId=:kitDescriptorId";
 
   protected static final Logger log = LoggerFactory.getLogger(SQLKitDAO.class);
@@ -319,6 +319,7 @@ public class SQLKitDAO implements KitStore {
     params.addValue("stockLevel", kd.getStockLevel());
     params.addValue("kitType", kd.getKitType().getKey());
     params.addValue("platformType", kd.getPlatformType().getKey());
+    params.addValue("description", kd.getDescription());
 
     if (kd.getKitDescriptorId() == KitDescriptor.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName("KitDescriptor").usingGeneratedKeyColumns("kitDescriptorId");
@@ -343,6 +344,7 @@ public class SQLKitDAO implements KitStore {
       kd.setManufacturer(rs.getString("manufacturer"));
       kd.setPartNumber(rs.getString("partNumber"));
       kd.setStockLevel(rs.getInt("stockLevel"));
+      kd.setDescription(rs.getString("description"));
       kd.setKitType(KitType.get(rs.getString("kitType")));
       kd.setPlatformType(PlatformType.get(rs.getString("platformType")));
 
