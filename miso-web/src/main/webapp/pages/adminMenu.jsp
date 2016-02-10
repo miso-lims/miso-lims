@@ -41,7 +41,9 @@
       <div class="portlet">
         <div class="portlet-header">Cache Administration</div>
         <div class="portlet-content">
+        <c:if test="${autoGenerateIdBarcodes}">
           <a href="javascript:void(0);" onclick="flushAllCaches();">Flush All Caches</a><br/>
+        </c:if>
           <a href="javascript:void(0);" onclick="regenAllBarcodes();">Regenerate All Barcodes</a>
           <a href="javascript:void(0);" onclick="reindexAlertManagers();">Reindex Alert Managers</a><br/>
         </div>

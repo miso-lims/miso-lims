@@ -56,7 +56,9 @@
             <a href="javascript:void(0);" onclick="flushAllCaches();">Flush All Caches</a><br/>
             <a href="javascript:void(0);" onclick="viewCacheStats();">Flush Cache...</a><br/>
             <a href="javascript:void(0);" onclick="viewCacheStats();">View Cache Stats</a><br/>
+          <c:if test="${autoGenerateIdBarcodes}">
             <a href="javascript:void(0);" onclick="regenAllBarcodes();">Regenerate All Barcodes</a><br/>
+          </c:if>
             <a href="javascript:void(0);" onclick="reindexAlertManagers();">Reindex Alert Managers</a>
           </div>
         </div>
