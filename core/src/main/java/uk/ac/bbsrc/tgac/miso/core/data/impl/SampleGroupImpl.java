@@ -16,6 +16,7 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleGroupId;
+import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 
 @Entity
 @Table(name = "SampleGroup", uniqueConstraints = @UniqueConstraint(columnNames = { "projectId", "groupId" }) )
@@ -28,6 +29,10 @@ public class SampleGroupImpl implements SampleGroupId {
   @OneToOne(targetEntity = ProjectImpl.class)
   @JoinColumn(name = "projectId", nullable = false)
   private Project project;
+
+  @OneToOne(targetEntity = SubprojectImpl.class)
+  @JoinColumn(name = "subprojectId")
+  private Subproject subproject;
 
   @Column(nullable = false)
   private Integer groupId;
@@ -67,6 +72,19 @@ public class SampleGroupImpl implements SampleGroupId {
   @Override
   public void setProject(Project project) {
     this.project = project;
+  }
+
+  @Override
+  public Subproject getSubproject() {
+    return subproject;
+  }
+
+  @Override
+  public void setSubproject(Subproject subproject) {
+    if (subproject != null && subproject.getParentProject().getId() != project.getId()) {
+      throw new IllegalArgumentException("Subproject does not match current project");
+    }
+    this.subproject = subproject;
   }
 
   @Override
@@ -128,12 +146,12 @@ public class SampleGroupImpl implements SampleGroupId {
   public void setLastUpdated(Date lastUpdated) {
     this.lastUpdated = lastUpdated;
   }
-  
+
   @Override
   public String toString() {
-    return "SampleGroupImpl [sampleGroupId=" + sampleGroupId + ", projectId=" + project + ", groupId=" + groupId + ", description=" 
-        + description + ", createdBy=" + createdBy + ", creationDate=" + creationDate + ", updatedBy=" + updatedBy + ", lastUpdated=" 
-        + lastUpdated + "]";
+    return "SampleGroupImpl [sampleGroupId=" + sampleGroupId + ", projectId=" + project + ", subprojectId=" + subproject + " groupId="
+        + groupId + ", description=" + description + ", createdBy=" + createdBy + ", creationDate=" + creationDate + ", updatedBy="
+        + updatedBy + ", lastUpdated=" + lastUpdated + "]";
   }
 
 }

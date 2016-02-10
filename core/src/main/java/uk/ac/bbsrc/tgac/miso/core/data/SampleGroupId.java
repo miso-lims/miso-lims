@@ -14,6 +14,10 @@ public interface SampleGroupId {
 
   void setProject(Project project);
 
+  Subproject getSubproject();
+
+  void setSubproject(Subproject subproject);
+
   Integer getGroupId();
 
   void setGroupId(Integer groupId);
