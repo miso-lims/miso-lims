@@ -415,22 +415,19 @@ var Institute = Institute || {
       data.sort(function (a, b) { //////////////// TODO: confirm alias??
         return (a.alias > b.alias) ? 1 : ((b.alias > a.alias) ? -1 : 0);
       });
-    } // else collection is empty, so render only the "Add New" button
+    } // else collection is empty, so render only teh "Add New" button
 
     var table = [];
-    var id, alias, lab, endpoint;
+    var id, alias, endpoint;
 
     if (data) {
       for (var i=0; i<data.length; i++) {
         id = data[i].id;
         alias = data[i].alias;
-        lab = data[i].lab;
         endpoint = data[i].url;
 
         table.push('<tr class="In"><td>');
         table.push(Options.createTextInput('In_alias_'+id, alias));
-        table.push('</td><td>');
-        table.push(Options.createTextInput('In_lab_'+id, lab));
         table.push('</td><td>');
         table.push(Options.createButton('Update', "Institute.update('"+endpoint+"', "+id+")"));
         table.push('</td><td>');
@@ -455,13 +452,12 @@ var Institute = Institute || {
 
   update: function (endpoint, suffix, givenMethod) {
     var alias = document.getElementById('In_alias_'+suffix).value;
-    var lab = document.getElementById('In_lab_'+suffix).value;
-    if (!alias || !lab) {
-      alert("Alias and lab can not be blank.");
+    if (!alias) {
+      alert("Alias can not be blank.");
       return null;
     }
     var method = givenMethod || 'PUT';
-    Options.makeXhrRequest(method, endpoint, Options.reloadTable, JSON.stringify({ 'alias': alias, 'lab': lab }), 'In');
+    Options.makeXhrRequest(method, endpoint, Options.reloadTable, JSON.stringify({ 'alias': alias }), 'In');
   },
 
   addNew: function () {
@@ -477,8 +473,6 @@ var Institute = Institute || {
 
       row.push('<tr><td>');
       row.push(Options.createTextInput('In_alias_new'));
-      row.push('</td><td>');
-      row.push(Options.createTextInput('In_lab_new'));
       row.push('</td><td>');
       row.push(Options.createButton('Add', "Institute.addNew()"));
       row.push('</td></tr>');

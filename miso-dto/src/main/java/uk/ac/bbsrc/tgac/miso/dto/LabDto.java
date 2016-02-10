@@ -3,10 +3,11 @@ package uk.ac.bbsrc.tgac.miso.dto;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
-public class InstituteDto {
+public class LabDto {
   
   private Long id;
   private String url;
+  private InstituteDto institute;
   private String alias;
   private Long createdById;
   private String createdByUrl;
@@ -29,6 +30,14 @@ public class InstituteDto {
   
   public void setUrl(String url) {
     this.url = url;
+  }
+  
+  public InstituteDto getInstitute() {
+    return institute;
+  }
+  
+  public void setInstitute(InstituteDto institute) {
+    this.institute = institute;
   }
   
   public String getAlias() {
@@ -89,11 +98,11 @@ public class InstituteDto {
 
   @Override
   public String toString() {
-    return "InstituteDto [id=" + id + ", url=" + url + ", alias=" + alias
-        + ", createdById=" + createdById + ", createdByUrl=" + createdByUrl
-        + ", creationDate=" + creationDate + ", updatedById=" + updatedById
-        + ", updatedByUrl=" + updatedByUrl + ", lastUpdated=" + lastUpdated
-        + "]";
+    return "LabDto [id=" + id + ", url=" + url + ", institute=" + institute
+        + ", alias=" + alias + ", createdById=" + createdById
+        + ", createdByUrl=" + createdByUrl + ", creationDate=" + creationDate
+        + ", updatedById=" + updatedById + ", updatedByUrl=" + updatedByUrl
+        + ", lastUpdated=" + lastUpdated + "]";
   }
-  
+
 }

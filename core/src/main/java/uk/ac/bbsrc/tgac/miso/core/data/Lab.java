@@ -4,7 +4,10 @@ import java.util.Date;
 
 import com.eaglegenomics.simlims.core.User;
 
-public interface Institute {
+/**
+ * A lab within an Institute
+ */
+public interface Lab {
 
   Long getId();
 
@@ -13,6 +16,18 @@ public interface Institute {
   String getAlias();
 
   void setAlias(String alias);
+  
+  /**
+   * @return the Institute to which this Lab belongs
+   */
+  Institute getInstitute();
+  
+  /**
+   * Sets the Institute to which this Lab belongs
+   * 
+   * @param institute
+   */
+  void setInstitute(Institute institute);
 
   User getCreatedBy();
 

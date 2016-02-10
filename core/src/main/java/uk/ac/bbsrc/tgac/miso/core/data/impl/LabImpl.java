@@ -13,40 +13,36 @@ import javax.persistence.Table;
 
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Institute;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 
 @Entity
-@Table(name = "SampleTissue")
-public class SampleTissueImpl implements SampleTissue {
-
+@Table(name = "Lab")
+public class LabImpl implements Lab {
+  
   @Id
+  @Column(name = "labId")
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
-
-  @OneToOne(targetEntity = SampleImpl.class)
-  @JoinColumn(name = "sampleId", nullable = false)
-  private Sample sample;
-
-  @OneToOne(targetEntity = LabImpl.class)
-  @JoinColumn(name = "labId", nullable = false)
-  private Lab lab;
-
-  private String instituteTissueName;
-  private Integer cellularity;
-
+  
+  @OneToOne(targetEntity = InstituteImpl.class)
+  @JoinColumn(name = "instituteId", nullable = false)
+  private Institute institute;
+  
+  @Column(nullable = false)
+  private String alias;
+  
   @OneToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "createdBy", nullable = false)
   private User createdBy;
-
+  
   @Column(nullable = false)
   private Date creationDate;
-
+  
   @OneToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "updatedBy", nullable = false)
   private User updatedBy;
-
+  
   @Column(nullable = false)
   private Date lastUpdated;
 
@@ -61,48 +57,28 @@ public class SampleTissueImpl implements SampleTissue {
   }
 
   @Override
-  public Sample getSample() {
-    return sample;
+  public String getAlias() {
+    return alias;
   }
 
   @Override
-  public void setSample(Sample sample) {
-    this.sample = sample;
+  public void setAlias(String alias) {
+    this.alias = alias;
   }
 
   @Override
-  public Lab getLab() {
-    return lab;
+  public Institute getInstitute() {
+    return institute;
   }
 
   @Override
-  public void setLab(Lab lab) {
-    this.lab = lab;
-  }
-
-  @Override
-  public String getInstituteTissueName() {
-    return instituteTissueName;
-  }
-
-  @Override
-  public void setInstituteTissueName(String instituteTissueName) {
-    this.instituteTissueName = instituteTissueName;
-  }
-
-  @Override
-  public Integer getCellularity() {
-    return cellularity;
-  }
-
-  @Override
-  public void setCellularity(Integer cellularity) {
-    this.cellularity = cellularity;
+  public void setInstitute(Institute institute) {
+    this.institute = institute;
   }
 
   @Override
   public User getCreatedBy() {
-    return createdBy;
+    return this.createdBy;
   }
 
   @Override
@@ -138,13 +114,6 @@ public class SampleTissueImpl implements SampleTissue {
   @Override
   public void setLastUpdated(Date lastUpdated) {
     this.lastUpdated = lastUpdated;
-  }
-
-  @Override
-  public String toString() {
-    return "SampleTissueImpl [id=" + id + ", sample=" + sample + ", lab=" + lab + ", instituteTissueName=" + instituteTissueName
-        + ", cellularity=" + cellularity + ", createdBy=" + createdBy + ", creationDate=" + creationDate + ", updatedBy=" + updatedBy
-        + ", lastUpdated=" + lastUpdated + "]";
   }
 
 }

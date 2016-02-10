@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
+import java.util.Collection;
 import java.util.Set;
 
 import org.joda.time.format.DateTimeFormatter;
@@ -9,6 +10,7 @@ import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Institute;
+import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.QcPassedDetail;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
@@ -25,6 +27,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstituteImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.QcPassedDetailImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAdditionalInfoImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAnalyteImpl;
@@ -547,7 +550,6 @@ public class Dtos {
     InstituteDto dto = new InstituteDto();
     dto.setId(from.getId());
     dto.setAlias(from.getAlias());
-    dto.setLab(from.getLab());
     dto.setCreatedById(from.getCreatedBy().getUserId());
     dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
     dto.setUpdatedById(from.getUpdatedBy().getUserId());
@@ -566,7 +568,34 @@ public class Dtos {
   public static Institute to(InstituteDto from) {
     Institute to = new InstituteImpl();
     to.setAlias(from.getAlias());
-    to.setLab(from.getLab());
+    return to;
+  }
+  
+  public static LabDto asDto(Lab from) {
+    LabDto dto = new LabDto();
+    dto.setId(from.getId());
+    dto.setInstitute(asDto(from.getInstitute()));
+    dto.setAlias(from.getAlias());
+    dto.setCreatedById(from.getCreatedBy().getUserId());
+    dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
+    dto.setUpdatedById(from.getUpdatedBy().getUserId());
+    dto.setLastUpdated(dateTimeFormatter.print(from.getLastUpdated().getTime()));
+    return dto;
+  }
+  
+  public static Set<LabDto> asLabDtos(Collection<Lab> from) {
+    Set<LabDto> dtoSet = Sets.newHashSet();
+    for (Lab lab : from) {
+      dtoSet.add(asDto(lab));
+    }
+    return dtoSet;
+  }
+  
+  public static Lab to(LabDto from) {
+    Lab to = new LabImpl();
+    to.setInstitute(to(from.getInstitute()));
+    to.getInstitute().setId(from.getInstitute().getId());
+    to.setAlias(from.getAlias());
     return to;
   }
 
@@ -574,7 +603,7 @@ public class Dtos {
     SampleTissueDto dto = new SampleTissueDto();
     dto.setId(from.getId());
     dto.setCellularity(from.getCellularity());
-    dto.setInstitute(asDto(from.getInstitute()));
+    dto.setLab(asDto(from.getLab()));
     dto.setInstituteTissueName(from.getInstituteTissueName());
     dto.setCreatedById(from.getCreatedBy().getUserId());
     dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
@@ -595,7 +624,7 @@ public class Dtos {
     SampleTissue to = new SampleTissueImpl();
     to.setId(from.getId());
     to.setCellularity(from.getCellularity());
-    to.setInstitute(to(from.getInstitute()));
+    to.setLab(to(from.getLab()));
     to.setInstituteTissueName(from.getInstituteTissueName());
     return to;
   }
