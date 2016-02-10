@@ -107,7 +107,7 @@
           <div class="portlet-header">Institute Defaults</div>
           <div class="portlet-content">
             <a href="<c:url value='/miso/admin/instituteDefaults#origins'/>">Tissue Origins</a><br/>
-            <a href="<c:url value='/miso/admin/instituteDefaults#conditions'/>">Tissue Types</a><br/>
+            <a href="<c:url value='/miso/admin/instituteDefaults#types'/>">Tissue Types</a><br/>
             <a href="<c:url value='/miso/admin/instituteDefaults#materials'/>">Tissue Materials</a><br/>
             <a href="<c:url value='/miso/admin/instituteDefaults#purposes'/>">Sample Purposes</a><br/>
             <a href="<c:url value='/miso/admin/instituteDefaults#qcDetails'/>">QC Details</a><br/>
