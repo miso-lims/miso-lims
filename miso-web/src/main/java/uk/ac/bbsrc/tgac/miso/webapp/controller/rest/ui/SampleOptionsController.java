@@ -13,10 +13,12 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SampleOptionsDto;
+import uk.ac.bbsrc.tgac.miso.service.InstituteService;
 import uk.ac.bbsrc.tgac.miso.service.QcPassedDetailService;
 import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.service.SampleGroupService;
 import uk.ac.bbsrc.tgac.miso.service.SamplePurposeService;
+import uk.ac.bbsrc.tgac.miso.service.SampleValidRelationshipService;
 import uk.ac.bbsrc.tgac.miso.service.SubprojectService;
 import uk.ac.bbsrc.tgac.miso.service.TissueMaterialService;
 import uk.ac.bbsrc.tgac.miso.service.TissueOriginService;
@@ -27,7 +29,7 @@ import uk.ac.bbsrc.tgac.miso.service.TissueTypeService;
 public class SampleOptionsController {
 
   protected static final Logger log = LoggerFactory.getLogger(SampleOptionsController.class);
-  
+
   @Autowired
   private SubprojectService subprojectService;
   @Autowired
@@ -44,7 +46,11 @@ public class SampleOptionsController {
   private TissueMaterialService tissueMaterialService;
   @Autowired
   private QcPassedDetailService qcPassedDetailService;
-  
+  @Autowired
+  private SampleValidRelationshipService sampleValidRelationshipService;
+  @Autowired
+  private InstituteService instituteService;
+
   @RequestMapping(value = "/sampleoptions", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
   public ResponseEntity<SampleOptionsDto> getSampleOptions(UriComponentsBuilder uriBuilder) {
@@ -57,7 +63,9 @@ public class SampleOptionsController {
     sampleOptionsDto.setSampleGroupsDtos(Dtos.asSampleGroupDtos(sampleGroupService.getAll()));
     sampleOptionsDto.setTissueMaterialsDtos(Dtos.asTissueMaterialDtos(tissueMaterialService.getAll()));
     sampleOptionsDto.setQcPassedDetailsDtos(Dtos.asQcPassedDetailDtos(qcPassedDetailService.getAll()));
-   
+    sampleOptionsDto.setSampleValidRelationshipDtos(Dtos.asSampleValidRelationshipDtos(sampleValidRelationshipService.getAll()));
+    sampleOptionsDto.setInstituteDtos(Dtos.asInstituteDtos(instituteService.getAll()));
+
     return new ResponseEntity<>(sampleOptionsDto, HttpStatus.OK);
   }
 }
