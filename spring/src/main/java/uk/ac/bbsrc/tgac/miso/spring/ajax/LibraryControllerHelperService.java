@@ -1223,7 +1223,7 @@ public class LibraryControllerHelperService {
         String identificationBarcode = library.getIdentificationBarcode();
         
         jsonArray.add(JsonSanitizer.sanitize("[\"" + library.getName() + "\",\"" + library.getAlias() + "\",\"" + library.getLibraryType().getDescription() + "\",\""
-            + library.getSample().getName() + "\",\"" + qcpassed + "\",\"" + "<a href=\"/miso/library/" + library.getId()
+            + library.getSample().getName() + " (" + library.getSample().getAlias() + ")" + "\",\"" + qcpassed + "\",\"" + "<a href=\"/miso/library/" + library.getId()
             + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "\",\""
             + (isStringEmptyOrNull(identificationBarcode) ? "" : identificationBarcode) + "\"]"));
       }

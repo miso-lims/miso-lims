@@ -825,10 +825,10 @@ public class PoolControllerHelperService {
           }
           JSONArray pout = new JSONArray();
           pout.add(libraryDilution.getName());
-          pout.add(libraryDilution.getLibrary().getName() + "-" + libraryDilution.getLibrary().getAlias());
-          pout.add(libraryDilution.getLibrary().getSample().getName() + "-" + libraryDilution.getLibrary().getSample().getAlias());
-          pout.add(libraryDilution.getLibrary().getSample().getProject().getName() + "-"
-              + libraryDilution.getLibrary().getSample().getProject().getAlias());
+          pout.add(libraryDilution.getLibrary().getName() + " (" + libraryDilution.getLibrary().getAlias() + ")");
+          pout.add(libraryDilution.getLibrary().getSample().getName() + " (" + libraryDilution.getLibrary().getSample().getAlias()+ ")");
+          pout.add(libraryDilution.getLibrary().getSample().getProject().getName() + " ("
+              + libraryDilution.getLibrary().getSample().getProject().getAlias() + ")");
           pout.add("<div style='cursor:pointer;' onmousedown=\"Pool.search.poolSearchSelectElement('" + libraryDilution.getId() + "', '"
               + libraryDilution.getName() + "')\"><span class=\"ui-icon ui-icon-plusthick\"></span></div>");
           arr.add(pout);

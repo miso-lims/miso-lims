@@ -214,7 +214,7 @@
         <c:otherwise>
           <td>
             <input type="hidden" value="${sample.project.id}" name="project" id="project"/>
-            <a href='<c:url value="/miso/project/${sample.project.id}"/>'>${sample.project.name}</a>
+            <a href='<c:url value="/miso/project/${sample.project.id}"/>'>${sample.project.name} (${sample.project.alias})</a>
           </td>
         </c:otherwise>
       </c:choose>
@@ -283,7 +283,7 @@
     <tr>
       <td>Permissions</td>
       <td><i>Inherited from project </i>
-        <a href='<c:url value="/miso/project/${sample.project.id}"/>'>${sample.project.name}</a>
+        <a href='<c:url value="/miso/project/${sample.project.id}"/>'>${sample.project.name} (${sample.project.alias})</a>
         <input type="hidden" value="${sample.project.securityProfile.profileId}"
                name="securityProfile" id="securityProfile"/>
       </td>
