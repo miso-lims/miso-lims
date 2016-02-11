@@ -48,7 +48,8 @@
       <tbody>
       <c:forEach items="${submissions}" var="submission">
         <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-          <td class="fit">
+          <td class="fit"
+              onclick="window.location.href='<c:url value="/miso/submission/${submission.id}"/>'">
               ${submission.id}
           </td>
           <td class="fit">

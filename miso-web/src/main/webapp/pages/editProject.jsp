@@ -425,7 +425,7 @@
       <thead>
       <tr>
         <th>Sample Name</th>
-        <th>Sample Alias*</th>
+        <th>Sample Alias</th>
         <th class="fit">Edit</th>
         <th class="fit">REMOVE</th>
       </tr>
@@ -603,7 +603,9 @@
       <c:forEach items="${project.studies}" var="study">
         <tr studyId="${study.id}" onMouseOver="this.className='highlightrow'"
             onMouseOut="this.className='normalrow'">
-          <td><b>${study.name}</b></td>
+          <td class="misoicon" onclick="window.location.href='<c:url value="/miso/study/${study.id}"/>'">
+            <b>${study.name}</b>
+          </td>
           <td>${study.alias}</td>
           <td class="misoicon" onclick="window.location.href='<c:url value="/miso/study/${study.id}"/>'">
             <span class="ui-icon ui-icon-pencil"/>
@@ -775,8 +777,10 @@
           <tbody>
           <c:forEach items="${project.samples}" var="sample">
             <tr sampleId="${sample.id}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-              <td><b>${sample.name}</b></td>
-              <td>${sample.alias}</td>
+              <td class="misoicon" onclick="window.location.href='<c:url value="/miso/sample/${sample.id}"/>'">
+                <b>${sample.name}</b></td>
+              <td class="misoicon" onclick="window.location.href='<c:url value="/miso/sample/${sample.id}"/>'">
+                ${sample.alias}</td>
               <td>${sample.description}</td>
               <td>${sample.sampleType}</td>
               <td>${sample.receivedDate}</td>
@@ -885,8 +889,10 @@
                 <tbody>
                 <c:forEach items="${overview.sampleGroup.entities}" var="sample">
                   <tr sampleId="${sample.id}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-                    <td><b>${sample.name}</b></td>
-                    <td>${sample.alias}</td>
+                    <td class="misoicon" onclick="window.location.href='<c:url value="/miso/sample/${sample.id}"/>'">
+                      <b>${sample.name}</b></td>
+                    <td class="misoicon" onclick="window.location.href='<c:url value="/miso/sample/${sample.id}"/>'">
+                      ${sample.alias}</td>
                     <td>${sample.description}</td>
                     <td>${sample.sampleType}</td>
                     <td>${sample.receivedDate}</td>
@@ -1015,8 +1021,10 @@
           <tbody>
           <c:forEach items="${projectLibraries}" var="library">
             <tr libraryId="${library.id}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-              <td><b>${library.name}</b></td>
-              <td>${library.alias}</td>
+              <td class="misoicon" onclick="window.location.href='<c:url value="/miso/library/${library.id}"/>'">
+                <b>${library.name}</b></td>
+              <td class="misoicon" onclick="window.location.href='<c:url value="/miso/library/${library.id}"/>'">
+                ${library.alias}</td>
               <td>${library.creationDate}</td>
               <td>${library.description}</td>
               <td>${library.libraryType.description}</td>
@@ -1118,7 +1126,9 @@
               <tbody>
               <c:forEach items="${libraryGroupMap[overview.id]}" var="grouplib" varStatus="lg">
                 <tr libraryId="${grouplib.id}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-                  <td><b>${grouplib.name}</b></td>
+                  <td class="misoicon" onclick="window.location.href='<c:url value="/miso/library/${grouplib.id}"/>'">
+                    <b>${grouplib.name}</b>
+                  </td>
                   <td>${grouplib.alias}</td>
                   <td>${grouplib.creationDate}</td>
                   <td>${grouplib.description}</td>
@@ -1229,7 +1239,9 @@
       <tbody>
       <c:forEach items="${projectLibraryDilutions}" var="dil">
         <tr dilutionId="${dil.id}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-          <td><b>${dil.name}</b></td>
+          <td class="misoicon" onclick="window.location.href='<c:url value="/miso/library/${dil.library.id}"/>'">
+            <b>${dil.name}</b>
+          </td>
           <td>${dil.library.alias}<c:if test="${not empty dil.library.tagBarcode}">
             (${dil.library.tagBarcode.name})</c:if></td>
           <td>${dil.dilutionCreator}</td>
@@ -1316,7 +1328,9 @@
       <tbody>
       <c:forEach items="${projectPools}" var="pool">
         <tr poolId="${pool.id}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-          <td><b>${pool.name}</b></td>
+          <td class="misoicon" onclick="window.location.href='<c:url value="/miso/pool/${pool.id}"/>'">
+            <b>${pool.name}</b>
+          </td>
           <td>${pool.alias}</td>
           <td>${pool.platformType.key}</td>
           <td>${pool.creationDate}</td>
@@ -1402,7 +1416,9 @@
       <tbody>
       <c:forEach items="${projectEmPcrs}" var="pcr">
         <tr pcrId="${pcr.id}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-          <td><b>${pcr.name}</b></td>
+          <td class="misoicon" onclick="window.location.href='<c:url value="/miso/library/${pcr.libraryDilution.library.id}"/>'">
+            <b>${pcr.name}</b>
+          </td>
           <td>${pcr.libraryDilution.name}</td>
           <td>${pcr.pcrCreator}</td>
           <td>${pcr.creationDate}</td>
@@ -1482,7 +1498,9 @@
       <tbody>
       <c:forEach items="${projectEmPcrDilutions}" var="dil">
         <tr dilutionId="${dil.id}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-          <td><b>${dil.name}</b></td>
+          <td class="misoicon" onclick="window.location.href='<c:url value="/miso/library/${dil.library.id}"/>'">
+            <b>${dil.name}</b>
+          </td>
           <td>${dil.dilutionCreator}</td>
           <td>${dil.creationDate}</td>
           <td>${dil.concentration}</td>
@@ -1559,7 +1577,9 @@
       <tbody>
       <c:forEach items="${projectPlates}" var="plate">
         <tr poolId="${plate.id}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-          <td><b>${plate.name}</b></td>
+          <td class="misoicon" onclick="window.location.href='<c:url value="/miso/plate/${plate.id}"/>'">
+            <b>${plate.name}</b>
+          </td>
           <td>${plate.size}</td>
           <td>${plate.creationDate}</td>
             <%-- <td class="misoicon" onclick="window.location.href='<c:url value="/miso/pool/${fn:toLowerCase(pool.platformType.key)}/${pool.id}"/>'"><span class="ui-icon ui-icon-pencil"/></td> --%>
@@ -1620,7 +1640,9 @@
     <tbody>
     <c:forEach items="${projectRuns}" var="run" varStatus="runCount">
       <tr runId="${run.id}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-        <td><b>${run.name}</b></td>
+        <td class="misoicon" onclick="window.location.href='<c:url value="/miso/run/${run.id}"/>'">
+          <b>${run.name}</b>
+        </td>
         <td>${run.alias}</td>
         <td>
           <c:forEach items="${run.sequencerPartitionContainers}" var="container" varStatus="fCount">

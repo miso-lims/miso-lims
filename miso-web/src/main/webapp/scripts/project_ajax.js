@@ -138,8 +138,7 @@ Project.ui = {
             { "sTitle": "Alias"},
             { "sTitle": "Description"},
             { "sTitle": "Progress"},
-            { "sTitle": "Overview"},
-            { "sTitle": "Edit"}
+            { "sTitle": "Overview"}
           ],
           "bJQueryUI": true,
           "iDisplayLength": 25,
@@ -382,8 +381,7 @@ Project.ui = {
           "aoColumns": [
             { "sTitle": "Name", "sType": "no-pla"},
             { "sTitle": "Alias"},
-            { "sTitle": "Description"},
-            { "sTitle": "Edit"}
+            { "sTitle": "Description"}
           ],
           "bJQueryUI": true,
           "iDisplayLength": 25,

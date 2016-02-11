@@ -436,7 +436,7 @@ Sample.library = {
     }
   },
   
-  validateLibraryQcs: function () {
+  validateLibraryQcs: function (json) {
     var ok = true;
     for (var i = 0; i < json.length; i++) {
       if (!json[i].results.match(/[0-9\.]+/) ||
@@ -771,7 +771,6 @@ Sample.ui = {
             { "sTitle": "Type"},
             { "sTitle": "QC Passed"},
             { "sTitle": "QC Result"},
-            { "sTitle": "Edit"},
             { "sTitle": "ID", "bVisible": false}
           ],
           "bJQueryUI": true,

@@ -34,7 +34,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
-import com.google.json.JsonSanitizer;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -106,10 +105,13 @@ public class StudyControllerHelperService {
       JSONObject j = new JSONObject();
       JSONArray jsonArray = new JSONArray();
       for (Study study : requestManager.listAllStudies()) {
-        jsonArray.add(JsonSanitizer.sanitize("[\"" + study.getName() + "\",\"" + study.getAlias() + "\",\"" + study.getDescription()
-            + "\",\"" + study.getStudyType() + "\",'" + "<a href=\"/miso/study/" + study.getId()
-            + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']"));
+        JSONArray inner = new JSONArray();
+        inner.add(TableHelper.hyperLinkify("/miso/study/" + study.getId(), study.getName()));
+        inner.add(TableHelper.hyperLinkify("/miso/study/" + study.getId(), study.getAlias()));
+        inner.add(study.getDescription());
+        inner.add(study.getStudyType());
 
+        jsonArray.add(inner);
       }
       j.put("array", jsonArray);
       return j;
