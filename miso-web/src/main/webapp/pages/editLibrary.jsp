@@ -840,15 +840,6 @@
               [1, 'asc'],
               [3, 'asc']
             ],
-            "aoColumns": [
-              null,
-              { "sType": 'natural' },
-              null,
-              null,
-              null,
-              null
-              <sec:authorize access="hasRole('ROLE_ADMIN')">, null</sec:authorize>
-            ],
             "iDisplayLength": 50,
             "bJQueryUI": true,
             "bRetrieve": true

@@ -305,7 +305,6 @@ Box.ui = {
         [0, "asc"]
       ]
     }).css("width", "100%");
-    jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
     jQuery("#toolbar").append('<button style=\"margin-left:5px;\" class=\"fg-button ui-state-default ui-corner-all\" id="listAllItems" onclick="Box.ui.filterTableByColumn(\'#listingBoxablesTable\', \'\', 0);">List all Box Contents</button>');
   },
 
