@@ -84,7 +84,11 @@ public class SQLBoxDAO implements BoxStore {
             int column = inner_rs.getInt("column");
             Boxable item = libraryDAO.getByPositionId(positionId);
             if (item == null) {
-              item = sampleDAO.getByPositionId(positionId);
+              try {
+                item = sampleDAO.getByPositionId(positionId);
+              } catch (IOException e) {
+                throw new SQLException("Could not get sample.", e);
+              }
             }
             if (item == null) {
               item = poolDAO.getByPositionId(positionId);
@@ -558,7 +562,7 @@ public class SQLBoxDAO implements BoxStore {
       template.update("INSERT INTO BoxChangeLog (boxId, columnsChanged, userId, message) VALUES (?, '', ?, ?)", box.getId(),
           box.getLastModifier().getUserId(), message);
     }
-    for (Class<?> clazz : new Class<?>[]{Library.class, Pool.class, Sample.class}) {
+    for (Class<?> clazz : new Class<?>[] { Library.class, Pool.class, Sample.class }) {
       // remove all caching for Libraries, Pools and Samples to ensure correct position is displayed
       DbUtils.lookupCache(getCacheManager(), clazz, false).removeAll();
       DbUtils.lookupCache(getCacheManager(), clazz, true).removeAll();

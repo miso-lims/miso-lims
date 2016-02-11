@@ -148,7 +148,7 @@
     </property>
     <property name="securityManager" ref="securityManager" />
     <property name="studyDAO" ref="sqlStudyDAO" />
-    <property name="sampleDAO" ref="sqlSampleDAO" />
+    <property name="sampleDAO" ref="hibernateSampleDao" />
     <property name="entityGroupDAO" ref="sqlEntityGroupDAO" />
     <property name="libraryDAO" ref="sqlLibraryDAO" />
     <property name="runDAO" ref="sqlRunDAO" />
@@ -214,7 +214,7 @@
     <property name="securityDAO" ref="sqlSecurityDAO" />
     <property name="changeLogDAO" ref="sqlChangeLogDAO" />
     <property name="studyDAO" ref="sqlStudyDAO" />
-    <property name="sampleDAO" ref="sqlSampleDAO" />
+    <property name="sampleDAO" ref="hibernateSampleDao" />
     <property name="runDAO" ref="sqlRunDAO" />
     <property name="poolDAO" ref="sqlPoolDAO" />
     <property name="platformDAO" ref="sqlPlatformDAO" />
@@ -223,19 +223,14 @@
     <property name="jdbcTemplate" ref="interfaceTemplate" />
   </bean>
 
-  <bean id="sqlSampleDAO" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLSampleDAO">
-    <property name="cascadeType">
-      <value type="javax.persistence.CascadeType">REMOVE</value>
-    </property>
-    <property name="changeLogDAO" ref="sqlChangeLogDAO" />
-    <property name="noteDAO" ref="sqlNoteDAO" />
-    <property name="libraryDAO" ref="sqlLibraryDAO" />
-    <property name="projectDAO" ref="sqlProjectDAO" />
-    <property name="sampleQcDAO" ref="sqlSampleQCDAO" />
-    <property name="securityDAO" ref="sqlSecurityDAO" />
-    <property name="securityProfileDAO" ref="sqlSecurityProfileDAO" />
-    <property name="boxDAO" ref="sqlBoxDAO" />
+  <bean id="hibernateSampleDao" class="uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleDao">
     <property name="jdbcTemplate" ref="interfaceTemplate" />
+    <property name="changeLogDao" ref="sqlChangeLogDAO" />
+    <property name="libraryDao" ref="sqlLibraryDAO" />
+    <property name="noteDao" ref="sqlNoteDAO" />
+    <property name="sampleQcDao" ref="sqlSampleQCDAO" />
+    <property name="securityDao" ref="sqlSecurityDAO" />
+    <property name="securityProfileDao" ref="sqlSecurityProfileDAO" />
     <property name="autoGenerateIdentificationBarcodes">
       <value>${miso.autoGenerateIdentificationBarcodes}</value>
     </property>
@@ -245,7 +240,7 @@
     <property name="cascadeType">
       <value type="javax.persistence.CascadeType">ALL</value>
     </property>
-    <property name="sampleDAO" ref="sqlSampleDAO" />
+    <property name="sampleDAO" ref="hibernateSampleDao" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />
   </bean>
 
@@ -314,7 +309,7 @@
     <property name="changeLogDAO" ref="sqlChangeLogDAO" />
     <property name="noteDAO" ref="sqlNoteDAO" />
     <property name="poolDAO" ref="sqlPoolDAO" />
-    <property name="sampleDAO" ref="sqlSampleDAO" />
+    <property name="sampleDAO" ref="hibernateSampleDao" />
     <property name="dilutionDAO" ref="sqlLibraryDilutionDAO" />
     <property name="libraryQcDAO" ref="sqlLibraryQCDAO" />
     <property name="securityProfileDAO" ref="sqlSecurityProfileDAO" />
@@ -393,7 +388,7 @@
     <property name="dilutionDAO" ref="sqlLibraryDilutionDAO" />
     <property name="experimentDAO" ref="sqlExperimentDAO" />
     <property name="partitionDAO" ref="sqlPartitionDAO" />
-    <property name="sampleDAO" ref="sqlSampleDAO" />
+    <property name="sampleDAO" ref="hibernateSampleDao" />
     <property name="studyDAO" ref="sqlStudyDAO" />
     <property name="runDAO" ref="sqlRunDAO" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />
@@ -426,7 +421,7 @@
     <property name="securityDAO" ref="sqlSecurityDAO" />
     <property name="changeLogDAO" ref="sqlChangeLogDAO" />
     <property name="libraryDAO" ref="sqlLibraryDAO" />
-    <property name="sampleDAO" ref="sqlSampleDAO" />
+    <property name="sampleDAO" ref="hibernateSampleDao" />
     <property name="dilutionDAO" ref="sqlLibraryDilutionDAO" />
     <property name="securityProfileDAO" ref="sqlSecurityProfileDAO" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />
@@ -454,7 +449,7 @@
     <property name="changeLogDAO" ref="sqlChangeLogDAO" />
     <property name="libraryDAO" ref="sqlLibraryDAO" />
     <property name="poolDAO" ref="sqlPoolDAO" />
-    <property name="sampleDAO" ref="sqlSampleDAO" />
+    <property name="sampleDAO" ref="hibernateSampleDao" />
     <property name="securityProfileDAO" ref="sqlSecurityProfileDAO" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />
   </bean>
@@ -557,7 +552,7 @@
     </property>
     <property name="interceptorNames">
       <list>
-        <value>sqlSampleDAO</value>
+        <value>hibernateSampleDao</value>
       </list>
     </property>
   </bean>
