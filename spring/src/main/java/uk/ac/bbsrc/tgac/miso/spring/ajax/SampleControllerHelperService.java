@@ -60,6 +60,7 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import com.google.json.JsonSanitizer;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -773,17 +774,13 @@ public class SampleControllerHelperService {
       JSONObject j = new JSONObject();
       JSONArray jsonArray = new JSONArray();
       for (Sample sample : requestManager.listAllSamples()) {
-        JSONArray inner = new JSONArray();
         String identificationBarcode = sample.getIdentificationBarcode();
 
-        inner.add(TableHelper.hyperLinkify("/miso/sample/" + sample.getId(), sample.getName()));
-        inner.add(TableHelper.hyperLinkify("/miso/sample/" + sample.getId(), sample.getAlias()));
-        inner.add(sample.getSampleType());
-        inner.add((sample.getQcPassed() != null ? sample.getQcPassed().toString() : ""));
-        inner.add(getSampleLastQC(sample.getId()));
-        inner.add((isStringEmptyOrNull(identificationBarcode) ? "" : identificationBarcode));
-        
-        jsonArray.add(inner);
+        jsonArray.add(JsonSanitizer.sanitize("[\"" + sample.getName() + "\",\"" + sample.getAlias() + "\",\"" + sample.getSampleType()
+            + "\",\"" + (sample.getQcPassed() != null ? sample.getQcPassed().toString() : "") + "\",\"" + getSampleLastQC(sample.getId())
+            + "\",'" + "<a href=\"/miso/sample/" + sample.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "','" 
+            + (isStringEmptyOrNull(identificationBarcode) ? "" : identificationBarcode) + "]"));
+
       }
       j.put("array", jsonArray);
       return j;

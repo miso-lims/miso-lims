@@ -182,10 +182,9 @@
               <td id="result${qc.id}">${qc.results} ${qc.qcType.units}</td>
               <c:if test="${(library.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
                                         or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-
-              <td id="edit${qc.id}" align="center"><a href="javascript:void(0);"
-                                                      onclick="Pool.qc.changePoolQCRow('${qc.id}','${pool.id}')">
-                <span class="ui-icon ui-icon-pencil"></span></a></td>
+                <td id="edit${qc.id}" align="center"><a href="javascript:void(0);"
+                                                        onclick="Pool.qc.changePoolQCRow('${qc.id}','${pool.id}')">
+                  <span class="ui-icon ui-icon-pencil"></span></a></td>
               </c:if>
             </tr>
           </c:forEach>

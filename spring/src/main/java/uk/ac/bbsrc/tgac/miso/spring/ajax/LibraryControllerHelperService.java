@@ -56,6 +56,7 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import com.google.json.JsonSanitizer;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONException;
@@ -1215,20 +1216,16 @@ public class LibraryControllerHelperService {
       JSONObject j = new JSONObject();
       JSONArray jsonArray = new JSONArray();
       for (Library library : requestManager.listAllLibraries()) {
-        JSONArray inner = new JSONArray();
-        String identificationBarcode = library.getIdentificationBarcode();
         String qcpassed = "Unknown";
         if (library.getQcPassed() != null) {
           qcpassed = library.getQcPassed().toString();
         }
-        inner.add(TableHelper.hyperLinkify("/miso/library/" + library.getId(), library.getName()));
-        inner.add(TableHelper.hyperLinkify("/miso/library/" + library.getId(), library.getAlias()));
-        inner.add(library.getLibraryType().getDescription());
-        inner.add(TableHelper.hyperLinkify("/miso/sample/" + library.getSample().getId(), library.getSample().getName()));
-        inner.add(qcpassed);
-        inner.add((isStringEmptyOrNull(identificationBarcode) ? "" : identificationBarcode));
+        String identificationBarcode = library.getIdentificationBarcode();
         
-        jsonArray.add(inner);
+        jsonArray.add(JsonSanitizer.sanitize("[\"" + library.getName() + "\",\"" + library.getAlias() + "\",\"" + library.getLibraryType().getDescription() + "\",\""
+            + library.getSample().getName() + " (" + library.getSample().getAlias() + ")" + "\",\"" + qcpassed + "\",\"" + "<a href=\"/miso/library/" + library.getId()
+            + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "\",\""
+            + (isStringEmptyOrNull(identificationBarcode) ? "" : identificationBarcode) + "\"]"));
       }
       j.put("array", jsonArray);
       return j;
