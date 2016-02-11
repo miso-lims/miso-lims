@@ -1222,10 +1222,15 @@ public class LibraryControllerHelperService {
         }
         String identificationBarcode = library.getIdentificationBarcode();
         
-        jsonArray.add(JsonSanitizer.sanitize("[\"" + library.getName() + "\",\"" + library.getAlias() + "\",\"" + library.getLibraryType().getDescription() + "\",\""
-            + library.getSample().getName() + "\",\"" + qcpassed + "\",\"" + "<a href=\"/miso/library/" + library.getId()
-            + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "\",\""
-            + (isStringEmptyOrNull(identificationBarcode) ? "" : identificationBarcode) + "\"]"));
+        JSONArray inner = new JSONArray();
+        inner.add(library.getName());
+        inner.add(library.getAlias());
+        inner.add(library.getLibraryType().getDescription());
+        inner.add(library.getSample().getName() + " (" + library.getSample().getAlias() + ")");
+        inner.add(qcpassed);
+        inner.add("<a href=\"/miso/library/" + library.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>");
+        inner.add((isStringEmptyOrNull(identificationBarcode) ? "" : identificationBarcode));
+        jsonArray.add(inner);
       }
       j.put("array", jsonArray);
       return j;

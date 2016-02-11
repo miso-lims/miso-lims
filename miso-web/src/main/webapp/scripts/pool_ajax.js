@@ -64,11 +64,11 @@ var Pool = Pool || {
     jQuery('#concentration').attr('data-parsley-type', 'number');
 
     // Creation Date input field validation
-    jQuery('creationDate').attr('class', 'form-control');
-    jQuery('creationDate').attr('required', 'true');
-    jQuery('creationDate').attr('data-parsley-pattern', Utils.validation.dateRegex);
-    jQuery('creationDate').attr('data-date-format', 'DD/MM/YYYY');
-    jQuery('creationDate').attr('data-parsley-error-message', 'Date must be of form DD/MM/YYYY');
+    jQuery('#creationDate').attr('class', 'form-control');
+    jQuery('#creationDate').attr('required', 'true');
+    jQuery('#creationDate').attr('data-parsley-pattern', Utils.validation.dateRegex);
+    jQuery('#creationDate').attr('data-date-format', 'DD/MM/YYYY');
+    jQuery('#creationDate').attr('data-parsley-error-message', 'Date must be of form DD/MM/YYYY');
 
     jQuery('#pool-form').parsley();
     jQuery('#pool-form').parsley().validate();
@@ -136,7 +136,8 @@ Pool.qc = {
         'results':f.poolQcResults,
         'url':ajaxurl
       },
-      {'updateElement':'poolQcTable',
+      {
+        'updateElement':'poolQcTable',
         'doOnSuccess':function(json) {
           jQuery('#poolQcTable').removeAttr("qcInProgress");
         }
@@ -153,7 +154,8 @@ Pool.qc = {
         'qcId':qcId,
         'url':ajaxurl
       },
-      {'doOnSuccess':function(json) {
+      {
+        'doOnSuccess':function(json) {
           jQuery('#result' + qcId).html(json.results);
           jQuery('#edit' + qcId).html(json.edit);
         }
@@ -171,7 +173,8 @@ Pool.qc = {
         'result':jQuery('#results' + qcId).val(),
         'url':ajaxurl
       },
-      {'doOnSuccess':Utils.page.pageReload
+      {
+        'doOnSuccess':Utils.page.pageReload
       }
     );
   }
@@ -456,33 +459,32 @@ Pool.ui = {
     jQuery('#elementSelectDatatableDiv').html("<table cellpadding='0' width='100%' cellspacing='0' border='0' class='display' id='elementSelectDatatable'></table>");
     jQuery('#elementSelectDatatable').html("<img src='/styles/images/ajax-loader.gif'/>");
     Fluxion.doAjax(
-            'poolControllerHelperService',
-            'createElementSelectDataTable',
-            {
-              'url':ajaxurl,
-              'platform':platform
-            },
-            {'doOnSuccess': function(json) {
-
-              jQuery('#elementSelectDatatable').html('');
-              jQuery('#elementSelectDatatable').dataTable({
-                                            "aaData": json.poolelements,
-                                            "aoColumns": [
-                                              { "sTitle": "Dilution Name", "sType":"natural"},
-                                              { "sTitle": "Library", "sType":"natural"},
-                                              { "sTitle": "Sample", "sType":"natural"},
-                                              { "sTitle": "Project", "sType":"natural"},
-                                              { "sTitle": "Add"}
-                                            ],
-                                            "bJQueryUI": true,
-                                            "iDisplayLength":  25,
-                                            "aaSorting":[
-                                              [0,"desc"]
-                                            ]
-                                          });
-
-            }
-            }
+      'poolControllerHelperService',
+      'createElementSelectDataTable',
+      {
+        'url':ajaxurl,
+        'platform':platform
+      },
+      {
+        'doOnSuccess': function(json) {
+          jQuery('#elementSelectDatatable').html('');
+          jQuery('#elementSelectDatatable').dataTable({
+            "aaData": json.poolelements,
+            "aoColumns": [
+              { "sTitle": "Dilution Name", "sType":"natural"},
+              { "sTitle": "Library", "sType":"natural"},
+              { "sTitle": "Sample", "sType":"natural"},
+              { "sTitle": "Project", "sType":"natural"},
+              { "sTitle": "Add"}
+            ],
+            "bJQueryUI": true,
+            "iDisplayLength":  25,
+            "aaSorting":[
+              [0,"desc"]
+            ]
+          });
+        }
+      }
     );
   },
 
@@ -497,13 +499,14 @@ Pool.search = {
       'poolControllerHelperService',
       'poolSearchExperiments',
       {'str':jQuery(input).val(), 'platform':platform, 'id':input.id, 'url':ajaxurl},
-      {'doOnSuccess': function(json) {
-        jQuery('#exptresult').css('visibility', 'visible');
-        jQuery('#exptresult').html(json.html);
-        jQuery(input).blur(function() {
-          jQuery('#exptresult :first-child').hide();
-        });
-      }
+      {
+        'doOnSuccess': function(json) {
+          jQuery('#exptresult').css('visibility', 'visible');
+          jQuery('#exptresult').html(json.html);
+          jQuery(input).blur(function() {
+            jQuery('#exptresult :first-child').hide();
+          });
+        }
       }
     );
   },
@@ -527,10 +530,11 @@ Pool.search = {
       'poolControllerHelperService',
       'poolSearchLibraryDilution',
       {'str':jQuery(input).val(), 'platform':platform, 'id':input.id, 'url':ajaxurl},
-      {'doOnSuccess': function(json) {
-        jQuery('#searchDilutionResult').css('visibility', 'visible');
-        jQuery('#searchDilutionResult').html(json.html);
-      }
+      {
+        'doOnSuccess': function(json) {
+          jQuery('#searchDilutionResult').css('visibility', 'visible');
+          jQuery('#searchDilutionResult').html(json.html);
+        }
       }
     );
   },
@@ -540,10 +544,11 @@ Pool.search = {
       'poolControllerHelperService',
       'poolSearchEmPcrDilution',
       {'str':jQuery(input).val(), 'platform':platform, 'id':input.id, 'url':ajaxurl},
-      {'doOnSuccess': function(json) {
-        jQuery('#searchDilutionResult').css('visibility', 'visible');
-        jQuery('#searchDilutionResult').html(json.html);
-      }
+      {
+        'doOnSuccess': function(json) {
+          jQuery('#searchDilutionResult').css('visibility', 'visible');
+          jQuery('#searchDilutionResult').html(json.html);
+        }
       }
     );
   },
@@ -553,13 +558,14 @@ Pool.search = {
       'poolSearchService',
       'poolSearchElements',
       {'str':jQuery(input).val(), 'platform':platform, 'id':input.id, 'url':ajaxurl},
-      {'doOnSuccess': function(json) {
-        jQuery('#searchElementsResult').css('visibility', 'visible');
-        jQuery('#searchElementsResult').html(json.html);
-        jQuery(input).blur(function() {
-          jQuery('#searchElementsResult :first-child').hide();
-        });
-      }
+      {
+        'doOnSuccess': function(json) {
+          jQuery('#searchElementsResult').css('visibility', 'visible');
+          jQuery('#searchElementsResult').html(json.html);
+          jQuery(input).blur(function() {
+            jQuery('#searchElementsResult :first-child').hide();
+          });
+        }
       }
     );
   },
@@ -610,7 +616,6 @@ Pool.barcode = {
             "</fieldset></form>");
 
     jQuery('#changePoolIdBarcodeDialog').dialog({
-      autoOpen: false,
       width: 400,
       modal: true,
       resizable: false,
@@ -623,7 +628,7 @@ Pool.barcode = {
           jQuery(this).dialog('close');
         }
       }
-    }).dialog('open');
+    });
   },
 
   changePoolIdBarcode: function (poolId, idBarcode) {

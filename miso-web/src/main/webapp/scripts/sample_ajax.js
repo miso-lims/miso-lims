@@ -28,10 +28,12 @@ var Sample = Sample || {
         'sampleControllerHelperService',
         'deleteSample',
         {'sampleId': sampleId, 'url': ajaxurl},
-        {'doOnSuccess': function (json) {
-          successfunc();
+        {
+          'doOnSuccess': function (json) {
+            successfunc();
+          }
         }
-      });
+      );
     }
   },
 
@@ -41,10 +43,12 @@ var Sample = Sample || {
         'sampleControllerHelperService',
         'removeSampleFromGroup',
         {'sampleId': sampleId, 'sampleGroupId':sampleGroupId, 'url': ajaxurl},
-        {'doOnSuccess': function (json) {
-          successfunc();
+        {
+          'doOnSuccess': function (json) {
+            successfunc();
+          }
         }
-      });
+      );
     }
   },
   
@@ -224,7 +228,8 @@ Sample.qc = {
         'qcType': f.sampleQcType,
         'results': f.sampleQcResults,
         'url': ajaxurl},
-      {'updateElement': 'sampleQcTable',
+      {
+        'updateElement': 'sampleQcTable',
         'doOnSuccess': function (json) {
           jQuery('#sampleQcTable').removeAttr("qcInProgress");
         }
@@ -258,7 +263,8 @@ Sample.qc = {
         'result': jQuery('#' + qcId).val(),
         'url': ajaxurl
       },
-      {'doOnSuccess': Utils.page.pageReload
+      {
+        'doOnSuccess': Utils.page.pageReload
       }
     );
   },
@@ -292,9 +298,11 @@ Sample.qc = {
             'qcs': aReturn,
             'url': ajaxurl
           },
-          {'doOnSuccess': function(json) {
-            Sample.library.processBulkLibraryQcTable(tableName, json);
-          }}
+          {
+            'doOnSuccess': function(json) {
+              Sample.library.processBulkLibraryQcTable(tableName, json);
+            }
+          }
         );
       }
       else {
@@ -380,9 +388,11 @@ Sample.library = {
             'dilutions': aReturn,
             'url': ajaxurl
           },
-          {'doOnSuccess': function(json) {
-            self.processBulkLibraryDilutionTable(tableName, json);
-          }}
+          {
+            'doOnSuccess': function(json) {
+              self.processBulkLibraryDilutionTable(tableName, json);
+            }
+          }
         );
       }
       else {
@@ -545,24 +555,21 @@ Sample.ui = {
             "<input type='text' name='idBarcodeInput' id='idBarcodeInput' class='text ui-widget-content ui-corner-all' />" +
             "</fieldset></form>");
 
-    jQuery(function () {
-      jQuery('#changeSampleIdBarcodeDialog').dialog({
-        autoOpen: false,
-        width: 400,
-        modal: true,
-        resizable: false,
-        buttons: {
-          "Save": function () {
-            self.changeSampleIdBarcode(sampleId, jQuery('#idBarcodeInput').val());
-            jQuery(this).dialog('close');
-          },
-          "Cancel": function () {
-            jQuery(this).dialog('close');
-          }
+
+    jQuery('#changeSampleIdBarcodeDialog').dialog({
+      width: 400,
+      modal: true,
+      resizable: false,
+      buttons: {
+        "Save": function () {
+          self.changeSampleIdBarcode(sampleId, jQuery('#idBarcodeInput').val());
+          jQuery(this).dialog('close');
+        },
+        "Cancel": function () {
+          jQuery(this).dialog('close');
         }
-      });
+      }
     });
-    jQuery('#changeSampleIdBarcodeDialog').dialog('open');
   },
 
   changeSampleIdBarcode: function (sampleId, idBarcode) {
@@ -675,7 +682,9 @@ Sample.ui = {
         'sampleControllerHelperService',
         'deleteSampleNote',
         {'sampleId': sampleId, 'noteId': noteId, 'url': ajaxurl},
-        {'doOnSuccess': Utils.page.pageReload}
+        {
+          'doOnSuccess': Utils.page.pageReload
+        }
       );
     }
   },
@@ -690,21 +699,22 @@ Sample.ui = {
         'sampleControllerHelperService',
         'getSampleByBarcode',
         {'barcode': barcode, 'url': ajaxurl},
-        {'doOnSuccess': function (json) {
-          var sample_desc = "<div id='" + json.id + "' class='dashboard'><table width=100%><tr><td>Sample Name: " + json.name + "<br> Sample ID: " + json.id + "<br>Desc: " + json.desc + "<br>Sample Type:" + json.type + "</td><td style='position: absolute;' align='right'><span class='float-right ui-icon ui-icon-circle-close' onclick='Sample.ui.removeSample(" + json.id + ");' style='position: absolute; top: 0; right: 0;'></span></td></tr></table> </div>";
-          if (jQuery("#" + json.id).length == 0) {
-            jQuery("#sample_pan").append(sample_desc);
-            jQuery('#msgspan').html("");
-          }
-          else {
-            jQuery('#msgspan').html("<i>This sample has already been scanned</i>");
-          }
-
-          //unbind to stop change error happening every time
-
-          //clear and focus
-          jQuery(input).val("");
-          jQuery(input).focus();
+        {
+          'doOnSuccess': function (json) {
+            var sample_desc = "<div id='" + json.id + "' class='dashboard'><table width=100%><tr><td>Sample Name: " + json.name + "<br> Sample ID: " + json.id + "<br>Desc: " + json.desc + "<br>Sample Type:" + json.type + "</td><td style='position: absolute;' align='right'><span class='float-right ui-icon ui-icon-circle-close' onclick='Sample.ui.removeSample(" + json.id + ");' style='position: absolute; top: 0; right: 0;'></span></td></tr></table> </div>";
+            if (jQuery("#" + json.id).length == 0) {
+              jQuery("#sample_pan").append(sample_desc);
+              jQuery('#msgspan').html("");
+            }
+            else {
+              jQuery('#msgspan').html("<i>This sample has already been scanned</i>");
+            }
+  
+            //unbind to stop change error happening every time
+  
+            //clear and focus
+            jQuery(input).val("");
+            jQuery(input).focus();
           },
           'doOnError': function (json) {
             jQuery('#msgspan').html("<i>" + json.error + "</i>");
@@ -733,10 +743,12 @@ Sample.ui = {
         'sampleControllerHelperService',
         'setSampleReceivedDateByBarcode',
         {'samples': samples, 'url': ajaxurl},
-        {'doOnSuccess': function (json) {
-          alert(json.result);
+        {
+          'doOnSuccess': function (json) {
+            alert(json.result);
+          }
         }
-      });
+      );
     }
     else {
       alert("No samples scanned");
@@ -761,30 +773,31 @@ Sample.ui = {
       {
         'url': ajaxurl
       },
-      {'doOnSuccess': function (json) {
-        jQuery('#listingSamplesTable').html('');
-        jQuery('#listingSamplesTable').dataTable({
-          "aaData": json.array,
-          "aoColumns": [
-            { "sTitle": "Sample Name", "sType": "no-sam"},
-            { "sTitle": "Alias"},
-            { "sTitle": "Type"},
-            { "sTitle": "QC Passed"},
-            { "sTitle": "QC Result"},
-            { "sTitle": "Edit"},
-            { "sTitle": "ID", "bVisible": false}
-          ],
-          "bJQueryUI": true,
-          "bAutoWidth": false,
-          "iDisplayLength": 25,
-          "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>',
-          "aaSorting": [
-            [0, "desc"]
-          ]
-        });
-        jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
-        jQuery("#toolbar").append("<button style=\"margin-left:5px;\" onclick=\"window.location.href='/miso/sample/new';\" class=\"fg-button ui-state-default ui-corner-all\">Add Sample</button>");
-      }
+      {
+        'doOnSuccess': function (json) {
+          jQuery('#listingSamplesTable').html('');
+          jQuery('#listingSamplesTable').dataTable({
+            "aaData": json.array,
+            "aoColumns": [
+              { "sTitle": "Sample Name", "sType": "no-sam"},
+              { "sTitle": "Alias"},
+              { "sTitle": "Type"},
+              { "sTitle": "QC Passed"},
+              { "sTitle": "QC Result"},
+              { "sTitle": "Edit"},
+              { "sTitle": "ID", "bVisible": false}
+            ],
+            "bJQueryUI": true,
+            "bAutoWidth": false,
+            "iDisplayLength": 25,
+            "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>',
+            "aaSorting": [
+              [0, "desc"]
+            ]
+          });
+          jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
+          jQuery("#toolbar").append("<button style=\"margin-left:5px;\" onclick=\"window.location.href='/miso/sample/new';\" class=\"fg-button ui-state-default ui-corner-all\">Add Sample</button>");
+        }
       }
     );
   }

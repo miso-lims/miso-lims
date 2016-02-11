@@ -1848,6 +1848,6 @@ button.disabled {
   opacity: .4;
 }
 
-.parsley-required parsley-custom-error-message {
+.parsley-required .parsley-custom-error-message {
 	color: #ff0000;
 }
