@@ -30,6 +30,7 @@ import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.store.SecurityStore;
 
 import net.sf.ehcache.CacheManager;
+import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -87,7 +88,7 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
 
     Library library = new LibraryImpl();
     String libraryName = "newLibrary";
-    library.setName(libraryName);;
+    library.setName(libraryName);
     library.setAlias("theAlias");
     library.setDescription("a description");
     Sample sample = new SampleImpl();
@@ -204,13 +205,12 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
     assertTrue(libraries.size() == 1);
     assertTrue(libraries.get(0).getId() == 1);
 
-
   }
 
   @Test
   public void testListByProjectId() throws Exception {
     List<Library> libraries = dao.listByProjectId(1);
-    List libraryIds = Arrays.asList(1l,2l,3l,4l,5l,6l,7l,8l,9l,10l,11l,12l,13l,14l);
+    List libraryIds = Arrays.asList(1l, 2l, 3l, 4l, 5l, 6l, 7l, 8l, 9l, 10l, 11l, 12l, 13l, 14l);
     assertTrue(libraries.size() == 14);
     for (Library library : libraries) {
       assertTrue("bad library found", libraryIds.contains(library.getId()));
@@ -220,7 +220,7 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
   @Test
   public void testListAll() throws Exception {
     List<Library> libraries = dao.listAll();
-    List libraryIds = Arrays.asList(1l,2l,3l,4l,5l,6l,7l,8l,9l,10l,11l,12l,13l,14l);
+    List libraryIds = Arrays.asList(1l, 2l, 3l, 4l, 5l, 6l, 7l, 8l, 9l, 10l, 11l, 12l, 13l, 14l);
     assertTrue(libraries.size() == 14);
     for (Library library : libraries) {
       assertTrue("bad library found", libraryIds.contains(library.getId()));
@@ -243,14 +243,14 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
 
   @Test
   public void testListBySearch() throws Exception {
-    String searchStr = "LIB" ;
+    String searchStr = "LIB";
     List<Library> libraries = dao.listBySearch(searchStr);
     assertTrue("did not find all libraries", libraries.size() == 14);
   }
 
   @Test
   public void testListBySearch_NoResults() throws Exception {
-    String searchStr = "IJOHEWF" ;
+    String searchStr = "IJOHEWF";
     List<Library> libraries = dao.listBySearch(searchStr);
     assertTrue("search returned results", libraries.size() == 0);
   }
@@ -342,7 +342,6 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
   public void testListAllLibraryTypes() throws Exception {
     List<LibraryType> libraryTypes = dao.listAllLibraryTypes();
     assertTrue(17 == libraryTypes.size());
-
 
   }
 

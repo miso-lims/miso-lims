@@ -133,7 +133,7 @@ public class UserAuthMisoRequestManager implements RequestManager {
     }
     return user;
   }
-  
+
   /**
    * @return the current user's full name, or "Unknown" if the current user cannot be determined
    */
@@ -146,8 +146,7 @@ public class UserAuthMisoRequestManager implements RequestManager {
     }
     if (user == null) {
       return "Unknown";
-    }
-    else {
+    } else {
       return user.getFullName();
     }
   }
@@ -433,8 +432,8 @@ public class UserAuthMisoRequestManager implements RequestManager {
     if (readCheck(o.getPool()))
       return o;
     else
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read parent Pool " + o.getPool().getId() 
-          + " for PoolQC " + qcId);
+      throw new AuthorizationIOException(
+          "User " + getCurrentUsername() + " cannot read parent Pool " + o.getPool().getId() + " for PoolQC " + qcId);
   }
 
   @Override
@@ -524,8 +523,8 @@ public class UserAuthMisoRequestManager implements RequestManager {
     if (readCheck(o.getLibrary()))
       return o;
     else
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read parent Library " + o.getLibrary().getId() 
-          + " for LibraryQC " + qcId);
+      throw new AuthorizationIOException(
+          "User " + getCurrentUsername() + " cannot read parent Library " + o.getLibrary().getId() + " for LibraryQC " + qcId);
   }
 
   @Override
@@ -635,8 +634,8 @@ public class UserAuthMisoRequestManager implements RequestManager {
     if (readCheck(o.getRun()))
       return o;
     else
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read parent Run " + o.getRun().getId() 
-          + " for RunQC " + runQcId);
+      throw new AuthorizationIOException(
+          "User " + getCurrentUsername() + " cannot read parent Run " + o.getRun().getId() + " for RunQC " + runQcId);
   }
 
   @Override
@@ -663,8 +662,8 @@ public class UserAuthMisoRequestManager implements RequestManager {
     if (readCheck(o.getSample()))
       return o;
     else
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read parent Run " + o.getSample().getId() 
-          + " for SampleQC " + sampleQcId);
+      throw new AuthorizationIOException(
+          "User " + getCurrentUsername() + " cannot read parent Sample " + o.getSample().getId() + " for SampleQC " + sampleQcId);
   }
 
   @Override
