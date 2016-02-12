@@ -102,9 +102,6 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
   @Transient
-  private Set<Plate<? extends LinkedList<Sample>, Sample>> plates = new HashSet<Plate<? extends LinkedList<Sample>, Sample>>();
-
-  @Transient
   public Document submissionDocument;
 
   @Transient
@@ -360,19 +357,6 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @Override
   public Collection<ChangeLog> getChangeLog() {
     return changeLog;
-  }
-
-  @Override
-  public Set<Plate<? extends LinkedList<Sample>, Sample>> getPlates() {
-    return plates;
-  }
-
-  public void addPlate(Plate<? extends LinkedList<Sample>, Sample> plate) {
-    this.plates.add(plate);
-  }
-
-  public void setPlates(Set<Plate<? extends LinkedList<Sample>, Sample>> plates) {
-    this.plates = plates;
   }
 
   @Override
