@@ -21,8 +21,9 @@ public class SampleDto {
   private Long projectId;
   private String scientificName;
   private String taxonIdentifier;
-  private SampleIdentityDto sampleIdentityDto;
+  private SampleIdentityDto sampleIdetityDto;
   private SampleAnalyteDto sampleAnalyte;
+  private SampleTissueDto sampleTissue;
   private SampleAdditionalInfoDto sampleAdditionalInfo;
   private Long parentId;
   private String parentUrl;
@@ -197,4 +198,11 @@ public class SampleDto {
     this.rootSampleClassUrl = rootSampleClassUrl;
   }
 
+  public SampleTissueDto getSampleTissueDto() {
+    return sampleTissue;
+  }
+
+  public void setSampleTissueDto(SampleTissueDto sampleTissueDto) {
+    this.sampleTissue = sampleTissueDto;
+  }
 }

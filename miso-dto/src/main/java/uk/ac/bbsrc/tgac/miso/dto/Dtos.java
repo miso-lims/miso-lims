@@ -465,7 +465,7 @@ public class Dtos {
 
     to.setAlias(from.getAlias());
     to.setDescription(from.getDescription());
-
+    to.setSampleTissue(to(from.getSampleTissueDto()));
     return to;
   }
 

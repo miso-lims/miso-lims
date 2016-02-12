@@ -332,3 +332,6 @@ CREATE TABLE `SampleTissue` (
   CONSTRAINT `sampleTissue_createUser_fkey` FOREIGN KEY (`createdBy`) REFERENCES `User` (`userId`),
   CONSTRAINT `sampleTissue_updateUser_fkey` FOREIGN KEY (`updatedBy`) REFERENCES `User` (`userId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+ALTER TABLE Sample ADD COLUMN `sampleTissueId` BIGINT (20) DEFAULT NULL after sampleAnalyteId;
+ALTER TABLE Sample ADD FOREIGN KEY (sampleTissueId) REFERENCES SampleTissue (sampleTissueId);

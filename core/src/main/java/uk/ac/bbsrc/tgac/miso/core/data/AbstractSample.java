@@ -61,6 +61,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAnalyteImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAnalyteNode;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityNode;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueNode;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
@@ -129,6 +131,10 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @OneToOne(targetEntity = SampleAnalyteImpl.class)
   @JoinColumn(name = "sampleAnalyteId")
   private SampleAnalyte sampleAnalyte;
+
+  @OneToOne(targetEntity = SampleTissueImpl.class)
+  @JoinColumn(name = "sampleTissueId")
+  private SampleTissue sampleTissue;
 
   @OneToOne(targetEntity = IdentityImpl.class)
   @JoinColumn(name = "identityId")
@@ -528,6 +534,16 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
     this.children = children;
   }
 
+  @Override
+  public SampleTissue getSampleTissue() {
+    return sampleTissue;
+  }
+
+  @Override
+  public void setSampleTissue(SampleTissue sampleTissue) {
+    this.sampleTissue = sampleTissue;
+  }
+
   public static class SampleFactoryBuilder {
     private String description;
     private String sampleType;
@@ -540,6 +556,7 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
     private SampleAdditionalInfo sampleAdditionalInfo;
     private Identity identity;
     private SampleAnalyte sampleAnalyte;
+    private SampleTissue sampleTissue;
     private String accession;
     private String name;
     private String identificationBarcode;
@@ -669,6 +686,11 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
       return this;
     }
 
+    public SampleFactoryBuilder sampleTissue(SampleTissue sampleTissue) {
+      this.sampleTissue = sampleTissue;
+      return this;
+    }
+
     public SampleAnalyte getSampleAnalyte() {
       return sampleAnalyte;
     }
@@ -705,6 +727,10 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
       return taxonIdentifier;
     }
 
+    public SampleTissue getSampleTissue() {
+      return this.sampleTissue;
+    }
+
     public Sample build() {
       checkNotNull(user, "A User must be provided to create a Sample.");
       checkNotNull(project, "A Project must be provided to create a Sample.");
@@ -727,6 +753,14 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
           checkNotNull(sampleAdditionalInfo.getTissueOrigin(), "SampleAdditionalInfo.tissueOrigin must be provided to create a Sample.");
           checkNotNull(sampleAdditionalInfo.getTissueType(), "SampleAdditionalInfo.tissueType must be provided to create a Sample.");
           return new SampleAnalyteNode(this);
+        } else if (sampleTissue != null) {
+          checkNotNull(sampleTissue, "sample tissue must be provided to create a SampleTissue");
+          checkNotNull(sampleTissue.getSample(), "sample must be provided to create a SampleTissue");
+          checkNotNull(sampleTissue.getLab(), "Lab must be provided to create a SampleTissue");
+          checkNotNull(sampleTissue.getLab().getAlias(), "Lab alias must be provided to create a SampleTissue");
+          checkNotNull(sampleTissue.getLab().getInstitute(), "Institute must be provided to create a SampleTissue");
+          checkNotNull(sampleTissue.getLab().getInstitute().getAlias(), "Institute alias must be provided to create a SampleTissue");
+          return new SampleTissueNode(this);
         }
       }
       throw new IllegalArgumentException("No sample can be built with the specified parameters.");

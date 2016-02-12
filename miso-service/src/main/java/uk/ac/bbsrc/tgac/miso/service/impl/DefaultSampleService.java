@@ -66,7 +66,7 @@ public class DefaultSampleService implements SampleService {
         .scientificName(s.getScientificName()).user(user).project(project).sampleAdditionalInfo(s.getSampleAdditionalInfo())
         .identity(s.getIdentity()).sampleAnalyte(s.getSampleAnalyte()).accession(s.getAccession()).name(s.getName())
         .identificationBarcode(s.getIdentificationBarcode()).locationBarcode(s.getLocationBarcode()).receivedDate(s.getReceivedDate())
-        .qcPassed(s.getQcPassed()).alias(s.getAlias()).taxonIdentifier(s.getTaxonIdentifier()).parent(parent).build();
+        .qcPassed(s.getQcPassed()).alias(s.getAlias()).taxonIdentifier(s.getTaxonIdentifier()).parent(parent).sampleTissue(s.getSampleTissue()).build();
 
     // Check for parent and valid relationship.
     // The relationship needs to be checked in the constructor as well.
