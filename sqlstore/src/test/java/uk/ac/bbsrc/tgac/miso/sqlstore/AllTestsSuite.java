@@ -37,6 +37,6 @@ import org.junit.runners.Suite;
  */
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses({ SQLRunDAOTest.class })
+@Suite.SuiteClasses({ SQLRunDAOTest.class, SQLSampleDAOTest.class })
 public class AllTestsSuite {
 }
