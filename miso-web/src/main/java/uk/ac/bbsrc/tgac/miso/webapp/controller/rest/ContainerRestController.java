@@ -53,7 +53,7 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 @Controller
 @RequestMapping("/rest/container")
 @SessionAttributes("container")
-public class ContainerRestController {
+public class ContainerRestController extends RestController {
   protected static final Logger log = LoggerFactory.getLogger(ContainerRestController.class);
 
   @Autowired
@@ -63,7 +63,7 @@ public class ContainerRestController {
     this.requestManager = requestManager;
   }
 
-  @RequestMapping(value = "{containerBarcode}", method = RequestMethod.GET)
+  @RequestMapping(value = "{containerBarcode}", method = RequestMethod.GET, produces="application/json")
   public @ResponseBody String jsonRest(@PathVariable String containerBarcode) throws IOException {
     StringBuilder sb = new StringBuilder();
     Collection<SequencerPartitionContainer<SequencerPoolPartition>> sequencerPartitionContainerCollection = requestManager
@@ -74,7 +74,9 @@ public class ContainerRestController {
       sb.append("{");
       sb.append("\"containerId\":\"" + sequencerPartitionContainer.getId() + "\",");
       sb.append("\"identificationBarcode\":\"" + sequencerPartitionContainer.getIdentificationBarcode() + "\",");
-      sb.append("\"platform\":\"" + sequencerPartitionContainer.getPlatform().getNameAndModel() + "\",");
+      if (sequencerPartitionContainer.getPlatform() != null) {
+        sb.append("\"platform\":\"" + sequencerPartitionContainer.getPlatform().getNameAndModel() + "\",");
+      }
       sb.append("\"partitions\":[");
       int ip = 0;
       for (SequencerPoolPartition partition : sequencerPartitionContainer.getPartitions()) {
@@ -123,10 +125,11 @@ public class ContainerRestController {
       }
       sb.append("]");
       sb.append("}");
-    }
-    if (i < sequencerPartitionContainerCollection.size()) {
-      sb.append(",");
+      if (i < sequencerPartitionContainerCollection.size()) {
+        sb.append(",");
+      }
     }
     return "[" + sb.toString() + "]";
   }
+  
 }

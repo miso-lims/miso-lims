@@ -54,43 +54,10 @@ public class LDAPSecurityManager extends LocalSecurityManager implements MisoSec
   private LdapUserDetailsManager ldapUserManager;
 
   @Autowired
-  private String groupRoleAttributeName;
-
-  @Autowired
-  private String groupSearchBase;
-
-  @Autowired
-  private String groupMemberAttributeName;
-
-  @Autowired
   private PasswordCodecService passwordCodecService;
 
   public void setLdapUserManager(LdapUserDetailsManager ldapUserManager) {
     this.ldapUserManager = ldapUserManager;
-  }
-
-  public void setGroupRoleAttributeName(String attribute) {
-    this.groupRoleAttributeName = attribute;
-  }
-
-  public void setGroupSearchBase(String base) {
-    this.groupSearchBase = base;
-  }
-
-  public void setGroupMemberAttributeName(String attribute) {
-    this.groupMemberAttributeName = attribute;
-  }
-
-  public String getGroupRoleAttributeName() {
-    return this.groupRoleAttributeName;
-  }
-
-  public String getGroupSearchBase() {
-    return this.groupSearchBase;
-  }
-
-  public String getGroupMemberAttributeName() {
-    return this.groupMemberAttributeName;
   }
 
   public void setPasswordCodecService(PasswordCodecService passwordCodecService) {

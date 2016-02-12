@@ -34,7 +34,54 @@
                         http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-3.1.xsd 
                         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd"
        default-autowire="byName">
-       
+  
+  <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+    <property name="dataSource" ref="dataSource" />
+    <property name="annotatedClasses">
+      <list>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.QcPassedDetailImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SamplePurposeImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleGroupImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAnalyteImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractSample</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractProject</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAdditionalInfoImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleValidRelationshipImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleNumberPerProjectImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.InstituteImpl</value>
+      </list>
+    </property>
+    <property name="hibernateProperties">
+      <props>
+        <prop key="hibernate.dialect">org.hibernate.dialect.MySQL5InnoDBDialect</prop>
+        <prop key="hibernate.show_sql">true</prop>
+      </props>
+    </property>
+  </bean>
+
+  <tx:annotation-driven/>
+  <bean id="jpaDialect"
+        class="org.springframework.orm.jpa.vendor.HibernateJpaDialect" />
+  <bean class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor" />
+  <ehcache:annotation-driven cache-manager="cacheManager" proxy-target-class="true"/>
+  <bean id="cacheManager" name="cacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean"/>
+  <bean id="limsHashKeyGenerator" class="com.googlecode.ehcache.annotations.key.HashCodeCacheKeyGenerator">
+    <property name="includeMethod" value="false" />
+    <property name="includeParameterTypes" value="false" />
+  </bean>
+  
+  <context:component-scan base-package="uk.ac.bbsrc.tgac.miso.persistence" /> 
+  
   <bean id="dataSource" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
     <property name="driverClass" value="org.h2.Driver"/>
     <property name="url" value="jdbc:h2:mem:testdb;MODE=MySQL;DB_CLOSE_DELAY=-1;INIT=RUNSCRIPT FROM 'classpath:db/scripts/init_tests.sql';"/>
@@ -42,7 +89,8 @@
   <bean name="interfaceTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
     <property name="dataSource" ref="dataSource"/>
   </bean>
-  <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+  <bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+    <property name="sessionFactory" ref="sessionFactory"/>
     <property name="dataSource" ref="dataSource"/>
   </bean>
   <bean id="flyway" class="org.flywaydb.core.Flyway" init-method="migrate">

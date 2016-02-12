@@ -44,7 +44,6 @@
   <%-- timestamp to force browser to reload javascript --%>
   <jsp:useBean id="timestamp" class="java.util.Date" scope="request"/>
 
-  <link rel="stylesheet" href="<c:url value='/styles/style.css?ts=${timestamp.time}'/>" type="text/css">
   <title>MISO LIMS <c:if test="${not empty title}">- ${title}</c:if></title>
   <script type="text/javascript" src="<c:url value='/scripts/scriptaculous/prototype.js'/>"></script>
   <script type="text/javascript"
@@ -74,6 +73,7 @@
         type="text/css">
   <link rel="stylesheet" href="<c:url value='/scripts/jquery/colorbox/colorbox-1.4.16.css'/>"
         type="text/css">
+        <link rel="stylesheet" href="<c:url value='/styles/style.css?ts=${timestamp.time}'/>" type="text/css">
   <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.tablesorter.min.js'/>"></script>
   <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.metadata.js'/>"></script>
 
