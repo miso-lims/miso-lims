@@ -179,20 +179,16 @@
                 <th>Experiment Alias</th>
                 <th>Description</th>
                 <th>Platform</th>
-                <th class="fit">Edit</th>
               </tr>
               </thead>
               <tbody>
               <c:forEach items="${study.experiments}" var="experiment">
                 <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-                  <td><b>${experiment.name}</b></td>
-                  <td>${experiment.alias}</td>
+                  <td><b><a href='<c:url value="/miso/experiment/${experiment.id}"/>'>${experiment.name}</a></b></td>
+                  <td><a href='<c:url value="/miso/experiment/${experiment.id}"/>'>${experiment.alias}</a></td>
                   <td>${experiment.description}</td>
                   <td>${experiment.platform.platformType.key}
                     - ${experiment.platform.instrumentModel}</td>
-                  <td class="misoicon"
-                      onclick="window.location.href='<c:url value="/miso/experiment/${experiment.id}"/>'">
-                    <span class="ui-icon ui-icon-pencil"/></td>
                 </tr>
               </c:forEach>
               </tbody>

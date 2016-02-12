@@ -463,10 +463,13 @@ public class ExperimentControllerHelperService {
       JSONObject j = new JSONObject();
       JSONArray jsonArray = new JSONArray();
       for (Experiment experiment : requestManager.listAllExperiments()) {
-        jsonArray.add("['" + experiment.getName() + "','" + experiment.getAlias() + "','" + experiment.getDescription() + "','"
-            + experiment.getPlatform().getPlatformType().getKey() + " " + experiment.getPlatform().getInstrumentModel() + "','"
-            + "<a href=\"/miso/experiment/" + experiment.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']");
+        JSONArray inner = new JSONArray();
+        inner.add(TableHelper.hyperLinkify("/miso/experiment/" + experiment.getId(), experiment.getName()));
+        inner.add(TableHelper.hyperLinkify("/miso/experiment/" + experiment.getId(), experiment.getAlias()));
+        inner.add(experiment.getDescription());
+        inner.add(experiment.getPlatform().getPlatformType().getKey() + " " + experiment.getPlatform().getInstrumentModel());
 
+        jsonArray.add(inner);
       }
       j.put("experimentsArray", jsonArray);
       return j;

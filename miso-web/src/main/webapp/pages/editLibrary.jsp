@@ -806,7 +806,6 @@
           <th>Pool Platform</th>
           <th>Pool Creation Date</th>
           <th>Pool Concentration</th>
-          <th class="fit">Edit</th>
           <sec:authorize access="hasRole('ROLE_ADMIN')">
             <th class="fit">DELETE</th>
           </sec:authorize>
@@ -815,15 +814,11 @@
         <tbody>
         <c:forEach items="${libraryPools}" var="pool">
           <tr poolId="${pool.id}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-            <td><b>${pool.name}</b></td>
-            <td>${pool.alias}</td>
+            <td><b><a href="<c:url value='/miso/pool/${pool.id}'/>">${pool.name}</a></b></td>
+            <td><a href="<c:url value='/miso/pool/${pool.id}'/>">${pool.alias}</a></td>
             <td>${pool.platformType.key}</td>
             <td>${pool.creationDate}</td>
             <td>${pool.concentration}</td>
-              <%-- <td class="misoicon" onclick="window.location.href='<c:url value="/miso/pool/${fn:toLowerCase(pool.platformType.key)}/${pool.id}"/>'"><span class="ui-icon ui-icon-pencil"/></td> --%>
-            <td class="misoicon" onclick="window.location.href='<c:url value="/miso/pool/${pool.id}"/>'">
-              <span class="ui-icon ui-icon-pencil"/>
-            </td>
             <sec:authorize access="hasRole('ROLE_ADMIN')">
               <td class="misoicon" onclick="Pool.deletePool(${pool.id}, Utils.page.pageReload);">
                 <span class="ui-icon ui-icon-trash"/>
@@ -839,6 +834,14 @@
             "aaSorting": [
               [1, 'asc'],
               [3, 'asc']
+            ],
+            "aoColumns": [
+              null,
+              { "sType": 'natural' },
+              null,
+              null,
+              null
+              <sec:authorize access="hasRole('ROLE_ADMIN')">, null</sec:authorize>
             ],
             "iDisplayLength": 50,
             "bJQueryUI": true,
@@ -860,7 +863,6 @@
         <th>Run Alias</th>
         <th>Partitions</th>
         <th>Status</th>
-        <th class="fit">Edit</th>
         <sec:authorize access="hasRole('ROLE_ADMIN')">
           <th class="fit">DELETE</th>
         </sec:authorize>
@@ -869,8 +871,8 @@
       <tbody>
       <c:forEach items="${libraryRuns}" var="run" varStatus="runCount">
         <tr runId="${run.id}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-          <td><b>${run.name}</b></td>
-          <td>${run.alias}</td>
+          <td><b><a href="<c:url value='/miso/run/${run.id}'/>">${run.name}</a></b></td>
+          <td><a href="<c:url value='/miso/run/${run.id}'/>">${run.alias}</a></td>
           <td>
             <c:forEach items="${run.sequencerPartitionContainers}" var="container" varStatus="fCount">
               <table class="containerSummary">
@@ -901,9 +903,6 @@
             </c:forEach>
           </td>
           <td>${run.status.health}</td>
-          <td class="misoicon" onclick="window.location.href='<c:url value="/miso/run/${run.id}"/>'">
-            <span class="ui-icon ui-icon-pencil"/>
-          </td>
           <sec:authorize access="hasRole('ROLE_ADMIN')">
             <td class="misoicon" onclick="Run.deleteRun(${run.id}, Utils.page.pageReload);">
               <span class="ui-icon ui-icon-trash"/>

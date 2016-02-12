@@ -114,17 +114,14 @@
             <th>Health</th>
             <th>Start Date</th>
             <th>Last Updated</th>
-            <th class="fit">View Run</th>
           </tr>
           </thead>
           <tbody>
           <tr>
-            <td>${runStatus.runName}</td>
+            <td><a href='<c:url value="/miso/run/${runId}"/>'>${runStatus.runName}</a></td>
             <td>${runStatus.health.key}</td>
             <td>${runStatus.startDate}</td>
             <td><fmt:formatDate value="${runStatus.lastUpdated}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
-            <td class="misoicon" onclick="window.location.href='<c:url value="/miso/run/${runId}"/>'"><span
-                    class="ui-icon ui-icon-pencil"/></td>
           </tr>
 
           </tbody>

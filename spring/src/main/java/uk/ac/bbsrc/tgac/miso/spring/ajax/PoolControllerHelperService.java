@@ -724,13 +724,13 @@ public class PoolControllerHelperService {
 
         for (Pool pool : poolMap.get(poolType)) {
           JSONArray pout = new JSONArray();
-          pout.add(pool.getName());
-          pout.add(pool.getAlias() != null ? pool.getAlias() : "");
+          pout.add(TableHelper.hyperLinkify("/miso/pool/" + pool.getId(), pool.getName()));
+          pout.add(TableHelper.hyperLinkify("/miso/pool/" + pool.getId(), pool.getAlias()));
           pout.add(pool.getCreationDate() != null ? pool.getCreationDate().toString() : "");
           pout.add(pool.getId());
           pout.add(pool.getId());
           pout.add(pool.getId());
-          pout.add("<a href=\"/miso/pool/" + pool.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>");
+
           arr.add(pout);
         }
 

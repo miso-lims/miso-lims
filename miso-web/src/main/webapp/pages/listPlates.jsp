@@ -43,21 +43,17 @@
         <th>Size</th>
         <th>Material Type</th>
         <th>Tag Barcode</th>
-        <th class="fit">Edit</th>
       </tr>
       </thead>
       <tbody>
       <c:forEach items="${plates}" var="plate">
         <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-          <td>${plate.name}</td>
+          <td><a href='<c:url value="/miso/plate/${plate.id}"/>'>${plate.name}</a></td>
           <td>${plate.description}</td>
           <td>${plate.creationDate}</td>
           <td>${plate.size}</td>
           <td>${plate.plateMaterialType}</td>
           <td>${plate.tagBarcode.sequence}</td>
-          <td class="misoicon"
-              onclick="window.location.href='<c:url value="/miso/plate/${plate.id}"/>'"><span
-              class="ui-icon ui-icon-pencil"/></td>
         </tr>
       </c:forEach>
       </tbody>

@@ -64,20 +64,16 @@
         <th>Barcode</th>
         <th>Date Created</th>
         <th>Low Quality</th>
-        <th class="fit">Edit</th>
       </tr>
       </thead>
       <tbody>
       <c:forEach items="${pools[pt]}" var="ipool">
         <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-          <td>${ipool.name}</td>
-          <td>${ipool.alias}</td>
+          <td><b><a href='<c:url value="/miso/pool/${ipool.id}"/>'>${ipool.name}</a></b></td> 
+          <td><a href='<c:url value="/miso/pool/${ipool.id}"/>'>${ipool.alias}</a></td>
           <td>${ipool.identificationBarcode}</td>
           <td>${ipool.creationDate}</td>
           <td>${ipool.hasLowQualityMembers}</td>
-          <td class="misoicon"
-              onclick="window.location.href='<c:url value="/miso/pool/${ipool.id}"/>'"><span
-              class="ui-icon ui-icon-pencil"/></td>
         </tr>
       </c:forEach>
       </tbody>
@@ -95,19 +91,15 @@
           <th>Alias</th>
           <th>Barcode</th>
           <th>Date Created</th>
-          <th class="fit">Edit</th>
         </tr>
         </thead>
         <tbody>
         <c:forEach items="${usedpools[pt]}" var="ipool">
           <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-            <td>${ipool.name}</td>
-            <td>${ipool.alias}</td>
+            <td><b><a href='<c:url value="/miso/pool/${ipool.id}"/>'>${ipool.name}</a></b></td> 
+            <td><a href='<c:url value="/miso/pool/${ipool.id}"/>'>${ipool.alias}</a></td>
             <td>${ipool.identificationBarcode}</td>
             <td>${ipool.creationDate}</td>
-            <td class="misoicon"
-                onclick="window.location.href='<c:url value="/miso/pool/${ipool.id}"/>'"><span
-                class="ui-icon ui-icon-pencil"/></td>
           </tr>
         </c:forEach>
         </tbody>

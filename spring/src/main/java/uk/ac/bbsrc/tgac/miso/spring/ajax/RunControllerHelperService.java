@@ -1190,16 +1190,15 @@ public class RunControllerHelperService {
       JSONObject j = new JSONObject();
       JSONArray jsonArray = new JSONArray();
       for (Run run : requestManager.listAllRuns()) {
-        jsonArray.add("['" + run.getName() + "','" + run.getAlias() + "','"
-            + (run.getStatus() != null && run.getStatus().getHealth() != null ? run.getStatus().getHealth().getKey() : "") + "','"
-            + (run.getStatus() != null && run.getStatus().getStartDate() != null ? LimsUtils.getDateAsString(run.getStatus().getStartDate())
-                : "")
-            + "','"
-            + (run.getStatus() != null && run.getStatus().getCompletionDate() != null
-                ? LimsUtils.getDateAsString(run.getStatus().getCompletionDate()) : "")
-            + "','" + (run.getPlatformType() != null ? run.getPlatformType().getKey() : "") + "','" + "<a href=\"/miso/run/" + run.getId()
-            + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']");
+        JSONArray inner = new JSONArray();
+        inner.add(TableHelper.hyperLinkify("/miso/run/" + run.getId(), run.getName()));
+        inner.add(TableHelper.hyperLinkify("/miso/run/" + run.getId(), run.getAlias()));
+        inner.add((run.getStatus() != null && run.getStatus().getHealth() != null ? run.getStatus().getHealth().getKey() : ""));
+        inner.add((run.getStatus() != null && run.getStatus().getStartDate() != null ? LimsUtils.getDateAsString(run.getStatus().getStartDate()) : ""));
+        inner.add((run.getStatus() != null && run.getStatus().getCompletionDate() != null ? LimsUtils.getDateAsString(run.getStatus().getCompletionDate()) : ""));
+        inner.add((run.getPlatformType() != null ? run.getPlatformType().getKey() : ""));
 
+        jsonArray.add(inner); 
       }
       j.put("runsArray", jsonArray);
       return j;

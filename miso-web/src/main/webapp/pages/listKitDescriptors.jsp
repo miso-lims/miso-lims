@@ -60,22 +60,18 @@
       <th>Stock Level</th>
       <th>Type</th>
       <th>Platform</th>
-      <th class="fit">Edit</th>
     </tr>
     </thead>
     <tbody>
     <c:forEach items="${sequencing}" var="sequencing">
       <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-        <td><b>${sequencing.name}</b></td>
+        <td><b><a href='<c:url value="/miso/kitdescriptor/${sequencing.kitDescriptorId}"/>'>${sequencing.name}</a></b></td>
         <td>${sequencing.version}</td>
         <td>${sequencing.manufacturer}</td>
         <td>${sequencing.partNumber}</td>
         <td>${sequencing.stockLevel}</td>
         <td>${sequencing.kitType.key}</td>
         <td>${sequencing.platformType.key}</td>
-        <td class="misoicon"
-            onclick="window.location.href='<c:url value="/miso/kitdescriptor/${sequencing.kitDescriptorId}"/>'"><span
-            class="ui-icon ui-icon-pencil"/></td>
       </tr>
     </c:forEach>
     </tbody>
@@ -127,22 +123,18 @@
       <th>Stock Level</th>
       <th>Type</th>
       <th>Platform</th>
-      <th class="fit">Edit</th>
     </tr>
     </thead>
     <tbody>
     <c:forEach items="${empcr}" var="empcr">
       <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-        <td><b>${empcr.name}</b></td>
+        <td><b><a href='<c:url value="/miso/kitdescriptor/${empcr.kitDescriptorId}"/>'>${empcr.name}</a></b></td> 
         <td>${empcr.version}</td>
         <td>${empcr.manufacturer}</td>
         <td>${empcr.partNumber}</td>
         <td>${empcr.stockLevel}</td>
         <td>${empcr.kitType.key}</td>
         <td>${empcr.platformType.key}</td>
-        <td class="misoicon"
-            onclick="window.location.href='<c:url value="/miso/kitdescriptor/${empcr.kitDescriptorId}"/>'"><span
-            class="ui-icon ui-icon-pencil"/></td>
       </tr>
     </c:forEach>
     </tbody>
@@ -195,22 +187,18 @@
       <th>Stock Level</th>
       <th>Type</th>
       <th>Platform</th>
-      <th class="fit">Edit</th>
     </tr>
     </thead>
     <tbody>
     <c:forEach items="${library}" var="library">
       <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-        <td><b>${library.name}</b></td>
+        <td><b><a href='<c:url value="/miso/kitdescriptor/${library.kitDescriptorId}"/>'>${library.name}</a></b></td>
         <td>${library.version}</td>
         <td>${library.manufacturer}</td>
         <td>${library.partNumber}</td>
         <td>${library.stockLevel}</td>
         <td>${library.kitType.key}</td>
         <td>${library.platformType.key}</td>
-        <td class="misoicon"
-            onclick="window.location.href='<c:url value="/miso/kitdescriptor/${library.kitDescriptorId}"/>'"><span
-            class="ui-icon ui-icon-pencil"/></td>
       </tr>
     </c:forEach>
     </tbody>
@@ -263,22 +251,18 @@
       <th>Stock Level</th>
       <th>Type</th>
       <th>Platform</th>
-      <th class="fit">Edit</th>
     </tr>
     </thead>
     <tbody>
     <c:forEach items="${clustering}" var="clustering">
       <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-        <td><b>${clustering.name}</b></td>
+        <td><b><a href='<c:url value="/miso/kitdescriptor/${clustering.kitDescriptorId}"/>'>${clustering.name}</a></b></td>
         <td>${clustering.version}</td>
         <td>${clustering.manufacturer}</td>
         <td>${clustering.partNumber}</td>
         <td>${clustering.stockLevel}</td>
         <td>${clustering.kitType.key}</td>
         <td>${clustering.platformType.key}</td>
-        <td class="misoicon"
-            onclick="window.location.href='<c:url value="/miso/kitdescriptor/${clustering.kitDescriptorId}"/>'"><span
-            class="ui-icon ui-icon-pencil"/></td>
       </tr>
     </c:forEach>
     </tbody>
@@ -330,22 +314,18 @@
       <th>Stock Level</th>
       <th>Type</th>
       <th>Platform</th>
-      <th class="fit">Edit</th>
     </tr>
     </thead>
     <tbody>
     <c:forEach items="${multiplexing}" var="multiplexing">
       <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-        <td><b>${multiplexing.name}</b></td>
+        <td><b><a href='<c:url value="/miso/kitdescriptor/${multiplexing.kitDescriptorId}"/>'>${multiplexing.name}</a></b></td>
         <td>${multiplexing.version}</td>
         <td>${multiplexing.manufacturer}</td>
         <td>${multiplexing.partNumber}</td>
         <td>${multiplexing.stockLevel}</td>
         <td>${multiplexing.kitType.key}</td>
         <td>${multiplexing.platformType.key}</td>
-        <td class="misoicon"
-            onclick="window.location.href='<c:url value="/miso/kitdescriptor/${multiplexing.kitDescriptorId}"/>'"><span
-            class="ui-icon ui-icon-pencil"/></td>
       </tr>
     </c:forEach>
     </tbody>
@@ -380,7 +360,7 @@
       jQuery('#SequencingtotalCount').html(jQuery('#table1>tbody>tr:visible').length.toString() + " Sequencing Kit");
       jQuery('#EMPCRtotalCount').html(jQuery('#table2>tbody>tr:visible').length.toString() + " EMPCR Kit");
       jQuery('#LibrarytotalCount').html(jQuery('#table3>tbody>tr:visible').length.toString() + " Library Kit");
-      jQuery('#ClusteringtotalCount').html(jQuery('#table4>tbody>tr:visible').length.toString() + " Clustring Kit");
+      jQuery('#ClusteringtotalCount').html(jQuery('#table4>tbody>tr:visible').length.toString() + " Clustering Kit");
       jQuery('#MultiplexingtotalCount').html(jQuery('#table5>tbody>tr:visible').length.toString() + " Multiplexing Kit");
     }
   </script>
