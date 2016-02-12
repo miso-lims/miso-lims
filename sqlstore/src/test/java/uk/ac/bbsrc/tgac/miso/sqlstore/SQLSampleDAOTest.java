@@ -39,6 +39,7 @@ import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.store.SecurityStore;
 
 import net.sf.ehcache.CacheManager;
+import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
