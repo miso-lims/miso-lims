@@ -9,7 +9,11 @@ public class SampleTissueNode extends SampleImpl {
 
   public SampleTissueNode(SampleFactoryBuilder builder) {
     super(builder);
+    setParent(builder.getParent());
+    getParent().getChildren().add(this);
     setSampleAdditionalInfo(builder.getSampleAdditionalInfo());
+    getSampleAdditionalInfo().setSample(this);
     setSampleTissue(builder.getSampleTissue());
+    getSampleTissue().setSample(this);
   }
 }

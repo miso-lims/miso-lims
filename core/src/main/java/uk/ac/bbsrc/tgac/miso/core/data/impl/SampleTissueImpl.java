@@ -23,7 +23,7 @@ public class SampleTissueImpl implements SampleTissue {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  private Long sampleTissueId;
 
   @OneToOne(targetEntity = SampleImpl.class)
   @JoinColumn(name = "sampleId", nullable = false)
@@ -49,16 +49,6 @@ public class SampleTissueImpl implements SampleTissue {
 
   @Column(nullable = false)
   private Date lastUpdated;
-
-  @Override
-  public Long getId() {
-    return id;
-  }
-
-  @Override
-  public void setId(Long id) {
-    this.id = id;
-  }
 
   @Override
   public Sample getSample() {
@@ -140,9 +130,17 @@ public class SampleTissueImpl implements SampleTissue {
     this.lastUpdated = lastUpdated;
   }
 
+  public Long getSampleTissueId() {
+    return sampleTissueId;
+  }
+
+  public void setSampleTissueId(Long sampleTissueId) {
+    this.sampleTissueId = sampleTissueId;
+  }
+
   @Override
   public String toString() {
-    return "SampleTissueImpl [id=" + id + ", sample=" + sample + ", lab=" + lab + ", instituteTissueName=" + instituteTissueName
+    return "SampleTissueImpl [id=" + sampleTissueId + ", sample=" + sample + ", lab=" + lab + ", instituteTissueName=" + instituteTissueName
         + ", cellularity=" + cellularity + ", createdBy=" + createdBy + ", creationDate=" + creationDate + ", updatedBy=" + updatedBy
         + ", lastUpdated=" + lastUpdated + "]";
   }

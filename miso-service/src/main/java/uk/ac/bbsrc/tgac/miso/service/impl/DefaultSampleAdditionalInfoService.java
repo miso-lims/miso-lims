@@ -1,12 +1,16 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import java.io.IOException;
+import java.util.Date;
 import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.User;
@@ -20,6 +24,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
+import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.dto.SampleAdditionalInfoDto;
 import uk.ac.bbsrc.tgac.miso.persistence.QcPassedDetailDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleAdditionalInfoDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleClassDao;
@@ -106,6 +112,85 @@ public class DefaultSampleAdditionalInfoService implements SampleAdditionalInfoS
     sampleAdditionalInfo.setCreatedBy(user);
     sampleAdditionalInfo.setUpdatedBy(user);
     return sampleAdditionalInfoDao.addSampleAdditionalInfo(sampleAdditionalInfo);
+  }
+
+  @Override
+  @Transactional(propagation = Propagation.REQUIRED)
+  public Long create(SampleAdditionalInfoDto sampleAdditionalInfoDto) throws IOException {
+    authorizationManager.throwIfNonAdmin();
+    User user = authorizationManager.getCurrentUser();
+
+    SampleAdditionalInfo sampleAdditionalInfo = Dtos.to(sampleAdditionalInfoDto);
+    sampleAdditionalInfo.setCreatedBy(user);
+    sampleAdditionalInfo.setUpdatedBy(user);
+
+    sampleAdditionalInfo.setSampleClass(sampleClassDao.getSampleClass(sampleAdditionalInfoDto.getSampleClassId()));
+
+    if (sampleAdditionalInfoDto.getTissueOriginId() != null) {
+      sampleAdditionalInfo.setTissueOrigin(tissueOriginDao.getTissueOrigin(sampleAdditionalInfoDto.getTissueOriginId()));
+    }
+    if (sampleAdditionalInfoDto.getTissueTypeId() != null) {
+      sampleAdditionalInfo.setTissueType(tissueTypeDao.getTissueType(sampleAdditionalInfoDto.getTissueTypeId()));
+    }
+    if (sampleAdditionalInfoDto.getQcPassedDetailId() != null) {
+      sampleAdditionalInfo.setQcPassedDetail(qcPassedDetailDao.getQcPassedDetails(sampleAdditionalInfoDto.getQcPassedDetailId()));
+    }
+    if (sampleAdditionalInfoDto.getSubprojectId() != null) {
+      sampleAdditionalInfo.setSubproject(subprojectDao.getSubproject(sampleAdditionalInfoDto.getSubprojectId()));
+    }
+    if (sampleAdditionalInfoDto.getPrepKitId() != null) {
+      sampleAdditionalInfo.setPrepKit(sqlKitDao.getKitDescriptorById(sampleAdditionalInfoDto.getPrepKitId()));
+    }
+
+    return sampleAdditionalInfoDao.addSampleAdditionalInfo(sampleAdditionalInfo);
+  }
+
+  @Override
+  @Transactional(propagation = Propagation.REQUIRED)
+  public SampleAdditionalInfo to(SampleAdditionalInfoDto sampleAdditionalInfoDto) throws IOException {
+    authorizationManager.throwIfUnauthenticated();
+    checkArgument(sampleAdditionalInfoDto.getSampleClassId() != null,
+        "A SampleAdditionalInfo.sampleClassId must be provided to construct SampleAdditionalInfo.");
+    User user = authorizationManager.getCurrentUser();
+
+    SampleAdditionalInfo sampleAdditionalInfo = Dtos.to(sampleAdditionalInfoDto);
+    sampleAdditionalInfo.setCreatedBy(user);
+    sampleAdditionalInfo.setUpdatedBy(user);
+    Date now = new Date();
+    sampleAdditionalInfo.setCreationDate(now);
+    sampleAdditionalInfo.setLastUpdated(now);
+
+    SampleClass sampleClass = sampleClassDao.getSampleClass(sampleAdditionalInfoDto.getSampleClassId());
+    ServiceUtils.throwIfNull(sampleClass, "SampleAdditionalInfo.sampleClassId", sampleAdditionalInfoDto.getSampleClassId());
+    sampleAdditionalInfo.setSampleClass(sampleClass);
+
+    if (sampleAdditionalInfoDto.getTissueOriginId() != null) {
+      TissueOrigin tissueOrigin = tissueOriginDao.getTissueOrigin(sampleAdditionalInfoDto.getTissueOriginId());
+      ServiceUtils.throwIfNull(tissueOrigin, "SampleAdditionalInfo.tissueOriginId", sampleAdditionalInfoDto.getTissueOriginId());
+      sampleAdditionalInfo.setTissueOrigin(tissueOrigin);
+    }
+    if (sampleAdditionalInfoDto.getTissueTypeId() != null) {
+      TissueType tissueType = tissueTypeDao.getTissueType(sampleAdditionalInfoDto.getTissueTypeId());
+      ServiceUtils.throwIfNull(tissueType, "SampleAdditionalInfo.tissueTypeId", sampleAdditionalInfoDto.getTissueTypeId());
+      sampleAdditionalInfo.setTissueType(tissueType);
+    }
+    if (sampleAdditionalInfoDto.getQcPassedDetailId() != null) {
+      QcPassedDetail qcPassedDetail = qcPassedDetailDao.getQcPassedDetails(sampleAdditionalInfoDto.getQcPassedDetailId());
+      ServiceUtils.throwIfNull(qcPassedDetail, "SampleAdditionalInfo.qcPassedDetailId", sampleAdditionalInfoDto.getQcPassedDetailId());
+      sampleAdditionalInfo.setQcPassedDetail(qcPassedDetail);
+    }
+    if (sampleAdditionalInfoDto.getSubprojectId() != null) {
+      Subproject subproject = subprojectDao.getSubproject(sampleAdditionalInfoDto.getSubprojectId());
+      ServiceUtils.throwIfNull(subproject, "SampleAdditionalInfo.subprojectId", sampleAdditionalInfoDto.getSubprojectId());
+      sampleAdditionalInfo.setSubproject(subproject);
+    }
+    if (sampleAdditionalInfoDto.getPrepKitId() != null) {
+      KitDescriptor kitDescriptor = sqlKitDao.getKitDescriptorById(sampleAdditionalInfoDto.getPrepKitId());
+      ServiceUtils.throwIfNull(kitDescriptor, "SampleAdditionalInfo.prepKitId", sampleAdditionalInfoDto.getPrepKitId());
+      sampleAdditionalInfo.setPrepKit(kitDescriptor);
+    }
+
+    return sampleAdditionalInfo;
   }
 
   @Override

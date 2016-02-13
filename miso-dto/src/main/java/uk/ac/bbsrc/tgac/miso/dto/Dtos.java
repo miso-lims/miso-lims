@@ -209,7 +209,7 @@ public class Dtos {
       dto.setSubprojectId(from.getSubproject().getSubprojectId());
     }
     if (from.getPrepKit() != null) {
-      dto.setPrepKit(asDto(from.getPrepKit()));
+      dto.setPrepKitId(from.getPrepKit().getKitDescriptorId());
     }
     dto.setPassageNumber(from.getPassageNumber());
     dto.setTimesReceived(from.getTimesReceived());
@@ -237,7 +237,6 @@ public class Dtos {
     to.setTubeNumber(from.getTubeNumber());
     to.setVolume(from.getVolume());
     to.setConcentration(from.getConcentration());
-    to.setPrepKit(to(from.getPrepKit()));
     return to;
   }
 
@@ -411,13 +410,16 @@ public class Dtos {
       dto.setTaxonIdentifier(from.getTaxonIdentifier());
     }
     if (from.getIdentity() != null) {
-      dto.setSampleIdentityDto(asDto(from.getIdentity()));
+      dto.setSampleIdentity(asDto(from.getIdentity()));
     }
     if (from.getSampleAnalyte() != null) {
       dto.setSampleAnalyte(asDto(from.getSampleAnalyte()));
     }
     if (from.getSampleAdditionalInfo() != null) {
       dto.setSampleAdditionalInfo(asDto(from.getSampleAdditionalInfo()));
+    }
+    if (from.getSampleTissue() != null) {
+      dto.setSampleTissue(asDto(from.getSampleTissue()));
     }
     if (from.getParent() != null) {
       dto.setParentId(from.getParent().getId());
@@ -457,7 +459,6 @@ public class Dtos {
     if (!LimsUtils.isStringEmptyOrNull(from.getAlias())) {
       to.setAlias(from.getAlias());
     }
-    // Project
     to.setScientificName(from.getScientificName());
     if (!LimsUtils.isStringEmptyOrNull(from.getTaxonIdentifier())) {
       to.setTaxonIdentifier(from.getTaxonIdentifier());
@@ -465,7 +466,6 @@ public class Dtos {
 
     to.setAlias(from.getAlias());
     to.setDescription(from.getDescription());
-    to.setSampleTissue(to(from.getSampleTissueDto()));
     return to;
   }
 
@@ -574,7 +574,7 @@ public class Dtos {
     to.setAlias(from.getAlias());
     return to;
   }
-  
+
   public static LabDto asDto(Lab from) {
     LabDto dto = new LabDto();
     dto.setId(from.getId());
@@ -586,7 +586,7 @@ public class Dtos {
     dto.setLastUpdated(dateTimeFormatter.print(from.getLastUpdated().getTime()));
     return dto;
   }
-  
+
   public static Set<LabDto> asLabDtos(Collection<Lab> from) {
     Set<LabDto> dtoSet = Sets.newHashSet();
     for (Lab lab : from) {
@@ -594,7 +594,7 @@ public class Dtos {
     }
     return dtoSet;
   }
-  
+
   public static Lab to(LabDto from) {
     Lab to = new LabImpl();
     to.setInstitute(to(from.getInstitute()));
@@ -605,9 +605,11 @@ public class Dtos {
 
   public static SampleTissueDto asDto(SampleTissue from) {
     SampleTissueDto dto = new SampleTissueDto();
-    dto.setId(from.getId());
+    dto.setId(from.getSampleTissueId());
     dto.setCellularity(from.getCellularity());
-    dto.setLab(asDto(from.getLab()));
+    if (from.getLab() != null) {
+      dto.setLabId(from.getLab().getId());
+    }
     dto.setInstituteTissueName(from.getInstituteTissueName());
     dto.setCreatedById(from.getCreatedBy().getUserId());
     dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
@@ -626,13 +628,11 @@ public class Dtos {
 
   public static SampleTissue to(SampleTissueDto from) {
     SampleTissue to = new SampleTissueImpl();
-    to.setId(from.getId());
     to.setCellularity(from.getCellularity());
-    to.setLab(to(from.getLab()));
     to.setInstituteTissueName(from.getInstituteTissueName());
     return to;
   }
-  
+
   public static KitDescriptorDto asDto(KitDescriptor from) {
     KitDescriptorDto dto = new KitDescriptorDto();
     dto.setId(from.getKitDescriptorId());
@@ -645,7 +645,7 @@ public class Dtos {
     dto.setPlatformType(from.getPlatformType().getKey());
     return dto;
   }
-  
+
   public static Set<KitDescriptorDto> asKitDescriptorDtos(Collection<KitDescriptor> from) {
     Set<KitDescriptorDto> dtoSet = Sets.newHashSet();
     for (KitDescriptor kd : from) {
@@ -653,7 +653,7 @@ public class Dtos {
     }
     return dtoSet;
   }
-  
+
   public static KitDescriptor to(KitDescriptorDto from) {
     KitDescriptor to = new KitDescriptor();
     if (from.getId() != null) to.setKitDescriptorId(from.getId());

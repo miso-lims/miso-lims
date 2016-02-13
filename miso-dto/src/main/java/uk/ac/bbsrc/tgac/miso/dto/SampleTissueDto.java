@@ -6,27 +6,17 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 public class SampleTissueDto {
 
   private String bioBankId;
-
   private Integer cellularity;
-
   private Long createdById;
-
   private String createdByUrl;
-
   private String creationDate;
-
   private Long id;
-
-  private LabDto lab;
-
+  private Long labId;
+  private String labUrl;
   private String instituteTissueName;
-
   private String lastUpdated;
-
   private Long updatedById;
-
   private String updatedByUrl;
-
   private String url;
 
   public String getBioBankId() {
@@ -51,10 +41,6 @@ public class SampleTissueDto {
 
   public Long getId() {
     return id;
-  }
-
-  public LabDto getLab() {
-    return lab;
   }
 
   public String getInstituteTissueName() {
@@ -101,10 +87,6 @@ public class SampleTissueDto {
     this.id = id;
   }
 
-  public void setLab(LabDto lab) {
-    this.lab = lab;
-  }
-
   public void setInstituteTissueName(String instituteTissueName) {
     this.instituteTissueName = instituteTissueName;
   }
@@ -125,10 +107,28 @@ public class SampleTissueDto {
     this.url = url;
   }
 
+  public Long getLabId() {
+    return labId;
+  }
+
+  public void setLabId(Long labId) {
+    this.labId = labId;
+  }
+
+  public String getLabUrl() {
+    return labUrl;
+  }
+
+  public void setLabUrl(String labUrl) {
+    this.labUrl = labUrl;
+  }
+
   @Override
   public String toString() {
-    return "SampleTissueDto [id=" + id + ", cellularity=" + cellularity + ", lab=" + lab + ", instituteTissueName="
-        + instituteTissueName + ", createdById=" + createdById + ", creationDate=" + creationDate + ", lastUpdatedById=" + updatedById
-        + ", lastUpdated=" + lastUpdated + "]";
+    return "SampleTissueDto [bioBankId=" + bioBankId + ", cellularity=" + cellularity + ", createdById=" + createdById + ", createdByUrl="
+        + createdByUrl + ", creationDate=" + creationDate + ", id=" + id + ", labId=" + labId + ", labUrl=" + labUrl
+        + ", instituteTissueName=" + instituteTissueName + ", lastUpdated=" + lastUpdated + ", updatedById=" + updatedById
+        + ", updatedByUrl=" + updatedByUrl + ", url=" + url + "]";
   }
+
 }

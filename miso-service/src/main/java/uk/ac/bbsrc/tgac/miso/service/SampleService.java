@@ -4,12 +4,13 @@ import java.io.IOException;
 import java.util.Set;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 
 public interface SampleService {
 
   Sample get(Long sampleId) throws IOException;
 
-  Long create(Sample sample, Long projectId, Long parentId, Long rootSampleClassId) throws IOException;
+  Long create(SampleDto sampleDto) throws IOException;
 
   void update(Sample sample) throws IOException;
 
