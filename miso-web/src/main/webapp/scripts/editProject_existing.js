@@ -46,11 +46,13 @@ var vis = d3.select("#chart").append("svg:svg")
         .append("svg:g")
         .attr("transform", "translate(" + r + "," + r + ")");
 
-d3.json("/miso/d3graph/project/" + projectId_d3graph, function (json) {
-  json.x0 = 800;
-  json.y0 = 0;
-  update(root = json);
-});
+function getProjectD3Json () {
+  d3.json("/miso/d3graph/project/" + projectId_d3graph, function (json) {
+    json.x0 = 800;
+    json.y0 = 0;
+    update(root = json);
+  });
+}
 
 function update(source) {
   // Compute the new tree layout.

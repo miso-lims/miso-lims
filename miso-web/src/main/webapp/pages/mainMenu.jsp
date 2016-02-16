@@ -21,7 +21,6 @@
   ~
   ~ **********************************************************************
   --%>
-<script type="text/javascript" src="<c:url value='/scripts/dashboard.js?ts=${timestamp.time}'/>"></script>
 <div id="maincontent">
     <div id="contentcolumn">
         <h1>Dashboard</h1>

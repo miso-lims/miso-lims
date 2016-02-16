@@ -30,11 +30,8 @@
 --%>
 <%@ include file="../header.jsp" %>
 
-<script src="<c:url value='/scripts/statsdb.js'/>" type="text/javascript"></script>
-<script src="<c:url value='/scripts/statsdbperbasecontent.js'/>" type="text/javascript"></script>
-
-<script type="text/javascript" src="<c:url value='/scripts/run_ajax.js?ts=${timestamp.time}'/>"></script>
-<script type="text/javascript" src="<c:url value='/scripts/stats_ajax.js?ts=${timestamp.time}'/>"></script>
+<script type="text/javascript" src="<c:url value='/scripts/run_ajax.js'/>"></script>
+<script type="text/javascript" src="<c:url value='/scripts/stats_ajax.js'/>"></script>
 
 
 <script type="text/javascript" src="<c:url value='/scripts/parsley/parsley.min.js'/>"></script>

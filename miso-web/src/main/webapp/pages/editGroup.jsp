@@ -24,7 +24,6 @@
   ~ **********************************************************************
   --%>
 <script type="text/javascript" src="<c:url value='/scripts/parsley/parsley.min.js'/>"></script>
-<script type="text/javascript" src="<c:url value='/scripts/group_validation.js?ts=${timestamp.time}'/>"></script>
 
 <div id="maincontent">
   <div id="contentcolumn">
@@ -74,6 +73,8 @@
 
 <script type="text/javascript">
   jQuery(document).ready(function () {
+    Validate.attachParsley('#group-form');
+    
     jQuery('#name').simplyCountable({
       counter: '#nameCounter',
       countType: 'characters',

@@ -23,7 +23,6 @@
   ~ **********************************************************************
   --%>
 <script type="text/javascript" src="<c:url value='/scripts/parsley/parsley.min.js'/>"></script>
-<script type="text/javascript" src="<c:url value='/scripts/user_validation.js?ts=${timestamp.time}'/>"></script>
 
 <div id="maincontent">
   <div id="contentcolumn">
@@ -153,7 +152,7 @@
         <form:form action="/miso/user" method="POST" commandName="user" autocomplete="off">
           <sessionConversation:insertSessionConversationId attributeName="user"/>
           <h1>Edit Your Account
-            <button type="submit" class="fg-button ui-state-default ui-corner-all">Save</button>
+            <button onclick="return validateUser()" class="fg-button ui-state-default ui-corner-all">Save</button>
           </h1>
           <table class="in">
             <tr>
@@ -217,6 +216,8 @@
 
 <script type="text/javascript">
   jQuery(document).ready(function () {
+    Validate.attachParsley('#user-form');
+    
     jQuery('#fullName').simplyCountable({
       counter: '#fullNameCounter',
       countType: 'characters',

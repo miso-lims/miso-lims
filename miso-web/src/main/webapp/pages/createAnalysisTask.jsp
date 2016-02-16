@@ -22,8 +22,6 @@
   --%>
 
 <%@ include file="../header.jsp" %>
-<script type="text/javascript" src="<c:url value='/scripts/run_ajax.js?ts=${timestamp.time}'/>"></script>
-<script type="text/javascript" src="<c:url value='/scripts/task_ajax.js?ts=${timestamp.time}'/>"></script>
 <div id="maincontent">
 <div id="contentcolumn">
 

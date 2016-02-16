@@ -23,8 +23,6 @@
   ~ **********************************************************************
   --%>
 
-<script type="text/javascript" src="<c:url value='/scripts/task_ajax.js?ts=${timestamp.time}'/>"></script>
-
 <div id="tabs">
   <ul>
     <li><a href="#tab-1"><span>Tasks</span></a></li>

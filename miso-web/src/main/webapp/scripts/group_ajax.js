@@ -21,10 +21,6 @@
  * *********************************************************************
  */
 
-jQuery(document).ready(function () {
-  Validate.attachParsley('#group-form');
-});
-
 function validateGroup() {
   Validate.cleanFields('#group-form');
   jQuery('#group-form').parsley().destroy();

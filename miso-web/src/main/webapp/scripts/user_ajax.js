@@ -21,10 +21,6 @@
  * *********************************************************************
  */
 
-jQuery(document).ready(function () {
-  Validate.attachParsley('#user-form');
-});
-
 function validateUser () {
   Validate.cleanFields('#user-form');
   jQuery('#user-form').parsley().destroy();

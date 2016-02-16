@@ -43,6 +43,63 @@
     <finalName>ROOT</finalName>
     <plugins>
       <plugin>
+        <groupId>com.samaxes.maven</groupId>
+        <artifactId>minify-maven-plugin</artifactId>
+        <version>1.7.4</version>
+        <executions>
+          <execution>
+            <id>default-minify</id>
+            <configuration>
+              <charset>UTF-8</charset>
+              <cssSourceDir>styles</cssSourceDir>
+              <cssSourceIncludes>
+                <cssSourceInclude>*.css</cssSourceInclude>
+              </cssSourceIncludes>
+              <cssFinalFile>style.css</cssFinalFile>
+              
+              <jsSourceDir>scripts</jsSourceDir>
+              <jsSourceFiles>
+                <jsSourceFile>scriptaculous/activityInput.js</jsSourceFile>
+                <jsSourceFile>scriptaculous/effects.js</jsSourceFile>
+                <jsSourceFile>scriptaculous/dragdrop.js</jsSourceFile>
+                <jsSourceFile>scriptaculous/slider.js</jsSourceFile>
+                <jsSourceFile>scriptaculous/sound.js</jsSourceFile>
+                <jsSourceFile>scriptaculous/controls.js</jsSourceFile>
+                <jsSourceFile>lims.js</jsSourceFile>
+                <jsSourceFile>search.js</jsSourceFile>
+                <jsSourceFile>experiment_ajax.js</jsSourceFile>
+                <jsSourceFile>library_ajax.js</jsSourceFile>
+                <jsSourceFile>pool_ajax.js</jsSourceFile>
+                <jsSourceFile>project_ajax.js</jsSourceFile>
+                <jsSourceFile>reporting_ajax.js</jsSourceFile>
+                <jsSourceFile>run_ajax.js</jsSourceFile>
+                <jsSourceFile>sample_ajax.js</jsSourceFile>
+                <jsSourceFile>sequencer_partition_container_ajax.js</jsSourceFile>
+                <jsSourceFile>sequencer_reference_ajax.js</jsSourceFile>
+                <jsSourceFile>study_ajax.js</jsSourceFile>
+                <jsSourceFile>parsley_form_validations.js</jsSourceFile>
+                <jsSourceFile>multi_select_drag_drop.js</jsSourceFile>
+                <jsSourceFile>menus.js</jsSourceFile>
+              </jsSourceFiles>
+              <jsSourceIncludes>
+                <jsSourceInclude>*.js</jsSourceInclude>
+              </jsSourceIncludes>
+              <jsSourceExcludes>
+                <jsSourceExclude>datatables_utils.js</jsSourceExclude>
+                <jsSourceExclude>natural_sort.js</jsSourceExclude>
+                <jsSourceExclude>xregexp-all-min.js</jsSourceExclude>
+                <jsSourceExclude>runCalendar.js</jsSourceExclude>
+                <jsSourceExclude>sortable.js</jsSourceExclude>
+              </jsSourceExcludes>
+              <jsFinalFile>header_script.js</jsFinalFile>
+            </configuration>
+            <goals>
+              <goal>minify</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>

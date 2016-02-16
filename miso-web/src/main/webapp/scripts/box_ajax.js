@@ -1,5 +1,3 @@
-jQuery.getScript("/scripts/box_visualization.js");
-
 var Box = Box || {
   boxJSON: null,
   originalBox: null,
@@ -157,7 +155,7 @@ var Box = Box || {
 
 Box.scan = {
   prepareScanner: function(boxRows, boxColumns) {
-    var prepScannerTimeout = setTimeout(Box.prepareScannerDialog.error, 10000); // otherwise box scanner may poll indefinitely
+    var prepareScannerTimeout = setTimeout(Box.prepareScannerDialog.error, 10000); // otherwise box scanner may poll indefinitely
     Fluxion.doAjax(
       'boxControllerHelperService',
       'prepareBoxScanner',
@@ -279,9 +277,9 @@ Box.ui = {
   //creates the table of the box contents
   createListingBoxablesTable: function(box) {
     jQuery('#listingBoxablesTable').empty();
-    array = [];
+    var array = [];
     for (var pos in box.boxables) {
-      row = [];
+      var row = [];
       row.push(pos);
       row.push(Box.utils.hyperlinkifyBoxable(box.boxables[pos].name, box.boxables[pos].id, box.boxables[pos].name));
       row.push(Box.utils.hyperlinkifyBoxable(box.boxables[pos].name, box.boxables[pos].id, box.boxables[pos].alias));
@@ -448,8 +446,8 @@ Box.ui = {
       var selectedBarcode = jQuery('#selectedBarcode').val().trim();
       var selectedPosition = Box.utils.getPositionString(Box.visual.selected.row, Box.visual.selected.col);
       // if selectedPosition is already filled, confirm before deleting that position
-      if (Box.boxJSON.boxables[selectedPosition] && Box.boxJSON.boxables[selectedPosition]["identificationBarcode"] != selectedBarcode) {
-        var sampleInfo = Box.boxJSON.boxables[selectedPosition]["name"]+"::"+ Box.boxJSON.boxables[selectedPosition]["alias"];
+      if (Box.boxJSON.boxables[selectedPosition] && Box.boxJSON.boxables[selectedPosition].identificationBarcode != selectedBarcode) {
+        var sampleInfo = Box.boxJSON.boxables[selectedPosition].name +"::"+ Box.boxJSON.boxables[selectedPosition].alias;
         if(confirm(sampleInfo + " is already located at position " + selectedPosition + ". Are you sure you wish to remove it from the box?")) {
           delete Box.boxJSON.boxables[selectedPosition];
         } else {

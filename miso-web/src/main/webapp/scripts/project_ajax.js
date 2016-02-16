@@ -21,6 +21,9 @@
  * *********************************************************************
  */
 
+// these variables are set on the editProject page if the project has samples/libraries
+var projectId_sample, sampleQcTypesString, libraryQcTypesString, projectId_d3graph;
+
 var Project = Project || {
   validateProject: function () {
     Validate.cleanFields('#project-form');
