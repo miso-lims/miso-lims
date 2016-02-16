@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
@@ -48,7 +50,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
 import uk.ac.bbsrc.tgac.miso.core.util.FormUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-import uk.ac.bbsrc.tgac.miso.core.util.TableUtils;
 import uk.ac.bbsrc.tgac.miso.integration.BoxScan;
 import uk.ac.bbsrc.tgac.miso.integration.BoxScanner;
 import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationException;
@@ -95,16 +96,20 @@ public class BoxControllerHelperService {
       JSONObject j = new JSONObject();
       JSONArray jsonArray = new JSONArray();
       for (Box box : requestManager.listAllBoxes()) {
-        jsonArray.add("['" +
-          TableUtils.hyperLinkify("/miso/box/" + box.getId(), box.getName(), true) + "','" +
-          TableUtils.hyperLinkify("/miso/box/" + box.getId(), box.getAlias()) + "','" +
-          box.getLocationBarcode() + "','" + 
-          (box.getSize().getRows() * box.getSize().getColumns() - box.getFree()) + "/" + 
-          box.getSize().getRows() * box.getSize().getColumns() + "','" +
-          box.getSize().getRows() + "x" + box.getSize().getColumns() + "','" +
-          (box.getIdentificationBarcode() != null ? box.getIdentificationBarcode() : "") + "','" +
-          box.getUse().getAlias() + "','" +
-          (box.getIdentificationBarcode() != null ? box.getIdentificationBarcode() : "") + "']");
+        int filledSpaces = box.getSize().getRows() * box.getSize().getColumns() - box.getFree();
+        int availableSpaces = box.getSize().getRows() * box.getSize().getColumns();
+        JSONArray inner = new JSONArray();
+        
+        inner.add(TableHelper.hyperLinkify("/miso/box/" + box.getId(), box.getName()));
+        inner.add(TableHelper.hyperLinkify("/miso/box/" + box.getId(), box.getAlias()));
+        inner.add(box.getLocationBarcode());
+        inner.add(filledSpaces + "/" + availableSpaces);
+        inner.add(box.getSize().getRows() + "x" + box.getSize().getColumns());
+        inner.add(isStringEmptyOrNull(box.getLocationBarcode()) ? "" : box.getLocationBarcode());
+        inner.add(box.getUse().getAlias());
+        inner.add(isStringEmptyOrNull(box.getIdentificationBarcode()) ? "" : box.getIdentificationBarcode());
+        
+        jsonArray.add(inner);
       }
       j.put("array", jsonArray);
       return j;
