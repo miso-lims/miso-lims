@@ -908,9 +908,10 @@ public class ContainerControllerHelperService {
                                      spc.getRun().getSequencerReference().getPlatform().getNameAndModel());
           }
         }
+        String identificationBarcode = (isStringEmptyOrNull(spc.getIdentificationBarcode()) ? "Unknown Barcode" : spc.getIdentificationBarcode());
         
         JSONArray inner = new JSONArray();
-        inner.add(isStringEmptyOrNull(spc.getIdentificationBarcode()) ? TableHelper.hyperLinkify("/miso/container/" + spc.getId(), spc.getIdentificationBarcode()) : "");
+        inner.add(TableHelper.hyperLinkify("/miso/container/" + spc.getId(),identificationBarcode));
         inner.add(spc.getPlatform() != null && spc.getPlatform().getPlatformType() != null ? spc.getPlatform().getPlatformType().getKey() : "");
         inner.add(run);
         inner.add(sequencer);

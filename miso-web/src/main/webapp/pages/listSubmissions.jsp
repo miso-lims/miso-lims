@@ -51,7 +51,7 @@
               <a href='<c:url value="/miso/submission/${submission.id}"/>'>${submission.id}</a>
           </td>
           <td class="fit">
-              ${submission.alias}
+              <a href='<c:url value="/miso/submission/${submission.id}"/>'>${submission.alias}</a>
           </td>
           <td class="fit">
               ${submission.creationDate}
