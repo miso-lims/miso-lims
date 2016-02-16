@@ -5,6 +5,7 @@ ALTER TABLE Sample ENGINE = InnoDB ROW_FORMAT = DEFAULT;
 ALTER TABLE Project ENGINE = InnoDB ROW_FORMAT = DEFAULT;
 ALTER TABLE KitDescriptor ENGINE = InnoDB ROW_FORMAT = DEFAULT;
 ALTER TABLE User ENGINE = InnoDB ROW_FORMAT = DEFAULT;
+ALTER TABLE Library ENGINE = InnoDB ROW_FORMAT = DEFAULT;
 --EndNoTest
 
 CREATE TABLE `TissueOrigin` (
@@ -334,3 +335,24 @@ CREATE TABLE `SampleTissue` (
 
 ALTER TABLE Sample ADD COLUMN `sampleTissueId` BIGINT (20) DEFAULT NULL after sampleAnalyteId;
 ALTER TABLE Sample ADD FOREIGN KEY (sampleTissueId) REFERENCES SampleTissue (sampleTissueId);
+
+CREATE TABLE `LibraryAdditionalInfo` (
+  `libraryAdditionalInfoId` bigint(20) PRIMARY KEY AUTO_INCREMENT,
+  `libraryId` bigint(20) NOT NULL UNIQUE,
+  `tissueOriginId` bigint(20) NOT NULL,
+  `tissueTypeId` bigint(20) NOT NULL,
+  `sampleGroupId` bigint(20) DEFAULT NULL,
+  `kitDescriptorId` bigint(20) DEFAULT NULL,
+  `createdBy` bigint(20) NOT NULL,
+  `creationDate` datetime NOT NULL,
+  `updatedBy` bigint(20) NOT NULL,
+  `lastUpdated` datetime NOT NULL,
+  CONSTRAINT `libraryAdditionalInfo_tissueOrigin_fkey` FOREIGN KEY (`tissueOriginId`) REFERENCES `TissueOrigin` (`tissueOriginId`),
+  CONSTRAINT `libraryAdditionalInfo_tissueType_fkey` FOREIGN KEY (`tissueTypeId`) REFERENCES `TissueType` (`tissueTypeId`),
+  CONSTRAINT `libraryAdditionalInfo_sampleGroup_fkey` FOREIGN KEY (`sampleGroupId`) REFERENCES `SampleGroup` (`sampleGroupId`),
+  CONSTRAINT `libraryAdditionalInfo_kitDescriptor_fkey` FOREIGN KEY (`kitDescriptorId`) REFERENCES `KitDescriptor` (`kitDescriptorId`),
+  CONSTRAINT `libraryAdditionalInfo_library_fkey` FOREIGN KEY (`libraryId`) REFERENCES `Library` (`libraryId`),
+  CONSTRAINT `libraryAdditionalInfo_createUser_fkey` FOREIGN KEY (`createdBy`) REFERENCES `User` (`userId`),
+  CONSTRAINT `libraryAdditionalInfo_updateUser_fkey` FOREIGN KEY (`updatedBy`) REFERENCES `User` (`userId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
