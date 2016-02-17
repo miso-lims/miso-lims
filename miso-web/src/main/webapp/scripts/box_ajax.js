@@ -30,8 +30,9 @@ var Box = Box || {
       },
       data: Box.boxJSON.boxables
     });
-    if (selected)
+    if (selected) {
       Box.visual.click(selected.row, selected.col);
+    }
   },
 
   createListingTable: function() {
@@ -54,7 +55,7 @@ var Box = Box || {
     );
   },
 
-  deleteBox: function (boxId, successfunc) {
+  deleteBox: function () {
     if (confirm("Are you sure you really want to delete BOX" + Box.boxId + "? This operation is permanent!")) {
       Fluxion.doAjax(
         'boxControllerHelperService',
@@ -279,11 +280,13 @@ Box.ui = {
     jQuery('#listingBoxablesTable').empty();
     var array = [];
     for (var pos in box.boxables) {
-      var row = [];
-      row.push(pos);
-      row.push(Box.utils.hyperlinkifyBoxable(box.boxables[pos].name, box.boxables[pos].id, box.boxables[pos].name));
-      row.push(Box.utils.hyperlinkifyBoxable(box.boxables[pos].name, box.boxables[pos].id, box.boxables[pos].alias));
-      array.push(row);
+      if (box.boxables.hasOwnProperty(pos)) {
+        var row = [];
+        row.push(pos);
+        row.push(Box.utils.hyperlinkifyBoxable(box.boxables[pos].name, box.boxables[pos].id, box.boxables[pos].name));
+        row.push(Box.utils.hyperlinkifyBoxable(box.boxables[pos].name, box.boxables[pos].id, box.boxables[pos].alias));
+        array.push(row);
+      }
     }
 
     jQuery('#listingBoxablesTable').dataTable({
@@ -483,7 +486,6 @@ Box.ui = {
   },
   
   removeOneItem: function() {
-    var selectedBarcode = jQuery('#selectedBarcode').val().trim();
     var selectedPosition = Box.utils.getPositionString(Box.visual.selected.row, Box.visual.selected.col);
   
     if (confirm("Are you sure you wish to set location to unknown for " + Box.boxJSON.boxables[selectedPosition].name + "? You should re-home it as soon as possible")) {

@@ -69,7 +69,7 @@ function removeAvailableInput(inputIds) {
 
 function getSelectedAvailableInputs() {
 	var opts = availableInput.options;
-	var results = new Array();
+	var results = [];
 	for (i = 0; i < opts.length; i++) {
 		if (opts[i].selected) {
 			results.push(opts[i].value);
@@ -101,7 +101,7 @@ function removeLockedInput(inputIds) {
 }
 
 function updateReleasedInput(inputDataXml) {
-	var inputIds = new Array();
+	var inputIds = [];
 	var data = inputDataXml.getElementsByTagName("activityData");
 	for (i = 0; i < data.length; i++) {
 		inputIds.push(data[i].attributes.getNamedItem("uniqueId").value);
@@ -112,7 +112,7 @@ function updateReleasedInput(inputDataXml) {
 
 function getSelectedLockedInputs() {
 	var opts = lockedInput.options;
-	var results = new Array();
+	var results = [];
 	for (i = 0; i < opts.length; i++) {
 		if (opts[i].selected) {
 			results.push(opts[i].value);
@@ -146,7 +146,7 @@ function ajaxAvailableInput() {
             updateAvailableInput(xmlHttpReq.responseXML.documentElement);
         }
         stopLoading();
-    }
+    };
     xmlHttpReq.send(strURL);
 }
 
@@ -169,7 +169,7 @@ function ajaxLockInput() {
             updateLockedInput(xmlHttpReq.responseXML.documentElement);
         }
         stopLoading();
-    }
+    };
     xmlHttpReq.send(strURL);
 }
 
@@ -191,6 +191,6 @@ function ajaxReleaseInput() {
             updateReleasedInput(xmlHttpReq.responseXML.documentElement);
         }
         stopLoading();
-    }
+    };
     xmlHttpReq.send(strURL);
 }

@@ -99,7 +99,7 @@ function update(source) {
                    return d._children ? "lightsteelblue" : "#fff";
                  })
           .style("stroke", function (d) {
-                   return d.color == 0 ? "red"
+                   return d.color === 0 ? "red"
                            : d.color == 1 ? "lightgreen"
                                   : d.color == 2 ? "gray"
                                      : "steelblue";
@@ -109,7 +109,7 @@ function update(source) {
                   return "rotate (" + (source.x0 - 90) + ")translate(" + source.y0 + ")";
                 })
           .style("stroke", function (d) {
-                   return d.color == 0 ? "red"
+                   return d.color === 0 ? "red"
                            : d.color == 1 ? "lightgreen"
                                   : d.color == 2 ? "gray"
                                      : "steelblue";
@@ -144,7 +144,7 @@ function update(source) {
                    return d._children ? "lightsteelblue" : "#fff";
                  })
           .style("stroke", function (d) {
-                   return d.color == 0 ? "red"
+                   return d.color === 0 ? "red"
                            : d.color == 1 ? "lightgreen"
                                   : d.color == 2 ? "gray"
                                      : "steelblue";

@@ -100,7 +100,7 @@ var BoxItem = function(opts) {
 
   self.click = opts.click || self.click;
   self.element.click({'row': self.row, 'col': self.col}, self.click);
-  self.selected ? self.select() : self.unselect();
+  self.selectedImg ? self.select() : self.unselect();
   return self;
 };
 
@@ -143,8 +143,9 @@ var BoxPosition = function(opts) {
   };
 
   self.cell = opts.cell;
-  if (typeof self.item !== 'undefined')
+  if (typeof self.item !== 'undefined') {
     self.addItem(self.item);
+  }
   self.row = opts.row || null;
   self.col = opts.col || null;
   self.setTitle();
@@ -227,10 +228,6 @@ var BoxVisual = function() {
       cell: tCell,
       boxItem: self.getBoxItem(row, col)
     });
-  };
-
-  self.getBoxItem = function(row, col) {
-    // Override this method
   };
 
   self.click = function(row, col) {
@@ -691,8 +688,8 @@ Box.PrepareScannerDialog = function() {
   self.show = function() {
     jQuery('#dialogInfoAbove').html('<h1>Preparing scanner</h1>');
     jQuery('#dialogVisual').html('');
-    jQuery('#dialogInfoBelow').html('<p>Please remove box from scanner until prompted.</p>' 
-                                     + '<img class="center" src="/styles/images/ajax-loader.gif"/>');   
+    jQuery('#dialogInfoBelow').html('<p>Please remove box from scanner until prompted.</p>' +
+                                     '<img class="center" src="/styles/images/ajax-loader.gif"/>');   
     jQuery('#dialogDialog').dialog({
       autoOpen: false,
       width: Box.dialogWidth,
@@ -709,8 +706,8 @@ Box.PrepareScannerDialog = function() {
   self.error = function() {
     jQuery('#dialogInfoAbove').html('<h1 class="warning">Error: could not find the scanner</h1>');
     jQuery('#dialogVisual').html('');
-    jQuery('#dialogInfoBelow').html('<p>Please ensure that the scanner software is running, ' 
-                                     + 'and remove the box before retrying.</p>');
+    jQuery('#dialogInfoBelow').html('<p>Please ensure that the scanner software is running, ' +
+                                    'and remove the box before retrying.</p>');
     jQuery('#dialogDialog').dialog({
       autoOpen: true,
       width: Box.dialogWidth,
@@ -737,7 +734,9 @@ Box.utils = {
 
   getPositionString: function(row, col) {
     var pos = Box.utils.getRowLetter(row);
-    if(col < 10) pos += 0;
+    if (col < 10) {
+      pos += 0;
+    }
     pos += col;
     return pos;
   },

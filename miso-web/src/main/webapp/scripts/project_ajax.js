@@ -59,7 +59,9 @@ var Project = Project || {
   validate_sample_qcs: function (json) {
     var ok = true;
     for (var i = 0; i < json.length; i++) {
-      if(!json[i].results.match(/[0-9\.]+/)) ok = false;
+      if(!json[i].results.match(/[0-9\.]+/)) {
+        ok = false;
+      }
     }
     return ok;
   },
@@ -67,7 +69,9 @@ var Project = Project || {
   validate_empcrs: function (json) {
     var ok = true;
     for (var i = 0; i < json.length; i++) {
-      if(!json[i].results.match(/[0-9\.]+/)) ok = false;
+      if(!json[i].results.match(/[0-9\.]+/)) {
+        ok = false;
+      }
     }
     return ok;
   },
@@ -75,7 +79,9 @@ var Project = Project || {
   validate_empcr_dilutions: function (json) {
     var ok = true;
     for (var i = 0; i < json.length; i++) {
-      if(!json[i].results.match(/[0-9\.]+/)) ok = false;
+      if(!json[i].results.match(/[0-9\.]+/)) {
+        ok = false;
+      }
     }
     return ok;
   }
@@ -107,7 +113,7 @@ Project.ui = {
       },
       {'doOnSuccess': function (json) {
         jQuery.each(json, function (i, val) {
-          jQuery('#pro' + i + 'overview').html(val)
+          jQuery('#pro' + i + 'overview').html(val);
         });
       }
       }
@@ -290,10 +296,11 @@ Project.ui = {
   processPlateUpload: function (frameId) {
     var iframe = document.getElementById(frameId);
     var iframedoc = iframe.document;
-    if (iframe.contentDocument)
+    if (iframe.contentDocument) {
       iframedoc = iframe.contentDocument;
-    else if (iframe.contentWindow)
+    } else if (iframe.contentWindow) {
       iframedoc = iframe.contentWindow.document;
+    }
     var response = jQuery(iframedoc).contents().find('body:first').find('#uploadresponsebody').val();
     if (!Utils.validation.isNullCheck(response)) {
       var json = jQuery.parseJSON(response);
@@ -313,7 +320,7 @@ Project.ui = {
               impb.append("<ul>");
               for (var k = 0; k < plate.elements.length; k++) {
                 var library = plate.elements[k];
-                impb.append("<li>" + library.alias + "</li>")
+                impb.append("<li>" + library.alias + "</li>");
               }
               impb.append("</ul>");
             }
@@ -324,7 +331,7 @@ Project.ui = {
     }
     else {
       setTimeout(function () {
-        Project.ui.processPlateUpload(frameId)
+        Project.ui.processPlateUpload(frameId);
       }, 2000);
     }
   },
@@ -338,10 +345,11 @@ Project.ui = {
   saveImportedElements: function (frameId) {
     var iframe = document.getElementById(frameId);
     var iframedoc = iframe.document;
-    if (iframe.contentDocument)
+    if (iframe.contentDocument) {
       iframedoc = iframe.contentDocument;
-    else if (iframe.contentWindow)
+    } else if (iframe.contentWindow) {
       iframedoc = iframe.contentWindow.document;
+    }
     var response = jQuery(iframedoc).contents().find('body:first').find('#uploadresponsebody').val();
     if (!Utils.validation.isNullCheck(response)) {
       var json = jQuery.parseJSON(response);
@@ -418,8 +426,8 @@ Project.ui = {
         var at = jQuery(this).attr("name");
         obj[at] = jQuery(this).text();
       });
-      obj["qcCreator"] = jQuery('#currentUser').text();
-      obj["sampleId"] = obj["name"].substring(3);
+      obj.qcCreator = jQuery('#currentUser').text();
+      obj.sampleId = obj.name.substring(3);
       aReturn.push(obj);
     }
 
@@ -472,10 +480,10 @@ Project.ui = {
     if (json.errors) {
       var errors = json.errors;
       var errorStr = "";
-      for (var i = 0; i < errors.length; i++) {
-        errorStr += errors[i].error + "\n";
+      for (var j = 0; j < errors.length; j++) {
+        errorStr += errors[j].error + "\n";
         jQuery(tableName).find("tr:gt(0)").each(function () {
-          if (jQuery(this).attr("sampleId") === errors[i].sampleId) {
+          if (jQuery(this).attr("sampleId") === errors[j].sampleId) {
             jQuery(this).find("td").each(function () {
               jQuery(this).css('background', '#EE9966');
             });
@@ -503,8 +511,8 @@ Project.ui = {
         var at = jQuery(this).attr("name");
         obj[at] = jQuery(this).text();
       });
-      obj["pcrCreator"] = jQuery('#currentUser').text();
-      obj["dilutionId"] = obj["dilName"].substring(3);
+      obj.pcrCreator = jQuery('#currentUser').text();
+      obj.dilutionId = obj.dilName.substring(3);
       aReturn.push(obj);
     }
     if (aReturn.length > 0) {
@@ -555,10 +563,10 @@ Project.ui = {
     if (json.errors) {
       var errors = json.errors;
       var errorStr = "";
-      for (var i = 0; i < errors.length; i++) {
-        errorStr += errors[i].error + "\n";
+      for (var j = 0; j < errors.length; j++) {
+        errorStr += errors[j].error + "\n";
         jQuery('#librarydils_table').find("tr:gt(0)").each(function () {
-          if (jQuery(this).attr("dilutionId") === errors[i].dilutionId) {
+          if (jQuery(this).attr("dilutionId") === errors[j].dilutionId) {
             jQuery(this).find("td").each(function () {
               jQuery(this).css('background', '#EE9966');
             });
@@ -586,8 +594,8 @@ Project.ui = {
         var at = jQuery(this).attr("name");
         obj[at] = jQuery(this).text();
       });
-      obj["pcrDilutionCreator"] = jQuery('#currentUser').text();
-      obj["pcrId"] = obj["pcrName"].substring(3);
+      obj.pcrDilutionCreator= jQuery('#currentUser').text();
+      obj.pcrId= obj.pcrName.substring(3);
       aReturn.push(obj);
     }
 
@@ -638,10 +646,10 @@ Project.ui = {
     if (json.errors) {
       var errors = json.errors;
       var errorStr = "";
-      for (var i = 0; i < errors.length; i++) {
-        errorStr += errors[i].error + "\n";
+      for (var j = 0; j < errors.length; j++) {
+        errorStr += errors[j].error + "\n";
         jQuery('#empcrs_table').find("tr:gt(0)").each(function () {
-          if (jQuery(this).attr("pcrId") === errors[i].pcrId) {
+          if (jQuery(this).attr("pcrId") === errors[j].pcrId) {
             jQuery(this).find("td").each(function () {
               jQuery(this).css('background', '#EE9966');
             });
@@ -666,7 +674,7 @@ Project.ui = {
 
       jQuery(tableId + ' tbody').find("tr").each(function () {
           // remove received samples
-          if (jQuery(this).find("td:eq(4)").html() == "") {
+          if (jQuery(this).find("td:eq(4)").html() === "") {
             jQuery(this).removeAttr("onmouseover").removeAttr("onmouseout");
             jQuery(this).find("td:eq(4)").remove();
           }
@@ -1091,7 +1099,7 @@ Project.issues = {
 
   importIssue: function (json) {
     if (json.invalidIssues === "undefined" ||
-        json.invalidIssues.length == 0 &&
+        json.invalidIssues.length === 0 &&
         json.validIssues !== "undefined" &&
         json.validIssues.length > 0) {
       var key = json.validIssues[0].key;
@@ -1197,29 +1205,29 @@ Project.issues = {
         jQuery('#issuebox' + i).append("<b>Created:</b> " + issue.created + "<br/>");
         jQuery('#issuebox' + i).append("<b>Updated:</b> " + issue.updated + "<br/>");
 
-        if (issue["issuelinks"].length > 0) {
+        if (issue.issuelinks.length > 0) {
           jQuery('#issuebox' + i).append("<h4>Links</h4>");
-          for (var j = 0; j < issue["issuelinks"].length; j++) {
-            var link = issue["issuelinks"][j];
+          for (var j = 0; j < issue.issuelinks.length; j++) {
+            var link = issue.issuelinks[j];
             jQuery('#issuebox' + i).append(link.type.outward + " <a href='javascript:void(0);' onclick=\"Utils.page.newWindow('" + link.url + "');\">" + link.url + "</a><br/>");
           }
         }
 
         if (issue["sub-tasks"].value.length > 0) {
           jQuery('#issuebox' + i).append("<h4>Subtasks</h4>");
-          for (var j = 0; j < issue["subtasks"].length; j++) {
-            var subtask = issue["subtasks"][j];
+          for (var k = 0; k < issue.subtasks.length; k++) {
+            var subtask = issue.subtasks[k];
             jQuery('#issuebox' + i).append("<a href='javascript:void(0);' onclick=\"Utils.page.newWindow('" + subtask.url + "');\">" + subtask.url + "</a><br/>");
           }
         }
 
         jQuery('#issuebox' + i).append("<h4>Comments</h4>");
-        for (var k = 0; k < issue["comment"]["comments"].length; k++) {
-          var comment = issue["comment"]["comments"][k];
-          jQuery('#issuebox' + i).append("<div id='commentbox" + i + "_" + k + "' class='simplebox backwhite' onclick=\"Utils.page.newWindow('" + comment.url + "');\">");
-          jQuery('#commentbox' + i + "_" + k).append("<a href='javascript:void(0);' onclick=\"Utils.page.newWindow('" + comment.author.url + "');\">" + comment.author.displayName + "</a>");
-          jQuery('#commentbox' + i + "_" + k).append(" at " + comment.created + "<br/>");
-          jQuery('#commentbox' + i + "_" + k).append("<pre class='wrap'>" + comment.body + "</pre>");
+        for (var m = 0; m < issue.comment.comments.length; m++) {
+          var comment = issue.comment.comments[m];
+          jQuery('#issuebox' + i).append("<div id='commentbox" + i + "_" + m + "' class='simplebox backwhite' onclick=\"Utils.page.newWindow('" + comment.url + "');\">");
+          jQuery('#commentbox' + i + "_" + m).append("<a href='javascript:void(0);' onclick=\"Utils.page.newWindow('" + comment.author.url + "');\">" + comment.author.displayName + "</a>");
+          jQuery('#commentbox' + i + "_" + m).append(" at " + comment.created + "<br/>");
+          jQuery('#commentbox' + i + "_" + m).append("<pre class='wrap'>" + comment.body + "</pre>");
         }
 
         jQuery('#issuebox' + i).append("<input type='hidden' name='issueKeys' id='issueKeys" + i + "' value='" + key + "'" + "><hr/>");
@@ -1681,7 +1689,7 @@ Project.alert = {
         'overviewId': overviewId,
         'url': ajaxurl
       },
-      {'doOnSuccess': function (json) {
+      {'doOnSuccess': function () {
         Utils.page.pageReload();
       }
       }
@@ -1696,7 +1704,7 @@ Project.alert = {
         'overviewId': overviewId,
         'url': ajaxurl
       },
-      {'doOnSuccess': function (json) {
+      {'doOnSuccess': function () {
         Utils.page.pageReload();
       }
       }

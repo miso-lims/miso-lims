@@ -170,23 +170,23 @@ Sample.qc = {
     if (!jQuery('#sampleQcTable').attr("qcInProgress")) {
       jQuery('#sampleQcTable').attr("qcInProgress", "true");
 
-      $('sampleQcTable').insertRow(1);
+      jQuery('sampleQcTable').insertRow(1);
       //QCId  QCed By  	QC Date  	Method  	Results
 
       if (includeId) {
-        var column1 = $('sampleQcTable').rows[1].insertCell(-1);
+        var column1 = jQuery('sampleQcTable').rows[1].insertCell(-1);
         column1.innerHTML = "<input type='hidden' id='sampleId' name='sampleId' value='" + json.sampleId + "'/>";
       }
 
-      var column2 = $('sampleQcTable').rows[1].insertCell(-1);
+      var column2 = jQuery('sampleQcTable').rows[1].insertCell(-1);
       column2.innerHTML = "<select id='sampleQcUser' name='sampleQcUser'>" + json.qcUserOptions + "</select>";
-      var column3 = $('sampleQcTable').rows[1].insertCell(-1);
+      var column3 = jQuery('sampleQcTable').rows[1].insertCell(-1);
       column3.innerHTML = "<input id='sampleQcDate' name='sampleQcDate' type='text'/>";
-      var column4 = $('sampleQcTable').rows[1].insertCell(-1);
+      var column4 = jQuery('sampleQcTable').rows[1].insertCell(-1);
       column4.innerHTML = "<select id='sampleQcType' name='sampleQcType' onchange='Sample.qc.changeSampleQcUnits(this);'/>";
-      var column5 = $('sampleQcTable').rows[1].insertCell(-1);
+      var column5 = jQuery('sampleQcTable').rows[1].insertCell(-1);
       column5.innerHTML = "<input id='sampleQcResults' name='sampleQcResults' type='text'/><span id='units'/>";
-      var column6 = $('sampleQcTable').rows[1].insertCell(-1);
+      var column6 = jQuery('sampleQcTable').rows[1].insertCell(-1);
       column6.innerHTML = "<a href='javascript:void(0);' onclick='Sample.qc.addSampleQC();'/>Add</a>";
 
       Utils.ui.addMaxDatePicker("sampleQcDate", 0);
@@ -202,13 +202,12 @@ Sample.qc = {
           }
         }
       );
-    }
-    else {
-      alert("Cannot add another QC when one is already in progress.")
+    } else {
+      alert("Cannot add another QC when one is already in progress.");
     }
   },
 
-  changeSampleQcUnits: function (input) {
+  changeSampleQcUnits: function () {
     jQuery('#units').html(jQuery('#sampleQcType').find(":selected").attr("units"));
   },
 
@@ -225,7 +224,7 @@ Sample.qc = {
         'results': f.sampleQcResults,
         'url': ajaxurl},
       {'updateElement': 'sampleQcTable',
-        'doOnSuccess': function (json) {
+        'doOnSuccess': function () {
           jQuery('#sampleQcTable').removeAttr("qcInProgress");
         }
       }
@@ -278,8 +277,8 @@ Sample.qc = {
         var at = jQuery(this).attr("name");
         obj[at] = jQuery(this).text();
       });
-      obj["qcCreator"] = jQuery('#currentUser').text();
-      obj["libraryId"] = obj["name"].substring(3);
+      obj.qcCreator = jQuery('#currentUser').text();
+      obj.libraryId = obj.name.substring(3);
       aReturn.push(obj);
     }
 
@@ -333,10 +332,10 @@ Sample.library = {
     if (json.errors) {
       var errors = json.errors;
       var errorStr = "";
-      for (var i = 0; i < errors.length; i++) {
-        errorStr += errors[i].error + "\n";
+      for (var j = 0; j < errors.length; j++) {
+        errorStr += errors[j].error + "\n";
         jQuery(tableName).find("tr:gt(0)").each(function () {
-          if (jQuery(this).attr("libraryId") === errors[i].libraryId) {
+          if (jQuery(this).attr("libraryId") === errors[j].libraryId) {
             jQuery(this).find("td").each(function () {
               jQuery(this).css('background', '#EE9966');
             });
@@ -365,8 +364,8 @@ Sample.library = {
           var at = jQuery(this).attr("name");
           obj[at] = jQuery(this).text();
         });
-        obj["dilutionCreator"] = jQuery('#currentUser').text();
-        obj["libraryId"] = obj["name"].substring(3);
+        obj.dilutionCreator = jQuery('#currentUser').text();
+        obj.libraryId = obj.name.substring(3);
         aReturn.push(obj);
       }
     }
@@ -419,10 +418,10 @@ Sample.library = {
     if (json.errors) {
       var errors = json.errors;
       var errorStr = "";
-      for (var i = 0; i < errors.length; i++) {
-        errorStr += errors[i].error + "\n";
+      for (var j = 0; j < errors.length; j++) {
+        errorStr += errors[j].error + "\n";
         jQuery(tableName).find("tr:gt(0)").each(function () {
-          if (jQuery(this).attr("libraryId") === errors[i].libraryId) {
+          if (jQuery(this).attr("libraryId") === errors[j].libraryId) {
             jQuery(this).find("td").each(function () {
               jQuery(this).css('background', '#EE9966');
             });
@@ -689,11 +688,10 @@ Sample.ui = {
         {'barcode': barcode, 'url': ajaxurl},
         {'doOnSuccess': function (json) {
           var sample_desc = "<div id='" + json.id + "' class='dashboard'><table width=100%><tr><td>Sample Name: " + json.name + "<br> Sample ID: " + json.id + "<br>Desc: " + json.desc + "<br>Sample Type:" + json.type + "</td><td style='position: absolute;' align='right'><span class='float-right ui-icon ui-icon-circle-close' onclick='Sample.ui.removeSample(" + json.id + ");' style='position: absolute; top: 0; right: 0;'></span></td></tr></table> </div>";
-          if (jQuery("#" + json.id).length == 0) {
+          if (jQuery("#" + json.id).length === 0) {
             jQuery("#sample_pan").append(sample_desc);
             jQuery('#msgspan').html("");
-          }
-          else {
+          } else {
             jQuery('#msgspan').html("<i>This sample has already been scanned</i>");
           }
 
@@ -708,9 +706,8 @@ Sample.ui = {
           }
         }
       );
-    }
-    else {
-      jQuery('#msgspan').html("")
+    } else {
+      jQuery('#msgspan').html("");
     }
   },
 
@@ -720,7 +717,7 @@ Sample.ui = {
 
   setSampleReceiveDate: function (sampleList) {
     var samples = [];
-    jQuery(sampleList).children('div').each(function (e) {
+    jQuery(sampleList).children('div').each(function () {
       var sdiv = jQuery(this);
       samples.push({'sampleId': sdiv.attr("id")});
     });
@@ -734,8 +731,7 @@ Sample.ui = {
           alert(json.result);
         }
       });
-    }
-    else {
+    } else {
       alert("No samples scanned");
     }
   },

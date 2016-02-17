@@ -105,7 +105,7 @@ var Run = Run || {
     if (!Utils.validation.isNullCheck(statusVal)) {
       if (statusVal === "Failed" || statusVal === "Stopped") {
         alert("You are manually setting a run to Stopped or Failed. Please remember to enter a Completion Date!");
-        if (jQuery("#completionDate input").length == 0) {
+        if (jQuery("#completionDate input").length === 0) {
           jQuery("#completionDate").html("<input type='text' name='status.completionDate' id='status.completionDate' value='" + jQuery('#completionDate').html() + "'>");
           Utils.ui.addDatePicker("status\\.completionDate");
         }
@@ -137,26 +137,26 @@ Run.qc = {
     if (!jQuery('#runQcTable').attr("qcInProgress")) {
       jQuery('#runQcTable').attr("qcInProgress", "true");
 
-      $('runQcTable').insertRow(1);
+      jQuery('runQcTable').insertRow(1);
 
       if (includeId) {
-        var column1 = $('runQcTable').rows[1].insertCell(-1);
+        var column1 = jQuery('runQcTable').rows[1].insertCell(-1);
         column1.innerHTML = "<input type='hidden' id='runId' name='runId' value='" + json.runId + "'/>";
       }
 
-      var column2 = $('runQcTable').rows[1].insertCell(-1);
+      var column2 = jQuery('runQcTable').rows[1].insertCell(-1);
       column2.innerHTML = "<select id='runQcUser' name='runQcUser'>" + json.qcUserOptions + "</select>";
-      var column3 = $('runQcTable').rows[1].insertCell(-1);
+      var column3 = jQuery('runQcTable').rows[1].insertCell(-1);
       column3.innerHTML = "<input id='runQcDate' name='runQcDate' type='text'/>";
-      var column4 = $('runQcTable').rows[1].insertCell(-1);
+      var column4 = jQuery('runQcTable').rows[1].insertCell(-1);
       column4.innerHTML = "<select id='runQcType' name='runQcType'/>";
-      var column5 = $('runQcTable').rows[1].insertCell(-1);
+      var column5 = jQuery('runQcTable').rows[1].insertCell(-1);
       column5.innerHTML = "<div id='runQcProcessSelection' name='runQcProcessSelection'/>";
-      var column6 = $('runQcTable').rows[1].insertCell(-1);
+      var column6 = jQuery('runQcTable').rows[1].insertCell(-1);
       column6.innerHTML = "<input id='runQcInformation' name='runQcInformation' type='text'/>";
-      var column7 = $('runQcTable').rows[1].insertCell(-1);
+      var column7 = jQuery('runQcTable').rows[1].insertCell(-1);
       column7.innerHTML = "<input id='runQcDoNotProcess' name='runQcDoNotProcess' type='checkbox'/>";
-      var column8 = $('runQcTable').rows[1].insertCell(-1);
+      var column8 = jQuery('runQcTable').rows[1].insertCell(-1);
       column8.innerHTML = "<a href='javascript:void(0);' onclick='Run.qc.addRunQC(this);'/>Add</a>";
 
       Utils.ui.addMaxDatePicker("runQcDate", 0);
@@ -183,9 +183,8 @@ Run.qc = {
         }
         }
       );
-    }
-    else {
-      alert("Cannot add another QC when one is already in progress.")
+    } else {
+      alert("Cannot add another QC when one is already in progress.");
     }
   },
 
@@ -212,7 +211,7 @@ Run.qc = {
         'doNotProcess': donotprocess,
         'url': ajaxurl},
       {'updateElement': 'runQcTable',
-        'doOnSuccess': function (json) {
+        'doOnSuccess': function () {
           jQuery('#runQcTable').removeAttr("qcInProgress");
           if ("SeqOps QC" === qctype && !donotprocess) {
             jQuery('#qcmenu').append("<a href='/miso/analysis/new/run/" + runid + "' class='add'>Initiate Analysis</a>");
@@ -258,7 +257,7 @@ Run.ui = {
   },
 
   populateRunOptions: function (form, runId) {
-    if (form.value != 0) {
+    if (form.value !== 0) {
       Fluxion.doAjax(
         'runControllerHelperService',
         'populateRunOptions',
@@ -409,7 +408,7 @@ Run.alert = {
         'url': ajaxurl
       },
       {
-        'doOnSuccess': function (json) {
+        'doOnSuccess': function () {
           Utils.page.pageReload();
         }
       }
@@ -425,7 +424,7 @@ Run.alert = {
         'url': ajaxurl
       },
       {
-        'doOnSuccess': function (json) {
+        'doOnSuccess': function () {
           Utils.page.pageReload();
         }
       }
@@ -518,7 +517,9 @@ Run.container = {
       if (json.verify) {
         var dialogStr = "Container Properties\n\n";
         for (var key in json.verify) {
-          dialogStr += "Partition " + key + ": " + json.verify[key] + "\n";
+          if (json.verify.hasOwnProperty(key)) {
+            dialogStr += "Partition " + key + ": " + json.verify[key] + "\n";
+          }
         }
 
         if (confirm("Found container '" + json.barcode + "'. Import this container?\n\n" + dialogStr)) {
@@ -538,7 +539,7 @@ Run.container = {
     });
 
     Utils.timer.typewatchFunc(jQuery("#poolBarcode" + partitionNum), function () {
-      Run.pool.getPool(jQuery("#poolBarcode" + partitionNum), containerNum)
+      Run.pool.getPool(jQuery("#poolBarcode" + partitionNum), containerNum);
     }, 300, 2);
   },
 
@@ -561,7 +562,7 @@ Run.container = {
           newpool.append(json.html);
           newpool.append("<span style='position: absolute; top: 0; right: 0;' onclick='Run.pool.confirmPoolRemove(this);' class='float-right ui-icon ui-icon-circle-close'></span>");
         },
-          'doOnError': function (json) {
+          'doOnError': function () {
             newpool.remove();
             alert("Error adding pool, no Study is present.");
           }
@@ -598,7 +599,7 @@ Run.container = {
         jQuery("#studySelectDiv" + partition + "_" + projectId).remove();
         div.append(json.html);
       },
-        'doOnError': function (json) {
+        'doOnError': function () {
           Utils.ui.reenableButton('studySelectButton-' + partition + '_' + poolId, "Select Study");
         }
       }

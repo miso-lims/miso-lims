@@ -32,7 +32,7 @@ var Submission = Submission || {
           Utils.page.pageReload();
         }
       }
-    )
+    );
   },
 
   validateSubmissionMetadata : function(submissionId) {
@@ -46,16 +46,16 @@ var Submission = Submission || {
         }
         else {
           if (json.errors) {
-            jQuery('#submissionreport').append("<h2>Errors</h2><div id='submissionreporterror' class='flasherror'></div>")
+            jQuery('#submissionreport').append("<h2>Errors</h2><div id='submissionreporterror' class='flasherror'></div>");
             for (var i = 0; i < json.errors.length; i++) {
               jQuery('#submissionreporterror').append(json.errors[i] + "<br/>");
             }
           }
 
           if (json.infos) {
-            jQuery('#submissionreport').append("<h2>Info</h2><div id='submissionreportinfo' class='flashinfo'></div>")
-            for (var i = 0; i < json.infos.length; i++) {
-              jQuery('#submissionreportinfo').append(json.infos[i] + "<br/>");
+            jQuery('#submissionreport').append("<h2>Info</h2><div id='submissionreportinfo' class='flashinfo'></div>");
+            for (var j = 0; j < json.infos.length; j++) {
+              jQuery('#submissionreportinfo').append(json.infos[j] + "<br/>");
             }
           }
         }
@@ -74,16 +74,16 @@ var Submission = Submission || {
         }
         else {
           if (json.errors) {
-            jQuery('#submissionreport').append("<h2>Errors</h2><div id='submissionreporterror' class='flasherror'></div>")
+            jQuery('#submissionreport').append("<h2>Errors</h2><div id='submissionreporterror' class='flasherror'></div>");
             for (var i = 0; i < json.errors.length; i++) {
               jQuery('#submissionreporterror').append(json.errors[i] + "<br/>");
             }
           }
 
           if (json.infos) {
-            jQuery('#submissionreport').append("<h2>Info</h2><div id='submissionreportinfo' class='flashinfo'></div>")
-            for (var i = 0; i < json.infos.length; i++) {
-              jQuery('#submissionreportinfo').append(json.infos[i] + "<br/>");
+            jQuery('#submissionreport').append("<h2>Info</h2><div id='submissionreportinfo' class='flashinfo'></div>");
+            for (var j = 0; j < json.infos.length; j++) {
+              jQuery('#submissionreportinfo').append(json.infos[j] + "<br/>");
             }
           }
         }
@@ -99,7 +99,7 @@ var Submission = Submission || {
             'submitSequenceData',
     {'submissionId':submissionId,'url':ajaxurl},
     {'doOnSuccess':function(json) {
-        jQuery('#submissionreport').append("<h3>"+json.response+"</h3>")
+        jQuery('#submissionreport').append("<h3>"+json.response+"</h3>");
         Submission.ui.displayUploadProgress(submissionId);
       }
     });
@@ -195,8 +195,8 @@ Submission.ui = {
             "<td>"+ json.uploadJobs[i].percent+"%</td></tr>");
         }
         jQuery('#submissionreport').append("</table>");
-        for (var i = 0; i < json.uploadJobs.length; i++) {
-          jQuery("#progressbar"+i).progressbar({ value: json.uploadJobs[i].percent });
+        for (var j = 0; j < json.uploadJobs.length; j++) {
+          jQuery("#progressbar"+j).progressbar({ value: json.uploadJobs[j].percent });
         }
       }
     });

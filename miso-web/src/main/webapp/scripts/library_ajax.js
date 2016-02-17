@@ -22,16 +22,18 @@
  */
 
 var Library = Library || {
-  deleteLibrary: function (libraryId, successfunc) {
+  deleteLibrary: function (libraryId) {
     if (confirm("Are you sure you really want to delete LIB" + libraryId + "? This operation is permanent!")) {
       Fluxion.doAjax(
         'libraryControllerHelperService',
         'deleteLibrary',
         {'libraryId': libraryId, 'url': ajaxurl},
-        {'doOnSuccess': function (json) {
-          successfunc();
+        {
+          'doOnSuccess': function () {
+            window.location.href = '/miso/libraries';
+          }
         }
-        });
+      );
     }
   },
   
@@ -122,24 +124,24 @@ Library.qc = {
     if (!jQuery('#libraryQcTable').attr("qcInProgress")) {
       jQuery('#libraryQcTable').attr("qcInProgress", "true");
 
-      $('libraryQcTable').insertRow(1);
+      jQuery('libraryQcTable').insertRow(1);
       //QCId  QCed By  	QC Date  	Method  	Results
 
       if (includeId) {
-        var column1 = $('libraryQcTable').rows[1].insertCell(-1);
+        var column1 = jQuery('libraryQcTable').rows[1].insertCell(-1);
         column1.innerHTML = "<input type='hidden' id='libraryId' name='libraryId' value='" + libraryId + "'/>";
       }
-      var column2 = $('libraryQcTable').rows[1].insertCell(-1);
-      column2.innerHTML = "<input id='libraryQcUser' name='libraryQcUser' type='hidden' value='" + $('currentUser').innerHTML + "'/>" + $('currentUser').innerHTML;
-      var column3 = $('libraryQcTable').rows[1].insertCell(-1);
+      var column2 = jQuery('libraryQcTable').rows[1].insertCell(-1);
+      column2.innerHTML = "<input id='libraryQcUser' name='libraryQcUser' type='hidden' value='" + jQuery('currentUser').innerHTML + "'/>" + jQuery('currentUser').innerHTML;
+      var column3 = jQuery('libraryQcTable').rows[1].insertCell(-1);
       column3.innerHTML = "<input id='libraryQcDate' name='libraryQcDate' type='text'/>";
-      var column4 = $('libraryQcTable').rows[1].insertCell(-1);
+      var column4 = jQuery('libraryQcTable').rows[1].insertCell(-1);
       column4.innerHTML = "<select id='libraryQcType' name='libraryQcType' onchange='Library.qc.changeLibraryQcUnits(this);'/>";
-      var column5 = $('libraryQcTable').rows[1].insertCell(-1);
+      var column5 = jQuery('libraryQcTable').rows[1].insertCell(-1);
       column5.innerHTML = "<input id='libraryQcResults' name='libraryQcResults' type='text'/><span id='units'/>";
-      var column6 = $('libraryQcTable').rows[1].insertCell(-1);
+      var column6 = jQuery('libraryQcTable').rows[1].insertCell(-1);
       column6.innerHTML = "<input id='libraryQcInsertSize' name='libraryQcInsertSize' type='text'/> bp";
-      var column7 = $('libraryQcTable').rows[1].insertCell(-1);
+      var column7 = jQuery('libraryQcTable').rows[1].insertCell(-1);
       column7.innerHTML = "<a href='javascript:void(0);' onclick='Library.qc.addLibraryQC();'/>Add</a>";
 
       Utils.ui.addMaxDatePicker("libraryQcDate", 0);
@@ -156,11 +158,11 @@ Library.qc = {
       );
     }
     else {
-      alert("Cannot add another QC when one is already in progress.")
+      alert("Cannot add another QC when one is already in progress.");
     }
   },
 
-  changeLibraryQcUnits: function (input) {
+  changeLibraryQcUnits: function () {
     jQuery('#units').html(jQuery('#libraryQcType').find(":selected").attr("units"));
   },
 
@@ -179,7 +181,7 @@ Library.qc = {
         'url': ajaxurl
       },
       {'updateElement': 'libraryQcTable',
-      'doOnSuccess': function (json) {
+      'doOnSuccess': function () {
         jQuery('#libraryQcTable').removeAttr("qcInProgress");
       }
     });
@@ -220,29 +222,28 @@ Library.qc = {
 };
 
 Library.dilution = {
-  insertLibraryDilutionRow: function (libraryId) {
+  insertLibraryDilutionRow: function () {
     if (!jQuery('#libraryDilutionTable').attr("dilutionInProgress")) {
       jQuery('#libraryDilutionTable').attr("dilutionInProgress", "true");
 
-      $('libraryDilutionTable').insertRow(1);
+      jQuery('libraryDilutionTable').insertRow(1);
       //dilutionId    Done By   Dilution Date Barcode Results
-      var column1 = $('libraryDilutionTable').rows[1].insertCell(-1);
+      var column1 = jQuery('libraryDilutionTable').rows[1].insertCell(-1);
       column1.innerHTML = "<input id='name' name='name' type='hidden' value='Unsaved '/>Unsaved";
-      var column2 = $('libraryDilutionTable').rows[1].insertCell(-1);
-      column2.innerHTML = "<input id='libraryDilutionCreator' name='libraryDilutionCreator' type='hidden' value='" + $('currentUser').innerHTML + "'/>" + $('currentUser').innerHTML;
-      var column3 = $('libraryDilutionTable').rows[1].insertCell(-1);
+      var column2 = jQuery('libraryDilutionTable').rows[1].insertCell(-1);
+      column2.innerHTML = "<input id='libraryDilutionCreator' name='libraryDilutionCreator' type='hidden' value='" + jQuery('currentUser').innerHTML + "'/>" + jQuery('currentUser').innerHTML;
+      var column3 = jQuery('libraryDilutionTable').rows[1].insertCell(-1);
       column3.innerHTML = "<input id='libraryDilutionDate' name='libraryDilutionDate' type='text'/>";
-      var column6 = $('libraryDilutionTable').rows[1].insertCell(-1);
+      var column6 = jQuery('libraryDilutionTable').rows[1].insertCell(-1);
       column6.innerHTML = "<input id='libraryDilutionResults' name='libraryDilutionResults' type='text'/>";
-      var column7 = $('libraryDilutionTable').rows[1].insertCell(-1);
+      var column7 = jQuery('libraryDilutionTable').rows[1].insertCell(-1);
       column7.innerHTML = "<i>Generated on save</i>";
-      var column8 = $('libraryDilutionTable').rows[1].insertCell(-1);
+      var column8 = jQuery('libraryDilutionTable').rows[1].insertCell(-1);
       column8.innerHTML = "<a href='javascript:void(0);' onclick='Library.dilution.addLibraryDilution();'/>Add</a>";
 
       Utils.ui.addMaxDatePicker("libraryDilutionDate", 0);
-    }
-    else {
-      alert("Cannot add another dilution when one is already in progress.")
+    } else {
+      alert("Cannot add another dilution when one is already in progress.");
     }
   },
 
@@ -259,7 +260,7 @@ Library.dilution = {
         'results': f.libraryDilutionResults,
         'url': ajaxurl},
       {'updateElement': 'libraryDilutionTable',
-        'doOnSuccess': function (json) {
+        'doOnSuccess': function () {
           jQuery('#libraryDilutionTable').removeAttr("dilutionInProgress");
         }
       }
@@ -296,16 +297,15 @@ Library.dilution = {
     );
   },
 
-  deleteLibraryDilution: function (libraryDilutionId, successfunc) {
+  deleteLibraryDilution: function (libraryDilutionId) {
     if (confirm("Are you sure you really want to delete LDI" + libraryDilutionId + "? This operation is permanent!")) {
       Fluxion.doAjax(
         'libraryControllerHelperService',
         'deleteLibraryDilution',
         {'libraryDilutionId': libraryDilutionId, 'url': ajaxurl},
-        {'doOnSuccess': function (json) {
-          successfunc();
+        {'doOnSuccess': window.location.reload(true)
         }
-      });
+      );
     }
   }
 };
@@ -315,23 +315,23 @@ Library.empcr = {
     if (!jQuery('#emPcrTable').attr("pcrInProgress")) {
       jQuery('#emPcrTable').attr("pcrInProgress", "true");
 
-      $('emPcrTable').insertRow(1);
+      jQuery('emPcrTable').insertRow(1);
 
-      var column2 = $('emPcrTable').rows[1].insertCell(-1);
+      var column2 = jQuery('emPcrTable').rows[1].insertCell(-1);
       column2.innerHTML = "" + dilutionId + " <input type='hidden' id='dilutionId' name='dilutionId' value='" + dilutionId + "'/>";
-      var column3 = $('emPcrTable').rows[1].insertCell(-1);
-      column3.innerHTML = "<input id='emPcrCreator' name='emPcrCreator' type='hidden' value='" + $('currentUser').innerHTML + "'/>" + $('currentUser').innerHTML;
-      var column4 = $('emPcrTable').rows[1].insertCell(-1);
+      var column3 = jQuery('emPcrTable').rows[1].insertCell(-1);
+      column3.innerHTML = "<input id='emPcrCreator' name='emPcrCreator' type='hidden' value='" + jQuery('currentUser').innerHTML + "'/>" + jQuery('currentUser').innerHTML;
+      var column4 = jQuery('emPcrTable').rows[1].insertCell(-1);
       column4.innerHTML = "<input id='emPcrDate' name='emPcrDate' type='text'/>";
-      var column5 = $('emPcrTable').rows[1].insertCell(-1);
+      var column5 = jQuery('emPcrTable').rows[1].insertCell(-1);
       column5.innerHTML = "<input id='emPcrResults' name='emPcrResults' type='text'/>";
-      var column6 = $('emPcrTable').rows[1].insertCell(-1);
+      var column6 = jQuery('emPcrTable').rows[1].insertCell(-1);
       column6.innerHTML = "<a href='javascript:void(0);' onclick='Library.empcr.addEmPcr();'/>Add</a>";
 
       Utils.ui.addMaxDatePicker("emPcrDate", 0);
     }
     else {
-      alert("Cannot add another emPCR when one is already in progress.")
+      alert("Cannot add another emPCR when one is already in progress.");
     }
   },
 
@@ -347,7 +347,7 @@ Library.empcr = {
         'results': f.emPcrResults,
         'url': ajaxurl},
       {'updateElement': 'emPcrTable',
-        'doOnSuccess': function (json) {
+        'doOnSuccess': function () {
           jQuery('#emPcrTable').removeAttr("pcrInProgress");
         }
       }
@@ -358,27 +358,27 @@ Library.empcr = {
     if (!jQuery('#emPcrDilutionTable').attr("dilutionInProgress")) {
       jQuery('#emPcrDilutionTable').attr("dilutionInProgress", "true");
 
-      $('emPcrDilutionTable').insertRow(1);
+      jQuery('emPcrDilutionTable').insertRow(1);
 
-      var column2 = $('emPcrDilutionTable').rows[1].insertCell(-1);
+      var column2 = jQuery('emPcrDilutionTable').rows[1].insertCell(-1);
       column2.innerHTML = "" + emPcrId + " <input type='hidden' id='emPcrId' name='emPcrId' value='" + emPcrId + "'/>";
-      var column3 = $('emPcrDilutionTable').rows[1].insertCell(-1);
-      column3.innerHTML = "<input id='emPcrDilutionCreator' name='emPcrDilutionCreator' type='hidden' value='" + $('currentUser').innerHTML + "'/>" + $('currentUser').innerHTML;
-      var column4 = $('emPcrDilutionTable').rows[1].insertCell(-1);
+      var column3 = jQuery('emPcrDilutionTable').rows[1].insertCell(-1);
+      column3.innerHTML = "<input id='emPcrDilutionCreator' name='emPcrDilutionCreator' type='hidden' value='" + jQuery('currentUser').innerHTML + "'/>" + jQuery('currentUser').innerHTML;
+      var column4 = jQuery('emPcrDilutionTable').rows[1].insertCell(-1);
       column4.innerHTML = "<input id='emPcrDilutionDate' name='emPcrDilutionDate' type='text'/>";
-      var column6 = $('emPcrDilutionTable').rows[1].insertCell(-1);
+      var column6 = jQuery('emPcrDilutionTable').rows[1].insertCell(-1);
       column6.innerHTML = "<input id='emPcrDilutionResults' name='emPcrDilutionResults' type='text'/>";
-      var column7 = $('emPcrDilutionTable').rows[1].insertCell(-1);
+      var column7 = jQuery('emPcrDilutionTable').rows[1].insertCell(-1);
       column7.innerHTML = "<a href='javascript:void(0);' onclick='Library.empcr.addEmPcrDilution();'/>Add</a>";
 
       Utils.ui.addMaxDatePicker("emPcrDilutionDate", 0);
     }
     else {
-      alert("Cannot add another dilution when one is already in progress.")
+      alert("Cannot add another dilution when one is already in progress.");
     }
   },
 
-  addEmPcrDilution: function (form) {
+  addEmPcrDilution: function () {
     var f = Utils.mappifyForm("addEmPcrDilutionForm");
     Fluxion.doAjax(
       'libraryControllerHelperService',
@@ -391,36 +391,34 @@ Library.empcr = {
         'results': f.emPcrDilutionResults,
         'url': ajaxurl},
       {'updateElement': 'emPcrDilutionTable',
-        'doOnSuccess': function (json) {
+        'doOnSuccess': function () {
           jQuery('#emPcrDilutionTable').removeAttr("dilutionInProgress");
         }
       }
     );
   },
 
-  deleteEmPCR: function (empcrId, successfunc) {
+  deleteEmPCR: function (empcrId) {
     if (confirm("Are you sure you really want to delete EmPCR " + empcrId + "? This operation is permanent!")) {
       Fluxion.doAjax(
         'libraryControllerHelperService',
         'deleteEmPCR',
         {'empcrId': empcrId, 'url': ajaxurl},
-        {'doOnSuccess': function (json) {
-          successfunc();
+        {'doOnSuccess': window.location.reload(true)
         }
-      });
+      );
     }
   },
 
-  deleteEmPCRDilution: function (empcrDilutionId, successfunc) {
+  deleteEmPCRDilution: function (empcrDilutionId) {
     if (confirm("Are you sure you really want to delete EmPCRDilution" + empcrDilutionId + "? This operation is permanent!")) {
       Fluxion.doAjax(
         'libraryControllerHelperService',
         'deleteEmPCRDilution',
         {'empcrDilutionId': empcrDilutionId, 'url': ajaxurl},
-        {'doOnSuccess': function (json) {
-          successfunc();
+        {'doOnSuccess': window.location.reload(true)
         }
-      });
+      );
     }
   }
 };
@@ -646,7 +644,6 @@ Library.ui = {
     );
   },
   changePlatformNameWithLibraryType: function (input, librarytype) {
-    var self = this;
     var platform = jQuery(input).val();
     Fluxion.doAjax(
       'libraryControllerHelperService',
@@ -660,7 +657,6 @@ Library.ui = {
     );
   },
   changePlatformNameWithTagBarcodeStrategy: function (input, tagBarcodeStrategy) {
-    var self = this;
     var platform = jQuery(input).val();
     Fluxion.doAjax(
       'libraryControllerHelperService',
@@ -717,7 +713,7 @@ Library.ui = {
             jQuery(c).html("");
             for (var i = 0; i < json.numApplicableBarcodes; i++) {
               jQuery(c).append("<span class='tagBarcodeSelectDiv' position='" + (i + 1) + "' id='tagbarcodes" + (i + 1) + "'>- <i>Select...</i></span>");
-              if (json.numApplicableBarcodes > 1 && i == 0) {
+              if (json.numApplicableBarcodes > 1 && i === 0) {
                 jQuery(c).append("|");
               }
             }
@@ -791,7 +787,7 @@ Library.ui = {
 
         if (stratText.trim()) {
           //no select means empty or already filled
-          if (firstSelText.indexOf("Select") == 0) {
+          if (firstSelText.indexOf("Select") === 0) {
             //same strategy, just copy the cell
             if (firstSelText === stratText) {
               cell.html(tdtext);
@@ -807,7 +803,7 @@ Library.ui = {
                   cell.html("");
                   for (var i = 0; i < json.numApplicableBarcodes; i++) {
                     cell.append("<span class='tagBarcodeSelectDiv' position='" + (i + 1) + "' id='tagbarcodes" + (i + 1) + "'>- <i>Select...</i></span>");
-                    if (json.numApplicableBarcodes > 1 && i == 0) {
+                    if (json.numApplicableBarcodes > 1 && i === 0) {
                       cell.append("|");
                     }
                   }

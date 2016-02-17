@@ -38,7 +38,7 @@ function readStatsdbperbasecontent(jsonfile) {
   load();
   function load() {
     var scorebox = vis.selectAll('rect.day')
-      .data(data)
+      .data(data);
     scorebox.enter().append('svg:rect')
       .attr('x', function (d, i) {
         return (i) * space;
@@ -59,7 +59,7 @@ function readStatsdbperbasecontent(jsonfile) {
       });
 
     var basebox = vis.selectAll('rect.day')
-      .data(percentile)
+      .data(percentile);
     basebox.enter().append('svg:rect')
       .attr('x', function (g) {
         return 0;

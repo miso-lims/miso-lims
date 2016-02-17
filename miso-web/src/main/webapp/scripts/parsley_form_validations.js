@@ -24,7 +24,9 @@
 var Validate = Validate || {
   // Attach a Parsley instance to the given form
   attachParsley: function (formSelector) {
-    if (jQuery(formSelector).length > 0) jQuery(formSelector).parsley();
+    if (jQuery(formSelector).length > 0) {
+      jQuery(formSelector).parsley();
+    }
     window.Parsley.on('parsley:field:validate', function () {
       Validate.updateWarningorSubmit(formSelector);
     });

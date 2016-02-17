@@ -125,10 +125,11 @@ var ImportExport = ImportExport || {
   processSampleSheetUpload: function (frameId) {
     var iframe = document.getElementById(frameId);
     var iframedoc = iframe.document;
-    if (iframe.contentDocument)
+    if (iframe.contentDocument) {
       iframedoc = iframe.contentDocument;
-    else if (iframe.contentWindow)
+    } else if (iframe.contentWindow) {
       iframedoc = iframe.contentWindow.document;
+    }
     var response = jQuery(iframedoc).contents().find('body:first').find('#uploadresponsebody').val();
     if (!Utils.validation.isNullCheck(response)) {
       response = jQuery.parseJSON(response);
@@ -161,7 +162,7 @@ var ImportExport = ImportExport || {
     }
     else {
       setTimeout(function () {
-        ImportExport.processSampleSheetUpload(frameId)
+        ImportExport.processSampleSheetUpload(frameId);
       }, 2000);
     }
   },
@@ -180,7 +181,7 @@ var ImportExport = ImportExport || {
         'url': ajaxurl
       },
       {
-        'doOnSuccess': function (json) {
+        'doOnSuccess': function () {
           sampleJSONArray = null;
           alert("Imported.");
           jQuery('#confirmSamplesUploadButton').html("Imported");
@@ -192,10 +193,11 @@ var ImportExport = ImportExport || {
   processLibraryPoolSheetUpload: function (frameId) {
     var iframe = document.getElementById(frameId);
     var iframedoc = iframe.document;
-    if (iframe.contentDocument)
+    if (iframe.contentDocument) {
       iframedoc = iframe.contentDocument;
-    else if (iframe.contentWindow)
+    } else if (iframe.contentWindow) {
       iframedoc = iframe.contentWindow.document;
+    }
     var response = jQuery(iframedoc).contents().find('body:first').find('#uploadresponsebody').val();
     if (!Utils.validation.isNullCheck(response)) {
       response = jQuery.parseJSON(response);
@@ -235,7 +237,7 @@ var ImportExport = ImportExport || {
     }
     else {
       setTimeout(function () {
-        ImportExport.processLibraryPoolSheetUpload(frameId)
+        ImportExport.processLibraryPoolSheetUpload(frameId);
       }, 2000);
     }
   },
@@ -259,7 +261,7 @@ var ImportExport = ImportExport || {
         'url': ajaxurl
       },
       {
-        'doOnSuccess': function (json) {
+        'doOnSuccess': function () {
           librariesPoolsJSON = null;
           alert("Imported.");
           jQuery('#confirmLibrariesPoolsUploadButton').html("Imported");
@@ -269,7 +271,6 @@ var ImportExport = ImportExport || {
   },
 
   changePlatformName: function (input) {
-    var self = this;
     var platform = jQuery(input).val();
     Fluxion.doAjax(
       'importExportControllerHelperService',

@@ -57,7 +57,6 @@ var Tissue = Tissue || {
     Tissue.createTable(Defaults.all.tissueOriginsDtos, 'TO', 'allOrigins', 'Origin', TOtable);
   },
 
-
   createTissueTypesTable: function (xhr) {
     var TTtable = [];
     var id, alias, description, endpoint;
@@ -477,6 +476,7 @@ var Lab = Lab || {
 
     // optional variable for if option == "Lab"
     var selectedInstituteId = null;
+    var id, alias, endpoint;
     
     // create rows if there is data; otherwise, add only the "Add New" button
     if (data) {
@@ -607,7 +607,6 @@ var Lab = Lab || {
 
 var Hierarchy = Hierarchy || {
 
-
   getSampleClasses: function () {
     Options.makeXhrRequest('GET', '/miso/rest/sampleclasses', Hierarchy.createSampleClassesTable);
   },
@@ -626,7 +625,7 @@ var Hierarchy = Hierarchy || {
     var table = [];
     var id, alias, category, endpoint;
 
-   // create rows if there is data; otherwise, add only the "Add New" button
+    // create rows if there is data; otherwise, add only the "Add New" button
     if (data) {
       data.sort(function (a, b) {
         return (a.sampleCategory > b.sampleCategory) ? 1 : ((b.sampleCategory > a.sampleCategory) ? -1 : 0);

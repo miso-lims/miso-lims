@@ -22,7 +22,7 @@
  */
 
 var width;
-var date = new Date;
+var date = new Date();
 //Default Selection
 var cellwidth;
 var tempcolour = ["#1f77b4", "#aec7e8", "#ff7f0e", "#ffbb78", "#2ca02c", "#98df8a", "#d62728", "#ff9896", "#9467bd", "#c5b0d5", "#8c564b", "#c49c94", "#e377c2", "#f7b6d2", "#7f7f7f", "#c7c7c7", "#bcbd22", "#dbdb8d", "#17becf", "#9edae5" ];
@@ -70,7 +70,7 @@ function init(selectedYear, machine, numberofmachine) {
       return d;
     });
     data = datanew;
-    drawCalendar(selectedYear, machine, numberofmachine)
+    drawCalendar(selectedYear, machine, numberofmachine);
   });
 }
 
@@ -87,11 +87,13 @@ function drawCalendar(selectedYear, machine, numberofmachine) {
   var currentTime = new Date();
   range_start = Number(currentTime.getFullYear());
   range_stop = parseInt(range_start) + 1;
+  
+  var month_filter_start, month_filter_stop, date_filter_start, date_filter_stop;
 
   if (selectedYear == "lweek") {
-    var month_filter_start = parseInt(currentTime.getMonth()) + 1;
-    var month_filter_stop = parseInt(currentTime.getMonth()) + 1;
-    var date_filter_start = currentTime.getDate() - 7;
+    month_filter_start = parseInt(currentTime.getMonth()) + 1;
+    month_filter_stop = parseInt(currentTime.getMonth()) + 1;
+    date_filter_start = currentTime.getDate() - 7;
     if (date_filter_start < 1) {
       month_filter_start -= 1;
       date_filter_start += daysInMonth(month_filter_start, currentTime.getFullYear());
@@ -99,23 +101,21 @@ function drawCalendar(selectedYear, machine, numberofmachine) {
     if (month_filter_start < 1) {
       range_start -= 1;
     }
-    var date_filter_stop = currentTime.getDate();
-  }
-  else if (selectedYear == "lmonth") {
-    var month_filter_start = parseInt(currentTime.getMonth());
-    var month_filter_stop = parseInt(currentTime.getMonth()) + 1;
-    var date_filter_start = currentTime.getDate();
+    date_filter_stop = currentTime.getDate();
+  } else if (selectedYear == "lmonth") {
+    month_filter_start = parseInt(currentTime.getMonth());
+    month_filter_stop = parseInt(currentTime.getMonth()) + 1;
+    date_filter_start = currentTime.getDate();
 
-    var date_filter_stop = currentTime.getDate();
+    date_filter_stop = currentTime.getDate();
     range_start = Number(currentTime.getFullYear());
     range_stop = parseInt(range_start) + 1;
     if (month_filter_start < 1) {
       range_start -= 1;
     }
-  }
-  else if (selectedYear == "l3month") {
-    var month_filter_start = currentTime.getMonth() - 2; // +1 -3
-    var month_filter_stop = parseInt(currentTime.getMonth()) + 1;
+  } else if (selectedYear == "l3month") {
+    month_filter_start = currentTime.getMonth() - 2; // +1 -3
+    month_filter_stop = parseInt(currentTime.getMonth()) + 1;
     range_start = Number(currentTime.getFullYear());
     range_stop = parseInt(range_start) + 1;
 
@@ -123,45 +123,41 @@ function drawCalendar(selectedYear, machine, numberofmachine) {
       range_start -= 1;
       month_filter_start = 12 + month_filter_start;
     }
-    var date_filter_start = currentTime.getDate();
-    var date_filter_stop = currentTime.getDate();
-  }
-  else if (selectedYear == "l6month") {
-    var month_filter_start = currentTime.getMonth() - 5; // +1 -3
-    var month_filter_stop = parseInt(currentTime.getMonth()) + 1;
+    date_filter_start = currentTime.getDate();
+    date_filter_stop = currentTime.getDate();
+  } else if (selectedYear == "l6month") {
+    month_filter_start = currentTime.getMonth() - 5; // +1 -3
+    month_filter_stop = parseInt(currentTime.getMonth()) + 1;
     range_start = Number(currentTime.getFullYear());
     range_stop = parseInt(range_start) + 1;
     if (month_filter_start < 1) {
       range_start -= 1;
       month_filter_start = 12 + month_filter_start;
     }
-    var date_filter_start = currentTime.getDate();
-    var date_filter_stop = currentTime.getDate();
-  }
-  else if (selectedYear == "cyear") {
-    var month_filter_start = "01";
-    var month_filter_stop = parseInt(currentTime.getMonth()) + 1;
-    var date_filter_start = "01"
-    var date_filter_stop = currentTime.getDate();
+    date_filter_start = currentTime.getDate();
+    date_filter_stop = currentTime.getDate();
+  } else if (selectedYear == "cyear") {
+    month_filter_start = "01";
+    month_filter_stop = parseInt(currentTime.getMonth()) + 1;
+    date_filter_start = "01";
+    date_filter_stop = currentTime.getDate();
     range_start = Number(currentTime.getFullYear());
     range_stop = parseInt(range_start) + 1;
-  }
-  else if (selectedYear == "lyear") {
-    var month_filter_start = "01";
-    var month_filter_stop = "12";
-    var date_filter_start = "01"
-    var date_filter_stop = "31";
+  } else if (selectedYear == "lyear") {
+    month_filter_start = "01";
+    month_filter_stop = "12";
+    date_filter_start = "01";
+    date_filter_stop = "31";
     range_start = Number(currentTime.getFullYear()) - 1;
     range_stop = parseInt(range_start) + 1;
-  }
-  else if (selectedYear == "custom") {
-    if (jQuery("#calendarfrom").val() != "" && jQuery("#calendarto").val()) {
+  } else if (selectedYear == "custom") {
+    if (jQuery("#calendarfrom").val() !== "" && jQuery("#calendarto").val()) {
       var calendarfrom = jQuery("#calendarfrom").val().split("-");
       var calendarto = jQuery("#calendarto").val().split("-");
-      var month_filter_start = calendarfrom[1];
-      var month_filter_stop = calendarto[1];
-      var date_filter_start = calendarfrom[0];
-      var date_filter_stop = calendarto[0];
+      month_filter_start = calendarfrom[1];
+      month_filter_stop = calendarto[1];
+      date_filter_start = calendarfrom[0];
+      date_filter_stop = calendarto[0];
       range_start = calendarfrom[2];
       range_stop = Number(calendarto[2]) + 1;
     }
@@ -175,7 +171,7 @@ function drawCalendar(selectedYear, machine, numberofmachine) {
   }
 
   instrument = machine;
-  if (machine == 0) {
+  if (machine === 0) {
     noofmachine = Number(numberofmachine) + 1;
   }
   else {
@@ -190,7 +186,7 @@ function drawCalendar(selectedYear, machine, numberofmachine) {
   }
 
   function eachCalendar(start, stop, data) {
-    var temp_data = data
+    var temp_data = data;
     temp_range_start = start;
     temp_range_stop = stop;
 
@@ -453,67 +449,55 @@ function drawCalendar(selectedYear, machine, numberofmachine) {
 
 //fill if months are diff
 function findWidth(g) {
+  var i, j;
 
   if (g.Stop == "null") {
     if (g.Health == "Running") {
-      var date = new Date;
+      var date = new Date();
       g.Stop = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
       findWidth(g);
-    }
-    else {
+    } else {
       return (z - 1);
     }
-  }
-  else if (g.Stop == "null") {
+  } else if (g.Stop == "null") {
     return (z - 1);
-  }
-  else if (getmonth(g.Stop) == getmonth(g.Start) && getyear(g.Stop) == getyear(g.Start) && getyear(g.Start) == temp_range_start) {
-
+  } else if (getmonth(g.Stop) == getmonth(g.Start) && getyear(g.Stop) == getyear(g.Start) && getyear(g.Start) == temp_range_start) {
     return((getdate(g.Stop) - getdate(g.Start) + 1) * z - 1);
-
-  }
-  else if (getyear(g.Stop) == getyear(g.Start) && getyear(g.Stop) == temp_range_start) {
-    var i = getmonth(g.Start);
-    var j = getmonth(g.Stop);
+  } else if (getyear(g.Stop) == getyear(g.Start) && getyear(g.Stop) == temp_range_start) {
+    i = getmonth(g.Start);
+    j = getmonth(g.Stop);
 
     for (i; i < j; i++) {
       if ((j - i) >= 2) {
         fillTheRest((daysInMonth((Number(i) + 1), getyear(g.Start))), g.Instrument, g, g.Description);
-      }
-      else {
+      } else {
         fillTheRest(getdate(g.Stop), (Number(i) + 1), g.Instrument, g, g.Description);
       }
     }
-
     return ((daysInMonth(getmonth(g.Start), getyear(g.Start)) - getdate(g.Start) + 1) * z - 1);
-  }
-  else if (getyear(g.Stop) > temp_range_start) {
-    var i = getmonth(g.Start);
-    var j = 12;
+ 
+  } else if (getyear(g.Stop) > temp_range_start) {
+    i = getmonth(g.Start);
+    j = 12;
     for (i; i < j; i++) {
       if ((j - i) >= 2) {
         fillTheRest((daysInMonth((Number(i) + 1), getyear(g.Start))), g.Instrument, g, g.Description);
-      }
-      else {
+      } else {
         fillTheRest(daysInMonth(12), (Number(i) + 1), g.Instrument, g, g.Description);
       }
     }
-
     return ((daysInMonth(getmonth(g.Start), getyear(g.Start)) - getdate(g.Start) + 1) * z - 1);
-  }
-  else {
-    var i = getmonth(g.Stop) - 1;
-    var j = 1;
+  
+  } else {
+    i = getmonth(g.Stop) - 1;
+    j = 1;
     for (i; i >= j; i--) {
       if ((i - j) >= 1) {
         fillTheBegin((daysInMonth((Number(i)), getyear(g.Start))), g.Instrument, g, g.Description);
-      }
-      else {
+      } else {
         fillTheBegin(daysInMonth(1), (Number(1)), g.Instrument, g, g.Description);
       }
     }
-
-
     return (getdate(g.Stop) * z - 1);
   }
 }
@@ -537,12 +521,10 @@ function fillTheRest(date, month, Instrument, g, Description) {
 
                     if (flowcell == 2 && temp == 2) {
                       return ("yellow");
-                    }
-                    else {
+                    } else {
                       return ("green");
                     }
-                  }
-                  else {
+                  } else {
                     return tempcolour[Instrument];
                   }
                 })
@@ -567,13 +549,11 @@ function fillTheRest(date, month, Instrument, g, Description) {
                     }
                     if (flowcell == 2 && temp == 2) {
                       return(((month - 1) * z) + (z / (noofmachine * flowcell)) + 1 );
-                    }
-                    else {
+                    } else {
                       return(((month - 1) * z) + 1);
                     }
-                  }
-                  else {
-                    return((month - 1) * z + (Instrument) * z / noofmachine + 1 )
+                  } else {
+                    return((month - 1) * z + (Instrument) * z / noofmachine + 1 );
                   }
                 })
           .append("svg:title")
@@ -600,12 +580,10 @@ function fillTheBegin(date, month, Instrument, g, Description) {
 
                     if (flowcell == 2 && temp == 2) {
                       return ("yellow");
-                    }
-                    else {
+                    } else {
                       return ("green");
                     }
-                  }
-                  else {
+                  } else {
                     return tempcolour[Instrument];
                   }
                 })
@@ -630,13 +608,11 @@ function fillTheBegin(date, month, Instrument, g, Description) {
                     }
                     if (flowcell == 2 && temp == 2) {
                       return(((month - 1) * z) + (z / (noofmachine * flowcell)) + 1 );
-                    }
-                    else {
+                    } else {
                       return(((month - 1) * z) + 1);
                     }
-                  }
-                  else {
-                    return((month - 1) * z + (Instrument) * z / noofmachine + 1)
+                  } else {
+                    return((month - 1) * z + (Instrument) * z / noofmachine + 1);
                   }
 
                 })
@@ -662,9 +638,9 @@ function monthPath(t0) {
 //count days in each month
 function daysInMonth(month, year) {
   var m = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-  if (month != 2)return m[month - 1];
-  if (year % 4 != 0)return m[1];
-  if (year % 100 == 0 && year % 400 != 0)return m[1];
+  if (month != 2) return m[month - 1];
+  if (year % 4 !== 0) return m[1];
+  if (year % 100 === 0 && year % 400 !== 0) return m[1];
   return m[1] + 1;
 }
 

@@ -21,52 +21,54 @@
  * *********************************************************************
  */
 
-function validateUser () {
-  Validate.cleanFields('#user-form');
-  jQuery('#user-form').parsley().destroy();
-
-  // Full name input field validation
-  jQuery('#fullName').attr('class', 'form-control');
-  jQuery('#fullName').attr('data-parsley-required', 'true');
-  jQuery('#fullName').attr('data-parsley-maxlength', '100');
-  jQuery('#fullName').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
-
-  // Login name input field validation
-  jQuery('#loginName').attr('class', 'form-control');
-  jQuery('#loginName').attr('data-parsley-required', 'true');
-  jQuery('#loginName').attr('data-parsley-maxlength', '100');
-  jQuery('#loginName').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
-
-  // Login name input field validation
-  jQuery('#email').attr('class', 'form-control');
-  jQuery('#email').attr('data-parsley-required', 'true');
-  jQuery('#email').attr('data-parsley-maxlength', '100');
-  //jQuery('#email').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
-  jQuery('#email').attr('data-parsley-type', 'email');
-
-
-  // Current Password input field validation
-  jQuery('#password').attr('class', 'form-control');
-  jQuery('#password').attr('data-parsley-required', 'true');
-  jQuery('#password').attr('data-parsley-maxlength', '100');
-  jQuery('#password').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
-
-  // New Password input field validation
-  jQuery('#newpassword').attr('class', 'form-control');
-  jQuery('#newpassword').attr('data-parsley-required', 'true');
-  jQuery('#newpassword').attr('data-parsley-maxlength', '100');
-  jQuery('#newpassword').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
-
-  // Confirm password input field validation
-  jQuery('#confirmpassword').attr('class', 'form-control');
-  jQuery('#confirmpassword').attr('data-parsley-required', 'true');
-  jQuery('#confirmpassword').attr('data-parsley-maxlength', '100');
-  jQuery('#confirmpassword').attr('data-parsley-equalto', '#newpassword');
-  jQuery('#confirmpassword').attr('data-parsley-error-message', 'Password does not match!');
-  jQuery('#confirmpassword').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
-
-  jQuery('#user-form').parsley();
-  jQuery('#user-form').parsley().validate();
-
-  Validate.updateWarningOrSubmit('#user-form');
+var User = User || {
+  validateUser: function () {
+    Validate.cleanFields('#user-form');
+    jQuery('#user-form').parsley().destroy();
+  
+    // Full name input field validation
+    jQuery('#fullName').attr('class', 'form-control');
+    jQuery('#fullName').attr('data-parsley-required', 'true');
+    jQuery('#fullName').attr('data-parsley-maxlength', '100');
+    jQuery('#fullName').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+  
+    // Login name input field validation
+    jQuery('#loginName').attr('class', 'form-control');
+    jQuery('#loginName').attr('data-parsley-required', 'true');
+    jQuery('#loginName').attr('data-parsley-maxlength', '100');
+    jQuery('#loginName').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+  
+    // Login name input field validation
+    jQuery('#email').attr('class', 'form-control');
+    jQuery('#email').attr('data-parsley-required', 'true');
+    jQuery('#email').attr('data-parsley-maxlength', '100');
+    //jQuery('#email').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+    jQuery('#email').attr('data-parsley-type', 'email');
+  
+  
+    // Current Password input field validation
+    jQuery('#password').attr('class', 'form-control');
+    jQuery('#password').attr('data-parsley-required', 'true');
+    jQuery('#password').attr('data-parsley-maxlength', '100');
+    jQuery('#password').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+  
+    // New Password input field validation
+    jQuery('#newpassword').attr('class', 'form-control');
+    jQuery('#newpassword').attr('data-parsley-required', 'true');
+    jQuery('#newpassword').attr('data-parsley-maxlength', '100');
+    jQuery('#newpassword').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+  
+    // Confirm password input field validation
+    jQuery('#confirmpassword').attr('class', 'form-control');
+    jQuery('#confirmpassword').attr('data-parsley-required', 'true');
+    jQuery('#confirmpassword').attr('data-parsley-maxlength', '100');
+    jQuery('#confirmpassword').attr('data-parsley-equalto', '#newpassword');
+    jQuery('#confirmpassword').attr('data-parsley-error-message', 'Password does not match!');
+    jQuery('#confirmpassword').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+  
+    jQuery('#user-form').parsley();
+    jQuery('#user-form').parsley().validate();
+  
+    Validate.updateWarningOrSubmit('#user-form');
+  }
 };
