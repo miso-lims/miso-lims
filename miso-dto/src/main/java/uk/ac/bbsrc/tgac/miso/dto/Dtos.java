@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
+import java.util.Collection;
 import java.util.Set;
 
 import org.joda.time.format.DateTimeFormatter;
@@ -39,6 +40,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
+import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 public class Dtos {
@@ -203,7 +207,7 @@ public class Dtos {
       dto.setSubprojectId(from.getSubproject().getSubprojectId());
     }
     if (from.getPrepKit() != null) {
-      dto.setPrepKitId(from.getPrepKit().getKitDescriptorId());
+      dto.setPrepKit(asDto(from.getPrepKit()));
     }
     dto.setPassageNumber(from.getPassageNumber());
     dto.setTimesReceived(from.getTimesReceived());
@@ -231,6 +235,7 @@ public class Dtos {
     to.setTubeNumber(from.getTubeNumber());
     to.setVolume(from.getVolume());
     to.setConcentration(from.getConcentration());
+    to.setPrepKit(to(from.getPrepKit()));
     return to;
   }
 
@@ -320,7 +325,7 @@ public class Dtos {
   public static SampleAnalyteDto asDto(SampleAnalyte from) {
     SampleAnalyteDto dto = new SampleAnalyteDto();
     dto.setId(from.getSampleAnalyteId());
-    dto.setSampleId(from.getSample().getSampleId());
+    dto.setSampleId(from.getSample().getId());
     if (from.getSamplePurpose() != null) {
       dto.setSamplePurposeId(from.getSamplePurpose().getSamplePurposeId());
     }
@@ -376,7 +381,7 @@ public class Dtos {
 
   public static SampleDto asDto(Sample from) {
     SampleDto dto = new SampleDto();
-    dto.setId(from.getSampleId());
+    dto.setId(from.getId());
     if (!LimsUtils.isStringEmptyOrNull(from.getAccession())) {
       dto.setAccession(from.getAccession());
     }
@@ -413,7 +418,7 @@ public class Dtos {
       dto.setSampleAdditionalInfo(asDto(from.getSampleAdditionalInfo()));
     }
     if (from.getParent() != null) {
-      dto.setParentId(from.getParent().getSampleId());
+      dto.setParentId(from.getParent().getId());
     }
 
     return dto;
@@ -465,7 +470,7 @@ public class Dtos {
   public static SampleIdentityDto asDto(Identity from) {
     SampleIdentityDto dto = new SampleIdentityDto();
     dto.setId(from.getIdentityId());
-    dto.setSampleId(from.getSample().getSampleId());
+    dto.setSampleId(from.getSample().getId());
     dto.setInternalName(from.getInternalName());
     dto.setExternalName(from.getExternalName());
     dto.setCreatedById(from.getCreatedBy().getUserId());
@@ -597,6 +602,40 @@ public class Dtos {
     to.setCellularity(from.getCellularity());
     to.setInstitute(to(from.getInstitute()));
     to.setInstituteTissueName(from.getInstituteTissueName());
+    return to;
+  }
+  
+  public static KitDescriptorDto asDto(KitDescriptor from) {
+    KitDescriptorDto dto = new KitDescriptorDto();
+    dto.setId(from.getKitDescriptorId());
+    dto.setName(from.getName());
+    dto.setManufacturer(from.getManufacturer());
+    dto.setPartNumber(from.getPartNumber());
+    dto.setVersion(from.getVersion());
+    dto.setStockLevel(from.getStockLevel());
+    dto.setKitType(from.getKitType().getKey());
+    dto.setPlatformType(from.getPlatformType().getKey());
+    return dto;
+  }
+  
+  public static Set<KitDescriptorDto> asKitDescriptorDtos(Collection<KitDescriptor> from) {
+    Set<KitDescriptorDto> dtoSet = Sets.newHashSet();
+    for (KitDescriptor kd : from) {
+      dtoSet.add(asDto(kd));
+    }
+    return dtoSet;
+  }
+  
+  public static KitDescriptor to(KitDescriptorDto from) {
+    KitDescriptor to = new KitDescriptor();
+    if (from.getId() != null) to.setKitDescriptorId(from.getId());
+    to.setName(from.getName());
+    to.setManufacturer(from.getManufacturer());
+    to.setPartNumber(from.getPartNumber());
+    to.setVersion(from.getVersion());
+    to.setStockLevel(from.getStockLevel());
+    to.setKitType(KitType.get(from.getKitType()));
+    to.setPlatformType(PlatformType.get(from.getPlatformType()));
     return to;
   }
 

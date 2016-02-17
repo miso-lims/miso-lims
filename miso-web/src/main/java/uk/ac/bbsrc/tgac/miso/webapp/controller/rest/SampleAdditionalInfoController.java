@@ -106,6 +106,10 @@ public class SampleAdditionalInfoController extends RestController {
       sampleAdditionalInfoDto.setSubprojectUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/subproject/{id}")
           .buildAndExpand(sampleAdditionalInfoDto.getSubprojectId()).toUriString());
     }
+    if (sampleAdditionalInfoDto.getPrepKit() != null && sampleAdditionalInfoDto.getPrepKit().getId() != null) {
+      sampleAdditionalInfoDto.getPrepKit().setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/kitdescriptor/{id}")
+          .buildAndExpand(sampleAdditionalInfoDto.getPrepKit().getId()).toUriString());
+    }
     return sampleAdditionalInfoDto;
   }
 
@@ -132,8 +136,8 @@ public class SampleAdditionalInfoController extends RestController {
     SampleAdditionalInfo sampleAdditionalInfo = Dtos.to(sampleAdditionalInfoDto);
     Long id = sampleAdditionalInfoService.create(sampleAdditionalInfo, sampleAdditionalInfoDto.getSampleId(),
         sampleAdditionalInfoDto.getTissueOriginId(), sampleAdditionalInfoDto.getTissueTypeId(),
-        sampleAdditionalInfoDto.getQcPassedDetailId(), sampleAdditionalInfoDto.getSubprojectId(), sampleAdditionalInfoDto.getPrepKitId(),
-        sampleAdditionalInfoDto.getSampleClassId());
+        sampleAdditionalInfoDto.getQcPassedDetailId(), sampleAdditionalInfoDto.getSubprojectId(), 
+        sampleAdditionalInfoDto.getPrepKit().getId(), sampleAdditionalInfoDto.getSampleClassId());
     UriComponents uriComponents = b.path("/sampleadditionalinfo/{id}").buildAndExpand(id);
     HttpHeaders headers = new HttpHeaders();
     headers.setLocation(uriComponents.toUri());
@@ -147,8 +151,8 @@ public class SampleAdditionalInfoController extends RestController {
     SampleAdditionalInfo sampleAdditionalInfo = Dtos.to(sampleAdditionalInfoDto);
     sampleAdditionalInfo.setSampleAdditionalInfoId(id);
     sampleAdditionalInfoService.update(sampleAdditionalInfo, sampleAdditionalInfoDto.getTissueOriginId(),
-        sampleAdditionalInfoDto.getTissueTypeId(), sampleAdditionalInfoDto.getQcPassedDetailId(), sampleAdditionalInfoDto.getPrepKitId(),
-        sampleAdditionalInfoDto.getSampleClassId());
+        sampleAdditionalInfoDto.getTissueTypeId(), sampleAdditionalInfoDto.getQcPassedDetailId(), 
+        sampleAdditionalInfoDto.getPrepKit().getId(), sampleAdditionalInfoDto.getSampleClassId());
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
