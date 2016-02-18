@@ -64,7 +64,7 @@ public class SamplePurposeController extends RestController {
   @RequestMapping(value = "/samplepurpose/{id}", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
   public SamplePurposeDto getSamplePurpose(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
-      HttpServletResponse response) {
+      HttpServletResponse response) throws IOException {
     SamplePurpose samplePurpose = samplePurposeService.get(id);
     if (samplePurpose == null) {
       throw new RestException("No sample purpose found with ID: " + id,Status.NOT_FOUND);
@@ -88,7 +88,7 @@ public class SamplePurposeController extends RestController {
 
   @RequestMapping(value = "/samplepurposes", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public Set<SamplePurposeDto> getSamplePurposes(UriComponentsBuilder uriBuilder, HttpServletResponse response) {
+  public Set<SamplePurposeDto> getSamplePurposes(UriComponentsBuilder uriBuilder, HttpServletResponse response) throws IOException {
     Set<SamplePurpose> samplePurposes = samplePurposeService.getAll();
     if (samplePurposes.isEmpty()) {
       throw new RestException("No sample purposes found", Status.NOT_FOUND);

@@ -63,7 +63,8 @@ public class SampleController extends RestController {
 
   @RequestMapping(value = "/sample/{id}", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public SampleDto getSample(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder, HttpServletResponse response) {
+  public SampleDto getSample(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder, HttpServletResponse response) 
+      throws IOException {
     Sample sample = sampleService.get(id);
     if (sample == null) {
       throw new RestException("No sample found with ID: " + id, Status.NOT_FOUND);
@@ -92,10 +93,10 @@ public class SampleController extends RestController {
 
   @RequestMapping(value = "/samples", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public ResponseEntity<Set<SampleDto>> getSamples(UriComponentsBuilder uriBuilder) {
+  public ResponseEntity<Set<SampleDto>> getSamples(UriComponentsBuilder uriBuilder) throws IOException {
     Set<Sample> samples = sampleService.getAll();
     if (samples.isEmpty()) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      throw new RestException("No samples found", Status.NOT_FOUND);
     } else {
       Set<SampleDto> sampleDtos = Dtos.asSampleDtos(samples);
       for (SampleDto sampleDto : sampleDtos) {

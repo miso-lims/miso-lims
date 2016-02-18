@@ -7,14 +7,14 @@ import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 
 public interface IdentityService {
 
-  Identity get(Long identityId);
+  Identity get(Long identityId) throws IOException;
 
   Long create(Identity identity) throws IOException;
 
   void update(Identity identity) throws IOException;
 
-  Set<Identity> getAll();
+  Set<Identity> getAll() throws IOException;
 
-  void delete(Long identityId);
+  void delete(Long identityId) throws IOException;
 
 }

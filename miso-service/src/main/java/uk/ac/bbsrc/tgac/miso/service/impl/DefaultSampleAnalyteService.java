@@ -6,7 +6,6 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +23,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.SampleGroupDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SamplePurposeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueMaterialDao;
 import uk.ac.bbsrc.tgac.miso.service.SampleAnalyteService;
+import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 @Transactional
 @Service
@@ -47,17 +47,19 @@ public class DefaultSampleAnalyteService implements SampleAnalyteService {
   private TissueMaterialDao tissueMaterialDao;
 
   @Autowired
-  private com.eaglegenomics.simlims.core.manager.SecurityManager securityManager;
+  private AuthorizationManager authorizationManager;
 
   @Override
-  public SampleAnalyte get(Long sampleAnalyteId) {
+  public SampleAnalyte get(Long sampleAnalyteId) throws IOException {
+    authorizationManager.throwIfUnauthenticated();
     return sampleAnalyteDao.getSampleAnalyte(sampleAnalyteId);
   }
 
   @Override
   public Long create(SampleAnalyte sampleAnalyte, Long sampleId, Long samplePurposeId, Long sampleGroupId, Long tissueMaterialId)
       throws IOException {
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    authorizationManager.throwIfNonAdmin();
+    User user = authorizationManager.getCurrentUser();
     Sample sample = sampleDao.getSample(sampleId);
 
     sampleAnalyte.setCreatedBy(user);
@@ -81,6 +83,7 @@ public class DefaultSampleAnalyteService implements SampleAnalyteService {
 
   @Override
   public void update(SampleAnalyte sampleAnalyte, Long samplePurposeId, Long sampleGroupId, Long tissueMaterialId) throws IOException {
+    authorizationManager.throwIfNonAdmin();
     SampleAnalyte updatedSampleAnalyte = get(sampleAnalyte.getSampleAnalyteId());
     updatedSampleAnalyte.setRegion(sampleAnalyte.getRegion());
     updatedSampleAnalyte.setTubeId(sampleAnalyte.getTubeId());
@@ -103,18 +106,20 @@ public class DefaultSampleAnalyteService implements SampleAnalyteService {
     updatedSampleAnalyte.setSampleGroup(sampleGroup);
     updatedSampleAnalyte.setTissueMaterial(tissueMaterial);
 
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    User user = authorizationManager.getCurrentUser();
     updatedSampleAnalyte.setUpdatedBy(user);
     sampleAnalyteDao.update(updatedSampleAnalyte);
   }
 
   @Override
-  public Set<SampleAnalyte> getAll() {
+  public Set<SampleAnalyte> getAll() throws IOException {
+    authorizationManager.throwIfUnauthenticated();
     return Sets.newHashSet(sampleAnalyteDao.getSampleAnalyte());
   }
 
   @Override
-  public void delete(Long sampleAnalyteId) {
+  public void delete(Long sampleAnalyteId) throws IOException {
+    authorizationManager.throwIfNonAdmin();
     SampleAnalyte sampleAnalyte = get(sampleAnalyteId);
     sampleAnalyteDao.deleteSampleAnalyte(sampleAnalyte);
   }

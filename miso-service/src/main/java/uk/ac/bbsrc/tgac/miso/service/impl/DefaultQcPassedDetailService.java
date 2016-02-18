@@ -6,7 +6,6 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +15,7 @@ import com.google.common.collect.Sets;
 import uk.ac.bbsrc.tgac.miso.core.data.QcPassedDetail;
 import uk.ac.bbsrc.tgac.miso.persistence.QcPassedDetailDao;
 import uk.ac.bbsrc.tgac.miso.service.QcPassedDetailService;
+import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 @Transactional
 @Service
@@ -27,16 +27,18 @@ public class DefaultQcPassedDetailService implements QcPassedDetailService {
   private QcPassedDetailDao qcPassedDetailDao;
 
   @Autowired
-  private com.eaglegenomics.simlims.core.manager.SecurityManager securityManager;
+  private AuthorizationManager authorizationManager;
 
   @Override
-  public QcPassedDetail get(Long qcPassedDetailId) {
+  public QcPassedDetail get(Long qcPassedDetailId) throws IOException {
+    authorizationManager.throwIfUnauthenticated();
     return qcPassedDetailDao.getQcPassedDetails(qcPassedDetailId);
   }
 
   @Override
   public Long create(QcPassedDetail qcPassedDetail) throws IOException {
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    authorizationManager.throwIfNonAdmin();
+    User user = authorizationManager.getCurrentUser();
     qcPassedDetail.setCreatedBy(user);
     qcPassedDetail.setUpdatedBy(user);
     return qcPassedDetailDao.addQcPassedDetails(qcPassedDetail);
@@ -44,22 +46,25 @@ public class DefaultQcPassedDetailService implements QcPassedDetailService {
 
   @Override
   public void update(QcPassedDetail qcPassedDetail) throws IOException {
+    authorizationManager.throwIfNonAdmin();
     QcPassedDetail updatedQcPassedDetails = get(qcPassedDetail.getQcPassedDetailId());
     updatedQcPassedDetails.setStatus(qcPassedDetail.getStatus());
     updatedQcPassedDetails.setDescription(qcPassedDetail.getDescription());
     updatedQcPassedDetails.setNoteRequired(qcPassedDetail.getNoteRequired());
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    User user = authorizationManager.getCurrentUser();
     updatedQcPassedDetails.setUpdatedBy(user);
     qcPassedDetailDao.update(updatedQcPassedDetails);
   }
 
   @Override
-  public Set<QcPassedDetail> getAll() {
+  public Set<QcPassedDetail> getAll() throws IOException {
+    authorizationManager.throwIfUnauthenticated();
     return Sets.newHashSet(qcPassedDetailDao.getQcPassedDetails());
   }
 
   @Override
-  public void delete(Long qcPassedDetailId) {
+  public void delete(Long qcPassedDetailId) throws IOException {
+    authorizationManager.throwIfNonAdmin();
     QcPassedDetail qcPassedDetail = get(qcPassedDetailId);
     qcPassedDetailDao.deleteQcPassedDetails(qcPassedDetail);
   }

@@ -6,7 +6,6 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +27,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.SubprojectDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueOriginDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueTypeDao;
 import uk.ac.bbsrc.tgac.miso.service.SampleAdditionalInfoService;
+import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLKitDAO;
 
 @Transactional
@@ -61,17 +61,19 @@ public class DefaultSampleAdditionalInfoService implements SampleAdditionalInfoS
   private SampleClassDao sampleClassDao;
 
   @Autowired
-  private com.eaglegenomics.simlims.core.manager.SecurityManager securityManager;
+  private AuthorizationManager authorizationManager;
 
   @Override
-  public SampleAdditionalInfo get(Long sampleAdditionalInfoId) {
+  public SampleAdditionalInfo get(Long sampleAdditionalInfoId) throws IOException {
+    authorizationManager.throwIfUnauthenticated();
     return sampleAdditionalInfoDao.getSampleAdditionalInfo(sampleAdditionalInfoId);
   }
 
   @Override
   public Long create(SampleAdditionalInfo sampleAdditionalInfo, Long sampleId, Long tissueOriginId, Long tissueTypeId,
       Long qcPassedDetailId, Long subprojectId, Long prepKitId, Long sampleClassId) throws IOException {
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    authorizationManager.throwIfNonAdmin();
+    User user = authorizationManager.getCurrentUser();
     Sample sample = sampleDao.getSample(sampleId);
     sampleAdditionalInfo.setSample(sample);
 
@@ -109,6 +111,7 @@ public class DefaultSampleAdditionalInfoService implements SampleAdditionalInfoS
   @Override
   public void update(SampleAdditionalInfo sampleAdditionalInfo, Long tissueOriginId, Long tissueTypeId, Long qcPassedDetailId,
       Long prepKitId, Long sampleClassId) throws IOException {
+    authorizationManager.throwIfNonAdmin();
     SampleAdditionalInfo updatedSampleAdditionalInfo = get(sampleAdditionalInfo.getSampleAdditionalInfoId());
 
     TissueOrigin tissueOrigin = null;
@@ -143,18 +146,20 @@ public class DefaultSampleAdditionalInfoService implements SampleAdditionalInfoS
     updatedSampleAdditionalInfo.setVolume(sampleAdditionalInfo.getVolume());
     updatedSampleAdditionalInfo.setConcentration(sampleAdditionalInfo.getConcentration());
     updatedSampleAdditionalInfo.setArchived(sampleAdditionalInfo.getArchived());
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    User user = authorizationManager.getCurrentUser();
     updatedSampleAdditionalInfo.setUpdatedBy(user);
     sampleAdditionalInfoDao.update(updatedSampleAdditionalInfo);
   }
 
   @Override
-  public Set<SampleAdditionalInfo> getAll() {
+  public Set<SampleAdditionalInfo> getAll() throws IOException {
+    authorizationManager.throwIfUnauthenticated();
     return Sets.newHashSet(sampleAdditionalInfoDao.getSampleAdditionalInfo());
   }
 
   @Override
-  public void delete(Long sampleAdditionalInfoId) {
+  public void delete(Long sampleAdditionalInfoId) throws IOException {
+    authorizationManager.throwIfNonAdmin();
     SampleAdditionalInfo sampleAdditionalInfo = get(sampleAdditionalInfoId);
     sampleAdditionalInfoDao.deleteSampleAdditionalInfo(sampleAdditionalInfo);
   }

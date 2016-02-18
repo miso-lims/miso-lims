@@ -1,17 +1,16 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.User;
-import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample.SampleFactoryBuilder;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -20,6 +19,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleClassDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleDao;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
+import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLProjectDAO;
 
 @Transactional
@@ -32,7 +32,7 @@ public class DefaultSampleService implements SampleService {
   private SampleDao sampleDao;
 
   @Autowired
-  private com.eaglegenomics.simlims.core.manager.SecurityManager securityManager;
+  private AuthorizationManager authorizationManager;
 
   @Autowired
   private SQLProjectDAO sqlProjectDAO;
@@ -41,13 +41,16 @@ public class DefaultSampleService implements SampleService {
   private SampleClassDao sampleClassDao;
 
   @Override
-  public Sample get(Long sampleId) {
-    return sampleDao.getSample(sampleId);
+  public Sample get(Long sampleId) throws IOException {
+    Sample sample = sampleDao.getSample(sampleId);
+    authorizationManager.throwIfNotReadable(sample);
+    return sample;
   }
 
   @Override
   public Long create(Sample s, Long projectId, Long parentId, Long rootSampleClassId) throws IOException {
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    authorizationManager.throwIfNotWritable(s);
+    User user = authorizationManager.getCurrentUser();
     Project project = sqlProjectDAO.get(projectId);
     if (parentId == null) {
       // Create Identity.
@@ -73,8 +76,8 @@ public class DefaultSampleService implements SampleService {
 
   @Override
   public void update(Sample sample) throws IOException {
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    Sample updatedSample = get(sample.getSampleId());
+    Sample updatedSample = get(sample.getId());
+    authorizationManager.throwIfNotWritable(updatedSample);
     updatedSample.setDescription(sample.getDescription());
     updatedSample.setSampleType(sample.getSampleType());
     updatedSample.setReceivedDate(sample.getReceivedDate());
@@ -92,12 +95,14 @@ public class DefaultSampleService implements SampleService {
   }
 
   @Override
-  public Set<Sample> getAll() {
-    return Sets.newHashSet(sampleDao.getSample());
+  public Set<Sample> getAll() throws IOException {
+    Collection<Sample> allSamples = sampleDao.getSample();
+    return authorizationManager.filterUnreadable(allSamples);
   }
 
   @Override
-  public void delete(Long sampleId) {
+  public void delete(Long sampleId) throws IOException {
+    authorizationManager.throwIfNonAdmin();
     Sample sample = get(sampleId);
     sampleDao.deleteSample(sample);
   }

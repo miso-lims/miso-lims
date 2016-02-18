@@ -68,7 +68,7 @@ public class SampleClassController extends RestController {
   @RequestMapping(value = "/sampleclass/{id}", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
   public SampleClassDto getSampleClass(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
-      HttpServletResponse response) {
+      HttpServletResponse response) throws IOException {
     SampleClass sampleClass = sampleClassService.get(id);
     if (sampleClass == null) {
       throw new RestException("No sample class found with ID: " + id, Status.UNAUTHORIZED);
@@ -92,7 +92,7 @@ public class SampleClassController extends RestController {
 
   @RequestMapping(value = "/sampleclasses", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public Set<SampleClassDto> getSampleClasss(UriComponentsBuilder uriBuilder, HttpServletResponse response) {
+  public Set<SampleClassDto> getSampleClasss(UriComponentsBuilder uriBuilder, HttpServletResponse response) throws IOException {
     Set<SampleClass> sampleClasss = sampleClassService.getAll();
     if (sampleClasss.isEmpty()) {
       throw new RestException("No sample classs found", Status.NOT_FOUND);

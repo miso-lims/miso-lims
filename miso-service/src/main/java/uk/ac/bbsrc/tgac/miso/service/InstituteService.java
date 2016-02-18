@@ -13,7 +13,7 @@ public interface InstituteService {
    * @param id ID of the Institute to retrieve
    * @return
    */
-  Institute get(Long id);
+  Institute get(Long id) throws IOException;
   
   /**
    * Saves a new Institute
@@ -35,13 +35,13 @@ public interface InstituteService {
   /**
    * @return a list of all Institutes
    */
-  Set<Institute> getAll();
+  Set<Institute> getAll() throws IOException;
   
   /**
    * Delete an existing Institute by ID
    * 
    * @param instituteId ID of the Institute to delete
    */
-  void delete(Long instituteId);
+  void delete(Long instituteId) throws IOException;
   
 }

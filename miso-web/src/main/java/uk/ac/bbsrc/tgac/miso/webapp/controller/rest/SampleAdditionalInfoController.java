@@ -64,7 +64,7 @@ public class SampleAdditionalInfoController extends RestController {
   @RequestMapping(value = "/sampleadditionalinfo/{id}", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
   public SampleAdditionalInfoDto getSampleAdditionalInfo(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
-      HttpServletResponse response) {
+      HttpServletResponse response) throws IOException {
     SampleAdditionalInfo sampleAdditionalInfo = sampleAdditionalInfoService.get(id);
     if (sampleAdditionalInfo == null) {
       throw new RestException("No sample additional info found with ID: " + id, Status.NOT_FOUND);
@@ -111,7 +111,8 @@ public class SampleAdditionalInfoController extends RestController {
 
   @RequestMapping(value = "/sampleadditionalinfos", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public Set<SampleAdditionalInfoDto> getSampleAdditionalInfos(UriComponentsBuilder uriBuilder, HttpServletResponse response) {
+  public Set<SampleAdditionalInfoDto> getSampleAdditionalInfos(UriComponentsBuilder uriBuilder, HttpServletResponse response) 
+      throws IOException {
     Set<SampleAdditionalInfo> sampleAdditionalInfos = sampleAdditionalInfoService.getAll();
     if (sampleAdditionalInfos.isEmpty()) {
       throw new RestException("No sample additional infos found", Status.NOT_FOUND);

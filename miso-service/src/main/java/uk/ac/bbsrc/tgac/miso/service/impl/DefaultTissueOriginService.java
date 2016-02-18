@@ -6,7 +6,6 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +15,7 @@ import com.google.common.collect.Sets;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueOriginDao;
 import uk.ac.bbsrc.tgac.miso.service.TissueOriginService;
+import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 @Transactional
 @Service
@@ -27,16 +27,18 @@ public class DefaultTissueOriginService implements TissueOriginService {
   private TissueOriginDao tissueOriginDao;
 
   @Autowired
-  private com.eaglegenomics.simlims.core.manager.SecurityManager securityManager;
+  private AuthorizationManager authorizationManager;
 
   @Override
-  public TissueOrigin get(Long tissueOriginId) {
+  public TissueOrigin get(Long tissueOriginId) throws IOException {
+    authorizationManager.throwIfUnauthenticated();
     return tissueOriginDao.getTissueOrigin(tissueOriginId);
   }
 
   @Override
   public Long create(TissueOrigin tissueOrigin) throws IOException {
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    authorizationManager.throwIfNonAdmin();
+    User user = authorizationManager.getCurrentUser();
     log.error("user name : " + user.getFullName());
     log.error("user : " + user);
     tissueOrigin.setCreatedBy(user);
@@ -47,22 +49,25 @@ public class DefaultTissueOriginService implements TissueOriginService {
 
   @Override
   public void update(TissueOrigin tissueOrigin) throws IOException {
+    authorizationManager.throwIfNonAdmin();
     TissueOrigin updatedTissueOrigin = get(tissueOrigin.getTissueOriginId());
     log.error("update tissueOrigin: " + updatedTissueOrigin);
     updatedTissueOrigin.setAlias(tissueOrigin.getAlias());
     updatedTissueOrigin.setDescription(tissueOrigin.getDescription());
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    User user = authorizationManager.getCurrentUser();
     updatedTissueOrigin.setUpdatedBy(user);
     tissueOriginDao.update(updatedTissueOrigin);
   }
 
   @Override
-  public Set<TissueOrigin> getAll() {
+  public Set<TissueOrigin> getAll() throws IOException {
+    authorizationManager.throwIfUnauthenticated();
     return Sets.newHashSet(tissueOriginDao.getTissueOrigin());
   }
 
   @Override
-  public void delete(Long tissueOriginId) {
+  public void delete(Long tissueOriginId) throws IOException {
+    authorizationManager.throwIfNonAdmin();
     TissueOrigin tissueOrigin = get(tissueOriginId);
     tissueOriginDao.deleteTissueOrigin(tissueOrigin);
   }

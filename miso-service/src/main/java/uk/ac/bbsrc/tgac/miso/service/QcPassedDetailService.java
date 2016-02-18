@@ -7,14 +7,14 @@ import uk.ac.bbsrc.tgac.miso.core.data.QcPassedDetail;
 
 public interface QcPassedDetailService {
 
-  QcPassedDetail get(Long qcPassedDetailId);
+  QcPassedDetail get(Long qcPassedDetailId) throws IOException;
 
   Long create(QcPassedDetail qcPassedDetail) throws IOException;
 
   void update(QcPassedDetail qcPassedDetail) throws IOException;
 
-  Set<QcPassedDetail> getAll();
+  Set<QcPassedDetail> getAll() throws IOException;
 
-  void delete(Long qcPassedDetailId);
+  void delete(Long qcPassedDetailId) throws IOException;
 
 }

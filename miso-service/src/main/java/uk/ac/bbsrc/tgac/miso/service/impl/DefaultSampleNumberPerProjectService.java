@@ -6,7 +6,6 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +16,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleNumberPerProject;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleNumberPerProjectDao;
 import uk.ac.bbsrc.tgac.miso.service.SampleNumberPerProjectService;
+import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLProjectDAO;
 
 @Transactional
@@ -32,16 +32,18 @@ public class DefaultSampleNumberPerProjectService implements SampleNumberPerProj
   private SQLProjectDAO sqlProjectDAO;
 
   @Autowired
-  private com.eaglegenomics.simlims.core.manager.SecurityManager securityManager;
+  private AuthorizationManager authorizationManager;
 
   @Override
-  public SampleNumberPerProject get(Long sampleNumberPerProjectId) {
+  public SampleNumberPerProject get(Long sampleNumberPerProjectId) throws IOException {
+    authorizationManager.throwIfUnauthenticated();
     return sampleNumberPerProjectDao.getSampleNumberPerProject(sampleNumberPerProjectId);
   }
 
   @Override
   public Long create(SampleNumberPerProject sampleNumberPerProject, Long projectId) throws IOException {
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    authorizationManager.throwIfNonAdmin();
+    User user = authorizationManager.getCurrentUser();
     Project project = sqlProjectDAO.get(projectId);
     sampleNumberPerProject.setCreatedBy(user);
     sampleNumberPerProject.setUpdatedBy(user);
@@ -51,20 +53,23 @@ public class DefaultSampleNumberPerProjectService implements SampleNumberPerProj
 
   @Override
   public void update(SampleNumberPerProject sampleNumberPerProject) throws IOException {
+    authorizationManager.throwIfNonAdmin();
     SampleNumberPerProject updatedSampleNumberPerProject = get(sampleNumberPerProject.getSampleNumberPerProjectId());
     // updatedSampleNumberPerProject.setAlias(sampleNumberPerProject.getAlias());
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    User user = authorizationManager.getCurrentUser();
     updatedSampleNumberPerProject.setUpdatedBy(user);
     sampleNumberPerProjectDao.update(updatedSampleNumberPerProject);
   }
 
   @Override
-  public Set<SampleNumberPerProject> getAll() {
+  public Set<SampleNumberPerProject> getAll() throws IOException {
+    authorizationManager.throwIfUnauthenticated();
     return Sets.newHashSet(sampleNumberPerProjectDao.getSampleNumberPerProject());
   }
 
   @Override
-  public void delete(Long sampleNumberPerProjectId) {
+  public void delete(Long sampleNumberPerProjectId) throws IOException {
+    authorizationManager.throwIfNonAdmin();
     SampleNumberPerProject sampleNumberPerProject = get(sampleNumberPerProjectId);
     sampleNumberPerProjectDao.deleteSampleNumberPerProject(sampleNumberPerProject);
   }

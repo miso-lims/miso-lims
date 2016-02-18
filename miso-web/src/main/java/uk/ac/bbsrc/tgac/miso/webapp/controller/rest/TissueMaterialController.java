@@ -64,7 +64,7 @@ public class TissueMaterialController extends RestController {
   @RequestMapping(value = "/tissuematerial/{id}", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
   public TissueMaterialDto getTissueMaterial(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
-      HttpServletResponse response) {
+      HttpServletResponse response) throws IOException {
     TissueMaterial tissueMaterial = tissueMaterialService.get(id);
     if (tissueMaterial == null) {
       throw new RestException("No tissue material found with ID: " + id, Status.NOT_FOUND);
@@ -88,7 +88,7 @@ public class TissueMaterialController extends RestController {
 
   @RequestMapping(value = "/tissuematerials", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public Set<TissueMaterialDto> getTissueMaterials(UriComponentsBuilder uriBuilder, HttpServletResponse response) {
+  public Set<TissueMaterialDto> getTissueMaterials(UriComponentsBuilder uriBuilder, HttpServletResponse response) throws IOException {
     Set<TissueMaterial> tissueMaterials = tissueMaterialService.getAll();
     if (tissueMaterials.isEmpty()) {
       throw new RestException("No tissue materials found", Status.NOT_FOUND);

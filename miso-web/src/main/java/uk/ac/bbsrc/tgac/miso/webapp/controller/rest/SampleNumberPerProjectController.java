@@ -64,7 +64,7 @@ public class SampleNumberPerProjectController extends RestController {
   @RequestMapping(value = "/samplenumberperproject/{id}", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
   public SampleNumberPerProjectDto getSampleNumberPerProject(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
-      HttpServletResponse response) {
+      HttpServletResponse response) throws IOException {
     SampleNumberPerProject sampleNumberPerProject = sampleNumberPerProjectService.get(id);
     if (sampleNumberPerProject == null) {
       throw new RestException("No sample number per project found with ID: " + id, Status.NOT_FOUND);
@@ -89,7 +89,8 @@ public class SampleNumberPerProjectController extends RestController {
 
   @RequestMapping(value = "/samplenumberperprojects", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public Set<SampleNumberPerProjectDto> getSampleNumberPerProjects(UriComponentsBuilder uriBuilder, HttpServletResponse response) {
+  public Set<SampleNumberPerProjectDto> getSampleNumberPerProjects(UriComponentsBuilder uriBuilder, HttpServletResponse response) 
+      throws IOException {
     Set<SampleNumberPerProject> sampleNumberPerProjects = sampleNumberPerProjectService.getAll();
     if (sampleNumberPerProjects.isEmpty()) {
       throw new RestException("No sample numbers per project found", Status.NOT_FOUND);
