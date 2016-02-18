@@ -43,6 +43,13 @@ public class HibernateIdentityDao implements IdentityDao {
   }
 
   @Override
+  public Identity getIdentity(String externalName) {
+    Query query = currentSession().createQuery("FROM IdentityImpl I WHERE I.externalName = :externalName");
+    query.setParameter("externalName", externalName);
+    return (Identity) query.uniqueResult();
+  }
+
+  @Override
   public Long addIdentity(Identity identity) {
     Date now = new Date();
     identity.setCreationDate(now);

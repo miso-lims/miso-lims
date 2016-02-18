@@ -212,3 +212,10 @@ VALUES (1,1,1),(2,1,1),(3,1,1),(4,1,1),(5,1,1),(6,1,1),(7,1,1),(8,1,1),(9,1,1),(
 DELETE FROM `Institute`;
 INSERT INTO `Institute`(`instituteId`, `alias`, `lab`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
 VALUES (1,'Institute A','Lab A',1,'2016-01-28 14:32:00',1,'2016-01-28 14:32:00'),(2,'Institute B','Lab B',1,'2016-01-29 09:32:00',1,'2016-01-29 09:32:00');
+
+DELETE FROM `Identity`;
+INSERT INTO `Identity` (`identityId`, `sampleId`, `internalName`, `externalName`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
+VALUES ('1', '1', 'internalName1', 'externalName1', '1', '2016-02-17 09:32:00', '1', '2016-02-17 09:32:00');
+INSERT INTO `Identity` (`identityId`, `sampleId`, `internalName`, `externalName`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
+VALUES ('2', '4', 'internalName2', 'externalName2', '1', '2016-02-17 09:32:00', '1', '2016-02-17 09:32:00');
+

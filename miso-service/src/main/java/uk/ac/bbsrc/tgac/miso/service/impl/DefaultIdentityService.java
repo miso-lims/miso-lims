@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -13,6 +14,7 @@ import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.persistence.IdentityDao;
 import uk.ac.bbsrc.tgac.miso.service.IdentityService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
@@ -33,6 +35,11 @@ public class DefaultIdentityService implements IdentityService {
   public Identity get(Long identityId) throws IOException {
     authorizationManager.throwIfUnauthenticated();
     return identityDao.getIdentity(identityId);
+  }
+
+  @Override
+  public Identity get(String externalName) {
+    return identityDao.getIdentity(externalName);
   }
 
   @Override
