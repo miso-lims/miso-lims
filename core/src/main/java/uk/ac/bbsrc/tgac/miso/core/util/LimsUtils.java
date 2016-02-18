@@ -77,6 +77,9 @@ import org.slf4j.LoggerFactory;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
@@ -785,5 +788,26 @@ public class LimsUtils {
   public static String getSimpleCurrentDate() {
     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
     return sdf.format(new Date());
+  }
+
+  public static boolean isValidRelationship(Iterable<SampleValidRelationship> relations, Sample parent, Sample child) {
+    if (child.getSampleAdditionalInfo() == null) {
+      return false;
+    }
+    if (parent.getSampleAdditionalInfo() == null) {
+      return false;
+    }
+    return isValidRelationship(relations, parent.getSampleAdditionalInfo().getSampleClass(),
+        child.getSampleAdditionalInfo().getSampleClass());
+  }
+
+  public static boolean isValidRelationship(Iterable<SampleValidRelationship> relations, SampleClass parent, SampleClass child) {
+    for (SampleValidRelationship relation : relations) {
+      if (relation.getParent().getSampleClassId() == parent.getSampleClassId()
+          && relation.getChild().getSampleClassId() == child.getSampleClassId()) {
+        return true;
+      }
+    }
+    return false;
   }
 }
