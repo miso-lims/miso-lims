@@ -11,7 +11,7 @@ public interface IdentityService {
 
   Identity get(Long identityId);
 
-  List<Identity> get(String externalName);
+  Identity get(String externalName);
 
   Long create(Identity identity) throws IOException;
 

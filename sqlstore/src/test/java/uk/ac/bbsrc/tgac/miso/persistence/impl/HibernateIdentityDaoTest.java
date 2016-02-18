@@ -43,9 +43,8 @@ public class HibernateIdentityDaoTest extends AbstractDAOTest {
 
   @Test
   public void testGetIdentityByExternalName() {
-    List<Identity> list = dao.getIdentity("externalName1");
-    assertTrue(list.size() == 1);
-    assertTrue(list.get(0).getExternalName().equals("externalName1"));
+    Identity identity = dao.getIdentity("externalName1");
+    assertTrue(identity.getExternalName().equals("externalName1"));
   }
 
   @Test
@@ -92,8 +91,7 @@ public class HibernateIdentityDaoTest extends AbstractDAOTest {
 
     dao.update(identity);
 
-    List<Identity> updatedExternal = dao.getIdentity("updatedExternal");
-    assertTrue(updatedExternal.size() == 1);
+    Identity updated = dao.getIdentity("updatedExternal");
     assertEquals(new Long(1), dao.getIdentity().get(0).getIdentityId());
 
   }

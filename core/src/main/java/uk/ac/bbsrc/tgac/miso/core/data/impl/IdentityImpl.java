@@ -31,7 +31,7 @@ public class IdentityImpl implements Identity {
   @Column(unique = true, nullable = false)
   private String internalName;
 
-  @Column(nullable = false)
+  @Column(nullable = false, unique = true)
   private String externalName;
 
   @OneToOne(targetEntity = UserImpl.class)

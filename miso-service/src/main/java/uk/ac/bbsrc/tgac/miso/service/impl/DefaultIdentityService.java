@@ -37,7 +37,7 @@ public class DefaultIdentityService implements IdentityService {
   }
 
   @Override
-  public List<Identity> get(String externalName) {
+  public Identity get(String externalName) {
     return identityDao.getIdentity(externalName);
   }
 

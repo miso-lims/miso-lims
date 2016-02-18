@@ -10,7 +10,7 @@ public interface IdentityDao {
 
   Identity getIdentity(Long id);
 
-  List<Identity> getIdentity(String externalName);
+  Identity getIdentity(String externalName);
 
   Long addIdentity(Identity identity);
 
