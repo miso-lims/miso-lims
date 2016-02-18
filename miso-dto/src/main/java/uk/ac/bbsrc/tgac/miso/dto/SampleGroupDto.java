@@ -9,6 +9,8 @@ public class SampleGroupDto {
   private String url;
   private Long projectId;
   private String projectUrl;
+  private Long subprojectId;
+  private String subprojectUrl;
   private Integer groupId;
   private String description;
   private Long createdById;
@@ -106,6 +108,22 @@ public class SampleGroupDto {
     this.projectUrl = projectUrl;
   }
 
+  public Long getSubprojectId() {
+    return subprojectId;
+  }
+
+  public void setSubprojectId(Long subprojectId) {
+    this.subprojectId = subprojectId;
+  }
+
+  public String getSubprojectUrl() {
+    return subprojectUrl;
+  }
+
+  public void setSubprojectUrl(String subprojectUrl) {
+    this.subprojectUrl = subprojectUrl;
+  }
+
   public Integer getGroupId() {
     return groupId;
   }
@@ -116,8 +134,9 @@ public class SampleGroupDto {
 
   @Override
   public String toString() {
-    return "SampleGroupDto [id=" + id + ", url=" + url  +", projectId=" + projectId + ", projectUrl=" + projectUrl + ", groupId=" + groupId
-        + ", description=" + description + ", createdById=" + createdById + ", createdByUrl=" + createdByUrl + ", creationDate=" 
-        + creationDate + ", updatedById=" + updatedById + ", updatedByUrl=" + updatedByUrl + ", lastUpdated=" + lastUpdated + "]";
+    return "SampleGroupDto [id=" + id + ", url=" + url + ", projectId=" + projectId + ", projectUrl=" + projectUrl + ", subprojectId="
+        + subprojectId + ", subprojectUrl=" + subprojectUrl + ", groupId=" + groupId + ", description=" + description + ", createdById="
+        + createdById + ", createdByUrl=" + createdByUrl + ", creationDate=" + creationDate + ", updatedById=" + updatedById
+        + ", updatedByUrl=" + updatedByUrl + ", lastUpdated=" + lastUpdated + "]";
   }
 }

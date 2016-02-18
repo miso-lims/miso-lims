@@ -14,7 +14,9 @@ import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleGroupId;
+import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleGroupDao;
+import uk.ac.bbsrc.tgac.miso.persistence.SubprojectDao;
 import uk.ac.bbsrc.tgac.miso.service.SampleGroupService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLProjectDAO;
@@ -32,6 +34,9 @@ public class DefaultSampleGroupService implements SampleGroupService {
   private SQLProjectDAO sqlProjectDAO;
 
   @Autowired
+  private SubprojectDao subprojectDAO;
+
+  @Autowired
   private AuthorizationManager authorizationManager;
 
   @Override
@@ -41,13 +46,18 @@ public class DefaultSampleGroupService implements SampleGroupService {
   }
 
   @Override
-  public Long create(SampleGroupId sampleGroup, Long projectId) throws IOException {
+  public Long create(SampleGroupId sampleGroup, Long projectId, Long subprojectId) throws IOException {
     authorizationManager.throwIfUnauthenticated();
     User user = authorizationManager.getCurrentUser();
     Project project = sqlProjectDAO.get(projectId);
+    Subproject subproject = subprojectId == null ? null : subprojectDAO.getSubproject(subprojectId);
+    if (subproject != null && subproject.getParentProject().getProjectId() != projectId) {
+      throw new IllegalArgumentException("Subproject specified is not part of project.");
+    }
     sampleGroup.setCreatedBy(user);
     sampleGroup.setUpdatedBy(user);
     sampleGroup.setProject(project);
+    sampleGroup.setSubproject(subproject);
     return sampleGroupDao.addSampleGroup(sampleGroup);
   }
 
