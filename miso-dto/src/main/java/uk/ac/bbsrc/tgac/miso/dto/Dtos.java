@@ -290,6 +290,8 @@ public class Dtos {
     SampleGroupDto dto = new SampleGroupDto();
     dto.setId(from.getSampleGroupId());
     dto.setGroupId(from.getGroupId());
+    dto.setProjectId(from.getProject().getId());
+    dto.setSubprojectId(from.getSubproject() == null ? null : from.getSubproject().getSubprojectId());
     dto.setDescription(from.getDescription());
     dto.setCreatedById(from.getCreatedBy().getUserId());
     dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
