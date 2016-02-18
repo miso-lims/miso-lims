@@ -64,7 +64,7 @@ public class TissueTypeController extends RestController {
   @RequestMapping(value = "/tissuetype/{id}", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
   public TissueTypeDto getTissueType(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
-      HttpServletResponse response) {
+      HttpServletResponse response) throws IOException {
     TissueType tissueType = tissueTypeService.get(id);
     if (tissueType == null) {
       throw new RestException("No tissue type found with ID: " + id, Status.NOT_FOUND);
@@ -88,7 +88,7 @@ public class TissueTypeController extends RestController {
 
   @RequestMapping(value = "/tissuetypes", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public Set<TissueTypeDto> getTissueTypes(UriComponentsBuilder uriBuilder, HttpServletResponse response) {
+  public Set<TissueTypeDto> getTissueTypes(UriComponentsBuilder uriBuilder, HttpServletResponse response) throws IOException {
     Set<TissueType> tissueTypes = tissueTypeService.getAll();
     if (tissueTypes.isEmpty()) {
       throw new RestException("No tissue types found", Status.NOT_FOUND);

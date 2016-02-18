@@ -6,7 +6,6 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +16,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.persistence.SubprojectDao;
 import uk.ac.bbsrc.tgac.miso.service.SubprojectService;
+import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLProjectDAO;
 
 @Transactional
@@ -31,17 +31,19 @@ public class DefaultSubprojectService implements SubprojectService {
   private SubprojectDao subprojectDao;
 
   @Autowired
-  private com.eaglegenomics.simlims.core.manager.SecurityManager securityManager;
+  private AuthorizationManager authorizationManager;
 
   @Override
-  public Subproject get(Long subprojectId) {
+  public Subproject get(Long subprojectId) throws IOException {
+    authorizationManager.throwIfUnauthenticated();
     return subprojectDao.getSubproject(subprojectId);
   }
   
 
   @Override
   public Long create(Subproject subproject, Long parentProjectId) throws IOException {
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    authorizationManager.throwIfNonAdmin();
+    User user = authorizationManager.getCurrentUser();
     Project parentProject = sqlProjectDAO.get(parentProjectId);
     subproject.setCreatedBy(user);
     subproject.setUpdatedBy(user);
@@ -51,22 +53,25 @@ public class DefaultSubprojectService implements SubprojectService {
 
   @Override
   public void update(Subproject subproject) throws IOException {
+    authorizationManager.throwIfNonAdmin();
     Subproject updatedSubproject = get(subproject.getSubprojectId());
     updatedSubproject.setAlias(subproject.getAlias());
     updatedSubproject.setDescription(subproject.getDescription());
     updatedSubproject.setPriority(subproject.getPriority());
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    User user = authorizationManager.getCurrentUser();
     updatedSubproject.setUpdatedBy(user);
     subprojectDao.update(updatedSubproject);
   }
 
   @Override
-  public Set<Subproject> getAll() {
+  public Set<Subproject> getAll() throws IOException {
+    authorizationManager.throwIfUnauthenticated();
     return Sets.newHashSet(subprojectDao.getSubproject());
   }
 
   @Override
-  public void delete(Long subprojectId) {
+  public void delete(Long subprojectId) throws IOException {
+    authorizationManager.throwIfNonAdmin();
     Subproject subproject = get(subprojectId);
     subprojectDao.deleteSubproject(subproject);
   }

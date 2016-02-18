@@ -63,7 +63,8 @@ public class SampleGroupController extends RestController {
 
   @RequestMapping(value = "/samplegroup/{id}", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public SampleGroupDto getSampleGroup(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder, HttpServletResponse response) {
+  public SampleGroupDto getSampleGroup(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder, HttpServletResponse response)
+      throws IOException {
     SampleGroupId sampleGroup = sampleGroupService.get(id);
     if (sampleGroup == null) {
       throw new RestException("No sample group found with ID: " + id, Status.NOT_FOUND);
@@ -76,8 +77,8 @@ public class SampleGroupController extends RestController {
 
   private static SampleGroupDto writeUrls(SampleGroupDto sampleGroupDto, UriComponentsBuilder uriBuilder) {
     URI baseUri = uriBuilder.build().toUri();
-    sampleGroupDto.setUrl(
-        UriComponentsBuilder.fromUri(baseUri).path("/rest/samplegroup/{id}").buildAndExpand(sampleGroupDto.getId()).toUriString());
+    sampleGroupDto
+        .setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/samplegroup/{id}").buildAndExpand(sampleGroupDto.getId()).toUriString());
     sampleGroupDto.setCreatedByUrl(
         UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}").buildAndExpand(sampleGroupDto.getCreatedById()).toUriString());
     sampleGroupDto.setUpdatedByUrl(
@@ -87,7 +88,7 @@ public class SampleGroupController extends RestController {
 
   @RequestMapping(value = "/samplegroups", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public Set<SampleGroupDto> getSampleGroups(UriComponentsBuilder uriBuilder, HttpServletResponse response) {
+  public Set<SampleGroupDto> getSampleGroups(UriComponentsBuilder uriBuilder, HttpServletResponse response) throws IOException {
     Set<SampleGroupId> sampleGroups = sampleGroupService.getAll();
     if (sampleGroups.isEmpty()) {
       throw new RestException("No sample groups found", Status.NOT_FOUND);
@@ -105,7 +106,7 @@ public class SampleGroupController extends RestController {
   public ResponseEntity<?> createSampleGroup(@RequestBody SampleGroupDto sampleGroupDto, UriComponentsBuilder b,
       HttpServletResponse response) throws IOException {
     SampleGroupId sampleGroup = Dtos.to(sampleGroupDto);
-    Long id = sampleGroupService.create(sampleGroup, sampleGroupDto.getProjectId());
+    Long id = sampleGroupService.create(sampleGroup, sampleGroupDto.getProjectId(), sampleGroupDto.getSubprojectId());
     UriComponents uriComponents = b.path("/samplegroup/{id}").buildAndExpand(id);
     HttpHeaders headers = new HttpHeaders();
     headers.setLocation(uriComponents.toUri());

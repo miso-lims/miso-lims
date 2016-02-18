@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest.ui;
 
+import java.io.IOException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +49,7 @@ public class SampleOptionsController {
   
   @RequestMapping(value = "/sampleoptions", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public ResponseEntity<SampleOptionsDto> getSampleOptions(UriComponentsBuilder uriBuilder) {
+  public ResponseEntity<SampleOptionsDto> getSampleOptions(UriComponentsBuilder uriBuilder) throws IOException {
     SampleOptionsDto sampleOptionsDto = new SampleOptionsDto();
     sampleOptionsDto.setSubprojectsDtos(Dtos.asSubprojectDtos(subprojectService.getAll()));
     sampleOptionsDto.setTissueOriginsDtos(Dtos.asTissueOriginDtos(tissueOriginService.getAll()));

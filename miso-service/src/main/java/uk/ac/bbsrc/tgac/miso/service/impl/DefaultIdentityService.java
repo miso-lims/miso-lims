@@ -6,7 +6,6 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +15,7 @@ import com.google.common.collect.Sets;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.persistence.IdentityDao;
 import uk.ac.bbsrc.tgac.miso.service.IdentityService;
+import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 @Transactional
 @Service
@@ -27,16 +27,18 @@ public class DefaultIdentityService implements IdentityService {
   private IdentityDao identityDao;
 
   @Autowired
-  private com.eaglegenomics.simlims.core.manager.SecurityManager securityManager;
+  private AuthorizationManager authorizationManager;
 
   @Override
-  public Identity get(Long identityId) {
+  public Identity get(Long identityId) throws IOException {
+    authorizationManager.throwIfUnauthenticated();
     return identityDao.getIdentity(identityId);
   }
 
   @Override
   public Long create(Identity identity) throws IOException {
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    authorizationManager.throwIfNonAdmin();
+    User user = authorizationManager.getCurrentUser();
     identity.setCreatedBy(user);
     identity.setUpdatedBy(user);
     return identityDao.addIdentity(identity);
@@ -44,21 +46,24 @@ public class DefaultIdentityService implements IdentityService {
 
   @Override
   public void update(Identity identity) throws IOException {
+    authorizationManager.throwIfNonAdmin();
     Identity updatedIdentity = get(identity.getIdentityId());
     updatedIdentity.setInternalName(identity.getInternalName());
     updatedIdentity.setExternalName(identity.getExternalName());
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    User user = authorizationManager.getCurrentUser();
     updatedIdentity.setUpdatedBy(user);
     identityDao.update(updatedIdentity);
   }
 
   @Override
-  public Set<Identity> getAll() {
+  public Set<Identity> getAll() throws IOException {
+    authorizationManager.throwIfUnauthenticated();
     return Sets.newHashSet(identityDao.getIdentity());
   }
 
   @Override
-  public void delete(Long identityId) {
+  public void delete(Long identityId) throws IOException {
+    authorizationManager.throwIfNonAdmin();
     Identity identity = get(identityId);
     identityDao.deleteIdentity(identity);
   }

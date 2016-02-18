@@ -51,7 +51,7 @@ public class InstituteController extends RestController {
   
   @RequestMapping(value = "/institute/{id}", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public InstituteDto getInstitute(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder) {
+  public InstituteDto getInstitute(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder) throws IOException {
     Institute institute = instituteService.get(id);
     if (institute == null) {
       throw new RestException("No institute found with ID: " + id,Status.NOT_FOUND);
@@ -64,7 +64,7 @@ public class InstituteController extends RestController {
   
   @RequestMapping(value = "/institutes", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public Set<InstituteDto> getInstitutes(UriComponentsBuilder uriBuilder) {
+  public Set<InstituteDto> getInstitutes(UriComponentsBuilder uriBuilder) throws IOException {
     Set<Institute> institutes = instituteService.getAll();
     if (institutes.isEmpty()) {
       throw new RestException("No institutes found", Status.NOT_FOUND);

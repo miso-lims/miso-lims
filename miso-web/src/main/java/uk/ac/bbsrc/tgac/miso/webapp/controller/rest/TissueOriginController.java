@@ -64,7 +64,7 @@ public class TissueOriginController extends RestController {
   @RequestMapping(value = "/tissueorigin/{id}", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
   public TissueOriginDto getTissueOrigin(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
-      HttpServletResponse response) {
+      HttpServletResponse response) throws IOException {
     TissueOrigin tissueOrigin = tissueOriginService.get(id);
     if (tissueOrigin == null) {
       throw new RestException("No tissue origin found with ID: " + id, Status.NOT_FOUND);
@@ -88,7 +88,7 @@ public class TissueOriginController extends RestController {
 
   @RequestMapping(value = "/tissueorigins", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public Set<TissueOriginDto> getTissueOrigins(UriComponentsBuilder uriBuilder, HttpServletResponse response) {
+  public Set<TissueOriginDto> getTissueOrigins(UriComponentsBuilder uriBuilder, HttpServletResponse response) throws IOException {
     Set<TissueOrigin> tissueOrigins = tissueOriginService.getAll();
     if (tissueOrigins.isEmpty()) {
       throw new RestException("No tissue origins found", Status.NOT_FOUND);

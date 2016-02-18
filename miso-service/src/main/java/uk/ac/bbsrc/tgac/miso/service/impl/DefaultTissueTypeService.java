@@ -6,7 +6,6 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +15,7 @@ import com.google.common.collect.Sets;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueTypeDao;
 import uk.ac.bbsrc.tgac.miso.service.TissueTypeService;
+import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 @Transactional
 @Service
@@ -27,16 +27,18 @@ public class DefaultTissueTypeService implements TissueTypeService {
   private TissueTypeDao tissueTypeDao;
 
   @Autowired
-  private com.eaglegenomics.simlims.core.manager.SecurityManager securityManager;
+  private AuthorizationManager authorizationManager;
 
   @Override
-  public TissueType get(Long tissueTypeId) {
+  public TissueType get(Long tissueTypeId) throws IOException {
+    authorizationManager.throwIfUnauthenticated();
     return tissueTypeDao.getTissueType(tissueTypeId);
   }
 
   @Override
   public Long create(TissueType tissueType) throws IOException {
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    authorizationManager.throwIfNonAdmin();
+    User user = authorizationManager.getCurrentUser();
     tissueType.setCreatedBy(user);
     tissueType.setUpdatedBy(user);
     return tissueTypeDao.addTissueType(tissueType);
@@ -44,21 +46,24 @@ public class DefaultTissueTypeService implements TissueTypeService {
 
   @Override
   public void update(TissueType tissueType) throws IOException {
+    authorizationManager.throwIfNonAdmin();
     TissueType updatedTissueType = get(tissueType.getTissueTypeId());
     updatedTissueType.setAlias(tissueType.getAlias());
     updatedTissueType.setDescription(tissueType.getDescription());
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    User user = authorizationManager.getCurrentUser();
     updatedTissueType.setUpdatedBy(user);
     tissueTypeDao.update(updatedTissueType);
   }
 
   @Override
-  public Set<TissueType> getAll() {
+  public Set<TissueType> getAll() throws IOException {
+    authorizationManager.throwIfUnauthenticated();
     return Sets.newHashSet(tissueTypeDao.getTissueType());
   }
 
   @Override
-  public void delete(Long tissueTypeId) {
+  public void delete(Long tissueTypeId) throws IOException {
+    authorizationManager.throwIfNonAdmin();
     TissueType tissueType = get(tissueTypeId);
     tissueTypeDao.deleteTissueType(tissueType);
   }

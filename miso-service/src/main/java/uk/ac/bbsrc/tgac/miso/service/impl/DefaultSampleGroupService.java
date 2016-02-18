@@ -6,7 +6,6 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,8 +14,11 @@ import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleGroupId;
+import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleGroupDao;
+import uk.ac.bbsrc.tgac.miso.persistence.SubprojectDao;
 import uk.ac.bbsrc.tgac.miso.service.SampleGroupService;
+import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLProjectDAO;
 
 @Transactional
@@ -32,40 +34,53 @@ public class DefaultSampleGroupService implements SampleGroupService {
   private SQLProjectDAO sqlProjectDAO;
 
   @Autowired
-  private com.eaglegenomics.simlims.core.manager.SecurityManager securityManager;
+  private SubprojectDao subprojectDAO;
+
+  @Autowired
+  private AuthorizationManager authorizationManager;
 
   @Override
-  public SampleGroupId get(Long sampleGroupId) {
+  public SampleGroupId get(Long sampleGroupId) throws IOException {
+    authorizationManager.throwIfUnauthenticated();
     return sampleGroupDao.getSampleGroup(sampleGroupId);
   }
 
   @Override
-  public Long create(SampleGroupId sampleGroup, Long projectId) throws IOException {
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+  public Long create(SampleGroupId sampleGroup, Long projectId, Long subprojectId) throws IOException {
+    authorizationManager.throwIfUnauthenticated();
+    User user = authorizationManager.getCurrentUser();
     Project project = sqlProjectDAO.get(projectId);
+    Subproject subproject = subprojectId == null ? null : subprojectDAO.getSubproject(subprojectId);
+    if (subproject != null && subproject.getParentProject().getProjectId() != projectId) {
+      throw new IllegalArgumentException("Subproject specified is not part of project.");
+    }
     sampleGroup.setCreatedBy(user);
     sampleGroup.setUpdatedBy(user);
     sampleGroup.setProject(project);
+    sampleGroup.setSubproject(subproject);
     return sampleGroupDao.addSampleGroup(sampleGroup);
   }
 
   @Override
   public void update(SampleGroupId sampleGroup) throws IOException {
+    authorizationManager.throwIfNonAdmin();
     SampleGroupId updatedSampleGroup = get(sampleGroup.getSampleGroupId());
     // updatedSampleGroup.setAlias(sampleGroup.getAlias());
     updatedSampleGroup.setDescription(sampleGroup.getDescription());
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    User user = authorizationManager.getCurrentUser();
     updatedSampleGroup.setUpdatedBy(user);
     sampleGroupDao.update(updatedSampleGroup);
   }
 
   @Override
-  public Set<SampleGroupId> getAll() {
+  public Set<SampleGroupId> getAll() throws IOException {
+    authorizationManager.throwIfUnauthenticated();
     return Sets.newHashSet(sampleGroupDao.getSampleGroups());
   }
 
   @Override
-  public void delete(Long sampleGroupId) {
+  public void delete(Long sampleGroupId) throws IOException {
+    authorizationManager.throwIfNonAdmin();
     SampleGroupId sampleGroup = get(sampleGroupId);
     sampleGroupDao.deleteSampleGroup(sampleGroup);
   }

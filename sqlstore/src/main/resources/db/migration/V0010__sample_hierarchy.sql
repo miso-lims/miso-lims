@@ -190,6 +190,7 @@ CREATE TABLE `SamplePurpose` (
 CREATE TABLE `SampleGroup` (
   `sampleGroupId` bigint(20) NOT NULL AUTO_INCREMENT,
   `projectId` bigint(20) NOT NULL,
+  `subprojectId` bigint(20),
   `groupId` int(11) NOT NULL,
   `description` varchar(255) NOT NULL,
   `createdBy` bigint(20) NOT NULL,
@@ -201,6 +202,7 @@ CREATE TABLE `SampleGroup` (
   KEY `FKnn6082qvedk02e1046e8y107d` (`createdBy`),
   KEY `FKisowhu857cxk85o0s0fklyevx` (`updatedBy`),
   CONSTRAINT `FKaykeqkgvy3fgpq8it98acblmv` FOREIGN KEY (`projectId`) REFERENCES `Project` (`projectId`),
+  CONSTRAINT `FKsubproject` FOREIGN KEY (`subprojectId`) REFERENCES `Subproject` (`subprojectId`),
   CONSTRAINT `FKisowhu857cxk85o0s0fklyevx` FOREIGN KEY (`updatedBy`) REFERENCES `User` (`userId`),
   CONSTRAINT `FKnn6082qvedk02e1046e8y107d` FOREIGN KEY (`createdBy`) REFERENCES `User` (`userId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

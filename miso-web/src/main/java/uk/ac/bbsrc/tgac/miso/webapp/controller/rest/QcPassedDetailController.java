@@ -64,7 +64,7 @@ public class QcPassedDetailController extends RestController {
   @RequestMapping(value = "/qcpasseddetail/{id}", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
   public QcPassedDetailDto getQcPassedDetail(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
-      HttpServletResponse response) {
+      HttpServletResponse response) throws IOException {
     QcPassedDetail qcPassedDetail = qcPassedDetailService.get(id);
     if (qcPassedDetail == null) {
       throw new RestException("No QC passed detail found with ID: " + id, Status.NOT_FOUND);
@@ -88,7 +88,7 @@ public class QcPassedDetailController extends RestController {
 
   @RequestMapping(value = "/qcpasseddetails", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public Set<QcPassedDetailDto> getQcPassedDetail(UriComponentsBuilder uriBuilder, HttpServletResponse response) {
+  public Set<QcPassedDetailDto> getQcPassedDetail(UriComponentsBuilder uriBuilder, HttpServletResponse response) throws IOException {
     Set<QcPassedDetail> qcPassedDetails = qcPassedDetailService.getAll();
     if (qcPassedDetails.isEmpty()) {
       throw new RestException("No QC passed details found", Status.NOT_FOUND);
