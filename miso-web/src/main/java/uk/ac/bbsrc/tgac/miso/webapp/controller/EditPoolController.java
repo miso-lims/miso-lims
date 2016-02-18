@@ -48,6 +48,9 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
+
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractPool;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
@@ -64,9 +67,6 @@ import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.context.ApplicationContextProvider;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoPropertyExporter;
-
-import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.controller
@@ -323,7 +323,7 @@ public class EditPoolController {
     return "redirect:/miso/pool/" + p.getId();
   }
 
-  @RequestMapping(value = { "/new", "/{poolId}" }, method = RequestMethod.POST)
+  @RequestMapping(method = RequestMethod.POST)
   public String processSubmit(@ModelAttribute("pool") Pool<? extends Poolable> pool, ModelMap model, SessionStatus session)
       throws IOException {
     try {

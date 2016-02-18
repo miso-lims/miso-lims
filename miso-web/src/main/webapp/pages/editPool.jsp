@@ -40,11 +40,11 @@
 
 <div id="maincontent">
 <div id="contentcolumn">
-<form:form id="pool-form" data-parsley-validate="" method="POST" commandName="pool" autocomplete="off">
+<form:form id="pool-form" data-parsley-validate="" action="/miso/pool" method="POST" commandName="pool" autocomplete="off">
 <sessionConversation:insertSessionConversationId attributeName="pool"/>
 <h1><c:choose><c:when
     test="${pool.id != 0}">Edit</c:when><c:otherwise>Create</c:otherwise></c:choose> Pool
-  <button type="submit" onclick="return Pool.validatePool();" class="fg-button ui-state-default ui-corner-all">Save</button>
+  <button type="button" onclick="return Pool.validatePool();" class="fg-button ui-state-default ui-corner-all">Save</button>
 </h1>
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
   <div id="note_arrowclick" class="toggleLeft"></div>
