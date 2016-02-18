@@ -190,7 +190,7 @@ public class PossiblyGzippedFileUtils {
   private static Matcher tailGrepGzipped(File file, Pattern pattern, int lines) throws FileNotFoundException, IOException {
     try (InputStream is = new FileInputStream(file);
         InputStream gis = new GZIPInputStream(is);
-        Reader r = new InputStreamReader(is);
+        Reader r = new InputStreamReader(gis);
         BufferedReader br = new BufferedReader(r)) {
       String[] lineText = new String[lines];
 
@@ -213,12 +213,14 @@ public class PossiblyGzippedFileUtils {
       done = false;
       Matcher m = null;
       while (!done) {
-        if (m == null)
-          m = pattern.matcher(lineText[i]);
-        else
-          m.reset(lineText[i]);
-        if (m.find()) {
-          return m;
+        if (lineText[i] != null) { // may be less lines in file than requested
+          if (m == null)
+            m = pattern.matcher(lineText[i]);
+          else
+            m.reset(lineText[i]);
+          if (m.find()) {
+            return m;
+          }
         }
         i++;
         if (i == lineText.length) i = 0;
