@@ -10,6 +10,8 @@ public interface SampleAdditionalInfoDao {
 
   SampleAdditionalInfo getSampleAdditionalInfo(Long id);
 
+  SampleAdditionalInfo getSampleAdditionalInfoBySampleId(Long id);
+
   Long addSampleAdditionalInfo(SampleAdditionalInfo sampleAdditionalInfo);
 
   void deleteSampleAdditionalInfo(SampleAdditionalInfo sampleAdditionalInfo);

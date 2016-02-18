@@ -43,6 +43,13 @@ public class HibernateSampleAnalyteDao implements SampleAnalyteDao {
   }
 
   @Override
+  public SampleAnalyte getSampleAnalyteBySampleId(Long id) {
+    Query query = currentSession().createQuery("from SampleAnalyteImpl where sampleId = :id");
+    query.setLong("id", id);
+    return (SampleAnalyte) query.uniqueResult();
+  }
+
+  @Override
   public Long addSampleAnalyte(SampleAnalyte sampleAnalyte) {
     Date now = new Date();
     sampleAnalyte.setCreationDate(now);
