@@ -37,7 +37,7 @@
   
   <div class="corner-padding">
     <a href="#origins">Tissue Origins</a><br/>
-    <a href="#conditions">Tissue Conditions</a><br/>
+    <a href="#types">Tissue Types</a><br/>
     <a href="#materials">Tissue Materials</a><br/>
     <a href="#purposes">Sample Purposes</a><br/>
     <a href="#qcDetails">QC Details</a><br/>
@@ -63,14 +63,14 @@
   
   <div class="sectionDivider"></div>
   <div class="corner-padding">
-    <h2 id="conditions">Tissue Conditions</h2>
-	  <table id="allConditionsTable" class="clear default-table" data-sortable>
+    <h2 id="types">Tissue Types</h2>
+	  <table id="allTypesTable" class="clear default-table" data-sortable>
 	    <thead>
 	      <tr>
 	        <th>Alias</th><th>Description</th>
 	      </tr>
 	    </thead>
-	    <tbody id="allConditions" class="TC"></tbody>
+	    <tbody id="allTypes" class="TT"></tbody>
 	  </table>
 	</div>
 	
@@ -163,7 +163,7 @@
 <script type="text/javascript">
   jQuery(document).ready(function() {
     Tissue.getTissueOrigins();
-    Tissue.getTissueConditions();
+    Tissue.getTissueTypes();
     Tissue.getTissueMaterials();
     Tissue.getSamplePurposes();
     QC.getQcDetails();

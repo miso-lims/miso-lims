@@ -32,14 +32,14 @@ var Tissue = Tissue || {
     Tissue.createTable(xhr, 'TO', 'allOrigins', 'Origin', TOtable);
   },
 
-  getTissueConditions: function () {
-    Options.makeXhrRequest('GET', '/miso/rest/tissuetypes', Tissue.createTissueConditionsTable);
+  getTissueTypes: function () {
+    Options.makeXhrRequest('GET', '/miso/rest/tissuetypes', Tissue.createTissueTypesTable);
   },
 
-  createTissueConditionsTable: function (xhr) {
-    var TCtable = [];
+  createTissueTypesTable: function (xhr) {
+    var TTtable = [];
     var id, alias, description, endpoint;
-    Tissue.createTable(xhr, 'TC', 'allConditions', 'Condition', TCtable);
+    Tissue.createTable(xhr, 'TT', 'allTypes', 'Type', TTtable);
   },
 
   getTissueMaterials: function () {
@@ -121,7 +121,7 @@ var Tissue = Tissue || {
     var endpoint = '/miso/rest/';
     if (option == 'TO') {
       endpoint += 'tissueorigin';
-    } else if (option == 'TC') {
+    } else if (option == 'TT') {
       endpoint += 'tissuetype';
     } else if (option == 'TM') {
       endpoint += 'tissuematerial';
@@ -793,7 +793,7 @@ var Options = Options || {
   reloadTable: function (option) {
     var reloadTableFunc;
     if (option == 'TO') { reloadTableFunc = Tissue.getTissueOrigins; }
-    else if (option == 'TC') { reloadTableFunc = Tissue.getTissueConditions; }
+    else if (option == 'TT') { reloadTableFunc = Tissue.getTissueTypes; }
     else if (option == 'TM') { reloadTableFunc = Tissue.getTissueMaterials; }
     else if (option == 'SP') { reloadTableFunc = Tissue.getSamplePurposes; }
     else if (option == 'QC') { reloadTableFunc = QC.getQcDetails; }
