@@ -19,6 +19,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.persistence.QcPassedDetailDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleAdditionalInfoDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleClassDao;
@@ -94,9 +95,8 @@ public class DefaultSampleAdditionalInfoService implements SampleAdditionalInfoS
       sampleAdditionalInfo.setSubproject(subproject);
     }
     if (prepKitId != null) {
-      // Need to resolve which kit we need to refer to in this case.
-      // Kit prepKit = sqlKitDao.get(prepKitId);
-      // sampleAdditionalInfo.setPrepKit(prepKit);
+      KitDescriptor prepKit = sqlKitDao.getKitDescriptorById(prepKitId);
+      sampleAdditionalInfo.setPrepKit(prepKit);
     }
     if (sampleClassId != null) {
       SampleClass sampleClass = sampleClassDao.getSampleClass(sampleClassId);
@@ -118,6 +118,7 @@ public class DefaultSampleAdditionalInfoService implements SampleAdditionalInfoS
     TissueType tissueType = null;
     QcPassedDetail qcPassedDetail = null;
     SampleClass sampleClass = null;
+    KitDescriptor prepKit = null;
     if (tissueOriginId != null) {
       tissueOrigin = tissueOriginDao.getTissueOrigin(tissueOriginId);
     }
@@ -128,9 +129,7 @@ public class DefaultSampleAdditionalInfoService implements SampleAdditionalInfoS
       qcPassedDetail = qcPassedDetailDao.getQcPassedDetails(qcPassedDetailId);
     }
     if (prepKitId != null) {
-      // Need to resolve which kit we need to refer to in this case.
-      // Kit prepKit = sqlKitDao.get(prepKitId);
-      // sampleAdditionalInfo.setPrepKit(prepKit);
+      prepKit = sqlKitDao.getKitDescriptorById(prepKitId);
     }
     if (sampleClassId != null) {
       sampleClass = sampleClassDao.getSampleClass(sampleClassId);
@@ -139,6 +138,7 @@ public class DefaultSampleAdditionalInfoService implements SampleAdditionalInfoS
     updatedSampleAdditionalInfo.setTissueType(tissueType);
     updatedSampleAdditionalInfo.setQcPassedDetail(qcPassedDetail);
     updatedSampleAdditionalInfo.setSampleClass(sampleClass);
+    updatedSampleAdditionalInfo.setPrepKit(prepKit);
 
     updatedSampleAdditionalInfo.setPassageNumber(sampleAdditionalInfo.getPassageNumber());
     updatedSampleAdditionalInfo.setTimesReceived(sampleAdditionalInfo.getTimesReceived());

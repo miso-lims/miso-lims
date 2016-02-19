@@ -19,8 +19,7 @@ public class SampleAdditionalInfoDto {
   private String qcPassedDetailUrl;
   private Long subprojectId;
   private String subprojectUrl;
-  private Long prepKitId;
-  private String prepKitUrl;
+  private KitDescriptorDto prepKit;
   private Integer passageNumber;
   private Integer timesReceived;
   private Integer tubeNumber;
@@ -128,21 +127,13 @@ public class SampleAdditionalInfoDto {
   public void setSubprojectUrl(String subprojectUrl) {
     this.subprojectUrl = subprojectUrl;
   }
-
-  public Long getPrepKitId() {
-    return prepKitId;
+  
+  public KitDescriptorDto getPrepKit() {
+    return prepKit;
   }
-
-  public void setPrepKitId(Long prepKitId) {
-    this.prepKitId = prepKitId;
-  }
-
-  public String getPrepKitUrl() {
-    return prepKitUrl;
-  }
-
-  public void setPrepKitUrl(String prepKitUrl) {
-    this.prepKitUrl = prepKitUrl;
+  
+  public void setPrepKit(KitDescriptorDto prepKit) {
+    this.prepKit = prepKit;
   }
 
   public Integer getPassageNumber() {

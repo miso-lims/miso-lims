@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -54,8 +55,9 @@ public class SampleAdditionalInfoImpl implements SampleAdditionalInfo {
   @JoinColumn(name = "subprojectId")
   private Subproject subproject;
 
-  @OneToOne(targetEntity = KitDescriptor.class)
-  @JoinColumn(name = "kitDescriptorId")
+  private Long kitDescriptorId;
+  
+  @Transient
   private KitDescriptor prepKit;
 
   private Integer passageNumber;
@@ -263,6 +265,18 @@ public class SampleAdditionalInfoImpl implements SampleAdditionalInfo {
   @Override
   public void setPrepKit(KitDescriptor prepKit) {
     this.prepKit = prepKit;
+    
+    // Keep kitDescriptorId field consistent for Hibernate persistence
+    if (prepKit == null) {
+      this.kitDescriptorId = null;
+    } else {
+      this.kitDescriptorId = prepKit.getKitDescriptorId();
+    }
+  }
+
+  @Override
+  public Long getHibernateKitDescriptorId() {
+    return kitDescriptorId;
   }
 
 }
