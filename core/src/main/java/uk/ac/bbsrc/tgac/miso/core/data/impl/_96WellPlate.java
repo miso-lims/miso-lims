@@ -75,8 +75,4 @@ public class _96WellPlate extends PlateImpl<Library> implements Plateable, Seria
     return Library.class;
   }
 
-  @Override
-  public <T> Set<Plate<LinkedList<T>, T>> getPlates() throws Exception {
-    throw new Exception("96-well plates have no internal plate structure");
-  }
 }

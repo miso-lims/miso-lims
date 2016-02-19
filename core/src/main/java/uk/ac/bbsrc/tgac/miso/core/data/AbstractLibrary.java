@@ -82,7 +82,6 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
 
   private final Collection<LibraryQC> libraryQCs = new TreeSet<LibraryQC>();
   private final Collection<LibraryDilution> libraryDilutions = new HashSet<LibraryDilution>();
-  private Set<Plate<? extends LinkedList<Library>, Library>> plates = new HashSet<Plate<? extends LinkedList<Library>, Library>>();
 
   private SecurityProfile securityProfile;
   private Sample sample;
@@ -156,6 +155,7 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
     this.accession = accession;
   }
 
+  @Override
   public Date getCreationDate() {
     return creationDate;
   }
@@ -343,20 +343,6 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   }
 
   @Override
-  public Set<Plate<? extends LinkedList<Library>, Library>> getPlates() {
-    return plates;
-  }
-
-  @CoverageIgnore
-  public void addPlate(Plate<? extends LinkedList<Library>, Library> plate) {
-    this.plates.add(plate);
-  }
-
-  public void setPlates(Set<Plate<? extends LinkedList<Library>, Library>> plates) {
-    this.plates = plates;
-  }
-
-  @Override
   public Date getLastUpdated() {
     return lastUpdated;
   }
@@ -477,10 +463,12 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
     return sb.toString();
   }
 
+  @Override
   public User getLastModifier() {
     return lastModifier;
   }
 
+  @Override
   public void setLastModifier(User lastModifier) {
     this.lastModifier = lastModifier;
   }

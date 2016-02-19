@@ -62,7 +62,6 @@ public abstract class AbstractDilution implements Dilution, Comparable {
   private String identificationBarcode;
   private String dilutionUserName;
   private final Set<Pool<Dilution>> pools = new HashSet<Pool<Dilution>>();
-  private Set<Plate<LinkedList<Dilution>, Dilution>> plates = new HashSet<Plate<LinkedList<Dilution>, Dilution>>();
 
   @Override
   @CoverageIgnore
@@ -153,20 +152,6 @@ public abstract class AbstractDilution implements Dilution, Comparable {
   @Override
   public Set<Pool<Dilution>> getPools() {
     return pools;
-  }
-
-  @Override
-  public Set<Plate<LinkedList<Dilution>, Dilution>> getPlates() {
-    return plates;
-  }
-
-  @CoverageIgnore
-  public void addPlate(Plate<LinkedList<Dilution>, Dilution> plate) {
-    this.plates.add(plate);
-  }
-
-  public void setPlates(Set<Plate<LinkedList<Dilution>, Dilution>> plates) {
-    this.plates = plates;
   }
 
   @Override
