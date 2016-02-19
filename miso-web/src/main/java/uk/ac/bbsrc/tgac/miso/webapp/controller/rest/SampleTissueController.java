@@ -29,11 +29,11 @@ import uk.ac.bbsrc.tgac.miso.dto.SampleTissueDto;
 import uk.ac.bbsrc.tgac.miso.service.SampleTissueService;
 
 @Controller
-@RequestMapping("/rest")
+@RequestMapping("/rest/sample/")
 @SessionAttributes("sampletissue")
-public class TissueSampleController extends RestController {
+public class SampleTissueController extends RestController {
 
-  protected static final Logger log = LoggerFactory.getLogger(TissueSampleController.class);
+  protected static final Logger log = LoggerFactory.getLogger(SampleTissueController.class);
 
   @Autowired
   private SampleTissueService sampleTissueService;
@@ -41,7 +41,7 @@ public class TissueSampleController extends RestController {
   private static SampleTissueDto writeUrls(SampleTissueDto sampleTissueDto, UriComponentsBuilder uriBuilder) {
     URI baseUri = uriBuilder.build().toUri();
     sampleTissueDto.setUrl(
-        UriComponentsBuilder.fromUri(baseUri).path("/rest/sampletissue/{id}").buildAndExpand(sampleTissueDto.getId()).toUriString());
+        UriComponentsBuilder.fromUri(baseUri).path("/rest/sample/tissue/{id}").buildAndExpand(sampleTissueDto.getId()).toUriString());
     sampleTissueDto.setCreatedByUrl(
         UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}").buildAndExpand(sampleTissueDto.getCreatedById()).toUriString());
     sampleTissueDto.setUpdatedByUrl(
@@ -49,7 +49,7 @@ public class TissueSampleController extends RestController {
     return sampleTissueDto;
   }
 
-  @RequestMapping(value = "/sampletissue/{id}", method = RequestMethod.GET, produces = { "application/json" })
+  @RequestMapping(value = "/tissue/{id}", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
   public SampleTissueDto getSampleTissue(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder) {
     SampleTissue sampleTissue = getSampleTissueService().get(id);
@@ -62,7 +62,7 @@ public class TissueSampleController extends RestController {
     }
   }
 
-  @RequestMapping(value = "/sampletissues", method = RequestMethod.GET, produces = { "application/json" })
+  @RequestMapping(value = "/tissues", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
   public Set<SampleTissueDto> getSampleTissues(UriComponentsBuilder uriBuilder) {
     Set<SampleTissue> sampleTissues = getSampleTissueService().getAll();
@@ -77,19 +77,19 @@ public class TissueSampleController extends RestController {
     }
   }
 
-  @RequestMapping(value = "/sampletissue", method = RequestMethod.POST, headers = { "Content-type=application/json" })
+  @RequestMapping(value = "/tissue", method = RequestMethod.POST, headers = { "Content-type=application/json" })
   @ResponseBody
   public ResponseEntity<?> createSampleTissue(@RequestBody SampleTissueDto sampletissueDto, UriComponentsBuilder uriBuilder)
       throws IOException {
     SampleTissue sampleTissue = Dtos.to(sampletissueDto);
     Long id = getSampleTissueService().create(sampleTissue);
-    UriComponents uriComponents = uriBuilder.path("/sampletissue/{id}").buildAndExpand(id);
+    UriComponents uriComponents = uriBuilder.path("/sample/tissue/{id}").buildAndExpand(id);
     HttpHeaders headers = new HttpHeaders();
     headers.setLocation(uriComponents.toUri());
     return new ResponseEntity<>(headers, HttpStatus.CREATED);
   }
 
-  @RequestMapping(value = "/sampletissue/{id}", method = RequestMethod.PUT, headers = { "Content-type=application/json" })
+  @RequestMapping(value = "/tissue/{id}", method = RequestMethod.PUT, headers = { "Content-type=application/json" })
   @ResponseBody
   public ResponseEntity<?> updateSampleTissue(@PathVariable("id") Long id, @RequestBody SampleTissueDto sampleTissueDto,
       UriComponentsBuilder uriBuilder) throws IOException {
@@ -99,7 +99,7 @@ public class TissueSampleController extends RestController {
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
-  @RequestMapping(value = "/sampletissue/{id}", method = RequestMethod.DELETE)
+  @RequestMapping(value = "/tissue/{id}", method = RequestMethod.DELETE)
   @ResponseBody
   public ResponseEntity<?> deleteSampleTissue(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
     getSampleTissueService().delete(id);

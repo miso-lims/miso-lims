@@ -52,7 +52,7 @@ import uk.ac.bbsrc.tgac.miso.dto.SampleAdditionalInfoDto;
 import uk.ac.bbsrc.tgac.miso.service.SampleAdditionalInfoService;
 
 @Controller
-@RequestMapping("/rest")
+@RequestMapping("/rest/sample")
 @SessionAttributes("sampleadditionalinfo")
 public class SampleAdditionalInfoController extends RestController {
 
@@ -61,7 +61,7 @@ public class SampleAdditionalInfoController extends RestController {
   @Autowired
   private SampleAdditionalInfoService sampleAdditionalInfoService;
 
-  @RequestMapping(value = "/sampleadditionalinfo/{id}", method = RequestMethod.GET, produces = { "application/json" })
+  @RequestMapping(value = "/additionalinfo/{id}", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
   public SampleAdditionalInfoDto getSampleAdditionalInfo(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
       HttpServletResponse response) throws IOException {
@@ -113,7 +113,7 @@ public class SampleAdditionalInfoController extends RestController {
     return sampleAdditionalInfoDto;
   }
 
-  @RequestMapping(value = "/sampleadditionalinfos", method = RequestMethod.GET, produces = { "application/json" })
+  @RequestMapping(value = "/additionalinfos", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
   public Set<SampleAdditionalInfoDto> getSampleAdditionalInfos(UriComponentsBuilder uriBuilder, HttpServletResponse response) 
       throws IOException {
@@ -129,7 +129,7 @@ public class SampleAdditionalInfoController extends RestController {
     }
   }
 
-  @RequestMapping(value = "/sampleadditionalinfo", method = RequestMethod.POST, headers = { "Content-type=application/json" })
+  @RequestMapping(value = "/additionalinfo", method = RequestMethod.POST, headers = { "Content-type=application/json" })
   @ResponseBody
   public ResponseEntity<?> createSampleAdditionalInfo(@RequestBody SampleAdditionalInfoDto sampleAdditionalInfoDto, UriComponentsBuilder b,
       HttpServletResponse response) throws IOException {
@@ -144,7 +144,7 @@ public class SampleAdditionalInfoController extends RestController {
     return new ResponseEntity<>(headers, HttpStatus.CREATED);
   }
 
-  @RequestMapping(value = "/sampleadditionalinfo/{id}", method = RequestMethod.PUT, headers = { "Content-type=application/json" })
+  @RequestMapping(value = "/additionalinfo/{id}", method = RequestMethod.PUT, headers = { "Content-type=application/json" })
   @ResponseBody
   public ResponseEntity<?> updateSampleAdditionalInfo(@PathVariable("id") Long id,
       @RequestBody SampleAdditionalInfoDto sampleAdditionalInfoDto, HttpServletResponse response) throws IOException {
@@ -156,7 +156,7 @@ public class SampleAdditionalInfoController extends RestController {
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
-  @RequestMapping(value = "/sampleadditionalinfo/{id}", method = RequestMethod.DELETE)
+  @RequestMapping(value = "/additionalinfo/{id}", method = RequestMethod.DELETE)
   @ResponseBody
   public ResponseEntity<?> deleteSampleAdditionalInfo(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
     sampleAdditionalInfoService.delete(id);
