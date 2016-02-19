@@ -2,6 +2,9 @@ package uk.ac.bbsrc.tgac.miso.persistence;
 
 import java.util.List;
 
+import com.eaglegenomics.simlims.core.User;
+
+import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleNumberPerProject;
 
 public interface SampleNumberPerProjectDao {
@@ -16,4 +19,5 @@ public interface SampleNumberPerProjectDao {
 
   void update(SampleNumberPerProject sampleNumberPerProject);
 
+  String nextNumber(Project project, User user);
 }
