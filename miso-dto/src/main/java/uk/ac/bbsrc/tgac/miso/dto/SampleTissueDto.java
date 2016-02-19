@@ -17,7 +17,7 @@ public class SampleTissueDto {
 
   private Long id;
 
-  private InstituteDto institute;
+  private LabDto lab;
 
   private String instituteTissueName;
 
@@ -53,8 +53,8 @@ public class SampleTissueDto {
     return id;
   }
 
-  public InstituteDto getInstitute() {
-    return institute;
+  public LabDto getLab() {
+    return lab;
   }
 
   public String getInstituteTissueName() {
@@ -101,8 +101,8 @@ public class SampleTissueDto {
     this.id = id;
   }
 
-  public void setInstitute(InstituteDto institute) {
-    this.institute = institute;
+  public void setLab(LabDto lab) {
+    this.lab = lab;
   }
 
   public void setInstituteTissueName(String instituteTissueName) {
@@ -127,7 +127,7 @@ public class SampleTissueDto {
 
   @Override
   public String toString() {
-    return "SampleTissueDto [id=" + id + ", cellularity=" + cellularity + ", institute=" + institute + ", instituteTissueName="
+    return "SampleTissueDto [id=" + id + ", cellularity=" + cellularity + ", lab=" + lab + ", instituteTissueName="
         + instituteTissueName + ", createdById=" + createdById + ", creationDate=" + creationDate + ", lastUpdatedById=" + updatedById
         + ", lastUpdated=" + lastUpdated + "]";
   }
