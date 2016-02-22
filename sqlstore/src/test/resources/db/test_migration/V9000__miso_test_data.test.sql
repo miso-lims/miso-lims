@@ -135,6 +135,10 @@ VALUES (1,1),(2,2),(3,3),(3,4),(4,5),(4,6),(4,7),(4,8),(5,9),(5,10),(5,11),(5,12
 DELETE FROM `Project`;
 INSERT INTO `Project`(`projectId`, `creationDate`, `description`, `name`, `securityProfile_profileId`, `progress`, `alias`, `lastUpdated`) 
 VALUES (1,'2015-08-27 15:40:15','Test project','PRO1',1,'Active','TEST','2015-08-27 19:40:40');
+INSERT INTO `Project`(`projectId`, `creationDate`, `description`, `name`, `securityProfile_profileId`, `progress`, `alias`, `lastUpdated`)
+VALUES (2,'2013-11-27 12:20:15','Test project2','PRO2',1,'Active','TEST','2015-11-30 15:23:18');
+INSERT INTO `Project`(`projectId`, `creationDate`, `description`, `name`, `securityProfile_profileId`, `progress`, `alias`, `lastUpdated`)
+VALUES (3,'2016-01-27 11:11:15','Test project3','PRO3',1,'Active','TEST','2016-02-22 10:43:18');
 
 DELETE FROM `Project_Study`;
 INSERT INTO `Project_Study` 
@@ -221,4 +225,12 @@ INSERT INTO `Identity` (`identityId`, `sampleId`, `internalName`, `externalName`
 VALUES ('1', '1', 'internalName1', 'externalName1', '1', '2016-02-17 09:32:00', '1', '2016-02-17 09:32:00');
 INSERT INTO `Identity` (`identityId`, `sampleId`, `internalName`, `externalName`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
 VALUES ('2', '4', 'internalName2', 'externalName2', '1', '2016-02-17 09:32:00', '1', '2016-02-17 09:32:00');
+
+INSERT INTO `SampleNumberPerProject`
+(`sampleNumberPerProjectId`, `projectId`, `highestSampleNumber`, `padding`, `createdBy`, `updatedBy`, `creationDate`, `lastUpdated`)
+VALUES ('1', '1', '1', '4', '1', '1', '2016-01-28 14:32:00', '2016-01-28 14:32:00');
+INSERT INTO `SampleNumberPerProject`
+(`sampleNumberPerProjectId`, `projectId`, `highestSampleNumber`, `padding`, `createdBy`, `updatedBy`, `creationDate`, `lastUpdated`)
+VALUES ('2', '3', '9999', '4', '1', '1', '2016-01-28 14:32:00', '2016-01-28 14:32:00');
+
 

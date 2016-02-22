@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.service;
 import java.io.IOException;
 import java.util.Set;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleNumberPerProject;
 
 public interface SampleNumberPerProjectService {
@@ -17,4 +18,5 @@ public interface SampleNumberPerProjectService {
 
   void delete(Long sampleNumberPerProjectId) throws IOException;
 
+  String nextNumber(Project project) throws IOException;
 }

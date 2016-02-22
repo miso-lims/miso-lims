@@ -74,4 +74,10 @@ public class DefaultSampleNumberPerProjectService implements SampleNumberPerProj
     sampleNumberPerProjectDao.deleteSampleNumberPerProject(sampleNumberPerProject);
   }
 
+  @Override
+  public String nextNumber(Project project) throws IOException {
+    User user = authorizationManager.getCurrentUser();
+    return sampleNumberPerProjectDao.nextNumber(project, user);
+  }
+
 }

@@ -12,6 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.eaglegenomics.simlims.core.User;
+
+import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleNumberPerProject;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleNumberPerProjectImpl;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleNumberPerProjectDao;
@@ -21,6 +24,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.SampleNumberPerProjectDao;
 public class HibernateSampleNumberPerProjectDao implements SampleNumberPerProjectDao {
 
   protected static final Logger log = LoggerFactory.getLogger(HibernateSampleNumberPerProjectDao.class);
+  private static final int DEFAULT_PADDING = 4;
 
   @Autowired
   private SessionFactory sessionFactory;
@@ -61,6 +65,44 @@ public class HibernateSampleNumberPerProjectDao implements SampleNumberPerProjec
     Date now = new Date();
     sampleNumberPerProject.setLastUpdated(now);
     currentSession().update(sampleNumberPerProject);
+  }
+
+  @Override
+  public synchronized String nextNumber(Project project, User user) {
+    Query query = currentSession().createQuery("from SampleNumberPerProjectImpl sn where sn.project = :project");
+    query.setParameter("project", project);
+    SampleNumberPerProject sampleNumberPerProject = (SampleNumberPerProject) query.uniqueResult();
+    if (sampleNumberPerProject == null) {
+      sampleNumberPerProject = createSampleNumberPerProject(project, user);
+    }
+    Integer highestSampleNumber = sampleNumberPerProject.getHighestSampleNumber();
+    highestSampleNumber++;
+    sampleNumberPerProject.setHighestSampleNumber(highestSampleNumber);
+    sampleNumberPerProject.setUpdatedBy(user);
+    update(sampleNumberPerProject);
+
+    return padInteger(sampleNumberPerProject.getPadding(), highestSampleNumber);
+  }
+
+  private SampleNumberPerProject createSampleNumberPerProject(Project project, User user) {
+    SampleNumberPerProject sampleNumberPerProject;
+    sampleNumberPerProject = new SampleNumberPerProjectImpl();
+    sampleNumberPerProject.setProject(project);
+    sampleNumberPerProject.setHighestSampleNumber(0);
+    sampleNumberPerProject.setPadding(DEFAULT_PADDING);
+    sampleNumberPerProject.setCreatedBy(user);
+    sampleNumberPerProject.setUpdatedBy(user);
+    addSampleNumberPerProject(sampleNumberPerProject);
+    return sampleNumberPerProject;
+  }
+
+  private String padInteger(Integer padLength, Integer highestSampleNumber) {
+    StringBuilder stringBuffer = new StringBuilder();
+    int toPad = padLength - Integer.toString(highestSampleNumber).length();
+    for (int i = 0; i < toPad; i++) {
+      stringBuffer.append("0");
+    }
+    return stringBuffer.toString() + highestSampleNumber;
   }
 
 }
