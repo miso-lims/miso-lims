@@ -88,17 +88,13 @@ public class QcPassedDetailController extends RestController {
 
   @RequestMapping(value = "/qcpasseddetails", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public Set<QcPassedDetailDto> getQcPassedDetail(UriComponentsBuilder uriBuilder, HttpServletResponse response) throws IOException {
+  public Set<QcPassedDetailDto> getQcPassedDetails(UriComponentsBuilder uriBuilder, HttpServletResponse response) throws IOException {
     Set<QcPassedDetail> qcPassedDetails = qcPassedDetailService.getAll();
-    if (qcPassedDetails.isEmpty()) {
-      throw new RestException("No QC passed details found", Status.NOT_FOUND);
-    } else {
-      Set<QcPassedDetailDto> qcPassedDetailDtos = Dtos.asQcPassedDetailDtos(qcPassedDetails);
-      for (QcPassedDetailDto qcPassedDetailDto : qcPassedDetailDtos) {
-        qcPassedDetailDto = writeUrls(qcPassedDetailDto, uriBuilder);
-      }
-      return qcPassedDetailDtos;
+    Set<QcPassedDetailDto> qcPassedDetailDtos = Dtos.asQcPassedDetailDtos(qcPassedDetails);
+    for (QcPassedDetailDto qcPassedDetailDto : qcPassedDetailDtos) {
+      qcPassedDetailDto = writeUrls(qcPassedDetailDto, uriBuilder);
     }
+    return qcPassedDetailDtos;
   }
 
   @RequestMapping(value = "/qcpasseddetail", method = RequestMethod.POST, headers = { "Content-type=application/json" })

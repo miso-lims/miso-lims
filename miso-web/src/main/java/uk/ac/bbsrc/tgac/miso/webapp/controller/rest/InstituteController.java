@@ -66,15 +66,11 @@ public class InstituteController extends RestController {
   @ResponseBody
   public Set<InstituteDto> getInstitutes(UriComponentsBuilder uriBuilder) throws IOException {
     Set<Institute> institutes = instituteService.getAll();
-    if (institutes.isEmpty()) {
-      throw new RestException("No institutes found", Status.NOT_FOUND);
-    } else {
-      Set<InstituteDto> instituteDtos = Dtos.asInstituteDtos(institutes);
-      for (InstituteDto instituteDto : instituteDtos) {
-        writeUrls(instituteDto, uriBuilder);
-      }
-      return instituteDtos;
+    Set<InstituteDto> instituteDtos = Dtos.asInstituteDtos(institutes);
+    for (InstituteDto instituteDto : instituteDtos) {
+      writeUrls(instituteDto, uriBuilder);
     }
+    return instituteDtos;
   }
   
   @RequestMapping(value = "/institute", method = RequestMethod.POST, headers = { "Content-type=application/json" })

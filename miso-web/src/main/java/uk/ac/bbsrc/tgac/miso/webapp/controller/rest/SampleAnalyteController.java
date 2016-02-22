@@ -98,15 +98,11 @@ public class SampleAnalyteController extends RestController {
   @ResponseBody
   public Set<SampleAnalyteDto> getSampleAnalytes(UriComponentsBuilder uriBuilder, HttpServletResponse response) throws IOException {
     Set<SampleAnalyte> sampleAnalytes = sampleAnalyteService.getAll();
-    if (sampleAnalytes.isEmpty()) {
-      throw new RestException("No sample analytes found", Status.NOT_FOUND);
-    } else {
-      Set<SampleAnalyteDto> sampleAnalyteDtos = Dtos.asSampleAnalyteDtos(sampleAnalytes);
-      for (SampleAnalyteDto sampleAnalyteDto : sampleAnalyteDtos) {
-        sampleAnalyteDto = writeUrls(sampleAnalyteDto, uriBuilder);
-      }
-      return sampleAnalyteDtos;
+    Set<SampleAnalyteDto> sampleAnalyteDtos = Dtos.asSampleAnalyteDtos(sampleAnalytes);
+    for (SampleAnalyteDto sampleAnalyteDto : sampleAnalyteDtos) {
+      sampleAnalyteDto = writeUrls(sampleAnalyteDto, uriBuilder);
     }
+    return sampleAnalyteDtos;
   }
 
   @RequestMapping(value = "/sampleanalyte", method = RequestMethod.POST, headers = { "Content-type=application/json" })

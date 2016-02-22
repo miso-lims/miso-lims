@@ -7,7 +7,8 @@ public class LabDto {
   
   private Long id;
   private String url;
-  private InstituteDto institute;
+  private Long instituteId;
+  private String instituteUrl;
   private String alias;
   private Long createdById;
   private String createdByUrl;
@@ -32,12 +33,20 @@ public class LabDto {
     this.url = url;
   }
   
-  public InstituteDto getInstitute() {
-    return institute;
+  public Long getInstituteId() {
+    return instituteId;
   }
   
-  public void setInstitute(InstituteDto institute) {
-    this.institute = institute;
+  public void setInstituteId(Long instituteId) {
+    this.instituteId = instituteId;
+  }
+  
+  public String getInstituteUrl() {
+    return instituteUrl;
+  }
+  
+  public void setInstituteUrl(String instituteUrl) {
+    this.instituteUrl = instituteUrl;
   }
   
   public String getAlias() {
@@ -98,11 +107,11 @@ public class LabDto {
 
   @Override
   public String toString() {
-    return "LabDto [id=" + id + ", url=" + url + ", institute=" + institute
-        + ", alias=" + alias + ", createdById=" + createdById
-        + ", createdByUrl=" + createdByUrl + ", creationDate=" + creationDate
-        + ", updatedById=" + updatedById + ", updatedByUrl=" + updatedByUrl
-        + ", lastUpdated=" + lastUpdated + "]";
+    return "LabDto [id=" + id + ", url=" + url + ", instituteId=" + instituteId
+        + ", instituteUrl=" + instituteUrl + ", alias=" + alias 
+        + ", createdById=" + createdById  + ", createdByUrl=" + createdByUrl 
+        + ", creationDate=" + creationDate + ", updatedById=" + updatedById 
+        + ", updatedByUrl=" + updatedByUrl + ", lastUpdated=" + lastUpdated + "]";
   }
 
 }

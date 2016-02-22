@@ -36,21 +36,21 @@ public class DefaultLabService implements LabService {
   }
 
   @Override
-  public Long create(Lab lab) throws IOException {
+  public Long create(Lab lab, Long instituteId) throws IOException {
     authorizationManager.throwIfNonAdmin();
     User user = authorizationManager.getCurrentUser();
     lab.setCreatedBy(user);
     lab.setUpdatedBy(user);
-    lab.setInstitute(instituteDao.getInstitute(lab.getInstitute().getId()));
+    lab.setInstitute(instituteDao.getInstitute(instituteId));
     return labDao.addLab(lab);
   }
 
   @Override
-  public void update(Lab lab) throws IOException {
+  public void update(Lab lab, Long instituteId) throws IOException {
     authorizationManager.throwIfNonAdmin();
     Lab updatedLab = get(lab.getId());
     updatedLab.setAlias(lab.getAlias());
-    updatedLab.setInstitute(instituteDao.getInstitute(lab.getInstitute().getId()));
+    updatedLab.setInstitute(instituteDao.getInstitute(instituteId));
     User user = authorizationManager.getCurrentUser();
     updatedLab.setUpdatedBy(user);
     labDao.update(updatedLab);

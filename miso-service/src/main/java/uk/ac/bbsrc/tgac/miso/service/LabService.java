@@ -20,18 +20,20 @@ public interface LabService {
    * Saves a new Lab
    * 
    * @param lab 
+   * @param instituteId of the associated Institute
    * @return the ID of the newly-saved Lab
    * @throws IOException
    */
-  Long create(Lab lab) throws IOException;
+  Long create(Lab lab, Long instituteId) throws IOException;
   
   /**
    * Updates an existing Lab
    * 
    * @param lab
+   * @param instituteId of the associated Institute
    * @throws IOException
    */
-  void update(Lab lab) throws IOException;
+  void update(Lab lab, Long instituteId) throws IOException;
   
   /**
    * @return a Set of all Labs

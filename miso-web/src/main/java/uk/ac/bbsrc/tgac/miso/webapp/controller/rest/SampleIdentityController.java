@@ -50,10 +50,6 @@ public class SampleIdentityController {
         log.error("Looking for sample categories", e);
       }
     }
-    if (results.isEmpty()) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    } else {
-      return new ResponseEntity<>(results, HttpStatus.OK);
-    }
+    return new ResponseEntity<>(results, HttpStatus.OK);
   }
 }

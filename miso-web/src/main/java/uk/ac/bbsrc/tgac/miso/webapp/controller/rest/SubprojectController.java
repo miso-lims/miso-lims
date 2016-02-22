@@ -90,15 +90,11 @@ public class SubprojectController extends RestController {
   @ResponseBody
   public Set<SubprojectDto> getSubprojects(UriComponentsBuilder uriBuilder, HttpServletResponse response) throws IOException {
     Set<Subproject> subprojects = subprojectService.getAll();
-    if (subprojects.isEmpty()) {
-      throw new RestException("No subprojects found", Status.NOT_FOUND);
-    } else {
-      Set<SubprojectDto> subprojectDtos = Dtos.asSubprojectDtos(subprojects);
-      for (SubprojectDto subprojectDto : subprojectDtos) {
-        subprojectDto = writeUrls(subprojectDto, uriBuilder);
-      }
-      return subprojectDtos;
+    Set<SubprojectDto> subprojectDtos = Dtos.asSubprojectDtos(subprojects);
+    for (SubprojectDto subprojectDto : subprojectDtos) {
+      subprojectDto = writeUrls(subprojectDto, uriBuilder);
     }
+    return subprojectDtos;
   }
 
   @RequestMapping(value = "/subproject", method = RequestMethod.POST, headers = { "Content-type=application/json" })

@@ -15,8 +15,9 @@ public class SampleOptionsDto {
   private Set<SampleGroupDto> sampleGroups;
   private Set<TissueMaterialDto> tissueMaterials;
   private Set<QcPassedDetailDto> qcPassedDetails;
-  private Set<SampleValidRelationshipDto> sampleValidRelationshipDtos;
-  private Set<InstituteDto> instituteDtos;
+  private Set<SampleValidRelationshipDto> sampleValidRelationships;
+  private Set<InstituteDto> institutes;
+  private Set<LabDto> labs;
 
   public Set<SubprojectDto> getSubprojectsDtos() {
     return subprojects;
@@ -82,20 +83,28 @@ public class SampleOptionsDto {
     this.qcPassedDetails = qcPassedDetails;
   }
 
-  public Set<SampleValidRelationshipDto> getSampleValidRelationshipDtos() {
-    return sampleValidRelationshipDtos;
+  public Set<SampleValidRelationshipDto> getSampleValidRelationshipsDtos() {
+    return sampleValidRelationships;
   }
 
-  public void setSampleValidRelationshipDtos(Set<SampleValidRelationshipDto> sampleValidRelationshipDtos) {
-    this.sampleValidRelationshipDtos = sampleValidRelationshipDtos;
+  public void setSampleValidRelationshipsDtos(Set<SampleValidRelationshipDto> sampleValidRelationships) {
+    this.sampleValidRelationships = sampleValidRelationships;
   }
 
-  public Set<InstituteDto> getInstituteDtos() {
-    return instituteDtos;
+  public Set<InstituteDto> getInstitutesDtos() {
+    return institutes;
   }
 
-  public void setInstituteDtos(Set<InstituteDto> instituteDtos) {
-    this.instituteDtos = instituteDtos;
+  public void setInstitutesDtos(Set<InstituteDto> institutes) {
+    this.institutes = institutes;
+  }
+  
+  public Set<LabDto> getLabsDtos() {
+    return labs;
+  }
+  
+  public void setLabsDtos(Set<LabDto> labs) {
+    this.labs = labs;
   }
 
 }

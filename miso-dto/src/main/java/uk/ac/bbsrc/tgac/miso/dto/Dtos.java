@@ -92,8 +92,8 @@ public class Dtos {
 
   public static Set<TissueTypeDto> asTissueTypeDtos(Set<TissueType> from) {
     Set<TissueTypeDto> dtoSet = Sets.newHashSet();
-    for (TissueType tissueOrigin : from) {
-      dtoSet.add(asDto(tissueOrigin));
+    for (TissueType tissueType : from) {
+      dtoSet.add(asDto(tissueType));
     }
     return dtoSet;
   }
@@ -311,8 +311,8 @@ public class Dtos {
 
   public static Set<SampleGroupDto> asSampleGroupDtos(Set<SampleGroupId> from) {
     Set<SampleGroupDto> dtoSet = Sets.newHashSet();
-    for (SampleGroupId samplePurpose : from) {
-      dtoSet.add(asDto(samplePurpose));
+    for (SampleGroupId sampleGroup : from) {
+      dtoSet.add(asDto(sampleGroup));
     }
     return dtoSet;
   }
@@ -484,8 +484,8 @@ public class Dtos {
 
   public static Set<SampleIdentityDto> asSampleIdentityDtos(Set<Identity> from) {
     Set<SampleIdentityDto> dtoSet = Sets.newHashSet();
-    for (Identity tissueOrigin : from) {
-      dtoSet.add(asDto(tissueOrigin));
+    for (Identity identity : from) {
+      dtoSet.add(asDto(identity));
     }
     return dtoSet;
   }
@@ -578,7 +578,7 @@ public class Dtos {
   public static LabDto asDto(Lab from) {
     LabDto dto = new LabDto();
     dto.setId(from.getId());
-    dto.setInstitute(asDto(from.getInstitute()));
+    dto.setInstituteId(from.getInstitute().getId());
     dto.setAlias(from.getAlias());
     dto.setCreatedById(from.getCreatedBy().getUserId());
     dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
@@ -597,8 +597,6 @@ public class Dtos {
   
   public static Lab to(LabDto from) {
     Lab to = new LabImpl();
-    to.setInstitute(to(from.getInstitute()));
-    to.getInstitute().setId(from.getInstitute().getId());
     to.setAlias(from.getAlias());
     return to;
   }
@@ -618,8 +616,8 @@ public class Dtos {
 
   public static Set<SampleTissueDto> asSampleTissueDtos(Set<SampleTissue> from) {
     Set<SampleTissueDto> dtoSet = Sets.newHashSet();
-    for (SampleTissue institute : from) {
-      dtoSet.add(asDto(institute));
+    for (SampleTissue sampleTissue : from) {
+      dtoSet.add(asDto(sampleTissue));
     }
     return dtoSet;
   }

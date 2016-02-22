@@ -118,15 +118,11 @@ public class SampleAdditionalInfoController extends RestController {
   public Set<SampleAdditionalInfoDto> getSampleAdditionalInfos(UriComponentsBuilder uriBuilder, HttpServletResponse response) 
       throws IOException {
     Set<SampleAdditionalInfo> sampleAdditionalInfos = sampleAdditionalInfoService.getAll();
-    if (sampleAdditionalInfos.isEmpty()) {
-      throw new RestException("No sample additional infos found", Status.NOT_FOUND);
-    } else {
-      Set<SampleAdditionalInfoDto> sampleAdditionalInfoDtos = Dtos.asSampleAdditionalInfoDtos(sampleAdditionalInfos);
-      for (SampleAdditionalInfoDto sampleAdditionalInfoDto : sampleAdditionalInfoDtos) {
-        sampleAdditionalInfoDto = writeUrls(sampleAdditionalInfoDto, uriBuilder);
-      }
-      return sampleAdditionalInfoDtos;
+    Set<SampleAdditionalInfoDto> sampleAdditionalInfoDtos = Dtos.asSampleAdditionalInfoDtos(sampleAdditionalInfos);
+    for (SampleAdditionalInfoDto sampleAdditionalInfoDto : sampleAdditionalInfoDtos) {
+      sampleAdditionalInfoDto = writeUrls(sampleAdditionalInfoDto, uriBuilder);
     }
+    return sampleAdditionalInfoDtos;
   }
 
   @RequestMapping(value = "/sampleadditionalinfo", method = RequestMethod.POST, headers = { "Content-type=application/json" })
