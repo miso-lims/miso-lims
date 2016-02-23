@@ -379,7 +379,7 @@ Pool.ui = {
       {'doOnSuccess': function(json) {
         jQuery('#'+table).html('');
         jQuery('#'+table).dataTable({
-          "aaData": json.pools,
+          "aaData": json[platform],
           "aoColumns": [
             { "sTitle": "Name", "sType":"no-po"},
             { "sTitle": "Alias"},
