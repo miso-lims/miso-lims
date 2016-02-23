@@ -52,11 +52,11 @@
           </h1>
           <ul class="sddm">
             <li>
-              <a onmouseover="mopen('ipomenu')" onmouseout="mclosetime()">Options
+              <a onmouseover="mopen('ipomenu${c.count}')" onmouseout="mclosetime()">Options
                 <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
               </a>
 
-              <div id="ipomenu"
+              <div id="ipomenu${c.count}"
                    onmouseover="mcancelclosetime()"
                    onmouseout="mclosetime()">
                 <a href='<c:url value="/miso/pool/new"/>'>Add Pool</a>
