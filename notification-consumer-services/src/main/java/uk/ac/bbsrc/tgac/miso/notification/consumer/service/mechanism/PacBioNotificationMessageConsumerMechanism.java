@@ -41,13 +41,14 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.integration.Message;
 import org.springframework.util.Assert;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
@@ -157,7 +158,7 @@ public class PacBioNotificationMessageConsumerMechanism
                 log.info("\\_ Saving new run and status: " + is.getRunName());
                 r = new PacBioRun(status);
                 r.setAlias(run.getString("runName"));
-                r.setDescription(m.group(2));
+                r.setDescription(m.group(1));
                 r.setPairedEnd(false);
 
                 if (run.has("fullPath")) {
@@ -199,7 +200,7 @@ public class PacBioNotificationMessageConsumerMechanism
                 r.setAlias(runName);
 
                 r.setPlatformType(PlatformType.PACBIO);
-                r.setDescription(m.group(2));
+                r.setDescription(m.group(1));
                 r.setPairedEnd(false);
 
                 if (r.getSequencerReference() == null) {
