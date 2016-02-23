@@ -246,7 +246,6 @@ Sequencer.ui = {
               { "sTitle": "Model"},
               { "sTitle": "Status"},
               { "sTitle": "Last Serviced"},
-              { "sTitle": "Edit"},
               { "sTitle": "Active", "bVisible": false}
             ],
             "bJQueryUI": true,

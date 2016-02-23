@@ -42,13 +42,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
-
-import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 /**
  * uk.ac.bbsrc.tgac.miso.spring.ajax
@@ -179,7 +179,7 @@ public class SequencerReferenceControllerHelperService {
       SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
       for (SequencerReference sequencer : requestManager.listAllSequencerReferences()) {
         JSONArray inner = new JSONArray();
-        inner.add(sequencer.getName());
+        inner.add(TableHelper.hyperLinkify("/miso/sequencer/" + sequencer.getId(), sequencer.getName()));
         inner.add(sequencer.getPlatform().getPlatformType().getKey());
         inner.add(sequencer.getPlatform().getInstrumentModel());
         
@@ -194,7 +194,6 @@ public class SequencerReferenceControllerHelperService {
         }
         
         inner.add(sequencer.getLastServicedDate() == null ? "" : df.format(sequencer.getLastServicedDate()));
-        inner.add("<a href=\"/miso/sequencer/" + sequencer.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>");
         inner.add(String.valueOf(sequencer.isActive()));
         jsonArray.add(inner);
       }

@@ -261,27 +261,18 @@
               <th>Title</th>
               <th>Serviced By</th>
               <th>Reference Number</th>
-              <c:choose>
-                <c:when test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-                  <th class="fit">Edit</th>
-                  <th class="fit">Delete</th>
-                </c:when>
-                <c:otherwise>
-                  <th class="fit">View</th>
-                </c:otherwise>
-              </c:choose>
+              <c:if test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+                <th class="fit">Delete</th>
+              </c:if>
             </tr>
           </thead>
           <tbody>
             <c:forEach items="${sequencerServiceRecords}" var="record">
               <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
                 <td>${record.serviceDate}</td>
-                <td>${record.title}</td>
+                <td><a href='<c:url value="/miso/sequencer/servicerecord/${record.id}"/>'>${record.title}</a></td>
                 <td>${record.servicedByName}</td>
                 <td>${record.referenceNumber}</td>
-                <td class="misoicon" onclick="window.location.href='<c:url value="/miso/sequencer/servicerecord/${record.id}"/>'">
-                  <span class="ui-icon ui-icon-pencil"></span>
-                </td>
                 <c:if test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
                   <td class="misoicon" onclick="Sequencer.ui.deleteServiceRecord(${record.id}, Utils.page.pageReload);">
                     <span class="ui-icon ui-icon-trash"></span>
@@ -303,11 +294,10 @@
             { "sType": 'date' },
             { "sType": 'string' },
             { "sType": 'string' },
-            { "sType": 'string' },
+            { "sType": 'string' }
             <c:if test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-              { "bSortable": false },
+              ,{ "bSortable": false }
             </c:if>
-            { "bSortable": false }
           ],
           "iDisplayLength": 50,
           "bJQueryUI": true,
@@ -334,19 +324,15 @@
             <th>Status</th>
             <th>Started At</th>
             <th>Completed At</th>
-            <th class="fit">Edit</th>
           </tr>
         </thead>
         <tbody>
           <c:forEach items="${sequencerRuns}" var="run">
             <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-              <td>${run.alias}</td>
+              <td><a href='<c:url value="/miso/run/${run.id}"/>'>${run.alias}</a></td>
               <td>${run.status.health.key}</td>
               <td>${run.status.startDate}</td>
               <td>${run.status.completionDate}</td>
-              <td class="misoicon"
-                  onclick="window.location.href='<c:url value="/miso/run/${run.id}"/>'"><span
-                  class="ui-icon ui-icon-pencil"></span></td>
             </tr>
           </c:forEach>
         </tbody>
@@ -362,8 +348,7 @@
             { "sType": 'string' },
             { "sType": 'string' },
             { "sType": 'date' },
-            { "sType": 'date' },
-            { "bSortable": false }
+            { "sType": 'date' }
           ],
           "iDisplayLength": 50,
           "bJQueryUI": true,
