@@ -919,7 +919,9 @@ var Options = Options || {
         } else if (xhr.status === unauthorizedStatus) {
           alert("You are not authorized to view this page.");
         } else {
-          alert("Sorry, something went wrong. Please try again. If the issue persists, contact your administrator.");
+          console.log(xhr);
+          var response = JSON.parse(xhr.response);
+          alert(response.detail);
         }
       }
     };
@@ -929,6 +931,7 @@ var Options = Options || {
 
   confirmDelete: function (endpoint) {
     if (endpoint.indexOf("sampleclass") != -1) {
+      // confirm there are no SampleValidRelationships which reference the SampleClass to be deleted
       var sampleClassId = endpoint.split('/').pop();
       var sampleClassAlias = Defaults.all.sampleClassesDtos.filter(function(sampleClass) { return sampleClass.id == sampleClassId; })[0].alias;
       var countRelatedClasses = 0;
@@ -944,6 +947,15 @@ var Options = Options || {
         }
       } else if (confirm('Are you sure you wish to delete '+ sampleClassAlias +'? This opearation cannot be undone!')) {
         Options.makeXhrRequest('DELETE', endpoint);
+      }
+    } else if (endpoint.indexOf("institute") != -1) {
+      // confirm there are no Labs which reference the Institute to be deleted
+      var instituteId = endpoint.split('/').pop();
+      var relatedLabs = Defaults.all.labsDtos.filter(function(lab) { return lab.instituteId == instituteId; });
+      if (relatedLabs.length > 0) {
+        var labAliasesString = relatedLabs.map(function(lab) { return lab.alias; });
+        alert("Please delete the related Labs ("+ labAliasesString.join(", ") +") before you delete this Institute.");
+        return false;
       }
     } else if (confirm('Are you sure you wish to delete? This operation cannot be undone!')) {
       Options.makeXhrRequest('DELETE', endpoint);
