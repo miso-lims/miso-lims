@@ -113,6 +113,7 @@
             <a href="<c:url value='/miso/admin/instituteDefaults#qcDetails'/>">QC Details</a><br/>
             <a href="<c:url value='/miso/admin/instituteDefaults#subprojects'/>">Subprojects</a><br/>
             <a href="<c:url value='/miso/admin/instituteDefaults#institutes'/>">Institutes</a><br/>
+            <a href="<c:url value='/miso/admin/instituteDefaults#labs'/>">Labs</a><br/>
             <a href="<c:url value='/miso/admin/instituteDefaults#classes'/>">Sample Classes</a><br/>
             <a href="<c:url value='/miso/admin/instituteDefaults#relationships'/>">Relationships between Sample Classes</a>
           </div>

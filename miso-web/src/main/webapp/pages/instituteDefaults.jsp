@@ -43,12 +43,16 @@
     <a href="#qcDetails">QC Details</a><br/>
     <a href="#subprojects">Subprojects</a><br/>
     <a href="#institutes">Institutes</a><br/>
+    <a href="#labs">Labs</a><br/>
     <a href="#classes">Sample Classes</a><br/>
     <a href="#relationships">Relationships between Sample Classes</a><br/>
   </div>
   
-  <div class="sectionDivider"></div>
-  <div class="corner-padding">
+  <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#origins_arrowclick'), 'originsdiv');">
+    Tissue Origins
+    <div id="origins_arrowclick" class="toggleLeft"></div>
+  </div>
+  <div class="corner-padding" id="originsdiv" style="display:none;">
     <h2 id="origins">Tissue Origins</h2>
 	  <table id="allOriginsTable" class="clear default-table" data-sortable>
 		  <thead>
@@ -61,8 +65,11 @@
   </div>
   
   
-  <div class="sectionDivider"></div>
-  <div class="corner-padding">
+  <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#types_arrowclick'), 'typesdiv');">
+    Tissue Types
+    <div id="types_arrowclick" class="toggleLeft"></div>
+  </div>
+  <div class="corner-padding" id="typesdiv" style="display:none;">
     <h2 id="types">Tissue Types</h2>
 	  <table id="allTypesTable" class="clear default-table" data-sortable>
 	    <thead>
@@ -74,8 +81,11 @@
 	  </table>
 	</div>
 	
-	<div class="sectionDivider"></div>
-	<div class="corner-padding">
+	<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#materials_arrowclick'), 'materialsdiv');">
+    Tissue Materials
+    <div id="materials_arrowclick" class="toggleLeft"></div>
+  </div>
+	<div class="corner-padding" id="materialsdiv" style="display:none;">
     <h2 id="materials">Tissue Materials</h2>
     <table id="allMaterialsTable" class="clear default-table" data-sortable>
       <thead>
@@ -87,8 +97,11 @@
     </table>
   </div>
   
-  <div class="sectionDivider"></div>
-  <div class="corner-padding">
+  <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#purposes_arrowclick'), 'purposesdiv');">
+    Sample Purposes
+    <div id="purposes_arrowclick" class="toggleLeft"></div>
+  </div>
+  <div class="corner-padding" id="purposesdiv" style="display:none;">
     <h2 id="purposes">Sample Purposes</h2>
     <table id="allPurposesTable" class="clear default-table" data-sortable>
       <thead>
@@ -100,8 +113,11 @@
     </table>
   </div>
   
-  <div class="sectionDivider"></div>
-  <div class="corner-padding">
+  <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#qcdetails_arrowclick'), 'qcdetailsdiv');">
+    QC Details
+    <div id="qcdetails_arrowclick" class="toggleLeft"></div>
+  </div>
+  <div class="corner-padding" id="qcdetailsdiv" style="display:none;">
     <h2 id="qcDetails">QC Details</h2>
     <table id="allQcDetailsTable" class="clear default-table" data-sortable>
       <thead>
@@ -113,8 +129,11 @@
     </table>
   </div>
   
-  <div class="sectionDivider"></div>
-  <div class="corner-padding">
+  <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#subprojects_arrowclick'), 'subprojectsdiv');">
+    Subprojects
+    <div id="subprojects_arrowclick" class="toggleLeft"></div>
+  </div>
+  <div class="corner-padding" id="subprojectsdiv" style="display:none;">
     <h2 id="subprojects">Subprojects</h2>
     <table id="allSubprojectsTable" class="clear default-table" data-sortable>
       <thead>
@@ -126,21 +145,43 @@
     </table>
   </div>
   
-  <div class="sectionDivider"></div>
-  <div class="corner-padding">
+  <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#institutes_arrowclick'), 'institutesdiv');">
+    Institutes
+    <div id="institutes_arrowclick" class="toggleLeft"></div>
+  </div>
+  <div class="corner-padding" id="institutesdiv" style="display:none;">
     <h2 id="institutes">Institutes</h2>
     <table id="allInstitutesTable" class="clear default-table" data-sortable>
       <thead>
         <tr>
-          <th>Name</th>
+          <th>Alias</th>
         </tr>
       </thead>
       <tbody id="allInstitutes" class="In"></tbody>
     </table>
   </div>
   
-  <div class="sectionDivider"></div>
-  <div class="corner-padding">
+  <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#labs_arrowclick'), 'labsdiv');">
+    Labs
+    <div id="labs_arrowclick" class="toggleLeft"></div>
+  </div>
+  <div class="corner-padding" id="labsdiv" style="display:none;">
+    <h2 id="labs">Labs</h2>
+    <table id="allLabsTable" class="clear default-table" data-sortable>
+      <thead>
+        <tr>
+          <th>Alias</th><th>Institute</th>
+        </tr>
+      </thead>
+      <tbody id="allLabs" class="Lab"></tbody>
+    </table>
+  </div>
+  
+  <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#classes_arrowclick'), 'classesdiv');">
+    Sample Classes
+    <div id="classes_arrowclick" class="toggleLeft"></div>
+  </div>
+  <div class="corner-padding" id="classesdiv" style="display:none;">
     <h2 id="classes">Sample Classes</h2>
     <table id="allClassesTable" class="clear default-table" data-sortable>
       <thead>
@@ -152,9 +193,20 @@
     </table>
   </div>
   
-  <div class="sectionDivider"></div>
-  <div class="corner-padding">
+  <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#relationships_arrowclick'), 'relationshipsdiv');">
+    Relationships between Sample Classes
+    <div id="relationships_arrowclick" class="toggleLeft"></div>
+  </div>
+  <div class="corner-padding" id="relationshipsdiv" style="display:none;">
     <h2 id="relationships" class="clear default-table" data-sortable>Relationships between Sample Classes</h2>
+    <table id="allRelationshipsTable" class="clear default-table" data-sortable>
+      <thead>
+        <tr>
+          <th>Parent Category</th><th>Parent Class</th><th>Child Category</th><th>Child Class</th>
+        </tr>
+      </thead>
+      <tbody id="allRelationships" class="Rel"></tbody>
+    </table>
   </div>
 
 </div>
@@ -162,13 +214,7 @@
   
 <script type="text/javascript">
   jQuery(document).ready(function() {
-    Tissue.getTissueOrigins();
-    Tissue.getTissueTypes();
-    Tissue.getTissueMaterials();
-    Tissue.getSamplePurposes();
-    QC.getQcDetails();
-    Subproject.getProjects();
-    Hierarchy.getSampleCategories(); // callback within this creates Relationships table as well
+    Defaults.getDefaults();
   });
 </script>
   

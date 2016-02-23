@@ -54,15 +54,11 @@ public class KitDescriptorController extends RestController {
   @ResponseBody
   public Set<KitDescriptorDto> getKitDescriptors(UriComponentsBuilder uriBuilder) throws IOException {
     Collection<KitDescriptor> kitDescriptors = requestManager.listAllKitDescriptors();
-    if (kitDescriptors.isEmpty()) {
-      throw new RestException("No kit descriptors found", Status.NOT_FOUND);
-    } else {
-      Set<KitDescriptorDto> dtos = Dtos.asKitDescriptorDtos(kitDescriptors);
-      for (KitDescriptorDto dto : dtos) {
-        writeUrls(dto, uriBuilder);
-      }
-      return dtos;
+    Set<KitDescriptorDto> dtos = Dtos.asKitDescriptorDtos(kitDescriptors);
+    for (KitDescriptorDto dto : dtos) {
+      writeUrls(dto, uriBuilder);
     }
+    return dtos;
   }
   
   @RequestMapping(value = "/kitdescriptor", method = RequestMethod.POST, headers = { "Content-type=application/json" })

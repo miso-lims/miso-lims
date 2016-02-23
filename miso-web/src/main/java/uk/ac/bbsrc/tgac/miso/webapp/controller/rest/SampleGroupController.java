@@ -90,15 +90,11 @@ public class SampleGroupController extends RestController {
   @ResponseBody
   public Set<SampleGroupDto> getSampleGroups(UriComponentsBuilder uriBuilder, HttpServletResponse response) throws IOException {
     Set<SampleGroupId> sampleGroups = sampleGroupService.getAll();
-    if (sampleGroups.isEmpty()) {
-      throw new RestException("No sample groups found", Status.NOT_FOUND);
-    } else {
-      Set<SampleGroupDto> sampleGroupDtos = Dtos.asSampleGroupDtos(sampleGroups);
-      for (SampleGroupDto sampleGroupDto : sampleGroupDtos) {
-        sampleGroupDto = writeUrls(sampleGroupDto, uriBuilder);
-      }
-      return sampleGroupDtos;
+    Set<SampleGroupDto> sampleGroupDtos = Dtos.asSampleGroupDtos(sampleGroups);
+    for (SampleGroupDto sampleGroupDto : sampleGroupDtos) {
+      sampleGroupDto = writeUrls(sampleGroupDto, uriBuilder);
     }
+    return sampleGroupDtos;
   }
 
   @RequestMapping(value = "/samplegroup", method = RequestMethod.POST, headers = { "Content-type=application/json" })

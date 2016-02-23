@@ -90,15 +90,11 @@ public class TissueMaterialController extends RestController {
   @ResponseBody
   public Set<TissueMaterialDto> getTissueMaterials(UriComponentsBuilder uriBuilder, HttpServletResponse response) throws IOException {
     Set<TissueMaterial> tissueMaterials = tissueMaterialService.getAll();
-    if (tissueMaterials.isEmpty()) {
-      throw new RestException("No tissue materials found", Status.NOT_FOUND);
-    } else {
-      Set<TissueMaterialDto> tissueMaterialDtos = Dtos.asTissueMaterialDtos(tissueMaterials);
-      for (TissueMaterialDto tissueMaterialDto : tissueMaterialDtos) {
-        tissueMaterialDto = writeUrls(tissueMaterialDto, uriBuilder);
-      }
-      return tissueMaterialDtos;
+    Set<TissueMaterialDto> tissueMaterialDtos = Dtos.asTissueMaterialDtos(tissueMaterials);
+    for (TissueMaterialDto tissueMaterialDto : tissueMaterialDtos) {
+      tissueMaterialDto = writeUrls(tissueMaterialDto, uriBuilder);
     }
+    return tissueMaterialDtos;
   }
 
   @RequestMapping(value = "/tissuematerial", method = RequestMethod.POST, headers = { "Content-type=application/json" })

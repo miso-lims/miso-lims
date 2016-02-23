@@ -21,59 +21,79 @@
  * *********************************************************************
  */
 
-var Tissue = Tissue || {
-  getTissueOrigins: function () {
-    Options.makeXhrRequest('GET', '/miso/rest/tissueorigins', Tissue.createTissueOriginsTable);
+var Defaults = Defaults || {
+  all: null,
+  
+  getDefaults: function () {
+    Options.makeXhrRequest('GET', '/miso/rest/ui/sampleoptions', Defaults.makeTables);
   },
+  
+  makeTables: function (xhr) {
+    if (xhr.status == 200) {
+      Defaults.all = JSON.parse(xhr.responseText);
+    
+      Tissue.createTissueOriginsTable();
+      Tissue.createTissueTypesTable();
+      Tissue.createTissueMaterialsTable();
+      Tissue.createSamplePurposesTable();
+      QC.createQcDetailsTable();
+      Subproject.getProjects();
+      Lab.createLabsTable();
+      Lab.createInstitutesTable();
+      Hierarchy.createSampleClassesTable();
+      Hierarchy.createRelationshipsTable();
+    }
+  }
+};
+
+var Tissue = Tissue || {
 
   createTissueOriginsTable: function (xhr) {
     var TOtable = [];
     var id, alias, description, endpoint;
-    Tissue.createTable(xhr, 'TO', 'allOrigins', 'Origin', TOtable);
+    
+    // if data is coming in from AJAX request, store it in Defaults.all
+    if (xhr) Defaults.all.tissueOriginsDtos = JSON.parse(xhr.responseText);
+    Tissue.createTable(Defaults.all.tissueOriginsDtos, 'TO', 'allOrigins', 'Origin', TOtable);
   },
 
-  getTissueTypes: function () {
-    Options.makeXhrRequest('GET', '/miso/rest/tissuetypes', Tissue.createTissueTypesTable);
-  },
 
   createTissueTypesTable: function (xhr) {
     var TTtable = [];
     var id, alias, description, endpoint;
-    Tissue.createTable(xhr, 'TT', 'allTypes', 'Type', TTtable);
-  },
-
-  getTissueMaterials: function () {
-    Options.makeXhrRequest('GET', '/miso/rest/tissuematerials', Tissue.createTissueMaterialsTable);
+    
+    // if data is coming in from AJAX request, store it in Defaults.all
+    if (xhr) Defaults.all.tissueTypesDtos = JSON.parse(xhr.responseText);
+    Tissue.createTable(Defaults.all.tissueTypesDtos, 'TT', 'allTypes', 'Type', TTtable);
   },
 
   createTissueMaterialsTable: function (xhr) {
     var TMtable = [];
     var id, alias, description, endpoint;
-    Tissue.createTable(xhr, 'TM', 'allMaterials', 'Material', TMtable);
-  },
-
-  getSamplePurposes: function () {
-    Options.makeXhrRequest('GET', '/miso/rest/samplepurposes', Tissue.createSamplePurposesTable);
+    
+    // if data is coming in from AJAX request, store it in Defaults.all
+    if (xhr) Defaults.all.tissueMaterialsDtos = JSON.parse(xhr.responseText);
+    Tissue.createTable(Defaults.all.tissueMaterialsDtos, 'TM', 'allMaterials', 'Material', TMtable);
   },
 
   createSamplePurposesTable: function (xhr) {
     var SPtable = [];
     var id, alias, description, endpoint;
-    Tissue.createTable(xhr, 'SP', 'allPurposes', 'Purpose', SPtable);
+    // if data is coming in from AJAX request, store it in Defaults.all
+    if (xhr) Defaults.all.samplePurposesDtos = JSON.parse(xhr.responseText);
+    Tissue.createTable(Defaults.all.samplePurposesDtos, 'SP', 'allPurposes', 'Purpose', SPtable);
   },
 
-  createTable: function (xhr, option, tableBodyId, word, table) {
+  createTable: function (data, option, tableBodyId, word, table) {
     var tableBody = document.getElementById(tableBodyId);
     tableBody.innerHTML = null;
 
-    var data;
-    if (xhr.status == 200) {
-      data = JSON.parse(xhr.responseText);
+    // create rows if there is data; otherwise, add only the "Add New" button
+    if (data) {
       data.sort(function (a,b) {
         return (a.alias > b.alias) ? 1 : ((b.alias > a.alias) ? -1 : 0);
       });
-    } // else collection is empty, so add only the "Add New" button
-    if (data) {
+
       for (var i=0; i<data.length; i++) {
         id = data[i].id;
         alias = data[i].alias;
@@ -94,14 +114,16 @@ var Tissue = Tissue || {
     tableBody.innerHTML = table.join('');
     Options.tableLoadCounter += 1;
 
-    if (!document.getElementById('new'+option+'RowButton')) { // add button if it's not already present
+    // add button if it's not already present
+    if (!document.getElementById('new'+option+'RowButton')) { 
       var button = ['<div id="new'+option+'RowButton">'];
       button.push(Options.createButton('New '+word, "Tissue.createNewRow('"+option+"')", 'new'+word));
       button.push('</div>');
       document.getElementById(tableBodyId).parentElement.insertAdjacentHTML('afterend', button.join(''));
     }
 
-    if (Options.tableLoadCounter > Options.tablesOnPage) { // if tables have all already been loaded once
+    // display checkmark if table has already been loaded once
+    if (Options.tableLoadCounter > Options.tablesOnPage) { 
       Options.displayCheckmark(tableBody.parentElement.id);
     }
   },
@@ -113,7 +135,7 @@ var Tissue = Tissue || {
       alert("Neither alias nor description can be blank.");
       return null;
     }
-    method = givenMethod || 'PUT';
+    var method = givenMethod || 'PUT';
     Options.makeXhrRequest(method, endpoint, Options.reloadTable, JSON.stringify({ 'alias': alias, 'description': description }), option);
   },
 
@@ -150,30 +172,42 @@ var Tissue = Tissue || {
       document.getElementById(tableBodyId).insertAdjacentHTML('beforeend', row.join(''));
       document.getElementById(option+'_alias_new').focus();
     }
+  },
+  
+  getTissueOrigins: function () {
+    Options.makeXhrRequest('GET', '/miso/rest/tissueorigins', Tissue.createTissueOriginsTable);
+  },
+  
+  getTissueTypes: function () {
+    Options.makeXhrRequest('GET', '/miso/rest/tissuetypes', Tissue.createTissueTypesTable);
+  },
+  
+  getTissueMaterials: function () {
+    Options.makeXhrRequest('GET', '/miso/rest/tissuematerials', Tissue.createTissueMaterialsTable);
+  },
+  
+  getSamplePurposes: function () {
+    Options.makeXhrRequest('GET', '/miso/rest/samplepurposes', Tissue.createSamplePurposesTable);
   }
 };
 
 var QC = QC || {
-  getQcDetails: function () {
-    Options.makeXhrRequest('GET','/miso/rest/qcpasseddetails', QC.createQcDetailsTable);
-  },
 
   createQcDetailsTable: function (xhr) {
     var tableBody = document.getElementById('allQcDetails');
     tableBody.innerHTML = null;
 
-    var data;
-    if (xhr.status == 200) {
-      data = JSON.parse(xhr.responseText);
-      data.sort(function (a, b){
-        return (a.description > b.description) ? 1 : ((b.description > a.description) ? -1 : 0);
-      });
-    } // else collection is empty, so render only the "Add New" button
-
+    // if data is coming in from AJAX request, store it in Defaults.all
+    if (xhr) Defaults.all.qcPassedDetailsDtos = JSON.parse(xhr.responseText);
+    var data = Defaults.all.qcPassedDetailsDtos;
     var table = [];
     var id, status, description, note, endpoint;
 
+    // create rows if there is data; otherwise, add only the "Add New" button
     if (data) {
+      data.sort(function (a, b){
+        return (a.description > b.description) ? 1 : ((b.description > a.description) ? -1 : 0);
+      });
       for (var i=0; i<data.length; i++) {
         id = data[i].id;
         status = data[i].status;
@@ -197,14 +231,16 @@ var QC = QC || {
     tableBody.innerHTML = table.join('');
     Options.tableLoadCounter += 1;
 
-    if (!document.getElementById('newQCRowButton')) { // add button if it's not already present
+    // add button if it's not already present
+    if (!document.getElementById('newQCRowButton')) { 
       var button = ['<div id="newQCRowButton">'];
       button.push(Options.createButton('New QC Details', 'QC.createNewRow()', 'newDetails'));
       button.push('</div>');
       document.getElementById('allQcDetailsTable').insertAdjacentHTML('afterend', button.join(''));
     }
 
-    if (Options.tableLoadCounter > Options.tablesOnPage) { // if tables have all already been loaded once
+    // display checkmark if table has already been loaded once
+    if (Options.tableLoadCounter > Options.tablesOnPage) {
       Options.displayCheckmark(tableBody.parentElement.id);
     }
   },
@@ -264,6 +300,10 @@ var QC = QC || {
       document.getElementById('allQcDetails').insertAdjacentHTML('beforeend', row.join(''));
       document.getElementById('QC_status_new').focus();
     }
+  },
+  
+  getQcDetails: function () {
+    Options.makeXhrRequest('GET','/miso/rest/qcpasseddetails', QC.createQcDetailsTable);
   }
 };
 
@@ -271,31 +311,36 @@ var Subproject = Subproject || {
   projectArray: null,
 
   getProjects: function () {
-    Options.makeXhrRequest('GET', '/miso/rest/project', Subproject.listProjects);
+    Options.makeXhrRequest('GET', '/miso/rest/project', Subproject.sortProjects);
+  },
+  
+  getSubprojects: function () {
+    Options.makeXhrRequest('GET', '/miso/rest/subprojects', Subproject.createSubprojectsTable);
   },
 
-  listProjects: function (pxhr) {
+  sortProjects: function (pxhr) {
     Subproject.projectArray = JSON.parse(pxhr.response).sort(function (a, b) {
       return (a.alias > b.alias) ? 1 : ((b.alias > a.alias) ? -1 : 0);
     });
-    Options.makeXhrRequest('GET', '/miso/rest/subprojects', Subproject.createSubprojectTable);
+    Subproject.getSubprojects();
   },
 
-  createSubprojectTable: function (xhr) {
+  createSubprojectsTable: function (xhr) {
     var tableBody = document.getElementById('allSubprojects');
     tableBody.innerHTML = null;
 
-    var data;
-    if (xhr.status == 200) {
-      data = JSON.parse(xhr.response).sort(function (a, b) {
-        return (a.alias > b.alias) ? 1 : ((b.alias > a.alias) ? -1 : 0);
-      });
-    } // else collection is empty, so render only the "Add New" button
-
+    // if data is coming in from AJAX request, store it in Defaults.all
+    if (xhr) Defaults.all.subprojectsDtos = JSON.parse(xhr.responseText);
+    var data = Defaults.all.subprojectsDtos;
     var table = [];
     var id, alias, description, project, priority, endpoint;
-
+  
+    // create rows if there is data; otherwise, add only the "Add New" button
     if (data) {
+      data.sort(function (a, b) {
+        return (a.alias > b.alias) ? 1 : ((b.alias > a.alias) ? -1 : 0);
+      });
+      
       for (var i=0; i<data.length; i++) {
         id = data[i].id;
         alias = data[i].alias;
@@ -323,14 +368,16 @@ var Subproject = Subproject || {
     tableBody.innerHTML = table.join('');
     Options.tableLoadCounter += 1;
 
-    if (!document.getElementById('newSubpRowButton')) { // add button if it's not already present
+    // add button if it's not already present
+    if (!document.getElementById('newSubpRowButton')) { 
       var button = ['<div id="newSubpRowButton">'];
       button.push(Options.createButton('New Subproject', 'Subproject.createNewRow()', 'newDetails'));
       button.push('</button>');
       document.getElementById('allSubprojectsTable').insertAdjacentHTML('afterend', button.join(''));
     }
 
-    if (Options.tableLoadCounter > Options.tablesOnPage) { // if tables have all already been loaded once
+    // display checkmark if table has already been loaded once
+    if (Options.tableLoadCounter > Options.tablesOnPage) {
       Options.displayCheckmark(tableBody.parentElement.id);
     }
   },
@@ -340,9 +387,9 @@ var Subproject = Subproject || {
     var select = [];
     select.push('<select id="'+ idValue +'">');
     for (var j=0;j<Subproject.projectArray.length;j++) {
-      select.push('<option value="'+ Subproject.projectArray[j]["projectId"] +'"');
-      if (Subproject.projectArray[j]["projectId"] == selectedProjectId) select.push(' selected=""');
-      select.push('>'+ Subproject.projectArray[j]["alias"] +'</option>');
+      select.push('<option value="'+ Subproject.projectArray[j].projectId +'"');
+      if (Subproject.projectArray[j].projectId == selectedProjectId) select.push(' selected=""');
+      select.push('>'+ Subproject.projectArray[j].alias +'</option>');
     }
     select.push('</select>');
     return select.join('');
@@ -400,36 +447,57 @@ var Subproject = Subproject || {
   }
 };
 
-var Institute = Institute || {
-  getInstitutes: function () {
-    Options.makeXhrRequest('GET', '/miso/rest/institutes', Institute.createInstitutesTable);
-  },
-
-  createInstitutesTable: function (xhr) {
-    var tableBody = document.getElementById('allInstitutes');
-    tableBody.innerHTML = null;
-
-    var data;
-    if (xhr.status == 200) {
-      data = JSON.parse(xhr.responseText);
-      data.sort(function (a, b) { //////////////// TODO: confirm alias??
-        return (a.alias > b.alias) ? 1 : ((b.alias > a.alias) ? -1 : 0);
-      });
-    } // else collection is empty, so render only teh "Add New" button
-
+var Lab = Lab || {
+  
+  createLabsTable: function (xhr) {
     var table = [];
     var id, alias, endpoint;
+    
+    // if data is coming in from AJAX request, store it in Defaults.all
+    if (xhr) Defaults.all.labsDtos = JSON.parse(xhr.responseText);
+    Lab.createTable(Defaults.all.labsDtos, 'Lab', 'allLabs', 'Lab', table);
+  },
+  
+  createInstitutesTable: function (xhr) {
+    var table = [];
+    var id, alias, endpoint;
+    
+    // if data is coming in from AJAX request, store it in Defaults.all
+    if (xhr) Defaults.all.institutesDtos = JSON.parse(xhr.responseText);
+    // sort institutes in place since labs makes use of them
+    Defaults.all.institutesDtos = Defaults.all.institutesDtos.sort(function (a, b) {
+      return (a.alias > b.alias) ? 1 : ((b.alias > a.alias) ? -1 : 0);
+    });
+    Lab.createTable(Defaults.all.institutesDtos, 'In', 'allInstitutes', 'Institute', table);
+  },
 
+  createTable: function (data, option, tableBodyId, word, table) {
+    var tableBody = document.getElementById(tableBodyId);
+    tableBody.innerHTML = null;
+
+    // optional variable for if option == "Lab"
+    var selectedInstituteId = null;
+    
+    // create rows if there is data; otherwise, add only the "Add New" button
     if (data) {
+      data.sort(function (a, b) {
+        return (a.alias > b.alias) ? 1 : ((b.alias > a.alias) ? -1 : 0);
+      });
+
       for (var i=0; i<data.length; i++) {
         id = data[i].id;
         alias = data[i].alias;
         endpoint = data[i].url;
+        selectedInstituteId = (option == 'Lab' ? data[i].instituteId : null);
 
-        table.push('<tr class="In"><td>');
-        table.push(Options.createTextInput('In_alias_'+id, alias));
+        table.push('<tr class="'+option+'"><td>');
+        table.push(Options.createTextInput(option+'_alias_'+id, alias));
         table.push('</td><td>');
-        table.push(Options.createButton('Update', "Institute.update('"+endpoint+"', "+id+")"));
+        if (selectedInstituteId) {
+          table.push(Lab.createInstitutesDropdown(option+'_institute_'+id, selectedInstituteId));
+          table.push('</td><td>');
+        }
+        table.push(Options.createButton('Update', "Lab.update('"+endpoint+"', "+id+", '"+option+"')"));
         table.push('</td><td>');
         table.push(Options.createButton('Delete', "Options.confirmDelete('"+endpoint+"')"));
         table.push('</td></tr>');
@@ -438,97 +506,142 @@ var Institute = Institute || {
     tableBody.innerHTML = table.join('');
     Options.tableLoadCounter += 1;
 
-    if (!document.getElementById('newInstituteRowButton')) { // add button if it's not already present
-      var button = ['<div id="newInstituteRowButton">'];
-      button.push(Options.createButton('New Institute', 'Institute.createNewRow()', 'newInstitute'));
+    // add button if it's not already present
+    if (!document.getElementById('new'+option+'RowButton')) { 
+      var button = ['<div id="new'+option+'RowButton">'];
+      button.push(Options.createButton('New '+word, "Lab.createNewRow('"+option+"')", 'new'+word));
       button.push('</div>');
-      document.getElementById('allInstitutesTable').insertAdjacentHTML('afterend', button.join(''));
+      document.getElementById(tableBodyId).parentElement.insertAdjacentHTML('afterend', button.join(''));
     }
 
-    if (Options.tableLoadCounter > Options.tablesOnPage) { // if all tables have already been loaded once
-      Options.displayCheckmark('allInstitutesTable');
+    // display checkmark if tables have already been loaded once
+    if (Options.tableLoadCounter > Options.tablesOnPage) { 
+      Options.displayCheckmark(tableBody.parentElement.id);
     }
   },
 
-  update: function (endpoint, suffix, givenMethod) {
-    var alias = document.getElementById('In_alias_'+suffix).value;
+  update: function (endpoint, suffix, option, givenMethod) {
+    var alias = document.getElementById(option+'_alias_'+suffix).value;
+    var instituteId = (option == 'Lab' ? document.getElementById(option+'_institute_'+suffix).value : null);
     if (!alias) {
       alert("Alias can not be blank.");
       return null;
     }
+    var data = {
+      'alias': alias
+    };
+    
+    // institute cannot be blank when creating a lab
+    if (instituteId === null && option == 'Lab') {
+      alert("Please select an institute.");
+      return false;
+    }
+    // use instituteId when creating a lab
+    if (instituteId) {
+      data.instituteId = instituteId;
+    }
     var method = givenMethod || 'PUT';
-    Options.makeXhrRequest(method, endpoint, Options.reloadTable, JSON.stringify({ 'alias': alias }), 'In');
+    Options.makeXhrRequest(method, endpoint, Options.reloadTable, JSON.stringify(data), option);
   },
 
-  addNew: function () {
-    Institute.update('/miso/rest/institute', 'new', 'POST'); // TODO: CHECK THIS
+  addNew: function (option) {
+    var endpoint = '/miso/rest/';
+    if (option == 'In') {
+      endpoint += 'institute';
+    } else if (option == 'Lab') {
+      endpoint += 'lab';
+    }
+    Lab.update(endpoint, 'new', option, 'POST');
   },
 
-  createNewRow: function () {
-    if (document.getElementById('In_alias_new')) {
-      document.getElementById('In_alias_new').focus();
+  createNewRow: function (option) {    
+    if (document.getElementById(option+'_alias_new')) {
+      document.getElementById(option+'_alias_new').focus();
       return false;
     } else {
+      if (option == 'Lab' && Defaults.all.institutesDtos.length === 0) {
+        alert ("Please add an Institute before creating a Lab.");
+        return false;
+      }
       var row = [];
 
       row.push('<tr><td>');
-      row.push(Options.createTextInput('In_alias_new'));
+      row.push(Options.createTextInput(option+'_alias_new'));
       row.push('</td><td>');
-      row.push(Options.createButton('Add', "Institute.addNew()"));
+      if (option == 'Lab') {
+        row.push(Lab.createInstitutesDropdown(option+'_institute_new'));
+        row.push('</td><td>');
+      }
+      row.push(Options.createButton('Add', "Lab.addNew('"+option+"')"));
       row.push('</td></tr>');
 
-      document.getElementById('allInstitutes').insertAdjacentHTML('beforeend', row.join(''));
-      document.getElementById('In_alias_new').focus();
+      var tableBodyId = document.querySelectorAll('.'+ option)[0].id;
+      document.getElementById(tableBodyId).insertAdjacentHTML('beforeend', row.join(''));
+      document.getElementById(option+'_alias_new').focus();
     }
+  },
+  
+  createInstitutesDropdown: function (idValue, selectedInstituteId) {
+    var instituteId = selectedInstituteId || '';
+    var select = [];
+    select.push('<select id="'+ idValue +'">');
+    for (var i=0; i<Defaults.all.institutesDtos.length; i++) {
+      select.push('<option value="'+ Defaults.all.institutesDtos[i].id +'"');
+      if (Defaults.all.institutesDtos[i].id == instituteId) {
+        select.push(' selected=""');
+      }
+      select.push('>'+ Defaults.all.institutesDtos[i].alias + '</option>');
+    }
+    select.push('</select>');
+    return select.join('');
+  },
+  
+  getLabs: function () {
+    Options.makeXhrRequest('GET', '/miso/rest/labs', Lab.createLabsTable);
+  },
+  
+  getInstitutes: function () {
+    Options.makeXhrRequest('GET', '/miso/rest/institutes', Lab.createInstitutesTable);
   }
 };
 
 var Hierarchy = Hierarchy || {
-  categoriesArray: [],
-  data: {},
-  allClasses: [],
-  allRelationships: {},
 
-  getSampleCategories: function () {
-    Options.makeXhrRequest('GET', '/miso/rest/samplecategories', Hierarchy.getSampleClasses);
+
+  getSampleClasses: function () {
+    Options.makeXhrRequest('GET', '/miso/rest/sampleclasses', Hierarchy.createSampleClassesTable);
   },
 
-  getSampleClasses: function (cxhr) {
-    Hierarchy.categoriesArray = JSON.parse(cxhr.response);
-    Options.makeXhrRequest('GET', '/miso/rest/sampleclasses', Hierarchy.createClassesAndRelationships);
-  },
-
-  createClassesAndRelationships: function (xhr) {
-    Hierarchy.createSampleClassesTable(xhr);
-    Hierarchy.getRelationships(); // relationships depend on already having classes available, and should be reloaded every time a class changes
+  getValidRelationships: function () {
+    Options.makeXhrRequest('GET', '/miso/rest/samplevalidrelationships', Hierarchy.createRelationshipsTable);
   },
 
   createSampleClassesTable: function (xhr) {
     var tableBody = document.getElementById('allClasses');
     tableBody.innerHTML = null;
-
-    if (xhr.status == 200) {
-      Hierarchy.allClasses = JSON.parse(xhr.response);
-      // data = { 1: {class1}, 2: {class2}, ... }
-      for (var i=0; i<Hierarchy.allClasses.length; i++) {
-        Hierarchy.data[Hierarchy.allClasses[i].id] = Hierarchy.allClasses[i];
-      }
-    } // else collection is empty, so render only the "Add New" button
-
+    
+    // if data is coming in from AJAX request, store it in Defaults.all
+    if (xhr) Defaults.all.sampleClassesDtos = JSON.parse(xhr.responseText);
+    var data = Defaults.all.sampleClassesDtos;
     var table = [];
     var id, alias, category, endpoint;
 
-    for (var key in Hierarchy.data) {
-      if (Hierarchy.data.hasOwnProperty(key)) {
-        id = Hierarchy.data[key].id;
-        alias = Hierarchy.data[key].alias;
-        category = Hierarchy.data[key].sampleCategory;
-        endpoint = Hierarchy.data[key].url;
+   // create rows if there is data; otherwise, add only the "Add New" button
+    if (data) {
+      data.sort(function (a, b) {
+        return (a.sampleCategory > b.sampleCategory) ? 1 : ((b.sampleCategory > a.sampleCategory) ? -1 : 0);
+      });
+
+      for (var i=0; i<data.length; i++) {
+        id = data[i].id;
+        alias = data[i].alias;
+        category = data[i].sampleCategory;
+        endpoint = data[i].url;
 
         table.push('<tr class="sampleClass"><td>');
         table.push(Options.createTextInput('class_alias_'+id, alias));
         table.push('</td><td>');
-        table.push(Hierarchy.createCategorySelect('class_category_'+ id, category));
+        table.push(Hierarchy.createCategorySelect('class_category_'+ id, category, true));
         table.push('</td><td>');
         table.push(Options.createButton('Update', "Hierarchy.updateClass('"+endpoint+"', "+id+")"));
         table.push('</td><td>');
@@ -539,31 +652,54 @@ var Hierarchy = Hierarchy || {
     tableBody.innerHTML = table.join('');
     Sortable.initTable(document.getElementById('allClassesTable'));
     Options.tableLoadCounter += 1;
+    
+    // add listener to all category select 
+    var categorySelects = document.querySelectorAll('select[id^="class_category"]');
+    [].forEach.call(categorySelects, function (e) {
+      e.addEventListener('change', Hierarchy.addNewCategory, false);
+    });
+    
 
-    if (!document.getElementById('newClassRowButton')) { // add button if it's not already present
+    // add button if it's not already present
+    if (!document.getElementById('newClassRowButton')) { 
       var button = ['<div id="newClassRowButton">'];
       button.push(Options.createButton('New Class', 'Hierarchy.createNewClassRow()', 'newClass'));
       button.push('</div>');
       document.getElementById('allClassesTable').insertAdjacentHTML('afterend', button.join(''));
     }
-
-    if (Options.tableLoadCounter > Options.tablesOnPage) { // if tables have all already been loaded once
+  
+    // display checkmark if tables have all already been loaded once
+    if (Options.tableLoadCounter > Options.tablesOnPage) { 
       Options.displayCheckmark(tableBody.parentElement.id);
     }
   },
 
-  createCategorySelect: function (idValue, category) {
+  createCategorySelect: function (idValue, category, canAddNewCategory) {
     var select = [];
     select.push('<select id="'+ idValue +'">');
     select.push('<option value="">Choose Category</option>');
-    var categories = Hierarchy.categoriesArray;
+    var categories = Hierarchy.getUniqueCategories();
     for (var i=0; i<categories.length; i++) {
-      select.push('<option value="'+ categories[i].alias +'"');
-      if (categories[i].alias == category) select.push(' selected=""');
-      select.push('>'+ categories[i].alias + '</option>');
+      select.push('<option value="'+ categories[i] +'"');
+      if (categories[i] == category) select.push(' selected=""');
+      select.push('>'+ categories[i] + '</option>');
+    }
+    if (canAddNewCategory) { 
+      select.push('<option value="new">Add New Category:</option>'); 
     }
     select.push('</select>');
     return select.join('');
+  },
+  
+  getUniqueCategories: function () {
+    var uniqueCategories = [];
+    var classes = Defaults.all.sampleClassesDtos;
+    for (var i=0; i<classes.length; i++) {
+      if (uniqueCategories.indexOf(classes[i].sampleCategory) == -1) {
+        uniqueCategories.push(classes[i].sampleCategory);
+      }
+    }
+    return uniqueCategories;
   },
 
   updateClass: function (endpoint, suffix, givenMethod) {
@@ -573,8 +709,18 @@ var Hierarchy = Hierarchy || {
       alert("Neither class nor category can be blank.");
       return false;
     }
+    // use 'new category' value if available
+    if (category == 'new') {
+      category = document.getElementById('new_category').value;
+      if (category === null) {
+        alert("Please enter a new category value, or select a category.");
+        return false;
+      }
+    }
     var method = givenMethod || 'PUT';
-    Options.makeXhrRequest(method, endpoint, Hierarchy.getSampleCategories, JSON.stringify({ 'alias': alias, 'sampleCategory': category }));
+    Options.makeXhrRequest(method, endpoint, Options.reloadTable, 
+      JSON.stringify({ 'alias': alias, 'sampleCategory': category }), 'Cl'
+    );
   },
 
   addNewClass: function () {
@@ -591,67 +737,69 @@ var Hierarchy = Hierarchy || {
       row.push('<tr><td>');
       row.push(Options.createTextInput('class_alias_new'));
       row.push('</td><td>');
-      row.push(Hierarchy.createCategorySelect('class_category_new')); // don't pass in category value because none is selected
+      row.push(Hierarchy.createCategorySelect('class_category_new', null, true));
       row.push('</td><td>');
       row.push(Options.createButton('Add', 'Hierarchy.addNewClass()'));
       row.push('</td></tr>');
 
       document.getElementById('allClasses').insertAdjacentHTML('beforeend', row.join(''));
       document.getElementById('class_alias_new').focus();
+      
+      var categorySelect = document.getElementById('class_category_new');
+      categorySelect.addEventListener('change', Hierarchy.addNewCategory);
     }
   },
-
-  getRelationships: function () {
-    Options.makeXhrRequest('GET', '/miso/rest/samplevalidrelationships', Hierarchy.createRelationshipsTable);
+  
+  addNewCategory: function (event) {
+    // event is fired by selecting a category
+    if (event.target.value == 'new') {
+      var input = '<input id="new_category" type="text" required="required" />';
+      document.getElementById(event.target.id).insertAdjacentHTML('afterend', input);
+    } else {
+      var inputOnPage = document.getElementById('new_category');
+      if (inputOnPage) inputOnPage.parentNode.removeChild(inputOnPage);
+      return false;
+    }
   },
 
   createRelationshipsTable: function (xhr) {
-    var tableBody = document.getElementById('allRelationshipsTable');
-    // tableBody exists only when reloading the table
-    if (tableBody) tableBody.parentNode.removeChild(tableBody);
-
-    if (xhr.status == 200) {
-      Hierarchy.allRelationships = JSON.parse(xhr.response);
-    } // else collection is empty, so render only the "Add New" button
-
+    var tableBody = document.getElementById('allRelationships');
+    tableBody.innerHTML = null;
+    
+    // if data is coming in from AJAX request, store it in Defaults.all
+    if (xhr) Defaults.all.sampleValidRelationshipsDtos = JSON.parse(xhr.responseText);
+    var data = Defaults.all.sampleValidRelationshipsDtos;
     var table = [];
     var id, parentClass, childClass, endpoint;
-
-    // add the table itself
-    table.push('<table id="allRelationshipsTable" class="clear default-table" data-sortable>');
-    table.push('<thead><tr class="relationship">');
-    table.push('<th>Parent Category</th><th>Parent Class</th><th>Child Category</th><th>Child Class</th>');
-    table.push('</tr></thead>');
-    table.push('<tbody id="allRelationships">');
-    // add any existing relationships to the table
-    for (var i=1; i<=Hierarchy.allRelationships.length; i++) {
-      var relationship = Hierarchy.allRelationships.filter(function (ship) {
-        return ship.id == i;
-      })[0];
-      id = relationship.id;
-      parentClass = Hierarchy.allClasses.filter(function (sampleClass) {
-        return sampleClass.id == relationship.parentId;
-      })[0];
-      childClass = Hierarchy.allClasses.filter(function (sampleClass) {
-        return sampleClass.id == relationship.childId;
-      })[0];
-      endpoint = relationship.url;
-
-      table.push('<tr class="relationship" data-id="'+ id +'"><td>');
-      table.push(parentClass.sampleCategory);
-      table.push('</td><td>');
-      table.push(parentClass.alias);
-      table.push('</td><td>');
-      table.push(childClass.sampleCategory);
-      table.push('</td><td>');
-      table.push(childClass.alias);
-      table.push('</td><td>');
-      table.push(Options.createButton('Delete', 'Options.confirmDelete("'+ endpoint +'")'));
-      // no Edit button
-      table.push('</td></tr>');
+    
+    // create rows if there is data; otherwise, add only the "Add New" button
+    if (data) {
+      for (var i=0; i<data.length; i++) {
+        id = data[i].id;
+        parentClass = Defaults.all.sampleClassesDtos.filter(function (sampleClass) {
+          return sampleClass.id == data[i].parentId;
+        })[0];
+        childClass = Defaults.all.sampleClassesDtos.filter(function (sampleClass) {
+          return sampleClass.id == data[i].childId;
+        })[0];
+        endpoint = data[i].url;
+  
+        table.push('<tr class="relationship" data-id="'+ id +'"><td>');
+        table.push(parentClass.sampleCategory);
+        table.push('</td><td>');
+        table.push(parentClass.alias);
+        table.push('</td><td>');
+        table.push(childClass.sampleCategory);
+        table.push('</td><td>');
+        table.push(childClass.alias);
+        table.push('</td><td>');
+        table.push(Options.createButton('Delete', "Options.confirmDelete('"+ endpoint +"')"));
+        // no Edit button
+        table.push('</td></tr>');
+      }
     }
     table.push('</tbody></table>');
-    document.getElementById('relationships').insertAdjacentHTML('afterend', table.join(''));
+    tableBody.innerHTML = table.join('');
     Sortable.initTable(document.getElementById('allRelationshipsTable')); // makes this table sortable
     Options.tableLoadCounter += 1;
 
@@ -668,10 +816,15 @@ var Hierarchy = Hierarchy || {
   },
 
   createNewRelationshipRow: function () {
+    if (Defaults.all.sampleClassesDtos.length < 2) {
+      alert("Please add at least two Sample Classes before creating Relationships between them.");
+      return false;
+    }
     if (document.getElementById('relationship_parent_category_new')) {
       document.getElementById('relationship_parent_category_new').focus();
       return false;
     } else {
+      
       var row = [];
       row.push ('<tr id="newRelationshipRow"><td id="parentCategoryNew">');
       row.push(Hierarchy.createCategorySelect('relationship_parent_category_new'));
@@ -693,13 +846,15 @@ var Hierarchy = Hierarchy || {
 
   createClassForCategorySelect: function (event) {
     var select = [];
-    var category = event.target.value; // event is fired by selecting a category
+    // event is fired by selecting a category
+    var category = event.target.value; 
     var role = event.target.getAttribute('data-role');
     var categoryTdId = event.target.parentElement.getAttribute('id');
     var classTdId;
-    var classesForCategory = Hierarchy.allClasses.filter(function (sampleClass) {
+    // grab the classes that fall under that category
+    var classesForCategory = Defaults.all.sampleClassesDtos.filter(function (sampleClass) {
       return sampleClass.sampleCategory == category;
-    }); // grab the classes that fall under that category
+    }); 
     var newRowTds = document.getElementById('newRelationshipRow').children;
     for (i=0;i<newRowTds.length; i++) {
       if (newRowTds[i].id == categoryTdId) classTdId = newRowTds[i+1].id;
@@ -717,18 +872,31 @@ var Hierarchy = Hierarchy || {
   addNewRelationship: function () {
     var parentId = document.getElementById('relationship_parent_class_new').value;
     var childId = document.getElementById('relationship_child_class_new').value;
-    if (parentId == '' || childId == '') {
+    if (parentId === '' || childId === '') {
       alert("You must choose a parent class and a child class.");
       return false;
     }
+    // check to see if this relationship already exists
+    var alreadyExists = Defaults.all.sampleValidRelationshipsDtos.filter(function (ship) {
+      return (ship.parentId == parentId && ship.childId == childId);
+    })[0];
+    if (alreadyExists) {
+      // highlight row in table
+      jQuery('.relationship[data-id='+ alreadyExists.id +']').children().each(function() { 
+        jQuery(this).addClass('warning');
+      });
+      alert("This relationship already exists.");
+      return false;
+    }
     Options.makeXhrRequest('POST', '/miso/rest/samplevalidrelationship', Options.reloadTable,
-      JSON.stringify({ 'parentId': parentId, 'childId': childId }), 'Rel');
+      JSON.stringify({ 'parentId': parentId, 'childId': childId }), 'Rel'
+    );
   }
 };
 
 var Options = Options || {
   tableLoadCounter: 0,
-  tablesOnPage: 9,
+  tablesOnPage: 10,
 
   makeXhrRequest: function (method, endpoint, callback, data, callbackarg) {
     var expectedStatus;
@@ -751,7 +919,9 @@ var Options = Options || {
         } else if (xhr.status === unauthorizedStatus) {
           alert("You are not authorized to view this page.");
         } else {
-          alert("Sorry, something went wrong. Please try again. If the issue persists, contact your administrator.");
+          console.log(xhr);
+          var response = JSON.parse(xhr.response);
+          alert(response.detail);
         }
       }
     };
@@ -761,11 +931,12 @@ var Options = Options || {
 
   confirmDelete: function (endpoint) {
     if (endpoint.indexOf("sampleclass") != -1) {
+      // confirm there are no SampleValidRelationships which reference the SampleClass to be deleted
       var sampleClassId = endpoint.split('/').pop();
-      var sampleClassAlias = Hierarchy.allClasses.filter(function(sampleClass) { return sampleClass.id == sampleClassId; })[0].alias;
+      var sampleClassAlias = Defaults.all.sampleClassesDtos.filter(function(sampleClass) { return sampleClass.id == sampleClassId; })[0].alias;
       var countRelatedClasses = 0;
-      for (var i=0;i<Hierarchy.allRelationships.length; i++) {
-        var relationship = Hierarchy.allRelationships[i];
+      for (var i=0;i<Defaults.all.sampleValidRelationshipsDtos.length; i++) {
+        var relationship = Defaults.all.sampleValidRelationshipsDtos[i];
         if (relationship.parentId == sampleClassId || relationship.childId == sampleClassId) {
           countRelatedClasses += 1;
         }
@@ -776,6 +947,15 @@ var Options = Options || {
         }
       } else if (confirm('Are you sure you wish to delete '+ sampleClassAlias +'? This opearation cannot be undone!')) {
         Options.makeXhrRequest('DELETE', endpoint);
+      }
+    } else if (endpoint.indexOf("institute") != -1) {
+      // confirm there are no Labs which reference the Institute to be deleted
+      var instituteId = endpoint.split('/').pop();
+      var relatedLabs = Defaults.all.labsDtos.filter(function(lab) { return lab.instituteId == instituteId; });
+      if (relatedLabs.length > 0) {
+        var labAliasesString = relatedLabs.map(function(lab) { return lab.alias; });
+        alert("Please delete the related Labs ("+ labAliasesString.join(", ") +") before you delete this Institute.");
+        return false;
       }
     } else if (confirm('Are you sure you wish to delete? This operation cannot be undone!')) {
       Options.makeXhrRequest('DELETE', endpoint);
@@ -797,8 +977,11 @@ var Options = Options || {
     else if (option == 'TM') { reloadTableFunc = Tissue.getTissueMaterials; }
     else if (option == 'SP') { reloadTableFunc = Tissue.getSamplePurposes; }
     else if (option == 'QC') { reloadTableFunc = QC.getQcDetails; }
-    else if (option == 'SubP') { reloadTableFunc = Subproject.getProjects; }
-    else if (option == 'In') { reloadTableFunc = Institute.getInstitutes; }
+    else if (option == 'SubP') { reloadTableFunc = Subproject.getSubprojects; }
+    else if (option == 'In') { reloadTableFunc = Lab.getInstitutes; }
+    else if (option == 'Lab') { reloadTableFunc = Lab.getLabs; }
+    else if (option == 'Cl') { reloadTableFunc = Hierarchy.getSampleClasses; }
+    else if (option == 'Rel') { reloadTableFunc = Hierarchy.getValidRelationships; }
     reloadTableFunc();
   },
 

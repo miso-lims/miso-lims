@@ -92,17 +92,13 @@ public class SampleClassController extends RestController {
 
   @RequestMapping(value = "/sampleclasses", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public Set<SampleClassDto> getSampleClasss(UriComponentsBuilder uriBuilder, HttpServletResponse response) throws IOException {
+  public Set<SampleClassDto> getSampleClasses(UriComponentsBuilder uriBuilder, HttpServletResponse response) throws IOException {
     Set<SampleClass> sampleClasss = sampleClassService.getAll();
-    if (sampleClasss.isEmpty()) {
-      throw new RestException("No sample classs found", Status.NOT_FOUND);
-    } else {
-      Set<SampleClassDto> sampleClassDtos = Dtos.asSampleClassDtos(sampleClasss);
-      for (SampleClassDto sampleClassDto : sampleClassDtos) {
-        sampleClassDto = writeUrls(sampleClassDto, uriBuilder);
-      }
-      return sampleClassDtos;
+    Set<SampleClassDto> sampleClassDtos = Dtos.asSampleClassDtos(sampleClasss);
+    for (SampleClassDto sampleClassDto : sampleClassDtos) {
+      sampleClassDto = writeUrls(sampleClassDto, uriBuilder);
     }
+    return sampleClassDtos;
   }
 
   @RequestMapping(value = "/sampleclass", method = RequestMethod.POST, headers = { "Content-type=application/json" })

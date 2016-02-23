@@ -7,6 +7,8 @@ import java.util.Set;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -31,6 +33,8 @@ import uk.ac.bbsrc.tgac.miso.service.LabService;
 @SessionAttributes("lab")
 public class LabController extends RestController {
   
+  protected static final Logger log = LoggerFactory.getLogger(LabController.class);
+  
   @Autowired
   private LabService labService;
   
@@ -38,6 +42,8 @@ public class LabController extends RestController {
     URI baseUri = uriBuilder.build().toUri();
     labDto.setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/lab/{id}")
         .buildAndExpand(labDto.getId()).toUriString());
+    labDto.setInstituteUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/institute/{id}")
+        .buildAndExpand(labDto.getInstituteId()).toUriString());
     labDto.setCreatedByUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}")
         .buildAndExpand(labDto.getCreatedById()).toUriString());
     labDto.setUpdatedByUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}")
@@ -62,22 +68,18 @@ public class LabController extends RestController {
   @ResponseBody
   public Set<LabDto> getLabs(UriComponentsBuilder uriBuilder) throws IOException {
     Set<Lab> labs = labService.getAll();
-    if (labs.isEmpty()) {
-      throw new RestException("No labs found", Status.NOT_FOUND);
-    } else {
-      Set<LabDto> labDtos = Dtos.asLabDtos(labs);
-      for (LabDto labDto : labDtos) {
-        writeUrls(labDto, uriBuilder);
-      }
-      return labDtos;
+    Set<LabDto> labDtos = Dtos.asLabDtos(labs);
+    for (LabDto labDto : labDtos) {
+      writeUrls(labDto, uriBuilder);
     }
+    return labDtos;
   }
   
   @RequestMapping(value = "/lab", method = RequestMethod.POST, headers = { "Content-type=application/json" })
   @ResponseBody
   public ResponseEntity<?> createLab(@RequestBody LabDto labDto, UriComponentsBuilder uriBuilder) throws IOException {
     Lab lab = Dtos.to(labDto);
-    Long id = labService.create(lab);
+    Long id = labService.create(lab, labDto.getInstituteId());
     UriComponents uriComponents = uriBuilder.path("/lab/{id}").buildAndExpand(id);
     HttpHeaders headers = new HttpHeaders();
     headers.setLocation(uriComponents.toUri());
@@ -90,7 +92,7 @@ public class LabController extends RestController {
       UriComponentsBuilder uriBuilder) throws IOException {
     Lab lab = Dtos.to(labDto);
     lab.setId(id);
-    labService.update(lab);
+    labService.update(lab, labDto.getInstituteId());
     return new ResponseEntity<>(HttpStatus.OK);
   }
   
