@@ -117,6 +117,28 @@ public class SampleImpl extends AbstractSample implements Serializable {
     }
   }
 
+  public static SampleImpl sampleAnalyte(SampleFactoryBuilder builder) {
+    SampleImpl sampleImpl = new SampleImpl(builder);
+    sampleImpl.setParent(builder.getParent());
+    sampleImpl.getParent().getChildren().add(sampleImpl);
+    sampleImpl.setSampleAdditionalInfo(builder.getSampleAdditionalInfo());
+    sampleImpl.getSampleAdditionalInfo().setSample(sampleImpl);
+    sampleImpl.setSampleAnalyte(builder.getSampleAnalyte());
+    sampleImpl.getSampleAnalyte().setSample(sampleImpl);
+    return sampleImpl;
+  }
+
+  public static SampleImpl sampleTissue(SampleFactoryBuilder builder) {
+    SampleImpl sampleImpl = new SampleImpl(builder);
+    sampleImpl.setParent(builder.getParent());
+    sampleImpl.getParent().getChildren().add(sampleImpl);
+    sampleImpl.setSampleAdditionalInfo(builder.getSampleAdditionalInfo());
+    sampleImpl.getSampleAdditionalInfo().setSample(sampleImpl);
+    sampleImpl.setSampleTissue(builder.getSampleTissue());
+    sampleImpl.getSampleTissue().setSample(sampleImpl);
+    return sampleImpl;
+  }
+
   @Override
   public void buildSubmission() {
     /*

@@ -21,8 +21,9 @@ public class SampleDto {
   private Long projectId;
   private String scientificName;
   private String taxonIdentifier;
-  private SampleIdentityDto sampleIdentityDto;
+  private SampleIdentityDto sampleIdentity;
   private SampleAnalyteDto sampleAnalyte;
+  private SampleTissueDto sampleTissue;
   private SampleAdditionalInfoDto sampleAdditionalInfo;
   private Long parentId;
   private String parentUrl;
@@ -141,14 +142,6 @@ public class SampleDto {
     this.taxonIdentifier = taxonIdentifier;
   }
 
-  public SampleIdentityDto getSampleIdentityDto() {
-    return sampleIdentityDto;
-  }
-
-  public void setSampleIdentityDto(SampleIdentityDto sampleIdentityDto) {
-    this.sampleIdentityDto = sampleIdentityDto;
-  }
-
   public SampleAnalyteDto getSampleAnalyte() {
     return sampleAnalyte;
   }
@@ -195,6 +188,22 @@ public class SampleDto {
 
   public void setRootSampleClassUrl(String rootSampleClassUrl) {
     this.rootSampleClassUrl = rootSampleClassUrl;
+  }
+
+  public SampleIdentityDto getSampleIdentity() {
+    return sampleIdentity;
+  }
+
+  public void setSampleIdentity(SampleIdentityDto sampleIdentity) {
+    this.sampleIdentity = sampleIdentity;
+  }
+
+  public SampleTissueDto getSampleTissue() {
+    return sampleTissue;
+  }
+
+  public void setSampleTissue(SampleTissueDto sampleTissue) {
+    this.sampleTissue = sampleTissue;
   }
 
 }

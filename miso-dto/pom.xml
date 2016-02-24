@@ -22,7 +22,7 @@
     </dependency>
     <dependency>
       <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-      <artifactId>miso-service</artifactId>
+      <artifactId>core</artifactId>
     </dependency>
     <dependency>
       <groupId>joda-time</groupId>

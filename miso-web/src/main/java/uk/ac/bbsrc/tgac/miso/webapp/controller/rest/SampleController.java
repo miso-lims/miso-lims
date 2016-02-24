@@ -30,6 +30,7 @@ import java.util.Set;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
 
+import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +53,7 @@ import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 
 @Controller
-@RequestMapping("/rest/fred")
+@RequestMapping("/rest/tree/")
 @SessionAttributes("sample")
 public class SampleController extends RestController {
 
@@ -63,7 +64,7 @@ public class SampleController extends RestController {
 
   @RequestMapping(value = "/sample/{id}", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public SampleDto getSample(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder, HttpServletResponse response) 
+  public SampleDto getSample(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder, HttpServletResponse response)
       throws IOException {
     Sample sample = sampleService.get(id);
     if (sample == null) {
@@ -77,12 +78,10 @@ public class SampleController extends RestController {
 
   private static SampleDto writeUrls(SampleDto sampleDto, UriComponentsBuilder uriBuilder) {
     URI baseUri = uriBuilder.build().toUri();
-    sampleDto.setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/fred/sample/{id}").buildAndExpand(sampleDto.getId()).toUriString());
-    // sampleDto.setCreatedByUrl(uriBuilder.path("/rest/user/{id}").buildAndExpand(sampleDto.getCreatedById()).toUriString());
-    // sampleDto.setUpdatedByUrl(uriBuilder.path("/rest/user/{id}").buildAndExpand(sampleDto.getUpdatedById()).toUriString());
+    sampleDto.setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/tree/sample/{id}").buildAndExpand(sampleDto.getId()).toUriString());
     if (sampleDto.getParentId() != null) {
       sampleDto.setParentUrl(
-          UriComponentsBuilder.fromUri(baseUri).path("/rest/fred/sample/{id}").buildAndExpand(sampleDto.getParentId()).toUriString());
+          UriComponentsBuilder.fromUri(baseUri).path("/rest/tree/sample/{id}").buildAndExpand(sampleDto.getParentId()).toUriString());
     }
     if (sampleDto.getRootSampleClassId() != null) {
       sampleDto.setRootSampleClassUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/sampleclass/{id}")
@@ -109,8 +108,12 @@ public class SampleController extends RestController {
   @RequestMapping(value = "/sample", method = RequestMethod.POST, headers = { "Content-type=application/json" })
   @ResponseBody
   public ResponseEntity<?> createSample(@RequestBody SampleDto sampleDto, UriComponentsBuilder b) throws IOException {
-    Sample sample = Dtos.to(sampleDto);
-    Long id = sampleService.create(sample, sampleDto.getProjectId(), sampleDto.getParentId(), sampleDto.getRootSampleClassId());
+    Long id = null;
+    try {
+      id = sampleService.create(sampleDto);
+    } catch (ConstraintViolationException | IllegalArgumentException e) {
+      throw new RestException(e.getMessage(), Status.BAD_REQUEST);
+    }
     UriComponents uriComponents = b.path("/sample/{id}").buildAndExpand(id);
     HttpHeaders headers = new HttpHeaders();
     headers.setLocation(uriComponents.toUri());

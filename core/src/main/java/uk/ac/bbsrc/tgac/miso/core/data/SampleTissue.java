@@ -6,9 +6,9 @@ import com.eaglegenomics.simlims.core.User;
 
 public interface SampleTissue {
 
-  Long getId();
+  Long getSampleTissueId();
 
-  void setId(Long id);
+  void setSampleTissueId(Long sampleTissueId);
 
   Sample getSample();
 

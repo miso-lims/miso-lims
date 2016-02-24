@@ -10,7 +10,10 @@ public class SampleAnalyteNode extends SampleImpl {
   public SampleAnalyteNode(SampleFactoryBuilder builder) {
     super(builder);
     setSampleAdditionalInfo(builder.getSampleAdditionalInfo());
+    getSampleAdditionalInfo().setSample(this);
     setSampleAnalyte(builder.getSampleAnalyte());
+    getSampleAnalyte().setSample(this);
+
   }
 
 }

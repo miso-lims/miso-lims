@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Set;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
+import uk.ac.bbsrc.tgac.miso.dto.SampleAdditionalInfoDto;
 
 public interface SampleAdditionalInfoService {
 
@@ -18,5 +19,9 @@ public interface SampleAdditionalInfoService {
   Set<SampleAdditionalInfo> getAll() throws IOException;
 
   void delete(Long sampleAdditionalInfoId) throws IOException;
+
+  Long create(SampleAdditionalInfoDto sampleAdditionalInfoDto) throws IOException;
+
+  SampleAdditionalInfo to(SampleAdditionalInfoDto sampleAdditionalInfoDto) throws IOException;
 
 }

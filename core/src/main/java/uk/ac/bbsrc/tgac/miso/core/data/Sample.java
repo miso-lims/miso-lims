@@ -311,4 +311,8 @@ public interface Sample extends SecurableByProfile, Submittable<Document>, Locat
   public Set<Sample> getChildren();
 
   public void setChildren(Set<Sample> children);
+
+  public void setSampleTissue(SampleTissue sampleTissue);
+
+  public SampleTissue getSampleTissue();
 }

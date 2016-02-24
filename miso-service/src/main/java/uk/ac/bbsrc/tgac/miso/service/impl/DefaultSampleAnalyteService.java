@@ -1,12 +1,14 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.User;
@@ -17,6 +19,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleAnalyte;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleGroupId;
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
+import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.dto.SampleAnalyteDto;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleAnalyteDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleGroupDao;
@@ -78,6 +82,72 @@ public class DefaultSampleAnalyteService implements SampleAnalyteService {
       TissueMaterial tissueMaterial = tissueMaterialDao.getTissueMaterial(tissueMaterialId);
       sampleAnalyte.setTissueMaterial(tissueMaterial);
     }
+    return sampleAnalyteDao.addSampleAnalyte(sampleAnalyte);
+  }
+
+  @Override
+  @Transactional(propagation = Propagation.REQUIRED)
+  public Long create(SampleAnalyteDto sampleAnalyteDto) throws IOException {
+    authorizationManager.throwIfNonAdmin();
+    User user = authorizationManager.getCurrentUser();
+
+    SampleAnalyte sampleAnalyte = Dtos.to(sampleAnalyteDto);
+    sampleAnalyte.setCreatedBy(user);
+    sampleAnalyte.setUpdatedBy(user);
+
+    if (sampleAnalyteDto.getSamplePurposeId() != null) {
+      sampleAnalyte.setSamplePurpose(samplePurposeDao.getSamplePurpose(sampleAnalyteDto.getSamplePurposeId()));
+    }
+    if (sampleAnalyteDto.getSampleGroupId() != null) {
+      sampleAnalyte.setSampleGroup(sampleGroupDao.getSampleGroup(sampleAnalyteDto.getSampleGroupId()));
+    }
+    if (sampleAnalyteDto.getTissueMaterialId() != null) {
+      sampleAnalyte.setTissueMaterial(tissueMaterialDao.getTissueMaterial(sampleAnalyteDto.getTissueMaterialId()));
+    }
+
+    return sampleAnalyteDao.addSampleAnalyte(sampleAnalyte);
+  }
+
+  @Override
+  @Transactional(propagation = Propagation.REQUIRED)
+  public SampleAnalyte to(SampleAnalyteDto sampleAnalyteDto) throws IOException {
+    authorizationManager.throwIfUnauthenticated();
+    User user = authorizationManager.getCurrentUser();
+
+    SampleAnalyte sampleAnalyte = Dtos.to(sampleAnalyteDto);
+    sampleAnalyte.setCreatedBy(user);
+    sampleAnalyte.setUpdatedBy(user);
+    Date now = new Date();
+    sampleAnalyte.setCreationDate(now);
+    sampleAnalyte.setLastUpdated(now);
+
+    if (sampleAnalyteDto.getSamplePurposeId() != null) {
+      SamplePurpose samplePurpose = samplePurposeDao.getSamplePurpose(sampleAnalyteDto.getSamplePurposeId());
+      ServiceUtils.throwIfNull(samplePurpose, "SampleAnalyte.samplePurposeId", sampleAnalyteDto.getSamplePurposeId());
+      sampleAnalyte.setSamplePurpose(samplePurpose);
+    }
+    if (sampleAnalyteDto.getSampleGroupId() != null) {
+      SampleGroupId sampleGroup = sampleGroupDao.getSampleGroup(sampleAnalyteDto.getSampleGroupId());
+      ServiceUtils.throwIfNull(sampleGroup, "SampleAnalyte.sampleGroupId", sampleAnalyteDto.getSampleGroupId());
+      sampleAnalyte.setSampleGroup(sampleGroup);
+    }
+    if (sampleAnalyteDto.getTissueMaterialId() != null) {
+      TissueMaterial tissueMaterial = tissueMaterialDao.getTissueMaterial(sampleAnalyteDto.getTissueMaterialId());
+      ServiceUtils.throwIfNull(tissueMaterial, "SampleAnalyte.tissueMaterialId", sampleAnalyteDto.getTissueMaterialId());
+      sampleAnalyte.setTissueMaterial(tissueMaterial);
+    }
+
+    return sampleAnalyte;
+  }
+
+  @Override
+  public Long create(SampleAnalyte sampleAnalyte) throws IOException {
+    authorizationManager.throwIfNonAdmin();
+    User user = authorizationManager.getCurrentUser();
+
+    sampleAnalyte.setCreatedBy(user);
+    sampleAnalyte.setUpdatedBy(user);
+
     return sampleAnalyteDao.addSampleAnalyte(sampleAnalyte);
   }
 

@@ -10,6 +10,8 @@ public class SampleIdentityNode extends SampleImpl {
   public SampleIdentityNode(SampleFactoryBuilder builder) {
     super(builder);
     setSampleAdditionalInfo(builder.getSampleAdditionalInfo());
+    getSampleAdditionalInfo().setSample(this);
     setIdentity(builder.getIdentity());
+    getIdentity().setSample(this);
   }
 }

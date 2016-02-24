@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Set;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
+import uk.ac.bbsrc.tgac.miso.dto.SampleTissueDto;
 
 public interface SampleTissueService {
 
@@ -16,5 +17,7 @@ public interface SampleTissueService {
   Set<SampleTissue> getAll();
 
   void delete(Long sampleTissueId);
+
+  SampleTissue to(SampleTissueDto sampleTissueDto) throws IOException;
 
 }

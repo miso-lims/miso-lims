@@ -94,7 +94,7 @@ public class SampleTissueController extends RestController {
   public ResponseEntity<?> updateSampleTissue(@PathVariable("id") Long id, @RequestBody SampleTissueDto sampleTissueDto,
       UriComponentsBuilder uriBuilder) throws IOException {
     SampleTissue sampleTissue = Dtos.to(sampleTissueDto);
-    sampleTissue.setId(id);
+    sampleTissue.setSampleTissueId(id);
     getSampleTissueService().update(sampleTissue);
     return new ResponseEntity<>(HttpStatus.OK);
   }
