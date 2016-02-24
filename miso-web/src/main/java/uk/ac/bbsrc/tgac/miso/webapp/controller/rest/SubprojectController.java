@@ -25,6 +25,8 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
@@ -46,9 +48,11 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import uk.ac.bbsrc.tgac.miso.core.data.SampleGroupId;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SubprojectDto;
+import uk.ac.bbsrc.tgac.miso.service.SampleGroupService;
 import uk.ac.bbsrc.tgac.miso.service.SubprojectService;
 
 @Controller
@@ -61,10 +65,13 @@ public class SubprojectController extends RestController {
   @Autowired
   private SubprojectService subprojectService;
 
+  @Autowired
+  private SampleGroupService sampleGroupService;
+
   @RequestMapping(value = "/subproject/{id}", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public SubprojectDto getSubproject(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
-      HttpServletResponse response) throws IOException {
+  public SubprojectDto getSubproject(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder, HttpServletResponse response)
+      throws IOException {
     Subproject subproject = subprojectService.get(id);
     if (subproject == null) {
       throw new RestException("No subproject found with ID: " + id, Status.NOT_FOUND);
@@ -77,8 +84,8 @@ public class SubprojectController extends RestController {
 
   private static SubprojectDto writeUrls(SubprojectDto subprojectDto, UriComponentsBuilder uriBuilder) {
     URI baseUri = uriBuilder.build().toUri();
-    subprojectDto.setUrl(
-        UriComponentsBuilder.fromUri(baseUri).path("/rest/subproject/{id}").buildAndExpand(subprojectDto.getId()).toUriString());
+    subprojectDto
+        .setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/subproject/{id}").buildAndExpand(subprojectDto.getId()).toUriString());
     subprojectDto.setCreatedByUrl(
         UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}").buildAndExpand(subprojectDto.getCreatedById()).toUriString());
     subprojectDto.setUpdatedByUrl(
@@ -124,6 +131,17 @@ public class SubprojectController extends RestController {
   public ResponseEntity<?> deleteSubproject(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
     subprojectService.delete(id);
     return new ResponseEntity<>(HttpStatus.OK);
+  }
+
+  @RequestMapping(value = "/subproject/{id}/groups", method = RequestMethod.GET, produces = { "application/json" })
+  @ResponseBody
+  public Collection<Integer> getSubprojectSampleGroups(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
+      HttpServletResponse response) throws IOException {
+    Set<Integer> groups = new HashSet<>();
+    for (SampleGroupId sgi : sampleGroupService.getAllForSubproject(id)) {
+      groups.add(sgi.getGroupId());
+    }
+    return groups;
   }
 
 }
