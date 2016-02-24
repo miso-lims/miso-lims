@@ -24,7 +24,6 @@ public class SampleAdditionalInfoDto {
   private Integer passageNumber;
   private Integer timesReceived;
   private Integer tubeNumber;
-  private Double volume;
   private Double concentration;
   private Long createdById;
   private String createdByUrl;
@@ -153,14 +152,6 @@ public class SampleAdditionalInfoDto {
 
   public void setTubeNumber(Integer tubeNumber) {
     this.tubeNumber = tubeNumber;
-  }
-
-  public Double getVolume() {
-    return volume;
-  }
-
-  public void setVolume(Double volume) {
-    this.volume = volume;
   }
 
   public Double getConcentration() {

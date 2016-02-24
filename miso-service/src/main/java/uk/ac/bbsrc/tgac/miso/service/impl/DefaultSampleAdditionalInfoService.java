@@ -238,7 +238,6 @@ public class DefaultSampleAdditionalInfoService implements SampleAdditionalInfoS
     updatedSampleAdditionalInfo.setPassageNumber(sampleAdditionalInfo.getPassageNumber());
     updatedSampleAdditionalInfo.setTimesReceived(sampleAdditionalInfo.getTimesReceived());
     updatedSampleAdditionalInfo.setTubeNumber(sampleAdditionalInfo.getTubeNumber());
-    updatedSampleAdditionalInfo.setVolume(sampleAdditionalInfo.getVolume());
     updatedSampleAdditionalInfo.setConcentration(sampleAdditionalInfo.getConcentration());
     updatedSampleAdditionalInfo.setArchived(sampleAdditionalInfo.getArchived());
     User user = authorizationManager.getCurrentUser();

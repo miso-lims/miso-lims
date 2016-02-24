@@ -150,7 +150,6 @@ CREATE TABLE `SampleAdditionalInfo` (
   `passageNumber` int(11) DEFAULT NULL,
   `timesReceived` int(11) DEFAULT NULL,
   `tubeNumber` int(11) DEFAULT NULL,
-  `volume` double DEFAULT NULL,
   `concentration` double DEFAULT NULL,
   `archived` bit(1) NOT NULL,
   `labId` bigint(20) DEFAULT NULL,

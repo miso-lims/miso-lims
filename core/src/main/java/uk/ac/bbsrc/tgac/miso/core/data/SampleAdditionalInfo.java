@@ -44,10 +44,6 @@ public interface SampleAdditionalInfo {
 
   void setTubeNumber(Integer tubeNumber);
 
-  Double getVolume();
-
-  void setVolume(Double volume);
-
   Double getConcentration();
 
   void setConcentration(Double concentration);
