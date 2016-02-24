@@ -18,6 +18,7 @@ public class SampleOptionsDto {
   private Set<SampleValidRelationshipDto> sampleValidRelationships;
   private Set<InstituteDto> institutes;
   private Set<LabDto> labs;
+  private Set<KitDescriptorDto> kitDescriptors;
 
   public Set<SubprojectDto> getSubprojectsDtos() {
     return subprojects;
@@ -105,6 +106,14 @@ public class SampleOptionsDto {
   
   public void setLabsDtos(Set<LabDto> labs) {
     this.labs = labs;
+  }
+  
+  public Set<KitDescriptorDto> getKitDescriptorsDtos() {
+    return kitDescriptors;
+  }
+  
+  public void setKitDescriptorsDtos(Set<KitDescriptorDto> kitDescriptors) {
+    this.kitDescriptors = kitDescriptors;
   }
 
 }

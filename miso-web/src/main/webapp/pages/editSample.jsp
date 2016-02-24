@@ -35,15 +35,22 @@
 <script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.datepicker.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.checkbox.js'/>" type="text/javascript"></script>
 <link href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" rel="stylesheet" type="text/css" />
+<link href="<c:url value='/scripts/handsontable/dist/pikaday/pikaday.css'/>" rel="stylesheet" type="text/css" />
+<script src="<c:url value='/scripts/handsontable/dist/pikaday/pikaday.js'/>" type="text/javascript"></script>
+<script src="<c:url value='/scripts/handsontable/dist/moment/moment.js'/>" type="text/javascript"></script>
 
 <script src="<c:url value='/scripts/datatables_utils.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/natural_sort.js'/>" type="text/javascript"></script>
 
+<script src="<c:url value='/scripts/handsontable/dist/handsontable.full.js'/>" type="text/javascript"></script>
+<script src="<c:url value='/scripts/handsontable_renderers.js'/>" type="text/javascript"></script>
+<link rel="stylesheet" media="screen" href="/scripts/handsontable/dist/handsontable.full.css">
+<script src="<c:url value='/scripts/sample_hot.js'/>" type="text/javascript"></script>
 <script type="text/javascript" src="<c:url value='/scripts/parsley/parsley.min.js'/>"></script>
 
 <div id="maincontent">
 <div id="contentcolumn">
-<c:if test="${sample.id == 0 and not empty sample.project}">
+<c:if test="${sample.id == 0}">
 <div id="tabs">
 <ul>
   <li><a href="#tab-1"><span>Single</span></a></li>
@@ -58,8 +65,8 @@
 <sessionConversation:insertSessionConversationId attributeName="sample"/>
 <h1>
   <c:choose>
-    <c:when test="${sample.id != 0}">Edit</c:when>
-    <c:otherwise>Create</c:otherwise>
+    <c:when test="${sample.id != 0}"><span id="status" data-status="edit">Edit</span></c:when>
+    <c:otherwise><span id="status" data-status="create">Create</span></c:otherwise>
   </c:choose> Sample
   <button type="button" class="fg-button ui-state-default ui-corner-all"
           onclick="return Sample.validateSample();">Save
@@ -137,6 +144,7 @@
     </c:if>
     <div id="changeSampleIdBarcodeDialog" title="Assign New Barcode"></div>
     <c:if test="${not empty sample.identificationBarcode}">
+      <span id="idBarcodePresent" data-idBarcodePresent="false" data-sampleId="${sample.id}" data-idbarcode="${sample.identificationBarcode}"></span>
       <script type="text/javascript">
         jQuery(document).ready(function () {
           Fluxion.doAjax(
@@ -329,6 +337,89 @@
   </c:if>
 </div>
 </form:form>
+<c:if test="${sample.id == 0}">
+</div>
+<div id="tab-2">
+  <div class="breadcrumbs">
+    <ul>
+      <li>
+        <a href="/">Home</a>
+      </li>
+      <c:if test="${not empty sample.project}">
+      <li>
+        <div class="breadcrumbsbubbleInfo">
+          <div class="trigger">
+            <a href='<c:url value="/miso/project/${sample.project.id}"/>'>${sample.project.name}</a>
+          </div>
+          <div class="breadcrumbspopup">
+              ${sample.project.alias}
+          </div>
+        </div>
+      </li>
+      </c:if>
+    </ul>
+  </div>
+  <h1>Create Samples
+    <button id="bulkSampleButton" onClick="submitBulkSamples();" class="fg-button ui-state-default ui-corner-all">
+      Save
+    </button>
+  </h1>
+  <br/>
+  <br/>
+
+
+  <div id="HOTbulkForm" data-detailed-sample="${detailedSample}">
+    <div class="floatleft">
+	    <div>Project:<select id="projectSelect"></select></div>
+	    <div id="subpSelectOptions"></div>
+	    <div id="classOptions"></div>
+	    <div id="saveSuccesses"  class="parsley-success hidden">
+	      <p id="successMessages"></p>
+	    </div>
+	    <div id="saveErrors" class="bs-callout bs-callout-warning hidden">
+	      <h2>Oh snap!</h2>
+	      <p>The following rows failed to save:</p>
+	      <p id="errorMessages"></p>
+	    </div>
+	    <div>
+	      <button id="makeTable" class="disabled" disabled="true" onclick="Sample.hot.checkForExistingHOT();">Make Table</button>
+	      <button id="rerender" class="disabled" disabled="true" onclick="Sample.hot.hotTable.render();">Readjust Table View</button>
+	    </div>
+	  </div>
+	  <div class="floatleft rightfloatleft">
+      <p>To fill all columns below with the value of your selected cell, <b>double-click</b> the square in the bottom right of your selected cell.
+      To fill a variable number of columns with the value of your selected cell, 
+      <b>click</b> the square in the bottom right of your filled-in selected cell and <b>drag</b> up or down. All selected columns will be filled in.
+    </div>
+	  
+	  <div style="clear:both;"></div>
+    <div>
+      <c:choose>
+      <c:when test="${detailedSample}">
+        <button id="saveDetailed" class="disabled" disabled="true" onclick="Sample.hot.saveDetailedData();">Save</button>
+        <div id="genAliasesButton"></div>
+      </c:when>
+      <c:otherwise>
+        <button id="savePlain" onclick="Sample.hot.savePlainData();">Save Bulk</button>
+      </c:otherwise>
+      </c:choose>
+    </div>
+    <div id="hotContainer"></div>
+  
+    <script type="text/javascript">
+      Sample.hot.dropdownRef = JSON.parse('${referenceDataJson}');
+      Sample.hot.selectedProjectId = parseInt('${sample.project.id}') || null;
+      Sample.hot.detailedSample = JSON.parse(document.getElementById('HOTbulkForm').dataset.detailedSample);
+      if (Boolean("${detailedSample}")) {
+        Sample.hot.fetchSampleOptions();
+      } else {
+        Sample.hot.addProjectEtcDropdowns();
+      }
+    </script>
+  </div>
+</div>
+</div>
+</c:if>
 
 <c:if test="${sample.id != 0}">
   <a name="sampleqc"></a>
@@ -678,362 +769,7 @@
     </span>
   </c:if>
 </c:if>
-
-<c:if test="${sample.id == 0 and not empty sample.project}">
 </div>
-<div id="tab-2" align="center">
-  <div class="breadcrumbs">
-    <ul>
-      <li>
-        <a href="/">Home</a>
-      </li>
-      <li>
-        <div class="breadcrumbsbubbleInfo">
-          <div class="trigger">
-            <a href='<c:url value="/miso/project/${sample.project.id}"/>'>${sample.project.name}</a>
-          </div>
-          <div class="breadcrumbspopup">
-              ${sample.project.alias}
-          </div>
-        </div>
-      </li>
-    </ul>
-  </div>
-  <h1>Create Samples
-    <button id="bulkSampleButton" onClick="submitBulkSamples();" class="fg-button ui-state-default ui-corner-all">
-      Save
-    </button>
-  </h1>
-  <br/>
-  <br/>
-
-  <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#options_arrowclick'), 'optionsdiv');">Table
-    Options
-    <div id="options_arrowclick" class="toggleLeft"></div>
-  </div>
-  <div id="optionsdiv" class="note" style="display:none;">
-    <input type="checkbox" name="autoIncrementSampleAlias" checked="checked"/>Increment Sample Aliases
-    Automatically<br/>
-  </div>
-  <table id="cinput" class="display">
-    <thead>
-    <tr>
-      <th>Sample Alias</th>
-      <th>Description</th>
-      <th>Scientific Name</th>
-      <th>Receipt Date</th>
-      <th>Type</th>
-        <%-- <th>ID Barcode</th> --%>
-      <th>Location Barcode</th>
-      <th>Notes</th>
-      <th>Copy</th>
-      <th>Delete</th>
-    </tr>
-    </thead>
-    <tbody>
-    </tbody>
-  </table>
-  <div id="pager"></div>
-</div>
-</div>
-
-<script type="text/javascript">
-var sampleheaders = ['alias', 'description', 'scientificName', 'receivedDate', 'sampleType', 'locationBarcode', 'note'];
-jQuery(document).ready(function () {
-  var oTable = jQuery('#cinput').dataTable({
-    "aoColumnDefs": [
-      {
-        "bUseRendered": false,
-        "aTargets": [ 0 ]
-      }
-    ],
-    "bPaginate": false,
-    "bInfo": false,
-    "bJQueryUI": true,
-    "bAutoWidth": true,
-    "bSort": false,
-    "sDom": '<<"toolbar">f>r<t>ip>'
-  });
-  jQuery("div.toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
-  jQuery("div.toolbar").html("<button onclick=\"bulkCopySample();\" class=\"fg-button ui-state-default ui-corner-all\"><span class=\"add\">Bulk Copy</span></button> <button onclick=\"fnClickAddRow();\" class=\"fg-button ui-state-default ui-corner-all\"><span class=\"add\">Add Row</span></button>");
-
-  jQuery("#tabs").tabs();
-  jQuery("#tabs").removeClass('ui-widget').removeClass('ui-widget-content');
-});
-
-function bulkCopySample() {
-  var table = jQuery('#cinput').dataTable();
-  var numrows = table.fnGetNodes().length;
-  var nodes = table.fnGetNodes();
-
-  if (numrows > 0) {
-    var copynumer = prompt("Note: This will copy the LAST row of table. \nPlease enter the copy number of samples to add ", "1");
-
-
-    var obj = {};
-    for (var j = 0; j < (nodes[numrows - 1].cells.length) - 1; j++) {
-      obj[sampleheaders[j]] = jQuery(nodes[numrows - 1].cells[j]).text();
-    }
-
-    if (Utils.validation.isNullCheck(obj.alias) ||
-        Utils.validation.isNullCheck(obj.description) ||
-        Utils.validation.isNullCheck(obj.scientificName) ||
-        Utils.validation.isNullCheck(obj.sampleType)) {
-      ok = false;
-      jQuery(nodes[numrows - 1]).css('background', '#EE9966');
-    }
-    else {
-      for (var i = 0; i < copynumer - 1; i++) {
-        copyRow(numrows - 1);
-      }
-    }
-  }
-  else {
-    alert("Please Enter some Sample Data first to Bulk Copy");
-  }
-}
-
-function fnClickAddRow(rowdata) {
-  var table = jQuery('#cinput').dataTable();
-  var a = [];
-  if (rowdata && rowdata.length > 0) {
-    a = table.fnAddData(rowdata);
-  }
-  else {
-    a = table.fnAddData(
-      [ "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "<span style='text-align:center;' name='copy-button' class='ui-icon ui-icon-arrowrefresh-1-n' title='Copy row'></span>",
-        "<span style='text-align:center;' name='del-button' class='ui-icon ui-icon-trash' title='Delete row'></span>"
-      ]
-    );
-  }
-
-  var tr = table.fnGetNodes(a[0]);
-  jQuery(tr).find("span[name='copy-button']").each(function () {
-    jQuery(this).click(function () {
-      copyRow(table.fnGetPosition(tr));
-    });
-  });
-
-  jQuery(tr).find("span[name='del-button']").each(function () {
-    jQuery(this).click(function () {
-      if (confirm("Are you sure you want to delete row " + table.fnGetPosition(tr) + "?")) {
-        table.fnDeleteRow(table.fnGetPosition(tr));
-      }
-    });
-  });
-
-  var nTr = table.fnSettings().aoData[a[0]].nTr;
-  for (var i = 0; i < sampleheaders.length; i++) {
-    jQuery(nTr.cells[i]).attr("name", sampleheaders[i]);
-    if (sampleheaders[i] === "sampleType") {
-      jQuery(nTr.cells[i]).addClass("sampleSelect");
-    }
-    else if (sampleheaders[i] === "receivedDate") {
-      jQuery(nTr.cells[i]).addClass("dateSelect");
-    }
-    else {
-      jQuery(nTr.cells[i]).addClass("defaultEditable");
-    }
-  }
-
-  setEditables(table);
-}
-
-function copyRow(row) {
-  DatatableUtils.collapseInputs('#cinput');
-
-  var table = jQuery('#cinput').dataTable();
-  var numrows = table.fnGetNodes().length;
-  var lastRow = table.fnGetData(numrows - 1);
-  var rowToCopy = table.fnGetData(row);
-  if (jQuery("input[name=autoIncrementSampleAlias]").length > 0 && jQuery('input[name=autoIncrementSampleAlias]').is(':checked')) {
-    var re = new RegExp(/[A-z0-9]+_S([0-9]+)_[\s\S]*/);
-    if (rowToCopy[0].match(re) && lastRow[0].match(re)) {
-      rowToCopy[0] = lastRow[0].replace(/_S([\d]+)_/, function (a, b) {
-        return "_S" + (parseInt(b, 10) + 1) + "_";
-      });
-    }
-  }
-  fnClickAddRow(rowToCopy);
-}
-
-function setEditables(datatable) {
-  jQuery('.defaultEditable').editable(function (value, settings) {
-    return value;
-  },
-  {
-    callback: function (sValue, y) {
-      var aPos = datatable.fnGetPosition(this);
-      datatable.fnUpdate(sValue, aPos[0], aPos[1]);
-    },
-    submitdata: function (value, settings) {
-      return {
-        "row_id": this.parentNode.getAttribute('id'),
-        "column": datatable.fnGetPosition(this)[2]
-      };
-    },
-    onblur: 'submit',
-    placeholder: '',
-    height: '14px'
-  });
-
-  jQuery(".sampleSelect").editable(function (value, settings) {
-    return value;
-  },
-  {
-    data: '{${sampleTypesString}}',
-    type: 'select',
-    onblur: 'submit',
-    placeholder: '',
-    style: 'inherit',
-    callback: function (sValue, y) {
-      var aPos = datatable.fnGetPosition(this);
-      datatable.fnUpdate(sValue, aPos[0], aPos[1]);
-    },
-    submitdata: function (value, settings) {
-      return {
-        "row_id": this.parentNode.getAttribute('id'),
-        "column": datatable.fnGetPosition(this)[2]
-      };
-    }
-  });
-
-  jQuery(".dateSelect").editable(function (value, settings) {
-    return value;
-  },
-  {
-    type: 'datepicker',
-    width: '100px',
-    onblur: 'submit',
-    placeholder: '',
-    style: 'inherit',
-    datepicker: {
-      dateFormat: 'dd/mm/yy',
-      showButtonPanel: true,
-      maxDate: 0
-    },
-     callback: function (sValue, y) {
-      var aPos = datatable.fnGetPosition(this);
-      datatable.fnUpdate(sValue, aPos[0], aPos[1]);
-    },
-    submitdata: function (value, settings) {
-      return {
-        "row_id": this.parentNode.getAttribute('id'),
-        "column": datatable.fnGetPosition(this)[2]
-      };
-    }
-  });
-
-  jQuery('.defaultEditable').bind('keydown', function (evt) {
-    if (evt.keyCode == 9) {
-      /* Submit the current element */
-      jQuery('input', this)[0].blur();
-
-      /* Activate the next element */
-      if (jQuery(this).next('.defaultEditable').length == 1) {
-        jQuery(this).next('.defaultEditable').click();
-      }
-      else if (jQuery('.defaultEditable', jQuery(this.parentNode).next()).length > 0) {
-        jQuery('.defaultEditable:eq(0)', jQuery(this.parentNode).next()).click();
-      }
-      return false;
-    }
-  });
-}
-
-function submitBulkSamples() {
-  jQuery('#bulkSampleButton').attr('disabled', 'disabled');
-  jQuery('#bulkSampleButton').html("Processing...");
-
-  DatatableUtils.collapseInputs('#cinput');
-
-  var table = jQuery('#cinput').dataTable();
-  var nodes = table.fnGetNodes();
-  var ok = true;
-  var arr = [];
-  for (var i = 0; i < nodes.length; i++) {
-    var obj = {};
-    for (var j = 0; j < (nodes[i].cells.length) - 1; j++) {
-      obj[sampleheaders[j]] = jQuery(nodes[i].cells[j]).text();
-    }
-
-    if (Utils.validation.isNullCheck(obj.alias) ||
-        Utils.validation.isNullCheck(obj.description) ||
-        Utils.validation.isNullCheck(obj.scientificName) ||
-        Utils.validation.isNullCheck(obj.sampleType)) {
-      ok = false;
-      jQuery(nodes[i]).css('background', '#EE9966');
-    }
-    else {
-      jQuery(nodes[i]).css('background', '#CCFF99');
-      arr.push(JSON.stringify(obj));
-    }
-  }
-
-  if (ok) {
-    Fluxion.doAjax(
-      'sampleControllerHelperService',
-      'bulkSaveSamples',
-      {'projectId':${sample.project.id},
-        'samples': "[" + arr.join(',') + "]",
-        'url': ajaxurl
-      },
-      {'doOnSuccess': function (json) {
-        var taxonErrorSamples = json.taxonErrorSamples;
-        var savedSamples = json.savedSamples;
-        if (savedSamples.length == nodes.length) {
-          if (taxonErrorSamples.length > 0) {
-            table.find("tr:gt(0)").each(function () {
-              for (var j = 0; j < taxonErrorSamples.length; j++) {
-                if (jQuery(this.cells[0]).text() === taxonErrorSamples[j]) {
-                  jQuery(this).css('background', '#EE9966');
-                }
-              }
-            });
-
-            alert("Samples saved, but those highlighted in red did not have valid taxon information. Any submissions made from these samples may not be valid!");
-          }
-          else {
-            window.location.href = '<c:url value='/miso/project/${sample.project.id}'/>';
-          }
-        }
-        else {
-          jQuery('#bulkSampleButton').removeAttr('disabled');
-          jQuery('#bulkSampleButton').html("Save");
-
-          table.find("tr:gt(0)").each(function () {
-            for (var j = 0; j < savedSamples.length; j++) {
-              if (jQuery(this.cells[0]).text() === savedSamples[j]) {
-                table.fnDeleteRow(this);
-              }
-              else {
-                jQuery(this).css('background', '#EE9966');
-              }
-            }
-          });
-
-          alert("Samples highlighted in red did not save. Please check that the sample alias is unique!");
-        }
-      }
-    });
-  }
-  else {
-    alert("The highlighted data rows in red are missing an alias, description, scientific name or sample type.");
-    setEditables(table);
-  }
-  jQuery('#bulkSampleButton').removeAttr('disabled');
-  jQuery('#bulkSampleButton').html("Save");
-}
-
-</script>
-</c:if>
 
 <c:if test="${not empty sample.libraries}">
 <script type="text/javascript">
@@ -1314,7 +1050,6 @@ function bulkLibraryDilutionTable() {
 </script>
 </c:if>
 
-</div>
 </div>
 
 <script type="text/javascript">

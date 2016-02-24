@@ -78,6 +78,7 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.context.ApplicationContextProvider;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.ProjectRestController;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoPropertyExporter;
 
 @Controller
@@ -94,6 +95,9 @@ public class EditSampleController {
 
   @Autowired
   private DataObjectFactory dataObjectFactory;
+  
+  @Autowired
+  private ProjectRestController projectRestController;
 
   public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
     this.dataObjectFactory = dataObjectFactory;
@@ -105,6 +109,10 @@ public class EditSampleController {
 
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
+  }
+  
+  public void setProjectRestController(ProjectRestController projectRestController) {
+    this.projectRestController = projectRestController;
   }
   
   
@@ -294,6 +302,24 @@ public class EditSampleController {
       types.add("\"" + s.getQcTypeId() + "\"" + ":" + "\"" + s.getName() + "\"");
     }
     return LimsUtils.join(types, ",");
+  }
+  
+  // Handsontable
+  @ModelAttribute("referenceDataJson")
+  public JSONObject referenceDataJsonString() throws IOException {
+    final JSONObject hot = new JSONObject();
+    final List<String> sampleTypes = new ArrayList<String>(requestManager.listAllSampleTypes());
+    // TODO eventually: fix this so it's not just strings...
+    final List<String> qcValues = new ArrayList<String>();
+    qcValues.add("true");
+    qcValues.add("false");
+    qcValues.add("");
+    
+    hot.put("sampleTypes", sampleTypes);
+    hot.put("projects", projectRestController.listAllProjects());
+    hot.put("qcValues", qcValues);
+    
+    return hot;
   }
 
   @RequestMapping(value = "/new", method = RequestMethod.GET)
@@ -498,5 +524,4 @@ public class EditSampleController {
       throw ex;
     }
   }
-  
 }
