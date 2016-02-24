@@ -70,6 +70,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ExperimentStore;
+import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
@@ -79,6 +80,7 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DaoLookup;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
+import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.store.SecurityStore;
@@ -233,6 +235,7 @@ public class SQLPoolDAO implements PoolStore {
   private boolean autoGenerateIdentificationBarcodes;
   private ChangeLogStore changeLogDAO;
   private SecurityStore securityDAO;
+  private NoteStore noteDAO;
   private BoxStore boxDAO;
 
   public ChangeLogStore getChangeLogDAO() {
@@ -326,7 +329,7 @@ public class SQLPoolDAO implements PoolStore {
   public void setWatcherDAO(WatcherStore watcherDAO) {
     this.watcherDAO = watcherDAO;
   }
-  
+
   public BoxStore getBoxDAO() {
     return boxDAO;
   }
@@ -341,6 +344,10 @@ public class SQLPoolDAO implements PoolStore {
 
   public void setAutoGenerateIdentificationBarcodes(boolean autoGenerateIdentificationBarcodes) {
     this.autoGenerateIdentificationBarcodes = autoGenerateIdentificationBarcodes;
+  }
+
+  public void setNoteDAO(NoteStore noteDAO) {
+    this.noteDAO = noteDAO;
   }
 
   public boolean getAutoGenerateIdentificationBarcodes() {
@@ -556,6 +563,12 @@ public class SQLPoolDAO implements PoolStore {
 
     for (User u : pool.getWatchers()) {
       watcherDAO.saveWatchedEntityUser(pool, u);
+    }
+
+    if (!pool.getNotes().isEmpty()) {
+      for (Note n : pool.getNotes()) {
+        noteDAO.savePoolNote(pool, n);
+      }
     }
 
     purgeListCache(pool);
@@ -819,6 +832,7 @@ public class SQLPoolDAO implements PoolStore {
           for (PoolQC qc : poolQcDAO.listByPoolId(id)) {
             p.addQc(qc);
           }
+          p.setNotes(noteDAO.listByPool(id));
         }
         p.getChangeLog().addAll(changeLogDAO.listAllById(TABLE_NAME, id));
       } catch (IOException e1) {

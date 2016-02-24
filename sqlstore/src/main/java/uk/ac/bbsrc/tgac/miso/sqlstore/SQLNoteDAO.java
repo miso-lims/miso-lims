@@ -44,6 +44,7 @@ import com.eaglegenomics.simlims.core.store.SecurityStore;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
@@ -80,6 +81,9 @@ public class SQLNoteDAO implements NoteStore {
 
   public static final String NOTES_BY_RELATED_RUN = "SELECT n.noteId, n.creationDate, n.internalOnly, n.text, n.owner_userId " + "FROM "
       + TABLE_NAME + " n, Run_Note rn " + "WHERE n.noteId=rn.notes_noteId " + "AND rn.run_runId=?";
+
+  public static final String NOTES_BY_RELATED_POOL = "SELECT n.noteId, n.creationDate, n.internalOnly, n.text, n.owner_userId " + "FROM "
+      + TABLE_NAME + " n, Pool_Note pn " + "WHERE n.noteId=pn.notes_noteId " + "AND pn.pool_poolId=?";
 
   public static final String NOTE_DELETE = "DELETE FROM " + TABLE_NAME + " WHERE noteId=:noteId";
 
@@ -215,6 +219,23 @@ public class SQLNoteDAO implements NoteStore {
   }
 
   @Override
+  public long savePoolNote(Pool pool, Note note) throws IOException {
+    long noteId = save(note);
+    SimpleJdbcInsert pInsert = new SimpleJdbcInsert(template).withTableName("Pool_Note");
+
+    MapSqlParameterSource poParams = new MapSqlParameterSource();
+    poParams.addValue("pool_poolId", pool.getId());
+    poParams.addValue("notes_noteId", noteId);
+
+    try {
+      pInsert.execute(poParams);
+    } catch (DuplicateKeyException se) {
+      // ignore
+    }
+    return note.getNoteId();
+  }
+
+  @Override
   public boolean remove(Note note) throws IOException {
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
     return (namedTemplate.update(NOTE_DELETE, new MapSqlParameterSource().addValue("noteId", note.getNoteId())) == 1);
@@ -265,6 +286,11 @@ public class SQLNoteDAO implements NoteStore {
   @Override
   public List<Note> listByRun(Long runId) throws IOException {
     return template.query(NOTES_BY_RELATED_RUN, new Object[] { runId }, new NoteMapper());
+  }
+
+  @Override
+  public List<Note> listByPool(Long poolId) throws IOException {
+    return template.query(NOTES_BY_RELATED_POOL, new Object[] { poolId }, new NoteMapper());
   }
 
   public class NoteMapper implements RowMapper<Note> {

@@ -306,6 +306,15 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
+  public long savePoolNote(Pool pool, Note note) throws IOException {
+    if (writeCheck(pool)) {
+      return backingManager.savePoolNote(pool, note);
+    } else {
+      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot write to this Pool");
+    }
+  }
+
+  @Override
   public long saveEmPCR(emPCR pcr) throws IOException {
     if (writeCheck(pcr)) {
       return backingManager.saveEmPCR(pcr);

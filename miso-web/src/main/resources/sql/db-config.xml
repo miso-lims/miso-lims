@@ -347,6 +347,7 @@
     <property name="watcherDAO" ref="sqlWatcherDAO" />
     <property name="boxDAO" ref="sqlBoxDAO" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />
+    <property name="noteDAO" ref="sqlNoteDAO" />
     <property name="autoGenerateIdentificationBarcodes">
       <value>${miso.autoGenerateIdentificationBarcodes}</value>
     </property>

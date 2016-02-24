@@ -32,6 +32,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -52,6 +53,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
@@ -842,6 +844,55 @@ public class PoolControllerHelperService {
     } else {
       return JSONUtils.SimpleJSONError("No platform specified");
     }
+  }
+
+  public JSONObject deletePoolNote(HttpSession session, JSONObject json) {
+    Long poolId = json.getLong("poolId");
+    Long noteId = json.getLong("noteId");
+
+    try {
+      Pool pool = requestManager.getPoolById(poolId);
+      Note note = requestManager.getNoteById(noteId);
+      if (pool.getNotes().contains(note)) {
+        pool.getNotes().remove(note);
+        requestManager.deleteNote(note);
+        requestManager.savePool(pool);
+        return JSONUtils.SimpleJSONResponse("OK");
+      } else {
+        return JSONUtils.SimpleJSONError("Pool does not have note " + noteId + ". Cannot remove");
+      }
+    } catch (IOException e) {
+      log.error("cannot remove note", e);
+      return JSONUtils.SimpleJSONError("Cannot remove note: " + e.getMessage());
+    }
+  }
+
+  public JSONObject addPoolNote(HttpSession session, JSONObject json) {
+    Long poolId = json.getLong("poolId");
+    String internalOnly = json.getString("internalOnly");
+    String text = json.getString("text");
+
+    try {
+      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+      Pool pool = requestManager.getPoolById(poolId);
+      Note note = new Note();
+
+      internalOnly = internalOnly.equals("on") ? "true" : "false";
+
+      note.setInternalOnly(Boolean.parseBoolean(internalOnly));
+      note.setText(text);
+      note.setOwner(user);
+      note.setCreationDate(new Date());
+      pool.getNotes().add(note);
+      requestManager.savePoolNote(pool, note);
+      pool.setLastModifier(user);
+      requestManager.savePool(pool);
+    } catch (IOException e) {
+      log.error("add pool note", e);
+      return JSONUtils.SimpleJSONError(e.getMessage());
+    }
+
+    return JSONUtils.SimpleJSONResponse("Note saved successfully");
   }
 
   public void setSecurityManager(SecurityManager securityManager) {

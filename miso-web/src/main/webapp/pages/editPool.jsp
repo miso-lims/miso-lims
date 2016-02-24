@@ -195,6 +195,48 @@
   });
 </script>
 
+<!--notes start -->
+<c:if test="${pool.id != 0}">
+    <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#notes_arrowclick'), 'notes');">Notes
+      <div id="notes_arrowclick" class="toggleLeftDown"></div>
+    </div>
+    <div id="notes">
+      <h1>Notes</h1>
+      <ul class="sddm">
+        <li>
+          <a onmouseover="mopen('notesmenu')" onmouseout="mclosetime()">Options
+            <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
+          </a>
+
+          <div id="notesmenu"
+               onmouseover="mcancelclosetime()"
+               onmouseout="mclosetime()">
+            <a onclick="Pool.ui.showPoolNoteDialog(${pool.id});" href="javascript:void(0);" class="add">Add Note</a>
+          </div>
+        </li>
+      </ul>
+      <c:if test="${fn:length(pool.notes) > 0}">
+        <div class="note" style="clear:both">
+          <c:forEach items="${pool.notes}" var="note" varStatus="n">
+            <div class="exppreview" id="pool-notes-${n.count}">
+              <b>${note.creationDate}</b>: ${note.text}
+              <span class="float-right" style="font-weight:bold; color:#C0C0C0;">${note.owner.loginName}
+                <c:if test="${(project.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
+                                or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+                  <span style="color:#000000"><a href='#' onclick="Pool.ui.deletePoolNote('${pool.id}', '${note.noteId}');">
+                    <span class="ui-icon ui-icon-trash" style="clear: both; position: relative; float: right; margin-top: -15px;"/></a></span>
+                  </span>
+                </c:if>
+            </div>
+          </c:forEach>
+        </div>
+      </c:if>
+      <div id="addPoolNoteDialog" title="Create new Note"></div>
+    </div>
+    <br/>
+</c:if>
+<!-- notes end -->
+
 <c:if test="${pool.id != 0}">
   <h1>
     <div id="qcsTotalCount">
