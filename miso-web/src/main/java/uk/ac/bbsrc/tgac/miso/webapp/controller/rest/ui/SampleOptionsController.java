@@ -17,6 +17,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import uk.ac.bbsrc.tgac.miso.dto.SampleOptionsDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.InstituteController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.KitDescriptorController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.LabController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.QcPassedDetailController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.SampleClassController;
@@ -56,6 +57,8 @@ public class SampleOptionsController {
   private LabController labController;
   @Autowired
   private InstituteController instituteController;
+  @Autowired
+  private KitDescriptorController kitDescriptorController;
 
   @RequestMapping(value = "/sampleoptions", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
@@ -72,6 +75,7 @@ public class SampleOptionsController {
     sampleOptionsDto.setSampleValidRelationshipsDtos(sampleValidRelationshipController.getSampleValidRelationships(uriBuilder, response));
     sampleOptionsDto.setInstitutesDtos(instituteController.getInstitutes(uriBuilder));
     sampleOptionsDto.setLabsDtos(labController.getLabs(uriBuilder));
+    sampleOptionsDto.setKitDescriptorsDtos(kitDescriptorController.getKitDescriptors(uriBuilder));
 
     return new ResponseEntity<>(sampleOptionsDto, HttpStatus.OK);
   }

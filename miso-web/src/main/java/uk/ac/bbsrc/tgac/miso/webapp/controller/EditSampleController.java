@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
+import static org.apache.commons.lang.StringEscapeUtils.escapeJavaScript;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -55,6 +57,7 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
+import net.sf.json.JSONObject;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
@@ -75,6 +78,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.context.ApplicationContextProvider;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.ProjectRestController;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoPropertyExporter;
 
 @Controller
@@ -94,6 +98,9 @@ public class EditSampleController {
 
   @Autowired
   private JdbcTemplate interfaceTemplate;
+  
+  @Autowired
+  private ProjectRestController projectRestController;
 
   public void setInterfaceTemplate(JdbcTemplate interfaceTemplate) {
     this.interfaceTemplate = interfaceTemplate;
@@ -109,6 +116,10 @@ public class EditSampleController {
 
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
+  }
+  
+  public void setProjectRestController(ProjectRestController projectRestController) {
+    this.projectRestController = projectRestController;
   }
   
   
@@ -291,6 +302,24 @@ public class EditSampleController {
       types.add("\"" + s.getQcTypeId() + "\"" + ":" + "\"" + s.getName() + "\"");
     }
     return LimsUtils.join(types, ",");
+  }
+  
+  // Handsontable
+  @ModelAttribute("referenceDataJson")
+  public String referenceDataJsonString() throws IOException {
+    final JSONObject rtn = new JSONObject();
+    final List<String> sampleTypes = new ArrayList<String>(requestManager.listAllSampleTypes());
+    // TODO eventually: fix this so it's not just strings...
+    final List<String> qcValues = new ArrayList<String>();
+    qcValues.add("true");
+    qcValues.add("false");
+    qcValues.add("");
+    
+    rtn.put("sampleTypes", sampleTypes);
+    rtn.put("projects", projectRestController.listAllProjects());
+    rtn.put("qcValues", qcValues);
+    
+    return escapeJavaScript(rtn.toString());
   }
 
   @RequestMapping(value = "/new", method = RequestMethod.GET)

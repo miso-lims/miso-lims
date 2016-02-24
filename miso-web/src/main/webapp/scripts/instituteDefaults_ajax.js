@@ -408,7 +408,7 @@ var Subproject = Subproject || {
     var alias = document.getElementById('subP_alias_'+suffix).value;
     var description = document.getElementById('subP_description_'+suffix).value;
     var priority = document.getElementById('subP_priority_'+suffix).value;
-    var parentProjectId = document.getElementById('subP_parentProject_'+suffix).value;
+    var parentProjectId = parseInt(document.getElementById('subP_parentProject_'+suffix).value);
     if (!alias || !description || !priority) {
       alert("Neither alias, description, nor priority can be blank.");
       return null;
@@ -755,6 +755,7 @@ var Hierarchy = Hierarchy || {
     if (event.target.value == 'new') {
       var input = '<input id="new_category" type="text" required="required" />';
       document.getElementById(event.target.id).insertAdjacentHTML('afterend', input);
+      document.getElementById('new_category').focus();
     } else {
       var inputOnPage = document.getElementById('new_category');
       if (inputOnPage) inputOnPage.parentNode.removeChild(inputOnPage);

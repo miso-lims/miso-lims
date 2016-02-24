@@ -102,7 +102,7 @@
 }
 
 .handsontable td.htInvalid {
-  background-color: #ff4c42 !important; /*gives priority over td.area selection background*/
+  background-color: #f2dede !important; /*gives priority over td.area selection background*/
 }
 
 .handsontable td.htNoWrap {
