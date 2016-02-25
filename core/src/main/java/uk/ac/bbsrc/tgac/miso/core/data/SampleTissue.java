@@ -14,10 +14,6 @@ public interface SampleTissue {
 
   void setSample(Sample sample);
 
-  Lab getLab();
-
-  void setLab(Lab lab);
-
   /**
    * @return the tissue's identifying name or ID at the source Institute
    */

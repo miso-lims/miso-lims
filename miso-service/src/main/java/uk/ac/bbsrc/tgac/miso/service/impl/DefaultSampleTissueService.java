@@ -1,7 +1,5 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import java.io.IOException;
 import java.util.Date;
 import java.util.Set;
@@ -18,12 +16,10 @@ import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import com.google.common.collect.Sets;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SampleTissueDto;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleTissueDao;
-import uk.ac.bbsrc.tgac.miso.service.LabService;
 import uk.ac.bbsrc.tgac.miso.service.SampleTissueService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
@@ -37,8 +33,6 @@ public class DefaultSampleTissueService implements SampleTissueService {
   private SecurityManager securityManager;
   @Autowired
   private AuthorizationManager authorizationManager;
-  @Autowired
-  private LabService labService;
 
   @Override
   public Long create(SampleTissue sampleTissue) throws IOException {
@@ -94,7 +88,6 @@ public class DefaultSampleTissueService implements SampleTissueService {
   @Transactional(propagation = Propagation.REQUIRED)
   public SampleTissue to(SampleTissueDto sampleTissueDto) throws IOException {
     authorizationManager.throwIfUnauthenticated();
-    checkArgument(sampleTissueDto.getLabId() != null, "A SampleTissue.labId must be provided to construct SampleTissue.");
     User user = authorizationManager.getCurrentUser();
 
     SampleTissue sampleTissue = Dtos.to(sampleTissueDto);
@@ -103,10 +96,6 @@ public class DefaultSampleTissueService implements SampleTissueService {
     Date now = new Date();
     sampleTissue.setCreationDate(now);
     sampleTissue.setLastUpdated(now);
-
-    Lab lab = labService.get(sampleTissueDto.getLabId());
-    ServiceUtils.throwIfNull(lab, "SampleTissue.labId", sampleTissueDto.getLabId());
-    sampleTissue.setLab(labService.get(sampleTissueDto.getLabId()));
 
     return sampleTissue;
   }

@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Sets;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.QcPassedDetail;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
@@ -33,6 +34,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.SampleDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SubprojectDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueOriginDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueTypeDao;
+import uk.ac.bbsrc.tgac.miso.service.LabService;
 import uk.ac.bbsrc.tgac.miso.service.SampleAdditionalInfoService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLKitDAO;
@@ -69,6 +71,9 @@ public class DefaultSampleAdditionalInfoService implements SampleAdditionalInfoS
 
   @Autowired
   private AuthorizationManager authorizationManager;
+
+  @Autowired
+  private LabService labService;
 
   @Override
   public SampleAdditionalInfo get(Long sampleAdditionalInfoId) throws IOException {
@@ -190,6 +195,11 @@ public class DefaultSampleAdditionalInfoService implements SampleAdditionalInfoS
       sampleAdditionalInfo.setPrepKit(kitDescriptor);
     }
 
+    if (sampleAdditionalInfoDto.getLabId() != null) {
+      Lab lab = labService.get(sampleAdditionalInfoDto.getLabId());
+      ServiceUtils.throwIfNull(lab, "SampleAdditionalInfo.labId", sampleAdditionalInfoDto.getLabId());
+      sampleAdditionalInfo.setLab(labService.get(sampleAdditionalInfoDto.getLabId()));
+    }
     return sampleAdditionalInfo;
   }
 

@@ -11,8 +11,6 @@ public class SampleTissueDto {
   private String createdByUrl;
   private String creationDate;
   private Long id;
-  private Long labId;
-  private String labUrl;
   private String instituteTissueName;
   private String lastUpdated;
   private Long updatedById;
@@ -107,28 +105,11 @@ public class SampleTissueDto {
     this.url = url;
   }
 
-  public Long getLabId() {
-    return labId;
-  }
-
-  public void setLabId(Long labId) {
-    this.labId = labId;
-  }
-
-  public String getLabUrl() {
-    return labUrl;
-  }
-
-  public void setLabUrl(String labUrl) {
-    this.labUrl = labUrl;
-  }
-
   @Override
   public String toString() {
     return "SampleTissueDto [bioBankId=" + bioBankId + ", cellularity=" + cellularity + ", createdById=" + createdById + ", createdByUrl="
-        + createdByUrl + ", creationDate=" + creationDate + ", id=" + id + ", labId=" + labId + ", labUrl=" + labUrl
-        + ", instituteTissueName=" + instituteTissueName + ", lastUpdated=" + lastUpdated + ", updatedById=" + updatedById
-        + ", updatedByUrl=" + updatedByUrl + ", url=" + url + "]";
+        + createdByUrl + ", creationDate=" + creationDate + ", id=" + id + ", instituteTissueName=" + instituteTissueName + ", lastUpdated="
+        + lastUpdated + ", updatedById=" + updatedById + ", updatedByUrl=" + updatedByUrl + ", url=" + url + "]";
   }
 
 }

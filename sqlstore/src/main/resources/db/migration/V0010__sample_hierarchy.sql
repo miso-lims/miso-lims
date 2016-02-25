@@ -114,6 +114,31 @@ CREATE TABLE `QcPassedDetail` (
   CONSTRAINT `FK8xn9wkmnf09k06en6m91g5ks3` FOREIGN KEY (`updatedBy`) REFERENCES `User` (`userId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE TABLE `Institute` (
+  `instituteId` bigint(20) PRIMARY KEY AUTO_INCREMENT,
+  `alias` varchar(255) NOT NULL UNIQUE,
+  `createdBy` bigint(20) NOT NULL,
+  `creationDate` datetime NOT NULL,
+  `updatedBy` bigint(20) NOT NULL,
+  `lastUpdated` datetime NOT NULL,
+  CONSTRAINT `institute_createUser_fkey` FOREIGN KEY (`createdBy`) REFERENCES `User` (`userId`),
+  CONSTRAINT `institute_updateUser_fkey` FOREIGN KEY (`updatedBy`) REFERENCES `User` (`userId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `Lab` (
+  `labId` bigint(20) PRIMARY KEY AUTO_INCREMENT,
+  `instituteId` bigint(20) NOT NULL,
+  `alias` varchar(255) NOT NULL,
+  `createdBy` bigint(20) NOT NULL,
+  `creationDate` datetime NOT NULL,
+  `updatedBy` bigint(20) NOT NULL,
+  `lastUpdated` datetime NOT NULL,
+  UNIQUE KEY `lab_institute-alias_uk` (`instituteId`,`alias`),
+  CONSTRAINT `lab_institute_fkey` FOREIGN KEY (`instituteId`) REFERENCES `Institute` (`instituteId`),
+  CONSTRAINT `lab_createUser_fkey` FOREIGN KEY (`createdBy`) REFERENCES `User` (`userId`),
+  CONSTRAINT `lab_updateUser_fkey` FOREIGN KEY (`updatedBy`) REFERENCES `User` (`userId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 CREATE TABLE `SampleAdditionalInfo` (
   `sampleAdditionalInfoId` bigint(20) NOT NULL AUTO_INCREMENT,
   `sampleId` bigint(20) NOT NULL,
@@ -128,6 +153,7 @@ CREATE TABLE `SampleAdditionalInfo` (
   `volume` double DEFAULT NULL,
   `concentration` double DEFAULT NULL,
   `archived` bit(1) NOT NULL,
+  `labId` bigint(20) DEFAULT NULL,
   `createdBy` bigint(20) NOT NULL,
   `creationDate` datetime NOT NULL,
   `updatedBy` bigint(20) NOT NULL,
@@ -148,6 +174,7 @@ CREATE TABLE `SampleAdditionalInfo` (
   CONSTRAINT `FKeutn2473w3yr16khgalspuviw` FOREIGN KEY (`createdBy`) REFERENCES `User` (`userId`),
   CONSTRAINT `FKlgx09pit706ehsyqq2tpe42do` FOREIGN KEY (`subprojectId`) REFERENCES `Subproject` (`subprojectId`),
   CONSTRAINT `FKoulifnc7plonin8pbreiovb3x` FOREIGN KEY (`tissueTypeId`) REFERENCES `TissueType` (`tissueTypeId`),
+  CONSTRAINT `sampleadditionalinfo_lab_fkey` FOREIGN KEY (`labId`) REFERENCES `Lab` (`labId`),
   CONSTRAINT `FKp8bvx3e7jsmnyw51toi7mq7cq` FOREIGN KEY (`updatedBy`) REFERENCES `User` (`userId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -292,35 +319,9 @@ CREATE TABLE `SampleValidRelationship` (
   CONSTRAINT `FKk7dtvey4xjbrt9qdwkjl00wlb` FOREIGN KEY (`childId`) REFERENCES `SampleClass` (`sampleClassId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE `Institute` (
-  `instituteId` bigint(20) PRIMARY KEY AUTO_INCREMENT,
-  `alias` varchar(255) NOT NULL UNIQUE,
-  `createdBy` bigint(20) NOT NULL,
-  `creationDate` datetime NOT NULL,
-  `updatedBy` bigint(20) NOT NULL,
-  `lastUpdated` datetime NOT NULL,
-  CONSTRAINT `institute_createUser_fkey` FOREIGN KEY (`createdBy`) REFERENCES `User` (`userId`),
-  CONSTRAINT `institute_updateUser_fkey` FOREIGN KEY (`updatedBy`) REFERENCES `User` (`userId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-CREATE TABLE `Lab` (
-  `labId` bigint(20) PRIMARY KEY AUTO_INCREMENT,
-  `instituteId` bigint(20) NOT NULL,
-  `alias` varchar(255) NOT NULL,
-  `createdBy` bigint(20) NOT NULL,
-  `creationDate` datetime NOT NULL,
-  `updatedBy` bigint(20) NOT NULL,
-  `lastUpdated` datetime NOT NULL,
-  UNIQUE KEY `lab_institute-alias_uk` (`instituteId`,`alias`),
-  CONSTRAINT `lab_institute_fkey` FOREIGN KEY (`instituteId`) REFERENCES `Institute` (`instituteId`),
-  CONSTRAINT `lab_createUser_fkey` FOREIGN KEY (`createdBy`) REFERENCES `User` (`userId`),
-  CONSTRAINT `lab_updateUser_fkey` FOREIGN KEY (`updatedBy`) REFERENCES `User` (`userId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 CREATE TABLE `SampleTissue` (
   `sampleTissueId` bigint(20) PRIMARY KEY AUTO_INCREMENT,
   `sampleId` bigint(20) NOT NULL,
-  `labId` bigint(20) NOT NULL,
   `instituteTissueName` varchar(255),
   `cellularity` int,
   `createdBy` bigint(20) NOT NULL,
@@ -328,7 +329,6 @@ CREATE TABLE `SampleTissue` (
   `updatedBy` bigint(20) NOT NULL,
   `lastUpdated` datetime NOT NULL,
   CONSTRAINT `sampleTissue_sample_fkey` FOREIGN KEY (`sampleId`) REFERENCES `Sample` (`sampleId`),
-  CONSTRAINT `sampleTissue_lab_fkey` FOREIGN KEY (`labId`) REFERENCES `Lab` (`labId`),
   CONSTRAINT `sampleTissue_createUser_fkey` FOREIGN KEY (`createdBy`) REFERENCES `User` (`userId`),
   CONSTRAINT `sampleTissue_updateUser_fkey` FOREIGN KEY (`updatedBy`) REFERENCES `User` (`userId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

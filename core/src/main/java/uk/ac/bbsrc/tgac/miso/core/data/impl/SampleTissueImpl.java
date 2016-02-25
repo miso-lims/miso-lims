@@ -13,7 +13,6 @@ import javax.persistence.Table;
 
 import com.eaglegenomics.simlims.core.User;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 
@@ -28,10 +27,6 @@ public class SampleTissueImpl implements SampleTissue {
   @OneToOne(targetEntity = SampleImpl.class)
   @JoinColumn(name = "sampleId", nullable = false)
   private Sample sample;
-
-  @OneToOne(targetEntity = LabImpl.class)
-  @JoinColumn(name = "labId", nullable = false)
-  private Lab lab;
 
   private String instituteTissueName;
   private Integer cellularity;
@@ -58,16 +53,6 @@ public class SampleTissueImpl implements SampleTissue {
   @Override
   public void setSample(Sample sample) {
     this.sample = sample;
-  }
-
-  @Override
-  public Lab getLab() {
-    return lab;
-  }
-
-  @Override
-  public void setLab(Lab lab) {
-    this.lab = lab;
   }
 
   @Override
@@ -130,17 +115,19 @@ public class SampleTissueImpl implements SampleTissue {
     this.lastUpdated = lastUpdated;
   }
 
+  @Override
   public Long getSampleTissueId() {
     return sampleTissueId;
   }
 
+  @Override
   public void setSampleTissueId(Long sampleTissueId) {
     this.sampleTissueId = sampleTissueId;
   }
 
   @Override
   public String toString() {
-    return "SampleTissueImpl [id=" + sampleTissueId + ", sample=" + sample + ", lab=" + lab + ", instituteTissueName=" + instituteTissueName
+    return "SampleTissueImpl [id=" + sampleTissueId + ", sample=" + sample + ", instituteTissueName=" + instituteTissueName
         + ", cellularity=" + cellularity + ", createdBy=" + createdBy + ", creationDate=" + creationDate + ", updatedBy=" + updatedBy
         + ", lastUpdated=" + lastUpdated + "]";
   }

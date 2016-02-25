@@ -196,6 +196,9 @@ public class Dtos {
     dto.setId(from.getSampleAdditionalInfoId());
     dto.setSampleId(from.getSample().getId());
     dto.setSampleClassId(from.getSampleClass().getSampleClassId());
+    if (from.getLab() != null) {
+      dto.setLabId(from.getLab().getId());
+    }
     if (from.getTissueOrigin() != null) {
       dto.setTissueOriginId(from.getTissueOrigin().getTissueOriginId());
     }
@@ -605,9 +608,6 @@ public class Dtos {
     SampleTissueDto dto = new SampleTissueDto();
     dto.setId(from.getSampleTissueId());
     dto.setCellularity(from.getCellularity());
-    if (from.getLab() != null) {
-      dto.setLabId(from.getLab().getId());
-    }
     dto.setInstituteTissueName(from.getInstituteTissueName());
     dto.setCreatedById(from.getCreatedBy().getUserId());
     dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
