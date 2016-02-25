@@ -213,6 +213,7 @@ public class Dtos {
     }
     dto.setPassageNumber(from.getPassageNumber());
     dto.setTimesReceived(from.getTimesReceived());
+    dto.setPieces(from.getPieces());
     dto.setVolume(from.getVolume());
     dto.setConcentration(from.getConcentration());
     dto.setCreatedById(from.getCreatedBy().getUserId());
@@ -234,6 +235,7 @@ public class Dtos {
     SampleAdditionalInfo to = new SampleAdditionalInfoImpl();
     to.setPassageNumber(from.getPassageNumber());
     to.setTimesReceived(from.getTimesReceived());
+    to.setPieces(from.getPieces());
     to.setTubeNumber(from.getTubeNumber());
     to.setVolume(from.getVolume());
     to.setConcentration(from.getConcentration());
