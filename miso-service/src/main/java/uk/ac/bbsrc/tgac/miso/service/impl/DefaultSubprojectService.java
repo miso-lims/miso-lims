@@ -58,6 +58,7 @@ public class DefaultSubprojectService implements SubprojectService {
     updatedSubproject.setAlias(subproject.getAlias());
     updatedSubproject.setDescription(subproject.getDescription());
     updatedSubproject.setPriority(subproject.getPriority());
+    updatedSubproject.setReferenceGenomeId(subproject.getReferenceGenomeId());
     User user = authorizationManager.getCurrentUser();
     updatedSubproject.setUpdatedBy(user);
     subprojectDao.update(updatedSubproject);

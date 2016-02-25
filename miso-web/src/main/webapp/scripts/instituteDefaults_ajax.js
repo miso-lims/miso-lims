@@ -37,6 +37,7 @@ var Defaults = Defaults || {
       Tissue.createTissueMaterialsTable();
       Tissue.createSamplePurposesTable();
       QC.createQcDetailsTable();
+      Subproject.getReferenceGenomeOptions();
       Subproject.getProjects();
       Lab.createLabsTable();
       Lab.createInstitutesTable();
@@ -309,9 +310,14 @@ var QC = QC || {
 
 var Subproject = Subproject || {
   projectArray: null,
+  referenceGenomeOptions: null,
 
   getProjects: function () {
     Options.makeXhrRequest('GET', '/miso/rest/project', Subproject.sortProjects);
+  },
+
+  getReferenceGenomeOptions: function () {
+    Options.makeXhrRequest('GET', '/miso/rest/referenceGenomeOptions', Subproject.saveReferenceGenomeOptions);
   },
   
   getSubprojects: function () {
@@ -323,6 +329,10 @@ var Subproject = Subproject || {
       return (a.alias > b.alias) ? 1 : ((b.alias > a.alias) ? -1 : 0);
     });
     Subproject.getSubprojects();
+  },
+
+  saveReferenceGenomeOptions: function (pxhr) {
+    Subproject.referenceGenomeOptions = JSON.parse(pxhr.response);
   },
 
   createSubprojectsTable: function (xhr) {
@@ -349,6 +359,7 @@ var Subproject = Subproject || {
         projectName = Subproject.projectArray.filter(function(p) { return p.projectId == projectId; })[0].alias;
         priority = data[i].priority;
         endpoint = data[i].url;
+        referenceGenomeId = data[i].referenceGenomeId;
 
         table.push('<tr class="subP"><td>');
         table.push('<b><span id="subP_parentProject_'+id+'">'+ projectName +'</span></b>'); // not editable after creation
@@ -358,6 +369,8 @@ var Subproject = Subproject || {
         table.push(Options.createTextInput('subP_description_'+id, description));
         table.push('</td><td>');
         table.push(Subproject.createPrioritySelect('subP_priority_'+ id, priority));
+        table.push('</td><td>');
+        table.push(Subproject.createReferenceGenomeSelect('subP_refGenome_'+ id, referenceGenomeId));
         table.push('</td><td>');
         table.push(Options.createButton('Update', "Subproject.update('"+endpoint+"', "+id+")"));
         table.push('</td><td>');
@@ -404,18 +417,33 @@ var Subproject = Subproject || {
     return select.join('');
   },
 
+  createReferenceGenomeSelect: function(idValue, referenceGenomeId) {
+    var select = [];
+    select.push('<select id="'+ idValue +'">');
+    select.push('<option value="-1">--Please select</option>');
+
+    for (var j=0; j<Subproject.referenceGenomeOptions.length; j++) {
+      select.push('<option value="'+ Subproject.referenceGenomeOptions[j].referenceGenomeId +'"');
+      if (Subproject.referenceGenomeOptions[j].referenceGenomeId == referenceGenomeId) select.push(' selected=""');
+      select.push('>'+ Subproject.referenceGenomeOptions[j].alias +'</option>');
+    }
+    select.push('</select>');
+    return select.join('');
+  },
+
   update: function (endpoint, suffix, givenMethod) {
     var alias = document.getElementById('subP_alias_'+suffix).value;
     var description = document.getElementById('subP_description_'+suffix).value;
     var priority = document.getElementById('subP_priority_'+suffix).value;
     var parentProjectId = document.getElementById('subP_parentProject_'+suffix).value;
+    var referenceGenomeId = document.getElementById('subP_refGenome_'+suffix).value;
     if (!alias || !description || !priority) {
       alert("Neither alias, description, nor priority can be blank.");
       return null;
     }
     var method = givenMethod || 'PUT';
     Options.makeXhrRequest(method, endpoint, Options.reloadTable,
-        JSON.stringify({ 'alias': alias, 'description': description, 'priority': priority, 'parentProjectId': parentProjectId }), 'SubP');
+        JSON.stringify({ 'alias': alias, 'description': description, 'priority': priority, 'parentProjectId': parentProjectId, 'referenceGenomeId': referenceGenomeId }), 'SubP');
   },
 
   addNew: function() {
@@ -437,6 +465,8 @@ var Subproject = Subproject || {
       row.push(Options.createTextInput('subP_description_new'));
       row.push('</td><td>');
       row.push(Subproject.createPrioritySelect('subP_priority_new'));
+      row.push('</td><td>');
+      row.push(Subproject.createReferenceGenomeSelect('subP_refGenome_new'));
       row.push('</td><td>');
       row.push(Options.createButton('Add', "Subproject.addNew()"));
       row.push('</td></tr>');

@@ -189,4 +189,8 @@ public interface Project extends com.eaglegenomics.simlims.core.Project, Compara
   Date getLastUpdated();
 
   void setLastUpdated(Date lastUpdated);
+
+  long getReferenceGenomeId();
+
+  void setReferenceGenomeId(long referenceGenome);
 }

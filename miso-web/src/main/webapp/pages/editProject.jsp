@@ -112,7 +112,7 @@
     </td>
   </tr>
   <tr>
-    <td class="h">Description:*</td>
+    <td class="h">Description:</td>
     <td><form:input id="description" path="description" maxlength="${maxLengths['description']}" class="validateable"/>
       <span id="descriptioncounter" class="counter"></span></td>
   </tr>
@@ -131,6 +131,16 @@
         </c:otherwise>
       </c:choose>
     </td>
+  </tr>
+  <tr>
+    <td>Reference Genome :*</td>
+    <td>
+        <form:select id="referenceGenome" path="referenceGenomeId">
+            <form:option value="-1" label="--Please Select"/>
+            <form:options items="${referenceGenome}" itemValue="referenceGenomeId" itemLabel="alias"/>
+        </form:select>
+    </td>
+
   </tr>
   <tr>
     <td></td>

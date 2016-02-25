@@ -59,6 +59,7 @@
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.InstituteImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl</value>
       </list>
     </property>
     <property name="hibernateProperties">

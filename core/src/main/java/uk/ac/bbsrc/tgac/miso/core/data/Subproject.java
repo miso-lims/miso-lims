@@ -42,4 +42,8 @@ public interface Subproject {
 
   void setPriority(Boolean priority);
 
+  void setReferenceGenomeId(Long referenceGenomeId);
+
+  Long getReferenceGenomeId();
+
 }
