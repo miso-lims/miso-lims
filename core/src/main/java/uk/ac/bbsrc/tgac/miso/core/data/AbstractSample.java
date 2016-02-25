@@ -765,7 +765,6 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
               "SampleAdditionalInfo.tissueType must be provided to create a Sample.");
           return SampleImpl.sampleAnalyte(this);
         } else if (sampleTissue != null) {
-          checkArgument(sampleTissue.getLab() != null, "SampleTissue.lab must be provided to create a SampleTissue");
           return SampleImpl.sampleTissue(this);
         }
       }

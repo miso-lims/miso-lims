@@ -79,10 +79,14 @@ public interface SampleAdditionalInfo {
   KitDescriptor getPrepKit();
 
   void setPrepKit(KitDescriptor prepKit);
-  
+
+  Lab getLab();
+
+  void setLab(Lab lab);
+
   /**
-   * This method should ONLY be used for load/save coordination between the Hibernate and old SQL DAOs. 
-   * For all other purposes, use getPrepKit().getKitDescriptorId()
+   * This method should ONLY be used for load/save coordination between the Hibernate and old SQL DAOs. For all other purposes, use
+   * getPrepKit().getKitDescriptorId()
    * 
    * @return the Kit Descriptor ID loaded by/for Hibernate
    */

@@ -32,6 +32,8 @@ public class SampleAdditionalInfoDto {
   private Long updatedById;
   private String updatedByUrl;
   private String lastUpdated;
+  private Long labId;
+  private String labUrl;
 
   public Long getId() {
     return id;
@@ -247,6 +249,22 @@ public class SampleAdditionalInfoDto {
 
   public void setPrepKitUrl(String prepKitUrl) {
     this.prepKitUrl = prepKitUrl;
+  }
+
+  public Long getLabId() {
+    return labId;
+  }
+
+  public void setLabId(Long labId) {
+    this.labId = labId;
+  }
+
+  public String getLabUrl() {
+    return labUrl;
+  }
+
+  public void setLabUrl(String labUrl) {
+    this.labUrl = labUrl;
   }
 
 }
