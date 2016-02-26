@@ -43,6 +43,10 @@ var Defaults = Defaults || {
       Hierarchy.createSampleClassesTable();
       Hierarchy.createRelationshipsTable();
     }
+    // expand table if anchor link was clicked
+    var clickedAnchor = window.location.hash.substr(1);
+    if (clickedAnchor && document.getElementById(clickedAnchor)) {
+      document.getElementById(clickedAnchor).click();
   }
 };
 

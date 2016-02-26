@@ -110,7 +110,7 @@
             <a href="<c:url value='/miso/admin/instituteDefaults#types'/>">Tissue Types</a><br/>
             <a href="<c:url value='/miso/admin/instituteDefaults#materials'/>">Tissue Materials</a><br/>
             <a href="<c:url value='/miso/admin/instituteDefaults#purposes'/>">Sample Purposes</a><br/>
-            <a href="<c:url value='/miso/admin/instituteDefaults#qcDetails'/>">QC Details</a><br/>
+            <a href="<c:url value='/miso/admin/instituteDefaults#qcdetails'/>">QC Details</a><br/>
             <a href="<c:url value='/miso/admin/instituteDefaults#subprojects'/>">Subprojects</a><br/>
             <a href="<c:url value='/miso/admin/instituteDefaults#institutes'/>">Institutes</a><br/>
             <a href="<c:url value='/miso/admin/instituteDefaults#labs'/>">Labs</a><br/>
