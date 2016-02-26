@@ -183,16 +183,6 @@ public class SampleAdditionalInfoImpl implements SampleAdditionalInfo {
   }
 
   @Override
-  public Double getVolume() {
-    return volume;
-  }
-
-  @Override
-  public void setVolume(Double volume) {
-    this.volume = volume;
-  }
-
-  @Override
   public Double getConcentration() {
     return concentration;
   }

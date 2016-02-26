@@ -216,7 +216,6 @@ public class Dtos {
     }
     dto.setPassageNumber(from.getPassageNumber());
     dto.setTimesReceived(from.getTimesReceived());
-    dto.setVolume(from.getVolume());
     dto.setConcentration(from.getConcentration());
     dto.setCreatedById(from.getCreatedBy().getUserId());
     dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
@@ -239,7 +238,6 @@ public class Dtos {
     to.setPassageNumber(from.getPassageNumber());
     to.setTimesReceived(from.getTimesReceived());
     to.setTubeNumber(from.getTubeNumber());
-    to.setVolume(from.getVolume());
     to.setConcentration(from.getConcentration());
     return to;
   }
