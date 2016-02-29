@@ -112,6 +112,7 @@ public class SampleController extends RestController {
     try {
       id = sampleService.create(sampleDto);
     } catch (ConstraintViolationException | IllegalArgumentException e) {
+      log.error("Error while creating sample. ", e);
       throw new RestException(e.getMessage(), Status.BAD_REQUEST);
     }
     UriComponents uriComponents = b.path("/sample/{id}").buildAndExpand(id);

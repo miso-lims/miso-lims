@@ -65,9 +65,13 @@
       <props>
         <prop key="hibernate.dialect">org.hibernate.dialect.MySQL5InnoDBDialect</prop>
         <prop key="hibernate.show_sql">true</prop>
-        <!-- <prop key="hibernate.hbm2ddl.auto">create</prop> -->
       </props>
     </property>
+    <property name="mappingResources">
+      <list>
+        <value>hibernate/miso.hbm.xml</value>
+      </list>
+    </property> 
   </bean>
 
   <tx:annotation-driven/>
