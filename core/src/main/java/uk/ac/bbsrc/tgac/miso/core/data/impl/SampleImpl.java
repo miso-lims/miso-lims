@@ -92,6 +92,7 @@ public class SampleImpl extends AbstractSample implements Serializable {
     setSampleType(builder.getSampleType());
     setScientificName(builder.getScientificName());
     setLastModifier(builder.getUser());
+    setVolume(builder.getVolume());
 
     if (!LimsUtils.isStringEmptyOrNull(builder.getAccession())) {
       setAccession(builder.getAccession());

@@ -82,13 +82,19 @@ public class DefaultSampleService implements SampleService {
     return sample;
   }
 
+  private boolean isParentedSample(Sample sample) {
+    // All parented samples contain a SampleAdditionalInfo reference.
+    return sample.getSampleAdditionalInfo() != null;
+  }
+
   @Override
   public Long create(SampleDto sampleDto) throws IOException {
     // Construct a Sample from the SampleDto.
     Sample sample = to(sampleDto);
     authorizationManager.throwIfNotWritable(sample);
     User user = authorizationManager.getCurrentUser();
-    if (sampleDto.getParentId() == null) {
+
+    if (sampleDto.getParentId() == null && isParentedSample(sample)) {
       log.debug("No parent has been provided.");
       if (sampleDto.getSampleIdentity() != null && !LimsUtils.isStringEmptyOrNull(sampleDto.getSampleIdentity().getExternalName())) {
         log.debug("Obtaining parent based on external name.");
@@ -126,7 +132,8 @@ public class DefaultSampleService implements SampleService {
         .sampleAdditionalInfo(sample.getSampleAdditionalInfo()).sampleAnalyte(sample.getSampleAnalyte()).accession(sample.getAccession())
         .name(sample.getName()).identificationBarcode(sample.getIdentificationBarcode()).locationBarcode(sample.getLocationBarcode())
         .receivedDate(sample.getReceivedDate()).qcPassed(sample.getQcPassed()).alias(sample.getAlias())
-        .taxonIdentifier(sample.getTaxonIdentifier()).parent(sample.getParent()).sampleTissue(sample.getSampleTissue()).build();
+        .taxonIdentifier(sample.getTaxonIdentifier()).parent(sample.getParent()).sampleTissue(sample.getSampleTissue())
+        .volume(sample.getVolume()).build();
 
     if (!LimsUtils.isValidRelationship(sampleValidRelationshipService.getAll(), newSample.getParent(), newSample)) {
       throw new IllegalArgumentException("Parent " + newSample.getParent().getSampleAdditionalInfo().getSampleClass().getAlias()
