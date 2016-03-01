@@ -206,7 +206,7 @@ public class SQLSecurityDAO implements SecurityStore {
       if (existingUser != null) {
         // if the user already exists, but no password has been set, grab the existing one
         // this is probably due to an admin change of user properties, but not a password change
-        if (!isStringEmptyOrNull(user.getPassword())) {
+        if (isStringEmptyOrNull(user.getPassword())) {
           if (!isStringEmptyOrNull(existingUser.getPassword())) {
             user.setPassword(existingUser.getPassword());
             params.addValue("password", user.getPassword());
