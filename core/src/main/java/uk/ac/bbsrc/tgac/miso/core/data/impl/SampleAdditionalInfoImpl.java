@@ -71,8 +71,6 @@ public class SampleAdditionalInfoImpl implements SampleAdditionalInfo {
 
   private Integer tubeNumber;
 
-  private Double volume;
-
   private Double concentration;
 
   @Column(nullable = false)
@@ -286,11 +284,12 @@ public class SampleAdditionalInfoImpl implements SampleAdditionalInfo {
 
   @Override
   public String toString() {
-    return "SampleAdditionalInfo[id = " + sampleAdditionalInfoId + ", sample=" + sample + ", sampleClass=" + sampleClass + ", tissueOrigin="
-        + tissueOrigin + ", tissueType=" + tissueType + ", qcPassedDetail=" + qcPassedDetail + ", subproject=" + subproject + ", lab=" + lab
-        + ", kitDescriptorId=" + kitDescriptorId + ", passageNumber=" + passageNumber + ", timesReceived=" + timesReceived + ", tubeNumber="
-        + tubeNumber + ", volume=" + volume + ", concentration=" + concentration + ", archived=" + archived + ", createdBy=" + createdBy
-        + ", creationDate=" + creationDate + ", updatedBy=" + updatedBy + ", lastUpdated=" + lastUpdated + "]";
+    return "SampleAdditionalInfoImpl [sampleAdditionalInfoId=" + sampleAdditionalInfoId + ", sample=" + sample + ", sampleClass="
+        + sampleClass + ", tissueOrigin=" + tissueOrigin + ", tissueType=" + tissueType + ", qcPassedDetail=" + qcPassedDetail
+        + ", subproject=" + subproject + ", lab=" + lab + ", kitDescriptorId=" + kitDescriptorId + ", prepKit=" + prepKit
+        + ", passageNumber=" + passageNumber + ", timesReceived=" + timesReceived + ", tubeNumber=" + tubeNumber + ", concentration="
+        + concentration + ", archived=" + archived + ", createdBy=" + createdBy + ", creationDate=" + creationDate + ", updatedBy="
+        + updatedBy + ", lastUpdated=" + lastUpdated + "]";
   }
 
 }
