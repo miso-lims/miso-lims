@@ -102,7 +102,7 @@ public abstract class AbstractProject implements Project {
   private ProgressType progress;
 
   @Column
-  private long referenceGenomeId;
+  private Long referenceGenomeId;
 
   @Transient
   private SecurityProfile securityProfile = null;
@@ -464,12 +464,12 @@ public abstract class AbstractProject implements Project {
   }
 
   @Override
-  public long getReferenceGenomeId() {
+  public Long getReferenceGenomeId() {
     return referenceGenomeId;
   }
 
   @Override
-  public void setReferenceGenomeId(long referenceGenomeId) {
+  public void setReferenceGenomeId(Long referenceGenomeId) {
     this.referenceGenomeId = referenceGenomeId;
   }
 

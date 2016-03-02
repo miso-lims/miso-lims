@@ -133,21 +133,19 @@
     </td>
   </tr>
   <tr>
+      <td></td>
+      <td>
+        <div class="parsley-errors-list filled" id="progressSelectError">
+          <div class="parsley-required"></div>
+        </div>
+      </td>
+  </tr>
+  <tr>
     <td>Reference Genome :*</td>
     <td>
         <form:select id="referenceGenome" path="referenceGenomeId">
-            <form:option value="-1" label="--Please Select"/>
             <form:options items="${referenceGenome}" itemValue="referenceGenomeId" itemLabel="alias"/>
         </form:select>
-    </td>
-
-  </tr>
-  <tr>
-    <td></td>
-    <td>
-      <div class="parsley-errors-list filled" id="progressSelectError">
-        <div class="parsley-required"></div>
-      </div>
     </td>
   </tr>
 </table>

@@ -2,6 +2,8 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -12,7 +14,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
 public class ReferenceGenomeImpl implements ReferenceGenome {
 
   @Id
-  @Column(unique = true, nullable = false)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long referenceGenomeId;
 
   @Column(unique = true, nullable = false)

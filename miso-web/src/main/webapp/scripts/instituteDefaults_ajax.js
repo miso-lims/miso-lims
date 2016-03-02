@@ -317,7 +317,7 @@ var Subproject = Subproject || {
   },
 
   getReferenceGenomeOptions: function () {
-    Options.makeXhrRequest('GET', '/miso/rest/referenceGenomeOptions', Subproject.saveReferenceGenomeOptions);
+    Options.makeXhrRequest('GET', '/miso/rest/referencegenomes', Subproject.saveReferenceGenomeOptions);
   },
   
   getSubprojects: function () {
@@ -398,7 +398,7 @@ var Subproject = Subproject || {
   createProjectsSelect: function(idValue, projectId) {
     var selectedProjectId = projectId || '';
     var select = [];
-    select.push('<select id="'+ idValue +'">');
+    select.push('<select id="'+ idValue +'" onchange="Subproject.selectReferenceGenome();">');
     for (var j=0;j<Subproject.projectArray.length;j++) {
       select.push('<option value="'+ Subproject.projectArray[j].projectId +'"');
       if (Subproject.projectArray[j].projectId == selectedProjectId) select.push(' selected=""');
@@ -417,14 +417,23 @@ var Subproject = Subproject || {
     return select.join('');
   },
 
+  getProjectGenomeReferenceId: function(projectId) {
+    for (var j=0;j<Subproject.projectArray.length;j++) {
+      if (Subproject.projectArray[j].projectId === parseInt(projectId)) {
+        return Subproject.projectArray[j].referenceGenomeId;
+      }
+    }
+    return null;
+  },
+
   createReferenceGenomeSelect: function(idValue, referenceGenomeId) {
+   
     var select = [];
     select.push('<select id="'+ idValue +'">');
-    select.push('<option value="-1">--Please select</option>');
 
     for (var j=0; j<Subproject.referenceGenomeOptions.length; j++) {
       select.push('<option value="'+ Subproject.referenceGenomeOptions[j].referenceGenomeId +'"');
-      if (Subproject.referenceGenomeOptions[j].referenceGenomeId == referenceGenomeId) select.push(' selected=""');
+      if (Subproject.referenceGenomeOptions[j].referenceGenomeId === referenceGenomeId) select.push(' selected=""');
       select.push('>'+ Subproject.referenceGenomeOptions[j].alias +'</option>');
     }
     select.push('</select>');
@@ -473,7 +482,22 @@ var Subproject = Subproject || {
 
       document.getElementById('allSubprojects').insertAdjacentHTML('beforeend', row.join(''));
       document.getElementById('subP_alias_new').focus();
+
+      this.selectReferenceGenome();
     }
+  },
+
+    selectReferenceGenome: function() {
+
+        var projectId = document.getElementById("subP_parentProject_new").value;
+        referenceGenomeId = this.getProjectGenomeReferenceId(projectId);
+
+        var select = document.getElementById("subP_refGenome_new");
+        for(var i = 0;i < select.options.length;i++){
+            if(select.options[i].value === referenceGenomeId + "" ){
+                select.options[i].selected = true;
+            }
+        }
   }
 };
 

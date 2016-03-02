@@ -37,7 +37,7 @@ public class DefaultReferenceGenomeService implements ReferenceGenomeService {
 
   @Override
   public Collection<ReferenceGenome> listAllReferenceGenomeTypes() throws IOException {
-    authorizationManager.throwIfNonAdmin();
+    authorizationManager.throwIfUnauthenticated();
     return referenceGenomeDao.listAllReferenceGenomeTypes();
   }
 

@@ -109,7 +109,7 @@ public class SubprojectController extends RestController {
     return subprojectDtos;
   }
 
-  @RequestMapping(value = "/referenceGenomeOptions", method = RequestMethod.GET, produces = { "application/json" })
+  @RequestMapping(value = "/referencegenomes", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
   public Collection<ReferenceGenome> getReferenceGenomeOptions(UriComponentsBuilder uriComponentsBuilder, HttpServletResponse response) throws IOException {
     return referenceGenomeService.listAllReferenceGenomeTypes();
