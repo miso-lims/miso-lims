@@ -53,6 +53,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.support.lob.LobHandler;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
@@ -119,6 +120,8 @@ public class SQLSecurityDAO implements SecurityStore {
   public static final String GROUP_UPDATE = "UPDATE " + GROUP_TABLE_NAME + " SET name=:name, description=:description " + "WHERE groupId=:groupId";
 
   public static final String USER_GROUP_DELETE_BY_USER_ID = "DELETE FROM User_Group " + "WHERE users_userId=:userId";
+
+  public static final String GET_ENCODED_PASSWORD = "Select password FROM User WHERE userId = ?";
 
   protected static final Logger log = LoggerFactory.getLogger(SQLSecurityDAO.class);
 
@@ -282,6 +285,16 @@ public class SQLSecurityDAO implements SecurityStore {
     List results = template.query(USER_SELECT_BY_ID, new Object[] { userId }, new UserMapper());
     User u = results.size() > 0 ? (User) results.get(0) : null;
     return u;
+  }
+
+  /**
+   * bypass cache and get password directly from database
+   * @param userId
+   * @return
+   * @throws IOException
+   */
+  public String getEncodedPassword(Long userId) throws IOException {
+    return template.queryForObject(GET_ENCODED_PASSWORD, new Object[] { userId }, String.class);
   }
 
   @Override
