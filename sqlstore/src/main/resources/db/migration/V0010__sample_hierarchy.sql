@@ -2,6 +2,8 @@
 -- Switch tables to InnoDB to permit foreign key constraints.
 --StartNoTest
 ALTER TABLE Sample ENGINE = InnoDB ROW_FORMAT = DEFAULT;
+ALTER TABLE Platform ENGINE = InnoDB ROW_FORMAT = DEFAULT;
+ALTER TABLE Pool ENGINE = InnoDB ROW_FORMAT = DEFAULT;
 ALTER TABLE Project ENGINE = InnoDB ROW_FORMAT = DEFAULT;
 ALTER TABLE KitDescriptor ENGINE = InnoDB ROW_FORMAT = DEFAULT;
 ALTER TABLE User ENGINE = InnoDB ROW_FORMAT = DEFAULT;
@@ -344,3 +346,65 @@ CREATE TABLE `LibraryPropagationRule` (
   CONSTRAINT `FK_lpr_strategytype` FOREIGN KEY (`libraryStrategyType`) REFERENCES `LibraryStrategyType` (`libraryStrategyTypeId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE TABLE `SequencingParameters` (
+  `parametersId` bigint(20) PRIMARY KEY AUTO_INCREMENT,
+  `name` text NOT NULL,
+  `platformId` bigint(20) NOT NULL,
+  `createdBy` bigint(20) NOT NULL,
+  `creationDate` datetime NOT NULL,
+  `updatedBy` bigint(20) NOT NULL,
+  `lastUpdated` datetime NOT NULL,
+  CONSTRAINT `sequencingParameters_createUser_fkey` FOREIGN KEY (`createdBy`) REFERENCES `User` (`userId`),
+  CONSTRAINT `sequencingParameters_updateUser_fkey` FOREIGN KEY (`updatedBy`) REFERENCES `User` (`userId`),
+  CONSTRAINT `parameter_platformId_fkey` FOREIGN KEY (`platformId`) REFERENCES `Platform` (`platformId`)
+) ENGINE=InnoDB CHARSET=utf8;
+
+INSERT INTO `SequencingParameters` (`platformId`, `name`, `createdBy`, `updatedBy`, `creationDate`, `lastUpdated`)
+VALUES
+	(16,'v3 1×101', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+	(16,'v3 1×51', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+	(16,'v3 2×101', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+	(16,'v3 2×51', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+	(16,'v4 1×136', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+	(16,'v4 2×126', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+	(16,'Rapid Run 1×101', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+	(16,'Rapid Run 1×51', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+	(16,'Rapid Run 2×101', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+	(16,'Rapid Run 2×51', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+	(24,'1×300', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+	(24,'1×50', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+	(24,'1×500', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+	(24,'2×101', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+	(24,'2×151', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+	(24,'2×250', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+	(24,'2×26', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+	(24,'2×36', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+	(24,'300×200', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+	(25,'v3 1×101', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+	(25,'v3 1×51', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+	(25,'v3 2×101', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+	(25,'v3 2×51', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+	(25,'v4 1×136', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+	(25,'v4 2×126', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+	(25,'Rapid Run 1×101', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+	(25,'Rapid Run 1×51', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+	(25,'Rapid Run 2×101', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+	(25,'Rapid Run 2×51', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+CREATE TABLE `PoolOrder` (
+  `poolOrderId` bigint(20) PRIMARY KEY AUTO_INCREMENT,
+  `poolId` bigint(20) NOT NULL,
+  `partitions` int NOT NULL,
+  `parametersId` bigint(20),
+  `createdBy` bigint(20) NOT NULL,
+  `creationDate` datetime NOT NULL,
+  `updatedBy` bigint(20) NOT NULL,
+  `lastUpdated` datetime NOT NULL,
+  CONSTRAINT `order_poolId_fkey` FOREIGN KEY (`poolId`) REFERENCES `Pool` (`poolId`),
+  CONSTRAINT `order_parametersId_fkey` FOREIGN KEY (`parametersId`) REFERENCES `SequencingParameters` (`parametersId`),
+  CONSTRAINT `order_createUser_fkey` FOREIGN KEY (`createdBy`) REFERENCES `User` (`userId`),
+  CONSTRAINT `order_updateUser_fkey` FOREIGN KEY (`updatedBy`) REFERENCES `User` (`userId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+ALTER TABLE Run ADD COLUMN sequencingParameters_parametersId bigint(20);
+ALTER TABLE Run ADD FOREIGN KEY (sequencingParameters_parametersId) REFERENCES SequencingParameters (parametersId);

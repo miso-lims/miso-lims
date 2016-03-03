@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Set;
 
 import org.joda.time.format.DateTimeFormatter;
@@ -12,6 +13,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Institute;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryAdditionalInfo;
+import uk.ac.bbsrc.tgac.miso.core.data.PoolOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.QcPassedDetail;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
@@ -22,6 +24,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleNumberPerProject;
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
@@ -30,6 +33,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstituteImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAdditionalInfoImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrderImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.QcPassedDetailImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAdditionalInfoImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAnalyteImpl;
@@ -103,7 +107,6 @@ public class Dtos {
 
   public static TissueType to(TissueTypeDto from) {
     TissueType to = new TissueTypeImpl();
-    to.setTissueTypeId(from.getId());
     to.setAlias(from.getAlias());
     to.setDescription(from.getDescription());
     return to;
@@ -358,7 +361,6 @@ public class Dtos {
 
   public static SampleGroupId to(SampleGroupDto from) {
     SampleGroupId to = new SampleGroupImpl();
-    to.setSampleGroupId(from.getId());
     to.setGroupId(from.getGroupId());
     to.setDescription(from.getDescription());
     return to;
@@ -766,4 +768,53 @@ public class Dtos {
     return to;
   }
 
+
+  public static PoolOrderDto asDto(PoolOrder from) {
+    PoolOrderDto dto = new PoolOrderDto();
+    dto.setId(from.getId());
+    dto.setParameters(asDto(from.getSequencingParameter()));
+    dto.setPartitions(from.getPartitions());
+    dto.setCreatedById(from.getCreatedBy().getUserId());
+    dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
+    dto.setUpdatedById(from.getUpdatedBy().getUserId());
+    dto.setLastUpdated(dateTimeFormatter.print(from.getLastUpdated().getTime()));
+    return dto;
+  }
+
+  public static Set<PoolOrderDto> asPoolOrderDtos(Collection<PoolOrder> from) {
+    Set<PoolOrderDto> dtoSet = Sets.newHashSet();
+    for (PoolOrder po : from) {
+      dtoSet.add(asDto(po));
+    }
+    return dtoSet;
+  }
+
+  public static PoolOrder to(PoolOrderDto from) {
+    PoolOrder to = new PoolOrderImpl();
+    to.setId(from.getId());
+    to.setPartitions(from.getPartitions());
+    return to;
+  }
+
+  public static SequencingParametersDto asDto(SequencingParameters from) {
+    SequencingParametersDto dto = new SequencingParametersDto();
+    dto.setId(from.getId());
+    dto.setName(from.getName());
+    dto.setPlatformId(from.getPlatformId());
+    return dto;
+  }
+
+  public static Set<SequencingParametersDto> asSequencingParametersDtos(Collection<SequencingParameters> from) {
+    Set<SequencingParametersDto> dtoSet = Sets.newTreeSet(new Comparator<SequencingParametersDto>() {
+
+      @Override
+      public int compare(SequencingParametersDto o1, SequencingParametersDto o2) {
+        return o1.getName().compareTo(o2.getName());
+      }
+    });
+    for (SequencingParameters sp : from) {
+      dtoSet.add(asDto(sp));
+    }
+    return dtoSet;
+  }
 }
