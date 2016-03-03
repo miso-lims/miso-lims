@@ -30,7 +30,7 @@ public class HibernateSampleNumberPerProjectDao implements SampleNumberPerProjec
   private SessionFactory sessionFactory;
 
   private Session currentSession() {
-    return sessionFactory.getCurrentSession();
+    return getSessionFactory().getCurrentSession();
   }
 
   @Override
@@ -103,6 +103,14 @@ public class HibernateSampleNumberPerProjectDao implements SampleNumberPerProjec
       stringBuffer.append("0");
     }
     return stringBuffer.toString() + highestSampleNumber;
+  }
+
+  public SessionFactory getSessionFactory() {
+    return sessionFactory;
+  }
+
+  public void setSessionFactory(SessionFactory sessionFactory) {
+    this.sessionFactory = sessionFactory;
   }
 
 }

@@ -26,7 +26,7 @@ public class HibernateIdentityDao implements IdentityDao {
   private SessionFactory sessionFactory;
 
   private Session currentSession() {
-    return sessionFactory.getCurrentSession();
+    return getSessionFactory().getCurrentSession();
   }
 
   @Override
@@ -68,6 +68,14 @@ public class HibernateIdentityDao implements IdentityDao {
     Date now = new Date();
     identity.setLastUpdated(now);
     currentSession().update(identity);
+  }
+
+  public SessionFactory getSessionFactory() {
+    return sessionFactory;
+  }
+
+  public void setSessionFactory(SessionFactory sessionFactory) {
+    this.sessionFactory = sessionFactory;
   }
 
 }

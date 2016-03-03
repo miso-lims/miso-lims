@@ -26,7 +26,7 @@ public class HibernateLabDao implements LabDao {
   private SessionFactory sessionFactory;
 
   private Session currentSession() {
-    return sessionFactory.getCurrentSession();
+    return getSessionFactory().getCurrentSession();
   }
 
   @Override
@@ -60,6 +60,14 @@ public class HibernateLabDao implements LabDao {
     Date now = new Date();
     lab.setLastUpdated(now);
     currentSession().update(lab);
+  }
+
+  public SessionFactory getSessionFactory() {
+    return sessionFactory;
+  }
+
+  public void setSessionFactory(SessionFactory sessionFactory) {
+    this.sessionFactory = sessionFactory;
   }
 
 }

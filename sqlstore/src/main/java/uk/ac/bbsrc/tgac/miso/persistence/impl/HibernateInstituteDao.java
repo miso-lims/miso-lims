@@ -26,7 +26,7 @@ public class HibernateInstituteDao implements InstituteDao {
   private SessionFactory sessionFactory;
 
   private Session currentSession() {
-    return sessionFactory.getCurrentSession();
+    return getSessionFactory().getCurrentSession();
   }
 
   @Override
@@ -60,6 +60,14 @@ public class HibernateInstituteDao implements InstituteDao {
     Date now = new Date();
     institute.setLastUpdated(now);
     currentSession().update(institute);
+  }
+
+  public SessionFactory getSessionFactory() {
+    return sessionFactory;
+  }
+
+  public void setSessionFactory(SessionFactory sessionFactory) {
+    this.sessionFactory = sessionFactory;
   }
 
 }
