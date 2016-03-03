@@ -348,6 +348,49 @@
 </table>
 <br/>
 
+<c:if test="${pool.poolId != 0}">
+  <h1>Orders</h1>
+
+  <div class="note">
+    <div id="orderlist" class="elementList ui-corner-all">
+    </div>
+    <form id="neworder">
+      Partitions: <input type="text" name="partitions" value="1" id="newOrderParitions" /><br/>
+      Platform: <select id="newOrderPlatformId" onchange="Pool.orders.changePlatform(null)"><c:forEach items="${platforms}" var="platform"><option value="${platform.platformId}">${platform.nameAndModel}</option></c:forEach></select><br/>
+      Sequencing Parameters: <select id="newOrderParameterId"><c:forEach items="${sequencingParameters}" var="sp"><option value="${sp.id}">${sp.name}</option></c:forEach></select><br/>
+      <input type="submit" class="br-button ui-state-default ui-corner-all" value="Add" onclick="return Pool.orders.addOrder(${pool.id})"/>
+    </form>
+  </div>
+  <c:if test="${not empty ordercompletions}">
+  <br/>
+    <h1>Order Completion</h1>
+    <span style="clear:both">
+      <table class="list" id="changelog_table">
+        <thead>
+        <tr>
+          <th>Platform</th>
+          <th>Parameters</th>
+          <th>Requested</th>
+          <th>Completed</th>
+          <th>Remaining</th>
+        </tr>
+        </thead>
+        <tbody>
+        <c:forEach items="${ordercompletions}" var="completion">
+          <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
+            <td>${completion.sequencingParameters.platform.nameAndModel}</td>
+            <td>${completion.sequencingParameters.name}</td>
+            <td>${completion.desiredPartitions}</td>
+            <td>${completion.completedPartitions}</td>
+            <td>${completion.remainingPartitions}</td>
+          </tr>
+        </c:forEach>
+        </tbody>
+      </table>
+    </span>
+  </c:if>
+</c:if>
+
 <h1>Pooled Elements</h1>
 
 <div class="note">
@@ -523,6 +566,10 @@
       countDirection: 'down'
     });
   });
+  Defaults = { 'all': {}};
+  Defaults.all.sequencingParameters = ${sequencingParametersJson};
+  Defaults.all.platforms = [ <c:forEach items="${platforms}" var="platform">{ 'id' : ${platform.platformId}, 'nameAndModel' : '${platform.nameAndModel}'}, </c:forEach> ];
+  Pool.orders.loadOrders(${pool.id});
 </script>
 
 <%@ include file="adminsub.jsp" %>

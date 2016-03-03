@@ -831,3 +831,86 @@ Pool.barcode = {
     );
   }
 };
+
+Pool.orders = Pool.orders || {
+  'makeXhrRequest': function (method, endpoint, callback, data, callbackarg) {
+    var expectedStatus;
+    var unauthorizedStatus = 401;
+    if (method == 'POST') {
+      expectedStatus = [201, 200];
+    } else {
+      expectedStatus = [200];
+    }
+    var xhr = new XMLHttpRequest();
+    xhr.open(method, endpoint);
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState === XMLHttpRequest.DONE) {
+        if (expectedStatus.indexOf(xhr.status) != -1) {
+          if (!callback) {
+            document.location.reload();
+          } else {
+            data ? ( callbackarg ? callback(callbackarg) : callback() ) : callback(xhr) ;
+          }
+        } else if (xhr.status === unauthorizedStatus) {
+          alert("You are not authorized to view this page.");
+        } else {
+          alert("Sorry, something went wrong. Please try again. If the issue persists, contact your administrator.");
+        }
+      }
+    };
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    data ? xhr.send(data) : xhr.send();
+  },
+  'addOrder': function(poolId) {
+    Pool.orders.makeXhrRequest('POST', '/miso/rest/poolorder', Pool.orders.loadOrders, JSON.stringify({ 'poolId': poolId, 'partitions': document.getElementById('newOrderParitions').value, 'parameters': { 'id': document.getElementById('newOrderParameterId').value } }), poolId);
+    return false;
+  },
+  'loadOrders': function(poolId) {
+    Pool.orders.makeXhrRequest('GET', '/miso/rest/pool/' + poolId + '/orders', function(xhr) {
+      var orders = JSON.parse(xhr.responseText);
+      document.getElementById('orderlist').innerHTML = orders.map(function(order) {
+        var platformOptions = Defaults.all.platforms.map(function(platform) {
+          return '<option value="' + platform.id + '"' + ((platform.id == order.parameters.platformId) ? " selected" : "") + '>' + platform.nameAndModel + '</option>';
+        }).join('');
+        var parameterOptions = Pool.orders.optionsForPlatform(function(parameter) {
+          return parameter.platformId == order.parameters.platformId;
+        }, order.parameters.id);
+        return ('<div id="order' + order.id + '" onmouseover="this.className=\'dashboardhighlight\'" onmouseout="this.className=\'dashboard\'" class="dashboard">' +
+          '<span class="float-left">' +
+          '<b>Partitions:</b> <input type="text" id="partitions' + order.id + '" value="' + order.partitions + '"/><br/>' +
+          '<b>Platform:</b> <select id="platforms' + order.id + '" onchange="Pool.orders.changePlatform(' + order.id + ')">' + platformOptions + '</select><br/>' +
+          '<b>Sequencing Parameters:</b> <select id="parameters' + order.id + '">' + parameterOptions + '</select><br/>' +
+          '<input type="submit" class="br-button ui-state-default ui-corner-all" onclick="return Pool.orders.saveOrder(' + order.id + ', ' + poolId + ')" value="Save" /></span>' +
+          '<span onclick="Pool.orders.removeOrder(' + order.id + ', ' + poolId + ');" class="float-right ui-icon ui-icon-circle-close"></span>' +
+          '</div>');
+      }).join('');
+    });
+  },
+  'optionsForPlatform' : function(filterCallback, selectedParameterId) {
+     var options = Defaults.all.sequencingParameters.filter(filterCallback).sort(function(a, b) {
+          return a.name < b.name ? -1 : (a.name == b.name ? 0 : 1);
+        }).map(function(parameter) {
+          return '<option value="' + parameter.id + '"' + ((parameter.id == selectedParameterId) ? " selected" : "") + '>' + parameter.name + '</option>';
+        }).join('');
+     if (options == '') {
+       return '<option value="-1" selected>Default</option>';
+     }
+     return options;
+   },
+  'changePlatform' : function(orderId) {
+     var platformId = document.getElementById(orderId == null ? 'newOrderPlatformId' : ('platforms' + orderId)).value;
+     document.getElementById(orderId == null ? 'newOrderParameterId' : ('parameters' + orderId)).innerHTML = Pool.orders.optionsForPlatform(function(parameter) {
+       return parameter.platformId == platformId;
+     }, null);
+   },
+  'saveOrder': function(orderId, poolId) {
+    Pool.orders.makeXhrRequest('PUT', '/miso/rest/poolorder/' + orderId, function() { Pool.orders.loadOrders(poolId); }, JSON.stringify({ 'partitions': document.getElementById('partitions' + orderId).value, 'parameters': { 'id': document.getElementById('parameters' + orderId).value } }));
+    return false;
+  },
+  'removeOrder': function(orderId, poolId) {
+    if (confirm('Delete this order?')) {
+      Pool.orders.makeXhrRequest('DELETE', '/miso/rest/poolorder/' + orderId, function() { Pool.orders.loadOrders(poolId); }, null);
+    }
+    return false;
+  }
+};
