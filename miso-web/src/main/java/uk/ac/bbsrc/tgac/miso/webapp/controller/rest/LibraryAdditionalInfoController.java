@@ -92,7 +92,7 @@ public class LibraryAdditionalInfoController extends RestController {
         .buildAndExpand(libraryAdditionalInfoDto.getTissueType().getId()).toUriString());
     if (libraryAdditionalInfoDto.getSampleGroup() != null) {
       libraryAdditionalInfoDto.getSampleGroup().setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/samplegroup/{id}")
-          .buildAndExpand(libraryAdditionalInfoDto.getSampleGroup()).toUriString());
+          .buildAndExpand(libraryAdditionalInfoDto.getSampleGroup().getId()).toUriString());
     }
     if (libraryAdditionalInfoDto.getPrepKit() != null && libraryAdditionalInfoDto.getPrepKit().getId() != null) {
       libraryAdditionalInfoDto.getPrepKit().setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/kitdescriptor/{id}")

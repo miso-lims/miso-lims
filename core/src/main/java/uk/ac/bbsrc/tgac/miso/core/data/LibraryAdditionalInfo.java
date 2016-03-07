@@ -48,6 +48,10 @@ public interface LibraryAdditionalInfo {
 
   void setLastUpdated(Date lastUpdated);
   
+  Boolean getArchived();
+
+  void setArchived(Boolean archived);
+  
   /**
    * This method should ONLY be used for load/save coordination between the Hibernate and old SQL DAOs. 
    * For all other purposes, use getPrepKit().getKitDescriptorId()
