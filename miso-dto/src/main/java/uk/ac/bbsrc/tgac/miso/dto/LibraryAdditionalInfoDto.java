@@ -19,6 +19,7 @@ public class LibraryAdditionalInfoDto {
   private Long updatedById;
   private String updatedByUrl;
   private String lastUpdated;
+  private Boolean archived;
 
   public Long getId() {
     return id;
@@ -132,6 +133,14 @@ public class LibraryAdditionalInfoDto {
     this.prepKit = prepKit;
   }
 
+  public Boolean getArchived() {
+    return archived;
+  }
+
+  public void setArchived(Boolean archived) {
+    this.archived = archived;
+  }
+
   @Override
   public String toString() {
     return "LibraryAdditionalInfoDto [id=" + id + ", url=" + url
@@ -141,7 +150,7 @@ public class LibraryAdditionalInfoDto {
         + ", createdById=" + createdById + ", createdByUrl=" + createdByUrl
         + ", creationDate=" + creationDate + ", updatedById=" + updatedById
         + ", updatedByUrl=" + updatedByUrl + ", lastUpdated=" + lastUpdated
-        + "]";
+        + ", archived=" + archived + "]";
   }
 
 }

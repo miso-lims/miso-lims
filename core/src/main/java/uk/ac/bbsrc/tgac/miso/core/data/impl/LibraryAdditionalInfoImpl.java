@@ -64,6 +64,9 @@ public class LibraryAdditionalInfoImpl implements LibraryAdditionalInfo {
   
   @Column(nullable = false)
   private Date lastUpdated;
+  
+  @Column(nullable = false)
+  private Boolean archived = Boolean.FALSE;
 
   @Override
   public Long getId() {
@@ -175,6 +178,16 @@ public class LibraryAdditionalInfoImpl implements LibraryAdditionalInfo {
   @Override
   public void setLastUpdated(Date lastUpdated) {
     this.lastUpdated = lastUpdated;
+  }
+
+  @Override
+  public Boolean getArchived() {
+    return archived;
+  }
+
+  @Override
+  public void setArchived(Boolean archived) {
+    this.archived = archived;
   }
 
 }

@@ -326,6 +326,7 @@ public class Dtos {
 
   public static SampleGroupId to(SampleGroupDto from) {
     SampleGroupId to = new SampleGroupImpl();
+    to.setSampleGroupId(from.getId());
     to.setGroupId(from.getGroupId());
     to.setDescription(from.getDescription());
     return to;
@@ -690,6 +691,7 @@ public class Dtos {
     dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
     dto.setUpdatedById(from.getUpdatedBy().getUserId());
     dto.setLastUpdated(dateTimeFormatter.print(from.getLastUpdated().getTime()));
+    dto.setArchived(from.getArchived());
     return dto;
   }
   
@@ -710,6 +712,7 @@ public class Dtos {
       to.setSampleGroupId(to(from.getSampleGroup()));
     }
     to.setPrepKit(to(from.getPrepKit()));
+    to.setArchived(from.getArchived());
     return to;
   }
 

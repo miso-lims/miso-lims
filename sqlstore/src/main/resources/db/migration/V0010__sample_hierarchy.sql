@@ -343,6 +343,7 @@ CREATE TABLE `LibraryAdditionalInfo` (
   `tissueTypeId` bigint(20) NOT NULL,
   `sampleGroupId` bigint(20) DEFAULT NULL,
   `kitDescriptorId` bigint(20) DEFAULT NULL,
+  `archived` bit(1) NOT NULL,
   `createdBy` bigint(20) NOT NULL,
   `creationDate` datetime NOT NULL,
   `updatedBy` bigint(20) NOT NULL,

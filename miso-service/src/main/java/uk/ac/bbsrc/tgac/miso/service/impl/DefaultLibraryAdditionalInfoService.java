@@ -87,6 +87,7 @@ public class DefaultLibraryAdditionalInfoService implements LibraryAdditionalInf
     if (libraryAdditionalInfo.getPrepKit() != null) {
       updated.setPrepKit(kitStore.getKitDescriptorById(libraryAdditionalInfo.getPrepKit().getKitDescriptorId()));
     }
+    updated.setArchived(libraryAdditionalInfo.getArchived());
     User user = authorizationManager.getCurrentUser();
     updated.setUpdatedBy(user);
     libraryAdditionalInfoDao.update(updated);
