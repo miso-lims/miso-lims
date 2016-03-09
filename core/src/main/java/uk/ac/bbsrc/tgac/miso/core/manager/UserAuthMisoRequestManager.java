@@ -159,7 +159,7 @@ public class UserAuthMisoRequestManager implements RequestManager {
         log.error("Cannot resolve a currently logged in user", e);
       }
     } else {
-      throw new IOException("Cannot check read permissions for null object. Does this object really exist?");
+      return true;
     }
     return false;
   }
