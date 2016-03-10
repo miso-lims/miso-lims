@@ -66,7 +66,6 @@ public class DefaultSampleGroupService implements SampleGroupService {
   public void update(SampleGroupId sampleGroup) throws IOException {
     authorizationManager.throwIfNonAdmin();
     SampleGroupId updatedSampleGroup = get(sampleGroup.getSampleGroupId());
-    // updatedSampleGroup.setAlias(sampleGroup.getAlias());
     updatedSampleGroup.setDescription(sampleGroup.getDescription());
     User user = authorizationManager.getCurrentUser();
     updatedSampleGroup.setUpdatedBy(user);
