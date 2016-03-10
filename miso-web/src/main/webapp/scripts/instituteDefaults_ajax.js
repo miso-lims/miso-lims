@@ -32,12 +32,12 @@ var Defaults = Defaults || {
     if (xhr.status == 200) {
       Defaults.all = JSON.parse(xhr.responseText);
     
+      Subproject.getProjects();
       Tissue.createTissueOriginsTable();
       Tissue.createTissueTypesTable();
       Tissue.createTissueMaterialsTable();
       Tissue.createSamplePurposesTable();
       QC.createQcDetailsTable();
-      Subproject.getProjects();
       Lab.createLabsTable();
       Lab.createInstitutesTable();
       Hierarchy.createSampleClassesTable();
@@ -307,6 +307,134 @@ var QC = QC || {
   }
 };
 
+var GroupId = GroupId || {
+  
+  createGroupIdsTable: function (xhr) {
+    var tableBody = document.getElementById('allGroupIds');
+    tableBody.innerHTML = null;
+    
+    // if data is coming in from AJAX request, store it in Defaults.all
+    if (xhr) Defaults.all.sampleGroupsDtos = JSON.parse(xhr.responseText);
+    var data = Defaults.all.sampleGroupsDtos;
+    var table = [];
+    var id, projectId, subprojectId, groupId, description, endpoint;
+    
+    // create rows if there is data; otherwise, add only the "Add New" button
+    if (data) {
+      // sort in reverse order by groupId
+      data.sort(function (a, b) {
+        return (a.groupId < b.groupId) ? 1 : ((b.groupId < a.groupId) ? -1 : 0);
+      });
+      
+      for (var i=0; i<data.length; i++) {
+        id = data[i].id;
+        projectId = data[i].projectId;
+        projectName = Subproject.projectArray.filter(function (p) { return p.projectId == projectId; })[0].alias;
+        subprojectId = (data[i].subprojectId ? data[i].subprojectId : null);
+        if (subprojectId) {
+          subprojectName = Defaults.all.subprojectsDtos.filter(function (s) { return s.id == subprojectId; })[0].alias;
+        }
+        groupId = data[i].groupId;
+        description = data[i].description;
+        endpoint = data[i].url;
+        
+        table.push('<tr class="GID"><td>');
+        table.push('<b><span id="GID_parentProject_'+id+'">'+ projectName +'</span></b>'); // not editable after creation
+        table.push('</td><td>');
+        if (subprojectId) {
+          table.push('<span id="GID_subproject_'+id+'">'+ subprojectName +'</span>'); // not editable after creation
+        } else {
+          table.push('(None)'); // not editable after creation
+        }
+        table.push('</td><td>');
+        table.push('<b>'+ groupId +'</b>');
+        table.push('</td><td>');
+        table.push(description);
+        table.push('</td><td>');
+        table.push(Options.createButton('Delete', "Options.confirmDelete('"+endpoint+"')"));
+      }
+    }
+    tableBody.innerHTML = table.join('');
+    Options.tableLoadCounter += 1;
+    
+    // add button if it's not already present
+    if (!document.getElementById('newGroupIdRowButton')) {
+      var button = ['<div id="newGroupIdRowButton">'];
+      button.push(Options.createButton('New Group ID', 'GroupId.createNewRow()', 'newGroupId'));
+      button.push('</button>');
+      document.getElementById('allGroupIdsTable').insertAdjacentHTML('afterend', button.join(''));
+    }
+    
+    // display checkmark if table has already been loaded once
+    if (Options.tableLoadCounter > Options.tablesOnPage) {
+      Options.displayCheckmark(tableBody.parentElement.id);
+    }
+  },
+  
+  addNew: function () {
+    var groupId = parseInt(document.getElementById('GID_groupId_new').innerHTML);
+    var description = document.getElementById('GID_description_new').value;
+    var projectId = parseInt(document.getElementById('GID_parentProject_new').value);
+    var subprojectId = parseInt(document.getElementById('GID_subproject_new').value) || null;
+    if (!projectId || !groupId || !description) {
+      alert("Neither project, group ID, nor group Description can be blank.");
+      return null;
+    }
+    var method = 'POST';
+    Options.makeXhrRequest(method, '/miso/rest/samplegroup', Options.reloadTable, JSON.stringify(
+        { 'projectId': projectId, 'subprojectId': subprojectId, 'groupId': groupId, 'description': description }), 'GID');
+  },
+  
+  createNewRow: function () {
+    if (document.getElementById('GID_parentProject_new')) {
+      document.getElementById('GID_parentProject_new').focus();
+      return false;
+    } else {
+      var row = [];
+      
+      row.push('<tr><td>');
+      row.push(Subproject.createProjectsSelect('GID_parentProject_new'));
+      row.push('</td><td>');
+      row.push('<span id="GID_subproject_dropdown"></span>');
+      row.push('</td><td>');
+      row.push('<b><span id="GID_groupId_new">'+ GroupId.getNextGIDNumber() +'</span></b>'); 
+      row.push('</td><td>');
+      row.push(Options.createTextInput('GID_description_new'));
+      row.push('<td><td>');
+      row.push(Options.createButton('Add', "GroupId.addNew()"));
+      row.push('</td></tr>');
+      
+      document.getElementById('allGroupIds').insertAdjacentHTML('beforeend', row.join(''));
+      document.getElementById('GID_parentProject_new').focus();
+      GroupId.createSubprojectsSelect();
+      document.getElementById('GID_parentProject_new').addEventListener('change', GroupId.createSubprojectsSelect);
+    }
+  },
+  
+  createSubprojectsSelect: function () {
+    var projectId = parseInt(document.getElementById('GID_parentProject_new').value);
+    var filteredSubps = Defaults.all.subprojectsDtos.filter(function (s) { return s.parentProjectId == projectId; });
+    var select = [];
+    select.push('<select id="GID_subproject_new">');
+    select.push('<option value="" selected="selected">No subproject</option>');
+    for (var i=0; i<filteredSubps.length; i++) {
+      select.push('<option value="'+ filteredSubps[i].id +'">'+ filteredSubps[i].alias +'</option>');
+    }
+    select.push('</select>');
+    document.getElementById('GID_subproject_dropdown').innerHTML = select.join('');
+  },
+  
+  getNextGIDNumber: function () {
+    // sampleGroups have already been reverse-sorted by groupId
+    var highestGroupId = Defaults.all.sampleGroupsDtos[0].groupId;
+    return highestGroupId + 1;
+  },
+  
+  getGroupIds: function () {
+    Options.makeXhrRequest('GET', '/miso/rest/samplegroups', GroupId.createGroupIdsTable);
+  }
+};
+
 var Subproject = Subproject || {
   projectArray: null,
 
@@ -323,6 +451,7 @@ var Subproject = Subproject || {
       return (a.alias > b.alias) ? 1 : ((b.alias > a.alias) ? -1 : 0);
     });
     Subproject.getSubprojects();
+    GroupId.createGroupIdsTable();
   },
 
   createSubprojectsTable: function (xhr) {
@@ -896,7 +1025,7 @@ var Hierarchy = Hierarchy || {
 
 var Options = Options || {
   tableLoadCounter: 0,
-  tablesOnPage: 10,
+  tablesOnPage: 11,
 
   makeXhrRequest: function (method, endpoint, callback, data, callbackarg) {
     var expectedStatus;
@@ -982,6 +1111,7 @@ var Options = Options || {
     else if (option == 'Lab') { reloadTableFunc = Lab.getLabs; }
     else if (option == 'Cl') { reloadTableFunc = Hierarchy.getSampleClasses; }
     else if (option == 'Rel') { reloadTableFunc = Hierarchy.getValidRelationships; }
+    else if (option == 'GID') { reloadTableFunc = GroupId.getGroupIds; }
     reloadTableFunc();
   },
 

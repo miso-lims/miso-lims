@@ -36,16 +36,51 @@
   <h1>Institute Defaults</h1>
   
   <div class="corner-padding">
+    <a href="#groupIds">Group IDs</a><br/>
+    <a href="#subprojects">Subprojects</a><br/>
     <a href="#origins">Tissue Origins</a><br/>
     <a href="#types">Tissue Types</a><br/>
     <a href="#materials">Tissue Materials</a><br/>
     <a href="#purposes">Sample Purposes</a><br/>
     <a href="#qcDetails">QC Details</a><br/>
-    <a href="#subprojects">Subprojects</a><br/>
     <a href="#institutes">Institutes</a><br/>
     <a href="#labs">Labs</a><br/>
     <a href="#classes">Sample Classes</a><br/>
     <a href="#relationships">Relationships between Sample Classes</a><br/>
+  </div>
+  
+    
+  <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#groupids_arrowclick'), 'groupidsdiv');">
+    Group IDs
+    <div id="groupids_arrowclick" class="toggleLeft"></div>
+  </div>
+  <div class="corner-padding" id="groupidsdiv" style="display:none;">
+    <h2 id="groupids">Group IDs</h2>
+    <table id="allGroupIdsTable" class="clear default-table" data-sortable>
+      <thead>
+        <tr>
+          <th>Project</th><th>Subproject</th><th>Group ID</th><th>Description</th>
+        </tr>
+      </thead>
+      <tbody id="allGroupIds" class="GID"></tbody>
+    </table>
+  </div>
+  
+    
+  <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#subprojects_arrowclick'), 'subprojectsdiv');">
+    Subprojects
+    <div id="subprojects_arrowclick" class="toggleLeft"></div>
+  </div>
+  <div class="corner-padding" id="subprojectsdiv" style="display:none;">
+    <h2 id="subprojects">Subprojects</h2>
+    <table id="allSubprojectsTable" class="clear default-table" data-sortable>
+      <thead>
+        <tr>
+          <th>Project</th><th>Alias</th><th>Description</th><th>Priority</th>
+        </tr>
+      </thead>
+      <tbody id="allSubprojects" class="SubP"></tbody>
+    </table>
   </div>
   
   <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#origins_arrowclick'), 'originsdiv');">
@@ -126,22 +161,6 @@
         </tr>
       </thead>
       <tbody id="allQcDetails" class="QC"></tbody>
-    </table>
-  </div>
-  
-  <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#subprojects_arrowclick'), 'subprojectsdiv');">
-    Subprojects
-    <div id="subprojects_arrowclick" class="toggleLeft"></div>
-  </div>
-  <div class="corner-padding" id="subprojectsdiv" style="display:none;">
-    <h2 id="subprojects">Subprojects</h2>
-    <table id="allSubprojectsTable" class="clear default-table" data-sortable>
-      <thead>
-        <tr>
-          <th>Project</th><th>Alias</th><th>Description</th><th>Priority</th>
-        </tr>
-      </thead>
-      <tbody id="allSubprojects" class="SubP"></tbody>
     </table>
   </div>
   
