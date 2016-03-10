@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import net.sf.ehcache.CacheManager;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +27,6 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.store.SecurityStore;
 
-import net.sf.ehcache.CacheManager;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBox;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
@@ -174,6 +175,8 @@ public class SQLBoxDAO implements BoxStore {
   private static final String BOX_DELETE_CONTENTS = "DELETE FROM BoxPosition WHERE boxId = ?";
 
   private static final String BOX_INSERT_CONTENTS = "REPLACE INTO BoxPosition (boxId, `row`, `column`, boxPositionId) VALUES (?, ?, ?, ?)";
+  
+  private static final String BOX_POSITION_REMOVE_BY_ID = "DELETE FROM BoxPosition WHERE boxPositionId = ?";
 
   @Autowired
   private DataObjectFactory dataObjectFactory;
@@ -444,6 +447,11 @@ public class SQLBoxDAO implements BoxStore {
 
       throw new IOException("Could not find a sample or library with barcode " + barcode);
     }
+  }
+  
+  @Override
+  public void removeBoxableFromBox(Boxable boxable) throws IOException {
+    template.update(BOX_POSITION_REMOVE_BY_ID, boxable.getBoxPositionId());
   }
 
   @Override

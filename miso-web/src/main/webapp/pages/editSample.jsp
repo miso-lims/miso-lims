@@ -114,34 +114,6 @@
 
 <div class="barcodes">
   <div class="barcodeArea ui-corner-all">
-    <c:choose>
-      <c:when test="${empty sample.locationBarcode}">
-        <span style="float: left; font-size: 24px; font-weight: bold; color:#BBBBBB">Location</span><form:input
-          path="locationBarcode" size="8"/>
-      </c:when>
-      <c:otherwise>
-        <span style="float: left; font-size: 24px; font-weight: bold; color:#BBBBBB">Location</span>
-        <ul class="barcode-ddm">
-          <li>
-            <a onmouseover="mopen('locationBarcodeMenu')" onmouseout="mclosetime()">
-              <span style="float:right; margin-top:6px;" class="ui-icon ui-icon-triangle-1-s"></span>
-              <span id="locationBarcode" style="float:right; margin-top:6px; padding-bottom: 11px;">${sample.locationBarcode}</span>
-            </a>
-
-            <div id="locationBarcodeMenu"
-                 onmouseover="mcancelclosetime()"
-                 onmouseout="mclosetime()">
-              <a href="javascript:void(0);"
-                 onclick="Sample.ui.showSampleLocationChangeDialog(${sample.id});">Change
-                location</a>
-            </div>
-          </li>
-        </ul>
-        <div id="changeSampleLocationDialog" title="Change Sample Location"></div>
-      </c:otherwise>
-    </c:choose>
-  </div>
-  <div class="barcodeArea ui-corner-all">
     <span style="float: left; font-size: 24px; font-weight: bold; color:#BBBBBB">ID</span>
     <c:if test="${sample.id != 0}">
       <ul class="barcode-ddm">
@@ -195,6 +167,13 @@
           <c:when test="${sample.id != 0}">${sample.id}</c:when>
           <c:otherwise><i>Unsaved</i></c:otherwise>
         </c:choose>
+      </td>
+    </tr>
+    <tr>
+      <td class="h">Location:</td>
+      <td>
+        <c:if test="${!empty sample.boxLocation}">${sample.boxLocation},</c:if>
+        <c:if test="${!empty sample.boxPosition}"><a href='<c:url value="/miso/box/${sample.boxId}"/>'>${sample.boxAlias}, ${sample.boxPosition}</a></c:if>
       </td>
     </tr>
     <tr>
@@ -276,6 +255,14 @@
         <form:radiobutton path="qcPassed" value="true" label="True"/>
         <form:radiobutton path="qcPassed" value="false" label="False"/>
       </td>
+    </tr>
+    <tr>
+      <td>Volume (&#181;l):</td>
+      <td><form:input id="volume" path="volume"/></td>
+    </tr>
+    <tr>
+      <td>Emptied:</td>
+      <td><form:checkbox id="empty" path="empty"/></td>
     </tr>
     <c:choose>
     <c:when

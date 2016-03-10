@@ -116,6 +116,13 @@
     </td>
   </tr>
   <tr>
+    <td class="h">Location:</td>
+    <td>
+      <c:if test="${!empty pool.boxLocation}">${pool.boxLocation},</c:if>
+      <c:if test="${!empty pool.boxPosition}"><a href='<c:url value="/miso/box/${pool.boxId}"/>'>${pool.boxAlias}, ${pool.boxPosition}</a></c:if>
+    </td>
+  </tr>
+  <tr>
     <td class="h">Name:</td>
     <td>
       <c:choose>
@@ -166,6 +173,15 @@
   <tr>
     <td class="h">Ready To Run</td>
     <td><form:checkbox path="readyToRun"/></td>
+  </tr>
+  
+  <tr>
+    <td>Volume (&#181;l):</td>
+    <td><form:input id="volume" path="volume"/></td>
+  </tr>
+  <tr>
+    <td>Emptied:</td>
+    <td><form:checkbox id="empty" path="empty"/></td>
   </tr>
 
 </table>

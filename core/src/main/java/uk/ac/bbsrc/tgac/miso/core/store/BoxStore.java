@@ -6,6 +6,7 @@ import java.util.Collection;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
+import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
 
 /**
@@ -84,4 +85,6 @@ public interface BoxStore extends Store<Box>, Remover<Box>, NamingSchemeAware<Bo
   void emptySingleTube(Box box, String position) throws IOException;
 
   void emptyAllTubes(Box box) throws IOException;
+  
+  void removeBoxableFromBox(Boxable boxable) throws IOException;
 }

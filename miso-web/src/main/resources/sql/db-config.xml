@@ -228,6 +228,7 @@
     <property name="sampleQcDAO" ref="sqlSampleQCDAO" />
     <property name="securityDAO" ref="sqlSecurityDAO" />
     <property name="securityProfileDAO" ref="sqlSecurityProfileDAO" />
+    <property name="boxDAO" ref="sqlBoxDAO" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />
     <property name="autoGenerateIdentificationBarcodes">
       <value>${miso.autoGenerateIdentificationBarcodes}</value>
@@ -311,6 +312,7 @@
     <property name="dilutionDAO" ref="sqlLibraryDilutionDAO" />
     <property name="libraryQcDAO" ref="sqlLibraryQCDAO" />
     <property name="securityProfileDAO" ref="sqlSecurityProfileDAO" />
+    <property name="boxDAO" ref="sqlBoxDAO" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />
     <property name="autoGenerateIdentificationBarcodes">
       <value>${miso.autoGenerateIdentificationBarcodes}</value>
@@ -337,6 +339,7 @@
     <property name="experimentDAO" ref="sqlExperimentDAO" />
     <property name="poolQcDAO" ref="sqlPoolQCDAO" />
     <property name="watcherDAO" ref="sqlWatcherDAO" />
+    <property name="boxDAO" ref="sqlBoxDAO" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />
     <property name="autoGenerateIdentificationBarcodes">
       <value>${miso.autoGenerateIdentificationBarcodes}</value>

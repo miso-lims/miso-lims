@@ -89,6 +89,12 @@ var Sample = Sample || {
     jQuery('#scientificName').attr('data-parsley-required', 'true');
     jQuery('#scientificName').attr('data-parsley-maxlength', '100');
     jQuery('#scientificName').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+    
+    // Volume validation
+    jQuery('#volume').attr('class', 'form-control');
+    jQuery('#volume').attr('data-parsley-required', 'true');
+    jQuery('#volume').attr('data-parsley-maxlength', '10');
+    jQuery('#volume').attr('data-parsley-type', 'number');
 
     Fluxion.doAjax(
       'sampleControllerHelperService',
