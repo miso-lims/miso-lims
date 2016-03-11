@@ -67,6 +67,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample.StrStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
@@ -132,6 +133,11 @@ public class EditSampleController {
   @ModelAttribute("detailedSample")
   public Boolean isDetailedSampleEnabled() { 
     return misoPropertyBoolean("miso.detailed.sample.enabled");
+  }
+  
+  @ModelAttribute("strStatusOptions")
+  public StrStatus[] getStrStatusOptions() {
+    return StrStatus.values();
   }
 
   public Map<String, Sample> getAdjacentSamplesInGroup(Sample s, @RequestParam(value = "entityGroupId", required = true) Long entityGroupId)
@@ -466,4 +472,5 @@ public class EditSampleController {
       throw ex;
     }
   }
+  
 }

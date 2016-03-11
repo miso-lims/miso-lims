@@ -34,12 +34,14 @@ import java.util.regex.Matcher;
 
 import javax.persistence.CascadeType;
 
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -56,9 +58,6 @@ import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.Property;
 import com.googlecode.ehcache.annotations.TriggersRemove;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -96,7 +95,7 @@ public class SQLSampleDAO implements SampleStore {
   private static final String TABLE_NAME = "Sample";
 
   public static final String SAMPLES_SELECT = "SELECT sampleId, name, description, scientificName, taxonIdentifier, alias, accession, securityProfile_profileId, identificationBarcode, locationBarcode, "
-      + "sampleType, receivedDate, qcPassed, project_projectId, lastModifier, volume, emptied, boxPositionId, (SELECT boxId FROM BoxPosition WHERE BoxPosition.boxPositionId = "
+      + "sampleType, receivedDate, qcPassed, project_projectId, lastModifier, volume, emptied, boxPositionId, strStatus, (SELECT boxId FROM BoxPosition WHERE BoxPosition.boxPositionId = "
       + TABLE_NAME
       + ".boxPositionId) AS boxId, (SELECT alias FROM Box, BoxPosition WHERE Box.boxId = BoxPosition.boxId AND BoxPosition.boxPositionId = "
       + TABLE_NAME + ".boxPositionId) AS boxAlias , (SELECT row FROM BoxPosition WHERE BoxPosition.boxPositionId = " + TABLE_NAME
@@ -125,7 +124,7 @@ public class SQLSampleDAO implements SampleStore {
   public static final String SAMPLE_UPDATE = "UPDATE " + TABLE_NAME + " "
       + "SET name=:name, description=:description, scientificName=:scientificName, taxonIdentifier=:taxonIdentifier, alias=:alias, accession=:accession, securityProfile_profileId=:securityProfile_profileId, "
       + "identificationBarcode=:identificationBarcode, locationBarcode=:locationBarcode, sampleType=:sampleType, receivedDate=:receivedDate, "
-      + "qcPassed=:qcPassed, project_projectId=:project_projectId, lastModifier=:lastModifier, volume=:volume, emptied=:emptied "
+      + "qcPassed=:qcPassed, project_projectId=:project_projectId, lastModifier=:lastModifier, volume=:volume, emptied=:emptied, strStatus=:strStatus "
       + "WHERE sampleId=:sampleId";
 
   public static final String SAMPLE_DELETE = "DELETE FROM " + TABLE_NAME + " WHERE sampleId=:sampleId";
@@ -329,6 +328,7 @@ public class SQLSampleDAO implements SampleStore {
     params.addValue("lastModifier", sample.getLastModifier().getUserId());
     params.addValue("volume", sample.getVolume());
     params.addValue("emptied", sample.isEmpty());
+    params.addValue("strStatus", sample.getStrStatus().getLabel());
 
     if (sample.getQcPassed() != null) {
       params.addValue("qcPassed", sample.getQcPassed().toString());
@@ -614,6 +614,7 @@ public class SQLSampleDAO implements SampleStore {
       } else {
         s.setQcPassed(null);
       }
+      s.setStrStatus(rs.getString("strStatus"));
 
       try {
         s.setLastModifier(securityDAO.getUserById(rs.getLong("lastModifier")));
