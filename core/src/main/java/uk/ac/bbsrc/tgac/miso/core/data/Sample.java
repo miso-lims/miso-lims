@@ -23,8 +23,12 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
@@ -315,4 +319,62 @@ public interface Sample extends SecurableByProfile, Submittable<Document>, Locat
   public void setSampleTissue(SampleTissue sampleTissue);
 
   public SampleTissue getSampleTissue();
+  
+  /**
+   * @return the short tandem repeat QC status for this Sample
+   */
+  public StrStatus getStrStatus();
+  
+  /**
+   * Sets the short tandem repeat QC status for this Sample
+   * 
+   * @param strStatus
+   */
+  public void setStrStatus(StrStatus strStatus);
+  
+  /**
+   * Convenience method for setting the short tandem repeat QC status for this Sample
+   * 
+   * @param strStatus must match an existing {@link StrStatus} label
+   */
+  public void setStrStatus(String strStatus);
+  
+  /**
+   * Possible status options for Short Tandem Repeat QC
+   */
+  public static enum StrStatus {
+    
+    NOT_SUBMITTED("Not Submitted"),
+    SUBMITTED("Submitted"),
+    PASS("Pass"),
+    FAIL("Fail");
+    
+    private static final Map<String, StrStatus> lookup = new HashMap<>();
+    
+    static {
+      for (StrStatus sr : StrStatus.values()) {
+        lookup.put(sr.getLabel(), sr);
+      }
+    }
+    
+    private final String label;
+    
+    private StrStatus(String label) {
+      this.label = label;
+    }
+    
+    public String getLabel() {
+      return label;
+    }
+    
+    public static StrStatus get(String label) {
+      if (!lookup.containsKey(label)) throw new IllegalArgumentException("Invalid STR Status: " + label);
+      return lookup.get(label);
+    }
+    
+    public static List<String> getLabels() {
+      return new ArrayList<String>(lookup.keySet());
+    }
+    
+  }
 }

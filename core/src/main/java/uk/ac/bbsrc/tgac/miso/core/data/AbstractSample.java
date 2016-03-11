@@ -76,6 +76,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
  */
 @MappedSuperclass
 public abstract class AbstractSample extends AbstractBoxable implements Sample {
+  
   protected static final Logger log = LoggerFactory.getLogger(AbstractSample.class);
   public static final Long UNSAVED_ID = 0L;
 
@@ -118,6 +119,7 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   private String identificationBarcode;
   private String locationBarcode;
   private String alias;
+  private StrStatus strStatus = StrStatus.NOT_SUBMITTED;
 
   @Transient
   private Date lastUpdated;
@@ -545,6 +547,21 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @Override
   public void setSampleTissue(SampleTissue sampleTissue) {
     this.sampleTissue = sampleTissue;
+  }
+  
+  @Override
+  public StrStatus getStrStatus() {
+    return strStatus;
+  }
+  
+  @Override
+  public void setStrStatus(StrStatus strStatus) {
+    this.strStatus = strStatus;
+  }
+  
+  @Override
+  public void setStrStatus(String strStatus) {
+    this.strStatus = StrStatus.get(strStatus);
   }
 
   public static class SampleFactoryBuilder {

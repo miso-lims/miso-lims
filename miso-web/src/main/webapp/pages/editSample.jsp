@@ -269,6 +269,21 @@
       <td>Sample Type:*</td>
       <td><form:select id="sampleTypes" path="sampleType" items="${sampleTypes}"/></td>
     </tr>
+    <tr>
+      <td class="h">STR Status</td>
+      <td><form:select id="strStatus" path="strStatus">
+        <c:forEach var="strStatusOption" items="${strStatusOptions}">
+          <c:choose>
+            <c:when test="${sample.strStatus == strStatusOption}">
+              <option value="${strStatusOption}" selected>${strStatusOption.label}</option>
+            </c:when>
+            <c:otherwise>
+              <option value="${strStatusOption}">${strStatusOption.label}</option>
+            </c:otherwise>
+          </c:choose>
+        </c:forEach>
+      </form:select></td>
+    </tr>
     <tr bgcolor="yellow">
       <td>QC Passed:</td>
       <td>
