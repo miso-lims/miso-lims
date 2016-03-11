@@ -154,6 +154,7 @@ CREATE TABLE `SampleAdditionalInfo` (
   `concentration` double DEFAULT NULL,
   `archived` bit(1) NOT NULL,
   `labId` bigint(20) DEFAULT NULL,
+  `strStatus` varchar(50) NOT NULL DEFAULT 'NOT_SUBMITTED',
   `createdBy` bigint(20) NOT NULL,
   `creationDate` datetime NOT NULL,
   `updatedBy` bigint(20) NOT NULL,

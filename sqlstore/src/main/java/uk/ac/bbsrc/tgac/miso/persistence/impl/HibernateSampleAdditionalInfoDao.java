@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAdditionalInfoImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleAdditionalInfoDao;
 
@@ -39,7 +40,10 @@ public class HibernateSampleAdditionalInfoDao implements SampleAdditionalInfoDao
   
   private SampleAdditionalInfo fetchSqlStore(SampleAdditionalInfo sampleAdditionalInfo) throws IOException {
     if (sampleAdditionalInfo != null) {
-      sampleAdditionalInfo.setPrepKit(kitStore.getKitDescriptorById(sampleAdditionalInfo.getHibernateKitDescriptorId()));
+      if (sampleAdditionalInfo.getHibernateKitDescriptorId() != null) {
+        KitDescriptor kit = kitStore.getKitDescriptorById(sampleAdditionalInfo.getHibernateKitDescriptorId());
+        sampleAdditionalInfo.setPrepKit(kit);
+      }
     }
     return sampleAdditionalInfo;
   }
