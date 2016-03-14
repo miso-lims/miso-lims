@@ -267,6 +267,7 @@
   <h1>
     Elements
   </h1>
+  <c:if test="${plate.id == 0}">
   <ul class="sddm">
     <li>
       <a onmouseover="mopen('qcmenu')" onmouseout="mclosetime()">Options
@@ -276,15 +277,16 @@
       <div id="qcmenu"
            onmouseover="mcancelclosetime()"
            onmouseout="mclosetime()">
-        <c:if test="${plate.id == 0}">
           <a href="javascript:void(0);" onclick="Plate.ui.downloadPlateInputForm();">Get Plate Input Form</a>
           <a href="javascript:void(0);" class="add" onclick="Plate.ui.uploadPlateInputForm();">Import Plate Input
             Form</a>
-        </c:if>
       </div>
     </li>
   </ul>
+  </c:if>
   <span style="clear:both">
+  <h3>Please note: You can only add Elements before the Plate is saved. Use the Options menu on the right to upload a spreadsheet of elements.</h3>
+
     <c:if test="${plate.id == 0}">
       <div id="plateformdiv" class="simplebox" style="display:none;">
         <table class="in">
