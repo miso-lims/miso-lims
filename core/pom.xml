@@ -74,6 +74,7 @@
   <dependency>
    <groupId>org.codehaus.jackson</groupId>
    <artifactId>jackson-mapper-asl</artifactId>
+   <version>1.9.2</version>
   </dependency>
   <dependency>
     <groupId>org.springframework</groupId>
@@ -82,6 +83,7 @@
   <dependency>
    <groupId>com.eaglegenomics.simlims</groupId>
    <artifactId>simlims-core</artifactId>
+   <version>${simlims-version}</version>
   </dependency>
   <dependency>
    <groupId>org.springframework</groupId>
