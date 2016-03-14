@@ -1,17 +1,41 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import javax.persistence.Column;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.Transient;
+
 /*
  * Skeleton implementation of a Boxable item
  */
+@MappedSuperclass
 public abstract class AbstractBoxable implements Boxable {
+
+  @Column(name = "emptied")
   private boolean empty;
-  private double volume;
+  @Column(nullable = true)
+  private Double volume;
+  @Transient
   private Long boxId;
+  @Transient
   private String boxAlias;
+  @Transient
   private String boxLocation;
+  @Transient
   private long positionId;
+  @Transient
   private String alias;
+  @Transient
   private String position;
+
+  @Override
+  public Double getVolume() {
+    return volume;
+  }
+
+  @Override
+  public void setVolume(Double volume) {
+    this.volume = volume;
+  }
 
   @Override
   public void setBoxId(Long boxId) {
@@ -24,23 +48,13 @@ public abstract class AbstractBoxable implements Boxable {
   }
 
   @Override
-  public void setVolume(double volume) {
-    this.volume = volume;
-  }
-
-  @Override
-  public double getVolume() {
-    return volume;
-  }
-
-  @Override
   public boolean isEmpty() {
     return empty;
   }
 
   @Override
   public void setEmpty(boolean empty) {
-    if (empty) volume = 0;
+    if (empty) volume = 0.0;
     this.empty = empty;
   }
 

@@ -12,13 +12,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
  * This interface simply describes an object that can be placed into a box. i.e. Sample, Library
  * 
  */
-@JsonIgnoreProperties({"boxId", "boxAlias", "boxLocation"})
-@JsonTypeInfo(use=JsonTypeInfo.Id.NAME, include=JsonTypeInfo.As.PROPERTY, property = "type")
-@JsonSubTypes({
-  @JsonSubTypes.Type(value=SampleImpl.class, name="SampleImpl"), 
-  @JsonSubTypes.Type(value=LibraryImpl.class, name="LibraryImpl"),
-  @JsonSubTypes.Type(value=PoolImpl.class, name="PoolImpl")
-})
+@JsonIgnoreProperties({ "boxId", "boxAlias", "boxLocation" })
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonSubTypes({ @JsonSubTypes.Type(value = SampleImpl.class, name = "SampleImpl"),
+    @JsonSubTypes.Type(value = LibraryImpl.class, name = "LibraryImpl"), @JsonSubTypes.Type(value = PoolImpl.class, name = "PoolImpl") })
 
 public interface Boxable extends Nameable, Barcodable {
   /**
@@ -51,37 +48,40 @@ public interface Boxable extends Nameable, Barcodable {
   /**
    * Sets the alias of this Sample object.
    *
-   * @param alias alias.
+   * @param alias
+   *          alias.
    */
   public void setAlias(String alias);
 
   /**
    * Sets the 'emptied' attribute for the Implementor
    * 
-   * @param boolean emptied
+   * @param boolean
+   *          emptied
    */
-   public void setEmpty(boolean emptied);
+  public void setEmpty(boolean emptied);
 
   /**
    * Returns whether or not the Implementor has been emptied
    * 
    * @return emptied
    */
-   public boolean isEmpty();
+  public boolean isEmpty();
 
   /**
    * Returns the volume of the Implementor
    * 
    * @return volume
    */
-  public double getVolume();
+  public Double getVolume();
 
   /**
    * Sets the volume of the Implementor
    * 
-   * @param double volume
+   * @param double
+   *          volume
    */
-  public void setVolume(double volume);
+  public void setVolume(Double volume);
 
   public long getBoxPositionId();
 
@@ -90,9 +90,9 @@ public interface Boxable extends Nameable, Barcodable {
   public String getBoxPosition();
 
   public void setBoxPosition(String id);
-  
+
   public String getBoxLocation();
-  
+
   public void setBoxLocation(String boxLocation);
 
 }

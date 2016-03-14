@@ -791,6 +791,9 @@ public class LimsUtils {
   }
 
   public static boolean isValidRelationship(Iterable<SampleValidRelationship> relations, Sample parent, Sample child) {
+    if (parent == null && child.getSampleAdditionalInfo() == null) {
+      return true; // Simple sample has no relationships.
+    }
     if (child.getSampleAdditionalInfo() == null) {
       return false;
     }

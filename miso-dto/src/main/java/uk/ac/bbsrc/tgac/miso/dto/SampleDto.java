@@ -29,6 +29,7 @@ public class SampleDto {
   private String parentUrl;
   private Long rootSampleClassId;
   private String rootSampleClassUrl;
+  private Double volume;
 
   public Long getId() {
     return id;
@@ -204,6 +205,14 @@ public class SampleDto {
 
   public void setSampleTissue(SampleTissueDto sampleTissue) {
     this.sampleTissue = sampleTissue;
+  }
+
+  public Double getVolume() {
+    return volume;
+  }
+
+  public void setVolume(Double volume) {
+    this.volume = volume;
   }
 
 }

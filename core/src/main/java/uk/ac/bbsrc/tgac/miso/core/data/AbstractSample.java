@@ -570,6 +570,7 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
     private String taxonIdentifier;
     private SampleClass rootSampleClass;
     private Sample parent;
+    private Double volume;
 
     public SampleFactoryBuilder parent(Sample parent) {
       this.parent = parent;
@@ -631,6 +632,11 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
       return this;
     }
 
+    public SampleFactoryBuilder volume(Double volume) {
+      this.volume = volume;
+      return this;
+    }
+
     public Identity getIdentity() {
       return identity;
     }
@@ -653,6 +659,10 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
 
     public User getUser() {
       return user;
+    }
+
+    public Double getVolume() {
+      return volume;
     }
 
     public Sample getParent() {

@@ -428,6 +428,7 @@ public class Dtos {
     if (from.getParent() != null) {
       dto.setParentId(from.getParent().getId());
     }
+    dto.setVolume(from.getVolume());
 
     return dto;
   }
@@ -470,6 +471,9 @@ public class Dtos {
 
     to.setAlias(from.getAlias());
     to.setDescription(from.getDescription());
+    if (from.getVolume() != null) {
+      to.setVolume(from.getVolume());
+    }
     return to;
   }
 

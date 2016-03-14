@@ -724,15 +724,15 @@ public class SQLLibraryDAO implements LibraryStore {
       if (isCacheEnabled() && lookupCache(cacheManager) != null) {
         Element element;
         if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
-               log.info("Cache hit on map for library " + id);
-               log.info("Cache hit on map for sample with library " + element);
-               Library library = (Library) element.getObjectValue();
-               if (library == null) throw new NullPointerException("The cache is full of lies!!!");
-               if (library.getId() == 0) {
-                  DbUtils.updateCaches(lookupCache(cacheManager), id);
-               } else {
-                  return (Library) element.getObjectValue();
-               }
+          log.info("Cache hit on map for library " + id);
+          log.info("Cache hit on map for sample with library " + element);
+          Library library = (Library) element.getObjectValue();
+          if (library == null) throw new NullPointerException("The cache is full of lies!!!");
+          if (library.getId() == 0) {
+            DbUtils.updateCaches(lookupCache(cacheManager), id);
+          } else {
+            return (Library) element.getObjectValue();
+          }
         }
       }
 
