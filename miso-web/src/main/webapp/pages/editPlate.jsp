@@ -285,7 +285,14 @@
   </ul>
   </c:if>
   <span style="clear:both">
-  <h3>Please note: You can only add Elements before the Plate is saved. Use the Options menu on the right to upload a spreadsheet of elements.</h3>
+  <c:choose>
+  <c:when test="${plate.id == 0}">
+    <h3>Please note: You can only add Elements before the Plate is saved. Use the Options menu on the right to upload a spreadsheet of elements.</h3>
+  </c:when>
+  <c:otherwise>
+    <h3>Please note: you can only add Elements before the Plate is saved.</h3>
+  </c:otherwise>
+  </c:choose>
 
     <c:if test="${plate.id == 0}">
       <div id="plateformdiv" class="simplebox" style="display:none;">
