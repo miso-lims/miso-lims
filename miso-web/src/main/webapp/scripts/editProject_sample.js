@@ -26,7 +26,6 @@
  * Created by bianx on 24/02/2014.
  */
 
-
 function bulkSampleQcTable(tableName) {
   var sTable = jQuery(tableName);
   if (!sTable.hasClass("display")) {
@@ -41,22 +40,23 @@ function bulkSampleQcTable(tableName) {
     jQuery(tableName + ' tr:first th:gt(5)').remove();
     jQuery(tableName + ' tr:first th:eq(4)').remove();
 
-    var headers = ['rowsel',
-                   'name',
-                   'alias',
-                   'description',
-                   'sampleType',
-                   'qcPassed',
-                   'qcDate',
-                   'qcType',
-                   'results'];
+    var headers = [
+      'rowsel',
+      'name',
+      'alias',
+      'description',
+      'sampleType',
+      'qcPassed',
+      'qcDate',
+      'qcType',
+      'results'
+    ];
 
     sTable.find("tr").each(function () {
       //remove rows where the sample QC has already passed
       if (jQuery(this).find("td:eq(5)").html() == "true") {
         jQuery(this).remove();
-      }
-      else {
+      } else {
         jQuery(this).removeAttr("onmouseover").removeAttr("onmouseout");
         jQuery(this).find("td:eq(4)").remove();
         jQuery(this).find("td:gt(4)").remove();
@@ -111,10 +111,11 @@ function bulkSampleQcTable(tableName) {
     });
 
     jQuery(tableName + ' .rowSelect').click(function () {
-      if (jQuery(this).parent().hasClass('row_selected'))
+      if (jQuery(this).parent().hasClass('row_selected')) {
         jQuery(this).parent().removeClass('row_selected');
-      else if (!jQuery(this).parent().hasClass('row_saved'))
+      } else if (!jQuery(this).parent().hasClass('row_saved')) {
         jQuery(this).parent().addClass('row_selected');
+      }
     });
 
     jQuery("div.toolbar").html("<input type='button' value='Save QCs' id=\"bulkSampleQcButton\" onclick=\"Project.ui.saveBulkSampleQc('"+tableName+"');\" class=\"fg-button ui-state-default ui-corner-all\"/>");
@@ -213,7 +214,7 @@ function bulkSampleQcTable(tableName) {
             "column": datatable.fnGetPosition(this)[2]
           };
         }
-            }
+      }
     );
   }
 }
@@ -230,19 +231,21 @@ function generateSampleDeliveryForm(tableName, projectId) {
     //remove edit header and column
     jQuery(tableName + ' tr:first th:gt(4)').remove();
 
-    var headers = ['rowsel',
-                   'name',
-                   'alias',
-                   'description',
-                   'sampleType',
-                   'qcPassed'];
+    var headers = [
+      'rowsel',
+      'name',
+      'alias',
+      'description',
+      'sampleType',
+      'qcPassed'
+    ];
 
     sTable.find("tr").each(function () {
       jQuery(this).removeAttr("onmouseover").removeAttr("onmouseout");
       jQuery(this).find("td:gt(4)").remove();
     });
 
-//headers
+    //headers
     jQuery(tableName + " tr:first").prepend("<th width='5%'>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\""+tableName+"\", this);'></span></th>");
     jQuery(tableName + " tr:gt(0)").prepend("<td width='5%' class='rowSelect'></td>");
 
@@ -276,10 +279,11 @@ function generateSampleDeliveryForm(tableName, projectId) {
     });
 
     jQuery(tableName + ' .rowSelect').click(function () {
-      if (jQuery(this).parent().hasClass('row_selected'))
+      if (jQuery(this).parent().hasClass('row_selected')) {
         jQuery(this).parent().removeClass('row_selected');
-      else if (!jQuery(this).parent().hasClass('row_saved'))
+      } else if (!jQuery(this).parent().hasClass('row_saved')){
         jQuery(this).parent().addClass('row_selected');
+      }
     });
 
     jQuery("div.toolbar").html("Plate: <input type='radio' name='plateinformationform' value='yes'/>Yes |<input type='radio' name='plateinformationform' value='no' checked='checked'/>No " + "<button type='button' onclick=\"Project.ui.processSampleDeliveryForm('"+tableName+"', " + projectId + ");\" class=\"fg-button ui-state-default ui-corner-all\">Generate Form</button>");
@@ -339,4 +343,3 @@ function getPlateInputForm(projectId) {
     }
   });
 }
-

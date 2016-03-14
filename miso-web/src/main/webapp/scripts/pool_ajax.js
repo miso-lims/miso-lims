@@ -28,7 +28,7 @@ var Pool = Pool || {
         'poolControllerHelperService',
         'deletePool',
         {'poolId':poolId, 'url':ajaxurl},
-        {'doOnSuccess':function(json) {
+        {'doOnSuccess':function() {
           successfunc();
         }
         }
@@ -89,22 +89,22 @@ Pool.qc = {
     if (!jQuery('#poolQcTable').attr("qcInProgress")) {
       jQuery('#poolQcTable').attr("qcInProgress", "true");
 
-      $('poolQcTable').insertRow(1);
+      jQuery('poolQcTable').insertRow(1);
       //QCId  QCed By  	QC Date  	Method  	Results
 
       if (includeId) {
-        var column1 = $('poolQcTable').rows[1].insertCell(-1);
+        var column1 = jQuery('poolQcTable').rows[1].insertCell(-1);
         column1.innerHTML = "<input type='hidden' id='poolId' name='poolId' value='" + poolId + "'/>";
       }
-      var column2 = $('poolQcTable').rows[1].insertCell(-1);
-      column2.innerHTML = "<input id='poolQcUser' name='poolQcUser' type='hidden' value='" + $('currentUser').innerHTML + "'/>" + $('currentUser').innerHTML;
-      var column3 = $('poolQcTable').rows[1].insertCell(-1);
+      var column2 = jQuery('poolQcTable').rows[1].insertCell(-1);
+      column2.innerHTML = "<input id='poolQcUser' name='poolQcUser' type='hidden' value='" + jQuery('currentUser').innerHTML + "'/>" + jQuery('currentUser').innerHTML;
+      var column3 = jQuery('poolQcTable').rows[1].insertCell(-1);
       column3.innerHTML = "<input id='poolQcDate' name='poolQcDate' type='text'/>";
-      var column4 = $('poolQcTable').rows[1].insertCell(-1);
+      var column4 = jQuery('poolQcTable').rows[1].insertCell(-1);
       column4.innerHTML = "<select id='poolQcType' name='poolQcType' onchange='Pool.qc.changePoolQcUnits(this);'/>";
-      var column5 = $('poolQcTable').rows[1].insertCell(-1);
+      var column5 = jQuery('poolQcTable').rows[1].insertCell(-1);
       column5.innerHTML = "<input id='poolQcResults' name='poolQcResults' type='text'/><span id='units'/>";
-      var column6 = $('poolQcTable').rows[1].insertCell(-1);
+      var column6 = jQuery('poolQcTable').rows[1].insertCell(-1);
       column6.innerHTML = "<a href='javascript:void(0);' onclick='Pool.qc.addPoolQC();'/>Add</a>";
 
       Utils.ui.addMaxDatePicker("poolQcDate", 0);
@@ -121,11 +121,11 @@ Pool.qc = {
       );
     }
     else {
-      alert("Cannot add another QC when one is already in progress.")
+      alert("Cannot add another QC when one is already in progress.");
     }
   },
 
-  changePoolQcUnits : function(input) {
+  changePoolQcUnits : function() {
     jQuery('#units').html(jQuery('#poolQcType').find(":selected").attr("units"));
   },
 
@@ -143,7 +143,7 @@ Pool.qc = {
         'url':ajaxurl
       },
       {'updateElement':'poolQcTable',
-        'doOnSuccess':function(json) {
+        'doOnSuccess':function() {
           jQuery('#poolQcTable').removeAttr("qcInProgress");
         }
       }
@@ -188,14 +188,14 @@ Pool.wizard = {
     if (!jQuery('#poolQcTable').attr("qcInProgress")) {
       jQuery('#poolQcTable').attr("qcInProgress", "true");
 
-      $('poolQcTable').insertRow(1);
-      var column3 = $('poolQcTable').rows[1].insertCell(-1);
+      jQuery('poolQcTable').insertRow(1);
+      var column3 = jQuery('poolQcTable').rows[1].insertCell(-1);
       column3.innerHTML = "<input id='poolQcDate' name='poolQcDate' type='text'/>";
-      var column4 = $('poolQcTable').rows[1].insertCell(-1);
+      var column4 = jQuery('poolQcTable').rows[1].insertCell(-1);
       column4.innerHTML = "<select id='poolQcType' name='poolQcType' onchange='Pool.qc.changePoolQcUnits(this);'/>";
-      var column5 = $('poolQcTable').rows[1].insertCell(-1);
+      var column5 = jQuery('poolQcTable').rows[1].insertCell(-1);
       column5.innerHTML = "<input id='poolQcResults' name='poolQcResults' type='text'/><span id='units'/>";
-      var column6 = $('poolQcTable').rows[1].insertCell(-1);
+      var column6 = jQuery('poolQcTable').rows[1].insertCell(-1);
       column6.innerHTML = "<a href='javascript:void(0);' onclick='Pool.wizard.addPoolQC(this);'/>Add</a>";
 
       jQuery("#poolQcDate").val(jQuery.datepicker.formatDate('dd/mm/yy', new Date()));
@@ -213,7 +213,7 @@ Pool.wizard = {
       );
     }
     else {
-      alert("Cannot add another QC when one is already in progress.")
+      alert("Cannot add another QC when one is already in progress.");
     }
   },
 
@@ -266,7 +266,7 @@ Pool.ui = {
     );
   },
 
-  dilutionFileUploadSuccessFunc : function(json) {
+  dilutionFileUploadSuccessFunc : function() {
     Fluxion.doAjax(
       'poolControllerHelperService',
       'selectDilutionsByBarcodeFile',
@@ -289,7 +289,7 @@ Pool.ui = {
   },
 
   /** Deprecated */
-  libraryDilutionFileUploadSuccessFunc : function(json) {
+  libraryDilutionFileUploadSuccessFunc : function() {
     Fluxion.doAjax(
       'poolControllerHelperService',
       'selectLibraryDilutionsByBarcodeFile',
@@ -312,7 +312,7 @@ Pool.ui = {
   },
 
   /** Deprecated */
-  ls454EmPcrDilutionFileUploadSuccessFunc : function(json) {
+  ls454EmPcrDilutionFileUploadSuccessFunc : function() {
     Fluxion.doAjax(
       'poolControllerHelperService',
       'select454EmPCRDilutionsByBarcodeFile',
@@ -335,7 +335,7 @@ Pool.ui = {
   },
 
   /** Deprecated */
-  solidEmPcrDilutionFileUploadSuccessFunc : function(json) {
+  solidEmPcrDilutionFileUploadSuccessFunc : function() {
     Fluxion.doAjax(
       'poolControllerHelperService',
       'selectSolidEmPCRDilutionsByBarcodeFile',
@@ -355,7 +355,7 @@ Pool.ui = {
       {
         'doOnSuccess': function(json) {
           jQuery.each(json, function(i, val) {
-            jQuery('#average' + i).html(val)
+            jQuery('#average' + i).html(val);
           });
         }
       }

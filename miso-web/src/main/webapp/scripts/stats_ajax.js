@@ -127,21 +127,21 @@ var Stats = Stats || {
             jQuery.each(obj, function(key, value) {
               if (obj.lane == laneNum) {
                 if (key == "density") {
-                  if (jQuery('#qheaders th[id=density]').length == 0) {
+                  if (jQuery('#qheaders th[id=density]').length === 0) {
                     jQuery('#qheaders').append("<th id='density'>Density "+obj.units+"</th>");
                   }
                   jQuery('#metricsTable tr:last').append('<td>'+obj.density+' &plusmn; '+obj.densitySD+'</td>');
                 }
 
                 if (key == "densityPassingFilter") {
-                  if (jQuery('#qheaders th[id=densityPassingFilter]').length == 0) {
+                  if (jQuery('#qheaders th[id=densityPassingFilter]').length === 0) {
                     jQuery('#qheaders').append("<th id='densityPassingFilter'>Density PF "+obj.units+"</th>");
                   }
                   jQuery('#metricsTable tr:last').append('<td>'+obj.densityPassingFilter+' &plusmn; '+obj.densityPassingFilterSD+'</td>');
                 }
 
                 if (key == "densityPercentPassed") {
-                  if (jQuery('#qheaders th[id=densityPercentPassed]').length == 0) {
+                  if (jQuery('#qheaders th[id=densityPercentPassed]').length === 0) {
                     jQuery('#qheaders').append("<th id='densityPercentPassed'>Density Passed %</th>");
                   }
                   jQuery('#metricsTable tr:last').append('<td>'+obj.densityPercentPassed+'</td>');
@@ -156,7 +156,7 @@ var Stats = Stats || {
             jQuery.each(obj, function(key, value) {
               if (obj.lane == laneNum) {
                 if (key != "lane" && key != "raw") {
-                  if (jQuery('#qheaders th[id='+key.replace(">", "")+']').length == 0) {
+                  if (jQuery('#qheaders th[id='+key.replace(">", "")+']').length === 0) {
                     jQuery('#qheaders').append("<th id='"+key.replace(">", "")+"'>Quality "+key.replace(">", "&gt;")+"</th>");
                     jQuery('#metricsTable tr:last').append('<td>'+value+'</td>');
                   }
@@ -176,7 +176,7 @@ var Stats = Stats || {
               var output = "";
               jQuery.each(obj, function(key, value) {
                 if (key != "lane") {
-                  if (jQuery('#qheaders th[id=phasing]').length == 0) {
+                  if (jQuery('#qheaders th[id=phasing]').length === 0) {
                     jQuery('#qheaders').append("<th id='phasing'>Phasing / Prephasing</th>");
                   }
 
@@ -199,7 +199,7 @@ var Stats = Stats || {
             jQuery.each(obj, function(key, value) {
               if (obj.lane == laneNum) {
                 if (key == "meanError") {
-                  if (jQuery('#qheaders th[id='+key+']').length == 0) {
+                  if (jQuery('#qheaders th[id='+key+']').length === 0) {
                     jQuery('#qheaders').append("<th id='"+key+"'>Mean Error</th>");
                   }
                   jQuery('#metricsTable tr:last').append("<td>"+value+" &plusmn; "+obj.errorSD+"</td>");
@@ -256,21 +256,21 @@ var Stats = Stats || {
           jQuery.each(cd, function(index, obj) {
             jQuery.each(obj, function(key, value) {
               if (key == "density") {
-                if (jQuery('#qheaders th[id=density]').length == 0) {
+                if (jQuery('#qheaders th[id=density]').length === 0) {
                   jQuery('#qheaders').append("<th id='density'>Density "+obj.units+"</th>");
                 }
                 jQuery('#metricsTable tr:eq('+obj.lane+'):last').append('<td>'+obj.density+' &plusmn; '+obj.densitySD+'</td>');
               }
 
               if (key == "densityPassingFilter") {
-                if (jQuery('#qheaders th[id=densityPassingFilter]').length == 0) {
+                if (jQuery('#qheaders th[id=densityPassingFilter]').length === 0) {
                   jQuery('#qheaders').append("<th id='densityPassingFilter'>Density PF "+obj.units+"</th>");
                 }
                 jQuery('#metricsTable tr:eq('+obj.lane+'):last').append('<td>'+obj.densityPassingFilter+' &plusmn; '+obj.densityPassingFilterSD+'</td>');
               }
 
               if (key == "densityPercentPassed") {
-                if (jQuery('#qheaders th[id=densityPercentPassed]').length == 0) {
+                if (jQuery('#qheaders th[id=densityPercentPassed]').length === 0) {
                   jQuery('#qheaders').append("<th id='densityPercentPassed'>Density Passed %</th>");
                 }
                 jQuery('#metricsTable tr:eq('+obj.lane+'):last').append('<td>'+obj.densityPercentPassed+'</td>');
@@ -294,7 +294,7 @@ var Stats = Stats || {
             jQuery.each(qm, function(index, obj) {
               jQuery.each(obj, function(key, value) {
                 if (key != "lane" && key != "raw") {
-                  if (jQuery('#qheaders th[id='+key.replace(">", "")+']').length == 0) {
+                  if (jQuery('#qheaders th[id='+key.replace(">", "")+']').length === 0) {
                     jQuery('#qheaders').append("<th id='"+key.replace(">", "")+"'>Quality "+key.replace(">", "&gt;")+"</th>");
                     jQuery('#metricsTable tr:eq('+obj.lane+'):last').append('<td>'+value+'</td>');
                   }
@@ -313,7 +313,7 @@ var Stats = Stats || {
             var output = "";
             jQuery.each(obj, function(key, value) {
               if (key != "lane") {
-                if (jQuery('#qheaders th[id=phasing]').length == 0) {
+                if (jQuery('#qheaders th[id=phasing]').length === 0) {
                   jQuery('#qheaders').append("<th id='phasing'>Phasing / Prephasing</th>");
                 }
 
@@ -334,7 +334,7 @@ var Stats = Stats || {
           jQuery.each(em, function(index, obj) {
             jQuery.each(obj, function(key, value) {
               if (key == "meanError") {
-                if (jQuery('#qheaders th[id='+key+']').length == 0) {
+                if (jQuery('#qheaders th[id='+key+']').length === 0) {
                   jQuery('#qheaders').append("<th id='"+key+"'>Mean Error</th>");
                 }
                 jQuery('#metricsTable tr:eq('+obj.lane+'):last').append("<td>"+value+" &plusmn; "+obj.errorSD+"</td>");

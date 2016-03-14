@@ -110,24 +110,30 @@ Utils.ui = {
 
   checkAll: function (field) {
     var self = this;
-    for (i = 0; i < self._N(field).length; i++) self._N(field)[i].checked = true;
+    for (var i = 0; i < self._N(field).length; i++) {
+      self._N(field)[i].checked = true;
+    }
   },
 
   checkAllConfirm: function (field, message) {
     if (confirm(message)) {
       var self = this;
-      for (i = 0; i < self._N(field).length; i++) self._N(field)[i].checked = true;
+      for (var i = 0; i < self._N(field).length; i++) {
+        self._N(field)[i].checked = true;
+      }
     }
   },
 
   uncheckAll: function (field) {
     var self = this;
-    for (i = 0; i < self._N(field).length; i++) self._N(field)[i].checked = false;
+    for (var i = 0; i < self._N(field).length; i++) {
+      self._N(field)[i].checked = false;
+    }
   },
 
   uncheckOthers: function (field, item) {
     var self = this;
-    for (i = 0; i < self._N(field).length; i++) {
+    for (var i = 0; i < self._N(field).length; i++) {
       if (self._N(field)[i] != item) {
         self._N(field)[i].checked = false;
       }
@@ -135,7 +141,9 @@ Utils.ui = {
   },
 
   _N: function (element) {
-    if (typeof element == 'string') element = document.getElementsByName(element);
+    if (typeof element == 'string') {
+      element = document.getElementsByName(element);
+    }
     return Element.extend(element);
   },
 
@@ -197,8 +205,6 @@ Utils.ui = {
 
 Utils.fileUpload = {
   fileUploadProgress: function (formname, divname, successfunc) {
-    var self = this;
-
     Fluxion.doAjaxUpload(
       formname,
       'fileUploadProgressBean',
@@ -387,7 +393,7 @@ Utils.page = {
   newWindow: function (url) {
     newwindow = window.open(url, 'name', 'height=500,width=500,menubar=yes,status=yes,scrollbars=yes');
     if (window.focus) {
-      newwindow.focus()
+      newwindow.focus();
     }
     return false;
   },
@@ -475,7 +481,7 @@ Utils.alert = {
         'dashboard',
         'setAllAlertsAsRead',
         {'url': ajaxurl},
-        {'doOnSuccess': function (json) {
+        {'doOnSuccess': function () {
           jQuery('#alertList').html("<i style='color: gray'>No unread alerts</i>");
           Utils.alert.checkAlerts();
         }

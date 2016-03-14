@@ -22,8 +22,8 @@
   --%>
 
 <%@ include file="../header.jsp" %>
-<script src="<c:url value='/scripts/datatables_utils.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
-<script src="<c:url value='/scripts/natural_sort.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
+<script src="<c:url value='/scripts/datatables_utils.js'/>" type="text/javascript"></script>
+<script src="<c:url value='/scripts/natural_sort.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/jquery/datatables/js/jquery.dataTables.min.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.mini.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.datepicker.js'/>" type="text/javascript"></script>
@@ -1653,34 +1653,23 @@ jQuery(document).ready(function () {
 
 <c:if test="${not empty project.samples}">
     <script type="text/javascript">
-        var projectId_sample = ${project.id};
-        var sampleQcTypesString = {${sampleQcTypesString}};
+      projectId_sample = ${project.id};
+      sampleQcTypesString = {${sampleQcTypesString}};
     </script>
-    <script src="<c:url value='/scripts/editProject_sample.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
 </c:if>
 
 <c:if test="${not empty projectLibraries}">
     <script type="text/javascript">
-        var libraryQcTypesString = {${libraryQcTypesString}};
+      libraryQcTypesString = {${libraryQcTypesString}};
     </script>
-    <script src="<c:url value='/scripts/editProject_library.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
-</c:if>
-
-<c:if test="${existsAnyEmPcrLibrary and not empty projectLibraryDilutions}">
-    <script src="<c:url value='/scripts/editProject_libraryDilution.js?ts=${timestamp.time}'/>"
-            type="text/javascript"></script>
-</c:if>
-
-<c:if test="${not empty projectEmPcrs}">
-    <script src="<c:url value='/scripts/editProject_empcr.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
 </c:if>
 
 <c:if test="${project.id != 0}">
     <script type="text/javascript">
-        var projectId_d3graph = ${project.id};
+        projectId_d3graph = ${project.id};
+        getProjectD3Json();
     </script>
-    <script src="<c:url value='/scripts/editProject_existing.js?ts=${timestamp.time}'/>"
-            type="text/javascript"></script>
+
 </c:if>
 
 <%@ include file="../footer.jsp" %>

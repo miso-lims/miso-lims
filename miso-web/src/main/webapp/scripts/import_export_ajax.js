@@ -24,25 +24,27 @@
 var sampleJSONArray = null;
 var librariesPoolsJSON = null;
 var ImportExport = ImportExport || {
-
   searchSamples: function (text) {
     jQuery('#sampleList').html("<img src='/styles/images/ajax-loader.gif'/>");
     Fluxion.doAjax(
-            'importExportControllerHelperService',
-            'searchSamples',
-            {  'str': text,
-              'url': ajaxurl
-            },
-            {'doOnSuccess': function (json) {
-              jQuery('#sampleList').html(json.html);
-              jQuery('#sampleList .dashboard').each(function () {
-                var inp = jQuery(this);
-                inp.dblclick(function () {
-                  ImportExport.insertSampleNextAvailable(inp);
-                });
-              });
-            }
+      'importExportControllerHelperService',
+      'searchSamples',
+      {  
+        'str': text,
+        'url': ajaxurl
+      },
+      {
+        'doOnSuccess': function (json) {
+          jQuery('#sampleList').html(json.html);
+          jQuery('#sampleList .dashboard').each(function () {
+            var inp = jQuery(this);
+            inp.dblclick(function () {
+              ImportExport.insertSampleNextAvailable(inp);
             });
+          });
+        }
+      }
+    );
   },
 
   selectSampleElement: function (elementId, elementName) {
@@ -81,17 +83,17 @@ var ImportExport = ImportExport || {
   exportSampleForm: function () {
     Utils.ui.disableButton("exportSampleForm");
     Fluxion.doAjax(
-            'importExportControllerHelperService',
-            'exportSampleForm',
-            {
-              'form': jQuery('#sampleExportForm').serializeArray(),
-              // 'documentFormat':documentFormat,
-              'url': ajaxurl
-            },
-            {'doOnSuccess': function (json) {
-              Utils.page.pageRedirect('/miso/download/sample/forms/' + json.response);
-            }
-            }
+      'importExportControllerHelperService',
+      'exportSampleForm',
+      {
+        'form': jQuery('#sampleExportForm').serializeArray(),
+        'url': ajaxurl
+      },
+      {
+        'doOnSuccess': function (json) {
+          Utils.page.pageRedirect('/miso/download/sample/forms/' + json.response);
+        }
+      }
     );
     Utils.ui.reenableButton("exportSampleForm", "Export Sample Sheet");
   },
@@ -99,18 +101,18 @@ var ImportExport = ImportExport || {
   exportLibraryPoolForm: function () {
     Utils.ui.disableButton("exportLibraryPoolForm");
     Fluxion.doAjax(
-            'importExportControllerHelperService',
-            'exportLibraryPoolForm',
-            {
-              'barcodekit': jQuery('#barcodekit :selected').text(),
-              'form': jQuery('#sampleExportForm').serializeArray(),
-              // 'documentFormat':documentFormat,
-              'url': ajaxurl
-            },
-            {'doOnSuccess': function (json) {
-              Utils.page.pageRedirect('/miso/download/library/forms/' + json.response);
-            }
-            }
+      'importExportControllerHelperService',
+      'exportLibraryPoolForm',
+      {
+        'barcodekit': jQuery('#barcodekit :selected').text(),
+        'form': jQuery('#sampleExportForm').serializeArray(),
+        'url': ajaxurl
+      },
+      {
+        'doOnSuccess': function (json) {
+          Utils.page.pageRedirect('/miso/download/library/forms/' + json.response);
+        }
+      }
     );
     Utils.ui.reenableButton("exportLibraryPoolForm", "Export Library & Pool Sheet");
   },
@@ -119,13 +121,15 @@ var ImportExport = ImportExport || {
     jQuery('#samplesheet_statusdiv').html("Processing...");
     ImportExport.processSampleSheetUpload(json.frameId);
   },
+  
   processSampleSheetUpload: function (frameId) {
     var iframe = document.getElementById(frameId);
     var iframedoc = iframe.document;
-    if (iframe.contentDocument)
+    if (iframe.contentDocument) {
       iframedoc = iframe.contentDocument;
-    else if (iframe.contentWindow)
+    } else if (iframe.contentWindow) {
       iframedoc = iframe.contentWindow.document;
+    }
     var response = jQuery(iframedoc).contents().find('body:first').find('#uploadresponsebody').val();
     if (!Utils.validation.isNullCheck(response)) {
       response = jQuery.parseJSON(response);
@@ -136,29 +140,29 @@ var ImportExport = ImportExport || {
                                             "onclick=\"window.location='/miso/importexport/importsamplesheet';\">Cancel</button>" +
                                             "<table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" class=\"display\" id=\"sampleSheetUploadSuccessTable\"></table>");
       jQuery('#sampleSheetUploadSuccessTable').dataTable({
-                                                           "aaData": response,
-                                                           "aoColumns": [
-                                                             { "sTitle": "Project"},
-                                                             { "sTitle": "Client"},
-                                                             { "sTitle": "Sample Name"},
-                                                             { "sTitle": "Sample Alias"},
-                                                             { "sTitle": "Well"},
-                                                             { "sTitle": "Adaptor"},
-                                                             { "sTitle": "QC value"},
-                                                             { "sTitle": "QC Passed"},
-                                                             { "sTitle": "Notes"}
-                                                           ],
-                                                           "bPaginate": false,
-                                                           "bFilter": false,
-                                                           "bSort": false,
-                                                           "bJQueryUI": true
-                                                         });
+        "aaData": response,
+        "aoColumns": [
+          { "sTitle": "Project"},
+          { "sTitle": "Client"},
+          { "sTitle": "Sample Name"},
+          { "sTitle": "Sample Alias"},
+          { "sTitle": "Well"},
+          { "sTitle": "Adaptor"},
+          { "sTitle": "QC value"},
+          { "sTitle": "QC Passed"},
+          { "sTitle": "Notes"}
+        ],
+        "bPaginate": false,
+        "bFilter": false,
+        "bSort": false,
+        "bJQueryUI": true
+      });
 
-    sampleJSONArray = response;
+      sampleJSONArray = response;
     }
     else {
       setTimeout(function () {
-        ImportExport.processSampleSheetUpload(frameId)
+        ImportExport.processSampleSheetUpload(frameId);
       }, 2000);
     }
   },
@@ -170,28 +174,30 @@ var ImportExport = ImportExport || {
   confirmSamplesUpload: function () {
     Utils.ui.disableButton("confirmSamplesUploadButton");
     Fluxion.doAjax(
-            'importExportControllerHelperService',
-            'confirmSamplesUpload',
-            {
-              'table': sampleJSONArray,
-              'url': ajaxurl
-            },
-            {'doOnSuccess': function (json) {
-              sampleJSONArray = null;
-              alert("Imported.");
-              jQuery('#confirmSamplesUploadButton').html("Imported");
-            }
-            }
+      'importExportControllerHelperService',
+      'confirmSamplesUpload',
+      {
+        'table': sampleJSONArray,
+        'url': ajaxurl
+      },
+      {
+        'doOnSuccess': function () {
+          sampleJSONArray = null;
+          alert("Imported.");
+          jQuery('#confirmSamplesUploadButton').html("Imported");
+        }
+      }
     );
   },
 
   processLibraryPoolSheetUpload: function (frameId) {
     var iframe = document.getElementById(frameId);
     var iframedoc = iframe.document;
-    if (iframe.contentDocument)
+    if (iframe.contentDocument) {
       iframedoc = iframe.contentDocument;
-    else if (iframe.contentWindow)
+    } else if (iframe.contentWindow) {
       iframedoc = iframe.contentWindow.document;
+    }
     var response = jQuery(iframedoc).contents().find('body:first').find('#uploadresponsebody').val();
     if (!Utils.validation.isNullCheck(response)) {
       response = jQuery.parseJSON(response);
@@ -202,36 +208,36 @@ var ImportExport = ImportExport || {
                                             "onclick=\"window.location='/miso/importexport/importlibrarypoolsheet';\">Cancel</button>" +
                                             "<table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" class=\"display\" id=\"librarypoolSheetUploadSuccessTable\"></table>");
       jQuery('#librarypoolSheetUploadSuccessTable').dataTable({
-                                                           "aaData": response['rows'],
-                                                           "aoColumns": [
-                                                             { "sTitle": "Sample Name"},
-                                                             { "sTitle": "Sample Alias"},
-                                                             { "sTitle": "Well"},
-                                                             { "sTitle": "Library Alias"},
-                                                             { "sTitle": "Library Description"},
-                                                             { "sTitle": "Qubit Conc"},
-                                                             { "sTitle": "Insert Size (bp)"},
-                                                             { "sTitle": "Molarity (nm)"},
-                                                             { "sTitle": "QC Passed"},
-                                                             { "sTitle": "Barcode Kit"},
-                                                             { "sTitle": "Barcode Tag"},
-                                                             { "sTitle": "LDI Conc"},
-                                                             { "sTitle": "Pool Name"},
-                                                             { "sTitle": "Pool Molarity (nm)"} ,
-                                                             { "sTitle": "Proceed Key"},
-                                                             { "sTitle": "Note"}
-                                                           ],
-                                                           "bPaginate": false,
-                                                           "bFilter": false,
-                                                           "bSort": false,
-                                                           "bJQueryUI": true
-                                                         });
+        "aaData": response['rows'],
+        "aoColumns": [
+          { "sTitle": "Sample Name"},
+          { "sTitle": "Sample Alias"},
+          { "sTitle": "Well"},
+          { "sTitle": "Library Alias"},
+          { "sTitle": "Library Description"},
+          { "sTitle": "Qubit Conc"},
+          { "sTitle": "Insert Size (bp)"},
+          { "sTitle": "Molarity (nm)"},
+          { "sTitle": "QC Passed"},
+          { "sTitle": "Barcode Kit"},
+          { "sTitle": "Barcode Tag"},
+          { "sTitle": "LDI Conc"},
+          { "sTitle": "Pool Name"},
+          { "sTitle": "Pool Molarity (nm)"} ,
+          { "sTitle": "Proceed Key"},
+          { "sTitle": "Note"}
+        ],
+        "bPaginate": false,
+        "bFilter": false,
+        "bSort": false,
+        "bJQueryUI": true
+      });
 
       librariesPoolsJSON = response;
     }
     else {
       setTimeout(function () {
-        ImportExport.processLibraryPoolSheetUpload(frameId)
+        ImportExport.processLibraryPoolSheetUpload(frameId);
       }, 2000);
     }
   },
@@ -248,33 +254,37 @@ var ImportExport = ImportExport || {
   confirmLibrariesPoolsUpload: function () {
     Utils.ui.disableButton("confirmLibrariesPoolsUploadButton");
     Fluxion.doAjax(
-            'importExportControllerHelperService',
-            'confirmLibrariesPoolsUpload',
-            {
-              'sheet': librariesPoolsJSON,
-              'url': ajaxurl
-            },
-            {'doOnSuccess': function (json) {
-              librariesPoolsJSON = null;
-              alert("Imported.");
-              jQuery('#confirmLibrariesPoolsUploadButton').html("Imported");
-            }
-            }
+      'importExportControllerHelperService',
+      'confirmLibrariesPoolsUpload',
+      {
+        'sheet': librariesPoolsJSON,
+        'url': ajaxurl
+      },
+      {
+        'doOnSuccess': function () {
+          librariesPoolsJSON = null;
+          alert("Imported.");
+          jQuery('#confirmLibrariesPoolsUploadButton').html("Imported");
+        }
+      }
     );
   },
 
   changePlatformName: function (input) {
-    var self = this;
     var platform = jQuery(input).val();
     Fluxion.doAjax(
-            'importExportControllerHelperService',
-            'changePlatformName',
-            {'platform': platform, 'url': ajaxurl},
-            {'doOnSuccess': function (json){
-              jQuery('#type').html(json.libraryTypes);
-              jQuery('#barcodekit').html(json.tagBarcodeStrategies);
-            }
-            }
+      'importExportControllerHelperService',
+      'changePlatformName',
+      {
+        'platform': platform, 
+        'url': ajaxurl
+      },
+      {
+        'doOnSuccess': function (json){
+          jQuery('#type').html(json.libraryTypes);
+          jQuery('#barcodekit').html(json.tagBarcodeStrategies);
+        }
+      }
     );
   },
 
@@ -282,18 +292,18 @@ var ImportExport = ImportExport || {
     Utils.ui.disableButton("generateCSVBACButton");
     console.info(jQuery('#generateCSVBACForm').serializeArray());
     Fluxion.doAjax(
-            'importExportControllerHelperService',
-            'generateCSVBAC',
-            {
-              'form': jQuery('#generateCSVBACForm').serializeArray(),
-              'url': ajaxurl
-            },
-            {'doOnSuccess': function (json) {
-              Utils.page.pageRedirect('/miso/download/plate/csv/' + json.response);
-            }
-            }
+      'importExportControllerHelperService',
+      'generateCSVBAC',
+      {
+        'form': jQuery('#generateCSVBACForm').serializeArray(),
+        'url': ajaxurl
+      },
+      {
+        'doOnSuccess': function (json) {
+          Utils.page.pageRedirect('/miso/download/plate/csv/' + json.response);
+        }
+      }
     );
     Utils.ui.reenableButton("generateCSVBACButton", "Generate CSV");
-
   }
 };

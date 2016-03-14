@@ -35,28 +35,30 @@ Sequencer.ui = {
   },
 
   processSequencerReferenceRow : function(json) {
-    $('sequencerReferenceTable').insertRow(1);
+    jQuery('sequencerReferenceTable').insertRow(1);
 
-    var column1 = $('sequencerReferenceTable').rows[1].insertCell(-1);
+    var column1 = jQuery('sequencerReferenceTable').rows[1].insertCell(-1);
     column1.innerHTML = "<i>Unsaved</i>";
-    var column2 = $('sequencerReferenceTable').rows[1].insertCell(-1);
+    var column2 = jQuery('sequencerReferenceTable').rows[1].insertCell(-1);
     column2.innerHTML = "<input id='sequencername' name='sequencername' type='text'/>";
-    var column3 = $('sequencerReferenceTable').rows[1].insertCell(-1);
+    var column3 = jQuery('sequencerReferenceTable').rows[1].insertCell(-1);
     column3.innerHTML = "<select id='platforms' name='platform'>" +json.platforms+ "</select>";
-    var column4 = $('sequencerReferenceTable').rows[1].insertCell(-1);
+    var column4 = jQuery('sequencerReferenceTable').rows[1].insertCell(-1);
     column4.innerHTML = "<input id='server' name='server' type='text' onkeyup='Sequencer.ui.validateServer(this)'/>";
-    var column5 = $('sequencerReferenceTable').rows[1].insertCell(-1);
+    var column5 = jQuery('sequencerReferenceTable').rows[1].insertCell(-1);
     column5.innerHTML = "<div id='available'></div>";
-    var column6 = $('sequencerReferenceTable').rows[1].insertCell(-1);
+    var column6 = jQuery('sequencerReferenceTable').rows[1].insertCell(-1);
     column6.id = "addTd";
     column6.innerHTML = "Add";
   },
 
   validateServer : function(t) {
-    $('available').innerHTML="<div align='center'><img src='../../styles/images/ajax-loader.gif'/></div>";
+    jQuery('available').innerHTML="<div align='center'><img src='../../styles/images/ajax-loader.gif'/></div>";
 
     if (t.value != t.lastValue) {
-      if (t.timer) clearTimeout(t.timer);
+      if (t.timer) {
+        clearTimeout(t.timer);
+      }
 
       t.timer = setTimeout(function () {
         Fluxion.doAjax(
@@ -64,13 +66,13 @@ Sequencer.ui = {
           'checkServerAvailability',
           {'server':t.value, 'url':ajaxurl},
           {"doOnSuccess": function(json) {
-            $('available').innerHTML = json.html;
+            jQuery('available').innerHTML = json.html;
             if (json.html == "OK") {
-              $('available').setAttribute("style", "background-color:green");
-              $('addTd').innerHTML = "<a href='javascript:void(0);' onclick='Sequencer.ui.addSequencerReference();'/>Add</a>";
+              jQuery('available').setAttribute("style", "background-color:green");
+              jQuery('addTd').innerHTML = "<a href='javascript:void(0);' onclick='Sequencer.ui.addSequencerReference();'/>Add</a>";
             }
             else {
-              $('available').setAttribute("style", "background-color:red");
+              jQuery('available').setAttribute("style", "background-color:red");
             }
           }
         });

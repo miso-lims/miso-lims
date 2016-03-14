@@ -24,11 +24,8 @@
 <%@ include file="../header.jsp" %>
 
 <script src="<c:url value='/scripts/jquery/js/jquery.breadcrumbs.popup.js'/>" type="text/javascript"></script>
-
 <script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.mini.js'/>" type="text/javascript"></script>
-
 <script src="<c:url value='/scripts/sortable.js'/>" type="text/javascript"></script>
-<script src="<c:url value='/scripts/instituteDefaults_ajax.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
 
 <div id="maincontent">
 <div id="contentcolumn">

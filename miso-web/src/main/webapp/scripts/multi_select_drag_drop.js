@@ -52,7 +52,6 @@
               jQuery(this).addClass('dds_selected').addClass(jQuery.fn.drag_drop_selectable.settings[jQuery.fn.drag_drop_selectable.getListId(jQuery(this).attr('dds'))].selectClass);
             }).bind('dds.deselect',function () {
               jQuery(this).removeClass('dds_selected').removeClass(jQuery.fn.drag_drop_selectable.settings[jQuery.fn.drag_drop_selectable.getListId(jQuery(this).attr('dds'))].selectClass);
-              ;
             }).css({cursor: 'pointer'});
           })
         //OK so they are selectable. now I need to make them draggable, in such a way that they pick up their friends when dragged. hmmm how do I do that?
@@ -121,8 +120,7 @@
     var jQueryothers = jQuery.fn.drag_drop_selectable.getListItems(list).clone().each(function () {
       jQuery(this).not('.dds_selected').css({visibility: 'hidden'});
       jQuery(this).filter('.dds_selected').addClass(jQuery.fn.drag_drop_selectable.settings[list].moveClass).css({opacity: jQuery.fn.drag_drop_selectable.settings[list].moveOpacity});
-      ;
-      jQuery(this).attr('dds_drag', jQuery(this).attr('dds'))
+      jQuery(this).attr('dds_drag', jQuery(this).attr('dds'));
       jQuery(this).attr('dds', '');
     });
     return jQueryothers;
@@ -132,7 +130,7 @@
     var this_offset = jQueryitem.position().top;
     var first_offset = jQuery.fn.drag_drop_selectable.getListItems(jQuery.fn.drag_drop_selectable.getListId(jQueryitem.attr('dds'))).eq(0).position().top;
     return this_offset - first_offset;
-  }
+  };
 
   jQuery.fn.drag_drop_selectable.toggle = function (id) {
     if (!jQuery.fn.drag_drop_selectable.isSelected(id)) {
@@ -212,7 +210,7 @@
     onListChange: function (list) {
       console.log(list.attr('id'));
     } //called once when the list changes
-  }
+  };
   jQuery.fn.drag_drop_selectable.settings = [];
 
 
@@ -243,33 +241,33 @@
     }
     jQuery(document).keydown(function (e) {
       if (e.keyCode == CTRL_KEY) {
-        jQuery.fn.captureKeys.stack.CTRL_KEY = true
+        jQuery.fn.captureKeys.stack.CTRL_KEY = true;
       }
       if (e.keyCode == SHIFT_KEY) {
-        jQuery.fn.captureKeys.stack.SHIFT_KEY = true
+        jQuery.fn.captureKeys.stack.SHIFT_KEY = true;
       }
       if (e.keyCode == ALT_KEY) {
-        jQuery.fn.captureKeys.stack.ALT_KEY = true
+        jQuery.fn.captureKeys.stack.ALT_KEY = true;
       }
       if (e.keyCode == META_KEY) {
-        jQuery.fn.captureKeys.stack.META_KEY = true
+        jQuery.fn.captureKeys.stack.META_KEY = true;
       }
     }).keyup(function (e) {
       if (e.keyCode == CTRL_KEY) {
-        jQuery.fn.captureKeys.stack.CTRL_KEY = false
+        jQuery.fn.captureKeys.stack.CTRL_KEY = false;
       }
       if (e.keyCode == SHIFT_KEY) {
-        jQuery.fn.captureKeys.stack.SHIFT_KEY = false
+        jQuery.fn.captureKeys.stack.SHIFT_KEY = false;
       }
       if (e.keyCode == ALT_KEY) {
-        jQuery.fn.captureKeys.stack.ALT_KEY = false
+        jQuery.fn.captureKeys.stack.ALT_KEY = false;
       }
       if (e.keyCode == META_KEY) {
-        jQuery.fn.captureKeys.stack.META_KEY = false
+        jQuery.fn.captureKeys.stack.META_KEY = false;
       }
     });
   };
-  jQuery.fn.captureKeys.stack = { CTRL_KEY: false, SHIFT_KEY: false, ALT_KEY: false, META_KEY: false }
+  jQuery.fn.captureKeys.stack = { CTRL_KEY: false, SHIFT_KEY: false, ALT_KEY: false, META_KEY: false };
   jQuery.fn.captureKeys.capturing = false;
   jQuery.fn.isPressed = function (key) {
     switch (key) {
@@ -284,14 +282,14 @@
       default:
         return false;
     }
-  }
+  };
 })(jQuery);
 
 
 jQuery(function () {
   mychange = function (jQuerylist) {
     jQuery('#' + jQuerylist.attr('id') + '_serialised').html(jQuery.dds.serialize(jQuerylist.attr('id')));
-  }
+  };
 
   jQuery('.dd').find('ul').drag_drop_selectable({onListChange: mychange});
 

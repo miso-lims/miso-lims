@@ -28,7 +28,7 @@ var Plate = Plate || {
               'plateControllerHelperService',
               'deletePlate',
               {'plateId': plateId, 'url': ajaxurl},
-              {'doOnSuccess': function (json) {
+              {'doOnSuccess': function () {
                 successfunc();
               }
               }
@@ -287,10 +287,11 @@ Plate.ui = {
   processPlateUpload: function (frameId) {
     var iframe = document.getElementById(frameId);
     var iframedoc = iframe.document;
-    if (iframe.contentDocument)
-        iframedoc = iframe.contentDocument;
-    else if (iframe.contentWindow)
+    if (iframe.contentDocument) {
+      iframedoc = iframe.contentDocument;
+    } else if (iframe.contentWindow) {
         iframedoc = iframe.contentWindow.document;
+    }
     var response = jQuery(iframedoc).contents().find('body:first').find('#uploadresponsebody').val();
     if (!Utils.validation.isNullCheck(response)) {
       var json = jQuery.parseJSON(response);
@@ -315,7 +316,7 @@ Plate.ui = {
               impb.append("<ul>");
               for (var k = 0; k < plate.elements.length; k++) {
                 var library = plate.elements[k];
-                impb.append("<li>" + library.alias + "</li>")
+                impb.append("<li>" + library.alias + "</li>");
               }
               impb.append("</ul>");
               impb.append("</div>");
@@ -326,7 +327,7 @@ Plate.ui = {
     }
     else {
       setTimeout(function () {
-        Plate.ui.processPlateUpload(frameId)
+        Plate.ui.processPlateUpload(frameId);
       }, 2000);
     }
   },
@@ -341,10 +342,11 @@ Plate.ui = {
     Utils.ui.disableButton("saveImportedElementsButton");
     var iframe = document.getElementById(frameId);
     var iframedoc = iframe.document;
-    if (iframe.contentDocument)
+    if (iframe.contentDocument) {
         iframedoc = iframe.contentDocument;
-    else if (iframe.contentWindow)
+    } else if (iframe.contentWindow) {
         iframedoc = iframe.contentWindow.document;
+    }
     var response = jQuery(iframedoc).contents().find('body:first').find('#uploadresponsebody').val();
     if (!Utils.validation.isNullCheck(response)) {
       var json = jQuery.parseJSON(response);

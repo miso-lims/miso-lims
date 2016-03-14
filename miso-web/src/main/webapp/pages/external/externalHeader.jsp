@@ -21,8 +21,7 @@
   ~ **********************************************************************
   --%>
 
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<!DOCTYPE html>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
@@ -64,22 +63,10 @@
     <%-- timestamp to force browser to reload javascript --%>
     <jsp:useBean id="timestamp" class="java.util.Date" scope="request"/>
 
-    <link rel="stylesheet" href="<c:url value='/styles/style.css?ts=${timestamp.time}'/>" type="text/css">
     <link rel="stylesheet" href="<c:url value='/styles/simpletree.css'/>" type="text/css">
     <title>MISO LIMS <c:if test="${not empty title}">- ${title}</c:if></title>
     <script type="text/javascript" src="<c:url value='/scripts/scriptaculous/prototype.js'/>"></script>
-    <script type="text/javascript" src="<c:url value='/scripts/fluxion-ajax/fluxion-ajax-compiled.js?ts=${timestamp.time}'/>"></script>
-
-    <!--Scriptaculous JS scripts below -->
-    <script type="text/javascript" src="<c:url value='/scripts/scriptaculous/scriptaculous.js'/>"></script>
-    <script type="text/javascript" src="<c:url value='/scripts/scriptaculous/activityInput.js'/>"></script>
-    <script type="text/javascript" src="<c:url value='/scripts/scriptaculous/effects.js'/>"></script>
-    <script type="text/javascript" src="<c:url value='/scripts/scriptaculous/unittest.js'/>"></script>
-    <script type="text/javascript" src="<c:url value='/scripts/scriptaculous/dragdrop.js'/>"></script>
-    <script type="text/javascript" src="<c:url value='/scripts/scriptaculous/slider.js'/>"></script>
-    <script type="text/javascript" src="<c:url value='/scripts/scriptaculous/builder.js'/>"></script>
-    <script type="text/javascript" src="<c:url value='/scripts/scriptaculous/sound.js'/>"></script>
-    <script type="text/javascript" src="<c:url value='/scripts/scriptaculous/controls.js'/>"></script>
+    <script type="text/javascript" src="<c:url value='/scripts/fluxion-ajax/fluxion-ajax-compiled.js'/>"></script>
 
     <!-- jQuery -->
     <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery-1.4.2.min.js'/>"></script>
@@ -100,39 +87,16 @@
     <script type="text/javascript" src="<c:url value='/scripts/d3/d3.layout.min.js'/>"></script>
     <script type="text/javascript" src="<c:url value='/scripts/d3/d3.chart.min.js'/>"></script>
 
-    <!-- LIMS -->
-    <script type="text/javascript" src="<c:url value='/scripts/lims.js?ts=${timestamp.time}'/>"></script>
-    <script type="text/javascript" src="<c:url value='/scripts/search.js?ts=${timestamp.time}'/>"></script>
-
-    <script type="text/javascript" src="<c:url value='/scripts/experiment_ajax.js?ts=${timestamp.time}'/>"></script>
-    <script type="text/javascript" src="<c:url value='/scripts/library_ajax.js?ts=${timestamp.time}'/>"></script>
-    <script type="text/javascript" src="<c:url value='/scripts/pool_ajax.js?ts=${timestamp.time}'/>"></script>
-    <script type="text/javascript" src="<c:url value='/scripts/project_ajax.js?ts=${timestamp.time}'/>"></script>
-    <script type="text/javascript" src="<c:url value='/scripts/reporting_ajax.js?ts=${timestamp.time}'/>"></script>
-    <script type="text/javascript" src="<c:url value='/scripts/run_ajax.js?ts=${timestamp.time}'/>"></script>
-    <script type="text/javascript" src="<c:url value='/scripts/sample_ajax.js?ts=${timestamp.time}'/>"></script>
-    <script type="text/javascript" src="<c:url value='/scripts/sequencer_reference_ajax.js?ts=${timestamp.time}'/>"></script>
-    <script type="text/javascript" src="<c:url value='/scripts/study_ajax.js?ts=${timestamp.time}'/>"></script>
-
-    <!-- form validations -->
-    <script type="text/javascript" src="<c:url value='/scripts/experiment_validation.js?ts=${timestamp.time}'/>"></script>
-    <script type="text/javascript" src="<c:url value='/scripts/library_validation.js?ts=${timestamp.time}'/>"></script>
-    <script type="text/javascript" src="<c:url value='/scripts/pool_validation.js?ts=${timestamp.time}'/>"></script>
-    <script type="text/javascript" src="<c:url value='/scripts/project_validation.js?ts=${timestamp.time}'/>"></script>
-    <script type="text/javascript" src="<c:url value='/scripts/run_validation.js?ts=${timestamp.time}'/>"></script>
-    <script type="text/javascript" src="<c:url value='/scripts/sample_validation.js?ts=${timestamp.time}'/>"></script>
-    <script type="text/javascript" src="<c:url value='/scripts/study_validation.js?ts=${timestamp.time}'/>"></script>
-
     <!-- give $ back to prototype -->
     <script type="text/javascript">jQuery.noConflict();</script>
 
-    <script type="text/javascript" src="<c:url value='/scripts/multi_select_drag_drop.js?ts=${timestamp.time}'/>"></script>
+    <!-- minified MISO stylesheets and scripts -->
+    <link rel="stylesheet" href="<c:url value='/styles/style.min.css'/>" type="text/css">
+    <script type="text/javascript" src="<c:url value='/scripts/header_script.min.js'/>"></script>
+
 
     <link rel="shortcut icon" href="<c:url value='/styles/images/favicon.ico'/>" type="image/x-icon"/>
 
-    <!--drop down menu -->
-
-    <script src="<c:url value='/scripts/menus.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
 
     <!-- refresh page every 30mins and 1 sec -->
     <!--<meta http-equiv="refresh" content="1801"/>-->

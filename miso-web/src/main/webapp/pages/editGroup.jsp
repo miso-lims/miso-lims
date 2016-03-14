@@ -24,7 +24,6 @@
   ~ **********************************************************************
   --%>
 <script type="text/javascript" src="<c:url value='/scripts/parsley/parsley.min.js'/>"></script>
-<script type="text/javascript" src="<c:url value='/scripts/group_validation.js?ts=${timestamp.time}'/>"></script>
 
 <div id="maincontent">
   <div id="contentcolumn">
@@ -35,7 +34,7 @@
       <h1><c:choose><c:when
           test="${not empty group.groupId}">Edit</c:when><c:otherwise>Create</c:otherwise></c:choose>
         Group
-        <button onclick="return validateGroup();" class="fg-button ui-state-default ui-corner-all">Save</button>
+        <button onclick="return Group.validateGroup();" class="fg-button ui-state-default ui-corner-all">Save</button>
       </h1>
 
       <div class="bs-callout bs-callout-warning hidden">
@@ -74,6 +73,8 @@
 
 <script type="text/javascript">
   jQuery(document).ready(function () {
+    Validate.attachParsley('#group-form');
+    
     jQuery('#name').simplyCountable({
       counter: '#nameCounter',
       countType: 'characters',

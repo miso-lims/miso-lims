@@ -38,10 +38,10 @@
     <%-- timestamp to force browser to reload javascript --%>
     <jsp:useBean id="timestamp" class="java.util.Date" scope="request"/>
 
-    <link rel="stylesheet" href="<c:url value='/styles/style.css?ts=${timestamp.time}'/>" type="text/css">
+    <link rel="stylesheet" href="<c:url value='/styles/style.css'/>" type="text/css">
     <title>MISO LIMS External<c:if test="${not empty title}">- ${title}</c:if></title>
     <script type="text/javascript" src="<c:url value='/scripts/scriptaculous/prototype.js'/>"></script>
-    <script type="text/javascript" src="<c:url value='/scripts/fluxion-ajax/fluxion-ajax-compiled.js?ts=${timestamp.time}'/>"></script>
+    <script type="text/javascript" src="<c:url value='/scripts/fluxion-ajax/fluxion-ajax-compiled.js'/>"></script>
 
     <!--Scriptaculous JS scripts below -->
     <script type="text/javascript" src="<c:url value='/scripts/scriptaculous/scriptaculous.js'/>"></script>
@@ -70,9 +70,9 @@
 
 
     <!-- LIMS -->
-    <script type="text/javascript" src="<c:url value='/scripts/lims.js?ts=${timestamp.time}'/>"></script>
-    <script type="text/javascript" src="<c:url value='/scripts/external.js?ts=${timestamp.time}'/>"></script>
-    <script type="text/javascript" src="<c:url value='/scripts/search.js?ts=${timestamp.time}'/>"></script>
+    <script type="text/javascript" src="<c:url value='/scripts/lims.js'/>"></script>
+    <script type="text/javascript" src="<c:url value='/scripts/external.js'/>"></script>
+    <script type="text/javascript" src="<c:url value='/scripts/search.js'/>"></script>
 
     <!--CryptoJS-->
     <script type="text/javascript" src="<c:url value='/scripts/sha1.js'/>"></script>
@@ -82,13 +82,13 @@
     <!-- give $ back to prototype -->
     <script type="text/javascript">jQuery.noConflict();</script>
 
-    <script type="text/javascript" src="<c:url value='/scripts/multi_select_drag_drop.js?ts=${timestamp.time}'/>"></script>
+    <script type="text/javascript" src="<c:url value='/scripts/multi_select_drag_drop.js'/>"></script>
 
     <link rel="shortcut icon" href="<c:url value='/styles/images/favicon.ico'/>" type="image/x-icon"/>
 
     <!--drop down menu -->
 
-    <script src="<c:url value='/scripts/menus.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
+    <script src="<c:url value='/scripts/menus.js'/>" type="text/javascript"></script>
 
     <!-- refresh page every 30mins and 1 sec -->
     <!--<meta http-equiv="refresh" content="1801"/>-->

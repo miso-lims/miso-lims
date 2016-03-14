@@ -31,7 +31,6 @@
 <%@ include file="../header.jsp" %>
 
 <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.jstree.js'/>"></script>
-<script type="text/javascript" src="<c:url value='/scripts/submission_ajax.js?ts=${timestamp.time}'/>"></script>
 
 <div id="maincontent">
 <div id="contentcolumn">

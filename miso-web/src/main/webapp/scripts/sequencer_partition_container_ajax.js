@@ -45,7 +45,9 @@ var Container = Container || {
       if (json.verify) {
         var dialogStr = "Container Properties\n\n";
         for (var key in json.verify) {
-          dialogStr += "Partition " + key + ": " + json.verify[key] + "\n";
+          if (json.verify.hasOwnProperty(key)) {
+            dialogStr += "Partition " + key + ": " + json.verify[key] + "\n";
+          }
         }
 
         if (confirm("Found container '" + json.barcode + "'. Import this container?\n\n" + dialogStr)) {
@@ -128,7 +130,7 @@ var Container = Container || {
     return false;
   },
   
-  validateStudyAdded: function (form) {
+  validateStudyAdded: function () {
     var ok = true;
     if (jQuery('div[id^="studySelectDiv"]').length > 0) {
       console.log(jQuery('div[id^="studySelectDiv"]'));
@@ -153,7 +155,7 @@ Container.ui = {
            "<button onclick='Container.lookupContainer(this);' type='button' class='fg-button ui-state-default ui-corner-all'>Lookup</button>");
   },
 
-  editContainerLocationBarcode: function (span, fc) {
+  editContainerLocationBarcode: function (span) {
     var s = jQuery(span);
     s.html("<input type='text' id='locationBarcode' name='locationBarcode' value='" + s.html() + "'/>");
   },
@@ -184,7 +186,7 @@ Container.ui = {
   },
 
   populateContainerOptions: function (form) {
-    if (form.value != 0) {
+    if (form.value !== 0) {
       Fluxion.doAjax(
         'containerControllerHelperService',
         'populateContainerOptions',
@@ -336,7 +338,7 @@ Container.partition = {
           newpool.append(json.html);
           newpool.append("<span style='position: absolute; top: 0; right: 0;' onclick='Container.pool.confirmPoolRemove(this);' class='float-right ui-icon ui-icon-circle-close'></span>");
         },
-          'doOnError': function (json) {
+          'doOnError': function () {
             newpool.remove();
             alert("Error adding pool, no Study is present.");
           }
@@ -374,7 +376,7 @@ Container.partition = {
         jQuery("#studySelectDiv" + partition + "_" + projectId).remove();
         div.append(json.html);
       },
-        'doOnError': function (json) {
+        'doOnError': function () {
           Utils.ui.reenableButton('studySelectButton-' + partition + '_' + poolId, "Select Study");
         }
       }

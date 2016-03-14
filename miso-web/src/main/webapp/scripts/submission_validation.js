@@ -25,17 +25,17 @@ function validate_submission(form) {
   var ok = true;
   var error = "Please correct the following error(s):\n\n";
 
-  if (jQuery('#title').val() == "") {
+  if (jQuery('#title').val() === "") {
     ok = false;
     error += "You have not entered a title for the Submission.\n";
   }
 
-  if (jQuery('#alias').val() == "") {
+  if (jQuery('#alias').val() === "") {
     ok = false;
     error += "You have not entered an alias for the Submission.\n";
   }
 
-  if (jQuery('#description').val() == "") {
+  if (jQuery('#description').val() === "") {
     ok = false;
     error += "You have not entered a description of the Submission.\n";
   }
@@ -46,7 +46,7 @@ function validate_submission(form) {
         ok = false;
         error += "You cannot use single or double quotes in the "+jQuery(this).attr("id")+" field and it cannot end with a space.\n";
       }
-    })
+    });
   }
 
   if (!ok) {
