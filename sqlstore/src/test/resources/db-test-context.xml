@@ -69,6 +69,11 @@
         <prop key="hibernate.show_sql">true</prop>
       </props>
     </property>
+    <property name="mappingResources">
+      <list>
+        <value>hibernate/miso.hbm.xml</value>
+      </list>
+    </property>
   </bean>
 
   <tx:annotation-driven/>

@@ -104,7 +104,7 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @Transient
   public Document submissionDocument;
 
-  @Transient
+  @OneToOne(targetEntity = SecurityProfile.class)
   private SecurityProfile securityProfile = null;
 
   private String accession;

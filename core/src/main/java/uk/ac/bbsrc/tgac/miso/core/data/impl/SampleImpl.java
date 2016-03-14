@@ -80,6 +80,8 @@ public class SampleImpl extends AbstractSample implements Serializable {
       setProject(project);
       setSecurityProfile(project.getSecurityProfile());
     } else {
+      log.error(String.format("User %s does not have permission to read Project %s. Unable to create Sample.", user.getFullName(),
+          project.getAlias()));
       setSecurityProfile(new SecurityProfile(user));
     }
   }
