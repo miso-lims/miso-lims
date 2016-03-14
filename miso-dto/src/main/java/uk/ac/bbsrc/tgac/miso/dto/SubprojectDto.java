@@ -18,6 +18,7 @@ public class SubprojectDto {
   private Long updatedById;
   private String updatedByUrl;
   private String lastUpdated;
+  private Long referenceGenomeId;
 
   public Long getId() {
     return id;
@@ -131,4 +132,11 @@ public class SubprojectDto {
         + updatedByUrl + ", lastUpdated=" + lastUpdated + "]";
   }
 
+  public Long getReferenceGenomeId() {
+    return referenceGenomeId;
+  }
+
+  public void setReferenceGenomeId(Long referenceGenomeId) {
+    this.referenceGenomeId = referenceGenomeId;
+  }
 }

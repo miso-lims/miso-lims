@@ -48,10 +48,12 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleGroupId;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SubprojectDto;
+import uk.ac.bbsrc.tgac.miso.service.ReferenceGenomeService;
 import uk.ac.bbsrc.tgac.miso.service.SampleGroupService;
 import uk.ac.bbsrc.tgac.miso.service.SubprojectService;
 
@@ -67,6 +69,9 @@ public class SubprojectController extends RestController {
 
   @Autowired
   private SampleGroupService sampleGroupService;
+
+  @Autowired
+  private ReferenceGenomeService referenceGenomeService;
 
   @RequestMapping(value = "/subproject/{id}", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
@@ -102,6 +107,12 @@ public class SubprojectController extends RestController {
       subprojectDto = writeUrls(subprojectDto, uriBuilder);
     }
     return subprojectDtos;
+  }
+
+  @RequestMapping(value = "/referencegenomes", method = RequestMethod.GET, produces = { "application/json" })
+  @ResponseBody
+  public Collection<ReferenceGenome> getReferenceGenomeOptions(UriComponentsBuilder uriComponentsBuilder, HttpServletResponse response) throws IOException {
+    return referenceGenomeService.listAllReferenceGenomeTypes();
   }
 
   @RequestMapping(value = "/subproject", method = RequestMethod.POST, headers = { "Content-type=application/json" })

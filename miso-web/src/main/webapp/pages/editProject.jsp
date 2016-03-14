@@ -112,7 +112,7 @@
     </td>
   </tr>
   <tr>
-    <td class="h">Description:*</td>
+    <td class="h">Description:</td>
     <td><form:input id="description" path="description" maxlength="${maxLengths['description']}" class="validateable"/>
       <span id="descriptioncounter" class="counter"></span></td>
   </tr>
@@ -133,11 +133,19 @@
     </td>
   </tr>
   <tr>
-    <td></td>
+      <td></td>
+      <td>
+        <div class="parsley-errors-list filled" id="progressSelectError">
+          <div class="parsley-required"></div>
+        </div>
+      </td>
+  </tr>
+  <tr>
+    <td>Reference Genome :*</td>
     <td>
-      <div class="parsley-errors-list filled" id="progressSelectError">
-        <div class="parsley-required"></div>
-      </div>
+        <form:select id="referenceGenome" path="referenceGenomeId">
+            <form:options items="${referenceGenome}" itemValue="referenceGenomeId" itemLabel="alias"/>
+        </form:select>
     </td>
   </tr>
 </table>

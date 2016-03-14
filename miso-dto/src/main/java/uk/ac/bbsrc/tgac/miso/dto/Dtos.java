@@ -116,6 +116,7 @@ public class Dtos {
     dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
     dto.setUpdatedById(from.getUpdatedBy().getUserId());
     dto.setLastUpdated(dateTimeFormatter.print(from.getLastUpdated().getTime()));
+    dto.setReferenceGenomeId(from.getReferenceGenomeId());
     return dto;
   }
 
@@ -132,6 +133,7 @@ public class Dtos {
     to.setAlias(from.getAlias());
     to.setDescription(from.getDescription());
     to.setPriority(from.getPriority());
+    to.setReferenceGenomeId(from.getReferenceGenomeId());
     return to;
   }
 

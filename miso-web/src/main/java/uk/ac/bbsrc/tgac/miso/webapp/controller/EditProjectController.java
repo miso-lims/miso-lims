@@ -89,6 +89,7 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.service.ReferenceGenomeService;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 @Controller
@@ -108,6 +109,9 @@ public class EditProjectController {
 
   @Autowired
   private DataObjectFactory dataObjectFactory;
+
+  @Autowired
+  private ReferenceGenomeService referenceGenomeService;
 
   public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
     this.dataObjectFactory = dataObjectFactory;
@@ -415,6 +419,7 @@ public class EditProjectController {
         model.put("projectPlates", populateProjectPlates(projectId));
 
         model.put("libraryGroupMap", populateLibraryGroupMap(project, libraries));
+
       }
 
       if (project == null) {
@@ -424,7 +429,7 @@ public class EditProjectController {
       if (!project.userCanRead(user)) {
         throw new SecurityException("Permission denied.");
       }
-
+      model.put("referenceGenome", referenceGenomeService.listAllReferenceGenomeTypes());
       model.put("formObj", project);
       model.put("project", project);
       model.put("projectFiles", populateProjectFiles(projectId));

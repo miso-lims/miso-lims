@@ -51,6 +51,9 @@ public class SubprojectImpl implements Subproject {
   @Column(nullable = false)
   private Date lastUpdated;
 
+  @Column(nullable = true)
+  private Long referenceGenomeId;
+
   @Override
   public Long getSubprojectId() {
     return subprojectId;
@@ -141,4 +144,13 @@ public class SubprojectImpl implements Subproject {
     this.priority = priority;
   }
 
+  @Override
+  public Long getReferenceGenomeId() {
+    return referenceGenomeId;
+  }
+
+  @Override
+  public void setReferenceGenomeId(Long referenceGenomeId) {
+    this.referenceGenomeId = referenceGenomeId;
+  }
 }

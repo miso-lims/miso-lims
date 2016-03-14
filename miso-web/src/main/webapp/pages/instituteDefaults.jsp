@@ -135,7 +135,7 @@
     <table id="allSubprojectsTable" class="clear default-table" data-sortable>
       <thead>
         <tr>
-          <th>Project</th><th>Alias</th><th>Description</th><th>Priority</th>
+          <th>Project</th><th>Alias</th><th>Description</th><th>Priority</th><th>Reference Genome</th>
         </tr>
       </thead>
       <tbody id="allSubprojects" class="SubP"></tbody>

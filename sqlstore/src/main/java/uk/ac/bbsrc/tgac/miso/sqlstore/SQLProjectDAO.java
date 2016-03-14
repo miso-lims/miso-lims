@@ -75,6 +75,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.core.store.StudyStore;
 import uk.ac.bbsrc.tgac.miso.core.store.WatcherStore;
+import uk.ac.bbsrc.tgac.miso.persistence.ReferenceGenomeDao;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
@@ -89,7 +90,7 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 public class SQLProjectDAO implements ProjectStore {
   private static final String TABLE_NAME = "Project";
 
-  public static final String PROJECTS_SELECT = "SELECT projectId, name, alias, description, creationDate, securityProfile_profileId, progress, lastUpdated "
+  public static final String PROJECTS_SELECT = "SELECT projectId, name, alias, description, creationDate, securityProfile_profileId, progress, lastUpdated, referenceGenomeId "
       + "FROM " + TABLE_NAME;
 
   public static final String PROJECTS_SELECT_LIMIT = PROJECTS_SELECT + " ORDER BY projectId DESC LIMIT ?";
@@ -102,7 +103,7 @@ public class SQLProjectDAO implements ProjectStore {
       + "description LIKE ? ";
 
   public static final String PROJECT_UPDATE = "UPDATE " + TABLE_NAME + " "
-      + "SET name=:name, alias=:alias, description=:description, creationDate=:creationDate, securityProfile_profileId=:securityProfile_profileId, progress=:progress "
+      + "SET name=:name, alias=:alias, description=:description, creationDate=:creationDate, securityProfile_profileId=:securityProfile_profileId, progress=:progress, referenceGenomeId=:referenceGenomeId "
       + "WHERE projectId=:projectId";
 
   public static final String PROJECT_DELETE = "DELETE FROM " + TABLE_NAME + " WHERE projectId=:projectId";
@@ -201,6 +202,9 @@ public class SQLProjectDAO implements ProjectStore {
   @Autowired
   private DataObjectFactory dataObjectFactory;
 
+  @Autowired
+  private ReferenceGenomeDao referenceGenomeDao;
+
   public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
     this.dataObjectFactory = dataObjectFactory;
   }
@@ -282,6 +286,7 @@ public class SQLProjectDAO implements ProjectStore {
     params.addValue("creationDate", project.getCreationDate());
     params.addValue("securityProfile_profileId", securityProfileId);
     params.addValue("progress", project.getProgress().getKey());
+    params.addValue("referenceGenomeId", project.getReferenceGenomeId());
 
     if (project.getId() == AbstractProject.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(TABLE_NAME).usingGeneratedKeyColumns("projectId");
@@ -569,6 +574,7 @@ public class SQLProjectDAO implements ProjectStore {
         project.setCreationDate(rs.getDate("creationDate"));
         project.setProgress(ProgressType.get(rs.getString("progress")));
         project.setLastUpdated(rs.getTimestamp("lastUpdated"));
+        project.setReferenceGenomeId(rs.getLong("referenceGenomeId"));
 
         try {
           project.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
