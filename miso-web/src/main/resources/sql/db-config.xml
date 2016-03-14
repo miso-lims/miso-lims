@@ -59,6 +59,9 @@
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.InstituteImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAdditionalInfoImpl</value>
       </list>
     </property>
     <property name="hibernateProperties">
@@ -462,6 +465,10 @@
   </bean>
   
   <bean id="hibernateSampleAdditionalInfoDao" class="uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleAdditionalInfoDao">
+    <property name="kitStore" ref="sqlKitDAO" />
+  </bean>
+  
+  <bean id="hibernateLibraryAdditionalInfoDao" class="uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryAdditionalInfoDao">
     <property name="kitStore" ref="sqlKitDAO" />
   </bean>
 

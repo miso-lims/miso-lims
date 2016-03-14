@@ -233,4 +233,14 @@ INSERT INTO `SampleNumberPerProject`
 (`sampleNumberPerProjectId`, `projectId`, `highestSampleNumber`, `padding`, `createdBy`, `updatedBy`, `creationDate`, `lastUpdated`)
 VALUES ('2', '3', '9999', '4', '1', '1', '2016-01-28 14:32:00', '2016-01-28 14:32:00');
 
+DELETE FROM `TissueOrigin`;
+INSERT INTO `TissueOrigin`(`tissueOriginId`, `alias`, `description`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
+VALUES (1,'Test Origin','for testing',1,'2016-02-19 11:28:00',1,'2016-02-19 11:28:00');
 
+DELETE FROM `TissueType`;
+INSERT INTO `TissueType`(`tissueTypeId`, `alias`, `description`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
+VALUES (1,'Test Type','for testing',1,'2016-02-19 11:28:00',1,'2016-02-19 11:28:00');
+
+DELETE FROM `LibraryAdditionalInfo`;
+INSERT INTO `LibraryAdditionalInfo`(`libraryAdditionalInfoId`, `libraryId`, `tissueOriginId`, `tissueTypeId`, `kitDescriptorId`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
+VALUES (1,1,1,1,1,1,'2016-02-19 11:28:00',1,'2016-02-19 11:28:00');

@@ -11,6 +11,7 @@ import com.google.common.collect.Sets;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Institute;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.QcPassedDetail;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
@@ -28,6 +29,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstituteImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAdditionalInfoImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.QcPassedDetailImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAdditionalInfoImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAnalyteImpl;
@@ -73,6 +75,7 @@ public class Dtos {
 
   public static TissueOrigin to(TissueOriginDto from) {
     TissueOrigin to = new TissueOriginImpl();
+    to.setTissueOriginId(from.getId());
     to.setAlias(from.getAlias());
     to.setDescription(from.getDescription());
     return to;
@@ -100,6 +103,7 @@ public class Dtos {
 
   public static TissueType to(TissueTypeDto from) {
     TissueType to = new TissueTypeImpl();
+    to.setTissueTypeId(from.getId());
     to.setAlias(from.getAlias());
     to.setDescription(from.getDescription());
     return to;
@@ -320,6 +324,7 @@ public class Dtos {
 
   public static SampleGroupId to(SampleGroupDto from) {
     SampleGroupId to = new SampleGroupImpl();
+    to.setSampleGroupId(from.getId());
     to.setGroupId(from.getGroupId());
     to.setDescription(from.getDescription());
     return to;
@@ -661,6 +666,47 @@ public class Dtos {
     to.setStockLevel(from.getStockLevel());
     to.setKitType(KitType.get(from.getKitType()));
     to.setPlatformType(PlatformType.get(from.getPlatformType()));
+    return to;
+  }
+  
+  public static LibraryAdditionalInfoDto asDto(LibraryAdditionalInfo from) {
+    LibraryAdditionalInfoDto dto = new LibraryAdditionalInfoDto();
+    dto.setId(from.getId());
+    dto.setLibraryId(from.getLibrary().getId());
+    dto.setTissueOrigin(asDto(from.getTissueOrigin()));
+    dto.setTissueType(asDto(from.getTissueType()));
+    if (from.getSampleGroupId() != null) {
+      dto.setSampleGroup(asDto(from.getSampleGroupId()));
+    }
+    if (from.getPrepKit() != null) {
+      dto.setPrepKit(asDto(from.getPrepKit()));
+    }
+    dto.setCreatedById(from.getCreatedBy().getUserId());
+    dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
+    dto.setUpdatedById(from.getUpdatedBy().getUserId());
+    dto.setLastUpdated(dateTimeFormatter.print(from.getLastUpdated().getTime()));
+    dto.setArchived(from.getArchived());
+    return dto;
+  }
+  
+  public static Set<LibraryAdditionalInfoDto> asLibraryAdditionalInfoDtos(Collection<LibraryAdditionalInfo> from) {
+    Set<LibraryAdditionalInfoDto> dtoSet = Sets.newHashSet();
+    for (LibraryAdditionalInfo l : from) {
+      dtoSet.add(asDto(l));
+    }
+    return dtoSet;
+  }
+  
+  public static LibraryAdditionalInfo to(LibraryAdditionalInfoDto from) {
+    LibraryAdditionalInfo to = new LibraryAdditionalInfoImpl();
+    to.setId(from.getId());
+    to.setTissueOrigin(to(from.getTissueOrigin()));
+    to.setTissueType(to(from.getTissueType()));
+    if (from.getSampleGroup() != null) {
+      to.setSampleGroupId(to(from.getSampleGroup()));
+    }
+    to.setPrepKit(to(from.getPrepKit()));
+    to.setArchived(from.getArchived());
     return to;
   }
 
