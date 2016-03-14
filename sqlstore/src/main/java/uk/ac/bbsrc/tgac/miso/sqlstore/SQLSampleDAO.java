@@ -34,12 +34,14 @@ import java.util.regex.Matcher;
 
 import javax.persistence.CascadeType;
 
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -56,9 +58,6 @@ import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.Property;
 import com.googlecode.ehcache.annotations.TriggersRemove;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -72,6 +71,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleQcException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
@@ -95,32 +95,32 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 public class SQLSampleDAO implements SampleStore {
   private static final String TABLE_NAME = "Sample";
 
-  public static final String SAMPLES_SELECT = "SELECT sampleId, name, description, scientificName, taxonIdentifier, alias, accession, securityProfile_profileId, identificationBarcode, locationBarcode, "
-      + "sampleType, receivedDate, qcPassed, project_projectId, lastModifier, volume, emptied, boxPositionId, (SELECT boxId FROM BoxPosition WHERE BoxPosition.boxPositionId = "
-      + TABLE_NAME
-      + ".boxPositionId) AS boxId, (SELECT alias FROM Box, BoxPosition WHERE Box.boxId = BoxPosition.boxId AND BoxPosition.boxPositionId = "
-      + TABLE_NAME + ".boxPositionId) AS boxAlias , (SELECT row FROM BoxPosition WHERE BoxPosition.boxPositionId = " + TABLE_NAME
-      + ".boxPositionId) AS boxRow, (SELECT `column` FROM BoxPosition WHERE BoxPosition.boxPositionId = " + TABLE_NAME
-      + ".boxPositionId) AS boxColumn " + "FROM " + TABLE_NAME;
+  public static final String SAMPLES_SELECT = "SELECT s.sampleId, s.name, s.description, s.scientificName, s.taxonIdentifier, s.alias, "
+      + "s.accession, s.securityProfile_profileId, s.identificationBarcode, s.locationBarcode, s.sampleType, s.receivedDate, s.qcPassed, "
+      + "s.project_projectId, s.lastModifier, s.volume, s.emptied, s.boxPositionId, b.boxId, b.alias AS boxAlias, "
+      + "b.locationBarcode AS boxLocation, bp.row AS boxRow, bp.column AS boxColumn "
+      + "FROM " + TABLE_NAME + " s "
+      + "LEFT JOIN BoxPosition bp ON bp.boxPositionId = s.boxPositionId "
+      + "LEFT JOIN Box b ON b.boxId = bp.boxId";
 
-  public static final String SAMPLES_SELECT_LIMIT = SAMPLES_SELECT + " ORDER BY sampleId DESC LIMIT ?";
+  public static final String SAMPLES_SELECT_LIMIT = SAMPLES_SELECT + " ORDER BY s.sampleId DESC LIMIT ?";
 
   public static final String SAMPLES_SELECT_RECEIVED_DATE = SAMPLES_SELECT
-      + " ORDER BY receivedDate DESC LIMIT ?";
+      + " ORDER BY s.receivedDate DESC LIMIT ?";
 
 
-  public static final String SAMPLE_SELECT_BY_ID = SAMPLES_SELECT + " " + "WHERE sampleId = ?";
+  public static final String SAMPLE_SELECT_BY_ID = SAMPLES_SELECT + " " + "WHERE s.sampleId = ?";
 
-  public static final String SAMPLE_SELECT_BY_ALIAS = SAMPLES_SELECT + " " + "WHERE alias = ?";
+  public static final String SAMPLE_SELECT_BY_ALIAS = SAMPLES_SELECT + " " + "WHERE s.alias = ?";
 
-  public static final String SAMPLE_SELECT_BY_IDENTIFICATION_BARCODE = SAMPLES_SELECT + " " + "WHERE identificationBarcode = ?";
+  public static final String SAMPLE_SELECT_BY_IDENTIFICATION_BARCODE = SAMPLES_SELECT + " " + "WHERE s.identificationBarcode = ?";
 
-  public static final String SAMPLES_SELECT_FROM_BARCODE_LIST = SAMPLES_SELECT + " " + "WHERE identificationBarcode IN (";
+  public static final String SAMPLES_SELECT_FROM_BARCODE_LIST = SAMPLES_SELECT + " " + "WHERE s.identificationBarcode IN (";
 
-  public static final String SAMPLE_SELECT_BY_BOX_POSITION_ID = SAMPLES_SELECT + " WHERE boxPositionId = ?";
+  public static final String SAMPLE_SELECT_BY_BOX_POSITION_ID = SAMPLES_SELECT + " WHERE s.boxPositionId = ?";
 
-  public static final String SAMPLES_SELECT_BY_SEARCH = SAMPLES_SELECT + " WHERE " + "identificationBarcode LIKE ? OR " + "name LIKE ? OR "
-      + "alias LIKE ? OR " + "description LIKE ? OR " + "scientificName LIKE ? ";
+  public static final String SAMPLES_SELECT_BY_SEARCH = SAMPLES_SELECT + " WHERE " + "s.identificationBarcode LIKE ? OR " + "s.name LIKE ? OR "
+      + "s.alias LIKE ? OR " + "s.description LIKE ? OR " + "s.scientificName LIKE ? ";
 
   public static final String SAMPLE_UPDATE = "UPDATE " + TABLE_NAME + " "
       + "SET name=:name, description=:description, scientificName=:scientificName, taxonIdentifier=:taxonIdentifier, alias=:alias, accession=:accession, securityProfile_profileId=:securityProfile_profileId, "
@@ -130,19 +130,19 @@ public class SQLSampleDAO implements SampleStore {
 
   public static final String SAMPLE_DELETE = "DELETE FROM " + TABLE_NAME + " WHERE sampleId=:sampleId";
 
-  public static String SAMPLES_SELECT_BY_PROJECT_ID = SAMPLES_SELECT + " " + "WHERE project_projectId = ?";
+  public static String SAMPLES_SELECT_BY_PROJECT_ID = SAMPLES_SELECT + " " + "WHERE s.project_projectId = ?";
 
   public static final String SAMPLES_SELECT_BY_EXPERIMENT_ID = SAMPLES_SELECT
-      + " WHERE sampleId IN (SELECT samples_sampleId FROM Experiment_Sample WHERE Experiment_experimentId=?)";
+      + " WHERE s.sampleId IN (SELECT samples_sampleId FROM Experiment_Sample WHERE Experiment_experimentId=?)";
 
   public static final String SAMPLE_SELECT_BY_LIBRARY_ID = SAMPLES_SELECT
-      + " WHERE sampleId IN (SELECT sample_sampleId FROM Library WHERE libraryId=?)";
+      + " WHERE s.sampleId IN (SELECT sample_sampleId FROM Library WHERE libraryId=?)";
 
   public static final String EXPERIMENT_SAMPLE_DELETE_BY_SAMPLE_ID = "DELETE FROM Experiment_Sample "
-      + "WHERE samples_sampleId=:samples_sampleId";
+      + "WHERE s.samples_sampleId=:samples_sampleId";
 
   public static final String SAMPLES_BY_RELATED_SUBMISSION = SAMPLES_SELECT
-      + " WHERE sampleId IN (SELECT samples_sampleId FROM Submission_Sample WHERE submission_submissionId=?)";
+      + " WHERE s.sampleId IN (SELECT samples_sampleId FROM Submission_Sample WHERE submission_submissionId=?)";
 
   public static final String SAMPLE_TYPES_SELECT = "SELECT name FROM SampleType";
 
@@ -158,6 +158,7 @@ public class SQLSampleDAO implements SampleStore {
   private boolean autoGenerateIdentificationBarcodes;
   private ChangeLogStore changeLogDAO;
   private SecurityStore securityDAO;
+  private BoxStore boxDAO;
 
   @Autowired
   private MisoNamingScheme<Sample> sampleNamingScheme;
@@ -219,6 +220,14 @@ public class SQLSampleDAO implements SampleStore {
 
   public void setSecurityProfileDAO(Store<SecurityProfile> securityProfileDAO) {
     this.securityProfileDAO = securityProfileDAO;
+  }
+  
+  public BoxStore getBoxDAO() {
+    return boxDAO;
+  }
+
+  public void setBoxDAO(BoxStore boxDAO) {
+    this.boxDAO = boxDAO;
   }
 
   public JdbcTemplate getJdbcTemplate() {
@@ -314,6 +323,10 @@ public class SQLSampleDAO implements SampleStore {
     Long securityProfileId = sample.getSecurityProfile().getProfileId();
     if (this.cascadeType != null) {
       securityProfileId = securityProfileDAO.save(sample.getSecurityProfile());
+    }
+    if (sample.isEmpty()) {
+      boxDAO.removeBoxableFromBox(sample);
+      sample.setVolume(0D);
     }
     MapSqlParameterSource params = new MapSqlParameterSource();
     params.addValue("alias", sample.getAlias());
@@ -602,13 +615,14 @@ public class SQLSampleDAO implements SampleStore {
       s.setLocationBarcode(rs.getString("locationBarcode"));
       s.setSampleType(rs.getString("sampleType"));
       s.setReceivedDate(rs.getDate("receivedDate"));
-      s.setVolume(rs.getLong("volume"));
+      s.setVolume(rs.getDouble("volume"));
       s.setEmpty(rs.getBoolean("emptied"));
       s.setBoxPositionId(rs.getLong("boxPositionId"));
       s.setBoxAlias(rs.getString("boxAlias"));
       s.setBoxId(rs.getLong("boxId"));
       int row = rs.getInt("boxRow");
       if (!rs.wasNull()) s.setBoxPosition(BoxUtils.getPositionString(row, rs.getInt("boxColumn")));
+      s.setBoxLocation(rs.getString("boxLocation"));
       if (rs.getString("qcPassed") != null) {
         s.setQcPassed(Boolean.parseBoolean(rs.getString("qcPassed")));
       } else {

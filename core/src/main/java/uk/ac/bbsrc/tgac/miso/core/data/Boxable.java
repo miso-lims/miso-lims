@@ -12,7 +12,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
  * This interface simply describes an object that can be placed into a box. i.e. Sample, Library
  * 
  */
-@JsonIgnoreProperties({"boxId", "boxAlias"})
+@JsonIgnoreProperties({"boxId", "boxAlias", "boxLocation"})
 @JsonTypeInfo(use=JsonTypeInfo.Id.NAME, include=JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes({
   @JsonSubTypes.Type(value=SampleImpl.class, name="SampleImpl"), 
@@ -90,5 +90,9 @@ public interface Boxable extends Nameable, Barcodable {
   public String getBoxPosition();
 
   public void setBoxPosition(String id);
+  
+  public String getBoxLocation();
+  
+  public void setBoxLocation(String boxLocation);
 
 }

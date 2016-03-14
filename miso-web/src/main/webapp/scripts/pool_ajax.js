@@ -69,6 +69,12 @@ var Pool = Pool || {
     jQuery('#creationDate').attr('data-parsley-pattern', Utils.validation.dateRegex);
     jQuery('#creationDate').attr('data-date-format', 'DD/MM/YYYY');
     jQuery('#creationDate').attr('data-parsley-error-message', 'Date must be of form DD/MM/YYYY');
+    
+    // Volume validation
+    jQuery('#volume').attr('class', 'form-control');
+    jQuery('#volume').attr('data-parsley-required', 'true');
+    jQuery('#volume').attr('data-parsley-maxlength', '10');
+    jQuery('#volume').attr('data-parsley-type', 'number');
 
     jQuery('#pool-form').parsley();
     jQuery('#pool-form').parsley().validate();

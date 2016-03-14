@@ -8,6 +8,7 @@ public abstract class AbstractBoxable implements Boxable {
   private double volume;
   private Long boxId;
   private String boxAlias;
+  private String boxLocation;
   private long positionId;
   private String alias;
   private String position;
@@ -81,5 +82,15 @@ public abstract class AbstractBoxable implements Boxable {
   @Override
   public void setBoxPosition(String position) {
     this.position = position;
+  }
+  
+  @Override
+  public String getBoxLocation() {
+    return boxLocation;
+  }
+  
+  @Override
+  public void setBoxLocation(String boxLocation) {
+    this.boxLocation = boxLocation;
   }
 }

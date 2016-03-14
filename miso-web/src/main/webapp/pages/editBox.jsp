@@ -210,7 +210,7 @@
       </a>
       <div id="actionsmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
         <a onclick="Box.ui.exportBox(${box.id});" href="javascript:void(0);" class="add">Export Box to Excel</a>
-        <a onclick="Box.ui.emptyEntireBox(${box.id});" href="javascript:void(0);" class="add">Mark Entire Box Empty</a>
+        <a onclick="Box.ui.emptyEntireBox(${box.id});" href="javascript:void(0);" class="add">Trash All Tubes</a>
         <c:if test="${(scannerEnabled) && (box.size.scannable)}"><a onclick="Box.initScan();" href="javascript:void(0);">Scan Box</a></c:if>
       </div>
     </li>
