@@ -102,12 +102,17 @@ import uk.ac.bbsrc.tgac.miso.core.store.RunQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
+import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerReferenceStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerServiceRecordStore;
 import uk.ac.bbsrc.tgac.miso.core.store.StatusStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.core.store.StudyStore;
+import uk.ac.bbsrc.tgac.miso.core.store.SubmissionStore;
+
+import com.eaglegenomics.simlims.core.Note;
+import com.eaglegenomics.simlims.core.SecurityProfile;
 
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
@@ -174,11 +179,17 @@ public class MisoRequestManager implements RequestManager {
   @Autowired
   private StudyStore studyStore;
   @Autowired
-  private Store<Submission> submissionStore;
+  private SubmissionStore submissionStore;
   @Autowired
   private ChangeLogStore changeLogStore;
   @Autowired
   private BoxStore boxStore;
+  @Autowired
+  private SecurityStore securityStore;
+  
+  public void setSecurityStore(SecurityStore securityStore) {
+    this.securityStore = securityStore;
+  }
 
   public void setBoxStore(BoxStore boxStore) {
     this.boxStore = boxStore;
@@ -288,7 +299,7 @@ public class MisoRequestManager implements RequestManager {
     this.studyStore = studyStore;
   }
 
-  public void setSubmissionStore(Store<Submission> submissionStore) {
+  public void setSubmissionStore(SubmissionStore submissionStore) {
     this.submissionStore = submissionStore;
   }
 
@@ -2603,6 +2614,14 @@ public class MisoRequestManager implements RequestManager {
       throw new IOException("No sequencerServiceRecordStore available. Check that it has been declared in the Spring config.");
     }
   }
+  
+  public Map<String, Integer> getBoxColumnSizes() throws IOException {
+    if (boxStore != null) {
+      return boxStore.getBoxColumnSizes();
+    } else {
+      throw new IOException("No boxStore available. Check that it has been declared in the Spring config.");
+    }
+  }
 
   @Override
   public SequencerServiceRecord getSequencerServiceRecordById(long id) throws IOException {
@@ -2612,6 +2631,14 @@ public class MisoRequestManager implements RequestManager {
       throw new IOException("No sequencerServiceRecordStore available. Check that it has been declared in the Spring config.");
     }
   }
+  
+  public Map<String, Integer> getExperimentColumnSizes() throws IOException {
+    if (experimentStore != null) {
+      return experimentStore.getExperimentColumnSizes();
+    } else {
+      throw new IOException("No experimentStore available. Check that it has been declared in the Spring config.");
+    }
+  }
 
   @Override
   public Collection<SequencerServiceRecord> listAllSequencerServiceRecords() throws IOException {
@@ -2619,6 +2646,14 @@ public class MisoRequestManager implements RequestManager {
       return sequencerServiceRecordStore.listAll();
     } else {
       throw new IOException("No sequencerServiceRecordStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+  
+  public Map<String, Integer> getPoolColumnSizes() throws IOException {
+    if (poolStore != null) {
+      return poolStore.getPoolColumnSizes();
+    } else {
+      throw new IOException("No poolStore available. Check that it has been declared in the Spring config.");
     }
   }
 
@@ -2637,6 +2672,104 @@ public class MisoRequestManager implements RequestManager {
       return sequencerServiceRecordStore.getServiceRecordColumnSizes();
     } else {
       throw new IOException("No sequencerServiceRecordStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+  
+  public Map<String, Integer> getKitDescriptorColumnSizes() throws IOException {
+    if (kitStore != null) {
+      return kitStore.getKitDescriptorColumnSizes();
+    } else {
+      throw new IOException("No kitStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public Map<String, Integer> getLibraryColumnSizes() throws IOException {
+    if (libraryStore != null) {
+      return libraryStore.getLibraryColumnSizes();
+    } else {
+      throw new IOException("No libraryStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public Map<String, Integer> getPlateColumnSizes() throws IOException {
+    if (plateStore != null) {
+      return plateStore.getPlateColumnSizes();
+    } else {
+      throw new IOException("No plateStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public Map<String, Integer> getProjectColumnSizes() throws IOException {
+    if (projectStore != null) {
+      return projectStore.getProjectColumnSizes();
+    } else {
+      throw new IOException("No projectStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public Map<String, Integer> getRunColumnSizes() throws IOException {
+    if (runStore != null) {
+      return runStore.getRunColumnSizes();
+    } else {
+      throw new IOException("No runStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public Map<String, Integer> getSampleColumnSizes() throws IOException {
+    if (sampleStore != null) {
+      return sampleStore.getSampleColumnSizes();
+    } else {
+      throw new IOException("No sampleStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public Map<String, Integer> getStudyColumnSizes() throws IOException {
+    if (studyStore != null) {
+      return studyStore.getStudyColumnSizes();
+    } else {
+      throw new IOException("No studyStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public Map<String, Integer> getSequencerReferenceColumnSizes() throws IOException {
+    if (sequencerReferenceStore != null) {
+      return sequencerReferenceStore.getSequencerReferenceColumnSizes();
+    } else {
+      throw new IOException("No sequencerReferenceStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public Map<String, Integer> getSubmissionColumnSizes() throws IOException {
+    if (submissionStore != null) {
+      return submissionStore.getSubmissionColumnSizes();
+    } else {
+      throw new IOException("No submissionStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public Map<String, Integer> getUserColumnSizes() throws IOException {
+    if (securityStore != null) {
+      return securityStore.getUserColumnSizes();
+    } else {
+      throw new IOException("No securityStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public Map<String, Integer> getGroupColumnSizes() throws IOException {
+    if (securityStore != null) {
+      return securityStore.getGroupColumnSizes();
+    } else {
+      throw new IOException("No securityStore available. Check that it has been declared in the Spring config.");
     }
   }
 }

@@ -25,6 +25,7 @@ package uk.ac.bbsrc.tgac.miso.core.store;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Map;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
@@ -88,4 +89,10 @@ public interface ExperimentStore extends Store<Experiment>, Cascadable, Remover<
    *           when the objects cannot be retrieved
    */
   Collection<Experiment> listAllWithLimit(long limit) throws IOException;
+  
+  /**
+   * @return a map containing all column names and max lengths from the Experiments table
+   * @throws IOException
+   */
+  public Map<String, Integer> getExperimentColumnSizes() throws IOException;
 }

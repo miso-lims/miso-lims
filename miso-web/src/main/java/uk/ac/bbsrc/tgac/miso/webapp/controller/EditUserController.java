@@ -37,7 +37,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.authority.GrantedAuthorityImpl;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -52,8 +51,8 @@ import org.springframework.web.servlet.ModelAndView;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
+import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.PasswordCodecService;
-import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 import com.eaglegenomics.simlims.core.Activity;
 import com.eaglegenomics.simlims.core.Group;
@@ -80,10 +79,10 @@ public class EditUserController {
   private DataObjectFactory dataObjectFactory;
   
   @Autowired
-  private JdbcTemplate interfaceTemplate;
-
-  public void setInterfaceTemplate(JdbcTemplate interfaceTemplate) {
-    this.interfaceTemplate = interfaceTemplate;
+  private RequestManager requestManager;
+  
+  public void setRequestManager(RequestManager requestManager) {
+    this.requestManager = requestManager;
   }
 
   public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
@@ -104,7 +103,7 @@ public class EditUserController {
 
   @ModelAttribute("maxLengths")
   public Map<String, Integer> maxLengths() throws IOException {
-    return DbUtils.getColumnSizes(interfaceTemplate, "User");
+    return requestManager.getUserColumnSizes();
   }
 
   @ModelAttribute("groups")

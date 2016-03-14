@@ -25,6 +25,7 @@ package uk.ac.bbsrc.tgac.miso.core.store;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Map;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
@@ -68,4 +69,10 @@ public interface SequencerReferenceStore extends Store<SequencerReference>, Remo
    *           when
    */
   Collection<SequencerReference> listByPlatformType(PlatformType platformType) throws IOException;
+  
+  /**
+   * @return a map containing all column names and max lengths from the Sequencer Reference table
+   * @throws IOException
+   */
+  public Map<String, Integer> getSequencerReferenceColumnSizes() throws IOException;
 }

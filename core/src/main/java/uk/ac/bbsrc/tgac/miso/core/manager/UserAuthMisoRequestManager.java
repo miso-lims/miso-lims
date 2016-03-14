@@ -2388,4 +2388,73 @@ public class UserAuthMisoRequestManager implements RequestManager {
   public Map<String, Integer> getServiceRecordColumnSizes() throws IOException {
     return backingManager.getServiceRecordColumnSizes();
   }
+  
+  public Map<String, Integer> getBoxColumnSizes() throws IOException {
+    return backingManager.getBoxColumnSizes();
+  }
+
+  @Override
+  public Map<String, Integer> getExperimentColumnSizes() throws IOException {
+    return backingManager.getExperimentColumnSizes();
+  }
+
+  @Override
+  public Map<String, Integer> getPoolColumnSizes() throws IOException {
+    return backingManager.getPoolColumnSizes();
+  }
+
+  @Override
+  public Map<String, Integer> getKitDescriptorColumnSizes() throws IOException {
+    return backingManager.getKitDescriptorColumnSizes();
+  }
+
+  @Override
+  public Map<String, Integer> getLibraryColumnSizes() throws IOException {
+    return backingManager.getLibraryColumnSizes();
+  }
+
+  @Override
+  public Map<String, Integer> getPlateColumnSizes() throws IOException {
+    return backingManager.getPlateColumnSizes();
+  }
+
+  @Override
+  public Map<String, Integer> getProjectColumnSizes() throws IOException {
+    return backingManager.getProjectColumnSizes();
+  }
+
+  @Override
+  public Map<String, Integer> getRunColumnSizes() throws IOException {
+    return backingManager.getRunColumnSizes();
+  }
+
+  @Override
+  public Map<String, Integer> getSampleColumnSizes() throws IOException {
+    return backingManager.getSampleColumnSizes();
+  }
+
+  @Override
+  public Map<String, Integer> getStudyColumnSizes() throws IOException {
+    return backingManager.getStudyColumnSizes();
+  }
+
+  @Override
+  public Map<String, Integer> getSequencerReferenceColumnSizes() throws IOException {
+    return backingManager.getSequencerReferenceColumnSizes();
+  }
+
+  @Override
+  public Map<String, Integer> getSubmissionColumnSizes() throws IOException {
+    return backingManager.getSubmissionColumnSizes();
+  }
+
+  @Override
+  public Map<String, Integer> getUserColumnSizes() throws IOException {
+    return backingManager.getUserColumnSizes();
+  }
+
+  @Override
+  public Map<String, Integer> getGroupColumnSizes() throws IOException {
+    return backingManager.getGroupColumnSizes();
+  }
 }

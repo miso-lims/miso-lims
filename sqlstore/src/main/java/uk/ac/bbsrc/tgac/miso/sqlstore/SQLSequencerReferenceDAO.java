@@ -30,6 +30,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import javax.sql.rowset.serial.SerialBlob;
 
@@ -48,6 +49,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.store.PlatformStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerReferenceStore;
+import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 /**
  * uk.ac.bbsrc.tgac.miso.sqlstore
@@ -259,5 +261,10 @@ public class SQLSequencerReferenceDAO implements SequencerReferenceStore {
       }
       return c;
     }
+  }
+  
+  @Override
+  public Map<String, Integer> getSequencerReferenceColumnSizes() throws IOException {
+    return DbUtils.getColumnSizes(template, TABLE_NAME);
   }
 }

@@ -28,6 +28,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 
 import javax.persistence.CascadeType;
@@ -848,5 +849,10 @@ public class SQLLibraryDAO implements LibraryStore {
       tb.setStrategyName(rs.getString("strategyName"));
       return tb;
     }
+  }
+  
+  @Override
+  public Map<String, Integer> getLibraryColumnSizes() throws IOException {
+    return DbUtils.getColumnSizes(template, TABLE_NAME);
   }
 }

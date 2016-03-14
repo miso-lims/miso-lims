@@ -33,7 +33,6 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -45,7 +44,7 @@ import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
-import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
+import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.User;
@@ -63,10 +62,10 @@ public class EditGroupController {
   private DataObjectFactory dataObjectFactory;
   
   @Autowired
-  private JdbcTemplate interfaceTemplate;
-
-  public void setInterfaceTemplate(JdbcTemplate interfaceTemplate) {
-    this.interfaceTemplate = interfaceTemplate;
+  private RequestManager requestManager;
+  
+  public void setRequestManager(RequestManager requestManager) {
+    this.requestManager = requestManager;
   }
 
   public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
@@ -93,7 +92,7 @@ public class EditGroupController {
   
   @ModelAttribute("maxLengths")
   public Map<String, Integer> maxLengths() throws IOException {
-    return DbUtils.getColumnSizes(interfaceTemplate, "_Group");
+    return requestManager.getGroupColumnSizes();
   }
 
   @RequestMapping(value = "/admin/group/new", method = RequestMethod.GET)

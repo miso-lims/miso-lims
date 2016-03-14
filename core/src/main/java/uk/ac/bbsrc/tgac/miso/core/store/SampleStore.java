@@ -26,6 +26,7 @@ package uk.ac.bbsrc.tgac.miso.core.store;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -153,4 +154,10 @@ public interface SampleStore extends Store<Sample>, Cascadable, Remover<Sample>,
    *           when the objects cannot be retrieved
    */
   Collection<Sample> getByBarcodeList(List<String> barcodeList) throws IOException;
+  
+  /**
+   * @return a map containing all column names and max lengths from the Sample table
+   * @throws IOException
+   */
+  public Map<String, Integer> getSampleColumnSizes() throws IOException;
 }

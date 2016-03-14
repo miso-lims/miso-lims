@@ -609,4 +609,9 @@ public class SQLBoxDAO implements BoxStore {
   public void setCacheManager(CacheManager cacheManager) {
     this.cacheManager = cacheManager;
   }
+
+  @Override
+  public Map<String, Integer> getBoxColumnSizes() throws IOException {
+    return DbUtils.getColumnSizes(template, TABLE_NAME);
+  }
 }

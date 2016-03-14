@@ -36,7 +36,6 @@ import javax.xml.transform.TransformerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -59,7 +58,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.integration.strategy.interrogator.Sequ
 import uk.ac.bbsrc.tgac.miso.core.service.integration.ws.solid.SolidService;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
-import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
@@ -121,16 +119,9 @@ public class StatsController {
     this.requestManager = requestManager;
   }
   
-  @Autowired
-  private JdbcTemplate interfaceTemplate;
-
-  public void setInterfaceTemplate(JdbcTemplate interfaceTemplate) {
-    this.interfaceTemplate = interfaceTemplate;
-  }
-  
   @ModelAttribute("maxLengths")
   public Map<String, Integer> maxLengths() throws IOException {
-    return DbUtils.getColumnSizes(interfaceTemplate, "SequencerReference");
+    return requestManager.getSequencerReferenceColumnSizes();
   }
 
   public Collection<SequencerReference> populateSequencerReferences() throws IOException {
