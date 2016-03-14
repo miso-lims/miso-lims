@@ -152,7 +152,7 @@
         <form:form action="/miso/user" method="POST" commandName="user" autocomplete="off">
           <sessionConversation:insertSessionConversationId attributeName="user"/>
           <h1>Edit Your Account
-            <button onclick="return validateUser()" class="fg-button ui-state-default ui-corner-all">Save</button>
+            <button onclick="return User.validateUser()" class="fg-button ui-state-default ui-corner-all">Save</button>
           </h1>
           <table class="in">
             <tr>
