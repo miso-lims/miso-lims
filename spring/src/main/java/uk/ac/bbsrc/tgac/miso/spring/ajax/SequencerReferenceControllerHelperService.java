@@ -27,9 +27,15 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
 
 import javax.servlet.http.HttpSession;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import net.sourceforge.fluxion.ajax.Ajaxified;
+import net.sourceforge.fluxion.ajax.util.JSONUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,10 +45,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-import net.sourceforge.fluxion.ajax.Ajaxified;
-import net.sourceforge.fluxion.ajax.util.JSONUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
@@ -81,7 +83,6 @@ public class SequencerReferenceControllerHelperService {
   public JSONObject listSequencers(HttpSession session, JSONObject json) {
     try {
       Collection<SequencerReference> sr = requestManager.listAllSequencerReferences();
-      StringBuilder sb = new StringBuilder();
       JSONObject sequencers = new JSONObject();
       JSONArray sequencers_list = new JSONArray();
       for (SequencerReference s : sr) {
@@ -169,5 +170,38 @@ public class SequencerReferenceControllerHelperService {
 
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
+  }
+  
+  public JSONObject listSequencersDataTable(HttpSession session, JSONObject json) {
+    try {
+      JSONObject j = new JSONObject();
+      JSONArray jsonArray = new JSONArray();
+      SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+      for (SequencerReference sequencer : requestManager.listAllSequencerReferences()) {
+        JSONArray inner = new JSONArray();
+        inner.add(TableHelper.hyperLinkify("/miso/sequencer/" + sequencer.getId(), sequencer.getName()));
+        inner.add(sequencer.getPlatform().getPlatformType().getKey());
+        inner.add(sequencer.getPlatform().getInstrumentModel());
+        
+        if (sequencer.isActive()) {
+          inner.add("Production");
+        } else {
+          if (sequencer.getUpgradedSequencerReference() == null) {
+            inner.add("Retired");
+          } else {
+            inner.add("Upgraded");
+          }
+        }
+        
+        inner.add(sequencer.getLastServicedDate() == null ? "" : df.format(sequencer.getLastServicedDate()));
+        inner.add(String.valueOf(sequencer.isActive()));
+        jsonArray.add(inner);
+      }
+      j.put("array", jsonArray);
+      return j;
+    } catch (IOException e) {
+      log.debug("Failed", e);
+      return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
+    }
   }
 }

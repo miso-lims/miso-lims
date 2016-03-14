@@ -147,6 +147,14 @@ public interface RunStore extends Store<Run>, Cascadable, Remover<Run>, NamingSc
   List<Run> listByStatus(String health) throws IOException;
 
   /**
+   * List all runs for a given sequencer reference id
+   * 
+   * @param sequencerReferenceId id of the sequencer reference to get runs for
+   * @return all runs  with matching sequencer reference id
+   */
+  List<Run> listBySequencerId(long sequencerReferenceId) throws IOException;
+  
+  /**
    * List all persisted objects
    *
    * @param the

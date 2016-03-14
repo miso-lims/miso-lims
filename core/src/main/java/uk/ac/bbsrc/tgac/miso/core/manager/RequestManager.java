@@ -26,9 +26,7 @@ package uk.ac.bbsrc.tgac.miso.core.manager;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
-
-import com.eaglegenomics.simlims.core.Note;
-import com.eaglegenomics.simlims.core.SecurityProfile;
+import java.util.Map;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
@@ -56,6 +54,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
@@ -72,6 +71,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.event.Alert;
+
+import com.eaglegenomics.simlims.core.Note;
+import com.eaglegenomics.simlims.core.SecurityProfile;
 
 public interface RequestManager {
 
@@ -131,6 +133,8 @@ public interface RequestManager {
   public long saveSubmission(Submission submission) throws IOException;
 
   public long saveSequencerReference(SequencerReference sequencerReference) throws IOException;
+  
+  public long saveSequencerServiceRecord(SequencerServiceRecord record) throws IOException;
 
   public long saveKit(Kit kit) throws IOException;
 
@@ -240,6 +244,8 @@ public interface RequestManager {
   public SequencerReference getSequencerReferenceByName(String referenceName) throws IOException;
 
   public SequencerReference getSequencerReferenceByRunId(long runId) throws IOException;
+  
+  public SequencerServiceRecord getSequencerServiceRecordById(long id) throws IOException;
 
   public Kit getKitById(long kitId) throws IOException;
 
@@ -488,6 +494,8 @@ public interface RequestManager {
   public Collection<Submission> listAllSubmissions() throws IOException;
 
   public Collection<Run> listRunsByExperimentId(Long experimentId) throws IOException;
+  
+  public Collection<Run> listRunsBySequencerId(Long sequencerReferenceId) throws IOException;
 
   /**
    * Obtain a list of Boxables by supplied identificationBarcode list
@@ -497,6 +505,10 @@ public interface RequestManager {
   public Collection<SequencerReference> listAllSequencerReferences() throws IOException;
 
   public Collection<SequencerReference> listSequencerReferencesByPlatformType(PlatformType platformType) throws IOException;
+  
+  public Collection<SequencerServiceRecord> listAllSequencerServiceRecords() throws IOException;
+  
+  public Collection<SequencerServiceRecord> listSequencerServiceRecordsBySequencerId(long referenceId) throws IOException;
 
   public Collection<Kit> listAllKits() throws IOException;
 
@@ -568,6 +580,8 @@ public interface RequestManager {
 
   public void deleteSequencerReference(SequencerReference sequencerReference) throws IOException;
 
+  public void deleteSequencerServiceRecord(SequencerServiceRecord serviceRecord) throws IOException;
+
   public void deletePool(Pool pool) throws IOException;
 
   public void deletePlate(Plate plate) throws IOException;
@@ -581,5 +595,7 @@ public interface RequestManager {
   public void deleteNote(Note note) throws IOException;
 
   public void deleteBox(Box box) throws IOException;
+  
+  public Map<String, Integer> getServiceRecordColumnSizes() throws IOException;
 
 }

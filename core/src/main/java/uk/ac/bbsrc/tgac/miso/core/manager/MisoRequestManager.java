@@ -30,14 +30,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import com.eaglegenomics.simlims.core.Note;
-import com.eaglegenomics.simlims.core.SecurityProfile;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
@@ -65,6 +63,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
@@ -105,9 +104,13 @@ import uk.ac.bbsrc.tgac.miso.core.store.SampleQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerReferenceStore;
+import uk.ac.bbsrc.tgac.miso.core.store.SequencerServiceRecordStore;
 import uk.ac.bbsrc.tgac.miso.core.store.StatusStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.core.store.StudyStore;
+
+import com.eaglegenomics.simlims.core.Note;
+import com.eaglegenomics.simlims.core.SecurityProfile;
 
 /**
  * Implementation of a RequestManager to facilitate persistence operations on MISO model objects
@@ -164,6 +167,8 @@ public class MisoRequestManager implements RequestManager {
   private SequencerPartitionContainerStore sequencerPartitionContainerStore;
   @Autowired
   private SequencerReferenceStore sequencerReferenceStore;
+  @Autowired
+  private SequencerServiceRecordStore sequencerServiceRecordStore;
   @Autowired
   private StatusStore statusStore;
   @Autowired
@@ -269,6 +274,10 @@ public class MisoRequestManager implements RequestManager {
 
   public void setSequencerReferenceStore(SequencerReferenceStore sequencerReferenceStore) {
     this.sequencerReferenceStore = sequencerReferenceStore;
+  }
+
+  public void setSequencerServiceRecordStore(SequencerServiceRecordStore sequencerServiceRecordStore) {
+    this.sequencerServiceRecordStore = sequencerServiceRecordStore;
   }
 
   public void setStatusStore(StatusStore statusStore) {
@@ -1098,6 +1107,15 @@ public class MisoRequestManager implements RequestManager {
       throw new IOException("No runStore available. Check that it has been declared in the Spring config.");
     }
   }
+  
+  @Override
+  public Collection<Run> listRunsBySequencerId(Long sequencerReferenceId) throws IOException {
+    if (runStore != null) {
+      return runStore.listBySequencerId(sequencerReferenceId);
+    } else {
+      throw new IOException("No runStore available. Check that it has been declared in the Spring config.");
+    }
+  }
 
   @Override
   public Collection<SequencerReference> listAllSequencerReferences() throws IOException {
@@ -1432,6 +1450,17 @@ public class MisoRequestManager implements RequestManager {
       }
     } else {
       throw new IOException("No sequencerReferenceStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+  
+  @Override
+  public void deleteSequencerServiceRecord(SequencerServiceRecord serviceRecord) throws IOException {
+    if (sequencerServiceRecordStore != null) {
+      if (!sequencerServiceRecordStore.remove(serviceRecord)) {
+        throw new IOException("Unable to delete Service Record.");
+      }
+    } else {
+      throw new IOException("No sequencerServiceRecordStore available. Check that it has been declared in the Spring config.");
     }
   }
 
@@ -2563,6 +2592,51 @@ public class MisoRequestManager implements RequestManager {
       }
     } else {
       throw new IOException("No boxStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public long saveSequencerServiceRecord(SequencerServiceRecord record) throws IOException {
+    if (sequencerServiceRecordStore != null) {
+      return sequencerServiceRecordStore.save(record);
+    } else {
+      throw new IOException("No sequencerServiceRecordStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public SequencerServiceRecord getSequencerServiceRecordById(long id) throws IOException {
+    if (sequencerServiceRecordStore != null) {
+      return sequencerServiceRecordStore.get(id);
+    } else {
+      throw new IOException("No sequencerServiceRecordStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public Collection<SequencerServiceRecord> listAllSequencerServiceRecords() throws IOException {
+    if (sequencerServiceRecordStore != null) {
+      return sequencerServiceRecordStore.listAll();
+    } else {
+      throw new IOException("No sequencerServiceRecordStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public Collection<SequencerServiceRecord> listSequencerServiceRecordsBySequencerId(long referenceId) throws IOException {
+    if (sequencerServiceRecordStore != null) {
+      return sequencerServiceRecordStore.listBySequencerId(referenceId);
+    } else {
+      throw new IOException("No sequencerServiceRecordStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+  
+  @Override
+  public Map<String, Integer> getServiceRecordColumnSizes() throws IOException {
+    if (sequencerServiceRecordStore != null) {
+      return sequencerServiceRecordStore.getServiceRecordColumnSizes();
+    } else {
+      throw new IOException("No sequencerServiceRecordStore available. Check that it has been declared in the Spring config.");
     }
   }
 }

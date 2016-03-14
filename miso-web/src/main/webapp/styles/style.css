@@ -302,6 +302,7 @@ table.in {
 
 table.in td.h {
     width: 20%;
+    vertical-align: baseline;
 }
 
 table.in td {
@@ -313,6 +314,14 @@ table.in input[type="text"] {
     border-left: 1px solid #666699;
     border-top: 1px solid #666666;
     width: 94%;
+}
+
+table.in textarea {
+    border-left: 1px solid #666699;
+    border-top: 1px solid #666666;
+    width: 94%;
+    height: 240px;
+    font-family: inherit;
 }
 
 table.in select[multiple="multiple"] {
@@ -1220,6 +1229,10 @@ div.experimentwizard li {
     text-align: right;
     text-decoration: none;
     cursor: pointer;
+}
+
+.sddm li a.disabled {
+	color: darkgray;
 }
 
 .sddm div.run {

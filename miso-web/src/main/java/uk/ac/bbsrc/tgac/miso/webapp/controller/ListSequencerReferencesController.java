@@ -21,16 +21,31 @@
  * *********************************************************************
  */
 
-package uk.ac.bbsrc.tgac.miso;
+package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
-import org.junit.runner.RunWith;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.ModelAndView;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("/db-test-context.xml")
-@Transactional
-public class AbstractDAOTest {
+import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+
+@Controller
+@RequestMapping("/sequencers")
+public class ListSequencerReferencesController {
+
+  @Autowired
+  private RequestManager requestManager;
+  
+  public void setRequestManager(RequestManager requestManager) {
+    this.requestManager = requestManager;
+  }
+  
+  @RequestMapping(method = RequestMethod.GET)
+  public ModelAndView listSequencers(ModelMap model) {
+    return new ModelAndView("/pages/listSequencerReferences.jsp", model);
+  }
 
 }

@@ -37,7 +37,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 /**
@@ -240,7 +239,7 @@ public class MisoFilesManager implements FilesManager {
   }
 
   @Override
-  public void deleteFile(Class<? extends Nameable> type, String qualifier, String fileName) throws IOException {
+  public void deleteFile(Class<?> type, String qualifier, String fileName) throws IOException {
     final File remove = getFile(type, qualifier, fileName, false);
     remove.delete();
     log.info(MessageFormat.format("{0} {1} deleted.", qualifier, fileName));

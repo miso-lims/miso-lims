@@ -29,17 +29,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolderStrategy;
-
-import com.eaglegenomics.simlims.core.Note;
-import com.eaglegenomics.simlims.core.SecurityProfile;
-import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
@@ -67,6 +63,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
@@ -86,6 +83,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.event.Alert;
 import uk.ac.bbsrc.tgac.miso.core.exception.AuthorizationIOException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
+
+import com.eaglegenomics.simlims.core.Note;
+import com.eaglegenomics.simlims.core.SecurityProfile;
+import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.manager
@@ -1602,6 +1604,18 @@ public class UserAuthMisoRequestManager implements RequestManager {
     }
     return accessibles;
   }
+  
+  @Override
+  public Collection<Run> listRunsBySequencerId(Long sequencerReferenceId) throws IOException {
+    User user = getCurrentUser();
+    Collection<Run> accessibles = new HashSet<>();
+    for (Run run : backingManager.listRunsBySequencerId(sequencerReferenceId)) {
+      if (run.userCanRead(user)) {
+        accessibles.add(run);
+      }
+    }
+    return accessibles;
+  }
 
   @Override
   public Collection<Plate<? extends List<? extends Plateable>, ? extends Plateable>> listAllPlates() throws IOException {
@@ -1729,6 +1743,13 @@ public class UserAuthMisoRequestManager implements RequestManager {
   public void deleteSequencerReference(SequencerReference sequencerReference) throws IOException {
     if (getCurrentUser().isAdmin()) {
       backingManager.deleteSequencerReference(sequencerReference);
+    }
+  }
+  
+  @Override
+  public void deleteSequencerServiceRecord(uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord serviceRecord) throws IOException {
+    if (getCurrentUser().isAdmin()) {
+      backingManager.deleteSequencerServiceRecord(serviceRecord);
     }
   }
 
@@ -2336,5 +2357,35 @@ public class UserAuthMisoRequestManager implements RequestManager {
     } else {
       throw new IOException("User " + getCurrentUser().getFullName() + " cannot change Box " + box.getAlias());
     }
+  }
+
+  @Override
+  public long saveSequencerServiceRecord(SequencerServiceRecord record) throws IOException {
+    if (getCurrentUser().isAdmin()) {
+      return backingManager.saveSequencerServiceRecord(record);
+    }
+    else {
+      throw new IOException("User " + getCurrentUser().getFullName() + " cannot write to this Service Record");
+    }
+  }
+
+  @Override
+  public SequencerServiceRecord getSequencerServiceRecordById(long id) throws IOException {
+    return backingManager.getSequencerServiceRecordById(id);
+  }
+
+  @Override
+  public Collection<SequencerServiceRecord> listAllSequencerServiceRecords() throws IOException {
+    return backingManager.listAllSequencerServiceRecords();
+  }
+
+  @Override
+  public Collection<SequencerServiceRecord> listSequencerServiceRecordsBySequencerId(long referenceId) throws IOException {
+    return backingManager.listSequencerServiceRecordsBySequencerId(referenceId);
+  }
+  
+  @Override
+  public Map<String, Integer> getServiceRecordColumnSizes() throws IOException {
+    return backingManager.getServiceRecordColumnSizes();
   }
 }
