@@ -37,6 +37,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.authority.GrantedAuthorityImpl;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -53,6 +54,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.PasswordCodecService;
+import uk.ac.bbsrc.tgac.miso.sqlstore.SQLSecurityDAO;
+import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 import com.eaglegenomics.simlims.core.Activity;
 import com.eaglegenomics.simlims.core.Group;
@@ -77,10 +80,13 @@ public class EditUserController {
 
   @Autowired
   private DataObjectFactory dataObjectFactory;
+
+  @Autowired
+  private SQLSecurityDAO sqlSecurityDAO;
   
   @Autowired
   private RequestManager requestManager;
-  
+
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
   }
@@ -220,16 +226,21 @@ public class EditUserController {
           }
         }
       } else {
+
         if (!isStringEmptyOrNull(request.getParameter("password"))
             && !isStringEmptyOrNull(request.getParameter("newpassword"))) {
           if (!isStringEmptyOrNull(request.getParameter("confirmpassword"))) {
             if (request.getParameter("newpassword").equals(request.getParameter("confirmpassword"))) {
               if (!isStringEmptyOrNull(request.getParameter("newpassword")) && !isStringEmptyOrNull(request.getParameter("confirmpassword"))) {
                 if (SecurityContextHolder.getContext().getAuthentication().getName().equals(user.getLoginName())) {
-                  if (passwordCodecService.getEncoder().isPasswordValid(user.getPassword(), request.getParameter("password"), null)) {
+                  String currentPassword = sqlSecurityDAO.getEncodedPassword(user.getUserId());
+                  if (passwordCodecService.getEncoder().isPasswordValid(currentPassword, request.getParameter("password"), null)) {
                     log.debug("User '" + user.getLoginName() + "' attempting own password change");
                     user.setPassword(request.getParameter("newpassword"));
+                  } else {
+                    throw new IOException("Your current password is wrong.");
                   }
+
                 } else if (SecurityContextHolder.getContext().getAuthentication().getAuthorities()
                     .contains(new GrantedAuthorityImpl("ROLE_ADMIN"))) {
                   // auth'ed user is the account holder or an admin
@@ -249,6 +260,8 @@ public class EditUserController {
             throw new IOException("You must supply a confirmation of your new password.");
           }
         }
+
+
       }
 
       securityManager.saveUser(user);
