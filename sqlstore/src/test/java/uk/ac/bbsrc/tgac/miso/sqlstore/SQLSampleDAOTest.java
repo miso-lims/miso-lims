@@ -6,9 +6,9 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collection;
@@ -19,16 +19,15 @@ import java.util.Map;
 
 import javax.persistence.CascadeType;
 
+import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.InjectMocks;
-import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,14 +37,13 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.store.SecurityStore;
 
-import net.sf.ehcache.CacheManager;
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
-import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
@@ -53,6 +51,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleDao;
 
 public class SQLSampleDAOTest extends AbstractDAOTest {
 
@@ -61,9 +60,7 @@ public class SQLSampleDAOTest extends AbstractDAOTest {
   public final ExpectedException exception = ExpectedException.none();
 
   @Autowired
-  @Spy
-  private JdbcTemplate jdbcTemplate;
-
+  private JdbcTemplate template;
   @Mock
   private SecurityStore securityDAO;
   @Mock
@@ -84,20 +81,24 @@ public class SQLSampleDAOTest extends AbstractDAOTest {
   private MisoNamingScheme<Sample> sampleNamingScheme;
 
   @InjectMocks
-  private SQLSampleDAO dao;
+  private HibernateSampleDao dao;
+
+  @Autowired
+  private SessionFactory sessionFactory;
 
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    dao.setJdbcTemplate(jdbcTemplate);
-    dao.setDataObjectFactory(new TgacDataObjectFactory());
-
+    dao.setSessionFactory(sessionFactory);
+    dao.setJdbcTemplate(template);
+    dao.setSecurityProfileDao(securityProfileDAO);
+    dao.setNamingScheme(sampleNamingScheme);
   }
 
   @Test
-  public void testListAll() {
-    List<Sample> samples = dao.listAll();
-    samples.get(0).getScientificName().equals("Homo sapiens");
+  public void testListAll() throws IOException {
+    Collection<Sample> samples = dao.listAll();
+    samples.iterator().next().getScientificName().equals("Homo sapiens");
     assertEquals(14, samples.size());
   }
 
@@ -108,21 +109,23 @@ public class SQLSampleDAOTest extends AbstractDAOTest {
     String sampleName = "latestSample32";
     sample.setName(sampleName);
     sample.setAlias("alias32LK");
-    sample.setProject(new ProjectImpl());
+    sample.setProject(dao.get(1L).getProject());
     sample.setId(AbstractSample.UNSAVED_ID);
-    User user = Mockito.mock(User.class);
-    Mockito.when(user.getUserId()).thenReturn(1L);
+    User user = new UserImpl();
+    user.setUserId(1L);
     sample.setLastModifier(user);
 
     mockAutoIncrement();
     when(sampleNamingScheme.generateNameFor(anyString(), any(Sample.class))).thenReturn(sampleName);
     when(sampleNamingScheme.validateField(anyString(), anyString())).thenReturn(true);
+    when(securityProfileDAO.save(any(SecurityProfile.class))).thenReturn(3L);
 
     int sizeBefore = dao.listAll().size();
     long id = dao.save(sample);
     Sample retrieved = dao.get(id);
-    assertEquals("sample name does not match", sampleName, retrieved.getName());
     assertEquals("did not insert sample", sizeBefore + 1, dao.listAll().size());
+    assertEquals("sample name does not match", sampleName, retrieved.getName());
+    assertEquals("Security profile does not match", 3L, (long) retrieved.getSecurityProfileId());
   }
 
   @Test
@@ -133,15 +136,15 @@ public class SQLSampleDAOTest extends AbstractDAOTest {
     SecurityProfile profile = Mockito.mock(SecurityProfile.class);
     sample.setSecurityProfile(profile);
 
-    Project mockProject = mock(Project.class);
-    when(mockProject.getProjectId()).thenReturn(2L);
-    sample.setProject(mockProject);
+    Project project = new ProjectImpl();
+    project.setProjectId(2L);
+    sample.setProject(project);
 
     String sampleName = "updatedSample";
     sample.setName(sampleName);
     sample.setAlias("updatedAlias");
-    User user = Mockito.mock(User.class);
-    Mockito.when(user.getUserId()).thenReturn(1L);
+    User user = new UserImpl();
+    user.setUserId(1L);
     sample.setLastModifier(user);
 
     when(sampleNamingScheme.generateNameFor(anyString(), any(Sample.class))).thenReturn(sampleName);
@@ -156,48 +159,48 @@ public class SQLSampleDAOTest extends AbstractDAOTest {
 
   @Test
   public void testListAllWithLimit() throws Exception {
-    List<Sample> samples = dao.listAllWithLimit(3);
+    Collection<Sample> samples = dao.listAllWithLimit(3);
     assertEquals(3, samples.size());
   }
 
-  @Test public void testListAllByReceivedDate() throws Exception {
-    List<Sample> samples = dao.listAllByReceivedDate(99);
+  @Test
+  public void testListAllByReceivedDate() throws Exception {
+    Collection<Sample> samples = dao.listAllByReceivedDate(99);
 
     Date previous = null;
     for (Sample sample : samples) {
       if (previous != null) {
         log.debug("testing receivedDates " + previous + " comes before " + sample.getReceivedDate());
-        assertTrue("not ordered by received date descending", previous.equals(sample.getReceivedDate()) ||
-            previous.after(sample.getReceivedDate()));
+        assertTrue("not ordered by received date descending",
+            previous.equals(sample.getReceivedDate()) || previous.after(sample.getReceivedDate()));
       }
       previous = sample.getReceivedDate();
     }
 
   }
 
-  @Test public void testCount() throws Exception {
+  @Test
+  public void testCount() throws Exception {
     int total = dao.count();
     assertEquals(14, total);
   }
 
-  @Test public void testRemove() throws Exception {
+  @Test
+  public void testRemove() throws Exception {
     dao.setCascadeType(CascadeType.ALL);
 
     Sample sample = dao.get(7);
-
-    CacheManager cacheManager = mock(CacheManager.class);
-    when(cacheManager.getCache(anyString())).thenReturn(null);
-    dao.setCacheManager(cacheManager);
 
     assertTrue(dao.remove(sample));
     assertNull(dao.get(7));
 
   }
 
-  @Test public void testGet() throws Exception {
+  @Test
+  public void testGet() throws Exception {
     Sample sample = dao.get(3);
     assertNotNull(sample);
-    assertEquals("sample name does not match","SAM3", sample.getName());
+    assertEquals("sample name does not match", "SAM3", sample.getName());
     assertEquals("sample description does not match", "Inherited from TEST_0002", sample.getDescription());
     assertNull("sample accession is not null", sample.getAccession());
     assertEquals("sample identification does not match", "SAM3::TEST_0002_Bn_P_nn_1-1_D_1", sample.getIdentificationBarcode());
@@ -211,13 +214,15 @@ public class SQLSampleDAOTest extends AbstractDAOTest {
     assertEquals("sample location type does not match", "2014-01-17", df.format(sample.getReceivedDate()));
   }
 
-  @Test public void testGetByBarcode() throws Exception {
+  @Test
+  public void testGetByBarcode() throws Exception {
     Sample sample = dao.getByBarcode("SAM7::TEST_0004_Bn_P_nn_1-1_D_1");
     assertEquals("Sample id does not match", 7, sample.getId());
   }
 
-  @Test public void testGetByBarcodeList() throws Exception {
-    List<Sample> samples = dao.getByBarcodeList(Arrays.asList("SAM7::TEST_0004_Bn_P_nn_1-1_D_1", "SAM11::TEST_0006_Bn_P_nn_1-1_D_1"));
+  @Test
+  public void testGetByBarcodeList() throws Exception {
+    Collection<Sample> samples = dao.getByBarcodeList(Arrays.asList("SAM7::TEST_0004_Bn_P_nn_1-1_D_1", "SAM11::TEST_0006_Bn_P_nn_1-1_D_1"));
     assertEquals("Sample size does not match", 2, samples.size());
 
     for (Sample sample : samples) {
@@ -226,23 +231,24 @@ public class SQLSampleDAOTest extends AbstractDAOTest {
 
   }
 
-  @Test public void testListByAlias() throws Exception {
+  @Test
+  public void testListByAlias() throws Exception {
     Collection<Sample> samples = dao.listByAlias("TEST_0007_Bn_P_nn_1-1_D_1");
-    assertEquals("wrong sample found", 13, ((Sample)samples.toArray()[0]).getId());
+    assertEquals("wrong sample found", 13, ((Sample) samples.toArray()[0]).getId());
   }
 
-  @Test public void testListAllSampleTypes() throws Exception {
-    List<String> sampleTypes = dao.listAllSampleTypes();
-    List<String> types = Arrays
-        .asList("NON GENOMIC", "GENOMIC", "OTHER", "VIRAL RNA", "SYNTHETIC",
-              "TRANSCRIPTOMIC", "METAGENOMIC", "METATRANSCRIPTOMIC");
+  @Test
+  public void testListAllSampleTypes() throws Exception {
+    Collection<String> sampleTypes = dao.listAllSampleTypes();
+    List<String> types = Arrays.asList("NON GENOMIC", "GENOMIC", "OTHER", "VIRAL RNA", "SYNTHETIC", "TRANSCRIPTOMIC", "METAGENOMIC",
+        "METATRANSCRIPTOMIC");
 
     assertTrue("Did not find all sample types", sampleTypes.containsAll(types));
 
   }
 
-  private void mockAutoIncrement() {
-    List<Sample> samples = dao.listAll();
+  private void mockAutoIncrement() throws IOException {
+    Collection<Sample> samples = dao.listAll();
     long max = 0;
     for (Sample sample : samples) {
       if (sample.getId() > max) {
@@ -252,8 +258,6 @@ public class SQLSampleDAOTest extends AbstractDAOTest {
     max++;
     Map<String, Object> rs = new HashMap<>();
     rs.put("Auto_increment", max);
-    Mockito.doReturn(rs).when(jdbcTemplate).queryForMap(Matchers.anyString());
   }
-  
 
 }

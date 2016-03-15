@@ -88,6 +88,11 @@
   </bean>
   
   <context:component-scan base-package="uk.ac.bbsrc.tgac.miso.persistence" /> 
+
+  <bean id="hibernateSampleDao" class="uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleDao">
+    <property name="jdbcTemplate" ref="interfaceTemplate" />
+    <property name="sessionFactory" ref="sessionFactory" />
+  </bean>
   
   <bean id="dataSource" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
     <property name="driverClass" value="org.h2.Driver"/>
