@@ -40,7 +40,8 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({ 
   SQLRunDAOTest.class,
   SQLSampleDAOTest.class,
-  SQLSequencerServiceRecordDAOTest.class
+  SQLSequencerServiceRecordDAOTest.class,
+  SQLProjectDAOTest.class
 })
 
 public class AllTestsSuite {

@@ -96,6 +96,8 @@
   <bean name="interfaceTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
     <property name="dataSource" ref="dataSource"/>
   </bean>
+  <bean name="dataObjectFactory" class="uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory">
+  </bean>
   <bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
     <property name="sessionFactory" ref="sessionFactory"/>
     <property name="dataSource" ref="dataSource"/>
