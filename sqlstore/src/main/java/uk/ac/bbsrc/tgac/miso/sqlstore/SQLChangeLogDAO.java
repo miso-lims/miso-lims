@@ -9,11 +9,13 @@ import org.springframework.jdbc.core.RowMapper;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
+import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 
 public class SQLChangeLogDAO implements ChangeLogStore {
   private static class ChangeLogMapper implements RowMapper<ChangeLog> {
 
     @Override
+    @CoverageIgnore
     public ChangeLog mapRow(ResultSet rs, int rownum) throws SQLException {
       ChangeLog cl = new ChangeLog();
       cl.setColumnsChanged(rs.getString("columnsChanged"));
@@ -29,19 +31,23 @@ public class SQLChangeLogDAO implements ChangeLogStore {
 
   private JdbcTemplate template;
 
+  @CoverageIgnore
   public SQLChangeLogDAO() {
   }
 
+  @CoverageIgnore
   public JdbcTemplate getJdbcTemplate() {
     return template;
   }
 
   @Override
+  @CoverageIgnore
   public Collection<ChangeLog> listAll(String type) {
     return template.query(String.format(CHANGELOG_SELECT, type), new ChangeLogMapper());
   }
 
   @Override
+  @CoverageIgnore
   public Collection<ChangeLog> listAllById(String type, long id) {
     char lowerTypeName[] = type.toCharArray();
     lowerTypeName[0] = Character.toLowerCase(lowerTypeName[0]);
@@ -49,10 +55,12 @@ public class SQLChangeLogDAO implements ChangeLogStore {
   }
 
   @Override
+  @CoverageIgnore
   public Collection<ChangeLog> listAllById(String type, String idName, long id) {
     return template.query(String.format(CHANGELOG_SELECT_WHERE, type, idName), new Object[] { id }, new ChangeLogMapper());
   }
 
+  @CoverageIgnore
   public void setJdbcTemplate(JdbcTemplate template) {
     this.template = template;
   }
