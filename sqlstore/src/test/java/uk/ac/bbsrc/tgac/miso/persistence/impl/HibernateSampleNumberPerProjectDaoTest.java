@@ -2,6 +2,8 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import static org.junit.Assert.*;
 
+import org.hibernate.SessionFactory;
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -15,7 +17,15 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 public class HibernateSampleNumberPerProjectDaoTest extends AbstractDAOTest {
 
   @Autowired
+  private SessionFactory sessionFactory;
+
   private HibernateSampleNumberPerProjectDao sampleNumberPerProjectDao;
+
+  @Before
+  public void setup() {
+    sampleNumberPerProjectDao = new HibernateSampleNumberPerProjectDao();
+    sampleNumberPerProjectDao.setSessionFactory(sessionFactory);
+  }
 
   @Test
   public void testNextNumber() throws Exception {
