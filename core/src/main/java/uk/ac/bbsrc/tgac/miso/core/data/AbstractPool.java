@@ -35,9 +35,13 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
+import javax.persistence.Transient;
+
 import org.codehaus.jackson.map.annotate.JsonDeserialize;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
@@ -88,6 +92,9 @@ public abstract class AbstractPool<P extends Poolable> extends AbstractBoxable i
   private Set<User> watchers = new HashSet<User>();
   private final Collection<ChangeLog> changeLog = new ArrayList<ChangeLog>();
   private User lastModifier;
+
+  @Transient
+  private Collection<Note> notes = new HashSet<Note>();
 
   @Override
   public User getLastModifier() {
@@ -433,4 +440,20 @@ public abstract class AbstractPool<P extends Poolable> extends AbstractBoxable i
     }
     return sb.toString();
   }
+
+  @Override
+  public Collection<Note> getNotes() {
+    return notes;
+  }
+
+  @Override
+  public void addNote(Note note) {
+    this.notes.add(note);
+  }
+
+  @Override
+  public void setNotes(Collection<Note> notes) {
+    this.notes = notes;
+  }
+
 }

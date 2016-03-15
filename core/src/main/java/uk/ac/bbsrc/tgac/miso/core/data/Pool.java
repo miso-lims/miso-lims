@@ -30,6 +30,7 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
+import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
@@ -275,5 +276,26 @@ public interface Pool<P extends Poolable> extends SecurableByProfile, Comparable
   public void setLastModifier(User user);
 
   public boolean getHasLowQualityMembers();
+
+  /**
+   * Sets the notes of this Pool object.
+   *
+   * @param notes notes.
+   */
+  public void setNotes(Collection<Note> notes);
+
+  /**
+   * Adds a Note to the Set of notes of this Pool object.
+   *
+   * @param note Note.
+   */
+  public void addNote(Note note);
+
+  /**
+   * Returns the notes of this Pool object.
+   *
+   * @return Collection<Note> notes.
+   */
+  public Collection<Note> getNotes();
 
 }

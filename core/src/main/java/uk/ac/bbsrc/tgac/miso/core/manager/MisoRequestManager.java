@@ -1715,6 +1715,15 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
+  public long savePoolNote(Pool pool, Note note) throws IOException {
+    if (noteStore != null) {
+      return noteStore.savePoolNote(pool, note);
+    } else {
+      throw new IOException("No noteStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
   public long saveExperiment(Experiment experiment) throws IOException {
     if (experimentStore != null) {
       return experimentStore.save(experiment);

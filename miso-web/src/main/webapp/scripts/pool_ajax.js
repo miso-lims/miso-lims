@@ -493,6 +493,61 @@ Pool.ui = {
 
   prepareElements : function () {
     Pool.ui.createElementSelectDatatable(jQuery('#platformType').val());
+  },
+
+  showPoolNoteDialog: function (poolId) {
+    var self = this;
+    jQuery('#addPoolNoteDialog')
+      .html("<form>" +
+        "<fieldset class='dialog'>" +
+        "<label for='internalOnly'>Internal Only?</label>" +
+        "<input type='checkbox' checked='checked' name='internalOnly' id='internalOnly' class='text ui-widget-content ui-corner-all' />" +
+        "<br/>" +
+        "<label for='notetext'>Text</label>" +
+        "<input type='text' name='notetext' id='notetext' class='text ui-widget-content ui-corner-all' />" +
+        "</fieldset></form>");
+
+    jQuery('#addPoolNoteDialog').dialog({
+      width: 400,
+      modal: true,
+      resizable: false,
+      buttons: {
+        "Add Note": function () {
+          self.addPoolNote(poolId, jQuery('#internalOnly').val(), jQuery('#notetext').val());
+          jQuery(this).dialog('close');
+        },
+        "Cancel": function () {
+          jQuery(this).dialog('close');
+        }
+      }
+    });
+  },
+
+  addPoolNote: function (poolId, internalOnly, text) {
+    Fluxion.doAjax(
+      'poolControllerHelperService',
+        'addPoolNote',
+        {
+          'poolId': poolId,
+          'internalOnly': internalOnly,
+          'text': text,
+          'url': ajaxurl
+        },
+        {
+          'doOnSuccess': Utils.page.pageReload
+        }
+      );
+  },
+
+  deletePoolNote: function (poolId, noteId) {
+    if (confirm("Are you sure you want to delete this note?")) {
+      Fluxion.doAjax(
+        'poolControllerHelperService',
+        'deletePoolNote',
+        {'poolId': poolId, 'noteId': noteId, 'url': ajaxurl},
+        {'doOnSuccess': Utils.page.pageReload}
+        );
+    }
   }
 };
 
