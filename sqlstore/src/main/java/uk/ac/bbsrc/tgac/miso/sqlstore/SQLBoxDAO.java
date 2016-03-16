@@ -352,15 +352,6 @@ public class SQLBoxDAO implements BoxStore {
   }
 
   @Override
-  public Collection<Box> listBySearch(String query) throws IOException {
-    String squery = "%" + query + "%";
-    MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("search", squery);
-    NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
-    return namedTemplate.query(BOX_SELECT_BY_SEARCH, params, new BoxMapper(true));
-  }
-
-  @Override
   public Collection<Box> listWithLimit(long limit) throws IOException {
     return template.query(BOX_SELECT_LIMIT, new Object[] { limit }, new BoxMapper(true));
   }

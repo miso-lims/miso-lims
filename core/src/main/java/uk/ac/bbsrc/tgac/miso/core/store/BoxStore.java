@@ -63,16 +63,6 @@ public interface BoxStore extends Store<Box>, Remover<Box>, NamingSchemeAware<Bo
    */
   Collection<Box> listByAlias(String alias) throws IOException;
 
-  /**
-   * List all the boxes matching a query
-   * 
-   * @param String
-   *          query
-   * @return Collection<Box> boxes
-   * @throws IOException
-   */
-  Collection<Box> listBySearch(String query) throws IOException;
-
   BoxUse getUseById(long id) throws IOException;
 
   BoxSize getSizeById(long id) throws IOException;

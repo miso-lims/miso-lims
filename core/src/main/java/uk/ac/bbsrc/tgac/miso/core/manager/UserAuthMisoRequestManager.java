@@ -2127,18 +2127,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Box> listAllBoxesBySearch(String query) throws IOException {
-    User user = getCurrentUser();
-    Collection<Box> accessibles = new HashSet<>();
-    for (Box o : backingManager.listAllBoxesBySearch(query)) {
-      if (o.userCanRead(user)) {
-        accessibles.add(o);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
   public Collection<Box> listAllBoxesByAlias(String alias) throws IOException {
     User user = getCurrentUser();
     Collection<Box> accessibles = new HashSet<>();
