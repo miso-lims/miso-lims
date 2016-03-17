@@ -62,7 +62,7 @@ public class SQLSequencerReferenceDAOTest extends AbstractDAOTest {
   @Test
   public void testSaveNew() throws Exception {
     String serialNumber = "F00";
-    Platform platform = platformDAO.get(6);
+    Platform platform = platformDAO.get(16);
     InetAddress address = Inet4Address.getLoopbackAddress();
     SequencerReference seqref = new SequencerReferenceImpl("foo", address, platform);
     seqref.setAvailable(true);
