@@ -319,8 +319,6 @@ public interface RequestManager {
 
   public Collection<Box> listAllBoxesWithLimit(long limit) throws IOException;
 
-  public Collection<Box> listAllBoxesBySearch(String query) throws IOException;
-
   public Collection<Box> listAllBoxesByAlias(String alias) throws IOException;
 
   public Collection<Run> listAllRuns() throws IOException;

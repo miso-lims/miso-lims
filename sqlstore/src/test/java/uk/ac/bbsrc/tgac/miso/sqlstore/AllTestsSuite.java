@@ -37,8 +37,12 @@ import org.junit.runners.Suite;
  */
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses({ SQLRunDAOTest.class, SQLSampleDAOTest.class, SQLSequencerReferenceDAOTest.class,
-    SQLSequencerServiceRecordDAOTest.class })
+@Suite.SuiteClasses({ 
+  SQLRunDAOTest.class,
+  SQLSampleDAOTest.class,
+  SQLSequencerServiceRecordDAOTest.class,
+  SQLBoxDAOTest.class
+})
 
 public class AllTestsSuite {
 }

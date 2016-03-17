@@ -245,4 +245,28 @@ INSERT INTO `SampleNumberPerProject`
 (`sampleNumberPerProjectId`, `projectId`, `highestSampleNumber`, `padding`, `createdBy`, `updatedBy`, `creationDate`, `lastUpdated`)
 VALUES ('2', '3', '9999', '4', '1', '1', '2016-01-28 14:32:00', '2016-01-28 14:32:00');
 
+DELETE FROM `BoxSize`;
+INSERT INTO `BoxSize` (`boxSizeId`, `rows`, `columns`, `scannable`)
+VALUES
+('1', '4', '4', '0');
+
+DELETE FROM `BoxUse`;
+INSERT INTO `BoxUse` (`boxUseId`, `alias`)
+VALUES
+('1', 'boxuse1'),
+('2', 'boxuse2');
+
+DELETE FROM Box;
+INSERT INTO `Box` (`boxId`, `boxSizeId`, `boxUseId`, `name`, `alias`, `description`, `identificationBarcode`, `locationBarcode`, `securityProfile_profileId`, `lastModifier`)
+VALUES
+('1','1', '1', 'box1', 'box1alias', 'box1', 'barcode1','identifcationbarcode1', '1', '1'),
+('2','1', '2', 'box2', 'box2alias', 'box2', 'barcode2','identifcationbarcode2', '1', '1');
+
+DELETE FROM BoxPosition;
+INSERT INTO `BoxPosition` (`BoxPositionId`, `boxId`, `column`, `row`, `lastModifier`)
+VALUES
+('1', '1', '1', '1', '1'),
+('2', '2', '1', '2', '1');
+
+
 

@@ -66,6 +66,13 @@ CREATE TABLE BoxPosition (
   FOREIGN KEY(lastModifier) REFERENCES User(userId)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+CREATE TABLE BoxChangeLog (
+  boxId bigint(20) NOT NULL REFERENCES Box(boxId),
+  columnsChanged text NOT NULL,
+  userId bigint(20) NOT NULL,
+  message text NOT NULL,
+  changeTime timestamp DEFAULT CURRENT_TIMESTAMP) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
 INSERT INTO sequence_data(sequence_name) VALUES('box_position_seq');
 
 ALTER TABLE Sample ADD COLUMN (
@@ -114,10 +121,5 @@ CREATE TRIGGER BeforeInsertPool BEFORE INSERT ON Pool
 -- There is no check that identificationBarcode and boxPositionId aren't reused between Sample, Library, and Pool, but there should be. 
 
 
-CREATE TABLE BoxChangeLog (
-  boxId bigint(20) NOT NULL REFERENCES Box(boxId),
-  columnsChanged text NOT NULL,
-  userId bigint(20) NOT NULL,
-  message text NOT NULL,
-  changeTime timestamp DEFAULT CURRENT_TIMESTAMP) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
 
