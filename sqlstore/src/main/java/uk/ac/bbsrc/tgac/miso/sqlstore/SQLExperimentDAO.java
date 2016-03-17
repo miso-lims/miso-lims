@@ -64,6 +64,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.core.store.StudyStore;
+import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
@@ -136,11 +137,13 @@ public class SQLExperimentDAO implements ExperimentStore {
   private MisoNamingScheme<Experiment> namingScheme;
 
   @Override
+  @CoverageIgnore
   public MisoNamingScheme<Experiment> getNamingScheme() {
     return namingScheme;
   }
 
   @Override
+  @CoverageIgnore
   public void setNamingScheme(MisoNamingScheme<Experiment> namingScheme) {
     this.namingScheme = namingScheme;
   }
@@ -148,6 +151,7 @@ public class SQLExperimentDAO implements ExperimentStore {
   @Autowired
   private CacheManager cacheManager;
 
+  @CoverageIgnore
   public void setCacheManager(CacheManager cacheManager) {
     this.cacheManager = cacheManager;
   }
@@ -155,38 +159,47 @@ public class SQLExperimentDAO implements ExperimentStore {
   @Autowired
   private DataObjectFactory dataObjectFactory;
 
+  @CoverageIgnore
   public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
     this.dataObjectFactory = dataObjectFactory;
   }
 
+  @CoverageIgnore
   public void setStudyDAO(StudyStore studyDAO) {
     this.studyDAO = studyDAO;
   }
 
+  @CoverageIgnore
   public void setSampleDAO(SampleStore sampleDAO) {
     this.sampleDAO = sampleDAO;
   }
 
+  @CoverageIgnore
   public void setRunDAO(RunStore runDAO) {
     this.runDAO = runDAO;
   }
 
+  @CoverageIgnore
   public void setPoolDAO(PoolStore poolDAO) {
     this.poolDAO = poolDAO;
   }
 
+  @CoverageIgnore
   public void setPlatformDAO(PlatformStore platformDAO) {
     this.platformDAO = platformDAO;
   }
 
+  @CoverageIgnore
   public void setKitDAO(KitStore kitDAO) {
     this.kitDAO = kitDAO;
   }
 
+  @CoverageIgnore
   public Store<SecurityProfile> getSecurityProfileDAO() {
     return securityProfileDAO;
   }
 
+  @CoverageIgnore
   public void setSecurityProfileDAO(Store<SecurityProfile> securityProfileDAO) {
     this.securityProfileDAO = securityProfileDAO;
   }
@@ -194,10 +207,12 @@ public class SQLExperimentDAO implements ExperimentStore {
   private JdbcTemplate template;
   private int maxQueryParams = 500;
 
+  @CoverageIgnore
   public JdbcTemplate getJdbcTemplate() {
     return template;
   }
 
+  @CoverageIgnore
   public void setJdbcTemplate(JdbcTemplate template) {
     this.template = template;
   }
@@ -210,6 +225,7 @@ public class SQLExperimentDAO implements ExperimentStore {
    *
    * @return the maximum bound on the query list size
    */
+  @CoverageIgnore
   public int getMaxQueryParams() {
     return maxQueryParams;
   }
@@ -223,20 +239,24 @@ public class SQLExperimentDAO implements ExperimentStore {
    * @param maxQueryParams
    *          the maximum bound on the query list size - this should never be greater than that allowed by the database, but can be smaller
    */
+  @CoverageIgnore
   public void setMaxQueryParams(int maxQueryParams) {
     this.maxQueryParams = maxQueryParams;
   }
 
   @Override
+  @CoverageIgnore
   public void setCascadeType(CascadeType cascadeType) {
     this.cascadeType = cascadeType;
   }
 
+  @CoverageIgnore
   private void purgeListCache(Experiment experiment, boolean replace) {
     Cache cache = cacheManager.getCache("experimentListCache");
     DbUtils.updateListCache(cache, replace, experiment, Experiment.class);
   }
 
+  @CoverageIgnore
   private void purgeListCache(Experiment experiment) {
     purgeListCache(experiment, true);
   }
@@ -251,7 +271,7 @@ public class SQLExperimentDAO implements ExperimentStore {
   @Transactional(readOnly = false, rollbackFor = IOException.class)
   @TriggersRemove(cacheName = { "experimentCache",
       "lazyExperimentCache" }, keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
-          @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
+          @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public long save(Experiment experiment) throws IOException {
     Long securityProfileId = experiment.getSecurityProfile().getProfileId();
     if (securityProfileId == null || this.cascadeType != null) {
@@ -360,7 +380,7 @@ public class SQLExperimentDAO implements ExperimentStore {
 
   @Override
   @Cacheable(cacheName = "experimentListCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
-      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
+      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public List<Experiment> listAll() {
     return template.query(EXPERIMENTS_SELECT, new ExperimentMapper(true));
   }
@@ -375,7 +395,9 @@ public class SQLExperimentDAO implements ExperimentStore {
     return template.queryForInt("SELECT count(*) FROM " + TABLE_NAME);
   }
 
+  @Deprecated
   @Override
+  @CoverageIgnore
   public List<Experiment> listBySearch(String query) {
     String mySQLQuery = "%" + query.replaceAll("_", Matcher.quoteReplacement("\\_")) + "%";
     return template.query(EXPERIMENTS_SELECT_BY_SEARCH, new Object[] { mySQLQuery, mySQLQuery, mySQLQuery }, new ExperimentMapper(true));
@@ -400,7 +422,7 @@ public class SQLExperimentDAO implements ExperimentStore {
 
   @Override
   @Cacheable(cacheName = "experimentCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
-      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
+      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public Experiment get(long experimentId) throws IOException {
     List eResults = template.query(EXPERIMENT_SELECT_BY_ID, new Object[] { experimentId }, new ExperimentMapper());
     Experiment e = eResults.size() > 0 ? (Experiment) eResults.get(0) : null;
@@ -418,7 +440,7 @@ public class SQLExperimentDAO implements ExperimentStore {
   @Transactional(readOnly = false, rollbackFor = IOException.class)
   @TriggersRemove(cacheName = { "experimentCache",
       "lazyExperimentCache" }, keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
-          @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
+          @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public boolean remove(Experiment experiment) throws IOException {
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
     if (experiment.isDeletable()
@@ -438,30 +460,35 @@ public class SQLExperimentDAO implements ExperimentStore {
           }
         }
       }
-
-      purgeListCache(experiment, false);
-
+      if (cacheManager != null) {
+        purgeListCache(experiment, false);
+      }
       return true;
     }
     return false;
   }
 
+  @CoverageIgnore
   public ChangeLogStore getChangeLogDAO() {
     return changeLogDAO;
   }
 
+  @CoverageIgnore
   public void setChangeLogDAO(ChangeLogStore changeLogDAO) {
     this.changeLogDAO = changeLogDAO;
   }
 
+  @CoverageIgnore
   public SecurityStore getSecurityDAO() {
     return securityDAO;
   }
 
+  @CoverageIgnore
   public void setSecurityDAO(SecurityStore securityDAO) {
     this.securityDAO = securityDAO;
   }
 
+  @CoverageIgnore
   public class ExperimentMapper extends CacheAwareRowMapper<Experiment> {
     public ExperimentMapper() {
       super(Experiment.class);
@@ -472,6 +499,7 @@ public class SQLExperimentDAO implements ExperimentStore {
     }
 
     @Override
+    @CoverageIgnore
     public Experiment mapRow(ResultSet rs, int rowNum) throws SQLException {
       long id = rs.getLong("experimentId");
 
@@ -513,7 +541,7 @@ public class SQLExperimentDAO implements ExperimentStore {
       return e;
     }
   }
-  
+
   @Override
   public Map<String, Integer> getExperimentColumnSizes() throws IOException {
     return DbUtils.getColumnSizes(template, TABLE_NAME);

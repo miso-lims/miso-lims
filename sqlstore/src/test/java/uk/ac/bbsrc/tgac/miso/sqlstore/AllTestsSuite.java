@@ -47,6 +47,8 @@ import org.junit.runners.Suite;
   SQLSequencerReferenceDAOTest.class,
   SQLSequencerPartitionContainerDAOTest.class,
   SQLBoxDAOTest.class,
+  SQLSequencerServiceRecordDAOTest.class,
+  SQLExperimentDAOTest.class,
   SQLPlatformDAOTest.class,
   SQLSequencerServiceRecordDAOTest.class,
   SQLPoolDAOTest.class,
