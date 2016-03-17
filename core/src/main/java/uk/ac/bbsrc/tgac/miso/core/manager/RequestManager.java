@@ -399,7 +399,7 @@ public interface RequestManager {
 
   public Collection<TagBarcode> listAllTagBarcodesByStrategyName(String platformType) throws IOException;
 
-  public Collection<Dilution> listDilutionsBySearch(String query, PlatformType platformType) throws IOException;
+  public Collection<Dilution> listAllLibraryDilutionsBySearchAndPlatform(String query, PlatformType platformType) throws IOException;
 
   public Collection<Dilution> listAllDilutionsByProjectAndPlatform(long projectId, PlatformType platformType) throws IOException;
 
@@ -412,8 +412,6 @@ public interface RequestManager {
   public Collection<LibraryDilution> listAllLibraryDilutionsByPlatform(PlatformType platformType) throws IOException;
 
   public Collection<LibraryDilution> listAllLibraryDilutionsByProjectId(long projectId) throws IOException;
-
-  public Collection<LibraryDilution> listAllLibraryDilutionsBySearch(String query, PlatformType platformType) throws IOException;
 
   public Collection<LibraryDilution> listAllLibraryDilutionsBySearchOnly(String query) throws IOException;
 
