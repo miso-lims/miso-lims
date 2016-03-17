@@ -137,17 +137,17 @@ public interface SampleStore extends Store<Sample>, Cascadable, Remover<Sample>,
 
   /**
    * List the Sample associated with the given positionId
+   * 
    * @param positionId
    *          of type long
    * @return Boxable
    * @throws IOException
    *           when
    */
-  Boxable getByPositionId(long positionId);
+  Boxable getByPositionId(long positionId) throws IOException;
 
   /**
-   * List all Samples associated with identificationBarcodes from the given 
-   * identificationBarcode list
+   * List all Samples associated with identificationBarcodes from the given identificationBarcode list
    * 
    * @return Collection<Sample
    * @throws IOException

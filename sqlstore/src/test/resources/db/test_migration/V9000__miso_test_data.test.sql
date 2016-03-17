@@ -188,6 +188,10 @@ DELETE FROM `SequencerPartitionContainer`;
 INSERT INTO `SequencerPartitionContainer`(`containerId`, `securityProfile_profileId`, `identificationBarcode`, `locationBarcode`, `platform`, `validationBarcode`, `lastModifier`) 
 VALUES (1,12,'C0JHTACXX','',16,'',1),(2,13,'D0VJ9ACXX','',16,'',1),(3,14,'C075RACXX','',16,'',1),(4,15,'C0KY7ACXX','',16,'',1);
 
+DELETE FROM `Platform`;
+INSERT INTO `Platform`(`platformId`, `name`, `instrumentModel`, `description`, `numContainers`) 
+VALUES (16,'Illumina','Illumina HiSeq 2000','4-channel flowgram',1),(17,'Illumina','Illumina MiSeq','Tiny Seq',1),(18,'PacBio','PacBio RS','Long Seq',1);
+
 DELETE FROM `SequencerPartitionContainer_Partition`;
 INSERT INTO `SequencerPartitionContainer_Partition`(`container_containerId`, `partitions_partitionId`) 
 VALUES (1,1),(1,2),(1,3),(1,4),(1,5),(1,6),(1,7),(1,8),(2,9),(2,10),(2,11),(2,12),(2,13),(2,14),(2,15),(2,16),(3,17),(3,18),(3,19),
@@ -195,8 +199,8 @@ VALUES (1,1),(1,2),(1,3),(1,4),(1,5),(1,6),(1,7),(1,8),(2,9),(2,10),(2,11),(2,12
 
 DELETE FROM `SequencerReference`;
 INSERT INTO `SequencerReference`(`referenceId`, `name`, `ipAddress`, `platformId`, `available`) 
-VALUES (1,'h1179',RAWTOHEX('127.0.0.1'),16,1),
-(2,'h1180',RAWTOHEX('127.0.0.1'),16,1);
+VALUES (1,'h1179',X'0F000001',16,1),
+(2,'h1180',X'0F000001',16,1);
 
 DELETE FROM `SequencerServiceRecord`;
 INSERT INTO `SequencerServiceRecord`(`recordId`, `sequencerReferenceId`, `title`, `details`, `servicedBy`, `referenceNumber`, `serviceDate`, `shutdownTime`, `restoredTime`)
@@ -245,4 +249,25 @@ INSERT INTO `SampleNumberPerProject`
 (`sampleNumberPerProjectId`, `projectId`, `highestSampleNumber`, `padding`, `createdBy`, `updatedBy`, `creationDate`, `lastUpdated`)
 VALUES ('2', '3', '9999', '4', '1', '1', '2016-01-28 14:32:00', '2016-01-28 14:32:00');
 
+DELETE FROM `BoxSize`;
+INSERT INTO `BoxSize` (`boxSizeId`, `rows`, `columns`, `scannable`)
+VALUES
+('1', '4', '4', '0');
 
+DELETE FROM `BoxUse`;
+INSERT INTO `BoxUse` (`boxUseId`, `alias`)
+VALUES
+('1', 'boxuse1'),
+('2', 'boxuse2');
+
+DELETE FROM Box;
+INSERT INTO `Box` (`boxId`, `boxSizeId`, `boxUseId`, `name`, `alias`, `description`, `identificationBarcode`, `locationBarcode`, `securityProfile_profileId`, `lastModifier`)
+VALUES
+('1','1', '1', 'box1', 'box1alias', 'box1', 'barcode1','identifcationbarcode1', '1', '1'),
+('2','1', '2', 'box2', 'box2alias', 'box2', 'barcode2','identifcationbarcode2', '1', '1');
+
+DELETE FROM BoxPosition;
+INSERT INTO `BoxPosition` (`BoxPositionId`, `boxId`, `column`, `row`, `lastModifier`)
+VALUES
+('1', '1', '1', '1', '1'),
+('2', '2', '1', '2', '1');

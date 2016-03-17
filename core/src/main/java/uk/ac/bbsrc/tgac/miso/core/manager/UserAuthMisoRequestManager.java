@@ -362,6 +362,7 @@ public class UserAuthMisoRequestManager implements RequestManager {
   @Override
   public long saveSequencerPartitionContainer(SequencerPartitionContainer container) throws IOException {
     if (writeCheck(container)) {
+      container.setLastModifier(getCurrentUser());
       return backingManager.saveSequencerPartitionContainer(container);
     } else {
       throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot write to this SequencerPartitionContainer");
@@ -1811,9 +1812,18 @@ public class UserAuthMisoRequestManager implements RequestManager {
 
   @Override
   public int[] saveRuns(Collection<Run> runs) throws IOException {
+    User user = getCurrentUser();
     for (Run run : runs) {
       if (!writeCheck(run)) {
         throw new IOException("User " + getCurrentUser().getFullName() + " cannot write to this Run");
+      } else {
+        run.setLastModifier(user);
+        List<SequencerPartitionContainer<SequencerPoolPartition>> containers = run.getSequencerPartitionContainers();
+        if (run.getSequencerPartitionContainers() != null) {
+          for (SequencerPartitionContainer<SequencerPoolPartition> container : containers) {
+            container.setLastModifier(user);
+          }
+        }
       }
     }
     return backingManager.saveRuns(runs);
@@ -2109,18 +2119,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
     User user = getCurrentUser();
     Collection<Box> accessibles = new HashSet<>();
     for (Box o : backingManager.listAllBoxesWithLimit(limit)) {
-      if (o.userCanRead(user)) {
-        accessibles.add(o);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Collection<Box> listAllBoxesBySearch(String query) throws IOException {
-    User user = getCurrentUser();
-    Collection<Box> accessibles = new HashSet<>();
-    for (Box o : backingManager.listAllBoxesBySearch(query)) {
       if (o.userCanRead(user)) {
         accessibles.add(o);
       }

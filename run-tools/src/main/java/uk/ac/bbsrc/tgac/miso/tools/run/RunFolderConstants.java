@@ -49,7 +49,8 @@ public interface RunFolderConstants {
   String LS454_SIGNAL_FOLDER_REGEX = "D_\\d{4}_\\d{2}_\\d{2}_\\d{2}_\\d{2}_\\d{2}_[A-z0-9\\+\\-]+_[signalProcessing|fullProcessingAmplicons].*";
   String LS454_IMAGE_FOLDER_REGEX = "D_\\d{4}_\\d{2}_\\d{2}_\\d{2}_\\d{2}_\\d{2}_[A-z0-9\\+\\-]+_imageProcessingOnly.*";
 
-  String PACBIO_FOLDER_REGEX = ".*/\\d{8}_.*";
-  String PACBIO_FOLDER_CAPTURE_REGEX = ".*/(\\d{8})_(.*)/.*";
-  String PACBIO_FOLDER_NAME_GROUP_CAPTURE_REGEX = "(\\d{8})_(.*)";
+  String PACBIO_FOLDER_REGEX = ".*/\\d{4}_?\\d{2}_?\\d{2}_.*";
+  String PACBIO_FOLDER_CAPTURE_REGEX = ".*/(\\d{4}_?\\d{2}_?\\d{2})_(.*)/.*";
+  String PACBIO_FOLDER_NAME_GROUP_CAPTURE_REGEX = "(\\d{4}_?\\d{2}_?\\d{2})_(.*)";
+
 }

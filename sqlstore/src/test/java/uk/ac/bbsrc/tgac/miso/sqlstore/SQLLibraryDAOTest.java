@@ -61,8 +61,6 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
   @Mock
   private Store<SecurityProfile> securityProfileDAO;
   @Mock
-  private SQLSampleDAO sampleDAO;
-  @Mock
   private LibraryDilutionStore libraryDilutionStore;
   @Mock
   private SQLLibraryQCDAO libraryQCDAO;

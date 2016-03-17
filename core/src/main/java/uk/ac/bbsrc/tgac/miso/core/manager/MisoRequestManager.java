@@ -2542,15 +2542,6 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Box> listAllBoxesBySearch(String query) throws IOException {
-    if (boxStore != null) {
-      return boxStore.listBySearch(query);
-    } else {
-      throw new IOException("No boxStore available. Check that is has been declared in the Spring config.");
-    }
-  }
-
-  @Override
   public Collection<Box> listAllBoxesByAlias(String alias) throws IOException {
     if (boxStore != null) {
       return boxStore.listByAlias(alias);

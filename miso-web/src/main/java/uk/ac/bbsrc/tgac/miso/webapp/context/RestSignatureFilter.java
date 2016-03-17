@@ -37,7 +37,6 @@ import javax.ws.rs.core.Response.Status;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -47,13 +46,13 @@ import org.springframework.security.web.context.HttpSessionSecurityContextReposi
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
+
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.integration.util.SignatureHelper;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestException;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestExceptionHandler;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestExceptionHandler.RestError;
-
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 /**
  * Authentication filter for REST requests. If authentication headers are found in the request, signature authentication will be 
@@ -215,19 +214,18 @@ public class RestSignatureFilter extends OncePerRequestFilter {
     User userdetails = null;
     boolean validSignature = false;
     try {
+      com.eaglegenomics.simlims.core.User user = securityManager.getUserByLoginName(loginName);
       if (loginName.equals("notification")) {
         logger.info("Incoming notification request");
-        userdetails = new User("notification", "none", true, true, true, true, AuthorityUtils.createAuthorityList("ROLE_INTERNAL"));
         validSignature = SignatureHelper.validateSignature(request, SignatureHelper.PUBLIC_KEY, signature);
       } else {
         logger.debug("Incoming user REST API request");
-        com.eaglegenomics.simlims.core.User user = securityManager.getUserByLoginName(loginName);
         if (user != null) {
-          userdetails = LimsSecurityUtils.toUserDetails(user);
           validSignature = SignatureHelper.validateSignature(request,
               SignatureHelper.generatePrivateUserKey((user.getLoginName() + "::" + user.getPassword()).getBytes("UTF-8")), signature);
         }
       }
+      userdetails = LimsSecurityUtils.toUserDetails(user);
     } catch (InvalidKeyException e) {
       logger.error("filter", e);
     } catch (Exception e) {

@@ -63,29 +63,26 @@ public class SQLSequencerReferenceDAO implements SequencerReferenceStore {
   private static final String TABLE_NAME = "SequencerReference";
 
   private static final String SEQUENCER_REFERENCE_SELECT = "SELECT sr.referenceId, sr.name, sr.ipAddress, sr.platformId, sr.available, sr.serialNumber,"
-      + " sr.dateCommissioned, sr.dateDecommissioned, sr.upgradedSequencerReferenceId, sv.lastServiced"
-      + " FROM " + TABLE_NAME + " sr"
-      + " LEFT JOIN (SELECT sequencerReferenceId, MAX(serviceDate) AS 'lastServiced' FROM SequencerServiceRecord GROUP BY sequencerReferenceId) sv"
+      + " sr.dateCommissioned, sr.dateDecommissioned, sr.upgradedSequencerReferenceId, sv.lastServiced" + " FROM " + TABLE_NAME + " sr"
+      + " LEFT JOIN (SELECT sequencerReferenceId, MAX(serviceDate) AS lastServiced FROM SequencerServiceRecord GROUP BY sequencerReferenceId) sv"
       + " ON sv.sequencerReferenceId = sr.referenceId";
 
   private static final String SEQUENCER_REFERENCE_SELECT_BY_ID = SEQUENCER_REFERENCE_SELECT + " WHERE sr.referenceId = ?";
 
   private static final String SEQUENCER_REFERENCE_SELECT_BY_NAME = SEQUENCER_REFERENCE_SELECT + " WHERE sr.name = ?";
-  
+
   private static final String SEQUENCER_REFERENCE_SELECT_BY_PLATFORM = SEQUENCER_REFERENCE_SELECT
-      + " LEFT JOIN Platform p ON sr.platformId=p.platformId"
-      + " WHERE p.name=?";
+      + " LEFT JOIN Platform p ON sr.platformId=p.platformId" + " WHERE p.name=?";
 
   private static final String SEQUENCER_REFERENCE_SELECT_BY_RELATED_RUN = "";
-  
+
   private static final String SEQUENCER_REFERENCE_SELECT_BY_UPGRADED_REFERENCE = SEQUENCER_REFERENCE_SELECT
       + " WHERE sr.upgradedSequencerReferenceId=?";
 
   private static final String SEQUENCER_REFERENCE_UPDATE = "UPDATE " + TABLE_NAME + " "
       + "SET name=:name, ipAddress=:ipAddress, platformId=:platformId, available=:available, serialNumber=:serialNumber, "
       + "dateCommissioned=:dateCommissioned, dateDecommissioned=:dateDecommissioned,"
-      + "upgradedSequencerReferenceId=:upgradedSequencerReferenceId "
-      + "WHERE referenceId=:referenceId";
+      + "upgradedSequencerReferenceId=:upgradedSequencerReferenceId " + "WHERE referenceId=:referenceId";
 
   private static final String SEQUENCER_REFERENCE_DELETE = "DELETE FROM " + TABLE_NAME + " WHERE referenceId=:referenceId";
 
@@ -132,11 +129,10 @@ public class SQLSequencerReferenceDAO implements SequencerReferenceStore {
     params.addValue("dateDecommissioned", sequencerReference.getDateDecommissioned());
     if (sequencerReference.getUpgradedSequencerReference() != null) {
       params.addValue("upgradedSequencerReferenceId", sequencerReference.getUpgradedSequencerReference().getId());
-    }
-    else {
+    } else {
       params.addValue("upgradedSequencerReferenceId", null);
     }
-    
+
     if (sequencerReference.getId() == AbstractSequencerReference.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(TABLE_NAME).usingGeneratedKeyColumns("referenceId");
 
@@ -160,23 +156,26 @@ public class SQLSequencerReferenceDAO implements SequencerReferenceStore {
   public SequencerReference lazyGet(long id) throws IOException {
     return get(id, true);
   }
-  
+
   public SequencerReference get(long id, boolean lazy) throws IOException {
-    List<SequencerReference> eResults = template.query(SEQUENCER_REFERENCE_SELECT_BY_ID, new Object[] { id }, new SequencerReferenceMapper(!lazy));
+    List<SequencerReference> eResults = template.query(SEQUENCER_REFERENCE_SELECT_BY_ID, new Object[] { id },
+        new SequencerReferenceMapper(!lazy));
     SequencerReference e = eResults.size() > 0 ? (SequencerReference) eResults.get(0) : null;
     return e;
   }
 
   @Override
   public SequencerReference getByRunId(long runId) throws IOException {
-    List<SequencerReference> eResults = template.query(SEQUENCER_REFERENCE_SELECT_BY_RELATED_RUN, new Object[] { runId }, new SequencerReferenceMapper());
+    List<SequencerReference> eResults = template.query(SEQUENCER_REFERENCE_SELECT_BY_RELATED_RUN, new Object[] { runId },
+        new SequencerReferenceMapper());
     SequencerReference e = eResults.size() > 0 ? (SequencerReference) eResults.get(0) : null;
     return e;
   }
 
   @Override
   public SequencerReference getByName(String referenceName) throws IOException {
-    List<SequencerReference> eResults = template.query(SEQUENCER_REFERENCE_SELECT_BY_NAME, new Object[] { referenceName }, new SequencerReferenceMapper());
+    List<SequencerReference> eResults = template.query(SEQUENCER_REFERENCE_SELECT_BY_NAME, new Object[] { referenceName },
+        new SequencerReferenceMapper());
     SequencerReference e = eResults.size() > 0 ? (SequencerReference) eResults.get(0) : null;
     return e;
   }
@@ -195,14 +194,13 @@ public class SQLSequencerReferenceDAO implements SequencerReferenceStore {
   public Collection<SequencerReference> listByPlatformType(PlatformType platformType) throws IOException {
     return template.query(SEQUENCER_REFERENCE_SELECT_BY_PLATFORM, new Object[] { platformType.getKey() }, new SequencerReferenceMapper());
   }
-  
+
   private SequencerReference getByUpgradedReference(long id) {
-    List<SequencerReference> upgradedFrom = template.query(
-        SEQUENCER_REFERENCE_SELECT_BY_UPGRADED_REFERENCE, new Object[] {id}, new SequencerReferenceMapper(false));
+    List<SequencerReference> upgradedFrom = template.query(SEQUENCER_REFERENCE_SELECT_BY_UPGRADED_REFERENCE, new Object[] { id },
+        new SequencerReferenceMapper(false));
     if (upgradedFrom.size() == 1) {
       return upgradedFrom.get(0);
-    }
-    else {
+    } else {
       return null;
     }
   }
@@ -215,17 +213,17 @@ public class SQLSequencerReferenceDAO implements SequencerReferenceStore {
   }
 
   public class SequencerReferenceMapper implements RowMapper<SequencerReference> {
-    
+
     private final boolean loadReferences;
-    
+
     public SequencerReferenceMapper() {
       this.loadReferences = true;
     }
-    
+
     public SequencerReferenceMapper(boolean loadReferences) {
       this.loadReferences = loadReferences;
     }
-    
+
     @Override
     public SequencerReference mapRow(ResultSet rs, int rowNum) throws SQLException {
       SequencerReference c = dataObjectFactory.getSequencerReference();
@@ -246,7 +244,7 @@ public class SQLSequencerReferenceDAO implements SequencerReferenceStore {
             }
             c.setPreUpgradeSequencerReference(getByUpgradedReference(c.getId()));
           }
-          
+
           Blob ipBlob = rs.getBlob("ipAddress");
           if (ipBlob != null) {
             if (ipBlob.length() > 0) {
@@ -262,7 +260,7 @@ public class SQLSequencerReferenceDAO implements SequencerReferenceStore {
       return c;
     }
   }
-  
+
   @Override
   public Map<String, Integer> getSequencerReferenceColumnSizes() throws IOException {
     return DbUtils.getColumnSizes(template, TABLE_NAME);
