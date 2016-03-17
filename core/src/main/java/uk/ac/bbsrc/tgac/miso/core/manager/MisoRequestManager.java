@@ -742,9 +742,9 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Dilution> listDilutionsBySearch(String query, PlatformType platformType) throws IOException {
+  public Collection<Dilution> listAllLibraryDilutionsBySearchAndPlatform(String query, PlatformType platformType) throws IOException {
     List<Dilution> dilutions = new ArrayList<Dilution>();
-    for (Dilution d : libraryDilutionStore.listAllLibraryDilutionsBySearch(query, platformType)) {
+    for (Dilution d : libraryDilutionStore.listAllLibraryDilutionsBySearchAndPlatform(query, platformType)) {
       dilutions.add(d);
     }
 
@@ -809,15 +809,6 @@ public class MisoRequestManager implements RequestManager {
       return libraryDilutionStore.listAllLibraryDilutionsByProjectId(projectId);
     } else {
       throw new IOException("No dilutionStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<LibraryDilution> listAllLibraryDilutionsBySearch(String query, PlatformType platformType) throws IOException {
-    if (libraryDilutionStore != null) {
-      return libraryDilutionStore.listAllLibraryDilutionsByPlatformAndSearch(query, platformType);
-    } else {
-      throw new IOException("No libraryDilutionStore available. Check that it has been declared in the Spring config.");
     }
   }
 

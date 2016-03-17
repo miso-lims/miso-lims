@@ -1113,10 +1113,10 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Dilution> listDilutionsBySearch(String query, PlatformType platformType) throws IOException {
+  public Collection<Dilution> listAllLibraryDilutionsBySearchAndPlatform(String query, PlatformType platformType) throws IOException {
     User user = getCurrentUser();
     Collection<Dilution> accessibles = new HashSet<>();
-    for (Dilution dilution : backingManager.listDilutionsBySearch(query, platformType)) {
+    for (Dilution dilution : backingManager.listAllLibraryDilutionsBySearchAndPlatform(query, platformType)) {
       if (dilution.userCanRead(user)) {
         accessibles.add(dilution);
       }
@@ -1189,18 +1189,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
     User user = getCurrentUser();
     Collection<LibraryDilution> accessibles = new HashSet<>();
     for (LibraryDilution dilution : backingManager.listAllLibraryDilutionsByProjectId(projectId)) {
-      if (dilution.userCanRead(user)) {
-        accessibles.add(dilution);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Collection<LibraryDilution> listAllLibraryDilutionsBySearch(String query, PlatformType platformType) throws IOException {
-    User user = getCurrentUser();
-    Collection<LibraryDilution> accessibles = new HashSet<>();
-    for (LibraryDilution dilution : backingManager.listAllLibraryDilutionsBySearch(query, platformType)) {
       if (dilution.userCanRead(user)) {
         accessibles.add(dilution);
       }

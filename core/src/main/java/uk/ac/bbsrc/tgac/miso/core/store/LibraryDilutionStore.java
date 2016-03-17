@@ -60,19 +60,6 @@ public interface LibraryDilutionStore extends Store<LibraryDilution>, Remover<Li
   Collection<LibraryDilution> listAllLibraryDilutionsByPlatform(PlatformType platformtype) throws IOException;
 
   /**
-   * List all Dilutions prepared for a given PlatformType and search query
-   * 
-   * @param query
-   *          of type String
-   * @param platformtype
-   *          of type PlatformType
-   * @return Collection<? extends Dilution>
-   * @throws IOException
-   *           when
-   */
-  Collection<LibraryDilution> listAllLibraryDilutionsByPlatformAndSearch(String query, PlatformType platformtype) throws IOException;
-
-  /**
    * List all LibraryDilutions that are related to a given Project
    * 
    * @param projectId
@@ -84,17 +71,14 @@ public interface LibraryDilutionStore extends Store<LibraryDilution>, Remover<Li
   Collection<LibraryDilution> listAllLibraryDilutionsByProjectId(long projectId) throws IOException;
 
   /**
-   * List all LibraryDilutions that match a given search string
+   * List all LibraryDilutions for a particular PlatformType that match a given search string
    * 
-   * @param query
-   *          of type String
-   * @param platformType
-   *          of type PlatformType
-   * @return Collection<LibraryDilution>
+   * @param query the name or identificationBarcode to search for
+   * @param platformType the PlatformType to include LibraryDilutions for
+   * @return a Collection of LibraryDilutions matching the PlatformType and search String
    * @throws IOException
-   *           when
    */
-  Collection<LibraryDilution> listAllLibraryDilutionsBySearch(String query, PlatformType platformType) throws IOException;
+  Collection<LibraryDilution> listAllLibraryDilutionsBySearchAndPlatform(String query, PlatformType platformType) throws IOException;
 
   Collection<LibraryDilution> listAllLibraryDilutionsBySearchOnly(String query) throws IOException;
 
@@ -148,5 +132,11 @@ public interface LibraryDilutionStore extends Store<LibraryDilution>, Remover<Li
    */
   LibraryDilution getLibraryDilutionByBarcode(String barcode) throws IOException;
 
+  /**
+   * Retrieve all Library Dilutions up to a set maximum number of records
+   * 
+   * @param limit maximum number of records to return. Negative values will result in no limit
+   * @throws IOException
+   */
   Collection<LibraryDilution> listAllWithLimit(long limit) throws IOException;
 }

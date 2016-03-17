@@ -481,7 +481,6 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
     libraryDilutionDAO.setJdbcTemplate(template);
     libraryDilutionDAO.setSecurityProfileDAO(securityProfileDAO);
     libraryDilutionDAO.setLibraryDAO(libraryDAO);
-    libraryDilutionDAO.setEmPcrDAO(emPCRDAO);
     libraryDilutionDAO.setCascadeType(CascadeType.PERSIST);
     libraryDilutionDAO.setDataObjectFactory(dataObjectFactory);
     daos.put(uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution.class, libraryDilutionDAO);
