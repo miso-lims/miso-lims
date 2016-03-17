@@ -195,8 +195,8 @@ VALUES (1,1),(1,2),(1,3),(1,4),(1,5),(1,6),(1,7),(1,8),(2,9),(2,10),(2,11),(2,12
 
 DELETE FROM `SequencerReference`;
 INSERT INTO `SequencerReference`(`referenceId`, `name`, `ipAddress`, `platformId`, `available`) 
-VALUES (1,'h1179',RAWTOHEX('127.0.0.1'),16,1),
-(2,'h1180',RAWTOHEX('127.0.0.1'),16,1);
+VALUES (1,'h1179',X'0F000001',16,1),
+(2,'h1180',X'0F000001',16,1);
 
 DELETE FROM `SequencerServiceRecord`;
 INSERT INTO `SequencerServiceRecord`(`recordId`, `sequencerReferenceId`, `title`, `details`, `servicedBy`, `referenceNumber`, `serviceDate`, `shutdownTime`, `restoredTime`)
