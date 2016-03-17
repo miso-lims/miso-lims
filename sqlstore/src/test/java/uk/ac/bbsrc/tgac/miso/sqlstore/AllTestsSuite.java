@@ -46,7 +46,11 @@ import org.junit.runners.Suite;
   SQLSequencerPartitionContainerDAOTest.class,
   SQLBoxDAOTest.class,
   SQLSequencerServiceRecordDAOTest.class,
-  SQLExperimentDAOTest.class
+  SQLExperimentDAOTest.class,
+  SQLPlatformDAOTest.class,
+  SQLSequencerServiceRecordDAOTest.class,
+  SQLPoolDAOTest.class,
+  SQLLibraryDilutionDAOTest.class
 })
 
 public class AllTestsSuite {
