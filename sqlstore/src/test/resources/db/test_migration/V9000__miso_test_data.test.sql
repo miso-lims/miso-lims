@@ -217,7 +217,10 @@ VALUES (1,'Completed','2012-03-31','2012-03-23','SN7001179','2015-08-28 18:32:29
 
 DELETE FROM `Study`;
 INSERT INTO `Study`(`studyId`, `name`, `description`, `accession`, `securityProfile_profileId`, `project_projectId`, `studyType`, `alias`, `lastModifier`)
-VALUES (1,'STU1','Test study',NULL,1,1,'Other','Test Study',1);
+VALUES (1,'STU1','Test study1',NULL,1,1,'Other','Test Study1',1),
+(2,'STU2','Test study2',NULL,1,1,'Other','Test Study2',1),
+(3,'STU3','OICR',NULL,1,1,'Other','Test Study3',1),
+(4,'STU4','OICR',NULL,1,1,'Other','Test Study4',1);
 
 DELETE FROM `Watcher`;
 INSERT INTO `Watcher`(`entityName`, `userId`) 

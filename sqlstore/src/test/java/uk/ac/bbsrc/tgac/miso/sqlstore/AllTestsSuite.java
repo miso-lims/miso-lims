@@ -40,6 +40,7 @@ import org.junit.runners.Suite;
 
 @Suite.SuiteClasses({ 
   SQLRunDAOTest.class,
+  SQLStudyDAOTest.class,
   SQLSampleDAOTest.class,
   SQLSequencerReferenceDAOTest.class,
   SQLSequencerPartitionContainerDAOTest.class,

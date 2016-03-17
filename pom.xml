@@ -377,14 +377,12 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.9</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
-      <version>1.10.19</version>
       <scope>test</scope>
     </dependency>
 
@@ -404,6 +402,10 @@
       <artifactId>hibernate-core</artifactId>
       <version>${hibernate.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-all</artifactId>
+    </dependency>    
   </dependencies>
 
   <modules>
@@ -484,6 +486,33 @@
         <artifactId>spring-security-config</artifactId>
         <version>${spring-version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.hamcrest</groupId>
+        <artifactId>hamcrest-all</artifactId>
+        <version>${hamcrest.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>${junit.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-core</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-core</artifactId>
+        <version>${mockito.verison}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-core</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -516,6 +545,9 @@
     <spring-version>3.1.3.RELEASE</spring-version>
     <hibernate.version>4.2.21.Final</hibernate.version>
     <joda-time.version>2.9</joda-time.version>
+    <hamcrest.version>1.3</hamcrest.version>
+    <junit.version>4.9</junit.version>
+    <mockito.verison>1.10.19</mockito.verison>
     <!-- Note: Jackson 1 versions beyond 1.9.4 are not compatible with
       recursive type parameters, such as in the Poolable interface -->
     <jackson.version>1.9.4</jackson.version>
