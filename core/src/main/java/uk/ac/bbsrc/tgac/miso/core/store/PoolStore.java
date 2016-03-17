@@ -103,15 +103,13 @@ public interface PoolStore
   List<Pool<? extends Poolable>> listAllByPlatform(PlatformType platformType) throws IOException;
 
   /**
-   * List all Pools that are for a given {@link PlatformType} that match a search query String
+   * List all Pools that are for a given {@link PlatformType} and have a name, alias, or identificationBarcode matching 
+   * a query String
    * 
-   * @param platformType
-   *          of type PlatformType
-   * @param query
-   *          of type String
-   * @return List<Pool<? extends Poolable>
+   * @param platformType the PlatformType to find Pools for. Must not be null
+   * @param query the name, alias, or identificationBarcode to search for. Null will be replaced with empty String
+   * @return List<Pool<? extends Poolable> all Pools matching the specified PlatformType and query String
    * @throws IOException
-   *           when
    */
   List<Pool<? extends Poolable>> listAllByPlatformAndSearch(PlatformType platformType, String query) throws IOException;
 
@@ -129,13 +127,10 @@ public interface PoolStore
   /**
    * List "ready to run" Pools that are for a given {@link PlatformType} that match a search query String
    * 
-   * @param platformType
-   *          of type PlatformType
-   * @param query
-   *          of type String
-   * @return List<Pool<? extends Poolable>
+   * @param platformType the PlatformType to find Pools for. Must not be null
+   * @param query the name, alias, or identificationBarcode to search for. Null will be replaced with empty String
+   * @return List<Pool<? extends Poolable> all Pools matching the specified Platform and query String
    * @throws IOException
-   *           when
    */
   List<Pool<? extends Poolable>> listReadyByPlatformAndSearch(PlatformType platformType, String query) throws IOException;
 
