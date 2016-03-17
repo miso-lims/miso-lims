@@ -54,6 +54,11 @@ VALUES (1,'LIB1','Inherited from TEST_0001',NULL,1,1,'LIB1::TEST_0001_Bn_P_PE_30
 (13,'LIB13','Inherited from TEST_0007',NULL,1,13,'LIB13::TEST_0007_Bn_P_PE_300_WG','LIBRARY_INBOX_B03',3,0,'2015-08-27','Illumina','TEST_0007_Bn_P_PE_300_WG',1,1,1,'true',1),
 (14,'LIB14','Inherited from TEST_0007',NULL,1,14,'LIB14::TEST_0007_Bn_R_PE_300_WG','LIBRARY_INBOX_B04',3,0,'2015-08-27','Illumina','TEST_0007_Bn_R_PE_300_WG',1,1,1,'true',1);
 
+DELETE FROM `Kit`;
+INSERT INTO `Kit`(`kitId`,`identificationBarcode`,`locationBarcode`,`lotNumber`,`kitDate`,`kitDescriptorId`) VALUES
+(1,'1234','Freezer2','LOT34',NOW(),1),
+(2,'5678','Freezer3','LOT35',NOW(),2);
+
 DELETE FROM `LibraryDilution`;
 INSERT INTO `LibraryDilution`(`dilutionId`, `concentration`, `library_libraryId`, `identificationBarcode`, `creationDate`, `dilutionUserName`, `name`, `securityProfile_profileId`) 
 VALUES (1,2,1,'LDI1::TEST_0001_Bn_P_PE_300_WG','2015-08-27','admin','LDI1',1),

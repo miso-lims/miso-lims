@@ -32,9 +32,6 @@ import java.util.Map;
 
 import javax.persistence.CascadeType;
 
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +43,8 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 
 import com.eaglegenomics.simlims.core.Note;
 
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractKit;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.ClusterKit;
@@ -56,9 +55,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.MultiplexingKit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.SequencingKit;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
 import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
+import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
@@ -83,16 +82,16 @@ public class SQLKitDAO implements KitStore {
 
   public static final String KIT_SELECT_BY_LOT_NUMBER = KITS_SELECT + " WHERE lotNumber = ?";
 
-  public static final String KITS_SELECT_BY_TYPE = "SELECT k.kitId, k.identificationBarcode, k.locationBarcode, k.lotNumber, k.kitDate, k.kitDescriptorId, ek.experiments_experimentId "
-      + "FROM " + KIT_TABLE_NAME + " k, Experiment_Kit ek " + "WHERE ek.kits_kitId=k.kitId " + "AND ek.experiments_experimentId=?";
+  public static final String KITS_SELECT_BY_TYPE = "SELECT k.kitId, k.identificationBarcode, k.locationBarcode, k.lotNumber, k.kitDate, k.kitDescriptorId "
+      + "FROM " + KIT_TABLE_NAME + " k, KitDescriptor kd " + "WHERE k.kitDescriptorId = kd.kitDescriptorId " + "AND kd.kitType = ?";
 
-  public static final String KITS_SELECT_BY_MANUFACTURER = "SELECT k.kitId, k.identificationBarcode, k.locationBarcode, k.lotNumber, k.kitDate, k.kitDescriptorId, ek.experiments_experimentId "
-      + "FROM " + KIT_TABLE_NAME + " k, Experiment_Kit ek " + "WHERE ek.kits_kitId=k.kitId " + "AND ek.experiments_experimentId=?";
+  public static final String KITS_SELECT_BY_MANUFACTURER = "SELECT k.kitId, k.identificationBarcode, k.locationBarcode, k.lotNumber, k.kitDate, k.kitDescriptorId "
+      + "FROM " + KIT_TABLE_NAME + " k, KitDescriptor kd " + "WHERE k.kitDescriptorId = kd.kitDescriptorId " + "AND kd.manufacturer = ?";
 
   public static final String KITS_SELECT_BY_RELATED_EXPERIMENT = "SELECT k.kitId, k.identificationBarcode, k.locationBarcode, k.lotNumber, k.kitDate, k.kitDescriptorId, ek.experiments_experimentId "
       + "FROM " + KIT_TABLE_NAME + " k, Experiment_Kit ek " + "WHERE ek.kits_kitId=k.kitId " + "AND ek.experiments_experimentId=?";
 
-  public static final String KITS_SELECT_BY_RELATED_LIBRARY = "SELECT k.kitId, k.identificationBarcode, k.locationBarcode, k.lotNumber, k.kitDate, k.kitDescriptorId, ek.experiments_experimentId "
+  public static final String KITS_SELECT_BY_RELATED_LIBRARY = "SELECT k.kitId, k.identificationBarcode, k.locationBarcode, k.lotNumber, k.kitDate, k.kitDescriptorId "
       + "FROM " + KIT_TABLE_NAME + " k, Library_Kit lk " + "WHERE lk.kits_kitId=k.kitId " + "AND lk.libraries_libraryId=?";
 
   public static final String KIT_UPDATE = "UPDATE " + KIT_TABLE_NAME + " "
@@ -122,21 +121,16 @@ public class SQLKitDAO implements KitStore {
   @Autowired
   private CacheManager cacheManager;
 
+  @CoverageIgnore
   public void setCacheManager(CacheManager cacheManager) {
     this.cacheManager = cacheManager;
-  }
-
-  @Autowired
-  private DataObjectFactory dataObjectFactory;
-
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
   }
 
   public void setNoteDAO(NoteStore noteDAO) {
     this.noteDAO = noteDAO;
   }
 
+  @CoverageIgnore
   public JdbcTemplate getJdbcTemplate() {
     return template;
   }
@@ -145,16 +139,18 @@ public class SQLKitDAO implements KitStore {
     this.template = template;
   }
 
+  @CoverageIgnore
   public void setCascadeType(CascadeType cascadeType) {
     this.cascadeType = cascadeType;
   }
 
   @Override
   public Kit get(long id) throws IOException {
-    List eResults = template.query(KIT_SELECT_BY_ID, new Object[] { id }, new KitMapper());
+    List<Kit> eResults = template.query(KIT_SELECT_BY_ID, new Object[] { id }, new KitMapper());
     return eResults.size() > 0 ? (Kit) eResults.get(0) : null;
   }
 
+  @CoverageIgnore
   @Override
   public Kit lazyGet(long id) throws IOException {
     return get(id);
@@ -162,13 +158,13 @@ public class SQLKitDAO implements KitStore {
 
   @Override
   public Kit getKitByIdentificationBarcode(String barcode) throws IOException {
-    List eResults = template.query(KIT_SELECT_BY_BARCODE, new Object[] { barcode }, new KitMapper());
+    List<Kit> eResults = template.query(KIT_SELECT_BY_BARCODE, new Object[] { barcode }, new KitMapper());
     return eResults.size() > 0 ? (Kit) eResults.get(0) : null;
   }
 
   @Override
   public Kit getKitByLotNumber(String lotNumber) throws IOException {
-    List eResults = template.query(KIT_SELECT_BY_LOT_NUMBER, new Object[] { lotNumber }, new KitMapper());
+    List<Kit> eResults = template.query(KIT_SELECT_BY_LOT_NUMBER, new Object[] { lotNumber }, new KitMapper());
     return eResults.size() > 0 ? (Kit) eResults.get(0) : null;
   }
 
@@ -185,11 +181,6 @@ public class SQLKitDAO implements KitStore {
   @Override
   public List<Kit> listByExperiment(long experimentId) throws IOException {
     return template.query(KITS_SELECT_BY_RELATED_EXPERIMENT, new Object[] { experimentId }, new KitMapper());
-  }
-
-  @Override
-  public List<Kit> listByLibrary(long libraryId) throws IOException {
-    return template.query(KITS_SELECT_BY_RELATED_LIBRARY, new Object[] { libraryId }, new KitMapper());
   }
 
   @Override
@@ -287,13 +278,14 @@ public class SQLKitDAO implements KitStore {
 
   @Override
   public KitDescriptor getKitDescriptorById(long id) throws IOException {
-    List eResults = template.query(KIT_DESCRIPTOR_SELECT_BY_ID, new Object[] { id }, new KitDescriptorMapper());
+    List<KitDescriptor> eResults = template.query(KIT_DESCRIPTOR_SELECT_BY_ID, new Object[] { id }, new KitDescriptorMapper());
     return eResults.size() > 0 ? (KitDescriptor) eResults.get(0) : null;
   }
 
   @Override
   public KitDescriptor getKitDescriptorByPartNumber(String partNumber) throws IOException {
-    List eResults = template.query(KIT_DESCRIPTOR_SELECT_BY_PART_NUMBER, new Object[] { partNumber }, new KitDescriptorMapper());
+    List<KitDescriptor> eResults = template.query(KIT_DESCRIPTOR_SELECT_BY_PART_NUMBER, new Object[] { partNumber },
+        new KitDescriptorMapper());
     return eResults.size() > 0 ? (KitDescriptor) eResults.get(0) : null;
   }
 
@@ -308,7 +300,7 @@ public class SQLKitDAO implements KitStore {
   }
 
   public List<KitDescriptor> listKitDescriptorsByPlatform(PlatformType platformType) throws IOException {
-    return template.query(KIT_DESCRIPTORS_SELECT_BY_PLATFORM, new Object[] { platformType }, new KitDescriptorMapper());
+    return template.query(KIT_DESCRIPTORS_SELECT_BY_PLATFORM, new Object[] { platformType.getKey() }, new KitDescriptorMapper());
   }
 
   @Override
@@ -354,7 +346,7 @@ public class SQLKitDAO implements KitStore {
       return kd;
     }
   }
-  
+
   @Override
   public Map<String, Integer> getKitDescriptorColumnSizes() throws IOException {
     return DbUtils.getColumnSizes(template, DESCRIPTOR_TABLE_NAME);

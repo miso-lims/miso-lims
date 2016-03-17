@@ -520,7 +520,6 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
     kitDAO.setJdbcTemplate(template);
     kitDAO.setNoteDAO(noteDAO);
     kitDAO.setCascadeType(CascadeType.PERSIST);
-    kitDAO.setDataObjectFactory(dataObjectFactory);
     daos.put(uk.ac.bbsrc.tgac.miso.core.data.Kit.class, kitDAO);
 
     libraryDAO.setJdbcTemplate(template);
