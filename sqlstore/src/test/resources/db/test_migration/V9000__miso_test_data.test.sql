@@ -188,6 +188,10 @@ DELETE FROM `SequencerPartitionContainer`;
 INSERT INTO `SequencerPartitionContainer`(`containerId`, `securityProfile_profileId`, `identificationBarcode`, `locationBarcode`, `platform`, `validationBarcode`, `lastModifier`) 
 VALUES (1,12,'C0JHTACXX','',16,'',1),(2,13,'D0VJ9ACXX','',16,'',1),(3,14,'C075RACXX','',16,'',1),(4,15,'C0KY7ACXX','',16,'',1);
 
+DELETE FROM `Platform`;
+INSERT INTO `Platform`(`platformId`, `name`, `instrumentModel`, `description`, `numContainers`) 
+VALUES (16,'Illumina','Illumina HiSeq 2000','4-channel flowgram',1),(17,'Illumina','Illumina MiSeq','Tiny Seq',1),(18,'PacBio','PacBio RS','Long Seq',1);
+
 DELETE FROM `SequencerPartitionContainer_Partition`;
 INSERT INTO `SequencerPartitionContainer_Partition`(`container_containerId`, `partitions_partitionId`) 
 VALUES (1,1),(1,2),(1,3),(1,4),(1,5),(1,6),(1,7),(1,8),(2,9),(2,10),(2,11),(2,12),(2,13),(2,14),(2,15),(2,16),(3,17),(3,18),(3,19),
@@ -267,6 +271,3 @@ INSERT INTO `BoxPosition` (`BoxPositionId`, `boxId`, `column`, `row`, `lastModif
 VALUES
 ('1', '1', '1', '1', '1'),
 ('2', '2', '1', '2', '1');
-
-
-
