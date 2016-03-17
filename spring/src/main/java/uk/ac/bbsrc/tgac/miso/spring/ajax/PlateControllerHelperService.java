@@ -260,7 +260,7 @@ public class PlateControllerHelperService {
         return JSONUtils.SimpleJSONError("Failed to get plate input form: " + e.getMessage());
       }
     } else {
-      return JSONUtils.SimpleJSONError("Missing project ID or document format supplied.");
+      return JSONUtils.SimpleJSONError("Document format not specified.");
     }
   }
 
