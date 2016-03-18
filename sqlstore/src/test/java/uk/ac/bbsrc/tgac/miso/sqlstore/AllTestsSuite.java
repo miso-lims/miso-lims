@@ -38,7 +38,8 @@ import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 
-@Suite.SuiteClasses({ 
+@Suite.SuiteClasses({
+  SQLLibraryQCDAOTest.class,
   SQLRunDAOTest.class,
   SQLStudyDAOTest.class,
   SQLSampleDAOTest.class,
