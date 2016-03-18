@@ -51,6 +51,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
+import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
@@ -94,6 +95,7 @@ public class SQLLibraryQCDAO implements LibraryQcStore {
   @Autowired
   private CacheManager cacheManager;
 
+  @CoverageIgnore
   public void setCacheManager(CacheManager cacheManager) {
     this.cacheManager = cacheManager;
   }
@@ -101,22 +103,27 @@ public class SQLLibraryQCDAO implements LibraryQcStore {
   @Autowired
   private DataObjectFactory dataObjectFactory;
 
+  @CoverageIgnore
   public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
     this.dataObjectFactory = dataObjectFactory;
   }
 
+  @CoverageIgnore
   public void setLibraryDAO(LibraryStore libraryDAO) {
     this.libraryDAO = libraryDAO;
   }
 
+  @CoverageIgnore
   public JdbcTemplate getJdbcTemplate() {
     return template;
   }
 
+  @CoverageIgnore
   public void setJdbcTemplate(JdbcTemplate template) {
     this.template = template;
   }
 
+  @CoverageIgnore
   public void setCascadeType(CascadeType cascadeType) {
     this.cascadeType = cascadeType;
   }
@@ -206,6 +213,7 @@ public class SQLLibraryQCDAO implements LibraryQcStore {
     return false;
   }
 
+  @CoverageIgnore
   public class LibraryQcMapper extends CacheAwareRowMapper<LibraryQC> {
     public LibraryQcMapper() {
       // library qcs aren't cached at present
@@ -218,6 +226,7 @@ public class SQLLibraryQCDAO implements LibraryQcStore {
     }
 
     @Override
+    @CoverageIgnore
     public LibraryQC mapRow(ResultSet rs, int rowNum) throws SQLException {
       long id = rs.getLong("qcId");
 
@@ -262,7 +271,7 @@ public class SQLLibraryQCDAO implements LibraryQcStore {
 
   @Override
   public QcType getLibraryQcTypeById(long qcTypeId) throws IOException {
-    List eResults = template.query(LIBRARY_QC_TYPE_SELECT_BY_ID, new Object[] { qcTypeId }, new LibraryQcTypeMapper());
+    List<QcType> eResults = template.query(LIBRARY_QC_TYPE_SELECT_BY_ID, new Object[] { qcTypeId }, new LibraryQcTypeMapper());
     QcType e = eResults.size() > 0 ? (QcType) eResults.get(0) : null;
     return e;
   }
@@ -274,8 +283,10 @@ public class SQLLibraryQCDAO implements LibraryQcStore {
     return e;
   }
 
+  @CoverageIgnore
   public class LibraryQcTypeMapper implements RowMapper<QcType> {
     @Override
+    @CoverageIgnore
     public QcType mapRow(ResultSet rs, int rowNum) throws SQLException {
       QcType qt = new QcType();
       qt.setQcTypeId(rs.getLong("qcTypeId"));
