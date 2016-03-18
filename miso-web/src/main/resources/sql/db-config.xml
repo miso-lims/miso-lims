@@ -185,7 +185,6 @@
       <value type="javax.persistence.CascadeType">REMOVE</value>
     </property>
     <property name="securityProfileDAO" ref="sqlSecurityProfileDAO" />
-    <property name="emPcrDAO" ref="sqlEmPCRDAO" />
     <property name="libraryDAO" ref="sqlLibraryDAO" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />
   </bean>
