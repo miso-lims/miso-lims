@@ -57,6 +57,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
+import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
@@ -99,6 +100,7 @@ public class SQLSampleQCDAO implements SampleQcStore {
   @Autowired
   private CacheManager cacheManager;
 
+  @CoverageIgnore
   public void setCacheManager(CacheManager cacheManager) {
     this.cacheManager = cacheManager;
   }
@@ -106,22 +108,27 @@ public class SQLSampleQCDAO implements SampleQcStore {
   @Autowired
   private DataObjectFactory dataObjectFactory;
 
+  @CoverageIgnore
   public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
     this.dataObjectFactory = dataObjectFactory;
   }
 
+  @CoverageIgnore
   public void setSampleDAO(SampleStore sampleDAO) {
     this.sampleDAO = sampleDAO;
   }
 
+  @CoverageIgnore
   public JdbcTemplate getJdbcTemplate() {
     return template;
   }
 
+  @CoverageIgnore
   public void setJdbcTemplate(JdbcTemplate template) {
     this.template = template;
   }
 
+  @CoverageIgnore
   public void setCascadeType(CascadeType cascadeType) {
     this.cascadeType = cascadeType;
   }
@@ -219,15 +226,18 @@ public class SQLSampleQCDAO implements SampleQcStore {
   }
 
   public class SampleQcMapper extends CacheAwareRowMapper<SampleQC> {
+    @CoverageIgnore
     public SampleQcMapper() {
       super(SampleQC.class);
     }
 
+    @CoverageIgnore
     public SampleQcMapper(boolean lazy) {
       super(SampleQC.class, lazy);
     }
 
     @Override
+    @CoverageIgnore
     public SampleQC mapRow(ResultSet rs, int rowNum) throws SQLException {
       long id = rs.getLong("qcId");
 
@@ -284,6 +294,7 @@ public class SQLSampleQCDAO implements SampleQcStore {
 
   public class SampleQcTypeMapper implements RowMapper<QcType> {
     @Override
+    @CoverageIgnore
     public QcType mapRow(ResultSet rs, int rowNum) throws SQLException {
       QcType qt = new QcType();
       qt.setQcTypeId(rs.getLong("qcTypeId"));
