@@ -106,15 +106,11 @@ public class LibraryAdditionalInfoController extends RestController {
   public Set<LibraryAdditionalInfoDto> getLibraryAdditionalInfos(UriComponentsBuilder uriBuilder, HttpServletResponse response) 
       throws IOException {
     Set<LibraryAdditionalInfo> libraryAdditionalInfos = libraryAdditionalInfoService.getAll();
-    if (libraryAdditionalInfos.isEmpty()) {
-      throw new RestException("No library additional infos found", Status.NOT_FOUND);
-    } else {
-      Set<LibraryAdditionalInfoDto> libraryAdditionalInfoDtos = Dtos.asLibraryAdditionalInfoDtos(libraryAdditionalInfos);
-      for (LibraryAdditionalInfoDto libraryAdditionalInfoDto : libraryAdditionalInfoDtos) {
-        libraryAdditionalInfoDto = writeUrls(libraryAdditionalInfoDto, uriBuilder);
-      }
-      return libraryAdditionalInfoDtos;
+    Set<LibraryAdditionalInfoDto> libraryAdditionalInfoDtos = Dtos.asLibraryAdditionalInfoDtos(libraryAdditionalInfos);
+    for (LibraryAdditionalInfoDto libraryAdditionalInfoDto : libraryAdditionalInfoDtos) {
+      libraryAdditionalInfoDto = writeUrls(libraryAdditionalInfoDto, uriBuilder);
     }
+    return libraryAdditionalInfoDtos;
   }
 
   @RequestMapping(value = "/additionalinfo", method = RequestMethod.POST, headers = { "Content-type=application/json" })
