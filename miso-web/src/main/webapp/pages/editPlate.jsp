@@ -276,7 +276,7 @@
       <div id="qcmenu"
            onmouseover="mcancelclosetime()"
            onmouseout="mclosetime()">
-          <a href="javascript:void(0);" onclick="Plate.ui.downloadPlateInputForm();">Get Plate Input Form</a>
+          <a href="javascript:void(0);" onclick="Plate.ui.downloadPlateInputForm('xlsx');">Get Plate Input Form</a>
           <a href="javascript:void(0);" class="add" onclick="Plate.ui.uploadPlateInputForm();">Import Plate Input
             Form</a>
       </div>

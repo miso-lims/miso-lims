@@ -42,8 +42,6 @@ public interface KitStore extends Store<Kit> {
 
   Kit getKitByLotNumber(String lotNumber) throws IOException;
 
-  List<Kit> listByLibrary(long libraryId) throws IOException;
-
   List<Kit> listByExperiment(long experimentId) throws IOException;
 
   List<Kit> listByManufacturer(String manufacturerName) throws IOException;
@@ -59,7 +57,7 @@ public interface KitStore extends Store<Kit> {
   List<KitDescriptor> listKitDescriptorsByType(KitType kitType) throws IOException;
 
   long saveKitDescriptor(KitDescriptor kitDescriptor) throws IOException;
-  
+
   /**
    * @return a map containing all column names and max lengths from the Kit Descriptor table
    * @throws IOException
