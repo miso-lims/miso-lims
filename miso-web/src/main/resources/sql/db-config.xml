@@ -378,8 +378,6 @@
   </bean>
 
   <bean id="sqlSecurityDAO" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLSecurityDAO">
-    <property name="lobHandler" ref="lobHandler" />
-    <property name="securityManager" ref="securityManager" />
     <property name="securityProfileDAO" ref="sqlSecurityProfileDAO" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />
   </bean>
