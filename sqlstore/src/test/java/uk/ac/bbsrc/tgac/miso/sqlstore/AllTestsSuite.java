@@ -41,6 +41,7 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({
   SQLLibraryQCDAOTest.class,
   SQLRunDAOTest.class,
+  SQLPoolQCDAOTest.class,
   SQLStudyDAOTest.class,
   SQLKitDAOTest.class,
   SQLSampleDAOTest.class,
