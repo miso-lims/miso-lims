@@ -137,6 +137,12 @@ INSERT INTO `Pool_Experiment`(`pool_poolId`, `experiments_experimentId`)
 VALUES (1,1),(2,2),(3,3),(3,4),(4,5),(4,6),(4,7),(4,8),(5,9),(5,10),(5,11),(5,12),(6,13),(6,14),(6,15),(6,16),(7,17),(7,18),(7,19),(7,20),
 (8,21),(8,22),(8,23),(8,24),(9,29),(9,30),(9,31),(9,32),(10,25),(10,26),(10,27),(10,28);
 
+DELETE FROM `PoolQC`;
+INSERT INTO `PoolQC`(`qcId`, `pool_poolId`, `qcUserName`, `qcDate`, `qcMethod`, `results`)
+VALUES (1,1,'person','2016-03-18',1,12.3),
+(2,1,'person','2016-03-18',1,45.6),
+(3,2,'person','2016-03-18',1,7.89);
+
 DELETE FROM `ReferenceGenome`;
 INSERT INTO `ReferenceGenome` (`referenceGenomeId`, `alias`) VALUES (1, 'Human hg19 random');
 INSERT INTO `ReferenceGenome` (`referenceGenomeId`, `alias`) VALUES (2, 'Human hg19');
@@ -313,4 +319,8 @@ VALUES
     (4,'QuBit','Quantitation of DNA, RNA and protein, manufacturered by Invitrogen','Library','ng/&#181;l'),
     (6,'SeqInfo QC','Post-run completion run QC step, undertaken by the SeqInfo team, as part of the primary analysis stage.','Run',''),
     (5,'SeqOps QC','Post-run completion run QC step, undertaken by the SeqOps team, to move a run through to the primary analysis stage.','Run',''),
-    (1,'qPCR','Quantitative PCR','Library','mol/&#181;l');
+    (1,'qPCR','Quantitative PCR','Library','mol/&#181;l'),
+    (8,'poolQcType1', 'qc 1 for pools', 'Pool', 'nM'),
+	(9,'poolQcType2', 'qc 2 for pools', 'Pool', 'nM'),
+	(10,'poolQcType3', 'qc 3 for pools', 'Pool', 'nM'),
+	(11,'poolQcType4', 'qc 4 for pools', 'Pool', 'nM');
