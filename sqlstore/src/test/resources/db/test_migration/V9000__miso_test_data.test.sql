@@ -161,6 +161,16 @@ VALUES (1,'RUN1','BC0JHTACXX',NULL,0,1,202,'/.mounts/labs/prod/archive/h1179/120
 (3,'RUN3','BC075RACXX',NULL,3,1,209,'/.mounts/labs/prod/archive/h1179/120412_h1179_0073_BC075RACXX',14,'Illumina',3,'120412_h1179_0073_BC075RACXX',1,1),
 (4,'RUN4','AC0KY7ACXX',NULL,8,1,209,'/.mounts/labs/prod/archive/h1179/120314_h1179_0068_AC0KY7ACXX',15,'Illumina',4,'120314_h1179_0068_AC0KY7ACXX',1,1);
 
+DELETE FROM RunQC;
+INSERT INTO `RunQc`(`run_runId`, `qcUserName`, `qcDate`, `qcMethod`, `information`, `doNotProcess`)
+VALUES ( 1, 'username1', '2016-01-26', 1, 'information1', 1),
+( 2, 'username2', '2016-02-26', 2, 'information2', 0),
+( 3, 'username3', '2015-03-26', 3, 'information3', 1);
+
+DELETE FROM RunQC_Partition;
+INSERT INTO `RunQC_Partition`(`runQc_runQcId`, `containers_containerId`, `partitionNumber`)
+VALUES (1, 2, 3), (2, 4, 5), (3,6,7);
+
 DELETE FROM `Run_SequencerPartitionContainer`;
 INSERT INTO `Run_SequencerPartitionContainer`(`Run_runId`, `containers_containerId`) 
 VALUES (1,1),(2,2),(3,3),(4,4);
