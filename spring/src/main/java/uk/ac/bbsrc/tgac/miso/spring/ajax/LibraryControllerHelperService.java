@@ -28,6 +28,7 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -660,8 +661,8 @@ public class LibraryControllerHelperService {
           sb.append("<td>" + qc.getQcCreator() + "</td>");
           sb.append("<td>" + qc.getQcDate() + "</td>");
           sb.append("<td>" + qc.getQcType().getName() + "</td>");
-          sb.append("<td>" + qc.getResults() + " " + qc.getQcType().getUnits() + "</td>");
-          sb.append("<td>" + qc.getInsertSize() + " bp</td>");
+          sb.append("<td>" + LimsUtils.round(qc.getResults(), 2) + " " + qc.getQcType().getUnits() + "</td>");
+          sb.append("<td>" + LimsUtils.round(qc.getInsertSize(), 2) + " bp</td>");
           sb.append("</tr>");
         }
         return JSONUtils.SimpleJSONResponse(sb.toString());
@@ -672,6 +673,8 @@ public class LibraryControllerHelperService {
     }
     return JSONUtils.SimpleJSONError("Cannot add LibraryQC");
   }
+
+
 
   public JSONObject bulkAddLibraryQCs(HttpSession session, JSONObject json) {
     try {
@@ -756,7 +759,7 @@ public class LibraryControllerHelperService {
           sb.append("<td>" + dil.getName() + "</td>");
           sb.append("<td>" + dil.getDilutionCreator() + "</td>");
           sb.append("<td>" + date.format(dil.getCreationDate()) + "</td>");
-          sb.append("<td>" + dil.getConcentration() + " " + dil.getUnits() + "</td>");
+          sb.append("<td>" + LimsUtils.round(dil.getConcentration(), 2) + " " + dil.getUnits() + "</td>");
           sb.append("<td>");
 
           try {

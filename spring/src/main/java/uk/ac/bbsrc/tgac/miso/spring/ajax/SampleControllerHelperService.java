@@ -354,7 +354,7 @@ public class SampleControllerHelperService {
           sb.append("<td>" + qc.getQcCreator() + "</td>");
           sb.append("<td>" + qc.getQcDate() + "</td>");
           sb.append("<td>" + qc.getQcType().getName() + "</td>");
-          sb.append("<td>" + qc.getResults() + " " + qc.getQcType().getUnits() + "</td>");
+          sb.append("<td>" + LimsUtils.round(qc.getResults(), 2) + " " + qc.getQcType().getUnits() + "</td>");
           sb.append("</tr>");
         }
         return JSONUtils.SimpleJSONResponse(sb.toString());
