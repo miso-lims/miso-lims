@@ -386,6 +386,7 @@ public class SQLStudyDAO implements StudyStore {
     return changeLogDAO;
   }
 
+  @CoverageIgnore
   public void setChangeLogDAO(ChangeLogStore changeLogDAO) {
     this.changeLogDAO = changeLogDAO;
   }
@@ -395,6 +396,7 @@ public class SQLStudyDAO implements StudyStore {
     return securityDAO;
   }
 
+  @CoverageIgnore
   public void setSecurityDAO(SecurityStore securityDAO) {
     this.securityDAO = securityDAO;
   }
