@@ -411,7 +411,9 @@
       <value type="javax.persistence.CascadeType">PERSIST</value>
     </property>
     <property name="noteDAO" ref="sqlNoteDAO" />
+    <property name="changeLogDAO" ref="sqlChangeLogDAO" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />
+    <property name="securityDAO" ref="sqlSecurityDAO" />
   </bean>
 
   <bean id="sqlPlateDAO" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLPlateDAO">
