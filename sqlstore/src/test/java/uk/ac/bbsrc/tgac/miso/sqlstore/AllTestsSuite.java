@@ -51,6 +51,7 @@ import org.junit.runners.Suite;
   SQLNoteDAOTest.class,
   SQLSequencerReferenceDAOTest.class,
   SQLRunQCDAOTest.class,
+  SQLEmPCRDAOTest.class,
   SQLSequencerPartitionContainerDAOTest.class,
   SQLBoxDAOTest.class,
   SQLSequencerServiceRecordDAOTest.class,
