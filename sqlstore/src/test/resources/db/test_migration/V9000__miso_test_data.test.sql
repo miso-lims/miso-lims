@@ -325,6 +325,20 @@ VALUES
 	(10,'poolQcType3', 'qc 3 for pools', 'Pool', 'nM'),
 	(11,'poolQcType4', 'qc 4 for pools', 'Pool', 'nM');
 
+DELETE FROM Alert;
+INSERT INTO `Alert` (
+  `alertId`,
+  `title`,
+  `text`,
+  `userId`,
+  `date`,
+  `isRead`,
+  `level`,
+) VALUES 
+(1, 'Alert 1', 'Alert 1 Text', 1, '2012-04-20', 0, 'INFO'),
+(2, 'Alert 2', 'Alert 2 Text', 1, '2012-04-20', 1, 'INFO'),
+(3, 'Alert 3', 'Alert 3 Text', 1, '2012-04-20', 0, 'INFO');
+
 DELETE FROM Note;
 INSERT INTO `Note`(`noteId`, `creationDate`, `internalOnly`, `text`, `owner_userId`)
 VALUES

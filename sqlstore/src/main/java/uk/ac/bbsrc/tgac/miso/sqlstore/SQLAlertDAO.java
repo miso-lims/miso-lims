@@ -53,6 +53,7 @@ import uk.ac.bbsrc.tgac.miso.core.event.impl.DefaultAlert;
 import uk.ac.bbsrc.tgac.miso.core.event.impl.SystemAlert;
 import uk.ac.bbsrc.tgac.miso.core.event.type.AlertLevel;
 import uk.ac.bbsrc.tgac.miso.core.store.AlertStore;
+import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
@@ -76,7 +77,7 @@ public class SQLAlertDAO implements AlertStore {
   private static final String ALERT_UPDATE = "UPDATE " + TABLE_NAME
       + " SET title=:title, text=:text, userId=:userId, date=:date, isRead=:isRead, level=:level " + "WHERE alertId=:alertId";
 
-  private static final String ALERT_DELETE = "DELETE FROM " + TABLE_NAME + " WHERE alertId=:alertId";
+  private static final String ALERT_DELETE = "DELETE FROM " + TABLE_NAME + " WHERE alertId = ?";
 
   private static final String ALERTS_BY_USER = ALERTS_SELECT + " WHERE userId = ?";
 
@@ -93,6 +94,7 @@ public class SQLAlertDAO implements AlertStore {
   @Autowired
   private CacheManager cacheManager;
 
+  @CoverageIgnore
   public void setCacheManager(CacheManager cacheManager) {
     this.cacheManager = cacheManager;
   }
@@ -102,14 +104,17 @@ public class SQLAlertDAO implements AlertStore {
 
   private JdbcTemplate template;
 
+  @CoverageIgnore
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
   }
 
+  @CoverageIgnore
   public JdbcTemplate getJdbcTemplate() {
     return template;
   }
 
+  @CoverageIgnore
   public void setJdbcTemplate(JdbcTemplate template) {
     this.template = template;
   }
@@ -200,6 +205,7 @@ public class SQLAlertDAO implements AlertStore {
     return template.query(UNREAD_ALERTS_BY_LEVEL, new Object[] { alertLevel.getKey() }, new AlertMapper());
   }
 
+  @CoverageIgnore
   public class AlertMapper extends CacheAwareRowMapper<Alert> {
     public AlertMapper() {
       super(Alert.class);
@@ -210,6 +216,7 @@ public class SQLAlertDAO implements AlertStore {
     }
 
     @Override
+    @CoverageIgnore
     public Alert mapRow(ResultSet rs, int rowNum) throws SQLException {
       long id = rs.getLong("alertId");
       Alert a = null;
