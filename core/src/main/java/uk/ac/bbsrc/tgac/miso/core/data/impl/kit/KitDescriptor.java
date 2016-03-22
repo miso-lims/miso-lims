@@ -24,6 +24,8 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl.kit;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -32,7 +34,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
+import com.eaglegenomics.simlims.core.User;
+
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
@@ -61,6 +67,10 @@ public class KitDescriptor implements Serializable {
   private String partNumber = "";
   private Integer stockLevel = 0;
   private String description = "";
+  @Transient
+  private Collection<ChangeLog> changelog = new ArrayList<>();
+  @Transient
+  private User lastModifier;
 
   @Enumerated(EnumType.STRING)
   private KitType kitType;
@@ -238,6 +248,18 @@ public class KitDescriptor implements Serializable {
    */
   public void setPlatformType(PlatformType platformType) {
     this.platformType = platformType;
+  }
+
+  public Collection<ChangeLog> getChangeLog() {
+    return changelog;
+  }
+
+  public User getLastModifier() {
+    return lastModifier;
+   }
+
+  public void setLastModifier(User lastModifier) {
+    this.lastModifier = lastModifier;
   }
 
   /**
