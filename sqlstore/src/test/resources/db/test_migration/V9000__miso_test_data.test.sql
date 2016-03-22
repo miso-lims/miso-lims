@@ -338,3 +338,41 @@ INSERT INTO `Alert` (
 (1, 'Alert 1', 'Alert 1 Text', 1, '2012-04-20', 0, 'INFO'),
 (2, 'Alert 2', 'Alert 2 Text', 1, '2012-04-20', 1, 'INFO'),
 (3, 'Alert 3', 'Alert 3 Text', 1, '2012-04-20', 0, 'INFO');
+
+DELETE FROM Note;
+INSERT INTO `Note`(`noteId`, `creationDate`, `internalOnly`, `text`, `owner_userId`)
+VALUES
+(1, '2016-02-25', 1, 'first note', 1),
+(2, '2016-01-23', 0, 'second note', 1),
+(3, '2016-03-11', 0, 'third note', 1);
+
+DELETE FROM `ProjectOverview_note`;
+INSERT INTO `ProjectOverview_note`(`overview_overviewId`, `notes_noteId`)
+VALUES (33, 2);
+
+
+DELETE FROM `Kit_Note`;
+INSERT INTO `Kit_note`(`kit_kitId`, `notes_noteId`)
+VALUES (33, 1);
+
+DELETE FROM `Sample_Note`;
+INSERT INTO `Sample_note`(`sample_sampleId`, `notes_noteId`)
+VALUES (33, 2);
+
+DELETE FROM `Library_Note`;
+INSERT INTO `Library_Note`(`library_libraryId`, `notes_noteId`)
+VALUES (33, 3);
+
+DELETE FROM `Run_Note`;
+INSERT INTO `Run_Note`(`run_runId`, `notes_noteId`)
+VALUES (33, 1);
+
+DELETE FROM `Pool_Note`;
+INSERT INTO `Pool_Note`(`pool_poolId`, `notes_noteId`)
+VALUES (33, 2);DELETE FROM `Run_Note`;
+INSERT INTO `Run_Note`(`run_runId`, `notes_noteId`)
+VALUES (33, 1);
+
+DELETE FROM `Pool_Note`;
+INSERT INTO `Pool_Note`(`pool_poolId`, `notes_noteId`)
+VALUES (33, 2);
