@@ -7,7 +7,12 @@ import java.util.Set;
 
 import javax.ws.rs.core.Response.Status;
 
+import com.eaglegenomics.simlims.core.SecurityProfile;
+import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,6 +35,9 @@ public class KitDescriptorController extends RestController {
   @Autowired
   private RequestManager requestManager;
   
+  @Autowired
+  private SecurityManager securityManager;
+
   private static KitDescriptorDto writeUrls(KitDescriptorDto kitDescriptorDto, UriComponentsBuilder uriBuilder) {
     URI baseUri = uriBuilder.build().toUri();
     kitDescriptorDto.setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/kitdescriptor/{id}")
@@ -65,8 +73,10 @@ public class KitDescriptorController extends RestController {
   @ResponseBody
   @ResponseStatus(HttpStatus.CREATED)
   public void createKitDescriptor(@RequestBody KitDescriptorDto kitDescriptorDto, UriComponentsBuilder uriBuilder) throws IOException {
+    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     KitDescriptor kd = Dtos.to(kitDescriptorDto);
     kd.setKitDescriptorId(KitDescriptor.UNSAVED_ID);
+    kd.setLastModifier(user);
     requestManager.saveKitDescriptor(kd);
   }
   

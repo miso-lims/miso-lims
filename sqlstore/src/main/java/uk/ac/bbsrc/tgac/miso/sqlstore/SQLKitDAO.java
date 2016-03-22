@@ -42,6 +42,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 
 import com.eaglegenomics.simlims.core.Note;
+import com.eaglegenomics.simlims.core.store.SecurityStore;
 
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
@@ -55,6 +56,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.MultiplexingKit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.SequencingKit;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
 import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
@@ -98,7 +100,7 @@ public class SQLKitDAO implements KitStore {
       + "SET identificationBarcode=:identificationBarcode, locationBarcode=:locationBarcode, lotNumber=:lotNumber, kitDate=:kitDate, kitDescriptorId=:kitDescriptorId "
       + "WHERE kitId=:kitId";
 
-  public static final String KIT_DESCRIPTORS_SELECT = "SELECT kitDescriptorId, name, version, manufacturer, partNumber, stockLevel, kitType, platformType, description "
+  public static final String KIT_DESCRIPTORS_SELECT = "SELECT kitDescriptorId, name, version, manufacturer, partNumber, stockLevel, kitType, platformType, description, lastModifier "
       + "FROM " + DESCRIPTOR_TABLE_NAME;
 
   public static final String KIT_DESCRIPTOR_SELECT_BY_ID = KIT_DESCRIPTORS_SELECT + " WHERE kitDescriptorId=?";
@@ -110,12 +112,14 @@ public class SQLKitDAO implements KitStore {
   public static final String KIT_DESCRIPTORS_SELECT_BY_PLATFORM = KIT_DESCRIPTORS_SELECT + " WHERE platformType = ?";
 
   public static final String KIT_DESCRIPTOR_UPDATE = "UPDATE " + DESCRIPTOR_TABLE_NAME
-      + " SET name=:name, version=:version, manufacturer=:manufacturer, partNumber=:partNumber, stockLevel=:stockLevel, kitType=:kitType, platformType=:platformType, description=:description"
+      + " SET name=:name, version=:version, manufacturer=:manufacturer, partNumber=:partNumber, stockLevel=:stockLevel, kitType=:kitType, platformType=:platformType, description=:description, lastModifier=:lastModifier"
       + " WHERE kitDescriptorId=:kitDescriptorId";
 
   protected static final Logger log = LoggerFactory.getLogger(SQLKitDAO.class);
   private JdbcTemplate template;
+  private ChangeLogStore changeLogDAO;
   private NoteStore noteDAO;
+  private SecurityStore securityDAO;
   private CascadeType cascadeType;
 
   @Autowired
@@ -142,6 +146,26 @@ public class SQLKitDAO implements KitStore {
   @CoverageIgnore
   public void setCascadeType(CascadeType cascadeType) {
     this.cascadeType = cascadeType;
+  }
+
+  @CoverageIgnore
+  public ChangeLogStore getChangeLogDAO() {
+    return changeLogDAO;
+  }
+
+  @CoverageIgnore
+  public void setChangeLogDAO(ChangeLogStore changeLogDAO) {
+    this.changeLogDAO = changeLogDAO;
+  }
+
+  @CoverageIgnore
+  public SecurityStore getSecurityDAO() {
+    return securityDAO;
+  }
+
+  @CoverageIgnore
+  public void setSecurityDAO(SecurityStore securityDAO) {
+    this.securityDAO = securityDAO;
   }
 
   @Override
@@ -315,6 +339,7 @@ public class SQLKitDAO implements KitStore {
     params.addValue("kitType", kd.getKitType().getKey());
     params.addValue("platformType", kd.getPlatformType().getKey());
     params.addValue("description", kd.getDescription());
+    params.addValue("lastModifier", kd.getLastModifier().getUserId());
 
     if (kd.getKitDescriptorId() == KitDescriptor.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName("KitDescriptor").usingGeneratedKeyColumns("kitDescriptorId");
@@ -342,6 +367,12 @@ public class SQLKitDAO implements KitStore {
       kd.setDescription(rs.getString("description"));
       kd.setKitType(KitType.get(rs.getString("kitType")));
       kd.setPlatformType(PlatformType.get(rs.getString("platformType")));
+      try {
+        kd.setLastModifier(securityDAO.getUserById(rs.getLong("lastModifier")));
+      } catch (IOException e) {
+        log.error("kit descriptor row mapper", e);
+      }
+      kd.getChangeLog().addAll(changeLogDAO.listAllById(DESCRIPTOR_TABLE_NAME, kd.getKitDescriptorId()));
 
       return kd;
     }

@@ -2,13 +2,19 @@ package uk.ac.bbsrc.tgac.miso.sqlstore;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasEntry;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.when;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+
+import com.eaglegenomics.simlims.core.User;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -20,12 +26,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.LibraryKit;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
+import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
+import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
 
 public class SQLKitDAOTest extends AbstractDAOTest {
 
@@ -39,10 +49,21 @@ public class SQLKitDAOTest extends AbstractDAOTest {
   @Mock
   private NoteStore noteDAO;
 
+  @Mock
+  private SecurityStore securityDAO;
+
+  @Mock
+  private ChangeLogStore changeLogDAO;
+
+  private User user = new UserImpl();
+
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
     dao.setJdbcTemplate(jdbcTemplate);
+    user.setUserId(1L);
+    when(securityDAO.getUserById(anyLong())).thenReturn(user);
+    when(changeLogDAO.listAllById(anyString(), anyLong())).thenReturn(new ArrayList<ChangeLog>());
   }
 
   @Test
@@ -168,6 +189,7 @@ public class SQLKitDAOTest extends AbstractDAOTest {
   @Test
   public void testSaveKitDescriptor() throws IOException {
     KitDescriptor newKitDescriptor = makeNewKitDescriptor();
+    newKitDescriptor.setLastModifier(user);
     assertThat(dao.saveKitDescriptor(newKitDescriptor), is(122L));
     KitDescriptor savedKitDescriptor = dao.getKitDescriptorById(122L);
     assertThat(newKitDescriptor.getName(), is(savedKitDescriptor.getName()));
