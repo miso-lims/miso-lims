@@ -78,7 +78,6 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.context.ApplicationContextProvider;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.ProjectRestController;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoPropertyExporter;
 
 @Controller
@@ -95,9 +94,6 @@ public class EditSampleController {
 
   @Autowired
   private DataObjectFactory dataObjectFactory;
-  
-  @Autowired
-  private ProjectRestController projectRestController;
 
   public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
     this.dataObjectFactory = dataObjectFactory;
@@ -109,12 +105,7 @@ public class EditSampleController {
 
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
-  }
-  
-  public void setProjectRestController(ProjectRestController projectRestController) {
-    this.projectRestController = projectRestController;
-  }
-  
+  }  
   
   public Boolean misoPropertyBoolean(String property) {
     MisoPropertyExporter exporter = (MisoPropertyExporter) ApplicationContextProvider.getApplicationContext().getBean("propertyConfigurer");
@@ -309,14 +300,21 @@ public class EditSampleController {
   public JSONObject referenceDataJsonString() throws IOException {
     final JSONObject hot = new JSONObject();
     final List<String> sampleTypes = new ArrayList<String>(requestManager.listAllSampleTypes());
-    // TODO eventually: fix this so it's not just strings...
     final List<String> qcValues = new ArrayList<String>();
     qcValues.add("true");
     qcValues.add("false");
     qcValues.add("");
+    JSONArray allProjects = new JSONArray();
+    for (Project fullProject : requestManager.listAllProjects()) {
+      JSONObject project = new JSONObject();
+      project.put("id", fullProject.getId());
+      project.put("alias", fullProject.getAlias());
+      project.put("name", fullProject.getName());
+      allProjects.add(project);
+    }
     
     hot.put("sampleTypes", sampleTypes);
-    hot.put("projects", projectRestController.listAllProjects());
+    hot.put("projects", allProjects);
     hot.put("qcValues", qcValues);
     
     return hot;

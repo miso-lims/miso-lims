@@ -153,7 +153,7 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @Cascade({ CascadeType.SAVE_UPDATE })
   private Sample parent;
 
-  @OneToMany(targetEntity = SampleImpl.class, fetch = FetchType.LAZY)
+  @OneToMany(targetEntity = SampleImpl.class, fetch = FetchType.EAGER)
   @JoinTable(name = "SampleHierarchy", joinColumns = @JoinColumn(name = "parentId"), inverseJoinColumns = @JoinColumn(name = "childId"))
   @Cascade({ CascadeType.SAVE_UPDATE })
   private Set<Sample> children = new HashSet<Sample>();
