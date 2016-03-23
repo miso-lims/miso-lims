@@ -469,7 +469,7 @@ Sample.hot = {
           header: 'Passage #',
           data: 'passageNumber',
           type: 'text',
-          validator: requiredText
+          validator: validatePassageNumber
         },{
           header: 'Times Received',
           data: 'timesReceived',
@@ -602,6 +602,16 @@ Sample.hot = {
     
     function validateAlias (value, callback) {
       if (value) {
+        var countAliases = 0;
+        for (var i=0; i<Sample.hot.startData.length; i++) {
+          if (Sample.hot.startData[i].alias == value) {
+            countAliases += 1;
+          }
+          // the first one will be the first to save, later ones will be unwanted duplicates
+          if (countAliases > 1) {
+            return callback(false);
+          }
+        }
         Fluxion.doAjax(
           'sampleControllerHelperService',
           'validateSampleAlias',
@@ -619,6 +629,14 @@ Sample.hot = {
             }
           }
         );
+      } else {
+        return callback(false);
+      }
+    }
+    
+    function validatePassageNumber (value, callback) {
+      if (value == 'nn' || Handsontable.helper.isNumeric(value)) {
+        return callback(true);
       } else {
         return callback(false);
       }
@@ -889,7 +907,6 @@ Sample.hot = {
         // attempt to save each of the remainder objects
         for (var i=0; i<sampleData.length; i++) {
           var newSample = Sample.hot.buildSampleDtosFromData(sampleData[i]);
-          console.log(newSample);
           Sample.hot.saveOneSample(JSON.stringify(newSample), i, messages, sampleData.length);
         }
       } else {
@@ -1031,6 +1048,7 @@ Sample.hot = {
   },
   
   addAnyErrors: function (messages) {
+    console.log(messages);
     if (messages.success.length) {
       Sample.hot.makeSavedRowsReadOnly(messages);
       var successMessage = "Successfully saved " + messages.success.length + " out of " + (messages.success.length + messages.failed.length) + " samples.";
