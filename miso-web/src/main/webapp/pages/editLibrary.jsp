@@ -528,7 +528,12 @@
             <td>${qc.qcCreator}</td>
             <td><fmt:formatDate value="${qc.qcDate}"/></td>
             <td>${qc.qcType.name}</td>
-            <td id="result${qc.id}">${qc.results} ${qc.qcType.units}</td>
+
+            <fmt:formatNumber var="resultsRounded"
+              value="${qc.results}"
+              maxFractionDigits="2" />
+
+            <td id="result${qc.id}">${resultsRounded} ${qc.qcType.units}</td>
             <td id="insert${qc.id}">${qc.insertSize} bp</td>
             <c:if test="${(library.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
                         or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
@@ -632,7 +637,10 @@
             <td>${dil.name}</td>
             <td>${dil.dilutionCreator}</td>
             <td><fmt:formatDate value="${dil.creationDate}"/></td>
-            <td id="results${dil.id}">${dil.concentration} ${libraryDilutionUnits}</td>
+            <fmt:formatNumber var="concentrationRounded"
+                          value="${dil.concentration}"
+                          maxFractionDigits="2" />
+            <td id="results${dil.id}">${concentrationRounded} ${libraryDilutionUnits}</td>
             <td class="fit">
               <c:if test="${not empty dil.identificationBarcode}">
                 <div class="barcodes">

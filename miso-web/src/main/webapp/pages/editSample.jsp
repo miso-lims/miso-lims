@@ -383,7 +383,8 @@
                 <td>${qc.qcCreator}</td>
                 <td><fmt:formatDate value="${qc.qcDate}"/></td>
                 <td>${qc.qcType.name}</td>
-                <td id="results${qc.id}">${qc.results} ${qc.qcType.units}</td>
+                <fmt:formatNumber var="resultsRounded" value="${qc.results}" maxFractionDigits="2" />
+                <td id="results${qc.id}">${resultsRounded} ${qc.qcType.units}</td>
                 <c:if test="${(sample.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
                                           or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
                   <td id="edit${qc.id}" align="center"><a href="javascript:void(0);"
