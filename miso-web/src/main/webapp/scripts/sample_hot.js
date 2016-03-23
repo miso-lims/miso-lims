@@ -159,6 +159,7 @@ Sample.hot = {
     select.push('<select id="classDropdown">');
     select.push('<option value="">Select class</option>');
     for (var i=0; i<classes.length; i++) {
+      if (classes[i].alias == "Identity") continue;
       select.push('<option value="'+ classes[i].id +'">'+ classes[i].alias +'</option>');
     }
     select.push('</select>');
@@ -209,6 +210,9 @@ Sample.hot = {
     
     // make the table
     Sample.hot.makeHOT();
+    
+    // disable sampleClass dropdown so they can't change it midway through editing table values
+    document.getElementById('classDropdown').setAttribute('disabled', 'disabled');
     
     // if detailedSample is enabled, re-store the selected sampleClassId for this table
     if (Sample.hot.detailedSample) {
@@ -327,7 +331,7 @@ Sample.hot = {
     return this.sortByProperty(this.sampleOptions['tissueOriginsDtos'], 'id').map(this.getAlias);
   },
 
-  getTissueConditions: function () {
+  getTissueTypes: function () {
     return this.sortByProperty(this.sampleOptions['tissueTypesDtos'], 'id').map(this.getAlias);
   },
 
@@ -456,11 +460,11 @@ Sample.hot = {
           trimDropdown: false,
           source: Sample.hot.getTissueOrigins()
         },{
-          header: 'Tissue Condition',
+          header: 'Tissue Type',
           data: 'tissueType',
           type: 'dropdown',
           trimDropdown: false,
-          source: Sample.hot.getTissueConditions()
+          source: Sample.hot.getTissueTypes()
         },{
           header: 'Passage #',
           data: 'passageNumber',
@@ -682,7 +686,6 @@ Sample.hot = {
     sample.alias = obj.alias;
     sample.projectId = parseInt(document.getElementById('projectSelect').value);
     sample.scientificName = obj.scientificName;
-    sample.taxonIdentifier = '';
     if (obj.receivedDate && obj.receivedDate.length) {
       // TODO: care about datetimes
       sample.receivedDate = obj.receivedDate + "T00:00:00-05:00";
