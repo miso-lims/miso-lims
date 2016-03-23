@@ -191,9 +191,9 @@
             <table id="dlTable" class="display">
               <thead>
               <tr>
-                <th>Dilution ID
-                </th>
+                <th>Dilution ID</th>
                 <th>Dilution Name</th>
+                <th>Concentration</th>
                 <th>Parent Library</th>
                 <th>Description</th>
                 <th>Parent Library Barcode</th>
@@ -220,7 +220,7 @@
   var ldselected = [];
   var dilutions;
   var oTable;
-  var headers = ['dilutionId', 'dilutionName', 'library', 'description', 'libraryBarcode'];
+  var headers = ['dilutionId', 'dilutionName', 'concentration', 'library', 'description', 'libraryBarcode'];
 
   function addStudy(form) {
     if (jQuery('#studyDescription').val() == "") {
@@ -250,7 +250,7 @@
         table.fnClearTable();
         dilutions = json.dilutions;
         jQuery.each(dilutions, function (index, value) {
-          var a = table.fnAddData([value.id, value.name, value.library, value.description, value.libraryBarcode]);
+          var a = table.fnAddData([value.id, value.name, value.concentration, value.library, value.description, value.libraryBarcode]);
           var nTr = table.fnSettings().aoData[a[0]].nTr;
         });
         ldselected = [];
@@ -332,6 +332,7 @@
             { "sType": 'natural' },
             { "sType": 'natural' },
             { "sType": 'natural' },
+            { "sType": 'natural' },
             { "sType": 'natural' }
           ],
           "fnRowCallback": function (nRow, aData, iDisplayIndex) {
@@ -350,7 +351,7 @@
         dilutions = json.dilutions;
 
         jQuery.each(dilutions, function (index, value) {
-          var a = oTable.fnAddData([value.id, value.name, value.library, value.description, value.libraryBarcode]);
+          var a = oTable.fnAddData([value.id, value.name, value.concentration, value.library, value.description, value.libraryBarcode]);
           var nTr = oTable.fnSettings().aoData[a[0]].nTr;
         });
       }
