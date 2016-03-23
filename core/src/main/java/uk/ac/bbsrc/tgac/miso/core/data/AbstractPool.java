@@ -37,6 +37,8 @@ import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.map.annotate.JsonDeserialize;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,13 +56,13 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolQcException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 import uk.ac.bbsrc.tgac.miso.core.util.jackson.PooledElementDeserializer;
 
-
 /**
  * Skeleton implementation of a Pool
  * 
  * @author Rob Davey
  * @since 0.0.2
  */
+@JsonIgnoreProperties({ "lastModifier", "hasLowQualityMembers" })
 public abstract class AbstractPool<P extends Poolable> extends AbstractBoxable implements Pool<P> {
   protected static final Logger log = LoggerFactory.getLogger(AbstractPool.class);
 
@@ -383,6 +385,7 @@ public abstract class AbstractPool<P extends Poolable> extends AbstractBoxable i
   }
 
   @Override
+  @JsonIgnore
   public boolean getHasLowQualityMembers() {
     for (Dilution d : getDilutions()) {
       if (d.getLibrary().isLowQuality()) {
