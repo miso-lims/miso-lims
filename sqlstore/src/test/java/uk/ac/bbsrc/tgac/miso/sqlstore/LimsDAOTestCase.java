@@ -50,8 +50,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.jdbc.support.lob.DefaultLobHandler;
-import org.springframework.jdbc.support.lob.LobHandler;
 
 import com.eaglegenomics.simlims.core.manager.LocalSecurityManager;
 
@@ -428,11 +426,9 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
         props.getProperty("db.password"));
 
     DataObjectFactory dataObjectFactory = new TgacDataObjectFactory();
-    LobHandler lh = new DefaultLobHandler();
     JdbcTemplate template = new JdbcTemplate(datasource);
 
     securityDAO = new MockSQLSecurityDAO();
-    securityDAO.setLobHandler(lh);
     securityDAO.setJdbcTemplate(template);
 
     securityProfileDAO = new SQLSecurityProfileDAO();

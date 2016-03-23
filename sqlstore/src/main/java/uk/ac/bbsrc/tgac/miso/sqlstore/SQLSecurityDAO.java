@@ -52,13 +52,13 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-import org.springframework.jdbc.support.lob.LobHandler;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.security.PasswordCodecService;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
+import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
@@ -66,7 +66,6 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import com.googlecode.ehcache.annotations.Cacheable;
 import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.Property;
@@ -125,42 +124,38 @@ public class SQLSecurityDAO implements SecurityStore {
   @Autowired
   private PasswordCodecService passwordCodecService;
 
-  private LobHandler lobHandler;
-  private SecurityManager securityManager;
   private Store<SecurityProfile> securityProfileDAO;
   private JdbcTemplate template;
 
   @Autowired
   private CacheManager cacheManager;
 
+  @CoverageIgnore
   public void setCacheManager(CacheManager cacheManager) {
     this.cacheManager = cacheManager;
   }
 
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
-
-  public void setLobHandler(LobHandler lobHandler) {
-    this.lobHandler = lobHandler;
-  }
-
+  @CoverageIgnore
   public void setSecurityProfileDAO(Store<SecurityProfile> securityProfileDAO) {
     this.securityProfileDAO = securityProfileDAO;
   }
 
+  @CoverageIgnore
   public JdbcTemplate getJdbcTemplate() {
     return template;
   }
 
+  @CoverageIgnore
   public void setJdbcTemplate(JdbcTemplate template) {
     this.template = template;
   }
 
+  @CoverageIgnore
   public PasswordCodecService getPasswordCodecService() {
     return passwordCodecService;
   }
 
+  @CoverageIgnore
   public void setPasswordCodecService(PasswordCodecService passwordCodecService) {
     this.passwordCodecService = passwordCodecService;
   }
@@ -270,7 +265,9 @@ public class SQLSecurityDAO implements SecurityStore {
       }
     }
 
-    DbUtils.updateCaches(cacheManager.getCache("userCache"), user.getUserId());
+    if (cacheManager != null) {
+      DbUtils.updateCaches(cacheManager.getCache("userCache"), user.getUserId());
+    }
 
     return user.getUserId();
   }
@@ -279,21 +276,21 @@ public class SQLSecurityDAO implements SecurityStore {
   @Cacheable(cacheName = "userCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
       @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
   public User getUserById(Long userId) throws IOException {
-    List results = template.query(USER_SELECT_BY_ID, new Object[] { userId }, new UserMapper());
+    List<User> results = template.query(USER_SELECT_BY_ID, new Object[] { userId }, new UserMapper());
     User u = results.size() > 0 ? (User) results.get(0) : null;
     return u;
   }
 
   @Override
   public User getUserByLoginName(String loginName) throws IOException {
-    List results = template.query(USER_SELECT_BY_LOGIN_NAME, new Object[] { loginName }, new UserMapper());
+    List<User> results = template.query(USER_SELECT_BY_LOGIN_NAME, new Object[] { loginName }, new UserMapper());
     User u = results.size() > 0 ? (User) results.get(0) : null;
     return u;
   }
 
   @Override
   public User getUserByEmail(String email) throws IOException {
-    List results = template.query(USER_SELECT_BY_EMAIL, new Object[] { email }, new UserMapper());
+    List<User> results = template.query(USER_SELECT_BY_EMAIL, new Object[] { email }, new UserMapper());
     User u = results.size() > 0 ? (User) results.get(0) : null;
     return u;
   }
@@ -318,6 +315,7 @@ public class SQLSecurityDAO implements SecurityStore {
 
   @Override
   public Collection<User> listUsersByGroupName(String name) throws IOException {
+    if (name == null) throw new NullPointerException("Can not search by null group name");
     return template.query(USERS_SELECT_BY_GROUP_NAME, new Object[] { name }, new UserMapper(true));
   }
 
@@ -342,14 +340,16 @@ public class SQLSecurityDAO implements SecurityStore {
 
   @Override
   public Group getGroupById(Long groupId) throws IOException {
-    List results = template.query(GROUP_SELECT_BY_ID, new Object[] { groupId }, new GroupMapper());
+    if (groupId == null) throw new NullPointerException("Cannot search for null groupId");
+    List<Group> results = template.query(GROUP_SELECT_BY_ID, new Object[] { groupId }, new GroupMapper());
     Group g = results.size() > 0 ? (Group) results.get(0) : null;
     return g;
   }
 
   @Override
   public Group getGroupByName(String groupName) throws IOException {
-    List results = template.query(GROUP_SELECT_BY_NAME, new Object[] { groupName }, new GroupMapper());
+    if (groupName == null) throw new NullPointerException("Cannot search for null group name");
+    List<Group> results = template.query(GROUP_SELECT_BY_NAME, new Object[] { groupName }, new GroupMapper());
     Group g = results.size() > 0 ? (Group) results.get(0) : null;
     return g;
   }

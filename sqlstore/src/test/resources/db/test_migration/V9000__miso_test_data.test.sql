@@ -376,3 +376,9 @@ VALUES (33, 1);
 DELETE FROM `Pool_Note`;
 INSERT INTO `Pool_Note`(`pool_poolId`, `notes_noteId`)
 VALUES (33, 2);
+
+INSERT INTO `User` (`userId`, `active`, `admin`, `external`, `fullName`, `internal`, `loginName`, `password`, `email`)
+VALUES (3,1,0,0,'user',1,'user','user','user@user.user');
+
+INSERT INTO `User_Group` (`users_userId`, `groups_groupId`)
+VALUES (3,1),(3,2),(1,1);
