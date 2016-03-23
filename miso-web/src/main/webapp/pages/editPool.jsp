@@ -149,7 +149,7 @@
     </td>
   </tr>
   <tr>
-    <td class="h">Desired Concentration:*</td>
+    <td class="h">Desired Concentration (${poolConcentrationUnits}):*</td>
     <td><form:input id="concentration" path="concentration"/></td>
   </tr>
   <tr>
@@ -429,10 +429,10 @@
     jQuery(document).ready(function () {
         <c:choose>
         <c:when test="${pool.id != 0}">
-        Pool.ui.createElementSelectDatatable('${pool.platformType.key}');
+        Pool.ui.createElementSelectDatatable('${pool.platformType.key}', '${libraryDilutionUnits}');
         </c:when>
         <c:otherwise>
-        Pool.ui.createElementSelectDatatable('Illumina');
+        Pool.ui.createElementSelectDatatable('Illumina', '${libraryDilutionUnits}');
         </c:otherwise>
         </c:choose>
     });

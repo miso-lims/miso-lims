@@ -227,7 +227,7 @@ function bulkLibraryQcTable(tableName) {
   }
 }
 
-function bulkLibraryDilutionTable(tableName) {
+function bulkLibraryDilutionTable(tableName, libraryDilutionConcentrationUnits) {
   var lTable = jQuery(tableName);
   if (!lTable.hasClass("display")) {
     //destroy current table and recreate
@@ -266,7 +266,7 @@ function bulkLibraryDilutionTable(tableName) {
     //headers
     jQuery(tableName + " tr:first").prepend("<th>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\"#library_table\", this);'></span></th>");
     jQuery(tableName + " tr:first").append("<th>Dilution Date <span header='dilutionDate' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.fillDown(\"#library_table\", this);'></span></th>");
-    jQuery(tableName + " tr:first").append("<th>Concentration <span header='qcType' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.fillDown(\"#library_table\", this);'></span></th>");
+    jQuery(tableName + " tr:first").append("<th>Concentration ("+libraryDilutionConcentrationUnits+") <span header='qcType' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.fillDown(\"#library_table\", this);'></span></th>");
 
     //columns
     jQuery(tableName + " tr:gt(0)").prepend("<td class='rowSelect'></td>");

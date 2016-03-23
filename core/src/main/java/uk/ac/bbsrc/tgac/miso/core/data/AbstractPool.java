@@ -44,6 +44,7 @@ import org.slf4j.LoggerFactory;
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
+
 import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
 import uk.ac.bbsrc.tgac.miso.core.event.model.PoolEvent;
 import uk.ac.bbsrc.tgac.miso.core.event.type.MisoEventType;
@@ -65,6 +66,7 @@ public abstract class AbstractPool<P extends Poolable> extends AbstractBoxable i
   protected static final Logger log = LoggerFactory.getLogger(AbstractPool.class);
 
   public static final Long UNSAVED_ID = 0L;
+  public static final String CONCENTRATION_UNITS = "nM";
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
