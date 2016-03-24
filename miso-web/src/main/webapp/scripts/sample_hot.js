@@ -1,51 +1,3 @@
-jQuery(document).ready(function() {
-  // display identification barcode image
-  if (document.getElementById('idBarcodePresent')) {
-    var sampleId = parseInt(document.getElementById('idBarcodePresent').getAttribute('data-sampleId'));
-    var idbarcode = document.getElementById('idBarcodePresent').getAttribute('data-idbarcode');
-    Fluxion.doAjax(
-      'sampleControllerHelperService',
-      'getSampleBarcode',
-      {
-        'sampleId': sampleId,
-        'url': ajaxurl
-      },
-      {
-        'doOnSuccess': function (json) {
-          var img = '<img style="height:30px; border:0;" alt="'+idbarcode+'" title="'+idbarcode+'" src="/temp/'+json.img+'"/>';
-          document.getElementById('idBarcode').innerHTML = img;
-        }
-      }
-    );
-  }
-  
-  // display sample QCs table, and count samples and libraries
-  jQuery('#sampleQcTable').tablesorter();
-  jQuery('#qcsTotalCount').html(jQuery('#sampleQcTable>tbody>tr:visible').length.toString() + ' QCs');
-  jQuery('#librariesTotalCount').html(jQuery('#library_table>tbody>tr:visible').length.toString() + ' Libraries');
-  
-  // display libraries table
-  jQuery('#library_table').dataTable({
-    "aaSorting": [
-      [1, 'asc']
-    ],
-    "aoColumns": [
-      null,
-      { "sType": 'natural '},
-      null,
-      null,
-      null
-    ],
-    "iDisplayLength": 50,
-    "bJQueryUI": true,
-    "bRetrieve": true
-  });
-  
-  jQuery('#tabs').tabs();
-  jQuery('#tabs').removeClass('ui-widget').removeClass('ui-widget-content');
-});
- ///////////////////////////// HOT ///////////////////////////////////////////////
-  
 Sample.hot = {
   dropdownRef: null,
   detailedSample: null,
@@ -56,6 +8,10 @@ Sample.hot = {
   colConf: null,
   hotTable: null,
   sampleData: null,
+  messages: {
+    success: [],
+    failed: []
+  },
 
   fetchSampleOptions: function () {
     var xhr = new XMLHttpRequest();
@@ -212,7 +168,9 @@ Sample.hot = {
     Sample.hot.makeHOT();
     
     // disable sampleClass dropdown so they can't change it midway through editing table values
-    document.getElementById('classDropdown').setAttribute('disabled', 'disabled');
+    if (document.getElementById('classDropdown')) {
+      document.getElementById('classDropdown').setAttribute('disabled', 'disabled');
+    }
     
     // if detailedSample is enabled, re-store the selected sampleClassId for this table
     if (Sample.hot.detailedSample) {
@@ -224,7 +182,6 @@ Sample.hot = {
     var number = window.prompt(message + "How many samples would you like to create?");
     if (number === null) return false;
     if (parseInt(number)) {
-      console.log(parseInt(number));
       return parseInt(number);
     } else {
       this.parseIntRows(number + " is not a number. Please enter a number.\n\n");
@@ -250,7 +207,8 @@ Sample.hot = {
       colHeaders: this.getValues('header', this.colConf),
       contextMenu: false,
       columns: this.colConf,
-      data: this.startData
+      data: this.startData,
+      dataSchema: this.dataSchema
     });
 
     // var addButtonGen = this.hotTable.addHook('afterChange', addAliasGenButton);
@@ -272,6 +230,17 @@ Sample.hot = {
    qcValue: '',
    alias: null,
  }],
+ 
+ dataSchema: {
+   project: null,
+   description: null,
+   receivedDate: null,
+   identificationBarcode: null,
+   scientificName: null,
+   sampleType: null,
+   qcValue: '',
+   alias: null,
+ },
  
  addEmptyRow: function (numberToAdd) {
    var number = (numberToAdd === undefined ? 1 : numberToAdd);
@@ -418,7 +387,8 @@ Sample.hot = {
           data: 'sampleType',
           type: 'dropdown',
           trimDropdown: false,
-          source: Sample.hot.getSampleTypes()
+          source: Sample.hot.getSampleTypes(),
+          validator: validateSampleTypes
         },{
           header: 'Barcode',
           data: 'identificationBarcode',
@@ -458,13 +428,15 @@ Sample.hot = {
           data: 'tissueOrigin',
           type: 'dropdown',
           trimDropdown: false,
-          source: Sample.hot.getTissueOrigins()
+          source: Sample.hot.getTissueOrigins(),
+          validator: validateTissueOrigins
         },{
           header: 'Tissue Type',
           data: 'tissueType',
           type: 'dropdown',
           trimDropdown: false,
-          source: Sample.hot.getTissueTypes()
+          source: Sample.hot.getTissueTypes(),
+          validator: validateTissueTypes
         },{
           header: 'Passage #',
           data: 'passageNumber',
@@ -624,13 +596,36 @@ Sample.hot = {
               return callback(true);
             },
             'doOnError': function (json) {
-              console.log(json.error);
               return callback(false);
             }
           }
         );
       } else {
         return callback(false);
+      }
+    }
+    
+    function validateSampleTypes (value, callback) {
+      if (Sample.hot.getSampleTypes().indexOf(value) == -1) {
+        return callback(false);
+      } else {
+        return callback(true);
+      }
+    }
+    
+    function validateTissueOrigins (value, callback) {
+      if (Sample.hot.getTissueOrigins().indexOf(value) == -1) {
+        return callback(false);
+      } else {
+        return callback(true);
+      }
+    }
+    
+    function validateTissueTypes (value, callback) {
+      if (Sample.hot.getTissueTypes().indexOf(value) == -1) {
+        return callback(false);
+      } else {
+        return callback(true);
       }
     }
     
@@ -814,7 +809,7 @@ Sample.hot = {
     }
     var rowIndex = rowIndex;
     console.log(rowIndex, columnIndex);
-    if (rowIndex !== undefined && columnIndex !== undefined) {
+    if (rowIndex !== undefined && columnIndex !== -1) {
       Sample.hot.hotTable.setCellMeta(rowIndex, columnIndex, 'valid', false);
       Sample.hot.hotTable.render();
     }
@@ -831,6 +826,9 @@ Sample.hot = {
   successSave: function (xhr, rowIndex, messages, numberToSave) {
     messages.success.push(rowIndex); 
     
+    // add a 'saved' attribute to the data source 
+    Sample.hot.startData[rowIndex].saved = true;
+    
     // display any errors if this is the final sample to be saved
     if (messages.success.length + messages.failed.length == numberToSave) {
       Sample.hot.addAnyErrors(messages);
@@ -838,16 +836,10 @@ Sample.hot = {
   },
 
   saveDetailedData: function () {
-    
-    var messages = {
-        success: [],
-        failed: []
-      };
-    
     // check that a project and class have been declared
     if (document.getElementById('projectSelect').value === '' || document.getElementById('classDropdown').value === '') {
-      messages.failed.push('Make sure both Project and Sample Class are selected before saving.');
-      Sample.hot.addAnyErrors(messages);
+      Sample.hot.messages.failed.push('Make sure both Project and Sample Class are selected before saving.');
+      Sample.hot.addAnyErrors(Sample.hot.messages);
       return false;
     }
     
@@ -874,8 +866,10 @@ Sample.hot = {
       return false;
     }
     
-    this.hotTable.validateCells(function (valid) {  
-      if (valid) {
+    this.hotTable.validateCells(function (isValid) { 
+      // ensure validateCells callback is only executed once per save
+      if (isValid) {
+        runValidationCallbackOnce += 1;
         // check for sampleValidRelationship
         // TODO: make parentClassId configurable
         var parentClassId = Sample.hot.getRootSampleClassId();
@@ -888,50 +882,43 @@ Sample.hot = {
           var childClassAlias = Sample.hot.sampleOptions.sampleClassesDtos.filter(function (sampleClass) {
             return sampleClass.id == childClassId;
           })[0].alias
-          messages.failed.push(parentClassAlias + ' is not a valid parent for ' + childClassAlias + '. Please select another child class and save again.');
+          Sample.hot.messages.failed.push(parentClassAlias + ' is not a valid parent for ' + childClassAlias + '. Please select another child class and save again.');
           
-          Sample.hot.addAnyErrors(messages);
+          Sample.hot.addAnyErrors(Sample.hot.messages);
           return false;
         }
 
         // send it through the parser to get a sampleData array that isn't merely a reference to Sample.hot.hotTable.getData()
         var sampleData = JSON.parse(JSON.parse(JSON.stringify(Sample.hot.hotTable.getData())));
         
-        // remove objects which have already been saved
+        // attempt to save each of the objects
         for (var i=0; i<sampleData.length; i++) {
-          if (Sample.hot.hotTable.getCellMeta(i, 0).readOnly) {        
-            sampleData.splice(i, 1);
+          // skip if it's already been saved
+          if (sampleData[i].saved) {
+            Sample.hot.messages.success.push(sampleData[i].alias);
+            continue;
           }
-        }
-        
-        // attempt to save each of the remainder objects
-        for (var i=0; i<sampleData.length; i++) {
+          
           var newSample = Sample.hot.buildSampleDtosFromData(sampleData[i]);
-          Sample.hot.saveOneSample(JSON.stringify(newSample), i, messages, sampleData.length);
+          Sample.hot.saveOneSample(JSON.stringify(newSample), i, Sample.hot.messages, sampleData.length);
         }
       } else {
-        messages.failed.push("It looks like some cells are not yet valid. Please fix them and save again.");
-        Sample.hot.addAnyErrors(messages);
+        Sample.hot.addAnyErrors(Sample.hot.messages);
         return false;
       }
     });
   },
   
-  savePlainData: function () { 
-    var messages = {
-        success: [],
-        failed: []
-    };
+  savePlainData: function () {
     // check that a project has been declared
     if (document.getElementById('projectSelect').value === '') {
-      messages.failed.push('Make sure that a Project is selected before saving.');
-      Sample.hot.addAnyErrors(messages);
+      Sample.hot.messages.failed.push('Make sure that a Project is selected before saving.');
+      Sample.hot.addAnyErrors(Sample.hot.messages);
       return false;
     }
     
     
     // if last row is empty, remove it before validation
-    // TODO: make behaviour more sensical
     var tableData = Sample.hot.startData;
     while (Sample.hot.startData.length > 1 && Sample.hot.hotTable.isEmptyRow(tableData.length - 1)) {
       Sample.hot.hotTable.alter('remove_row', parseInt(tableData.length - 1), keepEmptyRows = false);
@@ -953,8 +940,8 @@ Sample.hot = {
       return false;
     }
     
-    this.hotTable.validateCells(function (valid) {
-      if (valid) {
+    this.hotTable.validateCells(function (isValid) {
+      if (isValid) {
         document.getElementById('errorMessages').innerHTML = '';
         document.getElementById('saveErrors').classList.add('hidden');
         
@@ -964,6 +951,9 @@ Sample.hot = {
         var samplesArray = [];
         
         for (var i=0; i<sampleData.length; i++) {
+          // skip if it's already been saved
+          if (sampleData[i].saved) continue;
+          
           var newSample = Sample.hot.buildSampleDtosFromData(sampleData[i]);
           samplesArray.push(newSample);
         }
@@ -984,25 +974,25 @@ Sample.hot = {
               for (var j=0; j<sampleData.length; j++) {
                 // yell if a row's alias is not present in the returned (saved) data
                 if (savedSamples.indexOf(sampleData[j].alias) == -1) {
-                  messages.failed.push("Row " + (j+1) +": "+ " Sample did not save. Please check that the sample alias is unique!");
+                  Sample.hot.messages.failed.push("Row " + (j+1) +": "+ " Sample did not save. Please check that the sample alias is unique!");
                 }
               } 
                 
               // display any errors
-              if (messages.failed.length) {
-                Sample.hot.addAnyErrors(messages);
+              if (Sample.hot.messages.failed.length) {
+                Sample.hot.addAnyErrors(Sample.hot.messages);
               }
             },
             'doOnError': function (json) {
-              messages.failed.push(json.error);
-              Sample.hot.addAnyErrors(messages);
+              Sample.hot.messages.failed.push(json.error);
+              Sample.hot.addAnyErrors(Sample.hot.messages);
               return false;
             }
           }
         );
       } else {
-        messages.failed.push("It looks like some cells are not yet valid. Please fix them and save again.");
-        Sample.hot.addAnyErrors(messages);
+        Sample.hot.messages.failed.push("It looks like some cells are not yet valid. Please fix them and save again.");
+        Sample.hot.addAnyErrors(Sample.hot.messages);
         return false;
       }
     });
@@ -1033,12 +1023,12 @@ Sample.hot = {
     });
   },
   
-  makeSavedRowsReadOnly: function (messages) {
+  makeSavedRowsReadOnly: function () {
     Sample.hot.hotTable.updateSettings({
       cells: function (row, col, prop) {
         var cellProperties = {};
         
-        if (messages.success.indexOf(row) != -1) {
+        if (Sample.hot.hotTable.getData()[row].saved) {
           cellProperties.readOnly = true;
         }
         
@@ -1049,8 +1039,9 @@ Sample.hot = {
   
   addAnyErrors: function (messages) {
     console.log(messages);
+    Sample.hot.makeSavedRowsReadOnly();
+    Sample.hot.hotTable.render();
     if (messages.success.length) {
-      Sample.hot.makeSavedRowsReadOnly(messages);
       var successMessage = "Successfully saved " + messages.success.length + " out of " + (messages.success.length + messages.failed.length) + " samples.";
       document.getElementById('successMessages').innerHTML = successMessage;
       document.getElementById('saveSuccesses').classList.remove('hidden');
