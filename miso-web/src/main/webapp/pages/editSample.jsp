@@ -293,6 +293,52 @@
     jQuery(document).ready(function () {
       // Attach Parsley form validator
       Validate.attachParsley('#sample-form');
+
+      // display identification barcode image
+      if (document.getElementById('idBarcodePresent')) {
+        var sampleId = parseInt(document.getElementById('idBarcodePresent').getAttribute('data-sampleId'));
+        var idbarcode = document.getElementById('idBarcodePresent').getAttribute('data-idbarcode');
+        Fluxion.doAjax(
+          'sampleControllerHelperService',
+          'getSampleBarcode',
+          {
+            'sampleId': sampleId,
+            'url': ajaxurl
+          },
+          {
+            'doOnSuccess': function (json) {
+              var img = '<img style="height:30px; border:0;" alt="'+idbarcode+'" title="'+idbarcode+'" src="/temp/'+json.img+'"/>';
+              document.getElementById('idBarcode').innerHTML = img;
+            }
+          }
+        );
+      }
+
+      // display sample QCs table, and count samples and libraries
+      jQuery('#sampleQcTable').tablesorter();
+      jQuery('#qcsTotalCount').html(jQuery('#sampleQcTable>tbody>tr:visible').length.toString() + ' QCs');
+      jQuery('#librariesTotalCount').html(jQuery('#library_table>tbody>tr:visible').length.toString() + ' Libraries');
+      
+      // display libraries table
+      jQuery('#library_table').dataTable({
+        "aaSorting": [
+          [1, 'asc']
+        ],
+        "aoColumns": [
+          null,
+          { "sType": 'natural '},
+          null,
+          null,
+          null
+        ],
+        "iDisplayLength": 50,
+        "bJQueryUI": true,
+        "bRetrieve": true
+      });
+
+      // display tabs correctly for sample creation
+      jQuery('#tabs').tabs();
+      jQuery('#tabs').removeClass('ui-widget').removeClass('ui-widget-content');
     });
   </script>
   
