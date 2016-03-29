@@ -8,6 +8,7 @@ import org.junit.runners.Suite;
   HibernateInstituteDaoTest.class,
   HibernateLabDaoTest.class,
   HibernateIdentityDaoTest.class,
+  HibernateSampleDaoTest.class,
   HibernateSampleNumberPerProjectDaoTest.class,
   HibernateLibraryAdditionalInfoDaoTest.class
 })

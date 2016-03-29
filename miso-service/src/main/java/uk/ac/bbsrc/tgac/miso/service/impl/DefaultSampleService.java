@@ -3,11 +3,13 @@ package uk.ac.bbsrc.tgac.miso.service.impl;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Set;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.hibernate.exception.ConstraintViolationException;
+import org.hibernate.exception.GenericJDBCException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
@@ -30,6 +33,7 @@ import uk.ac.bbsrc.tgac.miso.dto.SampleAdditionalInfoDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleClassDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleDao;
 import uk.ac.bbsrc.tgac.miso.service.IdentityService;
 import uk.ac.bbsrc.tgac.miso.service.SampleAdditionalInfoService;
 import uk.ac.bbsrc.tgac.miso.service.SampleAnalyteService;
@@ -90,6 +94,10 @@ public class DefaultSampleService implements SampleService {
 
   @Override
   public Long create(SampleDto sampleDto) throws IOException {
+
+    // Retrieve this information early in the transaction to avoid an unnecessary hibernate autoflush.
+    Set<SampleValidRelationship> sampleValidRelationships = sampleValidRelationshipService.getAll();
+
     // Construct a Sample from the SampleDto.
     Sample sample = to(sampleDto);
     authorizationManager.throwIfNotWritable(sample);
@@ -117,8 +125,9 @@ public class DefaultSampleService implements SampleService {
           SampleAdditionalInfo sampleAdditionalInfo = sampleAdditionalInfoService.to(sampleAdditionalInfoDto);
 
           identitySample = new SampleFactoryBuilder().user(user).project(sample.getProject()).description("Identity").sampleType("Identity")
-              .scientificName("Identity").name(internalName).rootSampleClass(rootSampleClass).identity(sample.getIdentity())
-              .sampleAdditionalInfo(sampleAdditionalInfo).sampleTissue(sample.getSampleTissue()).build();
+              .scientificName("Identity").name(HibernateSampleDao.generateTemporaryName()).alias(internalName)
+              .rootSampleClass(rootSampleClass).identity(sample.getIdentity()).sampleAdditionalInfo(sampleAdditionalInfo)
+              .sampleTissue(sample.getSampleTissue()).build();
 
           sample.setParent(identitySample);
         }
@@ -131,20 +140,24 @@ public class DefaultSampleService implements SampleService {
     Sample newSample = new SampleFactoryBuilder().description(sample.getDescription()).sampleType(sample.getSampleType())
         .scientificName(sample.getScientificName()).user(user).project(sample.getProject())
         .sampleAdditionalInfo(sample.getSampleAdditionalInfo()).sampleAnalyte(sample.getSampleAnalyte()).accession(sample.getAccession())
-        .name(sample.getName()).identificationBarcode(sample.getIdentificationBarcode()).locationBarcode(sample.getLocationBarcode())
-        .receivedDate(sample.getReceivedDate()).qcPassed(sample.getQcPassed()).alias(sample.getAlias())
-        .taxonIdentifier(sample.getTaxonIdentifier()).parent(sample.getParent()).sampleTissue(sample.getSampleTissue())
-        .volume(sample.getVolume()).build();
+        .identificationBarcode(sample.getIdentificationBarcode()).locationBarcode(sample.getLocationBarcode())
+        .receivedDate(sample.getReceivedDate()).qcPassed(sample.getQcPassed()).name(HibernateSampleDao.generateTemporaryName())
+        .alias(sample.getAlias()).taxonIdentifier(sample.getTaxonIdentifier()).parent(sample.getParent())
+        .sampleTissue(sample.getSampleTissue()).volume(sample.getVolume()).build();
 
-    if (!LimsUtils.isValidRelationship(sampleValidRelationshipService.getAll(), newSample.getParent(), newSample)) {
+    if (!LimsUtils.isValidRelationship(sampleValidRelationships, newSample.getParent(), newSample)) {
       throw new IllegalArgumentException("Parent " + newSample.getParent().getSampleAdditionalInfo().getSampleClass().getAlias()
           + " not permitted to have a child of type " + newSample.getSampleAdditionalInfo().getSampleClass().getAlias());
     }
 
     try {
       return sampleDao.addSample(newSample);
+    } catch (GenericJDBCException e) {
+      throw new IllegalArgumentException(e.getSQLException().getMessage());
+    } catch (SQLException e) {
+      throw new IllegalArgumentException(e);
     } catch (MisoNamingException e) {
-      throw new IOException("Bad name", e);
+      throw new IllegalArgumentException("Bad name", e);
     } catch (ConstraintViolationException e) {
       // Send the nested root cause message to the user, since it contains the actual error.
       throw new ConstraintViolationException(e.getMessage() + " " + ExceptionUtils.getRootCauseMessage(e), e.getSQLException(),

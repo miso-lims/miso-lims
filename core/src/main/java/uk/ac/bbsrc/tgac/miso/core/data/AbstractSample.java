@@ -24,13 +24,11 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -60,7 +58,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAdditionalInfoImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAnalyteImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAnalyteNode;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityNode;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
@@ -156,7 +153,8 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   private Sample parent;
 
   @OneToMany(targetEntity = SampleImpl.class, fetch = FetchType.LAZY)
-  @JoinTable(name = "SampleHierarchy", joinColumns = @JoinColumn(name = "parentId") , inverseJoinColumns = @JoinColumn(name = "childId") )
+  @JoinTable(name = "SampleHierarchy", joinColumns = @JoinColumn(name = "parentId"), inverseJoinColumns = @JoinColumn(name = "childId"))
+  @Cascade({ CascadeType.SAVE_UPDATE })
   private Set<Sample> children = new HashSet<Sample>();
 
   @Override

@@ -40,6 +40,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.Group;
@@ -107,9 +108,9 @@ public class SQLSecurityProfileDAO implements Store<SecurityProfile> {
   }
 
   @Override
-  @Transactional(readOnly = false, rollbackFor = IOException.class)
+  @Transactional(readOnly = false, rollbackFor = IOException.class, propagation = Propagation.REQUIRED)
   @TriggersRemove(cacheName = { "securityProfileCache" }, keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
-      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
+      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public long save(SecurityProfile securityProfile) throws IOException {
     SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(TABLE_NAME);
     MapSqlParameterSource params = new MapSqlParameterSource();
@@ -204,7 +205,7 @@ public class SQLSecurityProfileDAO implements Store<SecurityProfile> {
 
   @Override
   @Cacheable(cacheName = "securityProfileCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
-      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
+      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public SecurityProfile get(long id) throws IOException {
     List results = template.query(PROFILE_SELECT_BY_ID, new Object[] { id }, new SecurityProfileMapper());
     SecurityProfile sp = results.size() > 0 ? (SecurityProfile) results.get(0) : null;

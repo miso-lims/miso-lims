@@ -1,26 +1,32 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.persistence.CascadeType;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.jdbc.Work;
 import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.store.SecurityStore;
+import com.google.common.annotations.VisibleForTesting;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -71,22 +77,50 @@ public class HibernateSampleDao implements SampleDao, SampleStore {
   @Autowired
   private JdbcTemplate template;
 
+  @Transactional(propagation = Propagation.MANDATORY)
   @Override
-  public Long addSample(Sample sample) throws IOException, MisoNamingException {
+  public Long addSample(final Sample sample) throws IOException, MisoNamingException {
     Date now = new Date();
     sample.setLastUpdated(now);
-    // if the sample naming scheme doesn't allow duplicates, and a sample alias already exists
-    if (!namingScheme.allowDuplicateEntityNameFor("alias") && !listByAlias(sample.getAlias()).isEmpty()) {
-      throw new IOException("NEW: A sample with this alias already exists in the database");
-    }
-    if (sample.getSecurityProfile() != null) {
-      sample.setSecurityProfileId(getSecurityProfileDao().save(sample.getSecurityProfile()));
-    }
-    // We can't generate the name until we have the ID and we don't have an ID until we start the persistance. So, we assign a temporary
+
+    // We can't generate the name until we have the ID and we don't have an ID until we start the persistence. So, we assign a temporary
     // name.
-    sample.setName("TEMPORARY_S" + sample.hashCode());
+    sample.setName(generateTemporaryName());
     long id = (Long) currentSession().save(sample);
+
+    sessionFactory.getCurrentSession().doWork(new Work() {
+
+      @Override
+      public void execute(Connection connection) throws SQLException {
+        try {
+          if (!namingScheme.allowDuplicateEntityNameFor("alias") && aliasExists(sample.getAlias())) {
+            // Size is greater than 1, since we've just added this to the db under a temporary name.
+            throw new IOException(String.format("NEW: A sample with this alias '%s' already exists in the database", sample.getAlias()));
+          }
+        } catch (IOException e) {
+          throw new SQLException(e);
+        }
+
+      }
+    });
+
+    if (sample.getSecurityProfile() != null) {
+      sessionFactory.getCurrentSession().doWork(new Work() {
+
+        @Override
+        public void execute(Connection connection) throws SQLException {
+          try {
+            sample.setSecurityProfileId(getSecurityProfileDao().save(sample.getSecurityProfile()));
+          } catch (IOException e) {
+            e.printStackTrace();
+          }
+        }
+
+      });
+    }
+
     sample.setId(id);
+    updateParentSampleNameIfRequired(sample);
 
     String name = namingScheme.generateNameFor("name", sample);
     sample.setName(name);
@@ -96,9 +130,18 @@ public class HibernateSampleDao implements SampleDao, SampleStore {
         autoGenerateIdBarcode(sample);
       } // if !autoGenerateIdentificationBarcodes then the identificationBarcode is set by the user
     }
+
     currentSession().update(sample);
     persistSqlStore(sample);
     return id;
+  }
+
+  @VisibleForTesting
+  void updateParentSampleNameIfRequired(Sample child) throws MisoNamingException, IOException {
+    if (hasTemporaryName(child.getParent()) && child.getParent().getId() > Sample.UNSAVED_ID) {
+      String name = namingScheme.generateNameFor("name", child.getParent());
+      child.getParent().setName(name);
+    }
   }
 
   /**
@@ -278,6 +321,26 @@ public class HibernateSampleDao implements SampleDao, SampleStore {
     return fetchSqlStore(records);
   }
 
+  /**
+   * Determines if an alias exists already. This method is specifically used during the creation of a sample and does not call fetchSqlStore
+   * since the partial state of the new sample will cause it to fail.
+   * 
+   * @param alias
+   *          See if this alias already exists.
+   * @return True if the alias already exists.
+   * @throws IOException
+   *           If there are difficulties reading from the database.
+   */
+  private boolean aliasExists(String alias) throws IOException {
+    Query query = currentSession().createQuery("from SampleImpl where alias = :alias");
+    query.setString("alias", alias);
+    @SuppressWarnings("unchecked")
+    List<Sample> records = query.list();
+    // Need to check greater than one since the alias was just added as part of sample creation. If any more of the sample creation
+    // fails the transaction will be rolled back and the sample entry removed.
+    return records.size() > 1;
+  }
+
   @Override
   public Collection<Sample> listByAlias(String alias) throws IOException {
     Query query = currentSession().createQuery("from SampleImpl where alias = :alias");
@@ -418,5 +481,24 @@ public class HibernateSampleDao implements SampleDao, SampleStore {
   @Override
   public Map<String, Integer> getSampleColumnSizes() throws IOException {
     return DbUtils.getColumnSizes(template, "Sample");
+  }
+
+  static final private String TEMPORARY_NAME_PREFIX = "TEMPORARY_S";
+
+  /**
+   * Generate a temporary name using a UUID.
+   * 
+   * @return Temporary name
+   */
+  static public String generateTemporaryName() {
+    return TEMPORARY_NAME_PREFIX + UUID.randomUUID();
+  }
+
+  static public boolean hasTemporaryName(Sample sample) {
+    boolean result = false;
+    if (sample != null && sample.getName() != null) {
+      result = sample.getName().startsWith(TEMPORARY_NAME_PREFIX);
+    }
+    return result;
   }
 }
