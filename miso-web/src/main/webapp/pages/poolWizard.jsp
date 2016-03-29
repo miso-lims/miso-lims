@@ -96,7 +96,7 @@
         </td>
       </tr>
       <tr>
-        <td>Concentration:</td>
+        <td>Concentration (${poolConcentrationUnits}):</td>
         <td>
           <input type="text" id="concentration" name="concentration"/><br/>
         </td>
@@ -193,7 +193,7 @@
               <tr>
                 <th>Dilution ID</th>
                 <th>Dilution Name</th>
-                <th>Concentration</th>
+                <th>Concentration (${libraryDilutionUnits})</th>
                 <th>Parent Library</th>
                 <th>Description</th>
                 <th>Parent Library Barcode</th>

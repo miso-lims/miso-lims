@@ -621,7 +621,7 @@
         <th>LD Name</th>
         <th>Done By</th>
         <th>Date</th>
-        <th>Results (${libraryDilutionUnits})</th>
+        <th>Concentration (${libraryDilutionUnits})</th>
         <th>ID Barcode</th>
           <%-- <th>Location Barcode</th> --%>
         <c:if test="${(dil.dilutionCreator eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
@@ -640,7 +640,7 @@
             <fmt:formatNumber var="concentrationRounded"
                           value="${dil.concentration}"
                           maxFractionDigits="2" />
-            <td id="results${dil.id}">${concentrationRounded} ${libraryDilutionUnits}</td>
+            <td id="results${dil.id}">${concentrationRounded}</td>
             <td class="fit">
               <c:if test="${not empty dil.identificationBarcode}">
                 <div class="barcodes">
@@ -800,7 +800,7 @@
           <th>Pool Alias</th>
           <th>Pool Platform</th>
           <th>Pool Creation Date</th>
-          <th>Pool Concentration</th>
+          <th>Pool Concentration (${poolConcentrationUnits})</th>
           <sec:authorize access="hasRole('ROLE_ADMIN')">
             <th class="fit">DELETE</th>
           </sec:authorize>
