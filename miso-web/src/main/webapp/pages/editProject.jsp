@@ -37,6 +37,8 @@
 
 <script type="text/javascript" src="<c:url value='/scripts/parsley/parsley.min.js'/>"></script>
 
+<div id="maincontent">
+<div id="contentcolumn">
 <form:form id="project-form" data-parsley-validate="" action="/miso/project" method="POST" commandName="project" autocomplete="off">
 <sessionConversation:insertSessionConversationId attributeName="project"/>
 <h1><c:choose><c:when
@@ -1682,5 +1684,10 @@ jQuery(document).ready(function () {
     </script>
 
 </c:if>
+</div>
+</div>
+</div>
+
+<%@ include file="adminsub.jsp" %>
 
 <%@ include file="../footer.jsp" %>

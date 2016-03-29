@@ -23,6 +23,8 @@
 
 <%@ include file="../header.jsp" %>
 
+<div id="maincontent">
+<div id="contentcolumn">
 <h1>
   <div id="title">Reports</div>
 </h1>
@@ -45,5 +47,9 @@
     Reports.ui.prepareTable();
   });
 </script>
+</div>
+</div>
+
+<%@ include file="adminsub.jsp" %>
 
 <%@ include file="../footer.jsp" %>
