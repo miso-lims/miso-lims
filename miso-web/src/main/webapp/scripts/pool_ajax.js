@@ -89,22 +89,22 @@ Pool.qc = {
     if (!jQuery('#poolQcTable').attr("qcInProgress")) {
       jQuery('#poolQcTable').attr("qcInProgress", "true");
 
-      jQuery('poolQcTable').insertRow(1);
+      jQuery('#poolQcTable')[0].insertRow(1);
       //QCId  QCed By  	QC Date  	Method  	Results
 
       if (includeId) {
-        var column1 = jQuery('poolQcTable').rows[1].insertCell(-1);
+        var column1 = jQuery('#poolQcTable')[0].rows[1].insertCell(-1);
         column1.innerHTML = "<input type='hidden' id='poolId' name='poolId' value='" + poolId + "'/>";
       }
-      var column2 = jQuery('poolQcTable').rows[1].insertCell(-1);
-      column2.innerHTML = "<input id='poolQcUser' name='poolQcUser' type='hidden' value='" + jQuery('currentUser').innerHTML + "'/>" + jQuery('currentUser').innerHTML;
-      var column3 = jQuery('poolQcTable').rows[1].insertCell(-1);
+      var column2 = jQuery('#poolQcTable')[0].rows[1].insertCell(-1);
+      column2.innerHTML = "<input id='poolQcUser' name='poolQcUser' type='hidden' value='" + jQuery('#currentUser')[0].innerHTML + "'/>" + jQuery('#currentUser')[0].innerHTML;
+      var column3 = jQuery('#poolQcTable')[0].rows[1].insertCell(-1);
       column3.innerHTML = "<input id='poolQcDate' name='poolQcDate' type='text'/>";
-      var column4 = jQuery('poolQcTable').rows[1].insertCell(-1);
+      var column4 = jQuery('#poolQcTable')[0].rows[1].insertCell(-1);
       column4.innerHTML = "<select id='poolQcType' name='poolQcType' onchange='Pool.qc.changePoolQcUnits(this);'/>";
-      var column5 = jQuery('poolQcTable').rows[1].insertCell(-1);
+      var column5 = jQuery('#poolQcTable')[0].rows[1].insertCell(-1);
       column5.innerHTML = "<input id='poolQcResults' name='poolQcResults' type='text'/><span id='units'/>";
-      var column6 = jQuery('poolQcTable').rows[1].insertCell(-1);
+      var column6 = jQuery('#poolQcTable')[0].rows[1].insertCell(-1);
       column6.innerHTML = "<a href='javascript:void(0);' onclick='Pool.qc.addPoolQC();'/>Add</a>";
 
       Utils.ui.addMaxDatePicker("poolQcDate", 0);
@@ -188,14 +188,14 @@ Pool.wizard = {
     if (!jQuery('#poolQcTable').attr("qcInProgress")) {
       jQuery('#poolQcTable').attr("qcInProgress", "true");
 
-      jQuery('poolQcTable').insertRow(1);
-      var column3 = jQuery('poolQcTable').rows[1].insertCell(-1);
+      jQuery('#poolQcTable')[0].insertRow(1);
+      var column3 = jQuery('#poolQcTable')[0].rows[1].insertCell(-1);
       column3.innerHTML = "<input id='poolQcDate' name='poolQcDate' type='text'/>";
-      var column4 = jQuery('poolQcTable').rows[1].insertCell(-1);
+      var column4 = jQuery('#poolQcTable')[0].rows[1].insertCell(-1);
       column4.innerHTML = "<select id='poolQcType' name='poolQcType' onchange='Pool.qc.changePoolQcUnits(this);'/>";
-      var column5 = jQuery('poolQcTable').rows[1].insertCell(-1);
+      var column5 = jQuery('#poolQcTable')[0].rows[1].insertCell(-1);
       column5.innerHTML = "<input id='poolQcResults' name='poolQcResults' type='text'/><span id='units'/>";
-      var column6 = jQuery('poolQcTable').rows[1].insertCell(-1);
+      var column6 = jQuery('#poolQcTable')[0].rows[1].insertCell(-1);
       column6.innerHTML = "<a href='javascript:void(0);' onclick='Pool.wizard.addPoolQC(this);'/>Add</a>";
 
       jQuery("#poolQcDate").val(jQuery.datepicker.formatDate('dd/mm/yy', new Date()));

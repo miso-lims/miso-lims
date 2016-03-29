@@ -30,9 +30,6 @@
 --%>
 <%@ include file="../header.jsp" %>
 
-<script type="text/javascript" src="<c:url value='/scripts/run_ajax.js'/>"></script>
-<script type="text/javascript" src="<c:url value='/scripts/stats_ajax.js'/>"></script>
-
 
 <script type="text/javascript" src="<c:url value='/scripts/parsley/parsley.min.js'/>"></script>
 

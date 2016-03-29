@@ -89,7 +89,7 @@ var Sample = Sample || {
     jQuery('#scientificName').attr('data-parsley-required', 'true');
     jQuery('#scientificName').attr('data-parsley-maxlength', '100');
     jQuery('#scientificName').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
-    
+
     // Volume validation
     jQuery('#volume').attr('class', 'form-control');
     jQuery('#volume').attr('data-parsley-required', 'true');
@@ -176,23 +176,23 @@ Sample.qc = {
     if (!jQuery('#sampleQcTable').attr("qcInProgress")) {
       jQuery('#sampleQcTable').attr("qcInProgress", "true");
 
-      jQuery('sampleQcTable').insertRow(1);
+      jQuery('#sampleQcTable')[0].insertRow(1);
       //QCId  QCed By  	QC Date  	Method  	Results
 
       if (includeId) {
-        var column1 = jQuery('sampleQcTable').rows[1].insertCell(-1);
+        var column1 = jQuery('#sampleQcTable')[0].rows[1].insertCell(-1);
         column1.innerHTML = "<input type='hidden' id='sampleId' name='sampleId' value='" + json.sampleId + "'/>";
       }
 
-      var column2 = jQuery('sampleQcTable').rows[1].insertCell(-1);
+      var column2 = jQuery('#sampleQcTable')[0].rows[1].insertCell(-1);
       column2.innerHTML = "<select id='sampleQcUser' name='sampleQcUser'>" + json.qcUserOptions + "</select>";
-      var column3 = jQuery('sampleQcTable').rows[1].insertCell(-1);
+      var column3 = jQuery('#sampleQcTable')[0].rows[1].insertCell(-1);
       column3.innerHTML = "<input id='sampleQcDate' name='sampleQcDate' type='text'/>";
-      var column4 = jQuery('sampleQcTable').rows[1].insertCell(-1);
+      var column4 = jQuery('#sampleQcTable')[0].rows[1].insertCell(-1);
       column4.innerHTML = "<select id='sampleQcType' name='sampleQcType' onchange='Sample.qc.changeSampleQcUnits(this);'/>";
-      var column5 = jQuery('sampleQcTable').rows[1].insertCell(-1);
+      var column5 = jQuery('#sampleQcTable')[0].rows[1].insertCell(-1);
       column5.innerHTML = "<input id='sampleQcResults' name='sampleQcResults' type='text'/><span id='units'/>";
-      var column6 = jQuery('sampleQcTable').rows[1].insertCell(-1);
+      var column6 = jQuery('#sampleQcTable')[0].rows[1].insertCell(-1);
       column6.innerHTML = "<a href='javascript:void(0);' onclick='Sample.qc.addSampleQC();'/>Add</a>";
 
       Utils.ui.addMaxDatePicker("sampleQcDate", 0);
