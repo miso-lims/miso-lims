@@ -255,7 +255,7 @@
       </td>
     </tr>
     <tr>
-      <td>Volume (&#181;l):</td>
+      <td>Volume (&#181;l):*</td>
       <td><form:input id="volume" path="volume"/></td>
     </tr>
     <tr>

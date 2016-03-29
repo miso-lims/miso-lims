@@ -171,7 +171,6 @@ public class SampleControllerHelperService {
               String scientificName = j.getString("scientificName");
               DateFormat df = new SimpleDateFormat("dd/mm/yyyy");
               String type = j.getString("sampleType");
-              String locationBarcode = j.getString("locationBarcode");
 
               Sample news = new SampleImpl();
               news.setProject(p);
@@ -180,7 +179,6 @@ public class SampleControllerHelperService {
               news.setScientificName(scientificName);
               news.setSecurityProfile(sp);
               news.setSampleType(type);
-              news.setLocationBarcode(locationBarcode);
               news.setLastModifier(user);
 
               if (j.has("receivedDate") && !isStringEmptyOrNull(j.getString("receivedDate"))) {
@@ -199,6 +197,11 @@ public class SampleControllerHelperService {
                   note.setCreationDate(date);
                 } else {
                   note.setCreationDate(new Date());
+                }
+                
+                if (j.has("identificationBarcode") && !isStringEmptyOrNull(j.getString("identificationBarcode"))) {
+                  String idBarcode = j.getString("identificationBarcode");
+                  news.setIdentificationBarcode(idBarcode);
                 }
 
                 news.setNotes(Arrays.asList(note));
