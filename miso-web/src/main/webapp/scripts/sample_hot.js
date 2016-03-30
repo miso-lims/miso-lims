@@ -888,8 +888,8 @@ Sample.hot = {
           return false;
         }
 
-        // send it through the parser to get a sampleData array that isn't merely a reference to Sample.hot.hotTable.getData()
-        var sampleData = JSON.parse(JSON.parse(JSON.stringify(Sample.hot.hotTable.getData())));
+        // send it through the parser to get a sampleData array that isn't merely a reference to Sample.hot.hotTable.getSourceData()
+        var sampleData = JSON.parse(JSON.parse(JSON.stringify(Sample.hot.hotTable.getSourceData())));
         
         // attempt to save each of the objects
         for (var i=0; i<sampleData.length; i++) {
@@ -945,8 +945,8 @@ Sample.hot = {
         document.getElementById('errorMessages').innerHTML = '';
         document.getElementById('saveErrors').classList.add('hidden');
         
-        // send it through the parser to get a sampleData array that isn't merely a reference to Sample.hot.hotTable.getData()
-        var sampleData = JSON.parse(JSON.parse(JSON.stringify(Sample.hot.hotTable.getData())));
+        // send it through the parser to get a sampleData array that isn't merely a reference to Sample.hot.hotTable.getSourceData()
+        var sampleData = JSON.parse(JSON.parse(JSON.stringify(Sample.hot.hotTable.getSourceData())));
         
         var samplesArray = [];
         
@@ -975,6 +975,13 @@ Sample.hot = {
                 // yell if a row's alias is not present in the returned (saved) data
                 if (savedSamples.indexOf(sampleData[j].alias) == -1) {
                   Sample.hot.messages.failed.push("Row " + (j+1) +": "+ " Sample did not save. Please check that the sample alias is unique!");
+                } else {
+                  for (var k=0; k<Sample.hot.startData.length; k++) {
+                    if (Sample.hot.startData[k].alias == sampleData[j].alias) {
+                      Sample.hot.startData[k].saved = true;
+                      Sample.hot.messages.success.push(Sample.hot.startData[k].alias);
+                    }
+                  }
                 }
               } 
                 
@@ -1028,7 +1035,7 @@ Sample.hot = {
       cells: function (row, col, prop) {
         var cellProperties = {};
         
-        if (Sample.hot.hotTable.getData()[row].saved) {
+        if (Sample.hot.hotTable.getSourceData()[row].saved) {
           cellProperties.readOnly = true;
         }
         

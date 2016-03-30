@@ -186,7 +186,7 @@ public class SampleControllerHelperService {
                 news.setReceivedDate(date);
               }
 
-              if (!isStringEmptyOrNull(j.getString("note"))) {
+              if (j.has("note") && !isStringEmptyOrNull(j.getString("note"))) {
                 Note note = new Note();
                 note.setOwner(sp.getOwner());
                 note.setText(j.getString("note"));
