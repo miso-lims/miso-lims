@@ -12092,7 +12092,22 @@ function Autofill(instance) {
     wtOnCellMouseOver(event, coords, TD, wt);
   };
   this.instance.view.wt.wtSettings.settings.onCellCornerDblClick = function() {
-    instance.autofill.selectAdjacent();
+    // adds autofill for object-based source data as well as built-in autofill for array-based source data
+    if (instance.getSourceData()[0] instanceof Array) {
+      instance.autofill.selectAdjacent();
+    } else {
+      // hack
+      var autofillValue = instance.getValue();
+      var selectedIndices = instance.getSelected();
+      var selectedCell = instance.getCellMeta(selectedIndices[0], selectedIndices[1]);
+      var rowIndex = selectedCell.row;
+      var selectedProp = selectedCell.prop;
+      var numRows = instance.countRenderedRows();
+      // start at one row below selected cell and fill in everything below that
+      for (var i = rowIndex + 1; i < numRows; i++) {
+        instance.setDataAtRowProp(i, selectedProp, autofillValue);
+      }
+    }
   };
 }
 Autofill.prototype.init = function() {
