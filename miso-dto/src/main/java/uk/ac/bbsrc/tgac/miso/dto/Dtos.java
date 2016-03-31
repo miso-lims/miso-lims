@@ -228,6 +228,7 @@ public class Dtos {
     dto.setUpdatedById(from.getUpdatedBy().getUserId());
     dto.setLastUpdated(dateTimeFormatter.print(from.getLastUpdated().getTime()));
     dto.setTubeNumber(from.getTubeNumber());
+    dto.setStrStatus(from.getStrStatus().getLabel());
     return dto;
   }
 
@@ -245,6 +246,7 @@ public class Dtos {
     to.setTimesReceived(from.getTimesReceived());
     to.setTubeNumber(from.getTubeNumber());
     to.setConcentration(from.getConcentration());
+    to.setStrStatus(from.getStrStatus());
     return to;
   }
 

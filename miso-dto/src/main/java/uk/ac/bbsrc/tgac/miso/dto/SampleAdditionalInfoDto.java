@@ -33,6 +33,7 @@ public class SampleAdditionalInfoDto {
   private String lastUpdated;
   private Long labId;
   private String labUrl;
+  private String strStatus;
 
   public Long getId() {
     return id;
@@ -256,6 +257,14 @@ public class SampleAdditionalInfoDto {
 
   public void setLabUrl(String labUrl) {
     this.labUrl = labUrl;
+  }
+
+  public String getStrStatus() {
+    return strStatus;
+  }
+
+  public void setStrStatus(String strStatus) {
+    this.strStatus = strStatus;
   }
 
 }

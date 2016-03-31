@@ -129,7 +129,7 @@ public class SampleAdditionalInfoController extends RestController {
   @ResponseBody
   public ResponseEntity<?> createSampleAdditionalInfo(@RequestBody SampleAdditionalInfoDto sampleAdditionalInfoDto, UriComponentsBuilder b,
       HttpServletResponse response) throws IOException {
-    SampleAdditionalInfo sampleAdditionalInfo = Dtos.to(sampleAdditionalInfoDto);
+    SampleAdditionalInfo sampleAdditionalInfo = to(sampleAdditionalInfoDto);
     Long id = sampleAdditionalInfoService.create(sampleAdditionalInfo, sampleAdditionalInfoDto.getSampleId(),
         sampleAdditionalInfoDto.getTissueOriginId(), sampleAdditionalInfoDto.getTissueTypeId(),
         sampleAdditionalInfoDto.getQcPassedDetailId(), sampleAdditionalInfoDto.getSubprojectId(), sampleAdditionalInfoDto.getPrepKitId(),
@@ -144,7 +144,7 @@ public class SampleAdditionalInfoController extends RestController {
   @ResponseBody
   public ResponseEntity<?> updateSampleAdditionalInfo(@PathVariable("id") Long id,
       @RequestBody SampleAdditionalInfoDto sampleAdditionalInfoDto, HttpServletResponse response) throws IOException {
-    SampleAdditionalInfo sampleAdditionalInfo = Dtos.to(sampleAdditionalInfoDto);
+    SampleAdditionalInfo sampleAdditionalInfo = to(sampleAdditionalInfoDto);
     sampleAdditionalInfo.setSampleAdditionalInfoId(id);
     sampleAdditionalInfoService.update(sampleAdditionalInfo, sampleAdditionalInfoDto.getTissueOriginId(),
         sampleAdditionalInfoDto.getTissueTypeId(), sampleAdditionalInfoDto.getQcPassedDetailId(), sampleAdditionalInfoDto.getPrepKitId(),
@@ -157,6 +157,16 @@ public class SampleAdditionalInfoController extends RestController {
   public ResponseEntity<?> deleteSampleAdditionalInfo(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
     sampleAdditionalInfoService.delete(id);
     return new ResponseEntity<>(HttpStatus.OK);
+  }
+  
+  private SampleAdditionalInfo to(SampleAdditionalInfoDto dto) {
+    try {
+      return Dtos.to(dto);
+    } catch (IllegalArgumentException e) {
+      RestException re = new RestException(e.getLocalizedMessage(), e);
+      re.setStatus(Status.BAD_REQUEST);
+      throw re;
+    }
   }
 
 }

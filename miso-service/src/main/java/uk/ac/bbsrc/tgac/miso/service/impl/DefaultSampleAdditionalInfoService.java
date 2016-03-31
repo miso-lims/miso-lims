@@ -240,6 +240,7 @@ public class DefaultSampleAdditionalInfoService implements SampleAdditionalInfoS
     updatedSampleAdditionalInfo.setTubeNumber(sampleAdditionalInfo.getTubeNumber());
     updatedSampleAdditionalInfo.setConcentration(sampleAdditionalInfo.getConcentration());
     updatedSampleAdditionalInfo.setArchived(sampleAdditionalInfo.getArchived());
+    updatedSampleAdditionalInfo.setStrStatus(sampleAdditionalInfo.getStrStatus());
     User user = authorizationManager.getCurrentUser();
     updatedSampleAdditionalInfo.setUpdatedBy(user);
     sampleAdditionalInfoDao.update(updatedSampleAdditionalInfo);

@@ -129,7 +129,6 @@ public class EditSampleController {
 
   public Map<String, Sample> getAdjacentSamplesInGroup(Sample s, @RequestParam(value = "entityGroupId", required = true) Long entityGroupId)
       throws IOException {
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     Project p = s.getProject();
     EntityGroup<? extends Nameable, Sample> sgroup = (EntityGroup<? extends Nameable, Sample>) requestManager
         .getEntityGroupById(entityGroupId);
@@ -164,7 +163,6 @@ public class EditSampleController {
 
   public Map<String, Sample> getAdjacentSamplesInProject(Sample s, @RequestParam(value = "projectId", required = false) Long projectId)
       throws IOException {
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     Project p = s.getProject();
     Sample prevS = null;
     Sample nextS = null;
@@ -196,7 +194,6 @@ public class EditSampleController {
 
   public Collection<Project> populateProjects(@RequestParam(value = "projectId", required = false) Long projectId) throws IOException {
     try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       if (projectId != null) {
         Collection<Project> ps = new ArrayList<Project>();
         for (Project p : requestManager.listAllProjects()) {
@@ -469,4 +466,5 @@ public class EditSampleController {
       throw ex;
     }
   }
+  
 }

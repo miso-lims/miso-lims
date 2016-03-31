@@ -76,6 +76,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
  */
 @MappedSuperclass
 public abstract class AbstractSample extends AbstractBoxable implements Sample {
+  
   protected static final Logger log = LoggerFactory.getLogger(AbstractSample.class);
   public static final Long UNSAVED_ID = 0L;
 
