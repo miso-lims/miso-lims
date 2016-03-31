@@ -429,7 +429,6 @@
 	    </div>
 	    <div>
 	      <button id="makeTable" class="disabled" disabled="true" onclick="Sample.hot.checkForExistingHOT();">Make Table</button>
-	      <button id="rerender" class="disabled" disabled="true" onclick="Sample.hot.hotTable.render();">Readjust Table View</button>
 	    </div>
 	  </div>
 	  <div class="floatleft rightfloatleft">

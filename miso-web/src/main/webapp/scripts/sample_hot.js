@@ -216,8 +216,6 @@ Sample.hot = {
     var button = (Sample.hot.detailedSample ? document.getElementById('saveDetailed') : document.getElementById('savePlain'));
     button.disabled = false;
     button.classList.remove('disabled');
-    document.getElementById('rerender').disabled = false;
-    document.getElementById('rerender').classList.remove('disabled');
   },
   
  startData: [{
@@ -381,7 +379,7 @@ Sample.hot = {
             firstDay: 0,
             numberOfMonths: 1
           },
-          validator: permitEmpty
+          allowEmpty: true
         },{
           header: 'Sample Type',
           data: 'sampleType',
@@ -665,14 +663,14 @@ Sample.hot = {
   
   getIdFromLabValue: function (aliasComposite, labCollection) {
     return labCollection.filter(function (lab) {
-      // labsDtos was changed above to include instituteAlias as property on each lab
+      // labsDtos was processed at an earlier step to include instituteAlias as property on each lab
       return lab.alias +" - "+ lab.instituteAlias == aliasComposite;
     })[0].id;
   },
   
   getIdFromSGComposite: function (sgComposite, sgCollection) {
     var sgByProject = sgCollection.filter(function (group) { return group.projectId == Sample.hot.selectedProjectId; });
-    // sgComposite is "[groupId] - [description]"
+    // samplegroupComposite is "[groupId] - [description]"
     var array = sgComposite.split(/\s\W\s/);
     sgByProject.filter(function (group) {
       return (group.groupId == array[0] && group.description == array[1]);
@@ -681,37 +679,36 @@ Sample.hot = {
   
   getRootSampleClassId: function () {
     return Sample.hot.sampleOptions.sampleClassesDtos.filter(function (sampleClass) {
-      // TODO: make this configurable
+      // TODO: make this configurable in case an institute wants a root sample class with a different name
       return sampleClass.alias == 'Identity'; 
     })[0].id;
   },
   
   buildSampleDtosFromData: function (obj) {
     var sample = {};
-    // TODO: check for empty strings
     
     // add SampleDto attributes
-    sample.description = obj.description;
+    sample.description = obj.description || '';
     sample.identificationBarcode = obj.identificationBarcode;
-    sample.locationBarcode = obj.locationBarcode;
     sample.sampleType = obj.sampleType;
     sample.qcPassed = '';
     sample.alias = obj.alias;
     sample.projectId = parseInt(document.getElementById('projectSelect').value);
     sample.scientificName = obj.scientificName;
     if (obj.receivedDate && obj.receivedDate.length) {
-      // TODO: care about datetimes
+      // this time string is added because the server is expecting a datetime value
       sample.receivedDate = obj.receivedDate + "T00:00:00-05:00";
     }
     
-    // if it's a plain sample, return now. // TODO: add QCs up here
+    // if it's a plain sample, return now.
     if (!Sample.hot.detailedSample) {
       return sample;
     }
 
     sample.rootSampleClassId = this.getRootSampleClassId();
     
-    // add sampleIdentity attributes. TODO: fix this up later to account for samples parented to other samples
+    // add sampleIdentity attributes. 
+    // TODO: change this later to account for samples parented to other samples (add parentId instead of sampleIdentity)
     sample.sampleIdentity = {
         externalName: obj.externalName
     };
@@ -804,6 +801,7 @@ Sample.hot = {
     var responseText = JSON.parse(xhr.responseText);
     var allColumnData = Sample.hot.getValues('data', Sample.hot.colConf);
     if (responseText.data && responseText.data.constraintName) {
+      // if a column's constraint was violated, extract it here
       var column = responseText.data.constraintName;
       var columnIndex = allColumnData.indexOf(column);
     }
@@ -813,7 +811,7 @@ Sample.hot = {
       Sample.hot.hotTable.setCellMeta(rowIndex, columnIndex, 'valid', false);
       Sample.hot.hotTable.render();
     }
-    // TODO: return something more useful?
+    // process error message if it was a SQL violation
     var reUserMessage = /could not execute .*?: (.*)/;
     messages.failed.push("Row "+ (rowIndex + 1) +": "+ responseText.detail.replace(reUserMessage, "$1")); 
     
@@ -843,8 +841,10 @@ Sample.hot = {
       return false;
     }
     
+    // reset error messages
+    Sample.hot.messages.failed = [];
+    
     // if last row is empty, remove it before validation
-    // TODO: make behaviour more sensical
     var tableData = Sample.hot.startData;
     while (Sample.hot.startData.length > 1 && Sample.hot.hotTable.isEmptyRow(tableData.length - 1)) {
       Sample.hot.hotTable.alter('remove_row', parseInt(tableData.length - 1), keepEmptyRows = false);
@@ -863,13 +863,12 @@ Sample.hot = {
         alias: null,
       }];
       Sample.hot.hotTable.render();
+      Sample.hot.hotTable.validateCells();
       return false;
     }
     
     this.hotTable.validateCells(function (isValid) { 
-      // ensure validateCells callback is only executed once per save
       if (isValid) {
-        runValidationCallbackOnce += 1;
         // check for sampleValidRelationship
         // TODO: make parentClassId configurable
         var parentClassId = Sample.hot.getRootSampleClassId();
@@ -904,6 +903,7 @@ Sample.hot = {
         }
       } else {
         Sample.hot.addAnyErrors(Sample.hot.messages);
+        Sample.hot.hotTable.validateCells();
         return false;
       }
     });
@@ -917,6 +917,8 @@ Sample.hot = {
       return false;
     }
     
+    // reset error messages
+    Sample.hot.messages.failed = [];
     
     // if last row is empty, remove it before validation
     var tableData = Sample.hot.startData;
@@ -937,6 +939,7 @@ Sample.hot = {
         alias: null,
       }];
       Sample.hot.hotTable.render();
+      Sample.hot.hotTable.validateCells();
       return false;
     }
     
@@ -1063,8 +1066,10 @@ Sample.hot = {
         ary.push("<li>"+ messages.failed[i] +"</li>");
       }
       ary.push("</ul>");
+      errorMessages.innerHTML = '';
       errorMessages.innerHTML = ary.join('');
       document.getElementById('saveErrors').classList.remove('hidden');
+      Sample.hot.hotTable.validateCells();
       return false;
     } else {
       document.getElementById('saveErrors').classList.add('hidden');
