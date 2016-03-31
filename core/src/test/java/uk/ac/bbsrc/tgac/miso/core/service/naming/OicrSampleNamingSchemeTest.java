@@ -1,7 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.core.service.naming;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -18,18 +17,28 @@ public class OicrSampleNamingSchemeTest {
   }
 
   @Test
-  public void test_alias() throws Exception {
-    assertThat(sut.validateField("alias", "BART_1273_Br_P_nn_1-1_D"), is(true));
+  public void testValidIdentityAlias() throws Exception {
+    assertTrue(sut.validateField("alias", "PROJ_1234"));
   }
-
+  
   @Test
-  public void test_alias_with_aliquot() throws Exception {
-    assertThat(sut.validateField("alias", "BART_1273_Br_P_nn_1-1_D_4"), is(true));
+  public void testValidTissueAlias() throws Exception {
+    assertTrue(sut.validateField("alias", "PROJ_1234_nn_n_nn_1-1"));
+    assertTrue(sut.validateField("alias", "PROJ_1234_Br_P_32_1-1"));
   }
-
+  
   @Test
-  public void test_alias_with_stock_aliquot() throws Exception {
-    assertThat(sut.validateField("alias", "BART_1273_Br_P_nn_1-1_D_S3"), is(true));
+  public void testValidTissueProcessingAlias() throws Exception {
+    assertTrue(sut.validateField("alias", "PROJ_1234_nn_n_nn_1-1_CV01"));
+  }
+  
+  @Test
+  public void testValidAnalyteAlias() throws Exception {
+    assertTrue(sut.validateField("alias", "PROJ_1234_nn_n_nn_1-1_D_S1"));
+    assertTrue(sut.validateField("alias", "PROJ_1234_nn_n_nn_1-1_R_S1"));
+    assertTrue(sut.validateField("alias", "PROJ_1234_nn_n_nn_1-1_D_1"));
+    assertTrue(sut.validateField("alias", "PROJ_1234_nn_n_nn_1-1_R_1"));
+    assertTrue(sut.validateField("alias", "PROJ_1234_nn_n_nn_1-1_R_1_SM_1"));
   }
 
 }

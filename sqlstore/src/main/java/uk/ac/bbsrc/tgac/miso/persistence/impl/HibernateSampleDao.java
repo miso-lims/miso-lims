@@ -68,8 +68,6 @@ public class HibernateSampleDao implements SampleDao, SampleStore {
 
   private LibraryStore libraryDao;
 
-  private MisoNamingScheme<Sample> namingScheme;
-
   private NoteStore noteDao;
 
   private SampleQcStore sampleQcDao;
@@ -86,6 +84,30 @@ public class HibernateSampleDao implements SampleDao, SampleStore {
 
   @Autowired
   private CacheManager cacheManager;
+  
+  @Autowired
+  private MisoNamingScheme<Sample> sampleNamingScheme;
+
+  public MisoNamingScheme<Sample> getSampleNamingScheme() {
+    return sampleNamingScheme;
+  }
+
+  public void setSampleNamingScheme(MisoNamingScheme<Sample> sampleNamingScheme) {
+    this.sampleNamingScheme = sampleNamingScheme;
+  }
+
+  @Autowired
+  private MisoNamingScheme<Sample> namingScheme;
+
+  @Override
+  public MisoNamingScheme<Sample> getNamingScheme() {
+    return namingScheme;
+  }
+
+  @Override
+  public void setNamingScheme(MisoNamingScheme<Sample> namingScheme) {
+    this.namingScheme = namingScheme;
+  }
 
   @Transactional(propagation = Propagation.MANDATORY)
   @Override
@@ -93,23 +115,11 @@ public class HibernateSampleDao implements SampleDao, SampleStore {
     // We can't generate the name until we have the ID and we don't have an ID until we start the persistence. So, we assign a temporary
     // name.
     sample.setName(generateTemporaryName());
+    if (sample.getAlias() == null) {
+      sample.setAlias(generateTemporaryName());
+    }
+    generateSiblingNumberIfRequired(sample);
     long id = (Long) currentSession().save(sample);
-
-    sessionFactory.getCurrentSession().doWork(new Work() {
-
-      @Override
-      public void execute(Connection connection) throws SQLException {
-        try {
-          if (!namingScheme.allowDuplicateEntityNameFor("alias") && aliasExists(sample.getAlias())) {
-            // Size is greater than 1, since we've just added this to the db under a temporary name.
-            throw new IOException(String.format("NEW: A sample with this alias '%s' already exists in the database", sample.getAlias()));
-          }
-        } catch (IOException e) {
-          throw new SQLException(e);
-        }
-
-      }
-    });
 
     if (sample.getSecurityProfile() != null) {
       sessionFactory.getCurrentSession().doWork(new Work() {
@@ -127,20 +137,51 @@ public class HibernateSampleDao implements SampleDao, SampleStore {
     }
 
     sample.setId(id);
+    
     updateParentSampleNameIfRequired(sample);
-
+    updateSampleAliasIfRequired(sample);
     String name = namingScheme.generateNameFor("name", sample);
     sample.setName(name);
 
-    if (namingScheme.validateField("name", sample.getName()) && namingScheme.validateField("alias", sample.getAlias())) {
+    if (sampleNamingScheme.validateField("name", sample.getName()) && sampleNamingScheme.validateField("alias", sample.getAlias())) {
       if (autoGenerateIdentificationBarcodes) {
         autoGenerateIdBarcode(sample);
       } // if !autoGenerateIdentificationBarcodes then the identificationBarcode is set by the user
     }
 
     currentSession().update(sample);
+    
+    sessionFactory.getCurrentSession().doWork(new Work() {
+
+      @Override
+      public void execute(Connection connection) throws SQLException {
+        try {
+          if (!sampleNamingScheme.allowDuplicateEntityNameFor("alias") && aliasExists(sample.getAlias())) {
+            // Size is greater than 1, since we've just added this to the db under a temporary name.
+            throw new IOException(String.format("NEW: A sample with this alias '%s' already exists in the database", sample.getAlias()));
+          }
+        } catch (IOException e) {
+          throw new SQLException(e);
+        }
+
+      }
+    });
     persistSqlStore(sample);
     return id;
+  }
+  
+  private void generateSiblingNumberIfRequired(Sample sample) {
+    if (sample.getSampleAdditionalInfo() != null && sample.getParent() != null) {
+      Query query = currentSession().createQuery("select max(siblingNumber) "
+          + "from SampleAdditionalInfoImpl "
+          + "where parentId = :parentId "
+          + "and sampleClassId = :sampleClassId");
+      query.setLong("parentId", sample.getParent().getId());
+      query.setLong("sampleClassId", sample.getSampleAdditionalInfo().getSampleClass().getSampleClassId());
+      Number result = ((Number) query.uniqueResult());
+      int siblingNumber = result == null ? 1 : result.intValue() + 1;
+      sample.getSampleAdditionalInfo().setSiblingNumber(siblingNumber);
+    }
   }
 
   @VisibleForTesting
@@ -150,6 +191,13 @@ public class HibernateSampleDao implements SampleDao, SampleStore {
         && child.getParent().getId() > Sample.UNSAVED_ID) {
       String name = namingScheme.generateNameFor("name", child.getSampleAdditionalInfo().getParent());
       child.getSampleAdditionalInfo().getParent().setName(name);
+    }
+  }
+  
+  private void updateSampleAliasIfRequired(Sample sample) throws MisoNamingException {
+    if (hasTemporaryAlias(sample) && sample.getId() > Sample.UNSAVED_ID) {
+      String alias = sampleNamingScheme.generateNameFor("alias", sample);
+      sample.setAlias(alias);
     }
   }
 
@@ -271,11 +319,6 @@ public class HibernateSampleDao implements SampleDao, SampleStore {
 
   public LibraryStore getLibraryDao() {
     return libraryDao;
-  }
-
-  @Override
-  public MisoNamingScheme<Sample> getNamingScheme() {
-    return namingScheme;
   }
 
   public NoteStore getNoteDao() {
@@ -475,11 +518,6 @@ public class HibernateSampleDao implements SampleDao, SampleStore {
     this.libraryDao = libraryDao;
   }
 
-  @Override
-  public void setNamingScheme(MisoNamingScheme<Sample> namingScheme) {
-    this.namingScheme = namingScheme;
-  }
-
   public void setNoteDao(NoteStore noteDao) {
     this.noteDao = noteDao;
   }
@@ -535,5 +573,9 @@ public class HibernateSampleDao implements SampleDao, SampleStore {
       result = sample.getName().startsWith(TEMPORARY_NAME_PREFIX);
     }
     return result;
+  }
+  
+  static public boolean hasTemporaryAlias(Sample sample) {
+    return sample.getAlias().startsWith(TEMPORARY_NAME_PREFIX);
   }
 }

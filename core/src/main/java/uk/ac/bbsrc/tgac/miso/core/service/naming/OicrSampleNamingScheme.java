@@ -6,10 +6,11 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sourceforge.fluxion.spi.ServiceProvider;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.sourceforge.fluxion.spi.ServiceProvider;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
@@ -19,8 +20,14 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 public class OicrSampleNamingScheme implements RequestManagerAwareNamingScheme<Sample> {
   protected static final Logger log = LoggerFactory.getLogger(OicrSampleNamingScheme.class);
 
-  public static final String NAME_REGEX = "([A-Z]{3})([0-9]+)";
-  public static final String ALIAS_REGEX = "([A-Z\\d]{3,5})_([0-9]{3,4}|[0-9][CR][0-9]{1,2})_(nn|[A-Z]{1}[a-z]{1})_([nRPXMCFETO])_(nn|\\d{2})_(\\d{1,2})-(\\d{1,2})_(D|R)(_S?\\d{1,2})?";
+  private static final String IDENTITY_REGEX_PART = "([A-Z\\d]{3,5})_(\\d{3,5})";
+  private static final String TISSUE_ORIGIN_REGEX = "(Ad|Ap|Ag|Bm|Bn|Br|Bu|Cb|Cn|Du|Es|Fs|Gb|Hr|Ki|Le|Li|Ln|Lu|Lv|Lx|Ly|Md|Me|Nk|Oc|Om|Ov|Pa|Pb|Pr|Sa|Si|Sk|Sm|Sp|St|Ta|Tr|Mu|Wm|nn)";
+  private static final String TISSUE_TYPE_REGEX = "[BRPXMCFESATOn]";
+  private static final String TISSUE_REGEX_PART = TISSUE_ORIGIN_REGEX+"_"+TISSUE_TYPE_REGEX+"_(nn|\\d{2})_(\\d{1,2})-(\\d{1,2})";
+  private static final String ANALYTE_REGEX_PART = "(C|CV|HE|LCM|D_S|R_S|D_|R_(\\d+_(MR|SM|WT)_)?)\\d+";
+  
+  public static final String NAME_REGEX = "^([A-Z]{3})([0-9]+)";
+  public static final String ALIAS_REGEX = "^" + IDENTITY_REGEX_PART + "(_" + TISSUE_REGEX_PART + "(_" + ANALYTE_REGEX_PART  + ")?)?$";
 
   private final Map<String, Boolean> allowDuplicateMap = new HashMap<String, Boolean>();
   private final Map<String, Pattern> validationMap = new HashMap<String, Pattern>();
@@ -55,7 +62,7 @@ public class OicrSampleNamingScheme implements RequestManagerAwareNamingScheme<S
 
   @Override
   public String getSchemeName() {
-    return OicrSampleNamingScheme.class.getSimpleName();
+    return "OicrSampleNamingScheme";
   }
 
   @Override
@@ -67,7 +74,8 @@ public class OicrSampleNamingScheme implements RequestManagerAwareNamingScheme<S
         return customName;
       } else {
         throw new MisoNamingException("Custom naming generator '" + sng.getGeneratorName() + "' supplied for Sample field '" + fieldName
-            + "' generated an invalid name according to the validation scheme '" + validationMap.get(fieldName) + "'");
+            + "' generated an invalid name according to the validation scheme '" + validationMap.get(fieldName) + "' (generated name: " 
+            + customName + ")");
       }
     } else {
       if ("alias".equals(fieldName)) {

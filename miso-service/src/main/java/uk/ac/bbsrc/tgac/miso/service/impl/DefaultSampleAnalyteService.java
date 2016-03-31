@@ -143,8 +143,6 @@ public class DefaultSampleAnalyteService implements SampleAnalyteService {
   public void applyChanges(SampleAnalyte target, SampleAnalyte source) throws IOException {
     target.setRegion(source.getRegion());
     target.setTubeId(source.getTubeId());
-    target.setStockNumber(source.getStockNumber());
-    target.setAliquotNumber(source.getAliquotNumber());
     target.setStrStatus(source.getStrStatus());
     loadMembers(target, source);
   }

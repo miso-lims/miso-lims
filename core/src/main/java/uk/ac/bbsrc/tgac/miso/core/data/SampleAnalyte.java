@@ -41,14 +41,6 @@ public interface SampleAnalyte {
 
   void setTubeId(String tubeId);
 
-  Integer getStockNumber();
-
-  void setStockNumber(Integer stockNumber);
-
-  Integer getAliquotNumber();
-
-  void setAliquotNumber(Integer aliquotNumber);
-
   User getCreatedBy();
 
   void setCreatedBy(User createdBy);
