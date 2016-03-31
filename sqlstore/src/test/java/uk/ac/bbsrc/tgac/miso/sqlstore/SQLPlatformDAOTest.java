@@ -83,9 +83,9 @@ import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
     private SQLPlatformDAO dao;
 
     // Auto-increment sequence doesn't roll back with transactions, so must be tracked
-    // There are 25 Platforms created during migrations, so this is the next id.
+    // There are 32 Platforms created during migrations, so this is the next id.
     // This will have to be changed if new Platforms are added during migrations.
-    private static long nextAutoIncrementId = 26L;
+    private static long nextAutoIncrementId = 33L;
     
     @Before
     public void setup() throws IOException {
