@@ -51,20 +51,23 @@
 <div id="maincontent">
 <div id="contentcolumn">
 
-<h1>Edit Samples</h1>
-
-<script type="text/javascript">
-  jQuery(document).ready(function () {
-    var Sample.hot.samples = ${samples};
-  })
-</script>
-
-<body>
+	<h1>Edit Samples</h1>
+	
+	<script type="text/javascript">
+	  jQuery(document).ready(function () {
+	    var Sample.hot.samples = ${samples} ;
+	  });
+	</script>
+	
+	<div>
     <c:forEach items="${samples}" var="sample">
-        <h1>${sample.name}<h1>
-        id: ${sample.id}
+        <h2>${sample.name}</h2>
+        <p>id: ${sample.id}</p>
     </c:forEach>
-</body>
+	</div>
+
+</div>
+</div>
 <%@ include file="adminsub.jsp" %>
 
 <%@ include file="../footer.jsp" %>
