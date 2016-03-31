@@ -4156,6 +4156,7 @@ public class FormUtils {
             pool.setPlatformType(pt);
             pool.setReadyToRun(true);
             pool.setCreationDate(new Date());
+            pool.setLastModifier(u);
             if (getCellValueAsString(poolConvertedMolarityCell) != null) {
               pool.setConcentration(poolConvertedMolarityCell.getNumericCellValue());
             } else {
