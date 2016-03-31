@@ -49,8 +49,6 @@ public class SampleAnalyteImpl implements SampleAnalyte {
 
   private String region;
   private String tubeId;
-  private Integer stockNumber;
-  private Integer aliquotNumber;
 
   @OneToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "createdBy", nullable = false)
@@ -137,26 +135,6 @@ public class SampleAnalyteImpl implements SampleAnalyte {
   }
 
   @Override
-  public Integer getStockNumber() {
-    return stockNumber;
-  }
-
-  @Override
-  public void setStockNumber(Integer stockNumber) {
-    this.stockNumber = stockNumber;
-  }
-
-  @Override
-  public Integer getAliquotNumber() {
-    return aliquotNumber;
-  }
-
-  @Override
-  public void setAliquotNumber(Integer aliquotNumber) {
-    this.aliquotNumber = aliquotNumber;
-  }
-
-  @Override
   public User getCreatedBy() {
     return createdBy;
   }
@@ -216,8 +194,7 @@ public class SampleAnalyteImpl implements SampleAnalyte {
     return "SampleAnalyteImpl [sampleId=" + sampleId + ", sample=" + sample
         + ", samplePurpose=" + samplePurpose + ", sampleGroup=" + sampleGroup
         + ", tissueMaterial=" + tissueMaterial + ", strStatus=" + strStatus
-        + ", region=" + region + ", tubeId=" + tubeId + ", stockNumber="
-        + stockNumber + ", aliquotNumber=" + aliquotNumber + ", createdBy="
+        + ", region=" + region + ", tubeId=" + tubeId + ", createdBy="
         + createdBy + ", creationDate=" + creationDate + ", updatedBy="
         + updatedBy + ", lastUpdated=" + lastUpdated + "]";
   }

@@ -17,8 +17,6 @@ public class SampleAnalyteDto {
 
   private String region;
   private String tubeId;
-  private Integer stockNumber;
-  private Integer aliquotNumber;
   private String strStatus;
 
   private Long createdById;
@@ -154,22 +152,6 @@ public class SampleAnalyteDto {
 
   public void setTubeId(String tubeId) {
     this.tubeId = tubeId;
-  }
-
-  public Integer getStockNumber() {
-    return stockNumber;
-  }
-
-  public void setStockNumber(Integer stockNumber) {
-    this.stockNumber = stockNumber;
-  }
-
-  public Integer getAliquotNumber() {
-    return aliquotNumber;
-  }
-
-  public void setAliquotNumber(Integer aliquotNumber) {
-    this.aliquotNumber = aliquotNumber;
   }
 
   public Long getTissueMaterialId() {

@@ -114,4 +114,16 @@ public interface SampleAdditionalInfo {
    */
   Long getHibernateKitDescriptorId();
 
+  /**
+   * @return the number of this Sample amongst Samples of the same SampleClass sharing the same parent 
+   */
+  Integer getSiblingNumber();
+  
+  /**
+   * Specifies the number of this Sample amongst Samples of the same SampleClass sharing the same parent
+   * 
+   * @param siblingNumber
+   */
+  void setSiblingNumber(Integer siblingNumber);
+
 }
