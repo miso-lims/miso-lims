@@ -88,21 +88,21 @@ Print.ui = {
 
       jQuery('#printerTable tr:first').append("<th>Printable Entity</th><th>Available</th><th></th>");
 
-      jQuery('printerTable').insertRow(1);
+      jQuery('#printerTable')[0].insertRow(1);
 
-      var column1 = jQuery('printerTable').rows[1].insertCell(-1);
+      var column1 = jQuery('#printerTable')[0].rows[1].insertCell(-1);
       column1.innerHTML = "<input id='serviceName' name='serviceName' type='text'/>";
-      var column2 = jQuery('printerTable').rows[1].insertCell(-1);
+      var column2 = jQuery('#printerTable')[0].rows[1].insertCell(-1);
       column2.innerHTML = "<i>Set in context fields</i>";
-      var column3 = jQuery('printerTable').rows[1].insertCell(-1);
+      var column3 = jQuery('#printerTable')[0].rows[1].insertCell(-1);
       column3.innerHTML = "<select id='contexts' name='context' onchange='Print.ui.getContextFieldsForContext(this)'>" +json.contexts+ "</select><br/><div id='contextFields' name='contextFields'/>";
-      var column4 = jQuery('printerTable').rows[1].insertCell(-1);
+      var column4 = jQuery('#printerTable')[0].rows[1].insertCell(-1);
       column4.innerHTML = "<select id='barcodableSchemas' name='printSchema'>" +json.barcodableSchemas+ "</select>";
-      var column5 = jQuery('printerTable').rows[1].insertCell(-1);
+      var column5 = jQuery('#printerTable')[0].rows[1].insertCell(-1);
       column5.innerHTML = "<select id='barcodables' name='printServiceFor'>" +json.barcodables+ "</select>";
-      var column6 = jQuery('printerTable').rows[1].insertCell(-1);
+      var column6 = jQuery('#printerTable')[0].rows[1].insertCell(-1);
       column6.innerHTML = "<div id='available'></div>";
-      var column7 = jQuery('printerTable').rows[1].insertCell(-1);
+      var column7 = jQuery('#printerTable')[0].rows[1].insertCell(-1);
       column7.id = "addTd";
       column7.innerHTML = "Add";
     }
@@ -136,7 +136,7 @@ Print.ui = {
 
 Print.service = {
   validatePrinter : function(t) {
-    jQuery('available').innerHTML="<div align='center'><img src='../../styles/images/ajax-loader.gif'/></div>";
+    jQuery('#available')[0].innerHTML="<div align='center'><img src='../../styles/images/ajax-loader.gif'/></div>";
 
     if (t.value != t.lastValue) {
       if (t.timer) {
@@ -149,13 +149,13 @@ Print.service = {
           'checkPrinterAvailability',
           {'host':t.value, 'url':ajaxurl},
           {"doOnSuccess": function(json) {
-            jQuery('available').innerHTML = json.html;
+            jQuery('#available')[0].innerHTML = json.html;
             if (json.html == "OK") {
-              jQuery('available').setAttribute("style", "background-color:green");
-              jQuery('addTd').innerHTML = "<a href='javascript:void(0);' onclick='Print.service.addPrinterService();'/>Add</a>";
+              jQuery('#available')[0].setAttribute("style", "background-color:green");
+              jQuery('#addTd')[0].innerHTML = "<a href='javascript:void(0);' onclick='Print.service.addPrinterService();'/>Add</a>";
             }
             else {
-              jQuery('available').setAttribute("style", "background-color:red");
+              jQuery('#available')[0].setAttribute("style", "background-color:red");
             }
           }
         });

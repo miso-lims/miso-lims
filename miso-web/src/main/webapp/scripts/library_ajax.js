@@ -130,24 +130,24 @@ Library.qc = {
     if (!jQuery('#libraryQcTable').attr("qcInProgress")) {
       jQuery('#libraryQcTable').attr("qcInProgress", "true");
 
-      jQuery('libraryQcTable').insertRow(1);
+      jQuery('#libraryQcTable')[0].insertRow(1);
       //QCId  QCed By  	QC Date  	Method  	Results
 
       if (includeId) {
-        var column1 = jQuery('libraryQcTable').rows[1].insertCell(-1);
+        var column1 = jQuery('#libraryQcTable')[0].rows[1].insertCell(-1);
         column1.innerHTML = "<input type='hidden' id='libraryId' name='libraryId' value='" + libraryId + "'/>";
       }
-      var column2 = jQuery('libraryQcTable').rows[1].insertCell(-1);
-      column2.innerHTML = "<input id='libraryQcUser' name='libraryQcUser' type='hidden' value='" + jQuery('currentUser').innerHTML + "'/>" + jQuery('currentUser').innerHTML;
-      var column3 = jQuery('libraryQcTable').rows[1].insertCell(-1);
+      var column2 = jQuery('#libraryQcTable')[0].rows[1].insertCell(-1);
+      column2.innerHTML = "<input id='libraryQcUser' name='libraryQcUser' type='hidden' value='" + jQuery('#currentUser')[0].innerHTML + "'/>" + jQuery('#currentUser')[0].innerHTML;
+      var column3 = jQuery('#libraryQcTable')[0].rows[1].insertCell(-1);
       column3.innerHTML = "<input id='libraryQcDate' name='libraryQcDate' type='text'/>";
-      var column4 = jQuery('libraryQcTable').rows[1].insertCell(-1);
+      var column4 = jQuery('#libraryQcTable')[0].rows[1].insertCell(-1);
       column4.innerHTML = "<select id='libraryQcType' name='libraryQcType' onchange='Library.qc.changeLibraryQcUnits(this);'/>";
-      var column5 = jQuery('libraryQcTable').rows[1].insertCell(-1);
+      var column5 = jQuery('#libraryQcTable')[0].rows[1].insertCell(-1);
       column5.innerHTML = "<input id='libraryQcResults' name='libraryQcResults' type='text'/><span id='units'/>";
-      var column6 = jQuery('libraryQcTable').rows[1].insertCell(-1);
+      var column6 = jQuery('#libraryQcTable')[0].rows[1].insertCell(-1);
       column6.innerHTML = "<input id='libraryQcInsertSize' name='libraryQcInsertSize' type='text'/> bp";
-      var column7 = jQuery('libraryQcTable').rows[1].insertCell(-1);
+      var column7 = jQuery('#libraryQcTable')[0].rows[1].insertCell(-1);
       column7.innerHTML = "<a href='javascript:void(0);' onclick='Library.qc.addLibraryQC();'/>Add</a>";
 
       Utils.ui.addMaxDatePicker("libraryQcDate", 0);
@@ -232,19 +232,19 @@ Library.dilution = {
     if (!jQuery('#libraryDilutionTable').attr("dilutionInProgress")) {
       jQuery('#libraryDilutionTable').attr("dilutionInProgress", "true");
 
-      jQuery('libraryDilutionTable').insertRow(1);
+      jQuery('#libraryDilutionTable')[0].insertRow(1);
       //dilutionId    Done By   Dilution Date Barcode Results
-      var column1 = jQuery('libraryDilutionTable').rows[1].insertCell(-1);
+      var column1 = jQuery('#libraryDilutionTable')[0].rows[1].insertCell(-1);
       column1.innerHTML = "<input id='name' name='name' type='hidden' value='Unsaved '/>Unsaved";
-      var column2 = jQuery('libraryDilutionTable').rows[1].insertCell(-1);
-      column2.innerHTML = "<input id='libraryDilutionCreator' name='libraryDilutionCreator' type='hidden' value='" + jQuery('currentUser').innerHTML + "'/>" + jQuery('currentUser').innerHTML;
-      var column3 = jQuery('libraryDilutionTable').rows[1].insertCell(-1);
+      var column2 = jQuery('#libraryDilutionTable')[0].rows[1].insertCell(-1);
+      column2.innerHTML = "<input id='libraryDilutionCreator' name='libraryDilutionCreator' type='hidden' value='" + jQuery('#currentUser')[0].innerHTML + "'/>" + jQuery('#currentUser')[0].innerHTML;
+      var column3 = jQuery('#libraryDilutionTable')[0].rows[1].insertCell(-1);
       column3.innerHTML = "<input id='libraryDilutionDate' name='libraryDilutionDate' type='text'/>";
-      var column6 = jQuery('libraryDilutionTable').rows[1].insertCell(-1);
+      var column6 = jQuery('#libraryDilutionTable')[0].rows[1].insertCell(-1);
       column6.innerHTML = "<input id='libraryDilutionResults' name='libraryDilutionResults' type='text'/>";
-      var column7 = jQuery('libraryDilutionTable').rows[1].insertCell(-1);
+      var column7 = jQuery('#libraryDilutionTable')[0].rows[1].insertCell(-1);
       column7.innerHTML = "<i>Generated on save</i>";
-      var column8 = jQuery('libraryDilutionTable').rows[1].insertCell(-1);
+      var column8 = jQuery('#libraryDilutionTable')[0].rows[1].insertCell(-1);
       column8.innerHTML = "<a href='javascript:void(0);' onclick='Library.dilution.addLibraryDilution();'/>Add</a>";
 
       Utils.ui.addMaxDatePicker("libraryDilutionDate", 0);
@@ -321,17 +321,17 @@ Library.empcr = {
     if (!jQuery('#emPcrTable').attr("pcrInProgress")) {
       jQuery('#emPcrTable').attr("pcrInProgress", "true");
 
-      jQuery('emPcrTable').insertRow(1);
+      jQuery('#emPcrTable')[0].insertRow(1);
 
-      var column2 = jQuery('emPcrTable').rows[1].insertCell(-1);
+      var column2 = jQuery('#emPcrTable')[0].rows[1].insertCell(-1);
       column2.innerHTML = "" + dilutionId + " <input type='hidden' id='dilutionId' name='dilutionId' value='" + dilutionId + "'/>";
-      var column3 = jQuery('emPcrTable').rows[1].insertCell(-1);
-      column3.innerHTML = "<input id='emPcrCreator' name='emPcrCreator' type='hidden' value='" + jQuery('currentUser').innerHTML + "'/>" + jQuery('currentUser').innerHTML;
-      var column4 = jQuery('emPcrTable').rows[1].insertCell(-1);
+      var column3 = jQuery('#emPcrTable')[0].rows[1].insertCell(-1);
+      column3.innerHTML = "<input id='emPcrCreator' name='emPcrCreator' type='hidden' value='" + jQuery('#currentUser')[0].innerHTML + "'/>" + jQuery('#currentUser')[0].innerHTML;
+      var column4 = jQuery('#emPcrTable')[0].rows[1].insertCell(-1);
       column4.innerHTML = "<input id='emPcrDate' name='emPcrDate' type='text'/>";
-      var column5 = jQuery('emPcrTable').rows[1].insertCell(-1);
+      var column5 = jQuery('#emPcrTable')[0].rows[1].insertCell(-1);
       column5.innerHTML = "<input id='emPcrResults' name='emPcrResults' type='text'/>";
-      var column6 = jQuery('emPcrTable').rows[1].insertCell(-1);
+      var column6 = jQuery('#emPcrTable')[0].rows[1].insertCell(-1);
       column6.innerHTML = "<a href='javascript:void(0);' onclick='Library.empcr.addEmPcr();'/>Add</a>";
 
       Utils.ui.addMaxDatePicker("emPcrDate", 0);
@@ -364,17 +364,17 @@ Library.empcr = {
     if (!jQuery('#emPcrDilutionTable').attr("dilutionInProgress")) {
       jQuery('#emPcrDilutionTable').attr("dilutionInProgress", "true");
 
-      jQuery('emPcrDilutionTable').insertRow(1);
+      jQuery('#emPcrDilutionTable')[0].insertRow(1);
 
-      var column2 = jQuery('emPcrDilutionTable').rows[1].insertCell(-1);
+      var column2 = jQuery('#emPcrDilutionTable')[0].rows[1].insertCell(-1);
       column2.innerHTML = "" + emPcrId + " <input type='hidden' id='emPcrId' name='emPcrId' value='" + emPcrId + "'/>";
-      var column3 = jQuery('emPcrDilutionTable').rows[1].insertCell(-1);
-      column3.innerHTML = "<input id='emPcrDilutionCreator' name='emPcrDilutionCreator' type='hidden' value='" + jQuery('currentUser').innerHTML + "'/>" + jQuery('currentUser').innerHTML;
-      var column4 = jQuery('emPcrDilutionTable').rows[1].insertCell(-1);
+      var column3 = jQuery('#emPcrDilutionTable')[0].rows[1].insertCell(-1);
+      column3.innerHTML = "<input id='emPcrDilutionCreator' name='emPcrDilutionCreator' type='hidden' value='" + jQuery('#currentUser')[0].innerHTML + "'/>" + jQuery('#currentUser')[0].innerHTML;
+      var column4 = jQuery('#emPcrDilutionTable')[0].rows[1].insertCell(-1);
       column4.innerHTML = "<input id='emPcrDilutionDate' name='emPcrDilutionDate' type='text'/>";
-      var column6 = jQuery('emPcrDilutionTable').rows[1].insertCell(-1);
+      var column6 = jQuery('#emPcrDilutionTable')[0].rows[1].insertCell(-1);
       column6.innerHTML = "<input id='emPcrDilutionResults' name='emPcrDilutionResults' type='text'/>";
-      var column7 = jQuery('emPcrDilutionTable').rows[1].insertCell(-1);
+      var column7 = jQuery('#emPcrDilutionTable')[0].rows[1].insertCell(-1);
       column7.innerHTML = "<a href='javascript:void(0);' onclick='Library.empcr.addEmPcrDilution();'/>Add</a>";
 
       Utils.ui.addMaxDatePicker("emPcrDilutionDate", 0);

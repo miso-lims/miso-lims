@@ -137,26 +137,26 @@ Run.qc = {
     if (!jQuery('#runQcTable').attr("qcInProgress")) {
       jQuery('#runQcTable').attr("qcInProgress", "true");
 
-      jQuery('runQcTable').insertRow(1);
+      jQuery('#runQcTable')[0].insertRow(1);
 
       if (includeId) {
-        var column1 = jQuery('runQcTable').rows[1].insertCell(-1);
+        var column1 = jQuery('#runQcTable')[0].rows[1].insertCell(-1);
         column1.innerHTML = "<input type='hidden' id='runId' name='runId' value='" + json.runId + "'/>";
       }
 
-      var column2 = jQuery('runQcTable').rows[1].insertCell(-1);
+      var column2 = jQuery('#runQcTable')[0].rows[1].insertCell(-1);
       column2.innerHTML = "<select id='runQcUser' name='runQcUser'>" + json.qcUserOptions + "</select>";
-      var column3 = jQuery('runQcTable').rows[1].insertCell(-1);
+      var column3 = jQuery('#runQcTable')[0].rows[1].insertCell(-1);
       column3.innerHTML = "<input id='runQcDate' name='runQcDate' type='text'/>";
-      var column4 = jQuery('runQcTable').rows[1].insertCell(-1);
+      var column4 = jQuery('#runQcTable')[0].rows[1].insertCell(-1);
       column4.innerHTML = "<select id='runQcType' name='runQcType'/>";
-      var column5 = jQuery('runQcTable').rows[1].insertCell(-1);
+      var column5 = jQuery('#runQcTable')[0].rows[1].insertCell(-1);
       column5.innerHTML = "<div id='runQcProcessSelection' name='runQcProcessSelection'/>";
-      var column6 = jQuery('runQcTable').rows[1].insertCell(-1);
+      var column6 = jQuery('#runQcTable')[0].rows[1].insertCell(-1);
       column6.innerHTML = "<input id='runQcInformation' name='runQcInformation' type='text'/>";
-      var column7 = jQuery('runQcTable').rows[1].insertCell(-1);
+      var column7 = jQuery('#runQcTable')[0].rows[1].insertCell(-1);
       column7.innerHTML = "<input id='runQcDoNotProcess' name='runQcDoNotProcess' type='checkbox'/>";
-      var column8 = jQuery('runQcTable').rows[1].insertCell(-1);
+      var column8 = jQuery('#runQcTable')[0].rows[1].insertCell(-1);
       column8.innerHTML = "<a href='javascript:void(0);' onclick='Run.qc.addRunQC(this);'/>Add</a>";
 
       Utils.ui.addMaxDatePicker("runQcDate", 0);

@@ -33,8 +33,6 @@
 <script src="<c:url value='/scripts/datatables_utils.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/natural_sort.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
 
-<script src="<c:url value='/scripts/stats_ajax.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
-
 <script type="text/javascript" src="<c:url value='/scripts/parsley/parsley.min.js'/>"></script>
 
 <div id="maincontent">
