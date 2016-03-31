@@ -54,6 +54,7 @@ public class SampleImpl extends AbstractSample implements Serializable {
    */
   public SampleImpl() {
     setSecurityProfile(new SecurityProfile());
+    setSecurityProfileId(getSecurityProfile().getProfileId());
   }
 
   /**
@@ -64,6 +65,7 @@ public class SampleImpl extends AbstractSample implements Serializable {
    */
   public SampleImpl(User user) {
     setSecurityProfile(new SecurityProfile(user));
+    setSecurityProfileId(getSecurityProfile().getProfileId());
   }
 
   /**
@@ -79,10 +81,12 @@ public class SampleImpl extends AbstractSample implements Serializable {
     if (project.userCanRead(user)) {
       setProject(project);
       setSecurityProfile(project.getSecurityProfile());
+      setSecurityProfileId(getSecurityProfile().getProfileId());
     } else {
       log.error(String.format("User %s does not have permission to read Project %s. Unable to create Sample.", user.getFullName(),
           project.getAlias()));
       setSecurityProfile(new SecurityProfile(user));
+      setSecurityProfileId(getSecurityProfile().getProfileId());
     }
   }
 
