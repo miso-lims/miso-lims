@@ -29,8 +29,13 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.store.SecurityStore;
 import com.google.common.annotations.VisibleForTesting;
 
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
+import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
@@ -40,6 +45,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleDao;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
@@ -77,6 +83,9 @@ public class HibernateSampleDao implements SampleDao, SampleStore {
 
   @Autowired
   private JdbcTemplate template;
+
+  @Autowired
+  private CacheManager cacheManager;
 
   @Transactional(propagation = Propagation.MANDATORY)
   @Override
@@ -401,6 +410,9 @@ public class HibernateSampleDao implements SampleDao, SampleStore {
    * Write all the non-Hibernate data from a Sample that aren't persisted manually in the controllers.
    */
   private void persistSqlStore(Sample sample) throws IOException {
+    Cache cache = cacheManager == null ? null : cacheManager.getCache(LimsUtils.noddyCamelCaseify(Project.class.getSimpleName()) + "Cache");
+    if (cache != null) cache.remove(DbUtils.hashCodeCacheKeyFor(sample.getProject().getId()));
+
     // Now we have to persist all the things that aren't covered by Hibernate. Turns out, just notes.
 
     for (Note n : sample.getNotes()) {
