@@ -867,6 +867,10 @@ Sample.hot = {
       return false;
     }
     
+    // disable the save button
+    var button = document.getElementById('saveDetailed');
+    if (button) button.classList.add('disabled');
+    
     this.hotTable.validateCells(function (isValid) { 
       if (isValid) {
         // check for sampleValidRelationship
@@ -942,6 +946,10 @@ Sample.hot = {
       Sample.hot.hotTable.validateCells();
       return false;
     }
+    
+    // disable the save button
+    var button = document.getElementById('savePlain');
+    if (button) button.classList.remove('disabled');
     
     this.hotTable.validateCells(function (isValid) {
       if (isValid) {
@@ -1050,7 +1058,6 @@ Sample.hot = {
   addAnyErrors: function (messages) {
     console.log(messages);
     Sample.hot.makeSavedRowsReadOnly();
-    Sample.hot.hotTable.render();
     if (messages.success.length) {
       var successMessage = "Successfully saved " + messages.success.length + " out of " + (messages.success.length + messages.failed.length) + " samples.";
       document.getElementById('successMessages').innerHTML = successMessage;
@@ -1058,6 +1065,10 @@ Sample.hot = {
     } else {
       document.getElementById('saveSuccesses').classList.add('hidden');
     }
+    
+    Sample.hot.hotTable.render();
+    var button = document.getElementById('saveDetailed') || document.getElementById('savePlain');
+    if (button) button.classList.remove('disabled');
     
     if (messages.failed.length) {
       var errorMessages = document.getElementById('errorMessages');
