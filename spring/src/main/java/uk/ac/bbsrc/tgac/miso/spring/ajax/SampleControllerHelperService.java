@@ -779,7 +779,7 @@ public class SampleControllerHelperService {
         JSONArray inner = new JSONArray();
         String identificationBarcode = sample.getIdentificationBarcode();
 
-        inner.add("<input type=\"checkbox\" value=\"" + sample.getId() + "\" name=\"bulkCheckbox\" id=\"bulk" + "_" + sample.getId() + "\">");
+        inner.add("<input type=\"checkbox\" value=\"" + sample.getId() + "\" class=\"bulkCheckbox\" id=\"bulk" + "_" + sample.getId() + "\">");
         inner.add(TableHelper.hyperLinkify("/miso/sample/" + sample.getId(), sample.getName()));
         inner.add(TableHelper.hyperLinkify("/miso/sample/" + sample.getId(), sample.getAlias()));
         inner.add(sample.getSampleType());

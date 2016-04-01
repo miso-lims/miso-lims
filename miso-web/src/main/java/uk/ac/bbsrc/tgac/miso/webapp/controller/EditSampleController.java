@@ -50,7 +50,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
@@ -454,10 +453,8 @@ public class EditSampleController {
     JSONArray ids = JSONArray.fromObject(json.get("ids"));
     StringBuffer stringBuffer = new StringBuffer();
     for (int i = 0; i < ids.size(); ++i) {
+      if (i > 0) stringBuffer.append(",");
       stringBuffer.append(ids.getLong(i));
-      if (i + 1 < ids.size()) {
-        stringBuffer.append(",");
-      }
     }
     return "redirect:/miso/sample/bulk/edit/" + stringBuffer.toString();
   }

@@ -760,52 +760,59 @@ Sample.ui = {
       {
         'url': ajaxurl
       },
-      {'doOnSuccess': function (json) {
-        jQuery('#listingSamplesTable').html('');
-        jQuery('#listingSamplesTable').dataTable({
-          "aaData": json.array,
-          "aoColumns": [
-            { "sTitle": "Bulk Edit"},
-            { "sTitle": "Sample Name", "sType": "no-sam"},
-            { "sTitle": "Alias"},
-            { "sTitle": "Type"},
-            { "sTitle": "QC Passed"},
-            { "sTitle": "QC Result"},
-            { "sTitle": "ID", "bVisible": false}
-          ],
-          "bJQueryUI": true,
-          "bAutoWidth": false,
-          "iDisplayLength": 25,
-          "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>',
-          "aaSorting": [
-            [0, "desc"]
-          ]
-        });
-        jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
-        jQuery("#toolbar").append("<button style=\"margin-left:5px;\" onclick=\"window.location.href='/miso/sample/new';\" class=\"fg-button ui-state-default ui-corner-all\">Add Sample</button>");
-
-        jQuery("input[name='bulkCheckbox']").click(function () {
-          if (jQuery(this).parent().parent().hasClass('row_selected')) {
-            jQuery(this).parent().parent().removeClass('row_selected');
-          } else if (!jQuery(this).parent().parent().hasClass('row_selected')) {
-            jQuery(this).parent().parent().addClass('row_selected');
-          }
-        });
-
-        jQuery("#listingSamplesTable").append("<button style=\"margin-left:0px;\" id=\"editBtn\" class=\"fg-button ui-state-default ui-corner-all\">Bulk Edit</button>");
-
-        jQuery("#editBtn").click(function() {
-          var ids = '';
-          jQuery("input[name=bulkCheckbox]").each( function (index) {
-            if (this.checked) {
-              if (ids != '') { ids = ids + ',';}
-              ids = ids + jQuery(this).val();
+      {
+        'doOnSuccess': function (json) {
+          jQuery('#listingSamplesTable').html('');
+          jQuery('#listingSamplesTable').dataTable({
+            "aaData": json.array,
+            "aoColumns": [
+              { "sTitle": "Bulk Edit"},
+              { "sTitle": "Sample Name", "sType": "no-sam"},
+              { "sTitle": "Alias"},
+              { "sTitle": "Type"},
+              { "sTitle": "QC Passed"},
+              { "sTitle": "QC Result"},
+              { "sTitle": "ID", "bVisible": false}
+            ],
+            "bJQueryUI": true,
+            "bAutoWidth": false,
+            "iDisplayLength": 25,
+            "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>',
+            "aaSorting": [
+              [0, "desc"]
+            ]
+          });
+          jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
+          jQuery("#toolbar").append("<button style=\"margin-left:5px;\" onclick=\"window.location.href='/miso/sample/new';\" class=\"fg-button ui-state-default ui-corner-all\">Add Sample</button>");
+  
+          jQuery("input[name='bulkCheckbox']").click(function () {
+            if (jQuery(this).parent().parent().hasClass('row_selected')) {
+              jQuery(this).parent().parent().removeClass('row_selected');
+            } else if (!jQuery(this).parent().parent().hasClass('row_selected')) {
+              jQuery(this).parent().parent().addClass('row_selected');
             }
           });
-          window.location="sample/bulk/edit/" + ids;
-        });
-      }
+  
+          var editButton = "<button id=\"editBtn\" class=\"fg-button ui-state-default ui-corner-all\" onclick=\"Sample.ui.bulkEditSelectedItems()\">Bulk Edit</button>"
+          jQuery("#listingSamplesTable").append(editButton);
+        }
       }
     );
+  },
+  
+  bulkEditSelectedItems: function () {
+    var selectedIdsArray = Sample.ui.getSelectedIds();
+    if (selectedIdsArray.length === 0) {
+      alert("Please select one or more Samples to bulk edit.");
+      return false;
+    }
+    window.location="sample/bulk/edit/" + selectedIdsArray.join(',');
+  },
+  
+  // get array of selected IDs
+  getSelectedIds: function () {
+    return [].slice.call(document.getElementsByClassName('bulkCheckbox'))
+             .filter(function (input) { return input.checked; })
+             .map(function (input) { return input.value; });
   }
 };
