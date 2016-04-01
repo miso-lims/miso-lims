@@ -38,10 +38,12 @@ public class SampleTissueController extends RestController {
   @Autowired
   private SampleTissueService sampleTissueService;
 
-  private static SampleTissueDto writeUrls(SampleTissueDto sampleTissueDto, UriComponentsBuilder uriBuilder) {
+  public static SampleTissueDto writeUrls(SampleTissueDto sampleTissueDto, UriComponentsBuilder uriBuilder) {
     URI baseUri = uriBuilder.build().toUri();
     sampleTissueDto.setUrl(
-        UriComponentsBuilder.fromUri(baseUri).path("/rest/sample/tissue/{id}").buildAndExpand(sampleTissueDto.getId()).toUriString());
+        UriComponentsBuilder.fromUri(baseUri).path("/rest/sample/tissue/{id}").buildAndExpand(sampleTissueDto.getSampleId()).toUriString());
+    sampleTissueDto.setSampleUrl(
+        UriComponentsBuilder.fromUri(baseUri).path("/rest/sample/{id}").buildAndExpand(sampleTissueDto.getSampleId()).toUriString());
     sampleTissueDto.setCreatedByUrl(
         UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}").buildAndExpand(sampleTissueDto.getCreatedById()).toUriString());
     sampleTissueDto.setUpdatedByUrl(
@@ -94,7 +96,7 @@ public class SampleTissueController extends RestController {
   public ResponseEntity<?> updateSampleTissue(@PathVariable("id") Long id, @RequestBody SampleTissueDto sampleTissueDto,
       UriComponentsBuilder uriBuilder) throws IOException {
     SampleTissue sampleTissue = Dtos.to(sampleTissueDto);
-    sampleTissue.setSampleTissueId(id);
+    sampleTissue.setSampleId(id);
     getSampleTissueService().update(sampleTissue);
     return new ResponseEntity<>(HttpStatus.OK);
   }

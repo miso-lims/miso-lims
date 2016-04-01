@@ -5,6 +5,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Set;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -117,7 +118,7 @@ public class DefaultSampleService implements SampleService {
           String number = sampleNumberPerProjectService.nextNumber(sample.getProject());
           String internalName = sample.getProject().getAlias() + "_" + number;
           sample.getIdentity().setInternalName(internalName);
-
+          
           SampleClass rootSampleClass = sampleClassDao.getSampleClass(sampleDto.getRootSampleClassId());
           ServiceUtils.throwIfNull(rootSampleClass, "rootSampleClassId", sampleDto.getRootSampleClassId());
           SampleAdditionalInfoDto sampleAdditionalInfoDto = new SampleAdditionalInfoDto();
@@ -128,7 +129,8 @@ public class DefaultSampleService implements SampleService {
               .scientificName("Identity").name(HibernateSampleDao.generateTemporaryName()).alias(internalName)
               .rootSampleClass(rootSampleClass).identity(sample.getIdentity()).sampleAdditionalInfo(sampleAdditionalInfo)
               .sampleTissue(sample.getSampleTissue()).build();
-
+          setChangeDetails(identitySample, true);
+          
           sample.setParent(identitySample);
         }
       } else {
@@ -144,6 +146,7 @@ public class DefaultSampleService implements SampleService {
         .receivedDate(sample.getReceivedDate()).qcPassed(sample.getQcPassed()).name(HibernateSampleDao.generateTemporaryName())
         .alias(sample.getAlias()).taxonIdentifier(sample.getTaxonIdentifier()).parent(sample.getParent())
         .sampleTissue(sample.getSampleTissue()).volume(sample.getVolume()).build();
+    setChangeDetails(newSample, true);
 
     if (!LimsUtils.isValidRelationship(sampleValidRelationships, newSample.getParent(), newSample)) {
       throw new IllegalArgumentException("Parent " + newSample.getParent().getSampleAdditionalInfo().getSampleClass().getAlias()
@@ -162,6 +165,45 @@ public class DefaultSampleService implements SampleService {
       // Send the nested root cause message to the user, since it contains the actual error.
       throw new ConstraintViolationException(e.getMessage() + " " + ExceptionUtils.getRootCauseMessage(e), e.getSQLException(),
           e.getConstraintName());
+    }
+  }
+  
+  private void setChangeDetails(Sample sample, boolean setCreated) throws IOException {
+    User user = authorizationManager.getCurrentUser();
+    Date now = new Date();
+    sample.setLastModifier(user);
+    sample.setLastUpdated(now);
+    if (sample.getSampleAdditionalInfo() != null) {
+      if (setCreated) {
+        sample.getSampleAdditionalInfo().setCreatedBy(user);
+        sample.getSampleAdditionalInfo().setCreationDate(now);
+      }
+      sample.getSampleAdditionalInfo().setUpdatedBy(user);
+      sample.getSampleAdditionalInfo().setLastUpdated(now);
+    }
+    if (sample.getIdentity() != null) {
+      if (setCreated) {
+        sample.getIdentity().setCreatedBy(user);
+        sample.getIdentity().setCreationDate(now);
+      }
+      sample.getIdentity().setUpdatedBy(user);
+      sample.getIdentity().setLastUpdated(now);
+    }
+    if (sample.getSampleTissue() != null) {
+      if (setCreated) {
+        sample.getSampleTissue().setCreatedBy(user);
+        sample.getSampleTissue().setCreationDate(now);
+      }
+      sample.getSampleTissue().setUpdatedBy(user);
+      sample.getSampleTissue().setLastUpdated(now);
+    }
+    if (sample.getSampleAnalyte() != null) {
+      if (setCreated) {
+        sample.getSampleAnalyte().setCreatedBy(user);
+        sample.getSampleAnalyte().setCreationDate(now);
+      }
+      sample.getSampleAnalyte().setUpdatedBy(user);
+      sample.getSampleAnalyte().setLastUpdated(now);
     }
   }
 
@@ -187,9 +229,6 @@ public class DefaultSampleService implements SampleService {
     if (sampleDto.getSampleAnalyte() != null) {
       sample.setSampleAnalyte(sampleAnalyteService.to(sampleDto.getSampleAnalyte()));
     }
-    if (sampleDto.getSampleAdditionalInfo() != null) {
-      sample.setSampleAdditionalInfo(sampleAdditionalInfoService.to(sampleDto.getSampleAdditionalInfo()));
-    }
     if (sampleDto.getSampleTissue() != null) {
       sample.setSampleTissue(sampleTissueService.to(sampleDto.getSampleTissue()));
     }
@@ -208,9 +247,20 @@ public class DefaultSampleService implements SampleService {
     updatedSample.setTaxonIdentifier(sample.getTaxonIdentifier());
     updatedSample.setAlias(sample.getAlias());
     updatedSample.setDescription(sample.getDescription());
-    updatedSample.setSampleAdditionalInfo(sample.getSampleAdditionalInfo());
-    updatedSample.setSampleAnalyte(sample.getSampleAnalyte());
-
+    if (updatedSample.getSampleAdditionalInfo() != null) {
+      sampleAdditionalInfoService.applyChanges(updatedSample.getSampleAdditionalInfo(), sample.getSampleAdditionalInfo());
+      if (updatedSample.getIdentity() != null) {
+        identityService.applyChanges(updatedSample.getIdentity(), sample.getIdentity());
+      }
+      if (updatedSample.getSampleTissue() != null) {
+        sampleTissueService.applyChanges(updatedSample.getSampleTissue(), sample.getSampleTissue());
+      }
+      if (updatedSample.getSampleAnalyte() != null) {
+        sampleAnalyteService.applyChanges(updatedSample.getSampleAnalyte(), sample.getSampleAnalyte());
+      }
+    }
+    
+    setChangeDetails(updatedSample, false);
     // Check for parent and valid relationship.
 
     sampleDao.update(updatedSample);

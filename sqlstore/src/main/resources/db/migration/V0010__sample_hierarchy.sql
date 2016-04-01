@@ -41,15 +41,13 @@ CREATE TABLE `TissueType` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `Identity` (
-  `identityId` bigint(20) NOT NULL AUTO_INCREMENT,
-  `sampleId` bigint(20) NOT NULL,
+  `sampleId` bigint(20) PRIMARY KEY,
   `internalName` varchar(255) NOT NULL,
   `externalName` varchar(255) NOT NULL,
   `createdBy` bigint(20) NOT NULL,
   `creationDate` datetime NOT NULL,
   `updatedBy` bigint(20) NOT NULL,
   `lastUpdated` datetime NOT NULL,
-  PRIMARY KEY (`identityId`),
   UNIQUE KEY `UK_ew7ogw2mxhcs9d6ncgelgyh9t` (`internalName`),
   KEY `FKauqylg2sle5eudy0tqabtlmsb` (`createdBy`),
   KEY `FKa11fikh6ktu2cn1qbgudb2st6` (`sampleId`),
@@ -58,9 +56,6 @@ CREATE TABLE `Identity` (
   CONSTRAINT `FKa8c6e56hg9iucguhr0dcse62h` FOREIGN KEY (`updatedBy`) REFERENCES `User` (`userId`),
   CONSTRAINT `FKauqylg2sle5eudy0tqabtlmsb` FOREIGN KEY (`createdBy`) REFERENCES `User` (`userId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-ALTER TABLE Sample ADD COLUMN `identityId` BIGINT (20) DEFAULT NULL after taxonIdentifier;
-ALTER TABLE Sample ADD FOREIGN KEY (identityId) REFERENCES Identity (identityId);
 
 CREATE TABLE `Subproject` (
   `subprojectId` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -141,8 +136,7 @@ CREATE TABLE `Lab` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `SampleAdditionalInfo` (
-  `sampleAdditionalInfoId` bigint(20) NOT NULL AUTO_INCREMENT,
-  `sampleId` bigint(20) NOT NULL,
+  `sampleId` bigint(20) PRIMARY KEY,
   `sampleClassId` bigint(20) NOT NULL,
   `tissueOriginId` bigint(20) DEFAULT NULL,
   `tissueTypeId` bigint(20) DEFAULT NULL,
@@ -159,7 +153,6 @@ CREATE TABLE `SampleAdditionalInfo` (
   `creationDate` datetime NOT NULL,
   `updatedBy` bigint(20) NOT NULL,
   `lastUpdated` datetime NOT NULL,
-  PRIMARY KEY (`sampleAdditionalInfoId`),
   KEY `FKeutn2473w3yr16khgalspuviw` (`createdBy`),
   KEY `FKa2t38wms0eer896xo4fw76tw0` (`qcPassedDetailId`),
   KEY `FKd4g1h1n50bflt9a2v2pgr0jn` (`sampleId`),
@@ -236,8 +229,7 @@ CREATE TABLE `SampleGroup` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `SampleAnalyte` (
-  `sampleAnalyteId` bigint(20) NOT NULL AUTO_INCREMENT,
-  `sampleId` bigint(20) NOT NULL,
+  `sampleId` bigint(20) PRIMARY KEY,
   `samplePurposeId` bigint(20) DEFAULT NULL,
   `sampleGroupId` bigint(20) DEFAULT NULL,
   `tissueMaterialId` bigint(20) DEFAULT NULL,
@@ -249,7 +241,6 @@ CREATE TABLE `SampleAnalyte` (
   `creationDate` datetime NOT NULL,
   `updatedBy` bigint(20) NOT NULL,
   `lastUpdated` datetime NOT NULL,
-  PRIMARY KEY (`sampleAnalyteId`),
   KEY `FKpras819b6p7vh12xbeovne8o0` (`createdBy`),
   KEY `FKe6n6a5x04km19m5376iaah9gy` (`sampleId`),
   KEY `FKmirq92ew3h3732cexgqdeyehk` (`sampleGroupId`),
@@ -264,23 +255,7 @@ CREATE TABLE `SampleAnalyte` (
   CONSTRAINT `FKprqyhv40bntjrf5l64mjdgl1j` FOREIGN KEY (`updatedBy`) REFERENCES `User` (`userId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
-ALTER TABLE Sample ADD COLUMN `sampleAnalyteId` BIGINT (20) DEFAULT NULL after identityId;
-ALTER TABLE Sample ADD FOREIGN KEY (sampleAnalyteId) REFERENCES SampleAnalyte (sampleAnalyteId);
-
-ALTER TABLE Sample ADD COLUMN `sampleAdditionalInfoId` BIGINT (20) DEFAULT NULL after sampleAnalyteId;
-ALTER TABLE Sample ADD FOREIGN KEY (sampleAdditionalInfoId) REFERENCES SampleAdditionalInfo (sampleAdditionalInfoId);
-
-CREATE TABLE `SampleHierarchy` (
-  `parentId` bigint(20) NOT NULL,
-  `childId` bigint(20) NOT NULL,
-  PRIMARY KEY (`parentId`,`childId`),
-  UNIQUE KEY `UK_a5jwa184bxpj7fm7bf7yqpmhh` (`childId`),
-  CONSTRAINT `FKdw2ithwf37a42xbbr98fqx91h` FOREIGN KEY (`childId`) REFERENCES `Sample` (`sampleId`),
-  CONSTRAINT `FKrw8dmp9ac7ikylmqup276vmf8` FOREIGN KEY (`parentId`) REFERENCES `Sample` (`sampleId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-ALTER TABLE Sample ADD COLUMN `parentId` BIGINT (20) DEFAULT NULL after sampleAdditionalInfoId;
+ALTER TABLE Sample ADD COLUMN `parentId` BIGINT (20) DEFAULT NULL;
 ALTER TABLE Sample ADD FOREIGN KEY (parentId) REFERENCES Sample (sampleId);
 
 CREATE TABLE `SampleNumberPerProject` (
@@ -321,8 +296,7 @@ CREATE TABLE `SampleValidRelationship` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `SampleTissue` (
-  `sampleTissueId` bigint(20) PRIMARY KEY AUTO_INCREMENT,
-  `sampleId` bigint(20) NOT NULL,
+  `sampleId` bigint(20) PRIMARY KEY,
   `instituteTissueName` varchar(255),
   `cellularity` int,
   `createdBy` bigint(20) NOT NULL,
@@ -333,9 +307,6 @@ CREATE TABLE `SampleTissue` (
   CONSTRAINT `sampleTissue_createUser_fkey` FOREIGN KEY (`createdBy`) REFERENCES `User` (`userId`),
   CONSTRAINT `sampleTissue_updateUser_fkey` FOREIGN KEY (`updatedBy`) REFERENCES `User` (`userId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-ALTER TABLE Sample ADD COLUMN `sampleTissueId` BIGINT (20) DEFAULT NULL after sampleAnalyteId;
-ALTER TABLE Sample ADD FOREIGN KEY (sampleTissueId) REFERENCES SampleTissue (sampleTissueId);
 
 CREATE TABLE `LibraryAdditionalInfo` (
   `libraryAdditionalInfoId` bigint(20) PRIMARY KEY AUTO_INCREMENT,

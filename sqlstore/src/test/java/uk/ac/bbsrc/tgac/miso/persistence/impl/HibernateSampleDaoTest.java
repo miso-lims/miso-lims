@@ -1,26 +1,63 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
+import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import com.eaglegenomics.simlims.core.SecurityProfile;
+import com.eaglegenomics.simlims.core.store.SecurityStore;
+
+import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.DefaultSampleNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
+import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
+import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
+import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
+import uk.ac.bbsrc.tgac.miso.core.store.SampleQcStore;
+import uk.ac.bbsrc.tgac.miso.core.store.Store;
 
-public class HibernateSampleDaoTest {
+public class HibernateSampleDaoTest extends AbstractDAOTest {
 
+  @Autowired
+  private SessionFactory sessionFactory;
+  
+  @Mock
+  private SecurityStore securityDAO;
+  @Mock
+  private Store<SecurityProfile> securityProfileDAO;
+  @Mock
+  private ChangeLogStore changeLogDAO;
+  @Mock
+  private ProjectStore projectStore;
+  @Mock
+  private LibraryStore libraryStore;
+  @Mock
+  private SampleQcStore sampleQCStore;
+  @Mock
+  private NoteStore noteStore;
+
+  @InjectMocks
   private HibernateSampleDao sut;
 
   @Before
   public void setUp() throws Exception {
-    sut = new HibernateSampleDao();
+    MockitoAnnotations.initMocks(this);
     sut.setNamingScheme(new DefaultSampleNamingScheme());
+    sut.setSessionFactory(sessionFactory);
   }
 
   @Test
@@ -91,6 +128,13 @@ public class HibernateSampleDaoTest {
     Sample sample = null;
     assertFalse("A null sample object does not contain a temporary name so must return false.",
         HibernateSampleDao.hasTemporaryName(sample));
+  }
+  
+  @Test
+  public void getSampleWithChildrenTest() throws Exception {
+    Sample sample = sut.get(15L);
+    assertNotNull(sample.getChildren());
+    assertEquals(2,sample.getChildren().size());
   }
 
 }

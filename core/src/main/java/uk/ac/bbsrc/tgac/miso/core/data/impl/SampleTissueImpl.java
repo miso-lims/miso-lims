@@ -4,10 +4,9 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.MapsId;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
@@ -21,11 +20,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 public class SampleTissueImpl implements SampleTissue {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long sampleTissueId;
+  private Long sampleId;
 
   @OneToOne(targetEntity = SampleImpl.class)
   @JoinColumn(name = "sampleId", nullable = false)
+  @MapsId
   private Sample sample;
 
   private String instituteTissueName;
@@ -116,18 +115,18 @@ public class SampleTissueImpl implements SampleTissue {
   }
 
   @Override
-  public Long getSampleTissueId() {
-    return sampleTissueId;
+  public Long getSampleId() {
+    return sampleId;
   }
 
   @Override
-  public void setSampleTissueId(Long sampleTissueId) {
-    this.sampleTissueId = sampleTissueId;
+  public void setSampleId(Long sampleId) {
+    this.sampleId = sampleId;
   }
 
   @Override
   public String toString() {
-    return "SampleTissueImpl [id=" + sampleTissueId + ", sample=" + sample + ", instituteTissueName=" + instituteTissueName
+    return "SampleTissueImpl [sampleId=" + sampleId + ", sample=" + sample + ", instituteTissueName=" + instituteTissueName
         + ", cellularity=" + cellularity + ", createdBy=" + createdBy + ", creationDate=" + creationDate + ", updatedBy=" + updatedBy
         + ", lastUpdated=" + lastUpdated + "]";
   }

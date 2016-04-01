@@ -4,10 +4,9 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.MapsId;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
@@ -24,11 +23,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 public class SampleAnalyteImpl implements SampleAnalyte {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long sampleAnalyteId;
+  private Long sampleId;
 
   @OneToOne(targetEntity = SampleImpl.class)
   @JoinColumn(name = "sampleId", nullable = false)
+  @MapsId
   private Sample sample;
 
   @OneToOne(targetEntity = SamplePurposeImpl.class)
@@ -63,13 +62,13 @@ public class SampleAnalyteImpl implements SampleAnalyte {
   private Date lastUpdated;
 
   @Override
-  public Long getSampleAnalyteId() {
-    return sampleAnalyteId;
+  public Long getSampleId() {
+    return sampleId;
   }
 
   @Override
-  public void setSampleAnalyteId(Long sampleAnalyteId) {
-    this.sampleAnalyteId = sampleAnalyteId;
+  public void setSampleId(Long sampleId) {
+    this.sampleId = sampleId;
   }
 
   @Override
@@ -194,7 +193,7 @@ public class SampleAnalyteImpl implements SampleAnalyte {
 
   @Override
   public String toString() {
-    return "SampleAnalyteImpl [sampleAnalyteId=" + sampleAnalyteId + ", sample=" + sample + ", samplePurpose=" + samplePurpose
+    return "SampleAnalyteImpl [sampleAnalyteId=" + sampleId + ", sample=" + sample + ", samplePurpose=" + samplePurpose
         + ", sampleGroup=" + sampleGroup + ", tissueMaterial=" + tissueMaterial + ", region=" + region + ", tubeId=" + tubeId
         + ", stockNumber=" + stockNumber + ", aliquotNumber=" + aliquotNumber + ", createdBy=" + createdBy + ", creationDate="
         + creationDate + ", updatedBy=" + updatedBy + ", lastUpdated=" + lastUpdated + "]";

@@ -99,7 +99,7 @@ public class SQLSampleDAOTest extends AbstractDAOTest {
   public void testListAll() throws IOException {
     Collection<Sample> samples = dao.listAll();
     samples.iterator().next().getScientificName().equals("Homo sapiens");
-    assertEquals(14, samples.size());
+    assertEquals(17, samples.size());
   }
 
   @Test
@@ -182,7 +182,7 @@ public class SQLSampleDAOTest extends AbstractDAOTest {
   @Test
   public void testCount() throws Exception {
     int total = dao.count();
-    assertEquals(14, total);
+    assertEquals(17, total);
   }
 
   @Test

@@ -60,28 +60,16 @@ public class DefaultSampleAnalyteService implements SampleAnalyteService {
   }
 
   @Override
-  public Long create(SampleAnalyte sampleAnalyte, Long sampleId, Long samplePurposeId, Long sampleGroupId, Long tissueMaterialId)
-      throws IOException {
+  public Long create(SampleAnalyte sampleAnalyte) throws IOException {
     authorizationManager.throwIfNonAdmin();
     User user = authorizationManager.getCurrentUser();
-    Sample sample = sampleDao.getSample(sampleId);
+    Sample sample = sampleDao.getSample(sampleAnalyte.getSampleId());
 
     sampleAnalyte.setCreatedBy(user);
     sampleAnalyte.setUpdatedBy(user);
     sampleAnalyte.setSample(sample);
 
-    if (samplePurposeId != null) {
-      SamplePurpose samplePurpose = samplePurposeDao.getSamplePurpose(samplePurposeId);
-      sampleAnalyte.setSamplePurpose(samplePurpose);
-    }
-    if (sampleGroupId != null) {
-      SampleGroupId sampleGroup = sampleGroupDao.getSampleGroup(sampleGroupId);
-      sampleAnalyte.setSampleGroup(sampleGroup);
-    }
-    if (tissueMaterialId != null) {
-      TissueMaterial tissueMaterial = tissueMaterialDao.getTissueMaterial(tissueMaterialId);
-      sampleAnalyte.setTissueMaterial(tissueMaterial);
-    }
+    loadMembers(sampleAnalyte);
     return sampleAnalyteDao.addSampleAnalyte(sampleAnalyte);
   }
 
@@ -141,44 +129,23 @@ public class DefaultSampleAnalyteService implements SampleAnalyteService {
   }
 
   @Override
-  public Long create(SampleAnalyte sampleAnalyte) throws IOException {
+  public void update(SampleAnalyte sampleAnalyte) throws IOException {
     authorizationManager.throwIfNonAdmin();
-    User user = authorizationManager.getCurrentUser();
-
-    sampleAnalyte.setCreatedBy(user);
-    sampleAnalyte.setUpdatedBy(user);
-
-    return sampleAnalyteDao.addSampleAnalyte(sampleAnalyte);
-  }
-
-  @Override
-  public void update(SampleAnalyte sampleAnalyte, Long samplePurposeId, Long sampleGroupId, Long tissueMaterialId) throws IOException {
-    authorizationManager.throwIfNonAdmin();
-    SampleAnalyte updatedSampleAnalyte = get(sampleAnalyte.getSampleAnalyteId());
-    updatedSampleAnalyte.setRegion(sampleAnalyte.getRegion());
-    updatedSampleAnalyte.setTubeId(sampleAnalyte.getTubeId());
-    updatedSampleAnalyte.setStockNumber(sampleAnalyte.getStockNumber());
-    updatedSampleAnalyte.setAliquotNumber(sampleAnalyte.getAliquotNumber());
-
-    SamplePurpose samplePurpose = null;
-    SampleGroupId sampleGroup = null;
-    TissueMaterial tissueMaterial = null;
-    if (samplePurposeId != null) {
-      samplePurpose = samplePurposeDao.getSamplePurpose(samplePurposeId);
-    }
-    if (sampleGroupId != null) {
-      sampleGroup = sampleGroupDao.getSampleGroup(sampleGroupId);
-    }
-    if (tissueMaterialId != null) {
-      tissueMaterial = tissueMaterialDao.getTissueMaterial(tissueMaterialId);
-    }
-    updatedSampleAnalyte.setSamplePurpose(samplePurpose);
-    updatedSampleAnalyte.setSampleGroup(sampleGroup);
-    updatedSampleAnalyte.setTissueMaterial(tissueMaterial);
+    SampleAnalyte updatedSampleAnalyte = get(sampleAnalyte.getSampleId());
+    applyChanges(updatedSampleAnalyte, sampleAnalyte);
 
     User user = authorizationManager.getCurrentUser();
     updatedSampleAnalyte.setUpdatedBy(user);
     sampleAnalyteDao.update(updatedSampleAnalyte);
+  }
+
+  @Override
+  public void applyChanges(SampleAnalyte target, SampleAnalyte source) throws IOException {
+    target.setRegion(source.getRegion());
+    target.setTubeId(source.getTubeId());
+    target.setStockNumber(source.getStockNumber());
+    target.setAliquotNumber(source.getAliquotNumber());
+    loadMembers(target, source);
   }
 
   @Override
@@ -192,6 +159,25 @@ public class DefaultSampleAnalyteService implements SampleAnalyteService {
     authorizationManager.throwIfNonAdmin();
     SampleAnalyte sampleAnalyte = get(sampleAnalyteId);
     sampleAnalyteDao.deleteSampleAnalyte(sampleAnalyte);
+  }
+
+  @Override
+  public void loadMembers(SampleAnalyte target) throws IOException {
+    loadMembers(target, target);
+  }
+
+  @Override
+  public void loadMembers(SampleAnalyte target, SampleAnalyte source)
+      throws IOException {
+    if (source.getSampleGroup() != null) {
+      target.setSampleGroup(sampleGroupDao.getSampleGroup(source.getSampleGroup().getSampleGroupId()));
+    }
+    if (source.getSamplePurpose() != null) {
+      target.setSamplePurpose(samplePurposeDao.getSamplePurpose(source.getSamplePurpose().getSamplePurposeId()));
+    }
+    if (source.getTissueMaterial() != null) {
+      target.setTissueMaterial(tissueMaterialDao.getTissueMaterial(source.getTissueMaterial().getTissueMaterialId()));
+    }
   }
 
 }

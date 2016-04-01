@@ -9,9 +9,9 @@ import com.eaglegenomics.simlims.core.User;
 @JsonIgnoreProperties({ "sample" })
 public interface SampleTissue {
 
-  Long getSampleTissueId();
+  Long getSampleId();
 
-  void setSampleTissueId(Long sampleTissueId);
+  void setSampleId(Long sampleId);
 
   Sample getSample();
 

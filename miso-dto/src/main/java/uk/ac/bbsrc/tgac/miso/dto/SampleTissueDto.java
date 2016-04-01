@@ -10,12 +10,13 @@ public class SampleTissueDto {
   private Long createdById;
   private String createdByUrl;
   private String creationDate;
-  private Long id;
+  private Long sampleId;
   private String instituteTissueName;
   private String lastUpdated;
   private Long updatedById;
   private String updatedByUrl;
   private String url;
+  private String sampleUrl;
 
   public String getBioBankId() {
     return bioBankId;
@@ -37,8 +38,8 @@ public class SampleTissueDto {
     return creationDate;
   }
 
-  public Long getId() {
-    return id;
+  public Long getSampleId() {
+    return sampleId;
   }
 
   public String getInstituteTissueName() {
@@ -81,8 +82,8 @@ public class SampleTissueDto {
     this.creationDate = creationDate;
   }
 
-  public void setId(Long id) {
-    this.id = id;
+  public void setSampleId(Long sampleId) {
+    this.sampleId = sampleId;
   }
 
   public void setInstituteTissueName(String instituteTissueName) {
@@ -105,11 +106,23 @@ public class SampleTissueDto {
     this.url = url;
   }
 
+  public String getSampleUrl() {
+    return sampleUrl;
+  }
+
+  public void setSampleUrl(String sampleUrl) {
+    this.sampleUrl = sampleUrl;
+  }
+
   @Override
   public String toString() {
-    return "SampleTissueDto [bioBankId=" + bioBankId + ", cellularity=" + cellularity + ", createdById=" + createdById + ", createdByUrl="
-        + createdByUrl + ", creationDate=" + creationDate + ", id=" + id + ", instituteTissueName=" + instituteTissueName + ", lastUpdated="
-        + lastUpdated + ", updatedById=" + updatedById + ", updatedByUrl=" + updatedByUrl + ", url=" + url + "]";
+    return "SampleTissueDto [bioBankId=" + bioBankId + ", cellularity="
+        + cellularity + ", createdById=" + createdById + ", createdByUrl="
+        + createdByUrl + ", creationDate=" + creationDate + ", sampleId="
+        + sampleId + ", instituteTissueName=" + instituteTissueName
+        + ", lastUpdated=" + lastUpdated + ", updatedById=" + updatedById
+        + ", updatedByUrl=" + updatedByUrl + ", url=" + url + ", sampleUrl="
+        + sampleUrl + "]";
   }
 
 }

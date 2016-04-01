@@ -75,11 +75,11 @@ public class SampleAdditionalInfoController extends RestController {
     }
   }
 
-  private static SampleAdditionalInfoDto writeUrls(SampleAdditionalInfoDto sampleAdditionalInfoDto, UriComponentsBuilder uriBuilder) {
+  public static SampleAdditionalInfoDto writeUrls(SampleAdditionalInfoDto sampleAdditionalInfoDto, UriComponentsBuilder uriBuilder) {
 
     URI baseUri = uriBuilder.build().toUri();
     sampleAdditionalInfoDto.setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/sampleadditionalinfo/{id}")
-        .buildAndExpand(sampleAdditionalInfoDto.getId()).toUriString());
+        .buildAndExpand(sampleAdditionalInfoDto.getSampleId()).toUriString());
     sampleAdditionalInfoDto.setCreatedByUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}")
         .buildAndExpand(sampleAdditionalInfoDto.getCreatedById()).toUriString());
     sampleAdditionalInfoDto.setUpdatedByUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}")
@@ -130,10 +130,7 @@ public class SampleAdditionalInfoController extends RestController {
   public ResponseEntity<?> createSampleAdditionalInfo(@RequestBody SampleAdditionalInfoDto sampleAdditionalInfoDto, UriComponentsBuilder b,
       HttpServletResponse response) throws IOException {
     SampleAdditionalInfo sampleAdditionalInfo = to(sampleAdditionalInfoDto);
-    Long id = sampleAdditionalInfoService.create(sampleAdditionalInfo, sampleAdditionalInfoDto.getSampleId(),
-        sampleAdditionalInfoDto.getTissueOriginId(), sampleAdditionalInfoDto.getTissueTypeId(),
-        sampleAdditionalInfoDto.getQcPassedDetailId(), sampleAdditionalInfoDto.getSubprojectId(), sampleAdditionalInfoDto.getPrepKitId(),
-        sampleAdditionalInfoDto.getSampleClassId());
+    Long id = sampleAdditionalInfoService.create(sampleAdditionalInfo);
     UriComponents uriComponents = b.path("/sampleadditionalinfo/{id}").buildAndExpand(id);
     HttpHeaders headers = new HttpHeaders();
     headers.setLocation(uriComponents.toUri());
@@ -145,10 +142,8 @@ public class SampleAdditionalInfoController extends RestController {
   public ResponseEntity<?> updateSampleAdditionalInfo(@PathVariable("id") Long id,
       @RequestBody SampleAdditionalInfoDto sampleAdditionalInfoDto, HttpServletResponse response) throws IOException {
     SampleAdditionalInfo sampleAdditionalInfo = to(sampleAdditionalInfoDto);
-    sampleAdditionalInfo.setSampleAdditionalInfoId(id);
-    sampleAdditionalInfoService.update(sampleAdditionalInfo, sampleAdditionalInfoDto.getTissueOriginId(),
-        sampleAdditionalInfoDto.getTissueTypeId(), sampleAdditionalInfoDto.getQcPassedDetailId(), sampleAdditionalInfoDto.getPrepKitId(),
-        sampleAdditionalInfoDto.getSampleClassId());
+    sampleAdditionalInfo.setSampleId(id);
+    sampleAdditionalInfoService.update(sampleAdditionalInfo);
     return new ResponseEntity<>(HttpStatus.OK);
   }
 

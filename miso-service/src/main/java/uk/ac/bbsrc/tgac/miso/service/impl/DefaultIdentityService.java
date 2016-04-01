@@ -57,12 +57,16 @@ public class DefaultIdentityService implements IdentityService {
   @Override
   public void update(Identity identity) throws IOException {
     authorizationManager.throwIfNonAdmin();
-    Identity updatedIdentity = get(identity.getIdentityId());
-    updatedIdentity.setInternalName(identity.getInternalName());
-    updatedIdentity.setExternalName(identity.getExternalName());
-    User user = authorizationManager.getCurrentUser();
-    updatedIdentity.setUpdatedBy(user);
+    Identity updatedIdentity = get(identity.getSampleId());
+    applyChanges(updatedIdentity, identity);
+    updatedIdentity.setUpdatedBy(authorizationManager.getCurrentUser());
     identityDao.update(updatedIdentity);
+  }
+  
+  @Override
+  public void applyChanges(Identity target, Identity source) {
+    target.setInternalName(source.getInternalName());
+    target.setExternalName(source.getExternalName());
   }
 
   @Override

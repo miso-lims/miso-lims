@@ -10,12 +10,9 @@ public interface SampleAnalyteService {
 
   SampleAnalyte get(Long sampleAnalyteId) throws IOException;
 
-  Long create(SampleAnalyte sampleAnalyte, Long sampleId, Long samplePurposeId, Long sampleGroupId, Long tissueMaterialId)
-      throws IOException;
-
   Long create(SampleAnalyte sampleAnalyte) throws IOException;
 
-  void update(SampleAnalyte sampleAnalyte, Long samplePurposeId, Long sampleGroupId, Long tissueMaterialId) throws IOException;
+  void update(SampleAnalyte sampleAnalyte) throws IOException;
 
   Set<SampleAnalyte> getAll() throws IOException;
 
@@ -24,5 +21,31 @@ public interface SampleAnalyteService {
   Long create(SampleAnalyteDto sampleAnalyteDto) throws IOException;
 
   SampleAnalyte to(SampleAnalyteDto sampleAnalyteDto) throws IOException;
+  
+  /**
+   * copies all the editable properties from one SampleAnalyte instance to another
+   * 
+   * @param target the persisted SampleAnalyte to copy changes into
+   * @param source the modified SampleAnalyte to copy changes from
+   */
+  public void applyChanges(SampleAnalyte target, SampleAnalyte source) throws IOException;
+  
+  /**
+   * loads the contained objects into the target object from the database using IDs that are already present in the target
+   * 
+   * @param target the SampleAnalyte whose attributes are to be populated from the database. Must already contain the IDs to 
+   * be used for lookup
+   * @throws IOException
+   */
+  void loadMembers(SampleAnalyte target) throws IOException;
+  
+  /**
+   * loads the contained objects into the target object from the database using IDs found in the source object
+   * 
+   * @param target the SampleAnalyte whose attributes are to be populated from the database
+   * @param source the SampleAnalyte containing IDs to be used for lookup
+   * @throws IOException 
+   */
+  void loadMembers(SampleAnalyte target, SampleAnalyte source) throws IOException;
 
 }

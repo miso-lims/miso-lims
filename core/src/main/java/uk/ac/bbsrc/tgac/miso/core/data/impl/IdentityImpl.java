@@ -4,10 +4,9 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.MapsId;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
@@ -21,11 +20,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 public class IdentityImpl implements Identity {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long identityId;
+  private Long sampleId;
 
   @OneToOne(targetEntity = SampleImpl.class)
   @JoinColumn(name = "sampleId", nullable = false)
+  @MapsId
   private Sample sample;
 
   @Column(unique = true, nullable = false)
@@ -49,13 +48,13 @@ public class IdentityImpl implements Identity {
   private Date lastUpdated;
 
   @Override
-  public Long getIdentityId() {
-    return identityId;
+  public Long getSampleId() {
+    return sampleId;
   }
 
   @Override
-  public void setIdentityId(Long identityId) {
-    this.identityId = identityId;
+  public void setSampleId(Long sampleId) {
+    this.sampleId = sampleId;
   }
 
   @Override
