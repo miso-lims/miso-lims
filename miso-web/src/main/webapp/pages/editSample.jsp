@@ -432,9 +432,9 @@
 	    </div>
 	  </div>
 	  <div class="floatleft rightfloatleft">
-      <p>To fill all columns below with the value of your selected cell, <b>double-click</b> the square in the bottom right of your selected cell.
-      To fill a variable number of columns with the value of your selected cell, 
-      <b>click</b> the square in the bottom right of your filled-in selected cell and <b>drag</b> up or down. All selected columns will be filled in.
+      <p>To fill all columns below with the value of your selected cell, <b>double-click</b> the square in the bottom right of your selected cell.</p>
+      <p>To fill a variable number of columns with the value of your selected cell,  <b>click</b> the square in the bottom right of your 
+      filled-in selected cell and <b>drag</b> up or down. All selected columns will be filled in.
     </div>
 	  
 	  <div style="clear:both;"></div>
