@@ -105,10 +105,8 @@ public class SQLPoolDAO implements PoolStore {
 
   private static final String POOL_SELECT = "SELECT p.poolId, p.concentration, p.identificationBarcode, p.name, p.alias, p.creationDate, "
       + "p.securityProfile_profileId, p.platformType, p.ready, p.qcPassed, p.lastModifier, p.boxPositionId, p.volume, p.emptied, b.boxId, "
-      + "b.alias AS boxAlias, b.locationBarcode AS boxLocation, bp.row AS boxRow, bp.column AS boxColumn "
-      + "FROM " + TABLE_NAME + " p "
-      + "LEFT JOIN BoxPosition bp ON bp.boxPositionId = p.boxPositionId "
-      + "LEFT JOIN Box b ON b.boxId = bp.boxId";
+      + "b.alias AS boxAlias, b.locationBarcode AS boxLocation, bp.row AS boxRow, bp.column AS boxColumn " + "FROM " + TABLE_NAME + " p "
+      + "LEFT JOIN BoxPosition bp ON bp.boxPositionId = p.boxPositionId " + "LEFT JOIN Box b ON b.boxId = bp.boxId";
 
   public static final String POOL_SELECT_BY_POOL_ID = POOL_SELECT + " WHERE p.poolId=?";
 
@@ -221,7 +219,8 @@ public class SQLPoolDAO implements PoolStore {
       + "FROM emPCRDilution l, Pool_emPCRDilution p " + "WHERE l.dilutionId=p.dilutions_dilutionId " + "AND p.pool_poolId=?";
 
   // EMPCR
-  public static final String EMPCR_POOL_SELECT = POOL_SELECT + " WHERE p.platformType='Solid' OR p.platformType='LS454' AND p.name LIKE 'EFO%'";
+  public static final String EMPCR_POOL_SELECT = POOL_SELECT
+      + " WHERE p.platformType='Solid' OR p.platformType='LS454' AND p.name LIKE 'EFO%'";
 
   public static final String EMPCR_POOL_SELECT_BY_POOL_ID = EMPCR_POOL_SELECT + " AND poolId = ?";
 
@@ -445,12 +444,7 @@ public class SQLPoolDAO implements PoolStore {
     params.addValue("emptied", pool.isEmpty());
     params.addValue("volume", pool.getVolume());
     params.addValue("lastModifier", pool.getLastModifier().getUserId());
-
-    if (pool.getQcPassed() != null) {
-      params.addValue("qcPassed", pool.getQcPassed().toString());
-    } else {
-      params.addValue("qcPassed", pool.getQcPassed());
-    }
+    params.addValue("qcPassed", pool.getQcPassed());
 
     if (pool.getId() == AbstractPool.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(TABLE_NAME).usingGeneratedKeyColumns("poolId");
@@ -844,9 +838,8 @@ public class SQLPoolDAO implements PoolStore {
         int row = rs.getInt("boxRow");
         if (!rs.wasNull()) p.setBoxPosition(BoxUtils.getPositionString(row, rs.getInt("boxColumn")));
         p.setBoxLocation(rs.getString("boxLocation"));
-        if (rs.getString("qcPassed") != null) {
-          p.setQcPassed(Boolean.parseBoolean(rs.getString("qcPassed")));
-        } else {
+        p.setQcPassed(rs.getBoolean("qcPassed"));
+        if (rs.wasNull()) {
           p.setQcPassed(null);
         }
 
@@ -916,7 +909,7 @@ public class SQLPoolDAO implements PoolStore {
       }
     }
   }
-  
+
   @Override
   public Map<String, Integer> getPoolColumnSizes() throws IOException {
     return DbUtils.getColumnSizes(template, TABLE_NAME);
