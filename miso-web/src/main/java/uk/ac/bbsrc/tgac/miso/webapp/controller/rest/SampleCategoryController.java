@@ -24,8 +24,8 @@ import uk.ac.bbsrc.tgac.miso.dto.SampleCategoryDto;
 @RequestMapping("/rest")
 @Controller
 @SessionAttributes("sampleidentity")
-public class SampleIdentityController {
-  protected static final Logger log = LoggerFactory.getLogger(SampleIdentityController.class);
+public class SampleCategoryController {
+  protected static final Logger log = LoggerFactory.getLogger(SampleCategoryController.class);
 
   @RequestMapping(value = "/samplecategories", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody

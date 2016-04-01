@@ -15,9 +15,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 @JsonIgnoreProperties({ "sample" })
 public interface SampleAdditionalInfo {
 
-  Long getSampleAdditionalInfoId();
+  Long getSampleId();
 
-  void setSampleAdditionalInfoId(Long sampleAdditionalInfoId);
+  void setSampleId(Long sampleAdditionalInfoId);
 
   Sample getSample();
 

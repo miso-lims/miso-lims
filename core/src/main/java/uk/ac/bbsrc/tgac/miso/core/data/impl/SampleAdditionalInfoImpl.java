@@ -6,10 +6,9 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.MapsId;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -31,11 +30,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 public class SampleAdditionalInfoImpl implements SampleAdditionalInfo {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  private Long sampleAdditionalInfoId;
+  private Long sampleId;
 
   @OneToOne(targetEntity = SampleImpl.class)
   @JoinColumn(name = "sampleId", nullable = false)
+  @MapsId
   private Sample sample;
 
   @OneToOne(targetEntity = SampleClassImpl.class)
@@ -96,13 +95,13 @@ public class SampleAdditionalInfoImpl implements SampleAdditionalInfo {
   private Date lastUpdated;
 
   @Override
-  public Long getSampleAdditionalInfoId() {
-    return sampleAdditionalInfoId;
+  public Long getSampleId() {
+    return sampleId;
   }
 
   @Override
-  public void setSampleAdditionalInfoId(Long sampleAdditionalInfoId) {
-    this.sampleAdditionalInfoId = sampleAdditionalInfoId;
+  public void setSampleId(Long sampleAdditionalInfoId) {
+    this.sampleId = sampleAdditionalInfoId;
   }
 
   @Override
@@ -304,7 +303,7 @@ public class SampleAdditionalInfoImpl implements SampleAdditionalInfo {
 
   @Override
   public String toString() {
-    return "SampleAdditionalInfoImpl [sampleAdditionalInfoId=" + sampleAdditionalInfoId + ", sample=" + sample + ", sampleClass="
+    return "SampleAdditionalInfoImpl [sampleId=" + sampleId + ", sample=" + sample + ", sampleClass="
         + sampleClass + ", tissueOrigin=" + tissueOrigin + ", tissueType=" + tissueType + ", qcPassedDetail=" + qcPassedDetail
         + ", subproject=" + subproject + ", lab=" + lab + ", kitDescriptorId=" + kitDescriptorId + ", prepKit=" + prepKit
         + ", passageNumber=" + passageNumber + ", timesReceived=" + timesReceived + ", tubeNumber=" + tubeNumber + ", concentration="

@@ -5,9 +5,8 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 public class SampleIdentityDto {
 
-  private Long id;
-  private String url;
   private Long sampleId;
+  private String url;
   private String sampleUrl;
   private String internalName;
   private String externalName;
@@ -18,12 +17,12 @@ public class SampleIdentityDto {
   private String updatedByUrl;
   private String lastUpdated;
 
-  public Long getId() {
-    return id;
+  public Long getSampleId() {
+    return sampleId;
   }
 
-  public void setId(Long id) {
-    this.id = id;
+  public void setSampleId(Long id) {
+    this.sampleId = id;
   }
 
   public String getUrl() {
@@ -96,14 +95,6 @@ public class SampleIdentityDto {
 
   public void setLastUpdated(String lastUpdated) {
     this.lastUpdated = lastUpdated;
-  }
-
-  public Long getSampleId() {
-    return sampleId;
-  }
-
-  public void setSampleId(Long sampleId) {
-    this.sampleId = sampleId;
   }
 
   public String getSampleUrl() {

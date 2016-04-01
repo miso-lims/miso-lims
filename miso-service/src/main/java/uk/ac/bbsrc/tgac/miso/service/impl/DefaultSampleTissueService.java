@@ -76,12 +76,17 @@ public class DefaultSampleTissueService implements SampleTissueService {
 
   @Override
   public void update(SampleTissue sampleTissue) throws IOException {
-    SampleTissue updatedSampleTissue = get(sampleTissue.getSampleTissueId());
-    updatedSampleTissue.setInstituteTissueName(sampleTissue.getInstituteTissueName());
-    updatedSampleTissue.setCellularity(sampleTissue.getCellularity());
+    SampleTissue updatedSampleTissue = get(sampleTissue.getSampleId());
+    applyChanges(updatedSampleTissue, sampleTissue);
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     updatedSampleTissue.setUpdatedBy(user);
     sampleTissueDao.update(updatedSampleTissue);
+  }
+
+  @Override
+  public void applyChanges(SampleTissue target, SampleTissue source) {
+    target.setInstituteTissueName(source.getInstituteTissueName());
+    target.setCellularity(source.getCellularity());
   }
 
   @Override

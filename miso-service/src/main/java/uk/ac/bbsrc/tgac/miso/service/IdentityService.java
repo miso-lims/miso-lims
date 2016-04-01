@@ -1,12 +1,10 @@
 package uk.ac.bbsrc.tgac.miso.service;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Set;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.dto.SampleIdentityDto;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 
 public interface IdentityService {
 
@@ -23,5 +21,13 @@ public interface IdentityService {
   void delete(Long identityId) throws IOException;
 
   Identity to(SampleIdentityDto sampleIdentityDto) throws IOException;
+  
+  /**
+   * copies all the editable properties from one Identity instance to another
+   * 
+   * @param target the persisted Identity to copy changes into
+   * @param source the modified Identity to copy changes from
+   */
+  public void applyChanges(Identity target, Identity source);
 
 }

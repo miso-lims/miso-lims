@@ -50,6 +50,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
+import uk.ac.bbsrc.tgac.miso.dto.SampleIdentityDto;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 
 @Controller
@@ -87,6 +88,29 @@ public class SampleController extends RestController {
       sampleDto.setRootSampleClassUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/sampleclass/{id}")
           .buildAndExpand(sampleDto.getRootSampleClassId()).toUriString());
     }
+    if (sampleDto.getSampleAdditionalInfo() != null) {
+      SampleAdditionalInfoController.writeUrls(sampleDto.getSampleAdditionalInfo(), uriBuilder);
+    }
+    if (sampleDto.getSampleIdentity() != null) {
+      SampleIdentityDto sid = sampleDto.getSampleIdentity();
+      sid.setSampleUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/tree/sample/{id}")
+          .buildAndExpand(sampleDto.getId()).toUriString());
+      if (sid.getCreatedById() != null) {
+        sid.setCreatedByUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}")
+            .buildAndExpand(sid.getCreatedById()).toUriString());
+      }
+      if (sid.getUpdatedById() != null) {
+        sid.setUpdatedByUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}")
+            .buildAndExpand(sid.getUpdatedById()).toUriString());
+      }
+    }
+    if (sampleDto.getSampleTissue() != null) {
+      SampleTissueController.writeUrls(sampleDto.getSampleTissue(), uriBuilder);
+    }
+    if (sampleDto.getSampleAnalyte() != null) {
+      SampleAnalyteController.writeUrls(sampleDto.getSampleAnalyte(), uriBuilder);
+    }
+    
     return sampleDto;
   }
 
@@ -129,7 +153,7 @@ public class SampleController extends RestController {
   @ResponseBody
   public ResponseEntity<?> updateSample(@PathVariable("id") Long id, @RequestBody SampleDto sampleDto) throws IOException {
     Sample sample = Dtos.to(sampleDto);
-    sample.setSampleId(id);
+    sample.setId(id);
     sampleService.update(sample);
     return new ResponseEntity<>(HttpStatus.OK);
   }

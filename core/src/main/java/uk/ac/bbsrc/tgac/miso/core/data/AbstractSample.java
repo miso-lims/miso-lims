@@ -37,7 +37,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToMany;
@@ -128,23 +127,19 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @JoinColumn(name = "lastModifier", nullable = false)
   private User lastModifier;
 
-  @OneToOne(targetEntity = SampleAnalyteImpl.class)
-  @JoinColumn(name = "sampleAnalyteId")
+  @OneToOne(targetEntity = SampleAnalyteImpl.class, mappedBy = "sample")
   @Cascade({ CascadeType.SAVE_UPDATE })
   private SampleAnalyte sampleAnalyte;
 
-  @OneToOne(targetEntity = SampleTissueImpl.class)
-  @JoinColumn(name = "sampleTissueId")
+  @OneToOne(targetEntity = SampleTissueImpl.class, mappedBy = "sample")
   @Cascade({ CascadeType.SAVE_UPDATE })
   private SampleTissue sampleTissue;
 
-  @OneToOne(targetEntity = IdentityImpl.class)
-  @JoinColumn(name = "identityId")
+  @OneToOne(targetEntity = IdentityImpl.class, mappedBy = "sample")
   @Cascade({ CascadeType.SAVE_UPDATE })
   private Identity identity;
 
-  @OneToOne(targetEntity = SampleAdditionalInfoImpl.class)
-  @JoinColumn(name = "sampleAdditionalInfoId")
+  @OneToOne(targetEntity = SampleAdditionalInfoImpl.class, mappedBy = "sample")
   @Cascade({ CascadeType.SAVE_UPDATE })
   private SampleAdditionalInfo sampleAdditionalInfo;
 
@@ -153,8 +148,7 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @Cascade({ CascadeType.SAVE_UPDATE })
   private Sample parent;
 
-  @OneToMany(targetEntity = SampleImpl.class, fetch = FetchType.EAGER)
-  @JoinTable(name = "SampleHierarchy", joinColumns = @JoinColumn(name = "parentId"), inverseJoinColumns = @JoinColumn(name = "childId"))
+  @OneToMany(targetEntity = SampleImpl.class, fetch = FetchType.LAZY, mappedBy = "parent")
   @Cascade({ CascadeType.SAVE_UPDATE })
   private Set<Sample> children = new HashSet<Sample>();
 

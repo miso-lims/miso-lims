@@ -19,5 +19,13 @@ public interface SampleTissueService {
   void delete(Long sampleTissueId);
 
   SampleTissue to(SampleTissueDto sampleTissueDto) throws IOException;
+  
+  /**
+   * copies all the editable properties from one SampleTissue instance to another
+   * 
+   * @param target the persisted SampleTissue to copy changes into
+   * @param source the modified SampleTissue to copy changes from
+   */
+  public void applyChanges(SampleTissue target, SampleTissue source);
 
 }

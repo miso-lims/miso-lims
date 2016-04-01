@@ -4,12 +4,14 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import javax.persistence.CascadeType;
+
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -29,13 +31,9 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.store.SecurityStore;
 import com.google.common.annotations.VisibleForTesting;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
@@ -90,9 +88,6 @@ public class HibernateSampleDao implements SampleDao, SampleStore {
   @Transactional(propagation = Propagation.MANDATORY)
   @Override
   public Long addSample(final Sample sample) throws IOException, MisoNamingException {
-    Date now = new Date();
-    sample.setLastUpdated(now);
-
     // We can't generate the name until we have the ID and we don't have an ID until we start the persistence. So, we assign a temporary
     // name.
     sample.setName(generateTemporaryName());
@@ -483,8 +478,6 @@ public class HibernateSampleDao implements SampleDao, SampleStore {
 
   @Override
   public void update(Sample sample) throws IOException {
-    Date now = new Date();
-    sample.setLastUpdated(now);
     if (sample.getSecurityProfile() != null) {
       sample.setSecurityProfileId(sample.getSecurityProfile().getProfileId());
     }
