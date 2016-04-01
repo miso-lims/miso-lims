@@ -246,7 +246,9 @@ public class Dtos {
     to.setTimesReceived(from.getTimesReceived());
     to.setTubeNumber(from.getTubeNumber());
     to.setConcentration(from.getConcentration());
-    to.setStrStatus(from.getStrStatus());
+    if (from.getStrStatus() != null) {
+      to.setStrStatus(from.getStrStatus());
+    }
     return to;
   }
 
