@@ -29,7 +29,7 @@
   Time: 14:22
 --%>
 <%@ include file="../header.jsp" %>
-<script src="<c:url value='/scripts/datatables_utils.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
+<script src="<c:url value='/scripts/datatables_utils.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/jquery/datatables/js/jquery.dataTables.min.js'/>" type="text/javascript"></script>
 <link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" type="text/css">
 <link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables_themeroller.css'/>">
@@ -52,11 +52,11 @@
           </h1>
           <ul class="sddm">
             <li>
-              <a onmouseover="mopen('ipomenu')" onmouseout="mclosetime()">Options
+              <a onmouseover="mopen('ipomenu${c.count}')" onmouseout="mclosetime()">Options
                 <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
               </a>
 
-              <div id="ipomenu"
+              <div id="ipomenu${c.count}"
                    onmouseover="mcancelclosetime()"
                    onmouseout="mclosetime()">
                 <a href='<c:url value="/miso/pool/new"/>'>Add Pool</a>
@@ -70,7 +70,7 @@
           <table cellpadding="0" cellspacing="0" border="0" class="display" id="listing${pt}PoolsTable"></table>
           <script type="text/javascript">
             jQuery(document).ready(function () {
-              Pool.ui.createListingPoolsTable('${pt}');
+              Pool.ui.createListingPoolsTable('${pt}', '${poolConcentrationUnits}');
             });
           </script>
         </div>

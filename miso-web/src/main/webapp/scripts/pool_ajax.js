@@ -28,7 +28,7 @@ var Pool = Pool || {
         'poolControllerHelperService',
         'deletePool',
         {'poolId':poolId, 'url':ajaxurl},
-        {'doOnSuccess':function(json) {
+        {'doOnSuccess':function() {
           successfunc();
         }
         }
@@ -69,6 +69,12 @@ var Pool = Pool || {
     jQuery('#creationDate').attr('data-parsley-pattern', Utils.validation.dateRegex);
     jQuery('#creationDate').attr('data-date-format', 'DD/MM/YYYY');
     jQuery('#creationDate').attr('data-parsley-error-message', 'Date must be of form DD/MM/YYYY');
+    
+    // Volume validation
+    jQuery('#volume').attr('class', 'form-control');
+    jQuery('#volume').attr('data-parsley-required', 'true');
+    jQuery('#volume').attr('data-parsley-maxlength', '10');
+    jQuery('#volume').attr('data-parsley-type', 'number');
 
     jQuery('#pool-form').parsley();
     jQuery('#pool-form').parsley().validate();
@@ -83,22 +89,22 @@ Pool.qc = {
     if (!jQuery('#poolQcTable').attr("qcInProgress")) {
       jQuery('#poolQcTable').attr("qcInProgress", "true");
 
-      $('poolQcTable').insertRow(1);
+      jQuery('#poolQcTable')[0].insertRow(1);
       //QCId  QCed By  	QC Date  	Method  	Results
 
       if (includeId) {
-        var column1 = $('poolQcTable').rows[1].insertCell(-1);
+        var column1 = jQuery('#poolQcTable')[0].rows[1].insertCell(-1);
         column1.innerHTML = "<input type='hidden' id='poolId' name='poolId' value='" + poolId + "'/>";
       }
-      var column2 = $('poolQcTable').rows[1].insertCell(-1);
-      column2.innerHTML = "<input id='poolQcUser' name='poolQcUser' type='hidden' value='" + $('currentUser').innerHTML + "'/>" + $('currentUser').innerHTML;
-      var column3 = $('poolQcTable').rows[1].insertCell(-1);
+      var column2 = jQuery('#poolQcTable')[0].rows[1].insertCell(-1);
+      column2.innerHTML = "<input id='poolQcUser' name='poolQcUser' type='hidden' value='" + jQuery('#currentUser')[0].innerHTML + "'/>" + jQuery('#currentUser')[0].innerHTML;
+      var column3 = jQuery('#poolQcTable')[0].rows[1].insertCell(-1);
       column3.innerHTML = "<input id='poolQcDate' name='poolQcDate' type='text'/>";
-      var column4 = $('poolQcTable').rows[1].insertCell(-1);
+      var column4 = jQuery('#poolQcTable')[0].rows[1].insertCell(-1);
       column4.innerHTML = "<select id='poolQcType' name='poolQcType' onchange='Pool.qc.changePoolQcUnits(this);'/>";
-      var column5 = $('poolQcTable').rows[1].insertCell(-1);
+      var column5 = jQuery('#poolQcTable')[0].rows[1].insertCell(-1);
       column5.innerHTML = "<input id='poolQcResults' name='poolQcResults' type='text'/><span id='units'/>";
-      var column6 = $('poolQcTable').rows[1].insertCell(-1);
+      var column6 = jQuery('#poolQcTable')[0].rows[1].insertCell(-1);
       column6.innerHTML = "<a href='javascript:void(0);' onclick='Pool.qc.addPoolQC();'/>Add</a>";
 
       Utils.ui.addMaxDatePicker("poolQcDate", 0);
@@ -115,11 +121,11 @@ Pool.qc = {
       );
     }
     else {
-      alert("Cannot add another QC when one is already in progress.")
+      alert("Cannot add another QC when one is already in progress.");
     }
   },
 
-  changePoolQcUnits : function(input) {
+  changePoolQcUnits : function() {
     jQuery('#units').html(jQuery('#poolQcType').find(":selected").attr("units"));
   },
 
@@ -137,7 +143,7 @@ Pool.qc = {
         'url':ajaxurl
       },
       {'updateElement':'poolQcTable',
-        'doOnSuccess':function(json) {
+        'doOnSuccess':function() {
           jQuery('#poolQcTable').removeAttr("qcInProgress");
         }
       }
@@ -182,14 +188,14 @@ Pool.wizard = {
     if (!jQuery('#poolQcTable').attr("qcInProgress")) {
       jQuery('#poolQcTable').attr("qcInProgress", "true");
 
-      $('poolQcTable').insertRow(1);
-      var column3 = $('poolQcTable').rows[1].insertCell(-1);
+      jQuery('#poolQcTable')[0].insertRow(1);
+      var column3 = jQuery('#poolQcTable')[0].rows[1].insertCell(-1);
       column3.innerHTML = "<input id='poolQcDate' name='poolQcDate' type='text'/>";
-      var column4 = $('poolQcTable').rows[1].insertCell(-1);
+      var column4 = jQuery('#poolQcTable')[0].rows[1].insertCell(-1);
       column4.innerHTML = "<select id='poolQcType' name='poolQcType' onchange='Pool.qc.changePoolQcUnits(this);'/>";
-      var column5 = $('poolQcTable').rows[1].insertCell(-1);
+      var column5 = jQuery('#poolQcTable')[0].rows[1].insertCell(-1);
       column5.innerHTML = "<input id='poolQcResults' name='poolQcResults' type='text'/><span id='units'/>";
-      var column6 = $('poolQcTable').rows[1].insertCell(-1);
+      var column6 = jQuery('#poolQcTable')[0].rows[1].insertCell(-1);
       column6.innerHTML = "<a href='javascript:void(0);' onclick='Pool.wizard.addPoolQC(this);'/>Add</a>";
 
       jQuery("#poolQcDate").val(jQuery.datepicker.formatDate('dd/mm/yy', new Date()));
@@ -207,7 +213,7 @@ Pool.wizard = {
       );
     }
     else {
-      alert("Cannot add another QC when one is already in progress.")
+      alert("Cannot add another QC when one is already in progress.");
     }
   },
 
@@ -260,7 +266,7 @@ Pool.ui = {
     );
   },
 
-  dilutionFileUploadSuccessFunc : function(json) {
+  dilutionFileUploadSuccessFunc : function() {
     Fluxion.doAjax(
       'poolControllerHelperService',
       'selectDilutionsByBarcodeFile',
@@ -283,7 +289,7 @@ Pool.ui = {
   },
 
   /** Deprecated */
-  libraryDilutionFileUploadSuccessFunc : function(json) {
+  libraryDilutionFileUploadSuccessFunc : function() {
     Fluxion.doAjax(
       'poolControllerHelperService',
       'selectLibraryDilutionsByBarcodeFile',
@@ -306,7 +312,7 @@ Pool.ui = {
   },
 
   /** Deprecated */
-  ls454EmPcrDilutionFileUploadSuccessFunc : function(json) {
+  ls454EmPcrDilutionFileUploadSuccessFunc : function() {
     Fluxion.doAjax(
       'poolControllerHelperService',
       'select454EmPCRDilutionsByBarcodeFile',
@@ -329,7 +335,7 @@ Pool.ui = {
   },
 
   /** Deprecated */
-  solidEmPcrDilutionFileUploadSuccessFunc : function(json) {
+  solidEmPcrDilutionFileUploadSuccessFunc : function() {
     Fluxion.doAjax(
       'poolControllerHelperService',
       'selectSolidEmPCRDilutionsByBarcodeFile',
@@ -349,14 +355,14 @@ Pool.ui = {
       {
         'doOnSuccess': function(json) {
           jQuery.each(json, function(i, val) {
-            jQuery('#average' + i).html(val)
+            jQuery('#average' + i).html(val);
           });
         }
       }
     );
   },
 
-  createListingPoolsTable : function(platform) {
+  createListingPoolsTable : function(platform, poolConcentrationUnits) {
     var table = 'listing'+platform+'PoolsTable';
     jQuery('#'+table).html("<img src='../styles/images/ajax-loader.gif'/>");
     jQuery.fn.dataTableExt.oSort['no-po-asc'] = function(x, y) {
@@ -379,14 +385,14 @@ Pool.ui = {
       {'doOnSuccess': function(json) {
         jQuery('#'+table).html('');
         jQuery('#'+table).dataTable({
-          "aaData": json.pools,
+          "aaData": json[platform],
           "aoColumns": [
             { "sTitle": "Name", "sType":"no-po"},
             { "sTitle": "Alias"},
             { "sTitle": "Date Created"},
             { "sTitle": "Information"},
             { "sTitle": "Average Insert Size"},
-            { "sTitle": "Concentration"}
+            { "sTitle": "Concentration ("+poolConcentrationUnits+")"}
           ],
           "bJQueryUI": true,
           "iDisplayLength":  25,
@@ -451,7 +457,7 @@ Pool.ui = {
     );
   },
 
-  createElementSelectDatatable : function(platform) {
+  createElementSelectDatatable : function(platform, libraryDilutionConcentrationUnits) {
     jQuery('#elementSelectDatatableDiv').html("<table cellpadding='0' width='100%' cellspacing='0' border='0' class='display' id='elementSelectDatatable'></table>");
     jQuery('#elementSelectDatatable').html("<img src='/styles/images/ajax-loader.gif'/>");
     Fluxion.doAjax(
@@ -465,20 +471,20 @@ Pool.ui = {
 
               jQuery('#elementSelectDatatable').html('');
               jQuery('#elementSelectDatatable').dataTable({
-                                            "aaData": json.poolelements,
-                                            "aoColumns": [
-                                              { "sTitle": "Dilution Name", "sType":"natural"},
-                                              { "sTitle": "Library", "sType":"natural"},
-                                              { "sTitle": "Sample", "sType":"natural"},
-                                              { "sTitle": "Project", "sType":"natural"},
-                                              { "sTitle": "Add"}
-                                            ],
-                                            "bJQueryUI": true,
-                                            "iDisplayLength":  25,
-                                            "aaSorting":[
-                                              [0,"desc"]
-                                            ]
-                                          });
+                "aaData": json.poolelements,
+                "aoColumns": [
+                  { "sTitle": "Dilution Name", "sType":"natural"},
+                  { "sTitle": "Concentration ("+libraryDilutionConcentrationUnits+")", "sType":"natural"},
+                  { "sTitle": "Library", "sType":"natural"},
+                  { "sTitle": "Sample", "sType":"natural"},
+                  { "sTitle": "Add"}
+                ],
+                "bJQueryUI": true,
+                "iDisplayLength":  25,
+                "aaSorting":[
+                  [0,"desc"]
+                ]
+              });
 
             }
             }
@@ -487,6 +493,61 @@ Pool.ui = {
 
   prepareElements : function () {
     Pool.ui.createElementSelectDatatable(jQuery('#platformType').val());
+  },
+
+  showPoolNoteDialog: function (poolId) {
+    var self = this;
+    jQuery('#addPoolNoteDialog')
+      .html("<form>" +
+        "<fieldset class='dialog'>" +
+        "<label for='internalOnly'>Internal Only?</label>" +
+        "<input type='checkbox' checked='checked' name='internalOnly' id='internalOnly' class='text ui-widget-content ui-corner-all' />" +
+        "<br/>" +
+        "<label for='notetext'>Text</label>" +
+        "<input type='text' name='notetext' id='notetext' class='text ui-widget-content ui-corner-all' />" +
+        "</fieldset></form>");
+
+    jQuery('#addPoolNoteDialog').dialog({
+      width: 400,
+      modal: true,
+      resizable: false,
+      buttons: {
+        "Add Note": function () {
+          self.addPoolNote(poolId, jQuery('#internalOnly').val(), jQuery('#notetext').val());
+          jQuery(this).dialog('close');
+        },
+        "Cancel": function () {
+          jQuery(this).dialog('close');
+        }
+      }
+    });
+  },
+
+  addPoolNote: function (poolId, internalOnly, text) {
+    Fluxion.doAjax(
+      'poolControllerHelperService',
+        'addPoolNote',
+        {
+          'poolId': poolId,
+          'internalOnly': internalOnly,
+          'text': text,
+          'url': ajaxurl
+        },
+        {
+          'doOnSuccess': Utils.page.pageReload
+        }
+      );
+  },
+
+  deletePoolNote: function (poolId, noteId) {
+    if (confirm("Are you sure you want to delete this note?")) {
+      Fluxion.doAjax(
+        'poolControllerHelperService',
+        'deletePoolNote',
+        {'poolId': poolId, 'noteId': noteId, 'url': ajaxurl},
+        {'doOnSuccess': Utils.page.pageReload}
+        );
+    }
   }
 };
 

@@ -171,7 +171,6 @@ public class SampleControllerHelperService {
               String scientificName = j.getString("scientificName");
               DateFormat df = new SimpleDateFormat("dd/mm/yyyy");
               String type = j.getString("sampleType");
-              String locationBarcode = j.getString("locationBarcode");
 
               Sample news = new SampleImpl();
               news.setProject(p);
@@ -180,7 +179,6 @@ public class SampleControllerHelperService {
               news.setScientificName(scientificName);
               news.setSecurityProfile(sp);
               news.setSampleType(type);
-              news.setLocationBarcode(locationBarcode);
               news.setLastModifier(user);
 
               if (j.has("receivedDate") && !isStringEmptyOrNull(j.getString("receivedDate"))) {
@@ -199,6 +197,11 @@ public class SampleControllerHelperService {
                   note.setCreationDate(date);
                 } else {
                   note.setCreationDate(new Date());
+                }
+                
+                if (j.has("identificationBarcode") && !isStringEmptyOrNull(j.getString("identificationBarcode"))) {
+                  String idBarcode = j.getString("identificationBarcode");
+                  news.setIdentificationBarcode(idBarcode);
                 }
 
                 news.setNotes(Arrays.asList(note));
@@ -354,7 +357,7 @@ public class SampleControllerHelperService {
           sb.append("<td>" + qc.getQcCreator() + "</td>");
           sb.append("<td>" + qc.getQcDate() + "</td>");
           sb.append("<td>" + qc.getQcType().getName() + "</td>");
-          sb.append("<td>" + qc.getResults() + " " + qc.getQcType().getUnits() + "</td>");
+          sb.append("<td>" + LimsUtils.round(qc.getResults(), 2) + " " + qc.getQcType().getUnits() + "</td>");
           sb.append("</tr>");
         }
         return JSONUtils.SimpleJSONResponse(sb.toString());
@@ -776,6 +779,7 @@ public class SampleControllerHelperService {
         JSONArray inner = new JSONArray();
         String identificationBarcode = sample.getIdentificationBarcode();
 
+        inner.add("<input type=\"checkbox\" value=\"" + sample.getId() + "\" class=\"bulkCheckbox\" id=\"bulk" + "_" + sample.getId() + "\">");
         inner.add(TableHelper.hyperLinkify("/miso/sample/" + sample.getId(), sample.getName()));
         inner.add(TableHelper.hyperLinkify("/miso/sample/" + sample.getId(), sample.getAlias()));
         inner.add(sample.getSampleType());

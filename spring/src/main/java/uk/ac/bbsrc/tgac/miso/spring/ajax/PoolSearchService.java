@@ -130,7 +130,7 @@ public class PoolSearchService {
 
         StringBuilder b = new StringBuilder();
         List<? extends Dilution> dilutions = new ArrayList<Dilution>(
-            requestManager.listDilutionsBySearch(searchStr, PlatformType.valueOf(platformType)));
+            requestManager.listAllLibraryDilutionsBySearchAndPlatform(searchStr, PlatformType.valueOf(platformType)));
         int numMatches = 0;
         for (Dilution d : dilutions) {
           // have to use onmousedown because of blur firing before onclick and hiding the div before it can be added

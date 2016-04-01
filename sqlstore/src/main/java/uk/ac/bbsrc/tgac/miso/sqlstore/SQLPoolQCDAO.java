@@ -51,6 +51,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
+import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
@@ -92,6 +93,7 @@ public class SQLPoolQCDAO implements PoolQcStore {
   @Autowired
   private CacheManager cacheManager;
 
+  @CoverageIgnore
   public void setCacheManager(CacheManager cacheManager) {
     this.cacheManager = cacheManager;
   }
@@ -99,22 +101,27 @@ public class SQLPoolQCDAO implements PoolQcStore {
   @Autowired
   private DataObjectFactory dataObjectFactory;
 
+  @CoverageIgnore
   public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
     this.dataObjectFactory = dataObjectFactory;
   }
 
+  @CoverageIgnore
   public void setPoolDAO(PoolStore poolDAO) {
     this.poolDAO = poolDAO;
   }
 
+  @CoverageIgnore
   public JdbcTemplate getJdbcTemplate() {
     return template;
   }
 
+  @CoverageIgnore
   public void setJdbcTemplate(JdbcTemplate template) {
     this.template = template;
   }
 
+  @CoverageIgnore
   public void setCascadeType(CascadeType cascadeType) {
     this.cascadeType = cascadeType;
   }
@@ -256,14 +263,14 @@ public class SQLPoolQCDAO implements PoolQcStore {
 
   @Override
   public QcType getPoolQcTypeById(long qcTypeId) throws IOException {
-    List eResults = template.query(POOL_QC_TYPE_SELECT_BY_ID, new Object[] { qcTypeId }, new PoolQcTypeMapper());
+    List<QcType> eResults = template.query(POOL_QC_TYPE_SELECT_BY_ID, new Object[] { qcTypeId }, new PoolQcTypeMapper());
     QcType e = eResults.size() > 0 ? (QcType) eResults.get(0) : null;
     return e;
   }
 
   @Override
   public QcType getPoolQcTypeByName(String qcName) throws IOException {
-    List eResults = template.query(POOL_QC_TYPE_SELECT_BY_NAME, new Object[] { qcName }, new PoolQcTypeMapper());
+    List<QcType> eResults = template.query(POOL_QC_TYPE_SELECT_BY_NAME, new Object[] { qcName }, new PoolQcTypeMapper());
     QcType e = eResults.size() > 0 ? (QcType) eResults.get(0) : null;
     return e;
   }

@@ -28,6 +28,8 @@
 <link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" type="text/css">
 <link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables_themeroller.css'/>">
 
+<div id="maincontent">
+<div id="contentcolumn">
 <h1>
   <div id="totalProjectCount"> Projects
   </div>
@@ -62,6 +64,8 @@
 
 <table cellpadding="0" cellspacing="0" border="0" class="display" id="listingProjectsTable">
 </table>
+</div>
+
 <script type="text/javascript">
 var fun, state = "tree";
 
@@ -777,5 +781,9 @@ function changeD3(type) {
 }
 d3.select(self.frameElement).style("height", "1000px");
 </script>
+</div>
+</div>
+
+<%@ include file="adminsub.jsp" %>
 
 <%@ include file="../footer.jsp" %>

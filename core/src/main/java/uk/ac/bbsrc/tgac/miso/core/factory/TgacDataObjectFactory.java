@@ -47,6 +47,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
@@ -66,6 +67,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerServiceRecordImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubmissionImpl;
@@ -536,4 +538,10 @@ public class TgacDataObjectFactory extends DataObjectFactory {
   public SampleAnalyte getSampleAnalyte() {
     return new SampleAnalyteImpl();
   }
+
+  @Override
+  public SequencerServiceRecord getSequencerServiceRecord() {
+    return new SequencerServiceRecordImpl();
+  }
+  
 }

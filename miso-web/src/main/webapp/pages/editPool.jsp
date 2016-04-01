@@ -33,8 +33,8 @@
 <link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" type="text/css">
 <link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables_themeroller.css'/>"
       type="text/css">
-<script src="<c:url value='/scripts/datatables_utils.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
-<script src="<c:url value='/scripts/natural_sort.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
+<script src="<c:url value='/scripts/datatables_utils.js'/>" type="text/javascript"></script>
+<script src="<c:url value='/scripts/natural_sort.js'/>" type="text/javascript"></script>
 
 <script type="text/javascript" src="<c:url value='/scripts/parsley/parsley.min.js'/>"></script>
 
@@ -116,6 +116,13 @@
     </td>
   </tr>
   <tr>
+    <td class="h">Location:</td>
+    <td>
+      <c:if test="${!empty pool.boxLocation}">${pool.boxLocation},</c:if>
+      <c:if test="${!empty pool.boxPosition}"><a href='<c:url value="/miso/box/${pool.boxId}"/>'>${pool.boxAlias}, ${pool.boxPosition}</a></c:if>
+    </td>
+  </tr>
+  <tr>
     <td class="h">Name:</td>
     <td>
       <c:choose>
@@ -142,7 +149,7 @@
     </td>
   </tr>
   <tr>
-    <td class="h">Desired Concentration:*</td>
+    <td class="h">Desired Concentration (${poolConcentrationUnits}):*</td>
     <td><form:input id="concentration" path="concentration"/></td>
   </tr>
   <tr>
@@ -167,6 +174,15 @@
     <td class="h">Ready To Run</td>
     <td><form:checkbox path="readyToRun"/></td>
   </tr>
+  
+  <tr>
+    <td>Volume (&#181;l):</td>
+    <td><form:input id="volume" path="volume"/></td>
+  </tr>
+  <tr>
+    <td>Emptied:</td>
+    <td><form:checkbox id="empty" path="empty"/></td>
+  </tr>
 
 </table>
 <%@ include file="permissions.jsp" %>
@@ -178,6 +194,50 @@
     Validate.attachParsley('#pool-form');
   });
 </script>
+
+<!--notes start -->
+<c:if test="${pool.id != 0}">
+    <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#notes_arrowclick'), 'notes');">Notes
+      <div id="notes_arrowclick" class="toggleLeftDown"></div>
+    </div>
+    <div id="notes">
+      <h1>Notes</h1>
+      <ul class="sddm">
+        <li>
+          <a onmouseover="mopen('notesmenu')" onmouseout="mclosetime()">Options
+            <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
+          </a>
+
+          <div id="notesmenu"
+               onmouseover="mcancelclosetime()"
+               onmouseout="mclosetime()">
+            <a onclick="Pool.ui.showPoolNoteDialog(${pool.id});" href="javascript:void(0);" class="add">Add Note</a>
+          </div>
+        </li>
+      </ul>
+      <c:if test="${fn:length(pool.notes) > 0}">
+        <div class="note" style="clear:both">
+          <c:forEach items="${pool.notes}" var="note" varStatus="n">
+            <div class="exppreview" id="pool-notes-${n.count}">
+              <b>${note.creationDate}</b>: ${note.text}
+              <span class="float-right" style="font-weight:bold; color:#C0C0C0;">${note.owner.loginName}</span>
+                <c:if test="${(note.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
+                                or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+                  <span style="color:#000000">
+                    <a href='#' onclick="Pool.ui.deletePoolNote('${pool.id}', '${note.noteId}');">
+                      <span class="ui-icon ui-icon-trash" style="clear: both; position: relative; float: right; margin-top: -15px;"></span>
+                    </a>
+                  </span>
+                </c:if>
+            </div>
+          </c:forEach>
+        </div>
+      </c:if>
+      <div id="addPoolNoteDialog" title="Create new Note"></div>
+    </div>
+    <br/>
+</c:if>
+<!-- notes end -->
 
 <c:if test="${pool.id != 0}">
   <h1>
@@ -369,10 +429,10 @@
     jQuery(document).ready(function () {
         <c:choose>
         <c:when test="${pool.id != 0}">
-        Pool.ui.createElementSelectDatatable('${pool.platformType.key}');
+        Pool.ui.createElementSelectDatatable('${pool.platformType.key}', '${libraryDilutionUnits}');
         </c:when>
         <c:otherwise>
-        Pool.ui.createElementSelectDatatable('Illumina');
+        Pool.ui.createElementSelectDatatable('Illumina', '${libraryDilutionUnits}');
         </c:otherwise>
         </c:choose>
     });

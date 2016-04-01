@@ -111,6 +111,7 @@ public class ProjectAlertManager {
   public void push(Project project) {
     if (enabled) {
       if (project != null) {
+        cloner.dontClone(org.hibernate.collection.internal.PersistentSet.class);
         Project clone = cloner.deepClone(project);
         if (clone != null) {
           if (projects.containsKey(project.getId())) {

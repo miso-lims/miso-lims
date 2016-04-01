@@ -18,6 +18,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleGroupDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SubprojectDao;
 import uk.ac.bbsrc.tgac.miso.service.SampleGroupService;
+import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationException;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLProjectDAO;
 
@@ -83,6 +84,18 @@ public class DefaultSampleGroupService implements SampleGroupService {
     authorizationManager.throwIfNonAdmin();
     SampleGroupId sampleGroup = get(sampleGroupId);
     sampleGroupDao.deleteSampleGroup(sampleGroup);
+  }
+
+  @Override
+  public Set<SampleGroupId> getAllForProject(Long projectId) throws AuthorizationException, IOException {
+    authorizationManager.throwIfUnauthenticated();
+    return Sets.newHashSet(sampleGroupDao.getSampleGroupsForProject(projectId));
+  }
+
+  @Override
+  public Set<SampleGroupId> getAllForSubproject(Long subprojectId) throws AuthorizationException, IOException {
+    authorizationManager.throwIfUnauthenticated();
+    return Sets.newHashSet(sampleGroupDao.getSampleGroupsForSubproject(subprojectId));
   }
 
 }

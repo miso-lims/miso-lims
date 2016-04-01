@@ -9,6 +9,8 @@ import static org.junit.Assert.assertTrue;
 import java.util.Date;
 import java.util.List;
 
+import org.hibernate.SessionFactory;
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -24,10 +26,18 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 
 public class HibernateIdentityDaoTest extends AbstractDAOTest {
-  
+
   @Autowired
+  private SessionFactory sessionFactory;
+
   private HibernateIdentityDao dao;
-  
+
+  @Before
+  public void setup() {
+    dao = new HibernateIdentityDao();
+    dao.setSessionFactory(sessionFactory);
+  }
+
   @Test
   public void testGetIdentity() {
     Identity identity = dao.getIdentity(1L);
@@ -95,7 +105,5 @@ public class HibernateIdentityDaoTest extends AbstractDAOTest {
     assertEquals(new Long(1), dao.getIdentity().get(0).getIdentityId());
 
   }
-
-
 
 }

@@ -28,13 +28,16 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Set;
 import java.util.TreeSet;
 
+import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.OneToOne;
+import javax.persistence.Transient;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +47,7 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
@@ -59,6 +63,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
  * @author Rob Davey
  * @since 0.0.2
  */
+@MappedSuperclass
 public abstract class AbstractLibrary extends AbstractBoxable implements Library {
   protected static final Logger log = LoggerFactory.getLogger(AbstractLibrary.class);
   public static final Long UNSAVED_ID = 0L;
@@ -74,32 +79,57 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   private Date creationDate = new Date();
   private String identificationBarcode;
   private String locationBarcode;
+  private String platformName;
+  private String alias;
+  private Boolean qcPassed;
+  private boolean lowQuality;
+
+  @Transient
   private TagBarcode tagBarcode;
 
+  @Transient
   private HashMap<Integer, TagBarcode> tagBarcodes = new HashMap<Integer, TagBarcode>();
 
   private Boolean paired;
 
+  @Transient
   private final Collection<LibraryQC> libraryQCs = new TreeSet<LibraryQC>();
+  
+  @Transient
   private final Collection<LibraryDilution> libraryDilutions = new HashSet<LibraryDilution>();
-  private Set<Plate<? extends LinkedList<Library>, Library>> plates = new HashSet<Plate<? extends LinkedList<Library>, Library>>();
 
+  @Transient
   private SecurityProfile securityProfile;
+  
+  @Transient
   private Sample sample;
+  
+  @Transient
   private LibraryType libraryType;
+  
+  @Transient
   private LibrarySelectionType librarySelectionType;
+  
+  @Transient
   private LibraryStrategyType libraryStrategyType;
-  private String platformName;
+  
+  @Column(name = "concentration")
   private Double initialConcentration;
+  
+  @Transient
   private Integer libraryQuant;
-  private String alias;
-  private Boolean qcPassed;
-  private User lastModifier;
-  private boolean lowQuality;
 
+  @OneToOne(targetEntity = UserImpl.class)
+  @JoinColumn(name = "lastModifier", nullable = false)
+  private User lastModifier;
+  
+  @Transient
   private Collection<Note> notes = new HashSet<Note>();
+  
+  @Transient
   private final Collection<ChangeLog> changeLog = new ArrayList<ChangeLog>();
 
+  @Transient
   private Date lastUpdated;
 
   @Override
@@ -156,6 +186,7 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
     this.accession = accession;
   }
 
+  @Override
   public Date getCreationDate() {
     return creationDate;
   }
@@ -343,20 +374,6 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   }
 
   @Override
-  public Set<Plate<? extends LinkedList<Library>, Library>> getPlates() {
-    return plates;
-  }
-
-  @CoverageIgnore
-  public void addPlate(Plate<? extends LinkedList<Library>, Library> plate) {
-    this.plates.add(plate);
-  }
-
-  public void setPlates(Set<Plate<? extends LinkedList<Library>, Library>> plates) {
-    this.plates = plates;
-  }
-
-  @Override
   public Date getLastUpdated() {
     return lastUpdated;
   }
@@ -477,10 +494,12 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
     return sb.toString();
   }
 
+  @Override
   public User getLastModifier() {
     return lastModifier;
   }
 
+  @Override
   public void setLastModifier(User lastModifier) {
     this.lastModifier = lastModifier;
   }

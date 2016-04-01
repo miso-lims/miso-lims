@@ -30,12 +30,6 @@
 --%>
 <%@ include file="../header.jsp" %>
 
-<script src="<c:url value='/scripts/statsdb.js'/>" type="text/javascript"></script>
-<script src="<c:url value='/scripts/statsdbperbasecontent.js'/>" type="text/javascript"></script>
-
-<script type="text/javascript" src="<c:url value='/scripts/run_ajax.js?ts=${timestamp.time}'/>"></script>
-<script type="text/javascript" src="<c:url value='/scripts/stats_ajax.js?ts=${timestamp.time}'/>"></script>
-
 
 <script type="text/javascript" src="<c:url value='/scripts/parsley/parsley.min.js'/>"></script>
 
@@ -320,10 +314,13 @@
             <b>${note.creationDate}</b>: ${note.text}
           <span class="float-right"
                 style="font-weight:bold; color:#C0C0C0;">${note.owner.loginName}
-            <c:if test="${(project.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
+            <c:if test="${(note.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
                             or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-            <span style="color:#000000"><a href='#' onclick="Run.ui.deleteRunNote('${run.runId}', '${note.noteId}');">
-              <span class="ui-icon ui-icon-trash" style="clear: both; position: relative; float: right; margin-top: -15px;"/></a></span>
+              <span style="color:#000000">
+                <a href='#' onclick="Run.ui.deleteRunNote('${run.runId}', '${note.noteId}');">
+                  <span class="ui-icon ui-icon-trash" style="clear: both; position: relative; float: right; margin-top: -15px;"></span>
+                </a>
+              </span>
             </c:if>
           </span>
           </div>

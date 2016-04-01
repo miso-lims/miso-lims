@@ -184,7 +184,7 @@ Experiment.kit = {
       'experimentControllerHelperService',
       'lookupKitByIdentificationBarcode',
       {'barcode': barcode, 'url': ajaxurl},
-      {'doOnSuccess': fillKitSelector}
+      {'doOnSuccess': fillKitSelector} // ?? fillKitSelector is not defined anywhere in the project.
     );
   },
 
@@ -193,7 +193,7 @@ Experiment.kit = {
       'experimentControllerHelperService',
       'lookupKitByLotNumber',
       {'lotNumber': lotNumber, 'url': ajaxurl},
-      {'doOnSuccess': fillKitSelector}
+      {'doOnSuccess': fillKitSelector} // ?? fillKitSelector is not defined anywhere in the project.
     );
   },
 
@@ -232,17 +232,17 @@ Experiment.kit = {
     var experimentId = json.experimentId;
     var multiplexed = json.multiplexed;
 
-    var libraryKits = new Array();
+    var libraryKits = [];
     if (json.libraryKitDescriptors) {
       for (var i = 0; i < json.libraryKitDescriptors.length; i++) {
         libraryKits.push(json.libraryKitDescriptors[i]);
       }
     }
 
-    var multiplexKits = new Array();
+    var multiplexKits = [];
     if (multiplexed == "true" && json.multiplexKitDescriptors) {
-      for (var i = 0; i < json.multiplexKitDescriptors.length; i++) {
-        multiplexKits.push(json.multiplexKitDescriptors[i]);
+      for (var j = 0; j < json.multiplexKitDescriptors.length; j++) {
+        multiplexKits.push(json.multiplexKitDescriptors[j]);
       }
     }
 
@@ -251,8 +251,8 @@ Experiment.kit = {
                      "<label for='kitDescriptor'>Library Kit</label>" +
                      "<select name='kitDescriptor' id='kitDescriptor' class='text ui-widget-content ui-corner-all' onchange='Experiment.kit.kitDescriptorChange(this)'>";
 
-    for (var i = 0; i < libraryKits.length; i++) {
-      dialogText += "<option partNumber='" + libraryKits[i].partNumber + "' value='" + libraryKits[i].id + "'>" + libraryKits[i].name + "</option>";
+    for (var k = 0; k < libraryKits.length; k++) {
+      dialogText += "<option partNumber='" + libraryKits[k].partNumber + "' value='" + libraryKits[k].id + "'>" + libraryKits[k].name + "</option>";
     }
 
     dialogText += "</select><br/>" +
@@ -263,8 +263,8 @@ Experiment.kit = {
       dialogText += "<label for='multiplexingKitType'>Multiplexing Kit</label>" +
                     "<select name='multiplexingKitType' id='multiplexingKitType' class='text ui-widget-content ui-corner-all'>";
 
-      for (var i = 0; i < multiplexKits.length; i++) {
-        dialogText += "<option partNumber='" + multiplexKits[i].partNumber + "' value='" + multiplexKits[i].id + "'>" + multiplexKits[i].name + "</option>";
+      for (var m = 0; m < multiplexKits.length; m++) {
+        dialogText += "<option partNumber='" + multiplexKits[m].partNumber + "' value='" + multiplexKits[m].id + "'>" + multiplexKits[m].name + "</option>";
       }
       dialogText += "</select><br/>" +
                     "<label for='multiplexingKitBarcode'>Multiplexing Kit Barcode</label>" +
@@ -310,13 +310,10 @@ Experiment.kit = {
         'experimentControllerHelperService',
         'addLibraryKit',
         {'experimentId': experimentId, 'kitDescriptor': kitDescriptorId, 'partNumber': partNumber, 'lotNumber': lotNumber, 'url': ajaxurl},
-        {'doOnSuccess': function (json) {
+        {'doOnSuccess': function () {
           alert("Added");
         }
       });
-    }
-    else {
-
     }
   },
 
@@ -336,7 +333,7 @@ Experiment.kit = {
 
     var experimentId = json.experimentId;
 
-    var kits = new Array();
+    var kits = [];
     if (json.emPcrKitDescriptors) {
       for (var i = 0; i < json.emPcrKitDescriptors.length; i++) {
         kits.push(json.emPcrKitDescriptors[i]);
@@ -348,8 +345,8 @@ Experiment.kit = {
                      "<label for='kitDescriptor'>EmPCR Kit</label>" +
                      "<select name='kitDescriptor' id='kitDescriptor' class='text ui-widget-content ui-corner-all' onchange='Experiment.kit.kitDescriptorChange(this)'>";
 
-    for (var i = 0; i < kits.length; i++) {
-      dialogText += "<option partNumber='" + kits[i].partNumber + "' value='" + kits[i].id + "'>" + kits[i].name + "</option>";
+    for (var j = 0; j < kits.length; j++) {
+      dialogText += "<option partNumber='" + kits[j].partNumber + "' value='" + kits[j].id + "'>" + kits[j].name + "</option>";
     }
 
     dialogText += "</select><br/>" +
@@ -388,7 +385,7 @@ Experiment.kit = {
       'experimentControllerHelperService',
       'addEmPcrKit',
       {'experimentId': experimentId, 'kitDescriptor': kitDescriptorId, 'partNumber': partNumber, 'lotNumber': lotNumber, 'url': ajaxurl},
-      {'doOnSuccess': function (json) {
+      {'doOnSuccess': function () {
         alert("Added");
       }
     });
@@ -410,7 +407,7 @@ Experiment.kit = {
 
     var experimentId = json.experimentId;
 
-    var kits = new Array();
+    var kits = [];
     if (json.clusteringKitDescriptors) {
       for (var i = 0; i < json.clusteringKitDescriptors.length; i++) {
         kits.push(json.clusteringKitDescriptors[i]);
@@ -422,8 +419,8 @@ Experiment.kit = {
                      "<label for='kitDescriptor'>Clustering Kit</label>" +
                      "<select name='kitDescriptor' id='kitDescriptor' class='text ui-widget-content ui-corner-all' onchange='Experiment.kit.kitDescriptorChange(this)'>";
 
-    for (var i = 0; i < kits.length; i++) {
-      dialogText += "<option partNumber='" + kits[i].partNumber + "' value='" + kits[i].id + "'>" + kits[i].name + "</option>";
+    for (var j = 0; j < kits.length; j++) {
+      dialogText += "<option partNumber='" + kits[j].partNumber + "' value='" + kits[j].id + "'>" + kits[j].name + "</option>";
     }
 
     dialogText += "</select><br/>" +
@@ -462,7 +459,7 @@ Experiment.kit = {
       'experimentControllerHelperService',
       'addClusteringKit',
       {'experimentId': experimentId, 'kitDescriptor': kitDescriptorId, 'partNumber': partNumber, 'lotNumber': lotNumber, 'url': ajaxurl},
-      {'doOnSuccess': function (json) {
+      {'doOnSuccess': function () {
         alert("Added");
       }
     });
@@ -484,7 +481,7 @@ Experiment.kit = {
 
     var experimentId = json.experimentId;
 
-    var kits = new Array();
+    var kits = [];
     if (json.sequencingKitDescriptors) {
       for (var i = 0; i < json.sequencingKitDescriptors.length; i++) {
         kits.push(json.sequencingKitDescriptors[i]);
@@ -496,8 +493,8 @@ Experiment.kit = {
                      "<label for='kitDescriptor'>Sequencing Kit</label>" +
                      "<select name='kitDescriptor' id='kitDescriptor' class='text ui-widget-content ui-corner-all' onchange='Experiment.kit.kitDescriptorChange(this)'>";
 
-    for (var i = 0; i < kits.length; i++) {
-      dialogText += "<option partNumber='" + kits[i].partNumber + "' value='" + kits[i].id + "'>" + kits[i].name + "</option>";
+    for (var j = 0; j < kits.length; j++) {
+      dialogText += "<option partNumber='" + kits[j].partNumber + "' value='" + kits[j].id + "'>" + kits[j].name + "</option>";
     }
 
     dialogText += "</select><br/>" +
@@ -537,7 +534,7 @@ Experiment.kit = {
       'experimentControllerHelperService',
       'addSequencingKit',
       {'experimentId': experimentId, 'kitDescriptor': kitDescriptorId, 'partNumber': partNumber, 'lotNumber': lotNumber, 'url': ajaxurl},
-      {'doOnSuccess': function (json) {
+      {'doOnSuccess': function () {
         alert("Added");
       }
     });

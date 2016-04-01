@@ -66,6 +66,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.PlatformStore;
 import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
+import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
@@ -113,7 +114,7 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
   public static final String SEQUENCER_PARTITION_CONTAINER_UPDATE = "UPDATE "
       + TABLE_NAME
       + " "
-      + "SET platform=:platform, identificationBarcode=:identificationBarcode, locationBarcode=:locationBarcode, validationBarcode=:validationBarcode, securityProfile_profileId:=securityProfile_profileId, lastModifier=:lastModifier "
+      + "SET platform=:platform, identificationBarcode=:identificationBarcode, locationBarcode=:locationBarcode, validationBarcode=:validationBarcode, securityProfile_profileId=:securityProfile_profileId, lastModifier=:lastModifier "
       + "WHERE containerId=:containerId";
 
   protected static final Logger log = LoggerFactory.getLogger(SQLSequencerPartitionContainerDAO.class);
@@ -132,11 +133,13 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
   private MisoNamingScheme<SequencerPartitionContainer<SequencerPoolPartition>> namingScheme;
 
   @Override
+  @CoverageIgnore
   public MisoNamingScheme<SequencerPartitionContainer<SequencerPoolPartition>> getNamingScheme() {
     return namingScheme;
   }
 
   @Override
+  @CoverageIgnore
   public void setNamingScheme(MisoNamingScheme<SequencerPartitionContainer<SequencerPoolPartition>> namingScheme) {
     this.namingScheme = namingScheme;
   }
@@ -144,6 +147,7 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
   @Autowired
   private CacheManager cacheManager;
 
+  @CoverageIgnore
   public void setCacheManager(CacheManager cacheManager) {
     this.cacheManager = cacheManager;
   }
@@ -151,38 +155,47 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
   @Autowired
   private DataObjectFactory dataObjectFactory;
 
+  @CoverageIgnore
   public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
     this.dataObjectFactory = dataObjectFactory;
   }
 
+  @CoverageIgnore
   public void setPartitionDAO(PartitionStore partitionDAO) {
     this.partitionDAO = partitionDAO;
   }
 
+  @CoverageIgnore
   public void setRunDAO(RunStore runDAO) {
     this.runDAO = runDAO;
   }
 
+  @CoverageIgnore
   public void setPlatformDAO(PlatformStore platformDAO) {
     this.platformDAO = platformDAO;
   }
 
+  @CoverageIgnore
   public Store<SecurityProfile> getSecurityProfileDAO() {
     return securityProfileDAO;
   }
 
+  @CoverageIgnore
   public void setSecurityProfileDAO(Store<SecurityProfile> securityProfileDAO) {
     this.securityProfileDAO = securityProfileDAO;
   }
 
+  @CoverageIgnore
   public JdbcTemplate getJdbcTemplate() {
     return template;
   }
 
+  @CoverageIgnore
   public void setJdbcTemplate(JdbcTemplate template) {
     this.template = template;
   }
 
+  @CoverageIgnore
   public void setCascadeType(CascadeType cascadeType) {
     this.cascadeType = cascadeType;
   }
@@ -250,6 +263,7 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
     return lp;
   }
 
+  @CoverageIgnore
   @Override
   public Collection<? extends SequencerPoolPartition> listPartitionsByContainerId(long sequencerPartitionContainerId) throws IOException {
     return partitionDAO.listBySequencerPartitionContainerId(sequencerPartitionContainerId);
@@ -360,6 +374,7 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
     }
 
     @Override
+    @CoverageIgnore
     public SequencerPartitionContainer<SequencerPoolPartition> mapRow(ResultSet rs, int rowNum) throws SQLException {
       long id = rs.getLong("containerId");
 
@@ -447,18 +462,22 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
     return false;
   }
 
+  @CoverageIgnore
   public ChangeLogStore getChangeLogDAO() {
     return changeLogDAO;
   }
 
+  @CoverageIgnore
   public void setChangeLogDAO(ChangeLogStore changeLogDAO) {
     this.changeLogDAO = changeLogDAO;
   }
 
+  @CoverageIgnore
   public SecurityStore getSecurityDAO() {
     return securityDAO;
   }
 
+  @CoverageIgnore
   public void setSecurityDAO(SecurityStore securityDAO) {
     this.securityDAO = securityDAO;
   }

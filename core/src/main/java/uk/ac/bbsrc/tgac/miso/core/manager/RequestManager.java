@@ -26,6 +26,7 @@ package uk.ac.bbsrc.tgac.miso.core.manager;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
@@ -56,6 +57,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
@@ -110,6 +112,8 @@ public interface RequestManager {
 
   public long savePoolQC(PoolQC poolQC) throws IOException;
 
+  public long savePoolNote(Pool pool, Note note) throws IOException;
+
   public long saveEmPCR(emPCR pcr) throws IOException;
 
   public long saveEmPCRDilution(emPCRDilution dilution) throws IOException;
@@ -131,6 +135,8 @@ public interface RequestManager {
   public long saveSubmission(Submission submission) throws IOException;
 
   public long saveSequencerReference(SequencerReference sequencerReference) throws IOException;
+  
+  public long saveSequencerServiceRecord(SequencerServiceRecord record) throws IOException;
 
   public long saveKit(Kit kit) throws IOException;
 
@@ -240,6 +246,8 @@ public interface RequestManager {
   public SequencerReference getSequencerReferenceByName(String referenceName) throws IOException;
 
   public SequencerReference getSequencerReferenceByRunId(long runId) throws IOException;
+  
+  public SequencerServiceRecord getSequencerServiceRecordById(long id) throws IOException;
 
   public Kit getKitById(long kitId) throws IOException;
 
@@ -311,8 +319,6 @@ public interface RequestManager {
 
   public Collection<Box> listAllBoxesWithLimit(long limit) throws IOException;
 
-  public Collection<Box> listAllBoxesBySearch(String query) throws IOException;
-
   public Collection<Box> listAllBoxesByAlias(String alias) throws IOException;
 
   public Collection<Run> listAllRuns() throws IOException;
@@ -362,6 +368,11 @@ public interface RequestManager {
   public Collection<Sample> listAllSamplesByExperimentId(long experimentId) throws IOException;
 
   public Collection<Sample> listSamplesByAlias(String alias) throws IOException;
+  
+  /** 
+   * throws AuthorizationIOException if user cannot read one of the requested samples
+   */
+  public Collection<Sample> getSamplesByIdList(List<Long> idList) throws IOException;
 
   public Collection<String> listAllSampleTypes() throws IOException;
 
@@ -393,7 +404,7 @@ public interface RequestManager {
 
   public Collection<TagBarcode> listAllTagBarcodesByStrategyName(String platformType) throws IOException;
 
-  public Collection<Dilution> listDilutionsBySearch(String query, PlatformType platformType) throws IOException;
+  public Collection<Dilution> listAllLibraryDilutionsBySearchAndPlatform(String query, PlatformType platformType) throws IOException;
 
   public Collection<Dilution> listAllDilutionsByProjectAndPlatform(long projectId, PlatformType platformType) throws IOException;
 
@@ -406,8 +417,6 @@ public interface RequestManager {
   public Collection<LibraryDilution> listAllLibraryDilutionsByPlatform(PlatformType platformType) throws IOException;
 
   public Collection<LibraryDilution> listAllLibraryDilutionsByProjectId(long projectId) throws IOException;
-
-  public Collection<LibraryDilution> listAllLibraryDilutionsBySearch(String query, PlatformType platformType) throws IOException;
 
   public Collection<LibraryDilution> listAllLibraryDilutionsBySearchOnly(String query) throws IOException;
 
@@ -488,6 +497,8 @@ public interface RequestManager {
   public Collection<Submission> listAllSubmissions() throws IOException;
 
   public Collection<Run> listRunsByExperimentId(Long experimentId) throws IOException;
+  
+  public Collection<Run> listRunsBySequencerId(Long sequencerReferenceId) throws IOException;
 
   /**
    * Obtain a list of Boxables by supplied identificationBarcode list
@@ -497,6 +508,10 @@ public interface RequestManager {
   public Collection<SequencerReference> listAllSequencerReferences() throws IOException;
 
   public Collection<SequencerReference> listSequencerReferencesByPlatformType(PlatformType platformType) throws IOException;
+  
+  public Collection<SequencerServiceRecord> listAllSequencerServiceRecords() throws IOException;
+  
+  public Collection<SequencerServiceRecord> listSequencerServiceRecordsBySequencerId(long referenceId) throws IOException;
 
   public Collection<Kit> listAllKits() throws IOException;
 
@@ -568,6 +583,8 @@ public interface RequestManager {
 
   public void deleteSequencerReference(SequencerReference sequencerReference) throws IOException;
 
+  public void deleteSequencerServiceRecord(SequencerServiceRecord serviceRecord) throws IOException;
+
   public void deletePool(Pool pool) throws IOException;
 
   public void deletePlate(Plate plate) throws IOException;
@@ -581,5 +598,35 @@ public interface RequestManager {
   public void deleteNote(Note note) throws IOException;
 
   public void deleteBox(Box box) throws IOException;
+  
+  public Map<String, Integer> getServiceRecordColumnSizes() throws IOException;
+  
+  public Map<String, Integer> getBoxColumnSizes() throws IOException;
+  
+  public Map<String, Integer> getExperimentColumnSizes() throws IOException;
+  
+  public Map<String, Integer> getPoolColumnSizes() throws IOException;
+  
+  public Map<String, Integer> getKitDescriptorColumnSizes() throws IOException;
+  
+  public Map<String, Integer> getLibraryColumnSizes() throws IOException;
+  
+  public Map<String, Integer> getPlateColumnSizes() throws IOException;
+  
+  public Map<String, Integer> getProjectColumnSizes() throws IOException;
+  
+  public Map<String, Integer> getRunColumnSizes() throws IOException;
+  
+  public Map<String, Integer> getSampleColumnSizes() throws IOException;
+  
+  public Map<String, Integer> getStudyColumnSizes() throws IOException;
+  
+  public Map<String, Integer> getSequencerReferenceColumnSizes() throws IOException;
+  
+  public Map<String, Integer> getSubmissionColumnSizes() throws IOException;
+  
+  public Map<String, Integer> getUserColumnSizes() throws IOException;
+  
+  public Map<String, Integer> getGroupColumnSizes() throws IOException;
 
 }

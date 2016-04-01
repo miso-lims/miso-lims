@@ -48,7 +48,7 @@ Print.ui = {
 
   editPrinterService : function(serviceName) {
     var schema='';
-    if(!jQuery('#newschema-' + serviceName).length == 0) {
+    if(jQuery('#newschema-' + serviceName).length !== 0) {
       schema =  jQuery('#newschema-' + serviceName+' option:selected').val();
     }
     Fluxion.doAjax(
@@ -88,26 +88,26 @@ Print.ui = {
 
       jQuery('#printerTable tr:first').append("<th>Printable Entity</th><th>Available</th><th></th>");
 
-      $('printerTable').insertRow(1);
+      jQuery('#printerTable')[0].insertRow(1);
 
-      var column1 = $('printerTable').rows[1].insertCell(-1);
+      var column1 = jQuery('#printerTable')[0].rows[1].insertCell(-1);
       column1.innerHTML = "<input id='serviceName' name='serviceName' type='text'/>";
-      var column2 = $('printerTable').rows[1].insertCell(-1);
+      var column2 = jQuery('#printerTable')[0].rows[1].insertCell(-1);
       column2.innerHTML = "<i>Set in context fields</i>";
-      var column3 = $('printerTable').rows[1].insertCell(-1);
+      var column3 = jQuery('#printerTable')[0].rows[1].insertCell(-1);
       column3.innerHTML = "<select id='contexts' name='context' onchange='Print.ui.getContextFieldsForContext(this)'>" +json.contexts+ "</select><br/><div id='contextFields' name='contextFields'/>";
-      var column4 = $('printerTable').rows[1].insertCell(-1);
+      var column4 = jQuery('#printerTable')[0].rows[1].insertCell(-1);
       column4.innerHTML = "<select id='barcodableSchemas' name='printSchema'>" +json.barcodableSchemas+ "</select>";
-      var column5 = $('printerTable').rows[1].insertCell(-1);
+      var column5 = jQuery('#printerTable')[0].rows[1].insertCell(-1);
       column5.innerHTML = "<select id='barcodables' name='printServiceFor'>" +json.barcodables+ "</select>";
-      var column6 = $('printerTable').rows[1].insertCell(-1);
+      var column6 = jQuery('#printerTable')[0].rows[1].insertCell(-1);
       column6.innerHTML = "<div id='available'></div>";
-      var column7 = $('printerTable').rows[1].insertCell(-1);
+      var column7 = jQuery('#printerTable')[0].rows[1].insertCell(-1);
       column7.id = "addTd";
       column7.innerHTML = "Add";
     }
     else {
-      alert("Cannot add another printer service when one is already in progress.")
+      alert("Cannot add another printer service when one is already in progress.");
     }
   },
 
@@ -130,16 +130,18 @@ Print.ui = {
         jQuery('#contextFields').append(key +": <input id='contextField-"+key+"' field='"+key+"' type='text' value='"+fields[key]+"'/><br/>");
       }
     }
-    jQuery('#contextField-host').keyup(function() { Print.service.validatePrinter(this) });
+    jQuery('#contextField-host').keyup(function() { Print.service.validatePrinter(this); });
   }
 };
 
 Print.service = {
   validatePrinter : function(t) {
-    $('available').innerHTML="<div align='center'><img src='../../styles/images/ajax-loader.gif'/></div>";
+    jQuery('#available')[0].innerHTML="<div align='center'><img src='../../styles/images/ajax-loader.gif'/></div>";
 
     if (t.value != t.lastValue) {
-      if (t.timer) clearTimeout(t.timer);
+      if (t.timer) {
+        clearTimeout(t.timer);
+      }
 
       t.timer = setTimeout(function () {
         Fluxion.doAjax(
@@ -147,13 +149,13 @@ Print.service = {
           'checkPrinterAvailability',
           {'host':t.value, 'url':ajaxurl},
           {"doOnSuccess": function(json) {
-            $('available').innerHTML = json.html;
+            jQuery('#available')[0].innerHTML = json.html;
             if (json.html == "OK") {
-              $('available').setAttribute("style", "background-color:green");
-              $('addTd').innerHTML = "<a href='javascript:void(0);' onclick='Print.service.addPrinterService();'/>Add</a>";
+              jQuery('#available')[0].setAttribute("style", "background-color:green");
+              jQuery('#addTd')[0].innerHTML = "<a href='javascript:void(0);' onclick='Print.service.addPrinterService();'/>Add</a>";
             }
             else {
-              $('available').setAttribute("style", "background-color:red");
+              jQuery('#available')[0].setAttribute("style", "background-color:red");
             }
           }
         });
@@ -167,7 +169,7 @@ Print.service = {
 
     var f = Utils.mappifyForm("addPrinterForm");
     var cf = {};
-    jQuery('input[id*="contextField-"]').each(function(e) {
+    jQuery('input[id*="contextField-"]').each(function() {
       var field = jQuery(this).attr("field");
       cf[field] = jQuery(this).val();
     });

@@ -24,7 +24,6 @@ public class SampleAdditionalInfoDto {
   private Integer passageNumber;
   private Integer timesReceived;
   private Integer tubeNumber;
-  private Double volume;
   private Double concentration;
   private Long createdById;
   private String createdByUrl;
@@ -32,6 +31,9 @@ public class SampleAdditionalInfoDto {
   private Long updatedById;
   private String updatedByUrl;
   private String lastUpdated;
+  private Long labId;
+  private String labUrl;
+  private String strStatus;
 
   public Long getId() {
     return id;
@@ -129,22 +131,6 @@ public class SampleAdditionalInfoDto {
     this.subprojectUrl = subprojectUrl;
   }
 
-  public Long getPrepKitId() {
-    return prepKitId;
-  }
-
-  public void setPrepKitId(Long prepKitId) {
-    this.prepKitId = prepKitId;
-  }
-
-  public String getPrepKitUrl() {
-    return prepKitUrl;
-  }
-
-  public void setPrepKitUrl(String prepKitUrl) {
-    this.prepKitUrl = prepKitUrl;
-  }
-
   public Integer getPassageNumber() {
     return passageNumber;
   }
@@ -167,14 +153,6 @@ public class SampleAdditionalInfoDto {
 
   public void setTubeNumber(Integer tubeNumber) {
     this.tubeNumber = tubeNumber;
-  }
-
-  public Double getVolume() {
-    return volume;
-  }
-
-  public void setVolume(Double volume) {
-    this.volume = volume;
   }
 
   public Double getConcentration() {
@@ -247,6 +225,46 @@ public class SampleAdditionalInfoDto {
 
   public void setSampleClassUrl(String sampleClassUrl) {
     this.sampleClassUrl = sampleClassUrl;
+  }
+
+  public Long getPrepKitId() {
+    return prepKitId;
+  }
+
+  public void setPrepKitId(Long prepKitId) {
+    this.prepKitId = prepKitId;
+  }
+
+  public String getPrepKitUrl() {
+    return prepKitUrl;
+  }
+
+  public void setPrepKitUrl(String prepKitUrl) {
+    this.prepKitUrl = prepKitUrl;
+  }
+
+  public Long getLabId() {
+    return labId;
+  }
+
+  public void setLabId(Long labId) {
+    this.labId = labId;
+  }
+
+  public String getLabUrl() {
+    return labUrl;
+  }
+
+  public void setLabUrl(String labUrl) {
+    this.labUrl = labUrl;
+  }
+
+  public String getStrStatus() {
+    return strStatus;
+  }
+
+  public void setStrStatus(String strStatus) {
+    this.strStatus = strStatus;
   }
 
 }

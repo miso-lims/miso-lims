@@ -80,7 +80,7 @@
 }
 
 #progress strong{
-  font-weight:normal
+  font-weight:normal;
 }
 #progress a:hover{
   text-decoration:none;

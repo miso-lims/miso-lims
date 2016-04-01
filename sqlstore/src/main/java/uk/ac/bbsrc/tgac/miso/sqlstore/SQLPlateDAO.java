@@ -35,6 +35,9 @@ import java.util.Map;
 
 import javax.persistence.CascadeType;
 
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
+
 import org.codehaus.jackson.type.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,15 +48,6 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
-import com.eaglegenomics.simlims.core.store.SecurityStore;
-import com.googlecode.ehcache.annotations.Cacheable;
-import com.googlecode.ehcache.annotations.KeyGenerator;
-import com.googlecode.ehcache.annotations.Property;
-import com.googlecode.ehcache.annotations.TriggersRemove;
-
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractPlate;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -74,6 +68,13 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DaoLookup;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
+import com.eaglegenomics.simlims.core.SecurityProfile;
+import com.eaglegenomics.simlims.core.store.SecurityStore;
+import com.googlecode.ehcache.annotations.Cacheable;
+import com.googlecode.ehcache.annotations.KeyGenerator;
+import com.googlecode.ehcache.annotations.Property;
+import com.googlecode.ehcache.annotations.TriggersRemove;
+
 /**
  * uk.ac.bbsrc.tgac.miso.sqlstore
  * <p/>
@@ -86,7 +87,7 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 public class SQLPlateDAO implements PlateStore {
   private static final String TABLE_NAME = "Plate";
 
-  public static final String PLATE_SELECT = "SELECT plateId, name, description, creationDate, plateMaterialType, identificationBarcode, locationBarcode, size, tagBarcodeId, securityProfile_profileId "
+  public static final String PLATE_SELECT = "SELECT plateId, name, description, creationDate, plateMaterialType, identificationBarcode, locationBarcode, size, tagBarcodeId, securityProfile_profileId, lastModifier "
       + "FROM " + TABLE_NAME;
 
   public static final String PLATE_SELECT_BY_ID = PLATE_SELECT + " WHERE plateId = ?";
@@ -502,5 +503,10 @@ public class SQLPlateDAO implements PlateStore {
 
   public void setSecurityDAO(SecurityStore securityDAO) {
     this.securityDAO = securityDAO;
+  }
+  
+  @Override
+  public Map<String, Integer> getPlateColumnSizes() throws IOException {
+    return DbUtils.getColumnSizes(template, TABLE_NAME);
   }
 }

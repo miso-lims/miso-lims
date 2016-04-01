@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" [
+    <!ENTITY types SYSTEM "classpath://your/domain/types.xml">
+]>
+
+<!--
+  Miso Hibernate configuration is done with annotations. XML is used here to annotate a binary only third party class stored in a jar. 
+ -->
+<hibernate-mapping>
+  <class name="com.eaglegenomics.simlims.core.SecurityProfile">
+    <id name="profileId" type="long" column="profileId" unsaved-value="0" access="field">
+      <generator class="native"></generator>
+    </id>
+    <property name="allowAllInternal" type="boolean" column="allowAllInternal" access="field" />
+    <one-to-one name="owner" class="uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl" access="field" cascade="save-update"></one-to-one>
+  </class>
+</hibernate-mapping>

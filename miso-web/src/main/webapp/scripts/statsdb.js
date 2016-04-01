@@ -25,7 +25,7 @@ function readStatsdb(file) {
     position.push(d.base);
   });
 
-  w = position.length * 20 + 35
+  w = position.length * 20 + 35;
   var vis = d3.select("#statschartqualityprofile").selectAll("svg")
     .data(datas)
     .enter().append("svg")
@@ -46,7 +46,7 @@ function readStatsdb(file) {
 
   function load() {
     var scorebox = vis.selectAll("rect.day")
-      .data(scores)
+      .data(scores);
     scorebox.enter().append("svg:rect")
       .attr("x", function (g) {
         return 52.5;
@@ -76,7 +76,7 @@ function readStatsdb(file) {
       .attr("height", width);
 
       var basebox = vis.selectAll("rect.day")
-        .data(position)
+        .data(position);
       basebox.enter().append("svg:rect")
         .attr("x", function (d, i) {
             return (i + 1) * 20 + 32.5;

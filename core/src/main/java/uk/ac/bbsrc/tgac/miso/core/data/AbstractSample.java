@@ -24,13 +24,11 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -46,6 +44,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -58,9 +58,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAdditionalInfoImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAnalyteImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAnalyteNode;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityNode;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
@@ -76,6 +76,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
  */
 @MappedSuperclass
 public abstract class AbstractSample extends AbstractBoxable implements Sample {
+  
   protected static final Logger log = LoggerFactory.getLogger(AbstractSample.class);
   public static final Long UNSAVED_ID = 0L;
 
@@ -102,9 +103,6 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
   @Transient
-  private Set<Plate<? extends LinkedList<Sample>, Sample>> plates = new HashSet<Plate<? extends LinkedList<Sample>, Sample>>();
-
-  @Transient
   public Document submissionDocument;
 
   @Transient
@@ -121,6 +119,7 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   private String identificationBarcode;
   private String locationBarcode;
   private String alias;
+  private Long securityProfile_profileId;
 
   @Transient
   private Date lastUpdated;
@@ -131,22 +130,32 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
 
   @OneToOne(targetEntity = SampleAnalyteImpl.class)
   @JoinColumn(name = "sampleAnalyteId")
+  @Cascade({ CascadeType.SAVE_UPDATE })
   private SampleAnalyte sampleAnalyte;
+
+  @OneToOne(targetEntity = SampleTissueImpl.class)
+  @JoinColumn(name = "sampleTissueId")
+  @Cascade({ CascadeType.SAVE_UPDATE })
+  private SampleTissue sampleTissue;
 
   @OneToOne(targetEntity = IdentityImpl.class)
   @JoinColumn(name = "identityId")
+  @Cascade({ CascadeType.SAVE_UPDATE })
   private Identity identity;
 
   @OneToOne(targetEntity = SampleAdditionalInfoImpl.class)
   @JoinColumn(name = "sampleAdditionalInfoId")
+  @Cascade({ CascadeType.SAVE_UPDATE })
   private SampleAdditionalInfo sampleAdditionalInfo;
 
   @ManyToOne(targetEntity = SampleImpl.class)
   @JoinColumn(name = "parentId")
+  @Cascade({ CascadeType.SAVE_UPDATE })
   private Sample parent;
 
   @OneToMany(targetEntity = SampleImpl.class, fetch = FetchType.LAZY)
-  @JoinTable(name = "SampleHierarchy", joinColumns = @JoinColumn(name = "parentId") , inverseJoinColumns = @JoinColumn(name = "childId") )
+  @JoinTable(name = "SampleHierarchy", joinColumns = @JoinColumn(name = "parentId"), inverseJoinColumns = @JoinColumn(name = "childId"))
+  @Cascade({ CascadeType.SAVE_UPDATE })
   private Set<Sample> children = new HashSet<Sample>();
 
   @Override
@@ -363,19 +372,6 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   }
 
   @Override
-  public Set<Plate<? extends LinkedList<Sample>, Sample>> getPlates() {
-    return plates;
-  }
-
-  public void addPlate(Plate<? extends LinkedList<Sample>, Sample> plate) {
-    this.plates.add(plate);
-  }
-
-  public void setPlates(Set<Plate<? extends LinkedList<Sample>, Sample>> plates) {
-    this.plates = plates;
-  }
-
-  @Override
   public Date getLastUpdated() {
     return lastUpdated;
   }
@@ -544,6 +540,26 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
     this.children = children;
   }
 
+  @Override
+  public Long getSecurityProfileId() {
+    return securityProfile_profileId;
+  }
+
+  @Override
+  public void setSecurityProfileId(Long securityProfileId) {
+    securityProfile_profileId = securityProfileId;
+  }
+
+  @Override
+  public SampleTissue getSampleTissue() {
+    return sampleTissue;
+  }
+
+  @Override
+  public void setSampleTissue(SampleTissue sampleTissue) {
+    this.sampleTissue = sampleTissue;
+  }
+
   public static class SampleFactoryBuilder {
     private String description;
     private String sampleType;
@@ -556,6 +572,7 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
     private SampleAdditionalInfo sampleAdditionalInfo;
     private Identity identity;
     private SampleAnalyte sampleAnalyte;
+    private SampleTissue sampleTissue;
     private String accession;
     private String name;
     private String identificationBarcode;
@@ -566,6 +583,7 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
     private String taxonIdentifier;
     private SampleClass rootSampleClass;
     private Sample parent;
+    private Double volume;
 
     public SampleFactoryBuilder parent(Sample parent) {
       this.parent = parent;
@@ -627,6 +645,11 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
       return this;
     }
 
+    public SampleFactoryBuilder volume(Double volume) {
+      this.volume = volume;
+      return this;
+    }
+
     public Identity getIdentity() {
       return identity;
     }
@@ -649,6 +672,14 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
 
     public User getUser() {
       return user;
+    }
+
+    public Double getVolume() {
+      return volume;
+    }
+
+    public Sample getParent() {
+      return parent;
     }
 
     public SampleAdditionalInfo getSampleAdditionalInfo() {
@@ -682,6 +713,11 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
 
     public SampleFactoryBuilder sampleAdditionalInfo(SampleAdditionalInfo sampleAdditionalInfo) {
       this.sampleAdditionalInfo = sampleAdditionalInfo;
+      return this;
+    }
+
+    public SampleFactoryBuilder sampleTissue(SampleTissue sampleTissue) {
+      this.sampleTissue = sampleTissue;
       return this;
     }
 
@@ -721,28 +757,38 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
       return taxonIdentifier;
     }
 
+    public SampleTissue getSampleTissue() {
+      return this.sampleTissue;
+    }
+
     public Sample build() {
-      checkNotNull(user, "A User must be provided to create a Sample.");
-      checkNotNull(project, "A Project must be provided to create a Sample.");
+      checkArgument(user != null, "A User must be provided to create a Sample.");
+      checkArgument(project != null, "A Project must be provided to create a Sample.");
       checkArgument(!LimsUtils.isStringEmptyOrNull(description), "Must provide a description to create a Sample");
       checkArgument(!LimsUtils.isStringEmptyOrNull(sampleType), "Must provide a sampleType to create a Sample");
       checkArgument(!LimsUtils.isStringEmptyOrNull(scientificName), "Must provide a scientificName to create a Sample");
 
       if (sampleAdditionalInfo == null) {
-        // Classic MISO Sample.
+        log.debug("Create a simple unparented MISO Sample.");
         return new SampleImpl(this);
       } else {
-        checkNotNull(parent, "parent must be provided to create a Sample.");
-        checkNotNull(sampleAdditionalInfo, "SampleAdditionalInfo must be provided to create a Sample.");
-        checkNotNull(sampleAdditionalInfo.getSampleClass(), "SampleAdditionalInfo.sampleClass must be provided to create a Sample.");
+        checkArgument(sampleAdditionalInfo != null, "SampleAdditionalInfo must be provided to create a Sample.");
+        checkArgument(sampleAdditionalInfo.getSampleClass() != null,
+            "SampleAdditionalInfo.sampleClass must be provided to create a Sample.");
         if (identity != null) {
-          // Or we could mark a SampleClass as the root.
-          checkNotNull(rootSampleClass, "A root SampleClass must be provided to create an Identity Sample.");
+          log.debug("Create an Identity Sample.");
+          checkArgument(rootSampleClass != null, "A root SampleClass must be provided to create an Identity Sample.");
           return new SampleIdentityNode(this);
         } else if (sampleAnalyte != null) {
-          checkNotNull(sampleAdditionalInfo.getTissueOrigin(), "SampleAdditionalInfo.tissueOrigin must be provided to create a Sample.");
-          checkNotNull(sampleAdditionalInfo.getTissueType(), "SampleAdditionalInfo.tissueType must be provided to create a Sample.");
-          return new SampleAnalyteNode(this);
+          log.debug("Create an Analyte Sample.");
+          checkArgument(parent != null, "parent must be provided to create a Sample.");
+          checkArgument(sampleAdditionalInfo.getTissueOrigin() != null,
+              "SampleAdditionalInfo.tissueOrigin must be provided to create a Sample.");
+          checkArgument(sampleAdditionalInfo.getTissueType() != null,
+              "SampleAdditionalInfo.tissueType must be provided to create a Sample.");
+          return SampleImpl.sampleAnalyte(this);
+        } else if (sampleTissue != null) {
+          return SampleImpl.sampleTissue(this);
         }
       }
       throw new IllegalArgumentException("No sample can be built with the specified parameters.");

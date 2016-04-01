@@ -8,7 +8,6 @@
 
 <%@ include file="../header.jsp" %>
 <jsp:useBean id="now" class="java.util.Date" scope="page" />
-<script type="text/javascript" src="<c:url value='/scripts/import_export_ajax.js?ts=${timestamp.time}'/>"></script>
 
 <div id="maincontent">
     <div id="contentcolumn">

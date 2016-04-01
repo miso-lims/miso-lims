@@ -2472,17 +2472,6 @@ public class UserAuthMisoRequestManagerTestSuite {
 
   /**
    * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#listDilutionsBySearch(java.lang.String, uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType)}
-   * .
-   */
-
-  @Test
-  public void testListDilutionsBySearch() throws IOException {
-    // TODO: Implement.
-  }
-
-  /**
-   * Test method for
    * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#listAllDilutionsByProjectAndPlatform(long, uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType)}
    * .
    */
@@ -2541,12 +2530,12 @@ public class UserAuthMisoRequestManagerTestSuite {
 
   /**
    * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#listAllLibraryDilutionsBySearch(java.lang.String, uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType)}
+   * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#listAllLibraryDilutionsBySearchAndPlatform(java.lang.String, uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType)}
    * .
    */
 
   @Test
-  public void testListAllLibraryDilutionsBySearch() throws IOException {
+  public void testListAllLibraryDilutionsBySearchAndPlatform() throws IOException {
     // TODO: Implement.
   }
 

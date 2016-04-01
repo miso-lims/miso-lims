@@ -29,7 +29,6 @@
   
 --%>
 <%@ include file="../header.jsp" %>
-<script type="text/javascript" src="<c:url value='/scripts/printer_ajax.js?ts=${timestamp.time}'/>"></script>
 
 <div id="maincontent">
   <div id="contentcolumn">

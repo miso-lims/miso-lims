@@ -7,6 +7,7 @@ import java.util.Set;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
 
+import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,15 +67,11 @@ public class InstituteController extends RestController {
   @ResponseBody
   public Set<InstituteDto> getInstitutes(UriComponentsBuilder uriBuilder) throws IOException {
     Set<Institute> institutes = instituteService.getAll();
-    if (institutes.isEmpty()) {
-      throw new RestException("No institutes found", Status.NOT_FOUND);
-    } else {
-      Set<InstituteDto> instituteDtos = Dtos.asInstituteDtos(institutes);
-      for (InstituteDto instituteDto : instituteDtos) {
-        writeUrls(instituteDto, uriBuilder);
-      }
-      return instituteDtos;
+    Set<InstituteDto> instituteDtos = Dtos.asInstituteDtos(institutes);
+    for (InstituteDto instituteDto : instituteDtos) {
+      writeUrls(instituteDto, uriBuilder);
     }
+    return instituteDtos;
   }
   
   @RequestMapping(value = "/institute", method = RequestMethod.POST, headers = { "Content-type=application/json" })
@@ -100,8 +97,18 @@ public class InstituteController extends RestController {
   
   @RequestMapping(value = "/institute/{id}", method = RequestMethod.DELETE)
   @ResponseBody
-  public ResponseEntity<?> deleteSamplePurpose(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
-    instituteService.delete(id);
+  public ResponseEntity<?> deleteInstitute(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
+    try {
+      instituteService.delete(id);
+    } catch (IOException e) {
+      if (e.getCause().getClass() == ConstraintViolationException.class) {
+        String instituteAlias = instituteService.get(id).getAlias();
+        throw new RestException(
+            "You must delete Labs that reference Institute " + instituteAlias + " before deleting " + instituteAlias, Status.INTERNAL_SERVER_ERROR);
+      } else {
+        throw e;
+      }
+    }
     return new ResponseEntity<>(HttpStatus.OK);
   }
   

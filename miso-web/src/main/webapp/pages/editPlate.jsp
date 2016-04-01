@@ -22,9 +22,8 @@
   --%>
 <%@ include file="../header.jsp" %>
 <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.breadcrumbs.popup.js'/>"></script>
-<script type="text/javascript" src="<c:url value='/scripts/plate_ajax.js?ts=${timestamp.time}'/>"></script>
 
-<script src="<c:url value='/scripts/datatables_utils.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
+<script src="<c:url value='/scripts/datatables_utils.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/jquery/datatables/js/jquery.dataTables.min.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.mini.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.datepicker.js'/>" type="text/javascript"></script>
@@ -267,6 +266,7 @@
   <h1>
     Elements
   </h1>
+  <c:if test="${plate.id == 0}">
   <ul class="sddm">
     <li>
       <a onmouseover="mopen('qcmenu')" onmouseout="mclosetime()">Options
@@ -276,15 +276,23 @@
       <div id="qcmenu"
            onmouseover="mcancelclosetime()"
            onmouseout="mclosetime()">
-        <c:if test="${plate.id == 0}">
-          <a href="javascript:void(0);" onclick="Plate.ui.downloadPlateInputForm();">Get Plate Input Form</a>
+          <a href="javascript:void(0);" onclick="Plate.ui.downloadPlateInputForm('xlsx');">Get Plate Input Form</a>
           <a href="javascript:void(0);" class="add" onclick="Plate.ui.uploadPlateInputForm();">Import Plate Input
             Form</a>
-        </c:if>
       </div>
     </li>
   </ul>
+  </c:if>
   <span style="clear:both">
+  <c:choose>
+  <c:when test="${plate.id == 0}">
+    <h3>Please note: You can only add Elements before the Plate is saved. Use the Options menu on the right to upload a spreadsheet of elements.</h3>
+  </c:when>
+  <c:otherwise>
+    <h3>Please note: you can only add Elements before the Plate is saved.</h3>
+  </c:otherwise>
+  </c:choose>
+
     <c:if test="${plate.id == 0}">
       <div id="plateformdiv" class="simplebox" style="display:none;">
         <table class="in">

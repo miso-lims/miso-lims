@@ -16,7 +16,7 @@
   }
 
   addEventListener = function(el, event, handler) {
-    if (el.addEventListener != null) {
+    if (el.addEventListener !== null) {
       return el.addEventListener(event, handler, false);
     } else {
       return el.attachEvent("on" + event, handler);
@@ -26,10 +26,10 @@
   sortable = {
     init: function(options) {
       var table, tables, _i, _len, _results;
-      if (options == null) {
+      if (options === null) {
         options = {};
       }
-      if (options.selector == null) {
+      if (options.selector === null) {
         options.selector = SELECTOR;
       }
       tables = document.querySelectorAll(options.selector);
@@ -42,7 +42,7 @@
     },
     initTable: function(table) {
       var i, th, ths, _i, _len, _ref;
-      if (((_ref = table.tHead) != null ? _ref.rows.length : void 0) !== 1) {
+      if (((_ref = table.tHead) !== null ? _ref.rows.length : void 0) !== 1) {
         return;
       }
       if (table.getAttribute('data-sortable-initialized') === 'true') {
@@ -86,7 +86,7 @@
         tBody = table.tBodies[0];
         rowArray = [];
         if (!sorted) {
-          if (type.compare != null) {
+          if (type.compare !== null) {
             _compare = type.compare;
           } else {
             _compare = function(a, b) {
@@ -107,7 +107,7 @@
           for (position = _j = 0, _len1 = _ref.length; _j < _len1; position = ++_j) {
             row = _ref[position];
             value = sortable.getNodeValue(row.cells[i]);
-            if (type.comparator != null) {
+            if (type.comparator !== null) {
               value = type.comparator(value);
             }
             rowArray.push([value, row, position]);
@@ -129,7 +129,7 @@
             tBody.appendChild(row);
           }
         }
-        if (typeof window['CustomEvent'] === 'function') {
+        if (typeof window.CustomEvent === 'function') {
           return typeof table.dispatchEvent === "function" ? table.dispatchEvent(new CustomEvent('Sortable.sorted', {
             bubbles: true
           })) : void 0;
@@ -144,8 +144,8 @@
     },
     getColumnType: function(table, i) {
       var row, specified, text, type, _i, _j, _len, _len1, _ref, _ref1, _ref2;
-      specified = (_ref = table.querySelectorAll('th')[i]) != null ? _ref.getAttribute('data-sortable-type') : void 0;
-      if (specified != null) {
+      specified = (_ref = table.querySelectorAll('th')[i]) !== null ? _ref.getAttribute('data-sortable-type') : void 0;
+      if (specified !== null) {
         return sortable.typesObject[specified];
       }
       _ref1 = table.tBodies[0].rows;

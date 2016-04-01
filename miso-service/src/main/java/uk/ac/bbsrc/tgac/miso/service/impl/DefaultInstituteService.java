@@ -49,7 +49,6 @@ public class DefaultInstituteService implements InstituteService {
     authorizationManager.throwIfNonAdmin();
     Institute updatedInstitute = get(institute.getId());
     updatedInstitute.setAlias(institute.getAlias());
-    updatedInstitute.setLab(institute.getLab());
     User user = authorizationManager.getCurrentUser();
     updatedInstitute.setUpdatedBy(user);
     instituteDao.update(updatedInstitute);

@@ -23,6 +23,10 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.util.Date;
+
+import org.codehaus.jackson.annotate.JsonBackReference;
+import org.codehaus.jackson.annotate.JsonManagedReference;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
@@ -49,4 +53,74 @@ public interface SequencerReference extends HardwareReference, Deletable {
    * @return Platform platform.
    */
   Platform getPlatform();
+  
+  public void setSerialNumber(String serialNumber);
+  
+  public String getSerialNumber();
+  
+  /**
+   * Sets the date when use of this sequencer began
+   * 
+   * @param date
+   */
+  public void setDateCommissioned(Date date);
+  
+  /**
+   * @return the date when use of this sequencer began
+   */
+  public Date getDateCommissioned();
+  
+  /**
+   * Sets the date when use of this sequencer ended
+   * 
+   * @param date
+   */
+  public void setDateDecommissioned(Date date);
+  
+  /**
+   * @return the date when use of this sequencer ended
+   */
+  public Date getDateDecommissioned();
+  
+  /**
+   * Sets the upgraded sequencer reference, which is a new version of this same sequencer, likely renamed during an upgrade
+   * 
+   * @param sequencer
+   */
+  public void setUpgradedSequencerReference(SequencerReference sequencer);
+  
+  /**
+   * @return the upgraded sequencer reference, which is a new version of this same sequencer, likely renamed during an upgrade
+   */
+  @JsonManagedReference
+  public SequencerReference getUpgradedSequencerReference();
+  
+  /**
+   * Sets the pre-upgrade sequencer reference, which is a previous version of this same sequencer, likely before an upgrade caused a rename
+   * 
+   * @param sequencer
+   */
+  public void setPreUpgradeSequencerReference(SequencerReference sequencer);
+  
+  /**
+   * @return the pre-upgrade sequencer reference, which is a previous version of this same sequencer, likely before an upgrade caused a rename
+   */
+  @JsonBackReference
+  public SequencerReference getPreUpgradeSequencerReference();
+  
+  /**
+   * @return true if the sequencer is currently being used in production; false if it is retired
+   */
+  public boolean isActive();
+  
+  /**
+   * @param date the date when this sequencer was most recently serviced
+   */
+  public void setLastServicedDate(Date date);
+  
+  /**
+   * @return the service date of the most recent service record for this sequencer, or null if there are no such service records
+   */
+  public Date getLastServicedDate();
+  
 }

@@ -42,7 +42,6 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -62,6 +61,7 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibraryQC;
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractPool;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
@@ -85,7 +85,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.tagbarcode.TagBarcodeStrategy;
 import uk.ac.bbsrc.tgac.miso.core.service.tagbarcode.TagBarcodeStrategyResolverService;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.context.ApplicationContextProvider;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoPropertyExporter;
 
@@ -113,14 +112,7 @@ public class EditLibraryController {
   private DataObjectFactory dataObjectFactory;
 
   @Autowired
-  private JdbcTemplate interfaceTemplate;
-
-  @Autowired
   private TagBarcodeStrategyResolverService tagBarcodeStrategyResolverService;
-
-  public void setInterfaceTemplate(JdbcTemplate interfaceTemplate) {
-    this.interfaceTemplate = interfaceTemplate;
-  }
 
   public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
     this.dataObjectFactory = dataObjectFactory;
@@ -229,7 +221,7 @@ public class EditLibraryController {
 
   @ModelAttribute("maxLengths")
   public Map<String, Integer> maxLengths() throws IOException {
-    return DbUtils.getColumnSizes(interfaceTemplate, "Library");
+    return requestManager.getLibraryColumnSizes();
   }
 
   @ModelAttribute("platformNames")
@@ -328,6 +320,11 @@ public class EditLibraryController {
   @ModelAttribute("libraryDilutionUnits")
   public String libraryDilutionUnits() {
     return LibraryDilution.UNITS;
+  }
+
+  @ModelAttribute("poolConcentrationUnits")
+  public String poolConcentrationUnits() {
+    return AbstractPool.CONCENTRATION_UNITS;
   }
 
   @ModelAttribute("emPCRUnits")

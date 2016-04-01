@@ -37,11 +37,13 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
+import net.sf.json.JSONObject;
+import net.sourceforge.fluxion.ajax.util.JSONUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -59,8 +61,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
-import net.sf.json.JSONObject;
-import net.sourceforge.fluxion.ajax.util.JSONUtils;
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractPool;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractProject;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
@@ -89,7 +90,7 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
+import uk.ac.bbsrc.tgac.miso.service.ReferenceGenomeService;
 
 @Controller
 @RequestMapping("/project")
@@ -109,6 +110,9 @@ public class EditProjectController {
   @Autowired
   private DataObjectFactory dataObjectFactory;
 
+  @Autowired
+  private ReferenceGenomeService referenceGenomeService;
+
   public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
     this.dataObjectFactory = dataObjectFactory;
   }
@@ -123,13 +127,6 @@ public class EditProjectController {
 
   public void setFilesManager(FilesManager filesManager) {
     this.filesManager = filesManager;
-  }
-
-  @Autowired
-  private JdbcTemplate interfaceTemplate;
-
-  public void setInterfaceTemplate(JdbcTemplate interfaceTemplate) {
-    this.interfaceTemplate = interfaceTemplate;
   }
 
   @InitBinder
@@ -154,7 +151,7 @@ public class EditProjectController {
 
   @ModelAttribute("maxLengths")
   public Map<String, Integer> maxLengths() throws IOException {
-    return DbUtils.getColumnSizes(interfaceTemplate, "Project");
+    return requestManager.getProjectColumnSizes();
   }
 
   @ModelAttribute("sampleQcTypesString")
@@ -170,6 +167,16 @@ public class EditProjectController {
   @ModelAttribute("sampleQCUnits")
   public String sampleQCUnits() throws IOException {
     return AbstractSampleQC.UNITS;
+  }
+  
+  @ModelAttribute("poolConcentrationUnits")
+  public String poolConcentrationUnits() {
+    return AbstractPool.CONCENTRATION_UNITS;
+  }
+  
+  @ModelAttribute("libraryDilutionUnits")
+  public String libraryDilutionUnits() {
+    return LibraryDilution.UNITS;
   }
 
   @ModelAttribute("libraryQcTypesString")
@@ -415,6 +422,7 @@ public class EditProjectController {
         model.put("projectPlates", populateProjectPlates(projectId));
 
         model.put("libraryGroupMap", populateLibraryGroupMap(project, libraries));
+
       }
 
       if (project == null) {
@@ -424,7 +432,7 @@ public class EditProjectController {
       if (!project.userCanRead(user)) {
         throw new SecurityException("Permission denied.");
       }
-
+      model.put("referenceGenome", referenceGenomeService.listAllReferenceGenomeTypes());
       model.put("formObj", project);
       model.put("project", project);
       model.put("projectFiles", populateProjectFiles(projectId));

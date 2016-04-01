@@ -2,10 +2,12 @@ package uk.ac.bbsrc.tgac.miso.core.store;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Map;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
+import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
 
 /**
@@ -61,16 +63,6 @@ public interface BoxStore extends Store<Box>, Remover<Box>, NamingSchemeAware<Bo
    */
   Collection<Box> listByAlias(String alias) throws IOException;
 
-  /**
-   * List all the boxes matching a query
-   * 
-   * @param String
-   *          query
-   * @return Collection<Box> boxes
-   * @throws IOException
-   */
-  Collection<Box> listBySearch(String query) throws IOException;
-
   BoxUse getUseById(long id) throws IOException;
 
   BoxSize getSizeById(long id) throws IOException;
@@ -84,4 +76,13 @@ public interface BoxStore extends Store<Box>, Remover<Box>, NamingSchemeAware<Bo
   void emptySingleTube(Box box, String position) throws IOException;
 
   void emptyAllTubes(Box box) throws IOException;
+  
+  void removeBoxableFromBox(Boxable boxable) throws IOException;
+
+  /**
+   * @return a map containing all column names and max lengths from the Box table
+   * @throws IOException
+   */
+  public Map<String, Integer> getBoxColumnSizes() throws IOException;
+
 }

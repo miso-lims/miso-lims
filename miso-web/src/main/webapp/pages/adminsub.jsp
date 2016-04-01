@@ -36,7 +36,7 @@
 	<ul class="bullets">
 		<li><a href="<c:url value="/miso/sample/receipt"/>">Receive
 				Samples</a></li>
-		<li><a href="<c:url value="/miso/importexport"/>">Import &
+		<li><a href="<c:url value="/miso/importexport"/>">Import &amp;
 				Export</a></li>
 		<%--<li><a href="<c:url value="/miso/plate/import"/>">Import Plate Sheet</a></li>--%>
 		<%--<li><a href="<c:url value="/miso/plate/export"/>">Export Plate Sheet</a></li>--%>
@@ -50,22 +50,20 @@
 		<li><a href="<c:url value="/miso/run/new"/>">Create New Run</a></li>
 	</ul>
 
-	<h2>Tracking</h2>
-	<ul class="bullets">
-		<li><a href="<c:url value="/miso/runs"/>">List Runs</a></li>
-		<li><a href="<c:url value="/miso/containers"/>">List
-				Partition Containers</a></li>
-		<li><a href="<c:url value="/miso/experiments"/>">List
-				Experiments</a></li>
-		<li><a href="<c:url value="/miso/pools"/>">List Pools</a></li>
-		<li><a href="<c:url value="/miso/libraries"/>">List Libraries</a></li>
-		<li><a href="<c:url value="/miso/samples"/>">List Samples</a></li>
-		<li><a href="<c:url value="/miso/studies"/>">List Studies</a></li>
-		<li><a href="<c:url value="/miso/kitdescriptors"/>">List
-				Consumables</a></li>
-		<li><a href="<c:url value="/miso/plates"/>">List Plates</a></li>
-		<li><a href="<c:url value="/miso/boxes"/>">List Boxes</a></li>
-	</ul>
+    <h2>Tracking</h2>
+    <ul class="bullets">
+        <li><a href="<c:url value="/miso/runs"/>">List Runs</a></li>
+        <li><a href="<c:url value="/miso/containers"/>">List Partition Containers</a></li>
+        <li><a href="<c:url value="/miso/experiments"/>">List Experiments</a></li>
+        <li><a href="<c:url value="/miso/pools"/>">List Pools</a></li>
+        <li><a href="<c:url value="/miso/libraries"/>">List Libraries</a></li>
+        <li><a href="<c:url value="/miso/samples"/>">List Samples</a></li>
+        <li><a href="<c:url value="/miso/studies"/>">List Studies</a></li>
+        <li><a href="<c:url value="/miso/kitdescriptors"/>">List Consumables</a></li>
+        <li><a href="<c:url value="/miso/plates"/>">List Plates</a></li>
+        <li><a href="<c:url value="/miso/boxes"/>">List Boxes</a></li>
+        <li><a href="<c:url value="/miso/sequencers"/>">List Sequencers</a></li>
+    </ul>
 
 	<h2>Print Jobs</h2>
 	<ul class="bullets">

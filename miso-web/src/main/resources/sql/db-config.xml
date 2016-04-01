@@ -56,16 +56,26 @@
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleValidRelationshipImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleNumberPerProjectImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.InstituteImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAdditionalInfoImpl</value>
       </list>
     </property>
     <property name="hibernateProperties">
       <props>
         <prop key="hibernate.dialect">org.hibernate.dialect.MySQL5InnoDBDialect</prop>
         <prop key="hibernate.show_sql">true</prop>
-        <!-- <prop key="hibernate.hbm2ddl.auto">create</prop> -->
       </props>
     </property>
+    <property name="mappingResources">
+      <list>
+        <value>hibernate/miso.hbm.xml</value>
+      </list>
+    </property> 
   </bean>
 
   <tx:annotation-driven/>
@@ -127,6 +137,7 @@
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.SampleQC" value-ref="sampleQcStore" />
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer" value-ref="sequencerPartitionContainerStore" />
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.SequencerReference" value-ref="sequencerReferenceStore" />
+        <entry key="uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord" value-ref="sequencerServiceRecordStore"/>
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.Status" value-ref="statusStore" />
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.Study" value-ref="studyStore" />
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.Submission" value-ref="submissionStore" />
@@ -140,7 +151,7 @@
     </property>
     <property name="securityManager" ref="securityManager" />
     <property name="studyDAO" ref="sqlStudyDAO" />
-    <property name="sampleDAO" ref="sqlSampleDAO" />
+    <property name="sampleDAO" ref="hibernateSampleDao" />
     <property name="entityGroupDAO" ref="sqlEntityGroupDAO" />
     <property name="libraryDAO" ref="sqlLibraryDAO" />
     <property name="runDAO" ref="sqlRunDAO" />
@@ -177,7 +188,6 @@
       <value type="javax.persistence.CascadeType">REMOVE</value>
     </property>
     <property name="securityProfileDAO" ref="sqlSecurityProfileDAO" />
-    <property name="emPcrDAO" ref="sqlEmPCRDAO" />
     <property name="libraryDAO" ref="sqlLibraryDAO" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />
   </bean>
@@ -206,7 +216,7 @@
     <property name="securityDAO" ref="sqlSecurityDAO" />
     <property name="changeLogDAO" ref="sqlChangeLogDAO" />
     <property name="studyDAO" ref="sqlStudyDAO" />
-    <property name="sampleDAO" ref="sqlSampleDAO" />
+    <property name="sampleDAO" ref="hibernateSampleDao" />
     <property name="runDAO" ref="sqlRunDAO" />
     <property name="poolDAO" ref="sqlPoolDAO" />
     <property name="platformDAO" ref="sqlPlatformDAO" />
@@ -215,18 +225,14 @@
     <property name="jdbcTemplate" ref="interfaceTemplate" />
   </bean>
 
-  <bean id="sqlSampleDAO" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLSampleDAO">
-    <property name="cascadeType">
-      <value type="javax.persistence.CascadeType">REMOVE</value>
-    </property>
-    <property name="changeLogDAO" ref="sqlChangeLogDAO" />
-    <property name="noteDAO" ref="sqlNoteDAO" />
-    <property name="libraryDAO" ref="sqlLibraryDAO" />
-    <property name="projectDAO" ref="sqlProjectDAO" />
-    <property name="sampleQcDAO" ref="sqlSampleQCDAO" />
-    <property name="securityDAO" ref="sqlSecurityDAO" />
-    <property name="securityProfileDAO" ref="sqlSecurityProfileDAO" />
+  <bean id="hibernateSampleDao" class="uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleDao">
     <property name="jdbcTemplate" ref="interfaceTemplate" />
+    <property name="changeLogDao" ref="sqlChangeLogDAO" />
+    <property name="libraryDao" ref="sqlLibraryDAO" />
+    <property name="noteDao" ref="sqlNoteDAO" />
+    <property name="sampleQcDao" ref="sqlSampleQCDAO" />
+    <property name="securityDao" ref="sqlSecurityDAO" />
+    <property name="securityProfileDao" ref="sqlSecurityProfileDAO" />
     <property name="autoGenerateIdentificationBarcodes">
       <value>${miso.autoGenerateIdentificationBarcodes}</value>
     </property>
@@ -236,7 +242,7 @@
     <property name="cascadeType">
       <value type="javax.persistence.CascadeType">ALL</value>
     </property>
-    <property name="sampleDAO" ref="sqlSampleDAO" />
+    <property name="sampleDAO" ref="hibernateSampleDao" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />
   </bean>
 
@@ -305,10 +311,11 @@
     <property name="changeLogDAO" ref="sqlChangeLogDAO" />
     <property name="noteDAO" ref="sqlNoteDAO" />
     <property name="poolDAO" ref="sqlPoolDAO" />
-    <property name="sampleDAO" ref="sqlSampleDAO" />
+    <property name="sampleDAO" ref="hibernateSampleDao" />
     <property name="dilutionDAO" ref="sqlLibraryDilutionDAO" />
     <property name="libraryQcDAO" ref="sqlLibraryQCDAO" />
     <property name="securityProfileDAO" ref="sqlSecurityProfileDAO" />
+    <property name="boxDAO" ref="sqlBoxDAO" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />
     <property name="autoGenerateIdentificationBarcodes">
       <value>${miso.autoGenerateIdentificationBarcodes}</value>
@@ -335,7 +342,9 @@
     <property name="experimentDAO" ref="sqlExperimentDAO" />
     <property name="poolQcDAO" ref="sqlPoolQCDAO" />
     <property name="watcherDAO" ref="sqlWatcherDAO" />
+    <property name="boxDAO" ref="sqlBoxDAO" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />
+    <property name="noteDAO" ref="sqlNoteDAO" />
     <property name="autoGenerateIdentificationBarcodes">
       <value>${miso.autoGenerateIdentificationBarcodes}</value>
     </property>
@@ -372,8 +381,6 @@
   </bean>
 
   <bean id="sqlSecurityDAO" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLSecurityDAO">
-    <property name="lobHandler" ref="lobHandler" />
-    <property name="securityManager" ref="securityManager" />
     <property name="securityProfileDAO" ref="sqlSecurityProfileDAO" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />
   </bean>
@@ -382,7 +389,7 @@
     <property name="dilutionDAO" ref="sqlLibraryDilutionDAO" />
     <property name="experimentDAO" ref="sqlExperimentDAO" />
     <property name="partitionDAO" ref="sqlPartitionDAO" />
-    <property name="sampleDAO" ref="sqlSampleDAO" />
+    <property name="sampleDAO" ref="hibernateSampleDao" />
     <property name="studyDAO" ref="sqlStudyDAO" />
     <property name="runDAO" ref="sqlRunDAO" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />
@@ -393,12 +400,21 @@
     <property name="jdbcTemplate" ref="interfaceTemplate" />
   </bean>
 
+  <bean id="sqlSequencerServiceRecordDAO"
+        class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLSequencerServiceRecordDAO">
+    <property name="sequencerReferenceDAO" ref="sqlSequencerReferenceDAO"/>
+    <property name="jdbcTemplate" ref="interfaceTemplate"/>
+    <property name="misoFilesManager" ref="misoFileManager"/>
+  </bean>
+
   <bean id="sqlKitDAO" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLKitDAO">
     <property name="cascadeType">
       <value type="javax.persistence.CascadeType">PERSIST</value>
     </property>
     <property name="noteDAO" ref="sqlNoteDAO" />
+    <property name="changeLogDAO" ref="sqlChangeLogDAO" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />
+    <property name="securityDAO" ref="sqlSecurityDAO" />
   </bean>
 
   <bean id="sqlPlateDAO" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLPlateDAO">
@@ -408,7 +424,7 @@
     <property name="securityDAO" ref="sqlSecurityDAO" />
     <property name="changeLogDAO" ref="sqlChangeLogDAO" />
     <property name="libraryDAO" ref="sqlLibraryDAO" />
-    <property name="sampleDAO" ref="sqlSampleDAO" />
+    <property name="sampleDAO" ref="hibernateSampleDao" />
     <property name="dilutionDAO" ref="sqlLibraryDilutionDAO" />
     <property name="securityProfileDAO" ref="sqlSecurityProfileDAO" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />
@@ -436,7 +452,7 @@
     <property name="changeLogDAO" ref="sqlChangeLogDAO" />
     <property name="libraryDAO" ref="sqlLibraryDAO" />
     <property name="poolDAO" ref="sqlPoolDAO" />
-    <property name="sampleDAO" ref="sqlSampleDAO" />
+    <property name="sampleDAO" ref="hibernateSampleDao" />
     <property name="securityProfileDAO" ref="sqlSecurityProfileDAO" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />
   </bean>
@@ -450,6 +466,14 @@
         <value>sqlBoxDAO</value>
       </list>
     </property>
+  </bean>
+  
+  <bean id="hibernateSampleAdditionalInfoDao" class="uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleAdditionalInfoDao">
+    <property name="kitStore" ref="sqlKitDAO" />
+  </bean>
+  
+  <bean id="hibernateLibraryAdditionalInfoDao" class="uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryAdditionalInfoDao">
+    <property name="kitStore" ref="sqlKitDAO" />
   </bean>
 
   <bean name="projectStore" class="org.springframework.aop.framework.ProxyFactoryBean">
@@ -535,7 +559,7 @@
     </property>
     <property name="interceptorNames">
       <list>
-        <value>sqlSampleDAO</value>
+        <value>hibernateSampleDao</value>
       </list>
     </property>
   </bean>
@@ -685,7 +709,7 @@
 
   <bean name="securityStore" class="org.springframework.aop.framework.ProxyFactoryBean">
     <property name="proxyInterfaces">
-      <value>com.eaglegenomics.simlims.core.store.SecurityStore</value>
+      <value>uk.ac.bbsrc.tgac.miso.core.store.SecurityStore</value>
     </property>
     <property name="interceptorNames">
       <list>
@@ -718,7 +742,7 @@
 
   <bean name="submissionStore" class="org.springframework.aop.framework.ProxyFactoryBean">
     <property name="proxyInterfaces">
-      <value>uk.ac.bbsrc.tgac.miso.core.store.Store</value>
+      <value>uk.ac.bbsrc.tgac.miso.core.store.SubmissionStore</value>
     </property>
     <property name="interceptorNames">
       <list>
@@ -734,6 +758,17 @@
     <property name="interceptorNames">
       <list>
         <value>sqlSequencerReferenceDAO</value>
+      </list>
+    </property>
+  </bean>
+
+  <bean name="sequencerServiceRecordStore" class="org.springframework.aop.framework.ProxyFactoryBean">
+    <property name="proxyInterfaces">
+      <value>uk.ac.bbsrc.tgac.miso.core.store.SequencerServiceRecordStore</value>
+    </property>
+    <property name="interceptorNames">
+      <list>
+        <value>sqlSequencerServiceRecordDAO</value>
       </list>
     </property>
   </bean>

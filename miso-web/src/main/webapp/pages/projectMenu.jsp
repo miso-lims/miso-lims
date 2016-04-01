@@ -23,10 +23,16 @@
   ~ **********************************************************************
   --%>
 
+<div id="maincontent">
+<div id="contentcolumn">
 <h1>Projects</h1>
 <ul>
   <li><a href="<c:url value="/miso/projects"/>">List Projects</a></li>
   <li><a href="<c:url value="/miso/project/new"/>">Create Project</a></li>
 </ul>
+</div>
+</div>
+
+<%@ include file="adminsub.jsp" %>
 
 <%@ include file="../footer.jsp" %>

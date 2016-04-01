@@ -90,15 +90,11 @@ public class TissueOriginController extends RestController {
   @ResponseBody
   public Set<TissueOriginDto> getTissueOrigins(UriComponentsBuilder uriBuilder, HttpServletResponse response) throws IOException {
     Set<TissueOrigin> tissueOrigins = tissueOriginService.getAll();
-    if (tissueOrigins.isEmpty()) {
-      throw new RestException("No tissue origins found", Status.NOT_FOUND);
-    } else {
-      Set<TissueOriginDto> tissueOriginDtos = Dtos.asTissueOriginDtos(tissueOrigins);
-      for (TissueOriginDto tissueOriginDto : tissueOriginDtos) {
-        tissueOriginDto = writeUrls(tissueOriginDto, uriBuilder);
-      }
-      return tissueOriginDtos;
+    Set<TissueOriginDto> tissueOriginDtos = Dtos.asTissueOriginDtos(tissueOrigins);
+    for (TissueOriginDto tissueOriginDto : tissueOriginDtos) {
+      tissueOriginDto = writeUrls(tissueOriginDto, uriBuilder);
     }
+    return tissueOriginDtos;
   }
 
   @RequestMapping(value = "/tissueorigin", method = RequestMethod.POST, headers = { "Content-type=application/json" })

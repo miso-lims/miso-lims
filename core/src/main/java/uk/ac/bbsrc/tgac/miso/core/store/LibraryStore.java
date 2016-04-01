@@ -26,6 +26,7 @@ package uk.ac.bbsrc.tgac.miso.core.store;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -292,4 +293,10 @@ public interface LibraryStore extends Store<Library>, Remover<Library>, NamingSc
    *           when the objects cannot be retrieved
    */
   Collection<Library> getByBarcodeList(List<String> barcodeList) throws IOException;
+  
+  /**
+   * @return a map containing all column names and max lengths from the Library table
+   * @throws IOException
+   */
+  public Map<String, Integer> getLibraryColumnSizes() throws IOException;
 }

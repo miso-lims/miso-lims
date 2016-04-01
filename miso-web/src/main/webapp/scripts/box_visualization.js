@@ -45,7 +45,7 @@ var BoxItem = function(opts) {
   };
 
   self.normalClick = function() {
-    if (self.selInfo.item == null) {
+    if (self.selInfo.item === null) {
       self.selInfo.item = self;
       self.select();
       return;
@@ -71,7 +71,7 @@ var BoxItem = function(opts) {
 
   self.controlClick = function() {
     // Clear a selected item before ctrl-clicking begins
-    if (self.selInfo.item != null) {
+    if (self.selInfo.item !== null) {
       self.selInfo.item.unselect();
       self.selInfo.item = null;
     }
@@ -89,7 +89,7 @@ var BoxItem = function(opts) {
     self.selInfo.row = event.data.row;
     self.selInfo.col = event.data.col;
 
-    if (ctrlPressed) {
+    if (event.ctrlKey) {
       self.controlClick();
     } else {
       self.clearSelectedItems();
@@ -100,7 +100,7 @@ var BoxItem = function(opts) {
 
   self.click = opts.click || self.click;
   self.element.click({'row': self.row, 'col': self.col}, self.click);
-  self.selected ? self.select() : self.unselect();
+  self.selectedImg ? self.select() : self.unselect();
   return self;
 };
 
@@ -143,8 +143,9 @@ var BoxPosition = function(opts) {
   };
 
   self.cell = opts.cell;
-  if (typeof self.item !== 'undefined')
+  if (typeof self.item !== 'undefined') {
     self.addItem(self.item);
+  }
   self.row = opts.row || null;
   self.col = opts.col || null;
   self.setTitle();
@@ -221,17 +222,12 @@ var BoxVisual = function() {
 
   self.getBoxPosition = function(row, col, tCell) {
     // Override this method
-    var item = self.getBoxItem(row, col);
     return new BoxPosition({
       row: row,
       col: col,
       cell: tCell,
       boxItem: self.getBoxItem(row, col)
     });
-  };
-
-  self.getBoxItem = function(row, col) {
-    // Override this method
   };
 
   self.click = function(row, col) {
@@ -536,7 +532,6 @@ Box.ScanErrors = function() {
 
   self.getBoxItem = function(row, col) {
     var pos = Box.utils.getPositionString(row, col);
-    var boxable = self.data[pos];
     var img = '/styles/images/tube_error.png';
     if (self.scan.errors.type == 'Unknown Barcode') {
       img = '/styles/images/tube_duplicate_barcode_error.png';
@@ -636,13 +631,14 @@ Box.ScanDiff = function() {
   self.getBoxItem = function(row, col) {
     var pos = Box.utils.getPositionString(row, col);
     var boxable = self.data[pos];
+    var sel, unsel;
 
     if (typeof boxable !== 'undefined') {
-      var sel = jQuery.inArray(pos, self.changed) !== -1 ?
+      sel = jQuery.inArray(pos, self.changed) !== -1 ?
             '/styles/images/tube_full_selected_changed.png' :
             '/styles/images/tube_full_selected.png';
 
-      var unsel = jQuery.inArray(pos, self.changed) !== -1 ?
+      unsel = jQuery.inArray(pos, self.changed) !== -1 ?
             '/styles/images/tube_full_changed.png' :
             '/styles/images/tube_full.png';
       return new BoxItem({
@@ -655,11 +651,11 @@ Box.ScanDiff = function() {
         onClick: function() {}
       });
     } else {
-      var sel = jQuery.inArray(pos, self.changed) !== -1 ?
+      sel = jQuery.inArray(pos, self.changed) !== -1 ?
             '/styles/images/tube_empty_selected_changed.png' :
             '/styles/images/tube_empty_selected.png';
 
-      var unsel = jQuery.inArray(pos, self.changed) !== -1 ?
+      unsel = jQuery.inArray(pos, self.changed) !== -1 ?
             '/styles/images/tube_empty_changed.png' :
             '/styles/images/tube_empty.png';
       return new BoxItem({
@@ -692,8 +688,8 @@ Box.PrepareScannerDialog = function() {
   self.show = function() {
     jQuery('#dialogInfoAbove').html('<h1>Preparing scanner</h1>');
     jQuery('#dialogVisual').html('');
-    jQuery('#dialogInfoBelow').html('<p>Please remove box from scanner until prompted.</p>' 
-                                     + '<img class="center" src="/styles/images/ajax-loader.gif"/>');   
+    jQuery('#dialogInfoBelow').html('<p>Please remove box from scanner until prompted.</p>' +
+                                     '<img class="center" src="/styles/images/ajax-loader.gif"/>');   
     jQuery('#dialogDialog').dialog({
       autoOpen: false,
       width: Box.dialogWidth,
@@ -710,8 +706,8 @@ Box.PrepareScannerDialog = function() {
   self.error = function() {
     jQuery('#dialogInfoAbove').html('<h1 class="warning">Error: could not find the scanner</h1>');
     jQuery('#dialogVisual').html('');
-    jQuery('#dialogInfoBelow').html('<p>Please ensure that the scanner software is running, ' 
-                                     + 'and remove the box before retrying.</p>');
+    jQuery('#dialogInfoBelow').html('<p>Please ensure that the scanner software is running, ' +
+                                    'and remove the box before retrying.</p>');
     jQuery('#dialogDialog').dialog({
       autoOpen: true,
       width: Box.dialogWidth,
@@ -738,7 +734,9 @@ Box.utils = {
 
   getPositionString: function(row, col) {
     var pos = Box.utils.getRowLetter(row);
-    if(col < 10) pos += 0;
+    if (col < 10) {
+      pos += 0;
+    }
     pos += col;
     return pos;
   },
@@ -790,25 +788,29 @@ Box.utils = {
 
     // Look for old items in the new
     for (var oldpos in oldBoxables) {
-      var name = oldBoxables[oldpos].name;
-      var newpos = Box.utils.findItemPos(name, newBoxables);
-      if (newpos == null) {
-        diff.push('<li style="color:red;"><b>-</b> '+name+': removed from the box</li>');
-        changed.push(oldpos);
-      }  else {
-        diff.push('<li style="color:orange;"><b>!</b> '+name+': moved ('+oldpos+'->'+newpos+')</li>');
-        changed.push(oldpos);
-        changed.push(newpos);
+      if (oldBoxables.hasOwnProperty(oldpos)) {
+        var oldname = oldBoxables[oldpos].name;
+        var newpos = Box.utils.findItemPos(oldname, newBoxables);
+        if (newpos === null) {
+          diff.push('<li style="color:red;"><b>-</b> '+oldname+': removed from the box</li>');
+          changed.push(oldpos);
+        }  else {
+          diff.push('<li style="color:orange;"><b>!</b> '+oldname+': moved ('+oldpos+'->'+newpos+')</li>');
+          changed.push(oldpos);
+          changed.push(newpos);
+        }
       }
     }
 
     // Look for new items
-    for (var newpos in newBoxables) {
-      var name = newBoxables[newpos].name;
-      var oldpos = Box.utils.findItemPos(name, oldBoxables);
-      if (oldpos == null) {
-        diff.push('<li style="color:green;"><b>+</b> '+name+': added to the box at position '+newpos+'</li>');
-        changed.push(newpos);
+    for (var pos in newBoxables) {
+      if (newBoxables.hasOwnProperty(pos)) {
+        var newname = newBoxables[pos].name;
+        oldpos = Box.utils.findItemPos(newname, oldBoxables);
+        if (oldpos === null) {
+          diff.push('<li style="color:green;"><b>+</b> '+newname+': added to the box at position '+pos+'</li>');
+          changed.push(pos);
+        }
       }
     }
     return {'html': diff, 'positions': changed};

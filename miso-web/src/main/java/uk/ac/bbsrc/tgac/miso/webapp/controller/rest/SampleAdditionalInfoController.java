@@ -52,7 +52,7 @@ import uk.ac.bbsrc.tgac.miso.dto.SampleAdditionalInfoDto;
 import uk.ac.bbsrc.tgac.miso.service.SampleAdditionalInfoService;
 
 @Controller
-@RequestMapping("/rest")
+@RequestMapping("/rest/sample")
 @SessionAttributes("sampleadditionalinfo")
 public class SampleAdditionalInfoController extends RestController {
 
@@ -61,7 +61,7 @@ public class SampleAdditionalInfoController extends RestController {
   @Autowired
   private SampleAdditionalInfoService sampleAdditionalInfoService;
 
-  @RequestMapping(value = "/sampleadditionalinfo/{id}", method = RequestMethod.GET, produces = { "application/json" })
+  @RequestMapping(value = "/additionalinfo/{id}", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
   public SampleAdditionalInfoDto getSampleAdditionalInfo(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
       HttpServletResponse response) throws IOException {
@@ -106,30 +106,30 @@ public class SampleAdditionalInfoController extends RestController {
       sampleAdditionalInfoDto.setSubprojectUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/subproject/{id}")
           .buildAndExpand(sampleAdditionalInfoDto.getSubprojectId()).toUriString());
     }
+    if (sampleAdditionalInfoDto.getPrepKitId() != null) {
+      sampleAdditionalInfoDto.setPrepKitUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/kitdescriptor/{id}")
+          .buildAndExpand(sampleAdditionalInfoDto.getPrepKitId()).toUriString());
+    }
     return sampleAdditionalInfoDto;
   }
 
-  @RequestMapping(value = "/sampleadditionalinfos", method = RequestMethod.GET, produces = { "application/json" })
+  @RequestMapping(value = "/additionalinfos", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public Set<SampleAdditionalInfoDto> getSampleAdditionalInfos(UriComponentsBuilder uriBuilder, HttpServletResponse response) 
+  public Set<SampleAdditionalInfoDto> getSampleAdditionalInfos(UriComponentsBuilder uriBuilder, HttpServletResponse response)
       throws IOException {
     Set<SampleAdditionalInfo> sampleAdditionalInfos = sampleAdditionalInfoService.getAll();
-    if (sampleAdditionalInfos.isEmpty()) {
-      throw new RestException("No sample additional infos found", Status.NOT_FOUND);
-    } else {
-      Set<SampleAdditionalInfoDto> sampleAdditionalInfoDtos = Dtos.asSampleAdditionalInfoDtos(sampleAdditionalInfos);
-      for (SampleAdditionalInfoDto sampleAdditionalInfoDto : sampleAdditionalInfoDtos) {
-        sampleAdditionalInfoDto = writeUrls(sampleAdditionalInfoDto, uriBuilder);
-      }
-      return sampleAdditionalInfoDtos;
+    Set<SampleAdditionalInfoDto> sampleAdditionalInfoDtos = Dtos.asSampleAdditionalInfoDtos(sampleAdditionalInfos);
+    for (SampleAdditionalInfoDto sampleAdditionalInfoDto : sampleAdditionalInfoDtos) {
+      sampleAdditionalInfoDto = writeUrls(sampleAdditionalInfoDto, uriBuilder);
     }
+    return sampleAdditionalInfoDtos;
   }
 
-  @RequestMapping(value = "/sampleadditionalinfo", method = RequestMethod.POST, headers = { "Content-type=application/json" })
+  @RequestMapping(value = "/additionalinfo", method = RequestMethod.POST, headers = { "Content-type=application/json" })
   @ResponseBody
   public ResponseEntity<?> createSampleAdditionalInfo(@RequestBody SampleAdditionalInfoDto sampleAdditionalInfoDto, UriComponentsBuilder b,
       HttpServletResponse response) throws IOException {
-    SampleAdditionalInfo sampleAdditionalInfo = Dtos.to(sampleAdditionalInfoDto);
+    SampleAdditionalInfo sampleAdditionalInfo = to(sampleAdditionalInfoDto);
     Long id = sampleAdditionalInfoService.create(sampleAdditionalInfo, sampleAdditionalInfoDto.getSampleId(),
         sampleAdditionalInfoDto.getTissueOriginId(), sampleAdditionalInfoDto.getTissueTypeId(),
         sampleAdditionalInfoDto.getQcPassedDetailId(), sampleAdditionalInfoDto.getSubprojectId(), sampleAdditionalInfoDto.getPrepKitId(),
@@ -140,11 +140,11 @@ public class SampleAdditionalInfoController extends RestController {
     return new ResponseEntity<>(headers, HttpStatus.CREATED);
   }
 
-  @RequestMapping(value = "/sampleadditionalinfo/{id}", method = RequestMethod.PUT, headers = { "Content-type=application/json" })
+  @RequestMapping(value = "/additionalinfo/{id}", method = RequestMethod.PUT, headers = { "Content-type=application/json" })
   @ResponseBody
   public ResponseEntity<?> updateSampleAdditionalInfo(@PathVariable("id") Long id,
       @RequestBody SampleAdditionalInfoDto sampleAdditionalInfoDto, HttpServletResponse response) throws IOException {
-    SampleAdditionalInfo sampleAdditionalInfo = Dtos.to(sampleAdditionalInfoDto);
+    SampleAdditionalInfo sampleAdditionalInfo = to(sampleAdditionalInfoDto);
     sampleAdditionalInfo.setSampleAdditionalInfoId(id);
     sampleAdditionalInfoService.update(sampleAdditionalInfo, sampleAdditionalInfoDto.getTissueOriginId(),
         sampleAdditionalInfoDto.getTissueTypeId(), sampleAdditionalInfoDto.getQcPassedDetailId(), sampleAdditionalInfoDto.getPrepKitId(),
@@ -152,11 +152,21 @@ public class SampleAdditionalInfoController extends RestController {
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
-  @RequestMapping(value = "/sampleadditionalinfo/{id}", method = RequestMethod.DELETE)
+  @RequestMapping(value = "/additionalinfo/{id}", method = RequestMethod.DELETE)
   @ResponseBody
   public ResponseEntity<?> deleteSampleAdditionalInfo(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
     sampleAdditionalInfoService.delete(id);
     return new ResponseEntity<>(HttpStatus.OK);
+  }
+  
+  private SampleAdditionalInfo to(SampleAdditionalInfoDto dto) {
+    try {
+      return Dtos.to(dto);
+    } catch (IllegalArgumentException e) {
+      RestException re = new RestException(e.getLocalizedMessage(), e);
+      re.setStatus(Status.BAD_REQUEST);
+      throw re;
+    }
   }
 
 }

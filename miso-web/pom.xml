@@ -31,8 +31,6 @@
     <version>0.2.1-SNAPSHOT</version>
   </parent>
 
-  <groupId>${parent.groupId}</groupId>
-  <version>${parent.version}</version>
   <artifactId>miso-web</artifactId>
 
   <packaging>war</packaging>
@@ -43,8 +41,66 @@
     <finalName>ROOT</finalName>
     <plugins>
       <plugin>
+        <groupId>com.samaxes.maven</groupId>
+        <artifactId>minify-maven-plugin</artifactId>
+        <version>1.7.4</version>
+        <executions>
+          <execution>
+            <id>default-minify</id>
+            <configuration>
+              <charset>UTF-8</charset>
+              <cssSourceDir>styles</cssSourceDir>
+              <cssSourceIncludes>
+                <cssSourceInclude>*.css</cssSourceInclude>
+              </cssSourceIncludes>
+              <cssFinalFile>style.css</cssFinalFile>
+              
+              <jsSourceDir>scripts</jsSourceDir>
+              <jsSourceFiles>
+                <jsSourceFile>scriptaculous/activityInput.js</jsSourceFile>
+                <jsSourceFile>scriptaculous/effects.js</jsSourceFile>
+                <jsSourceFile>scriptaculous/dragdrop.js</jsSourceFile>
+                <jsSourceFile>scriptaculous/slider.js</jsSourceFile>
+                <jsSourceFile>scriptaculous/sound.js</jsSourceFile>
+                <jsSourceFile>scriptaculous/controls.js</jsSourceFile>
+                <jsSourceFile>lims.js</jsSourceFile>
+                <jsSourceFile>search.js</jsSourceFile>
+                <jsSourceFile>experiment_ajax.js</jsSourceFile>
+                <jsSourceFile>library_ajax.js</jsSourceFile>
+                <jsSourceFile>pool_ajax.js</jsSourceFile>
+                <jsSourceFile>project_ajax.js</jsSourceFile>
+                <jsSourceFile>reporting_ajax.js</jsSourceFile>
+                <jsSourceFile>run_ajax.js</jsSourceFile>
+                <jsSourceFile>sample_ajax.js</jsSourceFile>
+                <jsSourceFile>sequencer_partition_container_ajax.js</jsSourceFile>
+                <jsSourceFile>sequencer_reference_ajax.js</jsSourceFile>
+                <jsSourceFile>study_ajax.js</jsSourceFile>
+                <jsSourceFile>parsley_form_validations.js</jsSourceFile>
+                <jsSourceFile>multi_select_drag_drop.js</jsSourceFile>
+                <jsSourceFile>menus.js</jsSourceFile>
+              </jsSourceFiles>
+              <jsSourceIncludes>
+                <jsSourceInclude>*.js</jsSourceInclude>
+              </jsSourceIncludes>
+              <jsSourceExcludes>
+                <jsSourceExclude>datatables_utils.js</jsSourceExclude>
+                <jsSourceExclude>natural_sort.js</jsSourceExclude>
+                <jsSourceExclude>xregexp-all-min.js</jsSourceExclude>
+                <jsSourceExclude>runCalendar.js</jsSourceExclude>
+                <jsSourceExclude>sortable.js</jsSourceExclude>
+              </jsSourceExcludes>
+              <jsFinalFile>header_script.js</jsFinalFile>
+            </configuration>
+            <goals>
+              <goal>minify</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.1</version>
         <configuration>
           <source>1.7</source>
           <target>1.7</target>
@@ -172,9 +228,9 @@
 
       <dependencies>
         <dependency>
-          <groupId>${parent.groupId}</groupId>
+          <groupId>${project.parent.groupId}</groupId>
           <artifactId>db4ostore</artifactId>
-          <version>${parent.version}</version>
+          <version>${project.parent.version}</version>
         </dependency>
       </dependencies>
 
@@ -283,34 +339,34 @@
 
   <dependencies>
     <dependency>
-      <groupId>${parent.groupId}</groupId>
+      <groupId>${project.parent.groupId}</groupId>
       <artifactId>spring</artifactId>
-      <version>${parent.version}</version>
+      <version>${project.parent.version}</version>
     </dependency>
     <dependency>
-      <groupId>${parent.groupId}</groupId>
+      <groupId>${project.parent.groupId}</groupId>
       <artifactId>integration-tools</artifactId>
-      <version>${parent.version}</version>
+      <version>${project.parent.version}</version>
     </dependency>
     <dependency>
-      <groupId>${parent.groupId}</groupId>
+      <groupId>${project.parent.groupId}</groupId>
       <artifactId>run-tools</artifactId>
-      <version>${parent.version}</version>
+      <version>${project.parent.version}</version>
     </dependency>
     <dependency>
-      <groupId>${parent.groupId}</groupId>
+      <groupId>${project.parent.groupId}</groupId>
       <artifactId>runstats-client</artifactId>
-      <version>${parent.version}</version>
+      <version>${project.parent.version}</version>
     </dependency>
     <dependency>
-      <groupId>${parent.groupId}</groupId>
+      <groupId>${project.parent.groupId}</groupId>
       <artifactId>notification-consumer-services</artifactId>
-      <version>${parent.version}</version>
+      <version>${project.parent.version}</version>
     </dependency>
     <dependency>
-      <groupId>${parent.groupId}</groupId>
+      <groupId>${project.parent.groupId}</groupId>
       <artifactId>tagbarcode-strategies</artifactId>
-      <version>${parent.version}</version>
+      <version>${project.parent.version}</version>
     </dependency>
 
     <dependency>
@@ -322,6 +378,7 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-webmvc</artifactId>
+      <version>${spring-version}</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.security</groupId>
@@ -348,6 +405,7 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-core</artifactId>
+      <version>${spring-version}</version>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
@@ -362,6 +420,7 @@
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-config</artifactId>
+      <version>${spring-security-version}</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.security</groupId>
@@ -499,31 +558,6 @@
       <classifier>jdk15</classifier>
     </dependency>
 
-    <!--
-      <dependency>
-        <groupId>oauth.signpost</groupId>
-        <artifactId>signpost-core</artifactId>
-        <version>1.2</version>
-        <exclusions>
-            <exclusion>
-                <groupId>commons-codec</groupId>
-                <artifactId>commons-codec</artifactId>
-            </exclusion>
-        </exclusions>
-      </dependency>
-
-    <dependency>
-        <groupId>com.atlassian.jira</groupId>
-        <artifactId>jira-rest-java-client</artifactId>
-        <version>0.1.1</version>
-        <exclusions>
-            <exclusion>
-                <groupId>org.codehaus.jackson</groupId>
-                <artifactId>jackson-core-asl</artifactId>
-            </exclusion>
-        </exclusions>
-    </dependency>
-    -->
 
     <dependency>
       <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
@@ -551,7 +585,7 @@
     -->
     <dependency>
       <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-      <artifactId>miso-dto</artifactId>
+      <artifactId>miso-service</artifactId>
     </dependency>
     <dependency>
       <groupId>org.codehaus.jackson</groupId>

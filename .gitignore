@@ -12,5 +12,7 @@ target/
 # Flyway database migration credentials file.
 sqlstore/flyway.properties
 
-# Test file
+# Test files
 core/test_file.txt
+notification-server/metrixDaemon.log
+

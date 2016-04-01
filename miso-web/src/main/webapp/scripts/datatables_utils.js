@@ -60,13 +60,13 @@ DatatableUtils = {
     var sel = s.attr("sel");
     if (sel == "none") {
       tableObj.find('tbody tr').each(function () {
-        jQuery(this).addClass('row_selected')
+        jQuery(this).addClass('row_selected');
       });
       s.attr("sel", "all");
     }
     else {
       tableObj.find('tbody tr').each(function () {
-        jQuery(this).removeClass('row_selected')
+        jQuery(this).removeClass('row_selected');
       });
       s.attr("sel", "none");
     }
@@ -105,7 +105,7 @@ DatatableUtils = {
   },
 
   fnGetSelected: function (datatable) {
-    var aReturn = new Array();
+    var aReturn = [];
     var aTrs = datatable.fnGetNodes();
     for (var i = 0; i < aTrs.length; i++) {
       if (jQuery(aTrs[i]).hasClass('row_selected')) {

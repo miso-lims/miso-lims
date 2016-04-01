@@ -47,8 +47,8 @@ Tasks.ui = {
         var processRuns = task.conanProcessRuns;
         var rowtext = "<td>"+task.id+"</td><td>"+task.name+"</td><td>"+task.pipeline.name+"</td><td>"+task.statusMessage+"</td><td>"+new Date(task.startDate)+"</td>";
         rowtext += "<td><table width='100%' border='0'><tr>";
-        for (var j = 0; j < task.pipeline.processes.length; j++) {
-          rowtext += "<td id='"+task.id+"-"+task.pipeline.processes[j].name+"'>"+task.pipeline.processes[j].name+"</td>";
+        for (var m = 0; m < task.pipeline.processes.length; m++) {
+          rowtext += "<td id='"+task.id+"-"+task.pipeline.processes[m].name+"'>"+task.pipeline.processes[m].name+"</td>";
         }
 
         rowtext += "</tr></table></td>";
@@ -61,7 +61,7 @@ Tasks.ui = {
           var process = task.pipeline.processes[j];
           for (var k = 0; k < processRuns.length; k++) {
             if (processRuns[k].processName === process.name) {
-              if (processRuns[k].exitValue == 0) {
+              if (processRuns[k].exitValue === 0) {
                 jQuery('#'+task.id+"-"+task.pipeline.processes[j].name).addClass("ok");
                 jQuery('#'+task.id+"-"+task.pipeline.processes[j].name).attr("title", "Finished: " + new Date(processRuns[k].endDate));
               }
@@ -229,8 +229,8 @@ Tasks.ui = {
 
           jQuery('#'+process.name+'-reqParams > tbody:last').append(jQuery('<tr>').append("<td>"+parameter.name+"</td><td>"+
                        "Required: " + !parameter.optional + "<br/>" +
-                       "Boolean: " + parameter.boolean + "<br/>" +
-                       "Transient: " + parameter.transient + "</td>"
+                       "Boolean: " + parameter["boolean"] + "<br/>" +
+                       "Transient: " + parameter["transient"] + "</td>"
           ));
         }
       }
@@ -267,31 +267,28 @@ Tasks.ui = {
 
         for (var i = 0; i < pipeline.allRequiredParameters.length; i++) {
           var parameter = pipeline.allRequiredParameters[i];
-          if (!parameter.transient) {
-            if (parameter.boolean) {
+          if (!parameter["transient"]) {
+            if (parameter["boolean"]) {
               if (parameter.optional) {
                 jQuery('#'+pipeline.name+'-reqParams > tbody:last')
                 .append(jQuery('<tr>')
                   .append("<td>"+parameter.name+"</td><td><input optional='true' type='checkbox' name='"+parameter.name+"'/>")
                 );
-              }
-              else {
+              } else {
                 jQuery('#'+pipeline.name+'-reqParams > tbody:last')
                 .append(jQuery('<tr>')
                   .append("<td>"+parameter.name+"</td><td><input required='true' type='checkbox' name='"+parameter.name+"'/>")
                 );
               }
-            }
-            else {
+            } else {
               if (parameter.optional) {
                 jQuery('#'+pipeline.name+'-reqParams > tbody:last')
-                  .append(jQuery('<tr>')
+                .append(jQuery('<tr>')
                   .append("<td>"+parameter.name+"</td><td><input optional='true' style='width:98%' type='text' id='"+parameter.name+"' name='"+parameter.name+"' value=''/>")
                 );
-              }
-              else {
+              } else {
                 jQuery('#'+pipeline.name+'-reqParams > tbody:last')
-                  .append(jQuery('<tr>')
+                .append(jQuery('<tr>')
                   .append("<td>"+parameter.name+" <span style='color: red'>*</span></td><td><input style='width:98%' required='true' type='text' id='"+parameter.name+"' name='"+parameter.name+"' value=''/>")
                 );
               }
@@ -303,7 +300,7 @@ Tasks.ui = {
       for (var j = 0; j < pipeline.processes.length; j++) {
         var process = pipeline.processes[j];
         for (var k = 0; k < process.parameters.length; k++) {
-          if (jQuery('input[name="'+process.parameters[k].name+'"]').length == 0) {
+          if (jQuery('input[name="'+process.parameters[k].name+'"]').length === 0) {
             jQuery('#'+pipeline.name+'-reqParams > tbody:last')
               .append(jQuery('<tr>')
               .append("<td>"+process.parameters[k].name+"</td><td><input style='width:98%' optional='true' type='text' id='"+process.parameters[k].name+"' name='"+process.parameters[k].name+"' value=''/>")

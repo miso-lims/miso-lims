@@ -25,6 +25,7 @@ package uk.ac.bbsrc.tgac.miso.core.store;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Plate;
 import uk.ac.bbsrc.tgac.miso.core.data.Plateable;
@@ -57,4 +58,10 @@ public interface PlateStore extends Store<Plate<? extends List<? extends Plateab
    *           when
    */
   <T extends List<S>, S extends Plateable> Plate<T, S> getPlateByIdentificationBarcode(String barcode) throws IOException;
+  
+  /**
+   * @return a map containing all column names and max lengths from the Plate table
+   * @throws IOException
+   */
+  public Map<String, Integer> getPlateColumnSizes() throws IOException;
 }

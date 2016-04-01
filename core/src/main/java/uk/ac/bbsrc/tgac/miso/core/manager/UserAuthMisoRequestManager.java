@@ -29,6 +29,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,6 +68,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
@@ -159,7 +161,7 @@ public class UserAuthMisoRequestManager implements RequestManager {
         log.error("Cannot resolve a currently logged in user", e);
       }
     } else {
-      throw new IOException("Cannot check read permissions for null object. Does this object really exist?");
+      return true;
     }
     return false;
   }
@@ -304,6 +306,15 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
+  public long savePoolNote(Pool pool, Note note) throws IOException {
+    if (writeCheck(pool)) {
+      return backingManager.savePoolNote(pool, note);
+    } else {
+      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot write to this Pool");
+    }
+  }
+
+  @Override
   public long saveEmPCR(emPCR pcr) throws IOException {
     if (writeCheck(pcr)) {
       return backingManager.saveEmPCR(pcr);
@@ -351,6 +362,7 @@ public class UserAuthMisoRequestManager implements RequestManager {
   @Override
   public long saveSequencerPartitionContainer(SequencerPartitionContainer container) throws IOException {
     if (writeCheck(container)) {
+      container.setLastModifier(getCurrentUser());
       return backingManager.saveSequencerPartitionContainer(container);
     } else {
       throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot write to this SequencerPartitionContainer");
@@ -1015,6 +1027,21 @@ public class UserAuthMisoRequestManager implements RequestManager {
     }
     return accessibles;
   }
+  
+  @Override
+  public Collection<Sample> getSamplesByIdList(List<Long> idList) throws IOException {
+    User user = getCurrentUser();
+    Collection<Sample> accessibles = new HashSet<>();
+    for (Sample sample : backingManager.getSamplesByIdList(idList)) {
+      if (sample.userCanRead(user)) {
+        accessibles.add(sample);
+      } else {
+        throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Sample " + sample.getId() +
+            " " + sample.getAlias() + "(" + sample.getName() + ")");
+      }
+    }
+    return accessibles;
+  }
 
   @Override
   public Collection<SampleQC> listAllSampleQCsBySampleId(long sampleId) throws IOException {
@@ -1101,10 +1128,10 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Dilution> listDilutionsBySearch(String query, PlatformType platformType) throws IOException {
+  public Collection<Dilution> listAllLibraryDilutionsBySearchAndPlatform(String query, PlatformType platformType) throws IOException {
     User user = getCurrentUser();
     Collection<Dilution> accessibles = new HashSet<>();
-    for (Dilution dilution : backingManager.listDilutionsBySearch(query, platformType)) {
+    for (Dilution dilution : backingManager.listAllLibraryDilutionsBySearchAndPlatform(query, platformType)) {
       if (dilution.userCanRead(user)) {
         accessibles.add(dilution);
       }
@@ -1177,18 +1204,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
     User user = getCurrentUser();
     Collection<LibraryDilution> accessibles = new HashSet<>();
     for (LibraryDilution dilution : backingManager.listAllLibraryDilutionsByProjectId(projectId)) {
-      if (dilution.userCanRead(user)) {
-        accessibles.add(dilution);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Collection<LibraryDilution> listAllLibraryDilutionsBySearch(String query, PlatformType platformType) throws IOException {
-    User user = getCurrentUser();
-    Collection<LibraryDilution> accessibles = new HashSet<>();
-    for (LibraryDilution dilution : backingManager.listAllLibraryDilutionsBySearch(query, platformType)) {
       if (dilution.userCanRead(user)) {
         accessibles.add(dilution);
       }
@@ -1602,6 +1617,18 @@ public class UserAuthMisoRequestManager implements RequestManager {
     }
     return accessibles;
   }
+  
+  @Override
+  public Collection<Run> listRunsBySequencerId(Long sequencerReferenceId) throws IOException {
+    User user = getCurrentUser();
+    Collection<Run> accessibles = new HashSet<>();
+    for (Run run : backingManager.listRunsBySequencerId(sequencerReferenceId)) {
+      if (run.userCanRead(user)) {
+        accessibles.add(run);
+      }
+    }
+    return accessibles;
+  }
 
   @Override
   public Collection<Plate<? extends List<? extends Plateable>, ? extends Plateable>> listAllPlates() throws IOException {
@@ -1731,6 +1758,13 @@ public class UserAuthMisoRequestManager implements RequestManager {
       backingManager.deleteSequencerReference(sequencerReference);
     }
   }
+  
+  @Override
+  public void deleteSequencerServiceRecord(uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord serviceRecord) throws IOException {
+    if (getCurrentUser().isAdmin()) {
+      backingManager.deleteSequencerServiceRecord(serviceRecord);
+    }
+  }
 
   @Override
   public void deletePool(Pool pool) throws IOException {
@@ -1781,9 +1815,18 @@ public class UserAuthMisoRequestManager implements RequestManager {
 
   @Override
   public int[] saveRuns(Collection<Run> runs) throws IOException {
+    User user = getCurrentUser();
     for (Run run : runs) {
       if (!writeCheck(run)) {
         throw new IOException("User " + getCurrentUser().getFullName() + " cannot write to this Run");
+      } else {
+        run.setLastModifier(user);
+        List<SequencerPartitionContainer<SequencerPoolPartition>> containers = run.getSequencerPartitionContainers();
+        if (run.getSequencerPartitionContainers() != null) {
+          for (SequencerPartitionContainer<SequencerPoolPartition> container : containers) {
+            container.setLastModifier(user);
+          }
+        }
       }
     }
     return backingManager.saveRuns(runs);
@@ -2087,18 +2130,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Box> listAllBoxesBySearch(String query) throws IOException {
-    User user = getCurrentUser();
-    Collection<Box> accessibles = new HashSet<>();
-    for (Box o : backingManager.listAllBoxesBySearch(query)) {
-      if (o.userCanRead(user)) {
-        accessibles.add(o);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
   public Collection<Box> listAllBoxesByAlias(String alias) throws IOException {
     User user = getCurrentUser();
     Collection<Box> accessibles = new HashSet<>();
@@ -2336,5 +2367,105 @@ public class UserAuthMisoRequestManager implements RequestManager {
     } else {
       throw new IOException("User " + getCurrentUser().getFullName() + " cannot change Box " + box.getAlias());
     }
+  }
+
+  @Override
+  public long saveSequencerServiceRecord(SequencerServiceRecord record) throws IOException {
+    if (getCurrentUser().isAdmin()) {
+      return backingManager.saveSequencerServiceRecord(record);
+    }
+    else {
+      throw new IOException("User " + getCurrentUser().getFullName() + " cannot write to this Service Record");
+    }
+  }
+
+  @Override
+  public SequencerServiceRecord getSequencerServiceRecordById(long id) throws IOException {
+    return backingManager.getSequencerServiceRecordById(id);
+  }
+
+  @Override
+  public Collection<SequencerServiceRecord> listAllSequencerServiceRecords() throws IOException {
+    return backingManager.listAllSequencerServiceRecords();
+  }
+
+  @Override
+  public Collection<SequencerServiceRecord> listSequencerServiceRecordsBySequencerId(long referenceId) throws IOException {
+    return backingManager.listSequencerServiceRecordsBySequencerId(referenceId);
+  }
+  
+  @Override
+  public Map<String, Integer> getServiceRecordColumnSizes() throws IOException {
+    return backingManager.getServiceRecordColumnSizes();
+  }
+  
+  @Override
+  public Map<String, Integer> getBoxColumnSizes() throws IOException {
+    return backingManager.getBoxColumnSizes();
+  }
+
+  @Override
+  public Map<String, Integer> getExperimentColumnSizes() throws IOException {
+    return backingManager.getExperimentColumnSizes();
+  }
+
+  @Override
+  public Map<String, Integer> getPoolColumnSizes() throws IOException {
+    return backingManager.getPoolColumnSizes();
+  }
+
+  @Override
+  public Map<String, Integer> getKitDescriptorColumnSizes() throws IOException {
+    return backingManager.getKitDescriptorColumnSizes();
+  }
+
+  @Override
+  public Map<String, Integer> getLibraryColumnSizes() throws IOException {
+    return backingManager.getLibraryColumnSizes();
+  }
+
+  @Override
+  public Map<String, Integer> getPlateColumnSizes() throws IOException {
+    return backingManager.getPlateColumnSizes();
+  }
+
+  @Override
+  public Map<String, Integer> getProjectColumnSizes() throws IOException {
+    return backingManager.getProjectColumnSizes();
+  }
+
+  @Override
+  public Map<String, Integer> getRunColumnSizes() throws IOException {
+    return backingManager.getRunColumnSizes();
+  }
+
+  @Override
+  public Map<String, Integer> getSampleColumnSizes() throws IOException {
+    return backingManager.getSampleColumnSizes();
+  }
+
+  @Override
+  public Map<String, Integer> getStudyColumnSizes() throws IOException {
+    return backingManager.getStudyColumnSizes();
+  }
+
+  @Override
+  public Map<String, Integer> getSequencerReferenceColumnSizes() throws IOException {
+    return backingManager.getSequencerReferenceColumnSizes();
+  }
+
+  @Override
+  public Map<String, Integer> getSubmissionColumnSizes() throws IOException {
+    return backingManager.getSubmissionColumnSizes();
+  }
+
+  @Override
+  public Map<String, Integer> getUserColumnSizes() throws IOException {
+    return backingManager.getUserColumnSizes();
+  }
+
+  @Override
+  public Map<String, Integer> getGroupColumnSizes() throws IOException {
+    return backingManager.getGroupColumnSizes();
   }
 }

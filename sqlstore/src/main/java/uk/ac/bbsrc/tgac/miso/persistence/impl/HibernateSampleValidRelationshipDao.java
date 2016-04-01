@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
@@ -30,6 +31,7 @@ public class HibernateSampleValidRelationshipDao implements SampleValidRelations
   }
 
   @Override
+  @Transactional(propagation = Propagation.REQUIRED)
   public List<SampleValidRelationship> getSampleValidRelationship() {
     Query query = currentSession().createQuery("from SampleValidRelationshipImpl");
     @SuppressWarnings("unchecked")

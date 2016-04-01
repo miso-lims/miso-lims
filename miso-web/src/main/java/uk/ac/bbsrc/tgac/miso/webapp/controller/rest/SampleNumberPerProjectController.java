@@ -92,15 +92,11 @@ public class SampleNumberPerProjectController extends RestController {
   public Set<SampleNumberPerProjectDto> getSampleNumberPerProjects(UriComponentsBuilder uriBuilder, HttpServletResponse response) 
       throws IOException {
     Set<SampleNumberPerProject> sampleNumberPerProjects = sampleNumberPerProjectService.getAll();
-    if (sampleNumberPerProjects.isEmpty()) {
-      throw new RestException("No sample numbers per project found", Status.NOT_FOUND);
-    } else {
-      Set<SampleNumberPerProjectDto> sampleNumberPerProjectDtos = Dtos.asSampleNumberPerProjectDtos(sampleNumberPerProjects);
-      for (SampleNumberPerProjectDto sampleNumberPerProjectDto : sampleNumberPerProjectDtos) {
-        sampleNumberPerProjectDto = writeUrls(sampleNumberPerProjectDto, uriBuilder);
-      }
-      return sampleNumberPerProjectDtos;
+    Set<SampleNumberPerProjectDto> sampleNumberPerProjectDtos = Dtos.asSampleNumberPerProjectDtos(sampleNumberPerProjects);
+    for (SampleNumberPerProjectDto sampleNumberPerProjectDto : sampleNumberPerProjectDtos) {
+      sampleNumberPerProjectDto = writeUrls(sampleNumberPerProjectDto, uriBuilder);
     }
+    return sampleNumberPerProjectDtos;
   }
 
   @RequestMapping(value = "/samplenumberperproject", method = RequestMethod.POST, headers = { "Content-type=application/json" })

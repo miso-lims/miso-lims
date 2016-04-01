@@ -37,12 +37,12 @@ import java.util.TreeSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -55,6 +55,9 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractPool;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
@@ -67,13 +70,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.context.ApplicationContextProvider;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoPropertyExporter;
 
@@ -91,13 +94,6 @@ public class EditSampleController {
 
   @Autowired
   private DataObjectFactory dataObjectFactory;
-
-  @Autowired
-  private JdbcTemplate interfaceTemplate;
-
-  public void setInterfaceTemplate(JdbcTemplate interfaceTemplate) {
-    this.interfaceTemplate = interfaceTemplate;
-  }
 
   public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
     this.dataObjectFactory = dataObjectFactory;
@@ -136,7 +132,6 @@ public class EditSampleController {
 
   public Map<String, Sample> getAdjacentSamplesInGroup(Sample s, @RequestParam(value = "entityGroupId", required = true) Long entityGroupId)
       throws IOException {
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     Project p = s.getProject();
     EntityGroup<? extends Nameable, Sample> sgroup = (EntityGroup<? extends Nameable, Sample>) requestManager
         .getEntityGroupById(entityGroupId);
@@ -171,7 +166,6 @@ public class EditSampleController {
 
   public Map<String, Sample> getAdjacentSamplesInProject(Sample s, @RequestParam(value = "projectId", required = false) Long projectId)
       throws IOException {
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     Project p = s.getProject();
     Sample prevS = null;
     Sample nextS = null;
@@ -203,7 +197,6 @@ public class EditSampleController {
 
   public Collection<Project> populateProjects(@RequestParam(value = "projectId", required = false) Long projectId) throws IOException {
     try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       if (projectId != null) {
         Collection<Project> ps = new ArrayList<Project>();
         for (Project p : requestManager.listAllProjects()) {
@@ -263,7 +256,7 @@ public class EditSampleController {
 
   @ModelAttribute("maxLengths")
   public Map<String, Integer> maxLengths() throws IOException {
-    return DbUtils.getColumnSizes(interfaceTemplate, "Sample");
+    return requestManager.getSampleColumnSizes();
   }
 
   @ModelAttribute("sampleTypesString")
@@ -280,6 +273,16 @@ public class EditSampleController {
   @ModelAttribute("sampleQCUnits")
   public String sampleQCUnits() throws IOException {
     return AbstractSampleQC.UNITS;
+  }
+  
+  @ModelAttribute("libraryDilutionUnits")
+  public String libraryDilutionUnits() {
+    return LibraryDilution.UNITS;
+  }
+
+  @ModelAttribute("poolConcentrationUnits")
+  public String poolConcentrationUnits() {
+    return AbstractPool.CONCENTRATION_UNITS;
   }
 
   @ModelAttribute("libraryQcTypesString")
@@ -444,6 +447,35 @@ public class EditSampleController {
   public String processSubmit() {
     return null;
   }
+  
+  @RequestMapping(value = "/bulk/", method = RequestMethod.POST, headers = "Accept=application/json")
+  public String getBulkSamples(@RequestBody JSONObject json) throws IOException {
+    JSONArray ids = JSONArray.fromObject(json.get("ids"));
+    StringBuffer stringBuffer = new StringBuffer();
+    for (int i = 0; i < ids.size(); ++i) {
+      if (i > 0) stringBuffer.append(",");
+      stringBuffer.append(ids.getLong(i));
+    }
+    return "redirect:/miso/sample/bulk/edit/" + stringBuffer.toString();
+  }
+  
+  @RequestMapping(value = "/bulk/edit/{sampleIds}", method = RequestMethod.GET)
+  public ModelAndView editBulkSamples(@PathVariable String sampleIds, ModelMap model) throws IOException {
+    try {
+      String[] split = sampleIds.split(",");
+      List<Long> idList = new ArrayList<Long>();
+      for (int i = 0; i < split.length; i++) {
+        idList.add(Long.parseLong(split[i]));
+      }
+      model.put("samples", requestManager.getSamplesByIdList(idList));
+      return new ModelAndView("/pages/bulkEditSamples.jsp", model);
+    } catch (IOException ex) {
+      if (log.isDebugEnabled()) {
+        log.error("Failed to get bulk samples", ex);
+      }
+      throw ex;
+    }
+  }
 
   @RequestMapping(method = RequestMethod.POST)
   public String processSubmit(@ModelAttribute("sample") Sample sample, ModelMap model, SessionStatus session)
@@ -466,4 +498,5 @@ public class EditSampleController {
       throw ex;
     }
   }
+  
 }

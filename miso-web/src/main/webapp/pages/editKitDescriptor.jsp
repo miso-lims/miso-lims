@@ -91,7 +91,9 @@
             <c:when test="${kitDescriptor.kitDescriptorId == 0 or empty kitDescriptor.platformType}">
               <td>Platform Type:</td>
               <td>
-                <form:select id="platformTypes" path="platformType" items="${platformTypes}"/>
+                <form:select id="platformTypes" path="platformType">
+                  <form:options items="${platformTypes}" itemValue="key" itemLabel="key"/>
+                </form:select>
               </td>
             </c:when>
             <c:otherwise>
@@ -102,6 +104,28 @@
         </tr>
       </table>
     </form:form>
+    <c:if test="${not empty kitDescriptor.changeLog}">
+      <br/>
+      <h1>Changes</h1>
+      <span style="clear:both">
+        <table class="list" id="changelog_table">
+          <thead>
+          <tr>
+            <th>Summary</th>
+            <th>Time</th>
+          </tr>
+          </thead>
+          <tbody>
+          <c:forEach items="${kitDescriptor.changeLog}" var="change">
+            <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
+              <td><b>${change.summary}</b></td>
+              <td>${change.time}</td>
+            </tr>
+          </c:forEach>
+          </tbody>
+        </table>
+      </span>
+    </c:if>
   </div>
 </div>
 

@@ -4,15 +4,19 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.QcPassedDetail;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
@@ -54,8 +58,13 @@ public class SampleAdditionalInfoImpl implements SampleAdditionalInfo {
   @JoinColumn(name = "subprojectId")
   private Subproject subproject;
 
-  @OneToOne(targetEntity = KitDescriptor.class)
-  @JoinColumn(name = "kitDescriptorId")
+  @OneToOne(targetEntity = LabImpl.class)
+  @JoinColumn(name = "labId", nullable = true)
+  private Lab lab;
+
+  private Long kitDescriptorId;
+
+  @Transient
   private KitDescriptor prepKit;
 
   private Integer passageNumber;
@@ -64,9 +73,10 @@ public class SampleAdditionalInfoImpl implements SampleAdditionalInfo {
 
   private Integer tubeNumber;
 
-  private Double volume;
-
   private Double concentration;
+
+  @Enumerated(EnumType.STRING)
+  private StrStatus strStatus = StrStatus.NOT_SUBMITTED;
 
   @Column(nullable = false)
   private Boolean archived = Boolean.FALSE;
@@ -176,16 +186,6 @@ public class SampleAdditionalInfoImpl implements SampleAdditionalInfo {
   }
 
   @Override
-  public Double getVolume() {
-    return volume;
-  }
-
-  @Override
-  public void setVolume(Double volume) {
-    this.volume = volume;
-  }
-
-  @Override
   public Double getConcentration() {
     return concentration;
   }
@@ -263,6 +263,53 @@ public class SampleAdditionalInfoImpl implements SampleAdditionalInfo {
   @Override
   public void setPrepKit(KitDescriptor prepKit) {
     this.prepKit = prepKit;
+
+    // Keep kitDescriptorId field consistent for Hibernate persistence
+    if (prepKit == null) {
+      this.kitDescriptorId = null;
+    } else {
+      this.kitDescriptorId = prepKit.getKitDescriptorId();
+    }
+  }
+
+  @Override
+  public Lab getLab() {
+    return lab;
+  }
+
+  @Override
+  public void setLab(Lab lab) {
+    this.lab = lab;
+  }
+
+  @Override
+  public Long getHibernateKitDescriptorId() {
+    return kitDescriptorId;
+  }
+  
+  @Override
+  public StrStatus getStrStatus() {
+    return strStatus;
+  }
+  
+  @Override
+  public void setStrStatus(StrStatus strStatus) {
+    this.strStatus = strStatus;
+  }
+  
+  @Override
+  public void setStrStatus(String strStatus) {
+    this.strStatus = StrStatus.get(strStatus);
+  }
+
+  @Override
+  public String toString() {
+    return "SampleAdditionalInfoImpl [sampleAdditionalInfoId=" + sampleAdditionalInfoId + ", sample=" + sample + ", sampleClass="
+        + sampleClass + ", tissueOrigin=" + tissueOrigin + ", tissueType=" + tissueType + ", qcPassedDetail=" + qcPassedDetail
+        + ", subproject=" + subproject + ", lab=" + lab + ", kitDescriptorId=" + kitDescriptorId + ", prepKit=" + prepKit
+        + ", passageNumber=" + passageNumber + ", timesReceived=" + timesReceived + ", tubeNumber=" + tubeNumber + ", concentration="
+        + concentration + ", archived=" + archived + ", createdBy=" + createdBy + ", creationDate=" + creationDate + ", updatedBy="
+        + updatedBy + ", lastUpdated=" + lastUpdated + ", strStatus=" + strStatus + "]";
   }
 
 }

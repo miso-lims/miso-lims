@@ -33,7 +33,6 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -44,9 +43,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
-
-import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -61,7 +57,9 @@ import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.SubmissionManager;
-import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
+
+import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 @Controller
 @RequestMapping("/submission")
@@ -83,13 +81,6 @@ public class EditSubmissionController {
 
   @Autowired
   private SubmissionManager submissionManager;
-
-  @Autowired
-  private JdbcTemplate interfaceTemplate;
-
-  public void setInterfaceTemplate(JdbcTemplate interfaceTemplate) {
-    this.interfaceTemplate = interfaceTemplate;
-  }
 
   public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
     this.dataObjectFactory = dataObjectFactory;
@@ -113,7 +104,7 @@ public class EditSubmissionController {
 
   @ModelAttribute("maxLengths")
   public Map<String, Integer> maxLengths() throws IOException {
-    return DbUtils.getColumnSizes(interfaceTemplate, "Submission");
+    return requestManager.getSubmissionColumnSizes();
   }
 
   @ModelAttribute("projects")

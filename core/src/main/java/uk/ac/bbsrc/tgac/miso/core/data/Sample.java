@@ -53,9 +53,10 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  */
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
 @JsonTypeName("sample")
-@JsonIgnoreProperties({"securityProfile","submissionDocument"})
+@JsonIgnoreProperties({ "securityProfile", "submissionDocument" })
 @PrintableBarcode
-public interface Sample extends SecurableByProfile, Submittable<Document>, Locatable, Reportable, Comparable, Deletable, Plateable, Boxable {
+public interface Sample
+    extends SecurableByProfile, Submittable<Document>, Locatable, Reportable, Comparable, Deletable, Plateable, Boxable {
 
   /** Field UNSAVED_ID */
   public static final Long UNSAVED_ID = 0L;
@@ -187,6 +188,7 @@ public interface Sample extends SecurableByProfile, Submittable<Document>, Locat
    * @return Collection<Note> notes.
    */
   public Collection<Note> getNotes();
+
   /**
    * Returns the change logs of this Sample object.
    * 
@@ -311,4 +313,18 @@ public interface Sample extends SecurableByProfile, Submittable<Document>, Locat
   public Set<Sample> getChildren();
 
   public void setChildren(Set<Sample> children);
+
+  public void setSampleTissue(SampleTissue sampleTissue);
+
+  public SampleTissue getSampleTissue();
+
+  /**
+   * Get the security profile id independently of the security profile. This is due to Hibernate. Don't use it.
+   */
+  public Long getSecurityProfileId();
+
+  /**
+   * Sets the security profile id independently of the security profile. This is due to Hibernate. Don't use it.
+   */
+  public void setSecurityProfileId(Long securityProfileId);
 }

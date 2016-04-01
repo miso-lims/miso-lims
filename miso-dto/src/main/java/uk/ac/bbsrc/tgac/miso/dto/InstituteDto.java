@@ -8,7 +8,6 @@ public class InstituteDto {
   private Long id;
   private String url;
   private String alias;
-  private String lab;
   private Long createdById;
   private String createdByUrl;
   private String creationDate;
@@ -38,14 +37,6 @@ public class InstituteDto {
   
   public void setAlias(String alias) {
     this.alias = alias;
-  }
-  
-  public String getLab() {
-    return lab;
-  }
-  
-  public void setLab(String lab) {
-    this.lab = lab;
   }
   
   public Long getCreatedById() {
@@ -99,7 +90,7 @@ public class InstituteDto {
   @Override
   public String toString() {
     return "InstituteDto [id=" + id + ", url=" + url + ", alias=" + alias
-        + ", lab=" + lab + ", createdById=" + createdById + ", createdByUrl=" + createdByUrl
+        + ", createdById=" + createdById + ", createdByUrl=" + createdByUrl
         + ", creationDate=" + creationDate + ", updatedById=" + updatedById
         + ", updatedByUrl=" + updatedByUrl + ", lastUpdated=" + lastUpdated
         + "]";

@@ -54,6 +54,7 @@ public class SampleImpl extends AbstractSample implements Serializable {
    */
   public SampleImpl() {
     setSecurityProfile(new SecurityProfile());
+    setSecurityProfileId(getSecurityProfile().getProfileId());
   }
 
   /**
@@ -64,6 +65,7 @@ public class SampleImpl extends AbstractSample implements Serializable {
    */
   public SampleImpl(User user) {
     setSecurityProfile(new SecurityProfile(user));
+    setSecurityProfileId(getSecurityProfile().getProfileId());
   }
 
   /**
@@ -79,8 +81,12 @@ public class SampleImpl extends AbstractSample implements Serializable {
     if (project.userCanRead(user)) {
       setProject(project);
       setSecurityProfile(project.getSecurityProfile());
+      setSecurityProfileId(getSecurityProfile().getProfileId());
     } else {
+      log.error(String.format("User %s does not have permission to read Project %s. Unable to create Sample.", user.getFullName(),
+          project.getAlias()));
       setSecurityProfile(new SecurityProfile(user));
+      setSecurityProfileId(getSecurityProfile().getProfileId());
     }
   }
 
@@ -90,6 +96,7 @@ public class SampleImpl extends AbstractSample implements Serializable {
     setSampleType(builder.getSampleType());
     setScientificName(builder.getScientificName());
     setLastModifier(builder.getUser());
+    setVolume(builder.getVolume());
 
     if (!LimsUtils.isStringEmptyOrNull(builder.getAccession())) {
       setAccession(builder.getAccession());
@@ -115,6 +122,28 @@ public class SampleImpl extends AbstractSample implements Serializable {
     if (!LimsUtils.isStringEmptyOrNull(builder.getTaxonIdentifier())) {
       setTaxonIdentifier(builder.getTaxonIdentifier());
     }
+  }
+
+  public static SampleImpl sampleAnalyte(SampleFactoryBuilder builder) {
+    SampleImpl sampleImpl = new SampleImpl(builder);
+    sampleImpl.setParent(builder.getParent());
+    sampleImpl.getParent().getChildren().add(sampleImpl);
+    sampleImpl.setSampleAdditionalInfo(builder.getSampleAdditionalInfo());
+    sampleImpl.getSampleAdditionalInfo().setSample(sampleImpl);
+    sampleImpl.setSampleAnalyte(builder.getSampleAnalyte());
+    sampleImpl.getSampleAnalyte().setSample(sampleImpl);
+    return sampleImpl;
+  }
+
+  public static SampleImpl sampleTissue(SampleFactoryBuilder builder) {
+    SampleImpl sampleImpl = new SampleImpl(builder);
+    sampleImpl.setParent(builder.getParent());
+    sampleImpl.getParent().getChildren().add(sampleImpl);
+    sampleImpl.setSampleAdditionalInfo(builder.getSampleAdditionalInfo());
+    sampleImpl.getSampleAdditionalInfo().setSample(sampleImpl);
+    sampleImpl.setSampleTissue(builder.getSampleTissue());
+    sampleImpl.getSampleTissue().setSample(sampleImpl);
+    return sampleImpl;
   }
 
   @Override

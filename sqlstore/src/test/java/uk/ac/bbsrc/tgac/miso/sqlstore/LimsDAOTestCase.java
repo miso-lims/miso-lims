@@ -50,8 +50,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.jdbc.support.lob.DefaultLobHandler;
-import org.springframework.jdbc.support.lob.LobHandler;
 
 import com.eaglegenomics.simlims.core.manager.LocalSecurityManager;
 
@@ -62,6 +60,7 @@ import uk.ac.bbsrc.tgac.miso.core.manager.PrintManager;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintContextResolverService;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleDao;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DaoLookup;
 
 /**
@@ -114,7 +113,7 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
   private SQLProjectDAO projectDAO;
   private SQLRunDAO runDAO;
   private SQLRunQCDAO runQcDAO;
-  private SQLSampleDAO sampleDAO;
+  private HibernateSampleDao sampleDAO;
   private SQLSampleQCDAO sampleQcDAO;
   private SQLSecurityProfileDAO securityProfileDAO;
   private SQLSecurityDAO securityDAO;
@@ -295,7 +294,7 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
     }
   }
 
-  public SQLSampleDAO getSampleDAO() {
+  public HibernateSampleDao getSampleDAO() {
     if (sampleDAO != null) {
       return sampleDAO;
     } else {
@@ -427,11 +426,9 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
         props.getProperty("db.password"));
 
     DataObjectFactory dataObjectFactory = new TgacDataObjectFactory();
-    LobHandler lh = new DefaultLobHandler();
     JdbcTemplate template = new JdbcTemplate(datasource);
 
     securityDAO = new MockSQLSecurityDAO();
-    securityDAO.setLobHandler(lh);
     securityDAO.setJdbcTemplate(template);
 
     securityProfileDAO = new SQLSecurityProfileDAO();
@@ -454,7 +451,7 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
     printServiceDAO = new SQLPrintServiceDAO();
     runDAO = new SQLRunDAO();
     runQcDAO = new SQLRunQCDAO();
-    sampleDAO = new SQLSampleDAO();
+    sampleDAO = new HibernateSampleDao();
     sampleQcDAO = new SQLSampleQCDAO();
     sequencerPartitionContainerDAO = new SQLSequencerPartitionContainerDAO();
     sequencerReferenceDAO = new SQLSequencerReferenceDAO();
@@ -480,7 +477,6 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
     libraryDilutionDAO.setJdbcTemplate(template);
     libraryDilutionDAO.setSecurityProfileDAO(securityProfileDAO);
     libraryDilutionDAO.setLibraryDAO(libraryDAO);
-    libraryDilutionDAO.setEmPcrDAO(emPCRDAO);
     libraryDilutionDAO.setCascadeType(CascadeType.PERSIST);
     libraryDilutionDAO.setDataObjectFactory(dataObjectFactory);
     daos.put(uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution.class, libraryDilutionDAO);
@@ -520,7 +516,6 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
     kitDAO.setJdbcTemplate(template);
     kitDAO.setNoteDAO(noteDAO);
     kitDAO.setCascadeType(CascadeType.PERSIST);
-    kitDAO.setDataObjectFactory(dataObjectFactory);
     daos.put(uk.ac.bbsrc.tgac.miso.core.data.Kit.class, kitDAO);
 
     libraryDAO.setJdbcTemplate(template);
@@ -617,13 +612,6 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
     daos.put(uk.ac.bbsrc.tgac.miso.core.data.RunQC.class, runQcDAO);
 
     sampleDAO.setJdbcTemplate(template);
-    sampleDAO.setSecurityProfileDAO(securityProfileDAO);
-    sampleDAO.setNoteDAO(noteDAO);
-    sampleDAO.setLibraryDAO(libraryDAO);
-    sampleDAO.setProjectDAO(projectDAO);
-    sampleDAO.setSampleQcDAO(sampleQcDAO);
-    sampleDAO.setCascadeType(CascadeType.PERSIST);
-    sampleDAO.setDataObjectFactory(dataObjectFactory);
     daos.put(uk.ac.bbsrc.tgac.miso.core.data.Sample.class, sampleDAO);
 
     sampleQcDAO.setJdbcTemplate(template);

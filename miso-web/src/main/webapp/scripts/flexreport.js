@@ -182,7 +182,7 @@ Reports.ui = {
         var start = jQuery('.chkbox').index(this);
         var end = jQuery('.chkbox').index(self.lastChecked);
 
-        for (i = Math.min(start, end); i <= Math.max(start, end); i++) {
+        for (var i = Math.min(start, end); i <= Math.max(start, end); i++) {
           jQuery('.chkbox')[i].checked = self.lastChecked.checked;
         }
       }
@@ -324,7 +324,7 @@ Reports.ui = {
   toggleCheckedItems: function (className, status) {
     jQuery("." + className).each(function () {
       jQuery(this).attr("checked", status);
-    })
+    });
   },
 
   createProjectFormTable: function (array) {
@@ -719,10 +719,10 @@ Reports.ui = {
       'listSequencers',
       {'url': ajaxurl},
       {'doOnSuccess': function (json) {
-        var list = "<select id='sequencers' name='sequencers' onchange='Reports.ui.updateCalendar();'> <option value=0> All </option>;"
+        var list = "<select id='sequencers' name='sequencers' onchange='Reports.ui.updateCalendar();'> <option value=0> All </option>;";
 
         for (var i = 0; i < json.sequencers.length; i++) {
-          list += "<option value=" + json.sequencers[i].id + ">" + json.sequencers[i].name_model + " - " + json.sequencers[i].name + "</option>"
+          list += "<option value=" + json.sequencers[i].id + ">" + json.sequencers[i].name_model + " - " + json.sequencers[i].name + "</option>";
         }
 
         list += "</select>";
@@ -740,7 +740,7 @@ Reports.ui = {
   },
 
   findMaxValue: function (element) {
-    var maxValue = undefined;
+    var maxValue;
     jQuery('option', element).each(function () {
       var val = jQuery(this).attr('value');
       val = parseInt(val, 10);
@@ -754,7 +754,7 @@ Reports.ui = {
 
   updateCalendar: function () {
     var self = this;
-    if (jQuery('#sequencers').val() == 0) {
+    if (jQuery('#sequencers').val() === 0) {
       jQuery("#listtoggle").fadeIn();
     }
     else {
@@ -787,7 +787,7 @@ Reports.ui = {
       }
       var label = jQuery("#sequencers option").eq(i).text();
       color += "<td bgcolor=" + tempcolour[jQuery("#sequencers option").eq(i).val()] + "> <font color='black'> <b> " + label + "</b> </font></td>";
-      if ((i % 2) == 0) {
+      if ((i % 2) === 0) {
         color += "</tr>";
       }
     }
@@ -844,8 +844,8 @@ Reports.chart = {
   },
 
   plotHollowPieChart: function (data, div) {
-    var w = 400, h = 600, r = 150, labelr = r + 10, sum = 0 // radius for label anchor
-    color = d3.scale.category20c(), donut = d3.layout.pie(), arc = d3.svg.arc().innerRadius(r * .6).outerRadius(r);
+    var w = 400, h = 600, r = 150, labelr = r + 10, sum = 0; // radius for label anchor
+    var color = d3.scale.category20c(), donut = d3.layout.pie(), arc = d3.svg.arc().innerRadius(r * 0.6).outerRadius(r);
 
     var vis = d3.select("#" + div)
         .append("svg:svg")
@@ -856,7 +856,7 @@ Reports.chart = {
     var arcs = vis.selectAll("g.arc")
         .data(donut.value(function (d) {
           sum += parseInt(d.value);
-          return d.value
+          return d.value;
         }))
         .enter().append("svg:g")
         .attr("class", "arc")

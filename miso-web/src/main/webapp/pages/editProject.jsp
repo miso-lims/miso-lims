@@ -22,8 +22,8 @@
   --%>
 
 <%@ include file="../header.jsp" %>
-<script src="<c:url value='/scripts/datatables_utils.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
-<script src="<c:url value='/scripts/natural_sort.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
+<script src="<c:url value='/scripts/datatables_utils.js'/>" type="text/javascript"></script>
+<script src="<c:url value='/scripts/natural_sort.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/jquery/datatables/js/jquery.dataTables.min.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.mini.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.datepicker.js'/>" type="text/javascript"></script>
@@ -37,6 +37,8 @@
 
 <script type="text/javascript" src="<c:url value='/scripts/parsley/parsley.min.js'/>"></script>
 
+<div id="maincontent">
+<div id="contentcolumn">
 <form:form id="project-form" data-parsley-validate="" action="/miso/project" method="POST" commandName="project" autocomplete="off">
 <sessionConversation:insertSessionConversationId attributeName="project"/>
 <h1><c:choose><c:when
@@ -112,7 +114,7 @@
     </td>
   </tr>
   <tr>
-    <td class="h">Description:*</td>
+    <td class="h">Description:</td>
     <td><form:input id="description" path="description" maxlength="${maxLengths['description']}" class="validateable"/>
       <span id="descriptioncounter" class="counter"></span></td>
   </tr>
@@ -133,11 +135,19 @@
     </td>
   </tr>
   <tr>
-    <td></td>
+      <td></td>
+      <td>
+        <div class="parsley-errors-list filled" id="progressSelectError">
+          <div class="parsley-required"></div>
+        </div>
+      </td>
+  </tr>
+  <tr>
+    <td>Reference Genome :*</td>
     <td>
-      <div class="parsley-errors-list filled" id="progressSelectError">
-        <div class="parsley-required"></div>
-      </div>
+        <form:select id="referenceGenome" path="referenceGenomeId">
+            <form:options items="${referenceGenome}" itemValue="referenceGenomeId" itemLabel="alias"/>
+        </form:select>
     </td>
   </tr>
 </table>
@@ -282,10 +292,13 @@
         <div class="exppreview" id="overview-notes-${n.count}">
           <b>${note.creationDate}</b>: ${note.text}
           <span class="float-right" style="font-weight:bold; color:#C0C0C0;">${note.owner.loginName}
-            <c:if test="${(project.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
+            <c:if test="${(note.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
                             or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-            <span style="color:#000000"><a href='#' onclick="Project.overview.deleteProjectOverviewNote('${overview.overviewId}', '${note.noteId}');">
-              <span class="ui-icon ui-icon-trash" style="clear: both; position: relative; float: right; margin-top: -15px;"/></a></span>
+              <span style="color:#000000">
+                <a href='#' onclick="Project.overview.deleteProjectOverviewNote('${overview.overviewId}', '${note.noteId}');">
+                  <span class="ui-icon ui-icon-trash" style="clear: both; position: relative; float: right; margin-top: -15px;"></span>
+                </a>
+              </span>
             </c:if>
           </span>
         </div>
@@ -967,7 +980,7 @@
 
             <c:if test="${not empty projectLibraries}">
               <a href="javascript:void(0);" onclick="bulkLibraryQcTable('#library_table');" class="add">QC these Libraries</a>
-              <a href="javascript:void(0);" onclick="bulkLibraryDilutionTable('#library_table');" class="add">Add Library Dilutions</a>
+              <a href="javascript:void(0);" onclick="bulkLibraryDilutionTable('#library_table', '${libraryDilutionUnits}');" class="add">Add Library Dilutions</a>
               <a href="javascript:void(0);" onclick="Project.barcode.selectLibraryBarcodesToPrint('#library_table');">Print Barcodes ...</a>
             </c:if>
           </div>
@@ -1064,7 +1077,7 @@
 
                 <c:if test="${not empty projectLibraries}">
                   <a href="javascript:void(0);" onclick="bulkLibraryQcTable('#overview_librarygroup_table_${overview.id}');" class="add">QC these Libraries</a>
-                  <a href="javascript:void(0);" onclick="bulkLibraryDilutionTable('#overview_librarygroup_table_${overview.id}');" class="add">Add Library Dilutions</a>
+                  <a href="javascript:void(0);" onclick="bulkLibraryDilutionTable('#overview_librarygroup_table_${overview.id}', '${libraryDilutionUnits}');" class="add">Add Library Dilutions</a>
                   <a href="javascript:void(0);" onclick="Project.barcode.selectLibraryBarcodesToPrint('#overview_librarygroup_table_${overview.id}');">Print Barcodes ...</a>
                 </c:if>
               </div>
@@ -1190,7 +1203,7 @@
         <th>Dilution Creator</th>
         <th>Dilution Creation Date</th>
         <th>Dilution Platform</th>
-        <th>Dilution Concentration</th>
+        <th>Dilution Concentration (${libraryDilutionUnits})</th>
         <sec:authorize access="hasRole('ROLE_ADMIN')">
           <th class="fit">DELETE</th>
         </sec:authorize>
@@ -1272,7 +1285,7 @@
         <th>Pool Alias</th>
         <th>Pool Platform</th>
         <th>Pool Creation Date</th>
-        <th>Pool Concentration</th>
+        <th>Pool Concentration (${poolConcentrationUnits})</th>
         <sec:authorize access="hasRole('ROLE_ADMIN')">
           <th class="fit">DELETE</th>
         </sec:authorize>
@@ -1653,34 +1666,28 @@ jQuery(document).ready(function () {
 
 <c:if test="${not empty project.samples}">
     <script type="text/javascript">
-        var projectId_sample = ${project.id};
-        var sampleQcTypesString = {${sampleQcTypesString}};
+      projectId_sample = ${project.id};
+      sampleQcTypesString = {${sampleQcTypesString}};
     </script>
-    <script src="<c:url value='/scripts/editProject_sample.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
 </c:if>
 
 <c:if test="${not empty projectLibraries}">
     <script type="text/javascript">
-        var libraryQcTypesString = {${libraryQcTypesString}};
+      libraryQcTypesString = {${libraryQcTypesString}};
     </script>
-    <script src="<c:url value='/scripts/editProject_library.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
-</c:if>
-
-<c:if test="${existsAnyEmPcrLibrary and not empty projectLibraryDilutions}">
-    <script src="<c:url value='/scripts/editProject_libraryDilution.js?ts=${timestamp.time}'/>"
-            type="text/javascript"></script>
-</c:if>
-
-<c:if test="${not empty projectEmPcrs}">
-    <script src="<c:url value='/scripts/editProject_empcr.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
 </c:if>
 
 <c:if test="${project.id != 0}">
     <script type="text/javascript">
-        var projectId_d3graph = ${project.id};
+        projectId_d3graph = ${project.id};
+        getProjectD3Json();
     </script>
-    <script src="<c:url value='/scripts/editProject_existing.js?ts=${timestamp.time}'/>"
-            type="text/javascript"></script>
+
 </c:if>
+</div>
+</div>
+</div>
+
+<%@ include file="adminsub.jsp" %>
 
 <%@ include file="../footer.jsp" %>

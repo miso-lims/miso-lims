@@ -163,8 +163,12 @@ public class PacBioTransformer implements FileSetTransformer<String, String, Fil
                 .getBean(run.getString("sequencerName"), PacBioServiceWrapper.class);
             PacBioService pacbioService = pacbioServiceWrapper.getPacBioService();
 
-            String plateStatus = pacbioService.getPlateStatus(URLEncoder.encode(run.getString("plateId"), "UTF-8"));
-            if ("Complete".equals(plateStatus)) {
+            // note: PacBio webservice doesn't understand "+" as space in URL, must use "%20"
+            String plateStatus = pacbioService.getPlateStatus(URLEncoder.encode(run.getString("plateId"), "UTF-8").replace("+", "%20"));
+            if (plateStatus == null) {
+              log.error(runName + " :: Could not retrieve plate status from PacBio webservice.");
+            }
+            else if ("Complete".equals(plateStatus)) {
               log.debug(runName + " :: Completed");
               if (!run.has("completionDate")) {
                 run.put("completionDate", "");

@@ -110,24 +110,30 @@ Utils.ui = {
 
   checkAll: function (field) {
     var self = this;
-    for (i = 0; i < self._N(field).length; i++) self._N(field)[i].checked = true;
+    for (var i = 0; i < self._N(field).length; i++) {
+      self._N(field)[i].checked = true;
+    }
   },
 
   checkAllConfirm: function (field, message) {
     if (confirm(message)) {
       var self = this;
-      for (i = 0; i < self._N(field).length; i++) self._N(field)[i].checked = true;
+      for (var i = 0; i < self._N(field).length; i++) {
+        self._N(field)[i].checked = true;
+      }
     }
   },
 
   uncheckAll: function (field) {
     var self = this;
-    for (i = 0; i < self._N(field).length; i++) self._N(field)[i].checked = false;
+    for (var i = 0; i < self._N(field).length; i++) {
+      self._N(field)[i].checked = false;
+    }
   },
 
   uncheckOthers: function (field, item) {
     var self = this;
-    for (i = 0; i < self._N(field).length; i++) {
+    for (var i = 0; i < self._N(field).length; i++) {
       if (self._N(field)[i] != item) {
         self._N(field)[i].checked = false;
       }
@@ -135,7 +141,9 @@ Utils.ui = {
   },
 
   _N: function (element) {
-    if (typeof element == 'string') element = document.getElementsByName(element);
+    if (typeof element == 'string') {
+      element = document.getElementsByName(element);
+    }
     return Element.extend(element);
   },
 
@@ -165,6 +173,15 @@ Utils.ui = {
 
   addMaxDatePicker: function (id, maxDateOffset) {
     jQuery("#" + id).datepicker({dateFormat: 'dd/mm/yy', showButtonPanel: true, maxDate: maxDateOffset});
+  },
+  
+  addDateTimePicker: function (id) {
+    jQuery("#" + id).datetimepicker({
+      controlType: 'select',
+      oneLine: true,
+      dateFormat: 'dd/mm/yy',
+      timeFormat: 'HH:mm'
+    });
   },
 
   disableButton: function (buttonDiv) {
@@ -197,8 +214,6 @@ Utils.ui = {
 
 Utils.fileUpload = {
   fileUploadProgress: function (formname, divname, successfunc) {
-    var self = this;
-
     Fluxion.doAjaxUpload(
       formname,
       'fileUploadProgressBean',
@@ -215,8 +230,8 @@ Utils.fileUpload = {
 };
 
 Utils.validation = {
-  //dateRegex: '^(?:(?:31(\/|-|\.)(?:0?[13578]|1[02]))\1|(?:(?:29|30)(\/|-|\.)(?:0?[1,3-9]|1[0-2])\2))(?:(?:1[6-9]|[2-9]\d)?\d{2})$|^(?:29(\/|-|\.)0?2\3(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\d|2[0-8])(\/|-|\.)(?:(?:0?[1-9])|(?:1[0-2]))\4(?:(?:1[6-9]|[2-9]\d)?\d{2})$',
-  dateRegex: '[0-9]{2}\/[0-9]{2}/[0-9]{4}',
+  dateRegex: '^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/(19|20)[0-9]{2}$',
+  dateTimeRegex: '^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/(19|20)[0-9]{2} ([01][0-9]|2[0-3]):[0-5][0-9]$',
   sanitizeRegex: '[^<>\'\/]+',
   //_base64 : XRegExp('^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{4})$'),
   unicodeWordRegex: '^[\\p{L}0-9_\\^\\-\\.\\s]+$',
@@ -387,7 +402,7 @@ Utils.page = {
   newWindow: function (url) {
     newwindow = window.open(url, 'name', 'height=500,width=500,menubar=yes,status=yes,scrollbars=yes');
     if (window.focus) {
-      newwindow.focus()
+      newwindow.focus();
     }
     return false;
   },
@@ -475,7 +490,7 @@ Utils.alert = {
         'dashboard',
         'setAllAlertsAsRead',
         {'url': ajaxurl},
-        {'doOnSuccess': function (json) {
+        {'doOnSuccess': function () {
           jQuery('#alertList').html("<i style='color: gray'>No unread alerts</i>");
           Utils.alert.checkAlerts();
         }

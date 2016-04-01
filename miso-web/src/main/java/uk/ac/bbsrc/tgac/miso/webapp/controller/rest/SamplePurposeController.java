@@ -90,15 +90,11 @@ public class SamplePurposeController extends RestController {
   @ResponseBody
   public Set<SamplePurposeDto> getSamplePurposes(UriComponentsBuilder uriBuilder, HttpServletResponse response) throws IOException {
     Set<SamplePurpose> samplePurposes = samplePurposeService.getAll();
-    if (samplePurposes.isEmpty()) {
-      throw new RestException("No sample purposes found", Status.NOT_FOUND);
-    } else {
-      Set<SamplePurposeDto> samplePurposeDtos = Dtos.asSamplePurposeDtos(samplePurposes);
-      for (SamplePurposeDto samplePurposeDto : samplePurposeDtos) {
-        samplePurposeDto = writeUrls(samplePurposeDto, uriBuilder);
-      }
-      return samplePurposeDtos;
+    Set<SamplePurposeDto> samplePurposeDtos = Dtos.asSamplePurposeDtos(samplePurposes);
+    for (SamplePurposeDto samplePurposeDto : samplePurposeDtos) {
+      samplePurposeDto = writeUrls(samplePurposeDto, uriBuilder);
     }
+    return samplePurposeDtos;
   }
 
   @RequestMapping(value = "/samplepurpose", method = RequestMethod.POST, headers = { "Content-type=application/json" })

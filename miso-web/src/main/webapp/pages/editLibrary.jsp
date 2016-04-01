@@ -30,11 +30,9 @@
 --%>
 <%@ include file="../header.jsp" %>
 <script src="<c:url value='/scripts/jquery/js/jquery.breadcrumbs.popup.js'/>" type="text/javascript"></script>
-<script src="<c:url value='/scripts/datatables_utils.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
+<script src="<c:url value='/scripts/datatables_utils.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/jquery/datatables/js/jquery.dataTables.min.js'/>" type="text/javascript"></script>
 <link href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" rel="stylesheet" type="text/css">
-
-<script src="<c:url value='/scripts/stats_ajax.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
 
 <script type="text/javascript" src="<c:url value='/scripts/parsley/parsley.min.js'/>"></script>
 
@@ -119,34 +117,6 @@
 
 <div class="barcodes">
   <div class="barcodeArea ui-corner-all">
-    <c:choose>
-      <c:when test="${empty library.locationBarcode}">
-        <span style="float: left; font-size: 24px; font-weight: bold; color:#BBBBBB">Location</span><form:input
-          path="locationBarcode" size="8"/>
-      </c:when>
-      <c:otherwise>
-        <span style="float: left; font-size: 24px; font-weight: bold; color:#BBBBBB">Location</span>
-        <ul class="barcode-ddm">
-          <li>
-            <a onmouseover="mopen('locationBarcodeMenu')" onmouseout="mclosetime()">
-              <span style="float:right; margin-top:6px;" class="ui-icon ui-icon-triangle-1-s"></span>
-              <span id="locationBarcode" style="float:right; margin-top:6px; padding-bottom: 11px;">
-                  ${sample.locationBarcode}
-              </span>
-            </a>
-
-            <div id="locationBarcodeMenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
-              <a href="javascript:void(0);" onclick="Library.barcode.showLibraryLocationChangeDialog(${library.id});">
-                Change location
-              </a>
-            </div>
-          </li>
-        </ul>
-        <div id="changeLibraryLocationDialog" title="Change Library Location"></div>
-      </c:otherwise>
-    </c:choose>
-  </div>
-  <div class="barcodeArea ui-corner-all">
     <span style="float: left; font-size: 24px; font-weight: bold; color:#BBBBBB">ID</span>
     <c:if test="${library.id != 0}">
       <ul class="barcode-ddm">
@@ -199,7 +169,14 @@
   </td>
 </tr>
 <tr>
-  <td>Name:</td>
+  <td class="h">Location:</td>
+  <td>
+    <c:if test="${!empty library.boxLocation}">${library.boxLocation},</c:if>
+    <c:if test="${!empty library.boxPosition}"><a href='<c:url value="/miso/box/${library.boxId}"/>'>${library.boxAlias}, ${library.boxPosition}</a></c:if>
+  </td>
+</tr>
+<tr>
+  <td class="h">Name:</td>
   <td>
     <c:choose>
       <c:when test="${library.id != 0}">${library.name}</c:when>
@@ -273,12 +250,6 @@
         <form:checkbox path="paired"/>
       </c:otherwise>
     </c:choose>
-  </td>
-</tr>
-<tr>
-  <td>Low Quality:</td>
-  <td>
-    <form:checkbox path="lowQuality"/>
   </td>
 </tr>
 <tr>
@@ -437,6 +408,22 @@
   </td>
 </tr>
 
+<tr>
+  <td>Low Quality Sequencing:</td>
+  <td>
+    <form:checkbox path="lowQuality"/>
+  </td>
+</tr>
+
+<tr>
+  <td>Volume (&#181;l):</td>
+  <td><form:input id="volume" path="volume"/></td>
+</tr>
+<tr>
+  <td>Emptied:</td>
+  <td><form:checkbox id="empty" path="empty"/></td>
+</tr>
+
 <c:choose>
   <c:when
       test="${!empty library.sample and library.securityProfile.profileId eq library.sample.project.securityProfile.profileId}">
@@ -486,7 +473,7 @@
           <div class="exppreview" id="library-notes-${n.count}">
             <b>${note.creationDate}</b>: ${note.text}
               <span class="float-right" style="font-weight:bold; color:#C0C0C0;">${note.owner.loginName}
-                <c:if test="${(project.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
+                <c:if test="${(note.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
                                 or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
                 <span style="color:#000000"><a href='#' onclick="Library.ui.deleteLibraryNote('${library.id}', '${note.noteId}');">
                   <span class="ui-icon ui-icon-trash" style="clear: both; position: relative; float: right; margin-top: -15px;"/></a></span>
@@ -541,7 +528,12 @@
             <td>${qc.qcCreator}</td>
             <td><fmt:formatDate value="${qc.qcDate}"/></td>
             <td>${qc.qcType.name}</td>
-            <td id="result${qc.id}">${qc.results} ${qc.qcType.units}</td>
+
+            <fmt:formatNumber var="resultsRounded"
+              value="${qc.results}"
+              maxFractionDigits="2" />
+
+            <td id="result${qc.id}">${resultsRounded} ${qc.qcType.units}</td>
             <td id="insert${qc.id}">${qc.insertSize} bp</td>
             <c:if test="${(library.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
                         or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
@@ -629,7 +621,7 @@
         <th>LD Name</th>
         <th>Done By</th>
         <th>Date</th>
-        <th>Results (${libraryDilutionUnits})</th>
+        <th>Concentration (${libraryDilutionUnits})</th>
         <th>ID Barcode</th>
           <%-- <th>Location Barcode</th> --%>
         <c:if test="${(dil.dilutionCreator eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
@@ -645,7 +637,10 @@
             <td>${dil.name}</td>
             <td>${dil.dilutionCreator}</td>
             <td><fmt:formatDate value="${dil.creationDate}"/></td>
-            <td id="results${dil.id}">${dil.concentration} ${libraryDilutionUnits}</td>
+            <fmt:formatNumber var="concentrationRounded"
+                          value="${dil.concentration}"
+                          maxFractionDigits="2" />
+            <td id="results${dil.id}">${concentrationRounded}</td>
             <td class="fit">
               <c:if test="${not empty dil.identificationBarcode}">
                 <div class="barcodes">
@@ -805,7 +800,7 @@
           <th>Pool Alias</th>
           <th>Pool Platform</th>
           <th>Pool Creation Date</th>
-          <th>Pool Concentration</th>
+          <th>Pool Concentration (${poolConcentrationUnits})</th>
           <sec:authorize access="hasRole('ROLE_ADMIN')">
             <th class="fit">DELETE</th>
           </sec:authorize>

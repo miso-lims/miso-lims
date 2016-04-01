@@ -96,15 +96,11 @@ public class SampleValidRelationshipController extends RestController {
   public Set<SampleValidRelationshipDto> getSampleValidRelationships(UriComponentsBuilder uriBuilder, HttpServletResponse response) 
       throws IOException {
     Set<SampleValidRelationship> sampleValidRelationships = sampleValidRelationshipService.getAll();
-    if (sampleValidRelationships.isEmpty()) {
-      throw new RestException("No sample valid relationships found", Status.NOT_FOUND);
-    } else {
-      Set<SampleValidRelationshipDto> sampleValidRelationshipDtos = Dtos.asSampleValidRelationshipDtos(sampleValidRelationships);
-      for (SampleValidRelationshipDto sampleValidRelationshipDto : sampleValidRelationshipDtos) {
-        sampleValidRelationshipDto = writeUrls(sampleValidRelationshipDto, uriBuilder);
-      }
-      return sampleValidRelationshipDtos;
+    Set<SampleValidRelationshipDto> sampleValidRelationshipDtos = Dtos.asSampleValidRelationshipDtos(sampleValidRelationships);
+    for (SampleValidRelationshipDto sampleValidRelationshipDto : sampleValidRelationshipDtos) {
+      sampleValidRelationshipDto = writeUrls(sampleValidRelationshipDto, uriBuilder);
     }
+    return sampleValidRelationshipDtos;
   }
 
   @RequestMapping(value = "/samplevalidrelationship", method = RequestMethod.POST, headers = { "Content-type=application/json" })

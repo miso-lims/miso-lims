@@ -46,11 +46,13 @@ var vis = d3.select("#chart").append("svg:svg")
         .append("svg:g")
         .attr("transform", "translate(" + r + "," + r + ")");
 
-d3.json("/miso/d3graph/project/" + projectId_d3graph, function (json) {
-  json.x0 = 800;
-  json.y0 = 0;
-  update(root = json);
-});
+function getProjectD3Json () {
+  d3.json("/miso/d3graph/project/" + projectId_d3graph, function (json) {
+    json.x0 = 800;
+    json.y0 = 0;
+    update(root = json);
+  });
+}
 
 function update(source) {
   // Compute the new tree layout.
@@ -97,7 +99,7 @@ function update(source) {
                    return d._children ? "lightsteelblue" : "#fff";
                  })
           .style("stroke", function (d) {
-                   return d.color == 0 ? "red"
+                   return d.color === 0 ? "red"
                            : d.color == 1 ? "lightgreen"
                                   : d.color == 2 ? "gray"
                                      : "steelblue";
@@ -107,7 +109,7 @@ function update(source) {
                   return "rotate (" + (source.x0 - 90) + ")translate(" + source.y0 + ")";
                 })
           .style("stroke", function (d) {
-                   return d.color == 0 ? "red"
+                   return d.color === 0 ? "red"
                            : d.color == 1 ? "lightgreen"
                                   : d.color == 2 ? "gray"
                                      : "steelblue";
@@ -142,7 +144,7 @@ function update(source) {
                    return d._children ? "lightsteelblue" : "#fff";
                  })
           .style("stroke", function (d) {
-                   return d.color == 0 ? "red"
+                   return d.color === 0 ? "red"
                            : d.color == 1 ? "lightgreen"
                                   : d.color == 2 ? "gray"
                                      : "steelblue";

@@ -30,9 +30,14 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
+
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 
 import org.apache.commons.lang.NotImplementedException;
 import org.codehaus.jackson.type.TypeReference;
@@ -49,17 +54,6 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
-import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.store.SecurityStore;
-import com.googlecode.ehcache.annotations.Cacheable;
-import com.googlecode.ehcache.annotations.KeyGenerator;
-import com.googlecode.ehcache.annotations.Property;
-import com.googlecode.ehcache.annotations.TriggersRemove;
-
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractPool;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
@@ -73,16 +67,28 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolQcException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ExperimentStore;
+import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.core.store.WatcherStore;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DaoLookup;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
+
+import com.eaglegenomics.simlims.core.Note;
+import com.eaglegenomics.simlims.core.SecurityProfile;
+import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.store.SecurityStore;
+import com.googlecode.ehcache.annotations.Cacheable;
+import com.googlecode.ehcache.annotations.KeyGenerator;
+import com.googlecode.ehcache.annotations.Property;
+import com.googlecode.ehcache.annotations.TriggersRemove;
 
 /**
  * uk.ac.bbsrc.tgac.miso.sqlstore
@@ -97,30 +103,29 @@ public class SQLPoolDAO implements PoolStore {
 
   private static final String POOL_CHANGE_LOG_INSERT = "INSERT INTO PoolChangeLog (poolId, columnsChanged, userId, message) VALUES (?, '', ?, ?)";
 
-  private static final String POOL_SELECT = "SELECT poolId, concentration, identificationBarcode, name, alias, creationDate, securityProfile_profileId, "
-      + "platformType, ready, qcPassed, lastModifier, boxPositionId, volume, emptied, "
-      + "(SELECT boxId FROM BoxPosition WHERE BoxPosition.boxPositionId = " + TABLE_NAME
-      + ".boxPositionId) AS boxId, (SELECT alias FROM Box, BoxPosition WHERE Box.boxId = BoxPosition.boxId AND BoxPosition.boxPositionId = "
-      + TABLE_NAME + ".boxPositionId) AS boxAlias, (SELECT row FROM BoxPosition WHERE BoxPosition.boxPositionId = " + TABLE_NAME
-      + ".boxPositionId) AS boxRow, (SELECT `column` FROM BoxPosition WHERE BoxPosition.boxPositionId = " + TABLE_NAME
-      + ".boxPositionId) AS boxColumn " + "FROM " + TABLE_NAME;
+  private static final String POOL_SELECT = "SELECT p.poolId, p.concentration, p.identificationBarcode, p.name, p.alias, p.creationDate, "
+      + "p.securityProfile_profileId, p.platformType, p.ready, p.qcPassed, p.lastModifier, p.boxPositionId, p.volume, p.emptied, b.boxId, "
+      + "b.alias AS boxAlias, b.locationBarcode AS boxLocation, bp.row AS boxRow, bp.column AS boxColumn "
+      + "FROM " + TABLE_NAME + " p "
+      + "LEFT JOIN BoxPosition bp ON bp.boxPositionId = p.boxPositionId "
+      + "LEFT JOIN Box b ON b.boxId = bp.boxId";
 
-  public static final String POOL_SELECT_BY_POOL_ID = POOL_SELECT + " WHERE poolId=?";
+  public static final String POOL_SELECT_BY_POOL_ID = POOL_SELECT + " WHERE p.poolId=?";
 
-  public static final String POOL_SELECT_BY_PLATFORM = POOL_SELECT + " WHERE platformType=?";
+  public static final String POOL_SELECT_BY_PLATFORM = POOL_SELECT + " WHERE p.platformType=?";
 
-  public static final String POOL_SELECT_BY_PLATFORM_AND_SEARCH = POOL_SELECT + " WHERE platformType=? AND " + "(name LIKE ? OR "
-      + "alias LIKE ? OR " + "identificationBarcode LIKE ?) ";
+  public static final String POOL_SELECT_BY_PLATFORM_AND_SEARCH = POOL_SELECT + " WHERE p.platformType=? AND " + "(p.name LIKE ? OR "
+      + "p.alias LIKE ? OR " + "p.identificationBarcode LIKE ?) ";
 
-  public static final String POOL_SELECT_BY_PLATFORM_AND_READY = POOL_SELECT_BY_PLATFORM + " AND ready=1";
+  public static final String POOL_SELECT_BY_PLATFORM_AND_READY = POOL_SELECT_BY_PLATFORM + " AND p.ready=1";
 
-  public static final String POOL_SELECT_BY_PLATFORM_AND_READY_AND_SEARCH = POOL_SELECT_BY_PLATFORM_AND_SEARCH + " AND ready=1";
+  public static final String POOL_SELECT_BY_PLATFORM_AND_READY_AND_SEARCH = POOL_SELECT_BY_PLATFORM_AND_SEARCH + " AND p.ready=1";
 
-  public static final String POOL_SELECT_BY_IDENTIFICATION_BARCODE = POOL_SELECT + " WHERE identificationBarcode = ?";
+  public static final String POOL_SELECT_BY_IDENTIFICATION_BARCODE = POOL_SELECT + " WHERE p.identificationBarcode = ?";
 
-  public static final String POOL_SELECT_FROM_BARCODE_LIST = POOL_SELECT + " WHERE identificationBarcode IN (";
+  public static final String POOL_SELECT_FROM_BARCODE_LIST = POOL_SELECT + " WHERE p.identificationBarcode IN (";
 
-  public static final String POOL_SELECT_BY_BOX_POSITION_ID = POOL_SELECT + " WHERE boxPositionId = ?";
+  public static final String POOL_SELECT_BY_BOX_POSITION_ID = POOL_SELECT + " WHERE p.boxPositionId = ?";
 
   public static final String POOL_UPDATE = "UPDATE " + TABLE_NAME + " "
       + "SET alias=:alias, concentration=:concentration, identificationBarcode=:identificationBarcode, creationDate=:creationDate, securityProfile_profileId=:securityProfile_profileId, "
@@ -134,7 +139,7 @@ public class SQLPoolDAO implements PoolStore {
   public static final String POOL_EXPERIMENT_DELETE_BY_POOL_ID = "DELETE FROM Pool_Experiment " + "WHERE pool_poolId=:pool_poolId";
 
   public static final String EMPCR_POOL_SELECT_BY_RELATED_PROJECT = POOL_SELECT
-      + " WHERE poolId IN (SELECT DISTINCT pool_poolId FROM Project p " + "INNER JOIN Sample sa ON sa.project_projectId = p.projectId "
+      + " WHERE p.poolId IN (SELECT DISTINCT pool_poolId FROM Project p " + "INNER JOIN Sample sa ON sa.project_projectId = p.projectId "
       + "INNER JOIN Library li ON li.sample_sampleId = sa.sampleId "
       + "INNER JOIN LibraryDilution ld ON ld.library_libraryId = li.libraryId "
       + "LEFT JOIN emPCR e ON e.dilution_dilutionId = ld.dilutionId " + "LEFT JOIN emPCRDilution ed ON ed.emPCR_pcrId = e.pcrId "
@@ -142,7 +147,7 @@ public class SQLPoolDAO implements PoolStore {
       + "WHERE p.projectId = ? AND ple.elementType = 'uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution')";
 
   public static final String DILUTION_POOL_SELECT_BY_RELATED_PROJECT = POOL_SELECT
-      + " WHERE poolId IN (SELECT DISTINCT pool_poolId FROM Project p "
+      + " WHERE p.poolId IN (SELECT DISTINCT pool_poolId FROM Project p "
 
       + "INNER JOIN Sample sa ON sa.project_projectId = p.projectId " + "INNER JOIN Library li ON li.sample_sampleId = sa.sampleId "
       + "INNER JOIN LibraryDilution ld ON ld.library_libraryId = li.libraryId "
@@ -150,21 +155,21 @@ public class SQLPoolDAO implements PoolStore {
       + "WHERE p.projectId = ? AND pld.elementType = 'uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution')";
 
   public static final String PLATE_POOL_SELECT_BY_RELATED_PROJECT = POOL_SELECT
-      + " WHERE poolId IN (SELECT DISTINCT pool_poolId FROM Project p "
+      + " WHERE p.poolId IN (SELECT DISTINCT pool_poolId FROM Project p "
 
       + "INNER JOIN Sample sa ON sa.project_projectId = p.projectId " + "INNER JOIN Library li ON li.sample_sampleId = sa.sampleId "
       + "INNER JOIN Plate_Elements pe ON li.libraryId = pe.elementId " + "INNER JOIN Plate pl ON pl.plateId = pe.plate_plateId "
       + "LEFT JOIN Pool_Elements pld ON pld.elementId = pl.plateId " + "WHERE p.projectId= ? AND pld.elementType LIKE '%Plate')";
 
   public static final String POOL_SELECT_BY_RELATED_LIBRARY = POOL_SELECT
-      + " WHERE poolId IN (SELECT COALESCE(pld.pool_poolId, ple.pool_poolId) FROM Library li "
+      + " WHERE p.poolId IN (SELECT COALESCE(pld.pool_poolId, ple.pool_poolId) FROM Library li "
       + "INNER JOIN LibraryDilution ld ON ld.library_libraryId = li.libraryId "
       + "LEFT JOIN emPCR e ON e.dilution_dilutionId = ld.dilutionId " + "LEFT JOIN emPCRDilution ed ON ed.emPCR_pcrId = e.pcrId "
       + "LEFT JOIN Pool_Elements pld ON pld.elementId = ld.dilutionId " + "LEFT JOIN Pool_Elements ple ON ple.elementId = ed.dilutionId "
       + "WHERE li.libraryId=?)";
 
   public static final String POOL_SELECT_BY_RELATED_SAMPLE = POOL_SELECT
-      + " WHERE poolId IN (SELECT COALESCE(ple.pool_poolId, pld.pool_poolId) FROM Sample s "
+      + " WHERE p.poolId IN (SELECT COALESCE(ple.pool_poolId, pld.pool_poolId) FROM Sample s "
       + "INNER JOIN Library li ON li.sample_sampleId = s.sampleId "
       + "INNER JOIN LibraryDilution ld ON ld.library_libraryId = li.libraryId "
       + "LEFT JOIN emPCR e ON e.dilution_dilutionId = ld.dilutionId " + "LEFT JOIN emPCRDilution ed ON ed.emPCR_pcrId = e.pcrId "
@@ -174,7 +179,7 @@ public class SQLPoolDAO implements PoolStore {
   public static final String POOL_ELEMENT_DELETE_BY_POOL_ID = "DELETE FROM Pool_Elements " + "WHERE pool_poolId=:pool_poolId";
 
   // ILLUMINA
-  public static final String ILLUMINA_POOL_SELECT = POOL_SELECT + " WHERE platformType='Illumina'";
+  public static final String ILLUMINA_POOL_SELECT = POOL_SELECT + " WHERE p.platformType='Illumina'";
 
   public static final String ILLUMINA_POOL_SELECT_BY_POOL_ID = ILLUMINA_POOL_SELECT + " AND poolId=?";
 
@@ -186,7 +191,7 @@ public class SQLPoolDAO implements PoolStore {
       + "AND poolId IN (SELECT pool_poolId FROM Pool_Experiment WHERE experiments_experimentId=?) ";
 
   // 454
-  public static final String LS454_POOL_SELECT = POOL_SELECT + " WHERE platformType='LS454'";
+  public static final String LS454_POOL_SELECT = POOL_SELECT + " WHERE p.platformType='LS454'";
 
   public static final String LS454_POOL_SELECT_BY_POOL_ID = LS454_POOL_SELECT + " AND poolId=?";
 
@@ -201,7 +206,7 @@ public class SQLPoolDAO implements PoolStore {
       + "FROM emPCRDilution l, Pool_emPCRDilution p " + "WHERE l.dilutionId=p.dilutions_dilutionId " + "AND p.pool_poolId=?";
 
   // SOLiD
-  public static final String SOLID_POOL_SELECT = POOL_SELECT + " WHERE platformType='Solid'";
+  public static final String SOLID_POOL_SELECT = POOL_SELECT + " WHERE p.platformType='Solid'";
 
   public static final String SOLID_POOL_SELECT_BY_POOL_ID = SOLID_POOL_SELECT + " AND poolId=?";
 
@@ -210,13 +215,13 @@ public class SQLPoolDAO implements PoolStore {
   public static final String SOLID_POOL_SELECT_BY_ID_BARCODE = SOLID_POOL_SELECT + " AND identificationBarcode=?";
 
   public static final String SOLID_POOL_SELECT_BY_EXPERIMENT_ID = SOLID_POOL_SELECT
-      + " AND poolId IN (SELECT pool_poolId FROM Pool_Experiment WHERE pe.experiments_experimentId=?)";
+      + " AND poolId IN (SELECT pool_poolId FROM Pool_Experiment WHERE p.experiment_experimentId=?)";
 
   public static final String EMPCR_DILUTIONS_BY_RELATED_SOLID_POOL_ID = "SELECT p.dilutions_dilutionId, l.concentration, l.emPCR_pcrId, l.identificationBarcode, l.name, l.alias, l.creationDate, l.securityProfile_profileId "
       + "FROM emPCRDilution l, Pool_emPCRDilution p " + "WHERE l.dilutionId=p.dilutions_dilutionId " + "AND p.pool_poolId=?";
 
   // EMPCR
-  public static final String EMPCR_POOL_SELECT = POOL_SELECT + " WHERE platformType='Solid' OR platformType='LS454' AND name LIKE 'EFO%'";
+  public static final String EMPCR_POOL_SELECT = POOL_SELECT + " WHERE p.platformType='Solid' OR p.platformType='LS454' AND p.name LIKE 'EFO%'";
 
   public static final String EMPCR_POOL_SELECT_BY_POOL_ID = EMPCR_POOL_SELECT + " AND poolId = ?";
 
@@ -231,11 +236,15 @@ public class SQLPoolDAO implements PoolStore {
   private boolean autoGenerateIdentificationBarcodes;
   private ChangeLogStore changeLogDAO;
   private SecurityStore securityDAO;
+  private NoteStore noteDAO;
+  private BoxStore boxDAO;
 
+  @CoverageIgnore
   public ChangeLogStore getChangeLogDAO() {
     return changeLogDAO;
   }
 
+  @CoverageIgnore
   public void setChangeLogDAO(ChangeLogStore changeLogDAO) {
     this.changeLogDAO = changeLogDAO;
   }
@@ -243,6 +252,7 @@ public class SQLPoolDAO implements PoolStore {
   @Autowired
   private PoolAlertManager poolAlertManager;
 
+  @CoverageIgnore
   public void setPoolAlertManager(PoolAlertManager poolAlertManager) {
     this.poolAlertManager = poolAlertManager;
   }
@@ -250,6 +260,7 @@ public class SQLPoolDAO implements PoolStore {
   @Autowired
   private DaoLookup daoLookup;
 
+  @CoverageIgnore
   public void setDaoLookup(DaoLookup daoLookup) {
     this.daoLookup = daoLookup;
   }
@@ -258,11 +269,13 @@ public class SQLPoolDAO implements PoolStore {
   private MisoNamingScheme<Pool<? extends Poolable>> namingScheme;
 
   @Override
+  @CoverageIgnore
   public MisoNamingScheme<Pool<? extends Poolable>> getNamingScheme() {
     return namingScheme;
   }
 
   @Override
+  @CoverageIgnore
   public void setNamingScheme(MisoNamingScheme<Pool<? extends Poolable>> namingScheme) {
     this.namingScheme = namingScheme;
   }
@@ -270,6 +283,7 @@ public class SQLPoolDAO implements PoolStore {
   @Autowired
   private com.eaglegenomics.simlims.core.manager.SecurityManager securityManager;
 
+  @CoverageIgnore
   public void setSecurityManager(com.eaglegenomics.simlims.core.manager.SecurityManager securityManager) {
     this.securityManager = securityManager;
   }
@@ -277,6 +291,7 @@ public class SQLPoolDAO implements PoolStore {
   @Autowired
   private CacheManager cacheManager;
 
+  @CoverageIgnore
   public void setCacheManager(CacheManager cacheManager) {
     this.cacheManager = cacheManager;
   }
@@ -284,54 +299,82 @@ public class SQLPoolDAO implements PoolStore {
   @Autowired
   private DataObjectFactory dataObjectFactory;
 
+  @CoverageIgnore
   public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
     this.dataObjectFactory = dataObjectFactory;
   }
 
+  @CoverageIgnore
   public Store<SecurityProfile> getSecurityProfileDAO() {
     return securityProfileDAO;
   }
 
+  @CoverageIgnore
   public void setSecurityProfileDAO(Store<SecurityProfile> securityProfileDAO) {
     this.securityProfileDAO = securityProfileDAO;
   }
 
+  @CoverageIgnore
   public SecurityStore getSecurityDAO() {
     return securityDAO;
   }
 
+  @CoverageIgnore
   public void setSecurityDAO(SecurityStore securityDAO) {
     this.securityDAO = securityDAO;
   }
 
+  @CoverageIgnore
   public JdbcTemplate getJdbcTemplate() {
     return template;
   }
 
+  @CoverageIgnore
   public void setJdbcTemplate(JdbcTemplate template) {
     this.template = template;
   }
 
+  @CoverageIgnore
   public void setExperimentDAO(ExperimentStore experimentDAO) {
     this.experimentDAO = experimentDAO;
   }
 
+  @CoverageIgnore
   public void setPoolQcDAO(PoolQcStore poolQcDAO) {
     this.poolQcDAO = poolQcDAO;
   }
 
+  @CoverageIgnore
   public void setWatcherDAO(WatcherStore watcherDAO) {
     this.watcherDAO = watcherDAO;
   }
 
+  @CoverageIgnore
+  public BoxStore getBoxDAO() {
+    return boxDAO;
+  }
+
+  @CoverageIgnore
+  public void setBoxDAO(BoxStore boxDAO) {
+    this.boxDAO = boxDAO;
+  }
+
+  @CoverageIgnore
   public void setCascadeType(CascadeType cascadeType) {
     this.cascadeType = cascadeType;
   }
 
+  @CoverageIgnore
   public void setAutoGenerateIdentificationBarcodes(boolean autoGenerateIdentificationBarcodes) {
     this.autoGenerateIdentificationBarcodes = autoGenerateIdentificationBarcodes;
   }
 
+  @CoverageIgnore
+  public void setNoteDAO(NoteStore noteDAO) {
+    this.noteDAO = noteDAO;
+  }
+
+  @CoverageIgnore
   public boolean getAutoGenerateIdentificationBarcodes() {
     return autoGenerateIdentificationBarcodes;
   }
@@ -347,8 +390,10 @@ public class SQLPoolDAO implements PoolStore {
   }
 
   private void purgeListCache(Pool p, boolean replace) {
-    Cache cache = cacheManager.getCache("poolListCache");
-    DbUtils.updateListCache(cache, replace, p, Pool.class);
+    if (cacheManager != null) {
+      Cache cache = cacheManager.getCache("poolListCache");
+      DbUtils.updateListCache(cache, replace, p, Pool.class);
+    }
   }
 
   private void purgeListCache(Pool p) {
@@ -381,11 +426,13 @@ public class SQLPoolDAO implements PoolStore {
       "lazyPoolCache" }, keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
           @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
   public long save(Pool<? extends Poolable> pool) throws IOException {
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-
     Long securityProfileId = pool.getSecurityProfile().getProfileId();
     if (securityProfileId == null || (this.cascadeType != null)) {
       securityProfileId = securityProfileDAO.save(pool.getSecurityProfile());
+    }
+    if (pool.isEmpty()) {
+      boxDAO.removeBoxableFromBox(pool);
+      pool.setVolume(0D);
     }
 
     MapSqlParameterSource params = new MapSqlParameterSource();
@@ -472,8 +519,12 @@ public class SQLPoolDAO implements PoolStore {
       SimpleJdbcInsert eInsert = new SimpleJdbcInsert(template).withTableName("Pool_Elements");
       String lc = type.substring(0, 1).toLowerCase() + type.substring(1);
 
-      Cache dc = cacheManager.getCache(lc + "Cache");
-      Cache ldc = cacheManager.getCache("lazy" + type + "Cache");
+      Cache dc = null;
+      Cache ldc = null;
+      if (cacheManager != null) {
+        dc = cacheManager.getCache(lc + "Cache");
+        ldc = cacheManager.getCache("lazy" + type + "Cache");
+      }
 
       for (Poolable d : pool.getPoolableElements()) {
         newIds.add(d.getClass().getSimpleName() + ":" + d.getId());
@@ -491,7 +542,7 @@ public class SQLPoolDAO implements PoolStore {
               dao.save(d);
             }
           } else if (this.cascadeType.equals(CascadeType.REMOVE)) {
-            if (d instanceof Plate) {
+            if (d instanceof Plate && cacheManager != null) {
               dc = cacheManager.getCache("plateCache");
               ldc = cacheManager.getCache("lazyPlateCache");
             }
@@ -507,7 +558,7 @@ public class SQLPoolDAO implements PoolStore {
     newIds.removeAll(commonIds);
     oldIds.removeAll(commonIds);
     if (!newIds.isEmpty() || !oldIds.isEmpty()) {
-      String message = user.getLoginName() + (oldIds.isEmpty() ? "" : (" Removed: " + buildElementString(oldIds)))
+      String message = pool.getLastModifier().getLoginName() + (oldIds.isEmpty() ? "" : (" Removed: " + buildElementString(oldIds)))
           + (newIds.isEmpty() ? "" : (" Added: " + buildElementString(newIds)));
       template.update(POOL_CHANGE_LOG_INSERT, pool.getId(), pool.getLastModifier().getUserId(), message);
     }
@@ -537,10 +588,16 @@ public class SQLPoolDAO implements PoolStore {
       }
     }
 
-    watcherDAO.removeWatchedEntityByUser(pool, user);
+    watcherDAO.removeWatchedEntityByUser(pool, pool.getLastModifier());
 
     for (User u : pool.getWatchers()) {
       watcherDAO.saveWatchedEntityUser(pool, u);
+    }
+
+    if (!pool.getNotes().isEmpty()) {
+      for (Note n : pool.getNotes()) {
+        noteDAO.savePoolNote(pool, n);
+      }
     }
 
     purgeListCache(pool);
@@ -577,12 +634,14 @@ public class SQLPoolDAO implements PoolStore {
 
   @Override
   public Pool<? extends Poolable> getPoolByBarcode(String barcode, PlatformType platformType) throws IOException {
+    if (barcode == null) throw new NullPointerException("cannot look up null barcode");
     List<Pool<? extends Poolable>> pools = listAllByPlatformAndSearch(platformType, barcode);
     return pools.size() == 1 ? pools.get(0) : null;
   }
 
   @Override
   public Pool<? extends Poolable> getByBarcode(String barcode) {
+    if (barcode == null) throw new NullPointerException("cannot look up null barcode");
     List<Pool<? extends Poolable>> eResults = template.query(POOL_SELECT_BY_IDENTIFICATION_BARCODE, new Object[] { barcode },
         new PoolMapper(true));
     Pool<? extends Poolable> e = eResults.size() > 0 ? (Pool<? extends Poolable>) eResults.get(0) : null;
@@ -657,6 +716,7 @@ public class SQLPoolDAO implements PoolStore {
 
   @Override
   public List<Pool<? extends Poolable>> listAllByPlatformAndSearch(PlatformType platformType, String query) throws IOException {
+    if (query == null) query = "";
     String mySQLQuery = "%" + query + "%";
     return template.query(POOL_SELECT_BY_PLATFORM_AND_SEARCH, new Object[] { platformType.getKey(), mySQLQuery, mySQLQuery, mySQLQuery },
         new PoolMapper());
@@ -669,6 +729,7 @@ public class SQLPoolDAO implements PoolStore {
 
   @Override
   public List<Pool<? extends Poolable>> listReadyByPlatformAndSearch(PlatformType platformType, String query) throws IOException {
+    if (query == null) query = "";
     String mySQLQuery = "%" + query + "%";
     return template.query(POOL_SELECT_BY_PLATFORM_AND_READY_AND_SEARCH,
         new Object[] { platformType.getKey(), mySQLQuery, mySQLQuery, mySQLQuery }, new PoolMapper());
@@ -774,7 +835,7 @@ public class SQLPoolDAO implements PoolStore {
         p.setConcentration(rs.getDouble("concentration"));
         p.setIdentificationBarcode(rs.getString("identificationBarcode"));
         p.setReadyToRun(rs.getBoolean("ready"));
-        p.setVolume(rs.getInt("volume"));
+        p.setVolume(rs.getDouble("volume"));
         p.setEmpty(rs.getBoolean("emptied"));
         p.setBoxPositionId(rs.getLong("boxPositionId"));
         p.setBoxAlias(rs.getString("boxAlias"));
@@ -782,7 +843,7 @@ public class SQLPoolDAO implements PoolStore {
         p.setLastModifier(securityDAO.getUserById(rs.getLong("lastModifier")));
         int row = rs.getInt("boxRow");
         if (!rs.wasNull()) p.setBoxPosition(BoxUtils.getPositionString(row, rs.getInt("boxColumn")));
-
+        p.setBoxLocation(rs.getString("boxLocation"));
         if (rs.getString("qcPassed") != null) {
           p.setQcPassed(Boolean.parseBoolean(rs.getString("qcPassed")));
         } else {
@@ -804,6 +865,7 @@ public class SQLPoolDAO implements PoolStore {
           for (PoolQC qc : poolQcDAO.listByPoolId(id)) {
             p.addQc(qc);
           }
+          p.setNotes(noteDAO.listByPool(id));
         }
         p.getChangeLog().addAll(changeLogDAO.listAllById(TABLE_NAME, id));
       } catch (IOException e1) {
@@ -853,5 +915,10 @@ public class SQLPoolDAO implements PoolStore {
         throw new SQLException("Cannot retrieve poolable element: [" + type + " ] " + elementId);
       }
     }
+  }
+  
+  @Override
+  public Map<String, Integer> getPoolColumnSizes() throws IOException {
+    return DbUtils.getColumnSizes(template, TABLE_NAME);
   }
 }

@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 
 import javax.persistence.CascadeType;
@@ -64,6 +65,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.ExperimentStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.core.store.StudyStore;
+import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
@@ -98,7 +100,7 @@ public class SQLStudyDAO implements StudyStore {
       + "FROM " + TABLE_NAME + " s, Experiment e " + "WHERE s.studyId=e.study_studyId " + "AND e.experimentId=?";
 
   public static final String STUDY_SELECT_BY_STUDY_TYPE = "SELECT s.studyId, s.name, s.description, s.alias, s.accession, s.securityProfile_profileId, s.project_projectId, s.studyType, s.lastModifier "
-      + "FROM " + TABLE_NAME + " s, StudyType t " + "WHERE s.studyType=t.name " + "AND t.name=?";
+      + "FROM " + TABLE_NAME + " s, StudyType t " + "WHERE s.studyType=t.name " + "AND t.typeId = ?";
 
   public static final String STUDIES_BY_RELATED_PROJECT = "SELECT s.studyId, s.name, s.description, s.alias, s.accession, s.securityProfile_profileId, s.project_projectId, s.studyType, s.lastModifier "
       + "FROM " + TABLE_NAME + " s, Project_Study ps " + "WHERE s.studyId=ps.studies_studyId " + "AND ps.Project_projectId=?";
@@ -130,6 +132,7 @@ public class SQLStudyDAO implements StudyStore {
   @Autowired
   private MisoNamingScheme<Study> namingScheme;
 
+  @CoverageIgnore
   @Override
   public MisoNamingScheme<Study> getNamingScheme() {
     return namingScheme;
@@ -162,6 +165,7 @@ public class SQLStudyDAO implements StudyStore {
     this.experimentDAO = experimentDAO;
   }
 
+  @CoverageIgnore
   public Store<SecurityProfile> getSecurityProfileDAO() {
     return securityProfileDAO;
   }
@@ -170,6 +174,7 @@ public class SQLStudyDAO implements StudyStore {
     this.securityProfileDAO = securityProfileDAO;
   }
 
+  @CoverageIgnore
   public JdbcTemplate getJdbcTemplate() {
     return template;
   }
@@ -188,6 +193,7 @@ public class SQLStudyDAO implements StudyStore {
     DbUtils.updateListCache(cache, replace, s, Study.class);
   }
 
+  @CoverageIgnore
   private void purgeListCache(Study s) {
     purgeListCache(s, true);
   }
@@ -196,7 +202,7 @@ public class SQLStudyDAO implements StudyStore {
   @Transactional(readOnly = false, rollbackFor = IOException.class)
   @TriggersRemove(cacheName = { "studyCache",
       "lazyStudyCache" }, keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
-          @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
+          @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public long save(Study study) throws IOException {
     Long securityProfileId = study.getSecurityProfile().getProfileId();
     if (this.cascadeType != null) {
@@ -282,7 +288,7 @@ public class SQLStudyDAO implements StudyStore {
 
   @Override
   @Cacheable(cacheName = "studyListCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
-      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
+      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public List<Study> listAll() {
     return template.query(STUDIES_SELECT, new StudyMapper(true));
   }
@@ -307,7 +313,7 @@ public class SQLStudyDAO implements StudyStore {
   @Transactional(readOnly = false, rollbackFor = IOException.class)
   @TriggersRemove(cacheName = { "studyCache",
       "lazyStudyCache" }, keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
-          @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
+          @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public boolean remove(Study study) throws IOException {
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
     if (study.isDeletable() && (namedTemplate.update(STUDY_DELETE, new MapSqlParameterSource().addValue("studyId", study.getId())) == 1)) {
@@ -329,16 +335,17 @@ public class SQLStudyDAO implements StudyStore {
 
   @Override
   @Cacheable(cacheName = "studyCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
-      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
+      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public Study get(long studyId) throws IOException {
-    List eResults = template.query(STUDY_SELECT_BY_ID, new Object[] { studyId }, new StudyMapper());
+    List<Study> eResults = template.query(STUDY_SELECT_BY_ID, new Object[] { studyId }, new StudyMapper());
     Study e = eResults.size() > 0 ? (Study) eResults.get(0) : null;
     return e;
   }
 
+  @CoverageIgnore
   @Override
   public Study lazyGet(long studyId) throws IOException {
-    List eResults = template.query(STUDY_SELECT_BY_ID, new Object[] { studyId }, new StudyMapper(true));
+    List<Study> eResults = template.query(STUDY_SELECT_BY_ID, new Object[] { studyId }, new StudyMapper(true));
     Study e = eResults.size() > 0 ? (Study) eResults.get(0) : null;
     return e;
   }
@@ -360,7 +367,7 @@ public class SQLStudyDAO implements StudyStore {
 
   @Override
   public Study getByExperimentId(long experimentId) throws IOException {
-    List eResults = template.query(STUDY_SELECT_BY_EXPERIMENT_ID, new Object[] { experimentId }, new StudyMapper());
+    List<Study> eResults = template.query(STUDY_SELECT_BY_EXPERIMENT_ID, new Object[] { experimentId }, new StudyMapper());
     Study e = eResults.size() > 0 ? (Study) eResults.get(0) : null;
     return e;
   }
@@ -374,18 +381,22 @@ public class SQLStudyDAO implements StudyStore {
     return template.queryForList(STUDY_TYPES_SELECT, String.class);
   }
 
+  @CoverageIgnore
   public ChangeLogStore getChangeLogDAO() {
     return changeLogDAO;
   }
 
+  @CoverageIgnore
   public void setChangeLogDAO(ChangeLogStore changeLogDAO) {
     this.changeLogDAO = changeLogDAO;
   }
 
+  @CoverageIgnore
   public SecurityStore getSecurityDAO() {
     return securityDAO;
   }
 
+  @CoverageIgnore
   public void setSecurityDAO(SecurityStore securityDAO) {
     this.securityDAO = securityDAO;
   }
@@ -443,5 +454,10 @@ public class SQLStudyDAO implements StudyStore {
 
       return s;
     }
+  }
+
+  @Override
+  public Map<String, Integer> getStudyColumnSizes() throws IOException {
+    return DbUtils.getColumnSizes(template, TABLE_NAME);
   }
 }

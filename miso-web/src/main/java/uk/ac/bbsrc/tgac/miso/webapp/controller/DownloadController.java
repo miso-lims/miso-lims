@@ -39,9 +39,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
-
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
@@ -49,9 +46,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.Plate;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+
+import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.controller
@@ -96,6 +97,11 @@ public class DownloadController {
     } else {
       throw new SecurityException("Access denied");
     }
+  }
+  
+  @RequestMapping(value = "/servicerecord/{id}/{hashcode}", method = RequestMethod.GET)
+  protected void downloadServiceRecordFile(@PathVariable Long id, @PathVariable Integer hashcode, HttpServletResponse response) throws Exception {
+    lookupAndRetrieveFile(SequencerServiceRecord.class, id.toString(), hashcode, response);
   }
 
   @RequestMapping(value = "/plate/forms/{hashcode}", method = RequestMethod.GET)

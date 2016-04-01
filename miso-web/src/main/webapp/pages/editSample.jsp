@@ -36,10 +36,8 @@
 <script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.checkbox.js'/>" type="text/javascript"></script>
 <link href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" rel="stylesheet" type="text/css" />
 
-<script src="<c:url value='/scripts/datatables_utils.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
-<script src="<c:url value='/scripts/natural_sort.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
-
-<script src="<c:url value='/scripts/stats_ajax.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
+<script src="<c:url value='/scripts/datatables_utils.js'/>" type="text/javascript"></script>
+<script src="<c:url value='/scripts/natural_sort.js'/>" type="text/javascript"></script>
 
 <script type="text/javascript" src="<c:url value='/scripts/parsley/parsley.min.js'/>"></script>
 
@@ -114,34 +112,6 @@
 
 <div class="barcodes">
   <div class="barcodeArea ui-corner-all">
-    <c:choose>
-      <c:when test="${empty sample.locationBarcode}">
-        <span style="float: left; font-size: 24px; font-weight: bold; color:#BBBBBB">Location</span><form:input
-          path="locationBarcode" size="8"/>
-      </c:when>
-      <c:otherwise>
-        <span style="float: left; font-size: 24px; font-weight: bold; color:#BBBBBB">Location</span>
-        <ul class="barcode-ddm">
-          <li>
-            <a onmouseover="mopen('locationBarcodeMenu')" onmouseout="mclosetime()">
-              <span style="float:right; margin-top:6px;" class="ui-icon ui-icon-triangle-1-s"></span>
-              <span id="locationBarcode" style="float:right; margin-top:6px; padding-bottom: 11px;">${sample.locationBarcode}</span>
-            </a>
-
-            <div id="locationBarcodeMenu"
-                 onmouseover="mcancelclosetime()"
-                 onmouseout="mclosetime()">
-              <a href="javascript:void(0);"
-                 onclick="Sample.ui.showSampleLocationChangeDialog(${sample.id});">Change
-                location</a>
-            </div>
-          </li>
-        </ul>
-        <div id="changeSampleLocationDialog" title="Change Sample Location"></div>
-      </c:otherwise>
-    </c:choose>
-  </div>
-  <div class="barcodeArea ui-corner-all">
     <span style="float: left; font-size: 24px; font-weight: bold; color:#BBBBBB">ID</span>
     <c:if test="${sample.id != 0}">
       <ul class="barcode-ddm">
@@ -195,6 +165,13 @@
           <c:when test="${sample.id != 0}">${sample.id}</c:when>
           <c:otherwise><i>Unsaved</i></c:otherwise>
         </c:choose>
+      </td>
+    </tr>
+    <tr>
+      <td class="h">Location:</td>
+      <td>
+        <c:if test="${!empty sample.boxLocation}">${sample.boxLocation},</c:if>
+        <c:if test="${!empty sample.boxPosition}"><a href='<c:url value="/miso/box/${sample.boxId}"/>'>${sample.boxAlias}, ${sample.boxPosition}</a></c:if>
       </td>
     </tr>
     <tr>
@@ -277,6 +254,14 @@
         <form:radiobutton path="qcPassed" value="false" label="False"/>
       </td>
     </tr>
+    <tr>
+      <td>Volume (&#181;l):*</td>
+      <td><form:input id="volume" path="volume"/></td>
+    </tr>
+    <tr>
+      <td>Emptied:</td>
+      <td><form:checkbox id="empty" path="empty"/></td>
+    </tr>
     <c:choose>
     <c:when
         test="${!empty sample.project and sample.securityProfile.profileId eq sample.project.securityProfile.profileId}">
@@ -328,7 +313,7 @@
             <div class="exppreview" id="sample-notes-${n.count}">
               <b>${note.creationDate}</b>: ${note.text}
               <span class="float-right" style="font-weight:bold; color:#C0C0C0;">${note.owner.loginName}
-                <c:if test="${(project.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
+                <c:if test="${(note.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
                                 or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
                 <span style="color:#000000"><a href='#' onclick="Sample.ui.deleteSampleNote('${sample.sampleId}', '${note.noteId}');">
                   <span class="ui-icon ui-icon-trash" style="clear: both; position: relative; float: right; margin-top: -15px;"/></a></span>
@@ -398,7 +383,8 @@
                 <td>${qc.qcCreator}</td>
                 <td><fmt:formatDate value="${qc.qcDate}"/></td>
                 <td>${qc.qcType.name}</td>
-                <td id="results${qc.id}">${qc.results} ${qc.qcType.units}</td>
+                <fmt:formatNumber var="resultsRounded" value="${qc.results}" maxFractionDigits="2" />
+                <td id="results${qc.id}">${resultsRounded} ${qc.qcType.units}</td>
                 <c:if test="${(sample.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
                                           or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
                   <td id="edit${qc.id}" align="center"><a href="javascript:void(0);"
@@ -540,7 +526,7 @@
           <th>Pool Alias</th>
           <th>Pool Platform</th>
           <th>Pool Creation Date</th>
-          <th>Pool Concentration</th>
+          <th>Pool Concentration (${poolConcentrationUnits})</th>
           <sec:authorize access="hasRole('ROLE_ADMIN')">
             <th class="fit">DELETE</th>
           </sec:authorize>
@@ -1240,7 +1226,7 @@ function bulkLibraryDilutionTable() {
     //headers
     jQuery("#library_table tr:first").prepend("<th>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\"#library_table\", this);'></span></th>");
     jQuery("#library_table tr:first").append("<th>Dilution Date <span header='qcDate' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.fillDown(\"#library_table\", this);'></span></th>");
-    jQuery("#library_table tr:first").append("<th>Results</th>");
+    jQuery("#library_table tr:first").append("<th>Concentration (${libraryDilutionUnits})</th>");
 
     //columns
     jQuery("#library_table tr:gt(0)").prepend("<td class='rowSelect'></td>");

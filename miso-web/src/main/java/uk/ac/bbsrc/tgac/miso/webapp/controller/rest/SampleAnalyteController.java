@@ -52,7 +52,7 @@ import uk.ac.bbsrc.tgac.miso.dto.SampleAnalyteDto;
 import uk.ac.bbsrc.tgac.miso.service.SampleAnalyteService;
 
 @Controller
-@RequestMapping("/rest")
+@RequestMapping("/rest/sample")
 @SessionAttributes("sampleanalyte")
 public class SampleAnalyteController extends RestController {
 
@@ -61,7 +61,7 @@ public class SampleAnalyteController extends RestController {
   @Autowired
   private SampleAnalyteService sampleAnalyteService;
 
-  @RequestMapping(value = "/sampleanalyte/{id}", method = RequestMethod.GET, produces = { "application/json" })
+  @RequestMapping(value = "/analyte/{id}", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
   public SampleAnalyteDto getSampleAnalyte(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder, HttpServletResponse response) 
       throws IOException {
@@ -77,7 +77,7 @@ public class SampleAnalyteController extends RestController {
 
   private static SampleAnalyteDto writeUrls(SampleAnalyteDto sampleAnalyteDto, UriComponentsBuilder uriBuilder) {
     URI baseUri = uriBuilder.build().toUri();
-    sampleAnalyteDto.setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/sampleanalyte/{id}")
+    sampleAnalyteDto.setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/sample/analyte/{id}")
         .buildAndExpand(sampleAnalyteDto.getId()).toUriString());
     sampleAnalyteDto.setCreatedByUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}")
         .buildAndExpand(sampleAnalyteDto.getCreatedById()).toUriString());
@@ -85,31 +85,33 @@ public class SampleAnalyteController extends RestController {
         .buildAndExpand(sampleAnalyteDto.getUpdatedById()).toUriString());
     sampleAnalyteDto.setSampleUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/sample/{id}")
         .buildAndExpand(sampleAnalyteDto.getSampleId()).toUriString());
-    sampleAnalyteDto.setSamplePurposeUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/samplepurpose/{id}")
-        .buildAndExpand(sampleAnalyteDto.getSamplePurposeId()).toUriString());
-    sampleAnalyteDto.setSampleGroupUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/samplegroup/{id}")
-        .buildAndExpand(sampleAnalyteDto.getSampleGroupId()).toUriString());
-    sampleAnalyteDto.setTissueMaterialUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/tissuematerial/{id}")
-        .buildAndExpand(sampleAnalyteDto.getTissueMaterialId()).toUriString());
+    if (sampleAnalyteDto.getSamplePurposeId() != null) {
+      sampleAnalyteDto.setSamplePurposeUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/samplepurpose/{id}")
+          .buildAndExpand(sampleAnalyteDto.getSamplePurposeId()).toUriString());
+    }
+    if (sampleAnalyteDto.getSampleGroupId() != null) {
+      sampleAnalyteDto.setSampleGroupUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/samplegroup/{id}")
+          .buildAndExpand(sampleAnalyteDto.getSampleGroupId()).toUriString());
+    }
+    if (sampleAnalyteDto.getTissueMaterialId() != null) {
+      sampleAnalyteDto.setTissueMaterialUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/tissuematerial/{id}")
+          .buildAndExpand(sampleAnalyteDto.getTissueMaterialId()).toUriString());
+    }
     return sampleAnalyteDto;
   }
 
-  @RequestMapping(value = "/sampleanalytes", method = RequestMethod.GET, produces = { "application/json" })
+  @RequestMapping(value = "/analytes", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
   public Set<SampleAnalyteDto> getSampleAnalytes(UriComponentsBuilder uriBuilder, HttpServletResponse response) throws IOException {
     Set<SampleAnalyte> sampleAnalytes = sampleAnalyteService.getAll();
-    if (sampleAnalytes.isEmpty()) {
-      throw new RestException("No sample analytes found", Status.NOT_FOUND);
-    } else {
-      Set<SampleAnalyteDto> sampleAnalyteDtos = Dtos.asSampleAnalyteDtos(sampleAnalytes);
-      for (SampleAnalyteDto sampleAnalyteDto : sampleAnalyteDtos) {
-        sampleAnalyteDto = writeUrls(sampleAnalyteDto, uriBuilder);
-      }
-      return sampleAnalyteDtos;
+    Set<SampleAnalyteDto> sampleAnalyteDtos = Dtos.asSampleAnalyteDtos(sampleAnalytes);
+    for (SampleAnalyteDto sampleAnalyteDto : sampleAnalyteDtos) {
+      sampleAnalyteDto = writeUrls(sampleAnalyteDto, uriBuilder);
     }
+    return sampleAnalyteDtos;
   }
 
-  @RequestMapping(value = "/sampleanalyte", method = RequestMethod.POST, headers = { "Content-type=application/json" })
+  @RequestMapping(value = "/analyte", method = RequestMethod.POST, headers = { "Content-type=application/json" })
   @ResponseBody
   public ResponseEntity<?> createSampleAnalyte(@RequestBody SampleAnalyteDto sampleAnalyteDto, UriComponentsBuilder b,
       HttpServletResponse response) throws IOException {
@@ -122,7 +124,7 @@ public class SampleAnalyteController extends RestController {
     return new ResponseEntity<>(headers, HttpStatus.CREATED);
   }
 
-  @RequestMapping(value = "/sampleanalyte/{id}", method = RequestMethod.PUT, headers = { "Content-type=application/json" })
+  @RequestMapping(value = "/analyte/{id}", method = RequestMethod.PUT, headers = { "Content-type=application/json" })
   @ResponseBody
   public ResponseEntity<?> updateSampleAnalyte(@PathVariable("id") Long id, @RequestBody SampleAnalyteDto sampleAnalyteDto,
       HttpServletResponse response) throws IOException {
@@ -133,7 +135,7 @@ public class SampleAnalyteController extends RestController {
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
-  @RequestMapping(value = "/sampleanalyte/{id}", method = RequestMethod.DELETE)
+  @RequestMapping(value = "/analyte/{id}", method = RequestMethod.DELETE)
   @ResponseBody
   public ResponseEntity<?> deleteSampleAnalyte(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
     sampleAnalyteService.delete(id);

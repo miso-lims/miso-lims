@@ -47,13 +47,15 @@ public interface PlatformStore extends Store<Platform> {
   Platform getByModel(String model) throws IOException;
 
   /**
-   * List all Platforms
+   * List all Platforms given a Platform manufacturer name
    * 
+   * @param name
+   *          of type String
    * @return List<Platform>
    * @throws IOException
    *           when
    */
-  List<Platform> listByName() throws IOException;
+  List<Platform> listByName(String name) throws IOException;
 
   /**
    * List all distinct Platform names

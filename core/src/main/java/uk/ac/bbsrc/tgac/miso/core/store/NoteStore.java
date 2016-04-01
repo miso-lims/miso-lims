@@ -30,6 +30,7 @@ import com.eaglegenomics.simlims.core.Note;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
@@ -171,4 +172,29 @@ public interface NoteStore extends Store<Note> {
    *           when the object cannot be removed
    */
   public boolean remove(Note note) throws IOException;
+
+  /**
+   * List all Notes related to a Pool given a Pool ID
+   *
+   * @param poolId
+   *          of type Long
+   * @return List<Note>
+   * @throws IOException
+   *           when
+   */
+  List<Note> listByPool(Long poolId) throws IOException;
+
+  /**
+   * Save a Pool Note
+   *
+   * @param pool
+   *          of type Pool
+   * @param note
+   *          of type Note
+   * @return long
+   * @throws IOException
+   *           when
+   */
+  long savePoolNote(Pool pool, Note note) throws IOException;
+
 }

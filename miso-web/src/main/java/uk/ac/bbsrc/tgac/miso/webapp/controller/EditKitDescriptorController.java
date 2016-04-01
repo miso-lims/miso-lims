@@ -28,10 +28,14 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 
+import com.eaglegenomics.simlims.core.SecurityProfile;
+import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -47,7 +51,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
-import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 @Controller
 @RequestMapping("/kitdescriptor")
@@ -62,15 +65,11 @@ public class EditKitDescriptorController {
   private DataObjectFactory dataObjectFactory;
   
   @Autowired
-  private JdbcTemplate interfaceTemplate;
+  private SecurityManager securityManager;
 
-  public void setInterfaceTemplate(JdbcTemplate interfaceTemplate) {
-    this.interfaceTemplate = interfaceTemplate;
-  }
-  
   @ModelAttribute("maxLengths")
   public Map<String, Integer> maxLengths() throws IOException {
-    return DbUtils.getColumnSizes(interfaceTemplate, "KitDescriptor");
+    return requestManager.getKitDescriptorColumnSizes();
   }
 
   @ModelAttribute("kitTypes")
@@ -128,6 +127,8 @@ public class EditKitDescriptorController {
   public String processSubmit(@ModelAttribute("kitDescriptor") KitDescriptor kitDescriptor, ModelMap model, SessionStatus session)
       throws IOException {
     try {
+      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+      kitDescriptor.setLastModifier(user);
       requestManager.saveKitDescriptor(kitDescriptor);
       session.setComplete();
       model.clear();

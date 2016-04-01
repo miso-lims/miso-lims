@@ -47,6 +47,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.store.StatusStore;
+import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 
 /**
  * uk.ac.bbsrc.tgac.miso.sqlstore
@@ -82,14 +83,17 @@ public class SQLStatusDAO implements StatusStore {
   @Autowired
   private DataObjectFactory dataObjectFactory;
 
+  @CoverageIgnore
   public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
     this.dataObjectFactory = dataObjectFactory;
   }
 
+  @CoverageIgnore
   public JdbcTemplate getJdbcTemplate() {
     return template;
   }
 
+  @CoverageIgnore
   public void setJdbcTemplate(JdbcTemplate template) {
     this.template = template;
   }
@@ -193,8 +197,10 @@ public class SQLStatusDAO implements StatusStore {
     return e;
   }
 
+  @CoverageIgnore
   public class StatusMapper implements RowMapper<Status> {
     @Override
+    @CoverageIgnore
     public Status mapRow(ResultSet rs, int rowNum) throws SQLException {
       Status s = dataObjectFactory.getStatus();
       s.setStatusId(rs.getLong("statusId"));

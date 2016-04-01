@@ -55,7 +55,7 @@ function naturalSort(a, b) {
     if (oFxNcL > oFyNcL) return 1;
   }
   return 0;
-};
+}
 
 jQuery(document).ready(function () {
   // Natural Sorting

@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,8 +66,8 @@ import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PartitionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
-import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.core.store.StudyStore;
+import uk.ac.bbsrc.tgac.miso.core.store.SubmissionStore;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 /**
@@ -77,7 +78,7 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
  * @author Rob Davey
  * @since 0.0.2
  */
-public class SQLTgacSubmissionDAO implements Store<Submission>, NamingSchemeAware<Submission> {
+public class SQLTgacSubmissionDAO implements SubmissionStore, NamingSchemeAware<Submission> {
   private static final String TABLE_NAME = "Submission";
 
   public static final String SUBMISSION_SELECT = "SELECT submissionId, creationDate, submittedDate, name, alias, title, description, accession, verified, completed "
@@ -435,5 +436,10 @@ public class SQLTgacSubmissionDAO implements Store<Submission>, NamingSchemeAwar
 
       return t;
     }
+  }
+
+  @Override
+  public Map<String, Integer> getSubmissionColumnSizes() throws IOException {
+    return DbUtils.getColumnSizes(template, TABLE_NAME);
   }
 }

@@ -21,8 +21,7 @@
   ~ **********************************************************************
   --%>
 
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<!DOCTYPE html>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
@@ -36,10 +35,6 @@
 <%@ page pageEncoding="UTF-8" contentType="text/html; charset=UTF-8" %>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-gb">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta http-equiv="Pragma" content="no-cache">
-  <meta http-equiv="Expires" content="0">
 
   <%-- timestamp to force browser to reload javascript --%>
   <jsp:useBean id="timestamp" class="java.util.Date" scope="request"/>
@@ -47,79 +42,42 @@
   <title>MISO LIMS <c:if test="${not empty title}">- ${title}</c:if></title>
   <script type="text/javascript" src="<c:url value='/scripts/scriptaculous/prototype.js'/>"></script>
   <script type="text/javascript"
-          src="<c:url value='/scripts/fluxion-ajax/fluxion-ajax.js?ts=${timestamp.time}'/>"></script>
-
-  <!--Scriptaculous JS scripts below -->
-  <script type="text/javascript" src="<c:url value='/scripts/scriptaculous/scriptaculous.js'/>"></script>
-  <script type="text/javascript" src="<c:url value='/scripts/scriptaculous/activityInput.js'/>"></script>
-  <script type="text/javascript" src="<c:url value='/scripts/scriptaculous/effects.js'/>"></script>
-  <script type="text/javascript" src="<c:url value='/scripts/scriptaculous/unittest.js'/>"></script>
-  <script type="text/javascript" src="<c:url value='/scripts/scriptaculous/dragdrop.js'/>"></script>
-  <script type="text/javascript" src="<c:url value='/scripts/scriptaculous/slider.js'/>"></script>
-  <script type="text/javascript" src="<c:url value='/scripts/scriptaculous/builder.js'/>"></script>
-  <script type="text/javascript" src="<c:url value='/scripts/scriptaculous/sound.js'/>"></script>
-  <script type="text/javascript" src="<c:url value='/scripts/scriptaculous/controls.js'/>"></script>
-
+          src="<c:url value='/scripts/fluxion-ajax/fluxion-ajax.js'/>"></script>
+          
   <!-- jQuery -->
   <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery-1.8.3.min.js'/>"></script>
   <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery-ui-1.9.2.custom.min.js'/>"></script>
+  <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.validate.min.js'/>"></script>
+  <script type="text/javascript" src="<c:url value='/scripts/jquery/colorbox/jquery.colorbox-min-1.4.16.js'/>"></script>
+  <link rel="stylesheet" href="<c:url value='/scripts/jquery/css/smoothness/jquery-ui-1.9.2.custom.min.css'/>"
+    type="text/css">  
+  <link rel="stylesheet" href="<c:url value='/scripts/jquery/colorbox/colorbox-1.4.16.css'/>"
+    type="text/css">
+  <!-- give $ back to prototype -->
+  <script type="text/javascript">jQuery.noConflict();</script>
+  
   <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.simplyCountable.js'/>"></script>
   <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.tinysort.min.js'/>"></script>
   <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.typewatch.js'/>"></script>
   <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.uitablefilter.js'/>"></script>
-  <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.validate.min.js'/>"></script>
-  <script type="text/javascript" src="<c:url value='/scripts/jquery/colorbox/jquery.colorbox-min-1.4.16.js'/>"></script>
-  <link rel="stylesheet" href="<c:url value='/scripts/jquery/css/smoothness/jquery-ui-1.9.2.custom.min.css'/>"
-        type="text/css">
-  <link rel="stylesheet" href="<c:url value='/scripts/jquery/colorbox/colorbox-1.4.16.css'/>"
-        type="text/css">
-        <link rel="stylesheet" href="<c:url value='/styles/style.css?ts=${timestamp.time}'/>" type="text/css">
+ 
   <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.tablesorter.min.js'/>"></script>
   <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.metadata.js'/>"></script>
-
-  <!-- Parsley -->
-  <script type="text/javascript" src="<c:url value='/scripts/parsley/parsley.min.js'/>"></script>
-
-  <!-- D3.js for Graphics -->
-  <script type="text/javascript" src="<c:url value='/scripts/d3v2/d3.v2.min.js'/>"></script>
-
+  
   <!-- unicode regexs for il8n validation -->
   <script type="text/javascript" src="<c:url value='/scripts/xregexp-all-min.js'/>"></script>
-
-  <!-- MISO objects -->
-  <script type="text/javascript" src="<c:url value='/scripts/lims.js?ts=${timestamp.time}'/>"></script>
-  <script type="text/javascript" src="<c:url value='/scripts/search.js?ts=${timestamp.time}'/>"></script>
-  <script type="text/javascript" src="<c:url value='/scripts/experiment_ajax.js?ts=${timestamp.time}'/>"></script>
-  <script type="text/javascript" src="<c:url value='/scripts/library_ajax.js?ts=${timestamp.time}'/>"></script>
-  <script type="text/javascript" src="<c:url value='/scripts/pool_ajax.js?ts=${timestamp.time}'/>"></script>
-  <script type="text/javascript" src="<c:url value='/scripts/project_ajax.js?ts=${timestamp.time}'/>"></script>
-  <script type="text/javascript" src="<c:url value='/scripts/reporting_ajax.js?ts=${timestamp.time}'/>"></script>
-  <script type="text/javascript" src="<c:url value='/scripts/sample_ajax.js?ts=${timestamp.time}'/>"></script>
-  <script type="text/javascript" src="<c:url value='/scripts/run_ajax.js?ts=${timestamp.time}'/>"></script>
-  <script type="text/javascript" src="<c:url value='/scripts/box_ajax.js?ts=${timestamp.time}'/>"></script>
-  <script type="text/javascript"
-          src="<c:url value='/scripts/sequencer_partition_container_ajax.js?ts=${timestamp.time}'/>"></script>
-  <script type="text/javascript"
-          src="<c:url value='/scripts/sequencer_reference_ajax.js?ts=${timestamp.time}'/>"></script>
-  <script type="text/javascript" src="<c:url value='/scripts/study_ajax.js?ts=${timestamp.time}'/>"></script>
-
-  <!-- form validations -->
-  <script type="text/javascript"
-          src="<c:url value='/scripts/parsley_form_validations.js?ts=${timestamp.time}'/>"></script>
   
-  <!-- give $ back to prototype -->
-  <script type="text/javascript">jQuery.noConflict();</script>
-
-  <!--multi-select drag drop -->
-  <script type="text/javascript"
-          src="<c:url value='/scripts/multi_select_drag_drop.js?ts=${timestamp.time}'/>"></script>
-
-  <!--drop down menu -->
-  <script src="<c:url value='/scripts/menus.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
-
-  <!-- high charts-->
+  <!-- D3.js for Graphics -->
+  <script type="text/javascript" src="<c:url value='/scripts/d3v2/d3.v2.min.js'/>"></script>
+  
+  <!-- high charts -->
   <script type="text/javascript" src="<c:url value='/scripts/highcharts/highcharts.js'/>"></script>
   <script type="text/javascript" src="<c:url value='/scripts/highcharts/highcharts-more.js'/>"></script>
+          
+  <!-- concatenated MISO stylesheets and scripts -->
+  <link rel="stylesheet" href="<c:url value='/styles/style.css'/>" type="text/css">
+  <script type="text/javascript" src="<c:url value='/scripts/header_script.js'/>"></script>
+
 
   <link rel="shortcut icon" href="<c:url value='/styles/images/favicon.ico'/>" type="image/x-icon"/>
 

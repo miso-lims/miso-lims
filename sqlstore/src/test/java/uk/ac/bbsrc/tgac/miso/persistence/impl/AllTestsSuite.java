@@ -5,7 +5,13 @@ import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-  HibernateInstituteDaoTest.class
+  HibernateInstituteDaoTest.class,
+  HibernateLabDaoTest.class,
+  HibernateIdentityDaoTest.class,
+  HibernateSampleDaoTest.class,
+  HibernateSampleNumberPerProjectDaoTest.class,
+  HibernateLibraryAdditionalInfoDaoTest.class
 })
+
 public class AllTestsSuite {
 }

@@ -101,6 +101,9 @@ public abstract class AbstractProject implements Project {
   @Type(type = "progressTypeUserType")
   private ProgressType progress;
 
+  @Column
+  private Long referenceGenomeId;
+
   @Transient
   private SecurityProfile securityProfile = null;
   @Transient
@@ -459,4 +462,15 @@ public abstract class AbstractProject implements Project {
     sb.append(getDescription());
     return sb.toString();
   }
+
+  @Override
+  public Long getReferenceGenomeId() {
+    return referenceGenomeId;
+  }
+
+  @Override
+  public void setReferenceGenomeId(Long referenceGenomeId) {
+    this.referenceGenomeId = referenceGenomeId;
+  }
+
 }

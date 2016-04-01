@@ -63,4 +63,22 @@ public class HibernateSampleGroupDao implements SampleGroupDao {
     currentSession().update(sampleGroup);
   }
 
+  @Override
+  public List<SampleGroupId> getSampleGroupsForProject(Long projectId) {
+    Query query = currentSession().createQuery("from SampleGroupImpl where projectId = :id");
+    query.setLong("id", projectId);
+    @SuppressWarnings("unchecked")
+    List<SampleGroupId> records = query.list();
+    return records;
+  }
+
+  @Override
+  public List<SampleGroupId> getSampleGroupsForSubproject(Long subprojectId) {
+    Query query = currentSession().createQuery("from SampleGroupImpl where subprojectId = :id");
+    query.setLong("id", subprojectId);
+    @SuppressWarnings("unchecked")
+    List<SampleGroupId> records = query.list();
+    return records;
+  }
+
 }
