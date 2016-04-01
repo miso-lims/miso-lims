@@ -149,7 +149,7 @@ public interface SampleStore extends Store<Sample>, Cascadable, Remover<Sample>,
   /**
    * List all Samples associated with identificationBarcodes from the given identificationBarcode list
    * 
-   * @return Collection<Sample
+   * @return Collection<Sample>
    * @throws IOException
    *           when the objects cannot be retrieved
    */
@@ -160,4 +160,13 @@ public interface SampleStore extends Store<Sample>, Cascadable, Remover<Sample>,
    * @throws IOException
    */
   public Map<String, Integer> getSampleColumnSizes() throws IOException;
+  
+  /**
+   * List all Samples associated with ids from the given id list
+   * 
+   * @return Collection<Sample>
+   * @throws IOException
+   *           when the objects cannot be retrieved
+   */
+  Collection<Sample> getByIdList(List<Long> idList) throws IOException;
 }

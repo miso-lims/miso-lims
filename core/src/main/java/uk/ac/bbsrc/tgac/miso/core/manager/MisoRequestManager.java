@@ -37,6 +37,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.eaglegenomics.simlims.core.Note;
+import com.eaglegenomics.simlims.core.SecurityProfile;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
@@ -110,12 +113,6 @@ import uk.ac.bbsrc.tgac.miso.core.store.StatusStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.core.store.StudyStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SubmissionStore;
-
-import com.eaglegenomics.simlims.core.Note;
-import com.eaglegenomics.simlims.core.SecurityProfile;
-
-import com.eaglegenomics.simlims.core.Note;
-import com.eaglegenomics.simlims.core.SecurityProfile;
 
 /**
  * Implementation of a RequestManager to facilitate persistence operations on MISO model objects
@@ -505,6 +502,15 @@ public class MisoRequestManager implements RequestManager {
   public Collection<Sample> listSamplesByAlias(String alias) throws IOException {
     if (sampleStore != null) {
       return sampleStore.listByAlias(alias);
+    } else {
+      throw new IOException("No sampleStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+  
+  @Override
+  public Collection<Sample> getSamplesByIdList(List<Long> idList) throws IOException {
+    if (sampleStore != null) {
+      return sampleStore.getByIdList(idList);
     } else {
       throw new IOException("No sampleStore available. Check that it has been declared in the Spring config.");
     }
@@ -2606,6 +2612,7 @@ public class MisoRequestManager implements RequestManager {
     }
   }
   
+  @Override
   public Map<String, Integer> getBoxColumnSizes() throws IOException {
     if (boxStore != null) {
       return boxStore.getBoxColumnSizes();
@@ -2623,6 +2630,7 @@ public class MisoRequestManager implements RequestManager {
     }
   }
   
+  @Override
   public Map<String, Integer> getExperimentColumnSizes() throws IOException {
     if (experimentStore != null) {
       return experimentStore.getExperimentColumnSizes();
@@ -2640,6 +2648,7 @@ public class MisoRequestManager implements RequestManager {
     }
   }
   
+  @Override
   public Map<String, Integer> getPoolColumnSizes() throws IOException {
     if (poolStore != null) {
       return poolStore.getPoolColumnSizes();
@@ -2666,6 +2675,7 @@ public class MisoRequestManager implements RequestManager {
     }
   }
   
+  @Override
   public Map<String, Integer> getKitDescriptorColumnSizes() throws IOException {
     if (kitStore != null) {
       return kitStore.getKitDescriptorColumnSizes();

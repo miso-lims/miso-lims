@@ -15,6 +15,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.jdbc.Work;
+import org.hibernate.type.LongType;
 import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -227,6 +228,15 @@ public class HibernateSampleDao implements SampleDao, SampleStore {
   public Collection<Sample> getByBarcodeList(List<String> barcodeList) throws IOException {
     Query query = currentSession().createQuery("from SampleImpl where identificationBarcode in (:barcodes)");
     query.setParameterList("barcodes", barcodeList, StringType.INSTANCE);
+    @SuppressWarnings("unchecked")
+    List<Sample> records = query.list();
+    return fetchSqlStore(records);
+  }
+  
+  @Override
+  public Collection<Sample> getByIdList(List<Long> idList) throws IOException {
+    Query query = currentSession().createQuery("from SampleImpl where sampleId in (:ids)");
+    query.setParameterList("ids", idList, LongType.INSTANCE);
     @SuppressWarnings("unchecked")
     List<Sample> records = query.list();
     return fetchSqlStore(records);
