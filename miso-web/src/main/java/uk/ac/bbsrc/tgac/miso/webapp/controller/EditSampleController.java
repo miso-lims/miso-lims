@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -491,7 +492,8 @@ public class EditSampleController {
       for (int i = 0; i < split.length; i++) {
         idList.add(Long.parseLong(split[i]));
       }
-      model.put("samples", requestManager.getSamplesByIdList(idList));
+      ObjectMapper mapper = new ObjectMapper();
+      model.put("samplesJSON", mapper.writer().writeValueAsString(requestManager.getSamplesByIdList(idList)));
       return new ModelAndView("/pages/bulkEditSamples.jsp", model);
     } catch (IOException ex) {
       if (log.isDebugEnabled()) {
