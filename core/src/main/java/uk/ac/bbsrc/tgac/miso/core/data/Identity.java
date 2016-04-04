@@ -2,8 +2,11 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.util.Date;
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+
 import com.eaglegenomics.simlims.core.User;
 
+@JsonIgnoreProperties({ "sample" })
 public interface Identity {
 
   Long getIdentityId();

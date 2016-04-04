@@ -448,7 +448,7 @@ var Subproject = Subproject || {
     var alias = document.getElementById('subP_alias_'+suffix).value;
     var description = document.getElementById('subP_description_'+suffix).value;
     var priority = document.getElementById('subP_priority_'+suffix).value;
-    var parentProjectId = document.getElementById('subP_parentProject_'+suffix).value;
+    var parentProjectId = parseInt(document.getElementById('subP_parentProject_'+suffix).value);
     var referenceGenomeId = document.getElementById('subP_refGenome_'+suffix).value;
     if (!alias || !description || !priority) {
       alert("Neither alias, description, nor priority can be blank.");
@@ -535,7 +535,7 @@ var Lab = Lab || {
 
     // optional variable for if option == "Lab"
     var selectedInstituteId = null;
-    var id, alias, endpoint;
+    var id, alias, endpoint, selectedInstituteId;
     
     // create rows if there is data; otherwise, add only the "Add New" button
     if (data) {
@@ -813,6 +813,7 @@ var Hierarchy = Hierarchy || {
     if (event.target.value == 'new') {
       var input = '<input id="new_category" type="text" required="required" />';
       document.getElementById(event.target.id).insertAdjacentHTML('afterend', input);
+      document.getElementById('new_category').focus();
     } else {
       var inputOnPage = document.getElementById('new_category');
       if (inputOnPage) inputOnPage.parentNode.removeChild(inputOnPage);

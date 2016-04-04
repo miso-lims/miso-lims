@@ -140,7 +140,7 @@ public class DefaultSampleService implements SampleService {
     Sample newSample = new SampleFactoryBuilder().description(sample.getDescription()).sampleType(sample.getSampleType())
         .scientificName(sample.getScientificName()).user(user).project(sample.getProject())
         .sampleAdditionalInfo(sample.getSampleAdditionalInfo()).sampleAnalyte(sample.getSampleAnalyte()).accession(sample.getAccession())
-        .identificationBarcode(sample.getIdentificationBarcode()).locationBarcode(sample.getLocationBarcode())
+        .identificationBarcode(sample.getIdentificationBarcode())
         .receivedDate(sample.getReceivedDate()).qcPassed(sample.getQcPassed()).name(HibernateSampleDao.generateTemporaryName())
         .alias(sample.getAlias()).taxonIdentifier(sample.getTaxonIdentifier()).parent(sample.getParent())
         .sampleTissue(sample.getSampleTissue()).volume(sample.getVolume()).build();

@@ -105,8 +105,7 @@ public class EditSampleController {
 
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
-  }
-  
+  }  
   
   public Boolean misoPropertyBoolean(String property) {
     MisoPropertyExporter exporter = (MisoPropertyExporter) ApplicationContextProvider.getApplicationContext().getBean("propertyConfigurer");
@@ -294,6 +293,31 @@ public class EditSampleController {
       types.add("\"" + s.getQcTypeId() + "\"" + ":" + "\"" + s.getName() + "\"");
     }
     return LimsUtils.join(types, ",");
+  }
+  
+  // Handsontable
+  @ModelAttribute("referenceDataJson")
+  public JSONObject referenceDataJsonString() throws IOException {
+    final JSONObject hot = new JSONObject();
+    final List<String> sampleTypes = new ArrayList<String>(requestManager.listAllSampleTypes());
+    final List<String> qcValues = new ArrayList<String>();
+    qcValues.add("true");
+    qcValues.add("false");
+    qcValues.add("");
+    JSONArray allProjects = new JSONArray();
+    for (Project fullProject : requestManager.listAllProjects()) {
+      JSONObject project = new JSONObject();
+      project.put("id", fullProject.getId());
+      project.put("alias", fullProject.getAlias());
+      project.put("name", fullProject.getName());
+      allProjects.add(project);
+    }
+    
+    hot.put("sampleTypes", sampleTypes);
+    hot.put("projects", allProjects);
+    hot.put("qcValues", qcValues);
+    
+    return hot;
   }
 
   @RequestMapping(value = "/new", method = RequestMethod.GET)
@@ -498,5 +522,4 @@ public class EditSampleController {
       throw ex;
     }
   }
-  
 }
