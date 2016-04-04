@@ -55,7 +55,7 @@
 	
 	<script type="text/javascript">
 	  jQuery(document).ready(function () {
-	    var Sample.hot.samples = ${samples} ;
+	    var Sample.hot.samples = ${samplesJSON} ;
 	  });
 	</script>
 	

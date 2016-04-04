@@ -115,6 +115,8 @@ public class SampleImpl extends AbstractSample implements Serializable {
     }
     if (builder.getQcPassed() != null) {
       setQcPassed(builder.getQcPassed());
+    } else {
+      setQcPassed(null);
     }
     if (!LimsUtils.isStringEmptyOrNull(builder.getAlias())) {
       setAlias(builder.getAlias());
