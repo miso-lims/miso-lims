@@ -132,7 +132,7 @@ Sample.hot = {
   
   checkForExistingHOT: function () {
     // if this is disabled, alert the user as to why
-    if (document.getElementById('makeTable').disabled) {
+    if (document.getElementById('makeTable').disabled || document.getElementById('projectSelect') === '') {
       var message = 'Please select a project ' + (Sample.hot.detailedSample ? 'and sample class ' : '') + 'before creating the table.';
       alert(message);
       return false;
@@ -696,8 +696,11 @@ Sample.hot = {
     sample.projectId = parseInt(document.getElementById('projectSelect').value);
     sample.scientificName = obj.scientificName;
     if (obj.receivedDate && obj.receivedDate.length) {
-      // this time string is added because the server is expecting a datetime value
-      sample.receivedDate = obj.receivedDate + "T00:00:00-05:00";
+      // the time string is added for detailedSample because the server is expecting a datetime value
+      sample.receivedDate = obj.receivedDate;
+      if (Sample.hot.detailedSample) {
+        obj.receivedDate += "T00:00:00-05:00";
+      }
     }
     
     // if it's a plain sample, return now.
@@ -834,15 +837,15 @@ Sample.hot = {
   },
 
   saveDetailedData: function () {
+    // reset error messages
+    Sample.hot.messages.failed = [];
+    
     // check that a project and class have been declared
     if (document.getElementById('projectSelect').value === '' || document.getElementById('classDropdown').value === '') {
       Sample.hot.messages.failed.push('Make sure both Project and Sample Class are selected before saving.');
       Sample.hot.addAnyErrors(Sample.hot.messages);
       return false;
     }
-    
-    // reset error messages
-    Sample.hot.messages.failed = [];
     
     // if last row is empty, remove it before validation
     var tableData = Sample.hot.startData;
@@ -864,12 +867,19 @@ Sample.hot = {
       }];
       Sample.hot.hotTable.render();
       Sample.hot.hotTable.validateCells();
+      Sample.hot.messages.failed.push("It looks like some cells are not yet valid. Please fix them before saving.");
+      Sample.hot.addAnyErrors(Sample.hot.messages);
       return false;
     }
     
     // disable the save button
     var button = document.getElementById('saveDetailed');
-    if (button) button.classList.add('disabled');
+    if (button) {
+      button.classList.add('disabled');
+      button.setAttribute('disabled', 'disabled');
+      var ajaxLoader = "<img id='ajaxLoader' src='/../styles/images/ajax-loader.gif'/>";
+      button.insertAdjacentHTML('afterend', ajaxLoader);
+    }
     
     this.hotTable.validateCells(function (isValid) { 
       if (isValid) {
@@ -906,6 +916,7 @@ Sample.hot = {
           Sample.hot.saveOneSample(JSON.stringify(newSample), i, Sample.hot.messages, sampleData.length);
         }
       } else {
+        Sample.hot.messages.failed.push("It looks like some cells are not yet valid. Please fix them before saving.");
         Sample.hot.addAnyErrors(Sample.hot.messages);
         Sample.hot.hotTable.validateCells();
         return false;
@@ -914,15 +925,15 @@ Sample.hot = {
   },
   
   savePlainData: function () {
+    // reset error messages
+    Sample.hot.messages.failed = [];
+    
     // check that a project has been declared
     if (document.getElementById('projectSelect').value === '') {
       Sample.hot.messages.failed.push('Make sure that a Project is selected before saving.');
       Sample.hot.addAnyErrors(Sample.hot.messages);
       return false;
     }
-    
-    // reset error messages
-    Sample.hot.messages.failed = [];
     
     // if last row is empty, remove it before validation
     var tableData = Sample.hot.startData;
@@ -943,13 +954,20 @@ Sample.hot = {
         alias: null,
       }];
       Sample.hot.hotTable.render();
+      Sample.hot.messages.failed.push("It looks like some cells are not yet valid. Please fix them before saving.");
+      Sample.hot.addAnyErrors(Sample.hot.messages);
       Sample.hot.hotTable.validateCells();
       return false;
     }
     
     // disable the save button
     var button = document.getElementById('savePlain');
-    if (button) button.classList.remove('disabled');
+    if (button) {
+      button.classList.add('disabled');
+      button.setAttribute('disabled', 'disabled');
+      var ajaxLoader = "<img id='ajaxLoader' src='/../styles/images/ajax-loader.gif'/>";
+      button.insertAdjacentHTML('afterend', ajaxLoader);
+    }
     
     this.hotTable.validateCells(function (isValid) {
       if (isValid) {
@@ -995,11 +1013,8 @@ Sample.hot = {
                   }
                 }
               } 
-                
-              // display any errors
-              if (Sample.hot.messages.failed.length) {
-                Sample.hot.addAnyErrors(Sample.hot.messages);
-              }
+              // display error/success messages
+              Sample.hot.addAnyErrors(Sample.hot.messages);
             },
             'doOnError': function (json) {
               Sample.hot.messages.failed.push(json.error);
@@ -1009,7 +1024,7 @@ Sample.hot = {
           }
         );
       } else {
-        Sample.hot.messages.failed.push("It looks like some cells are not yet valid. Please fix them and save again.");
+        Sample.hot.messages.failed.push("It looks like some cells are not yet valid. Please fix them before saving.");
         Sample.hot.addAnyErrors(Sample.hot.messages);
         return false;
       }
@@ -1068,7 +1083,12 @@ Sample.hot = {
     
     Sample.hot.hotTable.render();
     var button = document.getElementById('saveDetailed') || document.getElementById('savePlain');
-    if (button) button.classList.remove('disabled');
+    if (button) {
+      button.classList.remove('disabled');
+      button.removeAttribute('disabled');
+      var ajaxLoader = document.getElementById('ajaxLoader');
+      if (ajaxLoader) ajaxLoader.parentNode.removeChild(ajaxLoader);
+    }
     
     if (messages.failed.length) {
       var errorMessages = document.getElementById('errorMessages');
