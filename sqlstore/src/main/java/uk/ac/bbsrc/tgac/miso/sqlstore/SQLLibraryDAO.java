@@ -101,10 +101,8 @@ public class SQLLibraryDAO implements LibraryStore {
       + "l.securityProfile_profileId, l.sample_sampleId, l.identificationBarcode, l.locationBarcode, l.paired, l.libraryType, "
       + "l.librarySelectionType, l.libraryStrategyType, l.platformName, l.concentration, l.creationDate, l.qcPassed, l.lastModifier, "
       + "l.lowQuality, l.boxPositionId, l.volume, l.emptied, b.boxId, b.alias AS boxAlias, b.locationBarcode AS boxLocation, "
-      + "bp.row AS boxRow, bp.column AS boxColumn "
-      + "FROM " + TABLE_NAME + " l "
-      + "LEFT JOIN BoxPosition bp ON bp.boxPositionId = l.boxPositionId "
-      + "LEFT JOIN Box b ON b.boxId = bp.boxId";
+      + "bp.row AS boxRow, bp.column AS boxColumn " + "FROM " + TABLE_NAME + " l "
+      + "LEFT JOIN BoxPosition bp ON bp.boxPositionId = l.boxPositionId " + "LEFT JOIN Box b ON b.boxId = bp.boxId";
 
   public static final String LIBRARIES_SELECT_LIMIT = LIBRARIES_SELECT + " ORDER BY l.libraryId DESC LIMIT ?";
 
@@ -259,7 +257,7 @@ public class SQLLibraryDAO implements LibraryStore {
   public void setSecurityProfileDAO(Store<SecurityProfile> securityProfileDAO) {
     this.securityProfileDAO = securityProfileDAO;
   }
-  
+
   public BoxStore getBoxDAO() {
     return boxDAO;
   }
@@ -340,12 +338,7 @@ public class SQLLibraryDAO implements LibraryStore {
     params.addValue("lowQuality", library.isLowQuality());
     params.addValue("volume", library.getVolume());
     params.addValue("emptied", library.isEmpty());
-
-    if (library.getQcPassed() != null) {
-      params.addValue("qcPassed", library.getQcPassed().toString());
-    } else {
-      params.addValue("qcPassed", library.getQcPassed());
-    }
+    params.addValue("qcPassed", library.getQcPassed());
 
     if (library.getId() == AbstractLibrary.UNSAVED_ID) {
       if (!libraryNamingScheme.allowDuplicateEntityNameFor("alias") && getByAlias(library.getAlias()) != null) {
@@ -757,9 +750,8 @@ public class SQLLibraryDAO implements LibraryStore {
       int row = rs.getInt("boxRow");
       if (!rs.wasNull()) library.setBoxPosition(BoxUtils.getPositionString(row, rs.getInt("boxColumn")));
       library.setBoxLocation(rs.getString("boxLocation"));
-      if (rs.getString("qcPassed") != null) {
-        library.setQcPassed(Boolean.parseBoolean(rs.getString("qcPassed")));
-      } else {
+      library.setQcPassed(rs.getBoolean("qcPassed"));
+      if (rs.wasNull()) {
         library.setQcPassed(null);
       }
 
@@ -850,7 +842,7 @@ public class SQLLibraryDAO implements LibraryStore {
       return tb;
     }
   }
-  
+
   @Override
   public Map<String, Integer> getLibraryColumnSizes() throws IOException {
     return DbUtils.getColumnSizes(template, TABLE_NAME);
