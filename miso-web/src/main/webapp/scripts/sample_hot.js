@@ -28,7 +28,9 @@ Sample.hot = {
     // process sampleOptions further
     this.addInstituteAliasToLab();
     
-    this.addProjectEtcDropdowns();
+    if (document.getElementById('projectSelect')) {
+      this.addProjectEtcDropdowns();
+    }
   },
   
   // build the dropdowns that need to be chosen before the Handsontable is created
@@ -705,7 +707,7 @@ Sample.hot = {
       // the time string is added for detailedSample because the server is expecting a datetime value
       sample.receivedDate = obj.receivedDate;
       if (Sample.hot.detailedSample) {
-        obj.receivedDate += "T00:00:00-05:00";
+        sample.receivedDate += "T00:00:00-05:00";
       }
     }
     
