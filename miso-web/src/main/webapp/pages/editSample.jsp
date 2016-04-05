@@ -405,11 +405,7 @@
       </c:if>
     </ul>
   </div>
-  <h1>Create Samples
-    <button id="bulkSampleButton" onClick="submitBulkSamples();" class="fg-button ui-state-default ui-corner-all">
-      Save
-    </button>
-  </h1>
+  <h1>Create Samples</h1>
   <br/>
   <br/>
 
@@ -428,7 +424,7 @@
 	      <p id="errorMessages"></p>
 	    </div>
 	    <div>
-	      <button id="makeTable" class="disabled" disabled="true" onclick="Sample.hot.checkForExistingHOT();">Make Table</button>
+	      <button id="makeTable" class="disabled" disabled="true" onclick="Sample.hot.makeNewSamplesTable();">Make Table</button>
 	    </div>
 	  </div>
 	  <div class="floatleft rightfloatleft">
@@ -441,8 +437,7 @@
     <div>
       <c:choose>
       <c:when test="${detailedSample}">
-        <button id="saveDetailed" class="disabled" disabled="true" onclick="Sample.hot.saveDetailedData();">Save</button>
-        <div id="genAliasesButton"></div>
+        <button id="saveDetailed" class="disabled" disabled="disabled" onclick="Sample.hot.saveDetailedData();">Save</button>
       </c:when>
       <c:otherwise>
         <button id="savePlain" onclick="Sample.hot.savePlainData();">Save Bulk</button>
@@ -452,7 +447,7 @@
     <div id="hotContainer"></div>
   
     <script type="text/javascript">
-      Sample.hot.dropdownRef = ${referenceDataJson};
+      Sample.hot.dropdownRef = ${referenceDataJSON};
       Sample.hot.selectedProjectId = parseInt('${sample.project.id}') || null;
       Sample.hot.detailedSample = JSON.parse(document.getElementById('HOTbulkForm').dataset.detailedSample);
       if (Boolean(Sample.hot.detailedSample)) {

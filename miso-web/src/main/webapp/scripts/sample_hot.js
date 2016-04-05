@@ -28,7 +28,9 @@ Sample.hot = {
     // process sampleOptions further
     this.addInstituteAliasToLab();
     
-    this.addProjectEtcDropdowns();
+    if (document.getElementById('projectSelect')) {
+      this.addProjectEtcDropdowns();
+    }
   },
   
   // build the dropdowns that need to be chosen before the Handsontable is created
@@ -130,7 +132,7 @@ Sample.hot = {
     }
   },
   
-  checkForExistingHOT: function () {
+  makeNewSamplesTable: function () {
     // if this is disabled, alert the user as to why
     if (document.getElementById('makeTable').disabled || document.getElementById('projectSelect') === '') {
       var message = 'Please select a project ' + (Sample.hot.detailedSample ? 'and sample class ' : '') + 'before creating the table.';
@@ -165,7 +167,11 @@ Sample.hot = {
     }
     
     // make the table
-    Sample.hot.makeHOT();
+    var sampleCategory = null;
+    if (Sample.hot.detailedSample) {
+      sampleCategory = Sample.hot.getCategoryFromClassId(document.getElementById('classDropdown').value);
+    }
+    Sample.hot.makeHOT(null, false, sampleCategory);
     
     // disable sampleClass dropdown so they can't change it midway through editing table values
     if (document.getElementById('classDropdown')) {
@@ -188,14 +194,19 @@ Sample.hot = {
     }
   },
 
-  makeHOT: function (startingValues) {
-    // set initial number of rows to display. 
-    var startRowsNumber = Sample.hot.parseIntRows("");
-    if (startRowsNumber === false) return false;
-    Sample.hot.addEmptyRow(startRowsNumber - this.startData.length);
-        
+  makeHOT: function (startingValues, qcBoolean, sampleCategory) {
     // set sources for requested columns
-    this.colConf = Sample.hot.setColumnData(this.detailedSample, false);
+    var qcBoolean = qcBoolean || false;
+    this.colConf = Sample.hot.setColumnData(this.detailedSample, qcBoolean, sampleCategory);
+
+    if (!startingValues) {
+      // set initial number of rows to display. 
+      var startRowsNumber = Sample.hot.parseIntRows("");
+      if (startRowsNumber === false) return false;
+      Sample.hot.addEmptyRow(startRowsNumber - this.startData.length);
+    } else {
+      Sample.hot.startData = startingValues;
+    }
     
     // make HOT instance
     var hotContainer = document.getElementById('hotContainer');
@@ -210,9 +221,9 @@ Sample.hot = {
       data: this.startData,
       dataSchema: this.dataSchema
     });
-
-    // var addButtonGen = this.hotTable.addHook('afterChange', addAliasGenButton);
     document.getElementById('hotContainer').style.display = '';
+    
+    // enable save button
     var button = (Sample.hot.detailedSample ? document.getElementById('saveDetailed') : document.getElementById('savePlain'));
     button.disabled = false;
     button.classList.remove('disabled');
@@ -255,14 +266,6 @@ Sample.hot = {
      });
    }
  },
-  
-  addAliasGenButton: function () {
-    if (document.getElementById('aliasGenButton') === null) {
-      var button = '<button id="aliasGenButton" onclick="Sample.hot.generateAliases();">Generate Aliases</button>';
-      document.getElementById('genAliasesButton').innerHTML = '';
-      document.getElementById('genAliasesButton').innerHTML = button;
-    }
-  },
   
   getAlias: function (obj) {
     if (obj["alias"]) return obj["alias"];
@@ -335,7 +338,13 @@ Sample.hot = {
       .map(function (kit) { return kit.name; });
   },
   
-  setColumnData: function (detailedBool, qcBool) {
+  /*
+   * set which columns will be displayed
+   * params: boolean detailedSample
+   *         boolean qcBool (have qc columns been requested)
+   *         String sampleCategory
+   */
+  setColumnData: function (detailedBool, qcBool, sampleCategory) {
     
     if (!detailedBool && !qcBool) {
      // if neither detailed sample not qcs are requested
@@ -345,10 +354,10 @@ Sample.hot = {
       return this.concatArrays(setAliasCol(), setPlainCols(), setQcCols());
     } else if (detailedBool && !qcBool){
       // if detailed sample is requested but qcs are
-      return this.concatArrays(setAliasCol(), setPlainCols(), setDetailedCols());
+      return this.concatArrays(setAliasCol(), setPlainCols(), setDetailedCols(sampleCategory));
     } else if (detailedBool && qcBool) {
       // if detailed sample and qcs are requested
-      return this.concatArrays(setAliasCol(), setPlainCols(), setDetailedCols(), setQcCols());
+      return this.concatArrays(setAliasCol(), setPlainCols(), setDetailedCols(sampleCategory), setQcCols());
     }
     
     function setPlainCols () {
@@ -415,7 +424,7 @@ Sample.hot = {
       return aliasCol;
     };
     
-    function setDetailedCols () {
+    function setDetailedCols (sampleCategory) {
       var additionalCols = [
         {
           header: 'External Name',
@@ -517,16 +526,15 @@ Sample.hot = {
           validator: permitEmpty
         }
       ];  
-      return Sample.hot.concatArrays(additionalCols, getSampleCategoryCols(tissueCols, analyteCols));
+      return Sample.hot.concatArrays(additionalCols, getSampleCategoryCols(sampleCategory, tissueCols, analyteCols));
     }
     
-    function getSampleCategoryCols (tissueCols, analyteCols) {
-      var selectedCategory = Sample.hot.getSelectedCategory();
+    function getSampleCategoryCols (sampleCategory, tissueCols, analyteCols) {
       var categoryCols = {
         'Tissue': tissueCols,
         'Analyte': analyteCols
       };
-      return categoryCols[selectedCategory];
+      return categoryCols[sampleCategory];
     }
     
     function setQcCols () {    
@@ -645,9 +653,9 @@ Sample.hot = {
     return cols.reduce(function (a, b) { return a.concat(b); }, []);
   },
   
-  getSelectedCategory: function () {
+  getCategoryFromClassId: function (sampleClassId) {
     return Sample.hot.sampleOptions.sampleClassesDtos.filter(function (sampleClass) {
-      return sampleClass.id == document.getElementById('classDropdown').value;
+      return sampleClass.id == sampleClassId;
     })[0].sampleCategory;
   },
 
@@ -699,7 +707,7 @@ Sample.hot = {
       // the time string is added for detailedSample because the server is expecting a datetime value
       sample.receivedDate = obj.receivedDate;
       if (Sample.hot.detailedSample) {
-        obj.receivedDate += "T00:00:00-05:00";
+        sample.receivedDate += "T00:00:00-05:00";
       }
     }
     
@@ -738,7 +746,7 @@ Sample.hot = {
     }
     
     // add sampleAnalyte attributes. 
-    if (Sample.hot.getSelectedCategory() == 'Analyte') {
+    if (Sample.hot.getCategoryFromClassId(sample.sampleAdditionalInfo.sampleClassId) == 'Analyte') {
       sample.sampleAnalyte = {};
     
       if (obj.samplePurpose && obj.samplePurpose.length) {
@@ -766,7 +774,7 @@ Sample.hot = {
         }
       }
 
-    } else if (Sample.hot.getSelectedCategory() == 'Tissue') {
+    } else if (Sample.hot.getCategoryFromClassId(sample.sampleAdditionalInfo.sampleClassId) == 'Tissue') {
       sample.sampleTissue = {};
       
       if (obj.instituteTissueName && obj.instituteTissueName.length) {
@@ -829,6 +837,9 @@ Sample.hot = {
     
     // add a 'saved' attribute to the data source 
     Sample.hot.startData[rowIndex].saved = true;
+    
+    // add sampleId to the data source
+    Sample.hot.startData[rowIndex].sampleId = xhr.getResponseHeader('Location');
     
     // display any errors if this is the final sample to be saved
     if (messages.success.length + messages.failed.length == numberToSave) {

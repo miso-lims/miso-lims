@@ -253,8 +253,8 @@ var QC = QC || {
   createStatusInput: function (idValue, status) {
     var select = [];
     select.push('<select id="'+ idValue +'">');
-    select.push('<option value="true"'+ (status === 'true' ? ' selected' : '') +'>True</option>');
-    select.push('<option value="false"'+ (status === 'false' ? ' selected' : '') +'>False</option>');
+    select.push('<option value="1"'+ (status === 1 ? ' selected' : '') +'>True</option>');
+    select.push('<option value="0"'+ (status === 0 ? ' selected' : '') +'>False</option>');
     select.push('<option value=""'+ (status === '' ? ' selected' : '') +'>Unknown</option>');
     select.push('</select>');
     return select.join('');
