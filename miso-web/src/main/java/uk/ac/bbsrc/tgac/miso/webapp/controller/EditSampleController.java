@@ -297,7 +297,7 @@ public class EditSampleController {
   }
   
   // Handsontable
-  @ModelAttribute("referenceDataJson")
+  @ModelAttribute("referenceDataJSON")
   public JSONObject referenceDataJsonString() throws IOException {
     final JSONObject hot = new JSONObject();
     final List<String> sampleTypes = new ArrayList<String>(requestManager.listAllSampleTypes());

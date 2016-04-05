@@ -447,7 +447,7 @@
     <div id="hotContainer"></div>
   
     <script type="text/javascript">
-      Sample.hot.dropdownRef = ${referenceDataJson};
+      Sample.hot.dropdownRef = ${referenceDataJSON};
       Sample.hot.selectedProjectId = parseInt('${sample.project.id}') || null;
       Sample.hot.detailedSample = JSON.parse(document.getElementById('HOTbulkForm').dataset.detailedSample);
       if (Boolean(Sample.hot.detailedSample)) {
