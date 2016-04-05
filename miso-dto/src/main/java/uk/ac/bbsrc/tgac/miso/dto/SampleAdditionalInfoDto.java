@@ -10,6 +10,8 @@ public class SampleAdditionalInfoDto {
   private String sampleUrl;
   private Long parentId;
   private String parentUrl;
+  private String parentAlias;
+  private Long parentSampleClassId;
   private Long sampleClassId;
   private String sampleClassUrl;
   private Long tissueOriginId;
@@ -74,6 +76,22 @@ public class SampleAdditionalInfoDto {
 
   public void setParentUrl(String parentUrl) {
     this.parentUrl = parentUrl;
+  }
+  
+  public String getParentAlias() {
+    return parentAlias;
+  }
+  
+  public void setParentAlias(String parentAlias) {
+    this.parentAlias = parentAlias;
+  }
+  
+  public Long getParentSampleClassId() {
+    return parentSampleClassId;
+  }
+  
+  public void setParentSampleClassId(Long parentSampleClassId) {
+    this.parentSampleClassId = parentSampleClassId;
   }
 
   public Long getTissueOriginId() {
@@ -278,7 +296,8 @@ public class SampleAdditionalInfoDto {
 
   @Override
   public String toString() {
-    return "SampleAdditionalInfoDto [sampleId=" + sampleId + ", url=" + url + ", sampleUrl=" + sampleUrl + ", sampleClassId="
+    return "SampleAdditionalInfoDto [sampleId=" + sampleId + ", url=" + url + ", sampleUrl=" + sampleUrl + ", parentId=" + parentId 
+        + ", parentUrl=" + parentUrl + ", parentAlias=" + parentAlias + ", parentSampleClassId=" + parentSampleClassId + ", sampleClassId="
         + sampleClassId + ", sampleClassUrl=" + sampleClassUrl + ", tissueOriginId=" + tissueOriginId + ", tissueOriginUrl=" 
         + tissueOriginUrl + ", tissueTypeId=" + tissueTypeId + ", tissueTypeUrl=" + tissueTypeUrl + ", qcPassedDetailId=" 
         + qcPassedDetailId + ", qcPassedDetailUrl=" + qcPassedDetailUrl + ", subprojectId=" + subprojectId + ", subprojectUrl="

@@ -452,8 +452,10 @@
       Sample.hot.detailedSample = JSON.parse(document.getElementById('HOTbulkForm').dataset.detailedSample);
       if (Boolean(Sample.hot.detailedSample)) {
         Sample.hot.fetchSampleOptions();
+        Sample.hot.button = document.getElementById('saveDetailed');
       } else {
         Sample.hot.addProjectEtcDropdowns();
+        Sample.hot.button = document.getElementById('savePlain');
       }
     </script>
   </div>
