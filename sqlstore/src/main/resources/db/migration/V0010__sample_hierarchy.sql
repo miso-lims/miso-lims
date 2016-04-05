@@ -147,6 +147,7 @@ CREATE TABLE `SampleAdditionalInfo` (
   `tubeNumber` int(11) DEFAULT NULL,
   `concentration` double DEFAULT NULL,
   `archived` bit(1) NOT NULL,
+  `externalInstituteIdentifier` varchar(255) DEFAULT NULL,
   `labId` bigint(20) DEFAULT NULL,
   `strStatus` varchar(50) NOT NULL DEFAULT 'NOT_SUBMITTED',
   `createdBy` bigint(20) NOT NULL,
@@ -297,7 +298,6 @@ CREATE TABLE `SampleValidRelationship` (
 
 CREATE TABLE `SampleTissue` (
   `sampleId` bigint(20) PRIMARY KEY,
-  `instituteTissueName` varchar(255),
   `cellularity` int,
   `createdBy` bigint(20) NOT NULL,
   `creationDate` datetime NOT NULL,

@@ -85,7 +85,6 @@ public class DefaultSampleTissueService implements SampleTissueService {
 
   @Override
   public void applyChanges(SampleTissue target, SampleTissue source) {
-    target.setInstituteTissueName(source.getInstituteTissueName());
     target.setCellularity(source.getCellularity());
   }
 

@@ -226,6 +226,7 @@ public class Dtos {
     dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
     dto.setUpdatedById(from.getUpdatedBy().getUserId());
     dto.setLastUpdated(dateTimeFormatter.print(from.getLastUpdated().getTime()));
+    dto.setExternalInstituteIdentifier(from.getExternalInstituteIdentifier());
     dto.setTubeNumber(from.getTubeNumber());
     dto.setStrStatus(from.getStrStatus().getLabel());
     return dto;
@@ -245,6 +246,7 @@ public class Dtos {
     to.setPassageNumber(from.getPassageNumber());
     to.setTimesReceived(from.getTimesReceived());
     to.setTubeNumber(from.getTubeNumber());
+    to.setExternalInstituteIdentifier(from.getExternalInstituteIdentifier());
     to.setConcentration(from.getConcentration());
     if (from.getStrStatus() != null) {
       to.setStrStatus(from.getStrStatus());
@@ -668,7 +670,6 @@ public class Dtos {
     SampleTissueDto dto = new SampleTissueDto();
     dto.setSampleId(from.getSampleId());
     dto.setCellularity(from.getCellularity());
-    dto.setInstituteTissueName(from.getInstituteTissueName());
     dto.setCreatedById(from.getCreatedBy().getUserId());
     dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
     dto.setUpdatedById(from.getUpdatedBy().getUserId());
@@ -687,7 +688,6 @@ public class Dtos {
   public static SampleTissue to(SampleTissueDto from) {
     SampleTissue to = new SampleTissueImpl();
     to.setCellularity(from.getCellularity());
-    to.setInstituteTissueName(from.getInstituteTissueName());
     return to;
   }
 

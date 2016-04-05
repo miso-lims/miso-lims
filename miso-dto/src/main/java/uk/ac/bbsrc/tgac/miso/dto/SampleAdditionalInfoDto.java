@@ -30,6 +30,7 @@ public class SampleAdditionalInfoDto {
   private Long updatedById;
   private String updatedByUrl;
   private String lastUpdated;
+  private String externalInstituteIdentifier;
   private Long labId;
   private String labUrl;
   private String strStatus;
@@ -233,6 +234,14 @@ public class SampleAdditionalInfoDto {
   public void setPrepKitUrl(String prepKitUrl) {
     this.prepKitUrl = prepKitUrl;
   }
+  
+  public String getExternalInstituteIdentifier() {
+    return externalInstituteIdentifier;
+  }
+  
+  public void setExternalInstituteIdentifier(String externalInstituteIdentifier) {
+    this.externalInstituteIdentifier = externalInstituteIdentifier;
+  }
 
   public Long getLabId() {
     return labId;
@@ -257,5 +266,17 @@ public class SampleAdditionalInfoDto {
   public void setStrStatus(String strStatus) {
     this.strStatus = strStatus;
   }
-
+  
+  @Override
+  public String toString() {
+    return "SampleAdditionalInfoDto [sampleId=" + sampleId + ", url=" + url + ", sampleUrl=" + sampleUrl + ", sampleClassId="
+        + sampleClassId + ", sampleClassUrl=" + sampleClassUrl + ", tissueOriginId=" + tissueOriginId + ", tissueOriginUrl=" 
+        + tissueOriginUrl + ", tissueTypeId=" + tissueTypeId + ", tissueTypeUrl=" + tissueTypeUrl + ", qcPassedDetailId=" 
+        + qcPassedDetailId + ", qcPassedDetailUrl=" + qcPassedDetailUrl + ", subprojectId=" + subprojectId + ", subprojectUrl="
+        + subprojectUrl + ", prepKitId=" + prepKitId + ", prepKitUrl=" + prepKitUrl + ", passageNumber=" + passageNumber 
+        + ", timesReceived=" + timesReceived + ", tubeNumber=" + tubeNumber + ", concentration=" + concentration + ", createdById="
+        + createdById + ", createdByUrl=" + createdByUrl + ", creationDate=" + creationDate + ", updatedById=" + updatedById
+        + ", updatedByUrl=" + updatedByUrl + ", lastUpdated=" + lastUpdated + ", externalInstituteIdentifier=" + externalInstituteIdentifier
+        + ", labId=" + labId + ", labUrl=" + labUrl + "]";
+  }
 }
