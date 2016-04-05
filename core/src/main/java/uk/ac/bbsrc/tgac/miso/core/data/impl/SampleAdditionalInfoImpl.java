@@ -4,8 +4,6 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.MapsId;
@@ -75,9 +73,6 @@ public class SampleAdditionalInfoImpl implements SampleAdditionalInfo {
   private Integer tubeNumber;
 
   private Double concentration;
-
-  @Enumerated(EnumType.STRING)
-  private StrStatus strStatus = StrStatus.NOT_SUBMITTED;
 
   @Column(nullable = false)
   private Boolean archived = Boolean.FALSE;
@@ -298,20 +293,6 @@ public class SampleAdditionalInfoImpl implements SampleAdditionalInfo {
     return kitDescriptorId;
   }
   
-  @Override
-  public StrStatus getStrStatus() {
-    return strStatus;
-  }
-  
-  @Override
-  public void setStrStatus(StrStatus strStatus) {
-    this.strStatus = strStatus;
-  }
-  
-  @Override
-  public void setStrStatus(String strStatus) {
-    this.strStatus = StrStatus.get(strStatus);
-  }
 
   @Override
   public String toString() {
@@ -319,9 +300,8 @@ public class SampleAdditionalInfoImpl implements SampleAdditionalInfo {
         + sampleClass + ", tissueOrigin=" + tissueOrigin + ", tissueType=" + tissueType + ", qcPassedDetail=" + qcPassedDetail
         + ", subproject=" + subproject + ", lab=" + lab + ", kitDescriptorId=" + kitDescriptorId + ", prepKit=" + prepKit
         + ", passageNumber=" + passageNumber + ", timesReceived=" + timesReceived + ", tubeNumber=" + tubeNumber + ", concentration="
-        + concentration + ", kitDescriptorId=" + kitDescriptorId + ", lab=" + lab + ", externalInstituteIdentifier" 
-        + externalInstituteIdentifier + ", archived=" + archived + ", createdBy=" + createdBy + ", creationDate=" + creationDate 
-        + ", updatedBy=" + updatedBy + ", lastUpdated=" + lastUpdated + ", strStatus=" + strStatus + "]";
+        + concentration + ", externalInstituteIdentifier=" + externalInstituteIdentifier + ", archived=" + archived + ", createdBy=" 
+        + createdBy + ", creationDate=" + creationDate + ", updatedBy=" + updatedBy + ", lastUpdated=" + lastUpdated + "]";
   }
 
 }
