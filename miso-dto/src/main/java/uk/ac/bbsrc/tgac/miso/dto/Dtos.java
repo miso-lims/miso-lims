@@ -199,8 +199,7 @@ public class Dtos {
 
   public static SampleAdditionalInfoDto asDto(SampleAdditionalInfo from) {
     SampleAdditionalInfoDto dto = new SampleAdditionalInfoDto();
-    dto.setId(from.getSampleAdditionalInfoId());
-    dto.setSampleId(from.getSample().getId());
+    dto.setSampleId(from.getSampleId());
     dto.setSampleClassId(from.getSampleClass().getSampleClassId());
     if (from.getLab() != null) {
       dto.setLabId(from.getLab().getId());
@@ -242,12 +241,43 @@ public class Dtos {
 
   public static SampleAdditionalInfo to(SampleAdditionalInfoDto from) {
     SampleAdditionalInfo to = new SampleAdditionalInfoImpl();
+    to.setSampleId(from.getSampleId());
     to.setPassageNumber(from.getPassageNumber());
     to.setTimesReceived(from.getTimesReceived());
     to.setTubeNumber(from.getTubeNumber());
     to.setConcentration(from.getConcentration());
     if (from.getStrStatus() != null) {
       to.setStrStatus(from.getStrStatus());
+    }
+    if (from.getTissueOriginId() != null) {
+      TissueOrigin tissueOrigin = new TissueOriginImpl();
+      tissueOrigin.setTissueOriginId(from.getTissueOriginId());
+      to.setTissueOrigin(tissueOrigin);
+    }
+    if (from.getTissueTypeId() != null) {
+      TissueType tissueType = new TissueTypeImpl();
+      tissueType.setTissueTypeId(from.getTissueTypeId());
+      to.setTissueType(tissueType);
+    }
+    if (from.getQcPassedDetailId() != null) {
+      QcPassedDetail qcpassedDetail = new QcPassedDetailImpl();
+      qcpassedDetail.setQcPassedDetailId(from.getQcPassedDetailId());
+      to.setQcPassedDetail(qcpassedDetail);
+    }
+    if (from.getSubprojectId() != null) {
+      Subproject subproject = new SubprojectImpl();
+      subproject.setSubprojectId(from.getSubprojectId());
+      to.setSubproject(subproject);
+    }
+    if (from.getPrepKitId() != null) {
+      KitDescriptor prepKit = new KitDescriptor();
+      prepKit.setKitDescriptorId(from.getPrepKitId());
+      to.setPrepKit(prepKit);
+    }
+    if (from.getSampleClassId() != null) {
+      SampleClass sampleClass = new SampleClassImpl();
+      sampleClass.setSampleClassId(from.getSampleClassId());
+      to.setSampleClass(sampleClass);
     }
     return to;
   }
@@ -338,7 +368,7 @@ public class Dtos {
 
   public static SampleAnalyteDto asDto(SampleAnalyte from) {
     SampleAnalyteDto dto = new SampleAnalyteDto();
-    dto.setId(from.getSampleAnalyteId());
+    dto.setSampleId(from.getSampleId());
     dto.setSampleId(from.getSample().getId());
     if (from.getSamplePurpose() != null) {
       dto.setSamplePurposeId(from.getSamplePurpose().getSamplePurposeId());
@@ -378,17 +408,22 @@ public class Dtos {
 
   public static SampleAnalyte to(SampleAnalyteDto from) {
     SampleAnalyte to = new SampleAnalyteImpl();
-    if (from.getRegion() != null) {
-      to.setRegion(from.getRegion());
+    to.setSampleId(from.getSampleId());
+    to.setRegion(from.getRegion());
+    to.setTubeId(from.getTubeId());
+    to.setStockNumber(from.getStockNumber());
+    to.setAliquotNumber(from.getAliquotNumber());
+    if (from.getSampleGroupId() != null) {
+      to.setSampleGroup(new SampleGroupImpl());
+      to.getSampleGroup().setSampleGroupId(from.getSampleGroupId());
     }
-    if (from.getTubeId() != null) {
-      to.setTubeId(from.getTubeId());
+    if (from.getSamplePurposeId() != null) {
+      to.setSamplePurpose(new SamplePurposeImpl());
+      to.getSamplePurpose().setSamplePurposeId(from.getSamplePurposeId());
     }
-    if (from.getStockNumber() != null) {
-      to.setStockNumber(from.getStockNumber());
-    }
-    if (from.getAliquotNumber() != null) {
-      to.setAliquotNumber(from.getAliquotNumber());
+    if (from.getTissueMaterialId() != null) {
+      to.setTissueMaterial(new TissueMaterialImpl());
+      to.getTissueMaterial().setTissueMaterialId(from.getTissueMaterialId());
     }
     return to;
   }
@@ -483,13 +518,24 @@ public class Dtos {
     if (from.getVolume() != null) {
       to.setVolume(from.getVolume());
     }
+    if (from.getSampleAdditionalInfo() != null) {
+      to.setSampleAdditionalInfo(to(from.getSampleAdditionalInfo()));
+    }
+    if (from.getSampleIdentity() != null) {
+      to.setIdentity(to(from.getSampleIdentity()));
+    }
+    if (from.getSampleTissue() != null) {
+      to.setSampleTissue(to(from.getSampleTissue()));
+    }
+    if (from.getSampleAnalyte() != null) {
+      to.setSampleAnalyte(to(from.getSampleAnalyte()));
+    }
     return to;
   }
 
   public static SampleIdentityDto asDto(Identity from) {
     SampleIdentityDto dto = new SampleIdentityDto();
-    dto.setId(from.getIdentityId());
-    dto.setSampleId(from.getSample().getId());
+    dto.setSampleId(from.getSampleId());
     dto.setInternalName(from.getInternalName());
     dto.setExternalName(from.getExternalName());
     dto.setCreatedById(from.getCreatedBy().getUserId());
@@ -620,7 +666,7 @@ public class Dtos {
 
   public static SampleTissueDto asDto(SampleTissue from) {
     SampleTissueDto dto = new SampleTissueDto();
-    dto.setId(from.getSampleTissueId());
+    dto.setSampleId(from.getSampleId());
     dto.setCellularity(from.getCellularity());
     dto.setInstituteTissueName(from.getInstituteTissueName());
     dto.setCreatedById(from.getCreatedBy().getUserId());

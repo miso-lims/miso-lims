@@ -1,9 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
@@ -18,10 +16,8 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
-import uk.ac.bbsrc.tgac.miso.core.data.Institute;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.InstituteImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 
@@ -85,10 +81,10 @@ public class HibernateIdentityDaoTest extends AbstractDAOTest {
 
   @Test
   public void testDeleteIdentity() {
-    Identity identity = dao.getIdentity(2L);
+    Identity identity = dao.getIdentity(4L);
     dao.deleteIdentity(identity);
 
-    Identity deleted = dao.getIdentity(2L);
+    Identity deleted = dao.getIdentity(4L);
     assertTrue(deleted == null);
 
   }
@@ -102,7 +98,7 @@ public class HibernateIdentityDaoTest extends AbstractDAOTest {
     dao.update(identity);
 
     Identity updated = dao.getIdentity("updatedExternal");
-    assertEquals(new Long(1), dao.getIdentity().get(0).getIdentityId());
+    assertEquals(new Long(1), dao.getIdentity().get(0).getSampleId());
 
   }
 

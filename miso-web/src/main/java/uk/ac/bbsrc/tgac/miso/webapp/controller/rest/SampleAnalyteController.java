@@ -75,10 +75,10 @@ public class SampleAnalyteController extends RestController {
     }
   }
 
-  private static SampleAnalyteDto writeUrls(SampleAnalyteDto sampleAnalyteDto, UriComponentsBuilder uriBuilder) {
+  public static SampleAnalyteDto writeUrls(SampleAnalyteDto sampleAnalyteDto, UriComponentsBuilder uriBuilder) {
     URI baseUri = uriBuilder.build().toUri();
     sampleAnalyteDto.setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/sample/analyte/{id}")
-        .buildAndExpand(sampleAnalyteDto.getId()).toUriString());
+        .buildAndExpand(sampleAnalyteDto.getSampleId()).toUriString());
     sampleAnalyteDto.setCreatedByUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}")
         .buildAndExpand(sampleAnalyteDto.getCreatedById()).toUriString());
     sampleAnalyteDto.setUpdatedByUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}")
@@ -116,8 +116,7 @@ public class SampleAnalyteController extends RestController {
   public ResponseEntity<?> createSampleAnalyte(@RequestBody SampleAnalyteDto sampleAnalyteDto, UriComponentsBuilder b,
       HttpServletResponse response) throws IOException {
     SampleAnalyte sampleAnalyte = Dtos.to(sampleAnalyteDto);
-    Long id = sampleAnalyteService.create(sampleAnalyte, sampleAnalyteDto.getSampleId(), sampleAnalyteDto.getSamplePurposeId(),
-        sampleAnalyteDto.getSampleGroupId(), sampleAnalyteDto.getTissueMaterialId());
+    Long id = sampleAnalyteService.create(sampleAnalyte);
     UriComponents uriComponents = b.path("/sampleanalyte/{id}").buildAndExpand(id);
     HttpHeaders headers = new HttpHeaders();
     headers.setLocation(uriComponents.toUri());
@@ -129,9 +128,8 @@ public class SampleAnalyteController extends RestController {
   public ResponseEntity<?> updateSampleAnalyte(@PathVariable("id") Long id, @RequestBody SampleAnalyteDto sampleAnalyteDto,
       HttpServletResponse response) throws IOException {
     SampleAnalyte sampleAnalyte = Dtos.to(sampleAnalyteDto);
-    sampleAnalyte.setSampleAnalyteId(id);
-    sampleAnalyteService.update(sampleAnalyte, sampleAnalyteDto.getSamplePurposeId(), sampleAnalyteDto.getSampleGroupId(),
-        sampleAnalyteDto.getTissueMaterialId());
+    sampleAnalyte.setSampleId(id);
+    sampleAnalyteService.update(sampleAnalyte);
     return new ResponseEntity<>(HttpStatus.OK);
   }
 

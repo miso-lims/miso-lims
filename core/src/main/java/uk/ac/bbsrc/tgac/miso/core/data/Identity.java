@@ -9,9 +9,9 @@ import com.eaglegenomics.simlims.core.User;
 @JsonIgnoreProperties({ "sample" })
 public interface Identity {
 
-  Long getIdentityId();
+  Long getSampleId();
 
-  void setIdentityId(Long identityId);
+  void setSampleId(Long sampleId);
 
   Sample getSample();
 
