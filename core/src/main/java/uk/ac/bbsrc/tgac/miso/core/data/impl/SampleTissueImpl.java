@@ -27,7 +27,6 @@ public class SampleTissueImpl implements SampleTissue {
   @MapsId
   private Sample sample;
 
-  private String instituteTissueName;
   private Integer cellularity;
 
   @OneToOne(targetEntity = UserImpl.class)
@@ -52,16 +51,6 @@ public class SampleTissueImpl implements SampleTissue {
   @Override
   public void setSample(Sample sample) {
     this.sample = sample;
-  }
-
-  @Override
-  public String getInstituteTissueName() {
-    return instituteTissueName;
-  }
-
-  @Override
-  public void setInstituteTissueName(String instituteTissueName) {
-    this.instituteTissueName = instituteTissueName;
   }
 
   @Override
@@ -126,9 +115,8 @@ public class SampleTissueImpl implements SampleTissue {
 
   @Override
   public String toString() {
-    return "SampleTissueImpl [sampleId=" + sampleId + ", sample=" + sample + ", instituteTissueName=" + instituteTissueName
-        + ", cellularity=" + cellularity + ", createdBy=" + createdBy + ", creationDate=" + creationDate + ", updatedBy=" + updatedBy
-        + ", lastUpdated=" + lastUpdated + "]";
+    return "SampleTissueImpl [sampleId=" + sampleId + ", sample=" + sample + ", cellularity=" + cellularity + ", createdBy=" + createdBy 
+        + ", creationDate=" + creationDate + ", updatedBy=" + updatedBy + ", lastUpdated=" + lastUpdated + "]";
   }
 
 }

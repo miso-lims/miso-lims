@@ -82,6 +82,18 @@ public interface SampleAdditionalInfo {
   KitDescriptor getPrepKit();
 
   void setPrepKit(KitDescriptor prepKit);
+  
+  /**
+   * @return the sample's identifying name or ID at the source Institute
+   */
+  String getExternalInstituteIdentifier();
+
+  /**
+   * Sets the sample's identifying name or ID at the source Institute
+   * 
+   * @param externalInstituteIdentifier
+   */
+  void setExternalInstituteIdentifier(String externalInstituteIdentifier);
 
   Lab getLab();
 
