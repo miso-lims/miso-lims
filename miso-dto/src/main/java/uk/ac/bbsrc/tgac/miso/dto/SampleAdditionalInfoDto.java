@@ -33,7 +33,6 @@ public class SampleAdditionalInfoDto {
   private String externalInstituteIdentifier;
   private Long labId;
   private String labUrl;
-  private String strStatus;
 
   public Long getSampleId() {
     return sampleId;
@@ -259,14 +258,6 @@ public class SampleAdditionalInfoDto {
     this.labUrl = labUrl;
   }
 
-  public String getStrStatus() {
-    return strStatus;
-  }
-
-  public void setStrStatus(String strStatus) {
-    this.strStatus = strStatus;
-  }
-  
   @Override
   public String toString() {
     return "SampleAdditionalInfoDto [sampleId=" + sampleId + ", url=" + url + ", sampleUrl=" + sampleUrl + ", sampleClassId="

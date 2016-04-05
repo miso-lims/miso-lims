@@ -228,7 +228,6 @@ public class Dtos {
     dto.setLastUpdated(dateTimeFormatter.print(from.getLastUpdated().getTime()));
     dto.setExternalInstituteIdentifier(from.getExternalInstituteIdentifier());
     dto.setTubeNumber(from.getTubeNumber());
-    dto.setStrStatus(from.getStrStatus().getLabel());
     return dto;
   }
 
@@ -248,9 +247,6 @@ public class Dtos {
     to.setTubeNumber(from.getTubeNumber());
     to.setExternalInstituteIdentifier(from.getExternalInstituteIdentifier());
     to.setConcentration(from.getConcentration());
-    if (from.getStrStatus() != null) {
-      to.setStrStatus(from.getStrStatus());
-    }
     if (from.getTissueOriginId() != null) {
       TissueOrigin tissueOrigin = new TissueOriginImpl();
       tissueOrigin.setTissueOriginId(from.getTissueOriginId());
@@ -372,6 +368,7 @@ public class Dtos {
     SampleAnalyteDto dto = new SampleAnalyteDto();
     dto.setSampleId(from.getSampleId());
     dto.setSampleId(from.getSample().getId());
+    dto.setStrStatus(from.getStrStatus().getLabel());
     if (from.getSamplePurpose() != null) {
       dto.setSamplePurposeId(from.getSamplePurpose().getSamplePurposeId());
     }
@@ -426,6 +423,9 @@ public class Dtos {
     if (from.getTissueMaterialId() != null) {
       to.setTissueMaterial(new TissueMaterialImpl());
       to.getTissueMaterial().setTissueMaterialId(from.getTissueMaterialId());
+    }
+    if (from.getStrStatus() != null) {
+      to.setStrStatus(from.getStrStatus());
     }
     return to;
   }
