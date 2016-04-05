@@ -963,7 +963,7 @@ var Options = Options || {
     if (method == 'POST') {
       expectedStatus = [201, 200]; // will be 200 in case of a POST to sampleclass which triggers a GET for samplevalidrelationship
     } else {
-      expectedStatus = [200, 404];
+      expectedStatus = [200];
     }
     var xhr = new XMLHttpRequest();
     xhr.open(method, endpoint);

@@ -224,6 +224,7 @@ public class Dtos {
     }
     if (from.getParent() != null) {
       dto.setParentId(from.getParent().getId());
+      dto.setParentAlias(from.getParent().getAlias());
     }
     dto.setPassageNumber(from.getPassageNumber());
     dto.setTimesReceived(from.getTimesReceived());
@@ -282,6 +283,11 @@ public class Dtos {
       SampleClass sampleClass = new SampleClassImpl();
       sampleClass.setSampleClassId(from.getSampleClassId());
       to.setSampleClass(sampleClass);
+    }
+    if (from.getParentId() != null) {
+      Sample parentSample = new SampleImpl();
+      parentSample.setId(from.getParentId());
+      to.setParent(parentSample);
     }
     return to;
   }

@@ -751,9 +751,10 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
           return SampleImpl.sampleAnalyte(this);
         } else if (sampleTissue != null) {
           return SampleImpl.sampleTissue(this);
+        } else {
+          return SampleImpl.sampleTissueProcessing(this);
         }
       }
-      throw new IllegalArgumentException("No sample can be built with the specified parameters.");
     }
   }
 

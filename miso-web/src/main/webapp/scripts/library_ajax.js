@@ -1041,7 +1041,7 @@ Library.ui = {
       return false;
     }
     alert("Check if controller methods have been implemented.");
-    // window.location = "library/bulk/edit/" + selectedIdsArray.join(',');
+    // window.location = "library/bulk/" + selectedIdsArray.join(',');
   },
   
   // TODO: finish this, and the one in sample_ajax.js

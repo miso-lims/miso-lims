@@ -34,7 +34,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,6 +70,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAnalyte.StrStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
@@ -78,6 +78,7 @@ import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.webapp.context.ApplicationContextProvider;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoPropertyExporter;
 
@@ -302,6 +303,7 @@ public class EditSampleController {
     final JSONObject hot = new JSONObject();
     final List<String> sampleTypes = new ArrayList<String>(requestManager.listAllSampleTypes());
     final List<String> qcValues = new ArrayList<String>();
+    final List<String> strStatuses = new ArrayList<String>();
     qcValues.add("true");
     qcValues.add("false");
     qcValues.add("");
@@ -313,10 +315,14 @@ public class EditSampleController {
       project.put("name", fullProject.getName());
       allProjects.add(project);
     }
+    for (String strLabel : StrStatus.getLabels()) {
+      strStatuses.add(strLabel);
+    }
     
     hot.put("sampleTypes", sampleTypes);
     hot.put("projects", allProjects);
     hot.put("qcValues", qcValues);
+    hot.put("strStatuses", strStatuses);
     
     return hot;
   }
@@ -473,7 +479,8 @@ public class EditSampleController {
     return null;
   }
   
-  @RequestMapping(value = "/bulk/", method = RequestMethod.POST, headers = "Accept=application/json")
+  // TODO: fix this up
+  @RequestMapping(value = "/bulk/edit", method = RequestMethod.POST, headers = "Accept=application/json")
   public String getBulkSamples(@RequestBody JSONObject json) throws IOException {
     JSONArray ids = JSONArray.fromObject(json.get("ids"));
     StringBuffer stringBuffer = new StringBuffer();
@@ -484,6 +491,10 @@ public class EditSampleController {
     return "redirect:/miso/sample/bulk/edit/" + stringBuffer.toString();
   }
   
+  /**
+   * used to edit samples with ids from given {sampleIds}
+   * sends Dtos objects which will then be used for editing in grid
+   */
   @RequestMapping(value = "/bulk/edit/{sampleIds}", method = RequestMethod.GET)
   public ModelAndView editBulkSamples(@PathVariable String sampleIds, ModelMap model) throws IOException {
     try {
@@ -492,8 +503,40 @@ public class EditSampleController {
       for (int i = 0; i < split.length; i++) {
         idList.add(Long.parseLong(split[i]));
       }
-      ObjectMapper mapper = new ObjectMapper();
-      model.put("samplesJSON", mapper.writer().writeValueAsString(requestManager.getSamplesByIdList(idList)));
+      JSONArray samplesDtos = new JSONArray();
+      for (Sample sample : requestManager.getSamplesByIdList(idList)) {
+        samplesDtos.add(Dtos.asDto(sample));
+      }
+      model.put("samplesJSON", samplesDtos);
+      model.put("method", "edit");
+      return new ModelAndView("/pages/bulkEditSamples.jsp", model);
+    } catch (IOException ex) {
+      if (log.isDebugEnabled()) {
+        log.error("Failed to get bulk samples", ex);
+      }
+      throw ex;
+    }
+  }
+  
+  /**
+   * used to create new samples parented to samples with ids from given {sampleIds}
+   * sends Dtos objects which will then be used for editing in grid
+   */
+  @RequestMapping(value = "/bulk/create/{sampleIds}&scid={sampleClassId}", method = RequestMethod.GET)
+  public ModelAndView createBulkSamples(@PathVariable String sampleIds, @PathVariable Long sampleClassId, ModelMap model) throws IOException {
+    try {
+      String[] split = sampleIds.split(",");
+      List<Long> idList = new ArrayList<Long>();
+      for (int i = 0; i < split.length; i++) {
+        idList.add(Long.parseLong(split[i]));
+      }
+      JSONArray samplesDtos = new JSONArray();
+      for (Sample sample : requestManager.getSamplesByIdList(idList)) {
+        samplesDtos.add(Dtos.asDto(sample));
+      }
+      model.put("samplesJSON", samplesDtos);
+      model.put("method",  "create");
+      model.put("sampleClassId", sampleClassId);
       return new ModelAndView("/pages/bulkEditSamples.jsp", model);
     } catch (IOException ex) {
       if (log.isDebugEnabled()) {
