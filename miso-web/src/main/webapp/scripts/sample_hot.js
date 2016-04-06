@@ -466,15 +466,15 @@ Sample.hot = {
           trimDropdown: false,
           source: Sample.hot.getLabs(),
           validator: permitEmpty
+        },{
+          header: 'Ext. Inst. Identifier',
+          data: 'externalInstituteIdentifier',
+          type: 'text'
         }
       ];
       
       var tissueCols = [
         {
-          header: 'External Reference',
-          data: 'instituteTissueName',
-          type: 'text'
-        },{
           header: 'Cellularity',
           data: 'cellularity',
           type: 'text'
@@ -740,7 +740,9 @@ Sample.hot = {
     if (obj.lab && obj.lab.length) {
       sample.sampleAdditionalInfo.labId = Sample.hot.getIdFromLabValue(obj.lab, this.sampleOptions.labsDtos);
     }
-    
+    if (obj.externalInstituteIdentifier && obj.externalInstituteIdentifier.length) {
+      sample.sampleAdditionalInfo.externalInstituteIdentifier = obj.externalInstituteIdentifier;
+    }
     if (obj.kitDescriptor && obj.kitDescriptor.length) {
       sample.sampleAdditionalInfo.prepKitId = Sample.hot.getIdFromAlias(obj.prepKitId, Sample.hot.kitDescriptorsDtos);
     }
@@ -777,9 +779,6 @@ Sample.hot = {
     } else if (Sample.hot.getCategoryFromClassId(sample.sampleAdditionalInfo.sampleClassId) == 'Tissue') {
       sample.sampleTissue = {};
       
-      if (obj.instituteTissueName && obj.instituteTissueName.length) {
-        sample.sampleTissue.instituteTissueName = obj.instituteTissueName;
-      }
       if (obj.cellularity && obj.cellularity.length) {
         sample.sampleTissue.cellularity = obj.cellularity;
       }

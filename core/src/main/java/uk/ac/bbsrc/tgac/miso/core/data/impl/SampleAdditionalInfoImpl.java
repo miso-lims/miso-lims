@@ -56,6 +56,8 @@ public class SampleAdditionalInfoImpl implements SampleAdditionalInfo {
   @OneToOne(targetEntity = SubprojectImpl.class)
   @JoinColumn(name = "subprojectId")
   private Subproject subproject;
+  
+  private String externalInstituteIdentifier;
 
   @OneToOne(targetEntity = LabImpl.class)
   @JoinColumn(name = "labId", nullable = true)
@@ -270,6 +272,16 @@ public class SampleAdditionalInfoImpl implements SampleAdditionalInfo {
       this.kitDescriptorId = prepKit.getKitDescriptorId();
     }
   }
+  
+  @Override
+  public String getExternalInstituteIdentifier() {
+    return externalInstituteIdentifier;
+  }
+  
+  @Override
+  public void setExternalInstituteIdentifier(String externalInstituteIdentifier) {
+    this.externalInstituteIdentifier = externalInstituteIdentifier;
+  }
 
   @Override
   public Lab getLab() {
@@ -307,8 +319,9 @@ public class SampleAdditionalInfoImpl implements SampleAdditionalInfo {
         + sampleClass + ", tissueOrigin=" + tissueOrigin + ", tissueType=" + tissueType + ", qcPassedDetail=" + qcPassedDetail
         + ", subproject=" + subproject + ", lab=" + lab + ", kitDescriptorId=" + kitDescriptorId + ", prepKit=" + prepKit
         + ", passageNumber=" + passageNumber + ", timesReceived=" + timesReceived + ", tubeNumber=" + tubeNumber + ", concentration="
-        + concentration + ", archived=" + archived + ", createdBy=" + createdBy + ", creationDate=" + creationDate + ", updatedBy="
-        + updatedBy + ", lastUpdated=" + lastUpdated + ", strStatus=" + strStatus + "]";
+        + concentration + ", kitDescriptorId=" + kitDescriptorId + ", lab=" + lab + ", externalInstituteIdentifier" 
+        + externalInstituteIdentifier + ", archived=" + archived + ", createdBy=" + createdBy + ", creationDate=" + creationDate 
+        + ", updatedBy=" + updatedBy + ", lastUpdated=" + lastUpdated + ", strStatus=" + strStatus + "]";
   }
 
 }

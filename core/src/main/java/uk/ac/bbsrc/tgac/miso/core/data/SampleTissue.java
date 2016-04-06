@@ -17,18 +17,6 @@ public interface SampleTissue {
 
   void setSample(Sample sample);
 
-  /**
-   * @return the tissue's identifying name or ID at the source Institute
-   */
-  String getInstituteTissueName();
-
-  /**
-   * Sets the tissue's identifying name or ID at the source Institute
-   * 
-   * @param instituteTissueName
-   */
-  void setInstituteTissueName(String instituteTissueName);
-
   Integer getCellularity();
 
   void setCellularity(Integer cellularity);
