@@ -59,6 +59,22 @@ var Library = Library || {
     jQuery('#volume').attr('data-parsley-maxlength', '10');
     jQuery('#volume').attr('data-parsley-type', 'number');
 
+    jQuery('#propagationRuleError').css('display', 'none');
+    if (Library.propagationRules.length > 0) {
+      var selectionType = jQuery('#librarySelectionTypes')[0].value;
+      var strategyType = jQuery('#libraryStrategyTypes')[0].value;
+      var paired = jQuery('#paired')[0].value;
+      var platform = jQuery('#platformNames')[0].value.toUpperCase();
+      if (!Library.propagationRules.some(function(rule) {
+        return Library.isMatched(selectionType, rule.librarySelectionType)
+          && Library.isMatched(strategyType, rule.libraryStrategyType)
+          && Library.isMatched(paired, rule.paired)
+          && (rules.platform === null && typeof rules.platform === 'object' || rules.platform.toUpperCase() == platform);
+      })) {
+        jQuery('#propagationRuleError').css('display', 'block');
+      }
+    }
+
     Fluxion.doAjax(
       'libraryControllerHelperService',
       'getLibraryAliasRegex',
@@ -74,7 +90,7 @@ var Library = Library || {
           jQuery('#alias').attr('data-parsley-error-message', 'Must match '+regex);
           jQuery('#library-form').parsley();
           jQuery('#library-form').parsley().validate();
-          Validate.updateWarningOrSubmit('#library-form', Library.validateLibraryAlias);
+          Validate.updateWarningOrSubmit('#library-form', Library.validateLibraryExtra);
           return false;
         },
         'doOnError': function(json) {
@@ -83,8 +99,12 @@ var Library = Library || {
       }
     );
   },
+
+  isMatched: function (value, reference) {
+    return (reference === null && typeof reference === 'object') || value == reference;
+  },
   
-  validateLibraryAlias: function () {
+  validateLibraryExtra: function () {
     Fluxion.doAjax(
       'libraryControllerHelperService',
       'validateLibraryAlias',

@@ -50,6 +50,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.EntityGroup;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryPropagationRule;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Plate;
@@ -62,6 +63,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
@@ -92,6 +95,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.EntityGroupStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ExperimentStore;
 import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
+import uk.ac.bbsrc.tgac.miso.core.store.LibraryPropagationRuleDao;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
@@ -183,7 +187,9 @@ public class MisoRequestManager implements RequestManager {
   private BoxStore boxStore;
   @Autowired
   private SecurityStore securityStore;
-  
+  @Autowired
+  private LibraryPropagationRuleDao libraryPropagationRuleDao;
+
   public void setSecurityStore(SecurityStore securityStore) {
     this.securityStore = securityStore;
   }
@@ -506,7 +512,7 @@ public class MisoRequestManager implements RequestManager {
       throw new IOException("No sampleStore available. Check that it has been declared in the Spring config.");
     }
   }
-  
+
   @Override
   public Collection<Sample> getSamplesByIdList(List<Long> idList) throws IOException {
     if (sampleStore != null) {
@@ -1124,7 +1130,7 @@ public class MisoRequestManager implements RequestManager {
       throw new IOException("No runStore available. Check that it has been declared in the Spring config.");
     }
   }
-  
+
   @Override
   public Collection<Run> listRunsBySequencerId(Long sequencerReferenceId) throws IOException {
     if (runStore != null) {
@@ -1469,7 +1475,7 @@ public class MisoRequestManager implements RequestManager {
       throw new IOException("No sequencerReferenceStore available. Check that it has been declared in the Spring config.");
     }
   }
-  
+
   @Override
   public void deleteSequencerServiceRecord(SequencerServiceRecord serviceRecord) throws IOException {
     if (sequencerServiceRecordStore != null) {
@@ -1651,7 +1657,13 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public long saveLibrary(Library library) throws IOException {
     if (libraryStore != null) {
-      return libraryStore.save(library);
+      SampleAdditionalInfo info = library.getSample().getSampleAdditionalInfo();
+      if (LibraryPropagationRule.validate(library,
+          libraryPropagationRuleDao.getLibraryPropagationRulesByClass(info == null ? null : info.getSampleClass()))) {
+        return libraryStore.save(library);
+      } else {
+        throw new IOException("Invalid propagation.");
+      }
     } else {
       throw new IOException("No libraryStore available. Check that it has been declared in the Spring config.");
     }
@@ -2620,7 +2632,7 @@ public class MisoRequestManager implements RequestManager {
       throw new IOException("No sequencerServiceRecordStore available. Check that it has been declared in the Spring config.");
     }
   }
-  
+
   @Override
   public Map<String, Integer> getBoxColumnSizes() throws IOException {
     if (boxStore != null) {
@@ -2638,7 +2650,7 @@ public class MisoRequestManager implements RequestManager {
       throw new IOException("No sequencerServiceRecordStore available. Check that it has been declared in the Spring config.");
     }
   }
-  
+
   @Override
   public Map<String, Integer> getExperimentColumnSizes() throws IOException {
     if (experimentStore != null) {
@@ -2656,7 +2668,7 @@ public class MisoRequestManager implements RequestManager {
       throw new IOException("No sequencerServiceRecordStore available. Check that it has been declared in the Spring config.");
     }
   }
-  
+
   @Override
   public Map<String, Integer> getPoolColumnSizes() throws IOException {
     if (poolStore != null) {
@@ -2674,7 +2686,7 @@ public class MisoRequestManager implements RequestManager {
       throw new IOException("No sequencerServiceRecordStore available. Check that it has been declared in the Spring config.");
     }
   }
-  
+
   @Override
   public Map<String, Integer> getServiceRecordColumnSizes() throws IOException {
     if (sequencerServiceRecordStore != null) {
@@ -2683,7 +2695,7 @@ public class MisoRequestManager implements RequestManager {
       throw new IOException("No sequencerServiceRecordStore available. Check that it has been declared in the Spring config.");
     }
   }
-  
+
   @Override
   public Map<String, Integer> getKitDescriptorColumnSizes() throws IOException {
     if (kitStore != null) {
@@ -2781,5 +2793,10 @@ public class MisoRequestManager implements RequestManager {
     } else {
       throw new IOException("No securityStore available. Check that it has been declared in the Spring config.");
     }
+  }
+
+  @Override
+  public Collection<LibraryPropagationRule> listLibraryPropagationRulesByClass(SampleClass sampleClass) throws IOException {
+    return libraryPropagationRuleDao.getLibraryPropagationRulesByClass(sampleClass);
   }
 }

@@ -41,6 +41,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.EntityGroup;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryPropagationRule;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Plate;
@@ -53,6 +54,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
@@ -135,7 +137,7 @@ public interface RequestManager {
   public long saveSubmission(Submission submission) throws IOException;
 
   public long saveSequencerReference(SequencerReference sequencerReference) throws IOException;
-  
+
   public long saveSequencerServiceRecord(SequencerServiceRecord record) throws IOException;
 
   public long saveKit(Kit kit) throws IOException;
@@ -246,7 +248,7 @@ public interface RequestManager {
   public SequencerReference getSequencerReferenceByName(String referenceName) throws IOException;
 
   public SequencerReference getSequencerReferenceByRunId(long runId) throws IOException;
-  
+
   public SequencerServiceRecord getSequencerServiceRecordById(long id) throws IOException;
 
   public Kit getKitById(long kitId) throws IOException;
@@ -368,8 +370,8 @@ public interface RequestManager {
   public Collection<Sample> listAllSamplesByExperimentId(long experimentId) throws IOException;
 
   public Collection<Sample> listSamplesByAlias(String alias) throws IOException;
-  
-  /** 
+
+  /**
    * throws AuthorizationIOException if user cannot read one of the requested samples
    */
   public Collection<Sample> getSamplesByIdList(List<Long> idList) throws IOException;
@@ -502,7 +504,7 @@ public interface RequestManager {
   public Collection<Submission> listAllSubmissions() throws IOException;
 
   public Collection<Run> listRunsByExperimentId(Long experimentId) throws IOException;
-  
+
   public Collection<Run> listRunsBySequencerId(Long sequencerReferenceId) throws IOException;
 
   /**
@@ -513,9 +515,9 @@ public interface RequestManager {
   public Collection<SequencerReference> listAllSequencerReferences() throws IOException;
 
   public Collection<SequencerReference> listSequencerReferencesByPlatformType(PlatformType platformType) throws IOException;
-  
+
   public Collection<SequencerServiceRecord> listAllSequencerServiceRecords() throws IOException;
-  
+
   public Collection<SequencerServiceRecord> listSequencerServiceRecordsBySequencerId(long referenceId) throws IOException;
 
   public Collection<Kit> listAllKits() throws IOException;
@@ -603,35 +605,37 @@ public interface RequestManager {
   public void deleteNote(Note note) throws IOException;
 
   public void deleteBox(Box box) throws IOException;
-  
+
   public Map<String, Integer> getServiceRecordColumnSizes() throws IOException;
-  
+
   public Map<String, Integer> getBoxColumnSizes() throws IOException;
-  
+
   public Map<String, Integer> getExperimentColumnSizes() throws IOException;
-  
+
   public Map<String, Integer> getPoolColumnSizes() throws IOException;
-  
+
   public Map<String, Integer> getKitDescriptorColumnSizes() throws IOException;
-  
+
   public Map<String, Integer> getLibraryColumnSizes() throws IOException;
-  
+
   public Map<String, Integer> getPlateColumnSizes() throws IOException;
-  
+
   public Map<String, Integer> getProjectColumnSizes() throws IOException;
-  
+
   public Map<String, Integer> getRunColumnSizes() throws IOException;
-  
+
   public Map<String, Integer> getSampleColumnSizes() throws IOException;
-  
+
   public Map<String, Integer> getStudyColumnSizes() throws IOException;
-  
+
   public Map<String, Integer> getSequencerReferenceColumnSizes() throws IOException;
-  
+
   public Map<String, Integer> getSubmissionColumnSizes() throws IOException;
-  
+
   public Map<String, Integer> getUserColumnSizes() throws IOException;
-  
+
   public Map<String, Integer> getGroupColumnSizes() throws IOException;
+
+  public Collection<LibraryPropagationRule> listLibraryPropagationRulesByClass(SampleClass sampleClass) throws IOException;
 
 }

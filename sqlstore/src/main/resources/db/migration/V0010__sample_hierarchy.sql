@@ -6,6 +6,8 @@ ALTER TABLE Project ENGINE = InnoDB ROW_FORMAT = DEFAULT;
 ALTER TABLE KitDescriptor ENGINE = InnoDB ROW_FORMAT = DEFAULT;
 ALTER TABLE User ENGINE = InnoDB ROW_FORMAT = DEFAULT;
 ALTER TABLE Library ENGINE = InnoDB ROW_FORMAT = DEFAULT;
+ALTER TABLE LibrarySelectionType ENGINE = InnoDB ROW_FORMAT = DEFAULT;
+ALTER TABLE LibraryStrategyType ENGINE = InnoDB ROW_FORMAT = DEFAULT;
 --EndNoTest
 
 CREATE TABLE `TissueOrigin` (
@@ -327,5 +329,18 @@ CREATE TABLE `LibraryAdditionalInfo` (
   CONSTRAINT `libraryAdditionalInfo_library_fkey` FOREIGN KEY (`libraryId`) REFERENCES `Library` (`libraryId`),
   CONSTRAINT `libraryAdditionalInfo_createUser_fkey` FOREIGN KEY (`createdBy`) REFERENCES `User` (`userId`),
   CONSTRAINT `libraryAdditionalInfo_updateUser_fkey` FOREIGN KEY (`updatedBy`) REFERENCES `User` (`userId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `LibraryPropagationRule` (
+  `libraryPropagationRuleId` bigint(20) PRIMARY KEY AUTO_INCREMENT,
+  `name` text NOT NULL,
+  `sampleClassId` bigint(20) NOT NULL,
+  `platformName` varchar(255) DEFAULT NULL,
+  `paired` boolean DEFAULT NULL,
+  `librarySelectionType` bigint(20) DEFAULT NULL,
+  `libraryStrategyType` bigint(20) DEFAULT NULL,
+  CONSTRAINT `FK_lpr_sampleClassId` FOREIGN KEY (`sampleClassId`) REFERENCES `SampleClass` (`sampleClassId`),
+  CONSTRAINT `FK_lpr_selectiontype` FOREIGN KEY (`librarySelectionType`) REFERENCES `LibrarySelectionType` (`librarySelectionTypeId`),
+  CONSTRAINT `FK_lpr_strategytype` FOREIGN KEY (`libraryStrategyType`) REFERENCES `LibraryStrategyType` (`libraryStrategyTypeId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
