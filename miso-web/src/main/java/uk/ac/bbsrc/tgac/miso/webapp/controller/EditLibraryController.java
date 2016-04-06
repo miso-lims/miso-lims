@@ -62,6 +62,7 @@ import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import net.sf.json.JSONArray;
+import net.sf.json.JsonConfig;
 import net.sf.json.JSONObject;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibraryQC;
@@ -73,6 +74,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCR;
@@ -133,7 +135,7 @@ public class EditLibraryController {
   public void setTagBarcodeStrategyResolverService(TagBarcodeStrategyResolverService tagBarcodeStrategyResolverService) {
     this.tagBarcodeStrategyResolverService = tagBarcodeStrategyResolverService;
   }
-  
+
   public Boolean misoPropertyBoolean(String property) {
     MisoPropertyExporter exporter = (MisoPropertyExporter) ApplicationContextProvider.getApplicationContext().getBean("propertyConfigurer");
     Map<String, String> misoProperties = exporter.getResolvedProperties();
@@ -461,6 +463,7 @@ public class EditLibraryController {
       model.put("poolLibraryMap", poolLibraryMap);
       model.put("libraryPools", pools);
       model.put("libraryRuns", getRunsByLibraryPools(pools));
+      model.put("propagationRulesJSON", "[]");
 
       model.put("owners", LimsSecurityUtils.getPotentialOwners(user, library, securityManager.listAllUsers()));
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, library, securityManager.listAllUsers()));
@@ -497,9 +500,13 @@ public class EditLibraryController {
         throw new SecurityException("Permission denied.");
       }
 
+      SampleClass sampleClass = null;
       if (sampleId != null) {
         Sample sample = requestManager.getSampleById(sampleId);
         model.put("sample", sample);
+        if (sample.getSampleAdditionalInfo() != null) {
+          sampleClass = sample.getSampleAdditionalInfo().getSampleClass();
+        }
 
         List<Sample> projectSamples = new ArrayList<Sample>(requestManager.listAllSamplesByProjectId(sample.getProject().getProjectId()));
         Collections.sort(projectSamples, new AliasComparator(Sample.class));
@@ -525,6 +532,12 @@ public class EditLibraryController {
           library.inheritPermissions(sample);
         }
       }
+
+      JSONArray array = new JSONArray();
+      JsonConfig config = new JsonConfig();
+      config.setExcludes(new String[] { "sampleClass" });
+      array.addAll(requestManager.listLibraryPropagationRulesByClass(sampleClass), config);
+      model.put("propagationRulesJSON", array.toString());
 
       model.put("formObj", library);
       model.put("library", library);

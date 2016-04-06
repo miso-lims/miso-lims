@@ -52,6 +52,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.EntityGroup;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryPropagationRule;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Plate;
@@ -64,6 +65,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
@@ -1027,7 +1029,7 @@ public class UserAuthMisoRequestManager implements RequestManager {
     }
     return accessibles;
   }
-  
+
   @Override
   public Collection<Sample> getSamplesByIdList(List<Long> idList) throws IOException {
     User user = getCurrentUser();
@@ -1036,8 +1038,8 @@ public class UserAuthMisoRequestManager implements RequestManager {
       if (sample.userCanRead(user)) {
         accessibles.add(sample);
       } else {
-        throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Sample " + sample.getId() +
-            " " + sample.getAlias() + "(" + sample.getName() + ")");
+        throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Sample " + sample.getId() + " "
+            + sample.getAlias() + "(" + sample.getName() + ")");
       }
     }
     return accessibles;
@@ -1632,7 +1634,7 @@ public class UserAuthMisoRequestManager implements RequestManager {
     }
     return accessibles;
   }
-  
+
   @Override
   public Collection<Run> listRunsBySequencerId(Long sequencerReferenceId) throws IOException {
     User user = getCurrentUser();
@@ -1773,7 +1775,7 @@ public class UserAuthMisoRequestManager implements RequestManager {
       backingManager.deleteSequencerReference(sequencerReference);
     }
   }
-  
+
   @Override
   public void deleteSequencerServiceRecord(uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord serviceRecord) throws IOException {
     if (getCurrentUser().isAdmin()) {
@@ -2388,8 +2390,7 @@ public class UserAuthMisoRequestManager implements RequestManager {
   public long saveSequencerServiceRecord(SequencerServiceRecord record) throws IOException {
     if (getCurrentUser().isAdmin()) {
       return backingManager.saveSequencerServiceRecord(record);
-    }
-    else {
+    } else {
       throw new IOException("User " + getCurrentUser().getFullName() + " cannot write to this Service Record");
     }
   }
@@ -2408,12 +2409,12 @@ public class UserAuthMisoRequestManager implements RequestManager {
   public Collection<SequencerServiceRecord> listSequencerServiceRecordsBySequencerId(long referenceId) throws IOException {
     return backingManager.listSequencerServiceRecordsBySequencerId(referenceId);
   }
-  
+
   @Override
   public Map<String, Integer> getServiceRecordColumnSizes() throws IOException {
     return backingManager.getServiceRecordColumnSizes();
   }
-  
+
   @Override
   public Map<String, Integer> getBoxColumnSizes() throws IOException {
     return backingManager.getBoxColumnSizes();
@@ -2482,5 +2483,11 @@ public class UserAuthMisoRequestManager implements RequestManager {
   @Override
   public Map<String, Integer> getGroupColumnSizes() throws IOException {
     return backingManager.getGroupColumnSizes();
+  }
+
+  @Override
+  public Collection<LibraryPropagationRule> listLibraryPropagationRulesByClass(SampleClass sampleClass) throws IOException {
+    if (sampleClass == null) return Collections.emptyList();
+    return backingManager.listLibraryPropagationRulesByClass(sampleClass);
   }
 }

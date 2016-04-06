@@ -244,10 +244,10 @@
   <td>
     <c:choose>
       <c:when test="${library.id != 0}">
-        <form:checkbox path="paired" checked="checked"/>
+        <form:checkbox id="paired" path="paired" checked="checked"/>
       </c:when>
       <c:otherwise>
-        <form:checkbox path="paired"/>
+        <form:checkbox id="paired" path="paired"/>
       </c:otherwise>
     </c:choose>
   </td>
@@ -257,6 +257,9 @@
     <c:when test="${library.id ==0 or empty library.libraryType}">
       <td>Platform - Library Type:</td>
       <td>
+        <div class="parsley-errors-list filled">
+           <li class="parsley-required" style="display: none;" id="propagationRuleError">This combination of selection, strategy, platform, and pairedness is not allowed for this sample.</li>
+        </div>
         <form:select id="platformNames" path="platformName" items="${platformNames}"
                      onchange="Library.ui.changePlatformName(this);"/>
         <form:select id="libraryTypes" path="libraryType"/>
@@ -271,8 +274,11 @@
         or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_TECH')}">
       <td>Platform - Library Type:</td>
       <td>
+        <div class="parsley-errors-list filled">
+           <li class="parsley-required" style="display: none;" id="propagationRuleError">This combination of selection, strategy, platform, and pairedness is not allowed for this sample.</li>
+        </div>
         <form:select id="platformNames" path="platformName" items="${platformNames}"
-                     onchange="Library.ui.changePlatformName(this);"/>
+                     onchange="Library.ui.changePlatformName(this);" class="validateable"/>
         <form:select id="libraryTypes" path="libraryType"/>
       </td>
       <script type="text/javascript">
@@ -1453,6 +1459,7 @@ function submitBulkLibraries() {
 </div>
 
 <script type="text/javascript">
+  Library.propagationRules = ${propagationRulesJSON};
   jQuery(document).ready(function () {
     jQuery('#alias').simplyCountable({
       counter: '#aliasCounter',
