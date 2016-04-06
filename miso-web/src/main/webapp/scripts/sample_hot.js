@@ -793,10 +793,11 @@ Sample.hot = {
     return sample;
   },
   
-  saveOneSample: function (data, index, messages, numberToSave) {
+  saveOneSample: function (data, index, messages, numberToSave, callback) {
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function() {
       if (xhr.readyState === XMLHttpRequest.DONE) {
+    	callback(); // Indicate request has completed.
         xhr.status === 201 ? Sample.hot.successSave(xhr, index, messages, numberToSave) : Sample.hot.failSave(xhr, index, messages, numberToSave);
       }
     };
@@ -817,7 +818,7 @@ Sample.hot = {
     }
     var rowIndex = rowIndex;
     console.log(rowIndex, columnIndex);
-    if (rowIndex !== undefined && columnIndex !== -1) {
+    if (rowIndex !== undefined && columnIndex !== -1 && columnIndex !== undefined) {
       Sample.hot.hotTable.setCellMeta(rowIndex, columnIndex, 'valid', false);
       Sample.hot.hotTable.render();
     }
@@ -914,6 +915,17 @@ Sample.hot = {
         // send it through the parser to get a sampleData array that isn't merely a reference to Sample.hot.hotTable.getSourceData()
         var sampleData = JSON.parse(JSON.parse(JSON.stringify(Sample.hot.hotTable.getSourceData())));
         
+        // Array of save functions, one for each line in the table.
+        var sampleSaveArray = [];
+        
+        // Returns a save function for a single line in the table.
+        function sampleSaveFunction(data, index, messages, numberToSave) {
+        	// The callback is called once the http request in saveOneSample completes.
+        	return function(callback) {
+        		Sample.hot.saveOneSample(data, index, messages, numberToSave, callback);
+        	};
+        }
+        
         // attempt to save each of the objects
         for (var i=0; i<sampleData.length; i++) {
           // skip if it's already been saved
@@ -923,8 +935,9 @@ Sample.hot = {
           }
           
           var newSample = Sample.hot.buildSampleDtosFromData(sampleData[i]);
-          Sample.hot.saveOneSample(JSON.stringify(newSample), i, Sample.hot.messages, sampleData.length);
+          sampleSaveArray.push(sampleSaveFunction(JSON.stringify(newSample), i, Sample.hot.messages, sampleData.length));
         }
+        Sample.hot.serial(sampleSaveArray); // Execute saves serially.
       } else {
         Sample.hot.messages.failed.push("It looks like some cells are not yet valid. Please fix them before saving.");
         Sample.hot.addAnyErrors(Sample.hot.messages);
@@ -932,6 +945,19 @@ Sample.hot = {
         return false;
       }
     });
+  },
+  
+  /**
+   * Serial execution of an array of functions. 
+   * @param {Function[]} aof - Each function takes a single callback function parameter.
+   */
+  serial: function(aof) {
+	  var invokeNext = function(index) {
+		  if(index < (aof.length)) {
+			  aof[index](function() { invokeNext(index + 1);} );
+		  }
+	  }  
+	  invokeNext(0);
   },
   
   savePlainData: function () {
