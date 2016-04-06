@@ -940,6 +940,7 @@ Library.ui = {
           jQuery('#listingLibrariesTable').dataTable({
             "aaData": json.array,
             "aoColumns": [
+              { "sTitle": "Bulk Edit" },
               { "sTitle": "Library Name", "sType": "no-lib"},
               { "sTitle": "Alias"},
               { "sTitle": "Type"},
@@ -951,11 +952,105 @@ Library.ui = {
             "bAutoWidth": false,
             "iDisplayLength": 25,
             "aaSorting": [
-              [0, "desc"]
+              [1, "desc"]
             ]
           });
+          jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
+          jQuery("#toolbar").append("<button style=\"margin-left:5px;\" onclick=\"window.location.href='/miso/sample/new';\" class=\"fg-button ui-state-default ui-corner-all\">Add Sample</button>");
+          
+          jQuery("input[class='bulkCheckbox']").click(function () {
+            if (jQuery(this).parent().parent().hasClass('row_selected')) {
+              jQuery(this).parent().parent().removeClass('row_selected');
+            } else if (!jQuery(this).parent().parent().hasClass('row_selected')) {
+              jQuery(this).parent().parent().addClass('row_selected');
+            }
+          });
+          
+          var selectAll = '<label><input type="checkbox" onchange="Library.ui.checkAll(this)" id="checkAll">Select All</label>';
+          document.getElementById('listingLibrariesTable').insertAdjacentHTML('beforebegin', selectAll);
+          
+          var actions = ['<select class="dropdownActions" onchange="Library.ui.handleBulkAction(this)"><option value="">-- Bulk actions</option>'];
+          actions.push('<option value="update">Update selected</option>');
+          actions.push('<option value="dilutions">Make dilutions from selected</option>');
+          actions.push('<option value="empty">Empty selected</option>');
+          actions.push('<option value="archive">Archive selected</option>');
+          actions.push('</select>');
+          document.getElementById('listingLibrariesTable').insertAdjacentHTML('beforebegin', actions.join(''));
+          document.getElementById('listingLibrariesTable').insertAdjacentHTML('afterend', actions.join(''));
         }
       }
     );
+  },
+  
+  checkAll: function (el) {
+    var checkboxes = document.getElementsByClassName('bulkCheckbox');
+    if (el.checked) {
+      for (var i = 0; i < checkboxes.length; i++) {
+        checkboxes[i].checked = true;
+      }
+    } else {
+      for (var i = 0; i < checkboxes.length; i++) {
+        checkboxes[i].checked = false;
+      }
+    }
+  },
+  
+  handleBulkAction: function (el) {
+    var selectedValue = el.options[el.selectedIndex].value;
+    var options = {
+      "update": Library.ui.updateSelectedItems,
+      "dilutions": Library.ui.makeDilutionsFromSelectedItems,
+      "empty": Library.ui.emptySelectedItems,
+      "archive": Library.ui.archiveSelectedItems
+    }
+    var action = options[selectedValue];
+    action();
+  },
+  
+  // get array of selected IDs
+  getSelectedIds: function () {
+    return [].slice.call(document.getElementsByClassName('bulkCheckbox'))
+             .filter(function (input) { return input.checked; })
+             .map(function (input) { return input.value; });
+  },
+  
+  updateSelectedItems: function () {
+    var selectedIdsArray = Library.ui.getSelectedIds();
+    if (selectedIdsArray.length === 0) {
+      alert("Please select one or more Libraries to update.");
+      return false;
+    }
+    alert("Check if controller methods have been implemented.");
+    // window.location = "library/bulk/edit/" + selectedIdsArray.join(',');
+  },
+  
+  // TODO: finish this, and the one in sample_ajax.js
+  makeDilutionsFromSelectedItems: function () {
+    var selectedIdsArray = Library.ui.getSelectedIds();
+    if (selectedIdsArray.length === 0) {
+      alert("Please select one or more Libraries to dilute.");
+      return false;
+    }
+    alert("Finish methods to actually make the table and page.");
+  },
+  
+  // TODO: finish this, and the one in sample_ajax.js
+  emptySelectedItems: function () {
+    var selectedIdsArray = Library.ui.getSelectedIds();
+    if (selectedIdsArray.length === 0) {
+      alert("Please select one or more Libraries to empty.");
+      return false;
+    }
+    alert("Finish method to bulk empty libraries.");
+  },
+  
+  //TODO: finish this, and the one in sample_ajax.js
+  archiveSelectedItems: function () {
+    var selectedIdsArray = Library.ui.getSelectedIds();
+    if (selectedIdsArray.length === 0) {
+      alert("Please select one or more Libraries to archive.");
+      return false;
+    }
+    alert("Finish method to bulk archive libraries.");
   }
 };

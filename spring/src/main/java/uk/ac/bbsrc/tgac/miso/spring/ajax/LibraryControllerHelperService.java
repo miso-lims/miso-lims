@@ -1224,6 +1224,7 @@ public class LibraryControllerHelperService {
         if (library.getQcPassed() != null) {
           qcpassed = library.getQcPassed().toString();
         }
+        inner.add("<input type=\"checkbox\" value=\"" + library.getId() + "\" class=\"bulkCheckbox\" id=\"bulk_" + library.getId() + "\">");
         inner.add(TableHelper.hyperLinkify("/miso/library/" + library.getId(), library.getName()));
         inner.add(TableHelper.hyperLinkify("/miso/library/" + library.getId(), library.getAlias()));
         inner.add(library.getLibraryType().getDescription());
