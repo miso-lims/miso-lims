@@ -934,26 +934,27 @@ Library.ui = {
       {
         'url': ajaxurl
       },
-      {'doOnSuccess': function (json) {
-        jQuery('#listingLibrariesTable').html('');
-        jQuery('#listingLibrariesTable').dataTable({
-          "aaData": json.array,
-          "aoColumns": [
-            { "sTitle": "Library Name", "sType": "no-lib"},
-            { "sTitle": "Alias"},
-            { "sTitle": "Type"},
-            { "sTitle": "Sample Name", "sType": "no-sam"},
-            { "sTitle": "QC Passed"},
-            { "sTitle": "ID", "bVisible": false}
-          ],
-          "bJQueryUI": true,
-          "bAutoWidth": false,
-          "iDisplayLength": 25,
-          "aaSorting": [
-            [0, "desc"]
-          ]
-        });
-      }
+      {
+        'doOnSuccess': function (json) {
+          jQuery('#listingLibrariesTable').html('');
+          jQuery('#listingLibrariesTable').dataTable({
+            "aaData": json.array,
+            "aoColumns": [
+              { "sTitle": "Library Name", "sType": "no-lib"},
+              { "sTitle": "Alias"},
+              { "sTitle": "Type"},
+              { "sTitle": "Sample Name", "sType": "no-sam"},
+              { "sTitle": "QC Passed"},
+              { "sTitle": "ID", "bVisible": false}
+            ],
+            "bJQueryUI": true,
+            "bAutoWidth": false,
+            "iDisplayLength": 25,
+            "aaSorting": [
+              [0, "desc"]
+            ]
+          });
+        }
       }
     );
   }
