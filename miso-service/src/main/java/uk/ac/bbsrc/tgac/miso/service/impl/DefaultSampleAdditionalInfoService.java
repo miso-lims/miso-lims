@@ -128,7 +128,6 @@ public class DefaultSampleAdditionalInfoService implements SampleAdditionalInfoS
     target.setTubeNumber(source.getTubeNumber());
     target.setConcentration(source.getConcentration());
     target.setArchived(source.getArchived());
-    target.setStrStatus(source.getStrStatus());
     target.setExternalInstituteIdentifier(source.getExternalInstituteIdentifier());
     loadMembers(target, source);
   }

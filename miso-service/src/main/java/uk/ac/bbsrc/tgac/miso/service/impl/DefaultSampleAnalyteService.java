@@ -145,6 +145,7 @@ public class DefaultSampleAnalyteService implements SampleAnalyteService {
     target.setTubeId(source.getTubeId());
     target.setStockNumber(source.getStockNumber());
     target.setAliquotNumber(source.getAliquotNumber());
+    target.setStrStatus(source.getStrStatus());
     loadMembers(target, source);
   }
 

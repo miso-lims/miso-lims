@@ -19,6 +19,7 @@ public class SampleAnalyteDto {
   private String tubeId;
   private Integer stockNumber;
   private Integer aliquotNumber;
+  private String strStatus;
 
   private Long createdById;
   private String createdByUrl;
@@ -177,6 +178,14 @@ public class SampleAnalyteDto {
 
   public void setTissueMaterialId(Long tissueMaterialId) {
     this.tissueMaterialId = tissueMaterialId;
+  }
+
+  public String getStrStatus() {
+    return strStatus;
+  }
+
+  public void setStrStatus(String strStatus) {
+    this.strStatus = strStatus;
   }
 
 }

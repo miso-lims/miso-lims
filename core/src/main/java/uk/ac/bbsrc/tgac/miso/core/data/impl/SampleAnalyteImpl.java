@@ -4,6 +4,8 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.MapsId;
@@ -41,6 +43,9 @@ public class SampleAnalyteImpl implements SampleAnalyte {
   @OneToOne(targetEntity = TissueMaterialImpl.class)
   @JoinColumn(name = "tissueMaterialId")
   private TissueMaterial tissueMaterial;
+
+  @Enumerated(EnumType.STRING)
+  private StrStatus strStatus = StrStatus.NOT_SUBMITTED;
 
   private String region;
   private String tubeId;
@@ -190,13 +195,31 @@ public class SampleAnalyteImpl implements SampleAnalyte {
   public void setLastUpdated(Date lastUpdated) {
     this.lastUpdated = lastUpdated;
   }
+  
+  @Override
+  public StrStatus getStrStatus() {
+    return strStatus;
+  }
+  
+  @Override
+  public void setStrStatus(StrStatus strStatus) {
+    this.strStatus = strStatus;
+  }
+  
+  @Override
+  public void setStrStatus(String strStatus) {
+    this.strStatus = StrStatus.get(strStatus);
+  }
 
   @Override
   public String toString() {
-    return "SampleAnalyteImpl [sampleAnalyteId=" + sampleId + ", sample=" + sample + ", samplePurpose=" + samplePurpose
-        + ", sampleGroup=" + sampleGroup + ", tissueMaterial=" + tissueMaterial + ", region=" + region + ", tubeId=" + tubeId
-        + ", stockNumber=" + stockNumber + ", aliquotNumber=" + aliquotNumber + ", createdBy=" + createdBy + ", creationDate="
-        + creationDate + ", updatedBy=" + updatedBy + ", lastUpdated=" + lastUpdated + "]";
+    return "SampleAnalyteImpl [sampleId=" + sampleId + ", sample=" + sample
+        + ", samplePurpose=" + samplePurpose + ", sampleGroup=" + sampleGroup
+        + ", tissueMaterial=" + tissueMaterial + ", strStatus=" + strStatus
+        + ", region=" + region + ", tubeId=" + tubeId + ", stockNumber="
+        + stockNumber + ", aliquotNumber=" + aliquotNumber + ", createdBy="
+        + createdBy + ", creationDate=" + creationDate + ", updatedBy="
+        + updatedBy + ", lastUpdated=" + lastUpdated + "]";
   }
 
 }
