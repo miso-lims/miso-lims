@@ -39,6 +39,7 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -583,7 +584,9 @@ public class EditLibraryController {
       for (int i = 0; i < split.length; i++) {
         idList.add(Long.parseLong(split[i]));
       }
-      model.put("libraries", requestManager.getLibrariesByIdList(idList));
+      ObjectMapper mapper = new ObjectMapper();
+      Collection<Library> libraries = requestManager.getLibrariesByIdList(idList);
+      model.put("libraries", mapper.writer().writeValueAsString(libraries));
       return new ModelAndView("/pages/bulkEditLibraries.jsp", model);
     } catch (IOException ex) {
       if (log.isDebugEnabled()) {
