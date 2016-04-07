@@ -779,13 +779,13 @@ Sample.ui = {
             "iDisplayLength": 25,
             "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>',
             "aaSorting": [
-              [0, "desc"]
+              [1, "desc"]
             ]
           });
           jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
           jQuery("#toolbar").append("<button style=\"margin-left:5px;\" onclick=\"window.location.href='/miso/sample/new';\" class=\"fg-button ui-state-default ui-corner-all\">Add Sample</button>");
   
-          jQuery("input[name='bulkCheckbox']").click(function () {
+          jQuery("input[class='bulkCheckbox']").click(function () {
             if (jQuery(this).parent().parent().hasClass('row_selected')) {
               jQuery(this).parent().parent().removeClass('row_selected');
             } else if (!jQuery(this).parent().parent().hasClass('row_selected')) {
@@ -793,20 +793,45 @@ Sample.ui = {
             }
           });
   
-          var editButton = "<button id=\"editBtn\" class=\"fg-button ui-state-default ui-corner-all\" onclick=\"Sample.ui.bulkEditSelectedItems()\">Bulk Edit</button>"
-          jQuery("#listingSamplesTable").append(editButton);
+          var selectAll = '<label><input type="checkbox" onchange="Sample.ui.checkAll(this)" id="checkAll">Select All</label>';
+          document.getElementById('listingSamplesTable').insertAdjacentHTML('beforebegin', selectAll);
+          
+          var actions = ['<select class="dropdownActions" onchange="Sample.ui.handleBulkAction(this)"><option value="">-- Bulk actions</option>'];
+          actions.push('<option value="update">Update selected</option>');
+          actions.push('<option value="propagate">Propagate selected</option>');
+          actions.push('<option value="empty">Empty selected</option>');
+          actions.push('<option value="archive">Archive selected</option>');
+          actions.push('</select>');
+          document.getElementById('listingSamplesTable').insertAdjacentHTML('beforebegin', actions.join(''));
+          document.getElementById('listingSamplesTable').insertAdjacentHTML('afterend', actions.join(''));
         }
       }
     );
   },
   
-  bulkEditSelectedItems: function () {
-    var selectedIdsArray = Sample.ui.getSelectedIds();
-    if (selectedIdsArray.length === 0) {
-      alert("Please select one or more Samples to bulk edit.");
-      return false;
+  checkAll: function (el) {
+    var checkboxes = document.getElementsByClassName('bulkCheckbox');
+    if (el.checked) {
+      for (var i = 0; i < checkboxes.length; i++) {
+        checkboxes[i].checked = true;
+      }
+    } else {
+      for (var i = 0; i < checkboxes.length; i++) {
+        checkboxes[i].checked = false;
+      }
     }
-    window.location="sample/bulk/edit/" + selectedIdsArray.join(',');
+  },
+  
+  handleBulkAction: function (el) {
+    var selectedValue = el.options[el.selectedIndex].value;
+    var options = {
+      "update": Sample.ui.updateSelectedItems,
+      "propagate": Sample.ui.propagateSelectedItems,
+      "empty": Sample.ui.emptySelectedItems,
+      "archive": Sample.ui.archiveSelectedItems
+    }
+    var action = options[selectedValue];
+    action();
   },
   
   // get array of selected IDs
@@ -814,5 +839,44 @@ Sample.ui = {
     return [].slice.call(document.getElementsByClassName('bulkCheckbox'))
              .filter(function (input) { return input.checked; })
              .map(function (input) { return input.value; });
+  },
+  
+  updateSelectedItems: function () {
+    var selectedIdsArray = Sample.ui.getSelectedIds();
+    if (selectedIdsArray.length === 0) {
+      alert("Please select one or more Samples to update.");
+      return false;
+    }
+    window.location="sample/bulk/edit/" + selectedIdsArray.join(',');
+  },
+  
+  //TODO: finish this, and the one in library_ajax.js
+  propagateSelectedItems: function () {
+    var selectedIdsArray = Sample.ui.getSelectedIds();
+    if (selectedIdsArray.length === 0) {
+      alert("Please select one or more Samples to propagate.");
+      return false;
+    }
+    alert("Finish methods to check which samples or libraries this group can propagate, and then actually make the table.");
+  },
+  
+  // TODO: finish this, and the one in library_ajax.js
+  emptySelectedItems: function () {
+    var selectedIdsArray = Sample.ui.getSelectedIds();
+    if (selectedIdsArray.length === 0) {
+      alert("Please select one or more Samples to empty.");
+      return false;
+    }
+    alert("Finish method to bulk empty Samples.");
+  },
+  
+  //TODO: finish this, and the one in library_ajax.js
+  archiveSelectedItems: function () {
+    var selectedIdsArray = Sample.ui.getSelectedIds();
+    if (selectedIdsArray.length === 0) {
+      alert("Please select one or more Samples to archive.");
+      return false;
+    }
+    alert("Finish method to bulk archive samples.");
   }
 };
