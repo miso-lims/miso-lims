@@ -286,10 +286,6 @@ public interface Sample
    */
   void setQCs(Collection<SampleQC> qcs);
 
-  Date getLastUpdated();
-
-  void setLastUpdated(Date lastUpdated);
-
   public User getLastModifier();
 
   public void setLastModifier(User user);

@@ -172,7 +172,6 @@ public class DefaultSampleService implements SampleService {
     User user = authorizationManager.getCurrentUser();
     Date now = new Date();
     sample.setLastModifier(user);
-    sample.setLastUpdated(now);
     if (sample.getSampleAdditionalInfo() != null) {
       if (setCreated) {
         sample.getSampleAdditionalInfo().setCreatedBy(user);
