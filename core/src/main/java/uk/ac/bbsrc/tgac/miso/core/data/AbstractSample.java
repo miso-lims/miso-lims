@@ -123,9 +123,6 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   private String alias;
   private Long securityProfile_profileId;
 
-  @Transient
-  private Date lastUpdated;
-
   @OneToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "lastModifier", nullable = false)
   private User lastModifier;
@@ -368,16 +365,6 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @Override
   public Collection<ChangeLog> getChangeLog() {
     return changeLog;
-  }
-
-  @Override
-  public Date getLastUpdated() {
-    return lastUpdated;
-  }
-
-  @Override
-  public void setLastUpdated(Date lastUpdated) {
-    this.lastUpdated = lastUpdated;
   }
 
   @Override
