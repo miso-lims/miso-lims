@@ -55,16 +55,9 @@
   
   <script type="text/javascript">
     jQuery(document).ready(function () {
-      // do stuff here
+      Library.librariesJSON = ${libraries};
     });
   </script>
-  
-  <div>
-    <c:forEach items="${libraries}" var="library">
-        <h2>${library.name}</h2>
-        <p>id: ${library.id}</p>
-    </c:forEach>
-  </div>
 
 </div>
 </div>

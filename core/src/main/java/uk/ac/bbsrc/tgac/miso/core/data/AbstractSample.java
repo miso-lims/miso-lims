@@ -43,6 +43,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 
+import org.codehaus.jackson.annotate.JsonBackReference;
+import org.codehaus.jackson.annotate.JsonManagedReference;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.slf4j.Logger;
@@ -90,6 +92,7 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   private final Collection<Experiment> experiments = new HashSet<Experiment>();
 
   @Transient
+  @JsonManagedReference
   private final Collection<Library> libraries = new HashSet<Library>();
 
   @Transient
@@ -146,10 +149,12 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @ManyToOne(targetEntity = SampleImpl.class)
   @JoinColumn(name = "parentId")
   @Cascade({ CascadeType.SAVE_UPDATE })
+  @JsonBackReference
   private Sample parent;
 
   @OneToMany(targetEntity = SampleImpl.class, fetch = FetchType.LAZY, mappedBy = "parent")
   @Cascade({ CascadeType.SAVE_UPDATE })
+  @JsonManagedReference
   private Set<Sample> children = new HashSet<Sample>();
 
   @Override

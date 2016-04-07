@@ -39,6 +39,7 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 
+import org.codehaus.jackson.annotate.JsonBackReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,6 +103,7 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   private SecurityProfile securityProfile;
   
   @Transient
+  @JsonBackReference
   private Sample sample;
   
   @Transient
