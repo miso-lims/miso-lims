@@ -587,6 +587,15 @@ public class MisoRequestManager implements RequestManager {
       throw new IOException("No libraryQcStore available. Check that it has been declared in the Spring config.");
     }
   }
+  
+  @Override
+  public Collection<Library> getLibrariesByIdList(List<Long> idList) throws IOException {
+    if (libraryStore != null) {
+      return libraryStore.getByIdList(idList);
+    } else {
+      throw new IOException("No libraryStore available. Check that it has been declared in the Spring config.");
+    }
+  }
 
   @Override
   public Collection<Boxable> getBoxablesFromBarcodeList(List<String> barcodeList) throws IOException {
