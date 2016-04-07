@@ -1114,6 +1114,21 @@ public class UserAuthMisoRequestManager implements RequestManager {
     }
     return accessibles;
   }
+  
+  @Override
+  public Collection<Library> getLibrariesByIdList(List<Long> idList) throws IOException {
+    User user = getCurrentUser();
+    Collection<Library> accessibles = new HashSet<>();
+    for (Library library : backingManager.getLibrariesByIdList(idList)) {
+      if (library.userCanRead(user)) {
+        accessibles.add(library);
+      } else {
+        throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Library " + library.getId()
+            + " " + library.getAlias() + "(" + library.getName() + ")");
+      }
+    }
+    return accessibles;
+  }
 
   @Override
   public Collection<LibraryQC> listAllLibraryQCsByLibraryId(long libraryId) throws IOException {
