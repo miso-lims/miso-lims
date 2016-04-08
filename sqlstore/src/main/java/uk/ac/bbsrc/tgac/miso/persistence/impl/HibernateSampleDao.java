@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.persistence.CascadeType;
@@ -143,9 +145,11 @@ public class HibernateSampleDao implements SampleDao, SampleStore {
 
   @VisibleForTesting
   void updateParentSampleNameIfRequired(Sample child) throws MisoNamingException, IOException {
-    if (hasTemporaryName(child.getParent()) && child.getParent().getId() > Sample.UNSAVED_ID) {
-      String name = namingScheme.generateNameFor("name", child.getParent());
-      child.getParent().setName(name);
+    if (child.getSampleAdditionalInfo() != null
+        && hasTemporaryName(child.getParent())
+        && child.getParent().getId() > Sample.UNSAVED_ID) {
+      String name = namingScheme.generateNameFor("name", child.getSampleAdditionalInfo().getParent());
+      child.getSampleAdditionalInfo().getParent().setName(name);
     }
   }
 
@@ -196,6 +200,10 @@ public class HibernateSampleDao implements SampleDao, SampleStore {
 
     sample.getChangeLog().clear();
     sample.getChangeLog().addAll(changeLogDao.listAllById("Sample", sample.getId()));
+    
+    if (sample.getSampleAdditionalInfo() != null) {
+      sample.getSampleAdditionalInfo().setChildren(listByParentId(sample.getId()));
+    }
 
     return sample;
   }
@@ -399,6 +407,18 @@ public class HibernateSampleDao implements SampleDao, SampleStore {
     @SuppressWarnings("unchecked")
     List<Sample> records = query.list();
     return fetchSqlStore(records);
+  }
+  
+  private Set<Sample> listByParentId(long parentId) {
+    Query query = currentSession().createQuery(
+        "select s from SampleImpl s "
+        + "join s.sampleAdditionalInfo sai "
+        + "join sai.parent p "
+        + "where p.sampleId = :id");
+    query.setLong("id", parentId);
+    @SuppressWarnings("unchecked")
+    List<Sample> samples = query.list();
+    return new HashSet<Sample>(samples);
   }
 
   /**

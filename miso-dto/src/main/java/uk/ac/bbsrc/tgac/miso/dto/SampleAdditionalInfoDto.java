@@ -8,6 +8,8 @@ public class SampleAdditionalInfoDto {
   private Long sampleId;
   private String url;
   private String sampleUrl;
+  private Long parentId;
+  private String parentUrl;
   private Long sampleClassId;
   private String sampleClassUrl;
   private Long tissueOriginId;
@@ -56,6 +58,22 @@ public class SampleAdditionalInfoDto {
 
   public void setSampleUrl(String sampleUrl) {
     this.sampleUrl = sampleUrl;
+  }
+
+  public Long getParentId() {
+    return parentId;
+  }
+  
+  public void setParentId(Long parentId) {
+    this.parentId = parentId;
+  }
+
+  public String getParentUrl() {
+    return parentUrl;
+  }
+
+  public void setParentUrl(String parentUrl) {
+    this.parentUrl = parentUrl;
   }
 
   public Long getTissueOriginId() {

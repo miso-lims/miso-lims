@@ -1,23 +1,34 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.util.Date;
+import java.util.Set;
 
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import org.codehaus.jackson.annotate.JsonBackReference;
+import org.codehaus.jackson.annotate.JsonIgnore;
 
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 
-@JsonIgnoreProperties({ "sample" })
 public interface SampleAdditionalInfo {
 
   Long getSampleId();
 
   void setSampleId(Long sampleAdditionalInfoId);
 
+  @JsonBackReference
   Sample getSample();
 
   void setSample(Sample sample);
+  
+  public Sample getParent();
+  
+  public void setParent(Sample parent);
+  
+  public Set<Sample> getChildren();
+  
+  @JsonIgnore
+  public void setChildren(Set<Sample> children);
 
   SampleClass getSampleClass();
 

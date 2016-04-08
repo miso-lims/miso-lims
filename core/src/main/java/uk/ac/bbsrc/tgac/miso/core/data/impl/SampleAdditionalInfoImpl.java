@@ -1,11 +1,15 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.MapsId;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -34,6 +38,13 @@ public class SampleAdditionalInfoImpl implements SampleAdditionalInfo {
   @JoinColumn(name = "sampleId", nullable = false)
   @MapsId
   private Sample sample;
+  
+  @ManyToOne(optional = true, targetEntity = SampleImpl.class, cascade = CascadeType.ALL)
+  @JoinColumn(name = "parentId", nullable = true)
+  private Sample parent;
+
+  @Transient
+  private Set<Sample> children = new HashSet<>();
 
   @OneToOne(targetEntity = SampleClassImpl.class)
   @JoinColumn(name = "sampleClassId", nullable = false)
@@ -109,6 +120,26 @@ public class SampleAdditionalInfoImpl implements SampleAdditionalInfo {
   @Override
   public void setSample(Sample sample) {
     this.sample = sample;
+  }
+
+  @Override
+  public Sample getParent() {
+    return parent;
+  }
+
+  @Override
+  public void setParent(Sample parent) {
+    this.parent = parent;
+  }
+  
+  @Override
+  public Set<Sample> getChildren() {
+    return children;
+  }
+  
+  @Override
+  public void setChildren(Set<Sample> children) {
+    this.children = children;
   }
 
   @Override

@@ -80,9 +80,9 @@ public class SampleController extends RestController {
   private static SampleDto writeUrls(SampleDto sampleDto, UriComponentsBuilder uriBuilder) {
     URI baseUri = uriBuilder.build().toUri();
     sampleDto.setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/tree/sample/{id}").buildAndExpand(sampleDto.getId()).toUriString());
-    if (sampleDto.getParentId() != null) {
-      sampleDto.setParentUrl(
-          UriComponentsBuilder.fromUri(baseUri).path("/rest/tree/sample/{id}").buildAndExpand(sampleDto.getParentId()).toUriString());
+    if (sampleDto.getSampleAdditionalInfo() != null && sampleDto.getSampleAdditionalInfo().getParentId() != null) {
+      sampleDto.getSampleAdditionalInfo().setParentUrl(
+          UriComponentsBuilder.fromUri(baseUri).path("/rest/tree/sample/{id}").buildAndExpand(sampleDto.getSampleAdditionalInfo().getParentId()).toUriString());
     }
     if (sampleDto.getRootSampleClassId() != null) {
       sampleDto.setRootSampleClassUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/sampleclass/{id}")

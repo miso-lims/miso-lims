@@ -198,19 +198,19 @@ VALUES (1,NULL,'SAM1','Inherited from TEST_0001',1,'SAM1::TEST_0001_Bn_P_nn_1-1_
 (13,NULL,'SAM13','Inherited from TEST_0007',1,'SAM13::TEST_0007_Bn_P_nn_1-1_D_1','Freezer1_13','GENOMIC','2015-01-27','true','TEST_0007_Bn_P_nn_1-1_D_1',1,'Homo sapiens',NULL,1),
 (14,NULL,'SAM14','Inherited from TEST_0007',1,'SAM14::TEST_0007_Bn_R_nn_1-1_D_1','Freezer1_14','GENOMIC','2015-01-27','true','TEST_0007_Bn_R_nn_1-1_D_1',1,'Homo sapiens',NULL,1);
 
-INSERT INTO `Sample`(`sampleId`, `accession`, `name`, `description`, `securityProfile_profileId`, `identificationBarcode`, `locationBarcode`, `sampleType`, `receivedDate`, `qcPassed`, `alias`, `project_projectId`, `scientificName`, `taxonIdentifier`, `lastModifier`,`parentId`) 
-VALUES (15,NULL,'SAM15','identity1',1,'SAM15::TEST_0001_IDENTITY_1','Freezer1_1','GENOMIC','2016-04-05','true','TEST_0001_IDENTITY_1',1,'Homo sapiens',NULL,1,NULL),
-(16,NULL,'SAM16','tissue1',1,'SAM16::TEST_0001_TISSUE_1','Freezer1_1','GENOMIC','2016-04-05','true','TEST_0001_TISSUE_1',1,'Homo sapiens',NULL,1,15),
-(17,NULL,'SAM17','tissue2',1,'SAM17::TEST_0001_TISSUE_2','Freezer1_1','GENOMIC','2016-04-05','true','TEST_0001_TISSUE_2',1,'Homo sapiens',NULL,1,15);
+INSERT INTO `Sample`(`sampleId`, `accession`, `name`, `description`, `securityProfile_profileId`, `identificationBarcode`, `locationBarcode`, `sampleType`, `receivedDate`, `qcPassed`, `alias`, `project_projectId`, `scientificName`, `taxonIdentifier`, `lastModifier`) 
+VALUES (15,NULL,'SAM15','identity1',1,'SAM15::TEST_0001_IDENTITY_1','Freezer1_1','GENOMIC','2016-04-05','true','TEST_0001_IDENTITY_1',1,'Homo sapiens',NULL,1),
+(16,NULL,'SAM16','tissue1',1,'SAM16::TEST_0001_TISSUE_1','Freezer1_1','GENOMIC','2016-04-05','true','TEST_0001_TISSUE_1',1,'Homo sapiens',NULL,1),
+(17,NULL,'SAM17','tissue2',1,'SAM17::TEST_0001_TISSUE_2','Freezer1_1','GENOMIC','2016-04-05','true','TEST_0001_TISSUE_2',1,'Homo sapiens',NULL,1);
 
 INSERT INTO `SampleClass`(`sampleClassId`, `alias`, `sampleCategory`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
 VALUES (1,'Identity','Identity',1,'2016-04-05 14:57:00',1,'2016-04-05 14:57:00'),
 (2,'Primary Tumor Tissue','Tissue',1,'2016-04-05 14:57:00',1,'2016-04-05 14:57:00');
 
-INSERT INTO `SampleAdditionalInfo`(`sampleId`, `sampleClassId`, `archived`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
-VALUES (15,1,0,1,'2016-04-05 14:57:00',1,'2016-04-05 14:57:00'),
-(16,2,0,1,'2016-04-05 14:57:00',1,'2016-04-05 14:57:00'),
-(17,2,0,1,'2016-04-05 14:57:00',1,'2016-04-05 14:57:00');
+INSERT INTO `SampleAdditionalInfo`(`sampleId`, `sampleClassId`, `archived`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`, `parentId`)
+VALUES (15,1,0,1,'2016-04-05 14:57:00',1,'2016-04-05 14:57:00',NULL),
+(16,2,0,1,'2016-04-05 14:57:00',1,'2016-04-05 14:57:00',15),
+(17,2,0,1,'2016-04-05 14:57:00',1,'2016-04-05 14:57:00',15);
 
 INSERT INTO `Identity`(`sampleId`, `internalName`, `externalName`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
 VALUES (15,'INT1','EXT1',1,'2016-04-05 14:57:00',1,'2016-04-05 14:57:00');
