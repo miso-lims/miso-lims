@@ -219,6 +219,9 @@ public class Dtos {
     if (from.getPrepKit() != null) {
       dto.setPrepKitId(from.getPrepKit().getKitDescriptorId());
     }
+    if (from.getParent() != null) {
+      dto.setParentId(from.getParent().getId());
+    }
     dto.setPassageNumber(from.getPassageNumber());
     dto.setTimesReceived(from.getTimesReceived());
     dto.setConcentration(from.getConcentration());
@@ -470,9 +473,6 @@ public class Dtos {
     }
     if (from.getSampleTissue() != null) {
       dto.setSampleTissue(asDto(from.getSampleTissue()));
-    }
-    if (from.getParent() != null) {
-      dto.setParentId(from.getParent().getId());
     }
     dto.setVolume(from.getVolume());
 

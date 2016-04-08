@@ -21,6 +21,7 @@ import com.eaglegenomics.simlims.core.store.SecurityStore;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAdditionalInfoImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.DefaultSampleNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
@@ -63,6 +64,7 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
   @Test
   public void parentNameNotModifiedWhenParentNullTest() throws Exception {
     Sample sample = new SampleImpl();
+    sample.setSampleAdditionalInfo(new SampleAdditionalInfoImpl());
     sut.updateParentSampleNameIfRequired(sample);
     assertNull("Null parent will remain null. No need to udate sample name.", sample.getParent());
   }
@@ -71,7 +73,8 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
   public void parentNameNotModifiedWhenParentNameNotTemporaryTest() throws Exception {
     Sample sample = new SampleImpl();
     Sample parent = new SampleImpl();
-    sample.setParent(parent);
+    sample.setSampleAdditionalInfo(new SampleAdditionalInfoImpl());
+    sample.getSampleAdditionalInfo().setParent(parent);
     String nonTemporaryName = "RealSampleName";
     parent.setName(nonTemporaryName);
     sut.updateParentSampleNameIfRequired(sample);
@@ -82,7 +85,8 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
   public void parentNameNotModifiedWhenParentIdNotSetTest() throws Exception {
     Sample sample = new SampleImpl();
     Sample parent = new SampleImpl();
-    sample.setParent(parent);
+    sample.setSampleAdditionalInfo(new SampleAdditionalInfoImpl());
+    sample.getSampleAdditionalInfo().setParent(parent);
     String temporaryName = HibernateSampleDao.generateTemporaryName();
     parent.setName(temporaryName);
     parent.setId(Sample.UNSAVED_ID);
@@ -94,7 +98,8 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
   public void parentNameModifiedTest() throws Exception {
     Sample sample = new SampleImpl();
     Sample parent = new SampleImpl();
-    sample.setParent(parent);
+    sample.setSampleAdditionalInfo(new SampleAdditionalInfoImpl());
+    sample.getSampleAdditionalInfo().setParent(parent);
     String temporaryName = HibernateSampleDao.generateTemporaryName();
     parent.setName(temporaryName);
     parent.setId(42);
@@ -135,6 +140,18 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
     Sample sample = sut.get(15L);
     assertNotNull(sample.getChildren());
     assertEquals(2,sample.getChildren().size());
+    for (@SuppressWarnings("unused") Sample child : sample.getChildren()) {
+      // will throw ClassCastException if children are not correctly loaded as Samples
+    }
+  }
+  
+  @Test
+  public void getSampleWithParentTest() throws Exception {
+    SampleImpl sample = (SampleImpl) sut.get(16L);
+    assertNotNull(sample);
+    assertNotNull(sample.getSampleAdditionalInfo());
+    assertNotNull(sample.getParent());
+    assertEquals(15L, sample.getParent().getId());
   }
 
 }

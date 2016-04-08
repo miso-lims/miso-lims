@@ -110,6 +110,10 @@ public class SampleAdditionalInfoController extends RestController {
       sampleAdditionalInfoDto.setPrepKitUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/kitdescriptor/{id}")
           .buildAndExpand(sampleAdditionalInfoDto.getPrepKitId()).toUriString());
     }
+    if (sampleAdditionalInfoDto.getParentId() != null) {
+      sampleAdditionalInfoDto.setParentUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/sample/{id}")
+          .buildAndExpand(sampleAdditionalInfoDto.getParentId()).toUriString());
+    }
     return sampleAdditionalInfoDto;
   }
 
