@@ -39,6 +39,7 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +48,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -59,6 +61,8 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractPool;
@@ -558,6 +562,37 @@ public class EditLibraryController {
         log.debug("Failed to sort project samples", e);
       }
       throw new IOException(e);
+    }
+  }
+  
+  @RequestMapping(value = "/bulk/", method = RequestMethod.POST, headers = "Accept=application/json")
+  public String getBulkLibraries(@RequestBody JSONObject json) throws IOException {
+    JSONArray ids = JSONArray.fromObject(json.get("ids"));
+    StringBuffer stringBuffer = new StringBuffer();
+    for (int i = 0; i < ids.size(); i++) {
+      if (i > 0) stringBuffer.append(",");
+      stringBuffer.append(ids.getLong(i));
+    }
+    return "redirect:/miso/library/bulk/edit/" + stringBuffer.toString();
+  }
+  
+  @RequestMapping(value = "/bulk/edit/{libraryIds}", method = RequestMethod.GET)
+  public ModelAndView editBulkLibraries(@PathVariable String libraryIds, ModelMap model) throws IOException {
+    try {
+      String[] split = libraryIds.split(",");
+      List<Long> idList = new ArrayList<Long>();
+      for (int i = 0; i < split.length; i++) {
+        idList.add(Long.parseLong(split[i]));
+      }
+      ObjectMapper mapper = new ObjectMapper();
+      Collection<Library> libraries = requestManager.getLibrariesByIdList(idList);
+      model.put("libraries", mapper.writer().writeValueAsString(libraries));
+      return new ModelAndView("/pages/bulkEditLibraries.jsp", model);
+    } catch (IOException ex) {
+      if (log.isDebugEnabled()) {
+        log.error("Failed to get bulk libraries", ex);
+      }
+      throw ex;
     }
   }
 

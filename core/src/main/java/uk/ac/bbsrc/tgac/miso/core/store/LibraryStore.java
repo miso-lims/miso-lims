@@ -99,6 +99,15 @@ public interface LibraryStore extends Store<Library>, Remover<Library>, NamingSc
    *           when
    */
   Collection<Library> listByProjectId(long projectId) throws IOException;
+  
+  /**
+   * List all Libraries associated with ids from the given id list
+   * 
+   * @return Collection<Library>
+   * @throws IOException
+   *            when the objects cannot be retrieved or read
+   */
+  Collection<Library> getByIdList(List<Long> idList) throws IOException;
 
   /**
    * Get a LibraryType given a LibraryType ID

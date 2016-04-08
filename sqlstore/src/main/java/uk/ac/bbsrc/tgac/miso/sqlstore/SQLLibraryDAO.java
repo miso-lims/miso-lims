@@ -26,16 +26,13 @@ package uk.ac.bbsrc.tgac.miso.sqlstore;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 
 import javax.persistence.CascadeType;
-
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,6 +52,9 @@ import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.Property;
 import com.googlecode.ehcache.annotations.TriggersRemove;
 
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -107,6 +107,8 @@ public class SQLLibraryDAO implements LibraryStore {
   public static final String LIBRARIES_SELECT_LIMIT = LIBRARIES_SELECT + " ORDER BY l.libraryId DESC LIMIT ?";
 
   public static final String LIBRARY_SELECT_BY_ID = LIBRARIES_SELECT + " WHERE l.libraryId = ?";
+  
+  public static final String LIBRARY_SELECT_FROM_ID_LIST = LIBRARIES_SELECT + " WHERE l.libraryId in (";
 
   public static final String LIBRARY_SELECT_BY_ALIAS = LIBRARIES_SELECT + " WHERE l.alias = ?";
 
@@ -527,6 +529,20 @@ public class SQLLibraryDAO implements LibraryStore {
     String mySQLQuery = "%" + query.replaceAll("_", Matcher.quoteReplacement("\\_")) + "%";
     return template.query(LIBRARIES_SELECT_BY_SEARCH, new Object[] { mySQLQuery, mySQLQuery, mySQLQuery, mySQLQuery },
         new LibraryMapper(true));
+  }
+  
+  @Override
+  public List<Library> getByIdList(List<Long> idList) throws IOException {
+    StringBuilder queryBuilder = new StringBuilder();
+    queryBuilder.append(LIBRARY_SELECT_FROM_ID_LIST);
+    for (int i=0; i < idList.size(); i++) {
+      if (i != 0) {
+        queryBuilder.append(", ");
+      }
+      queryBuilder.append("?");
+    }
+    queryBuilder.append(")");
+    return template.query(queryBuilder.toString(), new Object[] { idList }, new int[] { Types.BIGINT }, new LibraryMapper(true));
   }
 
   @Override

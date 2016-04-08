@@ -387,6 +387,11 @@ public interface RequestManager {
   public Collection<Library> listAllLibrariesByProjectId(long projectId) throws IOException;
 
   public Collection<Library> listAllLibrariesBySampleId(long sampleId) throws IOException;
+  
+  /**
+   * throws AuthorizationIOException if user cannot read one of the requested libraries
+   */
+  public Collection<Library> getLibrariesByIdList(List<Long> idList) throws IOException;
 
   public Collection<LibraryQC> listAllLibraryQCsByLibraryId(long libraryId) throws IOException;
 
