@@ -23,16 +23,21 @@
 
 package uk.ac.bbsrc.tgac.miso.notification.consumer.service.strategy;
 
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.Message;
 
 import net.sourceforge.fluxion.spi.ServiceProvider;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.InterrogationException;
+import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersCollection;
 import uk.ac.bbsrc.tgac.miso.core.service.integration.strategy.NotificationConsumerStrategy;
 import uk.ac.bbsrc.tgac.miso.notification.consumer.service.mechanism.IlluminaNotificationMessageConsumerMechanism;
 
@@ -48,6 +53,8 @@ import uk.ac.bbsrc.tgac.miso.notification.consumer.service.mechanism.IlluminaNot
 @ServiceProvider
 public class IlluminaNotificationConsumerStrategy implements NotificationConsumerStrategy {
   protected static final Logger log = LoggerFactory.getLogger(IlluminaNotificationConsumerStrategy.class);
+  @Autowired
+  private SequencingParametersCollection parameterSet;
 
   @Override
   public String getName() {
@@ -56,7 +63,15 @@ public class IlluminaNotificationConsumerStrategy implements NotificationConsume
 
   @Override
   public void consume(Message<Map<String, List<String>>> m) throws InterrogationException {
-    new IlluminaNotificationMessageConsumerMechanism().consume(m);
+    IlluminaNotificationMessageConsumerMechanism inmcm = new IlluminaNotificationMessageConsumerMechanism();
+    inmcm.setParameterSet(parameterSet != null ? parameterSet : new SequencingParametersCollection() {
+
+      @Override
+      public Iterator<SequencingParameters> iterator() {
+        return Collections.emptyIterator();
+      }
+    });
+    inmcm.consume(m);
   }
 
   @Override

@@ -96,7 +96,7 @@ import com.googlecode.ehcache.annotations.TriggersRemove;
 public class SQLRunDAO implements RunStore {
   private static final String TABLE_NAME = "Run";
 
-  public static final String RUNS_SELECT = "SELECT runId, name, alias, description, accession, platformRunId, pairedEnd, cycles, filePath, securityProfile_profileId, platformType, status_statusId, sequencerReference_sequencerReferenceId, lastModifier "
+  public static final String RUNS_SELECT = "SELECT runId, name, alias, description, accession, platformRunId, pairedEnd, cycles, filePath, securityProfile_profileId, platformType, status_statusId, sequencerReference_sequencerReferenceId, lastModifier, sequencingParameters_parametersId "
       + "FROM " + TABLE_NAME;
 
   public static final String RUNS_SELECT_LIMIT = RUNS_SELECT + " ORDER BY runId DESC LIMIT ?";
@@ -104,7 +104,7 @@ public class SQLRunDAO implements RunStore {
   public static final String RUN_SELECT_BY_ID = RUNS_SELECT + " WHERE runId = ?";
 
   public static final String RUN_SELECT_BY_ALIAS = RUNS_SELECT + " WHERE alias = ?";
-  
+
   public static final String RUN_SELECT_BY_SEQUENCER_ID = RUNS_SELECT + " WHERE sequencerReference_sequencerReferenceId = ?";
 
   public static final String RUNS_SELECT_BY_SEARCH = RUNS_SELECT + " WHERE name LIKE ? OR alias LIKE ? OR description LIKE ? ";
@@ -112,8 +112,8 @@ public class SQLRunDAO implements RunStore {
   public static final String RUN_UPDATE = "UPDATE " + TABLE_NAME + " "
       + "SET name=:name, alias=:alias, description=:description, accession=:accession, platformRunId=:platformRunId, "
       + "pairedEnd=:pairedEnd, cycles=:cycles, filePath=:filePath, securityProfile_profileId=:securityProfile_profileId, "
-      + "platformType=:platformType, status_statusId=:status_statusId, sequencerReference_sequencerReferenceId=:sequencerReference_sequencerReferenceId "
-      + "WHERE runId=:runId";
+      + "platformType=:platformType, status_statusId=:status_statusId, sequencerReference_sequencerReferenceId=:sequencerReference_sequencerReferenceId, "
+      + "sequencingParameters_parametersId = :sequencingParameters_parametersId " + "WHERE runId=:runId";
 
   public static final String RUN_DELETE = "DELETE FROM " + TABLE_NAME + " WHERE runId=:runId";
 
@@ -318,6 +318,7 @@ public class SQLRunDAO implements RunStore {
     params.addValue("status_statusId", statusId);
     params.addValue("sequencerReference_sequencerReferenceId", run.getSequencerReference().getId());
     params.addValue("lastModifier", run.getLastModifier().getUserId());
+    params.addValue("sequencingParameters_parametersId", run.getSequencingParametersId());
 
     if (run.getId() == AbstractRun.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(TABLE_NAME).usingGeneratedKeyColumns("runId");
@@ -575,7 +576,7 @@ public class SQLRunDAO implements RunStore {
   public List<Run> listByStatus(String health) throws IOException {
     return template.query(RUNS_SELECT_BY_STATUS_HEALTH, new Object[] { health }, new RunMapper(true));
   }
-  
+
   @Override
   public List<Run> listBySequencerId(long sequencerReferenceId) throws IOException {
     return template.query(RUN_SELECT_BY_SEQUENCER_ID, new Object[] { sequencerReferenceId }, new RunMapper(true));
@@ -698,6 +699,10 @@ public class SQLRunDAO implements RunStore {
       r.setCycles(rs.getInt("cycles"));
       r.setFilePath(rs.getString("filePath"));
       r.setPlatformType(PlatformType.get(rs.getString("platformType")));
+      r.setSequencingParametersId(rs.getLong("sequencingParameters_parametersId"));
+      if (rs.wasNull()) {
+        r.setSequencingParametersId(null);
+      }
 
       try {
         r.setLastModifier(securityDAO.getUserById(rs.getLong("lastModifier")));
@@ -711,7 +716,7 @@ public class SQLRunDAO implements RunStore {
 
         if (!isLazy()) {
           r.setSequencerReference(sequencerReferenceDAO.get(rs.getLong("sequencerReference_sequencerReferenceId")));
-          
+
           List<SequencerPartitionContainer<SequencerPoolPartition>> ss = sequencerPartitionContainerDAO
               .listAllSequencerPartitionContainersByRunId(id);
           r.setSequencerPartitionContainers(ss);
@@ -741,7 +746,7 @@ public class SQLRunDAO implements RunStore {
       return r;
     }
   }
-  
+
   @Override
   public Map<String, Integer> getRunColumnSizes() throws IOException {
     return DbUtils.getColumnSizes(template, TABLE_NAME);

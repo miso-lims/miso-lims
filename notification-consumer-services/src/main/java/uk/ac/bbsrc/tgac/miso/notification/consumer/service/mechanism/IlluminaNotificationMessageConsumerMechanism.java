@@ -26,6 +26,8 @@ package uk.ac.bbsrc.tgac.miso.notification.consumer.service.mechanism;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import java.io.IOException;
+import java.io.StringBufferInputStream;
+import java.io.StringReader;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -39,10 +41,18 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPathExpressionException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.Message;
 import org.springframework.util.Assert;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -51,6 +61,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
@@ -60,6 +71,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.InterrogationException;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersCollection;
 import uk.ac.bbsrc.tgac.miso.core.service.integration.mechanism.NotificationMessageConsumerMechanism;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.tools.run.RunFolderConstants;
@@ -88,6 +100,7 @@ public class IlluminaNotificationMessageConsumerMechanism
   private final DateFormat logDateFormat = new SimpleDateFormat("MM'/'dd'/'yyyy','HH:mm:ss");
   private final DateFormat anotherLogDateFormat = new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH:mm:ss");
   private final DateFormat illuminaRunFolderDateFormat = new SimpleDateFormat("yyMMdd");
+  private SequencingParametersCollection parameterSet;
 
   @Override
   public Set<Run> consume(Message<Map<String, List<String>>> message) throws InterrogationException {
@@ -159,6 +172,21 @@ public class IlluminaNotificationMessageConsumerMechanism
               r.setCycles(Integer.parseInt(run.getString("numCycles")));
             }
 
+            if (run.has("runparams")) {
+              try {
+                Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+                    .parse(new InputSource(new StringReader(run.getString("runparams"))));
+                for (SequencingParameters parameters : getParameterSet()) {
+                  if (parameters.matches(document)) {
+                    r.setSequencingParametersId(parameters.getId());
+                    break;
+                  }
+                }
+              } catch (SAXException | ParserConfigurationException | XPathExpressionException e) {
+                log.error("Error parsing runparams", e);
+              }
+            }
+
             SequencerReference sr = null;
             if (run.has("sequencerName")) {
               sr = requestManager.getSequencerReferenceByName(run.getString("sequencerName"));
@@ -192,8 +220,7 @@ public class IlluminaNotificationMessageConsumerMechanism
 
               if (run.has("completionDate")) {
                 try {
-                  if (!"null".equals(run.getString("completionDate"))
-                      && !isStringEmptyOrNull(run.getString("completionDate"))) {
+                  if (!"null".equals(run.getString("completionDate")) && !isStringEmptyOrNull(run.getString("completionDate"))) {
                     log.debug("Updating completion date:" + run.getString("completionDate"));
                     r.getStatus().setCompletionDate(logDateFormat.parse(run.getString("completionDate")));
                   }
@@ -438,5 +465,13 @@ public class IlluminaNotificationMessageConsumerMechanism
     }
 
     return updatedRuns;
+  }
+
+  public SequencingParametersCollection getParameterSet() {
+    return parameterSet;
+  }
+
+  public void setParameterSet(SequencingParametersCollection parameterSet) {
+    this.parameterSet = parameterSet;
   }
 }
