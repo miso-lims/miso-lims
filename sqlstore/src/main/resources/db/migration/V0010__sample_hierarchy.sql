@@ -350,6 +350,8 @@ CREATE TABLE `SequencingParameters` (
   `parametersId` bigint(20) PRIMARY KEY AUTO_INCREMENT,
   `name` text NOT NULL,
   `platformId` bigint(20) NOT NULL,
+  `xpath` varchar(1024) DEFAULT NULL,
+  `runLength` int DEFAULT NULL,
   `createdBy` bigint(20) NOT NULL,
   `creationDate` datetime NOT NULL,
   `updatedBy` bigint(20) NOT NULL,
@@ -359,37 +361,37 @@ CREATE TABLE `SequencingParameters` (
   CONSTRAINT `parameter_platformId_fkey` FOREIGN KEY (`platformId`) REFERENCES `Platform` (`platformId`)
 ) ENGINE=InnoDB CHARSET=utf8;
 
-INSERT INTO `SequencingParameters` (`platformId`, `name`, `createdBy`, `updatedBy`, `creationDate`, `lastUpdated`)
+INSERT INTO `SequencingParameters` (`platformId`, `name`, `createdBy`, `updatedBy`, `creationDate`, `lastUpdated`, `runLength`, `xpath`)
 VALUES
-	(16,'v3 1×101', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-	(16,'v3 1×51', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-	(16,'v3 2×101', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-	(16,'v3 2×51', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-	(16,'v4 1×136', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-	(16,'v4 2×126', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-	(16,'Rapid Run 1×101', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-	(16,'Rapid Run 1×51', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-	(16,'Rapid Run 2×101', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-	(16,'Rapid Run 2×51', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-	(24,'1×300', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-	(24,'1×50', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-	(24,'1×500', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-	(24,'2×101', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-	(24,'2×151', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-	(24,'2×250', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-	(24,'2×26', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-	(24,'2×36', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-	(24,'300×200', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-	(25,'v3 1×101', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-	(25,'v3 1×51', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-	(25,'v3 2×101', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-	(25,'v3 2×51', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-	(25,'v4 1×136', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-	(25,'v4 2×126', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-	(25,'Rapid Run 1×101', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-	(25,'Rapid Run 1×51', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-	(25,'Rapid Run 2×101', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-	(25,'Rapid Run 2×51', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+	(16,'v3 1×101', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 101, '//Flowcell="HiSeq Flow Cell v3" and //RunInfoRead[@NumCycles=101] and not //RunInfoRead[@Number=3]'),
+	(16,'v3 1×51', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 51, '//Flowcell="HiSeq Flow Cell v3" and //RunInfoRead[@NumCycles=51] and not //RunInfoRead[@Number=3]'),
+	(16,'v3 2×101', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 101, '//Flowcell="HiSeq Flow Cell v3" and //RunInfoRead[@NumCycles=101] and //RunInfoRead[@Number=3]'),
+	(16,'v3 2×51', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 51, '//Flowcell="HiSeq Flow Cell v3" and //RunInfoRead[@NumCycles=51] and //RunInfoRead[@Number=3]'),
+	(16,'v4 1×136', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 136, '//Flowcell="HiSeq Flow Cell v4" and //RunInfoRead[@NumCycles=136] and not //RunInfoRead[@Number=3]'),
+	(16,'v4 2×126', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 126, '//Flowcell="HiSeq Flow Cell v4" and //RunInfoRead[@NumCycles=126] and //RunInfoRead[@Number=3]'),
+	(16,'Rapid Run 1×101', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 101, 'starts-with(//Flowcell, "HiSeq Rapid Flow Cell") and  and //RunInfoRead[@NumCycles=101] and not //RunInfoRead[@Number=3]'),
+	(16,'Rapid Run 1×51', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 51, 'starts-with(//Flowcell, "HiSeq Rapid Flow Cell") and  and //RunInfoRead[@NumCycles=51] and not //RunInfoRead[@Number=3]'),
+	(16,'Rapid Run 2×101', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 101, 'starts-with(//Flowcell, "HiSeq Rapid Flow Cell") and  and //RunInfoRead[@NumCycles=101] and //RunInfoRead[@Number=3]'),
+	(16,'Rapid Run 2×51', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 51, 'starts-with(//Flowcell, "HiSeq Rapid Flow Cell") and  and //RunInfoRead[@NumCycles=51] and //RunInfoRead[@Number=3]'),
+	(24,'1×300', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 300, '//RunInfoRead[@NumCycles=300] and not //RunInfoRead[@Number=3]'),
+	(24,'1×50', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 50, '//RunInfoRead[@NumCycles=50] and not //RunInfoRead[@Number=3]'),
+	(24,'1×500', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 500, '//RunInfoRead[@NumCycles=500] and not //RunInfoRead[@Number=3]'),
+	(24,'2×101', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 101, '//RunInfoRead[@NumCycles=101] and //RunInfoRead[@Number=3]'),
+	(24,'2×151', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 151, '//RunInfoRead[@NumCycles=151] and //RunInfoRead[@Number=3]'),
+	(24,'2×250', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 250, '//RunInfoRead[@NumCycles=250] and //RunInfoRead[@Number=3]'),
+	(24,'2×26', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 26, '//RunInfoRead[@NumCycles=26] and //RunInfoRead[@Number=3]'),
+	(24,'2×36', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 36, '//RunInfoRead[@NumCycles=36] and //RunInfoRead[@Number=3]'),
+	(24,'300×200', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 300, '//RunInfoRead[@NumCycles=36] and //RunInfoRead[@Number=3]'),
+	(25,'v3 1×101', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 101, '//Flowcell="HiSeq Flow Cell v3" and //RunInfoRead[@NumCycles=101] and not //RunInfoRead[@Number=3]'),
+	(25,'v3 1×51', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 51, '//Flowcell="HiSeq Flow Cell v3" and //RunInfoRead[@NumCycles=51] and not //RunInfoRead[@Number=3]'),
+	(25,'v3 2×101', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 101, '//Flowcell="HiSeq Flow Cell v3" and //RunInfoRead[@NumCycles=101] and //RunInfoRead[@Number=3]'),
+	(25,'v3 2×51', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 51, '//Flowcell="HiSeq Flow Cell v3" and //RunInfoRead[@NumCycles=51] and //RunInfoRead[@Number=3]'),
+	(25,'v4 1×136', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 136, '//Flowcell="HiSeq Flow Cell v4" and //RunInfoRead[@NumCycles=136] and not //RunInfoRead[@Number=3]'),
+	(25,'v4 2×126', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 126, '//Flowcell="HiSeq Flow Cell v4" and //RunInfoRead[@NumCycles=126] and //RunInfoRead[@Number=3]'),
+	(25,'Rapid Run 1×101', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 101, 'starts-with(//Flowcell, "HiSeq Rapid Flow Cell") and  and //RunInfoRead[@NumCycles=101] and not //RunInfoRead[@Number=3]'),
+	(25,'Rapid Run 1×51', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 51, 'starts-with(//Flowcell, "HiSeq Rapid Flow Cell") and  and //RunInfoRead[@NumCycles=51] and not //RunInfoRead[@Number=3]'),
+	(25,'Rapid Run 2×101', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 101, 'starts-with(//Flowcell, "HiSeq Rapid Flow Cell") and  and //RunInfoRead[@NumCycles=101] and //RunInfoRead[@Number=3]'),
+	(25,'Rapid Run 2×51', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 51, 'starts-with(//Flowcell, "HiSeq Rapid Flow Cell") and  and //RunInfoRead[@NumCycles=51] and //RunInfoRead[@Number=3]');
 
 CREATE TABLE `PoolOrder` (
   `poolOrderId` bigint(20) PRIMARY KEY AUTO_INCREMENT,
@@ -406,5 +408,5 @@ CREATE TABLE `PoolOrder` (
   CONSTRAINT `order_updateUser_fkey` FOREIGN KEY (`updatedBy`) REFERENCES `User` (`userId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-ALTER TABLE Run ADD COLUMN sequencingParameters_parametersId bigint(20);
+ALTER TABLE Run ADD COLUMN sequencingParameters_parametersId bigint(20) DEFAULT NULL;
 ALTER TABLE Run ADD FOREIGN KEY (sequencingParameters_parametersId) REFERENCES SequencingParameters (parametersId);

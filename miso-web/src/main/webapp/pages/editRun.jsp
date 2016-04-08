@@ -127,6 +127,12 @@
       </c:otherwise>
     </c:choose>
   </tr>
+  <c:if test="${run.id != 0}">
+    <tr>
+      <td>Sequencing Parameters</td>
+      <td><form:select id="sequencingParametersId" path="sequencingParametersId" items="${sequencingParameters}" itemLabel="name" itemValue="id"/></td>
+    </tr>
+  </c:if>
   <tr>
     <td></td>
     <td>

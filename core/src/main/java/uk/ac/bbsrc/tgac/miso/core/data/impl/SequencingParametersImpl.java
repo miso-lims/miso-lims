@@ -12,6 +12,12 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
+
+import org.w3c.dom.Document;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -31,6 +37,7 @@ public class SequencingParametersImpl implements SequencingParameters, Serializa
   private String name;
   @Column(nullable = false)
   private Long platformId;
+  private String xpath;
   @OneToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "createdBy", nullable = false)
   private User createdBy;
@@ -41,9 +48,26 @@ public class SequencingParametersImpl implements SequencingParameters, Serializa
   private User updatedBy;
   @Column(nullable = false)
   private Date lastUpdated;
+  @Transient
+  private XPathExpression expression;
 
   @Transient
   private Platform platform;
+
+  @Override
+  public int compareTo(SequencingParameters o) {
+    return name.compareTo(o.getName());
+  }
+
+  @Override
+  public User getCreatedBy() {
+    return createdBy;
+  }
+
+  @Override
+  public Date getCreationDate() {
+    return creationDate;
+  }
 
   @Override
   public Long getId() {
@@ -51,8 +75,8 @@ public class SequencingParametersImpl implements SequencingParameters, Serializa
   }
 
   @Override
-  public void setId(Long id) {
-    this.parametersId = id;
+  public Date getLastUpdated() {
+    return lastUpdated;
   }
 
   @Override
@@ -61,8 +85,8 @@ public class SequencingParametersImpl implements SequencingParameters, Serializa
   }
 
   @Override
-  public void setName(String name) {
-    this.name = name;
+  public Platform getPlatform() {
+    return platform;
   }
 
   @Override
@@ -71,8 +95,49 @@ public class SequencingParametersImpl implements SequencingParameters, Serializa
   }
 
   @Override
-  public Platform getPlatform() {
-    return platform;
+  public User getUpdatedBy() {
+    return updatedBy;
+  }
+
+  @Override
+  public String getXPath() {
+    return xpath;
+  }
+
+  @Override
+  public boolean matches(Document document) throws XPathExpressionException {
+    if (xpath == null) {
+      return false;
+    }
+    if (expression == null) {
+      expression = XPathFactory.newInstance().newXPath().compile(xpath);
+    }
+    return (Boolean) expression.evaluate(document, XPathConstants.BOOLEAN);
+  }
+
+  @Override
+  public void setCreatedBy(User createdBy) {
+    this.createdBy = createdBy;
+  }
+
+  @Override
+  public void setCreationDate(Date creation) {
+    this.creationDate = creation;
+  }
+
+  @Override
+  public void setId(Long id) {
+    this.parametersId = id;
+  }
+
+  @Override
+  public void setLastUpdated(Date lastUpdated) {
+    this.lastUpdated = lastUpdated;
+  }
+
+  @Override
+  public void setName(String name) {
+    this.name = name;
   }
 
   @Override
@@ -84,43 +149,14 @@ public class SequencingParametersImpl implements SequencingParameters, Serializa
   }
 
   @Override
-  public User getCreatedBy() {
-    return createdBy;
-  }
-
-  @Override
-  public void setCreatedBy(User createdBy) {
-    this.createdBy = createdBy;
-  }
-
-  @Override
-  public Date getCreationDate() {
-    return creationDate;
-  }
-
-  @Override
-  public void setCreationDate(Date creation) {
-    this.creationDate = creation;
-  }
-
-  @Override
-  public User getUpdatedBy() {
-    return updatedBy;
-  }
-
-  @Override
   public void setUpdatedBy(User updatedBy) {
     this.updatedBy = updatedBy;
   }
 
   @Override
-  public Date getLastUpdated() {
-    return lastUpdated;
-  }
-
-  @Override
-  public void setLastUpdated(Date lastUpdated) {
-    this.lastUpdated = lastUpdated;
+  public void setXPath(String xpath) {
+    expression = null;
+    this.xpath = xpath;
   }
 
 }

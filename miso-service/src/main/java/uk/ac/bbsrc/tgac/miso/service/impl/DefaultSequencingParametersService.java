@@ -1,7 +1,11 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,13 +17,14 @@ import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
+import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersCollection;
 import uk.ac.bbsrc.tgac.miso.persistence.SequencingParametersDao;
 import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 @Transactional
 @Service
-public class DefaultSequencingParametersService implements SequencingParametersService {
+public class DefaultSequencingParametersService implements SequencingParametersService, SequencingParametersCollection {
   protected static final Logger log = LoggerFactory.getLogger(DefaultSequencingParametersService.class);
 
   @Autowired
@@ -27,11 +32,6 @@ public class DefaultSequencingParametersService implements SequencingParametersS
 
   @Autowired
   private AuthorizationManager authorizationManager;
-
-  @Override
-  public SequencingParameters get(Long sequencingParametersId) throws IOException {
-    return sequencingParametersDao.getSequencingParameters(sequencingParametersId);
-  }
 
   @Override
   public Long create(SequencingParameters sequencingParameters) throws IOException {
@@ -43,6 +43,32 @@ public class DefaultSequencingParametersService implements SequencingParametersS
   }
 
   @Override
+  public void delete(Long sequencingParametersId) throws IOException {
+    authorizationManager.throwIfNonAdmin();
+    SequencingParameters sequencingParameters = sequencingParametersDao.getSequencingParameters(sequencingParametersId);
+    sequencingParametersDao.deleteSequencingParameters(sequencingParameters);
+  }
+
+  @Override
+  public SequencingParameters get(Long sequencingParametersId) throws IOException {
+    return sequencingParametersDao.getSequencingParameters(sequencingParametersId);
+  }
+
+  @Override
+  public Set<SequencingParameters> getAll() throws IOException {
+    return Sets.newTreeSet(sequencingParametersDao.getSequencingParameters());
+  }
+
+  @Override
+  public Iterator<SequencingParameters> iterator() {
+    try {
+      return getAll().iterator();
+    } catch (IOException e) {
+      return Collections.emptyIterator();
+    }
+  }
+
+  @Override
   public void update(SequencingParameters sequencingParameters) throws IOException {
     authorizationManager.throwIfNonAdmin();
     User user = authorizationManager.getCurrentUser();
@@ -51,15 +77,17 @@ public class DefaultSequencingParametersService implements SequencingParametersS
   }
 
   @Override
-  public Set<SequencingParameters> getAll() throws IOException {
-    return Sets.newHashSet(sequencingParametersDao.getSequencingParameters());
-  }
-
-  @Override
-  public void delete(Long sequencingParametersId) throws IOException {
-    authorizationManager.throwIfNonAdmin();
-    SequencingParameters sequencingParameters = sequencingParametersDao.getSequencingParameters(sequencingParametersId);
-    sequencingParametersDao.deleteSequencingParameters(sequencingParameters);
+  public Set<SequencingParameters> getForPlatform(Long platformId) throws IOException {
+    if (platformId == null) {
+      return Collections.emptySet();
+    }
+    Set<SequencingParameters> results = new TreeSet<>();
+    for (SequencingParameters sp : sequencingParametersDao.getSequencingParameters()) {
+      if (sp.getPlatformId() == platformId) {
+        results.add(sp);
+      }
+    }
+    return results;
   }
 
 }
