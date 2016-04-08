@@ -32,18 +32,15 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
-import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 
-import org.codehaus.jackson.annotate.JsonBackReference;
 import org.codehaus.jackson.annotate.JsonManagedReference;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
@@ -123,9 +120,6 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   private String alias;
   private Long securityProfile_profileId;
 
-  @Transient
-  private Date lastUpdated;
-
   @OneToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "lastModifier", nullable = false)
   private User lastModifier;
@@ -145,17 +139,6 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @OneToOne(targetEntity = SampleAdditionalInfoImpl.class, mappedBy = "sample")
   @Cascade({ CascadeType.SAVE_UPDATE })
   private SampleAdditionalInfo sampleAdditionalInfo;
-
-  @ManyToOne(targetEntity = SampleImpl.class)
-  @JoinColumn(name = "parentId")
-  @Cascade({ CascadeType.SAVE_UPDATE })
-  @JsonBackReference
-  private Sample parent;
-
-  @OneToMany(targetEntity = SampleImpl.class, fetch = FetchType.LAZY, mappedBy = "parent")
-  @Cascade({ CascadeType.SAVE_UPDATE })
-  @JsonManagedReference
-  private Set<Sample> children = new HashSet<Sample>();
 
   @Override
   public User getLastModifier() {
@@ -371,16 +354,6 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   }
 
   @Override
-  public Date getLastUpdated() {
-    return lastUpdated;
-  }
-
-  @Override
-  public void setLastUpdated(Date lastUpdated) {
-    this.lastUpdated = lastUpdated;
-  }
-
-  @Override
   public boolean isDeletable() {
     return getId() != AbstractSample.UNSAVED_ID && getLibraries().isEmpty() && getNotes().isEmpty() && getSampleQCs().isEmpty();
   }
@@ -521,22 +494,12 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
 
   @Override
   public Sample getParent() {
-    return parent;
-  }
-
-  @Override
-  public void setParent(Sample parent) {
-    this.parent = parent;
+    return sampleAdditionalInfo == null ? null : sampleAdditionalInfo.getParent();
   }
 
   @Override
   public Set<Sample> getChildren() {
-    return children;
-  }
-
-  @Override
-  public void setChildren(Set<Sample> children) {
-    this.children = children;
+    return sampleAdditionalInfo == null ? null : sampleAdditionalInfo.getChildren();
   }
 
   @Override

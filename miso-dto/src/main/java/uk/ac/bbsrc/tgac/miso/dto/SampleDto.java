@@ -25,8 +25,6 @@ public class SampleDto {
   private SampleAnalyteDto sampleAnalyte;
   private SampleTissueDto sampleTissue;
   private SampleAdditionalInfoDto sampleAdditionalInfo;
-  private Long parentId;
-  private String parentUrl;
   private Long rootSampleClassId;
   private String rootSampleClassUrl;
   private Double volume;
@@ -159,28 +157,12 @@ public class SampleDto {
     this.sampleAdditionalInfo = sampleAdditionalInfo;
   }
 
-  public Long getParentId() {
-    return parentId;
-  }
-
-  public void setParentId(Long parentId) {
-    this.parentId = parentId;
-  }
-
   public Long getRootSampleClassId() {
     return rootSampleClassId;
   }
 
   public void setRootSampleClassId(Long rootSampleClassId) {
     this.rootSampleClassId = rootSampleClassId;
-  }
-
-  public String getParentUrl() {
-    return parentUrl;
-  }
-
-  public void setParentUrl(String parentUrl) {
-    this.parentUrl = parentUrl;
   }
 
   public String getRootSampleClassUrl() {

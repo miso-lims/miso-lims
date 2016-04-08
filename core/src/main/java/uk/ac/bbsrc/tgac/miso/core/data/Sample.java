@@ -28,6 +28,7 @@ import java.util.Date;
 import java.util.Set;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import org.codehaus.jackson.annotate.JsonManagedReference;
 import org.codehaus.jackson.annotate.JsonTypeName;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.w3c.dom.Document;
@@ -53,7 +54,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  */
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
 @JsonTypeName("sample")
-@JsonIgnoreProperties({ "securityProfile", "submissionDocument", "parent" })
+@JsonIgnoreProperties({ "securityProfile", "submissionDocument", "children", "parent" })
 @PrintableBarcode
 public interface Sample
     extends SecurableByProfile, Submittable<Document>, Locatable, Reportable, Comparable, Deletable, Plateable, Boxable {
@@ -286,10 +287,6 @@ public interface Sample
    */
   void setQCs(Collection<SampleQC> qcs);
 
-  Date getLastUpdated();
-
-  void setLastUpdated(Date lastUpdated);
-
   public User getLastModifier();
 
   public void setLastModifier(User user);
@@ -302,17 +299,14 @@ public interface Sample
 
   public void setIdentity(Identity identity);
 
+  @JsonManagedReference
   public SampleAdditionalInfo getSampleAdditionalInfo();
 
   public void setSampleAdditionalInfo(SampleAdditionalInfo sampleAdditionalInfo);
 
   public Sample getParent();
 
-  public void setParent(Sample parent);
-
   public Set<Sample> getChildren();
-
-  public void setChildren(Set<Sample> children);
 
   public void setSampleTissue(SampleTissue sampleTissue);
 

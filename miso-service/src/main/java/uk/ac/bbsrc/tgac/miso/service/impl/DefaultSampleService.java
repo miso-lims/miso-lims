@@ -104,7 +104,7 @@ public class DefaultSampleService implements SampleService {
     authorizationManager.throwIfNotWritable(sample);
     User user = authorizationManager.getCurrentUser();
 
-    if (sampleDto.getParentId() == null && isParentedSample(sample)) {
+    if (sampleDto.getSampleAdditionalInfo() != null && sampleDto.getSampleAdditionalInfo().getParentId() == null) {
       log.debug("No parent has been provided.");
       if (sampleDto.getSampleIdentity() != null && !LimsUtils.isStringEmptyOrNull(sampleDto.getSampleIdentity().getExternalName())) {
         log.debug("Obtaining parent based on external name.");
@@ -112,7 +112,7 @@ public class DefaultSampleService implements SampleService {
         Identity existingIdentity = identityService.get(sampleDto.getSampleIdentity().getExternalName());
         if (existingIdentity != null) {
           log.debug("Parent with existing external name already exists. Using that parent.");
-          sample.setParent(existingIdentity.getSample());
+          sample.getSampleAdditionalInfo().setParent(existingIdentity.getSample());
         } else {
           log.debug("Creating a new Identity to use as a parent.");
           String number = sampleNumberPerProjectService.nextNumber(sample.getProject());
@@ -131,7 +131,7 @@ public class DefaultSampleService implements SampleService {
               .sampleTissue(sample.getSampleTissue()).build();
           setChangeDetails(identitySample, true);
           
-          sample.setParent(identitySample);
+          sample.getSampleAdditionalInfo().setParent(identitySample);
         }
       } else {
         throw new IllegalArgumentException(
@@ -172,7 +172,6 @@ public class DefaultSampleService implements SampleService {
     User user = authorizationManager.getCurrentUser();
     Date now = new Date();
     sample.setLastModifier(user);
-    sample.setLastUpdated(now);
     if (sample.getSampleAdditionalInfo() != null) {
       if (setCreated) {
         sample.getSampleAdditionalInfo().setCreatedBy(user);
@@ -217,10 +216,10 @@ public class DefaultSampleService implements SampleService {
     ServiceUtils.throwIfNull(project, "projectId", sampleDto.getProjectId());
     sample.setProject(project);
 
-    if (sampleDto.getParentId() != null) {
-      Sample parent = sampleDao.getSample(sampleDto.getParentId());
-      ServiceUtils.throwIfNull(parent, "parentId", sampleDto.getParentId());
-      sample.setParent(parent);
+    if (sampleDto.getSampleAdditionalInfo() != null && sampleDto.getSampleAdditionalInfo().getParentId() != null) {
+      Sample parent = sampleDao.getSample(sampleDto.getSampleAdditionalInfo().getParentId());
+      ServiceUtils.throwIfNull(parent, "parentId", sampleDto.getSampleAdditionalInfo().getParentId());
+      sample.getSampleAdditionalInfo().setParent(parent);
     }
 
     if (sampleDto.getSampleIdentity() != null) {
