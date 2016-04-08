@@ -295,4 +295,8 @@ public interface Run extends SecurableByProfile, Submittable<Document>, Comparab
    * Sets the user who last modified this item. It should always be set to the current user on save.
    */
   public void setLastModifier(User user);
+
+  public Long getSequencingParametersId();
+
+  public void setSequencingParametersId(Long id);
 }
