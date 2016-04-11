@@ -248,7 +248,7 @@ Library.qc = {
 };
 
 Library.dilution = {
-  insertLibraryDilutionRow: function () {
+  insertLibraryDilutionRow: function (libraryId, libraryPrepKitId) {
     if (!jQuery('#libraryDilutionTable').attr("dilutionInProgress")) {
       jQuery('#libraryDilutionTable').attr("dilutionInProgress", "true");
 
@@ -263,17 +263,54 @@ Library.dilution = {
       var column6 = jQuery('#libraryDilutionTable')[0].rows[1].insertCell(-1);
       column6.innerHTML = "<input id='libraryDilutionResults' name='libraryDilutionResults' type='text'/>";
       var column7 = jQuery('#libraryDilutionTable')[0].rows[1].insertCell(-1);
-      column7.innerHTML = "<i>Generated on save</i>";
+      column7.innerHTML = "<select id='libraryDilutionTargetedResequencing' name='libraryDilutionTargetedResequencing' onchange='Library.qc.changeLibraryQcUnits(this);'/>"
       var column8 = jQuery('#libraryDilutionTable')[0].rows[1].insertCell(-1);
-      column8.innerHTML = "<a href='javascript:void(0);' onclick='Library.dilution.addLibraryDilution();'/>Add</a>";
+      column8.innerHTML = "<i>Generated on save</i>";
+      var column9 = jQuery('#libraryDilutionTable')[0].rows[1].insertCell(-1);
+      column9.innerHTML = "<a href='javascript:void(0);' onclick='Library.dilution.addLibraryDilution();'/>Add</a>";
 
       Utils.ui.addMaxDatePicker("libraryDilutionDate", 0);
+      
+      Fluxion.doAjax(
+    	        'libraryControllerHelperService',
+    	        'getTargetedResequencingTypes',
+    	        {
+    	          'url': ajaxurl,
+    	          'libraryPrepKitId': libraryPrepKitId
+    	        },
+    	        {'doOnSuccess': function (json) {
+    	        	var selectElem = jQuery('#libraryDilutionTargetedResequencing');
+    	        	if(json.targetedResequencings.length == 0) {
+    	        		selectElem.append(new Option('NONE', 0));
+    	        	} else {
+    	        		selectElem.append(new Option('--- select'));
+    	        		selectElem.append(new Option('NONE', 0));
+                        json.targetedResequencings.sort(function(a, b) {
+                           return (a.alias > b.alias) - (a.alias < b.alias);
+                        });
+        	        	jQuery.each(json.targetedResequencings, function(index, item) {
+        	        		selectElem.append(new Option(item.alias, item.targetedSequencingId));
+        	        		});
+    	        	}
+    	        }
+    	        }
+    	      );
     } else {
       alert("Cannot add another dilution when one is already in progress.");
     }
   },
 
   addLibraryDilution: function () {
+	  
+   jQuery('#libraryDilutionTargetedResequencing').attr('class', 'form-control');
+   jQuery('#libraryDilutionTargetedResequencing').attr('data-parsley-required', 'true');
+   jQuery('#libraryDilutionTargetedResequencing').attr('data-parsley-type', 'number');  
+   
+   jQuery('#addDilutionForm').parsley();
+   if(!jQuery('#addDilutionForm').parsley().validate()) {
+	   return;
+   }
+	  
     var f = Utils.mappifyForm("addDilutionForm");
     Fluxion.doAjax(
       'libraryControllerHelperService',
@@ -284,6 +321,7 @@ Library.dilution = {
         'dilutionDate': f.libraryDilutionDate,
         //'locationBarcode':f.libraryDilutionBarcode.value,
         'results': f.libraryDilutionResults,
+        'libraryDilutionTargetedResequencing': f.libraryDilutionTargetedResequencing,
         'url': ajaxurl},
       {'updateElement': 'libraryDilutionTable',
         'doOnSuccess': function () {

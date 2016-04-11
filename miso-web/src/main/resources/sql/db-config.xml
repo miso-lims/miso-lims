@@ -119,6 +119,7 @@
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.impl.emPCR" value-ref="emPCRStore" />
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution" value-ref="emPCRDilutionStore" />
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution" value-ref="libraryDilutionStore" />
+        <entry key="uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedResequencing" value-ref="targetedResequencingStore" />
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.Box" value-ref="boxStore" />
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.Experiment" value-ref="experimentStore" />
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.EntityGroup" value-ref="entityGroupStore" />
@@ -193,6 +194,12 @@
     </property>
     <property name="securityProfileDAO" ref="sqlSecurityProfileDAO" />
     <property name="libraryDAO" ref="sqlLibraryDAO" />
+    <property name="targetedResequencingDAO" ref="sqlTargetedResequencingDAO" />
+    <property name="jdbcTemplate" ref="interfaceTemplate" />
+  </bean>
+  
+  <bean id="sqlTargetedResequencingDAO" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLTargetedResequencingDAO">
+    <property name="securityDAO" ref="sqlSecurityDAO" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />
   </bean>
 
@@ -531,6 +538,17 @@
     <property name="interceptorNames">
       <list>
         <value>sqlLibraryDilutionDAO</value>
+      </list>
+    </property>
+  </bean>
+  
+  <bean name="targetedResequencingStore" class="org.springframework.aop.framework.ProxyFactoryBean">
+    <property name="proxyInterfaces">
+      <value>uk.ac.bbsrc.tgac.miso.core.store.TargetedResequencingStore</value>
+    </property>
+    <property name="interceptorNames">
+      <list>
+        <value>sqlTargetedResequencingDAO</value>
       </list>
     </property>
   </bean>

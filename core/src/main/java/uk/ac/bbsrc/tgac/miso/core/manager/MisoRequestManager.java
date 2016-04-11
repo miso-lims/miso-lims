@@ -76,6 +76,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedResequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCR;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
@@ -117,6 +118,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.StatusStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.core.store.StudyStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SubmissionStore;
+import uk.ac.bbsrc.tgac.miso.core.store.TargetedResequencingStore;
 
 /**
  * Implementation of a RequestManager to facilitate persistence operations on MISO model objects
@@ -165,6 +167,8 @@ public class MisoRequestManager implements RequestManager {
   private RunQcStore runQcStore;
   @Autowired
   private SampleStore sampleStore;
+  @Autowired
+  private TargetedResequencingStore targetedResequencingStore;
   @Autowired
   private SampleQcStore sampleQcStore;
   @Autowired
@@ -593,7 +597,7 @@ public class MisoRequestManager implements RequestManager {
       throw new IOException("No libraryQcStore available. Check that it has been declared in the Spring config.");
     }
   }
-  
+
   @Override
   public Collection<Library> getLibrariesByIdList(List<Long> idList) throws IOException {
     if (libraryStore != null) {
@@ -2798,5 +2802,23 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public Collection<LibraryPropagationRule> listLibraryPropagationRulesByClass(SampleClass sampleClass) throws IOException {
     return libraryPropagationRuleDao.getLibraryPropagationRulesByClass(sampleClass);
+  }
+
+  @Override
+  public Collection<TargetedResequencing> listAllTargetedResequencing() throws IOException {
+    if (targetedResequencingStore != null) {
+      return targetedResequencingStore.listAll();
+    } else {
+      throw new IOException("No targetedResequencingStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public TargetedResequencing getTargetedResequencingById(long targetedResequencingId) throws IOException {
+    if (targetedResequencingStore != null) {
+      return targetedResequencingStore.get(targetedResequencingId);
+    } else {
+      throw new IOException("No securityStore available. Check that it has been declared in the Spring config.");
+    }
   }
 }

@@ -28,7 +28,6 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -57,6 +56,7 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import com.google.common.collect.Maps;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONException;
@@ -72,6 +72,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedResequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCR;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
@@ -121,7 +122,6 @@ public class LibraryControllerHelperService {
   private MisoNamingScheme<Sample> sampleNamingScheme;
   @Autowired
   private MisoNamingScheme<Library> libraryNamingScheme;
-
 
   /**
    * Returns a JSONObject containing the alias regex used by the current library naming scheme
@@ -471,7 +471,7 @@ public class LibraryControllerHelperService {
               String selectionType = j.getString("selectionType");
               String strategyType = j.getString("strategyType");
               String locationBarcode = j.getString("locationBarcode");
-              
+
               Library library = new LibraryImpl();
               library.setSample(sample);
 
@@ -631,6 +631,33 @@ public class LibraryControllerHelperService {
     return JSONUtils.SimpleJSONError("Cannot list all Library QC Types");
   }
 
+  public JSONObject getTargetedResequencingTypes(HttpSession session, JSONObject json) {
+    Long libraryPrepKitId = null;
+    if (json.has("libraryPrepKitId")) {
+      libraryPrepKitId = json.getLong("libraryPrepKitId");
+    }
+
+    try {
+      Collection<TargetedResequencing> targetedResequencings = requestManager.listAllTargetedResequencing();
+      JSONArray targetedResequencingCollection = new JSONArray();
+      for (TargetedResequencing targetedResequencing : targetedResequencings) {
+        if (libraryPrepKitId != null && libraryPrepKitId == targetedResequencing.getKitDescriptor().getKitDescriptorId()) {
+          Map<String, Object> targetedResequencingMap = Maps.newHashMap();
+          targetedResequencingMap.put("targetedSequencingId", targetedResequencing.getTargetedResequencingId());
+          targetedResequencingMap.put("alias", targetedResequencing.getAlias());
+          targetedResequencingMap.put("kitDescriptorId", targetedResequencing.getKitDescriptor().getKitDescriptorId());
+          targetedResequencingCollection.add(targetedResequencingMap);
+        }
+      }
+      Map<String, Object> targetedResequencingMap = Maps.newHashMap();
+      targetedResequencingMap.put("targetedResequencings", targetedResequencingCollection);
+      return JSONUtils.JSONObjectResponse(targetedResequencingMap);
+    } catch (IOException e) {
+      log.error("Cannot list all Targeted Resequencing entries ", e);
+    }
+    return JSONUtils.SimpleJSONError("Cannot list all Targeted Resequencing entries");
+  }
+
   public JSONObject addLibraryQC(HttpSession session, JSONObject json) {
     try {
       for (Object k : json.keySet()) {
@@ -673,8 +700,6 @@ public class LibraryControllerHelperService {
     }
     return JSONUtils.SimpleJSONError("Cannot add LibraryQC");
   }
-
-
 
   public JSONObject bulkAddLibraryQCs(HttpSession session, JSONObject json) {
     try {
@@ -741,12 +766,17 @@ public class LibraryControllerHelperService {
         newDilution.setDilutionCreator(json.getString("dilutionCreator"));
         newDilution.setCreationDate(new SimpleDateFormat("dd/MM/yyyy").parse(json.getString("dilutionDate")));
         newDilution.setConcentration(Double.parseDouble(json.getString("results")));
+        Long libraryDilutionTargetedResequencingId = Long.parseLong(json.getString("libraryDilutionTargetedResequencing"));
+        if (libraryDilutionTargetedResequencingId > 0) {
+          TargetedResequencing targetedResequencing = requestManager.getTargetedResequencingById(libraryDilutionTargetedResequencingId);
+          newDilution.setTargetedResequencing(targetedResequencing);
+        }
         library.addDilution(newDilution);
         requestManager.saveLibraryDilution(newDilution);
 
         StringBuilder sb = new StringBuilder();
         sb.append("<tr>");
-        sb.append("<th>LD Name</th><th>Done By</th><th>Date</th><th>Results</th><th>ID barcode</th>");
+        sb.append("<th>LD Name</th><th>Done By</th><th>Date</th><th>Results</th><th>Targeted Resequencing</th><th>ID barcode</th>");
         if (!library.getPlatformName().equals("Illumina")) {
           sb.append("<th>Add emPCR</th>");
         }
@@ -760,6 +790,13 @@ public class LibraryControllerHelperService {
           sb.append("<td>" + dil.getDilutionCreator() + "</td>");
           sb.append("<td>" + date.format(dil.getCreationDate()) + "</td>");
           sb.append("<td>" + LimsUtils.round(dil.getConcentration(), 2) + " " + dil.getUnits() + "</td>");
+          sb.append("<td>");
+          if (dil.getTargetedResequencing() == null) {
+            sb.append("NONE");
+          } else {
+            sb.append(dil.getTargetedResequencing().getAlias());
+          }
+          sb.append("</td>");
           sb.append("<td>");
 
           try {
@@ -1228,10 +1265,11 @@ public class LibraryControllerHelperService {
         inner.add(TableHelper.hyperLinkify("/miso/library/" + library.getId(), library.getName()));
         inner.add(TableHelper.hyperLinkify("/miso/library/" + library.getId(), library.getAlias()));
         inner.add(library.getLibraryType().getDescription());
-        inner.add(TableHelper.hyperLinkify("/miso/sample/" + library.getSample().getId(), library.getSample().getName() + " (" + library.getSample().getAlias() + ")"));
+        inner.add(TableHelper.hyperLinkify("/miso/sample/" + library.getSample().getId(),
+            library.getSample().getName() + " (" + library.getSample().getAlias() + ")"));
         inner.add(qcpassed);
         inner.add((isStringEmptyOrNull(identificationBarcode) ? "" : identificationBarcode));
-        
+
         jsonArray.add(inner);
       }
       j.put("array", jsonArray);

@@ -39,6 +39,7 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -93,6 +94,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.service.LibraryAdditionalInfoService;
+import uk.ac.bbsrc.tgac.miso.persistence.LibraryAdditionalInfoDao;
 import uk.ac.bbsrc.tgac.miso.webapp.context.ApplicationContextProvider;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoPropertyExporter;
 
@@ -118,6 +120,9 @@ public class EditLibraryController {
 
   @Autowired
   private DataObjectFactory dataObjectFactory;
+
+  @Autowired
+  private LibraryAdditionalInfoDao libraryAdditionalInfoDao;
 
   @Autowired
   private TagBarcodeStrategyResolverService tagBarcodeStrategyResolverService;
@@ -448,6 +453,15 @@ public class EditLibraryController {
         throw new SecurityException("Permission denied.");
       }
 
+      Long libraryPrepKitId = null;
+      LibraryAdditionalInfo libraryAdditionalInfo = libraryAdditionalInfoDao.getLibraryAdditionalInfoByLibraryId(libraryId);
+      if (libraryAdditionalInfo != null && libraryAdditionalInfo.getPrepKit() != null) {
+        libraryPrepKitId = libraryAdditionalInfo.getPrepKit().getKitDescriptorId();
+      } else {
+        libraryPrepKitId = -1L;
+      }
+      model.put("libraryPrepKitId", libraryPrepKitId);
+
       model.put("formObj", library);
       model.put("library", library);
 
@@ -590,7 +604,7 @@ public class EditLibraryController {
       throw new IOException(e);
     }
   }
-  
+
   @RequestMapping(value = "/bulk/", method = RequestMethod.POST, headers = "Accept=application/json")
   public String getBulkLibraries(@RequestBody JSONObject json) throws IOException {
     JSONArray ids = JSONArray.fromObject(json.get("ids"));
@@ -601,7 +615,7 @@ public class EditLibraryController {
     }
     return "redirect:/miso/library/bulk/edit/" + stringBuffer.toString();
   }
-  
+
   @RequestMapping(value = "/bulk/edit/{libraryIds}", method = RequestMethod.GET)
   public ModelAndView editBulkLibraries(@PathVariable String libraryIds, ModelMap model) throws IOException {
     try {

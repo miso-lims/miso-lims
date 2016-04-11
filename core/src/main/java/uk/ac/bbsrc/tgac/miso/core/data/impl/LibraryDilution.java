@@ -40,7 +40,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.Library;
  * @since 0.0.2
  */
 public class LibraryDilution extends AbstractDilution implements Serializable {
+
+  private static final long serialVersionUID = 1L;
   private Library library;
+  private TargetedResequencing targetedResequencing;
   public static final String UNITS = "nM";
 
   /**
@@ -73,4 +76,13 @@ public class LibraryDilution extends AbstractDilution implements Serializable {
   public String getUnits() {
     return UNITS;
   }
+
+  public TargetedResequencing getTargetedResequencing() {
+    return targetedResequencing;
+  }
+
+  public void setTargetedResequencing(TargetedResequencing targetedResequencing) {
+    this.targetedResequencing = targetedResequencing;
+  }
+
 }

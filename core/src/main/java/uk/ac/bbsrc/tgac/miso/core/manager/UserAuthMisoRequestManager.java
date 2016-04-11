@@ -77,6 +77,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedResequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCR;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution;
@@ -1116,7 +1117,7 @@ public class UserAuthMisoRequestManager implements RequestManager {
     }
     return accessibles;
   }
-  
+
   @Override
   public Collection<Library> getLibrariesByIdList(List<Long> idList) throws IOException {
     User user = getCurrentUser();
@@ -1125,8 +1126,8 @@ public class UserAuthMisoRequestManager implements RequestManager {
       if (library.userCanRead(user)) {
         accessibles.add(library);
       } else {
-        throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Library " + library.getId()
-            + " " + library.getAlias() + "(" + library.getName() + ")");
+        throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Library " + library.getId() + " "
+            + library.getAlias() + "(" + library.getName() + ")");
       }
     }
     return accessibles;
@@ -2489,5 +2490,15 @@ public class UserAuthMisoRequestManager implements RequestManager {
   public Collection<LibraryPropagationRule> listLibraryPropagationRulesByClass(SampleClass sampleClass) throws IOException {
     if (sampleClass == null) return Collections.emptyList();
     return backingManager.listLibraryPropagationRulesByClass(sampleClass);
+  }
+
+  @Override
+  public Collection<TargetedResequencing> listAllTargetedResequencing() throws IOException {
+    return backingManager.listAllTargetedResequencing();
+  }
+
+  @Override
+  public TargetedResequencing getTargetedResequencingById(long targetedResequencingId) throws IOException {
+    return backingManager.getTargetedResequencingById(targetedResequencingId);
   }
 }

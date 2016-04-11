@@ -71,6 +71,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerServiceRecordImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubmissionImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedResequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCR;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution;
@@ -162,6 +163,11 @@ public class TgacDataObjectFactory extends DataObjectFactory {
   @Override
   public LibraryDilution getLibraryDilution(User user) {
     return new LibraryDilution(user);
+  }
+
+  @Override
+  public TargetedResequencing getTargetedResequencing() {
+    return new TargetedResequencing();
   }
 
   @Override
@@ -543,5 +549,5 @@ public class TgacDataObjectFactory extends DataObjectFactory {
   public SequencerServiceRecord getSequencerServiceRecord() {
     return new SequencerServiceRecordImpl();
   }
-  
+
 }
