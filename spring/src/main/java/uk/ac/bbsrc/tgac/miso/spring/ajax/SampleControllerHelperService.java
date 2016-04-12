@@ -169,7 +169,7 @@ public class SampleControllerHelperService {
             if (sampleNamingScheme.validateField("alias", alias)) {
               String descr = j.getString("description");
               String scientificName = j.getString("scientificName");
-              DateFormat df = new SimpleDateFormat("dd/mm/yyyy");
+              DateFormat df = new SimpleDateFormat("yyyy-mm-dd");
               String type = j.getString("sampleType");
 
               Sample news = new SampleImpl();
