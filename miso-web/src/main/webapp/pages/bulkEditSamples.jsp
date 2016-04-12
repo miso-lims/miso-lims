@@ -53,9 +53,66 @@
 
 	<h1>Edit Samples</h1>
 	
+	<div id="HOTbulkForm" data-detailed-sample="${detailedSample}">
+	
+		<div id="saveSuccesses"  class="parsley-success hidden">
+	    <p id="successMessages"></p>
+	  </div>
+	    <div id="saveErrors" class="bs-callout bs-callout-warning hidden">
+	      <h2>Oh snap!</h2>
+	      <p>The following rows failed to save:</p>
+	      <p id="errorMessages"></p>
+	    </div>
+		<button id="saveSamples">Save</button>
+		<c:if test="${detailedSample}">
+			<button id="addQcs" onclick="Sample.hot.regenerateWithQcs();">Add QCs</button>
+			<button id="hideAddnalCols" onclick="Sample.hot.hideAdditionalCols();">Hide Extra Columns</button>
+		</c:if>
+		
+		<div id="hotContainer"></div>
+	
+	</div>
+	
 	<script type="text/javascript">
 	  jQuery(document).ready(function () {
-	    var Sample.hot.samples = ${samplesJSON} ;
+	    Sample.hot.samplesJSON = ${samplesJSON};
+	    Sample.hot.dropdownRef = ${referenceDataJSON};
+	    Sample.hot.detailedSample = JSON.parse(document.getElementById('HOTbulkForm').dataset.detailedSample);
+	    Sample.hot.button = document.getElementById('saveSamples');
+	    Sample.hot.createOrEdit = "${method}";
+
+	    Sample.hot.makeBulkEditTable = function () {
+        Sample.hot.samplesJSON = Sample.hot.modifySamplesForEdit(Sample.hot.samplesJSON);
+        var sampleCategory = Sample.hot.getCategoryFromClassId(Sample.hot.samplesJSON[0].sampleAdditionalInfo.sampleClassId);
+        Sample.hot.makeHOT(Sample.hot.samplesJSON, false, sampleCategory, false);
+      };
+
+      Sample.hot.makeBulkCreateTable = function () {
+        Sample.hot.newSamplesJSON = Sample.hot.modifySamplesForPropagate(Sample.hot.samplesJSON);
+        var sampleCategory = Sample.hot.getCategoryFromClassId(Sample.hot.newSamplesJSON[0].sampleAdditionalInfo.parentSampleClassId);
+        Sample.hot.makeHOT(Sample.hot.newSamplesJSON, false, sampleCategory, false);
+        Sample.hot.hotTable.updateSettings({
+          cells: function (row, col, prop) {
+            var cellProperties = {};
+            if (prop == 'sampleAdditionalInfo.sampleClassAlias') {
+              cellProperties.readOnly = false;
+            }
+            return cellProperties;
+          }
+        });
+      };
+
+	    // get SampleOptions and make the appropriate table
+      if (Boolean(Sample.hot.detailedSample)) {
+        if (Sample.hot.createOrEdit == "create") {
+          Sample.hot.sampleClassId = parseInt(${sampleClassId});
+          Sample.hot.button.addEventListener('click', Sample.hot.propagateData, true);
+          Sample.hot.fetchSampleOptions(Sample.hot.makeBulkCreateTable);
+        } else {
+          Sample.hot.button.addEventListener('click', Sample.hot.updateData, true);
+          Sample.hot.fetchSampleOptions(Sample.hot.makeBulkEditTable);
+        }
+      }
 	  });
 	</script>
 	

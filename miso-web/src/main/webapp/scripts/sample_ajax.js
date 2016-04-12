@@ -796,14 +796,16 @@ Sample.ui = {
           var selectAll = '<label><input type="checkbox" onchange="Sample.ui.checkAll(this)" id="checkAll">Select All</label>';
           document.getElementById('listingSamplesTable').insertAdjacentHTML('beforebegin', selectAll);
           
-          var actions = ['<select class="dropdownActions" onchange="Sample.ui.handleBulkAction(this)"><option value="">-- Bulk actions</option>'];
+          var actions = ['<select class="dropdownActions" onchange="Sample.ui.checkForPropagate(this);"><option value="">-- Bulk actions</option>'];
           actions.push('<option value="update">Update selected</option>');
-          actions.push('<option value="propagate">Propagate selected</option>');
+          actions.push('<option value="propagateSams">Propagate (sample) selected</option>');
+          actions.push('<option value="propagateLibs">Propagate (library) selected</option>');
           actions.push('<option value="empty">Empty selected</option>');
           actions.push('<option value="archive">Archive selected</option>');
           actions.push('</select>');
-          document.getElementById('listingSamplesTable').insertAdjacentHTML('beforebegin', actions.join(''));
           document.getElementById('listingSamplesTable').insertAdjacentHTML('afterend', actions.join(''));
+          var dropdownAndSave = '<div id="classOptions"></div><button id="go" type="button" onclick="Sample.ui.handleBulkAction();">Go</button>';
+          document.getElementById('dropdownActions').insertAdjacentHTML('afterend', dropdownAndSave);
         }
       }
     );
@@ -822,11 +824,25 @@ Sample.ui = {
     }
   },
   
-  handleBulkAction: function (el) {
+  checkForPropagate: function (el) {
     var selectedValue = el.options[el.selectedIndex].value;
+    if (selectedValue == 'propagateSams') {
+      // TODO: add some logic in here for SampleValidRelationships
+      Sample.ui.insertSampleClassesDropdown();
+    } else if (selectedValue == 'propagateLibs') {
+      // TODO: add some logic in here for LibraryPropagationRules
+      alert("Sorry, we're still work on that feature!");
+    } else {
+      document.getElementById('classOptions').innerHTML = '';
+    }
+  },
+  
+  handleBulkAction: function () {
+    var selectedValue = document.getElementById('dropdownActions').value;
     var options = {
       "update": Sample.ui.updateSelectedItems,
-      "propagate": Sample.ui.propagateSelectedItems,
+      "propagateSams": Sample.ui.propagateSamSelectedItems,
+      "propagateLibs": Sample.ui.propagateLibSelectedItems,
       "empty": Sample.ui.emptySelectedItems,
       "archive": Sample.ui.archiveSelectedItems
     }
@@ -847,17 +863,29 @@ Sample.ui = {
       alert("Please select one or more Samples to update.");
       return false;
     }
-    window.location="sample/bulk/edit/" + selectedIdsArray.join(',');
+    window.location="sample/bulk/" + selectedIdsArray.join(',');
   },
   
-  //TODO: finish this, and the one in library_ajax.js
-  propagateSelectedItems: function () {
+  // TODO: finish this
+  propagateSamSelectedItems: function () {
+    var selectedClass = document.getElementById('classDropdown').value;
     var selectedIdsArray = Sample.ui.getSelectedIds();
     if (selectedIdsArray.length === 0) {
       alert("Please select one or more Samples to propagate.");
       return false;
     }
-    alert("Finish methods to check which samples or libraries this group can propagate, and then actually make the table.");
+    alert("Finish methods to check which samples this group can propagate, and then actually make the table.");
+  },
+  
+  // TODO: finish this...
+  propagateLibSelectedItems: function () {
+    var selectedLib = document.getElementById('libDropdown').value;
+    var selectedIdsArray = Sample.ui.getSelectedIds();
+    if (selectedIdsArray.length === 0) {
+      alert("Please select one or more Samples to propagate.");
+      return false;
+    }
+    alert("Finish methods and make table");
   },
   
   // TODO: finish this, and the one in library_ajax.js
@@ -878,5 +906,22 @@ Sample.ui = {
       return false;
     }
     alert("Finish method to bulk archive samples.");
+  },
+  
+  insertSampleClassesDropdown: function () {
+    jQuery.get('/miso/rest/sampleclasses', function (data) {
+      var select = [];
+      var classes = classesDtos.sort(function(a, b) {
+        return a.id > b.id ? 1 : ((b.id > a.id) ? -1 : 0);
+      });
+      select.push('<select id="classDropdown">');
+      select.push('<option value="">-- Select child class</option>');
+      for (var i=0; i<classes.length; i++) {
+        if (classes[i].alias == "Identity") continue;
+        select.push('<option value="'+ classes[i].id +'">'+ classes[i].alias +'</option>');
+      }
+      select.push('</select>');
+      document.getElementById('classOptions').innerHTML = select.join('');
+    }, 'application/json');
   }
 };
