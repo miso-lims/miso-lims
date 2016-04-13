@@ -350,7 +350,7 @@ CREATE TABLE `SequencingParameters` (
   `name` text NOT NULL,
   `platformId` bigint(20) NOT NULL,
   `xpath` varchar(1024) DEFAULT NULL,
-  `runLength` int DEFAULT NULL,
+  `readLength` int DEFAULT NULL,
   `createdBy` bigint(20) NOT NULL,
   `creationDate` datetime NOT NULL,
   `updatedBy` bigint(20) NOT NULL,
@@ -360,7 +360,7 @@ CREATE TABLE `SequencingParameters` (
   CONSTRAINT `parameter_platformId_fkey` FOREIGN KEY (`platformId`) REFERENCES `Platform` (`platformId`)
 ) ENGINE=InnoDB CHARSET=utf8;
 
-INSERT INTO `SequencingParameters` (`platformId`, `name`, `createdBy`, `updatedBy`, `creationDate`, `lastUpdated`, `runLength`, `xpath`)
+INSERT INTO `SequencingParameters` (`platformId`, `name`, `createdBy`, `updatedBy`, `creationDate`, `lastUpdated`, `readLength`, `xpath`)
 VALUES
 	(16,'v3 1×101', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 101, '//Flowcell="HiSeq Flow Cell v3" and //RunInfoRead[@NumCycles=101] and not //RunInfoRead[@Number=3]'),
 	(16,'v3 1×51', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 51, '//Flowcell="HiSeq Flow Cell v3" and //RunInfoRead[@NumCycles=51] and not //RunInfoRead[@Number=3]'),
