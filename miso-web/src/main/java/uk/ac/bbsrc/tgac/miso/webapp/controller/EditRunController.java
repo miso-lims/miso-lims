@@ -72,6 +72,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
 import uk.ac.bbsrc.tgac.miso.runstats.client.RunStatsException;
 import uk.ac.bbsrc.tgac.miso.runstats.client.manager.RunStatsManager;
+import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.webapp.context.ApplicationContextProvider;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoPropertyExporter;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
@@ -98,6 +99,9 @@ public class EditRunController {
   private RunAlertManager runAlertManager;
 
   private RunStatsManager runStatsManager;
+
+  @Autowired
+  private SequencingParametersService sequencingParametersService;
 
   @Autowired
   private ApplicationContextProvider applicationContextProvider;
@@ -241,30 +245,28 @@ public class EditRunController {
     } else {
       run = requestManager.getRunById(runId);
     }
-    
+
     return setupForm(run, model);
   }
-  
+
   @RequestMapping(value = "/alias/{runAlias}", method = RequestMethod.GET)
   public ModelAndView setupForm(@PathVariable String runAlias, ModelMap model) throws IOException {
     Run run = requestManager.getRunByAlias(runAlias);
     return setupForm(run, model);
   }
-  
+
   public ModelAndView setupForm(Run run, ModelMap model) throws IOException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
 
       if (run == null) {
         throw new SecurityException("No such Run.");
-      }
-      else if (run.getId() == AbstractRun.UNSAVED_ID) {
+      } else if (run.getId() == AbstractRun.UNSAVED_ID) {
         run = dataObjectFactory.getRun(user);
         model.put("title", "New Run");
         model.put("availablePools", populateAvailablePools(user));
         model.put("multiplexed", false);
-      }
-      else {
+      } else {
         model.put("title", "Run " + run.getId());
         model.put("multiplexed", isMultiplexed(run));
         try {
@@ -277,7 +279,7 @@ public class EditRunController {
           log.error("setup run form", e);
         }
       }
-      
+
       if (!run.userCanRead(user)) {
         throw new SecurityException("Permission denied.");
       }
@@ -304,6 +306,8 @@ public class EditRunController {
       model.put("owners", LimsSecurityUtils.getPotentialOwners(user, run, securityManager.listAllUsers()));
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, run, securityManager.listAllUsers()));
       model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, run, securityManager.listAllGroups()));
+      model.put("sequencingParameters",
+          sequencingParametersService.getForPlatform((long) run.getSequencerReference().getPlatform().getPlatformId()));
 
       Map<Long, String> runMap = new HashMap<Long, String>();
       if (run.getWatchers().contains(user)) {
