@@ -51,31 +51,32 @@ Sample.hot = {
     return samplesArray.map(function (sam) {
       
       // add sampleAdditionalInfo values
-      if (sam.sampleAdditionalInfo.passageNumber === 0) sam.sampleAdditionalInfo.passageNumber = 'nn';
-      sam.sampleAdditionalInfo.sampleClassAlias = Sample.hot.getAliasFromId(sam.sampleAdditionalInfo.sampleClassId, Sample.hot.sampleOptions.sampleClassesDtos);
-      sam.sampleAdditionalInfo.parentSampleClassAlias = Sample.hot.getAliasFromId(sam.sampleAdditionalInfo.parentSampleClassId, Sample.hot.sampleOptions.sampleClassesDtos);
-      sam.sampleAdditionalInfo.tissueOriginAlias = Sample.hot.getAliasFromId(sam.sampleAdditionalInfo.tissueOriginId, Sample.hot.sampleOptions.tissueOriginsDtos);
-      sam.sampleAdditionalInfo.tissueTypeAlias = Sample.hot.getAliasFromId(sam.sampleAdditionalInfo.tissueTypeId, Sample.hot.sampleOptions.tissueTypesDtos);
-      if (sam.sampleAdditionalInfo.prepKitId) {
-        sam.sampleAdditionalInfo.prepKitAlias = Sample.hot.getAliasFromId(sam.sampleAdditionalInfo.prepKitId, Sample.hot.sampleOptions.kitDescriptorsDtos);
-      }
-      if (sam.sampleAdditionalInfo.subprojectId) {
-        sam.sampleAdditionalInfo.subprojectAlias = Sample.hot.getAliasFromId(sam.sampleAdditionalInfo.subprojectId, Sample.hot.sampleOptions.subprojectsDtos);
-      }
-      if (sam.sampleAdditionalInfo.labId) {
-        sam.sampleAdditionalInfo.labComposite = Sample.hot.getLabCompositeFromId(sam.sampleAdditionalInfo.labId, Sample.hot.sampleOptions.labsDtos);
-      }
-      
-      // add sampleAnalyte values, if applicable
-      if (Sample.hot.getCategoryFromClassId(sam.sampleAdditionalInfo.sampleClassId) == 'Analyte') {
-        if (sam.sampleAnalyte.tissueMaterialId) {
-          sam.sampleAnalyte.tissueMaterialAlias = Sample.hot.getAliasFromId(sam.sampleAnalyte.tissueMaterialId, Sample.hot.sampleOptions.tissueMaterialsDtos);
+      if (sam.sampleAdditionalInfo) {
+        if (sam.sampleAdditionalInfo.passageNumber === 0) sam.sampleAdditionalInfo.passageNumber = 'nn';
+        sam.sampleAdditionalInfo.sampleClassAlias = Sample.hot.getAliasFromId(sam.sampleAdditionalInfo.sampleClassId, Sample.hot.sampleOptions.sampleClassesDtos);
+        sam.sampleAdditionalInfo.tissueOriginAlias = Sample.hot.getAliasFromId(sam.sampleAdditionalInfo.tissueOriginId, Sample.hot.sampleOptions.tissueOriginsDtos);
+        sam.sampleAdditionalInfo.tissueTypeAlias = Sample.hot.getAliasFromId(sam.sampleAdditionalInfo.tissueTypeId, Sample.hot.sampleOptions.tissueTypesDtos);
+        if (sam.sampleAdditionalInfo.prepKitId) {
+          sam.sampleAdditionalInfo.prepKitAlias = Sample.hot.getAliasFromId(sam.sampleAdditionalInfo.prepKitId, Sample.hot.sampleOptions.kitDescriptorsDtos);
         }
-        if (sam.sampleAnalyte.sampleGroupId) {
-          sam.sampleAnalyte.sampleGroupComposite = Sample.hot.getSGCompositeFromId(sam.sampleAnalyte.sampleGroupId, Sample.hot.sampleOptions.sampleGroupsDtos);
+        if (sam.sampleAdditionalInfo.subprojectId) {
+          sam.sampleAdditionalInfo.subprojectAlias = Sample.hot.getAliasFromId(sam.sampleAdditionalInfo.subprojectId, Sample.hot.sampleOptions.subprojectsDtos);
         }
-        if (sam.sampleAnalyte.samplePurposeId) {
-          sam.sampleAnalyte.samplePurposeAlias = Sample.hot.getAliasFromId(sam.sampleAnalyte.samplePurposeId, Sample.hot.sampleOptions.samplePurposesDtos);
+        if (sam.sampleAdditionalInfo.labId) {
+          sam.sampleAdditionalInfo.labComposite = Sample.hot.getLabCompositeFromId(sam.sampleAdditionalInfo.labId, Sample.hot.sampleOptions.labsDtos);
+        }
+        
+        // add sampleAnalyte values, if applicable
+        if (Sample.hot.getCategoryFromClassId(sam.sampleAdditionalInfo.sampleClassId) == 'Analyte') {
+          if (sam.sampleAnalyte.tissueMaterialId) {
+            sam.sampleAnalyte.tissueMaterialAlias = Sample.hot.getAliasFromId(sam.sampleAnalyte.tissueMaterialId, Sample.hot.sampleOptions.tissueMaterialsDtos);
+          }
+          if (sam.sampleAnalyte.sampleGroupId) {
+            sam.sampleAnalyte.sampleGroupComposite = Sample.hot.getSGCompositeFromId(sam.sampleAnalyte.sampleGroupId, Sample.hot.sampleOptions.sampleGroupsDtos);
+          }
+          if (sam.sampleAnalyte.samplePurposeId) {
+            sam.sampleAnalyte.samplePurposeAlias = Sample.hot.getAliasFromId(sam.sampleAnalyte.samplePurposeId, Sample.hot.sampleOptions.samplePurposesDtos);
+          }
         }
       }
       if (sam.receivedDate) {
@@ -325,6 +326,7 @@ Sample.hot = {
  
  dataSchema: {
    project: null,
+   id: null,
    description: null,
    receivedDate: null,
    identificationBarcode: null,
@@ -402,11 +404,7 @@ Sample.hot = {
   },
   
   getValues: function (key, objArr) {
-    var rtn = [];
-    for (var i=0; i<objArr.length; i++) {
-      rtn.push(objArr[i][key]);
-    }
-    return rtn;
+    return objArr.map(function (obj) { return obj[key]; });
   },
   
   sortByProperty: function (array, propertyName) {
@@ -884,6 +882,7 @@ Sample.hot = {
     if (obj.id) {
       sample.id = obj.id;
       sample.name = obj.name;
+      sample.alias = obj.alias;
     }
     
     // add SampleDto attributes
@@ -1103,14 +1102,6 @@ Sample.hot = {
   },
 
   saveDetailedData: function () {
-    // reset error and success messages
-    Sample.hot.messages.failed = [];
-    Sample.hot.messages.success = [];
-    
-    // disable the save button
-    if (Sample.hot.button) Sample.hot.toggleButtonAndLoaderImage(Sample.hot.button);
-    document.getElementById('classDropdown').classList.remove('invalid');
-    
     // check that a project and class have been declared
     if (document.getElementById('projectSelect').value === '' || document.getElementById('classDropdown').value === '') {
       Sample.hot.messages.failed.push('Make sure both Project and Sample Class are selected before saving.');
@@ -1118,17 +1109,8 @@ Sample.hot = {
       return false;
     }
     
-    var tableData = Sample.hot.startData;
-    
-    // if last row is empty, remove it before validation
-    Sample.hot.removeEmptyBottomRows(tableData);
-    
-    // if there are no rows, add one back in and exit
-    if (tableData.length === 0) {
-      Sample.hot.startData = [];
-      Sample.hot.validationFails();
-      return false;
-    }
+    var continueValidation = Sample.hot.cleanRowsAndToggleSaveButton();
+    if (continueValidation === false) return false;
     
     Sample.hot.hotTable.validateCells(function (isValid) { 
       if (isValid) {
@@ -1240,6 +1222,28 @@ Sample.hot = {
     return parentClassAlias + ' is not a valid parent for ' + childClassAlias + '.';
   },
   
+  cleanRowsAndToggleSaveButton: function () {
+   // reset error and success messages
+    Sample.hot.messages.failed = [];
+    Sample.hot.messages.success = [];
+    
+    // disable the save button
+    if (Sample.hot.button) Sample.hot.toggleButtonAndLoaderImage(Sample.hot.button);
+    
+    var tableData = Sample.hot.startData;
+    
+    // if last row is empty, remove it before validation
+    Sample.hot.removeEmptyBottomRows(tableData);
+    
+    // if there are no rows, add one back in and exit
+    if (tableData.length === 0) {
+      Sample.hot.startData = [];
+      Sample.hot.validationFails();
+      return false;
+    }
+    
+  },
+  
   toggleButtonAndLoaderImage: function (button) {
     var ajaxLoader;
     if (button.className.indexOf('disabled') == -1) {
@@ -1256,32 +1260,16 @@ Sample.hot = {
   },
   
   savePlainData: function () {
-    // reset error and success messages
-    Sample.hot.messages.failed = [];
-    Sample.hot.messages.success = [];
-    
-    // disable the save button
-    if (Sample.hot.button) Sample.hot.toggleButtonAndLoaderImage(Sample.hot.button);
-    
     // check that a project has been declared
     if (document.getElementById('projectSelect').value === '') {
       Sample.hot.messages.failed.push('Make sure that a Project is selected before saving.');
       Sample.hot.addAnyErrors();
       return false;
     }
+    
+    var continueValidation = Sample.hot.cleanRowsAndToggleSaveButton();
+    if (continueValidation === false) return false;
 
-    var tableData = Sample.hot.startData;
-    
-    // if last row is empty, remove it before validation
-    Sample.hot.removeEmptyBottomRows(tableData);
-    
-    // if there are no rows, add one back in and exit
-    if (tableData.length === 0) {
-      Sample.hot.startData = [];
-      Sample.hot.validationFails();
-      return false;
-    }
-    
     Sample.hot.hotTable.validateCells(function (isValid) {
       if (isValid) {
         document.getElementById('errorMessages').innerHTML = '';
@@ -1337,25 +1325,9 @@ Sample.hot = {
   },
 
   updateData: function () {
-    // reset error and success messages
-    Sample.hot.messages.failed = [];
-    Sample.hot.messages.success = [];
-    
-    var tableData = Sample.hot.startData;
-    
-    // if last row is empty, remove it before validation
-    Sample.hot.removeEmptyBottomRows(tableData);
-    
-    // if there are no rows, add one back in and exit
-    if (tableData.length === 0) {
-      Sample.hot.startData = [];
-      Sample.hot.validationFails();
-      return false;
-    }
-    
-    // disable the save button
-    if (Sample.hot.button) Sample.hot.toggleButtonAndLoaderImage(Sample.hot.button);
-    
+    var continueValidation = Sample.hot.cleanRowsAndToggleSaveButton();
+    if (continueValidation === false) return false;
+      
     Sample.hot.hotTable.validateCells(function (isValid) {
       if (isValid) {
         // no check for sampleValidRelationship, since the sampleClass is not editable
@@ -1378,24 +1350,8 @@ Sample.hot = {
   },
   
   propagateData: function () {
-    // reset error and success messages
-    Sample.hot.messages.failed = [];
-    Sample.hot.messages.success = [];
-    
-    var tableData = Sample.hot.startData;
-    
-    // if last row is empty, remove it before validation
-    Sample.hot.removeEmptyBottomRows(tableData);
-    
-    // if there are no rows, add one back in and exit
-    if (tableData.length === 0) {
-      Sample.hot.startData = [];
-      Sample.hot.validationFails();
-      return false;
-    }
-    
-    // disable the save button
-    if (Sample.hot.button) Sample.hot.toggleButtonAndLoaderImage(Sample.hot.button);
+    var continueValidation = Sample.hot.cleanRowsAndToggleSaveButton();
+    if (continueValidation === false) return false;
     
     // send table data through the parser to get a copy of (not a reference to) sampleData array
     var sampleData = JSON.parse(JSON.parse(JSON.stringify(Sample.hot.hotTable.getSourceData())));
