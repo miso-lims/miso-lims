@@ -53,6 +53,7 @@ Sample.hot = {
       // add sampleAdditionalInfo values
       if (sam.sampleAdditionalInfo.passageNumber === 0) sam.sampleAdditionalInfo.passageNumber = 'nn';
       sam.sampleAdditionalInfo.sampleClassAlias = Sample.hot.getAliasFromId(sam.sampleAdditionalInfo.sampleClassId, Sample.hot.sampleOptions.sampleClassesDtos);
+      sam.sampleAdditionalInfo.parentSampleClassAlias = Sample.hot.getAliasFromId(sam.sampleAdditionalInfo.parentSampleClassId, Sample.hot.sampleOptions.sampleClassesDtos);
       sam.sampleAdditionalInfo.tissueOriginAlias = Sample.hot.getAliasFromId(sam.sampleAdditionalInfo.tissueOriginId, Sample.hot.sampleOptions.tissueOriginsDtos);
       sam.sampleAdditionalInfo.tissueTypeAlias = Sample.hot.getAliasFromId(sam.sampleAdditionalInfo.tissueTypeId, Sample.hot.sampleOptions.tissueTypesDtos);
       if (sam.sampleAdditionalInfo.prepKitId) {
@@ -1092,7 +1093,7 @@ Sample.hot = {
       return false;
     }
     
-    this.hotTable.validateCells(function (isValid) { 
+    Sample.hot.hotTable.validateCells(function (isValid) { 
       if (isValid) {
         // check for sampleValidRelationship with RootSampleClass as parent
         var parentClassId = Sample.hot.getRootSampleClassId();
@@ -1243,7 +1244,7 @@ Sample.hot = {
       return false;
     }
     
-    this.hotTable.validateCells(function (isValid) {
+    Sample.hot.hotTable.validateCells(function (isValid) {
       if (isValid) {
         document.getElementById('errorMessages').innerHTML = '';
         document.getElementById('saveErrors').classList.add('hidden');
@@ -1317,7 +1318,7 @@ Sample.hot = {
     // disable the save button
     if (Sample.hot.button) Sample.hot.toggleButtonAndLoaderImage(Sample.hot.button);
     
-    this.hotTable.validateCells(function (isValid) {
+    Sample.hot.hotTable.validateCells(function (isValid) {
       if (isValid) {
         // no check for sampleValidRelationship, since the sampleClass is not editable
         
