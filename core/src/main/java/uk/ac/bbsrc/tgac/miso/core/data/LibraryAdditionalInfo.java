@@ -8,9 +8,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 
 public interface LibraryAdditionalInfo {
   
-  Long getId();
+  Long getLibraryId();
 
-  void setId(Long id);
+  void setLibraryId(Long libraryid);
   
   Library getLibrary();
   

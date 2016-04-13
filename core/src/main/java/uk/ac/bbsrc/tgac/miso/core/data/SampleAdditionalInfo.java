@@ -14,7 +14,7 @@ public interface SampleAdditionalInfo {
 
   Long getSampleId();
 
-  void setSampleId(Long sampleAdditionalInfoId);
+  void setSampleId(Long sampleId);
 
   @JsonBackReference
   Sample getSample();

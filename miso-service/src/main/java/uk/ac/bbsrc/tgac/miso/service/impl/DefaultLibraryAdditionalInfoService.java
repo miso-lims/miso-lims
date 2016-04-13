@@ -78,7 +78,7 @@ public class DefaultLibraryAdditionalInfoService implements LibraryAdditionalInf
   public void update(LibraryAdditionalInfo libraryAdditionalInfo)
       throws IOException {
     authorizationManager.throwIfNonAdmin();
-    LibraryAdditionalInfo updated = get(libraryAdditionalInfo.getId());
+    LibraryAdditionalInfo updated = get(libraryAdditionalInfo.getLibraryId());
     updated.setTissueOrigin(tissueOriginDao.getTissueOrigin(libraryAdditionalInfo.getTissueOrigin().getTissueOriginId()));
     updated.setTissueType(tissueTypeDao.getTissueType(libraryAdditionalInfo.getTissueType().getTissueTypeId()));
     if (libraryAdditionalInfo.getSampleGroupId() != null) {
