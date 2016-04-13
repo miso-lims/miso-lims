@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.dto;
 
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Set;
 
 import org.joda.time.format.DateTimeFormatter;
@@ -12,6 +13,7 @@ import com.google.common.collect.Sets;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Institute;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.QcPassedDetail;
@@ -26,6 +28,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
+import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
@@ -33,6 +36,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstituteImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAdditionalInfoImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrderImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.QcPassedDetailImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAdditionalInfoImpl;
@@ -45,6 +49,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SamplePurposeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleValidRelationshipImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.TagBarcodeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
@@ -818,5 +823,59 @@ public class Dtos {
       dtoSet.add(asDto(sp));
     }
     return dtoSet;
+  }
+  
+  public static LibraryDto asDto(Library from, LibraryAdditionalInfo infoFrom) {
+    LibraryDto dto = new LibraryDto();
+    dto.setAlias(from.getAlias());
+    dto.setName(from.getName());
+    dto.setParentSampleId(from.getSample().getId());
+    dto.setParentSampleAlias(from.getSample().getAlias());
+    dto.setCreationDate(from.getCreationDate());
+    dto.setDescription(from.getDescription());
+    dto.setId(from.getId());
+    dto.setConcentration(from.getInitialConcentration());
+    dto.setLibrarySelectionTypeId(from.getLibrarySelectionType().getLibrarySelectionTypeId());
+    dto.setLibraryStrategyTypeId(from.getLibraryStrategyType().getLibraryStrategyTypeId());
+    dto.setLibraryTypeId(from.getLibraryType().getLibraryTypeId());
+    dto.setLowQuality(from.isLowQuality());
+    dto.setPlatformName(from.getPlatformName());
+    if (!from.getTagBarcodes().isEmpty()) {
+      dto.setTagBarcodeStrategyName(from.getTagBarcodes().get(1).getStrategyName());
+      dto.setTagBarcodeIndex1Id(from.getTagBarcodes().get(1).getId());
+      if (from.getTagBarcodes().containsKey(2)) {
+        dto.setTagBarcodeIndex2Id(from.getTagBarcodes().get(2).getId());
+      }
+    }
+    dto.setVolume(from.getVolume());
+    if (infoFrom != null) {
+      dto.setLibraryAdditionalInfo(asDto(infoFrom));
+    }
+    return dto;
+  }
+  
+  public static Library to (LibraryDto from) {
+   Library to = new LibraryImpl();
+   to.setAlias(from.getAlias());
+   to.setName(from.getName());
+   to.setDescription(from.getDescription());
+   to.setInitialConcentration(from.getConcentration());
+   to.setLowQuality(from.getLowQuality());
+   to.setPlatformName(from.getPlatformName());
+   if (from.getTagBarcodeIndex1Id() != null) {
+     HashMap<Integer, TagBarcode> tagBarcodes = new HashMap<>();
+     TagBarcode tb1 = new TagBarcodeImpl();
+     tb1.setId(from.getTagBarcodeIndex1Id());
+     tagBarcodes.put(1, tb1);
+     if (from.getTagBarcodeIndex2Id() != null) {
+       TagBarcode tb2 = new TagBarcodeImpl();
+       tb2.setId(from.getTagBarcodeIndex2Id());
+       tagBarcodes.put(1, tb2);
+     }
+     to.setTagBarcodes(tagBarcodes);
+   }
+   to.setVolume(from.getVolume());
+
+   return to;
   }
 }
