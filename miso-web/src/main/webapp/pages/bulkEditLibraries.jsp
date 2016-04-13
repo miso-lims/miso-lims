@@ -51,11 +51,56 @@
 <div id="maincontent">
 <div id="contentcolumn">
 
-  <h1>Edit Libraries</h1>
+  <h1>${method} Libraries</h1>
+  
+ <div id="HOTbulkForm" data-detailed-sample="${detailedSample}">
+ 
+   <div id="saveSuccesses"  class="parsley-success hidden">
+     <p id="successMessages"></p>
+   </div>
+     <div id="saveErrors" class="bs-callout bs-callout-warning hidden">
+       <h2>Oh snap!</h2>
+       <p>The following rows failed to save:</p>
+       <p id="errorMessages"></p>
+     </div>
+   <button id="saveLibraries">Save</button>
+   <c:if test="${detailedSample}">
+   <!--  TODO: add these back in later
+      <button id="addQcs" onclick="Sample.hot.regenerateWithQcs();">Add QCs</button>
+     <button id="hideAddnalCols" onclick="Sample.hot.hideAdditionalCols();">Hide Extra Columns</button>
+  -->
+   </c:if>
+   
+   <div id="hotContainer"></div>
+ 
+ </div>
   
   <script type="text/javascript">
     jQuery(document).ready(function () {
-      Library.librariesJSON = ${libraries};
+      Library.hot.librariesJSON = ${librariesJSON};
+      Library.hot.dropdownRef = ${referenceDataJSON};
+      Library.hot.dropdownRef.tagBarcodes = {};
+      Library.hot.dropdownRef.barcodeKits = {};
+      Library.hot.detailedSample = JSON.parse(document.getElementById('HOTbulkForm').dataset.detailedSample);
+      Library.hot.button = document.getElementById('saveLibraries');
+      Library.hot.propagateOrEdit = "${method}";
+      Library.libraryPropagationRulesJSON = ${libraryPropagationRulesJSON};
+
+      Library.hot.makeBulkCreateTable = function () {
+        Library.hot.librariesJSON = Library.hot.prepLibrariesForTable(Library.hot.librariesJSON);
+        Library.hot.makeHOT(Library.hot.librariesJSON);
+      };
+
+      // get SampleOptions and make the appropriate table
+      if (Boolean(Library.hot.detailedSample)) {
+        if (Library.hot.propagateOrEdit == 'Propagate') {
+          Library.hot.button.addEventListener('click', Library.hot.createData, true);
+          Library.hot.fetchSampleOptions(Library.hot.makeBulkCreateTable);
+  	    } else {
+  	      Library.hot.button.addEventListener('click', Library.hot.updateData, true);
+  	      Library.hot.fetchSampleOptions(Library.hot.makeBulkUpdateTable);
+	      }
+      }
     });
   </script>
 

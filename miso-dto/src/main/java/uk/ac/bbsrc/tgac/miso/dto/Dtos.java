@@ -112,6 +112,7 @@ public class Dtos {
 
   public static TissueType to(TissueTypeDto from) {
     TissueType to = new TissueTypeImpl();
+    to.setTissueTypeId(from.getId());
     to.setAlias(from.getAlias());
     to.setDescription(from.getDescription());
     return to;
@@ -729,7 +730,7 @@ public class Dtos {
     to.setPlatformType(PlatformType.get(from.getPlatformType()));
     return to;
   }
-  
+
   public static LibraryAdditionalInfoDto asDto(LibraryAdditionalInfo from) {
     LibraryAdditionalInfoDto dto = new LibraryAdditionalInfoDto();
     dto.setLibraryId(from.getLibraryId());
@@ -749,7 +750,7 @@ public class Dtos {
     dto.setArchived(from.getArchived());
     return dto;
   }
-  
+
   public static Set<LibraryAdditionalInfoDto> asLibraryAdditionalInfoDtos(Collection<LibraryAdditionalInfo> from) {
     Set<LibraryAdditionalInfoDto> dtoSet = Sets.newHashSet();
     for (LibraryAdditionalInfo l : from) {
@@ -757,7 +758,7 @@ public class Dtos {
     }
     return dtoSet;
   }
-  
+
   public static LibraryAdditionalInfo to(LibraryAdditionalInfoDto from) {
     LibraryAdditionalInfo to = new LibraryAdditionalInfoImpl();
     to.setLibraryId(from.getLibraryId());
@@ -766,11 +767,12 @@ public class Dtos {
     if (from.getSampleGroup() != null) {
       to.setSampleGroupId(to(from.getSampleGroup()));
     }
-    to.setPrepKit(to(from.getPrepKit()));
+    if (from.getPrepKit() != null) {
+      to.setPrepKit(to(from.getPrepKit()));
+    }
     to.setArchived(from.getArchived());
     return to;
   }
-
 
   public static PoolOrderDto asDto(PoolOrder from) {
     PoolOrderDto dto = new PoolOrderDto();
@@ -820,7 +822,7 @@ public class Dtos {
     }
     return dtoSet;
   }
-  
+
   public static LibraryDto asDto(Library from, LibraryAdditionalInfo infoFrom) {
     LibraryDto dto = new LibraryDto();
     dto.setAlias(from.getAlias());
@@ -835,6 +837,7 @@ public class Dtos {
     dto.setLibraryStrategyTypeId(from.getLibraryStrategyType().getLibraryStrategyTypeId());
     dto.setLibraryTypeId(from.getLibraryType().getLibraryTypeId());
     dto.setLowQuality(from.isLowQuality());
+    dto.setPaired(from.getPaired());
     dto.setPlatformName(from.getPlatformName());
     if (!from.getTagBarcodes().isEmpty()) {
       dto.setTagBarcodeStrategyName(from.getTagBarcodes().get(1).getStrategyName());
@@ -849,28 +852,39 @@ public class Dtos {
     }
     return dto;
   }
-  
-  public static Library to (LibraryDto from) {
-   Library to = new LibraryImpl();
-   to.setAlias(from.getAlias());
-   to.setName(from.getName());
-   to.setDescription(from.getDescription());
-   to.setInitialConcentration(from.getConcentration());
-   to.setLowQuality(from.getLowQuality());
-   to.setPlatformName(from.getPlatformName());
-   if (from.getTagBarcodeIndex1Id() != null) {
-     HashMap<Integer, TagBarcode> tagBarcodes = new HashMap<>();
-     TagBarcode tb1 = new TagBarcodeImpl();
-     tb1.setId(from.getTagBarcodeIndex1Id());
-     tagBarcodes.put(1, tb1);
-     if (from.getTagBarcodeIndex2Id() != null) {
-       TagBarcode tb2 = new TagBarcodeImpl();
-       tb2.setId(from.getTagBarcodeIndex2Id());
-       tagBarcodes.put(1, tb2);
-     }
-     to.setTagBarcodes(tagBarcodes);
-   }
-   to.setVolume(from.getVolume());
+
+  public static Library to(LibraryDto from) {
+    Library target = new LibraryImpl();
+    return to(from, target);
+  }
+
+  /**
+   * Overwrites all modifiable fields. 
+   * Intended to be used with a freshly-loaded database object or newly-created impl so save and update are similar.
+   */
+  public static Library to(LibraryDto from, Library to) {
+    to.setAlias(from.getAlias());
+    to.setName(from.getName());
+    to.setDescription(from.getDescription());
+    to.setIdentificationBarcode(from.getIdentificationBarcode());
+    to.setInitialConcentration(from.getConcentration());
+    to.setLowQuality(from.getLowQuality());
+    to.setPaired(from.getPaired());
+    to.setPlatformName(from.getPlatformName());
+    to.setQcPassed(from.getQcPassed());
+    if (from.getTagBarcodeIndex1Id() != null) {
+      HashMap<Integer, TagBarcode> tagBarcodes = new HashMap<>();
+      TagBarcode tb1 = new TagBarcodeImpl();
+      tb1.setId(from.getTagBarcodeIndex1Id());
+      tagBarcodes.put(1, tb1);
+      if (from.getTagBarcodeIndex2Id() != null) {
+        TagBarcode tb2 = new TagBarcodeImpl();
+        tb2.setId(from.getTagBarcodeIndex2Id());
+        tagBarcodes.put(1, tb2);
+      }
+      to.setTagBarcodes(tagBarcodes);
+    }
+    to.setVolume(from.getVolume());
 
    return to;
   }

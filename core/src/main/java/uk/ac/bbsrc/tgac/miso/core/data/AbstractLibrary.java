@@ -47,6 +47,7 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAdditionalInfoImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
@@ -133,6 +134,10 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
 
   @Transient
   private Date lastUpdated;
+  
+  @OneToOne(targetEntity = LibraryAdditionalInfoImpl.class, mappedBy = "library")
+  // TODO: add cascade
+  private LibraryAdditionalInfo libraryAdditionalInfo;
 
   @Override
   @CoverageIgnore
@@ -393,6 +398,16 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @Override
   public boolean isLowQuality() {
     return lowQuality;
+  }
+  
+  @Override
+  public LibraryAdditionalInfo getLibraryAdditionalInfo() {
+    return libraryAdditionalInfo;
+  }
+  
+  @Override
+  public void setLibraryAdditionalInfo(LibraryAdditionalInfo libraryAdditionalInfo) {
+    this.libraryAdditionalInfo = libraryAdditionalInfo;
   }
 
   @CoverageIgnore

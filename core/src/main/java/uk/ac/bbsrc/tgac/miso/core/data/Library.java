@@ -375,4 +375,8 @@ public interface Library extends SecurableByProfile, Comparable, Barcodable, Loc
   public void setLowQuality(boolean lowquality);
 
   public boolean isLowQuality();
+
+  public LibraryAdditionalInfo getLibraryAdditionalInfo();
+  
+  public void setLibraryAdditionalInfo(LibraryAdditionalInfo libraryAdditionalInfo);
 }
