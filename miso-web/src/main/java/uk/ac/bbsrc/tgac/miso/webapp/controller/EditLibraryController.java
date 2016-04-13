@@ -39,7 +39,6 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,13 +61,14 @@ import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import net.sf.json.JSONArray;
-import net.sf.json.JsonConfig;
 import net.sf.json.JSONObject;
+import net.sf.json.JsonConfig;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractPool;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -91,6 +91,8 @@ import uk.ac.bbsrc.tgac.miso.core.service.tagbarcode.TagBarcodeStrategy;
 import uk.ac.bbsrc.tgac.miso.core.service.tagbarcode.TagBarcodeStrategyResolverService;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.service.LibraryAdditionalInfoService;
 import uk.ac.bbsrc.tgac.miso.webapp.context.ApplicationContextProvider;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoPropertyExporter;
 
@@ -119,6 +121,8 @@ public class EditLibraryController {
 
   @Autowired
   private TagBarcodeStrategyResolverService tagBarcodeStrategyResolverService;
+  
+  @Autowired LibraryAdditionalInfoService libraryAdditionalInfoService;
 
   public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
     this.dataObjectFactory = dataObjectFactory;
@@ -134,6 +138,10 @@ public class EditLibraryController {
 
   public void setTagBarcodeStrategyResolverService(TagBarcodeStrategyResolverService tagBarcodeStrategyResolverService) {
     this.tagBarcodeStrategyResolverService = tagBarcodeStrategyResolverService;
+  }
+  
+  public void setLibraryAdditionalInfoService(LibraryAdditionalInfoService libraryAdditionalInfoService) {
+    this.libraryAdditionalInfoService = libraryAdditionalInfoService;
   }
 
   public Boolean misoPropertyBoolean(String property) {
@@ -151,6 +159,11 @@ public class EditLibraryController {
   @ModelAttribute("autoGenerateIdBarcodes")
   public Boolean autoGenerateIdentificationBarcodes() {
     return misoPropertyBoolean("miso.autoGenerateIdentificationBarcodes");
+  }
+  
+  @ModelAttribute("detailedSample")
+  public Boolean isDetailedSample() {
+    return misoPropertyBoolean("miso.detailed.sample.enabled");
   }
 
   public Map<String, Library> getAdjacentLibrariesInProject(Library l, Project p) throws IOException {
@@ -597,9 +610,17 @@ public class EditLibraryController {
       for (int i = 0; i < split.length; i++) {
         idList.add(Long.parseLong(split[i]));
       }
-      ObjectMapper mapper = new ObjectMapper();
-      Collection<Library> libraries = requestManager.getLibrariesByIdList(idList);
-      model.put("libraries", mapper.writer().writeValueAsString(libraries));
+      JSONArray libraryDtos = new JSONArray();
+      for (Library library : requestManager.getLibrariesByIdList(idList)) {
+        LibraryAdditionalInfo lai = null;
+        if (isDetailedSample()) {
+          lai = libraryAdditionalInfoService.get(library.getId());
+        }
+        libraryDtos.add(Dtos.asDto(library, lai));
+      }
+      
+      model.put("librariesJSON", libraryDtos);
+      model.put("method", "Edit");
       return new ModelAndView("/pages/bulkEditLibraries.jsp", model);
     } catch (IOException ex) {
       if (log.isDebugEnabled()) {

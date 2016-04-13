@@ -130,7 +130,7 @@ public class LibraryAdditionalInfoController extends RestController {
   public ResponseEntity<?> updateLibraryAdditionalInfo(@PathVariable("id") Long id,
       @RequestBody LibraryAdditionalInfoDto libraryAdditionalInfoDto, HttpServletResponse response) throws IOException {
     LibraryAdditionalInfo libraryAdditionalInfo = Dtos.to(libraryAdditionalInfoDto);
-    libraryAdditionalInfo.setId(id);
+    libraryAdditionalInfo.setLibraryId(id);
     libraryAdditionalInfoService.update(libraryAdditionalInfo);
     return new ResponseEntity<>(HttpStatus.OK);
   }

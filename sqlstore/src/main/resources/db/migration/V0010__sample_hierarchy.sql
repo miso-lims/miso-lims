@@ -312,8 +312,7 @@ CREATE TABLE `SampleTissue` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `LibraryAdditionalInfo` (
-  `libraryAdditionalInfoId` bigint(20) PRIMARY KEY AUTO_INCREMENT,
-  `libraryId` bigint(20) NOT NULL UNIQUE,
+  `libraryId` bigint(20) NOT NULL PRIMARY KEY,
   `tissueOriginId` bigint(20) NOT NULL,
   `tissueTypeId` bigint(20) NOT NULL,
   `sampleGroupId` bigint(20) DEFAULT NULL,

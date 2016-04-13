@@ -736,7 +736,7 @@ public class Dtos {
   
   public static LibraryAdditionalInfoDto asDto(LibraryAdditionalInfo from) {
     LibraryAdditionalInfoDto dto = new LibraryAdditionalInfoDto();
-    dto.setId(from.getId());
+    dto.setLibraryId(from.getLibraryId());
     dto.setLibraryId(from.getLibrary().getId());
     dto.setTissueOrigin(asDto(from.getTissueOrigin()));
     dto.setTissueType(asDto(from.getTissueType()));
@@ -764,7 +764,7 @@ public class Dtos {
   
   public static LibraryAdditionalInfo to(LibraryAdditionalInfoDto from) {
     LibraryAdditionalInfo to = new LibraryAdditionalInfoImpl();
-    to.setId(from.getId());
+    to.setLibraryId(from.getLibraryId());
     to.setTissueOrigin(to(from.getTissueOrigin()));
     to.setTissueType(to(from.getTissueType()));
     if (from.getSampleGroup() != null) {
@@ -831,7 +831,7 @@ public class Dtos {
     dto.setName(from.getName());
     dto.setParentSampleId(from.getSample().getId());
     dto.setParentSampleAlias(from.getSample().getAlias());
-    dto.setCreationDate(from.getCreationDate());
+    dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
     dto.setDescription(from.getDescription());
     dto.setId(from.getId());
     dto.setConcentration(from.getInitialConcentration());
