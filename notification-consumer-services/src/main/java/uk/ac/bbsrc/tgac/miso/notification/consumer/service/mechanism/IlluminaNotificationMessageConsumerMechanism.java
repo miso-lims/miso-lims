@@ -26,7 +26,6 @@ package uk.ac.bbsrc.tgac.miso.notification.consumer.service.mechanism;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import java.io.IOException;
-import java.io.StringBufferInputStream;
 import java.io.StringReader;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -73,7 +72,6 @@ import uk.ac.bbsrc.tgac.miso.core.exception.InterrogationException;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersCollection;
 import uk.ac.bbsrc.tgac.miso.core.service.integration.mechanism.NotificationMessageConsumerMechanism;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.tools.run.RunFolderConstants;
 
 /**
@@ -100,6 +98,7 @@ public class IlluminaNotificationMessageConsumerMechanism
   private final DateFormat logDateFormat = new SimpleDateFormat("MM'/'dd'/'yyyy','HH:mm:ss");
   private final DateFormat anotherLogDateFormat = new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH:mm:ss");
   private final DateFormat illuminaRunFolderDateFormat = new SimpleDateFormat("yyMMdd");
+  @Autowired
   private SequencingParametersCollection parameterSet;
 
   @Override
@@ -172,21 +171,6 @@ public class IlluminaNotificationMessageConsumerMechanism
               r.setCycles(Integer.parseInt(run.getString("numCycles")));
             }
 
-            if (run.has("runparams")) {
-              try {
-                Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder()
-                    .parse(new InputSource(new StringReader(run.getString("runparams"))));
-                for (SequencingParameters parameters : getParameterSet()) {
-                  if (parameters.matches(document)) {
-                    r.setSequencingParametersId(parameters.getId());
-                    break;
-                  }
-                }
-              } catch (SAXException | ParserConfigurationException | XPathExpressionException e) {
-                log.error("Error parsing runparams", e);
-              }
-            }
-
             SequencerReference sr = null;
             if (run.has("sequencerName")) {
               sr = requestManager.getSequencerReferenceByName(run.getString("sequencerName"));
@@ -227,6 +211,26 @@ public class IlluminaNotificationMessageConsumerMechanism
                 } catch (ParseException e) {
                   log.error("run JSON", e);
                 }
+              }
+
+              if (run.has("runparams")) {
+                try {
+                  Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+                      .parse(new InputSource(new StringReader(run.getString("runparams"))));
+                  for (SequencingParameters parameters : getParameterSet()) {
+                    log.debug("Checking run " + runName + " against parameters " + parameters.getName());
+
+                    if (parameters.getPlatformId() == sr.getPlatform().getPlatformId() && parameters.matches(document)) {
+                      log.debug("Matched run " + runName + " to parameters " + parameters.getName());
+                      r.setSequencingParametersId(parameters.getId());
+                      break;
+                    }
+                  }
+                } catch (SAXException | ParserConfigurationException | XPathExpressionException e) {
+                  log.error("Error parsing runparams", e);
+                }
+              } else {
+                log.debug("No run parameters: " + runName);
               }
             }
           } else {
