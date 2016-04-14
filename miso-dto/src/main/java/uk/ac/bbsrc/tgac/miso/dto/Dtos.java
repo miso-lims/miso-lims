@@ -154,6 +154,8 @@ public class Dtos {
     dto.setId(from.getSampleClassId());
     dto.setAlias(from.getAlias());
     dto.setSampleCategory(from.getSampleCategory());
+    dto.setSuffix(from.getSuffix());
+    dto.setStock(from.isStock());
     dto.setCreatedById(from.getCreatedBy().getUserId());
     dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
     dto.setUpdatedById(from.getUpdatedBy().getUserId());
@@ -173,6 +175,8 @@ public class Dtos {
     SampleClass to = new SampleClassImpl();
     to.setAlias(from.getAlias());
     to.setSampleCategory(from.getSampleCategory());
+    to.setSuffix(from.getSuffix());
+    to.setStock(from.isStock());
     return to;
   }
 
@@ -396,12 +400,6 @@ public class Dtos {
     if (!LimsUtils.isStringEmptyOrNull(from.getTubeId())) {
       dto.setTubeId(from.getTubeId());
     }
-    if (from.getStockNumber() != null) {
-      dto.setStockNumber(from.getStockNumber());
-    }
-    if (from.getAliquotNumber() != null) {
-      dto.setAliquotNumber(from.getAliquotNumber());
-    }
     dto.setCreatedById(from.getCreatedBy().getUserId());
     dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
     dto.setUpdatedById(from.getUpdatedBy().getUserId());
@@ -422,8 +420,6 @@ public class Dtos {
     to.setSampleId(from.getSampleId());
     to.setRegion(from.getRegion());
     to.setTubeId(from.getTubeId());
-    to.setStockNumber(from.getStockNumber());
-    to.setAliquotNumber(from.getAliquotNumber());
     if (from.getSampleGroupId() != null) {
       to.setSampleGroup(new SampleGroupImpl());
       to.getSampleGroup().setSampleGroupId(from.getSampleGroupId());

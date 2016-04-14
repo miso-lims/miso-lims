@@ -102,36 +102,17 @@ public class DefaultSampleService implements SampleService {
     // Construct a Sample from the SampleDto.
     Sample sample = to(sampleDto);
     authorizationManager.throwIfNotWritable(sample);
-    User user = authorizationManager.getCurrentUser();
 
     if (sampleDto.getSampleAdditionalInfo() != null && sampleDto.getSampleAdditionalInfo().getParentId() == null) {
       log.debug("No parent has been provided.");
       if (sampleDto.getSampleIdentity() != null && !LimsUtils.isStringEmptyOrNull(sampleDto.getSampleIdentity().getExternalName())) {
         log.debug("Obtaining parent based on external name.");
-        Sample identitySample = null;
         Identity existingIdentity = identityService.get(sampleDto.getSampleIdentity().getExternalName());
         if (existingIdentity != null) {
           log.debug("Parent with existing external name already exists. Using that parent.");
           sample.getSampleAdditionalInfo().setParent(existingIdentity.getSample());
         } else {
-          log.debug("Creating a new Identity to use as a parent.");
-          String number = sampleNumberPerProjectService.nextNumber(sample.getProject());
-          String internalName = sample.getProject().getAlias() + "_" + number;
-          sample.getIdentity().setInternalName(internalName);
-          
-          SampleClass rootSampleClass = sampleClassDao.getSampleClass(sampleDto.getRootSampleClassId());
-          ServiceUtils.throwIfNull(rootSampleClass, "rootSampleClassId", sampleDto.getRootSampleClassId());
-          SampleAdditionalInfoDto sampleAdditionalInfoDto = new SampleAdditionalInfoDto();
-          sampleAdditionalInfoDto.setSampleClassId(sampleDto.getRootSampleClassId());
-          SampleAdditionalInfo sampleAdditionalInfo = sampleAdditionalInfoService.to(sampleAdditionalInfoDto);
-
-          identitySample = new SampleFactoryBuilder().user(user).project(sample.getProject()).description("Identity").sampleType("Identity")
-              .scientificName("Identity").name(HibernateSampleDao.generateTemporaryName()).alias(internalName)
-              .rootSampleClass(rootSampleClass).identity(sample.getIdentity()).sampleAdditionalInfo(sampleAdditionalInfo)
-              .sampleTissue(sample.getSampleTissue()).build();
-          setChangeDetails(identitySample, true);
-          
-          sample.getSampleAdditionalInfo().setParent(identitySample);
+          sample.getSampleAdditionalInfo().setParent(createIdentityParent(sample, sampleDto));
         }
       } else {
         throw new IllegalArgumentException(
@@ -140,12 +121,15 @@ public class DefaultSampleService implements SampleService {
     }
 
     Sample newSample = new SampleFactoryBuilder().description(sample.getDescription()).sampleType(sample.getSampleType())
-        .scientificName(sample.getScientificName()).user(user).project(sample.getProject())
+        .scientificName(sample.getScientificName()).user(authorizationManager.getCurrentUser()).project(sample.getProject())
         .sampleAdditionalInfo(sample.getSampleAdditionalInfo()).sampleAnalyte(sample.getSampleAnalyte()).accession(sample.getAccession())
         .identificationBarcode(sample.getIdentificationBarcode())
         .receivedDate(sample.getReceivedDate()).qcPassed(sample.getQcPassed()).name(HibernateSampleDao.generateTemporaryName())
         .alias(sample.getAlias()).taxonIdentifier(sample.getTaxonIdentifier()).parent(sample.getParent())
         .sampleTissue(sample.getSampleTissue()).volume(sample.getVolume()).build();
+    if (newSample.getAlias() == null) {
+      newSample.setAlias(HibernateSampleDao.generateTemporaryName());
+    }
     setChangeDetails(newSample, true);
 
     if (!LimsUtils.isValidRelationship(sampleValidRelationships, newSample.getParent(), newSample)) {
@@ -160,12 +144,33 @@ public class DefaultSampleService implements SampleService {
     } catch (SQLException e) {
       throw new IllegalArgumentException(e);
     } catch (MisoNamingException e) {
-      throw new IllegalArgumentException("Bad name", e);
+      throw new IllegalArgumentException("Name generator failed to generate a valid name", e);
     } catch (ConstraintViolationException e) {
       // Send the nested root cause message to the user, since it contains the actual error.
       throw new ConstraintViolationException(e.getMessage() + " " + ExceptionUtils.getRootCauseMessage(e), e.getSQLException(),
           e.getConstraintName());
     }
+  }
+  
+  private Sample createIdentityParent(Sample buildingSample, SampleDto newSampleDto) throws IOException {
+    log.debug("Creating a new Identity to use as a parent.");
+    String number = sampleNumberPerProjectService.nextNumber(buildingSample.getProject());
+    // Cannot generate identity alias via sampleNameGenerator because of dependence on SampleNumberPerProjectService
+    String internalName = buildingSample.getProject().getAlias() + "_" + number;
+    buildingSample.getIdentity().setInternalName(internalName);
+    
+    SampleClass rootSampleClass = sampleClassDao.getSampleClass(newSampleDto.getRootSampleClassId());
+    ServiceUtils.throwIfNull(rootSampleClass, "rootSampleClassId", newSampleDto.getRootSampleClassId());
+    SampleAdditionalInfoDto sampleAdditionalInfoDto = new SampleAdditionalInfoDto();
+    sampleAdditionalInfoDto.setSampleClassId(newSampleDto.getRootSampleClassId());
+    SampleAdditionalInfo sampleAdditionalInfo = sampleAdditionalInfoService.to(sampleAdditionalInfoDto);
+
+    Sample identitySample = new SampleFactoryBuilder().user(authorizationManager.getCurrentUser()).project(buildingSample.getProject())
+        .description("Identity").sampleType("Identity").scientificName("Identity").name(HibernateSampleDao.generateTemporaryName())
+        .alias(internalName).rootSampleClass(rootSampleClass).identity(buildingSample.getIdentity()).sampleAdditionalInfo(sampleAdditionalInfo)
+        .sampleTissue(buildingSample.getSampleTissue()).build();
+    setChangeDetails(identitySample, true);
+    return identitySample;
   }
   
   private void setChangeDetails(Sample sample, boolean setCreated) throws IOException {
@@ -220,6 +225,10 @@ public class DefaultSampleService implements SampleService {
       Sample parent = sampleDao.getSample(sampleDto.getSampleAdditionalInfo().getParentId());
       ServiceUtils.throwIfNull(parent, "parentId", sampleDto.getSampleAdditionalInfo().getParentId());
       sample.getSampleAdditionalInfo().setParent(parent);
+      if (sampleDto.getSampleAdditionalInfo().getSampleClassId() != null) {
+        sample.getSampleAdditionalInfo().setSampleClass(sampleClassDao.getSampleClass(
+            sampleDto.getSampleAdditionalInfo().getSampleClassId()));
+      }
     }
 
     if (sampleDto.getSampleIdentity() != null) {

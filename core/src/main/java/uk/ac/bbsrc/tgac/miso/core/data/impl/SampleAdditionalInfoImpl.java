@@ -87,6 +87,8 @@ public class SampleAdditionalInfoImpl implements SampleAdditionalInfo {
 
   @Column(nullable = false)
   private Boolean archived = Boolean.FALSE;
+  
+  private Integer siblingNumber;
 
   @OneToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "createdBy", nullable = false)
@@ -326,13 +328,29 @@ public class SampleAdditionalInfoImpl implements SampleAdditionalInfo {
   
 
   @Override
+  public Integer getSiblingNumber() {
+    return siblingNumber;
+  }
+
+  @Override
+  public void setSiblingNumber(Integer siblingNumber) {
+    this.siblingNumber = siblingNumber;
+  }
+
+  @Override
   public String toString() {
-    return "SampleAdditionalInfoImpl [sampleId=" + sampleId + ", sample=" + sample + ", sampleClass="
-        + sampleClass + ", tissueOrigin=" + tissueOrigin + ", tissueType=" + tissueType + ", qcPassedDetail=" + qcPassedDetail
-        + ", subproject=" + subproject + ", lab=" + lab + ", kitDescriptorId=" + kitDescriptorId + ", prepKit=" + prepKit
-        + ", passageNumber=" + passageNumber + ", timesReceived=" + timesReceived + ", tubeNumber=" + tubeNumber + ", concentration="
-        + concentration + ", externalInstituteIdentifier=" + externalInstituteIdentifier + ", archived=" + archived + ", createdBy=" 
-        + createdBy + ", creationDate=" + creationDate + ", updatedBy=" + updatedBy + ", lastUpdated=" + lastUpdated + "]";
+    return "SampleAdditionalInfoImpl [sampleId=" + sampleId + ", sample="
+        + sample + ", parent=" + parent + ", sampleClass=" + sampleClass
+        + ", tissueOrigin=" + tissueOrigin + ", tissueType=" + tissueType
+        + ", qcPassedDetail=" + qcPassedDetail + ", subproject=" + subproject
+        + ", externalInstituteIdentifier=" + externalInstituteIdentifier
+        + ", lab=" + lab + ", kitDescriptorId=" + kitDescriptorId
+        + ", prepKit=" + prepKit + ", passageNumber=" + passageNumber
+        + ", timesReceived=" + timesReceived + ", tubeNumber=" + tubeNumber
+        + ", concentration=" + concentration + ", archived=" + archived
+        + ", siblingNumber=" + siblingNumber + ", createdBy=" + createdBy
+        + ", creationDate=" + creationDate + ", updatedBy=" + updatedBy
+        + ", lastUpdated=" + lastUpdated + "]";
   }
 
 }
