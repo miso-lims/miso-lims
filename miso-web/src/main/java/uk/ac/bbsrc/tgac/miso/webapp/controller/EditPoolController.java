@@ -110,6 +110,16 @@ public class EditPoolController {
   public Collection<String> populatePlatformTypes() {
     return PlatformType.getKeys();
   }
+
+  @ModelAttribute("libraryDilutionUnits")
+  public String libraryDilutionUnits() {
+    return LibraryDilution.UNITS;
+  }
+  
+  @ModelAttribute("poolConcentrationUnits")
+  public String poolConcentrationUnits() {
+    return AbstractPool.CONCENTRATION_UNITS;
+  }
   
   public Boolean misoPropertyBoolean(String property) {
     MisoPropertyExporter exporter = (MisoPropertyExporter) ApplicationContextProvider.getApplicationContext().getBean("propertyConfigurer");

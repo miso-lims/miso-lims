@@ -978,7 +978,7 @@
 
             <c:if test="${not empty projectLibraries}">
               <a href="javascript:void(0);" onclick="bulkLibraryQcTable('#library_table');" class="add">QC these Libraries</a>
-              <a href="javascript:void(0);" onclick="bulkLibraryDilutionTable('#library_table');" class="add">Add Library Dilutions</a>
+              <a href="javascript:void(0);" onclick="bulkLibraryDilutionTable('#library_table', '${libraryDilutionUnits}');" class="add">Add Library Dilutions</a>
               <a href="javascript:void(0);" onclick="Project.barcode.selectLibraryBarcodesToPrint('#library_table');">Print Barcodes ...</a>
             </c:if>
           </div>
@@ -1075,7 +1075,7 @@
 
                 <c:if test="${not empty projectLibraries}">
                   <a href="javascript:void(0);" onclick="bulkLibraryQcTable('#overview_librarygroup_table_${overview.id}');" class="add">QC these Libraries</a>
-                  <a href="javascript:void(0);" onclick="bulkLibraryDilutionTable('#overview_librarygroup_table_${overview.id}');" class="add">Add Library Dilutions</a>
+                  <a href="javascript:void(0);" onclick="bulkLibraryDilutionTable('#overview_librarygroup_table_${overview.id}', '${libraryDilutionUnits}');" class="add">Add Library Dilutions</a>
                   <a href="javascript:void(0);" onclick="Project.barcode.selectLibraryBarcodesToPrint('#overview_librarygroup_table_${overview.id}');">Print Barcodes ...</a>
                 </c:if>
               </div>
@@ -1201,7 +1201,7 @@
         <th>Dilution Creator</th>
         <th>Dilution Creation Date</th>
         <th>Dilution Platform</th>
-        <th>Dilution Concentration</th>
+        <th>Dilution Concentration (${libraryDilutionUnits})</th>
         <sec:authorize access="hasRole('ROLE_ADMIN')">
           <th class="fit">DELETE</th>
         </sec:authorize>
@@ -1283,7 +1283,7 @@
         <th>Pool Alias</th>
         <th>Pool Platform</th>
         <th>Pool Creation Date</th>
-        <th>Pool Concentration</th>
+        <th>Pool Concentration (${poolConcentrationUnits})</th>
         <sec:authorize access="hasRole('ROLE_ADMIN')">
           <th class="fit">DELETE</th>
         </sec:authorize>

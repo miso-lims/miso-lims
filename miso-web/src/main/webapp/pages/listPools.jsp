@@ -70,7 +70,7 @@
           <table cellpadding="0" cellspacing="0" border="0" class="display" id="listing${pt}PoolsTable"></table>
           <script type="text/javascript">
             jQuery(document).ready(function () {
-              Pool.ui.createListingPoolsTable('${pt}');
+              Pool.ui.createListingPoolsTable('${pt}', '${poolConcentrationUnits}');
             });
           </script>
         </div>

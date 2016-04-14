@@ -383,7 +383,8 @@
                 <td>${qc.qcCreator}</td>
                 <td><fmt:formatDate value="${qc.qcDate}"/></td>
                 <td>${qc.qcType.name}</td>
-                <td id="results${qc.id}">${qc.results} ${qc.qcType.units}</td>
+                <fmt:formatNumber var="resultsRounded" value="${qc.results}" maxFractionDigits="2" />
+                <td id="results${qc.id}">${resultsRounded} ${qc.qcType.units}</td>
                 <c:if test="${(sample.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
                                           or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
                   <td id="edit${qc.id}" align="center"><a href="javascript:void(0);"
@@ -525,7 +526,7 @@
           <th>Pool Alias</th>
           <th>Pool Platform</th>
           <th>Pool Creation Date</th>
-          <th>Pool Concentration</th>
+          <th>Pool Concentration (${poolConcentrationUnits})</th>
           <sec:authorize access="hasRole('ROLE_ADMIN')">
             <th class="fit">DELETE</th>
           </sec:authorize>
@@ -1225,7 +1226,7 @@ function bulkLibraryDilutionTable() {
     //headers
     jQuery("#library_table tr:first").prepend("<th>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\"#library_table\", this);'></span></th>");
     jQuery("#library_table tr:first").append("<th>Dilution Date <span header='qcDate' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.fillDown(\"#library_table\", this);'></span></th>");
-    jQuery("#library_table tr:first").append("<th>Results</th>");
+    jQuery("#library_table tr:first").append("<th>Concentration (${libraryDilutionUnits})</th>");
 
     //columns
     jQuery("#library_table tr:gt(0)").prepend("<td class='rowSelect'></td>");

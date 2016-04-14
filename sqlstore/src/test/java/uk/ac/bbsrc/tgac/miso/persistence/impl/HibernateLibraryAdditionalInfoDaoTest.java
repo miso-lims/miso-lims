@@ -1,0 +1,161 @@
+package uk.ac.bbsrc.tgac.miso.persistence.impl;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
+import java.io.IOException;
+import java.util.Date;
+import java.util.List;
+
+import org.hibernate.SessionFactory;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.eaglegenomics.simlims.core.User;
+
+import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryAdditionalInfo;
+import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
+import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAdditionalInfoImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
+import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
+
+public class HibernateLibraryAdditionalInfoDaoTest extends AbstractDAOTest {
+  
+  @Autowired
+  private SessionFactory sessionFactory;
+  
+  @Mock
+  private KitStore kitStore;
+  
+  @InjectMocks
+  HibernateLibraryAdditionalInfoDao dao;
+  
+  @Before
+  public void setup() {
+    MockitoAnnotations.initMocks(this);
+    dao.setSessionFactory(sessionFactory);
+  }
+  
+  @Test
+  public void testGetList() throws IOException {
+    List<LibraryAdditionalInfo> list = dao.getLibraryAdditionalInfo();
+    assertNotNull(list);
+    assertEquals(1, list.size());
+  }
+  
+  @Test
+  public void testGetSingle() throws IOException {
+    LibraryAdditionalInfo info = dao.getLibraryAdditionalInfo(1L);
+    assertNotNull(info);
+    assertEquals(Long.valueOf(1L), info.getId());
+  }
+  
+  @Test
+  public void testGetByLibrary() throws IOException {
+    LibraryAdditionalInfo info = dao.getLibraryAdditionalInfoByLibraryId(1L);
+    assertNotNull(info);
+    assertEquals(1L, info.getLibrary().getId());
+  }
+  
+  @Test
+  public void testGetByLibraryNull() throws IOException {
+    LibraryAdditionalInfo info = dao.getLibraryAdditionalInfoByLibraryId(100L);
+    assertNull(info);
+  }
+  
+  @Test
+  public void testGetSingleNull() throws IOException {
+    LibraryAdditionalInfo info = dao.getLibraryAdditionalInfo(100L);
+    assertNull(info);
+  }
+  
+  @Test
+  public void testAdd() throws IOException {
+    LibraryAdditionalInfo info = new LibraryAdditionalInfoImpl();
+    User user = new UserImpl();
+    user.setUserId(1L);
+    info.setCreatedBy(user);
+    info.setUpdatedBy(user);
+    Date now = new Date();
+    info.setCreationDate(now);
+    info.setLastUpdated(now);
+    KitDescriptor kit = mockKitDescriptorInStore(1L);
+    info.setPrepKit(kit);
+    Library library = new LibraryImpl();
+    library.setId(2L);
+    info.setLibrary(library);
+    TissueOrigin origin = new TissueOriginImpl();
+    origin.setTissueOriginId(1L);
+    info.setTissueOrigin(origin);
+    TissueType type = new TissueTypeImpl();
+    type.setTissueTypeId(1L);
+    info.setTissueType(type);
+    
+    Long newId = dao.addLibraryAdditionalInfo(info);
+    assertNotNull(newId);
+    LibraryAdditionalInfo saved = dao.getLibraryAdditionalInfo(newId);
+    assertNotNull(saved);
+    assertEquals(newId, saved.getId());
+    assertEquals(user.getUserId(), saved.getCreatedBy().getUserId());
+    assertEquals(user.getUserId(), saved.getUpdatedBy().getUserId());
+    assertEquals(library.getId(), saved.getLibrary().getId());
+    assertEquals(kit.getKitDescriptorId(), saved.getPrepKit().getKitDescriptorId());
+    assertEquals(origin.getTissueOriginId(), saved.getTissueOrigin().getTissueOriginId());
+    assertEquals(type.getTissueTypeId(), saved.getTissueType().getTissueTypeId());
+  }
+  
+  @Test
+  public void testDelete() throws IOException {
+    LibraryAdditionalInfo info = dao.getLibraryAdditionalInfo(1L);
+    assertNotNull(info);
+    dao.deleteLibraryAdditionalInfo(info);
+    assertNull(dao.getLibraryAdditionalInfo(1L));
+  }
+  
+  @Test
+  public void testUpdate() throws IOException {
+    mockKitDescriptorInStore(1L);
+    
+    LibraryAdditionalInfo info = dao.getLibraryAdditionalInfo(1L);
+    assertNotNull(info);
+    assertEquals(Long.valueOf(1L), info.getPrepKit().getKitDescriptorId());
+    KitDescriptor newKit = mockKitDescriptorInStore(2L);
+    info.setPrepKit(newKit);
+    Date oldDate = info.getLastUpdated();
+    
+    dao.update(info);
+    LibraryAdditionalInfo updated = dao.getLibraryAdditionalInfo(1L);
+    assertEquals(newKit.getKitDescriptorId(), updated.getPrepKit().getKitDescriptorId());
+    assertFalse(oldDate.equals(updated.getLastUpdated()));
+  }
+  
+  /**
+   * Creates a mock KitDescriptor with only getKitDescriptorId() set up, and adds it to be returned 
+   * from kitStore.getKitDescriptorById()
+   * 
+   * @param id the ID to use for the mock, and retrieval via kitStore
+   * @return the mock KitDescriptor
+   * @throws IOException
+   */
+  private KitDescriptor mockKitDescriptorInStore(Long id) throws IOException {
+    KitDescriptor kd = Mockito.mock(KitDescriptor.class);
+    Mockito.when(kd.getKitDescriptorId()).thenReturn(id);
+    Mockito.when(kitStore.getKitDescriptorById(id)).thenReturn(kd);
+    return kd;
+  }
+
+}

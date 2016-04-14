@@ -61,6 +61,9 @@
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleNumberPerProjectImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.InstituteImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAdditionalInfoImpl</value>
       </list>
     </property>
     <property name="hibernateProperties">

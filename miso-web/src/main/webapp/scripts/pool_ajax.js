@@ -362,7 +362,7 @@ Pool.ui = {
     );
   },
 
-  createListingPoolsTable : function(platform) {
+  createListingPoolsTable : function(platform, poolConcentrationUnits) {
     var table = 'listing'+platform+'PoolsTable';
     jQuery('#'+table).html("<img src='../styles/images/ajax-loader.gif'/>");
     jQuery.fn.dataTableExt.oSort['no-po-asc'] = function(x, y) {
@@ -392,7 +392,7 @@ Pool.ui = {
             { "sTitle": "Date Created"},
             { "sTitle": "Information"},
             { "sTitle": "Average Insert Size"},
-            { "sTitle": "Concentration"}
+            { "sTitle": "Concentration ("+poolConcentrationUnits+")"}
           ],
           "bJQueryUI": true,
           "iDisplayLength":  25,
@@ -457,7 +457,7 @@ Pool.ui = {
     );
   },
 
-  createElementSelectDatatable : function(platform) {
+  createElementSelectDatatable : function(platform, libraryDilutionConcentrationUnits) {
     jQuery('#elementSelectDatatableDiv').html("<table cellpadding='0' width='100%' cellspacing='0' border='0' class='display' id='elementSelectDatatable'></table>");
     jQuery('#elementSelectDatatable').html("<img src='/styles/images/ajax-loader.gif'/>");
     Fluxion.doAjax(
@@ -471,20 +471,20 @@ Pool.ui = {
 
               jQuery('#elementSelectDatatable').html('');
               jQuery('#elementSelectDatatable').dataTable({
-                                            "aaData": json.poolelements,
-                                            "aoColumns": [
-                                              { "sTitle": "Dilution Name", "sType":"natural"},
-                                              { "sTitle": "Library", "sType":"natural"},
-                                              { "sTitle": "Sample", "sType":"natural"},
-                                              { "sTitle": "Project", "sType":"natural"},
-                                              { "sTitle": "Add"}
-                                            ],
-                                            "bJQueryUI": true,
-                                            "iDisplayLength":  25,
-                                            "aaSorting":[
-                                              [0,"desc"]
-                                            ]
-                                          });
+                "aaData": json.poolelements,
+                "aoColumns": [
+                  { "sTitle": "Dilution Name", "sType":"natural"},
+                  { "sTitle": "Concentration ("+libraryDilutionConcentrationUnits+")", "sType":"natural"},
+                  { "sTitle": "Library", "sType":"natural"},
+                  { "sTitle": "Sample", "sType":"natural"},
+                  { "sTitle": "Add"}
+                ],
+                "bJQueryUI": true,
+                "iDisplayLength":  25,
+                "aaSorting":[
+                  [0,"desc"]
+                ]
+              });
 
             }
             }

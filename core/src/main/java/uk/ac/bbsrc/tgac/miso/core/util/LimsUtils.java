@@ -44,6 +44,7 @@ import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
@@ -813,4 +814,11 @@ public class LimsUtils {
     }
     return false;
   }
+
+  public static double round(double value, int numberOfDigitsAfterDecimalPoint) {
+    BigDecimal bigDecimal = new BigDecimal(value);
+    bigDecimal = bigDecimal.setScale(numberOfDigitsAfterDecimalPoint, BigDecimal.ROUND_HALF_UP);
+    return bigDecimal.doubleValue();
+  }
+
 }
