@@ -1,7 +1,5 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
-import java.util.Date;
-
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
@@ -9,9 +7,9 @@ public class LibraryDto {
   
   private String alias;
   private Double concentration;
-  private Date creationDate;
+  private String creationDate;
   private String description;
-  private Long id;
+  private Long libraryId;
   private LibraryAdditionalInfoDto libraryAdditionalInfo;
   private Long librarySelectionTypeId;
   private Long libraryStrategyTypeId;
@@ -32,14 +30,14 @@ public class LibraryDto {
   public Double getConcentration() {
     return concentration;
   }
-  public Date getCreationDate() {
+  public String getCreationDate() {
     return creationDate;
   }
   public String getDescription() {
     return description;
   }
   public Long getId() {
-    return id;
+    return libraryId;
   }
   public LibraryAdditionalInfoDto getLibraryAdditionalInfo() {
     return libraryAdditionalInfo;
@@ -86,14 +84,14 @@ public class LibraryDto {
   public void setConcentration(Double concentration) {
     this.concentration = concentration;
   }
-  public void setCreationDate(Date creationDate) {
+  public void setCreationDate(String creationDate) {
     this.creationDate = creationDate;
   }
   public void setDescription(String description) {
     this.description = description;
   }
-  public void setId(Long id) {
-    this.id = id;
+  public void setId(Long libraryId) {
+    this.libraryId = libraryId;
   }
   public void setLibraryAdditionalInfo(LibraryAdditionalInfoDto libraryAdditionalInfo) {
     this.libraryAdditionalInfo = libraryAdditionalInfo;

@@ -61,7 +61,7 @@ public class HibernateLibraryAdditionalInfoDaoTest extends AbstractDAOTest {
   public void testGetSingle() throws IOException {
     LibraryAdditionalInfo info = dao.getLibraryAdditionalInfo(1L);
     assertNotNull(info);
-    assertEquals(Long.valueOf(1L), info.getId());
+    assertEquals(Long.valueOf(1L), info.getLibraryId());
   }
   
   @Test
@@ -109,7 +109,7 @@ public class HibernateLibraryAdditionalInfoDaoTest extends AbstractDAOTest {
     assertNotNull(newId);
     LibraryAdditionalInfo saved = dao.getLibraryAdditionalInfo(newId);
     assertNotNull(saved);
-    assertEquals(newId, saved.getId());
+    assertEquals(newId, saved.getLibraryId());
     assertEquals(user.getUserId(), saved.getCreatedBy().getUserId());
     assertEquals(user.getUserId(), saved.getUpdatedBy().getUserId());
     assertEquals(library.getId(), saved.getLibrary().getId());

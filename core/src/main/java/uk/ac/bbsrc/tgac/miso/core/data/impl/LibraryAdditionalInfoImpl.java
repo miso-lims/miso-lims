@@ -4,10 +4,9 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.MapsId;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -26,12 +25,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 public class LibraryAdditionalInfoImpl implements LibraryAdditionalInfo {
   
   @Id
-  @Column(name = "libraryAdditionalInfoId")
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  private Long libraryId;
   
   @OneToOne(targetEntity = LibraryImpl.class)
   @JoinColumn(name = "libraryId", nullable = false)
+  @MapsId
   private Library library;
   
   @OneToOne(targetEntity = TissueOriginImpl.class)
@@ -69,13 +67,13 @@ public class LibraryAdditionalInfoImpl implements LibraryAdditionalInfo {
   private Boolean archived = Boolean.FALSE;
 
   @Override
-  public Long getId() {
-    return id;
+  public Long getLibraryId() {
+    return libraryId;
   }
 
   @Override
-  public void setId(Long id) {
-    this.id = id;
+  public void setLibraryId(Long libraryId) {
+    this.libraryId = libraryId;
   }
 
   @Override
