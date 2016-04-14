@@ -154,4 +154,9 @@ public class DefaultEntityNamingScheme<T extends Nameable> implements MisoNaming
     }
     return false;
   }
+
+  @Override
+  public boolean hasGeneratorFor(String fieldName) {
+    return "name".equals(fieldName) || customNameGeneratorMap.containsKey(fieldName);
+  }
 }

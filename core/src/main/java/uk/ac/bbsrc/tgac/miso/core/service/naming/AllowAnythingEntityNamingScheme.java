@@ -90,4 +90,10 @@ public class AllowAnythingEntityNamingScheme<T extends Nameable> implements Miso
   @CoverageIgnore
   public void setAllowDuplicateEntityName(String fieldName, boolean allow) {
   }
+
+  @Override
+  public boolean hasGeneratorFor(String fieldName) {
+    // technically generates the same name for any field.. Not intended for actual use though
+    return false;
+  }
 }

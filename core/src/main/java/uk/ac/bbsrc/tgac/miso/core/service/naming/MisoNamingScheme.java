@@ -33,4 +33,6 @@ public interface MisoNamingScheme<T> {
   boolean allowDuplicateEntityNameFor(String fieldName);
 
   void setAllowDuplicateEntityName(String fieldName, boolean allow);
+  
+  boolean hasGeneratorFor(String fieldName);
 }
