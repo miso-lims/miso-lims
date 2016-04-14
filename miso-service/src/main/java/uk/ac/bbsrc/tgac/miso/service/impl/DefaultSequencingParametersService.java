@@ -2,7 +2,6 @@ package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
@@ -24,7 +23,7 @@ import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 @Transactional
 @Service
-public class DefaultSequencingParametersService implements SequencingParametersService, SequencingParametersCollection {
+public class DefaultSequencingParametersService implements SequencingParametersService {
   protected static final Logger log = LoggerFactory.getLogger(DefaultSequencingParametersService.class);
 
   @Autowired
@@ -57,15 +56,6 @@ public class DefaultSequencingParametersService implements SequencingParametersS
   @Override
   public Set<SequencingParameters> getAll() throws IOException {
     return Sets.newTreeSet(sequencingParametersDao.getSequencingParameters());
-  }
-
-  @Override
-  public Iterator<SequencingParameters> iterator() {
-    try {
-      return getAll().iterator();
-    } catch (IOException e) {
-      return Collections.emptyIterator();
-    }
   }
 
   @Override

@@ -1,7 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import org.hibernate.Query;
@@ -81,6 +83,16 @@ public class HibernateSequencingParametersDao implements SequencingParametersDao
     Date now = new Date();
     sequencingParameters.setLastUpdated(now);
     currentSession().update(sequencingParameters);
+  }
+
+  @Override
+  public Iterator<SequencingParameters> iterator() {
+    try {
+      return getSequencingParameters().iterator();
+    } catch (IOException e) {
+      log.error("Failed to get sequencing parameters", e);
+      return Collections.emptyIterator();
+    }
   }
 
 }
