@@ -989,14 +989,15 @@ Library.ui = {
           var selectAll = '<label><input type="checkbox" onchange="Library.ui.checkAll(this)" id="checkAll">Select All</label>';
           document.getElementById('listingLibrariesTable').insertAdjacentHTML('beforebegin', selectAll);
           
-          var actions = ['<select class="dropdownActions" onchange="Library.ui.handleBulkAction(this)"><option value="">-- Bulk actions</option>'];
+          var actions = ['<select id="dropdownActions"><option value="">-- Bulk actions</option>'];
           actions.push('<option value="update">Update selected</option>');
           actions.push('<option value="dilutions">Make dilutions from selected</option>');
           actions.push('<option value="empty">Empty selected</option>');
           actions.push('<option value="archive">Archive selected</option>');
           actions.push('</select>');
-          document.getElementById('listingLibrariesTable').insertAdjacentHTML('beforebegin', actions.join(''));
           document.getElementById('listingLibrariesTable').insertAdjacentHTML('afterend', actions.join(''));
+          var saveButton = '<button id="go" type="button" onclick="Library.ui.handleBulkAction();">Go</button>';
+          document.getElementById('dropdownActions').insertAdjacentHTML('afterend', saveButton);
         }
       }
     );
@@ -1051,7 +1052,18 @@ Library.ui = {
       alert("Please select one or more Libraries to dilute.");
       return false;
     }
-    alert("Finish methods to actually make the table and page.");
+    var cageDiv = '<div id="cageDialog"><span class="dialog">Look for this feature in the next release!<br>' 
+      + '<img src="http://images.mentalfloss.com/sites/default/files/styles/insert_main_wide_image/public/uncanny_valley.jpg"/></span></div>';
+    document.getElementById('go').insertAdjacentHTML('afterend', cageDiv);
+    jQuery('#cageDialog').dialog({
+      modal: true,
+      width: 640,
+      buttons: {
+        "Ok": function () {
+          jQuery(this).dialog("close");
+        }
+      }
+    });
   },
   
   // TODO: finish this, and the one in sample_ajax.js
@@ -1061,7 +1073,18 @@ Library.ui = {
       alert("Please select one or more Libraries to empty.");
       return false;
     }
-    alert("Finish method to bulk empty libraries.");
+    var cageDiv = '<div id="cageDialog"><span class="dialog">Look for this feature in the next release!<br>' 
+      + '<img src="http://nicolascage.us/wp-content/uploads/2013/08/Comet-Cage1.jpg"/></span></div>';
+    document.getElementById('go').insertAdjacentHTML('afterend', cageDiv);
+    jQuery('#cageDialog').dialog({
+      modal: true,
+      width: 620,
+      buttons: {
+        "Ok": function () {
+          jQuery(this).dialog("close");
+        }
+      }
+    });
   },
   
   //TODO: finish this, and the one in sample_ajax.js
@@ -1071,6 +1094,17 @@ Library.ui = {
       alert("Please select one or more Libraries to archive.");
       return false;
     }
-    alert("Finish method to bulk archive libraries.");
+    var cageDiv = '<div id="cageDialog"><span class="dialog">Look for this feature in the next release!<br>' 
+      + '<img src="http://i2.listal.com/image/1675309/600full-fast-times-at-ridgemont-high-screenshot.jpg"/></span></div>';
+    document.getElementById('go').insertAdjacentHTML('afterend', cageDiv);
+    jQuery('#cageDialog').dialog({
+      modal: true,
+      width: 620,
+      buttons: {
+        "Ok": function () {
+          jQuery(this).dialog("close");
+        }
+      }
+    });
   }
 };

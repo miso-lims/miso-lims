@@ -796,7 +796,7 @@ Sample.ui = {
           var selectAll = '<label><input type="checkbox" onchange="Sample.ui.checkAll(this)" id="checkAll">Select All</label>';
           document.getElementById('listingSamplesTable').insertAdjacentHTML('beforebegin', selectAll);
           
-          var actions = ['<select class="dropdownActions" onchange="Sample.ui.checkForPropagate(this);"><option value="">-- Bulk actions</option>'];
+          var actions = ['<select id="dropdownActions" onchange="Sample.ui.checkForPropagate(this);"><option value="">-- Bulk actions</option>'];
           actions.push('<option value="update">Update selected</option>');
           actions.push('<option value="propagateSams">Propagate (sample) selected</option>');
           actions.push('<option value="propagateLibs">Propagate (library) selected</option>');
@@ -804,8 +804,8 @@ Sample.ui = {
           actions.push('<option value="archive">Archive selected</option>');
           actions.push('</select>');
           document.getElementById('listingSamplesTable').insertAdjacentHTML('afterend', actions.join(''));
-          var dropdownAndSave = '<div id="classOptions"></div><button id="go" type="button" onclick="Sample.ui.handleBulkAction();">Go</button>';
-          document.getElementById('dropdownActions').insertAdjacentHTML('afterend', dropdownAndSave);
+          var goButton = '<div id="classOptions"></div><button id="go" type="button" onclick="Sample.ui.handleBulkAction();">Go</button>';
+          document.getElementById('dropdownActions').insertAdjacentHTML('afterend', goButton);
         }
       }
     );
@@ -863,18 +863,17 @@ Sample.ui = {
       alert("Please select one or more Samples to update.");
       return false;
     }
-    window.location="sample/bulk/" + selectedIdsArray.join(',');
+    window.location="sample/bulk/edit/" + selectedIdsArray.join(',');
   },
-  
-  // TODO: finish this
+
   propagateSamSelectedItems: function () {
-    var selectedClass = document.getElementById('classDropdown').value;
+    var selectedClassId = document.getElementById('classDropdown').value;
     var selectedIdsArray = Sample.ui.getSelectedIds();
     if (selectedIdsArray.length === 0) {
       alert("Please select one or more Samples to propagate.");
       return false;
     }
-    alert("Finish methods to check which samples this group can propagate, and then actually make the table.");
+    window.location="sample/bulk/create/" + selectedIdsArray.join(',') + "&scid=" + selectedClassId;
   },
   
   // TODO: finish this...
@@ -895,7 +894,18 @@ Sample.ui = {
       alert("Please select one or more Samples to empty.");
       return false;
     }
-    alert("Finish method to bulk empty Samples.");
+    var cageDiv = '<div id="cageDialog"><span class="dialog">Look for this feature in the next release!<br>' 
+                  + '<img src="http://images.mentalfloss.com/sites/default/files/styles/insert_main_wide_image/public/tumblr_m3fc1bghyt1rq84v4o1_1280.png"/></span></div>';
+    document.getElementById('go').insertAdjacentHTML('afterend', cageDiv);
+    jQuery('#cageDialog').dialog({
+      modal: true,
+      width: 620,
+      buttons: {
+        "Ok": function () {
+          jQuery(this).dialog("close");
+        }
+      }
+    });
   },
   
   //TODO: finish this, and the one in library_ajax.js
@@ -905,7 +915,18 @@ Sample.ui = {
       alert("Please select one or more Samples to archive.");
       return false;
     }
-    alert("Finish method to bulk archive samples.");
+    var cageDiv = '<div id="cageDialog"><span class="dialog">Look for this feature in the next release!<br>' 
+      + '<img src="http://dorkshelf.com/wordpress/wp-content/uploads//2012/02/Raising-Arizona-Nicolas-Cage-2.jpg"/></span></div>';
+    document.getElementById('go').insertAdjacentHTML('afterend', cageDiv);
+    jQuery('#cageDialog').dialog({
+      modal: true,
+      width: 620,
+      buttons: {
+        "Ok": function () {
+          jQuery(this).dialog("close");
+        }
+      }
+    });
   },
   
   insertSampleClassesDropdown: function () {
