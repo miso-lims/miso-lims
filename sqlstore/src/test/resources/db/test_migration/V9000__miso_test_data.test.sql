@@ -391,6 +391,13 @@ VALUES (33, 1);
 DELETE FROM `Pool_Note`;
 INSERT INTO `Pool_Note`(`pool_poolId`, `notes_noteId`)
 VALUES (33, 2);
+	
+DELETE FROM `emPCR`;
+INSERT INTO `emPCR` (`pcrId`, `concentration`, `dilution_dilutionId`, `creationDate`, `pcrUserName`, `name`, `securityProfile_profileId`)
+VALUES 
+(1, 10.00, 1, '2016-03-19', 'Bobby Davro', 'Mr emPCR', 1),
+(2, 30.01, 1, '2016-03-19', 'Bobby Charlton', 'Mrs emPCR', 1),
+(3, 30.11, 1, '2016-03-19', 'Bobby Dazzler', 'Professor emPCR', 1);
 
 INSERT INTO `User` (`userId`, `active`, `admin`, `external`, `fullName`, `internal`, `loginName`, `password`, `email`)
 VALUES (3,1,0,0,'user',1,'user','user','user@user.user');

@@ -57,6 +57,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.EmPCRDilutionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.EmPCRStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
+import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
@@ -101,11 +102,13 @@ public class SQLEmPCRDAO implements EmPCRStore {
   private MisoNamingScheme<emPCR> namingScheme;
 
   @Override
+  @CoverageIgnore
   public MisoNamingScheme<emPCR> getNamingScheme() {
     return namingScheme;
   }
 
   @Override
+  @CoverageIgnore
   public void setNamingScheme(MisoNamingScheme<emPCR> namingScheme) {
     this.namingScheme = namingScheme;
   }
@@ -113,6 +116,7 @@ public class SQLEmPCRDAO implements EmPCRStore {
   @Autowired
   private CacheManager cacheManager;
 
+  @CoverageIgnore
   public void setCacheManager(CacheManager cacheManager) {
     this.cacheManager = cacheManager;
   }
@@ -120,34 +124,42 @@ public class SQLEmPCRDAO implements EmPCRStore {
   @Autowired
   private DataObjectFactory dataObjectFactory;
 
+  @CoverageIgnore
   public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
     this.dataObjectFactory = dataObjectFactory;
   }
 
+  @CoverageIgnore
   public JdbcTemplate getJdbcTemplate() {
     return template;
   }
 
+  @CoverageIgnore
   public void setJdbcTemplate(JdbcTemplate template) {
     this.template = template;
   }
 
+  @CoverageIgnore
   public void setLibraryDilutionDAO(LibraryDilutionStore libraryDilutionDAO) {
     this.libraryDilutionDAO = libraryDilutionDAO;
   }
 
+  @CoverageIgnore
   public void setEmPCRDilutionDAO(EmPCRDilutionStore emPCRDilutionDAO) {
     this.emPCRDilutionDAO = emPCRDilutionDAO;
   }
 
+  @CoverageIgnore
   public void setCascadeType(CascadeType cascadeType) {
     this.cascadeType = cascadeType;
   }
 
+  @CoverageIgnore
   public Store<SecurityProfile> getSecurityProfileDAO() {
     return securityProfileDAO;
   }
 
+  @CoverageIgnore
   public void setSecurityProfileDAO(Store<SecurityProfile> securityProfileDAO) {
     this.securityProfileDAO = securityProfileDAO;
   }
@@ -279,16 +291,19 @@ public class SQLEmPCRDAO implements EmPCRStore {
     return false;
   }
 
+  @CoverageIgnore
   public class EmPCRMapper extends CacheAwareRowMapper<emPCR> {
+    @CoverageIgnore
     public EmPCRMapper() {
       super(emPCR.class);
     }
-
+    @CoverageIgnore
     public EmPCRMapper(boolean lazy) {
       super(emPCR.class, lazy);
     }
 
     @Override
+    @CoverageIgnore
     public emPCR mapRow(ResultSet rs, int rowNum) throws SQLException {
       long id = rs.getLong("pcrId");
 
