@@ -160,4 +160,9 @@ public class OicrSampleNamingScheme implements RequestManagerAwareNamingScheme<S
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
   }
+
+  @Override
+  public boolean hasGeneratorFor(String fieldName) {
+    return customNameGeneratorMap.containsKey(fieldName);
+  }
 }

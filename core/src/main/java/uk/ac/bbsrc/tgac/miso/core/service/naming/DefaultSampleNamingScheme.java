@@ -157,4 +157,9 @@ public class DefaultSampleNamingScheme implements RequestManagerAwareNamingSchem
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
   }
+
+  @Override
+  public boolean hasGeneratorFor(String fieldName) {
+    return customNameGeneratorMap.containsKey(fieldName);
+  }
 }

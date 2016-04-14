@@ -199,4 +199,9 @@ public class OicrLibraryNamingScheme implements RequestManagerAwareNamingScheme<
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
   }
+
+  @Override
+  public boolean hasGeneratorFor(String fieldName) {
+    return "alias".equals(fieldName) || customNameGeneratorMap.containsKey(fieldName);
+  }
 }

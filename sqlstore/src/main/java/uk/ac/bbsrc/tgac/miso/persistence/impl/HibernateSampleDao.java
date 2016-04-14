@@ -115,7 +115,7 @@ public class HibernateSampleDao implements SampleDao, SampleStore {
     // We can't generate the name until we have the ID and we don't have an ID until we start the persistence. So, we assign a temporary
     // name.
     sample.setName(generateTemporaryName());
-    if (sample.getAlias() == null) {
+    if (sample.getAlias() == null && sampleNamingScheme.hasGeneratorFor("alias")) {
       sample.setAlias(generateTemporaryName());
     }
     generateSiblingNumberIfRequired(sample);
@@ -195,7 +195,8 @@ public class HibernateSampleDao implements SampleDao, SampleStore {
   }
   
   private void updateSampleAliasIfRequired(Sample sample) throws MisoNamingException {
-    if (hasTemporaryAlias(sample) && sample.getId() > Sample.UNSAVED_ID) {
+    if (hasTemporaryAlias(sample) && sample.getId() > Sample.UNSAVED_ID 
+        && sampleNamingScheme.hasGeneratorFor("alias") ) {
       String alias = sampleNamingScheme.generateNameFor("alias", sample);
       sample.setAlias(alias);
     }
