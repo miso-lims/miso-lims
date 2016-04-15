@@ -448,6 +448,7 @@ public class SQLRunDAO implements RunStore {
         params.addValue("status_statusId", statusId);
         params.addValue("sequencerReference_sequencerReferenceId", run.getSequencerReference().getId());
         params.addValue("lastModifier", run.getLastModifier().getUserId());
+        params.addValue("sequencingParameters_parametersId", run.getSequencingParametersId());
 
         if (run.getId() == AbstractRun.UNSAVED_ID) {
           SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(TABLE_NAME).usingGeneratedKeyColumns("runId");

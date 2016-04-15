@@ -35,6 +35,7 @@
   </bean>
 
   <bean id="applicationContextProvider" name="applicationContextProvider" class="uk.ac.bbsrc.tgac.miso.webapp.context.ApplicationContextProvider" />
+  <bean id="iApplicationContextProvider" name="iApplicationContextProvider" class="uk.ac.bbsrc.tgac.miso.integration.context.ApplicationContextProvider" />
 
   <!-- this will be wrapped in on the given build profile, i.e. 'mvn clean install -D database=sql' or 'mvn clean install -D database=db4o' -->
   <import resource="db-config.xml" />
