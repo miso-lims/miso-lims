@@ -11,17 +11,17 @@ INSERT INTO BoxUse (alias) VALUES
   ('Sequencing'),
   ('Plate');
 
-DELETE FROM `LibraryDesignType`;
-INSERT INTO LibraryDesignType (name, description) VALUES
-  ('WG', 'Whole genome'),
-  ('EX', 'Exome'),
-  ('TS', 'Targeted sequencing'),
-  ('TR', 'Total RNA library (no selection)'),
-  ('WT', 'Whole transcriptome'),
-  ('SM', 'smRNA'),
-  ('MR', 'mRNA'),
-  ('CH', 'ChIP'),
-  ('BS', 'Bisulphite');
+--DELETE FROM `LibraryDesignType`;
+--INSERT INTO LibraryDesignType (name, description) VALUES
+--  ('WG', 'Whole genome'),
+--  ('EX', 'Exome'),
+--  ('TS', 'Targeted sequencing'),
+--  ('TR', 'Total RNA library (no selection)'),
+--  ('WT', 'Whole transcriptome'),
+--  ('SM', 'smRNA'),
+--  ('MR', 'mRNA'),
+--  ('CH', 'ChIP'),
+--  ('BS', 'Bisulphite');
 
 INSERT INTO `LibraryType` (description, platformType) VALUES
   ('cDNA', 'PacBio'),
@@ -31,15 +31,6 @@ INSERT INTO `LibraryType` (description, platformType) VALUES
   ('20kb Shotgun', 'PacBio'),
   ('Plasmid', 'PacBio'),
   ('BAC', 'PacBio');
-
-INSERT INTO `Platform` (name, instrumentModel, description, numContainers) VALUES
-  ('Illumina', 'Illumina HiSeq 2500', '4-channel flowgram', 1),
-  ('Illumina', 'Illumina NextSeq 500', '4-channel flowgram', 1),
-  ('Illumina', 'Illumina HiSeq X Ten', '4-channel flowgram', 1),
-  ('OxfordNanopore', 'MinION', 'Nanopore', 1),
-  ('OxfordNanopore', 'GridION', 'Nanopore', 1),
-  ('IonTorrent', 'Ion Torrent PGM', 'Ion Torrent', 1),
-  ('IonTorrent', 'Ion Torrent Proton', 'Ion Torrent', 1);
 
 INSERT INTO KitDescriptor
   (name, version, manufacturer, partNumber, stockLevel, kitType, platformType, description) VALUES
@@ -85,15 +76,15 @@ INSERT INTO KitDescriptor
 
 DELETE FROM TagBarcodes WHERE strategyName = 'SureSelect XT2';
 INSERT INTO TagBarcodes (name, sequence, platformName, strategyName) VALUES
-  ('01', 'AACGTGAT', 'Illumina', 'NEXTflex 8bp'),
-  ('02', 'AAACATCG', 'Illumina', 'NEXTflex 8bp'),
-  ('03', 'ATGCCTAA', 'Illumina', 'NEXTflex 8bp'),
-  ('04', 'AGTGGTCA', 'Illumina', 'NEXTflex 8bp'),
-  ('05', 'ACCACTGT', 'Illumina', 'NEXTflex 8bp'),
-  ('06', 'ACATTGGC', 'Illumina', 'NEXTflex 8bp'),
-  ('07', 'CAGATCTG', 'Illumina', 'NEXTflex 8bp'),
-  ('08', 'CATCAAGT', 'Illumina', 'NEXTflex 8bp'),
-  ('09', 'CGCTGATC', 'Illumina', 'NEXTflex 8bp'),
+  ('1', 'AACGTGAT', 'Illumina', 'NEXTflex 8bp'),
+  ('2', 'AAACATCG', 'Illumina', 'NEXTflex 8bp'),
+  ('3', 'ATGCCTAA', 'Illumina', 'NEXTflex 8bp'),
+  ('4', 'AGTGGTCA', 'Illumina', 'NEXTflex 8bp'),
+  ('5', 'ACCACTGT', 'Illumina', 'NEXTflex 8bp'),
+  ('6', 'ACATTGGC', 'Illumina', 'NEXTflex 8bp'),
+  ('7', 'CAGATCTG', 'Illumina', 'NEXTflex 8bp'),
+  ('8', 'CATCAAGT', 'Illumina', 'NEXTflex 8bp'),
+  ('9', 'CGCTGATC', 'Illumina', 'NEXTflex 8bp'),
   ('10', 'ACAAGCTA', 'Illumina', 'NEXTflex 8bp'),
   ('11', 'CTGTAGCC', 'Illumina', 'NEXTflex 8bp'),
   ('12', 'AGTACAAG', 'Illumina', 'NEXTflex 8bp'),
@@ -394,10 +385,10 @@ INSERT INTO TagBarcodes (name, sequence, platformName, strategyName) VALUES
   ('BC22', 'CGTACG', 'Illumina', 'TruSeq smRNA'),
   ('BC23', 'GAGTGG', 'Illumina', 'TruSeq smRNA'),
   ('BC24', 'GGTAGC', 'Illumina', 'TruSeq smRNA'),
-  ('01', 'ATCGATCG', 'Illumina', 'TCRindex2'),
-  ('02', 'TCGATCGA', 'Illumina', 'TCRindex2'),
-  ('03', 'CGATCGAT', 'Illumina', 'TCRindex2'),
-  ('04', 'GATCGATC', 'Illumina', 'TCRindex2'),
+  ('1', 'ATCGATCG', 'Illumina', 'TCRindex2'),
+  ('2', 'TCGATCGA', 'Illumina', 'TCRindex2'),
+  ('3', 'CGATCGAT', 'Illumina', 'TCRindex2'),
+  ('4', 'GATCGATC', 'Illumina', 'TCRindex2'),
   ('A01', 'ATGCCTAA', 'Illumina', 'SureSelect XT2'),
   ('A02', 'AGCAGGAA', 'Illumina', 'SureSelect XT2'),
   ('A03', 'ATCATTCC', 'Illumina', 'SureSelect XT2'),
@@ -494,54 +485,54 @@ INSERT INTO TagBarcodes (name, sequence, platformName, strategyName) VALUES
   ('H10', 'ACAGATTC', 'Illumina', 'SureSelect XT2'),
   ('H11', 'AATCCGTC', 'Illumina', 'SureSelect XT2'),
   ('H12', 'ACAAGCTA', 'Illumina', 'SureSelect XT2'),
-  ("01", "CGATGT", "Illumina", "NEXTflex 6bp"),
-  ("02", "TGACCA", "Illumina", "NEXTflex 6bp"),
-  ("03", "ACAGTG", "Illumina", "NEXTflex 6bp"),
-  ("04", "GCCAAT", "Illumina", "NEXTflex 6bp"),
-  ("05", "CAGATC", "Illumina", "NEXTflex 6bp"),
-  ("06", "CTTGTA", "Illumina", "NEXTflex 6bp"),
-  ("07", "ATCACG", "Illumina", "NEXTflex 6bp"),
-  ("08", "TTAGGC", "Illumina", "NEXTflex 6bp"),
-  ("09", "ACTTGA", "Illumina", "NEXTflex 6bp"),
-  ("10", "GATCAG", "Illumina", "NEXTflex 6bp"),
-  ("11", "TAGCTT", "Illumina", "NEXTflex 6bp"),
-  ("12", "GGCTAC", "Illumina", "NEXTflex 6bp"),
-  ("13", "AGTCAA", "Illumina", "NEXTflex 6bp"),
-  ("14", "AGTTCC", "Illumina", "NEXTflex 6bp"),
-  ("15", "ATGTCA", "Illumina", "NEXTflex 6bp"),
-  ("16", "CCGTCC", "Illumina", "NEXTflex 6bp"),
-  ("17", "GTAGAG", "Illumina", "NEXTflex 6bp"),
-  ("18", "GTCCGC", "Illumina", "NEXTflex 6bp"),
-  ("19", "GTGAAA", "Illumina", "NEXTflex 6bp"),
-  ("20", "GTGGCC", "Illumina", "NEXTflex 6bp"),
-  ("21", "GTTTCG", "Illumina", "NEXTflex 6bp"),
-  ("22", "CGTACG", "Illumina", "NEXTflex 6bp"),
-  ("23", "GAGTGG", "Illumina", "NEXTflex 6bp"),
-  ("24", "GGTAGC", "Illumina", "NEXTflex 6bp"),
-  ("25", "ACTGAT", "Illumina", "NEXTflex 6bp"),
-  ("26", "ATGAGC", "Illumina", "NEXTflex 6bp"),
-  ("27", "ATTCCT", "Illumina", "NEXTflex 6bp"),
-  ("28", "CAAAAG", "Illumina", "NEXTflex 6bp"),
-  ("29", "CAACTA", "Illumina", "NEXTflex 6bp"),
-  ("30", "CACCGG", "Illumina", "NEXTflex 6bp"),
-  ("31", "CACGAT", "Illumina", "NEXTflex 6bp"),
-  ("32", "CACTCA", "Illumina", "NEXTflex 6bp"),
-  ("33", "CAGGCG", "Illumina", "NEXTflex 6bp"),
-  ("34", "CATGGC", "Illumina", "NEXTflex 6bp"),
-  ("35", "CATTTT", "Illumina", "NEXTflex 6bp"),
-  ("36", "CCAACA", "Illumina", "NEXTflex 6bp"),
-  ("37", "CGGAAT", "Illumina", "NEXTflex 6bp"),
-  ("38", "CTAGCT", "Illumina", "NEXTflex 6bp"),
-  ("39", "CTATAC", "Illumina", "NEXTflex 6bp"),
-  ("40", "CTCAGA", "Illumina", "NEXTflex 6bp"),
-  ("41", "GCGCTA", "Illumina", "NEXTflex 6bp"),
-  ("42", "TAATCG", "Illumina", "NEXTflex 6bp"),
-  ("43", "TACAGC", "Illumina", "NEXTflex 6bp"),
-  ("44", "TATAAT", "Illumina", "NEXTflex 6bp"),
-  ("45", "TCATTC", "Illumina", "NEXTflex 6bp"),
-  ("46", "TCCCGA", "Illumina", "NEXTflex 6bp"),
-  ("47", "TCGAAG", "Illumina", "NEXTflex 6bp"),
-  ("48", "TCGGCA", "Illumina", "NEXTflex 6bp");
+  ('1', 'CGATGT', 'Illumina', 'NEXTflex 6bp'),
+  ('2', 'TGACCA', 'Illumina', 'NEXTflex 6bp'),
+  ('3', 'ACAGTG', 'Illumina', 'NEXTflex 6bp'),
+  ('4', 'GCCAAT', 'Illumina', 'NEXTflex 6bp'),
+  ('5', 'CAGATC', 'Illumina', 'NEXTflex 6bp'),
+  ('6', 'CTTGTA', 'Illumina', 'NEXTflex 6bp'),
+  ('7', 'ATCACG', 'Illumina', 'NEXTflex 6bp'),
+  ('8', 'TTAGGC', 'Illumina', 'NEXTflex 6bp'),
+  ('9', 'ACTTGA', 'Illumina', 'NEXTflex 6bp'),
+  ('10', 'GATCAG', 'Illumina', 'NEXTflex 6bp'),
+  ('11', 'TAGCTT', 'Illumina', 'NEXTflex 6bp'),
+  ('12', 'GGCTAC', 'Illumina', 'NEXTflex 6bp'),
+  ('13', 'AGTCAA', 'Illumina', 'NEXTflex 6bp'),
+  ('14', 'AGTTCC', 'Illumina', 'NEXTflex 6bp'),
+  ('15', 'ATGTCA', 'Illumina', 'NEXTflex 6bp'),
+  ('16', 'CCGTCC', 'Illumina', 'NEXTflex 6bp'),
+  ('17', 'GTAGAG', 'Illumina', 'NEXTflex 6bp'),
+  ('18', 'GTCCGC', 'Illumina', 'NEXTflex 6bp'),
+  ('19', 'GTGAAA', 'Illumina', 'NEXTflex 6bp'),
+  ('20', 'GTGGCC', 'Illumina', 'NEXTflex 6bp'),
+  ('21', 'GTTTCG', 'Illumina', 'NEXTflex 6bp'),
+  ('22', 'CGTACG', 'Illumina', 'NEXTflex 6bp'),
+  ('23', 'GAGTGG', 'Illumina', 'NEXTflex 6bp'),
+  ('24', 'GGTAGC', 'Illumina', 'NEXTflex 6bp'),
+  ('25', 'ACTGAT', 'Illumina', 'NEXTflex 6bp'),
+  ('26', 'ATGAGC', 'Illumina', 'NEXTflex 6bp'),
+  ('27', 'ATTCCT', 'Illumina', 'NEXTflex 6bp'),
+  ('28', 'CAAAAG', 'Illumina', 'NEXTflex 6bp'),
+  ('29', 'CAACTA', 'Illumina', 'NEXTflex 6bp'),
+  ('30', 'CACCGG', 'Illumina', 'NEXTflex 6bp'),
+  ('31', 'CACGAT', 'Illumina', 'NEXTflex 6bp'),
+  ('32', 'CACTCA', 'Illumina', 'NEXTflex 6bp'),
+  ('33', 'CAGGCG', 'Illumina', 'NEXTflex 6bp'),
+  ('34', 'CATGGC', 'Illumina', 'NEXTflex 6bp'),
+  ('35', 'CATTTT', 'Illumina', 'NEXTflex 6bp'),
+  ('36', 'CCAACA', 'Illumina', 'NEXTflex 6bp'),
+  ('37', 'CGGAAT', 'Illumina', 'NEXTflex 6bp'),
+  ('38', 'CTAGCT', 'Illumina', 'NEXTflex 6bp'),
+  ('39', 'CTATAC', 'Illumina', 'NEXTflex 6bp'),
+  ('40', 'CTCAGA', 'Illumina', 'NEXTflex 6bp'),
+  ('41', 'GCGCTA', 'Illumina', 'NEXTflex 6bp'),
+  ('42', 'TAATCG', 'Illumina', 'NEXTflex 6bp'),
+  ('43', 'TACAGC', 'Illumina', 'NEXTflex 6bp'),
+  ('44', 'TATAAT', 'Illumina', 'NEXTflex 6bp'),
+  ('45', 'TCATTC', 'Illumina', 'NEXTflex 6bp'),
+  ('46', 'TCCCGA', 'Illumina', 'NEXTflex 6bp'),
+  ('47', 'TCGAAG', 'Illumina', 'NEXTflex 6bp'),
+  ('48', 'TCGGCA', 'Illumina', 'NEXTflex 6bp');
 
 INSERT INTO QCType (name, description, qcTarget, units) VALUES
   ('Bioanalyzer', 'Measures size of library, including adapters', 'Pool', 'bp'),
@@ -618,7 +609,7 @@ INSERT INTO TissueType (alias, description, createdBy, creationDate, updatedBy, 
   ('A','Cells taken from Ascites fluid',1,NOW(),1,NOW()),
   ('O','Organoid',1,NOW(),1,NOW());
 
-INSERT INTO TissueType (alias, description, createdBy, creationDate, updatedBy, lastUpdated) VALUES
+INSERT INTO TissueMaterial (alias, description, createdBy, creationDate, updatedBy, lastUpdated) VALUES
   ('Fresh Frozen','Fresh Frozen',1,NOW(),1,NOW()),
   ('FFPE','FFPE',1,NOW(),1,NOW()),
   ('Blood','Blood',1,NOW(),1,NOW());
@@ -635,39 +626,134 @@ INSERT INTO SamplePurpose (alias, description, createdBy, creationDate, updatedB
   ('Validation','Validation',1,NOW(),1,NOW()),
   ('WGA','WGA',1,NOW(),1,NOW());
 
+ALTER TABLE QcPassedDetail MODIFY status BOOLEAN NULL;
 INSERT INTO QcPassedDetail (status, description, noteRequired, createdBy, creationDate, updatedBy, lastUpdated) VALUES
-  ('true','STR Not Submitted',false,1,NOW(),1,NOW()),
-  ('true','STR Passed',false,1,NOW(),1,NOW()),
-  ('true','OKd by Collaborator',true,1,NOW(),1,NOW()),
-  (NULL,NULL,false,1,NOW(),1,NOW()),
-  (NULL,'Waiting: Path Report',true,1,NOW(),1,NOW()),
-  ('false','Failed STR',true,1,NOW(),1,NOW()),
-  ('false','Failed Diagnosis',true,1,NOW(),1,NOW()),
-  ('false','Failed QC',true,1,NOW(),1,NOW()),
-  ('false','Reference Required',false,1,NOW(),1,NOW()),
-  ('false','Refused Consent',false,1,NOW(),1,NOW());
+  (1,'',0,1,NOW(),1,NOW()),
+  (1,'OKd by Collaborator',1,1,NOW(),1,NOW()),
+  (NULL,'',0,1,NOW(),1,NOW()),
+  (NULL,'Waiting: Path Report',1,1,NOW(),1,NOW()),
+  (0,'Failed STR',1,1,NOW(),1,NOW()),
+  (0,'Failed Diagnosis',1,1,NOW(),1,NOW()),
+  (0,'Failed QC',1,1,NOW(),1,NOW()),
+  (0,'Reference Required',0,1,NOW(),1,NOW()),
+  (0,'Refused Consent',0,1,NOW(),1,NOW());
 
-INSERT INTO Institute (alias) VALUES
-  ('BioBank','Ontario Institute for Cancer Research');
-  ('BioBank','University Health Network');
-  ('Brad Wouters','University Health Network');
-  ('Catherine OBrien','University Health Network');
-  ('John Bell','Ontario Institute for Cancer Research');
-  ('Ming Tsao','University Health Network');
-  ('Not Specified','Kingston General Hospital');
-  ('Not Specified','Massachusetts General Hospital');
-  ('Not Specified','Mayo Clinic');
-  ('Not Specified','Ontario Institute for Cancer Research');
-  ('Not Specified','OPCS');
-  ('Not Specified','Ottawa Hospital Research Institute');
-  ('Not Specified','Sheba Medical Center');
-  ('Not Specified','St Josephs Healthcare Hamilton');
-  ('Not Specified','St Josephs Health Centre (Toronto)');
-  ('Not Specified','Sunnybrook Health Sciences Centre');
-  ('Not Specified','UHN McGill');
-  ('Not Specified','University Health Network');
-  ('Not Specified','University of Nebraska Medical Center');
-  ('Pathology','Ontario Institute for Cancer Research');
-  ('Steve Gallinger','Sunnybrook Health Sciences Centre');
-  ('Steve Gallinger','University Health Network');
+INSERT INTO Institute (alias, createdBy, creationDate, updatedBy, lastUpdated) VALUES
+  ('Ontario Institute for Cancer Research',1,NOW(),1,NOW()),
+  ('University Health Network',1,NOW(),1,NOW()),
+  ('Kingston General Hospital',1,NOW(),1,NOW()),
+  ('Massachusetts General Hospital',1,NOW(),1,NOW()),
+  ('Mayo Clinic',1,NOW(),1,NOW()),
+  ('OPCS',1,NOW(),1,NOW()),
+  ('Ottawa Hospital Research Institute',1,NOW(),1,NOW()),
+  ('Sheba Medical Center',1,NOW(),1,NOW()),
+  ('St Josephs Healthcare Hamilton',1,NOW(),1,NOW()),
+  ('St Josephs Health Centre (Toronto)',1,NOW(),1,NOW()),
+  ('Sunnybrook Health Sciences Centre',1,NOW(),1,NOW()),
+  ('UHN McGill',1,NOW(),1,NOW()),
+  ('University of Nebraska Medical Center',1,NOW(),1,NOW());
 
+INSERT INTO Lab (alias, instituteId, createdBy, creationDate, updatedBy, lastUpdated) VALUES
+  ('BioBank', (SELECT instituteId FROM Institute WHERE alias = 'Ontario Institute for Cancer Research'),1,NOW(),1,NOW()),
+  ('BioBank', (SELECT instituteId FROM Institute WHERE alias = 'University Health Network'),1,NOW(),1,NOW()),
+  ('Brad Wouters', (SELECT instituteId FROM Institute WHERE alias = 'University Health Network'),1,NOW(),1,NOW()),
+  ('Catherine OBrien', (SELECT instituteId FROM Institute WHERE alias = 'University Health Network'),1,NOW(),1,NOW()),
+  ('John Bell', (SELECT instituteId FROM Institute WHERE alias = 'Ontario Institute for Cancer Research'),1,NOW(),1,NOW()),
+  ('Ming Tsao', (SELECT instituteId FROM Institute WHERE alias = 'University Health Network'),1,NOW(),1,NOW()),
+  ('Not Specified', (SELECT instituteId FROM Institute WHERE alias = 'Kingston General Hospital'),1,NOW(),1,NOW()),
+  ('Not Specified', (SELECT instituteId FROM Institute WHERE alias = 'Massachusetts General Hospital'),1,NOW(),1,NOW()),
+  ('Not Specified', (SELECT instituteId FROM Institute WHERE alias = 'Mayo Clinic'),1,NOW(),1,NOW()),
+  ('Not Specified', (SELECT instituteId FROM Institute WHERE alias = 'Ontario Institute for Cancer Research'),1,NOW(),1,NOW()),
+  ('Not Specified', (SELECT instituteId FROM Institute WHERE alias = 'OPCS'),1,NOW(),1,NOW()),
+  ('Not Specified', (SELECT instituteId FROM Institute WHERE alias = 'Ottawa Hospital Research Institute'),1,NOW(),1,NOW()),
+  ('Not Specified', (SELECT instituteId FROM Institute WHERE alias = 'Sheba Medical Center'),1,NOW(),1,NOW()),
+  ('Not Specified', (SELECT instituteId FROM Institute WHERE alias = 'St Josephs Healthcare Hamilton'),1,NOW(),1,NOW()),
+  ('Not Specified', (SELECT instituteId FROM Institute WHERE alias = 'St Josephs Health Centre (Toronto)'),1,NOW(),1,NOW()),
+  ('Not Specified', (SELECT instituteId FROM Institute WHERE alias = 'Sunnybrook Health Sciences Centre'),1,NOW(),1,NOW()),
+  ('Not Specified', (SELECT instituteId FROM Institute WHERE alias = 'UHN McGill'),1,NOW(),1,NOW()),
+  ('Not Specified', (SELECT instituteId FROM Institute WHERE alias = 'University Health Network'),1,NOW(),1,NOW()),
+  ('Not Specified', (SELECT instituteId FROM Institute WHERE alias = 'University of Nebraska Medical Center'),1,NOW(),1,NOW()),
+  ('Pathology', (SELECT instituteId FROM Institute WHERE alias = 'Ontario Institute for Cancer Research'),1,NOW(),1,NOW()),
+  ('Steve Gallinger', (SELECT instituteId FROM Institute WHERE alias = 'Sunnybrook Health Sciences Centre'),1,NOW(),1,NOW()),
+  ('Steve Gallinger', (SELECT instituteId FROM Institute WHERE alias = 'University Health Network'),1,NOW(),1,NOW());
+
+INSERT INTO SampleClass (alias, sampleCategory, createdBy, creationDate, updatedBy, lastUpdated) VALUES
+  ('Identity','Identity',1,NOW(),1,NOW()),
+  ('Primary Tumor Tissue','Tissue',1,NOW(),1,NOW()),
+  ('Metastatic Tumor Tissue','Tissue',1,NOW(),1,NOW()),
+  ('Reference Tissue','Tissue',1,NOW(),1,NOW()),
+  ('Xenograft Tissue','Tissue',1,NOW(),1,NOW()),
+  ('Cell Line','Tissue',1,NOW(),1,NOW()),
+  ('CV Slide','Tissue Processing',1,NOW(),1,NOW()),
+  ('Curls','Tissue Processing',1,NOW(),1,NOW()),
+  ('H E Slide','Tissue Processing',1,NOW(),1,NOW()),
+  ('LCM Tube','Tissue Processing',1,NOW(),1,NOW()),
+  ('gDNA (stock)','Analyte',1,NOW(),1,NOW()),
+  ('gDNA_wga (stock)','Analyte',1,NOW(),1,NOW()),
+  ('whole RNA (stock)','Analyte',1,NOW(),1,NOW()),
+  ('cDNA (stock)','Analyte',1,NOW(),1,NOW()),
+  ('gDNA (aliquot)','Analyte',1,NOW(),1,NOW()),
+  ('gDNA_wga (aliquot)','Analyte',1,NOW(),1,NOW()),
+  ('whole RNA (aliquot)','Analyte',1,NOW(),1,NOW()),
+  ('smRNA','Analyte',1,NOW(),1,NOW()),
+  ('mRNA','Analyte',1,NOW(),1,NOW()),
+  ('rRNA_depleted','Analyte',1,NOW(),1,NOW()),
+  ('cDNA (aliquot)','Analyte',1,NOW(),1,NOW());
+
+INSERT INTO SampleValidRelationship (parentId, childId, createdBy, creationDate, updatedBy, lastUpdated) VALUES 
+  ((SELECT sampleClassId FROM SampleClass WHERE alias = 'Identity'),(SELECT sampleClassId FROM SampleClass WHERE alias = 'Primary Tumor Tissue'),1,NOW(),1,NOW()),
+  ((SELECT sampleClassId FROM SampleClass WHERE alias = 'Identity'),(SELECT sampleClassId FROM SampleClass WHERE alias = 'Metastatic Tumor Tissue'),1,NOW(),1,NOW()),
+  ((SELECT sampleClassId FROM SampleClass WHERE alias = 'Identity'),(SELECT sampleClassId FROM SampleClass WHERE alias = 'Reference Tissue'),1,NOW(),1,NOW()),
+  ((SELECT sampleClassId FROM SampleClass WHERE alias = 'Identity'),(SELECT sampleClassId FROM SampleClass WHERE alias = 'Xenograft Tissue'),1,NOW(),1,NOW()),
+  ((SELECT sampleClassId FROM SampleClass WHERE alias = 'Identity'),(SELECT sampleClassId FROM SampleClass WHERE alias = 'Cell Line'),1,NOW(),1,NOW()),
+  ((SELECT sampleClassId FROM SampleClass WHERE alias = 'Identity'),(SELECT sampleClassId FROM SampleClass WHERE alias = 'gDNA (stock)'),1,NOW(),1,NOW()),
+  ((SELECT sampleClassId FROM SampleClass WHERE alias = 'Identity'),(SELECT sampleClassId FROM SampleClass WHERE alias = 'gDNA_wga (stock)'),1,NOW(),1,NOW()),
+  ((SELECT sampleClassId FROM SampleClass WHERE alias = 'Identity'),(SELECT sampleClassId FROM SampleClass WHERE alias = 'whole RNA (stock)'),1,NOW(),1,NOW()),
+  ((SELECT sampleClassId FROM SampleClass WHERE alias = 'Identity'),(SELECT sampleClassId FROM SampleClass WHERE alias = 'cDNA (stock)'),1,NOW(),1,NOW()),
+  ((SELECT sampleClassId FROM SampleClass WHERE alias = 'Primary Tumor Tissue'),(SELECT sampleClassId FROM SampleClass WHERE alias = 'CV Slide'),1,NOW(),1,NOW()),
+  ((SELECT sampleClassId FROM SampleClass WHERE alias = 'Primary Tumor Tissue'),(SELECT sampleClassId FROM SampleClass WHERE alias = 'Curls'),1,NOW(),1,NOW()),
+  ((SELECT sampleClassId FROM SampleClass WHERE alias = 'Primary Tumor Tissue'),(SELECT sampleClassId FROM SampleClass WHERE alias = 'H E Slide'),1,NOW(),1,NOW()),
+  ((SELECT sampleClassId FROM SampleClass WHERE alias = 'Metastatic Tumor Tissue'),(SELECT sampleClassId FROM SampleClass WHERE alias = 'CV Slide'),1,NOW(),1,NOW()),
+  ((SELECT sampleClassId FROM SampleClass WHERE alias = 'Metastatic Tumor Tissue'),(SELECT sampleClassId FROM SampleClass WHERE alias = 'Curls'),1,NOW(),1,NOW()),
+  ((SELECT sampleClassId FROM SampleClass WHERE alias = 'Metastatic Tumor Tissue'),(SELECT sampleClassId FROM SampleClass WHERE alias = 'H E Slide'),1,NOW(),1,NOW()),
+  ((SELECT sampleClassId FROM SampleClass WHERE alias = 'Reference Tissue'),(SELECT sampleClassId FROM SampleClass WHERE alias = 'CV Slide'),1,NOW(),1,NOW()),
+  ((SELECT sampleClassId FROM SampleClass WHERE alias = 'Reference Tissue'),(SELECT sampleClassId FROM SampleClass WHERE alias = 'Curls'),1,NOW(),1,NOW()),
+  ((SELECT sampleClassId FROM SampleClass WHERE alias = 'Reference Tissue'),(SELECT sampleClassId FROM SampleClass WHERE alias = 'H E Slide'),1,NOW(),1,NOW()),
+  ((SELECT sampleClassId FROM SampleClass WHERE alias = 'Xenograft Tissue'),(SELECT sampleClassId FROM SampleClass WHERE alias = 'CV Slide'),1,NOW(),1,NOW()),
+  ((SELECT sampleClassId FROM SampleClass WHERE alias = 'Xenograft Tissue'),(SELECT sampleClassId FROM SampleClass WHERE alias = 'Curls'),1,NOW(),1,NOW()),
+  ((SELECT sampleClassId FROM SampleClass WHERE alias = 'Xenograft Tissue'),(SELECT sampleClassId FROM SampleClass WHERE alias = 'H E Slide'),1,NOW(),1,NOW()),
+  ((SELECT sampleClassId FROM SampleClass WHERE alias = 'CV Slide'),(SELECT sampleClassId FROM SampleClass WHERE alias = 'LCM Tube'),1,NOW(),1,NOW()),
+  ((SELECT sampleClassId FROM SampleClass WHERE alias = 'Curls'),(SELECT sampleClassId FROM SampleClass WHERE alias = 'gDNA (stock)'),1,NOW(),1,NOW()),
+  ((SELECT sampleClassId FROM SampleClass WHERE alias = 'LCM Tube'),(SELECT sampleClassId FROM SampleClass WHERE alias = 'gDNA (stock)'),1,NOW(),1,NOW()),
+  ((SELECT sampleClassId FROM SampleClass WHERE alias = 'LCM Tube'),(SELECT sampleClassId FROM SampleClass WHERE alias = 'whole RNA (stock)'),1,NOW(),1,NOW()),
+  ((SELECT sampleClassId FROM SampleClass WHERE alias = 'gDNA (stock)'),(SELECT sampleClassId FROM SampleClass WHERE alias = 'gDNA (stock)'),1,NOW(),1,NOW()),
+  ((SELECT sampleClassId FROM SampleClass WHERE alias = 'gDNA (stock)'),(SELECT sampleClassId FROM SampleClass WHERE alias = 'gDNA_wga (stock)'),1,NOW(),1,NOW()),
+  ((SELECT sampleClassId FROM SampleClass WHERE alias = 'gDNA (stock)'),(SELECT sampleClassId FROM SampleClass WHERE alias = 'gDNA (aliquot)'),1,NOW(),1,NOW()),
+  ((SELECT sampleClassId FROM SampleClass WHERE alias = 'gDNA_wga (stock)'),(SELECT sampleClassId FROM SampleClass WHERE alias = 'gDNA_wga (stock)'),1,NOW(),1,NOW()),
+  ((SELECT sampleClassId FROM SampleClass WHERE alias = 'gDNA_wga (stock)'),(SELECT sampleClassId FROM SampleClass WHERE alias = 'gDNA_wga (aliquot)'),1,NOW(),1,NOW()),
+  ((SELECT sampleClassId FROM SampleClass WHERE alias = 'whole RNA (stock)'),(SELECT sampleClassId FROM SampleClass WHERE alias = 'whole RNA (stock)'),1,NOW(),1,NOW()),
+  ((SELECT sampleClassId FROM SampleClass WHERE alias = 'whole RNA (stock)'),(SELECT sampleClassId FROM SampleClass WHERE alias = 'cDNA (stock)'),1,NOW(),1,NOW()),
+  ((SELECT sampleClassId FROM SampleClass WHERE alias = 'whole RNA (stock)'),(SELECT sampleClassId FROM SampleClass WHERE alias = 'whole RNA (aliquot)'),1,NOW(),1,NOW()),
+  ((SELECT sampleClassId FROM SampleClass WHERE alias = 'cDNA (stock)'),(SELECT sampleClassId FROM SampleClass WHERE alias = 'cDNA (stock)'),1,NOW(),1,NOW()),
+  ((SELECT sampleClassId FROM SampleClass WHERE alias = 'cDNA (stock)'),(SELECT sampleClassId FROM SampleClass WHERE alias = 'cDNA (aliquot)'),1,NOW(),1,NOW()),
+  ((SELECT sampleClassId FROM SampleClass WHERE alias = 'whole RNA (aliquot)'),(SELECT sampleClassId FROM SampleClass WHERE alias = 'smRNA'),1,NOW(),1,NOW()),
+  ((SELECT sampleClassId FROM SampleClass WHERE alias = 'whole RNA (aliquot)'),(SELECT sampleClassId FROM SampleClass WHERE alias = 'mRNA'),1,NOW(),1,NOW()),
+  ((SELECT sampleClassId FROM SampleClass WHERE alias = 'whole RNA (aliquot)'),(SELECT sampleClassId FROM SampleClass WHERE alias = 'rRNA_depleted'),1,NOW(),1,NOW());
+
+INSERT INTO ReferenceGenome (alias) VALUES 
+  ('Human hg19 random'),
+  ('Human hg19'),
+  ('Human hg18 random'),
+  ('Human hg18'),
+  ('Mouse mm9'),
+  ('Rat rn4'),
+  ('E. coli DH10B'),
+  ('phiX174'),
+  ('C. elegans ce6'),
+  ('C. pygerythrus'),
+  ('Vaccinia JX-594 (OICR)'),
+  ('P. falciparum'),
+  ('R. sphaeroides'),
+  ('S. aureus'),
+  ('de novo assembly'),
+  ('See comments');
