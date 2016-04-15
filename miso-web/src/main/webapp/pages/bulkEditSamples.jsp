@@ -77,6 +77,7 @@
 	  jQuery(document).ready(function () {
 	    Sample.hot.samplesJSON = ${samplesJSON};
 	    Sample.hot.dropdownRef = ${referenceDataJSON};
+	    Sample.hot.aliasGenerationEnabled = ${aliasGenerationEnabled};
 	    Sample.hot.detailedSample = JSON.parse(document.getElementById('HOTbulkForm').dataset.detailedSample);
 	    Sample.hot.button = document.getElementById('saveSamples');
 	    Sample.hot.createOrEdit = "${method}";
