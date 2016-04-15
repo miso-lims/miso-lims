@@ -280,6 +280,146 @@
       <td>Emptied:</td>
       <td><form:checkbox id="empty" path="empty"/></td>
     </tr>
+    
+    <c:if test="${!empty sample.sampleAdditionalInfo}">
+            <div class="bs-callout bs-callout-info">
+              <p>Some sample fields shown below cannot be updated on this page. 
+              <a href='<c:url value="/miso/sample/bulk/edit/${sample.id}"/>'>Use the bulk edit form</a> to modify these fields.</p>
+            </div>
+            
+            <tr>
+                <td><h2><br/>Details</h2></td>
+                <td></td>                               
+            </tr>  
+            <tr>
+                <td>Parent:</td>
+                 <c:choose>
+                    <c:when test="${empty sample.sampleAdditionalInfo.parent}">
+                        <td>None</td>
+                    </c:when>
+                    <c:otherwise>
+                        <td><a href='<c:url value="/miso/sample/${sample.sampleAdditionalInfo.parent.id}"/>'>${sample.sampleAdditionalInfo.parent.alias}</a></td>
+                    </c:otherwise>
+                </c:choose>          
+            </tr>
+            <tr>
+                <td>Children:</td>      
+                 <c:choose>
+                    <c:when test="${fn:length(sample.sampleAdditionalInfo.children) gt 0}">
+                        <td>
+                            <c:forEach items="${sample.sampleAdditionalInfo.children}" var="child">
+                                <a href='<c:url value="/miso/sample/${child.id}"/>'>${child.alias}</a>&nbsp;
+                            </c:forEach>
+                        </td>
+                    </c:when>
+                    <c:otherwise>
+                        <td>None</td>
+                    </c:otherwise>
+                </c:choose>          
+            </tr>            
+            <tr>
+                <td>Sample Class:</td>
+                <td><input readonly="true" value="${sample.sampleAdditionalInfo.sampleClass.alias}"/></td>       
+            </tr>
+            <tr>
+                <td>Tissue Origin:</td>
+                <td><input readonly="true" value="${sample.sampleAdditionalInfo.tissueOrigin.alias}"/></td>       
+            </tr>
+            <tr>
+                <td>Tissue Type:</td>
+                <td><input readonly="true" value="${sample.sampleAdditionalInfo.tissueType.alias}"/></td>                               
+            </tr>
+            <tr>
+                <td>QC Passed:</td>
+                <td><input readonly="true" value="${sample.sampleAdditionalInfo.qcPassedDetail.status}"/></td>                               
+            </tr>
+            <tr>
+                <td>Sub Project:</td>
+                <td><input readonly="true" value="${sample.sampleAdditionalInfo.subproject.alias}"/></td>                               
+            </tr>
+            <tr>
+                <td>External Institute:</td>
+                <td><input readonly="true" value="${sample.sampleAdditionalInfo.externalInstituteIdentifier}"/></td>                               
+            </tr>     
+            <tr>
+                <td>Lab:</td>
+                <td><input readonly="true" value="${sample.sampleAdditionalInfo.lab.alias}"/></td>                               
+            </tr>
+            <tr>
+                <td>Passage Number:</td>
+                <td><input readonly="true" value="${sample.sampleAdditionalInfo.passageNumber}"/></td>                               
+            </tr>                               
+            <tr>
+                <td>Times Received:</td>
+                <td><input readonly="true" value="${sample.sampleAdditionalInfo.timesReceived}"/></td>                               
+            </tr>                               
+            <tr>
+                <td>Tube Number:</td>
+                <td><input readonly="true" value="${sample.sampleAdditionalInfo.tubeNumber}"/></td>                               
+            </tr>                               
+            <tr>
+                <td>Concentration:</td>
+                <td><input readonly="true" value="${sample.sampleAdditionalInfo.concentration}"/></td>                               
+            </tr>                               
+    </c:if>
+    
+    <c:if test="${!empty sample.identity}">           
+            <tr>
+                <td><h2><br/>Identity</h2></td>
+                <td></td>                               
+            </tr>  
+            <tr>
+                <td>Internal Name:</td>
+                <td><input readonly="true" value="${sample.identity.internalName}"/></td>                               
+            </tr>                               
+            <tr>
+                <td>External Name:</td>
+                <td><input readonly="true" value="${sample.identity.externalName}"/></td>                               
+            </tr>              
+    </c:if>
+    
+    <c:if test="${!empty sample.sampleAnalyte}">           
+            <tr>
+                <td><h2><br/>Analyte</h2></td>
+                <td></td>                               
+            </tr>  
+            <tr>
+                <td>Sample Purpose:</td>
+                <td><input readonly="true" value="${sample.sampleAnalyte.samplePurpose.alias}"/></td>                               
+            </tr>                               
+            <tr>
+                <td>Group Id:</td>
+                <td><input readonly="true" value="${sample.sampleAnalyte.sampleGroup.groupId}"/></td>                               
+            </tr>              
+            <tr>
+                <td>Tissue Material:</td>
+                <td><input readonly="true" value="${sample.sampleAnalyte.tissueMaterial.alias}"/></td>                               
+            </tr>                               
+            <tr>
+                <td>STR Status:</td>
+                <td><input readonly="true" value="${sample.sampleAnalyte.strStatus}"/></td>                               
+            </tr>              
+            <tr>
+                <td>Region:</td>
+                <td><input readonly="true" value="${sample.sampleAnalyte.region}"/></td>                               
+            </tr>              
+            <tr>
+                <td>Tube Id:</td>
+                <td><input readonly="true" value="${sample.sampleAnalyte.tubeId}"/></td>                               
+            </tr>              
+    </c:if>
+        
+    <c:if test="${!empty sample.sampleTissue}">           
+            <tr>
+                <td><h2><br/>Tissue</h2></td>
+                <td></td>                               
+            </tr>  
+            <tr>
+                <td>Cellularity:</td>
+                <td><input readonly="true" value="${sample.sampleTissue.cellularity}"/></td>                               
+            </tr>                               
+    </c:if>    
+    
     <c:choose>
     <c:when
         test="${!empty sample.project and sample.securityProfile.profileId eq sample.project.securityProfile.profileId}">
