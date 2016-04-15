@@ -25,6 +25,9 @@ package uk.ac.bbsrc.tgac.miso.core.factory;
 
 import java.util.LinkedList;
 
+import com.eaglegenomics.simlims.core.Group;
+import com.eaglegenomics.simlims.core.User;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -49,6 +52,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedResequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCR;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRPool;
@@ -57,9 +61,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.ls454.LS454Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.pacbio.PacBioPool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.solid.SolidPool;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-
-import com.eaglegenomics.simlims.core.Group;
-import com.eaglegenomics.simlims.core.User;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.factory
@@ -125,6 +126,8 @@ public abstract class DataObjectFactory {
 
   public abstract LibraryDilution getLibraryDilution(User user);
 
+  public abstract TargetedResequencing getTargetedResequencing();
+
   public abstract emPCRDilution getEmPCRDilution();
 
   public abstract emPCRDilution getEmPCRDilution(User user);
@@ -178,7 +181,7 @@ public abstract class DataObjectFactory {
   public abstract Status getStatus();
 
   public abstract SequencerReference getSequencerReference();
-  
+
   public abstract SequencerServiceRecord getSequencerServiceRecord();
 
   public abstract Submission getSubmission();
