@@ -53,10 +53,9 @@ var Sample = Sample || {
     jQuery('#sample-form').parsley().destroy();
 
     // Alias input field validation
+    // 'data-parsley-required' attribute is set in JSP based on whether alias generation is enabled
     jQuery('#alias').attr('class', 'form-control');
-    jQuery('#alias').attr('data-parsley-required', 'true');
     jQuery('#alias').attr('data-parsley-maxlength', '100');
-    jQuery('#description').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
 
     // Description input field validation
     jQuery('#description').attr('class', 'form-control');
