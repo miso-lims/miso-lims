@@ -214,8 +214,18 @@
       </td>
     </tr>
     <tr>
-      <td class="h">Alias:*</td>
-      <td><form:input id="alias" path="alias" name="alias"/><span id="aliasCounter" class="counter"></span></td>
+      <td class="h">
+        Alias: 
+        <c:choose>
+          <c:when test="${aliasGenerationEnabled && sample.id == 0}">
+            (blank to auto-generate)
+          </c:when>
+          <c:otherwise>
+            *
+          </c:otherwise>
+        </c:choose>
+      </td>
+      <td><form:input id="alias" path="alias" name="alias" data-parsley-required='${!aliasGenerationEnabled || sample.id != 0}'/><span id="aliasCounter" class="counter"></span></td>
         <%--<td><a href="void(0);" onclick="popup('help/sampleAlias.html');">Help</a></td>--%>
     </tr>
     <tr>

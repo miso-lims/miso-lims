@@ -77,6 +77,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.webapp.context.ApplicationContextProvider;
@@ -96,6 +97,9 @@ public class EditSampleController {
 
   @Autowired
   private DataObjectFactory dataObjectFactory;
+  
+  @Autowired
+  private MisoNamingScheme<Sample> sampleNamingScheme;
 
   public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
     this.dataObjectFactory = dataObjectFactory;
@@ -119,6 +123,11 @@ public class EditSampleController {
   @ModelAttribute("metrixEnabled")
   public Boolean isMetrixEnabled() {
     return misoPropertyBoolean("miso.notification.interop.enabled");
+  }
+  
+  @ModelAttribute("aliasGenerationEnabled")
+  public boolean isAliasGenerationEnabled() {
+    return sampleNamingScheme != null && sampleNamingScheme.hasGeneratorFor("alias");
   }
 
   @ModelAttribute("autoGenerateIdBarcodes")
