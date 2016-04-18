@@ -298,6 +298,10 @@ Sample.hot = {
     });
     document.getElementById('hotContainer').style.display = '';
     
+    if (Sample.hot.detailedSample) {
+      Sample.hot.setDefaultValues();
+    }
+    
     // enable save button if it was disabled
     if (Sample.hot.button && Sample.hot.button.className.indexOf('disabled') !== -1) Sample.hot.toggleButtonAndLoaderImage(Sample.hot.button);
   },
@@ -374,6 +378,22 @@ Sample.hot = {
    var number = (numberToAdd === undefined ? 1 : numberToAdd);
    for (var i=1; i<=number; i++) {
      Sample.hot.startData.push({});
+   }
+ },
+ 
+ /**
+  *  pre-populate default values for certain columns
+  *  TODO: make this less hacky (column indices are hard-coded) 
+  */
+ setDefaultValues: function () {
+   var sampleClassAlias = Sample.hot.getAliasFromId(Sample.hot.sampleClassId, Sample.hot.sampleOptions.sampleClassesDtos);
+   for (var i = 0; i < Sample.hot.hotTable.countRows(); i++) {
+     if (Sample.hot.hotTable.getCellMeta(i, 5).prop == 'scientificName') {
+       Sample.hot.hotTable.setDataAtCell(i, 5, Sample.hot.sciName);
+     }
+     if (Sample.hot.hotTable.getCellMeta(1, 14).prop == 'sampleAdditionalInfo.sampleClassAlias') {
+       Sample.hot.hotTable.setDataAtCell(i, 14, sampleClassAlias);
+     }
    }
  },
   
@@ -590,10 +610,6 @@ Sample.hot = {
           source: Sample.hot.getSampleGroups(),
           validator: permitEmpty
         },{
-          header: 'Number',
-          data: 'sampleAnalyte.analyteNumber',
-          type: 'numeric'
-        },{
           header: 'Kit',
           data: 'sampleAnalyte.prepKitAlias',
           type: 'dropdown',
@@ -758,6 +774,8 @@ Sample.hot = {
             }
           }
         );
+      } else if (Sample.hot.aliasGenerationEnabled) {
+        return callback(true);
       } else {
         return callback(false);
       }
@@ -873,8 +891,8 @@ Sample.hot = {
     sample.identificationBarcode = obj.identificationBarcode;
     sample.sampleType = obj.sampleType;
     sample.qcPassed = '';
-    sample.alias = obj.alias;
-    sample.projectId = (obj.projectId || parseInt(document.getElementById('projectSelect').value));
+    sample.alias = obj.alias || '';
+    sample.projectId = (parseInt(obj.projectId) || parseInt(document.getElementById('projectSelect').value));
     sample.scientificName = obj.scientificName;
     if (obj.receivedDate && obj.receivedDate.length) {
       // the time string is added for detailedSample because the server is expecting a datetime value
@@ -996,6 +1014,18 @@ Sample.hot = {
     return sample;
   },
   
+  getOneSample: function (sampleId, rowIndex) {
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState === XMLHttpRequest.DONE) {
+        xhr.status === 200 ? Sample.hot.updateAlias(xhr, rowIndex) : console.log(xhr);
+      }
+    };
+    xhr.open('GET', '/miso/rest/tree/sample/' + sampleId);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.send();
+  },
+  
   saveOneSample: function (data, rowIndex, numberToSave, callback) {
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function() {
@@ -1041,28 +1071,35 @@ Sample.hot = {
     Sample.hot.messages.failed.push("Row "+ (rowIndex + 1) +": "+ responseText.detail.replace(reUserMessage, "$1")); 
     
     // display any errors if this is the final sample to be saved
-    if (Sample.hot.messages.success.length + Sample.hot.messages.failed.length == numberToSave) {
+    if (Sample.hot.messages.success.length + Sample.hot.messages.failed.length >= numberToSave) {
       Sample.hot.addAnyErrors();
     }
   },
   
   successSave: function (xhr, rowIndex, numberToSave) {
-    // push row index for new saves (previously-saved items have their aliases added)
-    Sample.hot.messages.success.push(rowIndex); 
-    
-    // add a 'saved' attribute to the data source 
-    Sample.hot.startData[rowIndex].saved = true;
-    
     // add sample url and id to the data source if the sample is newly created
     if (!Sample.hot.startData[rowIndex].id) {
       Sample.hot.startData[rowIndex].url = xhr.getResponseHeader('Location');
-      Sample.hot.startData[rowIndex].id = Sample.hot.startData[rowIndex].url.split('/').pop();
+      var sampleId = Sample.hot.startData[rowIndex].url.split('/').pop();
+      Sample.hot.startData[rowIndex].id = sampleId;
+      
+      // get sample data and update alias
+      Sample.hot.getOneSample(sampleId, rowIndex);
     }
-    
+
+    // add a 'saved' attribute to the data source 
+    Sample.hot.startData[rowIndex].saved = true;
+
     // display any errors if this is the final sample to be saved
     if (Sample.hot.messages.success.length + Sample.hot.messages.failed.length == numberToSave) {
       Sample.hot.addAnyErrors();
     }
+  },
+  
+  updateAlias: function (xhr, rowIndex) {
+    var sample = JSON.parse(xhr.response);
+    Sample.hot.messages.success[rowIndex] = sample.alias;
+    Sample.hot.hotTable.setDataAtCell(rowIndex, 0, sample.alias);
   },
 
   saveDetailedData: function () {
@@ -1112,9 +1149,10 @@ Sample.hot = {
         // send it through the parser to get a sampleData array that isn't merely a reference to Sample.hot.hotTable.getSourceData()
         var sampleData = JSON.parse(JSON.parse(JSON.stringify(Sample.hot.hotTable.getSourceData())));
         
-        Sample.hot.messages.success = sampleData.filter(function (sample) { return (sample.saved === true); })
-                                                .map(function (sample) { return sample.alias; });
-        
+        // add aliases of previously-saved items to the position corresponding to their row (zero-index data, one-index UI)
+        // aliases of successfully-saved items will be added after save
+        Sample.hot.messages.success = sampleData.map(function (sample) { return (sample.saved === true ? sample.alias : null); });
+
         // Array of save functions, one for each line in the table
         var sampleSaveArray = Sample.hot.getArrayOfNewObjects(sampleData);
         Sample.hot.serial(sampleSaveArray); // Execute saves serially      
@@ -1438,10 +1476,9 @@ Sample.hot = {
   addAnyErrors: function () {
     var messages = Sample.hot.messages;
     console.log(Sample.hot.messages);
-    if (messages.success.length) {
-      var previouslySaved = messages.success.filter(function (message) { return (!parseInt(message) && message !== 0); });
-      var successMessage = "Successfully saved " + messages.success.length + " out of " + (messages.success.length + messages.failed.length)
-                             + " samples. " + previouslySaved.length + " samples were saved previously.";
+    var successfullySaved = messages.success.filter(function (message) { return (!parseInt(message) && message !== null); });
+    if (successfullySaved.length) {
+      var successMessage = successfullySaved.length + " samples are now saved.";
       document.getElementById('successMessages').innerHTML = successMessage;
       document.getElementById('saveSuccesses').classList.remove('hidden');
       Sample.hot.makeSavedRowsReadOnly();

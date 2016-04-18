@@ -434,13 +434,16 @@
 	      <p id="errorMessages"></p>
 	    </div>
 	    <div>
-	      <button id="makeTable" class="disabled" disabled="true" onclick="Sample.hot.makeNewSamplesTable();">Make Table</button>
+	      <button id="makeTable" class="disabled" disabled="disabled" onclick="Sample.hot.makeNewSamplesTable();">Make Table</button>
 	    </div>
 	  </div>
 	  <div class="floatleft rightfloatleft">
       <p>To fill all columns below with the value of your selected cell, <b>double-click</b> the square in the bottom right of your selected cell.</p>
       <p>To fill a variable number of columns with the value of your selected cell,  <b>click</b> the square in the bottom right of your 
-      filled-in selected cell and <b>drag</b> up or down. All selected columns will be filled in.
+      filled-in selected cell and <b>drag</b> up or down. All selected columns will be filled in.</p>
+      <c:if test="${aliasGenerationEnabled}">
+      <br/><br/><p>Leave <b>alias</b> cell blank to auto-generate an alias for this sample.</p>
+      </c:if>
     </div>
 	  
 	  <div style="clear:both;"></div>
@@ -458,6 +461,7 @@
   
     <script type="text/javascript">
       Sample.hot.dropdownRef = ${referenceDataJSON};
+      Sample.hot.aliasGenerationEnabled = ${aliasGenerationEnabled};
       Sample.hot.selectedProjectId = parseInt('${sample.project.id}') || null;
       Sample.hot.detailedSample = JSON.parse(document.getElementById('HOTbulkForm').dataset.detailedSample);
       if (Boolean(Sample.hot.detailedSample)) {
