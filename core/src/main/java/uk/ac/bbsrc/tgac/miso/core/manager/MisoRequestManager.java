@@ -1661,12 +1661,17 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public long saveLibrary(Library library) throws IOException {
     if (libraryStore != null) {
-      SampleAdditionalInfo info = library.getSample().getSampleAdditionalInfo();
-      if (LibraryPropagationRule.validate(library,
-          libraryPropagationRuleDao.getLibraryPropagationRulesByClass(info == null ? null : info.getSampleClass()))) {
-        return libraryStore.save(library);
+      if (library.getSample().getSampleAdditionalInfo() != null) {
+        SampleAdditionalInfo info = library.getSample().getSampleAdditionalInfo();
+        
+        if (LibraryPropagationRule.validate(library,
+            libraryPropagationRuleDao.getLibraryPropagationRulesByClass(info == null ? null : info.getSampleClass()))) {
+          return libraryStore.save(library);
+        } else {
+          throw new IOException("Invalid propagation.");
+        }
       } else {
-        throw new IOException("Invalid propagation.");
+        return libraryStore.save(library);
       }
     } else {
       throw new IOException("No libraryStore available. Check that it has been declared in the Spring config.");

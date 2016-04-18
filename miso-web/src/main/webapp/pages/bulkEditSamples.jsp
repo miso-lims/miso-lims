@@ -51,7 +51,7 @@
 <div id="maincontent">
 <div id="contentcolumn">
 
-	<h1>Edit Samples</h1>
+	<h1>${method} Samples</h1>
 	
 	<div id="HOTbulkForm" data-detailed-sample="${detailedSample}">
 	
@@ -105,7 +105,7 @@
 
 	    // get SampleOptions and make the appropriate table
       if (Boolean(Sample.hot.detailedSample)) {
-        if (Sample.hot.createOrEdit == "create") {
+        if (Sample.hot.createOrEdit == "Create") {
           Sample.hot.sampleClassId = parseInt(${sampleClassId});
           Sample.hot.button.addEventListener('click', Sample.hot.propagateData, true);
           Sample.hot.fetchSampleOptions(Sample.hot.makeBulkCreateTable);

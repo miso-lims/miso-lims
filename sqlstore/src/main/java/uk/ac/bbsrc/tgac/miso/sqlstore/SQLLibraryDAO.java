@@ -267,7 +267,7 @@ public class SQLLibraryDAO implements LibraryStore {
   public void setBoxDAO(BoxStore boxDAO) {
     this.boxDAO = boxDAO;
   }
-
+  
   public JdbcTemplate getJdbcTemplate() {
     return template;
   }

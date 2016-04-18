@@ -805,6 +805,7 @@ Sample.ui = {
           document.getElementById('listingSamplesTable').insertAdjacentHTML('afterend', actions.join(''));
           var goButton = '<div id="classOptions"></div><button id="go" type="button" onclick="Sample.ui.handleBulkAction();">Go</button>';
           document.getElementById('dropdownActions').insertAdjacentHTML('afterend', goButton);
+          if (Sample.detailedSample) Sample.ui.getSampleClasses();
         }
       }
     );
@@ -826,11 +827,9 @@ Sample.ui = {
   checkForPropagate: function (el) {
     var selectedValue = el.options[el.selectedIndex].value;
     if (selectedValue == 'propagateSams') {
-      // TODO: add some logic in here for SampleValidRelationships
       Sample.ui.insertSampleClassesDropdown();
     } else if (selectedValue == 'propagateLibs') {
-      // TODO: add some logic in here for LibraryPropagationRules
-      alert("Sorry, we're still work on that feature!");
+      Sample.ui.insertLibraryDesignDropdown();
     } else {
       document.getElementById('classOptions').innerHTML = '';
     }
@@ -865,6 +864,8 @@ Sample.ui = {
     window.location="sample/bulk/edit/" + selectedIdsArray.join(',');
   },
 
+  // TODO: fix this up to work with plain samples
+  // TODO: add some logic in here for SampleValidRelationships
   propagateSamSelectedItems: function () {
     var selectedClassId = document.getElementById('classDropdown').value;
     var selectedIdsArray = Sample.ui.getSelectedIds();
@@ -875,15 +876,13 @@ Sample.ui = {
     window.location="sample/bulk/create/" + selectedIdsArray.join(',') + "&scid=" + selectedClassId;
   },
   
-  // TODO: finish this...
   propagateLibSelectedItems: function () {
-    var selectedLib = document.getElementById('libDropdown').value;
     var selectedIdsArray = Sample.ui.getSelectedIds();
     if (selectedIdsArray.length === 0) {
       alert("Please select one or more Samples to propagate.");
       return false;
     }
-    alert("Finish methods and make table");
+    window.location="library/bulk/propagate/" + selectedIdsArray.join(',');
   },
   
   // TODO: finish this, and the one in library_ajax.js
@@ -907,7 +906,7 @@ Sample.ui = {
     });
   },
   
-  //TODO: finish this, and the one in library_ajax.js
+  // TODO: finish this, and the one in library_ajax.js
   archiveSelectedItems: function () {
     var selectedIdsArray = Sample.ui.getSelectedIds();
     if (selectedIdsArray.length === 0) {
@@ -928,20 +927,40 @@ Sample.ui = {
     });
   },
   
+  getSampleClasses: function () {
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState === XMLHttpRequest.DONE) {
+        xhr.status == 200 ? (Sample.sampleClasses = JSON.parse(xhr.responseText)) : console.log(xhr);
+      }
+    };
+    xhr.open('GET', '/miso/rest/sampleclasses');
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.send();
+  },
+  
   insertSampleClassesDropdown: function () {
-    jQuery.get('/miso/rest/sampleclasses', function (data) {
-      var select = [];
-      var classes = classesDtos.sort(function(a, b) {
+    var classes = Sample.sampleClasses.sort(function(a, b) {
         return a.id > b.id ? 1 : ((b.id > a.id) ? -1 : 0);
       });
-      select.push('<select id="classDropdown">');
-      select.push('<option value="">-- Select child class</option>');
-      for (var i=0; i<classes.length; i++) {
-        if (classes[i].alias == "Identity") continue;
-        select.push('<option value="'+ classes[i].id +'">'+ classes[i].alias +'</option>');
-      }
-      select.push('</select>');
-      document.getElementById('classOptions').innerHTML = select.join('');
-    }, 'application/json');
+    var select = [];
+    select.push('<select id="classDropdown">');
+    select.push('<option value="">-- Select child class</option>');
+    for (var i=0; i<classes.length; i++) {
+      if (classes[i].alias == "Identity") continue;
+      select.push('<option value="'+ classes[i].id +'">'+ classes[i].alias +'</option>');
+    }
+    select.push('</select>');
+    document.getElementById('classOptions').innerHTML = select.join('');
+  },
+  
+  // TODO: add library propagation rule-checking here
+  insertLibraryDesignDropdown: function () {
+    
   }
 };
+
+window.addEventListener('error', function (e) {
+  var error = e.error;
+  console.log(error);
+});

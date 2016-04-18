@@ -42,7 +42,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -111,8 +110,8 @@ public class EditSampleController {
 
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
-  }  
-  
+  }
+
   public Boolean misoPropertyBoolean(String property) {
     MisoPropertyExporter exporter = (MisoPropertyExporter) ApplicationContextProvider.getApplicationContext().getBean("propertyConfigurer");
     Map<String, String> misoProperties = exporter.getResolvedProperties();
@@ -134,9 +133,9 @@ public class EditSampleController {
   public Boolean autoGenerateIdentificationBarcodes() {
     return misoPropertyBoolean("miso.autoGenerateIdentificationBarcodes");
   }
-  
+
   @ModelAttribute("detailedSample")
-  public Boolean isDetailedSampleEnabled() { 
+  public Boolean isDetailedSampleEnabled() {
     return misoPropertyBoolean("miso.detailed.sample.enabled");
   }
 
@@ -284,7 +283,7 @@ public class EditSampleController {
   public String sampleQCUnits() throws IOException {
     return AbstractSampleQC.UNITS;
   }
-  
+
   @ModelAttribute("libraryDilutionUnits")
   public String libraryDilutionUnits() {
     return LibraryDilution.UNITS;
@@ -305,7 +304,7 @@ public class EditSampleController {
     }
     return LimsUtils.join(types, ",");
   }
-  
+
   // Handsontable
   @ModelAttribute("referenceDataJSON")
   public JSONObject referenceDataJsonString() throws IOException {
@@ -327,12 +326,12 @@ public class EditSampleController {
     for (String strLabel : StrStatus.getLabels()) {
       strStatuses.add(strLabel);
     }
-    
+
     hot.put("sampleTypes", sampleTypes);
     hot.put("projects", allProjects);
     hot.put("qcValues", qcValues);
     hot.put("strStatuses", strStatuses);
-    
+
     return hot;
   }
 
@@ -487,19 +486,7 @@ public class EditSampleController {
   public String processSubmit() {
     return null;
   }
-  
-  // TODO: fix this up
-  @RequestMapping(value = "/bulk/edit", method = RequestMethod.POST, headers = "Accept=application/json")
-  public String getBulkSamples(@RequestBody JSONObject json) throws IOException {
-    JSONArray ids = JSONArray.fromObject(json.get("ids"));
-    StringBuffer stringBuffer = new StringBuffer();
-    for (int i = 0; i < ids.size(); ++i) {
-      if (i > 0) stringBuffer.append(",");
-      stringBuffer.append(ids.getLong(i));
-    }
-    return "redirect:/miso/sample/bulk/edit/" + stringBuffer.toString();
-  }
-  
+
   /**
    * used to edit samples with ids from given {sampleIds}
    * sends Dtos objects which will then be used for editing in grid
@@ -517,7 +504,7 @@ public class EditSampleController {
         samplesDtos.add(Dtos.asDto(sample));
       }
       model.put("samplesJSON", samplesDtos);
-      model.put("method", "edit");
+      model.put("method", "Edit");
       return new ModelAndView("/pages/bulkEditSamples.jsp", model);
     } catch (IOException ex) {
       if (log.isDebugEnabled()) {
@@ -526,10 +513,10 @@ public class EditSampleController {
       throw ex;
     }
   }
-  
+
   /**
-   * used to create new samples parented to samples with ids from given {sampleIds}
-   * sends Dtos objects which will then be used for editing in grid
+   * used to create new samples parented to samples with ids from given {sampleIds} sends Dtos objects which will then be used for editing
+   * in grid
    */
   @RequestMapping(value = "/bulk/create/{sampleIds}&scid={sampleClassId}", method = RequestMethod.GET)
   public ModelAndView createBulkSamples(@PathVariable String sampleIds, @PathVariable Long sampleClassId, ModelMap model) throws IOException {
@@ -544,7 +531,7 @@ public class EditSampleController {
         samplesDtos.add(Dtos.asDto(sample));
       }
       model.put("samplesJSON", samplesDtos);
-      model.put("method",  "create");
+      model.put("method",  "Create");
       model.put("sampleClassId", sampleClassId);
       return new ModelAndView("/pages/bulkEditSamples.jsp", model);
     } catch (IOException ex) {

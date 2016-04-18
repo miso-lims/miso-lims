@@ -42,6 +42,7 @@
     </table>
     <script type="text/javascript">
       jQuery(document).ready(function () {
+        Sample.detailedSample = ${detailedSample};
         Sample.ui.createListingSamplesTable();
       });
     </script>

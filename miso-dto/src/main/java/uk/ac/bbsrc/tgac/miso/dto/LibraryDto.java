@@ -9,6 +9,7 @@ public class LibraryDto {
   private Double concentration;
   private String creationDate;
   private String description;
+  private String identificationBarcode;
   private Long libraryId;
   private LibraryAdditionalInfoDto libraryAdditionalInfo;
   private Long librarySelectionTypeId;
@@ -16,9 +17,11 @@ public class LibraryDto {
   private Long libraryTypeId;
   private Boolean lowQuality;
   private String name;
+  private Boolean paired;
   private String parentSampleAlias;
   private Long parentSampleId;
   private String platformName;
+  private Boolean qcPassed;
   private Long tagBarcodeIndex1Id;
   private Long tagBarcodeIndex2Id;
   private String tagBarcodeStrategyName;
@@ -39,6 +42,9 @@ public class LibraryDto {
   public Long getId() {
     return libraryId;
   }
+  public String getIdentificationBarcode() {
+    return identificationBarcode;
+  }
   public LibraryAdditionalInfoDto getLibraryAdditionalInfo() {
     return libraryAdditionalInfo;
   }
@@ -57,6 +63,9 @@ public class LibraryDto {
   public String getName() {
     return name;
   }
+  public Boolean getPaired() {
+    return paired;
+  }
   public String getParentSampleAlias() {
     return parentSampleAlias;
   }
@@ -65,6 +74,9 @@ public class LibraryDto {
   }
   public String getPlatformName() {
     return platformName;
+  }
+  public Boolean getQcPassed() {
+    return qcPassed;
   }
   public Long getTagBarcodeIndex1Id() {
     return tagBarcodeIndex1Id;
@@ -93,6 +105,9 @@ public class LibraryDto {
   public void setId(Long libraryId) {
     this.libraryId = libraryId;
   }
+  public void setIdentificationBarcode(String identificationBarcode) {
+    this.identificationBarcode = identificationBarcode;
+  }
   public void setLibraryAdditionalInfo(LibraryAdditionalInfoDto libraryAdditionalInfo) {
     this.libraryAdditionalInfo = libraryAdditionalInfo;
   }
@@ -111,6 +126,9 @@ public class LibraryDto {
   public void setName(String name) {
     this.name = name;
   }
+  public void setPaired(Boolean paired) {
+    this.paired = paired;
+  }
   public void setParentSampleAlias(String parentSampleAlias) {
     this.parentSampleAlias = parentSampleAlias;
   }
@@ -119,6 +137,9 @@ public class LibraryDto {
   }
   public void setPlatformName(String platformName) {
     this.platformName = platformName;
+  }
+  public void setQcPassed(Boolean qcPassed) {
+    this.qcPassed = qcPassed;
   }
   public void setTagBarcodeIndex1Id(Long tagBarcodeIndex1Id) {
     this.tagBarcodeIndex1Id = tagBarcodeIndex1Id;

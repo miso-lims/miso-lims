@@ -25,11 +25,13 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -39,6 +41,8 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.webapp.context.ApplicationContextProvider;
+import uk.ac.bbsrc.tgac.miso.webapp.util.MisoPropertyExporter;
 
 /**
  * com.eaglegenomics.miso.web
@@ -64,6 +68,18 @@ public class ListSamplesController {
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
+  }
+  
+  public Boolean misoPropertyBoolean(String property) {
+    MisoPropertyExporter exporter = (MisoPropertyExporter) ApplicationContextProvider.getApplicationContext().getBean("propertyConfigurer");
+    Map<String, String> misoProperties = exporter.getResolvedProperties();
+    return misoProperties.containsKey(property)
+        && Boolean.parseBoolean(misoProperties.get(property));
+  }
+  
+  @ModelAttribute("detailedSample")
+  public Boolean isDetailedSampleEnabled() {
+    return misoPropertyBoolean("miso.detailed.sample.enabled");
   }
 
   @RequestMapping(value = "/samples/rest/", method = RequestMethod.GET)
