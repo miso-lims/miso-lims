@@ -42,7 +42,7 @@ public class HibernateLibraryAdditionalInfoDao implements LibraryAdditionalInfoD
   }
   
   private LibraryAdditionalInfo fetchSqlStore(LibraryAdditionalInfo libraryAdditionalInfo) throws IOException {
-    if (libraryAdditionalInfo != null) {
+    if (libraryAdditionalInfo != null && libraryAdditionalInfo.getHibernateKitDescriptorId() != null) {
       libraryAdditionalInfo.setPrepKit(kitStore.getKitDescriptorById(libraryAdditionalInfo.getHibernateKitDescriptorId()));
     }
     return libraryAdditionalInfo;
