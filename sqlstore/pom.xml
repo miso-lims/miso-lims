@@ -18,7 +18,7 @@
   ~ GNU General Public License for more details.
   ~
   ~ You should have received a copy of the GNU General Public License
-  ~ along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+  ~ along with MISO.  If not, see <http://www.gnu.org/licenses />.
   ~
   ~ **********************************************************************
   -->  
@@ -28,7 +28,7 @@
   <parent>
     <artifactId>miso</artifactId>
     <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-    <version>0.2.1-SNAPSHOT</version>
+    <version>0.2.2-SNAPSHOT</version>
   </parent>
 
   <artifactId>sqlstore</artifactId>

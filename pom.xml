@@ -8,16 +8,15 @@
   that it will be useful, ~ but WITHOUT ANY WARRANTY; without even the implied
   warranty of ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
   ~ GNU General Public License for more details. ~ ~ You should have received
-  a copy of the GNU General Public License ~ along with MISO. If not, see <http://www.gnu.org/licenses/>.
+  a copy of the GNU General Public License ~ along with MISO. If not, see <http://www.gnu.org/licenses />.
   ~ ~ ********************************************************************** -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>uk.ac.bbsrc.tgac.miso</groupId>
   <artifactId>miso</artifactId>
   <packaging>pom</packaging>
-  <version>0.2.1-SNAPSHOT</version>
+  <version>0.2.2-SNAPSHOT</version>
   <name>MISO Framework</name>
   <url>http://www.tgac.ac.uk/miso</url>
 
