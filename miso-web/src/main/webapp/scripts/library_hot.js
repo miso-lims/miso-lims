@@ -260,6 +260,10 @@ Library.hot = {
           trimDropdown: false,
           source: Library.hot.getPlatforms()
         },{
+          header: 'Barcode',
+          data: 'identificationBarcode',
+          type: 'text'
+        },{
           header: 'Type',
           data: 'libraryTypeAlias',
           type: 'dropdown',
