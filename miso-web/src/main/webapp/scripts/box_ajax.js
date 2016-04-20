@@ -464,7 +464,7 @@ Box.ui = {
         'boxControllerHelperService',
         'updateOneItem',
         {
-          'boxJSON': Box.boxJSON,
+          'boxId': Box.boxId,
           'barcode': selectedBarcode,
           'position': selectedPosition,
           'url': ajaxurl
@@ -495,7 +495,7 @@ Box.ui = {
         'boxControllerHelperService',
         'removeTubeFromBox',
         {
-          'boxJSON': Box.boxJSON,
+          'boxId': Box.boxId,
           'position': selectedPosition,
           'url': ajaxurl
         },

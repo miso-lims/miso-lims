@@ -159,13 +159,23 @@ public interface Box extends SecurableByProfile, Barcodable, Locatable, Deletabl
    * 
    */
   public void removeAllBoxables();
+  
+  /**
+   * @return the maximum number of tubes that can be stored in this box
+   */
+  public int getPositionCount();
 
   /**
    * Returns the number of free positions left in the Box.
    * 
    * @return int free positions
    */
-  public int getFree();
+  public int getFreeCount();
+  
+  /**
+   * @return the number of tubes that are stored in this box
+   */
+  public int getTubeCount();
 
   /**
    * Returns true/false is the position is free or not
