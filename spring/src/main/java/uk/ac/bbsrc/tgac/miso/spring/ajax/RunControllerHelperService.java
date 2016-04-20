@@ -966,28 +966,13 @@ public class RunControllerHelperService {
     RunImpl r = (RunImpl) session.getAttribute("run_" + json.getString("run_cId"));
 
     try {
-      Pool<? extends Poolable> p = null;
+      PlatformType pt = json.has("platform") && !isStringEmptyOrNull(json.getString("platform"))
+          ? PlatformType.get(json.getString("platform")) : r.getPlatformType();
 
-      if (!isStringEmptyOrNull(barcode)) {
-        if (LimsUtils.isBase64String(barcode)) {
-          // Base64-encoded string, most likely a barcode image beeped in. decode and search
-          barcode = new String(Base64.decodeBase64(barcode));
-        }
-      }
-
-      if (json.has("platform") && !isStringEmptyOrNull(json.getString("platform"))) {
-        PlatformType pt = PlatformType.get(json.getString("platform"));
-        if (pt != null) {
-          p = requestManager.getPoolByBarcode(barcode, pt);
-        } else {
-          p = requestManager.getPoolByBarcode(barcode);
-        }
-      } else {
-        if (r.getPlatformType() != null) {
-          p = requestManager.getPoolByBarcode(barcode, r.getPlatformType());
-        } else {
-          p = requestManager.getPoolByBarcode(barcode);
-        }
+      Pool<? extends Poolable> p = requestManager.getPoolByBarcode(barcode, pt);
+      // Base64-encoded string, most likely a barcode image beeped in. decode and search
+      if (p == null) {
+        p = requestManager.getPoolByBarcode(new String(Base64.decodeBase64(barcode)), pt);
       }
       List<SequencerPartitionContainer> fs = new ArrayList<SequencerPartitionContainer>(r.getSequencerPartitionContainers());
       if (!fs.isEmpty()) {
@@ -1194,11 +1179,13 @@ public class RunControllerHelperService {
         inner.add(TableHelper.hyperLinkify("/miso/run/" + run.getId(), run.getName()));
         inner.add(TableHelper.hyperLinkify("/miso/run/" + run.getId(), run.getAlias()));
         inner.add((run.getStatus() != null && run.getStatus().getHealth() != null ? run.getStatus().getHealth().getKey() : ""));
-        inner.add((run.getStatus() != null && run.getStatus().getStartDate() != null ? LimsUtils.getDateAsString(run.getStatus().getStartDate()) : ""));
-        inner.add((run.getStatus() != null && run.getStatus().getCompletionDate() != null ? LimsUtils.getDateAsString(run.getStatus().getCompletionDate()) : ""));
+        inner.add((run.getStatus() != null && run.getStatus().getStartDate() != null
+            ? LimsUtils.getDateAsString(run.getStatus().getStartDate()) : ""));
+        inner.add((run.getStatus() != null && run.getStatus().getCompletionDate() != null
+            ? LimsUtils.getDateAsString(run.getStatus().getCompletionDate()) : ""));
         inner.add((run.getPlatformType() != null ? run.getPlatformType().getKey() : ""));
 
-        jsonArray.add(inner); 
+        jsonArray.add(inner);
       }
       j.put("runsArray", jsonArray);
       return j;

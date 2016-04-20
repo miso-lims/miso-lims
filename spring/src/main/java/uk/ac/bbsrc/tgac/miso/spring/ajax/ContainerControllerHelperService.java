@@ -74,10 +74,7 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 /**
- * Created by IntelliJ IDEA.
- * User: davey
- * Date: 25-May-2010
- * Time: 16:39:52
+ * Created by IntelliJ IDEA. User: davey Date: 25-May-2010 Time: 16:39:52
  */
 @Ajaxified
 public class ContainerControllerHelperService {
@@ -545,14 +542,11 @@ public class ContainerControllerHelperService {
     int partition = json.getInt("partition");
 
     try {
-      if (isStringEmptyOrNull(barcode)) {
-        if (LimsUtils.isBase64String(barcode)) {
-          // Base64-encoded string, most likely a barcode image beeped in. decode and search
-          barcode = new String(Base64.decodeBase64(barcode));
-        }
-      }
-
       Pool p = requestManager.getPoolByBarcode(barcode);
+      // Base64-encoded string, most likely a barcode image beeped in. decode and search
+      if (p == null) {
+        p = requestManager.getPoolByBarcode(new String(Base64.decodeBase64(barcode)));
+      }
       SequencerPartitionContainer<SequencerPoolPartition> lf = (SequencerPartitionContainer<SequencerPoolPartition>) session
           .getAttribute("container_" + json.getString("container_cId"));
       if (lf.getPlatform().getPlatformType().equals(p.getPlatformType())) {
@@ -904,18 +898,20 @@ public class ContainerControllerHelperService {
         if (spc.getRun() != null) {
           run = TableHelper.hyperLinkify("/miso/run/" + spc.getRun().getId(), spc.getRun().getAlias());
           if (spc.getRun().getSequencerReference() != null) {
-            sequencer = TableHelper.hyperLinkify("/miso/sequencer/" + spc.getRun().getSequencerReference().getId(), 
-                                     spc.getRun().getSequencerReference().getPlatform().getNameAndModel());
+            sequencer = TableHelper.hyperLinkify("/miso/sequencer/" + spc.getRun().getSequencerReference().getId(),
+                spc.getRun().getSequencerReference().getPlatform().getNameAndModel());
           }
         }
-        String identificationBarcode = (isStringEmptyOrNull(spc.getIdentificationBarcode()) ? "Unknown Barcode" : spc.getIdentificationBarcode());
-        
+        String identificationBarcode = (isStringEmptyOrNull(spc.getIdentificationBarcode()) ? "Unknown Barcode"
+            : spc.getIdentificationBarcode());
+
         JSONArray inner = new JSONArray();
-        inner.add(TableHelper.hyperLinkify("/miso/container/" + spc.getId(),identificationBarcode));
-        inner.add(spc.getPlatform() != null && spc.getPlatform().getPlatformType() != null ? spc.getPlatform().getPlatformType().getKey() : "");
+        inner.add(TableHelper.hyperLinkify("/miso/container/" + spc.getId(), identificationBarcode));
+        inner.add(
+            spc.getPlatform() != null && spc.getPlatform().getPlatformType() != null ? spc.getPlatform().getPlatformType().getKey() : "");
         inner.add(run);
         inner.add(sequencer);
-        
+
         jsonArray.add(inner);
       }
       j.put("array", jsonArray);

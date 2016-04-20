@@ -684,8 +684,6 @@ Sample.ui = {
   receiveSample: function (input) {
     var barcode = jQuery(input).val();
     if (!Utils.validation.isNullCheck(barcode)) {
-      barcode = Utils.validation.base64Check(barcode);
-      jQuery(input).val(barcode);
 
       Fluxion.doAjax(
         'sampleControllerHelperService',

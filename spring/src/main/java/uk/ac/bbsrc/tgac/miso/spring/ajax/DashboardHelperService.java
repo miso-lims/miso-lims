@@ -310,11 +310,11 @@ public class DashboardHelperService {
       List<Library> libraries;
       StringBuilder b = new StringBuilder();
       if (!isStringEmptyOrNull(searchStr)) {
-        if (LimsUtils.isBase64String(searchStr)) {
-          // Base64-encoded string, most likely a barcode image beeped in. decode and search
-          searchStr = new String(Base64.decodeBase64(searchStr));
-        }
         libraries = new ArrayList<Library>(requestManager.listAllLibrariesBySearch(searchStr));
+        if (libraries.isEmpty()) {
+          // Base64-encoded string, most likely a barcode image beeped in. decode and search
+          libraries = new ArrayList<Library>(requestManager.listAllLibrariesBySearch(new String(Base64.decodeBase64(searchStr))));
+        }
       } else {
         libraries = new ArrayList<Library>(requestManager.listAllLibrariesWithLimit(50));
       }
@@ -345,11 +345,10 @@ public class DashboardHelperService {
       List<Sample> samples;
       StringBuilder b = new StringBuilder();
       if (!isStringEmptyOrNull(searchStr)) {
-        if (LimsUtils.isBase64String(searchStr)) {
-          // Base64-encoded string, most likely a barcode image beeped in. decode and search
-          searchStr = new String(Base64.decodeBase64(searchStr));
-        }
         samples = new ArrayList<>(requestManager.listAllSamplesBySearch(searchStr));
+        if (samples.isEmpty()) {
+          samples = new ArrayList<>(requestManager.listAllSamplesBySearch(new String(Base64.decodeBase64(searchStr))));
+        }
       } else {
         samples = new ArrayList<>(requestManager.listAllSamplesWithLimit(50));
       }
@@ -498,8 +497,8 @@ public class DashboardHelperService {
     try {
       StringBuilder b = new StringBuilder();
       Collection<Sample> samples = requestManager.listAllSamplesByReceivedDate(100);
-      
-      Set<Long> uniqueProjects = new HashSet<>();   
+
+      Set<Long> uniqueProjects = new HashSet<>();
 
       if (samples.size() > 0) {
         for (Sample s : samples) {
@@ -510,7 +509,7 @@ public class DashboardHelperService {
             b.append("Alias: <b>" + s.getProject().getAlias() + "</b><br/>");
             b.append("Last Received: <b>" + LimsUtils.getDateAsString(s.getReceivedDate()) + "</b><br/>");
             b.append("</div>");
-            
+
             uniqueProjects.add(s.getProject().getId());
           }
         }

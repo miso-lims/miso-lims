@@ -629,6 +629,9 @@ public class SQLPoolDAO implements PoolStore {
   @Override
   public Pool<? extends Poolable> getPoolByBarcode(String barcode, PlatformType platformType) throws IOException {
     if (barcode == null) throw new NullPointerException("cannot look up null barcode");
+    if (platformType == null) {
+      return getByBarcode(barcode);
+    }
     List<Pool<? extends Poolable>> pools = listAllByPlatformAndSearch(platformType, barcode);
     return pools.size() == 1 ? pools.get(0) : null;
   }
