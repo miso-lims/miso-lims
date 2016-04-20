@@ -100,7 +100,7 @@ var BoxItem = function(opts) {
 
   self.click = opts.click || self.click;
   self.element.click({'row': self.row, 'col': self.col}, self.click);
-  self.selectedImg ? self.select() : self.unselect();
+  self.selected ? self.select() : self.unselect();
   return self;
 };
 
