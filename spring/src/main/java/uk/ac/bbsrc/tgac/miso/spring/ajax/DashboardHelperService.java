@@ -446,7 +446,8 @@ public class DashboardHelperService {
           b.append("</div>");
         }
       } else {
-        return JSONUtils.SimpleJSONError("Failed: You do not have access to view system level alerts");
+        log.debug(String.format("The user '%s' cannot view the system alerts. Only the admin may do this. This is not an error.",
+            SecurityContextHolder.getContext().getAuthentication().getName()));
       }
     } catch (IOException e) {
       log.error("get system alerts", e);
@@ -498,8 +499,8 @@ public class DashboardHelperService {
     try {
       StringBuilder b = new StringBuilder();
       Collection<Sample> samples = requestManager.listAllSamplesByReceivedDate(100);
-      
-      Set<Long> uniqueProjects = new HashSet<>();   
+
+      Set<Long> uniqueProjects = new HashSet<>();
 
       if (samples.size() > 0) {
         for (Sample s : samples) {
@@ -510,7 +511,7 @@ public class DashboardHelperService {
             b.append("Alias: <b>" + s.getProject().getAlias() + "</b><br/>");
             b.append("Last Received: <b>" + LimsUtils.getDateAsString(s.getReceivedDate()) + "</b><br/>");
             b.append("</div>");
-            
+
             uniqueProjects.add(s.getProject().getId());
           }
         }
