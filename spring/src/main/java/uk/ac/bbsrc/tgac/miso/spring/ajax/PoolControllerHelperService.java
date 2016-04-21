@@ -247,11 +247,11 @@ public class PoolControllerHelperService {
     StringBuilder sb = new StringBuilder();
     sb.append("<div id='dilslist' class='checklist' style='width: 100%;'>");
     for (String s : codes) {
-      if (LimsUtils.isBase64String(s)) {
-        // Base64-encoded string, most likely a barcode image beeped in. decode and search
-        s = new String(Base64.decodeBase64(s));
-      }
       Dilution ed = requestManager.getDilutionByBarcode(s);
+      // Base64-encoded string, most likely a barcode image beeped in. decode and search
+      if (ed == null) {
+        ed = requestManager.getDilutionByBarcode(new String(Base64.decodeBase64(s)));
+      }
       if (ed != null) {
         sb.append("<span>");
         sb.append("<input type='checkbox' value='" + s + "' name='importdilslist' id='importdilslist_" + ed.getName() + "'/>");
@@ -716,7 +716,7 @@ public class PoolControllerHelperService {
 
     JSONObject j = new JSONObject();
 
-      try {
+    try {
       for (Pool pool : requestManager.listAllPools()) {
         poolMap.get(pool.getPlatformType().getKey()).add(pool);
       }
@@ -739,10 +739,10 @@ public class PoolControllerHelperService {
         j.put(poolType, arr);
       }
 
-        return j;
-      } catch (IOException e) {
-        log.debug("Failed", e);
-        return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
+      return j;
+    } catch (IOException e) {
+      log.debug("Failed", e);
+      return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
   }
 

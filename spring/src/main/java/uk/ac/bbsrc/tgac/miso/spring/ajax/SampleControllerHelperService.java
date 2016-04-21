@@ -117,7 +117,6 @@ public class SampleControllerHelperService {
   @Autowired
   private CacheHelperService cacheHelperService;
 
-
   /**
    * Returns a JSONObject containing the alias regex used by the current sample naming scheme
    */
@@ -202,7 +201,7 @@ public class SampleControllerHelperService {
                 } else {
                   note.setCreationDate(new Date());
                 }
-                
+
                 if (j.has("identificationBarcode") && !isStringEmptyOrNull(j.getString("identificationBarcode"))) {
                   String idBarcode = j.getString("identificationBarcode");
                   news.setIdentificationBarcode(idBarcode);
@@ -501,14 +500,13 @@ public class SampleControllerHelperService {
   public JSONObject getSampleByBarcode(HttpSession session, JSONObject json) {
     JSONObject response = new JSONObject();
     String barcode = json.getString("barcode");
-    if (LimsUtils.isBase64String(barcode)) {
-      log.info(barcode + "is base64");
-      // Base64-encoded string, most likely a barcode image beeped in. decode and search
-      barcode = new String(Base64.decodeBase64(barcode));
-    }
 
     try {
       Sample sample = requestManager.getSampleByBarcode(barcode);
+      // Base64-encoded string, most likely a barcode image beeped in. decode and search
+      if (sample == null) {
+        sample = requestManager.getSampleByBarcode(new String(Base64.decodeBase64(barcode)));
+      }
       if (sample.getReceivedDate() == null) {
         response.put("name", sample.getName());
         response.put("desc", sample.getDescription());
@@ -783,14 +781,15 @@ public class SampleControllerHelperService {
         JSONArray inner = new JSONArray();
         String identificationBarcode = sample.getIdentificationBarcode();
 
-        inner.add("<input type=\"checkbox\" value=\"" + sample.getId() + "\" class=\"bulkCheckbox\" id=\"bulk" + "_" + sample.getId() + "\">");
+        inner.add(
+            "<input type=\"checkbox\" value=\"" + sample.getId() + "\" class=\"bulkCheckbox\" id=\"bulk" + "_" + sample.getId() + "\">");
         inner.add(TableHelper.hyperLinkify("/miso/sample/" + sample.getId(), sample.getName()));
         inner.add(TableHelper.hyperLinkify("/miso/sample/" + sample.getId(), sample.getAlias()));
         inner.add(sample.getSampleType());
         inner.add((sample.getQcPassed() != null ? sample.getQcPassed().toString() : ""));
         inner.add(getSampleLastQC(sample.getId()));
         inner.add((isStringEmptyOrNull(identificationBarcode) ? "" : identificationBarcode));
-        
+
         jsonArray.add(inner);
       }
       j.put("array", jsonArray);
