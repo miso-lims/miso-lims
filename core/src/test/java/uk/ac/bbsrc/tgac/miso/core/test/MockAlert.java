@@ -23,11 +23,12 @@
 
 package uk.ac.bbsrc.tgac.miso.core.test;
 
+import java.util.Date;
+
 import com.eaglegenomics.simlims.core.User;
+
 import uk.ac.bbsrc.tgac.miso.core.event.Alert;
 import uk.ac.bbsrc.tgac.miso.core.event.type.AlertLevel;
-
-import java.util.Date;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.test
@@ -124,16 +125,6 @@ public class MockAlert implements Alert {
   }
 
   @Override
-  public int compareTo(Object o) {
-    Alert a = (Alert) o;
-    if (getAlertId() != null && a.getAlertId() != null) {
-      if (getAlertId() < a.getAlertId()) return -1;
-      if (getAlertId() > a.getAlertId()) return 1;
-    }
-    return 0;
-  }
-
-  @Override
   public boolean isDeletable() {
     return true;
   }
@@ -149,5 +140,14 @@ public class MockAlert implements Alert {
     sb.append(" : ");
     sb.append(getAlertDate());
     return sb.toString();
+  }
+
+  @Override
+  public int compareTo(Alert o) {
+    if (o.getAlertId() != null) {
+      if (this.alertId < o.getAlertId()) return -1;
+      if (this.alertId > o.getAlertId()) return 1;
+    }
+    return 0;
   }
 }

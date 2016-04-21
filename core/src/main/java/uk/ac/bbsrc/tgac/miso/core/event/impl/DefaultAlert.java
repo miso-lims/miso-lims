@@ -45,6 +45,9 @@ import uk.ac.bbsrc.tgac.miso.core.event.type.AlertLevel;
  * @since 0.1.2
  */
 public class DefaultAlert implements Alert, Serializable {
+
+  private static final long serialVersionUID = 1L;
+
   public static final Long UNSAVED_ID = 0L;
 
   @Id
@@ -137,16 +140,6 @@ public class DefaultAlert implements Alert, Serializable {
   }
 
   @Override
-  public int compareTo(Object o) {
-    Alert a = (Alert) o;
-    if (getAlertId() != null && a.getAlertId() != null) {
-      if (getAlertId() < a.getAlertId()) return -1;
-      if (getAlertId() > a.getAlertId()) return 1;
-    }
-    return 0;
-  }
-
-  @Override
   public boolean isDeletable() {
     return true;
   }
@@ -169,4 +162,14 @@ public class DefaultAlert implements Alert, Serializable {
     sb.append(getAlertRead());
     return sb.toString();
   }
+
+  @Override
+  public int compareTo(Alert o) {
+    if (o.getAlertId() != null) {
+      if (this.alertId < o.getAlertId()) return -1;
+      if (this.alertId > o.getAlertId()) return 1;
+    }
+    return 0;
+  }
+
 }
