@@ -1872,3 +1872,7 @@ button.disabled {
 	width: 80%;
 	margin-left: 15px;
 }
+
+.clear {
+	clear: both;
+}
