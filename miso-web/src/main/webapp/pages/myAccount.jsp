@@ -106,16 +106,16 @@
         <div class="portlet">
           <div class="portlet-header">Institute Defaults</div>
           <div class="portlet-content">
-            <a href="<c:url value='/miso/admin/instituteDefaults#origins'/>">Tissue Origins</a><br/>
-            <a href="<c:url value='/miso/admin/instituteDefaults#types'/>">Tissue Types</a><br/>
-            <a href="<c:url value='/miso/admin/instituteDefaults#materials'/>">Tissue Materials</a><br/>
-            <a href="<c:url value='/miso/admin/instituteDefaults#purposes'/>">Sample Purposes</a><br/>
-            <a href="<c:url value='/miso/admin/instituteDefaults#qcdetails'/>">QC Details</a><br/>
-            <a href="<c:url value='/miso/admin/instituteDefaults#subprojects'/>">Subprojects</a><br/>
-            <a href="<c:url value='/miso/admin/instituteDefaults#institutes'/>">Institutes</a><br/>
-            <a href="<c:url value='/miso/admin/instituteDefaults#labs'/>">Labs</a><br/>
-            <a href="<c:url value='/miso/admin/instituteDefaults#classes'/>">Sample Classes</a><br/>
-            <a href="<c:url value='/miso/admin/instituteDefaults#relationships'/>">Relationships between Sample Classes</a>
+            <a href="<c:url value='/miso/admin/instituteDefaults#tissueorigin'/>">Tissue Origins</a><br/>
+            <a href="<c:url value='/miso/admin/instituteDefaults#tissuetype'/>">Tissue Types</a><br/>
+            <a href="<c:url value='/miso/admin/instituteDefaults#tissuematerial'/>">Tissue Materials</a><br/>
+            <a href="<c:url value='/miso/admin/instituteDefaults#samplepurpose'/>">Sample Purposes</a><br/>
+            <a href="<c:url value='/miso/admin/instituteDefaults#qcpasseddetail'/>">QC Details</a><br/>
+            <a href="<c:url value='/miso/admin/instituteDefaults#subproject'/>">Subprojects</a><br/>
+            <a href="<c:url value='/miso/admin/instituteDefaults#institute'/>">Institutes</a><br/>
+            <a href="<c:url value='/miso/admin/instituteDefaults#lab'/>">Labs</a><br/>
+            <a href="<c:url value='/miso/admin/instituteDefaults#sampleclass'/>">Sample Classes</a><br/>
+            <a href="<c:url value='/miso/admin/instituteDefaults#samplevalidrelationship'/>">Relationships between Sample Classes</a>
           </div>
         </div>
       </sec:authorize>
