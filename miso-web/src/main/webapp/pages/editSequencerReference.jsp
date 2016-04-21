@@ -235,10 +235,13 @@
       <h1>Service Records</h1>
       <ul class="sddm">
         <li>
-          <a onmouseover="mopen('recordmenu')" onmouseout="mclosetime()">
-            Options
-            <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
-          </a>
+          <c:if test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')
+            or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_TECH')}">
+              <a onmouseover="mopen('recordmenu')" onmouseout="mclosetime()">
+                Options
+                <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
+              </a>
+          </c:if>
           <div id="recordmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
             <c:choose>
               <c:when test="${sequencerReference.dateDecommissioned == null}">
