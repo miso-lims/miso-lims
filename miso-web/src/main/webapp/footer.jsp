@@ -20,6 +20,7 @@
   ~
   ~ **********************************************************************
   --%>
+<%@ page import="uk.ac.bbsrc.tgac.miso.Version" %>
 
 </div>
 <div id="footer">
@@ -30,7 +31,7 @@
         Brought to you by <a href="http://www.tgac.ac.uk/" target="_blank">The Genome Analysis Centre</a>,
         <a href="http://oicr.on.ca/" target="_blank">The Ontario Institute for Cancer Research</a>,
         and the element <a href="http://en.wikipedia.org/wiki/Sodium" target="_blank">sodium</a> | Version:
-        0.2.1-SNAPSHOT
+        <%=Version.VERSION%>
     </p>
 </div>
 </body>
