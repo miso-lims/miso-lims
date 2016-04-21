@@ -45,7 +45,7 @@
     <a href="#samplevalidrelationship" onclick="document.getElementById('samplevalidrelationship').click();">Relationships between Sample Classes</a><br/>
   </div>
   
-  <div id="tissueorigin" class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#origins_arrowclick'), 'originsdiv');">
+  <div id="tissueorigin" class="sectionDivider clear" onclick="Utils.ui.toggleLeftInfo(jQuery('#origins_arrowclick'), 'originsdiv');">
     Tissue Origins
     <div id="origins_arrowclick" class="toggleLeft"></div>
   </div>
@@ -62,7 +62,7 @@
   </div>
   
   
-  <div id="tissuetype" class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#types_arrowclick'), 'typesdiv');">
+  <div id="tissuetype" class="sectionDivider clear" onclick="Utils.ui.toggleLeftInfo(jQuery('#types_arrowclick'), 'typesdiv');">
     Tissue Types
     <div id="types_arrowclick" class="toggleLeft"></div>
   </div>
@@ -78,7 +78,7 @@
 	  </table>
 	</div>
 	
-	<div id="tissuematerial" class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#materials_arrowclick'), 'materialsdiv');">
+	<div id="tissuematerial" class="sectionDivider clear" onclick="Utils.ui.toggleLeftInfo(jQuery('#materials_arrowclick'), 'materialsdiv');">
     Tissue Materials
     <div id="materials_arrowclick" class="toggleLeft"></div>
   </div>
@@ -94,7 +94,7 @@
     </table>
   </div>
   
-  <div id="samplepurpose" class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#purposes_arrowclick'), 'purposesdiv');">
+  <div id="samplepurpose" class="sectionDivider clear" onclick="Utils.ui.toggleLeftInfo(jQuery('#purposes_arrowclick'), 'purposesdiv');">
     Sample Purposes
     <div id="purposes_arrowclick" class="toggleLeft"></div>
   </div>
@@ -110,7 +110,7 @@
     </table>
   </div>
   
-  <div id="qcpasseddetail" class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#qcdetails_arrowclick'), 'qcdetailsdiv');">
+  <div id="qcpasseddetail" class="sectionDivider clear" onclick="Utils.ui.toggleLeftInfo(jQuery('#qcdetails_arrowclick'), 'qcdetailsdiv');">
     QC Details
     <div id="qcdetails_arrowclick" class="toggleLeft"></div>
   </div>
@@ -126,7 +126,7 @@
     </table>
   </div>
   
-  <div id="subproject" class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#subprojects_arrowclick'), 'subprojectsdiv');">
+  <div id="subproject" class="sectionDivider clear" onclick="Utils.ui.toggleLeftInfo(jQuery('#subprojects_arrowclick'), 'subprojectsdiv');">
     Subprojects
     <div id="subprojects_arrowclick" class="toggleLeft"></div>
   </div>
@@ -142,7 +142,7 @@
     </table>
   </div>
   
-  <div id="institute" class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#institutes_arrowclick'), 'institutesdiv');">
+  <div id="institute" class="sectionDivider clear" onclick="Utils.ui.toggleLeftInfo(jQuery('#institutes_arrowclick'), 'institutesdiv');">
     Institutes
     <div id="institutes_arrowclick" class="toggleLeft"></div>
   </div>
@@ -158,7 +158,7 @@
     </table>
   </div>
   
-  <div id="labs" class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#labs_arrowclick'), 'labsdiv');">
+  <div id="labs" class="sectionDivider clear" onclick="Utils.ui.toggleLeftInfo(jQuery('#labs_arrowclick'), 'labsdiv');">
     Labs
     <div id="labs_arrowclick" class="toggleLeft"></div>
   </div>
@@ -174,7 +174,7 @@
     </table>
   </div>
   
-  <div id="sampleclass" class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#classes_arrowclick'), 'classesdiv');">
+  <div id="sampleclass" class="sectionDivider clear" onclick="Utils.ui.toggleLeftInfo(jQuery('#classes_arrowclick'), 'classesdiv');">
     Sample Classes
     <div id="classes_arrowclick" class="toggleLeft"></div>
   </div>
@@ -190,7 +190,7 @@
     </table>
   </div>
   
-  <div id="samplevalidrelationship" class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#relationships_arrowclick'), 'relationshipsdiv');">
+  <div id="samplevalidrelationship" class="sectionDivider clear" onclick="Utils.ui.toggleLeftInfo(jQuery('#relationships_arrowclick'), 'relationshipsdiv');">
     Relationships between Sample Classes
     <div id="relationships_arrowclick" class="toggleLeft"></div>
   </div>
