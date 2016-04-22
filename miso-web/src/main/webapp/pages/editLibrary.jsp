@@ -254,6 +254,12 @@
 	  </td>
 	</tr>
 </c:if>
+<c:if test="${!empty library.sample && !empty library.sample.sampleAdditionalInfo && !empty library.libraryAdditionalInfo}">
+  <tr>
+    <td>Library Design:</td>
+    <td><miso:select id="libraryDesignTypes" path="libraryAdditionalInfo.libraryDesign" items="${libraryDesigns}" itemLabel="name" itemValue="id" defaultLabel="(None)" defaultValue="-1" onchange="Library.ui.changeDesign()"/></td>
+  </tr>
+</c:if>
 <tr>
   <c:choose>
     <c:when test="${library.id ==0 or empty library.libraryType}">
@@ -1472,6 +1478,7 @@ function submitBulkLibraries() {
 <script type="text/javascript">
   Library.propagationRules = ${propagationRulesJSON};
   jQuery(document).ready(function () {
+    Library.ui.changeDesign();
     jQuery('#alias').simplyCountable({
       counter: '#aliasCounter',
       countType: 'characters',
