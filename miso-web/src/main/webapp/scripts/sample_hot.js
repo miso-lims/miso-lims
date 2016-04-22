@@ -54,6 +54,7 @@ Sample.hot = {
       if (sam.sampleAdditionalInfo) {
         if (sam.sampleAdditionalInfo.passageNumber === 0) sam.sampleAdditionalInfo.passageNumber = 'nn';
         sam.sampleAdditionalInfo.sampleClassAlias = Sample.hot.getAliasFromId(sam.sampleAdditionalInfo.sampleClassId, Sample.hot.sampleOptions.sampleClassesDtos);
+        sam.sampleAdditionalInfo.parentSampleClassAlias = Sample.hot.getAliasFromId(sam.sampleAdditionalInfo.parentSampleClassId, Sample.hot.sampleOptions.sampleClassesDtos);
         sam.sampleAdditionalInfo.tissueOriginAlias = Sample.hot.getAliasFromId(sam.sampleAdditionalInfo.tissueOriginId, Sample.hot.sampleOptions.tissueOriginsDtos);
         sam.sampleAdditionalInfo.tissueTypeAlias = Sample.hot.getAliasFromId(sam.sampleAdditionalInfo.tissueTypeId, Sample.hot.sampleOptions.tissueTypesDtos);
         if (sam.sampleAdditionalInfo.prepKitId) {
