@@ -689,7 +689,7 @@ public class LibraryControllerHelperService {
           sb.append("<td>" + qc.getQcDate() + "</td>");
           sb.append("<td>" + qc.getQcType().getName() + "</td>");
           sb.append("<td>" + LimsUtils.round(qc.getResults(), 2) + " " + qc.getQcType().getUnits() + "</td>");
-          sb.append("<td>" + LimsUtils.round(qc.getInsertSize(), 2) + " bp</td>");
+          sb.append("<td>" + qc.getInsertSize() + " bp</td>");
           sb.append("</tr>");
         }
         return JSONUtils.SimpleJSONResponse(sb.toString());
