@@ -1054,8 +1054,8 @@ Library.ui = {
     }
   },
   
-  handleBulkAction: function (el) {
-    var selectedValue = el.options[el.selectedIndex].value;
+  handleBulkAction: function () {
+    var selectedValue = document.getElementById('dropdownActions').value;
     var options = {
       "update": Library.ui.updateSelectedItems,
       "dilutions": Library.ui.makeDilutionsFromSelectedItems,
