@@ -108,7 +108,9 @@ public class ContainerControllerHelperService {
         srb.append("<select name='sequencer' id='sequencerReference' onchange='Container.ui.populateContainerOptions(this);'>");
         srb.append("<option value='0' selected='selected'>Please select...</option>");
         for (SequencerReference sr : requestManager.listSequencerReferencesByPlatformType(pt)) {
-          srb.append("<option value='" + sr.getId() + "'>" + sr.getName() + " (" + sr.getPlatform().getInstrumentModel() + ")</option>");
+          if (sr.isActive()) {
+            srb.append("<option value='" + sr.getId() + "'>" + sr.getName() + " (" + sr.getPlatform().getInstrumentModel() + ")</option>");
+          }
         }
         srb.append("</select>");
 
