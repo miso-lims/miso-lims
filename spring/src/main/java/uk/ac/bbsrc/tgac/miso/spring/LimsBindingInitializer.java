@@ -60,6 +60,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
@@ -82,6 +83,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignDao;
 
 /**
  * Class that binds all the MISO model datatypes to the Spring form path types
@@ -98,6 +100,9 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
   @Autowired
   private SecurityManager securityManager;
+
+  @Autowired
+  private LibraryDesignDao libraryDesignDao;
 
   /**
    * Sets the requestManager of this LimsBindingInitializer object.
@@ -142,6 +147,8 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
    */
   @Override
   public void initBinder(WebDataBinder binder, WebRequest req) {
+    binder.setAutoGrowNestedPaths(false);
+
     binder.registerCustomEditor(Long.class, new CustomNumberEditor(Long.class, false));
 
     binder.registerCustomEditor(Boolean.class,
@@ -511,6 +518,19 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
         return resolvePoolable(element);
       }
     });
+
+    binder.registerCustomEditor(LibraryDesign.class, new PropertyEditorSupport() {
+      @Override
+      public void setAsText(String element) throws IllegalArgumentException {
+        long id = Long.parseLong(element);
+        if (id == -1) {
+          setValue(null);
+        } else {
+          setValue(libraryDesignDao.getLibraryDesign(id));
+        }
+      }
+
+    });
   }
 
   /**
@@ -568,7 +588,8 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
    */
   private User resolveUser(Object element) throws IllegalArgumentException {
     Long id = null;
-    if (element instanceof String && !isStringEmptyOrNull((String) element)) id = NumberUtils.parseNumber((String) element, Long.class).longValue();
+    if (element instanceof String && !isStringEmptyOrNull((String) element))
+      id = NumberUtils.parseNumber((String) element, Long.class).longValue();
     try {
       return id != null ? securityManager.getUserById(id) : null;
     } catch (IOException e) {
@@ -1108,7 +1129,8 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
    */
   private Kit resolveKit(Object element) throws IllegalArgumentException {
     Long id = null;
-    if (element instanceof String && !isStringEmptyOrNull((String) element)) id = NumberUtils.parseNumber((String) element, Long.class).longValue();
+    if (element instanceof String && !isStringEmptyOrNull((String) element))
+      id = NumberUtils.parseNumber((String) element, Long.class).longValue();
     try {
       return id != null ? requestManager.getKitById(id) : null;
     } catch (IOException e) {
@@ -1218,7 +1240,8 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
    */
   private TagBarcode resolveTagBarcode(Object element) throws IllegalArgumentException {
     Long id = null;
-    if (element instanceof String && !isStringEmptyOrNull((String) element)) id = NumberUtils.parseNumber((String) element, Long.class).longValue();
+    if (element instanceof String && !isStringEmptyOrNull((String) element))
+      id = NumberUtils.parseNumber((String) element, Long.class).longValue();
     try {
       return id != null ? requestManager.getTagBarcodeById(id) : null;
     } catch (IOException e) {

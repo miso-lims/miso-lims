@@ -52,7 +52,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.EntityGroup;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.LibraryPropagationRule;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Plate;
@@ -2487,9 +2487,9 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<LibraryPropagationRule> listLibraryPropagationRulesByClass(SampleClass sampleClass) throws IOException {
+  public Collection<LibraryDesign> listLibraryDesignByClass(SampleClass sampleClass) throws IOException {
     if (sampleClass == null) return Collections.emptyList();
-    return backingManager.listLibraryPropagationRulesByClass(sampleClass);
+    return backingManager.listLibraryDesignByClass(sampleClass);
   }
 
   @Override

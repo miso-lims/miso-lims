@@ -71,6 +71,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.AbstractPool;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryAdditionalInfo;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -78,6 +79,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAdditionalInfoImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCR;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution;
@@ -91,6 +93,7 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.service.tagbarcode.TagBarcodeStrategy;
 import uk.ac.bbsrc.tgac.miso.core.service.tagbarcode.TagBarcodeStrategyResolverService;
+import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignDao;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
@@ -126,12 +129,15 @@ public class EditLibraryController {
 
   @Autowired
   private TagBarcodeStrategyResolverService tagBarcodeStrategyResolverService;
-  
+
   @Autowired
   private LibraryAdditionalInfoService libraryAdditionalInfoService;
-  
+
   @Autowired
   private LibraryAdditionalInfoDao libraryAdditionalInfoDao;
+
+  @Autowired
+  private LibraryDesignDao libraryDesignDao;
 
   public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
     this.dataObjectFactory = dataObjectFactory;
@@ -148,7 +154,7 @@ public class EditLibraryController {
   public void setTagBarcodeStrategyResolverService(TagBarcodeStrategyResolverService tagBarcodeStrategyResolverService) {
     this.tagBarcodeStrategyResolverService = tagBarcodeStrategyResolverService;
   }
-  
+
   public void setLibraryAdditionalInfoService(LibraryAdditionalInfoService libraryAdditionalInfoService) {
     this.libraryAdditionalInfoService = libraryAdditionalInfoService;
   }
@@ -156,8 +162,7 @@ public class EditLibraryController {
   public Boolean misoPropertyBoolean(String property) {
     MisoPropertyExporter exporter = (MisoPropertyExporter) ApplicationContextProvider.getApplicationContext().getBean("propertyConfigurer");
     Map<String, String> misoProperties = exporter.getResolvedProperties();
-    return misoProperties.containsKey(property)
-        && Boolean.parseBoolean(misoProperties.get(property));
+    return misoProperties.containsKey(property) && Boolean.parseBoolean(misoProperties.get(property));
   }
 
   @ModelAttribute("metrixEnabled")
@@ -169,7 +174,7 @@ public class EditLibraryController {
   public Boolean autoGenerateIdentificationBarcodes() {
     return misoPropertyBoolean("miso.autoGenerateIdentificationBarcodes");
   }
-  
+
   @ModelAttribute("detailedSample")
   public Boolean isDetailedSampleEnabled() {
     return misoPropertyBoolean("miso.detailed.sample.enabled");
@@ -364,7 +369,7 @@ public class EditLibraryController {
   public String emPCRDilutionUnits() {
     return emPCRDilution.UNITS;
   }
-  
+
   // Handsontable
   @ModelAttribute("referenceDataJSON")
   public JSONObject referenceDataJsonString() throws IOException {
@@ -401,10 +406,10 @@ public class EditLibraryController {
     hot.put("strategyTypes", strategyTypes);
     hot.put("platformNames", populatePlatformNames());
     hot.put("libraryTypes", libraryTypes);
-    
+
     return hot;
   }
-  
+
   /* HOT */
   @RequestMapping(value = "tagBarcodesJson", method = RequestMethod.GET)
   public @ResponseBody JSONObject tagBarcodesJson(@RequestParam("strategy") String barcodeStrategy,
@@ -433,7 +438,6 @@ public class EditLibraryController {
     return rtn;
   }
 
-  
   /* HOT */
   @RequestMapping(value = "libraryTypesJson", method = RequestMethod.GET)
   public @ResponseBody JSONObject libraryTypesJson(@RequestParam("platform") String platform) throws IOException {
@@ -581,6 +585,7 @@ public class EditLibraryController {
 
       Long libraryPrepKitId = null;
       LibraryAdditionalInfo libraryAdditionalInfo = libraryAdditionalInfoDao.getLibraryAdditionalInfoByLibraryId(libraryId);
+      library.setLibraryAdditionalInfo(libraryAdditionalInfo);
       if (libraryAdditionalInfo != null && libraryAdditionalInfo.getPrepKit() != null) {
         libraryPrepKitId = libraryAdditionalInfo.getPrepKit().getKitDescriptorId();
       } else {
@@ -616,7 +621,9 @@ public class EditLibraryController {
       model.put("poolLibraryMap", poolLibraryMap);
       model.put("libraryPools", pools);
       model.put("libraryRuns", getRunsByLibraryPools(pools));
-      model.put("propagationRulesJSON", "[]");
+
+      populateDesigns(model,
+          library.getSample().getSampleAdditionalInfo() == null ? null : library.getSample().getSampleAdditionalInfo().getSampleClass());
 
       model.put("owners", LimsSecurityUtils.getPotentialOwners(user, library, securityManager.listAllUsers()));
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, library, securityManager.listAllUsers()));
@@ -659,6 +666,7 @@ public class EditLibraryController {
         model.put("sample", sample);
         if (sample.getSampleAdditionalInfo() != null) {
           sampleClass = sample.getSampleAdditionalInfo().getSampleClass();
+          library.setLibraryAdditionalInfo(new LibraryAdditionalInfoImpl());
         }
 
         List<Sample> projectSamples = new ArrayList<Sample>(requestManager.listAllSamplesByProjectId(sample.getProject().getProjectId()));
@@ -686,11 +694,7 @@ public class EditLibraryController {
         }
       }
 
-      JSONArray array = new JSONArray();
-      JsonConfig config = new JsonConfig();
-      config.setExcludes(new String[] { "sampleClass" });
-      array.addAll(requestManager.listLibraryPropagationRulesByClass(sampleClass), config);
-      model.put("propagationRulesJSON", array.toString());
+      populateDesigns(model, sampleClass);
 
       model.put("formObj", library);
       model.put("library", library);
@@ -730,7 +734,17 @@ public class EditLibraryController {
       throw new IOException(e);
     }
   }
-  
+
+  private void populateDesigns(ModelMap model, SampleClass sampleClass) throws IOException {
+    JSONArray array = new JSONArray();
+    JsonConfig config = new JsonConfig();
+    config.setExcludes(new String[] { "sampleClass" });
+    Collection<LibraryDesign> designs = requestManager.listLibraryDesignByClass(sampleClass);
+    array.addAll(designs, config);
+    model.put("libraryDesignsJSON", array.toString());
+    model.put("libraryDesigns", designs);
+  }
+
   /**
    * used to edit samples with ids from given {sampleIds} sends Dtos objects which will then be used for editing in grid
    */
@@ -753,7 +767,7 @@ public class EditLibraryController {
         LibraryDto library = new LibraryDto();
         library.setParentSampleId(sample.getId());
         library.setParentSampleAlias(sample.getAlias());
-        
+
         if (isDetailedSampleEnabled()) {
           LibraryAdditionalInfoDto lai = new LibraryAdditionalInfoDto();
           lai.setTissueOrigin(Dtos.asDto(sample.getSampleAdditionalInfo().getTissueOrigin()));
@@ -763,9 +777,9 @@ public class EditLibraryController {
         libraries.add(library);
       }
       model.put("librariesJSON", libraries);
-      JSONArray propagationRules = new JSONArray();
-      propagationRules.addAll(requestManager.listLibraryPropagationRulesByClass(sampleClass));
-      model.put("libraryPropagationRulesJSON", propagationRules.toString());
+      JSONArray libraryDesigns = new JSONArray();
+      libraryDesigns.addAll(requestManager.listLibraryDesignByClass(sampleClass));
+      model.put("libraryDesignsJSON", libraryDesigns.toString());
       model.put("method", "Propagate");
       return new ModelAndView("/pages/bulkEditLibraries.jsp", model);
     } catch (IOException ex) {
@@ -792,10 +806,10 @@ public class EditLibraryController {
         }
         libraryDtos.add(Dtos.asDto(library, lai));
       }
-      
+
       model.put("librariesJSON", libraryDtos);
       model.put("method", "Edit");
-      model.put("libraryPropagationRulesJSON", "[]");
+      model.put("libraryDesignsJSON", "[]");
       return new ModelAndView("/pages/bulkEditLibraries.jsp", model);
     } catch (IOException ex) {
       if (log.isDebugEnabled()) {
@@ -814,15 +828,41 @@ public class EditLibraryController {
         throw new SecurityException("Permission denied.");
       }
       library.setLastModifier(user);
-      
+
       if (library.getLibraryAdditionalInfo() != null) {
+        if (library.getLibraryAdditionalInfo().getLibraryDesign() != null) {
+
+          if (library.getLibraryAdditionalInfo().getLibraryDesign().getId() == -1) {
+            library.getLibraryAdditionalInfo().setLibraryDesign(null);
+          } else {
+            // If a design is selected, these form elements are disabled and therefore not submitted.
+            LibraryDesign design = libraryDesignDao.getLibraryDesign(library.getLibraryAdditionalInfo().getLibraryDesign().getId());
+            library.getLibraryAdditionalInfo().setLibraryDesign(design);
+            library.setLibrarySelectionType(requestManager.getLibrarySelectionTypeById(design.getLibrarySelectionType()));
+            library.setLibraryStrategyType(requestManager.getLibraryStrategyTypeById(design.getLibraryStrategyType()));
+            library.setPaired(design.getPaired());
+            library.setPlatformName(design.getPlatform().getKey());
+          }
+        }
         if (library.getId() == AbstractLibrary.UNSAVED_ID) {
           library.getLibraryAdditionalInfo().setCreatedBy(user);
         }
         library.getLibraryAdditionalInfo().setUpdatedBy(user);
+        library.getLibraryAdditionalInfo().setTissueOrigin(library.getSample().getSampleAdditionalInfo().getTissueOrigin());
+        library.getLibraryAdditionalInfo().setTissueType(library.getSample().getSampleAdditionalInfo().getTissueType());
       }
-      
-      requestManager.saveLibrary(library);
+
+      boolean create = library.getId() == AbstractLibrary.UNSAVED_ID;
+      long id = requestManager.saveLibrary(library);
+      if (library.getLibraryAdditionalInfo() != null) {
+        if (create) {
+          libraryAdditionalInfoService.create(library.getLibraryAdditionalInfo(), id);
+        } else {
+          library.getLibraryAdditionalInfo().setLibrary(library);
+          libraryAdditionalInfoService.update(library.getLibraryAdditionalInfo());
+        }
+      }
+
       session.setComplete();
       model.clear();
       return "redirect:/miso/library/" + library.getId();
@@ -833,16 +873,15 @@ public class EditLibraryController {
       throw ex;
     }
   }
-  
+
   @RequestMapping(value = "/bulk/create", method = RequestMethod.POST)
-  public String processBulkSubmit(@RequestBody JSONArray librariesDtos)
-      throws IOException, MalformedLibraryException {
+  public String processBulkSubmit(@RequestBody JSONArray librariesDtos) throws IOException, MalformedLibraryException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      
+
       if (librariesDtos != null && librariesDtos.size() > 0) {
         JSONArray savedLibraries = new JSONArray();
-        
+
         for (Object lDto : librariesDtos) {
           ObjectMapper mapper = new ObjectMapper();
           LibraryDto libDto = mapper.readValue(lDto.toString(), LibraryDto.class);
@@ -851,13 +890,12 @@ public class EditLibraryController {
           library.setLibrarySelectionType(requestManager.getLibrarySelectionTypeById(libDto.getLibrarySelectionTypeId()));
           library.setLibraryStrategyType(requestManager.getLibraryStrategyTypeById(libDto.getLibraryStrategyTypeId()));
           library.setLibraryType(requestManager.getLibraryTypeById(libDto.getLibraryTypeId()));
-          
-        
+
           if (!library.userCanWrite(user)) {
             throw new SecurityException("Permission denied.");
           }
           library.setLastModifier(user);
-          
+
           // TODO: fix this hack
           if (libDto.getLibraryAdditionalInfo() != null) {
             library.setLibraryAdditionalInfo(Dtos.to(libDto.getLibraryAdditionalInfo()));
@@ -866,7 +904,7 @@ public class EditLibraryController {
             }
             library.getLibraryAdditionalInfo().setUpdatedBy(user);
           }
-          
+
           Long savedId = requestManager.saveLibrary(library);
           savedLibraries.add(savedId);
         }

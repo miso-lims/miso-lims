@@ -50,7 +50,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.EntityGroup;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.LibraryPropagationRule;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Plate;
@@ -96,7 +96,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.EntityGroupStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ExperimentStore;
 import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
-import uk.ac.bbsrc.tgac.miso.core.store.LibraryPropagationRuleDao;
+import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignDao;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
@@ -192,7 +192,7 @@ public class MisoRequestManager implements RequestManager {
   @Autowired
   private SecurityStore securityStore;
   @Autowired
-  private LibraryPropagationRuleDao libraryPropagationRuleDao;
+  private LibraryDesignDao libraryDesignDao;
 
   public void setSecurityStore(SecurityStore securityStore) {
     this.securityStore = securityStore;
@@ -1664,8 +1664,8 @@ public class MisoRequestManager implements RequestManager {
       if (library.getSample().getSampleAdditionalInfo() != null) {
         SampleAdditionalInfo info = library.getSample().getSampleAdditionalInfo();
         
-        if (LibraryPropagationRule.validate(library,
-            libraryPropagationRuleDao.getLibraryPropagationRulesByClass(info == null ? null : info.getSampleClass()))) {
+        if (LibraryDesign.validate(library,
+            libraryDesignDao.getLibraryDesignByClass(info == null ? null : info.getSampleClass()))) {
           return libraryStore.save(library);
         } else {
           throw new IOException("Invalid propagation.");
@@ -2805,8 +2805,8 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<LibraryPropagationRule> listLibraryPropagationRulesByClass(SampleClass sampleClass) throws IOException {
-    return libraryPropagationRuleDao.getLibraryPropagationRulesByClass(sampleClass);
+  public Collection<LibraryDesign> listLibraryDesignByClass(SampleClass sampleClass) throws IOException {
+    return libraryDesignDao.getLibraryDesignByClass(sampleClass);
   }
 
   @Override

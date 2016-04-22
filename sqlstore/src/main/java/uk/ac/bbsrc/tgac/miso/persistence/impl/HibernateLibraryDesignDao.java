@@ -12,14 +12,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import uk.ac.bbsrc.tgac.miso.core.data.LibraryPropagationRule;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
-import uk.ac.bbsrc.tgac.miso.core.store.LibraryPropagationRuleDao;
+import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignDao;
 
 @Repository
 @Transactional
-public class HibernateLibraryPropagationRuleDao implements LibraryPropagationRuleDao {
-  protected static final Logger log = LoggerFactory.getLogger(HibernateLibraryPropagationRuleDao.class);
+public class HibernateLibraryDesignDao implements LibraryDesignDao {
+  protected static final Logger log = LoggerFactory.getLogger(HibernateLibraryDesignDao.class);
 
   @Autowired
   private SessionFactory sessionFactory;
@@ -29,18 +29,18 @@ public class HibernateLibraryPropagationRuleDao implements LibraryPropagationRul
   }
 
   @Override
-  public List<LibraryPropagationRule> getLibraryPropagationRulesByClass(SampleClass sampleClass) {
+  public List<LibraryDesign> getLibraryDesignByClass(SampleClass sampleClass) {
     if (sampleClass == null) return Collections.emptyList();
-    Query query = currentSession().createQuery("from LibraryPropagationRule where sampleClass.sampleClassId = :sampleClass");
+    Query query = currentSession().createQuery("from LibraryDesign where sampleClass.sampleClassId = :sampleClass");
     query.setLong("sampleClass", sampleClass.getSampleClassId());
     @SuppressWarnings("unchecked")
-    List<LibraryPropagationRule> rules = query.list();
+    List<LibraryDesign> rules = query.list();
     return rules;
   }
 
   @Override
-  public LibraryPropagationRule getLibraryPropagationRule(Long id) {
-    return (LibraryPropagationRule) currentSession().get(LibraryPropagationRule.class, id);
+  public LibraryDesign getLibraryDesign(Long id) {
+    return (LibraryDesign) currentSession().get(LibraryDesign.class, id);
   }
 
 }

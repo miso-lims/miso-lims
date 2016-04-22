@@ -20,6 +20,7 @@ public class LibraryAdditionalInfoDto {
   private String updatedByUrl;
   private String lastUpdated;
   private Boolean archived;
+  private Long libraryDesignId;
 
   public Long getId() {
     return id;
@@ -141,16 +142,21 @@ public class LibraryAdditionalInfoDto {
     this.archived = archived;
   }
 
+  public Long getLibraryDesignId() {
+    return libraryDesignId;
+  }
+
+  public void setLibraryDesignId(Long libraryDesignId) {
+    this.libraryDesignId = libraryDesignId;
+  }
+
   @Override
   public String toString() {
-    return "LibraryAdditionalInfoDto [id=" + id + ", url=" + url
-        + ", libraryId=" + libraryId + ", libraryUrl=" + libraryUrl
-        + ", tissueOrigin=" + tissueOrigin + ", tissueType=" + tissueType
-        + ", sampleGroup=" + sampleGroup + ", prepKit=" + prepKit
-        + ", createdById=" + createdById + ", createdByUrl=" + createdByUrl
-        + ", creationDate=" + creationDate + ", updatedById=" + updatedById
-        + ", updatedByUrl=" + updatedByUrl + ", lastUpdated=" + lastUpdated
-        + ", archived=" + archived + "]";
+    return "LibraryAdditionalInfoDto [id=" + id + ", url=" + url + ", libraryId=" + libraryId + ", libraryUrl=" + libraryUrl
+        + ", tissueOrigin=" + tissueOrigin + ", tissueType=" + tissueType + ", sampleGroup=" + sampleGroup + ", prepKit=" + prepKit
+        + ", createdById=" + createdById + ", createdByUrl=" + createdByUrl + ", creationDate=" + creationDate + ", updatedById="
+        + updatedById + ", updatedByUrl=" + updatedByUrl + ", lastUpdated=" + lastUpdated + ", archived=" + archived + ", libraryDesignId="
+        + libraryDesignId + "]";
   }
 
 }
