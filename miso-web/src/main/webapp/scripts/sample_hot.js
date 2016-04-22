@@ -280,7 +280,10 @@ Sample.hot = {
       // set initial number of rows to display. 
       var startRowsNumber = Sample.hot.parseIntRows("");
       if (startRowsNumber === false) return false;
-      Sample.hot.addEmptyRow(startRowsNumber - this.startData.length);
+      
+      // stringify and parse to clone the object (instead of using referential copies
+      var defaultObject = JSON.stringify(Sample.hot.getDefaultDetailedValues());
+      Sample.hot.addEmptyRow((startRowsNumber - this.startData.length), defaultObject);
     } else {
       Sample.hot.startData = startingValues;
     }
@@ -299,10 +302,6 @@ Sample.hot = {
       dataSchema: this.dataSchema
     });
     document.getElementById('hotContainer').style.display = '';
-    
-    if (Sample.hot.detailedSample) {
-      Sample.hot.setDefaultValues();
-    }
     
     // enable save button if it was disabled
     if (Sample.hot.button && Sample.hot.button.className.indexOf('disabled') !== -1) Sample.hot.toggleButtonAndLoaderImage(Sample.hot.button);
@@ -377,27 +376,26 @@ Sample.hot = {
    }
  },
  
- addEmptyRow: function (numberToAdd) {
+ addEmptyRow: function (numberToAdd, defaultObject) {
    var number = (numberToAdd === undefined ? 1 : numberToAdd);
    for (var i=1; i<=number; i++) {
-     Sample.hot.startData.push({});
+     Sample.hot.startData.push((defaultObject ? JSON.parse(defaultObject) : {}));
    }
  },
  
  /**
   *  pre-populate default values for certain columns
-  *  TODO: make this less hacky (column indices are hard-coded) 
   */
- setDefaultValues: function () {
+ getDefaultDetailedValues: function () {
    var sampleClassAlias = Sample.hot.getAliasFromId(Sample.hot.sampleClassId, Sample.hot.sampleOptions.sampleClassesDtos);
-   for (var i = 0; i < Sample.hot.hotTable.countRows(); i++) {
-     if (Sample.hot.hotTable.getCellMeta(i, 5).prop == 'scientificName') {
-       Sample.hot.hotTable.setDataAtCell(i, 5, Sample.hot.sciName);
-     }
-     if (Sample.hot.hotTable.getCellMeta(1, 14).prop == 'sampleAdditionalInfo.sampleClassAlias') {
-       Sample.hot.hotTable.setDataAtCell(i, 14, sampleClassAlias);
-     }
-   }
+   var rootSampleClassId = Sample.hot.getRootSampleClassId();
+   return {
+	 'sampleAdditionalInfo': {
+	   'sampleClassAlias': sampleClassAlias,
+	   'parentSampleClassId': rootSampleClassId
+	 },
+     'scientificName': Sample.hot.sciName
+   };
  },
   
   getAlias: function (obj) {
@@ -444,6 +442,13 @@ Sample.hot = {
 
   getSampleClasses: function () {
     return this.sortByProperty(this.sampleOptions['sampleClassesDtos'], 'id').map(this.getAlias);
+  },
+  
+  getValidClassesForParent: function (parentScId) {
+	var parentSampleClassId = parentScId;
+	return Sample.hot.sortByProperty(Sample.hot.sampleOptions['sampleValidRelationshipsDtos'], 'id')
+	             .filter(function (rel) { return rel.parentId == parentSampleClassId; })
+				 .map(function (rel) { return Sample.hot.getAliasFromId(rel.childId, Sample.hot.sampleOptions.sampleClassesDtos); });
   },
 
   getSamplePurposes: function () {
@@ -529,6 +534,7 @@ Sample.hot = {
           header: 'Sci. Name',
           data: 'scientificName',
           type: 'text',
+          source: Sample.hot.sciName,
           validator: requiredText,
           extraneous: true
         }
@@ -552,14 +558,7 @@ Sample.hot = {
     
     function setDetailedCols (sampleCategory, idColBoolean) {
       var additionalCols = [
-        {
-          header: 'Sample Class',
-          data: 'sampleAdditionalInfo.sampleClassAlias',
-          type: 'dropdown',
-          trimDropdown: false,
-          source: Sample.hot.getSampleClasses(),
-          readOnly: true
-        }
+        
       ];
       
       var tissueCols = [
@@ -652,6 +651,12 @@ Sample.hot = {
             type: 'numeric',
             validator: requiredText
           },{
+            header: 'Sample Class',
+            data: 'sampleAdditionalInfo.sampleClassAlias',
+            type: 'dropdown',
+            trimDropdown: false,
+            source: Sample.hot.getValidClassesForParent(Sample.hot.getRootSampleClassId())
+          },{
             header: 'Tube Number',
             data: 'sampleAdditionalInfo.tubeNumber',
             type: 'numeric',
@@ -682,6 +687,12 @@ Sample.hot = {
             trimDropdown: false,
             source: Sample.hot.getSampleClasses(),
             readOnly: true
+          },{
+            header: 'Sample Class',
+            data: 'sampleAdditionalInfo.sampleClassAlias',
+            type: 'dropdown',
+            trimDropdown: false,
+            source: Sample.hot.getSampleClasses()
           }
         ];
         var parentColumn = (idColBoolean ? parentIdentityCols : parentSampleCols);
@@ -919,24 +930,29 @@ Sample.hot = {
       timesReceived: parseInt(obj.sampleAdditionalInfo.timesReceived),
       tubeNumber: parseInt(obj.sampleAdditionalInfo.tubeNumber)
     };
-    if (obj.sampleAdditionalInfo.tissueOriginId) {
+    
+    // if the table data couldn't have changed (no alias value) then use the original id; 
+    // otherwise, generate id from alias (rather than calculating for each field whether the original id corresponds to the current alias
+    if (obj.sampleAdditionalInfo.tissueOriginId && !obj.sampleAdditionalInfo.tissueOriginAlias) {
       sample.sampleAdditionalInfo.tissueOriginId = obj.sampleAdditionalInfo.tissueOriginId;
     } else {
       sample.sampleAdditionalInfo.tissueOriginId = this.getIdFromAlias(obj.sampleAdditionalInfo.tissueOriginAlias, this.sampleOptions.tissueOriginsDtos);
     }
-    if (obj.sampleAdditionalInfo.tissueTypeId) {
+    if (obj.sampleAdditionalInfo.tissueTypeId && !obj.sampleAdditionalInfo.tissueTypeAlias) {
       sample.sampleAdditionalInfo.tissueTypeId = obj.sampleAdditionalInfo.tissueTypeId;
     } else {
       sample.sampleAdditionalInfo.tissueTypeId = this.getIdFromAlias(obj.sampleAdditionalInfo.tissueTypeAlias, this.sampleOptions.tissueTypesDtos);
     }
-    if (obj.sampleAdditionalInfo.sampleClassId) {
+    if (obj.sampleAdditionalInfo.sampleClassId && !obj.sampleAdditionalInfo.sampleClassAlias) {
       sample.sampleAdditionalInfo.sampleClassId = obj.sampleAdditionalInfo.sampleClassId;
     } else {
-      sample.sampleAdditionalInfo.sampleClassId = parseInt(document.getElementById('classDropdown').value);
+      sample.sampleAdditionalInfo.sampleClassId = this.getIdFromAlias(obj.sampleAdditionalInfo.sampleClassAlias, this.sampleOptions.sampleClassesDtos);
     }
     // add optional attributes
-    if (obj.sampleAdditionalInfo.subprojectId) {
+    if (obj.sampleAdditionalInfo.subprojectId && !obj.sampleAdditionalInfo.subprojectAlias) {
       sample.sampleAdditionalInfo.subprojectId = obj.sampleAdditionalInfo.subprojectId;
+    } else if (obj.sampleAdditionalInfo.subprojectAlias){
+    	sample.sampleAdditionalInfo.subprojectId = this.getIdFromAlias(obj.sampleAdditionalInfo.subprojectAlias, this.sampleOptions.subprojectsDtos);
     } else if (document.getElementById('subprojectSelect') && document.getElementById('subprojectSelect').value > 0) {
       sample.sampleAdditionalInfo.subprojectId = parseInt(document.getElementById('subprojectSelect').value);
     }
@@ -976,19 +992,7 @@ Sample.hot = {
         if (obj.sampleAnalyte.tubeId && obj.sampleAnalyte.tubeId.length) {
           sample.sampleAnalyte.tubeId = obj.sampleAnalyte.tubeId;
         }
-        // TODO: delete these once alias generator is complete
-        /*if (obj.sampleAnalyte.analyteNumber) {
-          var classDropdown = document.getElementById('classDropdown');
-          var classAlias = classDropdown.options[classDropdown.selectedIndex].text;
-          if (classAlias.indexOf("stock")) {
-            sample.sampleAnalyte.stockNumber = parseInt(obj.sampleAnalyte.analyteNumber);
-          } else {
-            sample.sampleAnalyte.aliquotNumber = parseInt(obj.sampleAnalyte.analyteNumber);
-          }
-        }
-        */
       }
-
     } else if (Sample.hot.getCategoryFromClassId(sample.sampleAdditionalInfo.sampleClassId) == 'Tissue') {
       sample.sampleTissue = {};
       
