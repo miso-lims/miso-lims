@@ -213,25 +213,7 @@ public class IlluminaNotificationMessageConsumerMechanism
                 }
               }
 
-              if (run.has("runparams")) {
-                try {
-                  Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder()
-                      .parse(new InputSource(new StringReader(run.getString("runparams"))));
-                  for (SequencingParameters parameters : getParameterSet()) {
-                    log.debug("Checking run " + runName + " against parameters " + parameters.getName());
-
-                    if (parameters.getPlatformId() == sr.getPlatform().getPlatformId() && parameters.matches(document)) {
-                      log.debug("Matched run " + runName + " to parameters " + parameters.getName());
-                      r.setSequencingParametersId(parameters.getId());
-                      break;
-                    }
-                  }
-                } catch (SAXException | ParserConfigurationException | XPathExpressionException e) {
-                  log.error("Error parsing runparams", e);
-                }
-              } else {
-                log.debug("No run parameters: " + runName);
-              }
+              processRunParams(run, r);
             }
           } else {
             log.debug("Updating existing run and status: " + runName);
@@ -329,6 +311,7 @@ public class IlluminaNotificationMessageConsumerMechanism
           }
 
           if (r.getSequencerReference() != null) {
+            processRunParams(run, r);
             Collection<SequencerPartitionContainer<SequencerPoolPartition>> fs = r.getSequencerPartitionContainers();
             if (fs.isEmpty()) {
               if (run.has("containerId") && !isStringEmptyOrNull(run.getString("containerId"))) {
@@ -469,6 +452,30 @@ public class IlluminaNotificationMessageConsumerMechanism
     }
 
     return updatedRuns;
+  }
+  
+  public void processRunParams(JSONObject run, Run r) {
+    if (run.has("runparams") && r.getSequencingParametersId() == null) {
+      Document document;
+      try {
+          document = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+              .parse(new InputSource(new StringReader(run.getString("runparams"))));
+
+        for (SequencingParameters parameters : getParameterSet()) {
+          log.debug("Checking run " + run.getString("name") + " against parameters " + parameters.getName());
+       
+          if (parameters.getPlatformId() == r.getSequencerReference().getPlatform().getPlatformId() && parameters.matches(document)) {
+            log.debug("Matched run " + run.getString("name") + " to parameters " + parameters.getName());
+            r.setSequencingParametersId(parameters.getId());
+            break;
+          }
+        }
+      } catch (SAXException | ParserConfigurationException | XPathExpressionException | IOException e) {
+        log.error("Error parsing runparams", e);
+      }
+    } else {
+      log.debug("No run parameters: " + run.getString("name"));
+    }
   }
 
   public SequencingParametersCollection getParameterSet() {

@@ -299,6 +299,12 @@ public class EditRunController {
               MisoWebUtils.generateErrorDivMessage("Cannot retrieve status XML for the given run: " + run.getAlias(), e.getMessage()));
           log.error("transform XML status", e);
         }
+        if (run.getSequencerReference() != null) {
+          model.put("sequencingParameters",
+              sequencingParametersService.getForPlatform((long) run.getSequencerReference().getPlatform().getPlatformId()));
+        } else {
+          model.put("sequencingParameters", Collections.emptyList());
+        }
       }
 
       model.put("formObj", run);
@@ -306,8 +312,6 @@ public class EditRunController {
       model.put("owners", LimsSecurityUtils.getPotentialOwners(user, run, securityManager.listAllUsers()));
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, run, securityManager.listAllUsers()));
       model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, run, securityManager.listAllGroups()));
-      model.put("sequencingParameters",
-          sequencingParametersService.getForPlatform((long) run.getSequencerReference().getPlatform().getPlatformId()));
 
       Map<Long, String> runMap = new HashMap<Long, String>();
       if (run.getWatchers().contains(user)) {
