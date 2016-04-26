@@ -478,7 +478,7 @@ public class EditLibraryController {
     if (platform != null && !"".equals(platform)) {
       final List<String> rtnStrat = new ArrayList<String>();
       for (final TagBarcodeStrategy t : tagBarcodeStrategyResolverService.getTagBarcodeStrategiesByPlatform(PlatformType.get(platform))) {
-        if (!t.getApplicableBarcodes().entrySet().isEmpty()) {
+        if (!t.getApplicableBarcodesForPosition(1).isEmpty()) {
           rtnStrat.add(t.getName());
         }
       }
