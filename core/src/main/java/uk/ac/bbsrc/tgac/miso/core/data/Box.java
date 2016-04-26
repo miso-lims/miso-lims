@@ -27,7 +27,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  * A Box usually has dimensions 8 by 12. (A-H, 1-12, A01 through H12)
  */
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
-@JsonIgnoreProperties({ "securityProfile", "free", "2DArray", "lastModifier", "changeLog" })
+@JsonIgnoreProperties({ "securityProfile", "2DArray", "lastModifier", "changeLog", "positionCount", "freeCount", "tubeCount" })
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public interface Box extends SecurableByProfile, Barcodable, Locatable, Deletable {
   public static class BoxablesSerializer extends JsonSerializer<Map<String, Boxable>> {
