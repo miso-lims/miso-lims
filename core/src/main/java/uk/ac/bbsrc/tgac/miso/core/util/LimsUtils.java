@@ -94,8 +94,6 @@ public class LimsUtils {
 
   protected static final Logger log = LoggerFactory.getLogger(LimsUtils.class);
 
-  private static final Pattern p = Pattern.compile("^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{4})$");
-
   public static String unicodeify(String barcode) {
     log.debug("ORIGINAL :: " + barcode);
     StringBuilder b = new StringBuilder();
@@ -111,12 +109,6 @@ public class LimsUtils {
     }
     log.debug("UNICODED :: " + b.toString());
     return b.toString();
-  }
-
-  public static boolean isBase64String(String base64) {
-    // nasty 20-character length hack for base64 strings.
-    // just have to hope that people don't generally search for 4-mer 20+ length strings very often
-    return base64.length() > 20 && p.matcher(base64).matches();
   }
 
   public static boolean isUrlValid(URL url) {

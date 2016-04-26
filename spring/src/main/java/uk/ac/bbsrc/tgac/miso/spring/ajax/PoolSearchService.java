@@ -74,31 +74,56 @@ public class PoolSearchService {
   @Autowired
   private RequestManager requestManager;
 
+  private abstract class PoolSearch {
+    public abstract Collection<Pool<? extends Poolable>> all(PlatformType type) throws IOException;
+
+    public abstract Collection<Pool<? extends Poolable>> search(PlatformType type, String query) throws IOException;
+  }
+
+  private class ReadyPools extends PoolSearch {
+
+    @Override
+    public Collection<Pool<? extends Poolable>> all(PlatformType type) throws IOException {
+      return requestManager.listReadyPoolsByPlatform(type);
+    }
+
+    @Override
+    public Collection<Pool<? extends Poolable>> search(PlatformType type, String query) throws IOException {
+      return requestManager.listReadyPoolsByPlatformAndSearch(type, query);
+    }
+  }
+
+  private class AllPools extends PoolSearch {
+
+    @Override
+    public Collection<Pool<? extends Poolable>> all(PlatformType type) throws IOException {
+      return requestManager.listAllPoolsByPlatform(type);
+    }
+
+    @Override
+    public Collection<Pool<? extends Poolable>> search(PlatformType type, String query) throws IOException {
+      return requestManager.listAllPoolsByPlatformAndSearch(type, query);
+    }
+
+  }
+
   public JSONObject poolSearch(HttpSession session, JSONObject json) {
     String searchStr = json.getString("str");
     StringBuilder b = new StringBuilder();
     if (json.has("platformType")) {
-      String platformType = json.getString("platformType").toUpperCase();
+      PlatformType platformType = PlatformType.valueOf(json.getString("platformType").toUpperCase());
       boolean readyOnly = json.getBoolean("readyOnly");
       try {
-        Collection<Pool<? extends Poolable>> pools = null;
+        Collection<Pool<? extends Poolable>> pools;
+        PoolSearch search = readyOnly ? new ReadyPools() : new AllPools();
         if (!isStringEmptyOrNull(searchStr)) {
-          if (LimsUtils.isBase64String(searchStr)) {
-            // Base64-encoded string, most likely a barcode image beeped in. decode and search
-            searchStr = new String(Base64.decodeBase64(searchStr));
-          }
-
-          if (readyOnly) {
-            pools = requestManager.listReadyPoolsByPlatformAndSearch(PlatformType.valueOf(platformType), searchStr);
-          } else {
-            pools = requestManager.listAllPoolsByPlatformAndSearch(PlatformType.valueOf(platformType), searchStr);
+          pools = search.search(platformType, searchStr);
+          // Base64-encoded string, most likely a barcode image beeped in. decode and search
+          if (pools.isEmpty()) {
+            pools = search.search(platformType, new String(Base64.decodeBase64(searchStr)));
           }
         } else {
-          if (readyOnly) {
-            pools = requestManager.listReadyPoolsByPlatform(PlatformType.valueOf(platformType));
-          } else {
-            pools = requestManager.listAllPoolsByPlatform(PlatformType.valueOf(platformType));
-          }
+          pools = search.all(platformType);
         }
         if (pools.size() > 0) {
           List<Pool<? extends Poolable>> rPools = new ArrayList<>(pools);
@@ -123,14 +148,15 @@ public class PoolSearchService {
     String platformType = json.getString("platform").toUpperCase();
     try {
       if (searchStr.length() > 1) {
-        if (LimsUtils.isBase64String(searchStr)) {
-          // Base64-encoded string, most likely a barcode image beeped in. decode and search
-          searchStr = new String(Base64.decodeBase64(searchStr));
-        }
-
         StringBuilder b = new StringBuilder();
         List<? extends Dilution> dilutions = new ArrayList<Dilution>(
             requestManager.listAllLibraryDilutionsBySearchAndPlatform(searchStr, PlatformType.valueOf(platformType)));
+        if (dilutions.isEmpty()) {
+          // Base64-encoded string, most likely a barcode image beeped in. decode and search
+          dilutions = new ArrayList<Dilution>(requestManager
+              .listAllLibraryDilutionsBySearchAndPlatform(new String(Base64.decodeBase64(searchStr)), PlatformType.valueOf(platformType)));
+
+        }
         int numMatches = 0;
         for (Dilution d : dilutions) {
           // have to use onmousedown because of blur firing before onclick and hiding the div before it can be added

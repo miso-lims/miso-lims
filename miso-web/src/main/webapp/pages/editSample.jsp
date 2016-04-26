@@ -464,28 +464,6 @@
         );
       }
 
-      // display sample QCs table, and count samples and libraries
-      jQuery('#sampleQcTable').tablesorter();
-      jQuery('#qcsTotalCount').html(jQuery('#sampleQcTable>tbody>tr:visible').length.toString() + ' QCs');
-      jQuery('#librariesTotalCount').html(jQuery('#library_table>tbody>tr:visible').length.toString() + ' Libraries');
-      
-      // display libraries table
-      jQuery('#library_table').dataTable({
-        "aaSorting": [
-          [1, 'asc']
-        ],
-        "aoColumns": [
-          null,
-          { "sType": 'natural '},
-          null,
-          null,
-          null
-        ],
-        "iDisplayLength": 50,
-        "bJQueryUI": true,
-        "bRetrieve": true
-      });
-
       // display tabs correctly for sample creation
       jQuery('#tabs').tabs();
       jQuery('#tabs').removeClass('ui-widget').removeClass('ui-widget-content');
@@ -686,13 +664,6 @@
         <input type='hidden' id='sampleId' name='id' value='${sample.id}'/>
       </form>
     </span>
-  <script type="text/javascript">
-    jQuery(document).ready(function () {
-      jQuery("#sampleQcTable").tablesorter();
-      jQuery('#qcsTotalCount').html(jQuery('#sampleQcTable>tbody>tr:visible').length.toString() + " QCs");
-      jQuery('#librariesTotalCount').html(jQuery('#library_table>tbody>tr:visible').length.toString() + " Libraries");
-    });
-  </script>
   <br/>
   <%--
       <h2 class="hrule">Upload SampleQC File</h2>
@@ -773,6 +744,11 @@
     </span>
   <script type="text/javascript">
     jQuery(document).ready(function () {
+    	// display sample QCs table, and count samples and libraries
+      jQuery('#sampleQcTable').tablesorter();
+      jQuery('#qcsTotalCount').html(jQuery('#sampleQcTable>tbody>tr:visible').length.toString() + ' QCs');
+      jQuery('#librariesTotalCount').html(jQuery('#library_table>tbody>tr:visible').length.toString() + ' Libraries');
+
       jQuery('#library_table').dataTable({
         "aaSorting": [
           [1, 'asc']

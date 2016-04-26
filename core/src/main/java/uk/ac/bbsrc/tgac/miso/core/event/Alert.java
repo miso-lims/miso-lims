@@ -42,7 +42,7 @@ import uk.ac.bbsrc.tgac.miso.core.event.type.AlertLevel;
  */
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public interface Alert extends Comparable, Deletable {
+public interface Alert extends Comparable<Alert>, Deletable {
   /**
    * Returns the alertId of this Alert object.
    * 

@@ -83,9 +83,9 @@ public interface Boxable extends Nameable, Barcodable {
    */
   public void setVolume(Double volume);
 
-  public long getBoxPositionId();
+  public Long getBoxPositionId();
 
-  public void setBoxPositionId(long id);
+  public void setBoxPositionId(Long id);
 
   public String getBoxPosition();
 

@@ -63,10 +63,20 @@ public class BoxImpl extends AbstractBox implements Serializable {
                                                                                                                   // zero-indexed in
                                                                                                                   // database
   }
+  
+  @Override
+  public int getPositionCount() {
+    return getSize().getColumns() * getSize().getRows();
+  }
 
   @Override
-  public int getFree() {
-    return getSize().getColumns() * getSize().getRows() - boxableItems.values().size();
+  public int getFreeCount() {
+    return getPositionCount() - getTubeCount();
+  }
+  
+  @Override
+  public int getTubeCount() {
+    return boxableItems.size();
   }
 
   @Override

@@ -49,6 +49,11 @@ var Defaults = Defaults || {
     if (clickedAnchor && document.getElementById(clickedAnchor)) {
       document.getElementById(clickedAnchor).click();
     }
+    
+    var storedDiv = localStorage.tablediv;
+    if (storedDiv && document.getElementById(storedDiv)) {
+      document.getElementById(storedDiv).click();
+    }
   }
 };
 
@@ -56,7 +61,7 @@ var Tissue = Tissue || {
 
   createTissueOriginsTable: function (xhr) {
     var TOtable = [];
-    var id, alias, description, endpoint;
+    var id, alias, description, endpoint, temp, rowId;
     
     // if data is coming in from AJAX request, store it in Defaults.all
     if (xhr) Defaults.all.tissueOriginsDtos = JSON.parse(xhr.responseText);
@@ -65,7 +70,7 @@ var Tissue = Tissue || {
 
   createTissueTypesTable: function (xhr) {
     var TTtable = [];
-    var id, alias, description, endpoint;
+    var id, alias, description, endpoint, temp, rowId;
     
     // if data is coming in from AJAX request, store it in Defaults.all
     if (xhr) Defaults.all.tissueTypesDtos = JSON.parse(xhr.responseText);
@@ -74,7 +79,7 @@ var Tissue = Tissue || {
 
   createTissueMaterialsTable: function (xhr) {
     var TMtable = [];
-    var id, alias, description, endpoint;
+    var id, alias, description, endpoint, temp, rowId;
     
     // if data is coming in from AJAX request, store it in Defaults.all
     if (xhr) Defaults.all.tissueMaterialsDtos = JSON.parse(xhr.responseText);
@@ -83,7 +88,7 @@ var Tissue = Tissue || {
 
   createSamplePurposesTable: function (xhr) {
     var SPtable = [];
-    var id, alias, description, endpoint;
+    var id, alias, description, endpoint, temp, rowId;
     // if data is coming in from AJAX request, store it in Defaults.all
     if (xhr) Defaults.all.samplePurposesDtos = JSON.parse(xhr.responseText);
     Tissue.createTable(Defaults.all.samplePurposesDtos, 'SP', 'allPurposes', 'Purpose', SPtable);
@@ -104,15 +109,17 @@ var Tissue = Tissue || {
         alias = data[i].alias;
         description = data[i].description;
         endpoint = data[i].url;
+        temp = endpoint.split('/');
+    	rowId = temp[temp.length - 2] + id;
 
-        table.push('<tr><td>');
+        table.push('<tr id="'+ rowId +'"><td>');
         table.push(Options.createTextInput(option+'_alias_'+id, alias));
         table.push('</td><td>');
         table.push(Options.createTextInput(option+'_description_'+id, description));
         table.push('</td><td>');
         table.push(Options.createButton('Update', "Tissue.update('"+endpoint+"', "+id+", '"+option+"')"));
         table.push('</td><td>');
-        table.push(Options.createButton('Delete', "Options.confirmDelete('"+endpoint+"')"));
+        table.push(Options.createButton('Delete', "Options.confirmDelete('"+endpoint+"', '"+rowId+"')"));
         table.push('</td></tr>');
       }
     }
@@ -206,7 +213,7 @@ var QC = QC || {
     if (xhr) Defaults.all.qcPassedDetailsDtos = JSON.parse(xhr.responseText);
     var data = Defaults.all.qcPassedDetailsDtos;
     var table = [];
-    var id, status, description, note, endpoint;
+    var id, status, description, note, endpoint, temp, rowId;
 
     // create rows if there is data; otherwise, add only the "Add New" button
     if (data) {
@@ -219,8 +226,10 @@ var QC = QC || {
         description = data[i].description;
         note = data[i].noteRequired;
         endpoint = data[i].url;
+        temp = endpoint.split('/');
+    	rowId = temp[temp.length - 2] + id;
 
-        table.push('<tr class="QC"><td>');
+        table.push('<tr id="'+ rowId +'"><td>');
         table.push(Options.createTextInput('QC_description_'+id, description));
         table.push('</td><td>');
         table.push(QC.createStatusInput('QC_status_'+id, status));
@@ -229,7 +238,7 @@ var QC = QC || {
         table.push('</td><td>');
         table.push(Options.createButton('Update', "QC.update('"+endpoint+"', "+id+")"));
         table.push('</td><td>');
-        table.push(Options.createButton('Delete', "Options.confirmDelete('"+endpoint+"')"));
+        table.push(Options.createButton('Delete', "Options.confirmDelete('"+endpoint+"', '"+ rowId +"')"));
         table.push('</td></tr>');
       }
     }
@@ -364,8 +373,10 @@ var Subproject = Subproject || {
         priority = data[i].priority;
         endpoint = data[i].url;
         referenceGenomeId = data[i].referenceGenomeId;
+        temp = endpoint.split('/');
+    	rowId = temp[temp.length - 2] + id;
 
-        table.push('<tr class="subP"><td>');
+        table.push('<tr class="subP" id="'+ rowId +'"><td>');
         table.push('<b><span id="subP_parentProject_'+id+'">'+ projectName +'</span></b>'); // not editable after creation
         table.push('</td><td>');
         table.push(Options.createTextInput('subP_alias_'+ id, alias));
@@ -378,7 +389,7 @@ var Subproject = Subproject || {
         table.push('</td><td>');
         table.push(Options.createButton('Update', "Subproject.update('"+endpoint+"', "+id+")"));
         table.push('</td><td>');
-        table.push(Options.createButton('Delete', "Options.confirmDelete('"+endpoint+"')"));
+        table.push(Options.createButton('Delete', "Options.confirmDelete('"+endpoint+"', '"+ rowId +"')"));
         table.push('</td></tr>');
       }
     }
@@ -548,8 +559,10 @@ var Lab = Lab || {
         alias = data[i].alias;
         endpoint = data[i].url;
         selectedInstituteId = (option == 'Lab' ? data[i].instituteId : null);
+        temp = endpoint.split('/');
+    	rowId = temp[temp.length - 2] + id;
 
-        table.push('<tr class="'+option+'"><td>');
+        table.push('<tr class="'+option+'" + id="'+ rowId +'"><td>');
         table.push(Options.createTextInput(option+'_alias_'+id, alias));
         table.push('</td><td>');
         if (selectedInstituteId) {
@@ -558,7 +571,7 @@ var Lab = Lab || {
         }
         table.push(Options.createButton('Update', "Lab.update('"+endpoint+"', "+id+", '"+option+"')"));
         table.push('</td><td>');
-        table.push(Options.createButton('Delete', "Options.confirmDelete('"+endpoint+"')"));
+        table.push(Options.createButton('Delete', "Options.confirmDelete('"+endpoint+"', '"+ rowId +"')"));
         table.push('</td></tr>');
       }
     }
@@ -695,15 +708,17 @@ var Hierarchy = Hierarchy || {
         alias = data[i].alias;
         category = data[i].sampleCategory;
         endpoint = data[i].url;
+        temp = endpoint.split('/');
+    	rowId = temp[temp.length - 2] + id;
 
-        table.push('<tr class="sampleClass"><td>');
+        table.push('<tr class="sampleClass" id="'+ rowId +'"><td>');
         table.push(Options.createTextInput('class_alias_'+id, alias));
         table.push('</td><td>');
         table.push(Hierarchy.createCategorySelect('class_category_'+ id, category, true));
         table.push('</td><td>');
         table.push(Options.createButton('Update', "Hierarchy.updateClass('"+endpoint+"', "+id+")"));
         table.push('</td><td>');
-        table.push(Options.createButton('Delete', "Options.confirmDelete('"+endpoint+"')"));
+        table.push(Options.createButton('Delete', "Options.confirmDelete('"+endpoint+"', '"+ rowId +"')"));
         table.push('</td></tr>');
       }
     }
@@ -842,8 +857,10 @@ var Hierarchy = Hierarchy || {
           return sampleClass.id == data[i].childId;
         })[0];
         endpoint = data[i].url;
-  
-        table.push('<tr class="relationship" data-id="'+ id +'"><td>');
+        temp = endpoint.split('/');
+    	rowId = temp[temp.length - 2] + id;
+
+        table.push('<tr class="relationship" data-id="'+ id +'" id="'+ rowId +'"><td>');
         table.push(parentClass.sampleCategory);
         table.push('</td><td>');
         table.push(parentClass.alias);
@@ -852,7 +869,7 @@ var Hierarchy = Hierarchy || {
         table.push('</td><td>');
         table.push(childClass.alias);
         table.push('</td><td>');
-        table.push(Options.createButton('Delete', "Options.confirmDelete('"+ endpoint +"')"));
+        table.push(Options.createButton('Delete', "Options.confirmDelete('"+ endpoint +"', '"+ rowId +"')"));
         // no Edit button
         table.push('</td></tr>');
       }
@@ -988,7 +1005,20 @@ var Options = Options || {
     data ? xhr.send(data) : xhr.send();
   },
 
-  confirmDelete: function (endpoint) {
+  confirmDelete: function (endpoint, rowId) {
+	// toggle-able divs have the same #ids as the resource (singular) of the endpoint. Store this in localStorage. Divs are toggled on page load if they are present in localStorage.
+	var pieces = endpoint.split('/');
+	var resource = pieces[pieces.length - 2];
+	localStorage['tablediv'] = resource;
+	
+	// remove row from table and make it clear to the user
+	var removeRow = function () {
+	  var row = document.getElementById(rowId);
+	  var tableId = row.parentNode.parentNode.id;
+	  row.parentNode.removeChild(row);
+	  Options.displayCheckmark(tableId);
+	}
+	
     if (endpoint.indexOf("sampleclass") != -1) {
       // confirm there are no SampleValidRelationships which reference the SampleClass to be deleted
       var sampleClassId = endpoint.split('/').pop();
@@ -1002,10 +1032,10 @@ var Options = Options || {
       }
       if (countRelatedClasses > 0) {
         if (confirm('Are you sure you wish to delete '+ sampleClassAlias +' and its '+ countRelatedClasses +' relationships? This operation cannot be undone!')) {
-          Options.makeXhrRequest('DELETE', endpoint);
+          Options.makeXhrRequest('DELETE', endpoint, removeRow);
         }
       } else if (confirm('Are you sure you wish to delete '+ sampleClassAlias +'? This opearation cannot be undone!')) {
-        Options.makeXhrRequest('DELETE', endpoint);
+        Options.makeXhrRequest('DELETE', endpoint, removeRow);
       }
     } else if (endpoint.indexOf("institute") != -1) {
       // confirm there are no Labs which reference the Institute to be deleted
@@ -1015,9 +1045,28 @@ var Options = Options || {
         var labAliasesString = relatedLabs.map(function(lab) { return lab.alias; });
         alert("Please delete the related Labs ("+ labAliasesString.join(", ") +") before you delete this Institute.");
         return false;
+      } else {
+    	Options.makeXhrRequest('DELETE', endpoint, removeRow);
       }
+    } else if (endpoint.indexOf("lab") != -1) {
+    	// need to deliberately remove lab from labsDtos as well, otherwise can't delete institutes associated with now-deleted lab
+    	var removeLabRow = function () {
+    	  var labIndex; 
+    	  for (var j = 0; j < Defaults.all.labsDtos.length; j++) {
+    		if (Defaults.all.labsDtos[j].id == endpoint.split('/').pop()) {
+    			labIndex = j;
+    			break;
+    		}
+    	  }
+    	  Defaults.all.labsDtos.splice(labIndex, 1);
+		  var row = document.getElementById(rowId);
+		  var tableId = row.parentNode.parentNode.id;
+		  row.parentNode.removeChild(row);
+		  Options.displayCheckmark(tableId);
+    	};
+    	Options.makeXhrRequest('DELETE', endpoint, removeLabRow);
     } else if (confirm('Are you sure you wish to delete? This operation cannot be undone!')) {
-      Options.makeXhrRequest('DELETE', endpoint);
+      Options.makeXhrRequest('DELETE', endpoint, removeRow);
     }
   },
 

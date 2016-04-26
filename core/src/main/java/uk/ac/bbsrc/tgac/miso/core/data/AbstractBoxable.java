@@ -20,8 +20,8 @@ public abstract class AbstractBoxable implements Boxable {
   private String boxAlias;
   @Transient
   private String boxLocation;
-  @Transient
-  private long positionId;
+  @Column(name = "boxPositionId")
+  private Long positionId;
   @Transient
   private String alias;
   @Transient
@@ -69,12 +69,12 @@ public abstract class AbstractBoxable implements Boxable {
   }
 
   @Override
-  public long getBoxPositionId() {
+  public Long getBoxPositionId() {
     return positionId;
   }
 
   @Override
-  public void setBoxPositionId(long id) {
+  public void setBoxPositionId(Long id) {
     positionId = id;
   }
 

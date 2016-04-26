@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -306,7 +307,7 @@ public class HibernateSampleDao implements SampleDao, SampleStore {
 
   @Override
   public Boxable getByPositionId(long positionId) throws IOException {
-    Query query = currentSession().createQuery("from SampleImpl where positionId = :posn");
+    Query query = currentSession().createQuery("from SampleImpl where boxPositionId = :posn");
     query.setLong("posn", positionId);
     return fetchSqlStore((Sample) query.uniqueResult());
   }
