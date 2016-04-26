@@ -45,20 +45,11 @@ var BoxItem = function(opts) {
   };
 
   self.normalClick = function() {
-    if (self.selInfo.item === null) {
-      self.selInfo.item = self;
-      self.select();
-      return;
-    }
-
-    if (self.selInfo.item == self) {
-      self.unselect();
-      self.selInfo.item = null;
-    } else {
+    if (self.selInfo.item !== null) {
       self.selInfo.item.unselect();
-      self.selInfo.item = self;
-      self.select();
     }
+    self.selInfo.item = self;
+    self.select();
   };
 
   self.clearSelectedItems = function() {
