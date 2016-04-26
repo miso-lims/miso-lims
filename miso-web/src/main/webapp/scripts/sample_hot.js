@@ -304,7 +304,7 @@ Sample.hot = {
     document.getElementById('hotContainer').style.display = '';
     
     // enable save button if it was disabled
-    if (Sample.hot.button && Sample.hot.button.className.indexOf('disabled') !== -1) Sample.hot.toggleButtonAndLoaderImage(Sample.hot.button);
+    if (Sample.hot.button && Sample.hot.button.classList.contains('disabled')) Sample.hot.toggleButtonAndLoaderImage(Sample.hot.button);
   },
   
   regenerateWithQcs: function () {
@@ -651,16 +651,16 @@ Sample.hot = {
             type: 'numeric',
             validator: requiredText
           },{
+            header: 'Tube Number',
+            data: 'sampleAdditionalInfo.tubeNumber',
+            type: 'numeric',
+            validator: requiredText
+          },{
             header: 'Sample Class',
             data: 'sampleAdditionalInfo.sampleClassAlias',
             type: 'dropdown',
             trimDropdown: false,
             source: Sample.hot.getValidClassesForParent(Sample.hot.getRootSampleClassId())
-          },{
-            header: 'Tube Number',
-            data: 'sampleAdditionalInfo.tubeNumber',
-            type: 'numeric',
-            validator: requiredText
           },{
             header: 'Lab',
             data: 'sampleAdditionalInfo.labComposite',
@@ -1018,7 +1018,7 @@ Sample.hot = {
     return sample;
   },
   
-  getOneSample: function (sampleId, rowIndex) {
+  getSampleAlias: function (sampleId, rowIndex) {
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function() {
       if (xhr.readyState === XMLHttpRequest.DONE) {
@@ -1072,45 +1072,47 @@ Sample.hot = {
     }
     // process error message if it was a SQL violation, and add any errors to the messages array
     var reUserMessage = /could not execute .*?: (.*)/;
-    Sample.hot.messages.failed.push("Row "+ (rowIndex + 1) +": "+ responseText.detail.replace(reUserMessage, "$1")); 
+    var extraCVEMessage = /(.*)ConstraintViolationException: (.*)/;
+    var errorMessage1 = responseText.detail.replace(reUserMessage, "$1");
+    var finalErrorMessage = errorMessage1.replace(extraCVEMessage, "$2");
+    Sample.hot.messages.failed.push("Row "+ (rowIndex + 1) +": "+ finalErrorMessage); 
     
     // display any errors if this is the final sample to be saved
     if (Sample.hot.messages.success.length + Sample.hot.messages.failed.length >= numberToSave) {
-      Sample.hot.addAnyErrors();
+      Sample.hot.addSuccessesAndErrors();
     }
   },
   
   successSave: function (xhr, rowIndex, numberToSave) {
     // add sample url and id to the data source if the sample is newly created
+    var sampleId;
     if (!Sample.hot.startData[rowIndex].id) {
       Sample.hot.startData[rowIndex].url = xhr.getResponseHeader('Location');
       var sampleId = Sample.hot.startData[rowIndex].url.split('/').pop();
       Sample.hot.startData[rowIndex].id = sampleId;
-      
-      // get sample data and update alias
-      Sample.hot.getOneSample(sampleId, rowIndex);
+    } else {
+      sampleId = Sample.hot.startData[rowIndex].id;
     }
-
+    
     // add a 'saved' attribute to the data source 
     Sample.hot.startData[rowIndex].saved = true;
-
-    // display any errors if this is the final sample to be saved
-    if (Sample.hot.messages.success.length + Sample.hot.messages.failed.length == numberToSave) {
-      Sample.hot.addAnyErrors();
-    }
+    
+    // get sample data and update alias
+    Sample.hot.getSampleAlias(sampleId, rowIndex);
   },
   
   updateAlias: function (xhr, rowIndex) {
     var sample = JSON.parse(xhr.response);
     Sample.hot.messages.success[rowIndex] = sample.alias;
     Sample.hot.hotTable.setDataAtCell(rowIndex, 0, sample.alias);
+    Sample.hot.addSuccessesAndErrors();
   },
 
   saveDetailedData: function () {
     // check that a project and class have been declared
     if (document.getElementById('projectSelect').value === '' || document.getElementById('classDropdown').value === '') {
       Sample.hot.messages.failed.push('Make sure both Project and Sample Class are selected before saving.');
-      Sample.hot.addAnyErrors();
+      Sample.hot.addErrors(Sample.hot.messages);
       return false;
     }
     
@@ -1121,12 +1123,13 @@ Sample.hot = {
       if (isValid) {
         // check for sampleValidRelationship with RootSampleClass as parent
         var parentClassId = Sample.hot.getRootSampleClassId();
+        // TODO: update this to check each be the cell, not the dropdown
         var childClassId = document.getElementById('classDropdown').value;
         var validRelationship = Sample.hot.findMatchingRelationship(parentClassId, childClassId);
         if (validRelationship.length === 0) {
           Sample.hot.messages.failed.push(Sample.hot.makeErrorMessageForInvalidRelationship(parentClassId, childClassId) 
                   +  " Please copy your data, select another child class and save again.");
-          Sample.hot.addAnyErrors();
+          Sample.hot.addErrors(Sample.hot.messages);
           document.getElementById('classDropdown').removeAttribute('disabled');
           document.getElementById('classDropdown').classList.remove('disabled');
           document.getElementById('classDropdown').classList.add('invalid');
@@ -1233,7 +1236,7 @@ Sample.hot = {
     Sample.hot.messages.success = [];
     
     // disable the save button
-    if (Sample.hot.button) Sample.hot.toggleButtonAndLoaderImage(Sample.hot.button);
+    if (Sample.hot.button && Sample.hot.button.classList.contains('disabled') === false) Sample.hot.toggleButtonAndLoaderImage(Sample.hot.button);
     
     var tableData = Sample.hot.startData;
     
@@ -1268,7 +1271,7 @@ Sample.hot = {
     // check that a project has been declared
     if (document.getElementById('projectSelect').value === '') {
       Sample.hot.messages.failed.push('Make sure that a Project is selected before saving.');
-      Sample.hot.addAnyErrors();
+      Sample.hot.addErrors(Sample.hot.messages);
       return false;
     }
     
@@ -1313,11 +1316,11 @@ Sample.hot = {
                 }
               } 
               // display error/success messages
-              Sample.hot.addAnyErrors();
+              Sample.hot.addSuccessesAndErrors();
             },
             'doOnError': function (json) {
               Sample.hot.messages.failed.push(json.error);
-              Sample.hot.addAnyErrors();
+              Sample.hot.addErrors(Sample.hot.messages);
               return false;
             }
           }
@@ -1364,7 +1367,7 @@ Sample.hot = {
     // check for SampleValidRelationships
     var validRelationships = Sample.hot.assessValidRelationships(sampleData);
     if (!validRelationships) {
-      Sample.hot.addAnyErrors();
+      Sample.hot.addErrors(Sample.hot.messages);
       return false;
     }
     
@@ -1431,13 +1434,60 @@ Sample.hot = {
   
   validationFails: function () {
     Sample.hot.messages.failed.push("It looks like some cells are not yet valid. Please fix them before saving.");
-    Sample.hot.addAnyErrors();
+    Sample.hot.addErrors(Sample.hot.messages);
   },
   
-  addAnyErrors: function () {
+  areAllProcessed: function () {
     var messages = Sample.hot.messages;
-    console.log(Sample.hot.messages);
-    var successfullySaved = messages.success.filter(function (message) { return (!parseInt(message) && message !== null); });
+    var savedSamples = messages.success.filter(function (sam) { return (sam !== null); });
+    if (savedSamples.length + messages.failed.length == messages.success.length) {
+      return true;
+    } else {
+      return false;
+    }
+  },
+  
+  addErrors: function (messages) {
+    console.log(messages);
+    var errorMessages = document.getElementById('errorMessages');
+    var ary = ["<ul>"];
+    for (var i=0; i<messages.failed.length; i++) {
+      ary.push("<li>"+ messages.failed[i] +"</li>");
+    }
+    ary.push("</ul>");
+    errorMessages.innerHTML = '';
+    errorMessages.innerHTML = ary.join('');
+    document.getElementById('saveErrors').classList.remove('hidden');
+    Sample.hot.hotTable.validateCells();
+    for (var i = 0; i < Sample.hot.failedComplexValidation.length; i++) {
+      var failedIndices = Sample.hot.failedComplexValidation[i];
+      Sample.hot.markCellsInvalid(failedIndices[0], failedIndices[1]);
+    }
+    Sample.hot.hotTable.render();
+
+    // enable the save button
+    if (Sample.hot.button && Sample.hot.button.classList.contains('disabled')) Sample.hot.toggleButtonAndLoaderImage(Sample.hot.button);
+  },
+  
+  addSuccessesAndErrors: function () {
+    // break if not all items have been processed yet
+    if (Sample.hot.areAllProcessed() === false) {
+      return false;
+    }
+    var messages = Sample.hot.messages;
+    
+    // add error messages
+    if (messages.failed.length) {
+      Sample.hot.addErrors(messages);
+    } else {
+      document.getElementById('saveErrors').classList.add('hidden');
+      
+      // enable the save button
+      if (Sample.hot.button && Sample.hot.button.classList.contains('disabled')) Sample.hot.toggleButtonAndLoaderImage(Sample.hot.button);
+    }
+    
+    // add success messages
+    var successfullySaved = messages.success.filter(function (message) { return (message !== null); });
     if (successfullySaved.length) {
       var successMessage = successfullySaved.length + " samples are now saved.";
       document.getElementById('successMessages').innerHTML = successMessage;
@@ -1446,29 +1496,5 @@ Sample.hot = {
     } else {
       document.getElementById('saveSuccesses').classList.add('hidden');
     }
-    
-    if (Sample.hot.button) Sample.hot.toggleButtonAndLoaderImage(Sample.hot.button);
-    
-    if (messages.failed.length) {
-      var errorMessages = document.getElementById('errorMessages');
-      var ary = ["<ul>"];
-      for (var i=0; i<messages.failed.length; i++) {
-        ary.push("<li>"+ messages.failed[i] +"</li>");
-      }
-      ary.push("</ul>");
-      errorMessages.innerHTML = '';
-      errorMessages.innerHTML = ary.join('');
-      document.getElementById('saveErrors').classList.remove('hidden');
-      Sample.hot.hotTable.validateCells();
-      for (var i = 0; i < Sample.hot.failedComplexValidation.length; i++) {
-        var failedIndices = Sample.hot.failedComplexValidation[i];
-        Sample.hot.markCellsInvalid(failedIndices[0], failedIndices[1]);
-      }
-      Sample.hot.hotTable.render();
-      return false;
-    } else {
-      document.getElementById('saveErrors').classList.add('hidden');
-    }
-    return true;
   }
 };

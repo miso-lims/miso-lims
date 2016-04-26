@@ -95,7 +95,7 @@ Library.hot = {
     }, Library.hot.hotTable);
     
     // enable save button if it was disabled
-    if (Library.hot.button && Library.hot.button.className.indexOf('disabled') !== -1) Library.hot.toggleButtonAndLoaderImage(Library.hot.button);
+    if (Library.hot.button && Library.hot.button.classList.contains('disabled')) Library.hot.toggleButtonAndLoaderImage(Library.hot.button);
     
     // TODO: fix this hack
     Library.hot.getBarcodeKitsOnly("Illumina");
@@ -760,7 +760,7 @@ Library.hot = {
     Library.hot.messages.failed = [];
     
     // disable the save button
-    if (Library.hot.button) Library.hot.toggleButtonAndLoaderImage(Library.hot.button);
+    if (Library.hot.button && Library.hot.button.classList.contains('disabled') === false) Library.hot.toggleButtonAndLoaderImage(Library.hot.button);
     
     var tableData = Library.hot.startData;
     
@@ -800,45 +800,64 @@ Library.hot = {
     Library.hot.addAnyErrors();
   },
   
-  addAnyErrors: function () {
+  areAllProcessed: function () {
     var messages = Library.hot.messages;
-    console.log(Library.hot.messages);
+    var savedItems = messages.success.filter(function (item) { return (item !== null); });
+    if (savedItems.length + messages.failed.length == messages.success.length) {
+      return true;
+    } else {
+      return false;
+    }
+  },
+  
+  addErrors: function (messages) {
+    var errorMessages = document.getElementById('errorMessages');
+    var ary = ["<ul>"];
+    for (var i=0; i<messages.failed.length; i++) {
+      ary.push("<li>"+ messages.failed[i] +"</li>");
+    }
+    ary.push("</ul>");
+    errorMessages.innerHTML = '';
+    errorMessages.innerHTML = ary.join('');
+    document.getElementById('saveErrors').classList.remove('hidden');
+    Library.hot.hotTable.validateCells();
+    for (var i = 0; i < Library.hot.failedComplexValidation.length; i++) {
+      var failedIndices = Library.hot.failedComplexValidation[i];
+      Library.hot.markCellsInvalid(failedIndices[0], failedIndices[1]);
+    }
+    Library.hot.hotTable.render();
     
+    // enable the save button
+    if (Library.hot.button && Library.hot.button.classList.contains('disabled')) Library.hot.toggleButtonAndLoaderImage(Library.hot.button);
+  },
+  
+  addSuccessesAndErrors: function () {
+    // break if not all items have been processed yet
+    if (Library.hot.areAllProcessed() == false) {
+      return false;
+    }
+    var messages = Library.hot.messages;
+    
+    // add error messages
+    if (messages.failed.length) {
+      Library.hot.addErrors(messages);
+    } else {
+      document.getElementById('saveErrors').classList.add('hidden');
+      
+      // enable the save button
+      if (Library.hot.button && Library.hot.button.classList.contains('disabled')) Library.hot.toggleButtonAndLoaderImage(Library.hot.button);
+    }
+    
+    // add success messages
+    var successfullySaved = messages.success.filter(function (message) { return (message !== null); });
     if (messages.success.length) {
-      var previouslySaved = messages.success.filter(function (message) { return (!parseInt(message) && message !== 0); });
-      var successMessage = "Successfully saved " + messages.success.length + " out of " + (messages.success.length + messages.failed.length)
-                             + " libraries. " + previouslySaved.length + " libraries were saved previously.";
+      var successMessage = successfullySaved.length + " libraries are now saved.";
       document.getElementById('successMessages').innerHTML = successMessage;
       document.getElementById('saveSuccesses').classList.remove('hidden');
       Library.hot.makeSavedRowsReadOnly();
     } else {
       document.getElementById('saveSuccesses').classList.add('hidden');
-    }
-    
-    
-    if (Library.hot.button) Library.hot.toggleButtonAndLoaderImage(Library.hot.button);
-    
-    if (messages.failed.length) {
-      var errorMessages = document.getElementById('errorMessages');
-      var ary = ["<ul>"];
-      for (var i=0; i<messages.failed.length; i++) {
-        ary.push("<li>"+ messages.failed[i] +"</li>");
-      }
-      ary.push("</ul>");
-      errorMessages.innerHTML = '';
-      errorMessages.innerHTML = ary.join('');
-      document.getElementById('saveErrors').classList.remove('hidden');
-      Library.hot.hotTable.validateCells();
-      for (var i = 0; i < Library.hot.failedComplexValidation.length; i++) {
-        var failedIndices = Library.hot.failedComplexValidation[i];
-        Library.hot.markCellsInvalid(failedIndices[0], failedIndices[1]);
-      }
-      Library.hot.hotTable.render();
-      return false;
-    } else {
-      document.getElementById('saveErrors').classList.add('hidden');
-    }
-    return true;
+    } 
   },
   
   markCellsInvalid: function (rowIndex, colIndex) {
