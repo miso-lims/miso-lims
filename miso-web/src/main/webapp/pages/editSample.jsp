@@ -534,9 +534,21 @@
     </ul>
   </div>
   <h1>Create Samples</h1>
+  <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#hothelp_arrowclick'), 'hothelpdiv');">Quick Help
+    <div id="hothelp_arrowclick" class="toggleLeft"></div>
+  </div>
+  <div id="hothelpdiv" class="note" style="display:none;">
+    <p>To fill all columns below with the value of your selected cell, <b>double-click</b> the square in the bottom right of your selected cell.
+      <br/>To fill a variable number of columns with the value of your selected cell,  <b>click</b> the square in the bottom right of your 
+      filled-in selected cell and <b>drag</b> up or down. All selected columns will be filled in.
+	    <c:if test="${aliasGenerationEnabled}">
+	      <br/>Leave <b>alias</b> cell blank to auto-generate an alias for this sample.
+	    </c:if>
+    </p>
+  </div>
+  <div class="clear"></div>
   <br/>
   <br/>
-
 
   <div id="HOTbulkForm" data-detailed-sample="${detailedSample}">
     <div class="floatleft">
@@ -555,17 +567,7 @@
 	      <button id="makeTable" class="disabled" disabled="disabled" onclick="Sample.hot.makeNewSamplesTable();">Make Table</button>
 	    </div>
 	  </div>
-	  <div class="floatleft rightfloatleft">
-      <p>To fill all columns below with the value of your selected cell, <b>double-click</b> the square in the bottom right of your selected cell.</p>
-      <p>To fill a variable number of columns with the value of your selected cell,  <b>click</b> the square in the bottom right of your 
-      filled-in selected cell and <b>drag</b> up or down. All selected columns will be filled in.</p>
-      <c:if test="${aliasGenerationEnabled}">
-      <br/><br/><p>Leave <b>alias</b> cell blank to auto-generate an alias for this sample.</p>
-      </c:if>
-    </div>
-	  
-	  <div style="clear:both;"></div>
-    <div>
+    <div class="clear">
       <c:choose>
       <c:when test="${detailedSample}">
         <button id="saveDetailed" class="disabled" disabled="disabled" onclick="Sample.hot.saveDetailedData();">Save</button>
