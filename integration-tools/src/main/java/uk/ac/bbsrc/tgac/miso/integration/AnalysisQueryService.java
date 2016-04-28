@@ -23,14 +23,13 @@
 
 package uk.ac.bbsrc.tgac.miso.integration;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationException;
 import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationUtils;
-
-import java.util.Iterator;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.service.task
@@ -63,7 +62,9 @@ public class AnalysisQueryService {
     q1.put("params", params);
     String query = q1.toString();
 
-    String response = IntegrationUtils.sendMessage(IntegrationUtils.prepareSocket(analysisServerHost, analysisServerPort), query);
+//    String response = IntegrationUtils.sendMessage(IntegrationUtils.prepareSocket(analysisServerHost, analysisServerPort), query);
+    String response = IntegrationUtils.makePostRequest(analysisServerHost, analysisServerPort, query);
+
     if (!"".equals(response)) {
       JSONArray r = JSONArray.fromObject(response);
       if (!r.isEmpty()) {
@@ -84,7 +85,9 @@ public class AnalysisQueryService {
     q1.put("query", "getTasks");
     String query = q1.toString();
 
-    String response = IntegrationUtils.sendMessage(IntegrationUtils.prepareSocket(analysisServerHost, analysisServerPort), query);
+    //String response = IntegrationUtils.sendMessage(IntegrationUtils.prepareSocket(analysisServerHost, analysisServerPort), query);
+    String response = IntegrationUtils.makePostRequest(analysisServerHost, analysisServerPort, query);
+
     if (!"".equals(response)) {
       JSONArray r = JSONArray.fromObject(response);
       if (!r.isEmpty()) {
@@ -105,7 +108,9 @@ public class AnalysisQueryService {
     q1.put("query", "getPendingTasks");
     String query = q1.toString();
 
-    String response = IntegrationUtils.sendMessage(IntegrationUtils.prepareSocket(analysisServerHost, analysisServerPort), query);
+    //String response = IntegrationUtils.sendMessage(IntegrationUtils.prepareSocket(analysisServerHost, analysisServerPort), query);
+    String response = IntegrationUtils.makePostRequest(analysisServerHost, analysisServerPort, query);
+
     if (!"".equals(response)) {
       JSONArray r = JSONArray.fromObject(response);
       if (!r.isEmpty()) {
@@ -117,9 +122,7 @@ public class AnalysisQueryService {
         else {
           JSONArray n = new JSONArray();
           for (JSONObject task : (Iterable<JSONObject>)r) {
-            if (!task.getString("statusMessage").contains("Failed")) {
               n.add(task);
-            }
           }
           return n;
         }
@@ -130,10 +133,11 @@ public class AnalysisQueryService {
 
   public JSONArray getFailedTasks() throws IntegrationException {
     JSONObject q1 = new JSONObject();
-    q1.put("query", "getPendingTasks");
+    q1.put("query", "getFailedTasks");
     String query = q1.toString();
 
-    String response = IntegrationUtils.sendMessage(IntegrationUtils.prepareSocket(analysisServerHost, analysisServerPort), query);
+    //String response = IntegrationUtils.sendMessage(IntegrationUtils.prepareSocket(analysisServerHost, analysisServerPort), query);
+    String response = IntegrationUtils.makePostRequest(analysisServerHost, analysisServerPort, query);
     if (!"".equals(response)) {
       JSONArray r = JSONArray.fromObject(response);
       if (!r.isEmpty()) {
@@ -145,9 +149,7 @@ public class AnalysisQueryService {
         else {
           JSONArray n = new JSONArray();
           for (JSONObject task : (Iterable<JSONObject>)r) {
-            if (task.getString("statusMessage").contains("Failed")) {
-              n.add(task);
-            }
+            n.add(task);
           }
           return n;
         }
@@ -161,7 +163,8 @@ public class AnalysisQueryService {
     q1.put("query", "getRunningTasks");
     String query = q1.toString();
 
-    String response = IntegrationUtils.sendMessage(IntegrationUtils.prepareSocket(analysisServerHost, analysisServerPort), query);
+//    String response = IntegrationUtils.sendMessage(IntegrationUtils.prepareSocket(analysisServerHost, analysisServerPort), query);
+    String response = IntegrationUtils.makePostRequest(analysisServerHost, analysisServerPort, query);
     if (!"".equals(response)) {
       JSONArray r = JSONArray.fromObject(response);
       if (!r.isEmpty()) {
@@ -182,7 +185,8 @@ public class AnalysisQueryService {
     q1.put("query", "getCompletedTasks");
     String query = q1.toString();
 
-    String response = IntegrationUtils.sendMessage(IntegrationUtils.prepareSocket(analysisServerHost, analysisServerPort), query);
+//    String response = IntegrationUtils.sendMessage(IntegrationUtils.prepareSocket(analysisServerHost, analysisServerPort), query);
+    String response = IntegrationUtils.makePostRequest(analysisServerHost, analysisServerPort, query);
     if (!"".equals(response)) {
       JSONArray r = JSONArray.fromObject(response);
       if (!r.isEmpty()) {
@@ -206,7 +210,8 @@ public class AnalysisQueryService {
     q1.put("params", params);
     String query = q1.toString();
 
-    String response = IntegrationUtils.sendMessage(IntegrationUtils.prepareSocket(analysisServerHost, analysisServerPort), query);
+//    String response = IntegrationUtils.sendMessage(IntegrationUtils.prepareSocket(analysisServerHost, analysisServerPort), query);
+    String response = IntegrationUtils.makePostRequest(analysisServerHost, analysisServerPort, query);
     if (!"".equals(response)) {
       JSONObject r = JSONObject.fromObject(response);
       if (!r.isEmpty()) {
@@ -227,7 +232,9 @@ public class AnalysisQueryService {
     q1.put("query", "getPipelines");
     String query = q1.toString();
 
-    String response = IntegrationUtils.sendMessage(IntegrationUtils.prepareSocket(analysisServerHost, analysisServerPort), query);
+//    String response = IntegrationUtils.sendMessage(IntegrationUtils.prepareSocket(analysisServerHost, analysisServerPort), query);
+    String response = IntegrationUtils.makePostRequest(analysisServerHost, analysisServerPort, query);
+
     if (!"".equals(response)) {
       JSONArray r = JSONArray.fromObject(response);
       if (!r.isEmpty()) {
@@ -258,9 +265,12 @@ public class AnalysisQueryService {
     j.put("pipeline", json.get("pipeline"));
     j.put("params", json);
 
-    task.put("submit", j);
+//    task.put("submit", j);
+    task.put("submitTask", j);
 
-    String response = IntegrationUtils.sendMessage(IntegrationUtils.prepareSocket(analysisServerHost, analysisServerPort), task.toString());
+//    String response = IntegrationUtils.sendMessage(IntegrationUtils.prepareSocket(analysisServerHost, analysisServerPort), task.toString());
+    String response = IntegrationUtils.makePostRequest(analysisServerHost, analysisServerPort, task.toString());
+
     if (!"".equals(response)) {
       JSONObject r = JSONObject.fromObject(response);
       if (r.has("error")) {

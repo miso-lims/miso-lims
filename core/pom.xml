@@ -248,18 +248,6 @@
     </dependency>
 
     <dependency>
-      <groupId>uk.ac.ebi.fgpt</groupId>
-      <artifactId>conan-service</artifactId>
-      <version>2.0.2</version>
-    </dependency>
-
-    <dependency>
-      <groupId>uk.ac.ebi.fgpt</groupId>
-      <artifactId>conan-core-services</artifactId>
-      <version>2.0.2</version>
-    </dependency>
-
-    <dependency>
       <groupId>org.reflections</groupId>
       <artifactId>reflections</artifactId>
       <version>0.9.5</version>
