@@ -257,8 +257,9 @@ public class SelectTag extends AbstractHtmlInputElementTag {
     String valueProperty = ObjectUtils.getDisplayString(evaluate("itemValue", getItemValue()));
     String labelProperty = ObjectUtils.getDisplayString(evaluate("itemLabel", getItemLabel()));
 
-    Object comparisonValue = PropertyAccessorFactory.forBeanPropertyAccess(getBindStatus().getActualValue())
-        .getPropertyValue(valueProperty);
+    Object pathValue = getBindStatus().getActualValue();
+    Object comparisonValue = pathValue == null ? new Object()
+        : PropertyAccessorFactory.forBeanPropertyAccess(pathValue).getPropertyValue(valueProperty);
 
     for (Object item : (Iterable<? extends Object>) evaluate("items", getItems())) {
       tagWriter.startTag("option");
