@@ -106,4 +106,14 @@ public class LibraryPropagationRule {
     return first;
   }
 
+  /**
+   * Check if this rule can be used as a library design.
+   * 
+   * A library design is a rule that has no wildcards in it. So, if any selection strategy is allowed (indicated by that property being
+   * null), they it isn't a design. As long as everything is locked, a rule is a design.
+   */
+  public boolean isDesign() {
+    return name != null && !name.isEmpty() && platformName != null && paired != null && librarySelectionType != null
+        && libraryStrategyType != null;
+  }
 }

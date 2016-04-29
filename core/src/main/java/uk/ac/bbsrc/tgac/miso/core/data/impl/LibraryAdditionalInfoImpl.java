@@ -15,6 +15,7 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryAdditionalInfo;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryPropagationRule;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleGroupId;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
@@ -23,48 +24,52 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 @Entity
 @Table(name = "LibraryAdditionalInfo")
 public class LibraryAdditionalInfoImpl implements LibraryAdditionalInfo {
-  
+
   @Id
   private Long libraryId;
-  
+
   @OneToOne(targetEntity = LibraryImpl.class)
   @JoinColumn(name = "libraryId", nullable = false)
   @MapsId
   private Library library;
-  
+
   @OneToOne(targetEntity = TissueOriginImpl.class)
   @JoinColumn(name = "tissueOriginId", nullable = false)
   private TissueOrigin tissueOrigin;
-  
+
   @OneToOne(targetEntity = TissueTypeImpl.class)
   @JoinColumn(name = "tissueTypeId", nullable = false)
   private TissueType tissueType;
-  
+
   @OneToOne(targetEntity = SampleGroupImpl.class)
   @JoinColumn(name = "sampleGroupId", nullable = true)
   private SampleGroupId sampleGroupId;
-  
+
   private Long kitDescriptorId;
-  
+
   @Transient
   private KitDescriptor prepKit;
-  
+
   @OneToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "createdBy", nullable = false)
   private User createdBy;
-  
+
   @Column(nullable = false)
   private Date creationDate;
-  
+
   @OneToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "updatedBy", nullable = false)
   private User updatedBy;
-  
+
   @Column(nullable = false)
   private Date lastUpdated;
-  
+
   @Column(nullable = false)
   private Boolean archived = Boolean.FALSE;
+
+  @OneToOne
+  @JoinColumn(name = "libraryDesign", nullable = true)
+  private LibraryPropagationRule libraryDesign;
 
   @Override
   public Long getLibraryId() {
@@ -124,7 +129,7 @@ public class LibraryAdditionalInfoImpl implements LibraryAdditionalInfo {
   @Override
   public void setPrepKit(KitDescriptor kitDescriptor) {
     this.prepKit = kitDescriptor;
-    
+
     // Keep kitDescriptorId field consistent for Hibernate persistence
     if (prepKit == null) {
       this.kitDescriptorId = null;
@@ -132,7 +137,7 @@ public class LibraryAdditionalInfoImpl implements LibraryAdditionalInfo {
       this.kitDescriptorId = prepKit.getKitDescriptorId();
     }
   }
-  
+
   @Override
   public Long getHibernateKitDescriptorId() {
     return kitDescriptorId;
@@ -186,6 +191,16 @@ public class LibraryAdditionalInfoImpl implements LibraryAdditionalInfo {
   @Override
   public void setArchived(Boolean archived) {
     this.archived = archived;
+  }
+
+  @Override
+  public LibraryPropagationRule getLibraryDesign() {
+    return libraryDesign;
+  }
+
+  @Override
+  public void setLibraryDesign(LibraryPropagationRule libraryDesign) {
+    this.libraryDesign = libraryDesign;
   }
 
 }

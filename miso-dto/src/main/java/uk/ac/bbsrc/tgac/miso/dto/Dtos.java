@@ -748,6 +748,9 @@ public class Dtos {
     dto.setUpdatedById(from.getUpdatedBy().getUserId());
     dto.setLastUpdated(dateTimeFormatter.print(from.getLastUpdated().getTime()));
     dto.setArchived(from.getArchived());
+    if (from.getLibraryDesign() != null) {
+      dto.setLibraryDesignId(from.getLibraryDesign().getId());
+    }
     return dto;
   }
 
@@ -859,8 +862,8 @@ public class Dtos {
   }
 
   /**
-   * Overwrites all modifiable fields. 
-   * Intended to be used with a freshly-loaded database object or newly-created impl so save and update are similar.
+   * Overwrites all modifiable fields. Intended to be used with a freshly-loaded database object or newly-created impl so save and update
+   * are similar.
    */
   public static Library to(LibraryDto from, Library to) {
     to.setAlias(from.getAlias());
@@ -886,6 +889,6 @@ public class Dtos {
     }
     to.setVolume(from.getVolume());
 
-   return to;
+    return to;
   }
 }

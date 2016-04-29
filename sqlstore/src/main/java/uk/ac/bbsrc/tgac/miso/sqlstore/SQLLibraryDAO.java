@@ -83,6 +83,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
+import uk.ac.bbsrc.tgac.miso.persistence.LibraryAdditionalInfoDao;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
@@ -107,7 +108,7 @@ public class SQLLibraryDAO implements LibraryStore {
   public static final String LIBRARIES_SELECT_LIMIT = LIBRARIES_SELECT + " ORDER BY l.libraryId DESC LIMIT ?";
 
   public static final String LIBRARY_SELECT_BY_ID = LIBRARIES_SELECT + " WHERE l.libraryId = ?";
-  
+
   public static final String LIBRARY_SELECT_FROM_ID_LIST = LIBRARIES_SELECT + " WHERE l.libraryId in (";
 
   public static final String LIBRARY_SELECT_BY_ALIAS = LIBRARIES_SELECT + " WHERE l.alias = ?";
@@ -193,6 +194,8 @@ public class SQLLibraryDAO implements LibraryStore {
   private ChangeLogStore changeLogDAO;
   private SecurityStore securityDAO;
   private BoxStore boxDAO;
+  @Autowired
+  private LibraryAdditionalInfoDao libraryAdditionalInfoDAO;
 
   @Autowired
   private MisoNamingScheme<Library> libraryNamingScheme;
@@ -267,7 +270,7 @@ public class SQLLibraryDAO implements LibraryStore {
   public void setBoxDAO(BoxStore boxDAO) {
     this.boxDAO = boxDAO;
   }
-  
+
   public JdbcTemplate getJdbcTemplate() {
     return template;
   }
@@ -530,12 +533,12 @@ public class SQLLibraryDAO implements LibraryStore {
     return template.query(LIBRARIES_SELECT_BY_SEARCH, new Object[] { mySQLQuery, mySQLQuery, mySQLQuery, mySQLQuery },
         new LibraryMapper(true));
   }
-  
+
   @Override
   public List<Library> getByIdList(List<Long> idList) throws IOException {
     StringBuilder queryBuilder = new StringBuilder();
     queryBuilder.append(LIBRARY_SELECT_FROM_ID_LIST);
-    for (int i=0; i < idList.size(); i++) {
+    for (int i = 0; i < idList.size(); i++) {
       if (i != 0) {
         queryBuilder.append(", ");
       }
@@ -797,6 +800,7 @@ public class SQLLibraryDAO implements LibraryStore {
           library.setSample(sampleDAO.lazyGet(rs.getLong("sample_sampleId")));
         }
         library.getChangeLog().addAll(getChangeLogDAO().listAllById(TABLE_NAME, id));
+        library.setLibraryAdditionalInfo(libraryAdditionalInfoDAO.getLibraryAdditionalInfoByLibraryId(library.getId()));
       } catch (IOException e1) {
         log.error("library row mapper", e1);
       } catch (MalformedLibraryQcException e) {

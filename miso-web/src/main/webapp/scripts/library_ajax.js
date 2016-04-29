@@ -60,16 +60,16 @@ var Library = Library || {
     jQuery('#volume').attr('data-parsley-type', 'number');
 
     jQuery('#propagationRuleError').css('display', 'none');
-    if (Library.propagationRules.length > 0) {
+    if (Library.propagationRules.length > 0 && jQuery('#libraryDesignTypes')[0].value != -1) {
       var selectionType = jQuery('#librarySelectionTypes')[0].value;
       var strategyType = jQuery('#libraryStrategyTypes')[0].value;
-      var paired = jQuery('#paired')[0].value;
+      var paired = jQuery('#paired')[0].value === "true";
       var platform = jQuery('#platformNames')[0].value.toUpperCase();
       if (!Library.propagationRules.some(function(rule) {
         return Library.isMatched(selectionType, rule.librarySelectionType)
           && Library.isMatched(strategyType, rule.libraryStrategyType)
           && Library.isMatched(paired, rule.paired)
-          && (rules.platform === null && typeof rules.platform === 'object' || rules.platform.toUpperCase() == platform);
+          && (rule.platform === null && typeof rule.platform === 'object' || rule.platform.toUpperCase() == platform);
       })) {
         jQuery('#propagationRuleError').css('display', 'block');
       }
@@ -1144,5 +1144,31 @@ Library.ui = {
         }
       }
     });
+  },
+
+  changeDesign: function() {
+    var designSelect = document.getElementById('libraryDesignTypes');
+    var selection = document.getElementById('librarySelectionTypes');
+    var strategy = document.getElementById('libraryStrategyTypes');
+    var paired = document.getElementById('paired');
+    var platform = document.getElementById('platformNames');
+    if (designSelect.value == -1) {
+      selection.disabled = false;
+      strategy.disabled = false;
+      paired.disabled = false;
+      platform.disabled = false;
+    } else {
+      var matchedRules = Library.propagationRules.filter(function (rule) { return rule.id == designSelect.value; });
+      if (matchedRules.length == 1) {
+        selection.value = matchedRules[0].librarySelectionType;
+        selection.disabled = true;
+        strategy.value = matchedRules[0].libraryStrategyType;
+        strategy.disabled = true;
+        paired.checked = matchedRules[0].paired;
+        paired.disabled = true;
+        platform.checked = matchedRules[0].platform;
+        platform.disabled = true;
+      }
+    }
   }
 };
