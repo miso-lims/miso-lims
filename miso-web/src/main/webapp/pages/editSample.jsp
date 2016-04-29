@@ -704,16 +704,16 @@
     <div id="hotContainer"></div>
   
     <script type="text/javascript">
-      Sample.hot.dropdownRef = ${referenceDataJSON};
+      Hot.dropdownRef = ${referenceDataJSON};
       Sample.hot.aliasGenerationEnabled = ${aliasGenerationEnabled};
       Sample.hot.selectedProjectId = parseInt('${sample.project.id}') || null;
-      Sample.hot.detailedSample = JSON.parse(document.getElementById('HOTbulkForm').dataset.detailedSample);
-      if (Boolean(Sample.hot.detailedSample)) {
-        Sample.hot.fetchSampleOptions();
-        Sample.hot.button = document.getElementById('saveDetailed');
+      Hot.detailedSample = JSON.parse(document.getElementById('HOTbulkForm').dataset.detailedSample);
+      if (Boolean(Hot.detailedSample)) {
+        Hot.fetchSampleOptions(Sample.hot.processSampleOptionsFurther);
+        Hot.saveButton = document.getElementById('saveDetailed');
       } else {
         Sample.hot.addProjectEtcDropdowns();
-        Sample.hot.button = document.getElementById('savePlain');
+        Hot.saveButton = document.getElementById('savePlain');
       }
     </script>
   </div>
