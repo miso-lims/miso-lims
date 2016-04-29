@@ -8,6 +8,8 @@ import com.eaglegenomics.simlims.core.User;
 
 @JsonIgnoreProperties({ "sample" })
 public interface SampleTissue {
+  
+  public static final String CATEGORY_NAME = "Tissue";
 
   Long getId();
 

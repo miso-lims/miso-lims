@@ -8,6 +8,8 @@ import com.eaglegenomics.simlims.core.User;
 
 @JsonIgnoreProperties({ "sample" })
 public interface Identity {
+  
+  public static final String CATEGORY_NAME = "Identity";
 
   Long getSampleId();
 

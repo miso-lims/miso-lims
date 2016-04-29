@@ -22,6 +22,8 @@
  */
 
 var Sample = Sample || {
+  sampleOptions: null,
+  
   deleteSample: function (sampleId, successfunc) {
     if (confirm("Are you sure you really want to delete SAM" + sampleId + "? This operation is permanent!")) {
       Fluxion.doAjax(
@@ -48,7 +50,7 @@ var Sample = Sample || {
     }
   },
   
-  validateSample: function () {
+  validateSample: function (isDetailedSample, isNewSample) {
     Validate.cleanFields('#sample-form');
     jQuery('#sample-form').parsley().destroy();
 
@@ -63,13 +65,10 @@ var Sample = Sample || {
     jQuery('#description').attr('data-parsley-maxlength', '100');
     jQuery('#description').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
 
-    // Checkbox validation: ensure a checkbox is selected (assumes there is a project 1, no other way to check because of dynamic
-    // generation)
-    jQuery('#project1').attr('data-parsley-maxcheck', '1');
-    jQuery('#project1').attr('required', 'true');
-    jQuery('#projectlist').attr('data-parsley-error-message', 'You must select a project.');
-    jQuery('#projectlist').attr('data-parsley-errors-container', '#projectError');
-    jQuery('#projectlist').attr('data-parsley-class-handler', '#projectlist');
+    // Project validation
+    jQuery('#project').attr('class', 'form-control');
+    jQuery('#project').attr('data-parsley-required', 'true');
+    jQuery('#project').attr('data-parsley-error-message', 'You must select a project.');
 
     // Date of Receipt validation: ensure date is of correct form
     jQuery('#receiveddatepicker').attr('class', 'form-control');
@@ -95,6 +94,73 @@ var Sample = Sample || {
     jQuery('#volume').attr('data-parsley-maxlength', '10');
     jQuery('#volume').attr('data-parsley-type', 'number');
 
+    if (isDetailedSample) {
+      
+      if (isNewSample) {
+        // External Name validation
+        jQuery('#externalName').attr('class', 'form-control');
+        jQuery('#externalName').attr('data-parsley-required', 'true');
+        jQuery('#externalName').attr('data-parsley-maxlength', '255');
+        jQuery('#externalName').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+      }
+      
+      // SampleClass validation
+      jQuery('#sampleClass').attr('class', 'form-control');
+      jQuery('#sampleClass').attr('data-parsley-required', 'true');
+      
+      // TissueOrigin validation
+      jQuery('#tissueOrigin').attr('class', 'form-control');
+      jQuery('#tissueOrigin').attr('data-parsley-required', 'true');
+      
+      // TissueType validation
+      jQuery('#tissueType').attr('class', 'form-control');
+      jQuery('#tissueType').attr('data-parsley-required', 'true');
+      
+      // External Institute Identifier validation
+      jQuery('#externalInstituteIdentifier').attr('class', 'form-control');
+      jQuery('#externalInstituteIdentifier').attr('data-parsley-maxlength', '255');
+      jQuery('#externalInstituteIdentifier').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+      
+      // PassageNumber validation
+      jQuery('#passageNumber').attr('class', 'form-control');
+      jQuery('#passageNumber').attr('data-parsley-type', 'integer');
+      
+      // TimesReceived validation
+      jQuery('#timesReceived').attr('class', 'form-control');
+      jQuery('#timesReceived').attr('data-parsley-required', 'true');
+      jQuery('#timesReceived').attr('data-parsley-type', 'integer');
+      
+      // TubeNumber validation
+      jQuery('#tubeNumber').attr('class', 'form-control');
+      jQuery('#tubeNumber').attr('data-parsley-required', 'true');
+      jQuery('#tubeNumber').attr('data-parsley-type', 'integer');
+      
+      // Concentration validation
+      jQuery('#concentration').attr('class', 'form-control');
+      jQuery('#concentration').attr('data-parsley-type', 'number');
+      
+      var selectedId = jQuery('#sampleClass option:selected').val();
+      var sampleCategory = Sample.ui.getSampleCategoryByClassId(selectedId);
+      switch (sampleCategory) {
+      case 'Tissue':
+        // Cellularity validation
+        jQuery('#cellularity').attr('class', 'form-control');
+        jQuery('#cellularity').attr('data-parsley-type', 'integer');
+        break;
+      case 'Analyte':
+        // Region validation
+        jQuery('#region').attr('class', 'form-control');
+        jQuery('#region').attr('data-parsley-maxlength', '255');
+        jQuery('#region').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+        
+        // TubeId validation
+        jQuery('#tubeId').attr('class', 'form-control');
+        jQuery('#tubeId').attr('data-parsley-maxlength', '255');
+        jQuery('#tubeId').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+        break;
+      }
+    }
+    
     Fluxion.doAjax(
       'sampleControllerHelperService',
       'getSampleAliasRegex',
@@ -520,6 +586,114 @@ Sample.barcode = {
 };
 
 Sample.ui = {
+  
+  filterSampleGroupOptions: function() {
+    var validSampleGroups = [];
+    var subProjectId = jQuery('#subProject option:selected').val();
+    if (subProjectId) {
+      console.log('filtering samplegroups by subproject ' + subProjectId);
+      validSampleGroups = Sample.ui.getSampleGroupsBySubProjectId(subProjectId);
+    } else {
+      var projectId = jQuery('#project option:selected').val();
+      if (projectId) {
+        console.log('filtering samplegroups by project ' + projectId);
+        validSampleGroups = Sample.ui.getSampleGroupsByProjectId(projectId);
+      }
+    }
+    
+    jQuery('#sampleGroup').empty()
+        .append('<option value = "">None</option>');
+    for (var i = 0, l = validSampleGroups.length; i < l; i++) {
+      jQuery('#sampleGroup').append('<option value = "' + validSampleGroups[i].id + '">' + validSampleGroups[i].groupId + '</option>');
+    }
+  },
+  
+  getSampleGroupsBySubProjectId: function(subProjectId) {
+    return Sample.sampleOptions.sampleGroupsDtos.filter(function (sampleGroup) {
+      return sampleGroup.subprojectId == subProjectId;
+    });
+  },
+  
+  getSampleGroupsByProjectId: function(projectId) {
+    return Sample.sampleOptions.sampleGroupsDtos.filter(function (sampleGroup) {
+      return sampleGroup.projectId == projectId;
+    });
+  },
+  
+  projectChanged: function() {
+    Sample.ui.filterSubProjectOptions();
+    Sample.ui.filterSampleGroupOptions();
+  },
+  
+  subProjectChanged: function() {
+    Sample.ui.filterSampleGroupOptions();
+  },
+  
+  filterSubProjectOptions: function() {
+    var projectId = jQuery('#project option:selected').val();
+    var subProjects = Sample.ui.getSubProjectsByProjectId(projectId);
+    jQuery('#subProject').empty()
+        .append('<option value = "">None</option>');
+    for (var i = 0, l = subProjects.length; i < l; i++) {
+      jQuery('#subProject').append('<option value = "' + subProjects[i].id + '">' + subProjects[i].alias + '</option>');
+    }
+  },
+  
+  getSubProjectsByProjectId: function(projectId) {
+    return Sample.sampleOptions.subprojectsDtos.filter(function (subProject) {
+      return subProject.parentProjectId == projectId;
+    });
+  },
+  
+  sampleClassChanged: function() {
+    var selectedId = jQuery('#sampleClass option:selected').val();
+    var sampleCategory = Sample.ui.getSampleCategoryByClassId(selectedId);
+    switch (sampleCategory) {
+    case 'Tissue':
+      Sample.ui.setUpForTissue();
+      break;
+    case 'Analyte':
+      Sample.ui.setUpForAnalyte();
+      break;
+    default:
+      // Identity (can't create), Tissue Processing (no additional fields), or no SampleClass selected 
+      Sample.ui.hideTissueFields();
+      Sample.ui.hideAnalyteFields();
+      break;
+    }
+  },
+  
+  getSampleCategoryByClassId: function(sampleClassId) {
+    var results = Sample.sampleOptions.sampleClassesDtos.filter(function (sampleClass) {
+      return sampleClass.id == sampleClassId;
+    });
+    return results.length > 0 ? results[0].sampleCategory : null;
+  },
+  
+  hideTissueFields: function() {
+    jQuery('#detailedSampleTissue').find(':input').each(function() {
+      jQuery(this).val('');
+    });
+    jQuery('#detailedSampleTissue').hide();
+  },
+  
+  hideAnalyteFields: function() {
+    jQuery('#detailedSampleAnalyte').find(':input').each(function() {
+      jQuery(this).val('');
+    });
+    jQuery('#detailedSampleAnalyte').hide();
+  },
+  
+  setUpForTissue: function() {
+    Sample.ui.hideAnalyteFields();
+    jQuery('#detailedSampleTissue').show();
+  },
+  
+  setUpForAnalyte: function() {
+    Sample.ui.hideTissueFields();
+    jQuery('#detailedSampleAnalyte').show();
+  },
+  
   editSampleIdBarcode: function (span, id) {
     Fluxion.doAjax(
       'loggedActionService',
