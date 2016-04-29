@@ -52,7 +52,6 @@ Sample.hot = {
       
       // add sampleAdditionalInfo values
       if (sam.sampleAdditionalInfo) {
-        if (sam.sampleAdditionalInfo.passageNumber === 0) sam.sampleAdditionalInfo.passageNumber = 'nn';
         sam.sampleAdditionalInfo.sampleClassAlias = Sample.hot.getAliasFromId(sam.sampleAdditionalInfo.sampleClassId, Sample.hot.sampleOptions.sampleClassesDtos);
         sam.sampleAdditionalInfo.parentSampleClassAlias = Sample.hot.getAliasFromId(sam.sampleAdditionalInfo.parentSampleClassId, Sample.hot.sampleOptions.sampleClassesDtos);
         sam.sampleAdditionalInfo.tissueOriginAlias = Sample.hot.getAliasFromId(sam.sampleAdditionalInfo.tissueOriginId, Sample.hot.sampleOptions.tissueOriginsDtos);
@@ -816,7 +815,7 @@ Sample.hot = {
     }
     
     function validatePassageNumber (value, callback) {
-      if (value == 'nn' || Handsontable.helper.isNumeric(value)) {
+      if (value === '' || Handsontable.helper.isNumeric(value) && value > 0) {
         return callback(true);
       } else {
         return callback(false);
@@ -926,7 +925,7 @@ Sample.hot = {
     
     // add sampleAdditionalInfo attributes
     sample.sampleAdditionalInfo = {
-      passageNumber: (obj.sampleAdditionalInfo.passageNumber == 'nn' ? 0 : parseInt(obj.sampleAdditionalInfo.passageNumber)),
+      passageNumber: (obj.sampleAdditionalInfo.passageNumber == '' ? null : parseInt(obj.sampleAdditionalInfo.passageNumber)),
       timesReceived: parseInt(obj.sampleAdditionalInfo.timesReceived),
       tubeNumber: parseInt(obj.sampleAdditionalInfo.tubeNumber)
     };
