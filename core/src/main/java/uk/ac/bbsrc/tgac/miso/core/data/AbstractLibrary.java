@@ -507,7 +507,6 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
     sb.append(getAlias());
     sb.append(" : ");
     sb.append(getDescription());
-    sb.append(" : ");
     return sb.toString();
   }
 
