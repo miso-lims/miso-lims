@@ -658,8 +658,9 @@ Library.hot = {
         // send it through the parser to get a sampleData array that isn't merely a reference to Library.hot.hotTable.getSourceData()
         libsData = JSON.parse(JSON.parse(JSON.stringify(Library.hot.hotTable.getSourceData())));
           
-        Library.hot.messages.success = libsData.filter(function (lib) { return (lib.saved === true); })
-                                               .map(function (lib) { return lib.alias; });
+        // add aliases of previously-saved items to the position corresponding to their row (zero-index data, one-index UI)
+        // aliases of successfully-saved items will be added after save
+        Library.hot.messages.success = libsData.map(function (lib) { return (lib.saved === true ? lib.alias : null); });
     
         // Array of save functions, one for each line in the table
         var libsSaveArray = Library.hot.getArrayOfNewObjects(libsData);
@@ -680,8 +681,10 @@ Library.hot = {
         // send it through the parser to get a sampleData array that isn't merely a reference to Library.hot.hotTable.getSourceData()
         libsData = JSON.parse(JSON.parse(JSON.stringify(Library.hot.hotTable.getSourceData())));
         
-        Library.hot.messages.success = libsData.filter(function (lib) { return (lib.saved === true); })
-                                               .map(function (lib) { return lib.alias; });
+        
+        // add aliases of previously-saved items to the position corresponding to their row (zero-index data, one-index UI)
+        // aliases of successfully-saved items will be added after save
+        Library.hot.messages.success = libsData.map(function (lib) { return (lib.saved === true ? lib.alias : null); });
         
         // Array of save functions, one for each line in the table
         var libsSaveArray = Library.hot.getArrayOfUpdatedObjects(libsData);

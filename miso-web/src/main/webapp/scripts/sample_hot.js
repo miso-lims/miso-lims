@@ -1285,6 +1285,10 @@ Sample.hot = {
         // send it through the parser to get a sampleData array that isn't merely a reference to Sample.hot.hotTable.getSourceData()
         var sampleData = JSON.parse(JSON.parse(JSON.stringify(Sample.hot.hotTable.getSourceData())));
         
+        // add aliases of previously-saved items to the position corresponding to their row (zero-index data, one-index UI)
+        // aliases of successfully-saved items will be added after save
+        Sample.hot.messages.success = sampleData.map(function (sam) { return (sam.saved === true ? sam.alias : null); });
+        
         var samplesArray = Sample.hot.getArrayOfNewObjects(sampleData);
         
         Fluxion.doAjax(
@@ -1342,9 +1346,9 @@ Sample.hot = {
         // send data through the parser to get a sampleData array that isn't merely a reference to Sample.hot.hotTable.getSourceData()
         var sampleData = JSON.parse(JSON.parse(JSON.stringify(Sample.hot.hotTable.getSourceData())));
         
-        // add previously-saved aliases to success message
-        Sample.hot.messages.success = sampleData.filter(function (sample) { return (sample.saved === true); })
-                                                .map(function (sample) { return sample.alias; });
+        // add aliases of previously-saved items to the position corresponding to their row (zero-index data, one-index UI)
+        // aliases of successfully-saved items will be added after save
+        Sample.hot.messages.success = sampleData.map(function (sample) { return (sample.saved === true ? sample.alias : null); });
         
         // Array of save functions, one for each line in the table
         var sampleSaveArray = Sample.hot.getArrayOfUpdatedObjects(sampleData);
@@ -1371,10 +1375,10 @@ Sample.hot = {
     }
     
     Sample.hot.hotTable.validateCells(function (isValid) {
-      if (isValid) {        
-        
-        Sample.hot.messages.success = sampleData.filter(function (sample) { return (sample.saved === true); })
-                                                .map(function (sample) { return sample.alias; });
+      if (isValid) {      
+        // add aliases of previously-saved items to the position corresponding to their row (zero-index data, one-index UI)
+        // aliases of successfully-saved items will be added after save
+        Sample.hot.messages.success = sampleData.map(function (sample) { return (sample.saved === true ? sample.alias : null); });
         
         // Array of save functions, one for each line in the table
         var sampleSaveArray = Sample.hot.getArrayOfNewObjects(sampleData);
