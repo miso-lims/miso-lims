@@ -27,11 +27,11 @@
   <parent>
     <artifactId>miso</artifactId>
     <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-    <version>0.2.4-SNAPSHOT</version>
+    <version>0.2.5-SNAPSHOT</version>
   </parent>
 
   <groupId>${parent.groupId}</groupId>
-  <version>0.2.4-SNAPSHOT</version>
+  <version>0.2.5-SNAPSHOT</version>
   <artifactId>run-tools</artifactId>
 
   <packaging>jar</packaging>
