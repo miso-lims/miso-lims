@@ -254,14 +254,17 @@
 	  </td>
 	</tr>
 </c:if>
+<c:if test="${!empty library.sample && !empty library.sample.sampleAdditionalInfo && !empty library.libraryAdditionalInfo}">
+  <tr>
+    <td>Library Design:</td>
+    <td><miso:select id="libraryDesignTypes" path="libraryAdditionalInfo.libraryDesign" items="${libraryDesigns}" itemLabel="name" itemValue="id" defaultLabel="(None)" defaultValue="-1" onchange="Library.ui.changeDesign()"/></td>
+  </tr>
+</c:if>
 <tr>
   <c:choose>
     <c:when test="${library.id ==0 or empty library.libraryType}">
       <td>Platform - Library Type:</td>
       <td>
-        <div class="parsley-errors-list filled">
-           <li class="parsley-required" style="display: none;" id="propagationRuleError">This combination of selection, strategy, platform, and pairedness is not allowed for this sample.</li>
-        </div>
         <form:select id="platformNames" path="platformName" items="${platformNames}"
                      onchange="Library.ui.changePlatformName(this);"/>
         <form:select id="libraryTypes" path="libraryType"/>
@@ -276,9 +279,6 @@
         or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_TECH')}">
       <td>Platform - Library Type:</td>
       <td>
-        <div class="parsley-errors-list filled">
-           <li class="parsley-required" style="display: none;" id="propagationRuleError">This combination of selection, strategy, platform, and pairedness is not allowed for this sample.</li>
-        </div>
         <form:select id="platformNames" path="platformName" items="${platformNames}"
                      onchange="Library.ui.changePlatformName(this);" class="validateable"/>
         <form:select id="libraryTypes" path="libraryType"/>
@@ -1470,8 +1470,9 @@ function submitBulkLibraries() {
 </div>
 
 <script type="text/javascript">
-  Library.propagationRules = ${propagationRulesJSON};
+  Library.designs = ${libraryDesignsJSON};
   jQuery(document).ready(function () {
+    Library.ui.changeDesign();
     jQuery('#alias').simplyCountable({
       counter: '#aliasCounter',
       countType: 'characters',

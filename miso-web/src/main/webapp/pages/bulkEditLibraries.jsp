@@ -97,7 +97,7 @@
       Library.hot.detailedSample = JSON.parse(document.getElementById('HOTbulkForm').dataset.detailedSample);
       Library.hot.button = document.getElementById('saveLibraries');
       Library.hot.propagateOrEdit = "${method}";
-      Library.libraryPropagationRulesJSON = ${libraryPropagationRulesJSON};
+      Library.designs = ${libraryDesignsJSON};
 
       Library.hot.makeBulkCreateTable = function () {
         Library.hot.librariesJSON = Library.hot.prepLibrariesForTable(Library.hot.librariesJSON);
