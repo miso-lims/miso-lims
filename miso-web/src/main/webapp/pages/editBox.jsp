@@ -172,14 +172,22 @@
     </tr>
     <tr>
       <td class="h">Box Use:</td>
-      <td><form:select id="boxUse" path="use.id" items="${boxUses}"/></td>
+      <td><miso:select id="boxUse" path="use" items="${boxUses}" itemLabel="alias" itemValue="id"/></td>
     </tr>
     <tr>
       <td>Box Size:</td>
       <c:choose>
         <c:when test="${box.id == 0}">
-          <td><form:select id="boxSize" path="size.id"><form:options items="${boxSizes}"/></form:select><c:choose>
-            <c:when test="${scannerEnabled}">("scannable" means this box can be scanned by your lab's bulk scanner)</c:when></c:choose></td>
+          <td>
+            <c:choose>
+              <c:when test="${scannerEnabled}">
+                <miso:select id="boxSize" path="size" items="${boxSizes}" itemLabel="rowsByColumnsWithScan" itemValue="id"/>
+                ("scannable" means this box can be scanned by the bulk scanner)
+              </c:when>
+             <c:otherwise>
+               <miso:select id="boxSize" path="size" items="${boxSizes}" itemLabel="rowsByColumns" itemValue="id"/>
+             </c:otherwise>
+           </c:choose></td>
         </c:when>
         <c:otherwise><td>${box.size.getRowsByColumns()} <c:choose><c:when test="${scannerEnabled}">(can ${box.size.scannable ? '':'not '}be scanned by your lab's bulk scanner)</c:when></c:choose></td></c:otherwise>
       </c:choose>

@@ -29,23 +29,27 @@ public class BoxSize {
   public void setRows(int rows) {
     this.rows = rows;
   }
-  
+
   /**
-   * Creates a String of number of rows x number of columns. 
+   * Creates a String of number of rows x number of columns.
    * 
    * @return String getRowsByColumns
    */
   public String getRowsByColumns() {
-    return Integer.toString(rows) + " x " + Integer.toString(columns);
+    return Integer.toString(rows) + " × " + Integer.toString(columns);
   }
-  
+
+  public String getRowsByColumnsWithScan() {
+    return getRowsByColumns() + (getScannable() ? " scannable" : "");
+  }
+
   /**
    * Returns whether the box is able to be scanned by the bulk scanner
    */
   public boolean getScannable() {
     return scannable;
   }
-  
+
   /**
    * Sets whether the box is able to be scanned by the bulk scanner
    */

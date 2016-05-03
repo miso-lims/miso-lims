@@ -73,7 +73,7 @@ public class EditBoxController {
     Map<String, String> misoProperties = exporter.getResolvedProperties();
     return misoProperties.containsKey("miso.boxscanner.enabled") && Boolean.parseBoolean(misoProperties.get("miso.boxscanner.enabled"));
   }
-  
+
   @ModelAttribute("maxLengths")
   public Map<String, Integer> maxLengths() throws IOException {
     return requestManager.getBoxColumnSizes();
@@ -127,24 +127,10 @@ public class EditBoxController {
       model.put("box", box);
 
       // add all BoxUses
-      LinkedHashMap<Long, String> uses = new LinkedHashMap<Long, String>();
-      for (BoxUse boxUse : requestManager.listAllBoxUses()) {
-        uses.put(boxUse.getId(), boxUse.getAlias());
-      }
-      model.put("boxUses", uses);
+      model.put("boxUses", requestManager.listAllBoxUses());
 
       // add all BoxSizes
-      LinkedHashMap<Long, String> sizes = new LinkedHashMap<Long, String>();
-      for (BoxSize boxSize : requestManager.listAllBoxSizes()) {
-        boolean scannable = boxSize.getScannable();
-        if (scannable) {
-          sizes.put(boxSize.getId(), boxSize.getRowsByColumns() + (isScannerEnabled() ? "  scannable" : ""));
-        } else {
-          sizes.put(boxSize.getId(), boxSize.getRowsByColumns() + (isScannerEnabled() ? "  not scannable" : ""));
-        }
-        // hides scannability if a lab does not have the bulk scanner enabled
-      }
-      model.put("boxSizes", sizes);
+      model.put("boxSizes", requestManager.listAllBoxSizes());
 
       // add all box contents
       model.put("boxables", box.getBoxables());

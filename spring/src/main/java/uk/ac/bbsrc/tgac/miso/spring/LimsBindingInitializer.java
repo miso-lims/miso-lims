@@ -56,6 +56,8 @@ import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.ProtocolManager;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
+import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
+import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
@@ -83,6 +85,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignDao;
 
 /**
@@ -103,6 +106,9 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
   @Autowired
   private LibraryDesignDao libraryDesignDao;
+
+  @Autowired
+  private BoxStore sqlBoxDAO;
 
   /**
    * Sets the requestManager of this LimsBindingInitializer object.
@@ -527,6 +533,32 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
           setValue(null);
         } else {
           setValue(libraryDesignDao.getLibraryDesign(id));
+        }
+      }
+
+    });
+    binder.registerCustomEditor(BoxUse.class, new PropertyEditorSupport() {
+      @Override
+      public void setAsText(String element) throws IllegalArgumentException {
+        long id = Long.parseLong(element);
+        try {
+          setValue(sqlBoxDAO.getUseById(id));
+        } catch (IOException e) {
+          log.error("Fetching box use " + id, e);
+          throw new IllegalArgumentException("Cannot find box use with id " + element);
+        }
+      }
+
+    });
+    binder.registerCustomEditor(BoxSize.class, new PropertyEditorSupport() {
+      @Override
+      public void setAsText(String element) throws IllegalArgumentException {
+        long id = Long.parseLong(element);
+        try {
+          setValue(sqlBoxDAO.getSizeById(id));
+        } catch (IOException e) {
+          log.error("Fetching box size " + id, e);
+          throw new IllegalArgumentException("Cannot find box size with id " + element);
         }
       }
 
