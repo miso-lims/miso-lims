@@ -118,6 +118,7 @@ public class EditSequencerPartitionContainerController {
 
       model.put("formObj", container);
       model.put("container", container);
+      model.put("containerRuns", requestManager.listRunsBySequencerPartitionContainerId(container.getId()));
       return new ModelAndView("/pages/editSequencerPartitionContainer.jsp", model);
     } catch (IOException ex) {
       if (log.isDebugEnabled()) {

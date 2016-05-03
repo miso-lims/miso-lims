@@ -53,6 +53,19 @@
 
   <h1>${method} Libraries</h1>
   
+  <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#hothelp_arrowclick'), 'hothelpdiv');">Quick Help
+    <div id="hothelp_arrowclick" class="toggleLeft"></div>
+  </div>
+  <div id="hothelpdiv" class="note" style="display:none;">
+    <p>To fill all columns below with the value of your selected cell, <b>double-click</b> the square in the bottom right of your selected cell.
+      <br/>To fill a variable number of columns with the value of your selected cell,  <b>click</b> the square in the bottom right of your 
+      filled-in selected cell and <b>drag</b> up or down. All selected columns will be filled in.
+    </p>
+  </div>
+  <div class="clear"></div>
+  <br/>
+  <br/>
+
  <div id="HOTbulkForm" data-detailed-sample="${detailedSample}">
  
    <div id="saveSuccesses"  class="parsley-success hidden">
@@ -84,7 +97,7 @@
       Library.hot.detailedSample = JSON.parse(document.getElementById('HOTbulkForm').dataset.detailedSample);
       Library.hot.button = document.getElementById('saveLibraries');
       Library.hot.propagateOrEdit = "${method}";
-      Library.libraryPropagationRulesJSON = ${libraryPropagationRulesJSON};
+      Library.designs = ${libraryDesignsJSON};
 
       Library.hot.makeBulkCreateTable = function () {
         Library.hot.librariesJSON = Library.hot.prepLibrariesForTable(Library.hot.librariesJSON);

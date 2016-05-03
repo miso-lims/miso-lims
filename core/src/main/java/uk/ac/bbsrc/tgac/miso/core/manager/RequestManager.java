@@ -41,7 +41,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.EntityGroup;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.LibraryPropagationRule;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Plate;
@@ -641,6 +641,6 @@ public interface RequestManager {
 
   public Map<String, Integer> getGroupColumnSizes() throws IOException;
 
-  public Collection<LibraryPropagationRule> listLibraryPropagationRulesByClass(SampleClass sampleClass) throws IOException;
+  public Collection<LibraryDesign> listLibraryDesignByClass(SampleClass sampleClass) throws IOException;
 
 }

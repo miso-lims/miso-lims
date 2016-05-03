@@ -20,6 +20,7 @@ import net.sf.ehcache.CacheManager;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.exception.ConstraintViolationException;
 import org.hibernate.jdbc.Work;
 import org.hibernate.type.LongType;
 import org.hibernate.type.StringType;
@@ -160,7 +161,8 @@ public class HibernateSampleDao implements SampleDao, SampleStore {
         try {
           if (!sampleNamingScheme.allowDuplicateEntityNameFor("alias") && aliasExists(sample.getAlias())) {
             // Size is greater than 1, since we've just added this to the db under a temporary name.
-            throw new IOException(String.format("NEW: A sample with this alias '%s' already exists in the database", sample.getAlias()));
+            throw new ConstraintViolationException(String.format("A sample with this alias '%s' already exists in the database", sample.getAlias()),
+                         null, "alias");
           }
         } catch (IOException e) {
           throw new SQLException(e);
