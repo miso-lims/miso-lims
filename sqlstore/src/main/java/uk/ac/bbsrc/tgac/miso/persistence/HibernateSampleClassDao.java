@@ -36,6 +36,15 @@ public class HibernateSampleClassDao implements SampleClassDao {
     List<SampleClass> records = query.list();
     return records;
   }
+  
+  @Override
+  public List<SampleClass> listByCategory(String sampleCategory) {
+    Query query = currentSession().createQuery("from SampleClassImpl where sampleCategory = :sampleCategory");
+    query.setString("sampleCategory", sampleCategory);
+    @SuppressWarnings("unchecked")
+    List<SampleClass> records = query.list();
+    return records;
+  }
 
   @Override
   @Transactional(propagation = Propagation.REQUIRED)

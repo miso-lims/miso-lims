@@ -7,6 +7,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 public interface SampleClassDao {
 
   List<SampleClass> getSampleClass();
+  
+  List<SampleClass> listByCategory(String sampleCategory);
 
   SampleClass getSampleClass(Long id);
 

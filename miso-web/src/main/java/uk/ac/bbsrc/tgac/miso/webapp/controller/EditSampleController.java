@@ -82,12 +82,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.QcPassedDetail;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleAnalyte;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAnalyte.StrStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleGroupId;
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
@@ -100,8 +98,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.QcPassedDetailImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAdditionalInfoImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAnalyteImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleGroupImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SamplePurposeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
@@ -117,6 +118,7 @@ import uk.ac.bbsrc.tgac.miso.service.QcPassedDetailService;
 import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.service.SampleGroupService;
 import uk.ac.bbsrc.tgac.miso.service.SamplePurposeService;
+import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.TissueMaterialService;
 import uk.ac.bbsrc.tgac.miso.service.TissueOriginService;
 import uk.ac.bbsrc.tgac.miso.service.TissueTypeService;
@@ -142,6 +144,9 @@ public class EditSampleController {
   
   @Autowired
   private SampleOptionsController sampleOptionsController;
+  
+  @Autowired
+  private SampleService sampleService;
   
   public void setSampleOptionsController(SampleOptionsController sampleOptionsController) {
     this.sampleOptionsController = sampleOptionsController;
@@ -545,6 +550,45 @@ public class EditSampleController {
         }
       }
     });
+    
+    binder.registerCustomEditor(SampleGroupId.class, "sampleAnalyte.sampleGroup", new PropertyEditorSupport() {
+      @Override
+      public void setAsText(String text) throws IllegalArgumentException {
+        if (isStringEmptyOrNull(text)) {
+          setValue(null);
+        } else {
+          SampleGroupId sg = new SampleGroupImpl();
+          sg.setId(Long.valueOf(text));
+          setValue(sg);
+        }
+      }
+    });
+    
+    binder.registerCustomEditor(SamplePurpose.class, "sampleAnalyte.samplePurpose", new PropertyEditorSupport() {
+      @Override
+      public void setAsText(String text) throws IllegalArgumentException {
+        if (isStringEmptyOrNull(text)) {
+          setValue(null);
+        } else {
+          SamplePurpose sp = new SamplePurposeImpl();
+          sp.setId(Long.valueOf(text));
+          setValue(sp);
+        }
+      }
+    });
+    
+    binder.registerCustomEditor(TissueMaterial.class, "sampleAnalyte.tissueMaterial", new PropertyEditorSupport() {
+      @Override
+      public void setAsText(String text) throws IllegalArgumentException {
+        if (isStringEmptyOrNull(text)) {
+          setValue(null);
+        } else {
+          TissueMaterial tm = new TissueMaterialImpl();
+          tm.setId(Long.valueOf(text));
+          setValue(tm);
+        }
+      }
+    });
   }
 
   @RequestMapping(value = "/new", method = RequestMethod.GET)
@@ -779,26 +823,11 @@ public class EditSampleController {
   public String processSubmit(@ModelAttribute("sample") Sample sample, ModelMap model, SessionStatus session)
       throws IOException, MalformedSampleException {
     try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      if (!sample.userCanWrite(user)) {
-        throw new SecurityException("Permission denied.");
+      if (sample.getId() == Sample.UNSAVED_ID) {
+        sampleService.create(sample);
+      } else {
+        sampleService.update(sample);
       }
-      
-      if (isDetailedSampleEnabled()) {
-        // Normalize model. New sample may include empty SampleAnalyte and/or SampleTissue
-        if (Sample.UNSAVED_ID.equals(sample.getId())) {
-          String category = sample.getSampleAdditionalInfo().getSampleClass().getSampleCategory();
-          if (!SampleTissue.CATEGORY_NAME.equals(category)) {
-            sample.setSampleTissue(null);
-          }
-          if (!SampleAnalyte.CATEGORY_NAME.equals(category)) {
-            sample.setSampleAnalyte(null);
-          }
-        }
-      }
-
-      sample.setLastModifier(user);
-      requestManager.saveSample(sample);
       session.setComplete();
       model.clear();
       return "redirect:/miso/sample/" + sample.getId();

@@ -28,6 +28,7 @@ public class SampleDto {
   private Long rootSampleClassId;
   private String rootSampleClassUrl;
   private Double volume;
+  private Boolean empty;
 
   public Long getId() {
     return id;
@@ -195,6 +196,14 @@ public class SampleDto {
 
   public void setVolume(Double volume) {
     this.volume = volume;
+  }
+
+  public Boolean getEmpty() {
+    return empty;
+  }
+
+  public void setEmpty(Boolean empty) {
+    this.empty = empty;
   }
 
 }

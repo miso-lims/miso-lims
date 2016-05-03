@@ -4,7 +4,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -39,7 +38,7 @@ public class SampleAdditionalInfoImpl implements SampleAdditionalInfo {
   @MapsId
   private Sample sample;
   
-  @ManyToOne(optional = true, targetEntity = SampleImpl.class, cascade = CascadeType.ALL)
+  @ManyToOne(optional = true, targetEntity = SampleImpl.class)
   @JoinColumn(name = "parentId", nullable = true)
   private Sample parent;
 

@@ -449,7 +449,7 @@
           <td>
             <c:choose>
               <c:when test="${sample.id == 0}"><form:input id="passageNumber" path="sampleAdditionalInfo.passageNumber"/></c:when>
-              <c:otherwise>${sample.sampleAdditionalInfo.passageNumber}</c:otherwise>
+              <c:otherwise>${!empty sample.sampleAdditionalInfo.passageNumber ? sample.sampleAdditionalInfo.passageNumber : 'n/a'}</c:otherwise>
             </c:choose>
           </td>                               
         </tr>
@@ -458,7 +458,7 @@
           <td>
             <c:choose>
               <c:when test="${sample.id == 0}"><form:input id="timesReceived" path="sampleAdditionalInfo.timesReceived"/></c:when>
-              <c:otherwise>${sample.sampleAdditionalInfo.timesReceived}</c:otherwise>
+              <c:otherwise>${!empty sample.sampleAdditionalInfo.timesReceived ? sample.sampleAdditionalInfo.timesReceived : 'n/a'}</c:otherwise>
             </c:choose>
           </td>                               
         </tr>
@@ -467,7 +467,7 @@
           <td>
             <c:choose>
               <c:when test="${sample.id == 0}"><form:input id="tubeNumber" path="sampleAdditionalInfo.tubeNumber"/></c:when>
-              <c:otherwise>${sample.sampleAdditionalInfo.tubeNumber}</c:otherwise>
+              <c:otherwise>${!empty sample.sampleAdditionalInfo.tubeNumber ? sample.sampleAdditionalInfo.tubeNumber : 'n/a'}</c:otherwise>
             </c:choose>
           </td>                               
         </tr>
