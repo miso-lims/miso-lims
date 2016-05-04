@@ -74,7 +74,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
  */
 @MappedSuperclass
 public abstract class AbstractSample extends AbstractBoxable implements Sample {
-  
+
   protected static final Logger log = LoggerFactory.getLogger(AbstractSample.class);
   public static final Long UNSAVED_ID = 0L;
 
@@ -158,18 +158,6 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @Override
   public void setProject(Project project) {
     this.project = project;
-  }
-
-  @Override
-  @Deprecated
-  public Long getSampleId() {
-    return sampleId;
-  }
-
-  @Override
-  @Deprecated
-  public void setSampleId(Long sampleId) {
-    this.sampleId = sampleId;
   }
 
   @Override
@@ -751,7 +739,7 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
           return SampleImpl.sampleAnalyte(this);
         } else if (sampleTissue != null) {
           return SampleImpl.sampleTissue(this);
-        } else if (sampleAdditionalInfo.getSampleClass().getSampleCategory().equals("Tissue Processing")){
+        } else if (sampleAdditionalInfo.getSampleClass().getSampleCategory().equals("Tissue Processing")) {
           return SampleImpl.sampleTissueProcessing(this);
         }
       }

@@ -98,17 +98,17 @@ public class SQLPlatformDAO implements PlatformStore {
     params.addValue("description", platform.getDescription());
     params.addValue("numContainers", platform.getNumContainers());
 
-    if (platform.getPlatformId() == AbstractPlatform.UNSAVED_ID) {
+    if (platform.getId() == AbstractPlatform.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(TABLE_NAME).usingGeneratedKeyColumns("platformId");
       Number newId = insert.executeAndReturnKey(params);
-      platform.setPlatformId(newId.longValue());
+      platform.setId(newId.longValue());
     } else {
-      params.addValue("platformId", platform.getPlatformId());
+      params.addValue("platformId", platform.getId());
       NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
       namedTemplate.update(PLATFORM_UPDATE, params);
     }
 
-    return platform.getPlatformId();
+    return platform.getId();
   }
 
   @Override
@@ -156,7 +156,7 @@ public class SQLPlatformDAO implements PlatformStore {
     @CoverageIgnore
     public Platform mapRow(ResultSet rs, int rowNum) throws SQLException {
       Platform p = new PlatformImpl();
-      p.setPlatformId(rs.getLong("platformId"));
+      p.setId(rs.getLong("platformId"));
       p.setPlatformType(PlatformType.get(rs.getString("name")));
       p.setDescription(rs.getString("description"));
       p.setInstrumentModel(rs.getString("instrumentModel"));

@@ -47,7 +47,7 @@ public class HibernateStatusStore extends HibernateDaoSupport implements Store<S
   @Transactional(readOnly = false)
   public long save(Status status) throws IOException {
     getHibernateTemplate().saveOrUpdate(status);
-    return status.getStatusId();
+    return status.getId();
   }
 
   @Override

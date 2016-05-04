@@ -65,12 +65,12 @@ public class SampleAnalyteImpl implements SampleAnalyte {
   private Date lastUpdated;
 
   @Override
-  public Long getSampleId() {
+  public Long getId() {
     return sampleId;
   }
 
   @Override
-  public void setSampleId(Long sampleId) {
+  public void setId(Long sampleId) {
     this.sampleId = sampleId;
   }
 

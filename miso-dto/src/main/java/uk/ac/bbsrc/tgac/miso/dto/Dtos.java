@@ -64,7 +64,7 @@ public class Dtos {
 
   public static TissueOriginDto asDto(TissueOrigin from) {
     TissueOriginDto dto = new TissueOriginDto();
-    dto.setId(from.getTissueOriginId());
+    dto.setId(from.getId());
     dto.setAlias(from.getAlias());
     dto.setDescription(from.getDescription());
     dto.setCreatedById(from.getCreatedBy().getUserId());
@@ -84,7 +84,7 @@ public class Dtos {
 
   public static TissueOrigin to(TissueOriginDto from) {
     TissueOrigin to = new TissueOriginImpl();
-    to.setTissueOriginId(from.getId());
+    to.setId(from.getId());
     to.setAlias(from.getAlias());
     to.setDescription(from.getDescription());
     return to;
@@ -92,7 +92,7 @@ public class Dtos {
 
   public static TissueTypeDto asDto(TissueType from) {
     TissueTypeDto dto = new TissueTypeDto();
-    dto.setId(from.getTissueTypeId());
+    dto.setId(from.getId());
     dto.setAlias(from.getAlias());
     dto.setDescription(from.getDescription());
     dto.setCreatedById(from.getCreatedBy().getUserId());
@@ -112,7 +112,7 @@ public class Dtos {
 
   public static TissueType to(TissueTypeDto from) {
     TissueType to = new TissueTypeImpl();
-    to.setTissueTypeId(from.getId());
+    to.setId(from.getId());
     to.setAlias(from.getAlias());
     to.setDescription(from.getDescription());
     return to;
@@ -120,7 +120,7 @@ public class Dtos {
 
   public static SubprojectDto asDto(Subproject from) {
     SubprojectDto dto = new SubprojectDto();
-    dto.setId(from.getSubprojectId());
+    dto.setId(from.getId());
     dto.setAlias(from.getAlias());
     dto.setDescription(from.getDescription());
     dto.setPriority(from.getPriority());
@@ -152,7 +152,7 @@ public class Dtos {
 
   public static SampleClassDto asDto(SampleClass from) {
     SampleClassDto dto = new SampleClassDto();
-    dto.setId(from.getSampleClassId());
+    dto.setId(from.getId());
     dto.setAlias(from.getAlias());
     dto.setSampleCategory(from.getSampleCategory());
     dto.setSuffix(from.getSuffix());
@@ -183,7 +183,7 @@ public class Dtos {
 
   public static QcPassedDetailDto asDto(QcPassedDetail from) {
     QcPassedDetailDto dto = new QcPassedDetailDto();
-    dto.setId(from.getQcPassedDetailId());
+    dto.setId(from.getId());
     dto.setStatus(from.getStatus());
     dto.setDescription(from.getDescription());
     dto.setNoteRequired(from.getNoteRequired());
@@ -212,30 +212,30 @@ public class Dtos {
 
   public static SampleAdditionalInfoDto asDto(SampleAdditionalInfo from) {
     SampleAdditionalInfoDto dto = new SampleAdditionalInfoDto();
-    dto.setSampleId(from.getSampleId());
-    dto.setSampleClassId(from.getSampleClass().getSampleClassId());
+    dto.setSampleId(from.getId());
+    dto.setSampleClassId(from.getSampleClass().getId());
     if (from.getLab() != null) {
       dto.setLabId(from.getLab().getId());
     }
     if (from.getTissueOrigin() != null) {
-      dto.setTissueOriginId(from.getTissueOrigin().getTissueOriginId());
+      dto.setTissueOriginId(from.getTissueOrigin().getId());
     }
     if (from.getTissueType() != null) {
-      dto.setTissueTypeId(from.getTissueType().getTissueTypeId());
+      dto.setTissueTypeId(from.getTissueType().getId());
     }
     if (from.getQcPassedDetail() != null) {
-      dto.setQcPassedDetailId(from.getQcPassedDetail().getQcPassedDetailId());
+      dto.setQcPassedDetailId(from.getQcPassedDetail().getId());
     }
     if (from.getSubproject() != null) {
-      dto.setSubprojectId(from.getSubproject().getSubprojectId());
+      dto.setSubprojectId(from.getSubproject().getId());
     }
     if (from.getPrepKit() != null) {
-      dto.setPrepKitId(from.getPrepKit().getKitDescriptorId());
+      dto.setPrepKitId(from.getPrepKit().getId());
     }
     if (from.getParent() != null) {
       dto.setParentId(from.getParent().getId());
       dto.setParentAlias(from.getParent().getAlias());
-      dto.setParentSampleClassId(from.getParent().getSampleAdditionalInfo().getSampleClass().getSampleClassId());
+      dto.setParentSampleClassId(from.getParent().getSampleAdditionalInfo().getSampleClass().getId());
     }
     dto.setPassageNumber(from.getPassageNumber());
     dto.setTimesReceived(from.getTimesReceived());
@@ -259,7 +259,7 @@ public class Dtos {
 
   public static SampleAdditionalInfo to(SampleAdditionalInfoDto from) {
     SampleAdditionalInfo to = new SampleAdditionalInfoImpl();
-    to.setSampleId(from.getSampleId());
+    to.setId(from.getSampleId());
     to.setPassageNumber(from.getPassageNumber());
     to.setTimesReceived(from.getTimesReceived());
     to.setTubeNumber(from.getTubeNumber());
@@ -267,32 +267,32 @@ public class Dtos {
     to.setConcentration(from.getConcentration());
     if (from.getTissueOriginId() != null) {
       TissueOrigin tissueOrigin = new TissueOriginImpl();
-      tissueOrigin.setTissueOriginId(from.getTissueOriginId());
+      tissueOrigin.setId(from.getTissueOriginId());
       to.setTissueOrigin(tissueOrigin);
     }
     if (from.getTissueTypeId() != null) {
       TissueType tissueType = new TissueTypeImpl();
-      tissueType.setTissueTypeId(from.getTissueTypeId());
+      tissueType.setId(from.getTissueTypeId());
       to.setTissueType(tissueType);
     }
     if (from.getQcPassedDetailId() != null) {
       QcPassedDetail qcpassedDetail = new QcPassedDetailImpl();
-      qcpassedDetail.setQcPassedDetailId(from.getQcPassedDetailId());
+      qcpassedDetail.setId(from.getQcPassedDetailId());
       to.setQcPassedDetail(qcpassedDetail);
     }
     if (from.getSubprojectId() != null) {
       Subproject subproject = new SubprojectImpl();
-      subproject.setSubprojectId(from.getSubprojectId());
+      subproject.setId(from.getSubprojectId());
       to.setSubproject(subproject);
     }
     if (from.getPrepKitId() != null) {
       KitDescriptor prepKit = new KitDescriptor();
-      prepKit.setKitDescriptorId(from.getPrepKitId());
+      prepKit.setId(from.getPrepKitId());
       to.setPrepKit(prepKit);
     }
     if (from.getSampleClassId() != null) {
       SampleClass sampleClass = new SampleClassImpl();
-      sampleClass.setSampleClassId(from.getSampleClassId());
+      sampleClass.setId(from.getSampleClassId());
       to.setSampleClass(sampleClass);
     }
     return to;
@@ -300,7 +300,7 @@ public class Dtos {
 
   public static TissueMaterialDto asDto(TissueMaterial from) {
     TissueMaterialDto dto = new TissueMaterialDto();
-    dto.setId(from.getTissueMaterialId());
+    dto.setId(from.getId());
     dto.setAlias(from.getAlias());
     dto.setDescription(from.getDescription());
     dto.setCreatedById(from.getCreatedBy().getUserId());
@@ -327,7 +327,7 @@ public class Dtos {
 
   public static SamplePurposeDto asDto(SamplePurpose from) {
     SamplePurposeDto dto = new SamplePurposeDto();
-    dto.setId(from.getSamplePurposeId());
+    dto.setId(from.getId());
     dto.setAlias(from.getAlias());
     dto.setDescription(from.getDescription());
     dto.setCreatedById(from.getCreatedBy().getUserId());
@@ -354,10 +354,10 @@ public class Dtos {
 
   public static SampleGroupDto asDto(SampleGroupId from) {
     SampleGroupDto dto = new SampleGroupDto();
-    dto.setId(from.getSampleGroupId());
+    dto.setId(from.getId());
     dto.setGroupId(from.getGroupId());
     dto.setProjectId(from.getProject().getId());
-    dto.setSubprojectId(from.getSubproject() == null ? null : from.getSubproject().getSubprojectId());
+    dto.setSubprojectId(from.getSubproject() == null ? null : from.getSubproject().getId());
     dto.setDescription(from.getDescription());
     dto.setCreatedById(from.getCreatedBy().getUserId());
     dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
@@ -383,17 +383,17 @@ public class Dtos {
 
   public static SampleAnalyteDto asDto(SampleAnalyte from) {
     SampleAnalyteDto dto = new SampleAnalyteDto();
-    dto.setSampleId(from.getSampleId());
+    dto.setSampleId(from.getId());
     dto.setSampleId(from.getSample().getId());
     dto.setStrStatus(from.getStrStatus().getLabel());
     if (from.getSamplePurpose() != null) {
-      dto.setSamplePurposeId(from.getSamplePurpose().getSamplePurposeId());
+      dto.setSamplePurposeId(from.getSamplePurpose().getId());
     }
     if (from.getSampleGroup() != null) {
-      dto.setSampleGroupId(from.getSampleGroup().getSampleGroupId());
+      dto.setSampleGroupId(from.getSampleGroup().getId());
     }
     if (from.getTissueMaterial() != null) {
-      dto.setTissueMaterialId(from.getTissueMaterial().getTissueMaterialId());
+      dto.setTissueMaterialId(from.getTissueMaterial().getId());
     }
     if (!LimsUtils.isStringEmptyOrNull(from.getRegion())) {
       dto.setRegion(from.getRegion());
@@ -418,20 +418,20 @@ public class Dtos {
 
   public static SampleAnalyte to(SampleAnalyteDto from) {
     SampleAnalyte to = new SampleAnalyteImpl();
-    to.setSampleId(from.getSampleId());
+    to.setId(from.getSampleId());
     to.setRegion(from.getRegion());
     to.setTubeId(from.getTubeId());
     if (from.getSampleGroupId() != null) {
       to.setSampleGroup(new SampleGroupImpl());
-      to.getSampleGroup().setSampleGroupId(from.getSampleGroupId());
+      to.getSampleGroup().setId(from.getSampleGroupId());
     }
     if (from.getSamplePurposeId() != null) {
       to.setSamplePurpose(new SamplePurposeImpl());
-      to.getSamplePurpose().setSamplePurposeId(from.getSamplePurposeId());
+      to.getSamplePurpose().setId(from.getSamplePurposeId());
     }
     if (from.getTissueMaterialId() != null) {
       to.setTissueMaterial(new TissueMaterialImpl());
-      to.getTissueMaterial().setTissueMaterialId(from.getTissueMaterialId());
+      to.getTissueMaterial().setId(from.getTissueMaterialId());
     }
     if (from.getStrStatus() != null) {
       to.setStrStatus(from.getStrStatus());
@@ -570,7 +570,7 @@ public class Dtos {
 
   public static SampleNumberPerProjectDto asDto(SampleNumberPerProject from) {
     SampleNumberPerProjectDto dto = new SampleNumberPerProjectDto();
-    dto.setId(from.getSampleNumberPerProjectId());
+    dto.setId(from.getId());
     dto.setProjectId(from.getProject().getProjectId());
     dto.setHighestSampleNumber(from.getHighestSampleNumber());
     dto.setPadding(from.getPadding());
@@ -598,9 +598,9 @@ public class Dtos {
 
   public static SampleValidRelationshipDto asDto(SampleValidRelationship from) {
     SampleValidRelationshipDto dto = new SampleValidRelationshipDto();
-    dto.setId(from.getSampleValidRelationshipId());
-    dto.setParentId(from.getParent().getSampleClassId());
-    dto.setChildId(from.getChild().getSampleClassId());
+    dto.setId(from.getId());
+    dto.setParentId(from.getParent().getId());
+    dto.setChildId(from.getChild().getId());
     dto.setCreatedById(from.getCreatedBy().getUserId());
     dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
     dto.setUpdatedById(from.getUpdatedBy().getUserId());
@@ -674,7 +674,7 @@ public class Dtos {
 
   public static SampleTissueDto asDto(SampleTissue from) {
     SampleTissueDto dto = new SampleTissueDto();
-    dto.setSampleId(from.getSampleId());
+    dto.setSampleId(from.getId());
     dto.setCellularity(from.getCellularity());
     dto.setCreatedById(from.getCreatedBy().getUserId());
     dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
@@ -699,7 +699,7 @@ public class Dtos {
 
   public static KitDescriptorDto asDto(KitDescriptor from) {
     KitDescriptorDto dto = new KitDescriptorDto();
-    dto.setId(from.getKitDescriptorId());
+    dto.setId(from.getId());
     dto.setName(from.getName());
     dto.setManufacturer(from.getManufacturer());
     dto.setPartNumber(from.getPartNumber());
@@ -720,7 +720,7 @@ public class Dtos {
 
   public static KitDescriptor to(KitDescriptorDto from) {
     KitDescriptor to = new KitDescriptor();
-    if (from.getId() != null) to.setKitDescriptorId(from.getId());
+    if (from.getId() != null) to.setId(from.getId());
     to.setName(from.getName());
     to.setManufacturer(from.getManufacturer());
     to.setPartNumber(from.getPartNumber());
@@ -836,9 +836,9 @@ public class Dtos {
     dto.setDescription(from.getDescription());
     dto.setId(from.getId());
     dto.setConcentration(from.getInitialConcentration());
-    dto.setLibrarySelectionTypeId(from.getLibrarySelectionType().getLibrarySelectionTypeId());
-    dto.setLibraryStrategyTypeId(from.getLibraryStrategyType().getLibraryStrategyTypeId());
-    dto.setLibraryTypeId(from.getLibraryType().getLibraryTypeId());
+    dto.setLibrarySelectionTypeId(from.getLibrarySelectionType().getId());
+    dto.setLibraryStrategyTypeId(from.getLibraryStrategyType().getId());
+    dto.setLibraryTypeId(from.getLibraryType().getId());
     dto.setLowQuality(from.isLowQuality());
     dto.setPaired(from.getPaired());
     dto.setPlatformName(from.getPlatformName());

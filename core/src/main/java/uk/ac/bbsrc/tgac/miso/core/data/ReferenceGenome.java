@@ -3,9 +3,9 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 public interface ReferenceGenome {
 
-  Long getReferenceGenomeId();
+  Long getId();
 
-  void setReferenceGenomeId(Long referenceGenomeId);
+  void setId(Long referenceGenomeId);
 
   String getAlias();
 

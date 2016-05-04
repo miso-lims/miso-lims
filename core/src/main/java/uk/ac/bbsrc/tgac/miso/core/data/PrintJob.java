@@ -43,9 +43,9 @@ import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService;
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public interface PrintJob extends Comparable {
-  void setJobId(Long jobId);
+  void setId(Long jobId);
 
-  Long getJobId();
+  Long getId();
 
   void setPrintDate(Date printDate);
 

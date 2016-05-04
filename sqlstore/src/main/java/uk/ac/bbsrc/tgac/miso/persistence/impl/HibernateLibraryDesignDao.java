@@ -32,7 +32,7 @@ public class HibernateLibraryDesignDao implements LibraryDesignDao {
   public List<LibraryDesign> getLibraryDesignByClass(SampleClass sampleClass) {
     if (sampleClass == null) return Collections.emptyList();
     Query query = currentSession().createQuery("from LibraryDesign where sampleClass.sampleClassId = :sampleClass");
-    query.setLong("sampleClass", sampleClass.getSampleClassId());
+    query.setLong("sampleClass", sampleClass.getId());
     @SuppressWarnings("unchecked")
     List<LibraryDesign> rules = query.list();
     return rules;

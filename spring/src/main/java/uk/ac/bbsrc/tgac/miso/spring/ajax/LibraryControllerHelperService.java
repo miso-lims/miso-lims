@@ -289,7 +289,7 @@ public class LibraryControllerHelperService {
         }
       }
       PrintJob pj = printManager.print(thingsToPrint, mps.getName(), user);
-      return JSONUtils.SimpleJSONResponse("Job " + pj.getJobId() + " : Barcodes printed.");
+      return JSONUtils.SimpleJSONResponse("Job " + pj.getId() + " : Barcodes printed.");
     } catch (MisoPrintException e) {
       log.error("print barcodes", e);
       return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
@@ -341,7 +341,7 @@ public class LibraryControllerHelperService {
         }
       }
       PrintJob pj = printManager.print(thingsToPrint, mps.getName(), user);
-      return JSONUtils.SimpleJSONResponse("Job " + pj.getJobId() + " : Barcodes printed.");
+      return JSONUtils.SimpleJSONResponse("Job " + pj.getId() + " : Barcodes printed.");
     } catch (MisoPrintException e) {
       log.error("print barcodes", e);
       return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
@@ -562,7 +562,7 @@ public class LibraryControllerHelperService {
         List<LibraryType> types = new ArrayList<LibraryType>(requestManager.listLibraryTypesByPlatform(platform));
         Collections.sort(types);
         for (LibraryType s : types) {
-          libsb.append("<option value='" + s.getLibraryTypeId() + "'>" + s.getDescription() + "</option>");
+          libsb.append("<option value='" + s.getId() + "'>" + s.getDescription() + "</option>");
         }
 
         StringBuilder tagsb = new StringBuilder();
@@ -641,11 +641,11 @@ public class LibraryControllerHelperService {
       Collection<TargetedResequencing> targetedResequencings = requestManager.listAllTargetedResequencing();
       JSONArray targetedResequencingCollection = new JSONArray();
       for (TargetedResequencing targetedResequencing : targetedResequencings) {
-        if (libraryPrepKitId != null && libraryPrepKitId == targetedResequencing.getKitDescriptor().getKitDescriptorId()) {
+        if (libraryPrepKitId != null && libraryPrepKitId == targetedResequencing.getKitDescriptor().getId()) {
           Map<String, Object> targetedResequencingMap = Maps.newHashMap();
           targetedResequencingMap.put("targetedSequencingId", targetedResequencing.getTargetedResequencingId());
           targetedResequencingMap.put("alias", targetedResequencing.getAlias());
-          targetedResequencingMap.put("kitDescriptorId", targetedResequencing.getKitDescriptor().getKitDescriptorId());
+          targetedResequencingMap.put("kitDescriptorId", targetedResequencing.getKitDescriptor().getId());
           targetedResequencingCollection.add(targetedResequencingMap);
         }
       }

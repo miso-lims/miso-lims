@@ -44,12 +44,12 @@ public class TissueOriginImpl implements TissueOrigin {
   private Date lastUpdated;
 
   @Override
-  public Long getTissueOriginId() {
+  public Long getId() {
     return tissueOriginId;
   }
 
   @Override
-  public void setTissueOriginId(Long tissueOriginId) {
+  public void setId(Long tissueOriginId) {
     this.tissueOriginId = tissueOriginId;
   }
 

@@ -111,11 +111,11 @@ public class LibraryDesign {
 
   public boolean validate(Library library) {
     if (library.getSample().getSampleAdditionalInfo() == null) return true;
-    if (library.getSample().getSampleAdditionalInfo().getSampleClass().getSampleClassId() != sampleClass.getSampleClassId()) return false;
+    if (library.getSample().getSampleAdditionalInfo().getSampleClass().getId() != sampleClass.getId()) return false;
     if (!library.getPlatformName().equals(platformName.getKey())) return false;
     if (library.getPaired().booleanValue() != paired.booleanValue()) return false;
-    if (library.getLibrarySelectionType().getLibrarySelectionTypeId() != librarySelectionType) return false;
-    if (library.getLibraryStrategyType().getLibraryStrategyTypeId() != libraryStrategyType) return false;
+    if (library.getLibrarySelectionType().getId() != librarySelectionType) return false;
+    if (library.getLibraryStrategyType().getId() != libraryStrategyType) return false;
     return true;
   }
 }

@@ -61,20 +61,6 @@ public abstract class AbstractKit implements Kit {
   private KitDescriptor kitDescriptor;
 
   @Override
-  @CoverageIgnore
-  @Deprecated
-  public Long getKitId() {
-    return kitId;
-  }
-
-  @Override
-  @CoverageIgnore
-  @Deprecated
-  public void setKitId(Long kitId) {
-    this.kitId = kitId;
-  }
-
-  @Override
   public long getId() {
     return kitId;
   }

@@ -105,12 +105,12 @@ public class SampleAdditionalInfoImpl implements SampleAdditionalInfo {
   private Date lastUpdated;
 
   @Override
-  public Long getSampleId() {
+  public Long getId() {
     return sampleId;
   }
 
   @Override
-  public void setSampleId(Long sampleAdditionalInfoId) {
+  public void setId(Long sampleAdditionalInfoId) {
     this.sampleId = sampleAdditionalInfoId;
   }
 
@@ -297,7 +297,7 @@ public class SampleAdditionalInfoImpl implements SampleAdditionalInfo {
     if (prepKit == null) {
       this.kitDescriptorId = null;
     } else {
-      this.kitDescriptorId = prepKit.getKitDescriptorId();
+      this.kitDescriptorId = prepKit.getId();
     }
   }
   

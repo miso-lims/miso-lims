@@ -71,7 +71,7 @@ public class SequencerReferenceControllerHelperService {
       Collection<Platform> ps = requestManager.listAllPlatforms();
       StringBuilder sb = new StringBuilder();
       for (Platform p : ps) {
-        sb.append("<option value=" + p.getPlatformId() + ">" + p.getNameAndModel() + "</option>");
+        sb.append("<option value=" + p.getId() + ">" + p.getNameAndModel() + "</option>");
       }
       return JSONUtils.JSONObjectResponse("platforms", sb.toString());
     } catch (IOException e) {

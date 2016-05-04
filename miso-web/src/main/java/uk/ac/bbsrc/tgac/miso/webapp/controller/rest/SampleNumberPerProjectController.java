@@ -116,7 +116,7 @@ public class SampleNumberPerProjectController extends RestController {
   public ResponseEntity<?> updateSampleNumberPerProject(@PathVariable("id") Long id,
       @RequestBody SampleNumberPerProjectDto sampleNumberPerProjectDto, HttpServletResponse response) throws IOException {
     SampleNumberPerProject sampleNumberPerProject = Dtos.to(sampleNumberPerProjectDto);
-    sampleNumberPerProject.setSampleNumberPerProjectId(id);
+    sampleNumberPerProject.setId(id);
     sampleNumberPerProjectService.update(sampleNumberPerProject);
     return new ResponseEntity<>(HttpStatus.OK);
   }

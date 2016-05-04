@@ -320,7 +320,7 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
     params.addValue("lastModifier", sequencerPartitionContainer.getLastModifier().getUserId());
 
     if (sequencerPartitionContainer.getPlatform() != null) {
-      params.addValue("platform", sequencerPartitionContainer.getPlatform().getPlatformId());
+      params.addValue("platform", sequencerPartitionContainer.getPlatform().getId());
     }
 
     if (sequencerPartitionContainer.getId() == AbstractSequencerPartitionContainer.UNSAVED_ID) {

@@ -46,24 +46,6 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 public interface Dilution extends SecurableByProfile, Barcodable, Comparable, Deletable, Poolable<Dilution, Dilution>, Plateable {
 
   /**
-   * Gets the current dilutionId
-   * 
-   * @return Long
-   */
-  @Deprecated
-  public Long getDilutionId();
-
-  /**
-   * Sets the dilutionId of this Dilution object
-   * 
-   * @param dilutionId
-   *          dilutionId.
-   * 
-   */
-  @Deprecated
-  public void setDilutionId(Long dilutionId);
-
-  /**
    * Method setName sets the name of this Dilution object.
    * 
    * @param name

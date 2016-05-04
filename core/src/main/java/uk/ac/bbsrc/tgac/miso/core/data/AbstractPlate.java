@@ -43,7 +43,6 @@ import org.slf4j.LoggerFactory;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlateMaterialType;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
-
 /**
  * Skeleton implementation of a Plate
  * 
@@ -83,18 +82,6 @@ public abstract class AbstractPlate<T extends List<S>, S extends Plateable> impl
   @Override
   public void setLastModifier(User lastModifier) {
     this.lastModifier = lastModifier;
-  }
-
-  @Override
-  @Deprecated
-  public Long getPlateId() {
-    return plateId;
-  }
-
-  @Override
-  @Deprecated
-  public void setPlateId(Long plateId) {
-    this.plateId = plateId;
   }
 
   @Override

@@ -55,12 +55,12 @@ public class SubprojectImpl implements Subproject {
   private Long referenceGenomeId;
 
   @Override
-  public Long getSubprojectId() {
+  public Long getId() {
     return subprojectId;
   }
 
   @Override
-  public void setSubprojectId(Long subprojectId) {
+  public void setId(Long subprojectId) {
     this.subprojectId = subprojectId;
   }
 

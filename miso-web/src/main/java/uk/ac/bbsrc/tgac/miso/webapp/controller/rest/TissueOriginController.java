@@ -114,7 +114,7 @@ public class TissueOriginController extends RestController {
   public ResponseEntity<?> updateTissueOrigin(@PathVariable("id") Long id, @RequestBody TissueOriginDto tissueOriginDto,
       HttpServletResponse response) throws IOException {
     TissueOrigin tissueOrigin = Dtos.to(tissueOriginDto);
-    tissueOrigin.setTissueOriginId(id);
+    tissueOrigin.setId(id);
     tissueOriginService.update(tissueOrigin);
     return new ResponseEntity<>(HttpStatus.OK);
   }

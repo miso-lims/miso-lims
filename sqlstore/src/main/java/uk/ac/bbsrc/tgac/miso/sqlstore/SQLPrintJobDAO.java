@@ -125,16 +125,16 @@ public class SQLPrintJobDAO implements PrintJobStore {
       log.error("print job save", e);
     }
 
-    if (printJob.getJobId() == AbstractPrintJob.UNSAVED_ID) {
+    if (printJob.getId() == AbstractPrintJob.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(TABLE_NAME).usingGeneratedKeyColumns("jobId");
       Number newId = insert.executeAndReturnKey(params);
-      printJob.setJobId(newId.longValue());
+      printJob.setId(newId.longValue());
     } else {
-      params.addValue("jobId", printJob.getJobId());
+      params.addValue("jobId", printJob.getId());
       NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
       namedTemplate.update(PRINT_JOB_UPDATE, params);
     }
-    return printJob.getJobId();
+    return printJob.getId();
   }
 
   @Override
@@ -174,7 +174,7 @@ public class SQLPrintJobDAO implements PrintJobStore {
     public PrintJob mapRow(ResultSet rs, int rowNum) throws SQLException {
       try {
         MisoPrintJob printJob = new MisoPrintJob();
-        printJob.setJobId(rs.getLong("jobId"));
+        printJob.setId(rs.getLong("jobId"));
         printJob.setPrintDate(rs.getDate("printDate"));
         printJob.setPrintService(printManager.getPrintService(rs.getString("printServiceName")));
         printJob.setPrintUser(securityManager.getUserById(rs.getLong("jobCreator_userId")));

@@ -146,7 +146,7 @@ public class SampleAdditionalInfoController extends RestController {
   public ResponseEntity<?> updateSampleAdditionalInfo(@PathVariable("id") Long id,
       @RequestBody SampleAdditionalInfoDto sampleAdditionalInfoDto, HttpServletResponse response) throws IOException {
     SampleAdditionalInfo sampleAdditionalInfo = to(sampleAdditionalInfoDto);
-    sampleAdditionalInfo.setSampleId(id);
+    sampleAdditionalInfo.setId(id);
     sampleAdditionalInfoService.update(sampleAdditionalInfo);
     return new ResponseEntity<>(HttpStatus.OK);
   }

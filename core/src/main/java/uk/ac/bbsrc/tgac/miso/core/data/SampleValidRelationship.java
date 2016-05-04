@@ -6,9 +6,9 @@ import com.eaglegenomics.simlims.core.User;
 
 public interface SampleValidRelationship {
 
-  Long getSampleValidRelationshipId();
+  Long getId();
 
-  void setSampleValidRelationshipId(Long sampleValidRelationshipId);
+  void setId(Long sampleValidRelationshipId);
 
   User getCreatedBy();
 

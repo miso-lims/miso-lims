@@ -46,7 +46,7 @@ public interface Status extends Securable {
    * 
    * @return Long statusId.
    */
-  public Long getStatusId();
+  public Long getId();
 
   /**
    * Sets the statusId of this Status object.
@@ -54,7 +54,7 @@ public interface Status extends Securable {
    * @param statusId
    *          statusId.
    */
-  public void setStatusId(Long statusId);
+  public void setId(Long statusId);
 
   /**
    * Returns the XML status string of this Status object. Illumina for example produces Status.xml files. If the platform doesn't supply xml

@@ -93,13 +93,13 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
     sample.setId(4);
     library.setSample(sample);
     LibraryType libraryType = new LibraryType();
-    libraryType.setLibraryTypeId(1L);
+    libraryType.setId(1L);
     library.setLibraryType(libraryType);
     LibrarySelectionType librarySelectionType = new LibrarySelectionType();
-    librarySelectionType.setLibrarySelectionTypeId(1L);
+    librarySelectionType.setId(1L);
     library.setLibrarySelectionType(librarySelectionType);
     LibraryStrategyType libraryStrategyType = new LibraryStrategyType();
-    libraryStrategyType.setLibraryStrategyTypeId(1L);
+    libraryStrategyType.setId(1L);
     library.setLibraryStrategyType(libraryStrategyType);
     User mockUser = mock(User.class);
     when(mockUser.getUserId()).thenReturn(1L);
@@ -116,9 +116,9 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
     assertEquals("theAlias", insertedLibrary.getAlias());
     assertEquals("a description", insertedLibrary.getDescription());
     assertEquals(4, library.getSample().getId());
-    assertEquals(Long.valueOf(1), library.getLibraryType().getLibraryTypeId());
-    assertEquals(Long.valueOf(1), library.getLibrarySelectionType().getLibrarySelectionTypeId());
-    assertEquals(Long.valueOf(1), library.getLibraryStrategyType().getLibraryStrategyTypeId());
+    assertEquals(Long.valueOf(1), library.getLibraryType().getId());
+    assertEquals(Long.valueOf(1), library.getLibrarySelectionType().getId());
+    assertEquals(Long.valueOf(1), library.getLibraryStrategyType().getId());
   }
 
   private void mockAutoIncrement() throws Exception {
@@ -272,7 +272,7 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
   public void testGetLibraryTypeById() throws Exception {
     LibraryType libraryTypeById = dao.getLibraryTypeById(5);
 
-    assertEquals(Long.valueOf(5), libraryTypeById.getLibraryTypeId());
+    assertEquals(Long.valueOf(5), libraryTypeById.getId());
     assertEquals("LS454", libraryTypeById.getPlatformType());
     assertEquals("Rapid Shotgun", libraryTypeById.getDescription());
 
@@ -282,7 +282,7 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
   public void testGetLibraryTypeByDescription() throws Exception {
     LibraryType libraryTypeByDescription = dao.getLibraryTypeByDescription("Mate Pair");
     assertEquals("Illumina", libraryTypeByDescription.getPlatformType());
-    assertEquals(Long.valueOf(2), libraryTypeByDescription.getLibraryTypeId());
+    assertEquals(Long.valueOf(2), libraryTypeByDescription.getId());
     assertEquals("Illumina", libraryTypeByDescription.getPlatformType());
 
   }
@@ -290,7 +290,7 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
   @Test
   public void testGetLibraryTypeByDescriptionAndPlatform() throws Exception {
     LibraryType libraryTypeByDescriptionAndPlatform = dao.getLibraryTypeByDescriptionAndPlatform("8kbp Paired End", PlatformType.LS454);
-    assertEquals(Long.valueOf(8), libraryTypeByDescriptionAndPlatform.getLibraryTypeId());
+    assertEquals(Long.valueOf(8), libraryTypeByDescriptionAndPlatform.getId());
     assertEquals("LS454", libraryTypeByDescriptionAndPlatform.getPlatformType());
     assertEquals("8kbp Paired End", libraryTypeByDescriptionAndPlatform.getDescription());
   }
@@ -305,7 +305,7 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
   @Test
   public void testGetLibrarySelectionTypeByName() throws Exception {
     LibrarySelectionType chIP = dao.getLibrarySelectionTypeByName("ChIP");
-    assertEquals(Long.valueOf(10), chIP.getLibrarySelectionTypeId());
+    assertEquals(Long.valueOf(10), chIP.getId());
     assertEquals("Chromatin Immunoprecipitation", chIP.getDescription());
     assertEquals("ChIP", chIP.getName());
   }
@@ -313,7 +313,7 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
   @Test
   public void testGetLibraryStrategyTypeById() throws Exception {
     LibraryStrategyType libraryStrategyTypeById = dao.getLibraryStrategyTypeById(14);
-    assertEquals(Long.valueOf(14), libraryStrategyTypeById.getLibraryStrategyTypeId());
+    assertEquals(Long.valueOf(14), libraryStrategyTypeById.getId());
     assertEquals("Concatenated Tag Sequencing", libraryStrategyTypeById.getDescription());
     assertEquals("CTS", libraryStrategyTypeById.getName());
   }
@@ -321,7 +321,7 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
   @Test
   public void testGetLibraryStrategyTypeByName() throws Exception {
     LibraryStrategyType est = dao.getLibraryStrategyTypeByName("EST");
-    assertEquals(Long.valueOf(12), est.getLibraryStrategyTypeId());
+    assertEquals(Long.valueOf(12), est.getId());
     assertEquals("Single pass sequencing of cDNA templates", est.getDescription());
     assertEquals("EST", est.getName());
   }

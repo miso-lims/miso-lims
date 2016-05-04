@@ -128,7 +128,7 @@ public class SampleAnalyteController extends RestController {
   public ResponseEntity<?> updateSampleAnalyte(@PathVariable("id") Long id, @RequestBody SampleAnalyteDto sampleAnalyteDto,
       HttpServletResponse response) throws IOException {
     SampleAnalyte sampleAnalyte = Dtos.to(sampleAnalyteDto);
-    sampleAnalyte.setSampleId(id);
+    sampleAnalyte.setId(id);
     sampleAnalyteService.update(sampleAnalyte);
     return new ResponseEntity<>(HttpStatus.OK);
   }

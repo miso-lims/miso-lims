@@ -51,12 +51,12 @@ public class SampleClassImpl implements SampleClass {
   private Date lastUpdated;
 
   @Override
-  public Long getSampleClassId() {
+  public Long getId() {
     return sampleClassId;
   }
 
   @Override
-  public void setSampleClassId(Long sampleClassId) {
+  public void setId(Long sampleClassId) {
     this.sampleClassId = sampleClassId;
   }
 

@@ -83,7 +83,7 @@ public class KitDescriptor implements Serializable {
    * 
    * @return Long kitDescriptorId.
    */
-  public Long getKitDescriptorId() {
+  public Long getId() {
     return kitDescriptorId;
   }
 
@@ -93,7 +93,7 @@ public class KitDescriptor implements Serializable {
    * @param kitDescriptorId
    *          kitDescriptorId.
    */
-  public void setKitDescriptorId(Long kitDescriptorId) {
+  public void setId(Long kitDescriptorId) {
     this.kitDescriptorId = kitDescriptorId;
   }
 
@@ -270,7 +270,7 @@ public class KitDescriptor implements Serializable {
   @Override
   public String toString() {
     StringBuffer sb = new StringBuffer();
-    sb.append(getKitDescriptorId());
+    sb.append(getId());
     sb.append(" : ");
     sb.append(getName());
     sb.append(" : ");

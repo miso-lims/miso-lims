@@ -59,7 +59,7 @@ public class DefaultSampleValidRelationshipService implements SampleValidRelatio
   public void update(SampleValidRelationship sampleValidRelationship, Long parentSampleClassId, Long childSampleClassId)
       throws IOException {
     authorizationManager.throwIfNonAdmin();
-    SampleValidRelationship updatedSampleValidRelationship = get(sampleValidRelationship.getSampleValidRelationshipId());
+    SampleValidRelationship updatedSampleValidRelationship = get(sampleValidRelationship.getId());
     SampleClass parent = sampleClassDao.getSampleClass(parentSampleClassId);
     SampleClass child = sampleClassDao.getSampleClass(childSampleClassId);
     updatedSampleValidRelationship.setParent(parent);

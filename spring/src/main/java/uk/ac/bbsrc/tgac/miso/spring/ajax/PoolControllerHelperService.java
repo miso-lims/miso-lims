@@ -401,7 +401,7 @@ public class PoolControllerHelperService {
       }
 
       PrintJob pj = printManager.print(thingsToPrint, mps.getName(), user);
-      return JSONUtils.SimpleJSONResponse("Job " + pj.getJobId() + " : Barcodes printed.");
+      return JSONUtils.SimpleJSONResponse("Job " + pj.getId() + " : Barcodes printed.");
     } catch (MisoPrintException e) {
       log.error("no printer of that name available", e);
       return JSONUtils.SimpleJSONError("No printer of that name available: " + e.getMessage());

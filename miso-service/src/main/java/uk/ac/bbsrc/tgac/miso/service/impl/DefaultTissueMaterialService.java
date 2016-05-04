@@ -47,7 +47,7 @@ public class DefaultTissueMaterialService implements TissueMaterialService {
   @Override
   public void update(TissueMaterial tissueMaterial) throws IOException {
     authorizationManager.throwIfNonAdmin();
-    TissueMaterial updatedTissueMaterial = get(tissueMaterial.getTissueMaterialId());
+    TissueMaterial updatedTissueMaterial = get(tissueMaterial.getId());
     updatedTissueMaterial.setAlias(tissueMaterial.getAlias());
     updatedTissueMaterial.setDescription(tissueMaterial.getDescription());
     User user = authorizationManager.getCurrentUser();

@@ -181,7 +181,7 @@ public class HibernateSampleDao implements SampleDao, SampleStore {
           + "where parentId = :parentId "
           + "and sampleClassId = :sampleClassId");
       query.setLong("parentId", sample.getParent().getId());
-      query.setLong("sampleClassId", sample.getSampleAdditionalInfo().getSampleClass().getSampleClassId());
+      query.setLong("sampleClassId", sample.getSampleAdditionalInfo().getSampleClass().getId());
       Number result = ((Number) query.uniqueResult());
       int siblingNumber = result == null ? 1 : result.intValue() + 1;
       sample.getSampleAdditionalInfo().setSiblingNumber(siblingNumber);

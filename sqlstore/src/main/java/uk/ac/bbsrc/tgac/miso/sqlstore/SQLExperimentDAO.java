@@ -283,7 +283,7 @@ public class SQLExperimentDAO implements ExperimentStore {
     params.addValue("accession", experiment.getAccession());
     params.addValue("description", experiment.getDescription());
     params.addValue("title", experiment.getTitle());
-    params.addValue("platform_platformId", experiment.getPlatform().getPlatformId());
+    params.addValue("platform_platformId", experiment.getPlatform().getId());
     params.addValue("securityProfile_profileId", securityProfileId);
     params.addValue("study_studyId", experiment.getStudy().getId());
     params.addValue("lastModifier", experiment.getLastModifier().getUserId());

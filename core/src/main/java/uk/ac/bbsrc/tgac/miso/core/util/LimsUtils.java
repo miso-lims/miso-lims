@@ -799,8 +799,8 @@ public class LimsUtils {
 
   public static boolean isValidRelationship(Iterable<SampleValidRelationship> relations, SampleClass parent, SampleClass child) {
     for (SampleValidRelationship relation : relations) {
-      if (relation.getParent().getSampleClassId() == parent.getSampleClassId()
-          && relation.getChild().getSampleClassId() == child.getSampleClassId()) {
+      if (relation.getParent().getId() == parent.getId()
+          && relation.getChild().getId() == child.getId()) {
         return true;
       }
     }

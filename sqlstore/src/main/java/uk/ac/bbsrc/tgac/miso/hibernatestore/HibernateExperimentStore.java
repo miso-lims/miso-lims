@@ -47,7 +47,7 @@ public class HibernateExperimentStore extends HibernateDaoSupport implements Sto
   @Transactional(readOnly = false)
   public long save(Experiment experiment) throws IOException {
     getHibernateTemplate().merge(experiment);
-    return experiment.getExperimentId();
+    return experiment.getId();
   }
 
   @Override

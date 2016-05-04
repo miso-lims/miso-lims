@@ -99,10 +99,10 @@ public class HibernateLibraryAdditionalInfoDaoTest extends AbstractDAOTest {
     library.setId(2L);
     info.setLibrary(library);
     TissueOrigin origin = new TissueOriginImpl();
-    origin.setTissueOriginId(1L);
+    origin.setId(1L);
     info.setTissueOrigin(origin);
     TissueType type = new TissueTypeImpl();
-    type.setTissueTypeId(1L);
+    type.setId(1L);
     info.setTissueType(type);
     
     Long newId = dao.addLibraryAdditionalInfo(info);
@@ -113,9 +113,9 @@ public class HibernateLibraryAdditionalInfoDaoTest extends AbstractDAOTest {
     assertEquals(user.getUserId(), saved.getCreatedBy().getUserId());
     assertEquals(user.getUserId(), saved.getUpdatedBy().getUserId());
     assertEquals(library.getId(), saved.getLibrary().getId());
-    assertEquals(kit.getKitDescriptorId(), saved.getPrepKit().getKitDescriptorId());
-    assertEquals(origin.getTissueOriginId(), saved.getTissueOrigin().getTissueOriginId());
-    assertEquals(type.getTissueTypeId(), saved.getTissueType().getTissueTypeId());
+    assertEquals(kit.getId(), saved.getPrepKit().getId());
+    assertEquals(origin.getId(), saved.getTissueOrigin().getId());
+    assertEquals(type.getId(), saved.getTissueType().getId());
   }
   
   @Test
@@ -132,14 +132,14 @@ public class HibernateLibraryAdditionalInfoDaoTest extends AbstractDAOTest {
     
     LibraryAdditionalInfo info = dao.getLibraryAdditionalInfo(1L);
     assertNotNull(info);
-    assertEquals(Long.valueOf(1L), info.getPrepKit().getKitDescriptorId());
+    assertEquals(Long.valueOf(1L), info.getPrepKit().getId());
     KitDescriptor newKit = mockKitDescriptorInStore(2L);
     info.setPrepKit(newKit);
     Date oldDate = info.getLastUpdated();
     
     dao.update(info);
     LibraryAdditionalInfo updated = dao.getLibraryAdditionalInfo(1L);
-    assertEquals(newKit.getKitDescriptorId(), updated.getPrepKit().getKitDescriptorId());
+    assertEquals(newKit.getId(), updated.getPrepKit().getId());
     assertFalse(oldDate.equals(updated.getLastUpdated()));
   }
   
@@ -153,7 +153,7 @@ public class HibernateLibraryAdditionalInfoDaoTest extends AbstractDAOTest {
    */
   private KitDescriptor mockKitDescriptorInStore(Long id) throws IOException {
     KitDescriptor kd = Mockito.mock(KitDescriptor.class);
-    Mockito.when(kd.getKitDescriptorId()).thenReturn(id);
+    Mockito.when(kd.getId()).thenReturn(id);
     Mockito.when(kitStore.getKitDescriptorById(id)).thenReturn(kd);
     return kd;
   }

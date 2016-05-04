@@ -49,12 +49,12 @@ public class SampleNumberPerProjectImpl implements SampleNumberPerProject {
   private Date lastUpdated;
 
   @Override
-  public Long getSampleNumberPerProjectId() {
+  public Long getId() {
     return sampleNumberPerProjectId;
   }
 
   @Override
-  public void setSampleNumberPerProjectId(Long sampleNumberPerProjectId) {
+  public void setId(Long sampleNumberPerProjectId) {
     this.sampleNumberPerProjectId = sampleNumberPerProjectId;
   }
 

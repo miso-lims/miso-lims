@@ -6,9 +6,9 @@ import com.eaglegenomics.simlims.core.User;
 
 public interface SampleNumberPerProject {
 
-  Long getSampleNumberPerProjectId();
+  Long getId();
 
-  void setSampleNumberPerProjectId(Long sampleNumberPerProjectId);
+  void setId(Long sampleNumberPerProjectId);
 
   User getCreatedBy();
 

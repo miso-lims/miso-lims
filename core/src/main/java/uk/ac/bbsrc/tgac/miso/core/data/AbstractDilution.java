@@ -26,7 +26,6 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -62,20 +61,6 @@ public abstract class AbstractDilution implements Dilution, Comparable {
   private String identificationBarcode;
   private String dilutionUserName;
   private final Set<Pool<Dilution>> pools = new HashSet<Pool<Dilution>>();
-
-  @Override
-  @CoverageIgnore
-  @Deprecated
-  public Long getDilutionId() {
-    return this.dilutionId;
-  }
-
-  @Override
-  @CoverageIgnore
-  @Deprecated
-  public void setDilutionId(Long dilutionId) {
-    this.dilutionId = dilutionId;
-  }
 
   @Override
   public long getId() {

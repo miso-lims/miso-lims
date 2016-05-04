@@ -45,12 +45,6 @@ public interface Submission<I, O, R> extends Submittable<O>, SecurableByProfile,
 
   public static final Long UNSAVED_ID = 0L;
 
-  @Deprecated
-  public Long getSubmissionId();
-
-  @Deprecated
-  public void setSubmissionId(Long submissionId);
-
   public void setId(long id);
 
   public void setName(String name);

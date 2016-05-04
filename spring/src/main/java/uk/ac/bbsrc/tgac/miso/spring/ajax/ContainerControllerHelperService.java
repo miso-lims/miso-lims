@@ -136,19 +136,19 @@ public class ContainerControllerHelperService {
           SequencerReference sr = requestManager.getSequencerReferenceById(sequencerReferenceId);
           Map<String, Object> responseMap = new HashMap<>();
           responseMap.put("partitions", getContainerOptions(sr));
-          responseMap.put("platformId", sr.getPlatform().getPlatformId());
+          responseMap.put("platformId", sr.getPlatform().getId());
           return JSONUtils.JSONObjectResponse(responseMap);
         } else {
           SequencerReference sr = requestManager.getSequencerReferenceById(sequencerReferenceId);
           lf.setPlatform(sr.getPlatform());
           Map<String, Object> responseMap = new HashMap<>();
-          responseMap.put("platformId", sr.getPlatform().getPlatformId());
+          responseMap.put("platformId", sr.getPlatform().getId());
           return JSONUtils.JSONObjectResponse(responseMap);
         }
       } else {
         Map<String, Object> responseMap = new HashMap<>();
         SequencerReference sr = requestManager.getSequencerReferenceById(sequencerReferenceId);
-        responseMap.put("platformId", sr.getPlatform().getPlatformId());
+        responseMap.put("platformId", sr.getPlatform().getId());
         return JSONUtils.JSONObjectResponse(responseMap);
       }
     } catch (IOException e) {

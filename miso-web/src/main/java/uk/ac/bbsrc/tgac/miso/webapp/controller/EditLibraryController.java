@@ -381,21 +381,21 @@ public class EditLibraryController {
     JSONArray selectionTypes = new JSONArray();
     for (final LibrarySelectionType lst : populateLibrarySelectionTypes()) {
       JSONObject selType = new JSONObject();
-      selType.put("id", lst.getLibrarySelectionTypeId());
+      selType.put("id", lst.getId());
       selType.put("alias", lst.getName());
       selectionTypes.add(selType);
     }
     JSONArray strategyTypes = new JSONArray();
     for (final LibraryStrategyType lstrat : populateLibraryStrategyTypes()) {
       JSONObject stratType = new JSONObject();
-      stratType.put("id", lstrat.getLibraryStrategyTypeId());
+      stratType.put("id", lstrat.getId());
       stratType.put("alias", lstrat.getName());
       strategyTypes.add(stratType);
     }
     JSONArray libraryTypes = new JSONArray();
     for (final LibraryType lt : populateLibraryTypes()) {
       JSONObject libType = new JSONObject();
-      libType.put("id", lt.getLibraryTypeId());
+      libType.put("id", lt.getId());
       libType.put("alias", lt.getDescription());
       libType.put("platform", lt.getPlatformType());
       libraryTypes.add(libType);
@@ -587,7 +587,7 @@ public class EditLibraryController {
       LibraryAdditionalInfo libraryAdditionalInfo = libraryAdditionalInfoDao.getLibraryAdditionalInfoByLibraryId(libraryId);
       library.setLibraryAdditionalInfo(libraryAdditionalInfo);
       if (libraryAdditionalInfo != null && libraryAdditionalInfo.getPrepKit() != null) {
-        libraryPrepKitId = libraryAdditionalInfo.getPrepKit().getKitDescriptorId();
+        libraryPrepKitId = libraryAdditionalInfo.getPrepKit().getId();
       } else {
         libraryPrepKitId = -1L;
       }
@@ -761,7 +761,7 @@ public class EditLibraryController {
       for (Sample sample : requestManager.getSamplesByIdList(idList)) {
         if (sampleClass == null) {
           sampleClass = sample.getSampleAdditionalInfo().getSampleClass();
-        } else if (sampleClass.getSampleClassId() != sample.getSampleAdditionalInfo().getSampleClass().getSampleClassId()) {
+        } else if (sampleClass.getId() != sample.getSampleAdditionalInfo().getSampleClass().getId()) {
           throw new IOException("Can only create libraries when samples all have the same class.");
         }
         LibraryDto library = new LibraryDto();

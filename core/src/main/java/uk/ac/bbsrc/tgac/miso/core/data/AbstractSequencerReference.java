@@ -171,7 +171,7 @@ public abstract class AbstractSequencerReference implements SequencerReference {
   @Override
   public String toString() {
     return "AbstractSequencerReference [id=" + id + ", name=" + name
-        + ", platform=" + String.valueOf(platform.getPlatformId()) + ", available=" + available
+        + ", platform=" + String.valueOf(platform.getId()) + ", available=" + available
         + ", ip=" + String.valueOf(ip)
         + ", serialNumber=" + serialNumber
         + ", dateCommissioned=" + String.valueOf(dateCommissioned)

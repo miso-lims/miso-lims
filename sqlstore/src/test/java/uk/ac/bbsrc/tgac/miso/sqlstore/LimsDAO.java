@@ -322,7 +322,7 @@ public class LimsDAO extends LimsDAOTestCase {
 
       for (Platform d : random(getPlatformDAO(), actual, 5)) {
         Assert.assertNotNull(d);
-        Assert.assertNotNull(d.getPlatformId());
+        Assert.assertNotNull(d.getId());
       }
     } catch (Exception e) {
       e.printStackTrace();
@@ -510,7 +510,7 @@ public class LimsDAO extends LimsDAOTestCase {
 
       for (Status d : random(getStatusDAO(), actual, 5)) {
         Assert.assertNotNull(d);
-        Assert.assertNotNull(d.getStatusId());
+        Assert.assertNotNull(d.getId());
       }
     } catch (Exception e) {
       e.printStackTrace();

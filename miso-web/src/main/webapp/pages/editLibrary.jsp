@@ -285,7 +285,7 @@
       </td>
       <script type="text/javascript">
         jQuery(document).ready(function () {
-          Library.ui.changePlatformNameWithLibraryType(jQuery("#platformNames"), '${library.libraryType.libraryTypeId}');
+          Library.ui.changePlatformNameWithLibraryType(jQuery("#platformNames"), '${library.libraryType.id}');
         });
       </script>
     </c:when>
@@ -304,7 +304,7 @@
       <td>Library Selection Type:</td>
       <td>
         <form:select id="librarySelectionTypes" path="librarySelectionType" items="${librarySelectionTypes}"
-                     itemLabel="name" itemValue="librarySelectionTypeId"/>
+                     itemLabel="name" itemValue="id"/>
       </td>
     </c:when>
     <c:otherwise>
@@ -323,7 +323,7 @@
       <td>Library Strategy Type:</td>
       <td>
         <form:select id="libraryStrategyTypes" path="libraryStrategyType" items="${libraryStrategyTypes}"
-                     itemLabel="name" itemValue="libraryStrategyTypeId"/>
+                     itemLabel="name" itemValue="id"/>
       </td>
     </c:when>
     <c:otherwise>

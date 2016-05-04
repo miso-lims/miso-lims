@@ -114,7 +114,7 @@ public class SampleGroupController extends RestController {
   public ResponseEntity<?> updateSampleGroup(@PathVariable("id") Long id, @RequestBody SampleGroupDto sampleGroupDto,
       HttpServletResponse response) throws IOException {
     SampleGroupId sampleGroup = Dtos.to(sampleGroupDto);
-    sampleGroup.setSampleGroupId(id);
+    sampleGroup.setId(id);
     sampleGroupService.update(sampleGroup);
     return new ResponseEntity<>(HttpStatus.OK);
   }

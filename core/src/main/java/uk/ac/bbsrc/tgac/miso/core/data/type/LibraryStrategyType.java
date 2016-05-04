@@ -56,7 +56,7 @@ public class LibraryStrategyType implements Comparable, Serializable {
    * 
    * @return Long libraryStrategyTypeId.
    */
-  public Long getLibraryStrategyTypeId() {
+  public Long getId() {
     return libraryStrategyTypeId;
   }
 
@@ -66,7 +66,7 @@ public class LibraryStrategyType implements Comparable, Serializable {
    * @param libraryStrategyTypeId
    *          libraryStrategyTypeId.
    */
-  public void setLibraryStrategyTypeId(Long libraryStrategyTypeId) {
+  public void setId(Long libraryStrategyTypeId) {
     this.libraryStrategyTypeId = libraryStrategyTypeId;
   }
 
@@ -121,8 +121,8 @@ public class LibraryStrategyType implements Comparable, Serializable {
 
   @Override
   public int hashCode() {
-    if (getLibraryStrategyTypeId() != UNSAVED_ID) {
-      return getLibraryStrategyTypeId().intValue();
+    if (getId() != UNSAVED_ID) {
+      return getId().intValue();
     } else {
       int hashcode = -1;
       if (getName() != null) hashcode = 37 * hashcode + getName().hashCode();
@@ -138,8 +138,8 @@ public class LibraryStrategyType implements Comparable, Serializable {
     int name = getName().compareTo(t.getName());
     if (name != 0) return name;
 
-    if (getLibraryStrategyTypeId() < t.getLibraryStrategyTypeId()) return -1;
-    if (getLibraryStrategyTypeId() > t.getLibraryStrategyTypeId()) return 1;
+    if (getId() < t.getId()) return -1;
+    if (getId() > t.getId()) return 1;
     return 0;
   }
 }

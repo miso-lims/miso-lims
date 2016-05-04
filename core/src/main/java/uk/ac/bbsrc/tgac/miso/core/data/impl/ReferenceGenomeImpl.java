@@ -21,12 +21,12 @@ public class ReferenceGenomeImpl implements ReferenceGenome {
   private String alias;
 
   @Override
-  public Long getReferenceGenomeId() {
+  public Long getId() {
     return referenceGenomeId;
   }
 
   @Override
-  public void setReferenceGenomeId(Long referenceGenomeId) {
+  public void setId(Long referenceGenomeId) {
         this.referenceGenomeId = referenceGenomeId;
   }
 

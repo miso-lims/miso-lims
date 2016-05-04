@@ -134,7 +134,7 @@ public class LibraryAdditionalInfoImpl implements LibraryAdditionalInfo {
     if (prepKit == null) {
       this.kitDescriptorId = null;
     } else {
-      this.kitDescriptorId = prepKit.getKitDescriptorId();
+      this.kitDescriptorId = prepKit.getId();
     }
   }
 

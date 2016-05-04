@@ -45,7 +45,6 @@ import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
-
 /**
  * Skeleton implementation of a Study
  * 
@@ -113,18 +112,6 @@ public abstract class AbstractStudy implements Study {
   @Override
   public void setProject(Project project) {
     this.project = project;
-  }
-
-  @Override
-  @Deprecated
-  public Long getStudyId() {
-    return studyId;
-  }
-
-  @Override
-  @Deprecated
-  public void setStudyId(Long studyId) {
-    this.studyId = studyId;
   }
 
   @Override
