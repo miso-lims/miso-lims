@@ -840,8 +840,8 @@ public class EditLibraryController {
             library.getLibraryAdditionalInfo().setLibraryDesign(design);
             library.setLibrarySelectionType(requestManager.getLibrarySelectionTypeById(design.getLibrarySelectionType()));
             library.setLibraryStrategyType(requestManager.getLibraryStrategyTypeById(design.getLibraryStrategyType()));
-            library.setPaired(design.getPaired());
-            library.setPlatformName(design.getPlatform().getKey());
+            library.setLibraryType(design.getLibraryType());
+            library.setPlatformName(design.getLibraryType().getPlatformType());
           }
         }
         if (library.getId() == AbstractLibrary.UNSAVED_ID) {
