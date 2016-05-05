@@ -22,8 +22,6 @@
  */
 
 var Sample = Sample || {
-  sampleOptions: null,
-  
   deleteSample: function (sampleId, successfunc) {
     if (confirm("Are you sure you really want to delete SAM" + sampleId + "? This operation is permanent!")) {
       Fluxion.doAjax(
@@ -140,7 +138,7 @@ var Sample = Sample || {
       jQuery('#concentration').attr('data-parsley-type', 'number');
       
       var selectedId = jQuery('#sampleClass option:selected').val();
-      var sampleCategory = Sample.ui.getSampleCategoryByClassId(selectedId);
+      var sampleCategory = Sample.options.getSampleCategoryByClassId(selectedId);
       switch (sampleCategory) {
       case 'Tissue':
         // Cellularity validation
@@ -585,19 +583,48 @@ Sample.barcode = {
   }
 };
 
+Sample.options = {
+  
+  all: null,
+  
+  getSampleGroupsBySubProjectId: function(subProjectId) {
+    return Sample.options.all.sampleGroupsDtos.filter(function (sampleGroup) {
+      return sampleGroup.subprojectId == subProjectId;
+    });
+  },
+  
+  getSampleGroupsByProjectId: function(projectId) {
+    return Sample.options.all.sampleGroupsDtos.filter(function (sampleGroup) {
+      return sampleGroup.projectId == projectId && !sampleGroup.subprojectId;
+    });
+  },
+  
+  getSubProjectsByProjectId: function(projectId) {
+    return Sample.options.all.subprojectsDtos.filter(function (subProject) {
+      return subProject.parentProjectId == projectId;
+    });
+  },
+  
+  getSampleCategoryByClassId: function(sampleClassId) {
+    var results = Sample.options.all.sampleClassesDtos.filter(function (sampleClass) {
+      return sampleClass.id == sampleClassId;
+    });
+    return results.length > 0 ? results[0].sampleCategory : null;
+  }
+  
+};
+
 Sample.ui = {
   
   filterSampleGroupOptions: function() {
     var validSampleGroups = [];
-    var subProjectId = jQuery('#subProject option:selected').val();
+    var subProjectId = Sample.ui.getSelectedSubprojectId();
     if (subProjectId) {
-      console.log('filtering samplegroups by subproject ' + subProjectId);
-      validSampleGroups = Sample.ui.getSampleGroupsBySubProjectId(subProjectId);
+      validSampleGroups = Sample.options.getSampleGroupsBySubProjectId(subProjectId);
     } else {
-      var projectId = jQuery('#project option:selected').val();
+      var projectId = Sample.ui.getSelectedProjectId();
       if (projectId) {
-        console.log('filtering samplegroups by project ' + projectId);
-        validSampleGroups = Sample.ui.getSampleGroupsByProjectId(projectId);
+        validSampleGroups = Sample.options.getSampleGroupsByProjectId(projectId);
       }
     }
     
@@ -606,18 +633,6 @@ Sample.ui = {
     for (var i = 0, l = validSampleGroups.length; i < l; i++) {
       jQuery('#sampleGroup').append('<option value = "' + validSampleGroups[i].id + '">' + validSampleGroups[i].groupId + '</option>');
     }
-  },
-  
-  getSampleGroupsBySubProjectId: function(subProjectId) {
-    return Sample.sampleOptions.sampleGroupsDtos.filter(function (sampleGroup) {
-      return sampleGroup.subprojectId == subProjectId;
-    });
-  },
-  
-  getSampleGroupsByProjectId: function(projectId) {
-    return Sample.sampleOptions.sampleGroupsDtos.filter(function (sampleGroup) {
-      return sampleGroup.projectId == projectId;
-    });
   },
   
   projectChanged: function() {
@@ -630,8 +645,8 @@ Sample.ui = {
   },
   
   filterSubProjectOptions: function() {
-    var projectId = jQuery('#project option:selected').val();
-    var subProjects = Sample.ui.getSubProjectsByProjectId(projectId);
+    var projectId = Sample.ui.getSelectedProjectId();
+    var subProjects = Sample.options.getSubProjectsByProjectId(projectId);
     jQuery('#subProject').empty()
         .append('<option value = "">None</option>');
     for (var i = 0, l = subProjects.length; i < l; i++) {
@@ -639,15 +654,17 @@ Sample.ui = {
     }
   },
   
-  getSubProjectsByProjectId: function(projectId) {
-    return Sample.sampleOptions.subprojectsDtos.filter(function (subProject) {
-      return subProject.parentProjectId == projectId;
-    });
+  getSelectedProjectId: function() {
+    return jQuery('#project option:selected').val() || jQuery('#project').val();
+  },
+  
+  getSelectedSubprojectId: function() {
+    return jQuery('#subProject option:selected').val() || jQuery('#subProject').val();
   },
   
   sampleClassChanged: function() {
     var selectedId = jQuery('#sampleClass option:selected').val();
-    var sampleCategory = Sample.ui.getSampleCategoryByClassId(selectedId);
+    var sampleCategory = Sample.options.getSampleCategoryByClassId(selectedId);
     switch (sampleCategory) {
     case 'Tissue':
       Sample.ui.setUpForTissue();
@@ -661,13 +678,6 @@ Sample.ui = {
       Sample.ui.hideAnalyteFields();
       break;
     }
-  },
-  
-  getSampleCategoryByClassId: function(sampleClassId) {
-    var results = Sample.sampleOptions.sampleClassesDtos.filter(function (sampleClass) {
-      return sampleClass.id == sampleClassId;
-    });
-    return results.length > 0 ? results[0].sampleCategory : null;
   },
   
   hideTissueFields: function() {

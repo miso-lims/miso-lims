@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -73,6 +74,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.AbstractSampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.EntityGroup;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
+import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
@@ -116,7 +118,6 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.service.LabService;
 import uk.ac.bbsrc.tgac.miso.service.QcPassedDetailService;
 import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
-import uk.ac.bbsrc.tgac.miso.service.SampleGroupService;
 import uk.ac.bbsrc.tgac.miso.service.SamplePurposeService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.TissueMaterialService;
@@ -396,15 +397,21 @@ public class EditSampleController {
   private SampleClassService sampleClassService;
   
   @ModelAttribute("sampleClasses")
-  public Collection<SampleClass> getSampleClasses() throws IOException {
-    Collection<SampleClass> sampleClasses =  sampleClassService.getAll();
+  public List<SampleClass> getSampleClasses() throws IOException {
+    List<SampleClass> sampleClasses = new ArrayList<>(sampleClassService.getAll());
     // Can't manually create Identities, so remove the option
     for (Iterator<SampleClass> i = sampleClasses.iterator(); i.hasNext();) {
       SampleClass sc = i.next();
-      if ("Identity".equals(sc.getSampleCategory())) {
+      if (Identity.CATEGORY_NAME.equals(sc.getSampleCategory())) {
         i.remove();
       }
     }
+    Collections.sort(sampleClasses, new Comparator<SampleClass>() {
+      @Override
+      public int compare(SampleClass o1, SampleClass o2) {
+        return o1.getAlias().compareTo(o2.getAlias());
+      }
+    });
     return sampleClasses;
   }
   
@@ -412,56 +419,90 @@ public class EditSampleController {
   private TissueOriginService tissueOriginService;
   
   @ModelAttribute("tissueOrigins")
-  public Collection<TissueOrigin> getTissueOrigins() throws IOException {
-    return tissueOriginService.getAll();
+  public List<TissueOrigin> getTissueOrigins() throws IOException {
+    List<TissueOrigin> list = new ArrayList<>(tissueOriginService.getAll());
+    Collections.sort(list, new Comparator<TissueOrigin>() {
+      @Override
+      public int compare(TissueOrigin o1, TissueOrigin o2) {
+        return o1.getDescription().compareTo(o2.getDescription());
+      }
+    });
+    return list;
   }
   
   @Autowired
   private TissueTypeService tissueTypeService;
   
   @ModelAttribute("tissueTypes")
-  public Collection<TissueType> getTissueTypes() throws IOException {
-    return tissueTypeService.getAll();
+  public List<TissueType> getTissueTypes() throws IOException {
+    List<TissueType> list = new ArrayList<>(tissueTypeService.getAll());
+    Collections.sort(list, new Comparator<TissueType>() {
+      @Override
+      public int compare(TissueType o1, TissueType o2) {
+        return o1.getDescription().compareTo(o2.getDescription());
+      }
+    });
+    return list;
   }
   
   @Autowired
   private QcPassedDetailService qcpassedDetailService;
   
   @ModelAttribute("qcPassedDetails")
-  public Collection<QcPassedDetail> getQcPassedDetails() throws IOException {
-    return qcpassedDetailService.getAll();
+  public List<QcPassedDetail> getQcPassedDetails() throws IOException {
+    List<QcPassedDetail> list = new ArrayList<>(qcpassedDetailService.getAll());
+    Collections.sort(list, new Comparator<QcPassedDetail>() {
+      @Override
+      public int compare(QcPassedDetail o1, QcPassedDetail o2) {
+        return o1.getDescription().compareTo(o2.getDescription());
+      }
+    });
+    return list;
   }
   
   @Autowired
   private LabService labService;
   
   @ModelAttribute("labs")
-  public Collection<Lab> getLabs() throws IOException {
-    return labService.getAll();
+  public List<Lab> getLabs() throws IOException {
+    List<Lab> list = new ArrayList<>(labService.getAll());
+    Collections.sort(list, new Comparator<Lab>() {
+      @Override
+      public int compare(Lab o1, Lab o2) {
+        return o1.getAlias().compareTo(o2.getAlias());
+      }
+    });
+    return list;
   }
   
   @Autowired
   private SamplePurposeService samplePurposeService;
   
   @ModelAttribute("samplePurposes")
-  public Collection<SamplePurpose> getSamplePurposes() throws IOException {
-    return samplePurposeService.getAll();
-  }
-  
-  @Autowired
-  private SampleGroupService sampleGroupService;
-  
-  @ModelAttribute("sampleGroups")
-  public Collection<SampleGroupId> getSampleGroups() throws IOException {
-    return sampleGroupService.getAll();
+  public List<SamplePurpose> getSamplePurposes() throws IOException {
+    List<SamplePurpose> list = new ArrayList<>(samplePurposeService.getAll());
+    Collections.sort(list, new Comparator<SamplePurpose>() {
+      @Override
+      public int compare(SamplePurpose o1, SamplePurpose o2) {
+        return o1.getAlias().compareTo(o2.getAlias());
+      }
+    });
+    return list;
   }
   
   @Autowired
   private TissueMaterialService tissueMaterialService;
   
   @ModelAttribute("tissueMaterials")
-  public Collection<TissueMaterial> getTissueMaterials() throws IOException {
-    return tissueMaterialService.getAll();
+  public List<TissueMaterial> getTissueMaterials() throws IOException {
+    List<TissueMaterial> list = new ArrayList<>(tissueMaterialService.getAll());
+    Collections.sort(list, new Comparator<TissueMaterial>() {
+      @Override
+      public int compare(TissueMaterial o1, TissueMaterial o2) {
+        return o1.getAlias().compareTo(o2.getAlias());
+      }
+    });
+    return list;
   }
   
   @ModelAttribute("strStatusOptions")

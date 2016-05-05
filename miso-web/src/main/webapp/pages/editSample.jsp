@@ -183,7 +183,7 @@
       </td>
     </tr>
     <tr>
-      <td>Project ID:</td>
+      <td>Project:</td>
       <c:choose>
         <c:when test="${empty sample.project}">
           <td>
@@ -191,7 +191,7 @@
               <option value="">SELECT</option>
               <c:forEach items="${accessibleProjects}" var="proj">
                 <option value="${proj.id}" <c:if test="${proj.id == sample.project.id}">selected="selected"</c:if>>
-                    ${proj.alias}
+                    ${proj.name}: ${proj.alias}
                 </option>
               </c:forEach>
             </form:select>
@@ -285,7 +285,7 @@
   <c:if test="${!empty sample.sampleAdditionalInfo}">
     
     <script type="text/javascript">
-      Sample.sampleOptions = ${sampleOptions};
+      Sample.options.all = ${sampleOptions};
       
       <c:if test="${sample.id == 0}">
         jQuery(document).ready(function () {
@@ -339,14 +339,8 @@
           <td>
             <c:choose>
               <c:when test="${sample.id == 0}">
-                <form:select id="sampleClass" path="sampleAdditionalInfo.sampleClass" onchange="Sample.ui.sampleClassChanged();">
-                  <option value="">SELECT</option>
-                  <c:forEach items="${sampleClasses}" var="sampleClass">
-                    <option value="${sampleClass.sampleClassId}" <c:if test="${sampleClass.sampleClassId == sample.sampleAdditionalInfo.sampleClass.sampleClassId}">selected="selected"</c:if>>
-                        ${sampleClass.alias}
-                    </option>
-                  </c:forEach>
-                </form:select>
+                <miso:select id="sampleClass" path="sampleAdditionalInfo.sampleClass" items="${sampleClasses}" itemLabel="alias" 
+                    itemValue="sampleClassId" defaultLabel="SELECT" defaultValue="" onchange="Sample.ui.sampleClassChanged();"/>
               </c:when>
               <c:otherwise>
                 ${sample.sampleAdditionalInfo.sampleClass.alias}
@@ -359,14 +353,8 @@
           <td>
             <c:choose>
               <c:when test="${sample.id == 0}">
-                <form:select id="tissueOrigin" path="sampleAdditionalInfo.tissueOrigin">
-                  <option value="">SELECT</option>
-                  <c:forEach items="${tissueOrigins}" var="tissueOrigin">
-                    <option value="${tissueOrigin.tissueOriginId}" <c:if test="${tissueOrigin.tissueOriginId == sample.sampleAdditionalInfo.tissueOrigin.tissueOriginId}">selected="selected"</c:if>>
-                        ${tissueOrigin.description}
-                    </option>
-                  </c:forEach>
-                </form:select>
+                <miso:select id="tissueOrigin" path="sampleAdditionalInfo.tissueOrigin" items="${tissueOrigins}" itemLabel="description" 
+                    itemValue="tissueOriginId" defaultLabel="SELECT" defaultValue=""/>
               </c:when>
               <c:otherwise>
                 ${sample.sampleAdditionalInfo.tissueOrigin.description}
@@ -397,18 +385,12 @@
         <tr>
           <td class="h">QC Details:</td>
           <td>
-            <form:select id="qcPassedDetail" path="sampleAdditionalInfo.qcPassedDetail">
-              <option value="">None</option>
-              <c:forEach items="${qcPassedDetails}" var="qcPassedDetail">
-                <option value="${qcPassedDetail.qcPassedDetailId}" <c:if test="${qcPassedDetail.qcPassedDetailId == sample.sampleAdditionalInfo.qcPassedDetail.qcPassedDetailId}">selected="selected"</c:if>>
-                    ${qcPassedDetail.description}
-                </option>
-              </c:forEach>
-            </form:select>
+            <miso:select id="qcPassedDetail" path="sampleAdditionalInfo.qcPassedDetail" items="${qcPassedDetails}" itemLabel="description" 
+                    itemValue="qcPassedDetailId" defaultLabel="None" defaultValue=""/>
           </td>                               
         </tr>
         <tr>
-          <td class="h">Sub Project:</td>
+          <td class="h">Sub-project:</td>
           <td>
             <c:choose>
               <c:when test="${sample.id == 0}">
@@ -422,7 +404,15 @@
                 </form:select>
               </c:when>
               <c:otherwise>
-                ${!empty sample.sampleAdditionalInfo.subproject ? sample.sampleAdditionalInfo.subproject.alias : 'n/a'}
+                <c:choose>
+                  <c:when test="!empty sample.sampleAdditionalInfo.subproject">
+                    ${sample.sampleAdditionalInfo.subproject.alias}
+                    <input type="hidden" value="${sample.sampleAdditionalInfo.subproject.subprojectId}" name="subProject" id="subProject"/>
+                  </c:when>
+                  <c:otherwise>
+                    n/a
+                  </c:otherwise>
+                </c:choose>
               </c:otherwise>
             </c:choose>
           </td>                               
@@ -498,15 +488,9 @@
             <tr>
               <td class="h">Purpose:</td>
               <td>
-                <form:select id="samplePurpose" path="sampleAnalyte.samplePurpose">
-                  <option value="">Unknown</option>
-                  <c:forEach items="${samplePurposes}" var="samplePurpose">
-                    <option value="${samplePurpose.samplePurposeId}" <c:if test="${samplePurpose.samplePurposeId == sample.sampleAnalyte.samplePurpose.samplePurposeId}">selected="selected"</c:if>>
-                        ${samplePurpose.alias}
-                    </option>
-                  </c:forEach>
-                </form:select>
-              </td>                               
+                <miso:select id="samplePurpose" path="sampleAnalyte.samplePurpose" items="${samplePurposes}" itemLabel="alias" 
+                    itemValue="samplePurposeId" defaultLabel="Unknown" defaultValue=""/>
+              </td>
             </tr>
             <tr>
               <td class="h">Group ID:</td>
@@ -526,20 +510,14 @@
                     ${!empty sample.sampleAnalyte.sampleGroup ? sample.sampleAnalyte.sampleGroup.groupId : 'n/a'}
                   </c:otherwise>
                 </c:choose>
-              </td>                              
+              </td>
             </tr>
             <tr>
               <td class="h">Tissue Material:</td>
               <td>
-                <form:select id="tissueMaterial" path="sampleAnalyte.tissueMaterial">
-                  <option value="">Unknown</option>
-                  <c:forEach items="${tissueMaterials}" var="tissueMaterial">
-                    <option value="${tissueMaterial.tissueMaterialId}" <c:if test="${tissueMaterial.tissueMaterialId == sample.sampleAnalyte.tissueMaterial.tissueMaterialId}">selected="selected"</c:if>>
-                        ${tissueMaterial.alias}
-                    </option>
-                  </c:forEach>
-                </form:select>
-              </td>                               
+                <miso:select id="tissueMaterial" path="sampleAnalyte.tissueMaterial" items="${tissueMaterials}" itemLabel="alias" 
+                    itemValue="tissueMaterialId" defaultLabel="Unknown" defaultValue=""/>
+              </td>
             </tr>
             <tr>
               <td class="h">STR Status</td>
@@ -551,7 +529,7 @@
                     </option>
                   </c:forEach>
                 </form:select>
-              </td>                               
+              </td>
             </tr>
             <tr>
               <td class="h">Region:</td>
