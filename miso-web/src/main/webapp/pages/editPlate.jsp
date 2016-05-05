@@ -190,30 +190,6 @@
         <i>Please choose a material type above...</i>
       </td>
     </tr>
-      <%--
-        <tr>
-            <c:choose>
-                <c:when test="${empty plate.plateId or empty plate.tagBarcode}">
-                    <td>Tag Barcode:</td>
-                    <td>
-                        <form:select id="tagBarcodes" path="tagBarcode">
-                          <form:option value="" label="No Barcode"/>
-                          <form:options items="${availableTagBarcodes}" itemLabel="name" itemValue="id" />
-                        </form:select>
-                    </td>
-                </c:when>
-                <c:otherwise>
-                    <td>Tag Barcode:</td>
-                    <td>
-                        <form:select id="tagBarcodes" path="tagBarcode">
-                          <form:option value="" label="No Barcode"/>
-                          <form:options items="${availableTagBarcodes}" itemLabel="name" itemValue="id" />
-                        </form:select>
-                    </td>
-                </c:otherwise>
-            </c:choose>
-        </tr>
-        --%>
   </table>
     <%--
     <c:if test="${plate.id != 0}">

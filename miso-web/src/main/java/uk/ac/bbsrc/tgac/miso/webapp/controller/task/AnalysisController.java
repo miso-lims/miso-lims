@@ -139,7 +139,7 @@ public class AnalysisController {
             if (pable instanceof Dilution) {
               Library l = ((Dilution) pable).getLibrary();
               if ("RNA-Seq".equals(l.getLibraryStrategyType().getName())) naType = "rna";
-              for (TagBarcode tb : l.getTagBarcodes().values()) {
+              for (TagBarcode tb : l.getTagBarcodes()) {
                 indexValue = Integer.toString(tb.getSequence().length());
               }
             }

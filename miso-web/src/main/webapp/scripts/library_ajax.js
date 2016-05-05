@@ -106,25 +106,6 @@ var Library = Library || {
   }
 };
 
-Library.tagbarcode = {
-  populateAvailableBarcodesForStrategy: function (input) {
-    var self = this;
-    var strategy = jQuery(input).val();
-    if (!Utils.validation.isNullCheck(strategy)) {
-      Fluxion.doAjax(
-        'libraryControllerHelperService',
-        'getTagBarcodesForStrategy',
-        {'strategy': strategy, 'url': ajaxurl},
-        {'doOnSuccess': self.processTagBarcodeStrategyChange}
-      );
-    }
-  },
-
-  processTagBarcodeStrategyChange: function (json) {
-    jQuery('#tagBarcodesDiv').html(json.tagBarcodes);
-  }
-};
-
 Library.qc = {
   insertLibraryQCRow: function (libraryId, includeId) {
     if (!jQuery('#libraryQcTable').attr("qcInProgress")) {
@@ -677,46 +658,111 @@ Library.barcode = {
 };
 
 Library.ui = {
-  changePlatformName: function (input) {
+  changePlatformName: function (callback) {
     var self = this;
-    var platform = jQuery(input).val();
+    var platform = jQuery('#platformNames').val();
     Fluxion.doAjax(
       'libraryControllerHelperService',
       'changePlatformName',
       {'platform': platform, 'url': ajaxurl},
-      {'doOnSuccess': self.processPlatformChange}
-    );
-  },
-  changePlatformNameWithLibraryType: function (input, librarytype) {
-    var platform = jQuery(input).val();
-    Fluxion.doAjax(
-      'libraryControllerHelperService',
-      'changePlatformName',
-      {'platform': platform, 'url': ajaxurl},
-      {'doOnSuccess': function (json) {
-        jQuery('#libraryTypes').html(json.libraryTypes);
-        jQuery('#libraryTypes').val(librarytype);
-      }
-      }
-    );
-  },
-  changePlatformNameWithTagBarcodeStrategy: function (input, tagBarcodeStrategy) {
-    var platform = jQuery(input).val();
-    Fluxion.doAjax(
-      'libraryControllerHelperService',
-      'changePlatformName',
-      {'platform': platform, 'url': ajaxurl},
-      {'doOnSuccess': function (json) {
-        jQuery('#tagBarcodeStrategies').html(json.tagBarcodeStrategies);
-        jQuery('#tagBarcodeStrategies').val(tagBarcodeStrategy);
-      }
-      }
+      {'doOnSuccess': function(json) {
+        Library.ui.processPlatformChange(json);
+        if (callback) {
+          callback();
+        }
+      }}
     );
   },
 
   processPlatformChange: function (json) {
     jQuery('#libraryTypes').html(json.libraryTypes);
-    jQuery('#tagBarcodeStrategies').html(json.tagBarcodeStrategies);
+    Library.barcodeFamilies = json.barcodeFamilies;
+    var box = jQuery('#tagBarcodeFamily').empty()[0];
+    for (var i = 0; i < Library.barcodeFamilies.length; i++) {
+      var option = document.createElement("option");
+      option.value = Library.barcodeFamilies[i].id;
+      option.text = Library.barcodeFamilies[i].name;
+      box.appendChild(option);
+    }
+    Library.ui.updateBarcodes();
+  },
+
+  updateBarcodes: function () {
+    jQuery('#tagBarcodesDiv').empty();
+    Library.lastBarcodePosition = 0;
+    Library.ui.createBarcodeNextBox();
+  },
+
+  createBarcodeBox: function(id) {
+    var selectedBarcode = Library.ui.getCurrentBarcodeFamily().barcodes.filter(function(barcode) { return barcode.id == id; })[0];
+    Library.ui.createBarcodeSelect(selectedBarcode.position, id);
+  },
+
+  maxOfArray: function(array) {
+    return Math.max(0, Math.max.apply(Math, array));
+  },
+
+  maxBarcodePositionInFamily: function(family) {
+    return Library.ui.maxOfArray(family.barcodes.map(function(barcode) { return barcode.position; }));
+  },
+
+  createBarcodeNextBox: function() {
+    var family = Library.ui.getCurrentBarcodeFamily();
+    var max = Library.ui.maxBarcodePositionInFamily(family);
+    if (Library.lastBarcodePosition < max) {
+      Library.ui.createBarcodeSelect(max, null);
+    } else {
+      var container = jQuery('#tagBarcodesDiv');
+      if (container.children().length == 0) {
+        container.text("No barcodes available.");
+      }
+    }
+    var container = document.getElementById('tagBarcodesDiv');
+    // If this barcode family requires fewer barcodes than previously selected, we need to null them out in the form input or Spring will create an array with a mix of new and old barcodes.
+    var biggestMax = Library.ui.maxOfArray(Library.barcodeFamilies.map(Library.ui.maxBarcodePositionInFamily));
+    for (var j = Library.lastBarcodePosition; j < biggestMax; j++) {
+       var nullInput = document.createElement("input");
+       nullInput.type = "hidden";
+       nullInput.value = "";
+       nullInput.name = "tagBarcodes[" + j + "]";
+       container.appendChild(nullInput);
+    }
+  },
+
+  getCurrentBarcodeFamily: function() {
+    var familyId = jQuery('#tagBarcodeFamily').val();
+    var families = Library.barcodeFamilies.filter(function(family) { return family.id == familyId; });
+    if (families.length == 0) {
+      return { id : 0, barcodes :  [] };
+    } else {
+      return families[0];
+    }
+  },
+
+  createBarcodeSelect: function(newPosition, selectedId) {
+    var container = document.getElementById('tagBarcodesDiv');
+    for (var position = Library.lastBarcodePosition + 1; position <= newPosition; position++) {
+      var widget = document.createElement("select");
+      widget.name = "tagBarcodes[" + (position - 1) + "]";
+      if (position > 1) {
+        var nullOption = document.createElement("option");
+        nullOption.value = "";
+        nullOption.text = "(None)";
+        widget.appendChild(nullOption);
+      }
+      var barcodes = Library.ui.getCurrentBarcodeFamily().barcodes.filter(function(barcode) { return barcode.position == position; });
+      for (var i = 0; i < barcodes.length; i++) {
+        var option = document.createElement("option");
+        option.value = barcodes[i].id;
+        option.text = barcodes[i].name + " (" + barcodes[i].sequence + ")";
+        widget.appendChild(option);
+      }
+      if (position == newPosition) {
+        widget.value = selectedId;
+      }
+      container.appendChild(widget);
+    }
+    Library.lastBarcodePosition = newPosition;
   },
 
   fillDownTagBarcodeStrategySelects: function (tableselector, th) {
@@ -984,6 +1030,7 @@ Library.ui = {
               { "sTitle": "Type"},
               { "sTitle": "Sample Name", "sType": "no-sam"},
               { "sTitle": "QC Passed"},
+              { "sTitle": "Barcode"},
               { "sTitle": "ID", "bVisible": false}
             ],
             "bJQueryUI": true,
@@ -1132,7 +1179,7 @@ Library.ui = {
     var strategy = document.getElementById('libraryStrategyTypes');
     var libraryType = document.getElementById('libraryTypes');
     var platform = document.getElementById('platformNames');
-    if (designSelect.value == -1) {
+    if (designSelect == null || designSelect.value == -1) {
       selection.disabled = false;
       strategy.disabled = false;
       libraryType.disabled = false;

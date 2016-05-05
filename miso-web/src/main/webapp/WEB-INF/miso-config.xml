@@ -55,10 +55,6 @@
     <property name="fileUploadListener" ref="multipartUploadListener"/>
   </bean>
 
-  <bean id="fileUploadController" class="uk.ac.bbsrc.tgac.miso.webapp.controller.UploadController">
-    <property name="filesManager" ref="misoFileManager" />
-  </bean>
-
   <bean id="fileDownloadController" class="uk.ac.bbsrc.tgac.miso.webapp.controller.DownloadController">
     <property name="filesManager" ref="misoFileManager" />
   </bean>
@@ -78,10 +74,6 @@
   </bean>
 
   <bean name="issueTrackerManager" class="uk.ac.bbsrc.tgac.miso.core.manager.DummyIssueTrackerManager" />
-
-  <bean name="tagBarcodeStrategyResolverService" class="uk.ac.bbsrc.tgac.miso.core.service.tagbarcode.TagBarcodeStrategyResolverService">
-    <property name="requestManager" ref="requestManager" />
-  </bean>
 
   <bean id="entityNamingSchemeResolverService" name="entityNamingSchemeResolverService" class="uk.ac.bbsrc.tgac.miso.core.service.naming.MisoEntityNamingSchemeResolverService" />
 

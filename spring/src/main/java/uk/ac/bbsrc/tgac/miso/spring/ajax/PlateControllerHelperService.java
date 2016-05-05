@@ -365,15 +365,15 @@ public class PlateControllerHelperService {
 
               StringBuilder seqbuilder = new StringBuilder();
               if (!l.getTagBarcodes().isEmpty()) {
-                int count = 1;
-                Collection<TagBarcode> barcodes = l.getTagBarcodes().values();
-                for (TagBarcode tb : barcodes) {
-                  strategyName = tb.getStrategyName();
+                boolean first = true;
+                for (TagBarcode tb : l.getTagBarcodes()) {
                   seqbuilder.append(tb.getSequence());
-                  if (l.getTagBarcodes().values().size() > 1 && count < l.getTagBarcodes().values().size()) {
+                  if (first) {
+                    strategyName = tb.getFamily().getName();
+                    first = false;
+                  } else {
                     seqbuilder.append("-");
                   }
-                  count++;
                 }
               } else {
                 log.info("No tag barcodes!");

@@ -23,7 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.spring;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringBlankOrNull;
 
 import java.beans.PropertyEditorSupport;
 import java.io.IOException;
@@ -46,7 +46,6 @@ import org.springframework.beans.propertyeditors.CustomCollectionEditor;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.beans.propertyeditors.CustomMapEditor;
 import org.springframework.beans.propertyeditors.CustomNumberEditor;
-import org.springframework.util.NumberUtils;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.support.WebBindingInitializer;
 import org.springframework.web.context.request.WebRequest;
@@ -88,9 +87,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.core.service.TagBarcodeService;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignDao;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.core.store.TagBarcodeStore;
 
 /**
  * Class that binds all the MISO model datatypes to the Spring form path types
@@ -113,6 +113,9 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
   @Autowired
   private BoxStore sqlBoxDAO;
+
+  @Autowired
+  private TagBarcodeService tagBarcodeService;
 
   /**
    * Simplified interface to convert form data to fields.
@@ -233,7 +236,7 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
     @Override
     public T resolve(String element) throws Exception {
-      if (LimsUtils.isStringBlankOrNull(element)) {
+      if (isStringBlankOrNull(element)) {
         return null;
       }
       long id = Long.parseLong(element);
@@ -287,7 +290,7 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
     @Override
     public T resolve(String element) throws Exception {
-      if (LimsUtils.isStringBlankOrNull(element)) {
+      if (isStringBlankOrNull(element)) {
         return null;
       }
       Matcher matcher = DISPATCH_PREFIX.matcher(element);
@@ -553,7 +556,7 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
     new BindingConverterById<TagBarcode>(TagBarcode.class) {
       @Override
       public TagBarcode resolveById(long id) throws Exception {
-        return requestManager.getTagBarcodeById(id);
+        return tagBarcodeService.getTagBarcodeById(id);
       }
 
     }.register(binder).registerMap(binder, HashMap.class, "tagBarcodes");

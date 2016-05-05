@@ -26,6 +26,7 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonTypeName;
@@ -228,35 +229,13 @@ public interface Library extends SecurableByProfile, Comparable, Barcodable, Loc
 
   /**
    * Returns the position-indexed map of TagBarcodes for this Library object.
-   * 
-   * @return Map<Integer, TagBarcode> tagBarcodes
    */
-  public HashMap<Integer, TagBarcode> getTagBarcodes();
+  public List<TagBarcode> getTagBarcodes();
 
   /**
    * Sets the position-indexed map of TagBarcodes for this Library object.
-   * 
-   * @param tagBarcodes
-   *          Map<Integer, TagBarcode>.
    */
-  public void setTagBarcodes(HashMap<Integer, TagBarcode> tagBarcodes);
-
-  /**
-   * Returns the TagBarcode of this Library object, if this Library is multiplexed
-   * 
-   * @return TagBarcode tagBarcode.
-   */
-  @Deprecated
-  public TagBarcode getTagBarcode();
-
-  /**
-   * Sets the TagBarcode of this Library object.
-   * 
-   * @param tagBarcode
-   *          TagBarcode.
-   */
-  @Deprecated
-  public void setTagBarcode(TagBarcode tagBarcode);
+  public void setTagBarcodes(List<TagBarcode> tagBarcodes);
 
   /**
    * Returns the platformName of this Library object.
@@ -362,4 +341,6 @@ public interface Library extends SecurableByProfile, Comparable, Barcodable, Loc
   public LibraryAdditionalInfo getLibraryAdditionalInfo();
 
   public void setLibraryAdditionalInfo(LibraryAdditionalInfo libraryAdditionalInfo);
+
+  public TagBarcodeFamily getCurrentFamily();
 }

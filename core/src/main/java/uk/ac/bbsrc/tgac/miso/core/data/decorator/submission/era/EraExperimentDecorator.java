@@ -109,7 +109,7 @@ public class EraExperimentDecorator extends AbstractSubmittableDecorator<Documen
             if (!relevantLibrary.getTagBarcodes().isEmpty()) {
               StringBuilder tsb = new StringBuilder();
               StringBuilder vsb = new StringBuilder();
-              for (TagBarcode tb : relevantLibrary.getTagBarcodes().values()) {
+              for (TagBarcode tb : relevantLibrary.getTagBarcodes()) {
                 tsb.append(tb.getSequence());
                 vsb.append(tb.getName());
               }

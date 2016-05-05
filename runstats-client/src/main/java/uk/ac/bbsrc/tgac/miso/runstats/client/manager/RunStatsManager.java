@@ -156,7 +156,7 @@ public class RunStatsManager {
             for (Dilution d : pool.getDilutions()) {
               Library l = d.getLibrary();
               if (!l.getTagBarcodes().isEmpty()) {
-                for (TagBarcode tb : l.getTagBarcodes().values()) {
+                for (TagBarcode tb : l.getTagBarcodes()) {
                   map.remove(RunProperty.barcode);
                   try {
                     map.put(RunProperty.barcode, tb.getSequence());
@@ -213,7 +213,7 @@ public class RunStatsManager {
             for (Dilution d : pool.getDilutions()) {
               Library l = d.getLibrary();
               if (!l.getTagBarcodes().isEmpty()) {
-                for (TagBarcode tb : l.getTagBarcodes().values()) {
+                for (TagBarcode tb : l.getTagBarcodes()) {
                   map.remove(RunProperty.barcode);
                   try {
                     map.put(RunProperty.barcode, tb.getSequence());

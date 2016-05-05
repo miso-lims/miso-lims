@@ -25,9 +25,10 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.TreeSet;
 
 import javax.persistence.Column;
@@ -67,6 +68,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
  */
 @MappedSuperclass
 public abstract class AbstractLibrary extends AbstractBoxable implements Library {
+
   protected static final Logger log = LoggerFactory.getLogger(AbstractLibrary.class);
   public static final Long UNSAVED_ID = 0L;
   public static final String UNITS = "nM";
@@ -90,7 +92,7 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   private TagBarcode tagBarcode;
 
   @Transient
-  private HashMap<Integer, TagBarcode> tagBarcodes = new HashMap<Integer, TagBarcode>();
+  private List<TagBarcode> tagBarcodes = Collections.emptyList();
 
   private Boolean paired;
 
@@ -215,27 +217,26 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
     return getAlias();
   }
 
-  @CoverageIgnore
   @Override
-  @Deprecated
-  public TagBarcode getTagBarcode() {
-    return tagBarcode;
-  }
-
-  @CoverageIgnore
-  @Override
-  @Deprecated
-  public void setTagBarcode(TagBarcode tagBarcode) {
-    this.tagBarcode = tagBarcode;
-  }
-
-  @Override
-  public HashMap<Integer, TagBarcode> getTagBarcodes() {
+  public List<TagBarcode> getTagBarcodes() {
     return tagBarcodes;
   }
 
   @Override
-  public void setTagBarcodes(HashMap<Integer, TagBarcode> tagBarcodes) {
+  public void setTagBarcodes(List<TagBarcode> tagBarcodes) {
+    TagBarcode.sort(tagBarcodes);
+    TagBarcodeFamily current = null;
+    for (TagBarcode barcode : tagBarcodes) {
+      if (barcode == null) continue;
+      if (current == null) {
+        current = barcode.getFamily();
+      } else {
+        if (current.getId() != barcode.getFamily().getId()) {
+          throw new IllegalArgumentException(String.format("Barcodes not all from the same family. (%d:%s vs %d:%s)", current.getId(),
+              current.getName(), barcode.getFamily().getId(), barcode.getFamily().getName()));
+        }
+      }
+    }
     this.tagBarcodes = tagBarcodes;
   }
 
@@ -509,5 +510,14 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @Override
   public Collection<ChangeLog> getChangeLog() {
     return changeLog;
+  }
+
+  @Override
+  public TagBarcodeFamily getCurrentFamily() {
+    if (tagBarcodes == null || tagBarcodes.isEmpty()) {
+      return TagBarcodeFamily.NULL;
+    } else {
+      return tagBarcodes.get(0).getFamily();
+    }
   }
 }

@@ -740,33 +740,6 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<TagBarcode> listAllTagBarcodes() throws IOException {
-    if (libraryStore != null) {
-      return libraryStore.listAllTagBarcodes();
-    } else {
-      throw new IOException("No libraryStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<TagBarcode> listAllTagBarcodesByPlatform(String platformName) throws IOException {
-    if (libraryStore != null) {
-      return libraryStore.listTagBarcodesByPlatform(platformName);
-    } else {
-      throw new IOException("No libraryStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<TagBarcode> listAllTagBarcodesByStrategyName(String strategyName) throws IOException {
-    if (libraryStore != null) {
-      return libraryStore.listTagBarcodesByStrategyName(strategyName);
-    } else {
-      throw new IOException("No libraryStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
   public Collection<Dilution> listAllLibraryDilutionsBySearchAndPlatform(String query, PlatformType platformType) throws IOException {
     List<Dilution> dilutions = new ArrayList<Dilution>();
     for (Dilution d : libraryDilutionStore.listAllLibraryDilutionsBySearchAndPlatform(query, platformType)) {
@@ -1663,9 +1636,8 @@ public class MisoRequestManager implements RequestManager {
     if (libraryStore != null) {
       if (library.getSample().getSampleAdditionalInfo() != null) {
         SampleAdditionalInfo info = library.getSample().getSampleAdditionalInfo();
-        
-        if (LibraryDesign.validate(library,
-            libraryDesignDao.getLibraryDesignByClass(info == null ? null : info.getSampleClass()))) {
+
+        if (LibraryDesign.validate(library, libraryDesignDao.getLibraryDesignByClass(info == null ? null : info.getSampleClass()))) {
           return libraryStore.save(library);
         } else {
           throw new IOException("Invalid propagation.");
@@ -2148,15 +2120,6 @@ public class MisoRequestManager implements RequestManager {
   public LibraryStrategyType getLibraryStrategyTypeByName(String name) throws IOException {
     if (libraryStore != null) {
       return libraryStore.getLibraryStrategyTypeByName(name);
-    } else {
-      throw new IOException("No libraryStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public TagBarcode getTagBarcodeById(long tagBarcodeId) throws IOException {
-    if (libraryStore != null) {
-      return libraryStore.getTagBarcodeById(tagBarcodeId);
     } else {
       throw new IOException("No libraryStore available. Check that it has been declared in the Spring config.");
     }

@@ -58,6 +58,7 @@ import org.springframework.web.context.support.XmlWebApplicationContext;
 
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
+import uk.ac.bbsrc.tgac.miso.core.data.TagBarcodeFamily;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.PoolAlertManager;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.ProjectAlertManager;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.RunAlertManager;
@@ -73,12 +74,11 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NameGenerator;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
-import uk.ac.bbsrc.tgac.miso.core.service.tagbarcode.TagBarcodeStrategy;
-import uk.ac.bbsrc.tgac.miso.core.service.tagbarcode.TagBarcodeStrategyResolverService;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
 import uk.ac.bbsrc.tgac.miso.core.store.RunQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
+import uk.ac.bbsrc.tgac.miso.core.store.TagBarcodeStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.runstats.client.manager.RunStatsManager;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoPropertyExporter;
@@ -202,14 +202,6 @@ public class MisoAppListener implements ServletContextListener {
       }
     } catch (Exception e) {
       log.error("Could not list print services. This does not bode well for printing.", e);
-    }
-
-    // set up Tag Barcode strategies
-    TagBarcodeStrategyResolverService tagBarcodeService = (TagBarcodeStrategyResolverService) context
-        .getBean("tagBarcodeStrategyResolverService");
-    Collection<TagBarcodeStrategy> tbss = tagBarcodeService.getTagBarcodeStrategies();
-    for (TagBarcodeStrategy tbs : tbss) {
-      log.info("Got Tag Barcode Index service: " + tbs.getName());
     }
 
     // set up alerting
