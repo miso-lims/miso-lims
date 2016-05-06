@@ -3,7 +3,6 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -11,6 +10,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -26,13 +26,10 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBox;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
-import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.integration.BoxScanner;
-import uk.ac.bbsrc.tgac.miso.webapp.context.ApplicationContextProvider;
-import uk.ac.bbsrc.tgac.miso.webapp.util.MisoPropertyExporter;
 
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
@@ -67,11 +64,12 @@ public class EditBoxController {
     this.securityManager = securityManager;
   }
 
+  @Value("${miso.boxscanner.enabled}")
+  private Boolean scannerEnabled;
+
   @ModelAttribute("scannerEnabled")
   public Boolean isScannerEnabled() {
-    MisoPropertyExporter exporter = (MisoPropertyExporter) ApplicationContextProvider.getApplicationContext().getBean("propertyConfigurer");
-    Map<String, String> misoProperties = exporter.getResolvedProperties();
-    return misoProperties.containsKey("miso.boxscanner.enabled") && Boolean.parseBoolean(misoProperties.get("miso.boxscanner.enabled"));
+    return scannerEnabled;
   }
 
   @ModelAttribute("maxLengths")
