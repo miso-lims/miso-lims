@@ -70,7 +70,7 @@ public class ExperimentWizardControllerHelperService {
     StringBuilder b = new StringBuilder();
     try {
       for (Platform platform : requestManager.listAllPlatforms()) {
-        b.append("<option value=\"" + platform.getPlatformId() + "\">" + platform.getNameAndModel() + "</option>");
+        b.append("<option value=\"" + platform.getId() + "\">" + platform.getNameAndModel() + "</option>");
       }
     } catch (IOException e) {
       log.debug("Failed to change ReportType", e);
@@ -195,7 +195,7 @@ public class ExperimentWizardControllerHelperService {
     StringBuilder a = new StringBuilder();
     try {
       for (Platform platform : requestManager.listAllPlatforms()) {
-        a.append("<option value=\"" + platform.getPlatformId() + "\">" + platform.getNameAndModel() + "</option>");
+        a.append("<option value=\"" + platform.getId() + "\">" + platform.getNameAndModel() + "</option>");
       }
     } catch (IOException e) {
       log.debug("Failed", e);

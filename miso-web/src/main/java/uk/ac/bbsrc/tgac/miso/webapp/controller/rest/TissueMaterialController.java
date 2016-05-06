@@ -114,7 +114,7 @@ public class TissueMaterialController extends RestController {
   public ResponseEntity<?> updateTissueMaterial(@PathVariable("id") Long id, @RequestBody TissueMaterialDto tissueMaterialDto,
       HttpServletResponse response) throws IOException {
     TissueMaterial tissueMaterial = Dtos.to(tissueMaterialDto);
-    tissueMaterial.setTissueMaterialId(id);
+    tissueMaterial.setId(id);
     tissueMaterialService.update(tissueMaterial);
     return new ResponseEntity<>(HttpStatus.OK);
   }

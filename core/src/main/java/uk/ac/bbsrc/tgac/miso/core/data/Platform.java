@@ -42,7 +42,7 @@ public interface Platform extends Comparable {
    * 
    * @return Long platformId.
    */
-  public Long getPlatformId();
+  public Long getId();
 
   /**
    * Sets the platformId of this Platform object.
@@ -50,7 +50,7 @@ public interface Platform extends Comparable {
    * @param platformId
    *          platformId.
    */
-  public void setPlatformId(Long platformId);
+  public void setId(Long platformId);
 
   /**
    * Returns the platformType of this Platform object.

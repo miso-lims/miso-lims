@@ -93,18 +93,6 @@ public class SubmissionImpl implements Submission<Submittable, Document, Documen
   }
 
   @Override
-  @Deprecated
-  public Long getSubmissionId() {
-    return submissionId;
-  }
-
-  @Override
-  @Deprecated
-  public void setSubmissionId(Long submissionId) {
-    this.submissionId = submissionId;
-  }
-
-  @Override
   public long getId() {
     return submissionId;
   }

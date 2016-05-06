@@ -189,7 +189,7 @@
       Mockito.when(profile.getProfileId()).thenReturn(1L);
       Platform platform = Mockito.mock(Platform.class);
       spc.setPlatform(platform);
-      Mockito.when(platform.getPlatformId()).thenReturn(1L);
+      Mockito.when(platform.getId()).thenReturn(1L);
       User user = Mockito.mock(User.class);
       Mockito.when(user.getUserId()).thenReturn(1L);
       spc.setLastModifier(user);

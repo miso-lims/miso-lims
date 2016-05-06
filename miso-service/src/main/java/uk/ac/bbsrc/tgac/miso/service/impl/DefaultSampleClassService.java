@@ -47,7 +47,7 @@ public class DefaultSampleClassService implements SampleClassService {
   @Override
   public void update(SampleClass sampleClass) throws IOException {
     authorizationManager.throwIfNonAdmin();
-    SampleClass updatedSampleClass = get(sampleClass.getSampleClassId());
+    SampleClass updatedSampleClass = get(sampleClass.getId());
     updatedSampleClass.setAlias(sampleClass.getAlias());
     updatedSampleClass.setSampleCategory(sampleClass.getSampleCategory());
     updatedSampleClass.setSuffix(sampleClass.getSuffix());

@@ -53,12 +53,12 @@ public class AbstractPrintJob implements PrintJob {
   private MisoPrintService printService;
 
   @Override
-  public void setJobId(Long jobId) {
+  public void setId(Long jobId) {
     this.jobId = jobId;
   }
 
   @Override
-  public Long getJobId() {
+  public Long getId() {
     return jobId;
   }
 
@@ -115,8 +115,8 @@ public class AbstractPrintJob implements PrintJob {
   @Override
   public int compareTo(Object o) {
     PrintJob t = (PrintJob) o;
-    if (getJobId() < t.getJobId()) return -1;
-    if (getJobId() > t.getJobId()) return 1;
+    if (getId() < t.getId()) return -1;
+    if (getId() > t.getId()) return 1;
     return 0;
   }
 }

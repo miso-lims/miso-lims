@@ -122,7 +122,7 @@ public class SQLStatusDAO implements StatusStore {
       log.error("status save", e);
     }
 
-    if (status.getStatusId() == 0L) {
+    if (status.getId() == 0L) {
       Status savedStatus = getByRunName(status.getRunName());
       if (savedStatus == null) {
         SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(TABLE_NAME).usingGeneratedKeyColumns("statusId");
@@ -133,21 +133,21 @@ public class SQLStatusDAO implements StatusStore {
         }
 
         Number newId = insert.executeAndReturnKey(params);
-        status.setStatusId(newId.longValue());
+        status.setId(newId.longValue());
       } else {
-        status.setStatusId(savedStatus.getStatusId());
-        params.addValue("statusId", status.getStatusId());
+        status.setId(savedStatus.getId());
+        params.addValue("statusId", status.getId());
         NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
         namedTemplate.update(STATUS_UPDATE, params);
       }
     } else {
-      params.addValue("statusId", status.getStatusId());
+      params.addValue("statusId", status.getId());
       params.addValue("startDate", new SimpleDateFormat("yyyy-MM-dd").format(status.getStartDate()));
       NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
       namedTemplate.update(STATUS_UPDATE, params);
     }
 
-    return status.getStatusId();
+    return status.getId();
   }
 
   @Override
@@ -203,7 +203,7 @@ public class SQLStatusDAO implements StatusStore {
     @CoverageIgnore
     public Status mapRow(ResultSet rs, int rowNum) throws SQLException {
       Status s = dataObjectFactory.getStatus();
-      s.setStatusId(rs.getLong("statusId"));
+      s.setId(rs.getLong("statusId"));
       s.setHealth(HealthType.valueOf(rs.getString("health")));
       s.setStartDate(rs.getDate("startDate"));
       s.setCompletionDate(rs.getDate("completionDate"));

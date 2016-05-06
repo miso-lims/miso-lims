@@ -104,12 +104,12 @@ public class SampleTissueImpl implements SampleTissue {
   }
 
   @Override
-  public Long getSampleId() {
+  public Long getId() {
     return sampleId;
   }
 
   @Override
-  public void setSampleId(Long sampleId) {
+  public void setId(Long sampleId) {
     this.sampleId = sampleId;
   }
 

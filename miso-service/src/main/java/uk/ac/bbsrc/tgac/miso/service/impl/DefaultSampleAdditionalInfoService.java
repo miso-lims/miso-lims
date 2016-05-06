@@ -79,7 +79,7 @@ public class DefaultSampleAdditionalInfoService implements SampleAdditionalInfoS
   public Long create(SampleAdditionalInfo sampleAdditionalInfo) throws IOException {
     authorizationManager.throwIfNonAdmin();
     User user = authorizationManager.getCurrentUser();
-    Sample sample = sampleDao.getSample(sampleAdditionalInfo.getSampleId());
+    Sample sample = sampleDao.getSample(sampleAdditionalInfo.getId());
     sampleAdditionalInfo.setSample(sample);
 
     loadMembers(sampleAdditionalInfo);
@@ -115,7 +115,7 @@ public class DefaultSampleAdditionalInfoService implements SampleAdditionalInfoS
   @Override
   public void update(SampleAdditionalInfo sampleAdditionalInfo) throws IOException {
     authorizationManager.throwIfNonAdmin();
-    SampleAdditionalInfo updatedSampleAdditionalInfo = get(sampleAdditionalInfo.getSampleId());
+    SampleAdditionalInfo updatedSampleAdditionalInfo = get(sampleAdditionalInfo.getId());
     applyChanges(updatedSampleAdditionalInfo, sampleAdditionalInfo);
     updatedSampleAdditionalInfo.setUpdatedBy(authorizationManager.getCurrentUser());
     sampleAdditionalInfoDao.update(updatedSampleAdditionalInfo);
@@ -140,26 +140,26 @@ public class DefaultSampleAdditionalInfoService implements SampleAdditionalInfoS
   @Override
   public void loadMembers(SampleAdditionalInfo target, SampleAdditionalInfo source) throws IOException {
     if (source.getTissueOrigin() != null) {
-      target.setTissueOrigin(tissueOriginDao.getTissueOrigin(source.getTissueOrigin().getTissueOriginId()));
+      target.setTissueOrigin(tissueOriginDao.getTissueOrigin(source.getTissueOrigin().getId()));
       ServiceUtils.throwIfNull(target.getTissueOrigin(), "SampleAdditionalInfo.tissueOriginId", 
-          source.getTissueOrigin().getTissueOriginId());
+          source.getTissueOrigin().getId());
     }
     if (source.getTissueType() != null) {
-      target.setTissueType(tissueTypeDao.getTissueType(source.getTissueType().getTissueTypeId()));
-      ServiceUtils.throwIfNull(target.getTissueType(), "SampleAdditionalInfo.tissueTypeId", source.getTissueType().getTissueTypeId());
+      target.setTissueType(tissueTypeDao.getTissueType(source.getTissueType().getId()));
+      ServiceUtils.throwIfNull(target.getTissueType(), "SampleAdditionalInfo.tissueTypeId", source.getTissueType().getId());
     }
     if (source.getQcPassedDetail() != null) {
-      target.setQcPassedDetail(qcPassedDetailDao.getQcPassedDetails(source.getQcPassedDetail().getQcPassedDetailId()));
+      target.setQcPassedDetail(qcPassedDetailDao.getQcPassedDetails(source.getQcPassedDetail().getId()));
       ServiceUtils.throwIfNull(target.getQcPassedDetail(), "SampleAdditionalInfo.qcPassedDetailId", 
-          source.getQcPassedDetail().getQcPassedDetailId());
+          source.getQcPassedDetail().getId());
     }
     if (source.getPrepKit() != null) {
-      target.setPrepKit(sqlKitDao.getKitDescriptorById(source.getPrepKit().getKitDescriptorId()));
-      ServiceUtils.throwIfNull(target.getPrepKit(), "SampleAdditionalInfo.prepKitId", source.getPrepKit().getKitDescriptorId());
+      target.setPrepKit(sqlKitDao.getKitDescriptorById(source.getPrepKit().getId()));
+      ServiceUtils.throwIfNull(target.getPrepKit(), "SampleAdditionalInfo.prepKitId", source.getPrepKit().getId());
     }
     if (source.getSampleClass() != null) {
-      target.setSampleClass(sampleClassDao.getSampleClass(source.getSampleClass().getSampleClassId()));
-      ServiceUtils.throwIfNull(target.getSampleClass(), "SampleAdditionalInfo.sampleClassId", source.getSampleClass().getSampleClassId());
+      target.setSampleClass(sampleClassDao.getSampleClass(source.getSampleClass().getId()));
+      ServiceUtils.throwIfNull(target.getSampleClass(), "SampleAdditionalInfo.sampleClassId", source.getSampleClass().getId());
     }
     if (source.getLab() != null) {
       target.setLab(labService.get(source.getLab().getId()));

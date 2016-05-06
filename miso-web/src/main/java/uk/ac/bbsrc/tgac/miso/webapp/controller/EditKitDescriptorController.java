@@ -132,7 +132,7 @@ public class EditKitDescriptorController {
       requestManager.saveKitDescriptor(kitDescriptor);
       session.setComplete();
       model.clear();
-      return "redirect:/miso/kitdescriptor/" + kitDescriptor.getKitDescriptorId();
+      return "redirect:/miso/kitdescriptor/" + kitDescriptor.getId();
     } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to save Kit Descriptor", ex);

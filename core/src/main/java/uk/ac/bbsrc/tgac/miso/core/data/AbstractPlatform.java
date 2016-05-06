@@ -64,12 +64,12 @@ public abstract class AbstractPlatform implements Platform {
   }
 
   @Override
-  public Long getPlatformId() {
+  public Long getId() {
     return platformId;
   }
 
   @Override
-  public void setPlatformId(Long platformId) {
+  public void setId(Long platformId) {
     this.platformId = platformId;
   }
 
@@ -129,17 +129,17 @@ public abstract class AbstractPlatform implements Platform {
     Platform them = (Platform) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
-    if (getPlatformId() == AbstractPlatform.UNSAVED_ID || them.getPlatformId() == AbstractPlatform.UNSAVED_ID) {
+    if (getId() == AbstractPlatform.UNSAVED_ID || them.getId() == AbstractPlatform.UNSAVED_ID) {
       return getPlatformType().equals(them.getPlatformType()) && getDescription().equals(them.getDescription());
     } else {
-      return getPlatformId().longValue() == them.getPlatformId().longValue();
+      return getId().longValue() == them.getId().longValue();
     }
   }
 
   @Override
   public int hashCode() {
-    if (getPlatformId() != AbstractPlatform.UNSAVED_ID) {
-      return getPlatformId().intValue();
+    if (getId() != AbstractPlatform.UNSAVED_ID) {
+      return getId().intValue();
     } else {
       final int PRIME = 37;
       int hashcode = -1;
@@ -152,8 +152,8 @@ public abstract class AbstractPlatform implements Platform {
   @Override
   public int compareTo(Object o) {
     Platform t = (Platform) o;
-    if (getPlatformId() < t.getPlatformId()) return -1;
-    if (getPlatformId() > t.getPlatformId()) return 1;
+    if (getId() < t.getId()) return -1;
+    if (getId() > t.getId()) return 1;
     return 0;
   }
 }

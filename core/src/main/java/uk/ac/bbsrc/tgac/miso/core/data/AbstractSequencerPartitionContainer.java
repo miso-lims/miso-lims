@@ -81,18 +81,6 @@ public abstract class AbstractSequencerPartitionContainer<T extends Partition> i
   }
 
   @Override
-  @Deprecated
-  public Long getContainerId() {
-    return containerId;
-  }
-
-  @Override
-  @Deprecated
-  public void setContainerId(Long containerId) {
-    this.containerId = containerId;
-  }
-
-  @Override
   public long getId() {
     return containerId;
   }

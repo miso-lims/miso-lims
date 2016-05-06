@@ -76,7 +76,7 @@ public class SQLSequencerReferenceDAOTest extends AbstractDAOTest {
     assertEquals("sequencer reference address does not match", retrieved.getIpAddress(), address);
     assertTrue("sequencer reference availability does not match", retrieved.getAvailable());
     assertEquals("sequencer reference date decommissioned does not match", retrieved.getDateDecommissioned(), null);
-    assertEquals("sequencer reference platform does not match", retrieved.getPlatform().getPlatformId(), platform.getPlatformId());
+    assertEquals("sequencer reference platform does not match", retrieved.getPlatform().getId(), platform.getId());
 
     assertTrue(dao.remove(retrieved));
     assertNull(dao.get(id));

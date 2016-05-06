@@ -86,12 +86,12 @@ public class StatusImpl implements Status, Serializable {
   }
 
   @Override
-  public Long getStatusId() {
+  public Long getId() {
     return statusId;
   }
 
   @Override
-  public void setStatusId(Long statusId) {
+  public void setId(Long statusId) {
     this.statusId = statusId;
   }
 
@@ -183,18 +183,18 @@ public class StatusImpl implements Status, Serializable {
     Status them = (Status) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
-    if (getStatusId().equals(StatusImpl.UNSAVED_ID) || them.getStatusId().equals(StatusImpl.UNSAVED_ID)) {
+    if (getId().equals(StatusImpl.UNSAVED_ID) || them.getId().equals(StatusImpl.UNSAVED_ID)) {
       return getRunName().equals(them.getRunName());
     } else {
-      return getStatusId().equals(them.getStatusId()) && getHealth().equals(them.getHealth()) && getStartDate().equals(them.getStartDate())
+      return getId().equals(them.getId()) && getHealth().equals(them.getHealth()) && getStartDate().equals(them.getStartDate())
           && getCompletionDate().equals(them.getCompletionDate());
     }
   }
 
   @Override
   public int hashCode() {
-    if (getStatusId() != null && !getStatusId().equals(StatusImpl.UNSAVED_ID)) {
-      return getStatusId().hashCode();
+    if (getId() != null && !getId().equals(StatusImpl.UNSAVED_ID)) {
+      return getId().hashCode();
     } else {
       final int PRIME = 31;
       int result = 1;
@@ -206,7 +206,7 @@ public class StatusImpl implements Status, Serializable {
   @Override
   public String toString() {
     StringBuffer sb = new StringBuffer();
-    sb.append(getStatusId());
+    sb.append(getId());
     sb.append(" : ");
     sb.append(getStartDate());
     sb.append(" : ");

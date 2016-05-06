@@ -32,7 +32,7 @@ public class MockFormTestRequestManager extends MisoRequestManager {
   @Override
   public LibraryType getLibraryTypeByDescriptionAndPlatform(String description, PlatformType platformType) {
     LibraryType lt = new LibraryType();
-    lt.setLibraryTypeId(1L);
+    lt.setId(1L);
     lt.setDescription("Paired End");
     lt.setPlatformType("Illumina");
     return lt;
@@ -41,7 +41,7 @@ public class MockFormTestRequestManager extends MisoRequestManager {
   @Override
   public LibrarySelectionType getLibrarySelectionTypeByName(String name) {
     LibrarySelectionType lst = new LibrarySelectionType();
-    lst.setLibrarySelectionTypeId(3L);
+    lst.setId(3L);
     lst.setName("PCR");
     lst.setDescription("Source material was selected by designed primers");
     return lst;
@@ -50,7 +50,7 @@ public class MockFormTestRequestManager extends MisoRequestManager {
   @Override
   public LibraryStrategyType getLibraryStrategyTypeByName(String name) {
     LibraryStrategyType lst = new LibraryStrategyType();
-    lst.setLibraryStrategyTypeId(1L);
+    lst.setId(1L);
     lst.setName("WGS");
     lst.setDescription("Whole genome shotgun");
     return lst;

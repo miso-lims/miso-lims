@@ -55,7 +55,7 @@ public class DefaultSampleNumberPerProjectService implements SampleNumberPerProj
   @Override
   public void update(SampleNumberPerProject sampleNumberPerProject) throws IOException {
     authorizationManager.throwIfNonAdmin();
-    SampleNumberPerProject updatedSampleNumberPerProject = get(sampleNumberPerProject.getSampleNumberPerProjectId());
+    SampleNumberPerProject updatedSampleNumberPerProject = get(sampleNumberPerProject.getId());
     // updatedSampleNumberPerProject.setAlias(sampleNumberPerProject.getAlias());
     User user = authorizationManager.getCurrentUser();
     updatedSampleNumberPerProject.setUpdatedBy(user);

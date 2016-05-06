@@ -114,7 +114,7 @@ public class SamplePurposeController extends RestController {
   public ResponseEntity<?> updateSamplePurpose(@PathVariable("id") Long id, @RequestBody SamplePurposeDto samplePurposeDto,
       HttpServletResponse response) throws IOException {
     SamplePurpose samplePurpose = Dtos.to(samplePurposeDto);
-    samplePurpose.setSamplePurposeId(id);
+    samplePurpose.setId(id);
     samplePurposeService.update(samplePurpose);
     return new ResponseEntity<>(HttpStatus.OK);
   }

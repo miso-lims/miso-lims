@@ -47,7 +47,7 @@ public class HibernateSampleStore extends HibernateDaoSupport implements Store<S
   @Transactional(readOnly = false)
   public long save(Sample sample) throws IOException {
     getHibernateTemplate().saveOrUpdate(sample);
-    return sample.getSampleId();
+    return sample.getId();
   }
 
   @Override

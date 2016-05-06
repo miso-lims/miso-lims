@@ -333,9 +333,9 @@ public class SQLLibraryDAO implements LibraryStore {
     params.addValue("paired", library.getPaired());
     params.addValue("sample_sampleId", library.getSample().getId());
     params.addValue("securityProfile_profileId", securityProfileId);
-    params.addValue("libraryType", library.getLibraryType().getLibraryTypeId());
-    params.addValue("librarySelectionType", library.getLibrarySelectionType().getLibrarySelectionTypeId());
-    params.addValue("libraryStrategyType", library.getLibraryStrategyType().getLibraryStrategyTypeId());
+    params.addValue("libraryType", library.getLibraryType().getId());
+    params.addValue("librarySelectionType", library.getLibrarySelectionType().getId());
+    params.addValue("libraryStrategyType", library.getLibraryStrategyType().getId());
     params.addValue("platformName", library.getPlatformName());
     params.addValue("concentration", library.getInitialConcentration());
     params.addValue("creationDate", library.getCreationDate());
@@ -821,7 +821,7 @@ public class SQLLibraryDAO implements LibraryStore {
     @Override
     public LibraryType mapRow(ResultSet rs, int rowNum) throws SQLException {
       LibraryType lt = new LibraryType();
-      lt.setLibraryTypeId(rs.getLong("libraryTypeId"));
+      lt.setId(rs.getLong("libraryTypeId"));
       lt.setDescription(rs.getString("description"));
       lt.setPlatformType(rs.getString("platformType"));
       return lt;
@@ -832,7 +832,7 @@ public class SQLLibraryDAO implements LibraryStore {
     @Override
     public LibrarySelectionType mapRow(ResultSet rs, int rowNum) throws SQLException {
       LibrarySelectionType lst = new LibrarySelectionType();
-      lst.setLibrarySelectionTypeId(rs.getLong("librarySelectionTypeId"));
+      lst.setId(rs.getLong("librarySelectionTypeId"));
       lst.setName(rs.getString("name"));
       lst.setDescription(rs.getString("description"));
       return lst;
@@ -843,7 +843,7 @@ public class SQLLibraryDAO implements LibraryStore {
     @Override
     public LibraryStrategyType mapRow(ResultSet rs, int rowNum) throws SQLException {
       LibraryStrategyType lst = new LibraryStrategyType();
-      lst.setLibraryStrategyTypeId(rs.getLong("libraryStrategyTypeId"));
+      lst.setId(rs.getLong("libraryStrategyTypeId"));
       lst.setName(rs.getString("name"));
       lst.setDescription(rs.getString("description"));
       return lst;

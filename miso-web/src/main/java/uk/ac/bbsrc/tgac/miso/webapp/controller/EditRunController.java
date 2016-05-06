@@ -301,7 +301,7 @@ public class EditRunController {
         }
         if (run.getSequencerReference() != null) {
           model.put("sequencingParameters",
-              sequencingParametersService.getForPlatform((long) run.getSequencerReference().getPlatform().getPlatformId()));
+              sequencingParametersService.getForPlatform((long) run.getSequencerReference().getPlatform().getId()));
         } else {
           model.put("sequencingParameters", Collections.emptyList());
         }

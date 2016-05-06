@@ -12,9 +12,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 
 public interface SampleAdditionalInfo {
 
-  Long getSampleId();
+  Long getId();
 
-  void setSampleId(Long sampleId);
+  void setId(Long sampleId);
 
   @JsonBackReference
   Sample getSample();

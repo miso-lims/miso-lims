@@ -47,7 +47,7 @@ public class HibernatePlatformStore extends HibernateDaoSupport implements Store
   @Transactional(readOnly = false)
   public long save(Platform platform) throws IOException {
     getHibernateTemplate().saveOrUpdate(platform);
-    return platform.getPlatformId();
+    return platform.getId();
   }
 
   @Override

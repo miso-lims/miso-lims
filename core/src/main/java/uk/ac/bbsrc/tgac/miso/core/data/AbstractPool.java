@@ -116,18 +116,6 @@ public abstract class AbstractPool<P extends Poolable> extends AbstractBoxable i
   }
 
   @Override
-  @Deprecated
-  public Long getPoolId() {
-    return this.poolId;
-  }
-
-  @Override
-  @Deprecated
-  public void setPoolId(Long poolId) {
-    this.poolId = poolId;
-  }
-
-  @Override
   public long getId() {
     return poolId;
   }

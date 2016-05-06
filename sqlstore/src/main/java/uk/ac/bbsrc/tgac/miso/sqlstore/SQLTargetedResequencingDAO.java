@@ -76,7 +76,7 @@ public class SQLTargetedResequencingDAO implements TargetedResequencingStore {
     MapSqlParameterSource params = new MapSqlParameterSource();
     params.addValue("alias", targetedResequencing.getAlias());
     params.addValue("description", targetedResequencing.getDescription());
-    params.addValue("kitDescriptorId", targetedResequencing.getKitDescriptor().getKitDescriptorId());
+    params.addValue("kitDescriptorId", targetedResequencing.getKitDescriptor().getId());
     params.addValue("lastUpdated", now);
     params.addValue("updatedBy", currentUser);
     if (targetedResequencing.getTargetedResequencingId() == TargetedResequencing.UNSAVED_ID) {

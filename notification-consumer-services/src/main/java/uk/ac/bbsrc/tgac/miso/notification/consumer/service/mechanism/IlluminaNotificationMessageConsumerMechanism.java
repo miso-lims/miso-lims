@@ -464,7 +464,7 @@ public class IlluminaNotificationMessageConsumerMechanism
         for (SequencingParameters parameters : getParameterSet()) {
           log.debug("Checking run " + run.getString("name") + " against parameters " + parameters.getName());
        
-          if (parameters.getPlatformId() == r.getSequencerReference().getPlatform().getPlatformId() && parameters.matches(document)) {
+          if (parameters.getPlatformId() == r.getSequencerReference().getPlatform().getId() && parameters.matches(document)) {
             log.debug("Matched run " + run.getString("name") + " to parameters " + parameters.getName());
             r.setSequencingParametersId(parameters.getId());
             break;

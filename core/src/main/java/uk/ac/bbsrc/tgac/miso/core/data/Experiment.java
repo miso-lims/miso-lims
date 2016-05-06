@@ -57,24 +57,6 @@ public interface Experiment extends SecurableByProfile, Submittable<Document>, C
   /** Field PREFIX */
   public static final String PREFIX = "EXP";
 
-  /**
-   * Returns the experimentId of this Experiment object.
-   * 
-   * @return Long experimentId.
-   */
-  @Deprecated
-  public Long getExperimentId();
-
-  /**
-   * Sets the experimentId of this Experiment object.
-   * 
-   * @param experimentId
-   *          the id of this Experiment object.
-   * 
-   */
-  @Deprecated
-  public void setExperimentId(Long experimentId);
-
   public void setId(long id);
 
   /**

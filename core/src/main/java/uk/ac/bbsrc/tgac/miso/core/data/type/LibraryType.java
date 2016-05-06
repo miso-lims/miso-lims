@@ -55,7 +55,7 @@ public class LibraryType implements Comparable, Serializable {
    * 
    * @return Long libraryTypeId.
    */
-  public Long getLibraryTypeId() {
+  public Long getId() {
     return libraryTypeId;
   }
 
@@ -65,7 +65,7 @@ public class LibraryType implements Comparable, Serializable {
    * @param libraryTypeId
    *          libraryTypeId.
    */
-  public void setLibraryTypeId(Long libraryTypeId) {
+  public void setId(Long libraryTypeId) {
     this.libraryTypeId = libraryTypeId;
   }
 
@@ -120,8 +120,8 @@ public class LibraryType implements Comparable, Serializable {
 
   @Override
   public int hashCode() {
-    if (getLibraryTypeId() != UNSAVED_ID) {
-      return getLibraryTypeId().intValue();
+    if (getId() != UNSAVED_ID) {
+      return getId().intValue();
     } else {
       int hashcode = -1;
       if (getDescription() != null) hashcode = 37 * hashcode + getDescription().hashCode();

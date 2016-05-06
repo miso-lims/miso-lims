@@ -50,7 +50,7 @@ public class DefaultTissueOriginService implements TissueOriginService {
   @Override
   public void update(TissueOrigin tissueOrigin) throws IOException {
     authorizationManager.throwIfNonAdmin();
-    TissueOrigin updatedTissueOrigin = get(tissueOrigin.getTissueOriginId());
+    TissueOrigin updatedTissueOrigin = get(tissueOrigin.getId());
     log.error("update tissueOrigin: " + updatedTissueOrigin);
     updatedTissueOrigin.setAlias(tissueOrigin.getAlias());
     updatedTissueOrigin.setDescription(tissueOrigin.getDescription());

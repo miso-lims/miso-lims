@@ -118,7 +118,7 @@ public class ExperimentWizardController {
       StringBuilder b = new StringBuilder();
 
       for (Platform platform : requestManager.listAllPlatforms()) {
-        a.append("<option value=\"" + platform.getPlatformId() + "\">" + platform.getNameAndModel() + "</option>");
+        a.append("<option value=\"" + platform.getId() + "\">" + platform.getNameAndModel() + "</option>");
       }
 
       for (String st : requestManager.listAllStudyTypes()) {

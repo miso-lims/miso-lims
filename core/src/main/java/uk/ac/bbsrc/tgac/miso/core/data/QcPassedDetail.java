@@ -6,9 +6,9 @@ import com.eaglegenomics.simlims.core.User;
 
 public interface QcPassedDetail {
 
-  Long getQcPassedDetailId();
+  Long getId();
 
-  void setQcPassedDetailId(Long qcPassedDetailsId);
+  void setId(Long qcPassedDetailsId);
 
   User getCreatedBy();
 

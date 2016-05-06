@@ -50,18 +50,6 @@ public abstract class AbstractQC implements QC {
   private Date qcDate = new Date();
 
   @Override
-  @Deprecated
-  public Long getQcId() {
-    return qcId;
-  }
-
-  @Override
-  @Deprecated
-  public void setQcId(Long qcId) {
-    this.qcId = qcId;
-  }
-
-  @Override
   public long getId() {
     return qcId;
   }
