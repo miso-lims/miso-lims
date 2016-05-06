@@ -86,8 +86,8 @@
   <bean id="entityNamingSchemeResolverService" name="entityNamingSchemeResolverService" class="uk.ac.bbsrc.tgac.miso.core.service.naming.MisoEntityNamingSchemeResolverService" />
 
   <bean id="namingScheme" name="namingScheme" class="uk.ac.bbsrc.tgac.miso.core.service.naming.DefaultEntityNamingScheme"/>
-  <bean id="sampleNamingScheme" name="sampleNamingScheme" class="uk.ac.bbsrc.tgac.miso.core.service.naming.DefaultSampleNamingScheme"/>
-  <bean id="libraryNamingScheme" name="libraryNamingScheme" class="uk.ac.bbsrc.tgac.miso.core.service.naming.DefaultLibraryNamingScheme"/>
+  <bean id="sampleNamingScheme" name="sampleNamingScheme" class="uk.ac.bbsrc.tgac.miso.core.service.naming.${miso.naming.scheme.sample}"/>
+  <bean id="libraryNamingScheme" name="libraryNamingScheme" class="uk.ac.bbsrc.tgac.miso.core.service.naming.${miso.naming.scheme.library}"/>
 
   <bean id="nameGeneratorResolverService" name="nameGeneratorResolverService" class="uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNameGeneratorResolverService" />
 
