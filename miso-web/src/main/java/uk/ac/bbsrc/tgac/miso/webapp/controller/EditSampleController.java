@@ -37,6 +37,7 @@ import java.util.TreeSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -79,8 +80,6 @@ import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
-import uk.ac.bbsrc.tgac.miso.webapp.context.ApplicationContextProvider;
-import uk.ac.bbsrc.tgac.miso.webapp.util.MisoPropertyExporter;
 
 @Controller
 @RequestMapping("/sample")
@@ -112,31 +111,31 @@ public class EditSampleController {
     this.securityManager = securityManager;
   }
 
-  public Boolean misoPropertyBoolean(String property) {
-    MisoPropertyExporter exporter = (MisoPropertyExporter) ApplicationContextProvider.getApplicationContext().getBean("propertyConfigurer");
-    Map<String, String> misoProperties = exporter.getResolvedProperties();
-    return misoProperties.containsKey(property)
-        && Boolean.parseBoolean(misoProperties.get(property));
+  @ModelAttribute("aliasGenerationEnabled")
+  public Boolean isAliasGenerationEnabled() {
+    return sampleNamingScheme != null && sampleNamingScheme.hasGeneratorFor("alias");
   }
+
+  @Value("${miso.notification.interop.enabled}")
+  private Boolean metrixEnabled;
+  @Value("${miso.autoGenerateIdentificationBarcodes}")
+  private Boolean autoGenerateIdBarcodes;
+  @Value("${miso.detailed.sample.enabled}")
+  private Boolean detailedSample;
 
   @ModelAttribute("metrixEnabled")
   public Boolean isMetrixEnabled() {
-    return misoPropertyBoolean("miso.notification.interop.enabled");
-  }
-  
-  @ModelAttribute("aliasGenerationEnabled")
-  public boolean isAliasGenerationEnabled() {
-    return sampleNamingScheme != null && sampleNamingScheme.hasGeneratorFor("alias");
+    return metrixEnabled;
   }
 
   @ModelAttribute("autoGenerateIdBarcodes")
   public Boolean autoGenerateIdentificationBarcodes() {
-    return misoPropertyBoolean("miso.autoGenerateIdentificationBarcodes");
+    return autoGenerateIdBarcodes;
   }
 
   @ModelAttribute("detailedSample")
   public Boolean isDetailedSampleEnabled() {
-    return misoPropertyBoolean("miso.detailed.sample.enabled");
+    return detailedSample;
   }
 
   public Map<String, Sample> getAdjacentSamplesInGroup(Sample s, @RequestParam(value = "entityGroupId", required = true) Long entityGroupId)

@@ -43,6 +43,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -101,8 +102,6 @@ import uk.ac.bbsrc.tgac.miso.dto.LibraryAdditionalInfoDto;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
 import uk.ac.bbsrc.tgac.miso.persistence.LibraryAdditionalInfoDao;
 import uk.ac.bbsrc.tgac.miso.service.LibraryAdditionalInfoService;
-import uk.ac.bbsrc.tgac.miso.webapp.context.ApplicationContextProvider;
-import uk.ac.bbsrc.tgac.miso.webapp.util.MisoPropertyExporter;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.controller
@@ -159,25 +158,26 @@ public class EditLibraryController {
     this.libraryAdditionalInfoService = libraryAdditionalInfoService;
   }
 
-  public Boolean misoPropertyBoolean(String property) {
-    MisoPropertyExporter exporter = (MisoPropertyExporter) ApplicationContextProvider.getApplicationContext().getBean("propertyConfigurer");
-    Map<String, String> misoProperties = exporter.getResolvedProperties();
-    return misoProperties.containsKey(property) && Boolean.parseBoolean(misoProperties.get(property));
-  }
+  @Value("${miso.notification.interop.enabled}")
+  private Boolean metrixEnabled;
+  @Value("${miso.autoGenerateIdentificationBarcodes}")
+  private Boolean autoGenerateIdBarcodes;
+  @Value("${miso.detailed.sample.enabled}")
+  private Boolean detailedSample;
 
   @ModelAttribute("metrixEnabled")
   public Boolean isMetrixEnabled() {
-    return misoPropertyBoolean("miso.notification.interop.enabled");
+    return metrixEnabled;
   }
 
   @ModelAttribute("autoGenerateIdBarcodes")
   public Boolean autoGenerateIdentificationBarcodes() {
-    return misoPropertyBoolean("miso.autoGenerateIdentificationBarcodes");
+    return autoGenerateIdBarcodes;
   }
 
   @ModelAttribute("detailedSample")
   public Boolean isDetailedSampleEnabled() {
-    return misoPropertyBoolean("miso.detailed.sample.enabled");
+    return detailedSample;
   }
 
   public Map<String, Library> getAdjacentLibrariesInProject(Library l, Project p) throws IOException {

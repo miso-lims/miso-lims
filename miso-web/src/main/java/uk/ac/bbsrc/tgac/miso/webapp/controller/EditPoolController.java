@@ -36,6 +36,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -71,8 +72,6 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SequencingParametersDto;
 import uk.ac.bbsrc.tgac.miso.service.PoolOrderCompletionService;
 import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
-import uk.ac.bbsrc.tgac.miso.webapp.context.ApplicationContextProvider;
-import uk.ac.bbsrc.tgac.miso.webapp.util.MisoPropertyExporter;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.controller
@@ -136,22 +135,18 @@ public class EditPoolController {
   public String libraryDilutionUnits() {
     return LibraryDilution.UNITS;
   }
-  
+
   @ModelAttribute("poolConcentrationUnits")
   public String poolConcentrationUnits() {
     return AbstractPool.CONCENTRATION_UNITS;
   }
-  
-  public Boolean misoPropertyBoolean(String property) {
-    MisoPropertyExporter exporter = (MisoPropertyExporter) ApplicationContextProvider.getApplicationContext().getBean("propertyConfigurer");
-    Map<String, String> misoProperties = exporter.getResolvedProperties();
-    return misoProperties.containsKey(property)
-        && Boolean.parseBoolean(misoProperties.get(property));
-  }
+
+  @Value("${miso.autoGenerateIdentificationBarcodes}")
+  private Boolean autoGenerateIdBarcodes;
 
   @ModelAttribute("autoGenerateIdBarcodes")
   public Boolean autoGenerateIdentificationBarcodes() {
-    return misoPropertyBoolean("miso.autoGenerateIdentificationBarcodes");
+    return autoGenerateIdBarcodes;
   }
 
   @ModelAttribute("maxLengths")
