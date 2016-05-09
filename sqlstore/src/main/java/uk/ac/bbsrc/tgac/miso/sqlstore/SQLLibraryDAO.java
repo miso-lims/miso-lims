@@ -28,12 +28,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 
 import javax.persistence.CascadeType;
+
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,9 +57,6 @@ import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.Property;
 import com.googlecode.ehcache.annotations.TriggersRemove;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -197,9 +197,18 @@ public class SQLLibraryDAO implements LibraryStore {
   private BoxStore boxDAO;
   @Autowired
   private LibraryAdditionalInfoDao libraryAdditionalInfoDAO;
+
+  public void setLibraryAdditionalInfoDao(LibraryAdditionalInfoDao libraryAdditionalInfoDao) {
+    this.libraryAdditionalInfoDAO = libraryAdditionalInfoDao;
+  }
+
   @Autowired
   private TagBarcodeStore tagBarcodeStrategyStore;
-
+  
+  public void setTagBarcodeStore (TagBarcodeStore tagBarcodeStore) {
+    this.tagBarcodeStrategyStore = tagBarcodeStore;
+  }
+  
   @Autowired
   private MisoNamingScheme<Library> libraryNamingScheme;
 
@@ -374,6 +383,11 @@ public class SQLLibraryDAO implements LibraryStore {
                   new MapSqlParameterSource().addValue("libraryId", newId.longValue()));
               throw new IOException("Something bad happened. Expected library ID doesn't match returned value from DB insert");
             }
+            if (library.getLibraryAdditionalInfo() != null) {
+              library.getLibraryAdditionalInfo().setLibrary(library);
+              library.getLibraryAdditionalInfo().setLibraryId(library.getId());
+              libraryAdditionalInfoDAO.addLibraryAdditionalInfo(library.getLibraryAdditionalInfo());
+            }
           } else {
             throw new IOException("Cannot save library - invalid field:" + library.toString());
           }
@@ -396,12 +410,23 @@ public class SQLLibraryDAO implements LibraryStore {
               library.getLocationBarcode());
           NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
           namedTemplate.update(LIBRARY_UPDATE, params);
+          if (library.getLibraryAdditionalInfo() != null) {
+            library.getLibraryAdditionalInfo().setLibrary(library);
+            library.getLibraryAdditionalInfo().setLibraryId(library.getId());
+            libraryAdditionalInfoDAO.update(library.getLibraryAdditionalInfo());
+          }
         } else {
           throw new IOException("Cannot save library - invalid field:" + library.toString());
         }
       } catch (MisoNamingException e) {
         throw new IOException("Cannot save library - issue with naming scheme", e);
       }
+    }
+    
+    if (library.getLibraryAdditionalInfo() != null) {
+      library.getLibraryAdditionalInfo().setLibrary(library);
+      library.getLibraryAdditionalInfo().setLibraryId(library.getId());
+      libraryAdditionalInfoDAO.addLibraryAdditionalInfo(library.getLibraryAdditionalInfo());
     }
 
     MapSqlParameterSource libparams = new MapSqlParameterSource();

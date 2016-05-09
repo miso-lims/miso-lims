@@ -696,7 +696,7 @@
     <c:choose>
     <c:when test="${not empty run.platformType}">
       Run.pool.poolSearch("", '${run.platformType.key}');
-      <c:if test="${run.id != 0}">
+      <c:if test="${run.id != 0 and metrixEnabled}">
         Stats.checkRunProgress('${run.alias}', '${run.platformType.key}');
       </c:if>
     </c:when>

@@ -33,6 +33,14 @@ public class DefaultIdentityService implements IdentityService {
   @Autowired
   private AuthorizationManager authorizationManager;
 
+  public void setIdentityDao(IdentityDao identityDao) {
+    this.identityDao = identityDao;
+  }
+
+  public void setAuthorizationManager(AuthorizationManager authorizationManager) {
+    this.authorizationManager = authorizationManager;
+  }
+
   @Override
   public Identity get(Long identityId) throws IOException {
     authorizationManager.throwIfUnauthenticated();

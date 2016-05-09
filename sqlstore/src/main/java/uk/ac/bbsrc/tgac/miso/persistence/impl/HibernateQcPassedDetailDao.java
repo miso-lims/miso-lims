@@ -25,6 +25,10 @@ public class HibernateQcPassedDetailDao implements QcPassedDetailDao {
   @Autowired
   private SessionFactory sessionFactory;
 
+  public void setSessionFactory(SessionFactory sessionFactory) {
+    this.sessionFactory = sessionFactory;
+  }
+
   private Session currentSession() {
     return sessionFactory.getCurrentSession();
   }

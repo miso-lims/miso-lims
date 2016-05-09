@@ -28,6 +28,14 @@ public class DefaultSampleClassService implements SampleClassService {
 
   @Autowired
   private AuthorizationManager authorizationManager;
+  
+  public void setAuthorizationManager(AuthorizationManager authorizationManager) {
+    this.authorizationManager = authorizationManager;
+  }
+  
+  public void setSampleClassDao(SampleClassDao sampleClassDao) {
+    this.sampleClassDao = sampleClassDao;
+  }
 
   @Override
   public SampleClass get(Long sampleClassId) throws IOException {

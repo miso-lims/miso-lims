@@ -38,6 +38,10 @@ public class HibernateSampleAdditionalInfoDao implements SampleAdditionalInfoDao
     this.kitStore = kitStore;
   }
   
+  public void setSessionFactory(SessionFactory sessionFactory) {
+    this.sessionFactory = sessionFactory;
+  }
+  
   private SampleAdditionalInfo fetchSqlStore(SampleAdditionalInfo sampleAdditionalInfo) throws IOException {
     if (sampleAdditionalInfo != null) {
       if (sampleAdditionalInfo.getHibernateKitDescriptorId() != null) {

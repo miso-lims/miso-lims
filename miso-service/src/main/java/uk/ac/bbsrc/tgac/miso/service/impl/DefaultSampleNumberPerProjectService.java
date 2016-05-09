@@ -35,6 +35,18 @@ public class DefaultSampleNumberPerProjectService implements SampleNumberPerProj
   @Autowired
   private AuthorizationManager authorizationManager;
 
+  public void setSampleNumberPerProjectDao(SampleNumberPerProjectDao sampleNumberPerProjectDao) {
+    this.sampleNumberPerProjectDao = sampleNumberPerProjectDao;
+  }
+
+  public void setSqlProjectDAO(SQLProjectDAO sqlProjectDAO) {
+    this.sqlProjectDAO = sqlProjectDAO;
+  }
+
+  public void setAuthorizationManager(AuthorizationManager authorizationManager) {
+    this.authorizationManager = authorizationManager;
+  }
+
   @Override
   public SampleNumberPerProject get(Long sampleNumberPerProjectId) throws IOException {
     authorizationManager.throwIfUnauthenticated();
