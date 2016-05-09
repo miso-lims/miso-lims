@@ -354,7 +354,8 @@ Sample.hot = {
     qcPassed: '',
     volume: null,
     sampleIdentity: {
-      externalName: null
+      externalName: null,
+      donorSex: null
     },
     sampleAdditionalInfo: {
       sampleClassId: null,
@@ -409,10 +410,10 @@ Sample.hot = {
     var sampleClassAlias = Hot.getAliasFromId(Sample.hot.sampleClassId, Hot.sampleOptions.sampleClassesDtos);
     var rootSampleClassId = Sample.hot.getRootSampleClassId();
     return {
-   	  'sampleAdditionalInfo': {
-   	    'sampleClassAlias': sampleClassAlias,
-  	    'parentSampleClassId': rootSampleClassId
-  	  },
+      'sampleAdditionalInfo': {
+        'sampleClassAlias': sampleClassAlias,
+        'parentSampleClassId': rootSampleClassId
+      },
       'scientificName': Sample.hot.sciName
     };
   },
@@ -443,6 +444,13 @@ Sample.hot = {
    */
   getStrStatuses: function () {
     return Hot.dropdownRef['strStatuses'];
+  },
+
+  /**
+   * Gets array of donor sex values (detailed sample only)
+   */
+  getDonorSexes: function () {
+    return Hot.dropdownRef['donorSexes'];
   },
 
   /**
@@ -477,10 +485,10 @@ Sample.hot = {
    * Gets array of sample class aliases that are a valid child of the given parent (detailed sample only)
    */
   getValidClassesForParent: function (parentScId) {
-  	var parentSampleClassId = parentScId;
-  	return Hot.sortByProperty(Hot.sampleOptions.sampleValidRelationshipsDtos, 'id')
-	             .filter(function (rel) { return rel.parentId == parentSampleClassId; })
-				       .map(function (rel) { return Hot.getAliasFromId(rel.childId, Hot.sampleOptions.sampleClassesDtos); });
+    var parentSampleClassId = parentScId;
+    return Hot.sortByProperty(Hot.sampleOptions.sampleValidRelationshipsDtos, 'id')
+               .filter(function (rel) { return rel.parentId == parentSampleClassId; })
+               .map(function (rel) { return Hot.getAliasFromId(rel.childId, Hot.sampleOptions.sampleClassesDtos); });
   },
 
   /**
@@ -674,6 +682,13 @@ Sample.hot = {
             data: 'sampleIdentity.externalName',
             type: 'text',
             validator: requiredText
+          },{
+            header: 'Sex',
+            data: 'sampleIdentity.donorSex',
+            type: 'dropdown',
+            trimDropdown: false,
+            source: Sample.hot.getDonorSexes(),
+            validator: permitEmpty
           },{
             header: 'Tissue Origin',
             data: 'sampleAdditionalInfo.tissueOriginAlias',
@@ -970,6 +985,9 @@ Sample.hot = {
       sample.sampleIdentity = {
           externalName: obj.sampleIdentity.externalName
       };
+      if (obj.sampleIdentity.donorSex && obj.sampleIdentity.donorSex.length) {
+        sample.sampleIdentity.donorSex = obj.sampleIdentity.donorSex;
+      }
     }
     
     // add sampleAdditionalInfo attributes
@@ -1000,7 +1018,7 @@ Sample.hot = {
     if (obj.sampleAdditionalInfo.subprojectId && !obj.sampleAdditionalInfo.subprojectAlias) {
       sample.sampleAdditionalInfo.subprojectId = obj.sampleAdditionalInfo.subprojectId;
     } else if (obj.sampleAdditionalInfo.subprojectAlias){
-    	sample.sampleAdditionalInfo.subprojectId = Hot.getIdFromAlias(obj.sampleAdditionalInfo.subprojectAlias, Hot.sampleOptions.subprojectsDtos);
+      sample.sampleAdditionalInfo.subprojectId = Hot.getIdFromAlias(obj.sampleAdditionalInfo.subprojectAlias, Hot.sampleOptions.subprojectsDtos);
     } else if (document.getElementById('subprojectSelect') && document.getElementById('subprojectSelect').value > 0) {
       sample.sampleAdditionalInfo.subprojectId = parseInt(document.getElementById('subprojectSelect').value);
     }
@@ -1088,7 +1106,7 @@ Sample.hot = {
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function() {
       if (xhr.readyState === XMLHttpRequest.DONE) {
-    	callback(); // Indicate request has completed.
+        callback(); // Indicate request has completed.
         xhr.status === 201 ? Sample.hot.successSave(xhr, rowIndex, numberToSave) : Sample.hot.failSave(xhr, rowIndex, numberToSave);
       }
     };

@@ -314,6 +314,25 @@
                   </c:choose>
                 </td>
               </tr>
+              <tr>
+                <td class="h">Sex:</td>
+                <td>
+                  <c:choose>
+                    <c:when test="${sample.id == 0}">
+                      <form:select id="donorSex" path="identity.donorSex">
+                      <c:forEach var="donorSexOption" items="${donorSexOptions}">
+                        <option value="${donorSexOption}" <c:if test="${sample.identity.donorSex == donorSexOption}">selected="selected"</c:if>>
+                          ${donorSexOption.label}
+                        </option>
+                      </c:forEach>
+                      </form:select>
+                    </c:when>
+                    <c:otherwise>
+                      ${sample.identity.donorSex}
+                    </c:otherwise>
+                  </c:choose>
+                </td>
+              </tr>
             </table>
           </div>
         </c:if>

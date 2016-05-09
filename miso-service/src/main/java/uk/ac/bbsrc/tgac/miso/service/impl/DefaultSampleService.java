@@ -281,10 +281,6 @@ public class DefaultSampleService implements SampleService {
     SampleAdditionalInfo parentSai = new SampleAdditionalInfoImpl();
     SampleAdditionalInfo childSai = sample.getSampleAdditionalInfo();
     parentSai.setSampleClass(rootSampleClass);
-    parentSai.setTissueOrigin(childSai.getTissueOrigin());
-    parentSai.setTissueType(childSai.getTissueType());
-    parentSai.setSubproject(childSai.getSubproject());
-    parentSai.setLab(childSai.getLab());
     
     Identity parentIdentity = new IdentityImpl();
     String number = sampleNumberPerProjectService.nextNumber(sample.getProject());
@@ -292,6 +288,7 @@ public class DefaultSampleService implements SampleService {
     String internalName = sample.getProject().getAlias() + "_" + number;
     parentIdentity.setInternalName(internalName);
     parentIdentity.setExternalName(sample.getIdentity().getExternalName());
+    parentIdentity.setDonorSex(sample.getIdentity().getDonorSex());
 
     Sample identitySample = new SampleFactoryBuilder()
         .user(authorizationManager.getCurrentUser())
