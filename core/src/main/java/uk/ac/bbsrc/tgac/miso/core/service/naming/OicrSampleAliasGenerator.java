@@ -73,7 +73,7 @@ public class OicrSampleAliasGenerator implements NameGenerator<Sample> {
     SampleAdditionalInfo sai = sample.getSampleAdditionalInfo();
     SampleClass sc = sai.getSampleClass();
     if (sc == null || sc.getSuffix() == null) {
-      throw new InvalidParameterException("Unexpected null SampleClass suffix");
+      throw new InvalidParameterException("Unexpected null SampleClass or suffix");
     }
     if (sai.getSiblingNumber() == null) {
       throw new InvalidParameterException("Cannot generate alias for " + sc.getAlias() + " without a siblingNumber");

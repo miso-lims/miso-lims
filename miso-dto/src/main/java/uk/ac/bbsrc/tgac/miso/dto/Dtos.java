@@ -38,6 +38,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAdditionalInfoImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrderImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.QcPassedDetailImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAdditionalInfoImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAnalyteImpl;
@@ -481,6 +482,7 @@ public class Dtos {
       dto.setSampleTissue(asDto(from.getSampleTissue()));
     }
     dto.setVolume(from.getVolume());
+    dto.setEmpty(from.isEmpty());
 
     return dto;
   }
@@ -495,6 +497,9 @@ public class Dtos {
 
   public static Sample to(SampleDto from) {
     Sample to = new SampleImpl();
+    if (from.getId() != null) {
+      to.setId(from.getId());
+    }
     if (!LimsUtils.isStringEmptyOrNull(from.getAccession())) {
       to.setAccession(from.getAccession());
     }
@@ -510,9 +515,7 @@ public class Dtos {
     if (from.getReceivedDate() != null) {
       to.setReceivedDate(dateTimeFormatter.parseDateTime(from.getReceivedDate()).toDate());
     }
-    if (from.getQcPassed() != null) {
-      to.setQcPassed(from.getQcPassed());
-    }
+    to.setQcPassed(from.getQcPassed());
     if (!LimsUtils.isStringEmptyOrNull(from.getAlias())) {
       to.setAlias(from.getAlias());
     }
@@ -520,11 +523,13 @@ public class Dtos {
     if (!LimsUtils.isStringEmptyOrNull(from.getTaxonIdentifier())) {
       to.setTaxonIdentifier(from.getTaxonIdentifier());
     }
-
     to.setAlias(from.getAlias());
     to.setDescription(from.getDescription());
-    if (from.getVolume() != null) {
-      to.setVolume(from.getVolume());
+    to.setVolume(from.getVolume());
+    if (from.getEmpty() != null) to.setEmpty(from.getEmpty());
+    if (from.getProjectId() != null) {
+      to.setProject(new ProjectImpl());
+      to.getProject().setProjectId(from.getProjectId());
     }
     if (from.getSampleAdditionalInfo() != null) {
       to.setSampleAdditionalInfo(to(from.getSampleAdditionalInfo()));
@@ -563,6 +568,7 @@ public class Dtos {
 
   public static Identity to(SampleIdentityDto from) {
     Identity to = new IdentityImpl();
+    to.setSampleId(from.getSampleId());
     to.setInternalName(from.getInternalName());
     to.setExternalName(from.getExternalName());
     return to;
@@ -693,6 +699,7 @@ public class Dtos {
 
   public static SampleTissue to(SampleTissueDto from) {
     SampleTissue to = new SampleTissueImpl();
+    to.setId(from.getSampleId());
     to.setCellularity(from.getCellularity());
     return to;
   }

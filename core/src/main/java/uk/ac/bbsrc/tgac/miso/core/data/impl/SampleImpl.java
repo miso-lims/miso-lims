@@ -156,6 +156,15 @@ public class SampleImpl extends AbstractSample implements Serializable {
     sampleImpl.getSampleAdditionalInfo().setSample(sampleImpl);
     return sampleImpl;
   }
+  
+  public static SampleImpl sampleIdentity(SampleFactoryBuilder builder) {
+    SampleImpl sampleImpl = new SampleImpl(builder);
+    sampleImpl.setSampleAdditionalInfo(builder.getSampleAdditionalInfo());
+    sampleImpl.getSampleAdditionalInfo().setSample(sampleImpl);
+    sampleImpl.setIdentity(builder.getIdentity());
+    sampleImpl.getIdentity().setSample(sampleImpl);
+    return sampleImpl;
+  }
 
   @Override
   public void buildSubmission() {

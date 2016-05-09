@@ -134,7 +134,8 @@ public class SampleController extends RestController {
   public ResponseEntity<?> createSample(@RequestBody SampleDto sampleDto, UriComponentsBuilder b) throws IOException {
     Long id = null;
     try {
-      id = sampleService.create(sampleDto);
+      Sample sample = Dtos.to(sampleDto);
+      id = sampleService.create(sample);
     } catch (ConstraintViolationException | IllegalArgumentException e) {
       log.error("Error while creating sample. ", e);
       RestException restException = new RestException(e.getMessage(), Status.BAD_REQUEST);
