@@ -91,11 +91,11 @@
   <script type="text/javascript">
     jQuery(document).ready(function () {
       Library.hot.librariesJSON = ${librariesJSON};
-      Library.hot.dropdownRef = ${referenceDataJSON};
-      Library.hot.dropdownRef.tagBarcodes = {};
-      Library.hot.dropdownRef.barcodeKits = {};
-      Library.hot.detailedSample = JSON.parse(document.getElementById('HOTbulkForm').dataset.detailedSample);
-      Library.hot.button = document.getElementById('saveLibraries');
+      Hot.dropdownRef = ${referenceDataJSON};
+      Hot.dropdownRef.tagBarcodes = {};
+      Hot.dropdownRef.barcodeKits = {};
+      Hot.detailedSample = JSON.parse(document.getElementById('HOTbulkForm').dataset.detailedSample);
+      Hot.saveButton = document.getElementById('saveLibraries');
       Library.hot.propagateOrEdit = "${method}";
       Library.designs = ${libraryDesignsJSON};
 
@@ -105,13 +105,13 @@
       };
 
       // get SampleOptions and make the appropriate table
-      if (Boolean(Library.hot.detailedSample)) {
+      if (Boolean(Hot.detailedSample)) {
         if (Library.hot.propagateOrEdit == 'Propagate') {
-          Library.hot.button.addEventListener('click', Library.hot.createData, true);
-          Library.hot.fetchSampleOptions(Library.hot.makeBulkCreateTable);
+          Hot.saveButton.addEventListener('click', Library.hot.createData, true);
+          Hot.fetchSampleOptions(Library.hot.makeBulkCreateTable);
   	    } else {
-  	      Library.hot.button.addEventListener('click', Library.hot.updateData, true);
-  	      Library.hot.fetchSampleOptions(Library.hot.makeBulkUpdateTable);
+  	      Hot.saveButton.addEventListener('click', Library.hot.updateData, true);
+  	      Hot.fetchSampleOptions(Library.hot.makeBulkUpdateTable);
 	      }
       }
     });

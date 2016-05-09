@@ -1,36 +1,14 @@
+/**
+ * Library-specific Handsontable code
+ */
+
 Library.hot = {
-  detailedSample: null,
-  colConf: null,
-  hotTable: null,
-  sampleOptions: null,
   libraryData: null,
   showQcs: false,
-  button: null,
-  failedComplexValidation: [],
-  messages: {
-    success: [],
-    failed: []
-  },
   
-  fetchSampleOptions: function (callback) {
-    var xhr = new XMLHttpRequest();
-    xhr.onreadystatechange = function() {
-      if (xhr.readyState === XMLHttpRequest.DONE) {
-        xhr.status === 200 ? Library.hot.processSampleOptionsXhr(xhr, callback) : console.log(xhr.response);
-      }
-    };
-    xhr.open('GET', '/miso/rest/ui/sampleoptions');
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.send();
-  },
-  
-  processSampleOptionsXhr: function (xhr, callback) {
-    this.sampleOptions = JSON.parse(xhr.responseText);
-    
-    // execute callback if provided
-    if (callback) callback();
-  },
-  
+  /**
+   * Modifies attributes of Library Dtos so Handsontable displays them correctly
+   */
   prepLibrariesForTable: function (libraries) {
     return libraries.map(function (lib) {
       if (lib.libraryAdditionalInfo) {
@@ -49,8 +27,11 @@ Library.hot = {
     });
   },
   
+  /**
+   * Makes create/edit libraries table
+   */
   makeHOT: function (startingValues) {
-    this.colConf = Library.hot.setColumnData(this.detailedSample);
+    Hot.colConf = Library.hot.setColumnData(Hot.detailedSample);
     
     if (!startingValues) {
       if (confirm("Please select samples to use as parents for libraries.")) {
@@ -59,21 +40,21 @@ Library.hot = {
         return false;
       }
     } else {
-      Library.hot.startData = startingValues;
+      Hot.startData = startingValues;
     }
     
     // make HOT instance
     var hotContainer = document.getElementById('hotContainer');
-    Library.hot.hotTable = new Handsontable(hotContainer, {
+    Hot.hotTable = new Handsontable(hotContainer, {
       debug: true,
       fixedColumnsLeft: 1,
       manualColumnResize: true,
       rowHeaders: true,
-      colHeaders: this.getValues('header', this.colConf),
+      colHeaders: Hot.getValues('header', Hot.colConf),
       contextMenu: false,
-      columns: this.colConf,
-      data: this.startData,
-      dataSchema: this.dataSchema
+      columns: Hot.colConf,
+      data: Hot.startData,
+      dataSchema: Library.hot.dataSchema
     });
     document.getElementById('hotContainer').style.display = '';
     
@@ -92,10 +73,10 @@ Library.hot = {
             Library.hot.changeBarcodeKit(row, col, from, to);
         }
       }
-    }, Library.hot.hotTable);
+    }, Hot.hotTable);
     
     // enable save button if it was disabled
-    if (Library.hot.button && Library.hot.button.classList.contains('disabled')) Library.hot.toggleButtonAndLoaderImage(Library.hot.button);
+    if (Hot.saveButton && Hot.saveButton.classList.contains('disabled')) Hot.toggleButtonAndLoaderImage(Hot.saveButton);
     
     // TODO: fix this hack
     Library.hot.getBarcodeKitsOnly("Illumina");
@@ -107,8 +88,9 @@ Library.hot = {
   
   // TODO: add function hideAdditionalCols
   
-  startData: [],
-  
+  /**
+   * Data schema for each row in table
+   */
   dataSchema: {
     alias: '',
     name: null,
@@ -159,92 +141,102 @@ Library.hot = {
     }
   },
   
-  getAlias: function (obj) {
-    if (obj.alias) return obj.alias;
-  },
-  
-  getValues: function (key, objArr) {
-    return objArr.map(function (obj) { return obj[key]; });
-  },
-  
-  sortByProperty: function (array, propertyName) {
-    return array.sort(function (a, b) {
-      return a[propertyName] > b[propertyName] ? 1 : ((b[propertyName] > a[propertyName]) ? -1 : 0);
-    });
-  },
-  
+  /**
+   * Gets array of platform names
+   */
   getPlatforms: function () {
-    return this.dropdownRef['platformNames'];
+    return Hot.dropdownRef['platformNames'];
   },
   
+  /**
+   * Gets array of library types
+   */
   getLibraryTypes: function () {
-    return this.sortByProperty(this.dropdownRef['libraryTypes'], 'id').map(this.getAlias);
+    return Hot.sortByProperty(Hot.dropdownRef['libraryTypes'], 'id').map(Hot.getAlias);
   },
   
+  /**
+   * Gets array of library selection types
+   */
   getSelectionTypes: function () {
-    return this.sortByProperty(this.dropdownRef['selectionTypes'], 'id').map(this.getAlias);
+    return Hot.sortByProperty(Hot.dropdownRef['selectionTypes'], 'id').map(Hot.getAlias);
   },
   
+  /**
+   * Gets array of library strategy types
+   */
   getStrategyTypes: function () {
-    return this.sortByProperty(this.dropdownRef['strategyTypes'], 'id').map(this.getAlias);
+    return Hot.sortByProperty(Hot.dropdownRef['strategyTypes'], 'id').map(Hot.getAlias);
   },
   
+  /**
+   * Gets array of tagbarcode strategies
+   */
   getBarcodeStrategies: function () {
-    return this.sortByProperty(this.dropdownRef['barcodeStrategies'], 'id').map(function (bs) { return bs.strategyName; });
+    return Hot.sortByProperty(Hot.dropdownRef['barcodeStrategies'], 'id').map(function (bs) { return bs.strategyName; });
   },
   
+  /**
+   * Gets array of qc values
+   */
   getQcValues: function () {
-    return this.dropdownRef['qcValues'].map(function (val) { if (val === '') val = 'unknown'; return val; });
+    return Hot.dropdownRef['qcValues'].map(function (val) { if (val === '') val = 'unknown'; return val; });
   },
   
+  /**
+   * Gets array of tissue origin aliases (detailed sample only)
+   */
   getTissueOrigins: function () {
-    return this.sortByProperty(this.sampleOptions['tissueOriginsDtos'], 'id').map(this.getAlias);
+    return Hot.sortByProperty(Hot.sampleOptions['tissueOriginsDtos'], 'id').map(Hot.getAlias);
   },
 
+  /**
+   * Gets array of tissue type aliases (detailed sample only)
+   */
   getTissueTypes: function () {
-    return this.sortByProperty(this.sampleOptions['tissueTypesDtos'], 'id').map(this.getAlias);
+    return Hot.sortByProperty(Hot.sampleOptions['tissueTypesDtos'], 'id').map(Hot.getAlias);
   },
   
+  /**
+   * Gets array of kit descriptor names
+   */
   getKitDescriptors: function () {
-    return this.sortByProperty(this.sampleOptions['kitDescriptorsDtos'], 'manufacturer')
+    return Hot.sortByProperty(Hot.sampleOptions['kitDescriptorsDtos'], 'manufacturer')
       .filter(function (kit) { return kit.kitType == 'Library'; })
       .map(function (kit) { return kit.name; });
   },
   
-  getIdFromAlias: function (alias, referenceCollection) {
-    return referenceCollection.filter(function (item) {
-      return item.alias == alias; 
-    })[0].id;
-  },
-  
-  getAliasFromId: function (id, referenceCollection) {
-    return referenceCollection.filter(function (item) {
-      return item.id == id;
-    })[0].alias;
-  },
-  
+  /**
+   * Gets array of tagBarcode composites (name and sequence)
+   */
   getBcComposites: function (bcCollection) {
-    return this.sortByProperty(bcCollection, 'id').map(function (bc) { return bc.name + ' - ' + bc.sequence; });
+    return Hot.sortByProperty(bcCollection, 'id').map(function (bc) { return bc.name + ' - ' + bc.sequence; });
   },
   
+  /**
+   * Gets tagBarcode id associated with given barcode composite (name and sequence)
+   */
   getIdFromBcComposite: function (aliasComposite, bcCollection) {
     return bcCollection.filter(function (bc) {
       return (bc.name + ' - ' + bc.sequence == aliasComposite); 
     })[0].id;
   },
   
+  /**
+   * Sets columns for table
+   */
   setColumnData: function (detailedBool) {
     var qcBool = Library.hot.showQcs;
     if (detailedBool) {
-      return this.concatArrays(setAliasCol(), setPlainCols(), setDetailedCols());
+      return Hot.concatArrays(setAliasCol(), setPlainCols(), setDetailedCols());
     } else {
-      return this.concatArrays(setAliasCol(), setPlainCols());
+      return Hot.concatArrays(setAliasCol(), setPlainCols());
     }
     
     function setPlainCols () {
       var libCols = [
         {
-          header: 'Parent Alias',
+          header: 'Sample Alias',
           data: 'parentSampleAlias',
           type: 'text',
           readOnly: true
@@ -254,15 +246,15 @@ Library.hot = {
           type: 'text',
           validator: requiredText
         },{
+          header: 'Matrix Barcode',
+          data: 'identificationBarcode',
+          type: 'text'
+        },{
           header: 'Platform',
           data: 'platformName',
           type: 'dropdown',
           trimDropdown: false,
           source: Library.hot.getPlatforms()
-        },{
-          header: 'Barcode',
-          data: 'identificationBarcode',
-          type: 'text'
         },{
           header: 'Type',
           data: 'libraryTypeAlias',
@@ -309,7 +301,7 @@ Library.hot = {
     function setAliasCol () {
       var aliasCol = [
         {
-          header: 'Alias',
+          header: 'Library Alias',
           data: 'alias',
           type: 'text',
           validator: validateAlias
@@ -383,63 +375,63 @@ Library.hot = {
     }
   },
   
-  concatArrays: function () {
-    // call this function with any number of col groups and it will concat and reduce them all
-    var cols = [];
-    for (var i = 0; i<arguments.length; i++) {
-      cols.push.apply(cols, arguments[i]); 
-    }
-    return cols.reduce(function (a, b) { return a.concat(b); }, []);
-  },
-  
+  /**
+   * Gets the column index for a given attribute
+   */
   getColIndex: function (dataString) {
-	for (var i = 0; i < Library.hot.colConf.length; i++) {
-	  if (Library.hot.colConf[i].data == dataString) return i;
-	}
+  	for (var i = 0; i < Hot.colConf.length; i++) {
+  	  if (Hot.colConf[i].data == dataString) return i;
+  	}
   },
   
+  /**
+   * Detects Platform change for a row and clears out library types, tagBarcode kits, tagBarcodes
+   */
   changePlatform: function (row, col, from, to) {
     // update library types
     jQuery.get('../../libraryTypesJson', {platform: to},
       function (data) {
     	var libTypeColIndex = Library.hot.getColIndex('libraryTypeAlias');
-        Library.hot.hotTable.setDataAtCell(row, libTypeColIndex, '', 'platform change');
-        Library.hot.hotTable.getCellMeta(row, libTypeColIndex).source = data['libraryTypes'];
+        Hot.hotTable.setDataAtCell(row, libTypeColIndex, '', 'platform change');
+        Hot.hotTable.getCellMeta(row, libTypeColIndex).source = data['libraryTypes'];
       }    
     );
     // update barcode kits
     // use stored barcode kits if these have already been retrieved. 'to' -- platform
     var bcStratColIndex = Library.hot.getColIndex('tagBarcodeStrategyName');
-    if (Library.hot.dropdownRef.barcodeKits[to]) {
-      Library.hot.hotTable.setDataAtCell(row, bcStratColIndex, '', 'platform change');
-      Library.hot.hotTable.getCellMeta(row, bcStratColIndex).source = Library.hot.dropdownRef.barcodeKits[to];
+    if (Hot.dropdownRef.barcodeKits[to]) {
+      Hot.hotTable.setDataAtCell(row, bcStratColIndex, '', 'platform change');
+      Hot.hotTable.getCellMeta(row, bcStratColIndex).source = Hot.dropdownRef.barcodeKits[to];
     } else {
       jQuery.get('../../barcodeStrategiesJson', {platform: to},
         function (data) {
         console.log(data);
-          Library.hot.hotTable.setDataAtCell(row, bcStratColIndex, '', 'platform change');
-          Library.hot.hotTable.getCellMeta(row, bcStratColIndex).source = data['barcodeKits'];
-          Library.hot.dropdownRef.barcodeKits[to] = {};
-          Library.hot.dropdownRef.barcodeKits[to] = data['barcodeKits'];
+          Hot.hotTable.setDataAtCell(row, bcStratColIndex, '', 'platform change');
+          Hot.hotTable.getCellMeta(row, bcStratColIndex).source = data['barcodeKits'];
+          Hot.dropdownRef.barcodeKits[to] = {};
+          Hot.dropdownRef.barcodeKits[to] = data['barcodeKits'];
         }    
       );
     }
     // clear tagBarcodes
-    Library.hot.hotTable.setDataAtCell(row, (bcStratColIndex + 1), '', 'platform change');
-    Library.hot.hotTable.setDataAtCell(row, (bcStratColIndex + 2), '', 'platform change');
+    Hot.hotTable.setDataAtCell(row, (bcStratColIndex + 1), '', 'platform change');
+    Hot.hotTable.setDataAtCell(row, (bcStratColIndex + 2), '', 'platform change');
   },
   
+  /**
+   * Detects tagBarcode kit for a row and clears out tagBarcodes
+   */
   changeBarcodeKit: function (row, col, from, to) {
     // use stored barcodes if these have already been retrieved. 'to' == strategy
-	var bcStratColIndex = Library.hot.getColIndex('tagBarcodeStrategyName');
-	var tb1ColIndex = bcStratColIndex + 1;
-	var tb2ColIndex = bcStratColIndex + 2;
-    if (Library.hot.dropdownRef.tagBarcodes[to]) {
-      Library.hot.hotTable.setDataAtCell(row, tb1ColIndex, '', 'barcode kit change');
-      Library.hot.hotTable.getCellMeta(row, tb1ColIndex).source = Library.hot.getBcComposites(Library.hot.dropdownRef.tagBarcodes[to].one);
-      if (Library.hot.dropdownRef.tagBarcodes[to].two) {
-        Library.hot.hotTable.setDataAtCell(row, tb2ColIndex, '', 'barcode kit change');
-        Library.hot.hotTable.getCellMeta(row, tb2ColIndex).source = Library.hot.getBcComposites(Library.hot.dropdownRef.tagBarcodes[to].two);
+  	var bcStratColIndex = Library.hot.getColIndex('tagBarcodeStrategyName');
+  	var tb1ColIndex = bcStratColIndex + 1;
+  	var tb2ColIndex = bcStratColIndex + 2;
+    if (Hot.dropdownRef.tagBarcodes[to]) {
+      Hot.hotTable.setDataAtCell(row, tb1ColIndex, '', 'barcode kit change');
+      Hot.hotTable.getCellMeta(row, tb1ColIndex).source = Library.hot.getBcComposites(Hot.dropdownRef.tagBarcodes[to].one);
+      if (Hot.dropdownRef.tagBarcodes[to].two) {
+        Hot.hotTable.setDataAtCell(row, tb2ColIndex, '', 'barcode kit change');
+        Hot.hotTable.getCellMeta(row, tb2ColIndex).source = Library.hot.getBcComposites(Hot.dropdownRef.tagBarcodes[to].two);
       }
     } else {
       // get barcodes from server
@@ -448,18 +440,18 @@ Library.hot = {
           // set tagBarcodeData
           jQuery.get('../../tagBarcodesJson', {strategy : to , position: 1},
             function (bc1Data) {
-              Library.hot.hotTable.setDataAtCell(row, tb1ColIndex, '', 'barcode kit change');
-              Library.hot.hotTable.getCellMeta(row, tb1ColIndex).source = Library.hot.getBcComposites(bc1Data.tagBarcodes);
-              Library.hot.dropdownRef.tagBarcodes[to] = {};
-              Library.hot.dropdownRef.tagBarcodes[to].one = bc1Data.tagBarcodes;
+              Hot.hotTable.setDataAtCell(row, tb1ColIndex, '', 'barcode kit change');
+              Hot.hotTable.getCellMeta(row, tb1ColIndex).source = Library.hot.getBcComposites(bc1Data.tagBarcodes);
+              Hot.dropdownRef.tagBarcodes[to] = {};
+              Hot.dropdownRef.tagBarcodes[to].one = bc1Data.tagBarcodes;
             }    
           );
           if (posData['numApplicableBarcodes'] == 2) {
             jQuery.get('../../tagBarcodesJson', {strategy : to , position: 2},
               function (bc2Data) {
-                Library.hot.hotTable.setDataAtCell(row, tb2ColIndex, '', 'barcode kit change');
-                Library.hot.hotTable.getCellMeta(row, tb2ColIndex).source = Library.hot.getBcComposites(bc2Data.tagBarcodes);
-                Library.hot.dropdownRef.tagBarcodes[to].two = bc2Data.tagBarcodes;
+                Hot.hotTable.setDataAtCell(row, tb2ColIndex, '', 'barcode kit change');
+                Hot.hotTable.getCellMeta(row, tb2ColIndex).source = Library.hot.getBcComposites(bc2Data.tagBarcodes);
+                Hot.dropdownRef.tagBarcodes[to].two = bc2Data.tagBarcodes;
               }    
             );
           }
@@ -468,38 +460,47 @@ Library.hot = {
     }
   },
   
+  /**
+   * Gets tagBarcode kits data from server
+   */
   getBarcodeKitsOnly: function (platformName) {
     jQuery.get('../../barcodeStrategiesJson', {platform: platformName},
       function (data) {
-        Library.hot.dropdownRef.barcodeKits[platformName] = {};
-        Library.hot.dropdownRef.barcodeKits[platformName] = data['barcodeKits'];
+        Hot.dropdownRef.barcodeKits[platformName] = {};
+        Hot.dropdownRef.barcodeKits[platformName] = data['barcodeKits'];
       }    
     );
   },
   
+  /**
+   * Gets tagBarcodes data from server
+   */
   getBarcodePositionsOnly: function (strat) {
     jQuery.get("../../barcodePositionsJson", {strategy : strat},
       function(posData) {
         // set tagBarcodeData
-        Library.hot.dropdownRef.tagBarcodes[strat] = {};
+        Hot.dropdownRef.tagBarcodes[strat] = {};
         if (posData['numApplicableBarcodes'] == 2) {
           
           jQuery.get('../../tagBarcodesJson', {strategy : strat , position: 2},
             function (bc2Data) {
               Library
-              Library.hot.dropdownRef.tagBarcodes[strat].two = bc2Data.tagBarcodes;
+              Hot.dropdownRef.tagBarcodes[strat].two = bc2Data.tagBarcodes;
             }    
           );
         }
         jQuery.get('../../tagBarcodesJson', {strategy : strat , position: 1},
           function (bc1Data) {
-            Library.hot.dropdownRef.tagBarcodes[strat].one = bc1Data.tagBarcodes;
+            Hot.dropdownRef.tagBarcodes[strat].one = bc1Data.tagBarcodes;
           }    
         );
       }
     );
   },
   
+  /**
+   * Creates the Library Dtos to pass to the server
+   */
   buildLibraryDtosFromData: function (obj) {
     var lib = {};
     
@@ -526,9 +527,9 @@ Library.hot = {
     
     lib.platformName = obj.platformName;
     
-    lib.librarySelectionTypeId = Library.hot.getIdFromAlias(obj.librarySelectionTypeAlias, Library.hot.dropdownRef['selectionTypes']);
-    lib.libraryStrategyTypeId = Library.hot.getIdFromAlias(obj.libraryStrategyTypeAlias, Library.hot.dropdownRef['strategyTypes']);
-    lib.libraryTypeId = Library.hot.getIdFromAlias(obj.libraryTypeAlias, Library.hot.dropdownRef['libraryTypes']);
+    lib.librarySelectionTypeId = Hot.getIdFromAlias(obj.librarySelectionTypeAlias, Hot.dropdownRef['selectionTypes']);
+    lib.libraryStrategyTypeId = Hot.getIdFromAlias(obj.libraryStrategyTypeAlias, Hot.dropdownRef['strategyTypes']);
+    lib.libraryTypeId = Hot.getIdFromAlias(obj.libraryTypeAlias, Hot.dropdownRef['libraryTypes']);
     
     if (obj.lowQuality !== undefined) {
       lib.lowQuality = obj.lowQuality;
@@ -541,10 +542,10 @@ Library.hot = {
         var tbsn = obj.tagBarcodeStrategyName;
         lib.tagBarcodeStrategyName = tbsn;
         if (obj.tagBarcodes.one.alias) {
-          lib.tagBarcodeIndex1Id = Library.hot.getIdFromBcComposite(obj.tagBarcodes.one.alias, Library.hot.dropdownRef.tagBarcodes[tbsn].one);
+          lib.tagBarcodeIndex1Id = Library.hot.getIdFromBcComposite(obj.tagBarcodes.one.alias, Hot.dropdownRef.tagBarcodes[tbsn].one);
         }
         if (obj.tagBarcodes.two.alias) {
-          lib.tagBarcodeIndex2Id = Library.hot.getIdFromBcComposite(obj.tagBarcodes.two.alias, Library.hot.dropdownRef.tagBarcodes[tbsn].two);
+          lib.tagBarcodeIndex2Id = Library.hot.getIdFromBcComposite(obj.tagBarcodes.two.alias, Hot.dropdownRef.tagBarcodes[tbsn].two);
         }
       }
     }
@@ -556,15 +557,13 @@ Library.hot = {
     }
     
     if (obj.libraryAdditionalInfo) {
-      var tissueOriginAlias = obj.libraryAdditionalInfo.tissueOrigin.alias;
-      var tissueTypeAlias = obj.libraryAdditionalInfo.tissueType.alias;
       lib.libraryAdditionalInfo = {
         tissueOrigin: obj.libraryAdditionalInfo.tissueOrigin,
         tissueType: obj.libraryAdditionalInfo.tissueType
       };
       if (obj.libraryAdditionalInfo.prepKit.alias) {
         var prepKitAlias = obj.libraryAdditionalInfo.prepKit.alias;
-        lib.libraryAdditionalInfo.prepKit = Library.hot.sampleOptions.kitDescriptorsDtos.filter(function (kd) { return (kd.name == prepKitAlias); })[0];
+        lib.libraryAdditionalInfo.prepKit = Hot.sampleOptions.kitDescriptorsDtos.filter(function (kd) { return (kd.name == prepKitAlias); })[0];
       }
       if (obj.libraryAdditionalInfo.archived) {
         lib.libraryAdditionalInfo.archived = obj.libraryAdditionalInfo.archived;
@@ -580,6 +579,9 @@ Library.hot = {
     return lib;
   },
   
+  /**
+   * Posts a single library to server and processes result
+   */
   saveOneLibrary: function (data, rowIndex, numberToSave, callback) {
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function() {
@@ -593,6 +595,9 @@ Library.hot = {
     xhr.send(data);
   },
   
+  /**
+   * Puts a single library to server and processes result
+   */
   updateOneLibrary: function (data, libraryId, rowIndex, numberToSave, callback) {
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function () {
@@ -606,10 +611,13 @@ Library.hot = {
     xhr.send(data);
   },
   
+  /**
+   * Processes a failure to save (adds invalid attribute to cell, creates user message)
+   */
   failSave: function (xhr, rowIndex, numberToSave) {
     console.log(xhr);
     var responseText = JSON.parse(xhr.responseText);
-    var allColumnData = Library.hot.getValues('data', Library.hot.colConf);
+    var allColumnData = Hot.getValues('data', Hot.colConf);
     var column, columnIndex;
     if (responseText.data && responseText.data.constraintName) {
       // if a column's constraint was violated, extract it here
@@ -618,84 +626,92 @@ Library.hot = {
     }
     console.log(rowIndex, columnIndex);
     if (rowIndex !== undefined && columnIndex !== -1 && columnIndex !== undefined) {
-      Library.hot.hotTable.setCellMeta(rowIndex, columnIndex, 'valid', false);
+      Hot.hotTable.setCellMeta(rowIndex, columnIndex, 'valid', false);
     }
     // process error message if it was a SQL violation, and add any errors to the messages array
     var reUserMessage = /could not execute .*?: (.*)/;
-    Library.hot.messages.failed.push("Row "+ (rowIndex + 1) +": "+ responseText.detail.replace(reUserMessage, "$1")); 
-    
-    // display any errors if this is the final sample to be saved
-    if (Library.hot.messages.success.length + Library.hot.messages.failed.length == numberToSave) {
-      Library.hot.addAnyErrors();
-    }
+    Hot.messages.failed.push("Row "+ (rowIndex + 1) +": "+ responseText.detail.replace(reUserMessage, "$1")); 
+
+    Hot.addSuccessesAndErrors();
   },
   
+  /**
+   * Processes a successful save
+   */
   successSave: function (xhr, rowIndex, numberToSave) {
-    // push row index for new saves (previously-saved items have their aliases added)
-    Library.hot.messages.success.push(rowIndex); 
+    // add library url and id to the data source if the library is newly created
+    var libraryId;
+    if (!Hot.startData[rowIndex].id) {
+      Hot.startData[rowIndex].url = xhr.getResponseHeader('Location');
+      libraryId = Hot.startData[rowIndex].url.split('/').pop();
+      Hot.startData[rowIndex].id = libraryId;
+      
+      // update this when library alias generator is enabled
+      Hot.messages.success[rowIndex] = Hot.startData[rowIndex].alias;
+    } else {
+      libraryId = Hot.startData[rowIndex].id;
+    }
     
     // add a 'saved' attribute to the data source 
-    Library.hot.startData[rowIndex].saved = true;
+    Hot.startData[rowIndex].saved = true;
     
-    // add sample url and id to the data source if the sample is newly created
-    if (!Library.hot.startData[rowIndex].id) {
-      Library.hot.startData[rowIndex].url = xhr.getResponseHeader('Location');
-      Library.hot.startData[rowIndex].id = Library.hot.startData[rowIndex].url.split('/').pop();
-    }
-    
-    // display any errors if this is the final sample to be saved
-    if (Library.hot.messages.success.length + Library.hot.messages.failed.length == numberToSave) {
-      Library.hot.addAnyErrors();
-    }
+    // create success and error messages
+    Hot.addSuccessesAndErrors();
   },
   
+  /**
+   * Checks if cells are all valid. If yes, POSTs libraries that need to be saved.
+   */
   createData: function () {
-    var continueValidation = Library.hot.cleanRowsAndToggleSaveButton();
+    var continueValidation = Hot.cleanRowsAndToggleSaveButton();
     if (continueValidation === false) return false;
     
-    Library.hot.hotTable.validateCells(function (isValid) {
+    Hot.hotTable.validateCells(function (isValid) {
       if (isValid) {
-        // send it through the parser to get a sampleData array that isn't merely a reference to Library.hot.hotTable.getSourceData()
-        libsData = JSON.parse(JSON.parse(JSON.stringify(Library.hot.hotTable.getSourceData())));
+        // send it through the parser to get a sampleData array that isn't merely a reference to Hot.hotTable.getSourceData()
+        libsData = JSON.parse(JSON.parse(JSON.stringify(Hot.hotTable.getSourceData())));
           
-        // add aliases of previously-saved items to the position corresponding to their row (zero-index data, one-index UI)
-        // aliases of successfully-saved items will be added after save
-        Library.hot.messages.success = libsData.map(function (lib) { return (lib.saved === true ? lib.alias : null); });
+        // add previously-saved aliases to success message, and placeholders for items to be saved
+        Hot.messages.success = libsData.map(function (lib) { return (lib.saved === true ? lib.alias : null); });
     
         // Array of save functions, one for each line in the table
         var libsSaveArray = Library.hot.getArrayOfNewObjects(libsData);
-        Library.hot.serial(libsSaveArray); // Execute saves serially     
+        Hot.serial(libsSaveArray); // Execute saves serially     
       } else {
-        Library.hot.validationFails();
+        Hot.validationFails();
         return false;
       }
     });
   },
   
+  /**
+   * Checks if cells are all valid. If yes, PUTs libraries that need to be saved.
+   */
   updateData: function () {
-    var continueValidation = Library.hot.cleanRowsAndToggleSaveButton();
+    var continueValidation = Hot.cleanRowsAndToggleSaveButton();
     if (continueValidation === false) return false;
     
-    Library.hot.hotTable.validateCells(function (isValid) {
+    Hot.hotTable.validateCells(function (isValid) {
       if (isValid) {
-        // send it through the parser to get a sampleData array that isn't merely a reference to Library.hot.hotTable.getSourceData()
-        libsData = JSON.parse(JSON.parse(JSON.stringify(Library.hot.hotTable.getSourceData())));
+        // send it through the parser to get a sampleData array that isn't merely a reference to Hot.hotTable.getSourceData()
+        libsData = JSON.parse(JSON.parse(JSON.stringify(Hot.hotTable.getSourceData())));
         
-        
-        // add aliases of previously-saved items to the position corresponding to their row (zero-index data, one-index UI)
-        // aliases of successfully-saved items will be added after save
-        Library.hot.messages.success = libsData.map(function (lib) { return (lib.saved === true ? lib.alias : null); });
+     // add previously-saved aliases to success message, and placeholders for items to be saved
+        Hot.messages.success = libsData.map(function (lib) { return (lib.saved === true ? lib.alias : null); });
         
         // Array of save functions, one for each line in the table
         var libsSaveArray = Library.hot.getArrayOfUpdatedObjects(libsData);
-        Library.hot.serial(libsSaveArray); // Execute saves serially     
+        Hot.serial(libsSaveArray); // Execute saves serially     
       } else {
-        Library.hot.validationFails();
+        Hot.validationFails();
         return false;
       }
     });
   },
   
+  /**
+   * Creates Library Dtos for libraries to be POSTed
+   */
   getArrayOfNewObjects: function (libraryData) {
     // Returns a save function for a single line in the table.
     function librarySaveFunction(data, index, numberToSave) {
@@ -712,7 +728,7 @@ Library.hot = {
       if (libraryData[i].saved) continue;
       
       var newLibrary = Library.hot.buildLibraryDtosFromData(libraryData[i]);
-      if (Library.hot.detailedSample) {
+      if (Hot.detailedSample) {
         arrayOfObjects.push(librarySaveFunction(JSON.stringify(newLibrary), i, len));
       } else {
         arrayOfObjects.push(newLibrary);
@@ -721,6 +737,9 @@ Library.hot = {
     return arrayOfObjects;
   },
   
+  /**
+   * Creates Library Dtos for libraries to be PUT-ed
+   */
   getArrayOfUpdatedObjects: function (libraryData) {
     // Returns a save function for a single line in the table.
     function librarySaveFunction(data, id, rowIndex, numberToSave) {
@@ -742,142 +761,5 @@ Library.hot = {
       arrayOfObjects.push(librarySaveFunction(JSON.stringify(newLibrary), newLibrary.id, i, len));
     }
     return arrayOfObjects;
-  },
-  
-  /**
-   * Serial execution of an array of functions. 
-   * @param {Function[]} aof - Each function takes a single callback function parameter.
-   */
-  serial: function(aof) {
-    var invokeNext = function(index) {
-      if(index < (aof.length)) {
-        aof[index](function() { invokeNext(index + 1);} );
-      }
-    };
-    invokeNext(0);
-  },
-  
-  cleanRowsAndToggleSaveButton: function () {
-    // reset error and success messages
-    Library.hot.messages.success = [];
-    Library.hot.messages.failed = [];
-    
-    // disable the save button
-    if (Library.hot.button && Library.hot.button.classList.contains('disabled') === false) Library.hot.toggleButtonAndLoaderImage(Library.hot.button);
-    
-    var tableData = Library.hot.startData;
-    
-    // if last row is empty, remove it before validation
-    Library.hot.removeEmptyBottomRows(tableData);
-    
-    // if there are no rows, add one back in and exit
-    if (tableData.length === 0) {
-      Library.hot.startData = [];
-      return false;
-    }
-  },
-  
-  removeEmptyBottomRows: function (tableData) {
-    while (Library.hot.startData.length > 1 && Library.hot.hotTable.isEmptyRow(tableData.length - 1)) {
-      Library.hot.hotTable.alter('remove_row', parseInt(tableData.length - 1), keepEmptyRows = false);
-    }
-  },
-  
-  toggleButtonAndLoaderImage: function (button) {
-    var ajaxLoader;
-    if (button.className.indexOf('disabled') == -1) {
-      button.classList.add('disabled');
-      button.setAttribute('disabled', 'disabled');
-      ajaxLoader = "<img id='ajaxLoader' src='/../styles/images/ajax-loader.gif'/>";
-      button.insertAdjacentHTML('afterend', ajaxLoader);      
-    } else {
-      button.classList.remove('disabled');
-      button.removeAttribute('disabled');
-      ajaxLoader = document.getElementById('ajaxLoader');
-      if (ajaxLoader) ajaxLoader.parentNode.removeChild(ajaxLoader);
-    }
-  },
-  
-  validationFails: function () {
-    Library.hot.messages.failed.push("It looks like some cells are not yet valid. Please fix them before saving.");
-    Library.hot.addAnyErrors();
-  },
-  
-  areAllProcessed: function () {
-    var messages = Library.hot.messages;
-    var savedItems = messages.success.filter(function (item) { return (item !== null); });
-    if (savedItems.length + messages.failed.length == messages.success.length) {
-      return true;
-    } else {
-      return false;
-    }
-  },
-  
-  addErrors: function (messages) {
-    var errorMessages = document.getElementById('errorMessages');
-    var ary = ["<ul>"];
-    for (var i=0; i<messages.failed.length; i++) {
-      ary.push("<li>"+ messages.failed[i] +"</li>");
-    }
-    ary.push("</ul>");
-    errorMessages.innerHTML = '';
-    errorMessages.innerHTML = ary.join('');
-    document.getElementById('saveErrors').classList.remove('hidden');
-    Library.hot.hotTable.validateCells();
-    for (var i = 0; i < Library.hot.failedComplexValidation.length; i++) {
-      var failedIndices = Library.hot.failedComplexValidation[i];
-      Library.hot.markCellsInvalid(failedIndices[0], failedIndices[1]);
-    }
-    Library.hot.hotTable.render();
-    
-    // enable the save button
-    if (Library.hot.button && Library.hot.button.classList.contains('disabled')) Library.hot.toggleButtonAndLoaderImage(Library.hot.button);
-  },
-  
-  addSuccessesAndErrors: function () {
-    // break if not all items have been processed yet
-    if (Library.hot.areAllProcessed() == false) {
-      return false;
-    }
-    var messages = Library.hot.messages;
-    
-    // add error messages
-    if (messages.failed.length) {
-      Library.hot.addErrors(messages);
-    } else {
-      document.getElementById('saveErrors').classList.add('hidden');
-      
-      // enable the save button
-      if (Library.hot.button && Library.hot.button.classList.contains('disabled')) Library.hot.toggleButtonAndLoaderImage(Library.hot.button);
-    }
-    
-    // add success messages
-    var successfullySaved = messages.success.filter(function (message) { return (message !== null); });
-    if (messages.success.length) {
-      var successMessage = successfullySaved.length + " libraries are now saved.";
-      document.getElementById('successMessages').innerHTML = successMessage;
-      document.getElementById('saveSuccesses').classList.remove('hidden');
-      Library.hot.makeSavedRowsReadOnly();
-    } else {
-      document.getElementById('saveSuccesses').classList.add('hidden');
-    } 
-  },
-  
-  markCellsInvalid: function (rowIndex, colIndex) {
-    Library.hot.hotTable.setCellMeta(rowIndex, colIndex, 'valid', false);
-  },
-  
-  makeSavedRowsReadOnly: function () {
-    Library.hot.hotTable.updateSettings({
-      cells: function (row, col, prop) {
-        var cellProperties = {};
-        
-        if (Library.hot.hotTable.getSourceData()[row].saved) {
-          cellProperties.readOnly = true;
-        }
-        
-        return cellProperties;
-      }
-    });
   }
 };

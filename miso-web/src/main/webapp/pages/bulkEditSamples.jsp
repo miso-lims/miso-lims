@@ -92,10 +92,10 @@
 	<script type="text/javascript">
 	  jQuery(document).ready(function () {
 	    Sample.hot.samplesJSON = ${samplesJSON};
-	    Sample.hot.dropdownRef = ${referenceDataJSON};
+	    Hot.dropdownRef = ${referenceDataJSON};
 	    Sample.hot.aliasGenerationEnabled = ${aliasGenerationEnabled};
-	    Sample.hot.detailedSample = JSON.parse(document.getElementById('HOTbulkForm').dataset.detailedSample);
-	    Sample.hot.button = document.getElementById('saveSamples');
+	    Hot.detailedSample = JSON.parse(document.getElementById('HOTbulkForm').dataset.detailedSample);
+	    Hot.saveButton = document.getElementById('saveSamples');
 	    Sample.hot.createOrEdit = "${method}";
 
 	    Sample.hot.makeBulkEditTable = function () {
@@ -108,7 +108,7 @@
         Sample.hot.newSamplesJSON = Sample.hot.modifySamplesForPropagate(Sample.hot.samplesJSON);
         var sampleCategory = Sample.hot.getCategoryFromClassId(Sample.hot.newSamplesJSON[0].sampleAdditionalInfo.parentSampleClassId);
         Sample.hot.makeHOT(Sample.hot.newSamplesJSON, sampleCategory);
-        Sample.hot.hotTable.updateSettings({
+        Hot.hotTable.updateSettings({
           cells: function (row, col, prop) {
             var cellProperties = {};
             if (prop == 'sampleAdditionalInfo.sampleClassAlias') {
@@ -120,14 +120,14 @@
       };
 
 	    // get SampleOptions and make the appropriate table
-      if (Boolean(Sample.hot.detailedSample)) {
+      if (Boolean(Hot.detailedSample)) {
         if (Sample.hot.createOrEdit == "Create") {
           Sample.hot.sampleClassId = parseInt(${sampleClassId});
-          Sample.hot.button.addEventListener('click', Sample.hot.propagateData, true);
-          Sample.hot.fetchSampleOptions(Sample.hot.makeBulkCreateTable);
+          Hot.saveButton.addEventListener('click', Sample.hot.propagateData, true);
+          Hot.fetchSampleOptions(Sample.hot.makeBulkCreateTable);
         } else {
-          Sample.hot.button.addEventListener('click', Sample.hot.updateData, true);
-          Sample.hot.fetchSampleOptions(Sample.hot.makeBulkEditTable);
+          Hot.saveButton.addEventListener('click', Sample.hot.updateData, true);
+          Hot.fetchSampleOptions(Sample.hot.makeBulkEditTable);
         }
       }
 	  });
