@@ -441,7 +441,7 @@ public class DefaultSampleService implements SampleService {
     applyChanges(updatedSample, sample);
     setChangeDetails(updatedSample, false);
     loadChildEntities(updatedSample);
-    if (updatedSample.getSampleAdditionalInfo() != null) {
+    if (updatedSample.getSampleAdditionalInfo() != null && updatedSample.getSampleAdditionalInfo().getParent() != null) {
       updatedSample.getSampleAdditionalInfo().setParent(get(updatedSample.getSampleAdditionalInfo().getParent().getId()));
       validateHierarchy(updatedSample);
     }
