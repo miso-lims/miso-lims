@@ -3,7 +3,6 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -11,6 +10,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -23,19 +23,16 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
+
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBox;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
-import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.integration.BoxScanner;
-import uk.ac.bbsrc.tgac.miso.webapp.context.ApplicationContextProvider;
-import uk.ac.bbsrc.tgac.miso.webapp.util.MisoPropertyExporter;
-
-import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 @Controller
 @RequestMapping("/box")
@@ -67,13 +64,14 @@ public class EditBoxController {
     this.securityManager = securityManager;
   }
 
+  @Value("${miso.boxscanner.enabled}")
+  private Boolean scannerEnabled;
+
   @ModelAttribute("scannerEnabled")
   public Boolean isScannerEnabled() {
-    MisoPropertyExporter exporter = (MisoPropertyExporter) ApplicationContextProvider.getApplicationContext().getBean("propertyConfigurer");
-    Map<String, String> misoProperties = exporter.getResolvedProperties();
-    return misoProperties.containsKey("miso.boxscanner.enabled") && Boolean.parseBoolean(misoProperties.get("miso.boxscanner.enabled"));
+    return scannerEnabled;
   }
-  
+
   @ModelAttribute("maxLengths")
   public Map<String, Integer> maxLengths() throws IOException {
     return requestManager.getBoxColumnSizes();
@@ -127,24 +125,10 @@ public class EditBoxController {
       model.put("box", box);
 
       // add all BoxUses
-      LinkedHashMap<Long, String> uses = new LinkedHashMap<Long, String>();
-      for (BoxUse boxUse : requestManager.listAllBoxUses()) {
-        uses.put(boxUse.getId(), boxUse.getAlias());
-      }
-      model.put("boxUses", uses);
+      model.put("boxUses", requestManager.listAllBoxUses());
 
       // add all BoxSizes
-      LinkedHashMap<Long, String> sizes = new LinkedHashMap<Long, String>();
-      for (BoxSize boxSize : requestManager.listAllBoxSizes()) {
-        boolean scannable = boxSize.getScannable();
-        if (scannable) {
-          sizes.put(boxSize.getId(), boxSize.getRowsByColumns() + (isScannerEnabled() ? "  scannable" : ""));
-        } else {
-          sizes.put(boxSize.getId(), boxSize.getRowsByColumns() + (isScannerEnabled() ? "  not scannable" : ""));
-        }
-        // hides scannability if a lab does not have the bulk scanner enabled
-      }
-      model.put("boxSizes", sizes);
+      model.put("boxSizes", requestManager.listAllBoxSizes());
 
       // add all box contents
       model.put("boxables", box.getBoxables());

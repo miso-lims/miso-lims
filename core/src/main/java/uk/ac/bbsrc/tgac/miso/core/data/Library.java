@@ -53,31 +53,14 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  * @author Rob Davey
  * @since 0.0.2
  */
-@JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)//, using = LibrarySerializer.class)
+@JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL) // , using = LibrarySerializer.class)
 @JsonTypeName("library")
-@JsonIgnoreProperties({"securityProfile"})
+@JsonIgnoreProperties({ "securityProfile" })
 @PrintableBarcode
 public interface Library extends SecurableByProfile, Comparable, Barcodable, Locatable, Deletable, Plateable, Boxable {
 
   /** Field PREFIX */
   public static final String PREFIX = "LIB";
-
-  /**
-   * Returns the libraryId of this Library object.
-   * 
-   * @return Long libraryId.
-   */
-  @Deprecated
-  public Long getLibraryId();
-
-  /**
-   * Sets the libraryId of this Library object.
-   * 
-   * @param libraryId
-   *          libraryId.
-   */
-  @Deprecated
-  public void setLibraryId(Long libraryId);
 
   public void setId(long id);
 
@@ -377,6 +360,6 @@ public interface Library extends SecurableByProfile, Comparable, Barcodable, Loc
   public boolean isLowQuality();
 
   public LibraryAdditionalInfo getLibraryAdditionalInfo();
-  
+
   public void setLibraryAdditionalInfo(LibraryAdditionalInfo libraryAdditionalInfo);
 }

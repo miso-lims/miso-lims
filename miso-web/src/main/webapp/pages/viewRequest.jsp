@@ -29,7 +29,7 @@
 
 <ul>
   <c:forEach var="execCount" begin="1" end="${request.executionCount}" step="1">
-    <li><a href='<c:url value="/miso/request/view/${request.requestId}/${execCount}"/>'>View results for
+    <li><a href='<c:url value="/miso/request/view/${request.id}/${execCount}"/>'>View results for
       execution ${execCount}</a></li>
   </c:forEach>
 </ul>
@@ -57,7 +57,7 @@
     <tr>
       <td>Note:</td>
       <td>
-        <input type="hidden" name="requestId" value="${request.requestId}"/>
+        <input type="hidden" name="requestId" value="${request.id}"/>
         <textarea name="text">Type note in here</textarea>
       </td>
     </tr>

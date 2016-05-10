@@ -126,18 +126,6 @@ public abstract class AbstractRun implements Run {
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
   @Override
-  @Deprecated
-  public Long getRunId() {
-    return runId;
-  }
-
-  @Override
-  @Deprecated
-  public void setRunId(Long runId) {
-    this.runId = runId;
-  }
-
-  @Override
   public long getId() {
     return runId;
   }
@@ -521,7 +509,7 @@ public abstract class AbstractRun implements Run {
 
     if (getStatus() != null) {
       sb.append(getStatus().getHealth());
-      sb.append("(" + getStatus().getStatusId() + ")");
+      sb.append("(" + getStatus().getId() + ")");
     }
     return sb.toString();
   }

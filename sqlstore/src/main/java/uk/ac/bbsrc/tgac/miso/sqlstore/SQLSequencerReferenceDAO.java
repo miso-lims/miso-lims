@@ -122,7 +122,7 @@ public class SQLSequencerReferenceDAO implements SequencerReferenceStore {
 
     params.addValue("name", sequencerReference.getName());
     params.addValue("ipAddress", ipBlob);
-    params.addValue("platformId", sequencerReference.getPlatform().getPlatformId());
+    params.addValue("platformId", sequencerReference.getPlatform().getId());
     params.addValue("available", sequencerReference.getAvailable());
     params.addValue("serialNumber", sequencerReference.getSerialNumber());
     params.addValue("dateCommissioned", sequencerReference.getDateCommissioned());

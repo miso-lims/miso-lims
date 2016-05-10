@@ -56,18 +56,6 @@ public class TagBarcodeImpl implements TagBarcode, Serializable {
   private String strategyName;
 
   @Override
-  @Deprecated
-  public Long getTagBarcodeId() {
-    return tagBarcodeId;
-  }
-
-  @Override
-  @Deprecated
-  public void setTagBarcodeId(Long tagBarcodeId) {
-    this.tagBarcodeId = tagBarcodeId;
-  }
-
-  @Override
   public long getId() {
     return tagBarcodeId;
   }

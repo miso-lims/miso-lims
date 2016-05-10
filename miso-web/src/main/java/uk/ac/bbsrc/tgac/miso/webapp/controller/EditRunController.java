@@ -37,6 +37,7 @@ import javax.xml.transform.TransformerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -73,8 +74,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
 import uk.ac.bbsrc.tgac.miso.runstats.client.RunStatsException;
 import uk.ac.bbsrc.tgac.miso.runstats.client.manager.RunStatsManager;
 import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
-import uk.ac.bbsrc.tgac.miso.webapp.context.ApplicationContextProvider;
-import uk.ac.bbsrc.tgac.miso.webapp.util.MisoPropertyExporter;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 import com.eaglegenomics.simlims.core.User;
@@ -102,13 +101,6 @@ public class EditRunController {
 
   @Autowired
   private SequencingParametersService sequencingParametersService;
-
-  @Autowired
-  private ApplicationContextProvider applicationContextProvider;
-
-  public void setApplicationContextProvider(ApplicationContextProvider applicationContextProvider) {
-    this.applicationContextProvider = applicationContextProvider;
-  }
 
   public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
     this.dataObjectFactory = dataObjectFactory;
@@ -163,12 +155,12 @@ public class EditRunController {
     return false;
   }
 
+  @Value("${miso.notification.interop.enabled}")
+  private Boolean metrixEnabled;
+
   @ModelAttribute("metrixEnabled")
   public Boolean isMetrixEnabled() {
-    MisoPropertyExporter exporter = (MisoPropertyExporter) ApplicationContextProvider.getApplicationContext().getBean("propertyConfigurer");
-    Map<String, String> misoProperties = exporter.getResolvedProperties();
-    return misoProperties.containsKey("miso.notification.interop.enabled")
-        && Boolean.parseBoolean(misoProperties.get("miso.notification.interop.enabled"));
+    return metrixEnabled;
   }
 
   public Boolean hasOperationsQcPassed(Run run) throws IOException {
@@ -301,7 +293,7 @@ public class EditRunController {
         }
         if (run.getSequencerReference() != null) {
           model.put("sequencingParameters",
-              sequencingParametersService.getForPlatform((long) run.getSequencerReference().getPlatform().getPlatformId()));
+              sequencingParametersService.getForPlatform((long) run.getSequencerReference().getPlatform().getId()));
         } else {
           model.put("sequencingParameters", Collections.emptyList());
         }

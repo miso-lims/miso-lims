@@ -8,7 +8,7 @@ ALTER TABLE LibraryDesign ADD CONSTRAINT `LibraryDesign_librarySelectionType_fke
 ALTER TABLE LibraryDesign DROP FOREIGN KEY `FK_lpr_strategytype`;
 ALTER TABLE LibraryDesign CHANGE `libraryStrategyType` `libraryStrategyType` bigint(20) NOT NULL;
 ALTER TABLE LibraryDesign ADD CONSTRAINT `LibraryDesign_libraryStrategyType_fkey` FOREIGN KEY (libraryStrategyType) REFERENCES LibraryStrategyType (libraryStrategyTypeId);
-ALTER TABLE LibraryDesign ADD COLUMN `suffix` text NOT NULL DEFAULT '';
+ALTER TABLE LibraryDesign ADD COLUMN `suffix` VARCHAR(5) NOT NULL DEFAULT '';
 
 ALTER TABLE LibraryAdditionalInfo ADD COLUMN libraryDesign bigint(20) DEFAULT NULL;
 ALTER TABLE LibraryAdditionalInfo ADD CONSTRAINT `LibraryAdditionalInfo_libraryDesign_fkey` FOREIGN KEY (libraryDesign) REFERENCES LibraryDesign (libraryDesignId);

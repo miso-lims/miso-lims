@@ -6,9 +6,9 @@ import com.eaglegenomics.simlims.core.User;
 
 public interface SamplePurpose {
 
-  Long getSamplePurposeId();
+  Long getId();
 
-  void setSamplePurposeId(Long samplePurposeId);
+  void setId(Long samplePurposeId);
 
   String getAlias();
 

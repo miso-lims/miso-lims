@@ -4,7 +4,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -39,7 +38,7 @@ public class SampleAdditionalInfoImpl implements SampleAdditionalInfo {
   @MapsId
   private Sample sample;
   
-  @ManyToOne(optional = true, targetEntity = SampleImpl.class, cascade = CascadeType.ALL)
+  @ManyToOne(optional = true, targetEntity = SampleImpl.class)
   @JoinColumn(name = "parentId", nullable = true)
   private Sample parent;
 
@@ -105,12 +104,12 @@ public class SampleAdditionalInfoImpl implements SampleAdditionalInfo {
   private Date lastUpdated;
 
   @Override
-  public Long getSampleId() {
+  public Long getId() {
     return sampleId;
   }
 
   @Override
-  public void setSampleId(Long sampleAdditionalInfoId) {
+  public void setId(Long sampleAdditionalInfoId) {
     this.sampleId = sampleAdditionalInfoId;
   }
 
@@ -297,7 +296,7 @@ public class SampleAdditionalInfoImpl implements SampleAdditionalInfo {
     if (prepKit == null) {
       this.kitDescriptorId = null;
     } else {
-      this.kitDescriptorId = prepKit.getKitDescriptorId();
+      this.kitDescriptorId = prepKit.getId();
     }
   }
   

@@ -224,7 +224,7 @@ public class SQLKitDAO implements KitStore {
     params.addValue("locationBarcode", kit.getLocationBarcode());
     params.addValue("lotNumber", kit.getLotNumber());
     params.addValue("kitDate", kit.getKitDate());
-    params.addValue("kitDescriptorId", kit.getKitDescriptor().getKitDescriptorId());
+    params.addValue("kitDescriptorId", kit.getKitDescriptor().getId());
 
     if (kit.getId() == AbstractKit.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(KIT_TABLE_NAME).usingGeneratedKeyColumns("kitId");
@@ -341,24 +341,24 @@ public class SQLKitDAO implements KitStore {
     params.addValue("description", kd.getDescription());
     params.addValue("lastModifier", kd.getLastModifier().getUserId());
 
-    if (kd.getKitDescriptorId() == KitDescriptor.UNSAVED_ID) {
+    if (kd.getId() == KitDescriptor.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName("KitDescriptor").usingGeneratedKeyColumns("kitDescriptorId");
       Number newId = insert.executeAndReturnKey(params);
-      kd.setKitDescriptorId(newId.longValue());
+      kd.setId(newId.longValue());
     } else {
-      params.addValue("kitDescriptorId", kd.getKitDescriptorId());
+      params.addValue("kitDescriptorId", kd.getId());
       NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
       namedTemplate.update(KIT_DESCRIPTOR_UPDATE, params);
     }
 
-    return kd.getKitDescriptorId();
+    return kd.getId();
   }
 
   public class KitDescriptorMapper implements RowMapper<KitDescriptor> {
     @Override
     public KitDescriptor mapRow(ResultSet rs, int rowNum) throws SQLException {
       KitDescriptor kd = new KitDescriptor();
-      kd.setKitDescriptorId(rs.getLong("kitDescriptorId"));
+      kd.setId(rs.getLong("kitDescriptorId"));
       kd.setName(rs.getString("name"));
       kd.setVersion(rs.getDouble("version"));
       kd.setManufacturer(rs.getString("manufacturer"));
@@ -372,7 +372,7 @@ public class SQLKitDAO implements KitStore {
       } catch (IOException e) {
         log.error("kit descriptor row mapper", e);
       }
-      kd.getChangeLog().addAll(changeLogDAO.listAllById(DESCRIPTOR_TABLE_NAME, kd.getKitDescriptorId()));
+      kd.getChangeLog().addAll(changeLogDAO.listAllById(DESCRIPTOR_TABLE_NAME, kd.getId()));
 
       return kd;
     }

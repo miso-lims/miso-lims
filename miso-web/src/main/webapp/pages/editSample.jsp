@@ -69,7 +69,7 @@
     <c:otherwise><span id="status" data-status="create">Create</span></c:otherwise>
   </c:choose> Sample
   <button type="button" class="fg-button ui-state-default ui-corner-all"
-          onclick="return Sample.validateSample();">Save
+          onclick="return Sample.validateSample(${!empty sample.sampleAdditionalInfo}, ${sample.id == 0});">Save
   </button>
 </h1>
 
@@ -183,17 +183,18 @@
       </td>
     </tr>
     <tr>
-      <td>Project ID:</td>
+      <td>Project:</td>
       <c:choose>
         <c:when test="${empty sample.project}">
           <td>
-            <div id="projectlist" class="checklist">
-              <form:checkboxes items="${accessibleProjects}" path="project" itemValue="id"
-                               itemLabel="name" onclick="Utils.ui.uncheckOthers('project', this);"/>
-            </div>
-            <div class="parsley-errors-list filled" id="projectError">
-              <div class="parsley-required"></div>
-            </div>
+            <form:select id="project" path="project" onchange="Sample.ui.projectChanged();">
+              <option value="">SELECT</option>
+              <c:forEach items="${accessibleProjects}" var="proj">
+                <option value="${proj.id}" <c:if test="${proj.id == sample.project.id}">selected="selected"</c:if>>
+                    ${proj.name}: ${proj.alias}
+                </option>
+              </c:forEach>
+            </form:select>
           </td>
         </c:when>
         <c:otherwise>
@@ -280,163 +281,305 @@
       <td>Emptied:</td>
       <td><form:checkbox id="empty" path="empty"/></td>
     </tr>
-    
-    <c:if test="${!empty sample.sampleAdditionalInfo}">
-            <div class="bs-callout bs-callout-info">
-              <p>Some sample fields shown below cannot be updated on this page. 
-              <a href='<c:url value="/miso/sample/bulk/edit/${sample.id}"/>'>Use the bulk edit form</a> to modify these fields.</p>
-            </div>
-            
-            <tr>
-                <td><h2><br/>Details</h2></td>
-                <td></td>                               
-            </tr>  
-            <tr>
-                <td>Parent:</td>
-                 <c:choose>
-                    <c:when test="${empty sample.sampleAdditionalInfo.parent}">
-                        <td>None</td>
-                    </c:when>
-                    <c:otherwise>
-                        <td><a href='<c:url value="/miso/sample/${sample.sampleAdditionalInfo.parent.id}"/>'>${sample.sampleAdditionalInfo.parent.alias}</a></td>
-                    </c:otherwise>
-                </c:choose>          
-            </tr>
-            <tr>
-                <td>Children:</td>      
-                 <c:choose>
-                    <c:when test="${fn:length(sample.sampleAdditionalInfo.children) gt 0}">
-                        <td>
-                            <c:forEach items="${sample.sampleAdditionalInfo.children}" var="child">
-                                <a href='<c:url value="/miso/sample/${child.id}"/>'>${child.alias}</a>&nbsp;
-                            </c:forEach>
-                        </td>
-                    </c:when>
-                    <c:otherwise>
-                        <td>None</td>
-                    </c:otherwise>
-                </c:choose>          
-            </tr>            
-            <tr>
-                <td>Sample Class:</td>
-                <td><input readonly="true" value="${sample.sampleAdditionalInfo.sampleClass.alias}"/></td>       
-            </tr>
-            <tr>
-                <td>Tissue Origin:</td>
-                <td><input readonly="true" value="${sample.sampleAdditionalInfo.tissueOrigin.alias}"/></td>       
-            </tr>
-            <tr>
-                <td>Tissue Type:</td>
-                <td><input readonly="true" value="${sample.sampleAdditionalInfo.tissueType.alias}"/></td>                               
-            </tr>
-            <tr>
-                <td>QC Passed:</td>
-                <td><input readonly="true" value="${sample.sampleAdditionalInfo.qcPassedDetail.status}"/></td>                               
-            </tr>
-            <tr>
-                <td>Sub Project:</td>
-                <td><input readonly="true" value="${sample.sampleAdditionalInfo.subproject.alias}"/></td>                               
-            </tr>
-            <tr>
-                <td>External Institute:</td>
-                <td><input readonly="true" value="${sample.sampleAdditionalInfo.externalInstituteIdentifier}"/></td>                               
-            </tr>     
-            <tr>
-                <td>Lab:</td>
-                <td><input readonly="true" value="${sample.sampleAdditionalInfo.lab.alias}"/></td>                               
-            </tr>
-            <tr>
-                <td>Passage Number:</td>
-                <td><input readonly="true" value="${sample.sampleAdditionalInfo.passageNumber}"/></td>                               
-            </tr>                               
-            <tr>
-                <td>Times Received:</td>
-                <td><input readonly="true" value="${sample.sampleAdditionalInfo.timesReceived}"/></td>                               
-            </tr>                               
-            <tr>
-                <td>Tube Number:</td>
-                <td><input readonly="true" value="${sample.sampleAdditionalInfo.tubeNumber}"/></td>                               
-            </tr>                               
-            <tr>
-                <td>Concentration:</td>
-                <td><input readonly="true" value="${sample.sampleAdditionalInfo.concentration}"/></td>                               
-            </tr>                               
-    </c:if>
-    
-    <c:if test="${!empty sample.identity}">           
-            <tr>
-                <td><h2><br/>Identity</h2></td>
-                <td></td>                               
-            </tr>  
-            <tr>
-                <td>Internal Name:</td>
-                <td><input readonly="true" value="${sample.identity.internalName}"/></td>                               
-            </tr>                               
-            <tr>
-                <td>External Name:</td>
-                <td><input readonly="true" value="${sample.identity.externalName}"/></td>                               
-            </tr>              
-    </c:if>
-    
-    <c:if test="${!empty sample.sampleAnalyte}">           
-            <tr>
-                <td><h2><br/>Analyte</h2></td>
-                <td></td>                               
-            </tr>  
-            <tr>
-                <td>Sample Purpose:</td>
-                <td><input readonly="true" value="${sample.sampleAnalyte.samplePurpose.alias}"/></td>                               
-            </tr>                               
-            <tr>
-                <td>Group Id:</td>
-                <td><input readonly="true" value="${sample.sampleAnalyte.sampleGroup.groupId}"/></td>                               
-            </tr>              
-            <tr>
-                <td>Tissue Material:</td>
-                <td><input readonly="true" value="${sample.sampleAnalyte.tissueMaterial.alias}"/></td>                               
-            </tr>                               
-            <tr>
-                <td>STR Status:</td>
-                <td><input readonly="true" value="${sample.sampleAnalyte.strStatus}"/></td>                               
-            </tr>              
-            <tr>
-                <td>Region:</td>
-                <td><input readonly="true" value="${sample.sampleAnalyte.region}"/></td>                               
-            </tr>              
-            <tr>
-                <td>Tube Id:</td>
-                <td><input readonly="true" value="${sample.sampleAnalyte.tubeId}"/></td>                               
-            </tr>              
-    </c:if>
-        
-    <c:if test="${!empty sample.sampleTissue}">           
-            <tr>
-                <td><h2><br/>Tissue</h2></td>
-                <td></td>                               
-            </tr>  
-            <tr>
-                <td>Cellularity:</td>
-                <td><input readonly="true" value="${sample.sampleTissue.cellularity}"/></td>                               
-            </tr>                               
-    </c:if>    
-    
-    <c:choose>
-    <c:when
-        test="${!empty sample.project and sample.securityProfile.profileId eq sample.project.securityProfile.profileId}">
-    <tr>
-      <td>Permissions</td>
-      <td><i>Inherited from project </i>
-        <a href='<c:url value="/miso/project/${sample.project.id}"/>'>${sample.project.name} (${sample.project.alias})</a>
-        <input type="hidden" value="${sample.project.securityProfile.profileId}"
-               name="securityProfile" id="securityProfile"/>
-      </td>
-    </tr>
   </table>
-  </c:when>
-  <c:otherwise>
-    </table>
-    <%@ include file="permissions.jsp" %>
-  </c:otherwise>
+  <c:if test="${!empty sample.sampleAdditionalInfo}">
+    
+    <script type="text/javascript">
+      Sample.options.all = ${sampleOptions};
+      
+      <c:if test="${sample.id == 0}">
+        jQuery(document).ready(function () {
+          Sample.ui.sampleClassChanged();
+        });
+      </c:if>
+    </script>
+    
+    <br/>
+    <div id="detailedSample">
+        <c:if test="${!empty sample.identity}">
+          <br/>
+          <div id="detailedSampleIdentity">
+            <h2>Identity</h2>
+            <table class="in">
+              <tr>
+                <td class="h">External Name:*</td>
+                <td>
+                  <c:choose>
+                    <c:when test="${sample.id == 0}">
+                      <form:input id="externalName" path="identity.externalName"/>
+                    </c:when>
+                    <c:otherwise>
+                      ${sample.identity.externalName}
+                    </c:otherwise>
+                  </c:choose>
+                </td>
+              </tr>
+              <tr>
+                <td class="h">Sex:</td>
+                <td>
+                  <c:choose>
+                    <c:when test="${sample.id == 0}">
+                      <form:select id="donorSex" path="identity.donorSex">
+                      <c:forEach var="donorSexOption" items="${donorSexOptions}">
+                        <option value="${donorSexOption}" <c:if test="${sample.identity.donorSex == donorSexOption}">selected="selected"</c:if>>
+                          ${donorSexOption.label}
+                        </option>
+                      </c:forEach>
+                      </form:select>
+                    </c:when>
+                    <c:otherwise>
+                      ${sample.identity.donorSex}
+                    </c:otherwise>
+                  </c:choose>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </c:if>
+        
+        <br/>
+        <h2>Details</h2>
+    	<table class="in">
+        <tr>
+          <c:if test="${sample.id != 0}">
+            <td class="h">Parent:</td>
+            <c:choose>
+              <c:when test="${empty sample.sampleAdditionalInfo.parent}">
+                <td>n/a</td>
+              </c:when>
+              <c:otherwise>
+                <td><a href='<c:url value="/miso/sample/${sample.sampleAdditionalInfo.parent.id}"/>'>${sample.sampleAdditionalInfo.parent.alias}</a></td>
+              </c:otherwise>
+            </c:choose>
+          </c:if>
+        </tr>
+        <tr>
+          <td class="h">Sample Class:*</td>
+          <td>
+            <c:choose>
+              <c:when test="${sample.id == 0}">
+                <miso:select id="sampleClass" path="sampleAdditionalInfo.sampleClass" items="${sampleClasses}" itemLabel="alias" 
+                    itemValue="id" defaultLabel="SELECT" defaultValue="" onchange="Sample.ui.sampleClassChanged();"/>
+              </c:when>
+              <c:otherwise>
+                ${sample.sampleAdditionalInfo.sampleClass.alias}
+              </c:otherwise>
+            </c:choose>
+          </td>
+        </tr>
+        <tr>
+          <td class="h">Tissue Origin:*</td>
+          <td>
+            <c:choose>
+              <c:when test="${sample.id == 0}">
+                <miso:select id="tissueOrigin" path="sampleAdditionalInfo.tissueOrigin" items="${tissueOrigins}" itemLabel="description" 
+                    itemValue="id" defaultLabel="SELECT" defaultValue=""/>
+              </c:when>
+              <c:otherwise>
+                ${sample.sampleAdditionalInfo.tissueOrigin.description}
+              </c:otherwise>
+            </c:choose>
+          </td>      
+        </tr>
+        <tr>
+          <td class="h">Tissue Type:*</td>
+          <td>
+            <c:choose>
+              <c:when test="${sample.id == 0}">
+                <form:select id="tissueType" path="sampleAdditionalInfo.tissueType">
+                  <option value="">SELECT</option>
+                  <c:forEach items="${tissueTypes}" var="tissueType">
+                    <option value="${tissueType.id}" <c:if test="${tissueType.id == sample.sampleAdditionalInfo.tissueType.id}">selected="selected"</c:if>>
+                      ${fn:length(tissueType.description) lt 51 ? tissueType.description : fn:substring(tissueType.description,0,49) += '&hellip;'}
+                    </option>
+                  </c:forEach>
+                </form:select>
+              </c:when>
+              <c:otherwise>
+                ${sample.sampleAdditionalInfo.tissueType.description}
+              </c:otherwise>
+            </c:choose>
+          </td>                               
+        </tr>
+        <tr>
+          <td class="h">QC Details:</td>
+          <td>
+            <miso:select id="qcPassedDetail" path="sampleAdditionalInfo.qcPassedDetail" items="${qcPassedDetails}" itemLabel="description" 
+                    itemValue="id" defaultLabel="None" defaultValue=""/>
+          </td>                               
+        </tr>
+        <tr>
+          <td class="h">Sub-project:</td>
+          <td>
+            <c:choose>
+              <c:when test="${sample.id == 0}">
+                <form:select id="subProject" path="sampleAdditionalInfo.subproject" onchange="Sample.ui.subProjectChanged()">
+                  <%-- list filtered and filled by js --%>
+                  <script type="text/javascript">
+                    jQuery(document).ready(function () {
+                      Sample.ui.filterSubProjectOptions();
+                    });
+                  </script>
+                </form:select>
+              </c:when>
+              <c:otherwise>
+                <c:choose>
+                  <c:when test="!empty sample.sampleAdditionalInfo.subproject">
+                    ${sample.sampleAdditionalInfo.subproject.alias}
+                    <input type="hidden" value="${sample.sampleAdditionalInfo.subproject.id}" name="subProject" id="subProject"/>
+                  </c:when>
+                  <c:otherwise>
+                    n/a
+                  </c:otherwise>
+                </c:choose>
+              </c:otherwise>
+            </c:choose>
+          </td>                               
+        </tr>
+        <tr>
+          <td class="h">External Institute Identifier:</td>
+          <td><form:input id="externalInstituteIdentifier" path="sampleAdditionalInfo.externalInstituteIdentifier"/></td>                               
+        </tr>
+        <tr>
+          <td class="h">Lab:</td>
+          <td>
+            <form:select id="lab" path="sampleAdditionalInfo.lab">
+              <option value="">None</option>
+              <c:forEach items="${labs}" var="lab">
+                <option value="${lab.id}" <c:if test="${lab.id == sample.sampleAdditionalInfo.lab.id}">selected="selected"</c:if>>
+                    ${lab.alias} - ${lab.institute.alias}
+                </option>
+              </c:forEach>
+            </form:select>
+          </td>
+        </tr>
+        <tr>
+          <td class="h">Passage Number:</td>
+          <td>
+            <c:choose>
+              <c:when test="${sample.id == 0}"><form:input id="passageNumber" path="sampleAdditionalInfo.passageNumber"/></c:when>
+              <c:otherwise>${!empty sample.sampleAdditionalInfo.passageNumber ? sample.sampleAdditionalInfo.passageNumber : 'n/a'}</c:otherwise>
+            </c:choose>
+          </td>                               
+        </tr>
+        <tr>
+          <td class="h">Times Received:*</td>
+          <td>
+            <c:choose>
+              <c:when test="${sample.id == 0}"><form:input id="timesReceived" path="sampleAdditionalInfo.timesReceived"/></c:when>
+              <c:otherwise>${!empty sample.sampleAdditionalInfo.timesReceived ? sample.sampleAdditionalInfo.timesReceived : 'n/a'}</c:otherwise>
+            </c:choose>
+          </td>                               
+        </tr>
+        <tr>
+          <td class="h">Tube Number:*</td>
+          <td>
+            <c:choose>
+              <c:when test="${sample.id == 0}"><form:input id="tubeNumber" path="sampleAdditionalInfo.tubeNumber"/></c:when>
+              <c:otherwise>${!empty sample.sampleAdditionalInfo.tubeNumber ? sample.sampleAdditionalInfo.tubeNumber : 'n/a'}</c:otherwise>
+            </c:choose>
+          </td>                               
+        </tr>
+        <tr>
+          <td class="h">Concentration (nM):</td>
+          <td><form:input id="concentration" path="sampleAdditionalInfo.concentration"/></td>                               
+        </tr>
+      </table>
+      
+      <c:if test="${!empty sample.sampleTissue}">
+        <br/>
+        <div id="detailedSampleTissue">
+          <h2>Tissue</h2>
+          <table class="in">
+            <tr>
+              <td class="h">Cellularity:</td>
+              <td><form:input id="cellularity" path="sampleTissue.cellularity"/></td>
+            </tr>
+          </table>                               
+        </div>
+      </c:if>
+      
+      <c:if test="${!empty sample.sampleAnalyte}">
+        <br/>
+        <div id="detailedSampleAnalyte">
+          <h2>Analyte</h2>
+          <table class="in">
+            <tr>
+              <td class="h">Purpose:</td>
+              <td>
+                <miso:select id="samplePurpose" path="sampleAnalyte.samplePurpose" items="${samplePurposes}" itemLabel="alias" 
+                    itemValue="id" defaultLabel="Unknown" defaultValue=""/>
+              </td>
+            </tr>
+            <tr>
+              <td class="h">Group ID:</td>
+              <td>
+                <c:choose>
+                  <c:when test="${sample.id == 0}">
+                    <form:select id="sampleGroup" path="sampleAnalyte.sampleGroup">
+                      <%-- list filtered and filled by js --%>
+                      <script type="text/javascript">
+                        jQuery(document).ready(function () {
+                          Sample.ui.filterSampleGroupOptions();
+                        });
+                      </script>
+                    </form:select>
+                  </c:when>
+                  <c:otherwise>
+                    ${!empty sample.sampleAnalyte.sampleGroup ? sample.sampleAnalyte.sampleGroup.groupId : 'n/a'}
+                  </c:otherwise>
+                </c:choose>
+              </td>
+            </tr>
+            <tr>
+              <td class="h">Tissue Material:</td>
+              <td>
+                <miso:select id="tissueMaterial" path="sampleAnalyte.tissueMaterial" items="${tissueMaterials}" itemLabel="alias" 
+                    itemValue="id" defaultLabel="Unknown" defaultValue=""/>
+              </td>
+            </tr>
+            <tr>
+              <td class="h">STR Status</td>
+              <td>
+                <form:select id="strStatus" path="sampleAnalyte.strStatus">
+                  <c:forEach var="strStatusOption" items="${strStatusOptions}">
+                    <option value="${strStatusOption}" <c:if test="${sample.sampleAnalyte.strStatus == strStatusOption}">selected="selected"</c:if>>
+                      ${strStatusOption.label}
+                    </option>
+                  </c:forEach>
+                </form:select>
+              </td>
+            </tr>
+            <tr>
+              <td class="h">Region:</td>
+              <td><form:input id="region" path="sampleAnalyte.region"/></td>                               
+            </tr>
+            <tr>
+              <td class="h">Tube ID:</td>
+              <td><form:input id="tubeId" path="sampleAnalyte.tubeId"/></td>                               
+            </tr>
+          </table>
+        </div>
+      </c:if>
+    </div>
+  </c:if>
+    
+  <c:choose>
+    <c:when test="${!empty sample.project and sample.securityProfile.profileId eq sample.project.securityProfile.profileId}">
+      <table class ="in">
+        <tr>
+          <td>Permissions</td>
+          <td><i>Inherited from project </i>
+            <a href='<c:url value="/miso/project/${sample.project.id}"/>'>${sample.project.name} (${sample.project.alias})</a>
+            <input type="hidden" value="${sample.project.securityProfile.profileId}"
+                   name="securityProfile" id="securityProfile"/>
+          </td>
+        </tr>
+      </table>
+    </c:when>
+    <c:otherwise>
+      <%@ include file="permissions.jsp" %>
+    </c:otherwise>
   </c:choose>
   
   <script type="text/javascript">
@@ -497,7 +640,7 @@
               <span class="float-right" style="font-weight:bold; color:#C0C0C0;">${note.owner.loginName}
                 <c:if test="${(note.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
                                 or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-                <span style="color:#000000"><a href='#' onclick="Sample.ui.deleteSampleNote('${sample.sampleId}', '${note.noteId}');">
+                <span style="color:#000000"><a href='#' onclick="Sample.ui.deleteSampleNote('${sample.id}', '${note.noteId}');">
                   <span class="ui-icon ui-icon-trash" style="clear: both; position: relative; float: right; margin-top: -15px;"/></a></span>
                 </c:if>
               </span>
@@ -580,16 +723,16 @@
     <div id="hotContainer"></div>
   
     <script type="text/javascript">
-      Sample.hot.dropdownRef = ${referenceDataJSON};
+      Hot.dropdownRef = ${referenceDataJSON};
       Sample.hot.aliasGenerationEnabled = ${aliasGenerationEnabled};
       Sample.hot.selectedProjectId = parseInt('${sample.project.id}') || null;
-      Sample.hot.detailedSample = JSON.parse(document.getElementById('HOTbulkForm').dataset.detailedSample);
-      if (Boolean(Sample.hot.detailedSample)) {
-        Sample.hot.fetchSampleOptions();
-        Sample.hot.button = document.getElementById('saveDetailed');
+      Hot.detailedSample = JSON.parse(document.getElementById('HOTbulkForm').dataset.detailedSample);
+      if (Boolean(Hot.detailedSample)) {
+        Hot.fetchSampleOptions(Sample.hot.processSampleOptionsFurther);
+        Hot.saveButton = document.getElementById('saveDetailed');
       } else {
         Sample.hot.addProjectEtcDropdowns();
-        Sample.hot.button = document.getElementById('savePlain');
+        Hot.saveButton = document.getElementById('savePlain');
       }
     </script>
   </div>
@@ -644,7 +787,7 @@
               <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
                   <%--
                   <sec:authorize access="hasRole('ROLE_ADMIN')">
-                      <td class="fit">${qc.qcId}</td>
+                      <td class="fit">${qc.id}</td>
                   </sec:authorize>
                   --%>
                 <td>${qc.qcCreator}</td>
@@ -678,7 +821,7 @@
                         enctype="multipart/form-data"
                         target="target_upload"
                         onsubmit="Utils.fileUpload.fileUploadProgress('ajax_upload_form', 'statusdiv', Utils.page.pageReload);">
-                      <input type="hidden" name="sampleId" value="${sample.sampleId}"/><br/>
+                      <input type="hidden" name="sampleId" value="${sample.id}"/><br/>
                       <input type="file" name="file"/><br/>
                       <button type="submit" class="br-button ui-state-default ui-corner-all">Upload</button>
                   </form>
@@ -690,7 +833,7 @@
 
       <ul>
           <c:forEach items="${qcFiles}" var="file">
-              <li><a href="<c:url value='/miso/download/sample/${sample.sampleId}/qc/${file.key}'/>">${file.value}</a>
+              <li><a href="<c:url value='/miso/download/sample/${sample.id}/qc/${file.key}'/>">${file.value}</a>
               </li>
           </c:forEach>
       </ul>

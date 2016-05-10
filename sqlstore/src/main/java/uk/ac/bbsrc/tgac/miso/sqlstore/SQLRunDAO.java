@@ -287,7 +287,7 @@ public class SQLRunDAO implements RunStore {
     Long statusId = null;
     if (run.getStatus() != null) {
       Status s = run.getStatus();
-      statusId = s.getStatusId();
+      statusId = s.getId();
       // if no status has ever been saved to the database for this run
       // we want to create one, cascading or not
       if (statusId == null || (this.cascadeType != null && this.cascadeType.equals(CascadeType.PERSIST))) {
@@ -416,7 +416,7 @@ public class SQLRunDAO implements RunStore {
       Long statusId = null;
       if (run.getStatus() != null) {
         Status s = run.getStatus();
-        statusId = s.getStatusId();
+        statusId = s.getId();
         // if no status has ever been saved to the database for this run
         // we want to create one, cascading or not
         if (statusId == StatusImpl.UNSAVED_ID || (this.cascadeType != null && this.cascadeType.equals(CascadeType.PERSIST))) {

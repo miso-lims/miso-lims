@@ -258,7 +258,7 @@ public class SelectTag extends AbstractHtmlInputElementTag {
     String labelProperty = ObjectUtils.getDisplayString(evaluate("itemLabel", getItemLabel()));
 
     Object pathValue = getBindStatus().getActualValue();
-    Object comparisonValue = pathValue == null ? new Object()
+    Object comparisonValue = pathValue == null ? null
         : PropertyAccessorFactory.forBeanPropertyAccess(pathValue).getPropertyValue(valueProperty);
 
     for (Object item : (Iterable<? extends Object>) evaluate("items", getItems())) {
@@ -269,7 +269,7 @@ public class SelectTag extends AbstractHtmlInputElementTag {
       // allows render values to handle some strange browser compat issues.
       tagWriter.writeAttribute("value", getDisplayString(renderValue));
 
-      if (comparisonValue.equals(renderValue)) {
+      if (comparisonValue != null && comparisonValue.equals(renderValue)) {
         tagWriter.writeAttribute("selected", "selected");
       }
       tagWriter.appendValue(getDisplayString(renderLabel));

@@ -43,6 +43,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -101,8 +102,6 @@ import uk.ac.bbsrc.tgac.miso.dto.LibraryAdditionalInfoDto;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
 import uk.ac.bbsrc.tgac.miso.persistence.LibraryAdditionalInfoDao;
 import uk.ac.bbsrc.tgac.miso.service.LibraryAdditionalInfoService;
-import uk.ac.bbsrc.tgac.miso.webapp.context.ApplicationContextProvider;
-import uk.ac.bbsrc.tgac.miso.webapp.util.MisoPropertyExporter;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.controller
@@ -159,25 +158,26 @@ public class EditLibraryController {
     this.libraryAdditionalInfoService = libraryAdditionalInfoService;
   }
 
-  public Boolean misoPropertyBoolean(String property) {
-    MisoPropertyExporter exporter = (MisoPropertyExporter) ApplicationContextProvider.getApplicationContext().getBean("propertyConfigurer");
-    Map<String, String> misoProperties = exporter.getResolvedProperties();
-    return misoProperties.containsKey(property) && Boolean.parseBoolean(misoProperties.get(property));
-  }
+  @Value("${miso.notification.interop.enabled}")
+  private Boolean metrixEnabled;
+  @Value("${miso.autoGenerateIdentificationBarcodes}")
+  private Boolean autoGenerateIdBarcodes;
+  @Value("${miso.detailed.sample.enabled}")
+  private Boolean detailedSample;
 
   @ModelAttribute("metrixEnabled")
   public Boolean isMetrixEnabled() {
-    return misoPropertyBoolean("miso.notification.interop.enabled");
+    return metrixEnabled;
   }
 
   @ModelAttribute("autoGenerateIdBarcodes")
   public Boolean autoGenerateIdentificationBarcodes() {
-    return misoPropertyBoolean("miso.autoGenerateIdentificationBarcodes");
+    return autoGenerateIdBarcodes;
   }
 
   @ModelAttribute("detailedSample")
   public Boolean isDetailedSampleEnabled() {
-    return misoPropertyBoolean("miso.detailed.sample.enabled");
+    return detailedSample;
   }
 
   public Map<String, Library> getAdjacentLibrariesInProject(Library l, Project p) throws IOException {
@@ -381,21 +381,21 @@ public class EditLibraryController {
     JSONArray selectionTypes = new JSONArray();
     for (final LibrarySelectionType lst : populateLibrarySelectionTypes()) {
       JSONObject selType = new JSONObject();
-      selType.put("id", lst.getLibrarySelectionTypeId());
+      selType.put("id", lst.getId());
       selType.put("alias", lst.getName());
       selectionTypes.add(selType);
     }
     JSONArray strategyTypes = new JSONArray();
     for (final LibraryStrategyType lstrat : populateLibraryStrategyTypes()) {
       JSONObject stratType = new JSONObject();
-      stratType.put("id", lstrat.getLibraryStrategyTypeId());
+      stratType.put("id", lstrat.getId());
       stratType.put("alias", lstrat.getName());
       strategyTypes.add(stratType);
     }
     JSONArray libraryTypes = new JSONArray();
     for (final LibraryType lt : populateLibraryTypes()) {
       JSONObject libType = new JSONObject();
-      libType.put("id", lt.getLibraryTypeId());
+      libType.put("id", lt.getId());
       libType.put("alias", lt.getDescription());
       libType.put("platform", lt.getPlatformType());
       libraryTypes.add(libType);
@@ -587,7 +587,7 @@ public class EditLibraryController {
       LibraryAdditionalInfo libraryAdditionalInfo = libraryAdditionalInfoDao.getLibraryAdditionalInfoByLibraryId(libraryId);
       library.setLibraryAdditionalInfo(libraryAdditionalInfo);
       if (libraryAdditionalInfo != null && libraryAdditionalInfo.getPrepKit() != null) {
-        libraryPrepKitId = libraryAdditionalInfo.getPrepKit().getKitDescriptorId();
+        libraryPrepKitId = libraryAdditionalInfo.getPrepKit().getId();
       } else {
         libraryPrepKitId = -1L;
       }
@@ -761,7 +761,7 @@ public class EditLibraryController {
       for (Sample sample : requestManager.getSamplesByIdList(idList)) {
         if (sampleClass == null) {
           sampleClass = sample.getSampleAdditionalInfo().getSampleClass();
-        } else if (sampleClass.getSampleClassId() != sample.getSampleAdditionalInfo().getSampleClass().getSampleClassId()) {
+        } else if (sampleClass.getId() != sample.getSampleAdditionalInfo().getSampleClass().getId()) {
           throw new IOException("Can only create libraries when samples all have the same class.");
         }
         LibraryDto library = new LibraryDto();
@@ -840,8 +840,8 @@ public class EditLibraryController {
             library.getLibraryAdditionalInfo().setLibraryDesign(design);
             library.setLibrarySelectionType(requestManager.getLibrarySelectionTypeById(design.getLibrarySelectionType()));
             library.setLibraryStrategyType(requestManager.getLibraryStrategyTypeById(design.getLibraryStrategyType()));
-            library.setPaired(design.getPaired());
-            library.setPlatformName(design.getPlatform().getKey());
+            library.setLibraryType(design.getLibraryType());
+            library.setPlatformName(design.getLibraryType().getPlatformType());
           }
         }
         if (library.getId() == AbstractLibrary.UNSAVED_ID) {

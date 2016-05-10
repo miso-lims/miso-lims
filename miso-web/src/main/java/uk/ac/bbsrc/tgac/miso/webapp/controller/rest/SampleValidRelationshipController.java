@@ -121,7 +121,7 @@ public class SampleValidRelationshipController extends RestController {
   public ResponseEntity<?> updateSampleValidRelationship(@PathVariable("id") Long id,
       @RequestBody SampleValidRelationshipDto sampleValidRelationshipDto, HttpServletResponse response) throws IOException {
     SampleValidRelationship sampleValidRelationship = Dtos.to(sampleValidRelationshipDto);
-    sampleValidRelationship.setSampleValidRelationshipId(id);
+    sampleValidRelationship.setId(id);
     sampleValidRelationshipService.update(sampleValidRelationship, sampleValidRelationshipDto.getParentId(),
         sampleValidRelationshipDto.getChildId());
     return new ResponseEntity<>(HttpStatus.OK);

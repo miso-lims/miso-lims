@@ -67,6 +67,7 @@
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAdditionalInfoImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType</value>
       </list>
     </property>
     <property name="hibernateProperties">

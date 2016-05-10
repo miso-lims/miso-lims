@@ -68,7 +68,7 @@ public class BarcodePrintManager extends AbstractPrintManager<Queue<File>> {
         job.setStatus("QUEUED");
         try {
           long jobId = storePrintJob(job);
-          job.setJobId(jobId);
+          job.setId(jobId);
         } catch (IOException e) {
           log.error("Could not store print job", e);
         }

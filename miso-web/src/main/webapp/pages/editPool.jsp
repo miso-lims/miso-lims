@@ -348,7 +348,7 @@
 </table>
 <br/>
 
-<c:if test="${pool.poolId != 0}">
+<c:if test="${pool.id != 0}">
   <h1>Orders</h1>
 
   <div class="note">
@@ -356,7 +356,7 @@
     </div>
     <form id="neworder">
       Partitions: <input type="text" name="partitions" value="1" id="newOrderParitions" /><br/>
-      Platform: <select id="newOrderPlatformId" onchange="Pool.orders.changePlatform(null)"><c:forEach items="${platforms}" var="platform"><option value="${platform.platformId}">${platform.nameAndModel}</option></c:forEach></select><br/>
+      Platform: <select id="newOrderPlatformId" onchange="Pool.orders.changePlatform(null)"><c:forEach items="${platforms}" var="platform"><option value="${platform.id}">${platform.nameAndModel}</option></c:forEach></select><br/>
       Sequencing Parameters: <select id="newOrderParameterId"><c:forEach items="${sequencingParameters}" var="sp"><option value="${sp.id}">${sp.name}</option></c:forEach></select><br/>
       <input type="submit" class="br-button ui-state-default ui-corner-all" value="Add" onclick="return Pool.orders.addOrder(${pool.id})"/>
     </form>
@@ -568,7 +568,7 @@
   });
   Defaults = { 'all': {}};
   Defaults.all.sequencingParameters = ${sequencingParametersJson};
-  Defaults.all.platforms = [ <c:forEach items="${platforms}" var="platform">{ 'id' : ${platform.platformId}, 'nameAndModel' : '${platform.nameAndModel}'}, </c:forEach> ];
+  Defaults.all.platforms = [ <c:forEach items="${platforms}" var="platform">{ 'id' : ${platform.id}, 'nameAndModel' : '${platform.nameAndModel}'}, </c:forEach> ];
   Pool.orders.loadOrders(${pool.id});
 </script>
 

@@ -48,12 +48,12 @@ public class SampleValidRelationshipImpl implements SampleValidRelationship {
   private Date lastUpdated;
 
   @Override
-  public Long getSampleValidRelationshipId() {
+  public Long getId() {
     return sampleValidRelationshipId;
   }
 
   @Override
-  public void setSampleValidRelationshipId(Long sampleValidRelationshipId) {
+  public void setId(Long sampleValidRelationshipId) {
     this.sampleValidRelationshipId = sampleValidRelationshipId;
   }
 

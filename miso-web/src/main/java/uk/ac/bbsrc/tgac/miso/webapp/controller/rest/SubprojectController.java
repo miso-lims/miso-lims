@@ -132,7 +132,7 @@ public class SubprojectController extends RestController {
   public ResponseEntity<?> updateSubproject(@PathVariable("id") Long id, @RequestBody SubprojectDto subprojectDto,
       HttpServletResponse response) throws IOException {
     Subproject subproject = Dtos.to(subprojectDto);
-    subproject.setSubprojectId(id);
+    subproject.setId(id);
     subprojectService.update(subproject);
     return new ResponseEntity<>(HttpStatus.OK);
   }

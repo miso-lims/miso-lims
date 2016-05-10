@@ -50,23 +50,6 @@ public interface Study extends SecurableByProfile, Submittable<Document>, Compar
   /** Field PREFIX */
   public static final String PREFIX = "STU";
 
-  /**
-   * Returns the studyId of this Study object.
-   * 
-   * @return Long studyId.
-   */
-  @Deprecated
-  public Long getStudyId();
-
-  /**
-   * Sets the studyId of this Study object.
-   * 
-   * @param studyId
-   *          studyId.
-   */
-  @Deprecated
-  public void setStudyId(Long studyId);
-
   public void setId(long id);
 
   /**

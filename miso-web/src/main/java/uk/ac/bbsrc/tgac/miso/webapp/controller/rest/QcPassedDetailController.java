@@ -114,7 +114,7 @@ public class QcPassedDetailController extends RestController {
   public ResponseEntity<?> updateQcPassedDetail(@PathVariable("id") Long id, @RequestBody QcPassedDetailDto qcPassedDetailDto,
       HttpServletResponse response) throws IOException {
     QcPassedDetail qcPassedDetail = Dtos.to(qcPassedDetailDto);
-    qcPassedDetail.setQcPassedDetailId(id);
+    qcPassedDetail.setId(id);
     qcPassedDetailService.update(qcPassedDetail);
     return new ResponseEntity<>(HttpStatus.OK);
   }

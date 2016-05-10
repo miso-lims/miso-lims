@@ -606,7 +606,7 @@ public class RunControllerHelperService {
     b.append("<select name='platform' id='platform' onchange='setContainerCount(this);'>");
     for (Platform p : platforms) {
       if (p.getPlatformType().equals(run.getPlatformType())) {
-        b.append("<option value='" + p.getPlatformId() + "' platform='" + p.getPlatformType().getKey() + "'");
+        b.append("<option value='" + p.getId() + "' platform='" + p.getPlatformType().getKey() + "'");
         b.append(">" + p.getPlatformType().getKey() + " - " + p.getInstrumentModel() + "</option>");
       }
     }

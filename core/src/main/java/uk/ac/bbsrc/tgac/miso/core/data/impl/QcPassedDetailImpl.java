@@ -48,12 +48,12 @@ public class QcPassedDetailImpl implements QcPassedDetail {
   private Date lastUpdated;
 
   @Override
-  public Long getQcPassedDetailId() {
+  public Long getId() {
     return qcPassedDetailId;
   }
 
   @Override
-  public void setQcPassedDetailId(Long qcPassedDetailId) {
+  public void setId(Long qcPassedDetailId) {
     this.qcPassedDetailId = qcPassedDetailId;
   }
 

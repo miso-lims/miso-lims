@@ -239,7 +239,11 @@
     </td>
   </tr>
 </c:if>
-<c:if test="${not detailedSample}">
+<c:choose>
+  <c:when test="${!empty library.sample && !empty library.sample.sampleAdditionalInfo && !empty library.libraryAdditionalInfo}">
+    <input type="hidden" value="true" name="paired" id="paired"/>
+  </c:when>
+  <c:otherwise>
 	<tr>
 	  <td>Paired:</td>
 	  <td>
@@ -253,7 +257,8 @@
 	    </c:choose>
 	  </td>
 	</tr>
-</c:if>
+  </c:otherwise>
+</c:choose>
 <c:if test="${!empty library.sample && !empty library.sample.sampleAdditionalInfo && !empty library.libraryAdditionalInfo}">
   <tr>
     <td>Library Design:</td>
@@ -285,7 +290,7 @@
       </td>
       <script type="text/javascript">
         jQuery(document).ready(function () {
-          Library.ui.changePlatformNameWithLibraryType(jQuery("#platformNames"), '${library.libraryType.libraryTypeId}');
+          Library.ui.changePlatformNameWithLibraryType(jQuery("#platformNames"), '${library.libraryType.id}');
         });
       </script>
     </c:when>
@@ -304,7 +309,7 @@
       <td>Library Selection Type:</td>
       <td>
         <form:select id="librarySelectionTypes" path="librarySelectionType" items="${librarySelectionTypes}"
-                     itemLabel="name" itemValue="librarySelectionTypeId"/>
+                     itemLabel="name" itemValue="id"/>
       </td>
     </c:when>
     <c:otherwise>
@@ -323,7 +328,7 @@
       <td>Library Strategy Type:</td>
       <td>
         <form:select id="libraryStrategyTypes" path="libraryStrategyType" items="${libraryStrategyTypes}"
-                     itemLabel="name" itemValue="libraryStrategyTypeId"/>
+                     itemLabel="name" itemValue="id"/>
       </td>
     </c:when>
     <c:otherwise>
@@ -571,7 +576,7 @@
                   enctype="multipart/form-data"
                   target="target_upload"
                   onsubmit="Utils.fileUpload.fileUploadProgress('ajax_upload_form', 'statusdiv', Utils.page.pageReload);">
-                <input type="hidden" name="libraryId" value="${library.libraryId}"/><br/>
+                <input type="hidden" name="libraryId" value="${library.id}"/><br/>
                 <input type="file" name="file"/><br/>
                 <button type="submit" class="br-button ui-state-default ui-corner-all">Upload</button>
             </form>
@@ -583,7 +588,7 @@
 
 <ul>
     <c:forEach items="${qcFiles}" var="file">
-        <li><a href="<c:url value='/miso/download/library/${library.libraryId}/qc/${file.key}'/>">${file.value}</a></li>
+        <li><a href="<c:url value='/miso/download/library/${library.id}/qc/${file.key}'/>">${file.value}</a></li>
     </c:forEach>
 </ul>
 --%>

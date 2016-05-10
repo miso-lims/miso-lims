@@ -98,6 +98,7 @@ public abstract class AbstractExperiment implements Experiment {
     this.lastModifier = lastModifier;
   }
 
+  @Override
   public List<ChangeLog> getChangeLog() {
     return changeLog;
   }
@@ -110,20 +111,6 @@ public abstract class AbstractExperiment implements Experiment {
   @Override
   public void setStudy(Study study) {
     this.study = study;
-  }
-
-  @CoverageIgnore
-  @Override
-  @Deprecated
-  public Long getExperimentId() {
-    return experimentId;
-  }
-
-  @CoverageIgnore
-  @Override
-  @Deprecated
-  public void setExperimentId(Long experimentId) {
-    this.experimentId = experimentId;
   }
 
   @Override

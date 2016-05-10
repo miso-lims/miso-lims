@@ -64,23 +64,6 @@ public interface Sample
   /** Field PREFIX */
   public static final String PREFIX = "SAM";
 
-  /**
-   * Returns the sampleId of this Sample object.
-   * 
-   * @return Long sampleId.
-   */
-  @Deprecated
-  public Long getSampleId();
-
-  /**
-   * Sets the sampleId of this Sample object.
-   * 
-   * @param sampleId
-   *          sampleId.
-   */
-  @Deprecated
-  public void setSampleId(Long sampleId);
-
   public void setId(long id);
 
   /**

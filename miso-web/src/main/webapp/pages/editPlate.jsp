@@ -200,7 +200,7 @@
                     <td>
                         <form:select id="tagBarcodes" path="tagBarcode">
                           <form:option value="" label="No Barcode"/>
-                          <form:options items="${availableTagBarcodes}" itemLabel="name" itemValue="tagBarcodeId" />
+                          <form:options items="${availableTagBarcodes}" itemLabel="name" itemValue="id" />
                         </form:select>
                     </td>
                 </c:when>
@@ -209,7 +209,7 @@
                     <td>
                         <form:select id="tagBarcodes" path="tagBarcode">
                           <form:option value="" label="No Barcode"/>
-                          <form:options items="${availableTagBarcodes}" itemLabel="name" itemValue="tagBarcodeId" />
+                          <form:options items="${availableTagBarcodes}" itemLabel="name" itemValue="id" />
                         </form:select>
                     </td>
                 </c:otherwise>

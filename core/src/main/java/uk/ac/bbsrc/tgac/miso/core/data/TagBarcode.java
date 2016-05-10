@@ -38,22 +38,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public interface TagBarcode extends Comparable, Nameable {
-  /**
-   * Returns the tagId of this TagBarcode object.
-   * 
-   * @return Long tagId
-   */
-  @Deprecated
-  public Long getTagBarcodeId();
-
-  /**
-   * Sets the tagBarcodeId of this TagBarcode object.
-   * 
-   * @param tagId
-   *          Long
-   */
-  @Deprecated
-  public void setTagBarcodeId(Long tagId);
 
   /**
    * Sets the ID of this TagBarcode object.

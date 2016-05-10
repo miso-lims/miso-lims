@@ -42,23 +42,6 @@ public interface QC extends Securable, Comparable, Deletable {
   public void setId(long id);
 
   /**
-   * Returns the qcId of this QC object.
-   * 
-   * @return Long qcId.
-   */
-  @Deprecated
-  public Long getQcId();
-
-  /**
-   * Sets the qcId of this QC object.
-   * 
-   * @param qcId
-   *          qcId.
-   */
-  @Deprecated
-  public void setQcId(Long qcId);
-
-  /**
    * Returns the qcCreator of this QC object.
    * 
    * @return String qcCreator.

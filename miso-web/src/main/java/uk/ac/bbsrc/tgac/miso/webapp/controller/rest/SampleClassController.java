@@ -118,7 +118,7 @@ public class SampleClassController extends RestController {
   public ResponseEntity<?> updateSampleClass(@PathVariable("id") Long id, @RequestBody SampleClassDto sampleClassDto,
       HttpServletResponse response) throws IOException {
     SampleClass sampleClass = Dtos.to(sampleClassDto);
-    sampleClass.setSampleClassId(id);
+    sampleClass.setId(id);
     sampleClassService.update(sampleClass);
     return new ResponseEntity<>(HttpStatus.OK);
   }
@@ -128,8 +128,8 @@ public class SampleClassController extends RestController {
   public ResponseEntity<?> deleteSampleClass(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
     // first delete all SampleValidRelationships which reference this Class (as parent or child)
     for (SampleValidRelationship relationship : sampleValidRelationshipService.getAll()) {
-      if (relationship.getChild().getSampleClassId().equals(id) || relationship.getParent().getSampleClassId().equals(id)) {
-        sampleValidRelationshipService.delete(relationship.getSampleValidRelationshipId());
+      if (relationship.getChild().getId().equals(id) || relationship.getParent().getId().equals(id)) {
+        sampleValidRelationshipService.delete(relationship.getId());
       }
     }
     // then delete the Class itself

@@ -189,7 +189,7 @@ import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
       assertEquals(16L, dao.save(platform));
       Platform savedPlatform = dao.get(16L);
       assertNotSame(platform, savedPlatform);
-      assertEquals(platform.getPlatformId(), savedPlatform.getPlatformId());
+      assertEquals(platform.getId(), savedPlatform.getId());
       assertEquals("Illumina HiSeq 2500", savedPlatform.getInstrumentModel());
       assertEquals("4-channel flow cell", savedPlatform.getDescription());
       assertEquals("Illumina", savedPlatform.getPlatformType().getKey());

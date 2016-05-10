@@ -47,7 +47,7 @@ public class HibernateStudyStore extends HibernateDaoSupport implements Store<St
   @Transactional(readOnly = false)
   public long save(Study study) throws IOException {
     getHibernateTemplate().saveOrUpdate(study);
-    return study.getStudyId();
+    return study.getId();
   }
 
   @Override

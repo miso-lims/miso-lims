@@ -54,7 +54,7 @@ public class DefaultSubprojectService implements SubprojectService {
   @Override
   public void update(Subproject subproject) throws IOException {
     authorizationManager.throwIfNonAdmin();
-    Subproject updatedSubproject = get(subproject.getSubprojectId());
+    Subproject updatedSubproject = get(subproject.getId());
     updatedSubproject.setAlias(subproject.getAlias());
     updatedSubproject.setDescription(subproject.getDescription());
     updatedSubproject.setPriority(subproject.getPriority());

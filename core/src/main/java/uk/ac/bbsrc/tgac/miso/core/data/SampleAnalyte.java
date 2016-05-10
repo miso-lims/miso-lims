@@ -12,10 +12,12 @@ import com.eaglegenomics.simlims.core.User;
 
 @JsonIgnoreProperties({ "sample" })
 public interface SampleAnalyte {
+  
+  public static String CATEGORY_NAME = "Analyte";
 
-  Long getSampleId();
+  Long getId();
 
-  void setSampleId(Long sampleId);
+  void setId(Long sampleId);
 
   Sample getSample();
 

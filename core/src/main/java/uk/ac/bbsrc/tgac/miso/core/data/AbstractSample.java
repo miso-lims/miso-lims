@@ -56,7 +56,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAdditionalInfoImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAnalyteImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityNode;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
@@ -74,7 +73,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
  */
 @MappedSuperclass
 public abstract class AbstractSample extends AbstractBoxable implements Sample {
-  
+
   protected static final Logger log = LoggerFactory.getLogger(AbstractSample.class);
   public static final Long UNSAVED_ID = 0L;
 
@@ -125,19 +124,19 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   private User lastModifier;
 
   @OneToOne(targetEntity = SampleAnalyteImpl.class, mappedBy = "sample")
-  @Cascade({ CascadeType.SAVE_UPDATE })
+  @Cascade({ CascadeType.ALL })
   private SampleAnalyte sampleAnalyte;
 
   @OneToOne(targetEntity = SampleTissueImpl.class, mappedBy = "sample")
-  @Cascade({ CascadeType.SAVE_UPDATE })
+  @Cascade({ CascadeType.ALL })
   private SampleTissue sampleTissue;
 
   @OneToOne(targetEntity = IdentityImpl.class, mappedBy = "sample")
-  @Cascade({ CascadeType.SAVE_UPDATE })
+  @Cascade({ CascadeType.ALL })
   private Identity identity;
 
   @OneToOne(targetEntity = SampleAdditionalInfoImpl.class, mappedBy = "sample")
-  @Cascade({ CascadeType.SAVE_UPDATE })
+  @Cascade({ CascadeType.ALL })
   private SampleAdditionalInfo sampleAdditionalInfo;
 
   @Override
@@ -158,18 +157,6 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @Override
   public void setProject(Project project) {
     this.project = project;
-  }
-
-  @Override
-  @Deprecated
-  public Long getSampleId() {
-    return sampleId;
-  }
-
-  @Override
-  @Deprecated
-  public void setSampleId(Long sampleId) {
-    this.sampleId = sampleId;
   }
 
   @Override
@@ -366,6 +353,9 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @Override
   public void setSecurityProfile(SecurityProfile securityProfile) {
     this.securityProfile = securityProfile;
+    if (securityProfile != null) {
+      this.securityProfile_profileId = securityProfile.getProfileId();
+    }
   }
 
   @Override
@@ -401,6 +391,9 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @Override
   public void setSampleAdditionalInfo(SampleAdditionalInfo sampleAdditionalInfo) {
     this.sampleAdditionalInfo = sampleAdditionalInfo;
+    if (sampleAdditionalInfo != null) {
+      sampleAdditionalInfo.setSample(this);
+    }
   }
 
   /**
@@ -480,6 +473,9 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @Override
   public void setSampleAnalyte(SampleAnalyte sampleAnalyte) {
     this.sampleAnalyte = sampleAnalyte;
+    if (sampleAnalyte != null) {
+      sampleAnalyte.setSample(this);
+    }
   }
 
   @Override
@@ -490,6 +486,9 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @Override
   public void setIdentity(Identity identity) {
     this.identity = identity;
+    if (identity != null) {
+      identity.setSample(this);
+    }
   }
 
   @Override
@@ -520,6 +519,9 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @Override
   public void setSampleTissue(SampleTissue sampleTissue) {
     this.sampleTissue = sampleTissue;
+    if (sampleTissue != null) {
+      sampleTissue.setSample(this);
+    }
   }
 
   public static class SampleFactoryBuilder {
@@ -740,7 +742,7 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
         if (identity != null) {
           log.debug("Create an Identity Sample.");
           checkArgument(rootSampleClass != null, "A root SampleClass must be provided to create an Identity Sample.");
-          return new SampleIdentityNode(this);
+          return SampleImpl.sampleIdentity(this);
         } else if (sampleAnalyte != null) {
           log.debug("Create an Analyte Sample.");
           checkArgument(parent != null, "parent must be provided to create a Sample.");
@@ -751,7 +753,7 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
           return SampleImpl.sampleAnalyte(this);
         } else if (sampleTissue != null) {
           return SampleImpl.sampleTissue(this);
-        } else if (sampleAdditionalInfo.getSampleClass().getSampleCategory().equals("Tissue Processing")){
+        } else if (sampleAdditionalInfo.getSampleClass().getSampleCategory().equals("Tissue Processing")) {
           return SampleImpl.sampleTissueProcessing(this);
         }
       }

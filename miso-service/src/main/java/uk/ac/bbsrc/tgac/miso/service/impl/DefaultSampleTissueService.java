@@ -76,7 +76,7 @@ public class DefaultSampleTissueService implements SampleTissueService {
 
   @Override
   public void update(SampleTissue sampleTissue) throws IOException {
-    SampleTissue updatedSampleTissue = get(sampleTissue.getSampleId());
+    SampleTissue updatedSampleTissue = get(sampleTissue.getId());
     applyChanges(updatedSampleTissue, sampleTissue);
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     updatedSampleTissue.setUpdatedBy(user);

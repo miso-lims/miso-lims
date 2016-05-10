@@ -55,12 +55,12 @@ public class SampleGroupImpl implements SampleGroupId {
   private Date lastUpdated;
 
   @Override
-  public Long getSampleGroupId() {
+  public Long getId() {
     return sampleGroupId;
   }
 
   @Override
-  public void setSampleGroupId(Long sampleGroupId) {
+  public void setId(Long sampleGroupId) {
     this.sampleGroupId = sampleGroupId;
   }
 

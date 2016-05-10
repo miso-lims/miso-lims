@@ -44,12 +44,12 @@ public class TissueMaterialImpl implements TissueMaterial {
   private Date lastUpdated;
 
   @Override
-  public Long getTissueMaterialId() {
+  public Long getId() {
     return tissueMaterialId;
   }
 
   @Override
-  public void setTissueMaterialId(Long tissueMaterialId) {
+  public void setId(Long tissueMaterialId) {
     this.tissueMaterialId = tissueMaterialId;
   }
 

@@ -60,13 +60,13 @@ public class DefaultLibraryAdditionalInfoService implements LibraryAdditionalInf
       throws IOException {
     authorizationManager.throwIfNonAdmin();
     libraryAdditionalInfo.setLibrary(libraryStore.get(libraryId));
-    libraryAdditionalInfo.setTissueOrigin(tissueOriginDao.getTissueOrigin(libraryAdditionalInfo.getTissueOrigin().getTissueOriginId()));
-    libraryAdditionalInfo.setTissueType(tissueTypeDao.getTissueType(libraryAdditionalInfo.getTissueType().getTissueTypeId()));
+    libraryAdditionalInfo.setTissueOrigin(tissueOriginDao.getTissueOrigin(libraryAdditionalInfo.getTissueOrigin().getId()));
+    libraryAdditionalInfo.setTissueType(tissueTypeDao.getTissueType(libraryAdditionalInfo.getTissueType().getId()));
     if (libraryAdditionalInfo.getSampleGroupId() != null) {
-      libraryAdditionalInfo.setSampleGroupId(sampleGroupDao.getSampleGroup(libraryAdditionalInfo.getSampleGroupId().getSampleGroupId()));
+      libraryAdditionalInfo.setSampleGroupId(sampleGroupDao.getSampleGroup(libraryAdditionalInfo.getSampleGroupId().getId()));
     }
     if (libraryAdditionalInfo.getPrepKit() != null) {
-      libraryAdditionalInfo.setPrepKit(kitStore.getKitDescriptorById(libraryAdditionalInfo.getPrepKit().getKitDescriptorId()));
+      libraryAdditionalInfo.setPrepKit(kitStore.getKitDescriptorById(libraryAdditionalInfo.getPrepKit().getId()));
     }
     User user = authorizationManager.getCurrentUser();
     libraryAdditionalInfo.setCreatedBy(user);
@@ -79,13 +79,13 @@ public class DefaultLibraryAdditionalInfoService implements LibraryAdditionalInf
       throws IOException {
     authorizationManager.throwIfNonAdmin();
     LibraryAdditionalInfo updated = get(libraryAdditionalInfo.getLibraryId());
-    updated.setTissueOrigin(tissueOriginDao.getTissueOrigin(libraryAdditionalInfo.getTissueOrigin().getTissueOriginId()));
-    updated.setTissueType(tissueTypeDao.getTissueType(libraryAdditionalInfo.getTissueType().getTissueTypeId()));
+    updated.setTissueOrigin(tissueOriginDao.getTissueOrigin(libraryAdditionalInfo.getTissueOrigin().getId()));
+    updated.setTissueType(tissueTypeDao.getTissueType(libraryAdditionalInfo.getTissueType().getId()));
     if (libraryAdditionalInfo.getSampleGroupId() != null) {
-      updated.setSampleGroupId(sampleGroupDao.getSampleGroup(libraryAdditionalInfo.getSampleGroupId().getSampleGroupId()));
+      updated.setSampleGroupId(sampleGroupDao.getSampleGroup(libraryAdditionalInfo.getSampleGroupId().getId()));
     }
     if (libraryAdditionalInfo.getPrepKit() != null) {
-      updated.setPrepKit(kitStore.getKitDescriptorById(libraryAdditionalInfo.getPrepKit().getKitDescriptorId()));
+      updated.setPrepKit(kitStore.getKitDescriptorById(libraryAdditionalInfo.getPrepKit().getId()));
     }
     updated.setArchived(libraryAdditionalInfo.getArchived());
     User user = authorizationManager.getCurrentUser();

@@ -43,24 +43,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public interface Kit extends Comparable, Barcodable, Locatable {
-  /**
-   * Returns the kitId of this Kit object.
-   * 
-   * @return Long kitId.
-   */
-  @Deprecated
-  Long getKitId();
-
-  /**
-   * Sets the kitId of this Kit object.
-   * 
-   * @param kitId
-   *          the id of this Kit object.
-   * 
-   */
-  @Deprecated
-  void setKitId(Long kitId);
-
   public void setId(long id);
 
   /**

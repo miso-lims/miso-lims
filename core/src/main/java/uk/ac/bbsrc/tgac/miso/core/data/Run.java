@@ -55,23 +55,6 @@ public interface Run extends SecurableByProfile, Submittable<Document>, Comparab
   /** Field PREFIX */
   public static final String PREFIX = "RUN";
 
-  /**
-   * Returns the runId of this Run object.
-   * 
-   * @return Long runId.
-   */
-  @Deprecated
-  public Long getRunId();
-
-  /**
-   * Sets the runId of this Run object.
-   * 
-   * @param runId
-   *          runId.
-   */
-  @Deprecated
-  public void setRunId(Long runId);
-
   public void setId(long id);
 
   /**

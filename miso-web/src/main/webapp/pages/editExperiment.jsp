@@ -141,7 +141,7 @@
       <td>Platform:</td>
       <td>
         <form:select id="platforms" path="platform" items="${platforms}" itemLabel="nameAndModel"
-                     itemValue="platformId"
+                     itemValue="id"
                      onchange="Experiment.pool.loadPoolsByPlatform(this);"/>
       </td>
     </c:when>

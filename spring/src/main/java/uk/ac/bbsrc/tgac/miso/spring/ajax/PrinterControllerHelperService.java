@@ -346,7 +346,7 @@ public class PrinterControllerHelperService {
       if (f != null) thingsToPrint.add(f);
 
       PrintJob pj = printManager.print(thingsToPrint, mps.getName(), user);
-      return JSONUtils.SimpleJSONResponse("Job " + pj.getJobId() + " : Barcodes printed.");
+      return JSONUtils.SimpleJSONResponse("Job " + pj.getId() + " : Barcodes printed.");
     } catch (MisoPrintException e) {
       log.error("failed to print barcodes", e);
       return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
@@ -378,7 +378,7 @@ public class PrinterControllerHelperService {
       if (f != null) thingsToPrint.add(f);
 
       PrintJob pj = printManager.print(thingsToPrint, mps.getName(), user);
-      return JSONUtils.SimpleJSONResponse("Job " + pj.getJobId() + " : Barcodes printed.");
+      return JSONUtils.SimpleJSONResponse("Job " + pj.getId() + " : Barcodes printed.");
     } catch (MisoPrintException e) {
       log.error("failed to print barcodes", e);
       return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
@@ -414,7 +414,7 @@ public class PrinterControllerHelperService {
           if (f != null) thingsToPrint.add(f);
 
           PrintJob pj = printManager.print(thingsToPrint, mps.getName(), user);
-          response += "Job " + pj.getJobId() + " : Barcodes printed.\n";
+          response += "Job " + pj.getId() + " : Barcodes printed.\n";
         }
         return JSONUtils.SimpleJSONResponse(response);
       } else {

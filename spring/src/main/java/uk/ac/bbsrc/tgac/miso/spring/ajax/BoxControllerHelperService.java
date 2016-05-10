@@ -670,7 +670,7 @@ public class BoxControllerHelperService {
       }
 
       PrintJob pj = printManager.print(thingsToPrint, mps.getName(), user);
-      return JSONUtils.SimpleJSONResponse("Job " + pj.getJobId() + " : Barcodes printed.");
+      return JSONUtils.SimpleJSONResponse("Job " + pj.getId() + " : Barcodes printed.");
     }
     catch (MisoPrintException e) {
       log.debug("Failed to print barcodes", e);

@@ -202,7 +202,7 @@ public class ImportExcel {
           experiment.setDescription(ce + chamberStr);
           experiment.setSecurityProfile(sp);
           experiment.setPlatform(misoManager.getPlatformById(13));
-          experiment.setExperimentId(misoManager.saveExperiment(experiment));
+          experiment.setId(misoManager.saveExperiment(experiment));
           break;
         }
       }
@@ -218,7 +218,7 @@ public class ImportExcel {
         s.setAlias(ce + chamberStr);
         s.setDescription(ce + chamberStr);
         s.setSecurityProfile(sp);
-        s.setStudyId(misoManager.saveStudy(s));
+        s.setId(misoManager.saveStudy(s));
         experiment = new ExperimentImpl();
         experiment.setStudy(s);
         experiment.setTitle(ce + chamberStr);
@@ -226,14 +226,14 @@ public class ImportExcel {
         experiment.setDescription(ce + chamberStr);
         experiment.setSecurityProfile(sp);
         experiment.setPlatform(misoManager.getPlatformById(13));
-        experiment.setExperimentId(misoManager.saveExperiment(experiment));
+        experiment.setId(misoManager.saveExperiment(experiment));
         project = newp;
       }
 
       Sample sample = null;
       Pool pool = null;
       for (Sample sa : misoManager.listAllSamples()) {
-        Long sampleId = sa.getSampleId();
+        Long sampleId = sa.getId();
         String sampleDescription = sa.getDescription();
 
         if (sampleDescription.equals(cd)) {
@@ -415,7 +415,7 @@ public class ImportExcel {
 
               run.getStatus().setInstrumentName(machine);
               long runId = misoManager.saveRun(run);
-              run.setRunId(runId);
+              run.setId(runId);
               log.info("Run [new illumina run created]: " + run);
             }
           }
@@ -462,7 +462,7 @@ public class ImportExcel {
     experiment.setDescription(projectDescr);
     experiment.setSecurityProfile(sp);
     experiment.setPlatform(misoManager.getPlatformById(6));
-    experiment.setExperimentId(misoManager.saveExperiment(experiment));
+    experiment.setId(misoManager.saveExperiment(experiment));
 
     return experiment;
   }
@@ -487,7 +487,7 @@ public class ImportExcel {
       news.setReceivedDate(date);
       news.setScientificName("F. bar");
       long sampleId = misoManager.saveSample(news);
-      news.setSampleId(sampleId);
+      news.setId(sampleId);
       sample = news;
 
       SampleQC sampleQC = new SampleQCImpl();
@@ -547,7 +547,7 @@ public class ImportExcel {
     li.setLibraryStrategyType(misoManager.getLibraryStrategyTypeById(15));
 
     long libraryId = misoManager.saveLibrary(li);
-    li.setLibraryId(libraryId);
+    li.setId(libraryId);
 
     LibraryQC libQC = new LibraryQCImpl();
     libQC.setLibrary(li);

@@ -6,9 +6,9 @@ import com.eaglegenomics.simlims.core.User;
 
 public interface TissueMaterial {
 
-  Long getTissueMaterialId();
+  Long getId();
 
-  void setTissueMaterialId(Long tissueMaterialId);
+  void setId(Long tissueMaterialId);
 
   String getAlias();
 

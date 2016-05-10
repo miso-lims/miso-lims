@@ -6,9 +6,9 @@ import com.eaglegenomics.simlims.core.User;
 
 public interface SampleGroupId {
 
-  Long getSampleGroupId();
+  Long getId();
 
-  void setSampleGroupId(Long sampleGroupId);
+  void setId(Long sampleGroupId);
 
   Project getProject();
 

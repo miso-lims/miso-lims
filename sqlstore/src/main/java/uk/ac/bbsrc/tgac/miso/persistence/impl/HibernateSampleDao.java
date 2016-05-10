@@ -1,16 +1,11 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
-
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import javax.persistence.CascadeType;
 
@@ -20,27 +15,23 @@ import net.sf.ehcache.CacheManager;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.exception.ConstraintViolationException;
-import org.hibernate.jdbc.Work;
 import org.hibernate.type.LongType;
 import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.store.SecurityStore;
-import com.google.common.annotations.VisibleForTesting;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
-import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
@@ -111,109 +102,25 @@ public class HibernateSampleDao implements SampleDao, SampleStore {
   public void setNamingScheme(MisoNamingScheme<Sample> namingScheme) {
     this.namingScheme = namingScheme;
   }
-
-  @Transactional(propagation = Propagation.MANDATORY)
+  
   @Override
-  public Long addSample(final Sample sample) throws IOException, MisoNamingException {
-    // We can't generate the name until we have the ID and we don't have an ID until we start the persistence. So, we assign a temporary
-    // name.
-    sample.setName(generateTemporaryName());
-    if (isStringEmptyOrNull(sample.getAlias()) && sampleNamingScheme.hasGeneratorFor("alias")) {
-      sample.setAlias(generateTemporaryName());
-    }
-    generateSiblingNumberIfRequired(sample);
-    long id = (Long) currentSession().save(sample);
-
+  public Long addSample(final Sample sample) throws IOException {
     if (sample.getSecurityProfile() != null) {
-      sessionFactory.getCurrentSession().doWork(new Work() {
-
-        @Override
-        public void execute(Connection connection) throws SQLException {
-          try {
-            sample.setSecurityProfileId(getSecurityProfileDao().save(sample.getSecurityProfile()));
-          } catch (IOException e) {
-            e.printStackTrace();
-          }
-        }
-
-      });
+      sample.setSecurityProfileId(getSecurityProfileDao().save(sample.getSecurityProfile()));
     }
-
-    sample.setId(id);
-    
-    updateParentSampleNameIfRequired(sample);
-    updateSampleAliasIfRequired(sample);
-    String name = namingScheme.generateNameFor("name", sample);
-    sample.setName(name);
-
-    if (sampleNamingScheme.validateField("name", sample.getName()) && sampleNamingScheme.validateField("alias", sample.getAlias())) {
-      if (autoGenerateIdentificationBarcodes) {
-        autoGenerateIdBarcode(sample);
-      } // if !autoGenerateIdentificationBarcodes then the identificationBarcode is set by the user
-    }
-
-    currentSession().update(sample);
-    
-    sessionFactory.getCurrentSession().doWork(new Work() {
-
-      @Override
-      public void execute(Connection connection) throws SQLException {
-        try {
-          if (!sampleNamingScheme.allowDuplicateEntityNameFor("alias") && aliasExists(sample.getAlias())) {
-            // Size is greater than 1, since we've just added this to the db under a temporary name.
-            throw new ConstraintViolationException(String.format("A sample with this alias '%s' already exists in the database", sample.getAlias()),
-                         null, "alias");
-          }
-        } catch (IOException e) {
-          throw new SQLException(e);
-        }
-
-      }
-    });
-    persistSqlStore(sample);
-    return id;
+    return (Long) currentSession().save(sample);
   }
   
-  private void generateSiblingNumberIfRequired(Sample sample) {
-    if (sample.getSampleAdditionalInfo() != null && sample.getParent() != null) {
-      Query query = currentSession().createQuery("select max(siblingNumber) "
-          + "from SampleAdditionalInfoImpl "
-          + "where parentId = :parentId "
-          + "and sampleClassId = :sampleClassId");
-      query.setLong("parentId", sample.getParent().getId());
-      query.setLong("sampleClassId", sample.getSampleAdditionalInfo().getSampleClass().getSampleClassId());
-      Number result = ((Number) query.uniqueResult());
-      int siblingNumber = result == null ? 1 : result.intValue() + 1;
-      sample.getSampleAdditionalInfo().setSiblingNumber(siblingNumber);
-    }
-  }
-
-  @VisibleForTesting
-  void updateParentSampleNameIfRequired(Sample child) throws MisoNamingException, IOException {
-    if (child.getSampleAdditionalInfo() != null
-        && hasTemporaryName(child.getParent())
-        && child.getParent().getId() > Sample.UNSAVED_ID) {
-      String name = namingScheme.generateNameFor("name", child.getSampleAdditionalInfo().getParent());
-      child.getSampleAdditionalInfo().getParent().setName(name);
-    }
-  }
-  
-  private void updateSampleAliasIfRequired(Sample sample) throws MisoNamingException {
-    if (hasTemporaryAlias(sample) && sample.getId() > Sample.UNSAVED_ID 
-        && sampleNamingScheme.hasGeneratorFor("alias") ) {
-      String alias = sampleNamingScheme.generateNameFor("alias", sample);
-      sample.setAlias(alias);
-    }
-  }
-
-  /**
-   * Generates a unique barcode. Note that the barcode will change when the alias is changed.
-   * 
-   * @param sample
-   */
-  public void autoGenerateIdBarcode(Sample sample) {
-    String barcode = sample.getName() + "::" + sample.getAlias();
-    sample.setIdentificationBarcode(barcode);
+  @Override
+  public int getNextSiblingNumber(Sample parent, SampleClass childClass) throws IOException {
+    Query query = currentSession().createQuery("select max(siblingNumber) "
+        + "from SampleAdditionalInfoImpl "
+        + "where parentId = :parentId "
+        + "and sampleClassId = :sampleClassId");
+    query.setLong("parentId", parent.getId());
+    query.setLong("sampleClassId", childClass.getId());
+    Number result = ((Number) query.uniqueResult());
+    return result == null ? 1 : result.intValue() + 1;
   }
 
   @Override
@@ -391,24 +298,13 @@ public class HibernateSampleDao implements SampleDao, SampleStore {
     return fetchSqlStore(records);
   }
 
-  /**
-   * Determines if an alias exists already. This method is specifically used during the creation of a sample and does not call fetchSqlStore
-   * since the partial state of the new sample will cause it to fail.
-   * 
-   * @param alias
-   *          See if this alias already exists.
-   * @return True if the alias already exists.
-   * @throws IOException
-   *           If there are difficulties reading from the database.
-   */
-  private boolean aliasExists(String alias) throws IOException {
+  @Override
+  public boolean aliasExists(String alias) throws IOException {
     Query query = currentSession().createQuery("from SampleImpl where alias = :alias");
     query.setString("alias", alias);
     @SuppressWarnings("unchecked")
     List<Sample> records = query.list();
-    // Need to check greater than one since the alias was just added as part of sample creation. If any more of the sample creation
-    // fails the transaction will be rolled back and the sample entry removed.
-    return records.size() > 1;
+    return records.size() > 0;
   }
 
   @Override
@@ -492,11 +388,7 @@ public class HibernateSampleDao implements SampleDao, SampleStore {
   @Override
   public long save(Sample t) throws IOException {
     if (t.getId() == SampleImpl.UNSAVED_ID) {
-      try {
-        return addSample(t);
-      } catch (MisoNamingException e) {
-        throw new IOException("Bad name", e);
-      }
+      return addSample(t);
     } else {
       update(t);
       return t.getId();
@@ -559,28 +451,5 @@ public class HibernateSampleDao implements SampleDao, SampleStore {
   @Override
   public Map<String, Integer> getSampleColumnSizes() throws IOException {
     return DbUtils.getColumnSizes(template, "Sample");
-  }
-
-  static final private String TEMPORARY_NAME_PREFIX = "TEMPORARY_S";
-
-  /**
-   * Generate a temporary name using a UUID.
-   * 
-   * @return Temporary name
-   */
-  static public String generateTemporaryName() {
-    return TEMPORARY_NAME_PREFIX + UUID.randomUUID();
-  }
-
-  static public boolean hasTemporaryName(Sample sample) {
-    boolean result = false;
-    if (sample != null && sample.getName() != null) {
-      result = sample.getName().startsWith(TEMPORARY_NAME_PREFIX);
-    }
-    return result;
-  }
-  
-  static public boolean hasTemporaryAlias(Sample sample) {
-    return sample.getAlias().startsWith(TEMPORARY_NAME_PREFIX);
   }
 }

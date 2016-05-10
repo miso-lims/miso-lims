@@ -146,7 +146,7 @@
     <td>Reference Genome :*</td>
     <td>
         <form:select id="referenceGenome" path="referenceGenomeId">
-            <form:options items="${referenceGenome}" itemValue="referenceGenomeId" itemLabel="alias"/>
+            <form:options items="${referenceGenome}" itemValue="id" itemLabel="alias"/>
         </form:select>
     </td>
   </tr>
@@ -170,12 +170,12 @@
 <c:when test="${not empty project.overviews}">
 
 <c:forEach items="${project.overviews}" var="overview" varStatus="ov">
-<div id="overviewdiv${overview.overviewId}" class="ui-corner-all simplebox">
+<div id="overviewdiv${overview.id}" class="ui-corner-all simplebox">
 
 <script type="text/javascript">
   jQuery(document).ready(function () {
     //show watchers list
-    Project.alert.listWatchOverview(${overview.overviewId});
+    Project.alert.listWatchOverview(${overview.id});
   });
 </script>
 
@@ -183,18 +183,18 @@
   <div class="breadcrumbsbubbleInfo">
     <div class="trigger"><c:choose>
       <c:when test="${not empty overviewMap[overview.overviewId]}">
-        <a href='javascript:void(0);' onclick="Project.alert.unwatchOverview(${overview.overviewId});">Stop
+        <a href='javascript:void(0);' onclick="Project.alert.unwatchOverview(${overview.id});">Stop
           watching</a>
       </c:when>
       <c:otherwise>
-        <a href='javascript:void(0);' onclick="Project.alert.watchOverview(${overview.overviewId});">Watch</a>
+        <a href='javascript:void(0);' onclick="Project.alert.watchOverview(${overview.id});">Watch</a>
       </c:otherwise>
     </c:choose>
       |
       (Watchers)
     </div>
     <div class="breadcrumbspopup">
-      <div id="watchersList${overview.overviewId}"></div>
+      <div id="watchersList${overview.id}"></div>
     </div>
   </div>
 </div>
@@ -220,14 +220,14 @@
       <c:choose>
         <c:when test="${overview.locked}">
           <td style="text-align:center;">
-            <a href="javascript:void(0);" onclick="Project.overview.unlockProjectOverview(${overview.overviewId})">
+            <a href="javascript:void(0);" onclick="Project.overview.unlockProjectOverview(${overview.id})">
               <img style="border:0;" alt="Unlock" title="Unlock this overview" src="<c:url value='/styles/images/lock_closed.png'/>"/>
             </a>
           </td>
         </c:when>
         <c:otherwise>
           <td style="text-align:center;">
-            <a href="javascript:void(0);" onclick="Project.overview.lockProjectOverview(${overview.overviewId})">
+            <a href="javascript:void(0);" onclick="Project.overview.lockProjectOverview(${overview.id})">
               <img style="border:0;" alt="Lock" title="Lock this overview" src="<c:url value='/styles/images/lock_open.png'/>"/>
             </a>
           </td>
@@ -278,14 +278,14 @@
     </td>
     <td>
         ${fn:length(overview.qcPassedSamples)} / ${overview.numProposedSamples}
-      <div id="progressbar${overview.overviewId}"></div>
+      <div id="progressbar${overview.id}"></div>
       <script type="text/javascript">
-        jQuery("#progressbar${overview.overviewId}").progressbar({ value: ${fn:length(overview.qcPassedSamples) / overview.numProposedSamples * 100} });
+        jQuery("#progressbar${overview.id}").progressbar({ value: ${fn:length(overview.qcPassedSamples) / overview.numProposedSamples * 100} });
       </script>
     </td>
     <td>
       <c:if test="${not overview.locked}">
-        <a onclick="Project.overview.showProjectOverviewNoteDialog(${overview.overviewId});"
+        <a onclick="Project.overview.showProjectOverviewNoteDialog(${overview.id});"
            href="javascript:void(0);" class="add">Add Note</a><br/>
       </c:if>
       <c:forEach items="${overview.notes}" var="note" varStatus="n">
@@ -295,7 +295,7 @@
             <c:if test="${(note.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
                             or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
               <span style="color:#000000">
-                <a href='#' onclick="Project.overview.deleteProjectOverviewNote('${overview.overviewId}', '${note.noteId}');">
+                <a href='#' onclick="Project.overview.deleteProjectOverviewNote('${overview.id}', '${note.noteId}');">
                   <span class="ui-icon ui-icon-trash" style="clear: both; position: relative; float: right; margin-top: -15px;"></span>
                 </a>
               </span>
@@ -417,7 +417,7 @@
   <c:if test="${empty overview.sampleGroup}">
     <a class="add" href="javascript:void(0);" onclick="Project.overview.addSampleGroupTable(${project.id}, ${overview.id});">Add Sample Group</a><br/>
   </c:if>
-  <div id="sampleGroupTableDiv${overview.overviewId}"></div>
+  <div id="sampleGroupTableDiv${overview.id}"></div>
 </c:if>
 <span style="clear:both">
   <c:if test="${not empty overview.sampleGroup}">
@@ -837,7 +837,7 @@
     <div id="samtab-2">
       <c:forEach items="${project.overviews}" var="overview" varStatus="ov">
         <c:if test="${not empty overview.sampleGroup}">
-          <div id="overviewsamdiv${overview.overviewId}" class="ui-corner-all simplebox">
+          <div id="overviewsamdiv${overview.id}" class="ui-corner-all simplebox">
             <h1>Group ${overview.sampleGroup.id} Samples</h1>
             <ul class="sddm">
               <li>
@@ -1062,7 +1062,7 @@
     <div id="libtab-2">
       <c:forEach items="${project.overviews}" var="overview" varStatus="ov">
         <c:if test="${not empty overview.sampleGroup}">
-        <div id="overviewlibdiv${overview.overviewId}" class="ui-corner-all simplebox">
+        <div id="overviewlibdiv${overview.id}" class="ui-corner-all simplebox">
           <h1>Group ${overview.sampleGroup.id} Libraries</h1>
           <ul class="sddm">
             <li>

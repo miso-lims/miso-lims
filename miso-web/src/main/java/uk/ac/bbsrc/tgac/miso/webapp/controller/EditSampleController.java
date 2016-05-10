@@ -23,23 +23,36 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
+import java.beans.PropertyEditorSupport;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.servlet.http.HttpServletResponse;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -49,28 +62,52 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractPool;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.EntityGroup;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
+import uk.ac.bbsrc.tgac.miso.core.data.Identity;
+import uk.ac.bbsrc.tgac.miso.core.data.Identity.DonorSex;
+import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.QcPassedDetail;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAnalyte.StrStatus;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleGroupId;
+import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
+import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
+import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
+import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
+import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.QcPassedDetailImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAdditionalInfoImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAnalyteImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleGroupImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SamplePurposeImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
@@ -79,8 +116,15 @@ import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
-import uk.ac.bbsrc.tgac.miso.webapp.context.ApplicationContextProvider;
-import uk.ac.bbsrc.tgac.miso.webapp.util.MisoPropertyExporter;
+import uk.ac.bbsrc.tgac.miso.service.LabService;
+import uk.ac.bbsrc.tgac.miso.service.QcPassedDetailService;
+import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
+import uk.ac.bbsrc.tgac.miso.service.SamplePurposeService;
+import uk.ac.bbsrc.tgac.miso.service.SampleService;
+import uk.ac.bbsrc.tgac.miso.service.TissueMaterialService;
+import uk.ac.bbsrc.tgac.miso.service.TissueOriginService;
+import uk.ac.bbsrc.tgac.miso.service.TissueTypeService;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.ui.SampleOptionsController;
 
 @Controller
 @RequestMapping("/sample")
@@ -99,6 +143,16 @@ public class EditSampleController {
   
   @Autowired
   private MisoNamingScheme<Sample> sampleNamingScheme;
+  
+  @Autowired
+  private SampleOptionsController sampleOptionsController;
+  
+  @Autowired
+  private SampleService sampleService;
+  
+  public void setSampleOptionsController(SampleOptionsController sampleOptionsController) {
+    this.sampleOptionsController = sampleOptionsController;
+  }
 
   public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
     this.dataObjectFactory = dataObjectFactory;
@@ -112,31 +166,36 @@ public class EditSampleController {
     this.securityManager = securityManager;
   }
 
-  public Boolean misoPropertyBoolean(String property) {
-    MisoPropertyExporter exporter = (MisoPropertyExporter) ApplicationContextProvider.getApplicationContext().getBean("propertyConfigurer");
-    Map<String, String> misoProperties = exporter.getResolvedProperties();
-    return misoProperties.containsKey(property)
-        && Boolean.parseBoolean(misoProperties.get(property));
+  @ModelAttribute("aliasGenerationEnabled")
+  public Boolean isAliasGenerationEnabled() {
+    return sampleNamingScheme != null && sampleNamingScheme.hasGeneratorFor("alias");
   }
+
+  @Value("${miso.notification.interop.enabled}")
+  private Boolean metrixEnabled;
+  @Value("${miso.autoGenerateIdentificationBarcodes}")
+  private Boolean autoGenerateIdBarcodes;
+  @Value("${miso.detailed.sample.enabled}")
+  private Boolean detailedSample;
 
   @ModelAttribute("metrixEnabled")
   public Boolean isMetrixEnabled() {
-    return misoPropertyBoolean("miso.notification.interop.enabled");
-  }
-  
-  @ModelAttribute("aliasGenerationEnabled")
-  public boolean isAliasGenerationEnabled() {
-    return sampleNamingScheme != null && sampleNamingScheme.hasGeneratorFor("alias");
+    return metrixEnabled;
   }
 
   @ModelAttribute("autoGenerateIdBarcodes")
   public Boolean autoGenerateIdentificationBarcodes() {
-    return misoPropertyBoolean("miso.autoGenerateIdentificationBarcodes");
+    return autoGenerateIdBarcodes;
   }
 
   @ModelAttribute("detailedSample")
   public Boolean isDetailedSampleEnabled() {
-    return misoPropertyBoolean("miso.detailed.sample.enabled");
+    return detailedSample;
+  }
+  
+  @ModelAttribute("sampleOptions")
+  public JSONObject getSampleOptions(UriComponentsBuilder uriBuilder, HttpServletResponse response) throws IOException {
+    return JSONObject.fromObject(sampleOptionsController.getSampleOptions(uriBuilder, response));
   }
 
   public Map<String, Sample> getAdjacentSamplesInGroup(Sample s, @RequestParam(value = "entityGroupId", required = true) Long entityGroupId)
@@ -312,6 +371,7 @@ public class EditSampleController {
     final List<String> sampleTypes = new ArrayList<String>(requestManager.listAllSampleTypes());
     final List<String> qcValues = new ArrayList<String>();
     final List<String> strStatuses = new ArrayList<String>();
+    final List<String> donorSexes = new ArrayList<String>();
     qcValues.add("true");
     qcValues.add("false");
     qcValues.add("");
@@ -326,13 +386,261 @@ public class EditSampleController {
     for (String strLabel : StrStatus.getLabels()) {
       strStatuses.add(strLabel);
     }
+    for (String dsLabel : DonorSex.getLabels()) {
+      donorSexes.add(dsLabel);
+    }
 
     hot.put("sampleTypes", sampleTypes);
     hot.put("projects", allProjects);
     hot.put("qcValues", qcValues);
     hot.put("strStatuses", strStatuses);
+    hot.put("donorSexes", donorSexes);
 
     return hot;
+  }
+  
+  @Autowired
+  private SampleClassService sampleClassService;
+  
+  @ModelAttribute("sampleClasses")
+  public List<SampleClass> getSampleClasses() throws IOException {
+    List<SampleClass> sampleClasses = new ArrayList<>(sampleClassService.getAll());
+    // Can't manually create Identities, so remove the option
+    for (Iterator<SampleClass> i = sampleClasses.iterator(); i.hasNext();) {
+      SampleClass sc = i.next();
+      if (Identity.CATEGORY_NAME.equals(sc.getSampleCategory())) {
+        i.remove();
+      }
+    }
+    Collections.sort(sampleClasses, new Comparator<SampleClass>() {
+      @Override
+      public int compare(SampleClass o1, SampleClass o2) {
+        return o1.getAlias().compareTo(o2.getAlias());
+      }
+    });
+    return sampleClasses;
+  }
+  
+  @Autowired
+  private TissueOriginService tissueOriginService;
+  
+  @ModelAttribute("tissueOrigins")
+  public List<TissueOrigin> getTissueOrigins() throws IOException {
+    List<TissueOrigin> list = new ArrayList<>(tissueOriginService.getAll());
+    Collections.sort(list, new Comparator<TissueOrigin>() {
+      @Override
+      public int compare(TissueOrigin o1, TissueOrigin o2) {
+        return o1.getDescription().compareTo(o2.getDescription());
+      }
+    });
+    return list;
+  }
+  
+  @Autowired
+  private TissueTypeService tissueTypeService;
+  
+  @ModelAttribute("tissueTypes")
+  public List<TissueType> getTissueTypes() throws IOException {
+    List<TissueType> list = new ArrayList<>(tissueTypeService.getAll());
+    Collections.sort(list, new Comparator<TissueType>() {
+      @Override
+      public int compare(TissueType o1, TissueType o2) {
+        return o1.getDescription().compareTo(o2.getDescription());
+      }
+    });
+    return list;
+  }
+  
+  @Autowired
+  private QcPassedDetailService qcpassedDetailService;
+  
+  @ModelAttribute("qcPassedDetails")
+  public List<QcPassedDetail> getQcPassedDetails() throws IOException {
+    List<QcPassedDetail> list = new ArrayList<>(qcpassedDetailService.getAll());
+    Collections.sort(list, new Comparator<QcPassedDetail>() {
+      @Override
+      public int compare(QcPassedDetail o1, QcPassedDetail o2) {
+        return o1.getDescription().compareTo(o2.getDescription());
+      }
+    });
+    return list;
+  }
+  
+  @Autowired
+  private LabService labService;
+  
+  @ModelAttribute("labs")
+  public List<Lab> getLabs() throws IOException {
+    List<Lab> list = new ArrayList<>(labService.getAll());
+    Collections.sort(list, new Comparator<Lab>() {
+      @Override
+      public int compare(Lab o1, Lab o2) {
+        return o1.getAlias().compareTo(o2.getAlias());
+      }
+    });
+    return list;
+  }
+  
+  @Autowired
+  private SamplePurposeService samplePurposeService;
+  
+  @ModelAttribute("samplePurposes")
+  public List<SamplePurpose> getSamplePurposes() throws IOException {
+    List<SamplePurpose> list = new ArrayList<>(samplePurposeService.getAll());
+    Collections.sort(list, new Comparator<SamplePurpose>() {
+      @Override
+      public int compare(SamplePurpose o1, SamplePurpose o2) {
+        return o1.getAlias().compareTo(o2.getAlias());
+      }
+    });
+    return list;
+  }
+  
+  @Autowired
+  private TissueMaterialService tissueMaterialService;
+  
+  @ModelAttribute("tissueMaterials")
+  public List<TissueMaterial> getTissueMaterials() throws IOException {
+    List<TissueMaterial> list = new ArrayList<>(tissueMaterialService.getAll());
+    Collections.sort(list, new Comparator<TissueMaterial>() {
+      @Override
+      public int compare(TissueMaterial o1, TissueMaterial o2) {
+        return o1.getAlias().compareTo(o2.getAlias());
+      }
+    });
+    return list;
+  }
+  
+  @ModelAttribute("strStatusOptions")
+  public StrStatus[] getStrStatusOptions() {
+    return StrStatus.values();
+  }
+  
+  @ModelAttribute("donorSexOptions")
+  public DonorSex[] getDonorSexOptions() {
+    return DonorSex.values();
+  }
+
+  /**
+   * Translates foreign keys to entity objects with only the ID set, to be used in service layer to reload persisted child objects
+   * 
+   * @param binder
+   */
+  @InitBinder
+  public void includeForeignKeys(WebDataBinder binder) {
+    binder.registerCustomEditor(Project.class, "project", new PropertyEditorSupport() {
+      @Override
+      public void setAsText(String text) throws IllegalArgumentException {
+        Project p = new ProjectImpl();
+        p.setId(Long.valueOf(text));
+        setValue(p);
+      }
+    });
+    
+    binder.registerCustomEditor(SampleClass.class, "sampleAdditionalInfo.sampleClass", new PropertyEditorSupport() {
+      @Override
+      public void setAsText(String text) throws IllegalArgumentException {
+        SampleClass sc = new SampleClassImpl();
+        sc.setId(Long.valueOf(text));
+        setValue(sc);
+      }
+    });
+    
+    binder.registerCustomEditor(TissueOrigin.class, "sampleAdditionalInfo.tissueOrigin", new PropertyEditorSupport() {
+      @Override
+      public void setAsText(String text) throws IllegalArgumentException {
+        TissueOrigin to = new TissueOriginImpl();
+        to.setId(Long.valueOf(text));
+        setValue(to);
+      }
+    });
+    
+    binder.registerCustomEditor(TissueType.class, "sampleAdditionalInfo.tissueType", new PropertyEditorSupport() {
+      @Override
+      public void setAsText(String text) throws IllegalArgumentException {
+        TissueType tt = new TissueTypeImpl();
+        tt.setId(Long.valueOf(text));
+        setValue(tt);
+      }
+    });
+    
+    binder.registerCustomEditor(QcPassedDetail.class, "sampleAdditionalInfo.qcPassedDetail", new PropertyEditorSupport() {
+      @Override
+      public void setAsText(String text) throws IllegalArgumentException {
+        if (isStringEmptyOrNull(text)) {
+          setValue(null);
+        } else {
+          QcPassedDetail qcpd = new QcPassedDetailImpl();
+          qcpd.setId(Long.valueOf(text));
+          setValue(qcpd);
+        }
+      }
+    });
+    
+    binder.registerCustomEditor(Subproject.class, "sampleAdditionalInfo.subproject", new PropertyEditorSupport() {
+      @Override
+      public void setAsText(String text) throws IllegalArgumentException {
+        if (isStringEmptyOrNull(text)) {
+          setValue(null);
+        } else {
+          Subproject sp = new SubprojectImpl();
+          sp.setId(Long.valueOf(text));
+          setValue(sp);
+        }
+      }
+    });
+    
+    binder.registerCustomEditor(Lab.class, "sampleAdditionalInfo.lab", new PropertyEditorSupport() {
+      @Override
+      public void setAsText(String text) throws IllegalArgumentException {
+        if (isStringEmptyOrNull(text)) {
+          setValue(null);
+        } else {
+          Lab lab = new LabImpl();
+          lab.setId(Long.valueOf(text));
+          setValue(lab);
+        }
+      }
+    });
+    
+    binder.registerCustomEditor(SampleGroupId.class, "sampleAnalyte.sampleGroup", new PropertyEditorSupport() {
+      @Override
+      public void setAsText(String text) throws IllegalArgumentException {
+        if (isStringEmptyOrNull(text)) {
+          setValue(null);
+        } else {
+          SampleGroupId sg = new SampleGroupImpl();
+          sg.setId(Long.valueOf(text));
+          setValue(sg);
+        }
+      }
+    });
+    
+    binder.registerCustomEditor(SamplePurpose.class, "sampleAnalyte.samplePurpose", new PropertyEditorSupport() {
+      @Override
+      public void setAsText(String text) throws IllegalArgumentException {
+        if (isStringEmptyOrNull(text)) {
+          setValue(null);
+        } else {
+          SamplePurpose sp = new SamplePurposeImpl();
+          sp.setId(Long.valueOf(text));
+          setValue(sp);
+        }
+      }
+    });
+    
+    binder.registerCustomEditor(TissueMaterial.class, "sampleAnalyte.tissueMaterial", new PropertyEditorSupport() {
+      @Override
+      public void setAsText(String text) throws IllegalArgumentException {
+        if (isStringEmptyOrNull(text)) {
+          setValue(null);
+        } else {
+          TissueMaterial tm = new TissueMaterialImpl();
+          tm.setId(Long.valueOf(text));
+          setValue(tm);
+        }
+      }
+    });
   }
 
   @RequestMapping(value = "/new", method = RequestMethod.GET)
@@ -409,6 +717,9 @@ public class EditSampleController {
       Sample sample = null;
       if (sampleId == AbstractSample.UNSAVED_ID) {
         sample = dataObjectFactory.getSample(user);
+        if (isDetailedSampleEnabled()) {
+          addNewDetailedSampleEntities(sample);
+        }
         model.put("title", "New Sample");
 
         if (projectId != null) {
@@ -475,6 +786,24 @@ public class EditSampleController {
       }
       throw ex;
     }
+  }
+  
+  /**
+   * Adds child entities to a new detailed Sample so they can be bound in the JSP. These will not all be useful for the same 
+   * object, but are all included to accomodate the JSP
+   * 
+   * @param sample
+   */
+  private void addNewDetailedSampleEntities(Sample sample) {
+    sample.setSampleAdditionalInfo(new SampleAdditionalInfoImpl());
+    sample.getSampleAdditionalInfo().setTissueOrigin(new TissueOriginImpl());
+    sample.getSampleAdditionalInfo().setTissueType(new TissueTypeImpl());
+    sample.getSampleAdditionalInfo().setQcPassedDetail(new QcPassedDetailImpl());
+    sample.getSampleAdditionalInfo().setSubproject(new SubprojectImpl());
+    
+    sample.setSampleTissue(new SampleTissueImpl());
+    sample.setSampleAnalyte(new SampleAnalyteImpl());
+    sample.setIdentity(new IdentityImpl());
   }
 
   @RequestMapping(value = "/rest/changes", method = RequestMethod.GET)
@@ -546,21 +875,18 @@ public class EditSampleController {
   public String processSubmit(@ModelAttribute("sample") Sample sample, ModelMap model, SessionStatus session)
       throws IOException, MalformedSampleException {
     try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      if (!sample.userCanWrite(user)) {
-        throw new SecurityException("Permission denied.");
+      if (sample.getId() == Sample.UNSAVED_ID) {
+        sampleService.create(sample);
+      } else {
+        sampleService.update(sample);
       }
-
-      sample.setLastModifier(user);
-      requestManager.saveSample(sample);
       session.setComplete();
       model.clear();
       return "redirect:/miso/sample/" + sample.getId();
     } catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to save sample", ex);
-      }
+      log.debug("Failed to save sample", ex);
       throw ex;
     }
   }
+  
 }

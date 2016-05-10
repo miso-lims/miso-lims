@@ -96,62 +96,48 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
 
   @Transient
   private final Collection<LibraryQC> libraryQCs = new TreeSet<LibraryQC>();
-  
+
   @Transient
   private final Collection<LibraryDilution> libraryDilutions = new HashSet<LibraryDilution>();
 
   @Transient
   private SecurityProfile securityProfile;
-  
+
   @Transient
   @JsonBackReference
   private Sample sample;
-  
+
   @Transient
   private LibraryType libraryType;
-  
+
   @Transient
   private LibrarySelectionType librarySelectionType;
-  
+
   @Transient
   private LibraryStrategyType libraryStrategyType;
-  
+
   @Column(name = "concentration")
   private Double initialConcentration;
-  
+
   @Transient
   private Integer libraryQuant;
 
   @OneToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "lastModifier", nullable = false)
   private User lastModifier;
-  
+
   @Transient
   private Collection<Note> notes = new HashSet<Note>();
-  
+
   @Transient
   private final Collection<ChangeLog> changeLog = new ArrayList<ChangeLog>();
 
   @Transient
   private Date lastUpdated;
-  
+
   @OneToOne(targetEntity = LibraryAdditionalInfoImpl.class, mappedBy = "library")
   // TODO: add cascade
   private LibraryAdditionalInfo libraryAdditionalInfo;
-
-  @Override
-  @CoverageIgnore
-  @Deprecated
-  public Long getLibraryId() {
-    return libraryId;
-  }
-
-  @Override
-  @CoverageIgnore
-  @Deprecated
-  public void setLibraryId(Long libraryId) {
-    this.libraryId = libraryId;
-  }
 
   @Override
   public long getId() {
@@ -399,12 +385,12 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   public boolean isLowQuality() {
     return lowQuality;
   }
-  
+
   @Override
   public LibraryAdditionalInfo getLibraryAdditionalInfo() {
     return libraryAdditionalInfo;
   }
-  
+
   @Override
   public void setLibraryAdditionalInfo(LibraryAdditionalInfo libraryAdditionalInfo) {
     this.libraryAdditionalInfo = libraryAdditionalInfo;

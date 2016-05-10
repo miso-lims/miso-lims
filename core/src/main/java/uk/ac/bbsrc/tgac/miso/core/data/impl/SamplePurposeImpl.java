@@ -44,12 +44,12 @@ public class SamplePurposeImpl implements SamplePurpose {
   private Date lastUpdated;
 
   @Override
-  public Long getSamplePurposeId() {
+  public Long getId() {
     return samplePurposeId;
   }
 
   @Override
-  public void setSamplePurposeId(Long samplePurposeId) {
+  public void setId(Long samplePurposeId) {
     this.samplePurposeId = samplePurposeId;
   }
 

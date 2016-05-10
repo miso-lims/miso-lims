@@ -69,7 +69,7 @@
     <tbody>
     <c:forEach items="${sequencing}" var="sequencing">
       <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-        <td><b><a href='<c:url value="/miso/kitdescriptor/${sequencing.kitDescriptorId}"/>'>${sequencing.name}</a></b></td>
+        <td><b><a href='<c:url value="/miso/kitdescriptor/${sequencing.id}"/>'>${sequencing.name}</a></b></td>
         <td>${sequencing.version}</td>
         <td>${sequencing.manufacturer}</td>
         <td>${sequencing.partNumber}</td>
@@ -132,7 +132,7 @@
     <tbody>
     <c:forEach items="${empcr}" var="empcr">
       <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-        <td><b><a href='<c:url value="/miso/kitdescriptor/${empcr.kitDescriptorId}"/>'>${empcr.name}</a></b></td> 
+        <td><b><a href='<c:url value="/miso/kitdescriptor/${empcr.id}"/>'>${empcr.name}</a></b></td> 
         <td>${empcr.version}</td>
         <td>${empcr.manufacturer}</td>
         <td>${empcr.partNumber}</td>
@@ -196,7 +196,7 @@
     <tbody>
     <c:forEach items="${library}" var="library">
       <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-        <td><b><a href='<c:url value="/miso/kitdescriptor/${library.kitDescriptorId}"/>'>${library.name}</a></b></td>
+        <td><b><a href='<c:url value="/miso/kitdescriptor/${library.id}"/>'>${library.name}</a></b></td>
         <td>${library.version}</td>
         <td>${library.manufacturer}</td>
         <td>${library.partNumber}</td>
@@ -260,7 +260,7 @@
     <tbody>
     <c:forEach items="${clustering}" var="clustering">
       <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-        <td><b><a href='<c:url value="/miso/kitdescriptor/${clustering.kitDescriptorId}"/>'>${clustering.name}</a></b></td>
+        <td><b><a href='<c:url value="/miso/kitdescriptor/${clustering.id}"/>'>${clustering.name}</a></b></td>
         <td>${clustering.version}</td>
         <td>${clustering.manufacturer}</td>
         <td>${clustering.partNumber}</td>
@@ -323,7 +323,7 @@
     <tbody>
     <c:forEach items="${multiplexing}" var="multiplexing">
       <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-        <td><b><a href='<c:url value="/miso/kitdescriptor/${multiplexing.kitDescriptorId}"/>'>${multiplexing.name}</a></b></td>
+        <td><b><a href='<c:url value="/miso/kitdescriptor/${multiplexing.id}"/>'>${multiplexing.name}</a></b></td>
         <td>${multiplexing.version}</td>
         <td>${multiplexing.manufacturer}</td>
         <td>${multiplexing.partNumber}</td>

@@ -144,7 +144,7 @@ public class SequencingParametersImpl implements SequencingParameters, Serializa
   public void setPlatform(Platform platform) {
     this.platform = platform;
     if (platform != null) {
-      platformId = platform.getPlatformId();
+      platformId = platform.getId();
     }
   }
 

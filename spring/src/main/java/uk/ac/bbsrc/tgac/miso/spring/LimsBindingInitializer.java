@@ -28,12 +28,15 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 import java.beans.PropertyEditorSupport;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,11 +59,14 @@ import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.ProtocolManager;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
+import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
+import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
+import uk.ac.bbsrc.tgac.miso.core.data.Plate;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
@@ -75,7 +81,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.Submittable;
 import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
@@ -83,7 +88,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignDao;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 /**
  * Class that binds all the MISO model datatypes to the Spring form path types
@@ -103,6 +110,225 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
   @Autowired
   private LibraryDesignDao libraryDesignDao;
+
+  @Autowired
+  private BoxStore sqlBoxDAO;
+
+  /**
+   * Simplified interface to convert form data to fields.
+   * 
+   * @param <T>
+   *          The target type of the conversion.
+   */
+  public static abstract class BindingConverter<T> {
+    private final PropertyEditorSupport editor = new PropertyEditorSupport() {
+      @Override
+      public void setAsText(String element) throws IllegalArgumentException {
+        try {
+          setValue(resolve(element));
+        } catch (Exception e) {
+          throw new IllegalArgumentException("Failed to convert: " + element, e);
+        }
+      }
+    };
+
+    /**
+     * Translate the string provided by the front end into a real object.
+     */
+    public abstract T resolve(String element) throws Exception;
+
+    private final Class<T> clazz;
+
+    public BindingConverter(Class<T> clazz) {
+      this.clazz = clazz;
+    }
+
+    /**
+     * Register this conversion with a Spring binder.
+     * 
+     * @param binder
+     *          The binder to receive the registration
+     * @param fields
+     *          The field names allowed. I'm not sure why this is needed.
+     * @return
+     */
+    public BindingConverter<T> register(WebDataBinder binder, String... fields) {
+      binder.registerCustomEditor(clazz, editor);
+      for (String field : fields) {
+        binder.registerCustomEditor(clazz, field, editor);
+      }
+      return this;
+    }
+
+    /**
+     * Register this conversion for a collection with a Spring binder.
+     * 
+     * @param binder
+     *          The binder to receive the registration
+     * @param collection
+     *          The target type of the collection (i.e., the type of the field)
+     * @param field
+     *          The name of the field
+     * @return
+     */
+    @SuppressWarnings("rawtypes")
+    public <C extends Collection> BindingConverter<T> register(WebDataBinder binder, Class<C> collection, String field) {
+      binder.registerCustomEditor(collection, field, new CustomCollectionEditor(collection) {
+        @Override
+        protected Object convertElement(Object element) throws IllegalArgumentException {
+          if (element instanceof String) {
+            try {
+              return resolve((String) element);
+            } catch (Exception e) {
+              throw new IllegalArgumentException("Failed to convert in collection.", e);
+            }
+          }
+          return null;
+        }
+      });
+      return this;
+    }
+
+    /**
+     * Register this conversion for a map with a Spring binder.
+     * 
+     * @param binder
+     *          The binder to receive the registration
+     * @param collection
+     *          The target type of the map (i.e., the type of the field)
+     * @param field
+     *          The name of the field
+     * @return
+     */
+    @SuppressWarnings("rawtypes")
+    public <C extends Map> BindingConverter<T> registerMap(WebDataBinder binder, Class<C> collection, String field) {
+      binder.registerCustomEditor(collection, field, new CustomMapEditor(collection) {
+
+        @Override
+        protected Object convertValue(Object element) {
+          if (element instanceof String) {
+            try {
+              return resolve((String) element);
+            } catch (Exception e) {
+              throw new IllegalArgumentException("Failed to convert in map.", e);
+            }
+          }
+          return null;
+        }
+
+      });
+      return this;
+    }
+  }
+
+  /**
+   * Translate numeric form data to an object.
+   */
+  public static abstract class BindingConverterById<T> extends BindingConverter<T> {
+    public BindingConverterById(Class<T> clazz) {
+      super(clazz);
+    }
+
+    public abstract T resolveById(long id) throws Exception;
+
+    @Override
+    public T resolve(String element) throws Exception {
+      if (LimsUtils.isStringBlankOrNull(element)) {
+        return null;
+      }
+      long id = Long.parseLong(element);
+      return resolveById(id);
+    }
+  }
+
+  /**
+   * Translate a MISO-style identifier (with a specific prefix) into an object
+   */
+  public static abstract class BindingConverterByPrefixedId<T> extends BindingConverter<T> {
+    private final String prefix;
+
+    public BindingConverterByPrefixedId(Class<T> clazz, String prefix) {
+      super(clazz);
+      this.prefix = prefix;
+    }
+
+    public abstract T resolveById(long id) throws Exception;
+
+    @Override
+    public T resolve(String element) throws Exception {
+      String numericPart = element.startsWith(prefix) ? element.substring(prefix.length()) : element;
+      long id = Long.parseLong(numericPart);
+      return resolveById(id);
+    }
+  }
+
+  public static interface Resolver<T> {
+    public abstract String getPrefix();
+
+    public abstract T resolve(long id) throws Exception;
+  }
+
+  private static final Pattern DISPATCH_PREFIX = Pattern.compile("^([A-Za-z]*)([0-9]*)");
+
+  /**
+   * Convert a collection of IDs with different prefixes.
+   */
+  public class BindingConverterByPrefixDispatch<T> extends BindingConverter<T> {
+    private final Map<String, Resolver<? extends T>> resolvers = new HashMap<>();
+
+    public BindingConverterByPrefixDispatch(Class<T> clazz) {
+      super(clazz);
+    }
+
+    public BindingConverterByPrefixDispatch<T> add(Resolver<? extends T> resolver) {
+      resolvers.put(resolver.getPrefix(), resolver);
+      return this;
+    }
+
+    @Override
+    public T resolve(String element) throws Exception {
+      if (LimsUtils.isStringBlankOrNull(element)) {
+        return null;
+      }
+      Matcher matcher = DISPATCH_PREFIX.matcher(element);
+      if (matcher.matches()) {
+        String prefix = matcher.group(1);
+        long id = Long.parseLong(matcher.group(2));
+        return resolvers.get(prefix).resolve(id);
+      } else {
+        throw new IllegalArgumentException();
+      }
+    }
+
+  }
+
+  public interface IdWriteable {
+    public void setId(Long id);
+  }
+
+  /**
+   * Create an empty shell object with an ID such that the service layer can reload it at will.
+   */
+  public static abstract class InstantiatingConverter<T extends I, I extends IdWriteable> extends BindingConverterById<I> {
+    private final Class<T> reified;
+
+    public InstantiatingConverter(Class<T> reified, Class<I> iface) {
+      super(iface);
+      this.reified = reified;
+    }
+
+    @Override
+    public I resolveById(long id) {
+      try {
+        T instance = reified.newInstance();
+        instance.setId(id);
+        return instance;
+      } catch (InstantiationException | IllegalAccessException e) {
+        log.error("Failed to instantiate empty shell object", e);
+        return null;
+      }
+    }
+  }
 
   /**
    * Sets the requestManager of this LimsBindingInitializer object.
@@ -156,368 +382,292 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
     binder.registerCustomEditor(Date.class, new CustomDateEditor(new SimpleDateFormat("dd/MM/yyyy"), true));
 
-    binder.registerCustomEditor(InetAddress.class, new PropertyEditorSupport() {
+    new BindingConverter<InetAddress>(InetAddress.class) {
       @Override
-      public void setAsText(String element) throws IllegalArgumentException {
-        setValue(resolveInetAddress(element));
+      public InetAddress resolve(String element) throws Exception {
+        return InetAddress.getByName(element);
       }
-    });
+    }.register(binder);
 
-    binder.registerCustomEditor(Activity.class, new PropertyEditorSupport() {
+    new BindingConverter<Activity>(Activity.class) {
       @Override
-      public void setAsText(String element) throws IllegalArgumentException {
-        setValue(resolveActivity(element));
+      public Activity resolve(String id) throws Exception {
+        return protocolManager.getActivity(id);
       }
-    });
+    }.register(binder);
 
-    binder.registerCustomEditor(Protocol.class, new PropertyEditorSupport() {
+    new BindingConverter<Protocol>(Protocol.class) {
       @Override
-      public void setAsText(String element) throws IllegalArgumentException {
-        setValue(resolveProtocol(element));
+      public Protocol resolve(String id) throws Exception {
+        return protocolManager.getProtocol(id);
       }
-    });
+    }.register(binder);
 
-    binder.registerCustomEditor(Group.class, new PropertyEditorSupport() {
+    new BindingConverterById<Group>(Group.class) {
       @Override
-      public void setAsText(String element) throws IllegalArgumentException {
-        setValue(resolveGroup(element));
+      public Group resolveById(long id) throws Exception {
+        return securityManager.getGroupById(id);
       }
-    });
+    }.register(binder).register(binder, Set.class, "groups");
 
-    binder.registerCustomEditor(Set.class, "users", new CustomCollectionEditor(Set.class) {
+    new BindingConverterById<User>(User.class) {
       @Override
-      protected Object convertElement(Object element) {
-        return resolveUser(element);
+      public User resolveById(long id) throws Exception {
+        return securityManager.getUserById(id);
       }
-    });
+    }.register(binder, "securityProfile.owner").register(binder, Set.class, "users");
 
-    binder.registerCustomEditor(Set.class, "groups", new CustomCollectionEditor(Set.class) {
+    new BindingConverterByPrefixedId<Project>(Project.class, Project.PREFIX) {
       @Override
-      protected Object convertElement(Object element) {
-        return resolveGroup(element);
+      public Project resolveById(long id) throws Exception {
+        return requestManager.getProjectById(id);
       }
-    });
+    }.register(binder);
 
-    // TGAC Classes
-    binder.registerCustomEditor(com.eaglegenomics.simlims.core.User.class, new PropertyEditorSupport() {
+    new BindingConverterByPrefixedId<Study>(Study.class, Study.PREFIX) {
       @Override
-      public void setAsText(String element) throws IllegalArgumentException {
-        setValue(resolveUser(element));
+      public Study resolveById(long id) throws Exception {
+        return requestManager.getStudyById(id);
       }
-    });
+    }.register(binder, "study").register(binder, Set.class, "studies");
 
-    binder.registerCustomEditor(com.eaglegenomics.simlims.core.User.class, "securityProfile.owner", new PropertyEditorSupport() {
+    new BindingConverterById<Experiment>(Experiment.class) {
       @Override
-      public void setAsText(String element) throws IllegalArgumentException {
-        setValue(resolveUser(element));
+      public Experiment resolveById(long id) throws Exception {
+        return requestManager.getExperimentById(id);
       }
-    });
+    }.register(binder).register(binder, Set.class, "experiments");
 
-    binder.registerCustomEditor(Project.class, new PropertyEditorSupport() {
+    new BindingConverterById<Sample>(Sample.class) {
       @Override
-      public void setAsText(String element) throws IllegalArgumentException {
-        setValue(resolveProject(element));
+      public Sample resolveById(long id) throws Exception {
+        return requestManager.getSampleById(id);
       }
-    });
+    }.register(binder, "sample").register(binder, Set.class, "samples");
 
-    binder.registerCustomEditor(Set.class, "studies", new CustomCollectionEditor(Set.class) {
+    new BindingConverterById<Run>(Run.class) {
       @Override
-      protected Object convertElement(Object element) {
-        return resolveStudy(element);
+      public Run resolveById(long id) throws Exception {
+        return requestManager.getRunById(id);
       }
-    });
 
-    binder.registerCustomEditor(Study.class, "study", new PropertyEditorSupport() {
+    }.register(binder).register(binder, Set.class, "runs");
+
+    new BindingConverterById<Pool>(Pool.class) {
       @Override
-      public void setAsText(String element) throws IllegalArgumentException {
-        setValue(resolveStudy(element));
+      public Pool resolveById(long id) throws Exception {
+        return requestManager.getPoolById(id);
       }
-    });
+    }.register(binder, "sequencerPartitionContainers.partitions.pool");
 
-    binder.registerCustomEditor(Set.class, "experiments", new CustomCollectionEditor(Set.class) {
-      @Override
-      protected Object convertElement(Object element) {
-        return resolveExperiment(element);
-      }
-    });
-
-    binder.registerCustomEditor(Experiment.class, new PropertyEditorSupport() {
-      @Override
-      public void setAsText(String element) throws IllegalArgumentException {
-        setValue(resolveExperiment(element));
-      }
-    });
-
-    binder.registerCustomEditor(Pool.class, "sequencerPartitionContainers.partitions.pool", new PropertyEditorSupport() {
-      @Override
-      public void setAsText(String element) throws IllegalArgumentException {
-        setValue(resolvePool(element));
-      }
-    });
-
-    binder.registerCustomEditor(Set.class, "samples", new CustomCollectionEditor(Set.class) {
-      @Override
-      protected Object convertElement(Object element) {
-        return resolveSample(element);
-      }
-    });
-
-    binder.registerCustomEditor(Sample.class, "sample", new PropertyEditorSupport() {
-      @Override
-      public void setAsText(String element) throws IllegalArgumentException {
-        setValue(resolveSample(element));
-      }
-    });
-
-    binder.registerCustomEditor(Set.class, "runs", new CustomCollectionEditor(Set.class) {
-      @Override
-      protected Object convertElement(Object element) {
-        return resolveRun(element);
-      }
-    });
-
-    binder.registerCustomEditor(Run.class, new PropertyEditorSupport() {
-      @Override
-      public void setAsText(String element) throws IllegalArgumentException {
-        setValue(resolveRun(element));
-      }
-    });
-
-    binder.registerCustomEditor(Pool.class, new PropertyEditorSupport() {
-      @Override
-      public void setAsText(String element) throws IllegalArgumentException {
-        setValue(resolvePool(element));
-      }
-    });
-
-    binder.registerCustomEditor(PlatformType.class, new PropertyEditorSupport() {
-      @Override
-      public void setAsText(String element) throws IllegalArgumentException {
-        setValue(resolvePlatformType(element));
-      }
-    });
-
-    binder.registerCustomEditor(Set.class, "platformTypes", new CustomCollectionEditor(Set.class) {
-      @Override
-      protected Object convertElement(Object element) {
-        return resolvePlatformType(element);
-      }
-    });
-
-    binder.registerCustomEditor(List.class, "partitions", new CustomCollectionEditor(List.class) {
-      @Override
-      protected Object convertElement(Object element) {
-        return resolvePartition(element);
-      }
-    });
-
-    binder.registerCustomEditor(SequencerPartitionContainer.class, new PropertyEditorSupport() {
-      @Override
-      public void setAsText(String element) throws IllegalArgumentException {
-        setValue(resolveSequencerPartitionContainer(element));
-      }
-    });
-
-    binder.registerCustomEditor(List.class, "sequencerPartitionContainers", new CustomCollectionEditor(List.class) {
-      @Override
-      protected Object convertElement(Object element) {
-        return resolveSequencerPartitionContainer(element);
-      }
-    });
-
-    binder.registerCustomEditor(Library.class, new PropertyEditorSupport() {
-      @Override
-      public void setAsText(String element) throws IllegalArgumentException {
-        setValue(resolveLibrary(element));
-      }
-    });
-
-    binder.registerCustomEditor(Set.class, "libraries", new CustomCollectionEditor(Set.class) {
-      @Override
-      protected Object convertElement(Object element) {
-        return resolveLibrary(element);
-      }
-    });
-
-    binder.registerCustomEditor(Dilution.class, new PropertyEditorSupport() {
-      @Override
-      public void setAsText(String element) throws IllegalArgumentException {
-        log.info("Binding dilution " + element);
-        setValue(resolveDilution(element));
-      }
-    });
-
-    binder.registerCustomEditor(Set.class, "dilutions", new CustomCollectionEditor(Set.class) {
-      @Override
-      protected Object convertElement(Object element) {
-        log.info("Binding dilution set " + element.toString());
-        return resolveDilution(element);
-      }
-    });
-
-    binder.registerCustomEditor(LibraryDilution.class, new PropertyEditorSupport() {
-      @Override
-      public void setAsText(String element) throws IllegalArgumentException {
-        log.info("Binding library dilution " + element);
-        setValue(resolveLibraryDilution(element));
-      }
-    });
-
-    binder.registerCustomEditor(Set.class, "libraryDilutions", new CustomCollectionEditor(Set.class) {
-      @Override
-      protected Object convertElement(Object element) {
-        log.info("Binding library dilution set " + element.toString());
-        return resolveLibraryDilution(element);
-      }
-    });
-
-    binder.registerCustomEditor(LibraryType.class, new PropertyEditorSupport() {
-      @Override
-      public void setAsText(String element) throws IllegalArgumentException {
-        setValue(resolveLibraryType(element));
-      }
-    });
-
-    binder.registerCustomEditor(Set.class, "libraryTypes", new CustomCollectionEditor(Set.class) {
-      @Override
-      protected Object convertElement(Object element) {
-        return resolveLibraryType(element);
-      }
-    });
-
-    binder.registerCustomEditor(LibrarySelectionType.class, new PropertyEditorSupport() {
-      @Override
-      public void setAsText(String element) throws IllegalArgumentException {
-        setValue(resolveLibrarySelectionType(element));
-      }
-    });
-
-    binder.registerCustomEditor(Set.class, "librarySelectionTypes", new CustomCollectionEditor(Set.class) {
-      @Override
-      protected Object convertElement(Object element) {
-        return resolveLibrarySelectionType(element);
-      }
-    });
-
-    binder.registerCustomEditor(LibraryStrategyType.class, new PropertyEditorSupport() {
-      @Override
-      public void setAsText(String element) throws IllegalArgumentException {
-        setValue(resolveLibraryStrategyType(element));
-      }
-    });
-
-    binder.registerCustomEditor(Set.class, "libraryStrategyTypes", new CustomCollectionEditor(Set.class) {
-      @Override
-      protected Object convertElement(Object element) {
-        return resolveLibraryStrategyType(element);
-      }
-    });
-
-    binder.registerCustomEditor(TagBarcode.class, new PropertyEditorSupport() {
-      @Override
-      public void setAsText(String element) throws IllegalArgumentException {
-        setValue(resolveTagBarcode(element));
-      }
-    });
-
-    binder.registerCustomEditor(HashMap.class, "tagBarcodes", new CustomMapEditor(HashMap.class) {
+    new BindingConverter<PlatformType>(PlatformType.class) {
 
       @Override
-      protected Object convertValue(Object element) {
-        return resolveTagBarcode(element);
+      public PlatformType resolve(String element) throws Exception {
+        return PlatformType.get(element);
       }
-    });
+    }.register(binder).register(binder, Set.class, "platformTypes");
 
-    binder.registerCustomEditor(emPCRDilution.class, new PropertyEditorSupport() {
-      @Override
-      public void setAsText(String element) throws IllegalArgumentException {
-        setValue(resolveEmPcrDilution(element));
-      }
-    });
+    new BindingConverterById<SequencerPoolPartition>(SequencerPoolPartition.class) {
 
-    binder.registerCustomEditor(Set.class, "pcrDilutions", new CustomCollectionEditor(Set.class) {
       @Override
-      protected Object convertElement(Object element) {
-        return resolveEmPcrDilution(element);
+      public SequencerPoolPartition resolveById(long id) throws Exception {
+        return requestManager.getSequencerPoolPartitionById(id);
       }
-    });
 
-    binder.registerCustomEditor(Platform.class, new PropertyEditorSupport() {
-      @Override
-      public void setAsText(String element) throws IllegalArgumentException {
-        setValue(resolvePlatform(element));
-      }
-    });
+    }.register(binder, List.class, "partitions");
 
-    binder.registerCustomEditor(SequencerReference.class, new PropertyEditorSupport() {
+    new BindingConverterById<SequencerPartitionContainer>(SequencerPartitionContainer.class) {
       @Override
-      public void setAsText(String element) throws IllegalArgumentException {
-        setValue(resolveSequencerReference(element));
+      public SequencerPartitionContainer resolveById(long id) throws Exception {
+        return requestManager.getSequencerPartitionContainerById(id);
       }
-    });
+    }.register(binder).register(binder, List.class, "sequencerPartitionContainers");
 
-    binder.registerCustomEditor(Status.class, new PropertyEditorSupport() {
+    new BindingConverterById<Library>(Library.class) {
       @Override
-      public void setAsText(String element) throws IllegalArgumentException {
-        setValue(resolveStatus(element));
+      public Library resolveById(long id) throws Exception {
+        return requestManager.getLibraryById(id);
       }
-    });
 
-    binder.registerCustomEditor(SecurityProfile.class, new PropertyEditorSupport() {
-      @Override
-      public void setAsText(String element) throws IllegalArgumentException {
-        setValue(resolveSecurityProfile(element));
-      }
-    });
+    }.register(binder).register(binder, Set.class, "libraries");
 
-    binder.registerCustomEditor(Submittable.class, "submissionElement", new PropertyEditorSupport() {
-      @Override
-      public void setAsText(String element) throws IllegalArgumentException {
-        setValue(resolveSubmittable(element));
-      }
-    });
+    Resolver<LibraryDilution> ldiResolver = new Resolver<LibraryDilution>() {
 
-    binder.registerCustomEditor(Set.class, "submissionElements", new CustomCollectionEditor(Set.class) {
       @Override
-      protected Object convertElement(Object element) {
-        return resolveSubmittable(element);
+      public String getPrefix() {
+        return "LDI";
       }
-    });
 
-    binder.registerCustomEditor(Kit.class, new PropertyEditorSupport() {
       @Override
-      public void setAsText(String element) throws IllegalArgumentException {
-        setValue(resolveKit(element));
+      public LibraryDilution resolve(long id) throws Exception {
+        return requestManager.getLibraryDilutionById(id);
       }
-    });
 
-    binder.registerCustomEditor(Set.class, "kits", new CustomCollectionEditor(Set.class) {
-      @Override
-      protected Object convertElement(Object element) {
-        return resolveKit(element);
-      }
-    });
+    };
+    Resolver<emPCRDilution> ediResolver = new Resolver<emPCRDilution>() {
 
-    binder.registerCustomEditor(KitDescriptor.class, new PropertyEditorSupport() {
       @Override
-      public void setAsText(String element) throws IllegalArgumentException {
-        setValue(resolveKitDescriptor(element));
+      public String getPrefix() {
+        return "EDI";
       }
-    });
 
-    binder.registerCustomEditor(Set.class, "kitDescriptors", new CustomCollectionEditor(Set.class) {
       @Override
-      protected Object convertElement(Object element) {
-        return resolveKitDescriptor(element);
+      public emPCRDilution resolve(long id) throws Exception {
+        return requestManager.getEmPCRDilutionById(id);
       }
-    });
 
-    binder.registerCustomEditor(Set.class, "poolableElements", new CustomCollectionEditor(Set.class) {
+    };
+    new BindingConverterByPrefixDispatch<Dilution>(Dilution.class).add(ldiResolver).add(ediResolver).register(binder).register(binder,
+        Set.class, "dilutions");
+
+    new BindingConverterById<LibraryDilution>(LibraryDilution.class) {
       @Override
-      protected Object convertElement(Object element) {
-        return resolvePoolable(element);
+      public LibraryDilution resolveById(long id) throws Exception {
+        return requestManager.getLibraryDilutionById(id);
       }
-    });
+    }.register(binder).register(binder, Set.class, "libraryDilutions");
+
+    new BindingConverterById<LibraryType>(LibraryType.class) {
+      @Override
+      public LibraryType resolveById(long id) throws Exception {
+        return requestManager.getLibraryTypeById(id);
+      }
+
+    }.register(binder).register(binder, Set.class, "libraryTypes");
+
+    new BindingConverterById<LibrarySelectionType>(LibrarySelectionType.class) {
+      @Override
+      public LibrarySelectionType resolveById(long id) throws Exception {
+        return requestManager.getLibrarySelectionTypeById(id);
+      }
+    }.register(binder).register(binder, Set.class, "librarySelectionTypes");
+
+    new BindingConverterById<LibraryStrategyType>(LibraryStrategyType.class) {
+      @Override
+      public LibraryStrategyType resolveById(long id) throws Exception {
+        return requestManager.getLibraryStrategyTypeById(id);
+      }
+    }.register(binder).register(binder, Set.class, "libraryStrategyTypes");
+
+    new BindingConverterById<TagBarcode>(TagBarcode.class) {
+      @Override
+      public TagBarcode resolveById(long id) throws Exception {
+        return requestManager.getTagBarcodeById(id);
+      }
+
+    }.register(binder).registerMap(binder, HashMap.class, "tagBarcodes");
+
+    new BindingConverterById<emPCRDilution>(emPCRDilution.class) {
+      @Override
+      public emPCRDilution resolveById(long id) throws Exception {
+        return requestManager.getEmPCRDilutionById(id);
+      }
+    }.register(binder).register(binder, Set.class, "pcrDilutions");
+
+    new BindingConverterById<Platform>(Platform.class) {
+      @Override
+      public Platform resolveById(long id) throws Exception {
+        return requestManager.getPlatformById(id);
+      }
+    }.register(binder);
+
+    new BindingConverterById<SequencerReference>(SequencerReference.class) {
+      @Override
+      public SequencerReference resolveById(long id) throws Exception {
+        return requestManager.getSequencerReferenceById(id);
+      }
+    }.register(binder);
+
+    new BindingConverterById<Status>(Status.class) {
+      @Override
+      public Status resolveById(long id) throws Exception {
+        return requestManager.getStatusById(id);
+      }
+    }.register(binder);
+
+    new BindingConverterById<SecurityProfile>(SecurityProfile.class) {
+      @Override
+      public SecurityProfile resolveById(long id) throws Exception {
+        return securityManager.getSecurityProfileById(id);
+      }
+
+    }.register(binder);
+
+    new BindingConverterByPrefixDispatch<>(Submittable.class).add(new Resolver<Study>() {
+      @Override
+      public String getPrefix() {
+        return Study.PREFIX;
+      }
+
+      @Override
+      public Study resolve(long id) throws Exception {
+        return requestManager.getStudyById(id);
+      }
+
+    }).add(new Resolver<Sample>() {
+      @Override
+      public String getPrefix() {
+        return Sample.PREFIX;
+      }
+
+      @Override
+      public Sample resolve(long id) throws Exception {
+        return requestManager.getSampleById(id);
+      }
+    }).add(new Resolver<Experiment>() {
+
+      @Override
+      public String getPrefix() {
+        return Experiment.PREFIX;
+      }
+
+      @Override
+      public Experiment resolve(long id) throws Exception {
+        return requestManager.getExperimentById(id);
+      }
+
+    }).add(new Resolver<SequencerPoolPartition>() {
+
+      @Override
+      public String getPrefix() {
+        return "PAR";
+      }
+
+      @Override
+      public SequencerPoolPartition resolve(long id) throws Exception {
+        return requestManager.getSequencerPoolPartitionById(id);
+      }
+
+    }).register(binder, "submissionElement").register(binder, Set.class, "submissionElements");
+
+    new BindingConverterById<Kit>(Kit.class) {
+      @Override
+      public Kit resolveById(long id) throws Exception {
+        return requestManager.getKitById(id);
+      }
+    }.register(binder).register(binder, Set.class, "kits");
+
+    new BindingConverterById<KitDescriptor>(KitDescriptor.class) {
+      @Override
+      public KitDescriptor resolveById(long id) throws Exception {
+        return requestManager.getKitDescriptorById(id);
+      }
+    }.register(binder).register(binder, Set.class, "kitDescriptors");
+
+    new BindingConverterByPrefixDispatch<>(Poolable.class).add(ldiResolver).add(ediResolver).add(new Resolver<Plate>() {
+
+      @Override
+      public String getPrefix() {
+        return "PLA";
+      }
+
+      @Override
+      public Plate resolve(long id) throws Exception {
+        return requestManager.getPlateById(id);
+      }
+
+    }).register(binder, Set.class, "poolableElements");
 
     binder.registerCustomEditor(LibraryDesign.class, new PropertyEditorSupport() {
       @Override
@@ -531,763 +681,31 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
       }
 
     });
-  }
-
-  /**
-   * Resolve an InetAddress object from a String
-   * 
-   * @param element
-   *          of type Object
-   * @return InetAddress
-   * @throws IllegalArgumentException
-   *           when
-   */
-  private InetAddress resolveInetAddress(Object element) throws IllegalArgumentException {
-    InetAddress i = null;
-    try {
-      if (element instanceof String) i = InetAddress.getByName((String) element);
-      return i;
-    } catch (UnknownHostException e) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to resolve InetAddress " + element, e);
-      }
-      throw new IllegalArgumentException(e);
-    }
-  }
-
-  /**
-   * Resolve a Group object from an ID String
-   * 
-   * @param element
-   *          of type Object
-   * @return Group
-   * @throws IllegalArgumentException
-   *           when
-   */
-  private Group resolveGroup(Object element) throws IllegalArgumentException {
-    Long id = null;
-    if (element instanceof String) id = NumberUtils.parseNumber((String) element, Long.class).longValue();
-    try {
-      return id != null ? securityManager.getGroupById(id) : null;
-    } catch (IOException e) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to resolve group " + element, e);
-      }
-      throw new IllegalArgumentException(e);
-    }
-  }
-
-  /**
-   * Resolve a User object from an ID String
-   * 
-   * @param element
-   *          of type Object
-   * @return User
-   * @throws IllegalArgumentException
-   *           when
-   */
-  private User resolveUser(Object element) throws IllegalArgumentException {
-    Long id = null;
-    if (element instanceof String && !isStringEmptyOrNull((String) element))
-      id = NumberUtils.parseNumber((String) element, Long.class).longValue();
-    try {
-      return id != null ? securityManager.getUserById(id) : null;
-    } catch (IOException e) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to resolve user " + element, e);
-      }
-      throw new IllegalArgumentException(e);
-    }
-  }
-
-  /**
-   * Resolve a SecurityProfile object from an ID String
-   * 
-   * @param element
-   *          of type Object
-   * @return SecurityProfile
-   * @throws IllegalArgumentException
-   *           when
-   */
-  private SecurityProfile resolveSecurityProfile(Object element) throws IllegalArgumentException {
-    Long id = null;
-    if (element instanceof String) id = NumberUtils.parseNumber((String) element, Long.class).longValue();
-    try {
-      return id != null ? securityManager.getSecurityProfileById(id) : null;
-    } catch (IOException e) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to resolve SecurityProfile " + element, e);
-      }
-      throw new IllegalArgumentException(e);
-    }
-  }
-
-  /**
-   * Resolve a Project object from an ID or {@link uk.ac.bbsrc.tgac.miso.core.data.Project.PREFIX} String
-   * 
-   * @param element
-   *          of type Object
-   * @return Project
-   * @throws IllegalArgumentException
-   *           when
-   */
-  private Project resolveProject(Object element) throws IllegalArgumentException {
-    Long id = null;
-    if (element instanceof String) {
-      if (((String) element).startsWith(Project.PREFIX)) {
-        String ident = ((String) element).substring(Project.PREFIX.length());
-        id = NumberUtils.parseNumber(ident, Long.class).longValue();
-      } else {
-        id = NumberUtils.parseNumber((String) element, Long.class).longValue();
-      }
-    }
-    try {
-      return id != null ? requestManager.getProjectById(id) : null;
-    } catch (IOException e) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to resolve project " + element, e);
-      }
-      throw new IllegalArgumentException(e);
-    }
-  }
-
-  private ProjectOverview resolveProjectOverview(Object element) throws IllegalArgumentException {
-    Long id = null;
-    if (element instanceof String) id = NumberUtils.parseNumber((String) element, Long.class).longValue();
-    try {
-      log.info("Resolved project overview");
-      return id != null ? requestManager.getProjectOverviewById(id) : null;
-    } catch (IOException e) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to resolve project overview" + element, e);
-      }
-      throw new IllegalArgumentException(e);
-    }
-  }
-
-  /**
-   * Resolve an Activity object from an ID String
-   * 
-   * @param element
-   *          of type Object
-   * @return Activity
-   * @throws IllegalArgumentException
-   *           when
-   */
-  private Activity resolveActivity(Object element) throws IllegalArgumentException {
-    String id = null;
-    if (element instanceof String) id = element.toString();
-    try {
-      return id != null ? protocolManager.getActivity(id) : null;
-    } catch (IOException e) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to resolve activity " + element, e);
-      }
-      throw new IllegalArgumentException(e);
-    }
-  }
-
-  /**
-   * Resolve a Protocol object from an ID String
-   * 
-   * @param element
-   *          of type Object
-   * @return Protocol
-   * @throws IllegalArgumentException
-   *           when
-   */
-  private Protocol resolveProtocol(Object element) throws IllegalArgumentException {
-    String id = null;
-    if (element instanceof String) id = element.toString();
-    try {
-      return id != null ? protocolManager.getProtocol(id) : null;
-    } catch (IOException e) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to resolve protocol " + element, e);
-      }
-      throw new IllegalArgumentException(e);
-    }
-  }
-
-  /**
-   * Resolve a Study object from an ID or {@link uk.ac.bbsrc.tgac.miso.core.data.Study.PREFIX} String
-   * 
-   * @param element
-   *          of type Object
-   * @return Study
-   * @throws IllegalArgumentException
-   *           when
-   */
-  private Study resolveStudy(Object element) throws IllegalArgumentException {
-    Long id = null;
-    if (element instanceof String) {
-      if (((String) element).startsWith(Study.PREFIX)) {
-        String ident = ((String) element).substring(Study.PREFIX.length());
-        id = NumberUtils.parseNumber(ident, Long.class).longValue();
-      } else {
-        id = NumberUtils.parseNumber((String) element, Long.class).longValue();
-      }
-    }
-    try {
-      return id != null ? requestManager.getStudyById(id) : null;
-    } catch (IOException e) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to resolve study " + element, e);
-      }
-      throw new IllegalArgumentException(e);
-    }
-  }
-
-  /**
-   * Resolve an Experiment object from an ID String
-   * 
-   * @param element
-   *          of type Object
-   * @return Experiment
-   * @throws IllegalArgumentException
-   *           when
-   */
-  private Experiment resolveExperiment(Object element) throws IllegalArgumentException {
-    Long id = null;
-    if (element instanceof String) {
-      id = NumberUtils.parseNumber((String) element, Long.class).longValue();
-    }
-    try {
-      return id != null ? requestManager.getExperimentById(id) : null;
-    } catch (IOException e) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to resolve experiment " + element, e);
-      }
-      throw new IllegalArgumentException(e);
-    }
-  }
-
-  /**
-   * Resolve a Sample object from an ID or {@link uk.ac.bbsrc.tgac.miso.core.data.Sample.PREFIX} String
-   * 
-   * @param element
-   *          of type Object
-   * @return Sample
-   * @throws IllegalArgumentException
-   *           when
-   */
-  private Sample resolveSample(Object element) throws IllegalArgumentException {
-    Long id = null;
-    if (element instanceof String) {
-      if (((String) element).startsWith(Sample.PREFIX)) {
-        String ident = ((String) element).substring(Sample.PREFIX.length());
-        id = NumberUtils.parseNumber(ident, Long.class).longValue();
-      } else {
-        id = NumberUtils.parseNumber((String) element, Long.class).longValue();
-      }
-    }
-    try {
-      return id != null ? requestManager.getSampleById(id) : null;
-    } catch (IOException e) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to resolve sample " + element, e);
-      }
-      throw new IllegalArgumentException(e);
-    }
-  }
-
-  /**
-   * Resolve a Run object from an ID String
-   * 
-   * @param element
-   *          of type Object
-   * @return Run
-   * @throws IllegalArgumentException
-   *           when
-   */
-  private Run resolveRun(Object element) throws IllegalArgumentException {
-    Long id = null;
-    if (element instanceof String) id = NumberUtils.parseNumber((String) element, Long.class).longValue();
-    try {
-      return id != null ? requestManager.getRunById(id) : null;
-    } catch (IOException e) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to resolve run " + element, e);
-      }
-      throw new IllegalArgumentException(e);
-    }
-  }
-
-  /**
-   * Resolve a PlatformType enum from a given key String
-   * 
-   * @param element
-   *          of type Object
-   * @return PlatformType
-   * @throws IllegalArgumentException
-   *           when
-   */
-  private PlatformType resolvePlatformType(Object element) throws IllegalArgumentException {
-    if (element instanceof String) {
-      return PlatformType.get((String) element);
-    } else {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to resolve PlatformType " + element);
-      }
-      throw new IllegalArgumentException(
-          "Cannot resolve PlatformType from key: " + element + ". Accepted keys are: [" + PlatformType.getKeys() + "]");
-    }
-  }
-
-  /**
-   * Resolve a Pool object from an ID or {@link uk.ac.bbsrc.tgac.miso.core.data.Pool} PREFIX String
-   * 
-   * @param element
-   *          of type Object
-   * @return Pool
-   * @throws IllegalArgumentException
-   *           when
-   */
-  private Pool resolvePool(Object element) throws IllegalArgumentException {
-    Long id = null;
-    if (element instanceof String) id = NumberUtils.parseNumber((String) element, Long.class).longValue();
-    try {
-      return id != null ? requestManager.getPoolById(id) : null;
-    } catch (IOException e) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to resolve pool " + element, e);
-      }
-      throw new IllegalArgumentException(e);
-    }
-  }
-
-  /**
-   * Resolve a Partition object from an ID String
-   * 
-   * @param element
-   *          of type Object
-   * @return Partition
-   * @throws IllegalArgumentException
-   *           when
-   */
-  private SequencerPoolPartition resolvePartition(Object element) throws IllegalArgumentException {
-    Long id = null;
-    if (element instanceof String) {
-      String s = (String) element;
-      if (!isStringEmptyOrNull(s)) {
-        id = NumberUtils.parseNumber((String) element, Long.class).longValue();
-      }
-    }
-    try {
-      return id != null ? requestManager.getSequencerPoolPartitionById(id) : null;
-    } catch (IOException e) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to resolve Partition " + element, e);
-      }
-      throw new IllegalArgumentException(e);
-    }
-  }
-
-  /**
-   * Resolve a SequencerPartitionContainer object from an ID String
-   * 
-   * @param element
-   *          of type Object
-   * @return SequencerPartitionContainer
-   * @throws IllegalArgumentException
-   *           when
-   */
-  private SequencerPartitionContainer resolveSequencerPartitionContainer(Object element) throws IllegalArgumentException {
-    Long id = null;
-    if (element instanceof String) {
-      String s = (String) element;
-      if (!isStringEmptyOrNull(s)) {
-        id = NumberUtils.parseNumber((String) element, Long.class).longValue();
-      }
-    }
-    try {
-      return id != null ? requestManager.getSequencerPartitionContainerById(id) : null;
-    } catch (IOException e) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to resolve SequencerPartitionContainer " + element, e);
-      }
-      throw new IllegalArgumentException(e);
-    }
-  }
-
-  /**
-   * Resolve a Library object from an ID String
-   * 
-   * @param element
-   *          of type Object
-   * @return Library
-   * @throws IllegalArgumentException
-   *           when
-   */
-  private Library resolveLibrary(Object element) throws IllegalArgumentException {
-    Long id = null;
-    if (element instanceof String) id = NumberUtils.parseNumber((String) element, Long.class).longValue();
-    try {
-      return id != null ? requestManager.getLibraryById(id) : null;
-    } catch (IOException e) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to resolve library " + element, e);
-      }
-      throw new IllegalArgumentException(e);
-    }
-  }
-
-  /**
-   * Resolve a Dilution object from an ID String
-   * 
-   * @param element
-   *          of type Object
-   * @return Dilution
-   * @throws IllegalArgumentException
-   *           when
-   */
-  private Dilution resolveDilution(Object element) throws IllegalArgumentException {
-    Long id = null;
-    if (element instanceof String) {
-      String prefix = ((String) element).substring(0, 3);
-      String ident = ((String) element).substring(3);
-      id = NumberUtils.parseNumber(ident, Long.class).longValue();
-
-      try {
-        if ("LDI".equals(prefix)) {
-          return id != null ? requestManager.getLibraryDilutionById(id) : null;
-        } else if ("EDI".equals(prefix)) {
-          return id != null ? requestManager.getEmPCRDilutionById(id) : null;
-        } else {
-          log.debug("Failed to resolve dilution with identifier: " + prefix + ident);
+    binder.registerCustomEditor(BoxUse.class, new PropertyEditorSupport() {
+      @Override
+      public void setAsText(String element) throws IllegalArgumentException {
+        long id = Long.parseLong(element);
+        try {
+          setValue(sqlBoxDAO.getUseById(id));
+        } catch (IOException e) {
+          log.error("Fetching box use " + id, e);
+          throw new IllegalArgumentException("Cannot find box use with id " + element);
         }
-      } catch (IOException e) {
-        if (log.isDebugEnabled()) {
-          log.debug("Failed to resolve dilution " + element, e);
+      }
+
+    });
+    binder.registerCustomEditor(BoxSize.class, new PropertyEditorSupport() {
+      @Override
+      public void setAsText(String element) throws IllegalArgumentException {
+        long id = Long.parseLong(element);
+        try {
+          setValue(sqlBoxDAO.getSizeById(id));
+        } catch (IOException e) {
+          log.error("Fetching box size " + id, e);
+          throw new IllegalArgumentException("Cannot find box size with id " + element);
         }
-        throw new IllegalArgumentException(e);
       }
-    }
-    return null;
-  }
 
-  /**
-   * Resolve a LibraryDilution object from an ID String
-   * 
-   * @param element
-   *          of type Object
-   * @return LibraryDilution
-   * @throws IllegalArgumentException
-   *           when
-   */
-  private LibraryDilution resolveLibraryDilution(Object element) throws IllegalArgumentException {
-    Long id = null;
-    if (element instanceof String) id = NumberUtils.parseNumber((String) element, Long.class).longValue();
-    try {
-      return id != null ? requestManager.getLibraryDilutionById(id) : null;
-    } catch (IOException e) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to resolve dilution " + element, e);
-      }
-      throw new IllegalArgumentException(e);
-    }
-  }
-
-  /**
-   * Resolve an emPCRDilution object from an ID String
-   * 
-   * @param element
-   *          of type Object
-   * @return emPCRDilution
-   * @throws IllegalArgumentException
-   *           when
-   */
-  private emPCRDilution resolveEmPcrDilution(Object element) throws IllegalArgumentException {
-    Long id = null;
-    if (element instanceof String) id = NumberUtils.parseNumber((String) element, Long.class).longValue();
-    try {
-      return id != null ? requestManager.getEmPCRDilutionById(id) : null;
-    } catch (IOException e) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to resolve dilution " + element, e);
-      }
-      throw new IllegalArgumentException(e);
-    }
-  }
-
-  /**
-   * Resolve a Platform object from an ID String
-   * 
-   * @param element
-   *          of type Object
-   * @return Platform
-   * @throws IllegalArgumentException
-   *           when
-   */
-  private Platform resolvePlatform(Object element) throws IllegalArgumentException {
-    Long id = null;
-    if (element instanceof String) id = NumberUtils.parseNumber((String) element, Long.class).longValue();
-    try {
-      return id != null ? requestManager.getPlatformById(id) : null;
-    } catch (IOException e) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to resolve platform " + element, e);
-      }
-      throw new IllegalArgumentException(e);
-    }
-  }
-
-  /**
-   * Resolve a SequencerReference object from an ID String
-   * 
-   * @param element
-   *          of type Object
-   * @return SequencerReference
-   * @throws IllegalArgumentException
-   *           when
-   */
-  private SequencerReference resolveSequencerReference(Object element) throws IllegalArgumentException {
-    Long id = null;
-    if (element instanceof String) id = NumberUtils.parseNumber((String) element, Long.class).longValue();
-    try {
-      return id != null ? requestManager.getSequencerReferenceById(id) : null;
-    } catch (IOException e) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to resolve SequencerReference " + element, e);
-      }
-      throw new IllegalArgumentException(e);
-    }
-  }
-
-  /**
-   * Resolve a Status object from an ID String
-   * 
-   * @param element
-   *          of type Object
-   * @return Status
-   * @throws IllegalArgumentException
-   *           when
-   */
-  private Status resolveStatus(Object element) throws IllegalArgumentException {
-    Long id = null;
-    if (element instanceof String) id = NumberUtils.parseNumber((String) element, Long.class).longValue();
-    try {
-      return id != null ? requestManager.getStatusById(id) : null;
-    } catch (IOException e) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to resolve status " + element, e);
-      }
-      throw new IllegalArgumentException(e);
-    }
-  }
-
-  /**
-   * Resolve a Submittable object from a PREFIX
-   * 
-   * @param element
-   *          of type Object
-   * @return Submittable
-   * @throws IllegalArgumentException
-   *           when
-   */
-  private Submittable resolveSubmittable(Object element) throws IllegalArgumentException {
-    Long id = null;
-    if (element instanceof String) {
-      String prefix = ((String) element).substring(0, 3);
-      String ident = ((String) element).substring(3);
-      id = NumberUtils.parseNumber(ident, Long.class).longValue();
-
-      try {
-        if (Study.PREFIX.equals(prefix)) {
-          log.info(prefix + ":" + ident + " -> Study");
-          return id != null ? requestManager.getStudyById(id) : null;
-        } else if (Sample.PREFIX.equals(prefix)) {
-          log.info(prefix + ":" + ident + " -> Sample");
-          return id != null ? requestManager.getSampleById(id) : null;
-        } else if (Experiment.PREFIX.equals(prefix)) {
-          log.info(prefix + ":" + ident + " -> Experiment");
-          return id != null ? requestManager.getExperimentById(id) : null;
-        } else if ("PAR".equals(prefix)) {
-          log.info(prefix + ":" + ident + " -> Partition");
-          return id != null ? requestManager.getSequencerPoolPartitionById(id) : null;
-        } else {
-          log.debug("Failed to resolve submittable element with identifier: " + prefix + ident);
-        }
-      } catch (IOException e) {
-        if (log.isDebugEnabled()) {
-          log.debug("Failed to resolve submittable element " + element, e);
-        }
-        throw new IllegalArgumentException(e);
-      }
-    }
-    return null;
-  }
-
-  /**
-   * Resolve a Kit object from an ID String
-   * 
-   * @param element
-   *          of type Object
-   * @return Kit
-   * @throws IllegalArgumentException
-   *           when
-   */
-  private Kit resolveKit(Object element) throws IllegalArgumentException {
-    Long id = null;
-    if (element instanceof String && !isStringEmptyOrNull((String) element))
-      id = NumberUtils.parseNumber((String) element, Long.class).longValue();
-    try {
-      return id != null ? requestManager.getKitById(id) : null;
-    } catch (IOException e) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to resolve kit " + element, e);
-      }
-      throw new IllegalArgumentException(e);
-    }
-  }
-
-  /**
-   * Resolve a KitDescriptor object from an ID String
-   * 
-   * @param element
-   *          of type Object
-   * @return KitDescriptor
-   * @throws IllegalArgumentException
-   *           when
-   */
-  private KitDescriptor resolveKitDescriptor(Object element) throws IllegalArgumentException {
-    Long id = null;
-    if (element instanceof String) id = NumberUtils.parseNumber((String) element, Long.class).longValue();
-    try {
-      return id != null ? requestManager.getKitDescriptorById(id) : null;
-    } catch (IOException e) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to resolve kit descriptor " + element, e);
-      }
-      throw new IllegalArgumentException(e);
-    }
-  }
-
-  /**
-   * Resolve a LibraryType object from an ID String
-   * 
-   * @param element
-   *          of type Object
-   * @return LibraryType
-   * @throws IllegalArgumentException
-   *           when
-   */
-  private LibraryType resolveLibraryType(Object element) throws IllegalArgumentException {
-    Long id = null;
-    if (element instanceof String) id = NumberUtils.parseNumber((String) element, Long.class).longValue();
-    try {
-      return id != null ? requestManager.getLibraryTypeById(id) : null;
-    } catch (IOException e) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to resolve LibraryType " + element, e);
-      }
-      throw new IllegalArgumentException(e);
-    }
-  }
-
-  /**
-   * Resolve a LibrarySelectionType object from an ID String
-   * 
-   * @param element
-   *          of type Object
-   * @return LibrarySelectionType
-   * @throws IllegalArgumentException
-   *           when
-   */
-  private LibrarySelectionType resolveLibrarySelectionType(Object element) throws IllegalArgumentException {
-    Long id = null;
-    if (element instanceof String) id = NumberUtils.parseNumber((String) element, Long.class).longValue();
-    try {
-      return id != null ? requestManager.getLibrarySelectionTypeById(id) : null;
-    } catch (IOException e) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to resolve LibrarySelectionType " + element, e);
-      }
-      throw new IllegalArgumentException(e);
-    }
-  }
-
-  /**
-   * Resolve a LibraryStrategyType object from an ID String
-   * 
-   * @param element
-   *          of type Object
-   * @return LibraryStrategyType
-   * @throws IllegalArgumentException
-   *           when
-   */
-  private LibraryStrategyType resolveLibraryStrategyType(Object element) throws IllegalArgumentException {
-    Long id = null;
-    if (element instanceof String) id = NumberUtils.parseNumber((String) element, Long.class).longValue();
-    try {
-      return id != null ? requestManager.getLibraryStrategyTypeById(id) : null;
-    } catch (IOException e) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to resolve LibrarySelectionType " + element, e);
-      }
-      throw new IllegalArgumentException(e);
-    }
-  }
-
-  /**
-   * Resolve a TagBarcode object from an ID String
-   * 
-   * @param element
-   *          of type Object
-   * @return TagBarcode
-   * @throws IllegalArgumentException
-   *           when
-   */
-  private TagBarcode resolveTagBarcode(Object element) throws IllegalArgumentException {
-    Long id = null;
-    if (element instanceof String && !isStringEmptyOrNull((String) element))
-      id = NumberUtils.parseNumber((String) element, Long.class).longValue();
-    try {
-      return id != null ? requestManager.getTagBarcodeById(id) : null;
-    } catch (IOException e) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to resolve TagBarcode " + element, e);
-      }
-      throw new IllegalArgumentException(e);
-    }
-  }
-
-  /**
-   * Resolve a Poolable object from a PREFIX
-   * 
-   * @param element
-   *          of type Object
-   * @return Poolable
-   * @throws IllegalArgumentException
-   *           when
-   */
-  private Poolable resolvePoolable(Object element) throws IllegalArgumentException {
-    Long id = null;
-    if (element instanceof String) {
-      String prefix = ((String) element).substring(0, 3);
-      String ident = ((String) element).substring(3);
-      id = NumberUtils.parseNumber(ident, Long.class).longValue();
-
-      try {
-        if ("LDI".equals(prefix)) {
-          log.info(prefix + ":" + ident + " -> LibraryDilution");
-          return id != null ? requestManager.getLibraryDilutionById(id) : null;
-        } else if ("EDI".equals(prefix)) {
-          log.info(prefix + ":" + ident + " -> EmPCRDilution");
-          return id != null ? requestManager.getEmPCRDilutionById(id) : null;
-        } else if ("PLA".equals(prefix)) {
-          log.info(prefix + ":" + ident + " -> Plate");
-          return id != null ? requestManager.getPlateById(id) : null;
-        } else {
-          log.debug("Failed to resolve poolable element with identifier: " + prefix + ident);
-        }
-      } catch (IOException e) {
-        if (log.isDebugEnabled()) {
-          log.debug("Failed to resolve poolable element " + element, e);
-        }
-        throw new IllegalArgumentException(e);
-      }
-    }
-    return null;
+    });
   }
 }

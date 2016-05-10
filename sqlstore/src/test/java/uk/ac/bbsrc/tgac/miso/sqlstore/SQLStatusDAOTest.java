@@ -163,7 +163,7 @@ public class SQLStatusDAOTest extends AbstractDAOTest {
     Status status = dao.get(id);
 
     assertNotNull(status);
-    assertEquals(id, status.getStatusId());
+    assertEquals(id, status.getId());
     assertEquals(health, status.getHealth());
     assertEquals(completion, status.getCompletionDate().toString());
     assertEquals(start, status.getStartDate().toString());
@@ -192,7 +192,7 @@ public class SQLStatusDAOTest extends AbstractDAOTest {
     Status status = dao.get(id);
 
     assertNotNull(status);
-    assertEquals(id, status.getStatusId());
+    assertEquals(id, status.getId());
     assertEquals(health, status.getHealth());
     assertEquals(completion, status.getCompletionDate().toString());
     assertEquals(start, status.getStartDate().toString());

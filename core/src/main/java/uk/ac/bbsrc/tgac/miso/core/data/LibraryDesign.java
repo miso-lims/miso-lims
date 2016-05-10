@@ -10,7 +10,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 
 @Entity
 @Table(name = "LibraryDesign")
@@ -31,17 +31,15 @@ public class LibraryDesign {
   private Long librarySelectionType;
   @Column(nullable = false)
   private Long libraryStrategyType;
+  @OneToOne(targetEntity = LibraryType.class)
+  @JoinColumn(name = "libraryType", nullable = false)
+  private LibraryType libraryType;
   @Column(nullable = false)
   private String name;
-  @Column(nullable = false)
-  private Boolean paired;
-  @Enumerated(EnumType.STRING)
-  @Column(nullable = false)
-  private PlatformType platformName;
+
   @OneToOne(targetEntity = SampleClassImpl.class)
   @JoinColumn(name = "sampleClassId", nullable = false)
   private SampleClass sampleClass;
-
   @Column(nullable = false)
   private String suffix;
 
@@ -57,16 +55,12 @@ public class LibraryDesign {
     return libraryStrategyType;
   }
 
+  public LibraryType getLibraryType() {
+    return libraryType;
+  }
+
   public String getName() {
     return name;
-  }
-
-  public Boolean getPaired() {
-    return paired;
-  }
-
-  public PlatformType getPlatform() {
-    return platformName;
   }
 
   public SampleClass getSampleClass() {
@@ -89,16 +83,12 @@ public class LibraryDesign {
     this.libraryStrategyType = libraryStrategyType;
   }
 
+  public void setLibraryType(LibraryType libraryType) {
+    this.libraryType = libraryType;
+  }
+
   public void setName(String name) {
     this.name = name;
-  }
-
-  public void setPaired(Boolean paired) {
-    this.paired = paired;
-  }
-
-  public void setPlatform(PlatformType platformName) {
-    this.platformName = platformName;
   }
 
   public void setSampleClass(SampleClass sampleClass) {
@@ -111,11 +101,10 @@ public class LibraryDesign {
 
   public boolean validate(Library library) {
     if (library.getSample().getSampleAdditionalInfo() == null) return true;
-    if (library.getSample().getSampleAdditionalInfo().getSampleClass().getSampleClassId() != sampleClass.getSampleClassId()) return false;
-    if (!library.getPlatformName().equals(platformName.getKey())) return false;
-    if (library.getPaired().booleanValue() != paired.booleanValue()) return false;
-    if (library.getLibrarySelectionType().getLibrarySelectionTypeId() != librarySelectionType) return false;
-    if (library.getLibraryStrategyType().getLibraryStrategyTypeId() != libraryStrategyType) return false;
+    if (library.getSample().getSampleAdditionalInfo().getSampleClass().getId() != sampleClass.getId()) return false;
+    if (library.getLibraryType().getId() != libraryType.getId()) return false;
+    if (library.getLibrarySelectionType().getId() != librarySelectionType) return false;
+    if (library.getLibraryStrategyType().getId() != libraryStrategyType) return false;
     return true;
   }
 }

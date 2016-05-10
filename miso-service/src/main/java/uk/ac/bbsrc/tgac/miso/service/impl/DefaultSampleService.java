@@ -1,40 +1,52 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
-import static com.google.common.base.Preconditions.checkArgument;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.hibernate.exception.ConstraintViolationException;
-import org.hibernate.exception.GenericJDBCException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample.SampleFactoryBuilder;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
-import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAnalyte;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAdditionalInfoImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
+import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
+import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
+import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-import uk.ac.bbsrc.tgac.miso.dto.Dtos;
-import uk.ac.bbsrc.tgac.miso.dto.SampleAdditionalInfoDto;
-import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
+import uk.ac.bbsrc.tgac.miso.persistence.QcPassedDetailDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleClassDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleDao;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleDao;
+import uk.ac.bbsrc.tgac.miso.persistence.SampleGroupDao;
+import uk.ac.bbsrc.tgac.miso.persistence.SamplePurposeDao;
+import uk.ac.bbsrc.tgac.miso.persistence.SubprojectDao;
+import uk.ac.bbsrc.tgac.miso.persistence.TissueMaterialDao;
+import uk.ac.bbsrc.tgac.miso.persistence.TissueOriginDao;
+import uk.ac.bbsrc.tgac.miso.persistence.TissueTypeDao;
 import uk.ac.bbsrc.tgac.miso.service.IdentityService;
 import uk.ac.bbsrc.tgac.miso.service.SampleAdditionalInfoService;
 import uk.ac.bbsrc.tgac.miso.service.SampleAnalyteService;
@@ -80,6 +92,55 @@ public class DefaultSampleService implements SampleService {
 
   @Autowired
   private SampleTissueService sampleTissueService;
+  
+  @Autowired
+  private ProjectStore projectStore;
+  
+  @Autowired
+  private TissueOriginDao tissueOriginDao;
+  
+  @Autowired
+  private TissueTypeDao tissueTypeDao;
+  
+  @Autowired
+  private QcPassedDetailDao qcPassedDetailDao;
+  
+  @Autowired
+  private SubprojectDao subProjectDao;
+  
+  @Autowired
+  private KitStore kitStore;
+  
+  @Autowired
+  private SecurityStore securityStore;
+  
+  @Autowired
+  private SamplePurposeDao samplePurposeDao;
+  
+  @Autowired
+  private SampleGroupDao sampleGroupDao;
+  
+  @Autowired
+  private TissueMaterialDao tissueMaterialDao;
+  
+  @Autowired
+  private MisoNamingScheme<Sample> sampleNamingScheme;
+  
+  @Autowired
+  private MisoNamingScheme<Sample> namingScheme;
+  
+  @Value("${miso.autoGenerateIdentificationBarcodes}")
+  private Boolean autoGenerateIdBarcodes;
+  
+  @CoverageIgnore
+  public Boolean getAutoGenerateIdBarcodes() {
+    return autoGenerateIdBarcodes;
+  }
+
+  @CoverageIgnore
+  public void setAutoGenerateIdBarcodes(Boolean autoGenerateIdBarcodes) {
+    this.autoGenerateIdBarcodes = autoGenerateIdBarcodes;
+  }
 
   @Override
   public Sample get(Long sampleId) throws IOException {
@@ -87,92 +148,251 @@ public class DefaultSampleService implements SampleService {
     authorizationManager.throwIfNotReadable(sample);
     return sample;
   }
-
-  private boolean isParentedSample(Sample sample) {
-    // All parented samples contain a SampleAdditionalInfo reference.
-    return sample.getSampleAdditionalInfo() != null;
-  }
-
+  
   @Override
-  public Long create(SampleDto sampleDto) throws IOException {
-
-    // Retrieve this information early in the transaction to avoid an unnecessary hibernate autoflush.
-    Set<SampleValidRelationship> sampleValidRelationships = sampleValidRelationshipService.getAll();
-
-    // Construct a Sample from the SampleDto.
-    Sample sample = to(sampleDto);
+  public Long create(Sample sample) throws IOException {
+    loadChildEntities(sample);
     authorizationManager.throwIfNotWritable(sample);
-
-    if (sampleDto.getSampleAdditionalInfo() != null && sampleDto.getSampleAdditionalInfo().getParentId() == null) {
-      log.debug("No parent has been provided.");
-      if (sampleDto.getSampleIdentity() != null && !LimsUtils.isStringEmptyOrNull(sampleDto.getSampleIdentity().getExternalName())) {
-        log.debug("Obtaining parent based on external name.");
-        Identity existingIdentity = identityService.get(sampleDto.getSampleIdentity().getExternalName());
-        if (existingIdentity != null) {
-          log.debug("Parent with existing external name already exists. Using that parent.");
-          sample.getSampleAdditionalInfo().setParent(existingIdentity.getSample());
-        } else {
-          sample.getSampleAdditionalInfo().setParent(createIdentityParent(sample, sampleDto));
-        }
-      } else {
-        throw new IllegalArgumentException(
-            "Unable to create parent Identity for sample. Must provide either a parentId or a sampleIdentity.externalName.");
+    setChangeDetails(sample, true);
+    if (sample.getSampleAdditionalInfo() != null) { 
+      if (sample.getSampleAdditionalInfo().getSampleClass() == null 
+          || sample.getSampleAdditionalInfo().getSampleClass().getSampleCategory() == null) {
+        throw new IllegalArgumentException("Sample class or category missing");
+      }
+      if (!Identity.CATEGORY_NAME.equals(sample.getSampleAdditionalInfo().getSampleClass().getSampleCategory())) {
+        sample.getSampleAdditionalInfo().setParent(findOrCreateParent(sample));
+        validateHierarchy(sample);
       }
     }
-
-    Sample newSample = new SampleFactoryBuilder().description(sample.getDescription()).sampleType(sample.getSampleType())
-        .scientificName(sample.getScientificName()).user(authorizationManager.getCurrentUser()).project(sample.getProject())
-        .sampleAdditionalInfo(sample.getSampleAdditionalInfo()).sampleAnalyte(sample.getSampleAnalyte()).accession(sample.getAccession())
-        .identificationBarcode(sample.getIdentificationBarcode())
-        .receivedDate(sample.getReceivedDate()).qcPassed(sample.getQcPassed()).name(HibernateSampleDao.generateTemporaryName())
-        .alias(sample.getAlias()).taxonIdentifier(sample.getTaxonIdentifier()).parent(sample.getParent())
-        .sampleTissue(sample.getSampleTissue()).volume(sample.getVolume()).build();
-    if (newSample.getAlias() == null) {
-      newSample.setAlias(HibernateSampleDao.generateTemporaryName());
+    
+    // pre-save field generation
+    sample.setName(generateTemporaryName());
+    if (isStringEmptyOrNull(sample.getAlias()) && sampleNamingScheme.hasGeneratorFor("alias")) {
+      sample.setAlias(generateTemporaryName());
+    } else {
+      validateAliasUniqueness(sample.getAlias());
     }
-    setChangeDetails(newSample, true);
-
-    if (!LimsUtils.isValidRelationship(sampleValidRelationships, newSample.getParent(), newSample)) {
-      throw new IllegalArgumentException("Parent " + newSample.getParent().getSampleAdditionalInfo().getSampleClass().getAlias()
-          + " not permitted to have a child of type " + newSample.getSampleAdditionalInfo().getSampleClass().getAlias());
+    if (sample.getSampleAdditionalInfo() != null && sample.getParent() != null) {
+      int siblingNumber = sampleDao.getNextSiblingNumber(sample.getParent(), sample.getSampleAdditionalInfo().getSampleClass());
+      sample.getSampleAdditionalInfo().setSiblingNumber(siblingNumber);
     }
+    
+    normalizeSample(sample);
+    return save(sample).getId();
+  }
 
+  private Sample save(Sample sample) throws IOException {
     try {
-      return sampleDao.addSample(newSample);
-    } catch (GenericJDBCException e) {
-      throw new IllegalArgumentException(e.getSQLException().getMessage());
-    } catch (SQLException e) {
-      throw new IllegalArgumentException(e);
+      Long newId = sample.getId();
+      if (newId == Sample.UNSAVED_ID) {
+        newId = sampleDao.addSample(sample);
+      } else {
+        sampleDao.update(sample);
+      }
+      Sample created = sampleDao.getSample(newId);
+      
+      // post-save field generation
+      boolean needsUpdate = false;
+      if (hasTemporaryName(sample)) {
+        created.setName(namingScheme.generateNameFor("name", created));
+        needsUpdate = true;
+      }
+      if (hasTemporaryAlias(sample)) {
+        String generatedAlias = sampleNamingScheme.generateNameFor("alias", created);
+        validateAliasUniqueness(generatedAlias);
+        created.setAlias(generatedAlias);
+        needsUpdate = true;
+      }
+      if (autoGenerateIdBarcodes) {
+        autoGenerateIdBarcode(sample);
+        needsUpdate = true;
+      } // if !autoGenerateIdentificationBarcodes then the identificationBarcode is set by the user
+      if (needsUpdate) sampleDao.update(created);
+      
+      return created;
     } catch (MisoNamingException e) {
       throw new IllegalArgumentException("Name generator failed to generate a valid name", e);
     } catch (ConstraintViolationException e) {
       // Send the nested root cause message to the user, since it contains the actual error.
       throw new ConstraintViolationException(e.getMessage() + " " + ExceptionUtils.getRootCauseMessage(e), e.getSQLException(),
           e.getConstraintName());
+    } catch (SQLException e) {
+      throw new IOException(e);
     }
   }
   
-  private Sample createIdentityParent(Sample buildingSample, SampleDto newSampleDto) throws IOException {
-    log.debug("Creating a new Identity to use as a parent.");
-    String number = sampleNumberPerProjectService.nextNumber(buildingSample.getProject());
-    // Cannot generate identity alias via sampleNameGenerator because of dependence on SampleNumberPerProjectService
-    String internalName = buildingSample.getProject().getAlias() + "_" + number;
-    buildingSample.getIdentity().setInternalName(internalName);
-    
-    SampleClass rootSampleClass = sampleClassDao.getSampleClass(newSampleDto.getRootSampleClassId());
-    ServiceUtils.throwIfNull(rootSampleClass, "rootSampleClassId", newSampleDto.getRootSampleClassId());
-    SampleAdditionalInfoDto sampleAdditionalInfoDto = new SampleAdditionalInfoDto();
-    sampleAdditionalInfoDto.setSampleClassId(newSampleDto.getRootSampleClassId());
-    SampleAdditionalInfo sampleAdditionalInfo = sampleAdditionalInfoService.to(sampleAdditionalInfoDto);
-
-    Sample identitySample = new SampleFactoryBuilder().user(authorizationManager.getCurrentUser()).project(buildingSample.getProject())
-        .description("Identity").sampleType("Identity").scientificName("Identity").name(HibernateSampleDao.generateTemporaryName())
-        .alias(internalName).rootSampleClass(rootSampleClass).identity(buildingSample.getIdentity()).sampleAdditionalInfo(sampleAdditionalInfo)
-        .sampleTissue(buildingSample.getSampleTissue()).build();
-    setChangeDetails(identitySample, true);
-    return identitySample;
+  /**
+   * Checks whether the configured naming scheme allows duplicate alias. If not, checks to see whether an alias is already 
+   * in use, in order to prevent duplicates. This method should be called <b>before</b> saving a new Sample
+   * 
+   * @param alias the alias to validate
+   * @throws ConstraintViolationException if duplicate alias are <b>not</b> allowed <b>and</b> the alias is already in use
+   * @throws IOException
+   */
+  private void validateAliasUniqueness(String alias) throws ConstraintViolationException, IOException {
+    if (!sampleNamingScheme.allowDuplicateEntityNameFor("alias") && sampleDao.aliasExists(alias)) {
+      throw new ConstraintViolationException(String.format("A sample with this alias '%s' already exists in the database", 
+          alias), null, "alias");
+    }
   }
   
+  /**
+   * Finds an existing parent Sample or creates a new one if necessary
+   * 
+   * @param sample must contain Identity details (via {@link Sample#getIdentity() getIdentity}), 
+   * including externalName if a new parent is to be created. And existing parent may be specified by including its sampleId or 
+   * externalName
+   * @return
+   * @throws IOException 
+   * @throws SQLException 
+   * @throws MisoNamingException 
+   */
+  private Sample findOrCreateParent(Sample sample) throws IOException {
+    Identity parentIdentity = sample.getIdentity();
+    if (parentIdentity == null) throw new IllegalArgumentException("Parent identity is required to create a new Sample");
+    if (parentIdentity.getSampleId() != null) {
+      Sample parent = get(parentIdentity.getSampleId());
+      if (parent != null) return parent;
+    }
+    if (isStringEmptyOrNull(parentIdentity.getExternalName())) {
+      throw new IllegalArgumentException("Parent identity must be specified by sample ID or external name");
+    }
+    Identity parent = identityService.get(parentIdentity.getExternalName());
+    if (parent != null) {
+      return parent.getSample();
+    }
+    try {
+      return createParentIdentity(sample);
+    } catch (MisoNamingException e) {
+      throw new IllegalArgumentException("Name generator failed to generate a valid name", e);
+    } catch (SQLException e) {
+      throw new IOException(e);
+    }
+  }
+  
+  private Sample createParentIdentity(Sample sample) throws IOException, MisoNamingException, SQLException {
+    log.debug("Creating a new Identity to use as a parent.");
+    List<SampleClass> identityClasses = sampleClassDao.listByCategory(Identity.CATEGORY_NAME);
+    if (identityClasses.size() != 1) {
+      throw new IllegalStateException("Found more than one SampleClass of category " + Identity.CATEGORY_NAME
+          + ". Cannot choose which to use as root sample class.");
+    }
+    SampleClass rootSampleClass = identityClasses.get(0);
+    SampleAdditionalInfo parentSai = new SampleAdditionalInfoImpl();
+    SampleAdditionalInfo childSai = sample.getSampleAdditionalInfo();
+    parentSai.setSampleClass(rootSampleClass);
+    
+    Identity parentIdentity = new IdentityImpl();
+    String number = sampleNumberPerProjectService.nextNumber(sample.getProject());
+    // Cannot generate identity alias via sampleNameGenerator because of dependence on SampleNumberPerProjectService
+    String internalName = sample.getProject().getAlias() + "_" + number;
+    parentIdentity.setInternalName(internalName);
+    parentIdentity.setExternalName(sample.getIdentity().getExternalName());
+    parentIdentity.setDonorSex(sample.getIdentity().getDonorSex());
+
+    Sample identitySample = new SampleFactoryBuilder()
+        .user(authorizationManager.getCurrentUser())
+        .project(sample.getProject())
+        .description("Identity")
+        .sampleType(sample.getSampleType())
+        .scientificName(sample.getScientificName())
+        .name(generateTemporaryName())
+        .alias(internalName)
+        .rootSampleClass(rootSampleClass)
+        .volume(0D)
+        .sampleAdditionalInfo(parentSai)
+        .identity(parentIdentity)
+        .build();
+    
+    setChangeDetails(identitySample, true);
+    return save(identitySample);
+  }
+  
+  /**
+   * Loads persisted objects into sample fields. Should be called before saving new samples. 
+   * Loads all member objects <b>except</b>
+   * <ul><li>parent sample for detailed samples</li>
+   * <li>creator/lastModifier User objects</li></ul>
+   * 
+   * @param sample the Sample to load entities into. Must contain at least the IDs of objects to load (e.g. to 
+   * load the persisted Project into sample.project, sample.project.id must be set)
+   * @throws IOException 
+   */
+  private void loadChildEntities(Sample sample) throws IOException {
+    if (sample.getProject() != null) {
+      sample.setProject(projectStore.get(sample.getProject().getId()));
+    }
+    // TODO: move these to public methods in other DAOs (e.g. sampleAdditionalInfoDao.loadChildEntities(SampleAdditionalInfo))
+    if (sample.getSampleAdditionalInfo() != null) {
+      SampleAdditionalInfo sai = sample.getSampleAdditionalInfo();
+      if (sai.getSampleClass() != null && sai.getSampleClass().getId() != null) {
+        sai.setSampleClass(sampleClassDao.getSampleClass(sai.getSampleClass().getId()));
+      }
+      if (sai.getTissueOrigin() != null && sai.getTissueOrigin().getId() != null) {
+        sai.setTissueOrigin(tissueOriginDao.getTissueOrigin(sai.getTissueOrigin().getId()));
+      }
+      if (sai.getTissueType() != null && sai.getTissueType().getId() != null) {
+        sai.setTissueType(tissueTypeDao.getTissueType(sai.getTissueType().getId()));
+      }
+      if (sai.getQcPassedDetail() != null && sai.getQcPassedDetail().getId() != null) {
+        sai.setQcPassedDetail(qcPassedDetailDao.getQcPassedDetails(sai.getQcPassedDetail().getId()));
+      }
+      if (sai.getSubproject() != null && sai.getSubproject().getId() != null) {
+        sai.setSubproject(subProjectDao.getSubproject(sai.getSubproject().getId()));
+      }
+      if (sai.getPrepKit() != null && sai.getPrepKit().getId() != null) {
+        sai.setPrepKit(kitStore.getKitDescriptorById(sai.getPrepKit().getId()));
+      }
+      if (sample.getSampleAnalyte() != null) {
+        SampleAnalyte sa = sample.getSampleAnalyte();
+        if (sa.getSamplePurpose() != null && sa.getSamplePurpose().getId() != null) {
+          sa.setSamplePurpose(samplePurposeDao.getSamplePurpose(sa.getSamplePurpose().getId()));
+        }
+        if (sa.getSampleGroup() != null && sa.getSampleGroup().getId() != null) {
+          sa.setSampleGroup(sampleGroupDao.getSampleGroup(sa.getSampleGroup().getId()));
+        }
+        if (sa.getTissueMaterial() != null && sa.getTissueMaterial().getId() != null) {
+          sa.setTissueMaterial(tissueMaterialDao.getTissueMaterial(sa.getTissueMaterial().getId()));
+        }
+      }
+    }
+  }
+  
+  /**
+   * Cleans up parts of the model which may have been used during the creation process, but which should not be persisted
+   * 
+   * @param sample the Sample to normalize
+   */
+  private void normalizeSample(Sample sample) {
+    if (sample.getSampleAdditionalInfo() != null) {
+      String category = sample.getSampleAdditionalInfo().getSampleClass().getSampleCategory();
+      if (!SampleTissue.CATEGORY_NAME.equals(category)) {
+        sample.setSampleTissue(null);
+      }
+      if (!SampleAnalyte.CATEGORY_NAME.equals(category)) {
+        sample.setSampleAnalyte(null);
+      }
+      if (!Identity.CATEGORY_NAME.equals(category)) {
+        sample.setIdentity(null);
+      }
+    }
+  }
+  
+  private void validateHierarchy(Sample sample) throws IOException {
+    Set<SampleValidRelationship> sampleValidRelationships = sampleValidRelationshipService.getAll();
+    if (!LimsUtils.isValidRelationship(sampleValidRelationships, sample.getParent(), sample)) {
+      throw new IllegalArgumentException("Parent " + sample.getParent().getSampleAdditionalInfo().getSampleClass().getAlias()
+          + " not permitted to have a child of type " + sample.getSampleAdditionalInfo().getSampleClass().getAlias());
+    }
+  }
+  
+  /**
+   * Updates all timestamps and user data associated with the change
+   * 
+   * @param sample the Sample to update
+   * @param setCreated specifies whether this is a newly created Sample requiring creation timestamps and user data
+   * @throws IOException 
+   */
   private void setChangeDetails(Sample sample, boolean setCreated) throws IOException {
     User user = authorizationManager.getCurrentUser();
     Date now = new Date();
@@ -211,67 +431,54 @@ public class DefaultSampleService implements SampleService {
     }
   }
 
-  @Transactional(propagation = Propagation.MANDATORY)
-  Sample to(SampleDto sampleDto) throws IOException {
-    authorizationManager.throwIfUnauthenticated();
-    checkArgument(sampleDto.getProjectId() != null, "A Project id must be provided to construct Sample.");
-    Sample sample = Dtos.to(sampleDto);
-
-    Project project = sqlProjectDAO.get(sampleDto.getProjectId());
-    ServiceUtils.throwIfNull(project, "projectId", sampleDto.getProjectId());
-    sample.setProject(project);
-
-    if (sampleDto.getSampleAdditionalInfo() != null && sampleDto.getSampleAdditionalInfo().getParentId() != null) {
-      Sample parent = sampleDao.getSample(sampleDto.getSampleAdditionalInfo().getParentId());
-      ServiceUtils.throwIfNull(parent, "parentId", sampleDto.getSampleAdditionalInfo().getParentId());
-      sample.getSampleAdditionalInfo().setParent(parent);
-      if (sampleDto.getSampleAdditionalInfo().getSampleClassId() != null) {
-        sample.getSampleAdditionalInfo().setSampleClass(sampleClassDao.getSampleClass(
-            sampleDto.getSampleAdditionalInfo().getSampleClassId()));
-      }
-    }
-
-    if (sampleDto.getSampleIdentity() != null) {
-      sample.setIdentity(identityService.to(sampleDto.getSampleIdentity()));
-    }
-    if (sampleDto.getSampleAnalyte() != null) {
-      sample.setSampleAnalyte(sampleAnalyteService.to(sampleDto.getSampleAnalyte()));
-    }
-    if (sampleDto.getSampleTissue() != null) {
-      sample.setSampleTissue(sampleTissueService.to(sampleDto.getSampleTissue()));
-    }
-    return sample;
-  }
-
   @Override
   public void update(Sample sample) throws IOException {
     Sample updatedSample = get(sample.getId());
     authorizationManager.throwIfNotWritable(updatedSample);
-    updatedSample.setDescription(sample.getDescription());
-    updatedSample.setSampleType(sample.getSampleType());
-    updatedSample.setReceivedDate(sample.getReceivedDate());
-    updatedSample.setQcPassed(sample.getQcPassed());
-    updatedSample.setScientificName(sample.getScientificName());
-    updatedSample.setTaxonIdentifier(sample.getTaxonIdentifier());
-    updatedSample.setAlias(sample.getAlias());
-    updatedSample.setDescription(sample.getDescription());
-    if (updatedSample.getSampleAdditionalInfo() != null) {
-      sampleAdditionalInfoService.applyChanges(updatedSample.getSampleAdditionalInfo(), sample.getSampleAdditionalInfo());
-      if (updatedSample.getIdentity() != null) {
-        identityService.applyChanges(updatedSample.getIdentity(), sample.getIdentity());
-      }
-      if (updatedSample.getSampleTissue() != null) {
-        sampleTissueService.applyChanges(updatedSample.getSampleTissue(), sample.getSampleTissue());
-      }
-      if (updatedSample.getSampleAnalyte() != null) {
-        sampleAnalyteService.applyChanges(updatedSample.getSampleAnalyte(), sample.getSampleAnalyte());
-      }
+    applyChanges(updatedSample, sample);
+    setChangeDetails(updatedSample, false);
+    loadChildEntities(updatedSample);
+    if (updatedSample.getSampleAdditionalInfo() != null && updatedSample.getSampleAdditionalInfo().getParent() != null) {
+      updatedSample.getSampleAdditionalInfo().setParent(get(updatedSample.getSampleAdditionalInfo().getParent().getId()));
+      validateHierarchy(updatedSample);
     }
     
-    setChangeDetails(updatedSample, false);
-    // Check for parent and valid relationship.
-
-    sampleDao.update(updatedSample);
+    save(updatedSample);
+  }
+  
+  /**
+   * Copies modifiable fields from the source Sample into the target Sample to be persisted
+   * 
+   * @param target the persisted Sample to modify
+   * @param source the modified Sample to copy modifiable fields from
+   * @throws IOException
+   */
+  private void applyChanges(Sample target, Sample source) throws IOException {
+    target.setDescription(source.getDescription());
+    target.setSampleType(source.getSampleType());
+    target.setReceivedDate(source.getReceivedDate());
+    target.setQcPassed(source.getQcPassed());
+    target.setScientificName(source.getScientificName());
+    target.setTaxonIdentifier(source.getTaxonIdentifier());
+    if (!target.getAlias().equals(source.getAlias())) {
+      validateAliasUniqueness(source.getAlias());
+    }
+    target.setAlias(source.getAlias());
+    target.setDescription(source.getDescription());
+    target.setEmpty(source.isEmpty());
+    target.setVolume(source.getVolume());
+    if (target.getSampleAdditionalInfo() != null) {
+      sampleAdditionalInfoService.applyChanges(target.getSampleAdditionalInfo(), source.getSampleAdditionalInfo());
+      if (target.getIdentity() != null) {
+        identityService.applyChanges(target.getIdentity(), source.getIdentity());
+      }
+      if (target.getSampleTissue() != null) {
+        sampleTissueService.applyChanges(target.getSampleTissue(), source.getSampleTissue());
+      }
+      if (target.getSampleAnalyte() != null) {
+        sampleAnalyteService.applyChanges(target.getSampleAnalyte(), source.getSampleAnalyte());
+      }
+    }
   }
 
   @Override
@@ -285,6 +492,35 @@ public class DefaultSampleService implements SampleService {
     authorizationManager.throwIfNonAdmin();
     Sample sample = get(sampleId);
     sampleDao.deleteSample(sample);
+  }
+  
+  static final private String TEMPORARY_NAME_PREFIX = "TEMPORARY_S";
+
+  /**
+   * Generate a temporary name using a UUID.
+   * 
+   * @return Temporary name
+   */
+  static public String generateTemporaryName() {
+    return TEMPORARY_NAME_PREFIX + UUID.randomUUID();
+  }
+
+  static public boolean hasTemporaryName(Sample sample) {
+    return sample != null && sample.getName() != null && sample.getName().startsWith(TEMPORARY_NAME_PREFIX);
+  }
+  
+  static public boolean hasTemporaryAlias(Sample sample) {
+    return sample != null && sample.getAlias() != null && sample.getAlias().startsWith(TEMPORARY_NAME_PREFIX);
+  }
+  
+  /**
+   * Generates a unique barcode. Note that the barcode will change when the alias is changed.
+   * 
+   * @param sample
+   */
+  public void autoGenerateIdBarcode(Sample sample) {
+    String barcode = sample.getName() + "::" + sample.getAlias();
+    sample.setIdentificationBarcode(barcode);
   }
 
 }

@@ -6,9 +6,9 @@ import com.eaglegenomics.simlims.core.User;
 
 public interface Subproject {
 
-  Long getSubprojectId();
+  Long getId();
 
-  void setSubprojectId(Long subprojectId);
+  void setId(Long subprojectId);
 
   String getAlias();
 

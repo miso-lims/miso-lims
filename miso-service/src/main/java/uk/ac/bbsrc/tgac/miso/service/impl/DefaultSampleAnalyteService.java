@@ -63,7 +63,7 @@ public class DefaultSampleAnalyteService implements SampleAnalyteService {
   public Long create(SampleAnalyte sampleAnalyte) throws IOException {
     authorizationManager.throwIfNonAdmin();
     User user = authorizationManager.getCurrentUser();
-    Sample sample = sampleDao.getSample(sampleAnalyte.getSampleId());
+    Sample sample = sampleDao.getSample(sampleAnalyte.getId());
 
     sampleAnalyte.setCreatedBy(user);
     sampleAnalyte.setUpdatedBy(user);
@@ -131,7 +131,7 @@ public class DefaultSampleAnalyteService implements SampleAnalyteService {
   @Override
   public void update(SampleAnalyte sampleAnalyte) throws IOException {
     authorizationManager.throwIfNonAdmin();
-    SampleAnalyte updatedSampleAnalyte = get(sampleAnalyte.getSampleId());
+    SampleAnalyte updatedSampleAnalyte = get(sampleAnalyte.getId());
     applyChanges(updatedSampleAnalyte, sampleAnalyte);
 
     User user = authorizationManager.getCurrentUser();
@@ -169,13 +169,13 @@ public class DefaultSampleAnalyteService implements SampleAnalyteService {
   public void loadMembers(SampleAnalyte target, SampleAnalyte source)
       throws IOException {
     if (source.getSampleGroup() != null) {
-      target.setSampleGroup(sampleGroupDao.getSampleGroup(source.getSampleGroup().getSampleGroupId()));
+      target.setSampleGroup(sampleGroupDao.getSampleGroup(source.getSampleGroup().getId()));
     }
     if (source.getSamplePurpose() != null) {
-      target.setSamplePurpose(samplePurposeDao.getSamplePurpose(source.getSamplePurpose().getSamplePurposeId()));
+      target.setSamplePurpose(samplePurposeDao.getSamplePurpose(source.getSamplePurpose().getId()));
     }
     if (source.getTissueMaterial() != null) {
-      target.setTissueMaterial(tissueMaterialDao.getTissueMaterial(source.getTissueMaterial().getTissueMaterialId()));
+      target.setTissueMaterial(tissueMaterialDao.getTissueMaterial(source.getTissueMaterial().getId()));
     }
   }
 

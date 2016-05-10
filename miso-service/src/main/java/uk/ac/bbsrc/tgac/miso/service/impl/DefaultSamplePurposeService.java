@@ -47,7 +47,7 @@ public class DefaultSamplePurposeService implements SamplePurposeService {
   @Override
   public void update(SamplePurpose samplePurpose) throws IOException {
     authorizationManager.throwIfNonAdmin();
-    SamplePurpose updatedSamplePurpose = get(samplePurpose.getSamplePurposeId());
+    SamplePurpose updatedSamplePurpose = get(samplePurpose.getId());
     updatedSamplePurpose.setAlias(samplePurpose.getAlias());
     updatedSamplePurpose.setDescription(samplePurpose.getDescription());
     User user = authorizationManager.getCurrentUser();

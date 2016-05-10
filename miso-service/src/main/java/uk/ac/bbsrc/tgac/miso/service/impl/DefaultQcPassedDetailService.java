@@ -47,7 +47,7 @@ public class DefaultQcPassedDetailService implements QcPassedDetailService {
   @Override
   public void update(QcPassedDetail qcPassedDetail) throws IOException {
     authorizationManager.throwIfNonAdmin();
-    QcPassedDetail updatedQcPassedDetails = get(qcPassedDetail.getQcPassedDetailId());
+    QcPassedDetail updatedQcPassedDetails = get(qcPassedDetail.getId());
     updatedQcPassedDetails.setStatus(qcPassedDetail.getStatus());
     updatedQcPassedDetails.setDescription(qcPassedDetail.getDescription());
     updatedQcPassedDetails.setNoteRequired(qcPassedDetail.getNoteRequired());

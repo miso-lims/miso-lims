@@ -75,7 +75,7 @@ public class KitDescriptorController extends RestController {
   public void createKitDescriptor(@RequestBody KitDescriptorDto kitDescriptorDto, UriComponentsBuilder uriBuilder) throws IOException {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     KitDescriptor kd = Dtos.to(kitDescriptorDto);
-    kd.setKitDescriptorId(KitDescriptor.UNSAVED_ID);
+    kd.setId(KitDescriptor.UNSAVED_ID);
     kd.setLastModifier(user);
     requestManager.saveKitDescriptor(kd);
   }
@@ -86,7 +86,7 @@ public class KitDescriptorController extends RestController {
   public void updateKitDescriptor(@PathVariable("id") Long id, @RequestBody KitDescriptorDto kitDescriptorDto, 
       UriComponentsBuilder uriBuilder) throws IOException {
     KitDescriptor kd = Dtos.to(kitDescriptorDto);
-    kd.setKitDescriptorId(id);
+    kd.setId(id);
     requestManager.saveKitDescriptor(kd);
   }
 

@@ -56,7 +56,7 @@ public class LibrarySelectionType implements Comparable, Serializable {
    * 
    * @return Long librarySelectionTypeId.
    */
-  public Long getLibrarySelectionTypeId() {
+  public Long getId() {
     return librarySelectionTypeId;
   }
 
@@ -67,7 +67,7 @@ public class LibrarySelectionType implements Comparable, Serializable {
    *          librarySelectionTypeId.
    * 
    */
-  public void setLibrarySelectionTypeId(Long librarySelectionTypeId) {
+  public void setId(Long librarySelectionTypeId) {
     this.librarySelectionTypeId = librarySelectionTypeId;
   }
 
@@ -122,8 +122,8 @@ public class LibrarySelectionType implements Comparable, Serializable {
 
   @Override
   public int hashCode() {
-    if (getLibrarySelectionTypeId() != UNSAVED_ID) {
-      return getLibrarySelectionTypeId().intValue();
+    if (getId() != UNSAVED_ID) {
+      return getId().intValue();
     } else {
       int hashcode = -1;
       if (getName() != null) hashcode = 37 * hashcode + getName().hashCode();
@@ -139,8 +139,8 @@ public class LibrarySelectionType implements Comparable, Serializable {
     int name = getName().compareTo(t.getName());
     if (name != 0) return name;
 
-    if (getLibrarySelectionTypeId() < t.getLibrarySelectionTypeId()) return -1;
-    if (getLibrarySelectionTypeId() > t.getLibrarySelectionTypeId()) return 1;
+    if (getId() < t.getId()) return -1;
+    if (getId() > t.getId()) return 1;
     return 0;
   }
 }

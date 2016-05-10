@@ -51,23 +51,6 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 @PrintableBarcode
 public interface Plate<T extends List<S>, S>
     extends SecurableByProfile, Barcodable, Locatable, Comparable, Deletable, Poolable<Plate<LinkedList<S>, S>, S> {
-  /**
-   * Gets the current plateId
-   * 
-   * @return Long
-   */
-  @Deprecated
-  public Long getPlateId();
-
-  /**
-   * Sets the plateId of this Plate object
-   * 
-   * @param plateId
-   *          Long.
-   * 
-   */
-  @Deprecated
-  public void setPlateId(Long plateId);
 
   /**
    * Sets the ID of this Plate object.
