@@ -571,7 +571,7 @@
                   enctype="multipart/form-data"
                   target="target_upload"
                   onsubmit="Utils.fileUpload.fileUploadProgress('ajax_upload_form', 'statusdiv', Utils.page.pageReload);">
-                <input type="hidden" name="libraryId" value="${library.libraryId}"/><br/>
+                <input type="hidden" name="libraryId" value="${library.id}"/><br/>
                 <input type="file" name="file"/><br/>
                 <button type="submit" class="br-button ui-state-default ui-corner-all">Upload</button>
             </form>
@@ -583,7 +583,7 @@
 
 <ul>
     <c:forEach items="${qcFiles}" var="file">
-        <li><a href="<c:url value='/miso/download/library/${library.libraryId}/qc/${file.key}'/>">${file.value}</a></li>
+        <li><a href="<c:url value='/miso/download/library/${library.id}/qc/${file.key}'/>">${file.value}</a></li>
     </c:forEach>
 </ul>
 --%>

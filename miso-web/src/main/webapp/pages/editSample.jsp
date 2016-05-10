@@ -359,7 +359,7 @@
             <c:choose>
               <c:when test="${sample.id == 0}">
                 <miso:select id="sampleClass" path="sampleAdditionalInfo.sampleClass" items="${sampleClasses}" itemLabel="alias" 
-                    itemValue="sampleClassId" defaultLabel="SELECT" defaultValue="" onchange="Sample.ui.sampleClassChanged();"/>
+                    itemValue="id" defaultLabel="SELECT" defaultValue="" onchange="Sample.ui.sampleClassChanged();"/>
               </c:when>
               <c:otherwise>
                 ${sample.sampleAdditionalInfo.sampleClass.alias}
@@ -373,7 +373,7 @@
             <c:choose>
               <c:when test="${sample.id == 0}">
                 <miso:select id="tissueOrigin" path="sampleAdditionalInfo.tissueOrigin" items="${tissueOrigins}" itemLabel="description" 
-                    itemValue="tissueOriginId" defaultLabel="SELECT" defaultValue=""/>
+                    itemValue="id" defaultLabel="SELECT" defaultValue=""/>
               </c:when>
               <c:otherwise>
                 ${sample.sampleAdditionalInfo.tissueOrigin.description}
@@ -389,7 +389,7 @@
                 <form:select id="tissueType" path="sampleAdditionalInfo.tissueType">
                   <option value="">SELECT</option>
                   <c:forEach items="${tissueTypes}" var="tissueType">
-                    <option value="${tissueType.tissueTypeId}" <c:if test="${tissueType.tissueTypeId == sample.sampleAdditionalInfo.tissueType.tissueTypeId}">selected="selected"</c:if>>
+                    <option value="${tissueType.id}" <c:if test="${tissueType.id == sample.sampleAdditionalInfo.tissueType.id}">selected="selected"</c:if>>
                       ${fn:length(tissueType.description) lt 51 ? tissueType.description : fn:substring(tissueType.description,0,49) += '&hellip;'}
                     </option>
                   </c:forEach>
@@ -405,7 +405,7 @@
           <td class="h">QC Details:</td>
           <td>
             <miso:select id="qcPassedDetail" path="sampleAdditionalInfo.qcPassedDetail" items="${qcPassedDetails}" itemLabel="description" 
-                    itemValue="qcPassedDetailId" defaultLabel="None" defaultValue=""/>
+                    itemValue="id" defaultLabel="None" defaultValue=""/>
           </td>                               
         </tr>
         <tr>
@@ -426,7 +426,7 @@
                 <c:choose>
                   <c:when test="!empty sample.sampleAdditionalInfo.subproject">
                     ${sample.sampleAdditionalInfo.subproject.alias}
-                    <input type="hidden" value="${sample.sampleAdditionalInfo.subproject.subprojectId}" name="subProject" id="subProject"/>
+                    <input type="hidden" value="${sample.sampleAdditionalInfo.subproject.id}" name="subProject" id="subProject"/>
                   </c:when>
                   <c:otherwise>
                     n/a
@@ -508,7 +508,7 @@
               <td class="h">Purpose:</td>
               <td>
                 <miso:select id="samplePurpose" path="sampleAnalyte.samplePurpose" items="${samplePurposes}" itemLabel="alias" 
-                    itemValue="samplePurposeId" defaultLabel="Unknown" defaultValue=""/>
+                    itemValue="id" defaultLabel="Unknown" defaultValue=""/>
               </td>
             </tr>
             <tr>
@@ -535,7 +535,7 @@
               <td class="h">Tissue Material:</td>
               <td>
                 <miso:select id="tissueMaterial" path="sampleAnalyte.tissueMaterial" items="${tissueMaterials}" itemLabel="alias" 
-                    itemValue="tissueMaterialId" defaultLabel="Unknown" defaultValue=""/>
+                    itemValue="id" defaultLabel="Unknown" defaultValue=""/>
               </td>
             </tr>
             <tr>
@@ -787,7 +787,7 @@
               <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
                   <%--
                   <sec:authorize access="hasRole('ROLE_ADMIN')">
-                      <td class="fit">${qc.qcId}</td>
+                      <td class="fit">${qc.id}</td>
                   </sec:authorize>
                   --%>
                 <td>${qc.qcCreator}</td>
@@ -821,7 +821,7 @@
                         enctype="multipart/form-data"
                         target="target_upload"
                         onsubmit="Utils.fileUpload.fileUploadProgress('ajax_upload_form', 'statusdiv', Utils.page.pageReload);">
-                      <input type="hidden" name="sampleId" value="${sample.sampleId}"/><br/>
+                      <input type="hidden" name="sampleId" value="${sample.id}"/><br/>
                       <input type="file" name="file"/><br/>
                       <button type="submit" class="br-button ui-state-default ui-corner-all">Upload</button>
                   </form>
@@ -833,7 +833,7 @@
 
       <ul>
           <c:forEach items="${qcFiles}" var="file">
-              <li><a href="<c:url value='/miso/download/sample/${sample.sampleId}/qc/${file.key}'/>">${file.value}</a>
+              <li><a href="<c:url value='/miso/download/sample/${sample.id}/qc/${file.key}'/>">${file.value}</a>
               </li>
           </c:forEach>
       </ul>
