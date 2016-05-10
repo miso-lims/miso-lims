@@ -790,7 +790,7 @@ public class EditSampleController {
   
   /**
    * Adds child entities to a new detailed Sample so they can be bound in the JSP. These will not all be useful for the same 
-   * object, but are all included to accomodate the JSP
+   * object, but are all included to accommodate the JSP.
    * 
    * @param sample
    */
