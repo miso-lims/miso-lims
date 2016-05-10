@@ -239,7 +239,11 @@
     </td>
   </tr>
 </c:if>
-<c:if test="${not detailedSample}">
+<c:choose>
+  <c:when test="${!empty library.sample && !empty library.sample.sampleAdditionalInfo && !empty library.libraryAdditionalInfo}">
+    <input type="hidden" value="true" name="paired" id="paired"/>
+  </c:when>
+  <c:otherwise>
 	<tr>
 	  <td>Paired:</td>
 	  <td>
@@ -253,7 +257,8 @@
 	    </c:choose>
 	  </td>
 	</tr>
-</c:if>
+  </c:otherwise>
+</c:choose>
 <c:if test="${!empty library.sample && !empty library.sample.sampleAdditionalInfo && !empty library.libraryAdditionalInfo}">
   <tr>
     <td>Library Design:</td>

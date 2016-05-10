@@ -1130,12 +1130,12 @@ Library.ui = {
     var designSelect = document.getElementById('libraryDesignTypes');
     var selection = document.getElementById('librarySelectionTypes');
     var strategy = document.getElementById('libraryStrategyTypes');
-    var paired = document.getElementById('paired');
+    var libraryType = document.getElementById('libraryTypes');
     var platform = document.getElementById('platformNames');
     if (designSelect.value == -1) {
       selection.disabled = false;
       strategy.disabled = false;
-      paired.disabled = false;
+      libraryType.disabled = false;
       platform.disabled = false;
     } else {
       var matchedDesigns = Library.designs.filter(function (rule) { return rule.id == designSelect.value; });
@@ -1144,10 +1144,18 @@ Library.ui = {
         selection.disabled = true;
         strategy.value = matchedDesigns[0].libraryStrategyType;
         strategy.disabled = true;
-        paired.checked = matchedDesigns[0].paired;
-        paired.disabled = true;
-        platform.checked = matchedDesigns[0].platform;
+        platform.value = matchedDesigns[0].libraryType.platformType;
         platform.disabled = true;
+        Fluxion.doAjax(
+          'libraryControllerHelperService',
+          'changePlatformName',
+          {'platform': platform.value, 'url': ajaxurl},
+          {'doOnSuccess': function(data) {
+            Library.ui.processPlatformChange(data);
+            libraryType.value = matchedDesigns[0].libraryType.id;
+            libraryType.disabled = true;
+          } }
+        );
       }
     }
   }

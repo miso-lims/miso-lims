@@ -25,9 +25,11 @@ package uk.ac.bbsrc.tgac.miso.core.data.type;
 
 import java.io.Serializable;
 
+import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 /**
  * Provides model access to the underlying MISO LibraryType lookup table. These types should match the SRA submission schema for Library
@@ -38,6 +40,8 @@ import javax.persistence.Id;
  * @author Rob Davey
  * @since 0.0.2
  */
+@Entity
+@Table(name = "LibraryType")
 public class LibraryType implements Comparable, Serializable {
   public static final Long UNSAVED_ID = 0L;
 
