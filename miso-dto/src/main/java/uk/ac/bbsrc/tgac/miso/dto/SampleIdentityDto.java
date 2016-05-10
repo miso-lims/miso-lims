@@ -10,6 +10,7 @@ public class SampleIdentityDto {
   private String sampleUrl;
   private String internalName;
   private String externalName;
+  private String donorSex;
   private Long createdById;
   private String createdByUrl;
   private String creationDate;
@@ -103,6 +104,14 @@ public class SampleIdentityDto {
 
   public void setSampleUrl(String sampleUrl) {
     this.sampleUrl = sampleUrl;
+  }
+
+  public String getDonorSex() {
+    return donorSex;
+  }
+
+  public void setDonorSex(String donorSex) {
+    this.donorSex = donorSex;
   }
 
 }

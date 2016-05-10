@@ -75,6 +75,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.EntityGroup;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
+import uk.ac.bbsrc.tgac.miso.core.data.Identity.DonorSex;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
@@ -370,6 +371,7 @@ public class EditSampleController {
     final List<String> sampleTypes = new ArrayList<String>(requestManager.listAllSampleTypes());
     final List<String> qcValues = new ArrayList<String>();
     final List<String> strStatuses = new ArrayList<String>();
+    final List<String> donorSexes = new ArrayList<String>();
     qcValues.add("true");
     qcValues.add("false");
     qcValues.add("");
@@ -384,11 +386,15 @@ public class EditSampleController {
     for (String strLabel : StrStatus.getLabels()) {
       strStatuses.add(strLabel);
     }
+    for (String dsLabel : DonorSex.getLabels()) {
+      donorSexes.add(dsLabel);
+    }
 
     hot.put("sampleTypes", sampleTypes);
     hot.put("projects", allProjects);
     hot.put("qcValues", qcValues);
     hot.put("strStatuses", strStatuses);
+    hot.put("donorSexes", donorSexes);
 
     return hot;
   }
@@ -510,6 +516,11 @@ public class EditSampleController {
     return StrStatus.values();
   }
   
+  @ModelAttribute("donorSexOptions")
+  public DonorSex[] getDonorSexOptions() {
+    return DonorSex.values();
+  }
+
   /**
    * Translates foreign keys to entity objects with only the ID set, to be used in service layer to reload persisted child objects
    * 

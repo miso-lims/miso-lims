@@ -4,6 +4,8 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.MapsId;
@@ -32,6 +34,9 @@ public class IdentityImpl implements Identity {
 
   @Column(nullable = false, unique = true)
   private String externalName;
+  
+  @Enumerated(EnumType.STRING)
+  private DonorSex donorSex = DonorSex.UNKNOWN;
 
   @OneToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "createdBy", nullable = false)
@@ -125,6 +130,28 @@ public class IdentityImpl implements Identity {
   @Override
   public void setLastUpdated(Date lastUpdated) {
     this.lastUpdated = lastUpdated;
+  }
+
+  @Override
+  public DonorSex getDonorSex() {
+    return donorSex;
+  }
+
+  @Override
+  public void setDonorSex(DonorSex donorSex) {
+    this.donorSex = donorSex;
+  }
+
+  @Override
+  public void setDonorSex(String donorSex) {
+    this.donorSex = DonorSex.get(donorSex);
+  }
+
+  @Override
+  public String toString() {
+    return "IdentityImpl [sampleId=" + sampleId + ", sample=" + sample + ", internalName=" + internalName 
+        + ", externalName=" + externalName + ", donorSex=" + donorSex + ", createdBy=" + createdBy
+        + ", creationDate=" + creationDate + ", updatedBy=" + updatedBy + ", lastUpdated=" + lastUpdated + "]";
   }
 
 }

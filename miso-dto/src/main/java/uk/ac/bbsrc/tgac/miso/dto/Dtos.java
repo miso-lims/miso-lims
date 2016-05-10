@@ -551,6 +551,7 @@ public class Dtos {
     dto.setSampleId(from.getSampleId());
     dto.setInternalName(from.getInternalName());
     dto.setExternalName(from.getExternalName());
+    dto.setDonorSex(from.getDonorSex().getLabel());
     dto.setCreatedById(from.getCreatedBy().getUserId());
     dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
     dto.setUpdatedById(from.getUpdatedBy().getUserId());
@@ -571,6 +572,9 @@ public class Dtos {
     to.setSampleId(from.getSampleId());
     to.setInternalName(from.getInternalName());
     to.setExternalName(from.getExternalName());
+    if (from.getDonorSex() != null) {
+      to.setDonorSex(from.getDonorSex());
+    }
     return to;
   }
 
