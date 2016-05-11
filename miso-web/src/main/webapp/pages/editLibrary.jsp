@@ -436,10 +436,63 @@
   <td>Emptied:</td>
   <td><form:checkbox id="empty" path="empty"/></td>
 </tr>
+</table>
+
+<c:if test="${detailedSample}">
+<br/>
+<br/>
+<h2>Details</h2>
+<br/>
+<table class="in">
+<c:choose>
+<c:when test="${library.id == 0}">
+  <tr>
+    <td class="h">Tissue Origin:</td>
+    <td>${library.sample.sampleAdditionalInfo.tissueOrigin.alias}</td>
+  </tr>
+  <tr>
+    <td class="h">Tissue Type:</td>
+    <td>${library.sample.sampleAdditionalInfo.tissueType.alias}</td>
+  </tr>
+  <c:if test="${not empty library.sample.sampleAnalyte.groupId}">
+  <tr>
+    <td class="h">Group ID:</td>
+    <td>${library.sample.sampleAnalyte.groupId}</td>
+  </tr>
+  <tr>
+    <td class="h">Group Description:</td>
+    <td>${library.sample.sampleAnalyte.groupDescription}</td>
+  </tr>
+  </c:if>
+</c:when>
+<c:otherwise>
+  <tr>
+    <td class="h">Tissue Origin:</td>
+    <td>${library.libraryAdditionalInfo.tissueOrigin.alias}</td>
+  </tr>
+  <tr>
+    <td class="h">Tissue Type:</td>
+    <td>${library.libraryAdditionalInfo.tissueType.alias}</td>
+  </tr>
+  <c:if test="${not empty library.libraryAdditionalInfo.groupId}">
+  <tr>
+    <td class="h">Group ID:</td>
+    <td>${library.libraryAdditionalInfo.groupId}</td>
+  </tr>
+  <tr>
+    <td class="h">Group Description:</td>
+    <td>${library.libraryAdditionalInfo.groupDescription}</td>
+  </tr>
+  </c:if>
+</c:otherwise>
+</c:choose>
+</table>
+</c:if>
 
 <c:choose>
   <c:when
       test="${!empty library.sample and library.securityProfile.profileId eq library.sample.project.securityProfile.profileId}">
+    <table class="in">
     <tr>
       <td>Permissions</td>
       <td><i>Inherited from sample </i>
@@ -451,7 +504,6 @@
     </table>
   </c:when>
   <c:otherwise>
-    </table>
     <%@ include file="permissions.jsp" %>
   </c:otherwise>
 </c:choose>

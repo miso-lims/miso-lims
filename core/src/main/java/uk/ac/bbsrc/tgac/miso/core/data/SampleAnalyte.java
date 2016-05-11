@@ -27,9 +27,29 @@ public interface SampleAnalyte {
 
   void setSamplePurpose(SamplePurpose samplePurpose);
 
-  SampleGroupId getSampleGroup();
+  /**
+   * Gets the Group ID string of this sample analyte.
+   * @return Long groupId
+   */
+  Long getGroupId();
 
-  void setSampleGroup(SampleGroupId sampleGroup);
+  /**
+   * Sets the Group ID string of this sample analyte.
+   * @param Long groupId
+   */
+  void setGroupId(Long groupId);
+
+  /**
+   * Gets the Group Description string of this sample analyte.
+   * @return String groupDescription
+   */
+  String getGroupDescription();
+
+  /**
+   * Sets the Group Description string of this sample analyte.
+   * @param String groupDescription
+   */
+  void setGroupDescription(String groupDescription);
 
   TissueMaterial getTissueMaterial();
 

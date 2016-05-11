@@ -45,9 +45,6 @@ public class DefaultSampleAnalyteService implements SampleAnalyteService {
   private SamplePurposeDao samplePurposeDao;
 
   @Autowired
-  private SampleGroupDao sampleGroupDao;
-
-  @Autowired
   private TissueMaterialDao tissueMaterialDao;
 
   @Autowired
@@ -86,9 +83,6 @@ public class DefaultSampleAnalyteService implements SampleAnalyteService {
     if (sampleAnalyteDto.getSamplePurposeId() != null) {
       sampleAnalyte.setSamplePurpose(samplePurposeDao.getSamplePurpose(sampleAnalyteDto.getSamplePurposeId()));
     }
-    if (sampleAnalyteDto.getSampleGroupId() != null) {
-      sampleAnalyte.setSampleGroup(sampleGroupDao.getSampleGroup(sampleAnalyteDto.getSampleGroupId()));
-    }
     if (sampleAnalyteDto.getTissueMaterialId() != null) {
       sampleAnalyte.setTissueMaterial(tissueMaterialDao.getTissueMaterial(sampleAnalyteDto.getTissueMaterialId()));
     }
@@ -113,11 +107,6 @@ public class DefaultSampleAnalyteService implements SampleAnalyteService {
       SamplePurpose samplePurpose = samplePurposeDao.getSamplePurpose(sampleAnalyteDto.getSamplePurposeId());
       ServiceUtils.throwIfNull(samplePurpose, "SampleAnalyte.samplePurposeId", sampleAnalyteDto.getSamplePurposeId());
       sampleAnalyte.setSamplePurpose(samplePurpose);
-    }
-    if (sampleAnalyteDto.getSampleGroupId() != null) {
-      SampleGroupId sampleGroup = sampleGroupDao.getSampleGroup(sampleAnalyteDto.getSampleGroupId());
-      ServiceUtils.throwIfNull(sampleGroup, "SampleAnalyte.sampleGroupId", sampleAnalyteDto.getSampleGroupId());
-      sampleAnalyte.setSampleGroup(sampleGroup);
     }
     if (sampleAnalyteDto.getTissueMaterialId() != null) {
       TissueMaterial tissueMaterial = tissueMaterialDao.getTissueMaterial(sampleAnalyteDto.getTissueMaterialId());
@@ -144,6 +133,8 @@ public class DefaultSampleAnalyteService implements SampleAnalyteService {
     target.setRegion(source.getRegion());
     target.setTubeId(source.getTubeId());
     target.setStrStatus(source.getStrStatus());
+    target.setGroupId(source.getGroupId());
+    target.setGroupDescription(source.getGroupDescription());
     loadMembers(target, source);
   }
 
@@ -168,9 +159,6 @@ public class DefaultSampleAnalyteService implements SampleAnalyteService {
   @Override
   public void loadMembers(SampleAnalyte target, SampleAnalyte source)
       throws IOException {
-    if (source.getSampleGroup() != null) {
-      target.setSampleGroup(sampleGroupDao.getSampleGroup(source.getSampleGroup().getId()));
-    }
     if (source.getSamplePurpose() != null) {
       target.setSamplePurpose(samplePurposeDao.getSamplePurpose(source.getSamplePurpose().getId()));
     }

@@ -48,9 +48,6 @@ Sample.hot = {
           if (sam.sampleAnalyte.tissueMaterialId) {
             sam.sampleAnalyte.tissueMaterialAlias = Hot.getAliasFromId(sam.sampleAnalyte.tissueMaterialId, Hot.sampleOptions.tissueMaterialsDtos);
           }
-          if (sam.sampleAnalyte.sampleGroupId) {
-            sam.sampleAnalyte.sampleGroupComposite = Sample.hot.getSGCompositeFromId(sam.sampleAnalyte.sampleGroupId, Hot.sampleOptions.sampleGroupsDtos);
-          }
           if (sam.sampleAnalyte.samplePurposeId) {
             sam.sampleAnalyte.samplePurposeAlias = Hot.getAliasFromId(sam.sampleAnalyte.samplePurposeId, Hot.sampleOptions.samplePurposesDtos);
           }
@@ -88,6 +85,10 @@ Sample.hot = {
       newSam.sampleAdditionalInfo.sampleClassAlias = Hot.getAliasFromId(newSam.sampleAdditionalInfo.sampleClassId, Hot.sampleOptions.sampleClassesDtos);
       newSam.sampleAdditionalInfo.parentId = parseInt(sam.id);
       newSam.sampleAdditionalInfo.parentAlias = clone(sam.alias);
+      if (sam.sampleAnalyte && sam.sampleAnalyte.groupId.length) {
+        newSam.sampleAnalyte.groupId = sam.sampleAnalyte.groupId;
+        newSam.sampleAnalyte.groupDescription = sam.sampleAnalyte.groupDescription;
+      }
       
       return newSam;
     });
@@ -379,13 +380,13 @@ Sample.hot = {
     sampleAnalyte: {
       samplePurposeId: null,
       samplePurposeAlias: null,
-      sampleGroupId: null,
-      sampleGroupComposite: null,
       tissueMaterialId: null,
       tissueMaterialAlias: null,
       strStatus: null,
       region: null,
-      tubeId: null
+      tubeId: null,
+      groupId: null,
+      groupDescription:null
     },
     sampleTissue: {
       instituteTissueName: null,
@@ -496,16 +497,6 @@ Sample.hot = {
    */
   getSamplePurposes: function () {
     return Hot.sortByProperty(Hot.sampleOptions.samplePurposesDtos, 'id').map(Hot.getAlias); 
-  },
-
-  /**
-   * Gets array of sample groupId aliases (detailed sample only)
-   */
-  getSampleGroups: function () {
-    var filteredSGs = Hot.sampleOptions.sampleGroupsDtos.filter(function (group) { 
-      return group.projectId == Sample.hot.selectedProjectId;
-    });
-    return Hot.sortByProperty(filteredSGs, 'id').reverse().map(function (group) { return group.groupId +' - '+ group.description; });
   },
 
   /**
@@ -656,12 +647,13 @@ Sample.hot = {
           type: 'text'
         },{
           header: 'Group ID',
-          data: 'sampleAnalyte.sampleGroupComposite',
-          type: 'autocomplete',
-          strict: false,
-          trimDropdown: false,
-          allowInvalid: false,
-          source: Sample.hot.getSampleGroups(),
+          data: 'sampleAnalyte.groupId',
+          type: 'numeric',
+          validator: validateNumber
+        },{
+          header: 'Group Desc.',
+          data: 'sampleAnalyte.groupDescription',
+          type: 'text',
           validator: permitEmpty
         },{
           header: 'Kit',
@@ -707,7 +699,7 @@ Sample.hot = {
             header: 'Passage #',
             data: 'sampleAdditionalInfo.passageNumber',
             type: 'text',
-            validator: validatePassageNumber
+            validator: validateNumber
           },{
             header: 'Times Received',
             data: 'sampleAdditionalInfo.timesReceived',
@@ -878,7 +870,7 @@ Sample.hot = {
       }
     }
     
-    function validatePassageNumber (value, callback) {
+    function validateNumber (value, callback) {
       if (value === '' || value === null || Handsontable.helper.isNumeric(value) && value > 0) {
         return callback(true);
       } else {
@@ -914,28 +906,6 @@ Sample.hot = {
       return lab.id == id;
     })[0];
     return lab.alias +' - '+ lab.instituteAlias;
-  },
-  
-  /**
-   * Gets sample groupId id associated with a given sampleGroupId composite (groupId and description)
-   */
-  getIdFromSGComposite: function (sgComposite, sgCollection) {
-    var sgByProject = sgCollection.filter(function (group) { return group.projectId == Sample.hot.selectedProjectId; });
-    // samplegroupComposite is "[groupId] - [description]"
-    var array = sgComposite.split(/\s\W\s/);
-    return sgByProject.filter(function (group) {
-      return (group.groupId == array[0] && group.description == array[1]);
-    })[0].id;
-  },
-  
-  /**
-   * Creates custom sampleGroupId composite (groupId and description)
-   */
-  getSGCompositeFromId: function (id, sgCollection) {
-    var sg = sgCollection.filter(function (sg) {
-      return sg.id == id;
-    })[0];
-    return sg.groupId + ' - ' + sg.description;
   },
   
   /**
@@ -1057,6 +1027,12 @@ Sample.hot = {
         }
         if (obj.sampleAnalyte.tubeId && obj.sampleAnalyte.tubeId.length) {
           sample.sampleAnalyte.tubeId = obj.sampleAnalyte.tubeId;
+        }
+        if (obj.sampleAnalyte.groupId && obj.sampleAnalyte.groupId.length) {
+          sample.sampleAnalyte.groupId = obj.sampleAnalyte.groupId;
+        }
+        if (obj.sampleAnalyte.groupDescription && obj.sampleAnalyte.groupDescription.length) {
+          sample.sampleAnalyte.groupDescription = obj.sampleAnalyte.groupDescription;
         }
       }
     } else if (Sample.hot.getCategoryFromClassId(sample.sampleAdditionalInfo.sampleClassId) == 'Tissue') {
