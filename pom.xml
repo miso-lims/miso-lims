@@ -391,10 +391,7 @@
       <id>external</id>
       <modules>
         <module>sqlstore</module>
-
         <module>runstats-client</module>
-
-        <module>analysis-server</module>
         <module>notification-consumer-services</module>
         <module>notification-server</module>
 
