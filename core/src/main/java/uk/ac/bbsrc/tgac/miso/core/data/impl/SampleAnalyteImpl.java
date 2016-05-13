@@ -36,9 +36,8 @@ public class SampleAnalyteImpl implements SampleAnalyte {
   @JoinColumn(name = "samplePurposeId")
   private SamplePurpose samplePurpose;
 
-  @OneToOne(targetEntity = SampleGroupImpl.class)
-  @JoinColumn(name = "sampleGroupId")
-  private SampleGroupId sampleGroup;
+  private Long groupId;
+  private String groupDescription;
 
   @OneToOne(targetEntity = TissueMaterialImpl.class)
   @JoinColumn(name = "tissueMaterialId")
@@ -95,13 +94,23 @@ public class SampleAnalyteImpl implements SampleAnalyte {
   }
 
   @Override
-  public SampleGroupId getSampleGroup() {
-    return sampleGroup;
+  public Long getGroupId() {
+    return groupId;
   }
 
   @Override
-  public void setSampleGroup(SampleGroupId sampleGroup) {
-    this.sampleGroup = sampleGroup;
+  public void setGroupId(Long groupId) {
+    this.groupId = groupId;
+  }
+
+  @Override
+  public String getGroupDescription() {
+    return groupDescription;
+  }
+
+  @Override
+  public void setGroupDescription(String groupDescription) {
+    this.groupDescription = groupDescription;
   }
 
   @Override
@@ -173,17 +182,17 @@ public class SampleAnalyteImpl implements SampleAnalyte {
   public void setLastUpdated(Date lastUpdated) {
     this.lastUpdated = lastUpdated;
   }
-  
+
   @Override
   public StrStatus getStrStatus() {
     return strStatus;
   }
-  
+
   @Override
   public void setStrStatus(StrStatus strStatus) {
     this.strStatus = strStatus;
   }
-  
+
   @Override
   public void setStrStatus(String strStatus) {
     this.strStatus = StrStatus.get(strStatus);
@@ -192,7 +201,7 @@ public class SampleAnalyteImpl implements SampleAnalyte {
   @Override
   public String toString() {
     return "SampleAnalyteImpl [sampleId=" + sampleId + ", sample=" + sample
-        + ", samplePurpose=" + samplePurpose + ", sampleGroup=" + sampleGroup
+        + ", samplePurpose=" + samplePurpose + ", groupId=" + groupId + ", groupDescription=" + groupDescription
         + ", tissueMaterial=" + tissueMaterial + ", strStatus=" + strStatus
         + ", region=" + region + ", tubeId=" + tubeId + ", createdBy="
         + createdBy + ", creationDate=" + creationDate + ", updatedBy="

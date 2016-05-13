@@ -348,9 +348,6 @@ public class DefaultSampleService implements SampleService {
         if (sa.getSamplePurpose() != null && sa.getSamplePurpose().getId() != null) {
           sa.setSamplePurpose(samplePurposeDao.getSamplePurpose(sa.getSamplePurpose().getId()));
         }
-        if (sa.getSampleGroup() != null && sa.getSampleGroup().getId() != null) {
-          sa.setSampleGroup(sampleGroupDao.getSampleGroup(sa.getSampleGroup().getId()));
-        }
         if (sa.getTissueMaterial() != null && sa.getTissueMaterial().getId() != null) {
           sa.setTissueMaterial(tissueMaterialDao.getTissueMaterial(sa.getTissueMaterial().getId()));
         }

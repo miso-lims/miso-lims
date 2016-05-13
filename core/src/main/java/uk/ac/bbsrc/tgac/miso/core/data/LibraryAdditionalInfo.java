@@ -24,9 +24,13 @@ public interface LibraryAdditionalInfo {
 
   void setTissueType(TissueType tissueType);
 
-  SampleGroupId getSampleGroupId();
+  Long getGroupId();
 
-  void setSampleGroupId(SampleGroupId sampleGroupId);
+  void setGroupId(Long groupId);
+
+  String getGroupDescription();
+
+  void setGroupDescription(String groupDescription);
 
   KitDescriptor getPrepKit();
 

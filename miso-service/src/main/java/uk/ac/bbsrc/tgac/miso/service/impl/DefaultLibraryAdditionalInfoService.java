@@ -41,9 +41,6 @@ public class DefaultLibraryAdditionalInfoService implements LibraryAdditionalInf
   private TissueTypeDao tissueTypeDao;
   
   @Autowired
-  private SampleGroupDao sampleGroupDao;
-  
-  @Autowired
   private KitStore kitStore;
   
   @Autowired
@@ -62,11 +59,12 @@ public class DefaultLibraryAdditionalInfoService implements LibraryAdditionalInf
     libraryAdditionalInfo.setLibrary(libraryStore.get(libraryId));
     libraryAdditionalInfo.setTissueOrigin(tissueOriginDao.getTissueOrigin(libraryAdditionalInfo.getTissueOrigin().getId()));
     libraryAdditionalInfo.setTissueType(tissueTypeDao.getTissueType(libraryAdditionalInfo.getTissueType().getId()));
-    if (libraryAdditionalInfo.getSampleGroupId() != null) {
-      libraryAdditionalInfo.setSampleGroupId(sampleGroupDao.getSampleGroup(libraryAdditionalInfo.getSampleGroupId().getId()));
-    }
     if (libraryAdditionalInfo.getPrepKit() != null) {
       libraryAdditionalInfo.setPrepKit(kitStore.getKitDescriptorById(libraryAdditionalInfo.getPrepKit().getId()));
+    }
+    if (libraryAdditionalInfo.getLibrary().getSample().getSampleAnalyte().getGroupId() != null) {
+      libraryAdditionalInfo.setGroupId(libraryAdditionalInfo.getLibrary().getSample().getSampleAnalyte().getGroupId());
+      libraryAdditionalInfo.setGroupDescription(libraryAdditionalInfo.getLibrary().getSample().getSampleAnalyte().getGroupDescription());
     }
     User user = authorizationManager.getCurrentUser();
     libraryAdditionalInfo.setCreatedBy(user);
@@ -81,9 +79,8 @@ public class DefaultLibraryAdditionalInfoService implements LibraryAdditionalInf
     LibraryAdditionalInfo updated = get(libraryAdditionalInfo.getLibraryId());
     updated.setTissueOrigin(tissueOriginDao.getTissueOrigin(libraryAdditionalInfo.getTissueOrigin().getId()));
     updated.setTissueType(tissueTypeDao.getTissueType(libraryAdditionalInfo.getTissueType().getId()));
-    if (libraryAdditionalInfo.getSampleGroupId() != null) {
-      updated.setSampleGroupId(sampleGroupDao.getSampleGroup(libraryAdditionalInfo.getSampleGroupId().getId()));
-    }
+    updated.setGroupId(libraryAdditionalInfo.getGroupId());
+    updated.setGroupDescription(libraryAdditionalInfo.getGroupDescription());
     if (libraryAdditionalInfo.getPrepKit() != null) {
       updated.setPrepKit(kitStore.getKitDescriptorById(libraryAdditionalInfo.getPrepKit().getId()));
     }

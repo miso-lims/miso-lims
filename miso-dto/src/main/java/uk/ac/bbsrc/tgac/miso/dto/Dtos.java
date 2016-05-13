@@ -390,8 +390,11 @@ public class Dtos {
     if (from.getSamplePurpose() != null) {
       dto.setSamplePurposeId(from.getSamplePurpose().getId());
     }
-    if (from.getSampleGroup() != null) {
-      dto.setSampleGroupId(from.getSampleGroup().getId());
+    if (from.getGroupId() != null) {
+      dto.setGroupId(from.getGroupId());
+    }
+    if (from.getGroupDescription() != null) {
+      dto.setGroupDescription(from.getGroupDescription());
     }
     if (from.getTissueMaterial() != null) {
       dto.setTissueMaterialId(from.getTissueMaterial().getId());
@@ -422,9 +425,9 @@ public class Dtos {
     to.setId(from.getSampleId());
     to.setRegion(from.getRegion());
     to.setTubeId(from.getTubeId());
-    if (from.getSampleGroupId() != null) {
-      to.setSampleGroup(new SampleGroupImpl());
-      to.getSampleGroup().setId(from.getSampleGroupId());
+    if (from.getGroupId() != null) {
+      to.setGroupId(from.getGroupId());
+      to.setGroupDescription(from.getGroupDescription());
     }
     if (from.getSamplePurposeId() != null) {
       to.setSamplePurpose(new SamplePurposeImpl());
@@ -748,8 +751,11 @@ public class Dtos {
     dto.setLibraryId(from.getLibrary().getId());
     dto.setTissueOrigin(asDto(from.getTissueOrigin()));
     dto.setTissueType(asDto(from.getTissueType()));
-    if (from.getSampleGroupId() != null) {
-      dto.setSampleGroup(asDto(from.getSampleGroupId()));
+    if (from.getGroupId() != null) {
+      dto.setGroupId(from.getGroupId());
+    }
+    if (from.getGroupDescription() != null) {
+      dto.setGroupDescription(from.getGroupDescription());
     }
     if (from.getPrepKit() != null) {
       dto.setPrepKit(asDto(from.getPrepKit()));
@@ -778,8 +784,9 @@ public class Dtos {
     to.setLibraryId(from.getLibraryId());
     to.setTissueOrigin(to(from.getTissueOrigin()));
     to.setTissueType(to(from.getTissueType()));
-    if (from.getSampleGroup() != null) {
-      to.setSampleGroupId(to(from.getSampleGroup()));
+    if (from.getGroupId() != null) {
+      to.setGroupId(from.getGroupId());
+      to.setGroupDescription(from.getGroupDescription());
     }
     if (from.getPrepKit() != null) {
       to.setPrepKit(to(from.getPrepKit()));

@@ -514,21 +514,13 @@
             <tr>
               <td class="h">Group ID:</td>
               <td>
-                <c:choose>
-                  <c:when test="${sample.id == 0}">
-                    <form:select id="sampleGroup" path="sampleAnalyte.sampleGroup">
-                      <%-- list filtered and filled by js --%>
-                      <script type="text/javascript">
-                        jQuery(document).ready(function () {
-                          Sample.ui.filterSampleGroupOptions();
-                        });
-                      </script>
-                    </form:select>
-                  </c:when>
-                  <c:otherwise>
-                    ${!empty sample.sampleAnalyte.sampleGroup ? sample.sampleAnalyte.sampleGroup.groupId : 'n/a'}
-                  </c:otherwise>
-                </c:choose>
+                <form:input id="groupId" path="sampleAnalyte.groupId"/>
+              </td>
+            </tr>
+            <tr>
+              <td class="h">Group Description:</td>
+              <td>
+                <form:input id="groupDescription" path="sampleAnalyte.groupDescription"/>
               </td>
             </tr>
             <tr>

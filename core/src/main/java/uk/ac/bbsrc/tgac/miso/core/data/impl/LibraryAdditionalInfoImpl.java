@@ -41,9 +41,8 @@ public class LibraryAdditionalInfoImpl implements LibraryAdditionalInfo {
   @JoinColumn(name = "tissueTypeId", nullable = false)
   private TissueType tissueType;
 
-  @OneToOne(targetEntity = SampleGroupImpl.class)
-  @JoinColumn(name = "sampleGroupId", nullable = true)
-  private SampleGroupId sampleGroupId;
+  private Long groupId;
+  private String groupDescription;
 
   private Long kitDescriptorId;
 
@@ -112,13 +111,23 @@ public class LibraryAdditionalInfoImpl implements LibraryAdditionalInfo {
   }
 
   @Override
-  public SampleGroupId getSampleGroupId() {
-    return sampleGroupId;
+  public Long getGroupId() {
+    return groupId;
   }
 
   @Override
-  public void setSampleGroupId(SampleGroupId sampleGroupId) {
-    this.sampleGroupId = sampleGroupId;
+  public void setGroupId(Long groupId) {
+    this.groupId = groupId;
+  }
+
+  @Override
+  public String getGroupDescription() {
+    return groupDescription;
+  }
+
+  @Override
+  public void setGroupDescription(String groupDescription) {
+    this.groupDescription = groupDescription;
   }
 
   @Override
