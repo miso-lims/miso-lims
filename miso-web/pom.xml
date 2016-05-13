@@ -95,7 +95,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-war-plugin</artifactId>
-	          <version>2.3</version>
+            <version>${war-plugin-version}</version>
             <configuration>
               <webResources>
                 <resource>
@@ -149,7 +149,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-war-plugin</artifactId>
-            <version>2.3</version>
+            <version>${war-plugin-version}</version>
             <configuration>
               <webResources>
                 <resource>
@@ -202,7 +202,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-war-plugin</artifactId>
-            <version>2.3</version>
+            <version>${war-plugin-version}</version>
             <configuration>
               <webResources>
                 <resource>
@@ -244,7 +244,6 @@
             <directory>src/main/resources</directory>
             <filtering>true</filtering>
             <includes>
-              <include>conan/</include>
               <include>fluxion/</include>
               <include>status/</include>
             </includes>
@@ -268,13 +267,11 @@
       <url>http://www.hasbanana.com/maven/repo</url>
     </repository>
 
-    <!--
-    <repository>
+    <!--<repository>
       <id>sonatype-sourceforge-snapshots</id>
       <name>Sonatype SF Repository</name>
       <url>http://oss.sonatype.org/content/repositories/sourceforge-snapshots/</url>
-    </repository>
-    -->
+    </repository>-->
 
     <repository>
       <id>Atlassian Maven Repository</id>
@@ -520,19 +517,19 @@
     <dependency>
       <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
       <artifactId>oauth-signature</artifactId>
-      <version>1.19</version>
+      <version>1.5</version>
     </dependency>
 
     <dependency>
       <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
       <artifactId>oauth-client</artifactId>
-      <version>1.19</version>
+      <version>1.5</version>
     </dependency>
 
     <dependency>
       <groupId>com.sun.jersey.contribs</groupId>
       <artifactId>jersey-apache-client</artifactId>
-      <version>1.19</version>
+      <version>1.5</version>
     </dependency>
     <!--
     <dependency>
@@ -543,6 +540,7 @@
     -->
   </dependencies>
   <properties>
+    <war-plugin-version>2.4</war-plugin-version>
     <jdom-version>1.1</jdom-version>
     <jstl-version>1.2</jstl-version>
     <javassist-version>3.8.0.GA</javassist-version>
