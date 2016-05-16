@@ -87,7 +87,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAnalyte.StrStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleGroupId;
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
@@ -101,7 +100,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.QcPassedDetailImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAdditionalInfoImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAnalyteImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleGroupImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SamplePurposeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl;
@@ -603,19 +601,6 @@ public class EditSampleController {
       }
     });
     
-    binder.registerCustomEditor(SampleGroupId.class, "sampleAnalyte.sampleGroup", new PropertyEditorSupport() {
-      @Override
-      public void setAsText(String text) throws IllegalArgumentException {
-        if (isStringEmptyOrNull(text)) {
-          setValue(null);
-        } else {
-          SampleGroupId sg = new SampleGroupImpl();
-          sg.setId(Long.valueOf(text));
-          setValue(sg);
-        }
-      }
-    });
-    
     binder.registerCustomEditor(SamplePurpose.class, "sampleAnalyte.samplePurpose", new PropertyEditorSupport() {
       @Override
       public void setAsText(String text) throws IllegalArgumentException {
@@ -639,6 +624,13 @@ public class EditSampleController {
           tm.setId(Long.valueOf(text));
           setValue(tm);
         }
+      }
+    });
+    
+    binder.registerCustomEditor(Long.class, new PropertyEditorSupport() {
+      @Override
+      public void setAsText(String text) throws IllegalArgumentException {
+        setValue(isStringEmptyOrNull(text) ? null : Long.valueOf(text));
       }
     });
   }
