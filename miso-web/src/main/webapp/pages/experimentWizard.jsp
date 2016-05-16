@@ -27,7 +27,6 @@
 
 --%>
 <%@ include file="../header.jsp" %>
-<script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.breadcrumbs.popup.js'/>"></script>
 
 <div id="maincontent">
   <div id="contentcolumn">

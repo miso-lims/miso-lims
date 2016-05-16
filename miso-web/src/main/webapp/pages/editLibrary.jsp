@@ -72,32 +72,32 @@
     <li>
       <div class="breadcrumbsbubbleInfo">
         <div class="trigger">
-          <a href='<c:url value="/miso/project/${library.sample.project.id}"/>'>${library.sample.project.name}</a>
+          <a href='<c:url value="/miso/project/${library.sample.project.id}"/>'>${library.sample.project.alias}</a>
         </div>
         <div class="breadcrumbspopup">
-            ${library.sample.project.alias}
+            ${library.sample.project.name}
         </div>
       </div>
     </li>
     <li>
       <div class="breadcrumbsbubbleInfo">
         <div class="trigger">
-          <a href='<c:url value="/miso/sample/${library.sample.id}"/>'>${library.sample.name}</a>
+          <a href='<c:url value="/miso/sample/${library.sample.id}"/>'>${library.sample.alias}</a>
         </div>
         <div class="breadcrumbspopup">
-            ${library.sample.alias}
+            ${library.sample.name}
         </div>
       </div>
     </li>
   </ul>
   <c:if test="${not empty nextLibrary}">
     <span style="float:right; padding-top: 5px; padding-left: 6px">
-      <a class='arrowright' href='<c:url value="/miso/library/${nextLibrary.id}"/>'>Next Library <b>${nextLibrary.name}</b></a>
+      <a class='arrowright' href='<c:url value="/miso/library/${nextLibrary.id}"/>'>Next Library <b>${nextLibrary.alias}</b></a>
     </span>
   </c:if>
   <c:if test="${not empty previousLibrary}">
     <span style="float:right; padding-top: 5px">
-      <a class='arrowleft' href='<c:url value="/miso/library/${previousLibrary.id}"/>'>Previous Library <b>${previousLibrary.name}</b></a>
+      <a class='arrowleft' href='<c:url value="/miso/library/${previousLibrary.id}"/>'>Previous Library <b>${previousLibrary.alias}</b></a>
     </span>
   </c:if>
 </div>
@@ -192,7 +192,7 @@
         <i>Unassigned</i>
       </c:when>
       <c:otherwise>
-        <a href='<c:url value="/miso/sample/${library.sample.id}"/>'>${library.sample.name} (${library.sample.alias})</a>
+        <a href='<c:url value="/miso/sample/${library.sample.id}"/>'>${library.sample.alias} (${library.sample.name})</a>
       </c:otherwise>
     </c:choose>
   </td>
@@ -1048,20 +1048,20 @@
       <li>
         <div class="breadcrumbsbubbleInfo">
           <div class="trigger">
-            <a href='<c:url value="/miso/project/${library.sample.project.id}"/>'>${library.sample.project.name}</a>
+            <a href='<c:url value="/miso/project/${library.sample.project.id}"/>'>${library.sample.project.alias}</a>
           </div>
           <div class="breadcrumbspopup">
-              ${library.sample.project.alias}
+              ${library.sample.project.name}
           </div>
         </div>
       </li>
       <li>
         <div class="breadcrumbsbubbleInfo">
           <div class="trigger">
-            <a href='<c:url value="/miso/sample/${library.sample.id}"/>'>${library.sample.name}</a>
+            <a href='<c:url value="/miso/sample/${library.sample.id}"/>'>${library.sample.alias}</a>
           </div>
           <div class="breadcrumbspopup">
-              ${library.sample.alias}
+              ${library.sample.name}
           </div>
         </div>
       </li>
