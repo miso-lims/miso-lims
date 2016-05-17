@@ -25,11 +25,13 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
+import java.beans.PropertyEditorSupport;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -47,6 +49,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -78,12 +82,15 @@ import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAdditionalInfoImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCR;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
+import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
@@ -369,6 +376,55 @@ public class EditLibraryController {
   public String emPCRDilutionUnits() {
     return emPCRDilution.UNITS;
   }
+  
+  @ModelAttribute("prepKits")
+  public List<KitDescriptor> getPrepKits() throws IOException {
+    List<KitDescriptor> list = new ArrayList<>(requestManager.listKitDescriptorsByType(KitType.LIBRARY));
+    Collections.sort(list, new Comparator<KitDescriptor>() {
+      @Override
+      public int compare(KitDescriptor kd1, KitDescriptor kd2) {
+        return kd1.getName().compareTo(kd2.getName());
+      }
+    });
+    return list;
+  }
+  
+  /**
+   * Adds child entities to a new detailed Library so they can be bound in the JSP. These will not all be useful for the same
+   * object, but are all included to accommodate the JSP.
+   * @param library
+   */
+  private void addNewDetailedLibraryEntities(Library library) {
+    library.setLibraryAdditionalInfo(new LibraryAdditionalInfoImpl());
+    library.getLibraryAdditionalInfo().setPrepKit(new KitDescriptor());
+  }
+
+  private void populateDesigns(ModelMap model, SampleClass sampleClass) throws IOException {
+    JSONArray array = new JSONArray();
+    JsonConfig config = new JsonConfig();
+    config.setExcludes(new String[] { "sampleClass" });
+    Collection<LibraryDesign> designs = requestManager.listLibraryDesignByClass(sampleClass);
+    array.addAll(designs, config);
+    model.put("libraryDesignsJSON", array.toString());
+    model.put("libraryDesigns", designs);
+  }
+  
+  /**
+   * Translates foreign keys to entity objects with only the ID set, to be used in service layer to reload persisted child objects
+   * 
+   * @param binder
+   */
+  @InitBinder
+  public void includeForeignKeys(WebDataBinder binder) {
+    binder.registerCustomEditor(KitDescriptor.class, "libraryAdditionalInfo.prepKit", new PropertyEditorSupport() {
+      @Override
+      public void setAsText(String text) throws IllegalArgumentException {
+        KitDescriptor to = new KitDescriptor();
+        to.setId(Long.valueOf(text));
+        setValue(to);
+      }
+    });
+  }
 
   // Handsontable
   @ModelAttribute("referenceDataJSON")
@@ -645,6 +701,9 @@ public class EditLibraryController {
       Library library = null;
       if (libraryId == AbstractLibrary.UNSAVED_ID) {
         library = dataObjectFactory.getLibrary(user);
+        if (isDetailedSampleEnabled()) {
+          addNewDetailedLibraryEntities(library);
+        }
         model.put("title", "New Library");
       } else {
         library = requestManager.getLibraryById(libraryId);
@@ -667,6 +726,10 @@ public class EditLibraryController {
         if (sample.getSampleAdditionalInfo() != null) {
           sampleClass = sample.getSampleAdditionalInfo().getSampleClass();
           library.setLibraryAdditionalInfo(new LibraryAdditionalInfoImpl());
+          library.getLibraryAdditionalInfo().setTissueOrigin(sample.getSampleAdditionalInfo().getTissueOrigin());
+          library.getLibraryAdditionalInfo().setTissueType(sample.getSampleAdditionalInfo().getTissueType());
+          //library.getLibraryAdditionalInfo().setGroupId(library.getSample().getSampleAnalyte().getGroupId());
+          // library.getLibraryAdditionalInfo().setGroupDescription(library.getSample().getSampleAnalyte().getGroupDescription());
         }
 
         List<Sample> projectSamples = new ArrayList<Sample>(requestManager.listAllSamplesByProjectId(sample.getProject().getProjectId()));
@@ -733,16 +796,6 @@ public class EditLibraryController {
       }
       throw new IOException(e);
     }
-  }
-
-  private void populateDesigns(ModelMap model, SampleClass sampleClass) throws IOException {
-    JSONArray array = new JSONArray();
-    JsonConfig config = new JsonConfig();
-    config.setExcludes(new String[] { "sampleClass" });
-    Collection<LibraryDesign> designs = requestManager.listLibraryDesignByClass(sampleClass);
-    array.addAll(designs, config);
-    model.put("libraryDesignsJSON", array.toString());
-    model.put("libraryDesigns", designs);
   }
 
   /**

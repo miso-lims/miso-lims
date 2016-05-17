@@ -438,12 +438,18 @@
 </tr>
 </table>
 
-<c:if test="${detailedSample}">
+<c:if test="${!empty library.libraryAdditionalInfo}">
 <br/>
 <br/>
 <h2>Details</h2>
-<br/>
 <table class="in">
+  <tr>
+    <td>Library Kit:*</td>
+    <td>
+      <miso:select id="libraryKit" path="libraryAdditionalInfo.prepKit" items="${prepKits}" itemLabel="name"
+          itemValue="id" defaultLabel="Unknown" defaultValue=""/>
+    </td>
+  </tr>
 <c:choose>
 <c:when test="${library.id == 0}">
   <tr>
@@ -486,6 +492,10 @@
   </c:if>
 </c:otherwise>
 </c:choose>
+  <tr>
+    <td class="h">Archived:</td>
+    <td><form:checkbox id="archived" path="libraryAdditionalInfo.archived"/></td>
+  </tr>
 </table>
 </c:if>
 
