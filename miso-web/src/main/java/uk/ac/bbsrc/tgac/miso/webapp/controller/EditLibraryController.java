@@ -85,6 +85,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
+import uk.ac.bbsrc.tgac.miso.core.data.TagBarcodeFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAdditionalInfoImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCR;
@@ -99,8 +100,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
-import uk.ac.bbsrc.tgac.miso.core.service.tagbarcode.TagBarcodeStrategy;
-import uk.ac.bbsrc.tgac.miso.core.service.tagbarcode.TagBarcodeStrategyResolverService;
+import uk.ac.bbsrc.tgac.miso.core.service.TagBarcodeService;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignDao;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -124,6 +124,12 @@ import uk.ac.bbsrc.tgac.miso.service.LibraryAdditionalInfoService;
 public class EditLibraryController {
   protected static final Logger log = LoggerFactory.getLogger(EditLibraryController.class);
 
+  private static final TagBarcodeFamily BARCODE_FAMILY_NEEDS_PLATFORM = new TagBarcodeFamily();
+
+  static {
+    BARCODE_FAMILY_NEEDS_PLATFORM.setName("Please select a platform...");
+  }
+
   @Autowired
   private SecurityManager securityManager;
 
@@ -134,7 +140,7 @@ public class EditLibraryController {
   private DataObjectFactory dataObjectFactory;
 
   @Autowired
-  private TagBarcodeStrategyResolverService tagBarcodeStrategyResolverService;
+  private TagBarcodeService tagBarcodeService;
 
   @Autowired
   private LibraryAdditionalInfoService libraryAdditionalInfoService;
@@ -157,8 +163,8 @@ public class EditLibraryController {
     this.securityManager = securityManager;
   }
 
-  public void setTagBarcodeStrategyResolverService(TagBarcodeStrategyResolverService tagBarcodeStrategyResolverService) {
-    this.tagBarcodeStrategyResolverService = tagBarcodeStrategyResolverService;
+  public void setTagBarcodeService(TagBarcodeService tagBarcodeService) {
+    this.tagBarcodeService = tagBarcodeService;
   }
 
   public void setLibraryAdditionalInfoService(LibraryAdditionalInfoService libraryAdditionalInfoService) {
@@ -325,26 +331,23 @@ public class EditLibraryController {
     return LimsUtils.join(types, ",");
   }
 
-  public Collection<TagBarcodeStrategy> populateAvailableTagBarcodeStrategies(Library l) throws IOException {
-    List<TagBarcodeStrategy> strategies = new ArrayList<TagBarcodeStrategy>(
-        tagBarcodeStrategyResolverService.getTagBarcodeStrategiesByPlatform(PlatformType.get(l.getPlatformName())));
-    return strategies;
-  }
-
-  public Collection<TagBarcode> populateAvailableTagBarcodes(Library l) throws IOException {
-    List<TagBarcode> barcodes = new ArrayList<TagBarcode>(requestManager.listAllTagBarcodesByPlatform(l.getPlatformName()));
-    Collections.sort(barcodes);
-    return barcodes;
-  }
-
-  public String tagBarcodesString(String platformName) throws IOException {
-    List<TagBarcode> tagBarcodes = new ArrayList<TagBarcode>(requestManager.listAllTagBarcodesByPlatform(platformName));
-    Collections.sort(tagBarcodes);
-    List<String> names = new ArrayList<String>();
-    for (TagBarcode tb : tagBarcodes) {
-      names.add("\"" + tb.getName() + " (" + tb.getSequence() + ")\"" + ":" + "\"" + tb.getId() + "\"");
+  public void populateAvailableTagBarcodeStrategies(Library library, ModelMap model) throws IOException {
+    if (isStringEmptyOrNull(library.getPlatformName())) {
+      model.put("barcodeFamiliesJSON", "[]");
+      model.put("barcodeFamilies", Collections.singleton(BARCODE_FAMILY_NEEDS_PLATFORM));
+    } else {
+      Collection<TagBarcodeFamily> families = tagBarcodeService
+          .getTagBarcodeFamiliesByPlatform(PlatformType.get(library.getPlatformName()));
+      List<TagBarcodeFamily> visbileFamilies = new ArrayList<>();
+      visbileFamilies.add(TagBarcodeFamily.NULL);
+      visbileFamilies.addAll(families);
+      JSONArray familiesJson = new JSONArray();
+      JsonConfig config = new JsonConfig();
+      config.setExcludes(new String[] { "family" });
+      familiesJson.addAll(families, config);
+      model.put("barcodeFamiliesJSON", familiesJson.toString());
+      model.put("barcodeFamilies", visbileFamilies);
     }
-    return LimsUtils.join(names, ",");
   }
 
   @ModelAttribute("libraryInitialConcentrationUnits")
@@ -474,10 +477,9 @@ public class EditLibraryController {
     final List<JSONObject> rtnList = new ArrayList<JSONObject>();
     try {
       if (!isStringEmptyOrNull(barcodeStrategy)) {
-        final TagBarcodeStrategy tbs = tagBarcodeStrategyResolverService.getTagBarcodeStrategy(barcodeStrategy);
+        final TagBarcodeFamily tbs = tagBarcodeService.getTagBarcodeFamilyByName(barcodeStrategy);
         if (tbs != null) {
-          final List<TagBarcode> tagBarcodes = new ArrayList<TagBarcode>(tbs.getApplicableBarcodesForPosition(Integer.parseInt(position)));
-          for (final TagBarcode tb : tagBarcodes) {
+          for (final TagBarcode tb : tbs.getBarcodesForPosition(Integer.parseInt(position))) {
             final JSONObject obj = new JSONObject();
             obj.put("id", tb.getId());
             obj.put("name", tb.getName());
@@ -517,10 +519,10 @@ public class EditLibraryController {
       strategy = strategy.trim();
       log.warn("strategy = " + strategy);
       System.out.println("strategy = " + strategy);
-      final TagBarcodeStrategy tbs = tagBarcodeStrategyResolverService.getTagBarcodeStrategy(strategy);
+      final TagBarcodeFamily tbs = tagBarcodeService.getTagBarcodeFamilyByName(strategy);
       if (tbs != null) {
         rtn = new JSONObject();
-        rtn.put("numApplicableBarcodes", tbs.getNumApplicableBarcodes());
+        rtn.put("numApplicableBarcodes", tbs.getMaximumNumber());
       } else {
         rtn = JSONUtils.SimpleJSONError("No strategy found with the name: \"" + strategy + "\"");
       }
@@ -537,10 +539,8 @@ public class EditLibraryController {
 
     if (platform != null && !"".equals(platform)) {
       final List<String> rtnStrat = new ArrayList<String>();
-      for (final TagBarcodeStrategy t : tagBarcodeStrategyResolverService.getTagBarcodeStrategiesByPlatform(PlatformType.get(platform))) {
-        if (!t.getApplicableBarcodesForPosition(1).isEmpty()) {
-          rtnStrat.add(t.getName());
-        }
+      for (final TagBarcodeFamily t : tagBarcodeService.getTagBarcodeFamiliesByPlatform(PlatformType.get(platform))) {
+        rtnStrat.add(t.getName());
       }
       rtn.put("barcodeKits", rtnStrat);
     }
@@ -564,7 +564,7 @@ public class EditLibraryController {
   public @ResponseBody String jsonRestBarcodeStrategies(@RequestParam("platform") String platform) throws IOException {
     if (!isStringEmptyOrNull(platform)) {
       List<String> types = new ArrayList<String>();
-      for (TagBarcodeStrategy t : tagBarcodeStrategyResolverService.getTagBarcodeStrategiesByPlatform(PlatformType.get(platform))) {
+      for (TagBarcodeFamily t : tagBarcodeService.getTagBarcodeFamiliesByPlatform(PlatformType.get(platform))) {
         types.add("\"" + t.getName() + "\"" + ":" + "\"" + t.getName() + "\"");
       }
       return "{" + LimsUtils.join(types, ",") + "}";
@@ -577,11 +577,10 @@ public class EditLibraryController {
   public @ResponseBody String jsonRestTagBarcodes(@RequestParam("barcodeStrategy") String barcodeStrategy,
       @RequestParam("position") String position) throws IOException {
     if (!isStringEmptyOrNull(barcodeStrategy)) {
-      TagBarcodeStrategy tbs = tagBarcodeStrategyResolverService.getTagBarcodeStrategy(barcodeStrategy);
+      TagBarcodeFamily tbs = tagBarcodeService.getTagBarcodeFamilyByName(barcodeStrategy);
       if (tbs != null) {
-        List<TagBarcode> tagBarcodes = new ArrayList<TagBarcode>(tbs.getApplicableBarcodesForPosition(Integer.parseInt(position)));
         List<String> names = new ArrayList<String>();
-        for (TagBarcode tb : tagBarcodes) {
+        for (TagBarcode tb : tbs.getBarcodesForPosition(Integer.parseInt(position))) {
           names.add("\"" + tb.getId() + "\"" + ":" + "\"" + tb.getName() + " (" + tb.getSequence() + ")\"");
         }
         return "{" + LimsUtils.join(names, ",") + "}";
@@ -656,13 +655,7 @@ public class EditLibraryController {
       model.put("emPCRs", pcrs);
       model.put("emPcrDilutions", populateEmPcrDilutions(user, pcrs));
 
-      if (library.getTagBarcodes() != null && !library.getTagBarcodes().isEmpty() && library.getTagBarcodes().get(1) != null) {
-        model.put("selectedTagBarcodeStrategy", library.getTagBarcodes().get(1).getStrategyName());
-        model.put("availableTagBarcodeStrategyBarcodes", tagBarcodeStrategyResolverService
-            .getTagBarcodeStrategy(library.getTagBarcodes().get(1).getStrategyName()).getApplicableBarcodes());
-      }
-      model.put("availableTagBarcodeStrategies", populateAvailableTagBarcodeStrategies(library));
-
+      populateAvailableTagBarcodeStrategies(library, model);
       Map<String, Library> adjacentLibraries = getAdjacentLibrariesInProject(library, library.getSample().getProject());
       if (!adjacentLibraries.isEmpty()) {
         model.put("previousLibrary", adjacentLibraries.get("previousLibrary"));
@@ -709,9 +702,8 @@ public class EditLibraryController {
         library = requestManager.getLibraryById(libraryId);
         model.put("title", "Library " + libraryId);
         if (library.getTagBarcodes() != null && !library.getTagBarcodes().isEmpty() && library.getTagBarcodes().get(1) != null) {
-          model.put("selectedTagBarcodeStrategy", library.getTagBarcodes().get(1).getStrategyName());
-          model.put("availableTagBarcodeStrategyBarcodes", tagBarcodeStrategyResolverService
-              .getTagBarcodeStrategy(library.getTagBarcodes().get(1).getStrategyName()).getApplicableBarcodes());
+          model.put("selectedTagBarcodeStrategy", library.getTagBarcodes().get(1).getFamily().getName());
+          model.put("availableTagBarcodeStrategyBarcodes", library.getTagBarcodes().get(1).getFamily().getBarcodes());
         }
       }
 
@@ -764,7 +756,7 @@ public class EditLibraryController {
       Collection<emPCR> pcrs = populateEmPcrs(user, library);
       model.put("emPCRs", pcrs);
       model.put("emPcrDilutions", populateEmPcrDilutions(user, pcrs));
-      model.put("availableTagBarcodeStrategies", populateAvailableTagBarcodeStrategies(library));
+      populateAvailableTagBarcodeStrategies(library, model);
 
       Map<String, Library> adjacentLibraries = getAdjacentLibrariesInProject(library, library.getSample().getProject());
       if (!adjacentLibraries.isEmpty()) {

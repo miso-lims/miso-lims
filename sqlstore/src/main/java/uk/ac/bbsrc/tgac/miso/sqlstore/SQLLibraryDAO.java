@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +39,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -63,7 +65,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.TagBarcodeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
@@ -82,6 +83,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
+import uk.ac.bbsrc.tgac.miso.core.store.TagBarcodeStore;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.persistence.LibraryAdditionalInfoDao;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
@@ -169,8 +171,7 @@ public class SQLLibraryDAO implements LibraryStore {
 
   public static final String TAG_BARCODE_SELECT_BY_NAME = TAG_BARCODES_SELECT + " WHERE name = ? ORDER by tagId";
 
-  public static final String TAG_BARCODE_SELECT_BY_LIBRARY_ID = "SELECT tb.tagId, tb.name, tb.sequence, tb.platformName, tb.strategyName "
-      + "FROM TagBarcodes tb, Library_TagBarcode lt " + "WHERE tb.tagId = lt.barcode_barcodeId " + "AND lt.library_libraryId = ? ";
+  public static final String TAG_BARCODE_SELECT_BY_LIBRARY_ID = "SELECT barcode_barcodeId FROM Library_TagBarcode WHERE library_libraryId = ?";
 
   public static final String TAG_BARCODES_SELECT_BY_PLATFORM = TAG_BARCODES_SELECT + " WHERE platformName = ? ORDER by tagId";
 
@@ -196,6 +197,8 @@ public class SQLLibraryDAO implements LibraryStore {
   private BoxStore boxDAO;
   @Autowired
   private LibraryAdditionalInfoDao libraryAdditionalInfoDAO;
+  @Autowired
+  private TagBarcodeStore tagBarcodeStrategyStore;
 
   @Autowired
   private MisoNamingScheme<Library> libraryNamingScheme;
@@ -409,11 +412,13 @@ public class SQLLibraryDAO implements LibraryStore {
     if (library.getTagBarcodes() != null && !library.getTagBarcodes().isEmpty()) {
       SimpleJdbcInsert eInsert = new SimpleJdbcInsert(template).withTableName("Library_TagBarcode");
 
-      for (TagBarcode t : library.getTagBarcodes().values()) {
-        MapSqlParameterSource ltParams = new MapSqlParameterSource();
-        ltParams.addValue("library_libraryId", library.getId());
-        ltParams.addValue("barcode_barcodeId", t.getId());
-        eInsert.execute(ltParams);
+      for (TagBarcode t : library.getTagBarcodes()) {
+        if (t != null) {
+          MapSqlParameterSource ltParams = new MapSqlParameterSource();
+          ltParams.addValue("library_libraryId", library.getId());
+          ltParams.addValue("barcode_barcodeId", t.getId());
+          eInsert.execute(ltParams);
+        }
       }
     }
 
@@ -656,54 +661,6 @@ public class SQLLibraryDAO implements LibraryStore {
     return template.query(LIBRARY_STRATEGY_TYPES_SELECT, new LibraryStrategyTypeMapper());
   }
 
-  @Override
-  public TagBarcode getTagBarcodeById(long tagBarcodeId) throws IOException {
-    List eResults = template.query(TAG_BARCODE_SELECT_BY_ID, new Object[] { tagBarcodeId }, new TagBarcodeMapper());
-    TagBarcode e = eResults.size() > 0 ? (TagBarcode) eResults.get(0) : null;
-    return e;
-  }
-
-  public TagBarcode getTagBarcodeByName(String name) throws IOException {
-    List eResults = template.query(TAG_BARCODE_SELECT_BY_NAME, new Object[] { name }, new TagBarcodeMapper());
-    TagBarcode e = eResults.size() > 0 ? (TagBarcode) eResults.get(0) : null;
-    return e;
-  }
-
-  public TagBarcode getTagBarcodeByLibraryId(long libraryId) throws IOException {
-    List eResults = template.query(TAG_BARCODE_SELECT_BY_LIBRARY_ID, new Object[] { libraryId }, new TagBarcodeMapper());
-    TagBarcode e = eResults.size() > 0 ? (TagBarcode) eResults.get(0) : null;
-    return e;
-  }
-
-  public HashMap<Integer, TagBarcode> getTagBarcodesByLibraryId(long libraryId) throws IOException {
-    List<TagBarcode> eResults = template.query(TAG_BARCODE_SELECT_BY_LIBRARY_ID, new Object[] { libraryId }, new TagBarcodeMapper());
-    if (!eResults.isEmpty()) {
-      HashMap<Integer, TagBarcode> map = new HashMap<Integer, TagBarcode>();
-      int count = 1;
-      for (TagBarcode t : eResults) {
-        map.put(count, t);
-        count++;
-      }
-      return map;
-    }
-    return new HashMap<Integer, TagBarcode>();
-  }
-
-  @Override
-  public List<TagBarcode> listTagBarcodesByPlatform(String platformType) throws IOException {
-    return template.query(TAG_BARCODES_SELECT_BY_PLATFORM, new Object[] { platformType }, new TagBarcodeMapper());
-  }
-
-  @Override
-  public List<TagBarcode> listTagBarcodesByStrategyName(String strategyName) throws IOException {
-    return template.query(TAG_BARCODES_SELECT_BY_STRATEGY_NAME, new Object[] { strategyName }, new TagBarcodeMapper());
-  }
-
-  @Override
-  public List<TagBarcode> listAllTagBarcodes() throws IOException {
-    return template.query(TAG_BARCODES_SELECT, new TagBarcodeMapper());
-  }
-
   public ChangeLogStore getChangeLogDAO() {
     return changeLogDAO;
   }
@@ -782,7 +739,16 @@ public class SQLLibraryDAO implements LibraryStore {
         library.setLibrarySelectionType(getLibrarySelectionTypeById(rs.getLong("librarySelectionType")));
         library.setLibraryStrategyType(getLibraryStrategyTypeById(rs.getLong("libraryStrategyType")));
 
-        library.setTagBarcodes(getTagBarcodesByLibraryId(id));
+        final List<TagBarcode> barcodes = new ArrayList<>();
+        template.query(TAG_BARCODE_SELECT_BY_LIBRARY_ID, new Object[] { id }, new RowCallbackHandler() {
+
+          @Override
+          public void processRow(ResultSet brs) throws SQLException {
+            TagBarcode b = tagBarcodeStrategyStore.getTagBarcodeById(brs.getLong("barcode_barcodeId"));
+            barcodes.add(b);
+          }
+        });
+        library.setTagBarcodes(barcodes);
 
         if (!isLazy()) {
           library.setSample(sampleDAO.get(rs.getLong("sample_sampleId")));
@@ -847,19 +813,6 @@ public class SQLLibraryDAO implements LibraryStore {
       lst.setName(rs.getString("name"));
       lst.setDescription(rs.getString("description"));
       return lst;
-    }
-  }
-
-  public class TagBarcodeMapper implements RowMapper<TagBarcode> {
-    @Override
-    public TagBarcode mapRow(ResultSet rs, int rowNum) throws SQLException {
-      TagBarcode tb = new TagBarcodeImpl();
-      tb.setId(rs.getLong("tagId"));
-      tb.setName(rs.getString("name"));
-      tb.setSequence(rs.getString("sequence"));
-      tb.setPlatformType(PlatformType.get(rs.getString("platformName")));
-      tb.setStrategyName(rs.getString("strategyName"));
-      return tb;
     }
   }
 

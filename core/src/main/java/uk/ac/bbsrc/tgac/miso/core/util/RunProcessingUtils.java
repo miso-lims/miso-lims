@@ -73,15 +73,14 @@ public class RunProcessingUtils {
               .append(ld.getLibrary().getSample().getAlias().replaceAll("\\s", "")).append(",");
 
           if (ld.getLibrary().getTagBarcodes() != null && !ld.getLibrary().getTagBarcodes().isEmpty()) {
-            Map<Integer, TagBarcode> barcodes = new TreeMap<Integer, TagBarcode>(ld.getLibrary().getTagBarcodes());
-            int bcount = 1;
-            for (Integer key : barcodes.keySet()) {
-              TagBarcode t = barcodes.get(key);
+            boolean first = true;
+            for (TagBarcode t : ld.getLibrary().getTagBarcodes()) {
               sb.append(t.getSequence());
-              if (bcount < barcodes.keySet().size() && barcodes.keySet().size() > 1) {
+              if (first) {
+                first = false;
+              } else {
                 sb.append("-");
               }
-              bcount++;
             }
             sb.append(",");
           } else {

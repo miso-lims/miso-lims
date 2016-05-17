@@ -1,25 +1,24 @@
 package uk.ac.bbsrc.tgac.miso.core.test;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+
+import com.eaglegenomics.simlims.core.SecurityProfile;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
+import uk.ac.bbsrc.tgac.miso.core.data.TagBarcodeFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.TagBarcodeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoRequestManager;
-
-import com.eaglegenomics.simlims.core.SecurityProfile;
 
 /**
  * Mock request manager for form tests
@@ -78,11 +77,7 @@ public class MockFormTestRequestManager extends MisoRequestManager {
     p.setAlias("MockInputProject");
     s.setProject(p);
 
-    return new ArrayList<Sample>() {
-      {
-        add(s);
-      }
-    };
+    return Collections.singletonList(s);
   }
 
   @Override
@@ -103,21 +98,6 @@ public class MockFormTestRequestManager extends MisoRequestManager {
     qt.setDescription("Chip-based capillary electrophoresis machine to analyse RNA, DNA, and protein, manufactured by Agilent");
     qt.setUnits("nM");
     return qt;
-  }
-
-  @Override
-  public Collection<TagBarcode> listAllTagBarcodesByStrategyName(String name) {
-    final TagBarcode tb = new TagBarcodeImpl();
-    tb.setId(1L);
-    tb.setName("Index 1");
-    tb.setSequence("");
-    tb.setPlatformType(PlatformType.ILLUMINA);
-    tb.setStrategyName("TruSeq Single Index");
-    return new ArrayList<TagBarcode>() {
-      {
-        add(tb);
-      }
-    };
   }
 
   @Override

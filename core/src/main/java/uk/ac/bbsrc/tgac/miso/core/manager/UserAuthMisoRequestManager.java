@@ -1985,11 +1985,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public TagBarcode getTagBarcodeById(long tagBarcodeId) throws IOException {
-    return backingManager.getTagBarcodeById(tagBarcodeId);
-  }
-
-  @Override
   public Platform getPlatformById(long platformId) throws IOException {
     return backingManager.getPlatformById(platformId);
   }
@@ -2188,21 +2183,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   @Override
   public Collection<LibraryStrategyType> listAllLibraryStrategyTypes() throws IOException {
     return backingManager.listAllLibraryStrategyTypes();
-  }
-
-  @Override
-  public Collection<TagBarcode> listAllTagBarcodes() throws IOException {
-    return backingManager.listAllTagBarcodes();
-  }
-
-  @Override
-  public Collection<TagBarcode> listAllTagBarcodesByPlatform(String platformType) throws IOException {
-    return backingManager.listAllTagBarcodesByPlatform(platformType);
-  }
-
-  @Override
-  public Collection<TagBarcode> listAllTagBarcodesByStrategyName(String platformType) throws IOException {
-    return backingManager.listAllTagBarcodesByStrategyName(platformType);
   }
 
   @Override

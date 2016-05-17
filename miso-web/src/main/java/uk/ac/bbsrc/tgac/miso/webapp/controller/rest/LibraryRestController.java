@@ -24,9 +24,10 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.List;
 
 import javax.ws.rs.core.Response.Status;
 
@@ -56,6 +57,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.core.service.TagBarcodeService;
 import uk.ac.bbsrc.tgac.miso.core.util.jackson.ProjectSampleRecursionAvoidanceMixin;
 import uk.ac.bbsrc.tgac.miso.core.util.jackson.SampleRecursionAvoidanceMixin;
 import uk.ac.bbsrc.tgac.miso.core.util.jackson.UserInfoMixin;
@@ -82,9 +84,12 @@ public class LibraryRestController extends RestController {
 
   @Autowired
   private LibraryAdditionalInfoService libraryAdditionalInfoService;
-  
+
   @Autowired
   private AuthorizationManager authorizationManager;
+
+  @Autowired
+  private TagBarcodeService tagBarcodeStrategyService;
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
@@ -119,12 +124,12 @@ public class LibraryRestController extends RestController {
     library.setLibrarySelectionType(requestManager.getLibrarySelectionTypeById(libraryDto.getLibrarySelectionTypeId()));
     library.setLibraryStrategyType(requestManager.getLibraryStrategyTypeById(libraryDto.getLibraryStrategyTypeId()));
     library.setLibraryType(requestManager.getLibraryTypeById(libraryDto.getLibraryTypeId()));
-    HashMap<Integer, TagBarcode> tagBarcodes = new HashMap<>();
+    List<TagBarcode> tagBarcodes = new ArrayList<>();
     if (libraryDto.getTagBarcodeIndex1Id() != null) {
-      tagBarcodes.put(1, requestManager.getTagBarcodeById(libraryDto.getTagBarcodeIndex1Id()));
+      tagBarcodes.add(tagBarcodeStrategyService.getTagBarcodeById(libraryDto.getTagBarcodeIndex1Id()));
     }
     if (libraryDto.getTagBarcodeIndex2Id() != null) {
-      tagBarcodes.put(2, requestManager.getTagBarcodeById(libraryDto.getTagBarcodeIndex2Id()));
+      tagBarcodes.add(tagBarcodeStrategyService.getTagBarcodeById(libraryDto.getTagBarcodeIndex2Id()));
     }
     library.setTagBarcodes(tagBarcodes);
     Long id = requestManager.saveLibrary(library);

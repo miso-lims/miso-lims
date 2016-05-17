@@ -34,9 +34,6 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 import org.slf4j.Logger;
@@ -49,6 +46,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Plate;
@@ -60,14 +62,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.PlatePool;
 import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.core.service.TagBarcodeService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.util.FormUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.jackson.SampleRecursionAvoidanceMixin;
 import uk.ac.bbsrc.tgac.miso.webapp.service.forms.MisoFormsService;
-
-import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 @Controller
 @RequestMapping("/upload")
@@ -85,6 +85,12 @@ public class UploadController {
   public MisoFormsService misoFormsService;
   @Autowired
   private MisoNamingScheme<Library> libraryNamingScheme;
+  @Autowired
+  private TagBarcodeService tagBarcodeService;
+
+  public void setTagBarcodeService(TagBarcodeService tagBarcodeService) {
+    this.tagBarcodeService = tagBarcodeService;
+  }
 
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
@@ -137,7 +143,7 @@ public class UploadController {
     } else if (requestManager.getProjectById(Long.valueOf(projectId)) == null) {
       throw new IOException("Cannot upload file - service record does not exist");
     }
-    
+
     for (MultipartFile fileItem : getMultipartFiles(request)) {
       uploadFile(Project.class, projectId, fileItem);
     }
@@ -151,7 +157,7 @@ public class UploadController {
     } else if (requestManager.getProjectById(Long.valueOf(projectId)) == null) {
       throw new IOException("Cannot upload file - project does not exist");
     }
-    
+
     boolean taxonCheck = (Boolean) request.getSession().getServletContext().getAttribute("taxonLookupEnabled");
 
     try {
@@ -177,13 +183,13 @@ public class UploadController {
     } else if (requestManager.getProjectById(Long.valueOf(projectId)) == null) {
       throw new IOException("Cannot upload file - project does not exist");
     }
-    
+
     try {
       for (MultipartFile fileItem : getMultipartFiles(request)) {
         uploadFile(Project.class, projectId, fileItem);
         File f = filesManager.getFile(Project.class, projectId, fileItem.getOriginalFilename().replaceAll("\\s+", "_"));
         User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-        List<Sample> samples = FormUtils.importSampleInputSpreadsheet(f, user, requestManager, libraryNamingScheme);
+        List<Sample> samples = FormUtils.importSampleInputSpreadsheet(f, user, requestManager, libraryNamingScheme, tagBarcodeService);
 
         ObjectMapper mapper = new ObjectMapper();
 
@@ -210,7 +216,7 @@ public class UploadController {
     } else if (requestManager.getProjectById(Long.valueOf(projectId)) == null) {
       throw new IOException("Cannot upload file - project does not exist");
     }
-    
+
     try {
       JSONArray a = new JSONArray();
       JSONObject o = new JSONObject();
@@ -219,7 +225,8 @@ public class UploadController {
         uploadFile(Project.class, projectId, fileItem);
         File f = filesManager.getFile(Project.class, projectId, fileItem.getOriginalFilename().replaceAll("\\s+", "_"));
         User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-        Map<String, PlatePool> pooledPlates = FormUtils.importPlateInputSpreadsheet(f, user, requestManager, libraryNamingScheme);
+        Map<String, PlatePool> pooledPlates = FormUtils.importPlateInputSpreadsheet(f, user, requestManager, libraryNamingScheme,
+            tagBarcodeService);
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.getSerializationConfig().addMixInAnnotations(Sample.class, SampleRecursionAvoidanceMixin.class);
@@ -250,7 +257,8 @@ public class UploadController {
         uploadFile(Plate.class, "forms", fileItem);
         File f = filesManager.getFile(Plate.class, "forms", fileItem.getOriginalFilename().replaceAll("\\s+", "_"));
         User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-        Map<String, PlatePool> pooledPlates = FormUtils.importPlateInputSpreadsheet(f, user, requestManager, libraryNamingScheme);
+        Map<String, PlatePool> pooledPlates = FormUtils.importPlateInputSpreadsheet(f, user, requestManager, libraryNamingScheme,
+            tagBarcodeService);
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.getSerializationConfig().addMixInAnnotations(Sample.class, SampleRecursionAvoidanceMixin.class);
@@ -318,7 +326,7 @@ public class UploadController {
     } else if (requestManager.getLibraryById(Long.valueOf(libraryId)) == null) {
       throw new IOException("Cannot upload file - library does not exist");
     }
-    
+
     for (MultipartFile fileItem : getMultipartFiles(request)) {
       uploadFile(LibraryQC.class, libraryId + File.separator + "qc" + File.separator, fileItem);
     }
@@ -332,7 +340,7 @@ public class UploadController {
     } else if (requestManager.getSampleById(Long.valueOf(sampleId)) == null) {
       throw new IOException("Cannot upload file - sample does not exist");
     }
-    
+
     for (MultipartFile fileItem : getMultipartFiles(request)) {
       uploadFile(SampleQC.class, sampleId + File.separator + "qc" + File.separator, fileItem);
     }
@@ -358,7 +366,7 @@ public class UploadController {
       log.debug("UPLOAD FAIL:", e);
     }
   }
-  
+
   @RequestMapping(value = "/servicerecord", method = RequestMethod.POST)
   public void uploadServiceRecordDocument(MultipartHttpServletRequest request) throws IOException {
     String recordId = request.getParameter("serviceRecordId");
@@ -367,7 +375,7 @@ public class UploadController {
     } else if (requestManager.getSequencerServiceRecordById(Long.valueOf(recordId)) == null) {
       throw new IOException("Cannot upload file - service record does not exist");
     }
-    
+
     for (MultipartFile fileItem : getMultipartFiles(request)) {
       uploadFile(SequencerServiceRecord.class, recordId, fileItem);
     }

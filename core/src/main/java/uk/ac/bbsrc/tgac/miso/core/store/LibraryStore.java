@@ -30,7 +30,6 @@ import java.util.Map;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
@@ -99,13 +98,13 @@ public interface LibraryStore extends Store<Library>, Remover<Library>, NamingSc
    *           when
    */
   Collection<Library> listByProjectId(long projectId) throws IOException;
-  
+
   /**
    * List all Libraries associated with ids from the given id list
    * 
    * @return Collection<Library>
    * @throws IOException
-   *            when the objects cannot be retrieved or read
+   *           when the objects cannot be retrieved or read
    */
   Collection<Library> getByIdList(List<Long> idList) throws IOException;
 
@@ -189,17 +188,6 @@ public interface LibraryStore extends Store<Library>, Remover<Library>, NamingSc
   LibraryStrategyType getLibraryStrategyTypeByName(String name) throws IOException;
 
   /**
-   * Get a TagBarcode given a TagBarcode ID
-   * 
-   * @param tagBarcodeId
-   *          of type long
-   * @return TagBarcode
-   * @throws IOException
-   *           when
-   */
-  TagBarcode getTagBarcodeById(long tagBarcodeId) throws IOException;
-
-  /**
    * List all LibraryTypes
    * 
    * @return Collection<LibraryType>
@@ -238,33 +226,6 @@ public interface LibraryStore extends Store<Library>, Remover<Library>, NamingSc
   Collection<LibraryStrategyType> listAllLibraryStrategyTypes() throws IOException;
 
   /**
-   * List all TagBarcodes
-   * 
-   * @return Collection<LibraryStrategyType>
-   * @throws IOException
-   *           when
-   */
-  Collection<TagBarcode> listAllTagBarcodes() throws IOException;
-
-  /**
-   * List all TagBarcodes by a given Platform
-   * 
-   * @return Collection<TagBarcode>
-   * @throws IOException
-   *           when
-   */
-  Collection<TagBarcode> listTagBarcodesByPlatform(String platformName) throws IOException;
-
-  /**
-   * List all TagBarcodes in a given strategy
-   * 
-   * @return Collection<TagBarcode>
-   * @throws IOException
-   *           when
-   */
-  Collection<TagBarcode> listTagBarcodesByStrategyName(String strategyName) throws IOException;
-
-  /**
    * List all libraries related to a given LibraryDilution given a LibraryDilution ID
    * 
    * @param dilutionId
@@ -294,15 +255,15 @@ public interface LibraryStore extends Store<Library>, Remover<Library>, NamingSc
   Boxable getByPositionId(long positionId);
 
   /**
-   * List all libraries associated with an identificationBarcode from given list of
-   * identificationBarcodes (from scan)
+   * List all libraries associated with an identificationBarcode from given list of identificationBarcodes (from scan)
+   * 
    * @param barcodeList
    * @return Collection<Library>
    * @throws IOException
    *           when the objects cannot be retrieved
    */
   Collection<Library> getByBarcodeList(List<String> barcodeList) throws IOException;
-  
+
   /**
    * @return a map containing all column names and max lengths from the Library table
    * @throws IOException

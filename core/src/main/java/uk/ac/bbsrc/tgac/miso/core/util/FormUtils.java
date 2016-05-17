@@ -43,7 +43,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -76,6 +75,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
+import uk.ac.bbsrc.tgac.miso.core.data.TagBarcodeFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryQCImpl;
@@ -94,6 +94,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.InputFormException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.core.service.TagBarcodeService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.RequestManagerAwareNamingScheme;
 
@@ -2891,7 +2892,7 @@ public class FormUtils {
   // private static Map<String, Pool<Plate<LinkedList<Library>, Library>>> process384PlateInputODS(OdfSpreadsheetDocument oDoc, User u,
   // RequestManager manager, MisoNamingScheme<Library> libraryNamingScheme) throws Exception {
   private static Map<String, PlatePool> process384PlateInputODS(OdfSpreadsheetDocument oDoc, User u, RequestManager manager,
-      MisoNamingScheme<Library> libraryNamingScheme) throws Exception {
+      MisoNamingScheme<Library> libraryNamingScheme, TagBarcodeService tagBarcodeService) throws Exception {
     ((RequestManagerAwareNamingScheme) libraryNamingScheme).setRequestManager(manager);
 
     List<Sample> samples = new ArrayList<Sample>();
@@ -3127,33 +3128,11 @@ public class FormUtils {
               }
 
               if (!isStringEmptyOrNull(barcodeKitCell.getStringValue())) {
-                Collection<TagBarcode> bcs = manager.listAllTagBarcodesByStrategyName(barcodeKitCell.getStringValue());
-                if (!bcs.isEmpty()) {
+                TagBarcodeFamily bcs = tagBarcodeService.getTagBarcodeFamilyByName(barcodeKitCell.getStringValue());
+                if (bcs != null) {
                   String tags = barcodeTagsCell.getStringValue();
                   if (!isStringEmptyOrNull(tags)) {
-                    HashMap<Integer, TagBarcode> tbs = new HashMap<Integer, TagBarcode>();
-                    if (tags.contains("-")) {
-                      String[] splits = tags.split("-");
-                      int count = 1;
-                      for (String tag : splits) {
-                        for (TagBarcode tb : bcs) {
-                          if (tb.getName().equals(tag)) {
-                            // set tag barcodes
-                            tbs.put(count, tb);
-                            count++;
-                          }
-                        }
-                      }
-                    } else {
-                      for (TagBarcode tb : bcs) {
-                        if (tb.getName().equals(tags)) {
-                          // set tag barcode
-                          tbs.put(1, tb);
-                        }
-                      }
-                    }
-
-                    library.setTagBarcodes(tbs);
+                    library.setTagBarcodes(matchBarcodesFromText(bcs, tags));
                   } else {
                     throw new InputFormException(
                         "Barcode Kit specified but no tag barcodes entered for: '" + sampleAliasCell.getStringValue() + "'.");
@@ -3414,8 +3393,7 @@ public class FormUtils {
 
               }
             }
-            if (!isStringEmptyOrNull(getCellValueAsString(wellCell))
-                && !"NA".equals(getCellValueAsString(wellCell))) {
+            if (!isStringEmptyOrNull(getCellValueAsString(wellCell)) && !"NA".equals(getCellValueAsString(wellCell))) {
               Note note = new Note();
               note.setCreationDate(date);
               note.setOwner(u);
@@ -3427,8 +3405,7 @@ public class FormUtils {
                 log.info("Added sample Note for Well: " + note.toString());
               }
             }
-            if (!isStringEmptyOrNull(getCellValueAsString(rinCell))
-                && !"NA".equals(getCellValueAsString(rinCell))) {
+            if (!isStringEmptyOrNull(getCellValueAsString(rinCell)) && !"NA".equals(getCellValueAsString(rinCell))) {
               Note note = new Note();
               note.setCreationDate(date);
               note.setOwner(u);
@@ -3686,7 +3663,8 @@ public class FormUtils {
     }
   }
 
-  public static String processLibraryPoolSheetImport(File inPath, User u, RequestManager manager) throws Exception {
+  public static String processLibraryPoolSheetImport(File inPath, User u, RequestManager manager, TagBarcodeService tagBarcodeService)
+      throws Exception {
     if (inPath.getName().endsWith(".xlsx")) {
       XSSFWorkbook wb = new XSSFWorkbook(new FileInputStream(inPath));
       XSSFSheet sheet = wb.getSheetAt(0);
@@ -3916,35 +3894,11 @@ public class FormUtils {
               }
 
               if (getCellValueAsString(barcodeKitCell) != null) {
-                Collection<TagBarcode> bcs = manager.listAllTagBarcodesByStrategyName(getCellValueAsString(barcodeKitCell));
-                if (!bcs.isEmpty()) {
+                TagBarcodeFamily bcs = tagBarcodeService.getTagBarcodeFamilyByName(getCellValueAsString(barcodeKitCell));
+                if (bcs != null) {
                   String tags = getCellValueAsString(barcodeTagsCell);
                   if (!isStringEmptyOrNull(tags)) {
-                    HashMap<Integer, TagBarcode> tbs = new HashMap<Integer, TagBarcode>();
-                    if (tags.contains("-")) {
-                      String[] splits = tags.split("-");
-                      int count = 1;
-                      for (String tag : splits) {
-                        for (TagBarcode tb : bcs) {
-                          if (tb.getName().equals(tag)) {
-                            // set tag barcodes
-                            tbs.put(count, tb);
-                            count++;
-                          }
-                        }
-                      }
-                    } else {
-                      for (TagBarcode tb : bcs) {
-                        if (tb.getName().equals(tags) || tb.getSequence().equals(tags)) {
-                          // set tag barcode
-                          tbs.put(1, tb);
-                          log.info("Got tag barcode: " + tb.getName());
-                          break;
-                        }
-                      }
-                    }
-
-                    library.setTagBarcodes(tbs);
+                    library.setTagBarcodes(matchBarcodesFromText(bcs, tags));
                   } else {
                     throw new InputFormException("Barcode Kit specified but no tag barcodes entered for: '" + s.getAlias() + "'.");
                   }
@@ -4015,7 +3969,7 @@ public class FormUtils {
   }
 
   private static Map<String, PlatePool> process384PlateInputXLSX(XSSFWorkbook wb, User u, RequestManager manager,
-      MisoNamingScheme<Library> libraryNamingScheme) throws Exception {
+      MisoNamingScheme<Library> libraryNamingScheme, TagBarcodeService tagBarcodeService) throws Exception {
     ((RequestManagerAwareNamingScheme) libraryNamingScheme).setRequestManager(manager);
 
     List<Sample> samples = new ArrayList<Sample>();
@@ -4255,35 +4209,11 @@ public class FormUtils {
             }
 
             if (getCellValueAsString(barcodeKitCell) != null) {
-              Collection<TagBarcode> bcs = manager.listAllTagBarcodesByStrategyName(getCellValueAsString(barcodeKitCell));
-              if (!bcs.isEmpty()) {
+              TagBarcodeFamily bcs = tagBarcodeService.getTagBarcodeFamilyByName(getCellValueAsString(barcodeKitCell));
+              if (bcs != null) {
                 String tags = getCellValueAsString(barcodeTagsCell);
                 if (!isStringEmptyOrNull(tags)) {
-                  HashMap<Integer, TagBarcode> tbs = new HashMap<Integer, TagBarcode>();
-                  if (tags.contains("-")) {
-                    String[] splits = tags.split("-");
-                    int count = 1;
-                    for (String tag : splits) {
-                      for (TagBarcode tb : bcs) {
-                        if (tb.getName().equals(tag)) {
-                          // set tag barcodes
-                          tbs.put(count, tb);
-                          count++;
-                        }
-                      }
-                    }
-                  } else {
-                    for (TagBarcode tb : bcs) {
-                      if (tb.getName().equals(tags) || tb.getSequence().equals(tags)) {
-                        // set tag barcode
-                        tbs.put(1, tb);
-                        log.info("Got tag barcode: " + tb.getName());
-                        break;
-                      }
-                    }
-                  }
-
-                  library.setTagBarcodes(tbs);
+                  library.setTagBarcodes(matchBarcodesFromText(bcs, tags));
                 } else {
                   throw new InputFormException("Barcode Kit specified but no tag barcodes entered for: '" + s.getAlias() + "'.");
                 }
@@ -4333,20 +4263,20 @@ public class FormUtils {
   }
 
   public static Map<String, PlatePool> importPlateInputSpreadsheet(File inPath, User u, RequestManager manager,
-      MisoNamingScheme<Library> libraryNamingScheme) throws Exception {
+      MisoNamingScheme<Library> libraryNamingScheme, TagBarcodeService tagBarcodeService) throws Exception {
     if (inPath.getName().endsWith(".xlsx")) {
       XSSFWorkbook wb = new XSSFWorkbook(new FileInputStream(inPath));
-      return process384PlateInputXLSX(wb, u, manager, libraryNamingScheme);
+      return process384PlateInputXLSX(wb, u, manager, libraryNamingScheme, tagBarcodeService);
     } else if (inPath.getName().endsWith(".ods")) {
       OdfSpreadsheetDocument oDoc = (OdfSpreadsheetDocument) OdfDocument.loadDocument(inPath);
-      return process384PlateInputODS(oDoc, u, manager, libraryNamingScheme);
+      return process384PlateInputODS(oDoc, u, manager, libraryNamingScheme, tagBarcodeService);
     } else {
       throw new UnsupportedOperationException("Cannot process bulk input files other than xls, xlsx, and ods.");
     }
   }
 
   private static List<Sample> processSampleInputODS(OdfSpreadsheetDocument oDoc, User u, RequestManager manager,
-      MisoNamingScheme<Library> libraryNamingScheme) throws Exception {
+      MisoNamingScheme<Library> libraryNamingScheme, TagBarcodeService tagBarcodeService) throws Exception {
     ((RequestManagerAwareNamingScheme) libraryNamingScheme).setRequestManager(manager);
 
     List<Sample> samples = new ArrayList<Sample>();
@@ -4474,7 +4404,7 @@ public class FormUtils {
               libraryNamingScheme);
           if (library != null) {
             processLibraryQC(libraryQcCell, libraryQcMolarityCell, libraryQcInsertSizeCell, library, u, manager);
-            processBarcodes(barcodeKitCell, barcodeTagsCell, library, manager);
+            processBarcodes(barcodeKitCell, barcodeTagsCell, library, manager, tagBarcodeService);
             processDilutions(dilutionMolarityCell, library, pools.get(poolNumberCell), u);
             log.info("Added library: " + library.toString());
             s.addLibrary(library);
@@ -4488,7 +4418,7 @@ public class FormUtils {
   }
 
   private static List<Sample> processSampleInputXLSX(XSSFWorkbook wb, User u, RequestManager manager,
-      MisoNamingScheme<Library> libraryNamingScheme) throws Exception {
+      MisoNamingScheme<Library> libraryNamingScheme, TagBarcodeService tagBarcodeService) throws Exception {
     ((RequestManagerAwareNamingScheme) libraryNamingScheme).setRequestManager(manager);
 
     List<Sample> samples = new ArrayList<Sample>();
@@ -4620,7 +4550,7 @@ public class FormUtils {
             libraryNamingScheme);
         if (library != null) {
           processLibraryQC(libraryQcCell, libraryQcMolarityCell, libraryQcInsertSizeCell, library, u, manager);
-          processBarcodes(barcodeKitCell, barcodeTagsCell, library, manager);
+          processBarcodes(barcodeKitCell, barcodeTagsCell, library, manager, tagBarcodeService);
           processDilutions(dilutionMolarityCell, library, pools.get(poolNumberCell), u);
           log.info("Added library: " + library.toString());
           s.addLibrary(library);
@@ -4758,34 +4688,13 @@ public class FormUtils {
     }
   }
 
-  private static void processBarcodes(String barcodeKit, String barcodeTags, Library library, RequestManager manager) throws Exception {
+  private static void processBarcodes(String barcodeKit, String barcodeTags, Library library, RequestManager manager,
+      TagBarcodeService tagBarcodeService) throws Exception {
     if (!isStringEmptyOrNull(barcodeKit)) {
-      Collection<TagBarcode> bcs = manager.listAllTagBarcodesByStrategyName(barcodeKit);
-      if (!bcs.isEmpty()) {
+      TagBarcodeFamily bcs = tagBarcodeService.getTagBarcodeFamilyByName(barcodeKit);
+      if (bcs != null) {
         if (!isStringEmptyOrNull(barcodeTags)) {
-          HashMap<Integer, TagBarcode> tbs = new HashMap<Integer, TagBarcode>();
-          if (barcodeTags.contains("-")) {
-            String[] splits = barcodeTags.split("-");
-            int count = 1;
-            for (String tag : splits) {
-              for (TagBarcode tb : bcs) {
-                if (tb.getName().equals(tag)) {
-                  // set tag barcodes
-                  tbs.put(count, tb);
-                  count++;
-                }
-              }
-            }
-          } else {
-            for (TagBarcode tb : bcs) {
-              if (tb.getName().equals(barcodeTags)) {
-                // set tag barcode
-                tbs.put(1, tb);
-              }
-            }
-          }
-
-          library.setTagBarcodes(tbs);
+          library.setTagBarcodes(matchBarcodesFromText(bcs, barcodeTags));
         } else {
           throw new InputFormException("Barcode Kit specified but no tag barcodes entered for: '" + library.getSample().getAlias() + "'.");
         }
@@ -4820,13 +4729,13 @@ public class FormUtils {
   }
 
   public static List<Sample> importSampleInputSpreadsheet(File inPath, User u, RequestManager manager,
-      MisoNamingScheme<Library> libraryNamingScheme) throws Exception {
+      MisoNamingScheme<Library> libraryNamingScheme, TagBarcodeService tagBarcodeStrategyService) throws Exception {
     if (inPath.getName().endsWith(".xlsx")) {
       XSSFWorkbook wb = new XSSFWorkbook(new FileInputStream(inPath));
-      return processSampleInputXLSX(wb, u, manager, libraryNamingScheme);
+      return processSampleInputXLSX(wb, u, manager, libraryNamingScheme, tagBarcodeStrategyService);
     } else if (inPath.getName().endsWith(".ods")) {
       OdfSpreadsheetDocument oDoc = (OdfSpreadsheetDocument) OdfDocument.loadDocument(inPath);
-      return processSampleInputODS(oDoc, u, manager, libraryNamingScheme);
+      return processSampleInputODS(oDoc, u, manager, libraryNamingScheme, tagBarcodeStrategyService);
     } else {
       throw new UnsupportedOperationException("Cannot process bulk input files other than xls, xlsx, and ods.");
     }
@@ -5063,5 +4972,24 @@ public class FormUtils {
     } else {
       throw new IOException("Could not read from resource.");
     }
+  }
+
+  public static List<TagBarcode> matchBarcodesFromText(Iterable<TagBarcode> allowBarcodes, String tagText) throws InputFormException {
+    List<TagBarcode> matchedBarcodes = new ArrayList<TagBarcode>();
+    String[] splits = tagText.split("-");
+    for (String tag : splits) {
+      boolean success = false;
+      for (TagBarcode tb : allowBarcodes) {
+        if (tb.getName().equals(tag) || tb.getSequence().equals(tagText)) {
+          matchedBarcodes.add(tb);
+          success = true;
+          break;
+        }
+        if (!success) {
+          throw new InputFormException("Unknown barcode: " + tag);
+        }
+      }
+    }
+    return matchedBarcodes;
   }
 }

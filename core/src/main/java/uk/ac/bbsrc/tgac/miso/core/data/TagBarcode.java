@@ -23,10 +23,22 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
-
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 /**
  * TagBarcodes represent adapter sequences that can be prepended to sequencable material in order to facilitate multiplexing.
@@ -37,63 +49,75 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
  */
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public interface TagBarcode extends Comparable, Nameable {
+@Entity
+@Table(name = "TagBarcodes")
+public class TagBarcode implements Nameable {
 
-  /**
-   * Sets the ID of this TagBarcode object.
-   * 
-   * @param id
-   *          long
-   */
-  public void setId(long id);
+  public static final Long UNSAVED_ID = 0L;
 
-  /**
-   * Sets the name of this TagBarcode object.
-   * 
-   * @param name
-   */
-  public void setName(String name);
+  public static void sort(final List<TagBarcode> barcodes) {
+    Collections.sort(barcodes, new Comparator<TagBarcode>() {
+      @Override
+      public int compare(TagBarcode o1, TagBarcode o2) {
+        return o1.getPosition() - o2.getPosition();
+      }
+    });
+  }
 
-  /**
-   * Returns the DNA sequence of this TagBarcode object.
-   * 
-   * @return
-   */
-  public String getSequence();
+  @ManyToOne(fetch = FetchType.EAGER)
+  @JoinColumn(name = "tagFamilyId", nullable = false)
+  private TagBarcodeFamily family;
+  @Column(nullable = false)
+  private String name;
+  @Column(nullable = false)
+  private int position;
+  @Column(nullable = false)
+  private String sequence;
 
-  /**
-   * Sets the DNA sequence of this TagBarcode object.
-   * 
-   * @param sequence
-   */
-  public void setSequence(String sequence);
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private long tagId = UNSAVED_ID;
 
-  /**
-   * Returns the {@link PlatformType} of this TagBarcode object.
-   * 
-   * @return
-   */
-  public PlatformType getPlatformType();
+  public TagBarcodeFamily getFamily() {
+    return family;
+  }
 
-  /**
-   * Sets the {@link PlatformType} of this TagBarcode object.
-   * 
-   * @param platformType
-   */
-  public void setPlatformType(PlatformType platformType);
+  @Override
+  public long getId() {
+    return tagId;
+  }
 
-  /**
-   * Returns the strategy name to which this TagBarcode belongs.
-   * 
-   * @return String strategyName
-   */
-  public String getStrategyName();
+  @Override
+  public String getName() {
+    return name;
+  }
 
-  /**
-   * Sets the strategy name to which this TagBarcode belongs.
-   * 
-   * @param strategyName
-   *          String
-   */
-  public void setStrategyName(String strategyName);
+  public int getPosition() {
+    return position;
+  }
+
+  public String getSequence() {
+    return sequence;
+  }
+
+  public void setFamily(TagBarcodeFamily family) {
+    this.family = family;
+  }
+
+  public void setId(long id) {
+    this.tagId = id;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public void setPosition(int position) {
+    this.position = position;
+  }
+
+  public void setSequence(String sequence) {
+    this.sequence = sequence;
+  }
+
 }

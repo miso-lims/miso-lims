@@ -267,30 +267,20 @@
 </c:if>
 <tr>
   <c:choose>
-    <c:when test="${library.id ==0 or empty library.libraryType}">
-      <td>Platform - Library Type:</td>
-      <td>
-        <form:select id="platformNames" path="platformName" items="${platformNames}"
-                     onchange="Library.ui.changePlatformName(this);"/>
-        <form:select id="libraryTypes" path="libraryType"/>
-      </td>
-      <script type="text/javascript">
-        jQuery(document).ready(function () {
-          Library.ui.changePlatformName(jQuery("#platformNames"));
-        });
-      </script>
-    </c:when>
-    <c:when test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')
+    <c:when test="${library.id == 0 or empty library.libraryType or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')
         or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_TECH')}">
       <td>Platform - Library Type:</td>
       <td>
         <form:select id="platformNames" path="platformName" items="${platformNames}"
-                     onchange="Library.ui.changePlatformName(this);" class="validateable"/>
+                     onchange="Library.ui.changePlatformName(null);" class="validateable"/>
         <form:select id="libraryTypes" path="libraryType"/>
       </td>
       <script type="text/javascript">
         jQuery(document).ready(function () {
-          Library.ui.changePlatformNameWithLibraryType(jQuery("#platformNames"), '${library.libraryType.id}');
+          Library.ui.changePlatformName(function() {
+            <c:if test="${not empty library.libraryType}">jQuery('#libraryTypes').val('${library.libraryType.id}');</c:if>
+            Library.setOriginalBarcodes();
+          });
         });
       </script>
     </c:when>
@@ -338,78 +328,33 @@
   </c:choose>
 </tr>
 <tr>
-  <c:choose>
-    <c:when test="${library.id == 0 }">
-      <td>Barcoding Strategy:</td>
-      <td>
-        <select name='tagBarcodeStrategies' id='tagBarcodeStrategies' onchange='Library.tagbarcode.populateAvailableBarcodesForStrategy(this);'>
-          <option value="">Please select a platform...</option>
-        </select>
-      </td>
-    </c:when>
-    <c:when test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')
-    or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_INTERNAL')}">
-      <td>Barcoding Strategy:</td>
-      <td>
-        <c:choose>
-          <c:when test="${empty library.tagBarcodes}">
-            <select id="tagBarcodeStrategies" id='tagBarcodeStrategies' onchange="Library.tagbarcode.populateAvailableBarcodesForStrategy(this);">
-              <option selected="selected" value="">No barcoding</option>
-              <c:forEach items="${availableTagBarcodeStrategies}" var="tagBarcodeStrategy">
-              <option value="${tagBarcodeStrategy.name}">${tagBarcodeStrategy.name}</option>
-              </c:forEach>
-            </select>
-          </c:when>
-          <c:otherwise>
-            <select name='tagBarcodeStrategies' id='tagBarcodeStrategies' onchange='Library.tagbarcode.populateAvailableBarcodesForStrategy(this);'>
-            </select>
-            <script type="text/javascript">
-              jQuery(document).ready(function () {
-                Library.ui.changePlatformNameWithTagBarcodeStrategy(jQuery("#platformNames"), '${selectedTagBarcodeStrategy}');
-              });
-            </script>
-          </c:otherwise>
-        </c:choose>
-      </td>
-    </c:when>
-    <c:otherwise>
-      <td>Barcoding Strategy:</td>
-      <td>
-        <c:choose>
-          <c:when test="${empty library.tagBarcodes}">
-            <select id="tagBarcodeStrategies" id='tagBarcodeStrategies' onchange="Library.tagbarcode.populateAvailableBarcodesForStrategy(this);">
-              <option selected="selected" value="">No barcoding</option>
-              <c:forEach items="${availableTagBarcodeStrategies}" var="tagBarcodeStrategy">
-              <option value="${tagBarcodeStrategy.name}">${tagBarcodeStrategy.name}</option>
-              </c:forEach>
-            </select>
-          </c:when>
-          <c:otherwise>
-            ${selectedTagBarcodeStrategy}
-          </c:otherwise>
-        </c:choose>
-      </td>
-    </c:otherwise>
-  </c:choose>
+  <td>Barcoding Family:</td>
+  <td>
+    <select name='tagBarcodeFamily' id='tagBarcodeFamily' onchange='Library.ui.updateBarcodes();'>
+      <c:forEach items="${barcodeFamilies}" var="family">
+        <option value="${family.id}" <c:if test="${library.currentFamily.id == family.id}">selected="selected"</c:if>>${family.name}</option>
+      </c:forEach>
+    </select>
+  </td>
 </tr>
 
 <tr>
-  <c:choose>
-    <c:when test="${library.id == 0 or empty library.tagBarcodes}">
-      <td>Barcodes:</td>
-      <td id="tagBarcodesDiv">
-      </td>
-    </c:when>
-    <c:otherwise>
-      <td>Barcodes:</td>
-      <td id="tagBarcodesDiv">
-        <c:forEach items="${availableTagBarcodeStrategyBarcodes}" var="barcodemap">
-          <form:select path="tagBarcodes['${barcodemap.key}']" items="${barcodemap.value}"
-                       itemLabel="name" itemValue="id"/>
-        </c:forEach>
-      </td>
-    </c:otherwise>
-  </c:choose>
+  <td>Barcodes:</td>
+  <td id="tagBarcodesDiv">
+  </td>
+  <script type="text/javascript">
+    Library = Library || {};
+    Library.barcodeFamilies = ${barcodeFamiliesJSON};
+    Library.setOriginalBarcodes = function() {
+      Library.lastBarcodePosition = 0;
+      jQuery('#tagBarcodesDiv').empty();
+      <c:forEach items="${library.tagBarcodes}" var="barcode">
+        Library.ui.createBarcodeBox(${barcode.id});
+      </c:forEach>
+      Library.ui.createBarcodeNextBox();
+    };
+    Library.setOriginalBarcodes();
+  </script>
 </tr>
 
 <tr bgcolor="yellow">

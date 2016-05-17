@@ -83,7 +83,7 @@ public class TGACIlluminaFilepathGenerator implements FilePathGenerator {
         }
         if (l.getLibrary().getTagBarcodes() != null && !l.getLibrary().getTagBarcodes().isEmpty()) {
           filePath.append("_");
-          for (TagBarcode tb : l.getLibrary().getTagBarcodes().values()) {
+          for (TagBarcode tb : l.getLibrary().getTagBarcodes()) {
             filePath.append(tb.getSequence());
           }
         }
