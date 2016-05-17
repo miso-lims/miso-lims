@@ -25,11 +25,13 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
+import java.beans.PropertyEditorSupport;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -47,6 +49,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -78,12 +82,16 @@ import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
+import uk.ac.bbsrc.tgac.miso.core.data.TagBarcodeFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAdditionalInfoImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCR;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
+import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
@@ -92,8 +100,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
-import uk.ac.bbsrc.tgac.miso.core.service.tagbarcode.TagBarcodeStrategy;
-import uk.ac.bbsrc.tgac.miso.core.service.tagbarcode.TagBarcodeStrategyResolverService;
+import uk.ac.bbsrc.tgac.miso.core.service.TagBarcodeService;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignDao;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -117,6 +124,12 @@ import uk.ac.bbsrc.tgac.miso.service.LibraryAdditionalInfoService;
 public class EditLibraryController {
   protected static final Logger log = LoggerFactory.getLogger(EditLibraryController.class);
 
+  private static final TagBarcodeFamily BARCODE_FAMILY_NEEDS_PLATFORM = new TagBarcodeFamily();
+
+  static {
+    BARCODE_FAMILY_NEEDS_PLATFORM.setName("Please select a platform...");
+  }
+
   @Autowired
   private SecurityManager securityManager;
 
@@ -127,7 +140,7 @@ public class EditLibraryController {
   private DataObjectFactory dataObjectFactory;
 
   @Autowired
-  private TagBarcodeStrategyResolverService tagBarcodeStrategyResolverService;
+  private TagBarcodeService tagBarcodeService;
 
   @Autowired
   private LibraryAdditionalInfoService libraryAdditionalInfoService;
@@ -150,8 +163,8 @@ public class EditLibraryController {
     this.securityManager = securityManager;
   }
 
-  public void setTagBarcodeStrategyResolverService(TagBarcodeStrategyResolverService tagBarcodeStrategyResolverService) {
-    this.tagBarcodeStrategyResolverService = tagBarcodeStrategyResolverService;
+  public void setTagBarcodeService(TagBarcodeService tagBarcodeService) {
+    this.tagBarcodeService = tagBarcodeService;
   }
 
   public void setLibraryAdditionalInfoService(LibraryAdditionalInfoService libraryAdditionalInfoService) {
@@ -318,26 +331,23 @@ public class EditLibraryController {
     return LimsUtils.join(types, ",");
   }
 
-  public Collection<TagBarcodeStrategy> populateAvailableTagBarcodeStrategies(Library l) throws IOException {
-    List<TagBarcodeStrategy> strategies = new ArrayList<TagBarcodeStrategy>(
-        tagBarcodeStrategyResolverService.getTagBarcodeStrategiesByPlatform(PlatformType.get(l.getPlatformName())));
-    return strategies;
-  }
-
-  public Collection<TagBarcode> populateAvailableTagBarcodes(Library l) throws IOException {
-    List<TagBarcode> barcodes = new ArrayList<TagBarcode>(requestManager.listAllTagBarcodesByPlatform(l.getPlatformName()));
-    Collections.sort(barcodes);
-    return barcodes;
-  }
-
-  public String tagBarcodesString(String platformName) throws IOException {
-    List<TagBarcode> tagBarcodes = new ArrayList<TagBarcode>(requestManager.listAllTagBarcodesByPlatform(platformName));
-    Collections.sort(tagBarcodes);
-    List<String> names = new ArrayList<String>();
-    for (TagBarcode tb : tagBarcodes) {
-      names.add("\"" + tb.getName() + " (" + tb.getSequence() + ")\"" + ":" + "\"" + tb.getId() + "\"");
+  public void populateAvailableTagBarcodeStrategies(Library library, ModelMap model) throws IOException {
+    if (isStringEmptyOrNull(library.getPlatformName())) {
+      model.put("barcodeFamiliesJSON", "[]");
+      model.put("barcodeFamilies", Collections.singleton(BARCODE_FAMILY_NEEDS_PLATFORM));
+    } else {
+      Collection<TagBarcodeFamily> families = tagBarcodeService
+          .getTagBarcodeFamiliesByPlatform(PlatformType.get(library.getPlatformName()));
+      List<TagBarcodeFamily> visbileFamilies = new ArrayList<>();
+      visbileFamilies.add(TagBarcodeFamily.NULL);
+      visbileFamilies.addAll(families);
+      JSONArray familiesJson = new JSONArray();
+      JsonConfig config = new JsonConfig();
+      config.setExcludes(new String[] { "family" });
+      familiesJson.addAll(families, config);
+      model.put("barcodeFamiliesJSON", familiesJson.toString());
+      model.put("barcodeFamilies", visbileFamilies);
     }
-    return LimsUtils.join(names, ",");
   }
 
   @ModelAttribute("libraryInitialConcentrationUnits")
@@ -368,6 +378,55 @@ public class EditLibraryController {
   @ModelAttribute("emPCRDilutionUnits")
   public String emPCRDilutionUnits() {
     return emPCRDilution.UNITS;
+  }
+  
+  @ModelAttribute("prepKits")
+  public List<KitDescriptor> getPrepKits() throws IOException {
+    List<KitDescriptor> list = new ArrayList<>(requestManager.listKitDescriptorsByType(KitType.LIBRARY));
+    Collections.sort(list, new Comparator<KitDescriptor>() {
+      @Override
+      public int compare(KitDescriptor kd1, KitDescriptor kd2) {
+        return kd1.getName().compareTo(kd2.getName());
+      }
+    });
+    return list;
+  }
+  
+  /**
+   * Adds child entities to a new detailed Library so they can be bound in the JSP. These will not all be useful for the same
+   * object, but are all included to accommodate the JSP.
+   * @param library
+   */
+  private void addNewDetailedLibraryEntities(Library library) {
+    library.setLibraryAdditionalInfo(new LibraryAdditionalInfoImpl());
+    library.getLibraryAdditionalInfo().setPrepKit(new KitDescriptor());
+  }
+
+  private void populateDesigns(ModelMap model, SampleClass sampleClass) throws IOException {
+    JSONArray array = new JSONArray();
+    JsonConfig config = new JsonConfig();
+    config.setExcludes(new String[] { "sampleClass" });
+    Collection<LibraryDesign> designs = requestManager.listLibraryDesignByClass(sampleClass);
+    array.addAll(designs, config);
+    model.put("libraryDesignsJSON", array.toString());
+    model.put("libraryDesigns", designs);
+  }
+  
+  /**
+   * Translates foreign keys to entity objects with only the ID set, to be used in service layer to reload persisted child objects
+   * 
+   * @param binder
+   */
+  @InitBinder
+  public void includeForeignKeys(WebDataBinder binder) {
+    binder.registerCustomEditor(KitDescriptor.class, "libraryAdditionalInfo.prepKit", new PropertyEditorSupport() {
+      @Override
+      public void setAsText(String text) throws IllegalArgumentException {
+        KitDescriptor to = new KitDescriptor();
+        to.setId(Long.valueOf(text));
+        setValue(to);
+      }
+    });
   }
 
   // Handsontable
@@ -418,10 +477,9 @@ public class EditLibraryController {
     final List<JSONObject> rtnList = new ArrayList<JSONObject>();
     try {
       if (!isStringEmptyOrNull(barcodeStrategy)) {
-        final TagBarcodeStrategy tbs = tagBarcodeStrategyResolverService.getTagBarcodeStrategy(barcodeStrategy);
+        final TagBarcodeFamily tbs = tagBarcodeService.getTagBarcodeFamilyByName(barcodeStrategy);
         if (tbs != null) {
-          final List<TagBarcode> tagBarcodes = new ArrayList<TagBarcode>(tbs.getApplicableBarcodesForPosition(Integer.parseInt(position)));
-          for (final TagBarcode tb : tagBarcodes) {
+          for (final TagBarcode tb : tbs.getBarcodesForPosition(Integer.parseInt(position))) {
             final JSONObject obj = new JSONObject();
             obj.put("id", tb.getId());
             obj.put("name", tb.getName());
@@ -461,10 +519,10 @@ public class EditLibraryController {
       strategy = strategy.trim();
       log.warn("strategy = " + strategy);
       System.out.println("strategy = " + strategy);
-      final TagBarcodeStrategy tbs = tagBarcodeStrategyResolverService.getTagBarcodeStrategy(strategy);
+      final TagBarcodeFamily tbs = tagBarcodeService.getTagBarcodeFamilyByName(strategy);
       if (tbs != null) {
         rtn = new JSONObject();
-        rtn.put("numApplicableBarcodes", tbs.getNumApplicableBarcodes());
+        rtn.put("numApplicableBarcodes", tbs.getMaximumNumber());
       } else {
         rtn = JSONUtils.SimpleJSONError("No strategy found with the name: \"" + strategy + "\"");
       }
@@ -481,10 +539,8 @@ public class EditLibraryController {
 
     if (platform != null && !"".equals(platform)) {
       final List<String> rtnStrat = new ArrayList<String>();
-      for (final TagBarcodeStrategy t : tagBarcodeStrategyResolverService.getTagBarcodeStrategiesByPlatform(PlatformType.get(platform))) {
-        if (!t.getApplicableBarcodesForPosition(1).isEmpty()) {
-          rtnStrat.add(t.getName());
-        }
+      for (final TagBarcodeFamily t : tagBarcodeService.getTagBarcodeFamiliesByPlatform(PlatformType.get(platform))) {
+        rtnStrat.add(t.getName());
       }
       rtn.put("barcodeKits", rtnStrat);
     }
@@ -508,7 +564,7 @@ public class EditLibraryController {
   public @ResponseBody String jsonRestBarcodeStrategies(@RequestParam("platform") String platform) throws IOException {
     if (!isStringEmptyOrNull(platform)) {
       List<String> types = new ArrayList<String>();
-      for (TagBarcodeStrategy t : tagBarcodeStrategyResolverService.getTagBarcodeStrategiesByPlatform(PlatformType.get(platform))) {
+      for (TagBarcodeFamily t : tagBarcodeService.getTagBarcodeFamiliesByPlatform(PlatformType.get(platform))) {
         types.add("\"" + t.getName() + "\"" + ":" + "\"" + t.getName() + "\"");
       }
       return "{" + LimsUtils.join(types, ",") + "}";
@@ -521,11 +577,10 @@ public class EditLibraryController {
   public @ResponseBody String jsonRestTagBarcodes(@RequestParam("barcodeStrategy") String barcodeStrategy,
       @RequestParam("position") String position) throws IOException {
     if (!isStringEmptyOrNull(barcodeStrategy)) {
-      TagBarcodeStrategy tbs = tagBarcodeStrategyResolverService.getTagBarcodeStrategy(barcodeStrategy);
+      TagBarcodeFamily tbs = tagBarcodeService.getTagBarcodeFamilyByName(barcodeStrategy);
       if (tbs != null) {
-        List<TagBarcode> tagBarcodes = new ArrayList<TagBarcode>(tbs.getApplicableBarcodesForPosition(Integer.parseInt(position)));
         List<String> names = new ArrayList<String>();
-        for (TagBarcode tb : tagBarcodes) {
+        for (TagBarcode tb : tbs.getBarcodesForPosition(Integer.parseInt(position))) {
           names.add("\"" + tb.getId() + "\"" + ":" + "\"" + tb.getName() + " (" + tb.getSequence() + ")\"");
         }
         return "{" + LimsUtils.join(names, ",") + "}";
@@ -600,13 +655,7 @@ public class EditLibraryController {
       model.put("emPCRs", pcrs);
       model.put("emPcrDilutions", populateEmPcrDilutions(user, pcrs));
 
-      if (library.getTagBarcodes() != null && !library.getTagBarcodes().isEmpty() && library.getTagBarcodes().get(1) != null) {
-        model.put("selectedTagBarcodeStrategy", library.getTagBarcodes().get(1).getStrategyName());
-        model.put("availableTagBarcodeStrategyBarcodes", tagBarcodeStrategyResolverService
-            .getTagBarcodeStrategy(library.getTagBarcodes().get(1).getStrategyName()).getApplicableBarcodes());
-      }
-      model.put("availableTagBarcodeStrategies", populateAvailableTagBarcodeStrategies(library));
-
+      populateAvailableTagBarcodeStrategies(library, model);
       Map<String, Library> adjacentLibraries = getAdjacentLibrariesInProject(library, library.getSample().getProject());
       if (!adjacentLibraries.isEmpty()) {
         model.put("previousLibrary", adjacentLibraries.get("previousLibrary"));
@@ -645,14 +694,16 @@ public class EditLibraryController {
       Library library = null;
       if (libraryId == AbstractLibrary.UNSAVED_ID) {
         library = dataObjectFactory.getLibrary(user);
+        if (isDetailedSampleEnabled()) {
+          addNewDetailedLibraryEntities(library);
+        }
         model.put("title", "New Library");
       } else {
         library = requestManager.getLibraryById(libraryId);
         model.put("title", "Library " + libraryId);
         if (library.getTagBarcodes() != null && !library.getTagBarcodes().isEmpty() && library.getTagBarcodes().get(1) != null) {
-          model.put("selectedTagBarcodeStrategy", library.getTagBarcodes().get(1).getStrategyName());
-          model.put("availableTagBarcodeStrategyBarcodes", tagBarcodeStrategyResolverService
-              .getTagBarcodeStrategy(library.getTagBarcodes().get(1).getStrategyName()).getApplicableBarcodes());
+          model.put("selectedTagBarcodeStrategy", library.getTagBarcodes().get(1).getFamily().getName());
+          model.put("availableTagBarcodeStrategyBarcodes", library.getTagBarcodes().get(1).getFamily().getBarcodes());
         }
       }
 
@@ -667,6 +718,10 @@ public class EditLibraryController {
         if (sample.getSampleAdditionalInfo() != null) {
           sampleClass = sample.getSampleAdditionalInfo().getSampleClass();
           library.setLibraryAdditionalInfo(new LibraryAdditionalInfoImpl());
+          library.getLibraryAdditionalInfo().setTissueOrigin(sample.getSampleAdditionalInfo().getTissueOrigin());
+          library.getLibraryAdditionalInfo().setTissueType(sample.getSampleAdditionalInfo().getTissueType());
+          //library.getLibraryAdditionalInfo().setGroupId(library.getSample().getSampleAnalyte().getGroupId());
+          // library.getLibraryAdditionalInfo().setGroupDescription(library.getSample().getSampleAnalyte().getGroupDescription());
         }
 
         List<Sample> projectSamples = new ArrayList<Sample>(requestManager.listAllSamplesByProjectId(sample.getProject().getProjectId()));
@@ -701,7 +756,7 @@ public class EditLibraryController {
       Collection<emPCR> pcrs = populateEmPcrs(user, library);
       model.put("emPCRs", pcrs);
       model.put("emPcrDilutions", populateEmPcrDilutions(user, pcrs));
-      model.put("availableTagBarcodeStrategies", populateAvailableTagBarcodeStrategies(library));
+      populateAvailableTagBarcodeStrategies(library, model);
 
       Map<String, Library> adjacentLibraries = getAdjacentLibrariesInProject(library, library.getSample().getProject());
       if (!adjacentLibraries.isEmpty()) {
@@ -733,16 +788,6 @@ public class EditLibraryController {
       }
       throw new IOException(e);
     }
-  }
-
-  private void populateDesigns(ModelMap model, SampleClass sampleClass) throws IOException {
-    JSONArray array = new JSONArray();
-    JsonConfig config = new JsonConfig();
-    config.setExcludes(new String[] { "sampleClass" });
-    Collection<LibraryDesign> designs = requestManager.listLibraryDesignByClass(sampleClass);
-    array.addAll(designs, config);
-    model.put("libraryDesignsJSON", array.toString());
-    model.put("libraryDesigns", designs);
   }
 
   /**

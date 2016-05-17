@@ -239,15 +239,28 @@ public class DefaultSampleService implements SampleService {
   /**
    * Finds an existing parent Sample or creates a new one if necessary
    * 
-   * @param sample must contain Identity details (via {@link Sample#getIdentity() getIdentity}), 
-   * including externalName if a new parent is to be created. And existing parent may be specified by including its sampleId or 
-   * externalName
+   * @param sample must contain parent (via {@link SampleAdditionalInfo#getParent() getParent}) or Identity details 
+   * (via {@link Sample#getIdentity() getIdentity}), including externalName if a new parent is to be created. An existing 
+   * parent may be specified by including its sampleId or externalName
+   * 
    * @return
    * @throws IOException 
    * @throws SQLException 
    * @throws MisoNamingException 
    */
   private Sample findOrCreateParent(Sample sample) throws IOException {
+    if (sample.getSampleAdditionalInfo() != null && sample.getSampleAdditionalInfo().getParent() != null) {
+      Sample tempParent = sample.getSampleAdditionalInfo().getParent();
+      if (tempParent.getId() != Sample.UNSAVED_ID) {
+        Sample parent = sampleDao.getSample(tempParent.getId());
+        if (parent != null) return parent;
+      }
+      if (tempParent.getIdentity() != null && !isStringEmptyOrNull(tempParent.getIdentity().getExternalName())) {
+        Identity parentIdentity = identityService.get(tempParent.getIdentity().getExternalName());
+        if (parentIdentity != null) return parentIdentity.getSample();
+      }
+    }
+    
     Identity parentIdentity = sample.getIdentity();
     if (parentIdentity == null) throw new IllegalArgumentException("Parent identity is required to create a new Sample");
     if (parentIdentity.getSampleId() != null) {
@@ -347,9 +360,6 @@ public class DefaultSampleService implements SampleService {
         SampleAnalyte sa = sample.getSampleAnalyte();
         if (sa.getSamplePurpose() != null && sa.getSamplePurpose().getId() != null) {
           sa.setSamplePurpose(samplePurposeDao.getSamplePurpose(sa.getSamplePurpose().getId()));
-        }
-        if (sa.getSampleGroup() != null && sa.getSampleGroup().getId() != null) {
-          sa.setSampleGroup(sampleGroupDao.getSampleGroup(sa.getSampleGroup().getId()));
         }
         if (sa.getTissueMaterial() != null && sa.getTissueMaterial().getId() != null) {
           sa.setTissueMaterial(tissueMaterialDao.getTissueMaterial(sa.getTissueMaterial().getId()));

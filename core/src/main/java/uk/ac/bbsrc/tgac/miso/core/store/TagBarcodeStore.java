@@ -21,35 +21,23 @@
  * *********************************************************************
  */
 
-package uk.ac.bbsrc.tgac.miso.core.service.tagbarcode;
+package uk.ac.bbsrc.tgac.miso.core.store;
 
-import java.util.Map;
-import java.util.Set;
+import java.util.Collection;
 
-import net.sourceforge.fluxion.spi.Spi;
 import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
+import uk.ac.bbsrc.tgac.miso.core.data.TagBarcodeFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
-/**
- * uk.ac.bbsrc.tgac.miso.core.service.tagbarcode
- * <p/>
- * Info
- * 
- * @author Rob Davey
- * @date 28/06/12
- * @since 0.1.6
- */
-@Spi
-public interface TagBarcodeStrategy {
-  String getName();
+public interface TagBarcodeStore {
 
-  PlatformType getPlatformType();
+  public TagBarcodeFamily getTagBarcodeFamilyByName(String name);
 
-  int getNumApplicableBarcodes();
+  public Collection<TagBarcodeFamily> getTagBarcodeFamilies();
 
-  Map<Integer, Set<TagBarcode>> getApplicableBarcodes();
+  public Collection<TagBarcodeFamily> getTagBarcodeFamiliesByPlatform(PlatformType platformType);
 
-  Set<TagBarcode> getApplicableBarcodesForPosition(int position);
+  public TagBarcode getTagBarcodeById(long id);
 
-  void reload();
+  public Collection<TagBarcode> listAllTagBarcodes(PlatformType platformType);
 }

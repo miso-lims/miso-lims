@@ -72,32 +72,32 @@
     <li>
       <div class="breadcrumbsbubbleInfo">
         <div class="trigger">
-          <a href='<c:url value="/miso/project/${library.sample.project.id}"/>'>${library.sample.project.name}</a>
+          <a href='<c:url value="/miso/project/${library.sample.project.id}"/>'>${library.sample.project.alias}</a>
         </div>
         <div class="breadcrumbspopup">
-            ${library.sample.project.alias}
+            ${library.sample.project.name}
         </div>
       </div>
     </li>
     <li>
       <div class="breadcrumbsbubbleInfo">
         <div class="trigger">
-          <a href='<c:url value="/miso/sample/${library.sample.id}"/>'>${library.sample.name}</a>
+          <a href='<c:url value="/miso/sample/${library.sample.id}"/>'>${library.sample.alias}</a>
         </div>
         <div class="breadcrumbspopup">
-            ${library.sample.alias}
+            ${library.sample.name}
         </div>
       </div>
     </li>
   </ul>
   <c:if test="${not empty nextLibrary}">
     <span style="float:right; padding-top: 5px; padding-left: 6px">
-      <a class='arrowright' href='<c:url value="/miso/library/${nextLibrary.id}"/>'>Next Library <b>${nextLibrary.name}</b></a>
+      <a class='arrowright' href='<c:url value="/miso/library/${nextLibrary.id}"/>'>Next Library <b>${nextLibrary.alias}</b></a>
     </span>
   </c:if>
   <c:if test="${not empty previousLibrary}">
     <span style="float:right; padding-top: 5px">
-      <a class='arrowleft' href='<c:url value="/miso/library/${previousLibrary.id}"/>'>Previous Library <b>${previousLibrary.name}</b></a>
+      <a class='arrowleft' href='<c:url value="/miso/library/${previousLibrary.id}"/>'>Previous Library <b>${previousLibrary.alias}</b></a>
     </span>
   </c:if>
 </div>
@@ -192,7 +192,7 @@
         <i>Unassigned</i>
       </c:when>
       <c:otherwise>
-        <a href='<c:url value="/miso/sample/${library.sample.id}"/>'>${library.sample.name} (${library.sample.alias})</a>
+        <a href='<c:url value="/miso/sample/${library.sample.id}"/>'>${library.sample.alias} (${library.sample.name})</a>
       </c:otherwise>
     </c:choose>
   </td>
@@ -267,30 +267,20 @@
 </c:if>
 <tr>
   <c:choose>
-    <c:when test="${library.id ==0 or empty library.libraryType}">
-      <td>Platform - Library Type:</td>
-      <td>
-        <form:select id="platformNames" path="platformName" items="${platformNames}"
-                     onchange="Library.ui.changePlatformName(this);"/>
-        <form:select id="libraryTypes" path="libraryType"/>
-      </td>
-      <script type="text/javascript">
-        jQuery(document).ready(function () {
-          Library.ui.changePlatformName(jQuery("#platformNames"));
-        });
-      </script>
-    </c:when>
-    <c:when test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')
+    <c:when test="${library.id == 0 or empty library.libraryType or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')
         or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_TECH')}">
       <td>Platform - Library Type:</td>
       <td>
         <form:select id="platformNames" path="platformName" items="${platformNames}"
-                     onchange="Library.ui.changePlatformName(this);" class="validateable"/>
+                     onchange="Library.ui.changePlatformName(null);" class="validateable"/>
         <form:select id="libraryTypes" path="libraryType"/>
       </td>
       <script type="text/javascript">
         jQuery(document).ready(function () {
-          Library.ui.changePlatformNameWithLibraryType(jQuery("#platformNames"), '${library.libraryType.id}');
+          Library.ui.changePlatformName(function() {
+            <c:if test="${not empty library.libraryType}">jQuery('#libraryTypes').val('${library.libraryType.id}');</c:if>
+            Library.setOriginalBarcodes();
+          });
         });
       </script>
     </c:when>
@@ -338,78 +328,33 @@
   </c:choose>
 </tr>
 <tr>
-  <c:choose>
-    <c:when test="${library.id == 0 }">
-      <td>Barcoding Strategy:</td>
-      <td>
-        <select name='tagBarcodeStrategies' id='tagBarcodeStrategies' onchange='Library.tagbarcode.populateAvailableBarcodesForStrategy(this);'>
-          <option value="">Please select a platform...</option>
-        </select>
-      </td>
-    </c:when>
-    <c:when test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')
-    or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_INTERNAL')}">
-      <td>Barcoding Strategy:</td>
-      <td>
-        <c:choose>
-          <c:when test="${empty library.tagBarcodes}">
-            <select id="tagBarcodeStrategies" id='tagBarcodeStrategies' onchange="Library.tagbarcode.populateAvailableBarcodesForStrategy(this);">
-              <option selected="selected" value="">No barcoding</option>
-              <c:forEach items="${availableTagBarcodeStrategies}" var="tagBarcodeStrategy">
-              <option value="${tagBarcodeStrategy.name}">${tagBarcodeStrategy.name}</option>
-              </c:forEach>
-            </select>
-          </c:when>
-          <c:otherwise>
-            <select name='tagBarcodeStrategies' id='tagBarcodeStrategies' onchange='Library.tagbarcode.populateAvailableBarcodesForStrategy(this);'>
-            </select>
-            <script type="text/javascript">
-              jQuery(document).ready(function () {
-                Library.ui.changePlatformNameWithTagBarcodeStrategy(jQuery("#platformNames"), '${selectedTagBarcodeStrategy}');
-              });
-            </script>
-          </c:otherwise>
-        </c:choose>
-      </td>
-    </c:when>
-    <c:otherwise>
-      <td>Barcoding Strategy:</td>
-      <td>
-        <c:choose>
-          <c:when test="${empty library.tagBarcodes}">
-            <select id="tagBarcodeStrategies" id='tagBarcodeStrategies' onchange="Library.tagbarcode.populateAvailableBarcodesForStrategy(this);">
-              <option selected="selected" value="">No barcoding</option>
-              <c:forEach items="${availableTagBarcodeStrategies}" var="tagBarcodeStrategy">
-              <option value="${tagBarcodeStrategy.name}">${tagBarcodeStrategy.name}</option>
-              </c:forEach>
-            </select>
-          </c:when>
-          <c:otherwise>
-            ${selectedTagBarcodeStrategy}
-          </c:otherwise>
-        </c:choose>
-      </td>
-    </c:otherwise>
-  </c:choose>
+  <td>Barcoding Family:</td>
+  <td>
+    <select name='tagBarcodeFamily' id='tagBarcodeFamily' onchange='Library.ui.updateBarcodes();'>
+      <c:forEach items="${barcodeFamilies}" var="family">
+        <option value="${family.id}" <c:if test="${library.currentFamily.id == family.id}">selected="selected"</c:if>>${family.name}</option>
+      </c:forEach>
+    </select>
+  </td>
 </tr>
 
 <tr>
-  <c:choose>
-    <c:when test="${library.id == 0 or empty library.tagBarcodes}">
-      <td>Barcodes:</td>
-      <td id="tagBarcodesDiv">
-      </td>
-    </c:when>
-    <c:otherwise>
-      <td>Barcodes:</td>
-      <td id="tagBarcodesDiv">
-        <c:forEach items="${availableTagBarcodeStrategyBarcodes}" var="barcodemap">
-          <form:select path="tagBarcodes['${barcodemap.key}']" items="${barcodemap.value}"
-                       itemLabel="name" itemValue="id"/>
-        </c:forEach>
-      </td>
-    </c:otherwise>
-  </c:choose>
+  <td>Barcodes:</td>
+  <td id="tagBarcodesDiv">
+  </td>
+  <script type="text/javascript">
+    Library = Library || {};
+    Library.barcodeFamilies = ${barcodeFamiliesJSON};
+    Library.setOriginalBarcodes = function() {
+      Library.lastBarcodePosition = 0;
+      jQuery('#tagBarcodesDiv').empty();
+      <c:forEach items="${library.tagBarcodes}" var="barcode">
+        Library.ui.createBarcodeBox(${barcode.id});
+      </c:forEach>
+      Library.ui.createBarcodeNextBox();
+    };
+    Library.setOriginalBarcodes();
+  </script>
 </tr>
 
 <tr bgcolor="yellow">
@@ -436,10 +381,73 @@
   <td>Emptied:</td>
   <td><form:checkbox id="empty" path="empty"/></td>
 </tr>
+</table>
+
+<c:if test="${!empty library.libraryAdditionalInfo}">
+<br/>
+<br/>
+<h2>Details</h2>
+<table class="in">
+  <tr>
+    <td>Library Kit:*</td>
+    <td>
+      <miso:select id="libraryKit" path="libraryAdditionalInfo.prepKit" items="${prepKits}" itemLabel="name"
+          itemValue="id" defaultLabel="Unknown" defaultValue=""/>
+    </td>
+  </tr>
+<c:choose>
+<c:when test="${library.id == 0}">
+  <tr>
+    <td class="h">Tissue Origin:</td>
+    <td>${library.sample.sampleAdditionalInfo.tissueOrigin.alias}</td>
+  </tr>
+  <tr>
+    <td class="h">Tissue Type:</td>
+    <td>${library.sample.sampleAdditionalInfo.tissueType.alias}</td>
+  </tr>
+  <c:if test="${not empty library.sample.sampleAnalyte.groupId}">
+  <tr>
+    <td class="h">Group ID:</td>
+    <td>${library.sample.sampleAnalyte.groupId}</td>
+  </tr>
+  <tr>
+    <td class="h">Group Description:</td>
+    <td>${library.sample.sampleAnalyte.groupDescription}</td>
+  </tr>
+  </c:if>
+</c:when>
+<c:otherwise>
+  <tr>
+    <td class="h">Tissue Origin:</td>
+    <td>${library.libraryAdditionalInfo.tissueOrigin.alias}</td>
+  </tr>
+  <tr>
+    <td class="h">Tissue Type:</td>
+    <td>${library.libraryAdditionalInfo.tissueType.alias}</td>
+  </tr>
+  <c:if test="${not empty library.libraryAdditionalInfo.groupId}">
+  <tr>
+    <td class="h">Group ID:</td>
+    <td>${library.libraryAdditionalInfo.groupId}</td>
+  </tr>
+  <tr>
+    <td class="h">Group Description:</td>
+    <td>${library.libraryAdditionalInfo.groupDescription}</td>
+  </tr>
+  </c:if>
+</c:otherwise>
+</c:choose>
+  <tr>
+    <td class="h">Archived:</td>
+    <td><form:checkbox id="archived" path="libraryAdditionalInfo.archived"/></td>
+  </tr>
+</table>
+</c:if>
 
 <c:choose>
   <c:when
       test="${!empty library.sample and library.securityProfile.profileId eq library.sample.project.securityProfile.profileId}">
+    <table class="in">
     <tr>
       <td>Permissions</td>
       <td><i>Inherited from sample </i>
@@ -451,7 +459,6 @@
     </table>
   </c:when>
   <c:otherwise>
-    </table>
     <%@ include file="permissions.jsp" %>
   </c:otherwise>
 </c:choose>
@@ -986,20 +993,20 @@
       <li>
         <div class="breadcrumbsbubbleInfo">
           <div class="trigger">
-            <a href='<c:url value="/miso/project/${library.sample.project.id}"/>'>${library.sample.project.name}</a>
+            <a href='<c:url value="/miso/project/${library.sample.project.id}"/>'>${library.sample.project.alias}</a>
           </div>
           <div class="breadcrumbspopup">
-              ${library.sample.project.alias}
+              ${library.sample.project.name}
           </div>
         </div>
       </li>
       <li>
         <div class="breadcrumbsbubbleInfo">
           <div class="trigger">
-            <a href='<c:url value="/miso/sample/${library.sample.id}"/>'>${library.sample.name}</a>
+            <a href='<c:url value="/miso/sample/${library.sample.id}"/>'>${library.sample.alias}</a>
           </div>
           <div class="breadcrumbspopup">
-              ${library.sample.alias}
+              ${library.sample.name}
           </div>
         </div>
       </li>

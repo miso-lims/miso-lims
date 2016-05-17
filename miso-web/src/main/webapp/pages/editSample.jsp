@@ -82,10 +82,10 @@
       <li>
         <div class="breadcrumbsbubbleInfo">
           <div class="trigger">
-            <a href='<c:url value="/miso/project/${sample.project.id}"/>'>${sample.project.name}</a>
+            <a href='<c:url value="/miso/project/${sample.project.id}"/>'>${sample.project.alias}</a>
           </div>
           <div class="breadcrumbspopup">
-              ${sample.project.alias}
+              ${sample.project.name}
           </div>
         </div>
       </li>
@@ -514,21 +514,13 @@
             <tr>
               <td class="h">Group ID:</td>
               <td>
-                <c:choose>
-                  <c:when test="${sample.id == 0}">
-                    <form:select id="sampleGroup" path="sampleAnalyte.sampleGroup">
-                      <%-- list filtered and filled by js --%>
-                      <script type="text/javascript">
-                        jQuery(document).ready(function () {
-                          Sample.ui.filterSampleGroupOptions();
-                        });
-                      </script>
-                    </form:select>
-                  </c:when>
-                  <c:otherwise>
-                    ${!empty sample.sampleAnalyte.sampleGroup ? sample.sampleAnalyte.sampleGroup.groupId : 'n/a'}
-                  </c:otherwise>
-                </c:choose>
+                <form:input id="groupId" path="sampleAnalyte.groupId"/>
+              </td>
+            </tr>
+            <tr>
+              <td class="h">Group Description:</td>
+              <td>
+                <form:input id="groupDescription" path="sampleAnalyte.groupDescription"/>
               </td>
             </tr>
             <tr>
@@ -657,25 +649,6 @@
 <c:if test="${sample.id == 0}">
 </div>
 <div id="tab-2">
-  <div class="breadcrumbs">
-    <ul>
-      <li>
-        <a href="/">Home</a>
-      </li>
-      <c:if test="${not empty sample.project}">
-      <li>
-        <div class="breadcrumbsbubbleInfo">
-          <div class="trigger">
-            <a href='<c:url value="/miso/project/${sample.project.id}"/>'>${sample.project.name}</a>
-          </div>
-          <div class="breadcrumbspopup">
-              ${sample.project.alias}
-          </div>
-        </div>
-      </li>
-      </c:if>
-    </ul>
-  </div>
   <h1>Create Samples</h1>
   <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#hothelp_arrowclick'), 'hothelpdiv');">Quick Help
     <div id="hothelp_arrowclick" class="toggleLeft"></div>

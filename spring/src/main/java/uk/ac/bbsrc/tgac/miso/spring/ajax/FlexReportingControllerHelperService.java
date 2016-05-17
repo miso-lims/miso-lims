@@ -445,13 +445,16 @@ public class FlexReportingControllerHelperService {
                           Sample sample = libraryInRun.getSample();
 
                           StringBuilder tagBarcode = new StringBuilder();
-                          for (Map.Entry<Integer, TagBarcode> entry : libraryInRun.getTagBarcodes().entrySet()) {
-                            tagBarcode.append(entry.getKey().toString() + ": " + entry.getValue().getName() + " ("
-                                + entry.getValue().getSequence() + ")<br/>");
+                          for (TagBarcode barcode : libraryInRun.getTagBarcodes()) {
+                            tagBarcode.append(barcode.getPosition());
+                            tagBarcode.append(": ");
+                            tagBarcode.append(barcode.getName());
+                            tagBarcode.append(" (");
+                            tagBarcode.append(barcode.getSequence() + ")<br/>");
                           }
 
-                          List list = new ArrayList(libraryInRun.getLibraryQCs());
-                          LibraryQC libraryQc = (LibraryQC) list.get(list.size() - 1);
+                          List<LibraryQC> list = new ArrayList<>(libraryInRun.getLibraryQCs());
+                          LibraryQC libraryQc = list.get(list.size() - 1);
 
                           jsonArray.add(JsonSanitizer.sanitize("[\"" + sample.getAlias() + "\",\"" + sample.getDescription() + "\",\""
                               + sample.getSampleType() + "\",\"" + libraryInRun.getName() + "\",\"" + dilution.getName() + "\",\""
@@ -767,7 +770,6 @@ public class FlexReportingControllerHelperService {
               }
             }
           }
-          
 
           if (libqcpassed > 0 || libqcfailed > 0) {
             overviewRelationArray.add(

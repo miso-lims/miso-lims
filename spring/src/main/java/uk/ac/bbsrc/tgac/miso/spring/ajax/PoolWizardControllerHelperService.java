@@ -270,13 +270,14 @@ public class PoolWizardControllerHelperService {
           if (dl.getLibrary().getQcPassed()) {
             StringBuilder barcode = new StringBuilder();
             if (!dl.getLibrary().getTagBarcodes().isEmpty()) {
-              int count = 0;
-              for (TagBarcode tb : dl.getLibrary().getTagBarcodes().values()) {
-                if (dl.getLibrary().getTagBarcodes().values().size() > 1 && count > 0) {
+              boolean first = true;
+              for (TagBarcode tb : dl.getLibrary().getTagBarcodes()) {
+                if (first) {
+                  first = false;
+                } else {
                   barcode.append("-");
                 }
                 barcode.append(tb.getName());
-                count++;
               }
             }
 
@@ -287,10 +288,9 @@ public class PoolWizardControllerHelperService {
             b.append("</td>");
             b.append("</tr>");
 
-            a.add(JSONObject
-                .fromObject("{'id':" + dl.getId() + ",'name':'" + dl.getName() + "','concentration':'" + dl.getConcentration() 
-                    + "','description':'" + dl.getLibrary().getDescription()+ "','library':'" + dl.getLibrary().getAlias() 
-                    + "','libraryBarcode':'" + barcode.toString() + "'}"));
+            a.add(JSONObject.fromObject("{'id':" + dl.getId() + ",'name':'" + dl.getName() + "','concentration':'" + dl.getConcentration()
+                + "','description':'" + dl.getLibrary().getDescription() + "','library':'" + dl.getLibrary().getAlias()
+                + "','libraryBarcode':'" + barcode.toString() + "'}"));
           }
         }
       }

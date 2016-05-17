@@ -24,9 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +49,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.AbstractPlate;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Plate;
 import uk.ac.bbsrc.tgac.miso.core.data.Plateable;
-import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -90,7 +87,7 @@ public class EditPlateController {
   public Collection<String> populateMaterialTypes() throws IOException {
     return requestManager.listAllStudyTypes();
   }
-  
+
   @ModelAttribute("maxLengths")
   public Map<String, Integer> maxLengths() throws IOException {
     return requestManager.getPlateColumnSizes();
@@ -102,22 +99,6 @@ public class EditPlateController {
   @ModelAttribute("autoGenerateIdBarcodes")
   public Boolean autoGenerateIdentificationBarcodes() {
     return autoGenerateIdBarcodes;
-  }
-
-  public Collection<TagBarcode> populateAvailableTagBarcodes() throws IOException {
-    List<TagBarcode> barcodes = new ArrayList<TagBarcode>(requestManager.listAllTagBarcodes());
-    Collections.sort(barcodes);
-    return barcodes;
-  }
-
-  public String tagBarcodesString(String platformName) throws IOException {
-    List<TagBarcode> tagBarcodes = new ArrayList<TagBarcode>(requestManager.listAllTagBarcodes());
-    Collections.sort(tagBarcodes);
-    List<String> names = new ArrayList<String>();
-    for (TagBarcode tb : tagBarcodes) {
-      names.add("\"" + tb.getName() + " (" + tb.getSequence() + ")\"" + ":" + "\"" + tb.getId() + "\"");
-    }
-    return LimsUtils.join(names, ",");
   }
 
   @RequestMapping(value = "/new", method = RequestMethod.GET)
@@ -158,14 +139,6 @@ public class EditPlateController {
       } else {
         throw new SecurityException("No such Plate");
       }
-
-      model.put("availableTagBarcodes", populateAvailableTagBarcodes());
-
-      /*
-       * model.put("owners", LimsSecurityUtils.getPotentialOwners(user, study, securityManager.listAllUsers()));
-       * model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, study, securityManager.listAllUsers()));
-       * model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, study, securityManager.listAllGroups()));
-       */
       return new ModelAndView("/pages/editPlate.jsp", model);
     } catch (IOException ex) {
       if (log.isDebugEnabled()) {
@@ -183,7 +156,6 @@ public class EditPlateController {
       model.put("title", "Import Plate");
       model.put("formObj", plate);
       model.put("plate", plate);
-      model.put("availableTagBarcodes", populateAvailableTagBarcodes());
       return new ModelAndView("/pages/importPlate.jsp", model);
     } catch (IOException ex) {
       if (log.isDebugEnabled()) {

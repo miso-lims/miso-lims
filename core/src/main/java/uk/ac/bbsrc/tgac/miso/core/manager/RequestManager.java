@@ -63,7 +63,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
-import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedResequencing;
@@ -203,8 +202,6 @@ public interface RequestManager {
   public LibraryStrategyType getLibraryStrategyTypeById(long libraryStrategyTypeId) throws IOException;
 
   public LibraryStrategyType getLibraryStrategyTypeByName(String name) throws IOException;
-
-  public TagBarcode getTagBarcodeById(long tagBarcodeId) throws IOException;
 
   public emPCR getEmPCRById(long pcrId) throws IOException;
 
@@ -407,12 +404,6 @@ public interface RequestManager {
   public Collection<LibrarySelectionType> listAllLibrarySelectionTypes() throws IOException;
 
   public Collection<LibraryStrategyType> listAllLibraryStrategyTypes() throws IOException;
-
-  public Collection<TagBarcode> listAllTagBarcodes() throws IOException;
-
-  public Collection<TagBarcode> listAllTagBarcodesByPlatform(String platformType) throws IOException;
-
-  public Collection<TagBarcode> listAllTagBarcodesByStrategyName(String platformType) throws IOException;
 
   public Collection<Dilution> listAllLibraryDilutionsBySearchAndPlatform(String query, PlatformType platformType) throws IOException;
 

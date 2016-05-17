@@ -155,6 +155,15 @@ var Sample = Sample || {
         jQuery('#tubeId').attr('class', 'form-control');
         jQuery('#tubeId').attr('data-parsley-maxlength', '255');
         jQuery('#tubeId').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+        
+        // Group ID validation
+        jQuery('#groupId').attr('class', 'form-control');
+        jQuery('#groupId').attr('data-parsley-type', 'integer');
+        
+        // Group Description validation
+        jQuery('#groupDescription').attr('class', 'form-control');
+        jQuery('#groupDescription').attr('data-parsley-maxlength', '255');
+        jQuery('#groupDescription').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
         break;
       }
     }

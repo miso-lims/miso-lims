@@ -89,10 +89,6 @@ public class SampleAnalyteController extends RestController {
       sampleAnalyteDto.setSamplePurposeUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/samplepurpose/{id}")
           .buildAndExpand(sampleAnalyteDto.getSamplePurposeId()).toUriString());
     }
-    if (sampleAnalyteDto.getSampleGroupId() != null) {
-      sampleAnalyteDto.setSampleGroupUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/samplegroup/{id}")
-          .buildAndExpand(sampleAnalyteDto.getSampleGroupId()).toUriString());
-    }
     if (sampleAnalyteDto.getTissueMaterialId() != null) {
       sampleAnalyteDto.setTissueMaterialUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/tissuematerial/{id}")
           .buildAndExpand(sampleAnalyteDto.getTissueMaterialId()).toUriString());

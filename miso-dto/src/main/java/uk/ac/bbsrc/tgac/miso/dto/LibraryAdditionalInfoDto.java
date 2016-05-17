@@ -11,7 +11,8 @@ public class LibraryAdditionalInfoDto {
   private String libraryUrl;
   private TissueOriginDto tissueOrigin;
   private TissueTypeDto tissueType;
-  private SampleGroupDto sampleGroup;
+  private Long groupId;
+  private String groupDescription;
   private KitDescriptorDto prepKit;
   private Long createdById;
   private String createdByUrl;
@@ -70,12 +71,20 @@ public class LibraryAdditionalInfoDto {
     this.tissueType = tissueType;
   }
 
-  public SampleGroupDto getSampleGroup() {
-    return sampleGroup;
+  public Long getGroupId() {
+    return groupId;
   }
 
-  public void setSampleGroup(SampleGroupDto sampleGroup) {
-    this.sampleGroup = sampleGroup;
+  public void setGroupId(Long groupId) {
+    this.groupId = groupId;
+  }
+
+  public String getGroupDescription() {
+    return groupDescription;
+  }
+
+  public void setGroupDescription(String groupDescription) {
+    this.groupDescription = groupDescription;
   }
 
   public Long getCreatedById() {
@@ -153,7 +162,7 @@ public class LibraryAdditionalInfoDto {
   @Override
   public String toString() {
     return "LibraryAdditionalInfoDto [id=" + id + ", url=" + url + ", libraryId=" + libraryId + ", libraryUrl=" + libraryUrl
-        + ", tissueOrigin=" + tissueOrigin + ", tissueType=" + tissueType + ", sampleGroup=" + sampleGroup + ", prepKit=" + prepKit
+        + ", tissueOrigin=" + tissueOrigin + ", tissueType=" + tissueType + ", groupId=" + groupId + ", groupDescription=" + groupDescription + ", prepKit=" + prepKit
         + ", createdById=" + createdById + ", createdByUrl=" + createdByUrl + ", creationDate=" + creationDate + ", updatedById="
         + updatedById + ", updatedByUrl=" + updatedByUrl + ", lastUpdated=" + lastUpdated + ", archived=" + archived + ", libraryDesignId="
         + libraryDesignId + "]";

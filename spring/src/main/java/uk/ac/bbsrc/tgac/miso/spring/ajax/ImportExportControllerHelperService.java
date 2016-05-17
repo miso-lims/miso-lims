@@ -61,6 +61,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
+import uk.ac.bbsrc.tgac.miso.core.data.TagBarcodeFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryQCImpl;
@@ -73,8 +74,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.InputFormException;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
-import uk.ac.bbsrc.tgac.miso.core.service.tagbarcode.TagBarcodeStrategy;
-import uk.ac.bbsrc.tgac.miso.core.service.tagbarcode.TagBarcodeStrategyResolverService;
+import uk.ac.bbsrc.tgac.miso.core.service.TagBarcodeService;
 import uk.ac.bbsrc.tgac.miso.core.util.FormUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
@@ -92,11 +92,11 @@ public class ImportExportControllerHelperService {
   @Autowired
   private RequestManager requestManager;
   @Autowired
+  private TagBarcodeService tagBarcodeService;
+  @Autowired
   private MisoFilesManager misoFileManager;
   @Autowired
   private SecurityManager securityManager;
-  @Autowired
-  private TagBarcodeStrategyResolverService tagBarcodeStrategyResolverService;
 
   private static final Pattern digitPattern = Pattern.compile("(^[0-9]+)[\\.0-9]*");
 
@@ -417,35 +417,11 @@ public class ImportExportControllerHelperService {
 
               if (jsonArrayElement.get(9) != null && !isStringEmptyOrNull(jsonArrayElement.getString(9))
                   && (library.getQcPassed() || library.getQcPassed() == null)) {
-                Collection<TagBarcode> bcs = requestManager.listAllTagBarcodesByStrategyName(jsonArrayElement.getString(9));
-                if (!bcs.isEmpty()) {
+                Iterable<TagBarcode> bcs = tagBarcodeService.getTagBarcodeFamilyByName(jsonArrayElement.getString(9));
+                if (bcs != null) {
                   String tags = jsonArrayElement.getString(10);
                   if (!isStringEmptyOrNull(tags)) {
-                    HashMap<Integer, TagBarcode> tbs = new HashMap<Integer, TagBarcode>();
-                    if (tags.contains("-")) {
-                      String[] splits = tags.split("-");
-                      int count = 1;
-                      for (String tag : splits) {
-                        for (TagBarcode tb : bcs) {
-                          if (tb.getName().equals(tag)) {
-                            // set tag barcodes
-                            tbs.put(count, tb);
-                            count++;
-                          }
-                        }
-                      }
-                    } else {
-                      for (TagBarcode tb : bcs) {
-                        if (tb.getName().equals(tags) || tb.getSequence().equals(tags)) {
-                          // set tag barcode
-                          tbs.put(1, tb);
-                          log.info("Got tag barcode: " + tb.getName());
-                          break;
-                        }
-                      }
-                    }
-
-                    library.setTagBarcodes(tbs);
+                    library.setTagBarcodes(FormUtils.matchBarcodesFromText(bcs, tags));
                   } else {
                     throw new InputFormException(
                         "Barcode Kit specified but no tag barcodes entered for library '" + jsonArrayElement.getString(3) + "'.");
@@ -604,10 +580,8 @@ public class ImportExportControllerHelperService {
         }
 
         StringBuilder tagsb = new StringBuilder();
-        List<TagBarcodeStrategy> strategies = new ArrayList<TagBarcodeStrategy>(
-            tagBarcodeStrategyResolverService.getTagBarcodeStrategiesByPlatform(PlatformType.get(platform)));
         tagsb.append("<option >No Barcode Strategy</option>");
-        for (TagBarcodeStrategy tb : strategies) {
+        for (TagBarcodeFamily tb : tagBarcodeService.getTagBarcodeFamiliesByPlatform(PlatformType.get(platform))) {
           tagsb.append("<option>" + tb.getName() + "</option>");
         }
 
@@ -635,8 +609,8 @@ public class ImportExportControllerHelperService {
     this.securityManager = securityManager;
   }
 
-  public void setTagBarcodeStrategyResolverService(TagBarcodeStrategyResolverService tagBarcodeStrategyResolverService) {
-    this.tagBarcodeStrategyResolverService = tagBarcodeStrategyResolverService;
+  public void setTagBarcodeStrategyResolverService(TagBarcodeService tagBarcodeService) {
+    this.tagBarcodeService = tagBarcodeService;
   }
 
 }
