@@ -55,20 +55,20 @@
     <li>
       <div class="breadcrumbsbubbleInfo">
         <div class="trigger">
-          <a href='<c:url value="/miso/project/${experiment.study.project.id}"/>'>${experiment.study.project.name}</a>
+          <a href='<c:url value="/miso/project/${experiment.study.project.id}"/>'>${experiment.study.project.alias}</a>
         </div>
         <div class="breadcrumbspopup">
-            ${experiment.study.project.alias}
+            ${experiment.study.project.name}
         </div>
       </div>
     </li>
     <li>
       <div class="breadcrumbsbubbleInfo">
         <div class="trigger">
-          <a href='<c:url value="/miso/study/${experiment.study.id}"/>'>${experiment.study.name}</a>
+          <a href='<c:url value="/miso/study/${experiment.study.id}"/>'>${experiment.study.alias}</a>
         </div>
         <div class="breadcrumbspopup">
-            ${experiment.study.alias}
+            ${experiment.study.name}
         </div>
       </div>
     </li>
