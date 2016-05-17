@@ -247,6 +247,11 @@ public class Dtos {
     dto.setLastUpdated(dateTimeFormatter.print(from.getLastUpdated().getTime()));
     dto.setExternalInstituteIdentifier(from.getExternalInstituteIdentifier());
     dto.setTubeNumber(from.getTubeNumber());
+    if (from.getParent() != null) {
+      dto.setParentId(from.getParent().getId());
+      dto.setParentAlias(from.getParent().getAlias());
+      dto.setParentSampleClassId(from.getSampleClass().getId());
+    }
     return dto;
   }
 
@@ -295,6 +300,26 @@ public class Dtos {
       SampleClass sampleClass = new SampleClassImpl();
       sampleClass.setId(from.getSampleClassId());
       to.setSampleClass(sampleClass);
+    }
+    Sample parent = null;
+    if (from.getParentId() != null) {
+      parent = new SampleImpl();
+      parent.setId(from.getParentId());
+    }
+    if (from.getParentAlias() != null) {
+      if (parent == null) parent = new SampleImpl();
+      parent.setAlias(from.getParentAlias());
+    }
+    if (from.getParentSampleClassId() != null) {
+      if (parent == null) {
+        parent = new SampleImpl();
+        parent.setSampleAdditionalInfo(new SampleAdditionalInfoImpl());
+        parent.getSampleAdditionalInfo().setSampleClass(new SampleClassImpl());
+        parent.getSampleAdditionalInfo().getSampleClass().setId(from.getParentSampleClassId());
+      }
+    }
+    if (parent != null) {
+      to.setParent(parent);
     }
     return to;
   }
