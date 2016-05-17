@@ -392,7 +392,7 @@
     <td>Library Kit:*</td>
     <td>
       <miso:select id="libraryKit" path="libraryAdditionalInfo.prepKit" items="${prepKits}" itemLabel="name"
-          itemValue="id" defaultLabel="Unknown" defaultValue=""/>
+          itemValue="id" defaultLabel="SELECT" defaultValue=""/>
     </td>
   </tr>
 <c:choose>
