@@ -28,6 +28,7 @@ import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.Property;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCR;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
@@ -47,6 +48,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
+import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
@@ -768,8 +770,34 @@ public class SQLDilutionDAO implements DilutionStore {
     return false;
   }
 
-  public class LazyLibraryDilutionMapper implements RowMapper<LibraryDilution> {
+  public class LazyLibraryDilutionMapper extends CacheAwareRowMapper<LibraryDilution> {
+    
+    public LazyLibraryDilutionMapper() {
+      super(LibraryDilution.class);
+   }
+
+   public LazyLibraryDilutionMapper(boolean lazy) {
+      super(LibraryDilution.class, lazy);
+   }
+    
     public LibraryDilution mapRow(ResultSet rs, int rowNum) throws SQLException {
+
+      long id = rs.getLong("dilutionId");
+
+      if (isCacheEnabled() && lookupCache(cacheManager) != null) {
+         Element element;
+         if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
+            log.info("Cache hit on map for librarydilution " + id);
+            LibraryDilution dilution = (LibraryDilution) element.getObjectValue();
+            if (dilution == null) throw new NullPointerException("The LazyLibraryDilutionMapper cache is full of lies!!!");
+            if (dilution.getId() == 0) {
+               DbUtils.updateCaches(lookupCache(cacheManager), id);
+            } else {
+               return (LibraryDilution) element.getObjectValue();
+            }
+         }
+      }
+
       LibraryDilution libraryDilution = dataObjectFactory.getLibraryDilution();
       libraryDilution.setId(rs.getLong("dilutionId"));
       libraryDilution.setName(rs.getString("name"));
@@ -793,8 +821,33 @@ public class SQLDilutionDAO implements DilutionStore {
     }
   }
 
-  public class LibraryDilutionMapper implements RowMapper<LibraryDilution> {
+  public class LibraryDilutionMapper extends CacheAwareRowMapper<LibraryDilution> {
+    
+    public LibraryDilutionMapper() {
+      super(LibraryDilution.class);
+   }
+
+   public LibraryDilutionMapper(boolean lazy) {
+      super(LibraryDilution.class, lazy);
+   }
+
     public LibraryDilution mapRow(ResultSet rs, int rowNum) throws SQLException {
+      long id = rs.getLong("dilutionId");
+
+      if (isCacheEnabled() && lookupCache(cacheManager) != null) {
+         Element element;
+         if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
+            log.info("Cache hit on map for librarydilution " + id);
+            LibraryDilution dilution = (LibraryDilution) element.getObjectValue();
+            if (dilution == null) throw new NullPointerException("The LazyLibraryDilutionMapper cache is full of lies!!!");
+            if (dilution.getId() == 0) {
+               DbUtils.updateCaches(lookupCache(cacheManager), id);
+            } else {
+               return (LibraryDilution) element.getObjectValue();
+            }
+         }
+      }
+      
       LibraryDilution libraryDilution = dataObjectFactory.getLibraryDilution();
       libraryDilution.setId(rs.getLong("dilutionId"));
       libraryDilution.setName(rs.getString("name"));
@@ -817,8 +870,34 @@ public class SQLDilutionDAO implements DilutionStore {
     }
   }
 
-  public class LazyEmPCRDilutionMapper implements RowMapper<emPCRDilution> {
+  public class LazyEmPCRDilutionMapper extends CacheAwareRowMapper<emPCRDilution> {
+    
+    public LazyEmPCRDilutionMapper() {
+      super(emPCRDilution.class);
+   }
+
+   public LazyEmPCRDilutionMapper(boolean lazy) {
+      super(emPCRDilution.class, lazy);
+   }
+    
     public emPCRDilution mapRow(ResultSet rs, int rowNum) throws SQLException {
+      
+      long id = rs.getLong("dilutionId");
+
+      if (isCacheEnabled() && lookupCache(cacheManager) != null) {
+         Element element;
+         if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
+            log.info("Cache hit on map for LazyEmPCRDilutionMapper " + id);
+            emPCRDilution dilution = (emPCRDilution) element.getObjectValue();
+            if (dilution == null) throw new NullPointerException("The LazyEmPCRDilutionMapper cache is full of lies!!!");
+            if (dilution.getId() == 0) {
+               DbUtils.updateCaches(lookupCache(cacheManager), id);
+            } else {
+               return (emPCRDilution) element.getObjectValue();
+            }
+         }
+      }
+      
       emPCRDilution pcrDilution = dataObjectFactory.getEmPCRDilution();
       pcrDilution.setId(rs.getLong("dilutionId"));
       pcrDilution.setName(rs.getString("name"));
@@ -841,8 +920,33 @@ public class SQLDilutionDAO implements DilutionStore {
     }
   }
 
-  public class EmPCRDilutionMapper implements RowMapper<emPCRDilution> {
+  public class EmPCRDilutionMapper extends CacheAwareRowMapper<emPCRDilution> {
+    
+    public EmPCRDilutionMapper() {
+      super(emPCRDilution.class);
+   }
+
+   public EmPCRDilutionMapper(boolean lazy) {
+      super(emPCRDilution.class, lazy);
+   }
+    
     public emPCRDilution mapRow(ResultSet rs, int rowNum) throws SQLException {
+      
+      long id = rs.getLong("dilutionId");
+
+      if (isCacheEnabled() && lookupCache(cacheManager) != null) {
+         Element element;
+         if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
+            log.info("Cache hit on map for EmPCRDilutionMapper " + id);
+            emPCRDilution dilution = (emPCRDilution) element.getObjectValue();
+            if (dilution == null) throw new NullPointerException("The EmPCRDilutionMapper cache is full of lies!!!");
+            if (dilution.getId() == 0) {
+               DbUtils.updateCaches(lookupCache(cacheManager), id);
+            } else {
+               return (emPCRDilution) element.getObjectValue();
+            }
+         }
+      }
       emPCRDilution pcrDilution = dataObjectFactory.getEmPCRDilution();
       pcrDilution.setId(rs.getLong("dilutionId"));
       pcrDilution.setName(rs.getString("name"));
