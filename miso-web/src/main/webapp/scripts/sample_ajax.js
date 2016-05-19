@@ -27,11 +27,16 @@ var Sample = Sample || {
       Fluxion.doAjax(
         'sampleControllerHelperService',
         'deleteSample',
-        {'sampleId': sampleId, 'url': ajaxurl},
-        {'doOnSuccess': function (json) {
-          successfunc();
+        {
+          'sampleId': sampleId,
+          'url': ajaxurl
+        },
+        {
+          'doOnSuccess': function (json) {
+            successfunc();
+          }
         }
-      });
+      );
     }
   },
 
@@ -40,11 +45,17 @@ var Sample = Sample || {
       Fluxion.doAjax(
         'sampleControllerHelperService',
         'removeSampleFromGroup',
-        {'sampleId': sampleId, 'sampleGroupId':sampleGroupId, 'url': ajaxurl},
-        {'doOnSuccess': function (json) {
-          successfunc();
+        {
+          'sampleId': sampleId,
+          'sampleGroupId':sampleGroupId,
+          'url': ajaxurl
+        },
+        {
+          'doOnSuccess': function (json) {
+            successfunc();
+          }
         }
-      });
+      );
     }
   },
   
@@ -171,7 +182,9 @@ var Sample = Sample || {
     Fluxion.doAjax(
       'sampleControllerHelperService',
       'getSampleAliasRegex',
-      { 'url': ajaxurl },
+      { 
+        'url': ajaxurl
+      },
       {
         'doOnSuccess': function(json) {
           var regex = json.aliasRegex.split(' ').join('+');
@@ -240,7 +253,9 @@ Sample.qc = {
         'sampleId': sampleId,
         'url': ajaxurl
       },
-      {'doOnSuccess': self.insertSampleQCRow}
+      {
+        'doOnSuccess': self.insertSampleQCRow
+      }
     );
   },
 
@@ -272,7 +287,9 @@ Sample.qc = {
       Fluxion.doAjax(
         'sampleControllerHelperService',
         'getSampleQcTypes',
-        {'url': ajaxurl},
+        {
+          'url': ajaxurl
+        },
         {
           'doOnSuccess': function (json) {
             jQuery('#sampleQcType').html(json.types);
@@ -300,8 +317,10 @@ Sample.qc = {
         'qcDate': f.sampleQcDate,
         'qcType': f.sampleQcType,
         'results': f.sampleQcResults,
-        'url': ajaxurl},
-      {'updateElement': 'sampleQcTable',
+        'url': ajaxurl
+      },
+      {
+        'updateElement': 'sampleQcTable',
         'doOnSuccess': function () {
           jQuery('#sampleQcTable').removeAttr("qcInProgress");
         }
@@ -335,7 +354,8 @@ Sample.qc = {
         'result': jQuery('#' + qcId).val(),
         'url': ajaxurl
       },
-      {'doOnSuccess': Utils.page.pageReload
+      {
+        'doOnSuccess': Utils.page.pageReload
       }
     );
   },
@@ -369,9 +389,11 @@ Sample.qc = {
             'qcs': aReturn,
             'url': ajaxurl
           },
-          {'doOnSuccess': function(json) {
-            Sample.library.processBulkLibraryQcTable(tableName, json);
-          }}
+          {
+            'doOnSuccess': function(json) {
+              Sample.library.processBulkLibraryQcTable(tableName, json);
+            }
+          }
         );
       }
       else {
@@ -457,9 +479,11 @@ Sample.library = {
             'dilutions': aReturn,
             'url': ajaxurl
           },
-          {'doOnSuccess': function(json) {
-            self.processBulkLibraryDilutionTable(tableName, json);
-          }}
+          {
+            'doOnSuccess': function(json) {
+              self.processBulkLibraryDilutionTable(tableName, json);
+            }
+          }
         );
       }
       else {
@@ -868,8 +892,14 @@ Sample.ui = {
       Fluxion.doAjax(
         'sampleControllerHelperService',
         'deleteSampleNote',
-        {'sampleId': sampleId, 'noteId': noteId, 'url': ajaxurl},
-        {'doOnSuccess': Utils.page.pageReload}
+        {
+          'sampleId': sampleId,
+          'noteId': noteId,
+          'url': ajaxurl
+        },
+        {
+          'doOnSuccess': Utils.page.pageReload
+        }
       );
     }
   },
@@ -881,21 +911,25 @@ Sample.ui = {
       Fluxion.doAjax(
         'sampleControllerHelperService',
         'getSampleByBarcode',
-        {'barcode': barcode, 'url': ajaxurl},
-        {'doOnSuccess': function (json) {
-          var sample_desc = "<div id='" + json.id + "' class='dashboard'><table width=100%><tr><td>Sample Name: " + json.name + "<br> Sample ID: " + json.id + "<br>Desc: " + json.desc + "<br>Sample Type:" + json.type + "</td><td style='position: absolute;' align='right'><span class='float-right ui-icon ui-icon-circle-close' onclick='Sample.ui.removeSample(" + json.id + ");' style='position: absolute; top: 0; right: 0;'></span></td></tr></table> </div>";
-          if (jQuery("#" + json.id).length === 0) {
-            jQuery("#sample_pan").append(sample_desc);
-            jQuery('#msgspan').html("");
-          } else {
-            jQuery('#msgspan').html("<i>This sample has already been scanned</i>");
-          }
-
-          //unbind to stop change error happening every time
-
-          //clear and focus
-          jQuery(input).val("");
-          jQuery(input).focus();
+        {
+          'barcode': barcode,
+          'url': ajaxurl
+        },
+        {
+          'doOnSuccess': function (json) {
+            var sample_desc = "<div id='" + json.id + "' class='dashboard'><table width=100%><tr><td>Sample Name: " + json.name + "<br> Sample ID: " + json.id + "<br>Desc: " + json.desc + "<br>Sample Type:" + json.type + "</td><td style='position: absolute;' align='right'><span class='float-right ui-icon ui-icon-circle-close' onclick='Sample.ui.removeSample(" + json.id + ");' style='position: absolute; top: 0; right: 0;'></span></td></tr></table> </div>";
+            if (jQuery("#" + json.id).length === 0) {
+              jQuery("#sample_pan").append(sample_desc);
+              jQuery('#msgspan').html("");
+            } else {
+              jQuery('#msgspan').html("<i>This sample has already been scanned</i>");
+            }
+  
+            //unbind to stop change error happening every time
+  
+            //clear and focus
+            jQuery(input).val("");
+            jQuery(input).focus();
           },
           'doOnError': function (json) {
             jQuery('#msgspan').html("<i>" + json.error + "</i>");
@@ -922,11 +956,16 @@ Sample.ui = {
       Fluxion.doAjax(
         'sampleControllerHelperService',
         'setSampleReceivedDateByBarcode',
-        {'samples': samples, 'url': ajaxurl},
-        {'doOnSuccess': function (json) {
-          alert(json.result);
+        {
+          'samples': samples,
+          'url': ajaxurl
+        },
+        {
+          'doOnSuccess': function (json) {
+            alert(json.result);
+          }
         }
-      });
+      );
     } else {
       alert("No samples scanned");
     }

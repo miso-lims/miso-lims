@@ -178,23 +178,31 @@ Container.ui = {
     Fluxion.doAjax(
       'containerControllerHelperService',
       'getPlatformTypes',
-      {'url': ajaxurl},
+      {
+        'url': ajaxurl
+      },
       {
         'doOnSuccess': function (json) {
           jQuery('#platformTypesDiv').html(json.html);
         }
-      });
+      }
+    );
   },
 
   changeContainerPlatformType: function (form) {
     Fluxion.doAjax(
       'containerControllerHelperService',
       'changePlatformType',
-      {'platformtype': form.value, 'container_cId': jQuery('input[name=container_cId]').val(), 'url': ajaxurl},
-      {'doOnSuccess': function (json) {
-        jQuery('#sequencerReferenceSelect').html(json.sequencers);
-        Container.pool.poolSearch("", form.value);
-      }
+      {
+        'platformtype': form.value,
+        'container_cId': jQuery('input[name=container_cId]').val(),
+        'url': ajaxurl
+      },
+      {
+        'doOnSuccess': function (json) {
+          jQuery('#sequencerReferenceSelect').html(json.sequencers);
+          Container.pool.poolSearch("", form.value);
+        }
       }
     );
   },
@@ -204,12 +212,17 @@ Container.ui = {
       Fluxion.doAjax(
         'containerControllerHelperService',
         'populateContainerOptions',
-        {'sequencerReference': form.value, 'container_cId': jQuery('input[name=container_cId]').val(), 'url': ajaxurl},
-        {'doOnSuccess': function (json) {
-          jQuery('#sequencerReferenceSelect').attr("platformId", json.platformId);
-          if (json.partitions) {
-            jQuery('#containerPartitions').html(json.partitions);
-          }
+        {
+          'sequencerReference': form.value,
+          'container_cId': jQuery('input[name=container_cId]').val(),
+          'url': ajaxurl
+        },
+        {
+          'doOnSuccess': function (json) {
+            jQuery('#sequencerReferenceSelect').attr("platformId", json.platformId);
+            if (json.partitions) {
+              jQuery('#containerPartitions').html(json.partitions);
+            }
           }
         }
       );
@@ -220,40 +233,85 @@ Container.ui = {
     Fluxion.doAjax(
       'containerControllerHelperService',
       'changeContainer',
-      {'platform': platform, 'container_cId': jQuery('input[name=container_cId]').val(), 'numContainers': numContainers, 'sequencerReferenceId': seqrefId, 'url': ajaxurl},
-      {'updateElement': 'containerdiv'});
+      {
+        'platform': platform,
+        'container_cId': jQuery('input[name=container_cId]').val(),
+        'numContainers': numContainers,
+        'sequencerReferenceId': seqrefId,
+        'url': ajaxurl
+      },
+      {
+        'updateElement': 'containerdiv'
+      }
+    );
   },
 
   changeContainerIlluminaLane: function (t, container) {
     Fluxion.doAjax(
       'containerControllerHelperService',
       'changeIlluminaLane',
-      {'platform': 'Illumina', 'container_cId': jQuery('input[name=container_cId]').val(), 'numLanes': jQuery(t).val(), 'container': container, 'url': ajaxurl},
-      {'updateElement': 'containerdiv' + container});
+      {
+        'platform': 'Illumina',
+        'container_cId': jQuery('input[name=container_cId]').val(),
+        'numLanes': jQuery(t).val(),
+        'container': container,
+        'url': ajaxurl
+      },
+      {
+        'updateElement': 'containerdiv' + container
+      }
+    );
   },
 
   changeContainerLS454Chamber: function (t, container) {
     Fluxion.doAjax(
       'containerControllerHelperService',
       'changeChamber',
-      {'platform': 'LS454', 'container_cId': jQuery('input[name=container_cId]').val(), 'numChambers': jQuery(t).val(), 'container': container, 'url': ajaxurl},
-      {'updateElement': 'containerdiv' + container});
+      {
+        'platform': 'LS454',
+        'container_cId': jQuery('input[name=container_cId]').val(),
+        'numChambers': jQuery(t).val(),
+        'container': container,
+        'url': ajaxurl
+      },
+      {
+        'updateElement': 'containerdiv' + container
+      }
+    );
   },
 
   changeContainerSolidChamber: function (t, container) {
     Fluxion.doAjax(
       'containerControllerHelperService',
       'changeChamber',
-      {'platform': 'Solid', 'container_cId': jQuery('input[name=container_cId]').val(), 'numChambers': jQuery(t).val(), 'container': container, 'url': ajaxurl},
-      {'updateElement': 'containerdiv' + container});
+      {
+        'platform': 'Solid',
+        'container_cId': jQuery('input[name=container_cId]').val(),
+        'numChambers': jQuery(t).val(),
+        'container': container,
+        'url': ajaxurl
+      },
+      {
+        'updateElement': 'containerdiv' + container
+      }
+    );
   },
 
   changeContainerPacBioChamber: function (t, container) {
     Fluxion.doAjax(
       'containerControllerHelperService',
       'changeChamber',
-      {'platform': 'PacBio', 'container_cId': jQuery('input[name=container_cId]').val(), 'numChambers': jQuery(t).val(), 'container': container, 'url': ajaxurl},
-      {'updateElement': 'containerdiv' + container});
+      {
+        'platform': 'PacBio',
+        'container_cId': jQuery('input[name=container_cId]').val(),
+        'numChambers': jQuery(t).val(),
+        'container': container,
+        'url': ajaxurl
+      },
+      {
+        'updateElement': 'containerdiv' + container
+      }
+    );
   },
 
   confirmPoolRemove: function (t) {
@@ -270,27 +328,28 @@ Container.ui = {
       {
         'url': ajaxurl
       },
-      {'doOnSuccess': function (json) {
-        jQuery('#listingContainersTable').html('');
-        jQuery('#listingContainersTable').dataTable({
-          "aaData": json.array,
-          "aoColumns": [
-            //{ "sTitle": "Name"},
-            { "sTitle": "ID Barcode"},
-            { "sTitle": "Platform"},
-            { "sTitle": "Last Associated Run"},
-            { "sTitle": "Last Sequencer Used"}
-          ],
-          "bJQueryUI": true,
-          "iDisplayLength": 25,
-          "aaSorting": [
-            [0, "desc"]
-          ],
-          "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>'
-        });
-        jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
-        jQuery("#toolbar").append("<button style=\"margin-left:5px;\" onclick=\"window.location.href='/miso/container/new';\" class=\"fg-button ui-state-default ui-corner-all\">Create Partition Container</button>");
-      }
+      {
+        'doOnSuccess': function (json) {
+          jQuery('#listingContainersTable').html('');
+          jQuery('#listingContainersTable').dataTable({
+            "aaData": json.array,
+            "aoColumns": [
+              //{ "sTitle": "Name"},
+              { "sTitle": "ID Barcode"},
+              { "sTitle": "Platform"},
+              { "sTitle": "Last Associated Run"},
+              { "sTitle": "Last Sequencer Used"}
+            ],
+            "bJQueryUI": true,
+            "iDisplayLength": 25,
+            "aaSorting": [
+              [0, "desc"]
+            ],
+            "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>'
+          });
+          jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
+          jQuery("#toolbar").append("<button style=\"margin-left:5px;\" onclick=\"window.location.href='/miso/container/new';\" class=\"fg-button ui-state-default ui-corner-all\">Create Partition Container</button>");
+        }
       }
     );
   }
@@ -347,11 +406,16 @@ Container.partition = {
       Fluxion.doAjax(
         'containerControllerHelperService',
         'checkPoolExperiment',
-        {'poolId': newpool.find('input').val(), 'partition': jQuery(this).attr("partition"), 'url': ajaxurl},
-        {'doOnSuccess': function (json) {
-          newpool.append(json.html);
-          newpool.append("<span style='position: absolute; top: 0; right: 0;' onclick='Container.pool.confirmPoolRemove(this);' class='float-right ui-icon ui-icon-circle-close'></span>");
+        {
+          'poolId': newpool.find('input').val(),
+          'partition': jQuery(this).attr("partition"),
+          'url': ajaxurl
         },
+        {
+          'doOnSuccess': function (json) {
+            newpool.append(json.html);
+            newpool.append("<span style='position: absolute; top: 0; right: 0;' onclick='Container.pool.confirmPoolRemove(this);' class='float-right ui-icon ui-icon-circle-close'></span>");
+          },
           'doOnError': function () {
             newpool.remove();
             alert("Error adding pool, no Study is present.");
@@ -365,10 +429,15 @@ Container.partition = {
     Fluxion.doAjax(
       'containerControllerHelperService',
       'checkPoolExperiment',
-      {'poolId': poolId, 'partition': partitionNum, 'url': ajaxurl},
-      {'doOnSuccess': function (json) {
-        jQuery(t).append(json.html);
+      {
+        'poolId': poolId,
+        'partition': partitionNum,
+        'url': ajaxurl
       },
+      {
+        'doOnSuccess': function (json) {
+          jQuery(t).append(json.html);
+        },
         'doOnError': function (json) {
           alert("Error populating partition: " + json.error);
         }
@@ -384,12 +453,18 @@ Container.partition = {
     Fluxion.doAjax(
       'containerControllerHelperService',
       'selectStudyForPool',
-      {'poolId': poolId, 'studyId': studyId, 'platformId': platformId, 'url': ajaxurl},
-      {'doOnSuccess': function (json) {
-        var div = jQuery("#studySelectDiv" + partition + "_" + projectId).parent();
-        jQuery("#studySelectDiv" + partition + "_" + projectId).remove();
-        div.append(json.html);
+      {
+        'poolId': poolId,
+        'studyId': studyId,
+        'platformId': platformId,
+        'url': ajaxurl
       },
+      {
+        'doOnSuccess': function (json) {
+          var div = jQuery("#studySelectDiv" + partition + "_" + projectId).parent();
+          jQuery("#studySelectDiv" + partition + "_" + projectId).remove();
+          div.append(json.html);
+        },
         'doOnError': function () {
           Utils.ui.reenableButton('studySelectButton-' + partition + '_' + poolId, "Select Study");
         }
@@ -413,7 +488,12 @@ Container.pool = {
     Fluxion.doAjax(
       'poolSearchService',
       'poolSearch',
-      {'str': input, 'readyOnly': readyBool, 'platformType': platform, 'url': ajaxurl},
+      {
+        'str': input,
+        'readyOnly': readyBool,
+        'platformType': platform,
+        'url': ajaxurl
+      },
       {
         "doOnSuccess": function (json) {
           jQuery('#poolList').html(json.html);
@@ -424,7 +504,8 @@ Container.pool = {
             });
           });
         }
-      });
+      }
+    );
   },
 
   getPool: function (t) {
@@ -434,15 +515,22 @@ Container.pool = {
     Fluxion.doAjax(
       'containerControllerHelperService',
       'getPoolByBarcode',
-      {'platform': platform, 'container_cId': jQuery('input[name=container_cId]').val(), 'partition': pNum, 'barcode': a.val(), 'url': ajaxurl},
-      {'doOnSuccess': function (json) {
-        if (json.err) {
-          jQuery("#msg" + pNum).html(json.err);
+      {
+        'platform': platform,
+        'container_cId': jQuery('input[name=container_cId]').val(),
+        'partition': pNum,
+        'barcode': a.val(),
+        'url': ajaxurl
+      },
+      {
+        'doOnSuccess': function (json) {
+          if (json.err) {
+            jQuery("#msg" + pNum).html(json.err);
+          }
+          else {
+            a.parent().html(json.html);
+          }
         }
-        else {
-          a.parent().html(json.html);
-        }
-      }
       }
     );
   },
@@ -458,8 +546,14 @@ Container.pool = {
         Fluxion.doAjax(
           'containerControllerHelperService',
           'removePoolFromPartition',
-          {'container_cId': jQuery('input[name=container_cId]').val(), 'partitionNum': partitionNum, 'url': ajaxurl},
-          {'doOnSuccess': jQuery(t).parent().remove()}
+          {
+            'container_cId': jQuery('input[name=container_cId]').val(),
+            'partitionNum': partitionNum,
+            'url': ajaxurl
+          },
+          {
+            'doOnSuccess': jQuery(t).parent().remove()
+          }
         );
       }
     }
