@@ -35,10 +35,10 @@
     <div id="tabs">
       <ul>
         <li>
-          <a href="#tab" onclick="Sequencer.ui.changeSequencerListingActive('true')"><span>Current</span></a>
+          <a href="#tab-1" onclick="Sequencer.ui.changeSequencerListingActive('true')"><span>Current</span></a>
         </li>
         <li>
-          <a href="#tab" onclick="Sequencer.ui.changeSequencerListingActive('false')"><span>Retired</span></a>
+          <a href="#tab-2" onclick="Sequencer.ui.changeSequencerListingActive('false')"><span>Retired</span></a>
         </li>
       </ul>
       

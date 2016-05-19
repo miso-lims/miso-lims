@@ -162,7 +162,7 @@
                       <span id="idBarcode">${container.identificationBarcode}</span>
                       <a href="javascript:void(0);"
                          onclick="Container.ui.editContainerIdBarcode(jQuery('#idBarcode'))">
-                        <span class="fg-button ui-icon ui-icon-pencil"></span>
+                        <span id="pencil" class="fg-button ui-icon ui-icon-pencil"></span>
                       </a>
                     </td>
                   </c:otherwise>

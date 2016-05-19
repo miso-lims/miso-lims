@@ -31,8 +31,15 @@ var Container = Container || {
       Fluxion.doAjax(
         'containerControllerHelperService',
         'lookupContainer',
-        {'barcode': barcode, 'sequencerReferenceId':seqRef, 'container_cId':container_cId, 'url': ajaxurl},
-        {'doOnSuccess': self.processLookup}
+        {
+          'barcode': barcode,
+          'sequencerReferenceId':seqRef,
+          'container_cId':container_cId,
+          'url': ajaxurl
+        },
+        {
+          'doOnSuccess': self.processLookup
+        }
       );
     }
   },
@@ -62,17 +69,20 @@ var Container = Container || {
       Fluxion.doAjax(
         'containerControllerHelperService',
         'checkContainer',
-        {'containerId': id, 'url': ajaxurl},
-        {'doOnSuccess': function (json) {
-          if (json.response == 'yes') {
-            if (confirm("This container is in a completed run, are you sure to delete it?")) {
+        {
+          'containerId': id, 'url': ajaxurl
+        },
+        {
+          'doOnSuccess': function (json) {
+            if (json.response == 'yes') {
+              if (confirm("This container is in a completed run, are you sure to delete it?")) {
+                Container.confirmedDeleteContainer(id);
+              }
+            }
+            else {
               Container.confirmedDeleteContainer(id);
             }
           }
-          else {
-            Container.confirmedDeleteContainer(id);
-          }
-        }
         }
       );
     }
@@ -82,11 +92,14 @@ var Container = Container || {
     Fluxion.doAjax(
       'containerControllerHelperService',
       'deleteContainer',
-      {'containerId': id, 'url': ajaxurl},
-      {'doOnSuccess': function (json) {
-        alert(json.response);
-        window.location.href = "/miso/containers";
-      }
+      {
+        'containerId': id, 'url': ajaxurl
+      },
+      {
+        'doOnSuccess': function (json) {
+          alert(json.response);
+          window.location.href = "/miso/containers";
+        }
       }
     );
   },
@@ -153,6 +166,7 @@ Container.ui = {
     var s = jQuery(span);
     s.html("<input type='text' id='identificationBarcode' name='identificationBarcode' value='" + s.html() + "'/>" +
            "<button onclick='Container.lookupContainer(this);' type='button' class='fg-button ui-state-default ui-corner-all'>Lookup</button>");
+    if (jQuery('#pencil')) jQuery('#pencil').hide();
   },
 
   editContainerLocationBarcode: function (span) {

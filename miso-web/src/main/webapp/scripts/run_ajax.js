@@ -236,6 +236,7 @@ Run.ui = {
     var s = jQuery(span);
     s.html("<input type='text' id='sequencerPartitionContainers[" + fc + "].identificationBarcode' name='sequencerPartitionContainers[" + fc + "].identificationBarcode' value='" + s.html() + "'/>" +
            "<button onclick='Run.container.lookupContainer(this, " + fc + ");' type='button' class='fg-button ui-state-default ui-corner-all'>Lookup</button>");
+    if (jQuery('#pencil')) jQuery('#pencil').hide();
   },
 
   editContainerLocationBarcode: function (span, fc) {
@@ -492,8 +493,17 @@ Run.container = {
     Fluxion.doAjax(
       'runControllerHelperService',
       'changeContainer',
-      {'platform': platform, 'run_cId': jQuery('input[name=run_cId]').val(), 'numContainers': numContainers, 'sequencerReferenceId': seqrefId, 'url': ajaxurl},
-      {'updateElement': 'containerdiv'});
+      {
+        'platform': platform,
+        'run_cId': jQuery('input[name=run_cId]').val(),
+        'numContainers': numContainers,
+        'sequencerReferenceId': seqrefId,
+        'url': ajaxurl
+      },
+      {
+        'updateElement': 'containerdiv'
+      }
+    );
   },
 
   lookupContainer: function (t, containerNum) {
@@ -503,8 +513,14 @@ Run.container = {
       Fluxion.doAjax(
         'runControllerHelperService',
         'lookupContainer',
-        {'barcode': barcode, 'containerNum': containerNum, 'url': ajaxurl},
-        {'doOnSuccess': self.processLookup}
+        {
+          'barcode': barcode,
+          'containerNum': containerNum,
+          'url': ajaxurl
+        },
+        {
+          'doOnSuccess': self.processLookup
+        }
       );
     }
   },

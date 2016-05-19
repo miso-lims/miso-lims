@@ -410,11 +410,11 @@
 </c:if>
 
 <div id="runinfo">
+<h1>Containers</h1>
 <table width="100%">
 <tbody>
 <tr>
 <td width="50%" valign="top">
-<h2>Run Parameters</h2>
 
 <div id="runPartitions">
 <c:choose>
@@ -474,7 +474,7 @@
             <c:when test="${empty container.identificationBarcode}">
               <td>ID:</td>
               <td>
-                <button onclick='Run.container.lookupContainer(this, ${containerCount.index});'
+                <button id="pencil" onclick='Run.container.lookupContainer(this, ${containerCount.index});'
                         type='button' class='right-button ui-state-default ui-corner-all'>
                   Lookup
                 </button>
@@ -490,7 +490,7 @@
                 <span id="idBarcode">${container.identificationBarcode}</span>
                 <a href="javascript:void(0);"
                    onclick="Run.ui.editContainerIdBarcode(jQuery('#idBarcode'), ${containerCount.index})">
-                  <span class="fg-button ui-icon ui-icon-pencil"></span>
+                  <span id="pencil" class="fg-button ui-icon ui-icon-pencil"></span>
                 </a>
               </td>
             </c:otherwise>
@@ -546,16 +546,18 @@
           </tr>
           --%>
       </table>
-      <div id='partitionErrorDiv'></div>
+      <div id='partitionErrorDiv' class="parsley-custom-error-message"></div>
       <div id="partitionDiv">
         <i class="italicInfo">Click in a partition box to beep/type in barcodes, or double click a
           pool on the right to sequentially add pools to the container</i>
         <table class="in">
-          <th>Partition No.</th>
-          <th>Pool</th>
-          <c:if test="${statsAvailable}">
-            <th>Stats</th>
-          </c:if>
+          <tr>
+	          <th>Partition No.</th>
+	          <th>Pool</th>
+	          <c:if test="${statsAvailable}">
+	            <th>Stats</th>
+	          </c:if>
+	        </tr>
           <c:forEach items="${container.partitions}" var="partition" varStatus="partitionCount">
             <tr>
               <td>${partition.partitionNumber}</td>
