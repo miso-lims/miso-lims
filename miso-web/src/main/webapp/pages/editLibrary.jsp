@@ -348,6 +348,7 @@
     Library.setOriginalBarcodes = function() {
       Library.lastBarcodePosition = 0;
       jQuery('#tagBarcodesDiv').empty();
+      document.getElementById('tagBarcodeFamily').value = '${library.currentFamily.id}';
       <c:forEach items="${library.tagBarcodes}" var="barcode">
         Library.ui.createBarcodeBox(${barcode.id});
       </c:forEach>
