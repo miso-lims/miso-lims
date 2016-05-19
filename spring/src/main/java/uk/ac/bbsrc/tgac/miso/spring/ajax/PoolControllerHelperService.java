@@ -34,7 +34,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +43,11 @@ import java.util.TreeSet;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpSession;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import net.sourceforge.fluxion.ajax.Ajaxified;
+import net.sourceforge.fluxion.ajax.util.JSONUtils;
 
 import org.apache.commons.codec.binary.Base64;
 import org.krysalis.barcode4j.BarcodeDimension;
@@ -57,10 +61,6 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-import net.sourceforge.fluxion.ajax.Ajaxified;
-import net.sourceforge.fluxion.ajax.util.JSONUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
@@ -89,7 +89,6 @@ import uk.ac.bbsrc.tgac.miso.core.manager.PrintManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 /**
  * uk.ac.bbsrc.tgac.miso.spring.ajax
@@ -709,22 +708,16 @@ public class PoolControllerHelperService {
   }
 
   public JSONObject listPoolsDataTable(HttpSession session, JSONObject json) {
-    Map<String, Set<Pool>> poolMap = new HashMap<>();
-    for (PlatformType pt : PlatformType.values()) {
-      poolMap.put(pt.getKey(), new HashSet<Pool>());
+    if (!json.has("platform")) {
+      return JSONUtils.SimpleJSONError("No platform specified");
     }
-
+    
+    PlatformType platform = PlatformType.get(json.getString("platform"));
     JSONObject j = new JSONObject();
 
     try {
-      for (Pool pool : requestManager.listAllPools()) {
-        poolMap.get(pool.getPlatformType().getKey()).add(pool);
-      }
-
-      for (String poolType : poolMap.keySet()) {
         JSONArray arr = new JSONArray();
-
-        for (Pool pool : poolMap.get(poolType)) {
+        for (Pool pool : requestManager.listAllPoolsByPlatform(platform)) {
           JSONArray pout = new JSONArray();
           pout.add(TableHelper.hyperLinkify("/miso/pool/" + pool.getId(), pool.getName()));
           pout.add(TableHelper.hyperLinkify("/miso/pool/" + pool.getId(), pool.getAlias()));
@@ -735,9 +728,7 @@ public class PoolControllerHelperService {
 
           arr.add(pout);
         }
-
-        j.put(poolType, arr);
-      }
+        j.put("pools", arr);
 
       return j;
     } catch (IOException e) {
