@@ -131,15 +131,15 @@ public class LibraryControllerHelperService {
     StringBuilder sb = new StringBuilder();
     boolean first = true;
     for (TagBarcode barcode : tagBarcodes) {
-      sb.append(barcode.getName());
-      sb.append(" (");
-      sb.append(barcode.getSequence());
-      sb.append(")");
       if (first) {
         first = false;
       } else {
         sb.append(", ");
       }
+      sb.append(barcode.getName());
+      sb.append(" (");
+      sb.append(barcode.getSequence());
+      sb.append(")");
     }
     return sb.toString();
   }
