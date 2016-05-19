@@ -38,9 +38,9 @@ public class DefaultPoolOrderCompletionService implements PoolOrderCompletionSer
   }
 
   @Override
-  public Collection<PoolOrderCompletion> getOutstandingOrders() throws AuthorizationException, IOException {
+  public Collection<PoolOrderCompletion> getAllOrders() throws AuthorizationException, IOException {
     authorizationManager.throwIfUnauthenticated();
-    return poolOrderCompletionDao.getUnfulfilled();
+    return poolOrderCompletionDao.list();
   }
 
 }
