@@ -59,6 +59,10 @@ var Library = Library || {
     jQuery('#volume').attr('data-parsley-maxlength', '10');
     jQuery('#volume').attr('data-parsley-type', 'number');
 
+    // Prep Kit validation
+    jQuery('#libraryKit').attr('class', 'form-control');
+    jQuery('#libraryKit').attr('data-parsley-required', 'true');
+
     Fluxion.doAjax(
       'libraryControllerHelperService',
       'getLibraryAliasRegex',
