@@ -470,14 +470,26 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
 
     public LibraryDilution mapRow(ResultSet rs, int rowNum) throws SQLException {
       long id = rs.getLong("dilutionId");
-
+      log.info("Mapping LibraryDilution: " + id);
+      
       if (isCacheEnabled() && lookupCache(cacheManager) != null) {
-        Element element;
-        if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
-          log.debug("Cache hit on map for LibraryDilution " + id);
-          return (LibraryDilution)element.getObjectValue();
-        }
+         log.info("Checking LibraryDilution cache");
+         Element element;
+         if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
+            log.info("Cache hit on map for librarydilution " + id);
+            LibraryDilution dilution = (LibraryDilution) element.getObjectValue();
+            if (dilution == null) throw new NullPointerException("The LibraryDilutionMapper cache is full of lies!!!");
+            if (dilution.getId() == 0) {
+               DbUtils.updateCaches(lookupCache(cacheManager), id);
+            } else {
+               return (LibraryDilution) element.getObjectValue();
+            }
+         }
+         else {
+           log.info("No dilution in cache. Databasing");
+         }         
       }
+      
       LibraryDilution libraryDilution = dataObjectFactory.getLibraryDilution();
       libraryDilution.setId(id);
       libraryDilution.setName(rs.getString("name"));

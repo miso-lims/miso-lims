@@ -158,7 +158,7 @@ public abstract class AbstractDilution implements Dilution, Comparable {
   }
 
   public boolean userCanRead(User user) {
-    return securityProfile.userCanRead(user);
+     return securityProfile.userCanRead(user);
   }
 
   public boolean userCanWrite(User user) {

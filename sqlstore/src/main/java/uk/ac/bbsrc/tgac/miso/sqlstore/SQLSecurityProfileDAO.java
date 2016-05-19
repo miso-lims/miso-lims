@@ -29,7 +29,9 @@ import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.Property;
+import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import com.googlecode.ehcache.annotations.Cacheable;
@@ -47,6 +49,9 @@ import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
+
+import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
+import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 /**
  * uk.ac.bbsrc.tgac.miso.sqlstore
@@ -279,10 +284,36 @@ public class SQLSecurityProfileDAO implements Store<SecurityProfile> {
     sp.getWriteGroups().addAll(securityManager.listGroupsByIds(wgIds));
   }
 
-  public class SecurityProfileMapper implements RowMapper<SecurityProfile> {
+  public class SecurityProfileMapper extends CacheAwareRowMapper<SecurityProfile> {
+    
+    public SecurityProfileMapper() {
+      super(SecurityProfile.class);
+   }
+
+   public SecurityProfileMapper(boolean lazy) {
+      super(SecurityProfile.class, lazy);
+   }
+    
     public SecurityProfile mapRow(ResultSet rs, int rowNum) throws SQLException {
+      
+      long id = rs.getLong("profileId");
+
+      if (isCacheEnabled() && lookupCache(cacheManager) != null) {
+         Element element;
+         if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
+            log.info("Cache hit on map for SecurityProfile " + id);
+            SecurityProfile profile = (SecurityProfile) element.getObjectValue();
+            if (profile == null) throw new NullPointerException("The SecurityProfile cache is full of lies!!!");
+            if (profile.getProfileId() == 0) {
+               DbUtils.updateCaches(lookupCache(cacheManager), id);
+            } else {
+               return (SecurityProfile) element.getObjectValue();
+            }
+         }
+      }
+
       SecurityProfile sp = new SecurityProfile();
-      sp.setProfileId(rs.getLong("profileId"));
+      sp.setProfileId(id);
       sp.setAllowAllInternal(rs.getBoolean("allowAllInternal"));
 
       try {
@@ -292,6 +323,9 @@ public class SQLSecurityProfileDAO implements Store<SecurityProfile> {
         e.printStackTrace();
       }
 
+      if (isCacheEnabled() && lookupCache(cacheManager) != null) {
+        lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id), sp));
+     }
       return sp;
     }
   }

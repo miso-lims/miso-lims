@@ -816,7 +816,9 @@ public class SQLDilutionDAO implements DilutionStore {
         log.error("Cannot map from database to LibraryDilution: ", e);
         e.printStackTrace();
       }
-
+      if (isCacheEnabled() && lookupCache(cacheManager) != null) {
+        lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id), libraryDilution));
+      }
       return libraryDilution;
     }
   }
@@ -866,6 +868,11 @@ public class SQLDilutionDAO implements DilutionStore {
       catch (IOException e1) {
         e1.printStackTrace();
       }
+      
+      if (isCacheEnabled() && lookupCache(cacheManager) != null) {
+        lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id), libraryDilution));
+      }
+      
       return libraryDilution;
     }
   }
@@ -916,6 +923,10 @@ public class SQLDilutionDAO implements DilutionStore {
         log.error("Cannot map from database to emPCRDilution: ", e);
         e.printStackTrace();
       }
+      if (isCacheEnabled() && lookupCache(cacheManager) != null) {
+        lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id), pcrDilution));
+     }
+      
       return pcrDilution;
     }
   }
@@ -964,6 +975,9 @@ public class SQLDilutionDAO implements DilutionStore {
       catch (IOException e1) {
         e1.printStackTrace();
       }
+      if (isCacheEnabled() && lookupCache(cacheManager) != null) {
+        lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id), pcrDilution));
+     }
       return pcrDilution;
     }
   }
