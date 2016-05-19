@@ -99,10 +99,6 @@ and populate it with the following information:
       username="tgaclims"
       password="tgaclims"/>
 
-     <Resource name="file/CONAN_PROPERTIES" type="java.util.File"
-                factory="uk.ac.ebi.fgpt.naming.factory.FileFactory"
-                 path="../webapps/ROOT/WEB-INF/conan.properties"/>
-
      <!-- uncomment if using the Stats DB -->
      <!--
      <Resource name="jdbc/STATSDB" type="javax.sql.DataSource"

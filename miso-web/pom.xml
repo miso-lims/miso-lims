@@ -293,7 +293,6 @@
             <directory>src/main/resources</directory>
             <filtering>true</filtering>
             <includes>
-              <include>conan/</include>
               <include>fluxion/</include>
               <include>status/</include>
             </includes>
