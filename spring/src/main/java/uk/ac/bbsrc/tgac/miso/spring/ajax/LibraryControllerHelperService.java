@@ -131,6 +131,7 @@ public class LibraryControllerHelperService {
     StringBuilder sb = new StringBuilder();
     boolean first = true;
     for (TagBarcode barcode : tagBarcodes) {
+      if (barcode == null) continue;
       if (first) {
         first = false;
       } else {
