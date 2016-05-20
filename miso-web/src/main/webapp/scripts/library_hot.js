@@ -412,7 +412,6 @@ Library.hot = {
     } else {
       jQuery.get('../../barcodeStrategiesJson', {platform: to},
         function (data) {
-        console.log(data);
           Hot.hotTable.setDataAtCell(row, bcStratColIndex, '', 'platform change');
           Hot.hotTable.getCellMeta(row, bcStratColIndex).source = data['barcodeKits'];
           Hot.dropdownRef.barcodeKits[to] = {};
@@ -624,21 +623,24 @@ Library.hot = {
   failSave: function (xhr, rowIndex, numberToSave) {
     console.log(xhr);
     var responseText = JSON.parse(xhr.responseText);
-    var allColumnData = Hot.getValues('data', Hot.colConf);
-    var column, columnIndex;
-    if (responseText.data && responseText.data.constraintName) {
-      // if a column's constraint was violated, extract it here
-      column = responseText.data.constraintName;
-      columnIndex = allColumnData.indexOf(column);
+    if (xhr.status >= 500 || responseText.detail == undefined) {
+      Hot.messages.failed.push("<b>Row " + (rowIndex + 1) + ": Something went terribly wrong. Please file a ticket with a screenshot or "
+          + "copy-paste of the data that you were trying to save.</b>");
+    } else {
+      var allColumnData = Hot.getValues('data', Hot.colConf);
+      var column, columnIndex;
+      if (responseText.data && responseText.data.constraintName) {
+        // if a column's constraint was violated, extract it here
+        column = responseText.data.constraintName;
+        columnIndex = allColumnData.indexOf(column);
+      }
+      if (rowIndex !== undefined && columnIndex !== -1 && columnIndex !== undefined) {
+        Hot.hotTable.setCellMeta(rowIndex, columnIndex, 'valid', false);
+      }
+      // process error message if it was a SQL violation, and add any errors to the messages array
+      var reUserMessage = /could not execute .*?: (.*)/;
+      Hot.messages.failed.push("Row "+ (rowIndex + 1) +": "+ responseText.detail.replace(reUserMessage, "$1"));
     }
-    console.log(rowIndex, columnIndex);
-    if (rowIndex !== undefined && columnIndex !== -1 && columnIndex !== undefined) {
-      Hot.hotTable.setCellMeta(rowIndex, columnIndex, 'valid', false);
-    }
-    // process error message if it was a SQL violation, and add any errors to the messages array
-    var reUserMessage = /could not execute .*?: (.*)/;
-    Hot.messages.failed.push("Row "+ (rowIndex + 1) +": "+ responseText.detail.replace(reUserMessage, "$1")); 
-
     Hot.addSuccessesAndErrors();
   },
   
