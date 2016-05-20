@@ -533,19 +533,30 @@ Sample.hot = {
    */
   setColumnData: function (detailedBool, sampleCategory, idColBoolean) {
     var qcBool = Sample.hot.showQcs;
+    var cols;
     if (!detailedBool && !qcBool) {
      // if neither detailed sample not qcs are requested
-      return Hot.concatArrays(setAliasCol(), setPlainCols());
+      cols = Hot.concatArrays(setAliasCol(), setPlainCols());
     } else if (!detailedBool && qcBool) {
       // if detailed sample is not requested but qcs are
-      return Hot.concatArrays(setAliasCol(), setPlainCols(), setQcCols());
+      cols = Hot.concatArrays(setAliasCol(), setPlainCols(), setQcCols());
     } else if (detailedBool && !qcBool){
       // if detailed sample is requested but qcs are
-      return Hot.concatArrays(setAliasCol(), setPlainCols(), setDetailedCols(sampleCategory, idColBoolean));
+      cols = Hot.concatArrays(setAliasCol(), setPlainCols(), setDetailedCols(sampleCategory, idColBoolean));
     } else if (detailedBool && qcBool) {
       // if detailed sample and qcs are requested
-      return Hot.concatArrays(setAliasCol(), setPlainCols(), setDetailedCols(sampleCategory, idColBoolean), setQcCols());
+      cols = Hot.concatArrays(setAliasCol(), setPlainCols(), setDetailedCols(sampleCategory, idColBoolean), setQcCols());
     }
+    // add the ID Barcode column if it is not auto-generated
+    if (!Hot.autoGenerateIdBarcodes) {
+      cols.splice(3, 0, {
+          header: 'Matrix Barcode',
+          data: 'identificationBarcode',
+          type: 'text'
+        }
+      );
+    }
+    return cols;
     
     function setPlainCols () {
       var sampleCols = [
@@ -573,10 +584,6 @@ Sample.hot = {
           source: Sample.hot.getSampleTypes(),
           validator: validateSampleTypes,
           extraneous: true
-        },{
-          header: 'Matrix Barcode',
-          data: 'identificationBarcode',
-          type: 'text'
         },{
           header: 'Sci. Name',
           data: 'scientificName',
