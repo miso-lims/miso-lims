@@ -52,7 +52,7 @@
       </plugin>
 
       <plugin>
-        <groupId>org.dstovall</groupId>
+        <groupId>com.jolira</groupId>
         <artifactId>onejar-maven-plugin</artifactId>
         <version>1.4.4</version>
         <executions>
@@ -85,17 +85,6 @@
     </plugins>
   </build>
 
-  <pluginRepositories>
-    <pluginRepository>
-      <id>onejar-maven-plugin.googlecode.com</id>
-      <url>http://onejar-maven-plugin.googlecode.com/svn/mavenrepo</url>
-    </pluginRepository>
-    <pluginRepository>
-      <id>seqwaremaven.oicr.on.ca</id>
-      <url>http://seqwaremaven.oicr.on.ca/artifactory/seqware-dependencies</url>
-    </pluginRepository>
-  </pluginRepositories>
-
   <dependencies>
     <dependency>
       <groupId>${project.parent.groupId}</groupId>
@@ -116,7 +105,6 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-core</artifactId>
-      <version>${spring-version}</version>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
@@ -169,7 +157,7 @@
       <version>1.3.146</version>
     </dependency>
     <dependency>
-      <groupId>ca.on.oicr.pde</groupId>
+      <groupId>ca.on.oicr.gsi</groupId>
       <artifactId>metrix</artifactId>
       <version>1.2-2016</version>
     </dependency>
@@ -179,12 +167,6 @@
         <version>1.1.1</version>
     </dependency>
      <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.12</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.12</version>
