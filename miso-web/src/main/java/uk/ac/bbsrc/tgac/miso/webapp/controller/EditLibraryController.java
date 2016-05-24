@@ -807,6 +807,7 @@ public class EditLibraryController {
         }
         libraries.add(library);
       }
+      model.put("title", "Bulk Create Libraries");
       model.put("librariesJSON", libraries);
       JSONArray libraryDesigns = new JSONArray();
       libraryDesigns.addAll(requestManager.listLibraryDesignByClass(sampleClass));
@@ -837,7 +838,7 @@ public class EditLibraryController {
         }
         libraryDtos.add(Dtos.asDto(library, lai));
       }
-
+      model.put("title", "Bulk Edit Libraries");
       model.put("librariesJSON", libraryDtos);
       model.put("method", "Edit");
       model.put("libraryDesignsJSON", "[]");

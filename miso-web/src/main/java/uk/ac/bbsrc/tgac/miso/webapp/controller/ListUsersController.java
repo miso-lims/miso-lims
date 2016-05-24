@@ -34,6 +34,7 @@ import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -52,6 +53,11 @@ public class ListUsersController {
   public void setSecurityManager(SecurityManager securityManager) {
     assert (securityManager != null);
     this.securityManager = securityManager;
+  }
+
+  @ModelAttribute("title")
+  public String title() {
+    return "List Users";
   }
 
   @RequestMapping("/admin/users")

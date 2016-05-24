@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -17,6 +18,11 @@ import uk.ac.bbsrc.tgac.miso.core.service.TagBarcodeService;
 public class ListTagBarcodesController {
   @Autowired
   private TagBarcodeService tagBarcodeService;
+
+  @ModelAttribute("title")
+  public String title() {
+    return "List Tag Barcodes";
+  }
 
   @RequestMapping("/tagbarcodes")
   public ModelAndView listTagBarcodes() throws IOException {

@@ -77,6 +77,11 @@ public class ListSamplesController {
     return detailedSample;
   }
 
+  @ModelAttribute("title")
+  public String title() {
+    return "List Samples";
+  }
+
   @RequestMapping(value = "/samples/rest/", method = RequestMethod.GET)
   public @ResponseBody Collection<Sample> jsonRest() throws IOException {
     return requestManager.listAllSamples();

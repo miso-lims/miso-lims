@@ -824,6 +824,7 @@ public class EditSampleController {
       for (Sample sample : requestManager.getSamplesByIdList(idList)) {
         samplesDtos.add(Dtos.asDto(sample));
       }
+      model.put("title", "Bulk Edit Samples");
       model.put("samplesJSON", samplesDtos);
       model.put("method", "Edit");
       return new ModelAndView("/pages/bulkEditSamples.jsp", model);
@@ -851,6 +852,7 @@ public class EditSampleController {
       for (Sample sample : requestManager.getSamplesByIdList(idList)) {
         samplesDtos.add(Dtos.asDto(sample));
       }
+      model.put("title", "Bulk Create Samples");
       model.put("samplesJSON", samplesDtos);
       model.put("method",  "Create");
       model.put("sampleClassId", sampleClassId);
