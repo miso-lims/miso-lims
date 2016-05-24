@@ -199,10 +199,6 @@
       </snapshots>
     </repository>
 
-    <!-- <repository> <id>apache-snapshots</id> <name>apache snapshots repository</name>
-      <url>http://repository.apache.org/snapshots</url> <snapshots> <enabled>true</enabled>
-      <updatePolicy>never</updatePolicy> </snapshots> </repository> -->
-
     <repository>
       <id>spring-snapshot</id>
       <name>Spring Portfolio Milestone Repository</name>
@@ -266,6 +262,12 @@
         <enabled>false</enabled>
         <updatePolicy>always</updatePolicy>
       </snapshots>
+    </repository>
+        
+    <repository>
+      <id>seqwaremaven.oicr.on.ca</id>
+      <name>seqwaremaven.oicr.on.ca-releases</name>
+      <url>https://seqwaremaven.oicr.on.ca/artifactory/gsi-dependencies</url>
     </repository>
   </repositories>
 
@@ -421,6 +423,10 @@
     <module>miso-service</module>
     <module>sqlstore</module>
     <module>miso-dto</module>
+    
+    <module>notification-server</module>
+    <module>runstats-client</module>
+    <module>notification-consumer-services</module>
   </modules>
 
   <dependencyManagement>
