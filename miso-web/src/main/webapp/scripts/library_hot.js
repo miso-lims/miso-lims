@@ -227,11 +227,22 @@ Library.hot = {
    */
   setColumnData: function (detailedBool) {
     var qcBool = Library.hot.showQcs;
+    var cols;
     if (detailedBool) {
-      return Hot.concatArrays(setAliasCol(), setPlainCols(), setDetailedCols());
+      cols = Hot.concatArrays(setAliasCol(), setPlainCols(), setDetailedCols());
     } else {
-      return Hot.concatArrays(setAliasCol(), setPlainCols());
+      cols = Hot.concatArrays(setAliasCol(), setPlainCols());
     }
+    // add the ID Barcode column if it is not auto-generated
+    if (!Hot.autoGenerateIdBarcodes) {
+      cols.splice(3, 0, {
+          header: 'Matrix Barcode',
+          data: 'identificationBarcode',
+          type: 'text'
+        }
+      );
+    }
+    return cols;
     
     function setPlainCols () {
       var libCols = [
@@ -245,10 +256,6 @@ Library.hot = {
           data: 'description',
           type: 'text',
           validator: requiredText
-        },{
-          header: 'Matrix Barcode',
-          data: 'identificationBarcode',
-          type: 'text'
         },{
           header: 'Platform',
           data: 'platformName',
