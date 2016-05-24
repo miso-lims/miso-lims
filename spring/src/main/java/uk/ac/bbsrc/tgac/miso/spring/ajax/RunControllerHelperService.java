@@ -825,7 +825,7 @@ public class RunControllerHelperService {
                 sb.append("<div id='p_div_" + (p.getPartitionNumber() - 1) + "' class='elementListDroppableDiv'>");
                 sb.append("<ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + containerNum + "].partitions["
                     + (p.getPartitionNumber() - 1) + "].pool' partition='" + (p.getPartitionNumber() - 1)
-                    + "' ondblclick='Run.container.populatePartition(this);'></ul>");
+                    + "' ondblclick='Run.container.populatePartition(this, " + containerNum + ", " + (p.getPartitionNumber() - 1) + ");'></ul>");
                 sb.append("</div>");
               }
               sb.append("</td>");
@@ -973,6 +973,10 @@ public class RunControllerHelperService {
       // Base64-encoded string, most likely a barcode image beeped in. decode and search
       if (p == null) {
         p = requestManager.getPoolByBarcode(new String(Base64.decodeBase64(barcode)), pt);
+      }
+      // if pool still can't be found, return error
+      if (p == null) {
+        return JSONUtils.SimpleJSONError("Cannot find a pool with barcode " + barcode);
       }
       List<SequencerPartitionContainer> fs = new ArrayList<SequencerPartitionContainer>(r.getSequencerPartitionContainers());
       if (!fs.isEmpty()) {
