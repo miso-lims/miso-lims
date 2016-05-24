@@ -580,6 +580,7 @@ public class LibraryControllerHelperService {
         JSONArray families = new JSONArray();
         JsonConfig config = new JsonConfig();
         config.setExcludes(new String[] { "family" });
+        families.add(TagBarcodeFamily.NULL);
         families.addAll(tagBarcodeService.getTagBarcodeFamiliesByPlatform(PlatformType.get(platform)), config);
         result.put("barcodeFamilies", families);
 
