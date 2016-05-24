@@ -77,12 +77,6 @@
         <updatePolicy>always</updatePolicy>
       </snapshots>
     </repository>
-    
-    <repository>
-      <id>seqwaremaven.oicr.on.ca</id>
-      <name>seqwaremaven.oicr.on.ca-releases</name>
-      <url>https://seqwaremaven.oicr.on.ca/artifactory/gsi-dependencies</url>
-    </repository>
   </repositories>
 
   <dependencies>

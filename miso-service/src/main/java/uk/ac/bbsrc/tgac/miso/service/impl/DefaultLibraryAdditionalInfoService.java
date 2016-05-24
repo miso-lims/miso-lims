@@ -55,7 +55,7 @@ public class DefaultLibraryAdditionalInfoService implements LibraryAdditionalInf
   @Override
   public Long create(LibraryAdditionalInfo libraryAdditionalInfo, Long libraryId)
       throws IOException {
-    authorizationManager.throwIfNonAdmin();
+    authorizationManager.throwIfNotWritable(libraryAdditionalInfo.getLibrary());
     libraryAdditionalInfo.setLibrary(libraryStore.get(libraryId));
     libraryAdditionalInfo.setTissueOrigin(tissueOriginDao.getTissueOrigin(libraryAdditionalInfo.getTissueOrigin().getId()));
     libraryAdditionalInfo.setTissueType(tissueTypeDao.getTissueType(libraryAdditionalInfo.getTissueType().getId()));
@@ -75,7 +75,7 @@ public class DefaultLibraryAdditionalInfoService implements LibraryAdditionalInf
   @Override
   public void update(LibraryAdditionalInfo libraryAdditionalInfo)
       throws IOException {
-    authorizationManager.throwIfNonAdmin();
+    authorizationManager.throwIfNotWritable(libraryAdditionalInfo.getLibrary());
     LibraryAdditionalInfo updated = get(libraryAdditionalInfo.getLibraryId());
     updated.setTissueOrigin(tissueOriginDao.getTissueOrigin(libraryAdditionalInfo.getTissueOrigin().getId()));
     updated.setTissueType(tissueTypeDao.getTissueType(libraryAdditionalInfo.getTissueType().getId()));

@@ -348,6 +348,7 @@
     Library.setOriginalBarcodes = function() {
       Library.lastBarcodePosition = 0;
       jQuery('#tagBarcodesDiv').empty();
+      document.getElementById('tagBarcodeFamily').value = '${library.currentFamily.id}';
       <c:forEach items="${library.tagBarcodes}" var="barcode">
         Library.ui.createBarcodeBox(${barcode.id});
       </c:forEach>
@@ -392,7 +393,7 @@
     <td>Library Kit:*</td>
     <td>
       <miso:select id="libraryKit" path="libraryAdditionalInfo.prepKit" items="${prepKits}" itemLabel="name"
-          itemValue="id" defaultLabel="Unknown" defaultValue=""/>
+          itemValue="id" defaultLabel="SELECT" defaultValue=""/>
     </td>
   </tr>
 <c:choose>

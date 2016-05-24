@@ -89,6 +89,7 @@
       Hot.saveButton = document.getElementById('saveLibraries');
       Library.hot.propagateOrEdit = "${method}";
       Library.designs = ${libraryDesignsJSON};
+      Hot.autoGenerateIdBarcodes = ${autoGenerateIdBarcodes};
 
       Library.hot.makeBulkCreateTable = function () {
         Library.hot.librariesJSON = Library.hot.prepLibrariesForTable(Library.hot.librariesJSON);

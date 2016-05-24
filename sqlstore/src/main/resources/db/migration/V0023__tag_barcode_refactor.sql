@@ -28,6 +28,7 @@ INSERT INTO TagBarcodeFamily(platformType, name) VALUES
 
 ALTER TABLE TagBarcodes ADD COLUMN position int DEFAULT 1;
 ALTER TABLE TagBarcodes ADD COLUMN tagFamilyId bigint(20);
+INSERT INTO TagBarcodeFamily(name, platformType) SELECT DISTINCT strategyName, UPPER(platformName) FROM TagBarcodes WHERE 0 = (SELECT COUNT(*) FROM TagBarcodeFamily WHERE TagBarcodeFamily.name = TagBarcodes.strategyName AND TagBarcodeFamily.platformType = UPPER(TagBarcodes.platformName));
 UPDATE TagBarcodes SET tagFamilyId = (SELECT tagFamilyId FROM TagBarcodeFamily WHERE TagBarcodeFamily.platformType = UPPER(TagBarcodes.platformName) AND TagBarcodeFamily.name = TagBarcodes.strategyName);
 ALTER TABLE TagBarcodes CHANGE COLUMN tagFamilyId tagFamilyId bigint(20) NOT NULL;
 ALTER TABLE TagBarcodes ADD FOREIGN KEY (tagFamilyId) REFERENCES TagBarcodeFamily (tagFamilyId);

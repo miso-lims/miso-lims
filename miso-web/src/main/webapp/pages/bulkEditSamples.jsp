@@ -88,6 +88,7 @@
 	    Hot.detailedSample = JSON.parse(document.getElementById('HOTbulkForm').dataset.detailedSample);
 	    Hot.saveButton = document.getElementById('saveSamples');
 	    Sample.hot.createOrEdit = "${method}";
+      Hot.autoGenerateIdBarcodes = ${autoGenerateIdBarcodes};
 
 	    Sample.hot.makeBulkEditTable = function () {
         Sample.hot.samplesJSON = Sample.hot.modifySamplesForEdit(Sample.hot.samplesJSON);
