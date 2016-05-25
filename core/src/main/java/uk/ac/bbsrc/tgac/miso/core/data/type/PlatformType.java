@@ -35,7 +35,7 @@ import java.util.Map;
  * @since 0.0.2
  */
 public enum PlatformType {
-  ILLUMINA("Illumina"), LS454("LS454"), SOLID("Solid"), IONTORRENT("IonTorrent"), PACBIO("PacBio"), OXFORD_NANOPORE("OxfordNanopore");
+  ILLUMINA("Illumina"), LS454("LS454"), SOLID("Solid"), IONTORRENT("IonTorrent"), PACBIO("PacBio"), OXFORDNANOPORE("OxfordNanopore");
 
   /**
    * Field key

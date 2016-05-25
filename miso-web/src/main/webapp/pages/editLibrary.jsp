@@ -384,7 +384,7 @@
 </tr>
 </table>
 
-<c:if test="${!empty library.libraryAdditionalInfo}">
+<c:if test="${detailedSample}">
 <br/>
 <br/>
 <h2>Details</h2>

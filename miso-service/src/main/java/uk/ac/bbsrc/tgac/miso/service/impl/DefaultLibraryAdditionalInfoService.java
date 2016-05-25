@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Sets;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
@@ -55,7 +56,7 @@ public class DefaultLibraryAdditionalInfoService implements LibraryAdditionalInf
   @Override
   public Long create(LibraryAdditionalInfo libraryAdditionalInfo, Long libraryId)
       throws IOException {
-    authorizationManager.throwIfNotWritable(libraryAdditionalInfo.getLibrary());
+    authorizationManager.throwIfNotWritable(libraryStore.get(libraryId));
     libraryAdditionalInfo.setLibrary(libraryStore.get(libraryId));
     libraryAdditionalInfo.setTissueOrigin(tissueOriginDao.getTissueOrigin(libraryAdditionalInfo.getTissueOrigin().getId()));
     libraryAdditionalInfo.setTissueType(tissueTypeDao.getTissueType(libraryAdditionalInfo.getTissueType().getId()));

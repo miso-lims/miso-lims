@@ -282,7 +282,7 @@
       <td><form:checkbox id="empty" path="empty"/></td>
     </tr>
   </table>
-  <c:if test="${!empty sample.sampleAdditionalInfo}">
+  <c:if test="${detailedSample}">
     
     <script type="text/javascript">
       Sample.options.all = ${sampleOptions};
