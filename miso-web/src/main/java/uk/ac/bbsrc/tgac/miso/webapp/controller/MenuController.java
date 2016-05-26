@@ -96,6 +96,7 @@ public class MenuController implements ServletContextAware {
       for (String role : user.getRoles()) {
         groups.append(role.replaceAll("ROLE_", "") + "&nbsp;");
       }
+      model.put("title", "My Account");
       model.put("userRealName", realName);
       model.put("userId", user.getUserId());
       model.put("apiKey", SignatureHelper.generatePrivateUserKey((user.getLoginName() + "::" + user.getPassword()).getBytes("UTF-8")));
@@ -118,6 +119,7 @@ public class MenuController implements ServletContextAware {
   public ModelAndView mainMenu(ModelMap model) {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+      model.put("title", "Home");
       Map<String, String> checks = MisoWebUtils.checkStorageDirectories((String) servletContext.getAttribute("miso.baseDirectory"));
       if (checks.keySet().contains("error")) {
         model.put("error", checks.get("error"));
@@ -143,8 +145,9 @@ public class MenuController implements ServletContextAware {
   }
   
   @RequestMapping("/admin/instituteDefaults")
-  public String tissueOptions() {
-    return "/pages/instituteDefaults.jsp";
+  public ModelAndView tissueOptions(ModelMap model) {
+    model.put("title", "Institute Defaults");
+    return new ModelAndView("/pages/instituteDefaults.jsp", model);
   }
 
   @Override
