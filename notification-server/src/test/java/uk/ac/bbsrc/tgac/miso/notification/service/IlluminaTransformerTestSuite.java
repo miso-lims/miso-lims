@@ -17,8 +17,10 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore
 public class IlluminaTransformerTestSuite {
 
   private static final String h1080_84_raw = "/runs/raw/Completed/111110_h1080_0084_AC08UPACXX";

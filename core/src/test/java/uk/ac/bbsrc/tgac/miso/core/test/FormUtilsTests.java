@@ -26,6 +26,8 @@ package uk.ac.bbsrc.tgac.miso.core.test;
 import com.eaglegenomics.simlims.core.User;
 
 import junit.framework.Assert;
+
+import org.junit.Ignore;
 import org.junit.Test;
 import org.odftoolkit.odfdom.doc.OdfTextDocument;
 import org.slf4j.Logger;
@@ -52,6 +54,7 @@ import java.util.List;
  * @date 06-Sep-2011
  * @since 0.1.1
  */
+@Ignore
 public class FormUtilsTests {
   protected static final Logger log = LoggerFactory.getLogger(FormUtilsTests.class);
 
