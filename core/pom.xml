@@ -64,9 +64,9 @@
 
   <repositories>
     <repository>
-        <id>OpenSymphony mirror repository</id>
-        <name>OpenSymphony mirror repository</name>
-        <url>https://oswokflow-repository.googlecode.com/svn/deploy/</url>
+      <id>seqwaremaven.oicr.on.ca</id>
+      <name>seqwaremaven.oicr.on.ca-releases</name>
+      <url>https://seqwaremaven.oicr.on.ca/artifactory/gsi-dependencies</url>
     </repository>
   </repositories>
 
@@ -217,11 +217,11 @@
       <version>2.0</version>
     </dependency>
 
-    <dependency>
-      <groupId>opensymphony</groupId>
-      <artifactId>oscore</artifactId>
-      <version>2.2.7</version>
-    </dependency>
+  <dependency>
+   <groupId>ca.on.oicr.gsi</groupId>
+   <artifactId>oscore</artifactId>
+   <version>2.2.7</version>
+  </dependency>
 
     <dependency>
       <groupId>jfree</groupId>
