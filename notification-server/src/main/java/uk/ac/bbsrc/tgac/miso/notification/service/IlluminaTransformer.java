@@ -44,6 +44,14 @@ import java.util.regex.Pattern;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import nki.core.MetrixContainer;
+import nki.decorators.MetrixContainerDecorator;
+import nki.objects.Summary;
+import nki.parsers.illumina.ExtractionMetrics;
+import nki.parsers.xml.RunInfoHandler;
+
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,13 +64,6 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-import nki.core.MetrixContainer;
-import nki.decorators.MetrixContainerDecorator;
-import nki.objects.Summary;
-import nki.parsers.illumina.ExtractionMetrics;
-import nki.parsers.xml.RunInfoHandler;
 import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
 import uk.ac.bbsrc.tgac.miso.notification.util.NotificationUtils;
 import uk.ac.bbsrc.tgac.miso.notification.util.PossiblyGzippedFileUtils;
@@ -145,7 +146,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
               int numReads = 0;
 
               run.put(JSON_RUN_NAME, runName);
-              run.put(JSON_FULL_PATH, rootFile.getCanonicalPath()); // follow symlinks!
+              run.put(JSON_FULL_PATH, rootFile.getAbsolutePath());
 
               // Get xml files
               Document statusDoc = null;
@@ -202,9 +203,9 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
 
               // if a completed run has been moved (e.g. archived), update the new path
               JSONObject json = JSONObject.fromObject(finishedCache.get(runName));
-              if (json.has("fullPath") && !rootFile.getCanonicalPath().equals(json.getString("fullPath"))) {
+              if (json.has(JSON_FULL_PATH) && !rootFile.getAbsolutePath().equals(json.getString(JSON_FULL_PATH))) {
                 log.info("Cached path changed. Updating " + runName);
-                json.put("fullPath", rootFile.getCanonicalPath());
+                json.put(JSON_FULL_PATH, rootFile.getAbsolutePath());
                 finishedCache.put(runName, json.toString());
               }
               map.get(STATUS_COMPLETE).add(finishedCache.get(runName));
@@ -228,9 +229,9 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
 
       if (STATUS_COMPLETE.equals(key)) {
         for (JSONObject run : (Iterable<JSONObject>) map.get(key)) {
-          if (!finishedCache.keySet().contains(run.getString("runName"))) {
-            log.info("Caching completed run " + run.getString("runName"));
-            finishedCache.put(run.getString("runName"), run.toString());
+          if (!finishedCache.keySet().contains(run.getString(JSON_RUN_NAME))) {
+            log.info("Caching completed run " + run.getString(JSON_RUN_NAME));
+            finishedCache.put(run.getString(JSON_RUN_NAME), run.toString());
           }
         }
       }
@@ -429,7 +430,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
    * @throws IOException
    */
   private void checkDates(File rootFile, JSONObject run) throws IOException {
-    String runName = run.getString("runName");
+    String runName = run.getString(JSON_RUN_NAME);
 
     String runDirRegex = "(\\d{6})_[A-z0-9]+_\\d+_[A-z0-9_\\+\\-]*";
     Matcher startMatcher = Pattern.compile(runDirRegex).matcher(runName);
@@ -645,7 +646,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
     Document runInfo = null;
 
     try {
-      runInfo = PossiblyGzippedFileUtils.getXmlDocument(rootFile, "/RunInfo.xml");
+      runInfo = PossiblyGzippedFileUtils.getXmlDocument(rootFile, runInfoPath);
     } catch (ParserConfigurationException | TransformerException e) {
       log.error("Error parsing file", e);
     }
@@ -654,10 +655,10 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
       return null;
     } else {
       Summary sum = new Summary();
-      sum.setRunDirectory(rootFile.getCanonicalPath());
+      sum.setRunDirectory(rootFile.getAbsolutePath());
 
       // Metrix fails to set current cycle, and parsing ErrorMetricsOut.bin depends on this, so set it here
-      final String extractionMetricsPath = rootFile.getCanonicalPath() + "/InterOp/" + nki.constants.Constants.EXTRACTION_METRICS;
+      final String extractionMetricsPath = rootFile.getAbsolutePath() + "/InterOp/" + nki.constants.Constants.EXTRACTION_METRICS;
       ExtractionMetrics eim = new ExtractionMetrics(extractionMetricsPath, null);
       sum.setCurrentCycle(eim.getLastCycle());
 
@@ -690,7 +691,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
               } else {
                 run.put("error", "Cannot provide metrics - parsing failed.");
               }
-              run.put("runName", runName);
+              run.put(JSON_RUN_NAME, runName);
               map.add(run);
             } else {
               JSONObject cachedRun = JSONObject.fromObject(finishedCache.get(runName));
@@ -706,7 +707,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
               } else {
                 run.put("metrix", cachedRun.get("metrix"));
               }
-              run.put("runName", runName);
+              run.put(JSON_RUN_NAME, runName);
               map.add(run);
             }
           } catch (IOException e) {
@@ -714,7 +715,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
           }
         } else {
           log.error(rootFile.getName() + " :: Permission denied");
-          run.put("runName", rootFile.getName());
+          run.put(JSON_RUN_NAME, rootFile.getName());
           run.put("error", "Cannot read into run directory. Permission denied.");
           map.add(run);
         }
