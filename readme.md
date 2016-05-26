@@ -3,7 +3,7 @@ MISO: An open source LIMS for small-to-large scale sequencing centres
 
 &copy; 2013. [The Genome Analysis Centre] [1], Norwich, UK
 
-> MISO project contacts: Robert Davey (robert.davey@tgac.ac.uk), Mario Caccamo (mario.caccamo@tgac.ac.uk)
+> MISO project contacts: Robert Davey (robert.davey@tgac.ac.uk), Chris Salt (chris.salt@tgac.ac.uk), Morgan Taschuk (Morgan.Taschuk@oicr.on.ca)
 >
 > MISO is free software: you can redistribute it and/or modify
 > it under the terms of the GNU General Public License as published by
