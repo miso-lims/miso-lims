@@ -96,9 +96,10 @@ Project.ui = {
         'projectId': projectId,
         'url': ajaxurl
       },
-      {'doOnSuccess': function (json) {
-        jQuery('#pro' + projectId + 'traf').html(json.html);
-      }
+      {
+        'doOnSuccess': function (json) {
+          jQuery('#pro' + projectId + 'traf').html(json.html);
+        }
       }
     );
   },
@@ -111,11 +112,12 @@ Project.ui = {
       {
         'url': ajaxurl
       },
-      {'doOnSuccess': function (json) {
-        jQuery.each(json, function (i, val) {
-          jQuery('#pro' + i + 'overview').html(val);
-        });
-      }
+      {
+        'doOnSuccess': function (json) {
+          jQuery.each(json, function (i, val) {
+            jQuery('#pro' + i + 'overview').html(val);
+          });
+        }
       }
     );
   },
@@ -138,41 +140,43 @@ Project.ui = {
       {
         'url': ajaxurl
       },
-      {'doOnSuccess': function (json) {
-        jQuery('#listingProjectsTable').html('');
-        jQuery('#listingProjectsTable').dataTable({
-          "aaData": json.projectsArray,
-          "aoColumns": [
-            { "sTitle": "Project Name", "sType": "no-pro"},
-            { "sTitle": "Alias"},
-            { "sTitle": "Description"},
-            { "sTitle": "Progress"},
-            { "sTitle": "Overview"}
-          ],
-          "bJQueryUI": true,
-          "iDisplayLength": 25,
-          "aaSorting": [
-            [0, "desc"]
-          ],
-          "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>',
-          "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-            Fluxion.doAjax(
-              'projectControllerHelperService',
-              'checkOverviewByProjectId',
-              {
-                'projectId': aData[4],
-                'url': ajaxurl
-              },
-              {'doOnSuccess': function (json) {
-                jQuery('td:eq(4)', nRow).html(json.response);
-              }
-              }
-            );
-          }
-        });
-        jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
-        jQuery("#toolbar").append("<button style=\"margin-left:5px;\" onclick=\"window.location.href='/miso/project/new';\" class=\"fg-button ui-state-default ui-corner-all\">Add Project</button>");
-      }
+      {
+        'doOnSuccess': function (json) {
+          jQuery('#listingProjectsTable').html('');
+          jQuery('#listingProjectsTable').dataTable({
+            "aaData": json.projectsArray,
+            "aoColumns": [
+              { "sTitle": "Project Name", "sType": "no-pro"},
+              { "sTitle": "Alias"},
+              { "sTitle": "Description"},
+              { "sTitle": "Progress"},
+              { "sTitle": "Overview"}
+            ],
+            "bJQueryUI": true,
+            "iDisplayLength": 25,
+            "aaSorting": [
+              [0, "desc"]
+            ],
+            "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>',
+            "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+              Fluxion.doAjax(
+                'projectControllerHelperService',
+                'checkOverviewByProjectId',
+                {
+                  'projectId': aData[4],
+                  'url': ajaxurl
+                },
+                {
+                  'doOnSuccess': function (json) {
+                    jQuery('td:eq(4)', nRow).html(json.response);
+                  }
+                }
+              );
+            }
+          });
+          jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
+          jQuery("#toolbar").append("<button style=\"margin-left:5px;\" onclick=\"window.location.href='/miso/project/new';\" class=\"fg-button ui-state-default ui-corner-all\">Add Project</button>");
+        }
       }
     );
   },
@@ -196,9 +200,10 @@ Project.ui = {
         'samples': aReturn,
         'url': ajaxurl
       },
-      {'doOnSuccess': function (json) {
-        Utils.page.pageRedirect('/miso/download/project/' + projectId + '/' + json.response);
-      }
+      {
+        'doOnSuccess': function (json) {
+          Utils.page.pageRedirect('/miso/download/project/' + projectId + '/' + json.response);
+        }
       }
     );
   },
@@ -212,8 +217,14 @@ Project.ui = {
 	      Fluxion.doAjax(
 	        'projectControllerHelperService',
 	        'deleteProjectFile',
-	        {'id': projectId, 'hashcode': fileKey, 'url': ajaxurl},
-	        {'doOnSuccess': Utils.page.pageReload}
+	        {
+	          'id': projectId,
+	          'hashcode': fileKey,
+	          'url': ajaxurl
+	        },
+	        {
+	          'doOnSuccess': Utils.page.pageReload
+	        }
 	      );
 	    }
 	  },
@@ -239,9 +250,10 @@ Project.ui = {
         'documentFormat': documentFormat,
         'url': ajaxurl
       },
-      {'doOnSuccess': function (json) {
-        Utils.page.pageRedirect('/miso/download/project/' + projectId + '/' + json.response);
-      }
+      {
+        'doOnSuccess': function (json) {
+          Utils.page.pageRedirect('/miso/download/project/' + projectId + '/' + json.response);
+        }
       }
     );
   },
@@ -251,8 +263,12 @@ Project.ui = {
     Fluxion.doAjax(
       'projectControllerHelperService',
       'visualiseBulkSampleInputForm',
-      {'url': ajaxurl},
-      {'updateElement': 'inputform_statusdiv'}
+      {
+        'url': ajaxurl
+      },
+      {
+        'updateElement': 'inputform_statusdiv'
+      }
     );
   },
 
@@ -273,9 +289,10 @@ Project.ui = {
         'documentFormat': documentFormat,
         'url': ajaxurl
       },
-      {'doOnSuccess': function (json) {
-        Utils.page.pageRedirect('/miso/download/project/' + projectId + '/' + json.response);
-      }
+      {
+        'doOnSuccess': function (json) {
+          Utils.page.pageRedirect('/miso/download/project/' + projectId + '/' + json.response);
+        }
       }
     );
   },
@@ -328,8 +345,7 @@ Project.ui = {
           });
         }
       }
-    }
-    else {
+    } else {
       setTimeout(function () {
         Project.ui.processPlateUpload(frameId);
       }, 2000);
@@ -385,24 +401,25 @@ Project.ui = {
       {
         'url': ajaxurl
       },
-      {'doOnSuccess': function (json) {
-        jQuery('#plateElementsTable').html('');
-        jQuery('#plateElementsTable').dataTable({
-          "aaData": json.elementsArray,
-          "aoColumns": [
-            { "sTitle": "Name", "sType": "no-pla"},
-            { "sTitle": "Alias"},
-            { "sTitle": "Description"}
-          ],
-          "bJQueryUI": true,
-          "iDisplayLength": 25,
-          "aaSorting": [
-            [0, "desc"]
-          ],
-          "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>'
-        });
-        jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
-      }
+      {
+        'doOnSuccess': function (json) {
+          jQuery('#plateElementsTable').html('');
+          jQuery('#plateElementsTable').dataTable({
+            "aaData": json.elementsArray,
+            "aoColumns": [
+              { "sTitle": "Name", "sType": "no-pla"},
+              { "sTitle": "Alias"},
+              { "sTitle": "Description"}
+            ],
+            "bJQueryUI": true,
+            "iDisplayLength": 25,
+            "aaSorting": [
+              [0, "desc"]
+            ],
+            "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>'
+          });
+          jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
+        }
       }
     );
   },
@@ -446,13 +463,11 @@ Project.ui = {
             }
           }
         );
-      }
-      else {
+      } else {
         alert("The results field can only contain integers or decimals.");
         Utils.ui.reenableButton('bulkSampleQcButton', "Save QCs");
       }
-    }
-    else {
+    } else {
       alert("You have not selected any QC rows to save!\nPlease click the Select column cells in the rows you wish to save.");
       Utils.ui.reenableButton('bulkSampleQcButton', "Save QCs");
     }
@@ -491,8 +506,7 @@ Project.ui = {
         });
       }
       alert("There were errors in your bulk input. The green rows have been saved, please fix the red rows:\n\n" + errorStr);
-    }
-    else {
+    } else {
       Utils.timer.timedFunc(Utils.page.pageReload(), 1000);
     }
   },
@@ -528,13 +542,11 @@ Project.ui = {
             'doOnSuccess': self.processBulkEmPcrTable
           }
         );
-      }
-      else {
+      } else {
         alert("The results field can only contain integers or decimals.");
         Utils.ui.reenableButton('bulkEmPcrButton', "Save EmPCRs");
       }
-    }
-    else {
+    } else {
       alert("You have not selected any EmPCR rows to save!\nPlease click the Select column cells in the rows you wish to save.");
       Utils.ui.reenableButton('bulkEmPcrButton', "Save EmPCRs");
     }
@@ -574,8 +586,7 @@ Project.ui = {
         });
       }
       alert("There were errors in your bulk input. The green rows have been saved, please fix the red rows:\n\n" + errorStr);
-    }
-    else {
+    } else {
       Utils.timer.timedFunc(Utils.page.pageReload(), 1000);
     }
   },
@@ -610,14 +621,13 @@ Project.ui = {
           },
           {
             'doOnSuccess': self.processBulkEmPcrDilutionTable
-          });
-      }
-      else {
+          }
+        );
+      } else {
         alert("The results field can only contain integers or decimals.");
         Utils.ui.reenableButton('bulkEmPcrDilutionButton', "Save Dilutions");
       }
-    }
-    else {
+    } else {
       alert("You have not selected any EmPCR Dilution rows to save!\nPlease click the Select column cells in the rows you wish to save.");
       Utils.ui.reenableButton('bulkEmPcrDilutionButton', "Save Dilutions");
     }
@@ -657,8 +667,7 @@ Project.ui = {
         });
       }
       alert("There were errors in your bulk input. The green rows have been saved, please fix the red rows:\n\n" + errorStr);
-    }
-    else {
+    } else {
       Utils.timer.timedFunc(Utils.page.pageReload(), 1000);
     }
   },
@@ -669,7 +678,6 @@ Project.ui = {
       jQuery(tableId).dataTable().fnDestroy();
       //bug fix to reset table width
       jQuery(tableId).removeAttr("style");
-
       jQuery(tableId).addClass("display");
 
       jQuery(tableId + ' tbody').find("tr").each(function () {
@@ -677,8 +685,7 @@ Project.ui = {
           if (jQuery(this).find("td:eq(4)").html() === "") {
             jQuery(this).removeAttr("onmouseover").removeAttr("onmouseout");
             jQuery(this).find("td:eq(4)").remove();
-          }
-          else {
+          } else {
             jQuery(this).remove();
           }
       });
@@ -715,8 +722,7 @@ Project.ui = {
       jQuery(tableId).find('.rowSelect').click(function () {
         if (jQuery(this).parent().hasClass('row_selected')) {
           jQuery(this).parent().removeClass('row_selected');
-        }
-        else {
+        } else {
           jQuery(this).parent().addClass('row_selected');
         }
       });
@@ -740,14 +746,18 @@ Project.ui = {
         Fluxion.doAjax(
           'sampleControllerHelperService',
           'setSampleReceivedDateByBarcode',
-          {'samples': samples, 'url': ajaxurl},
-          {'doOnSuccess': function (json) {
-            alert(json.result);
-            Utils.page.pageReload();
+          {
+            'samples': samples,
+            'url': ajaxurl
+          },
+          {
+            'doOnSuccess': function (json) {
+              alert(json.result);
+              Utils.page.pageReload();
+            }
           }
-        });
-      }
-      else {
+        );
+      } else {
         alert("No samples selected");
       }
     }
@@ -846,8 +856,14 @@ Project.overview = {
       Fluxion.doAjax(
         'projectControllerHelperService',
         'deleteProjectOverviewNote',
-        {'overviewId': overviewId, 'noteId': noteId, 'url': ajaxurl},
-        {'doOnSuccess': Utils.page.pageReload}
+        {
+          'overviewId': overviewId,
+          'noteId': noteId,
+          'url': ajaxurl
+        },
+        {
+          'doOnSuccess': Utils.page.pageReload
+        }
       );
     }
   },
@@ -865,59 +881,60 @@ Project.overview = {
         'projectId': projectId,
         'url': ajaxurl
       },
-      {'doOnSuccess': function (json) {
-        jQuery(tableId).html('');
-
-        var oTable = jQuery(tableId).dataTable({
-          "aaData": json.array,
-          "aoColumns": [
-            { "mData":"id", "bVisible":"false"},
-            { "sTitle": "Sample Name", "mData":"name"},
-            { "sTitle": "Alias", "mData":"alias", "sType": "natural"},
-            { "sTitle": "Type", "mData":"type"},
-            { "sTitle": "Description", "mData":"description"}
-          ],
-          "aoColumnDefs": [
-            {
-              "bUseRendered": false,
-              "aTargets": [ 0 ]
+      {
+        'doOnSuccess': function (json) {
+          jQuery(tableId).html('');
+  
+          var oTable = jQuery(tableId).dataTable({
+            "aaData": json.array,
+            "aoColumns": [
+              { "mData":"id", "bVisible":"false"},
+              { "sTitle": "Sample Name", "mData":"name"},
+              { "sTitle": "Alias", "mData":"alias", "sType": "natural"},
+              { "sTitle": "Type", "mData":"type"},
+              { "sTitle": "Description", "mData":"description"}
+            ],
+            "aoColumnDefs": [
+              {
+                "bUseRendered": false,
+                "aTargets": [ 0 ]
+              }
+            ],
+            "aaSorting": [
+              [1, 'asc']
+            ],
+            "bPaginate": false,
+            "bInfo": false,
+            "bJQueryUI": true,
+            "bAutoWidth": true,
+            "bFilter": false,
+            "sDom": '<<"toolbar">f>r<t>ip>'
+          });
+  
+          //bug fix to reset table width
+          jQuery(tableId).removeAttr("style");
+  
+          jQuery(tableId).find("tr").each(function () {
+            jQuery(this).removeAttr("onmouseover").removeAttr("onmouseout");
+          });
+  
+          jQuery(tableId).find("tr:first").prepend("<th>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\"" + tableId + "\", this);'></span></th>");
+          jQuery(tableId).find("tr:gt(0)").prepend("<td class='rowSelect'></td>");
+  
+          jQuery(tableId).find('.rowSelect').click(function () {
+            if (jQuery(this).parent().hasClass('row_selected')) {
+              jQuery(this).parent().removeClass('row_selected');
+            } else {
+              jQuery(this).parent().addClass('row_selected');
             }
-          ],
-          "aaSorting": [
-            [1, 'asc']
-          ],
-          "bPaginate": false,
-          "bInfo": false,
-          "bJQueryUI": true,
-          "bAutoWidth": true,
-          "bFilter": false,
-          "sDom": '<<"toolbar">f>r<t>ip>'
-        });
-
-        //bug fix to reset table width
-        jQuery(tableId).removeAttr("style");
-
-        jQuery(tableId).find("tr").each(function () {
-          jQuery(this).removeAttr("onmouseover").removeAttr("onmouseout");
-        });
-
-        jQuery(tableId).find("tr:first").prepend("<th>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\"" + tableId + "\", this);'></span></th>");
-        jQuery(tableId).find("tr:gt(0)").prepend("<td class='rowSelect'></td>");
-
-        jQuery(tableId).find('.rowSelect').click(function () {
-          if (jQuery(this).parent().hasClass('row_selected')) {
-            jQuery(this).parent().removeClass('row_selected');
-          }
-          else {
-            jQuery(this).parent().addClass('row_selected');
-          }
-        });
-
-        jQuery("div.toolbar").html("<input type='button' value='Group Selected' onclick=\"Project.overview.addSampleGroup('"+overviewId+"', '" + tableId + "');\" class=\"fg-button ui-state-default ui-corner-all\"/>");
-        jQuery("div.toolbar").append("<input type='button' value='Cancel' onclick=\"Utils.page.pageReload();\" class=\"fg-button ui-state-default ui-corner-all\"/>");
-        jQuery("div.toolbar").removeClass("toolbar");
+          });
+  
+          jQuery("div.toolbar").html("<input type='button' value='Group Selected' onclick=\"Project.overview.addSampleGroup('"+overviewId+"', '" + tableId + "');\" class=\"fg-button ui-state-default ui-corner-all\"/>");
+          jQuery("div.toolbar").append("<input type='button' value='Cancel' onclick=\"Utils.page.pageReload();\" class=\"fg-button ui-state-default ui-corner-all\"/>");
+          jQuery("div.toolbar").removeClass("toolbar");
+        }
       }
-    });
+    );
   },
 
   addSampleGroup: function (overviewId, tableId) {
@@ -956,59 +973,60 @@ Project.overview = {
         'projectId': projectId,
         'url': ajaxurl
       },
-      {'doOnSuccess': function (json) {
-        jQuery(tableId).html('');
-
-        var oTable = jQuery(tableId).dataTable({
-          "aaData": json.array,
-          "aoColumns": [
-            { "mData":"id", "bVisible":"false"},
-            { "sTitle": "Sample Name", "mData":"name"},
-            { "sTitle": "Alias", "mData":"alias", "sType": "natural"},
-            { "sTitle": "Type", "mData":"type"},
-            { "sTitle": "Description", "mData":"description"}
-          ],
-          "aoColumnDefs": [
-            {
-              "bUseRendered": false,
-              "aTargets": [ 0 ]
+      {
+        'doOnSuccess': function (json) {
+          jQuery(tableId).html('');
+  
+          var oTable = jQuery(tableId).dataTable({
+            "aaData": json.array,
+            "aoColumns": [
+              { "mData":"id", "bVisible":"false"},
+              { "sTitle": "Sample Name", "mData":"name"},
+              { "sTitle": "Alias", "mData":"alias", "sType": "natural"},
+              { "sTitle": "Type", "mData":"type"},
+              { "sTitle": "Description", "mData":"description"}
+            ],
+            "aoColumnDefs": [
+              {
+                "bUseRendered": false,
+                "aTargets": [ 0 ]
+              }
+            ],
+            "aaSorting": [
+              [1, 'asc']
+            ],
+            "bPaginate": false,
+            "bInfo": false,
+            "bJQueryUI": true,
+            "bAutoWidth": true,
+            "bFilter": false,
+            "sDom": '<<"toolbar">f>r<t>ip>'
+          });
+  
+          //bug fix to reset table width
+          jQuery(tableId).removeAttr("style");
+  
+          jQuery(tableId).find("tr").each(function () {
+            jQuery(this).removeAttr("onmouseover").removeAttr("onmouseout");
+          });
+  
+          jQuery(tableId).find("tr:first").prepend("<th>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\"" + tableId + "\", this);'></span></th>");
+          jQuery(tableId).find("tr:gt(0)").prepend("<td class='rowSelect'></td>");
+  
+          jQuery(tableId).find('.rowSelect').click(function () {
+            if (jQuery(this).parent().hasClass('row_selected')) {
+              jQuery(this).parent().removeClass('row_selected');
+            } else {
+              jQuery(this).parent().addClass('row_selected');
             }
-          ],
-          "aaSorting": [
-            [1, 'asc']
-          ],
-          "bPaginate": false,
-          "bInfo": false,
-          "bJQueryUI": true,
-          "bAutoWidth": true,
-          "bFilter": false,
-          "sDom": '<<"toolbar">f>r<t>ip>'
-        });
-
-        //bug fix to reset table width
-        jQuery(tableId).removeAttr("style");
-
-        jQuery(tableId).find("tr").each(function () {
-          jQuery(this).removeAttr("onmouseover").removeAttr("onmouseout");
-        });
-
-        jQuery(tableId).find("tr:first").prepend("<th>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\"" + tableId + "\", this);'></span></th>");
-        jQuery(tableId).find("tr:gt(0)").prepend("<td class='rowSelect'></td>");
-
-        jQuery(tableId).find('.rowSelect').click(function () {
-          if (jQuery(this).parent().hasClass('row_selected')) {
-            jQuery(this).parent().removeClass('row_selected');
-          }
-          else {
-            jQuery(this).parent().addClass('row_selected');
-          }
-        });
-
-        jQuery("div.toolbar").html("<input type='button' value='Add Selected' onclick=\"Project.overview.addSamplesToGroup('"+overviewId+"', '" + tableId + "', '"+groupId+"');\" class=\"fg-button ui-state-default ui-corner-all\">Add Selected</input>");
-        jQuery("div.toolbar").append("<input type='button' value='Cancel' onclick=\"Utils.page.pageReload();\" class=\"fg-button ui-state-default ui-corner-all\">Cancel</input>");
-        jQuery("div.toolbar").removeClass("toolbar");
+          });
+  
+          jQuery("div.toolbar").html("<input type='button' value='Add Selected' onclick=\"Project.overview.addSamplesToGroup('"+overviewId+"', '" + tableId + "', '"+groupId+"');\" class=\"fg-button ui-state-default ui-corner-all\">Add Selected</input>");
+          jQuery("div.toolbar").append("<input type='button' value='Cancel' onclick=\"Utils.page.pageReload();\" class=\"fg-button ui-state-default ui-corner-all\">Cancel</input>");
+          jQuery("div.toolbar").removeClass("toolbar");
+        }
       }
-    });
+    );
   },
 
   addSamplesToGroup: function (overviewId, tableId, groupId) {
@@ -1091,8 +1109,7 @@ Project.issues = {
           'doOnSuccess': self.importIssue
         }
       );
-    }
-    else {
+    } else {
       alert("Please enter a valid Issue Key, e.g. FOO-1");
     }
   },
@@ -1144,8 +1161,7 @@ Project.issues = {
           'doOnSuccess': self.previewIssues
         }
       );
-    }
-    else {
+    } else {
       alert("Please enter a valid Issue Key, or list of keys, e.g. FOO-1,FOO-2,FOO-3");
     }
   },
@@ -1350,8 +1366,7 @@ Project.barcode = {
       jQuery(tableId).find('.rowSelect').click(function () {
         if (jQuery(this).parent().hasClass('row_selected')) {
           jQuery(this).parent().removeClass('row_selected');
-        }
-        else {
+        } else {
           jQuery(this).parent().addClass('row_selected');
         }
       });
@@ -1482,8 +1497,7 @@ Project.barcode = {
       jQuery(tableId).find('.rowSelect').click(function () {
         if (jQuery(this).parent().hasClass('row_selected')) {
           jQuery(this).parent().removeClass('row_selected');
-        }
-        else {
+        } else {
           jQuery(this).parent().addClass('row_selected');
         }
       });
@@ -1608,8 +1622,7 @@ Project.barcode = {
       jQuery(tableId).find('.rowSelect').click(function () {
         if (jQuery(this).parent().hasClass('row_selected')) {
           jQuery(this).parent().removeClass('row_selected');
-        }
-        else {
+        } else {
           jQuery(this).parent().addClass('row_selected');
         }
       });
@@ -1689,9 +1702,10 @@ Project.alert = {
         'overviewId': overviewId,
         'url': ajaxurl
       },
-      {'doOnSuccess': function () {
-        Utils.page.pageReload();
-      }
+      {
+        'doOnSuccess': function () {
+          Utils.page.pageReload();
+        }
       }
     );
   },
@@ -1704,9 +1718,10 @@ Project.alert = {
         'overviewId': overviewId,
         'url': ajaxurl
       },
-      {'doOnSuccess': function () {
-        Utils.page.pageReload();
-      }
+      {
+        'doOnSuccess': function () {
+          Utils.page.pageReload();
+        }
       }
     );
   },
@@ -1719,9 +1734,10 @@ Project.alert = {
         'overviewId': overviewId,
         'url': ajaxurl
       },
-      {'doOnSuccess': function (json) {
-        jQuery('#watchersList' + overviewId).html(json.watchers);
-      }
+      {
+        'doOnSuccess': function (json) {
+          jQuery('#watchersList' + overviewId).html(json.watchers);
+        }
       }
     );
   }

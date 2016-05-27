@@ -282,7 +282,7 @@
       <td><form:checkbox id="empty" path="empty"/></td>
     </tr>
   </table>
-  <c:if test="${!empty sample.sampleAdditionalInfo}">
+  <c:if test="${detailedSample}">
     
     <script type="text/javascript">
       Sample.options.all = ${sampleOptions};
@@ -698,6 +698,7 @@
     <script type="text/javascript">
       Hot.dropdownRef = ${referenceDataJSON};
       Sample.hot.aliasGenerationEnabled = ${aliasGenerationEnabled};
+      Hot.autoGenerateIdBarcodes = ${autoGenerateIdBarcodes};
       Sample.hot.selectedProjectId = parseInt('${sample.project.id}') || null;
       Hot.detailedSample = JSON.parse(document.getElementById('HOTbulkForm').dataset.detailedSample);
       if (Boolean(Hot.detailedSample)) {

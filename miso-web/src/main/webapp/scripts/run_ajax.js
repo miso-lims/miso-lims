@@ -27,10 +27,14 @@ var Run = Run || {
       Fluxion.doAjax(
         'runControllerHelperService',
         'deleteRun',
-        {'runId': runId, 'url': ajaxurl},
-        {'doOnSuccess': function (json) {
-          successfunc();
-        }
+        {
+          'runId': runId,
+          'url': ajaxurl
+        },
+        {
+          'doOnSuccess': function (json) {
+            successfunc();
+          }
         }
       );
     }
@@ -129,7 +133,9 @@ Run.qc = {
         'runId': runId,
         'url': ajaxurl
       },
-      {'doOnSuccess': self.insertRunQCRow}
+      {
+        'doOnSuccess': self.insertRunQCRow
+      }
     );
   },
 
@@ -164,10 +170,13 @@ Run.qc = {
       Fluxion.doAjax(
         'runControllerHelperService',
         'getRunQCTypes',
-        {'url': ajaxurl},
-        {'doOnSuccess': function (json) {
-          jQuery('#runQcType').html(json.types);
-        }
+        {
+          'url': ajaxurl
+        },
+        { 
+          'doOnSuccess': function (json) {
+            jQuery('#runQcType').html(json.types);
+          }
         }
       );
 
@@ -178,9 +187,10 @@ Run.qc = {
           'runId': json.runId,
           'url': ajaxurl
         },
-        {'doOnSuccess': function (json) {
-          jQuery('#runQcProcessSelection').html(json.processSelection);
-        }
+        {
+          'doOnSuccess': function (json) {
+            jQuery('#runQcProcessSelection').html(json.processSelection);
+          }
         }
       );
     } else {
@@ -209,8 +219,10 @@ Run.qc = {
         'processSelection': a,
         'information': jQuery("input[name='runQcInformation']").val(),
         'doNotProcess': donotprocess,
-        'url': ajaxurl},
-      {'updateElement': 'runQcTable',
+        'url': ajaxurl
+      },
+      {
+        'updateElement': 'runQcTable',
         'doOnSuccess': function () {
           jQuery('#runQcTable').removeAttr("qcInProgress");
           if ("SeqOps QC" === qctype && !donotprocess) {
@@ -236,6 +248,7 @@ Run.ui = {
     var s = jQuery(span);
     s.html("<input type='text' id='sequencerPartitionContainers[" + fc + "].identificationBarcode' name='sequencerPartitionContainers[" + fc + "].identificationBarcode' value='" + s.html() + "'/>" +
            "<button onclick='Run.container.lookupContainer(this, " + fc + ");' type='button' class='fg-button ui-state-default ui-corner-all'>Lookup</button>");
+    if (jQuery('#pencil')) jQuery('#pencil').hide();
   },
 
   editContainerLocationBarcode: function (span, fc) {
@@ -247,11 +260,17 @@ Run.ui = {
     Fluxion.doAjax(
       'runControllerHelperService',
       'changePlatformType',
-      {'platformtype': form.value, 'run_cId': jQuery('input[name=run_cId]').val(), 'runId': runId, 'url': ajaxurl},
-      {'doOnSuccess': function (json) {
-        jQuery('#sequencerReferenceSelect').html(json.sequencers);
-        Run.pool.poolSearch("", jQuery('input[name=platformType]:checked').val());
-      }
+      {
+        'platformtype': form.value,
+        'run_cId': jQuery('input[name=run_cId]').val(),
+        'runId': runId,
+        'url': ajaxurl
+      },
+      {
+        'doOnSuccess': function (json) {
+          jQuery('#sequencerReferenceSelect').html(json.sequencers);
+          Run.pool.poolSearch("", jQuery('input[name=platformType]:checked').val());
+        }
       }
     );
   },
@@ -261,10 +280,16 @@ Run.ui = {
       Fluxion.doAjax(
         'runControllerHelperService',
         'populateRunOptions',
-        {'sequencerReference': form.value, 'run_cId': jQuery('input[name=run_cId]').val(), 'runId': runId, 'url': ajaxurl},
-        {'doOnSuccess': function (json) {
-          jQuery('#runPartitions').html(json.partitions);
-        }
+        {
+          'sequencerReference': form.value,
+          'run_cId': jQuery('input[name=run_cId]').val(),
+          'runId': runId,
+          'url': ajaxurl
+        },
+        {
+          'doOnSuccess': function (json) {
+            jQuery('#runPartitions').html(json.partitions);
+          }
         }
       );
     }
@@ -288,58 +313,96 @@ Run.ui = {
       {
         'url': ajaxurl
       },
-      {'doOnSuccess': function (json) {
-        jQuery('#listingRunsTable').html('');
-        jQuery('#listingRunsTable').dataTable({
-          "aaData": json.runsArray,
-          "aoColumns": [
-            { "sTitle": "Run Name", "sType": "no-run"},
-            { "sTitle": "Alias"},
-            { "sTitle": "Status"},
-            { "sTitle": "Start Date"},
-            { "sTitle": "End Date"},
-            { "sTitle": "Type"}
-          ],
-          "bJQueryUI": true,
-          "iDisplayLength": 25,
-          "aaSorting": [
-            [0, "desc"]
-          ]
-        });
+      {
+        'doOnSuccess': function (json) {
+          jQuery('#listingRunsTable').html('');
+          jQuery('#listingRunsTable').dataTable({
+            "aaData": json.runsArray,
+            "aoColumns": [
+              { "sTitle": "Run Name", "sType": "no-run"},
+              { "sTitle": "Alias"},
+              { "sTitle": "Status"},
+              { "sTitle": "Start Date"},
+              { "sTitle": "End Date"},
+              { "sTitle": "Type"}
+            ],
+            "bJQueryUI": true,
+            "iDisplayLength": 25,
+            "aaSorting": [
+              [0, "desc"]
+            ]
+          });
+        }
       }
-    });
+    );
   },
 
   changeIlluminaLane: function (t, container) {
     Fluxion.doAjax(
-            'runControllerHelperService',
-            'changeIlluminaLane',
-            {'platform': 'Illumina', 'run_cId': jQuery('input[name=run_cId]').val(), 'numLanes': jQuery(t).val(), 'container': container, 'url': ajaxurl},
-            {'updateElement': 'containerdiv' + container});
+      'runControllerHelperService',
+      'changeIlluminaLane',
+      {
+        'platform': 'Illumina',
+        'run_cId': jQuery('input[name=run_cId]').val(),
+        'numLanes': jQuery(t).val(),
+        'container': container,
+        'url': ajaxurl
+      },
+      {
+        'updateElement': 'containerdiv' + container
+      }
+    );
   },
 
   changeLS454Chamber: function (t, container) {
     Fluxion.doAjax(
-            'runControllerHelperService',
-            'changeChamber',
-            {'platform': 'LS454', 'run_cId': jQuery('input[name=run_cId]').val(), 'numChambers': jQuery(t).val(), 'container': container, 'url': ajaxurl},
-            {'updateElement': 'containerdiv' + container});
+      'runControllerHelperService',
+      'changeChamber',
+      {
+        'platform': 'LS454',
+        'run_cId': jQuery('input[name=run_cId]').val(),
+        'numChambers': jQuery(t).val(),
+        'container': container,
+        'url': ajaxurl
+      },
+      {
+        'updateElement': 'containerdiv' + container
+      }
+    );
   },
 
   changeSolidChamber: function (t, container) {
     Fluxion.doAjax(
-            'runControllerHelperService',
-            'changeChamber',
-            {'platform': 'Solid', 'run_cId': jQuery('input[name=run_cId]').val(), 'numChambers': t.value, 'container': container, 'url': ajaxurl},
-            {'updateElement': 'containerdiv' + container});
+      'runControllerHelperService',
+      'changeChamber',
+      {
+        'platform': 'Solid',
+        'run_cId': jQuery('input[name=run_cId]').val(),
+        'numChambers': t.value,
+        'container': container,
+        'url': ajaxurl
+      },
+      {
+        'updateElement': 'containerdiv' + container
+      }
+    );
   },
 
   changePacBioChamber: function (t, container) {
     Fluxion.doAjax(
-            'runControllerHelperService',
-            'changeChamber',
-            {'platform': 'PacBio', 'run_cId': jQuery('input[name=run_cId]').val(), 'numChambers': t.value, 'container': container, 'url': ajaxurl},
-            {'updateElement': 'containerdiv' + container});
+      'runControllerHelperService',
+      'changeChamber',
+      {
+        'platform': 'PacBio',
+        'run_cId': jQuery('input[name=run_cId]').val(),
+        'numChambers': t.value,
+        'container': container,
+        'url': ajaxurl
+      },
+      {
+        'updateElement': 'containerdiv' + container
+      }
+    );
   },
 
   showRunNoteDialog: function (runId) {
@@ -391,8 +454,14 @@ Run.ui = {
       Fluxion.doAjax(
         'runControllerHelperService',
         'deleteRunNote',
-        {'runId': runId, 'noteId': noteId, 'url': ajaxurl},
-        {'doOnSuccess': Utils.page.pageReload}
+        {
+          'runId': runId,
+          'noteId': noteId,
+          'url': ajaxurl
+        },
+        {
+          'doOnSuccess': Utils.page.pageReload
+        }
       );
     }
   }
@@ -492,8 +561,17 @@ Run.container = {
     Fluxion.doAjax(
       'runControllerHelperService',
       'changeContainer',
-      {'platform': platform, 'run_cId': jQuery('input[name=run_cId]').val(), 'numContainers': numContainers, 'sequencerReferenceId': seqrefId, 'url': ajaxurl},
-      {'updateElement': 'containerdiv'});
+      {
+        'platform': platform,
+        'run_cId': jQuery('input[name=run_cId]').val(),
+        'numContainers': numContainers,
+        'sequencerReferenceId': seqrefId,
+        'url': ajaxurl
+      },
+      {
+        'updateElement': 'containerdiv'
+      }
+    );
   },
 
   lookupContainer: function (t, containerNum) {
@@ -503,8 +581,14 @@ Run.container = {
       Fluxion.doAjax(
         'runControllerHelperService',
         'lookupContainer',
-        {'barcode': barcode, 'containerNum': containerNum, 'url': ajaxurl},
-        {'doOnSuccess': self.processLookup}
+        {
+          'barcode': barcode,
+          'containerNum': containerNum,
+          'url': ajaxurl
+        },
+        {
+          'doOnSuccess': self.processLookup
+        }
       );
     }
   },
@@ -557,28 +641,39 @@ Run.container = {
       Fluxion.doAjax(
         'runControllerHelperService',
         'checkPoolExperiment',
-        {'poolId': newpool.find('input').val(), 'partition': jQuery(this).attr("partition"), 'url': ajaxurl},
-        {'doOnSuccess': function (json) {
-          newpool.append(json.html);
-          newpool.append("<span style='position: absolute; top: 0; right: 0;' onclick='Run.pool.confirmPoolRemove(this);' class='float-right ui-icon ui-icon-circle-close'></span>");
+        {
+          'poolId': newpool.find('input').val(),
+          'partition': jQuery(this).attr("partition"),
+          'url': ajaxurl
         },
-          'doOnError': function () {
-            newpool.remove();
-            alert("Error adding pool, no Study is present.");
+        {
+          'doOnSuccess': function (json) {
+            newpool.append(json.html);
+            newpool.append("<span style='position: absolute; top: 0; right: 0;' onclick='Run.pool.confirmPoolRemove(this);' class='float-right ui-icon ui-icon-circle-close'></span>");
+          },
+            'doOnError': function () {
+              newpool.remove();
+              alert("Error adding pool, no Study is present.");
+            }
           }
-        }
-      );
-    });
+        );
+      }
+    );
   },
 
   checkPoolExperiment: function(t, poolId, partitionNum) {
     Fluxion.doAjax(
       'runControllerHelperService',
       'checkPoolExperiment',
-      {'poolId': poolId, 'partition': partitionNum, 'url': ajaxurl},
-      {'doOnSuccess': function (json) {
-        jQuery(t).append(json.html);
+      {
+        'poolId': poolId,
+        'partition': partitionNum,
+        'url': ajaxurl
       },
+      {
+        'doOnSuccess': function (json) {
+          jQuery(t).append(json.html);
+        },
         'doOnError': function (json) {
           alert("Error populating partition: " + json.error);
         }
@@ -593,12 +688,18 @@ Run.container = {
     Fluxion.doAjax(
       'poolControllerHelperService',
       'selectStudyForPool',
-      {'poolId': poolId, 'studyId': studyId, 'runId': jQuery("input[name='runId']").val(), 'url': ajaxurl},
-      {'doOnSuccess': function (json) {
-        var div = jQuery("#studySelectDiv" + partition + "_" + projectId).parent();
-        jQuery("#studySelectDiv" + partition + "_" + projectId).remove();
-        div.append(json.html);
+      {
+        'poolId': poolId,
+        'studyId': studyId,
+        'runId': jQuery("input[name='runId']").val(),
+        'url': ajaxurl
       },
+      {
+        'doOnSuccess': function (json) {
+          var div = jQuery("#studySelectDiv" + partition + "_" + projectId).parent();
+          jQuery("#studySelectDiv" + partition + "_" + projectId).remove();
+          div.append(json.html);
+        },
         'doOnError': function () {
           Utils.ui.reenableButton('studySelectButton-' + partition + '_' + poolId, "Select Study");
         }
@@ -610,8 +711,14 @@ Run.container = {
     Fluxion.doAjax(
       'runControllerHelperService',
       'generateIlluminaDemultiplexCSV',
-      {'runId': runId, 'containerId': containerId, 'casavaVersion': '1.7', 'url': ajaxurl},
-      {'doOnSuccess': function (json) {
+      {
+        'runId': runId,
+        'containerId': containerId,
+        'casavaVersion': '1.7',
+        'url': ajaxurl
+      },
+      {
+        'doOnSuccess': function (json) {
           jQuery.colorbox({width:"90%",height:"100%",html:"<pre>"+json.response+"</pre>"});
         }
       }
@@ -622,12 +729,17 @@ Run.container = {
     Fluxion.doAjax(
       'runControllerHelperService',
       'generateIlluminaDemultiplexCSV',
-      {'runId': runId, 'containerId': containerId, 'casavaVersion': '1.8', 'url': ajaxurl},
-      {'doOnSuccess': function (json) {
+      {
+        'runId': runId,
+        'containerId': containerId,
+        'casavaVersion': '1.8',
+        'url': ajaxurl
+      },
+      {
+        'doOnSuccess': function (json) {
           jQuery.colorbox({width:"90%",height:"100%",html:"<pre>"+json.response+"</pre>"});
         }
       }
     );
   }
 };
-

@@ -92,7 +92,7 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   private TagBarcode tagBarcode;
 
   @Transient
-  private List<TagBarcode> tagBarcodes = Collections.emptyList();
+  private List<TagBarcode> tagBarcodes = new ArrayList<>();
 
   private Boolean paired;
 

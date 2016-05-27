@@ -16,7 +16,7 @@
   <groupId>uk.ac.bbsrc.tgac.miso</groupId>
   <artifactId>miso</artifactId>
   <packaging>pom</packaging>
-  <version>0.2.9-SNAPSHOT</version>
+  <version>0.2.10-SNAPSHOT</version>
   <name>MISO Framework</name>
   <url>http://www.tgac.ac.uk/miso</url>
 
@@ -199,10 +199,6 @@
       </snapshots>
     </repository>
 
-    <!-- <repository> <id>apache-snapshots</id> <name>apache snapshots repository</name>
-      <url>http://repository.apache.org/snapshots</url> <snapshots> <enabled>true</enabled>
-      <updatePolicy>never</updatePolicy> </snapshots> </repository> -->
-
     <repository>
       <id>spring-snapshot</id>
       <name>Spring Portfolio Milestone Repository</name>
@@ -266,6 +262,12 @@
         <enabled>false</enabled>
         <updatePolicy>always</updatePolicy>
       </snapshots>
+    </repository>
+        
+    <repository>
+      <id>seqwaremaven.oicr.on.ca</id>
+      <name>seqwaremaven.oicr.on.ca-releases</name>
+      <url>https://seqwaremaven.oicr.on.ca/artifactory/gsi-dependencies</url>
     </repository>
   </repositories>
 
@@ -340,7 +342,6 @@
           <stylesheetfile>${basedir}/src/main/javadoc/stylesheet.css</stylesheetfile>
         </configuration>
       </plugin>
-
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>cobertura-maven-plugin</artifactId>
@@ -348,7 +349,9 @@
         <configuration>
           <formats>
             <format>html</format>
+            <format>xml</format>
           </formats>
+          <aggregate>true</aggregate>
           <instrumentation>
             <!-- <excludes> <exclude>**/Abstract*.*</exclude> </excludes> -->
             <ignoreTrivial>true</ignoreTrivial>
@@ -358,7 +361,6 @@
           </instrumentation>
         </configuration>
       </plugin>
-
     </plugins>
 
     <pluginManagement>
@@ -421,6 +423,10 @@
     <module>miso-service</module>
     <module>sqlstore</module>
     <module>miso-dto</module>
+    
+    <module>notification-server</module>
+    <module>runstats-client</module>
+    <module>notification-consumer-services</module>
   </modules>
 
   <dependencyManagement>

@@ -454,6 +454,7 @@ public class DefaultSampleServiceTestSuite {
     project.setId(shell.getId());
     project.setAlias("real_project");
     Mockito.when(projectStore.get(shell.getId())).thenReturn(project);
+    Mockito.when(projectStore.lazyGet(shell.getId())).thenReturn(project);
     return project;
   }
   

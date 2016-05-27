@@ -105,6 +105,7 @@ public class ViewSequencerReferenceController {
         model.put(ModelKeys.SEQUENCER.getKey(), sr);
         model.put(ModelKeys.RUNS.getKey(), runs);
         model.put(ModelKeys.RECORDS.getKey(), serviceRecords);
+        model.put("title", "Edit Sequencer");
         String ip = sr.getIpAddress() == null ? "" : sr.getIpAddress().toString();
         if (ip.startsWith("/")) {
           model.put(ModelKeys.TRIMMED_IP.getKey(), ip.substring(1));

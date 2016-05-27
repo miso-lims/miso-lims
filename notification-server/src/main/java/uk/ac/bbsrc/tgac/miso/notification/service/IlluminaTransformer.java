@@ -658,7 +658,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
 
       // Metrix fails to set current cycle, and parsing ErrorMetricsOut.bin depends on this, so set it here
       final String extractionMetricsPath = rootFile.getCanonicalPath() + "/InterOp/" + nki.constants.Constants.EXTRACTION_METRICS;
-      ExtractionMetrics eim = new ExtractionMetrics(extractionMetricsPath, 0);
+      ExtractionMetrics eim = new ExtractionMetrics(extractionMetricsPath, null);
       sum.setCurrentCycle(eim.getLastCycle());
 
       RunInfoHandler.parseAll(runInfo, sum);

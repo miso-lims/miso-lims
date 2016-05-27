@@ -64,6 +64,7 @@
         <li><a href="<c:url value="/miso/plates"/>">List Plates</a></li>
         <li><a href="<c:url value="/miso/boxes"/>">List Boxes</a></li>
         <li><a href="<c:url value="/miso/sequencers"/>">List Sequencers</a></li>
+        <li><a href="<c:url value="/miso/tagbarcodes"/>">List Tag Barcodes</a></li>
     </ul>
 
 	<h2>Print Jobs</h2>

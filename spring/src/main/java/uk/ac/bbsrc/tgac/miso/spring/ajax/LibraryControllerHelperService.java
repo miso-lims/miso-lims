@@ -131,15 +131,16 @@ public class LibraryControllerHelperService {
     StringBuilder sb = new StringBuilder();
     boolean first = true;
     for (TagBarcode barcode : tagBarcodes) {
-      sb.append(barcode.getName());
-      sb.append(" (");
-      sb.append(barcode.getSequence());
-      sb.append(")");
+      if (barcode == null) continue;
       if (first) {
         first = false;
       } else {
         sb.append(", ");
       }
+      sb.append(barcode.getName());
+      sb.append(" (");
+      sb.append(barcode.getSequence());
+      sb.append(")");
     }
     return sb.toString();
   }
@@ -579,6 +580,7 @@ public class LibraryControllerHelperService {
         JSONArray families = new JSONArray();
         JsonConfig config = new JsonConfig();
         config.setExcludes(new String[] { "family" });
+        families.add(TagBarcodeFamily.NULL);
         families.addAll(tagBarcodeService.getTagBarcodeFamiliesByPlatform(PlatformType.get(platform)), config);
         result.put("barcodeFamilies", families);
 

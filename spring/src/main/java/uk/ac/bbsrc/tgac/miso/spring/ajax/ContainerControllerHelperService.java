@@ -549,6 +549,10 @@ public class ContainerControllerHelperService {
       if (p == null) {
         p = requestManager.getPoolByBarcode(new String(Base64.decodeBase64(barcode)));
       }
+      // if pool still can't be found, return error
+      if (p == null) {
+        return JSONUtils.SimpleJSONError("Cannot find a pool with barcode " + barcode);
+      }
       SequencerPartitionContainer<SequencerPoolPartition> lf = (SequencerPartitionContainer<SequencerPoolPartition>) session
           .getAttribute("container_" + json.getString("container_cId"));
       if (lf.getPlatform().getPlatformType().equals(p.getPlatformType())) {

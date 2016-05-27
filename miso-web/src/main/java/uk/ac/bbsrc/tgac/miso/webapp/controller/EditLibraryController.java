@@ -68,7 +68,6 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-import net.sf.json.JsonConfig;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibraryQC;
@@ -82,7 +81,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
 import uk.ac.bbsrc.tgac.miso.core.data.TagBarcodeFamily;
@@ -109,6 +107,7 @@ import uk.ac.bbsrc.tgac.miso.dto.LibraryAdditionalInfoDto;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
 import uk.ac.bbsrc.tgac.miso.persistence.LibraryAdditionalInfoDao;
 import uk.ac.bbsrc.tgac.miso.service.LibraryAdditionalInfoService;
+import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.controller
@@ -336,17 +335,10 @@ public class EditLibraryController {
       model.put("barcodeFamiliesJSON", "[]");
       model.put("barcodeFamilies", Collections.singleton(BARCODE_FAMILY_NEEDS_PLATFORM));
     } else {
-      Collection<TagBarcodeFamily> families = tagBarcodeService
-          .getTagBarcodeFamiliesByPlatform(PlatformType.get(library.getPlatformName()));
       List<TagBarcodeFamily> visbileFamilies = new ArrayList<>();
       visbileFamilies.add(TagBarcodeFamily.NULL);
-      visbileFamilies.addAll(families);
-      JSONArray familiesJson = new JSONArray();
-      JsonConfig config = new JsonConfig();
-      config.setExcludes(new String[] { "family" });
-      familiesJson.addAll(families, config);
-      model.put("barcodeFamiliesJSON", familiesJson.toString());
-      model.put("barcodeFamilies", visbileFamilies);
+      visbileFamilies.addAll(tagBarcodeService.getTagBarcodeFamiliesByPlatform(PlatformType.get(library.getPlatformName())));
+      MisoWebUtils.populateListAndJson(model, "barcodeFamilies", visbileFamilies, "family");
     }
   }
 
@@ -379,7 +371,7 @@ public class EditLibraryController {
   public String emPCRDilutionUnits() {
     return emPCRDilution.UNITS;
   }
-  
+
   @ModelAttribute("prepKits")
   public List<KitDescriptor> getPrepKits() throws IOException {
     List<KitDescriptor> list = new ArrayList<>(requestManager.listKitDescriptorsByType(KitType.LIBRARY));
@@ -391,10 +383,11 @@ public class EditLibraryController {
     });
     return list;
   }
-  
+
   /**
-   * Adds child entities to a new detailed Library so they can be bound in the JSP. These will not all be useful for the same
-   * object, but are all included to accommodate the JSP.
+   * Adds child entities to a new detailed Library so they can be bound in the JSP. These will not all be useful for the same object, but
+   * are all included to accommodate the JSP.
+   * 
    * @param library
    */
   private void addNewDetailedLibraryEntities(Library library) {
@@ -403,15 +396,9 @@ public class EditLibraryController {
   }
 
   private void populateDesigns(ModelMap model, SampleClass sampleClass) throws IOException {
-    JSONArray array = new JSONArray();
-    JsonConfig config = new JsonConfig();
-    config.setExcludes(new String[] { "sampleClass" });
-    Collection<LibraryDesign> designs = requestManager.listLibraryDesignByClass(sampleClass);
-    array.addAll(designs, config);
-    model.put("libraryDesignsJSON", array.toString());
-    model.put("libraryDesigns", designs);
+    MisoWebUtils.populateListAndJson(model, "libraryDesigns", requestManager.listLibraryDesignByClass(sampleClass), "sampleClass");
   }
-  
+
   /**
    * Translates foreign keys to entity objects with only the ID set, to be used in service layer to reload persisted child objects
    * 
@@ -489,8 +476,7 @@ public class EditLibraryController {
         }
       }
     } catch (Exception e) {
-      log.error(e.getMessage());
-      e.printStackTrace();
+      log.error("Failed to get barcodes", e);
     }
     rtn.put("tagBarcodes", rtnList);
     return rtn;
@@ -720,7 +706,7 @@ public class EditLibraryController {
           library.setLibraryAdditionalInfo(new LibraryAdditionalInfoImpl());
           library.getLibraryAdditionalInfo().setTissueOrigin(sample.getSampleAdditionalInfo().getTissueOrigin());
           library.getLibraryAdditionalInfo().setTissueType(sample.getSampleAdditionalInfo().getTissueType());
-          //library.getLibraryAdditionalInfo().setGroupId(library.getSample().getSampleAnalyte().getGroupId());
+          // library.getLibraryAdditionalInfo().setGroupId(library.getSample().getSampleAnalyte().getGroupId());
           // library.getLibraryAdditionalInfo().setGroupDescription(library.getSample().getSampleAnalyte().getGroupDescription());
         }
 
@@ -821,6 +807,7 @@ public class EditLibraryController {
         }
         libraries.add(library);
       }
+      model.put("title", "Bulk Create Libraries");
       model.put("librariesJSON", libraries);
       JSONArray libraryDesigns = new JSONArray();
       libraryDesigns.addAll(requestManager.listLibraryDesignByClass(sampleClass));
@@ -851,7 +838,7 @@ public class EditLibraryController {
         }
         libraryDtos.add(Dtos.asDto(library, lai));
       }
-
+      model.put("title", "Bulk Edit Libraries");
       model.put("librariesJSON", libraryDtos);
       model.put("method", "Edit");
       model.put("libraryDesignsJSON", "[]");
@@ -900,6 +887,7 @@ public class EditLibraryController {
       boolean create = library.getId() == AbstractLibrary.UNSAVED_ID;
       long id = requestManager.saveLibrary(library);
       if (library.getLibraryAdditionalInfo() != null) {
+        library.getLibraryAdditionalInfo().setLibrary(library);
         if (create) {
           libraryAdditionalInfoService.create(library.getLibraryAdditionalInfo(), id);
         } else {

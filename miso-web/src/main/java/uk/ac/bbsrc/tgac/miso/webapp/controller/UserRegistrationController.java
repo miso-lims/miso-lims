@@ -67,6 +67,7 @@ public class UserRegistrationController {
   @RequestMapping(method = RequestMethod.GET)
   public ModelAndView setupForm(ModelMap model) throws IOException {
     model.put("user", new UserImpl());
+    model.put("title", "New User");
     return new ModelAndView("/pages/registerUser.jsp", model);
   }
 
