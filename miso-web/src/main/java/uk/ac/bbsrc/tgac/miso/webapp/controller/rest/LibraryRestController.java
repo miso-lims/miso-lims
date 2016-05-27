@@ -134,6 +134,7 @@ public class LibraryRestController extends RestController {
     library.setTagBarcodes(tagBarcodes);
     Long id = requestManager.saveLibrary(library);
     LibraryAdditionalInfo info = Dtos.to(libraryDto.getLibraryAdditionalInfo());
+    info.setLibrary(requestManager.getLibraryById(id));
     if (create) {
       libraryAdditionalInfoService.create(info, id);
     } else {

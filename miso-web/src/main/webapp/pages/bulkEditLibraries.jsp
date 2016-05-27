@@ -83,7 +83,7 @@
     jQuery(document).ready(function () {
       Library.hot.librariesJSON = ${librariesJSON};
       Hot.dropdownRef = ${referenceDataJSON};
-      Hot.dropdownRef.tagBarcodes = {};
+      Hot.dropdownRef.tagBarcodes = ${tagBarcodes};
       Hot.dropdownRef.barcodeKits = {};
       Hot.detailedSample = JSON.parse(document.getElementById('HOTbulkForm').dataset.detailedSample);
       Hot.saveButton = document.getElementById('saveLibraries');
