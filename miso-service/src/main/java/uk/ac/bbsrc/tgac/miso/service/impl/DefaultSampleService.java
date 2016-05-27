@@ -35,13 +35,11 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
-import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.persistence.QcPassedDetailDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleClassDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleDao;
-import uk.ac.bbsrc.tgac.miso.persistence.SampleGroupDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SamplePurposeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SubprojectDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueMaterialDao;
@@ -55,7 +53,6 @@ import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.SampleTissueService;
 import uk.ac.bbsrc.tgac.miso.service.SampleValidRelationshipService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
-import uk.ac.bbsrc.tgac.miso.sqlstore.SQLProjectDAO;
 
 @Transactional
 @Service
@@ -68,9 +65,6 @@ public class DefaultSampleService implements SampleService {
 
   @Autowired
   private AuthorizationManager authorizationManager;
-
-  @Autowired
-  private SQLProjectDAO sqlProjectDAO;
 
   @Autowired
   private SampleClassDao sampleClassDao;
@@ -112,13 +106,7 @@ public class DefaultSampleService implements SampleService {
   private KitStore kitStore;
   
   @Autowired
-  private SecurityStore securityStore;
-  
-  @Autowired
   private SamplePurposeDao samplePurposeDao;
-  
-  @Autowired
-  private SampleGroupDao sampleGroupDao;
   
   @Autowired
   private TissueMaterialDao tissueMaterialDao;
@@ -132,6 +120,85 @@ public class DefaultSampleService implements SampleService {
   @Value("${miso.autoGenerateIdentificationBarcodes}")
   private Boolean autoGenerateIdBarcodes;
   
+  public void setSampleDao(SampleDao sampleDao) {
+    this.sampleDao = sampleDao;
+  }
+
+  public void setAuthorizationManager(AuthorizationManager authorizationManager) {
+    this.authorizationManager = authorizationManager;
+  }
+
+  public void setSampleClassDao(SampleClassDao sampleClassDao) {
+    this.sampleClassDao = sampleClassDao;
+  }
+
+  public void setSampleAnalyteService(SampleAnalyteService sampleAnalyteService) {
+    this.sampleAnalyteService = sampleAnalyteService;
+  }
+
+  public void setSampleAdditionalInfoService(
+      SampleAdditionalInfoService sampleAdditionalInfoService) {
+    this.sampleAdditionalInfoService = sampleAdditionalInfoService;
+  }
+
+  public void setIdentityService(IdentityService identityService) {
+    this.identityService = identityService;
+  }
+
+  public void setSampleValidRelationshipService(
+      SampleValidRelationshipService sampleValidRelationshipService) {
+    this.sampleValidRelationshipService = sampleValidRelationshipService;
+  }
+
+  public void setSampleNumberPerProjectService(
+      SampleNumberPerProjectService sampleNumberPerProjectService) {
+    this.sampleNumberPerProjectService = sampleNumberPerProjectService;
+  }
+
+  public void setSampleTissueService(SampleTissueService sampleTissueService) {
+    this.sampleTissueService = sampleTissueService;
+  }
+
+  public void setProjectStore(ProjectStore projectStore) {
+    this.projectStore = projectStore;
+  }
+
+  public void setTissueOriginDao(TissueOriginDao tissueOriginDao) {
+    this.tissueOriginDao = tissueOriginDao;
+  }
+
+  public void setTissueTypeDao(TissueTypeDao tissueTypeDao) {
+    this.tissueTypeDao = tissueTypeDao;
+  }
+
+  public void setQcPassedDetailDao(QcPassedDetailDao qcPassedDetailDao) {
+    this.qcPassedDetailDao = qcPassedDetailDao;
+  }
+
+  public void setSubProjectDao(SubprojectDao subProjectDao) {
+    this.subProjectDao = subProjectDao;
+  }
+
+  public void setKitStore(KitStore kitStore) {
+    this.kitStore = kitStore;
+  }
+
+  public void setSamplePurposeDao(SamplePurposeDao samplePurposeDao) {
+    this.samplePurposeDao = samplePurposeDao;
+  }
+
+  public void setTissueMaterialDao(TissueMaterialDao tissueMaterialDao) {
+    this.tissueMaterialDao = tissueMaterialDao;
+  }
+
+  public void setSampleNamingScheme(MisoNamingScheme<Sample> sampleNamingScheme) {
+    this.sampleNamingScheme = sampleNamingScheme;
+  }
+
+  public void setNamingScheme(MisoNamingScheme<Sample> namingScheme) {
+    this.namingScheme = namingScheme;
+  }
+
   @CoverageIgnore
   public Boolean getAutoGenerateIdBarcodes() {
     return autoGenerateIdBarcodes;
@@ -292,7 +359,6 @@ public class DefaultSampleService implements SampleService {
     }
     SampleClass rootSampleClass = identityClasses.get(0);
     SampleAdditionalInfo parentSai = new SampleAdditionalInfoImpl();
-    SampleAdditionalInfo childSai = sample.getSampleAdditionalInfo();
     parentSai.setSampleClass(rootSampleClass);
     
     Identity parentIdentity = new IdentityImpl();
@@ -333,7 +399,7 @@ public class DefaultSampleService implements SampleService {
    */
   private void loadChildEntities(Sample sample) throws IOException {
     if (sample.getProject() != null) {
-      sample.setProject(projectStore.get(sample.getProject().getId()));
+      sample.setProject(projectStore.lazyGet(sample.getProject().getId()));
     }
     // TODO: move these to public methods in other DAOs (e.g. sampleAdditionalInfoDao.loadChildEntities(SampleAdditionalInfo))
     if (sample.getSampleAdditionalInfo() != null) {

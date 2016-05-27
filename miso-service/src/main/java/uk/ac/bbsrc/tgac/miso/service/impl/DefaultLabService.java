@@ -30,6 +30,18 @@ public class DefaultLabService implements LabService {
   @Autowired
   private AuthorizationManager authorizationManager;
 
+  public void setLabDao(LabDao labDao) {
+    this.labDao = labDao;
+  }
+
+  public void setInstituteDao(InstituteDao instituteDao) {
+    this.instituteDao = instituteDao;
+  }
+
+  public void setAuthorizationManager(AuthorizationManager authorizationManager) {
+    this.authorizationManager = authorizationManager;
+  }
+
   @Override
   @Transactional(propagation = Propagation.REQUIRED)
   public Lab get(Long id) throws IOException {

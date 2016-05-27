@@ -203,8 +203,37 @@ public abstract class AbstractDilution implements Dilution, Comparable {
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
     if (AbstractDilution.UNSAVED_ID == getId() || AbstractDilution.UNSAVED_ID == them.getId()) {
-      return getCreationDate().equals(them.getCreationDate()) && getDilutionCreator().equals(them.getDilutionCreator())
-          && getConcentration().equals(them.getConcentration());
+      if (name == null) {
+        if (them.getName() != null)
+          return false;
+      }
+      else if (!name.equals(them.getName()))
+        return false;
+      if (identificationBarcode == null) {
+        if (them.getIdentificationBarcode() != null)
+          return false;
+      }
+      else if (!identificationBarcode.equals(them.getIdentificationBarcode()))
+        return false;
+      if (concentration == null) {
+        if (them.getConcentration() != null)
+          return false;
+      }
+      else if (!concentration.equals(them.getConcentration()))
+        return false;
+      if (creationDate == null) {
+        if (them.getCreationDate() != null)
+          return false;
+      }
+      else if (!creationDate.equals(them.getCreationDate()))
+        return false;
+      if (dilutionUserName == null) {
+        if (them.getDilutionCreator() != null)
+          return false;
+      }
+      else if (!dilutionUserName.equals(them.getDilutionCreator()))
+        return false;
+      return true;
     } else {
       return getId() == them.getId();
     }
