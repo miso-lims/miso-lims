@@ -479,23 +479,22 @@ FOR EACH ROW
 
 DELIMITER ;
 
-CREATE OR REPLACE VIEW CompletedPartitions AS
-  SELECT pool_poolId AS poolId, sequencingParameters_parametersId as parametersId, COUNT(*) AS completed_partitions
+DROP VIEW IF EXISTS CompletedPartitions;
+CREATE OR REPLACE VIEW RunPartitionsByHealth AS
+  SELECT pool_poolId AS poolId, sequencingParameters_parametersId as parametersId, COUNT(*) AS num_partitions, Status.health AS health
     FROM Run JOIN Run_SequencerPartitionContainer ON Run.runId = Run_SequencerPartitionContainer.Run_runId
      JOIN SequencerPartitionContainer_Partition ON Run_SequencerPartitionContainer.containers_containerId = SequencerPartitionContainer_Partition.container_containerId
      JOIN _Partition ON SequencerPartitionContainer_Partition.partitions_partitionId = _Partition.partitionId
      JOIN Status ON Status.statusId = Run.status_statusId
-    WHERE Status.health = 'Completed' AND sequencingParameters_parametersId IS NOT NULL
-    GROUP BY pool_poolId, platformRunId;
+    WHERE sequencingParameters_parametersId IS NOT NULL
+    GROUP BY pool_poolId, platformRunId, Status.health;
 
 CREATE OR REPLACE VIEW DesiredPartitions AS
-  SELECT poolId, parametersId, SUM(partitions) AS desired_partitions
+  SELECT poolId, parametersId, SUM(partitions) AS num_partitions
     FROM PoolOrder
     GROUP BY poolId, parametersId;
 
 CREATE OR REPLACE VIEW OrderCompletion AS
-  (SELECT CompletedPartitions.poolId AS poolId, CompletedPartitions.parametersId AS parametersId, completed_partitions, COALESCE(desired_partitions, 0) AS desired_partitions
-    FROM CompletedPartitions LEFT JOIN DesiredPartitions ON CompletedPartitions.poolId = DesiredPartitions.poolId AND CompletedPartitions.parametersId = DesiredPartitions.parametersId)
+  (SELECT poolId, parametersId, num_partitions, health FROM RunPartitionsByHealth)
   UNION
-  (SELECT DesiredPartitions.poolId AS poolId, DesiredPartitions.parametersId AS parametersId, COALESCE(completed_partitions, 0), desired_partitions
-    FROM CompletedPartitions RIGHT JOIN DesiredPartitions ON CompletedPartitions.poolId = DesiredPartitions.poolId AND CompletedPartitions.parametersId = DesiredPartitions.parametersId);
+  (SELECT poolId, parametersId, num_partitions, 'Requested' AS health FROM DesiredPartitions);

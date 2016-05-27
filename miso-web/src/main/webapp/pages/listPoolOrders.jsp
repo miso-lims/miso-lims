@@ -43,16 +43,18 @@
        jQuery('#listingPoolOrderTable').html('');
        jQuery('#listingPoolOrderTable').dataTable({
          "aaData": [
-           <c:forEach items="${ordercompletions}" var="completion">[
-            '<a href="/miso/pool/${completion.poolId}">${completion.pool.name}</a>', 
-            '<a href="/miso/pool/${completion.poolId}">${completion.pool.alias}</a>',
-            '${completion.sequencingParameters.platform.nameAndModel}',
-            '${completion.sequencingParameters.name}',
-            ${completion.desiredPartitions},
-            ${completion.completedPartitions},
-            ${completion.remainingPartitions},
-            ${completion.poolId}
+           <c:forEach items="${ordercompletions}" var="poolGroup">
+            <c:forEach items="${poolGroup.value}" var="parameterGroup">[
+              '<a href="/miso/pool/${poolGroup.key.id}">${poolGroup.key.name}</a>', 
+              '<a href="/miso/pool/${poolGroup.key.id}">${poolGroup.key.alias}</a>',
+              '${parameterGroup.key.platform.nameAndModel}',
+              '${parameterGroup.key.name}',
+              <c:forEach items="${ordercompletionheadings}" var="heading">
+                '${parameterGroup.value[heading].numPartitions}',
+              </c:forEach>
+              '${parameterGroup.value.getRemaining()}'
           ],
+           </c:forEach>
          </c:forEach>
          ],
          "aoColumns": [
@@ -60,10 +62,10 @@
            { "sTitle": "Alias"},
            { "sTitle": "Platform"},
            { "sTitle": "Sequencing Parameters"},
-           { "sTitle": "Requested"},
-           { "sTitle": "Completed"},
-           { "sTitle": "Remaining"},
-           { "sTitle": "ID", "bVisible": false}
+           <c:forEach items="${ordercompletionheadings}" var="heading">
+           { "sTitle": "${heading.key}"},
+           </c:forEach>
+           { "sTitle": "Remaining"}
          ],
          "bJQueryUI": true,
          "bAutoWidth": false,

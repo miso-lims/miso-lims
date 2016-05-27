@@ -370,19 +370,21 @@
         <tr>
           <th>Platform</th>
           <th>Parameters</th>
-          <th>Requested</th>
-          <th>Completed</th>
+          <c:forEach items="${ordercompletionheadings}" var="heading">
+            <th>${heading.key}</th>
+          </c:forEach>
           <th>Remaining</th>
         </tr>
         </thead>
         <tbody>
-        <c:forEach items="${ordercompletions}" var="completion">
+        <c:forEach items="${ordercompletions}" var="parameterGroup">
           <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-            <td>${completion.sequencingParameters.platform.nameAndModel}</td>
-            <td>${completion.sequencingParameters.name}</td>
-            <td>${completion.desiredPartitions}</td>
-            <td>${completion.completedPartitions}</td>
-            <td>${completion.remainingPartitions}</td>
+            <td>${parameterGroup.key.platform.nameAndModel}</td>
+            <td>${parameterGroup.key.name}</td>
+            <c:forEach items="${ordercompletionheadings}" var="heading">
+              <td>${parameterGroup.value[heading].numPartitions}</td>
+            </c:forEach>
+            <td>${parameterGroup.value.getRemaining()}</td>
           </tr>
         </c:forEach>
         </tbody>
