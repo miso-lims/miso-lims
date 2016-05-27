@@ -3,10 +3,10 @@ package uk.ac.bbsrc.tgac.miso.migration;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import uk.ac.bbsrc.tgac.miso.migration.destination.DefaultMigrationTarget;
+import uk.ac.bbsrc.tgac.miso.migration.destination.MigrationTarget;
 import uk.ac.bbsrc.tgac.miso.migration.source.LoadGeneratorSource;
 import uk.ac.bbsrc.tgac.miso.migration.source.MigrationSource;
-import uk.ac.bbsrc.tgac.miso.migration.target.DefaultMigrationTarget;
-import uk.ac.bbsrc.tgac.miso.migration.target.MigrationTarget;
 
 public class Migration {
   
