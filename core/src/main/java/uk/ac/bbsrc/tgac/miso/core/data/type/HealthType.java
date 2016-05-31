@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data.type;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,10 +36,17 @@ import java.util.Map;
  * @since 0.0.2
  */
 public enum HealthType {
-  Unknown("Unknown"), Completed("Completed"), Failed("Failed"), Started("Started"), Stopped("Stopped"), Running("Running");
+  Unknown("Unknown", 0, true), Completed("Completed", -1, true), Failed("Failed", 0, true), Started("Started", -1, true), Stopped("Stopped",
+      -1, true), Running("Running", -1, true), Requested("Requested", 1, false);
 
-  /** Field key */
-  private String key;
+  public static final Comparator<HealthType> COMPARATOR = new Comparator<HealthType>() {
+    @Override
+    public int compare(HealthType o1, HealthType o2) {
+      int p1 = o1 == null ? -1 : o1.ordinal();
+      int p2 = o2 == null ? -1 : o2.ordinal();
+      return p1 - p2;
+    }
+  };
   /**
    * Field lookup
    */
@@ -47,16 +55,6 @@ public enum HealthType {
   static {
     for (HealthType s : EnumSet.allOf(HealthType.class))
       lookup.put(s.getKey(), s);
-  }
-
-  /**
-   * Constructs a HealthType based on a given key
-   * 
-   * @param key
-   *          of type String
-   */
-  HealthType(String key) {
-    this.key = key;
   }
 
   /**
@@ -71,15 +69,6 @@ public enum HealthType {
   }
 
   /**
-   * Returns the key of this HealthType enum.
-   * 
-   * @return String key.
-   */
-  public String getKey() {
-    return key;
-  }
-
-  /**
    * Returns the keys of this HealthType enum.
    * 
    * @return ArrayList<String> keys.
@@ -90,5 +79,46 @@ public enum HealthType {
       keys.add(h.getKey());
     }
     return keys;
+  }
+
+  /** Field key */
+  private final String key;
+
+  private final int multiplier;
+
+  private final boolean allowedFromSequencer;
+
+  /**
+   * Constructs a HealthType based on a given key
+   * 
+   * @param key
+   *          of type String
+   */
+  HealthType(String key, int multiplier, boolean allowedFromSequencer) {
+    this.key = key;
+    this.multiplier = multiplier;
+    this.allowedFromSequencer = allowedFromSequencer;
+  }
+
+  /**
+   * Returns the key of this HealthType enum.
+   * 
+   * @return String key.
+   */
+  public String getKey() {
+    return key;
+  }
+
+  public int getMultiplier() {
+    return multiplier;
+  }
+
+  /**
+   * Whether is health type may be used as a status from a sequencer.
+   * 
+   * Some health information is used for pool order completions that cannot be a state of an actual sequencer run's status.
+   */
+  public boolean isAllowedFromSequencer() {
+    return allowedFromSequencer;
   }
 }

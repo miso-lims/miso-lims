@@ -9,5 +9,5 @@ import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationException;
 public interface PoolOrderCompletionService {
   public Collection<PoolOrderCompletion> getOrderCompletionForPool(long id) throws AuthorizationException, IOException;
 
-  public Collection<PoolOrderCompletion> getOutstandingOrders() throws AuthorizationException, IOException;
+  public Collection<PoolOrderCompletion> getAllOrders() throws AuthorizationException, IOException;
 }

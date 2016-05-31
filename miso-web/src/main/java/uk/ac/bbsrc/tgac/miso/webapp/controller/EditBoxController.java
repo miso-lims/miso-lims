@@ -111,7 +111,7 @@ public class EditBoxController {
         model.put("title", "New Box");
       } else {
         box = requestManager.getBoxById(boxId);
-        model.put("title", "Box " + boxId);
+        model.put("title", box.getAlias());
       }
 
       if (box == null) {

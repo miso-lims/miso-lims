@@ -37,12 +37,13 @@ import java.util.regex.Pattern;
 
 import javax.xml.transform.TransformerException;
 
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.integration.Message;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
 import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationUtils;
@@ -119,7 +120,7 @@ public class LS454Transformer implements FileSetTransformer<String, String, File
           run.put("runName", runName);
 
           try {
-            run.put("fullPath", rootFile.getCanonicalPath()); // follow symlinks!
+            run.put("fullPath", rootFile.getAbsolutePath());
 
             if (recentImageDir != null) {
               File paramsFile = new File(recentImageDir, "dataRunParams.xml");

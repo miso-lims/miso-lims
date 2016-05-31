@@ -82,6 +82,11 @@ public class ListPoolsController {
     return AbstractPool.CONCENTRATION_UNITS;
   }
 
+  @ModelAttribute("title")
+  public String title() {
+    return "List Pools";
+  }
+
   @RequestMapping("/pools")
   public ModelAndView listPools() throws IOException {
     return new ModelAndView("/pages/listPools.jsp");

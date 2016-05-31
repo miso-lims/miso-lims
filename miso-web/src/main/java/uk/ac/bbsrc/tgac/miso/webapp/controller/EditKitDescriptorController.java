@@ -105,7 +105,7 @@ public class EditKitDescriptorController {
         model.put("title", "New Kit Descriptor");
       } else {
         kitDescriptor = requestManager.getKitDescriptorById(kitDescriptorId);
-        model.put("title", "Kit Descriptor " + kitDescriptorId);
+        model.put("title", kitDescriptor.getName());
       }
 
       if (kitDescriptor == null) {

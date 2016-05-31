@@ -228,12 +228,12 @@ public interface Library extends SecurableByProfile, Comparable, Barcodable, Loc
   public void setLibraryStrategyType(LibraryStrategyType libraryStrategyType);
 
   /**
-   * Returns the position-indexed map of TagBarcodes for this Library object.
+   * Returns the position-indexed list of TagBarcodes for this Library object.
    */
   public List<TagBarcode> getTagBarcodes();
 
   /**
-   * Sets the position-indexed map of TagBarcodes for this Library object.
+   * Sets the position-indexed list of TagBarcodes for this Library object.
    */
   public void setTagBarcodes(List<TagBarcode> tagBarcodes);
 

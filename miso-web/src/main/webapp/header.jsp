@@ -40,7 +40,7 @@
   <%-- timestamp to force browser to reload javascript --%>
   <jsp:useBean id="timestamp" class="java.util.Date" scope="request"/>
 
-  <title>MISO LIMS <c:if test="${not empty title}">- ${title}</c:if></title>
+  <title><c:if test="${not empty title}">${title} &mdash; </c:if>MISO LIMS</title>
   <script type="text/javascript" src="<c:url value='/scripts/scriptaculous/prototype.js'/>"></script>
   <script type="text/javascript"
           src="<c:url value='/scripts/fluxion-ajax/fluxion-ajax.js'/>"></script>

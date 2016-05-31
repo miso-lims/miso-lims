@@ -39,6 +39,7 @@ public class ReceiveSampleController {
   @RequestMapping(method = RequestMethod.GET)
   public ModelAndView setupForm(ModelMap model) throws Exception {
     try {
+      model.put("title", "Receive Samples");
       return new ModelAndView("/pages/sampleReceipt.jsp", model);
     } catch (Exception ex) {
       if (log.isDebugEnabled()) {

@@ -34,6 +34,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -458,21 +459,15 @@ public class EditLibraryController {
 
   /* HOT */
   @RequestMapping(value = "tagBarcodesJson", method = RequestMethod.GET)
-  public @ResponseBody JSONObject tagBarcodesJson(@RequestParam("strategy") String barcodeStrategy,
+  public @ResponseBody JSONObject tagBarcodesJson(@RequestParam("tagBarcodeFamily") String tagBarcodeFamily,
       @RequestParam("position") String position) throws IOException {
     final JSONObject rtn = new JSONObject();
-    final List<JSONObject> rtnList = new ArrayList<JSONObject>();
+    List<JSONObject> rtnList = new ArrayList<JSONObject>();
     try {
-      if (!isStringEmptyOrNull(barcodeStrategy)) {
-        final TagBarcodeFamily tbs = tagBarcodeService.getTagBarcodeFamilyByName(barcodeStrategy);
-        if (tbs != null) {
-          for (final TagBarcode tb : tbs.getBarcodesForPosition(Integer.parseInt(position))) {
-            final JSONObject obj = new JSONObject();
-            obj.put("id", tb.getId());
-            obj.put("name", tb.getName());
-            obj.put("sequence", tb.getSequence());
-            rtnList.add(obj);
-          }
+      if (!isStringEmptyOrNull(tagBarcodeFamily)) {
+        final TagBarcodeFamily tbf = tagBarcodeService.getTagBarcodeFamilyByName(tagBarcodeFamily);
+        if (tbf != null) {
+          rtnList = barcodesForPosition(tbf, Integer.parseInt(position));
         }
       }
     } catch (Exception e) {
@@ -480,6 +475,72 @@ public class EditLibraryController {
     }
     rtn.put("tagBarcodes", rtnList);
     return rtn;
+  }
+
+  /**
+   * Each PlatformName holds a null TagBarcodeFamily.
+   *
+   * Structure of this tagBarcodes object: {
+   *   PlatformName : {
+   *     TagBarcodeFamilyName: {
+   *       1: [
+   *         {
+   *           id: ##,
+   *           name: AAAA,
+   *           sequence: XXXXX
+   *         }, ...
+   *       ], ...
+   *     }, ...
+   *   }, ...
+   * }
+   *
+   * @return tagBarcodes object
+   */
+  @ModelAttribute("tagBarcodes")
+  public JSONObject tagBarcodesString() {
+    final JSONObject tbo = new JSONObject();
+    try {
+      for (String pfName : requestManager.listDistinctPlatformNames()) {
+        JSONObject pf = new JSONObject();
+        tbo.put(pfName, pf);
+        tbo.getJSONObject(pfName).put("No Barcode", nullBarcodeFamily());
+      }
+      for (TagBarcodeFamily tbf : tagBarcodeService.getTagBarcodeFamilies()) {
+        JSONObject tbfo = new JSONObject();
+        for (int i = 1; i <= tbf.getMaximumNumber(); i++) {
+          tbfo.put(Integer.toString(i), barcodesForPosition(tbf, i));
+        }
+        String platformKey = tbf.getPlatformType().getKey();
+        tbo.getJSONObject(platformKey).put(tbf.getName(), tbfo);
+      }
+    } catch (IOException e) {
+      log.error("Failed to retrieve all platform names: " + e);
+    }
+    return tbo;
+  }
+
+  public List<JSONObject> barcodesForPosition(TagBarcodeFamily tbf, int position) {
+    final List<JSONObject> rtnList = new ArrayList<JSONObject>();
+    for (final TagBarcode tb : tbf.getBarcodesForPosition(position)) {
+      final JSONObject obj = new JSONObject();
+      obj.put("id", tb.getId());
+      obj.put("name", tb.getName());
+      obj.put("sequence", tb.getSequence());
+      rtnList.add(obj);
+    }
+    return rtnList;
+  }
+
+  public JSONObject nullBarcodeFamily() {
+    final JSONObject nullTBF = new JSONObject();
+    final JSONArray nullTBsList = new JSONArray();
+    final JSONObject nullTB = new JSONObject();
+    nullTB.put("id", TagBarcodeFamily.NULL.getId());
+    nullTB.put("name", TagBarcodeFamily.NULL.getName());
+    nullTB.put("sequence", "");
+    nullTBsList.add(nullTB);
+    nullTBF.put("1", nullTBsList);
+    return nullTBF;
   }
 
   /* HOT */
@@ -499,18 +560,17 @@ public class EditLibraryController {
 
   /* HOT */
   @RequestMapping(value = "barcodePositionsJson", method = RequestMethod.GET)
-  public @ResponseBody JSONObject barcodePositionsJson(@RequestParam("strategy") String strategy) {
+  public @ResponseBody JSONObject barcodePositionsJson(@RequestParam("tagBarcodeFamily") String tagBarcodeFamily) {
     JSONObject rtn;
-    if (!isStringEmptyOrNull(strategy)) {
-      strategy = strategy.trim();
-      log.warn("strategy = " + strategy);
-      System.out.println("strategy = " + strategy);
-      final TagBarcodeFamily tbs = tagBarcodeService.getTagBarcodeFamilyByName(strategy);
-      if (tbs != null) {
+    if (!isStringEmptyOrNull(tagBarcodeFamily)) {
+      tagBarcodeFamily = tagBarcodeFamily.trim();
+      log.debug("tagBarcodeFamily = " + tagBarcodeFamily);
+      final TagBarcodeFamily tbf = tagBarcodeService.getTagBarcodeFamilyByName(tagBarcodeFamily);
+      if (tbf != null) {
         rtn = new JSONObject();
-        rtn.put("numApplicableBarcodes", tbs.getMaximumNumber());
+        rtn.put("numApplicableBarcodes", tbf.getMaximumNumber());
       } else {
-        rtn = JSONUtils.SimpleJSONError("No strategy found with the name: \"" + strategy + "\"");
+        rtn = JSONUtils.SimpleJSONError("No strategy found with the name: \"" + tagBarcodeFamily + "\"");
       }
     } else {
       rtn = JSONUtils.SimpleJSONError("No valid strategy given");
@@ -519,16 +579,17 @@ public class EditLibraryController {
   }
 
   /* HOT */
-  @RequestMapping(value = "barcodeStrategiesJson", method = RequestMethod.GET)
-  public @ResponseBody JSONObject barcodeStrategiesJson(@RequestParam("platform") String platform) throws IOException {
+  @RequestMapping(value = "tagBarcodeFamiliesJson", method = RequestMethod.GET)
+  public @ResponseBody JSONObject tagBarcodeFamiliesJson(@RequestParam("platform") String platform) throws IOException {
     final JSONObject rtn = new JSONObject();
 
     if (platform != null && !"".equals(platform)) {
-      final List<String> rtnStrat = new ArrayList<String>();
-      for (final TagBarcodeFamily t : tagBarcodeService.getTagBarcodeFamiliesByPlatform(PlatformType.get(platform))) {
-        rtnStrat.add(t.getName());
+      final List<String> rtnTBFamily = new ArrayList<String>();
+      rtnTBFamily.add(TagBarcodeFamily.NULL.getName());
+      for (final TagBarcodeFamily tbf : tagBarcodeService.getTagBarcodeFamiliesByPlatform(PlatformType.get(platform))) {
+        rtnTBFamily.add(tbf.getName());
       }
-      rtn.put("barcodeKits", rtnStrat);
+      rtn.put("barcodeKits", rtnTBFamily);
     }
     return rtn;
   }
@@ -547,7 +608,7 @@ public class EditLibraryController {
   }
 
   @RequestMapping(value = "barcodeStrategies", method = RequestMethod.GET)
-  public @ResponseBody String jsonRestBarcodeStrategies(@RequestParam("platform") String platform) throws IOException {
+  public @ResponseBody String jsonRestTagBarcodeFamilies(@RequestParam("platform") String platform) throws IOException {
     if (!isStringEmptyOrNull(platform)) {
       List<String> types = new ArrayList<String>();
       for (TagBarcodeFamily t : tagBarcodeService.getTagBarcodeFamiliesByPlatform(PlatformType.get(platform))) {
@@ -560,13 +621,13 @@ public class EditLibraryController {
   }
 
   @RequestMapping(value = "barcodesForPosition", method = RequestMethod.GET)
-  public @ResponseBody String jsonRestTagBarcodes(@RequestParam("barcodeStrategy") String barcodeStrategy,
+  public @ResponseBody String jsonRestTagBarcodes(@RequestParam("tagBarcodeFamily") String tagBarcodeFamily,
       @RequestParam("position") String position) throws IOException {
-    if (!isStringEmptyOrNull(barcodeStrategy)) {
-      TagBarcodeFamily tbs = tagBarcodeService.getTagBarcodeFamilyByName(barcodeStrategy);
-      if (tbs != null) {
+    if (!isStringEmptyOrNull(tagBarcodeFamily)) {
+      TagBarcodeFamily tbf = tagBarcodeService.getTagBarcodeFamilyByName(tagBarcodeFamily);
+      if (tbf != null) {
         List<String> names = new ArrayList<String>();
-        for (TagBarcode tb : tbs.getBarcodesForPosition(Integer.parseInt(position))) {
+        for (TagBarcode tb : tbf.getBarcodesForPosition(Integer.parseInt(position))) {
           names.add("\"" + tb.getId() + "\"" + ":" + "\"" + tb.getName() + " (" + tb.getSequence() + ")\"");
         }
         return "{" + LimsUtils.join(names, ",") + "}";
@@ -807,6 +868,7 @@ public class EditLibraryController {
         }
         libraries.add(library);
       }
+      model.put("title", "Bulk Create Libraries");
       model.put("librariesJSON", libraries);
       JSONArray libraryDesigns = new JSONArray();
       libraryDesigns.addAll(requestManager.listLibraryDesignByClass(sampleClass));
@@ -837,7 +899,7 @@ public class EditLibraryController {
         }
         libraryDtos.add(Dtos.asDto(library, lai));
       }
-
+      model.put("title", "Bulk Edit Libraries");
       model.put("librariesJSON", libraryDtos);
       model.put("method", "Edit");
       model.put("libraryDesignsJSON", "[]");
@@ -886,10 +948,10 @@ public class EditLibraryController {
       boolean create = library.getId() == AbstractLibrary.UNSAVED_ID;
       long id = requestManager.saveLibrary(library);
       if (library.getLibraryAdditionalInfo() != null) {
+        library.getLibraryAdditionalInfo().setLibrary(library);
         if (create) {
           libraryAdditionalInfoService.create(library.getLibraryAdditionalInfo(), id);
         } else {
-          library.getLibraryAdditionalInfo().setLibrary(library);
           libraryAdditionalInfoService.update(library.getLibraryAdditionalInfo());
         }
       }

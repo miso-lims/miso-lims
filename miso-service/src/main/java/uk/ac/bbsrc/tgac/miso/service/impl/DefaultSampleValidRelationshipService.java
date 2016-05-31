@@ -35,6 +35,18 @@ public class DefaultSampleValidRelationshipService implements SampleValidRelatio
   @Autowired
   private AuthorizationManager authorizationManager;
 
+  public void setSampleValidRelationshipDao(SampleValidRelationshipDao sampleValidRelationshipDao) {
+    this.sampleValidRelationshipDao = sampleValidRelationshipDao;
+  }
+
+  public void setSampleClassDao(SampleClassDao sampleClassDao) {
+    this.sampleClassDao = sampleClassDao;
+  }
+
+  public void setAuthorizationManager(AuthorizationManager authorizationManager) {
+    this.authorizationManager = authorizationManager;
+  }
+
   @Override
   public SampleValidRelationship get(Long sampleValidRelationshipId) throws IOException {
     authorizationManager.throwIfUnauthenticated();

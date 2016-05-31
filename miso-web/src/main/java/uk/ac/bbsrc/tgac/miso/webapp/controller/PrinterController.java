@@ -84,6 +84,7 @@ public class PrinterController {
   @RequestMapping(value = "/admin/configuration/printers", method = RequestMethod.GET)
   public ModelAndView view(ModelMap model) throws IOException {
     model.put("barcodePrinters", printManager.listAllPrintServices());
+    model.put("title", "Configure Printers");
     return new ModelAndView("/pages/viewPrinters.jsp", model);
   }
 
@@ -107,6 +108,7 @@ public class PrinterController {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Collection<? extends PrintJob> jobs = printManager.listPrintJobsByUser(user);
       model.put("userPrintJobs", jobs);
+      model.put("title", "Print Jobs");
     } catch (Exception e) {
       log.error("my print jobs", e);
     }
