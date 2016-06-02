@@ -69,6 +69,46 @@ public class DefaultSampleAdditionalInfoService implements SampleAdditionalInfoS
   @Autowired
   private LabService labService;
 
+  public void setSampleAdditionalInfoDao(SampleAdditionalInfoDao sampleAdditionalInfoDao) {
+    this.sampleAdditionalInfoDao = sampleAdditionalInfoDao;
+  }
+
+  public void setSampleDao(SampleDao sampleDao) {
+    this.sampleDao = sampleDao;
+  }
+
+  public void setTissueOriginDao(TissueOriginDao tissueOriginDao) {
+    this.tissueOriginDao = tissueOriginDao;
+  }
+
+  public void setTissueTypeDao(TissueTypeDao tissueTypeDao) {
+    this.tissueTypeDao = tissueTypeDao;
+  }
+
+  public void setQcPassedDetailDao(QcPassedDetailDao qcPassedDetailDao) {
+    this.qcPassedDetailDao = qcPassedDetailDao;
+  }
+
+  public void setSubprojectDao(SubprojectDao subprojectDao) {
+    this.subprojectDao = subprojectDao;
+  }
+
+  public void setSqlKitDao(SQLKitDAO sqlKitDao) {
+    this.sqlKitDao = sqlKitDao;
+  }
+
+  public void setSampleClassDao(SampleClassDao sampleClassDao) {
+    this.sampleClassDao = sampleClassDao;
+  }
+
+  public void setAuthorizationManager(AuthorizationManager authorizationManager) {
+    this.authorizationManager = authorizationManager;
+  }
+
+  public void setLabService(LabService labService) {
+    this.labService = labService;
+  }
+
   @Override
   public SampleAdditionalInfo get(Long sampleAdditionalInfoId) throws IOException {
     authorizationManager.throwIfUnauthenticated();

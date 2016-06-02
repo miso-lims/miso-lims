@@ -43,8 +43,8 @@ public class HibernatePoolOrderCompletionDao implements PoolOrderCompletionDao {
 
   @SuppressWarnings("unchecked")
   @Override
-  public Collection<PoolOrderCompletion> getUnfulfilled() throws HibernateException, IOException {
-    Query query = currentSession().createQuery("from PoolOrderCompletion where desired_partitions > completed_partitions");
+  public Collection<PoolOrderCompletion> list() throws HibernateException, IOException {
+    Query query = currentSession().createQuery("from PoolOrderCompletion");
     return fetchSqlStore(query.list());
   }
 

@@ -132,7 +132,11 @@ public class StatusImpl implements Status, Serializable {
 
   @Override
   public void setHealth(HealthType health) {
-    this.health = health;
+    if (health.isAllowedFromSequencer()) {
+      this.health = health;
+    } else {
+      throw new IllegalArgumentException("Cannot set a status to " + health.getKey());
+    }
   }
 
   @Override

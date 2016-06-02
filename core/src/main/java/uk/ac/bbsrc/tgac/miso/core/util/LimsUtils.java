@@ -65,8 +65,13 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
@@ -78,9 +83,15 @@ import org.slf4j.LoggerFactory;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 
+import uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletionGroup;
+import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.PoolOrder;
+import uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletion;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
+import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
@@ -799,8 +810,7 @@ public class LimsUtils {
 
   public static boolean isValidRelationship(Iterable<SampleValidRelationship> relations, SampleClass parent, SampleClass child) {
     for (SampleValidRelationship relation : relations) {
-      if (relation.getParent().getId() == parent.getId()
-          && relation.getChild().getId() == child.getId()) {
+      if (relation.getParent().getId() == parent.getId() && relation.getChild().getId() == child.getId()) {
         return true;
       }
     }
@@ -811,6 +821,60 @@ public class LimsUtils {
     BigDecimal bigDecimal = new BigDecimal(value);
     bigDecimal = bigDecimal.setScale(numberOfDigitsAfterDecimalPoint, BigDecimal.ROUND_HALF_UP);
     return bigDecimal.doubleValue();
+  }
+
+  public static SortedSet<HealthType> getUsedHealthTypes(Iterable<PoolOrderCompletion> completions) {
+    SortedSet<HealthType> healths = new TreeSet<>(HealthType.COMPARATOR);
+    addUsedHealthTypes(completions, healths);
+    return healths;
+  }
+
+  public static void addUsedHealthTypes(Iterable<PoolOrderCompletion> completions, SortedSet<HealthType> healths) {
+    for (PoolOrderCompletion completion : completions) {
+      healths.add(completion.getHealth());
+    }
+  }
+
+  public static Map<Pool<?>, Map<SequencingParameters, PoolOrderCompletionGroup>> groupCompletions(Iterable<PoolOrderCompletion> completions) {
+    Map<Pool<?>, Map<SequencingParameters, PoolOrderCompletionGroup>> poolGroups = new TreeMap<>();
+    for (PoolOrderCompletion completion : completions) {
+      Map<SequencingParameters, PoolOrderCompletionGroup> parametersGroup;
+      if (poolGroups.containsKey(completion.getPool())) {
+        parametersGroup = poolGroups.get(completion.getPool());
+      } else {
+        parametersGroup = new HashMap<>();
+        poolGroups.put(completion.getPool(), parametersGroup);
+      }
+      PoolOrderCompletionGroup groupedCompletions;
+      if (parametersGroup.containsKey(completion.getSequencingParameters())) {
+        groupedCompletions = parametersGroup.get(completion.getSequencingParameters());
+      } else {
+        groupedCompletions = new PoolOrderCompletionGroup();
+        parametersGroup.put(completion.getSequencingParameters(), groupedCompletions);
+      }
+      groupedCompletions.add(completion);
+    }
+    return poolGroups;
+  }
+
+  public static Map<Pool<?>, Map<SequencingParameters, PoolOrderCompletionGroup>> filterUnfulfilledCompletions(
+      Map<Pool<?>, Map<SequencingParameters, PoolOrderCompletionGroup>> groups) {
+    Map<Pool<?>, Map<SequencingParameters, PoolOrderCompletionGroup>> poolGroups = new TreeMap<>();
+    for (Entry<Pool<?>, Map<SequencingParameters, PoolOrderCompletionGroup>> poolEntry : groups.entrySet()) {
+      for (Entry<SequencingParameters, PoolOrderCompletionGroup> parameterEntry : poolEntry.getValue().entrySet()) {
+        if (parameterEntry.getValue().getRemaining() < 1) continue;
+
+        Map<SequencingParameters, PoolOrderCompletionGroup> parametersGroup = null;
+        if (poolGroups.containsKey(poolEntry.getKey())) {
+          parametersGroup = poolGroups.get(poolEntry.getKey());
+        } else {
+          parametersGroup = new HashMap<>();
+          poolGroups.put(poolEntry.getKey(), parametersGroup);
+        }
+        parametersGroup.put(parameterEntry.getKey(), parameterEntry.getValue());
+      }
+    }
+    return poolGroups;
   }
 
 }

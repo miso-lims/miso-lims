@@ -179,10 +179,10 @@ public class StatsController {
   public String processSubmit(@ModelAttribute("sequencerReference") SequencerReference sr, ModelMap model, SessionStatus session)
       throws IOException {
     try {
-      requestManager.saveSequencerReference(sr);
+      Long srId = requestManager.saveSequencerReference(sr);
       session.setComplete();
       model.clear();
-      return "redirect:/miso/stats";
+      return "redirect:/miso/stats/sequencer/" + srId;
     } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to save Sequencer Reference", ex);

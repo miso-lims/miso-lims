@@ -16,14 +16,12 @@ import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAnalyte;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleGroupId;
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SampleAnalyteDto;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleAnalyteDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleDao;
-import uk.ac.bbsrc.tgac.miso.persistence.SampleGroupDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SamplePurposeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueMaterialDao;
 import uk.ac.bbsrc.tgac.miso.service.SampleAnalyteService;
@@ -49,6 +47,26 @@ public class DefaultSampleAnalyteService implements SampleAnalyteService {
 
   @Autowired
   private AuthorizationManager authorizationManager;
+
+  public void setSampleAnalyteDao(SampleAnalyteDao sampleAnalyteDao) {
+    this.sampleAnalyteDao = sampleAnalyteDao;
+  }
+
+  public void setSampleDao(SampleDao sampleDao) {
+    this.sampleDao = sampleDao;
+  }
+
+  public void setSamplePurposeDao(SamplePurposeDao samplePurposeDao) {
+    this.samplePurposeDao = samplePurposeDao;
+  }
+
+  public void setTissueMaterialDao(TissueMaterialDao tissueMaterialDao) {
+    this.tissueMaterialDao = tissueMaterialDao;
+  }
+
+  public void setAuthorizationManager(AuthorizationManager authorizationManager) {
+    this.authorizationManager = authorizationManager;
+  }
 
   @Override
   public SampleAnalyte get(Long sampleAnalyteId) throws IOException {

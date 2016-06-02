@@ -1015,11 +1015,9 @@
               <td>${library.libraryType.description}</td>
               <td>${library.platformName}</td>
               <td><c:if test="${not empty library.tagBarcodes}">
-                <c:forEach items="${library.tagBarcodes}" varStatus="status" var="barcodemap">
-                  ${status.count}: ${barcodemap.value.name} (${barcodemap.value.sequence})
-                  <c:if test="${status.count lt fn:length(library.tagBarcodes)}">
-                    <br/>
-                  </c:if>
+                <c:forEach items="${library.tagBarcodes}" varStatus="status" var="barcode">
+                  <c:if test="${status.index gt 0}"><br/></c:if>
+                  ${status.count}: ${barcode.name} (${barcode.sequence})
                 </c:forEach>
               </c:if></td>
               <td><c:forEach var="qc" items="${library.libraryQCs}" end="0">${qc.insertSize}</c:forEach></td>
@@ -1113,11 +1111,9 @@
                   <td>${grouplib.libraryType.description}</td>
                   <td>${grouplib.platformName}</td>
                   <td><c:if test="${not empty grouplib.tagBarcodes}">
-                    <c:forEach items="${grouplib.tagBarcodes}" varStatus="status" var="barcodemap">
-                      ${status.count}: ${barcodemap.value.name} (${barcodemap.value.sequence})
-                      <c:if test="${status.count lt fn:length(grouplib.tagBarcodes)}">
-                        <br/>
-                      </c:if>
+                    <c:forEach items="${grouplib.tagBarcodes}" varStatus="status" var="barcode">
+                       <c:if test="${status.index gt 0}"><br/></c:if>
+                       ${status.count}: ${barcode.name} (${barcode.sequence})
                     </c:forEach>
                   </c:if></td>
                   <td><c:forEach var="qc" items="${grouplib.libraryQCs}" end="0">${qc.insertSize}</c:forEach></td>
@@ -1213,8 +1209,9 @@
       <c:forEach items="${projectLibraryDilutions}" var="dil">
         <tr dilutionId="${dil.id}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
           <td><b><a href="<c:url value='/miso/library/${dil.library.id}'/>">${dil.name}</a></b></td>
-          <td><a href="<c:url value='/miso/library/${dil.library.id}'/>">${dil.library.alias}</a><c:if test="${not empty dil.library.tagBarcode}">
-            (${dil.library.tagBarcode.name})</c:if></td>
+          <td><a href="<c:url value='/miso/library/${dil.library.id}'/>">${dil.library.alias}</a>
+            <c:if test="${not empty dil.library.tagBarcodes}">(<c:forEach items="${dil.library.tagBarcodes}" varStatus="status" var="barcode"><c:if test="${status.index gt 0}">, </c:if>${barcode.name}</c:forEach>)</c:if>
+          </td>
           <td>${dil.dilutionCreator}</td>
           <td>${dil.creationDate}</td>
           <td>${dil.library.platformName}</td>

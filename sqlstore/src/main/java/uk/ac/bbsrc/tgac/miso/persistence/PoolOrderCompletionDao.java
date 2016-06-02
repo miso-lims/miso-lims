@@ -11,5 +11,5 @@ public interface PoolOrderCompletionDao {
 
   public Collection<PoolOrderCompletion> getForPool(Long poolId) throws HibernateException, IOException;
 
-  public Collection<PoolOrderCompletion> getUnfulfilled() throws HibernateException, IOException;
+  public Collection<PoolOrderCompletion> list() throws HibernateException, IOException;
 }

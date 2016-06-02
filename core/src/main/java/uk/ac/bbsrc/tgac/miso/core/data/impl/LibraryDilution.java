@@ -85,4 +85,39 @@ public class LibraryDilution extends AbstractDilution implements Serializable {
     this.targetedResequencing = targetedResequencing;
   }
 
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + ((library == null) ? 0 : library.hashCode());
+    result = prime
+        * result
+        + ((targetedResequencing == null) ? 0 : targetedResequencing.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (!super.equals(obj))
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    LibraryDilution other = (LibraryDilution) obj;
+    if (library == null) {
+      if (other.library != null)
+        return false;
+    }
+    else if (!library.equals(other.library))
+      return false;
+    if (targetedResequencing == null) {
+      if (other.targetedResequencing != null)
+        return false;
+    }
+    else if (!targetedResequencing.equals(other.targetedResequencing))
+      return false;
+    return true;
+  }
+
 }
