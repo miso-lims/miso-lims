@@ -242,12 +242,13 @@ Tasks.ui = {
       for (var j = 0; j < pipeline.processes.length; j++) {
         var process = pipeline.processes[j];
         for (var k = 0; k < process.parameters.length; k++) {
-          if (jQuery('input[name="' + process.parameters[k].name + '"]').length == 0) {
+          if (jQuery('input[name="' + process.parameters[k].name + '"]').length === 0) {
             jQuery('#' + pipeline.name + '-reqParams > tbody:last').append(
-                jQuery('<tr>').append("<td>" + process.parameters[k].name + "</td>").append(
-                    "<td><input style='width:98%' optional='true' type='text'").append(
-                    "id='" + process.parameters[k].name + "'").append("name='" + process.parameters[k].name + "'")
-                    .append("value='" + process.parameters[k].default_text + "'/>"));
+                    "<tr><td>" + process.parameters[k].name + "</td>"
+                        + "<td><input style='width:98%' optional='true' type='text'" 
+                        + "id='"+ process.parameters[k].name + "'" 
+                        + "name='" + process.parameters[k].name + "'" 
+                        + "value='"+ process.parameters[k].default_text + "'/>");
           }
         }
       }

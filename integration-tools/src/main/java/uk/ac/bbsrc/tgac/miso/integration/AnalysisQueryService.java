@@ -62,7 +62,6 @@ public class AnalysisQueryService {
     q1.put("params", params);
     String query = q1.toString();
 
-//    String response = IntegrationUtils.sendMessage(IntegrationUtils.prepareSocket(analysisServerHost, analysisServerPort), query);
     String response = IntegrationUtils.makePostRequest(analysisServerHost, analysisServerPort, query);
 
     if (!"".equals(response)) {
@@ -85,7 +84,6 @@ public class AnalysisQueryService {
     q1.put("query", "getTasks");
     String query = q1.toString();
 
-    //String response = IntegrationUtils.sendMessage(IntegrationUtils.prepareSocket(analysisServerHost, analysisServerPort), query);
     String response = IntegrationUtils.makePostRequest(analysisServerHost, analysisServerPort, query);
 
     if (!"".equals(response)) {
@@ -108,7 +106,6 @@ public class AnalysisQueryService {
     q1.put("query", "getPendingTasks");
     String query = q1.toString();
 
-    //String response = IntegrationUtils.sendMessage(IntegrationUtils.prepareSocket(analysisServerHost, analysisServerPort), query);
     String response = IntegrationUtils.makePostRequest(analysisServerHost, analysisServerPort, query);
 
     if (!"".equals(response)) {
@@ -136,7 +133,6 @@ public class AnalysisQueryService {
     q1.put("query", "getFailedTasks");
     String query = q1.toString();
 
-    //String response = IntegrationUtils.sendMessage(IntegrationUtils.prepareSocket(analysisServerHost, analysisServerPort), query);
     String response = IntegrationUtils.makePostRequest(analysisServerHost, analysisServerPort, query);
     if (!"".equals(response)) {
       JSONArray r = JSONArray.fromObject(response);
@@ -163,7 +159,6 @@ public class AnalysisQueryService {
     q1.put("query", "getRunningTasks");
     String query = q1.toString();
 
-//    String response = IntegrationUtils.sendMessage(IntegrationUtils.prepareSocket(analysisServerHost, analysisServerPort), query);
     String response = IntegrationUtils.makePostRequest(analysisServerHost, analysisServerPort, query);
     if (!"".equals(response)) {
       JSONArray r = JSONArray.fromObject(response);
@@ -185,7 +180,6 @@ public class AnalysisQueryService {
     q1.put("query", "getCompletedTasks");
     String query = q1.toString();
 
-//    String response = IntegrationUtils.sendMessage(IntegrationUtils.prepareSocket(analysisServerHost, analysisServerPort), query);
     String response = IntegrationUtils.makePostRequest(analysisServerHost, analysisServerPort, query);
     if (!"".equals(response)) {
       JSONArray r = JSONArray.fromObject(response);
@@ -210,7 +204,6 @@ public class AnalysisQueryService {
     q1.put("params", params);
     String query = q1.toString();
 
-//    String response = IntegrationUtils.sendMessage(IntegrationUtils.prepareSocket(analysisServerHost, analysisServerPort), query);
     String response = IntegrationUtils.makePostRequest(analysisServerHost, analysisServerPort, query);
     if (!"".equals(response)) {
       JSONObject r = JSONObject.fromObject(response);
@@ -232,7 +225,6 @@ public class AnalysisQueryService {
     q1.put("query", "getPipelines");
     String query = q1.toString();
 
-//    String response = IntegrationUtils.sendMessage(IntegrationUtils.prepareSocket(analysisServerHost, analysisServerPort), query);
     String response = IntegrationUtils.makePostRequest(analysisServerHost, analysisServerPort, query);
 
     if (!"".equals(response)) {
@@ -268,7 +260,6 @@ public class AnalysisQueryService {
 //    task.put("submit", j);
     task.put("submitTask", j);
 
-//    String response = IntegrationUtils.sendMessage(IntegrationUtils.prepareSocket(analysisServerHost, analysisServerPort), task.toString());
     String response = IntegrationUtils.makePostRequest(analysisServerHost, analysisServerPort, task.toString());
 
     if (!"".equals(response)) {
