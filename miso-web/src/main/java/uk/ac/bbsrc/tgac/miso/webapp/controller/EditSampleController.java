@@ -88,10 +88,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.QcPassedDetail;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleAnalyte;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleAnalyte.StrStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
@@ -109,6 +108,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.StrStatus;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
@@ -405,24 +405,27 @@ public class EditSampleController {
   @Autowired
   private SampleClassService sampleClassService;
 
+  private static final Comparator<SampleClass> SAMPLECLASS_ALIAS = new Comparator<SampleClass>() {
+    @Override
+    public int compare(SampleClass o1, SampleClass o2) {
+      return o1.getAlias().compareTo(o2.getAlias());
+    }
+  };
+
   private void populateSampleClasses(ModelMap model) throws IOException {
-    List<SampleClass> sampleClasses = new ArrayList<>(sampleClassService.getAll());
+    List<SampleClass> sampleClasses = new ArrayList<>();
     List<SampleClass> tissueClasses = new ArrayList<>();
-    for (Iterator<SampleClass> i = sampleClasses.iterator(); i.hasNext();) {
-      SampleClass sc = i.next();
+    // Can only create Tissues and Analyte Stock from this page, so remove other classes
+    for (SampleClass sc : sampleClassService.getAll()) {
       if (SampleTissue.CATEGORY_NAME.equals(sc.getSampleCategory())) {
         tissueClasses.add(sc);
-      } else if (!SampleAnalyte.CATEGORY_NAME.equals(sc.getSampleCategory()) || !sc.isStock()) {
-        // Can only create Tissues and Analyte Stock from this page, so remove other classes
-        i.remove();
+        sampleClasses.add(sc);
+      } else if (SampleStock.CATEGORY_NAME.equals(sc.getSampleCategory())) {
+        sampleClasses.add(sc);
       }
     }
-    Collections.sort(sampleClasses, new Comparator<SampleClass>() {
-      @Override
-      public int compare(SampleClass o1, SampleClass o2) {
-        return o1.getAlias().compareTo(o2.getAlias());
-      }
-    });
+    Collections.sort(sampleClasses, SAMPLECLASS_ALIAS);
+    Collections.sort(tissueClasses, SAMPLECLASS_ALIAS);
     model.put("sampleClasses", sampleClasses);
     model.put("tissueClasses", tissueClasses);
   }
@@ -738,6 +741,7 @@ public class EditSampleController {
       model.put("owners", LimsSecurityUtils.getPotentialOwners(user, sample, securityManager.listAllUsers()));
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, sample, securityManager.listAllUsers()));
       model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, sample, securityManager.listAllGroups()));
+      populateSampleClasses(model);
 
       return new ModelAndView("/pages/editSample.jsp", model);
     } catch (IOException ex) {
@@ -759,8 +763,7 @@ public class EditSampleController {
   }
 
   /**
-   * used to edit samples with ids from given {sampleIds}
-   * sends Dtos objects which will then be used for editing in grid
+   * used to edit samples with ids from given {sampleIds} sends Dtos objects which will then be used for editing in grid
    */
   @RequestMapping(value = "/bulk/edit/{sampleIds}", method = RequestMethod.GET)
   public ModelAndView editBulkSamples(@PathVariable String sampleIds, ModelMap model) throws IOException {
@@ -770,7 +773,8 @@ public class EditSampleController {
       for (int i = 0; i < split.length; i++) {
         idList.add(Long.parseLong(split[i]));
       }
-      Set<SampleDto> samplesDtos = new HashSet<>();
+      ObjectMapper mapper = new ObjectMapper();
+      List<SampleDto> samplesDtos = new ArrayList<>();
       for (Sample sample : requestManager.getSamplesByIdList(idList)) {
         samplesDtos.add(Dtos.asDto(sample));
       }

@@ -11,33 +11,35 @@ import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleAnalyte;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleLCMTube;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAnalyteImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleLCMTubeImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleStockImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
 
 public class OicrSampleAliasGeneratorTest {
-  
+
   @Rule
   public final ExpectedException exception = ExpectedException.none();
 
   private OicrSampleAliasGenerator sut;
-  
+
   @Before
   public void setUp() {
     sut = new OicrSampleAliasGenerator();
   }
-  
+
   @Test
   public void generateForIdentityExceptionTest() throws Exception {
     // Cannot generate alias for Identity
@@ -45,61 +47,61 @@ public class OicrSampleAliasGeneratorTest {
     exception.expect(IllegalArgumentException.class);
     sut.generateName(identity);
   }
-  
+
   @Test
   public void generateForTissueTest() throws Exception {
     assertEquals("PROJ_0001_nn_n_nn_1-1", sut.generateName(makeMinimalTissue()));
     assertEquals("PROJ_0001_Bn_P_32_2-3", sut.generateName(makeFullTissue()));
   }
-  
+
   @Test
   public void generateForTissueProcessingTest() throws Exception {
     assertEquals("PROJ_0001_nn_n_nn_1-1_LCM02", sut.generateName(makeLcmTube()));
   }
-  
+
   @Test
   public void generateForStockFromTissueTest() throws Exception {
     assertEquals("PROJ_0001_nn_n_nn_1-1_D_S4", sut.generateName(makeStockFromTissue()));
   }
-  
+
   @Test
   public void generateForStockFromProcessingTest() throws Exception {
     assertEquals("PROJ_0001_nn_n_nn_1-1_D_S4", sut.generateName(makeStockFromProcessing()));
   }
-  
+
   @Test
   public void generateForStockFromStockTest() throws Exception {
     assertEquals("PROJ_0001_nn_n_nn_1-1_D_S6", sut.generateName(makeStockFromStock()));
   }
-  
+
   @Test
   public void generateForAliquotFromStockTest() throws Exception {
     assertEquals("PROJ_0001_nn_n_nn_1-1_R_12", sut.generateName(makeAliquotFromStock()));
   }
-  
+
   @Test
   public void generateForAliquotFromAliquotTest() throws Exception {
     assertEquals("PROJ_0001_nn_n_nn_1-1_R_12_MR_2", sut.generateName(makeAliquotFromAliquot()));
   }
-  
-  private Sample makeAliquotFromAliquot() throws Exception {
-    SampleAnalyte aliquot = new SampleAnalyteImpl();
-    SampleAnalyte parent = makeAliquotFromStock();
+
+  private SampleAliquot makeAliquotFromAliquot() throws Exception {
+    SampleAliquot aliquot = new SampleAliquotImpl();
+    SampleAliquot parent = makeAliquotFromStock();
     parent.setAlias("PROJ_0001_nn_n_nn_1-1_R_12");
     aliquot.setParent(parent);
     SampleClass sc = new SampleClassImpl();
     sc.setSuffix("MR_");
     aliquot.setSampleClass(sc);
     aliquot.setSiblingNumber(2);
-    
+
     return aliquot;
   }
-  
-  private SampleAnalyte makeAliquotFromStock() throws Exception {
+
+  private SampleAliquot makeAliquotFromStock() throws Exception {
     SampleAdditionalInfo lcm = makeLcmTube();
     lcm.setAlias("PROJ_0001_nn_n_nn_1-1_LCM02");
-    
-    SampleAnalyte stock = new SampleAnalyteImpl();
+
+    SampleStock stock = new SampleStockImpl();
     stock.setParent(lcm);
     SampleClass stockSc = new SampleClassImpl();
     stockSc.setSuffix("R_S");
@@ -107,21 +109,20 @@ public class OicrSampleAliasGeneratorTest {
     stock.setSampleClass(stockSc);
     stock.setSiblingNumber(4);
     stock.setAlias("PROJ_0001_nn_n_nn_1-1_R_S4");
-    
-    
-    SampleAnalyte aliquot = new SampleAnalyteImpl();
+
+    SampleAliquot aliquot = new SampleAliquotImpl();
     aliquot.setParent(stock);
     SampleClass aliquotSc = new SampleClassImpl();
     aliquotSc.setSuffix("R_");
     aliquot.setSampleClass(aliquotSc);
     aliquot.setSiblingNumber(12);
-    
+
     return aliquot;
   }
-  
+
   private Sample makeStockFromStock() throws Exception {
-    SampleAnalyte stock = new SampleAnalyteImpl();
-    SampleAnalyte parentStock = makeStockFromTissue();
+    SampleStock stock = new SampleStockImpl();
+    SampleStock parentStock = makeStockFromTissue();
     parentStock.setAlias("PROJ_0001_nn_n_nn_1-1_D_S4");
     stock.setParent(parentStock);
     SampleClass sc = new SampleClassImpl();
@@ -131,9 +132,9 @@ public class OicrSampleAliasGeneratorTest {
     stock.setSiblingNumber(6);
     return stock;
   }
-  
+
   private Sample makeStockFromProcessing() throws Exception {
-    SampleAnalyte stock = new SampleAnalyteImpl();
+    SampleStock stock = new SampleStockImpl();
     SampleAdditionalInfo lcmTube = makeLcmTube();
     lcmTube.setAlias("PROJ_0001_nn_n_nn_1-1_LCM02");
     stock.setParent(lcmTube);
@@ -144,9 +145,9 @@ public class OicrSampleAliasGeneratorTest {
     stock.setSiblingNumber(4);
     return stock;
   }
-  
-  private SampleAnalyte makeStockFromTissue() throws Exception {
-    SampleAnalyte stock = new SampleAnalyteImpl();
+
+  private SampleStock makeStockFromTissue() throws Exception {
+    SampleStock stock = new SampleStockImpl();
     SampleTissue tissue = makeMinimalTissue();
     tissue.setAlias("PROJ_0001_nn_n_nn_1-1");
     stock.setParent(tissue);
@@ -157,7 +158,7 @@ public class OicrSampleAliasGeneratorTest {
     stock.setSiblingNumber(4);
     return stock;
   }
-  
+
   private SampleLCMTube makeLcmTube() {
     SampleLCMTube lcmTube = new SampleLCMTubeImpl();
     SampleTissue tissue = makeMinimalTissue();
@@ -169,18 +170,18 @@ public class OicrSampleAliasGeneratorTest {
     lcmTube.setSampleClass(sc);
     return lcmTube;
   }
-  
+
   private SampleTissue makeMinimalTissue() {
     SampleTissue tissue = new SampleTissueImpl();
     tissue.setParent(makeIdentity());
     tissue.setTimesReceived(1);
     tissue.setTubeNumber(1);
-   return tissue;
+    return tissue;
   }
-  
+
   private Sample makeFullTissue() {
     SampleTissue tissue = makeMinimalTissue();
-    
+
     TissueOrigin to = new TissueOriginImpl();
     to.setAlias("Bn");
     tissue.setTissueOrigin(to);
@@ -190,20 +191,20 @@ public class OicrSampleAliasGeneratorTest {
     tissue.setPassageNumber(32);
     tissue.setTimesReceived(2);
     tissue.setTubeNumber(3);
-    
+
     return tissue;
   }
-  
+
   private Identity makeIdentity() {
     Identity identity = new IdentityImpl();
     identity.setId(1L);
     identity.setAlias("PROJ_0001");
-    
+
     Project proj = new ProjectImpl();
     proj.setId(1L);
     proj.setAlias("PROJ");
     identity.setProject(proj);
-    
+
     return identity;
   }
 

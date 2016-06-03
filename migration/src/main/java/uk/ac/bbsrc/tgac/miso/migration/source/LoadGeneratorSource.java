@@ -18,8 +18,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleAnalyte;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
@@ -36,8 +37,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.PlatformImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAnalyteImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleStockImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
@@ -54,17 +56,16 @@ import uk.ac.bbsrc.tgac.miso.migration.MigrationData;
 import uk.ac.bbsrc.tgac.miso.migration.MigrationProperties;
 
 /**
- * This MigrationSource is used for generating bulk data for load-testing. It creates projects,
- * detailed samples, libraries, library dilutions, pools, and runs. The detailed samples generated
- * include identities, tissue, analyte stock, and aliquots. Runs include sequencer partition
- * containers with pools loaded
+ * This MigrationSource is used for generating bulk data for load-testing. It creates projects, detailed samples, libraries, library
+ * dilutions, pools, and runs. The detailed samples generated include identities, tissue, analyte stock, and aliquots. Runs include
+ * sequencer partition containers with pools loaded
  */
 public class LoadGeneratorSource implements MigrationSource {
-  
+
   Logger log = Logger.getLogger(getClass());
-  
+
   public static final String SOURCE_PARAM = "load-generator";
-  
+
   private static final String OPT_PROJECT_COUNT = "source.load-generator.projectCount";
   private static final String OPT_SAMPLE_COUNT = "source.load-generator.sampleCount";
   private static final String OPT_LIBRARY_COUNT = "source.load-generator.libraryCount";
@@ -72,7 +73,7 @@ public class LoadGeneratorSource implements MigrationSource {
   private static final String OPT_POOL_SIZE = "source.load-generator.poolSize";
   private static final String OPT_RUN_COUNT = "source.load-generator.runCount";
   private static final String OPT_RUN_SIZE = "source.load-generator.runSize";
-  
+
   private static final String OPT_SAMPLECLASS_ROOT = "source.load-generator.rootSampleClassId";
   private static final String OPT_SAMPLECLASS_TISSUE = "source.load-generator.tissueSampleClassId";
   private static final String OPT_SAMPLECLASS_STOCK = "source.load-generator.stockSampleClassId";
@@ -84,13 +85,13 @@ public class LoadGeneratorSource implements MigrationSource {
   private static final String OPT_LIBRARY_STRATEGY_TYPE = "source.load-generator.libraryStrategyTypeId";
   private static final String OPT_RUN_SEQUENCER_ID = "source.load-generator.runSequencerId";
   private static final String OPT_RUN_PLATFORM_ID = "source.load-generator.runPlatformId";
-  
+
   // Division of samples for hierarchy
   private static final int percentIdentities = 5;
   private static final int percentTissue = 10;
   private static final int percentStock = 10;
   private static final int percentAliquot = 100 - percentIdentities - percentTissue - percentStock;
-  
+
   private final int projectCount;
   private final int sampleCount;
   private final int libraryCount;
@@ -98,7 +99,7 @@ public class LoadGeneratorSource implements MigrationSource {
   private final int poolSize;
   private final int runCount;
   private final int runSize;
-  
+
   private final long rootSampleClassId;
   private final long tissueSampleClassId;
   private final long stockSampleClassId;
@@ -110,24 +111,25 @@ public class LoadGeneratorSource implements MigrationSource {
   private final long libraryStrategyTypeId;
   private final long runSequencerId;
   private final long runPlatformId;
-  
+
   private MigrationData migrationData = null;
-  
+
   private List<Project> projects = null;
   private List<Sample> samples = null;
   private List<Library> libraries = null;
   private List<LibraryDilution> libraryDilutions = null;
   private List<Pool<LibraryDilution>> pools = null;
   private List<Run> runs = null;
-  
+
   private static final String DEFAULT_SAMPLE_TYPE = "OTHER";
-  
+
   /**
    * Creates a LoadGeneratorSource using the configuration found in properties.
    * 
-   * @param properties contains options which include numbers of objects to generate, foreign
-   * key IDs from the migration target, and other settings
-   * @throws IllegalArgumentException if any of the required properties are missing
+   * @param properties
+   *          contains options which include numbers of objects to generate, foreign key IDs from the migration target, and other settings
+   * @throws IllegalArgumentException
+   *           if any of the required properties are missing
    */
   public LoadGeneratorSource(MigrationProperties properties) {
     this.projectCount = properties.getRequiredInt(OPT_PROJECT_COUNT);
@@ -149,13 +151,13 @@ public class LoadGeneratorSource implements MigrationSource {
     this.runSequencerId = properties.getRequiredLong(OPT_RUN_SEQUENCER_ID);
     this.runPlatformId = properties.getRequiredLong(OPT_RUN_PLATFORM_ID);
   }
-  
+
   public List<Project> getProjects() {
     if (this.projects == null) {
       log.info("Generating " + projectCount + " projects...");
       final Date now = new Date();
       final String projectDescription = "load test project";
-      
+
       List<Project> projects = new ArrayList<>();
       for (int projectNum = 1; projectNum <= projectCount; projectNum++) {
         Project project = new ProjectImpl();
@@ -177,45 +179,43 @@ public class LoadGeneratorSource implements MigrationSource {
     if (this.samples == null) {
       int samplesPerProject = sampleCount / projectCount;
       if (sampleCount % projectCount > 0) samplesPerProject++;
-      
+
       int identitiesPerProject = Math.max(samplesPerProject * percentIdentities / 100, 1);
       int tissuesPerProject = Math.max(samplesPerProject * percentTissue / 100, 1);
       int stocksPerProject = Math.max(samplesPerProject * percentStock / 100, 1);
       int aliquotsPerProject = Math.max(samplesPerProject * percentAliquot / 100, 1);
-      
+
       int tissuesPerIdentity = Math.max(tissuesPerProject / identitiesPerProject, 1);
       int stocksPerTissue = Math.max(stocksPerProject / tissuesPerProject, 1);
       int aliquotsPerStock = Math.max(aliquotsPerProject / stocksPerProject, 1);
-      
-      while (identitiesPerProject
-          + identitiesPerProject * tissuesPerIdentity
-          + identitiesPerProject * tissuesPerIdentity * stocksPerTissue
-          + identitiesPerProject * tissuesPerIdentity * stocksPerTissue * aliquotsPerStock
-          < samplesPerProject) {
+
+      while (identitiesPerProject + identitiesPerProject * tissuesPerIdentity + identitiesPerProject * tissuesPerIdentity * stocksPerTissue
+          + identitiesPerProject * tissuesPerIdentity * stocksPerTissue * aliquotsPerStock < samplesPerProject) {
         aliquotsPerStock++;
       }
-      log.info(String.format("Generating %d aliquots * %d stocks * %d tissues * %d identities * %d projects "
-          + "with a hard limit of %d total samples created...",
+      log.info(String.format(
+          "Generating %d aliquots * %d stocks * %d tissues * %d identities * %d projects "
+              + "with a hard limit of %d total samples created...",
           aliquotsPerStock, stocksPerTissue, tissuesPerIdentity, identitiesPerProject, projectCount, sampleCount));
-      
+
       SampleClass identityClass = makeSampleClass(rootSampleClassId, Identity.CATEGORY_NAME);
       SampleClass tissueClass = makeSampleClass(tissueSampleClassId, SampleTissue.CATEGORY_NAME);
-      SampleClass stockClass = makeSampleClass(stockSampleClassId, SampleAnalyte.CATEGORY_NAME);
-      SampleClass aliquotClass = makeSampleClass(aliquotSampleClassId, SampleAnalyte.CATEGORY_NAME);
-      
+      SampleClass stockClass = makeSampleClass(stockSampleClassId, SampleStock.CATEGORY_NAME);
+      SampleClass aliquotClass = makeSampleClass(aliquotSampleClassId, SampleAliquot.CATEGORY_NAME);
+
       List<Sample> samples = new ArrayList<>();
       for (Project project : getProjects()) {
         for (int identitiesCreated = 0; identitiesCreated < identitiesPerProject && samples.size() < sampleCount; identitiesCreated++) {
-          Identity identity = createIdentity(identityClass, project, identitiesCreated+1);
+          Identity identity = createIdentity(identityClass, project, identitiesCreated + 1);
           samples.add(identity);
           for (int tissuesCreated = 0; tissuesCreated < tissuesPerIdentity && samples.size() < sampleCount; tissuesCreated++) {
-            SampleTissue tissue = createTissue(tissueClass, project, identity, tissuesCreated+1);
+            SampleTissue tissue = createTissue(tissueClass, project, identity, tissuesCreated + 1);
             samples.add(tissue);
             for (int stocksCreated = 0; stocksCreated < stocksPerTissue && samples.size() < sampleCount; stocksCreated++) {
-              SampleAnalyte stock = createStock(stockClass, project, tissue, stocksCreated+1);
+              SampleStock stock = createStock(stockClass, project, tissue, stocksCreated + 1);
               samples.add(stock);
               for (int aliquotsCreated = 0; aliquotsCreated < aliquotsPerStock && samples.size() < sampleCount; aliquotsCreated++) {
-                SampleAnalyte aliquot = createAliquot(aliquotClass, project, stock, aliquotsCreated+1); 
+                SampleAliquot aliquot = createAliquot(aliquotClass, project, stock, aliquotsCreated + 1);
                 samples.add(aliquot);
               }
             }
@@ -227,17 +227,18 @@ public class LoadGeneratorSource implements MigrationSource {
     }
     return this.samples;
   }
-  
+
   private SampleClass makeSampleClass(long id, String category) {
     SampleClass sc = new SampleClassImpl();
     sc.setId(id);
     sc.setSampleCategory(category);
     return sc;
   }
-  
+
   private static final String ZERO_STRING = "0";
   private static final String IDENTITY_DESC = "identity";
   private static final String SCIENTIFIC_NAME = "test";
+
   private Identity createIdentity(SampleClass sampleClass, Project project, int identityNum) {
     Identity sample = new IdentityImpl();
     String identityNumString = String.valueOf(identityNum);
@@ -252,11 +253,12 @@ public class LoadGeneratorSource implements MigrationSource {
     sample.setSampleClass(sampleClass);
     sample.setExternalName(sample.getAlias());
     sample.setInternalName(sample.getAlias());
-    
+
     return sample;
   }
-  
+
   private static final String TISSUE_DESC = "tissue";
+
   private SampleTissue createTissue(SampleClass sampleClass, Project project, SampleAdditionalInfo parent, int timesReceived) {
     SampleTissue sample = new SampleTissueImpl();
     sample.setDescription(TISSUE_DESC);
@@ -276,10 +278,11 @@ public class LoadGeneratorSource implements MigrationSource {
     sample.setSiblingNumber(timesReceived);
     return sample;
   }
-  
+
   private static final String STOCK_DESC = "stock";
-  private SampleAnalyte createStock(SampleClass sampleClass, Project project, SampleAdditionalInfo parent, int siblingNumber) {
-    SampleAnalyte sample = new SampleAnalyteImpl();
+
+  private SampleStock createStock(SampleClass sampleClass, Project project, SampleAdditionalInfo parent, int siblingNumber) {
+    SampleStock sample = new SampleStockImpl();
     sample.setDescription(STOCK_DESC);
     sample.setSampleType(DEFAULT_SAMPLE_TYPE);
     sample.setProject(project);
@@ -289,10 +292,11 @@ public class LoadGeneratorSource implements MigrationSource {
     sample.setSiblingNumber(siblingNumber);
     return sample;
   }
-  
+
   private static final String ALIQUOT_DESC = "aliquot";
-  private SampleAnalyte createAliquot(SampleClass sampleClass, Project project, SampleAdditionalInfo parent, int siblingNumber) {
-    SampleAnalyte sample = new SampleAnalyteImpl();
+
+  private SampleAliquot createAliquot(SampleClass sampleClass, Project project, SampleAdditionalInfo parent, int siblingNumber) {
+    SampleAliquot sample = new SampleAliquotImpl();
     sample.setDescription(ALIQUOT_DESC);
     sample.setSampleType(DEFAULT_SAMPLE_TYPE);
     sample.setProject(project);
@@ -312,7 +316,7 @@ public class LoadGeneratorSource implements MigrationSource {
         for (Sample s : getSamples()) {
           SampleAdditionalInfo sample = (SampleAdditionalInfo) s;
           if (sample.getSampleClass().getId() == aliquotSampleClassId) {
-            libraries.add(createLibrary(sample, libraries.size()+1));
+            libraries.add(createLibrary(sample, libraries.size() + 1));
             if (libraries.size() >= libraryCount) break;
           }
         }
@@ -325,10 +329,10 @@ public class LoadGeneratorSource implements MigrationSource {
     }
     return this.libraries;
   }
-  
+
   private Library createLibrary(SampleAdditionalInfo sample, int libraryNum) {
     Library lib = new LibraryImpl();
-    
+
     lib.setDescription("library");
     lib.setSample(sample);
     LibraryType lt = new LibraryType();
@@ -337,34 +341,31 @@ public class LoadGeneratorSource implements MigrationSource {
     lib.setPlatformName("Illumina");
     lib.setPaired(true);
     lib.setQcPassed(true);
-    
+
     LibrarySelectionType sel = new LibrarySelectionType();
     sel.setId(librarySelectionTypeId);
     lib.setLibrarySelectionType(sel);
-    
+
     LibraryStrategyType strat = new LibraryStrategyType();
     strat.setId(libraryStrategyTypeId);
     lib.setLibraryStrategyType(strat);
-    
+
     LibraryAdditionalInfo lai = new LibraryAdditionalInfoImpl();
     lai.setArchived(false);
     lai.setLibrary(lib);
     lib.setLibraryAdditionalInfo(lai);
-    
+
     // faked alias generation to avoid necessity of target database data
     // Note: this will fail (OICR) validation if libraryCount > 999999
-    lib.setAlias(getRootSample(sample).getAlias()
-        + "_Ad_R_PE_"
-        + (libraryNum > 9 ? libraryNum : "0" + libraryNum)
-        + "_WG");
-    
+    lib.setAlias(getRootSample(sample).getAlias() + "_Ad_R_PE_" + (libraryNum > 9 ? libraryNum : "0" + libraryNum) + "_WG");
+
     return lib;
   }
-  
+
   private static SampleAdditionalInfo getRootSample(SampleAdditionalInfo sample) {
     SampleAdditionalInfo root = sample;
     while (root.getParent() != null) {
-      root = (SampleAdditionalInfo) root.getParent();
+      root = root.getParent();
     }
     return root;
   }
@@ -381,7 +382,7 @@ public class LoadGeneratorSource implements MigrationSource {
     }
     return this.libraryDilutions;
   }
-  
+
   private static LibraryDilution createLibraryDilution(Library library) {
     LibraryDilution ldi = new LibraryDilution();
     ldi.setLibrary(library);
@@ -409,7 +410,7 @@ public class LoadGeneratorSource implements MigrationSource {
     }
     return this.pools;
   }
-  
+
   private Pool<LibraryDilution> createPool(Collection<LibraryDilution> libraryDilutions, int poolNum) {
     Pool<LibraryDilution> p = new PoolImpl<LibraryDilution>();
     p.setAlias("Test_Pool_" + poolNum);
@@ -439,10 +440,11 @@ public class LoadGeneratorSource implements MigrationSource {
     }
     return this.runs;
   }
-  
+
   private static final Date RUN_DATE = new Date();
   private static final String RUN_DATE_STRING = new DateFormatter("yyyyMMdd").print(RUN_DATE, Locale.ENGLISH);
   private static final String RUN_INSTRUMENT_NAME = "Instrument";
+
   private Run createRun(List<Pool<LibraryDilution>> pools, int runNum) {
     int runNumPadding = Math.max(Integer.toString(runNum).length(), 4);
     String runNumPadded = Integer.toString(runNum);
@@ -455,24 +457,24 @@ public class LoadGeneratorSource implements MigrationSource {
     run.setDescription(runBarcode);
     run.setPairedEnd(true);
     run.setPlatformType(PlatformType.ILLUMINA);
-    
+
     SequencerReference sequencer = new SequencerReferenceImpl(null, null, null);
     sequencer.setId(runSequencerId);
     run.setSequencerReference(sequencer);
-    
+
     SequencerPartitionContainer<SequencerPoolPartition> container = new SequencerPartitionContainerImpl();
     container.setIdentificationBarcode(runBarcode);
     Platform platform = new PlatformImpl();
     platform.setId(runPlatformId);
     container.setPlatform(platform);
-    
+
     Status status = new StatusImpl(run.getAlias());
     status.setHealth(HealthType.Completed);
     status.setStartDate(RUN_DATE);
     status.setCompletionDate(RUN_DATE);
     status.setInstrumentName(RUN_INSTRUMENT_NAME);
     run.setStatus(status);
-    
+
     List<SequencerPoolPartition> partitions = new ArrayList<>();
     for (int i = 0; i < pools.size(); i++) {
       SequencerPoolPartition partition = new PartitionImpl();
@@ -481,9 +483,9 @@ public class LoadGeneratorSource implements MigrationSource {
       partition.setSequencerPartitionContainer(container);
       partitions.add(partition);
     }
-    
+
     container.setPartitions(partitions);
-    
+
     List<SequencerPartitionContainer<SequencerPoolPartition>> containers = new ArrayList<>();
     containers.add(container);
     run.setSequencerPartitionContainers(containers);

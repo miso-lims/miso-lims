@@ -532,4 +532,15 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
       return tagBarcodes.get(0).getFamily();
     }
   }
+
+  @Override
+  public SampleTissue getSampleTissue() {
+    if (this.getSample() instanceof SampleAdditionalInfo) {
+
+      for (SampleAdditionalInfo parent = (SampleAdditionalInfo) this.getSample(); parent != null; parent = parent.getParent()) {
+        if (parent instanceof SampleTissue) return (SampleTissue) parent;
+      }
+    }
+    return null;
+  }
 }

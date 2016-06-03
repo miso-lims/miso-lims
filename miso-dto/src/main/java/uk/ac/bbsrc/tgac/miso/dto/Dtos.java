@@ -1,6 +1,12 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isAliquotSample;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isDetailedSample;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isIdentitySample;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStockSample;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isTissueProcessingSample;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isTissueSample;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -28,13 +34,14 @@ import uk.ac.bbsrc.tgac.miso.core.data.PoolOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.QcPassedDetail;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleAnalyte;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleCVSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleGroupId;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleLCMTube;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleNumberPerProject;
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
@@ -54,7 +61,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrderImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.QcPassedDetailImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAdditionalInfoImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAnalyteImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleCVSlideImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleGroupImpl;
@@ -62,6 +69,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleLCMTubeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleNumberPerProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SamplePurposeImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleStockImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueProcessingImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleValidRelationshipImpl;
@@ -233,10 +241,12 @@ public class Dtos {
       dto = asIdentitySampleDto((Identity) from);
     } else if (isTissueSample(from)) {
       dto = asTissueSampleDto((SampleTissue) from);
-    } else if (isTissueProcessingSample(from)){
+    } else if (isTissueProcessingSample(from)) {
       dto = asTissueProcessingSampleDto((SampleTissueProcessing) from);
-    } else if (isAnalyteSample(from)) {
-      dto = asAnalyteSampleDto((SampleAnalyte) from);
+    } else if (isAliquotSample(from)) {
+      dto = asAliquotSampleDto((SampleAliquot) from);
+    } else if (isStockSample(from)) {
+      dto = asStockSampleDto((SampleStock) from);
     } else {
       throw new IllegalArgumentException();
     }
@@ -253,7 +263,7 @@ public class Dtos {
     if (from.getParent() != null) {
       dto.setParentId(from.getParent().getId());
       dto.setParentAlias(from.getParent().getAlias());
-      dto.setParentSampleClassId(((SampleAdditionalInfo) from.getParent()).getSampleClass().getId());
+      dto.setParentSampleClassId(from.getParent().getSampleClass().getId());
     }
     if (from.getGroupId() != null) {
       dto.setGroupId(from.getGroupId());
@@ -261,7 +271,11 @@ public class Dtos {
     if (from.getGroupDescription() != null) {
       dto.setGroupDescription(from.getGroupDescription());
     }
-    dto.setConcentration(from.getConcentration());
+    if (from.getParent() != null) {
+      dto.setParentId(from.getParent().getId());
+      dto.setParentAlias(from.getParent().getAlias());
+      dto.setParentSampleClassId(from.getSampleClass().getId());
+    }
     return dto;
   }
 
@@ -273,12 +287,13 @@ public class Dtos {
       to = toTissueSample((SampleTissueDto) from);
     } else if (from instanceof SampleTissueProcessingDto) {
       to = toTissueProcessingSample((SampleTissueProcessingDto) from);
-    } else if (from.getClass() == SampleAnalyteDto.class) {
-      to = toAnalyteSample((SampleAnalyteDto) from);
+    } else if (from.getClass() == SampleStockDto.class) {
+      to = toStockSample((SampleStockDto) from);
+    } else if (from.getClass() == SampleAliquotDto.class) {
+      to = toAliquotSample((SampleAliquotDto) from);
     } else {
       to = new SampleAdditionalInfoImpl();
     }
-    to.setConcentration(from.getConcentration());
     if (from.getQcPassedDetailId() != null) {
       QcPassedDetail qcpassedDetail = new QcPassedDetailImpl();
       qcpassedDetail.setId(from.getQcPassedDetailId());
@@ -306,20 +321,21 @@ public class Dtos {
     to.setParent(getParent(from));
     return to;
   }
-  
+
   /**
    * Extracts parent details from the DTO, according to three possible cases:
    * 
-   * <ol><li>parent ID is provided. This implies that the parent exists, so no other parent information
-   *     will be required</li>
-   * <li>identity information and parentSampleClassId are provided. This implies that a tissue parent
-   *     should be created, and that the identity may or may not yet exist</li>
-   * <li>identity information is provided, but no parentSampleClassId. This implies that the direct
-   *     parent of this sample will be an identity, which may or may not yet exist</li></ol>
-   *     
-   * @param childDto the DTO to take parent details from
-   * @return the parent details from the DTO, or null if there are none. A returned sample will also
-   * include its own parent if applicable.
+   * <ol>
+   * <li>parent ID is provided. This implies that the parent exists, so no other parent information will be required</li>
+   * <li>identity information and parentSampleClassId are provided. This implies that a tissue parent should be created, and that the
+   * identity may or may not yet exist</li>
+   * <li>identity information is provided, but no parentSampleClassId. This implies that the direct parent of this sample will be an
+   * identity, which may or may not yet exist</li>
+   * </ol>
+   * 
+   * @param childDto
+   *          the DTO to take parent details from
+   * @return the parent details from the DTO, or null if there are none. A returned sample will also include its own parent if applicable.
    */
   private static SampleAdditionalInfo getParent(SampleAdditionalInfoDto childDto) {
     SampleAdditionalInfo parent = null;
@@ -427,38 +443,35 @@ public class Dtos {
     return to;
   }
 
-  private static SampleAnalyteDto asAnalyteSampleDto(SampleAnalyte from) {
-    SampleAnalyteDto dto = new SampleAnalyteDto();
-    dto.setStrStatus(from.getStrStatus().getLabel());
+  private static SampleAliquotDto asAliquotSampleDto(SampleAliquot from) {
+    SampleAliquotDto dto = new SampleAliquotDto();
     if (from.getSamplePurpose() != null) {
       dto.setSamplePurposeId(from.getSamplePurpose().getId());
-    }
-    if (from.getTissueMaterial() != null) {
-      dto.setTissueMaterialId(from.getTissueMaterial().getId());
-    }
-    if (!isStringEmptyOrNull(from.getRegion())) {
-      dto.setRegion(from.getRegion());
-    }
-    if (!isStringEmptyOrNull(from.getTubeId())) {
-      dto.setTubeId(from.getTubeId());
     }
     return dto;
   }
 
-  private static SampleAnalyte toAnalyteSample(SampleAnalyteDto from) {
-    SampleAnalyte to = new SampleAnalyteImpl();
-    to.setRegion(from.getRegion());
-    to.setTubeId(from.getTubeId());
+  private static SampleStockDto asStockSampleDto(SampleStock from) {
+    SampleStockDto dto = new SampleStockDto();
+    dto.setConcentration(from.getConcentration());
+    dto.setStrStatus(from.getStrStatus().getLabel());
+    return dto;
+  }
+
+  private static SampleStock toStockSample(SampleStockDto from) {
+    SampleStock to = new SampleStockImpl();
+    to.setConcentration(from.getConcentration());
+    if (from.getStrStatus() != null) {
+      to.setStrStatus(from.getStrStatus());
+    }
+    return to;
+  }
+
+  private static SampleAliquot toAliquotSample(SampleAliquotDto from) {
+    SampleAliquot to = new SampleAliquotImpl();
     if (from.getSamplePurposeId() != null) {
       to.setSamplePurpose(new SamplePurposeImpl());
       to.getSamplePurpose().setId(from.getSamplePurposeId());
-    }
-    if (from.getTissueMaterialId() != null) {
-      to.setTissueMaterial(new TissueMaterialImpl());
-      to.getTissueMaterial().setId(from.getTissueMaterialId());
-    }
-    if (from.getStrStatus() != null) {
-      to.setStrStatus(from.getStrStatus());
     }
     return to;
   }
@@ -501,6 +514,7 @@ public class Dtos {
     }
     dto.setVolume(from.getVolume());
     dto.setEmpty(from.isEmpty());
+    dto.setLastModified(dateTimeFormatter.print(from.getLastModified().getTime()));
 
     return dto;
   }
@@ -537,7 +551,7 @@ public class Dtos {
     }
     to.setSampleType(from.getSampleType());
     if (from.getReceivedDate() != null) {
-      to.setReceivedDate(dateTimeFormatter.parseDateTime(from.getReceivedDate()).toDate());
+      to.setReceivedDate(dateFormatter.parseDateTime(from.getReceivedDate()).toDate());
     }
     to.setQcPassed(from.getQcPassed());
     if (!isStringEmptyOrNull(from.getAlias())) {
@@ -682,6 +696,11 @@ public class Dtos {
 
   private static SampleTissueDto asTissueSampleDto(SampleTissue from) {
     SampleTissueDto dto = new SampleTissueDto();
+    dto.setPassageNumber(from.getPassageNumber());
+    dto.setTimesReceived(from.getTimesReceived());
+    dto.setExternalInstituteIdentifier(from.getExternalInstituteIdentifier());
+    dto.setRegion(from.getRegion());
+    dto.setTubeNumber(from.getTubeNumber());
     if (from.getLab() != null) {
       dto.setLabId(from.getLab().getId());
     }
@@ -691,11 +710,9 @@ public class Dtos {
     if (from.getTissueType() != null) {
       dto.setTissueTypeId(from.getTissueType().getId());
     }
-    dto.setPassageNumber(from.getPassageNumber());
-    dto.setTimesReceived(from.getTimesReceived());
-    dto.setExternalInstituteIdentifier(from.getExternalInstituteIdentifier());
-    dto.setTubeNumber(from.getTubeNumber());
-    dto.setCellularity(from.getCellularity());
+    if (from.getTissueMaterial() != null) {
+      dto.setTissueMaterialId(from.getTissueMaterial().getId());
+    }
     return dto;
   }
 
@@ -704,6 +721,7 @@ public class Dtos {
     to.setPassageNumber(from.getPassageNumber());
     to.setTimesReceived(from.getTimesReceived());
     to.setTubeNumber(from.getTubeNumber());
+    to.setRegion(from.getRegion());
     to.setExternalInstituteIdentifier(from.getExternalInstituteIdentifier());
     if (from.getTissueOriginId() != null) {
       TissueOrigin tissueOrigin = new TissueOriginImpl();
@@ -715,7 +733,11 @@ public class Dtos {
       tissueType.setId(from.getTissueTypeId());
       to.setTissueType(tissueType);
     }
-    to.setCellularity(from.getCellularity());
+    if (from.getTissueMaterialId() != null) {
+      TissueMaterial tissueMaterial = new TissueMaterialImpl();
+      tissueMaterial.setId(from.getTissueMaterialId());
+      to.setTissueMaterial(tissueMaterial);
+    }
     return to;
   }
 
@@ -759,7 +781,6 @@ public class Dtos {
     to.setThickness(from.getThickness());
     return to;
   }
-
 
   private static SampleLCMTubeDto asLCMTubeSampleDto(SampleLCMTube from) {
     SampleLCMTubeDto dto = new SampleLCMTubeDto();

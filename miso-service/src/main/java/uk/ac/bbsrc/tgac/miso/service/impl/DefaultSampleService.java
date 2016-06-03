@@ -1,8 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isAnalyteSample;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isAliquotSample;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isDetailedSample;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isIdentitySample;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStockSample;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isTissueProcessingSample;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isTissueSample;
@@ -28,10 +29,11 @@ import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleAnalyte;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleCVSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleLCMTube;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
@@ -53,7 +55,6 @@ import uk.ac.bbsrc.tgac.miso.persistence.TissueTypeDao;
 import uk.ac.bbsrc.tgac.miso.service.IdentityService;
 import uk.ac.bbsrc.tgac.miso.service.LabService;
 import uk.ac.bbsrc.tgac.miso.service.SampleAdditionalInfoService;
-import uk.ac.bbsrc.tgac.miso.service.SampleAnalyteService;
 import uk.ac.bbsrc.tgac.miso.service.SampleNumberPerProjectService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.SampleTissueService;
@@ -74,9 +75,6 @@ public class DefaultSampleService implements SampleService {
 
   @Autowired
   private SampleClassDao sampleClassDao;
-
-  @Autowired
-  private SampleAnalyteService sampleAnalyteService;
 
   @Autowired
   private SampleAdditionalInfoService sampleAdditionalInfoService;
@@ -139,10 +137,6 @@ public class DefaultSampleService implements SampleService {
 
   public void setSampleClassDao(SampleClassDao sampleClassDao) {
     this.sampleClassDao = sampleClassDao;
-  }
-
-  public void setSampleAnalyteService(SampleAnalyteService sampleAnalyteService) {
-    this.sampleAnalyteService = sampleAnalyteService;
   }
 
   public void setSampleAdditionalInfoService(SampleAdditionalInfoService sampleAdditionalInfoService) {
@@ -234,7 +228,11 @@ public class DefaultSampleService implements SampleService {
     if (isDetailedSample(sample)) {
       if (!isIdentitySample(sample)) {
         SampleAdditionalInfo detailed = (SampleAdditionalInfo) sample;
-        detailed.setParent(findOrCreateParent(detailed));
+        try {
+          detailed.setParent(findOrCreateParent(detailed));
+        } catch (MisoNamingException e) {
+          throw new IOException(e.getMessage(), e);
+        }
         validateHierarchy(detailed);
       }
     }
@@ -333,7 +331,7 @@ public class DefaultSampleService implements SampleService {
    * @throws SQLException
    * @throws MisoNamingException
    */
-  private Sample findOrCreateParent(SampleAdditionalInfo sample) throws IOException {
+  private SampleAdditionalInfo findOrCreateParent(SampleAdditionalInfo sample) throws IOException, MisoNamingException {
     if (sample.getParent() == null) {
       throw new IllegalArgumentException("Detailed sample is missing parent identifier");
     }
@@ -343,7 +341,7 @@ public class DefaultSampleService implements SampleService {
       if (parent == null)
         throw new IllegalArgumentException("Parent sample does not exist");
       else
-        return parent;
+        return (SampleAdditionalInfo) parent;
     } else if (isIdentitySample(tempParent) && !isStringEmptyOrNull(((Identity) tempParent).getExternalName())) {
       Identity parentIdentity = identityService.get(((Identity) tempParent).getExternalName());
       if (parentIdentity != null) return parentIdentity;
@@ -358,7 +356,7 @@ public class DefaultSampleService implements SampleService {
     throw new IllegalArgumentException("Could not resolve parent sample");
   }
 
-  private Sample createParentTissue(SampleTissue tissue, SampleAdditionalInfo child) throws IOException {
+  private SampleTissue createParentTissue(SampleTissue tissue, SampleAdditionalInfo child) throws IOException {
     log.debug("Creating a new Tissue to use as a parent.");
     tissue.setProject(child.getProject());
     tissue.setDescription("Tissue");
@@ -369,7 +367,7 @@ public class DefaultSampleService implements SampleService {
     return tissue;
   }
 
-  private Sample createParentIdentity(SampleAdditionalInfo sample) throws IOException, SQLException {
+  private Identity createParentIdentity(SampleAdditionalInfo sample) throws IOException, MisoNamingException, SQLException {
     log.debug("Creating a new Identity to use as a parent.");
     List<SampleClass> identityClasses = sampleClassDao.listByCategory(Identity.CATEGORY_NAME);
     if (identityClasses.size() != 1) {
@@ -380,7 +378,7 @@ public class DefaultSampleService implements SampleService {
 
     String number = sampleNumberPerProjectService.nextNumber(sample.getProject());
     // Cannot generate identity alias via sampleNameGenerator because of dependence on SampleNumberPerProjectService
-    String internalName = sample.getProject().getAlias() + "_" + number;
+    String internalName = sample.getProject().getShortName() + "_" + number;
     Identity shellParent = (Identity) sample.getParent();
 
     Sample identitySample = new IdentityBuilder().user(authorizationManager.getCurrentUser()).project(sample.getProject())
@@ -389,7 +387,7 @@ public class DefaultSampleService implements SampleService {
         .internalName(internalName).donorSex(shellParent.getDonorSex()).build();
 
     setChangeDetails(identitySample);
-    return save(identitySample);
+    return (Identity) save(identitySample);
   }
 
   /**
@@ -423,24 +421,25 @@ public class DefaultSampleService implements SampleService {
       if (sai.getPrepKit() != null && sai.getPrepKit().getId() != null) {
         sai.setPrepKit(kitStore.getKitDescriptorById(sai.getPrepKit().getId()));
       }
-      if (isAnalyteSample(sai)) {
-        SampleAnalyte sa = (SampleAnalyte) sai;
+      if (isAliquotSample(sai)) {
+        SampleAliquot sa = (SampleAliquot) sai;
         if (sa.getSamplePurpose() != null && sa.getSamplePurpose().getId() != null) {
           sa.setSamplePurpose(samplePurposeDao.getSamplePurpose(sa.getSamplePurpose().getId()));
         }
-        if (sa.getTissueMaterial() != null && sa.getTissueMaterial().getId() != null) {
-          sa.setTissueMaterial(tissueMaterialDao.getTissueMaterial(sa.getTissueMaterial().getId()));
+      }
+      if (isTissueSample(sai)) {
+        SampleTissue st = (SampleTissue) sai;
+        if (st.getTissueMaterial() != null && st.getTissueMaterial().getId() != null) {
+          st.setTissueMaterial(tissueMaterialDao.getTissueMaterial(st.getTissueMaterial().getId()));
         }
-      } else if (isTissueSample(sai)) {
-        SampleTissue tissue = (SampleTissue) sai;
-        if (tissue.getTissueOrigin() != null && tissue.getTissueOrigin().getId() != null) {
-          tissue.setTissueOrigin(tissueOriginDao.getTissueOrigin(tissue.getTissueOrigin().getId()));
+        if (st.getTissueOrigin() != null && st.getTissueOrigin().getId() != null) {
+          st.setTissueOrigin(tissueOriginDao.getTissueOrigin(st.getTissueOrigin().getId()));
         }
-        if (tissue.getTissueType() != null && tissue.getTissueType().getId() != null) {
-          tissue.setTissueType(tissueTypeDao.getTissueType(tissue.getTissueType().getId()));
+        if (st.getTissueType() != null && st.getTissueType().getId() != null) {
+          st.setTissueType(tissueTypeDao.getTissueType(st.getTissueType().getId()));
         }
-        if (tissue.getLab() != null && tissue.getLab().getId() != null) {
-          tissue.setLab(labService.get(tissue.getLab().getId()));
+        if (st.getLab() != null && st.getLab().getId() != null) {
+          st.setLab(labService.get(st.getLab().getId()));
         }
       }
     }
@@ -449,7 +448,7 @@ public class DefaultSampleService implements SampleService {
   private void validateHierarchy(SampleAdditionalInfo sample) throws IOException {
     Set<SampleValidRelationship> sampleValidRelationships = sampleValidRelationshipService.getAll();
     if (!LimsUtils.isValidRelationship(sampleValidRelationships, sample.getParent(), sample)) {
-      throw new IllegalArgumentException("Parent " + ((SampleAdditionalInfo) sample.getParent()).getSampleClass().getAlias()
+      throw new IllegalArgumentException("Parent " + sample.getParent().getSampleClass().getAlias()
           + " not permitted to have a child of type " + sample.getSampleClass().getAlias());
     }
   }
@@ -478,7 +477,7 @@ public class DefaultSampleService implements SampleService {
     if (isDetailedSample(updatedSample)) {
       SampleAdditionalInfo detailedUpdated = (SampleAdditionalInfo) updatedSample;
       if (detailedUpdated.getParent() != null) {
-        detailedUpdated.setParent(get(detailedUpdated.getParent().getId()));
+        detailedUpdated.setParent((SampleAdditionalInfo) get(detailedUpdated.getParent().getId()));
         validateHierarchy(detailedUpdated);
       }
     }
@@ -520,8 +519,16 @@ public class DefaultSampleService implements SampleService {
       if (isTissueProcessingSample(target)) {
         applyChanges((SampleTissueProcessing) target, (SampleTissueProcessing) source);
       }
-      if (isAnalyteSample(target)) {
-        sampleAnalyteService.applyChanges((SampleAnalyte) target, (SampleAnalyte) source);
+      if (isAliquotSample(target)) {
+        SampleAliquot saTarget = (SampleAliquot) target;
+        SampleAliquot saSource = (SampleAliquot) source;
+        saTarget.setSamplePurpose(saSource.getSamplePurpose());
+      }
+      if (isStockSample(target)) {
+        SampleStock ssTarget = (SampleStock) target;
+        SampleStock ssSource = (SampleStock) source;
+        ssTarget.setStrStatus(ssSource.getStrStatus());
+        ssTarget.setConcentration(ssSource.getConcentration());
       }
     }
   }
