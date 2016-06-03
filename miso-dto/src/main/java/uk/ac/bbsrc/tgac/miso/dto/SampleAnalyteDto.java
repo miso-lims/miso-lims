@@ -10,8 +10,6 @@ public class SampleAnalyteDto {
   private String sampleUrl;
   private Long samplePurposeId;
   private String samplePurposeUrl;
-  private Long groupId;
-  private String groupDescription;
   private Long tissueMaterialId;
   private String tissueMaterialUrl;
 
@@ -112,22 +110,6 @@ public class SampleAnalyteDto {
 
   public void setSamplePurposeUrl(String samplePurposeUrl) {
     this.samplePurposeUrl = samplePurposeUrl;
-  }
-
-  public Long getGroupId() {
-    return groupId;
-  }
-
-  public void setGroupId(Long groupId) {
-    this.groupId = groupId;
-  }
-
-  public String getGroupDescription() {
-    return groupDescription;
-  }
-
-  public void setGroupDescription(String groupDescription) {
-    this.groupDescription = groupDescription;
   }
 
   public String getTissueMaterialUrl() {

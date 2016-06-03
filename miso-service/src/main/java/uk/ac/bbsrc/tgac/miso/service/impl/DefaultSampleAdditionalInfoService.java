@@ -113,7 +113,7 @@ public class DefaultSampleAdditionalInfoService implements SampleAdditionalInfoS
     authorizationManager.throwIfUnauthenticated();
     return sampleAdditionalInfoDao.getSampleAdditionalInfo(sampleAdditionalInfoId);
   }
-  
+
   @Override
   public Long create(SampleAdditionalInfo sampleAdditionalInfo) throws IOException {
     authorizationManager.throwIfNonAdmin();
@@ -141,7 +141,7 @@ public class DefaultSampleAdditionalInfoService implements SampleAdditionalInfoS
     Date now = new Date();
     sampleAdditionalInfo.setCreationDate(now);
     sampleAdditionalInfo.setLastUpdated(now);
-    
+
     SampleClass sampleClass = sampleClassDao.getSampleClass(sampleAdditionalInfoDto.getSampleClassId());
     ServiceUtils.throwIfNull(sampleClass, "SampleAdditionalInfo.sampleClassId", sampleAdditionalInfoDto.getSampleClassId());
     sampleAdditionalInfo.setSampleClass(sampleClass);
@@ -149,7 +149,7 @@ public class DefaultSampleAdditionalInfoService implements SampleAdditionalInfoS
     loadMembers(sampleAdditionalInfo);
     return sampleAdditionalInfo;
   }
-  
+
   @Override
   public void update(SampleAdditionalInfo sampleAdditionalInfo) throws IOException {
     authorizationManager.throwIfNonAdmin();
@@ -158,7 +158,7 @@ public class DefaultSampleAdditionalInfoService implements SampleAdditionalInfoS
     updatedSampleAdditionalInfo.setUpdatedBy(authorizationManager.getCurrentUser());
     sampleAdditionalInfoDao.update(updatedSampleAdditionalInfo);
   }
-  
+
   @Override
   public void applyChanges(SampleAdditionalInfo target, SampleAdditionalInfo source) throws IOException {
     target.setPassageNumber(source.getPassageNumber());
@@ -167,20 +167,21 @@ public class DefaultSampleAdditionalInfoService implements SampleAdditionalInfoS
     target.setConcentration(source.getConcentration());
     target.setArchived(source.getArchived());
     target.setExternalInstituteIdentifier(source.getExternalInstituteIdentifier());
+    target.setGroupDescription(source.getGroupDescription());
+    target.setGroupId(source.getGroupId());
     loadMembers(target, source);
   }
-  
+
   @Override
   public void loadMembers(SampleAdditionalInfo target) throws IOException {
     loadMembers(target, target);
   }
-  
+
   @Override
   public void loadMembers(SampleAdditionalInfo target, SampleAdditionalInfo source) throws IOException {
     if (source.getTissueOrigin() != null) {
       target.setTissueOrigin(tissueOriginDao.getTissueOrigin(source.getTissueOrigin().getId()));
-      ServiceUtils.throwIfNull(target.getTissueOrigin(), "SampleAdditionalInfo.tissueOriginId", 
-          source.getTissueOrigin().getId());
+      ServiceUtils.throwIfNull(target.getTissueOrigin(), "SampleAdditionalInfo.tissueOriginId", source.getTissueOrigin().getId());
     }
     if (source.getTissueType() != null) {
       target.setTissueType(tissueTypeDao.getTissueType(source.getTissueType().getId()));
@@ -188,8 +189,7 @@ public class DefaultSampleAdditionalInfoService implements SampleAdditionalInfoS
     }
     if (source.getQcPassedDetail() != null) {
       target.setQcPassedDetail(qcPassedDetailDao.getQcPassedDetails(source.getQcPassedDetail().getId()));
-      ServiceUtils.throwIfNull(target.getQcPassedDetail(), "SampleAdditionalInfo.qcPassedDetailId", 
-          source.getQcPassedDetail().getId());
+      ServiceUtils.throwIfNull(target.getQcPassedDetail(), "SampleAdditionalInfo.qcPassedDetailId", source.getQcPassedDetail().getId());
     }
     if (source.getPrepKit() != null) {
       target.setPrepKit(sqlKitDao.getKitDescriptorById(source.getPrepKit().getId()));

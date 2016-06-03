@@ -409,11 +409,11 @@
   <c:if test="${not empty library.sample.sampleAnalyte.groupId}">
   <tr>
     <td class="h">Group ID:</td>
-    <td>${library.sample.sampleAnalyte.groupId}</td>
+    <td>${library.sample.sampleAdditionalInfo.groupId}</td>
   </tr>
   <tr>
     <td class="h">Group Description:</td>
-    <td>${library.sample.sampleAnalyte.groupDescription}</td>
+    <td>${library.sample.sampledditionalInfo.groupDescription}</td>
   </tr>
   </c:if>
 </c:when>

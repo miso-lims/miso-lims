@@ -146,6 +146,15 @@ var Sample = Sample || {
       // Concentration validation
       jQuery('#concentration').attr('class', 'form-control');
       jQuery('#concentration').attr('data-parsley-type', 'number');
+        
+      // Group ID validation
+      jQuery('#groupId').attr('class', 'form-control');
+      jQuery('#groupId').attr('data-parsley-type', 'integer');
+      
+      // Group Description validation
+      jQuery('#groupDescription').attr('class', 'form-control');
+      jQuery('#groupDescription').attr('data-parsley-maxlength', '255');
+      jQuery('#groupDescription').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
       
       var selectedId = jQuery('#sampleClass option:selected').val();
       var sampleCategory = Sample.options.getSampleCategoryByClassId(selectedId);
@@ -165,15 +174,6 @@ var Sample = Sample || {
         jQuery('#tubeId').attr('class', 'form-control');
         jQuery('#tubeId').attr('data-parsley-maxlength', '255');
         jQuery('#tubeId').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
-        
-        // Group ID validation
-        jQuery('#groupId').attr('class', 'form-control');
-        jQuery('#groupId').attr('data-parsley-type', 'integer');
-        
-        // Group Description validation
-        jQuery('#groupDescription').attr('class', 'form-control');
-        jQuery('#groupDescription').attr('data-parsley-maxlength', '255');
-        jQuery('#groupDescription').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
         break;
       }
     }

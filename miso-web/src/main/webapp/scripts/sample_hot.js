@@ -85,9 +85,9 @@ Sample.hot = {
       newSam.sampleAdditionalInfo.sampleClassAlias = Hot.getAliasFromId(newSam.sampleAdditionalInfo.sampleClassId, Hot.sampleOptions.sampleClassesDtos);
       newSam.sampleAdditionalInfo.parentId = parseInt(sam.id);
       newSam.sampleAdditionalInfo.parentAlias = clone(sam.alias);
-      if (sam.sampleAnalyte && sam.sampleAnalyte.groupId && sam.sampleAnalyte.groupId.length) {
-        newSam.sampleAnalyte.groupId = sam.sampleAnalyte.groupId;
-        newSam.sampleAnalyte.groupDescription = sam.sampleAnalyte.groupDescription;
+      if (sam.sampleAdditionalInfo.groupId.length) {
+        newSam.sampleAdditionalInfo.groupId = parseInt(sam.sampleAdditionalInfo.groupId);
+        newSam.sampleAdditionalInfo.groupDescription = sam.sampleAdditionalInfo.groupDescription;
       }
       
       return newSam;
@@ -239,12 +239,17 @@ Sample.hot = {
         Hot.startData = [];
       }
     }
+    // if detailedSample is enabled, re-store the selected sampleClassId for this table
+    if (Hot.detailedSample) {
+      Sample.hot.sampleClassId = document.getElementById('classDropdown').value;
+      Sample.hot.dataSchema.sampleAdditionalInfo.sampleClassAlias = Hot.getAliasFromId(Sample.hot.sampleClassId, Hot.sampleOptions.sampleClassesDtos);
+    }
     
     // make the table
     var sampleCategory = null;
     if (Hot.detailedSample) {
-      Sample.hot.sampleClassId = document.getElementById('classDropdown').value;
-      sampleCategory = Sample.hot.getCategoryFromClassId(Sample.hot.sampleClassId);
+      sampleCategory = Sample.hot.getCategoryFromClassId(document.getElementById('classDropdown').value);
+      Sample.hot.dataSchema.scientificName = "Homo sapiens";
     }
     Sample.hot.makeHOT(null, sampleCategory);
     
@@ -344,7 +349,7 @@ Sample.hot = {
     description: null,
     receivedDate: null,
     identificationBarcode: null,
-    scientificName: null,
+    scientificName: this.sciName,
     sampleType: null,
     alias: null,
     qcPassed: '',
@@ -370,7 +375,10 @@ Sample.hot = {
       prepKitId: null,
       prepKitAlias: null,
       concentration: null,
-      qcPassedDetailId: null
+      qcPassedDetailId: null,
+      groupId: null,
+      groupDescription:null
+
     },
     sampleAnalyte: {
       samplePurposeId: null,
@@ -379,9 +387,7 @@ Sample.hot = {
       tissueMaterialAlias: null,
       strStatus: null,
       region: null,
-      tubeId: null,
-      groupId: null,
-      groupDescription:null
+      tubeId: null
     },
     sampleTissue: {
       instituteTissueName: null,
@@ -661,12 +667,12 @@ Sample.hot = {
           type: 'text'
         },{
           header: 'Group ID',
-          data: 'sampleAnalyte.groupId',
+          data: 'sampleAdditionalInfo.groupId',
           type: 'numeric',
           validator: validateNumber
         },{
           header: 'Group Desc.',
-          data: 'sampleAnalyte.groupDescription',
+          data: 'sampleAdditionalInfo.groupDescription',
           type: 'text',
           validator: permitEmpty
         },{
@@ -953,7 +959,8 @@ Sample.hot = {
     sample.projectId = (parseInt(obj.projectId) || parseInt(document.getElementById('projectSelect').value));
     sample.scientificName = obj.scientificName;
     if (obj.receivedDate && obj.receivedDate.length) {
-      sample.receivedDate = obj.receivedDate;
+      // the time string is added for detailedSample because the server is expecting a datetime value
+      sample.receivedDate = obj.receivedDate += "T00:00:00-05:00";
     }
     
     // if it's a plain sample, return now.
@@ -1017,6 +1024,12 @@ Sample.hot = {
     if (obj.sampleAdditionalInfo.parentId) {
       sample.sampleAdditionalInfo.parentId = obj.sampleAdditionalInfo.parentId;
     }
+    if (obj.sampleAdditionalInfo.groupId) {
+      sample.sampleAdditionalInfo.groupId = obj.sampleAdditionalInfo.groupId;
+    }
+    if (obj.sampleAdditionalInfo.groupDescription && obj.sampleAdditionalInfo.groupDescription.length) {
+      sample.sampleAdditionalInfo.groupDescription = obj.sampleAdditionalInfo.groupDescription;
+    }
     
     // add sampleAnalyte attributes. 
     if (Sample.hot.getCategoryFromClassId(sample.sampleAdditionalInfo.sampleClassId) == 'Analyte') {
@@ -1040,12 +1053,6 @@ Sample.hot = {
         }
         if (obj.sampleAnalyte.tubeId && obj.sampleAnalyte.tubeId.length) {
           sample.sampleAnalyte.tubeId = obj.sampleAnalyte.tubeId;
-        }
-        if (obj.sampleAnalyte.groupId && obj.sampleAnalyte.groupId.length) {
-          sample.sampleAnalyte.groupId = obj.sampleAnalyte.groupId;
-        }
-        if (obj.sampleAnalyte.groupDescription && obj.sampleAnalyte.groupDescription.length) {
-          sample.sampleAnalyte.groupDescription = obj.sampleAnalyte.groupDescription;
         }
       }
     } else if (Sample.hot.getCategoryFromClassId(sample.sampleAdditionalInfo.sampleClassId) == 'Tissue') {
