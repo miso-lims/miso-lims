@@ -21,7 +21,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.PlatformStore;
 import uk.ac.bbsrc.tgac.miso.persistence.SequencingParametersDao;
 
 @Repository
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class HibernateSequencingParametersDao implements SequencingParametersDao {
 
   protected static final Logger log = LoggerFactory.getLogger(HibernateSequencingParametersDao.class);

@@ -33,6 +33,9 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,8 +47,6 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.transaction.annotation.Transactional;
 
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
@@ -70,6 +71,7 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
  * @author Rob Davey
  * @since 0.0.3
  */
+@Transactional(rollbackFor = Exception.class)
 public class SQLRunQCDAO implements RunQcStore {
   private static final String TABLE_NAME = "RunQC";
 
@@ -138,7 +140,6 @@ public class SQLRunQCDAO implements RunQcStore {
   }
 
   @Override
-  @Transactional(readOnly = false, rollbackFor = IOException.class)
   public long save(RunQC runQC) throws IOException {
     MapSqlParameterSource params = new MapSqlParameterSource();
     params.addValue("run_runId", runQC.getRun().getId());

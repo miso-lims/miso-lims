@@ -78,6 +78,7 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
  * @author Rob Davey
  * @since 0.0.2
  */
+@Transactional(rollbackFor = Exception.class)
 public class SQLTgacSubmissionDAO implements SubmissionStore, NamingSchemeAware<Submission> {
   private static final String TABLE_NAME = "Submission";
 
@@ -165,7 +166,6 @@ public class SQLTgacSubmissionDAO implements SubmissionStore, NamingSchemeAware<
   }
 
   @Override
-  @Transactional(readOnly = false, rollbackFor = IOException.class)
   public long save(Submission submission) throws IOException {
     SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName("Submission");
 

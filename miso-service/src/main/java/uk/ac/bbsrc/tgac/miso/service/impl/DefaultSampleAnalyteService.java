@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.User;
@@ -27,7 +26,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.TissueMaterialDao;
 import uk.ac.bbsrc.tgac.miso.service.SampleAnalyteService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 @Service
 public class DefaultSampleAnalyteService implements SampleAnalyteService {
 
@@ -89,7 +88,6 @@ public class DefaultSampleAnalyteService implements SampleAnalyteService {
   }
 
   @Override
-  @Transactional(propagation = Propagation.REQUIRED)
   public Long create(SampleAnalyteDto sampleAnalyteDto) throws IOException {
     authorizationManager.throwIfNonAdmin();
     User user = authorizationManager.getCurrentUser();
@@ -109,7 +107,6 @@ public class DefaultSampleAnalyteService implements SampleAnalyteService {
   }
 
   @Override
-  @Transactional(propagation = Propagation.REQUIRED)
   public SampleAnalyte to(SampleAnalyteDto sampleAnalyteDto) throws IOException {
     authorizationManager.throwIfUnauthenticated();
     User user = authorizationManager.getCurrentUser();

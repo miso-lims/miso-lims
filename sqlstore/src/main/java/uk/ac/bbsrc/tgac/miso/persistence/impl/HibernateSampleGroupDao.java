@@ -17,7 +17,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleGroupImpl;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleGroupDao;
 
 @Repository
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class HibernateSampleGroupDao implements SampleGroupDao {
 
   protected static final Logger log = LoggerFactory.getLogger(HibernateSampleGroupDao.class);

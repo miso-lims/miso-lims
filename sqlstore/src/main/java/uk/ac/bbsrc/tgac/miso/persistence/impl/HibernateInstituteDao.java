@@ -17,7 +17,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.InstituteImpl;
 import uk.ac.bbsrc.tgac.miso.persistence.InstituteDao;
 
 @Repository
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class HibernateInstituteDao implements InstituteDao {
   
   protected static final Logger log = LoggerFactory.getLogger(HibernateInstituteDao.class);

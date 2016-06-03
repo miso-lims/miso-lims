@@ -51,7 +51,7 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
  * that Hibernate cannot access. Similarly, it then follows any necessary links on save. All the SqlStore-populated fields are marked
  * “transient” in the Sample class.
  */
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class HibernateSampleDao implements SampleDao, SampleStore {
 
   protected static final Logger log = LoggerFactory.getLogger(HibernateSampleDao.class);

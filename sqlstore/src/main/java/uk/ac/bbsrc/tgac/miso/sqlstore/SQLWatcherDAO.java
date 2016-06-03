@@ -37,6 +37,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
@@ -53,6 +54,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.WatcherStore;
  * @date 07/10/11
  * @since 0.1.3
  */
+@Transactional(rollbackFor = Exception.class)
 public class SQLWatcherDAO implements WatcherStore {
   private static final String WATCHER_SELECT = "SELECT entityName, userId " + "FROM Watcher";
 

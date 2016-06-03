@@ -16,7 +16,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
 import uk.ac.bbsrc.tgac.miso.persistence.ReferenceGenomeDao;
 
 @Repository
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class HibernateReferenceGenomeDao implements ReferenceGenomeDao {
 
   protected static final Logger log = LoggerFactory.getLogger(HibernateReferenceGenomeDao.class);

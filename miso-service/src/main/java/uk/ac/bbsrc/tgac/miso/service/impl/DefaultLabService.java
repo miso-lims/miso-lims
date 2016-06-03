@@ -5,7 +5,6 @@ import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.User;
@@ -17,7 +16,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.LabDao;
 import uk.ac.bbsrc.tgac.miso.service.LabService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 @Service
 public class DefaultLabService implements LabService {
 
@@ -43,7 +42,6 @@ public class DefaultLabService implements LabService {
   }
 
   @Override
-  @Transactional(propagation = Propagation.REQUIRED)
   public Lab get(Long id) throws IOException {
     authorizationManager.throwIfUnauthenticated();
     return labDao.getLab(id);

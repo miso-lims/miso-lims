@@ -17,7 +17,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAnalyteImpl;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleAnalyteDao;
 
 @Repository
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class HibernateSampleAnalyteDao implements SampleAnalyteDao {
 
   protected static final Logger log = LoggerFactory.getLogger(HibernateSampleAnalyteDao.class);

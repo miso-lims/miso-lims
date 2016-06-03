@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.User;
@@ -20,7 +19,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.SampleValidRelationshipDao;
 import uk.ac.bbsrc.tgac.miso.service.SampleValidRelationshipService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 @Service
 public class DefaultSampleValidRelationshipService implements SampleValidRelationshipService {
 
@@ -82,7 +81,6 @@ public class DefaultSampleValidRelationshipService implements SampleValidRelatio
   }
 
   @Override
-  @Transactional(propagation = Propagation.REQUIRED)
   public Set<SampleValidRelationship> getAll() throws IOException {
     authorizationManager.throwIfUnauthenticated();
     return Sets.newHashSet(sampleValidRelationshipDao.getSampleValidRelationship());

@@ -17,7 +17,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrderImpl;
 import uk.ac.bbsrc.tgac.miso.persistence.PoolOrderDao;
 
 @Repository
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class HibernatePoolOrderDao implements PoolOrderDao {
 
   protected static final Logger log = LoggerFactory.getLogger(HibernatePoolOrderDao.class);

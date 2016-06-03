@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.User;
@@ -21,7 +20,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.IdentityDao;
 import uk.ac.bbsrc.tgac.miso.service.IdentityService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 @Service
 public class DefaultIdentityService implements IdentityService {
 
@@ -48,7 +47,6 @@ public class DefaultIdentityService implements IdentityService {
   }
 
   @Override
-  @Transactional(propagation = Propagation.REQUIRED)
   public Identity get(String externalName) {
     return identityDao.getIdentity(externalName);
   }
@@ -91,7 +89,6 @@ public class DefaultIdentityService implements IdentityService {
   }
 
   @Override
-  @Transactional(propagation = Propagation.REQUIRED)
   public Identity to(SampleIdentityDto sampleIdentityDto) throws IOException {
     authorizationManager.throwIfUnauthenticated();
     User user = authorizationManager.getCurrentUser();
