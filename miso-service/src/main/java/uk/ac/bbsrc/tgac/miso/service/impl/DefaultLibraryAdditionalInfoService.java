@@ -12,12 +12,10 @@ import org.springframework.transaction.annotation.Transactional;
 import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Sets;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.persistence.LibraryAdditionalInfoDao;
-import uk.ac.bbsrc.tgac.miso.persistence.SampleGroupDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueOriginDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueTypeDao;
 import uk.ac.bbsrc.tgac.miso.service.LibraryAdditionalInfoService;
@@ -28,25 +26,25 @@ import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 public class DefaultLibraryAdditionalInfoService implements LibraryAdditionalInfoService {
 
   protected static final Logger log = LoggerFactory.getLogger(DefaultLibraryAdditionalInfoService.class);
-  
+
   @Autowired
   private LibraryAdditionalInfoDao libraryAdditionalInfoDao;
-  
+
   @Autowired
   private LibraryStore libraryStore;
-  
+
   @Autowired
   private TissueOriginDao tissueOriginDao;
-  
+
   @Autowired
   private TissueTypeDao tissueTypeDao;
-  
+
   @Autowired
   private KitStore kitStore;
-  
+
   @Autowired
   private AuthorizationManager authorizationManager;
-  
+
   @Override
   public LibraryAdditionalInfo get(Long id) throws IOException {
     authorizationManager.throwIfUnauthenticated();
@@ -54,8 +52,7 @@ public class DefaultLibraryAdditionalInfoService implements LibraryAdditionalInf
   }
 
   @Override
-  public Long create(LibraryAdditionalInfo libraryAdditionalInfo, Long libraryId)
-      throws IOException {
+  public Long create(LibraryAdditionalInfo libraryAdditionalInfo, Long libraryId) throws IOException {
     authorizationManager.throwIfNotWritable(libraryStore.get(libraryId));
     libraryAdditionalInfo.setLibrary(libraryStore.get(libraryId));
     libraryAdditionalInfo.setTissueOrigin(tissueOriginDao.getTissueOrigin(libraryAdditionalInfo.getTissueOrigin().getId()));
@@ -63,9 +60,10 @@ public class DefaultLibraryAdditionalInfoService implements LibraryAdditionalInf
     if (libraryAdditionalInfo.getPrepKit() != null) {
       libraryAdditionalInfo.setPrepKit(kitStore.getKitDescriptorById(libraryAdditionalInfo.getPrepKit().getId()));
     }
-    if (libraryAdditionalInfo.getLibrary().getSample().getSampleAnalyte().getGroupId() != null) {
-      libraryAdditionalInfo.setGroupId(libraryAdditionalInfo.getLibrary().getSample().getSampleAnalyte().getGroupId());
-      libraryAdditionalInfo.setGroupDescription(libraryAdditionalInfo.getLibrary().getSample().getSampleAnalyte().getGroupDescription());
+    if (libraryAdditionalInfo.getLibrary().getSample().getSampleAdditionalInfo().getGroupId() != null) {
+      libraryAdditionalInfo.setGroupId(libraryAdditionalInfo.getLibrary().getSample().getSampleAdditionalInfo().getGroupId());
+      libraryAdditionalInfo
+          .setGroupDescription(libraryAdditionalInfo.getLibrary().getSample().getSampleAdditionalInfo().getGroupDescription());
     }
     User user = authorizationManager.getCurrentUser();
     libraryAdditionalInfo.setCreatedBy(user);
@@ -74,8 +72,7 @@ public class DefaultLibraryAdditionalInfoService implements LibraryAdditionalInf
   }
 
   @Override
-  public void update(LibraryAdditionalInfo libraryAdditionalInfo)
-      throws IOException {
+  public void update(LibraryAdditionalInfo libraryAdditionalInfo) throws IOException {
     authorizationManager.throwIfNotWritable(libraryAdditionalInfo.getLibrary());
     LibraryAdditionalInfo updated = get(libraryAdditionalInfo.getLibraryId());
     updated.setTissueOrigin(tissueOriginDao.getTissueOrigin(libraryAdditionalInfo.getTissueOrigin().getId()));

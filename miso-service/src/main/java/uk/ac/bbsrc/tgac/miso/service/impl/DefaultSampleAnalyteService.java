@@ -151,8 +151,6 @@ public class DefaultSampleAnalyteService implements SampleAnalyteService {
     target.setRegion(source.getRegion());
     target.setTubeId(source.getTubeId());
     target.setStrStatus(source.getStrStatus());
-    target.setGroupId(source.getGroupId());
-    target.setGroupDescription(source.getGroupDescription());
     loadMembers(target, source);
   }
 
@@ -175,8 +173,7 @@ public class DefaultSampleAnalyteService implements SampleAnalyteService {
   }
 
   @Override
-  public void loadMembers(SampleAnalyte target, SampleAnalyte source)
-      throws IOException {
+  public void loadMembers(SampleAnalyte target, SampleAnalyte source) throws IOException {
     if (source.getSamplePurpose() != null) {
       target.setSamplePurpose(samplePurposeDao.getSamplePurpose(source.getSamplePurpose().getId()));
     }

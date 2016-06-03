@@ -85,9 +85,9 @@ Sample.hot = {
       newSam.sampleAdditionalInfo.sampleClassAlias = Hot.getAliasFromId(newSam.sampleAdditionalInfo.sampleClassId, Hot.sampleOptions.sampleClassesDtos);
       newSam.sampleAdditionalInfo.parentId = parseInt(sam.id);
       newSam.sampleAdditionalInfo.parentAlias = clone(sam.alias);
-      if (sam.sampleAnalyte && sam.sampleAnalyte.groupId.length) {
-        newSam.sampleAnalyte.groupId = sam.sampleAnalyte.groupId;
-        newSam.sampleAnalyte.groupDescription = sam.sampleAnalyte.groupDescription;
+      if (sam.sampleAdditionalInfo.groupId.length) {
+        newSam.sampleAdditionalInfo.groupId = parseInt(sam.sampleAdditionalInfo.groupId);
+        newSam.sampleAdditionalInfo.groupDescription = sam.sampleAdditionalInfo.groupDescription;
       }
       
       return newSam;
@@ -375,7 +375,10 @@ Sample.hot = {
       prepKitId: null,
       prepKitAlias: null,
       concentration: null,
-      qcPassedDetailId: null
+      qcPassedDetailId: null,
+      groupId: null,
+      groupDescription:null
+
     },
     sampleAnalyte: {
       samplePurposeId: null,
@@ -384,9 +387,7 @@ Sample.hot = {
       tissueMaterialAlias: null,
       strStatus: null,
       region: null,
-      tubeId: null,
-      groupId: null,
-      groupDescription:null
+      tubeId: null
     },
     sampleTissue: {
       instituteTissueName: null,
@@ -654,12 +655,12 @@ Sample.hot = {
           type: 'text'
         },{
           header: 'Group ID',
-          data: 'sampleAnalyte.groupId',
+          data: 'sampleAdditionalInfo.groupId',
           type: 'numeric',
           validator: validateNumber
         },{
           header: 'Group Desc.',
-          data: 'sampleAnalyte.groupDescription',
+          data: 'sampleAdditionalInfo.groupDescription',
           type: 'text',
           validator: permitEmpty
         },{
@@ -1011,6 +1012,12 @@ Sample.hot = {
     if (obj.sampleAdditionalInfo.parentId) {
       sample.sampleAdditionalInfo.parentId = obj.sampleAdditionalInfo.parentId;
     }
+    if (obj.sampleAdditionalInfo.groupId) {
+      sample.sampleAdditionalInfo.groupId = obj.sampleAdditionalInfo.groupId;
+    }
+    if (obj.sampleAdditionalInfo.groupDescription && obj.sampleAdditionalInfo.groupDescription.length) {
+      sample.sampleAdditionalInfo.groupDescription = obj.sampleAdditionalInfo.groupDescription;
+    }
     
     // add sampleAnalyte attributes. 
     if (Sample.hot.getCategoryFromClassId(sample.sampleAdditionalInfo.sampleClassId) == 'Analyte') {
@@ -1034,12 +1041,6 @@ Sample.hot = {
         }
         if (obj.sampleAnalyte.tubeId && obj.sampleAnalyte.tubeId.length) {
           sample.sampleAnalyte.tubeId = obj.sampleAnalyte.tubeId;
-        }
-        if (obj.sampleAnalyte.groupId && obj.sampleAnalyte.groupId.length) {
-          sample.sampleAnalyte.groupId = obj.sampleAnalyte.groupId;
-        }
-        if (obj.sampleAnalyte.groupDescription && obj.sampleAnalyte.groupDescription.length) {
-          sample.sampleAnalyte.groupDescription = obj.sampleAnalyte.groupDescription;
         }
       }
     } else if (Sample.hot.getCategoryFromClassId(sample.sampleAdditionalInfo.sampleClassId) == 'Tissue') {

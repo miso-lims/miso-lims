@@ -36,9 +36,6 @@ public class SampleAnalyteImpl implements SampleAnalyte {
   @JoinColumn(name = "samplePurposeId")
   private SamplePurpose samplePurpose;
 
-  private Long groupId;
-  private String groupDescription;
-
   @OneToOne(targetEntity = TissueMaterialImpl.class)
   @JoinColumn(name = "tissueMaterialId")
   private TissueMaterial tissueMaterial;
@@ -91,26 +88,6 @@ public class SampleAnalyteImpl implements SampleAnalyte {
   @Override
   public void setSamplePurpose(SamplePurpose samplePurpose) {
     this.samplePurpose = samplePurpose;
-  }
-
-  @Override
-  public Long getGroupId() {
-    return groupId;
-  }
-
-  @Override
-  public void setGroupId(Long groupId) {
-    this.groupId = groupId;
-  }
-
-  @Override
-  public String getGroupDescription() {
-    return groupDescription;
-  }
-
-  @Override
-  public void setGroupDescription(String groupDescription) {
-    this.groupDescription = groupDescription;
   }
 
   @Override
@@ -200,12 +177,9 @@ public class SampleAnalyteImpl implements SampleAnalyte {
 
   @Override
   public String toString() {
-    return "SampleAnalyteImpl [sampleId=" + sampleId + ", sample=" + sample
-        + ", samplePurpose=" + samplePurpose + ", groupId=" + groupId + ", groupDescription=" + groupDescription
-        + ", tissueMaterial=" + tissueMaterial + ", strStatus=" + strStatus
-        + ", region=" + region + ", tubeId=" + tubeId + ", createdBy="
-        + createdBy + ", creationDate=" + creationDate + ", updatedBy="
-        + updatedBy + ", lastUpdated=" + lastUpdated + "]";
+    return "SampleAnalyteImpl [sampleId=" + sampleId + ", sample=" + sample + ", samplePurpose=" + samplePurpose + ", tissueMaterial="
+        + tissueMaterial + ", strStatus=" + strStatus + ", region=" + region + ", tubeId=" + tubeId + ", createdBy=" + createdBy
+        + ", creationDate=" + creationDate + ", updatedBy=" + updatedBy + ", lastUpdated=" + lastUpdated + "]";
   }
 
 }

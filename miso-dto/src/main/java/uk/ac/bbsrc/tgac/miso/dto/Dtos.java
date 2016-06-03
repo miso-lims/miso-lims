@@ -3,7 +3,6 @@ package uk.ac.bbsrc.tgac.miso.dto;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -239,6 +238,12 @@ public class Dtos {
       dto.setParentAlias(from.getParent().getAlias());
       dto.setParentSampleClassId(from.getParent().getSampleAdditionalInfo().getSampleClass().getId());
     }
+    if (from.getGroupId() != null) {
+      dto.setGroupId(from.getGroupId());
+    }
+    if (from.getGroupDescription() != null) {
+      dto.setGroupDescription(from.getGroupDescription());
+    }
     dto.setPassageNumber(from.getPassageNumber());
     dto.setTimesReceived(from.getTimesReceived());
     dto.setConcentration(from.getConcentration());
@@ -318,6 +323,10 @@ public class Dtos {
         parent.getSampleAdditionalInfo().setSampleClass(new SampleClassImpl());
         parent.getSampleAdditionalInfo().getSampleClass().setId(from.getParentSampleClassId());
       }
+    }
+    if (from.getGroupId() != null) {
+      to.setGroupId(from.getGroupId());
+      to.setGroupDescription(from.getGroupDescription());
     }
     if (parent != null) {
       to.setParent(parent);
@@ -416,12 +425,6 @@ public class Dtos {
     if (from.getSamplePurpose() != null) {
       dto.setSamplePurposeId(from.getSamplePurpose().getId());
     }
-    if (from.getGroupId() != null) {
-      dto.setGroupId(from.getGroupId());
-    }
-    if (from.getGroupDescription() != null) {
-      dto.setGroupDescription(from.getGroupDescription());
-    }
     if (from.getTissueMaterial() != null) {
       dto.setTissueMaterialId(from.getTissueMaterial().getId());
     }
@@ -451,10 +454,6 @@ public class Dtos {
     to.setId(from.getSampleId());
     to.setRegion(from.getRegion());
     to.setTubeId(from.getTubeId());
-    if (from.getGroupId() != null) {
-      to.setGroupId(from.getGroupId());
-      to.setGroupDescription(from.getGroupDescription());
-    }
     if (from.getSamplePurposeId() != null) {
       to.setSamplePurpose(new SamplePurposeImpl());
       to.getSamplePurpose().setId(from.getSamplePurposeId());

@@ -484,6 +484,18 @@
           <td class="h">Concentration (nM):</td>
           <td><form:input id="concentration" path="sampleAdditionalInfo.concentration"/></td>                               
         </tr>
+        <tr>
+          <td class="h">Group ID:</td>
+          <td>
+            <form:input id="groupId" path="sampleAdditionalInfo.groupId"/>
+          </td>
+        </tr>
+        <tr>
+          <td class="h">Group Description:</td>
+          <td>
+            <form:input id="groupDescription" path="sampleAdditionalInfo.groupDescription"/>
+          </td>
+        </tr>
       </table>
       
       <c:if test="${!empty sample.sampleTissue}">
@@ -509,18 +521,6 @@
               <td>
                 <miso:select id="samplePurpose" path="sampleAnalyte.samplePurpose" items="${samplePurposes}" itemLabel="alias" 
                     itemValue="id" defaultLabel="Unknown" defaultValue=""/>
-              </td>
-            </tr>
-            <tr>
-              <td class="h">Group ID:</td>
-              <td>
-                <form:input id="groupId" path="sampleAnalyte.groupId"/>
-              </td>
-            </tr>
-            <tr>
-              <td class="h">Group Description:</td>
-              <td>
-                <form:input id="groupDescription" path="sampleAnalyte.groupDescription"/>
               </td>
             </tr>
             <tr>

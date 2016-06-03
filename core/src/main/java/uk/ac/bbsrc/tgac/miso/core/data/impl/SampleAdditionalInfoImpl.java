@@ -37,7 +37,7 @@ public class SampleAdditionalInfoImpl implements SampleAdditionalInfo {
   @JoinColumn(name = "sampleId", nullable = false)
   @MapsId
   private Sample sample;
-  
+
   @ManyToOne(optional = true, targetEntity = SampleImpl.class)
   @JoinColumn(name = "parentId", nullable = true)
   private Sample parent;
@@ -64,7 +64,7 @@ public class SampleAdditionalInfoImpl implements SampleAdditionalInfo {
   @OneToOne(targetEntity = SubprojectImpl.class)
   @JoinColumn(name = "subprojectId")
   private Subproject subproject;
-  
+
   private String externalInstituteIdentifier;
 
   @OneToOne(targetEntity = LabImpl.class)
@@ -86,8 +86,11 @@ public class SampleAdditionalInfoImpl implements SampleAdditionalInfo {
 
   @Column(nullable = false)
   private Boolean archived = Boolean.FALSE;
-  
+
   private Integer siblingNumber;
+
+  private Long groupId;
+  private String groupDescription;
 
   @OneToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "createdBy", nullable = false)
@@ -132,12 +135,12 @@ public class SampleAdditionalInfoImpl implements SampleAdditionalInfo {
   public void setParent(Sample parent) {
     this.parent = parent;
   }
-  
+
   @Override
   public Set<Sample> getChildren() {
     return children;
   }
-  
+
   @Override
   public void setChildren(Set<Sample> children) {
     this.children = children;
@@ -299,12 +302,12 @@ public class SampleAdditionalInfoImpl implements SampleAdditionalInfo {
       this.kitDescriptorId = prepKit.getId();
     }
   }
-  
+
   @Override
   public String getExternalInstituteIdentifier() {
     return externalInstituteIdentifier;
   }
-  
+
   @Override
   public void setExternalInstituteIdentifier(String externalInstituteIdentifier) {
     this.externalInstituteIdentifier = externalInstituteIdentifier;
@@ -324,7 +327,6 @@ public class SampleAdditionalInfoImpl implements SampleAdditionalInfo {
   public Long getHibernateKitDescriptorId() {
     return kitDescriptorId;
   }
-  
 
   @Override
   public Integer getSiblingNumber() {
@@ -337,19 +339,34 @@ public class SampleAdditionalInfoImpl implements SampleAdditionalInfo {
   }
 
   @Override
+  public Long getGroupId() {
+    return groupId;
+  }
+
+  @Override
+  public void setGroupId(Long groupId) {
+    this.groupId = groupId;
+  }
+
+  @Override
+  public String getGroupDescription() {
+    return groupDescription;
+  }
+
+  @Override
+  public void setGroupDescription(String groupDescription) {
+    this.groupDescription = groupDescription;
+  }
+
+  @Override
   public String toString() {
-    return "SampleAdditionalInfoImpl [sampleId=" + sampleId + ", sample="
-        + sample + ", parent=" + parent + ", sampleClass=" + sampleClass
-        + ", tissueOrigin=" + tissueOrigin + ", tissueType=" + tissueType
-        + ", qcPassedDetail=" + qcPassedDetail + ", subproject=" + subproject
-        + ", externalInstituteIdentifier=" + externalInstituteIdentifier
-        + ", lab=" + lab + ", kitDescriptorId=" + kitDescriptorId
-        + ", prepKit=" + prepKit + ", passageNumber=" + passageNumber
-        + ", timesReceived=" + timesReceived + ", tubeNumber=" + tubeNumber
-        + ", concentration=" + concentration + ", archived=" + archived
-        + ", siblingNumber=" + siblingNumber + ", createdBy=" + createdBy
-        + ", creationDate=" + creationDate + ", updatedBy=" + updatedBy
-        + ", lastUpdated=" + lastUpdated + "]";
+    return "SampleAdditionalInfoImpl [sampleId=" + sampleId + ", sample=" + sample + ", parent=" + parent + ", sampleClass=" + sampleClass
+        + ", tissueOrigin=" + tissueOrigin + ", tissueType=" + tissueType + ", qcPassedDetail=" + qcPassedDetail + ", subproject="
+        + subproject + ", externalInstituteIdentifier=" + externalInstituteIdentifier + ", lab=" + lab + ", kitDescriptorId="
+        + kitDescriptorId + ", prepKit=" + prepKit + ", passageNumber=" + passageNumber + ", timesReceived=" + timesReceived
+        + ", tubeNumber=" + tubeNumber + ", concentration=" + concentration + ", archived=" + archived + ", siblingNumber=" + siblingNumber
+        + ", groupId=" + groupId + ", groupDescription=" + groupDescription + ", createdBy=" + createdBy + ", creationDate=" + creationDate
+        + ", updatedBy=" + updatedBy + ", lastUpdated=" + lastUpdated + "]";
   }
 
 }
