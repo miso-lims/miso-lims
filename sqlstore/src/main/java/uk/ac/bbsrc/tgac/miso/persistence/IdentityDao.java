@@ -12,10 +12,6 @@ public interface IdentityDao {
 
   Identity getIdentity(String externalName);
 
-  Long addIdentity(Identity identity);
-
   void deleteIdentity(Identity identity);
-
-  void update(Identity identity);
 
 }

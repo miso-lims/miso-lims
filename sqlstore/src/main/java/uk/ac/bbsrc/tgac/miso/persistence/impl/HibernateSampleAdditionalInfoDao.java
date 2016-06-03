@@ -2,7 +2,6 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 import org.hibernate.Query;
@@ -83,24 +82,8 @@ public class HibernateSampleAdditionalInfoDao implements SampleAdditionalInfoDao
   }
 
   @Override
-  public Long addSampleAdditionalInfo(SampleAdditionalInfo sampleAdditionalInfo) {
-    Date now = new Date();
-    sampleAdditionalInfo.setCreationDate(now);
-    sampleAdditionalInfo.setLastUpdated(now);
-    return (Long) currentSession().save(sampleAdditionalInfo);
-  }
-
-  @Override
   public void deleteSampleAdditionalInfo(SampleAdditionalInfo sampleAdditionalInfo) {
     currentSession().delete(sampleAdditionalInfo);
-
-  }
-
-  @Override
-  public void update(SampleAdditionalInfo sampleAdditionalInfo) {
-    Date now = new Date();
-    sampleAdditionalInfo.setLastUpdated(now);
-    currentSession().update(sampleAdditionalInfo);
   }
 
 }

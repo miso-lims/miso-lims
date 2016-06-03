@@ -107,28 +107,6 @@ public class SampleAnalyteController extends RestController {
     return sampleAnalyteDtos;
   }
 
-  @RequestMapping(value = "/analyte", method = RequestMethod.POST, headers = { "Content-type=application/json" })
-  @ResponseBody
-  public ResponseEntity<?> createSampleAnalyte(@RequestBody SampleAnalyteDto sampleAnalyteDto, UriComponentsBuilder b,
-      HttpServletResponse response) throws IOException {
-    SampleAnalyte sampleAnalyte = Dtos.to(sampleAnalyteDto);
-    Long id = sampleAnalyteService.create(sampleAnalyte);
-    UriComponents uriComponents = b.path("/sampleanalyte/{id}").buildAndExpand(id);
-    HttpHeaders headers = new HttpHeaders();
-    headers.setLocation(uriComponents.toUri());
-    return new ResponseEntity<>(headers, HttpStatus.CREATED);
-  }
-
-  @RequestMapping(value = "/analyte/{id}", method = RequestMethod.PUT, headers = { "Content-type=application/json" })
-  @ResponseBody
-  public ResponseEntity<?> updateSampleAnalyte(@PathVariable("id") Long id, @RequestBody SampleAnalyteDto sampleAnalyteDto,
-      HttpServletResponse response) throws IOException {
-    SampleAnalyte sampleAnalyte = Dtos.to(sampleAnalyteDto);
-    sampleAnalyte.setId(id);
-    sampleAnalyteService.update(sampleAnalyte);
-    return new ResponseEntity<>(HttpStatus.OK);
-  }
-
   @RequestMapping(value = "/analyte/{id}", method = RequestMethod.DELETE)
   @ResponseBody
   public ResponseEntity<?> deleteSampleAnalyte(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {

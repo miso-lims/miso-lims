@@ -1,6 +1,5 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import java.util.Date;
 import java.util.List;
 
 import org.hibernate.Query;
@@ -54,25 +53,8 @@ public class HibernateSampleAnalyteDao implements SampleAnalyteDao {
   }
 
   @Override
-  public Long addSampleAnalyte(SampleAnalyte sampleAnalyte) {
-    Date now = new Date();
-    sampleAnalyte.setCreationDate(now);
-    sampleAnalyte.setLastUpdated(now);
-    System.out.println("********* " + sampleAnalyte);
-    return (Long) currentSession().save(sampleAnalyte);
-  }
-
-  @Override
   public void deleteSampleAnalyte(SampleAnalyte sampleAnalyte) {
     currentSession().delete(sampleAnalyte);
-
-  }
-
-  @Override
-  public void update(SampleAnalyte sampleAnalyte) {
-    Date now = new Date();
-    sampleAnalyte.setLastUpdated(now);
-    currentSession().update(sampleAnalyte);
   }
 
 }
