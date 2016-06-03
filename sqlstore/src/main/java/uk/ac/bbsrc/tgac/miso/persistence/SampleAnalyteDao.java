@@ -12,10 +12,6 @@ public interface SampleAnalyteDao {
 
   SampleAnalyte getSampleAnalyteBySampleId(Long id);
 
-  Long addSampleAnalyte(SampleAnalyte sampleAnalyte);
-
   void deleteSampleAnalyte(SampleAnalyte sampleAnalyte);
-
-  void update(SampleAnalyte sampleAnalyte);
 
 }

@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.User;
@@ -17,9 +18,6 @@ import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
-import uk.ac.bbsrc.tgac.miso.dto.Dtos;
-import uk.ac.bbsrc.tgac.miso.dto.SampleAdditionalInfoDto;
 import uk.ac.bbsrc.tgac.miso.persistence.QcPassedDetailDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleAdditionalInfoDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleClassDao;
@@ -112,51 +110,6 @@ public class DefaultSampleAdditionalInfoService implements SampleAdditionalInfoS
   public SampleAdditionalInfo get(Long sampleAdditionalInfoId) throws IOException {
     authorizationManager.throwIfUnauthenticated();
     return sampleAdditionalInfoDao.getSampleAdditionalInfo(sampleAdditionalInfoId);
-  }
-
-  @Override
-  public Long create(SampleAdditionalInfo sampleAdditionalInfo) throws IOException {
-    authorizationManager.throwIfNonAdmin();
-    User user = authorizationManager.getCurrentUser();
-    Sample sample = sampleDao.getSample(sampleAdditionalInfo.getId());
-    sampleAdditionalInfo.setSample(sample);
-
-    loadMembers(sampleAdditionalInfo);
-
-    sampleAdditionalInfo.setCreatedBy(user);
-    sampleAdditionalInfo.setUpdatedBy(user);
-    return sampleAdditionalInfoDao.addSampleAdditionalInfo(sampleAdditionalInfo);
-  }
-
-  @Override
-  public SampleAdditionalInfo to(SampleAdditionalInfoDto sampleAdditionalInfoDto) throws IOException {
-    authorizationManager.throwIfUnauthenticated();
-    checkArgument(sampleAdditionalInfoDto.getSampleClassId() != null,
-        "A SampleAdditionalInfo.sampleClassId must be provided to construct SampleAdditionalInfo.");
-    User user = authorizationManager.getCurrentUser();
-
-    SampleAdditionalInfo sampleAdditionalInfo = Dtos.to(sampleAdditionalInfoDto);
-    sampleAdditionalInfo.setCreatedBy(user);
-    sampleAdditionalInfo.setUpdatedBy(user);
-    Date now = new Date();
-    sampleAdditionalInfo.setCreationDate(now);
-    sampleAdditionalInfo.setLastUpdated(now);
-
-    SampleClass sampleClass = sampleClassDao.getSampleClass(sampleAdditionalInfoDto.getSampleClassId());
-    ServiceUtils.throwIfNull(sampleClass, "SampleAdditionalInfo.sampleClassId", sampleAdditionalInfoDto.getSampleClassId());
-    sampleAdditionalInfo.setSampleClass(sampleClass);
-
-    loadMembers(sampleAdditionalInfo);
-    return sampleAdditionalInfo;
-  }
-
-  @Override
-  public void update(SampleAdditionalInfo sampleAdditionalInfo) throws IOException {
-    authorizationManager.throwIfNonAdmin();
-    SampleAdditionalInfo updatedSampleAdditionalInfo = get(sampleAdditionalInfo.getId());
-    applyChanges(updatedSampleAdditionalInfo, sampleAdditionalInfo);
-    updatedSampleAdditionalInfo.setUpdatedBy(authorizationManager.getCurrentUser());
-    sampleAdditionalInfoDao.update(updatedSampleAdditionalInfo);
   }
 
   @Override

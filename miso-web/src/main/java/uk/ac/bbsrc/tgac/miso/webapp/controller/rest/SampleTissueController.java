@@ -10,17 +10,14 @@ import javax.ws.rs.core.Response.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
-import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
@@ -77,28 +74,6 @@ public class SampleTissueController extends RestController {
       }
       return sampleTissueDtos;
     }
-  }
-
-  @RequestMapping(value = "/tissue", method = RequestMethod.POST, headers = { "Content-type=application/json" })
-  @ResponseBody
-  public ResponseEntity<?> createSampleTissue(@RequestBody SampleTissueDto sampletissueDto, UriComponentsBuilder uriBuilder)
-      throws IOException {
-    SampleTissue sampleTissue = Dtos.to(sampletissueDto);
-    Long id = getSampleTissueService().create(sampleTissue);
-    UriComponents uriComponents = uriBuilder.path("/sample/tissue/{id}").buildAndExpand(id);
-    HttpHeaders headers = new HttpHeaders();
-    headers.setLocation(uriComponents.toUri());
-    return new ResponseEntity<>(headers, HttpStatus.CREATED);
-  }
-
-  @RequestMapping(value = "/tissue/{id}", method = RequestMethod.PUT, headers = { "Content-type=application/json" })
-  @ResponseBody
-  public ResponseEntity<?> updateSampleTissue(@PathVariable("id") Long id, @RequestBody SampleTissueDto sampleTissueDto,
-      UriComponentsBuilder uriBuilder) throws IOException {
-    SampleTissue sampleTissue = Dtos.to(sampleTissueDto);
-    sampleTissue.setId(id);
-    getSampleTissueService().update(sampleTissue);
-    return new ResponseEntity<>(HttpStatus.OK);
   }
 
   @RequestMapping(value = "/tissue/{id}", method = RequestMethod.DELETE)
