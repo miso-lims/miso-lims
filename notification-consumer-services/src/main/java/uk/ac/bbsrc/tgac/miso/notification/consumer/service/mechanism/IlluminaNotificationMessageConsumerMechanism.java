@@ -72,6 +72,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.InterrogationException;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersCollection;
 import uk.ac.bbsrc.tgac.miso.core.service.integration.mechanism.NotificationMessageConsumerMechanism;
+import uk.ac.bbsrc.tgac.miso.notification.service.IlluminaTransformer;
 import uk.ac.bbsrc.tgac.miso.tools.run.RunFolderConstants;
 
 /**
@@ -124,7 +125,7 @@ public class IlluminaNotificationMessageConsumerMechanism
     StringBuilder sb = new StringBuilder();
 
     for (JSONObject run : (Iterable<JSONObject>) runs) {
-      String runName = run.getString("runName");
+      String runName = run.getString(IlluminaTransformer.JSON_RUN_NAME);
       sb.append("Processing " + runName);
       log.debug("Processing " + runName);
       Status is = new IlluminaStatus();
@@ -145,7 +146,7 @@ public class IlluminaNotificationMessageConsumerMechanism
         if (attemptRunPopulation) {
           if (r == null) {
             log.debug("Saving new run and status: " + runName);
-            if (!run.has("status")) {
+            if (!run.has(IlluminaTransformer.JSON_STATUS)) {
               // probably MiSeq
               r = new IlluminaRun();
               r.setPlatformRunId(Integer.parseInt(m.group(2)));
@@ -156,25 +157,25 @@ public class IlluminaNotificationMessageConsumerMechanism
               is.setHealth(ht);
               r.setStatus(is);
             } else {
-              String xml = run.getString("status");
+              String xml = run.getString(IlluminaTransformer.JSON_STATUS);
               is = new IlluminaStatus(xml);
               r = new IlluminaRun(xml);
               is.setHealth(ht);
               r.getStatus().setHealth(ht);
             }
 
-            if (run.has("fullPath")) {
-              r.setFilePath(run.getString("fullPath"));
+            if (run.has(IlluminaTransformer.JSON_FULL_PATH)) {
+              r.setFilePath(run.getString(IlluminaTransformer.JSON_FULL_PATH));
             }
 
-            if (run.has("numCycles")) {
-              r.setCycles(Integer.parseInt(run.getString("numCycles")));
+            if (run.has(IlluminaTransformer.JSON_NUM_CYCLES)) {
+              r.setCycles(Integer.parseInt(run.getString(IlluminaTransformer.JSON_NUM_CYCLES)));
             }
 
             SequencerReference sr = null;
-            if (run.has("sequencerName")) {
-              sr = requestManager.getSequencerReferenceByName(run.getString("sequencerName"));
-              r.getStatus().setInstrumentName(run.getString("sequencerName"));
+            if (run.has(IlluminaTransformer.JSON_SEQUENCER_NAME)) {
+              sr = requestManager.getSequencerReferenceByName(run.getString(IlluminaTransformer.JSON_SEQUENCER_NAME));
+              r.getStatus().setInstrumentName(run.getString(IlluminaTransformer.JSON_SEQUENCER_NAME));
               r.setSequencerReference(sr);
             }
             if (r.getSequencerReference() == null) {
@@ -191,22 +192,22 @@ public class IlluminaNotificationMessageConsumerMechanism
             } else {
               log.debug("Setting sequencer reference: " + sr.getName());
 
-              if (run.has("startDate")) {
+              if (run.has(IlluminaTransformer.JSON_START_DATE)) {
                 try {
-                  if (!isStringEmptyOrNull(run.getString("startDate")) && !"null".equals(run.getString("startDate"))) {
-                    log.debug("Updating start date:" + run.getString("startDate"));
-                    r.getStatus().setStartDate(illuminaRunFolderDateFormat.parse(run.getString("startDate")));
+                  if (!isStringEmptyOrNull(run.getString(IlluminaTransformer.JSON_START_DATE)) && !"null".equals(run.getString(IlluminaTransformer.JSON_START_DATE))) {
+                    log.debug("Updating start date:" + run.getString(IlluminaTransformer.JSON_START_DATE));
+                    r.getStatus().setStartDate(illuminaRunFolderDateFormat.parse(run.getString(IlluminaTransformer.JSON_START_DATE)));
                   }
                 } catch (ParseException e) {
                   log.error("run JSON", e);
                 }
               }
 
-              if (run.has("completionDate")) {
+              if (run.has(IlluminaTransformer.JSON_COMPLETE_DATE)) {
                 try {
-                  if (!"null".equals(run.getString("completionDate")) && !isStringEmptyOrNull(run.getString("completionDate"))) {
-                    log.debug("Updating completion date:" + run.getString("completionDate"));
-                    r.getStatus().setCompletionDate(logDateFormat.parse(run.getString("completionDate")));
+                  if (!"null".equals(run.getString(IlluminaTransformer.JSON_COMPLETE_DATE)) && !isStringEmptyOrNull(run.getString(IlluminaTransformer.JSON_COMPLETE_DATE))) {
+                    log.debug("Updating completion date:" + run.getString(IlluminaTransformer.JSON_COMPLETE_DATE));
+                    r.getStatus().setCompletionDate(logDateFormat.parse(run.getString(IlluminaTransformer.JSON_COMPLETE_DATE)));
                   }
                 } catch (ParseException e) {
                   log.error("run JSON", e);
@@ -232,14 +233,14 @@ public class IlluminaNotificationMessageConsumerMechanism
                 r.getStatus().setHealth(ht);
               }
 
-              if (run.has("status")) {
-                r.getStatus().setXml(run.getString("status"));
+              if (run.has(IlluminaTransformer.JSON_STATUS)) {
+                r.getStatus().setXml(run.getString(IlluminaTransformer.JSON_STATUS));
               } else {
                 log.debug("No new status XML information coming through from notification system...");
               }
             } else {
-              if (run.has("status")) {
-                is.setXml(run.getString("status"));
+              if (run.has(IlluminaTransformer.JSON_STATUS)) {
+                is.setXml(run.getString(IlluminaTransformer.JSON_STATUS));
               }
 
               is.setHealth(ht);
@@ -248,15 +249,15 @@ public class IlluminaNotificationMessageConsumerMechanism
 
             log.debug(runName + " New status: " + r.getStatus().getHealth().toString() + " -> " + ht.toString());
 
-            if (run.has("numCycles")) {
-              r.setCycles(Integer.parseInt(run.getString("numCycles")));
+            if (run.has(IlluminaTransformer.JSON_NUM_CYCLES)) {
+              r.setCycles(Integer.parseInt(run.getString(IlluminaTransformer.JSON_NUM_CYCLES)));
             }
 
             if (r.getSequencerReference() == null) {
               SequencerReference sr = null;
-              if (run.has("sequencerName")) {
-                sr = requestManager.getSequencerReferenceByName(run.getString("sequencerName"));
-                r.getStatus().setInstrumentName(run.getString("sequencerName"));
+              if (run.has(IlluminaTransformer.JSON_SEQUENCER_NAME)) {
+                sr = requestManager.getSequencerReferenceByName(run.getString(IlluminaTransformer.JSON_SEQUENCER_NAME));
+                r.getStatus().setInstrumentName(run.getString(IlluminaTransformer.JSON_SEQUENCER_NAME));
                 r.setSequencerReference(sr);
               }
               if (r.getSequencerReference() == null) {
@@ -269,26 +270,26 @@ public class IlluminaNotificationMessageConsumerMechanism
               }
             }
 
-            if (run.has("startDate")) {
+            if (run.has(IlluminaTransformer.JSON_START_DATE)) {
               try {
-                if (!"null".equals(run.getString("startDate")) && !isStringEmptyOrNull(run.getString("startDate"))) {
-                  log.debug("Updating start date:" + run.getString("startDate"));
-                  r.getStatus().setStartDate(illuminaRunFolderDateFormat.parse(run.getString("startDate")));
+                if (!"null".equals(run.getString(IlluminaTransformer.JSON_START_DATE)) && !isStringEmptyOrNull(run.getString(IlluminaTransformer.JSON_START_DATE))) {
+                  log.debug("Updating start date:" + run.getString(IlluminaTransformer.JSON_START_DATE));
+                  r.getStatus().setStartDate(illuminaRunFolderDateFormat.parse(run.getString(IlluminaTransformer.JSON_START_DATE)));
                 }
               } catch (ParseException e) {
                 log.error(runName, e);
               }
             }
 
-            if (run.has("completionDate")) {
-              if (!"null".equals(run.getString("completionDate")) && !isStringEmptyOrNull(run.getString("completionDate"))) {
-                log.debug("Updating completion date:" + run.getString("completionDate"));
+            if (run.has(IlluminaTransformer.JSON_COMPLETE_DATE)) {
+              if (!"null".equals(run.getString(IlluminaTransformer.JSON_COMPLETE_DATE)) && !isStringEmptyOrNull(run.getString(IlluminaTransformer.JSON_COMPLETE_DATE))) {
+                log.debug("Updating completion date:" + run.getString(IlluminaTransformer.JSON_COMPLETE_DATE));
                 try {
-                  r.getStatus().setCompletionDate(logDateFormat.parse(run.getString("completionDate")));
+                  r.getStatus().setCompletionDate(logDateFormat.parse(run.getString(IlluminaTransformer.JSON_COMPLETE_DATE)));
                 } catch (ParseException e) {
                   log.error(runName, e);
                   try {
-                    r.getStatus().setCompletionDate(anotherLogDateFormat.parse(run.getString("completionDate")));
+                    r.getStatus().setCompletionDate(anotherLogDateFormat.parse(run.getString(IlluminaTransformer.JSON_COMPLETE_DATE)));
                   } catch (ParseException e1) {
                     log.error(runName, e1);
                   }
@@ -302,10 +303,10 @@ public class IlluminaNotificationMessageConsumerMechanism
             }
 
             // update path if changed
-            if (run.has("fullPath") && !isStringEmptyOrNull(run.getString("fullPath")) && !isStringEmptyOrNull(r.getFilePath())) {
-              if (!run.getString("fullPath").equals(r.getFilePath())) {
-                log.debug("Updating run file path:" + r.getFilePath() + " -> " + run.getString("fullPath"));
-                r.setFilePath(run.getString("fullPath"));
+            if (run.has(IlluminaTransformer.JSON_FULL_PATH) && !isStringEmptyOrNull(run.getString(IlluminaTransformer.JSON_FULL_PATH)) && !isStringEmptyOrNull(r.getFilePath())) {
+              if (!run.getString(IlluminaTransformer.JSON_FULL_PATH).equals(r.getFilePath())) {
+                log.debug("Updating run file path:" + r.getFilePath() + " -> " + run.getString(IlluminaTransformer.JSON_FULL_PATH));
+                r.setFilePath(run.getString(IlluminaTransformer.JSON_FULL_PATH));
               }
             }
           }
@@ -328,10 +329,10 @@ public class IlluminaNotificationMessageConsumerMechanism
                       lf.setPlatform(r.getSequencerReference().getPlatform());
                     }
 
-                    if (run.has("laneCount") && run.getInt("laneCount") != lf.getPartitions().size()) {
+                    if (run.has(IlluminaTransformer.JSON_LANE_COUNT) && run.getInt(IlluminaTransformer.JSON_LANE_COUNT) != lf.getPartitions().size()) {
                       log.warn(r.getAlias()
                           + ":: Previously saved flowcell lane count does not match notification-supplied value from RunInfo.xml. Setting new partitionLimit");
-                      lf.setPartitionLimit(run.getInt("laneCount"));
+                      lf.setPartitionLimit(run.getInt(IlluminaTransformer.JSON_LANE_COUNT));
                     }
 
                     r.addSequencerPartitionContainer(lf);
@@ -347,8 +348,8 @@ public class IlluminaNotificationMessageConsumerMechanism
                     f.setPlatform(r.getSequencerReference().getPlatform());
                   }
 
-                  if (run.has("laneCount")) {
-                    f.setPartitionLimit(run.getInt("laneCount"));
+                  if (run.has(IlluminaTransformer.JSON_LANE_COUNT)) {
+                    f.setPartitionLimit(run.getInt(IlluminaTransformer.JSON_LANE_COUNT));
                   } else {
                     if (r.getSequencerReference().getPlatform().getInstrumentModel().contains("MiSeq")) {
                       f.setPartitionLimit(1);
@@ -368,8 +369,8 @@ public class IlluminaNotificationMessageConsumerMechanism
               }
 
               if (f.getPartitions().isEmpty()) {
-                if (run.has("laneCount")) {
-                  f.setPartitionLimit(run.getInt("laneCount"));
+                if (run.has(IlluminaTransformer.JSON_LANE_COUNT)) {
+                  f.setPartitionLimit(run.getInt(IlluminaTransformer.JSON_LANE_COUNT));
                 } else {
                   String instrumentModel = r.getSequencerReference().getPlatform().getInstrumentModel();
                   if (instrumentModel.contains("MiSeq") || instrumentModel.contains("NextSeq")) {
@@ -425,8 +426,8 @@ public class IlluminaNotificationMessageConsumerMechanism
               }
 
               if (isStringEmptyOrNull(f.getIdentificationBarcode())) {
-                if (run.has("containerId") && !isStringEmptyOrNull(run.getString("containerId"))) {
-                  f.setIdentificationBarcode(run.getString("containerId"));
+                if (run.has(IlluminaTransformer.JSON_CONTAINER_ID) && !isStringEmptyOrNull(run.getString(IlluminaTransformer.JSON_CONTAINER_ID))) {
+                  f.setIdentificationBarcode(run.getString(IlluminaTransformer.JSON_CONTAINER_ID));
                 }
               }
             }
@@ -455,17 +456,17 @@ public class IlluminaNotificationMessageConsumerMechanism
   }
   
   public void processRunParams(JSONObject run, Run r) {
-    if (run.has("runparams") && r.getSequencingParametersId() == null) {
+    if (run.has(IlluminaTransformer.JSON_RUN_PARAMS) && r.getSequencingParametersId() == null) {
       Document document;
       try {
           document = DocumentBuilderFactory.newInstance().newDocumentBuilder()
-              .parse(new InputSource(new StringReader(run.getString("runparams"))));
+              .parse(new InputSource(new StringReader(run.getString(IlluminaTransformer.JSON_RUN_PARAMS))));
 
         for (SequencingParameters parameters : getParameterSet()) {
-          log.debug("Checking run " + run.getString("name") + " against parameters " + parameters.getName());
+          log.debug("Checking run " + run.getString(IlluminaTransformer.JSON_RUN_NAME) + " against parameters " + parameters.getName());
        
           if (parameters.getPlatformId() == r.getSequencerReference().getPlatform().getId() && parameters.matches(document)) {
-            log.debug("Matched run " + run.getString("name") + " to parameters " + parameters.getName());
+            log.debug("Matched run " + run.getString(IlluminaTransformer.JSON_RUN_NAME) + " to parameters " + parameters.getName());
             r.setSequencingParametersId(parameters.getId());
             break;
           }
@@ -474,7 +475,7 @@ public class IlluminaNotificationMessageConsumerMechanism
         log.error("Error parsing runparams", e);
       }
     } else {
-      log.debug("No run parameters: " + run.getString("name"));
+      log.debug("No run parameters: " + run.getString(IlluminaTransformer.JSON_RUN_NAME));
     }
   }
 

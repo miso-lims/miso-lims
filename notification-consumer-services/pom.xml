@@ -66,5 +66,9 @@
       <artifactId>core</artifactId>
       <version>${project.parent.version}</version>
     </dependency>
+    <dependency>
+    	<groupId>uk.ac.bbsrc.tgac.miso</groupId>
+    	<artifactId>notification-server</artifactId>
+    </dependency>
   </dependencies>
 </project>
