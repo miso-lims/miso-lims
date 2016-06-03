@@ -37,6 +37,8 @@ public class SampleAdditionalInfoDto {
   private String externalInstituteIdentifier;
   private Long labId;
   private String labUrl;
+  private Long groupId;
+  private String groupDescription;
 
   public Long getSampleId() {
     return sampleId;
@@ -65,7 +67,7 @@ public class SampleAdditionalInfoDto {
   public Long getParentId() {
     return parentId;
   }
-  
+
   public void setParentId(Long parentId) {
     this.parentId = parentId;
   }
@@ -77,19 +79,19 @@ public class SampleAdditionalInfoDto {
   public void setParentUrl(String parentUrl) {
     this.parentUrl = parentUrl;
   }
-  
+
   public String getParentAlias() {
     return parentAlias;
   }
-  
+
   public void setParentAlias(String parentAlias) {
     this.parentAlias = parentAlias;
   }
-  
+
   public Long getParentSampleClassId() {
     return parentSampleClassId;
   }
-  
+
   public void setParentSampleClassId(Long parentSampleClassId) {
     this.parentSampleClassId = parentSampleClassId;
   }
@@ -269,11 +271,11 @@ public class SampleAdditionalInfoDto {
   public void setPrepKitUrl(String prepKitUrl) {
     this.prepKitUrl = prepKitUrl;
   }
-  
+
   public String getExternalInstituteIdentifier() {
     return externalInstituteIdentifier;
   }
-  
+
   public void setExternalInstituteIdentifier(String externalInstituteIdentifier) {
     this.externalInstituteIdentifier = externalInstituteIdentifier;
   }
@@ -294,27 +296,34 @@ public class SampleAdditionalInfoDto {
     this.labUrl = labUrl;
   }
 
+  public Long getGroupId() {
+    return groupId;
+  }
+
+  public void setGroupId(Long groupId) {
+    this.groupId = groupId;
+  }
+
+  public String getGroupDescription() {
+    return groupDescription;
+  }
+
+  public void setGroupDescription(String groupDescription) {
+    this.groupDescription = groupDescription;
+  }
+
   @Override
   public String toString() {
-    return "SampleAdditionalInfoDto [sampleId=" + sampleId + ", url=" + url
-        + ", sampleUrl=" + sampleUrl + ", parentId=" + parentId
-        + ", parentUrl=" + parentUrl + ", parentAlias=" + parentAlias
-        + ", parentSampleClassId=" + parentSampleClassId + ", sampleClassId="
-        + sampleClassId + ", sampleClassUrl=" + sampleClassUrl
-        + ", tissueOriginId=" + tissueOriginId + ", tissueOriginUrl="
-        + tissueOriginUrl + ", tissueTypeId=" + tissueTypeId
-        + ", tissueTypeUrl=" + tissueTypeUrl + ", qcPassedDetailId="
-        + qcPassedDetailId + ", qcPassedDetailUrl=" + qcPassedDetailUrl
-        + ", subprojectId=" + subprojectId + ", subprojectUrl=" + subprojectUrl
-        + ", prepKitId=" + prepKitId + ", prepKitUrl=" + prepKitUrl
-        + ", passageNumber=" + passageNumber + ", timesReceived="
-        + timesReceived + ", tubeNumber=" + tubeNumber + ", concentration="
-        + concentration + ", createdById=" + createdById + ", createdByUrl="
-        + createdByUrl + ", creationDate=" + creationDate + ", updatedById="
-        + updatedById + ", updatedByUrl=" + updatedByUrl + ", lastUpdated="
-        + lastUpdated + ", externalInstituteIdentifier="
-        + externalInstituteIdentifier + ", labId=" + labId + ", labUrl="
-        + labUrl + "]";
+    return "SampleAdditionalInfoDto [sampleId=" + sampleId + ", url=" + url + ", sampleUrl=" + sampleUrl + ", parentId=" + parentId
+        + ", parentUrl=" + parentUrl + ", parentAlias=" + parentAlias + ", parentSampleClassId=" + parentSampleClassId + ", sampleClassId="
+        + sampleClassId + ", sampleClassUrl=" + sampleClassUrl + ", tissueOriginId=" + tissueOriginId + ", tissueOriginUrl="
+        + tissueOriginUrl + ", tissueTypeId=" + tissueTypeId + ", tissueTypeUrl=" + tissueTypeUrl + ", qcPassedDetailId=" + qcPassedDetailId
+        + ", qcPassedDetailUrl=" + qcPassedDetailUrl + ", subprojectId=" + subprojectId + ", subprojectUrl=" + subprojectUrl
+        + ", prepKitId=" + prepKitId + ", prepKitUrl=" + prepKitUrl + ", passageNumber=" + passageNumber + ", timesReceived="
+        + timesReceived + ", tubeNumber=" + tubeNumber + ", concentration=" + concentration + ", createdById=" + createdById
+        + ", createdByUrl=" + createdByUrl + ", creationDate=" + creationDate + ", updatedById=" + updatedById + ", updatedByUrl="
+        + updatedByUrl + ", lastUpdated=" + lastUpdated + ", externalInstituteIdentifier=" + externalInstituteIdentifier + ", labId="
+        + labId + ", labUrl=" + labUrl + ", groupId=" + groupId + ", groupDescription=" + groupDescription + "]";
   }
-  
+
 }

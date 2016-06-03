@@ -86,40 +86,40 @@ public class DefaultSampleService implements SampleService {
 
   @Autowired
   private SampleTissueService sampleTissueService;
-  
+
   @Autowired
   private ProjectStore projectStore;
-  
+
   @Autowired
   private TissueOriginDao tissueOriginDao;
-  
+
   @Autowired
   private TissueTypeDao tissueTypeDao;
-  
+
   @Autowired
   private QcPassedDetailDao qcPassedDetailDao;
-  
+
   @Autowired
   private SubprojectDao subProjectDao;
-  
+
   @Autowired
   private KitStore kitStore;
-  
+
   @Autowired
   private SamplePurposeDao samplePurposeDao;
-  
+
   @Autowired
   private TissueMaterialDao tissueMaterialDao;
-  
+
   @Autowired
   private MisoNamingScheme<Sample> sampleNamingScheme;
-  
+
   @Autowired
   private MisoNamingScheme<Sample> namingScheme;
-  
+
   @Value("${miso.autoGenerateIdentificationBarcodes}")
   private Boolean autoGenerateIdBarcodes;
-  
+
   public void setSampleDao(SampleDao sampleDao) {
     this.sampleDao = sampleDao;
   }
@@ -136,8 +136,7 @@ public class DefaultSampleService implements SampleService {
     this.sampleAnalyteService = sampleAnalyteService;
   }
 
-  public void setSampleAdditionalInfoService(
-      SampleAdditionalInfoService sampleAdditionalInfoService) {
+  public void setSampleAdditionalInfoService(SampleAdditionalInfoService sampleAdditionalInfoService) {
     this.sampleAdditionalInfoService = sampleAdditionalInfoService;
   }
 
@@ -145,13 +144,11 @@ public class DefaultSampleService implements SampleService {
     this.identityService = identityService;
   }
 
-  public void setSampleValidRelationshipService(
-      SampleValidRelationshipService sampleValidRelationshipService) {
+  public void setSampleValidRelationshipService(SampleValidRelationshipService sampleValidRelationshipService) {
     this.sampleValidRelationshipService = sampleValidRelationshipService;
   }
 
-  public void setSampleNumberPerProjectService(
-      SampleNumberPerProjectService sampleNumberPerProjectService) {
+  public void setSampleNumberPerProjectService(SampleNumberPerProjectService sampleNumberPerProjectService) {
     this.sampleNumberPerProjectService = sampleNumberPerProjectService;
   }
 
@@ -215,14 +212,14 @@ public class DefaultSampleService implements SampleService {
     authorizationManager.throwIfNotReadable(sample);
     return sample;
   }
-  
+
   @Override
   public Long create(Sample sample) throws IOException {
     loadChildEntities(sample);
     authorizationManager.throwIfNotWritable(sample);
     setChangeDetails(sample, true);
-    if (sample.getSampleAdditionalInfo() != null) { 
-      if (sample.getSampleAdditionalInfo().getSampleClass() == null 
+    if (sample.getSampleAdditionalInfo() != null) {
+      if (sample.getSampleAdditionalInfo().getSampleClass() == null
           || sample.getSampleAdditionalInfo().getSampleClass().getSampleCategory() == null) {
         throw new IllegalArgumentException("Sample class or category missing");
       }
@@ -231,7 +228,7 @@ public class DefaultSampleService implements SampleService {
         validateHierarchy(sample);
       }
     }
-    
+
     // pre-save field generation
     sample.setName(generateTemporaryName());
     if (isStringEmptyOrNull(sample.getAlias()) && sampleNamingScheme.hasGeneratorFor("alias")) {
@@ -243,7 +240,7 @@ public class DefaultSampleService implements SampleService {
       int siblingNumber = sampleDao.getNextSiblingNumber(sample.getParent(), sample.getSampleAdditionalInfo().getSampleClass());
       sample.getSampleAdditionalInfo().setSiblingNumber(siblingNumber);
     }
-    
+
     normalizeSample(sample);
     return save(sample).getId();
   }
@@ -257,7 +254,7 @@ public class DefaultSampleService implements SampleService {
         sampleDao.update(sample);
       }
       Sample created = sampleDao.getSample(newId);
-      
+
       // post-save field generation
       boolean needsUpdate = false;
       if (hasTemporaryName(sample)) {
@@ -275,7 +272,7 @@ public class DefaultSampleService implements SampleService {
         needsUpdate = true;
       } // if !autoGenerateIdentificationBarcodes then the identificationBarcode is set by the user
       if (needsUpdate) sampleDao.update(created);
-      
+
       return created;
     } catch (MisoNamingException e) {
       throw new IllegalArgumentException("Name generator failed to generate a valid name", e);
@@ -287,33 +284,36 @@ public class DefaultSampleService implements SampleService {
       throw new IOException(e);
     }
   }
-  
+
   /**
-   * Checks whether the configured naming scheme allows duplicate alias. If not, checks to see whether an alias is already 
-   * in use, in order to prevent duplicates. This method should be called <b>before</b> saving a new Sample
+   * Checks whether the configured naming scheme allows duplicate alias. If not, checks to see whether an alias is already in use, in order
+   * to prevent duplicates. This method should be called <b>before</b> saving a new Sample
    * 
-   * @param alias the alias to validate
-   * @throws ConstraintViolationException if duplicate alias are <b>not</b> allowed <b>and</b> the alias is already in use
+   * @param alias
+   *          the alias to validate
+   * @throws ConstraintViolationException
+   *           if duplicate alias are <b>not</b> allowed <b>and</b> the alias is already in use
    * @throws IOException
    */
   private void validateAliasUniqueness(String alias) throws ConstraintViolationException, IOException {
     if (!sampleNamingScheme.allowDuplicateEntityNameFor("alias") && sampleDao.aliasExists(alias)) {
-      throw new ConstraintViolationException(String.format("A sample with this alias '%s' already exists in the database", 
-          alias), null, "alias");
+      throw new ConstraintViolationException(String.format("A sample with this alias '%s' already exists in the database", alias), null,
+          "alias");
     }
   }
-  
+
   /**
    * Finds an existing parent Sample or creates a new one if necessary
    * 
-   * @param sample must contain parent (via {@link SampleAdditionalInfo#getParent() getParent}) or Identity details 
-   * (via {@link Sample#getIdentity() getIdentity}), including externalName if a new parent is to be created. An existing 
-   * parent may be specified by including its sampleId or externalName
+   * @param sample
+   *          must contain parent (via {@link SampleAdditionalInfo#getParent() getParent}) or Identity details (via
+   *          {@link Sample#getIdentity() getIdentity}), including externalName if a new parent is to be created. An existing parent may be
+   *          specified by including its sampleId or externalName
    * 
    * @return
-   * @throws IOException 
-   * @throws SQLException 
-   * @throws MisoNamingException 
+   * @throws IOException
+   * @throws SQLException
+   * @throws MisoNamingException
    */
   private Sample findOrCreateParent(Sample sample) throws IOException {
     if (sample.getSampleAdditionalInfo() != null && sample.getSampleAdditionalInfo().getParent() != null) {
@@ -327,7 +327,7 @@ public class DefaultSampleService implements SampleService {
         if (parentIdentity != null) return parentIdentity.getSample();
       }
     }
-    
+
     Identity parentIdentity = sample.getIdentity();
     if (parentIdentity == null) throw new IllegalArgumentException("Parent identity is required to create a new Sample");
     if (parentIdentity.getSampleId() != null) {
@@ -349,18 +349,18 @@ public class DefaultSampleService implements SampleService {
       throw new IOException(e);
     }
   }
-  
+
   private Sample createParentIdentity(Sample sample) throws IOException, MisoNamingException, SQLException {
     log.debug("Creating a new Identity to use as a parent.");
     List<SampleClass> identityClasses = sampleClassDao.listByCategory(Identity.CATEGORY_NAME);
     if (identityClasses.size() != 1) {
-      throw new IllegalStateException("Found more than one SampleClass of category " + Identity.CATEGORY_NAME
-          + ". Cannot choose which to use as root sample class.");
+      throw new IllegalStateException(
+          "Found more than one SampleClass of category " + Identity.CATEGORY_NAME + ". Cannot choose which to use as root sample class.");
     }
     SampleClass rootSampleClass = identityClasses.get(0);
     SampleAdditionalInfo parentSai = new SampleAdditionalInfoImpl();
     parentSai.setSampleClass(rootSampleClass);
-    
+
     Identity parentIdentity = new IdentityImpl();
     String number = sampleNumberPerProjectService.nextNumber(sample.getProject());
     // Cannot generate identity alias via sampleNameGenerator because of dependence on SampleNumberPerProjectService
@@ -369,33 +369,25 @@ public class DefaultSampleService implements SampleService {
     parentIdentity.setExternalName(sample.getIdentity().getExternalName());
     parentIdentity.setDonorSex(sample.getIdentity().getDonorSex());
 
-    Sample identitySample = new SampleFactoryBuilder()
-        .user(authorizationManager.getCurrentUser())
-        .project(sample.getProject())
-        .description("Identity")
-        .sampleType(sample.getSampleType())
-        .scientificName(sample.getScientificName())
-        .name(generateTemporaryName())
-        .alias(internalName)
-        .rootSampleClass(rootSampleClass)
-        .volume(0D)
-        .sampleAdditionalInfo(parentSai)
-        .identity(parentIdentity)
-        .build();
-    
+    Sample identitySample = new SampleFactoryBuilder().user(authorizationManager.getCurrentUser()).project(sample.getProject())
+        .description("Identity").sampleType(sample.getSampleType()).scientificName(sample.getScientificName()).name(generateTemporaryName())
+        .alias(internalName).rootSampleClass(rootSampleClass).volume(0D).sampleAdditionalInfo(parentSai).identity(parentIdentity).build();
+
     setChangeDetails(identitySample, true);
     return save(identitySample);
   }
-  
+
   /**
-   * Loads persisted objects into sample fields. Should be called before saving new samples. 
-   * Loads all member objects <b>except</b>
-   * <ul><li>parent sample for detailed samples</li>
-   * <li>creator/lastModifier User objects</li></ul>
+   * Loads persisted objects into sample fields. Should be called before saving new samples. Loads all member objects <b>except</b>
+   * <ul>
+   * <li>parent sample for detailed samples</li>
+   * <li>creator/lastModifier User objects</li>
+   * </ul>
    * 
-   * @param sample the Sample to load entities into. Must contain at least the IDs of objects to load (e.g. to 
-   * load the persisted Project into sample.project, sample.project.id must be set)
-   * @throws IOException 
+   * @param sample
+   *          the Sample to load entities into. Must contain at least the IDs of objects to load (e.g. to load the persisted Project into
+   *          sample.project, sample.project.id must be set)
+   * @throws IOException
    */
   private void loadChildEntities(Sample sample) throws IOException {
     if (sample.getProject() != null) {
@@ -433,11 +425,12 @@ public class DefaultSampleService implements SampleService {
       }
     }
   }
-  
+
   /**
    * Cleans up parts of the model which may have been used during the creation process, but which should not be persisted
    * 
-   * @param sample the Sample to normalize
+   * @param sample
+   *          the Sample to normalize
    */
   private void normalizeSample(Sample sample) {
     if (sample.getSampleAdditionalInfo() != null) {
@@ -453,7 +446,7 @@ public class DefaultSampleService implements SampleService {
       }
     }
   }
-  
+
   private void validateHierarchy(Sample sample) throws IOException {
     Set<SampleValidRelationship> sampleValidRelationships = sampleValidRelationshipService.getAll();
     if (!LimsUtils.isValidRelationship(sampleValidRelationships, sample.getParent(), sample)) {
@@ -461,13 +454,15 @@ public class DefaultSampleService implements SampleService {
           + " not permitted to have a child of type " + sample.getSampleAdditionalInfo().getSampleClass().getAlias());
     }
   }
-  
+
   /**
    * Updates all timestamps and user data associated with the change
    * 
-   * @param sample the Sample to update
-   * @param setCreated specifies whether this is a newly created Sample requiring creation timestamps and user data
-   * @throws IOException 
+   * @param sample
+   *          the Sample to update
+   * @param setCreated
+   *          specifies whether this is a newly created Sample requiring creation timestamps and user data
+   * @throws IOException
    */
   private void setChangeDetails(Sample sample, boolean setCreated) throws IOException {
     User user = authorizationManager.getCurrentUser();
@@ -518,15 +513,17 @@ public class DefaultSampleService implements SampleService {
       updatedSample.getSampleAdditionalInfo().setParent(get(updatedSample.getSampleAdditionalInfo().getParent().getId()));
       validateHierarchy(updatedSample);
     }
-    
+
     save(updatedSample);
   }
-  
+
   /**
    * Copies modifiable fields from the source Sample into the target Sample to be persisted
    * 
-   * @param target the persisted Sample to modify
-   * @param source the modified Sample to copy modifiable fields from
+   * @param target
+   *          the persisted Sample to modify
+   * @param source
+   *          the modified Sample to copy modifiable fields from
    * @throws IOException
    */
   private void applyChanges(Sample target, Sample source) throws IOException {
@@ -569,7 +566,7 @@ public class DefaultSampleService implements SampleService {
     Sample sample = get(sampleId);
     sampleDao.deleteSample(sample);
   }
-  
+
   static final private String TEMPORARY_NAME_PREFIX = "TEMPORARY_S";
 
   /**
@@ -584,11 +581,11 @@ public class DefaultSampleService implements SampleService {
   static public boolean hasTemporaryName(Sample sample) {
     return sample != null && sample.getName() != null && sample.getName().startsWith(TEMPORARY_NAME_PREFIX);
   }
-  
+
   static public boolean hasTemporaryAlias(Sample sample) {
     return sample != null && sample.getAlias() != null && sample.getAlias().startsWith(TEMPORARY_NAME_PREFIX);
   }
-  
+
   /**
    * Generates a unique barcode. Note that the barcode will change when the alias is changed.
    * 
