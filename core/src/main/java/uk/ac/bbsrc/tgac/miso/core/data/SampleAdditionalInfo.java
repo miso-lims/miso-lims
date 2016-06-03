@@ -8,14 +8,14 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 
 public interface SampleAdditionalInfo extends Sample {
 
-  public Sample getParent();
-  
-  public void setParent(Sample parent);
+  public SampleAdditionalInfo getParent();
 
-  public Set<Sample> getChildren();
+  public void setParent(SampleAdditionalInfo parent);
+
+  public Set<SampleAdditionalInfo> getChildren();
 
   @JsonIgnore
-  public void setChildren(Set<Sample> children);
+  public void setChildren(Set<SampleAdditionalInfo> children);
 
   SampleClass getSampleClass();
 
@@ -24,10 +24,6 @@ public interface SampleAdditionalInfo extends Sample {
   Subproject getSubproject();
 
   void setSubproject(Subproject subproject);
-
-  Double getConcentration();
-
-  void setConcentration(Double concentration);
 
   Boolean getArchived();
 

@@ -7,6 +7,7 @@ import javax.persistence.Table;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
+import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 
@@ -14,7 +15,21 @@ import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 @Table(name = "SampleTissue")
 public class SampleTissueImpl extends SampleAdditionalInfoImpl implements SampleTissue {
 
-  private static final long serialVersionUID = 1L;
+  private String externalInstituteIdentifier;
+
+  @OneToOne(targetEntity = LabImpl.class)
+  @JoinColumn(name = "labId", nullable = true)
+  private Lab lab;
+
+  private Integer passageNumber;
+
+  private String region;
+
+  private Integer timesReceived;
+
+  @OneToOne(targetEntity = TissueMaterialImpl.class)
+  @JoinColumn(name = "tissueMaterialId")
+  private TissueMaterial tissueMaterial;
 
   @OneToOne(targetEntity = TissueOriginImpl.class)
   @JoinColumn(name = "tissueOriginId")
@@ -24,73 +39,11 @@ public class SampleTissueImpl extends SampleAdditionalInfoImpl implements Sample
   @JoinColumn(name = "tissueTypeId")
   private TissueType tissueType;
 
-  private Integer passageNumber;
-  private Integer timesReceived;
   private Integer tubeNumber;
-  private String externalInstituteIdentifier;
-
-  @OneToOne(targetEntity = LabImpl.class)
-  @JoinColumn(name = "labId", nullable = true)
-  private Lab lab;
-
-  @Override
-  public TissueOrigin getTissueOrigin() {
-    return tissueOrigin;
-  }
-
-  @Override
-  public void setTissueOrigin(TissueOrigin tissueOrigin) {
-    this.tissueOrigin = tissueOrigin;
-  }
-
-  @Override
-  public TissueType getTissueType() {
-    return tissueType;
-  }
-
-  @Override
-  public void setTissueType(TissueType tissueType) {
-    this.tissueType = tissueType;
-  }
-
-  @Override
-  public Integer getPassageNumber() {
-    return passageNumber;
-  }
-
-  @Override
-  public void setPassageNumber(Integer passageNumber) {
-    this.passageNumber = passageNumber;
-  }
-
-  @Override
-  public Integer getTimesReceived() {
-    return timesReceived;
-  }
-
-  @Override
-  public void setTimesReceived(Integer timesReceived) {
-    this.timesReceived = timesReceived;
-  }
-
-  @Override
-  public Integer getTubeNumber() {
-    return tubeNumber;
-  }
-
-  @Override
-  public void setTubeNumber(Integer tubeNumber) {
-    this.tubeNumber = tubeNumber;
-  }
 
   @Override
   public String getExternalInstituteIdentifier() {
     return externalInstituteIdentifier;
-  }
-
-  @Override
-  public void setExternalInstituteIdentifier(String externalInstituteIdentifier) {
-    this.externalInstituteIdentifier = externalInstituteIdentifier;
   }
 
   @Override
@@ -99,25 +52,82 @@ public class SampleTissueImpl extends SampleAdditionalInfoImpl implements Sample
   }
 
   @Override
+  public Integer getPassageNumber() {
+    return passageNumber;
+  }
+
+  @Override
+  public String getRegion() {
+    return region;
+  }
+
+  @Override
+  public Integer getTimesReceived() {
+    return timesReceived;
+  }
+
+  @Override
+  public TissueMaterial getTissueMaterial() {
+    return tissueMaterial;
+  }
+
+  @Override
+  public TissueOrigin getTissueOrigin() {
+    return tissueOrigin;
+  }
+
+  @Override
+  public TissueType getTissueType() {
+    return tissueType;
+  }
+
+  @Override
+  public Integer getTubeNumber() {
+    return tubeNumber;
+  }
+
+  @Override
+  public void setExternalInstituteIdentifier(String externalInstituteIdentifier) {
+    this.externalInstituteIdentifier = externalInstituteIdentifier;
+  }
+
+  @Override
   public void setLab(Lab lab) {
     this.lab = lab;
   }
 
-  private Integer cellularity;
-
   @Override
-  public Integer getCellularity() {
-    return cellularity;
+  public void setPassageNumber(Integer passageNumber) {
+    this.passageNumber = passageNumber;
   }
 
   @Override
-  public void setCellularity(Integer cellularity) {
-    this.cellularity = cellularity;
+  public void setRegion(String region) {
+    this.region = region;
   }
 
   @Override
-  public String toString() {
-    return "SampleTissueImpl [cellularity=" + cellularity + "]";
+  public void setTimesReceived(Integer timesReceived) {
+    this.timesReceived = timesReceived;
   }
 
+  @Override
+  public void setTissueMaterial(TissueMaterial tissueMaterial) {
+    this.tissueMaterial = tissueMaterial;
+  }
+
+  @Override
+  public void setTissueOrigin(TissueOrigin tissueOrigin) {
+    this.tissueOrigin = tissueOrigin;
+  }
+
+  @Override
+  public void setTissueType(TissueType tissueType) {
+    this.tissueType = tissueType;
+  }
+
+  @Override
+  public void setTubeNumber(Integer tubeNumber) {
+    this.tubeNumber = tubeNumber;
+  }
 }

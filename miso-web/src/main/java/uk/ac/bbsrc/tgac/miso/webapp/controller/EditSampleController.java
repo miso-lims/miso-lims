@@ -41,9 +41,7 @@ import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletResponse;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-
+import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,12 +66,15 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractPool;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.EntityGroup;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
+import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity.DonorSex;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -85,10 +86,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.QcPassedDetail;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleAnalyte;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleAnalyte.StrStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
@@ -106,6 +106,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.StrStatus;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
@@ -113,6 +114,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 import uk.ac.bbsrc.tgac.miso.service.LabService;
 import uk.ac.bbsrc.tgac.miso.service.QcPassedDetailService;
 import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
@@ -137,16 +139,16 @@ public class EditSampleController {
 
   @Autowired
   private DataObjectFactory dataObjectFactory;
-  
+
   @Autowired
   private MisoNamingScheme<Sample> sampleNamingScheme;
-  
+
   @Autowired
   private SampleOptionsController sampleOptionsController;
-  
+
   @Autowired
   private SampleService sampleService;
-  
+
   public void setSampleOptionsController(SampleOptionsController sampleOptionsController) {
     this.sampleOptionsController = sampleOptionsController;
   }
@@ -189,7 +191,7 @@ public class EditSampleController {
   public Boolean isDetailedSampleEnabled() {
     return detailedSample;
   }
-  
+
   @ModelAttribute("sampleOptions")
   public JSONObject getSampleOptions(UriComponentsBuilder uriBuilder, HttpServletResponse response) throws IOException {
     return JSONObject.fromObject(sampleOptionsController.getSampleOptions(uriBuilder, response));
@@ -395,35 +397,38 @@ public class EditSampleController {
 
     return hot;
   }
-  
+
   @Autowired
   private SampleClassService sampleClassService;
-  
+
+  private static final Comparator<SampleClass> SAMPLECLASS_ALIAS = new Comparator<SampleClass>() {
+    @Override
+    public int compare(SampleClass o1, SampleClass o2) {
+      return o1.getAlias().compareTo(o2.getAlias());
+    }
+  };
+
   private void populateSampleClasses(ModelMap model) throws IOException {
-    List<SampleClass> sampleClasses = new ArrayList<>(sampleClassService.getAll());
+    List<SampleClass> sampleClasses = new ArrayList<>();
     List<SampleClass> tissueClasses = new ArrayList<>();
-    for (Iterator<SampleClass> i = sampleClasses.iterator(); i.hasNext();) {
-      SampleClass sc = i.next();
+    // Can only create Tissues and Analyte Stock from this page, so remove other classes
+    for (SampleClass sc : sampleClassService.getAll()) {
       if (SampleTissue.CATEGORY_NAME.equals(sc.getSampleCategory())) {
         tissueClasses.add(sc);
-      } else if (!SampleAnalyte.CATEGORY_NAME.equals(sc.getSampleCategory()) || !sc.isStock()) {
-        // Can only create Tissues and Analyte Stock from this page, so remove other classes
-        i.remove();
+        sampleClasses.add(sc);
+      } else if (SampleStock.CATEGORY_NAME.equals(sc.getSampleCategory())) {
+        sampleClasses.add(sc);
       }
     }
-    Collections.sort(sampleClasses, new Comparator<SampleClass>() {
-      @Override
-      public int compare(SampleClass o1, SampleClass o2) {
-        return o1.getAlias().compareTo(o2.getAlias());
-      }
-    });
+    Collections.sort(sampleClasses, SAMPLECLASS_ALIAS);
+    Collections.sort(tissueClasses, SAMPLECLASS_ALIAS);
     model.put("sampleClasses", sampleClasses);
     model.put("tissueClasses", tissueClasses);
   }
-  
+
   @Autowired
   private TissueOriginService tissueOriginService;
-  
+
   @ModelAttribute("tissueOrigins")
   public List<TissueOrigin> getTissueOrigins() throws IOException {
     List<TissueOrigin> list = new ArrayList<>(tissueOriginService.getAll());
@@ -435,10 +440,10 @@ public class EditSampleController {
     });
     return list;
   }
-  
+
   @Autowired
   private TissueTypeService tissueTypeService;
-  
+
   @ModelAttribute("tissueTypes")
   public List<TissueType> getTissueTypes() throws IOException {
     List<TissueType> list = new ArrayList<>(tissueTypeService.getAll());
@@ -450,10 +455,10 @@ public class EditSampleController {
     });
     return list;
   }
-  
+
   @Autowired
   private QcPassedDetailService qcpassedDetailService;
-  
+
   @ModelAttribute("qcPassedDetails")
   public List<QcPassedDetail> getQcPassedDetails() throws IOException {
     List<QcPassedDetail> list = new ArrayList<>(qcpassedDetailService.getAll());
@@ -465,10 +470,10 @@ public class EditSampleController {
     });
     return list;
   }
-  
+
   @Autowired
   private LabService labService;
-  
+
   @ModelAttribute("labs")
   public List<Lab> getLabs() throws IOException {
     List<Lab> list = new ArrayList<>(labService.getAll());
@@ -480,10 +485,10 @@ public class EditSampleController {
     });
     return list;
   }
-  
+
   @Autowired
   private SamplePurposeService samplePurposeService;
-  
+
   @ModelAttribute("samplePurposes")
   public List<SamplePurpose> getSamplePurposes() throws IOException {
     List<SamplePurpose> list = new ArrayList<>(samplePurposeService.getAll());
@@ -495,10 +500,10 @@ public class EditSampleController {
     });
     return list;
   }
-  
+
   @Autowired
   private TissueMaterialService tissueMaterialService;
-  
+
   @ModelAttribute("tissueMaterials")
   public List<TissueMaterial> getTissueMaterials() throws IOException {
     List<TissueMaterial> list = new ArrayList<>(tissueMaterialService.getAll());
@@ -510,12 +515,12 @@ public class EditSampleController {
     });
     return list;
   }
-  
+
   @ModelAttribute("strStatusOptions")
   public StrStatus[] getStrStatusOptions() {
     return StrStatus.values();
   }
-  
+
   @ModelAttribute("donorSexOptions")
   public DonorSex[] getDonorSexOptions() {
     return DonorSex.values();
@@ -536,7 +541,7 @@ public class EditSampleController {
         setValue(p);
       }
     });
-    
+
     binder.registerCustomEditor(SampleClass.class, new PropertyEditorSupport() {
       @Override
       public void setAsText(String text) throws IllegalArgumentException {
@@ -549,7 +554,7 @@ public class EditSampleController {
         }
       }
     });
-    
+
     binder.registerCustomEditor(TissueOrigin.class, new PropertyEditorSupport() {
       @Override
       public void setAsText(String text) throws IllegalArgumentException {
@@ -558,7 +563,7 @@ public class EditSampleController {
         setValue(to);
       }
     });
-    
+
     binder.registerCustomEditor(TissueType.class, new PropertyEditorSupport() {
       @Override
       public void setAsText(String text) throws IllegalArgumentException {
@@ -567,7 +572,7 @@ public class EditSampleController {
         setValue(tt);
       }
     });
-    
+
     binder.registerCustomEditor(QcPassedDetail.class, new PropertyEditorSupport() {
       @Override
       public void setAsText(String text) throws IllegalArgumentException {
@@ -580,7 +585,7 @@ public class EditSampleController {
         }
       }
     });
-    
+
     binder.registerCustomEditor(Subproject.class, new PropertyEditorSupport() {
       @Override
       public void setAsText(String text) throws IllegalArgumentException {
@@ -593,7 +598,7 @@ public class EditSampleController {
         }
       }
     });
-    
+
     binder.registerCustomEditor(Lab.class, new PropertyEditorSupport() {
       @Override
       public void setAsText(String text) throws IllegalArgumentException {
@@ -606,7 +611,7 @@ public class EditSampleController {
         }
       }
     });
-    
+
     binder.registerCustomEditor(SamplePurpose.class, new PropertyEditorSupport() {
       @Override
       public void setAsText(String text) throws IllegalArgumentException {
@@ -619,7 +624,7 @@ public class EditSampleController {
         }
       }
     });
-    
+
     binder.registerCustomEditor(TissueMaterial.class, new PropertyEditorSupport() {
       @Override
       public void setAsText(String text) throws IllegalArgumentException {
@@ -632,7 +637,7 @@ public class EditSampleController {
         }
       }
     });
-    
+
     binder.registerCustomEditor(Long.class, new PropertyEditorSupport() {
       @Override
       public void setAsText(String text) throws IllegalArgumentException {
@@ -695,7 +700,7 @@ public class EditSampleController {
           model.put("sampleClass", ((SampleAdditionalInfo) sample).getSampleClass().getAlias());
         }
         model.put("title", "Sample " + sampleId);
-        
+
         if (projectId != null) {
           Project project = requestManager.getProjectById(projectId);
           model.addAttribute("project", project);
@@ -710,7 +715,7 @@ public class EditSampleController {
         } else {
           model.put("accessibleProjects", populateProjects(null));
         }
-        
+
         Set<Pool<? extends Poolable>> pools = getPoolsBySample(sample);
         Map<Long, Sample> poolSampleMap = new HashMap<>();
         for (Pool pool : pools) {
@@ -733,7 +738,7 @@ public class EditSampleController {
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, sample, securityManager.listAllUsers()));
       model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, sample, securityManager.listAllGroups()));
       populateSampleClasses(model);
-      
+
       return new ModelAndView("/pages/editSample.jsp", model);
     } catch (IOException ex) {
       if (log.isDebugEnabled()) {
@@ -754,8 +759,7 @@ public class EditSampleController {
   }
 
   /**
-   * used to edit samples with ids from given {sampleIds}
-   * sends Dtos objects which will then be used for editing in grid
+   * used to edit samples with ids from given {sampleIds} sends Dtos objects which will then be used for editing in grid
    */
   @RequestMapping(value = "/bulk/edit/{sampleIds}", method = RequestMethod.GET)
   public ModelAndView editBulkSamples(@PathVariable String sampleIds, ModelMap model) throws IOException {
@@ -765,12 +769,13 @@ public class EditSampleController {
       for (int i = 0; i < split.length; i++) {
         idList.add(Long.parseLong(split[i]));
       }
-      JSONArray samplesDtos = new JSONArray();
+      ObjectMapper mapper = new ObjectMapper();
+      List<SampleDto> samplesDtos = new ArrayList<>();
       for (Sample sample : requestManager.getSamplesByIdList(idList)) {
         samplesDtos.add(Dtos.asDto(sample));
       }
       model.put("title", "Bulk Edit Samples");
-      model.put("samplesJSON", samplesDtos);
+      model.put("samplesJSON", mapper.writeValueAsString(samplesDtos));
       model.put("method", "Edit");
       return new ModelAndView("/pages/bulkEditSamples.jsp", model);
     } catch (IOException ex) {
@@ -786,7 +791,8 @@ public class EditSampleController {
    * in grid
    */
   @RequestMapping(value = "/bulk/create/{sampleIds}&scid={sampleClassId}", method = RequestMethod.GET)
-  public ModelAndView createBulkSamples(@PathVariable String sampleIds, @PathVariable Long sampleClassId, ModelMap model) throws IOException {
+  public ModelAndView createBulkSamples(@PathVariable String sampleIds, @PathVariable Long sampleClassId, ModelMap model)
+      throws IOException {
     try {
       String[] split = sampleIds.split(",");
       List<Long> idList = new ArrayList<Long>();
@@ -799,7 +805,7 @@ public class EditSampleController {
       }
       model.put("title", "Bulk Create Samples");
       model.put("samplesJSON", samplesDtos);
-      model.put("method",  "Create");
+      model.put("method", "Create");
       model.put("sampleClassId", sampleClassId);
       return new ModelAndView("/pages/bulkEditSamples.jsp", model);
     } catch (IOException ex) {
@@ -835,5 +841,5 @@ public class EditSampleController {
       throw ex;
     }
   }
-  
+
 }

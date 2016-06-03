@@ -18,14 +18,14 @@ import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.QcPassedDetail;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleAnalyte;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleCVSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleLCMTube;
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
@@ -33,17 +33,18 @@ import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
+import uk.ac.bbsrc.tgac.miso.core.data.type.StrStatus;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleQcException;
 import uk.ac.bbsrc.tgac.miso.core.exception.ReportingException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
-public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAnalyte, SampleTissue,
-  SampleTissueProcessing, SampleCVSlide, SampleLCMTube, Identity {
+public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAliquot, SampleStock, SampleTissue, SampleTissueProcessing,
+    SampleCVSlide, SampleLCMTube, Identity {
 
   @SuppressWarnings("unused")
   private static final long serialVersionUID = 1L;
-  
+
   // Sample attributes
   private long sampleId = AbstractSample.UNSAVED_ID;
   private Project project;
@@ -63,27 +64,25 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAnalyt
   private User lastModifier;
   private Double volume;
   private boolean emptied = false;
-  
+
   // DetailedSample attributes
-  private Sample parent;
+  private SampleAdditionalInfo parent;
   private SampleClass sampleClass;
   private QcPassedDetail qcPassedDetail;
   private Subproject subproject;
   private Long kitDescriptorId;
   private KitDescriptor prepKit;
-  private Double concentration;
   private Boolean archived = Boolean.FALSE;
   private Long groupId;
   private String groupDescription;
-  
+
   // Identity attributes
   private String internalName;
   private String externalName;
   private DonorSex donorSex = DonorSex.UNKNOWN;
-  
+
   // TissueSample attributes
   private SampleClass tissueClass; // identifies a parent tissue class if this sample itself is not a tissue
-  private Integer cellularity;
   private TissueOrigin tissueOrigin;
   private TissueType tissueType;
   private String externalInstituteIdentifier;
@@ -91,7 +90,16 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAnalyt
   private Integer passageNumber;
   private Integer timesReceived;
   private Integer tubeNumber;
-  
+  private TissueMaterial tissueMaterial;
+  private String region;
+
+  // AnalyteAliquot attributes
+  private SamplePurpose samplePurpose;
+
+  // SampleStock attributes
+  private StrStatus strStatus = StrStatus.NOT_SUBMITTED;
+  private Double concentration;
+
   // TissueProcessingSample attributes
   // CV Slide
   private Integer cuts;
@@ -100,17 +108,10 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAnalyt
   // LCM Tube
   private Integer cutsConsumed;
 
-  // AnalyteSample attributes
-  private SamplePurpose samplePurpose;
-  private TissueMaterial tissueMaterial;
-  private StrStatus strStatus = StrStatus.NOT_SUBMITTED;
-  private String region;
-  private String tubeId;
-  
   public DetailedSampleBuilder() {
     this(null);
   }
-  
+
   public DetailedSampleBuilder(User user) {
     if (user != null) {
       securityProfile = new SecurityProfile(user);
@@ -307,22 +308,22 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAnalyt
   }
 
   @Override
-  public Sample getParent() {
+  public SampleAdditionalInfo getParent() {
     return parent;
   }
 
   @Override
-  public void setParent(Sample parent) {
+  public void setParent(SampleAdditionalInfo parent) {
     this.parent = parent;
   }
 
   @Override
-  public Set<Sample> getChildren() {
+  public Set<SampleAdditionalInfo> getChildren() {
     throw new UnsupportedOperationException("Method not implemented on builder");
   }
 
   @Override
-  public void setChildren(Set<Sample> children) {
+  public void setChildren(Set<SampleAdditionalInfo> children) {
     throw new UnsupportedOperationException("Method not implemented on builder");
   }
 
@@ -525,16 +526,6 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAnalyt
   }
 
   @Override
-  public Integer getCellularity() {
-    return cellularity;
-  }
-
-  @Override
-  public void setCellularity(Integer cellularity) {
-    this.cellularity = cellularity;
-  }
-
-  @Override
   public Integer getCuts() {
     return cuts;
   }
@@ -617,16 +608,6 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAnalyt
   @Override
   public void setRegion(String region) {
     this.region = region;
-  }
-
-  @Override
-  public String getTubeId() {
-    return tubeId;
-  }
-
-  @Override
-  public void setTubeId(String tubeId) {
-    this.tubeId = tubeId;
   }
 
   @Override
@@ -782,15 +763,15 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAnalyt
   public Collection<Library> getLibraries() {
     return Lists.newArrayList();
   }
-  
+
   public SampleClass getTissueClass() {
     return tissueClass;
   }
-  
+
   public void setTissueClass(SampleClass tissueClass) {
     this.tissueClass = tissueClass;
   }
-  
+
   public SampleAdditionalInfo build() {
     if (sampleClass == null || sampleClass.getSampleCategory() == null) {
       throw new NullPointerException("Missing sample class or category");
@@ -823,19 +804,21 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAnalyt
         sample = processing;
       }
       break;
-    case SampleAnalyte.CATEGORY_NAME:
-      SampleAnalyte analyte = new SampleAnalyteImpl();
-      analyte.setSamplePurpose(samplePurpose);
-      analyte.setTissueMaterial(tissueMaterial);
-      analyte.setStrStatus(strStatus);
-      analyte.setRegion(region);
-      analyte.setTubeId(tubeId);
-      sample = analyte;
+    case SampleStock.CATEGORY_NAME:
+      SampleStock stock = new SampleStockImpl();
+      stock.setStrStatus(strStatus);
+      stock.setConcentration(concentration);
+      sample = stock;
+      break;
+    case SampleAliquot.CATEGORY_NAME:
+      SampleAliquot aliquot = new SampleAliquotImpl();
+      aliquot.setSamplePurpose(samplePurpose);
+      sample = aliquot;
       break;
     default:
       throw new IllegalArgumentException("Unknown sample category: " + sampleClass.getSampleCategory());
     }
-    
+
     if (parent != null) {
       sample.setParent(parent);
     } else if (!Identity.CATEGORY_NAME.equals(sampleClass.getSampleCategory())) {
@@ -846,13 +829,14 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAnalyt
       if (SampleTissue.CATEGORY_NAME.equals(sampleClass.getSampleCategory())) {
         sample.setParent(identity);
       } else {
+        if (tissueClass == null) throw new NullPointerException("Missing tissue class");
         SampleTissue tissue = buildTissue();
         tissue.setSampleClass(tissueClass);
         tissue.setParent(identity);
         sample.setParent(tissue);
       }
     }
-    
+
     sample.setId(sampleId);
     sample.setProject(project);
     sample.setSecurityProfileId(securityProfile_profileId);
@@ -871,22 +855,20 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAnalyt
     sample.setLastModifier(lastModifier);
     sample.setVolume(volume);
     sample.setEmpty(emptied);
-    
+
     sample.setSampleClass(sampleClass);
     sample.setQcPassedDetail(qcPassedDetail);
     sample.setSubproject(subproject);
     sample.setPrepKit(prepKit);
-    sample.setConcentration(concentration);
     sample.setArchived(archived);
     sample.setGroupId(groupId);
     sample.setGroupDescription(groupDescription);
-    
+
     return sample;
   }
-  
+
   private SampleTissue buildTissue() {
     SampleTissue tissue = new SampleTissueImpl();
-    tissue.setCellularity(cellularity);
     tissue.setTimesReceived(timesReceived);
     tissue.setTubeNumber(tubeNumber);
     tissue.setPassageNumber(passageNumber);
@@ -894,6 +876,8 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAnalyt
     tissue.setTissueOrigin(tissueOrigin);
     tissue.setExternalInstituteIdentifier(externalInstituteIdentifier);
     tissue.setLab(lab);
+    tissue.setTissueMaterial(tissueMaterial);
+    tissue.setRegion(region);
     return tissue;
   }
 

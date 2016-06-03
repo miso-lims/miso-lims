@@ -9,7 +9,7 @@ Sample.hot = {
   sciName: null,
   sampleData: null,
   showQcs: false,
-  
+
   /**
    * Additional sample-specific processing.
    */
@@ -20,14 +20,14 @@ Sample.hot = {
       Sample.hot.addProjectEtcDropdowns();
     }
   },
-  
+
   /**
    * Modifies attributes of Sample Dtos (ex. adds the alias for each attribute ID) so Handsontable displays correctly
    */
   modifySamplesForEdit: function (samplesArray) {
     Sample.hot.sampleClassId = samplesArray[0].sampleClassId;
     return samplesArray.map(function (sam) {
-      
+
       // add sampleAdditionalInfo values
       if (sam.type != 'Plain') {
         // add attributes if it's a first receipt
@@ -40,7 +40,17 @@ Sample.hot = {
         if (sam.subprojectId) sam.subprojectAlias = Hot.getAliasFromId(sam.subprojectId, Hot.sampleOptions.subprojectsDtos);
 
         // add sampleAnalyte values, if applicable
-        if (Sample.hot.getCategoryFromClassId(sam.sampleClassId) == 'Analyte') {
+        if (Sample.hot.getCategoryFromClassId(sam.sampleClassId) == 'Tissue') {
+          if (sam.tissueMaterialId) {
+            sam.tissueMaterialAlias = Hot.getAliasFromId(sam.tissueMaterialId, Hot.sampleOptions.tissueMaterialsDtos);
+          }
+		  sam.tissueOriginAlias = Hot.getAliasFromId(sam.tissueOriginId, Hot.sampleOptions.tissueOriginsDtos);
+		  sam.tissueTypeAlias = Hot.getAliasFromId(sam.tissueTypeId, Hot.sampleOptions.tissueTypesDtos);
+		  if (sam.labId) {
+		    sam.labComposite = Sample.hot.getLabCompositeFromId(sam.labId, Hot.sampleOptions.labsDtos);
+		  }
+        }
+        if (Sample.hot.getCategoryFromClassId(sam.sampleClassId) == 'Aliquot') {
           if (sam.samplePurposeId) {
             sam.samplePurposeAlias = Hot.getAliasFromId(sam.samplePurposeId, Hot.sampleOptions.samplePurposesDtos);
           }
@@ -49,11 +59,11 @@ Sample.hot = {
       if (sam.receivedDate) {
         sam.receivedDate = sam.receivedDate.substring(0,10);
       }
-      
+
       return sam;
     });
   },
-  
+
   /**
    * Creates proto-samples with some inherited attributes from parent samples.
    */
@@ -68,7 +78,7 @@ Sample.hot = {
     }
     return samplesArray.map(function (sam) {
       var newSam = {};
-      newSam.sampleType = sam.sampleType; 
+      newSam.sampleType = sam.sampleType;
       newSam.projectId = sam.projectId;
       newSam.scientificName = sam.scientificName;
       newSam.parentSampleClassId = sam.sampleClassId;
@@ -77,6 +87,15 @@ Sample.hot = {
       newSam.sampleClassAlias = Hot.getAliasFromId(newSam.sampleClassId, Hot.sampleOptions.sampleClassesDtos);
       newSam.parentId = parseInt(sam.id);
       newSam.parentAlias = clone(sam.alias);
+      newSam.tissueOriginId = sam.tissueOriginId;
+      newSam.tissueOriginAlias = sam.tissueOriginAlias;
+      newSam.tissueTypeId = sam.tissueTypeId;
+      newSam.tissueTypeAlias = sam.tissueTypeAlias;
+      newSam.timesReceived = sam.timesReceived;
+      newSam.tubeNumber = sam.tubeNumber;
+      newSam.passageNumber = sam.passageNumber;
+      newSam.externalInstituteIdentifier = sam.externalInstituteIdentifier;
+      newSam.labId = sam.labId;
       if (sam.groupId.length) {
         newSam.groupId = parseInt(sam.groupId);
         newSam.groupDescription = sam.groupDescription;
@@ -87,7 +106,7 @@ Sample.hot = {
       return newSam;
     });
   },
-  
+
   /**
    * Creates required dropdowns and adds them to the page
    */
@@ -104,7 +123,7 @@ Sample.hot = {
       document.getElementById('makeTable').classList.remove('disabled');
     }
   },
-  
+
   /**
    * Adds institute alias to lab (lab dropdown displays lab alias + institute alias) (detailed sample only)
    */
@@ -118,7 +137,7 @@ Sample.hot = {
       labs[i].instituteAlias = instituteAlias;
     }
   },
-  
+
   /**
    * Creates the project dorpdown and adds it to the page
    */
@@ -132,7 +151,7 @@ Sample.hot = {
       select.push('>'+ Sample.hot.projectsArray[i].alias +' ('+ Sample.hot.projectsArray[i].name +')</option>');
     }
     document.getElementById('projectSelect').insertAdjacentHTML('beforeend', select.join(''));
-    
+
     // if detailedSample is selected, add subproject dropdown
     if (Hot.detailedSample && Sample.hot.selectedProjectId) {
       Sample.hot.addSubprojectSelect();
@@ -168,7 +187,7 @@ Sample.hot = {
       subprojectSelect.style.display = '';
     }
   },
-  
+
   /**
    * Helper method to return subprojects associated with a given project
    */
@@ -179,30 +198,32 @@ Sample.hot = {
     });
     return rtn;
   },
-  
+
   /**
    * Creates dropdown for sample classes
    */
   addClassSelect: function () {
     var select = [];
+    var classes = Hot.sortByProperty(Hot.sampleOptions.sampleClassesDtos, 'id');
     select.push('<select id="classDropdown">');
     select.push('<option value="">Select class</option>');
     var classOptions = Sample.hot.getNewSampleClassOptions();
     for (var i=0; i<classOptions.length; i++) {
-      select.push('<option value="'+ classOptions[i].id +'">'+ classOptions[i].alias +'</option>');
+     if (classes[i].alias == "Identity") continue;
+       select.push('<option value="'+ classOptions[i].id +'">'+ classOptions[i].alias +'</option>');
     }
     select.push('</select>');
     document.getElementById('classOptions').innerHTML = select.join('');
     document.getElementById('classDropdown').addEventListener('change', Sample.hot.enableTableButton);
   },
-  
+
   /**
    * Returns true if a new sample of the provided SampleClass can be created without an existing parent
    */
   canCreateNew: function (sampleClass) {
     return sampleClass.sampleCategory === "Tissue" || (sampleClass.sampleCategory === "Analyte" && sampleClass.stock === true);
   },
-  
+
   /**
    * Returns the SampleClasses which may be created without an existing parent
    */
@@ -216,7 +237,7 @@ Sample.hot = {
     }
     return options;
   },
-  
+
   /**
    * Returns the alias of each SampleClass which may be created without an existing parent
    */
@@ -230,7 +251,7 @@ Sample.hot = {
     }
     return options;
   },
-  
+
   getTissueClassesAliasOnly: function () {
     var classes = Hot.sortByProperty(Hot.sampleOptions.sampleClassesDtos, 'id');
     var options = [];
@@ -241,7 +262,7 @@ Sample.hot = {
     }
     return options;
   },
-  
+
   /**
    * Enables "Make Table" button once required dropdowns are chosen
    */
@@ -251,7 +272,7 @@ Sample.hot = {
       document.getElementById('makeTable').classList.remove('disabled');
     }
   },
-  
+
   /**
    * Checks to see if table exists before creating a new one.
    */
@@ -283,7 +304,7 @@ Sample.hot = {
       Sample.hot.sampleClassId = document.getElementById('classDropdown').value;
       Sample.hot.dataSchema.sampleClassAlias = Hot.getAliasFromId(Sample.hot.sampleClassId, Hot.sampleOptions.sampleClassesDtos);
     }
-    
+
     // make the table
     var sampleCategory = null;
     if (Hot.detailedSample) {
@@ -291,14 +312,14 @@ Sample.hot = {
       Sample.hot.dataSchema.scientificName = "Homo sapiens";
     }
     Sample.hot.makeHOT(null, sampleCategory);
-    
+
     // disable sampleClass dropdown so they can't change it midway through editing table values
     if (document.getElementById('classDropdown')) {
       document.getElementById('classDropdown').setAttribute('disabled', 'disabled');
       document.getElementById('classDropdown').classList.add('disabled');
     }
   },
-  
+
   /**
    * Gets number of rows to add to table
    */
@@ -325,10 +346,10 @@ Sample.hot = {
     Hot.colConf = Sample.hot.setColumnData(Hot.detailedSample, sampleCategory, idColBoolean);
 
     if (!startingValues) {
-      // set initial number of rows to display. 
+      // set initial number of rows to display.
       var startRowsNumber = Sample.hot.parseIntRows("");
       if (startRowsNumber === false) return false;
-      
+
       // stringify and parse to clone the default object (instead of using referential copies) if detailedSample is enabled
       var defaultObject = (Hot.detailedSample ? JSON.stringify(Sample.hot.getDefaultDetailedValues()) : null);
       Sample.hot.addEmptyRow((startRowsNumber - Hot.startData.length), defaultObject);
@@ -336,7 +357,7 @@ Sample.hot = {
     } else {
       Hot.startData = startingValues;
     }
-    
+
     // make HOT instance
     var hotContainer = document.getElementById('hotContainer');
     Hot.hotTable = new Handsontable(hotContainer, {
@@ -351,11 +372,11 @@ Sample.hot = {
       dataSchema: Sample.hot.dataSchema
     });
     document.getElementById('hotContainer').style.display = '';
-    
+
     // enable save button if it was disabled
     if (Hot.saveButton && Hot.saveButton.classList.contains('disabled')) Hot.toggleButtonAndLoaderImage(Hot.saveButton);
   },
-  
+
   /**
    * Redraws the samples table to include QC columns
    * TODO: finish this (make sure it contains the necessary columns)
@@ -364,10 +385,10 @@ Sample.hot = {
     Sample.hot.showQcs = true;
     var sampleCategory = Sample.hot.getCategoryFromClassId(Hot.hotTable.getSourceData()[0].sampleClassId);
     Hot.colConf = Sample.hot.setColumnData(Hot.detailedSample, sampleCategory, false);
-    
+
     Hot.hotTable.updateSettings({ columns: Hot.colConf, colHeaders: Hot.getValues('header', Hot.colConf) });
   },
-  
+
   /**
    * Hides columns which don't change often and do take up extra space
    * TODO: finish this
@@ -375,10 +396,10 @@ Sample.hot = {
   hideAdditionalCols: function () {
     var sampleCategory = Sample.hot.getCategoryFromClassId(Hot.hotTable.getSourceData()[0].sampleClassId);
     Hot.colConf = Sample.hot.setColumnData(false, sampleCategory, false);
-    
+
     Hot.hotTable.updateSettings({ columns: Hot.colConf, colHeaders: Hot.getValues('header', Hot.colConf) });
   },
- 
+
   /**
    * Data schema for each row in table
    */
@@ -422,13 +443,12 @@ Sample.hot = {
     region: null,
     tubeId: null,
     instituteTissueName: null,
-    cellularity: null,
     cuts: null,
     discards: null,
     thickness: null,
     cutsConsumed: null
   },
- 
+
   /**
    * Adds an object to the startData (can have default values)
    */
@@ -438,7 +458,7 @@ Sample.hot = {
       Hot.startData.push((defaultObject ? JSON.parse(defaultObject) : {}));
     }
   },
- 
+
   /**
    * Pre-populates default values for certain columns. (detailed sample only)
    */
@@ -458,7 +478,7 @@ Sample.hot = {
   getSubprojects: function() {
     return Hot.sortByProperty(Hot.sampleOptions.subprojectsDtos, 'id').map(Hot.getAlias);
   },
-  
+
   /**
    * Gets array of sample type aliases (detailed sample only)
    */
@@ -472,7 +492,7 @@ Sample.hot = {
   getQcValues: function () {
     return Hot.dropdownRef['qcValues'].map(function (val) { if (val === '') val = 'unknown'; return val; });
   },
-  
+
   /**
    * Gets array of STR statuses (detailed sample only)
    */
@@ -500,7 +520,7 @@ Sample.hot = {
   getTissueTypes: function () {
     return Hot.sortByProperty(Hot.sampleOptions.tissueTypesDtos, 'id').map(Hot.getAlias);
   },
-  
+
   /**
    * Gets array of tissue material aliases (detailed sample only)
    */
@@ -514,7 +534,7 @@ Sample.hot = {
   getSampleClasses: function () {
     return Hot.sortByProperty(Hot.sampleOptions.sampleClassesDtos, 'id').map(Hot.getAlias);
   },
-  
+
   /**
    * Gets array of sample class aliases that are a valid child of the given parent (detailed sample only)
    */
@@ -529,7 +549,7 @@ Sample.hot = {
    * Gets array of sample purpose aliases (detailed sample only)
    */
   getSamplePurposes: function () {
-    return Hot.sortByProperty(Hot.sampleOptions.samplePurposesDtos, 'id').map(Hot.getAlias); 
+    return Hot.sortByProperty(Hot.sampleOptions.samplePurposesDtos, 'id').map(Hot.getAlias);
   },
 
   /**
@@ -539,14 +559,14 @@ Sample.hot = {
   getQcPassedDetails: function () {
     return Hot.sortByProperty(Hot.sampleOptions.qcPassedDetailsDtos, 'id').map(function (qcpd) { return qcpd.description; });
   },
-  
+
   /**
    * Gets array of lab custom aliases (with institute alias) (detailed sample only)
    */
   getLabs: function () {
     return Hot.sortByProperty(Hot.sampleOptions.labsDtos,'id').map(function (lab) { return lab.alias +' - '+ lab.instituteAlias; });
   },
-  
+
   /**
    * Gets array of kit descriptor names(detailed sample only)
    */
@@ -555,31 +575,18 @@ Sample.hot = {
       .filter(function (kit) { return kit.kitType == 'Extraction'; })
       .map(function (kit) { return kit.name; });
   },
-  
+
   /**
    * sets which columns will be displayed
    * params: boolean detailedSample
    *         boolean qcBool (have qc columns been requested)
    *         String sampleCategory
-   *         boolean idColBoolean (true if no starting values are provided so parent is Identity, false if starting values are provided 
+   *         boolean idColBoolean (true if no starting values are provided so parent is Identity, false if starting values are provided
    *                               so parent is sample)
    */
   setColumnData: function (detailedBool, sampleCategory, idColBoolean) {
     var qcBool = Sample.hot.showQcs;
-    var cols;
-    if (!detailedBool && !qcBool) {
-     // if neither detailed sample not qcs are requested
-      cols = Hot.concatArrays(setAliasCol(), setPlainCols());
-    } else if (!detailedBool && qcBool) {
-      // if detailed sample is not requested but qcs are
-      cols = Hot.concatArrays(setAliasCol(), setPlainCols(), setQcCols());
-    } else if (detailedBool && !qcBool){
-      // if detailed sample is requested but qcs are not
-      cols = Hot.concatArrays(setAliasCol(), setPlainCols(), setDetailedCols(sampleCategory, idColBoolean));
-    } else if (detailedBool && qcBool) {
-      // if detailed sample and qcs are requested
-      cols = Hot.concatArrays(setAliasCol(), setPlainCols(), setDetailedCols(sampleCategory, idColBoolean), setQcCols());
-    }
+    var cols = Hot.concatArrays(setAliasCol(), setPlainCols(), detailedBool ? setDetailedCols(sampleCategory, idColBoolean) : [], qcBool ? setQcCols() : []);
     // add the ID Barcode column if it is not auto-generated
     if (!Hot.autoGenerateIdBarcodes) {
       cols.splice(3, 0, {
@@ -590,7 +597,7 @@ Sample.hot = {
       );
     }
     return cols;
-    
+
     function setPlainCols () {
       var sampleCols = [
         {
@@ -626,10 +633,10 @@ Sample.hot = {
           extraneous: true
         }
       ];
-      
+
       return sampleCols;
     }
-    
+
     function setAliasCol () {
       var aliasCol = [
         {
@@ -639,17 +646,65 @@ Sample.hot = {
           validator: validateAlias
         }
       ];
-            
+
       return aliasCol;
     }
-    
+
     function setDetailedCols (sampleCategory, idColBoolean) {
       var additionalCols = [
-        
+        {
+          header: 'Group ID',
+          data: 'groupId',
+          type: 'numeric',
+          validator: validateNumber
+        },{
+          header: 'Group Desc.',
+          data: 'groupDescription',
+          type: 'text',
+          validator: permitEmpty
+        }
       ];
       
       var tissueCols = [
-        
+        {
+          header: 'Material',
+          data: 'tissueMaterialAlias',
+          type: 'dropdown',
+          trimDropdown: false,
+          source: Sample.hot.getTissueMaterials(),
+          validator: permitEmpty
+        },{
+          header: 'Region',
+          data: 'region',
+          type: 'text'
+        }
+      ];
+
+      var aliquotCols = [
+        {
+          header: 'Purpose',
+          data: 'samplePurposeAlias',
+          type: 'dropdown',
+          trimDropdown: false,
+          source: Sample.hot.getSamplePurposes(),
+          validator: permitEmpty
+        },{
+          header: 'Kit',
+          data: 'prepKitAlias',
+          type: 'dropdown',
+          trimDropdown: false,
+          source: Sample.hot.getKitDescriptors(),
+          validator: permitEmpty
+        }
+      ];
+      var stockCols = [
+        {
+          header: 'STR Status',
+          data: 'strStatus',
+          type: 'dropdown',
+          trimDropdown: false,
+          source: Sample.hot.getStrStatuses()
+        }
       ];
 
       var tissueProcessingCols = {
@@ -681,44 +736,13 @@ Sample.hot = {
         'Curls': []
       };
 
-      var analyteCols = [
+      var aliquotCols = [
         {
-          header: 'Material',
-          data: 'tissueMaterialAlias',
-          type: 'dropdown',
-          trimDropdown: false,
-          source: Sample.hot.getTissueMaterials(),
-          validator: permitEmpty
-        },{
           header: 'Purpose',
           data: 'samplePurposeAlias',
           type: 'dropdown',
           trimDropdown: false,
           source: Sample.hot.getSamplePurposes(),
-          validator: permitEmpty
-        },{
-          header: 'STR Status',
-          data: 'strStatus',
-          type: 'dropdown',
-          trimDropdown: false,
-          source: Sample.hot.getStrStatuses()
-        },{
-          header: 'Region',
-          data: 'region',
-          type: 'text'
-        },{
-          header: 'Tube ID',
-          data: 'tubeId',
-          type: 'text'
-        },{
-          header: 'Group ID',
-          data: 'groupId',
-          type: 'numeric',
-          validator: validateNumber
-        },{
-          header: 'Group Desc.',
-          data: 'groupDescription',
-          type: 'text',
           validator: permitEmpty
         },{
           header: 'Kit',
@@ -728,7 +752,16 @@ Sample.hot = {
           source: Sample.hot.getKitDescriptors(),
           validator: permitEmpty
         }
-      ];  
+      ];
+      var stockCols = [
+        {
+          header: 'STR Status',
+          data: 'strStatus',
+          type: 'dropdown',
+          trimDropdown: false,
+          source: Sample.hot.getStrStatuses()
+        }
+      ];
       
       // fields required to create a tissue parent and identify or create an identity parent 
       // for the tissue. Used when receiving new samples
@@ -748,7 +781,7 @@ Sample.hot = {
         }
       ];
       
-      if (sampleCategory === 'Analyte') {
+      if (sampleCategory === 'Aliquot' || sampleCategory === 'Stock') {
         parentIdentityCols.push({
           header: 'Tissue Class',
           data: 'parentSampleClassAlias',
@@ -838,18 +871,19 @@ Sample.hot = {
       
       return Hot.concatArrays(additionalCols, getSampleCategoryCols(sampleCategory, tissueCols, tissueProcessingCols, analyteCols));
     }
-    
-    function getSampleCategoryCols (sampleCategory, tissueCols, tissueProcessingCols, analyteCols) {
+
+    function getSampleCategoryCols (sampleCategory, tissueCols, tissueProcessingCols, aliquotCols, stockCols) {
       var categoryCols = {
         'Tissue': tissueCols,
-        'Analyte': analyteCols,
+        'Aliquot': aliquotCols,
+        'Stock': stockCols,
         'Tissue Processing': tissueProcessingCols[Hot.getAliasFromId(Sample.hot.sampleClassId, Hot.sampleOptions.sampleClassesDtos)]
         // Tissue Processing is different because the columns vary by sample class, unlike the other sample categories
       };
       return categoryCols[sampleCategory];
     }
-    
-    function setQcCols () {    
+
+    function setQcCols () {
       var qcCols = [
         {
           header: 'Vol.',
@@ -879,7 +913,7 @@ Sample.hot = {
       ];
       return qcCols;
     }
-    
+
     function requiredText (value, callback) {
       if (!value || value.length === 0) {
         callback(false);
@@ -887,7 +921,7 @@ Sample.hot = {
         callback(true);
       }
     }
-    
+
     function permitEmpty (value, callback) {
       if (value === undefined || value === null || value.length > 0 || value === '') {
         return callback(true);
@@ -895,7 +929,7 @@ Sample.hot = {
         return callback(false);
       }
     }
-    
+
     function validateAlias (value, callback) {
       if (value) {
         var countAliases = 0;
@@ -930,7 +964,7 @@ Sample.hot = {
         return callback(false);
       }
     }
-    
+
     function validateSampleTypes (value, callback) {
       if (Sample.hot.getSampleTypes().indexOf(value) == -1) {
         return callback(false);
@@ -938,7 +972,7 @@ Sample.hot = {
         return callback(true);
       }
     }
-    
+
     function validateTissueClasses (value, callback) {
       if (Sample.hot.getTissueClassesAliasOnly().indexOf(value) == -1) {
         return callback(false);
@@ -946,7 +980,7 @@ Sample.hot = {
         return callback(true);
       }
     }
-    
+
     function validateTissueOrigins (value, callback) {
       if (Sample.hot.getTissueOrigins().indexOf(value) == -1) {
         return callback(false);
@@ -954,7 +988,7 @@ Sample.hot = {
         return callback(true);
       }
     }
-    
+
     function validateTissueTypes (value, callback) {
       if (Sample.hot.getTissueTypes().indexOf(value) == -1) {
         return callback(false);
@@ -962,7 +996,7 @@ Sample.hot = {
         return callback(true);
       }
     }
-    
+
     function validateNumber (value, callback) {
       if (value === '' || value === null || Handsontable.helper.isNumeric(value) && value > 0) {
         return callback(true);
@@ -971,7 +1005,7 @@ Sample.hot = {
       }
     }
   },
-  
+
   /**
    * Gets the sampleCategory associated with a given sampleClass
    */
@@ -984,7 +1018,7 @@ Sample.hot = {
     }
     return 'Plain';
   },
-  
+
   /**
    * Gets lab id associated with a given lab composite (alias and institute alias)
    */
@@ -994,7 +1028,7 @@ Sample.hot = {
       return lab.alias +" - "+ lab.instituteAlias == aliasComposite;
     })[0].id;
   },
-  
+
   /**
    * Creates custom lab composite (alias and institute alias)
    */
@@ -1004,29 +1038,29 @@ Sample.hot = {
     })[0];
     return lab.alias +' - '+ lab.instituteAlias;
   },
-  
+
   /**
    * Gets sampleClass id for sampleClass at base of hierarchy (detailed sample only; Identity for OICR)
    */
   getRootSampleClassId: function () {
     return Hot.sampleOptions.sampleClassesDtos.filter(function (sampleClass) {
       // TODO: make this configurable in case an institute wants a root sample class with a different name
-      return sampleClass.alias == 'Identity'; 
+      return sampleClass.alias == 'Identity';
     })[0].id;
   },
-  
+
   /**
    * Creates the SampleDtos to pass to the server
    */
   buildSampleDtosFromData: function (obj) {
     var sample = {};
-    
+
     if (obj.id) {
       sample.id = obj.id;
       sample.name = obj.name;
       sample.alias = obj.alias;
     }
-    
+
     // add SampleDto attributes
     sample.description = obj.description || '';
     sample.identificationBarcode = obj.identificationBarcode;
@@ -1039,7 +1073,7 @@ Sample.hot = {
       // the time string is added for detailedSample because the server is expecting a datetime value
       sample.receivedDate = obj.receivedDate += "T00:00:00-05:00";
     }
-    
+
     // if it's a plain sample, return now.
     if (!Hot.detailedSample) {
       sample.type = 'Plain';
@@ -1048,7 +1082,7 @@ Sample.hot = {
 
     sample.rootSampleClassId = Sample.hot.getRootSampleClassId();
     
-    // add sample parent attributes, and all other attributes for the first receipt of a sample 
+    // add sample parent attributes, and all other attributes for the first receipt of a sample
     if (obj.externalName) {
       sample.externalName = obj.externalName;
       if (obj.donorSex && obj.donorSex.length) sample.donorSex = obj.donorSex;
@@ -1074,7 +1108,8 @@ Sample.hot = {
       }
     }
 
-    // if the table data couldn't have changed (no alias value) then use the original id; 
+
+    // if the table data couldn't have changed (no alias value) then use the original id;
     // otherwise, generate id from alias (rather than calculating for each field whether the original id corresponds to the current alias
     if (obj.sampleClassId && !obj.sampleClassAlias) {
       sample.sampleClassId = obj.sampleClassId;
@@ -1102,37 +1137,21 @@ Sample.hot = {
     if (obj.groupDescription && obj.groupDescription.length) {
       sample.groupDescription = obj.groupDescription;
     }
-    
+
     // add SampleCategory-specific attributes.
     switch (Sample.hot.getCategoryFromClassId(sample.sampleClassId)) {
-    case 'Analyte':
+    case 'Aliquot':
       if (obj.samplePurposeAlias && obj.samplePurposeAlias.length) {
         sample.samplePurposeId = Hot.getIdFromAlias(obj.samplePurposeAlias, Hot.sampleOptions.samplePurposesDtos);
       }
       if (obj.sampleGroupComposite && obj.sampleGroupComposite.length) {
         sample.sampleGroupId = Sample.hot.getIdFromSGComposite(obj.sampleGroupComposite, Hot.sampleOptions.sampleGroupsDtos);
       }
-      if (obj.tissueMaterialAlias && obj.tissueMaterialAlias.length) {
-        sample.tissueMaterialId = Hot.getIdFromAlias(obj.tissueMaterialAlias, Hot.sampleOptions.tissueMaterialsDtos);
-      }
+      break;
+    case 'Stock':
       if (obj.strStatus && obj.strStatus.length) {
         sample.strStatus = obj.strStatus;
       }
-      if (obj.region && obj.region.length) {
-        sample.region = obj.region;
-      }
-      if (obj.tubeId && obj.tubeId.length) {
-        sample.tubeId = obj.tubeId;
-      }
-      if (obj.parentSampleClassAlias && obj.parentSampleClassAlias.length) {
-        sample.parentSampleClassId = Hot.getIdFromAlias(obj.parentSampleClassAlias, Hot.sampleOptions.sampleClassesDtos);
-      }
-      break;
-    case 'Tissue':
-      if (obj.cellularity && obj.cellularity.length) {
-        sample.cellularity = obj.cellularity;
-      }
-      break;
     case 'Tissue Processing':
       if (obj.cuts) {
         sample.cuts = obj.cuts;
@@ -1161,7 +1180,7 @@ Sample.hot = {
     }
     return sample;
   },
-  
+
   /**
    * Gets a single sample from server and update alias in table source
    */
@@ -1176,7 +1195,7 @@ Sample.hot = {
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.send();
   },
-  
+
   /**
    * Posts a single sample to server and processes result
    */
@@ -1192,7 +1211,7 @@ Sample.hot = {
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.send(data);
   },
-  
+
   /**
    * Puts a single sample to server and processes result
    */
@@ -1208,7 +1227,7 @@ Sample.hot = {
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.send(data);
   },
-  
+
   /**
    * Processes a failure to save (adds invalid attribute to cell, creates user message)
    */
@@ -1239,7 +1258,7 @@ Sample.hot = {
     }
     Hot.addSuccessesAndErrors();
   },
-  
+
   /**
    * Processes a successful save and gets sample from server (to update alias)
    */
@@ -1253,14 +1272,14 @@ Sample.hot = {
     } else {
       sampleId = Hot.startData[rowIndex].id;
     }
-    
-    // add a 'saved' attribute to the data source 
+
+    // add a 'saved' attribute to the data source
     Hot.startData[rowIndex].saved = true;
-    
+
     // get sample data and update alias
     Sample.hot.getSampleAlias(sampleId, rowIndex);
   },
-  
+
   /**
    * Updates a sample's alias in table source data
    */
@@ -1281,29 +1300,29 @@ Sample.hot = {
       Hot.addErrors(Hot.messages);
       return false;
     }
-    
+
     var continueValidation = Hot.cleanRowsAndToggleSaveButton();
     if (continueValidation === false) return false;
-    
-    Hot.hotTable.validateCells(function (isValid) { 
+
+    Hot.hotTable.validateCells(function (isValid) {
       if (isValid) {
         // send it through the parser to get a sampleData array that isn't merely a reference to Hot.hotTable.getSourceData()
         var sampleData = JSON.parse(JSON.parse(JSON.stringify(Hot.hotTable.getSourceData())));
-        
+
         // add aliases of previously-saved items to the position corresponding to their row (zero-index data, one-index UI)
         // aliases of successfully-saved items will be added after save
         Hot.messages.success = sampleData.map(function (sample) { return (sample.saved === true ? sample.alias : null); });
 
         // Array of save functions, one for each line in the table
         var sampleSaveArray = Sample.hot.getArrayOfNewObjects(sampleData);
-        Hot.serial(sampleSaveArray); // Execute saves serially      
+        Hot.serial(sampleSaveArray); // Execute saves serially
       } else {
         Hot.validationFails();
         return false;
       }
     });
   },
-  
+
   /**
    * Creates Sample Dtos for samples to be POSTed
    */
@@ -1317,11 +1336,11 @@ Sample.hot = {
     }
     var len = sampleData.length;
     var arrayOfObjects = [];
-    
+
     // return an array of samples or saveFunctions for samples
     for (var i = 0; i < len; i++) {
       if (sampleData[i].saved) continue;
-      
+
       var newSample = Sample.hot.buildSampleDtosFromData(sampleData[i]);
       if (Hot.detailedSample) {
         arrayOfObjects.push(sampleSaveFunction(JSON.stringify(newSample), i, len));
@@ -1331,7 +1350,7 @@ Sample.hot = {
     }
     return arrayOfObjects;
   },
-  
+
   /**
    * Creates Sample Dtos for samples to be PUT-ed
    */
@@ -1345,19 +1364,19 @@ Sample.hot = {
     }
     var len = sampleData.length;
     var arrayOfObjects = [];
-    
+
     // return an array of samples or saveFunctions for samples
     for (var i = 0; i < len; i++) {
       if (sampleData[i].saved) continue;
-      
+
       var newSample = Sample.hot.buildSampleDtosFromData(sampleData[i]);
-      
+
       // all updated objects go through the REST WS
       arrayOfObjects.push(sampleSaveFunction(JSON.stringify(newSample), newSample.id, i, len));
     }
     return arrayOfObjects;
   },
-  
+
   /**
    * Creates a custom error message for invalid parent-child relationship
    */
@@ -1370,7 +1389,7 @@ Sample.hot = {
     })[0].alias;
     return parentClassAlias + ' is not a valid parent for ' + childClassAlias + '.';
   },
-  
+
   /**
    * Checks if all cells are valid. If yes, POSTs samples that need to be saved. (plain sample only)
    */
@@ -1381,7 +1400,7 @@ Sample.hot = {
       Hot.addErrors(Hot.messages);
       return false;
     }
-    
+
     var continueValidation = Hot.cleanRowsAndToggleSaveButton();
     if (continueValidation === false) return false;
 
@@ -1389,12 +1408,12 @@ Sample.hot = {
       if (isValid) {
         document.getElementById('errorMessages').innerHTML = '';
         document.getElementById('saveErrors').classList.add('hidden');
-        
+
         // send it through the parser to get a sampleData array that isn't merely a reference to Hot.hotTable.getSourceData()
         var sampleData = JSON.parse(JSON.parse(JSON.stringify(Hot.hotTable.getSourceData())));
-        
+
         var samplesArray = Sample.hot.getArrayOfNewObjects(sampleData);
-        
+
         Fluxion.doAjax(
           'sampleControllerHelperService',
           'bulkSaveSamples',
@@ -1407,7 +1426,7 @@ Sample.hot = {
             'doOnSuccess': function (json) {
               var taxonErrorSamples = json.taxonErrorSamples;
               var savedSamples = json.savedSamples; // array of saved samples aliases
-              
+
               for (var j=0; j<sampleData.length; j++) {
                 // yell if a row's alias is not present in the returned (saved) data
                 if (savedSamples.indexOf(sampleData[j].alias) == -1) {
@@ -1421,7 +1440,7 @@ Sample.hot = {
                     }
                   }
                 }
-              } 
+              }
               // display error/success messages
               Hot.addSuccessesAndErrors();
             },
@@ -1445,49 +1464,49 @@ Sample.hot = {
   updateData: function () {
     var continueValidation = Hot.cleanRowsAndToggleSaveButton();
     if (continueValidation === false) return false;
-      
+
     Hot.hotTable.validateCells(function (isValid) {
       if (isValid) {
         // no check for sampleValidRelationship, since the sampleClass is not editable
         // send data through the parser to get a sampleData array that isn't merely a reference to Hot.hotTable.getSourceData()
         var sampleData = JSON.parse(JSON.parse(JSON.stringify(Hot.hotTable.getSourceData())));
-        
+
         // add previously-saved aliases to success message, and placeholders for items to be saved
         Hot.messages.success = sampleData.map(function (sample) { return (sample.saved === true ? sample.alias : null); });
-        
+
         // Array of save functions, one for each line in the table
         var sampleSaveArray = Sample.hot.getArrayOfUpdatedObjects(sampleData);
-        Hot.serial(sampleSaveArray); // Execute saves serially    
+        Hot.serial(sampleSaveArray); // Execute saves serially
       } else {
         Hot.validationFails();
         return false;
       }
     });
   },
-  
+
   /**
    * Checks if all cells are valid. If yes, POSTs new samples (parented to other samples) that need to be saved.
    */
   propagateData: function () {
     var continueValidation = Hot.cleanRowsAndToggleSaveButton();
     if (continueValidation === false) return false;
-    
+
     // send table data through the parser to get a copy of (not a reference to) sampleData array
     var sampleData = JSON.parse(JSON.parse(JSON.stringify(Hot.hotTable.getSourceData())));
-    
+
     // check for SampleValidRelationships
     var validRelationships = Sample.hot.assessValidRelationships(sampleData);
     if (!validRelationships) {
       Hot.addErrors(Hot.messages);
       return false;
     }
-    
+
     Hot.hotTable.validateCells(function (isValid) {
-      if (isValid) {        
-        
+      if (isValid) {
+
         // add previously-saved aliases to success message, and placeholders for items to be saved
         Hot.messages.success = sampleData.map(function (sample) { return (sample.saved === true ? sample.alias : null); });
-        
+
         // Array of save functions, one for each line in the table
         var sampleSaveArray = Sample.hot.getArrayOfNewObjects(sampleData);
         Hot.serial(sampleSaveArray); // Execute saves serially
@@ -1497,7 +1516,7 @@ Sample.hot = {
       }
     });
   },
-  
+
   /**
    * Gets sampleValidRelationship which corresponds to given parent and child
    */
@@ -1507,7 +1526,7 @@ Sample.hot = {
     });
     return value;
   },
-  
+
   /**
    * Gets parent sampleClass and child sampleClass and checks to see if parent and child have an associated valid relationship
    */

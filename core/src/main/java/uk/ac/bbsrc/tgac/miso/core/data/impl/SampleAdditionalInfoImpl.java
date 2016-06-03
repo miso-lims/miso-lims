@@ -14,7 +14,6 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import uk.ac.bbsrc.tgac.miso.core.data.QcPassedDetail;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
@@ -29,10 +28,10 @@ public class SampleAdditionalInfoImpl extends SampleImpl implements SampleAdditi
 
   @ManyToOne(optional = true, targetEntity = SampleAdditionalInfoImpl.class)
   @JoinColumn(name = "parentId", nullable = true)
-  private Sample parent;
+  private SampleAdditionalInfo parent;
 
   @Transient
-  private Set<Sample> children = new HashSet<>();
+  private Set<SampleAdditionalInfo> children = new HashSet<>();
 
   @OneToOne(targetEntity = SampleClassImpl.class)
   @JoinColumn(name = "sampleClassId", nullable = false)
@@ -51,8 +50,6 @@ public class SampleAdditionalInfoImpl extends SampleImpl implements SampleAdditi
   @Transient
   private KitDescriptor prepKit;
 
-  private Double concentration;
-
   @Column(nullable = false)
   private Boolean archived = Boolean.FALSE;
 
@@ -62,22 +59,22 @@ public class SampleAdditionalInfoImpl extends SampleImpl implements SampleAdditi
   private String groupDescription;
 
   @Override
-  public Sample getParent() {
+  public SampleAdditionalInfo getParent() {
     return parent;
   }
 
   @Override
-  public void setParent(Sample parent) {
+  public void setParent(SampleAdditionalInfo parent) {
     this.parent = parent;
   }
 
   @Override
-  public Set<Sample> getChildren() {
+  public Set<SampleAdditionalInfo> getChildren() {
     return children;
   }
 
   @Override
-  public void setChildren(Set<Sample> children) {
+  public void setChildren(Set<SampleAdditionalInfo> children) {
     this.children = children;
   }
 
@@ -99,16 +96,6 @@ public class SampleAdditionalInfoImpl extends SampleImpl implements SampleAdditi
   @Override
   public void setSubproject(Subproject subproject) {
     this.subproject = subproject;
-  }
-
-  @Override
-  public Double getConcentration() {
-    return concentration;
-  }
-
-  @Override
-  public void setConcentration(Double concentration) {
-    this.concentration = concentration;
   }
 
   @Override
@@ -182,5 +169,4 @@ public class SampleAdditionalInfoImpl extends SampleImpl implements SampleAdditi
   public void setGroupDescription(String groupDescription) {
     this.groupDescription = groupDescription;
   }
-
 }

@@ -42,7 +42,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleAnalyte;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
@@ -91,8 +90,6 @@ public abstract class DataObjectFactory {
   public abstract Sample getSample();
 
   public abstract Sample getSample(User user);
-
-  public abstract SampleAnalyte getSampleAnalyte();
 
   public abstract SampleQC getSampleQC();
 

@@ -47,7 +47,8 @@
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SamplePurposeImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleGroupImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl</value>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAnalyteImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleStockImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueProcessingImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleCVSlideImpl</value>

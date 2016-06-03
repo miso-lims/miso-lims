@@ -191,16 +191,11 @@ var Sample = Sample || {
           break;
         }
         break;
-      case 'Analyte':
+      case 'Stock':
         // Region validation
         jQuery('#region').attr('class', 'form-control');
         jQuery('#region').attr('data-parsley-maxlength', '255');
         jQuery('#region').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
-        
-        // TubeId validation
-        jQuery('#tubeId').attr('class', 'form-control');
-        jQuery('#tubeId').attr('data-parsley-maxlength', '255');
-        jQuery('#tubeId').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
         
         // TissueClass validation
         jQuery('#tissueClass').attr('class', 'form-control');
@@ -733,8 +728,11 @@ Sample.ui = {
     var sampleCategory = Sample.options.getSampleCategoryByClassId(selectedId);
     jQuery('#sampleCategory').val(sampleCategory);
     switch (sampleCategory) {
-    case 'Analyte':
-      Sample.ui.setUpForAnalyte();
+    case 'Aliquot':
+      Sample.ui.setUpForAliquot();
+      break;
+    case 'Stock':
+      Sample.ui.setUpForStock();
       break;
     default:
       Sample.ui.setUpForTissue();
@@ -743,20 +741,34 @@ Sample.ui = {
   },
   
   setUpForTissue: function() {
-    jQuery('#detailedSampleAnalyte').find(':input').each(function() {
+    jQuery('#detailedSampleAliquot').find(':input').each(function() {
       jQuery(this).val('');
     });
-    Sample.ui.hideTissueProcessingFields();
-    jQuery('#detailedSampleAnalyte').hide();
+    jQuery('#detailedSampleStock').find(':input').each(function() {
+      jQuery(this).val('');
+    });
+    jQuery('#detailedSampleAliquot').hide();
+    jQuery('#detailedSampleStock').hide();
     jQuery('#tissueClassRow').hide();
     jQuery('#tissueClass').val('');
     jQuery('#detailedSampleTissue').show();
   },
-
-  setUpForAnalyte: function() {
-    Sample.ui.hideTissueProcessingFields();
+  
+  setUpForAliquot: function() {
+    jQuery('#detailedSampleStock').find(':input').each(function() {
+      jQuery(this).val('');
+    });
     jQuery('#tissueClassRow').show();
-    jQuery('#detailedSampleAnalyte').show();
+    jQuery('#detailedSampleAliquot').show();
+    jQuery('#detailedSampleStock').hide();
+  },
+   setUpForStock: function() {
+    jQuery('#detailedSampleAliquot').find(':input').each(function() {
+      jQuery(this).val('');
+    });
+    jQuery('#tissueClassRow').show();
+    jQuery('#detailedSampleStock').show();
+    jQuery('#detailedSampleAliquot').hide();
   },
   
   editSampleIdBarcode: function (span, id) {

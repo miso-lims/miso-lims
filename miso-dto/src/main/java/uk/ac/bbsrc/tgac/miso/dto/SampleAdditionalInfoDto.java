@@ -20,8 +20,6 @@ public class SampleAdditionalInfoDto extends SampleDto {
   private String subprojectUrl;
   private Long prepKitId;
   private String prepKitUrl;
-  private Double concentration;
-  private String labUrl;
   private Long groupId;
   private String groupDescription;
 
@@ -89,14 +87,6 @@ public class SampleAdditionalInfoDto extends SampleDto {
     this.subprojectUrl = subprojectUrl;
   }
 
-  public Double getConcentration() {
-    return concentration;
-  }
-
-  public void setConcentration(Double concentration) {
-    this.concentration = concentration;
-  }
-
   public Long getSampleClassId() {
     return sampleClassId;
   }
@@ -129,14 +119,6 @@ public class SampleAdditionalInfoDto extends SampleDto {
     this.prepKitUrl = prepKitUrl;
   }
 
-  public String getLabUrl() {
-    return labUrl;
-  }
-
-  public void setLabUrl(String labUrl) {
-    this.labUrl = labUrl;
-  }
-
   public Long getGroupId() {
     return groupId;
   }
@@ -156,6 +138,7 @@ public class SampleAdditionalInfoDto extends SampleDto {
   @Override
   public void writeUrls(URI baseUri) {
     super.writeUrls(baseUri);
+    setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/sample/{id}").buildAndExpand(getId()).toUriString());
     if (getSampleClassId() != null) {
       setSampleClassUrl(
           UriComponentsBuilder.fromUri(baseUri).path("/rest/sampleclass/{id}").buildAndExpand(getSampleClassId()).toUriString());
@@ -173,20 +156,6 @@ public class SampleAdditionalInfoDto extends SampleDto {
     if (getParentId() != null) {
       setParentUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/sample/{id}").buildAndExpand(getParentId()).toUriString());
     }
-  }
-
-  @Override
-  public String toString() {
-    return "SampleAdditionalInfoDto [parentId=" + parentId + ", parentUrl="
-        + parentUrl + ", parentAlias=" + parentAlias + ", parentSampleClassId="
-        + parentSampleClassId + ", sampleClassId=" + sampleClassId
-        + ", sampleClassUrl=" + sampleClassUrl + ", qcPassedDetailId="
-        + qcPassedDetailId + ", qcPassedDetailUrl=" + qcPassedDetailUrl
-        + ", subprojectId=" + subprojectId + ", subprojectUrl=" + subprojectUrl
-        + ", prepKitId=" + prepKitId + ", prepKitUrl=" + prepKitUrl
-        + ", concentration=" + concentration + ", labUrl=" + labUrl
-        + ", groupId=" + groupId + ", groupDescription=" + groupDescription
-        + ", super=" + super.toString() + "]";
   }
 
 }

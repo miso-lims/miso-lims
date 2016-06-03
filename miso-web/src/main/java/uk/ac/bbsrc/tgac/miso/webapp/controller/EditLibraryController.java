@@ -41,10 +41,6 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-import net.sourceforge.fluxion.ajax.util.JSONUtils;
-
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,6 +66,9 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import net.sourceforge.fluxion.ajax.util.JSONUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractPool;
@@ -84,6 +83,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
 import uk.ac.bbsrc.tgac.miso.core.data.TagBarcodeFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAdditionalInfoImpl;
@@ -481,20 +481,18 @@ public class EditLibraryController {
   /**
    * Each PlatformName holds a null TagBarcodeFamily.
    *
-   * Structure of this tagBarcodes object: {
-   *   PlatformName : {
-   *     TagBarcodeFamilyName: {
-   *       1: [
-   *         {
-   *           id: ##,
-   *           name: AAAA,
-   *           sequence: XXXXX
-   *         }, ...
-   *       ], ...
-   *     }, ...
-   *   }, ...
-   * }
-   *
+   * Structure of this tagBarcodes object:
+   * 
+   * <pre>
+   *  {
+   *    PlatformName : {
+   *      TagBarcodeFamilyName: {
+   *        1: [ { id: ##, name: AAAA, sequence: XXXXX }, ... ],
+   *        ... },
+   *      ... },
+   *  ... }
+   * </pre>
+   * 
    * @return tagBarcodes object
    */
   @ModelAttribute("tagBarcodes")
@@ -766,7 +764,6 @@ public class EditLibraryController {
         if (LimsUtils.isDetailedSample(sample)) {
           SampleAdditionalInfo detailed = (SampleAdditionalInfo) sample;
           sampleClass = detailed.getSampleClass();
-          library.setLibraryAdditionalInfo(new LibraryAdditionalInfoImpl());
         }
 
         List<Sample> projectSamples = new ArrayList<Sample>(requestManager.listAllSamplesByProjectId(sample.getProject().getProjectId()));
@@ -861,6 +858,7 @@ public class EditLibraryController {
 
         if (isDetailedSampleEnabled()) {
           LibraryAdditionalInfoDto lai = new LibraryAdditionalInfoDto();
+          setTissueInfo(detailed, lai);
           library.setLibraryAdditionalInfo(lai);
         }
         libraries.add(library);
@@ -877,6 +875,16 @@ public class EditLibraryController {
         log.error("Failed to get bulk samples", ex);
       }
       throw ex;
+    }
+  }
+
+  public void setTissueInfo(SampleAdditionalInfo detailed, LibraryAdditionalInfoDto lai) {
+    for (SampleAdditionalInfo sai = detailed; sai != null; sai = sai.getParent()) {
+      if (sai instanceof SampleTissue) {
+        lai.setTissueOrigin(Dtos.asDto(((SampleTissue) sai).getTissueOrigin()));
+        lai.setTissueType(Dtos.asDto(((SampleTissue) sai).getTissueType()));
+        break;
+      }
     }
   }
 

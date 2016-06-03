@@ -17,9 +17,6 @@ import uk.ac.bbsrc.tgac.miso.persistence.SampleAdditionalInfoDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleClassDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SubprojectDao;
-import uk.ac.bbsrc.tgac.miso.persistence.TissueOriginDao;
-import uk.ac.bbsrc.tgac.miso.persistence.TissueTypeDao;
-import uk.ac.bbsrc.tgac.miso.service.LabService;
 import uk.ac.bbsrc.tgac.miso.service.SampleAdditionalInfoService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLKitDAO;
@@ -37,12 +34,6 @@ public class DefaultSampleAdditionalInfoService implements SampleAdditionalInfoS
   private SampleDao sampleDao;
 
   @Autowired
-  private TissueOriginDao tissueOriginDao;
-
-  @Autowired
-  private TissueTypeDao tissueTypeDao;
-
-  @Autowired
   private QcPassedDetailDao qcPassedDetailDao;
 
   @Autowired
@@ -57,23 +48,12 @@ public class DefaultSampleAdditionalInfoService implements SampleAdditionalInfoS
   @Autowired
   private AuthorizationManager authorizationManager;
 
-  @Autowired
-  private LabService labService;
-
   public void setSampleAdditionalInfoDao(SampleAdditionalInfoDao sampleAdditionalInfoDao) {
     this.sampleAdditionalInfoDao = sampleAdditionalInfoDao;
   }
 
   public void setSampleDao(SampleDao sampleDao) {
     this.sampleDao = sampleDao;
-  }
-
-  public void setTissueOriginDao(TissueOriginDao tissueOriginDao) {
-    this.tissueOriginDao = tissueOriginDao;
-  }
-
-  public void setTissueTypeDao(TissueTypeDao tissueTypeDao) {
-    this.tissueTypeDao = tissueTypeDao;
   }
 
   public void setQcPassedDetailDao(QcPassedDetailDao qcPassedDetailDao) {
@@ -96,10 +76,6 @@ public class DefaultSampleAdditionalInfoService implements SampleAdditionalInfoS
     this.authorizationManager = authorizationManager;
   }
 
-  public void setLabService(LabService labService) {
-    this.labService = labService;
-  }
-
   @Override
   public SampleAdditionalInfo get(Long sampleAdditionalInfoId) throws IOException {
     authorizationManager.throwIfUnauthenticated();
@@ -108,7 +84,6 @@ public class DefaultSampleAdditionalInfoService implements SampleAdditionalInfoS
 
   @Override
   public void applyChanges(SampleAdditionalInfo target, SampleAdditionalInfo source) throws IOException {
-    target.setConcentration(source.getConcentration());
     target.setArchived(source.getArchived());
     target.setGroupDescription(source.getGroupDescription());
     target.setGroupId(source.getGroupId());

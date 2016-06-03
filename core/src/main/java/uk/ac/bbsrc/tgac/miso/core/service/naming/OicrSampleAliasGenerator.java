@@ -36,7 +36,7 @@ public class OicrSampleAliasGenerator implements NameGenerator<Sample> {
     
     for (SampleAdditionalInfo parent = (SampleAdditionalInfo) detailed.getParent(); parent != null;
         parent = (SampleAdditionalInfo) parent.getParent()) {
-      if (isAnalyteAliquot(parent)) {
+      if (isAliquotSample(parent)) {
         return parent.getAlias() + getSiblingTag(detailed);
       }
       if (isTissueSample(parent)) {

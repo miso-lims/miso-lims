@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
+import java.io.IOException;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -13,7 +14,11 @@ import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleTissueDao;
+import uk.ac.bbsrc.tgac.miso.persistence.TissueOriginDao;
+import uk.ac.bbsrc.tgac.miso.persistence.TissueTypeDao;
+import uk.ac.bbsrc.tgac.miso.service.LabService;
 import uk.ac.bbsrc.tgac.miso.service.SampleTissueService;
+import uk.ac.bbsrc.tgac.miso.service.TissueMaterialService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 @Transactional
@@ -26,6 +31,14 @@ public class DefaultSampleTissueService implements SampleTissueService {
   private SecurityManager securityManager;
   @Autowired
   private AuthorizationManager authorizationManager;
+  @Autowired
+  private TissueOriginDao tissueOriginDao;
+  @Autowired
+  private TissueTypeDao tissueTypeDao;
+  @Autowired
+  private LabService labService;
+  @Autowired
+  private TissueMaterialService tissueMaterialService;
 
   @Override
   public void delete(Long sampleTissueId) {
@@ -59,13 +72,44 @@ public class DefaultSampleTissueService implements SampleTissueService {
     this.securityManager = securityManager;
   }
 
+  public void setTissueOriginDao(TissueOriginDao tissueOriginDao) {
+    this.tissueOriginDao = tissueOriginDao;
+  }
+
+  public void setTissueTypeDao(TissueTypeDao tissueTypeDao) {
+    this.tissueTypeDao = tissueTypeDao;
+  }
+
+  public void setLabService(LabService labService) {
+    this.labService = labService;
+  }
+
   @Override
-  public void applyChanges(SampleTissue target, SampleTissue source) {
+  public void loadMembers(SampleTissue target, SampleTissue source) throws IOException {
+    if (source.getTissueOrigin() != null) {
+      target.setTissueOrigin(tissueOriginDao.getTissueOrigin(source.getTissueOrigin().getId()));
+      ServiceUtils.throwIfNull(target.getTissueOrigin(), "SampleAdditionalInfo.tissueOriginId", source.getTissueOrigin().getId());
+    }
+    if (source.getTissueType() != null) {
+      target.setTissueType(tissueTypeDao.getTissueType(source.getTissueType().getId()));
+      ServiceUtils.throwIfNull(target.getTissueType(), "SampleAdditionalInfo.tissueTypeId", source.getTissueType().getId());
+    }
+    if (source.getLab() != null) {
+      target.setLab(labService.get(source.getLab().getId()));
+      ServiceUtils.throwIfNull(target.getLab(), "sampleAdditionalInfo.labId", source.getLab().getId());
+    }
+    if (source.getTissueMaterial() != null) {
+      target.setTissueMaterial(tissueMaterialService.get(source.getTissueMaterial().getId()));
+    }
+  }
+
+  @Override
+  public void applyChanges(SampleTissue target, SampleTissue source) throws IOException {
+    loadMembers(target, source);
     target.setPassageNumber(source.getPassageNumber());
     target.setTimesReceived(source.getTimesReceived());
     target.setTubeNumber(source.getTubeNumber());
     target.setExternalInstituteIdentifier(source.getExternalInstituteIdentifier());
-    target.setCellularity(source.getCellularity());
   }
 
 }

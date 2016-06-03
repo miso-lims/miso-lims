@@ -352,12 +352,12 @@ public class HibernateSampleDao implements SampleDao, SampleStore {
     return fetchSqlStore(records);
   }
 
-  private Set<Sample> listByParentId(long parentId) {
+  private Set<SampleAdditionalInfo> listByParentId(long parentId) {
     Query query = currentSession().createQuery("select s from SampleImpl s " + "join s.parent p " + "where p.sampleId = :id");
     query.setLong("id", parentId);
     @SuppressWarnings("unchecked")
-    List<Sample> samples = query.list();
-    return new HashSet<Sample>(samples);
+    List<SampleAdditionalInfo> samples = query.list();
+    return new HashSet<SampleAdditionalInfo>(samples);
   }
 
   /**

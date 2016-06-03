@@ -88,8 +88,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletion;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletionGroup;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleAnalyte;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
@@ -835,7 +836,8 @@ public class LimsUtils {
     }
   }
 
-  public static Map<Pool<?>, Map<SequencingParameters, PoolOrderCompletionGroup>> groupCompletions(Iterable<PoolOrderCompletion> completions) {
+  public static Map<Pool<?>, Map<SequencingParameters, PoolOrderCompletionGroup>> groupCompletions(
+      Iterable<PoolOrderCompletion> completions) {
     Map<Pool<?>, Map<SequencingParameters, PoolOrderCompletionGroup>> poolGroups = new TreeMap<>();
     for (PoolOrderCompletion completion : completions) {
       Map<SequencingParameters, PoolOrderCompletionGroup> parametersGroup;
@@ -876,20 +878,20 @@ public class LimsUtils {
     }
     return poolGroups;
   }
-  
+
   public static boolean isDetailedSample(Sample sample) {
     return sample instanceof SampleAdditionalInfo;
   }
-  
+
   public static boolean isPlainSample(Sample sample) {
     return !isDetailedSample(sample);
   }
-  
+
   public static boolean isIdentitySample(Sample sample) {
     if (!isDetailedSample(sample)) return false;
     return sample instanceof Identity;
   }
-  
+
   public static boolean isTissueSample(Sample sample) {
     if (!isDetailedSample(sample)) return false;
     return sample instanceof SampleTissue;
@@ -899,18 +901,13 @@ public class LimsUtils {
     if (!isDetailedSample(sample)) return false;
     return sample instanceof SampleTissueProcessing;
   }
-  
-  public static boolean isAnalyteSample(Sample sample) {
-    if (!isDetailedSample(sample)) return false;
-    return sample instanceof SampleAnalyte;
+
+  public static boolean isStockSample(Sample sample) {
+    return sample instanceof SampleStock;
   }
-  
-  public static boolean isAnalyteStock(Sample sample) {
-    return isAnalyteSample(sample) && ((SampleAnalyte) sample).getSampleClass().isStock();
-  }
-  
-  public static boolean isAnalyteAliquot(Sample sample) {
-    return isAnalyteSample(sample) && !((SampleAnalyte) sample).getSampleClass().isStock();
+
+  public static boolean isAliquotSample(Sample sample) {
+    return sample instanceof SampleAliquot;
   }
 
 }
