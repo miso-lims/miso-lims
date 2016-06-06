@@ -40,14 +40,7 @@
   <context:component-scan annotation-config="true" base-package="uk.ac.bbsrc.tgac.miso" />
   <context:component-scan annotation-config="true" base-package="net.sourceforge.fluxion.ajax" />
 
-  <context:property-placeholder location="classpath:miso.properties" />
-
-  <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
-    <property name="location">
-      <value>classpath:miso.properties</value>
-    </property>
-    <property name="ignoreUnresolvablePlaceholders" value="true" />
-  </bean>
+  <context:property-placeholder location="${miso.propertiesFile}" />
 
   <bean name="webBindingInitializer" class="uk.ac.bbsrc.tgac.miso.spring.LimsBindingInitializer" />
 
