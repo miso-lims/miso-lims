@@ -19,7 +19,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleAdditionalInfoDao;
 
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class HibernateSampleAdditionalInfoDao implements SampleAdditionalInfoDao {
 
   protected static final Logger log = LoggerFactory.getLogger(HibernateSampleAdditionalInfoDao.class);

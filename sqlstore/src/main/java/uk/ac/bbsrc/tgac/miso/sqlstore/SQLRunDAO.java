@@ -93,6 +93,7 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
  * @author Rob Davey
  * @since 0.0.2
  */
+@Transactional(rollbackFor = Exception.class)
 public class SQLRunDAO implements RunStore {
   private static final String TABLE_NAME = "Run";
 
@@ -278,7 +279,6 @@ public class SQLRunDAO implements RunStore {
   }
 
   @Override
-  @Transactional(readOnly = false, rollbackFor = IOException.class)
   @TriggersRemove(cacheName = { "runCache",
       "lazyRunCache" }, keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
           @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
@@ -644,7 +644,6 @@ public class SQLRunDAO implements RunStore {
   }
 
   @Override
-  @Transactional(readOnly = false, rollbackFor = IOException.class)
   @TriggersRemove(cacheName = { "runCache",
       "lazyRunCache" }, keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
           @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )

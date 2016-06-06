@@ -17,7 +17,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.SamplePurposeDao;
 import uk.ac.bbsrc.tgac.miso.service.SamplePurposeService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 @Service
 public class DefaultSamplePurposeService implements SamplePurposeService {
 

@@ -17,7 +17,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.InstituteDao;
 import uk.ac.bbsrc.tgac.miso.service.InstituteService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 @Service
 public class DefaultInstituteService implements InstituteService {
   

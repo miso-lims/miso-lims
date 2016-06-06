@@ -17,7 +17,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.QcPassedDetailImpl;
 import uk.ac.bbsrc.tgac.miso.persistence.QcPassedDetailDao;
 
 @Repository
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class HibernateQcPassedDetailDao implements QcPassedDetailDao {
 
   protected static final Logger log = LoggerFactory.getLogger(HibernateQcPassedDetailDao.class);

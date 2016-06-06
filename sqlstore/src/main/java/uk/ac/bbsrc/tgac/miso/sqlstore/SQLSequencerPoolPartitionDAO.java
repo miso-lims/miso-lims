@@ -31,6 +31,10 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,9 +50,6 @@ import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.Property;
 import com.googlecode.ehcache.annotations.TriggersRemove;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
@@ -67,6 +68,7 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
  * @author Rob Davey
  * @since 0.1.6
  */
+@Transactional(rollbackFor = Exception.class)
 public class SQLSequencerPoolPartitionDAO implements PartitionStore {
   private static final String TABLE_NAME = "_Partition";
 
@@ -166,7 +168,6 @@ public class SQLSequencerPoolPartitionDAO implements PartitionStore {
   }
 
   @Override
-  @Transactional(readOnly = false, rollbackFor = IOException.class)
   @TriggersRemove(cacheName = { "sequencerPoolPartitionCache",
       "lazySequencerPoolPartitionCache" }, keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
           @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
@@ -302,7 +303,6 @@ public class SQLSequencerPoolPartitionDAO implements PartitionStore {
   }
 
   @Override
-  @Transactional(readOnly = false, rollbackFor = IOException.class)
   @TriggersRemove(cacheName = { "sequencerPoolPartitionCache",
       "lazySequencerPoolPartitionCache" }, keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
           @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )

@@ -42,6 +42,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
@@ -63,6 +64,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
  * @date 01-Jul-2011
  * @since 0.0.3
  */
+@Transactional(rollbackFor = Exception.class)
 public class SQLPrintJobDAO implements PrintJobStore {
   private static final String TABLE_NAME = "PrintJob";
 

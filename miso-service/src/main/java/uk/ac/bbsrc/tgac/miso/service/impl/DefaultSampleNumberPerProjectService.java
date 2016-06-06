@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.User;
@@ -20,7 +19,7 @@ import uk.ac.bbsrc.tgac.miso.service.SampleNumberPerProjectService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLProjectDAO;
 
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 @Service
 public class DefaultSampleNumberPerProjectService implements SampleNumberPerProjectService {
 
@@ -88,7 +87,6 @@ public class DefaultSampleNumberPerProjectService implements SampleNumberPerProj
   }
 
   @Override
-  @Transactional(propagation = Propagation.REQUIRED)
   public String nextNumber(Project project) throws IOException {
     User user = authorizationManager.getCurrentUser();
     return sampleNumberPerProjectDao.nextNumber(project, user);

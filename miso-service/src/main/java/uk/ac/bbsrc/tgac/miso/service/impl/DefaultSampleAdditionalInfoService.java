@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.User;
@@ -33,7 +32,7 @@ import uk.ac.bbsrc.tgac.miso.service.SampleAdditionalInfoService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLKitDAO;
 
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 @Service
 public class DefaultSampleAdditionalInfoService implements SampleAdditionalInfoService {
 
@@ -130,7 +129,6 @@ public class DefaultSampleAdditionalInfoService implements SampleAdditionalInfoS
   }
 
   @Override
-  @Transactional(propagation = Propagation.REQUIRED)
   public SampleAdditionalInfo to(SampleAdditionalInfoDto sampleAdditionalInfoDto) throws IOException {
     authorizationManager.throwIfUnauthenticated();
     checkArgument(sampleAdditionalInfoDto.getSampleClassId() != null,

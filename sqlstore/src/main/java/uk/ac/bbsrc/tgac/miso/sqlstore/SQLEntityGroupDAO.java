@@ -12,6 +12,9 @@ import java.util.Set;
 
 import javax.persistence.CascadeType;
 
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+
 import org.codehaus.jackson.type.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,9 +23,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.transaction.annotation.Transactional;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
 import uk.ac.bbsrc.tgac.miso.core.data.EntityGroup;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.EntityGroupImpl;
@@ -43,6 +45,7 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
  * @date 23/10/13
  * @since 0.2.1-SNAPSHOT
  */
+@Transactional(rollbackFor = Exception.class)
 public class SQLEntityGroupDAO implements EntityGroupStore {
   private static final String TABLE_NAME = "EntityGroup";
 

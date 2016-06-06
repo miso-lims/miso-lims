@@ -6,11 +6,13 @@ import java.util.Collection;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 
+@Transactional(rollbackFor = Exception.class)
 public class SQLChangeLogDAO implements ChangeLogStore {
   private static class ChangeLogMapper implements RowMapper<ChangeLog> {
 

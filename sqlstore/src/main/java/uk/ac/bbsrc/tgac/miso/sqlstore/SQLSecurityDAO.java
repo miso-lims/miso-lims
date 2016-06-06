@@ -54,6 +54,14 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.eaglegenomics.simlims.core.Group;
+import com.eaglegenomics.simlims.core.SecurityProfile;
+import com.eaglegenomics.simlims.core.User;
+import com.googlecode.ehcache.annotations.Cacheable;
+import com.googlecode.ehcache.annotations.KeyGenerator;
+import com.googlecode.ehcache.annotations.Property;
+import com.googlecode.ehcache.annotations.TriggersRemove;
+
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.security.PasswordCodecService;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
@@ -63,14 +71,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
-import com.eaglegenomics.simlims.core.Group;
-import com.eaglegenomics.simlims.core.SecurityProfile;
-import com.eaglegenomics.simlims.core.User;
-import com.googlecode.ehcache.annotations.Cacheable;
-import com.googlecode.ehcache.annotations.KeyGenerator;
-import com.googlecode.ehcache.annotations.Property;
-import com.googlecode.ehcache.annotations.TriggersRemove;
-
 /**
  * uk.ac.bbsrc.tgac.miso.sqlstore
  * <p/>
@@ -79,6 +79,7 @@ import com.googlecode.ehcache.annotations.TriggersRemove;
  * @author Rob Davey
  * @since 0.0.2
  */
+@Transactional(rollbackFor = Exception.class)
 public class SQLSecurityDAO implements SecurityStore {
   private static final String USER_TABLE_NAME = "User";
   private static final String GROUP_TABLE_NAME = "_Group";
@@ -161,7 +162,6 @@ public class SQLSecurityDAO implements SecurityStore {
   }
 
   @Override
-  @Transactional(readOnly = false, rollbackFor = IOException.class)
   @TriggersRemove(cacheName = { "userCache",
       "lazyUserCache" }, keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
           @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )

@@ -16,7 +16,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.PlatformStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
 import uk.ac.bbsrc.tgac.miso.persistence.PoolOrderCompletionDao;
 
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 @Repository
 public class HibernatePoolOrderCompletionDao implements PoolOrderCompletionDao {
 

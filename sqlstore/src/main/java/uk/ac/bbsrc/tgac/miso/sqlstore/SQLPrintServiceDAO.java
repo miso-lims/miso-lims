@@ -29,6 +29,9 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 
+import net.sf.json.JSONException;
+import net.sf.json.JSONObject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,11 +40,10 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
-import net.sf.json.JSONException;
-import net.sf.json.JSONObject;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.PrintManager;
@@ -62,6 +64,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.PrintServiceUtils;
  * @date 16-Apr-2012
  * @since 0.1.6
  */
+@Transactional(rollbackFor = Exception.class)
 public class SQLPrintServiceDAO implements PrintServiceStore {
   private static final String TABLE_NAME = "PrintService";
 

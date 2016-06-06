@@ -12,7 +12,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.service.TagBarcodeService;
 import uk.ac.bbsrc.tgac.miso.core.store.TagBarcodeStore;
 
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 @Service
 public class DefaultTagBarcodeService implements TagBarcodeService {
   @Autowired

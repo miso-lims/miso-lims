@@ -14,6 +14,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
@@ -23,6 +24,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.SequencerReferenceStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerServiceRecordStore;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
+@Transactional(rollbackFor = Exception.class)
 public class SQLSequencerServiceRecordDAO implements SequencerServiceRecordStore {
   
   private static final String TABLE_NAME = "SequencerServiceRecord";

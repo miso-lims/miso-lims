@@ -17,7 +17,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
 import uk.ac.bbsrc.tgac.miso.persistence.IdentityDao;
 
 @Repository
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class HibernateIdentityDao implements IdentityDao {
 
   protected static final Logger log = LoggerFactory.getLogger(HibernateIdentityDao.class);

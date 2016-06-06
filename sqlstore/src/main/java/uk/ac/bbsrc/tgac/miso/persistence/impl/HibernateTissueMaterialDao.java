@@ -17,7 +17,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueMaterialDao;
 
 @Repository
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class HibernateTissueMaterialDao implements TissueMaterialDao {
 
   protected static final Logger log = LoggerFactory.getLogger(HibernateTissueMaterialDao.class);

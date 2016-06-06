@@ -48,6 +48,13 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.eaglegenomics.simlims.core.SecurityProfile;
+import com.eaglegenomics.simlims.core.store.SecurityStore;
+import com.googlecode.ehcache.annotations.Cacheable;
+import com.googlecode.ehcache.annotations.KeyGenerator;
+import com.googlecode.ehcache.annotations.Property;
+import com.googlecode.ehcache.annotations.TriggersRemove;
+
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractPlate;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -69,13 +76,6 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DaoLookup;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
-import com.eaglegenomics.simlims.core.store.SecurityStore;
-import com.googlecode.ehcache.annotations.Cacheable;
-import com.googlecode.ehcache.annotations.KeyGenerator;
-import com.googlecode.ehcache.annotations.Property;
-import com.googlecode.ehcache.annotations.TriggersRemove;
-
 /**
  * uk.ac.bbsrc.tgac.miso.sqlstore
  * <p/>
@@ -85,6 +85,7 @@ import com.googlecode.ehcache.annotations.TriggersRemove;
  * @date 12-Sep-2011
  * @since 0.1.1
  */
+@Transactional(rollbackFor = Exception.class)
 public class SQLPlateDAO implements PlateStore {
   private static final String TABLE_NAME = "Plate";
 
@@ -277,7 +278,6 @@ public class SQLPlateDAO implements PlateStore {
   }
 
   @Override
-  @Transactional(readOnly = false, rollbackFor = Exception.class)
   @TriggersRemove(cacheName = { "plateCache",
       "lazyPlateCache" }, keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
           @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )

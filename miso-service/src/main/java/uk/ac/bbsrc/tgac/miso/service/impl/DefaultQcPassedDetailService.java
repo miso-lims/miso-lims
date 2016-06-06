@@ -17,7 +17,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.QcPassedDetailDao;
 import uk.ac.bbsrc.tgac.miso.service.QcPassedDetailService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 @Service
 public class DefaultQcPassedDetailService implements QcPassedDetailService {
 
