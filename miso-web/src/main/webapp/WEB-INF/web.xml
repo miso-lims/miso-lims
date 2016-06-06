@@ -147,4 +147,9 @@
   <session-config>
     <session-timeout>60</session-timeout>
   </session-config>
+  
+  <context-param>
+    <param-name>miso.propertiesFile</param-name>
+    <param-value>classpath:miso.properties</param-value>
+  </context-param>
 </web-app>
