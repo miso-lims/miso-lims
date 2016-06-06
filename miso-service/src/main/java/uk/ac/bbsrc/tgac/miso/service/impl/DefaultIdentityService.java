@@ -1,7 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -11,12 +10,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
-import uk.ac.bbsrc.tgac.miso.dto.Dtos;
-import uk.ac.bbsrc.tgac.miso.dto.SampleIdentityDto;
 import uk.ac.bbsrc.tgac.miso.persistence.IdentityDao;
 import uk.ac.bbsrc.tgac.miso.service.IdentityService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
@@ -52,24 +48,6 @@ public class DefaultIdentityService implements IdentityService {
   public Identity get(String externalName) {
     return identityDao.getIdentity(externalName);
   }
-
-  @Override
-  public Long create(Identity identity) throws IOException {
-    authorizationManager.throwIfNonAdmin();
-    User user = authorizationManager.getCurrentUser();
-    identity.setCreatedBy(user);
-    identity.setUpdatedBy(user);
-    return identityDao.addIdentity(identity);
-  }
-
-  @Override
-  public void update(Identity identity) throws IOException {
-    authorizationManager.throwIfNonAdmin();
-    Identity updatedIdentity = get(identity.getSampleId());
-    applyChanges(updatedIdentity, identity);
-    updatedIdentity.setUpdatedBy(authorizationManager.getCurrentUser());
-    identityDao.update(updatedIdentity);
-  }
   
   @Override
   public void applyChanges(Identity target, Identity source) {
@@ -88,22 +66,6 @@ public class DefaultIdentityService implements IdentityService {
     authorizationManager.throwIfNonAdmin();
     Identity identity = get(identityId);
     identityDao.deleteIdentity(identity);
-  }
-
-  @Override
-  @Transactional(propagation = Propagation.REQUIRED)
-  public Identity to(SampleIdentityDto sampleIdentityDto) throws IOException {
-    authorizationManager.throwIfUnauthenticated();
-    User user = authorizationManager.getCurrentUser();
-
-    Identity identity = Dtos.to(sampleIdentityDto);
-    identity.setCreatedBy(user);
-    identity.setUpdatedBy(user);
-    Date now = new Date();
-    identity.setCreationDate(now);
-    identity.setLastUpdated(now);
-
-    return identity;
   }
 
 }

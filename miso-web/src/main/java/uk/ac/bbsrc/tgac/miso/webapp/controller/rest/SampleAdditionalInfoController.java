@@ -33,17 +33,14 @@ import javax.ws.rs.core.Response.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
-import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
@@ -129,43 +126,11 @@ public class SampleAdditionalInfoController extends RestController {
     return sampleAdditionalInfoDtos;
   }
 
-  @RequestMapping(value = "/additionalinfo", method = RequestMethod.POST, headers = { "Content-type=application/json" })
-  @ResponseBody
-  public ResponseEntity<?> createSampleAdditionalInfo(@RequestBody SampleAdditionalInfoDto sampleAdditionalInfoDto, UriComponentsBuilder b,
-      HttpServletResponse response) throws IOException {
-    SampleAdditionalInfo sampleAdditionalInfo = to(sampleAdditionalInfoDto);
-    Long id = sampleAdditionalInfoService.create(sampleAdditionalInfo);
-    UriComponents uriComponents = b.path("/sampleadditionalinfo/{id}").buildAndExpand(id);
-    HttpHeaders headers = new HttpHeaders();
-    headers.setLocation(uriComponents.toUri());
-    return new ResponseEntity<>(headers, HttpStatus.CREATED);
-  }
-
-  @RequestMapping(value = "/additionalinfo/{id}", method = RequestMethod.PUT, headers = { "Content-type=application/json" })
-  @ResponseBody
-  public ResponseEntity<?> updateSampleAdditionalInfo(@PathVariable("id") Long id,
-      @RequestBody SampleAdditionalInfoDto sampleAdditionalInfoDto, HttpServletResponse response) throws IOException {
-    SampleAdditionalInfo sampleAdditionalInfo = to(sampleAdditionalInfoDto);
-    sampleAdditionalInfo.setId(id);
-    sampleAdditionalInfoService.update(sampleAdditionalInfo);
-    return new ResponseEntity<>(HttpStatus.OK);
-  }
-
   @RequestMapping(value = "/additionalinfo/{id}", method = RequestMethod.DELETE)
   @ResponseBody
   public ResponseEntity<?> deleteSampleAdditionalInfo(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
     sampleAdditionalInfoService.delete(id);
     return new ResponseEntity<>(HttpStatus.OK);
-  }
-  
-  private SampleAdditionalInfo to(SampleAdditionalInfoDto dto) {
-    try {
-      return Dtos.to(dto);
-    } catch (IllegalArgumentException e) {
-      RestException re = new RestException(e.getLocalizedMessage(), e);
-      re.setStatus(Status.BAD_REQUEST);
-      throw re;
-    }
   }
 
 }

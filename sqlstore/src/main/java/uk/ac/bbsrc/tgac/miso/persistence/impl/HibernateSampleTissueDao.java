@@ -1,6 +1,5 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import java.util.Date;
 import java.util.List;
 
 import org.hibernate.Query;
@@ -47,23 +46,8 @@ public class HibernateSampleTissueDao implements SampleTissueDao {
   }
 
   @Override
-  public Long addSampleTissue(SampleTissue sampleTissue) {
-    Date now = new Date();
-    sampleTissue.setCreationDate(now);
-    sampleTissue.setLastUpdated(now);
-    return (Long) currentSession().save(sampleTissue);
-  }
-
-  @Override
   public void deleteSampleTissue(SampleTissue sampleTissue) {
     currentSession().delete(sampleTissue);
-  }
-
-  @Override
-  public void update(SampleTissue sampleTissue) {
-    Date now = new Date();
-    sampleTissue.setLastUpdated(now);
-    currentSession().update(sampleTissue);
   }
 
 }
