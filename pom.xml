@@ -419,7 +419,6 @@
     <module>spring</module>
     <module>miso-web</module>
 
-    <module>tagbarcode-strategies</module>
     <module>miso-service</module>
     <module>sqlstore</module>
     <module>miso-dto</module>
