@@ -18,7 +18,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAdditionalInfoImpl;
 import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
 import uk.ac.bbsrc.tgac.miso.persistence.LibraryAdditionalInfoDao;
 
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class HibernateLibraryAdditionalInfoDao implements LibraryAdditionalInfoDao {
   
   protected static final Logger log = LoggerFactory.getLogger(HibernateLibraryAdditionalInfoDao.class);

@@ -27,11 +27,7 @@
   default-autowire="byName">
 
   <bean id="propertyConfigurer" class="uk.ac.bbsrc.tgac.miso.webapp.util.MisoPropertyExporter">
-    <property name="locations">
-      <list>
-        <value>classpath:miso.properties</value>
-      </list>
-    </property>
+    <property name="location" value="${miso.propertiesFile}" />
   </bean>
 
   <bean id="applicationContextProvider" name="applicationContextProvider" class="uk.ac.bbsrc.tgac.miso.webapp.context.ApplicationContextProvider" />

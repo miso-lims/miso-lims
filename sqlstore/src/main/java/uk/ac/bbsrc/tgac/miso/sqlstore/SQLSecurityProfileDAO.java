@@ -32,6 +32,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.sf.ehcache.CacheManager;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +42,6 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.Group;
@@ -52,7 +53,6 @@ import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.Property;
 import com.googlecode.ehcache.annotations.TriggersRemove;
 
-import net.sf.ehcache.CacheManager;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 
 /**
@@ -63,6 +63,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.Store;
  * @author Rob Davey
  * @since 0.0.2
  */
+@Transactional(rollbackFor = Exception.class)
 public class SQLSecurityProfileDAO implements Store<SecurityProfile> {
   private static final String TABLE_NAME = "SecurityProfile";
 
@@ -86,7 +87,7 @@ public class SQLSecurityProfileDAO implements Store<SecurityProfile> {
 
   private SecurityManager securityManager;
   private JdbcTemplate template;
-  private int maxQueryParams = 500;
+  private final int maxQueryParams = 500;
 
   @Autowired
   private CacheManager cacheManager;
@@ -108,7 +109,6 @@ public class SQLSecurityProfileDAO implements Store<SecurityProfile> {
   }
 
   @Override
-  @Transactional(readOnly = false, rollbackFor = IOException.class, propagation = Propagation.REQUIRED)
   @TriggersRemove(cacheName = { "securityProfileCache" }, keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
       @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public long save(SecurityProfile securityProfile) throws IOException {

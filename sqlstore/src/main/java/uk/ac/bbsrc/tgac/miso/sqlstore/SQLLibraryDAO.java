@@ -97,6 +97,7 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
  * @author Rob Davey
  * @since 0.0.2
  */
+@Transactional(rollbackFor = Exception.class)
 public class SQLLibraryDAO implements LibraryStore {
   private static String TABLE_NAME = "Library";
 
@@ -323,7 +324,6 @@ public class SQLLibraryDAO implements LibraryStore {
   }
 
   @Override
-  @Transactional(readOnly = false, rollbackFor = Exception.class)
   @TriggersRemove(cacheName = { "libraryCache",
       "lazyLibraryCache" }, keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
           @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
@@ -579,7 +579,6 @@ public class SQLLibraryDAO implements LibraryStore {
   }
 
   @Override
-  @Transactional(readOnly = false, rollbackFor = IOException.class)
   @TriggersRemove(cacheName = { "libraryCache",
       "lazyLibraryCache" }, keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
           @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )

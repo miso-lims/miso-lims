@@ -90,6 +90,7 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
  * @author Rob Davey
  * @since 0.0.2
  */
+@Transactional(rollbackFor = Exception.class)
 public class SQLProjectDAO implements ProjectStore {
   private static final String TABLE_NAME = "Project";
 
@@ -282,7 +283,6 @@ public class SQLProjectDAO implements ProjectStore {
   }
 
   @Override
-  @Transactional(readOnly = false, rollbackFor = Exception.class)
   @TriggersRemove(cacheName = { "projectCache",
       "lazyProjectCache" }, keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
           @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
@@ -465,7 +465,6 @@ public class SQLProjectDAO implements ProjectStore {
   }
 
   @Override
-  @Transactional(readOnly = false, rollbackFor = IOException.class)
   @TriggersRemove(cacheName = { "projectCache",
       "lazyProjectCache" }, keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
           @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))

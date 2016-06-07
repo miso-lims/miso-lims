@@ -20,7 +20,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleNumberPerProjectImpl;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleNumberPerProjectDao;
 
 @Repository
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class HibernateSampleNumberPerProjectDao implements SampleNumberPerProjectDao {
 
   protected static final Logger log = LoggerFactory.getLogger(HibernateSampleNumberPerProjectDao.class);

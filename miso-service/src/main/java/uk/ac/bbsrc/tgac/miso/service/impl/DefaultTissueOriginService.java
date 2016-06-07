@@ -17,7 +17,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.TissueOriginDao;
 import uk.ac.bbsrc.tgac.miso.service.TissueOriginService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 @Service
 public class DefaultTissueOriginService implements TissueOriginService {
 

@@ -17,7 +17,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SamplePurposeImpl;
 import uk.ac.bbsrc.tgac.miso.persistence.SamplePurposeDao;
 
 @Repository
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class HibernateSamplePurposeDao implements SamplePurposeDao {
 
   protected static final Logger log = LoggerFactory.getLogger(HibernateSamplePurposeDao.class);

@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.User;
@@ -23,7 +22,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.SampleTissueDao;
 import uk.ac.bbsrc.tgac.miso.service.SampleTissueService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 @Service
 public class DefaultSampleTissueService implements SampleTissueService {
   protected static final Logger log = LoggerFactory.getLogger(DefaultSampleTissueService.class);
@@ -89,7 +88,6 @@ public class DefaultSampleTissueService implements SampleTissueService {
   }
 
   @Override
-  @Transactional(propagation = Propagation.REQUIRED)
   public SampleTissue to(SampleTissueDto sampleTissueDto) throws IOException {
     authorizationManager.throwIfUnauthenticated();
     User user = authorizationManager.getCurrentUser();

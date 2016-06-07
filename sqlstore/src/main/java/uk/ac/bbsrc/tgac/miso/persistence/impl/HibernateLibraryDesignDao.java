@@ -17,7 +17,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignDao;
 
 @Repository
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class HibernateLibraryDesignDao implements LibraryDesignDao {
   protected static final Logger log = LoggerFactory.getLogger(HibernateLibraryDesignDao.class);
 

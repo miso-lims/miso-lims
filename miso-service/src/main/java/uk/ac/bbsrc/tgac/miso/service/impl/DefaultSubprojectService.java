@@ -19,7 +19,7 @@ import uk.ac.bbsrc.tgac.miso.service.SubprojectService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLProjectDAO;
 
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 @Service
 public class DefaultSubprojectService implements SubprojectService {
 

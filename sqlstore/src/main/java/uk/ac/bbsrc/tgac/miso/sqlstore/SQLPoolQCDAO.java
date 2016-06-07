@@ -31,6 +31,9 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,8 +44,6 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.transaction.annotation.Transactional;
 
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
@@ -63,6 +64,7 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
  * @author Rob Davey
  * @since 0.1.9
  */
+@Transactional(rollbackFor = Exception.class)
 public class SQLPoolQCDAO implements PoolQcStore {
   private static final String TABLE_NAME = "PoolQC";
 
@@ -127,7 +129,6 @@ public class SQLPoolQCDAO implements PoolQcStore {
   }
 
   @Override
-  @Transactional(readOnly = false, rollbackFor = IOException.class)
   public long save(PoolQC poolQC) throws IOException {
     MapSqlParameterSource params = new MapSqlParameterSource();
     params.addValue("pool_poolId", poolQC.getPool().getId());

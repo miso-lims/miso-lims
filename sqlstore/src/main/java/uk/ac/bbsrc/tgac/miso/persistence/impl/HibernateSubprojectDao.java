@@ -17,7 +17,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl;
 import uk.ac.bbsrc.tgac.miso.persistence.SubprojectDao;
 
 @Repository
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class HibernateSubprojectDao implements SubprojectDao {
 
   protected static final Logger log = LoggerFactory.getLogger(HibernateSubprojectDao.class);

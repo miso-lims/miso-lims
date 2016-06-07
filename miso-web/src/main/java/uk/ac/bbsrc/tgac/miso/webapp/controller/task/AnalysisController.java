@@ -59,8 +59,6 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.RunProcessingUtils;
 import uk.ac.bbsrc.tgac.miso.integration.AnalysisQueryService;
 import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationException;
-import uk.ac.ebi.fgpt.conan.model.ConanPipeline;
-import uk.ac.ebi.fgpt.conan.model.ConanTask;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.controller
@@ -188,82 +186,5 @@ public class AnalysisController {
 
       return new ModelAndView("/pages/createAnalysisTask.jsp", model);
     }
-  }
-
-  /**
-   * Gets the {@link uk.ac.ebi.fgpt.conan.model.ConanTask} with the given ID.
-   * 
-   * @param taskID
-   *          the ID of the task to retrieve
-   * @return the task assigned this ID
-   */
-  @RequestMapping(value = "/analysis/task/{taskID}", method = RequestMethod.GET)
-  public @ResponseBody ConanTask<? extends ConanPipeline> getTask(@PathVariable String taskID) {
-    return null;
-  }
-
-  /**
-   * Returns a list of all submitted tasks, in submission order. This includes all pending, running and completed tasks - basically a
-   * history of everything that has ever been submitted.
-   * 
-   * @return the list of all submitted tasks
-   */
-  @RequestMapping(value = "/analysis/tasks", method = RequestMethod.GET)
-  public @ResponseBody List<ConanTask<? extends ConanPipeline>> getTasks() {
-    return null;
-  }
-
-  /**
-   * Returns a list of all tasks that have been submitted but are pending execution. Tasks in this list may have been executed but failed:
-   * tasks that fail should highlight their failure to the submitter, and flag the task as pending.
-   * 
-   * @return a list of all tasks pending execution
-   */
-  @RequestMapping(value = "/analysis/tasks", method = RequestMethod.GET, params = "pending")
-  public @ResponseBody List<ConanTask<? extends ConanPipeline>> getPendingTasks() {
-    return null;
-  }
-
-  /**
-   * Returns a list of all tasks that are currently being executed.
-   * 
-   * @return the currently executing tasks
-   */
-  @RequestMapping(value = "/analysis/tasks", method = RequestMethod.GET, params = "running")
-  public @ResponseBody List<ConanTask<? extends ConanPipeline>> getRunningTasks() {
-    return null;
-  }
-
-  /**
-   * Returns a list of all tasks that have been executed and completed. This includes tasks that completed successfully, and those that
-   * completed because a process failed and was subsequently marked as complete by the submitter.
-   * 
-   * @return the tasks that have completed
-   */
-  @RequestMapping(value = "/analysis/tasks", method = RequestMethod.GET, params = "complete")
-  public @ResponseBody List<ConanTask<? extends ConanPipeline>> getCompletedTasks() {
-    return null;
-  }
-
-  /**
-   * Returns a list of all submitted tasks, in submission order. This includes all pending, running and completed tasks - basically a
-   * history of everything that has ever been submitted.
-   * 
-   * @return the list of all submitted tasks
-   */
-  @RequestMapping(value = "/analysis/pipeline/{pipelineName}", method = RequestMethod.GET)
-  public @ResponseBody ConanPipeline getPipeline(@PathVariable String pipelineName) {
-    return null;
-  }
-
-  /**
-   * Returns a list of all tasks that have been executed and completed. This includes tasks that completed successfully, and those that
-   * completed because a process failed and was subsequently marked as complete by the submitter.
-   * 
-   * @return the tasks that have completed
-   */
-  @RequestMapping(value = "/analysis/pipelines", method = RequestMethod.GET)
-  public @ResponseBody List<ConanPipeline> getPipelines() {
-    return null;
   }
 }

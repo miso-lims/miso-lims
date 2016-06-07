@@ -16,7 +16,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.TagBarcodeFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.store.TagBarcodeStore;
 
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 @Repository
 public class HibernateTagBarcodeDao implements TagBarcodeStore {
 

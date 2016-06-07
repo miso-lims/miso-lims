@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
@@ -18,7 +17,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleValidRelationshipImpl;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleValidRelationshipDao;
 
 @Repository
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class HibernateSampleValidRelationshipDao implements SampleValidRelationshipDao {
 
   protected static final Logger log = LoggerFactory.getLogger(HibernateSampleValidRelationshipDao.class);
@@ -35,7 +34,6 @@ public class HibernateSampleValidRelationshipDao implements SampleValidRelations
   }
 
   @Override
-  @Transactional(propagation = Propagation.REQUIRED)
   public List<SampleValidRelationship> getSampleValidRelationship() {
     Query query = currentSession().createQuery("from SampleValidRelationshipImpl");
     @SuppressWarnings("unchecked")

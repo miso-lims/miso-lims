@@ -17,7 +17,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueOriginDao;
 
 @Repository
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class HibernateTissueOriginDao implements TissueOriginDao {
 
   protected static final Logger log = LoggerFactory.getLogger(HibernateTissueOriginDao.class);

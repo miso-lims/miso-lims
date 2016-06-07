@@ -28,7 +28,6 @@
 <div id="tabs">
   <ul>
     <li><a href="#tab-1"><span>Tasks</span></a></li>
-    <li><a href="#tab-2"><span>Pipelines</span></a></li>
   </ul>
 
   <div id="tab-1">
@@ -107,77 +106,11 @@
 
   </div>
 
-  <div id="tab-2">
-    <h1>Available Pipelines</h1>
-    <table id="pipelines" class="list">
-      <thead>
-      <tr>
-        <th>Pipeline Name</th>
-        <th>Processes</th>
-      </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
-
-  <%--
-      <h1>Running Jobs</h1>
-      <table class="list">
-        <c:forEach items="${running}" var="task">
-          <tr>
-            <td>
-              <b>${task.name}</b>
-            </td>
-            <td class="fit"><a href='<c:url value="/miso/task/${task.taskId}"/>'>View</a></td>
-          </tr>
-        </c:forEach>
-      </table>
-
-      <h1>Pending Jobs</h1>
-      <table class="list">
-        <c:forEach items="${pending}" var="task">
-          <tr>
-            <td>
-              <b>${task.name}</b>
-            </td>
-            <td class="fit"><a href='<c:url value="/miso/task/${task.taskId}"/>'>View</a></td>
-          </tr>
-        </c:forEach>
-      </table>
-
-      <h1>Completed Jobs</h1>
-      <table class="list">
-        <c:forEach items="${complete}" var="task">
-          <tr>
-            <td>
-              <b>${task.name}</b>
-            </td>
-            <td class="fit"><a href='<c:url value="/miso/task/${task.taskId}"/>'>View</a></td>
-          </tr>
-        </c:forEach>
-      </table>
-    </div>
-
-    <div id="tab-2">
-      <h1>Available Pipelines</h1>
-      <table class="list">
-        <c:forEach items="${pipelines}" var="pipeline">
-          <tr>
-            <td>
-              <b>${pipeline.name}</b>
-            </td>
-            <td class="fit"><a href='<c:url value="/miso/pipeline/${pipeline.taskId}"/>'>View</a></td>
-          </tr>
-        </c:forEach>
-      </table>
-      --%>
-
   <script type="text/javascript">
     jQuery(document).ready(function () {
       jQuery("#tabs").tabs();
       jQuery("#tabs").removeClass('ui-widget').removeClass('ui-widget-content');
 
-      Tasks.ui.populatePipelines();
       Tasks.ui.populateRunningTasks();
       Tasks.ui.populatePendingTasks();
       Tasks.ui.populateFailedTasks();

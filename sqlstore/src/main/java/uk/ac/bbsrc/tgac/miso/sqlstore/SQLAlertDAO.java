@@ -29,6 +29,10 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 
+import net.sf.ehcache.CacheException;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,9 +49,6 @@ import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.Property;
 import com.googlecode.ehcache.annotations.TriggersRemove;
 
-import net.sf.ehcache.CacheException;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
 import uk.ac.bbsrc.tgac.miso.core.event.Alert;
 import uk.ac.bbsrc.tgac.miso.core.event.impl.DefaultAlert;
 import uk.ac.bbsrc.tgac.miso.core.event.impl.SystemAlert;
@@ -67,6 +68,7 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
  * @date 07/10/11
  * @since 0.1.2
  */
+@Transactional(rollbackFor = Exception.class)
 public class SQLAlertDAO implements AlertStore {
   private static final String TABLE_NAME = "Alert";
 
@@ -120,7 +122,6 @@ public class SQLAlertDAO implements AlertStore {
   }
 
   @Override
-  @Transactional(readOnly = false, rollbackFor = IOException.class)
   @TriggersRemove(cacheName = "alertCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
       @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
   public boolean remove(Alert alert) throws IOException {
@@ -128,7 +129,6 @@ public class SQLAlertDAO implements AlertStore {
   }
 
   @Override
-  @Transactional(readOnly = false, rollbackFor = IOException.class)
   @TriggersRemove(cacheName = "alertCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
       @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
   public long save(Alert alert) throws IOException {
