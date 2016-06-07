@@ -26,18 +26,13 @@ Development Machine(s):
 - Eclipse
 - A merge tool such as Meld
 
-# Creating a Fork and Setting Configuration
+# Creating a Fork
 Use the GitHub interface or a private instance to create a forked repository.
 
-Proceed to set up a build environment, then edit
-`miso-web/src/main/webapp/WEB-INF/miso-config.xml` and set the naming schemes.
-The naming schemes will determine how MISO checks if object names (especially
-samples, libraries) are valid. If you do not want to use one of the supplied
-ones (TGAC's standard, OICR's standard, or no checks), you will have to write
-one or more specific to your organisation.
+Proceed to set up a build environment.
 
 # Setting Up the Build Environment
-One or machines should be set up to build MISO. A typical Linux system will
+One or more machines should be set up to build MISO. A typical Linux system will
 work.
 
 You will need:
@@ -56,7 +51,7 @@ Locally, create a checkout:
     git remote add tgac git@github.com:TGAC/miso-lims.git
 
 # Setting Up the Database Server
-The database server needs to have [mySQL 5](https://www.mysql.com/). The tool
+The database server needs to have [MySQL 5](https://www.mysql.com/). The tool
 [Flyway](https://flywaydb.org/) must also be present to migrate the database as
 the application is developed, but it can be installed on a different server so
 long as it can access the database server.
@@ -64,7 +59,7 @@ long as it can access the database server.
 The default password in the following `IDENTIFIED BY` clauses should be
 changed.
 
-Once installed, start the mySQL console and create the database:
+Once installed, start the MySQL console and create the database:
 
     CREATE DATABASE lims;
     USE lims;
@@ -109,6 +104,10 @@ and populate it with the following information:
       <Parameter name="miso.propertiesFile" value="file:${CATALINA_HOME}/conf/Catalina/localhost/miso.properties" override="false"/>
     </Context>
 
+Make sure the database path in `ROOT.xml` is correct for your install:
+
+    url="jdbc:mysql://your.database.server:3306/lims"
+
 If your Tomcat install has the `autoDeploy="true"` flag set in `server.xml`, if
 you delete the `webapps/ROOT` directory and the `ROOT.war` file, Tomcat will
 delete the context `ROOT.xml` file. Either set autoDeploy to false, and
@@ -116,13 +115,20 @@ manually deploy your webapp, or make the `ROOT.xml` file undeletable by using
 `chattr +i` (`chattr -i` will undo this operation). [Upstream
 bug](https://issues.apache.org/bugzilla/show_bug.cgi?id=40050)
 
-Make sure the database path in the `server.xml` is correct for your install:
-
-    url="jdbc:mysql://your.database.server:3306/lims"
-
-Copy `$MISO_SRC/miso-web/src/main/resources/internal/miso.properties` to
+Copy `$MISO_SRC/miso-web/src/main/resources/external/miso.properties` to
 `${CATALINA_HOME}/conf/Catalina/localhost/miso.properties`. Review and edit
 this file as appropriate.
+
+- The naming schemes will determine how MISO checks if object names (especially
+samples, libraries) are valid. If you do not want to use one of the supplied
+ones (TGAC's standard, OICR's standard, or no checks), you will have to write
+one or more specific to your organisation.
+- If using a notification server, change `miso.notification.interop.enabled`
+to `true` and change the host and port for your notification server
+ (see Setting Up the Notification Server below).
+- If using a bulk barcode scanner (only VisionMate is supported at present), 
+set `miso.boxscanner.enabled` to `true` and change the host and port for your
+VisionMate server.
 
 Download some supporting JARs:
 
@@ -136,7 +142,7 @@ Append the following line to `$CATALINA_HOME/bin/setenv.sh` or, if using Tomcat 
 
 Create the directory `/storage/miso` and download the default MISO configuration files.
 
-	cd /storage/miso
+  	cd /storage/miso
     curl https://repos.tgac.ac.uk/miso/latest/miso_userspace_properties.tar.gz | tar xvfz -
 
 The configuration files are:
@@ -146,15 +152,16 @@ The configuration files are:
 | `issuetracker.properties` | settings for an issue tracking system, such as JIRA or RT. |
 | `mail.properties`         | email settings so that MISO can send emails to users.      |
 | `security.properties`     | properties to set the security environment (see below).    |
-| `submission.properties`   | properties to set the submission environment (see below).  |
+| `submission.properties`   | properties to set the submission environment.              |
 
 ## Security Environment
-MISO can use either LDAP or SQL as an authentication mechanism. The mechanism
+MISO can use either LDAP or JDBC as an authentication mechanism. The mechanism
 is set in both `/storage/miso/security.properties` and the
 `$CATALINA_HOME/bin/setenv.sh` or `/etc/default/tomcat8` files and both must be
 the same.
 
-If you are using the database (aka JDBC), set the security method to `jdbc`.
+If you are using JDBC (aka storing usernames and passwords in the database), set the 
+security method to `jdbc`.
 The default configuration should work properly.
 
 For using LDAP, set the security method to `ldap`. Additional settings are
@@ -167,7 +174,7 @@ If using JDBC, once running, you should change the passwords of the `admin` and
 The notification server is a Java daemon that scans the paths containing
 sequencer output. It is not required for a functioning MISO install, but
 without it, sequencer runs must be added manually. Configuration for
-`systemd`-based Linux systems is provided.
+`systemd`-based Linux systems is provided here.
 
 Create the default configuration:
 
