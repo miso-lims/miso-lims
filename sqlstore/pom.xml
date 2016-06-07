@@ -28,7 +28,7 @@
   <parent>
     <artifactId>miso</artifactId>
     <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-    <version>0.2.11</version>
+    <version>0.2.12</version>
   </parent>
 
   <artifactId>sqlstore</artifactId>
