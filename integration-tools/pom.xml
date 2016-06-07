@@ -26,7 +26,7 @@
   <parent>
     <artifactId>miso</artifactId>
     <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-    <version>0.2.12-SNAPSHOT</version>
+    <version>0.2.13-SNAPSHOT</version>
   </parent>
 
   <artifactId>integration-tools</artifactId>
