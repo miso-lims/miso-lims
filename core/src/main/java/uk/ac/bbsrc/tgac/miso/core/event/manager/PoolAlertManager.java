@@ -100,14 +100,13 @@ public class PoolAlertManager {
       if (pool != null) {
         log.debug("Attempting to clone pool " + pool.getId());
         try {
-          Pool clone = cloner.deepClone(pool);
-          if (clone != null) {
-            applyListeners(clone);
+          if (pool != null) {
+            applyListeners(pool);
             if (pools.containsKey(pool.getId())) {
-              log.debug("Not replacing Pool " + clone.getId() + ": Ready? " + clone.getReadyToRun());
+              log.debug("Not replacing Pool " + pool.getId() + ": Ready? " + pool.getReadyToRun());
             } else {
-              pools.put(pool.getId(), clone);
-              log.debug("Queued Pool " + clone.getId() + ": Ready? " + clone.getReadyToRun());
+              pools.put(pool.getId(), pool);
+              log.debug("Queued Pool " + pool.getId() + ": Ready? " + pool.getReadyToRun());
             }
           }
         } catch (Exception e) {
