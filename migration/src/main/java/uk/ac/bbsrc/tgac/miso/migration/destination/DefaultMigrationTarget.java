@@ -13,6 +13,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -21,6 +22,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.migration.MigrationData;
 import uk.ac.bbsrc.tgac.miso.migration.MigrationProperties;
 
@@ -98,14 +100,14 @@ public class DefaultMigrationTarget implements MigrationTarget {
     }
     if (hasParent(sample)) {
       // save parent first to generate ID
-      saveSample(sample.getSampleAdditionalInfo().getParent());
+      saveSample(((SampleAdditionalInfo) sample).getParent());
     }
     sample.setId(serviceManager.getSampleService().create(sample));
     log.debug("Saved sample " + sample.getAlias());
   }
   
   private static boolean hasParent(Sample sample) {
-    return sample.getSampleAdditionalInfo() != null && sample.getSampleAdditionalInfo().getParent() != null;
+    return LimsUtils.isDetailedSample(sample) && ((SampleAdditionalInfo) sample).getParent() != null;
   }
 
   public void saveLibraries(final Collection<Library> libraries) throws IOException {

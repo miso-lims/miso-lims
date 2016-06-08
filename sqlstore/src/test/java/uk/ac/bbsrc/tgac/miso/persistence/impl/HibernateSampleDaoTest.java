@@ -1,7 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 import org.hibernate.SessionFactory;
 import org.junit.Before;
@@ -15,6 +14,7 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.store.SecurityStore;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.DefaultSampleNamingScheme;
@@ -24,6 +24,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 public class HibernateSampleDaoTest extends AbstractDAOTest {
 
@@ -58,9 +59,11 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
   @Test
   public void getSampleWithChildrenTest() throws Exception {
     Sample sample = sut.get(15L);
-    assertNotNull(sample.getChildren());
-    assertEquals(2,sample.getChildren().size());
-    for (@SuppressWarnings("unused") Sample child : sample.getChildren()) {
+    assertTrue(LimsUtils.isDetailedSample(sample));
+    SampleAdditionalInfo detailed = (SampleAdditionalInfo) sample;
+    assertNotNull(detailed.getChildren());
+    assertEquals(2, detailed.getChildren().size());
+    for (@SuppressWarnings("unused") Sample child : detailed.getChildren()) {
       // will throw ClassCastException if children are not correctly loaded as Samples
     }
   }
@@ -69,9 +72,10 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
   public void getSampleWithParentTest() throws Exception {
     SampleImpl sample = (SampleImpl) sut.get(16L);
     assertNotNull(sample);
-    assertNotNull(sample.getSampleAdditionalInfo());
-    assertNotNull(sample.getParent());
-    assertEquals(15L, sample.getParent().getId());
+    assertTrue(LimsUtils.isDetailedSample(sample));
+    SampleAdditionalInfo detailed = (SampleAdditionalInfo) sample;
+    assertNotNull(detailed.getParent());
+    assertEquals(15L, detailed.getParent().getId());
   }
 
 }

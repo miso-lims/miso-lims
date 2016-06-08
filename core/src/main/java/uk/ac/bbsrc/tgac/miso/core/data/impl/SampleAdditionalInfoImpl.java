@@ -1,20 +1,17 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.MapsId;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-
-import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.QcPassedDetail;
@@ -28,17 +25,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 
 @Entity
 @Table(name = "SampleAdditionalInfo")
-public class SampleAdditionalInfoImpl implements SampleAdditionalInfo {
+@Inheritance(strategy = InheritanceType.JOINED)
+public class SampleAdditionalInfoImpl extends SampleImpl implements SampleAdditionalInfo {
 
-  @Id
-  private Long sampleId;
+  private static final long serialVersionUID = 1L;
 
-  @OneToOne(targetEntity = SampleImpl.class)
-  @JoinColumn(name = "sampleId", nullable = false)
-  @MapsId
-  private Sample sample;
-
-  @ManyToOne(optional = true, targetEntity = SampleImpl.class)
+  @ManyToOne(optional = true, targetEntity = SampleAdditionalInfoImpl.class)
   @JoinColumn(name = "parentId", nullable = true)
   private Sample parent;
 
@@ -91,40 +83,6 @@ public class SampleAdditionalInfoImpl implements SampleAdditionalInfo {
 
   private Long groupId;
   private String groupDescription;
-
-  @OneToOne(targetEntity = UserImpl.class)
-  @JoinColumn(name = "createdBy", nullable = false)
-  private User createdBy;
-
-  @Column(nullable = false)
-  private Date creationDate;
-
-  @OneToOne(targetEntity = UserImpl.class)
-  @JoinColumn(name = "updatedBy", nullable = false)
-  private User updatedBy;
-
-  @Column(nullable = false)
-  private Date lastUpdated;
-
-  @Override
-  public Long getId() {
-    return sampleId;
-  }
-
-  @Override
-  public void setId(Long sampleAdditionalInfoId) {
-    this.sampleId = sampleAdditionalInfoId;
-  }
-
-  @Override
-  public Sample getSample() {
-    return sample;
-  }
-
-  @Override
-  public void setSample(Sample sample) {
-    this.sample = sample;
-  }
 
   @Override
   public Sample getParent() {
@@ -237,46 +195,6 @@ public class SampleAdditionalInfoImpl implements SampleAdditionalInfo {
   }
 
   @Override
-  public User getCreatedBy() {
-    return createdBy;
-  }
-
-  @Override
-  public void setCreatedBy(User createdBy) {
-    this.createdBy = createdBy;
-  }
-
-  @Override
-  public Date getCreationDate() {
-    return creationDate;
-  }
-
-  @Override
-  public void setCreationDate(Date creationDate) {
-    this.creationDate = creationDate;
-  }
-
-  @Override
-  public User getUpdatedBy() {
-    return updatedBy;
-  }
-
-  @Override
-  public void setUpdatedBy(User updatedBy) {
-    this.updatedBy = updatedBy;
-  }
-
-  @Override
-  public Date getLastUpdated() {
-    return lastUpdated;
-  }
-
-  @Override
-  public void setLastUpdated(Date lastUpdated) {
-    this.lastUpdated = lastUpdated;
-  }
-
-  @Override
   public QcPassedDetail getQcPassedDetail() {
     return qcPassedDetail;
   }
@@ -356,17 +274,6 @@ public class SampleAdditionalInfoImpl implements SampleAdditionalInfo {
   @Override
   public void setGroupDescription(String groupDescription) {
     this.groupDescription = groupDescription;
-  }
-
-  @Override
-  public String toString() {
-    return "SampleAdditionalInfoImpl [sampleId=" + sampleId + ", sample=" + sample + ", parent=" + parent + ", sampleClass=" + sampleClass
-        + ", tissueOrigin=" + tissueOrigin + ", tissueType=" + tissueType + ", qcPassedDetail=" + qcPassedDetail + ", subproject="
-        + subproject + ", externalInstituteIdentifier=" + externalInstituteIdentifier + ", lab=" + lab + ", kitDescriptorId="
-        + kitDescriptorId + ", prepKit=" + prepKit + ", passageNumber=" + passageNumber + ", timesReceived=" + timesReceived
-        + ", tubeNumber=" + tubeNumber + ", concentration=" + concentration + ", archived=" + archived + ", siblingNumber=" + siblingNumber
-        + ", groupId=" + groupId + ", groupDescription=" + groupDescription + ", createdBy=" + createdBy + ", creationDate=" + creationDate
-        + ", updatedBy=" + updatedBy + ", lastUpdated=" + lastUpdated + "]";
   }
 
 }

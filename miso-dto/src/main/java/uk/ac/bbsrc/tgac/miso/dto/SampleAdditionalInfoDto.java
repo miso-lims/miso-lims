@@ -1,13 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
+import java.net.URI;
+
 import org.codehaus.jackson.map.annotate.JsonSerialize;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
-public class SampleAdditionalInfoDto {
+public class SampleAdditionalInfoDto extends SampleDto {
 
-  private Long sampleId;
-  private String url;
-  private String sampleUrl;
   private Long parentId;
   private String parentUrl;
   private String parentAlias;
@@ -28,41 +28,11 @@ public class SampleAdditionalInfoDto {
   private Integer timesReceived;
   private Integer tubeNumber;
   private Double concentration;
-  private Long createdById;
-  private String createdByUrl;
-  private String creationDate;
-  private Long updatedById;
-  private String updatedByUrl;
-  private String lastUpdated;
   private String externalInstituteIdentifier;
   private Long labId;
   private String labUrl;
   private Long groupId;
   private String groupDescription;
-
-  public Long getSampleId() {
-    return sampleId;
-  }
-
-  public void setSampleId(Long id) {
-    this.sampleId = id;
-  }
-
-  public String getUrl() {
-    return url;
-  }
-
-  public void setUrl(String url) {
-    this.url = url;
-  }
-
-  public String getSampleUrl() {
-    return sampleUrl;
-  }
-
-  public void setSampleUrl(String sampleUrl) {
-    this.sampleUrl = sampleUrl;
-  }
 
   public Long getParentId() {
     return parentId;
@@ -192,54 +162,6 @@ public class SampleAdditionalInfoDto {
     this.concentration = concentration;
   }
 
-  public String getCreatedByUrl() {
-    return createdByUrl;
-  }
-
-  public void setCreatedByUrl(String createdByUrl) {
-    this.createdByUrl = createdByUrl;
-  }
-
-  public String getCreationDate() {
-    return creationDate;
-  }
-
-  public void setCreationDate(String creationDate) {
-    this.creationDate = creationDate;
-  }
-
-  public String getUpdatedByUrl() {
-    return updatedByUrl;
-  }
-
-  public void setUpdatedByUrl(String updatedByUrl) {
-    this.updatedByUrl = updatedByUrl;
-  }
-
-  public String getLastUpdated() {
-    return lastUpdated;
-  }
-
-  public void setLastUpdated(String lastUpdated) {
-    this.lastUpdated = lastUpdated;
-  }
-
-  public Long getCreatedById() {
-    return createdById;
-  }
-
-  public void setCreatedById(Long createdById) {
-    this.createdById = createdById;
-  }
-
-  public Long getUpdatedById() {
-    return updatedById;
-  }
-
-  public void setUpdatedById(Long updatedById) {
-    this.updatedById = updatedById;
-  }
-
   public Long getSampleClassId() {
     return sampleClassId;
   }
@@ -313,17 +235,41 @@ public class SampleAdditionalInfoDto {
   }
 
   @Override
+  public void writeUrls(URI baseUri) {
+    super.writeUrls(baseUri);
+    setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/sample/{id}").buildAndExpand(getId()).toUriString());
+    if (getTissueOriginId() != null) {
+      setTissueOriginUrl(
+          UriComponentsBuilder.fromUri(baseUri).path("/rest/tissueorigin/{id}").buildAndExpand(getTissueOriginId()).toUriString());
+    }
+    if (getTissueTypeId() != null) {
+      setTissueTypeUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/tissuetype/{id}").buildAndExpand(getTissueTypeId()).toUriString());
+    }
+    if (getQcPassedDetailId() != null) {
+      setQcPassedDetailUrl(
+          UriComponentsBuilder.fromUri(baseUri).path("/rest/qcpasseddetail/{id}").buildAndExpand(getQcPassedDetailId()).toUriString());
+    }
+    if (getSubprojectId() != null) {
+      setSubprojectUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/subproject/{id}").buildAndExpand(getSubprojectId()).toUriString());
+    }
+    if (getPrepKitId() != null) {
+      setPrepKitUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/kitdescriptor/{id}").buildAndExpand(getPrepKitId()).toUriString());
+    }
+    if (getParentId() != null) {
+      setParentUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/sample/{id}").buildAndExpand(getParentId()).toUriString());
+    }
+  }
+
+  @Override
   public String toString() {
-    return "SampleAdditionalInfoDto [sampleId=" + sampleId + ", url=" + url + ", sampleUrl=" + sampleUrl + ", parentId=" + parentId
-        + ", parentUrl=" + parentUrl + ", parentAlias=" + parentAlias + ", parentSampleClassId=" + parentSampleClassId + ", sampleClassId="
-        + sampleClassId + ", sampleClassUrl=" + sampleClassUrl + ", tissueOriginId=" + tissueOriginId + ", tissueOriginUrl="
-        + tissueOriginUrl + ", tissueTypeId=" + tissueTypeId + ", tissueTypeUrl=" + tissueTypeUrl + ", qcPassedDetailId=" + qcPassedDetailId
-        + ", qcPassedDetailUrl=" + qcPassedDetailUrl + ", subprojectId=" + subprojectId + ", subprojectUrl=" + subprojectUrl
-        + ", prepKitId=" + prepKitId + ", prepKitUrl=" + prepKitUrl + ", passageNumber=" + passageNumber + ", timesReceived="
-        + timesReceived + ", tubeNumber=" + tubeNumber + ", concentration=" + concentration + ", createdById=" + createdById
-        + ", createdByUrl=" + createdByUrl + ", creationDate=" + creationDate + ", updatedById=" + updatedById + ", updatedByUrl="
-        + updatedByUrl + ", lastUpdated=" + lastUpdated + ", externalInstituteIdentifier=" + externalInstituteIdentifier + ", labId="
-        + labId + ", labUrl=" + labUrl + ", groupId=" + groupId + ", groupDescription=" + groupDescription + "]";
+    return "SampleAdditionalInfoDto [parentId=" + parentId + ", parentUrl=" + parentUrl + ", parentAlias=" + parentAlias
+        + ", parentSampleClassId=" + parentSampleClassId + ", sampleClassId=" + sampleClassId + ", sampleClassUrl=" + sampleClassUrl
+        + ", tissueOriginId=" + tissueOriginId + ", tissueOriginUrl=" + tissueOriginUrl + ", tissueTypeId=" + tissueTypeId
+        + ", tissueTypeUrl=" + tissueTypeUrl + ", qcPassedDetailId=" + qcPassedDetailId + ", qcPassedDetailUrl=" + qcPassedDetailUrl
+        + ", subprojectId=" + subprojectId + ", subprojectUrl=" + subprojectUrl + ", prepKitId=" + prepKitId + ", prepKitUrl=" + prepKitUrl
+        + ", passageNumber=" + passageNumber + ", timesReceived=" + timesReceived + ", tubeNumber=" + tubeNumber + ", concentration="
+        + concentration + ", externalInstituteIdentifier=" + externalInstituteIdentifier + ", labId=" + labId + ", labUrl=" + labUrl
+        + ", groupId=" + groupId + ", groupDescription=" + groupDescription + "]";
   }
 
 }
