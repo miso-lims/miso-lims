@@ -25,10 +25,8 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.util.Collection;
 import java.util.Date;
-import java.util.Set;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonManagedReference;
 import org.codehaus.jackson.annotate.JsonTypeName;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.w3c.dom.Document;
@@ -273,27 +271,6 @@ public interface Sample
   public User getLastModifier();
 
   public void setLastModifier(User user);
-
-  public SampleAnalyte getSampleAnalyte();
-
-  public void setSampleAnalyte(SampleAnalyte sampleAnalyte);
-
-  public Identity getIdentity();
-
-  public void setIdentity(Identity identity);
-
-  @JsonManagedReference
-  public SampleAdditionalInfo getSampleAdditionalInfo();
-
-  public void setSampleAdditionalInfo(SampleAdditionalInfo sampleAdditionalInfo);
-
-  public Sample getParent();
-
-  public Set<Sample> getChildren();
-
-  public void setSampleTissue(SampleTissue sampleTissue);
-
-  public SampleTissue getSampleTissue();
 
   /**
    * Get the security profile id independently of the security profile. This is due to Hibernate. Don't use it.

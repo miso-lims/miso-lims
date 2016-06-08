@@ -1,27 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-
-import com.eaglegenomics.simlims.core.User;
-
-@JsonIgnoreProperties({ "sample" })
-public interface SampleAnalyte {
+public interface SampleAnalyte extends SampleAdditionalInfo {
 
   public static String CATEGORY_NAME = "Analyte";
-
-  Long getId();
-
-  void setId(Long sampleId);
-
-  Sample getSample();
-
-  void setSample(Sample sample);
 
   SamplePurpose getSamplePurpose();
 
@@ -38,22 +24,6 @@ public interface SampleAnalyte {
   String getTubeId();
 
   void setTubeId(String tubeId);
-
-  User getCreatedBy();
-
-  void setCreatedBy(User createdBy);
-
-  Date getCreationDate();
-
-  void setCreationDate(Date creationDate);
-
-  User getUpdatedBy();
-
-  void setUpdatedBy(User updatedBy);
-
-  Date getLastUpdated();
-
-  void setLastUpdated(Date lastUpdated);
 
   /**
    * @return the short tandem repeat QC status for this SampleAnalyte

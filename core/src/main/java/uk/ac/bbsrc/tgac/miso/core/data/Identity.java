@@ -1,27 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-
-import com.eaglegenomics.simlims.core.User;
-
-@JsonIgnoreProperties({ "sample" })
-public interface Identity {
+public interface Identity extends SampleAdditionalInfo {
   
   public static final String CATEGORY_NAME = "Identity";
-
-  Long getSampleId();
-
-  void setSampleId(Long sampleId);
-
-  Sample getSample();
-
-  void setSample(Sample sample);
 
   String getInternalName();
 
@@ -30,22 +16,6 @@ public interface Identity {
   String getExternalName();
 
   void setExternalName(String externalName);
-
-  User getCreatedBy();
-
-  void setCreatedBy(User createdBy);
-
-  Date getCreationDate();
-
-  void setCreationDate(Date creationDate);
-
-  User getUpdatedBy();
-
-  void setUpdatedBy(User updatedBy);
-
-  Date getLastUpdated();
-
-  void setLastUpdated(Date lastUpdated);
 
   /**
    * @return the sex for this donor

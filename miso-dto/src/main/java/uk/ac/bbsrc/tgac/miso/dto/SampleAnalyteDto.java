@@ -1,100 +1,41 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
+import java.net.URI;
+
+import org.codehaus.jackson.annotate.JsonTypeName;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAnalyte;
 
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
-public class SampleAnalyteDto {
+@JsonTypeName(value = SampleAnalyte.CATEGORY_NAME)
+public class SampleAnalyteDto extends SampleIdentityDto {
 
-  private Long sampleId;
-  private String url;
-  private String sampleUrl;
   private Long samplePurposeId;
   private String samplePurposeUrl;
   private Long tissueMaterialId;
+
+  @Override
+  public void writeUrls(URI baseUri) {
+    super.writeUrls(baseUri);
+    setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/sample/analyte/{id}").buildAndExpand(getId()).toUriString());
+    if (getSamplePurposeId() != null) {
+      setSamplePurposeUrl(
+          UriComponentsBuilder.fromUri(baseUri).path("/rest/samplepurpose/{id}").buildAndExpand(getSamplePurposeId()).toUriString());
+    }
+    if (getTissueMaterialId() != null) {
+      setTissueMaterialUrl(
+          UriComponentsBuilder.fromUri(baseUri).path("/rest/tissuematerial/{id}").buildAndExpand(getTissueMaterialId()).toUriString());
+    }
+
+  }
+
   private String tissueMaterialUrl;
 
   private String region;
   private String tubeId;
   private String strStatus;
-
-  private Long createdById;
-  private String createdByUrl;
-  private String creationDate;
-  private Long updatedById;
-  private String updatedByUrl;
-  private String lastUpdated;
-
-  public Long getSampleId() {
-    return sampleId;
-  }
-
-  public void setSampleId(Long sampleId) {
-    this.sampleId = sampleId;
-  }
-
-  public String getUrl() {
-    return url;
-  }
-
-  public void setUrl(String url) {
-    this.url = url;
-  }
-
-  public String getCreatedByUrl() {
-    return createdByUrl;
-  }
-
-  public void setCreatedByUrl(String createdByUrl) {
-    this.createdByUrl = createdByUrl;
-  }
-
-  public String getCreationDate() {
-    return creationDate;
-  }
-
-  public void setCreationDate(String creationDate) {
-    this.creationDate = creationDate;
-  }
-
-  public String getUpdatedByUrl() {
-    return updatedByUrl;
-  }
-
-  public void setUpdatedByUrl(String updatedByUrl) {
-    this.updatedByUrl = updatedByUrl;
-  }
-
-  public String getLastUpdated() {
-    return lastUpdated;
-  }
-
-  public void setLastUpdated(String lastUpdated) {
-    this.lastUpdated = lastUpdated;
-  }
-
-  public Long getCreatedById() {
-    return createdById;
-  }
-
-  public void setCreatedById(Long createdById) {
-    this.createdById = createdById;
-  }
-
-  public Long getUpdatedById() {
-    return updatedById;
-  }
-
-  public void setUpdatedById(Long updatedById) {
-    this.updatedById = updatedById;
-  }
-
-  public String getSampleUrl() {
-    return sampleUrl;
-  }
-
-  public void setSampleUrl(String sampleUrl) {
-    this.sampleUrl = sampleUrl;
-  }
 
   public Long getSamplePurposeId() {
     return samplePurposeId;

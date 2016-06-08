@@ -34,6 +34,7 @@ import net.sf.ehcache.CacheManager;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
@@ -81,7 +82,7 @@ public class HibernateSampleDao implements SampleDao {
 
   @Autowired
   private CacheManager cacheManager;
-  
+
   @Autowired
   private MisoNamingScheme<Sample> sampleNamingScheme;
 
@@ -105,7 +106,7 @@ public class HibernateSampleDao implements SampleDao {
   public void setNamingScheme(MisoNamingScheme<Sample> namingScheme) {
     this.namingScheme = namingScheme;
   }
-  
+
   @Override
   public Long addSample(final Sample sample) throws IOException {
     if (sample.getSecurityProfile() != null) {
@@ -113,13 +114,11 @@ public class HibernateSampleDao implements SampleDao {
     }
     return (Long) currentSession().save(sample);
   }
-  
+
   @Override
   public int getNextSiblingNumber(Sample parent, SampleClass childClass) throws IOException {
-    Query query = currentSession().createQuery("select max(siblingNumber) "
-        + "from SampleAdditionalInfoImpl "
-        + "where parentId = :parentId "
-        + "and sampleClassId = :sampleClassId");
+    Query query = currentSession().createQuery("select max(siblingNumber) " + "from SampleAdditionalInfoImpl "
+        + "where parentId = :parentId " + "and sampleClassId = :sampleClassId");
     query.setLong("parentId", parent.getId());
     query.setLong("sampleClassId", childClass.getId());
     Number result = ((Number) query.uniqueResult());
@@ -162,9 +161,9 @@ public class HibernateSampleDao implements SampleDao {
 
     sample.getChangeLog().clear();
     sample.getChangeLog().addAll(changeLogDao.listAllById("Sample", sample.getId()));
-    
-    if (sample.getSampleAdditionalInfo() != null) {
-      sample.getSampleAdditionalInfo().setChildren(listByParentId(sample.getId()));
+
+    if (LimsUtils.isDetailedSample(sample)) {
+      ((SampleAdditionalInfo) sample).setChildren(listByParentId(sample.getId()));
     }
 
     extractBoxableInformation(template, sample);
@@ -208,7 +207,7 @@ public class HibernateSampleDao implements SampleDao {
     List<Sample> records = query.list();
     return fetchSqlStore(records);
   }
-  
+
   @Override
   public Collection<Sample> getByIdList(List<Long> idList) throws IOException {
     Query query = currentSession().createQuery("from SampleImpl where sampleId in (:ids)");
@@ -392,13 +391,9 @@ public class HibernateSampleDao implements SampleDao {
     List<Sample> records = query.list();
     return fetchSqlStore(records);
   }
-  
+
   private Set<Sample> listByParentId(long parentId) {
-    Query query = currentSession().createQuery(
-        "select s from SampleImpl s "
-        + "join s.sampleAdditionalInfo sai "
-        + "join sai.parent p "
-        + "where p.sampleId = :id");
+    Query query = currentSession().createQuery("select s from SampleImpl s " + "join s.parent p " + "where p.sampleId = :id");
     query.setLong("id", parentId);
     @SuppressWarnings("unchecked")
     List<Sample> samples = query.list();

@@ -41,6 +41,10 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import net.sourceforge.fluxion.ajax.util.JSONUtils;
+
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,9 +70,6 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-import net.sourceforge.fluxion.ajax.util.JSONUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractPool;
@@ -81,6 +82,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
 import uk.ac.bbsrc.tgac.miso.core.data.TagBarcodeFamily;
@@ -718,7 +720,7 @@ public class EditLibraryController {
       model.put("libraryRuns", getRunsByLibraryPools(pools));
 
       populateDesigns(model,
-          library.getSample().getSampleAdditionalInfo() == null ? null : library.getSample().getSampleAdditionalInfo().getSampleClass());
+          LimsUtils.isDetailedSample(library.getSample()) ? null : ((SampleAdditionalInfo) library.getSample()).getSampleClass());
 
       model.put("owners", LimsSecurityUtils.getPotentialOwners(user, library, securityManager.listAllUsers()));
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, library, securityManager.listAllUsers()));
@@ -761,11 +763,12 @@ public class EditLibraryController {
       if (sampleId != null) {
         Sample sample = requestManager.getSampleById(sampleId);
         model.put("sample", sample);
-        if (sample.getSampleAdditionalInfo() != null) {
-          sampleClass = sample.getSampleAdditionalInfo().getSampleClass();
+        if (LimsUtils.isDetailedSample(sample)) {
+          SampleAdditionalInfo detailed = (SampleAdditionalInfo) sample;
+          sampleClass = detailed.getSampleClass();
           library.setLibraryAdditionalInfo(new LibraryAdditionalInfoImpl());
-          library.getLibraryAdditionalInfo().setTissueOrigin(sample.getSampleAdditionalInfo().getTissueOrigin());
-          library.getLibraryAdditionalInfo().setTissueType(sample.getSampleAdditionalInfo().getTissueType());
+          library.getLibraryAdditionalInfo().setTissueOrigin(detailed.getTissueOrigin());
+          library.getLibraryAdditionalInfo().setTissueType(detailed.getTissueType());
           // library.getLibraryAdditionalInfo().setGroupId(library.getSample().getSampleAnalyte().getGroupId());
           // library.getLibraryAdditionalInfo().setGroupDescription(library.getSample().getSampleAnalyte().getGroupDescription());
         }
@@ -850,9 +853,10 @@ public class EditLibraryController {
       JSONArray libraries = new JSONArray();
       SampleClass sampleClass = null;
       for (Sample sample : requestManager.getSamplesByIdList(idList)) {
+        SampleAdditionalInfo detailed = (SampleAdditionalInfo) sample;
         if (sampleClass == null) {
-          sampleClass = sample.getSampleAdditionalInfo().getSampleClass();
-        } else if (sampleClass.getId() != sample.getSampleAdditionalInfo().getSampleClass().getId()) {
+          sampleClass = detailed.getSampleClass();
+        } else if (sampleClass.getId() != detailed.getSampleClass().getId()) {
           throw new IOException("Can only create libraries when samples all have the same class.");
         }
         LibraryDto library = new LibraryDto();
@@ -861,8 +865,8 @@ public class EditLibraryController {
 
         if (isDetailedSampleEnabled()) {
           LibraryAdditionalInfoDto lai = new LibraryAdditionalInfoDto();
-          lai.setTissueOrigin(Dtos.asDto(sample.getSampleAdditionalInfo().getTissueOrigin()));
-          lai.setTissueType(Dtos.asDto(sample.getSampleAdditionalInfo().getTissueType()));
+          lai.setTissueOrigin(Dtos.asDto(detailed.getTissueOrigin()));
+          lai.setTissueType(Dtos.asDto(detailed.getTissueType()));
           library.setLibraryAdditionalInfo(lai);
         }
         libraries.add(library);
@@ -940,8 +944,9 @@ public class EditLibraryController {
           library.getLibraryAdditionalInfo().setCreatedBy(user);
         }
         library.getLibraryAdditionalInfo().setUpdatedBy(user);
-        library.getLibraryAdditionalInfo().setTissueOrigin(library.getSample().getSampleAdditionalInfo().getTissueOrigin());
-        library.getLibraryAdditionalInfo().setTissueType(library.getSample().getSampleAdditionalInfo().getTissueType());
+        SampleAdditionalInfo detailed = (SampleAdditionalInfo) library.getSample();
+        library.getLibraryAdditionalInfo().setTissueOrigin(detailed.getTissueOrigin());
+        library.getLibraryAdditionalInfo().setTissueType(detailed.getTissueType());
       }
 
       boolean create = library.getId() == AbstractLibrary.UNSAVED_ID;

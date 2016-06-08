@@ -63,13 +63,14 @@
 
 <form:form id="sample-form" data-parsley-validate="" action="/miso/sample" method="POST" commandName="sample" autocomplete="off" acceptCharset="utf-8">
 <sessionConversation:insertSessionConversationId attributeName="sample"/>
+<input type="hidden" id="sampleCategory" name="sampleCategory" value="${sampleId eq 0 ? 'new' : sampleCategory}"/>
 <h1>
   <c:choose>
     <c:when test="${sample.id != 0}"><span id="status" data-status="edit">Edit</span></c:when>
     <c:otherwise><span id="status" data-status="create">Create</span></c:otherwise>
   </c:choose> Sample
   <button type="button" class="fg-button ui-state-default ui-corner-all"
-          onclick="return Sample.validateSample(${!empty sample.sampleAdditionalInfo}, ${sample.id == 0});">Save
+          onclick="return Sample.validateSample(${detailedSample}, ${sample.id == 0});">Save
   </button>
 </h1>
 
@@ -296,7 +297,7 @@
     
     <br/>
     <div id="detailedSample">
-        <c:if test="${!empty sample.identity}">
+        <c:if test="${sampleCategory eq 'Identity' or sampleCategory eq 'new'}">
           <br/>
           <div id="detailedSampleIdentity">
             <h2>Identity</h2>
@@ -306,10 +307,10 @@
                 <td>
                   <c:choose>
                     <c:when test="${sample.id == 0}">
-                      <form:input id="externalName" path="identity.externalName"/>
+                      <form:input id="externalName" path="externalName"/>
                     </c:when>
                     <c:otherwise>
-                      ${sample.identity.externalName}
+                      ${sample.externalName}
                     </c:otherwise>
                   </c:choose>
                 </td>
@@ -319,16 +320,16 @@
                 <td>
                   <c:choose>
                     <c:when test="${sample.id == 0}">
-                      <form:select id="donorSex" path="identity.donorSex">
+                      <form:select id="donorSex" path="donorSex">
                       <c:forEach var="donorSexOption" items="${donorSexOptions}">
-                        <option value="${donorSexOption}" <c:if test="${sample.identity.donorSex == donorSexOption}">selected="selected"</c:if>>
+                        <option value="${donorSexOption}" <c:if test="${sample.donorSex == donorSexOption}">selected="selected"</c:if>>
                           ${donorSexOption.label}
                         </option>
                       </c:forEach>
                       </form:select>
                     </c:when>
                     <c:otherwise>
-                      ${sample.identity.donorSex}
+                      ${sample.donorSex}
                     </c:otherwise>
                   </c:choose>
                 </td>
@@ -344,11 +345,11 @@
           <c:if test="${sample.id != 0}">
             <td class="h">Parent:</td>
             <c:choose>
-              <c:when test="${empty sample.sampleAdditionalInfo.parent}">
+              <c:when test="${empty sample.parent}">
                 <td>n/a</td>
               </c:when>
               <c:otherwise>
-                <td><a href='<c:url value="/miso/sample/${sample.sampleAdditionalInfo.parent.id}"/>'>${sample.sampleAdditionalInfo.parent.alias}</a></td>
+                <td><a href='<c:url value="/miso/sample/${sample.parent.id}"/>'>${sample.parent.alias}</a></td>
               </c:otherwise>
             </c:choose>
           </c:if>
@@ -358,11 +359,12 @@
           <td>
             <c:choose>
               <c:when test="${sample.id == 0}">
-                <miso:select id="sampleClass" path="sampleAdditionalInfo.sampleClass" items="${sampleClasses}" itemLabel="alias" 
+                <miso:select id="sampleClass" path="sampleClass" items="${sampleClasses}" itemLabel="alias" 
                     itemValue="id" defaultLabel="SELECT" defaultValue="" onchange="Sample.ui.sampleClassChanged();"/>
               </c:when>
               <c:otherwise>
-                ${sample.sampleAdditionalInfo.sampleClass.alias}
+                <input type="hidden" id="sampleClass" value="${sample.sampleClass.id}"/>
+                ${sample.sampleClass.alias}
               </c:otherwise>
             </c:choose>
           </td>
@@ -372,11 +374,11 @@
           <td>
             <c:choose>
               <c:when test="${sample.id == 0}">
-                <miso:select id="tissueOrigin" path="sampleAdditionalInfo.tissueOrigin" items="${tissueOrigins}" itemLabel="description" 
+                <miso:select id="tissueOrigin" path="tissueOrigin" items="${tissueOrigins}" itemLabel="description" 
                     itemValue="id" defaultLabel="SELECT" defaultValue=""/>
               </c:when>
               <c:otherwise>
-                ${sample.sampleAdditionalInfo.tissueOrigin.description}
+                ${sample.tissueOrigin.description}
               </c:otherwise>
             </c:choose>
           </td>      
@@ -386,17 +388,17 @@
           <td>
             <c:choose>
               <c:when test="${sample.id == 0}">
-                <form:select id="tissueType" path="sampleAdditionalInfo.tissueType">
+                <form:select id="tissueType" path="tissueType">
                   <option value="">SELECT</option>
                   <c:forEach items="${tissueTypes}" var="tissueType">
-                    <option value="${tissueType.id}" <c:if test="${tissueType.id == sample.sampleAdditionalInfo.tissueType.id}">selected="selected"</c:if>>
+                    <option value="${tissueType.id}" <c:if test="${tissueType.id == sample.tissueType.id}">selected="selected"</c:if>>
                       ${fn:length(tissueType.description) lt 51 ? tissueType.description : fn:substring(tissueType.description,0,49) += '&hellip;'}
                     </option>
                   </c:forEach>
                 </form:select>
               </c:when>
               <c:otherwise>
-                ${sample.sampleAdditionalInfo.tissueType.description}
+                ${sample.tissueType.description}
               </c:otherwise>
             </c:choose>
           </td>                               
@@ -404,7 +406,7 @@
         <tr>
           <td class="h">QC Details:</td>
           <td>
-            <miso:select id="qcPassedDetail" path="sampleAdditionalInfo.qcPassedDetail" items="${qcPassedDetails}" itemLabel="description" 
+            <miso:select id="qcPassedDetail" path="qcPassedDetail" items="${qcPassedDetails}" itemLabel="description" 
                     itemValue="id" defaultLabel="None" defaultValue=""/>
           </td>                               
         </tr>
@@ -413,7 +415,7 @@
           <td>
             <c:choose>
               <c:when test="${sample.id == 0}">
-                <form:select id="subProject" path="sampleAdditionalInfo.subproject" onchange="Sample.ui.subProjectChanged()">
+                <form:select id="subProject" path="subproject" onchange="Sample.ui.subProjectChanged()">
                   <%-- list filtered and filled by js --%>
                   <script type="text/javascript">
                     jQuery(document).ready(function () {
@@ -424,9 +426,9 @@
               </c:when>
               <c:otherwise>
                 <c:choose>
-                  <c:when test="!empty sample.sampleAdditionalInfo.subproject">
-                    ${sample.sampleAdditionalInfo.subproject.alias}
-                    <input type="hidden" value="${sample.sampleAdditionalInfo.subproject.id}" name="subProject" id="subProject"/>
+                  <c:when test="!empty sample.subproject">
+                    ${sample.subproject.alias}
+                    <input type="hidden" value="${sample.subproject.id}" name="subProject" id="subProject"/>
                   </c:when>
                   <c:otherwise>
                     n/a
@@ -438,15 +440,15 @@
         </tr>
         <tr>
           <td class="h">External Institute Identifier:</td>
-          <td><form:input id="externalInstituteIdentifier" path="sampleAdditionalInfo.externalInstituteIdentifier"/></td>                               
+          <td><form:input id="externalInstituteIdentifier" path="externalInstituteIdentifier"/></td>                               
         </tr>
         <tr>
           <td class="h">Lab:</td>
           <td>
-            <form:select id="lab" path="sampleAdditionalInfo.lab">
+            <form:select id="lab" path="lab">
               <option value="">None</option>
               <c:forEach items="${labs}" var="lab">
-                <option value="${lab.id}" <c:if test="${lab.id == sample.sampleAdditionalInfo.lab.id}">selected="selected"</c:if>>
+                <option value="${lab.id}" <c:if test="${lab.id == sample.lab.id}">selected="selected"</c:if>>
                     ${lab.alias} - ${lab.institute.alias}
                 </option>
               </c:forEach>
@@ -457,8 +459,8 @@
           <td class="h">Passage Number:</td>
           <td>
             <c:choose>
-              <c:when test="${sample.id == 0}"><form:input id="passageNumber" path="sampleAdditionalInfo.passageNumber"/></c:when>
-              <c:otherwise>${!empty sample.sampleAdditionalInfo.passageNumber ? sample.sampleAdditionalInfo.passageNumber : 'n/a'}</c:otherwise>
+              <c:when test="${sample.id == 0}"><form:input id="passageNumber" path="passageNumber"/></c:when>
+              <c:otherwise>${!empty sample.passageNumber ? sample.passageNumber : 'n/a'}</c:otherwise>
             </c:choose>
           </td>                               
         </tr>
@@ -466,8 +468,8 @@
           <td class="h">Times Received:*</td>
           <td>
             <c:choose>
-              <c:when test="${sample.id == 0}"><form:input id="timesReceived" path="sampleAdditionalInfo.timesReceived"/></c:when>
-              <c:otherwise>${!empty sample.sampleAdditionalInfo.timesReceived ? sample.sampleAdditionalInfo.timesReceived : 'n/a'}</c:otherwise>
+              <c:when test="${sample.id == 0}"><form:input id="timesReceived" path="timesReceived"/></c:when>
+              <c:otherwise>${!empty sample.timesReceived ? sample.timesReceived : 'n/a'}</c:otherwise>
             </c:choose>
           </td>                               
         </tr>
@@ -475,43 +477,43 @@
           <td class="h">Tube Number:*</td>
           <td>
             <c:choose>
-              <c:when test="${sample.id == 0}"><form:input id="tubeNumber" path="sampleAdditionalInfo.tubeNumber"/></c:when>
-              <c:otherwise>${!empty sample.sampleAdditionalInfo.tubeNumber ? sample.sampleAdditionalInfo.tubeNumber : 'n/a'}</c:otherwise>
+              <c:when test="${sample.id == 0}"><form:input id="tubeNumber" path="tubeNumber"/></c:when>
+              <c:otherwise>${!empty sample.tubeNumber ? sample.tubeNumber : 'n/a'}</c:otherwise>
             </c:choose>
           </td>                               
         </tr>
         <tr>
           <td class="h">Concentration (nM):</td>
-          <td><form:input id="concentration" path="sampleAdditionalInfo.concentration"/></td>                               
+          <td><form:input id="concentration" path="concentration"/></td>                               
         </tr>
         <tr>
           <td class="h">Group ID:</td>
           <td>
-            <form:input id="groupId" path="sampleAdditionalInfo.groupId"/>
+            <form:input id="groupId" path="groupId"/>
           </td>
         </tr>
         <tr>
           <td class="h">Group Description:</td>
           <td>
-            <form:input id="groupDescription" path="sampleAdditionalInfo.groupDescription"/>
+            <form:input id="groupDescription" path="groupDescription"/>
           </td>
         </tr>
       </table>
       
-      <c:if test="${!empty sample.sampleTissue}">
+      <c:if test="${sampleCategory eq 'Tissue' or sampleCategory eq 'new'}">
         <br/>
         <div id="detailedSampleTissue">
           <h2>Tissue</h2>
           <table class="in">
             <tr>
               <td class="h">Cellularity:</td>
-              <td><form:input id="cellularity" path="sampleTissue.cellularity"/></td>
+              <td><form:input id="cellularity" path="cellularity"/></td>
             </tr>
           </table>                               
         </div>
       </c:if>
       
-      <c:if test="${!empty sample.sampleAnalyte}">
+      <c:if test="${sampleCategory eq 'Analyte' or sampleCategory eq 'new'}">
         <br/>
         <div id="detailedSampleAnalyte">
           <h2>Analyte</h2>
@@ -519,23 +521,23 @@
             <tr>
               <td class="h">Purpose:</td>
               <td>
-                <miso:select id="samplePurpose" path="sampleAnalyte.samplePurpose" items="${samplePurposes}" itemLabel="alias" 
+                <miso:select id="samplePurpose" path="samplePurpose" items="${samplePurposes}" itemLabel="alias" 
                     itemValue="id" defaultLabel="Unknown" defaultValue=""/>
               </td>
             </tr>
             <tr>
               <td class="h">Tissue Material:</td>
               <td>
-                <miso:select id="tissueMaterial" path="sampleAnalyte.tissueMaterial" items="${tissueMaterials}" itemLabel="alias" 
+                <miso:select id="tissueMaterial" path="tissueMaterial" items="${tissueMaterials}" itemLabel="alias" 
                     itemValue="id" defaultLabel="Unknown" defaultValue=""/>
               </td>
             </tr>
             <tr>
               <td class="h">STR Status</td>
               <td>
-                <form:select id="strStatus" path="sampleAnalyte.strStatus">
+                <form:select id="strStatus" path="strStatus">
                   <c:forEach var="strStatusOption" items="${strStatusOptions}">
-                    <option value="${strStatusOption}" <c:if test="${sample.sampleAnalyte.strStatus == strStatusOption}">selected="selected"</c:if>>
+                    <option value="${strStatusOption}" <c:if test="${sample.strStatus == strStatusOption}">selected="selected"</c:if>>
                       ${strStatusOption.label}
                     </option>
                   </c:forEach>
@@ -544,11 +546,11 @@
             </tr>
             <tr>
               <td class="h">Region:</td>
-              <td><form:input id="region" path="sampleAnalyte.region"/></td>                               
+              <td><form:input id="region" path="region"/></td>                               
             </tr>
             <tr>
               <td class="h">Tube ID:</td>
-              <td><form:input id="tubeId" path="sampleAnalyte.tubeId"/></td>                               
+              <td><form:input id="tubeId" path="tubeId"/></td>                               
             </tr>
           </table>
         </div>

@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Sets;
 
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
@@ -60,10 +61,10 @@ public class DefaultLibraryAdditionalInfoService implements LibraryAdditionalInf
     if (libraryAdditionalInfo.getPrepKit() != null) {
       libraryAdditionalInfo.setPrepKit(kitStore.getKitDescriptorById(libraryAdditionalInfo.getPrepKit().getId()));
     }
-    if (libraryAdditionalInfo.getLibrary().getSample().getSampleAdditionalInfo().getGroupId() != null) {
-      libraryAdditionalInfo.setGroupId(libraryAdditionalInfo.getLibrary().getSample().getSampleAdditionalInfo().getGroupId());
-      libraryAdditionalInfo
-          .setGroupDescription(libraryAdditionalInfo.getLibrary().getSample().getSampleAdditionalInfo().getGroupDescription());
+    SampleAdditionalInfo sample = (SampleAdditionalInfo) libraryAdditionalInfo.getLibrary().getSample();
+    if (sample.getGroupId() != null) {
+      libraryAdditionalInfo.setGroupId(sample.getGroupId());
+      libraryAdditionalInfo.setGroupDescription(sample.getGroupDescription());
     }
     User user = authorizationManager.getCurrentUser();
     libraryAdditionalInfo.setCreatedBy(user);

@@ -87,6 +87,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.QcPassedDetail;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAnalyte.StrStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
@@ -94,16 +95,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleBuilder;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.QcPassedDetailImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAdditionalInfoImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAnalyteImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SamplePurposeImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
@@ -132,7 +130,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.ui.SampleOptionsController;
 @SessionAttributes("sample")
 public class EditSampleController {
   protected static final Logger log = LoggerFactory.getLogger(EditSampleController.class);
-  
+
   private final ObjectMapper mapper = new ObjectMapper();
 
   @Autowired
@@ -531,7 +529,7 @@ public class EditSampleController {
    */
   @InitBinder
   public void includeForeignKeys(WebDataBinder binder) {
-    binder.registerCustomEditor(Project.class, "project", new PropertyEditorSupport() {
+    binder.registerCustomEditor(Project.class, new PropertyEditorSupport() {
       @Override
       public void setAsText(String text) throws IllegalArgumentException {
         Project p = new ProjectImpl();
@@ -540,7 +538,7 @@ public class EditSampleController {
       }
     });
 
-    binder.registerCustomEditor(SampleClass.class, "sampleAdditionalInfo.sampleClass", new PropertyEditorSupport() {
+    binder.registerCustomEditor(SampleClass.class, new PropertyEditorSupport() {
       @Override
       public void setAsText(String text) throws IllegalArgumentException {
         SampleClass sc = new SampleClassImpl();
@@ -549,7 +547,7 @@ public class EditSampleController {
       }
     });
 
-    binder.registerCustomEditor(TissueOrigin.class, "sampleAdditionalInfo.tissueOrigin", new PropertyEditorSupport() {
+    binder.registerCustomEditor(TissueOrigin.class, new PropertyEditorSupport() {
       @Override
       public void setAsText(String text) throws IllegalArgumentException {
         TissueOrigin to = new TissueOriginImpl();
@@ -558,7 +556,7 @@ public class EditSampleController {
       }
     });
 
-    binder.registerCustomEditor(TissueType.class, "sampleAdditionalInfo.tissueType", new PropertyEditorSupport() {
+    binder.registerCustomEditor(TissueType.class, new PropertyEditorSupport() {
       @Override
       public void setAsText(String text) throws IllegalArgumentException {
         TissueType tt = new TissueTypeImpl();
@@ -567,7 +565,7 @@ public class EditSampleController {
       }
     });
 
-    binder.registerCustomEditor(QcPassedDetail.class, "sampleAdditionalInfo.qcPassedDetail", new PropertyEditorSupport() {
+    binder.registerCustomEditor(QcPassedDetail.class, new PropertyEditorSupport() {
       @Override
       public void setAsText(String text) throws IllegalArgumentException {
         if (isStringEmptyOrNull(text)) {
@@ -580,7 +578,7 @@ public class EditSampleController {
       }
     });
 
-    binder.registerCustomEditor(Subproject.class, "sampleAdditionalInfo.subproject", new PropertyEditorSupport() {
+    binder.registerCustomEditor(Subproject.class, new PropertyEditorSupport() {
       @Override
       public void setAsText(String text) throws IllegalArgumentException {
         if (isStringEmptyOrNull(text)) {
@@ -593,7 +591,7 @@ public class EditSampleController {
       }
     });
 
-    binder.registerCustomEditor(Lab.class, "sampleAdditionalInfo.lab", new PropertyEditorSupport() {
+    binder.registerCustomEditor(Lab.class, new PropertyEditorSupport() {
       @Override
       public void setAsText(String text) throws IllegalArgumentException {
         if (isStringEmptyOrNull(text)) {
@@ -606,7 +604,7 @@ public class EditSampleController {
       }
     });
 
-    binder.registerCustomEditor(SamplePurpose.class, "sampleAnalyte.samplePurpose", new PropertyEditorSupport() {
+    binder.registerCustomEditor(SamplePurpose.class, new PropertyEditorSupport() {
       @Override
       public void setAsText(String text) throws IllegalArgumentException {
         if (isStringEmptyOrNull(text)) {
@@ -619,7 +617,7 @@ public class EditSampleController {
       }
     });
 
-    binder.registerCustomEditor(TissueMaterial.class, "sampleAnalyte.tissueMaterial", new PropertyEditorSupport() {
+    binder.registerCustomEditor(TissueMaterial.class, new PropertyEditorSupport() {
       @Override
       public void setAsText(String text) throws IllegalArgumentException {
         if (isStringEmptyOrNull(text)) {
@@ -657,54 +655,7 @@ public class EditSampleController {
 
   @RequestMapping(value = "/{sampleId}", method = RequestMethod.GET)
   public ModelAndView setupForm(@PathVariable Long sampleId, ModelMap model) throws IOException {
-    try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Sample sample = null;
-      if (sampleId == AbstractSample.UNSAVED_ID) {
-        sample = dataObjectFactory.getSample(user);
-        model.put("title", "New Sample");
-      } else {
-        sample = requestManager.getSampleById(sampleId);
-        model.put("title", "Sample " + sampleId);
-      }
-
-      if (sample == null) {
-        throw new SecurityException("No such Sample.");
-      }
-      if (!sample.userCanRead(user)) {
-        throw new SecurityException("Permission denied.");
-      }
-
-      model.put("formObj", sample);
-      model.put("sample", sample);
-      model.put("sampleTypes", requestManager.listAllSampleTypes());
-      model.put("accessibleProjects", populateProjects(null));
-      Map<String, Sample> adjacentSamples = getAdjacentSamplesInProject(sample, sample.getProject().getProjectId());
-      if (!adjacentSamples.isEmpty()) {
-        model.put("previousSample", adjacentSamples.get("previousSample"));
-        model.put("nextSample", adjacentSamples.get("nextSample"));
-      }
-
-      Set<Pool<? extends Poolable<?, ?>>> pools = getPoolsBySample(sample);
-      Map<Long, Sample> poolSampleMap = new HashMap<>();
-      for (Pool<? extends Poolable<?, ?>> pool : pools) {
-        poolSampleMap.put(pool.getId(), sample);
-      }
-      model.put("poolSampleMap", poolSampleMap);
-      model.put("samplePools", pools);
-      model.put("sampleRuns", getRunsBySamplePools(pools));
-
-      model.put("owners", LimsSecurityUtils.getPotentialOwners(user, sample, securityManager.listAllUsers()));
-      model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, sample, securityManager.listAllUsers()));
-      model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, sample, securityManager.listAllGroups()));
-
-      return new ModelAndView("/pages/editSample.jsp", model);
-    } catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to show sample", ex);
-      }
-      throw ex;
-    }
+    return setupForm(sampleId, null, model);
   }
 
   @RequestMapping(value = "/{sampleId}/project/{projectId}", method = RequestMethod.GET)
@@ -713,10 +664,8 @@ public class EditSampleController {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Sample sample = null;
       if (sampleId == AbstractSample.UNSAVED_ID) {
-        sample = dataObjectFactory.getSample(user);
-        if (isDetailedSampleEnabled()) {
-          addNewDetailedSampleEntities(sample);
-        }
+        sample = detailedSample ? new DetailedSampleBuilder(user) : dataObjectFactory.getSample(user);
+        model.put("sampleCategory", "new");
         model.put("title", "New Sample");
 
         if (projectId != null) {
@@ -737,6 +686,8 @@ public class EditSampleController {
         }
       } else {
         sample = requestManager.getSampleById(sampleId);
+        if (sample == null) throw new SecurityException("No such sample.");
+        model.put("sampleCategory", detailedSample ? ((SampleAdditionalInfo) sample).getSampleClass().getSampleCategory() : "plain");
         model.put("title", "Sample " + sampleId);
 
         if (projectId != null) {
@@ -753,6 +704,15 @@ public class EditSampleController {
         } else {
           model.put("accessibleProjects", populateProjects(null));
         }
+
+        Set<Pool<? extends Poolable<?, ?>>> pools = getPoolsBySample(sample);
+        Map<Long, Sample> poolSampleMap = new HashMap<>();
+        for (Pool pool : pools) {
+          poolSampleMap.put(pool.getId(), sample);
+        }
+        model.put("poolSampleMap", poolSampleMap);
+        model.put("samplePools", pools);
+        model.put("sampleRuns", getRunsBySamplePools(pools));
       }
 
       if (sample != null && !sample.userCanWrite(user)) {
@@ -762,15 +722,6 @@ public class EditSampleController {
       model.put("formObj", sample);
       model.put("sample", sample);
       model.put("sampleTypes", requestManager.listAllSampleTypes());
-
-      Set<Pool<? extends Poolable<?, ?>>> pools = getPoolsBySample(sample);
-      Map<Long, Sample> poolSampleMap = new HashMap<>();
-      for (Pool<? extends Poolable<?, ?>> pool : pools) {
-        poolSampleMap.put(pool.getId(), sample);
-      }
-      model.put("poolSampleMap", poolSampleMap);
-      model.put("samplePools", pools);
-      model.put("sampleRuns", getRunsBySamplePools(pools));
 
       model.put("owners", LimsSecurityUtils.getPotentialOwners(user, sample, securityManager.listAllUsers()));
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, sample, securityManager.listAllUsers()));
@@ -783,24 +734,6 @@ public class EditSampleController {
       }
       throw ex;
     }
-  }
-
-  /**
-   * Adds child entities to a new detailed Sample so they can be bound in the JSP. These will not all be useful for the same object, but are
-   * all included to accommodate the JSP.
-   * 
-   * @param sample
-   */
-  private void addNewDetailedSampleEntities(Sample sample) {
-    sample.setSampleAdditionalInfo(new SampleAdditionalInfoImpl());
-    sample.getSampleAdditionalInfo().setTissueOrigin(new TissueOriginImpl());
-    sample.getSampleAdditionalInfo().setTissueType(new TissueTypeImpl());
-    sample.getSampleAdditionalInfo().setQcPassedDetail(new QcPassedDetailImpl());
-    sample.getSampleAdditionalInfo().setSubproject(new SubprojectImpl());
-
-    sample.setSampleTissue(new SampleTissueImpl());
-    sample.setSampleAnalyte(new SampleAnalyteImpl());
-    sample.setIdentity(new IdentityImpl());
   }
 
   @RequestMapping(value = "/rest/changes", method = RequestMethod.GET)
@@ -859,7 +792,7 @@ public class EditSampleController {
       }
       model.put("title", "Bulk Create Samples");
       model.put("samplesJSON", mapper.writeValueAsString(samplesDtos));
-      model.put("method",  "Create");
+      model.put("method", "Create");
       model.put("sampleClassId", sampleClassId);
       return new ModelAndView("/pages/bulkEditSamples.jsp", model);
     } catch (IOException ex) {
@@ -873,6 +806,11 @@ public class EditSampleController {
   @RequestMapping(method = RequestMethod.POST)
   public String processSubmit(@ModelAttribute("sample") Sample sample, ModelMap model, SessionStatus session)
       throws IOException, MalformedSampleException {
+    if (sample instanceof DetailedSampleBuilder) {
+      DetailedSampleBuilder builder = (DetailedSampleBuilder) sample;
+      builder.setSampleClass(sampleClassService.get(builder.getSampleClass().getId()));
+      sample = builder.build();
+    }
     try {
       if (sample.getId() == Sample.UNSAVED_ID) {
         sampleService.create(sample);
