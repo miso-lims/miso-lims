@@ -20,7 +20,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 public class OicrSampleNamingScheme implements RequestManagerAwareNamingScheme<Sample> {
   protected static final Logger log = LoggerFactory.getLogger(OicrSampleNamingScheme.class);
 
-  private static final String IDENTITY_REGEX_PART = "([A-Z\\d]{3,5})_(\\d{3,5})";
+  private static final String IDENTITY_REGEX_PART = "([A-Z0-9\\d]{3,5})_(\\d{3,5})";
   private static final String TISSUE_ORIGIN_REGEX = "(Ad|Ap|Ag|Bm|Bn|Br|Bu|Cb|Cn|Du|Es|Fs|Gb|Hr|Ki|Le|Li|Ln|Lu|Lv|Lx|Ly|Md|Me|Nk|Oc|Om|Ov|Pa|Pb|Pr|Sa|Sg|Si|Sk|Sm|Sp|St|Ta|Tr|Mu|Wm|nn)";
   private static final String TISSUE_TYPE_REGEX = "[BRPXMCFESATOn]";
   private static final String TISSUE_REGEX_PART = TISSUE_ORIGIN_REGEX+"_"+TISSUE_TYPE_REGEX+"_(nn|\\d{2})_(\\d{1,2})-(\\d{1,2})";
