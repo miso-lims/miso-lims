@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+import static uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils.getBarcodeFileLocation;
 
 import java.awt.image.RenderedImage;
 import java.io.File;
@@ -231,7 +232,7 @@ public class LibraryControllerHelperService {
 
   public JSONObject getLibraryBarcode(HttpSession session, JSONObject json) {
     Long libraryId = json.getLong("libraryId");
-    File temploc = new File(session.getServletContext().getRealPath("/") + "temp/");
+    File temploc = getBarcodeFileLocation(session);
     try {
       Library library = requestManager.getLibraryById(libraryId);
       barcodeFactory.setPointPixels(1.5f);
@@ -429,7 +430,7 @@ public class LibraryControllerHelperService {
 
   public JSONObject getLibraryDilutionBarcode(HttpSession session, JSONObject json) {
     Long dilutionId = json.getLong("dilutionId");
-    File temploc = new File(session.getServletContext().getRealPath("/") + "temp/");
+    File temploc = getBarcodeFileLocation(session);
     try {
       LibraryDilution dil = requestManager.getLibraryDilutionById(dilutionId);
       barcodeFactory.setPointPixels(1.5f);
@@ -787,7 +788,7 @@ public class LibraryControllerHelperService {
         }
         sb.append("</tr>");
 
-        File temploc = new File(session.getServletContext().getRealPath("/") + "temp/");
+        File temploc = getBarcodeFileLocation(session);
         for (LibraryDilution dil : library.getLibraryDilutions()) {
           SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
           sb.append("<tr>");
@@ -983,7 +984,7 @@ public class LibraryControllerHelperService {
         sb.append("<th>ID</th><th>Done By</th><th>Date</th><th>Results</th><th>ID Barcode</th>");
         sb.append("</tr>");
 
-        File temploc = new File(session.getServletContext().getRealPath("/") + "temp/");
+        File temploc = getBarcodeFileLocation(session);
         for (emPCRDilution dil : requestManager.listAllEmPCRDilutionsByEmPcrId(pcrId)) {
           sb.append("<tr>");
           sb.append("<td>" + dil.getId() + "</td>");

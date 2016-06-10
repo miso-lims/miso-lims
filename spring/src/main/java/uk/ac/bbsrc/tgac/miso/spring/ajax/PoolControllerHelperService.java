@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+import static uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils.getBarcodeFileLocation;
 
 import java.awt.image.RenderedImage;
 import java.io.File;
@@ -324,7 +325,7 @@ public class PoolControllerHelperService {
 
   public JSONObject getPoolBarcode(HttpSession session, JSONObject json) {
     Long poolId = json.getLong("poolId");
-    File temploc = new File(session.getServletContext().getRealPath("/") + "temp/");
+    File temploc = getBarcodeFileLocation(session);
     try {
       Pool pool = requestManager.getPoolById(poolId);
       barcodeFactory.setPointPixels(1.5f);
