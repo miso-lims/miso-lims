@@ -7,22 +7,22 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import uk.ac.bbsrc.tgac.miso.core.data.SampleAnalyte;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAnalyte;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
-import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
+import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAnalyteImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAdditionalInfoImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAdditionalInfoImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAnalyteImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
 
 public class OicrSampleAliasGeneratorTest {
@@ -72,11 +72,6 @@ public class OicrSampleAliasGeneratorTest {
   }
   
   @Test
-  public void generateForStockFromIdentity() throws Exception {
-    assertEquals("PROJ_0001_Bn_P_nn_5-6_D_S7", sut.generateName(makeStockFromIdentity()));
-  }
-  
-  @Test
   public void generateForAliquotFromStockTest() throws Exception {
     assertEquals("PROJ_0001_nn_n_nn_1-1_R_12", sut.generateName(makeAliquotFromStock()));
   }
@@ -121,26 +116,6 @@ public class OicrSampleAliasGeneratorTest {
     aliquot.setSiblingNumber(12);
     
     return aliquot;
-  }
-  
-  private Sample makeStockFromIdentity() throws Exception {
-    SampleAnalyte stock = new SampleAnalyteImpl();
-    Identity parent = makeIdentity();
-    stock.setParent(parent);
-    stock.setTimesReceived(5);
-    stock.setTubeNumber(6);
-    TissueOrigin to = new TissueOriginImpl();
-    to.setAlias("Bn");
-    stock.setTissueOrigin(to);
-    TissueType tt = new TissueTypeImpl();
-    tt.setAlias("P");
-    stock.setTissueType(tt);
-    SampleClass sc = new SampleClassImpl();
-    sc.setSuffix("D_S");
-    sc.setStock(true);
-    stock.setSampleClass(sc);
-    stock.setSiblingNumber(7);
-    return stock;
   }
   
   private Sample makeStockFromStock() throws Exception {
