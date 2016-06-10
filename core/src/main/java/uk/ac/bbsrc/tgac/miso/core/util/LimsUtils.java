@@ -82,17 +82,17 @@ import org.slf4j.LoggerFactory;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 
-import uk.ac.bbsrc.tgac.miso.core.data.SampleAnalyte;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletion;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletionGroup;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAnalyte;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
@@ -904,6 +904,14 @@ public class LimsUtils {
   public static boolean isAnalyteSample(Sample sample) {
     if (!isDetailedSample(sample)) return false;
     return sample instanceof SampleAnalyte;
+  }
+  
+  public static boolean isAnalyteStock(Sample sample) {
+    return isAnalyteSample(sample) && ((SampleAnalyte) sample).getSampleClass().isStock();
+  }
+  
+  public static boolean isAnalyteAliquot(Sample sample) {
+    return isAnalyteSample(sample) && !((SampleAnalyte) sample).getSampleClass().isStock();
   }
 
 }

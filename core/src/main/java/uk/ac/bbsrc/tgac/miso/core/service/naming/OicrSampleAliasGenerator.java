@@ -9,8 +9,8 @@ import net.sourceforge.fluxion.spi.ServiceProvider;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleAnalyte;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 @ServiceProvider
@@ -36,40 +36,37 @@ public class OicrSampleAliasGenerator implements NameGenerator<Sample> {
     
     for (SampleAdditionalInfo parent = (SampleAdditionalInfo) detailed.getParent(); parent != null;
         parent = (SampleAdditionalInfo) parent.getParent()) {
-      if (isAnalyteSample(parent) && !((SampleAnalyte) parent).getSampleClass().isStock()) {
+      if (isAnalyteAliquot(parent)) {
         return parent.getAlias() + getSiblingTag(detailed);
       }
       if (isTissueSample(parent)) {
         return parent.getAlias() + getSiblingTag(detailed);
       }
       if (isIdentitySample(parent)) {
-        String alias = generateTissueAlias(detailed, (Identity) parent);
-        if (!isTissueSample(detailed)) {
-          alias += getSiblingTag(detailed);
-        }
-        return alias;
+        if (!isTissueSample(detailed)) throw new IllegalArgumentException("Missing parent tissue");
+        return generateTissueAlias((SampleTissue) detailed, (Identity) parent);
       }
     }
     // Identity name generation requires access to SampleNumberPerProjectDao
     throw new IllegalArgumentException("Cannot generate alias for Identities");
   }
   
-  private String generateTissueAlias(SampleAdditionalInfo sample, Identity parent) {
+  private String generateTissueAlias(SampleTissue tissue, Identity identity) {
     StringBuilder sb = new StringBuilder();
     
-    sb.append(parent.getAlias())
+    sb.append(identity.getAlias())
     .append(SEPARATOR)
-    .append(sample.getTissueOrigin() == null ? TISSUE_ORIGIN_UNKNOWN : sample.getTissueOrigin().getAlias())
+    .append(tissue.getTissueOrigin() == null ? TISSUE_ORIGIN_UNKNOWN : tissue.getTissueOrigin().getAlias())
     .append(SEPARATOR)
-    .append(sample.getTissueType() == null ? TISSUE_TYPE_UNKNOWN : sample.getTissueType().getAlias())
+    .append(tissue.getTissueType() == null ? TISSUE_TYPE_UNKNOWN : tissue.getTissueType().getAlias())
     .append(SEPARATOR)
-    .append(passageNumber(sample.getPassageNumber()))
+    .append(passageNumber(tissue.getPassageNumber()))
     .append(SEPARATOR)
-    .append(sample.getTimesReceived());
+    .append(tissue.getTimesReceived());
     
-    if (sample.getTubeNumber() != null) {
+    if (tissue.getTubeNumber() != null) {
       sb.append(DASH)
-      .append(sample.getTubeNumber());
+      .append(tissue.getTubeNumber());
     }
     return sb.toString();
   }
