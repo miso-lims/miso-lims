@@ -24,11 +24,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAnalyte;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAnalyteImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
@@ -131,10 +133,13 @@ public class DefaultSampleServiceTestSuite {
   @InjectMocks
   private DefaultSampleService sut;
   
+  private Set<SampleValidRelationship> relationships;
+  
   @Before
   public void setUp() {
     MockitoAnnotations.initMocks(this);
     sut.setAutoGenerateIdBarcodes(false);
+    relationships = new HashSet<>();
   }
   
   @Test
@@ -227,13 +232,13 @@ public class DefaultSampleServiceTestSuite {
   
   @Test
   public void testCreateDetailedSampleExistingParentById() throws Exception {
-    Identity parent = makeParentWithLookup();
-    SampleTissue child = makeChild();
+    Identity parent = makeParentIdentityWithLookup();
+    SampleTissue child = makeUnsavedChildTissue();
     child.setParent(new IdentityImpl());
     child.getParent().setId(parent.getId());
     
     Long newId = 89L;
-    SampleAdditionalInfo postSave = makeChild();
+    SampleAdditionalInfo postSave = makeUnsavedChildTissue();
     postSave.setId(newId);
     postSave.setParent(parent);
     
@@ -253,15 +258,15 @@ public class DefaultSampleServiceTestSuite {
   
   @Test
   public void testCreateDetailedSampleExistingParentByExternalName() throws Exception {
-    Identity parent = makeParentWithLookup();
-    SampleTissue child = makeChild();
+    Identity parent = makeParentIdentityWithLookup();
+    SampleTissue child = makeUnsavedChildTissue();
     
     Identity shellParent = new IdentityImpl();
     shellParent.setExternalName(parent.getExternalName());
     child.setParent(shellParent);
     
     Long newId = 89L;
-    SampleTissue postSave = makeChild();
+    SampleTissue postSave = makeUnsavedChildTissue();
     postSave.setId(newId);
     postSave.setParent(parent);
     
@@ -292,7 +297,7 @@ public class DefaultSampleServiceTestSuite {
   
   @Test
   public void testCreateDetailedSampleNoParent() throws Exception {
-    SampleTissue sample = makeChild();
+    SampleTissue sample = makeUnsavedChildTissue();
     Identity fakeParent = new IdentityImpl();
     fakeParent.setExternalName("non-existing");
     sample.setParent(fakeParent);
@@ -301,7 +306,7 @@ public class DefaultSampleServiceTestSuite {
     
     // because of mocked dao, we can't actually continue with the same parent sample that should be created, but the partial 
     // parent sample that gets created is caught and examined below 
-    Identity parent = makeParentWithLookup();
+    Identity parent = makeParentIdentityWithLookup();
     Mockito.when(sampleDao.addSample(Mockito.any(Sample.class))).thenReturn(parent.getId());
     mockValidRelationship(parent.getSampleClass(), sample.getSampleClass());
     
@@ -327,6 +332,70 @@ public class DefaultSampleServiceTestSuite {
     Sample finalChild = updatedCapture.getAllValues().get(1);
     assertNotNull("Child sample should have parent", ((SampleTissue) finalChild).getParent());
     assertEquals("Unexpected parent ID", ((SampleTissue) finalChild).getParent().getId(), finalParent.getId());
+  }
+  
+  @Test
+  public void testCreateDetailedSampleNoTissue() throws Exception {
+    Identity identity = makeParentIdentityWithLookup();
+    SampleTissue tissue = makeUnsavedParentTissue();
+    
+    Identity shellIdentity = new IdentityImpl();
+    shellIdentity.setExternalName(identity.getExternalName());
+    tissue.setParent(shellIdentity);
+    
+    SampleAnalyte analyte = makeUnsavedChildAnalyte();
+    analyte.setParent(tissue);
+    
+    Mockito.when(sampleDao.addSample(tissue)).thenReturn(94L);
+    Mockito.when(sampleDao.getSample(94L)).thenReturn(tissue);
+    Mockito.when(sampleDao.addSample(analyte)).thenReturn(12L);
+    Mockito.when(sampleDao.getSample(12L)).thenReturn(analyte);
+    
+    mockValidRelationship(identity.getSampleClass(), tissue.getSampleClass());
+    mockValidRelationship(tissue.getSampleClass(), analyte.getSampleClass());
+    sut.create(analyte);
+    ArgumentCaptor<Sample> updatedCapture = ArgumentCaptor.forClass(Sample.class);
+    Mockito.verify(sampleDao, Mockito.times(2)).update(updatedCapture.capture());
+    Sample createdTissue = updatedCapture.getAllValues().get(0);
+    assertTrue(LimsUtils.isTissueSample(createdTissue));
+    Sample createdAnalyte = updatedCapture.getAllValues().get(1);
+    assertTrue(LimsUtils.isAnalyteSample(createdAnalyte));
+  }
+  
+  @Test
+  public void testCreateDetailedSampleNoTissueOrIdentity() throws Exception {
+    Identity identity = makeUnsavedParentIdentity();
+    Mockito.when(sampleClassDao.listByCategory(Mockito.eq(Identity.CATEGORY_NAME)))
+    .thenReturn(Lists.newArrayList(identity.getSampleClass()));
+    SampleTissue tissue = makeUnsavedParentTissue();
+    
+    Identity shellIdentity = new IdentityImpl();
+    shellIdentity.setExternalName(identity.getExternalName());
+    tissue.setParent(shellIdentity);
+    
+    SampleAnalyte analyte = makeUnsavedChildAnalyte();
+    analyte.setParent(tissue);
+    
+    Identity identityPostCreate = makeUnsavedParentIdentity();
+    identityPostCreate.setId(39L);
+    Mockito.when(sampleDao.addSample(Mockito.any(Sample.class))).thenReturn(identityPostCreate.getId());
+    Mockito.when(sampleDao.getSample(39L)).thenReturn(identityPostCreate);
+    Mockito.when(sampleDao.addSample(tissue)).thenReturn(94L);
+    Mockito.when(sampleDao.getSample(94L)).thenReturn(tissue);
+    Mockito.when(sampleDao.addSample(analyte)).thenReturn(12L);
+    Mockito.when(sampleDao.getSample(12L)).thenReturn(analyte);
+    
+    mockValidRelationship(identity.getSampleClass(), tissue.getSampleClass());
+    mockValidRelationship(tissue.getSampleClass(), analyte.getSampleClass());
+    sut.create(analyte);
+    ArgumentCaptor<Sample> updatedCapture = ArgumentCaptor.forClass(Sample.class);
+    Mockito.verify(sampleDao, Mockito.times(3)).update(updatedCapture.capture());
+    Sample createdIdentity = updatedCapture.getAllValues().get(0);
+    assertTrue(LimsUtils.isIdentitySample(createdIdentity));
+    Sample createdTissue = updatedCapture.getAllValues().get(1);
+    assertTrue(LimsUtils.isTissueSample(createdTissue));
+    Sample createdAnalyte = updatedCapture.getAllValues().get(2);
+    assertTrue(LimsUtils.isAnalyteSample(createdAnalyte));
   }
   
   @Test
@@ -375,8 +444,8 @@ public class DefaultSampleServiceTestSuite {
     return sample;
   }
   
-  private Identity makeParentWithLookup() throws IOException {
-    Identity sample = makeParent();
+  private Identity makeParentIdentityWithLookup() throws IOException {
+    Identity sample = makeUnsavedParentIdentity();
     Mockito.when(sampleDao.getSample(sample.getId())).thenReturn(sample);
     Mockito.when(identityService.get(sample.getExternalName())).thenReturn(sample);
     Mockito.when(sampleClassDao.listByCategory(Mockito.eq(Identity.CATEGORY_NAME)))
@@ -384,38 +453,59 @@ public class DefaultSampleServiceTestSuite {
     return sample;
   }
   
-  private Identity makeParent() {
+  private Identity makeUnsavedParentIdentity() {
     Identity sample = new IdentityImpl();
     sample.setId(63L);
     sample.setSampleClass(new SampleClassImpl());
     sample.getSampleClass().setId(51L);
-    sample.getSampleClass().setAlias("parent");
+    sample.getSampleClass().setAlias("identity");
     sample.getSampleClass().setSampleCategory(Identity.CATEGORY_NAME);
     sample.setExternalName("external");
     return sample;
   }
   
-  private SampleTissue makeChild() {
-    SampleTissue sample = new SampleTissueImpl();
+  private SampleTissue makeUnsavedChildTissue() {
+    SampleTissue sample = makeUnsavedParentTissue();
     sample.setSampleType("type");
     sample.setScientificName("scientific");
+    return sample;
+  }
+  
+  private SampleTissue makeUnsavedParentTissue() {
+    SampleTissue sample = new SampleTissueImpl();
     sample.setSampleClass(new SampleClassImpl());
     sample.getSampleClass().setId(10L);
-    sample.getSampleClass().setAlias("child");
+    sample.getSampleClass().setAlias("tissue");
     sample.getSampleClass().setSampleCategory(SampleTissue.CATEGORY_NAME);
     Mockito.when(sampleClassDao.getSampleClass(sample.getSampleClass().getId()))
         .thenReturn(sample.getSampleClass());
     return sample;
   }
   
+  private SampleAnalyte makeUnsavedChildAnalyte() throws IOException {
+    SampleAnalyte sample = new SampleAnalyteImpl();
+    sample.setSampleType("type");
+    sample.setScientificName("scientific");
+    sample.setLastModifier(mockUser());
+    sample.setSampleClass(new SampleClassImpl());
+    sample.getSampleClass().setId(30L);
+    sample.getSampleClass().setAlias("analyte");
+    sample.getSampleClass().setSampleCategory(SampleAnalyte.CATEGORY_NAME);
+    Mockito.when(sampleClassDao.getSampleClass(sample.getSampleClass().getId()))
+        .thenReturn(sample.getSampleClass());
+    mockShellProjectWithRealLookup(sample);
+    return sample;
+  }
+  
   private void mockValidRelationship(SampleClass parentClass, SampleClass childClass) throws IOException {
-    Set<SampleValidRelationship> relationships = new HashSet<>();
     SampleValidRelationship rel = new SampleValidRelationshipImpl();
     rel.setParent(parentClass);
     rel.setChild(childClass);
     relationships.add(rel);
     Mockito.when(sampleValidRelationshipService.getAll()).thenReturn(relationships);
   }
+  
+  
   
   /**
    * Adds a shell project to the provided Sample, and adds the real project to the mocked projectStore. The 
