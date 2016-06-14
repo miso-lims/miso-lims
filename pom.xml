@@ -16,7 +16,7 @@
   <groupId>uk.ac.bbsrc.tgac.miso</groupId>
   <artifactId>miso</artifactId>
   <packaging>pom</packaging>
-  <version>0.2.13</version>
+  <version>0.2.14</version>
   <name>MISO Framework</name>
   <url>http://www.tgac.ac.uk/miso</url>
 
