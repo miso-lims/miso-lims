@@ -88,9 +88,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.QcPassedDetail;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAnalyte;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAnalyte.StrStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
@@ -403,13 +405,15 @@ public class EditSampleController {
   @Autowired
   private SampleClassService sampleClassService;
 
-  @ModelAttribute("sampleClasses")
-  public List<SampleClass> getSampleClasses() throws IOException {
+  private void populateSampleClasses(ModelMap model) throws IOException {
     List<SampleClass> sampleClasses = new ArrayList<>(sampleClassService.getAll());
-    // Can't manually create Identities, so remove the option
+    List<SampleClass> tissueClasses = new ArrayList<>();
     for (Iterator<SampleClass> i = sampleClasses.iterator(); i.hasNext();) {
       SampleClass sc = i.next();
-      if (Identity.CATEGORY_NAME.equals(sc.getSampleCategory())) {
+      if (SampleTissue.CATEGORY_NAME.equals(sc.getSampleCategory())) {
+        tissueClasses.add(sc);
+      } else if (!SampleAnalyte.CATEGORY_NAME.equals(sc.getSampleCategory()) || !sc.isStock()) {
+        // Can only create Tissues and Analyte Stock from this page, so remove other classes
         i.remove();
       }
     }
@@ -419,7 +423,8 @@ public class EditSampleController {
         return o1.getAlias().compareTo(o2.getAlias());
       }
     });
-    return sampleClasses;
+    model.put("sampleClasses", sampleClasses);
+    model.put("tissueClasses", tissueClasses);
   }
 
   @Autowired
@@ -541,9 +546,13 @@ public class EditSampleController {
     binder.registerCustomEditor(SampleClass.class, new PropertyEditorSupport() {
       @Override
       public void setAsText(String text) throws IllegalArgumentException {
-        SampleClass sc = new SampleClassImpl();
-        sc.setId(Long.valueOf(text));
-        setValue(sc);
+        if (isStringEmptyOrNull(text)) {
+          setValue(null);
+        } else {
+          SampleClass sc = new SampleClassImpl();
+          sc.setId(Long.valueOf(text));
+          setValue(sc);
+        }
       }
     });
 
@@ -747,7 +756,8 @@ public class EditSampleController {
   }
 
   /**
-   * used to edit samples with ids from given {sampleIds} sends Dtos objects which will then be used for editing in grid
+   * used to edit samples with ids from given {sampleIds}
+   * sends Dtos objects which will then be used for editing in grid
    */
   @RequestMapping(value = "/bulk/edit/{sampleIds}", method = RequestMethod.GET)
   public ModelAndView editBulkSamples(@PathVariable String sampleIds, ModelMap model) throws IOException {
@@ -809,6 +819,9 @@ public class EditSampleController {
     if (sample instanceof DetailedSampleBuilder) {
       DetailedSampleBuilder builder = (DetailedSampleBuilder) sample;
       builder.setSampleClass(sampleClassService.get(builder.getSampleClass().getId()));
+      if (builder.getTissueClass() != null) {
+        builder.setTissueClass(sampleClassService.get(builder.getTissueClass().getId()));
+      }
       sample = builder.build();
     }
     try {

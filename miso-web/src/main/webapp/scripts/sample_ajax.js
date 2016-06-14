@@ -116,6 +116,23 @@ var Sample = Sample || {
       jQuery('#sampleClass').attr('class', 'form-control');
       jQuery('#sampleClass').attr('data-parsley-required', 'true');
       
+      // Concentration validation
+      jQuery('#concentration').attr('class', 'form-control');
+      jQuery('#concentration').attr('data-parsley-type', 'number');
+        
+      // Group ID validation
+      jQuery('#groupId').attr('class', 'form-control');
+      jQuery('#groupId').attr('data-parsley-type', 'integer');
+      
+      // Group Description validation
+      jQuery('#groupDescription').attr('class', 'form-control');
+      jQuery('#groupDescription').attr('data-parsley-maxlength', '255');
+      jQuery('#groupDescription').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+      
+      // Cellularity validation
+      jQuery('#cellularity').attr('class', 'form-control');
+      jQuery('#cellularity').attr('data-parsley-type', 'integer');
+      
       // TissueOrigin validation
       jQuery('#tissueOrigin').attr('class', 'form-control');
       jQuery('#tissueOrigin').attr('data-parsley-required', 'true');
@@ -143,28 +160,9 @@ var Sample = Sample || {
       jQuery('#tubeNumber').attr('data-parsley-required', 'true');
       jQuery('#tubeNumber').attr('data-parsley-type', 'integer');
       
-      // Concentration validation
-      jQuery('#concentration').attr('class', 'form-control');
-      jQuery('#concentration').attr('data-parsley-type', 'number');
-        
-      // Group ID validation
-      jQuery('#groupId').attr('class', 'form-control');
-      jQuery('#groupId').attr('data-parsley-type', 'integer');
-      
-      // Group Description validation
-      jQuery('#groupDescription').attr('class', 'form-control');
-      jQuery('#groupDescription').attr('data-parsley-maxlength', '255');
-      jQuery('#groupDescription').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
-      
       var selectedId = jQuery('#sampleClass').is('select') ? jQuery('#sampleClass option:selected').val() : jQuery('#sampleClass').val();
       var sampleCategory = Sample.options.getSampleCategoryByClassId(selectedId);
-      switch (sampleCategory) {
-      case 'Tissue':
-        // Cellularity validation
-        jQuery('#cellularity').attr('class', 'form-control');
-        jQuery('#cellularity').attr('data-parsley-type', 'integer');
-        break;
-      case 'Analyte':
+      if (sampleCategory === 'Analyte') {
         // Region validation
         jQuery('#region').attr('class', 'form-control');
         jQuery('#region').attr('data-parsley-maxlength', '255');
@@ -174,7 +172,10 @@ var Sample = Sample || {
         jQuery('#tubeId').attr('class', 'form-control');
         jQuery('#tubeId').attr('data-parsley-maxlength', '255');
         jQuery('#tubeId').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
-        break;
+        
+        // TissueClass validation
+        jQuery('#tissueClass').attr('class', 'form-control');
+        jQuery('#tissueClass').attr('data-parsley-required', 'true');
       }
     }
     
@@ -699,41 +700,27 @@ Sample.ui = {
     var sampleCategory = Sample.options.getSampleCategoryByClassId(selectedId);
     jQuery('#sampleCategory').val(sampleCategory);
     switch (sampleCategory) {
-    case 'Tissue':
-      Sample.ui.setUpForTissue();
-      break;
     case 'Analyte':
       Sample.ui.setUpForAnalyte();
       break;
     default:
-      // Identity (can't create), Tissue Processing (no additional fields), or no SampleClass selected 
-      Sample.ui.hideTissueFields();
-      Sample.ui.hideAnalyteFields();
+      Sample.ui.setUpForTissue();
       break;
     }
   },
   
-  hideTissueFields: function() {
-    jQuery('#detailedSampleTissue').find(':input').each(function() {
-      jQuery(this).val('');
-    });
-    jQuery('#detailedSampleTissue').hide();
-  },
-  
-  hideAnalyteFields: function() {
+  setUpForTissue: function() {
     jQuery('#detailedSampleAnalyte').find(':input').each(function() {
       jQuery(this).val('');
     });
     jQuery('#detailedSampleAnalyte').hide();
-  },
-  
-  setUpForTissue: function() {
-    Sample.ui.hideAnalyteFields();
+    jQuery('#tissueClassRow').hide();
+    jQuery('#tissueClass').val('');
     jQuery('#detailedSampleTissue').show();
   },
   
   setUpForAnalyte: function() {
-    Sample.ui.hideTissueFields();
+    jQuery('#tissueClassRow').show();
     jQuery('#detailedSampleAnalyte').show();
   },
   
