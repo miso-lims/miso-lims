@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+import static uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils.getBarcodeFileLocation;
 
 import java.awt.image.RenderedImage;
 import java.io.File;
@@ -100,7 +101,7 @@ public class PlateControllerHelperService {
 
   public JSONObject getPlateBarcode(HttpSession session, JSONObject json) {
     Long plateId = json.getLong("plateId");
-    File temploc = new File(session.getServletContext().getRealPath("/") + "temp/");
+    File temploc = getBarcodeFileLocation(session);
     try {
       Plate<? extends List<? extends Plateable>, ? extends Plateable> plate = requestManager.getPlateById(plateId);
       barcodeFactory.setPointPixels(1.5f);
