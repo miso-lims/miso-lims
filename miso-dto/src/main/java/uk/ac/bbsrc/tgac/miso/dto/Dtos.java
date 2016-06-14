@@ -1,10 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isAnalyteSample;
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isDetailedSample;
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isIdentitySample;
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isTissueSample;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -316,42 +312,69 @@ public class Dtos {
       sampleClass.setId(from.getSampleClassId());
       to.setSampleClass(sampleClass);
     }
-    SampleAdditionalInfo parent = null;
-    if (from instanceof SampleIdentityDto && from.getClass() != SampleIdentityDto.class) {
-      parent = new IdentityImpl();
-      ((Identity) parent).setExternalName(((SampleIdentityDto) from).getExternalName());
-      ((Identity) parent).setInternalName(((SampleIdentityDto) from).getInternalName());
-      String donorSex = ((SampleIdentityDto) from).getDonorSex();
-      if (!isStringEmptyOrNull(donorSex)) {
-        ((Identity) parent).setDonorSex(donorSex);
-      }
-    }
-    if (from.getParentId() != null) {
-      if (parent == null) {
-        parent = new SampleAdditionalInfoImpl();
-      }
-      parent.setId(from.getParentId());
-    }
-    // TODO(dcooke): Synthesise multiple levels of parents, as necessary
-    if (from.getParentAlias() != null) {
-      if (parent == null) parent = new SampleAdditionalInfoImpl();
-      parent.setAlias(from.getParentAlias());
-    }
-    if (from.getParentSampleClassId() != null) {
-      if (parent == null) {
-        parent = new SampleAdditionalInfoImpl();
-        parent.setSampleClass(new SampleClassImpl());
-        parent.getSampleClass().setId(from.getParentSampleClassId());
-      }
-    }
     if (from.getGroupId() != null) {
       to.setGroupId(from.getGroupId());
       to.setGroupDescription(from.getGroupDescription());
     }
-    if (parent != null) {
-      to.setParent(parent);
-    }
+    to.setParent(getParent(from));
     return to;
+  }
+  
+  /**
+   * Extracts parent details from the DTO, according to three possible cases:
+   * 
+   * <ol><li>parent ID is provided. This implies that the parent exists, so no other parent information
+   *     will be required</li>
+   * <li>identity information and parentSampleClassId are provided. This implies that a tissue parent
+   *     should be created, and that the identity may or may not yet exist</li>
+   * <li>identity information is provided, but no parentSampleClassId. This implies that the direct
+   *     parent of this sample will be an identity, which may or may not yet exist</li></ol>
+   *     
+   * @param childDto the DTO to take parent details from
+   * @return the parent details from the DTO, or null if there are none. A returned sample will also
+   * include its own parent if applicable.
+   */
+  private static SampleAdditionalInfo getParent(SampleAdditionalInfoDto childDto) {
+    SampleAdditionalInfo parent = null;
+    if (childDto.getParentId() != null) {
+      // Case 1
+      parent = new SampleAdditionalInfoImpl();
+      parent.setId(childDto.getParentId());
+    } else if (childDto instanceof SampleIdentityDto && childDto.getClass() != SampleIdentityDto.class) {
+      Identity identity = new IdentityImpl();
+      identity.setExternalName(((SampleIdentityDto) childDto).getExternalName());
+      identity.setInternalName(((SampleIdentityDto) childDto).getInternalName());
+      String donorSex = ((SampleIdentityDto) childDto).getDonorSex();
+      if (!isStringEmptyOrNull(donorSex)) {
+        identity.setDonorSex(donorSex);
+      }
+      if (childDto.getParentSampleClassId() != null) {
+        // Case 2
+        parent = new SampleTissueImpl();
+        parent.setSampleClass(new SampleClassImpl());
+        parent.getSampleClass().setId(childDto.getParentSampleClassId());
+        if (childDto.getTissueOriginId() != null) {
+          // TODO: this can use toTissueSample once the below fields have been moved into SampleTissue
+          parent.setTissueOrigin(new TissueOriginImpl());
+          parent.getTissueOrigin().setId(childDto.getTissueOriginId());
+          parent.setTissueType(new TissueTypeImpl());
+          parent.getTissueType().setId(childDto.getTissueTypeId());
+          parent.setTimesReceived(childDto.getTimesReceived());
+          parent.setTubeNumber(childDto.getTubeNumber());
+          parent.setPassageNumber(childDto.getPassageNumber());
+          parent.setExternalInstituteIdentifier(childDto.getExternalInstituteIdentifier());
+          if (childDto.getLabId() != null) {
+            parent.setLab(new LabImpl());
+            parent.getLab().setId(childDto.getLabId());
+          }
+        }
+        parent.setParent(identity);
+      } else {
+        // Case 3
+        parent = identity;
+      }
+    }
+    return parent;
   }
 
   public static TissueMaterialDto asDto(TissueMaterial from) {
