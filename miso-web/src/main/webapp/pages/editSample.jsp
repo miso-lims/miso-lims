@@ -184,7 +184,7 @@
       </td>
     </tr>
     <tr>
-      <td>Project:</td>
+      <td>Project:*</td>
       <c:choose>
         <c:when test="${empty sample.project}">
           <td>
@@ -297,52 +297,52 @@
     
     <br/>
     <div id="detailedSample">
-        <c:if test="${sampleCategory eq 'Identity' or sampleCategory eq 'new'}">
-          <br/>
-          <div id="detailedSampleIdentity">
-            <h2>Identity</h2>
-            <table class="in">
-              <tr>
-                <td class="h">External Name:*</td>
-                <td>
-                  <c:choose>
-                    <c:when test="${sample.id == 0}">
-                      <form:input id="externalName" path="externalName"/>
-                    </c:when>
-                    <c:otherwise>
-                      ${sample.externalName}
-                    </c:otherwise>
-                  </c:choose>
-                </td>
-              </tr>
-              <tr>
-                <td class="h">Sex:</td>
-                <td>
-                  <c:choose>
-                    <c:when test="${sample.id == 0}">
-                      <form:select id="donorSex" path="donorSex">
-                      <c:forEach var="donorSexOption" items="${donorSexOptions}">
-                        <option value="${donorSexOption}" <c:if test="${sample.donorSex == donorSexOption}">selected="selected"</c:if>>
-                          ${donorSexOption.label}
-                        </option>
-                      </c:forEach>
-                      </form:select>
-                    </c:when>
-                    <c:otherwise>
-                      ${sample.donorSex}
-                    </c:otherwise>
-                  </c:choose>
-                </td>
-              </tr>
-            </table>
-          </div>
-        </c:if>
-        
+      <c:if test="${sampleCategory eq 'Identity' or sampleCategory eq 'new'}">
         <br/>
-        <h2>Details</h2>
-    	<table class="in">
-        <tr>
-          <c:if test="${sample.id != 0}">
+        <div id="detailedSampleIdentity">
+          <h2>Identity</h2>
+          <table class="in">
+            <tr>
+              <td class="h">External Name:*</td>
+              <td>
+                <c:choose>
+                  <c:when test="${sample.id == 0}">
+                    <form:input id="externalName" path="externalName"/>
+                  </c:when>
+                  <c:otherwise>
+                    ${sample.externalName}
+                  </c:otherwise>
+                </c:choose>
+              </td>
+            </tr>
+            <tr>
+              <td class="h">Sex:</td>
+              <td>
+                <c:choose>
+                  <c:when test="${sample.id == 0}">
+                    <form:select id="donorSex" path="donorSex">
+                    <c:forEach var="donorSexOption" items="${donorSexOptions}">
+                      <option value="${donorSexOption}" <c:if test="${sample.donorSex == donorSexOption}">selected="selected"</c:if>>
+                        ${donorSexOption.label}
+                      </option>
+                    </c:forEach>
+                    </form:select>
+                  </c:when>
+                  <c:otherwise>
+                    ${sample.donorSex}
+                  </c:otherwise>
+                </c:choose>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </c:if>
+        
+      <br/>
+      <h2>Details</h2>
+      <table class="in">
+        <c:if test="${sample.id != 0}">
+          <tr>
             <td class="h">Parent:</td>
             <c:choose>
               <c:when test="${empty sample.parent}">
@@ -352,8 +352,8 @@
                 <td><a href='<c:url value="/miso/sample/${sample.parent.id}"/>'>${sample.parent.alias}</a></td>
               </c:otherwise>
             </c:choose>
-          </c:if>
-        </tr>
+          </tr>
+        </c:if>
         <tr>
           <td class="h">Sample Class:*</td>
           <td>
@@ -368,40 +368,6 @@
               </c:otherwise>
             </c:choose>
           </td>
-        </tr>
-        <tr>
-          <td class="h">Tissue Origin:*</td>
-          <td>
-            <c:choose>
-              <c:when test="${sample.id == 0}">
-                <miso:select id="tissueOrigin" path="tissueOrigin" items="${tissueOrigins}" itemLabel="description" 
-                    itemValue="id" defaultLabel="SELECT" defaultValue=""/>
-              </c:when>
-              <c:otherwise>
-                ${sample.tissueOrigin.description}
-              </c:otherwise>
-            </c:choose>
-          </td>      
-        </tr>
-        <tr>
-          <td class="h">Tissue Type:*</td>
-          <td>
-            <c:choose>
-              <c:when test="${sample.id == 0}">
-                <form:select id="tissueType" path="tissueType">
-                  <option value="">SELECT</option>
-                  <c:forEach items="${tissueTypes}" var="tissueType">
-                    <option value="${tissueType.id}" <c:if test="${tissueType.id == sample.tissueType.id}">selected="selected"</c:if>>
-                      ${fn:length(tissueType.description) lt 51 ? tissueType.description : fn:substring(tissueType.description,0,49) += '&hellip;'}
-                    </option>
-                  </c:forEach>
-                </form:select>
-              </c:when>
-              <c:otherwise>
-                ${sample.tissueType.description}
-              </c:otherwise>
-            </c:choose>
-          </td>                               
         </tr>
         <tr>
           <td class="h">QC Details:</td>
@@ -439,50 +405,6 @@
           </td>                               
         </tr>
         <tr>
-          <td class="h">External Institute Identifier:</td>
-          <td><form:input id="externalInstituteIdentifier" path="externalInstituteIdentifier"/></td>                               
-        </tr>
-        <tr>
-          <td class="h">Lab:</td>
-          <td>
-            <form:select id="lab" path="lab">
-              <option value="">None</option>
-              <c:forEach items="${labs}" var="lab">
-                <option value="${lab.id}" <c:if test="${lab.id == sample.lab.id}">selected="selected"</c:if>>
-                    ${lab.alias} - ${lab.institute.alias}
-                </option>
-              </c:forEach>
-            </form:select>
-          </td>
-        </tr>
-        <tr>
-          <td class="h">Passage Number:</td>
-          <td>
-            <c:choose>
-              <c:when test="${sample.id == 0}"><form:input id="passageNumber" path="passageNumber"/></c:when>
-              <c:otherwise>${!empty sample.passageNumber ? sample.passageNumber : 'n/a'}</c:otherwise>
-            </c:choose>
-          </td>                               
-        </tr>
-        <tr>
-          <td class="h">Times Received:*</td>
-          <td>
-            <c:choose>
-              <c:when test="${sample.id == 0}"><form:input id="timesReceived" path="timesReceived"/></c:when>
-              <c:otherwise>${!empty sample.timesReceived ? sample.timesReceived : 'n/a'}</c:otherwise>
-            </c:choose>
-          </td>                               
-        </tr>
-        <tr>
-          <td class="h">Tube Number:*</td>
-          <td>
-            <c:choose>
-              <c:when test="${sample.id == 0}"><form:input id="tubeNumber" path="tubeNumber"/></c:when>
-              <c:otherwise>${!empty sample.tubeNumber ? sample.tubeNumber : 'n/a'}</c:otherwise>
-            </c:choose>
-          </td>                               
-        </tr>
-        <tr>
           <td class="h">Concentration (nM):</td>
           <td><form:input id="concentration" path="concentration"/></td>                               
         </tr>
@@ -505,6 +427,99 @@
         <div id="detailedSampleTissue">
           <h2>Tissue</h2>
           <table class="in">
+            <tr id="tissueClassRow">
+              <td class="h">Tissue Class:*</td>
+              <td>
+                <c:choose>
+                  <c:when test="${sample.id == 0}">
+                    <miso:select id="tissueClass" path="tissueClass" items="${tissueClasses}" itemLabel="alias" 
+                        itemValue="id" defaultLabel="SELECT" defaultValue=""/>
+                  </c:when>
+                  <c:otherwise>
+                    <input type="hidden" id="sampleClass" value="${sample.sampleClass.id}"/>
+                    ${sample.sampleClass.alias}
+                  </c:otherwise>
+                </c:choose>
+              </td>
+            </tr>
+            <tr>
+              <td class="h">Tissue Origin:*</td>
+              <td>
+                <c:choose>
+                  <c:when test="${sample.id == 0}">
+                    <miso:select id="tissueOrigin" path="tissueOrigin" items="${tissueOrigins}" itemLabel="description" 
+                        itemValue="id" defaultLabel="SELECT" defaultValue=""/>
+                  </c:when>
+                  <c:otherwise>
+                    ${sample.tissueOrigin.description}
+                  </c:otherwise>
+                </c:choose>
+              </td>      
+            </tr>
+            <tr>
+              <td class="h">Tissue Type:*</td>
+              <td>
+                <c:choose>
+                  <c:when test="${sample.id == 0}">
+                    <form:select id="tissueType" path="tissueType">
+                      <option value="">SELECT</option>
+                      <c:forEach items="${tissueTypes}" var="tissueType">
+                        <option value="${tissueType.id}" <c:if test="${tissueType.id == sample.tissueType.id}">selected="selected"</c:if>>
+                          ${fn:length(tissueType.description) lt 51 ? tissueType.description : fn:substring(tissueType.description,0,49) += '&hellip;'}
+                        </option>
+                      </c:forEach>
+                    </form:select>
+                  </c:when>
+                  <c:otherwise>
+                    ${sample.tissueType.description}
+                  </c:otherwise>
+                </c:choose>
+              </td>                               
+            </tr>
+            <tr>
+              <td class="h">External Institute Identifier:</td>
+              <td><form:input id="externalInstituteIdentifier" path="externalInstituteIdentifier"/></td>                               
+            </tr>
+            <tr>
+              <td class="h">Lab:</td>
+              <td>
+                <form:select id="lab" path="lab">
+                  <option value="">None</option>
+                  <c:forEach items="${labs}" var="lab">
+                    <option value="${lab.id}" <c:if test="${lab.id == sample.lab.id}">selected="selected"</c:if>>
+                        ${lab.alias} - ${lab.institute.alias}
+                    </option>
+                  </c:forEach>
+                </form:select>
+              </td>
+            </tr>
+            <tr>
+              <td class="h">Passage Number:</td>
+              <td>
+                <c:choose>
+                  <c:when test="${sample.id == 0}"><form:input id="passageNumber" path="passageNumber"/></c:when>
+                  <c:otherwise>${!empty sample.passageNumber ? sample.passageNumber : 'n/a'}</c:otherwise>
+                </c:choose>
+              </td>                               
+            </tr>
+            <tr>
+              <td class="h">Times Received:*</td>
+              <td>
+                <c:choose>
+                  <c:when test="${sample.id == 0}"><form:input id="timesReceived" path="timesReceived"/></c:when>
+                  <c:otherwise>${!empty sample.timesReceived ? sample.timesReceived : 'n/a'}</c:otherwise>
+                </c:choose>
+              </td>                               
+            </tr>
+            <tr>
+              <td class="h">Tube Number:*</td>
+              <td>
+                <c:choose>
+                  <c:when test="${sample.id == 0}"><form:input id="tubeNumber" path="tubeNumber"/></c:when>
+                  <c:otherwise>${!empty sample.tubeNumber ? sample.tubeNumber : 'n/a'}</c:otherwise>
+                </c:choose>
+              </td>                               
+            </tr>
             <tr>
               <td class="h">Cellularity:</td>
               <td><form:input id="cellularity" path="cellularity"/></td>

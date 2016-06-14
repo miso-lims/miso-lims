@@ -64,17 +64,10 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAnalyt
   // DetailedSample attributes
   private Sample parent;
   private SampleClass sampleClass;
-  private TissueOrigin tissueOrigin;
-  private TissueType tissueType;
   private QcPassedDetail qcPassedDetail;
   private Subproject subproject;
-  private String externalInstituteIdentifier;
-  private Lab lab;
   private Long kitDescriptorId;
   private KitDescriptor prepKit;
-  private Integer passageNumber;
-  private Integer timesReceived;
-  private Integer tubeNumber;
   private Double concentration;
   private Boolean archived = Boolean.FALSE;
   private Long groupId;
@@ -86,7 +79,17 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAnalyt
   private DonorSex donorSex = DonorSex.UNKNOWN;
   
   // TissueSample attributes
+  private SampleClass tissueClass;
   private Integer cellularity;
+  
+  // Transitioning to tissue
+  private TissueOrigin tissueOrigin;
+  private TissueType tissueType;
+  private String externalInstituteIdentifier;
+  private Lab lab;
+  private Integer passageNumber;
+  private Integer timesReceived;
+  private Integer tubeNumber;
   
   // AnalyteSample attributes
   private SamplePurpose samplePurpose;
@@ -726,12 +729,19 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAnalyt
     return Lists.newArrayList();
   }
   
+  public SampleClass getTissueClass() {
+    return tissueClass;
+  }
+  
+  public void setTissueClass(SampleClass tissueClass) {
+    this.tissueClass = tissueClass;
+  }
+  
   public SampleAdditionalInfo build() {
-    SampleAdditionalInfo sample = null;
-    
     if (sampleClass == null || sampleClass.getSampleCategory() == null) {
       throw new NullPointerException("Missing sample class or category");
     }
+    SampleAdditionalInfo sample = null;
     switch (sampleClass.getSampleCategory()) {
     case Identity.CATEGORY_NAME:
       Identity identity = new IdentityImpl();
@@ -743,6 +753,13 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAnalyt
     case SampleTissue.CATEGORY_NAME:
       SampleTissue tissue = new SampleTissueImpl();
       tissue.setCellularity(cellularity);
+      tissue.setTimesReceived(timesReceived);
+      tissue.setTubeNumber(tubeNumber);
+      tissue.setPassageNumber(passageNumber);
+      tissue.setTissueType(tissueType);
+      tissue.setTissueOrigin(tissueOrigin);
+      tissue.setExternalInstituteIdentifier(externalInstituteIdentifier);
+      tissue.setLab(lab);
       sample = tissue;
       break;
     case TissueProcessingSample.CATEGORY_NAME:
@@ -765,12 +782,27 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAnalyt
     
     if (parent != null) {
       sample.setParent(parent);
-    } else if (sampleClass.getSampleCategory() != Identity.CATEGORY_NAME) {
-      Identity p = new IdentityImpl();
-      p.setExternalName(externalName);
-      p.setInternalName(internalName);
-      p.setDonorSex(donorSex);
-      sample.setParent(p);
+    } else if (!Identity.CATEGORY_NAME.equals(sampleClass.getSampleCategory())) {
+      Identity identity = new IdentityImpl();
+      identity.setExternalName(externalName);
+      identity.setInternalName(internalName);
+      identity.setDonorSex(donorSex);
+      if (SampleTissue.CATEGORY_NAME.equals(sampleClass.getSampleCategory())) {
+        sample.setParent(identity);
+      } else {
+        SampleTissue tissue = new SampleTissueImpl();
+        tissue.setSampleClass(tissueClass);
+        tissue.setCellularity(cellularity);
+        tissue.setTimesReceived(timesReceived);
+        tissue.setTubeNumber(tubeNumber);
+        tissue.setPassageNumber(passageNumber);
+        tissue.setTissueType(tissueType);
+        tissue.setTissueOrigin(tissueOrigin);
+        tissue.setExternalInstituteIdentifier(externalInstituteIdentifier);
+        tissue.setLab(lab);
+        tissue.setParent(identity);
+        sample.setParent(tissue);
+      }
     }
     
     sample.setId(sampleId);
