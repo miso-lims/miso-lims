@@ -199,16 +199,61 @@ Sample.hot = {
    */
   addClassSelect: function () {
     var select = [];
-    var classes = Hot.sortByProperty(Hot.sampleOptions.sampleClassesDtos, 'id');
     select.push('<select id="classDropdown">');
     select.push('<option value="">Select class</option>');
-    for (var i=0; i<classes.length; i++) {
-      if (classes[i].alias == "Identity") continue;
-      select.push('<option value="'+ classes[i].id +'">'+ classes[i].alias +'</option>');
+    var classOptions = Sample.hot.getNewSampleClassOptions();
+    for (var i=0; i<classOptions.length; i++) {
+      select.push('<option value="'+ classOptions[i].id +'">'+ classOptions[i].alias +'</option>');
     }
     select.push('</select>');
     document.getElementById('classOptions').innerHTML = select.join('');
     document.getElementById('classDropdown').addEventListener('change', Sample.hot.enableTableButton);
+  },
+  
+  /**
+   * Returns true if a new sample of the provided SampleClass can be created without an existing parent
+   */
+  canCreateNew: function (sampleClass) {
+    return sampleClass.sampleCategory === "Tissue" || (sampleClass.sampleCategory === "Analyte" && sampleClass.stock === true);
+  },
+  
+  /**
+   * Returns the SampleClasses which may be created without an existing parent
+   */
+  getNewSampleClassOptions: function () {
+    var classes = Hot.sortByProperty(Hot.sampleOptions.sampleClassesDtos, 'id');
+    var options = [];
+    for (var i=0; i<classes.length; i++) {
+      if (Sample.hot.canCreateNew(classes[i])) {
+        options.push(classes[i]);
+      }
+    }
+    return options;
+  },
+  
+  /**
+   * Returns the alias of each SampleClass which may be created without an existing parent
+   */
+  getNewSampleClassOptionsAliasOnly: function () {
+    var classes = Hot.sortByProperty(Hot.sampleOptions.sampleClassesDtos, 'id');
+    var options = [];
+    for (var i=0; i<classes.length; i++) {
+      if (Sample.hot.canCreateNew(classes[i])) {
+        options.push(classes[i].alias);
+      }
+    }
+    return options;
+  },
+  
+  getTissueClassesAliasOnly: function () {
+    var classes = Hot.sortByProperty(Hot.sampleOptions.sampleClassesDtos, 'id');
+    var options = [];
+    for (var i=0; i<classes.length; i++) {
+      if (classes[i].sampleCategory === 'Tissue') {
+        options.push(classes[i].alias);
+      }
+    }
+    return options;
   },
   
   /**
@@ -624,11 +669,7 @@ Sample.hot = {
       ];
       
       var tissueCols = [
-        {
-          header: 'Cellularity',
-          data: 'cellularity',
-          type: 'text'
-        }                 
+        
       ];
        
       var analyteCols = [
@@ -680,94 +721,112 @@ Sample.hot = {
         }
       ];  
       
-      // attach either the external name column & cols required to create sample alias, 
-      //   or the parentAlias column (depending on what kind of parent is required)
-      (function () {
-        var parentIdentityCols = [
-          {
-            header: 'External Name',
-            data: 'externalName',
-            type: 'text',
-            validator: requiredText
-          },{
-            header: 'Sex',
-            data: 'donorSex',
-            type: 'dropdown',
-            trimDropdown: false,
-            source: Sample.hot.getDonorSexes(),
-            validator: permitEmpty
-          },{
-            header: 'Tissue Origin',
-            data: 'tissueOriginAlias',
-            type: 'dropdown',
-            trimDropdown: false,
-            source: Sample.hot.getTissueOrigins(),
-            validator: validateTissueOrigins
-          },{
-            header: 'Tissue Type',
-            data: 'tissueTypeAlias',
-            type: 'dropdown',
-            trimDropdown: false,
-            source: Sample.hot.getTissueTypes(),
-            validator: validateTissueTypes
-          },{
-            header: 'Passage #',
-            data: 'passageNumber',
-            type: 'text',
-            validator: validateNumber
-          },{
-            header: 'Times Received',
-            data: 'timesReceived',
-            type: 'numeric',
-            validator: requiredText
-          },{
-            header: 'Tube Number',
-            data: 'tubeNumber',
-            type: 'numeric',
-            validator: requiredText
-          },{
-            header: 'Sample Class',
-            data: 'sampleClassAlias',
-            type: 'dropdown',
-            trimDropdown: false,
-            source: Sample.hot.getValidClassesForParent(Sample.hot.getRootSampleClassId())
-          },{
-            header: 'Lab',
-            data: 'labComposite',
-            type: 'dropdown',
-            trimDropdown: false,
-            source: Sample.hot.getLabs(),
-            validator: permitEmpty
-          },{
-            header: 'Ext. Inst. Identifier',
-            data: 'externalInstituteIdentifier',
-            type: 'text'
-          }
-        ];
-        var parentSampleCols = [
-          {
-            header: 'Parent Alias',
-            data: 'parentAlias',
-            type: 'text',
-            readOnly: true
-          },{
-            header: 'Parent Sample Class',
-            data: 'parentSampleClassAlias',
-            type: 'dropdown',
-            trimDropdown: false,
-            source: Sample.hot.getSampleClasses(),
-            readOnly: true
-          },{
-            header: 'Sample Class',
-            data: 'sampleClassAlias',
-            type: 'dropdown',
-            trimDropdown: false,
-            source: Sample.hot.getSampleClasses()
-          }
-        ];
-        var parentColumn = (idColBoolean ? parentIdentityCols : parentSampleCols);
-        additionalCols = Hot.concatArrays(parentColumn, additionalCols);
-      }()); 
+      // fields required to create a tissue parent and identify or create an identity parent 
+      // for the tissue. Used when receiving new samples
+      var parentIdentityCols = [
+        {
+          header: 'External Name',
+          data: 'externalName',
+          type: 'text',
+          validator: requiredText
+        },{
+          header: 'Sex',
+          data: 'donorSex',
+          type: 'dropdown',
+          trimDropdown: false,
+          source: Sample.hot.getDonorSexes(),
+          validator: permitEmpty
+        }
+      ];
+      
+      if (sampleCategory === 'Analyte') {
+        parentIdentityCols.push({
+          header: 'Tissue Class',
+          data: 'parentSampleClassAlias',
+          type: 'dropdown',
+          trimDropdown: false,
+          source: Sample.hot.getTissueClassesAliasOnly(),
+          validator: validateTissueClasses
+        });
+      }
+      
+      parentIdentityCols.push({
+        header: 'Tissue Origin',
+        data: 'tissueOriginAlias',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: Sample.hot.getTissueOrigins(),
+        validator: validateTissueOrigins
+      },{
+        header: 'Tissue Type',
+        data: 'tissueTypeAlias',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: Sample.hot.getTissueTypes(),
+        validator: validateTissueTypes
+      },{
+        header: 'Passage #',
+        data: 'passageNumber',
+        type: 'text',
+        validator: validateNumber
+      },{
+        header: 'Times Received',
+        data: 'timesReceived',
+        type: 'numeric',
+        validator: requiredText
+      },{
+        header: 'Tube Number',
+        data: 'tubeNumber',
+        type: 'numeric',
+        validator: requiredText
+      },{
+        header: 'Cellularity',
+        data: 'cellularity',
+        type: 'text'
+      },{
+        header: 'Sample Class',
+        data: 'sampleClassAlias',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: Sample.hot.getNewSampleClassOptionsAliasOnly()
+      },{
+        header: 'Lab',
+        data: 'labComposite',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: Sample.hot.getLabs(),
+        validator: permitEmpty
+      },{
+        header: 'Ext. Inst. Identifier',
+        data: 'externalInstituteIdentifier',
+        type: 'text'
+      });
+      
+      // fields used when propagating
+      var parentSampleCols = [
+        {
+          header: 'Parent Alias',
+          data: 'parentAlias',
+          type: 'text',
+          readOnly: true
+        },{
+          header: 'Parent Sample Class',
+          data: 'parentSampleClassAlias',
+          type: 'dropdown',
+          trimDropdown: false,
+          source: Sample.hot.getSampleClasses(),
+          readOnly: true
+        },{
+          header: 'Sample Class',
+          data: 'sampleClassAlias',
+          type: 'dropdown',
+          trimDropdown: false,
+          source: Sample.hot.getSampleClasses()
+        }
+      ];
+      var parentColumn = (idColBoolean ? parentIdentityCols : parentSampleCols);
+      additionalCols = Hot.concatArrays(parentColumn, additionalCols);
+      
       return Hot.concatArrays(additionalCols, getSampleCategoryCols(sampleCategory, tissueCols, analyteCols));
     }
     
@@ -863,6 +922,14 @@ Sample.hot = {
     
     function validateSampleTypes (value, callback) {
       if (Sample.hot.getSampleTypes().indexOf(value) == -1) {
+        return callback(false);
+      } else {
+        return callback(true);
+      }
+    }
+    
+    function validateTissueClasses (value, callback) {
+      if (Sample.hot.getTissueClassesAliasOnly().indexOf(value) == -1) {
         return callback(false);
       } else {
         return callback(true);
@@ -1049,6 +1116,9 @@ Sample.hot = {
       if (obj.tubeId && obj.tubeId.length) {
         sample.tubeId = obj.tubeId;
       }
+      if (obj.parentSampleClassAlias && obj.parentSampleClassAlias.length) {
+        sample.parentSampleClassId = Hot.getIdFromAlias(obj.parentSampleClassAlias, Hot.sampleOptions.sampleClassesDtos);
+      }
       break;
     case 'Tissue':
       if (obj.cellularity && obj.cellularity.length) {
@@ -1196,21 +1266,6 @@ Sample.hot = {
     
     Hot.hotTable.validateCells(function (isValid) { 
       if (isValid) {
-        // check for sampleValidRelationship with RootSampleClass as parent
-        var parentClassId = Sample.hot.getRootSampleClassId();
-        // TODO: update this to check each be the cell, not the dropdown
-        var childClassId = document.getElementById('classDropdown').value;
-        var validRelationship = Sample.hot.findMatchingRelationship(parentClassId, childClassId);
-        if (validRelationship.length === 0) {
-          Hot.messages.failed.push(Sample.hot.makeErrorMessageForInvalidRelationship(parentClassId, childClassId) 
-                  +  " Please copy your data, select another child class and save again.");
-          Hot.addErrors(Hot.messages);
-          document.getElementById('classDropdown').removeAttribute('disabled');
-          document.getElementById('classDropdown').classList.remove('disabled');
-          document.getElementById('classDropdown').classList.add('invalid');
-          return false;
-        }
-
         // send it through the parser to get a sampleData array that isn't merely a reference to Hot.hotTable.getSourceData()
         var sampleData = JSON.parse(JSON.parse(JSON.stringify(Hot.hotTable.getSourceData())));
         
