@@ -25,12 +25,13 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.TreeSet;
 
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -41,6 +42,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 
 import org.codehaus.jackson.annotate.JsonBackReference;
+import org.codehaus.jackson.annotate.JsonManagedReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -138,7 +140,8 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   private Date lastUpdated;
 
   @OneToOne(targetEntity = LibraryAdditionalInfoImpl.class, mappedBy = "library")
-  // TODO: add cascade
+  @Cascade({ CascadeType.ALL })
+  @JsonManagedReference
   private LibraryAdditionalInfo libraryAdditionalInfo;
 
   @Override

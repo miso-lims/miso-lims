@@ -5,6 +5,7 @@ import java.util.Date;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
+import org.codehaus.jackson.annotate.JsonBackReference;
 
 public interface LibraryAdditionalInfo {
 
@@ -12,6 +13,7 @@ public interface LibraryAdditionalInfo {
 
   void setLibraryId(Long libraryid);
 
+  @JsonBackReference
   Library getLibrary();
 
   void setLibrary(Library library);
