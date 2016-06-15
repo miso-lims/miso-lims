@@ -96,7 +96,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  * uk.ac.bbsrc.tgac.miso.core.manager
  * <p/>
  * Info
- * 
+ *
  * @author Rob Davey
  * @date 22-Aug-2011
  * @since 0.1.0
@@ -2480,5 +2480,29 @@ public class UserAuthMisoRequestManager implements RequestManager {
   @Override
   public TargetedResequencing getTargetedResequencingById(long targetedResequencingId) throws IOException {
     return backingManager.getTargetedResequencingById(targetedResequencingId);
+  }
+
+  @Override
+  public List<Pool<? extends Poolable>> listAllPoolsBySearch(String query) throws IOException {
+    User user = getCurrentUser();
+    List<Pool<? extends Poolable>> accessibles = new ArrayList<>();
+    for (Pool pool : backingManager.listAllPoolsBySearch(query)) {
+      if (pool.userCanRead(user)) {
+        accessibles.add(pool);
+      }
+    }
+    return accessibles;
+  }
+
+  @Override
+  public List<Pool<? extends Poolable>> listAllPoolsWithLimit(int limit) throws IOException {
+    User user = getCurrentUser();
+    List<Pool<? extends Poolable>> accessibles = new ArrayList<>();
+    for (Pool pool : backingManager.listAllPoolsWithLimit(limit)) {
+      if (pool.userCanRead(user)) {
+        accessibles.add(pool);
+      }
+    }
+    return accessibles;
   }
 }

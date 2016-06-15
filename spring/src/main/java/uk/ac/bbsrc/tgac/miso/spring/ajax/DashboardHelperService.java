@@ -52,6 +52,7 @@ import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -67,7 +68,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
  * uk.ac.bbsrc.tgac.miso.miso.spring.ajax
  * <p/>
  * Info
- * 
+ *
  * @author Xingdong Bian
  * @author Rob Davey
  * @since 0.0.2
@@ -160,6 +161,41 @@ public class DashboardHelperService {
         Collections.reverse(projects);
         for (Project p : projects) {
           b.append("<a class=\"dashboardresult\" href=\"/miso/project/" + p.getProjectId()
+              + "\"><div onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
+          b.append("Name: <b>" + p.getName() + "</b><br/>");
+          b.append("Alias: <b>" + p.getAlias() + "</b><br/>");
+          b.append("</div></a>");
+        }
+      } else {
+        b.append("No matches");
+      }
+      return JSONUtils.JSONObjectResponse("html", b.toString());
+
+    } catch (IOException e) {
+      log.debug("Failed", e);
+      return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
+    }
+  }
+
+
+  public JSONObject searchPool(HttpSession session, JSONObject json) {
+    String searchStr = json.getString("str");
+    try {
+      List<Pool> pools;
+      StringBuilder b = new StringBuilder();
+      if (!isStringEmptyOrNull(searchStr)) {
+
+        pools = new ArrayList<Pool>(requestManager.listAllPoolsBySearch(searchStr));
+      } else {
+        pools = new ArrayList<Pool>(requestManager.listAllPoolsWithLimit(50));
+      }
+
+      if (pools.size() > 0) {
+        Collections.sort(pools);
+        Collections.reverse(pools);
+        for (Pool p : pools) {
+          // yuck-o
+          b.append("<a class=\"dashboardresult\" href=\"/miso/pool/" + p.getId()
               + "\"><div onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
           b.append("Name: <b>" + p.getName() + "</b><br/>");
           b.append("Alias: <b>" + p.getAlias() + "</b><br/>");

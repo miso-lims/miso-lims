@@ -122,7 +122,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.TargetedResequencingStore;
 
 /**
  * Implementation of a RequestManager to facilitate persistence operations on MISO model objects
- * 
+ *
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -334,6 +334,26 @@ public class MisoRequestManager implements RequestManager {
       return projectStore.listBySearch(query);
     } else {
       throw new IOException("No projectStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @SuppressWarnings("rawtypes")
+  @Override
+  public Collection<Pool<? extends Poolable>> listAllPoolsBySearch(String query) throws IOException {
+    if (poolStore != null) {
+      return poolStore.listBySearch(query);
+    } else {
+      throw new IOException("No poolStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @SuppressWarnings("rawtypes")
+  @Override
+  public Collection<Pool<? extends Poolable>> listAllPoolsWithLimit(int limit) throws IOException {
+    if (poolStore != null) {
+      return poolStore.listAllPoolsWithLimit(limit);
+    } else {
+      throw new IOException("No poolStore available. Check that it has been declared in the Spring config.");
     }
   }
 

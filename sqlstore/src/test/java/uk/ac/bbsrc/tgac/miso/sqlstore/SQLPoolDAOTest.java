@@ -284,11 +284,46 @@ public class SQLPoolDAOTest extends AbstractDAOTest {
     assertEquals(5, dao.listReadyByPlatformAndSearch(PlatformType.ILLUMINA, null).size());
   }
 
+  @SuppressWarnings("deprecation")
+  @Test
+  public void testListBySearchWithNullQuery() throws IOException {
+    assertEquals(0, dao.listBySearch(null).size());
+  }
+
+  @SuppressWarnings("deprecation")
+  @Test
+  public void testListBySearchWithBadQuery() throws IOException {
+    assertEquals(0, dao.listBySearch(";DROP TABLE Users;").size());
+  }
+
+  @SuppressWarnings("deprecation")
+  @Test
+  public void testListBySearchWithGoodNameQuery() throws IOException {
+    assertEquals(2, dao.listBySearch("Pool 1").size());
+  }
+
+  @SuppressWarnings("deprecation")
+  @Test
+  public void testListBySearchWithGoodAliasQuery() throws IOException {
+    dao.listAll();
+    assertEquals(2, dao.listBySearch("IPO1").size());
+  }
+
   @Test
   public void testGetPoolColumnSizes() throws IOException {
     Map<String, Integer> map = dao.getPoolColumnSizes();
     assertNotNull(map);
     assertFalse(map.isEmpty());
+  }
+
+  @Test
+  public void testListPoolsWithLimitZero() {
+    assertEquals(0, dao.listAllPoolsWithLimit(0).size());
+  }
+
+  @Test
+  public void testListPoolsWithLimit() {
+    assertEquals(10, dao.listAllPoolsWithLimit(10).size());
   }
 
   @Test
