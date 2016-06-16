@@ -448,6 +448,12 @@ public interface RequestManager {
 
   public Collection<Pool<? extends Poolable>> listAllPools() throws IOException;
 
+  @SuppressWarnings("rawtypes")
+  public Collection<Pool<? extends Poolable>> listAllPoolsBySearch(String query) throws IOException;
+
+  @SuppressWarnings("rawtypes")
+  public Collection<Pool<? extends Poolable>> listAllPoolsWithLimit(int limit) throws IOException;
+
   public Collection<Pool<? extends Poolable>> listAllPoolsByPlatform(PlatformType platformType) throws IOException;
 
   public Collection<Pool<? extends Poolable>> listAllPoolsByPlatformAndSearch(PlatformType platformType, String query) throws IOException;
@@ -633,5 +639,4 @@ public interface RequestManager {
   public Map<String, Integer> getGroupColumnSizes() throws IOException;
 
   public Collection<LibraryDesign> listLibraryDesignByClass(SampleClass sampleClass) throws IOException;
-
 }

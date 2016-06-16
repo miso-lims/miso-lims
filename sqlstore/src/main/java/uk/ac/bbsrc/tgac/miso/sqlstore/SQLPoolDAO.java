@@ -27,17 +27,15 @@ import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
 
 import javax.persistence.CascadeType;
-
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
 
 import org.apache.commons.lang.NotImplementedException;
 import org.codehaus.jackson.type.TypeReference;
@@ -62,6 +60,9 @@ import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.Property;
 import com.googlecode.ehcache.annotations.TriggersRemove;
 
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractPool;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
@@ -88,7 +89,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DaoLookup;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
-
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 /**
  * uk.ac.bbsrc.tgac.miso.sqlstore
  * <p/>
@@ -223,6 +224,10 @@ public class SQLPoolDAO implements PoolStore {
       + " WHERE p.platformType='Solid' OR p.platformType='LS454' AND p.name LIKE 'EFO%'";
 
   public static final String EMPCR_POOL_SELECT_BY_POOL_ID = EMPCR_POOL_SELECT + " AND poolId = ?";
+
+  public static final String POOL_SELECT_BY_SEARCH = POOL_SELECT + " WHERE " + "p.name LIKE ? OR " + "p.alias LIKE ? ";
+
+  public static final String POOL_SELECT_LIMIT = POOL_SELECT + " ORDER BY p.poolId DESC LIMIT ?";
 
   protected static final Logger log = LoggerFactory.getLogger(SQLPoolDAO.class);
 
@@ -380,7 +385,7 @@ public class SQLPoolDAO implements PoolStore {
 
   /**
    * Generates a unique barcode. Note that the barcode will change if the Platform is changed.
-   * 
+   *
    * @param pool
    */
   public void autoGenerateIdBarcode(Pool pool) {
@@ -916,4 +921,25 @@ public class SQLPoolDAO implements PoolStore {
   public Map<String, Integer> getPoolColumnSizes() throws IOException {
     return DbUtils.getColumnSizes(template, TABLE_NAME);
   }
+
+  @Deprecated
+  @Override
+  @CoverageIgnore
+  public List<Pool<? extends Poolable>> listBySearch(String query) {
+    List<Pool<? extends Poolable>> rtn;
+    if (isStringEmptyOrNull(query)) {
+      rtn = new ArrayList<>();
+    }
+    else {
+      String mySQLQuery = "%" + query.replaceAll("_", Matcher.quoteReplacement("\\_")) + "%";
+      rtn = template.query(POOL_SELECT_BY_SEARCH, new Object[] { mySQLQuery, mySQLQuery }, new PoolMapper(true));
+    }
+    return rtn;
+  }
+
+  @Override
+  public List<Pool<? extends Poolable>> listAllPoolsWithLimit(int limit) {
+    return template.query(POOL_SELECT_LIMIT, new Object[] { limit }, new PoolMapper(true));
+  }
+
 }
