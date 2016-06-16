@@ -1,10 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.util.Date;
@@ -27,12 +23,12 @@ import com.google.common.collect.Lists;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAdditionalInfoImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
@@ -42,6 +38,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.persistence.QcPassedDetailDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleClassDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleDao;
@@ -187,10 +184,7 @@ public class DefaultSampleServiceTestSuite {
     assertEquals("shell project should be replaced by real project", expectedProject.getAlias(), created.getProject().getAlias());
     assertNotNull("modification details should be added", created.getLastModifier());
     assertEquals("modification details should be added", expectedLastModifier.getUserId(), created.getLastModifier().getUserId());
-    assertNull("plain sample still should not contain SampleAdditionalInfo", created.getSampleAdditionalInfo());
-    assertNull("plain sample still should not contain Identity", created.getIdentity());
-    assertNull("plain sample still should not contain SampleTissue", created.getSampleTissue());
-    assertNull("plain sample still should not contain SampleAnalyte", created.getSampleAnalyte());
+    assertTrue("expected a plain sample", LimsUtils.isPlainSample(created));
     
     // name generators get called after initial save
     ArgumentCaptor<Sample> updatedCapture = ArgumentCaptor.forClass(Sample.class);
@@ -199,10 +193,7 @@ public class DefaultSampleServiceTestSuite {
     assertEquals("name should be generated", expectedName, updated.getName());
     assertEquals("alias should not be generated", expectedAlias, updated.getAlias());
     assertNull("identificationBarcode should not be generated", updated.getIdentificationBarcode());
-    assertNull("plain sample still should not contain SampleAdditionalInfo", updated.getSampleAdditionalInfo());
-    assertNull("plain sample still should not contain Identity", updated.getIdentity());
-    assertNull("plain sample still should not contain SampleTissue", updated.getSampleTissue());
-    assertNull("plain sample still should not contain SampleAnalyte", updated.getSampleAnalyte());
+    assertTrue("expected a plain sample", LimsUtils.isPlainSample(updated));
   }
   
   @Test
@@ -236,83 +227,83 @@ public class DefaultSampleServiceTestSuite {
   
   @Test
   public void testCreateDetailedSampleExistingParentById() throws Exception {
-    Sample parent = makeParentWithLookup();
-    Sample child = makeChild();
-    child.setIdentity(new IdentityImpl());
-    child.getIdentity().setSampleId(parent.getId());
+    Identity parent = makeParentWithLookup();
+    SampleTissue child = makeChild();
+    child.setParent(new IdentityImpl());
+    child.getParent().setId(parent.getId());
     
     Long newId = 89L;
-    Sample postSave = makeChild();
+    SampleAdditionalInfo postSave = makeChild();
     postSave.setId(newId);
-    postSave.getSampleAdditionalInfo().setParent(parent);
+    postSave.setParent(parent);
     
     Mockito.when(sampleDao.addSample(Mockito.any(Sample.class))).thenReturn(newId);
     Mockito.when(sampleDao.getSample(newId)).thenReturn(postSave);
-    mockValidRelationship(parent.getSampleAdditionalInfo().getSampleClass(), child.getSampleAdditionalInfo().getSampleClass());
+    mockValidRelationship(parent.getSampleClass(), child.getSampleClass());
     
     sut.create(child);
     
     ArgumentCaptor<Sample> createdCapture = ArgumentCaptor.forClass(Sample.class);
     Mockito.verify(sampleDao).addSample(createdCapture.capture());
     Sample created = createdCapture.getValue();
-    assertNotNull("Detailed sample should have SampleAdditionalInfo", created.getSampleAdditionalInfo());
-    assertNotNull("Detailed sample should have SampleTissue", created.getSampleTissue());
-    assertNull("Child sample should not have Identity", created.getIdentity());
-    assertNotNull("Child sample should have parent", created.getSampleAdditionalInfo().getParent());
-    assertEquals("Unexpected parent ID", parent.getId(), created.getSampleAdditionalInfo().getParent().getId());
+    assertTrue("Expected a TissueSample", LimsUtils.isTissueSample(created));
+    assertNotNull("Child sample should have parent", ((SampleTissue) created).getParent());
+    assertEquals("Unexpected parent ID", parent.getId(), ((SampleTissue) created).getParent().getId());
   }
   
   @Test
   public void testCreateDetailedSampleExistingParentByExternalName() throws Exception {
-    Sample parent = makeParentWithLookup();
-    Sample child = makeChild();
-    child.setIdentity(new IdentityImpl());
-    child.getIdentity().setExternalName(parent.getIdentity().getExternalName());
+    Identity parent = makeParentWithLookup();
+    SampleTissue child = makeChild();
+    
+    Identity shellParent = new IdentityImpl();
+    shellParent.setExternalName(parent.getExternalName());
+    child.setParent(shellParent);
     
     Long newId = 89L;
-    Sample postSave = makeChild();
+    SampleTissue postSave = makeChild();
     postSave.setId(newId);
-    postSave.getSampleAdditionalInfo().setParent(parent);
+    postSave.setParent(parent);
     
     Mockito.when(sampleDao.addSample(Mockito.any(Sample.class))).thenReturn(newId);
     Mockito.when(sampleDao.getSample(newId)).thenReturn(postSave);
-    mockValidRelationship(parent.getSampleAdditionalInfo().getSampleClass(), child.getSampleAdditionalInfo().getSampleClass());
+    mockValidRelationship(parent.getSampleClass(), child.getSampleClass());
     
     sut.create(child);
     
     ArgumentCaptor<Sample> createdCapture = ArgumentCaptor.forClass(Sample.class);
     Mockito.verify(sampleDao).addSample(createdCapture.capture());
     Sample created = createdCapture.getValue();
-    assertNotNull("Detailed sample should have SampleAdditionalInfo", created.getSampleAdditionalInfo());
-    assertNotNull("Detailed sample should have SampleTissue", created.getSampleTissue());
-    assertNull("Child sample should not have Identity", created.getIdentity());
-    assertNotNull("Child sample should have parent", created.getSampleAdditionalInfo().getParent());
-    assertEquals("Unexpected parent ID", parent.getId(), created.getSampleAdditionalInfo().getParent().getId());
+    assertTrue("Expected a TissueSample", LimsUtils.isTissueSample(created));
+    assertNotNull("Child sample should have parent", ((SampleTissue) created).getParent());
+    assertEquals("Unexpected parent ID", parent.getId(), ((SampleTissue) created).getParent().getId());
   }
   
   @Test
   public void testCreateDetailedSampleMissingIdentity() throws Exception {
-    Sample sample = new SampleImpl();
-    sample.setSampleAdditionalInfo(new SampleAdditionalInfoImpl());
-    sample.getSampleAdditionalInfo().setSampleClass(new SampleClassImpl());
-    sample.getSampleAdditionalInfo().getSampleClass().setSampleCategory(SampleTissue.CATEGORY_NAME);
+    SampleTissue sample = new SampleTissueImpl();
+    sample.setSampleClass(new SampleClassImpl());
+    sample.getSampleClass().setSampleCategory(SampleTissue.CATEGORY_NAME);
+    Mockito.when(sampleClassDao.listByCategory(Mockito.eq(Identity.CATEGORY_NAME)))
+        .thenReturn(Lists.newArrayList(sample.getSampleClass()));
     exception.expect(IllegalArgumentException.class);
     sut.create(sample);
   }
   
   @Test
   public void testCreateDetailedSampleNoParent() throws Exception {
-    Sample sample = makeChild();
-    sample.setIdentity(new IdentityImpl());
-    sample.getIdentity().setExternalName("non-existing");
+    SampleTissue sample = makeChild();
+    Identity fakeParent = new IdentityImpl();
+    fakeParent.setExternalName("non-existing");
+    sample.setParent(fakeParent);
     mockShellProjectWithRealLookup(sample);
     mockUser();
     
     // because of mocked dao, we can't actually continue with the same parent sample that should be created, but the partial 
     // parent sample that gets created is caught and examined below 
-    Sample parent = makeParentWithLookup();
+    Identity parent = makeParentWithLookup();
     Mockito.when(sampleDao.addSample(Mockito.any(Sample.class))).thenReturn(parent.getId());
-    mockValidRelationship(parent.getSampleAdditionalInfo().getSampleClass(), sample.getSampleAdditionalInfo().getSampleClass());
+    mockValidRelationship(parent.getSampleClass(), sample.getSampleClass());
     
     Long newId = 31L;
     Mockito.when(sampleDao.addSample(sample)).thenReturn(newId);
@@ -323,13 +314,10 @@ public class DefaultSampleServiceTestSuite {
     ArgumentCaptor<Sample> createdCapture = ArgumentCaptor.forClass(Sample.class);
     Mockito.verify(sampleDao, Mockito.times(2)).addSample(createdCapture.capture());
     Sample partialParent = createdCapture.getAllValues().get(0);
-    assertNotNull("Parent sample should have SampleAdditionalInfo", partialParent.getSampleAdditionalInfo());
-    assertNotNull("Parent sample should have Identity", partialParent.getIdentity());
+    assertTrue(LimsUtils.isIdentitySample(partialParent));
     
     Sample partialChild = createdCapture.getAllValues().get(1);
-    assertNotNull("Detailed sample should have SampleAdditionalInfo", partialChild.getSampleAdditionalInfo());
-    assertNotNull("Detailed sample should have SampleTissue", partialChild.getSampleTissue());
-    assertNull("Child sample should not have Identity", partialChild.getIdentity());
+    assertTrue(LimsUtils.isTissueSample(partialChild));
     
     ArgumentCaptor<Sample> updatedCapture = ArgumentCaptor.forClass(Sample.class);
     Mockito.verify(sampleDao, Mockito.times(2)).update(updatedCapture.capture());
@@ -337,8 +325,8 @@ public class DefaultSampleServiceTestSuite {
     // linked to finalChild
     Sample finalParent = updatedCapture.getAllValues().get(0); 
     Sample finalChild = updatedCapture.getAllValues().get(1);
-    assertNotNull("Child sample should have parent", finalChild.getSampleAdditionalInfo().getParent());
-    assertEquals("Unexpected parent ID", finalChild.getSampleAdditionalInfo().getParent().getId(), finalParent.getId());
+    assertNotNull("Child sample should have parent", ((SampleTissue) finalChild).getParent());
+    assertEquals("Unexpected parent ID", ((SampleTissue) finalChild).getParent().getId(), finalParent.getId());
   }
   
   @Test
@@ -360,7 +348,6 @@ public class DefaultSampleServiceTestSuite {
     // unmodifiable
     updated.setName("newName");
     mockShellProjectWithRealLookup(updated);
-    
     
     sut.update(updated);
     
@@ -388,42 +375,36 @@ public class DefaultSampleServiceTestSuite {
     return sample;
   }
   
-  private Sample makeParentWithLookup() throws IOException {
-    Sample sample = makeParent();
+  private Identity makeParentWithLookup() throws IOException {
+    Identity sample = makeParent();
     Mockito.when(sampleDao.getSample(sample.getId())).thenReturn(sample);
-    Mockito.when(identityService.get(sample.getIdentity().getExternalName())).thenReturn(sample.getIdentity());
+    Mockito.when(identityService.get(sample.getExternalName())).thenReturn(sample);
     Mockito.when(sampleClassDao.listByCategory(Mockito.eq(Identity.CATEGORY_NAME)))
-        .thenReturn(Lists.newArrayList(sample.getSampleAdditionalInfo().getSampleClass()));
+        .thenReturn(Lists.newArrayList(sample.getSampleClass()));
     return sample;
   }
   
-  private Sample makeParent() {
-    Sample sample = new SampleImpl();
+  private Identity makeParent() {
+    Identity sample = new IdentityImpl();
     sample.setId(63L);
-    sample.setSampleAdditionalInfo(new SampleAdditionalInfoImpl());
-    sample.getSampleAdditionalInfo().setSampleClass(new SampleClassImpl());
-    sample.getSampleAdditionalInfo().getSampleClass().setId(51L);
-    sample.getSampleAdditionalInfo().getSampleClass().setAlias("parent");
-    sample.getSampleAdditionalInfo().getSampleClass().setSampleCategory(Identity.CATEGORY_NAME);
-    Identity identity = new IdentityImpl();
-    identity.setSampleId(sample.getId());
-    identity.setExternalName("external");
-    sample.setIdentity(identity);
+    sample.setSampleClass(new SampleClassImpl());
+    sample.getSampleClass().setId(51L);
+    sample.getSampleClass().setAlias("parent");
+    sample.getSampleClass().setSampleCategory(Identity.CATEGORY_NAME);
+    sample.setExternalName("external");
     return sample;
   }
   
-  private Sample makeChild() {
-    Sample sample = new SampleImpl();
+  private SampleTissue makeChild() {
+    SampleTissue sample = new SampleTissueImpl();
     sample.setSampleType("type");
     sample.setScientificName("scientific");
-    sample.setSampleAdditionalInfo(new SampleAdditionalInfoImpl());
-    sample.getSampleAdditionalInfo().setSampleClass(new SampleClassImpl());
-    sample.getSampleAdditionalInfo().getSampleClass().setId(10L);
-    sample.getSampleAdditionalInfo().getSampleClass().setAlias("child");
-    sample.getSampleAdditionalInfo().getSampleClass().setSampleCategory(SampleTissue.CATEGORY_NAME);
-    sample.setSampleTissue(new SampleTissueImpl());
-    Mockito.when(sampleClassDao.getSampleClass(sample.getSampleAdditionalInfo().getSampleClass().getId()))
-        .thenReturn(sample.getSampleAdditionalInfo().getSampleClass());
+    sample.setSampleClass(new SampleClassImpl());
+    sample.getSampleClass().setId(10L);
+    sample.getSampleClass().setAlias("child");
+    sample.getSampleClass().setSampleCategory(SampleTissue.CATEGORY_NAME);
+    Mockito.when(sampleClassDao.getSampleClass(sample.getSampleClass().getId()))
+        .thenReturn(sample.getSampleClass());
     return sample;
   }
   

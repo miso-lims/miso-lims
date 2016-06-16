@@ -1,8 +1,24 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
+import java.net.URI;
+
+import org.codehaus.jackson.annotate.JsonSubTypes;
+import org.codehaus.jackson.annotate.JsonTypeInfo;
+import org.codehaus.jackson.annotate.JsonTypeName;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import uk.ac.bbsrc.tgac.miso.core.data.Identity;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAnalyte;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonSubTypes({ @JsonSubTypes.Type(value = SampleAnalyteDto.class, name = SampleAnalyte.CATEGORY_NAME),
+    @JsonSubTypes.Type(value = SampleIdentityDto.class, name = Identity.CATEGORY_NAME),
+    @JsonSubTypes.Type(value = SampleTissueDto.class, name = SampleTissue.CATEGORY_NAME),
+    @JsonSubTypes.Type(value = SampleDto.class, name = "Plain") })
+@JsonTypeName(value = "Plain")
 public class SampleDto {
 
   private Long id;
@@ -21,14 +37,12 @@ public class SampleDto {
   private Long projectId;
   private String scientificName;
   private String taxonIdentifier;
-  private SampleIdentityDto sampleIdentity;
-  private SampleAnalyteDto sampleAnalyte;
-  private SampleTissueDto sampleTissue;
-  private SampleAdditionalInfoDto sampleAdditionalInfo;
   private Long rootSampleClassId;
   private String rootSampleClassUrl;
   private Double volume;
   private Boolean empty;
+  private Long updatedById;
+  private String updatedByUrl;
 
   public Long getId() {
     return id;
@@ -142,22 +156,6 @@ public class SampleDto {
     this.taxonIdentifier = taxonIdentifier;
   }
 
-  public SampleAnalyteDto getSampleAnalyte() {
-    return sampleAnalyte;
-  }
-
-  public void setSampleAnalyte(SampleAnalyteDto sampleAnalyte) {
-    this.sampleAnalyte = sampleAnalyte;
-  }
-
-  public SampleAdditionalInfoDto getSampleAdditionalInfo() {
-    return sampleAdditionalInfo;
-  }
-
-  public void setSampleAdditionalInfo(SampleAdditionalInfoDto sampleAdditionalInfo) {
-    this.sampleAdditionalInfo = sampleAdditionalInfo;
-  }
-
   public Long getRootSampleClassId() {
     return rootSampleClassId;
   }
@@ -174,22 +172,6 @@ public class SampleDto {
     this.rootSampleClassUrl = rootSampleClassUrl;
   }
 
-  public SampleIdentityDto getSampleIdentity() {
-    return sampleIdentity;
-  }
-
-  public void setSampleIdentity(SampleIdentityDto sampleIdentity) {
-    this.sampleIdentity = sampleIdentity;
-  }
-
-  public SampleTissueDto getSampleTissue() {
-    return sampleTissue;
-  }
-
-  public void setSampleTissue(SampleTissueDto sampleTissue) {
-    this.sampleTissue = sampleTissue;
-  }
-
   public Double getVolume() {
     return volume;
   }
@@ -204,6 +186,37 @@ public class SampleDto {
 
   public void setEmpty(Boolean empty) {
     this.empty = empty;
+  }
+
+  public Long getUpdatedById() {
+    return updatedById;
+  }
+
+  public void setUpdatedById(Long updatedById) {
+    this.updatedById = updatedById;
+  }
+
+  public String getUpdatedByUrl() {
+    return updatedByUrl;
+  }
+
+  public void setUpdatedByUrl(String updatedByUrl) {
+    this.updatedByUrl = updatedByUrl;
+  }
+
+  public void writeUrls(UriComponentsBuilder uriBuilder) {
+    URI baseUri = uriBuilder.build().toUri();
+    writeUrls(baseUri);
+  }
+
+  public void writeUrls(URI baseUri) {
+    setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/tree/sample/{id}").buildAndExpand(getId()).toUriString());
+    setUpdatedByUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}").buildAndExpand(getUpdatedById()).toUriString());
+    if (getRootSampleClassId() != null) {
+      setRootSampleClassUrl(
+          UriComponentsBuilder.fromUri(baseUri).path("/rest/sampleclass/{id}").buildAndExpand(getRootSampleClassId()).toUriString());
+    }
+    setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/sample/{id}").buildAndExpand(getId()).toUriString());
   }
 
 }

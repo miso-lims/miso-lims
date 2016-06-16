@@ -1,7 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.List;
 
@@ -28,29 +27,30 @@ public class HibernateIdentityDaoTest extends AbstractDAOTest {
 
   @Test
   public void testGetIdentity() {
-    Identity identity = dao.getIdentity(1L);
+    Identity identity = dao.getIdentity(15L);
     assertNotNull(identity);
-    assertTrue(identity.getExternalName().equals("externalName1"));
+    assertTrue(identity.getExternalName().equals("EXT1"));
   }
 
   @Test
   public void testGetIdentityList() {
     List<Identity> identity = dao.getIdentity();
-    assertTrue(identity.size() == 2);
+    assertTrue(identity.size() == 1);
   }
 
   @Test
   public void testGetIdentityByExternalName() {
-    Identity identity = dao.getIdentity("externalName1");
-    assertTrue(identity.getExternalName().equals("externalName1"));
+    Identity identity = dao.getIdentity("EXT1");
+    assertEquals("EXT1", identity.getExternalName());
+    assertEquals("INT1", identity.getInternalName());
   }
 
   @Test
   public void testDeleteIdentity() {
-    Identity identity = dao.getIdentity(4L);
+    Identity identity = dao.getIdentity(15L);
     dao.deleteIdentity(identity);
 
-    Identity deleted = dao.getIdentity(4L);
+    Identity deleted = dao.getIdentity(15L);
     assertTrue(deleted == null);
 
   }

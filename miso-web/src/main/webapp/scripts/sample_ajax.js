@@ -157,7 +157,7 @@ var Sample = Sample || {
       jQuery('#groupDescription').attr('data-parsley-maxlength', '255');
       jQuery('#groupDescription').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
       
-      var selectedId = jQuery('#sampleClass option:selected').val();
+      var selectedId = jQuery('#sampleClass').is('select') ? jQuery('#sampleClass option:selected').val() : jQuery('#sampleClass').val();
       var sampleCategory = Sample.options.getSampleCategoryByClassId(selectedId);
       switch (sampleCategory) {
       case 'Tissue':
@@ -698,6 +698,7 @@ Sample.ui = {
   sampleClassChanged: function() {
     var selectedId = jQuery('#sampleClass option:selected').val();
     var sampleCategory = Sample.options.getSampleCategoryByClassId(selectedId);
+    jQuery('#sampleCategory').val(sampleCategory);
     switch (sampleCategory) {
     case 'Tissue':
       Sample.ui.setUpForTissue();

@@ -2,8 +2,6 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
@@ -100,8 +98,8 @@ public class LibraryDesign {
   }
 
   public boolean validate(Library library) {
-    if (library.getSample().getSampleAdditionalInfo() == null) return true;
-    if (library.getSample().getSampleAdditionalInfo().getSampleClass().getId() != sampleClass.getId()) return false;
+    if (!(library.getSample() instanceof SampleAdditionalInfo)) return true;
+    if (((SampleAdditionalInfo) library.getSample()).getSampleClass().getId() != sampleClass.getId()) return false;
     if (library.getLibraryType().getId() != libraryType.getId()) return false;
     if (library.getLibrarySelectionType().getId() != librarySelectionType) return false;
     if (library.getLibraryStrategyType().getId() != libraryStrategyType) return false;

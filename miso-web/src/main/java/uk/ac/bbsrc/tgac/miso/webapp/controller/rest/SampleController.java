@@ -72,46 +72,9 @@ public class SampleController extends RestController {
       throw new RestException("No sample found with ID: " + id, Status.NOT_FOUND);
     } else {
       SampleDto dto = Dtos.asDto(sample);
-      dto = writeUrls(dto, uriBuilder);
+      dto.writeUrls(uriBuilder);
       return dto;
     }
-  }
-
-  private static SampleDto writeUrls(SampleDto sampleDto, UriComponentsBuilder uriBuilder) {
-    URI baseUri = uriBuilder.build().toUri();
-    sampleDto.setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/tree/sample/{id}").buildAndExpand(sampleDto.getId()).toUriString());
-    if (sampleDto.getSampleAdditionalInfo() != null && sampleDto.getSampleAdditionalInfo().getParentId() != null) {
-      sampleDto.getSampleAdditionalInfo().setParentUrl(
-          UriComponentsBuilder.fromUri(baseUri).path("/rest/tree/sample/{id}").buildAndExpand(sampleDto.getSampleAdditionalInfo().getParentId()).toUriString());
-    }
-    if (sampleDto.getRootSampleClassId() != null) {
-      sampleDto.setRootSampleClassUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/sampleclass/{id}")
-          .buildAndExpand(sampleDto.getRootSampleClassId()).toUriString());
-    }
-    if (sampleDto.getSampleAdditionalInfo() != null) {
-      SampleAdditionalInfoController.writeUrls(sampleDto.getSampleAdditionalInfo(), uriBuilder);
-    }
-    if (sampleDto.getSampleIdentity() != null) {
-      SampleIdentityDto sid = sampleDto.getSampleIdentity();
-      sid.setSampleUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/tree/sample/{id}")
-          .buildAndExpand(sampleDto.getId()).toUriString());
-      if (sid.getCreatedById() != null) {
-        sid.setCreatedByUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}")
-            .buildAndExpand(sid.getCreatedById()).toUriString());
-      }
-      if (sid.getUpdatedById() != null) {
-        sid.setUpdatedByUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}")
-            .buildAndExpand(sid.getUpdatedById()).toUriString());
-      }
-    }
-    if (sampleDto.getSampleTissue() != null) {
-      SampleTissueController.writeUrls(sampleDto.getSampleTissue(), uriBuilder);
-    }
-    if (sampleDto.getSampleAnalyte() != null) {
-      SampleAnalyteController.writeUrls(sampleDto.getSampleAnalyte(), uriBuilder);
-    }
-    
-    return sampleDto;
   }
 
   @RequestMapping(value = "/samples", method = RequestMethod.GET, produces = { "application/json" })
@@ -123,7 +86,7 @@ public class SampleController extends RestController {
     } else {
       Set<SampleDto> sampleDtos = Dtos.asSampleDtos(samples);
       for (SampleDto sampleDto : sampleDtos) {
-        sampleDto = writeUrls(sampleDto, uriBuilder);
+        sampleDto.writeUrls(uriBuilder);
       }
       return new ResponseEntity<>(sampleDtos, HttpStatus.OK);
     }

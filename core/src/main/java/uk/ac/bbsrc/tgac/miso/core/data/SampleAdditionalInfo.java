@@ -1,28 +1,15 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import java.util.Date;
 import java.util.Set;
 
-import org.codehaus.jackson.annotate.JsonBackReference;
 import org.codehaus.jackson.annotate.JsonIgnore;
-
-import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 
-public interface SampleAdditionalInfo {
-
-  Long getId();
-
-  void setId(Long sampleId);
-
-  @JsonBackReference
-  Sample getSample();
-
-  void setSample(Sample sample);
+public interface SampleAdditionalInfo extends Sample {
 
   public Sample getParent();
-
+  
   public void setParent(Sample parent);
 
   public Set<Sample> getChildren();
@@ -65,22 +52,6 @@ public interface SampleAdditionalInfo {
   Boolean getArchived();
 
   void setArchived(Boolean archived);
-
-  User getCreatedBy();
-
-  void setCreatedBy(User createdBy);
-
-  Date getCreationDate();
-
-  void setCreationDate(Date creationDate);
-
-  User getUpdatedBy();
-
-  void setUpdatedBy(User updatedBy);
-
-  Date getLastUpdated();
-
-  void setLastUpdated(Date lastUpdated);
 
   QcPassedDetail getQcPassedDetail();
 
