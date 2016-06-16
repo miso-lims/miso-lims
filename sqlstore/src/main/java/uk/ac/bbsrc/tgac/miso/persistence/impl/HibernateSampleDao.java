@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.BoxUtils.extractBoxableInformation;
+
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
@@ -125,7 +127,6 @@ public class HibernateSampleDao implements SampleDao, SampleStore {
 
   @Override
   public int count() throws IOException {
-    System.out.println(template.toString());
     return getSample().size();
   }
 
@@ -164,6 +165,8 @@ public class HibernateSampleDao implements SampleDao, SampleStore {
     if (sample.getSampleAdditionalInfo() != null) {
       sample.getSampleAdditionalInfo().setChildren(listByParentId(sample.getId()));
     }
+
+    extractBoxableInformation(template, sample);
 
     return sample;
   }
