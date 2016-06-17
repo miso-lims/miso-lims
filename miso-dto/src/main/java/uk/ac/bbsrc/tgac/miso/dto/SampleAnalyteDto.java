@@ -10,7 +10,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleAnalyte;
 
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @JsonTypeName(value = SampleAnalyte.CATEGORY_NAME)
-public class SampleAnalyteDto extends SampleIdentityDto {
+public class SampleAnalyteDto extends SampleTissueDto {
 
   private Long samplePurposeId;
   private String samplePurposeUrl;
@@ -28,7 +28,6 @@ public class SampleAnalyteDto extends SampleIdentityDto {
       setTissueMaterialUrl(
           UriComponentsBuilder.fromUri(baseUri).path("/rest/tissuematerial/{id}").buildAndExpand(getTissueMaterialId()).toUriString());
     }
-
   }
 
   private String tissueMaterialUrl;

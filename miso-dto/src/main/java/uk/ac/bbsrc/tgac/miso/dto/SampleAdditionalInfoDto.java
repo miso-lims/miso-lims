@@ -237,7 +237,10 @@ public class SampleAdditionalInfoDto extends SampleDto {
   @Override
   public void writeUrls(URI baseUri) {
     super.writeUrls(baseUri);
-    setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/sample/{id}").buildAndExpand(getId()).toUriString());
+    if (getSampleClassId() != null) {
+      setSampleClassUrl(
+          UriComponentsBuilder.fromUri(baseUri).path("/rest/sampleclass/{id}").buildAndExpand(getSampleClassId()).toUriString());
+    }
     if (getTissueOriginId() != null) {
       setTissueOriginUrl(
           UriComponentsBuilder.fromUri(baseUri).path("/rest/tissueorigin/{id}").buildAndExpand(getTissueOriginId()).toUriString());
