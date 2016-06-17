@@ -152,6 +152,11 @@ FOR EACH ROW
       (SELECT fullname FROM User WHERE userId = NEW.lastModifier),
       ' created run.'))//
 
+DROP TRIGGER IF EXISTS BeforeInsertPool//
+CREATE TRIGGER BeforeInsertPool BEFORE INSERT ON Pool
+  FOR EACH ROW
+  SET NEW.boxPositionId = nextval('box_position_seq')//
+
 DROP TRIGGER IF EXISTS PoolChange//
 CREATE TRIGGER PoolChange BEFORE UPDATE ON Pool
 FOR EACH ROW

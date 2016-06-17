@@ -37,6 +37,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.codehaus.jackson.annotate.JsonBackReference;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
@@ -66,6 +67,7 @@ public class TagBarcode implements Nameable {
 
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "tagFamilyId", nullable = false)
+  @JsonBackReference
   private TagBarcodeFamily family;
   @Column(nullable = false)
   private String name;

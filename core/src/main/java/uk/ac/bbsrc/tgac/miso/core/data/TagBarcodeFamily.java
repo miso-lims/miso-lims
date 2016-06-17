@@ -39,6 +39,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
 
+import org.codehaus.jackson.annotate.JsonManagedReference;
+
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 @Entity
@@ -57,6 +59,7 @@ public class TagBarcodeFamily implements Iterable<TagBarcode> {
   @OneToMany(targetEntity = TagBarcode.class, fetch = FetchType.EAGER)
   @JoinColumn(name = "tagFamilyId")
   @OrderBy("position, name")
+  @JsonManagedReference
   private List<TagBarcode> barcodes;
   @Column(nullable = false)
   private String name;

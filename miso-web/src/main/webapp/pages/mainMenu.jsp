@@ -82,7 +82,16 @@
                 </div>
             </div>
         </div>
+        <div class="dashboard_widget">
 
+            <div class="widget_title ui-corner-top">
+                Pool <input type="text" size="20" id="searchPool" name="searchPool"/>
+            </div>
+            <div class="widget ui-corner-bottom">
+                <div id="searchPoolresult">
+                </div>
+            </div>
+        </div>
         <div class="dashboard_widget">
 
             <div class="widget_title ui-corner-top">
@@ -113,6 +122,9 @@
     Utils.timer.typewatchFunc(jQuery('#searchLibraryDilution'), function () {
         Search.dashboardSearch(jQuery('#searchLibraryDilution'))
     }, 300, 2);
+    Utils.timer.typewatchFunc(jQuery('#searchPool'), function () {
+      Search.dashboardSearch(jQuery('#searchPool'))
+  }, 300, 2);
 </script>
 <%@ include file="adminsub.jsp" %>
 

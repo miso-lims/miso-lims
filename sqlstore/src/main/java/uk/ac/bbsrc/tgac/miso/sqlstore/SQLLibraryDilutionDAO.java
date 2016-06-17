@@ -413,7 +413,13 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
         Element element;
         if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
           log.debug("Cache hit on map for LibraryDilution " + id);
-          return (LibraryDilution) element.getObjectValue();
+          LibraryDilution dilution = (LibraryDilution) element.getObjectValue();
+          if (dilution == null) throw new NullPointerException("The LazyLibraryDilutionMapper cache is full of lies!!!");
+          if (dilution.getId() == 0) {
+             DbUtils.updateCaches(lookupCache(cacheManager), id);
+          } else {
+             return (LibraryDilution) element.getObjectValue();
+          }
         }
       }
       LibraryDilution libraryDilution = dataObjectFactory.getLibraryDilution();
