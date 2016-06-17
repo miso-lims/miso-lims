@@ -25,9 +25,7 @@ package uk.ac.bbsrc.tgac.miso.core.event.manager;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,10 +33,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
-import com.rits.cloning.Cloner;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunQcException;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
@@ -57,7 +56,6 @@ public class RunAlertManager {
   Map<Long, Run> runs = new HashMap<Long, Run>();
 
   private RequestManager misoRequestManager;
-  private Cloner cloner = new Cloner();
   private boolean enabled = true;
 
   @Autowired
@@ -96,7 +94,7 @@ public class RunAlertManager {
   public void push(Run run) {
     if (enabled) {
       if (run != null) {
-        Run clone = cloner.deepClone(run);
+        Run clone = partialCopy(run);
         if (clone != null) {
           applyListeners(clone);
           if (runs.containsKey(run.getId())) {
@@ -154,11 +152,14 @@ public class RunAlertManager {
 
         // run QC added
         if (r.getRunQCs().size() > clone.getRunQCs().size()) {
-          Set<RunQC> clonedQCs = new HashSet<RunQC>(clone.getRunQCs());
+          Map<Long, RunQC> clonedQCs = new HashMap<>();
+          for (RunQC qc : clone.getRunQCs()) {
+            clonedQCs.put(qc.getId(), qc);
+          }
           for (RunQC qc : r.getRunQCs()) {
-            if (!clonedQCs.contains(qc)) {
+            if (!clonedQCs.containsKey(qc)) {
               try {
-                clone.addQc(cloner.deepClone(qc));
+                clone.addQc(partialCopy(qc));
               } catch (MalformedRunQcException e) {
                 throw new IOException(e);
               }
@@ -212,5 +213,47 @@ public class RunAlertManager {
         }
       }
     }
+  }
+  
+  /**
+   * Creates a minimal copy of the run to be used for change tracking in the alerting system. Only relevant 
+   * fields are copied
+   * 
+   * @param run the run to copy
+   * @return the copy
+   */
+  private Run partialCopy(Run run) {
+    Run clone = new RunImpl();
+    clone.setId(run.getId());
+    clone.setAlias(run.getAlias());
+    clone.setStatus(run.getStatus());
+    for (RunQC qc : run.getRunQCs()) {
+      try {
+        clone.addQc(partialCopy(qc));
+      } catch (MalformedRunQcException e) {
+        log.error("Can't track Malformed RunQC", e);
+      }
+    }
+    for (User u : run.getWatchers()) {
+      clone.addWatcher(u);
+    }
+    return clone;
+  }
+  
+  /**
+   * Creates a minimal copy of the RunQC to be used for change tracking in the alerting system. Only relevant
+   * fields are copied
+   * 
+   * @param runQc the RunQC to copy
+   * @return the copy
+   */
+  private RunQC partialCopy(RunQC runQc) {
+    RunQC clone = new RunQCImpl();
+    clone.setId(runQc.getId());
+    clone.setQcDate(runQc.getQcDate());
+    clone.setQcType(runQc.getQcType());
+    clone.setQcCreator(runQc.getQcCreator());
+    clone.setInformation(runQc.getInformation());
+    return clone;
   }
 }
