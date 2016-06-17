@@ -49,12 +49,11 @@ import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.core.util.FormUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.integration.BoxScan;
 import uk.ac.bbsrc.tgac.miso.integration.BoxScanner;
 import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationException;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
-
-
 
 @Ajaxified
 public class BoxControllerHelperService {
@@ -168,19 +167,15 @@ public class BoxControllerHelperService {
         log.debug("Multiple items with same barcode", k);
         return JSONUtils.SimpleJSONError("Multiple items have this barcode: " + k.getMessage());
       }
-      
+
       if (boxable == null) {
-        return JSONUtils.SimpleJSONError("Could not find barcode " + barcode + ". Confirm that it is associated with a sample, library, or pool before retrying.");
+        return JSONUtils.SimpleJSONError(
+            "Could not find barcode " + barcode + ". Confirm that it is associated with a sample, library, or pool before retrying.");
       }
-      
-      try {
-        ObjectMapper mapper = new ObjectMapper();
-        response.put("boxable",  mapper.writer().writeValueAsString(boxable));
-        if (boxable.isEmpty()) response.put("trashed", boxable.getName() + " (" + boxable.getAlias() + ") has been trashed, and can not be added to the box.");
-      } catch (IOException e) {
-        log.debug("Error serializing boxable", e);
-        return JSONUtils.SimpleJSONError("Error finding item: " + e.getMessage());
-      }
+
+      response.put("boxable", Dtos.asDto(boxable));
+      if (boxable.isEmpty())
+        response.put("trashed", boxable.getName() + " (" + boxable.getAlias() + ") has been trashed, and can not be added to the box.");
       return response;
     } else {
       return JSONUtils.SimpleJSONError("Please enter a barcode.");

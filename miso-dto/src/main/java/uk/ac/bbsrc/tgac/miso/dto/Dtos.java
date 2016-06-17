@@ -5,13 +5,19 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
 import com.google.common.collect.Sets;
 
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxable;
+import uk.ac.bbsrc.tgac.miso.core.data.Box;
+import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Institute;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
@@ -34,6 +40,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstituteImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
@@ -935,4 +942,64 @@ public class Dtos {
 
     return to;
   }
+
+  public static BoxDto asDto(Box from) {
+    BoxDto dto = new BoxDto();
+    dto.setId(from.getId());
+    dto.setAlias(from.getAlias());
+    dto.setDescription(from.getDescription());
+    dto.setIdentificationBarcode(from.getIdentificationBarcode());
+    dto.setUseId(from.getUse().getId());
+    dto.setUseAlias(from.getUse().getAlias());
+    dto.setSizeId(from.getSize().getId());
+    dto.setRows(from.getSize().getRows());
+    dto.setCols(from.getSize().getColumns());
+    dto.setScannable(from.getSize().getScannable());
+    dto.setItems(asBoxablesDtos(from.getBoxables()));
+    return dto;
+  }
+
+  public static List<BoxableDto> asBoxablesDtos(Map<String, Boxable> boxables) {
+    List<BoxableDto> items = new ArrayList<>();
+    for (Entry<String, Boxable> entry : boxables.entrySet()) {
+      items.add(asDto(entry.getValue(), entry.getKey()));
+    }
+    return items;
+  }
+
+  public static BoxableDto asDto(Boxable from) {
+    return asDto(from, from.getBoxPosition());
+  }
+
+  public static BoxableDto asDto(Boxable from, String position) {
+    BoxableDto dto = new BoxableDto();
+    dto.setBoxPosition(position);
+    dto.setId(from.getId());
+    dto.setAlias(from.getAlias());
+    dto.setBoxAlias(from.getBoxAlias());
+    dto.setBoxPosition(from.getBoxPosition());
+    dto.setEmpty(from.isEmpty());
+    dto.setIdentificationBarcode(from.getIdentificationBarcode());
+    dto.setName(from.getName());
+    dto.setVolume(from.getVolume());
+    return dto;
+  }
+
+  public static Box to(BoxDto from) {
+    Box to = new BoxImpl();
+    to.setId(from.getId());
+    to.setAlias(from.getAlias());
+    to.setDescription(from.getDescription());
+    to.setIdentificationBarcode(from.getIdentificationBarcode());
+    return to;
+  }
+
+  public static Boxable to(BoxableDto item, Boxable to) {
+    to.setAlias(item.getAlias());
+    to.setBoxPositionId(item.getId());
+    to.setVolume(item.getVolume());
+    to.setEmpty(item.getEmpty());
+    return to;
+  }
+
 }
