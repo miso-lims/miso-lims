@@ -1,12 +1,12 @@
 [Unit]
-Description=MISO Notification Server
+Description=MISO Notification Service
 
-[Server]
-Type=forking
-StandardOutput=null
-StandardError=journal
-WorkingDirectory=/srv/notification-server
-ExecStart=/usr/bin/java -jar notification-server.jar
+[Service]
+Type=simple
+User=seqprodbio
+Group=seq
+WorkingDirectory=/opt/miso-notification
+ExecStart=/usr/bin/java -Xmx2G -jar /opt/miso-notification/notification-server-onejar.jar
 
 [Install]
 WantedBy=multi-user.target
