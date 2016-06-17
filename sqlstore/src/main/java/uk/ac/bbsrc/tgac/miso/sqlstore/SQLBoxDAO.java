@@ -370,7 +370,7 @@ public class SQLBoxDAO implements BoxStore {
     String barcode = box.getBoxable(position).getIdentificationBarcode();
     Sample sample = sampleDAO.getByBarcode(barcode);
     Library library = libraryDAO.getByBarcode(barcode);
-    Pool<? extends Poolable> pool = poolDAO.getByBarcode(barcode);
+    Pool<? extends Poolable<?,?>> pool = poolDAO.getByBarcode(barcode);
 
     if ((sample == null ? 0 : 1) + (library == null ? 0 : 1) + (pool == null ? 0 : 1) > 1) {
       String errorMessage = "";
@@ -435,7 +435,7 @@ public class SQLBoxDAO implements BoxStore {
         continue;
       }
 
-      Pool<? extends Poolable> pool = poolDAO.getByBarcode(barcode);
+      Pool<? extends Poolable<?,?>> pool = poolDAO.getByBarcode(barcode);
       if (pool != null) {
         pool.setEmpty(true);
         poolDAO.save(pool);

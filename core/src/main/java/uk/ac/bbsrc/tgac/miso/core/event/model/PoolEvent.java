@@ -25,6 +25,7 @@ package uk.ac.bbsrc.tgac.miso.core.event.model;
 
 import net.sf.json.JSONObject;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.event.Event;
 import uk.ac.bbsrc.tgac.miso.core.event.type.MisoEventType;
 
@@ -37,20 +38,20 @@ import uk.ac.bbsrc.tgac.miso.core.event.type.MisoEventType;
  * @date 28/09/11
  * @since 0.1.6
  */
-public class PoolEvent implements Event<Pool> {
-  private Pool pool;
+public class PoolEvent implements Event<Pool<? extends Poolable<?, ?>>> {
+  private Pool<? extends Poolable<?, ?>> pool;
   private String message;
   private MisoEventType eventType;
   private JSONObject eventContext = new JSONObject();
 
-  public PoolEvent(Pool pool, MisoEventType eventType, String message) {
+  public PoolEvent(Pool<? extends Poolable<?, ?>> pool, MisoEventType eventType, String message) {
     this.pool = pool;
     this.message = message;
     this.eventType = eventType;
   }
 
   @Override
-  public Pool getEventObject() {
+  public Pool<? extends Poolable<?, ?>> getEventObject() {
     return this.pool;
   }
 

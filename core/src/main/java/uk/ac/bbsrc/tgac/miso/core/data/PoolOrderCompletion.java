@@ -31,7 +31,7 @@ public class PoolOrderCompletion implements Serializable {
   @JoinColumn(name = "parametersId", nullable = false)
   private SequencingParameters parameters;
   @Transient
-  private Pool<?> pool;
+  private Pool<? extends Poolable<?, ?>> pool;
   @Id
   private Long poolId;
 
@@ -43,7 +43,7 @@ public class PoolOrderCompletion implements Serializable {
     return num_partitions;
   }
 
-  public Pool<?> getPool() {
+  public Pool<? extends Poolable<?, ?>> getPool() {
     return pool;
   }
 
@@ -59,7 +59,7 @@ public class PoolOrderCompletion implements Serializable {
     this.health = health;
   }
 
-  public void setPool(Pool<?> pool) {
+  public void setPool(Pool<? extends Poolable<?, ?>> pool) {
     this.pool = pool;
   }
 }

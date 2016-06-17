@@ -64,7 +64,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.jackson.PooledElementDeserializer;
  * @since 0.0.2
  */
 @JsonIgnoreProperties({ "lastModifier", "hasLowQualityMembers" })
-public abstract class AbstractPool<P extends Poolable> extends AbstractBoxable implements Pool<P> {
+public abstract class AbstractPool<P extends Poolable<?, ?>> extends AbstractBoxable implements Pool<P> {
   protected static final Logger log = LoggerFactory.getLogger(AbstractPool.class);
 
   public static final Long UNSAVED_ID = 0L;

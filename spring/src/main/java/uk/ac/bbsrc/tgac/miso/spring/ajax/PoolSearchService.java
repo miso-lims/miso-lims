@@ -75,20 +75,20 @@ public class PoolSearchService {
   private RequestManager requestManager;
 
   private abstract class PoolSearch {
-    public abstract Collection<Pool<? extends Poolable>> all(PlatformType type) throws IOException;
+    public abstract Collection<Pool<? extends Poolable<?,?>>> all(PlatformType type) throws IOException;
 
-    public abstract Collection<Pool<? extends Poolable>> search(PlatformType type, String query) throws IOException;
+    public abstract Collection<Pool<? extends Poolable<?,?>>> search(PlatformType type, String query) throws IOException;
   }
 
   private class ReadyPools extends PoolSearch {
 
     @Override
-    public Collection<Pool<? extends Poolable>> all(PlatformType type) throws IOException {
+    public Collection<Pool<? extends Poolable<?,?>>> all(PlatformType type) throws IOException {
       return requestManager.listReadyPoolsByPlatform(type);
     }
 
     @Override
-    public Collection<Pool<? extends Poolable>> search(PlatformType type, String query) throws IOException {
+    public Collection<Pool<? extends Poolable<?,?>>> search(PlatformType type, String query) throws IOException {
       return requestManager.listReadyPoolsByPlatformAndSearch(type, query);
     }
   }
@@ -96,12 +96,12 @@ public class PoolSearchService {
   private class AllPools extends PoolSearch {
 
     @Override
-    public Collection<Pool<? extends Poolable>> all(PlatformType type) throws IOException {
+    public Collection<Pool<? extends Poolable<?,?>>> all(PlatformType type) throws IOException {
       return requestManager.listAllPoolsByPlatform(type);
     }
 
     @Override
-    public Collection<Pool<? extends Poolable>> search(PlatformType type, String query) throws IOException {
+    public Collection<Pool<? extends Poolable<?,?>>> search(PlatformType type, String query) throws IOException {
       return requestManager.listAllPoolsByPlatformAndSearch(type, query);
     }
 
@@ -114,7 +114,7 @@ public class PoolSearchService {
       PlatformType platformType = PlatformType.valueOf(json.getString("platformType").toUpperCase());
       boolean readyOnly = json.getBoolean("readyOnly");
       try {
-        Collection<Pool<? extends Poolable>> pools;
+        Collection<Pool<? extends Poolable<?,?>>> pools;
         PoolSearch search = readyOnly ? new ReadyPools() : new AllPools();
         if (!isStringEmptyOrNull(searchStr)) {
           pools = search.search(platformType, searchStr);
@@ -126,9 +126,9 @@ public class PoolSearchService {
           pools = search.all(platformType);
         }
         if (pools.size() > 0) {
-          List<Pool<? extends Poolable>> rPools = new ArrayList<>(pools);
+          List<Pool<? extends Poolable<?,?>>> rPools = new ArrayList<>(pools);
           Collections.reverse(rPools);
-          for (Pool<? extends Poolable> pool : rPools) {
+          for (Pool<? extends Poolable<?,?>> pool : rPools) {
             b.append(poolHtml(pool));
           }
         } else {
@@ -208,7 +208,7 @@ public class PoolSearchService {
     }
   }
 
-  private String poolHtml(Pool<? extends Poolable> p) {
+  private String poolHtml(Pool<? extends Poolable<?,?>> p) {
     StringBuilder b = new StringBuilder();
     String lowquality = p.getHasLowQualityMembers() ? " lowquality" : "";
     b.append("<div style='position:relative' onMouseOver='this.className=\"dashboardhighlight" + lowquality
@@ -219,7 +219,7 @@ public class PoolSearchService {
       b.append("<div style=\"float:left\"><b>" + p.getName() + " (" + p.getAlias() + ") : " + p.getCreationDate() + "</b><br/>");
     }
 
-    Collection<? extends Poolable> ds = p.getPoolableElements();
+    Collection<? extends Poolable<?,?>> ds = p.getPoolableElements();
     for (Poolable d : ds) {
       if (d instanceof Dilution) {
         b.append("<span" + (((Dilution) d).getLibrary().isLowQuality() ? " class='lowquality'" : "") + ">" + d.getName() + " ("

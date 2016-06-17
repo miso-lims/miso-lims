@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletion;
+import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
 import uk.ac.bbsrc.tgac.miso.persistence.PoolOrderCompletionDao;
 import uk.ac.bbsrc.tgac.miso.service.PoolOrderCompletionService;
@@ -32,7 +33,7 @@ public class DefaultPoolOrderCompletionService implements PoolOrderCompletionSer
 
   @Override
   public Collection<PoolOrderCompletion> getOrderCompletionForPool(long id) throws AuthorizationException, IOException {
-    Pool<?> p = poolDao.get(id);
+    Pool<? extends Poolable<?, ?>> p = poolDao.get(id);
     authorizationManager.throwIfNotReadable(p);
     return poolOrderCompletionDao.getForPool(id);
   }

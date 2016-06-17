@@ -41,9 +41,6 @@ import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletResponse;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,6 +65,8 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractPool;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSampleQC;
@@ -138,16 +137,16 @@ public class EditSampleController {
 
   @Autowired
   private DataObjectFactory dataObjectFactory;
-  
+
   @Autowired
   private MisoNamingScheme<Sample> sampleNamingScheme;
-  
+
   @Autowired
   private SampleOptionsController sampleOptionsController;
-  
+
   @Autowired
   private SampleService sampleService;
-  
+
   public void setSampleOptionsController(SampleOptionsController sampleOptionsController) {
     this.sampleOptionsController = sampleOptionsController;
   }
@@ -190,7 +189,7 @@ public class EditSampleController {
   public Boolean isDetailedSampleEnabled() {
     return detailedSample;
   }
-  
+
   @ModelAttribute("sampleOptions")
   public JSONObject getSampleOptions(UriComponentsBuilder uriBuilder, HttpServletResponse response) throws IOException {
     return JSONObject.fromObject(sampleOptionsController.getSampleOptions(uriBuilder, response));
@@ -296,11 +295,11 @@ public class EditSampleController {
     }
   }
 
-  private Set<Pool<? extends Poolable>> getPoolsBySample(Sample s) throws IOException {
+  private Set<Pool<? extends Poolable<?, ?>>> getPoolsBySample(Sample s) throws IOException {
     if (!s.getLibraries().isEmpty()) {
-      Set<Pool<? extends Poolable>> pools = new TreeSet<>();
+      Set<Pool<? extends Poolable<?, ?>>> pools = new TreeSet<>();
       for (Library l : s.getLibraries()) {
-        List<Pool<? extends Poolable>> prs = new ArrayList<>(requestManager.listPoolsByLibraryId(l.getId()));
+        List<Pool<? extends Poolable<?, ?>>> prs = new ArrayList<>(requestManager.listPoolsByLibraryId(l.getId()));
         pools.addAll(prs);
       }
       return pools;
@@ -308,10 +307,10 @@ public class EditSampleController {
     return Collections.emptySet();
   }
 
-  private Set<Run> getRunsBySamplePools(Set<Pool<? extends Poolable>> pools) throws IOException {
+  private Set<Run> getRunsBySamplePools(Set<Pool<? extends Poolable<?, ?>>> pools) throws IOException {
     if (!pools.isEmpty()) {
       Set<Run> runs = new TreeSet<>();
-      for (Pool<? extends Poolable> pool : pools) {
+      for (Pool<? extends Poolable<?, ?>> pool : pools) {
         Collection<Run> prs = requestManager.listRunsByPoolId(pool.getId());
         runs.addAll(prs);
       }
@@ -396,10 +395,10 @@ public class EditSampleController {
 
     return hot;
   }
-  
+
   @Autowired
   private SampleClassService sampleClassService;
-  
+
   @ModelAttribute("sampleClasses")
   public List<SampleClass> getSampleClasses() throws IOException {
     List<SampleClass> sampleClasses = new ArrayList<>(sampleClassService.getAll());
@@ -418,10 +417,10 @@ public class EditSampleController {
     });
     return sampleClasses;
   }
-  
+
   @Autowired
   private TissueOriginService tissueOriginService;
-  
+
   @ModelAttribute("tissueOrigins")
   public List<TissueOrigin> getTissueOrigins() throws IOException {
     List<TissueOrigin> list = new ArrayList<>(tissueOriginService.getAll());
@@ -433,10 +432,10 @@ public class EditSampleController {
     });
     return list;
   }
-  
+
   @Autowired
   private TissueTypeService tissueTypeService;
-  
+
   @ModelAttribute("tissueTypes")
   public List<TissueType> getTissueTypes() throws IOException {
     List<TissueType> list = new ArrayList<>(tissueTypeService.getAll());
@@ -448,10 +447,10 @@ public class EditSampleController {
     });
     return list;
   }
-  
+
   @Autowired
   private QcPassedDetailService qcpassedDetailService;
-  
+
   @ModelAttribute("qcPassedDetails")
   public List<QcPassedDetail> getQcPassedDetails() throws IOException {
     List<QcPassedDetail> list = new ArrayList<>(qcpassedDetailService.getAll());
@@ -463,10 +462,10 @@ public class EditSampleController {
     });
     return list;
   }
-  
+
   @Autowired
   private LabService labService;
-  
+
   @ModelAttribute("labs")
   public List<Lab> getLabs() throws IOException {
     List<Lab> list = new ArrayList<>(labService.getAll());
@@ -478,10 +477,10 @@ public class EditSampleController {
     });
     return list;
   }
-  
+
   @Autowired
   private SamplePurposeService samplePurposeService;
-  
+
   @ModelAttribute("samplePurposes")
   public List<SamplePurpose> getSamplePurposes() throws IOException {
     List<SamplePurpose> list = new ArrayList<>(samplePurposeService.getAll());
@@ -493,10 +492,10 @@ public class EditSampleController {
     });
     return list;
   }
-  
+
   @Autowired
   private TissueMaterialService tissueMaterialService;
-  
+
   @ModelAttribute("tissueMaterials")
   public List<TissueMaterial> getTissueMaterials() throws IOException {
     List<TissueMaterial> list = new ArrayList<>(tissueMaterialService.getAll());
@@ -508,12 +507,12 @@ public class EditSampleController {
     });
     return list;
   }
-  
+
   @ModelAttribute("strStatusOptions")
   public StrStatus[] getStrStatusOptions() {
     return StrStatus.values();
   }
-  
+
   @ModelAttribute("donorSexOptions")
   public DonorSex[] getDonorSexOptions() {
     return DonorSex.values();
@@ -534,7 +533,7 @@ public class EditSampleController {
         setValue(p);
       }
     });
-    
+
     binder.registerCustomEditor(SampleClass.class, "sampleAdditionalInfo.sampleClass", new PropertyEditorSupport() {
       @Override
       public void setAsText(String text) throws IllegalArgumentException {
@@ -543,7 +542,7 @@ public class EditSampleController {
         setValue(sc);
       }
     });
-    
+
     binder.registerCustomEditor(TissueOrigin.class, "sampleAdditionalInfo.tissueOrigin", new PropertyEditorSupport() {
       @Override
       public void setAsText(String text) throws IllegalArgumentException {
@@ -552,7 +551,7 @@ public class EditSampleController {
         setValue(to);
       }
     });
-    
+
     binder.registerCustomEditor(TissueType.class, "sampleAdditionalInfo.tissueType", new PropertyEditorSupport() {
       @Override
       public void setAsText(String text) throws IllegalArgumentException {
@@ -561,7 +560,7 @@ public class EditSampleController {
         setValue(tt);
       }
     });
-    
+
     binder.registerCustomEditor(QcPassedDetail.class, "sampleAdditionalInfo.qcPassedDetail", new PropertyEditorSupport() {
       @Override
       public void setAsText(String text) throws IllegalArgumentException {
@@ -574,7 +573,7 @@ public class EditSampleController {
         }
       }
     });
-    
+
     binder.registerCustomEditor(Subproject.class, "sampleAdditionalInfo.subproject", new PropertyEditorSupport() {
       @Override
       public void setAsText(String text) throws IllegalArgumentException {
@@ -587,7 +586,7 @@ public class EditSampleController {
         }
       }
     });
-    
+
     binder.registerCustomEditor(Lab.class, "sampleAdditionalInfo.lab", new PropertyEditorSupport() {
       @Override
       public void setAsText(String text) throws IllegalArgumentException {
@@ -600,7 +599,7 @@ public class EditSampleController {
         }
       }
     });
-    
+
     binder.registerCustomEditor(SamplePurpose.class, "sampleAnalyte.samplePurpose", new PropertyEditorSupport() {
       @Override
       public void setAsText(String text) throws IllegalArgumentException {
@@ -613,7 +612,7 @@ public class EditSampleController {
         }
       }
     });
-    
+
     binder.registerCustomEditor(TissueMaterial.class, "sampleAnalyte.tissueMaterial", new PropertyEditorSupport() {
       @Override
       public void setAsText(String text) throws IllegalArgumentException {
@@ -626,7 +625,7 @@ public class EditSampleController {
         }
       }
     });
-    
+
     binder.registerCustomEditor(Long.class, new PropertyEditorSupport() {
       @Override
       public void setAsText(String text) throws IllegalArgumentException {
@@ -680,9 +679,9 @@ public class EditSampleController {
         model.put("nextSample", adjacentSamples.get("nextSample"));
       }
 
-      Set<Pool<? extends Poolable>> pools = getPoolsBySample(sample);
+      Set<Pool<? extends Poolable<?, ?>>> pools = getPoolsBySample(sample);
       Map<Long, Sample> poolSampleMap = new HashMap<>();
-      for (Pool pool : pools) {
+      for (Pool<? extends Poolable<?, ?>> pool : pools) {
         poolSampleMap.put(pool.getId(), sample);
       }
       model.put("poolSampleMap", poolSampleMap);
@@ -758,9 +757,9 @@ public class EditSampleController {
       model.put("sample", sample);
       model.put("sampleTypes", requestManager.listAllSampleTypes());
 
-      Set<Pool<? extends Poolable>> pools = getPoolsBySample(sample);
+      Set<Pool<? extends Poolable<?, ?>>> pools = getPoolsBySample(sample);
       Map<Long, Sample> poolSampleMap = new HashMap<>();
-      for (Pool pool : pools) {
+      for (Pool<? extends Poolable<?, ?>> pool : pools) {
         poolSampleMap.put(pool.getId(), sample);
       }
       model.put("poolSampleMap", poolSampleMap);
@@ -779,10 +778,10 @@ public class EditSampleController {
       throw ex;
     }
   }
-  
+
   /**
-   * Adds child entities to a new detailed Sample so they can be bound in the JSP. These will not all be useful for the same 
-   * object, but are all included to accommodate the JSP.
+   * Adds child entities to a new detailed Sample so they can be bound in the JSP. These will not all be useful for the same object, but are
+   * all included to accommodate the JSP.
    * 
    * @param sample
    */
@@ -792,7 +791,7 @@ public class EditSampleController {
     sample.getSampleAdditionalInfo().setTissueType(new TissueTypeImpl());
     sample.getSampleAdditionalInfo().setQcPassedDetail(new QcPassedDetailImpl());
     sample.getSampleAdditionalInfo().setSubproject(new SubprojectImpl());
-    
+
     sample.setSampleTissue(new SampleTissueImpl());
     sample.setSampleAnalyte(new SampleAnalyteImpl());
     sample.setIdentity(new IdentityImpl());
@@ -809,8 +808,7 @@ public class EditSampleController {
   }
 
   /**
-   * used to edit samples with ids from given {sampleIds}
-   * sends Dtos objects which will then be used for editing in grid
+   * used to edit samples with ids from given {sampleIds} sends Dtos objects which will then be used for editing in grid
    */
   @RequestMapping(value = "/bulk/edit/{sampleIds}", method = RequestMethod.GET)
   public ModelAndView editBulkSamples(@PathVariable String sampleIds, ModelMap model) throws IOException {
@@ -841,7 +839,8 @@ public class EditSampleController {
    * in grid
    */
   @RequestMapping(value = "/bulk/create/{sampleIds}&scid={sampleClassId}", method = RequestMethod.GET)
-  public ModelAndView createBulkSamples(@PathVariable String sampleIds, @PathVariable Long sampleClassId, ModelMap model) throws IOException {
+  public ModelAndView createBulkSamples(@PathVariable String sampleIds, @PathVariable Long sampleClassId, ModelMap model)
+      throws IOException {
     try {
       String[] split = sampleIds.split(",");
       List<Long> idList = new ArrayList<Long>();
@@ -854,7 +853,7 @@ public class EditSampleController {
       }
       model.put("title", "Bulk Create Samples");
       model.put("samplesJSON", samplesDtos);
-      model.put("method",  "Create");
+      model.put("method", "Create");
       model.put("sampleClassId", sampleClassId);
       return new ModelAndView("/pages/bulkEditSamples.jsp", model);
     } catch (IOException ex) {
@@ -882,5 +881,5 @@ public class EditSampleController {
       throw ex;
     }
   }
-  
+
 }

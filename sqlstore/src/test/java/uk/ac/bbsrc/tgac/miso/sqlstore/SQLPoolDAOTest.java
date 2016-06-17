@@ -1,6 +1,10 @@
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,6 +24,7 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.store.SecurityStore;
@@ -454,7 +459,7 @@ public class SQLPoolDAOTest extends AbstractDAOTest {
 
   @Test
   public void testRemove() throws IOException {
-    Pool<?> pool = dao.get(1L);
+    Pool<? extends Poolable<?, ?>> pool = dao.get(1L);
     assertNotNull(pool);
     pool.setExperiments(new ArrayList<Experiment>());
     pool.setPoolableElements(null);
@@ -481,7 +486,7 @@ public class SQLPoolDAOTest extends AbstractDAOTest {
 
   @Test
   public void testSaveEdit() throws IOException, MisoNamingException {
-    Pool<?> oldPool = dao.get(1L);
+    Pool<? extends Poolable<?, ?>> oldPool = dao.get(1L);
     assertNotNull(oldPool);
     oldPool.setAlias("New Alias");
     oldPool.setVolume(20.5D);
@@ -494,7 +499,7 @@ public class SQLPoolDAOTest extends AbstractDAOTest {
     Mockito.when(namingScheme.validateField(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
 
     assertEquals(1L, dao.save(oldPool));
-    Pool<?> newPool = dao.get(1L);
+    Pool<? extends Poolable<?, ?>> newPool = dao.get(1L);
     assertNotNull(newPool);
     assertEquals(oldPool.getAlias(), newPool.getAlias());
     assertEquals(oldPool.getVolume(), newPool.getVolume());

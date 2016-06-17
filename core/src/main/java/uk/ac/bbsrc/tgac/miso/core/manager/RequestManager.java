@@ -159,13 +159,13 @@ public interface RequestManager {
 
   public Experiment getExperimentById(long experimentId) throws IOException;
 
-  public Pool<? extends Poolable> getPoolById(long poolId) throws IOException;
+  public Pool<? extends Poolable<?, ?>> getPoolById(long poolId) throws IOException;
 
-  public Pool<? extends Poolable> getPoolByBarcode(String barcode) throws IOException;
+  public Pool<? extends Poolable<?, ?>> getPoolByBarcode(String barcode) throws IOException;
 
-  public Pool<? extends Poolable> getPoolByBarcode(String barcode, PlatformType platformType) throws IOException;
+  public Pool<? extends Poolable<?, ?>> getPoolByBarcode(String barcode, PlatformType platformType) throws IOException;
 
-  public Pool<? extends Poolable> getPoolByIdBarcode(String barcode) throws IOException;
+  public Pool<? extends Poolable<?, ?>> getPoolByIdBarcode(String barcode) throws IOException;
 
   public PoolQC getPoolQCById(long poolQcId) throws IOException;
 
@@ -446,27 +446,27 @@ public interface RequestManager {
 
   public Collection<emPCR> listAllEmPCRsByProjectId(long projectId) throws IOException;
 
-  public Collection<Pool<? extends Poolable>> listAllPools() throws IOException;
+  public Collection<Pool<? extends Poolable<?, ?>>> listAllPools() throws IOException;
 
-  @SuppressWarnings("rawtypes")
-  public Collection<Pool<? extends Poolable>> listAllPoolsBySearch(String query) throws IOException;
+  public Collection<Pool<? extends Poolable<?, ?>>> listAllPoolsBySearch(String query) throws IOException;
 
-  @SuppressWarnings("rawtypes")
-  public Collection<Pool<? extends Poolable>> listAllPoolsWithLimit(int limit) throws IOException;
+  public Collection<Pool<? extends Poolable<?, ?>>> listAllPoolsWithLimit(int limit) throws IOException;
 
-  public Collection<Pool<? extends Poolable>> listAllPoolsByPlatform(PlatformType platformType) throws IOException;
+  public Collection<Pool<? extends Poolable<?, ?>>> listAllPoolsByPlatform(PlatformType platformType) throws IOException;
 
-  public Collection<Pool<? extends Poolable>> listAllPoolsByPlatformAndSearch(PlatformType platformType, String query) throws IOException;
+  public Collection<Pool<? extends Poolable<?, ?>>> listAllPoolsByPlatformAndSearch(PlatformType platformType, String query)
+      throws IOException;
 
-  public Collection<Pool<? extends Poolable>> listReadyPoolsByPlatform(PlatformType platformType) throws IOException;
+  public Collection<Pool<? extends Poolable<?, ?>>> listReadyPoolsByPlatform(PlatformType platformType) throws IOException;
 
-  public Collection<Pool<? extends Poolable>> listReadyPoolsByPlatformAndSearch(PlatformType platformType, String query) throws IOException;
+  public Collection<Pool<? extends Poolable<?, ?>>> listReadyPoolsByPlatformAndSearch(PlatformType platformType, String query)
+      throws IOException;
 
-  public Collection<Pool<? extends Poolable>> listPoolsByProjectId(long projectId) throws IOException;
+  public Collection<Pool<? extends Poolable<?, ?>>> listPoolsByProjectId(long projectId) throws IOException;
 
-  public Collection<Pool<? extends Poolable>> listPoolsByLibraryId(long libraryId) throws IOException;
+  public Collection<Pool<? extends Poolable<?, ?>>> listPoolsByLibraryId(long libraryId) throws IOException;
 
-  public Collection<Pool<? extends Poolable>> listPoolsBySampleId(long sampleId) throws IOException;
+  public Collection<Pool<? extends Poolable<?, ?>>> listPoolsBySampleId(long sampleId) throws IOException;
 
   public Collection<PoolQC> listAllPoolQCsByPoolId(long poolId) throws IOException;
 
