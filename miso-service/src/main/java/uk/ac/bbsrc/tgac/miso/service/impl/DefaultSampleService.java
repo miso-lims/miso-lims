@@ -47,6 +47,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.TissueMaterialDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueOriginDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueTypeDao;
 import uk.ac.bbsrc.tgac.miso.service.IdentityService;
+import uk.ac.bbsrc.tgac.miso.service.LabService;
 import uk.ac.bbsrc.tgac.miso.service.SampleAdditionalInfoService;
 import uk.ac.bbsrc.tgac.miso.service.SampleAnalyteService;
 import uk.ac.bbsrc.tgac.miso.service.SampleNumberPerProjectService;
@@ -111,6 +112,9 @@ public class DefaultSampleService implements SampleService {
 
   @Autowired
   private TissueMaterialDao tissueMaterialDao;
+  
+  @Autowired
+  private LabService labService;
 
   @Autowired
   private MisoNamingScheme<Sample> sampleNamingScheme;
@@ -187,6 +191,10 @@ public class DefaultSampleService implements SampleService {
 
   public void setTissueMaterialDao(TissueMaterialDao tissueMaterialDao) {
     this.tissueMaterialDao = tissueMaterialDao;
+  }
+  
+  public void setLabService(LabService labService) {
+    this.labService = labService;
   }
 
   public void setSampleNamingScheme(MisoNamingScheme<Sample> sampleNamingScheme) {
@@ -400,12 +408,6 @@ public class DefaultSampleService implements SampleService {
       if (sai.getSampleClass() != null && sai.getSampleClass().getId() != null) {
         sai.setSampleClass(sampleClassDao.getSampleClass(sai.getSampleClass().getId()));
       }
-      if (sai.getTissueOrigin() != null && sai.getTissueOrigin().getId() != null) {
-        sai.setTissueOrigin(tissueOriginDao.getTissueOrigin(sai.getTissueOrigin().getId()));
-      }
-      if (sai.getTissueType() != null && sai.getTissueType().getId() != null) {
-        sai.setTissueType(tissueTypeDao.getTissueType(sai.getTissueType().getId()));
-      }
       if (sai.getQcPassedDetail() != null && sai.getQcPassedDetail().getId() != null) {
         sai.setQcPassedDetail(qcPassedDetailDao.getQcPassedDetails(sai.getQcPassedDetail().getId()));
       }
@@ -422,6 +424,17 @@ public class DefaultSampleService implements SampleService {
         }
         if (sa.getTissueMaterial() != null && sa.getTissueMaterial().getId() != null) {
           sa.setTissueMaterial(tissueMaterialDao.getTissueMaterial(sa.getTissueMaterial().getId()));
+        }
+      } else if (isTissueSample(sai)) {
+        SampleTissue tissue = (SampleTissue) sai;
+        if (tissue.getTissueOrigin() != null && tissue.getTissueOrigin().getId() != null) {
+          tissue.setTissueOrigin(tissueOriginDao.getTissueOrigin(tissue.getTissueOrigin().getId()));
+        }
+        if (tissue.getTissueType() != null && tissue.getTissueType().getId() != null) {
+          tissue.setTissueType(tissueTypeDao.getTissueType(tissue.getTissueType().getId()));
+        }
+        if (tissue.getLab() != null && tissue.getLab().getId() != null) {
+          tissue.setLab(labService.get(tissue.getLab().getId()));
         }
       }
     }

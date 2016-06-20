@@ -428,5 +428,5 @@ INSERT INTO `TissueType`(`tissueTypeId`, `alias`, `description`, `createdBy`, `c
 VALUES (1,'Test Type','for testing',1,'2016-02-19 11:28:00',1,'2016-02-19 11:28:00');
 
 DELETE FROM `LibraryAdditionalInfo`;
-INSERT INTO `LibraryAdditionalInfo`(`libraryId`, `tissueOriginId`, `tissueTypeId`, `kitDescriptorId`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
-VALUES (1,1,1,1,1,'2016-02-19 11:28:00',1,'2016-02-19 11:28:00');
+INSERT INTO `LibraryAdditionalInfo`(`libraryId`, `kitDescriptorId`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
+VALUES (1,1,1,'2016-02-19 11:28:00',1,'2016-02-19 11:28:00');

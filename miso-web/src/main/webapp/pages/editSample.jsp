@@ -427,21 +427,15 @@
         <div id="detailedSampleTissue">
           <h2>Tissue</h2>
           <table class="in">
-            <tr id="tissueClassRow">
-              <td class="h">Tissue Class:*</td>
-              <td>
-                <c:choose>
-                  <c:when test="${sample.id == 0}">
-                    <miso:select id="tissueClass" path="tissueClass" items="${tissueClasses}" itemLabel="alias" 
-                        itemValue="id" defaultLabel="SELECT" defaultValue=""/>
-                  </c:when>
-                  <c:otherwise>
-                    <input type="hidden" id="sampleClass" value="${sample.sampleClass.id}"/>
-                    ${sample.sampleClass.alias}
-                  </c:otherwise>
-                </c:choose>
-              </td>
-            </tr>
+            <c:if test="${sample.id == 0}">
+              <tr id="tissueClassRow">
+                <td class="h">Tissue Class:*</td>
+                <td>
+                  <miso:select id="tissueClass" path="tissueClass" items="${tissueClasses}" itemLabel="alias" 
+                      itemValue="id" defaultLabel="SELECT" defaultValue=""/>
+                </td>
+              </tr>
+            </c:if>
             <tr>
               <td class="h">Tissue Origin:*</td>
               <td>

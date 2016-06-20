@@ -285,10 +285,6 @@ public class LoadGeneratorSource implements MigrationSource {
     sample.setProject(project);
     sample.setScientificName(SCIENTIFIC_NAME);
     sample.setSampleClass(sampleClass);
-    sample.setTissueOrigin(parent.getTissueOrigin());
-    sample.setTissueType(parent.getTissueType());
-    sample.setTimesReceived(parent.getTimesReceived());
-    sample.setTubeNumber(parent.getTubeNumber());
     sample.setParent(parent);
     sample.setSiblingNumber(siblingNumber);
     return sample;
@@ -303,10 +299,6 @@ public class LoadGeneratorSource implements MigrationSource {
     sample.setScientificName(SCIENTIFIC_NAME);
     sample.setQcPassed(true);
     sample.setSampleClass(sampleClass);
-    sample.setTissueOrigin(parent.getTissueOrigin());
-    sample.setTissueType(parent.getTissueType());
-    sample.setTimesReceived(parent.getTimesReceived());
-    sample.setTubeNumber(parent.getTubeNumber());
     sample.setParent(parent);
     sample.setSiblingNumber(siblingNumber);
     return sample;
@@ -357,8 +349,6 @@ public class LoadGeneratorSource implements MigrationSource {
     LibraryAdditionalInfo lai = new LibraryAdditionalInfoImpl();
     lai.setArchived(false);
     lai.setLibrary(lib);
-    lai.setTissueOrigin(sample.getTissueOrigin());
-    lai.setTissueType(sample.getTissueType());
     lib.setLibraryAdditionalInfo(lai);
     
     // faked alias generation to avoid necessity of target database data

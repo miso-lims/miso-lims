@@ -7,8 +7,6 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 
 import org.codehaus.jackson.map.ObjectMapper;
-import org.hamcrest.CoreMatchers;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -19,8 +17,6 @@ import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAdditionalInfoImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 public class AbstractLibraryTestSuite {
@@ -58,13 +54,11 @@ public class AbstractLibraryTestSuite {
   }
 
   @Test
-  public final void testLibrarySerialization()  throws Exception {
+  public final void testLibrarySerialization() throws Exception {
     Sample sample = new SampleImpl();
     Library library = new LibraryImpl();
     LibraryAdditionalInfo lai = new LibraryAdditionalInfoImpl();
     library.setSample(sample);
-    lai.setTissueOrigin(new TissueOriginImpl());
-    lai.setTissueType(new TissueTypeImpl());
     lai.setLibrary(library);
     library.setLibraryAdditionalInfo(lai);
     library.setAlias("TestLib");

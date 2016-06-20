@@ -12,8 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Sets;
 
-import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryAdditionalInfo;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.persistence.LibraryAdditionalInfoDao;
@@ -56,8 +56,6 @@ public class DefaultLibraryAdditionalInfoService implements LibraryAdditionalInf
   public Long create(LibraryAdditionalInfo libraryAdditionalInfo, Long libraryId) throws IOException {
     authorizationManager.throwIfNotWritable(libraryStore.get(libraryId));
     libraryAdditionalInfo.setLibrary(libraryStore.get(libraryId));
-    libraryAdditionalInfo.setTissueOrigin(tissueOriginDao.getTissueOrigin(libraryAdditionalInfo.getTissueOrigin().getId()));
-    libraryAdditionalInfo.setTissueType(tissueTypeDao.getTissueType(libraryAdditionalInfo.getTissueType().getId()));
     if (libraryAdditionalInfo.getPrepKit() != null) {
       libraryAdditionalInfo.setPrepKit(kitStore.getKitDescriptorById(libraryAdditionalInfo.getPrepKit().getId()));
     }
@@ -76,8 +74,6 @@ public class DefaultLibraryAdditionalInfoService implements LibraryAdditionalInf
   public void update(LibraryAdditionalInfo libraryAdditionalInfo) throws IOException {
     authorizationManager.throwIfNotWritable(libraryAdditionalInfo.getLibrary());
     LibraryAdditionalInfo updated = get(libraryAdditionalInfo.getLibraryId());
-    updated.setTissueOrigin(tissueOriginDao.getTissueOrigin(libraryAdditionalInfo.getTissueOrigin().getId()));
-    updated.setTissueType(tissueTypeDao.getTissueType(libraryAdditionalInfo.getTissueType().getId()));
     updated.setGroupId(libraryAdditionalInfo.getGroupId());
     updated.setGroupDescription(libraryAdditionalInfo.getGroupDescription());
     if (libraryAdditionalInfo.getPrepKit() != null) {
