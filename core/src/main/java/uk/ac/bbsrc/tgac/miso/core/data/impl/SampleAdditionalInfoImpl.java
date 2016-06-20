@@ -13,14 +13,11 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.QcPassedDetail;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
-import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
-import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 
 @Entity
@@ -41,14 +38,6 @@ public class SampleAdditionalInfoImpl extends SampleImpl implements SampleAdditi
   @JoinColumn(name = "sampleClassId", nullable = false)
   private SampleClass sampleClass;
 
-  @OneToOne(targetEntity = TissueOriginImpl.class)
-  @JoinColumn(name = "tissueOriginId")
-  private TissueOrigin tissueOrigin;
-
-  @OneToOne(targetEntity = TissueTypeImpl.class)
-  @JoinColumn(name = "tissueTypeId")
-  private TissueType tissueType;
-
   @OneToOne(targetEntity = QcPassedDetailImpl.class)
   @JoinColumn(name = "qcPassedDetailId")
   private QcPassedDetail qcPassedDetail;
@@ -57,22 +46,10 @@ public class SampleAdditionalInfoImpl extends SampleImpl implements SampleAdditi
   @JoinColumn(name = "subprojectId")
   private Subproject subproject;
 
-  private String externalInstituteIdentifier;
-
-  @OneToOne(targetEntity = LabImpl.class)
-  @JoinColumn(name = "labId", nullable = true)
-  private Lab lab;
-
   private Long kitDescriptorId;
 
   @Transient
   private KitDescriptor prepKit;
-
-  private Integer passageNumber;
-
-  private Integer timesReceived;
-
-  private Integer tubeNumber;
 
   private Double concentration;
 
@@ -115,26 +92,6 @@ public class SampleAdditionalInfoImpl extends SampleImpl implements SampleAdditi
   }
 
   @Override
-  public TissueOrigin getTissueOrigin() {
-    return tissueOrigin;
-  }
-
-  @Override
-  public void setTissueOrigin(TissueOrigin tissueOrigin) {
-    this.tissueOrigin = tissueOrigin;
-  }
-
-  @Override
-  public TissueType getTissueType() {
-    return tissueType;
-  }
-
-  @Override
-  public void setTissueType(TissueType tissueType) {
-    this.tissueType = tissueType;
-  }
-
-  @Override
   public Subproject getSubproject() {
     return subproject;
   }
@@ -142,36 +99,6 @@ public class SampleAdditionalInfoImpl extends SampleImpl implements SampleAdditi
   @Override
   public void setSubproject(Subproject subproject) {
     this.subproject = subproject;
-  }
-
-  @Override
-  public Integer getPassageNumber() {
-    return passageNumber;
-  }
-
-  @Override
-  public void setPassageNumber(Integer passageNumber) {
-    this.passageNumber = passageNumber;
-  }
-
-  @Override
-  public Integer getTimesReceived() {
-    return timesReceived;
-  }
-
-  @Override
-  public void setTimesReceived(Integer timesReceived) {
-    this.timesReceived = timesReceived;
-  }
-
-  @Override
-  public Integer getTubeNumber() {
-    return tubeNumber;
-  }
-
-  @Override
-  public void setTubeNumber(Integer tubeNumber) {
-    this.tubeNumber = tubeNumber;
   }
 
   @Override
@@ -219,26 +146,6 @@ public class SampleAdditionalInfoImpl extends SampleImpl implements SampleAdditi
     } else {
       this.kitDescriptorId = prepKit.getId();
     }
-  }
-
-  @Override
-  public String getExternalInstituteIdentifier() {
-    return externalInstituteIdentifier;
-  }
-
-  @Override
-  public void setExternalInstituteIdentifier(String externalInstituteIdentifier) {
-    this.externalInstituteIdentifier = externalInstituteIdentifier;
-  }
-
-  @Override
-  public Lab getLab() {
-    return lab;
-  }
-
-  @Override
-  public void setLab(Lab lab) {
-    this.lab = lab;
   }
 
   @Override

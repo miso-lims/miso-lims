@@ -767,10 +767,6 @@ public class EditLibraryController {
           SampleAdditionalInfo detailed = (SampleAdditionalInfo) sample;
           sampleClass = detailed.getSampleClass();
           library.setLibraryAdditionalInfo(new LibraryAdditionalInfoImpl());
-          library.getLibraryAdditionalInfo().setTissueOrigin(detailed.getTissueOrigin());
-          library.getLibraryAdditionalInfo().setTissueType(detailed.getTissueType());
-          // library.getLibraryAdditionalInfo().setGroupId(library.getSample().getSampleAnalyte().getGroupId());
-          // library.getLibraryAdditionalInfo().setGroupDescription(library.getSample().getSampleAnalyte().getGroupDescription());
         }
 
         List<Sample> projectSamples = new ArrayList<Sample>(requestManager.listAllSamplesByProjectId(sample.getProject().getProjectId()));
@@ -865,8 +861,6 @@ public class EditLibraryController {
 
         if (isDetailedSampleEnabled()) {
           LibraryAdditionalInfoDto lai = new LibraryAdditionalInfoDto();
-          lai.setTissueOrigin(Dtos.asDto(detailed.getTissueOrigin()));
-          lai.setTissueType(Dtos.asDto(detailed.getTissueType()));
           library.setLibraryAdditionalInfo(lai);
         }
         libraries.add(library);
@@ -944,9 +938,6 @@ public class EditLibraryController {
           library.getLibraryAdditionalInfo().setCreatedBy(user);
         }
         library.getLibraryAdditionalInfo().setUpdatedBy(user);
-        SampleAdditionalInfo detailed = (SampleAdditionalInfo) library.getSample();
-        library.getLibraryAdditionalInfo().setTissueOrigin(detailed.getTissueOrigin());
-        library.getLibraryAdditionalInfo().setTissueType(detailed.getTissueType());
       }
 
       boolean create = library.getId() == AbstractLibrary.UNSAVED_ID;

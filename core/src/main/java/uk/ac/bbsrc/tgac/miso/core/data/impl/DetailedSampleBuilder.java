@@ -79,10 +79,8 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAnalyt
   private DonorSex donorSex = DonorSex.UNKNOWN;
   
   // TissueSample attributes
-  private SampleClass tissueClass;
+  private SampleClass tissueClass; // identifies a parent tissue class if this sample itself is not a tissue
   private Integer cellularity;
-  
-  // Transitioning to tissue
   private TissueOrigin tissueOrigin;
   private TissueType tissueType;
   private String externalInstituteIdentifier;
@@ -751,16 +749,7 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAnalyt
       sample = identity;
       break;
     case SampleTissue.CATEGORY_NAME:
-      SampleTissue tissue = new SampleTissueImpl();
-      tissue.setCellularity(cellularity);
-      tissue.setTimesReceived(timesReceived);
-      tissue.setTubeNumber(tubeNumber);
-      tissue.setPassageNumber(passageNumber);
-      tissue.setTissueType(tissueType);
-      tissue.setTissueOrigin(tissueOrigin);
-      tissue.setExternalInstituteIdentifier(externalInstituteIdentifier);
-      tissue.setLab(lab);
-      sample = tissue;
+      sample = buildTissue();
       break;
     case TissueProcessingSample.CATEGORY_NAME:
       // no subclass or additional attributes required
@@ -790,16 +779,8 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAnalyt
       if (SampleTissue.CATEGORY_NAME.equals(sampleClass.getSampleCategory())) {
         sample.setParent(identity);
       } else {
-        SampleTissue tissue = new SampleTissueImpl();
+        SampleTissue tissue = buildTissue();
         tissue.setSampleClass(tissueClass);
-        tissue.setCellularity(cellularity);
-        tissue.setTimesReceived(timesReceived);
-        tissue.setTubeNumber(tubeNumber);
-        tissue.setPassageNumber(passageNumber);
-        tissue.setTissueType(tissueType);
-        tissue.setTissueOrigin(tissueOrigin);
-        tissue.setExternalInstituteIdentifier(externalInstituteIdentifier);
-        tissue.setLab(lab);
         tissue.setParent(identity);
         sample.setParent(tissue);
       }
@@ -825,22 +806,28 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAnalyt
     sample.setEmpty(emptied);
     
     sample.setSampleClass(sampleClass);
-    sample.setTissueOrigin(tissueOrigin);
-    sample.setTissueType(tissueType);
     sample.setQcPassedDetail(qcPassedDetail);
     sample.setSubproject(subproject);
-    sample.setExternalInstituteIdentifier(externalInstituteIdentifier);
-    sample.setLab(lab);
     sample.setPrepKit(prepKit);
-    sample.setPassageNumber(passageNumber);
-    sample.setTimesReceived(timesReceived);
-    sample.setTubeNumber(tubeNumber);
     sample.setConcentration(concentration);
     sample.setArchived(archived);
     sample.setGroupId(groupId);
     sample.setGroupDescription(groupDescription);
     
     return sample;
+  }
+  
+  private SampleTissue buildTissue() {
+    SampleTissue tissue = new SampleTissueImpl();
+    tissue.setCellularity(cellularity);
+    tissue.setTimesReceived(timesReceived);
+    tissue.setTubeNumber(tubeNumber);
+    tissue.setPassageNumber(passageNumber);
+    tissue.setTissueType(tissueType);
+    tissue.setTissueOrigin(tissueOrigin);
+    tissue.setExternalInstituteIdentifier(externalInstituteIdentifier);
+    tissue.setLab(lab);
+    return tissue;
   }
 
 }

@@ -92,4 +92,13 @@ public class SampleAnalyteDto extends SampleTissueDto {
     this.strStatus = strStatus;
   }
 
+  @Override
+  public String toString() {
+    return "SampleAnalyteDto [samplePurposeId=" + samplePurposeId
+        + ", samplePurposeUrl=" + samplePurposeUrl + ", tissueMaterialId="
+        + tissueMaterialId + ", tissueMaterialUrl=" + tissueMaterialUrl
+        + ", region=" + region + ", tubeId=" + tubeId + ", strStatus="
+        + strStatus + ", super=" + super.toString() + "]";
+  }
+
 }
