@@ -1,5 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.core.util;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowCallbackHandler;
+
+import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
+
 /**
  * Utility class to provide helpful functions for Box-related methods in MISO
  *
@@ -141,5 +149,20 @@ public class BoxUtils {
     if (letter >= 'a' && letter <= 'z') letter = Character.toUpperCase(letter);
     if (letter < 'A' || letter > 'Z') throw new IllegalArgumentException("Row letter must be between A and Z");
     return letter;
+  }
+
+  public static void extractBoxableInformation(JdbcTemplate template, final Boxable boxable) {
+    template.query(
+        "SELECT Box.alias AS alias, Box.boxId AS id, Box.locationBarcode AS location, BoxPosition.`column` AS `column`, BoxPosition.`row` AS `row` FROM BoxPosition JOIN Box ON BoxPosition.boxId = Box.boxId WHERE boxPositionId = ?",
+        new Object[] { boxable.getBoxPositionId() }, new RowCallbackHandler() {
+
+          @Override
+          public void processRow(ResultSet rs) throws SQLException {
+            boxable.setBoxAlias(rs.getString("alias"));
+            boxable.setBoxId(rs.getLong("id"));
+            boxable.setBoxLocation(rs.getString("location"));
+            boxable.setBoxPosition(getPositionString(rs.getInt("row"), rs.getInt("column")));
+          }
+        });
   }
 }

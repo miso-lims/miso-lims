@@ -10,6 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.store.SecurityStore;
@@ -29,7 +30,9 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
 
   @Autowired
   private SessionFactory sessionFactory;
-  
+  @Autowired
+  private JdbcTemplate jdbcTemplate;
+
   @Mock
   private SecurityStore securityDAO;
   @Mock
@@ -53,6 +56,7 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
     MockitoAnnotations.initMocks(this);
     sut.setNamingScheme(new DefaultSampleNamingScheme());
     sut.setSessionFactory(sessionFactory);
+    sut.setJdbcTemplate(jdbcTemplate);
   }
   
   @Test
