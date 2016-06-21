@@ -3,19 +3,16 @@ package uk.ac.bbsrc.tgac.miso.dto;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
 import com.google.common.collect.Sets;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
@@ -70,6 +67,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 public class Dtos {
 
   private static DateTimeFormatter dateTimeFormatter = ISODateTimeFormat.dateTimeNoMillis();
+  private static DateTimeFormatter dateFormatter = ISODateTimeFormat.date();
 
   public static TissueOriginDto asDto(TissueOrigin from) {
     TissueOriginDto dto = new TissueOriginDto();
@@ -423,21 +421,13 @@ public class Dtos {
     if (from.getSamplePurpose() != null) {
       dto.setSamplePurposeId(from.getSamplePurpose().getId());
     }
-    if (from.getGroupId() != null) {
-      dto.setGroupId(from.getGroupId());
-    }
-    if (from.getGroupDescription() != null) {
-      dto.setGroupDescription(from.getGroupDescription());
-    }
+    dto.setGroupId(from.getGroupId());
+    dto.setGroupDescription(from.getGroupDescription());
     if (from.getTissueMaterial() != null) {
       dto.setTissueMaterialId(from.getTissueMaterial().getId());
     }
-    if (!LimsUtils.isStringEmptyOrNull(from.getRegion())) {
-      dto.setRegion(from.getRegion());
-    }
-    if (!LimsUtils.isStringEmptyOrNull(from.getTubeId())) {
-      dto.setTubeId(from.getTubeId());
-    }
+    dto.setRegion(from.getRegion());
+    dto.setTubeId(from.getTubeId());
     dto.setCreatedById(from.getCreatedBy().getUserId());
     dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
     dto.setUpdatedById(from.getUpdatedBy().getUserId());
@@ -549,7 +539,7 @@ public class Dtos {
     }
     to.setSampleType(from.getSampleType());
     if (from.getReceivedDate() != null) {
-      to.setReceivedDate(dateTimeFormatter.parseDateTime(from.getReceivedDate()).toDate());
+      to.setReceivedDate(dateFormatter.parseDateTime(from.getReceivedDate()).toDate());
     }
     to.setQcPassed(from.getQcPassed());
     if (!LimsUtils.isStringEmptyOrNull(from.getAlias())) {

@@ -85,7 +85,7 @@ Sample.hot = {
       newSam.sampleAdditionalInfo.sampleClassAlias = Hot.getAliasFromId(newSam.sampleAdditionalInfo.sampleClassId, Hot.sampleOptions.sampleClassesDtos);
       newSam.sampleAdditionalInfo.parentId = parseInt(sam.id);
       newSam.sampleAdditionalInfo.parentAlias = clone(sam.alias);
-      if (sam.sampleAnalyte && sam.sampleAnalyte.groupId.length) {
+      if (sam.sampleAnalyte && sam.sampleAnalyte.groupId && sam.sampleAnalyte.groupId.length) {
         newSam.sampleAnalyte.groupId = sam.sampleAnalyte.groupId;
         newSam.sampleAnalyte.groupDescription = sam.sampleAnalyte.groupDescription;
       }
@@ -239,17 +239,12 @@ Sample.hot = {
         Hot.startData = [];
       }
     }
-    // if detailedSample is enabled, re-store the selected sampleClassId for this table
-    if (Hot.detailedSample) {
-      Sample.hot.sampleClassId = document.getElementById('classDropdown').value;
-      Sample.hot.dataSchema.sampleAdditionalInfo.sampleClassAlias = Hot.getAliasFromId(Sample.hot.sampleClassId, Hot.sampleOptions.sampleClassesDtos);
-    }
     
     // make the table
     var sampleCategory = null;
     if (Hot.detailedSample) {
-      sampleCategory = Sample.hot.getCategoryFromClassId(document.getElementById('classDropdown').value);
-      Sample.hot.dataSchema.scientificName = "Homo sapiens";
+      Sample.hot.sampleClassId = document.getElementById('classDropdown').value;
+      sampleCategory = Sample.hot.getCategoryFromClassId(Sample.hot.sampleClassId);
     }
     Sample.hot.makeHOT(null, sampleCategory);
     
@@ -349,7 +344,7 @@ Sample.hot = {
     description: null,
     receivedDate: null,
     identificationBarcode: null,
-    scientificName: this.sciName,
+    scientificName: null,
     sampleType: null,
     alias: null,
     qcPassed: '',
@@ -410,10 +405,14 @@ Sample.hot = {
   getDefaultDetailedValues: function () {
     var sampleClassAlias = Hot.getAliasFromId(Sample.hot.sampleClassId, Hot.sampleOptions.sampleClassesDtos);
     var rootSampleClassId = Sample.hot.getRootSampleClassId();
+    var sampleCategory = Sample.hot.getCategoryFromClassId(document.getElementById('classDropdown').value);
     return {
       'sampleAdditionalInfo': {
         'sampleClassAlias': sampleClassAlias,
         'parentSampleClassId': rootSampleClassId
+      },
+      'sampleAnalyte': {
+        'strStatus': sampleCategory === 'Analyte' ? 'Not Submitted' : null
       },
       'scientificName': Sample.hot.sciName
     };
@@ -565,7 +564,11 @@ Sample.hot = {
           data: 'description',
           type: 'text',
           validator: requiredText
-        },{
+        }
+      ];
+        
+      if (!detailedBool || idColBoolean) {
+        sampleCols.push({
           header: 'Date of receipt',
           data: 'receivedDate',
           type: 'date',
@@ -576,7 +579,11 @@ Sample.hot = {
           },
           allowEmpty: true,
           extraneous: true
-        },{
+        });
+      }
+      
+      sampleCols.push(
+        {
           header: 'Sample Type',
           data: 'sampleType',
           type: 'dropdown',
@@ -592,7 +599,7 @@ Sample.hot = {
           validator: requiredText,
           extraneous: true
         }
-      ];
+      );
       
       return sampleCols;
     }
@@ -946,8 +953,7 @@ Sample.hot = {
     sample.projectId = (parseInt(obj.projectId) || parseInt(document.getElementById('projectSelect').value));
     sample.scientificName = obj.scientificName;
     if (obj.receivedDate && obj.receivedDate.length) {
-      // the time string is added for detailedSample because the server is expecting a datetime value
-      sample.receivedDate = obj.receivedDate += "T00:00:00-05:00";
+      sample.receivedDate = obj.receivedDate;
     }
     
     // if it's a plain sample, return now.
