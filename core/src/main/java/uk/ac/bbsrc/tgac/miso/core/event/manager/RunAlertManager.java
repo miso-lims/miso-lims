@@ -133,6 +133,11 @@ public class RunAlertManager {
   public void update(Long runId) throws IOException {
     update(misoRequestManager.getRunById(runId));
   }
+  
+  public void updateQcs(Long runQcId) throws IOException {
+    Run run = misoRequestManager.getRunQCById(runQcId).getRun();
+    update(run);
+  }
 
   private void update(Run r) throws IOException {
     if (enabled) {
@@ -157,7 +162,7 @@ public class RunAlertManager {
             clonedQCs.put(qc.getId(), qc);
           }
           for (RunQC qc : r.getRunQCs()) {
-            if (!clonedQCs.containsKey(qc)) {
+            if (!clonedQCs.containsKey(qc.getId())) {
               try {
                 clone.addQc(partialCopy(qc));
               } catch (MalformedRunQcException e) {

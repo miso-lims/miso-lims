@@ -242,6 +242,10 @@
       <aop:pointcut id="runAlertPointcut"
         expression="execution(* uk.ac.bbsrc.tgac.miso.core.manager.RequestManager.saveRun(uk.ac.bbsrc.tgac.miso.core.data.Run))" />
       <aop:after-returning pointcut-ref="runAlertPointcut" method="update" returning="runId" />
+      
+      <aop:pointcut id="runQcAlertPointcut"
+        expression="execution(* uk.ac.bbsrc.tgac.miso.core.manager.RequestManager.saveRunQC(uk.ac.bbsrc.tgac.miso.core.data.RunQC))" />
+      <aop:after-returning pointcut-ref="runQcAlertPointcut" method="updateQcs" returning="runQcId" />
 
       <aop:pointcut id="runWatchPointcut"
         expression="execution(* uk.ac.bbsrc.tgac.miso.core.event.manager.WatchManager.watch(uk.ac.bbsrc.tgac.miso.core.data.Run,com.eaglegenomics.simlims.core.User)) and args(run,user)" />
