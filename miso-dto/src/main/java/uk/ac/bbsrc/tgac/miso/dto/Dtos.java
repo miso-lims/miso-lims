@@ -224,15 +224,6 @@ public class Dtos {
       throw new IllegalArgumentException();
     }
     dto.setSampleClassId(from.getSampleClass().getId());
-    if (from.getLab() != null) {
-      dto.setLabId(from.getLab().getId());
-    }
-    if (from.getTissueOrigin() != null) {
-      dto.setTissueOriginId(from.getTissueOrigin().getId());
-    }
-    if (from.getTissueType() != null) {
-      dto.setTissueTypeId(from.getTissueType().getId());
-    }
     if (from.getQcPassedDetail() != null) {
       dto.setQcPassedDetailId(from.getQcPassedDetail().getId());
     }
@@ -253,11 +244,7 @@ public class Dtos {
     if (from.getGroupDescription() != null) {
       dto.setGroupDescription(from.getGroupDescription());
     }
-    dto.setPassageNumber(from.getPassageNumber());
-    dto.setTimesReceived(from.getTimesReceived());
     dto.setConcentration(from.getConcentration());
-    dto.setExternalInstituteIdentifier(from.getExternalInstituteIdentifier());
-    dto.setTubeNumber(from.getTubeNumber());
     if (from.getParent() != null) {
       dto.setParentId(from.getParent().getId());
       dto.setParentAlias(from.getParent().getAlias());
@@ -277,21 +264,7 @@ public class Dtos {
     } else {
       to = new SampleAdditionalInfoImpl();
     }
-    to.setPassageNumber(from.getPassageNumber());
-    to.setTimesReceived(from.getTimesReceived());
-    to.setTubeNumber(from.getTubeNumber());
-    to.setExternalInstituteIdentifier(from.getExternalInstituteIdentifier());
     to.setConcentration(from.getConcentration());
-    if (from.getTissueOriginId() != null) {
-      TissueOrigin tissueOrigin = new TissueOriginImpl();
-      tissueOrigin.setId(from.getTissueOriginId());
-      to.setTissueOrigin(tissueOrigin);
-    }
-    if (from.getTissueTypeId() != null) {
-      TissueType tissueType = new TissueTypeImpl();
-      tissueType.setId(from.getTissueTypeId());
-      to.setTissueType(tissueType);
-    }
     if (from.getQcPassedDetailId() != null) {
       QcPassedDetail qcpassedDetail = new QcPassedDetailImpl();
       qcpassedDetail.setId(from.getQcPassedDetailId());
@@ -341,33 +314,13 @@ public class Dtos {
       parent = new SampleAdditionalInfoImpl();
       parent.setId(childDto.getParentId());
     } else if (childDto instanceof SampleIdentityDto && childDto.getClass() != SampleIdentityDto.class) {
-      Identity identity = new IdentityImpl();
-      identity.setExternalName(((SampleIdentityDto) childDto).getExternalName());
-      identity.setInternalName(((SampleIdentityDto) childDto).getInternalName());
-      String donorSex = ((SampleIdentityDto) childDto).getDonorSex();
-      if (!isStringEmptyOrNull(donorSex)) {
-        identity.setDonorSex(donorSex);
-      }
-      if (childDto.getParentSampleClassId() != null) {
+      // Case 2 or 3 require Identity details
+      Identity identity = toIdentitySample((SampleIdentityDto) childDto);
+      if (childDto instanceof SampleTissueDto && childDto.getParentSampleClassId() != null) {
         // Case 2
-        parent = new SampleTissueImpl();
+        parent = toTissueSample((SampleTissueDto) childDto);
         parent.setSampleClass(new SampleClassImpl());
         parent.getSampleClass().setId(childDto.getParentSampleClassId());
-        if (childDto.getTissueOriginId() != null) {
-          // TODO: this can use toTissueSample once the below fields have been moved into SampleTissue
-          parent.setTissueOrigin(new TissueOriginImpl());
-          parent.getTissueOrigin().setId(childDto.getTissueOriginId());
-          parent.setTissueType(new TissueTypeImpl());
-          parent.getTissueType().setId(childDto.getTissueTypeId());
-          parent.setTimesReceived(childDto.getTimesReceived());
-          parent.setTubeNumber(childDto.getTubeNumber());
-          parent.setPassageNumber(childDto.getPassageNumber());
-          parent.setExternalInstituteIdentifier(childDto.getExternalInstituteIdentifier());
-          if (childDto.getLabId() != null) {
-            parent.setLab(new LabImpl());
-            parent.getLab().setId(childDto.getLabId());
-          }
-        }
         parent.setParent(identity);
       } else {
         // Case 3
@@ -715,12 +668,39 @@ public class Dtos {
 
   private static SampleTissueDto asTissueSampleDto(SampleTissue from) {
     SampleTissueDto dto = new SampleTissueDto();
+    if (from.getLab() != null) {
+      dto.setLabId(from.getLab().getId());
+    }
+    if (from.getTissueOrigin() != null) {
+      dto.setTissueOriginId(from.getTissueOrigin().getId());
+    }
+    if (from.getTissueType() != null) {
+      dto.setTissueTypeId(from.getTissueType().getId());
+    }
+    dto.setPassageNumber(from.getPassageNumber());
+    dto.setTimesReceived(from.getTimesReceived());
+    dto.setExternalInstituteIdentifier(from.getExternalInstituteIdentifier());
+    dto.setTubeNumber(from.getTubeNumber());
     dto.setCellularity(from.getCellularity());
     return dto;
   }
 
   private static SampleTissue toTissueSample(SampleTissueDto from) {
     SampleTissue to = new SampleTissueImpl();
+    to.setPassageNumber(from.getPassageNumber());
+    to.setTimesReceived(from.getTimesReceived());
+    to.setTubeNumber(from.getTubeNumber());
+    to.setExternalInstituteIdentifier(from.getExternalInstituteIdentifier());
+    if (from.getTissueOriginId() != null) {
+      TissueOrigin tissueOrigin = new TissueOriginImpl();
+      tissueOrigin.setId(from.getTissueOriginId());
+      to.setTissueOrigin(tissueOrigin);
+    }
+    if (from.getTissueTypeId() != null) {
+      TissueType tissueType = new TissueTypeImpl();
+      tissueType.setId(from.getTissueTypeId());
+      to.setTissueType(tissueType);
+    }
     to.setCellularity(from.getCellularity());
     return to;
   }
@@ -763,8 +743,6 @@ public class Dtos {
     LibraryAdditionalInfoDto dto = new LibraryAdditionalInfoDto();
     dto.setLibraryId(from.getLibraryId());
     dto.setLibraryId(from.getLibrary().getId());
-    dto.setTissueOrigin(asDto(from.getTissueOrigin()));
-    dto.setTissueType(asDto(from.getTissueType()));
     if (from.getGroupId() != null) {
       dto.setGroupId(from.getGroupId());
     }
@@ -796,8 +774,6 @@ public class Dtos {
   public static LibraryAdditionalInfo to(LibraryAdditionalInfoDto from) {
     LibraryAdditionalInfo to = new LibraryAdditionalInfoImpl();
     to.setLibraryId(from.getLibraryId());
-    to.setTissueOrigin(to(from.getTissueOrigin()));
-    to.setTissueType(to(from.getTissueType()));
     if (from.getGroupId() != null) {
       to.setGroupId(from.getGroupId());
       to.setGroupDescription(from.getGroupDescription());

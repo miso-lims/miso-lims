@@ -14,22 +14,13 @@ public class SampleAdditionalInfoDto extends SampleDto {
   private Long parentSampleClassId;
   private Long sampleClassId;
   private String sampleClassUrl;
-  private Long tissueOriginId;
-  private String tissueOriginUrl;
-  private Long tissueTypeId;
-  private String tissueTypeUrl;
   private Long qcPassedDetailId;
   private String qcPassedDetailUrl;
   private Long subprojectId;
   private String subprojectUrl;
   private Long prepKitId;
   private String prepKitUrl;
-  private Integer passageNumber;
-  private Integer timesReceived;
-  private Integer tubeNumber;
   private Double concentration;
-  private String externalInstituteIdentifier;
-  private Long labId;
   private String labUrl;
   private Long groupId;
   private String groupDescription;
@@ -66,38 +57,6 @@ public class SampleAdditionalInfoDto extends SampleDto {
     this.parentSampleClassId = parentSampleClassId;
   }
 
-  public Long getTissueOriginId() {
-    return tissueOriginId;
-  }
-
-  public void setTissueOriginId(Long tissueOriginId) {
-    this.tissueOriginId = tissueOriginId;
-  }
-
-  public String getTissueOriginUrl() {
-    return tissueOriginUrl;
-  }
-
-  public void setTissueOriginUrl(String tissueOriginUrl) {
-    this.tissueOriginUrl = tissueOriginUrl;
-  }
-
-  public Long getTissueTypeId() {
-    return tissueTypeId;
-  }
-
-  public void setTissueTypeId(Long tissueTypeId) {
-    this.tissueTypeId = tissueTypeId;
-  }
-
-  public String getTissueTypeUrl() {
-    return tissueTypeUrl;
-  }
-
-  public void setTissueTypeUrl(String tissueTypeUrl) {
-    this.tissueTypeUrl = tissueTypeUrl;
-  }
-
   public Long getQcPassedDetailId() {
     return qcPassedDetailId;
   }
@@ -128,30 +87,6 @@ public class SampleAdditionalInfoDto extends SampleDto {
 
   public void setSubprojectUrl(String subprojectUrl) {
     this.subprojectUrl = subprojectUrl;
-  }
-
-  public Integer getPassageNumber() {
-    return passageNumber;
-  }
-
-  public void setPassageNumber(Integer passageNumber) {
-    this.passageNumber = passageNumber;
-  }
-
-  public Integer getTimesReceived() {
-    return timesReceived;
-  }
-
-  public void setTimesReceived(Integer timesReceived) {
-    this.timesReceived = timesReceived;
-  }
-
-  public Integer getTubeNumber() {
-    return tubeNumber;
-  }
-
-  public void setTubeNumber(Integer tubeNumber) {
-    this.tubeNumber = tubeNumber;
   }
 
   public Double getConcentration() {
@@ -194,22 +129,6 @@ public class SampleAdditionalInfoDto extends SampleDto {
     this.prepKitUrl = prepKitUrl;
   }
 
-  public String getExternalInstituteIdentifier() {
-    return externalInstituteIdentifier;
-  }
-
-  public void setExternalInstituteIdentifier(String externalInstituteIdentifier) {
-    this.externalInstituteIdentifier = externalInstituteIdentifier;
-  }
-
-  public Long getLabId() {
-    return labId;
-  }
-
-  public void setLabId(Long labId) {
-    this.labId = labId;
-  }
-
   public String getLabUrl() {
     return labUrl;
   }
@@ -241,13 +160,6 @@ public class SampleAdditionalInfoDto extends SampleDto {
       setSampleClassUrl(
           UriComponentsBuilder.fromUri(baseUri).path("/rest/sampleclass/{id}").buildAndExpand(getSampleClassId()).toUriString());
     }
-    if (getTissueOriginId() != null) {
-      setTissueOriginUrl(
-          UriComponentsBuilder.fromUri(baseUri).path("/rest/tissueorigin/{id}").buildAndExpand(getTissueOriginId()).toUriString());
-    }
-    if (getTissueTypeId() != null) {
-      setTissueTypeUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/tissuetype/{id}").buildAndExpand(getTissueTypeId()).toUriString());
-    }
     if (getQcPassedDetailId() != null) {
       setQcPassedDetailUrl(
           UriComponentsBuilder.fromUri(baseUri).path("/rest/qcpasseddetail/{id}").buildAndExpand(getQcPassedDetailId()).toUriString());
@@ -265,14 +177,16 @@ public class SampleAdditionalInfoDto extends SampleDto {
 
   @Override
   public String toString() {
-    return "SampleAdditionalInfoDto [parentId=" + parentId + ", parentUrl=" + parentUrl + ", parentAlias=" + parentAlias
-        + ", parentSampleClassId=" + parentSampleClassId + ", sampleClassId=" + sampleClassId + ", sampleClassUrl=" + sampleClassUrl
-        + ", tissueOriginId=" + tissueOriginId + ", tissueOriginUrl=" + tissueOriginUrl + ", tissueTypeId=" + tissueTypeId
-        + ", tissueTypeUrl=" + tissueTypeUrl + ", qcPassedDetailId=" + qcPassedDetailId + ", qcPassedDetailUrl=" + qcPassedDetailUrl
-        + ", subprojectId=" + subprojectId + ", subprojectUrl=" + subprojectUrl + ", prepKitId=" + prepKitId + ", prepKitUrl=" + prepKitUrl
-        + ", passageNumber=" + passageNumber + ", timesReceived=" + timesReceived + ", tubeNumber=" + tubeNumber + ", concentration="
-        + concentration + ", externalInstituteIdentifier=" + externalInstituteIdentifier + ", labId=" + labId + ", labUrl=" + labUrl
-        + ", groupId=" + groupId + ", groupDescription=" + groupDescription + "]";
+    return "SampleAdditionalInfoDto [parentId=" + parentId + ", parentUrl="
+        + parentUrl + ", parentAlias=" + parentAlias + ", parentSampleClassId="
+        + parentSampleClassId + ", sampleClassId=" + sampleClassId
+        + ", sampleClassUrl=" + sampleClassUrl + ", qcPassedDetailId="
+        + qcPassedDetailId + ", qcPassedDetailUrl=" + qcPassedDetailUrl
+        + ", subprojectId=" + subprojectId + ", subprojectUrl=" + subprojectUrl
+        + ", prepKitId=" + prepKitId + ", prepKitUrl=" + prepKitUrl
+        + ", concentration=" + concentration + ", labUrl=" + labUrl
+        + ", groupId=" + groupId + ", groupDescription=" + groupDescription
+        + ", super=" + super.toString() + "]";
   }
 
 }

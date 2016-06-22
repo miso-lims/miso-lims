@@ -44,4 +44,11 @@ public class SampleIdentityDto extends SampleAdditionalInfoDto {
     this.donorSex = donorSex;
   }
 
+  @Override
+  public String toString() {
+    return "SampleIdentityDto [internalName=" + internalName
+        + ", externalName=" + externalName + ", donorSex=" + donorSex
+        + ", super=" + super.toString() + "]";
+  }
+
 }

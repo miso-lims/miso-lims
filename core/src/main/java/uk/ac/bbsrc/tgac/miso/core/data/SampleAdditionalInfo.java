@@ -21,29 +21,9 @@ public interface SampleAdditionalInfo extends Sample {
 
   void setSampleClass(SampleClass sampleClass);
 
-  TissueOrigin getTissueOrigin();
-
-  void setTissueOrigin(TissueOrigin tissueOrigin);
-
-  TissueType getTissueType();
-
-  void setTissueType(TissueType tissueType);
-
   Subproject getSubproject();
 
   void setSubproject(Subproject subproject);
-
-  Integer getPassageNumber();
-
-  void setPassageNumber(Integer passageNumber);
-
-  Integer getTimesReceived();
-
-  void setTimesReceived(Integer timesReceived);
-
-  Integer getTubeNumber();
-
-  void setTubeNumber(Integer tubeNumber);
 
   Double getConcentration();
 
@@ -60,22 +40,6 @@ public interface SampleAdditionalInfo extends Sample {
   KitDescriptor getPrepKit();
 
   void setPrepKit(KitDescriptor prepKit);
-
-  /**
-   * @return the sample's identifying name or ID at the source Institute
-   */
-  String getExternalInstituteIdentifier();
-
-  /**
-   * Sets the sample's identifying name or ID at the source Institute
-   * 
-   * @param externalInstituteIdentifier
-   */
-  void setExternalInstituteIdentifier(String externalInstituteIdentifier);
-
-  Lab getLab();
-
-  void setLab(Lab lab);
 
   /**
    * This method should ONLY be used for load/save coordination between the Hibernate and old SQL DAOs. For all other purposes, use

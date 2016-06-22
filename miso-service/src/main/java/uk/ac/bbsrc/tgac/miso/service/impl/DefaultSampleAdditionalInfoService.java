@@ -108,12 +108,8 @@ public class DefaultSampleAdditionalInfoService implements SampleAdditionalInfoS
 
   @Override
   public void applyChanges(SampleAdditionalInfo target, SampleAdditionalInfo source) throws IOException {
-    target.setPassageNumber(source.getPassageNumber());
-    target.setTimesReceived(source.getTimesReceived());
-    target.setTubeNumber(source.getTubeNumber());
     target.setConcentration(source.getConcentration());
     target.setArchived(source.getArchived());
-    target.setExternalInstituteIdentifier(source.getExternalInstituteIdentifier());
     target.setGroupDescription(source.getGroupDescription());
     target.setGroupId(source.getGroupId());
     loadMembers(target, source);
@@ -126,14 +122,6 @@ public class DefaultSampleAdditionalInfoService implements SampleAdditionalInfoS
 
   @Override
   public void loadMembers(SampleAdditionalInfo target, SampleAdditionalInfo source) throws IOException {
-    if (source.getTissueOrigin() != null) {
-      target.setTissueOrigin(tissueOriginDao.getTissueOrigin(source.getTissueOrigin().getId()));
-      ServiceUtils.throwIfNull(target.getTissueOrigin(), "SampleAdditionalInfo.tissueOriginId", source.getTissueOrigin().getId());
-    }
-    if (source.getTissueType() != null) {
-      target.setTissueType(tissueTypeDao.getTissueType(source.getTissueType().getId()));
-      ServiceUtils.throwIfNull(target.getTissueType(), "SampleAdditionalInfo.tissueTypeId", source.getTissueType().getId());
-    }
     if (source.getQcPassedDetail() != null) {
       target.setQcPassedDetail(qcPassedDetailDao.getQcPassedDetails(source.getQcPassedDetail().getId()));
       ServiceUtils.throwIfNull(target.getQcPassedDetail(), "SampleAdditionalInfo.qcPassedDetailId", source.getQcPassedDetail().getId());
@@ -145,10 +133,6 @@ public class DefaultSampleAdditionalInfoService implements SampleAdditionalInfoS
     if (source.getSampleClass() != null) {
       target.setSampleClass(sampleClassDao.getSampleClass(source.getSampleClass().getId()));
       ServiceUtils.throwIfNull(target.getSampleClass(), "SampleAdditionalInfo.sampleClassId", source.getSampleClass().getId());
-    }
-    if (source.getLab() != null) {
-      target.setLab(labService.get(source.getLab().getId()));
-      ServiceUtils.throwIfNull(target.getLab(), "sampleAdditionalInfo.labId", source.getLab().getId());
     }
   }
 
