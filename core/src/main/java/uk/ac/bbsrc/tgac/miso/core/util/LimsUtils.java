@@ -91,6 +91,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAnalyte;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
@@ -894,11 +895,9 @@ public class LimsUtils {
     return sample instanceof SampleTissue;
   }
   
-  public static boolean isTissueProcessing(Sample sample) {
+  public static boolean isTissueProcessingSample(Sample sample) {
     if (!isDetailedSample(sample)) return false;
-    // There is no table/subclass for TissueProcessing currently, so a DetailedSample that isn't in any other
-    // category is assumed to be a TissueProcessing
-    return !(sample instanceof Identity || sample instanceof SampleTissue || sample instanceof SampleAnalyte);
+    return sample instanceof SampleTissueProcessing;
   }
   
   public static boolean isAnalyteSample(Sample sample) {

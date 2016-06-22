@@ -21,14 +21,16 @@ import uk.ac.bbsrc.tgac.miso.core.data.QcPassedDetail;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAnalyte;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleCVSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleLCMTube;
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
-import uk.ac.bbsrc.tgac.miso.core.data.TissueProcessingSample;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
@@ -36,7 +38,8 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleQcException;
 import uk.ac.bbsrc.tgac.miso.core.exception.ReportingException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
-public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAnalyte, SampleTissue, Identity {
+public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAnalyte, SampleTissue,
+  SampleTissueProcessing, SampleCVSlide, SampleLCMTube, Identity {
 
   @SuppressWarnings("unused")
   private static final long serialVersionUID = 1L;
@@ -89,6 +92,14 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAnalyt
   private Integer timesReceived;
   private Integer tubeNumber;
   
+  // TissueProcessingSample attributes
+  // CV Slide
+  private Integer cuts;
+  private Integer discards;
+  private Integer thickness;
+  // LCM Tube
+  private Integer cutsConsumed;
+
   // AnalyteSample attributes
   private SamplePurpose samplePurpose;
   private TissueMaterial tissueMaterial;
@@ -524,6 +535,51 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAnalyt
   }
 
   @Override
+  public Integer getCuts() {
+    return cuts;
+  }
+
+  @Override
+  public void setCuts(Integer cuts) {
+    this.cuts = cuts;
+  }
+
+  @Override
+  public Integer getCutsRemaining() {
+    throw new UnsupportedOperationException("Method not implemented on builder");
+  }
+
+  @Override
+  public Integer getDiscards() {
+    return discards;
+  }
+
+  @Override
+  public void setDiscards(Integer discards) {
+    this.discards = discards;
+  }
+
+  @Override
+  public Integer getThickness() {
+    return thickness;
+  }
+
+  @Override
+  public void setThickness(Integer thickness) {
+    this.thickness = thickness;
+  }
+
+  @Override
+  public Integer getCutsConsumed() {
+    return cutsConsumed;
+  }
+
+  @Override
+  public void setCutsConsumed(Integer cutsConsumed) {
+    this.cutsConsumed = cutsConsumed;
+  }
+
+  @Override
   public SamplePurpose getSamplePurpose() {
     return samplePurpose;
   }
@@ -751,10 +807,21 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAnalyt
     case SampleTissue.CATEGORY_NAME:
       sample = buildTissue();
       break;
-    case TissueProcessingSample.CATEGORY_NAME:
-      // no subclass or additional attributes required
-      SampleAdditionalInfo processing = new SampleAdditionalInfoImpl();
-      sample = processing;
+    case SampleTissueProcessing.CATEGORY_NAME:
+      if (sampleClass.getAlias() == SampleCVSlide.SAMPLE_CLASS_NAME) {
+        SampleCVSlide cvSlide = new SampleCVSlideImpl();
+        cvSlide.setCuts(cuts);
+        cvSlide.setDiscards(discards);
+        cvSlide.setThickness(thickness);
+        sample = cvSlide;
+      } else if (sampleClass.getAlias() == SampleLCMTube.SAMPLE_CLASS_NAME) {
+        SampleLCMTube lcmTube = new SampleLCMTubeImpl();
+        lcmTube.setCutsConsumed(cutsConsumed);
+        sample = lcmTube;
+      } else {
+        SampleTissueProcessing processing = new SampleTissueProcessingImpl();
+        sample = processing;
+      }
       break;
     case SampleAnalyte.CATEGORY_NAME:
       SampleAnalyte analyte = new SampleAnalyteImpl();
