@@ -72,6 +72,16 @@ public interface Project extends com.eaglegenomics.simlims.core.Project, Compara
   void setAlias(String alias);
 
   /**
+   * Returns the short name, used as a prefix for generating sample names, or the alias if not specified.
+   */
+  String getShortName();
+
+  /**
+   * Sets the short name, used as a prefix for generating sample names.
+   */
+  void setShortName(String shortName);
+
+  /**
    * Returns the progress of this Project object.
    * 
    * @return ProgressType progress.
