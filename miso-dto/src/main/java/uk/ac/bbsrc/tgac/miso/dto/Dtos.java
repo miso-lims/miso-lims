@@ -29,11 +29,14 @@ import uk.ac.bbsrc.tgac.miso.core.data.QcPassedDetail;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAnalyte;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleCVSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleGroupId;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleLCMTube;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleNumberPerProject;
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
@@ -52,12 +55,15 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.QcPassedDetailImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAdditionalInfoImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAnalyteImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleCVSlideImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleGroupImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleLCMTubeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleNumberPerProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SamplePurposeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueProcessingImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleValidRelationshipImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl;
@@ -227,6 +233,8 @@ public class Dtos {
       dto = asIdentitySampleDto((Identity) from);
     } else if (isTissueSample(from)) {
       dto = asTissueSampleDto((SampleTissue) from);
+    } else if (isTissueProcessingSample(from)){
+      dto = asTissueProcessingSampleDto((SampleTissueProcessing) from);
     } else if (isAnalyteSample(from)) {
       dto = asAnalyteSampleDto((SampleAnalyte) from);
     } else {
@@ -254,11 +262,6 @@ public class Dtos {
       dto.setGroupDescription(from.getGroupDescription());
     }
     dto.setConcentration(from.getConcentration());
-    if (from.getParent() != null) {
-      dto.setParentId(from.getParent().getId());
-      dto.setParentAlias(from.getParent().getAlias());
-      dto.setParentSampleClassId(from.getSampleClass().getId());
-    }
     return dto;
   }
 
@@ -268,6 +271,8 @@ public class Dtos {
       to = toIdentitySample((SampleIdentityDto) from);
     } else if (from.getClass() == SampleTissueDto.class) {
       to = toTissueSample((SampleTissueDto) from);
+    } else if (from instanceof SampleTissueProcessingDto) {
+      to = toTissueProcessingSample((SampleTissueProcessingDto) from);
     } else if (from.getClass() == SampleAnalyteDto.class) {
       to = toAnalyteSample((SampleAnalyteDto) from);
     } else {
@@ -711,6 +716,60 @@ public class Dtos {
       to.setTissueType(tissueType);
     }
     to.setCellularity(from.getCellularity());
+    return to;
+  }
+
+  private static SampleTissueProcessingDto asTissueProcessingSampleDto(SampleTissueProcessing from) {
+    SampleTissueProcessingDto dto = null;
+    if (from instanceof SampleCVSlideImpl) {
+      dto = asCVSlideSampleDto((SampleCVSlide) from);
+    } else if (from.getClass() == SampleLCMTubeImpl.class) {
+      dto = asLCMTubeSampleDto((SampleLCMTube) from);
+    } else {
+      dto = new SampleTissueProcessingDto();
+    }
+    return dto;
+  }
+
+  private static SampleTissueProcessing toTissueProcessingSample(SampleTissueProcessingDto from) {
+    SampleTissueProcessing to = null;
+    if (from.getClass() == SampleCVSlideDto.class) {
+      to = toCVSlideSample((SampleCVSlideDto) from);
+    } else if (from.getClass() == SampleLCMTubeDto.class) {
+      to = toLCMTubeSample((SampleLCMTubeDto) from);
+    } else {
+      to = new SampleTissueProcessingImpl();
+    }
+    return to;
+  }
+
+  private static SampleCVSlideDto asCVSlideSampleDto(SampleCVSlide from) {
+    SampleCVSlideDto dto = new SampleCVSlideDto();
+    dto.setCuts(from.getCuts());
+    dto.setDiscards(from.getDiscards());
+    dto.setCutsRemaining(from.getCutsRemaining());
+    dto.setThickness(from.getThickness());
+    return dto;
+  }
+
+  private static SampleCVSlide toCVSlideSample(SampleCVSlideDto from) {
+    SampleCVSlide to = new SampleCVSlideImpl();
+    to.setCuts(from.getCuts());
+    to.setDiscards(from.getDiscards());
+    to.setThickness(from.getThickness());
+    return to;
+  }
+
+
+  private static SampleLCMTubeDto asLCMTubeSampleDto(SampleLCMTube from) {
+    SampleLCMTubeDto dto = new SampleLCMTubeDto();
+    dto.setCutsConsumed(from.getCutsConsumed());
+    return dto;
+  }
+
+  private static SampleLCMTube toLCMTubeSample(SampleLCMTubeDto from) {
+    SampleLCMTube to = new SampleLCMTubeImpl();
+    to.setCutsConsumed(from.getCutsConsumed());
     return to;
   }
 

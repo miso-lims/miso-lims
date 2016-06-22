@@ -162,7 +162,35 @@ var Sample = Sample || {
       
       var selectedId = jQuery('#sampleClass').is('select') ? jQuery('#sampleClass option:selected').val() : jQuery('#sampleClass').val();
       var sampleCategory = Sample.options.getSampleCategoryByClassId(selectedId);
-      if (sampleCategory === 'Analyte') {
+      // assign sample class alias based on whether text or dropdown menu are present
+      var sampleClassAlias = '';
+      if (jQuery('#sampleClassAlias')) sampleClassAlias = jQuery('#samplClassAlias');
+      if (jQuery('#sampleClass').children(':selected').text()) sampleClassAlias = jQuery('#sampleClass').children(':selected').text();
+      switch (sampleCategory) {
+      case 'Tissue Processing':
+        switch (sampleClassAlias) {
+        case 'CV Slide':
+          // Cuts validation
+          jQuery('#cuts').attr('class', 'form-control');
+          jQuery('#cuts').attr('data-parsley-type', 'digits');
+          jQuery('#cuts').attr('data-parsley-required', 'true');
+
+          // Discards validation
+          jQuery('#discards').attr('class', 'form-control');
+          jQuery('#discards').attr('data-parsley-type', 'digits');
+          jQuery('#discards').attr('data-parsley-required', 'true');
+
+          // Thickness validation
+          jQuery('#thickness').attr('class', 'form-control');
+          jQuery('#thickness').attr('data-parsley-type', 'number');
+          break;
+        case 'LCM Tube':
+          jQuery('#cutsConsumed').attr('class', 'form-control');
+          jQuery('#cutsConsumed').attr('data-parsley-type', 'digits');
+          break;
+        }
+        break;
+      case 'Analyte':
         // Region validation
         jQuery('#region').attr('class', 'form-control');
         jQuery('#region').attr('data-parsley-maxlength', '255');
@@ -176,6 +204,7 @@ var Sample = Sample || {
         // TissueClass validation
         jQuery('#tissueClass').attr('class', 'form-control');
         jQuery('#tissueClass').attr('data-parsley-required', 'true');
+        break;
       }
     }
     
@@ -695,6 +724,9 @@ Sample.ui = {
     return jQuery('#subProject option:selected').val() || jQuery('#subProject').val();
   },
   
+  /**
+   * Update display when user selects different sample classes during new sample receipt
+   */
   sampleClassChanged: function() {
     var selectedId = jQuery('#sampleClass option:selected').val();
     var sampleCategory = Sample.options.getSampleCategoryByClassId(selectedId);
@@ -713,13 +745,15 @@ Sample.ui = {
     jQuery('#detailedSampleAnalyte').find(':input').each(function() {
       jQuery(this).val('');
     });
+    Sample.ui.hideTissueProcessingFields();
     jQuery('#detailedSampleAnalyte').hide();
     jQuery('#tissueClassRow').hide();
     jQuery('#tissueClass').val('');
     jQuery('#detailedSampleTissue').show();
   },
-  
+
   setUpForAnalyte: function() {
+    Sample.ui.hideTissueProcessingFields();
     jQuery('#tissueClassRow').show();
     jQuery('#detailedSampleAnalyte').show();
   },
@@ -1136,7 +1170,6 @@ Sample.ui = {
     window.location="sample/bulk/edit/" + selectedIdsArray.join(',');
   },
 
-  // TODO: fix this up to work with plain samples
   // TODO: add some logic in here for SampleValidRelationships
   propagateSamSelectedItems: function () {
     var selectedClassId = document.getElementById('classDropdown').value;

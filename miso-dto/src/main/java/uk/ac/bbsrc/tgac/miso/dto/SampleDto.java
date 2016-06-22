@@ -10,13 +10,19 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAnalyte;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleCVSlide;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleLCMTube;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes({ @JsonSubTypes.Type(value = SampleAnalyteDto.class, name = SampleAnalyte.CATEGORY_NAME),
     @JsonSubTypes.Type(value = SampleIdentityDto.class, name = Identity.CATEGORY_NAME),
     @JsonSubTypes.Type(value = SampleTissueDto.class, name = SampleTissue.CATEGORY_NAME),
+    @JsonSubTypes.Type(value = SampleTissueProcessingDto.class, name = SampleTissueProcessing.CATEGORY_NAME),
+    @JsonSubTypes.Type(value = SampleCVSlideDto.class, name = SampleCVSlide.SAMPLE_CLASS_NAME),
+    @JsonSubTypes.Type(value = SampleLCMTubeDto.class, name = SampleLCMTube.SAMPLE_CLASS_NAME),
     @JsonSubTypes.Type(value = SampleDto.class, name = "Plain") })
 @JsonTypeName(value = "Plain")
 public class SampleDto {

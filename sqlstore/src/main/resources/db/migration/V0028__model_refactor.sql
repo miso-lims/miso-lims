@@ -81,3 +81,23 @@ ALTER TABLE LibraryAdditionalInfo DROP FOREIGN KEY libraryAdditionalInfo_tissueO
 ALTER TABLE LibraryAdditionalInfo DROP FOREIGN KEY libraryAdditionalInfo_tissueType_fkey;
 ALTER TABLE LibraryAdditionalInfo DROP COLUMN tissueOriginId;
 ALTER TABLE LibraryAdditionalInfo DROP COLUMN tissueTypeId;
+
+CREATE TABLE `SampleTissueProcessing` (
+    `sampleId` bigint(20) PRIMARY KEY,
+    CONSTRAINT `sampleTP_sample_fkey` FOREIGN KEY (`sampleId`) REFERENCES `Sample` (`sampleId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `SampleCVSlide` (
+    `sampleId` bigint(20) PRIMARY KEY,
+    `cuts` int NOT NULL DEFAULT 0,
+    `discards` int DEFAULT 0,
+    `thickness` int,
+    CONSTRAINT `sampleCVSlide_sample_fkey` FOREIGN KEY (`sampleId`) REFERENCES `Sample` (`sampleId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `SampleLCMTube` (
+    `sampleId` bigint(20) PRIMARY KEY,
+    `cutsConsumed` int NOT NULL DEFAULT 0,
+    CONSTRAINT `sampleLCMTube_sample_fkey` FOREIGN KEY (`sampleId`) REFERENCES `Sample` (`sampleId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
