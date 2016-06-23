@@ -207,7 +207,7 @@ var Hot = {
     errorMessages.innerHTML = '<ul>' + ary.join('') + '</ul>';
     document.getElementById('saveErrors').classList.remove('hidden');
     Hot.hotTable.validateCells();
-    for (var j = 0; j < Hot.failedComplexValidation.length; i++) {
+    for (var j = 0; j < Hot.failedComplexValidation.length; j++) {
       var failedIndices = Hot.failedComplexValidation[j];
       Hot.markCellsInvalid(failedIndices[0], failedIndices[1]);
     }
