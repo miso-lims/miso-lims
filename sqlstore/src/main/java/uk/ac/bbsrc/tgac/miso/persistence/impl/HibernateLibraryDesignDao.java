@@ -27,6 +27,10 @@ public class HibernateLibraryDesignDao implements LibraryDesignDao {
   private Session currentSession() {
     return sessionFactory.getCurrentSession();
   }
+  
+  public void setSessionFactory(SessionFactory sessionFactory) {
+    this.sessionFactory = sessionFactory;
+  }
 
   @Override
   public List<LibraryDesign> getLibraryDesignByClass(SampleClass sampleClass) {
@@ -41,6 +45,14 @@ public class HibernateLibraryDesignDao implements LibraryDesignDao {
   @Override
   public LibraryDesign getLibraryDesign(Long id) {
     return (LibraryDesign) currentSession().get(LibraryDesign.class, id);
+  }
+
+  @Override
+  public List<LibraryDesign> getLibraryDesigns() {
+    Query query = currentSession().createQuery("from LibraryDesign");
+    @SuppressWarnings("unchecked")
+    List<LibraryDesign> libraryDesigns = query.list();
+    return libraryDesigns;
   }
 
 }

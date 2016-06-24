@@ -6,7 +6,7 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({ HibernateInstituteDaoTest.class, HibernateLabDaoTest.class, HibernateIdentityDaoTest.class,
     HibernateSampleDaoTest.class, HibernateSampleNumberPerProjectDaoTest.class, HibernateLibraryAdditionalInfoDaoTest.class,
-    HiberateTagBarcodeStrategyDaoTest.class })
+    HibernateLibraryDesignDaoTest.class, HiberateTagBarcodeDaoTest.class })
 
 public class AllTestsSuite {
 }

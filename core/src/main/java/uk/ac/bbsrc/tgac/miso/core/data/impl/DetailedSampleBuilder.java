@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Set;
@@ -65,6 +66,7 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAliquo
   private Double volume;
   private boolean emptied = false;
   private boolean isSynthetic = false;
+  private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
   // DetailedSample attributes
   private SampleAdditionalInfo parent;
@@ -76,6 +78,7 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAliquo
   private Boolean archived = Boolean.FALSE;
   private Long groupId;
   private String groupDescription;
+  private Integer siblingNumber;
 
   // Identity attributes
   private String internalName;
@@ -468,12 +471,12 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAliquo
 
   @Override
   public Integer getSiblingNumber() {
-    throw new UnsupportedOperationException("Method not implemented on builder");
+    return siblingNumber;
   }
 
   @Override
   public void setSiblingNumber(Integer siblingNumber) {
-    throw new UnsupportedOperationException("Method not implemented on builder");
+    this.siblingNumber = siblingNumber;
   }
 
   @Override
@@ -613,7 +616,7 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAliquo
 
   @Override
   public Collection<ChangeLog> getChangeLog() {
-    throw new UnsupportedOperationException("Method not implemented on builder");
+    return changeLog;
   }
 
   @Override
@@ -871,6 +874,7 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAliquo
     sample.setLastModifier(lastModifier);
     sample.setVolume(volume);
     sample.setEmpty(emptied);
+    sample.getChangeLog().addAll(changeLog);
 
     sample.setSampleClass(sampleClass);
     sample.setQcPassedDetail(qcPassedDetail);
@@ -880,6 +884,7 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAliquo
     sample.setGroupId(groupId);
     sample.setGroupDescription(groupDescription);
     sample.setSynthetic(isSynthetic);
+    sample.setSiblingNumber(siblingNumber);
 
     return sample;
   }

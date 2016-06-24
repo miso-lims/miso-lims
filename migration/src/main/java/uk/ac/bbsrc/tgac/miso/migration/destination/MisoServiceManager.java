@@ -39,6 +39,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateIdentityDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateInstituteDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLabDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryAdditionalInfoDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDesignDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateQcPassedDetailDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleAdditionalInfoDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleDao;
@@ -47,6 +48,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSamplePurposeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleTissueDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleValidRelationshipDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSubprojectDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTagBarcodeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueMaterialDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueOriginDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueTypeDao;
@@ -150,6 +152,8 @@ public class MisoServiceManager {
   private HibernateSampleNumberPerProjectDao sampleNumberPerProjectDao;
   private HibernateSampleValidRelationshipDao sampleValidRelationshipDao;
   private HibernateLibraryAdditionalInfoDao libraryAdditionalInfoDao;
+  private HibernateLibraryDesignDao libraryDesignDao;
+  private HibernateTagBarcodeDao tagBarcodeDao;
 
   /**
    * Constructs a new MisoServiceManager with no services initialized
@@ -226,6 +230,8 @@ public class MisoServiceManager {
     m.setDefaultTissueOriginDao();
     m.setDefaultTissueTypeDao();
     m.setDefaultWatcherDao();
+    m.setDefaultLibraryDesignDao();
+    m.setDefaultTagBarcodeDao();
 
     User migrationUser = m.getsecurityStore().getUserByLoginName(username);
     if (migrationUser == null) throw new IllegalArgumentException("User '" + username + "' not found");
@@ -498,6 +504,7 @@ public class MisoServiceManager {
     svc.setTissueOriginDao(tissueOriginDao);
     svc.setTissueTypeDao(tissueTypeDao);
     svc.setSampleDao(sampleDao);
+    svc.setLabService(labService);
     setSampleService(svc);
   }
 
@@ -640,6 +647,7 @@ public class MisoServiceManager {
     dao.setSecurityDAO(securityStore);
     dao.setSecurityProfileDAO(securityProfileDao);
     dao.setLibraryAdditionalInfoDao(libraryAdditionalInfoDao);
+    dao.setTagBarcodeStore(tagBarcodeDao);
     setLibraryDao(dao);
   }
 
@@ -1422,8 +1430,46 @@ public class MisoServiceManager {
     setLibraryAdditionalInfoDao(dao);
   }
 
-  public void updateLibraryAdditionalInfoDaoDependencies() {
+  private void updateLibraryAdditionalInfoDaoDependencies() {
     if (libraryDao != null) libraryDao.setLibraryAdditionalInfoDao(libraryAdditionalInfoDao);
+  }
+  
+  public HibernateLibraryDesignDao getLibraryDesignDao() {
+    return libraryDesignDao;
+  }
+  
+  public void setLibraryDesignDao(HibernateLibraryDesignDao libraryDesignDao) {
+    this.libraryDesignDao = libraryDesignDao;
+    updateLibraryDesignDaoDependencies();
+  }
+  
+  public void setDefaultLibraryDesignDao() {
+    HibernateLibraryDesignDao dao = new HibernateLibraryDesignDao();
+    dao.setSessionFactory(sessionFactory);
+    setLibraryDesignDao(dao);
+  }
+  
+  private void updateLibraryDesignDaoDependencies() {
+    
+  }
+  
+  public HibernateTagBarcodeDao getTagBarcodeDao() {
+    return tagBarcodeDao;
+  }
+  
+  public void setTagBarcodeDao(HibernateTagBarcodeDao tagBarcodeDao) {
+    this.tagBarcodeDao = tagBarcodeDao;
+    updateTagBarcodeDaoDependencies();
+  }
+  
+  public void setDefaultTagBarcodeDao() {
+    HibernateTagBarcodeDao dao = new HibernateTagBarcodeDao();
+    dao.setSessionFactory(sessionFactory);
+    setTagBarcodeDao(dao);
+  }
+  
+  private void updateTagBarcodeDaoDependencies() {
+    if (libraryDao != null) libraryDao.setTagBarcodeStore(tagBarcodeDao);
   }
 
 }

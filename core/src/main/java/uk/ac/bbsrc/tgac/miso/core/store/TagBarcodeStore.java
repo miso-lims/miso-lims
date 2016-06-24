@@ -23,7 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.core.store;
 
-import java.util.Collection;
+import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
 import uk.ac.bbsrc.tgac.miso.core.data.TagBarcodeFamily;
@@ -33,11 +33,13 @@ public interface TagBarcodeStore {
 
   public TagBarcodeFamily getTagBarcodeFamilyByName(String name);
 
-  public Collection<TagBarcodeFamily> getTagBarcodeFamilies();
+  public List<TagBarcodeFamily> getTagBarcodeFamilies();
 
-  public Collection<TagBarcodeFamily> getTagBarcodeFamiliesByPlatform(PlatformType platformType);
+  public List<TagBarcodeFamily> getTagBarcodeFamiliesByPlatform(PlatformType platformType);
 
   public TagBarcode getTagBarcodeById(long id);
 
-  public Collection<TagBarcode> listAllTagBarcodes(PlatformType platformType);
+  public List<TagBarcode> listAllTagBarcodes(PlatformType platformType);
+  
+  public List<TagBarcode> listAllTagBarcodes();
 }

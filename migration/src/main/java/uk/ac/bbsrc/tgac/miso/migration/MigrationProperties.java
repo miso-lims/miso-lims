@@ -91,4 +91,17 @@ public class MigrationProperties extends Properties {
     }
   }
   
+  /**
+   * Retrieves a boolean value from the Properties
+   * 
+   * @param property key of the property to retrieve
+   * @param defaultValue value to return if the property is not found
+   * @return the boolean property value if found; defaultValue otherwise
+   */
+  public boolean getBoolean(String property, boolean defaultValue) {
+    String prop = getStringOrNull(property);
+    if (prop == null) return defaultValue;
+    return Boolean.valueOf(prop);
+  }
+  
 }

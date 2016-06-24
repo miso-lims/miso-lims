@@ -1,12 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isAliquotSample;
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isDetailedSample;
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isIdentitySample;
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStockSample;
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isTissueProcessingSample;
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isTissueSample;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -244,12 +238,13 @@ public class DefaultSampleService implements SampleService {
     } else {
       validateAliasUniqueness(sample.getAlias());
     }
-    if (isDetailedSample(sample) && ((SampleAdditionalInfo) sample).getParent() != null) {
+    if (isStockSample(sample) || isAliquotSample(sample)) {
       SampleAdditionalInfo detailed = (SampleAdditionalInfo) sample;
-      int siblingNumber = sampleDao.getNextSiblingNumber(detailed.getParent(), detailed.getSampleClass());
-      detailed.setSiblingNumber(siblingNumber);
+      if (detailed.getParent() != null && detailed.getSiblingNumber() == null) {
+        int siblingNumber = sampleDao.getNextSiblingNumber(detailed.getParent(), detailed.getSampleClass());
+        detailed.setSiblingNumber(siblingNumber);
+      }
     }
-
     return save(sample).getId();
   }
 

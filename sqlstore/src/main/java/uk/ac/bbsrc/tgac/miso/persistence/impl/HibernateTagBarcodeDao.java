@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import java.util.Collection;
+import java.util.List;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -40,19 +40,21 @@ public class HibernateTagBarcodeDao implements TagBarcodeStore {
     return (TagBarcode) query.uniqueResult();
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public Collection<TagBarcodeFamily> getTagBarcodeFamilies() {
+  public List<TagBarcodeFamily> getTagBarcodeFamilies() {
     Query query = currentSession().createQuery("from TagBarcodeFamily");
-    return query.list();
+    @SuppressWarnings("unchecked")
+    List<TagBarcodeFamily> list = query.list();
+    return list;
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public Collection<TagBarcodeFamily> getTagBarcodeFamiliesByPlatform(PlatformType platformType) {
+  public List<TagBarcodeFamily> getTagBarcodeFamiliesByPlatform(PlatformType platformType) {
     Query query = currentSession().createQuery("from TagBarcodeFamily where platformType = :platform");
     query.setParameter("platform", platformType);
-    return query.list();
+    @SuppressWarnings("unchecked")
+    List<TagBarcodeFamily> list = query.list();
+    return list;
   }
 
   @Override
@@ -62,16 +64,25 @@ public class HibernateTagBarcodeDao implements TagBarcodeStore {
     return (TagBarcodeFamily) query.uniqueResult();
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public Collection<TagBarcode> listAllTagBarcodes(PlatformType platformType) {
+  public List<TagBarcode> listAllTagBarcodes(PlatformType platformType) {
     Query query = currentSession().createQuery("from TagBarcode where family.platformType = :platform");
     query.setParameter("platform", platformType);
-    return query.list();
+    @SuppressWarnings("unchecked")
+    List<TagBarcode> list = query.list();
+    return list;
   }
 
   public void setSessionFactory(SessionFactory sessionFactory) {
     this.sessionFactory = sessionFactory;
+  }
+
+  @Override
+  public List<TagBarcode> listAllTagBarcodes() {
+    Query query = currentSession().createQuery("from TagBarcode");
+    @SuppressWarnings("unchecked")
+    List<TagBarcode> list = query.list();
+    return list;
   }
 
 }

@@ -41,6 +41,11 @@ import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpSession;
 
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import net.sourceforge.fluxion.ajax.Ajaxified;
+import net.sourceforge.fluxion.ajax.util.JSONUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,10 +55,6 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-import net.sourceforge.fluxion.ajax.Ajaxified;
-import net.sourceforge.fluxion.ajax.util.JSONUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Plate;
@@ -417,7 +418,7 @@ public class ImportExportControllerHelperService {
 
               if (jsonArrayElement.get(9) != null && !isStringEmptyOrNull(jsonArrayElement.getString(9))
                   && (library.getQcPassed() || library.getQcPassed() == null)) {
-                Iterable<TagBarcode> bcs = tagBarcodeService.getTagBarcodeFamilyByName(jsonArrayElement.getString(9));
+                Iterable<TagBarcode> bcs = tagBarcodeService.getTagBarcodeFamilyByName(jsonArrayElement.getString(9)).getBarcodes();
                 if (bcs != null) {
                   String tags = jsonArrayElement.getString(10);
                   if (!isStringEmptyOrNull(tags)) {
@@ -446,6 +447,7 @@ public class ImportExportControllerHelperService {
                   ldi.setSecurityProfile(library.getSecurityProfile());
                   ldi.setConcentration(Double.valueOf(jsonArrayElement.getString(11)));
                   ldi.setCreationDate(new Date());
+                  ldi.setLastModified(ldi.getCreationDate());
                   ldi.setDilutionCreator(user.getLoginName());
                   if (!library.getLibraryDilutions().contains(ldi)) {
                     library.addDilution(ldi);

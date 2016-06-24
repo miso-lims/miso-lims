@@ -25,7 +25,6 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -45,7 +44,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 @Entity
 @Table(name = "TagBarcodeFamily")
-public class TagBarcodeFamily implements Iterable<TagBarcode> {
+public class TagBarcodeFamily {
   public static final TagBarcodeFamily NULL = new TagBarcodeFamily();
 
   static {
@@ -79,7 +78,7 @@ public class TagBarcodeFamily implements Iterable<TagBarcode> {
 
   public Iterable<TagBarcode> getBarcodesForPosition(int position) {
     List<TagBarcode> selected = new ArrayList<>();
-    for (TagBarcode barcode : this) {
+    for (TagBarcode barcode : barcodes) {
       if (barcode.getPosition() == position) {
         selected.add(barcode);
       }
@@ -93,7 +92,7 @@ public class TagBarcodeFamily implements Iterable<TagBarcode> {
 
   public int getMaximumNumber() {
     int max = 0;
-    for (TagBarcode barcode : this) {
+    for (TagBarcode barcode : barcodes) {
       if (barcode.getPosition() > max) {
         max = barcode.getPosition();
       }
@@ -107,11 +106,6 @@ public class TagBarcodeFamily implements Iterable<TagBarcode> {
 
   public PlatformType getPlatformType() {
     return platformType;
-  }
-
-  @Override
-  public Iterator<TagBarcode> iterator() {
-    return getBarcodes().iterator();
   }
 
   public void setArchived(Boolean archived) {
