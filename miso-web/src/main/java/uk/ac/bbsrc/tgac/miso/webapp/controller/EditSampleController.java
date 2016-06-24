@@ -33,6 +33,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +42,10 @@ import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,8 +70,6 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractPool;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSampleQC;
@@ -113,6 +116,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 import uk.ac.bbsrc.tgac.miso.service.LabService;
 import uk.ac.bbsrc.tgac.miso.service.QcPassedDetailService;
 import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
@@ -128,6 +132,8 @@ import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.ui.SampleOptionsController;
 @SessionAttributes("sample")
 public class EditSampleController {
   protected static final Logger log = LoggerFactory.getLogger(EditSampleController.class);
+  
+  private final ObjectMapper mapper = new ObjectMapper();
 
   @Autowired
   private SecurityManager securityManager;
@@ -191,8 +197,8 @@ public class EditSampleController {
   }
 
   @ModelAttribute("sampleOptions")
-  public JSONObject getSampleOptions(UriComponentsBuilder uriBuilder, HttpServletResponse response) throws IOException {
-    return JSONObject.fromObject(sampleOptionsController.getSampleOptions(uriBuilder, response));
+  public String getSampleOptions(UriComponentsBuilder uriBuilder, HttpServletResponse response) throws IOException {
+    return mapper.writeValueAsString(sampleOptionsController.getSampleOptions(uriBuilder, response));
   }
 
   public Map<String, Sample> getAdjacentSamplesInGroup(Sample s, @RequestParam(value = "entityGroupId", required = true) Long entityGroupId)
@@ -363,7 +369,7 @@ public class EditSampleController {
 
   // Handsontable
   @ModelAttribute("referenceDataJSON")
-  public JSONObject referenceDataJsonString() throws IOException {
+  public JSONObject referenceDataJsonString() throws IOException, JSONException {
     final JSONObject hot = new JSONObject();
     final List<String> sampleTypes = new ArrayList<String>(requestManager.listAllSampleTypes());
     final List<String> qcValues = new ArrayList<String>();
@@ -378,7 +384,7 @@ public class EditSampleController {
       project.put("id", fullProject.getId());
       project.put("alias", fullProject.getAlias());
       project.put("name", fullProject.getName());
-      allProjects.add(project);
+      allProjects.put(project);
     }
     for (String strLabel : StrStatus.getLabels()) {
       strStatuses.add(strLabel);
@@ -818,12 +824,12 @@ public class EditSampleController {
       for (int i = 0; i < split.length; i++) {
         idList.add(Long.parseLong(split[i]));
       }
-      JSONArray samplesDtos = new JSONArray();
+      Set<SampleDto> samplesDtos = new HashSet<>();
       for (Sample sample : requestManager.getSamplesByIdList(idList)) {
         samplesDtos.add(Dtos.asDto(sample));
       }
       model.put("title", "Bulk Edit Samples");
-      model.put("samplesJSON", samplesDtos);
+      model.put("samplesJSON", mapper.writeValueAsString(samplesDtos));
       model.put("method", "Edit");
       return new ModelAndView("/pages/bulkEditSamples.jsp", model);
     } catch (IOException ex) {
@@ -847,13 +853,13 @@ public class EditSampleController {
       for (int i = 0; i < split.length; i++) {
         idList.add(Long.parseLong(split[i]));
       }
-      JSONArray samplesDtos = new JSONArray();
+      Set<SampleDto> samplesDtos = new HashSet<>();
       for (Sample sample : requestManager.getSamplesByIdList(idList)) {
         samplesDtos.add(Dtos.asDto(sample));
       }
       model.put("title", "Bulk Create Samples");
-      model.put("samplesJSON", samplesDtos);
-      model.put("method", "Create");
+      model.put("samplesJSON", mapper.writeValueAsString(samplesDtos));
+      model.put("method",  "Create");
       model.put("sampleClassId", sampleClassId);
       return new ModelAndView("/pages/bulkEditSamples.jsp", model);
     } catch (IOException ex) {

@@ -99,7 +99,6 @@ var Sample = Sample || {
 
     // Volume validation
     jQuery('#volume').attr('class', 'form-control');
-    jQuery('#volume').attr('data-parsley-required', 'true');
     jQuery('#volume').attr('data-parsley-maxlength', '10');
     jQuery('#volume').attr('data-parsley-type', 'number');
 
@@ -1177,7 +1176,7 @@ Sample.ui = {
     select.push('<select id="classDropdown">');
     select.push('<option value="">-- Select child class</option>');
     for (var i=0; i<classes.length; i++) {
-      if (classes[i].alias == "Identity") continue;
+      if (classes[i].alias == "Identity" || classes[i].sampleCategory == "Tissue") continue;
       select.push('<option value="'+ classes[i].id +'">'+ classes[i].alias +'</option>');
     }
     select.push('</select>');
