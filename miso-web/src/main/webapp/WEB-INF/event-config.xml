@@ -108,7 +108,6 @@
         <ref bean="libraryPreparationCompleteResponderService" />
         <ref bean="allLibrariesQcPassedResponderService" />
         <ref bean="poolConstructionCompleteResponderService" />
-        <ref bean="poolConstructionCompleteResponderService" />
         <ref bean="allRunsCompleteResponderService" />
         <ref bean="primaryAnalysisCompleteResponderService" />
       </set>

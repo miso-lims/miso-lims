@@ -34,7 +34,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -235,18 +234,18 @@ public class EditLibraryController {
     return Collections.emptyMap();
   }
 
-  public List<Pool<? extends Poolable>> getPoolsByLibrary(Library l) throws IOException {
+  public List<Pool<? extends Poolable<?, ?>>> getPoolsByLibrary(Library l) throws IOException {
     if (!l.getLibraryDilutions().isEmpty()) {
-      List<Pool<? extends Poolable>> pools = new ArrayList<>(requestManager.listPoolsByLibraryId(l.getId()));
+      List<Pool<? extends Poolable<?, ?>>> pools = new ArrayList<>(requestManager.listPoolsByLibraryId(l.getId()));
       Collections.sort(pools);
       return pools;
     }
     return Collections.emptyList();
   }
 
-  public Set<Run> getRunsByLibraryPools(List<Pool<? extends Poolable>> pools) throws IOException {
+  public Set<Run> getRunsByLibraryPools(List<Pool<? extends Poolable<?, ?>>> pools) throws IOException {
     Set<Run> runs = new TreeSet<>();
-    for (Pool<? extends Poolable> pool : pools) {
+    for (Pool<? extends Poolable<?, ?>> pool : pools) {
       Collection<Run> prs = requestManager.listRunsByPoolId(pool.getId());
       runs.addAll(prs);
     }
@@ -709,9 +708,9 @@ public class EditLibraryController {
         model.put("nextLibrary", adjacentLibraries.get("nextLibrary"));
       }
 
-      List<Pool<? extends Poolable>> pools = getPoolsByLibrary(library);
+      List<Pool<? extends Poolable<?, ?>>> pools = getPoolsByLibrary(library);
       Map<Long, Library> poolLibraryMap = new HashMap<>();
-      for (Pool pool : pools) {
+      for (Pool<? extends Poolable<?, ?>> pool : pools) {
         poolLibraryMap.put(pool.getId(), library);
       }
       model.put("poolLibraryMap", poolLibraryMap);
@@ -811,9 +810,9 @@ public class EditLibraryController {
         model.put("nextLibrary", adjacentLibraries.get("nextLibrary"));
       }
 
-      List<Pool<? extends Poolable>> pools = getPoolsByLibrary(library);
+      List<Pool<? extends Poolable<?, ?>>> pools = getPoolsByLibrary(library);
       Map<Long, Library> poolLibraryMap = new HashMap<>();
-      for (Pool pool : pools) {
+      for (Pool<? extends Poolable<?, ?>> pool : pools) {
         poolLibraryMap.put(pool.getId(), library);
       }
       model.put("poolLibraryMap", poolLibraryMap);

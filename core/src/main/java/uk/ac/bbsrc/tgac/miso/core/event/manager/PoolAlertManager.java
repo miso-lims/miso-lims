@@ -24,7 +24,6 @@
 package uk.ac.bbsrc.tgac.miso.core.event.manager;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -36,10 +35,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
-import com.rits.cloning.Cloner;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractPool;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 
@@ -54,11 +53,10 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
  */
 public class PoolAlertManager {
   protected static final Logger log = LoggerFactory.getLogger(PoolAlertManager.class);
-  final Map<Long, Pool> pools = new HashMap<Long, Pool>();
+  final Map<Long, Pool<? extends Poolable<?, ?>>> pools = new HashMap<>();
   final Set<User> poolWatchers = new HashSet<User>();
 
   private RequestManager misoRequestManager;
-  private Cloner cloner = new Cloner();
   private boolean enabled = true;
 
   @Autowired
@@ -87,26 +85,27 @@ public class PoolAlertManager {
     this.enabled = enabled;
   }
 
-  public void applyListeners(Pool pool) {
+  public <P extends Poolable<?, ?>> void applyListeners(Pool<P> pool) {
     pool.addListener(getPoolListener());
   }
 
-  public void removeListeners(Pool pool) {
+  public <P extends Poolable<?, ?>> void removeListeners(Pool<P> pool) {
     pool.removeListener(getPoolListener());
   }
 
-  public void push(Pool pool) {
+  public <P extends Poolable<?, ?>> void push(Pool<P> pool) {
     if (enabled) {
       if (pool != null) {
+        Pool<P> clone = partialCopy(pool);
         log.debug("Attempting to clone pool " + pool.getId());
         try {
-          if (pool != null) {
-            applyListeners(pool);
+          if (clone != null) {
+            applyListeners(clone);
             if (pools.containsKey(pool.getId())) {
-              log.debug("Not replacing Pool " + pool.getId() + ": Ready? " + pool.getReadyToRun());
+              log.debug("Not replacing Pool " + clone.getId() + ": Ready? " + clone.getReadyToRun());
             } else {
-              pools.put(pool.getId(), pool);
-              log.debug("Queued Pool " + pool.getId() + ": Ready? " + pool.getReadyToRun());
+              pools.put(pool.getId(), clone);
+              log.debug("Queued Pool " + clone.getId() + ": Ready? " + clone.getReadyToRun());
             }
           }
         } catch (Exception e) {
@@ -118,10 +117,10 @@ public class PoolAlertManager {
     }
   }
 
-  public void pop(Pool pool) {
+  public void pop(Pool<? extends Poolable<?, ?>> pool) {
     if (enabled) {
       if (pool != null) {
-        Pool clone = pools.get(pool.getId());
+        Pool<? extends Poolable<?, ?>> clone = pools.get(pool.getId());
         if (clone != null) {
           removeListeners(clone);
           clone = null;
@@ -138,9 +137,9 @@ public class PoolAlertManager {
     update(misoRequestManager.getPoolById(poolId));
   }
 
-  private void update(Pool p) throws IOException {
+  private void update(Pool<? extends Poolable<?, ?>> p) throws IOException {
     if (enabled) {
-      Pool clone = pools.get(p.getId());
+      Pool<? extends Poolable<?, ?>> clone = pools.get(p.getId());
       if (clone == null) {
         log.debug("Update: no clone - pushing");
         // new run - add all PoolWatchers!
@@ -150,31 +149,17 @@ public class PoolAlertManager {
         push(p);
       } else {
         log.debug("Update: got clone of " + clone.getId());
-        // TODO EVIL EVIL EVIL FIX UPON PAIN OF DEATH
-        if (clone.getReadyToRun()) {
-          try {
-            // fire event if pool has been saved initially to ready to run
-            Method m = AbstractPool.class.getDeclaredMethod("firePoolReadyEvent");
-            m.setAccessible(true);
-            m.invoke(clone);
-          } catch (Exception e) {
-            log.error("Cannot fire pool ready event", e);
-          }
-        } else {
-          log.debug("Updating Pool " + clone.getId() + " ...");
-          clone.setReadyToRun(p.getReadyToRun());
-        }
-
+        clone.setReadyToRun(p.getReadyToRun());
         pop(clone);
         push(p);
       }
     }
   }
 
-  public void addWatcher(Pool pool, Long userId) throws IOException {
+  public <P extends Poolable<?, ?>> void addWatcher(Pool<P> pool, Long userId) throws IOException {
     User user = securityManager.getUserById(userId);
     if (user != null) {
-      Pool clone = pools.get(pool.getId());
+      Pool<? extends Poolable<?, ?>> clone = pools.get(pool.getId());
       if (clone == null) {
         pool.addWatcher(user);
         push(pool);
@@ -184,10 +169,10 @@ public class PoolAlertManager {
     }
   }
 
-  public void removeWatcher(Pool pool, Long userId) throws IOException {
+  public void removeWatcher(Pool<? extends Poolable<?, ?>> pool, Long userId) throws IOException {
     User user = securityManager.getUserById(userId);
     if (user != null && pool.getWatchers().contains(user)) {
-      Pool clone = pools.get(pool.getId());
+      Pool<? extends Poolable<?, ?>> clone = pools.get(pool.getId());
       if (clone == null) {
         pool.removeWatcher(user);
         push(pool);
@@ -203,7 +188,7 @@ public class PoolAlertManager {
       poolWatchers.clear();
       poolWatchers.addAll(securityManager.listUsersByGroupName("PoolWatchers"));
 
-      for (Pool p : pools.values()) {
+      for (Pool<? extends Poolable<?, ?>> p : pools.values()) {
         if (user.getGroups() != null && user.getGroups().contains(securityManager.getGroupByName("PoolWatchers"))) {
           addWatcher(p, userId);
         } else {
@@ -215,4 +200,21 @@ public class PoolAlertManager {
       }
     }
   }
+
+  /**
+   * Creates a minimal copy of the pool to be used for change tracking in the alerting system. Only relevant fields are copied
+   * 
+   * @param pool
+   *          the pool to copy
+   * @return the copy
+   */
+  private <P extends Poolable<?, ?>> Pool<P> partialCopy(Pool<P> pool) {
+    Pool<P> clone = new PoolImpl<>();
+    clone.setId(pool.getId());
+    clone.setAlias(pool.getAlias());
+    clone.setName(pool.getName());
+    clone.setReadyToRun(pool.getReadyToRun());
+    return clone;
+  }
+
 }

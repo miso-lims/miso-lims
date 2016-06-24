@@ -50,6 +50,9 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
+
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractRun;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
@@ -75,9 +78,6 @@ import uk.ac.bbsrc.tgac.miso.runstats.client.RunStatsException;
 import uk.ac.bbsrc.tgac.miso.runstats.client.manager.RunStatsManager;
 import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
-
-import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 @Controller
 @RequestMapping("/run")
@@ -185,12 +185,13 @@ public class EditRunController {
     return false;
   }
 
-  public Collection<Pool<? extends Poolable>> populateAvailablePools(User user) throws IOException {
+  public Collection<Pool<? extends Poolable<?, ?>>> populateAvailablePools(User user) throws IOException {
     return requestManager.listAllPools();
   }
 
-  public Collection<Pool> populateAvailablePools(PlatformType platformType, User user) throws IOException {
-    List<Pool> pools = new ArrayList<Pool>(requestManager.listAllPoolsByPlatform(platformType));
+  public Collection<Pool<? extends Poolable<?, ?>>> populateAvailablePools(PlatformType platformType, User user) throws IOException {
+    List<Pool<? extends Poolable<?, ?>>> pools = new ArrayList<Pool<? extends Poolable<?, ?>>>(
+        requestManager.listAllPoolsByPlatform(platformType));
     Collections.sort(pools);
     return pools;
   }

@@ -26,6 +26,7 @@ package uk.ac.bbsrc.tgac.miso.core.event.manager;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,9 +34,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
-import com.rits.cloning.Cloner;
+import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
@@ -54,7 +56,6 @@ public class ProjectAlertManager {
   final Map<Long, Project> projects = new HashMap<Long, Project>();
 
   private RequestManager misoRequestManager;
-  private final Cloner cloner = new Cloner();
   private boolean enabled = true;
 
   @Autowired
@@ -111,8 +112,7 @@ public class ProjectAlertManager {
   public void push(Project project) {
     if (enabled) {
       if (project != null) {
-        cloner.dontClone(org.hibernate.collection.internal.PersistentSet.class);
-        Project clone = cloner.deepClone(project);
+        Project clone = partialCopy(project);
         if (clone != null) {
           if (projects.containsKey(project.getId())) {
             if (clone.getProgress() != null) {
@@ -178,7 +178,7 @@ public class ProjectAlertManager {
         push(p);
       } else {
         log.debug("Update: got clone of " + clone.getId());
-        clone.setProgress(cloner.deepClone(p.getProgress()));
+        clone.setProgress(p.getProgress());
 
         for (ProjectOverview po : p.getOverviews()) {
           ProjectOverview cloneOverview = clone.getOverviewById(po.getOverviewId());
@@ -295,5 +295,50 @@ public class ProjectAlertManager {
         }
       }
     }
+  }
+
+  /**
+   * Creates a minimal copy of the project to be used for change tracking in the alerting system. Only relevant fields are copied
+   * 
+   * @param project
+   *          the project to copy
+   * @return the copy
+   */
+  private Project partialCopy(Project project) {
+    Project clone = new ProjectImpl();
+    clone.setId(project.getId());
+    clone.setAlias(project.getAlias());
+    clone.setName(project.getName());
+    clone.setProgress(project.getProgress());
+    Set<ProjectOverview> projectOverviews = Sets.newHashSet();
+    for (ProjectOverview projectOverview : project.getOverviews()) {
+      projectOverviews.add(partialCopy(projectOverview));
+    }
+    clone.setOverviews(projectOverviews);
+
+    for (User u : project.getWatchers()) {
+      clone.addWatcher(u);
+    }
+    return clone;
+  }
+
+  /**
+   * Creates a minimal copy of the ProjectOverview to be used for change tracking in the alerting system. Only relevant fields are copied
+   * 
+   * @param projectOverview
+   *          The ProjectOverview to copy
+   * @return the copy
+   */
+  private ProjectOverview partialCopy(ProjectOverview projectOverview) {
+    ProjectOverview clone = new ProjectOverview();
+    clone.setId(projectOverview.getId());
+    clone.setProject(projectOverview.getProject());
+    clone.setAllSampleQcPassed(projectOverview.getAllSampleQcPassed());
+    clone.setLibraryPreparationComplete(projectOverview.getLibraryPreparationComplete());
+    clone.setAllLibrariesQcPassed(projectOverview.getAllLibrariesQcPassed());
+    clone.setAllPoolsConstructed(projectOverview.getAllPoolsConstructed());
+    clone.setAllRunsCompleted(projectOverview.getAllRunsCompleted());
+    clone.setPrimaryAnalysisCompleted(projectOverview.getPrimaryAnalysisCompleted());
+    return clone;
   }
 }

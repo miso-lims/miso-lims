@@ -23,7 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.core.event.impl;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -50,7 +50,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.AlertingException;
  * @date 05/03/12
  * @since 0.1.6
  */
-public abstract class AbstractResponderService implements ResponderService {
+public abstract class AbstractResponderService<T extends Event<?>> implements ResponderService<T> {
   protected static final Logger log = LoggerFactory.getLogger(AbstractResponderService.class);
 
   private boolean saveSystemAlert = true;
@@ -73,22 +73,23 @@ public abstract class AbstractResponderService implements ResponderService {
   }
 
   @Override
-  public abstract boolean respondsTo(Event event);
+  public abstract boolean respondsTo(T event);
 
-  public void raiseSystemAlert(Event event) {
-    raiseSystemAlert(event, DaoAlerterService.class);
+  public void raiseSystemAlert(T event) {
+    List<Class<? extends AlerterService>> servicesToAlert = new ArrayList<>();
+    servicesToAlert.add(DaoAlerterService.class);
+    raiseSystemAlert(event, servicesToAlert);
   }
 
-  protected void raiseSystemAlert(Event event, Class<? extends AlerterService>... servicesToAlert) {
+  protected void raiseSystemAlert(T event, List<Class<? extends AlerterService>> servicesToAlert) {
     Watchable o = (Watchable) event.getEventObject();
 
     Alert a = new SystemAlert();
     a.setAlertTitle("[" + o.getWatchableIdentifier() + "] " + event.getEventType().name());
     a.setAlertText(event.getEventMessage());
 
-    List<Class<? extends AlerterService>> serviceList = Arrays.asList(servicesToAlert);
     for (AlerterService as : alerterServices) {
-      if (serviceList.contains(as.getClass())) {
+      if (servicesToAlert.contains(as.getClass())) {
         log.debug("Raising system alert via " + as.getClass());
         try {
           as.raiseAlert(a);
@@ -100,7 +101,7 @@ public abstract class AbstractResponderService implements ResponderService {
   }
 
   @Override
-  public void generateResponse(Event event) {
+  public void generateResponse(T event) {
     Watchable o = (Watchable) event.getEventObject();
 
     for (User user : o.getWatchers()) {
@@ -118,7 +119,9 @@ public abstract class AbstractResponderService implements ResponderService {
     }
 
     if (saveSystemAlert) {
-      raiseSystemAlert(event, AlerterService.class);
+      List<Class<? extends AlerterService>> servicesToAlert = new ArrayList<>();
+      servicesToAlert.add(AlerterService.class);
+      raiseSystemAlert(event, servicesToAlert);
     }
   }
 }

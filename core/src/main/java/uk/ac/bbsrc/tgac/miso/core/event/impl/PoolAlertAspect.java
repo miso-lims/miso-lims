@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.PoolAlertManager;
 
 /**
@@ -53,7 +54,7 @@ public class PoolAlertAspect {
     this.poolAlertManager = poolAlertManager;
   }
 
-  public void removeWatcher(Pool pool, User user) {
+  public void removeWatcher(Pool<? extends Poolable<?, ?>> pool, User user) {
     try {
       if (user != null) {
         poolAlertManager.removeWatcher(pool, user.getUserId());
@@ -63,7 +64,7 @@ public class PoolAlertAspect {
     }
   }
 
-  public void addWatcher(Pool pool, User user) {
+  public void addWatcher(Pool<? extends Poolable<?, ?>> pool, User user) {
     try {
       if (user != null) {
         poolAlertManager.addWatcher(pool, user.getUserId());
@@ -73,7 +74,7 @@ public class PoolAlertAspect {
     }
   }
 
-  public void update(Pool pool) {
+  public void update(Pool<? extends Poolable<?, ?>> pool) {
     try {
       poolAlertManager.update(pool.getId());
     } catch (IOException e) {

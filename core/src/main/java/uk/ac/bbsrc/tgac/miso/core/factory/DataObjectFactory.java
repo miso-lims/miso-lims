@@ -140,11 +140,11 @@ public abstract class DataObjectFactory {
 
   public abstract Plate<LinkedList<Plateable>, Plateable> getPlateOfSize(int size, User user);
 
-  public abstract Pool<? extends Poolable> getPool();
+  public abstract Pool<? extends Poolable<?, ?>> getPool();
 
-  public abstract Pool<? extends Poolable> getPool(User user);
+  public abstract Pool<? extends Poolable<?, ?>> getPool(User user);
 
-  public abstract Pool<? extends Poolable> getPoolOfType(PlatformType platformType, User user);
+  public abstract Pool<? extends Poolable<?, ?>> getPoolOfType(PlatformType platformType, User user);
 
   public abstract PoolQC getPoolQC();
 
