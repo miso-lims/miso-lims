@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringBlankOrNull;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -56,6 +58,7 @@ import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
 import uk.ac.bbsrc.tgac.miso.core.event.listener.ProjectListener;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 /**
  * Skeleton implementation of a Project
@@ -78,6 +81,7 @@ public abstract class AbstractProject implements Project {
   private String description = "";
   private String name = "";
   private String alias = "";
+  private String shortName;
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -130,6 +134,23 @@ public abstract class AbstractProject implements Project {
   @Override
   public String getAlias() {
     return alias;
+  }
+
+  @Override
+  public String getShortName() {
+    if (isStringBlankOrNull(shortName)) {
+      String syntheticShortName = alias.toUpperCase().replaceAll("[^A-Z0-9]", "");
+      if (syntheticShortName.length() > 5) {
+        syntheticShortName = syntheticShortName.substring(0, 5);
+      }
+      return syntheticShortName;
+    }
+    return shortName;
+  }
+
+  @Override
+  public void setShortName(String shortName) {
+    this.shortName = shortName;
   }
 
   @Override
