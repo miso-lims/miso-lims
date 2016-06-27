@@ -30,12 +30,16 @@ import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -64,6 +68,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.illumina.IlluminaStatus;
 import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
 import uk.ac.bbsrc.tgac.miso.notification.util.NotificationUtils;
 import uk.ac.bbsrc.tgac.miso.notification.util.PossiblyGzippedFileUtils;
@@ -101,7 +106,6 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
   private final String oldStatusPath = "/Data/Status.xml";
   private final String newStatusPath = "/Data/reports/Status.xml";
   private final String runInfoPath = "/RunInfo.xml";
-  private final String runParametersPath = "/runParameters.xml";
 
   private final Map<String, String> finishedCache = new HashMap<>();
 
@@ -112,6 +116,17 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
       .compile("(\\d{1,2}\\/\\d{1,2}\\/\\d{4},\\d{2}:\\d{2}:\\d{2})\\.\\d{3},\\d+,\\d+,\\d+,.*");
 
   private final DateFormat logDateFormat = new SimpleDateFormat("MM'/'dd'/'yyyy','HH:mm:ss");
+
+  private static final RunSink<String> steps = new All<String>().add(makeRunParametersProcessor());
+
+  private static RunSink<String> makeRunParametersProcessor() {
+    FindFile matchParametersFiles = new FindFile("/runParameters.xml", "/RunParameters.xml");
+    RunTransform<?, Document> readXmlDocument = new ParseXml().attachTo(matchParametersFiles);
+    new WriteXml().attachTo(readXmlDocument).add(new WriteRunParams());
+    new FindXmlElement("ScannerID").attachTo(readXmlDocument).toText().add(new WriteSequencerName());
+    new FindXmlElement("Barcode").attachTo(readXmlDocument).toText().add(new WriteContainerId());
+    return matchParametersFiles;
+  }
 
   public Map<String, String> transform(Message<Set<File>> message) {
     return transform(message.getPayload());
@@ -136,7 +151,8 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
       String countStr = "[#" + count + "/" + files.size() + "] ";
       if (rootFile.isDirectory()) {
         if (rootFile.canRead()) {
-          JSONObject run = new JSONObject();
+          IlluminaRunStatus run = new IlluminaRunStatus();
+          steps.process(rootFile.getAbsolutePath(), run);
 
           try {
             String runName = rootFile.getName();
@@ -186,12 +202,6 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                 if (numReads == 0) {
                   numReads = runInfoDoc.getElementsByTagName("Read").getLength();
                 }
-              }
-
-              // Get main stuff from runParams.xml
-              if (runParamDoc != null) {
-                run.put(JSON_RUN_PARAMS, SubmissionUtils.transform(runParamDoc));
-                checkRunParams(runParamDoc, run);
               }
 
               boolean lastCycleComplete = checkCycles(rootFile, run, statusDoc, runInfoDoc);
@@ -288,15 +298,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
    * @throws ParserConfigurationException
    */
   private void checkRunParams(Document runParamDoc, JSONObject run) {
-    if (!run.has(JSON_SEQUENCER_NAME) && runParamDoc.getElementsByTagName("ScannerID").getLength() != 0) {
-      run.put(JSON_SEQUENCER_NAME, runParamDoc.getElementsByTagName("ScannerID").item(0).getTextContent());
-    }
 
-    if (!run.has(JSON_CONTAINER_ID) && runParamDoc.getElementsByTagName("Barcode").getLength() != 0) {
-      run.put(JSON_CONTAINER_ID, runParamDoc.getElementsByTagName("Barcode").item(0).getTextContent());
-    }
-
-    run.put("kits", checkKits(runParamDoc));
   }
 
   /**
@@ -625,21 +627,47 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
     }
   }
 
-  private JSONArray checkKits(Document runParamDoc) {
-    Set<String> rlist = new HashSet<>();
-    NodeList reagents = runParamDoc.getElementsByTagName("ReagentKits");
-    if (reagents.getLength() > 0) {
-      Element rkit = (Element) reagents.item(0);
-      NodeList kits = rkit.getElementsByTagName("ID");
-      for (int i = 0; i < kits.getLength(); i++) {
-        Element e = (Element) kits.item(i);
-        String rs = e.getTextContent();
-        for (String r : rs.split("[,;]")) {
-          if (!isStringEmptyOrNull(r)) rlist.add(r.trim());
+  private static final class WriteContainerId extends RunSink<String> {
+    @Override
+    public void process(String input, IlluminaRunStatus output) throws Exception {
+      output.setContainerId(input);
+    }
+  }
+
+  private static final class WriteSequencerName extends RunSink<String> {
+    @Override
+    public void process(String input, IlluminaRunStatus output) throws Exception {
+      output.setSequencerName(input);
+    }
+  }
+
+  private static final class WriteRunParams extends RunSink<String> {
+    @Override
+    public void process(String input, IlluminaRunStatus output) throws Exception {
+      output.setRunparams(input);
+
+    }
+  }
+
+  private static class GetKits extends RunSink<Document> {
+
+    @Override
+    public void process(Document input, IlluminaRunStatus output) throws Exception {
+      Set<String> rlist = new HashSet<>();
+      NodeList reagents = input.getElementsByTagName("ReagentKits");
+      if (reagents.getLength() > 0) {
+        Element rkit = (Element) reagents.item(0);
+        NodeList kits = rkit.getElementsByTagName("ID");
+        for (int i = 0; i < kits.getLength(); i++) {
+          Element e = (Element) kits.item(i);
+          String rs = e.getTextContent();
+          for (String r : rs.split("[,;]")) {
+            if (!isStringEmptyOrNull(r)) rlist.add(r.trim());
+          }
         }
       }
+      output.setKits(rlist);
     }
-    return JSONArray.fromObject(rlist);
   }
 
   private JSONObject parseInterOp(File rootFile) throws IOException {
