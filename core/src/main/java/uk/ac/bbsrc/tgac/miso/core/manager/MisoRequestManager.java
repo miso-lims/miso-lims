@@ -73,7 +73,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
-import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedResequencing;
@@ -95,8 +94,8 @@ import uk.ac.bbsrc.tgac.miso.core.store.EmPCRStore;
 import uk.ac.bbsrc.tgac.miso.core.store.EntityGroupStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ExperimentStore;
 import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
-import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignDao;
+import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
@@ -339,7 +338,7 @@ public class MisoRequestManager implements RequestManager {
 
   @SuppressWarnings("rawtypes")
   @Override
-  public Collection<Pool<? extends Poolable>> listAllPoolsBySearch(String query) throws IOException {
+  public Collection<Pool<? extends Poolable<?, ?>>> listAllPoolsBySearch(String query) throws IOException {
     if (poolStore != null) {
       return poolStore.listBySearch(query);
     } else {
@@ -349,7 +348,7 @@ public class MisoRequestManager implements RequestManager {
 
   @SuppressWarnings("rawtypes")
   @Override
-  public Collection<Pool<? extends Poolable>> listAllPoolsWithLimit(int limit) throws IOException {
+  public Collection<Pool<? extends Poolable<?, ?>>> listAllPoolsWithLimit(int limit) throws IOException {
     if (poolStore != null) {
       return poolStore.listAllPoolsWithLimit(limit);
     } else {
@@ -642,7 +641,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Pool<? extends Poolable>> listAllPools() throws IOException {
+  public Collection<Pool<? extends Poolable<?, ?>>> listAllPools() throws IOException {
     if (poolStore != null) {
       return poolStore.listAll();
     } else {
@@ -651,7 +650,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Pool<? extends Poolable>> listAllPoolsByPlatform(PlatformType platformType) throws IOException {
+  public Collection<Pool<? extends Poolable<?, ?>>> listAllPoolsByPlatform(PlatformType platformType) throws IOException {
     if (poolStore != null) {
       return poolStore.listAllByPlatform(platformType);
     } else {
@@ -660,7 +659,8 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Pool<? extends Poolable>> listAllPoolsByPlatformAndSearch(PlatformType platformType, String query) throws IOException {
+  public Collection<Pool<? extends Poolable<?, ?>>> listAllPoolsByPlatformAndSearch(PlatformType platformType, String query)
+      throws IOException {
     if (poolStore != null) {
       return poolStore.listAllByPlatformAndSearch(platformType, query);
     } else {
@@ -669,7 +669,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Pool<? extends Poolable>> listReadyPoolsByPlatform(PlatformType platformType) throws IOException {
+  public Collection<Pool<? extends Poolable<?, ?>>> listReadyPoolsByPlatform(PlatformType platformType) throws IOException {
     if (poolStore != null) {
       return poolStore.listReadyByPlatform(platformType);
     } else {
@@ -678,7 +678,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Pool<? extends Poolable>> listReadyPoolsByPlatformAndSearch(PlatformType platformType, String query)
+  public Collection<Pool<? extends Poolable<?, ?>>> listReadyPoolsByPlatformAndSearch(PlatformType platformType, String query)
       throws IOException {
     if (poolStore != null) {
       return poolStore.listReadyByPlatformAndSearch(platformType, query);
@@ -688,7 +688,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Pool<? extends Poolable>> listPoolsByProjectId(long projectId) throws IOException {
+  public Collection<Pool<? extends Poolable<?, ?>>> listPoolsByProjectId(long projectId) throws IOException {
     if (poolStore != null) {
       return poolStore.listByProjectId(projectId);
     } else {
@@ -697,7 +697,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Pool<? extends Poolable>> listPoolsByLibraryId(long libraryId) throws IOException {
+  public Collection<Pool<? extends Poolable<?, ?>>> listPoolsByLibraryId(long libraryId) throws IOException {
     if (poolStore != null) {
       return poolStore.listByLibraryId(libraryId);
     } else {
@@ -706,7 +706,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Pool<? extends Poolable>> listPoolsBySampleId(long sampleId) throws IOException {
+  public Collection<Pool<? extends Poolable<?, ?>>> listPoolsBySampleId(long sampleId) throws IOException {
     if (poolStore != null) {
       return poolStore.listBySampleId(sampleId);
     } else {
@@ -2173,7 +2173,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Pool<? extends Poolable> getPoolById(long poolId) throws IOException {
+  public Pool<? extends Poolable<?, ?>> getPoolById(long poolId) throws IOException {
     if (poolStore != null) {
       return poolStore.get(poolId);
     } else {
@@ -2191,7 +2191,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Pool<? extends Poolable> getPoolByBarcode(String barcode, PlatformType platformType) throws IOException {
+  public Pool<? extends Poolable<?, ?>> getPoolByBarcode(String barcode, PlatformType platformType) throws IOException {
     if (poolStore != null) {
       return poolStore.getPoolByBarcode(barcode, platformType);
     } else {
@@ -2200,7 +2200,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Pool<? extends Poolable> getPoolByBarcode(String barcode) throws IOException {
+  public Pool<? extends Poolable<?, ?>> getPoolByBarcode(String barcode) throws IOException {
     String[] s = barcode.split("::");
     if (s.length > 1) {
       String platformKey = s[1];
@@ -2215,7 +2215,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Pool<? extends Poolable> getPoolByIdBarcode(String barcode) throws IOException {
+  public Pool<? extends Poolable<?, ?>> getPoolByIdBarcode(String barcode) throws IOException {
     if (poolStore != null) {
       return poolStore.getByBarcode(barcode);
     } else {

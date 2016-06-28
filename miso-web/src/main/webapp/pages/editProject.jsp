@@ -114,6 +114,12 @@
     </td>
   </tr>
   <tr>
+    <td class="h">Short Name:</td>
+    <td><form:input id="shortName" path="shortName" maxlength="${maxLengths['shortName']}" class="validateable"/>
+      <span id="shortNamecounter" class="counter"></span>
+    </td>
+  </tr>
+  <tr>
     <td class="h">Description:</td>
     <td><form:input id="description" path="description" maxlength="${maxLengths['description']}" class="validateable"/>
       <span id="descriptioncounter" class="counter"></span></td>
@@ -1644,6 +1650,13 @@ jQuery(document).ready(function () {
     counter: '#aliascounter',
     countType: 'characters',
     maxCount: ${maxLengths['alias']},
+    countDirection: 'down'
+  });
+
+  jQuery('#shortName').simplyCountable({
+    counter: '#shortNamecounter',
+    countType: 'characters',
+    maxCount: ${maxLengths['shortName']},
     countDirection: 'down'
   });
 

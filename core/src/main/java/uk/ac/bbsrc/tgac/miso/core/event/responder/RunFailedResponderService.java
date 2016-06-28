@@ -35,7 +35,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.event.Alert;
 import uk.ac.bbsrc.tgac.miso.core.event.AlerterService;
-import uk.ac.bbsrc.tgac.miso.core.event.Event;
 import uk.ac.bbsrc.tgac.miso.core.event.impl.AbstractResponderService;
 import uk.ac.bbsrc.tgac.miso.core.event.impl.DefaultAlert;
 import uk.ac.bbsrc.tgac.miso.core.event.model.RunEvent;
@@ -52,7 +51,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.AlertingException;
  * @date 20/10/11
  * @since 0.1.2
  */
-public class RunFailedResponderService extends AbstractResponderService {
+public class RunFailedResponderService extends AbstractResponderService<RunEvent> {
   protected static final Logger log = LoggerFactory.getLogger(RunFailedResponderService.class);
 
   private Set<AlerterService> alerterServices = new HashSet<AlerterService>();
@@ -71,50 +70,44 @@ public class RunFailedResponderService extends AbstractResponderService {
   }
 
   @Override
-  public boolean respondsTo(Event event) {
-    if (event instanceof RunEvent) {
-      RunEvent re = (RunEvent) event;
-      Run r = re.getEventObject();
-      if (re.getEventType().equals(MisoEventType.RUN_FAILED) && r.getStatus() != null
-          && r.getStatus().getHealth().equals(HealthType.Failed)) {
-        log.info("Run " + r.getAlias() + ": " + re.getEventMessage());
-        return true;
-      }
+  public boolean respondsTo(RunEvent event) {
+    Run r = event.getEventObject();
+    if (event.getEventType().equals(MisoEventType.RUN_FAILED) && r.getStatus() != null
+        && r.getStatus().getHealth().equals(HealthType.Failed)) {
+      log.info("Run " + r.getAlias() + ": " + event.getEventMessage());
+      return true;
     }
     return false;
   }
 
   @Override
-  public void generateResponse(Event event) {
-    if (event instanceof RunEvent) {
-      RunEvent re = (RunEvent) event;
-      Run r = re.getEventObject();
+  public void generateResponse(RunEvent event) {
+    Run r = event.getEventObject();
 
-      for (User user : r.getWatchers()) {
-        Alert a = new DefaultAlert(user);
-        a.setAlertLevel(AlertLevel.CRITICAL);
-        a.setAlertTitle("Run Failed: " + r.getAlias());
+    for (User user : r.getWatchers()) {
+      Alert a = new DefaultAlert(user);
+      a.setAlertLevel(AlertLevel.CRITICAL);
+      a.setAlertTitle("Run Failed: " + r.getAlias());
 
-        StringBuilder at = new StringBuilder();
-        at.append("The following Run has been set to FAILED: " + r.getAlias() + " (" + event.getEventMessage() + "). Please view Run "
-            + r.getId() + " in MISO for more information");
-        if (event.getEventContext().has("baseURL")) {
-          at.append(":\n\n" + event.getEventContext().getString("baseURL") + "/run/" + r.getId());
-        }
-        a.setAlertText(at.toString());
+      StringBuilder at = new StringBuilder();
+      at.append("The following Run has been set to FAILED: " + r.getAlias() + " (" + event.getEventMessage() + "). Please view Run "
+          + r.getId() + " in MISO for more information");
+      if (event.getEventContext().has("baseURL")) {
+        at.append(":\n\n" + event.getEventContext().getString("baseURL") + "/run/" + r.getId());
+      }
+      a.setAlertText(at.toString());
 
-        for (AlerterService as : alerterServices) {
-          try {
-            as.raiseAlert(a);
-          } catch (AlertingException e) {
-            log.error("Cannot raise user-level alert", e);
-          }
+      for (AlerterService as : alerterServices) {
+        try {
+          as.raiseAlert(a);
+        } catch (AlertingException e) {
+          log.error("Cannot raise user-level alert", e);
         }
       }
+    }
 
-      if (getSaveSystemAlert()) {
-        raiseSystemAlert(event);
-      }
+    if (getSaveSystemAlert()) {
+      raiseSystemAlert(event);
     }
   }
 }

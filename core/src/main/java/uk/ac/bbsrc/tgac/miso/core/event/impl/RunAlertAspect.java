@@ -46,7 +46,7 @@ import uk.ac.bbsrc.tgac.miso.core.event.manager.RunAlertManager;
 @Aspect
 public class RunAlertAspect {
   protected static final Logger log = LoggerFactory.getLogger(RunAlertAspect.class);
-  private RunAlertManager runAlertManager;
+  private final RunAlertManager runAlertManager;
 
   public RunAlertAspect(RunAlertManager runAlertManager) {
     this.runAlertManager = runAlertManager;
@@ -77,6 +77,14 @@ public class RunAlertAspect {
       runAlertManager.update(runId);
     } catch (IOException e) {
       log.error("update run alert aspect", e);
+    }
+  }
+  
+  public void updateQcs(Long runQcId) {
+    try {
+      runAlertManager.updateQcs(runQcId);
+    } catch (IOException e) {
+      log.error("updateQcs run alert aspect", e);
     }
   }
 }

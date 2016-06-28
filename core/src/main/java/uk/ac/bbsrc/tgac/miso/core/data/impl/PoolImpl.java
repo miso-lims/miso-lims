@@ -38,7 +38,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
  * @author Rob Davey
  * @since 0.0.2
  */
-public class PoolImpl<P extends Poolable> extends AbstractPool<P> implements Serializable {
+public class PoolImpl<P extends Poolable<?, ?>> extends AbstractPool<P> implements Serializable {
+
+  private static final long serialVersionUID = 1L;
+
   public static final String PREFIX = "MPO";
 
   private String units = "";

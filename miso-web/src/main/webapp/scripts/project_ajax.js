@@ -35,6 +35,12 @@ var Project = Project || {
     jQuery('#alias').attr('data-parsley-maxlength', '100');
     jQuery('#alias').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
 
+    // Short name input field validation
+    jQuery('#shortName').attr('class', 'form-control');
+    jQuery('#shortName').attr('data-parsley-required', 'true');
+    jQuery('#shortName').attr('data-parsley-maxlength', '5');
+    jQuery('#shortName').attr('data-parsley-pattern', Utils.validation.shortNameRegex);
+
     // Description input field validation
     jQuery('#description').attr('class', 'form-control');
     jQuery('#description').attr('data-parsley-required', 'true');

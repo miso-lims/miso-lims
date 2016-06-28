@@ -46,7 +46,7 @@ public interface SequencerPoolPartition extends Partition, Deletable, Submittabl
    * @return Pool pool.
    */
   @JsonManagedReference(value = "pool")
-  public Pool<? extends Poolable> getPool();
+  public Pool<? extends Poolable<?,?>> getPool();
 
   /**
    * Sets the pool of this SequencerPoolPartition object.
@@ -54,5 +54,5 @@ public interface SequencerPoolPartition extends Partition, Deletable, Submittabl
    * @param pool
    *          pool.
    */
-  public void setPool(Pool<? extends Poolable> pool);
+  public void setPool(Pool<? extends Poolable<?,?>> pool);
 }

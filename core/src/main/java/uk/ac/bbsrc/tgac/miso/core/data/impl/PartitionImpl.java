@@ -47,7 +47,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 @JsonIgnoreProperties({ "securityProfile", "container" })
 public class PartitionImpl extends AbstractPartition implements SequencerPoolPartition, Serializable {
-  Pool<? extends Poolable> pool = null;
+  Pool<? extends Poolable<?,?>> pool = null;
 
   public PartitionImpl() {
   }
@@ -57,12 +57,12 @@ public class PartitionImpl extends AbstractPartition implements SequencerPoolPar
   }
 
   @Override
-  public Pool<? extends Poolable> getPool() {
+  public Pool<? extends Poolable<?,?>> getPool() {
     return pool;
   }
 
   @Override
-  public void setPool(Pool<? extends Poolable> pool) {
+  public void setPool(Pool<? extends Poolable<?,?>> pool) {
     this.pool = pool;
   }
 

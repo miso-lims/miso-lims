@@ -201,13 +201,13 @@ public class TgacDataObjectFactory extends DataObjectFactory {
   }
 
   @Override
-  public Pool<? extends Poolable> getPool() {
-    return new PoolImpl<Poolable>();
+  public Pool<? extends Poolable<?, ?>> getPool() {
+    return new PoolImpl<Poolable<?, ?>>();
   }
 
   @Override
-  public Pool<? extends Poolable> getPool(User user) {
-    return new PoolImpl<Poolable>(user);
+  public Pool<? extends Poolable<?, ?>> getPool(User user) {
+    return new PoolImpl<Poolable<?, ?>>(user);
   }
 
   @Override
@@ -433,9 +433,9 @@ public class TgacDataObjectFactory extends DataObjectFactory {
   }
 
   @Override
-  public Pool<? extends Poolable> getPoolOfType(PlatformType platformtype, User user) throws IllegalArgumentException {
+  public Pool<? extends Poolable<?, ?>> getPoolOfType(PlatformType platformtype, User user) throws IllegalArgumentException {
     if (platformtype != null) {
-      Pool<? extends Poolable> p = getPool(user);
+      Pool<? extends Poolable<?, ?>> p = getPool(user);
       p.setPlatformType(platformtype);
       return p;
     } else {

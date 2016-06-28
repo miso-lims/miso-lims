@@ -122,7 +122,8 @@ this file as appropriate.
 - The naming schemes will determine how MISO checks if object names (especially
 samples, libraries) are valid. If you do not want to use one of the supplied
 ones (TGAC's standard, OICR's standard, or no checks), you will have to write
-one or more specific to your organisation.
+one or more specific to your organisation. See Naming Schemes below for more
+information.
 - If using a notification server, change `miso.notification.interop.enabled`
 to `true` and change the host and port for your notification server
  (see Setting Up the Notification Server below).
@@ -169,6 +170,34 @@ needed for LDAP in the `security.properties`. Talk to your LDAP administrator.
 
 If using JDBC, once running, you should change the passwords of the `admin` and
 `notification` accounts.
+
+## Naming Schemes
+MISO Naming Schemes are used to validate and generate entity String fields. They are
+used for all `name` fields, and some `alias` fields. There are configuration options
+for three naming schemes in `miso.properties`:
+
+* `miso.naming.scheme.sample`
+* `miso.naming.scheme.library`
+* `miso.naming.scheme.nameable` (used for anything not covered above)
+
+Existing naming schemes:
+
+| Naming Scheme              | Used for  | Generation                                                  | Validation         |
+|----------------------------|-----------|-------------------------------------------------------------|--------------------|
+| DefaultEntityNamingScheme  | all       | Uses 3-digit entity identifier (e.g. 'SAM' for Sample) + ID | Matches validation |
+| AllowAnythingNamingScheme  | all       | Uses Java class name. Not intended for generation purposes  | None               |
+| DefaultSampleNamingScheme  | Samples   | None built in                                               | TGAC's standard    |
+| OicrSampleNamingScheme     | Samples   | None built in                                               | OICR's standard    |
+| DefaultLibraryNamingScheme | Libraries | None built in                                               | TGAC's standard    |
+| OicrLibraryNamingScheme    | Libraries | None built in                                               | OICR's standard    |
+
+A Sample alias generator may also be configured via `miso.naming.generator.sample.alias`
+
+The values used in these options refer to classes in the `uk.ac.bbsrc.tgac.miso.core.service.naming`
+Java package. To create a new naming scheme option, create a new class in this package that extends 
+`MisoNamingScheme<T>`. To create a new Sample alias generator, extend `NameGenerator<Sample>`.
+Extending the functionality to validate and/or generate additional fields is possible, but will
+require modifications at the Service layer as well.
 
 # Setting Up the Notification Server
 The notification server is a Java daemon that scans the paths containing

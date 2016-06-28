@@ -34,11 +34,13 @@ import java.util.Set;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 
@@ -67,6 +69,9 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 @JsonIgnoreProperties({ "project", "samples", "libraries", "runs", "qcPassedSamples" })
 public class ProjectOverview implements Watchable, Alertable, Nameable, Serializable {
+
+  private static final long serialVersionUID = 1L;
+
   protected static final Logger log = LoggerFactory.getLogger(ProjectOverview.class);
 
   public static final Long UNSAVED_ID = 0L;

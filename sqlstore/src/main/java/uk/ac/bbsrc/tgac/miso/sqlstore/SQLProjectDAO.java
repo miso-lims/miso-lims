@@ -94,7 +94,7 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 public class SQLProjectDAO implements ProjectStore {
   private static final String TABLE_NAME = "Project";
 
-  public static final String PROJECTS_SELECT = "SELECT projectId, name, alias, description, creationDate, securityProfile_profileId, progress, lastUpdated, referenceGenomeId "
+  public static final String PROJECTS_SELECT = "SELECT projectId, name, alias, shortName, description, creationDate, securityProfile_profileId, progress, lastUpdated, referenceGenomeId "
       + "FROM " + TABLE_NAME;
 
   public static final String PROJECTS_SELECT_LIMIT = PROJECTS_SELECT + " ORDER BY projectId DESC LIMIT ?";
@@ -107,13 +107,13 @@ public class SQLProjectDAO implements ProjectStore {
       + "description LIKE ? ";
 
   public static final String PROJECT_UPDATE = "UPDATE " + TABLE_NAME + " "
-      + "SET name=:name, alias=:alias, description=:description, creationDate=:creationDate, securityProfile_profileId=:securityProfile_profileId, progress=:progress, referenceGenomeId=:referenceGenomeId "
+      + "SET name=:name, alias=:alias, shortName=:shortName, description=:description, creationDate=:creationDate, securityProfile_profileId=:securityProfile_profileId, progress=:progress, referenceGenomeId=:referenceGenomeId "
       + "WHERE projectId=:projectId";
 
   public static final String PROJECT_DELETE = "DELETE FROM " + TABLE_NAME + " WHERE projectId=:projectId";
 
-  public static final String PROJECT_SELECT_BY_STUDY_ID = "SELECT p.projectId, p.name, p.alias, p.description, p.creationDate, p.securityProfile_profileId, p.progress, p.lastUpdated, p.referenceGenomeId "
-      + "FROM " + TABLE_NAME + " p, Study s " + "WHERE p.projectId=s.project_projectId " + "AND s.studyId=?";
+  public static final String PROJECT_SELECT_BY_STUDY_ID = PROJECTS_SELECT
+      + " WHERE projectId IN (SELECT project_projectId FROM Study WHERE studyId=?)";
 
   // OVERVIEWS
   public static final String OVERVIEWS_SELECT = "SELECT p.project_projectId, " + "po.overviewId, " + "po.principalInvestigator, "
@@ -285,7 +285,7 @@ public class SQLProjectDAO implements ProjectStore {
   @Override
   @TriggersRemove(cacheName = { "projectCache",
       "lazyProjectCache" }, keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
-          @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
+          @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
   public long save(Project project) throws IOException {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
 
@@ -296,6 +296,7 @@ public class SQLProjectDAO implements ProjectStore {
 
     MapSqlParameterSource params = new MapSqlParameterSource();
     params.addValue("alias", project.getAlias());
+    params.addValue("shortName", project.getShortName());
     params.addValue("description", project.getDescription());
     params.addValue("creationDate", project.getCreationDate());
     params.addValue("securityProfile_profileId", securityProfileId);
@@ -449,7 +450,7 @@ public class SQLProjectDAO implements ProjectStore {
 
   @Override
   @Cacheable(cacheName = "projectListCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
-      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
+      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
   public List<Project> listAll() {
     return template.query(PROJECTS_SELECT, new ProjectMapper(true));
   }
@@ -467,7 +468,7 @@ public class SQLProjectDAO implements ProjectStore {
   @Override
   @TriggersRemove(cacheName = { "projectCache",
       "lazyProjectCache" }, keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
-          @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
+          @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
   public boolean remove(Project project) throws IOException {
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
     boolean ok = true;
@@ -506,7 +507,7 @@ public class SQLProjectDAO implements ProjectStore {
 
   @Override
   @Cacheable(cacheName = "projectCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
-      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
+      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
   public Project get(long projectId) throws IOException {
     List<Project> eResults = template.query(PROJECT_SELECT_BY_ID, new Object[] { projectId }, new ProjectMapper());
     return eResults.size() > 0 ? eResults.get(0) : null;
@@ -588,6 +589,7 @@ public class SQLProjectDAO implements ProjectStore {
         project.setProjectId(id);
         project.setName(rs.getString("name"));
         project.setAlias(rs.getString("alias"));
+        project.setShortName(rs.getString("shortName"));
         project.setDescription(rs.getString("description"));
         project.setCreationDate(rs.getDate("creationDate"));
         project.setProgress(ProgressType.get(rs.getString("progress")));

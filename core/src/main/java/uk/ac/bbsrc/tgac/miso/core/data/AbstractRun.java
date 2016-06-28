@@ -45,9 +45,11 @@ import javax.persistence.Transient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
+
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
+
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
@@ -271,14 +273,13 @@ public abstract class AbstractRun implements Run {
 
   @Override
   public void addQc(RunQC runQC) throws MalformedRunQcException {
-    fireRunQcAddedEvent();
-
     this.runQCs.add(runQC);
     try {
       runQC.setRun(this);
     } catch (MalformedRunException e) {
       log.error("set run", e);
     }
+    fireRunQcAddedEvent();
   }
 
   @Override

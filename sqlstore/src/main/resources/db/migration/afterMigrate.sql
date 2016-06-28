@@ -492,7 +492,7 @@ CREATE OR REPLACE VIEW RunPartitionsByHealth AS
      JOIN _Partition ON SequencerPartitionContainer_Partition.partitions_partitionId = _Partition.partitionId
      JOIN Status ON Status.statusId = Run.status_statusId
     WHERE sequencingParameters_parametersId IS NOT NULL AND pool_poolId IS NOT NULL
-    GROUP BY pool_poolId, platformRunId, Status.health;
+    GROUP BY pool_poolId, sequencingParameters_parametersId, Status.health;
 
 CREATE OR REPLACE VIEW DesiredPartitions AS
   SELECT poolId, parametersId, SUM(partitions) AS num_partitions
