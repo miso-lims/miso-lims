@@ -2,10 +2,13 @@ package uk.ac.bbsrc.tgac.miso.notification.service;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -13,14 +16,12 @@ import java.util.Set;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import org.junit.Test;
+
 import net.sf.json.JSONArray;
 import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
 
-import org.junit.Ignore;
-import org.junit.Test;
-
-@Ignore
 public class IlluminaTransformerTestSuite {
 
   private static final String h1080_84_raw = "/runs/raw/Completed/111110_h1080_0084_AC08UPACXX";
@@ -86,8 +87,12 @@ public class IlluminaTransformerTestSuite {
     assertEqualFields(run1, run2, IlluminaTransformer.JSON_CONTAINER_ID);
     assertEqualFields(run1, run2, IlluminaTransformer.JSON_LANE_COUNT);
     assertEqualFields(run1, run2, IlluminaTransformer.JSON_NUM_CYCLES);
-    assertEqualFields(run1, run2, IlluminaTransformer.JSON_START_DATE);
-    assertEqualFields(run1, run2, IlluminaTransformer.JSON_COMPLETE_DATE);
+    assertCloseFields(run1, run2, IlluminaTransformer.JSON_START_DATE, 120);
+    assertCloseFields(run1, run2, IlluminaTransformer.JSON_COMPLETE_DATE, 120);
+  }
+
+  private void assertCloseFields(JSONObject run1, JSONObject run2, String field, int difference) {
+    assertTrue(Math.abs(run1.getLong(field) - run2.getLong(field)) < difference);
   }
 
   private void assertEqualFields(JSONObject run1, JSONObject run2, String field) throws JSONException {
@@ -164,8 +169,8 @@ public class IlluminaTransformerTestSuite {
     assertEqualFields(raw, nostat, IlluminaTransformer.JSON_CONTAINER_ID);
     assertEqualFields(raw, nostat, IlluminaTransformer.JSON_LANE_COUNT);
     assertEqualFields(raw, nostat, IlluminaTransformer.JSON_NUM_CYCLES);
-    assertEqualFields(raw, nostat, IlluminaTransformer.JSON_START_DATE);
-    assertEqualFields(raw, nostat, IlluminaTransformer.JSON_COMPLETE_DATE);
+    assertCloseFields(raw, nostat, IlluminaTransformer.JSON_START_DATE, 120);
+    assertCloseFields(raw, nostat, IlluminaTransformer.JSON_COMPLETE_DATE, 120);
   }
 
   @Test
@@ -183,8 +188,8 @@ public class IlluminaTransformerTestSuite {
     assertEqualFields(raw, nostat_noparam, IlluminaTransformer.JSON_CONTAINER_ID);
     assertEqualFields(raw, nostat_noparam, IlluminaTransformer.JSON_LANE_COUNT);
     assertEqualFields(raw, nostat_noparam, IlluminaTransformer.JSON_NUM_CYCLES);
-    assertEqualFields(raw, nostat_noparam, IlluminaTransformer.JSON_START_DATE);
-    assertEqualFields(raw, nostat_noparam, IlluminaTransformer.JSON_COMPLETE_DATE);
+    assertCloseFields(raw, nostat_noparam, IlluminaTransformer.JSON_START_DATE, 120);
+    assertCloseFields(raw, nostat_noparam, IlluminaTransformer.JSON_COMPLETE_DATE, 120);
   }
 
   @Test
@@ -202,8 +207,8 @@ public class IlluminaTransformerTestSuite {
     assertEqualFields(raw, nostat, IlluminaTransformer.JSON_SEQUENCER_NAME);
     assertEqualFields(raw, nostat, IlluminaTransformer.JSON_CONTAINER_ID);
     assertEqualFields(raw, nostat, IlluminaTransformer.JSON_NUM_CYCLES);
-    assertEqualFields(raw, nostat, IlluminaTransformer.JSON_START_DATE);
-    assertEqualFields(raw, nostat, IlluminaTransformer.JSON_COMPLETE_DATE);
+    assertCloseFields(raw, nostat, IlluminaTransformer.JSON_START_DATE, 120);
+    assertCloseFields(raw, nostat, IlluminaTransformer.JSON_COMPLETE_DATE, 120);
   }
 
   @Test
@@ -292,11 +297,12 @@ public class IlluminaTransformerTestSuite {
 
   @Test
   public void testInterOpNormal() throws ParserConfigurationException, TransformerException {
-    Set<File> files = new HashSet<>();
-    files.add(getResourceFile(interop_normal_h1179_70));
-    JSONObject json = new IlluminaTransformer().transformInterOpOnly(files).getJSONObject(0);
-    assertTrue(json.has("metrix"));
-    JSONObject metrix = json.getJSONObject("metrix");
+    File resource = getResourceFile(interop_normal_h1179_70);
+    IlluminaTransformer it = new IlluminaTransformer();
+    it.transform(Collections.singleton(resource));
+    IlluminaRunMessage run = it.transformInterOpOnly(resource);
+    assertNotNull(run.getMetrixJson());
+    JSONObject metrix = JSONObject.fromObject(run.getMetrixJson());
     assertKnownSummary(metrix);
     assertCompleteMetrics(metrix);
     assertCorrectQualityMetricsCombinedCalculation(metrix);
@@ -304,21 +310,22 @@ public class IlluminaTransformerTestSuite {
 
   @Test
   public void testInterOpGzippedRunInfo() throws ParserConfigurationException, TransformerException {
-    Set<File> files = new HashSet<>();
-    files.add(getResourceFile(interop_runinfo_gzipped_h1179_70));
-    JSONObject json = new IlluminaTransformer().transformInterOpOnly(files).getJSONObject(0);
-    assertTrue(json.has("metrix"));
-    JSONObject metrix = json.getJSONObject("metrix");
+    File resource = getResourceFile(interop_runinfo_gzipped_h1179_70);
+    IlluminaTransformer it = new IlluminaTransformer();
+    it.transform(Collections.singleton(resource));
+    IlluminaRunMessage run = it.transformInterOpOnly(resource);
+    assertNotNull(run.getMetrixJson());
+    JSONObject metrix = JSONObject.fromObject(run.getMetrixJson());
     assertKnownSummary(metrix);
   }
 
   @Test
   public void testInterOpNoFiles() throws ParserConfigurationException, TransformerException {
-    Set<File> files = new HashSet<>();
-    files.add(getResourceFile(interop_no_files_h1179_70));
-    JSONObject json = new IlluminaTransformer().transformInterOpOnly(files).getJSONObject(0);
-    assertTrue(!json.has("metrix"));
-    assertTrue(json.has("error"));
+    File resource = getResourceFile(interop_no_files_h1179_70);
+    IlluminaTransformer it = new IlluminaTransformer();
+    it.transform(Collections.singleton(resource));
+    IlluminaRunMessage run = it.transformInterOpOnly(resource);
+    assertNull(run.getMetrixJson());
   }
 
   private void assertKnownSummary(JSONObject metrix) {

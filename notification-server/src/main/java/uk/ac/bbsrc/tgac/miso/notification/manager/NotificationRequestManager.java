@@ -30,13 +30,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import uk.ac.bbsrc.tgac.miso.notification.service.IlluminaRunMessage;
 import uk.ac.bbsrc.tgac.miso.notification.service.IlluminaTransformer;
 import uk.ac.bbsrc.tgac.miso.tools.run.RunFolderScanner;
 import uk.ac.bbsrc.tgac.miso.tools.run.util.FileSetTransformer;
@@ -52,7 +52,6 @@ import uk.ac.bbsrc.tgac.miso.tools.run.util.FileSetTransformer;
  */
 public class NotificationRequestManager {
   protected static final Logger log = LoggerFactory.getLogger(NotificationRequestManager.class);
-  private ObjectMapper mapper = new ObjectMapper();
 
   private ClassPathXmlApplicationContext context;
   private Map<String, Set<File>> dataPaths;
@@ -166,16 +165,9 @@ public class NotificationRequestManager {
   public String queryInterOpMetrics(JSONObject request) throws IllegalStateException, IllegalArgumentException {
     File folder = lookupRunAliasPath(request);
     if (folder != null) {
-      JSONArray runs = parseIlluminaInterOpFolder(folder);
-      if (!runs.isEmpty()) {
-        JSONObject run = runs.getJSONObject(0);
-        if (run.has("error")) {
-          return run.getString("error");
-        }
-
-        if (run.has("metrix")) {
-          return run.getString("metrix");
-        }
+      IlluminaRunMessage run = parseIlluminaInterOpFolder(folder);
+      if (run.getMetrixJson() != null) {
+        return run.getMetrixJson();
       }
     } else {
       return "{\"error\":\"Cannot find run folder " + request.getString("run").replaceAll("('|\")", "\\\\$1") + "\"}";
@@ -223,13 +215,11 @@ public class NotificationRequestManager {
     }
   }
 
-  private JSONArray parseIlluminaInterOpFolder(File path) throws IllegalStateException {
+  private IlluminaRunMessage parseIlluminaInterOpFolder(File path) throws IllegalStateException {
     if (context != null && dataPaths != null) {
       IlluminaTransformer fst = (IlluminaTransformer) context.getBean("illuminaTransformer");
       if (fst != null) {
-        Set<File> fs = new HashSet<>();
-        fs.add(path);
-        return fst.transformInterOpOnly(fs);
+        return fst.transformInterOpOnly(path);
       } else {
         throw new IllegalStateException("No IlluminaTransformer available");
       }

@@ -10,12 +10,12 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
 
+/**
+ * Write an XML document as a string.
+ */
 public class WriteXml extends RunTransform<Document, String> {
-
-  public static final WriteXml INSTANCE = new WriteXml();
-
   @Override
-  protected String convert(Document input) throws Exception {
+  protected String convert(Document input, IlluminaRunMessage output) throws Exception {
     Transformer transformer = TransformerFactory.newInstance().newTransformer();
     transformer.setOutputProperty(OutputKeys.INDENT, "no");
 
