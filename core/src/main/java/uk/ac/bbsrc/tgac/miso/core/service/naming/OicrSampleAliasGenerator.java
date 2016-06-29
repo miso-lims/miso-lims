@@ -81,7 +81,7 @@ public class OicrSampleAliasGenerator implements NameGenerator<Sample> {
     }
     String siblingNum = sample.getSiblingNumber().toString();
     // Sibling number is only padded for Tissue Processing
-    if (isTissueProcessing(sample)) {
+    if (isTissueProcessingSample(sample)) {
       while (siblingNum.length() < 2) siblingNum = "0" + siblingNum;
     }
     return SEPARATOR + sc.getSuffix() + siblingNum;

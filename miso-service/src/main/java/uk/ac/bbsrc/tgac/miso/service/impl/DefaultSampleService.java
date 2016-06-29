@@ -24,8 +24,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAnalyte;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleCVSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleLCMTube;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl.IdentityBuilder;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
@@ -507,9 +510,22 @@ public class DefaultSampleService implements SampleService {
       if (isTissueSample(target)) {
         sampleTissueService.applyChanges((SampleTissue) target, (SampleTissue) source);
       }
+      if (isTissueProcessingSample(target)) {
+        applyChanges((SampleTissueProcessing) target, (SampleTissueProcessing) source);
+      }
       if (isAnalyteSample(target)) {
         sampleAnalyteService.applyChanges((SampleAnalyte) target, (SampleAnalyte) source);
       }
+    }
+  }
+
+  public void applyChanges(SampleTissueProcessing target, SampleTissueProcessing source) {
+    if (source instanceof SampleCVSlide) {
+      ((SampleCVSlide) target).setCuts(((SampleCVSlide) source).getCuts());
+      ((SampleCVSlide) target).setDiscards(((SampleCVSlide) source).getDiscards());
+      ((SampleCVSlide) target).setThickness(((SampleCVSlide) source).getThickness());
+    } else if (source instanceof SampleLCMTube) {
+      ((SampleLCMTube) target).setCutsConsumed(((SampleLCMTube) source).getCutsConsumed());
     }
   }
 

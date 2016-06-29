@@ -25,29 +25,22 @@ Sample.hot = {
    * Modifies attributes of Sample Dtos (ex. adds the alias for each attribute ID) so Handsontable displays correctly
    */
   modifySamplesForEdit: function (samplesArray) {
+    Sample.hot.sampleClassId = samplesArray[0].sampleClassId;
     return samplesArray.map(function (sam) {
       
       // add sampleAdditionalInfo values
       if (sam.type != 'Plain') {
+        // add attributes if it's a first receipt
         sam.sampleClassAlias = Hot.getAliasFromId(sam.sampleClassId, Hot.sampleOptions.sampleClassesDtos);
-        sam.parentSampleClassAlias = Hot.getAliasFromId(sam.parentSampleClassId, Hot.sampleOptions.sampleClassesDtos);
-        sam.tissueOriginAlias = Hot.getAliasFromId(sam.tissueOriginId, Hot.sampleOptions.tissueOriginsDtos);
-        sam.tissueTypeAlias = Hot.getAliasFromId(sam.tissueTypeId, Hot.sampleOptions.tissueTypesDtos);
-        if (sam.prepKitId) {
-          sam.prepKitAlias = Hot.getAliasFromId(sam.prepKitId, Hot.sampleOptions.kitDescriptorsDtos);
-        }
-        if (sam.subprojectId) {
-          sam.subprojectAlias = Hot.getAliasFromId(sam.subprojectId, Hot.sampleOptions.subprojectsDtos);
-        }
-        if (sam.labId) {
-          sam.labComposite = Sample.hot.getLabCompositeFromId(sam.labId, Hot.sampleOptions.labsDtos);
-        }
-        
+        if (sam.parentSampleClassId) sam.parentSampleClassAlias = Hot.getAliasFromId(sam.parentSampleClassId, Hot.sampleOptions.sampleClassesDtos);
+        if (sam.tissueOriginId) sam.tissueOriginAlias = Hot.getAliasFromId(sam.tissueOriginId, Hot.sampleOptions.tissueOriginsDtos);
+        if (sam.tissueTypeId) sam.tissueTypeAlias = Hot.getAliasFromId(sam.tissueTypeId, Hot.sampleOptions.tissueTypesDtos);
+        if (sam.labId) sam.labComposite = Sample.hot.getLabCompositeFromId(sam.labId, Hot.sampleOptions.labsDtos);
+        if (sam.prepKitId) sam.prepKitAlias = Hot.getAliasFromId(sam.prepKitId, Hot.sampleOptions.kitDescriptorsDtos);
+        if (sam.subprojectId) sam.subprojectAlias = Hot.getAliasFromId(sam.subprojectId, Hot.sampleOptions.subprojectsDtos);
+
         // add sampleAnalyte values, if applicable
         if (Sample.hot.getCategoryFromClassId(sam.sampleClassId) == 'Analyte') {
-          if (sam.tissueMaterialId) {
-            sam.tissueMaterialAlias = Hot.getAliasFromId(sam.tissueMaterialId, Hot.sampleOptions.tissueMaterialsDtos);
-          }
           if (sam.samplePurposeId) {
             sam.samplePurposeAlias = Hot.getAliasFromId(sam.samplePurposeId, Hot.sampleOptions.samplePurposesDtos);
           }
@@ -62,7 +55,7 @@ Sample.hot = {
   },
   
   /**
-   * Creates proto-samples with inherited attributes from parent samples.
+   * Creates proto-samples with some inherited attributes from parent samples.
    */
   modifySamplesForPropagate: function (samplesArray) {
     function clone (obj) {
@@ -84,20 +77,13 @@ Sample.hot = {
       newSam.sampleClassAlias = Hot.getAliasFromId(newSam.sampleClassId, Hot.sampleOptions.sampleClassesDtos);
       newSam.parentId = parseInt(sam.id);
       newSam.parentAlias = clone(sam.alias);
-      newSam.tissueOriginId = sam.tissueOriginId;
-      newSam.tissueOriginAlias = sam.tissueOriginAlias;
-      newSam.tissueTypeId = sam.tissueTypeId;
-      newSam.tissueTypeAlias = sam.tissueTypeAlias;
-      newSam.timesReceived = sam.timesReceived;
-      newSam.tubeNumber = sam.tubeNumber;
-      newSam.passageNumber = sam.passageNumber;
-      newSam.externalInstituteIdentifier = sam.externalInstituteIdentifier;
-      newSam.labId = sam.labId;
       if (sam.groupId.length) {
         newSam.groupId = parseInt(sam.groupId);
         newSam.groupDescription = sam.groupDescription;
       }
-      
+      if (sam.subprojectId) {
+        newSam.subprojectId = parseInt(sam.subprojectId);
+      }
       return newSam;
     });
   },
@@ -143,7 +129,7 @@ Sample.hot = {
     for (var i=0; i<Sample.hot.projectsArray.length; i++) {
       select.push('<option value="'+ Sample.hot.projectsArray[i].id +'"');
       select.push(Sample.hot.projectsArray[i].id == Sample.hot.selectedProjectId ? ' selected' : '');
-      select.push('>'+ Sample.hot.projectsArray[i].name +' ('+ Sample.hot.projectsArray[i].alias +')</option>');
+      select.push('>'+ Sample.hot.projectsArray[i].alias +' ('+ Sample.hot.projectsArray[i].name +')</option>');
     }
     document.getElementById('projectSelect').insertAdjacentHTML('beforeend', select.join(''));
     
@@ -436,7 +422,11 @@ Sample.hot = {
     region: null,
     tubeId: null,
     instituteTissueName: null,
-    cellularity: null
+    cellularity: null,
+    cuts: null,
+    discards: null,
+    thickness: null,
+    cutsConsumed: null
   },
  
   /**
@@ -584,7 +574,7 @@ Sample.hot = {
       // if detailed sample is not requested but qcs are
       cols = Hot.concatArrays(setAliasCol(), setPlainCols(), setQcCols());
     } else if (detailedBool && !qcBool){
-      // if detailed sample is requested but qcs are
+      // if detailed sample is requested but qcs are not
       cols = Hot.concatArrays(setAliasCol(), setPlainCols(), setDetailedCols(sampleCategory, idColBoolean));
     } else if (detailedBool && qcBool) {
       // if detailed sample and qcs are requested
@@ -661,7 +651,36 @@ Sample.hot = {
       var tissueCols = [
         
       ];
-       
+
+      var tissueProcessingCols = {
+        'CV Slide': [
+          {
+            header: 'Cuts',
+            data: 'cuts',
+            type: 'numeric',
+            validator: requiredText
+          },{
+            header: 'Discards',
+            data: 'discards',
+            type: 'numeric'
+          },{
+            header: 'Thickness',
+            data: 'thickness',
+            type: 'numeric'
+          }
+        ],
+        'LCM Tube': [
+          {
+            header: 'Cuts Consumed',
+            data: 'cutsConsumed',
+            type: 'numeric',
+            validator: requiredText
+          }
+        ],
+        'HE Slide': [],
+        'Curls': []
+      };
+
       var analyteCols = [
         {
           header: 'Material',
@@ -817,13 +836,15 @@ Sample.hot = {
       var parentColumn = (idColBoolean ? parentIdentityCols : parentSampleCols);
       additionalCols = Hot.concatArrays(parentColumn, additionalCols);
       
-      return Hot.concatArrays(additionalCols, getSampleCategoryCols(sampleCategory, tissueCols, analyteCols));
+      return Hot.concatArrays(additionalCols, getSampleCategoryCols(sampleCategory, tissueCols, tissueProcessingCols, analyteCols));
     }
     
-    function getSampleCategoryCols (sampleCategory, tissueCols, analyteCols) {
+    function getSampleCategoryCols (sampleCategory, tissueCols, tissueProcessingCols, analyteCols) {
       var categoryCols = {
         'Tissue': tissueCols,
-        'Analyte': analyteCols
+        'Analyte': analyteCols,
+        'Tissue Processing': tissueProcessingCols[Hot.getAliasFromId(Sample.hot.sampleClassId, Hot.sampleOptions.sampleClassesDtos)]
+        // Tissue Processing is different because the columns vary by sample class, unlike the other sample categories
       };
       return categoryCols[sampleCategory];
     }
@@ -1027,31 +1048,34 @@ Sample.hot = {
 
     sample.rootSampleClassId = Sample.hot.getRootSampleClassId();
     
-    // add sample parent attributes. 
+    // add sample parent attributes, and all other attributes for the first receipt of a sample 
     if (obj.externalName) {
       sample.externalName = obj.externalName;
-      if (obj.donorSex && obj.donorSex.length) {
-        sample.donorSex = obj.donorSex;
+      if (obj.donorSex && obj.donorSex.length) sample.donorSex = obj.donorSex;
+      
+      if (obj.tissueOriginId && !obj.tissueOriginAlias) {
+        sample.tissueOriginId = obj.tissueOriginId;
+      } else {
+        sample.tissueOriginId = Hot.getIdFromAlias(obj.tissueOriginAlias, Hot.sampleOptions.tissueOriginsDtos);
+      }
+      if (obj.tissueTypeId && !obj.tissueTypeAlias) {
+        sample.tissueTypeId = obj.tissueTypeId;
+      } else {
+        sample.tissueTypeId = Hot.getIdFromAlias(obj.tissueTypeAlias, Hot.sampleOptions.tissueTypesDtos);
+      }
+      sample.passageNumber = (obj.passageNumber == '' ? null : parseInt(obj.passageNumber));
+      sample.timesReceived = parseInt(obj.timesReceived);
+      sample.tubeNumber = parseInt(obj.tubeNumber);
+      if (obj.labComposite && obj.labComposite.length) {
+        sample.labId = Sample.hot.getIdFromLabComposite(obj.labComposite, Hot.sampleOptions.labsDtos);
+      }
+      if (obj.externalInstituteIdentifier && obj.externalInstituteIdentifier.length) {
+        sample.externalInstituteIdentifier = obj.externalInstituteIdentifier;
       }
     }
-    
-    // add sampleAdditionalInfo attributes
-    sample.passageNumber = (obj.passageNumber == '' ? null : parseInt(obj.passageNumber));
-    sample.timesReceived = parseInt(obj.timesReceived);
-    sample.tubeNumber = parseInt(obj.tubeNumber);
-    
+
     // if the table data couldn't have changed (no alias value) then use the original id; 
     // otherwise, generate id from alias (rather than calculating for each field whether the original id corresponds to the current alias
-    if (obj.tissueOriginId && !obj.tissueOriginAlias) {
-      sample.tissueOriginId = obj.tissueOriginId;
-    } else {
-      sample.tissueOriginId = Hot.getIdFromAlias(obj.tissueOriginAlias, Hot.sampleOptions.tissueOriginsDtos);
-    }
-    if (obj.tissueTypeId && !obj.tissueTypeAlias) {
-      sample.tissueTypeId = obj.tissueTypeId;
-    } else {
-      sample.tissueTypeId = Hot.getIdFromAlias(obj.tissueTypeAlias, Hot.sampleOptions.tissueTypesDtos);
-    }
     if (obj.sampleClassId && !obj.sampleClassAlias) {
       sample.sampleClassId = obj.sampleClassId;
     } else {
@@ -1065,12 +1089,6 @@ Sample.hot = {
       sample.subprojectId = Hot.getIdFromAlias(obj.subprojectAlias, Hot.sampleOptions.subprojectsDtos);
     } else if (document.getElementById('subprojectSelect') && document.getElementById('subprojectSelect').value > 0) {
       sample.subprojectId = parseInt(document.getElementById('subprojectSelect').value);
-    }
-    if (obj.labComposite && obj.labComposite.length) {
-      sample.labId = Sample.hot.getIdFromLabComposite(obj.labComposite, Hot.sampleOptions.labsDtos);
-    }
-    if (obj.externalInstituteIdentifier && obj.externalInstituteIdentifier.length) {
-      sample.externalInstituteIdentifier = obj.externalInstituteIdentifier;
     }
     if (obj.prepKitAlias && obj.prepKitAlias.length) {
       sample.prepKitId = Hot.getIdFromAlias(obj.prepKitAlias, Sample.hot.kitDescriptorsDtos);
@@ -1114,6 +1132,19 @@ Sample.hot = {
       if (obj.cellularity && obj.cellularity.length) {
         sample.cellularity = obj.cellularity;
       }
+      break;
+    case 'Tissue Processing':
+      if (obj.cuts) {
+        sample.cuts = obj.cuts;
+        sample.type = 'CV Slide'; // add type info for deserialization
+        sample.discards = (obj.discards ? obj.discards : 0);
+        if (obj.thickness) sample.thickness = obj.thickness;
+      }
+      if (obj.cutsConsumed) {
+        sample.cutsConsumed = obj.cutsConsumed;
+        sample.type = 'LCM Tube'; // add type info for deserialization
+      }
+      break;
     }
     
     // TODO: add qcCols attributes to their objects:
@@ -1122,10 +1153,10 @@ Sample.hot = {
     }
      // TODO: fix QCPD
      //sample.qcPassedDetailId = Hot.getIdFromAlias(obj.qcPassedDetailAlias, Hot.sampleOptions.qcPassedDetailsDtos);
-    if (obj.volume && obj.volume.length) {
+    if (obj.volume) {
       sample.volume = obj.volume;
     }
-    if (obj.concentration && obj.concentration.length) {
+    if (obj.concentration) {
       sample.concentration = obj.concentration;
     }
     return sample;

@@ -521,7 +521,47 @@
           </table>                               
         </div>
       </c:if>
-      
+
+      <c:if test="${sampleCategory eq 'Tissue Processing'}">
+        <br/>
+        <c:choose>
+        <c:when test="${sampleClass eq 'CV Slide'}">
+        <div id="cvSlideTable">
+          <h2>Tissue Processing</h2>
+          <table class="in">
+            <tr>
+              <td class="h">Cuts Remaining:</td>
+              <td id="cutsRemaining">${sample.cutsRemaining}</td>
+            </tr>
+            <tr>
+              <td class="h">Cuts:*</td>
+              <td><form:input id="cuts" path="cuts"/></td>
+            </tr>
+            <tr>
+              <td class="h">Discards:*</td>
+              <td><form:input id="discards" path="discards"/></td>
+            </tr>
+            <tr>
+              <td class="h">Thickness (&#181;m):</td>
+              <td><form:input id="thickness" path="thickness"/></td>
+            </tr>
+          </table>
+        </div>
+        </c:when>
+        <c:when test="${sampleClass eq 'LCM Tube'}">
+        <div id="lcmTubeTable">
+          <h2>Tissue Processing</h2>
+          <table class="in">
+            <tr>
+              <td class="h">Cuts Consumed:*</td>
+              <td><form:input id="cutsConsumed" path="cutsConsumed"/></td>
+            </tr>
+          </table>
+        </div>
+        </c:when>
+        </c:choose>
+      </c:if>
+
       <c:if test="${sampleCategory eq 'Analyte' or sampleCategory eq 'new'}">
         <br/>
         <div id="detailedSampleAnalyte">

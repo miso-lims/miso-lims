@@ -691,6 +691,9 @@ public class EditSampleController {
         sample = requestManager.getSampleById(sampleId);
         if (sample == null) throw new SecurityException("No such sample.");
         model.put("sampleCategory", detailedSample ? ((SampleAdditionalInfo) sample).getSampleClass().getSampleCategory() : "plain");
+        if (detailedSample) {
+          model.put("sampleClass", ((SampleAdditionalInfo) sample).getSampleClass().getAlias());
+        }
         model.put("title", "Sample " + sampleId);
         
         if (projectId != null) {
