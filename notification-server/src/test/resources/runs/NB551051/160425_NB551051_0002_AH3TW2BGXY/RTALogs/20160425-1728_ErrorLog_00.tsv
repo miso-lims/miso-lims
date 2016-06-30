@@ -1,0 +1,3 @@
+Date	Time	Sender	Level	Message	Tile	LastImageReceivedCycle	LastExtractedCycle	LastColorCorrectedCycle	LastCycleNeighborCorrected	LastBasecalledAndQScoredCycle	LastAlignedCycle
+4/25/2016	10:31:15 PM	ImageTransformation 15	Error	Registration failed in cycle 31, channel 1 due to four bad registration regions	4_22404	31	30	30	30	29	29
+4/25/2016	10:31:32 PM	ImageTransformation 18	Error	Registration failed in cycle 31, channel 0 due to four bad registration regions	2_22303	31	30	30	30	29	29

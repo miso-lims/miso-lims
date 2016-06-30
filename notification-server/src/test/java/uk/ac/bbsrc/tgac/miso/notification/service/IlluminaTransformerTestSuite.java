@@ -44,6 +44,7 @@ public class IlluminaTransformerTestSuite {
   private static final String interop_normal_h1179_70 = "/runs/interop/normal/120323_h1179_0070_BC0JHTACXX";
   private static final String interop_runinfo_gzipped_h1179_70 = "/runs/interop/runinfo_gzipped/120323_h1179_0070_BC0JHTACXX";
   private static final String interop_no_files_h1179_70 = "/runs/interop/no_files/120323_h1179_0070_BC0JHTACXX";
+  private static final String nb551051_complete = "/runs/NB551051/160425_NB551051_0002_AH3TW2BGXY";
 
   private String getResourcePath(String path) {
     return this.getClass().getResource(path).getPath();
@@ -326,6 +327,17 @@ public class IlluminaTransformerTestSuite {
     it.transform(Collections.singleton(resource));
     IlluminaRunMessage run = it.transformInterOpOnly(resource);
     assertNull(run.getMetrixJson());
+  }
+
+  @Test
+  public void testNextSeq() throws JSONException {
+    Map<String, String> map = transform(nb551051_complete);
+    JSONArray completed = JSONArray.fromObject(map.get(IlluminaTransformer.STATUS_COMPLETE));
+    assertTrue(completed.size() == 1);
+
+    JSONObject run = (JSONObject) completed.get(0);
+    assertComplete(run, true);
+    assertTrue("160425_NB551051_0002_AH3TW2BGXY".equals(run.getString(IlluminaTransformer.JSON_RUN_NAME)));
   }
 
   private void assertKnownSummary(JSONObject metrix) {

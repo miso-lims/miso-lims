@@ -292,6 +292,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
   protected static final Logger log = LoggerFactory.getLogger(IlluminaTransformer.class);
 
   private final static String logDateFormat = "MM'/'dd'/'yyyy','HH:mm:ss";
+  private final static String logDateFormatNextSeq = "MM'/'dd'/'yyyy','HH:mm:ss' 'a";
 
   private final static String runCompleteLogPattern = "(\\d{1,2}\\/\\d{1,2}\\/\\d{4},\\d{2}:\\d{2}:\\d{2})\\.\\d{3},\\d+,\\d+,\\d+,Proce[s||e]sing\\s+completed\\.\\s+Run\\s+has\\s+finished\\.";
 
@@ -304,7 +305,8 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
   public static final String STATUS_UNKNOWN = "Unknown";
 
   private static final RunSink<String> steps = new All<String>(makeRunParametersProcessor(), makeRunStatusProcessor(),
-      makeRunInfoProcessor(), new CheckLoggedFailures(), new CheckLastCycle(), makeDates(), makeBasecallChecks());
+      makeRunInfoProcessor(), new CheckLoggedFailures(), new CheckLastCycle(), makeDates(), makeBasecallChecks(),
+      makeRunCompletionProcessor());
 
   private static All<String> makeBasecallChecks() {
     FindFile netcopyComplete = new FindFile("/Basecalling_Netcopy_complete.txt", "/Basecalling_Netcopy_complete_SINGLEREAD.txt");
@@ -334,18 +336,18 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
     new DateInRunName().attachTo(all).add(new WriteStartDate());
     WriteCompletionDate writeCompletion = new WriteCompletionDate();
     RunSink<String> writeCompletionDate = new AsDate(logDateFormat).add(writeCompletion);
-    RunTransform<String, String> onlyIfUnset = writeCompletion.onlyIfUnset();
-    onlyIfUnset.attachTo(all);
-    new MatchPatternInFile("/Data/RTALogs/Log.txt", runCompleteLogPattern, lastDateEntryLogPattern).attachTo(onlyIfUnset)
-        .add(writeCompletionDate);
-    new MatchPatternInFile("/Data/Log.txt", runCompleteLogPattern, lastDateEntryLogPattern).attachTo(onlyIfUnset).add(writeCompletionDate);
+
+    new MatchPatternInFile("/Data/RTALogs/Log.txt", runCompleteLogPattern, lastDateEntryLogPattern).attachTo(all).add(writeCompletionDate);
+    new MatchPatternInFile("/Data/Log.txt", runCompleteLogPattern, lastDateEntryLogPattern).attachTo(all).add(writeCompletionDate);
     new MatchPatternInFile("/Logs/CycleTimes.txt",
-        "(\\d{1,2}\\/\\d{1,2}\\/\\d{4})\\s+(\\d{2}:\\d{2}:\\d{2})\\.\\d{3}\\s+[A-z0-9]+\\s+\\d+\\s+End\\s{1}Imaging").attachTo(onlyIfUnset)
+        "(\\d{1,2}\\/\\d{1,2}\\/\\d{4})\\s+(\\d{2}:\\d{2}:\\d{2})\\.\\d{3}\\s+[A-z0-9]+\\s+\\d+\\s+End\\s{1}Imaging").attachTo(all)
             .add(writeCompletionDate);
-    new MatchPatternInFile("/Events.log", "\\.*\\s+(\\d{1,2}\\/\\d{2}\\/\\d{4})\\s+(\\d{1,2}:\\d{2}:\\d{2}).\\d+.*").attachTo(onlyIfUnset)
+    new MatchPatternInFile("/Events.log", "\\.*\\s+(\\d{1,2}\\/\\d{2}\\/\\d{4})\\s+(\\d{1,2}:\\d{2}:\\d{2}).\\d+.*").attachTo(all)
         .add(writeCompletionDate);
-    new MatchPatternInFile("/RTAComplete.txt", "\\.*(\\d{1,2}\\/\\d{1,2}\\/\\d{4}),(\\d{1,2}:\\d{1,2}:\\d{1,2}).\\d+.*")
-        .attachTo(onlyIfUnset).add(writeCompletionDate);
+    new MatchPatternInFile("/RTAComplete.txt", "\\.*(\\d{1,2}\\/\\d{1,2}\\/\\d{4}),(\\d{1,2}:\\d{1,2}:\\d{1,2}).\\d+.*").attachTo(all)
+        .add(writeCompletionDate);
+    new MatchPatternInFile("/RTAComplete.txt", "(\\d{1,2}\\/\\d{1,2}\\/\\d{4}) (\\d{1,2}:\\d{1,2}:\\d{1,2} [AP]M)").attachTo(all)
+        .add(new AsDate(logDateFormatNextSeq).add(writeCompletion));
     return all;
   }
 
@@ -390,7 +392,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
   }
 
   private static RunSink<String> makeRunStatusProcessor() {
-    FindFile matchFiles = new FindFile("/Data/Status.xml", "/Data/reports/Status.xml");
+    FindFile matchFiles = new FindFile("/Data/Status.xml", "/Data/reports/Status.xml", "/RunCompletionStatus.xml");
     RunTransform<?, Document> readXmlDocument = new ParseXml().attachTo(matchFiles);
     new WriteXml().attachTo(readXmlDocument).add(new WriteStatus());
     new FindXmlElement("RunName").attachTo(readXmlDocument).toText().add(new WriteRunName());
@@ -399,6 +401,12 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
     new FindXmlElement("ImgCycle").attachTo(readXmlDocument).toText().add(new AsInteger().add(new LastCycleComplete()));
     new FindXmlElement("ScoreCycle").attachTo(readXmlDocument).toText().add(new AsInteger().add(new LastCycleComplete()));
     new FindXmlElement("CallCycle").attachTo(readXmlDocument).toText().add(new AsInteger().add(new LastCycleComplete()));
+    return matchFiles;
+  }
+
+  private static RunSink<String> makeRunCompletionProcessor() {
+    FindFile matchFiles = new FindFile("/RunCompletionStatus.xml");
+    new ParseXml().attachTo(matchFiles).add(new NextSeqCycleSummation());
     return matchFiles;
   }
 

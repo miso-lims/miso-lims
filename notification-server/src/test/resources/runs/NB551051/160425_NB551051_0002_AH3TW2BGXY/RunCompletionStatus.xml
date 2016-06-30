@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<RunCompletionStatus xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Version>1</Version>
+  <CompletionStatus>CompletedAsPlanned</CompletionStatus>
+  <RunId>160425_NB551051_0002_AH3TW2BGXY</RunId>
+  <PlannedRead1Cycles>151</PlannedRead1Cycles>
+  <PlannedRead2Cycles>151</PlannedRead2Cycles>
+  <PlannedIndex1ReadCycles>8</PlannedIndex1ReadCycles>
+  <PlannedIndex2ReadCycles>0</PlannedIndex2ReadCycles>
+  <CompletedRead1Cycles>151</CompletedRead1Cycles>
+  <CompletedRead2Cycles>151</CompletedRead2Cycles>
+  <CompletedIndex1ReadCycles>8</CompletedIndex1ReadCycles>
+  <CompletedIndex2ReadCycles>0</CompletedIndex2ReadCycles>
+  <ClusterDensity>168.11911</ClusterDensity>
+  <ClustersPassingFilter>83.59225</ClustersPassingFilter>
+  <EstimatedYield>111.947037</EstimatedYield>
+  <ErrorDescription>None</ErrorDescription>
+</RunCompletionStatus>
