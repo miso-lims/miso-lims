@@ -39,6 +39,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
+import com.google.common.collect.Lists;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
@@ -1074,6 +1075,18 @@ public class MisoRequestManager implements RequestManager {
     } else {
       throw new IOException("No platformStore available. Check that it has been declared in the Spring config.");
     }
+  }
+
+  @Override
+  public Collection<PlatformType> listActivePlatformTypes() throws IOException {
+    Collection<PlatformType> activePlatformTypes = Lists.newArrayList();
+    for (PlatformType platformType : PlatformType.values()) {
+      Collection<SequencerReference> sequencers = listSequencerReferencesByPlatformType(platformType);
+      if (!sequencers.isEmpty()) {
+        activePlatformTypes.add(platformType);
+      }
+    }
+    return activePlatformTypes;
   }
 
   @Override

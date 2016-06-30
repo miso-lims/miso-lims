@@ -271,7 +271,7 @@ public class EditLibraryController {
 
   @ModelAttribute("platformNames")
   public Collection<String> populatePlatformNames() throws IOException {
-    List<String> types = new ArrayList<String>(requestManager.listDistinctPlatformNames());
+    List<String> types = new ArrayList<>(PlatformType.platformTypeNames(requestManager.listActivePlatformTypes()));
     Collections.sort(types);
     return types;
   }
