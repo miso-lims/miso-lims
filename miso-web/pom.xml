@@ -77,6 +77,7 @@
                 <jsSourceFile>parsley_form_validations.js</jsSourceFile>
                 <jsSourceFile>multi_select_drag_drop.js</jsSourceFile>
                 <jsSourceFile>menus.js</jsSourceFile>
+                <jsSourceFile>shared_hot.js</jsSourceFile>
               </jsSourceFiles>
               <jsSourceIncludes>
                 <jsSourceInclude>*.js</jsSourceInclude>

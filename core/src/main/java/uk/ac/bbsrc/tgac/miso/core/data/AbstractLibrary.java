@@ -43,6 +43,7 @@ import javax.persistence.Transient;
 
 import org.codehaus.jackson.annotate.JsonBackReference;
 import org.codehaus.jackson.annotate.JsonManagedReference;
+import org.hibernate.annotations.Formula;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -129,6 +130,9 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @OneToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "lastModifier", nullable = false)
   private User lastModifier;
+
+  @Formula(value = "SELECT MAX(lcl.changeTime) FROM LibraryChangeLog lcl WHERE lcl.libraryId = libraryId")
+  private Date lastModified;
 
   @Transient
   private Collection<Note> notes = new HashSet<Note>();
@@ -508,6 +512,11 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @Override
   public void setLastModifier(User lastModifier) {
     this.lastModifier = lastModifier;
+  }
+
+  @Override
+  public Date getLastModified() {
+    return lastModified;
   }
 
   @Override

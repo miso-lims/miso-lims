@@ -23,10 +23,14 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import java.io.IOException;
 import java.net.URI;
-import java.util.Set;
+import java.util.Collection;
+import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
 
@@ -48,6 +52,7 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleIdentityDto;
@@ -110,22 +115,61 @@ public class SampleController extends RestController {
     if (sampleDto.getSampleAnalyte() != null) {
       SampleAnalyteController.writeUrls(sampleDto.getSampleAnalyte(), uriBuilder);
     }
+
     
     return sampleDto;
   }
 
   @RequestMapping(value = "/samples", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public ResponseEntity<Set<SampleDto>> getSamples(UriComponentsBuilder uriBuilder) throws IOException {
-    Set<Sample> samples = sampleService.getAll();
-    if (samples.isEmpty()) {
-      throw new RestException("No samples found", Status.NOT_FOUND);
-    } else {
-      Set<SampleDto> sampleDtos = Dtos.asSampleDtos(samples);
+  public List<SampleDto> getSamples(UriComponentsBuilder uriBuilder) throws IOException {
+    List<Sample> samples = sampleService.getAll();
+    // return all samples
+    List<SampleDto> sampleDtos = Dtos.asSampleDtos(samples);
+    for (SampleDto sampleDto : sampleDtos) {
+      sampleDto = writeUrls(sampleDto, uriBuilder);
+    }
+    return sampleDtos;
+  }
+
+  @RequestMapping(value = "/samples/dt", method = RequestMethod.GET, produces = { "application/json" })
+  @ResponseBody
+  public DataTablesResponseDto<SampleDto> getDTSamples(HttpServletRequest request, HttpServletResponse response,
+      UriComponentsBuilder uriBuilder) throws IOException {
+    if (request.getParameterMap().size() > 0) {
+      Long numSamples = sampleService.countAll();
+      // get request params from DataTables
+      Integer iDisplayStart = Integer.parseInt(request.getParameter("iDisplayStart"));
+      Integer iDisplayLength = Integer.parseInt(request.getParameter("iDisplayLength"));
+      String sSearch = request.getParameter("sSearch");
+      String sSortDir = request.getParameter("sSortDir_0");
+      String sortColIndex = request.getParameter("iSortCol_0");
+      String sortCol = request.getParameter("mDataProp_" + sortColIndex);
+
+      // get requested subset of samples
+      Collection<Sample> sampleSubset;
+      Long numMatches;
+
+      if (!isStringEmptyOrNull(sSearch)) {
+        sampleSubset = sampleService.getByPageAndSizeAndSearch(iDisplayStart, iDisplayLength, sSearch, sortCol, sSortDir);
+        numMatches = new Long(sampleService.getBySearch(sSearch).size());
+      } else {
+        sampleSubset = sampleService.getByPageAndSize(iDisplayStart, iDisplayLength, sortCol, sSortDir);
+        numMatches = numSamples;
+      }
+      List<SampleDto> sampleDtos = Dtos.asSampleDtos(sampleSubset);
       for (SampleDto sampleDto : sampleDtos) {
         sampleDto = writeUrls(sampleDto, uriBuilder);
       }
-      return new ResponseEntity<>(sampleDtos, HttpStatus.OK);
+
+      DataTablesResponseDto<SampleDto> dtResponse = new DataTablesResponseDto<SampleDto>();
+      dtResponse.setITotalRecords(numSamples);
+      dtResponse.setITotalDisplayRecords(numMatches);
+      dtResponse.setAaData(sampleDtos);
+      dtResponse.setSEcho(new Long(request.getParameter("sEcho")));
+      return dtResponse;
+    } else {
+      throw new RestException("Malformed Request: must send parameters in request to endpoint /samples/dt");
     }
   }
 

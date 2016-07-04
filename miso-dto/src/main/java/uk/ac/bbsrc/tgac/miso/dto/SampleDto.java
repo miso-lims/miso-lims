@@ -29,6 +29,7 @@ public class SampleDto {
   private String rootSampleClassUrl;
   private Double volume;
   private Boolean empty;
+  private String lastModified;
 
   public Long getId() {
     return id;
@@ -74,6 +75,7 @@ public class SampleDto {
     return identificationBarcode;
   }
 
+  @JsonSerialize(include = JsonSerialize.Inclusion.ALWAYS)
   public void setIdentificationBarcode(String identificationBarcode) {
     this.identificationBarcode = identificationBarcode;
   }
@@ -106,6 +108,7 @@ public class SampleDto {
     return qcPassed;
   }
 
+  @JsonSerialize(include = JsonSerialize.Inclusion.ALWAYS)
   public void setQcPassed(Boolean qcPassed) {
     this.qcPassed = qcPassed;
   }
@@ -204,6 +207,14 @@ public class SampleDto {
 
   public void setEmpty(Boolean empty) {
     this.empty = empty;
+  }
+
+  public String getLastModified() {
+    return lastModified;
+  }
+
+  public void setLastModified(String lastModified) {
+    this.lastModified = lastModified;
   }
 
 }

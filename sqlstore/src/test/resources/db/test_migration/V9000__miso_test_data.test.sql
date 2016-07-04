@@ -203,6 +203,25 @@ VALUES (15,NULL,'SAM15','identity1',1,'SAM15::TEST_0001_IDENTITY_1','Freezer1_1'
 (16,NULL,'SAM16','tissue1',1,'SAM16::TEST_0001_TISSUE_1','Freezer1_1','GENOMIC','2016-04-05','true','TEST_0001_TISSUE_1',1,'Homo sapiens',NULL,1),
 (17,NULL,'SAM17','tissue2',1,'SAM17::TEST_0001_TISSUE_2','Freezer1_1','GENOMIC','2016-04-05','true','TEST_0001_TISSUE_2',1,'Homo sapiens',NULL,1);
 
+INSERT INTO `SampleChangeLog`(`sampleId`, `columnsChanged`, `userId`, `message`, `changeTime`)
+VALUES (1, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:49'),
+(2, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:51'),
+(3, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:53'),
+(4, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:55'),
+(5, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:57'),
+(6, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:59'),
+(7, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:01'),
+(8, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:03'),
+(9, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:05'),
+(10, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:07'),
+(11, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:09'),
+(12, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:11'),
+(13, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:13'),
+(14, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:15'),
+(15, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:17'),
+(16, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:19'),
+(17, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:21');
+
 INSERT INTO `SampleClass`(`sampleClassId`, `alias`, `sampleCategory`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
 VALUES (1,'Identity','Identity',1,'2016-04-05 14:57:00',1,'2016-04-05 14:57:00'),
 (2,'Primary Tumor Tissue','Tissue',1,'2016-04-05 14:57:00',1,'2016-04-05 14:57:00');

@@ -244,7 +244,41 @@ public class SQLSampleDAOTest extends AbstractDAOTest {
         "METATRANSCRIPTOMIC");
 
     assertTrue("Did not find all sample types", sampleTypes.containsAll(types));
+  }
 
+  @Test
+  public void getSamplesOffsetZeroWithTwoSamplesPerPageTest() throws Exception {
+    List<Sample> samples = dao.listByOffsetAndNumResults(0, 2, "id", "desc");
+    assertEquals(2, samples.size());
+    assertEquals(17L, samples.get(0).getId());
+  }
+
+  @Test
+  public void getSamplesOffsetThreeWithThreeSamplesPerPageTest() throws Exception {
+    List<Sample> samples = dao.listByOffsetAndNumResults(3, 3, "id", "desc");
+    assertEquals(3, samples.size());
+    assertEquals(14L, samples.get(0).getId());
+  }
+
+  @Test
+  public void getSamplesOffsetThreeWithThreeSamplesPerPageOrderLastModTest() throws Exception {
+    List<Sample> samples = dao.listByOffsetAndNumResults(2, 2, "lastModified", "desc");
+    assertEquals(2, samples.size());
+    assertEquals(15L, samples.get(0).getId());
+  }
+
+  @Test
+  public void getSamplesBySearchOffsetZeroWithTwoSamplesPerPageTest() throws Exception {
+    List<Sample> samples = dao.listBySearchOffsetAndNumResults(0, 2, "TEST_0006", "id", "asc");
+    assertEquals(2, samples.size());
+    assertEquals(11L, samples.get(0).getId());
+  }
+
+  @Test
+  public void getSamplesBySearchOffsetZeroWithTenSamplesPerPageTest() throws Exception {
+    List<Sample> samples = dao.listBySearchOffsetAndNumResults(0, 10, "SaM1", "id", "desc");
+    assertEquals(9, samples.size());
+    assertEquals(17L, samples.get(0).getId());
   }
 
   private void mockAutoIncrement() throws IOException {

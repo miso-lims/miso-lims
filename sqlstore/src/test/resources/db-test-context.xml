@@ -70,6 +70,7 @@
         <value>uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.TagBarcode</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.TagBarcodeFamily</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleDerivedInfo</value>
       </list>
     </property>
     <property name="hibernateProperties">

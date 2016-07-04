@@ -555,9 +555,14 @@ public class DefaultSampleService implements SampleService {
   }
 
   @Override
-  public Set<Sample> getAll() throws IOException {
-    Collection<Sample> allSamples = sampleDao.getSample();
+  public List<Sample> getAll() throws IOException {
+    List<Sample> allSamples = sampleDao.getSample();
     return authorizationManager.filterUnreadable(allSamples);
+  }
+
+  @Override
+  public Long countAll() throws IOException {
+    return sampleDao.countAll();
   }
 
   @Override
@@ -594,6 +599,24 @@ public class DefaultSampleService implements SampleService {
   public void autoGenerateIdBarcode(Sample sample) {
     String barcode = sample.getName() + "::" + sample.getAlias();
     sample.setIdentificationBarcode(barcode);
+  }
+
+  @Override
+  public List<Sample> getByPageAndSize(int offset, int size, String sortCol, String sortDir) throws IOException {
+    Collection<Sample> samples = sampleDao.listByOffsetAndNumResults(offset, size, sortCol, sortDir);
+    return authorizationManager.filterUnreadable(samples);
+  }
+
+  @Override
+  public List<Sample> getByPageAndSizeAndSearch(int offset, int size, String querystr, String sortCol, String sortDir) throws IOException {
+    Collection<Sample> samples = sampleDao.listBySearchOffsetAndNumResults(offset, size, querystr, sortCol, sortDir);
+    return authorizationManager.filterUnreadable(samples);
+  }
+
+  @Override
+  public List<Sample> getBySearch(String querystr) throws IOException {
+    Collection<Sample> samples = sampleDao.listBySearch(querystr);
+    return authorizationManager.filterUnreadable(samples);
   }
 
 }
