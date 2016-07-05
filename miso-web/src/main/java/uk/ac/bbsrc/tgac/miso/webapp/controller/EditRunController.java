@@ -128,8 +128,8 @@ public class EditRunController {
   }
 
   @ModelAttribute("platformTypes")
-  public Collection<String> populatePlatformTypes() {
-    return PlatformType.getKeys();
+  public Collection<String> populatePlatformTypes() throws IOException {
+    return PlatformType.platformTypeNames(requestManager.listActivePlatformTypes());
   }
 
   @ModelAttribute("healthTypes")

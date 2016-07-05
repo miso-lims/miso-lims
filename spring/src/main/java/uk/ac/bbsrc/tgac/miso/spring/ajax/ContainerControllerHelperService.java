@@ -31,7 +31,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -71,7 +70,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 /**
  * Created by IntelliJ IDEA. User: davey Date: 25-May-2010 Time: 16:39:52
@@ -88,8 +86,7 @@ public class ContainerControllerHelperService {
 
   public JSONObject getPlatformTypes(HttpSession session, JSONObject json) throws IOException {
     StringBuilder b = new StringBuilder();
-    List<String> platformTypes = PlatformType.getKeys();
-    for (String p : platformTypes) {
+    for (String p : PlatformType.platformTypeNames(requestManager.listActivePlatformTypes())) {
       b.append("<input type='radio' name='platformTypes' id='platformTypes" + p + "' value='" + p
           + "' onchange='Container.ui.changeContainerPlatformType(this);'/>");
       b.append("<label for='platformTypes" + p + "'>" + p + "</label>");
