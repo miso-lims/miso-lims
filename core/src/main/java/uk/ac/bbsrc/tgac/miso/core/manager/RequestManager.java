@@ -485,6 +485,13 @@ public interface RequestManager {
    */
   public Collection<Platform> listAllPlatforms() throws IOException;
 
+  /**
+   * PlatformTypes with existing sequencers.
+   * 
+   * @throws IOException
+   */
+  public Collection<PlatformType> listActivePlatformTypes() throws IOException;
+
   public Collection<Platform> listPlatformsOfType(PlatformType platformType) throws IOException;
 
   public Collection<String> listDistinctPlatformNames() throws IOException;

@@ -24,9 +24,12 @@
 package uk.ac.bbsrc.tgac.miso.core.data.type;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.google.common.collect.Lists;
 
 /**
  * Enum representing the different platform types available
@@ -92,5 +95,13 @@ public enum PlatformType {
       keys.add(r.getKey());
     }
     return keys;
+  }
+
+  public static Collection<String> platformTypeNames(Collection<PlatformType> platformTypes) {
+    Collection<String> result = Lists.newArrayList();
+    for (PlatformType platformType : platformTypes) {
+      result.add(platformType.getKey());
+    }
+    return result;
   }
 }

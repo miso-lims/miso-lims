@@ -2211,6 +2211,11 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
+  public Collection<PlatformType> listActivePlatformTypes() throws IOException {
+    return backingManager.listActivePlatformTypes();
+  }
+
+  @Override
   public Collection<Platform> listPlatformsOfType(PlatformType platformType) throws IOException {
     return backingManager.listPlatformsOfType(platformType);
   }
