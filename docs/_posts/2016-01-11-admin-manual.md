@@ -1,3 +1,11 @@
+---
+layout: page
+title: "Administrator's Manual"
+category: adm
+date: 2016-01-11 13:51:46
+---
+
+
 # Running a MISO Instance
 MISO requires some configuration directly in the source code. While we plan to
 change this over time, running an instance of MISO will require building and
@@ -8,23 +16,28 @@ For each service, which may be put on the same machine, the following tools are
 required:
 
 All:
-- JDK 7
+
+* JDK 7
 
 Application Server:
-- Tomcat 8
+
+* Tomcat 8
 
 Database Server:
-- mySQL 5
-- Flyway
+
+* mySQL 5
+* Flyway
 
 Notification Server:
-- Nothing extra
+
+* Nothing extra
 
 Development Machine(s):
-- Maven
-- git
-- Eclipse
-- A merge tool such as Meld
+
+* Maven
+* git
+* Eclipse
+* A merge tool such as Meld
 
 # Creating a Fork
 Use the GitHub interface or a private instance to create a forked repository.
@@ -37,9 +50,9 @@ work.
 
 You will need:
 
-- JDK 7.0
-- [Maven 3.0.5](http://maven.apache.org/download.html) or later
-- Git
+* JDK 7.0
+* [Maven 3.0.5](http://maven.apache.org/download.html) or later
+* Git
 
 For development purposes, Eclipse is recommended and it might be useful to set
 up the server environments for testing. There is an automatic code formatting
@@ -119,15 +132,15 @@ Copy `$MISO_SRC/miso-web/src/main/resources/external/miso.properties` to
 `${CATALINA_HOME}/conf/Catalina/localhost/miso.properties`. Review and edit
 this file as appropriate.
 
-- The naming schemes will determine how MISO checks if object names (especially
+* The naming schemes will determine how MISO checks if object names (especially
 samples, libraries) are valid. If you do not want to use one of the supplied
 ones (TGAC's standard, OICR's standard, or no checks), you will have to write
 one or more specific to your organisation. See Naming Schemes below for more
 information.
-- If using a notification server, change `miso.notification.interop.enabled`
+* If using a notification server, change `miso.notification.interop.enabled`
 to `true` and change the host and port for your notification server
  (see Setting Up the Notification Server below).
-- If using a bulk barcode scanner (only VisionMate is supported at present), 
+* If using a bulk barcode scanner (only VisionMate is supported at present), 
 set `miso.boxscanner.enabled` to `true` and change the host and port for your
 VisionMate server.
 
@@ -233,8 +246,8 @@ Building the application is done by:
 
 There will be two important build artefacts:
 
-- `miso-web/target/ROOT.war`
-- `notification-server/target/notification-server-*.one-jar.jar`
+* `miso-web/target/ROOT.war`
+* `notification-server/target/notification-server-*.one-jar.jar`
 
 # Releasing and Upgrading
 
