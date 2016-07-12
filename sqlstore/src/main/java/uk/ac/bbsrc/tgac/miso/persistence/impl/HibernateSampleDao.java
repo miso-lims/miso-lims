@@ -11,12 +11,12 @@ import java.util.Set;
 
 import javax.persistence.CascadeType;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-
+import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 import org.hibernate.type.LongType;
 import org.hibernate.type.StringType;
 import org.slf4j.Logger;
@@ -29,6 +29,8 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.store.SecurityStore;
 
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -39,7 +41,6 @@ import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleQcStore;
-import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleDao;
@@ -54,7 +55,7 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
  * “transient” in the Sample class.
  */
 @Transactional(rollbackFor = Exception.class)
-public class HibernateSampleDao implements SampleDao, SampleStore {
+public class HibernateSampleDao implements SampleDao {
 
   protected static final Logger log = LoggerFactory.getLogger(HibernateSampleDao.class);
 
@@ -253,6 +254,12 @@ public class HibernateSampleDao implements SampleDao, SampleStore {
     return fetchSqlStore((Sample) currentSession().get(SampleImpl.class, id));
   }
 
+  @Override
+  public Long countAll() throws IOException {
+    Query query = currentSession().createQuery("select count(*) from SampleImpl");
+    return (Long) query.uniqueResult();
+  }
+
   public SampleQcStore getSampleQcDao() {
     return sampleQcDao;
   }
@@ -339,12 +346,42 @@ public class HibernateSampleDao implements SampleDao, SampleStore {
 
   @Override
   public Collection<Sample> listBySearch(String querystr) throws IOException {
-    Query query = currentSession().createQuery(
-        "from SampleImpl where identificationBarcode like :query or name LIKE :query or alias like :query or description like :query or scientificName like :query");
-    query.setString("query", querystr);
+    Criteria criteria = currentSession().createCriteria(Sample.class);
+    criteria.add(Restrictions.or(Restrictions.ilike("identificationBarcode", "%" + querystr + "%"),
+        Restrictions.ilike("name", "%" + querystr + "%"), Restrictions.ilike("alias", "%" + querystr + "%")));
     @SuppressWarnings("unchecked")
-    List<Sample> records = query.list();
+    List<Sample> records = criteria.list();
     return fetchSqlStore(records);
+  }
+
+  @Override
+  public List<Sample> listBySearchOffsetAndNumResults(int offset, int resultsPerPage, String querystr, String sortCol, String sortDir)
+      throws IOException {
+    if ("lastModified".equals(sortCol)) sortCol = "derivedInfo.lastModified";
+    Criteria criteria = currentSession().createCriteria(SampleImpl.class);
+    criteria.add(Restrictions.or(Restrictions.ilike("identificationBarcode", "%" + querystr + "%"),
+        Restrictions.ilike("name", "%" + querystr + "%"), Restrictions.ilike("alias", "%" + querystr + "%")));
+    criteria.setFirstResult(offset);
+    criteria.setMaxResults(resultsPerPage);
+    criteria.addOrder("asc".equals(sortDir) ? Order.asc(sortCol) : Order.desc(sortCol));
+    @SuppressWarnings("unchecked")
+    List<Sample> requestedPage = criteria.list();
+    return requestedPage;
+  }
+
+  @Override
+  public List<Sample> listByOffsetAndNumResults(int offset, int resultsPerPage, String sortCol, String sortDir) throws IOException {
+    Criteria criteria = currentSession().createCriteria(SampleImpl.class);
+    if ("lastModified".equals(sortCol)) sortCol = "derivedInfo.lastModified";
+    // I don't know why this alias is required, but without it, you can't sort by 'derivedInfo.lastModifier', which is the field on which we
+    // want to sort most List X pages
+    criteria.createAlias("derivedInfo", "derivedInfo");
+    criteria.setFirstResult(offset);
+    criteria.setMaxResults(resultsPerPage);
+    criteria.addOrder("asc".equals(sortDir) ? Order.asc(sortCol) : Order.desc(sortCol));
+    @SuppressWarnings("unchecked")
+    List<Sample> requestedPage = criteria.list();
+    return requestedPage;
   }
 
   @Override

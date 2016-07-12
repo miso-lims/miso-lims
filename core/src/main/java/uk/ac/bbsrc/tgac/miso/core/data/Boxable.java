@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.util.Date;
+
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonSubTypes;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
@@ -94,5 +96,7 @@ public interface Boxable extends Nameable, Barcodable {
   public String getBoxLocation();
 
   public void setBoxLocation(String boxLocation);
+
+  public Date getLastModified();
 
 }

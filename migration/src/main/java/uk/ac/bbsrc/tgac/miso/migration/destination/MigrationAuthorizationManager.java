@@ -1,9 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.migration.destination;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -12,8 +12,8 @@ import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationException;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 /**
- * Custom AuthorizationManager that sets the user to attribute migration to and authorizes that user to do everything.
- * This basically disables authorization checks and should only be used for migration
+ * Custom AuthorizationManager that sets the user to attribute migration to and authorizes that user to do everything. This basically
+ * disables authorization checks and should only be used for migration
  */
 public class MigrationAuthorizationManager implements AuthorizationManager {
 
@@ -79,8 +79,8 @@ public class MigrationAuthorizationManager implements AuthorizationManager {
   }
 
   @Override
-  public <T extends SecurableByProfile> Set<T> filterUnreadable(Collection<T> unfiltered) throws IOException, AuthorizationException {
-    return new HashSet<>(unfiltered);
+  public <T extends SecurableByProfile> List<T> filterUnreadable(Collection<T> unfiltered) throws IOException, AuthorizationException {
+    return new ArrayList<>(unfiltered);
   }
 
 }

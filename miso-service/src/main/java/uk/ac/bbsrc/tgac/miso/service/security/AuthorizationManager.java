@@ -2,7 +2,7 @@ package uk.ac.bbsrc.tgac.miso.service.security;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Set;
+import java.util.List;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -103,12 +103,12 @@ public interface AuthorizationManager {
    * Determines which items in an unfiltered collection are readable by the current user
    * 
    * @param unfiltered the items to check permissions for
-   * @return a Set containing only the items to which the current user has read permission. If unfiltered is null, 
-   * or there are no readable items, an empty Set is returned
-   * @throws IOException if there is an error while looking up the current user. This does not indicate whether 
-   * the user exists or is authenticated, but represents other errors occurring while checking these conditions
+   * @return a List containing only the items to which the current user has read permission. If unfiltered is null, or there are no readable
+   * items, an empty List is returned
+   * @throws IOException if there is an error while looking up the current user. This does not indicate whether the user exists or is
+   * authenticated, but represents other errors occurring while checking these conditions
    * @throws AuthorizationException if the current user is not authenticated
    */
-  public <T extends SecurableByProfile> Set<T> filterUnreadable(Collection<T> unfiltered) throws IOException, AuthorizationException;
-  
+  public <T extends SecurableByProfile> List<T> filterUnreadable(Collection<T> unfiltered) throws IOException, AuthorizationException;
+
 }

@@ -40,6 +40,7 @@ import javax.persistence.Transient;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.map.annotate.JsonDeserialize;
+import org.hibernate.annotations.Formula;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,6 +98,9 @@ public abstract class AbstractPool<P extends Poolable<?, ?>> extends AbstractBox
   private final Collection<ChangeLog> changeLog = new ArrayList<ChangeLog>();
   private User lastModifier;
 
+  @Formula(value = "SELECT MAX(pcl.changeTime) FROM PoolChangeLog pcl WHERE pcl.poolId = poolId")
+  private Date lastModified;
+
   @Transient
   private Collection<Note> notes = new HashSet<Note>();
 
@@ -108,6 +112,11 @@ public abstract class AbstractPool<P extends Poolable<?, ?>> extends AbstractBox
   @Override
   public void setLastModifier(User lastModifier) {
     this.lastModifier = lastModifier;
+  }
+
+  @Override
+  public Date getLastModified() {
+    return lastModified;
   }
 
   @Override

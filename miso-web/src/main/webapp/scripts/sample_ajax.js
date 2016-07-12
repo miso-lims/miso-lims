@@ -971,73 +971,127 @@ Sample.ui = {
   },
 
   createListingSamplesTable: function () {
+    if (Sample.detailedSample) Sample.ui.getSampleClasses();
     jQuery('#listingSamplesTable').html("<img src='../styles/images/ajax-loader.gif'/>");
-    jQuery.fn.dataTableExt.oSort['no-sam-asc'] = function (x, y) {
-      var a = parseInt(x.replace(/^SAM/i, ""));
-      var b = parseInt(y.replace(/^SAM/i, ""));
-      return ((a < b) ? -1 : ((a > b) ? 1 : 0));
-    };
-    jQuery.fn.dataTableExt.oSort['no-sam-desc'] = function (x, y) {
-      var a = parseInt(x.replace(/^SAM/i, ""));
-      var b = parseInt(y.replace(/^SAM/i, ""));
-      return ((a < b) ? 1 : ((a > b) ? -1 : 0));
-    };
-    Fluxion.doAjax(
-      'sampleControllerHelperService',
-      'listSamplesDataTable',
-      {
-        'url': ajaxurl
-      },
-      {
-        'doOnSuccess': function (json) {
-          jQuery('#listingSamplesTable').html('');
-          jQuery('#listingSamplesTable').dataTable({
-            "aaData": json.array,
-            "aoColumns": [
-              { "sTitle": "Bulk Edit"},
-              { "sTitle": "Sample Name", "sType": "no-sam"},
-              { "sTitle": "Alias"},
-              { "sTitle": "Type"},
-              { "sTitle": "QC Passed"},
-              { "sTitle": "QC Result"},
-              { "sTitle": "ID", "bVisible": false}
-            ],
-            "bJQueryUI": true,
-            "bAutoWidth": false,
-            "iDisplayLength": 25,
-            "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>',
-            "aaSorting": [
-              [1, "desc"]
-            ]
-          });
-          jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
-          jQuery("#toolbar").append("<button style=\"margin-left:5px;\" onclick=\"window.location.href='/miso/sample/new';\" class=\"fg-button ui-state-default ui-corner-all\">Add Sample</button>");
-  
-          jQuery("input[class='bulkCheckbox']").click(function () {
-            if (jQuery(this).parent().parent().hasClass('row_selected')) {
-              jQuery(this).parent().parent().removeClass('row_selected');
-            } else if (!jQuery(this).parent().parent().hasClass('row_selected')) {
-              jQuery(this).parent().parent().addClass('row_selected');
-            }
-          });
-  
-          var selectAll = '<label><input type="checkbox" onchange="Sample.ui.checkAll(this)" id="checkAll">Select All</label>';
-          document.getElementById('listingSamplesTable').insertAdjacentHTML('beforebegin', selectAll);
-          
-          var actions = ['<select id="dropdownActions" onchange="Sample.ui.checkForPropagate(this);"><option value="">-- Bulk actions</option>'];
-          actions.push('<option value="update">Update selected</option>');
-          actions.push('<option value="propagateSams">Propagate (sample) selected</option>');
-          actions.push('<option value="propagateLibs">Propagate (library) selected</option>');
-          actions.push('<option value="empty">Empty selected</option>');
-          actions.push('<option value="archive">Archive selected</option>');
-          actions.push('</select>');
-          document.getElementById('listingSamplesTable').insertAdjacentHTML('afterend', actions.join(''));
-          var goButton = '<div id="classOptions"></div><button id="go" type="button" onclick="Sample.ui.handleBulkAction();">Go</button>';
-          document.getElementById('dropdownActions').insertAdjacentHTML('afterend', goButton);
-          if (Sample.detailedSample) Sample.ui.getSampleClasses();
+
+    jQuery('#listingSamplesTable').html('');
+    jQuery('#listingSamplesTable').dataTable({
+      "aoColumns": [
+        {
+          "sTitle": "Bulk Edit",
+          "mData": "id",
+          "mRender": function (data, type, full) {
+            return "<input type=\"checkbox\" value=\"" + data + "\" class=\"bulkCheckbox\" id=\"bulk_" + data + "\">"
+          }
+        },
+        {
+          "sTitle": "Sample Name",
+          "mData": "name",
+          "mRender": function (data, type, full) {
+            return "<a href=\"/miso/sample/" + full.id + "\">" + data + "</a>";
+          }
+        },
+        {
+          "sTitle": "Alias",
+          "mData": "alias",
+          "mRender": function (data, type, full) {
+            return "<a href=\"/miso/sample/" + full.id + "\">" + data + "</a>";
+          }
+        },
+        {
+          "sTitle": "Sample Class",
+          "mData": (Sample.detailedSample ? "sampleAdditionalInfo.sampleClassId" : "id"),
+          "mRender": function (data, type, full) {
+            return Hot.getAliasFromId(data, Sample.sampleClasses);
+          },
+          "bVisible": (Sample.detailedSample? "true" : "false")
+        },
+        {
+          "sTitle": "Type",
+          "mData": "sampleType"
+        },
+        {
+          "sTitle": "QC Passed",
+          "mData": "qcPassed",
+          "mRender": function (data, type, full) {
+            return (data ? data : "Unknown");
+          }
+        },
+        {
+          "sTitle": "QC Result",
+          "mData": "id"
+        },
+        {
+          "sTitle": "Last Updated",
+          "mData": (Sample.detailedSample ? "lastModified" : "id"),
+          "bVisible": (Sample.detailedSample? "true" : "false")
+        },
+        {
+          "sTitle": "ID",
+          "mData": "identificationBarcode",
+          "bVisible": false
         }
+      ],
+      "bJQueryUI": true,
+      "bAutoWidth": false,
+      "iDisplayLength": 25,
+      "iDisplayStart": 0,
+      "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>',
+      "aaSorting": [
+        [7, "desc"]
+      ],
+      "sPaginationType": "full_numbers",
+      "bProcessing": true,
+      "bServerSide": true,
+      "sAjaxSource": "/miso/rest/tree/samples/dt",
+      "fnServerData": function (sSource, aoData, fnCallback) {
+        jQuery.ajax({
+          "dataType": "json",
+          "type": "GET",
+          "url": sSource,
+          "data": aoData,
+          "success": fnCallback // Do not alter this DataTables property
+        });
+      },
+      "fnRowCallback": function(nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+        Fluxion.doAjax(
+          'sampleControllerHelperService',
+          'getSampleLastQCRequest',
+          {
+            'sampleId': aData.id,
+            'url': ajaxurl
+          },{
+            'doOnSuccess': function (json) {
+              jQuery('td:eq(6)', nRow).html(json.response);
+            }
+          }
+        );
       }
-    );
+    }).fnSetFilteringDelay();
+    jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
+    jQuery("#toolbar").append("<button style=\"margin-left:5px;\" onclick=\"window.location.href='/miso/sample/new';\" class=\"fg-button ui-state-default ui-corner-all\">Add Sample</button>");
+
+    jQuery("input[class='bulkCheckbox']").click(function () {
+      if (jQuery(this).parent().parent().hasClass('row_selected')) {
+        jQuery(this).parent().parent().removeClass('row_selected');
+      } else if (!jQuery(this).parent().parent().hasClass('row_selected')) {
+        jQuery(this).parent().parent().addClass('row_selected');
+      }
+    });
+
+    var selectAll = '<label><input type="checkbox" onchange="Sample.ui.checkAll(this)" id="checkAll">Select All</label>';
+    document.getElementById('listingSamplesTable').insertAdjacentHTML('beforebegin', selectAll);
+
+    var actions = ['<select id="dropdownActions" onchange="Sample.ui.checkForPropagate(this);"><option value="">-- Bulk actions</option>'];
+    actions.push('<option value="update">Update selected</option>');
+    actions.push('<option value="propagateSams">Propagate (sample) selected</option>');
+    actions.push('<option value="propagateLibs">Propagate (library) selected</option>');
+    actions.push('<option value="empty">Empty selected</option>');
+    actions.push('<option value="archive">Archive selected</option>');
+    actions.push('</select>');
+    document.getElementById('listingSamplesTable').insertAdjacentHTML('afterend', actions.join(''));
+    var goButton = '<div id="classOptions"></div><button id="go" type="button" onclick="Sample.ui.handleBulkAction();">Go</button>';
+    document.getElementById('dropdownActions').insertAdjacentHTML('afterend', goButton);
   },
   
   checkAll: function (el) {
@@ -1054,6 +1108,7 @@ Sample.ui = {
   },
   
   checkForPropagate: function (el) {
+    if (jQuery('#classDropdown')) jQuery('#classDropdown').hide();
     var selectedValue = el.options[el.selectedIndex].value;
     if (selectedValue == 'propagateSams') {
       Sample.ui.insertSampleClassesDropdown();

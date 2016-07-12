@@ -39,6 +39,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Transient;
 
 import org.codehaus.jackson.annotate.JsonManagedReference;
@@ -56,6 +57,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAdditionalInfoImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAnalyteImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleDerivedInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
@@ -122,6 +124,10 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @OneToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "lastModifier", nullable = false)
   private User lastModifier;
+
+  @OneToOne(targetEntity = SampleDerivedInfo.class)
+  @PrimaryKeyJoinColumn
+  private SampleDerivedInfo derivedInfo;
 
   @OneToOne(targetEntity = SampleAnalyteImpl.class, mappedBy = "sample")
   @Cascade({ CascadeType.ALL })
@@ -394,6 +400,11 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
     if (sampleAdditionalInfo != null) {
       sampleAdditionalInfo.setSample(this);
     }
+  }
+
+  @Override
+  public Date getLastModified() {
+    return (derivedInfo == null ? null : derivedInfo.getLastModified());
   }
 
   /**

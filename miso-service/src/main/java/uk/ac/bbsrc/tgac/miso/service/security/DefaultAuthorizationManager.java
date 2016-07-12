@@ -1,9 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.service.security;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,8 +59,7 @@ public class DefaultAuthorizationManager implements AuthorizationManager {
     }
     if (user == null || LimsUtils.isStringEmptyOrNull(user.getFullName())) {
       return UNKNOWN_USER;
-    }
-    else {
+    } else {
       return user.getFullName();
     }
   }
@@ -118,9 +117,9 @@ public class DefaultAuthorizationManager implements AuthorizationManager {
   }
 
   @Override
-  public <T extends SecurableByProfile> Set<T> filterUnreadable(Collection<T> unfiltered) throws IOException {
+  public <T extends SecurableByProfile> List<T> filterUnreadable(Collection<T> unfiltered) throws IOException {
     throwIfUnauthenticated();
-    HashSet<T> filtered = new HashSet<>();
+    List<T> filtered = new ArrayList<>();
     if (unfiltered != null) {
       for (T item : unfiltered) {
         if (readCheck(item)) {

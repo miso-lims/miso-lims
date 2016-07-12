@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -486,6 +487,8 @@ public class Dtos {
     }
     if (from.getQcPassed() != null) {
       dto.setQcPassed(from.getQcPassed());
+    } else {
+      dto.setQcPassed(null);
     }
     if (!LimsUtils.isStringEmptyOrNull(from.getAlias())) {
       dto.setAlias(from.getAlias());
@@ -509,16 +512,20 @@ public class Dtos {
     }
     dto.setVolume(from.getVolume());
     dto.setEmpty(from.isEmpty());
+    if (from.getLastModified() != null) {
+      SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+      dto.setLastModified(sdf.format(from.getLastModified()));
+    }
 
     return dto;
   }
 
-  public static Set<SampleDto> asSampleDtos(Set<Sample> from) {
-    Set<SampleDto> dtoSet = Sets.newHashSet();
+  public static List<SampleDto> asSampleDtos(Collection<Sample> from) {
+    List<SampleDto> dtoList = new ArrayList<>();
     for (Sample sample : from) {
-      dtoSet.add(asDto(sample));
+      dtoList.add(asDto(sample));
     }
-    return dtoSet;
+    return dtoList;
   }
 
   public static Sample to(SampleDto from) {
