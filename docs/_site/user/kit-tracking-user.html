@@ -9,15 +9,15 @@
         <meta name="description" content="An open-source LIMS for NGS sequencing centres">
 
         <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
-        <link rel="stylesheet" href="/miso-lims/css/syntax.css">
-        <link rel="stylesheet" href="/miso-lims/css/main.css">
+        <link rel="stylesheet" href="/css/syntax.css">
+        <link rel="stylesheet" href="/css/main.css">
     </head>
     <body>
 <a href="https://github.com/TGAC/miso-lims"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
         <div class="container">
             <div class="row">
                 <div id="header" class="col-sm-12">
-                    <h2><a class="brand" href="/miso-lims/"><img src="/miso-lims/images/MISO.png"/>MISO</a>
+                    <h2><a class="brand" href="/"><img src="/images/MISO.png"/>MISO</a>
     <small>An open-source LIMS for NGS sequencing centres</small>
 </h2>
 
@@ -29,16 +29,11 @@
                 
                     <div id="navigation" class="col-sm-2">
                         <ul class="nav nav-list">
-    <!--<li><a href="/miso-lims/">Home</a></li>-->
+    <!--<li><a href="/">Home</a></li>-->
     
         
         
 
-        
-            
-                <li class="nav-header">Getting Started</li>
-            
-            <li data-order="1"><a href="/miso-lims/start/installation.html">Installation</a></li>
         
     
         
@@ -48,7 +43,7 @@
             
                 <li class="nav-header">User Guides</li>
             
-            <li data-order="1"><a href="/miso-lims/usr/user-manual.html">User Manual</a></li>
+            <li data-order="1"><a href="/usr/user-manual.html">User Manual</a></li>
         
     
         
@@ -58,7 +53,10 @@
             
                 <li class="nav-header">Admin Guides</li>
             
-            <li data-order=""><a href="/miso-lims/adm/external-webapp.html">Configuring the external webapp</a></li>
+            <li data-order=""><a href="/adm/external-webapp.html">Configuring the external webapp</a></li>
+        
+            
+            <li data-order=""><a href="/adm/admin-manual.html">Administrator's Manual</a></li>
         
     
         
@@ -68,22 +66,22 @@
             
                 <li class="nav-header">Developer Guides</li>
             
-            <li data-order=""><a href="/miso-lims/dev/rest-testing.html">REST Testing</a></li>
+            <li data-order=""><a href="/dev/rest-testing.html">REST Testing</a></li>
         
             
-            <li data-order=""><a href="/miso-lims/dev/maven-artifacts.html">Maven artifacts</a></li>
+            <li data-order=""><a href="/dev/maven-artifacts.html">Maven artifacts</a></li>
         
             
-            <li data-order=""><a href="/miso-lims/dev/kit-tracking.html">Kit Tracking</a></li>
+            <li data-order=""><a href="/dev/kit-tracking.html">Kit Tracking</a></li>
         
             
-            <li data-order=""><a href="/miso-lims/dev/eclipse-code-formatting.html">Eclipse Code Formatting</a></li>
+            <li data-order=""><a href="/dev/eclipse-code-formatting.html">Eclipse Code Formatting</a></li>
         
             
-            <li data-order=""><a href="/miso-lims/dev/code-style.html">Code Style</a></li>
+            <li data-order=""><a href="/dev/code-style.html">Code Style</a></li>
         
             
-            <li data-order=""><a href="/miso-lims/dev/developers-manual.html">Developer's Manual</a></li>
+            <li data-order=""><a href="/dev/developers-manual.html">Developer's Manual</a></li>
         
     
         
@@ -93,20 +91,12 @@
             
                 <li class="nav-header">Reference</li>
             
-            <li data-order=""><a href="/miso-lims/ref/rest-api.html">REST API</a></li>
+            <li data-order=""><a href="/ref/rest-api.html">REST API</a></li>
         
     
         
         
 
-        
-            
-                <li class="nav-header">Posts</li>
-            
-            <li data-order=""><a href="/miso-lims/post/changelogs-0.2.0.html">Version 0.2.0</a></li>
-        
-            
-            <li data-order=""><a href="/miso-lims/post/changelogs-0.1.9.html">Version 0.1.9</a></li>
         
     
 <!-- List additional links. It is recommended to add a divider
@@ -213,12 +203,12 @@
 <ol>
   <li>
     <p>Clicking on ‘Create a Kit Descriptor’ link takes the user to a form which needs to be filled in. The form consists of all the information required for the new Kit Descriptor instance which is: name, version, manufacturer, part number, units, value, type, platform.  <br />
-<img src="/miso-lims/images/newdescriptor.png" alt="New kit" /></p>
+<img src="/images/newdescriptor.png" alt="New kit" /></p>
   </li>
   <li>After filling out all the fields the user can proceed to add Component Descriptors to the newly created Kit Descriptor</li>
   <li>
     <p>The ‘Add a new Component’ form requires the user fill in name and reference number of a Kit Component Descriptor. There can be multiple Kit Component Descriptors linked to one Kit Descriptor.  <br />
-<img src="/miso-lims/images/newkitcomponentdescriptor.png" alt="New kit component" /></p>
+<img src="/images/newkitcomponentdescriptor.png" alt="New kit component" /></p>
 
     <ac:image ac:height="400" ac:style="margin-left: 2.0px;"></ac:image>
   </li>
@@ -238,7 +228,7 @@
   <li>After choosing a Kit Descriptor from the list, the expanded overview of this Kit Descriptor details will be displayed. This Kit Descriptor’s Component Descriptors are presented in a sortable and searchable table. The stock level field shows the current quantity of Kit Components that use this specifiic Kit Component Descriptor</li>
 </ol>
 
-<p><img src="/miso-lims/images/kitdescmanagement.png" alt="Kit management" /></p>
+<p><img src="/images/kitdescmanagement.png" alt="Kit management" /></p>
 
 <h2 id="kit-components-change-log-admin">Kit Components Change Log (ADMIN)</h2>
 
@@ -263,7 +253,7 @@
   <li>Clicking on ‘Kit Components Change Log’ link takes the user to page with a change log table.</li>
 </ol>
 
-<p><img src="/miso-lims/images/changelog.png" alt="Change logs" /></p>
+<p><img src="/images/changelog.png" alt="Change logs" /></p>
 
 <h2 id="log-kit-component">Log Kit Component</h2>
 
@@ -315,17 +305,17 @@
 <ol>
   <li>
     <p>Clicking on ‘Log a Kit Component’ link takes the user to a page where they have to scan the location barcode in order to start the logging session. Pressing Enter(Return) takes the user to the next page.  <br />
-<img src="/miso-lims/images/log_location.png" alt="Set location" /></p>
+<img src="/images/log_location.png" alt="Set location" /></p>
   </li>
   <li>
     <p>The next page requires the user to fill in the form by scanning the barcodes on the physical box and entering the expiry date. (tip: press TAB after each barcode to focus on the next field). Once all the info is filled out the user can ‘Add the component’ to the session.  <br />
-<img src="/miso-lims/images/log_add.png" alt="Set location" /></p>
+<img src="/images/log_add.png" alt="Set location" /></p>
   </li>
   <li>There is an option to remove the entry from the list. By selecting the entry from the table and clicking “Remove selected entry” the component will be removed from the logging session.</li>
   <li>The table is searchable and sortable to help with checking the list against the packaging slip.</li>
   <li>Once the user has added all the components they can save the session by clicking the ‘Save logging session button’.</li>
   <li>The Overview window will pop up. Confirming the logging session saves the components into the database.  <br />
-<img src="/miso-lims/images/log_confirm.png" alt="Confirmation" /></li>
+<img src="/images/log_confirm.png" alt="Confirmation" /></li>
 </ol>
 
 <h2 id="kit-component-management">Kit Component Management</h2>
@@ -338,12 +328,12 @@
 
 <ol>
   <li>Clicking on ‘Kit Component Management’ link takes the user to a page where they have to scan the identification barcode of the Kit Component.  <br />
-<img src="/miso-lims/images/component_manage.png" alt="Kit Component Management" /></li>
+<img src="/images/component_manage.png" alt="Kit Component Management" /></li>
   <li>On success - the user will see the detailed overview page showing all the information about the Kit Component along with its Change Log</li>
   <li>The user can choose from two actions - Exhaust or Change Location. This actions are restricted for the Kit Components that have already been exhausted before.</li>
   <li>With Exhaust the user has the option to add a change of location. By default exhaustion means the Kit Component has been used up but there are cases where one would want to mark the Kit Component as exhausted and move it somewhere else. Choosing this option requires user to scan the barcode of the new location.</li>
   <li>With Change Location the only thing that changes it the location. The user is required to scan the barcode of the new location  <br />
-<img src="/miso-lims/images/component_manage_final.png" alt="Set location" /></li>
+<img src="/images/component_manage_final.png" alt="Set location" /></li>
 </ol>
 
 <h2 id="list-kit-components">List Kit Components</h2>
@@ -368,7 +358,7 @@
       </li>
       <li>Search by Id - filters the table to only show the Kit Components of this ID</li>
       <li>Show additional fields - checking the boxes will expand the table to show more information. Unchecking a box has the opposite effect<br />
-<img src="/miso-lims/images/listKits.png" alt="Kit Component Management" /></li>
+<img src="/images/listKits.png" alt="Kit Component Management" /></li>
     </ol>
   </li>
 </ol>
