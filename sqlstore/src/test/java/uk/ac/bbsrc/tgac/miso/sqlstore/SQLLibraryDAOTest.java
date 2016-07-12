@@ -7,6 +7,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -35,6 +36,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAdditionalInfoImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
@@ -46,7 +48,10 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
+import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
+import uk.ac.bbsrc.tgac.miso.core.store.TagBarcodeStore;
+import uk.ac.bbsrc.tgac.miso.persistence.LibraryAdditionalInfoDao;
 
 public class SQLLibraryDAOTest extends AbstractDAOTest {
 
@@ -70,15 +75,24 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
   private ChangeLogStore changeLogStore;
   @Mock
   private MisoNamingScheme<Library> libraryNamingSchema;
+  @Mock
+  private TagBarcodeStore tagBarcodeStore;
+  @Mock
+  private SampleStore sampleStore;
+  @Mock
+  private LibraryAdditionalInfoDao libraryAdditionalInfoDao;
 
   @InjectMocks
   private SQLLibraryDAO dao;
 
   @Before
-  public void setup() {
+  public void setup() throws IOException {
     MockitoAnnotations.initMocks(this);
     dao.setJdbcTemplate(jdbcTemplate);
     dao.setDataObjectFactory(new TgacDataObjectFactory());
+    when(tagBarcodeStore.getTagBarcodeById(Matchers.anyLong())).thenReturn(new TagBarcode());
+    when(sampleStore.get(Matchers.anyLong())).thenReturn(new SampleImpl());
+    when(libraryAdditionalInfoDao.getLibraryAdditionalInfoByLibraryId(Matchers.anyLong())).thenReturn(new LibraryAdditionalInfoImpl());
   }
 
   @Test
@@ -192,16 +206,16 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
   public void testListByLibraryDilutionId() throws Exception {
 
     List<Library> libraries = dao.listByLibraryDilutionId(9);
-    assertTrue(libraries.size() == 1);
-    assertTrue(9 == libraries.get(0).getId());
+    assertEquals(1, libraries.size());
+    assertEquals(9, libraries.get(0).getId());
   }
 
   @Test
   public void testListBySampleId() throws Exception {
     List<Library> libraries = dao.listBySampleId(1);
 
-    assertTrue(libraries.size() == 1);
-    assertTrue(libraries.get(0).getId() == 1);
+    assertEquals(1, libraries.size());
+    assertEquals(1, libraries.get(0).getId());
 
   }
 
@@ -209,7 +223,7 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
   public void testListByProjectId() throws Exception {
     List<Library> libraries = dao.listByProjectId(1);
     List libraryIds = Arrays.asList(1l, 2l, 3l, 4l, 5l, 6l, 7l, 8l, 9l, 10l, 11l, 12l, 13l, 14l);
-    assertTrue(libraries.size() == 14);
+    assertEquals(14, libraries.size());
     for (Library library : libraries) {
       assertTrue("bad library found", libraryIds.contains(library.getId()));
     }
@@ -219,7 +233,7 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
   public void testListAll() throws Exception {
     List<Library> libraries = dao.listAll();
     List libraryIds = Arrays.asList(1l, 2l, 3l, 4l, 5l, 6l, 7l, 8l, 9l, 10l, 11l, 12l, 13l, 14l);
-    assertTrue(libraries.size() == 14);
+    assertEquals(14, libraries.size());
     for (Library library : libraries) {
       assertTrue("bad library found", libraryIds.contains(library.getId()));
     }
@@ -229,28 +243,27 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
   @Test
   public void testListAllWithLimit() throws Exception {
     List<Library> libraries = dao.listAllWithLimit(5);
-    assertTrue("not within limit", libraries.size() == 5);
+    assertEquals("not within limit", 5, libraries.size());
 
   }
 
   @Test
   public void testCount() throws Exception {
-    int count = dao.count();
-    assertTrue("count incorrect", dao.count() == 14);
+    assertEquals("count incorrect", 14, dao.count());
   }
 
   @Test
   public void testListBySearch() throws Exception {
     String searchStr = "LIB";
     List<Library> libraries = dao.listBySearch(searchStr);
-    assertTrue("did not find all libraries", libraries.size() == 14);
+    assertEquals("did not find all libraries", 14, libraries.size());
   }
 
   @Test
   public void testListBySearch_NoResults() throws Exception {
     String searchStr = "IJOHEWF";
     List<Library> libraries = dao.listBySearch(searchStr);
-    assertTrue("search returned results", libraries.size() == 0);
+    assertEquals("search returned results", 0, libraries.size());
   }
 
   @Test
@@ -265,7 +278,7 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
     boolean remove = dao.remove(library);
     assertTrue("library did not remove successfully", remove);
     Library library1 = dao.get(3);
-    assertTrue("library did not remove successfully", library1 == null);
+    assertEquals("library did not remove successfully", null, library1);
   }
 
   @Test
@@ -339,20 +352,20 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
   @Test
   public void testListAllLibraryTypes() throws Exception {
     List<LibraryType> libraryTypes = dao.listAllLibraryTypes();
-    assertTrue(17 == libraryTypes.size());
+    assertEquals(18, libraryTypes.size());
 
   }
 
   @Test
   public void testListAllLibrarySelectionTypes() throws Exception {
     List<LibrarySelectionType> librarySelectionTypes = dao.listAllLibrarySelectionTypes();
-    assertTrue(25 == librarySelectionTypes.size());
+    assertEquals(25, librarySelectionTypes.size());
   }
 
   @Test
   public void testListAllLibraryStrategyTypes() throws Exception {
     List<LibraryStrategyType> libraryStrategyTypes = dao.listAllLibraryStrategyTypes();
-    assertTrue(20 == libraryStrategyTypes.size());
+    assertEquals(20, libraryStrategyTypes.size());
   }
 
 }
