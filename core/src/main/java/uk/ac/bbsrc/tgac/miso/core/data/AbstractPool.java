@@ -98,7 +98,7 @@ public abstract class AbstractPool<P extends Poolable<?, ?>> extends AbstractBox
   private final Collection<ChangeLog> changeLog = new ArrayList<ChangeLog>();
   private User lastModifier;
 
-  @Formula(value = "SELECT MAX(pcl.changeTime) FROM PoolChangeLog pcl WHERE pcl.poolId = poolId")
+  @Formula(value = "(SELECT MAX(pcl.changeTime) FROM PoolChangeLog pcl WHERE pcl.poolId = poolId)")
   private Date lastModified;
 
   @Transient

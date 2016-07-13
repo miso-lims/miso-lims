@@ -131,7 +131,7 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @JoinColumn(name = "lastModifier", nullable = false)
   private User lastModifier;
 
-  @Formula(value = "SELECT MAX(lcl.changeTime) FROM LibraryChangeLog lcl WHERE lcl.libraryId = libraryId")
+  @Formula(value = "(SELECT MAX(lcl.changeTime) FROM LibraryChangeLog lcl WHERE lcl.libraryId = libraryId)")
   private Date lastModified;
 
   @Transient
