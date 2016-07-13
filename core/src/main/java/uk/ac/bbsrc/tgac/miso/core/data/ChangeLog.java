@@ -6,9 +6,10 @@ import java.util.Date;
  * A single entry in the database-generated change log for an object.
  */
 public class ChangeLog {
-  public String columnsChanged;
-  public String summary;
-  public Date time;
+  private String columnsChanged;
+  private String summary;
+  private Date time;
+  private Long userId;
 
   public String getColumnsChanged() {
     return columnsChanged;
@@ -32,6 +33,14 @@ public class ChangeLog {
 
   public void setTime(Date time) {
     this.time = time;
+  }
+
+  public Long getUserId() {
+    return userId;
+  }
+
+  public void setUserId(Long userId) {
+    this.userId = userId;
   }
 
 }
