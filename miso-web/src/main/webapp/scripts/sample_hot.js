@@ -587,338 +587,290 @@ Sample.hot = {
    */
   setColumnData: function (detailedBool, sampleCategory, idColBoolean) {
     var qcBool = Sample.hot.showQcs;
-    var cols = Hot.concatArrays(setAliasCol(), setPlainCols(), detailedBool ? setDetailedCols(sampleCategory, idColBoolean) : [], qcBool ? setQcCols() : []);
-    // add the ID Barcode column if it is not auto-generated
-    if (!Hot.autoGenerateIdBarcodes) {
-      cols.splice(3, 0, {
-          header: 'Matrix Barcode',
-          data: 'identificationBarcode',
-          type: 'text'
-        }
-      );
-    }
-    return cols;
+    var sampleClassAlias = Hot.getAliasFromId(Sample.hot.sampleClassId, Hot.sampleOptions.sampleClassesDtos);
 
-    function setPlainCols () {
-      var sampleCols = [
-        {
-          header: 'Description',
-          data: 'description',
-          type: 'text',
-          validator: requiredText
-        }
-      ];
-
-      if (!detailedBool || idColBoolean) {
-        sampleCols.push({
-          header: 'Date of receipt',
-          data: 'receivedDate',
-          type: 'date',
-          dateFormat: 'YYYY-MM-DD',
-          datePickerConfig: {
-            firstDay: 0,
-            numberOfMonths: 1
-          },
-          allowEmpty: true,
-          extraneous: true
-        });
-      }
-
-      sampleCols.push(
-        {
-          header: 'Sample Type',
-          data: 'sampleType',
-          type: 'dropdown',
-          trimDropdown: false,
-          source: Sample.hot.getSampleTypes(),
-          validator: validateSampleTypes,
-          extraneous: true
-        },{
-          header: 'Sci. Name',
-          data: 'scientificName',
-          type: 'text',
-          source: Sample.hot.sciName,
-          validator: requiredText,
-          extraneous: true
-        }
-      );
-
-      return sampleCols;
-    }
-
-    function setAliasCol () {
-      var aliasCol = [
-        {
-          header: 'Sample Alias',
-          data: 'alias',
-          type: 'text',
-          validator: validateAlias
-        }
-      ];
-
-      return aliasCol;
-    }
-
-    function setDetailedCols (sampleCategory, idColBoolean) {
-      var additionalCols = [
-        {
-          header: 'Group ID',
-          data: 'groupId',
-          type: 'numeric',
-          validator: validateNumber
-        },{
-          header: 'Group Desc.',
-          data: 'groupDescription',
-          type: 'text',
-          validator: permitEmpty
-        }
-      ];
-
-      var tissueCols = [
-        {
-          header: 'Material',
-          data: 'tissueMaterialAlias',
-          type: 'dropdown',
-          trimDropdown: false,
-          source: Sample.hot.getTissueMaterials(),
-          validator: permitEmpty
-        },{
-          header: 'Region',
-          data: 'region',
-          type: 'text',
-          validator: permitEmpty
-        }
-      ];
-
-      var aliquotCols = [
-        {
-          header: 'Purpose',
-          data: 'samplePurposeAlias',
-          type: 'dropdown',
-          trimDropdown: false,
-          source: Sample.hot.getSamplePurposes(),
-          validator: permitEmpty
-        },{
-          header: 'Kit',
-          data: 'prepKitAlias',
-          type: 'dropdown',
-          trimDropdown: false,
-          source: Sample.hot.getKitDescriptors(),
-          validator: permitEmpty
-        }
-      ];
-      var stockCols = [
-        {
-          header: 'STR Status',
-          data: 'strStatus',
-          type: 'dropdown',
-          trimDropdown: false,
-          source: Sample.hot.getStrStatuses()
-        }
-      ];
-
-      var tissueProcessingCols = {
-        'CV Slide': [
-          {
-            header: 'Cuts',
-            data: 'cuts',
-            type: 'numeric',
-            validator: requiredText
-          },{
-            header: 'Discards',
-            data: 'discards',
-            type: 'numeric'
-          },{
-            header: 'Thickness',
-            data: 'thickness',
-            type: 'numeric'
-          }
-        ],
-        'LCM Tube': [
-          {
-            header: 'Cuts Consumed',
-            data: 'cutsConsumed',
-            type: 'numeric',
-            validator: requiredText
-          }
-        ],
-        'HE Slide': [],
-        'Curls': []
-      };
-
-      var aliquotCols = [
-        {
-          header: 'Purpose',
-          data: 'samplePurposeAlias',
-          type: 'dropdown',
-          trimDropdown: false,
-          source: Sample.hot.getSamplePurposes(),
-          validator: permitEmpty
-        },{
-          header: 'Kit',
-          data: 'prepKitAlias',
-          type: 'dropdown',
-          trimDropdown: false,
-          source: Sample.hot.getKitDescriptors(),
-          validator: permitEmpty
-        }
-      ];
-      var stockCols = [
-        {
-          header: 'STR Status',
-          data: 'strStatus',
-          type: 'dropdown',
-          trimDropdown: false,
-          source: Sample.hot.getStrStatuses()
-        }
-      ];
-
-      // fields required to create a tissue parent and identify or create an identity parent
-      // for the tissue. Used when receiving new samples
-      var parentIdentityCols = [
-        {
-          header: 'External Name',
-          data: 'externalName',
-          type: 'text',
-          validator: requiredText
-        },{
-          header: 'Sex',
-          data: 'donorSex',
-          type: 'dropdown',
-          trimDropdown: false,
-          source: Sample.hot.getDonorSexes(),
-          validator: permitEmpty
-        }
-      ];
-
-      if (sampleCategory === 'Aliquot' || sampleCategory === 'Stock') {
-        parentIdentityCols.push({
-          header: 'Tissue Class',
-          data: 'parentSampleClassAlias',
-          type: 'dropdown',
-          trimDropdown: false,
-          source: Sample.hot.getTissueClassesAliasOnly(),
-          validator: validateTissueClasses
-        });
-      }
-
-      parentIdentityCols.push({
+    return [
+      {
+        header: 'Sample Alias',
+        data: 'alias',
+        type: 'text',
+        validator: validateAlias,
+        include: true
+      },
+      {
+        header: 'Description',
+        data: 'description',
+        type: 'text',
+        validator: requiredText,
+        include: true
+      },
+      {
+        header: 'Date of receipt',
+        data: 'receivedDate',
+        type: 'date',
+        dateFormat: 'YYYY-MM-DD',
+        datePickerConfig: {
+          firstDay: 0,
+          numberOfMonths: 1
+        },
+        allowEmpty: true,
+        extraneous: true,
+        include: !detailedBool || idColBoolean
+      },
+      {
+        header: 'Matrix Barcode',
+        data: 'identificationBarcode',
+        type: 'text',
+        include: !Hot.autoGenerateIdBarcodes
+      },
+      {
+        header: 'Sample Type',
+        data: 'sampleType',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: Sample.hot.getSampleTypes(),
+        validator: validateSampleTypes,
+        extraneous: true,
+        include: true
+      },
+      {
+        header: 'Sci. Name',
+        data: 'scientificName',
+        type: 'text',
+        source: Sample.hot.sciName,
+        validator: requiredText,
+        extraneous: true,
+        include: true
+      },
+      {
+        header: 'Group ID',
+        data: 'groupId',
+        type: 'numeric',
+        validator: validateNumber,
+        include: detailedBool
+      },
+      {
+        header: 'Group Desc.',
+        data: 'groupDescription',
+        type: 'text',
+        validator: permitEmpty,
+        include: detailedBool
+      },
+      {
+        header: 'External Name',
+        data: 'externalName',
+        type: 'text',
+        validator: requiredText,
+        include: detailedBool && idColBoolean
+      },{
+        header: 'Sex',
+        data: 'donorSex',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: Sample.hot.getDonorSexes(),
+        validator: permitEmpty,
+        include: detailedBool && idColBoolean
+      },
+      {
+        header: 'Tissue Class',
+        data: 'parentSampleClassAlias',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: Sample.hot.getTissueClassesAliasOnly(),
+        validator: validateTissueClasses,
+        include: detailedBool && idColBoolean && sampleCategory === 'Stock'
+      },
+      {
         header: 'Tissue Origin',
         data: 'tissueOriginAlias',
         type: 'dropdown',
         trimDropdown: false,
         source: Sample.hot.getTissueOrigins(),
-        validator: validateTissueOrigins
-      },{
+        validator: validateTissueOrigins,
+        include: detailedBool && idColBoolean
+      },
+      {
         header: 'Tissue Type',
         data: 'tissueTypeAlias',
         type: 'dropdown',
         trimDropdown: false,
         source: Sample.hot.getTissueTypes(),
-        validator: validateTissueTypes
-      },{
+        validator: validateTissueTypes,
+        include: detailedBool && idColBoolean
+      },
+      {
         header: 'Passage #',
         data: 'passageNumber',
         type: 'text',
-        validator: validateNumber
-      },{
+        validator: validateNumber,
+        include: detailedBool && idColBoolean
+      },
+      {
         header: 'Times Received',
         data: 'timesReceived',
         type: 'numeric',
-        validator: requiredText
-      },{
+        validator: requiredText,
+        include: detailedBool && idColBoolean
+      },
+      {
         header: 'Tube Number',
         data: 'tubeNumber',
         type: 'numeric',
-        validator: requiredText
-      },{
+        validator: requiredText,
+        include: detailedBool && idColBoolean
+      },
+      {
         header: 'Sample Class',
         data: 'sampleClassAlias',
         type: 'dropdown',
         trimDropdown: false,
-        source: Sample.hot.getNewSampleClassOptionsAliasOnly()
-      },{
+        source: Sample.hot.getNewSampleClassOptionsAliasOnly(),
+        include: detailedBool && idColBoolean
+      },
+      {
         header: 'Lab',
         data: 'labComposite',
         type: 'dropdown',
         trimDropdown: false,
         source: Sample.hot.getLabs(),
-        validator: permitEmpty
-      },{
+        validator: permitEmpty,
+        include: detailedBool && idColBoolean
+      },
+      {
         header: 'Ext. Inst. Identifier',
         data: 'externalInstituteIdentifier',
-        type: 'text'
-      });
+        type: 'text',
+        include: detailedBool && idColBoolean
+      },
 
-      // fields used when propagating
-      var parentSampleCols = [
-        {
-          header: 'Parent Alias',
-          data: 'parentAlias',
-          type: 'text',
-          readOnly: true
-        },{
-          header: 'Parent Sample Class',
-          data: 'parentSampleClassAlias',
-          type: 'dropdown',
-          trimDropdown: false,
-          source: Sample.hot.getSampleClasses(),
-          readOnly: true
-        },{
-          header: 'Sample Class',
-          data: 'sampleClassAlias',
-          type: 'dropdown',
-          trimDropdown: false,
-          source: Sample.hot.getSampleClasses()
-        }
-      ];
-      var parentColumn = (idColBoolean ? parentIdentityCols : parentSampleCols);
-      additionalCols = Hot.concatArrays(parentColumn, additionalCols);
+      {
+        header: 'Parent Alias',
+        data: 'parentAlias',
+        type: 'text',
+        readOnly: true,
+        include: detailedBool && !idColBoolean
+      },
+      {
+        header: 'Parent Sample Class',
+        data: 'parentSampleClassAlias',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: Sample.hot.getSampleClasses(),
+        readOnly: true,
+        include: detailedBool && !idColBoolean
+      },
+      {
+        header: 'Sample Class',
+        data: 'sampleClassAlias',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: Sample.hot.getSampleClasses(),
+        include: detailedBool && !idColBoolean
+      },
 
-      return Hot.concatArrays(additionalCols, getSampleCategoryCols(sampleCategory, tissueCols, tissueProcessingCols, aliquotCols, stockCols));
-    }
+      {
+        header: 'Material',
+        data: 'tissueMaterialAlias',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: Sample.hot.getTissueMaterials(),
+        validator: permitEmpty,
+        include: sampleCategory === 'Tissue'
+      },
+      {
+        header: 'Region',
+        data: 'region',
+        type: 'text',
+        validator: permitEmpty,
+        include: sampleCategory === 'Tissue'
+      },
+      {
+        header: 'STR Status',
+        data: 'strStatus',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: Sample.hot.getStrStatuses(),
+        include: sampleCategory === 'Stock'
 
-    function getSampleCategoryCols (sampleCategory, tissueCols, tissueProcessingCols, aliquotCols, stockCols) {
-      var categoryCols = {
-        'Tissue': tissueCols,
-        'Aliquot': aliquotCols,
-        'Stock': stockCols,
-        'Tissue Processing': tissueProcessingCols[Hot.getAliasFromId(Sample.hot.sampleClassId, Hot.sampleOptions.sampleClassesDtos)]
-        // Tissue Processing is different because the columns vary by sample class, unlike the other sample categories
-      };
-      return categoryCols[sampleCategory];
-    }
+      },
+      {
+        header: 'Purpose',
+        data: 'samplePurposeAlias',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: Sample.hot.getSamplePurposes(),
+        validator: permitEmpty,
+        include: sampleCategory === 'Aliquot'
 
-    function setQcCols () {
-      var qcCols = [
-        {
-          header: 'Vol.',
-          data: 'volume',
-          type: 'numeric',
-          format: '0.00'
-        },{
-          header: 'Conc.',
-          data: 'concentration',
-          type: 'numeric',
-          format: '0.00'
-        },{
-          header: 'QC Passed?',
-          data: 'qcValue',
-          type: 'dropdown',
-          trimDropdown: false,
-          source: Sample.hot.getQcValues(),
-          validator: permitEmpty
-        },{
-          header: 'QC Detail',
-          data: 'qcPassedDetailAlias',
-          type: 'dropdown',
-          trimDropdown: false,
-          source: Sample.hot.getQcPassedDetails(),
-          validator: permitEmpty
-        }
-      ];
-      return qcCols;
-    }
+      },
+      {
+        header: 'Kit',
+        data: 'prepKitAlias',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: Sample.hot.getKitDescriptors(),
+        validator: permitEmpty,
+        include: sampleCategory === 'Aliquot'
+      },
+      {
+        header: 'Cuts',
+        data: 'cuts',
+        type: 'numeric',
+        validator: requiredText,
+        include: sampleCategory === 'Tissue Processing' && sampleClassAlias == 'CV Slide'
+      },
+      {
+        header: 'Discards',
+        data: 'discards',
+        type: 'numeric',
+        include: sampleCategory === 'Tissue Processing' && sampleClassAlias == 'CV Slide'
+      },
+      {
+        header: 'Thickness',
+        data: 'thickness',
+        type: 'numeric',
+        include: sampleCategory === 'Tissue Processing' && sampleClassAlias == 'CV Slide'
+      },
+      {
+        header: 'Cuts Consumed',
+        data: 'cutsConsumed',
+        type: 'numeric',
+        validator: requiredText,
+        include: sampleCategory === 'Tissue Processing' && sampleClassAlias == 'LCM Tube'
+      },
+      {
+        header: 'Vol.',
+        data: 'volume',
+        type: 'numeric',
+        format: '0.00',
+        include: qcBool
+      },
+      {
+        header: 'Conc.',
+        data: 'concentration',
+        type: 'numeric',
+        format: '0.00',
+        include: qcBool
+      },
+      {
+        header: 'QC Passed?',
+        data: 'qcValue',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: Sample.hot.getQcValues(),
+        validator: permitEmpty,
+        include: qcBool
+      },
+      {
+        header: 'QC Detail',
+        data: 'qcPassedDetailAlias',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: Sample.hot.getQcPassedDetails(),
+        validator: permitEmpty,
+        include: qcBool
+      }
+    ].filter(function(x) { return x.include; });
 
     function requiredText (value, callback) {
       if (!value || value.length === 0) {
