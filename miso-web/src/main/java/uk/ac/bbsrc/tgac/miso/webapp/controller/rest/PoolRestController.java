@@ -23,16 +23,17 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
-
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
@@ -44,14 +45,22 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import com.eaglegenomics.simlims.core.User;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.jackson.UserInfoMixin;
-
-import com.eaglegenomics.simlims.core.User;
+import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
+import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 
 /**
  * A controller to handle all REST requests for Pools
@@ -71,10 +80,10 @@ public class PoolRestController extends RestController {
     this.requestManager = requestManager;
   }
 
-  @RequestMapping(value = "{poolId}", method = RequestMethod.GET, produces="application/json")
+  @RequestMapping(value = "{poolId}", method = RequestMethod.GET, produces = "application/json")
   public @ResponseBody String getPoolById(@PathVariable Long poolId) throws IOException {
     ObjectMapper mapper = new ObjectMapper();
-    Pool p = requestManager.getPoolById(poolId);
+    Pool<? extends Poolable<?, ?>> p = requestManager.getPoolById(poolId);
     if (p == null) {
       throw new RestException("No pool found with ID: " + poolId, Status.NOT_FOUND);
     }
@@ -82,7 +91,70 @@ public class PoolRestController extends RestController {
     return mapper.writeValueAsString(p);
   }
 
-  @RequestMapping(value = "/wizard/librarydilutions", method = RequestMethod.GET, produces="application/json")
+  @RequestMapping(value = "platform/{platform}", method = RequestMethod.GET, produces = "application/json")
+  @ResponseBody
+  public List<PoolDto> getPoolsByPlatform(@PathVariable("platform") String platform, HttpServletRequest request,
+      HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
+    if (PlatformType.getKeys().contains(platform)) {
+      Collection<Pool<? extends Poolable<?, ?>>> pools = new ArrayList<Pool<? extends Poolable<?, ?>>>();
+      PlatformType platformType = PlatformType.get(platform);
+      pools = requestManager.listAllPoolsByPlatform(platformType);
+      return serializePools(pools, uriBuilder);
+    } else {
+      throw new RestException("Request must specify a platform");
+    }
+  }
+
+  @RequestMapping(value = "dt/platform/{platform}", method = RequestMethod.GET, produces = "application/json")
+  @ResponseBody
+  public DataTablesResponseDto<PoolDto> getDTPoolsByPlatform(@PathVariable("platform") String platform, HttpServletRequest request,
+      HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
+    if (request.getParameter("iDisplayStart") != null && PlatformType.getKeys().contains(platform)) {
+      PlatformType platformType = PlatformType.get(platform);
+      Long numPools = requestManager.countPoolsByPlatform(platformType);
+      // get request params from DataTables
+      Integer iDisplayStart = Integer.parseInt(request.getParameter("iDisplayStart"));
+      Integer iDisplayLength = Integer.parseInt(request.getParameter("iDisplayLength"));
+      String sSearch = request.getParameter("sSearch");
+      String sSortDir = request.getParameter("sSortDir_0");
+      String sortColIndex = request.getParameter("iSortCol_0");
+      String sortCol = request.getParameter("mDataProp_" + sortColIndex);
+
+      // get requested subset of pools
+      Collection<Pool<? extends Poolable<?, ?>>> poolSubset;
+      Long numMatches;
+
+      if (!isStringEmptyOrNull(sSearch)) {
+        poolSubset = requestManager
+            .getPoolsByPageSizeSearchPlatform(iDisplayStart, iDisplayLength, sSearch, sSortDir, sortCol, platformType);
+        numMatches = requestManager.getNumPoolsBySearch(platformType, sSearch);
+      } else {
+        poolSubset = requestManager.getPoolsByPageAndSize(iDisplayStart, iDisplayLength, sSortDir, sortCol, platformType);
+        numMatches = numPools;
+      }
+      List<PoolDto> poolDtos = serializePools(poolSubset, uriBuilder);
+
+      DataTablesResponseDto<PoolDto> dtResponse = new DataTablesResponseDto<PoolDto>();
+      dtResponse.setITotalRecords(numPools);
+      dtResponse.setITotalDisplayRecords(numMatches);
+      dtResponse.setAaData(poolDtos);
+      dtResponse.setSEcho(new Long(request.getParameter("sEcho")));
+      return dtResponse;
+    } else {
+      throw new RestException("Request must specify platform and DataTables parameters");
+    }
+  }
+
+  public List<PoolDto> serializePools(Collection<Pool<? extends Poolable<?, ?>>> pools, UriComponentsBuilder uriBuilder)
+      throws IOException {
+    List<PoolDto> poolDtos = Dtos.asPoolDtos(pools);
+    for (PoolDto poolDto : poolDtos) {
+      poolDto.writeUrls(uriBuilder);
+    }
+    return poolDtos;
+  }
+
+  @RequestMapping(value = "/wizard/librarydilutions", method = RequestMethod.GET, produces = "application/json")
   public @ResponseBody JSONObject ldRest() throws IOException {
     Collection<LibraryDilution> lds = requestManager.listAllLibraryDilutions();
 
@@ -108,7 +180,7 @@ public class PoolRestController extends RestController {
     return ldJSON;
   }
 
-  @RequestMapping(value = "/wizard/platformtypes", method = RequestMethod.GET, produces="application/json")
+  @RequestMapping(value = "/wizard/platformtypes", method = RequestMethod.GET, produces = "application/json")
   public @ResponseBody String platformTypesRest() throws IOException {
     List<String> names = new ArrayList<String>();
     List<String> types = new ArrayList<String>(requestManager.listDistinctPlatformNames());
@@ -117,5 +189,5 @@ public class PoolRestController extends RestController {
     }
     return "[" + LimsUtils.join(names, ",") + "]";
   }
-  
+
 }

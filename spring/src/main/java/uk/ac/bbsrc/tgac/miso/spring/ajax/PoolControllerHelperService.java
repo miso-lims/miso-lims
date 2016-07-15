@@ -141,7 +141,7 @@ public class PoolControllerHelperService {
       }
       if (json.has("poolId") && !isStringEmptyOrNull(json.getString("poolId"))) {
         Long poolId = Long.parseLong(json.getString("poolId"));
-        Pool<? extends Poolable> pool = requestManager.getPoolById(poolId);
+        Pool<? extends Poolable<?, ?>> pool = requestManager.getPoolById(poolId);
         PoolQC newQc = dataObjectFactory.getPoolQC();
         if (json.has("qcPassed") && json.getString("qcPassed").equals("true")) {
           pool.setQcPassed(true);
@@ -327,7 +327,7 @@ public class PoolControllerHelperService {
     Long poolId = json.getLong("poolId");
     File temploc = getBarcodeFileLocation(session);
     try {
-      Pool pool = requestManager.getPoolById(poolId);
+      Pool<? extends Poolable<?, ?>> pool = requestManager.getPoolById(poolId);
       barcodeFactory.setPointPixels(1.5f);
       barcodeFactory.setBitmapResolution(600);
 
@@ -390,7 +390,7 @@ public class PoolControllerHelperService {
       for (JSONObject p : (Iterable<JSONObject>) ss) {
         try {
           Long poolId = p.getLong("poolId");
-          Pool pool = requestManager.getPoolById(poolId);
+          Pool<? extends Poolable<?, ?>> pool = requestManager.getPoolById(poolId);
 
           File f = mps.getLabelFor(pool);
           if (f != null) thingsToPrint.add(f);
@@ -417,7 +417,7 @@ public class PoolControllerHelperService {
 
     try {
       if (!isStringEmptyOrNull(idBarcode)) {
-        Pool<? extends Poolable> pool = requestManager.getPoolById(poolId);
+        Pool<? extends Poolable<?, ?>> pool = requestManager.getPoolById(poolId);
         User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
 
         pool.setIdentificationBarcode(idBarcode);
@@ -477,7 +477,7 @@ public class PoolControllerHelperService {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Long poolId = json.getLong("poolId");
-      Pool p = requestManager.getPoolById(poolId);
+      Pool<? extends Poolable<?, ?>> p = requestManager.getPoolById(poolId);
 
       Long studyId = json.getLong("studyId");
       Study s = requestManager.getStudyById(studyId);
@@ -524,7 +524,8 @@ public class PoolControllerHelperService {
   public JSONObject listPoolAverageInsertSizes(HttpSession session, JSONObject json) {
     try {
       JSONObject j = new JSONObject();
-      for (Pool<? extends Poolable> pool : requestManager.listAllPools()) {
+      for (Pool<? extends Poolable<?, ?>> pool : requestManager.listAllPools()) {
+
         StringBuilder b = new StringBuilder();
         Collection<? extends Dilution> dls = pool.getDilutions();
         if (dls.size() > 0) {
@@ -557,7 +558,7 @@ public class PoolControllerHelperService {
     try {
       JSONObject j = new JSONObject();
       Long poolId = json.getLong("poolId");
-      Pool pool = requestManager.getPoolById(poolId);
+      Pool<? extends Poolable<?, ?>> pool = requestManager.getPoolById(poolId);
       StringBuilder b = new StringBuilder();
       Collection<? extends Dilution> dls = pool.getDilutions();
       if (dls.size() > 0) {
@@ -573,6 +574,8 @@ public class PoolControllerHelperService {
         }
         if (count > 0) {
           b.append(Math.round(sum / count) + " bp");
+        } else {
+          b.append("No QC");
         }
       } else {
         b.append("No QC");
@@ -589,7 +592,7 @@ public class PoolControllerHelperService {
     try {
       JSONObject j = new JSONObject();
       Long poolId = json.getLong("poolId");
-      Pool pool = requestManager.getPoolById(poolId);
+      Pool<? extends Poolable<?, ?>> pool = requestManager.getPoolById(poolId);
       double concentration = pool.getConcentration();
       j.put("response", concentration);
       return j;
@@ -599,11 +602,12 @@ public class PoolControllerHelperService {
     }
   }
 
+  // TODO: delete this once we confirm it's no longer necessary
   public JSONObject checkInfoByPoolId(HttpSession session, JSONObject json) {
     try {
       JSONObject j = new JSONObject();
       Long poolId = json.getLong("poolId");
-      Pool<? extends Poolable> pool = requestManager.getPoolById(poolId);
+      Pool<? extends Poolable<?, ?>> pool = requestManager.getPoolById(poolId);
       StringBuilder info = new StringBuilder();
       if (pool.getDilutions().size() > 0) {
         info.append("<ul class=\"shorterbullets\">");
@@ -621,8 +625,8 @@ public class PoolControllerHelperService {
         info.append("</ul>");
       } else if (pool.getPoolableElements().size() > 0) {
         info.append("<ul class=\"shorterbullets\">");
-        Collection<? extends Poolable> ds = pool.getPoolableElements();
-        for (Poolable p : ds) {
+        Collection<? extends Poolable<?, ?>> ds = pool.getPoolableElements();
+        for (Poolable<?, ?> p : ds) {
           if (p instanceof Dilution) {
             Dilution dilution = (Dilution) p;
             info.append("<li><b>" + dilution.getName() + "</b>");
@@ -708,47 +712,17 @@ public class PoolControllerHelperService {
     }
   }
 
-  public JSONObject listPoolsDataTable(HttpSession session, JSONObject json) {
-    if (!json.has("platform")) {
-      return JSONUtils.SimpleJSONError("No platform specified");
-    }
-    
-    PlatformType platform = PlatformType.get(json.getString("platform"));
-    JSONObject j = new JSONObject();
-
-    try {
-        JSONArray arr = new JSONArray();
-        for (Pool pool : requestManager.listAllPoolsByPlatform(platform)) {
-          JSONArray pout = new JSONArray();
-          pout.add(TableHelper.hyperLinkify("/miso/pool/" + pool.getId(), pool.getName()));
-          pout.add(TableHelper.hyperLinkify("/miso/pool/" + pool.getId(), pool.getAlias()));
-          pout.add(pool.getCreationDate() != null ? pool.getCreationDate().toString() : "");
-          pout.add(pool.getId());
-          pout.add(pool.getId());
-          pout.add(pool.getId());
-
-          arr.add(pout);
-        }
-        j.put("pools", arr);
-
-      return j;
-    } catch (IOException e) {
-      log.debug("Failed", e);
-      return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
-    }
-  }
-
   public JSONObject getPoolableElementInfo(HttpSession session, JSONObject json) {
     if (json.has("poolId") && json.has("elementId")) {
       try {
         Long poolId = json.getLong("poolId");
         Long elementId = json.getLong("elementId");
-        Pool<? extends Poolable> pool = requestManager.getPoolById(poolId);
+        Pool<? extends Poolable<?, ?>> pool = requestManager.getPoolById(poolId);
         StringBuilder info = new StringBuilder();
-        for (Poolable p : pool.getPoolableElements()) {
+        for (Poolable<?, ?> p : pool.getPoolableElements()) {
           if (p.getId() == elementId) {
             if (p instanceof Plate) {
-              Plate<LinkedList<Plateable>, Plateable> plate = (Plate) p;
+              Plate<LinkedList<Plateable>, Plateable> plate = (Plate<LinkedList<Plateable>, Plateable>) p;
               for (Plateable plateable : plate.getElements()) {
                 if (plateable instanceof Plate) {
                   info.append("<b>Internal Plate:</b> <a href='/miso/plate/" + plate.getId() + "'>" + plate.getName() + "</a><br/>");
@@ -837,7 +811,7 @@ public class PoolControllerHelperService {
     Long noteId = json.getLong("noteId");
 
     try {
-      Pool pool = requestManager.getPoolById(poolId);
+      Pool<? extends Poolable<?, ?>> pool = requestManager.getPoolById(poolId);
       Note note = requestManager.getNoteById(noteId);
       if (pool.getNotes().contains(note)) {
         pool.getNotes().remove(note);
@@ -860,7 +834,7 @@ public class PoolControllerHelperService {
 
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Pool pool = requestManager.getPoolById(poolId);
+      Pool<? extends Poolable<?, ?>> pool = requestManager.getPoolById(poolId);
       Note note = new Note();
 
       internalOnly = internalOnly.equals("on") ? "true" : "false";

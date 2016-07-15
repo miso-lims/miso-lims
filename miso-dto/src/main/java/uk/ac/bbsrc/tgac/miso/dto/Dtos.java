@@ -11,6 +11,7 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isTissueSample;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -23,12 +24,15 @@ import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
+import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Institute;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryAdditionalInfo;
+import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrder;
+import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.QcPassedDetail;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
@@ -78,6 +82,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 public class Dtos {
 
@@ -245,7 +250,6 @@ public class Dtos {
     } else {
       throw new IllegalArgumentException();
     }
-    dto.setSynthetic(from.isSynthetic());
     dto.setSampleClassId(from.getSampleClass().getId());
     if (from.getQcPassedDetail() != null) {
       dto.setQcPassedDetailId(from.getQcPassedDetail().getId());
@@ -332,8 +336,7 @@ public class Dtos {
    * identity, which may or may not yet exist</li>
    * </ol>
    * 
-   * @param childDto
-   *          the DTO to take parent details from
+   * @param childDto the DTO to take parent details from
    * @return the parent details from the DTO, or null if there are none. A returned sample will also include its own parent if applicable.
    */
   private static SampleAdditionalInfo getParent(SampleAdditionalInfoDto childDto) {
@@ -1045,6 +1048,60 @@ public class Dtos {
     to.setVolume(item.getVolume());
     to.setEmpty(item.getEmpty());
     return to;
+  }
+
+  public static DilutionDto asDto(Dilution from) {
+    DilutionDto dto = new DilutionDto();
+    dto.setId(from.getId());
+    dto.setName(from.getName());
+    if (from.getIdentificationBarcode() != null) {
+      dto.setIdentificationBarcode(from.getIdentificationBarcode());
+    }
+    LibraryDto ldto = asMinimalDto(from.getLibrary());
+    dto.setLibrary(ldto);
+    return dto;
+  }
+
+  public static LibraryDto asMinimalDto(Library from) {
+    LibraryDto dto = new LibraryDto();
+    dto.setId(from.getId());
+    dto.setName(from.getName());
+    dto.setAlias(from.getAlias());
+    if (from.getIdentificationBarcode() != null) {
+      dto.setIdentificationBarcode(from.getIdentificationBarcode());
+    }
+    return dto;
+  }
+
+  public static PoolDto asDto(Pool<? extends Poolable<?, ?>> from) {
+    PoolDto dto = new PoolDto();
+    dto.setId(from.getId());
+    dto.setName(from.getName());
+    dto.setAlias(from.getAlias());
+    dto.setConcentration(from.getConcentration());
+    dto.setIdentificationBarcode(from.getIdentificationBarcode());
+    dto.setReadyToRun(from.getReadyToRun());
+    dto.setQcPassed(from.getQcPassed());
+    dto.setCreationDate(from.getCreationDate());
+    if (from.getLastModified() != null) {
+      dto.setLastModified(LimsUtils.getDateAsString(from.getLastModified()));
+    }
+    Set<DilutionDto> pooledElements = new HashSet<DilutionDto>();
+    for (Dilution ld : from.getDilutions()) {
+      if (ld != null) {
+        pooledElements.add(asDto(ld));
+      }
+    }
+    dto.setPooledElements(pooledElements);
+    return dto;
+  }
+
+  public static List<PoolDto> asPoolDtos(Collection<Pool<? extends Poolable<?, ?>>> poolSubset) {
+    List<PoolDto> dtoList = new ArrayList<>();
+    for (Pool<? extends Poolable<?, ?>> pool : poolSubset) {
+      dtoList.add(asDto(pool));
+    }
+    return dtoList;
   }
 
 }

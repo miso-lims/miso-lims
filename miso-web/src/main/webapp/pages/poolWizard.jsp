@@ -202,6 +202,7 @@
               <tbody id="dilutions">
               </tbody>
             </table>
+            <p>Don't see a dilution you're expecting? Make sure that the library has "QC Passed" set to "true".</p>
           </div>
         </td>
         <td width="50%" valign="top">

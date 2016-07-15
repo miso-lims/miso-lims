@@ -315,8 +315,10 @@ public class SQLLibraryDAO implements LibraryStore {
   }
 
   private void purgeListCache(Library l, boolean replace) {
-    Cache cache = cacheManager.getCache("libraryListCache");
-    DbUtils.updateListCache(cache, replace, l, Library.class);
+    if (cacheManager != null) {
+      Cache cache = cacheManager.getCache("libraryListCache");
+      DbUtils.updateListCache(cache, replace, l, Library.class);
+    }
   }
 
   private void purgeListCache(Library l) {
@@ -584,6 +586,9 @@ public class SQLLibraryDAO implements LibraryStore {
           @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
   public boolean remove(Library library) throws IOException {
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
+    if (library.isDeletable()) {
+      changeLogDAO.deleteAllById(TABLE_NAME, library.getId());
+    }
     if (library.isDeletable()
         && (namedTemplate.update(LIBRARY_DELETE, new MapSqlParameterSource().addValue("libraryId", library.getId())) == 1)) {
       if (this.cascadeType.equals(CascadeType.PERSIST)) {
@@ -714,7 +719,7 @@ public class SQLLibraryDAO implements LibraryStore {
     public Library mapRow(ResultSet rs, int rowNum) throws SQLException {
       long id = rs.getLong("libraryId");
 
-      if (isCacheEnabled() && lookupCache(cacheManager) != null) {
+      if (isCacheEnabled() && cacheManager != null && lookupCache(cacheManager) != null) {
         Element element;
         if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
           log.info("Cache hit on map for library " + id);
