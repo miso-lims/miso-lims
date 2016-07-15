@@ -81,7 +81,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
 import uk.ac.bbsrc.tgac.miso.core.data.TagBarcodeFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAdditionalInfoImpl;
@@ -479,20 +481,18 @@ public class EditLibraryController {
   /**
    * Each PlatformName holds a null TagBarcodeFamily.
    *
-   * Structure of this tagBarcodes object: {
-   *   PlatformName : {
-   *     TagBarcodeFamilyName: {
-   *       1: [
-   *         {
-   *           id: ##,
-   *           name: AAAA,
-   *           sequence: XXXXX
-   *         }, ...
-   *       ], ...
-   *     }, ...
-   *   }, ...
-   * }
-   *
+   * Structure of this tagBarcodes object:
+   * 
+   * <pre>
+   *  {
+   *    PlatformName : {
+   *      TagBarcodeFamilyName: {
+   *        1: [ { id: ##, name: AAAA, sequence: XXXXX }, ... ],
+   *        ... },
+   *      ... },
+   *  ... }
+   * </pre>
+   * 
    * @return tagBarcodes object
    */
   @ModelAttribute("tagBarcodes")
@@ -718,7 +718,7 @@ public class EditLibraryController {
       model.put("libraryRuns", getRunsByLibraryPools(pools));
 
       populateDesigns(model,
-          library.getSample().getSampleAdditionalInfo() == null ? null : library.getSample().getSampleAdditionalInfo().getSampleClass());
+          LimsUtils.isDetailedSample(library.getSample()) ? null : ((SampleAdditionalInfo) library.getSample()).getSampleClass());
 
       model.put("owners", LimsSecurityUtils.getPotentialOwners(user, library, securityManager.listAllUsers()));
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, library, securityManager.listAllUsers()));
@@ -761,13 +761,9 @@ public class EditLibraryController {
       if (sampleId != null) {
         Sample sample = requestManager.getSampleById(sampleId);
         model.put("sample", sample);
-        if (sample.getSampleAdditionalInfo() != null) {
-          sampleClass = sample.getSampleAdditionalInfo().getSampleClass();
-          library.setLibraryAdditionalInfo(new LibraryAdditionalInfoImpl());
-          library.getLibraryAdditionalInfo().setTissueOrigin(sample.getSampleAdditionalInfo().getTissueOrigin());
-          library.getLibraryAdditionalInfo().setTissueType(sample.getSampleAdditionalInfo().getTissueType());
-          // library.getLibraryAdditionalInfo().setGroupId(library.getSample().getSampleAnalyte().getGroupId());
-          // library.getLibraryAdditionalInfo().setGroupDescription(library.getSample().getSampleAnalyte().getGroupDescription());
+        if (LimsUtils.isDetailedSample(sample)) {
+          SampleAdditionalInfo detailed = (SampleAdditionalInfo) sample;
+          sampleClass = detailed.getSampleClass();
         }
 
         List<Sample> projectSamples = new ArrayList<Sample>(requestManager.listAllSamplesByProjectId(sample.getProject().getProjectId()));
@@ -850,9 +846,10 @@ public class EditLibraryController {
       JSONArray libraries = new JSONArray();
       SampleClass sampleClass = null;
       for (Sample sample : requestManager.getSamplesByIdList(idList)) {
+        SampleAdditionalInfo detailed = (SampleAdditionalInfo) sample;
         if (sampleClass == null) {
-          sampleClass = sample.getSampleAdditionalInfo().getSampleClass();
-        } else if (sampleClass.getId() != sample.getSampleAdditionalInfo().getSampleClass().getId()) {
+          sampleClass = detailed.getSampleClass();
+        } else if (sampleClass.getId() != detailed.getSampleClass().getId()) {
           throw new IOException("Can only create libraries when samples all have the same class.");
         }
         LibraryDto library = new LibraryDto();
@@ -861,8 +858,7 @@ public class EditLibraryController {
 
         if (isDetailedSampleEnabled()) {
           LibraryAdditionalInfoDto lai = new LibraryAdditionalInfoDto();
-          lai.setTissueOrigin(Dtos.asDto(sample.getSampleAdditionalInfo().getTissueOrigin()));
-          lai.setTissueType(Dtos.asDto(sample.getSampleAdditionalInfo().getTissueType()));
+          setTissueInfo(detailed, lai);
           library.setLibraryAdditionalInfo(lai);
         }
         libraries.add(library);
@@ -879,6 +875,16 @@ public class EditLibraryController {
         log.error("Failed to get bulk samples", ex);
       }
       throw ex;
+    }
+  }
+
+  public void setTissueInfo(SampleAdditionalInfo detailed, LibraryAdditionalInfoDto lai) {
+    for (SampleAdditionalInfo sai = detailed; sai != null; sai = sai.getParent()) {
+      if (sai instanceof SampleTissue) {
+        lai.setTissueOrigin(Dtos.asDto(((SampleTissue) sai).getTissueOrigin()));
+        lai.setTissueType(Dtos.asDto(((SampleTissue) sai).getTissueType()));
+        break;
+      }
     }
   }
 
@@ -940,8 +946,6 @@ public class EditLibraryController {
           library.getLibraryAdditionalInfo().setCreatedBy(user);
         }
         library.getLibraryAdditionalInfo().setUpdatedBy(user);
-        library.getLibraryAdditionalInfo().setTissueOrigin(library.getSample().getSampleAdditionalInfo().getTissueOrigin());
-        library.getLibraryAdditionalInfo().setTissueType(library.getSample().getSampleAdditionalInfo().getTissueType());
       }
 
       boolean create = library.getId() == AbstractLibrary.UNSAVED_ID;

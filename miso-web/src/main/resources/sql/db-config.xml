@@ -45,7 +45,8 @@
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SamplePurposeImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleGroupImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl</value>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAnalyteImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleStockImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractSample</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl</value>
@@ -59,6 +60,9 @@
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleValidRelationshipImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleNumberPerProjectImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueProcessingImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleCVSlideImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleLCMTubeImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingParametersImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.InstituteImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl</value>

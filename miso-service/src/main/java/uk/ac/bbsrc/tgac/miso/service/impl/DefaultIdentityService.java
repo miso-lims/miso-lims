@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.User;
@@ -47,26 +48,9 @@ public class DefaultIdentityService implements IdentityService {
   }
 
   @Override
+  @Transactional(propagation = Propagation.REQUIRED)
   public Identity get(String externalName) {
     return identityDao.getIdentity(externalName);
-  }
-
-  @Override
-  public Long create(Identity identity) throws IOException {
-    authorizationManager.throwIfNonAdmin();
-    User user = authorizationManager.getCurrentUser();
-    identity.setCreatedBy(user);
-    identity.setUpdatedBy(user);
-    return identityDao.addIdentity(identity);
-  }
-
-  @Override
-  public void update(Identity identity) throws IOException {
-    authorizationManager.throwIfNonAdmin();
-    Identity updatedIdentity = get(identity.getSampleId());
-    applyChanges(updatedIdentity, identity);
-    updatedIdentity.setUpdatedBy(authorizationManager.getCurrentUser());
-    identityDao.update(updatedIdentity);
   }
   
   @Override
@@ -86,21 +70,6 @@ public class DefaultIdentityService implements IdentityService {
     authorizationManager.throwIfNonAdmin();
     Identity identity = get(identityId);
     identityDao.deleteIdentity(identity);
-  }
-
-  @Override
-  public Identity to(SampleIdentityDto sampleIdentityDto) throws IOException {
-    authorizationManager.throwIfUnauthenticated();
-    User user = authorizationManager.getCurrentUser();
-
-    Identity identity = Dtos.to(sampleIdentityDto);
-    identity.setCreatedBy(user);
-    identity.setUpdatedBy(user);
-    Date now = new Date();
-    identity.setCreationDate(now);
-    identity.setLastUpdated(now);
-
-    return identity;
   }
 
 }

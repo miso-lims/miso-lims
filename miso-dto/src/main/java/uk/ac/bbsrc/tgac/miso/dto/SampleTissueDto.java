@@ -1,106 +1,151 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
+import java.net.URI;
+
+import org.codehaus.jackson.annotate.JsonTypeName;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
-public class SampleTissueDto {
+@JsonTypeName(value = SampleTissue.CATEGORY_NAME)
+public class SampleTissueDto extends SampleIdentityDto {
+  private String externalInstituteIdentifier;
+  private Long labId;
+  private String labUrl;
+  private Integer passageNumber;
+  private String region;
+  private Integer timesReceived;
+  private Long tissueMaterialId;
+  private String tissueMaterialUrl;
+  private Long tissueOriginId;
+  private String tissueOriginUrl;
+  private Long tissueTypeId;
+  private String tissueTypeUrl;
+  private Integer tubeNumber;
 
-  private Integer cellularity;
-  private Long createdById;
-  private String createdByUrl;
-  private String creationDate;
-  private Long sampleId;
-  private String lastUpdated;
-  private Long updatedById;
-  private String updatedByUrl;
-  private String url;
-  private String sampleUrl;
-
-  public Integer getCellularity() {
-    return cellularity;
+  public String getExternalInstituteIdentifier() {
+    return externalInstituteIdentifier;
   }
 
-  public Long getCreatedById() {
-    return createdById;
+  public Long getLabId() {
+    return labId;
   }
 
-  public String getCreatedByUrl() {
-    return createdByUrl;
+  public String getLabUrl() {
+    return labUrl;
   }
 
-  public String getCreationDate() {
-    return creationDate;
+  public Integer getPassageNumber() {
+    return passageNumber;
   }
 
-  public Long getSampleId() {
-    return sampleId;
+  public String getRegion() {
+    return region;
   }
 
-  public String getLastUpdated() {
-    return lastUpdated;
+  public Integer getTimesReceived() {
+    return timesReceived;
   }
 
-  public Long getUpdatedById() {
-    return updatedById;
+  public Long getTissueMaterialId() {
+    return tissueMaterialId;
   }
 
-  public String getUpdatedByUrl() {
-    return updatedByUrl;
+  public String getTissueMaterialUrl() {
+    return tissueMaterialUrl;
   }
 
-  public String getUrl() {
-    return url;
+  public Long getTissueOriginId() {
+    return tissueOriginId;
   }
 
-  public void setCellularity(Integer cellularity) {
-    this.cellularity = cellularity;
+  public String getTissueOriginUrl() {
+    return tissueOriginUrl;
   }
 
-  public void setCreatedById(Long createdById) {
-    this.createdById = createdById;
+  public Long getTissueTypeId() {
+    return tissueTypeId;
   }
 
-  public void setCreatedByUrl(String createdByUrl) {
-    this.createdByUrl = createdByUrl;
+  public String getTissueTypeUrl() {
+    return tissueTypeUrl;
   }
 
-  public void setCreationDate(String creationDate) {
-    this.creationDate = creationDate;
+  public Integer getTubeNumber() {
+    return tubeNumber;
   }
 
-  public void setSampleId(Long sampleId) {
-    this.sampleId = sampleId;
+  public void setExternalInstituteIdentifier(String externalInstituteIdentifier) {
+    this.externalInstituteIdentifier = externalInstituteIdentifier;
   }
 
-  public void setLastUpdated(String lastUpdated) {
-    this.lastUpdated = lastUpdated;
+  public void setLabId(Long labId) {
+    this.labId = labId;
   }
 
-  public void setUpdatedById(Long updatedById) {
-    this.updatedById = updatedById;
+  public void setLabUrl(String labUrl) {
+    this.labUrl = labUrl;
   }
 
-  public void setUpdatedByUrl(String updatedByUrl) {
-    this.updatedByUrl = updatedByUrl;
+  public void setPassageNumber(Integer passageNumber) {
+    this.passageNumber = passageNumber;
   }
 
-  public void setUrl(String url) {
-    this.url = url;
+  public void setRegion(String region) {
+    this.region = region;
   }
 
-  public String getSampleUrl() {
-    return sampleUrl;
+  public void setTimesReceived(Integer timesReceived) {
+    this.timesReceived = timesReceived;
   }
 
-  public void setSampleUrl(String sampleUrl) {
-    this.sampleUrl = sampleUrl;
+  public void setTissueMaterialId(Long tissueMaterialId) {
+    this.tissueMaterialId = tissueMaterialId;
+  }
+
+  public void setTissueMaterialUrl(String tissueMaterialUrl) {
+    this.tissueMaterialUrl = tissueMaterialUrl;
+  }
+
+  public void setTissueOriginId(Long tissueOriginId) {
+    this.tissueOriginId = tissueOriginId;
+  }
+
+  public void setTissueOriginUrl(String tissueOriginUrl) {
+    this.tissueOriginUrl = tissueOriginUrl;
+  }
+
+  public void setTissueTypeId(Long tissueTypeId) {
+    this.tissueTypeId = tissueTypeId;
+  }
+
+  public void setTissueTypeUrl(String tissueTypeUrl) {
+    this.tissueTypeUrl = tissueTypeUrl;
+  }
+
+  public void setTubeNumber(Integer tubeNumber) {
+    this.tubeNumber = tubeNumber;
   }
 
   @Override
-  public String toString() {
-    return "SampleTissueDto [cellularity=" + cellularity + ", createdById=" + createdById + ", createdByUrl=" + createdByUrl 
-        + ", creationDate=" + creationDate + ", sampleId=" + sampleId + ", lastUpdated=" + lastUpdated + ", updatedById=" + updatedById 
-        + ", updatedByUrl=" + updatedByUrl + ", url=" + url + ", sampleUrl=" + sampleUrl + "]";
+  public void writeUrls(URI baseUri) {
+    super.writeUrls(baseUri);
+    if (getTissueOriginId() != null) {
+      setTissueOriginUrl(
+          UriComponentsBuilder.fromUri(baseUri).path("/rest/tissueorigin/{id}").buildAndExpand(getTissueOriginId()).toUriString());
+    }
+    if (getTissueTypeId() != null) {
+      setTissueTypeUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/tissuetype/{id}").buildAndExpand(getTissueTypeId()).toUriString());
+    }
+    if (getTissueMaterialId() != null) {
+      setTissueMaterialUrl(
+          UriComponentsBuilder.fromUri(baseUri).path("/rest/tissuematerial/{id}").buildAndExpand(getTissueMaterialId()).toUriString());
+    }
+    if (getLabId() != null) {
+      setLabUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/lab/{id}").buildAndExpand(getLabId()).toUriString());
+    }
   }
 
 }

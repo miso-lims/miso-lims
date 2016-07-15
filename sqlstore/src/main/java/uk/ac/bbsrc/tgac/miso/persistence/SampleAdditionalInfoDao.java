@@ -13,10 +13,6 @@ public interface SampleAdditionalInfoDao {
 
   SampleAdditionalInfo getSampleAdditionalInfoBySampleId(Long id) throws IOException;
 
-  Long addSampleAdditionalInfo(SampleAdditionalInfo sampleAdditionalInfo);
-
   void deleteSampleAdditionalInfo(SampleAdditionalInfo sampleAdditionalInfo);
-
-  void update(SampleAdditionalInfo sampleAdditionalInfo);
 
 }

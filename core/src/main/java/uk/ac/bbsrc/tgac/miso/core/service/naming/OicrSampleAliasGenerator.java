@@ -1,12 +1,17 @@
 package uk.ac.bbsrc.tgac.miso.core.service.naming;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
+
 import java.security.InvalidParameterException;
 
 import net.sourceforge.fluxion.spi.ServiceProvider;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 @ServiceProvider
 public class OicrSampleAliasGenerator implements NameGenerator<Sample> {
@@ -24,70 +29,62 @@ public class OicrSampleAliasGenerator implements NameGenerator<Sample> {
 
   @Override
   public String generateName(Sample t) {
-    SampleAdditionalInfo sai = t.getSampleAdditionalInfo();
-    if (sai == null) {
-      throw new IllegalArgumentException("SampleAdditionalInfo missing. Can only generate an alias for detailed samples");
+    if (!LimsUtils.isDetailedSample(t)) {
+      throw new IllegalArgumentException("Can only generate an alias for detailed samples");
     }
+    SampleAdditionalInfo detailed = (SampleAdditionalInfo) t;
     
-    for (Sample parent = t.getParent(); parent != null; parent = parent.getParent()) {
-      if (parent.getSampleAnalyte() != null && !parent.getSampleAdditionalInfo().getSampleClass().isStock()) {
-        return parent.getAlias() + getSiblingTag(t);
+    for (SampleAdditionalInfo parent = (SampleAdditionalInfo) detailed.getParent(); parent != null;
+        parent = (SampleAdditionalInfo) parent.getParent()) {
+      if (isAliquotSample(parent)) {
+        return parent.getAlias() + getSiblingTag(detailed);
       }
-      if (parent.getSampleTissue() != null) {
-        return parent.getAlias() + getSiblingTag(t);
+      if (isTissueSample(parent)) {
+        return parent.getAlias() + getSiblingTag(detailed);
       }
-      if (parent.getIdentity() != null) {
-        String alias = generateTissueAlias(t, parent);
-        if (t.getSampleTissue() == null) {
-          alias += getSiblingTag(t);
-        }
-        return alias;
+      if (isIdentitySample(parent)) {
+        if (!isTissueSample(detailed)) throw new IllegalArgumentException("Missing parent tissue");
+        return generateTissueAlias((SampleTissue) detailed, (Identity) parent);
       }
     }
     // Identity name generation requires access to SampleNumberPerProjectDao
     throw new IllegalArgumentException("Cannot generate alias for Identities");
   }
   
-  private String generateTissueAlias(Sample sample, Sample identityParent) {
+  private String generateTissueAlias(SampleTissue tissue, Identity identity) {
     StringBuilder sb = new StringBuilder();
-    SampleAdditionalInfo sai = sample.getSampleAdditionalInfo();
     
-    sb.append(identityParent.getAlias())
+    sb.append(identity.getAlias())
     .append(SEPARATOR)
-    .append(sai.getTissueOrigin() == null ? TISSUE_ORIGIN_UNKNOWN : sai.getTissueOrigin().getAlias())
+    .append(tissue.getTissueOrigin() == null ? TISSUE_ORIGIN_UNKNOWN : tissue.getTissueOrigin().getAlias())
     .append(SEPARATOR)
-    .append(sai.getTissueType() == null ? TISSUE_TYPE_UNKNOWN : sai.getTissueType().getAlias())
+    .append(tissue.getTissueType() == null ? TISSUE_TYPE_UNKNOWN : tissue.getTissueType().getAlias())
     .append(SEPARATOR)
-    .append(passageNumber(sai.getPassageNumber()))
+    .append(passageNumber(tissue.getPassageNumber()))
     .append(SEPARATOR)
-    .append(sai.getTimesReceived());
+    .append(tissue.getTimesReceived());
     
-    if (sai.getTubeNumber() != null) {
+    if (tissue.getTubeNumber() != null) {
       sb.append(DASH)
-      .append(sai.getTubeNumber());
+      .append(tissue.getTubeNumber());
     }
     return sb.toString();
   }
   
-  private String getSiblingTag(Sample sample) {
-    SampleAdditionalInfo sai = sample.getSampleAdditionalInfo();
-    SampleClass sc = sai.getSampleClass();
+  private String getSiblingTag(SampleAdditionalInfo sample) {
+    SampleClass sc = sample.getSampleClass();
     if (sc == null || sc.getSuffix() == null) {
       throw new InvalidParameterException("Unexpected null SampleClass or suffix");
     }
-    if (sai.getSiblingNumber() == null) {
+    if (sample.getSiblingNumber() == null) {
       throw new InvalidParameterException("Cannot generate alias for " + sc.getAlias() + " without a siblingNumber");
     }
-    String siblingNum = sai.getSiblingNumber().toString();
+    String siblingNum = sample.getSiblingNumber().toString();
     // Sibling number is only padded for Tissue Processing
-    if (isTissueProcessing(sample)) {
+    if (isTissueProcessingSample(sample)) {
       while (siblingNum.length() < 2) siblingNum = "0" + siblingNum;
     }
     return SEPARATOR + sc.getSuffix() + siblingNum;
-  }
-  
-  private boolean isTissueProcessing(Sample sample) {
-    return sample.getIdentity() == null && sample.getSampleTissue() == null && sample.getSampleAnalyte() == null;
   }
 
   @Override

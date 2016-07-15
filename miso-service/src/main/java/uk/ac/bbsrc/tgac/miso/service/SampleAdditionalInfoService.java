@@ -4,21 +4,14 @@ import java.io.IOException;
 import java.util.Set;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
-import uk.ac.bbsrc.tgac.miso.dto.SampleAdditionalInfoDto;
 
 public interface SampleAdditionalInfoService {
 
   SampleAdditionalInfo get(Long sampleAdditionalInfoId) throws IOException;
-  
-  Long create(SampleAdditionalInfo sampleAdditionalInfo) throws IOException;
-
-  void update(SampleAdditionalInfo sampleAdditionalInfo) throws IOException;
 
   Set<SampleAdditionalInfo> getAll() throws IOException;
 
   void delete(Long sampleAdditionalInfoId) throws IOException;
-
-  SampleAdditionalInfo to(SampleAdditionalInfoDto sampleAdditionalInfoDto) throws IOException;
 
   /**
    * copies all editable properties from one SampleAdditionalInfo instance to another

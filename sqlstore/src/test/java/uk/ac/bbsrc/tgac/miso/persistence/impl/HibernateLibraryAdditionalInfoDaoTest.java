@@ -1,9 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.util.Date;
@@ -23,12 +20,8 @@ import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryAdditionalInfo;
-import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
-import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAdditionalInfoImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
@@ -98,12 +91,6 @@ public class HibernateLibraryAdditionalInfoDaoTest extends AbstractDAOTest {
     Library library = new LibraryImpl();
     library.setId(2L);
     info.setLibrary(library);
-    TissueOrigin origin = new TissueOriginImpl();
-    origin.setId(1L);
-    info.setTissueOrigin(origin);
-    TissueType type = new TissueTypeImpl();
-    type.setId(1L);
-    info.setTissueType(type);
     
     Long newId = dao.addLibraryAdditionalInfo(info);
     assertNotNull(newId);
@@ -114,8 +101,6 @@ public class HibernateLibraryAdditionalInfoDaoTest extends AbstractDAOTest {
     assertEquals(user.getUserId(), saved.getUpdatedBy().getUserId());
     assertEquals(library.getId(), saved.getLibrary().getId());
     assertEquals(kit.getId(), saved.getPrepKit().getId());
-    assertEquals(origin.getId(), saved.getTissueOrigin().getId());
-    assertEquals(type.getId(), saved.getTissueType().getId());
   }
   
   @Test

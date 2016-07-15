@@ -92,18 +92,18 @@
 
 	    Sample.hot.makeBulkEditTable = function () {
         Sample.hot.samplesJSON = Sample.hot.modifySamplesForEdit(Sample.hot.samplesJSON);
-        var sampleCategory = Sample.hot.getCategoryFromClassId(Sample.hot.samplesJSON[0].sampleAdditionalInfo.sampleClassId);
+        var sampleCategory = Sample.hot.getCategoryFromClassId(Sample.hot.samplesJSON[0].sampleClassId);
         Sample.hot.makeHOT(Sample.hot.samplesJSON, sampleCategory);
       };
 
       Sample.hot.makeBulkCreateTable = function () {
         Sample.hot.newSamplesJSON = Sample.hot.modifySamplesForPropagate(Sample.hot.samplesJSON);
-        var sampleCategory = Sample.hot.getCategoryFromClassId(Sample.hot.newSamplesJSON[0].sampleAdditionalInfo.parentSampleClassId);
+        var sampleCategory = Sample.hot.getCategoryFromClassId(Sample.hot.newSamplesJSON[0].sampleClassId);
         Sample.hot.makeHOT(Sample.hot.newSamplesJSON, sampleCategory);
         Hot.hotTable.updateSettings({
           cells: function (row, col, prop) {
             var cellProperties = {};
-            if (prop == 'sampleAdditionalInfo.sampleClassAlias') {
+            if (prop == 'sampleClassAlias') {
               cellProperties.readOnly = false;
             }
             return cellProperties;

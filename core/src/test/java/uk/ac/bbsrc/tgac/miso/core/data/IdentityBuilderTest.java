@@ -10,9 +10,9 @@ import org.junit.Test;
 
 import com.eaglegenomics.simlims.core.User;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample.SampleFactoryBuilder;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl.IdentityBuilder;
 
-public class SampleFactoryBuilderTest {
+public class IdentityBuilderTest {
 
   @BeforeClass
   public static void setUpBeforeClass() throws Exception {
@@ -30,16 +30,16 @@ public class SampleFactoryBuilderTest {
   public void tearDown() throws Exception {
   }
 
-  @Test(expected = NullPointerException.class)
+  @Test(expected = IllegalArgumentException.class)
   public void test_user_must_be_provided() throws Exception {
-    new SampleFactoryBuilder().build();
+    new IdentityBuilder().build();
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void test_description_must_be_provided() throws Exception {
     User mockedUser = mock(User.class);
     Project mockedProject = mock(Project.class);
-    new SampleFactoryBuilder().user(mockedUser).project(mockedProject).build();
+    new IdentityBuilder().user(mockedUser).project(mockedProject).build();
   }
 
 }

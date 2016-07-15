@@ -226,17 +226,17 @@ INSERT INTO `SampleClass`(`sampleClassId`, `alias`, `sampleCategory`, `createdBy
 VALUES (1,'Identity','Identity',1,'2016-04-05 14:57:00',1,'2016-04-05 14:57:00'),
 (2,'Primary Tumor Tissue','Tissue',1,'2016-04-05 14:57:00',1,'2016-04-05 14:57:00');
 
-INSERT INTO `SampleAdditionalInfo`(`sampleId`, `sampleClassId`, `archived`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`, `parentId`)
-VALUES (15,1,0,1,'2016-04-05 14:57:00',1,'2016-04-05 14:57:00',NULL),
-(16,2,0,1,'2016-04-05 14:57:00',1,'2016-04-05 14:57:00',15),
-(17,2,0,1,'2016-04-05 14:57:00',1,'2016-04-05 14:57:00',15);
+INSERT INTO `SampleAdditionalInfo`(`sampleId`, `sampleClassId`, `archived`, `parentId`)
+VALUES (15,1,0,NULL),
+(16,2,0,15),
+(17,2,0,15);
 
-INSERT INTO `Identity`(`sampleId`, `internalName`, `externalName`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
-VALUES (15,'INT1','EXT1',1,'2016-04-05 14:57:00',1,'2016-04-05 14:57:00');
+INSERT INTO `Identity`(`sampleId`, `internalName`, `externalName`)
+VALUES (15,'INT1','EXT1');
 
-INSERT INTO `SampleTissue`(`sampleId`,`createdBy`,`creationDate`,`updatedBy`,`lastUpdated`)
-VALUES (16,1,'2016-04-05 14:57:00',1,'2016-04-05 14:57:00'),
-(17,1,'2016-04-05 14:57:00',1,'2016-04-05 14:57:00');
+INSERT INTO `SampleTissue`(`sampleId`)
+VALUES (16),
+(17);
 
 DELETE FROM `SampleQC`;
 INSERT INTO `SampleQC`(`qcId`, `sample_sampleId`, `qcUserName`, `qcDate`, `qcMethod`, `results`) 
@@ -300,11 +300,6 @@ DELETE FROM `Lab`;
 INSERT INTO `Lab`(`labId`, `instituteId`, `alias`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
 VALUES (1,1,'Lab A1',1,'2016-02-10 15:35:00',1,'2016-02-10 15:35:00'),(2,1,'Lab A2',1,'2016-02-10 15:35:00',1,'2016-02-10 15:35:00'),
 (3,1,'Lab B1',1,'2016-02-10 15:35:00',1,'2016-02-10 15:35:00'),(4,1,'Lab B2',1,'2016-02-10 15:35:00',1,'2016-02-10 15:35:00');
-
-DELETE FROM `Identity`;
-INSERT INTO `Identity` (`sampleId`, `internalName`, `externalName`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
-VALUES ('1', 'internalName1', 'externalName1', '1', '2016-02-17 09:32:00', '1', '2016-02-17 09:32:00'),
-('4', 'internalName2', 'externalName2', '1', '2016-02-17 09:32:00', '1', '2016-02-17 09:32:00');
 
 INSERT INTO `SampleNumberPerProject`
 (`sampleNumberPerProjectId`, `projectId`, `highestSampleNumber`, `padding`, `createdBy`, `updatedBy`, `creationDate`, `lastUpdated`)
@@ -433,5 +428,5 @@ INSERT INTO `TissueType`(`tissueTypeId`, `alias`, `description`, `createdBy`, `c
 VALUES (1,'Test Type','for testing',1,'2016-02-19 11:28:00',1,'2016-02-19 11:28:00');
 
 DELETE FROM `LibraryAdditionalInfo`;
-INSERT INTO `LibraryAdditionalInfo`(`libraryId`, `tissueOriginId`, `tissueTypeId`, `kitDescriptorId`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
-VALUES (1,1,1,1,1,'2016-02-19 11:28:00',1,'2016-02-19 11:28:00');
+INSERT INTO `LibraryAdditionalInfo`(`libraryId`, `kitDescriptorId`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
+VALUES (1,1,1,'2016-02-19 11:28:00',1,'2016-02-19 11:28:00');

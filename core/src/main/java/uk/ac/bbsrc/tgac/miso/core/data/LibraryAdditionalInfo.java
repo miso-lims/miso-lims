@@ -18,14 +18,6 @@ public interface LibraryAdditionalInfo {
 
   void setLibrary(Library library);
 
-  TissueOrigin getTissueOrigin();
-
-  void setTissueOrigin(TissueOrigin tissueOrigin);
-
-  TissueType getTissueType();
-
-  void setTissueType(TissueType tissueType);
-
   Long getGroupId();
 
   void setGroupId(Long groupId);

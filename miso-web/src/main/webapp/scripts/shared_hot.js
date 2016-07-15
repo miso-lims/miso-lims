@@ -62,18 +62,20 @@ var Hot = {
    * Gets the id of an object from a given alias and collection
    */
   getIdFromAlias: function (alias, referenceCollection) {
-    return referenceCollection.filter(function (item) {
+    var results = referenceCollection.filter(function (item) {
       return item.alias == alias;
-    })[0].id;
+    });
+    return results.length > 0 ? results[0].id : null;
   },
 
   /**
    * Gets the alias of an object from a given id and collection
    */
   getAliasFromId: function (id, referenceCollection) {
-    return referenceCollection.filter(function (item) {
+    var results = referenceCollection.filter(function (item) {
       return item.id == id;
-    })[0].alias;
+    });
+    return results.length > 0 ? results[0].alias : null;
   },
 
   /**

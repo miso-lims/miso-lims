@@ -131,7 +131,7 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @JoinColumn(name = "lastModifier", nullable = false)
   private User lastModifier;
 
-  @Formula(value = "SELECT MAX(lcl.changeTime) FROM LibraryChangeLog lcl WHERE lcl.libraryId = libraryId")
+  @Formula(value = "(SELECT MAX(lcl.changeTime) FROM LibraryChangeLog lcl WHERE lcl.libraryId = libraryId)")
   private Date lastModified;
 
   @Transient
@@ -531,5 +531,16 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
     } else {
       return tagBarcodes.get(0).getFamily();
     }
+  }
+
+  @Override
+  public SampleTissue getSampleTissue() {
+    if (this.getSample() instanceof SampleAdditionalInfo) {
+
+      for (SampleAdditionalInfo parent = (SampleAdditionalInfo) this.getSample(); parent != null; parent = parent.getParent()) {
+        if (parent instanceof SampleTissue) return (SampleTissue) parent;
+      }
+    }
+    return null;
   }
 }

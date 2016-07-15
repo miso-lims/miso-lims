@@ -1,6 +1,5 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import java.util.Date;
 import java.util.List;
 
 import org.hibernate.Query;
@@ -50,24 +49,9 @@ public class HibernateIdentityDao implements IdentityDao {
   }
 
   @Override
-  public Long addIdentity(Identity identity) {
-    Date now = new Date();
-    identity.setCreationDate(now);
-    identity.setLastUpdated(now);
-    return (Long) currentSession().save(identity);
-  }
-
-  @Override
   public void deleteIdentity(Identity identity) {
     currentSession().delete(identity);
 
-  }
-
-  @Override
-  public void update(Identity identity) {
-    Date now = new Date();
-    identity.setLastUpdated(now);
-    currentSession().update(identity);
   }
 
   public SessionFactory getSessionFactory() {
