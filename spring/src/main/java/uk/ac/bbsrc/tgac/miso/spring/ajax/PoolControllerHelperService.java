@@ -712,24 +712,24 @@ public class PoolControllerHelperService {
     if (!json.has("platform")) {
       return JSONUtils.SimpleJSONError("No platform specified");
     }
-    
+
     PlatformType platform = PlatformType.get(json.getString("platform"));
     JSONObject j = new JSONObject();
 
     try {
-        JSONArray arr = new JSONArray();
-        for (Pool pool : requestManager.listAllPoolsByPlatform(platform)) {
-          JSONArray pout = new JSONArray();
-          pout.add(TableHelper.hyperLinkify("/miso/pool/" + pool.getId(), pool.getName()));
-          pout.add(TableHelper.hyperLinkify("/miso/pool/" + pool.getId(), pool.getAlias()));
-          pout.add(pool.getCreationDate() != null ? pool.getCreationDate().toString() : "");
-          pout.add(pool.getId());
-          pout.add(pool.getId());
-          pout.add(pool.getId());
+      JSONArray arr = new JSONArray();
+      for (Pool pool : requestManager.listAllPoolsByPlatform(platform)) {
+        JSONArray pout = new JSONArray();
+        pout.add(TableHelper.hyperLinkify("/miso/pool/" + pool.getId(), pool.getName()));
+        pout.add(TableHelper.hyperLinkify("/miso/pool/" + pool.getId(), pool.getAlias()));
+        pout.add(pool.getCreationDate() != null ? pool.getCreationDate().toString() : "");
+        pout.add(pool.getId());
+        pout.add(pool.getId());
+        pout.add(pool.getId());
 
-          arr.add(pout);
-        }
-        j.put("pools", arr);
+        arr.add(pout);
+      }
+      j.put("pools", arr);
 
       return j;
     } catch (IOException e) {
@@ -745,6 +745,12 @@ public class PoolControllerHelperService {
         Long elementId = json.getLong("elementId");
         Pool<? extends Poolable> pool = requestManager.getPoolById(poolId);
         StringBuilder info = new StringBuilder();
+        double total = 0;
+        for (Poolable p : pool.getPoolableElements()) {
+          if (p instanceof Dilution) {
+            total += ((Dilution) p).getConcentration();
+          }
+        }
         for (Poolable p : pool.getPoolableElements()) {
           if (p.getId() == elementId) {
             if (p instanceof Plate) {
@@ -768,6 +774,7 @@ public class PoolControllerHelperService {
                   + dilution.getLibrary().getAlias() + "(" + dilution.getLibrary().getName() + ")</a><br/>");
               info.append("<b>Sample:</b> <a href='/miso/sample/" + dilution.getLibrary().getSample().getId() + "'>"
                   + dilution.getLibrary().getSample().getAlias() + "(" + dilution.getLibrary().getSample().getName() + ")</a><br/>");
+              info.append("<b>Percentage:</b> " + Math.round(dilution.getConcentration() * 100 / total) + "%<br/>");
               if (pool.getPoolableElements().size() > 1) {
                 if (!dilution.getLibrary().getTagBarcodes().isEmpty()) {
                   info.append("<b>Barcodes:</b></br>");
