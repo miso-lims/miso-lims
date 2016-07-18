@@ -89,17 +89,11 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
   private static final String SEQUENCER_PARTITION_CONTAINER_SELECT_BY_ID = SEQUENCER_PARTITION_CONTAINER_SELECT + " WHERE containerId=?";
 
   private static final String SEQUENCER_PARTITION_CONTAINER_SELECT_BY_PARTITION_ID = "SELECT s.containerId, s.platform, s.identificationBarcode, s.locationBarcode, s.validationBarcode, s.securityProfile_profileId, s.lastModifier "
-      + "FROM "
-      + TABLE_NAME
-      + " s, SequencerPartitionContainer_Partition sp "
-      + "WHERE s.containerId=sp.container_containerId "
+      + "FROM " + TABLE_NAME + " s, SequencerPartitionContainer_Partition sp " + "WHERE s.containerId=sp.container_containerId "
       + "AND sp.partitions_partitionId=?";
 
   private static final String SEQUENCER_PARTITION_CONTAINER_SELECT_BY_RELATED_RUN = "SELECT DISTINCT f.containerId, f.platform, f.identificationBarcode, f.locationBarcode, f.validationBarcode, f.securityProfile_profileId, f.lastModifier "
-      + "FROM "
-      + TABLE_NAME
-      + " f, Run_SequencerPartitionContainer rf "
-      + "WHERE f.containerId=rf.containers_containerId "
+      + "FROM " + TABLE_NAME + " f, Run_SequencerPartitionContainer rf " + "WHERE f.containerId=rf.containers_containerId "
       + "AND rf.run_runId=?";
 
   private static final String SEQUENCER_PARTITION_CONTAINER_SELECT_BY_IDENTIFICATION_BARCODE = SEQUENCER_PARTITION_CONTAINER_SELECT
@@ -111,9 +105,7 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
   public static final String RUN_SEQUENCER_PARTITION_CONTAINER_DELETE_BY_SEQUENCER_PARTITION_CONTAINER_ID = "DELETE FROM Run_SequencerPartitionContainer "
       + "WHERE containers_containerId=:containers_containerId";
 
-  public static final String SEQUENCER_PARTITION_CONTAINER_UPDATE = "UPDATE "
-      + TABLE_NAME
-      + " "
+  public static final String SEQUENCER_PARTITION_CONTAINER_UPDATE = "UPDATE " + TABLE_NAME + " "
       + "SET platform=:platform, identificationBarcode=:identificationBarcode, locationBarcode=:locationBarcode, validationBarcode=:validationBarcode, securityProfile_profileId=:securityProfile_profileId, lastModifier=:lastModifier "
       + "WHERE containerId=:containerId";
 

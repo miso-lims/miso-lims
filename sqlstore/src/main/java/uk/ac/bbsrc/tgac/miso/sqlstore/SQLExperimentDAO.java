@@ -32,14 +32,9 @@ import java.util.regex.Matcher;
 
 import javax.persistence.CascadeType;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -53,6 +48,9 @@ import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.Property;
 import com.googlecode.ehcache.annotations.TriggersRemove;
 
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractExperiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
@@ -74,6 +72,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.StudyStore;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
+import uk.ac.bbsrc.tgac.miso.sqlstore.util.BridgeCollectionUpdater;
 
 /**
  * A data access object designed for retrieving Experiments from the LIMS database. This DAO should be configured with a spring
@@ -122,6 +121,23 @@ public class SQLExperimentDAO implements ExperimentStore {
       + "WHERE experiments_experimentId=:experiments_experimentId";
 
   protected static final Logger log = LoggerFactory.getLogger(SQLExperimentDAO.class);
+  private static final BridgeCollectionUpdater<Kit> KIT_WRITER = new BridgeCollectionUpdater<Kit>("Experiment_Kit", "experiments_experimentId",
+      "kits_kidId") {
+
+    @Override
+    protected Object getId(Kit item) {
+      return item.getId();
+    }
+
+  };
+  private static final BridgeCollectionUpdater<Pool<?>> POOL_WRITER = new BridgeCollectionUpdater<Pool<?>>("Pool_Experiment", "experiments_experimentId",
+      "pool_poolId") {
+
+    @Override
+    protected Object getId(Pool<?> item) {
+      return item.getId();
+    }
+  };
 
   private StudyStore studyDAO;
   private SampleStore sampleDAO;
@@ -271,7 +287,7 @@ public class SQLExperimentDAO implements ExperimentStore {
   @Override
   @TriggersRemove(cacheName = { "experimentCache",
       "lazyExperimentCache" }, keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
-          @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
+          @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
   public long save(Experiment experiment) throws IOException {
     Long securityProfileId = experiment.getSecurityProfile().getProfileId();
     if (securityProfileId == null || this.cascadeType != null) {
@@ -328,18 +344,9 @@ public class SQLExperimentDAO implements ExperimentStore {
     }
 
     if (this.cascadeType != null) {
-      MapSqlParameterSource eParams = new MapSqlParameterSource();
-      eParams.addValue("experiments_experimentId", experiment.getId());
-      NamedParameterJdbcTemplate eNamedTemplate = new NamedParameterJdbcTemplate(template);
-      eNamedTemplate.update(POOL_EXPERIMENT_DELETE_BY_EXPERIMENT_ID, eParams);
+      POOL_WRITER.saveOne(template, experiment.getId(), experiment.getPool());
 
       if (experiment.getPool() != null) {
-        SimpleJdbcInsert eInsert = new SimpleJdbcInsert(template).withTableName("Pool_Experiment");
-
-        MapSqlParameterSource esParams = new MapSqlParameterSource();
-        esParams.addValue("experiments_experimentId", experiment.getId()).addValue("pool_poolId", experiment.getPool().getId());
-        eInsert.execute(esParams);
-
         if (this.cascadeType.equals(CascadeType.PERSIST)) {
           DbUtils.flushCache(cacheManager, "poolCache");
         } else if (this.cascadeType.equals(CascadeType.REMOVE)) {
@@ -356,22 +363,7 @@ public class SQLExperimentDAO implements ExperimentStore {
         }
       }
 
-      if (!experiment.getKits().isEmpty()) {
-        for (Kit k : experiment.getKits()) {
-          kitDAO.save(k);
-
-          SimpleJdbcInsert kInsert = new SimpleJdbcInsert(template).withTableName("Experiment_Kit");
-
-          MapSqlParameterSource kParams = new MapSqlParameterSource();
-          kParams.addValue("experiments_experimentId", experiment.getId()).addValue("kits_kidId", k.getId());
-          try {
-            kInsert.execute(kParams);
-          } catch (DuplicateKeyException dke) {
-            // ignore
-          }
-        }
-      }
-
+      KIT_WRITER.saveAll(template, experiment.getId(), experiment.getKits());
       purgeListCache(experiment);
     }
 
@@ -380,7 +372,7 @@ public class SQLExperimentDAO implements ExperimentStore {
 
   @Override
   @Cacheable(cacheName = "experimentListCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
-      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
+      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
   public List<Experiment> listAll() {
     return template.query(EXPERIMENTS_SELECT, new ExperimentMapper(true));
   }
@@ -422,7 +414,7 @@ public class SQLExperimentDAO implements ExperimentStore {
 
   @Override
   @Cacheable(cacheName = "experimentCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
-      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
+      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
   public Experiment get(long experimentId) throws IOException {
     List eResults = template.query(EXPERIMENT_SELECT_BY_ID, new Object[] { experimentId }, new ExperimentMapper());
     Experiment e = eResults.size() > 0 ? (Experiment) eResults.get(0) : null;
@@ -439,7 +431,7 @@ public class SQLExperimentDAO implements ExperimentStore {
   @Override
   @TriggersRemove(cacheName = { "experimentCache",
       "lazyExperimentCache" }, keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
-          @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
+          @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
   public boolean remove(Experiment experiment) throws IOException {
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
     if (experiment.isDeletable()
