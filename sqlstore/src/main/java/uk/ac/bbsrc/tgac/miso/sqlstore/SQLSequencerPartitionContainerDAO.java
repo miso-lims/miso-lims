@@ -33,15 +33,10 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
-
 import org.codehaus.jackson.type.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -55,6 +50,9 @@ import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.Property;
 import com.googlecode.ehcache.annotations.TriggersRemove;
 
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
@@ -337,6 +335,7 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
     }
 
     if (sequencerPartitionContainer.getPartitions() != null && !sequencerPartitionContainer.getPartitions().isEmpty()) {
+      removeContainerPartitionAssociations(sequencerPartitionContainer);
 
       SimpleJdbcInsert eInsert = new SimpleJdbcInsert(template).withTableName("SequencerPartitionContainer_Partition");
 
@@ -346,11 +345,7 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
 
         MapSqlParameterSource flParams = new MapSqlParameterSource();
         flParams.addValue("container_containerId", sequencerPartitionContainer.getId()).addValue("partitions_partitionId", partitionId);
-        try {
-          eInsert.execute(flParams);
-        } catch (DuplicateKeyException dke) {
-          log.error("This Container/Partition combination already exists - not inserting", dke);
-        }
+        eInsert.execute(flParams);
       }
     }
 
