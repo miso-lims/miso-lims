@@ -8,7 +8,6 @@ Sample.hot = {
   sampleClassId: null,
   sciName: null,
   sampleData: null,
-  showQcs: false,
 
   /**
    * Additional sample-specific processing.
@@ -77,7 +76,7 @@ Sample.hot = {
       return copy;
     }
     return samplesArray.map(function (sam) {
-      var newSam = {};
+      var newSam = Sample.hot.getDefaultDetailedValues();
       newSam.sampleType = sam.sampleType;
       newSam.projectId = sam.projectId;
       newSam.scientificName = sam.scientificName;
@@ -310,7 +309,7 @@ Sample.hot = {
       sampleCategory = Sample.hot.getCategoryFromClassId(document.getElementById('classDropdown').value);
       Sample.hot.dataSchema.scientificName = "Homo sapiens";
     }
-    Sample.hot.makeHOT(null, sampleCategory);
+    Sample.hot.makeHOT(null, 'create', null, sampleCategory);
 
     // disable sampleClass dropdown so they can't change it midway through editing table values
     if (document.getElementById('classDropdown')) {
@@ -339,10 +338,10 @@ Sample.hot = {
   /**
    * Makes create/edit samples table
    */
-  makeHOT: function (startingValues, sampleCategory) {
+  makeHOT: function (startingValues, action, sourceSampleCategory, targetSampleCategory) {
     // are new samples parented to IDs being requested
-    var idColBoolean = (startingValues ? false : true);
-    Hot.colConf = Sample.hot.setColumnData(Hot.detailedSample, sampleCategory, idColBoolean);
+    Sample.hot.generateColumnData = function(showQcs) { return Sample.hot.getAppropriateColumns(action, sourceSampleCategory, targetSampleCategory, showQcs); };
+    Hot.colConf = Sample.hot.generateColumnData(false);
 
     if (!startingValues) {
       // set initial number of rows to display.
@@ -378,23 +377,9 @@ Sample.hot = {
 
   /**
    * Redraws the samples table to include QC columns
-   * TODO: finish this (make sure it contains the necessary columns)
    */
   regenerateWithQcs: function () {
-    Sample.hot.showQcs = true;
-    var sampleCategory = Sample.hot.getCategoryFromClassId(Hot.hotTable.getSourceData()[0].sampleClassId);
-    Hot.colConf = Sample.hot.setColumnData(Hot.detailedSample, sampleCategory, false);
-
-    Hot.hotTable.updateSettings({ columns: Hot.colConf, colHeaders: Hot.getValues('header', Hot.colConf) });
-  },
-
-  /**
-   * Hides columns which don't change often and do take up extra space
-   * TODO: finish this
-   */
-  hideAdditionalCols: function () {
-    var sampleCategory = Sample.hot.getCategoryFromClassId(Hot.hotTable.getSourceData()[0].sampleClassId);
-    Hot.colConf = Sample.hot.setColumnData(false, sampleCategory, false);
+    Hot.colConf = Sample.hot.generateColumnData(true);
 
     Hot.hotTable.updateSettings({ columns: Hot.colConf, colHeaders: Hot.getValues('header', Hot.colConf) });
   },
@@ -464,7 +449,7 @@ Sample.hot = {
   getDefaultDetailedValues: function () {
     var sampleClassAlias = Hot.getAliasFromId(Sample.hot.sampleClassId, Hot.sampleOptions.sampleClassesDtos);
     var rootSampleClassId = Sample.hot.getRootSampleClassId();
-    var sampleCategory = Sample.hot.getCategoryFromClassId(document.getElementById('classDropdown').value);
+    var sampleCategory = Sample.hot.getCategoryFromClassId(Sample.hot.sampleClassId);
     return {
       'sampleClassAlias': sampleClassAlias,
       'parentSampleClassId': rootSampleClassId,
@@ -578,18 +563,49 @@ Sample.hot = {
   },
 
   /**
-   * sets which columns will be displayed
-   * params: boolean detailedSample
-   *         boolean qcBool (have qc columns been requested)
-   *         String sampleCategory
-   *         boolean idColBoolean (true if no starting values are provided so parent is Identity, false if starting values are provided
-   *                               so parent is sample)
+   * Returns a list of the columns will be displayed for the current situation
+   * params: string action: one of create, update, or propagate
+   *         string sourceSampleCategory: if propagating, the sample category of the parent, null otherwise
+   *         string targetSampleCategory: the sample category of the sample being created or modified, null if plain
+   *         Boolean showQcs: show quality control columns
    */
-  setColumnData: function (detailedBool, sampleCategory, idColBoolean) {
-    var qcBool = Sample.hot.showQcs;
+  getAppropriateColumns: function (action, sourceSampleCategory, targetSampleCategory, showQcs) {
+    var isDetailed = targetSampleCategory != null;
     var sampleClassAlias = Hot.getAliasFromId(Sample.hot.sampleClassId, Hot.sampleOptions.sampleClassesDtos);
+	// We assume we have a linear progression of information that must be
+	// collected as a sample progressed through the hierarchy.
+    var progression = ['Identity', 'Tissue', 'Tissue Processing', 'Stock', 'Aliquot'];
+    // First, set all the groups of detailed columns we will show to off.
+    var show = {};
+    for (var i = 0; i <= progression.length; i++) {
+      show[progression[i]] = false;
+    }
+    // Determine the indices of the first and less steps in the progression.
+    var endProgression = targetSampleCategory == null ? -1 : progression.indexOf(targetSampleCategory);
+    var startProgression;
+    if (!isDetailed) {
+      startProgression = -1;
+    } else if (action == 'create') {
+      startProgression = 0;
+    } else if (action == 'update') {
+      startProgression = endProgression;
+    } else {
+      // Start at the category *after* our source type.
+      startProgression = progression.indexOf(sourceSampleCategory) + 1;
+    }
+    // Now, mark all the appropriate column groups active
+    for (i = startProgression; i <= endProgression && i != -1; i++) {
+      show[progression[i]] = true;
+    }
+	// If we aren't starting or finished with a tissue processing, hide those
+	// columns since we don't really want to show tissue processing unless the
+	// user specifically requested it.
+	if (sourceSampleCategory != 'Tissue Processing' && targetSampleCategory != 'Tissue Processing') {
+      show['Tissue Processing'] = false;
+    }
 
     return [
+      // Basic columns
       {
         header: 'Sample Alias',
         data: 'alias',
@@ -615,7 +631,7 @@ Sample.hot = {
         },
         allowEmpty: true,
         extraneous: true,
-        include: !detailedBool || idColBoolean
+        include: !isDetailed || show['Tissue']
       },
       {
         header: 'Matrix Barcode',
@@ -640,115 +656,16 @@ Sample.hot = {
         source: Sample.hot.sciName,
         validator: requiredText,
         extraneous: true,
-        include: true
-      },
-      {
-        header: 'Group ID',
-        data: 'groupId',
-        type: 'numeric',
-        validator: validateNumber,
-        include: detailedBool
-      },
-      {
-        header: 'Group Desc.',
-        data: 'groupDescription',
-        type: 'text',
-        validator: permitEmpty,
-        include: detailedBool
-      },
-      {
-        header: 'External Name',
-        data: 'externalName',
-        type: 'text',
-        validator: requiredText,
-        include: detailedBool && idColBoolean
-      },{
-        header: 'Sex',
-        data: 'donorSex',
-        type: 'dropdown',
-        trimDropdown: false,
-        source: Sample.hot.getDonorSexes(),
-        validator: permitEmpty,
-        include: detailedBool && idColBoolean
-      },
-      {
-        header: 'Tissue Class',
-        data: 'parentSampleClassAlias',
-        type: 'dropdown',
-        trimDropdown: false,
-        source: Sample.hot.getTissueClassesAliasOnly(),
-        validator: validateTissueClasses,
-        include: detailedBool && idColBoolean && sampleCategory === 'Stock'
-      },
-      {
-        header: 'Tissue Origin',
-        data: 'tissueOriginAlias',
-        type: 'dropdown',
-        trimDropdown: false,
-        source: Sample.hot.getTissueOrigins(),
-        validator: validateTissueOrigins,
-        include: detailedBool && idColBoolean
-      },
-      {
-        header: 'Tissue Type',
-        data: 'tissueTypeAlias',
-        type: 'dropdown',
-        trimDropdown: false,
-        source: Sample.hot.getTissueTypes(),
-        validator: validateTissueTypes,
-        include: detailedBool && idColBoolean
-      },
-      {
-        header: 'Passage #',
-        data: 'passageNumber',
-        type: 'text',
-        validator: validateNumber,
-        include: detailedBool && idColBoolean
-      },
-      {
-        header: 'Times Received',
-        data: 'timesReceived',
-        type: 'numeric',
-        validator: requiredText,
-        include: detailedBool && idColBoolean
-      },
-      {
-        header: 'Tube Number',
-        data: 'tubeNumber',
-        type: 'numeric',
-        validator: requiredText,
-        include: detailedBool && idColBoolean
-      },
-      {
-        header: 'Sample Class',
-        data: 'sampleClassAlias',
-        type: 'dropdown',
-        trimDropdown: false,
-        source: Sample.hot.getNewSampleClassOptionsAliasOnly(),
-        include: detailedBool && idColBoolean
-      },
-      {
-        header: 'Lab',
-        data: 'labComposite',
-        type: 'dropdown',
-        trimDropdown: false,
-        source: Sample.hot.getLabs(),
-        validator: permitEmpty,
-        include: detailedBool && idColBoolean
-      },
-      {
-        header: 'Ext. Inst. Identifier',
-        data: 'externalInstituteIdentifier',
-        type: 'text',
-        include: detailedBool && idColBoolean
+        include: !isDetailed || show['Tissue']
       },
 
+      // Parent columns
       {
         header: 'Parent Alias',
         data: 'parentAlias',
         type: 'text',
         readOnly: true,
-        include: detailedBool && !idColBoolean
+        include: isDetailed && action == 'propagate'
       },
       {
         header: 'Parent Sample Class',
@@ -757,51 +674,49 @@ Sample.hot = {
         trimDropdown: false,
         source: Sample.hot.getSampleClasses(),
         readOnly: true,
-        include: detailedBool && !idColBoolean
+        include: isDetailed && action == 'propagate'
       },
+
+      // Identity columns
+      {
+        header: 'External Name',
+        data: 'externalName',
+        type: 'text',
+        validator: requiredText,
+        include: show['Identity']
+      },
+      {
+        header: 'Sex',
+        data: 'donorSex',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: Sample.hot.getDonorSexes(),
+        validator: permitEmpty,
+        include: show['Identity']
+      },
+
+      // Detailed columns
       {
         header: 'Sample Class',
         data: 'sampleClassAlias',
         type: 'dropdown',
         trimDropdown: false,
-        source: Sample.hot.getSampleClasses(),
-        include: detailedBool && !idColBoolean
-      },
-
-      {
-        header: 'Material',
-        data: 'tissueMaterialAlias',
-        type: 'dropdown',
-        trimDropdown: false,
-        source: Sample.hot.getTissueMaterials(),
-        validator: permitEmpty,
-        include: sampleCategory === 'Tissue'
+        source: sourceSampleCategory == null ? Sample.hot.getNewSampleClassOptionsAliasOnly() : Sample.hot.getSampleClasses(),
+        include: isDetailed
       },
       {
-        header: 'Region',
-        data: 'region',
+        header: 'Group ID',
+        data: 'groupId',
+        type: 'numeric',
+        validator: validateNumber,
+        include: isDetailed
+      },
+      {
+        header: 'Group Desc.',
+        data: 'groupDescription',
         type: 'text',
         validator: permitEmpty,
-        include: sampleCategory === 'Tissue'
-      },
-      {
-        header: 'STR Status',
-        data: 'strStatus',
-        type: 'dropdown',
-        trimDropdown: false,
-        source: Sample.hot.getStrStatuses(),
-        include: sampleCategory === 'Stock'
-
-      },
-      {
-        header: 'Purpose',
-        data: 'samplePurposeAlias',
-        type: 'dropdown',
-        trimDropdown: false,
-        source: Sample.hot.getSamplePurposes(),
-        validator: permitEmpty,
-        include: sampleCategory === 'Aliquot'
-
+        include: isDetailed
       },
       {
         header: 'Kit',
@@ -810,47 +725,145 @@ Sample.hot = {
         trimDropdown: false,
         source: Sample.hot.getKitDescriptors(),
         validator: permitEmpty,
-        include: sampleCategory === 'Aliquot'
+        include: show['Aliquot']
       },
+
+      // Tissue columns
+      {
+        header: 'Tissue Class',
+        data: 'parentSampleClassAlias',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: Sample.hot.getTissueClassesAliasOnly(),
+        validator: validateTissueClasses,
+        include: show['Tissue'] && targetSampleCategory != 'Tissue'
+      },
+      {
+        header: 'Tissue Origin',
+        data: 'tissueOriginAlias',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: Sample.hot.getTissueOrigins(),
+        validator: validateTissueOrigins,
+        include: show['Tissue']
+      },
+      {
+        header: 'Tissue Type',
+        data: 'tissueTypeAlias',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: Sample.hot.getTissueTypes(),
+        validator: validateTissueTypes,
+        include: show['Tissue']
+      },
+      {
+        header: 'Passage #',
+        data: 'passageNumber',
+        type: 'text',
+        validator: validateNumber,
+        include: show['Tissue']
+      },
+      {
+        header: 'Times Received',
+        data: 'timesReceived',
+        type: 'numeric',
+        validator: requiredText,
+        include: show['Tissue']
+      },
+      {
+        header: 'Tube Number',
+        data: 'tubeNumber',
+        type: 'numeric',
+        validator: requiredText,
+        include: show['Tissue']
+      },
+      {
+        header: 'Lab',
+        data: 'labComposite',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: Sample.hot.getLabs(),
+        validator: permitEmpty,
+        include: show['Tissue']
+      },
+      {
+        header: 'Ext. Inst. Identifier',
+        data: 'externalInstituteIdentifier',
+        type: 'text',
+        include: show['Tissue']
+      },
+      {
+        header: 'Material',
+        data: 'tissueMaterialAlias',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: Sample.hot.getTissueMaterials(),
+        validator: permitEmpty,
+        include: show['Tissue']
+      },
+      {
+        header: 'Region',
+        data: 'region',
+        type: 'text',
+        validator: permitEmpty,
+        include: show['Tissue']
+      },
+
+      // Tissue Processing: CV Slides columns
       {
         header: 'Cuts',
         data: 'cuts',
         type: 'numeric',
         validator: requiredText,
-        include: sampleCategory === 'Tissue Processing' && sampleClassAlias == 'CV Slide'
+        include: show['Tissue Processing'] && sampleClassAlias == 'CV Slide'
       },
       {
         header: 'Discards',
         data: 'discards',
         type: 'numeric',
-        include: sampleCategory === 'Tissue Processing' && sampleClassAlias == 'CV Slide'
+        include: show['Tissue Processing'] && sampleClassAlias == 'CV Slide'
       },
       {
         header: 'Thickness',
         data: 'thickness',
         type: 'numeric',
-        include: sampleCategory === 'Tissue Processing' && sampleClassAlias == 'CV Slide'
+        include: show['Tissue Processing'] && sampleClassAlias == 'CV Slide'
       },
+
+      // Tissue Processing: LCM Tube columns
       {
         header: 'Cuts Consumed',
         data: 'cutsConsumed',
         type: 'numeric',
         validator: requiredText,
-        include: sampleCategory === 'Tissue Processing' && sampleClassAlias == 'LCM Tube'
+        include: show['Tissue Processing'] && sampleClassAlias == 'LCM Tube'
       },
+
+      // Stock columns
+      {
+        header: 'STR Status',
+        data: 'strStatus',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: Sample.hot.getStrStatuses(),
+        include: show['Stock']
+
+      },
+
+      // QC columns
       {
         header: 'Vol.',
         data: 'volume',
         type: 'numeric',
         format: '0.00',
-        include: qcBool
+        include: showQcs || show['Stock']
       },
       {
         header: 'Conc.',
         data: 'concentration',
         type: 'numeric',
         format: '0.00',
-        include: qcBool
+        include: show['Stock']
       },
       {
         header: 'QC Passed?',
@@ -859,7 +872,7 @@ Sample.hot = {
         trimDropdown: false,
         source: Sample.hot.getQcValues(),
         validator: permitEmpty,
-        include: qcBool
+        include: showQcs || show['Stock']
       },
       {
         header: 'QC Detail',
@@ -868,7 +881,19 @@ Sample.hot = {
         trimDropdown: false,
         source: Sample.hot.getQcPassedDetails(),
         validator: permitEmpty,
-        include: qcBool
+        include: Sample.hot.showQcs || show['Stock']
+      },
+
+
+      // Aliquot columns
+      {
+        header: 'Purpose',
+        data: 'samplePurposeAlias',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: Sample.hot.getSamplePurposes(),
+        validator: permitEmpty,
+        include: show['Aliquot']
       }
     ].filter(function(x) { return x.include; });
 
