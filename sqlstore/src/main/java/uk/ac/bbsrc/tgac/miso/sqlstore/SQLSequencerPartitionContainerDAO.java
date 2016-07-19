@@ -33,15 +33,10 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
-
 import org.codehaus.jackson.type.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -55,6 +50,9 @@ import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.Property;
 import com.googlecode.ehcache.annotations.TriggersRemove;
 
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
@@ -91,17 +89,11 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
   private static final String SEQUENCER_PARTITION_CONTAINER_SELECT_BY_ID = SEQUENCER_PARTITION_CONTAINER_SELECT + " WHERE containerId=?";
 
   private static final String SEQUENCER_PARTITION_CONTAINER_SELECT_BY_PARTITION_ID = "SELECT s.containerId, s.platform, s.identificationBarcode, s.locationBarcode, s.validationBarcode, s.securityProfile_profileId, s.lastModifier "
-      + "FROM "
-      + TABLE_NAME
-      + " s, SequencerPartitionContainer_Partition sp "
-      + "WHERE s.containerId=sp.container_containerId "
+      + "FROM " + TABLE_NAME + " s, SequencerPartitionContainer_Partition sp " + "WHERE s.containerId=sp.container_containerId "
       + "AND sp.partitions_partitionId=?";
 
   private static final String SEQUENCER_PARTITION_CONTAINER_SELECT_BY_RELATED_RUN = "SELECT DISTINCT f.containerId, f.platform, f.identificationBarcode, f.locationBarcode, f.validationBarcode, f.securityProfile_profileId, f.lastModifier "
-      + "FROM "
-      + TABLE_NAME
-      + " f, Run_SequencerPartitionContainer rf "
-      + "WHERE f.containerId=rf.containers_containerId "
+      + "FROM " + TABLE_NAME + " f, Run_SequencerPartitionContainer rf " + "WHERE f.containerId=rf.containers_containerId "
       + "AND rf.run_runId=?";
 
   private static final String SEQUENCER_PARTITION_CONTAINER_SELECT_BY_IDENTIFICATION_BARCODE = SEQUENCER_PARTITION_CONTAINER_SELECT
@@ -113,9 +105,7 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
   public static final String RUN_SEQUENCER_PARTITION_CONTAINER_DELETE_BY_SEQUENCER_PARTITION_CONTAINER_ID = "DELETE FROM Run_SequencerPartitionContainer "
       + "WHERE containers_containerId=:containers_containerId";
 
-  public static final String SEQUENCER_PARTITION_CONTAINER_UPDATE = "UPDATE "
-      + TABLE_NAME
-      + " "
+  public static final String SEQUENCER_PARTITION_CONTAINER_UPDATE = "UPDATE " + TABLE_NAME + " "
       + "SET platform=:platform, identificationBarcode=:identificationBarcode, locationBarcode=:locationBarcode, validationBarcode=:validationBarcode, securityProfile_profileId=:securityProfile_profileId, lastModifier=:lastModifier "
       + "WHERE containerId=:containerId";
 
@@ -337,6 +327,7 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
     }
 
     if (sequencerPartitionContainer.getPartitions() != null && !sequencerPartitionContainer.getPartitions().isEmpty()) {
+      removeContainerPartitionAssociations(sequencerPartitionContainer);
 
       SimpleJdbcInsert eInsert = new SimpleJdbcInsert(template).withTableName("SequencerPartitionContainer_Partition");
 
@@ -346,11 +337,7 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
 
         MapSqlParameterSource flParams = new MapSqlParameterSource();
         flParams.addValue("container_containerId", sequencerPartitionContainer.getId()).addValue("partitions_partitionId", partitionId);
-        try {
-          eInsert.execute(flParams);
-        } catch (DuplicateKeyException dke) {
-          log.error("This Container/Partition combination already exists - not inserting", dke);
-        }
+        eInsert.execute(flParams);
       }
     }
 
