@@ -105,7 +105,6 @@ public class OicrSampleAliasGeneratorTest {
     stock.setParent(lcm);
     SampleClass stockSc = new SampleClassImpl();
     stockSc.setSuffix("R_S");
-    stockSc.setStock(true);
     stock.setSampleClass(stockSc);
     stock.setSiblingNumber(4);
     stock.setAlias("PROJ_0001_nn_n_nn_1-1_R_S4");
@@ -127,7 +126,6 @@ public class OicrSampleAliasGeneratorTest {
     stock.setParent(parentStock);
     SampleClass sc = new SampleClassImpl();
     sc.setSuffix("D_S");
-    sc.setStock(true);
     stock.setSampleClass(sc);
     stock.setSiblingNumber(6);
     return stock;
@@ -140,7 +138,6 @@ public class OicrSampleAliasGeneratorTest {
     stock.setParent(lcmTube);
     SampleClass sc = new SampleClassImpl();
     sc.setSuffix("D_S");
-    sc.setStock(true);
     stock.setSampleClass(sc);
     stock.setSiblingNumber(4);
     return stock;
@@ -153,7 +150,6 @@ public class OicrSampleAliasGeneratorTest {
     stock.setParent(tissue);
     SampleClass sc = new SampleClassImpl();
     sc.setSuffix("D_S");
-    sc.setStock(true);
     stock.setSampleClass(sc);
     stock.setSiblingNumber(4);
     return stock;

@@ -29,12 +29,9 @@ public class SampleClassImpl implements SampleClass {
 
   @Column(nullable = false)
   private String sampleCategory;
-  
+
   @Column(nullable = true)
   private String suffix;
-  
-  @Column(nullable = false)
-  private boolean isStock;
 
   @OneToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "createdBy", nullable = false)
@@ -129,15 +126,4 @@ public class SampleClassImpl implements SampleClass {
   public void setSuffix(String suffix) {
     this.suffix = suffix;
   }
-
-  @Override
-  public boolean isStock() {
-    return isStock;
-  }
-
-  @Override
-  public void setStock(boolean isStock) {
-    this.isStock = isStock;
-  }
-
 }

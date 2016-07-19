@@ -87,4 +87,12 @@ public interface SampleAdditionalInfo extends Sample {
    */
   void setGroupDescription(String groupDescription);
 
+  /**
+   * True if the entity is not a physical sample, but one created to create the appearance of a complete hierarchy when partially processed
+   * sample is received by the lab.
+   */
+  Boolean isSynthetic();
+
+  void setSynthetic(Boolean synthetic);
+
 }

@@ -22,6 +22,7 @@ public class SampleAdditionalInfoDto extends SampleDto {
   private String prepKitUrl;
   private Long groupId;
   private String groupDescription;
+  private Boolean isSynthetic;
 
   public Long getParentId() {
     return parentId;
@@ -133,6 +134,14 @@ public class SampleAdditionalInfoDto extends SampleDto {
 
   public void setGroupDescription(String groupDescription) {
     this.groupDescription = groupDescription;
+  }
+
+  public Boolean isSynthetic() {
+    return isSynthetic;
+  }
+
+  public void setSynthetic(Boolean isSynthetic) {
+    this.isSynthetic = isSynthetic;
   }
 
   @Override

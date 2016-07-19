@@ -363,6 +363,7 @@ public class DefaultSampleService implements SampleService {
     tissue.setSampleType(child.getSampleType());
     tissue.setScientificName(child.getScientificName());
     tissue.setVolume(0D);
+    tissue.setSynthetic(true);
     create(tissue);
     return tissue;
   }

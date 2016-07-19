@@ -28,11 +28,11 @@ public class DefaultSampleClassService implements SampleClassService {
 
   @Autowired
   private AuthorizationManager authorizationManager;
-  
+
   public void setAuthorizationManager(AuthorizationManager authorizationManager) {
     this.authorizationManager = authorizationManager;
   }
-  
+
   public void setSampleClassDao(SampleClassDao sampleClassDao) {
     this.sampleClassDao = sampleClassDao;
   }
@@ -59,7 +59,6 @@ public class DefaultSampleClassService implements SampleClassService {
     updatedSampleClass.setAlias(sampleClass.getAlias());
     updatedSampleClass.setSampleCategory(sampleClass.getSampleCategory());
     updatedSampleClass.setSuffix(sampleClass.getSuffix());
-    updatedSampleClass.setStock(sampleClass.isStock());
     User user = authorizationManager.getCurrentUser();
     updatedSampleClass.setUpdatedBy(user);
     sampleClassDao.update(updatedSampleClass);
