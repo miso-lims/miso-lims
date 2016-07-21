@@ -204,7 +204,8 @@ VALUES (15,NULL,'SAM15','identity1',1,'SAM15::TEST_0001_IDENTITY_1','Freezer1_1'
 (17,NULL,'SAM17','tissue2',1,'SAM17::TEST_0001_TISSUE_2','Freezer1_1','GENOMIC','2016-04-05','true','TEST_0001_TISSUE_2',1,'Homo sapiens',NULL,1);
 
 INSERT INTO `SampleChangeLog`(`sampleId`, `columnsChanged`, `userId`, `message`, `changeTime`)
-VALUES (1, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:49'),
+VALUES (1, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:47'),
+(1, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:49'),
 (2, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:51'),
 (3, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:53'),
 (4, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:55'),
