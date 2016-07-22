@@ -10,7 +10,6 @@ public class SampleClassDto {
   private String alias;
   private String sampleCategory;
   private String suffix;
-  private boolean isStock;
   private Long createdById;
   private String createdByUrl;
   private String creationDate;
@@ -106,22 +105,11 @@ public class SampleClassDto {
     this.suffix = suffix;
   }
 
-  public boolean isStock() {
-    return isStock;
-  }
-
-  public void setStock(boolean isStock) {
-    this.isStock = isStock;
-  }
-
   @Override
   public String toString() {
-    return "SampleClassDto [id=" + id + ", url=" + url + ", alias=" + alias
-        + ", sampleCategory=" + sampleCategory + ", suffix=" + suffix
-        + ", isStock=" + isStock + ", createdById=" + createdById
-        + ", createdByUrl=" + createdByUrl + ", creationDate=" + creationDate
-        + ", updatedById=" + updatedById + ", updatedByUrl=" + updatedByUrl
-        + ", lastUpdated=" + lastUpdated + "]";
+    return "SampleClassDto [id=" + id + ", url=" + url + ", alias=" + alias + ", sampleCategory=" + sampleCategory + ", suffix=" + suffix
+        + ", createdById=" + createdById + ", createdByUrl=" + createdByUrl + ", creationDate=" + creationDate + ", updatedById="
+        + updatedById + ", updatedByUrl=" + updatedByUrl + ", lastUpdated=" + lastUpdated + "]";
   }
 
 }

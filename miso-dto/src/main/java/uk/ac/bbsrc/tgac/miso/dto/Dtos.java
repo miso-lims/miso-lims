@@ -8,11 +8,9 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isTissueProcessingSample;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isTissueSample;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -80,7 +78,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 public class Dtos {
 
@@ -181,7 +178,6 @@ public class Dtos {
     dto.setAlias(from.getAlias());
     dto.setSampleCategory(from.getSampleCategory());
     dto.setSuffix(from.getSuffix());
-    dto.setStock(from.isStock());
     dto.setCreatedById(from.getCreatedBy().getUserId());
     dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
     dto.setUpdatedById(from.getUpdatedBy().getUserId());
@@ -202,7 +198,6 @@ public class Dtos {
     to.setAlias(from.getAlias());
     to.setSampleCategory(from.getSampleCategory());
     to.setSuffix(from.getSuffix());
-    to.setStock(from.isStock());
     return to;
   }
 
@@ -250,6 +245,7 @@ public class Dtos {
     } else {
       throw new IllegalArgumentException();
     }
+    dto.setSynthetic(from.isSynthetic());
     dto.setSampleClassId(from.getSampleClass().getId());
     if (from.getQcPassedDetail() != null) {
       dto.setQcPassedDetailId(from.getQcPassedDetail().getId());
@@ -317,6 +313,9 @@ public class Dtos {
     if (from.getGroupId() != null) {
       to.setGroupId(from.getGroupId());
       to.setGroupDescription(from.getGroupDescription());
+    }
+    if (from.isSynthetic() != null) {
+      to.setSynthetic(from.isSynthetic());
     }
     to.setParent(getParent(from));
     return to;

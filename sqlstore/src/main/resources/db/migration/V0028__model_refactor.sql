@@ -1,5 +1,8 @@
+-- This migration may delete sample valid relationships that are in use. To find bad entities, do:
+-- SELECT child.sampleId AS sampleId FROM SampleAdditionalInfo child JOIN SampleAdditionalInfo parent ON child.parentId = parent.sampleId WHERE (SELECT COUNT(*) FROM SampleValidRelationship WHERE SampleValidRelationship.parentId = parent.sampleClassId AND SampleValidRelationship.childId = child.sampleClassId) = 0;
 ALTER TABLE SampleAdditionalInfo ADD COLUMN groupId int(10);
 ALTER TABLE SampleAdditionalInfo ADD COLUMN groupDescription varchar(255);
+ALTER TABLE SampleAdditionalInfo ADD COLUMN isSynthetic BOOLEAN NOT NULL DEFAULT FALSE;
 
 UPDATE SampleAdditionalInfo SET groupId = (SELECT groupId FROM SampleAnalyte WHERE SampleAdditionalInfo.sampleId = SampleAnalyte.sampleId), groupDescription = (SELECT groupDescription FROM SampleAnalyte WHERE SampleAdditionalInfo.sampleId = SampleAnalyte.sampleId);
 
@@ -25,13 +28,7 @@ ALTER TABLE SampleTissue DROP COLUMN createdBy;
 ALTER TABLE SampleTissue DROP COLUMN creationDate;
 ALTER TABLE SampleTissue DROP COLUMN updatedBy;
 ALTER TABLE SampleTissue DROP COLUMN lastUpdated;
-
---StartNoTest
-DELETE svr FROM SampleValidRelationship svr
-JOIN SampleClass parent ON parent.sampleClassId = svr.parentId
-JOIN SampleClass child ON child.sampleClassId = svr.childId
-WHERE parent.sampleCategory = 'Identity' AND child.sampleCategory <> 'Tissue';
---EndNoTest
+ALTER TABLE SampleTissue DROP COLUMN cellularity;
 
 ALTER TABLE SampleTissue ADD COLUMN tissueOriginId bigint(20);
 ALTER TABLE SampleTissue ADD CONSTRAINT `FK_st_tissueOrigin_tissueOriginId` FOREIGN KEY (`tissueOriginId`) REFERENCES `TissueOrigin` (`tissueOriginId`);
@@ -88,6 +85,14 @@ INSERT INTO SampleAliquot(sampleId, samplePurposeId) SELECT sampleId, samplePurp
 DROP TABLE SampleAnalyte;
 
 DELETE FROM SampleClass WHERE sampleCategory = 'Analyte';
+ALTER TABLE SampleClass DROP COLUMN isStock;
+
+--StartNoTest
+DELETE svr FROM SampleValidRelationship svr
+JOIN SampleClass parent ON parent.sampleClassId = svr.parentId
+JOIN SampleClass child ON child.sampleClassId = svr.childId
+WHERE parent.sampleCategory = 'Identity' AND child.sampleCategory <> 'Tissue';
+--EndNoTest
 
 -- tissueOrigin fkey
 ALTER TABLE SampleAdditionalInfo DROP FOREIGN KEY FK24aduvv5cljo3ggnt0s2cs1w3;

@@ -18,7 +18,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.QcPassedDetail;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleCVSlide;
@@ -65,6 +64,7 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAliquo
   private User lastModifier;
   private Double volume;
   private boolean emptied = false;
+  private boolean isSynthetic = false;
 
   // DetailedSample attributes
   private SampleAdditionalInfo parent;
@@ -778,6 +778,16 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAliquo
     return new Date();
   }
 
+  @Override
+  public Boolean isSynthetic() {
+    return isSynthetic;
+  }
+
+  @Override
+  public void setSynthetic(Boolean isSynthetic) {
+    this.isSynthetic = isSynthetic;
+  }
+
   public SampleAdditionalInfo build() {
     if (sampleClass == null || sampleClass.getSampleCategory() == null) {
       throw new NullPointerException("Missing sample class or category");
@@ -869,6 +879,7 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAliquo
     sample.setArchived(archived);
     sample.setGroupId(groupId);
     sample.setGroupDescription(groupDescription);
+    sample.setSynthetic(isSynthetic);
 
     return sample;
   }

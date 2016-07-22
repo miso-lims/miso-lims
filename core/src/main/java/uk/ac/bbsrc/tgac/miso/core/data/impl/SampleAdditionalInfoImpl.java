@@ -57,6 +57,7 @@ public class SampleAdditionalInfoImpl extends SampleImpl implements SampleAdditi
 
   private Long groupId;
   private String groupDescription;
+  private boolean isSynthetic = false;
 
   @Override
   public SampleAdditionalInfo getParent() {
@@ -168,5 +169,17 @@ public class SampleAdditionalInfoImpl extends SampleImpl implements SampleAdditi
   @Override
   public void setGroupDescription(String groupDescription) {
     this.groupDescription = groupDescription;
+  }
+
+  @Override
+  public Boolean isSynthetic() {
+    return isSynthetic;
+  }
+
+  @Override
+  public void setSynthetic(Boolean isSynthetic) {
+    if (isSynthetic != null) {
+      this.isSynthetic = isSynthetic;
+    }
   }
 }
