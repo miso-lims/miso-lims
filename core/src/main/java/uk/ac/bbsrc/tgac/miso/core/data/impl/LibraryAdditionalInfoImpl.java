@@ -25,9 +25,11 @@ public class LibraryAdditionalInfoImpl implements LibraryAdditionalInfo {
   @Id
   private Long libraryId;
 
-  @OneToOne(targetEntity = LibraryImpl.class)
-  @JoinColumn(name = "libraryId", nullable = false)
-  @MapsId
+  // TODO: enable once Library is migrated to Hibernate.
+  // @OneToOne(targetEntity = LibraryImpl.class)
+  // @JoinColumn(name = "libraryId", nullable = false)
+  // @MapsId
+  @Transient
   private Library library;
 
   private Long groupId;

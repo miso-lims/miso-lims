@@ -950,16 +950,7 @@ public class EditLibraryController {
         library.getLibraryAdditionalInfo().setUpdatedBy(user);
       }
 
-      boolean create = library.getId() == AbstractLibrary.UNSAVED_ID;
-      long id = requestManager.saveLibrary(library);
-      if (library.getLibraryAdditionalInfo() != null) {
-        library.getLibraryAdditionalInfo().setLibrary(library);
-        if (create) {
-          libraryAdditionalInfoService.create(library.getLibraryAdditionalInfo(), id);
-        } else {
-          libraryAdditionalInfoService.update(library.getLibraryAdditionalInfo());
-        }
-      }
+      requestManager.saveLibrary(library);
 
       session.setComplete();
       model.clear();
