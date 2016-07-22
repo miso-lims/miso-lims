@@ -414,9 +414,10 @@ Pool.ui = {
     );
   },
 
-  createListingPoolsTable : function(platform, poolConcentrationUnits) {
-    var table = 'listing'+platform+'PoolsTable';
-    jQuery('#'+table).html("<img src='../styles/images/ajax-loader.gif'/>");
+  createListingPoolsTable: function (platform, poolConcentrationUnits) {
+    var table = 'listing' + platform + 'PoolsTable';
+    jQuery('#'+table).html('');
+    
     jQuery.fn.dataTableExt.oSort['no-po-asc'] = function(x, y) {
       var a = parseInt(x.replace(/^.*PO/i, ""));
       var b = parseInt(y.replace(/^.*PO/i, ""));
@@ -427,78 +428,99 @@ Pool.ui = {
       var b = parseInt(y.replace(/^.*PO/i, ""));
       return ((a < b) ? 1 : ((a > b) ? -1 : 0));
     };
-    Fluxion.doAjax(
-      'poolControllerHelperService',
-      'listPoolsDataTable',
-      {
-        'url':ajaxurl,
-        'platform':platform
-      },
-      {
-        'doOnSuccess': function(json) {
-          jQuery('#'+table).html('');
-          jQuery('#'+table).dataTable({
-            "aaData": json.pools,
-            "aoColumns": [
-              { "sTitle": "Name", "sType":"no-po"},
-              { "sTitle": "Alias"},
-              { "sTitle": "Date Created"},
-              { "sTitle": "Information"},
-              { "sTitle": "Average Insert Size"},
-              { "sTitle": "Concentration ("+poolConcentrationUnits+")"}
-            ],
-            "bJQueryUI": true,
-            "iDisplayLength":  25,
-            "aaSorting":[
-              [0,"desc"]
-            ] ,
-            "fnRowCallback": function(nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-              Fluxion.doAjax(
-                'poolControllerHelperService',
-                'checkInfoByPoolId',
-                {
-                  'poolId':aData[3],
-                  'url':ajaxurl
-                },
-                {
-                  'doOnSuccess': function(json) {
-                    jQuery('td:eq(3)', nRow).html(json.response);
-                  }
-                }
-              );
-  
-              Fluxion.doAjax(
-                'poolControllerHelperService',
-                'checkAverageInsertSizeByPoolId',
-                {
-                  'poolId':aData[4],
-                  'url':ajaxurl
-                },
-                {
-                  'doOnSuccess': function(json) {
-                    jQuery('td:eq(4)', nRow).html(json.response);
-                  }
-                }
-              );
-  
-              Fluxion.doAjax(
-                'poolControllerHelperService',
-                'checkConcentrationByPoolId',
-                {
-                  'poolId':aData[5],
-                  'url':ajaxurl
-                },
-                {
-                  'doOnSuccess': function(json) {
-                    jQuery('td:eq(5)', nRow).html(json.response);
-                  }
-                }
-              );
-            }
-          });
+    jQuery('#'+table).dataTable({
+      "aoColumns": [
+        {
+          "sTitle": "Name",
+          "sType": "no-po",
+          "mData": "name",
+          "mRender": function (data, type, full) {
+            return "<a href=\"/miso/pool/" + full.id + "\">" + data + "</a>";
+          }
+        },
+        {
+          "sTitle": "Alias",
+          "mData": "alias",
+          "mRender": function (data, type, full) {
+            return "<a href=\"/miso/pool/" + full.id + "\">" + data + "</a>";
+          }
+        },
+        {
+          "sTitle": "Date Created",
+          "mData": "creationDate"
+        },
+        {
+          "sTitle": "Elements",
+          "mData": "pooledElements",
+          "mRender": function (data, type, full) {
+            var pooledEls = data.map(function (ld) {
+              return "<li><strong>" + ld.name + "</strong> " + "<a href=\"" + ld.url + "\">"
+              + ld.library.alias + " (" + ld.library.name + ")</a>" + "</li>";
+            });
+            return "<ul>" + pooledEls.join('') + "</ul>";
+          },
+          "bSortable": false
+        },
+        {
+          "sTitle": "Average Insert Size",
+          "mData": "id"
+        },
+        {
+          "sTitle": "Conc. (" + poolConcentrationUnits + ")",
+          "mData": "concentration"
+        },
+        {
+          "sTitle": "Last Updated",
+          "mData": "lastModified",
+          "bVisible": (Sample.detailedSample ? "true" : "false")
+        },
+        {
+          "sTitle": "ID",
+          "mData": "identificationBarcode",
+          "bVisible": false
         }
+      ],
+      "bJQueryUI": true,
+      "bAutoWidth": false,
+      "iDisplayLength": 25,
+      "iDisplayStart": 0,
+      "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>',
+      "fnRowCallback": function(nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+        Fluxion.doAjax(
+          'poolControllerHelperService',
+          'checkAverageInsertSizeByPoolId',
+          {
+            'poolId':aData.id,
+            'url':ajaxurl
+          },
+          {
+            'doOnSuccess': function(json) {
+              jQuery('td:eq(4)', nRow).html(json.response);
+            }
+          }
+        );
+      },
+      "aaSorting": [
+        [(Sample.detailedSample ? 6 : 0), "desc"]              
+      ],
+      "sPaginationType": "full_numbers",
+      "bProcessing": true,
+      "bServerSide": true,
+      "sAjaxSource": "/miso/rest/pool/dt/platform/" + platform, // has to be singular because of mapping in PoolRestController
+      "fnServerData": function (sSource, aoData, fnCallback) {
+        jQuery('#'+table).addClass('disabled');
+        jQuery.ajax({
+          "dataType": "json",
+          "type": "GET",
+          "url": sSource,
+          "data": aoData,
+          "success": fnCallback // do not alter this DataTables property
+        });
+      },
+      "fnDrawCallback": function (oSettings) {
+        jQuery('#'+table).removeClass('disabled');
       }
-    );
+    }).fnSetFilteringDelay();
   },
 
   getPoolableElementInfo : function(poolId, elementId) {

@@ -396,9 +396,7 @@
           itemValue="id" defaultLabel="SELECT" defaultValue=""/>
     </td>
   </tr>
-<c:choose>
-<c:when test="${library.id == 0}">
-  <tr>
+    <tr>
     <td class="h">Tissue Origin:</td>
     <td>${library.sampleTissue.tissueOrigin.alias}</td>
   </tr>
@@ -406,6 +404,9 @@
     <td class="h">Tissue Type:</td>
     <td>${library.sampleTissue.tissueType.alias}</td>
   </tr>
+<c:choose>
+<c:when test="${library.id == 0}">
+
   <c:if test="${not empty library.sample.groupId}">
   <tr>
     <td class="h">Group ID:</td>
@@ -413,19 +414,11 @@
   </tr>
   <tr>
     <td class="h">Group Description:</td>
-    <td>${library.sample.sampledditionalInfo.groupDescription}</td>
+    <td>${library.sample.groupDescription}</td>
   </tr>
   </c:if>
 </c:when>
 <c:otherwise>
-  <tr>
-    <td class="h">Tissue Origin:</td>
-    <td>${library.libraryAdditionalInfo.tissueOrigin.alias}</td>
-  </tr>
-  <tr>
-    <td class="h">Tissue Type:</td>
-    <td>${library.libraryAdditionalInfo.tissueType.alias}</td>
-  </tr>
   <c:if test="${not empty library.libraryAdditionalInfo.groupId}">
   <tr>
     <td class="h">Group ID:</td>

@@ -2822,4 +2822,43 @@ public class MisoRequestManager implements RequestManager {
       throw new IOException("No securityStore available. Check that it has been declared in the Spring config.");
     }
   }
+
+  @Override
+  public Long countPoolsByPlatform(PlatformType platform) throws IOException {
+    if (poolStore != null) {
+      return poolStore.countPoolsByPlatform(platform);
+    } else {
+      throw new IOException("No poolStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public Long getNumPoolsBySearch(PlatformType platform, String querystr) throws IOException {
+    if (poolStore != null) {
+      return poolStore.countPoolsBySearch(platform, querystr);
+    } else {
+      throw new IOException("No poolStore available. Check that it has been declared in the Spring config.");
+    }
+  };
+
+  @Override
+  public List<Pool<? extends Poolable<?, ?>>> getPoolsByPageSizeSearchPlatform(int offset, int limit, String querystr, String sortDir,
+      String sortCol, PlatformType platform) throws IOException {
+    if (poolStore != null) {
+      return poolStore.listBySearchOffsetAndNumResultsAndPlatform(offset, limit, querystr, sortDir, sortCol, platform);
+    } else {
+      throw new IOException("No poolStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public List<Pool<? extends Poolable<?, ?>>> getPoolsByPageAndSize(int offset, int limit, String sortDir, String sortCol,
+      PlatformType platform) throws IOException {
+    if (poolStore != null) {
+      return poolStore.listByOffsetAndNumResults(offset, limit, sortDir, sortCol, platform);
+    } else {
+      throw new IOException("No poolStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
 }

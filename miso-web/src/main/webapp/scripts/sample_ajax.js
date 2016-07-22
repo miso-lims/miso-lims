@@ -1012,6 +1012,16 @@ Sample.ui = {
     jQuery('#listingSamplesTable').html("<img src='../styles/images/ajax-loader.gif'/>");
 
     jQuery('#listingSamplesTable').html('');
+    jQuery.fn.dataTableExt.oSort['no-sam-asc'] = function (x, y) {
+      var a = parseInt(x.replace(/^SAM/i, ""));
+      var b = parseInt(y.replace(/^SAM/i, ""));
+      return ((a < b) ? -1 : ((a > b) ? 1 : 0));
+    };
+    jQuery.fn.dataTableExt.oSort['no-sam-desc'] = function (x, y) {
+      var a = parseInt(x.replace(/^SAM/i, ""));
+      var b = parseInt(y.replace(/^SAM/i, ""));
+      return ((a < b) ? 1 : ((a > b) ? -1 : 0));
+    };
     jQuery('#listingSamplesTable').dataTable({
       "aoColumns": [
         {
@@ -1023,6 +1033,7 @@ Sample.ui = {
         },
         {
           "sTitle": "Sample Name",
+          "sType": "no-sam",
           "mData": "name",
           "mRender": function (data, type, full) {
             return "<a href=\"/miso/sample/" + full.id + "\">" + data + "</a>";
@@ -1060,8 +1071,8 @@ Sample.ui = {
         },
         {
           "sTitle": "Last Updated",
-          "mData": (Sample.detailedSample ? "lastModified" : "id"),
-          "bVisible": (Sample.detailedSample? "true" : "false")
+          "mData": "lastModified",
+          "bVisible": (Sample.detailedSample ? "true" : "false")
         },
         {
           "sTitle": "ID",
@@ -1075,13 +1086,14 @@ Sample.ui = {
       "iDisplayStart": 0,
       "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>',
       "aaSorting": [
-        [7, "desc"]
+        [(Sample.detailedSample ? 7 : 1), "desc"]
       ],
       "sPaginationType": "full_numbers",
       "bProcessing": true,
       "bServerSide": true,
       "sAjaxSource": "/miso/rest/tree/samples/dt",
       "fnServerData": function (sSource, aoData, fnCallback) {
+        jQuery('#listingSamplesTable').addClass('disabled');
         jQuery.ajax({
           "dataType": "json",
           "type": "GET",
@@ -1089,6 +1101,9 @@ Sample.ui = {
           "data": aoData,
           "success": fnCallback // Do not alter this DataTables property
         });
+      },
+      "fnDrawCallback": function (oSettings) {
+        jQuery('#listingSamplesTable').removeClass('disabled');
       },
       "fnRowCallback": function(nRow, aData, iDisplayIndex, iDisplayIndexFull) {
         Fluxion.doAjax(
@@ -1249,7 +1264,8 @@ Sample.ui = {
     if (Sample.detailedSample) {
       // rejects propagation if samples are not of aliquot category
       // TODO: add a more detailed check, or library designs?
-      if (Sample.ui.getUniqueCategoriesForSelected() !== 'Aliquot') {
+      var category = Sample.ui.getUniqueCategoriesForSelected();
+      if (category.length != 1 && category[0] !== 'Aliquot') {
         jQuery('#errors').html("Identity, Tissue, Tissue Processing, and Stock samples cannot be propagated to libraries.");
         jQuery('#errors').css('display', 'block');
         return false;

@@ -54,6 +54,18 @@ VALUES (1,'LIB1','Inherited from TEST_0001',NULL,1,1,'LIB1::TEST_0001_Bn_P_PE_30
 (13,'LIB13','Inherited from TEST_0007',NULL,1,13,'LIB13::TEST_0007_Bn_P_PE_300_WG','LIBRARY_INBOX_B03',3,0,'2015-08-27','Illumina','TEST_0007_Bn_P_PE_300_WG',1,1,1,'true',1),
 (14,'LIB14','Inherited from TEST_0007',NULL,1,14,'LIB14::TEST_0007_Bn_R_PE_300_WG','LIBRARY_INBOX_B04',3,0,'2015-08-27','Illumina','TEST_0007_Bn_R_PE_300_WG',1,1,1,'true',1);
 
+INSERT INTO `LibraryChangeLog`(`libraryId`, `columnsChanged`, `userId`, `message`, `changeTime`)
+VALUES (1, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:49'),
+(2, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:51'),
+(3, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:53'),
+(4, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:55'),
+(5, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:57'),
+(6, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:59'),
+(7, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:01'),
+(8, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:03'),
+(9, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:05'),
+(10, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:07');
+
 DELETE FROM `Kit`;
 INSERT INTO `Kit`(`kitId`,`identificationBarcode`,`locationBarcode`,`lotNumber`,`kitDate`,`kitDescriptorId`) VALUES
 (1,'1234','Freezer2','LOT34',NOW(),1),
@@ -142,6 +154,19 @@ INSERT INTO `PoolQC`(`qcId`, `pool_poolId`, `qcUserName`, `qcDate`, `qcMethod`, 
 VALUES (1,1,'person','2016-03-18',1,12.3),
 (2,1,'person','2016-03-18',1,45.6),
 (3,2,'person','2016-03-18',1,7.89);
+
+INSERT INTO `PoolChangeLog`(`poolId`, `columnsChanged`, `userId`, `message`, `changeTime`)
+VALUES (1, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:49'),
+(1, 'alias', 1, 'Poll 1 -> Pool 1', '2016-06-07 13:13:30'),
+(2, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:51'),
+(3, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:53'),
+(4, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:55'),
+(5, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:57'),
+(6, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:59'),
+(7, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:01'),
+(8, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:03'),
+(9, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:05'),
+(10, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:07');
 
 DELETE FROM `ReferenceGenome`;
 INSERT INTO `ReferenceGenome` (`referenceGenomeId`, `alias`) VALUES (1, 'Human hg19 random');

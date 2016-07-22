@@ -2510,4 +2510,40 @@ public class UserAuthMisoRequestManager implements RequestManager {
     }
     return accessibles;
   }
+
+  @Override
+  public Long countPoolsByPlatform(PlatformType platform) throws IOException {
+    return backingManager.countPoolsByPlatform(platform);
+  }
+
+  @Override
+  public Long getNumPoolsBySearch(PlatformType platform, String querystr) throws IOException {
+    return backingManager.getNumPoolsBySearch(platform, querystr);
+  };
+
+  @Override
+  public List<Pool<? extends Poolable<?, ?>>> getPoolsByPageSizeSearchPlatform(int offset, int limit, String querystr, String sortDir,
+      String sortCol, PlatformType platform) throws IOException {
+    User user = getCurrentUser();
+    List<Pool<? extends Poolable<?, ?>>> accessibles = new ArrayList<>();
+    for (Pool pool : backingManager.getPoolsByPageSizeSearchPlatform(offset, limit, querystr, sortDir, sortCol, platform)) {
+      if (pool.userCanRead(user)) {
+        accessibles.add(pool);
+      }
+    }
+    return accessibles;
+  }
+
+  @Override
+  public List<Pool<? extends Poolable<?, ?>>> getPoolsByPageAndSize(int offset, int limit, String sortDir, String sortCol,
+      PlatformType platform) throws IOException {
+    User user = getCurrentUser();
+    List<Pool<? extends Poolable<?, ?>>> accessibles = new ArrayList<>();
+    for (Pool pool : backingManager.getPoolsByPageAndSize(offset, limit, sortDir, sortCol, platform)) {
+      if (pool.userCanRead(user)) {
+        accessibles.add(pool);
+      }
+    }
+    return accessibles;
+  }
 }

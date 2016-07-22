@@ -377,7 +377,7 @@ public class HibernateSampleDao implements SampleDao {
     criteria.createAlias("derivedInfo", "derivedInfo");
     criteria.setFirstResult(offset);
     criteria.setMaxResults(resultsPerPage);
-    criteria.addOrder("asc".equals(sortDir) ? Order.asc(sortCol) : Order.desc(sortCol));
+    criteria.addOrder("asc".equals(sortDir.toLowerCase()) ? Order.asc(sortCol) : Order.desc(sortCol));
     @SuppressWarnings("unchecked")
     List<Sample> requestedPage = criteria.list();
     return requestedPage;

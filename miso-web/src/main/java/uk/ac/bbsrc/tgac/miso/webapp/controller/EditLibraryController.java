@@ -717,7 +717,8 @@ public class EditLibraryController {
       model.put("libraryPools", pools);
       model.put("libraryRuns", getRunsByLibraryPools(pools));
 
-      populateDesigns(model,
+      populateDesigns(
+          model,
           LimsUtils.isDetailedSample(library.getSample()) ? null : ((SampleAdditionalInfo) library.getSample()).getSampleClass());
 
       model.put("owners", LimsSecurityUtils.getPotentialOwners(user, library, securityManager.listAllUsers()));
@@ -760,6 +761,7 @@ public class EditLibraryController {
       SampleClass sampleClass = null;
       if (sampleId != null) {
         Sample sample = requestManager.getSampleById(sampleId);
+        library.setSample(sample);
         model.put("sample", sample);
         if (LimsUtils.isDetailedSample(sample)) {
           SampleAdditionalInfo detailed = (SampleAdditionalInfo) sample;

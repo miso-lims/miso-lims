@@ -97,8 +97,6 @@ public abstract class AbstractPool<P extends Poolable<?, ?>> extends AbstractBox
   private Set<User> watchers = new HashSet<User>();
   private final Collection<ChangeLog> changeLog = new ArrayList<ChangeLog>();
   private User lastModifier;
-
-  @Formula(value = "(SELECT MAX(pcl.changeTime) FROM PoolChangeLog pcl WHERE pcl.poolId = poolId)")
   private Date lastModified;
 
   @Transient
@@ -117,6 +115,11 @@ public abstract class AbstractPool<P extends Poolable<?, ?>> extends AbstractBox
   @Override
   public Date getLastModified() {
     return lastModified;
+  }
+
+  @Override
+  public void setLastModified(Date lastModified) {
+    this.lastModified = lastModified;
   }
 
   @Override
@@ -182,7 +185,7 @@ public abstract class AbstractPool<P extends Poolable<?, ?>> extends AbstractBox
   @Override
   public Collection<? extends Dilution> getDilutions() {
     Set<Dilution> allDilutions = new HashSet<Dilution>();
-    for (Poolable poolable : getPoolableElements()) {
+    for (Poolable<?, ?> poolable : getPoolableElements()) {
       if (poolable instanceof Dilution) {
         allDilutions.add((Dilution) poolable);
       }
@@ -399,7 +402,7 @@ public abstract class AbstractPool<P extends Poolable<?, ?>> extends AbstractBox
     if (obj == null) return false;
     if (obj == this) return true;
     if (!(obj instanceof Pool)) return false;
-    Pool them = (Pool) obj;
+    Pool<? extends Poolable<?, ?>> them = (Pool<? extends Poolable<?, ?>>) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
     if (getId() == AbstractPool.UNSAVED_ID || them.getId() == AbstractPool.UNSAVED_ID) {
@@ -424,7 +427,7 @@ public abstract class AbstractPool<P extends Poolable<?, ?>> extends AbstractBox
 
   @Override
   public int compareTo(Object o) {
-    Pool t = (Pool) o;
+    Pool<? extends Poolable<?, ?>> t = (Pool<? extends Poolable<?, ?>>) o;
     if (getId() < t.getId()) return -1;
     if (getId() > t.getId()) return 1;
     return 0;

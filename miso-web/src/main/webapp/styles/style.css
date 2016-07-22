@@ -68,6 +68,11 @@ a {
     color: #0066cc;
 }
 
+.disabled {
+    opacity: .4;
+    color: darkgray;
+}
+
 .misoicon {
     text-align: center !important;
     cursor: pointer;
@@ -1799,6 +1804,7 @@ textarea.parsley-error {
   -moz-transition: all .3s ease-in;
   -webkit-transition: all .3s ease-in;
 }
+
 
 .parsley-errors-list.filled {
   opacity: 1;

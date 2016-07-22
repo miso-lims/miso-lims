@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -322,13 +323,89 @@ public class SQLPoolDAOTest extends AbstractDAOTest {
   }
 
   @Test
-  public void testListPoolsWithLimitZero() {
+  public void testListPoolsWithLimitZero() throws IOException {
     assertEquals(0, dao.listAllPoolsWithLimit(0).size());
   }
 
   @Test
-  public void testListPoolsWithLimit() {
+  public void testListPoolsWithLimit() throws IOException {
     assertEquals(10, dao.listAllPoolsWithLimit(10).size());
+  }
+
+  @Test
+  public void testListIlluminaPoolsWithLimitAndOffset() throws IOException {
+    assertEquals(3, dao.listByOffsetAndNumResults(5, 3, "ASC", "id", PlatformType.ILLUMINA).size());
+  }
+
+  @Test
+  public void testCountIlluminaPools() throws IOException {
+    assertEquals(10L, dao.countPoolsByPlatform(PlatformType.ILLUMINA));
+  }
+
+  @Test
+  public void testCountPacBioPools() throws IOException {
+    assertEquals(0L, dao.countPoolsByPlatform(PlatformType.PACBIO));
+  }
+
+  @Test
+  public void testCountIlluminaPoolsBySearch() throws IOException {
+    assertEquals(2L, dao.countPoolsBySearch(PlatformType.ILLUMINA, "IPO1"));
+  }
+
+  @Test
+  public void testCountPacBioPoolsBySearch() throws IOException {
+    assertEquals(0L, dao.countPoolsBySearch(PlatformType.PACBIO, "IPO1"));
+  }
+
+  @Test
+  public void testCountIlluminaPoolsEmptySearch() throws IOException {
+    assertEquals(10L, dao.countPoolsBySearch(PlatformType.ILLUMINA, ""));
+  }
+
+  @Test
+  public void testCountIlluminaPoolsBadSearch() throws IOException {
+    assertEquals(0L, dao.countPoolsBySearch(PlatformType.ILLUMINA, "; DROP TABLE Pool;"));
+  }
+
+  @Test
+  public void testListByIlluminaSearchWithLimit() throws IOException {
+    List<Pool<? extends Poolable<?, ?>>> pools = dao
+        .listBySearchOffsetAndNumResultsAndPlatform(5, 3, "IPO", "asc", "id", PlatformType.ILLUMINA);
+    assertEquals(3, pools.size());
+    assertEquals(6L, pools.get(0).getId());
+  }
+
+  @Test
+  public void testListByIlluminaEmptySearchWithLimit() throws IOException {
+    List<Pool<? extends Poolable<?, ?>>> pools = dao
+        .listBySearchOffsetAndNumResultsAndPlatform(5, 3, "", "asc", "id", PlatformType.ILLUMINA);
+    assertEquals(3L, pools.size());
+  }
+
+  @Test
+  public void testListByIlluminaBadSearchWithLimit() throws IOException {
+    List<Pool<? extends Poolable<?, ?>>> pools = dao
+        .listBySearchOffsetAndNumResultsAndPlatform(5, 3, "; DROP TABLE Pool;", "asc", "id", PlatformType.ILLUMINA);
+    assertEquals(0L, pools.size());
+  }
+
+  @Test
+  public void testListByIlluminaOffsetBadSortDir() throws IOException {
+    List<Pool<? extends Poolable<?, ?>>> pools = dao.listByOffsetAndNumResults(5, 3, "BARK", "id", PlatformType.ILLUMINA);
+    assertEquals(3, pools.size());
+  }
+
+  @Test
+  public void testListIlluminaOffsetBadLimit() throws IOException {
+    expectedException.expect(IOException.class);
+    dao.listByOffsetAndNumResults(5, -3, "asc", "id", PlatformType.ILLUMINA);
+  }
+
+  @Test
+  public void testListIlluminaOffsetThreeWithThreeSamplesPerPageOrderLastMod() throws IOException {
+    List<Pool<? extends Poolable<?, ?>>> pools = dao.listByOffsetAndNumResults(3, 3, "desc", "lastModified", PlatformType.ILLUMINA);
+    assertEquals(3, pools.size());
+    assertEquals(7, pools.get(0).getId());
   }
 
   @Test
@@ -458,13 +535,30 @@ public class SQLPoolDAOTest extends AbstractDAOTest {
   }
 
   @Test
-  public void testRemove() throws IOException {
-    Pool<? extends Poolable<?, ?>> pool = dao.get(1L);
-    assertNotNull(pool);
-    pool.setExperiments(new ArrayList<Experiment>());
-    pool.setPoolableElements(null);
-    assertTrue(dao.remove(pool));
-    assertNull(dao.get(1L));
+  public void testRemove() throws Exception {
+    Pool<? extends Poolable<?, ?>> pool = new PoolImpl();
+    String poolName = "IPO111";
+    pool.setName(poolName);
+    pool.setAlias("poolAlias");
+    pool.setConcentration((double) 3);
+    pool.setPlatformType(PlatformType.ILLUMINA);
+    User mockUser = Mockito.mock(User.class);
+    when(mockUser.getUserId()).thenReturn(1L);
+    pool.setLastModifier(mockUser);
+
+    mockAutoIncrement(nextAutoIncrementId);
+    when(namingScheme.generateNameFor("name", pool)).thenReturn(poolName);
+    when(namingScheme.validateField("name", pool.getName())).thenReturn(true);
+
+    long poolId = dao.save(pool);
+    Pool<? extends Poolable<?, ?>> insertedPool = dao.get(poolId);
+    assertNotNull(insertedPool);
+    insertedPool.setExperiments(new ArrayList<Experiment>());
+    insertedPool.setPoolableElements(null);
+    assertTrue(dao.remove(insertedPool));
+    Mockito.verify(changeLogDAO, Mockito.times(1)).deleteAllById("Pool", insertedPool.getId());
+    assertNull(dao.get(insertedPool.getId()));
+    nextAutoIncrementId++;
   }
 
   @Test
@@ -479,7 +573,8 @@ public class SQLPoolDAOTest extends AbstractDAOTest {
     pool.setLastModifier(user);
     Mockito.when(namingScheme.validateField(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
     mockAutoIncrement(autoIncrementId);
-    assertEquals(autoIncrementId, dao.save(pool));
+    Long poolId = dao.save(pool);
+    assertEquals(Long.valueOf(autoIncrementId), Long.valueOf(poolId));
     assertNotNull(dao.get(autoIncrementId));
     nextAutoIncrementId++;
   }
