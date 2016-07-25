@@ -205,11 +205,11 @@ public class SQLLibraryDAO implements LibraryStore {
 
   @Autowired
   private TagBarcodeStore tagBarcodeStrategyStore;
-  
-  public void setTagBarcodeStore (TagBarcodeStore tagBarcodeStore) {
+
+  public void setTagBarcodeStore(TagBarcodeStore tagBarcodeStore) {
     this.tagBarcodeStrategyStore = tagBarcodeStore;
   }
-  
+
   @Autowired
   private MisoNamingScheme<Library> libraryNamingScheme;
 
@@ -387,7 +387,7 @@ public class SQLLibraryDAO implements LibraryStore {
             }
             if (library.getLibraryAdditionalInfo() != null) {
               library.getLibraryAdditionalInfo().setLibrary(library);
-              library.getLibraryAdditionalInfo().setLibraryId(library.getId());
+              library.getLibraryAdditionalInfo().setLibraryId(newId.longValue());
               libraryAdditionalInfoDAO.addLibraryAdditionalInfo(library.getLibraryAdditionalInfo());
             }
           } else {
@@ -424,7 +424,7 @@ public class SQLLibraryDAO implements LibraryStore {
         throw new IOException("Cannot save library - issue with naming scheme", e);
       }
     }
-    
+
     if (library.getLibraryAdditionalInfo() != null) {
       library.getLibraryAdditionalInfo().setLibrary(library);
       library.getLibraryAdditionalInfo().setLibraryId(library.getId());

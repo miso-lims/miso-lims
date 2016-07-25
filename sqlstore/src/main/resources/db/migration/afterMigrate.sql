@@ -63,6 +63,201 @@ FOR EACH ROW
   END IF;
   END//
 
+DROP TRIGGER IF EXISTS SampleAdditionalInfoChange//
+CREATE TRIGGER SampleAdditionalInfoChange BEFORE UPDATE ON SampleAdditionalInfo
+FOR EACH ROW
+  BEGIN
+  DECLARE log_message varchar(500) CHARACTER SET utf8;
+  SET log_message = CONCAT_WS(', ',
+     CASE WHEN NEW.archived <> OLD.archived THEN CONCAT('archived: ', OLD.archived, ' → ', NEW.archived) END,
+     CASE WHEN (NEW.groupDescription IS NULL) <> (OLD.groupDescription IS NULL) OR NEW.groupDescription <> OLD.groupDescription THEN CONCAT('group description: ', COALESCE(OLD.groupDescription, 'n/a'), ' → ', COALESCE(NEW.groupDescription, 'n/a')) END,
+     CASE WHEN (NEW.groupId IS NULL) <> (OLD.groupId IS NULL) OR NEW.groupId <> OLD.groupId THEN CONCAT('group id: ', COALESCE(OLD.groupId, 'n/a'), ' → ', COALESCE(NEW.groupId, 'n/a')) END,
+     CASE WHEN (NEW.kitDescriptorId IS NULL) <> (OLD.kitDescriptorId IS NULL) OR NEW.kitDescriptorId <> OLD.kitDescriptorId THEN CONCAT('kit: ', COALESCE((SELECT name FROM KitDescriptor WHERE kitDescriptorId = OLD.kitDescriptorId), 'n/a'), ' → ', COALESCE((SELECT name FROM KitDescriptor WHERE kitDescriptorId = NEW.kitDescriptorId), 'n/a')) END,
+     CASE WHEN (NEW.parentId IS NULL) <> (OLD.parentId IS NULL) OR NEW.parentId <> OLD.parentId THEN CONCAT('parent: ', (SELECT name FROM Sample WHERE sampleId = OLD.parentId), ' → ', (SELECT name FROM Sample WHERE sampleId = NEW.parentId)) END,
+     CASE WHEN (NEW.qcPassedDetailId IS NULL) <> (OLD.qcPassedDetailId IS NULL) OR NEW.qcPassedDetailId <> OLD.qcPassedDetailId THEN CONCAT('QC passed: ', COALESCE((SELECT description FROM QcPassedDetail WHERE qcPassedDetailId = OLD.qcPassedDetailId), 'n/a'), ' → ', COALESCE((SELECT description FROM QcPassedDetail WHERE qcPassedDetailId = NEW.qcPassedDetailId), 'n/a')) END,
+     CASE WHEN NEW.sampleClassId <> OLD.sampleClassId THEN CONCAT('class: ', (SELECT alias FROM SampleClass WHERE sampleClassId = OLD.sampleClassId), ' → ', (SELECT alias FROM SampleClass WHERE sampleClassId = NEW.sampleClassId)) END,
+     CASE WHEN (NEW.siblingNumber IS NULL) <> (OLD.siblingNumber IS NULL) OR NEW.siblingNumber <> OLD.siblingNumber THEN CONCAT('sibling: ', COALESCE(OLD.siblingNumber, 'n/a'), ' → ', COALESCE(NEW.siblingNumber, 'n/a')) END,
+     CASE WHEN (NEW.subprojectId IS NULL) <> (OLD.subprojectId IS NULL) OR NEW.subprojectId <> OLD.subprojectId THEN CONCAT('subproject: ', COALESCE((SELECT alias FROM Subproject WHERE subprojectId = OLD.subprojectId), 'n/a'), ' → ', COALESCE((SELECT alias FROM Subproject WHERE subprojectId = NEW.subprojectId), 'n/a')) END);
+  IF log_message IS NOT NULL AND log_message <> '' THEN
+    INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message) VALUES (
+      NEW.sampleId,
+      COALESCE(CONCAT_WS(',',
+        CASE WHEN NEW.archived <> OLD.archived THEN 'archived' END,
+        CASE WHEN (NEW.groupDescription IS NULL) <> (OLD.groupDescription IS NULL) OR NEW.groupDescription <> OLD.groupDescription THEN 'groupDescription' END,
+        CASE WHEN (NEW.groupId IS NULL) <> (OLD.groupId IS NULL) OR NEW.groupId <> OLD.groupId THEN 'groupId' END,
+        CASE WHEN (NEW.kitDescriptorId IS NULL) <> (OLD.kitDescriptorId IS NULL) OR NEW.kitDescriptorId <> OLD.kitDescriptorId THEN 'kitDescriptorId' END,
+        CASE WHEN (NEW.parentId IS NULL) <> (OLD.parentId IS NULL) OR NEW.parentId <> OLD.parentId THEN 'parentId' END,
+        CASE WHEN (NEW.qcPassedDetailId IS NULL) <> (OLD.qcPassedDetailId IS NULL) OR NEW.qcPassedDetailId <> OLD.qcPassedDetailId THEN 'qcPassedDetailId' END,
+        CASE WHEN NEW.sampleClassId <> OLD.sampleClassId THEN 'sampleClassId' END,
+        CASE WHEN (NEW.siblingNumber IS NULL) <> (OLD.siblingNumber IS NULL) OR NEW.siblingNumber <> OLD.siblingNumber THEN 'siblingNumber' END,
+        CASE WHEN (NEW.subprojectId IS NULL) <> (OLD.subprojectId IS NULL) OR NEW.subprojectId <> OLD.subprojectId THEN 'subprojectId' END
+      ), ''),
+      (SELECT lastModifier FROM Sample WHERE sampleId = NEW.sampleId),
+      CONCAT(
+        (SELECT fullname FROM User WHERE userId = (SELECT lastModifier FROM Sample WHERE sampleId = NEW.sampleId)),
+        ' has changed: ',
+        log_message
+      ));
+  END IF;
+  END//
+
+DROP TRIGGER IF EXISTS SampleAliquotChange//
+CREATE TRIGGER SampleAliquotChange BEFORE UPDATE ON SampleAliquot
+FOR EACH ROW
+  BEGIN
+  DECLARE log_message varchar(500) CHARACTER SET utf8;
+  SET log_message = CONCAT_WS(', ',
+     CASE WHEN (NEW.samplePurposeId IS NULL) <> (OLD.samplePurposeId IS NULL) OR NEW.samplePurposeId <> OLD.samplePurposeId THEN CONCAT('purpose: ', COALESCE((SELECT alias FROM SamplePurpose WHERE samplePurposeId = OLD.samplePurposeId), 'n/a'), ' → ', COALESCE((SELECT alias FROM SamplePurpose WHERE samplePurposeId = NEW.samplePurposeId), 'n/a')) END);
+  IF log_message IS NOT NULL AND log_message <> '' THEN
+    INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message) VALUES (
+      NEW.sampleId,
+      COALESCE(CONCAT_WS(',',
+        CASE WHEN (NEW.samplePurposeId IS NULL) <> (OLD.samplePurposeId IS NULL) OR NEW.samplePurposeId <> OLD.samplePurposeId THEN 'samplePurposeId' END
+      ), ''),
+      (SELECT lastModifier FROM Sample WHERE sampleId = NEW.sampleId),
+      CONCAT(
+        (SELECT fullname FROM User WHERE userId = (SELECT lastModifier FROM Sample WHERE sampleId = NEW.sampleId)),
+        ' has changed: ',
+        log_message
+      ));
+  END IF;
+  END//
+
+DROP TRIGGER IF EXISTS SampleCVSlideChange//
+CREATE TRIGGER SampleCVSlideChange BEFORE UPDATE ON SampleCVSlide
+FOR EACH ROW
+  BEGIN
+  DECLARE log_message varchar(500) CHARACTER SET utf8;
+  SET log_message = CONCAT_WS(', ',
+     CASE WHEN NEW.cuts <> OLD.cuts THEN CONCAT('cuts: ', OLD.cuts, ' → ', NEW.cuts) END,
+     CASE WHEN (NEW.discards IS NULL) <> (OLD.discards IS NULL) OR NEW.discards <> OLD.discards THEN CONCAT('discards: ', COALESCE(OLD.discards, 'n/a'), ' → ', COALESCE(NEW.discards, 'n/a')) END,
+     CASE WHEN (NEW.thickness IS NULL) <> (OLD.thickness IS NULL) OR NEW.thickness <> OLD.thickness THEN CONCAT('thickness: ', COALESCE(OLD.thickness, 'n/a'), ' → ', COALESCE(NEW.thickness, 'n/a')) END);
+  IF log_message IS NOT NULL AND log_message <> '' THEN
+    INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message) VALUES (
+      NEW.sampleId,
+      COALESCE(CONCAT_WS(',',
+        CASE WHEN NEW.cuts <> OLD.cuts THEN 'cuts' END,
+        CASE WHEN (NEW.discards IS NULL) <> (OLD.discards IS NULL) OR NEW.discards <> OLD.discards THEN 'discards' END,
+        CASE WHEN (NEW.thickness IS NULL) <> (OLD.thickness IS NULL) OR NEW.thickness <> OLD.thickness THEN 'thickness' END
+      ), ''),
+      (SELECT lastModifier FROM Sample WHERE sampleId = NEW.sampleId),
+      CONCAT(
+        (SELECT fullname FROM User WHERE userId = (SELECT lastModifier FROM Sample WHERE sampleId = NEW.sampleId)),
+        ' has changed: ',
+        log_message
+      ));
+  END IF;
+  END//
+
+DROP TRIGGER IF EXISTS SampleLCMTubeChange//
+CREATE TRIGGER SampleLCMTubeChange BEFORE UPDATE ON SampleLCMTube
+FOR EACH ROW
+  BEGIN
+  DECLARE log_message varchar(500) CHARACTER SET utf8;
+  SET log_message = CONCAT_WS(', ',
+     CASE WHEN NEW.cutsConsumed <> OLD.cutsConsumed THEN CONCAT('cuts: ', OLD.cutsConsumed, ' → ', NEW.cutsConsumed) END);
+  IF log_message IS NOT NULL AND log_message <> '' THEN
+    INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message) VALUES (
+      NEW.sampleId,
+      COALESCE(CONCAT_WS(',',
+        CASE WHEN NEW.cutsConsumed <> OLD.cutsConsumed THEN 'cuts' END
+      ), ''),
+      (SELECT lastModifier FROM Sample WHERE sampleId = NEW.sampleId),
+      CONCAT(
+        (SELECT fullname FROM User WHERE userId = (SELECT lastModifier FROM Sample WHERE sampleId = NEW.sampleId)),
+        ' has changed: ',
+        log_message
+      ));
+  END IF;
+  END//
+
+DROP TRIGGER IF EXISTS SampleStockChange//
+CREATE TRIGGER SampleStockChange BEFORE UPDATE ON SampleStock
+FOR EACH ROW
+  BEGIN
+  DECLARE log_message varchar(500) CHARACTER SET utf8;
+  SET log_message = CONCAT_WS(', ',
+    CASE WHEN (NEW.concentration IS NULL) <> (OLD.concentration IS NULL) OR NEW.concentration <> OLD.concentration THEN CONCAT('concentration: ', COALESCE(OLD.concentration, 'n/a'), ' → ', COALESCE(NEW.concentration, 'n/a')) END,
+    CASE WHEN NEW.strStatus <> OLD.strStatus THEN CONCAT('STR status: ', OLD.strStatus, ' → ', NEW.strStatus) END);
+  IF log_message IS NOT NULL AND log_message <> '' THEN
+    INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message) VALUES (
+      NEW.sampleId,
+      COALESCE(CONCAT_WS(',',
+         CASE WHEN (NEW.concentration IS NULL) <> (OLD.concentration IS NULL) OR NEW.concentration <> OLD.concentration THEN 'concentration' END,
+         CASE WHEN NEW.strStatus <> OLD.strStatus THEN 'strStatus' END
+      ), ''),
+      (SELECT lastModifier FROM Sample WHERE sampleId = NEW.sampleId),
+      CONCAT(
+        (SELECT fullname FROM User WHERE userId = (SELECT lastModifier FROM Sample WHERE sampleId = NEW.sampleId)),
+        ' has changed: ',
+        log_message
+      ));
+  END IF;
+  END//
+
+DROP TRIGGER IF EXISTS SampleTissueChange//
+CREATE TRIGGER SampleTissueChange BEFORE UPDATE ON SampleTissue
+FOR EACH ROW
+  BEGIN
+  DECLARE log_message varchar(500) CHARACTER SET utf8;
+  SET log_message = CONCAT_WS(', ',
+    CASE WHEN (NEW.externalInstituteIdentifier IS NULL) <> (OLD.externalInstituteIdentifier IS NULL) OR NEW.externalInstituteIdentifier <> OLD.externalInstituteIdentifier THEN CONCAT('external identifier: ', COALESCE(OLD.externalInstituteIdentifier, 'n/a'), ' → ', COALESCE(NEW.externalInstituteIdentifier, 'n/a')) END,
+    CASE WHEN (NEW.labId IS NULL) <> (OLD.labId IS NULL) OR NEW.labId <> OLD.labId THEN CONCAT('lab: ', COALESCE((SELECT alias FROM Lab WHERE labId = OLD.labId), 'n/a'), ' → ', COALESCE((SELECT alias FROM Lab WHERE labId = NEW.labId), 'n/a')) END,
+    CASE WHEN (NEW.passageNumber IS NULL) <> (OLD.passageNumber IS NULL) OR NEW.passageNumber <> OLD.passageNumber OR (NEW.timesReceived IS NULL) <> (OLD.timesReceived IS NULL) OR NEW.timesReceived <> OLD.timesReceived OR (NEW.tubeNumber IS NULL) <> (OLD.tubeNumber IS NULL) OR NEW.tubeNumber <> OLD.tubeNumber THEN CONCAT('passage: ', COALESCE(OLD.passageNumber, 'n/a'), '-', COALESCE(OLD.timesReceived, 'n/a'), '-', COALESCE(OLD.tubeNumber, 'n/a'), ' → ', COALESCE(NEW.passageNumber, 'n/a'), '-', COALESCE(NEW.timesReceived, 'n/a'), '-', COALESCE(NEW.tubeNumber, 'n/a')) END,
+    CASE WHEN (NEW.region IS NULL) <> (OLD.region IS NULL) OR NEW.region <> OLD.region THEN CONCAT('region: ', COALESCE(OLD.region, 'n/a'), ' → ', COALESCE(NEW.region, 'n/a')) END,
+    CASE WHEN (NEW.tissueMaterialId IS NULL) <> (OLD.tissueMaterialId IS NULL) OR NEW.tissueMaterialId <> OLD.tissueMaterialId THEN CONCAT('material: ', COALESCE((SELECT alias FROM TissueMaterial WHERE tissueMaterialId = OLD.tissueMaterialId), 'n/a'), ' → ', COALESCE((SELECT alias FROM TissueMaterial WHERE tissueMaterialId = NEW.tissueMaterialId), 'n/a')) END,
+    CASE WHEN (NEW.tissueOriginId IS NULL) <> (OLD.tissueOriginId IS NULL) OR NEW.tissueOriginId <> OLD.tissueOriginId THEN CONCAT('origin: ', COALESCE((SELECT alias FROM TissueOrigin WHERE tissueOriginId = OLD.tissueOriginId), 'n/a'), ' → ', COALESCE((SELECT alias FROM TissueOrigin WHERE tissueOriginId = NEW.tissueOriginId), 'n/a')) END,
+    CASE WHEN (NEW.tissueTypeId IS NULL) <> (OLD.tissueTypeId IS NULL) OR NEW.tissueTypeId <> OLD.tissueTypeId THEN CONCAT('type: ', COALESCE((SELECT alias FROM TissueType WHERE tissueTypeId = OLD.tissueTypeId), 'n/a'), ' → ', COALESCE((SELECT alias FROM TissueType WHERE tissueTypeId = NEW.tissueTypeId), 'n/a')) END);
+  IF log_message IS NOT NULL AND log_message <> '' THEN
+    INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message) VALUES (
+      NEW.sampleId,
+      COALESCE(CONCAT_WS(',',
+         CASE WHEN (NEW.externalInstituteIdentifier IS NULL) <> (OLD.externalInstituteIdentifier IS NULL) OR NEW.externalInstituteIdentifier <> OLD.externalInstituteIdentifier THEN 'externalInstituteIdentifier' END,
+         CASE WHEN (NEW.labId IS NULL) <> (OLD.labId IS NULL) OR NEW.labId <> OLD.labId THEN 'labId' END,
+         CASE WHEN (NEW.passageNumber IS NULL) <> (OLD.passageNumber IS NULL) OR NEW.passageNumber <> OLD.passageNumber THEN 'passageNumber' END,
+         CASE WHEN (NEW.region IS NULL) <> (OLD.region IS NULL) OR NEW.region <> OLD.region THEN 'region' END,
+         CASE WHEN (NEW.timesReceived IS NULL) <> (OLD.timesReceived IS NULL) OR NEW.timesReceived <> OLD.timesReceived THEN 'timesReceived' END,
+         CASE WHEN (NEW.tissueMaterialId IS NULL) <> (OLD.tissueMaterialId IS NULL) OR NEW.tissueMaterialId <> OLD.tissueMaterialId THEN 'tissueMaterialId' END,
+         CASE WHEN (NEW.tissueOriginId IS NULL) <> (OLD.tissueOriginId IS NULL) OR NEW.tissueOriginId <> OLD.tissueOriginId THEN 'tissueOriginId' END,
+         CASE WHEN (NEW.tissueTypeId IS NULL) <> (OLD.tissueTypeId IS NULL) OR NEW.tissueTypeId <> OLD.tissueTypeId THEN 'tissueTypeId' END,
+         CASE WHEN (NEW.tubeNumber IS NULL) <> (OLD.tubeNumber IS NULL) OR NEW.tubeNumber <> OLD.tubeNumber THEN 'tubeNumber' END
+      ), ''),
+      (SELECT lastModifier FROM Sample WHERE sampleId = NEW.sampleId),
+      CONCAT(
+        (SELECT fullname FROM User WHERE userId = (SELECT lastModifier FROM Sample WHERE sampleId = NEW.sampleId)),
+        ' has changed: ',
+        log_message
+      ));
+  END IF;
+  END//
+
+DROP TRIGGER IF EXISTS IdentityChange//
+CREATE TRIGGER IdentityChange BEFORE UPDATE ON Identity
+FOR EACH ROW
+  BEGIN
+  DECLARE log_message varchar(500) CHARACTER SET utf8;
+  SET log_message = CONCAT_WS(', ',
+     CASE WHEN NEW.donorSex <> OLD.donorSex THEN CONCAT('donor sex: ', OLD.donorSex, ' → ', NEW.donorSex) END,
+     CASE WHEN NEW.externalName <> OLD.externalName THEN CONCAT('external name: ', OLD.externalName, ' → ', NEW.externalName) END,
+     CASE WHEN NEW.internalName <> OLD.internalName THEN CONCAT('internal name: ', OLD.internalName, ' → ', NEW.internalName) END);
+  IF log_message IS NOT NULL AND log_message <> '' THEN
+    INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message) VALUES (
+      NEW.sampleId,
+      COALESCE(CONCAT_WS(',',
+        CASE WHEN NEW.donorSex <> OLD.donorSex THEN 'donorSex' END,
+        CASE WHEN NEW.externalName <> OLD.externalName THEN 'externalName' END,
+        CASE WHEN NEW.internalName <> OLD.internalName THEN 'internalName' END
+      ), ''),
+      (SELECT lastModifier FROM Sample WHERE sampleId = NEW.sampleId),
+      CONCAT(
+        (SELECT fullname FROM User WHERE userId = (SELECT lastModifier FROM Sample WHERE sampleId = NEW.sampleId)),
+        ' has changed: ',
+        log_message
+      ));
+  END IF;
+  END//
+
+
 DROP TRIGGER IF EXISTS BeforeInsertSample//
 CREATE TRIGGER BeforeInsertSample BEFORE INSERT ON Sample
   FOR EACH ROW
@@ -311,6 +506,37 @@ FOR EACH ROW
        ));
   END IF;
   END//
+
+DROP TRIGGER IF EXISTS LibraryAdditionalInfoChange//
+CREATE TRIGGER LibraryAdditionalInfoChange BEFORE UPDATE ON LibraryAdditionalInfo
+FOR EACH ROW
+  BEGIN
+  DECLARE log_message varchar(500) CHARACTER SET utf8;
+  SET log_message = CONCAT_WS(', ',
+     CASE WHEN NEW.archived <> OLD.archived THEN CONCAT('archived: ', OLD.archived, ' → ', NEW.archived) END,
+     CASE WHEN (NEW.groupDescription IS NULL) <> (OLD.groupDescription IS NULL) OR NEW.groupDescription <> OLD.groupDescription THEN CONCAT('group description: ', COALESCE(OLD.groupDescription, 'n/a'), ' → ', COALESCE(NEW.groupDescription, 'n/a')) END,
+     CASE WHEN (NEW.groupId IS NULL) <> (OLD.groupId IS NULL) OR NEW.groupId <> OLD.groupId THEN CONCAT('group: ', COALESCE(OLD.groupId, 'n/a'), ' → ', COALESCE(NEW.groupId, 'n/a')) END,
+     CASE WHEN (NEW.kitDescriptorId IS NULL) <> (OLD.kitDescriptorId IS NULL) OR NEW.kitDescriptorId <> OLD.kitDescriptorId THEN CONCAT('kit: ', COALESCE((SELECT name FROM KitDescriptor WHERE kitDescriptorId = OLD.kitDescriptorId), 'n/a'), ' → ', COALESCE((SELECT name FROM KitDescriptor WHERE kitDescriptorId = NEW.kitDescriptorId), 'n/a')) END,
+     CASE WHEN (NEW.libraryDesign IS NULL) <> (OLD.libraryDesign IS NULL) OR NEW.libraryDesign <> OLD.libraryDesign THEN CONCAT('library design: ', COALESCE((SELECT name FROM LibraryDesign WHERE libraryDesignId = OLD.libraryDesign), 'n/a'), ' → ', COALESCE((SELECT name FROM LibraryDesign WHERE libraryDesignId = NEW.libraryDesign), 'n/a')) END);
+  IF log_message IS NOT NULL AND log_message <> '' THEN
+    INSERT INTO LibraryChangeLog(libraryId, columnsChanged, userId, message) VALUES (
+      NEW.libraryId,
+      COALESCE(CONCAT_WS(',',
+        CASE WHEN NEW.archived <> OLD.archived THEN 'archived' END,
+        CASE WHEN (NEW.groupDescription IS NULL) <> (OLD.groupDescription IS NULL) OR NEW.groupDescription <> OLD.groupDescription THEN 'groupDescription' END,
+        CASE WHEN (NEW.groupId IS NULL) <> (OLD.groupId IS NULL) OR NEW.groupId <> OLD.groupId THEN 'groupId' END,
+        CASE WHEN (NEW.kitDescriptorId IS NULL) <> (OLD.kitDescriptorId IS NULL) OR NEW.kitDescriptorId <> OLD.kitDescriptorId THEN 'kitDescriptorId' END,
+        CASE WHEN (NEW.libraryDesign IS NULL) <> (OLD.libraryDesign IS NULL) OR NEW.libraryDesign <> OLD.libraryDesign THEN 'libraryDesign' END
+      ), ''),
+      (SELECT lastModifier FROM Library WHERE libraryId = NEW.libraryId),
+      CONCAT(
+        (SELECT fullname FROM User WHERE userId = (SELECT lastModifier FROM Library WHERE libraryId = NEW.libraryId)),
+        ' has changed: ',
+        log_message
+      ));
+  END IF;
+  END//
+
 
 DROP TRIGGER IF EXISTS BeforeInsertLibrary//
 CREATE TRIGGER BeforeInsertLibrary BEFORE INSERT ON Library
