@@ -1053,7 +1053,7 @@ Library.ui = {
   },
 
   createListingLibrariesTable: function () {
-    jQuery('#listingLibrariesTable').html("<img src='../styles/images/ajax-loader.gif'/>");
+    jQuery('#listingLibrariesTable').html("");
     jQuery.fn.dataTableExt.oSort['no-lib-asc'] = function (x, y) {
       var a = parseInt(x.replace(/^LIB/i, ""));
       var b = parseInt(y.replace(/^LIB/i, ""));
@@ -1074,60 +1074,118 @@ Library.ui = {
       var b = parseInt(y.replace(/^SAM/i, ""));
       return ((a < b) ? 1 : ((a > b) ? -1 : 0));
     };
-    Fluxion.doAjax(
-      'libraryControllerHelperService',
-      'listLibrariesDataTable',
-      {
-        'url': ajaxurl
-      },
-      {
-        'doOnSuccess': function (json) {
-          jQuery('#listingLibrariesTable').html('');
-          jQuery('#listingLibrariesTable').dataTable({
-            "aaData": json.array,
-            "aoColumns": [
-              { "sTitle": "Bulk Edit" },
-              { "sTitle": "Library Name", "sType": "no-lib"},
-              { "sTitle": "Alias"},
-              { "sTitle": "Type"},
-              { "sTitle": "Sample Name", "sType": "no-sam"},
-              { "sTitle": "QC Passed"},
-              { "sTitle": "Barcode"},
-              { "sTitle": "ID", "bVisible": false}
-            ],
-            "bJQueryUI": true,
-            "bAutoWidth": false,
-            "iDisplayLength": 25,
-            "aaSorting": [
-              [1, "desc"]
-            ]
-          });
-          jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
-          jQuery("#toolbar").append("<button style=\"margin-left:5px;\" onclick=\"window.location.href='/miso/sample/new';\" class=\"fg-button ui-state-default ui-corner-all\">Add Sample</button>");
-          
-          jQuery("input[class='bulkCheckbox']").click(function () {
-            if (jQuery(this).parent().parent().hasClass('row_selected')) {
-              jQuery(this).parent().parent().removeClass('row_selected');
-            } else if (!jQuery(this).parent().parent().hasClass('row_selected')) {
-              jQuery(this).parent().parent().addClass('row_selected');
-            }
-          });
-          
-          var selectAll = '<label><input type="checkbox" onchange="Library.ui.checkAll(this)" id="checkAll">Select All</label>';
-          document.getElementById('listingLibrariesTable').insertAdjacentHTML('beforebegin', selectAll);
-          
-          var actions = ['<select id="dropdownActions"><option value="">-- Bulk actions</option>'];
-          actions.push('<option value="update">Update selected</option>');
-          actions.push('<option value="dilutions">Make dilutions from selected</option>');
-          actions.push('<option value="empty">Empty selected</option>');
-          actions.push('<option value="archive">Archive selected</option>');
-          actions.push('</select>');
-          document.getElementById('listingLibrariesTable').insertAdjacentHTML('afterend', actions.join(''));
-          var saveButton = '<button id="go" type="button" onclick="Library.ui.handleBulkAction();">Go</button>';
-          document.getElementById('dropdownActions').insertAdjacentHTML('afterend', saveButton);
+
+    jQuery('#listingLibrariesTable').dataTable({
+      "aoColumns": [
+        { 
+          "sTitle": "",
+          "mData": "id",
+          "mRender": function (data, type, full) {
+            return "<input type=\"checkbox\" value=\"" + data + "\" class=\"bulkCheckbox\" id=\"bulk_" + data + "\">"
+          },
+          "bSortable": false
+        },
+        { 
+          "sTitle": "Library Name", 
+          "sType": "no-lib",
+          "mData": "name",
+          "mRender": function (data, type, full) {
+            return "<a href=\"/miso/library/" + full.id + "\">" + data + "</a>";
+          }
+        },
+        { 
+          "sTitle": "Alias",
+          "mData": "alias",
+          "mRender": function (data, type, full) {
+            return "<a href=\"/miso/library/" + full.id + "\">" + data + "</a>";
+          }
+        },
+        { 
+          "sTitle": "Type",
+          "mData": "libraryTypeAlias"
+        },
+        { 
+          "sTitle": "Sample Name", 
+          "sType": "no-sam",
+          "mData": "parentSampleAlias" ,
+          "mRender": function (data, type, full) {
+            return "<a href=\"/miso/sample/" + full.parentSampleId + "\">" + data + "(SAM" + full.id + ")</a>";
+          }
+        },
+        { 
+          "sTitle": "QC Passed",
+          "mData": "qcPassed",
+          "mRender": function (data, type, full) {
+            return (data ? data : "Unknown");
+          }
+        },
+        { 
+          "sTitle": "Tag Barcode(s)",
+          "mData": "tagBarcodeIndex1Label",
+          "mRender": function (data, type, full) {
+            return (data ? (full.tagBarcodeIndex2Label ? data + ", " + full.tagBarcodeIndex2Label : data) : "None");
+          },
+          "bSortable": false
+        },
+        {
+          "sTitle": "Last Updated",
+          "mData": "lastModified",
+          "bVisible": (Sample.detailedSample ? "true" : "false")
+        },
+        { 
+          "sTitle": "ID",
+          "mData": "identificationBarcode",
+          "bVisible": false
         }
+      ],
+      "bJQueryUI": true,
+      "bAutoWidth": false,
+      "iDisplayLength": 25,
+      "iDisplayStart": 0,
+      "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>',
+      "aaSorting": [
+        [(Sample.detailedSample ? 7 : 1), "desc"]
+      ],
+      "sPaginationType": "full_numbers",
+      "bProcessing": true,
+      "bServerSide": true,
+      "sAjaxSource": "/miso/rest/library/dt",
+      "fnServerData": function (sSource, aoData, fnCallback) {
+        jQuery('#listingSamplesTable').addClass('disabled');
+        jQuery.ajax({
+          "dataType": "json",
+          "type": "GET",
+          "url": sSource,
+          "data": aoData,
+          "success": fnCallback // Do not alter this DataTables property
+        });
+      },
+      "fnDrawCallback": function (oSettings) {
+        jQuery('#listingSamplesTable').removeClass('disabled');
       }
-    );
+    }).fnSetFilteringDelay();
+    jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
+    
+    jQuery("input[class='bulkCheckbox']").click(function () {
+      if (jQuery(this).parent().parent().hasClass('row_selected')) {
+        jQuery(this).parent().parent().removeClass('row_selected');
+      } else if (!jQuery(this).parent().parent().hasClass('row_selected')) {
+        jQuery(this).parent().parent().addClass('row_selected');
+      }
+    });
+    
+    var selectAll = '<label><input type="checkbox" onchange="Library.ui.checkAll(this)" id="checkAll">Select All</label>';
+    document.getElementById('listingLibrariesTable').insertAdjacentHTML('beforebegin', selectAll);
+    
+    var actions = ['<select id="dropdownActions"><option value="">-- Bulk actions</option>'];
+    actions.push('<option value="update">Update selected</option>');
+    actions.push('<option value="dilutions">Make dilutions from selected</option>');
+    actions.push('<option value="empty">Empty selected</option>');
+    actions.push('<option value="archive">Archive selected</option>');
+    actions.push('</select>');
+    document.getElementById('listingLibrariesTable').insertAdjacentHTML('afterend', actions.join(''));
+    var saveButton = '<button id="go" type="button" onclick="Library.ui.handleBulkAction();">Go</button>';
+    document.getElementById('dropdownActions').insertAdjacentHTML('afterend', saveButton);
   },
   
   checkAll: function (el) {

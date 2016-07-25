@@ -13,11 +13,13 @@ public class LibraryDto {
   private String creationDate;
   private String description;
   private String identificationBarcode;
+  private String lastModified;
   private Long libraryId;
   private LibraryAdditionalInfoDto libraryAdditionalInfo;
   private Long librarySelectionTypeId;
   private Long libraryStrategyTypeId;
   private Long libraryTypeId;
+  private String libraryTypeAlias;
   private Boolean lowQuality;
   private String name;
   private Boolean paired;
@@ -27,6 +29,8 @@ public class LibraryDto {
   private Boolean qcPassed;
   private Long tagBarcodeIndex1Id;
   private Long tagBarcodeIndex2Id;
+  private String tagBarcodeIndex1Label;
+  private String tagBarcodeIndex2Label;
   private String tagBarcodeStrategyName;
   private String url;
   private Double volume;
@@ -55,6 +59,10 @@ public class LibraryDto {
     return identificationBarcode;
   }
 
+  public String getLastModified() {
+    return lastModified;
+  }
+
   public LibraryAdditionalInfoDto getLibraryAdditionalInfo() {
     return libraryAdditionalInfo;
   }
@@ -69,6 +77,14 @@ public class LibraryDto {
 
   public Long getLibraryTypeId() {
     return libraryTypeId;
+  }
+
+  public String getLibraryTypeAlias() {
+    return libraryTypeAlias;
+  }
+
+  public void setLibraryTypeAlias(String libraryTypeAlias) {
+    this.libraryTypeAlias = libraryTypeAlias;
   }
 
   public Boolean getLowQuality() {
@@ -107,6 +123,14 @@ public class LibraryDto {
     return tagBarcodeIndex2Id;
   }
 
+  public String getTagBarcodeIndex1Label() {
+    return tagBarcodeIndex1Label;
+  }
+
+  public String getTagBarcodeIndex2Label() {
+    return tagBarcodeIndex2Label;
+  }
+
   public String getTagBarcodeStrategyName() {
     return tagBarcodeStrategyName;
   }
@@ -139,8 +163,14 @@ public class LibraryDto {
     this.libraryId = libraryId;
   }
 
+  @JsonSerialize(include = JsonSerialize.Inclusion.ALWAYS)
   public void setIdentificationBarcode(String identificationBarcode) {
     this.identificationBarcode = identificationBarcode;
+  }
+
+  @JsonSerialize(include = JsonSerialize.Inclusion.ALWAYS)
+  public void setLastModified(String lastModified) {
+    this.lastModified = lastModified;
   }
 
   public void setLibraryAdditionalInfo(LibraryAdditionalInfoDto libraryAdditionalInfo) {
@@ -183,16 +213,29 @@ public class LibraryDto {
     this.platformName = platformName;
   }
 
+  @JsonSerialize(include = JsonSerialize.Inclusion.ALWAYS)
   public void setQcPassed(Boolean qcPassed) {
     this.qcPassed = qcPassed;
   }
 
+  @JsonSerialize(include = JsonSerialize.Inclusion.ALWAYS)
   public void setTagBarcodeIndex1Id(Long tagBarcodeIndex1Id) {
     this.tagBarcodeIndex1Id = tagBarcodeIndex1Id;
   }
 
+  @JsonSerialize(include = JsonSerialize.Inclusion.ALWAYS)
   public void setTagBarcodeIndex2Id(Long tagBarcodeIndex2Id) {
     this.tagBarcodeIndex2Id = tagBarcodeIndex2Id;
+  }
+
+  @JsonSerialize(include = JsonSerialize.Inclusion.ALWAYS)
+  public void setTagBarcodeIndex1Label(String tagBarcodeIndex1Label) {
+    this.tagBarcodeIndex1Label = tagBarcodeIndex1Label;
+  }
+
+  @JsonSerialize(include = JsonSerialize.Inclusion.ALWAYS)
+  public void setTagBarcodeIndex2Label(String tagBarcodeIndex2Label) {
+    this.tagBarcodeIndex2Label = tagBarcodeIndex2Label;
   }
 
   public void setTagBarcodeStrategyName(String tagBarcodeStrategyName) {

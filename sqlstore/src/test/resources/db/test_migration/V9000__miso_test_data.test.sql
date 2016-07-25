@@ -163,7 +163,11 @@ VALUES (1, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:49'),
 (7, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:01'),
 (8, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:03'),
 (9, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:05'),
-(10, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:07');
+(10, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:07'),
+(11, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:09'),
+(12, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:11'),
+(13, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:13'),
+(14, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:15');
 
 DELETE FROM `Kit`;
 INSERT INTO `Kit`(`kitId`,`identificationBarcode`,`locationBarcode`,`lotNumber`,`kitDate`,`kitDescriptorId`) VALUES

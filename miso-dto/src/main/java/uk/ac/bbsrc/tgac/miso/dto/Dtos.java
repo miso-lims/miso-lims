@@ -833,7 +833,6 @@ public class Dtos {
   public static LibraryAdditionalInfoDto asDto(LibraryAdditionalInfo from) {
     LibraryAdditionalInfoDto dto = new LibraryAdditionalInfoDto();
     dto.setLibraryId(from.getLibraryId());
-    dto.setLibraryId(from.getLibrary().getId());
     if (from.getGroupId() != null) {
       dto.setGroupId(from.getGroupId());
     }
@@ -935,17 +934,31 @@ public class Dtos {
     dto.setDescription(from.getDescription());
     dto.setId(from.getId());
     dto.setConcentration(from.getInitialConcentration());
-    dto.setLibrarySelectionTypeId(from.getLibrarySelectionType().getId());
-    dto.setLibraryStrategyTypeId(from.getLibraryStrategyType().getId());
-    dto.setLibraryTypeId(from.getLibraryType().getId());
+    if (from.getLibrarySelectionType() != null) {
+      dto.setLibrarySelectionTypeId(from.getLibrarySelectionType().getId());
+    }
+    if (from.getLibraryStrategyType() != null) {
+      dto.setLibraryStrategyTypeId(from.getLibraryStrategyType().getId());
+    }
+    if (from.getLibraryType() != null) {
+      dto.setLibraryTypeId(from.getLibraryType().getId());
+      dto.setLibraryTypeAlias(from.getLibraryType().getDescription());
+    }
     dto.setLowQuality(from.isLowQuality());
     dto.setPaired(from.getPaired());
-    dto.setPlatformName(from.getPlatformName());
+    if (from.getPlatformName() != null) {
+      dto.setPlatformName(from.getPlatformName());
+    }
+    if (from.getLastModified() != null) {
+      dto.setLastModified(LimsUtils.getDateAsString(from.getLastModified()));
+    }
     if (!from.getTagBarcodes().isEmpty()) {
-      dto.setTagBarcodeStrategyName(from.getTagBarcodes().get(1).getFamily().getName());
-      dto.setTagBarcodeIndex1Id(from.getTagBarcodes().get(1).getId());
+      dto.setTagBarcodeStrategyName(from.getTagBarcodes().get(0).getFamily().getName());
+      dto.setTagBarcodeIndex1Id(from.getTagBarcodes().get(0).getId());
+      dto.setTagBarcodeIndex1Label(from.getTagBarcodes().get(0).getLabel());
       if (from.getTagBarcodes().size() > 1) {
-        dto.setTagBarcodeIndex2Id(from.getTagBarcodes().get(2).getId());
+        dto.setTagBarcodeIndex2Id(from.getTagBarcodes().get(1).getId());
+        dto.setTagBarcodeIndex2Label(from.getTagBarcodes().get(0).getLabel());
       }
     }
     dto.setVolume(from.getVolume());
@@ -953,6 +966,14 @@ public class Dtos {
       dto.setLibraryAdditionalInfo(asDto(infoFrom));
     }
     return dto;
+  }
+
+  public static List<LibraryDto> asLibraryDtos(Collection<Library> from) {
+    List<LibraryDto> dtoSet = new ArrayList<>();
+    for (Library lib : from) {
+      dtoSet.add(asDto(lib, lib.getLibraryAdditionalInfo()));
+    }
+    return dtoSet;
   }
 
   public static Library to(LibraryDto from) {

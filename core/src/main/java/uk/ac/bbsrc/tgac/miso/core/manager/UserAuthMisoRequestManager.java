@@ -2539,11 +2539,46 @@ public class UserAuthMisoRequestManager implements RequestManager {
       PlatformType platform) throws IOException {
     User user = getCurrentUser();
     List<Pool<? extends Poolable<?, ?>>> accessibles = new ArrayList<>();
-    for (Pool pool : backingManager.getPoolsByPageAndSize(offset, limit, sortDir, sortCol, platform)) {
+    for (Pool<? extends Poolable<?, ?>> pool : backingManager.getPoolsByPageAndSize(offset, limit, sortDir, sortCol, platform)) {
       if (pool.userCanRead(user)) {
         accessibles.add(pool);
       }
     }
     return accessibles;
+  }
+
+  @Override
+  public int countLibraries() throws IOException {
+    return backingManager.countLibraries();
+  }
+
+  @Override
+  public List<Library> getLibrariesByPageSizeSearch(int offset, int limit, String querystr, String sortDir, String sortCol)
+      throws IOException {
+    User user = getCurrentUser();
+    List<Library> accessibles = new ArrayList<>();
+    for (Library library : backingManager.getLibrariesByPageSizeSearch(offset, limit, querystr, sortDir, sortCol)) {
+      if (library.userCanRead(user)) {
+        accessibles.add(library);
+      }
+    }
+    return accessibles;
+  }
+
+  @Override
+  public List<Library> getLibrariesByPageAndSize(int offset, int limit, String sortDir, String sortCol) throws IOException {
+    User user = getCurrentUser();
+    List<Library> accessibles = new ArrayList<>();
+    for (Library library : backingManager.getLibrariesByPageAndSize(offset, limit, sortDir, sortCol)) {
+      if (library.userCanRead(user)) {
+        accessibles.add(library);
+      }
+    }
+    return accessibles;
+  }
+
+  @Override
+  public Long countLibrariesBySearch(String querystr) throws IOException {
+    return backingManager.countLibrariesBySearch(querystr);
   }
 }

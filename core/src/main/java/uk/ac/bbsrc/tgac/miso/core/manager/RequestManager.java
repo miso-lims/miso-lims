@@ -656,4 +656,13 @@ public interface RequestManager {
       PlatformType platform) throws IOException;
 
   public Long getNumPoolsBySearch(PlatformType platform, String querystr) throws IOException;
+
+  public int countLibraries() throws IOException;
+
+  public List<Library> getLibrariesByPageSizeSearch(int offset, int limit, String querystr, String sortDir, String sortCol)
+      throws IOException;
+
+  public List<Library> getLibrariesByPageAndSize(int offset, int limit, String sortDir, String sortCol) throws IOException;
+
+  public Long countLibrariesBySearch(String querystr) throws IOException;
 }

@@ -43,7 +43,6 @@ import org.codehaus.jackson.annotate.JsonBackReference;
 import org.codehaus.jackson.annotate.JsonManagedReference;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
-import org.hibernate.annotations.Formula;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -131,7 +130,6 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @JoinColumn(name = "lastModifier", nullable = false)
   private User lastModifier;
 
-  @Formula(value = "(SELECT MAX(lcl.changeTime) FROM LibraryChangeLog lcl WHERE lcl.libraryId = libraryId)")
   private Date lastModified;
 
   @Transient
@@ -239,8 +237,12 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
         current = barcode.getFamily();
       } else {
         if (current.getId() != barcode.getFamily().getId()) {
-          throw new IllegalArgumentException(String.format("Barcodes not all from the same family. (%d:%s vs %d:%s)", current.getId(),
-              current.getName(), barcode.getFamily().getId(), barcode.getFamily().getName()));
+          throw new IllegalArgumentException(String.format(
+              "Barcodes not all from the same family. (%d:%s vs %d:%s)",
+              current.getId(),
+              current.getName(),
+              barcode.getFamily().getId(),
+              barcode.getFamily().getName()));
         }
       }
     }
@@ -517,6 +519,11 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @Override
   public Date getLastModified() {
     return lastModified;
+  }
+
+  @Override
+  public void setLastModified(Date lastModified) {
+    this.lastModified = lastModified;
   }
 
   @Override
