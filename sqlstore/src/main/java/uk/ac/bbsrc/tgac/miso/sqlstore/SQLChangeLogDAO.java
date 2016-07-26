@@ -39,7 +39,7 @@ public class SQLChangeLogDAO implements ChangeLogStore {
     POOL("PoolChangeLog", "poolId"),
     RUN("RunChangeLog", "runId"),
     SAMPLE("SampleChangeLog", "sampleId"),
-    SEQUENCERPARTITIONCONTAINER("SequencerPartitionContainerChangeLog", "sequencerPartitionContainerId"),
+    SEQUENCERPARTITIONCONTAINER("SequencerPartitionContainerChangeLog", "containerId"),
     STUDY("StudyChangeLog", "studyId");
     
     private final String tableName;
