@@ -258,6 +258,57 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
   }
 
   @Test
+  public void testListWithLimitAndOffset() throws IOException {
+    assertEquals(3, dao.listByOffsetAndNumResults(5, 3, "ASC", "id").size());
+  }
+
+  @Test
+  public void testCountBySearch() throws IOException {
+    assertEquals(6L, dao.countLibrariesBySearch("LIB1"));
+  }
+
+  @Test
+  public void testCountByEmptySearch() throws IOException {
+    assertEquals(14L, dao.countLibrariesBySearch(""));
+  }
+
+  @Test
+  public void testCountByBadSearch() throws IOException {
+    assertEquals(0L, dao.countLibrariesBySearch("; DROP TABLE Library;"));
+  }
+
+  @Test
+  public void testListBySearchWithLimit() throws IOException {
+    List<Library> libraries = dao.listBySearchOffsetAndNumResults(2, 3, "Bn_R", "desc", "lastModified");
+    assertEquals(3, libraries.size());
+    assertEquals(10L, libraries.get(0).getId());
+  }
+
+  @Test
+  public void testListByIlluminaBadSearchWithLimit() throws IOException {
+    List<Library> libraries = dao.listBySearchOffsetAndNumResults(5, 3, "; DROP TABLE Library;", "asc", "id");
+    assertEquals(0L, libraries.size());
+  }
+
+  @Test
+  public void testListOffsetBadSortDir() throws IOException {
+    List<Library> libraries = dao.listByOffsetAndNumResults(5, 3, "BARK", "id");
+    assertEquals(3, libraries.size());
+  }
+
+  @Test(expected = IOException.class)
+  public void testListIlluminaOffsetBadLimit() throws IOException {
+    dao.listByOffsetAndNumResults(5, -3, "asc", "id");
+  }
+
+  @Test
+  public void testListOffsetThreeWithThreeLibsPerPageOrderLastMod() throws IOException {
+    List<Library> libraries = dao.listByOffsetAndNumResults(3, 3, "desc", "lastModified");
+    assertEquals(3, libraries.size());
+    assertEquals(11, libraries.get(0).getId());
+  }
+
+  @Test
   public void testRemove() throws Exception {
     dao.setCascadeType(CascadeType.ALL);
     CacheManager cacheManager = null;

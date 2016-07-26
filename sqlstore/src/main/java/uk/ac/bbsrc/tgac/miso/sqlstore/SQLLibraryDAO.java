@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -33,10 +35,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 
 import javax.persistence.CascadeType;
-
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,6 +55,9 @@ import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.Property;
 import com.googlecode.ehcache.annotations.TriggersRemove;
 
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -104,9 +105,10 @@ public class SQLLibraryDAO implements LibraryStore {
   public static final String LIBRARIES_SELECT = "SELECT l.libraryId, l.name, l.description, l.alias, l.accession, "
       + "l.securityProfile_profileId, l.sample_sampleId, l.identificationBarcode, l.locationBarcode, l.paired, l.libraryType, "
       + "l.librarySelectionType, l.libraryStrategyType, l.platformName, l.concentration, l.creationDate, l.qcPassed, l.lastModifier, "
-      + "l.lowQuality, l.boxPositionId, l.volume, l.emptied, b.boxId, b.alias AS boxAlias, b.locationBarcode AS boxLocation, "
+      + "lmod.lastModified, l.lowQuality, l.boxPositionId, l.volume, l.emptied, b.boxId, b.alias AS boxAlias, b.locationBarcode AS boxLocation, "
       + "bp.row AS boxRow, bp.column AS boxColumn " + "FROM " + TABLE_NAME + " l "
-      + "LEFT JOIN BoxPosition bp ON bp.boxPositionId = l.boxPositionId " + "LEFT JOIN Box b ON b.boxId = bp.boxId";
+      + "LEFT JOIN BoxPosition bp ON bp.boxPositionId = l.boxPositionId " + "LEFT JOIN Box b ON b.boxId = bp.boxId "
+      + "LEFT JOIN (SELECT libraryId, MAX(changeTime) AS lastModified FROM LibraryChangeLog GROUP BY libraryId) lmod ON l.libraryId = lmod.libraryId";
 
   public static final String LIBRARIES_SELECT_LIMIT = LIBRARIES_SELECT + " ORDER BY l.libraryId DESC LIMIT ?";
 
@@ -124,6 +126,11 @@ public class SQLLibraryDAO implements LibraryStore {
   public static final String LIBRARIES_SELECT_FROM_BARCODE_LIST = LIBRARIES_SELECT + " WHERE l.identificationBarcode IN (";
 
   public static final String LIBRARY_SELECT_BY_BOX_POSITION_ID = LIBRARIES_SELECT + " WHERE l.boxPositionId = ?";
+
+  public static final String LIBRARY_COUNT = "SELECT COUNT(*) " + "FROM " + TABLE_NAME + " l";
+
+  public static final String LIBRARY_COUNT_BY_SEARCH = LIBRARY_COUNT
+      + " WHERE (l.name LIKE ? OR l.alias LIKE ? OR l.identificationBarcode LIKE ? OR l.description LIKE ?)";
 
   public static final String LIBRARY_UPDATE = "UPDATE " + TABLE_NAME
       + " SET name=:name, description=:description, alias=:alias, accession=:accession, securityProfile_profileId=:securityProfile_profileId, "
@@ -328,7 +335,7 @@ public class SQLLibraryDAO implements LibraryStore {
   @Override
   @TriggersRemove(cacheName = { "libraryCache",
       "lazyLibraryCache" }, keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
-          @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
+          @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public long save(Library library) throws IOException {
     Long securityProfileId = library.getSecurityProfile().getProfileId();
     if (this.cascadeType != null) {
@@ -381,8 +388,8 @@ public class SQLLibraryDAO implements LibraryStore {
             Number newId = insert.executeAndReturnKey(params);
             if (newId.longValue() != library.getId()) {
               log.error("Expected library ID doesn't match returned value from database insert: rolling back...");
-              new NamedParameterJdbcTemplate(template).update(LIBRARY_DELETE,
-                  new MapSqlParameterSource().addValue("libraryId", newId.longValue()));
+              new NamedParameterJdbcTemplate(template)
+                  .update(LIBRARY_DELETE, new MapSqlParameterSource().addValue("libraryId", newId.longValue()));
               throw new IOException("Something bad happened. Expected library ID doesn't match returned value from DB insert");
             }
             if (library.getLibraryAdditionalInfo() != null) {
@@ -408,8 +415,8 @@ public class SQLLibraryDAO implements LibraryStore {
           if (autoGenerateIdentificationBarcodes) {
             autoGenerateIdBarcode(library);
           } // if !autoGenerateIdentificationBarcodes then the identificationBarcode is set by the user
-          params.addValue("identificationBarcode", library.getIdentificationBarcode()).addValue("locationBarcode",
-              library.getLocationBarcode());
+          params.addValue("identificationBarcode", library.getIdentificationBarcode())
+              .addValue("locationBarcode", library.getLocationBarcode());
           NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
           namedTemplate.update(LIBRARY_UPDATE, params);
           if (library.getLibraryAdditionalInfo() != null) {
@@ -481,7 +488,7 @@ public class SQLLibraryDAO implements LibraryStore {
 
   @Override
   @Cacheable(cacheName = "libraryCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
-      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
+      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public Library get(long libraryId) throws IOException {
     List eResults = template.query(LIBRARY_SELECT_BY_ID, new Object[] { libraryId }, new LibraryMapper());
     Library e = eResults.size() > 0 ? (Library) eResults.get(0) : null;
@@ -544,7 +551,7 @@ public class SQLLibraryDAO implements LibraryStore {
 
   @Override
   @Cacheable(cacheName = "libraryListCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
-      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
+      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public List<Library> listAll() throws IOException {
     return template.query(LIBRARIES_SELECT, new LibraryMapper(true));
   }
@@ -556,14 +563,14 @@ public class SQLLibraryDAO implements LibraryStore {
 
   @Override
   public int count() throws IOException {
-    return template.queryForInt("SELECT count(*) FROM " + TABLE_NAME);
+    return template.queryForInt(LIBRARY_COUNT);
   }
 
   @Override
   public List<Library> listBySearch(String query) {
     String mySQLQuery = "%" + query.replaceAll("_", Matcher.quoteReplacement("\\_")) + "%";
-    return template.query(LIBRARIES_SELECT_BY_SEARCH, new Object[] { mySQLQuery, mySQLQuery, mySQLQuery, mySQLQuery },
-        new LibraryMapper(true));
+    return template
+        .query(LIBRARIES_SELECT_BY_SEARCH, new Object[] { mySQLQuery, mySQLQuery, mySQLQuery, mySQLQuery }, new LibraryMapper(true));
   }
 
   @Override
@@ -583,7 +590,7 @@ public class SQLLibraryDAO implements LibraryStore {
   @Override
   @TriggersRemove(cacheName = { "libraryCache",
       "lazyLibraryCache" }, keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
-          @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
+          @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public boolean remove(Library library) throws IOException {
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
     if (library.isDeletable()) {
@@ -634,7 +641,9 @@ public class SQLLibraryDAO implements LibraryStore {
 
   @Override
   public LibraryType getLibraryTypeByDescriptionAndPlatform(String description, PlatformType platformType) throws IOException {
-    List eResults = template.query(LIBRARY_TYPE_SELECT_BY_DESCRIPTION_AND_PLATFORM, new Object[] { description, platformType.getKey() },
+    List eResults = template.query(
+        LIBRARY_TYPE_SELECT_BY_DESCRIPTION_AND_PLATFORM,
+        new Object[] { description, platformType.getKey() },
         new LibraryTypeMapper());
     LibraryType e = eResults.size() > 0 ? (LibraryType) eResults.get(0) : null;
     return e;
@@ -642,8 +651,8 @@ public class SQLLibraryDAO implements LibraryStore {
 
   @Override
   public LibrarySelectionType getLibrarySelectionTypeById(long librarySelectionTypeId) throws IOException {
-    List eResults = template.query(LIBRARY_SELECTION_TYPE_SELECT_BY_ID, new Object[] { librarySelectionTypeId },
-        new LibrarySelectionTypeMapper());
+    List eResults = template
+        .query(LIBRARY_SELECTION_TYPE_SELECT_BY_ID, new Object[] { librarySelectionTypeId }, new LibrarySelectionTypeMapper());
     LibrarySelectionType e = eResults.size() > 0 ? (LibrarySelectionType) eResults.get(0) : null;
     return e;
   }
@@ -657,8 +666,8 @@ public class SQLLibraryDAO implements LibraryStore {
 
   @Override
   public LibraryStrategyType getLibraryStrategyTypeById(long libraryStrategyTypeId) throws IOException {
-    List eResults = template.query(LIBRARY_STRATEGY_TYPE_SELECT_BY_ID, new Object[] { libraryStrategyTypeId },
-        new LibraryStrategyTypeMapper());
+    List eResults = template
+        .query(LIBRARY_STRATEGY_TYPE_SELECT_BY_ID, new Object[] { libraryStrategyTypeId }, new LibraryStrategyTypeMapper());
     LibraryStrategyType e = eResults.size() > 0 ? (LibraryStrategyType) eResults.get(0) : null;
     return e;
   }
@@ -688,6 +697,66 @@ public class SQLLibraryDAO implements LibraryStore {
   @Override
   public List<LibraryStrategyType> listAllLibraryStrategyTypes() throws IOException {
     return template.query(LIBRARY_STRATEGY_TYPES_SELECT, new LibraryStrategyTypeMapper());
+  }
+
+  public String updateSortCol(String sortCol) {
+    sortCol = sortCol.replaceAll("[^\\w]", "");
+    if ("lastModified".equals(sortCol)) {
+      sortCol = "lmod.lastModified";
+    } else {
+      switch (sortCol) {
+      case "id":
+        sortCol = "libraryId";
+        break;
+      case "name":
+        break;
+      case "alias":
+        break;
+      case "libraryTypeAlias":
+        sortCol = "libraryType";
+        break;
+      case "parentSampleAlias":
+        sortCol = "sample_sampleId";
+        break;
+      }
+      sortCol = "l." + sortCol;
+    }
+    return sortCol;
+  }
+
+  @Override
+  public List<Library> listBySearchOffsetAndNumResults(int offset, int limit, String querystr, String sortDir, String sortCol)
+      throws IOException {
+    if (offset < 0 || limit < 0) throw new IOException("Limit and Offset must be greater than zero");
+    if (isStringEmptyOrNull(querystr)) {
+      return listByOffsetAndNumResults(offset, limit, sortDir, sortCol);
+    } else {
+      sortCol = updateSortCol(sortCol);
+      if (!"asc".equals(sortDir.toLowerCase()) && !"desc".equals(sortDir.toLowerCase())) sortDir = "desc";
+      querystr = "%" + querystr.replaceAll("_", Matcher.quoteReplacement("\\_")) + "%";
+      String query = LIBRARIES_SELECT_BY_SEARCH + " ORDER BY " + sortCol + " " + sortDir + " LIMIT " + limit + " OFFSET " + offset;
+      List<Library> rtn = template.query(query, new Object[] { querystr, querystr, querystr, querystr }, new LibraryMapper(true));
+      return rtn;
+    }
+  }
+
+  @Override
+  public List<Library> listByOffsetAndNumResults(int offset, int limit, String sortDir, String sortCol) throws IOException {
+    if (offset < 0 || limit < 0) throw new IOException("Limit and Offset must be greater than zero");
+    sortCol = updateSortCol(sortCol);
+    if (!"asc".equals(sortDir.toLowerCase()) && !"desc".equals(sortDir.toLowerCase())) sortDir = "DESC";
+    String query = LIBRARIES_SELECT + " ORDER BY " + sortCol + " " + sortDir + " LIMIT " + limit + " OFFSET " + offset;
+    return template.query(query, new LibraryMapper(true));
+  }
+
+  @Override
+  public long countLibrariesBySearch(String querystr) throws IOException {
+    if (isStringEmptyOrNull(querystr)) {
+      return (count());
+    } else {
+      querystr = "%" + querystr.replaceAll("_", Matcher.quoteReplacement("\\_")) + "%";
+      return template.queryForLong(LIBRARY_COUNT_BY_SEARCH, new Object[] { querystr, querystr, querystr, querystr });
+    }
   }
 
   public ChangeLogStore getChangeLogDAO() {
@@ -752,6 +821,7 @@ public class SQLLibraryDAO implements LibraryStore {
       library.setBoxPositionId(rs.getLong("boxPositionId"));
       library.setBoxAlias(rs.getString("boxAlias"));
       library.setBoxId(rs.getLong("boxId"));
+      library.setLastModified(rs.getDate("lastModified"));
       int row = rs.getInt("boxRow");
       if (!rs.wasNull()) library.setBoxPosition(BoxUtils.getPositionString(row, rs.getInt("boxColumn")));
       library.setBoxLocation(rs.getString("boxLocation"));
@@ -849,4 +919,5 @@ public class SQLLibraryDAO implements LibraryStore {
   public Map<String, Integer> getLibraryColumnSizes() throws IOException {
     return DbUtils.getColumnSizes(template, TABLE_NAME);
   }
+
 }

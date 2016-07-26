@@ -128,25 +128,6 @@ public class LibraryControllerHelperService {
   @Autowired
   private MisoNamingScheme<Library> libraryNamingScheme;
 
-  private static String prettyBarcodes(List<TagBarcode> tagBarcodes) {
-    if (tagBarcodes.isEmpty()) return "None";
-    StringBuilder sb = new StringBuilder();
-    boolean first = true;
-    for (TagBarcode barcode : tagBarcodes) {
-      if (barcode == null) continue;
-      if (first) {
-        first = false;
-      } else {
-        sb.append(", ");
-      }
-      sb.append(barcode.getName());
-      sb.append(" (");
-      sb.append(barcode.getSequence());
-      sb.append(")");
-    }
-    return sb.toString();
-  }
-
   /**
    * Returns a JSONObject containing the alias regex used by the current library naming scheme
    */
@@ -170,8 +151,9 @@ public class LibraryControllerHelperService {
           return JSONUtils.SimpleJSONResponse("OK");
         } else {
           log.error("Library alias not valid: " + alias);
-          return JSONUtils.SimpleJSONError("The following Library alias doesn't conform to the chosen naming scheme ("
-              + libraryNamingScheme.getValidationRegex("alias") + ") or already exists: " + json.getString("alias"));
+          return JSONUtils.SimpleJSONError(
+              "The following Library alias doesn't conform to the chosen naming scheme (" + libraryNamingScheme.getValidationRegex("alias")
+                  + ") or already exists: " + json.getString("alias"));
         }
       } catch (MisoNamingException e) {
         log.error("Cannot validate Library alias " + json.getString("alias"), e);
@@ -516,8 +498,9 @@ public class LibraryControllerHelperService {
                     barcodes.add(bc);
                   } catch (NumberFormatException e) {
                     log.error("cannot save library", e);
-                    return JSONUtils.SimpleJSONError("Cannot save Library. It looks like there are tag barcodes for the library of "
-                        + sample.getAlias() + ", but they cannot be processed");
+                    return JSONUtils.SimpleJSONError(
+                        "Cannot save Library. It looks like there are tag barcodes for the library of " + sample.getAlias()
+                            + ", but they cannot be processed");
                   }
                 }
                 library.setTagBarcodes(barcodes);
@@ -892,8 +875,8 @@ public class LibraryControllerHelperService {
       Long dilutionId = Long.parseLong(json.getString("dilutionId"));
       LibraryDilution dilution = requestManager.getLibraryDilutionById(dilutionId);
       response.put("results", "<input type='text' id='" + dilutionId + "' value='" + dilution.getConcentration() + "'/>");
-      response.put("edit",
-          "<a href='javascript:void(0);' onclick='Library.dilution.editLibraryDilution(\"" + dilutionId + "\");'>Save</a>");
+      response
+          .put("edit", "<a href='javascript:void(0);' onclick='Library.dilution.editLibraryDilution(\"" + dilutionId + "\");'>Save</a>");
       return response;
     } catch (Exception e) {
       log.error("Failed to display Library Dilution of this Library: ", e);
@@ -948,8 +931,9 @@ public class LibraryControllerHelperService {
           sb.append("<td>" + p.getPcrCreator() + "</td>");
           sb.append("<td>" + p.getCreationDate() + "</td>");
           sb.append("<td>" + p.getConcentration() + " " + p.getUnits() + "</td>");
-          sb.append("<td><a href='javascript:void(0);' onclick='Library.empcr.insertEmPcrDilutionRow(" + p.getId()
-              + ");'>Add emPCR Dilution</a></td>");
+          sb.append(
+              "<td><a href='javascript:void(0);' onclick='Library.empcr.insertEmPcrDilutionRow(" + p.getId()
+                  + ");'>Add emPCR Dilution</a></td>");
           sb.append("</tr>");
         }
         return JSONUtils.SimpleJSONResponse(sb.toString());
@@ -1011,8 +995,9 @@ public class LibraryControllerHelperService {
           }
           sb.append("</td>");
 
-          sb.append("<td><a href='/miso/poolwizard/new/" + pcr.getLibraryDilution().getLibrary().getSample().getProject().getProjectId()
-              + "'>Construct New Pool</a></td>");
+          sb.append(
+              "<td><a href='/miso/poolwizard/new/" + pcr.getLibraryDilution().getLibrary().getSample().getProject().getProjectId()
+                  + "'>Construct New Pool</a></td>");
           sb.append("</tr>");
         }
         return JSONUtils.SimpleJSONResponse(sb.toString());
@@ -1124,7 +1109,8 @@ public class LibraryControllerHelperService {
 
       response.put("results", "<input type='text' id='results" + qcId + "' value='" + libraryQc.getResults() + "'/>");
       response.put("insertSize", "<input type='text' id='insertSize" + qcId + "' value='" + libraryQc.getInsertSize() + "'/>");
-      response.put("edit",
+      response.put(
+          "edit",
           "<a href='javascript:void(0);' onclick='Library.qc.editLibraryQC(\"" + qcId + "\",\"" + libraryId + "\");'>Save</a>");
       return response;
     } catch (Exception e) {
@@ -1259,37 +1245,6 @@ public class LibraryControllerHelperService {
     }
   }
 
-  public JSONObject listLibrariesDataTable(HttpSession session, JSONObject json) {
-    try {
-      JSONObject j = new JSONObject();
-      JSONArray jsonArray = new JSONArray();
-      for (Library library : requestManager.listAllLibraries()) {
-        JSONArray inner = new JSONArray();
-        String identificationBarcode = library.getIdentificationBarcode();
-        String qcpassed = "Unknown";
-        if (library.getQcPassed() != null) {
-          qcpassed = library.getQcPassed().toString();
-        }
-        inner.add("<input type=\"checkbox\" value=\"" + library.getId() + "\" class=\"bulkCheckbox\" id=\"bulk_" + library.getId() + "\">");
-        inner.add(TableHelper.hyperLinkify("/miso/library/" + library.getId(), library.getName()));
-        inner.add(TableHelper.hyperLinkify("/miso/library/" + library.getId(), library.getAlias()));
-        inner.add(library.getLibraryType().getDescription());
-        inner.add(TableHelper.hyperLinkify("/miso/sample/" + library.getSample().getId(),
-            library.getSample().getName() + " (" + library.getSample().getAlias() + ")"));
-        inner.add(qcpassed);
-        inner.add(prettyBarcodes(library.getTagBarcodes()));
-        inner.add((isStringEmptyOrNull(identificationBarcode) ? "" : identificationBarcode));
-
-        jsonArray.add(inner);
-      }
-      j.put("array", jsonArray);
-      return j;
-    } catch (IOException e) {
-      log.error("Failed", e);
-      return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
-    }
-  }
-
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
   }
@@ -1320,5 +1275,9 @@ public class LibraryControllerHelperService {
 
   public void setLibraryNamingScheme(MisoNamingScheme<Library> libraryNamingScheme) {
     this.libraryNamingScheme = libraryNamingScheme;
+  }
+
+  public void setTagBarcodeService(TagBarcodeStore tagBarcodeStore) {
+    this.tagBarcodeService = tagBarcodeStore;
   }
 }

@@ -1029,7 +1029,8 @@ Sample.ui = {
           "mData": "id",
           "mRender": function (data, type, full) {
             return "<input type=\"checkbox\" value=\"" + data + "\" class=\"bulkCheckbox\" id=\"bulk_" + data + "\">"
-          }
+          },
+          "bSortable": false
         },
         {
           "sTitle": "Sample Name",
