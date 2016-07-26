@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.getDateAsString;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isAliquotSample;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isDetailedSample;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isIdentitySample;
@@ -34,6 +35,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.QcPassedDetail;
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
@@ -82,7 +84,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 public class Dtos {
 
@@ -950,7 +951,7 @@ public class Dtos {
       dto.setPlatformName(from.getPlatformName());
     }
     if (from.getLastModified() != null) {
-      dto.setLastModified(LimsUtils.getDateAsString(from.getLastModified()));
+      dto.setLastModified(getDateAsString(from.getLastModified()));
     }
     if (!from.getTagBarcodes().isEmpty()) {
       dto.setTagBarcodeStrategyName(from.getTagBarcodes().get(0).getFamily().getName());
@@ -1105,7 +1106,7 @@ public class Dtos {
     dto.setQcPassed(from.getQcPassed());
     dto.setCreationDate(from.getCreationDate());
     if (from.getLastModified() != null) {
-      dto.setLastModified(LimsUtils.getDateAsString(from.getLastModified()));
+      dto.setLastModified(getDateAsString(from.getLastModified()));
     }
     Set<DilutionDto> pooledElements = new HashSet<DilutionDto>();
     for (Dilution ld : from.getDilutions()) {
@@ -1121,6 +1122,43 @@ public class Dtos {
     List<PoolDto> dtoList = new ArrayList<>();
     for (Pool<? extends Poolable<?, ?>> pool : poolSubset) {
       dtoList.add(asDto(pool));
+    }
+    return dtoList;
+  }
+
+  public static RunDto asDto(Run from) {
+    RunDto dto = new RunDto();
+    dto.setId(from.getId());
+    dto.setName(from.getName());
+    dto.setAlias(from.getAlias());
+    if (from.getStatus() != null && from.getStatus().getHealth() != null) {
+      dto.setStatus(from.getStatus().getHealth().getKey());
+    } else {
+      dto.setStatus("");
+    }
+    if (from.getLastUpdated() != null) {
+      dto.setLastUpdated(getDateAsString(from.getLastUpdated()));
+    }
+    if (from.getPlatformType() != null) {
+      dto.setPlatformType(from.getPlatformType().getKey());
+    } else {
+      dto.setPlatformType("");
+    }
+    if (from.getStatus() != null && from.getStatus().getStartDate() != null) {
+      dto.setStartDate(getDateAsString(from.getStatus().getStartDate()));
+    } else {
+      dto.setStartDate("");
+    }
+    if (from.getStatus() != null && from.getStatus().getCompletionDate() != null) {
+      dto.setEndDate(getDateAsString(from.getStatus().getStartDate()));
+    }
+    return dto;
+  }
+
+  public static List<RunDto> asRunDtos(Collection<Run> runSubset) {
+    List<RunDto> dtoList = new ArrayList<>();
+    for (Run run : runSubset) {
+      dtoList.add(asDto(run));
     }
     return dtoList;
   }

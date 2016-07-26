@@ -2581,4 +2581,38 @@ public class UserAuthMisoRequestManager implements RequestManager {
   public Long countLibrariesBySearch(String querystr) throws IOException {
     return backingManager.countLibrariesBySearch(querystr);
   }
+
+  @Override
+  public Long countRuns() throws IOException {
+    return backingManager.countRuns();
+  }
+
+  @Override
+  public List<Run> getRunsByPageSizeSearch(int offset, int limit, String querystr, String sortDir, String sortCol) throws IOException {
+    User user = getCurrentUser();
+    List<Run> accessibles = new ArrayList<>();
+    for (Run run : backingManager.getRunsByPageSizeSearch(offset, limit, querystr, sortDir, sortCol)) {
+      if (run.userCanRead(user)) {
+        accessibles.add(run);
+      }
+    }
+    return accessibles;
+  }
+
+  @Override
+  public List<Run> getRunsByPageAndSize(int offset, int limit, String sortDir, String sortCol) throws IOException {
+    User user = getCurrentUser();
+    List<Run> accessibles = new ArrayList<>();
+    for (Run run : backingManager.getRunsByPageAndSize(offset, limit, sortDir, sortCol)) {
+      if (run.userCanRead(user)) {
+        accessibles.add(run);
+      }
+    }
+    return accessibles;
+  }
+
+  @Override
+  public Long countRunsBySearch(String querystr) throws IOException {
+    return backingManager.countRunsBySearch(querystr);
+  }
 }

@@ -296,7 +296,7 @@ Run.ui = {
   },
 
   createListingRunsTable: function () {
-    jQuery('#listingRunsTable').html("<img src='../styles/images/ajax-loader.gif'/>");
+    jQuery('#listingRunsTable').html("");
     jQuery.fn.dataTableExt.oSort['no-run-asc'] = function (x, y) {
       var a = parseInt(x.replace(/^RUN/i, ""));
       var b = parseInt(y.replace(/^RUN/i, ""));
@@ -307,34 +307,85 @@ Run.ui = {
       var b = parseInt(y.replace(/^RUN/i, ""));
       return ((a < b) ? 1 : ((a > b) ? -1 : 0));
     };
-    Fluxion.doAjax(
-      'runControllerHelperService',
-      'listRunsDataTable',
-      {
-        'url': ajaxurl
-      },
-      {
-        'doOnSuccess': function (json) {
-          jQuery('#listingRunsTable').html('');
-          jQuery('#listingRunsTable').dataTable({
-            "aaData": json.runsArray,
-            "aoColumns": [
-              { "sTitle": "Run Name", "sType": "no-run"},
-              { "sTitle": "Alias"},
-              { "sTitle": "Status"},
-              { "sTitle": "Start Date"},
-              { "sTitle": "End Date"},
-              { "sTitle": "Type"}
-            ],
-            "bJQueryUI": true,
-            "iDisplayLength": 25,
-            "aaSorting": [
-              [0, "desc"]
-            ]
-          });
+    
+    jQuery('#listingRunsTable').dataTable({
+      "aoColumns": [
+        {
+          "sTitle": "Run Name",
+          "sType": "no-run",
+          "mData": "name",
+          "mRender": function (data, type, full) {
+            return "<a href=\"/miso/run/" + full.id + "\">" + data + "</a>";
+          }
+        },
+        {
+          "sTitle": "Alias",
+          "mData": "alias",
+          "mRender": function (data, type, full) {
+            return "<a href=\"/miso/run/" + full.id + "\">" + data + "</a>";
+          }
+        },
+        {
+          "sTitle": "Status",
+          "mData": "status",
+          "mRender": function (data, type, full) {
+            return (data ? data : "");
+          },
+          "bSortable": false // status, start date and end date are pulled via status dao, not via run dao
+        },
+        {
+          "sTitle": "Start Date",
+          "mData": "startDate",
+          "mRender": function (data, type, full) {
+            return (data ? data : "");
+          },
+          "bSortable": false
+        },
+        {
+          "sTitle": "End Date",
+          "mData": "endDate",
+          "mRender": function (data, type, full) {
+            return (data ? data : "");
+          },
+          "bSortable": false
+        },
+        {
+          "sTitle": "Type",
+          "mData": "platformType"
+        },
+        {
+          "sTitle": "Last Updated",
+          "mData": "lastUpdated",
+          "bVisible": (Sample.detailedSample ? "true" : "false")
         }
+      ],
+      "bJQueryUI": true,
+      "bAutoWidth": false,
+      "iDisplayLength": 25,
+      "iDisplayStart": 0,
+      "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>',
+      "aaSorting": [
+        [(Sample.detailedSample ? 6 : 0), "desc"]
+      ],
+      "sPaginationType": "full_numbers",
+      "bProcessing": true,
+      "bServerSide": true,
+      "sAjaxSource": "/miso/rest/run/dt",
+      "fnServerData": function (sSource, aoData, fnCallback) {
+        jQuery('#listingRunsTable').addClass('disabled');
+        jQuery.ajax({
+          "dataType": "json",
+          "type": "GET",
+          "url": sSource,
+          "data": aoData,
+          "success": fnCallback // Do not alter this DataTables property
+        });
+      },
+      "fnDrawCallback": function (oSettings) {
+        jQuery('#listingRunsTable').removeClass('disabled');
       }
-    );
+    }).fnSetFilteringDelay();
+    jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
   },
 
   changeIlluminaLane: function (t, container) {

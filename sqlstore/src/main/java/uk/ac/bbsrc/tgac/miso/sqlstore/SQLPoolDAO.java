@@ -981,20 +981,26 @@ public class SQLPoolDAO implements PoolStore {
     }
   }
 
-  @Override
-  public List<Pool<? extends Poolable<?, ?>>> listBySearchOffsetAndNumResultsAndPlatform(int offset, int resultsPerPage, String querystr,
-      String sortDir, String sortCol, PlatformType platform) throws IOException {
+  public String updateSortCol(String sortCol) {
+    sortCol = sortCol.replaceAll("[^\\w]", "");
     if ("id".equals(sortCol)) sortCol = "poolId";
     if ("lastModified".equals(sortCol)) {
       sortCol = "pmod.lastModified";
     } else {
       sortCol = "p." + sortCol;
     }
-    if (offset < 0 || resultsPerPage < 0) throw new IOException("Limit and Offset must be greater than zero");
-    if (!"asc".equals(sortDir.toLowerCase()) && !"desc".equals(sortDir.toLowerCase())) sortDir = "desc";
+    return sortCol;
+  }
+
+  @Override
+  public List<Pool<? extends Poolable<?, ?>>> listBySearchOffsetAndNumResultsAndPlatform(int offset, int resultsPerPage, String querystr,
+      String sortDir, String sortCol, PlatformType platform) throws IOException {
     if (isStringEmptyOrNull(querystr)) {
       return listByOffsetAndNumResults(offset, resultsPerPage, sortDir, sortCol, platform);
     } else {
+      sortCol = updateSortCol(sortCol);
+      if (offset < 0 || resultsPerPage < 0) throw new IOException("Limit and Offset must be greater than zero");
+      if (!"asc".equals(sortDir.toLowerCase()) && !"desc".equals(sortDir.toLowerCase())) sortDir = "desc";
       querystr = "%" + querystr.replaceAll("_", Matcher.quoteReplacement("\\_")) + "%";
       String query = POOL_SELECT_BY_PLATFORM_AND_SEARCH + " ORDER BY " + sortCol + " " + sortDir + " LIMIT " + resultsPerPage + " OFFSET "
           + offset;
@@ -1007,12 +1013,7 @@ public class SQLPoolDAO implements PoolStore {
   @Override
   public List<Pool<? extends Poolable<?, ?>>> listByOffsetAndNumResults(int offset, int limit, String sortDir, String sortCol,
       PlatformType platform) throws IOException {
-    if ("id".equals(sortCol)) sortCol = "poolId";
-    if ("lastModified".equals(sortCol)) {
-      sortCol = "pmod.lastModified";
-    } else {
-      sortCol = "p." + sortCol;
-    }
+    sortCol = updateSortCol(sortCol);
     if (offset < 0 || limit < 0) throw new IOException("Limit and Offset must be greater than zero");
     if (!"asc".equals(sortDir.toLowerCase()) && !"desc".equals(sortDir.toLowerCase())) sortDir = "DESC";
     String query = POOL_SELECT_BY_PLATFORM + " ORDER BY " + sortCol + " " + sortDir + " LIMIT " + limit + " OFFSET " + offset;

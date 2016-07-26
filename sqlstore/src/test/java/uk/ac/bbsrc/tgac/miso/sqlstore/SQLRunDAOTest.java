@@ -29,14 +29,13 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import net.sf.ehcache.CacheManager;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -56,6 +55,7 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.store.SecurityStore;
 
+import net.sf.ehcache.CacheManager;
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
@@ -319,16 +319,32 @@ public class SQLRunDAOTest extends AbstractDAOTest {
   }
 
   @Test
-  public void testRemove() throws IOException {
-    Run run = dao.get(1L);
-    assertNotNull(run);
+  public void testRemove() throws IOException, MisoNamingException {
+    Run run = new RunImpl();
+    String runName = "RUN111";
+    run.setName(runName);
+    run.setAlias("RunAlias");
+    run.setDescription("Run Description");
+    run.setPairedEnd(true);
+    run.setPlatformType(PlatformType.ILLUMINA);
+    SequencerReference mockSR = Mockito.mock(SequencerReference.class);
+    when(mockSR.getId()).thenReturn(1L);
+    run.setSequencerReference(mockSR);
+    User mockUser = Mockito.mock(User.class);
+    when(mockUser.getUserId()).thenReturn(1L);
+    run.setLastModifier(mockUser);
 
-    CacheManager cacheManager = Mockito.mock(CacheManager.class);
-    Mockito.when(cacheManager.getCache(Matchers.anyString())).thenReturn(null);
-    dao.setCacheManager(cacheManager);
+    mockAutoIncrement(nextAutoIncrementId);
+    when(namingScheme.generateNameFor("name", run)).thenReturn(runName);
+    when(namingScheme.validateField(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
 
-    assertTrue(dao.remove(run));
-    assertNull(dao.get(1L));
+    long runId = dao.save(run);
+    Run insertedRun = dao.get(runId);
+    assertNotNull(insertedRun);
+    assertTrue(dao.remove(insertedRun));
+    Mockito.verify(changeLogDAO, Mockito.times(1)).deleteAllById("Run", run.getId());
+    assertNull(dao.get(insertedRun.getId()));
+    nextAutoIncrementId++;
   }
 
   @Test
@@ -345,6 +361,7 @@ public class SQLRunDAOTest extends AbstractDAOTest {
     run.setFilePath("/far/far/away");
     run.setName("AwesomeRun");
     run.setLastModifier(user);
+    run.setSequencingParametersId(null);
 
     Mockito.when(namingScheme.validateField(Matchers.anyString(), Matchers.anyString())).thenReturn(true);
 
@@ -358,16 +375,16 @@ public class SQLRunDAOTest extends AbstractDAOTest {
 
   @Test
   public void testSaveNew() throws IOException, MisoNamingException {
-    long autoIncrementId = nextAutoIncrementId;
+    assertNull(dao.get(nextAutoIncrementId));
     Run newRun = makeRun("TestRun");
-    mockAutoIncrement(autoIncrementId);
+    mockAutoIncrement(nextAutoIncrementId);
     Mockito.when(namingScheme.validateField(Matchers.anyString(), Matchers.anyString())).thenReturn(true);
 
-    assertEquals(autoIncrementId, dao.save(newRun));
+    assertEquals(nextAutoIncrementId, dao.save(newRun));
 
-    Run savedRun = dao.get(autoIncrementId);
+    Run savedRun = dao.get(nextAutoIncrementId);
     assertEquals(newRun.getAlias(), savedRun.getAlias());
-    nextAutoIncrementId += 1;
+    nextAutoIncrementId++;
   }
 
   @Test
@@ -474,4 +491,63 @@ public class SQLRunDAOTest extends AbstractDAOTest {
     assertFalse(run.getNotes().isEmpty());
   }
 
+  @Test
+  public void testListWithLimitAndOffset() throws IOException {
+    List<Run> runs = dao.listByOffsetAndNumResults(2, 2, "asc", "id");
+    assertEquals(2, runs.size());
+    assertEquals(3L, runs.get(0).getId());
+  }
+
+  @Test
+  public void testCountBySearch() throws IOException {
+    assertEquals(2, dao.countBySearch("1204"));
+  }
+
+  @Test
+  public void testCountByEmptySearch() throws IOException {
+    assertEquals(4L, dao.countBySearch(""));
+  }
+
+  @Test
+  public void testCountByBadSearch() throws IOException {
+    assertEquals(0L, dao.countBySearch("; DROP TABLE Run;"));
+  }
+
+  @Test
+  public void testListBySearchWithLimit() throws IOException {
+    List<Run> runs = dao.listBySearchOffsetAndNumResults(2, 2, "C0", "asc", "id");
+    assertEquals(1, runs.size());
+    assertEquals(4L, runs.get(0).getId());
+  }
+
+  @Test
+  public void testListByEmptySearchWithLimit() throws IOException {
+    List<Run> runs = dao.listBySearchOffsetAndNumResults(0, 3, "", "asc", "id");
+    assertEquals(3L, runs.size());
+  }
+
+  @Test
+  public void testListByBadSearchWithLimit() throws IOException {
+    List<Run> runs = dao.listBySearchOffsetAndNumResults(0, 2, "; DROP TABLE Run;", "asc", "id");
+    assertEquals(0L, runs.size());
+  }
+
+  @Test
+  public void testListByOffsetBadSortDir() throws IOException {
+    List<Run> runs = dao.listByOffsetAndNumResults(1, 3, "BARK", "id");
+    assertEquals(3, runs.size());
+  }
+
+  @Test
+  public void testListOffsetBadLimit() throws IOException {
+    exception.expect(IOException.class);
+    dao.listByOffsetAndNumResults(5, -3, "asc", "id");
+  }
+
+  @Test
+  public void testListOffsetThreeWithThreeSamplesPerPageOrderLastMod() throws IOException {
+    List<Run> runs = dao.listByOffsetAndNumResults(2, 2, "desc", "lastModified");
+    assertEquals(2, runs.size());
+    assertEquals(2, runs.get(0).getId());
+  }
 }
