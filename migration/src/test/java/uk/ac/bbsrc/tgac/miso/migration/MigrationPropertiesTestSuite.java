@@ -1,7 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.migration;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -18,14 +17,17 @@ public class MigrationPropertiesTestSuite {
   private static final String VALID_STRING = "validString";
   private static final String VALID_INT = "validInt";
   private static final String VALID_LONG = "validLong";
+  private static final String VALID_BOOLEAN = "validBoolean";
   
   private static final String VALID_STRING_VALUE = "ok";
   private static final int VALID_INT_VALUE = 123;
   private static final long VALID_LONG_VALUE = 9999999999L;
+  private static final boolean VALID_BOOLEAN_VALUE = true;
   
   private static final String NEEDS_TRIMMED_STRING = "needsTrimmedString";
   private static final String NEEDS_TRIMMED_INT = "needsTrimmedInt";
   private static final String NEEDS_TRIMMED_LONG = "needsTrimmedLong";
+  private static final String NEEDS_TRIMMED_BOOLEAN = "needsTrimmedBoolean";
   
   private static final String MISSING_PROPERTY = "missingProperty";
   private static final String EMPTY_PROPERTY = "emptyProperty";
@@ -148,6 +150,24 @@ public class MigrationPropertiesTestSuite {
   public void testGetRequiredLongSpaces() {
     exception.expect(IllegalArgumentException.class);
     sut.getRequiredLong(SPACES_PROPERTY);
+  }
+  
+  @Test
+  public void testGetBooleanMissing() {
+    assertFalse(sut.getBoolean(MISSING_PROPERTY, false));
+    assertTrue(sut.getBoolean(MISSING_PROPERTY, true));
+  }
+  
+  @Test
+  public void testGetBooleanValid() {
+    assertEquals(VALID_BOOLEAN_VALUE, sut.getBoolean(VALID_BOOLEAN, false));
+    assertEquals(VALID_BOOLEAN_VALUE, sut.getBoolean(VALID_BOOLEAN, true));
+  }
+  
+  @Test
+  public void testGetBooleanNeedsTrimmed() {
+    assertEquals(VALID_BOOLEAN_VALUE, sut.getBoolean(NEEDS_TRIMMED_BOOLEAN, false));
+    assertEquals(VALID_BOOLEAN_VALUE, sut.getBoolean(NEEDS_TRIMMED_BOOLEAN, true));
   }
 
 }

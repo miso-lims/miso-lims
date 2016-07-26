@@ -43,6 +43,9 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -65,8 +68,6 @@ import org.w3c.dom.Node;
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
@@ -3132,7 +3133,7 @@ public class FormUtils {
                 if (bcs != null) {
                   String tags = barcodeTagsCell.getStringValue();
                   if (!isStringEmptyOrNull(tags)) {
-                    library.setTagBarcodes(matchBarcodesFromText(bcs, tags));
+                    library.setTagBarcodes(matchBarcodesFromText(bcs.getBarcodes(), tags));
                   } else {
                     throw new InputFormException(
                         "Barcode Kit specified but no tag barcodes entered for: '" + sampleAliasCell.getStringValue() + "'.");
@@ -3898,7 +3899,7 @@ public class FormUtils {
                 if (bcs != null) {
                   String tags = getCellValueAsString(barcodeTagsCell);
                   if (!isStringEmptyOrNull(tags)) {
-                    library.setTagBarcodes(matchBarcodesFromText(bcs, tags));
+                    library.setTagBarcodes(matchBarcodesFromText(bcs.getBarcodes(), tags));
                   } else {
                     throw new InputFormException("Barcode Kit specified but no tag barcodes entered for: '" + s.getAlias() + "'.");
                   }
@@ -3914,6 +3915,7 @@ public class FormUtils {
                   ldi.setSecurityProfile(library.getSecurityProfile());
                   ldi.setConcentration(Double.valueOf(getCellValueAsString(dilutionMolarityCell)));
                   ldi.setCreationDate(new Date());
+                  ldi.setLastModified(ldi.getCreationDate());
                   ldi.setDilutionCreator(u.getLoginName());
                   if (!library.getLibraryDilutions().contains(ldi)) {
                     library.addDilution(ldi);
@@ -4213,7 +4215,7 @@ public class FormUtils {
               if (bcs != null) {
                 String tags = getCellValueAsString(barcodeTagsCell);
                 if (!isStringEmptyOrNull(tags)) {
-                  library.setTagBarcodes(matchBarcodesFromText(bcs, tags));
+                  library.setTagBarcodes(matchBarcodesFromText(bcs.getBarcodes(), tags));
                 } else {
                   throw new InputFormException("Barcode Kit specified but no tag barcodes entered for: '" + s.getAlias() + "'.");
                 }
@@ -4694,7 +4696,7 @@ public class FormUtils {
       TagBarcodeFamily bcs = tagBarcodeService.getTagBarcodeFamilyByName(barcodeKit);
       if (bcs != null) {
         if (!isStringEmptyOrNull(barcodeTags)) {
-          library.setTagBarcodes(matchBarcodesFromText(bcs, barcodeTags));
+          library.setTagBarcodes(matchBarcodesFromText(bcs.getBarcodes(), barcodeTags));
         } else {
           throw new InputFormException("Barcode Kit specified but no tag barcodes entered for: '" + library.getSample().getAlias() + "'.");
         }
@@ -4953,7 +4955,7 @@ public class FormUtils {
       cellB.setCellValue(boxAlias);
 
       int i = 4; // start on row 4 of the sheet
-      for (String item : (Iterable<String>) array) {
+      for (String item : array) {
         String position = item.split(":")[0];
         String name = item.split(":")[1];
         String alias = item.split(":")[2];

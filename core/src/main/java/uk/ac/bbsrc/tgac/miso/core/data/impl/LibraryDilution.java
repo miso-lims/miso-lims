@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
@@ -44,6 +45,7 @@ public class LibraryDilution extends AbstractDilution implements Serializable {
   private static final long serialVersionUID = 1L;
   private Library library;
   private TargetedResequencing targetedResequencing;
+  private Date lastModified;
   public static final String UNITS = "nM";
 
   /**
@@ -83,6 +85,14 @@ public class LibraryDilution extends AbstractDilution implements Serializable {
 
   public void setTargetedResequencing(TargetedResequencing targetedResequencing) {
     this.targetedResequencing = targetedResequencing;
+  }
+
+  public Date getLastModified() {
+    return lastModified;
+  }
+
+  public void setLastModified(Date lastModified) {
+    this.lastModified = lastModified;
   }
 
   @Override

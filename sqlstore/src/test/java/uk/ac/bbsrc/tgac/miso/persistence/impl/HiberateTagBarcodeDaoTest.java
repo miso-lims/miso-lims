@@ -1,9 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.hibernate.SessionFactory;
 import org.junit.Before;
@@ -15,7 +15,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
 import uk.ac.bbsrc.tgac.miso.core.data.TagBarcodeFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
-public class HiberateTagBarcodeStrategyDaoTest extends AbstractDAOTest {
+public class HiberateTagBarcodeDaoTest extends AbstractDAOTest {
   private HibernateTagBarcodeDao dao;
   @Autowired
   private SessionFactory sessionFactory;
@@ -31,7 +31,7 @@ public class HiberateTagBarcodeStrategyDaoTest extends AbstractDAOTest {
     TagBarcode tagBarcodeById = dao.getTagBarcodeById(8);
     assertEquals(8L, tagBarcodeById.getId());
     assertEquals("ACTTGA", tagBarcodeById.getSequence());
-    assertEquals("Index 08", tagBarcodeById.getName());
+    assertEquals("Index 8", tagBarcodeById.getName());
     assertEquals("TruSeq Single Index", tagBarcodeById.getFamily().getName());
 
   }
@@ -46,5 +46,28 @@ public class HiberateTagBarcodeStrategyDaoTest extends AbstractDAOTest {
   public void testListTagBarcodesByStrategyName() throws Exception {
     TagBarcodeFamily tagBarcodes = dao.getTagBarcodeFamilyByName("Nextera Dual Index");
     assertTrue(20 == tagBarcodes.getBarcodes().size());
+  }
+  
+  @Test
+  public void testListAllTagBarcodes() throws Exception {
+    List<TagBarcode> list = dao.listAllTagBarcodes();
+    assertEquals(80, list.size());
+  }
+  
+  @Test
+  public void testGetTagBarcodeFamilies() throws Exception {
+    List<TagBarcodeFamily> list = dao.getTagBarcodeFamilies();
+    assertEquals(12, list.size());
+  }
+  
+  @Test
+  public void testGetTagBarcodeFamiliesByPlatform() throws Exception {
+    List<TagBarcodeFamily> list = dao.getTagBarcodeFamiliesByPlatform(PlatformType.ILLUMINA);
+    assertEquals(11, list.size());
+    int totalIlluminaBarcodes = 0;
+    for (TagBarcodeFamily fam : list) {
+      totalIlluminaBarcodes += fam.getBarcodes().size();
+    }
+    assertEquals(68, totalIlluminaBarcodes);
   }
 }
