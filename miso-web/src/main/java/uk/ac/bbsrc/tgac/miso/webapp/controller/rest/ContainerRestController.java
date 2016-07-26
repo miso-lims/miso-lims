@@ -23,8 +23,15 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import java.io.IOException;
+import java.net.URI;
 import java.util.Collection;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
@@ -36,12 +43,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.dto.ContainerDto;
+import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
+import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.controller.rest
@@ -63,7 +74,7 @@ public class ContainerRestController extends RestController {
     this.requestManager = requestManager;
   }
 
-  @RequestMapping(value = "{containerBarcode}", method = RequestMethod.GET, produces="application/json")
+  @RequestMapping(value = "{containerBarcode}", method = RequestMethod.GET, produces = "application/json")
   public @ResponseBody String jsonRest(@PathVariable String containerBarcode) throws IOException {
     StringBuilder sb = new StringBuilder();
     Collection<SequencerPartitionContainer<SequencerPoolPartition>> sequencerPartitionContainerCollection = requestManager
@@ -131,5 +142,49 @@ public class ContainerRestController extends RestController {
     }
     return "[" + sb.toString() + "]";
   }
-  
+
+  @RequestMapping(value = "/dt", method = RequestMethod.GET, produces = "application/json")
+  @ResponseBody
+  public DataTablesResponseDto<ContainerDto> getContainers(HttpServletRequest request, HttpServletResponse response,
+      UriComponentsBuilder uriBuilder) throws IOException {
+    if (request.getParameterMap().size() > 0) {
+      Long numContainers = Long.valueOf(requestManager.countContainers());
+      // get request params from DataTables
+      Integer iDisplayStart = Integer.parseInt(request.getParameter("iDisplayStart"));
+      Integer iDisplayLength = Integer.parseInt(request.getParameter("iDisplayLength"));
+      String sSearch = request.getParameter("sSearch");
+      String sSortDir = request.getParameter("sSortDir_0");
+      String sortColIndex = request.getParameter("iSortCol_0");
+      String sortCol = request.getParameter("mDataProp_" + sortColIndex);
+
+      // get requested subset of libraries
+      Collection<SequencerPartitionContainer<SequencerPoolPartition>> containerSubset;
+      Long numMatches;
+
+      if (!isStringEmptyOrNull(sSearch)) {
+        containerSubset = requestManager.getContainersByPageSizeSearch(iDisplayStart, iDisplayLength, sSearch, sSortDir, sortCol);
+        numMatches = Long.valueOf(requestManager.countLibrariesBySearch(sSearch));
+      } else {
+        containerSubset = requestManager.getContainersByPageAndSize(iDisplayStart, iDisplayLength, sSortDir, sortCol);
+        numMatches = numContainers;
+      }
+      List<ContainerDto> containerDtos = Dtos.asContainerDtos(containerSubset);
+      URI baseUri = uriBuilder.build().toUri();
+      for (ContainerDto containerDto : containerDtos) {
+        containerDto.setUrl(
+            UriComponentsBuilder.fromUri(baseUri).path("/rest/run/container/{barcode}")
+                .buildAndExpand(containerDto.getIdentificationBarcode()).toUriString());
+      }
+
+      DataTablesResponseDto<ContainerDto> dtResponse = new DataTablesResponseDto<ContainerDto>();
+      dtResponse.setITotalRecords(numContainers);
+      dtResponse.setITotalDisplayRecords(numMatches);
+      dtResponse.setAaData(containerDtos);
+      dtResponse.setSEcho(new Long(request.getParameter("sEcho")));
+      return dtResponse;
+    } else {
+      throw new RestException("Request must specify DataTables parameters.");
+    }
+  }
+
 }

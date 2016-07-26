@@ -49,6 +49,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
@@ -517,7 +519,7 @@ public class Dtos {
     }
     dto.setVolume(from.getVolume());
     dto.setEmpty(from.isEmpty());
-    dto.setLastModified(dateTimeFormatter.print(from.getLastModified().getTime()));
+    dto.setLastModified(getDateAsString(from.getLastModified()));
 
     return dto;
   }
@@ -1159,6 +1161,29 @@ public class Dtos {
     List<RunDto> dtoList = new ArrayList<>();
     for (Run run : runSubset) {
       dtoList.add(asDto(run));
+    }
+    return dtoList;
+  }
+
+  public static ContainerDto asDto(SequencerPartitionContainer<SequencerPoolPartition> from) {
+    ContainerDto dto = new ContainerDto();
+    dto.setId(from.getId());
+    dto.setIdentificationBarcode(from.getIdentificationBarcode());
+    dto.setPlatform(from.getPlatform().getPlatformType().getKey());
+    if (from.getRun() != null) {
+      dto.setLastRunAlias(from.getRun().getAlias());
+      dto.setLastRunId(from.getRun().getId());
+    }
+    if (from.getLastModified() != null) {
+      dto.setLastModified(getDateAsString(from.getLastModified()));
+    }
+    return dto;
+  }
+
+  public static List<ContainerDto> asContainerDtos(Collection<SequencerPartitionContainer<SequencerPoolPartition>> containerSubset) {
+    List<ContainerDto> dtoList = new ArrayList<>();
+    for (SequencerPartitionContainer<SequencerPoolPartition> container : containerSubset) {
+      dtoList.add(asDto(container));
     }
     return dtoList;
   }

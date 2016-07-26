@@ -388,6 +388,12 @@ DELETE FROM `SequencerPartitionContainer`;
 INSERT INTO `SequencerPartitionContainer`(`containerId`, `securityProfile_profileId`, `identificationBarcode`, `locationBarcode`, `platform`, `validationBarcode`, `lastModifier`) 
 VALUES (1,12,'C0JHTACXX','',16,'',1),(2,13,'D0VJ9ACXX','',16,'',1),(3,14,'C075RACXX','',16,'',1),(4,15,'C0KY7ACXX','',16,'',1);
 
+INSERT INTO `SequencerPartitionContainerChangeLog`(`containerId`, `columnsChanged`, `userId`, `message`, `changeTime`)
+VALUES (1, 'validationBarcode', 1, 'NULL -> real', '2016-07-07 13:30:47'),
+(2, 'validationBarcode', 1, 'NULL -> real', '2016-07-07 13:30:49'),
+(3, 'validationBarcode', 1, 'NULL -> real', '2016-07-07 13:30:51'),
+(4, 'validationBarcode', 1, 'NULL -> real', '2016-07-07 13:30:53');
+
 DELETE FROM `SequencingParameters`;
 DELETE FROM `Platform`;
 INSERT INTO `Platform`(`platformId`, `name`, `instrumentModel`, `description`, `numContainers`) 

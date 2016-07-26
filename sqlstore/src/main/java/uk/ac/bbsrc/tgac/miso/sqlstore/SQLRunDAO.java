@@ -604,7 +604,7 @@ public class SQLRunDAO implements RunStore {
   @Override
   public Run getLatestRunIdRunBySequencerPartitionContainerId(long containerId) throws IOException {
     List<Run> eResults = template
-        .query(LATEST_RUN_ID_SELECT_BY_SEQUENCER_PARTITION_CONTAINER_ID, new Object[] { containerId }, new RunMapper(true));
+        .query(LATEST_RUN_ID_SELECT_BY_SEQUENCER_PARTITION_CONTAINER_ID, new Object[] { containerId }, new RunMapper());
     return eResults.size() > 0 ? eResults.get(0) : null;
   }
 

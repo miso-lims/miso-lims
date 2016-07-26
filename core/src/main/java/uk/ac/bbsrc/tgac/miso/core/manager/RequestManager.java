@@ -673,4 +673,17 @@ public interface RequestManager {
   public List<Run> getRunsByPageAndSize(int offset, int limit, String sortDir, String sortCol) throws IOException;
 
   public Long countRunsBySearch(String querystr) throws IOException;
+
+  public Run getLatestRunBySequencerPartitionContainerId(Long containerId) throws IOException;
+
+  public Long countContainers() throws IOException;
+
+  public List<SequencerPartitionContainer<SequencerPoolPartition>> getContainersByPageSizeSearch(int offset, int limit, String querystr,
+      String sortDir, String sortCol) throws IOException;
+
+  public List<SequencerPartitionContainer<SequencerPoolPartition>> getContainersByPageAndSize(int offset, int limit, String sortDir,
+      String sortCol) throws IOException;
+
+  public Long countContainersBySearch(String querystr) throws IOException;
+
 }

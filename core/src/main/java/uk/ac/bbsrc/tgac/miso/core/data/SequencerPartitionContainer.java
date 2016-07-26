@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
@@ -147,5 +148,9 @@ public interface SequencerPartitionContainer<T extends Partition> extends Secura
   public void setLastModifier(User lastModifier);
 
   public Collection<ChangeLog> getChangeLog();
+
+  public Date getLastModified();
+
+  public void setLastModified(Date lastModified);
 
 }
