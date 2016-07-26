@@ -78,12 +78,13 @@
                 <jsSourceFile>multi_select_drag_drop.js</jsSourceFile>
                 <jsSourceFile>menus.js</jsSourceFile>
                 <jsSourceFile>shared_hot.js</jsSourceFile>
+                <jsSourceFile>jquery/datatables/js/jquery.dataTables.min.js</jsSourceFile>
+                <jsSourceFile>datatables_utils.js</jsSourceFile>
               </jsSourceFiles>
               <jsSourceIncludes>
                 <jsSourceInclude>*.js</jsSourceInclude>
               </jsSourceIncludes>
               <jsSourceExcludes>
-                <jsSourceExclude>datatables_utils.js</jsSourceExclude>
                 <jsSourceExclude>natural_sort.js</jsSourceExclude>
                 <jsSourceExclude>xregexp-all-min.js</jsSourceExclude>
                 <jsSourceExclude>runCalendar.js</jsSourceExclude>

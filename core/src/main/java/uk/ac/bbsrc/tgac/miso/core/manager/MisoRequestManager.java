@@ -2899,4 +2899,40 @@ public class MisoRequestManager implements RequestManager {
     }
   }
 
+  @Override
+  public Long countRuns() throws IOException {
+    if (runStore != null) {
+      return runStore.countRuns();
+    } else {
+      throw new IOException("No runStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public List<Run> getRunsByPageSizeSearch(int offset, int limit, String querystr, String sortDir, String sortCol) throws IOException {
+    if (runStore != null) {
+      return runStore.listBySearchOffsetAndNumResults(offset, limit, querystr, sortDir, sortCol);
+    } else {
+      throw new IOException("No runStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public List<Run> getRunsByPageAndSize(int offset, int limit, String sortDir, String sortCol) throws IOException {
+    if (runStore != null) {
+      return runStore.listByOffsetAndNumResults(offset, limit, sortDir, sortCol);
+    } else {
+      throw new IOException("No runStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public Long countRunsBySearch(String querystr) throws IOException {
+    if (runStore != null) {
+      return runStore.countBySearch(querystr);
+    } else {
+      throw new IOException("No runStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
 }

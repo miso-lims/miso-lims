@@ -665,4 +665,12 @@ public interface RequestManager {
   public List<Library> getLibrariesByPageAndSize(int offset, int limit, String sortDir, String sortCol) throws IOException;
 
   public Long countLibrariesBySearch(String querystr) throws IOException;
+
+  public Long countRuns() throws IOException;
+
+  public List<Run> getRunsByPageSizeSearch(int offset, int limit, String querystr, String sortDir, String sortCol) throws IOException;
+
+  public List<Run> getRunsByPageAndSize(int offset, int limit, String sortDir, String sortCol) throws IOException;
+
+  public Long countRunsBySearch(String querystr) throws IOException;
 }
