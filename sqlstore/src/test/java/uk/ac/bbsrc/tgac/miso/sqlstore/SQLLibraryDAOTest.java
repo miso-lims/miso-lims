@@ -7,6 +7,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -32,9 +33,9 @@ import com.eaglegenomics.simlims.core.store.SecurityStore;
 import net.sf.ehcache.CacheManager;
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAdditionalInfoImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
@@ -43,10 +44,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
-import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
+import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
+import uk.ac.bbsrc.tgac.miso.core.store.TagBarcodeStore;
+import uk.ac.bbsrc.tgac.miso.persistence.LibraryAdditionalInfoDao;
 
 public class SQLLibraryDAOTest extends AbstractDAOTest {
 
@@ -54,8 +57,6 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
   @Spy
   private JdbcTemplate jdbcTemplate;
 
-  @Mock
-  private MisoNamingScheme<Run> namingScheme;
   @Mock
   private SecurityStore securityDAO;
   @Mock
@@ -67,18 +68,30 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
   @Mock
   private NoteStore noteStore;
   @Mock
-  private ChangeLogStore changeLogStore;
-  @Mock
   private MisoNamingScheme<Library> libraryNamingSchema;
+  @Mock
+  private TagBarcodeStore tagBarcodeStore;
+  @Mock
+  private SampleStore sampleStore;
+  @Mock
+  private LibraryAdditionalInfoDao libraryAdditionalInfoDao;
+  @Mock
+  private SQLChangeLogDAO changeLogDAO;
 
   @InjectMocks
   private SQLLibraryDAO dao;
 
+  // Auto-increment sequence doesn't roll back with transactions, so must be tracked
+  private static long nextAutoIncrementId = 15L;
+
   @Before
-  public void setup() {
+  public void setup() throws IOException {
     MockitoAnnotations.initMocks(this);
     dao.setJdbcTemplate(jdbcTemplate);
     dao.setDataObjectFactory(new TgacDataObjectFactory());
+    when(tagBarcodeStore.getTagBarcodeById(Matchers.anyLong())).thenReturn(new TagBarcode());
+    when(sampleStore.get(Matchers.anyLong())).thenReturn(new SampleImpl());
+    when(libraryAdditionalInfoDao.getLibraryAdditionalInfoByLibraryId(Matchers.anyLong())).thenReturn(new LibraryAdditionalInfoImpl());
   }
 
   @Test
@@ -105,13 +118,12 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
     when(mockUser.getUserId()).thenReturn(1L);
     library.setLastModifier(mockUser);
 
-    mockAutoIncrement();
+    mockAutoIncrement(nextAutoIncrementId);
     when(libraryNamingSchema.validateField(anyString(), anyString())).thenReturn(true);
     when(libraryNamingSchema.generateNameFor("name", library)).thenReturn(libraryName);
 
     long libraryId = dao.save(library);
     Library insertedLibrary = dao.get(libraryId);
-    assertEquals(15, library.getId());
     assertEquals(libraryName, insertedLibrary.getName());
     assertEquals("theAlias", insertedLibrary.getAlias());
     assertEquals("a description", insertedLibrary.getDescription());
@@ -119,19 +131,12 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
     assertEquals(Long.valueOf(1), library.getLibraryType().getId());
     assertEquals(Long.valueOf(1), library.getLibrarySelectionType().getId());
     assertEquals(Long.valueOf(1), library.getLibraryStrategyType().getId());
+    nextAutoIncrementId++;
   }
 
-  private void mockAutoIncrement() throws Exception {
-    List<Library> samples = dao.listAll();
-    long max = 0;
-    for (Library sample : samples) {
-      if (sample.getId() > max) {
-        max = sample.getId();
-      }
-    }
-    max++;
+  private void mockAutoIncrement(long value) throws Exception {
     Map<String, Object> rs = new HashMap<>();
-    rs.put("Auto_increment", max);
+    rs.put("Auto_increment", value);
     Mockito.doReturn(rs).when(jdbcTemplate).queryForMap(Matchers.anyString());
   }
 
@@ -192,16 +197,16 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
   public void testListByLibraryDilutionId() throws Exception {
 
     List<Library> libraries = dao.listByLibraryDilutionId(9);
-    assertTrue(libraries.size() == 1);
-    assertTrue(9 == libraries.get(0).getId());
+    assertEquals(1, libraries.size());
+    assertEquals(9, libraries.get(0).getId());
   }
 
   @Test
   public void testListBySampleId() throws Exception {
     List<Library> libraries = dao.listBySampleId(1);
 
-    assertTrue(libraries.size() == 1);
-    assertTrue(libraries.get(0).getId() == 1);
+    assertEquals(1, libraries.size());
+    assertEquals(1, libraries.get(0).getId());
 
   }
 
@@ -209,7 +214,7 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
   public void testListByProjectId() throws Exception {
     List<Library> libraries = dao.listByProjectId(1);
     List libraryIds = Arrays.asList(1l, 2l, 3l, 4l, 5l, 6l, 7l, 8l, 9l, 10l, 11l, 12l, 13l, 14l);
-    assertTrue(libraries.size() == 14);
+    assertEquals(14, libraries.size());
     for (Library library : libraries) {
       assertTrue("bad library found", libraryIds.contains(library.getId()));
     }
@@ -219,7 +224,7 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
   public void testListAll() throws Exception {
     List<Library> libraries = dao.listAll();
     List libraryIds = Arrays.asList(1l, 2l, 3l, 4l, 5l, 6l, 7l, 8l, 9l, 10l, 11l, 12l, 13l, 14l);
-    assertTrue(libraries.size() == 14);
+    assertEquals(14, libraries.size());
     for (Library library : libraries) {
       assertTrue("bad library found", libraryIds.contains(library.getId()));
     }
@@ -229,43 +234,112 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
   @Test
   public void testListAllWithLimit() throws Exception {
     List<Library> libraries = dao.listAllWithLimit(5);
-    assertTrue("not within limit", libraries.size() == 5);
+    assertEquals("not within limit", 5, libraries.size());
 
   }
 
   @Test
   public void testCount() throws Exception {
-    int count = dao.count();
-    assertTrue("count incorrect", dao.count() == 14);
+    assertEquals("count incorrect", 14, dao.count());
   }
 
   @Test
   public void testListBySearch() throws Exception {
     String searchStr = "LIB";
     List<Library> libraries = dao.listBySearch(searchStr);
-    assertTrue("did not find all libraries", libraries.size() == 14);
+    assertEquals("did not find all libraries", 14, libraries.size());
   }
 
   @Test
   public void testListBySearch_NoResults() throws Exception {
     String searchStr = "IJOHEWF";
     List<Library> libraries = dao.listBySearch(searchStr);
-    assertTrue("search returned results", libraries.size() == 0);
+    assertEquals("search returned results", 0, libraries.size());
+  }
+
+  @Test
+  public void testListWithLimitAndOffset() throws IOException {
+    assertEquals(3, dao.listByOffsetAndNumResults(5, 3, "ASC", "id").size());
+  }
+
+  @Test
+  public void testCountBySearch() throws IOException {
+    assertEquals(6L, dao.countLibrariesBySearch("LIB1"));
+  }
+
+  @Test
+  public void testCountByEmptySearch() throws IOException {
+    assertEquals(14L, dao.countLibrariesBySearch(""));
+  }
+
+  @Test
+  public void testCountByBadSearch() throws IOException {
+    assertEquals(0L, dao.countLibrariesBySearch("; DROP TABLE Library;"));
+  }
+
+  @Test
+  public void testListBySearchWithLimit() throws IOException {
+    List<Library> libraries = dao.listBySearchOffsetAndNumResults(2, 3, "Bn_R", "desc", "lastModified");
+    assertEquals(3, libraries.size());
+    assertEquals(10L, libraries.get(0).getId());
+  }
+
+  @Test
+  public void testListByIlluminaBadSearchWithLimit() throws IOException {
+    List<Library> libraries = dao.listBySearchOffsetAndNumResults(5, 3, "; DROP TABLE Library;", "asc", "id");
+    assertEquals(0L, libraries.size());
+  }
+
+  @Test
+  public void testListOffsetBadSortDir() throws IOException {
+    List<Library> libraries = dao.listByOffsetAndNumResults(5, 3, "BARK", "id");
+    assertEquals(3, libraries.size());
+  }
+
+  @Test(expected = IOException.class)
+  public void testListIlluminaOffsetBadLimit() throws IOException {
+    dao.listByOffsetAndNumResults(5, -3, "asc", "id");
+  }
+
+  @Test
+  public void testListOffsetThreeWithThreeLibsPerPageOrderLastMod() throws IOException {
+    List<Library> libraries = dao.listByOffsetAndNumResults(3, 3, "desc", "lastModified");
+    assertEquals(3, libraries.size());
+    assertEquals(11, libraries.get(0).getId());
   }
 
   @Test
   public void testRemove() throws Exception {
     dao.setCascadeType(CascadeType.ALL);
-    Library library = dao.get(3);
-
-    CacheManager cacheManager = mock(CacheManager.class);
-    when(cacheManager.getCache(Matchers.anyString())).thenReturn(null);
+    CacheManager cacheManager = null;
     dao.setCacheManager(cacheManager);
 
-    boolean remove = dao.remove(library);
-    assertTrue("library did not remove successfully", remove);
-    Library library1 = dao.get(3);
-    assertTrue("library did not remove successfully", library1 == null);
+    Library library = new LibraryImpl();
+    String libraryName = "LIB111";
+    library.setName(libraryName);
+    library.setAlias("libraryAlias");
+    library.setDescription("test");
+    library.setSample(new SampleImpl());
+    library.setPaired(true);
+    library.setLibraryType(dao.getLibraryTypeById(1L));
+    library.setLibrarySelectionType(dao.getLibrarySelectionTypeById(1L));
+    library.setLibraryStrategyType(dao.getLibraryStrategyTypeById(1L));
+    User mockUser = Mockito.mock(User.class);
+    when(mockUser.getUserId()).thenReturn(1L);
+    library.setLastModifier(mockUser);
+
+    mockAutoIncrement(nextAutoIncrementId);
+    when(libraryNamingSchema.generateNameFor("name", library)).thenReturn(libraryName);
+    when(libraryNamingSchema.validateField("name", library.getName())).thenReturn(true);
+    when(libraryNamingSchema.validateField("alias", library.getAlias())).thenReturn(true);
+
+    long libraryId = dao.save(library);
+    Library insertedLibrary = dao.get(libraryId);
+
+    assertNotNull(insertedLibrary);
+    assertTrue(dao.remove(insertedLibrary));
+    Mockito.verify(changeLogDAO, Mockito.times(1)).deleteAllById("Library", insertedLibrary.getId());
+    nextAutoIncrementId++;
   }
 
   @Test
@@ -339,20 +413,20 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
   @Test
   public void testListAllLibraryTypes() throws Exception {
     List<LibraryType> libraryTypes = dao.listAllLibraryTypes();
-    assertTrue(17 == libraryTypes.size());
+    assertEquals(18, libraryTypes.size());
 
   }
 
   @Test
   public void testListAllLibrarySelectionTypes() throws Exception {
     List<LibrarySelectionType> librarySelectionTypes = dao.listAllLibrarySelectionTypes();
-    assertTrue(25 == librarySelectionTypes.size());
+    assertEquals(25, librarySelectionTypes.size());
   }
 
   @Test
   public void testListAllLibraryStrategyTypes() throws Exception {
     List<LibraryStrategyType> libraryStrategyTypes = dao.listAllLibraryStrategyTypes();
-    assertTrue(20 == libraryStrategyTypes.size());
+    assertEquals(20, libraryStrategyTypes.size());
   }
 
 }

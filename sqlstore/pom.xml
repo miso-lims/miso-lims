@@ -28,7 +28,7 @@
   <parent>
     <artifactId>miso</artifactId>
     <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-    <version>0.2.19</version>
+    <version>0.2.19-SNAPSHOT</version>
   </parent>
 
   <artifactId>sqlstore</artifactId>
@@ -267,6 +267,10 @@
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-core</artifactId>
       <version>${hibernate.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>joda-time</groupId>
+      <artifactId>joda-time</artifactId>
     </dependency>
   </dependencies>
   <properties>

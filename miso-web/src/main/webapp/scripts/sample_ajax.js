@@ -116,6 +116,23 @@ var Sample = Sample || {
       jQuery('#sampleClass').attr('class', 'form-control');
       jQuery('#sampleClass').attr('data-parsley-required', 'true');
       
+      // Concentration validation
+      jQuery('#concentration').attr('class', 'form-control');
+      jQuery('#concentration').attr('data-parsley-type', 'number');
+        
+      // Group ID validation
+      jQuery('#groupId').attr('class', 'form-control');
+      jQuery('#groupId').attr('data-parsley-type', 'integer');
+      
+      // Group Description validation
+      jQuery('#groupDescription').attr('class', 'form-control');
+      jQuery('#groupDescription').attr('data-parsley-maxlength', '255');
+      jQuery('#groupDescription').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+      
+      // Cellularity validation
+      jQuery('#cellularity').attr('class', 'form-control');
+      jQuery('#cellularity').attr('data-parsley-type', 'integer');
+      
       // TissueOrigin validation
       jQuery('#tissueOrigin').attr('class', 'form-control');
       jQuery('#tissueOrigin').attr('data-parsley-required', 'true');
@@ -143,37 +160,45 @@ var Sample = Sample || {
       jQuery('#tubeNumber').attr('data-parsley-required', 'true');
       jQuery('#tubeNumber').attr('data-parsley-type', 'integer');
       
-      // Concentration validation
-      jQuery('#concentration').attr('class', 'form-control');
-      jQuery('#concentration').attr('data-parsley-type', 'number');
-      
-      var selectedId = jQuery('#sampleClass option:selected').val();
+      var selectedId = jQuery('#sampleClass').is('select') ? jQuery('#sampleClass option:selected').val() : jQuery('#sampleClass').val();
       var sampleCategory = Sample.options.getSampleCategoryByClassId(selectedId);
+      // assign sample class alias based on whether text or dropdown menu are present
+      var sampleClassAlias = '';
+      if (jQuery('#sampleClassAlias')) sampleClassAlias = jQuery('#samplClassAlias');
+      if (jQuery('#sampleClass').children(':selected').text()) sampleClassAlias = jQuery('#sampleClass').children(':selected').text();
       switch (sampleCategory) {
-      case 'Tissue':
-        // Cellularity validation
-        jQuery('#cellularity').attr('class', 'form-control');
-        jQuery('#cellularity').attr('data-parsley-type', 'integer');
+      case 'Tissue Processing':
+        switch (sampleClassAlias) {
+        case 'CV Slide':
+          // Cuts validation
+          jQuery('#cuts').attr('class', 'form-control');
+          jQuery('#cuts').attr('data-parsley-type', 'digits');
+          jQuery('#cuts').attr('data-parsley-required', 'true');
+
+          // Discards validation
+          jQuery('#discards').attr('class', 'form-control');
+          jQuery('#discards').attr('data-parsley-type', 'digits');
+          jQuery('#discards').attr('data-parsley-required', 'true');
+
+          // Thickness validation
+          jQuery('#thickness').attr('class', 'form-control');
+          jQuery('#thickness').attr('data-parsley-type', 'number');
+          break;
+        case 'LCM Tube':
+          jQuery('#cutsConsumed').attr('class', 'form-control');
+          jQuery('#cutsConsumed').attr('data-parsley-type', 'digits');
+          break;
+        }
         break;
-      case 'Analyte':
+      case 'Stock':
         // Region validation
         jQuery('#region').attr('class', 'form-control');
         jQuery('#region').attr('data-parsley-maxlength', '255');
         jQuery('#region').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
         
-        // TubeId validation
-        jQuery('#tubeId').attr('class', 'form-control');
-        jQuery('#tubeId').attr('data-parsley-maxlength', '255');
-        jQuery('#tubeId').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
-        
-        // Group ID validation
-        jQuery('#groupId').attr('class', 'form-control');
-        jQuery('#groupId').attr('data-parsley-type', 'integer');
-        
-        // Group Description validation
-        jQuery('#groupDescription').attr('class', 'form-control');
-        jQuery('#groupDescription').attr('data-parsley-maxlength', '255');
-        jQuery('#groupDescription').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+        // TissueClass validation
+        jQuery('#tissueClass').attr('class', 'form-control');
+        jQuery('#tissueClass').attr('data-parsley-required', 'true');
         break;
       }
     }
@@ -694,46 +719,55 @@ Sample.ui = {
     return jQuery('#subProject option:selected').val() || jQuery('#subProject').val();
   },
   
+  /**
+   * Update display when user selects different sample classes during new sample receipt
+   */
   sampleClassChanged: function() {
     var selectedId = jQuery('#sampleClass option:selected').val();
     var sampleCategory = Sample.options.getSampleCategoryByClassId(selectedId);
+    jQuery('#sampleCategory').val(sampleCategory);
     switch (sampleCategory) {
-    case 'Tissue':
-      Sample.ui.setUpForTissue();
+    case 'Aliquot':
+      Sample.ui.setUpForAliquot();
       break;
-    case 'Analyte':
-      Sample.ui.setUpForAnalyte();
+    case 'Stock':
+      Sample.ui.setUpForStock();
       break;
     default:
-      // Identity (can't create), Tissue Processing (no additional fields), or no SampleClass selected 
-      Sample.ui.hideTissueFields();
-      Sample.ui.hideAnalyteFields();
+      Sample.ui.setUpForTissue();
       break;
     }
   },
   
-  hideTissueFields: function() {
-    jQuery('#detailedSampleTissue').find(':input').each(function() {
-      jQuery(this).val('');
-    });
-    jQuery('#detailedSampleTissue').hide();
-  },
-  
-  hideAnalyteFields: function() {
-    jQuery('#detailedSampleAnalyte').find(':input').each(function() {
-      jQuery(this).val('');
-    });
-    jQuery('#detailedSampleAnalyte').hide();
-  },
-  
   setUpForTissue: function() {
-    Sample.ui.hideAnalyteFields();
+    jQuery('#detailedSampleAliquot').find(':input').each(function() {
+      jQuery(this).val('');
+    });
+    jQuery('#detailedSampleStock').find(':input').each(function() {
+      jQuery(this).val('');
+    });
+    jQuery('#detailedSampleAliquot').hide();
+    jQuery('#detailedSampleStock').hide();
+    jQuery('#tissueClassRow').hide();
+    jQuery('#tissueClass').val('');
     jQuery('#detailedSampleTissue').show();
   },
   
-  setUpForAnalyte: function() {
-    Sample.ui.hideTissueFields();
-    jQuery('#detailedSampleAnalyte').show();
+  setUpForAliquot: function() {
+    jQuery('#detailedSampleStock').find(':input').each(function() {
+      jQuery(this).val('');
+    });
+    jQuery('#tissueClassRow').show();
+    jQuery('#detailedSampleAliquot').show();
+    jQuery('#detailedSampleStock').hide();
+  },
+   setUpForStock: function() {
+    jQuery('#detailedSampleAliquot').find(':input').each(function() {
+      jQuery(this).val('');
+    });
+    jQuery('#tissueClassRow').show();
+    jQuery('#detailedSampleStock').show();
+    jQuery('#detailedSampleAliquot').hide();
   },
   
   editSampleIdBarcode: function (span, id) {
@@ -971,7 +1005,13 @@ Sample.ui = {
   },
 
   createListingSamplesTable: function () {
+    if (Sample.detailedSample && Sample.sampleClasses === undefined) {
+      Sample.ui.getSampleClasses();
+      Sample.ui.getSampleValidRelationships();
+    }
     jQuery('#listingSamplesTable').html("<img src='../styles/images/ajax-loader.gif'/>");
+
+    jQuery('#listingSamplesTable').html('');
     jQuery.fn.dataTableExt.oSort['no-sam-asc'] = function (x, y) {
       var a = parseInt(x.replace(/^SAM/i, ""));
       var b = parseInt(y.replace(/^SAM/i, ""));
@@ -982,64 +1022,139 @@ Sample.ui = {
       var b = parseInt(y.replace(/^SAM/i, ""));
       return ((a < b) ? 1 : ((a > b) ? -1 : 0));
     };
-    Fluxion.doAjax(
-      'sampleControllerHelperService',
-      'listSamplesDataTable',
-      {
-        'url': ajaxurl
-      },
-      {
-        'doOnSuccess': function (json) {
-          jQuery('#listingSamplesTable').html('');
-          jQuery('#listingSamplesTable').dataTable({
-            "aaData": json.array,
-            "aoColumns": [
-              { "sTitle": "Bulk Edit"},
-              { "sTitle": "Sample Name", "sType": "no-sam"},
-              { "sTitle": "Alias"},
-              { "sTitle": "Type"},
-              { "sTitle": "QC Passed"},
-              { "sTitle": "QC Result"},
-              { "sTitle": "ID", "bVisible": false}
-            ],
-            "bJQueryUI": true,
-            "bAutoWidth": false,
-            "iDisplayLength": 25,
-            "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>',
-            "aaSorting": [
-              [1, "desc"]
-            ]
-          });
-          jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
-          jQuery("#toolbar").append("<button style=\"margin-left:5px;\" onclick=\"window.location.href='/miso/sample/new';\" class=\"fg-button ui-state-default ui-corner-all\">Add Sample</button>");
-  
-          jQuery("input[class='bulkCheckbox']").click(function () {
-            if (jQuery(this).parent().parent().hasClass('row_selected')) {
-              jQuery(this).parent().parent().removeClass('row_selected');
-            } else if (!jQuery(this).parent().parent().hasClass('row_selected')) {
-              jQuery(this).parent().parent().addClass('row_selected');
-            }
-          });
-  
-          var selectAll = '<label><input type="checkbox" onchange="Sample.ui.checkAll(this)" id="checkAll">Select All</label>';
-          document.getElementById('listingSamplesTable').insertAdjacentHTML('beforebegin', selectAll);
-          
-          var actions = ['<select id="dropdownActions" onchange="Sample.ui.checkForPropagate(this);"><option value="">-- Bulk actions</option>'];
-          actions.push('<option value="update">Update selected</option>');
-          actions.push('<option value="propagateSams">Propagate (sample) selected</option>');
-          actions.push('<option value="propagateLibs">Propagate (library) selected</option>');
-          actions.push('<option value="empty">Empty selected</option>');
-          actions.push('<option value="archive">Archive selected</option>');
-          actions.push('</select>');
-          document.getElementById('listingSamplesTable').insertAdjacentHTML('afterend', actions.join(''));
-          var goButton = '<div id="classOptions"></div><button id="go" type="button" onclick="Sample.ui.handleBulkAction();">Go</button>';
-          document.getElementById('dropdownActions').insertAdjacentHTML('afterend', goButton);
-          if (Sample.detailedSample) Sample.ui.getSampleClasses();
+    jQuery('#listingSamplesTable').dataTable({
+      "aoColumns": [
+        {
+          "sTitle": "",
+          "mData": "id",
+          "mRender": function (data, type, full) {
+            return "<input type=\"checkbox\" value=\"" + data + "\" class=\"bulkCheckbox\" id=\"bulk_" + data + "\">"
+          },
+          "bSortable": false
+        },
+        {
+          "sTitle": "Sample Name",
+          "sType": "no-sam",
+          "mData": "name",
+          "mRender": function (data, type, full) {
+            return "<a href=\"/miso/sample/" + full.id + "\">" + data + "</a>";
+          }
+        },
+        {
+          "sTitle": "Alias",
+          "mData": "alias",
+          "mRender": function (data, type, full) {
+            return "<a href=\"/miso/sample/" + full.id + "\">" + data + "</a>";
+          }
+        },
+        (Sample.detailedSample ? {
+          "sTitle": "Sample Class",
+          "mData": "sampleClassId",
+          "mRender": function (data, type, full) {
+            return Hot.getAliasFromId(data, Sample.sampleClasses) || "Plain";
+          },
+          "bVisible": (Sample.detailedSample? "true" : "false")
+        } : null),
+        {
+          "sTitle": "Type",
+          "mData": "sampleType"
+        },
+        {
+          "sTitle": "QC Passed",
+          "mData": "qcPassed",
+          "mRender": function (data, type, full) {
+            return (data ? data : "Unknown");
+          }
+        },
+        {
+          "sTitle": "QC Result",
+          "mData": "id"
+        },
+        {
+          "sTitle": "Last Updated",
+          "mData": "lastModified",
+          "bVisible": (Sample.detailedSample ? "true" : "false")
+        },
+        {
+          "sTitle": "ID",
+          "mData": "identificationBarcode",
+          "bVisible": false
         }
+      ].filter(function(x) { return x; }),
+      "bJQueryUI": true,
+      "bAutoWidth": false,
+      "iDisplayLength": 25,
+      "iDisplayStart": 0,
+      "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>',
+      "aaSorting": [
+        [(Sample.detailedSample ? 7 : 1), "desc"]
+      ],
+      "sPaginationType": "full_numbers",
+      "bProcessing": true,
+      "bServerSide": true,
+      "sAjaxSource": "/miso/rest/tree/samples/dt",
+      "fnServerData": function (sSource, aoData, fnCallback) {
+        jQuery('#listingSamplesTable').addClass('disabled');
+        jQuery.ajax({
+          "dataType": "json",
+          "type": "GET",
+          "url": sSource,
+          "data": aoData,
+          "success": fnCallback // Do not alter this DataTables property
+        });
+      },
+      "fnDrawCallback": function (oSettings) {
+        jQuery('#listingSamplesTable').removeClass('disabled');
+      },
+      "fnRowCallback": function(nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+        Fluxion.doAjax(
+          'sampleControllerHelperService',
+          'getSampleLastQCRequest',
+          {
+            'sampleId': aData.id,
+            'url': ajaxurl
+          },{
+            'doOnSuccess': function (json) {
+              jQuery('td:eq(6)', nRow).html(json.response);
+            }
+          }
+        );
       }
-    );
+    }).fnSetFilteringDelay();
+    jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
+    jQuery("#toolbar").append("<button style=\"margin-left:5px;\" onclick=\"window.location.href='/miso/sample/new';\" class=\"fg-button ui-state-default ui-corner-all\">Add Sample</button>");
+
+    jQuery("input[class='bulkCheckbox']").click(function () {
+      if (jQuery(this).parent().parent().hasClass('row_selected')) {
+        jQuery(this).parent().parent().removeClass('row_selected');
+      } else if (!jQuery(this).parent().parent().hasClass('row_selected')) {
+        jQuery(this).parent().parent().addClass('row_selected');
+      }
+    });
+
+    var selectAll = '<label><input type="checkbox" onchange="Sample.ui.checkAll(this)" id="checkAll">Select All</label>';
+    document.getElementById('listingSamplesTable').insertAdjacentHTML('beforebegin', selectAll);
+
+    var actions = ['<select id="dropdownActions" onchange="Sample.ui.checkForPropagate(this);"><option value="">-- Bulk actions</option>'];
+    actions.push('<option value="update">Update selected</option>');
+    if (Sample.detailedSample) {
+      actions.push('<option value="propagateSams">Propagate (sample) selected</option>');
+    }
+    actions.push('<option value="propagateLibs">Propagate (library) selected</option>');
+    if (Sample.detailedSample) {
+      actions.push('<option value="empty">Empty selected</option>');
+      actions.push('<option value="archive">Archive selected</option>');
+    }
+    actions.push('</select>');
+    document.getElementById('listingSamplesTable').insertAdjacentHTML('afterend', actions.join(''));
+    document.getElementById('dropdownActions').insertAdjacentHTML('afterend', '<div id="errors" class="parsley-error" ></div>');
+    var goButton = '<div id="classOptions"></div><button id="go" type="button" onclick="Sample.ui.handleBulkAction();">Go</button>';
+    document.getElementById('dropdownActions').insertAdjacentHTML('afterend', goButton);
   },
   
+  /**
+   * Check all boxes to select all samples.
+   */
   checkAll: function (el) {
     var checkboxes = document.getElementsByClassName('bulkCheckbox');
     if (el.checked) {
@@ -1053,10 +1168,21 @@ Sample.ui = {
     }
   },
   
+  /**
+   * Fires on action dropdown's onchange event. Assesses which element was selected and does more processing
+   * if propagate actions were selected.
+   */
   checkForPropagate: function (el) {
+    jQuery('#errors').hide();
+    Sample.selectedIdsArray = Sample.ui.getSelectedIds();
+    if (Sample.selectedIdsArray.length === 0) {
+      alert("Please select one or more Samples.");
+      return false;
+    }
+    if (jQuery('#classDropdown')) jQuery('#classDropdown').hide();
     var selectedValue = el.options[el.selectedIndex].value;
     if (selectedValue == 'propagateSams') {
-      Sample.ui.insertSampleClassesDropdown();
+      Sample.ui.insertSampleClassDropdown();
     } else if (selectedValue == 'propagateLibs') {
       Sample.ui.insertLibraryDesignDropdown();
     } else {
@@ -1064,6 +1190,9 @@ Sample.ui = {
     }
   },
   
+  /**
+   * Handle bulk action after user clicks "GO" button
+   */
   handleBulkAction: function () {
     var selectedValue = document.getElementById('dropdownActions').value;
     var options = {
@@ -1077,50 +1206,78 @@ Sample.ui = {
     action();
   },
   
-  // get array of selected IDs
+  /**
+   * Returns an array of selected IDs
+   */
   getSelectedIds: function () {
     return [].slice.call(document.getElementsByClassName('bulkCheckbox'))
              .filter(function (input) { return input.checked; })
-             .map(function (input) { return input.value; });
+             .map(function (input) { return parseInt(input.value); });
   },
   
+  /**
+   * Bulk edit selected samples after GO button is clicked.
+   */
   updateSelectedItems: function () {
-    var selectedIdsArray = Sample.ui.getSelectedIds();
-    if (selectedIdsArray.length === 0) {
-      alert("Please select one or more Samples to update.");
+    var cats = Sample.ui.getUniqueCategoriesForSelected();
+    if (!Sample.detailedSample || cats.length === 1) {
+      if (cats[0] == 'Tissue Processing') {
+        // requires special consideration as not all Tissue Processing sample classes require the same columns
+        var classes = Sample.ui.getSampleClassesForSelected().map(function (sc) {
+          return sc.alias;
+        });
+        if (Sample.ui.getUniqueValues(classes).length > 1 && (classes.indexOf("LCM Tube") != -1 || classes.indexOf("CV Slide") != -1)) {
+          // An ugly check which indicates that more than two Tissue Processing classes have been requested,
+          // and they include LCM Tubes or CV Slides (each of which requires a specific set of columns) plus something else.
+          // (Though it should be fine to edit Curls and H E Slides together, as they have no data specific to this class.
+          // In other words, the selected items require more than one set of columns.
+          jQuery('#errors').html("Tissue Processing sample classes cannot be mixed -- you can only edit LCM Tubes with other "
+              + "LCM Tubes, or CV Slides with other CV Slides. You cannot edit LCM Tubes and CV Slides together.");
+          jQuery('#errors').css('display', 'block');
+          return false;
+        }
+      }
+      window.location="sample/bulk/edit/" + Sample.selectedIdsArray.join(',');
+    } else {
+      Sample.ui.displayMultipleCategoriesError();
       return false;
     }
-    window.location="sample/bulk/edit/" + selectedIdsArray.join(',');
   },
 
-  // TODO: fix this up to work with plain samples
-  // TODO: add some logic in here for SampleValidRelationships
+  /**
+   * Action after GO button is clicked.
+   */
   propagateSamSelectedItems: function () {
     var selectedClassId = document.getElementById('classDropdown').value;
-    var selectedIdsArray = Sample.ui.getSelectedIds();
-    if (selectedIdsArray.length === 0) {
-      alert("Please select one or more Samples to propagate.");
+    if (!selectedClassId) {
+      jQuery('#errors').html("Please select a sample class for child samples.");
+      jQuery('#errors').css('display', 'block');
       return false;
     }
-    window.location="sample/bulk/create/" + selectedIdsArray.join(',') + "&scid=" + selectedClassId;
+    window.location="sample/bulk/create/" + Sample.selectedIdsArray.join(',') + "&scid=" + selectedClassId;
   },
   
+  /**
+   * Create new libraries from the selected samples
+   */
   propagateLibSelectedItems: function () {
-    var selectedIdsArray = Sample.ui.getSelectedIds();
-    if (selectedIdsArray.length === 0) {
-      alert("Please select one or more Samples to propagate.");
-      return false;
+    jQuery('#go').attr('disabled', 'disabled');
+    if (Sample.detailedSample) {
+      // rejects propagation if samples are not of aliquot category
+      // TODO: add a more detailed check, or library designs?
+      var category = Sample.ui.getUniqueCategoriesForSelected();
+      if (category.length != 1 && category[0] !== 'Aliquot') {
+        jQuery('#errors').html("Identity, Tissue, Tissue Processing, and Stock samples cannot be propagated to libraries.");
+        jQuery('#errors').css('display', 'block');
+        return false;
+      }
     }
-    window.location="library/bulk/propagate/" + selectedIdsArray.join(',');
+    window.location="library/bulk/propagate/" + Sample.selectedIdsArray.join(',');
   },
   
-  // TODO: finish this, and the one in library_ajax.js
+  // TODO: finish this, and the one in library_ajax.js . This will require writing the controller and db methods...
   emptySelectedItems: function () {
-    var selectedIdsArray = Sample.ui.getSelectedIds();
-    if (selectedIdsArray.length === 0) {
-      alert("Please select one or more Samples to empty.");
-      return false;
-    }
+    Sample.selectedIdsArray;
     var cageDiv = '<div id="cageDialog"><span class="dialog">Look for this feature in the next release!<br>' 
                   + '<img src="http://images.mentalfloss.com/sites/default/files/styles/insert_main_wide_image/public/tumblr_m3fc1bghyt1rq84v4o1_1280.png"/></span></div>';
     document.getElementById('go').insertAdjacentHTML('afterend', cageDiv);
@@ -1135,13 +1292,9 @@ Sample.ui = {
     });
   },
   
-  // TODO: finish this, and the one in library_ajax.js
+  // TODO: finish this, and the one in library_ajax.js . This will require writing the controller and db methods...
   archiveSelectedItems: function () {
-    var selectedIdsArray = Sample.ui.getSelectedIds();
-    if (selectedIdsArray.length === 0) {
-      alert("Please select one or more Samples to archive.");
-      return false;
-    }
+    Sample.selectedIdsArray;
     var cageDiv = '<div id="cageDialog"><span class="dialog">Look for this feature in the next release!<br>' 
       + '<img src="http://dorkshelf.com/wordpress/wp-content/uploads//2012/02/Raising-Arizona-Nicolas-Cage-2.jpg"/></span></div>';
     document.getElementById('go').insertAdjacentHTML('afterend', cageDiv);
@@ -1155,32 +1308,138 @@ Sample.ui = {
       }
     });
   },
-  
-  getSampleClasses: function () {
-    var xhr = new XMLHttpRequest();
-    xhr.onreadystatechange = function () {
-      if (xhr.readyState === XMLHttpRequest.DONE) {
-        xhr.status == 200 ? (Sample.sampleClasses = JSON.parse(xhr.responseText)) : console.log(xhr);
-      }
-    };
-    xhr.open('GET', '/miso/rest/sampleclasses');
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.send();
+
+  /**
+   * Returns an array of sample classes associated with selected samples
+   */
+  getSampleClassesForSelected: function () {
+    var selectedIds = Sample.ui.getSelectedIds();
+    
+    // get unique sample class IDs
+    var selectedSampleClasses = jQuery('#listingSamplesTable').dataTable().fnGetData().filter(function (row) {
+      return selectedIds.indexOf(row.id) != -1;
+    }).map(function (dtRow) {
+      return Sample.sampleClasses.filter(function (sc) {
+        return sc.id == dtRow.sampleClassId;
+      });
+    });
+    selectedSampleClasses = [].concat.apply([], selectedSampleClasses);
+    return selectedSampleClasses;
+  },
+
+  /**
+   * Returns an array of unique sample categories for selected samples
+   */
+  getUniqueCategoriesForSelected: function () {
+    var categories =  Sample.ui.getSampleClassesForSelected().map(function (sc) {
+      return sc.sampleCategory;
+    });
+    
+    return Sample.ui.getUniqueValues(categories);
   },
   
-  insertSampleClassesDropdown: function () {
-    var classes = Sample.sampleClasses.sort(function(a, b) {
-        return a.id > b.id ? 1 : ((b.id > a.id) ? -1 : 0);
+  /**
+   * Display the error message for multiple categories selected
+   */
+  displayMultipleCategoriesError: function () {
+    var categories = Sample.ui.getUniqueCategoriesForSelected();
+    jQuery('#errors').html("You have selected samples of category " + categories.join(" & ") 
+        + ". Please select samples from only one category.");
+    jQuery('#errors').css('display', 'block');
+  },
+
+  /**
+   * Adds the child sample classes dropdown to the UI after filtering through SampleValidRelationships for relevant SVRs
+   */
+  insertSampleClassDropdown: function () {
+    jQuery('#go').attr('disabled', 'disabled');   
+    if (Sample.ui.getUniqueCategoriesForSelected().length == 1) {
+      var classes = Sample.ui.getChildSampleClasses(Sample.ui.selectValidRelationships());
+      var select = [];
+      select.push('<select id="classDropdown">');
+      select.push('<option value="">-- Select child class</option>');
+      for (var i=0; i<classes.length; i++) {
+        select.push('<option value="'+ classes[i].id +'">'+ classes[i].alias +'</option>');
+      }
+      select.push('</select>');
+      document.getElementById('classOptions').innerHTML = select.join('');
+      document.getElementById('classDropdown').addEventListener('change', function() {
+        // hide error message if user has solved error by selecting a sample class
+        var scId = document.getElementById('classDropdown').value;
+        if (scId && jQuery('#errors').css('display') == 'block') {
+          jQuery('#errors').css('display', 'none');
+        }
       });
-    var select = [];
-    select.push('<select id="classDropdown">');
-    select.push('<option value="">-- Select child class</option>');
-    for (var i=0; i<classes.length; i++) {
-      if (classes[i].alias == "Identity" || classes[i].sampleCategory == "Tissue") continue;
-      select.push('<option value="'+ classes[i].id +'">'+ classes[i].alias +'</option>');
+      jQuery('#go').removeAttr('disabled');
+    } else {
+      Sample.ui.displayMultipleCategoriesError();
+      return false;
     }
-    select.push('</select>');
-    document.getElementById('classOptions').innerHTML = select.join('');
+  },
+  /**
+   * Returns an array of sample classes that correspond to given sample class IDs (for child samples)
+   */
+  getChildSampleClasses: function (sampleClassIDs) {
+    return Sample.sampleClasses.filter(function (sc) {
+      return sampleClassIDs.indexOf(sc.id) != -1;
+    });
+  },
+  
+  /**
+   * Returns an array of SampleValidRelationships objects. Each SVR can be parented to at least one selected sample.
+   */
+  selectValidRelationships: function  () {
+    // get unique sample class IDs
+    var selectedSCIDs = Sample.ui.getSampleClassesForSelected().map(function (sc) {
+        return sc.id;
+      });
+    selectedSCIDs = Sample.ui.getUniqueValues(selectedSCIDs);
+
+    // get unique sample class IDs of children that can be parented to sample classes of the selected samples
+    var permittedChildSCIDs = Sample.validRelationships.filter(function (svr) {
+      return selectedSCIDs.indexOf(svr.parentId) != -1;
+    }).map(function (svr) {
+      return svr.childId;
+    });
+    return Sample.ui.getUniqueValues(permittedChildSCIDs);
+  },
+
+  /**
+   * Returns an array of unique members of array parameter. Does not work with objects as array parameter members.
+   */
+  getUniqueValues: function (valueSet) {
+    if (valueSet.constructor !== Array) return valueSet;
+    var dict = {}, uniques = [];
+    for (var i = 0; i < valueSet.length; i++) {
+      if (!dict[valueSet[i]]) {
+        dict[valueSet[i]] = true;
+        uniques.push(valueSet[i]);
+      }
+    }
+    return uniques;
+  },
+
+  /**
+   * AJAX fetch of sample classes
+   */
+  getSampleClasses: function () {
+    jQuery.get('/miso/rest/sampleclasses',
+      function (json) { 
+        Sample.sampleClasses = json; 
+      }
+    );
+  },
+
+  /**
+   * AJAX fetch of sample valid relationships
+   */
+  getSampleValidRelationships: function () {
+    jQuery.get(
+     '/miso/rest/samplevalidrelationships',
+      function (json) { 
+        Sample.validRelationships = json; 
+      }
+    );
   },
   
   // TODO: add library propagation rule-checking here
@@ -1189,6 +1448,9 @@ Sample.ui = {
   }
 };
 
+/**
+ * Catches and logs errors.
+ */
 window.addEventListener('error', function (e) {
   var error = e.error;
   console.log(error);

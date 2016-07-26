@@ -7,6 +7,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 
 public interface LibraryDesignDao {
 
+  /**
+   * @return a list of all LibraryDesigns
+   */
+  List<LibraryDesign> getLibraryDesigns();
+  
   List<LibraryDesign> getLibraryDesignByClass(SampleClass sampleClass);
 
   LibraryDesign getLibraryDesign(Long id);

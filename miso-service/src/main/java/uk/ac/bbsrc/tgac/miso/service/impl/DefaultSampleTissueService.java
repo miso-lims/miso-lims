@@ -1,25 +1,24 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
-import uk.ac.bbsrc.tgac.miso.dto.Dtos;
-import uk.ac.bbsrc.tgac.miso.dto.SampleTissueDto;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleTissueDao;
+import uk.ac.bbsrc.tgac.miso.persistence.TissueOriginDao;
+import uk.ac.bbsrc.tgac.miso.persistence.TissueTypeDao;
+import uk.ac.bbsrc.tgac.miso.service.LabService;
 import uk.ac.bbsrc.tgac.miso.service.SampleTissueService;
+import uk.ac.bbsrc.tgac.miso.service.TissueMaterialService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 @Transactional(rollbackFor = Exception.class)
@@ -32,14 +31,14 @@ public class DefaultSampleTissueService implements SampleTissueService {
   private SecurityManager securityManager;
   @Autowired
   private AuthorizationManager authorizationManager;
-
-  @Override
-  public Long create(SampleTissue sampleTissue) throws IOException {
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    sampleTissue.setCreatedBy(user);
-    sampleTissue.setUpdatedBy(user);
-    return sampleTissueDao.addSampleTissue(sampleTissue);
-  }
+  @Autowired
+  private TissueOriginDao tissueOriginDao;
+  @Autowired
+  private TissueTypeDao tissueTypeDao;
+  @Autowired
+  private LabService labService;
+  @Autowired
+  private TissueMaterialService tissueMaterialService;
 
   @Override
   public void delete(Long sampleTissueId) {
@@ -73,33 +72,45 @@ public class DefaultSampleTissueService implements SampleTissueService {
     this.securityManager = securityManager;
   }
 
-  @Override
-  public void update(SampleTissue sampleTissue) throws IOException {
-    SampleTissue updatedSampleTissue = get(sampleTissue.getId());
-    applyChanges(updatedSampleTissue, sampleTissue);
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    updatedSampleTissue.setUpdatedBy(user);
-    sampleTissueDao.update(updatedSampleTissue);
+  public void setTissueOriginDao(TissueOriginDao tissueOriginDao) {
+    this.tissueOriginDao = tissueOriginDao;
+  }
+
+  public void setTissueTypeDao(TissueTypeDao tissueTypeDao) {
+    this.tissueTypeDao = tissueTypeDao;
+  }
+
+  public void setLabService(LabService labService) {
+    this.labService = labService;
   }
 
   @Override
-  public void applyChanges(SampleTissue target, SampleTissue source) {
-    target.setCellularity(source.getCellularity());
+  public void loadMembers(SampleTissue target, SampleTissue source) throws IOException {
+    if (source.getTissueOrigin() != null) {
+      target.setTissueOrigin(tissueOriginDao.getTissueOrigin(source.getTissueOrigin().getId()));
+      ServiceUtils.throwIfNull(target.getTissueOrigin(), "SampleAdditionalInfo.tissueOriginId", source.getTissueOrigin().getId());
+    }
+    if (source.getTissueType() != null) {
+      target.setTissueType(tissueTypeDao.getTissueType(source.getTissueType().getId()));
+      ServiceUtils.throwIfNull(target.getTissueType(), "SampleAdditionalInfo.tissueTypeId", source.getTissueType().getId());
+    }
+    if (source.getLab() != null) {
+      target.setLab(labService.get(source.getLab().getId()));
+      ServiceUtils.throwIfNull(target.getLab(), "sampleAdditionalInfo.labId", source.getLab().getId());
+    }
+    if (source.getTissueMaterial() != null) {
+      target.setTissueMaterial(tissueMaterialService.get(source.getTissueMaterial().getId()));
+    }
   }
 
   @Override
-  public SampleTissue to(SampleTissueDto sampleTissueDto) throws IOException {
-    authorizationManager.throwIfUnauthenticated();
-    User user = authorizationManager.getCurrentUser();
-
-    SampleTissue sampleTissue = Dtos.to(sampleTissueDto);
-    sampleTissue.setCreatedBy(user);
-    sampleTissue.setUpdatedBy(user);
-    Date now = new Date();
-    sampleTissue.setCreationDate(now);
-    sampleTissue.setLastUpdated(now);
-
-    return sampleTissue;
+  public void applyChanges(SampleTissue target, SampleTissue source) throws IOException {
+    loadMembers(target, source);
+    target.setPassageNumber(source.getPassageNumber());
+    target.setTimesReceived(source.getTimesReceived());
+    target.setTubeNumber(source.getTubeNumber());
+    target.setExternalInstituteIdentifier(source.getExternalInstituteIdentifier());
+    target.setRegion(source.getRegion());
   }
 
 }

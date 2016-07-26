@@ -122,4 +122,12 @@ public class TagBarcode implements Nameable {
     this.sequence = sequence;
   }
 
+  public String getLabel() {
+    if (getId() != UNSAVED_ID) {
+      return getName() + " (" + getSequence() + ")";
+    } else {
+      return null;
+    }
+  }
+
 }

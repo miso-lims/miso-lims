@@ -240,7 +240,7 @@
   </tr>
 </c:if>
 <c:choose>
-  <c:when test="${!empty library.sample && !empty library.sample.sampleAdditionalInfo && !empty library.libraryAdditionalInfo}">
+  <c:when test="${!empty library.sample && !empty library.libraryAdditionalInfo}">
     <input type="hidden" value="true" name="paired" id="paired"/>
   </c:when>
   <c:otherwise>
@@ -259,7 +259,7 @@
 	</tr>
   </c:otherwise>
 </c:choose>
-<c:if test="${!empty library.sample && !empty library.sample.sampleAdditionalInfo && !empty library.libraryAdditionalInfo}">
+<c:if test="${!empty library.sample && !empty library.libraryAdditionalInfo}">
   <tr>
     <td>Library Design:</td>
     <td><miso:select id="libraryDesignTypes" path="libraryAdditionalInfo.libraryDesign" items="${libraryDesigns}" itemLabel="name" itemValue="id" defaultLabel="(None)" defaultValue="-1" onchange="Library.ui.changeDesign()"/></td>
@@ -396,36 +396,29 @@
           itemValue="id" defaultLabel="SELECT" defaultValue=""/>
     </td>
   </tr>
-<c:choose>
-<c:when test="${library.id == 0}">
-  <tr>
+    <tr>
     <td class="h">Tissue Origin:</td>
-    <td>${library.sample.sampleAdditionalInfo.tissueOrigin.alias}</td>
+    <td>${library.sampleTissue.tissueOrigin.alias}</td>
   </tr>
   <tr>
     <td class="h">Tissue Type:</td>
-    <td>${library.sample.sampleAdditionalInfo.tissueType.alias}</td>
+    <td>${library.sampleTissue.tissueType.alias}</td>
   </tr>
-  <c:if test="${not empty library.sample.sampleAnalyte.groupId}">
+<c:choose>
+<c:when test="${library.id == 0}">
+
+  <c:if test="${not empty library.sample.groupId}">
   <tr>
     <td class="h">Group ID:</td>
-    <td>${library.sample.sampleAnalyte.groupId}</td>
+    <td>${library.sample.groupId}</td>
   </tr>
   <tr>
     <td class="h">Group Description:</td>
-    <td>${library.sample.sampleAnalyte.groupDescription}</td>
+    <td>${library.sample.groupDescription}</td>
   </tr>
   </c:if>
 </c:when>
 <c:otherwise>
-  <tr>
-    <td class="h">Tissue Origin:</td>
-    <td>${library.libraryAdditionalInfo.tissueOrigin.alias}</td>
-  </tr>
-  <tr>
-    <td class="h">Tissue Type:</td>
-    <td>${library.libraryAdditionalInfo.tissueType.alias}</td>
-  </tr>
   <c:if test="${not empty library.libraryAdditionalInfo.groupId}">
   <tr>
     <td class="h">Group ID:</td>

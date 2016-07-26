@@ -118,7 +118,7 @@ public interface PoolStore extends Store<Pool<? extends Poolable<?, ?>>>, Remove
    *          the maximum number of results to return.
    * @return Collection<Pool<? extends Poolable<?,?>>> a limited number of Pools.
    */
-  public List<Pool<? extends Poolable<?, ?>>> listAllPoolsWithLimit(int limit);
+  public List<Pool<? extends Poolable<?, ?>>> listAllPoolsWithLimit(int limit) throws IOException;
 
   /**
    * List all Pools that are for a given {@link PlatformType} and have a name, alias, or identificationBarcode matching a query String
@@ -203,4 +203,46 @@ public interface PoolStore extends Store<Pool<? extends Poolable<?, ?>>>, Remove
    * @throws IOException
    */
   public Map<String, Integer> getPoolColumnSizes() throws IOException;
+
+  /**
+   * 
+   * @param offset of type int
+   * @param resultsPerPage of type int
+   * @param querystr of type String
+   * @param sortDir of type String
+   * @param platform o type PlatformType
+   * @return a list of pools for given platform of size resultsPerPage which match the querystr
+   * @throws IOException
+   */
+  List<Pool<? extends Poolable<?, ?>>> listBySearchOffsetAndNumResultsAndPlatform(int offset, int resultsPerPage, String querystr,
+      String sortDir, String sortCol, PlatformType platform) throws IOException;
+
+  /**
+   * 
+   * @param offset of type int
+   * @param limit of type int
+   * @param sortDir of type String
+   * @param platform of type PlatformType
+   * @return a list of pools for given platform of size limit
+   * @throws IOException
+   */
+  List<Pool<? extends Poolable<?, ?>>> listByOffsetAndNumResults(int offset, int limit, String sortDir, String sortCol,
+      PlatformType platform) throws IOException;
+
+  /**
+   * 
+   * @param platformName of type String
+   * @param querystr of type String
+   * @return a count of how many pools for given platform match the querystr
+   * @throws IOException
+   */
+  long countPoolsBySearch(PlatformType platform, String querystr) throws IOException;
+
+  /**
+   * 
+   * @param platform of type PlatformType
+   * @return a count of pools for a given platform
+   * @throws IOException
+   */
+  long countPoolsByPlatform(PlatformType platform) throws IOException;
 }

@@ -1,11 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.migration;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import uk.ac.bbsrc.tgac.miso.migration.destination.DefaultMigrationTarget;
 import uk.ac.bbsrc.tgac.miso.migration.destination.MigrationTarget;
 import uk.ac.bbsrc.tgac.miso.migration.source.LoadGeneratorSource;
+import uk.ac.bbsrc.tgac.miso.migration.source.MigrationException;
 import uk.ac.bbsrc.tgac.miso.migration.source.MigrationSource;
 
 public class Migration {
@@ -16,8 +18,12 @@ public class Migration {
   
   public static void main(String[] args) {
     properties = getProperties(args);
-    
     MigrationSource source = getMigrationSource();
+    migrate(source, properties);
+  }
+  
+  public static void migrate(MigrationSource source, MigrationProperties properties) {
+    Migration.properties = properties;
     MigrationTarget target = null;
     try {
       target = getMigrationTarget();
@@ -34,13 +40,16 @@ public class Migration {
       System.out.println("Loading data into target...");
       target.migrate(data);
       System.out.println("Migration complete.");
+    } catch (MigrationException e) {
+      System.err.println("Error converting source data");
+      e.printStackTrace();
     } catch (IOException e) {
-      System.err.println("Error during migration");
+      System.err.println("Error saving data in destination");
       e.printStackTrace();
     }
   }
   
-  private static MigrationProperties getProperties(String[] args) {
+  public static MigrationProperties getProperties(String[] args) {
     if (args.length != 1) {
       showHelpAndExit(1);
     } else {
@@ -73,7 +82,8 @@ public class Migration {
   }
   
   private static void showHelpAndExit(int exitCode) {
-    System.out.println("Usage: java -jar <migration-jar.jar> migration.properties");
+    String jar = new File(Migration.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getName();
+    System.out.println(String.format("Usage: java -jar %s <properties-file>", jar));
     System.exit(exitCode);
   }
 

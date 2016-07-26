@@ -1,3 +1,102 @@
+DELETE FROM TagBarcodes;
+DELETE FROM TagBarcodeFamily;
+INSERT INTO TagBarcodeFamily(tagFamilyId, platformType, name) VALUES
+  (1, 'ILLUMINA', 'TruSeq Single Index'),
+  (2, 'LS454', '454 Rapid Library'),
+  (3, 'ILLUMINA', 'Nextera Dual Index'),
+  (4, 'ILLUMINA', 'NEXTflex 8bp'),
+  (5, 'ILLUMINA', 'Nextera'),
+  (6, 'ILLUMINA', 'RBC1'),
+  (7, 'ILLUMINA', 'Illumina 6bp'),
+  (8, 'ILLUMINA', 'Agilent'),
+  (9, 'ILLUMINA', 'TruSeq smRNA'),
+  (10, 'ILLUMINA', 'TCRindex2'),
+  (11, 'ILLUMINA', 'SureSelect XT2'),
+  (12, 'ILLUMINA', 'NEXTflex 6bp');
+
+INSERT INTO `TagBarcodes` (`tagId`, `name`, `sequence`, `tagFamilyId`)
+VALUES
+    (12,'Index 12','CTTGTA',1),
+    (11,'Index 11','GGCTAC',1),
+    (10,'Index 10','TAGCTT',1),
+    (9,'Index 9','GATCAG',1),
+    (8,'Index 8','ACTTGA',1),
+    (7,'Index 7','CAGATC',1),
+    (6,'Index 6','GCCAAT',1),
+    (5,'Index 5','ACAGTG',1),
+    (4,'Index 4','TGACCA',1),
+    (3,'Index 3','TTAGGC',1),
+    (2,'Index 2','CGATGT',1),
+    (1,'Index 1','ATCACG',1),
+    (24,'Index 24','GGTAGC',1),
+    (23,'Index 23','GAGTGG',1),
+    (22,'Index 22','CGTACG',1),
+    (21,'Index 21','GTTTCG',1),
+    (20,'Index 20','GTGGCC',1),
+    (19,'Index 19','GTGAAA',1),
+    (18,'Index 18','GTCCGC',1),
+    (17,'Index 17','GTAGAG',1),
+    (16,'Index 16','CCGTCC',1),
+    (15,'Index 15','ATGTCA',1),
+    (14,'Index 14','AGTTCC',1),
+    (13,'Index 13','AGTCAA',1),
+    (48,'Index 48','TCGGCA',1),
+    (47,'Index 47','TCGAAG',1),
+    (46,'Index 46','TCCCGA',1),
+    (45,'Index 45','TCATTC',1),
+    (44,'Index 44','TATAAT',1),
+    (43,'Index 43','TACAGC',1),
+    (42,'Index 42','TAATCG',1),
+    (41,'Index 41','GACGAC',1),
+    (40,'Index 40','CTCAGA',1),
+    (39,'Index 39','CTATAC',1),
+    (38,'Index 38','CTAGCT',1),
+    (37,'Index 37','CGGAAT',1),
+    (36,'Index 36','CCAACA',1),
+    (35,'Index 35','CATTTT',1),
+    (34,'Index 34','CATGGC',1),
+    (33,'Index 33','CAGGCG',1),
+    (32,'Index 32','CACTCA',1),
+    (31,'Index 31','CACGAT',1),
+    (30,'Index 30','CACCGG',1),
+    (29,'Index 29','CAACTA',1),
+    (28,'Index 28','CAAAAG',1),
+    (27,'Index 27','ATTCCT',1),
+    (26,'Index 26','ATGAGC',1),
+    (25,'Index 25','ACTGAT',1),
+    (60,'RL12','ACTCGCGTCGT',2),
+    (59,'RL11','ACTATACGAGT',2),
+    (58,'RL10','ACTACGTCTCT',2),
+    (57,'RL9','ACGTAGATCGT',2),
+    (56,'RL8','ACGTACTGTGT',2),
+    (55,'RL7','ACGTACACACT',2),
+    (54,'RL6','ACGCGTCTAGT',2),
+    (53,'RL5','ACGAGTAGACT',2),
+    (52,'RL4','ACGACACGTAT',2),
+    (51,'RL3','ACACTACTCGT',2),
+    (50,'RL2','ACACGTAGTAT',2),
+    (49,'RL1','ACACGACGACT',2),
+    (80,'N508','CTAAGCCT',3),
+    (79,'N507','AAGGAGTA',3),
+    (78,'N506','ACTGCATA',3),
+    (77,'N505','GTAAGGAG',3),
+    (76,'N504','AGAGTAGA',3),
+    (75,'N503','TATCCTCT',3),
+    (74,'N502','CTCTCTAT',3),
+    (73,'N501','TAGATCGC',3),
+    (72,'N712','GTAGAGGA',3),
+    (71,'N711','AAGAGGCA',3),
+    (70,'N710','CGAGGCTG',3),
+    (69,'N709','GCTACGCT',3),
+    (68,'N708','CAGAGAGG',3),
+    (67,'N707','CTCTCTAC',3),
+    (66,'N706','TAGGCATG',3),
+    (65,'N705','GGACTCCT',3),
+    (64,'N704','TCCTGAGC',3),
+    (63,'N703','AGGCAGAA',3),
+    (62,'N702','CGTACTAG',3),
+    (61,'N701','TAAGGCGA',3);
+
 DELETE FROM `_Partition`;
 INSERT INTO `_Partition` (`partitionId`, `partitionNumber`, `pool_poolId`, `securityProfile_profileId`)
 VALUES (1,1,1,1);
@@ -53,6 +152,22 @@ VALUES (1,'LIB1','Inherited from TEST_0001',NULL,1,1,'LIB1::TEST_0001_Bn_P_PE_30
 (12,'LIB12','Inherited from TEST_0006',NULL,1,12,'LIB12::TEST_0006_Bn_R_PE_300_WG','LIBRARY_INBOX_B02',3,0,'2015-08-27','Illumina','TEST_0006_Bn_R_PE_300_WG',1,1,1,'true',1),
 (13,'LIB13','Inherited from TEST_0007',NULL,1,13,'LIB13::TEST_0007_Bn_P_PE_300_WG','LIBRARY_INBOX_B03',3,0,'2015-08-27','Illumina','TEST_0007_Bn_P_PE_300_WG',1,1,1,'true',1),
 (14,'LIB14','Inherited from TEST_0007',NULL,1,14,'LIB14::TEST_0007_Bn_R_PE_300_WG','LIBRARY_INBOX_B04',3,0,'2015-08-27','Illumina','TEST_0007_Bn_R_PE_300_WG',1,1,1,'true',1);
+
+INSERT INTO `LibraryChangeLog`(`libraryId`, `columnsChanged`, `userId`, `message`, `changeTime`)
+VALUES (1, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:49'),
+(2, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:51'),
+(3, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:53'),
+(4, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:55'),
+(5, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:57'),
+(6, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:59'),
+(7, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:01'),
+(8, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:03'),
+(9, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:05'),
+(10, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:07'),
+(11, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:09'),
+(12, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:11'),
+(13, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:13'),
+(14, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:15');
 
 DELETE FROM `Kit`;
 INSERT INTO `Kit`(`kitId`,`identificationBarcode`,`locationBarcode`,`lotNumber`,`kitDate`,`kitDescriptorId`) VALUES
@@ -143,6 +258,19 @@ VALUES (1,1,'person','2016-03-18',1,12.3),
 (2,1,'person','2016-03-18',1,45.6),
 (3,2,'person','2016-03-18',1,7.89);
 
+INSERT INTO `PoolChangeLog`(`poolId`, `columnsChanged`, `userId`, `message`, `changeTime`)
+VALUES (1, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:49'),
+(1, 'alias', 1, 'Poll 1 -> Pool 1', '2016-06-07 13:13:30'),
+(2, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:51'),
+(3, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:53'),
+(4, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:55'),
+(5, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:57'),
+(6, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:59'),
+(7, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:01'),
+(8, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:03'),
+(9, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:05'),
+(10, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:07');
+
 DELETE FROM `ReferenceGenome`;
 INSERT INTO `ReferenceGenome` (`referenceGenomeId`, `alias`) VALUES (1, 'Human hg19 random');
 INSERT INTO `ReferenceGenome` (`referenceGenomeId`, `alias`) VALUES (2, 'Human hg19');
@@ -203,21 +331,45 @@ VALUES (15,NULL,'SAM15','identity1',1,'SAM15::TEST_0001_IDENTITY_1','Freezer1_1'
 (16,NULL,'SAM16','tissue1',1,'SAM16::TEST_0001_TISSUE_1','Freezer1_1','GENOMIC','2016-04-05','true','TEST_0001_TISSUE_1',1,'Homo sapiens',NULL,1),
 (17,NULL,'SAM17','tissue2',1,'SAM17::TEST_0001_TISSUE_2','Freezer1_1','GENOMIC','2016-04-05','true','TEST_0001_TISSUE_2',1,'Homo sapiens',NULL,1);
 
+INSERT INTO `SampleChangeLog`(`sampleId`, `columnsChanged`, `userId`, `message`, `changeTime`)
+VALUES (1, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:47'),
+(1, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:49'),
+(2, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:51'),
+(3, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:53'),
+(4, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:55'),
+(5, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:57'),
+(6, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:59'),
+(7, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:01'),
+(8, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:03'),
+(9, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:05'),
+(10, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:07'),
+(11, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:09'),
+(12, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:11'),
+(13, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:13'),
+(14, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:15'),
+(15, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:17'),
+(16, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:19'),
+(17, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:21');
+
 INSERT INTO `SampleClass`(`sampleClassId`, `alias`, `sampleCategory`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
 VALUES (1,'Identity','Identity',1,'2016-04-05 14:57:00',1,'2016-04-05 14:57:00'),
 (2,'Primary Tumor Tissue','Tissue',1,'2016-04-05 14:57:00',1,'2016-04-05 14:57:00');
 
-INSERT INTO `SampleAdditionalInfo`(`sampleId`, `sampleClassId`, `archived`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`, `parentId`)
-VALUES (15,1,0,1,'2016-04-05 14:57:00',1,'2016-04-05 14:57:00',NULL),
-(16,2,0,1,'2016-04-05 14:57:00',1,'2016-04-05 14:57:00',15),
-(17,2,0,1,'2016-04-05 14:57:00',1,'2016-04-05 14:57:00',15);
+DELETE FROM `LibraryDesign`;
+INSERT INTO `LibraryDesign`(`libraryDesignId`, `name`, `sampleClassId`, `librarySelectionType`, `libraryStrategyType`, `suffix`, `libraryType`)
+VALUES (1, 'DESIGN1', 1, 1, 1, 'D1', 1), (2, 'DESIGN2', 2, 1, 1, 'D2', 1);
 
-INSERT INTO `Identity`(`sampleId`, `internalName`, `externalName`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
-VALUES (15,'INT1','EXT1',1,'2016-04-05 14:57:00',1,'2016-04-05 14:57:00');
+INSERT INTO `SampleAdditionalInfo`(`sampleId`, `sampleClassId`, `archived`, `parentId`)
+VALUES (15,1,0,NULL),
+(16,2,0,15),
+(17,2,0,15);
 
-INSERT INTO `SampleTissue`(`sampleId`,`createdBy`,`creationDate`,`updatedBy`,`lastUpdated`)
-VALUES (16,1,'2016-04-05 14:57:00',1,'2016-04-05 14:57:00'),
-(17,1,'2016-04-05 14:57:00',1,'2016-04-05 14:57:00');
+INSERT INTO `Identity`(`sampleId`, `internalName`, `externalName`)
+VALUES (15,'INT1','EXT1');
+
+INSERT INTO `SampleTissue`(`sampleId`)
+VALUES (16),
+(17);
 
 DELETE FROM `SampleQC`;
 INSERT INTO `SampleQC`(`qcId`, `sample_sampleId`, `qcUserName`, `qcDate`, `qcMethod`, `results`) 
@@ -281,11 +433,6 @@ DELETE FROM `Lab`;
 INSERT INTO `Lab`(`labId`, `instituteId`, `alias`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
 VALUES (1,1,'Lab A1',1,'2016-02-10 15:35:00',1,'2016-02-10 15:35:00'),(2,1,'Lab A2',1,'2016-02-10 15:35:00',1,'2016-02-10 15:35:00'),
 (3,1,'Lab B1',1,'2016-02-10 15:35:00',1,'2016-02-10 15:35:00'),(4,1,'Lab B2',1,'2016-02-10 15:35:00',1,'2016-02-10 15:35:00');
-
-DELETE FROM `Identity`;
-INSERT INTO `Identity` (`sampleId`, `internalName`, `externalName`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
-VALUES ('1', 'internalName1', 'externalName1', '1', '2016-02-17 09:32:00', '1', '2016-02-17 09:32:00'),
-('4', 'internalName2', 'externalName2', '1', '2016-02-17 09:32:00', '1', '2016-02-17 09:32:00');
 
 INSERT INTO `SampleNumberPerProject`
 (`sampleNumberPerProjectId`, `projectId`, `highestSampleNumber`, `padding`, `createdBy`, `updatedBy`, `creationDate`, `lastUpdated`)
@@ -420,5 +567,5 @@ INSERT INTO `TissueType`(`tissueTypeId`, `alias`, `description`, `createdBy`, `c
 VALUES (1,'Test Type','for testing',1,'2016-02-19 11:28:00',1,'2016-02-19 11:28:00');
 
 DELETE FROM `LibraryAdditionalInfo`;
-INSERT INTO `LibraryAdditionalInfo`(`libraryId`, `tissueOriginId`, `tissueTypeId`, `kitDescriptorId`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
-VALUES (1,1,1,1,1,'2016-02-19 11:28:00',1,'2016-02-19 11:28:00');
+INSERT INTO `LibraryAdditionalInfo`(`libraryId`, `kitDescriptorId`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
+VALUES (1,1,1,'2016-02-19 11:28:00',1,'2016-02-19 11:28:00');

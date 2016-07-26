@@ -1,42 +1,48 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import java.util.Date;
+public interface SampleTissue extends SampleAdditionalInfo {
 
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-
-import com.eaglegenomics.simlims.core.User;
-
-@JsonIgnoreProperties({ "sample" })
-public interface SampleTissue {
-  
   public static final String CATEGORY_NAME = "Tissue";
 
-  Long getId();
+  public String getExternalInstituteIdentifier();
 
-  void setId(Long sampleId);
+  /**
+   * Sets the sample's identifying name or ID at the source Institute
+   * 
+   * @param externalInstituteIdentifier
+   */
+  void setExternalInstituteIdentifier(String externalInstituteIdentifier);
 
-  Sample getSample();
+  Lab getLab();
 
-  void setSample(Sample sample);
+  void setLab(Lab lab);
 
-  Integer getCellularity();
+  Integer getPassageNumber();
 
-  void setCellularity(Integer cellularity);
+  void setPassageNumber(Integer passageNumber);
 
-  User getCreatedBy();
+  String getRegion();
 
-  void setCreatedBy(User createdBy);
+  void setRegion(String region);
 
-  Date getCreationDate();
+  Integer getTimesReceived();
 
-  void setCreationDate(Date creationDate);
+  void setTimesReceived(Integer timesReceived);
 
-  User getUpdatedBy();
+  TissueMaterial getTissueMaterial();
 
-  void setUpdatedBy(User updatedBy);
+  void setTissueMaterial(TissueMaterial tissueMaterial);
 
-  Date getLastUpdated();
+  TissueOrigin getTissueOrigin();
 
-  void setLastUpdated(Date lastUpdated);
+  void setTissueOrigin(TissueOrigin tissueOrigin);
+
+  TissueType getTissueType();
+
+  void setTissueType(TissueType tissueType);
+
+  Integer getTubeNumber();
+
+  void setTubeNumber(Integer tubeNumber);
 
 }

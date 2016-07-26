@@ -23,6 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.core.manager;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isDetailedSample;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import java.io.IOException;
@@ -1667,10 +1668,10 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public long saveLibrary(Library library) throws IOException {
     if (libraryStore != null) {
-      if (library.getSample().getSampleAdditionalInfo() != null) {
-        SampleAdditionalInfo info = library.getSample().getSampleAdditionalInfo();
+      if (isDetailedSample(library.getSample())) {
+        SampleAdditionalInfo sample = (SampleAdditionalInfo) library.getSample();
 
-        if (LibraryDesign.validate(library, libraryDesignDao.getLibraryDesignByClass(info == null ? null : info.getSampleClass()))) {
+        if (LibraryDesign.validate(library, libraryDesignDao.getLibraryDesignByClass(sample.getSampleClass()))) {
           return libraryStore.save(library);
         } else {
           throw new IOException("Invalid propagation.");
@@ -2822,4 +2823,80 @@ public class MisoRequestManager implements RequestManager {
       throw new IOException("No securityStore available. Check that it has been declared in the Spring config.");
     }
   }
+
+  @Override
+  public Long countPoolsByPlatform(PlatformType platform) throws IOException {
+    if (poolStore != null) {
+      return poolStore.countPoolsByPlatform(platform);
+    } else {
+      throw new IOException("No poolStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public Long getNumPoolsBySearch(PlatformType platform, String querystr) throws IOException {
+    if (poolStore != null) {
+      return poolStore.countPoolsBySearch(platform, querystr);
+    } else {
+      throw new IOException("No poolStore available. Check that it has been declared in the Spring config.");
+    }
+  };
+
+  @Override
+  public List<Pool<? extends Poolable<?, ?>>> getPoolsByPageSizeSearchPlatform(int offset, int limit, String querystr, String sortDir,
+      String sortCol, PlatformType platform) throws IOException {
+    if (poolStore != null) {
+      return poolStore.listBySearchOffsetAndNumResultsAndPlatform(offset, limit, querystr, sortDir, sortCol, platform);
+    } else {
+      throw new IOException("No poolStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public List<Pool<? extends Poolable<?, ?>>> getPoolsByPageAndSize(int offset, int limit, String sortDir, String sortCol,
+      PlatformType platform) throws IOException {
+    if (poolStore != null) {
+      return poolStore.listByOffsetAndNumResults(offset, limit, sortDir, sortCol, platform);
+    } else {
+      throw new IOException("No poolStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public int countLibraries() throws IOException {
+    if (libraryStore != null) {
+      return libraryStore.count();
+    } else {
+      throw new IOException("No libraryStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public List<Library> getLibrariesByPageSizeSearch(int offset, int limit, String querystr, String sortDir, String sortCol)
+      throws IOException {
+    if (libraryStore != null) {
+      return libraryStore.listBySearchOffsetAndNumResults(offset, limit, querystr, sortDir, sortCol);
+    } else {
+      throw new IOException("No libraryStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public List<Library> getLibrariesByPageAndSize(int offset, int limit, String sortDir, String sortCol) throws IOException {
+    if (libraryStore != null) {
+      return libraryStore.listByOffsetAndNumResults(offset, limit, sortDir, sortCol);
+    } else {
+      throw new IOException("No libraryStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public Long countLibrariesBySearch(String querystr) throws IOException {
+    if (libraryStore != null) {
+      return libraryStore.countLibrariesBySearch(querystr);
+    } else {
+      throw new IOException("No libraryStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
 }

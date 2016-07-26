@@ -30,8 +30,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.TreeSet;
 
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -43,6 +41,8 @@ import javax.persistence.Transient;
 
 import org.codehaus.jackson.annotate.JsonBackReference;
 import org.codehaus.jackson.annotate.JsonManagedReference;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -129,6 +129,8 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @OneToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "lastModifier", nullable = false)
   private User lastModifier;
+
+  private Date lastModified;
 
   @Transient
   private Collection<Note> notes = new HashSet<Note>();
@@ -235,8 +237,12 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
         current = barcode.getFamily();
       } else {
         if (current.getId() != barcode.getFamily().getId()) {
-          throw new IllegalArgumentException(String.format("Barcodes not all from the same family. (%d:%s vs %d:%s)", current.getId(),
-              current.getName(), barcode.getFamily().getId(), barcode.getFamily().getName()));
+          throw new IllegalArgumentException(String.format(
+              "Barcodes not all from the same family. (%d:%s vs %d:%s)",
+              current.getId(),
+              current.getName(),
+              barcode.getFamily().getId(),
+              barcode.getFamily().getName()));
         }
       }
     }
@@ -511,6 +517,16 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   }
 
   @Override
+  public Date getLastModified() {
+    return lastModified;
+  }
+
+  @Override
+  public void setLastModified(Date lastModified) {
+    this.lastModified = lastModified;
+  }
+
+  @Override
   public Collection<ChangeLog> getChangeLog() {
     return changeLog;
   }
@@ -522,5 +538,16 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
     } else {
       return tagBarcodes.get(0).getFamily();
     }
+  }
+
+  @Override
+  public SampleTissue getSampleTissue() {
+    if (this.getSample() instanceof SampleAdditionalInfo) {
+
+      for (SampleAdditionalInfo parent = (SampleAdditionalInfo) this.getSample(); parent != null; parent = parent.getParent()) {
+        if (parent instanceof SampleTissue) return (SampleTissue) parent;
+      }
+    }
+    return null;
   }
 }

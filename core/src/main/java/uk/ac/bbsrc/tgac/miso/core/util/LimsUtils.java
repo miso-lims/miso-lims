@@ -68,7 +68,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.Set;
-import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -83,12 +82,17 @@ import org.slf4j.LoggerFactory;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 
-import uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletionGroup;
+import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.PoolOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletion;
+import uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletionGroup;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
@@ -795,17 +799,14 @@ public class LimsUtils {
   }
 
   public static boolean isValidRelationship(Iterable<SampleValidRelationship> relations, Sample parent, Sample child) {
-    if (parent == null && child.getSampleAdditionalInfo() == null) {
+    if (parent == null && !isDetailedSample(child)) {
       return true; // Simple sample has no relationships.
     }
-    if (child.getSampleAdditionalInfo() == null) {
+    if (!isDetailedSample(child) || !isDetailedSample(parent)) {
       return false;
     }
-    if (parent.getSampleAdditionalInfo() == null) {
-      return false;
-    }
-    return isValidRelationship(relations, parent.getSampleAdditionalInfo().getSampleClass(),
-        child.getSampleAdditionalInfo().getSampleClass());
+    return isValidRelationship(relations, ((SampleAdditionalInfo) parent).getSampleClass(),
+        ((SampleAdditionalInfo) child).getSampleClass());
   }
 
   public static boolean isValidRelationship(Iterable<SampleValidRelationship> relations, SampleClass parent, SampleClass child) {
@@ -835,7 +836,8 @@ public class LimsUtils {
     }
   }
 
-  public static Map<Pool<?>, Map<SequencingParameters, PoolOrderCompletionGroup>> groupCompletions(Iterable<PoolOrderCompletion> completions) {
+  public static Map<Pool<?>, Map<SequencingParameters, PoolOrderCompletionGroup>> groupCompletions(
+      Iterable<PoolOrderCompletion> completions) {
     Map<Pool<?>, Map<SequencingParameters, PoolOrderCompletionGroup>> poolGroups = new TreeMap<>();
     for (PoolOrderCompletion completion : completions) {
       Map<SequencingParameters, PoolOrderCompletionGroup> parametersGroup;
@@ -875,6 +877,37 @@ public class LimsUtils {
       }
     }
     return poolGroups;
+  }
+
+  public static boolean isDetailedSample(Sample sample) {
+    return sample instanceof SampleAdditionalInfo;
+  }
+
+  public static boolean isPlainSample(Sample sample) {
+    return !isDetailedSample(sample);
+  }
+
+  public static boolean isIdentitySample(Sample sample) {
+    if (!isDetailedSample(sample)) return false;
+    return sample instanceof Identity;
+  }
+
+  public static boolean isTissueSample(Sample sample) {
+    if (!isDetailedSample(sample)) return false;
+    return sample instanceof SampleTissue;
+  }
+  
+  public static boolean isTissueProcessingSample(Sample sample) {
+    if (!isDetailedSample(sample)) return false;
+    return sample instanceof SampleTissueProcessing;
+  }
+
+  public static boolean isStockSample(Sample sample) {
+    return sample instanceof SampleStock;
+  }
+
+  public static boolean isAliquotSample(Sample sample) {
+    return sample instanceof SampleAliquot;
   }
 
 }

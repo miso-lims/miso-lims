@@ -72,8 +72,7 @@
 	    </div>
 		<button id="saveSamples">Save</button>
 		<c:if test="${detailedSample}">
-			<button id="addQcs" onclick="Sample.hot.regenerateWithQcs();">Add QCs</button>
-			<button id="hideAddnalCols" onclick="Sample.hot.hideAdditionalCols();">Hide Extra Columns</button>
+			<button id="addQcs" onclick="Sample.hot.regenerateWithQcs();">Show QCs Columns</button>
 		</c:if>
 		
 		<div id="hotContainer"></div>
@@ -92,18 +91,19 @@
 
 	    Sample.hot.makeBulkEditTable = function () {
         Sample.hot.samplesJSON = Sample.hot.modifySamplesForEdit(Sample.hot.samplesJSON);
-        var sampleCategory = Sample.hot.getCategoryFromClassId(Sample.hot.samplesJSON[0].sampleAdditionalInfo.sampleClassId);
-        Sample.hot.makeHOT(Sample.hot.samplesJSON, sampleCategory);
+        var sampleCategory = Sample.hot.getCategoryFromClassId(Sample.hot.samplesJSON[0].sampleClassId);
+        Sample.hot.makeHOT(Sample.hot.samplesJSON, 'update', null, sampleCategory);
       };
 
       Sample.hot.makeBulkCreateTable = function () {
+        var sourceSampleCategory = Sample.hot.getCategoryFromClassId(Sample.hot.samplesJSON[0].sampleClassId);
         Sample.hot.newSamplesJSON = Sample.hot.modifySamplesForPropagate(Sample.hot.samplesJSON);
-        var sampleCategory = Sample.hot.getCategoryFromClassId(Sample.hot.newSamplesJSON[0].sampleAdditionalInfo.parentSampleClassId);
-        Sample.hot.makeHOT(Sample.hot.newSamplesJSON, sampleCategory);
+        var targetSampleCategory = Sample.hot.getCategoryFromClassId(Sample.hot.newSamplesJSON[0].sampleClassId);
+        Sample.hot.makeHOT(Sample.hot.newSamplesJSON, 'propagate', sourceSampleCategory, targetSampleCategory);
         Hot.hotTable.updateSettings({
           cells: function (row, col, prop) {
             var cellProperties = {};
-            if (prop == 'sampleAdditionalInfo.sampleClassAlias') {
+            if (prop == 'sampleClassAlias') {
               cellProperties.readOnly = false;
             }
             return cellProperties;

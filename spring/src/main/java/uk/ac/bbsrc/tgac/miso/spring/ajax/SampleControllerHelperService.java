@@ -774,33 +774,6 @@ public class SampleControllerHelperService {
     }
   }
 
-  public JSONObject listSamplesDataTable(HttpSession session, JSONObject json) {
-    try {
-      JSONObject j = new JSONObject();
-      JSONArray jsonArray = new JSONArray();
-      for (Sample sample : requestManager.listAllSamples()) {
-        JSONArray inner = new JSONArray();
-        String identificationBarcode = sample.getIdentificationBarcode();
-
-        inner.add(
-            "<input type=\"checkbox\" value=\"" + sample.getId() + "\" class=\"bulkCheckbox\" id=\"bulk" + "_" + sample.getId() + "\">");
-        inner.add(TableHelper.hyperLinkify("/miso/sample/" + sample.getId(), sample.getName()));
-        inner.add(TableHelper.hyperLinkify("/miso/sample/" + sample.getId(), sample.getAlias()));
-        inner.add(sample.getSampleType());
-        inner.add((sample.getQcPassed() != null ? sample.getQcPassed().toString() : ""));
-        inner.add(getSampleLastQC(sample.getId()));
-        inner.add((isStringEmptyOrNull(identificationBarcode) ? "" : identificationBarcode));
-
-        jsonArray.add(inner);
-      }
-      j.put("array", jsonArray);
-      return j;
-    } catch (IOException e) {
-      log.debug("Failed", e);
-      return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
-    }
-  }
-
   public JSONObject getSampleLastQCRequest(HttpSession session, JSONObject json) {
     Long sampleId = json.getLong("sampleId");
     return JSONUtils.SimpleJSONResponse(getSampleLastQC(sampleId));

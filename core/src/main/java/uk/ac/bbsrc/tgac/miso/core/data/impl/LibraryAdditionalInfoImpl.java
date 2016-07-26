@@ -16,8 +16,6 @@ import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
-import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
-import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 
 @Entity
@@ -27,18 +25,12 @@ public class LibraryAdditionalInfoImpl implements LibraryAdditionalInfo {
   @Id
   private Long libraryId;
 
-  @OneToOne(targetEntity = LibraryImpl.class)
-  @JoinColumn(name = "libraryId", nullable = false)
-  @MapsId
+  // TODO: enable once Library is migrated to Hibernate.
+  // @OneToOne(targetEntity = LibraryImpl.class)
+  // @JoinColumn(name = "libraryId", nullable = false)
+  // @MapsId
+  @Transient
   private Library library;
-
-  @OneToOne(targetEntity = TissueOriginImpl.class)
-  @JoinColumn(name = "tissueOriginId", nullable = false)
-  private TissueOrigin tissueOrigin;
-
-  @OneToOne(targetEntity = TissueTypeImpl.class)
-  @JoinColumn(name = "tissueTypeId", nullable = false)
-  private TissueType tissueType;
 
   private Long groupId;
   private String groupDescription;
@@ -87,26 +79,6 @@ public class LibraryAdditionalInfoImpl implements LibraryAdditionalInfo {
   @Override
   public void setLibrary(Library library) {
     this.library = library;
-  }
-
-  @Override
-  public TissueOrigin getTissueOrigin() {
-    return tissueOrigin;
-  }
-
-  @Override
-  public void setTissueOrigin(TissueOrigin tissueOrigin) {
-    this.tissueOrigin = tissueOrigin;
-  }
-
-  @Override
-  public TissueType getTissueType() {
-    return tissueType;
-  }
-
-  @Override
-  public void setTissueType(TissueType tissueType) {
-    this.tissueType = tissueType;
   }
 
   @Override

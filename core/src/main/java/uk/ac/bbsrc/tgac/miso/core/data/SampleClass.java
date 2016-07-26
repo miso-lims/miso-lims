@@ -33,29 +33,16 @@ public interface SampleClass {
   String getSampleCategory();
 
   void setSampleCategory(String sampleCategory);
-  
+
   /**
    * @return the class identifier used in Sample alias generation
    */
   String getSuffix();
-  
+
   /**
    * Sets the class identifier used in Sample alias generation
    * 
    * @param suffix
    */
   void setSuffix(String suffix);
-  
-  /**
-   * @return true if this SampleClass represents stock tubes; false otherwise
-   */
-  boolean isStock();
-  
-  /**
-   * Specifies whether this SampleClass represents stock tubes
-   * 
-   * @param isStock
-   */
-  void setStock(boolean isStock);
-
 }

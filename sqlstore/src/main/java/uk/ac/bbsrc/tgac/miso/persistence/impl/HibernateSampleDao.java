@@ -11,12 +11,12 @@ import java.util.Set;
 
 import javax.persistence.CascadeType;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-
+import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 import org.hibernate.type.LongType;
 import org.hibernate.type.StringType;
 import org.slf4j.Logger;
@@ -29,9 +29,12 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.store.SecurityStore;
 
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
@@ -39,7 +42,6 @@ import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleQcStore;
-import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleDao;
@@ -54,7 +56,7 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
  * “transient” in the Sample class.
  */
 @Transactional(rollbackFor = Exception.class)
-public class HibernateSampleDao implements SampleDao, SampleStore {
+public class HibernateSampleDao implements SampleDao {
 
   protected static final Logger log = LoggerFactory.getLogger(HibernateSampleDao.class);
 
@@ -80,7 +82,7 @@ public class HibernateSampleDao implements SampleDao, SampleStore {
 
   @Autowired
   private CacheManager cacheManager;
-  
+
   @Autowired
   private MisoNamingScheme<Sample> sampleNamingScheme;
 
@@ -104,7 +106,7 @@ public class HibernateSampleDao implements SampleDao, SampleStore {
   public void setNamingScheme(MisoNamingScheme<Sample> namingScheme) {
     this.namingScheme = namingScheme;
   }
-  
+
   @Override
   public Long addSample(final Sample sample) throws IOException {
     if (sample.getSecurityProfile() != null) {
@@ -112,13 +114,12 @@ public class HibernateSampleDao implements SampleDao, SampleStore {
     }
     return (Long) currentSession().save(sample);
   }
-  
+
   @Override
   public int getNextSiblingNumber(Sample parent, SampleClass childClass) throws IOException {
-    Query query = currentSession().createQuery("select max(siblingNumber) "
-        + "from SampleAdditionalInfoImpl "
-        + "where parentId = :parentId "
-        + "and sampleClassId = :sampleClassId");
+    Query query = currentSession().createQuery(
+        "select max(siblingNumber) " + "from SampleAdditionalInfoImpl " + "where parentId = :parentId "
+            + "and sampleClassId = :sampleClassId");
     query.setLong("parentId", parent.getId());
     query.setLong("sampleClassId", childClass.getId());
     Number result = ((Number) query.uniqueResult());
@@ -161,9 +162,9 @@ public class HibernateSampleDao implements SampleDao, SampleStore {
 
     sample.getChangeLog().clear();
     sample.getChangeLog().addAll(changeLogDao.listAllById("Sample", sample.getId()));
-    
-    if (sample.getSampleAdditionalInfo() != null) {
-      sample.getSampleAdditionalInfo().setChildren(listByParentId(sample.getId()));
+
+    if (LimsUtils.isDetailedSample(sample)) {
+      ((SampleAdditionalInfo) sample).setChildren(listByParentId(sample.getId()));
     }
 
     extractBoxableInformation(template, sample);
@@ -207,7 +208,7 @@ public class HibernateSampleDao implements SampleDao, SampleStore {
     List<Sample> records = query.list();
     return fetchSqlStore(records);
   }
-  
+
   @Override
   public Collection<Sample> getByIdList(List<Long> idList) throws IOException {
     Query query = currentSession().createQuery("from SampleImpl where sampleId in (:ids)");
@@ -251,6 +252,12 @@ public class HibernateSampleDao implements SampleDao, SampleStore {
   @Override
   public Sample getSample(Long id) throws IOException {
     return fetchSqlStore((Sample) currentSession().get(SampleImpl.class, id));
+  }
+
+  @Override
+  public Long countAll() throws IOException {
+    Query query = currentSession().createQuery("select count(*) from SampleImpl");
+    return (Long) query.uniqueResult();
   }
 
   public SampleQcStore getSampleQcDao() {
@@ -339,12 +346,49 @@ public class HibernateSampleDao implements SampleDao, SampleStore {
 
   @Override
   public Collection<Sample> listBySearch(String querystr) throws IOException {
-    Query query = currentSession().createQuery(
-        "from SampleImpl where identificationBarcode like :query or name LIKE :query or alias like :query or description like :query or scientificName like :query");
-    query.setString("query", querystr);
+    Criteria criteria = currentSession().createCriteria(Sample.class);
+    criteria.add(Restrictions.or(
+        Restrictions.ilike("identificationBarcode", "%" + querystr + "%"),
+        Restrictions.ilike("name", "%" + querystr + "%"),
+        Restrictions.ilike("alias", "%" + querystr + "%")));
     @SuppressWarnings("unchecked")
-    List<Sample> records = query.list();
+    List<Sample> records = criteria.list();
     return fetchSqlStore(records);
+  }
+
+  @Override
+  public List<Sample> listBySearchOffsetAndNumResults(int offset, int resultsPerPage, String querystr, String sortCol, String sortDir)
+      throws IOException {
+    if ("lastModified".equals(sortCol)) sortCol = "derivedInfo.lastModified";
+    Criteria criteria = currentSession().createCriteria(SampleImpl.class);
+    criteria.add(Restrictions.or(
+        Restrictions.ilike("identificationBarcode", querystr + "%"),
+        Restrictions.ilike("name", querystr + "%"),
+        Restrictions.ilike("alias", querystr + "%")));
+    // I don't know why this alias is required, but without it, you can't sort by 'derivedInfo.lastModifier', which is the field on which we
+    // want to sort most List X pages
+    criteria.createAlias("derivedInfo", "derivedInfo");
+    criteria.setFirstResult(offset);
+    criteria.setMaxResults(resultsPerPage);
+    criteria.addOrder("asc".equals(sortDir) ? Order.asc(sortCol) : Order.desc(sortCol));
+    @SuppressWarnings("unchecked")
+    List<Sample> requestedPage = criteria.list();
+    return requestedPage;
+  }
+
+  @Override
+  public List<Sample> listByOffsetAndNumResults(int offset, int resultsPerPage, String sortCol, String sortDir) throws IOException {
+    Criteria criteria = currentSession().createCriteria(SampleImpl.class);
+    if ("lastModified".equals(sortCol)) sortCol = "derivedInfo.lastModified";
+    // I don't know why this alias is required, but without it, you can't sort by 'derivedInfo.lastModifier', which is the field on which we
+    // want to sort most List X pages
+    criteria.createAlias("derivedInfo", "derivedInfo");
+    criteria.setFirstResult(offset);
+    criteria.setMaxResults(resultsPerPage);
+    criteria.addOrder("asc".equals(sortDir.toLowerCase()) ? Order.asc(sortCol) : Order.desc(sortCol));
+    @SuppressWarnings("unchecked")
+    List<Sample> requestedPage = criteria.list();
+    return requestedPage;
   }
 
   @Override
@@ -355,17 +399,13 @@ public class HibernateSampleDao implements SampleDao, SampleStore {
     List<Sample> records = query.list();
     return fetchSqlStore(records);
   }
-  
-  private Set<Sample> listByParentId(long parentId) {
-    Query query = currentSession().createQuery(
-        "select s from SampleImpl s "
-        + "join s.sampleAdditionalInfo sai "
-        + "join sai.parent p "
-        + "where p.sampleId = :id");
+
+  private Set<SampleAdditionalInfo> listByParentId(long parentId) {
+    Query query = currentSession().createQuery("select s from SampleImpl s " + "join s.parent p " + "where p.sampleId = :id");
     query.setLong("id", parentId);
     @SuppressWarnings("unchecked")
-    List<Sample> samples = query.list();
-    return new HashSet<Sample>(samples);
+    List<SampleAdditionalInfo> samples = query.list();
+    return new HashSet<SampleAdditionalInfo>(samples);
   }
 
   /**

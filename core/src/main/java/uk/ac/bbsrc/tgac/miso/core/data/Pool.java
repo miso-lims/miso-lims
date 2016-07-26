@@ -283,4 +283,11 @@ public interface Pool<P extends Poolable> extends SecurableByProfile, Comparable
    */
   public Collection<Note> getNotes();
 
+  /**
+   * Adds the last modified date of this Pool object.
+   * 
+   * @param lastModified
+   */
+  void setLastModified(Date lastModified);
+
 }

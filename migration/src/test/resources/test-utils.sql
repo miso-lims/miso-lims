@@ -11,10 +11,16 @@ BEGIN
     UNION SELECT 'SampleAdditionalInfo',COUNT(*) FROM SampleAdditionalInfo 
     UNION SELECT 'Identities',COUNT(*) FROM Identity 
     UNION SELECT 'SampleTissues',COUNT(*) FROM SampleTissue 
-    UNION SELECT 'Analyte Stocks',COUNT(*) FROM SampleAdditionalInfo sai JOIN SampleAnalyte sa on sa.sampleId = sai.sampleId JOIN SampleClass sc ON sai.sampleClassId = sc.sampleClassId WHERE sc.isStock = 1
-    UNION SELECT 'Analyte Aliquots',COUNT(*) FROM SampleAdditionalInfo sai JOIN SampleAnalyte sa on sa.sampleId = sai.sampleId JOIN SampleClass sc ON sai.sampleClassId = sc.sampleClassId WHERE sc.isStock = 0
+    UNION SELECT 'SampleTissueProcessings',COUNT(*) FROM SampleTissueProcessing 
+    UNION SELECT 'SampleCVSlides',COUNT(*) FROM SampleCVSlide 
+    UNION SELECT 'SampleLCMTubes',COUNT(*) FROM SampleLCMTube 
+    UNION SELECT 'SampleTissues',COUNT(*) FROM SampleTissue
+    UNION SELECT 'SampleChangeLogs',COUNT(*) FROM SampleChangeLog
+    UNION SELECT 'Analyte Stocks',COUNT(*) FROM SampleStock
+    UNION SELECT 'Analyte Aliquots',COUNT(*) FROM SampleAliquot
     UNION SELECT 'Libraries',COUNT(*) FROM Library
     UNION SELECT 'LibraryAdditionalInfo',COUNT(*) FROM LibraryAdditionalInfo
+    UNION SELECT 'LibraryChangeLogs',COUNT(*) FROM LibraryChangeLog
     UNION SELECT 'LibraryDilutions',COUNT(*) FROM LibraryDilution
     UNION SELECT 'Pool_Elements',COUNT(*) FROM Pool_Elements
     UNION SELECT 'Pools',COUNT(*) FROM Pool
@@ -41,11 +47,18 @@ BEGIN
     DELETE FROM Pool_Elements;
     DELETE FROM LibraryDilution;
     DELETE FROM LibraryAdditionalInfo;
+    DELETE FROM Library_TagBarcode;
+    DELETE FROM LibraryChangeLog;
     DELETE FROM Library;
     DELETE FROM Identity;
     DELETE FROM SampleTissue;
-    DELETE FROM SampleAnalyte;
+    DELETE FROM SampleCVSlide;
+    DELETE FROM SampleLCMTube;
+    DELETE FROM SampleTissueProcessing;
+    DELETE FROM SampleStock;
+    DELETE FROM SampleAliquot;
     DELETE FROM SampleAdditionalInfo;
+    DELETE FROM SampleChangeLog;
     DELETE FROM Sample;
     DELETE FROM SampleNumberPerProject;
     DELETE FROM Project;

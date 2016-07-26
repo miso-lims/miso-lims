@@ -79,12 +79,16 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
       + "INNER JOIN emPCRDilution ed ON ed.library_libraryId = l.libraryId " + "WHERE ld.dilutionId = ? OR ed.dilutionId = ? "
       + "AND l.platformName = ?";
 
-  public static String LIBRARY_DILUTION_SELECT = "SELECT dilutionId, name, concentration, library_libraryId, identificationBarcode, creationDate, dilutionUserName, securityProfile_profileId, targetedResequencingId "
+  public static String LIBRARY_DILUTION_SELECT = "SELECT dilutionId, name, concentration, library_libraryId, "
+      + "identificationBarcode, creationDate, dilutionUserName, securityProfile_profileId, targetedResequencingId, "
+      + "lastUpdated "
       + "FROM LibraryDilution";
 
   public static final String LIBRARY_DILUTIONS_SELECT_LIMIT = LIBRARY_DILUTION_SELECT + " ORDER BY dilutionId DESC LIMIT ?";
 
-  public static String LIBRARY_DILUTION_SELECT_BY_LIBRARY_PLATFORM = "SELECT ld.dilutionId, ld.name, ld.concentration, ld.library_libraryId, ld.identificationBarcode, ld.creationDate, ld.dilutionUserName, ld.securityProfile_profileId, ld.targetedResequencingId, l.platformName "
+  public static String LIBRARY_DILUTION_SELECT_BY_LIBRARY_PLATFORM = "SELECT ld.dilutionId, ld.name, ld.concentration, "
+      + "ld.library_libraryId, ld.identificationBarcode, ld.creationDate, ld.dilutionUserName, ld.securityProfile_profileId, "
+      + "ld.targetedResequencingId, l.platformName, ld.lastUpdated "
       + "FROM LibraryDilution ld, Library l " + "WHERE ld.library_libraryId = l.libraryId " + "AND l.platformName = ?";
 
   public static String LIBRARY_DILUTION_SELECT_BY_PROJECT_AND_LIBRARY_PLATFORM = "SELECT ld.* FROM Project p "
@@ -99,19 +103,27 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
 
   public static final String LIBRARY_DILUTION_SELECT_BY_LIBRARY_ID = LIBRARY_DILUTION_SELECT + " WHERE library_libraryId=?";
 
-  public static final String LIBRARY_DILUTION_SELECT_BY_IDENTIFICATION_BARCODE = LIBRARY_DILUTION_SELECT + " WHERE identificationBarcode=?";
+  public static final String LIBRARY_DILUTION_SELECT_BY_IDENTIFICATION_BARCODE = LIBRARY_DILUTION_SELECT
+      + " WHERE identificationBarcode=?";
 
   public static final String LIBRARY_DILUTION_UPDATE = "UPDATE LibraryDilution "
-      + "SET name=:name, concentration=:concentration, library_libraryId=:library_libraryId, identificationBarcode=:identificationBarcode, creationDate=:creationDate, securityProfile_profileId=:securityProfile_profileId, targetedResequencingId=:targetedResequencingId "
+      + "SET name=:name, concentration=:concentration, library_libraryId=:library_libraryId, "
+      + "identificationBarcode=:identificationBarcode, creationDate=:creationDate, "
+      + "securityProfile_profileId=:securityProfile_profileId, targetedResequencingId=:targetedResequencingId, "
+      + "lastUpdated=:lastUpdated "
       + "WHERE dilutionId=:dilutionId";
 
   public static final String LIBRARY_DILUTION_DELETE = "DELETE FROM LibraryDilution WHERE dilutionId=:dilutionId";
 
-  public static String LIBRARY_DILUTION_SELECT_BY_SEARCH = "SELECT ld.dilutionId, ld.name, ld.concentration, ld.library_libraryId, ld.identificationBarcode, ld.creationDate, ld.dilutionUserName, ld.securityProfile_profileId, ld.targetedResequencingId "
+  public static String LIBRARY_DILUTION_SELECT_BY_SEARCH = "SELECT ld.dilutionId, ld.name, ld.concentration, ld.library_libraryId, "
+      + "ld.identificationBarcode, ld.creationDate, ld.dilutionUserName, ld.securityProfile_profileId, ld.targetedResequencingId, "
+      + "ld.lastUpdated "
       + "FROM LibraryDilution ld " + "JOIN Library l ON l.libraryId = ld.library_libraryId "
       + "WHERE l.platformName = :platformName AND (ld.name LIKE :search OR ld.identificationBarcode LIKE :search)";
 
-  public static String LIBRARY_DILUTION_SELECT_BY_SEARCH_ONLY = "SELECT ld.dilutionId, ld.name, ld.concentration, ld.library_libraryId, ld.identificationBarcode, ld.creationDate, ld.dilutionUserName, ld.securityProfile_profileId, ld.targetedResequencingId "
+  public static String LIBRARY_DILUTION_SELECT_BY_SEARCH_ONLY = "SELECT ld.dilutionId, ld.name, ld.concentration, "
+      + "ld.library_libraryId, ld.identificationBarcode, ld.creationDate, ld.dilutionUserName, ld.securityProfile_profileId, "
+      + "ld.targetedResequencingId, ld.lastUpdated "
       + "FROM LibraryDilution ld " + "WHERE ld.name LIKE :search OR ld.identificationBarcode LIKE :search";
 
   protected static final Logger log = LoggerFactory.getLogger(SQLLibraryDilutionDAO.class);
@@ -302,6 +314,7 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
     params.addValue("creationDate", dilution.getCreationDate());
     params.addValue("securityProfile_profileId", securityProfileId);
     params.addValue("dilutionUserName", dilution.getDilutionCreator());
+    params.addValue("lastUpdated", dilution.getLastModified());
     if (dilution.getTargetedResequencing() != null) {
       params.addValue("targetedResequencingId", dilution.getTargetedResequencing().getTargetedResequencingId());
     } else {
@@ -429,6 +442,7 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
       libraryDilution.setIdentificationBarcode(rs.getString("identificationBarcode"));
       libraryDilution.setCreationDate(rs.getDate("creationDate"));
       libraryDilution.setDilutionCreator(rs.getString("dilutionUserName"));
+      libraryDilution.setLastModified(rs.getTimestamp("lastUpdated"));
 
       try {
         libraryDilution.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));

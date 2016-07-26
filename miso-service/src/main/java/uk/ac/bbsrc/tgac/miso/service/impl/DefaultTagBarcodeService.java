@@ -18,6 +18,10 @@ public class DefaultTagBarcodeService implements TagBarcodeService {
   @Autowired
   private TagBarcodeStore tagBarcodeStore;
 
+  public void setTagBarcodeStore(TagBarcodeStore tagBarcodeStore) {
+    this.tagBarcodeStore = tagBarcodeStore;
+  }
+
   public DefaultTagBarcodeService() {
     System.out.println(this.hashCode());
   }

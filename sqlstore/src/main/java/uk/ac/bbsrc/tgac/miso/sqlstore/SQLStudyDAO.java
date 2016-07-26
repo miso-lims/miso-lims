@@ -32,14 +32,9 @@ import java.util.regex.Matcher;
 
 import javax.persistence.CascadeType;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -53,6 +48,9 @@ import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.Property;
 import com.googlecode.ehcache.annotations.TriggersRemove;
 
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractStudy;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -69,6 +67,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.StudyStore;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
+import uk.ac.bbsrc.tgac.miso.sqlstore.util.BridgeCollectionUpdater;
 
 /**
  * uk.ac.bbsrc.tgac.miso.sqlstore
@@ -122,6 +121,14 @@ public class SQLStudyDAO implements StudyStore {
   public static final String STUDY_TYPES_SELECT = "SELECT name " + "FROM StudyType";
 
   protected static final Logger log = LoggerFactory.getLogger(SQLStudyDAO.class);
+
+  private static final BridgeCollectionUpdater<Project> PROJECT_WRITER = new BridgeCollectionUpdater<Project>("Project_Study", "studies_studyId",
+      "Project_projectId") {
+    @Override
+    protected Object getId(Project item) {
+      return item.getProjectId();
+    }
+  };
 
   private JdbcTemplate template;
   private ProjectStore projectDAO;
@@ -203,7 +210,7 @@ public class SQLStudyDAO implements StudyStore {
   @Override
   @TriggersRemove(cacheName = { "studyCache",
       "lazyStudyCache" }, keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
-          @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
+          @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
   public long save(Study study) throws IOException {
     Long securityProfileId = study.getSecurityProfile().getProfileId();
     if (this.cascadeType != null) {
@@ -244,18 +251,7 @@ public class SQLStudyDAO implements StudyStore {
         throw new IOException("Cannot save Study - issue with naming scheme", e);
       }
 
-      Project p = study.getProject();
-
-      SimpleJdbcInsert pInsert = new SimpleJdbcInsert(template).withTableName("Project_Study");
-
-      MapSqlParameterSource poParams = new MapSqlParameterSource();
-      poParams.addValue("Project_projectId", p.getProjectId());
-      poParams.addValue("studies_studyId", study.getId());
-      try {
-        pInsert.execute(poParams);
-      } catch (DuplicateKeyException dke) {
-        // ignore
-      }
+      PROJECT_WRITER.saveOne(template, study.getId(), study.getProject());
     } else {
       try {
         if (namingScheme.validateField("name", study.getName())) {
@@ -289,7 +285,7 @@ public class SQLStudyDAO implements StudyStore {
 
   @Override
   @Cacheable(cacheName = "studyListCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
-      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
+      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
   public List<Study> listAll() {
     return template.query(STUDIES_SELECT, new StudyMapper(true));
   }
@@ -313,7 +309,7 @@ public class SQLStudyDAO implements StudyStore {
   @Override
   @TriggersRemove(cacheName = { "studyCache",
       "lazyStudyCache" }, keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
-          @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
+          @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
   public boolean remove(Study study) throws IOException {
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
     if (study.isDeletable() && (namedTemplate.update(STUDY_DELETE, new MapSqlParameterSource().addValue("studyId", study.getId())) == 1)) {
@@ -335,7 +331,7 @@ public class SQLStudyDAO implements StudyStore {
 
   @Override
   @Cacheable(cacheName = "studyCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
-      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
+      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
   public Study get(long studyId) throws IOException {
     List<Study> eResults = template.query(STUDY_SELECT_BY_ID, new Object[] { studyId }, new StudyMapper());
     Study e = eResults.size() > 0 ? (Study) eResults.get(0) : null;

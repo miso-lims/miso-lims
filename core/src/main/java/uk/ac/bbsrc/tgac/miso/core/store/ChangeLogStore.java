@@ -11,9 +11,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
  * 
  */
 public interface ChangeLogStore {
+  
   public Collection<ChangeLog> listAll(String type);
 
   public Collection<ChangeLog> listAllById(String type, long id);
-
-  public Collection<ChangeLog> listAllById(String type, String idName, long id);
+  
+  public void deleteAllById(String type, long id);
+  
+  public void create(String type, long entityId, ChangeLog changeLog);
+  
 }

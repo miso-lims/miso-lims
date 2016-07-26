@@ -8,8 +8,7 @@ Sample.hot = {
   sampleClassId: null,
   sciName: null,
   sampleData: null,
-  showQcs: false,
-  
+
   /**
    * Additional sample-specific processing.
    */
@@ -20,49 +19,52 @@ Sample.hot = {
       Sample.hot.addProjectEtcDropdowns();
     }
   },
-  
+
   /**
    * Modifies attributes of Sample Dtos (ex. adds the alias for each attribute ID) so Handsontable displays correctly
    */
   modifySamplesForEdit: function (samplesArray) {
+    Sample.hot.sampleClassId = samplesArray[0].sampleClassId;
     return samplesArray.map(function (sam) {
-      
+
       // add sampleAdditionalInfo values
-      if (sam.sampleAdditionalInfo) {
-        sam.sampleAdditionalInfo.sampleClassAlias = Hot.getAliasFromId(sam.sampleAdditionalInfo.sampleClassId, Hot.sampleOptions.sampleClassesDtos);
-        sam.sampleAdditionalInfo.parentSampleClassAlias = Hot.getAliasFromId(sam.sampleAdditionalInfo.parentSampleClassId, Hot.sampleOptions.sampleClassesDtos);
-        sam.sampleAdditionalInfo.tissueOriginAlias = Hot.getAliasFromId(sam.sampleAdditionalInfo.tissueOriginId, Hot.sampleOptions.tissueOriginsDtos);
-        sam.sampleAdditionalInfo.tissueTypeAlias = Hot.getAliasFromId(sam.sampleAdditionalInfo.tissueTypeId, Hot.sampleOptions.tissueTypesDtos);
-        if (sam.sampleAdditionalInfo.prepKitId) {
-          sam.sampleAdditionalInfo.prepKitAlias = Hot.getAliasFromId(sam.sampleAdditionalInfo.prepKitId, Hot.sampleOptions.kitDescriptorsDtos);
-        }
-        if (sam.sampleAdditionalInfo.subprojectId) {
-          sam.sampleAdditionalInfo.subprojectAlias = Hot.getAliasFromId(sam.sampleAdditionalInfo.subprojectId, Hot.sampleOptions.subprojectsDtos);
-        }
-        if (sam.sampleAdditionalInfo.labId) {
-          sam.sampleAdditionalInfo.labComposite = Sample.hot.getLabCompositeFromId(sam.sampleAdditionalInfo.labId, Hot.sampleOptions.labsDtos);
-        }
-        
+      if (sam.type != 'Plain') {
+        // add attributes if it's a first receipt
+        sam.sampleClassAlias = Hot.getAliasFromId(sam.sampleClassId, Hot.sampleOptions.sampleClassesDtos);
+        if (sam.parentSampleClassId) sam.parentSampleClassAlias = Hot.getAliasFromId(sam.parentSampleClassId, Hot.sampleOptions.sampleClassesDtos);
+        if (sam.tissueOriginId) sam.tissueOriginAlias = Hot.getAliasFromId(sam.tissueOriginId, Hot.sampleOptions.tissueOriginsDtos);
+        if (sam.tissueTypeId) sam.tissueTypeAlias = Hot.getAliasFromId(sam.tissueTypeId, Hot.sampleOptions.tissueTypesDtos);
+        if (sam.labId) sam.labComposite = Sample.hot.getLabCompositeFromId(sam.labId, Hot.sampleOptions.labsDtos);
+        if (sam.prepKitId) sam.prepKitAlias = Hot.getAliasFromId(sam.prepKitId, Hot.sampleOptions.kitDescriptorsDtos);
+        if (sam.subprojectId) sam.subprojectAlias = Hot.getAliasFromId(sam.subprojectId, Hot.sampleOptions.subprojectsDtos);
+
         // add sampleAnalyte values, if applicable
-        if (Sample.hot.getCategoryFromClassId(sam.sampleAdditionalInfo.sampleClassId) == 'Analyte') {
-          if (sam.sampleAnalyte.tissueMaterialId) {
-            sam.sampleAnalyte.tissueMaterialAlias = Hot.getAliasFromId(sam.sampleAnalyte.tissueMaterialId, Hot.sampleOptions.tissueMaterialsDtos);
+        if (Sample.hot.getCategoryFromClassId(sam.sampleClassId) == 'Tissue') {
+          if (sam.tissueMaterialId) {
+            sam.tissueMaterialAlias = Hot.getAliasFromId(sam.tissueMaterialId, Hot.sampleOptions.tissueMaterialsDtos);
           }
-          if (sam.sampleAnalyte.samplePurposeId) {
-            sam.sampleAnalyte.samplePurposeAlias = Hot.getAliasFromId(sam.sampleAnalyte.samplePurposeId, Hot.sampleOptions.samplePurposesDtos);
+		  sam.tissueOriginAlias = Hot.getAliasFromId(sam.tissueOriginId, Hot.sampleOptions.tissueOriginsDtos);
+		  sam.tissueTypeAlias = Hot.getAliasFromId(sam.tissueTypeId, Hot.sampleOptions.tissueTypesDtos);
+		  if (sam.labId) {
+		    sam.labComposite = Sample.hot.getLabCompositeFromId(sam.labId, Hot.sampleOptions.labsDtos);
+		  }
+        }
+        if (Sample.hot.getCategoryFromClassId(sam.sampleClassId) == 'Aliquot') {
+          if (sam.samplePurposeId) {
+            sam.samplePurposeAlias = Hot.getAliasFromId(sam.samplePurposeId, Hot.sampleOptions.samplePurposesDtos);
           }
         }
       }
       if (sam.receivedDate) {
         sam.receivedDate = sam.receivedDate.substring(0,10);
       }
-      
+
       return sam;
     });
   },
-  
+
   /**
-   * Creates proto-samples with inherited attributes from parent samples.
+   * Creates proto-samples with some inherited attributes from parent samples.
    */
   modifySamplesForPropagate: function (samplesArray) {
     function clone (obj) {
@@ -74,26 +76,36 @@ Sample.hot = {
       return copy;
     }
     return samplesArray.map(function (sam) {
-      var newSam = {};
-      newSam.sampleType = sam.sampleType; 
+      var newSam = Sample.hot.getDefaultDetailedValues();
+      newSam.sampleType = sam.sampleType;
       newSam.projectId = sam.projectId;
       newSam.scientificName = sam.scientificName;
-      newSam.sampleAdditionalInfo = clone(sam.sampleAdditionalInfo);
-      newSam.sampleAdditionalInfo.parentSampleClassId = newSam.sampleAdditionalInfo.sampleClassId;
-      newSam.sampleAdditionalInfo.parentSampleClassAlias = Hot.getAliasFromId(newSam.sampleAdditionalInfo.parentSampleClassId, Hot.sampleOptions.sampleClassesDtos);
-      newSam.sampleAdditionalInfo.sampleClassId = Sample.hot.sampleClassId;
-      newSam.sampleAdditionalInfo.sampleClassAlias = Hot.getAliasFromId(newSam.sampleAdditionalInfo.sampleClassId, Hot.sampleOptions.sampleClassesDtos);
-      newSam.sampleAdditionalInfo.parentId = parseInt(sam.id);
-      newSam.sampleAdditionalInfo.parentAlias = clone(sam.alias);
-      if (sam.sampleAnalyte && sam.sampleAnalyte.groupId && sam.sampleAnalyte.groupId.length) {
-        newSam.sampleAnalyte.groupId = sam.sampleAnalyte.groupId;
-        newSam.sampleAnalyte.groupDescription = sam.sampleAnalyte.groupDescription;
+      newSam.parentSampleClassId = sam.sampleClassId;
+      newSam.parentSampleClassAlias = Hot.getAliasFromId(newSam.parentSampleClassId, Hot.sampleOptions.sampleClassesDtos);
+      newSam.sampleClassId = Sample.hot.sampleClassId;
+      newSam.sampleClassAlias = Hot.getAliasFromId(newSam.sampleClassId, Hot.sampleOptions.sampleClassesDtos);
+      newSam.parentId = parseInt(sam.id);
+      newSam.parentAlias = clone(sam.alias);
+      newSam.tissueOriginId = sam.tissueOriginId;
+      newSam.tissueOriginAlias = sam.tissueOriginAlias;
+      newSam.tissueTypeId = sam.tissueTypeId;
+      newSam.tissueTypeAlias = sam.tissueTypeAlias;
+      newSam.timesReceived = sam.timesReceived;
+      newSam.tubeNumber = sam.tubeNumber;
+      newSam.passageNumber = sam.passageNumber;
+      newSam.externalInstituteIdentifier = sam.externalInstituteIdentifier;
+      newSam.labId = sam.labId;
+      if (sam.groupId && sam.groupDescription && sam.groupDescription.length) {
+        newSam.groupId = parseInt(sam.groupId);
+        newSam.groupDescription = sam.groupDescription;
       }
-      
+      if (sam.subprojectId) {
+        newSam.subprojectId = parseInt(sam.subprojectId);
+      }
       return newSam;
     });
   },
-  
+
   /**
    * Creates required dropdowns and adds them to the page
    */
@@ -110,7 +122,7 @@ Sample.hot = {
       document.getElementById('makeTable').classList.remove('disabled');
     }
   },
-  
+
   /**
    * Adds institute alias to lab (lab dropdown displays lab alias + institute alias) (detailed sample only)
    */
@@ -124,7 +136,7 @@ Sample.hot = {
       labs[i].instituteAlias = instituteAlias;
     }
   },
-  
+
   /**
    * Creates the project dorpdown and adds it to the page
    */
@@ -135,10 +147,10 @@ Sample.hot = {
     for (var i=0; i<Sample.hot.projectsArray.length; i++) {
       select.push('<option value="'+ Sample.hot.projectsArray[i].id +'"');
       select.push(Sample.hot.projectsArray[i].id == Sample.hot.selectedProjectId ? ' selected' : '');
-      select.push('>'+ Sample.hot.projectsArray[i].name +' ('+ Sample.hot.projectsArray[i].alias +')</option>');
+      select.push('>'+ Sample.hot.projectsArray[i].alias +' ('+ Sample.hot.projectsArray[i].name +')</option>');
     }
     document.getElementById('projectSelect').insertAdjacentHTML('beforeend', select.join(''));
-    
+
     // if detailedSample is selected, add subproject dropdown
     if (Hot.detailedSample && Sample.hot.selectedProjectId) {
       Sample.hot.addSubprojectSelect();
@@ -174,7 +186,7 @@ Sample.hot = {
       subprojectSelect.style.display = '';
     }
   },
-  
+
   /**
    * Helper method to return subprojects associated with a given project
    */
@@ -185,7 +197,7 @@ Sample.hot = {
     });
     return rtn;
   },
-  
+
   /**
    * Creates dropdown for sample classes
    */
@@ -194,15 +206,61 @@ Sample.hot = {
     var classes = Hot.sortByProperty(Hot.sampleOptions.sampleClassesDtos, 'id');
     select.push('<select id="classDropdown">');
     select.push('<option value="">Select class</option>');
-    for (var i=0; i<classes.length; i++) {
-      if (classes[i].alias == "Identity") continue;
-      select.push('<option value="'+ classes[i].id +'">'+ classes[i].alias +'</option>');
+    var classOptions = Sample.hot.getNewSampleClassOptions();
+    for (var i=0; i<classOptions.length; i++) {
+       select.push('<option value="'+ classOptions[i].id +'">'+ classOptions[i].alias +'</option>');
     }
     select.push('</select>');
     document.getElementById('classOptions').innerHTML = select.join('');
     document.getElementById('classDropdown').addEventListener('change', Sample.hot.enableTableButton);
   },
-  
+
+  /**
+   * Returns true if a new sample of the provided SampleClass can be created without an existing parent
+   */
+  canCreateNew: function (sampleClass) {
+    return sampleClass.sampleCategory === "Tissue" || sampleClass.sampleCategory === "Stock";
+  },
+
+  /**
+   * Returns the SampleClasses which may be created without an existing parent
+   */
+  getNewSampleClassOptions: function () {
+    var classes = Hot.sortByProperty(Hot.sampleOptions.sampleClassesDtos, 'id');
+    var options = [];
+    for (var i=0; i<classes.length; i++) {
+      if (Sample.hot.canCreateNew(classes[i])) {
+        options.push(classes[i]);
+      }
+    }
+    return options;
+  },
+
+  /**
+   * Returns the alias of each SampleClass which may be created without an existing parent
+   */
+  getNewSampleClassOptionsAliasOnly: function () {
+    var classes = Hot.sortByProperty(Hot.sampleOptions.sampleClassesDtos, 'id');
+    var options = [];
+    for (var i=0; i<classes.length; i++) {
+      if (Sample.hot.canCreateNew(classes[i])) {
+        options.push(classes[i].alias);
+      }
+    }
+    return options;
+  },
+
+  getTissueClassesAliasOnly: function () {
+    var classes = Hot.sortByProperty(Hot.sampleOptions.sampleClassesDtos, 'id');
+    var options = [];
+    for (var i=0; i<classes.length; i++) {
+      if (classes[i].sampleCategory === 'Tissue') {
+        options.push(classes[i].alias);
+      }
+    }
+    return options;
+  },
+
   /**
    * Enables "Make Table" button once required dropdowns are chosen
    */
@@ -212,7 +270,7 @@ Sample.hot = {
       document.getElementById('makeTable').classList.remove('disabled');
     }
   },
-  
+
   /**
    * Checks to see if table exists before creating a new one.
    */
@@ -239,22 +297,27 @@ Sample.hot = {
         Hot.startData = [];
       }
     }
-    
+    // if detailedSample is enabled, re-store the selected sampleClassId for this table
+    if (Hot.detailedSample) {
+      Sample.hot.sampleClassId = document.getElementById('classDropdown').value;
+      Sample.hot.dataSchema.sampleClassAlias = Hot.getAliasFromId(Sample.hot.sampleClassId, Hot.sampleOptions.sampleClassesDtos);
+    }
+
     // make the table
     var sampleCategory = null;
     if (Hot.detailedSample) {
-      Sample.hot.sampleClassId = document.getElementById('classDropdown').value;
-      sampleCategory = Sample.hot.getCategoryFromClassId(Sample.hot.sampleClassId);
+      sampleCategory = Sample.hot.getCategoryFromClassId(document.getElementById('classDropdown').value);
+      Sample.hot.dataSchema.scientificName = "Homo sapiens";
     }
-    Sample.hot.makeHOT(null, sampleCategory);
-    
+    Sample.hot.makeHOT(null, 'create', null, sampleCategory);
+
     // disable sampleClass dropdown so they can't change it midway through editing table values
     if (document.getElementById('classDropdown')) {
       document.getElementById('classDropdown').setAttribute('disabled', 'disabled');
       document.getElementById('classDropdown').classList.add('disabled');
     }
   },
-  
+
   /**
    * Gets number of rows to add to table
    */
@@ -275,16 +338,16 @@ Sample.hot = {
   /**
    * Makes create/edit samples table
    */
-  makeHOT: function (startingValues, sampleCategory) {
+  makeHOT: function (startingValues, action, sourceSampleCategory, targetSampleCategory) {
     // are new samples parented to IDs being requested
-    var idColBoolean = (startingValues ? false : true);
-    Hot.colConf = Sample.hot.setColumnData(Hot.detailedSample, sampleCategory, idColBoolean);
+    Sample.hot.generateColumnData = function(showQcs) { return Sample.hot.getAppropriateColumns(action, sourceSampleCategory, targetSampleCategory, showQcs); };
+    Hot.colConf = Sample.hot.generateColumnData(false);
 
     if (!startingValues) {
-      // set initial number of rows to display. 
+      // set initial number of rows to display.
       var startRowsNumber = Sample.hot.parseIntRows("");
       if (startRowsNumber === false) return false;
-      
+
       // stringify and parse to clone the default object (instead of using referential copies) if detailedSample is enabled
       var defaultObject = (Hot.detailedSample ? JSON.stringify(Sample.hot.getDefaultDetailedValues()) : null);
       Sample.hot.addEmptyRow((startRowsNumber - Hot.startData.length), defaultObject);
@@ -292,7 +355,7 @@ Sample.hot = {
     } else {
       Hot.startData = startingValues;
     }
-    
+
     // make HOT instance
     var hotContainer = document.getElementById('hotContainer');
     Hot.hotTable = new Handsontable(hotContainer, {
@@ -307,34 +370,20 @@ Sample.hot = {
       dataSchema: Sample.hot.dataSchema
     });
     document.getElementById('hotContainer').style.display = '';
-    
+
     // enable save button if it was disabled
     if (Hot.saveButton && Hot.saveButton.classList.contains('disabled')) Hot.toggleButtonAndLoaderImage(Hot.saveButton);
   },
-  
+
   /**
    * Redraws the samples table to include QC columns
-   * TODO: finish this (make sure it contains the necessary columns)
    */
   regenerateWithQcs: function () {
-    Sample.hot.showQcs = true;
-    var sampleCategory = Sample.hot.getCategoryFromClassId(Hot.hotTable.getSourceData()[0].sampleAdditionalInfo.sampleClassId);
-    Hot.colConf = Sample.hot.setColumnData(Hot.detailedSample, sampleCategory, false);
-    
+    Hot.colConf = Sample.hot.generateColumnData(true);
+
     Hot.hotTable.updateSettings({ columns: Hot.colConf, colHeaders: Hot.getValues('header', Hot.colConf) });
   },
-  
-  /**
-   * Hides columns which don't change often and do take up extra space
-   * TODO: finish this
-   */
-  hideAdditionalCols: function () {
-    var sampleCategory = Sample.hot.getCategoryFromClassId(Hot.hotTable.getSourceData()[0].sampleAdditionalInfo.sampleClassId);
-    Hot.colConf = Sample.hot.setColumnData(false, sampleCategory, false);
-    
-    Hot.hotTable.updateSettings({ columns: Hot.colConf, colHeaders: Hot.getValues('header', Hot.colConf) });
-  },
- 
+
   /**
    * Data schema for each row in table
    */
@@ -344,51 +393,46 @@ Sample.hot = {
     description: null,
     receivedDate: null,
     identificationBarcode: null,
-    scientificName: null,
+    scientificName: this.sciName,
     sampleType: null,
     alias: null,
     qcPassed: '',
     volume: null,
-    sampleIdentity: {
-      externalName: null,
-      donorSex: null
-    },
-    sampleAdditionalInfo: {
-      sampleClassId: null,
-      sampleClassAlias: null,
-      tissueOriginId: null,
-      tissueOriginAlias: null,
-      tissueTypeId: null,
-      tissueTypeAlias: null,
-      passageNumber: null,
-      timesReceived: null,
-      tubeNumber: null,
-      subprojectId: null,
-      subprojectAlias: null,
-      labId: null,
-      labComposite: null,
-      prepKitId: null,
-      prepKitAlias: null,
-      concentration: null,
-      qcPassedDetailId: null
-    },
-    sampleAnalyte: {
-      samplePurposeId: null,
-      samplePurposeAlias: null,
-      tissueMaterialId: null,
-      tissueMaterialAlias: null,
-      strStatus: null,
-      region: null,
-      tubeId: null,
-      groupId: null,
-      groupDescription:null
-    },
-    sampleTissue: {
-      instituteTissueName: null,
-      cellularity: null
-    }
+    externalName: null,
+    donorSex: null,
+    sampleClassId: null,
+    sampleClassAlias: null,
+    tissueOriginId: null,
+    tissueOriginAlias: null,
+    tissueTypeId: null,
+    tissueTypeAlias: null,
+    passageNumber: null,
+    timesReceived: null,
+    tubeNumber: null,
+    subprojectId: null,
+    subprojectAlias: null,
+    labId: null,
+    labComposite: null,
+    prepKitId: null,
+    prepKitAlias: null,
+    concentration: null,
+    qcPassedDetailId: null,
+    groupId: null,
+    groupDescription:null,
+    samplePurposeId: null,
+    samplePurposeAlias: null,
+    tissueMaterialId: null,
+    tissueMaterialAlias: null,
+    strStatus: null,
+    region: null,
+    tubeId: null,
+    instituteTissueName: null,
+    cuts: null,
+    discards: null,
+    thickness: null,
+    cutsConsumed: null
   },
- 
+
   /**
    * Adds an object to the startData (can have default values)
    */
@@ -398,22 +442,18 @@ Sample.hot = {
       Hot.startData.push((defaultObject ? JSON.parse(defaultObject) : {}));
     }
   },
- 
+
   /**
    * Pre-populates default values for certain columns. (detailed sample only)
    */
   getDefaultDetailedValues: function () {
     var sampleClassAlias = Hot.getAliasFromId(Sample.hot.sampleClassId, Hot.sampleOptions.sampleClassesDtos);
     var rootSampleClassId = Sample.hot.getRootSampleClassId();
-    var sampleCategory = Sample.hot.getCategoryFromClassId(document.getElementById('classDropdown').value);
+    var sampleCategory = Sample.hot.getCategoryFromClassId(Sample.hot.sampleClassId);
     return {
-      'sampleAdditionalInfo': {
-        'sampleClassAlias': sampleClassAlias,
-        'parentSampleClassId': rootSampleClassId
-      },
-      'sampleAnalyte': {
-        'strStatus': sampleCategory === 'Analyte' ? 'Not Submitted' : null
-      },
+      'sampleClassAlias': sampleClassAlias,
+      'parentSampleClassId': rootSampleClassId,
+      'strStatus': sampleCategory === 'Stock' ? 'Not Submitted' : null,
       'scientificName': Sample.hot.sciName
     };
   },
@@ -424,7 +464,7 @@ Sample.hot = {
   getSubprojects: function() {
     return Hot.sortByProperty(Hot.sampleOptions.subprojectsDtos, 'id').map(Hot.getAlias);
   },
-  
+
   /**
    * Gets array of sample type aliases (detailed sample only)
    */
@@ -438,7 +478,7 @@ Sample.hot = {
   getQcValues: function () {
     return Hot.dropdownRef['qcValues'].map(function (val) { if (val === '') val = 'unknown'; return val; });
   },
-  
+
   /**
    * Gets array of STR statuses (detailed sample only)
    */
@@ -466,7 +506,7 @@ Sample.hot = {
   getTissueTypes: function () {
     return Hot.sortByProperty(Hot.sampleOptions.tissueTypesDtos, 'id').map(Hot.getAlias);
   },
-  
+
   /**
    * Gets array of tissue material aliases (detailed sample only)
    */
@@ -480,7 +520,7 @@ Sample.hot = {
   getSampleClasses: function () {
     return Hot.sortByProperty(Hot.sampleOptions.sampleClassesDtos, 'id').map(Hot.getAlias);
   },
-  
+
   /**
    * Gets array of sample class aliases that are a valid child of the given parent (detailed sample only)
    */
@@ -495,7 +535,7 @@ Sample.hot = {
    * Gets array of sample purpose aliases (detailed sample only)
    */
   getSamplePurposes: function () {
-    return Hot.sortByProperty(Hot.sampleOptions.samplePurposesDtos, 'id').map(Hot.getAlias); 
+    return Hot.sortByProperty(Hot.sampleOptions.samplePurposesDtos, 'id').map(Hot.getAlias);
   },
 
   /**
@@ -505,14 +545,14 @@ Sample.hot = {
   getQcPassedDetails: function () {
     return Hot.sortByProperty(Hot.sampleOptions.qcPassedDetailsDtos, 'id').map(function (qcpd) { return qcpd.description; });
   },
-  
+
   /**
    * Gets array of lab custom aliases (with institute alias) (detailed sample only)
    */
   getLabs: function () {
     return Hot.sortByProperty(Hot.sampleOptions.labsDtos,'id').map(function (lab) { return lab.alias +' - '+ lab.instituteAlias; });
   },
-  
+
   /**
    * Gets array of kit descriptor names(detailed sample only)
    */
@@ -521,294 +561,342 @@ Sample.hot = {
       .filter(function (kit) { return kit.kitType == 'Extraction'; })
       .map(function (kit) { return kit.name; });
   },
-  
+
   /**
-   * sets which columns will be displayed
-   * params: boolean detailedSample
-   *         boolean qcBool (have qc columns been requested)
-   *         String sampleCategory
-   *         boolean idColBoolean (true if no starting values are provided so parent is Identity, false if starting values are provided 
-   *                               so parent is sample)
+   * Returns a list of the columns will be displayed for the current situation
+   * params: string action: one of create, update, or propagate
+   *         string sourceSampleCategory: if propagating, the sample category of the parent, null otherwise
+   *         string targetSampleCategory: the sample category of the sample being created or modified, null if plain
+   *         Boolean showQcs: show quality control columns
    */
-  setColumnData: function (detailedBool, sampleCategory, idColBoolean) {
-    var qcBool = Sample.hot.showQcs;
-    var cols;
-    if (!detailedBool && !qcBool) {
-     // if neither detailed sample not qcs are requested
-      cols = Hot.concatArrays(setAliasCol(), setPlainCols());
-    } else if (!detailedBool && qcBool) {
-      // if detailed sample is not requested but qcs are
-      cols = Hot.concatArrays(setAliasCol(), setPlainCols(), setQcCols());
-    } else if (detailedBool && !qcBool){
-      // if detailed sample is requested but qcs are
-      cols = Hot.concatArrays(setAliasCol(), setPlainCols(), setDetailedCols(sampleCategory, idColBoolean));
-    } else if (detailedBool && qcBool) {
-      // if detailed sample and qcs are requested
-      cols = Hot.concatArrays(setAliasCol(), setPlainCols(), setDetailedCols(sampleCategory, idColBoolean), setQcCols());
+  getAppropriateColumns: function (action, sourceSampleCategory, targetSampleCategory, showQcs) {
+    var isDetailed = targetSampleCategory != null;
+    var sampleClassAlias = Hot.getAliasFromId(Sample.hot.sampleClassId, Hot.sampleOptions.sampleClassesDtos);
+	// We assume we have a linear progression of information that must be
+	// collected as a sample progressed through the hierarchy.
+    var progression = ['Identity', 'Tissue', 'Tissue Processing', 'Stock', 'Aliquot'];
+    // First, set all the groups of detailed columns we will show to off.
+    var show = {};
+    for (var i = 0; i <= progression.length; i++) {
+      show[progression[i]] = false;
     }
-    // add the ID Barcode column if it is not auto-generated
-    if (!Hot.autoGenerateIdBarcodes) {
-      cols.splice(3, 0, {
-          header: 'Matrix Barcode',
-          data: 'identificationBarcode',
-          type: 'text'
-        }
-      );
+    // Determine the indices of the first and less steps in the progression.
+    var endProgression = targetSampleCategory == null ? -1 : progression.indexOf(targetSampleCategory);
+    var startProgression;
+    if (!isDetailed) {
+      startProgression = -1;
+    } else if (action == 'create') {
+      startProgression = 0;
+    } else if (action == 'update') {
+      startProgression = endProgression;
+    } else {
+      // Start at the category *after* our source type.
+      startProgression = progression.indexOf(sourceSampleCategory) + 1;
     }
-    return cols;
-    
-    function setPlainCols () {
-      var sampleCols = [
-        {
-          header: 'Description',
-          data: 'description',
-          type: 'text',
-          validator: requiredText
-        }
-      ];
-        
-      if (!detailedBool || idColBoolean) {
-        sampleCols.push({
-          header: 'Date of receipt',
-          data: 'receivedDate',
-          type: 'date',
-          dateFormat: 'YYYY-MM-DD',
-          datePickerConfig: {
-            firstDay: 0,
-            numberOfMonths: 1
-          },
-          allowEmpty: true,
-          extraneous: true
-        });
+    // Now, mark all the appropriate column groups active
+    for (i = startProgression; i <= endProgression && i != -1; i++) {
+      show[progression[i]] = true;
+    }
+	// If we aren't starting or finished with a tissue processing, hide those
+	// columns since we don't really want to show tissue processing unless the
+	// user specifically requested it.
+	if (sourceSampleCategory != 'Tissue Processing' && targetSampleCategory != 'Tissue Processing') {
+      show['Tissue Processing'] = false;
+    }
+
+    return [
+      // Basic columns
+      {
+        header: 'Sample Alias',
+        data: 'alias',
+        type: 'text',
+        validator: validateAlias,
+        include: true
+      },
+      {
+        header: 'Description',
+        data: 'description',
+        type: 'text',
+        validator: requiredText,
+        include: true
+      },
+      {
+        header: 'Date of receipt',
+        data: 'receivedDate',
+        type: 'date',
+        dateFormat: 'YYYY-MM-DD',
+        datePickerConfig: {
+          firstDay: 0,
+          numberOfMonths: 1
+        },
+        allowEmpty: true,
+        extraneous: true,
+        include: !isDetailed || show['Tissue']
+      },
+      {
+        header: 'Matrix Barcode',
+        data: 'identificationBarcode',
+        type: 'text',
+        include: !Hot.autoGenerateIdBarcodes
+      },
+      {
+        header: 'Sample Type',
+        data: 'sampleType',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: Sample.hot.getSampleTypes(),
+        validator: validateSampleTypes,
+        extraneous: true,
+        include: true
+      },
+      {
+        header: 'Sci. Name',
+        data: 'scientificName',
+        type: 'text',
+        source: Sample.hot.sciName,
+        validator: requiredText,
+        extraneous: true,
+        include: !isDetailed || show['Tissue']
+      },
+
+      // Parent columns
+      {
+        header: 'Parent Alias',
+        data: 'parentAlias',
+        type: 'text',
+        readOnly: true,
+        include: isDetailed && action == 'propagate'
+      },
+      {
+        header: 'Parent Sample Class',
+        data: 'parentSampleClassAlias',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: Sample.hot.getSampleClasses(),
+        readOnly: true,
+        include: isDetailed && action == 'propagate'
+      },
+
+      // Identity columns
+      {
+        header: 'External Name',
+        data: 'externalName',
+        type: 'text',
+        validator: requiredText,
+        include: show['Identity']
+      },
+      {
+        header: 'Sex',
+        data: 'donorSex',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: Sample.hot.getDonorSexes(),
+        validator: permitEmpty,
+        include: show['Identity']
+      },
+
+      // Detailed columns
+      {
+        header: 'Sample Class',
+        data: 'sampleClassAlias',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: sourceSampleCategory == null ? Sample.hot.getNewSampleClassOptionsAliasOnly() : Sample.hot.getSampleClasses(),
+        include: isDetailed
+      },
+      {
+        header: 'Group ID',
+        data: 'groupId',
+        type: 'numeric',
+        validator: validateNumber,
+        include: isDetailed
+      },
+      {
+        header: 'Group Desc.',
+        data: 'groupDescription',
+        type: 'text',
+        validator: permitEmpty,
+        include: isDetailed
+      },
+      {
+        header: 'Kit',
+        data: 'prepKitAlias',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: Sample.hot.getKitDescriptors(),
+        validator: permitEmpty,
+        include: show['Aliquot']
+      },
+
+      // Tissue columns
+      {
+        header: 'Tissue Class',
+        data: 'parentSampleClassAlias',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: Sample.hot.getTissueClassesAliasOnly(),
+        validator: validateTissueClasses,
+        include: show['Tissue'] && targetSampleCategory != 'Tissue'
+      },
+      {
+        header: 'Tissue Origin',
+        data: 'tissueOriginAlias',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: Sample.hot.getTissueOrigins(),
+        validator: validateTissueOrigins,
+        include: show['Tissue']
+      },
+      {
+        header: 'Tissue Type',
+        data: 'tissueTypeAlias',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: Sample.hot.getTissueTypes(),
+        validator: validateTissueTypes,
+        include: show['Tissue']
+      },
+      {
+        header: 'Passage #',
+        data: 'passageNumber',
+        type: 'text',
+        validator: validateNumber,
+        include: show['Tissue']
+      },
+      {
+        header: 'Times Received',
+        data: 'timesReceived',
+        type: 'numeric',
+        validator: requiredText,
+        include: show['Tissue']
+      },
+      {
+        header: 'Tube Number',
+        data: 'tubeNumber',
+        type: 'numeric',
+        validator: requiredText,
+        include: show['Tissue']
+      },
+      {
+        header: 'Lab',
+        data: 'labComposite',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: Sample.hot.getLabs(),
+        validator: permitEmpty,
+        include: show['Tissue']
+      },
+      {
+        header: 'Ext. Inst. Identifier',
+        data: 'externalInstituteIdentifier',
+        type: 'text',
+        include: show['Tissue']
+      },
+      {
+        header: 'Material',
+        data: 'tissueMaterialAlias',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: Sample.hot.getTissueMaterials(),
+        validator: permitEmpty,
+        include: show['Tissue']
+      },
+      {
+        header: 'Region',
+        data: 'region',
+        type: 'text',
+        validator: permitEmpty,
+        include: show['Tissue']
+      },
+
+      // Tissue Processing: CV Slides columns
+      {
+        header: 'Cuts',
+        data: 'cuts',
+        type: 'numeric',
+        validator: requiredText,
+        include: show['Tissue Processing'] && sampleClassAlias == 'CV Slide'
+      },
+      {
+        header: 'Discards',
+        data: 'discards',
+        type: 'numeric',
+        include: show['Tissue Processing'] && sampleClassAlias == 'CV Slide'
+      },
+      {
+        header: 'Thickness',
+        data: 'thickness',
+        type: 'numeric',
+        include: show['Tissue Processing'] && sampleClassAlias == 'CV Slide'
+      },
+
+      // Tissue Processing: LCM Tube columns
+      {
+        header: 'Cuts Consumed',
+        data: 'cutsConsumed',
+        type: 'numeric',
+        validator: requiredText,
+        include: show['Tissue Processing'] && sampleClassAlias == 'LCM Tube'
+      },
+
+      // Stock columns
+      {
+        header: 'STR Status',
+        data: 'strStatus',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: Sample.hot.getStrStatuses(),
+        include: show['Stock']
+
+      },
+
+      // QC columns
+      {
+        header: 'Vol.',
+        data: 'volume',
+        type: 'numeric',
+        format: '0.00',
+        include: showQcs || show['Stock']
+      },
+      {
+        header: 'Conc.',
+        data: 'concentration',
+        type: 'numeric',
+        format: '0.00',
+        include: show['Stock']
+      },
+      {
+        header: 'QC Passed?',
+        data: 'qcValue',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: Sample.hot.getQcValues(),
+        validator: permitEmpty,
+        include: showQcs || show['Stock']
+      },
+      {
+        header: 'QC Detail',
+        data: 'qcPassedDetailAlias',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: Sample.hot.getQcPassedDetails(),
+        validator: permitEmpty,
+        include: Sample.hot.showQcs || show['Stock']
+      },
+
+
+      // Aliquot columns
+      {
+        header: 'Purpose',
+        data: 'samplePurposeAlias',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: Sample.hot.getSamplePurposes(),
+        validator: permitEmpty,
+        include: show['Aliquot']
       }
-      
-      sampleCols.push(
-        {
-          header: 'Sample Type',
-          data: 'sampleType',
-          type: 'dropdown',
-          trimDropdown: false,
-          source: Sample.hot.getSampleTypes(),
-          validator: validateSampleTypes,
-          extraneous: true
-        },{
-          header: 'Sci. Name',
-          data: 'scientificName',
-          type: 'text',
-          source: Sample.hot.sciName,
-          validator: requiredText,
-          extraneous: true
-        }
-      );
-      
-      return sampleCols;
-    }
-    
-    function setAliasCol () {
-      var aliasCol = [
-        {
-          header: 'Sample Alias',
-          data: 'alias',
-          type: 'text',
-          validator: validateAlias
-        }
-      ];
-            
-      return aliasCol;
-    }
-    
-    function setDetailedCols (sampleCategory, idColBoolean) {
-      var additionalCols = [
-        
-      ];
-      
-      var tissueCols = [
-        {
-          header: 'Cellularity',
-          data: 'sampleTissue.cellularity',
-          type: 'text'
-        }                 
-      ];
-       
-      var analyteCols = [
-        {
-          header: 'Material',
-          data: 'sampleAnalyte.tissueMaterialAlias',
-          type: 'dropdown',
-          trimDropdown: false,
-          source: Sample.hot.getTissueMaterials(),
-          validator: permitEmpty
-        },{
-          header: 'Purpose',
-          data: 'sampleAnalyte.samplePurposeAlias',
-          type: 'dropdown',
-          trimDropdown: false,
-          source: Sample.hot.getSamplePurposes(),
-          validator: permitEmpty
-        },{
-          header: 'STR Status',
-          data: 'sampleAnalyte.strStatus',
-          type: 'dropdown',
-          trimDropdown: false,
-          source: Sample.hot.getStrStatuses()
-        },{
-          header: 'Region',
-          data: 'sampleAnalyte.region',
-          type: 'text'
-        },{
-          header: 'Tube ID',
-          data: 'sampleAnalyte.tubeId',
-          type: 'text'
-        },{
-          header: 'Group ID',
-          data: 'sampleAnalyte.groupId',
-          type: 'numeric',
-          validator: validateNumber
-        },{
-          header: 'Group Desc.',
-          data: 'sampleAnalyte.groupDescription',
-          type: 'text',
-          validator: permitEmpty
-        },{
-          header: 'Kit',
-          data: 'sampleAnalyte.prepKitAlias',
-          type: 'dropdown',
-          trimDropdown: false,
-          source: Sample.hot.getKitDescriptors(),
-          validator: permitEmpty
-        }
-      ];  
-      
-      // attach either the external name column & cols required to create sample alias, 
-      //   or the parentAlias column (depending on what kind of parent is required)
-      (function () {
-        var parentIdentityCols = [
-          {
-            header: 'External Name',
-            data: 'sampleIdentity.externalName',
-            type: 'text',
-            validator: requiredText
-          },{
-            header: 'Sex',
-            data: 'sampleIdentity.donorSex',
-            type: 'dropdown',
-            trimDropdown: false,
-            source: Sample.hot.getDonorSexes(),
-            validator: permitEmpty
-          },{
-            header: 'Tissue Origin',
-            data: 'sampleAdditionalInfo.tissueOriginAlias',
-            type: 'dropdown',
-            trimDropdown: false,
-            source: Sample.hot.getTissueOrigins(),
-            validator: validateTissueOrigins
-          },{
-            header: 'Tissue Type',
-            data: 'sampleAdditionalInfo.tissueTypeAlias',
-            type: 'dropdown',
-            trimDropdown: false,
-            source: Sample.hot.getTissueTypes(),
-            validator: validateTissueTypes
-          },{
-            header: 'Passage #',
-            data: 'sampleAdditionalInfo.passageNumber',
-            type: 'text',
-            validator: validateNumber
-          },{
-            header: 'Times Received',
-            data: 'sampleAdditionalInfo.timesReceived',
-            type: 'numeric',
-            validator: requiredText
-          },{
-            header: 'Tube Number',
-            data: 'sampleAdditionalInfo.tubeNumber',
-            type: 'numeric',
-            validator: requiredText
-          },{
-            header: 'Sample Class',
-            data: 'sampleAdditionalInfo.sampleClassAlias',
-            type: 'dropdown',
-            trimDropdown: false,
-            source: Sample.hot.getValidClassesForParent(Sample.hot.getRootSampleClassId())
-          },{
-            header: 'Lab',
-            data: 'sampleAdditionalInfo.labComposite',
-            type: 'dropdown',
-            trimDropdown: false,
-            source: Sample.hot.getLabs(),
-            validator: permitEmpty
-          },{
-            header: 'Ext. Inst. Identifier',
-            data: 'sampleAdditionalInfo.externalInstituteIdentifier',
-            type: 'text'
-          }
-        ];
-        var parentSampleCols = [
-          {
-            header: 'Parent Alias',
-            data: 'sampleAdditionalInfo.parentAlias',
-            type: 'text',
-            readOnly: true
-          },{
-            header: 'Parent Sample Class',
-            data: 'sampleAdditionalInfo.parentSampleClassAlias',
-            type: 'dropdown',
-            trimDropdown: false,
-            source: Sample.hot.getSampleClasses(),
-            readOnly: true
-          },{
-            header: 'Sample Class',
-            data: 'sampleAdditionalInfo.sampleClassAlias',
-            type: 'dropdown',
-            trimDropdown: false,
-            source: Sample.hot.getSampleClasses()
-          }
-        ];
-        var parentColumn = (idColBoolean ? parentIdentityCols : parentSampleCols);
-        additionalCols = Hot.concatArrays(parentColumn, additionalCols);
-      }()); 
-      return Hot.concatArrays(additionalCols, getSampleCategoryCols(sampleCategory, tissueCols, analyteCols));
-    }
-    
-    function getSampleCategoryCols (sampleCategory, tissueCols, analyteCols) {
-      var categoryCols = {
-        'Tissue': tissueCols,
-        'Analyte': analyteCols
-      };
-      return categoryCols[sampleCategory];
-    }
-    
-    function setQcCols () {    
-      var qcCols = [
-        {
-          header: 'Vol.',
-          data: 'volume',
-          type: 'numeric',
-          format: '0.00'
-        },{
-          header: 'Conc.',
-          data: 'sampleAdditionalInfo.concentration',
-          type: 'numeric',
-          format: '0.00'
-        },{
-          header: 'QC Passed?',
-          data: 'qcValue',
-          type: 'dropdown',
-          trimDropdown: false,
-          source: Sample.hot.getQcValues(),
-          validator: permitEmpty
-        },{
-          header: 'QC Detail',
-          data: 'sampleAdditionalInfo.qcPassedDetailAlias',
-          type: 'dropdown',
-          trimDropdown: false,
-          source: Sample.hot.getQcPassedDetails(),
-          validator: permitEmpty
-        }
-      ];
-      return qcCols;
-    }
-    
+    ].filter(function(x) { return x.include; });
+
     function requiredText (value, callback) {
       if (!value || value.length === 0) {
         callback(false);
@@ -816,7 +904,7 @@ Sample.hot = {
         callback(true);
       }
     }
-    
+
     function permitEmpty (value, callback) {
       if (value === undefined || value === null || value.length > 0 || value === '') {
         return callback(true);
@@ -824,7 +912,7 @@ Sample.hot = {
         return callback(false);
       }
     }
-    
+
     function validateAlias (value, callback) {
       if (value) {
         var countAliases = 0;
@@ -859,7 +947,7 @@ Sample.hot = {
         return callback(false);
       }
     }
-    
+
     function validateSampleTypes (value, callback) {
       if (Sample.hot.getSampleTypes().indexOf(value) == -1) {
         return callback(false);
@@ -867,7 +955,15 @@ Sample.hot = {
         return callback(true);
       }
     }
-    
+
+    function validateTissueClasses (value, callback) {
+      if (Sample.hot.getTissueClassesAliasOnly().indexOf(value) == -1) {
+        return callback(false);
+      } else {
+        return callback(true);
+      }
+    }
+
     function validateTissueOrigins (value, callback) {
       if (Sample.hot.getTissueOrigins().indexOf(value) == -1) {
         return callback(false);
@@ -875,7 +971,7 @@ Sample.hot = {
         return callback(true);
       }
     }
-    
+
     function validateTissueTypes (value, callback) {
       if (Sample.hot.getTissueTypes().indexOf(value) == -1) {
         return callback(false);
@@ -883,7 +979,7 @@ Sample.hot = {
         return callback(true);
       }
     }
-    
+
     function validateNumber (value, callback) {
       if (value === '' || value === null || Handsontable.helper.isNumeric(value) && value > 0) {
         return callback(true);
@@ -892,16 +988,20 @@ Sample.hot = {
       }
     }
   },
-  
+
   /**
    * Gets the sampleCategory associated with a given sampleClass
    */
   getCategoryFromClassId: function (sampleClassId) {
-    return Hot.sampleOptions.sampleClassesDtos.filter(function (sampleClass) {
+    var sampleClasses = (Hot.sampleOptions.sampleClassesDtos || Sample.sampleClasses).filter(function (sampleClass) {
       return sampleClass.id == sampleClassId;
-    })[0].sampleCategory;
+    });
+    if (sampleClasses.length > 0) {
+      return sampleClasses[0].sampleCategory;
+    }
+    return 'Plain';
   },
-  
+
   /**
    * Gets lab id associated with a given lab composite (alias and institute alias)
    */
@@ -911,7 +1011,7 @@ Sample.hot = {
       return lab.alias +" - "+ lab.instituteAlias == aliasComposite;
     })[0].id;
   },
-  
+
   /**
    * Creates custom lab composite (alias and institute alias)
    */
@@ -921,29 +1021,29 @@ Sample.hot = {
     })[0];
     return lab.alias +' - '+ lab.instituteAlias;
   },
-  
+
   /**
    * Gets sampleClass id for sampleClass at base of hierarchy (detailed sample only; Identity for OICR)
    */
   getRootSampleClassId: function () {
     return Hot.sampleOptions.sampleClassesDtos.filter(function (sampleClass) {
       // TODO: make this configurable in case an institute wants a root sample class with a different name
-      return sampleClass.alias == 'Identity'; 
+      return sampleClass.alias == 'Identity';
     })[0].id;
   },
-  
+
   /**
    * Creates the SampleDtos to pass to the server
    */
   buildSampleDtosFromData: function (obj) {
     var sample = {};
-    
+
     if (obj.id) {
       sample.id = obj.id;
       sample.name = obj.name;
       sample.alias = obj.alias;
     }
-    
+
     // add SampleDto attributes
     sample.description = obj.description || '';
     sample.identificationBarcode = obj.identificationBarcode;
@@ -955,124 +1055,116 @@ Sample.hot = {
     if (obj.receivedDate && obj.receivedDate.length) {
       sample.receivedDate = obj.receivedDate;
     }
-    
+
     // if it's a plain sample, return now.
     if (!Hot.detailedSample) {
+      sample.type = 'Plain';
       return sample;
     }
 
     sample.rootSampleClassId = Sample.hot.getRootSampleClassId();
-    
-    // add sample parent attributes. 
-    if (obj.sampleIdentity && obj.sampleIdentity.externalName) {
-      sample.sampleIdentity = {
-          externalName: obj.sampleIdentity.externalName
-      };
-      if (obj.sampleIdentity.donorSex && obj.sampleIdentity.donorSex.length) {
-        sample.sampleIdentity.donorSex = obj.sampleIdentity.donorSex;
+
+    // add sample parent attributes, and all other attributes for the first receipt of a sample
+    if (obj.externalName) {
+      sample.externalName = obj.externalName;
+      if (obj.donorSex && obj.donorSex.length) sample.donorSex = obj.donorSex;
+
+      if (obj.tissueOriginId && !obj.tissueOriginAlias) {
+        sample.tissueOriginId = obj.tissueOriginId;
+      } else {
+        sample.tissueOriginId = Hot.getIdFromAlias(obj.tissueOriginAlias, Hot.sampleOptions.tissueOriginsDtos);
+      }
+      if (obj.tissueTypeId && !obj.tissueTypeAlias) {
+        sample.tissueTypeId = obj.tissueTypeId;
+      } else {
+        sample.tissueTypeId = Hot.getIdFromAlias(obj.tissueTypeAlias, Hot.sampleOptions.tissueTypesDtos);
+      }
+      sample.passageNumber = (obj.passageNumber == '' ? null : parseInt(obj.passageNumber));
+      sample.timesReceived = parseInt(obj.timesReceived);
+      sample.tubeNumber = parseInt(obj.tubeNumber);
+      if (obj.labComposite && obj.labComposite.length) {
+        sample.labId = Sample.hot.getIdFromLabComposite(obj.labComposite, Hot.sampleOptions.labsDtos);
+      }
+      if (obj.externalInstituteIdentifier && obj.externalInstituteIdentifier.length) {
+        sample.externalInstituteIdentifier = obj.externalInstituteIdentifier;
       }
     }
-    
-    // add sampleAdditionalInfo attributes
-    sample.sampleAdditionalInfo = {
-      passageNumber: (obj.sampleAdditionalInfo.passageNumber == '' ? null : parseInt(obj.sampleAdditionalInfo.passageNumber)),
-      timesReceived: parseInt(obj.sampleAdditionalInfo.timesReceived),
-      tubeNumber: parseInt(obj.sampleAdditionalInfo.tubeNumber)
-    };
-    
-    // if the table data couldn't have changed (no alias value) then use the original id; 
+
+
+    // if the table data couldn't have changed (no alias value) then use the original id;
     // otherwise, generate id from alias (rather than calculating for each field whether the original id corresponds to the current alias
-    if (obj.sampleAdditionalInfo.tissueOriginId && !obj.sampleAdditionalInfo.tissueOriginAlias) {
-      sample.sampleAdditionalInfo.tissueOriginId = obj.sampleAdditionalInfo.tissueOriginId;
+    if (obj.sampleClassId && !obj.sampleClassAlias) {
+      sample.sampleClassId = obj.sampleClassId;
     } else {
-      sample.sampleAdditionalInfo.tissueOriginId = Hot.getIdFromAlias(obj.sampleAdditionalInfo.tissueOriginAlias, Hot.sampleOptions.tissueOriginsDtos);
+      sample.sampleClassId = Hot.getIdFromAlias(obj.sampleClassAlias, Hot.sampleOptions.sampleClassesDtos);
     }
-    if (obj.sampleAdditionalInfo.tissueTypeId && !obj.sampleAdditionalInfo.tissueTypeAlias) {
-      sample.sampleAdditionalInfo.tissueTypeId = obj.sampleAdditionalInfo.tissueTypeId;
-    } else {
-      sample.sampleAdditionalInfo.tissueTypeId = Hot.getIdFromAlias(obj.sampleAdditionalInfo.tissueTypeAlias, Hot.sampleOptions.tissueTypesDtos);
-    }
-    if (obj.sampleAdditionalInfo.sampleClassId && !obj.sampleAdditionalInfo.sampleClassAlias) {
-      sample.sampleAdditionalInfo.sampleClassId = obj.sampleAdditionalInfo.sampleClassId;
-    } else {
-      sample.sampleAdditionalInfo.sampleClassId = Hot.getIdFromAlias(obj.sampleAdditionalInfo.sampleClassAlias, Hot.sampleOptions.sampleClassesDtos);
-    }
+    sample.type = Sample.hot.getCategoryFromClassId(sample.sampleClassId);
     // add optional attributes
-    if (obj.sampleAdditionalInfo.subprojectId && !obj.sampleAdditionalInfo.subprojectAlias) {
-      sample.sampleAdditionalInfo.subprojectId = obj.sampleAdditionalInfo.subprojectId;
-    } else if (obj.sampleAdditionalInfo.subprojectAlias){
-      sample.sampleAdditionalInfo.subprojectId = Hot.getIdFromAlias(obj.sampleAdditionalInfo.subprojectAlias, Hot.sampleOptions.subprojectsDtos);
+    if (obj.subprojectId && !obj.subprojectAlias) {
+      sample.subprojectId = obj.subprojectId;
+    } else if (obj.subprojectAlias){
+      sample.subprojectId = Hot.getIdFromAlias(obj.subprojectAlias, Hot.sampleOptions.subprojectsDtos);
     } else if (document.getElementById('subprojectSelect') && document.getElementById('subprojectSelect').value > 0) {
-      sample.sampleAdditionalInfo.subprojectId = parseInt(document.getElementById('subprojectSelect').value);
+      sample.subprojectId = parseInt(document.getElementById('subprojectSelect').value);
     }
-    if (obj.sampleAdditionalInfo.labComposite && obj.sampleAdditionalInfo.labComposite.length) {
-      sample.sampleAdditionalInfo.labId = Sample.hot.getIdFromLabComposite(obj.sampleAdditionalInfo.labComposite, Hot.sampleOptions.labsDtos);
+    if (obj.prepKitAlias && obj.prepKitAlias.length) {
+      sample.prepKitId = Hot.getIdFromAlias(obj.prepKitAlias, Sample.hot.kitDescriptorsDtos);
     }
-    if (obj.sampleAdditionalInfo.externalInstituteIdentifier && obj.sampleAdditionalInfo.externalInstituteIdentifier.length) {
-      sample.sampleAdditionalInfo.externalInstituteIdentifier = obj.sampleAdditionalInfo.externalInstituteIdentifier;
+    if (obj.parentId) {
+      sample.parentId = obj.parentId;
+    } else if (obj.parentSampleClassAlias) {
+      sample.parentSampleClassId = Hot.getIdFromAlias(obj.parentSampleClassAlias, Hot.sampleOptions.sampleClassesDtos);
     }
-    if (obj.sampleAdditionalInfo.prepKitAlias && obj.sampleAdditionalInfo.prepKitAlias.length) {
-      sample.sampleAdditionalInfo.prepKitId = Hot.getIdFromAlias(obj.sampleAdditionalInfo.prepKitAlias, Sample.hot.kitDescriptorsDtos);
+    if (obj.groupId) {
+      sample.groupId = obj.groupId;
     }
-    if (obj.sampleAdditionalInfo.parentId) {
-      sample.sampleAdditionalInfo.parentId = obj.sampleAdditionalInfo.parentId;
+    if (obj.groupDescription && obj.groupDescription.length) {
+      sample.groupDescription = obj.groupDescription;
     }
-    
-    // add sampleAnalyte attributes. 
-    if (Sample.hot.getCategoryFromClassId(sample.sampleAdditionalInfo.sampleClassId) == 'Analyte') {
-      sample.sampleAnalyte = {};
-    
-      if (obj.sampleAnalyte) {
-        if (obj.sampleAnalyte.samplePurposeAlias && obj.sampleAnalyte.samplePurposeAlias.length) {
-          sample.sampleAnalyte.samplePurposeId = Hot.getIdFromAlias(obj.sampleAnalyte.samplePurposeAlias, Hot.sampleOptions.samplePurposesDtos);
-        }
-        if (obj.sampleAnalyte.sampleGroupComposite && obj.sampleAnalyte.sampleGroupComposite.length) {
-          sample.sampleAnalyte.sampleGroupId = Sample.hot.getIdFromSGComposite(obj.sampleAnalyte.sampleGroupComposite, Hot.sampleOptions.sampleGroupsDtos);
-        }
-        if (obj.sampleAnalyte.tissueMaterialAlias && obj.sampleAnalyte.tissueMaterialAlias.length) {
-          sample.sampleAnalyte.tissueMaterialId = Hot.getIdFromAlias(obj.sampleAnalyte.tissueMaterialAlias, Hot.sampleOptions.tissueMaterialsDtos);
-        }
-        if (obj.sampleAnalyte.strStatus && obj.sampleAnalyte.strStatus.length) {
-          sample.sampleAnalyte.strStatus = obj.sampleAnalyte.strStatus;
-        }
-        if (obj.sampleAnalyte.region && obj.sampleAnalyte.region.length) {
-          sample.sampleAnalyte.region = obj.sampleAnalyte.region;
-        }
-        if (obj.sampleAnalyte.tubeId && obj.sampleAnalyte.tubeId.length) {
-          sample.sampleAnalyte.tubeId = obj.sampleAnalyte.tubeId;
-        }
-        if (obj.sampleAnalyte.groupId && obj.sampleAnalyte.groupId.length) {
-          sample.sampleAnalyte.groupId = obj.sampleAnalyte.groupId;
-        }
-        if (obj.sampleAnalyte.groupDescription && obj.sampleAnalyte.groupDescription.length) {
-          sample.sampleAnalyte.groupDescription = obj.sampleAnalyte.groupDescription;
-        }
+
+    // add SampleCategory-specific attributes.
+    switch (Sample.hot.getCategoryFromClassId(sample.sampleClassId)) {
+    case 'Aliquot':
+      if (obj.samplePurposeAlias && obj.samplePurposeAlias.length) {
+        sample.samplePurposeId = Hot.getIdFromAlias(obj.samplePurposeAlias, Hot.sampleOptions.samplePurposesDtos);
       }
-    } else if (Sample.hot.getCategoryFromClassId(sample.sampleAdditionalInfo.sampleClassId) == 'Tissue') {
-      sample.sampleTissue = {};
-      
-      if (obj.sampleTissue) {
-       if (obj.sampleTissue.cellularity && obj.sampleTissue.cellularity.length) {
-          sample.sampleTissue.cellularity = obj.sampleTissue.cellularity;
-        }
+      if (obj.sampleGroupComposite && obj.sampleGroupComposite.length) {
+        sample.sampleGroupId = Sample.hot.getIdFromSGComposite(obj.sampleGroupComposite, Hot.sampleOptions.sampleGroupsDtos);
       }
+      break;
+    case 'Stock':
+      if (obj.strStatus && obj.strStatus.length) {
+        sample.strStatus = obj.strStatus;
+      }
+    case 'Tissue Processing':
+      if (obj.cuts) {
+        sample.cuts = obj.cuts;
+        sample.type = 'CV Slide'; // add type info for deserialization
+        sample.discards = (obj.discards ? obj.discards : 0);
+        if (obj.thickness) sample.thickness = obj.thickness;
+      }
+      if (obj.cutsConsumed) {
+        sample.cutsConsumed = obj.cutsConsumed;
+        sample.type = 'LCM Tube'; // add type info for deserialization
+      }
+      break;
     }
-    
+
     // TODO: add qcCols attributes to their objects:
     if (obj.qcPassed) {
       sample.qcPassed = (obj.qcPassed == 'unknown' ? '' : obj.qcPassed);
     }
      // TODO: fix QCPD
-     //sample.sampleAdditionalInfo.qcPassedDetailId = Hot.getIdFromAlias(obj.sampleAdditionalInfo.qcPassedDetailAlias, Hot.sampleOptions.qcPassedDetailsDtos);
-    if (obj.volume && obj.volume.length) {
+     //sample.qcPassedDetailId = Hot.getIdFromAlias(obj.qcPassedDetailAlias, Hot.sampleOptions.qcPassedDetailsDtos);
+    if (obj.volume) {
       sample.volume = obj.volume;
     }
-    if (obj.sampleAdditionalInfo.concentration && obj.sampleAdditionalInfo.concentration.length) {
-      sample.sampleAdditionalInfo.concentration = obj.sampleAdditionalInfo.concentration;
+    if (obj.concentration) {
+      sample.concentration = obj.concentration;
     }
     return sample;
   },
-  
+
   /**
    * Gets a single sample from server and update alias in table source
    */
@@ -1087,7 +1179,7 @@ Sample.hot = {
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.send();
   },
-  
+
   /**
    * Posts a single sample to server and processes result
    */
@@ -1103,7 +1195,7 @@ Sample.hot = {
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.send(data);
   },
-  
+
   /**
    * Puts a single sample to server and processes result
    */
@@ -1119,7 +1211,7 @@ Sample.hot = {
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.send(data);
   },
-  
+
   /**
    * Processes a failure to save (adds invalid attribute to cell, creates user message)
    */
@@ -1150,7 +1242,7 @@ Sample.hot = {
     }
     Hot.addSuccessesAndErrors();
   },
-  
+
   /**
    * Processes a successful save and gets sample from server (to update alias)
    */
@@ -1164,14 +1256,14 @@ Sample.hot = {
     } else {
       sampleId = Hot.startData[rowIndex].id;
     }
-    
-    // add a 'saved' attribute to the data source 
+
+    // add a 'saved' attribute to the data source
     Hot.startData[rowIndex].saved = true;
-    
+
     // get sample data and update alias
     Sample.hot.getSampleAlias(sampleId, rowIndex);
   },
-  
+
   /**
    * Updates a sample's alias in table source data
    */
@@ -1192,44 +1284,29 @@ Sample.hot = {
       Hot.addErrors(Hot.messages);
       return false;
     }
-    
+
     var continueValidation = Hot.cleanRowsAndToggleSaveButton();
     if (continueValidation === false) return false;
-    
-    Hot.hotTable.validateCells(function (isValid) { 
-      if (isValid) {
-        // check for sampleValidRelationship with RootSampleClass as parent
-        var parentClassId = Sample.hot.getRootSampleClassId();
-        // TODO: update this to check each be the cell, not the dropdown
-        var childClassId = document.getElementById('classDropdown').value;
-        var validRelationship = Sample.hot.findMatchingRelationship(parentClassId, childClassId);
-        if (validRelationship.length === 0) {
-          Hot.messages.failed.push(Sample.hot.makeErrorMessageForInvalidRelationship(parentClassId, childClassId) 
-                  +  " Please copy your data, select another child class and save again.");
-          Hot.addErrors(Hot.messages);
-          document.getElementById('classDropdown').removeAttribute('disabled');
-          document.getElementById('classDropdown').classList.remove('disabled');
-          document.getElementById('classDropdown').classList.add('invalid');
-          return false;
-        }
 
+    Hot.hotTable.validateCells(function (isValid) {
+      if (isValid) {
         // send it through the parser to get a sampleData array that isn't merely a reference to Hot.hotTable.getSourceData()
         var sampleData = JSON.parse(JSON.parse(JSON.stringify(Hot.hotTable.getSourceData())));
-        
+
         // add aliases of previously-saved items to the position corresponding to their row (zero-index data, one-index UI)
         // aliases of successfully-saved items will be added after save
         Hot.messages.success = sampleData.map(function (sample) { return (sample.saved === true ? sample.alias : null); });
 
         // Array of save functions, one for each line in the table
         var sampleSaveArray = Sample.hot.getArrayOfNewObjects(sampleData);
-        Hot.serial(sampleSaveArray); // Execute saves serially      
+        Hot.serial(sampleSaveArray); // Execute saves serially
       } else {
         Hot.validationFails();
         return false;
       }
     });
   },
-  
+
   /**
    * Creates Sample Dtos for samples to be POSTed
    */
@@ -1243,11 +1320,11 @@ Sample.hot = {
     }
     var len = sampleData.length;
     var arrayOfObjects = [];
-    
+
     // return an array of samples or saveFunctions for samples
     for (var i = 0; i < len; i++) {
       if (sampleData[i].saved) continue;
-      
+
       var newSample = Sample.hot.buildSampleDtosFromData(sampleData[i]);
       if (Hot.detailedSample) {
         arrayOfObjects.push(sampleSaveFunction(JSON.stringify(newSample), i, len));
@@ -1257,7 +1334,7 @@ Sample.hot = {
     }
     return arrayOfObjects;
   },
-  
+
   /**
    * Creates Sample Dtos for samples to be PUT-ed
    */
@@ -1271,19 +1348,19 @@ Sample.hot = {
     }
     var len = sampleData.length;
     var arrayOfObjects = [];
-    
+
     // return an array of samples or saveFunctions for samples
     for (var i = 0; i < len; i++) {
       if (sampleData[i].saved) continue;
-      
+
       var newSample = Sample.hot.buildSampleDtosFromData(sampleData[i]);
-      
+
       // all updated objects go through the REST WS
       arrayOfObjects.push(sampleSaveFunction(JSON.stringify(newSample), newSample.id, i, len));
     }
     return arrayOfObjects;
   },
-  
+
   /**
    * Creates a custom error message for invalid parent-child relationship
    */
@@ -1296,7 +1373,7 @@ Sample.hot = {
     })[0].alias;
     return parentClassAlias + ' is not a valid parent for ' + childClassAlias + '.';
   },
-  
+
   /**
    * Checks if all cells are valid. If yes, POSTs samples that need to be saved. (plain sample only)
    */
@@ -1307,7 +1384,7 @@ Sample.hot = {
       Hot.addErrors(Hot.messages);
       return false;
     }
-    
+
     var continueValidation = Hot.cleanRowsAndToggleSaveButton();
     if (continueValidation === false) return false;
 
@@ -1315,12 +1392,12 @@ Sample.hot = {
       if (isValid) {
         document.getElementById('errorMessages').innerHTML = '';
         document.getElementById('saveErrors').classList.add('hidden');
-        
+
         // send it through the parser to get a sampleData array that isn't merely a reference to Hot.hotTable.getSourceData()
         var sampleData = JSON.parse(JSON.parse(JSON.stringify(Hot.hotTable.getSourceData())));
-        
+
         var samplesArray = Sample.hot.getArrayOfNewObjects(sampleData);
-        
+
         Fluxion.doAjax(
           'sampleControllerHelperService',
           'bulkSaveSamples',
@@ -1333,7 +1410,7 @@ Sample.hot = {
             'doOnSuccess': function (json) {
               var taxonErrorSamples = json.taxonErrorSamples;
               var savedSamples = json.savedSamples; // array of saved samples aliases
-              
+
               for (var j=0; j<sampleData.length; j++) {
                 // yell if a row's alias is not present in the returned (saved) data
                 if (savedSamples.indexOf(sampleData[j].alias) == -1) {
@@ -1347,7 +1424,7 @@ Sample.hot = {
                     }
                   }
                 }
-              } 
+              }
               // display error/success messages
               Hot.addSuccessesAndErrors();
             },
@@ -1371,49 +1448,49 @@ Sample.hot = {
   updateData: function () {
     var continueValidation = Hot.cleanRowsAndToggleSaveButton();
     if (continueValidation === false) return false;
-      
+
     Hot.hotTable.validateCells(function (isValid) {
       if (isValid) {
         // no check for sampleValidRelationship, since the sampleClass is not editable
         // send data through the parser to get a sampleData array that isn't merely a reference to Hot.hotTable.getSourceData()
         var sampleData = JSON.parse(JSON.parse(JSON.stringify(Hot.hotTable.getSourceData())));
-        
+
         // add previously-saved aliases to success message, and placeholders for items to be saved
         Hot.messages.success = sampleData.map(function (sample) { return (sample.saved === true ? sample.alias : null); });
-        
+
         // Array of save functions, one for each line in the table
         var sampleSaveArray = Sample.hot.getArrayOfUpdatedObjects(sampleData);
-        Hot.serial(sampleSaveArray); // Execute saves serially    
+        Hot.serial(sampleSaveArray); // Execute saves serially
       } else {
         Hot.validationFails();
         return false;
       }
     });
   },
-  
+
   /**
    * Checks if all cells are valid. If yes, POSTs new samples (parented to other samples) that need to be saved.
    */
   propagateData: function () {
     var continueValidation = Hot.cleanRowsAndToggleSaveButton();
     if (continueValidation === false) return false;
-    
+
     // send table data through the parser to get a copy of (not a reference to) sampleData array
     var sampleData = JSON.parse(JSON.parse(JSON.stringify(Hot.hotTable.getSourceData())));
-    
+
     // check for SampleValidRelationships
     var validRelationships = Sample.hot.assessValidRelationships(sampleData);
     if (!validRelationships) {
       Hot.addErrors(Hot.messages);
       return false;
     }
-    
+
     Hot.hotTable.validateCells(function (isValid) {
-      if (isValid) {        
-        
+      if (isValid) {
+
         // add previously-saved aliases to success message, and placeholders for items to be saved
         Hot.messages.success = sampleData.map(function (sample) { return (sample.saved === true ? sample.alias : null); });
-        
+
         // Array of save functions, one for each line in the table
         var sampleSaveArray = Sample.hot.getArrayOfNewObjects(sampleData);
         Hot.serial(sampleSaveArray); // Execute saves serially
@@ -1423,31 +1500,39 @@ Sample.hot = {
       }
     });
   },
-  
+
   /**
    * Gets sampleValidRelationship which corresponds to given parent and child
    */
   findMatchingRelationship: function (parentClassId, childClassId) {
-    var value = Hot.sampleOptions.sampleValidRelationshipsDtos.filter(function (sampleClass) {
-      return (sampleClass.parentId == parentClassId && sampleClass.childId == childClassId);
-    });
-    return value;
+    var findRecursive = function(child) {
+      return Hot.sampleOptions.sampleValidRelationshipsDtos.filter(function (relationship) {
+        if (relationship.childId != child || relationship.childId == relationship.parentId) {
+          return false;
+        }
+        if (relationship.parentId == parentClassId) {
+          return true;
+        }
+        return findRecursive(relationship.parentId).length > 0;
+      });
+    };
+    return findRecursive(childClassId);
   },
-  
+
   /**
    * Gets parent sampleClass and child sampleClass and checks to see if parent and child have an associated valid relationship
    */
   assessValidRelationships: function (sampleData) {
     var col;
     for (var j = 0; j < Hot.hotTable.countCols(); j++) {
-      if (Hot.hotTable.getCellMeta(0, j).prop == "sampleAdditionalInfo.sampleClassAlias") {
+      if (Hot.hotTable.getCellMeta(0, j).prop == "sampleClassAlias") {
         col = j;
         break;
       }
     }
     for (var i = 0; i < sampleData.length; i++) {
-      var parentClassId = Hot.getIdFromAlias(sampleData[i].sampleAdditionalInfo.parentSampleClassAlias, Hot.sampleOptions.sampleClassesDtos);
-      var childClassId = Hot.getIdFromAlias(sampleData[i].sampleAdditionalInfo.sampleClassAlias, Hot.sampleOptions.sampleClassesDtos);
+      var parentClassId = Hot.getIdFromAlias(sampleData[i].parentSampleClassAlias, Hot.sampleOptions.sampleClassesDtos);
+      var childClassId = Hot.getIdFromAlias(sampleData[i].sampleClassAlias, Hot.sampleOptions.sampleClassesDtos);
       var validRelationship = Sample.hot.findMatchingRelationship(parentClassId, childClassId);
       if (validRelationship.length === 0) {
         Hot.messages.failed.push("Row " + i + ": " + Sample.hot.makeErrorMessageForInvalidRelationship(parentClassId, childClassId));

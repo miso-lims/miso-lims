@@ -1,11 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
@@ -39,6 +35,7 @@ import com.eaglegenomics.simlims.core.store.SecurityStore;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
+import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
@@ -51,6 +48,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleDao;
 
 public class SQLSampleDAOTest extends AbstractDAOTest {
@@ -213,6 +211,35 @@ public class SQLSampleDAOTest extends AbstractDAOTest {
     SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
     assertEquals("sample location type does not match", "2014-01-17", df.format(sample.getReceivedDate()));
   }
+  
+  @Test
+  public void testGetPlainSample() throws Exception {
+    Sample sample = dao.get(1L);
+    assertTrue(LimsUtils.isPlainSample(sample));
+  }
+  
+  @Test
+  public void testGetDetailedSample() throws Exception {
+    Sample sample = dao.get(15L);
+    assertTrue(LimsUtils.isDetailedSample(sample));
+  }
+  
+  @Test
+  public void testGetIdentitySample() throws Exception {
+    Sample sample = dao.get(15L);
+    assertTrue(LimsUtils.isDetailedSample(sample));
+    assertTrue(LimsUtils.isIdentitySample(sample));
+    Identity identity = (Identity) sample;
+    assertEquals("INT1", identity.getInternalName());
+    assertEquals("EXT1", identity.getExternalName());
+  }
+  
+  @Test
+  public void testGetTissueSample() throws Exception {
+    Sample sample = dao.get(16L);
+    assertTrue(LimsUtils.isDetailedSample(sample));
+    assertTrue(LimsUtils.isTissueSample(sample));
+  }
 
   @Test
   public void testGetByBarcode() throws Exception {
@@ -244,7 +271,41 @@ public class SQLSampleDAOTest extends AbstractDAOTest {
         "METATRANSCRIPTOMIC");
 
     assertTrue("Did not find all sample types", sampleTypes.containsAll(types));
+  }
 
+  @Test
+  public void getSamplesOffsetZeroWithTwoSamplesPerPageTest() throws Exception {
+    List<Sample> samples = dao.listByOffsetAndNumResults(0, 2, "id", "desc");
+    assertEquals(2, samples.size());
+    assertEquals(17L, samples.get(0).getId());
+  }
+
+  @Test
+  public void getSamplesOffsetThreeWithThreeSamplesPerPageTest() throws Exception {
+    List<Sample> samples = dao.listByOffsetAndNumResults(3, 3, "id", "desc");
+    assertEquals(3, samples.size());
+    assertEquals(14L, samples.get(0).getId());
+  }
+
+  @Test
+  public void getSamplesOffsetThreeWithThreeSamplesPerPageOrderLastModTest() throws Exception {
+    List<Sample> samples = dao.listByOffsetAndNumResults(2, 2, "lastModified", "desc");
+    assertEquals(2, samples.size());
+    assertEquals(15L, samples.get(0).getId());
+  }
+
+  @Test
+  public void getSamplesBySearchOffsetZeroWithTwoSamplesPerPageTest() throws Exception {
+    List<Sample> samples = dao.listBySearchOffsetAndNumResults(0, 2, "TEST_0006", "id", "asc");
+    assertEquals(2, samples.size());
+    assertEquals(11L, samples.get(0).getId());
+  }
+
+  @Test
+  public void getSamplesBySearchOffsetZeroWithTenSamplesPerPageTest() throws Exception {
+    List<Sample> samples = dao.listBySearchOffsetAndNumResults(0, 10, "SaM1", "id", "desc");
+    assertEquals(9, samples.size());
+    assertEquals(17L, samples.get(0).getId());
   }
 
   private void mockAutoIncrement() throws IOException {

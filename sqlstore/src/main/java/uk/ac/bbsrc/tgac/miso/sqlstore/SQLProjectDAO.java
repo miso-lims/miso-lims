@@ -81,6 +81,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.persistence.ReferenceGenomeDao;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
+import uk.ac.bbsrc.tgac.miso.sqlstore.util.BridgeCollectionUpdater;
 
 /**
  * uk.ac.bbsrc.tgac.miso.sqlstore
@@ -147,6 +148,16 @@ public class SQLProjectDAO implements ProjectStore {
       + "WHERE project_projectId=:project_projectId";
 
   protected static final Logger log = LoggerFactory.getLogger(SQLProjectDAO.class);
+
+  private static final BridgeCollectionUpdater<String> ISSUE_KEY_WRITER = new BridgeCollectionUpdater<String>("Project_Issues", "project_projectId",
+      "issueKey") {
+
+    @Override
+    protected Object getId(String item) {
+      return item;
+    }
+
+  };
   private JdbcTemplate template;
   private StudyStore studyDAO;
   private Store<SecurityProfile> securityProfileDAO;
@@ -345,25 +356,7 @@ public class SQLProjectDAO implements ProjectStore {
 
     if (this.cascadeType != null) {
       if (this.cascadeType.equals(CascadeType.PERSIST)) {
-        MapSqlParameterSource eParams = new MapSqlParameterSource();
-        eParams.addValue("project_projectId", project.getProjectId());
-        NamedParameterJdbcTemplate eNamedTemplate = new NamedParameterJdbcTemplate(template);
-        eNamedTemplate.update(PROJECT_ISSUES_DELETE_BY_PROJECT_ID, eParams);
-
-        if (project.getIssueKeys() != null && !project.getIssueKeys().isEmpty()) {
-          for (String s : project.getIssueKeys()) {
-            SimpleJdbcInsert fInsert = new SimpleJdbcInsert(template).withTableName("Project_Issues");
-            MapSqlParameterSource fcParams = new MapSqlParameterSource();
-            fcParams.addValue("project_projectId", project.getProjectId());
-            fcParams.addValue("issueKey", s);
-
-            try {
-              fInsert.execute(fcParams);
-            } catch (DuplicateKeyException dke) {
-              log.error("This Project/Issue Key combination already exists - not inserting", dke);
-            }
-          }
-        }
+        ISSUE_KEY_WRITER.saveAll(template, project.getProjectId(), project.getIssueKeys());
         if (!project.getOverviews().isEmpty()) {
           for (ProjectOverview po : project.getOverviews()) {
             saveOverview(po);

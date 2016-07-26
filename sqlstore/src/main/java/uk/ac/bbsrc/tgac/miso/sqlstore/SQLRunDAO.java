@@ -84,6 +84,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.core.store.WatcherStore;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
+import uk.ac.bbsrc.tgac.miso.sqlstore.util.BridgeCollectionUpdater;
 
 /**
  * uk.ac.bbsrc.tgac.miso.sqlstore
@@ -159,6 +160,16 @@ public class SQLRunDAO implements RunStore {
       + " ORDER BY runId DESC LIMIT 1";
 
   protected static final Logger log = LoggerFactory.getLogger(SQLRunDAO.class);
+
+  private static final BridgeCollectionUpdater<SequencerPartitionContainer<SequencerPoolPartition>> SEQ_PART_CONTAINER_WRITER = new BridgeCollectionUpdater<SequencerPartitionContainer<SequencerPoolPartition>>(
+      "Run_SequencerPartitionContainer", "Run_runId", "containers_containerId") {
+
+    @Override
+    protected Object getId(SequencerPartitionContainer<SequencerPoolPartition> item) {
+      return item.getId();
+    }
+
+  };
 
   private JdbcTemplate template;
   private Store<SecurityProfile> securityProfileDAO;
@@ -260,7 +271,7 @@ public class SQLRunDAO implements RunStore {
 
   private void purgeCaches(Collection<Run> runs) {
     if (cacheManager == null) return;
-    
+
     for (Run run : runs) {
       purgeListCache(run, true);
       DbUtils.updateCaches(cacheManager, run, Run.class);
@@ -269,7 +280,7 @@ public class SQLRunDAO implements RunStore {
 
   private void purgeListCache(Run run, boolean replace) {
     if (cacheManager == null) return;
-    
+
     Cache cache = cacheManager.getCache("runListCache");
     DbUtils.updateListCache(cache, replace, run, Run.class);
   }
@@ -364,24 +375,7 @@ public class SQLRunDAO implements RunStore {
 
     if (this.cascadeType != null) {
       if (this.cascadeType.equals(CascadeType.PERSIST)) {
-        for (SequencerPartitionContainer<SequencerPoolPartition> l : run.getSequencerPartitionContainers()) {
-          l.setSecurityProfile(run.getSecurityProfile());
-          if (l.getPlatform().getPlatformType() == null) {
-            l.getPlatform().setPlatformType(run.getPlatformType());
-          }
-          long containerId = sequencerPartitionContainerDAO.save(l);
-
-          SimpleJdbcInsert fInsert = new SimpleJdbcInsert(template).withTableName("Run_SequencerPartitionContainer");
-          MapSqlParameterSource fcParams = new MapSqlParameterSource();
-          fcParams.addValue("Run_runId", run.getId());
-          fcParams.addValue("containers_containerId", containerId);
-
-          try {
-            fInsert.execute(fcParams);
-          } catch (DuplicateKeyException dke) {
-            log.error("This Run/SequencerPartitionContainer combination already exists - not inserting", dke);
-          }
-        }
+        SEQ_PART_CONTAINER_WRITER.saveAll(template, run.getId(), run.getSequencerPartitionContainers());
       }
 
       if (!run.getNotes().isEmpty()) {
@@ -502,19 +496,9 @@ public class SQLRunDAO implements RunStore {
               if (l.getPlatform() == null) {
                 l.setPlatform(run.getSequencerReference().getPlatform());
               }
-              long containerId = sequencerPartitionContainerDAO.save(l);
-
-              SimpleJdbcInsert fInsert = new SimpleJdbcInsert(template).withTableName("Run_SequencerPartitionContainer");
-              MapSqlParameterSource fcParams = new MapSqlParameterSource();
-              fcParams.addValue("Run_runId", run.getId());
-              fcParams.addValue("containers_containerId", containerId);
-
-              try {
-                fInsert.execute(fcParams);
-              } catch (DuplicateKeyException dke) {
-                log.debug("This Run/SequencerPartitionContainer combination already exists - not inserting: " + dke.getMessage());
-              }
+              l.setId(sequencerPartitionContainerDAO.save(l));
             }
+            SEQ_PART_CONTAINER_WRITER.saveAll(template, run.getId(), run.getSequencerPartitionContainers());
           }
 
           if (!run.getNotes().isEmpty()) {

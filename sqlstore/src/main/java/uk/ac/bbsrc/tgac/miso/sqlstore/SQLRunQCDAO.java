@@ -33,13 +33,9 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -47,6 +43,8 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.transaction.annotation.Transactional;
 
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
@@ -62,6 +60,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
+import uk.ac.bbsrc.tgac.miso.sqlstore.util.BridgeCollectionUpdater;
 
 /**
  * uk.ac.bbsrc.tgac.miso.sqlstore
@@ -99,6 +98,20 @@ public class SQLRunQCDAO implements RunQcStore {
       + "FROM RunQC_Partition rqc " + "WHERE rqc.runQc_runQcId = ?";
 
   protected static final Logger log = LoggerFactory.getLogger(SQLRunQCDAO.class);
+
+  private static final BridgeCollectionUpdater<Partition> PART_CONTAINER_WRITER = new BridgeCollectionUpdater<Partition>("RunQC_Partition", "runQc_runQcId",
+      "containers_containerId", "partitionNumber") {
+
+    @Override
+    protected Object getPosition(Partition item) {
+      return item.getPartitionNumber();
+    }
+
+    @Override
+    protected Object getId(Partition item) {
+      return item.getSequencerPartitionContainer().getId();
+    }
+  };
 
   private JdbcTemplate template;
   private SequencerPartitionContainerStore sequencerPartitionContainerDAO;
@@ -159,19 +172,7 @@ public class SQLRunQCDAO implements RunQcStore {
       namedTemplate.update(RUN_QC_UPDATE, params);
     }
 
-    for (Partition p : runQC.getPartitionSelections()) {
-      SimpleJdbcInsert pInsert = new SimpleJdbcInsert(template).withTableName("RunQC_Partition");
-
-      MapSqlParameterSource poParams = new MapSqlParameterSource();
-      poParams.addValue("runQc_runQcId", runQC.getId());
-      poParams.addValue("containers_containerId", p.getSequencerPartitionContainer().getId());
-      poParams.addValue("partitionNumber", p.getPartitionNumber());
-      try {
-        pInsert.execute(poParams);
-      } catch (DuplicateKeyException se) {
-        // ignore
-      }
-    }
+    PART_CONTAINER_WRITER.saveAll(template, runQC.getId(), runQC.getPartitionSelections());
 
     if (this.cascadeType != null) {
       Run r = runQC.getRun();
