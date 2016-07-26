@@ -55,10 +55,10 @@ To use it:
 may have to select _Bridged Adaptor_ instead of _NAT_ in the network settings.
 1.  Start the instance. Starting the appliance will result in an Ubuntu virtual
 machine complete with all MISO’s prerequisites pre-installed. The login for the
-virtual image is `miso` / `misoadmin`.  1.  Start MISO server by using
-`./misoStart.sh` and then open the browser and go http://localhost:8090/ 1.  Log
-in to MISO using `admin` / `admin`. Only some simple configuration for certain
-elements is required, such as _Sequencer References_, Printers and any
+virtual image is `miso` / `misoadmin`.
+1.  Start MISO server by using `./misoStart.sh` and then open the browser and go http://localhost:8080/
+1.  Log in to MISO using `admin` / `admin`. Only some simple configuration for
+certain elements is required, such as _Sequencer References_, Printers and any
 additional users and groups.
 
 ## Running an Instance of MISO 
