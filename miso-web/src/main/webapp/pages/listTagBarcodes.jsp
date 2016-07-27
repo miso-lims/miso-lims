@@ -61,11 +61,15 @@
          "bJQueryUI": true,
          "bAutoWidth": false,
          "iDisplayLength": 25,
+         "sPaginationType": "full_numbers",
          "aaSorting": [
            [0, "asc"],
            [1, "asc"],
            [2, "asc"]
-         ]
+         ],
+         "fnDrawCallback": function (oSettings) {
+           jQuery('#listingTagBarcodeTable_paginate').find('.fg-button').removeClass('fg-button');
+         }
        });
     </script>
   </div>

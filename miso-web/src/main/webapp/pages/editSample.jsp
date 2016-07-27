@@ -868,6 +868,8 @@
       </ul>
   --%>
   <a name="library"></a>
+  
+  <c:if test="${ !detailedSample or detailedSample and sampleCategory eq 'Aliquot' }">
 
   <h1>
     <div id="librariesTotalCount">
@@ -939,6 +941,7 @@
       });
     });
   </script>
+  </c:if>
 
   <c:if test="${not empty samplePools}">
     <br/>

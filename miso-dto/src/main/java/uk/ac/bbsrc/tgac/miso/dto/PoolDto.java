@@ -16,6 +16,7 @@ public class PoolDto {
   private String alias;
   private Double concentration;
   private String identificationBarcode;
+  private String locationLabel;
   private Boolean readyToRun;
   private Boolean qcPassed;
   private Integer avgInsertSize;
@@ -45,6 +46,10 @@ public class PoolDto {
 
   public String getIdentificationBarcode() {
     return identificationBarcode;
+  }
+
+  public String getLocationLabel() {
+    return locationLabel;
   }
 
   public String getLastModified() {
@@ -91,8 +96,14 @@ public class PoolDto {
     this.id = id;
   }
 
+  @JsonSerialize(include = JsonSerialize.Inclusion.ALWAYS)
   public void setIdentificationBarcode(String identificationBarcode) {
     this.identificationBarcode = identificationBarcode;
+  }
+
+  @JsonSerialize(include = JsonSerialize.Inclusion.ALWAYS)
+  public void setLocationLabel(String locationLabel) {
+    this.locationLabel = locationLabel;
   }
 
   public void setLastModified(String lastModified) {

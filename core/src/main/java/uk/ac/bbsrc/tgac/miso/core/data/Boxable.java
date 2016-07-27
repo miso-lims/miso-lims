@@ -99,4 +99,6 @@ public interface Boxable extends Nameable, Barcodable {
 
   public Date getLastModified();
 
+  public String getLocationBarcode();
+
 }

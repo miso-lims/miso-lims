@@ -1,10 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+
 public class DilutionDto {
 
   private Long id;
   private String name;
   private String identificationBarcode;
+  private String locationLabel;
   private LibraryDto library;
   private String libraryUrl;
 
@@ -24,12 +27,22 @@ public class DilutionDto {
     this.name = name;
   }
 
+  @JsonSerialize(include = JsonSerialize.Inclusion.ALWAYS)
   public String getIdentificationBarcode() {
     return identificationBarcode;
   }
 
   public void setIdentificationBarcode(String identificationBarcode) {
     this.identificationBarcode = identificationBarcode;
+  }
+
+  public String getLocationLabel() {
+    return locationLabel;
+  }
+
+  @JsonSerialize(include = JsonSerialize.Inclusion.ALWAYS)
+  public void setLocationLabel(String locationLabel) {
+    this.locationLabel = locationLabel;
   }
 
   public LibraryDto getLibrary() {

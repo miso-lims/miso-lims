@@ -86,6 +86,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 
 public class Dtos {
 
@@ -339,7 +340,8 @@ public class Dtos {
    * identity, which may or may not yet exist</li>
    * </ol>
    * 
-   * @param childDto the DTO to take parent details from
+   * @param childDto
+   *          the DTO to take parent details from
    * @return the parent details from the DTO, or null if there are none. A returned sample will also include its own parent if applicable.
    */
   private static SampleAdditionalInfo getParent(SampleAdditionalInfoDto childDto) {
@@ -499,9 +501,7 @@ public class Dtos {
     if (!isStringEmptyOrNull(from.getIdentificationBarcode())) {
       dto.setIdentificationBarcode(from.getIdentificationBarcode());
     }
-    if (!isStringEmptyOrNull(from.getLocationBarcode())) {
-      dto.setLocationBarcode(from.getLocationBarcode());
-    }
+    dto.setLocationLabel(BoxUtils.makeLocationLabel(from));
     dto.setSampleType(from.getSampleType());
     if (from.getReceivedDate() != null) {
       dto.setReceivedDate(dateTimeFormatter.print(from.getReceivedDate().getTime()));
@@ -551,8 +551,8 @@ public class Dtos {
     if (!isStringEmptyOrNull(from.getIdentificationBarcode())) {
       to.setIdentificationBarcode(from.getIdentificationBarcode());
     }
-    if (!isStringEmptyOrNull(from.getLocationBarcode())) {
-      to.setLocationBarcode(from.getLocationBarcode());
+    if (!isStringEmptyOrNull(from.getLocationLabel())) {
+      to.setLocationBarcode(from.getLocationLabel());
     }
     to.setSampleType(from.getSampleType());
     if (from.getReceivedDate() != null) {
@@ -947,6 +947,7 @@ public class Dtos {
       dto.setLibraryTypeId(from.getLibraryType().getId());
       dto.setLibraryTypeAlias(from.getLibraryType().getDescription());
     }
+    dto.setQcPassed(from.getQcPassed());
     dto.setLowQuality(from.isLowQuality());
     dto.setPaired(from.getPaired());
     if (from.getPlatformName() != null) {
@@ -968,6 +969,10 @@ public class Dtos {
     if (infoFrom != null) {
       dto.setLibraryAdditionalInfo(asDto(infoFrom));
     }
+    if (!isStringEmptyOrNull(from.getIdentificationBarcode())) {
+      dto.setIdentificationBarcode(from.getIdentificationBarcode());
+    }
+    dto.setLocationLabel(BoxUtils.makeLocationLabel(from));
     return dto;
   }
 
@@ -1034,22 +1039,17 @@ public class Dtos {
   public static List<BoxableDto> asBoxablesDtos(Map<String, Boxable> boxables) {
     List<BoxableDto> items = new ArrayList<>();
     for (Entry<String, Boxable> entry : boxables.entrySet()) {
-      items.add(asDto(entry.getValue(), entry.getKey()));
+      items.add(asDto(entry.getValue()));
     }
     return items;
   }
 
   public static BoxableDto asDto(Boxable from) {
-    return asDto(from, from.getBoxPosition());
-  }
-
-  public static BoxableDto asDto(Boxable from, String position) {
     BoxableDto dto = new BoxableDto();
-    dto.setBoxPosition(position);
     dto.setId(from.getId());
     dto.setAlias(from.getAlias());
     dto.setBoxAlias(from.getBoxAlias());
-    dto.setBoxPosition(from.getBoxPosition());
+    dto.setBoxPosition(BoxUtils.makeLocationLabel(from));
     dto.setEmpty(from.isEmpty());
     dto.setIdentificationBarcode(from.getIdentificationBarcode());
     dto.setName(from.getName());
@@ -1068,7 +1068,6 @@ public class Dtos {
 
   public static Boxable to(BoxableDto item, Boxable to) {
     to.setAlias(item.getAlias());
-    to.setBoxPositionId(item.getId());
     to.setVolume(item.getVolume());
     to.setEmpty(item.getEmpty());
     return to;
@@ -1078,7 +1077,7 @@ public class Dtos {
     DilutionDto dto = new DilutionDto();
     dto.setId(from.getId());
     dto.setName(from.getName());
-    if (from.getIdentificationBarcode() != null) {
+    if (!isStringEmptyOrNull(from.getIdentificationBarcode())) {
       dto.setIdentificationBarcode(from.getIdentificationBarcode());
     }
     LibraryDto ldto = asMinimalDto(from.getLibrary());
@@ -1103,7 +1102,6 @@ public class Dtos {
     dto.setName(from.getName());
     dto.setAlias(from.getAlias());
     dto.setConcentration(from.getConcentration());
-    dto.setIdentificationBarcode(from.getIdentificationBarcode());
     dto.setReadyToRun(from.getReadyToRun());
     dto.setQcPassed(from.getQcPassed());
     dto.setCreationDate(from.getCreationDate());
@@ -1117,6 +1115,10 @@ public class Dtos {
       }
     }
     dto.setPooledElements(pooledElements);
+    if (!isStringEmptyOrNull(from.getIdentificationBarcode())) {
+      dto.setIdentificationBarcode(from.getIdentificationBarcode());
+    }
+    dto.setLocationLabel(BoxUtils.makeLocationLabel(from));
     return dto;
   }
 

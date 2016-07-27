@@ -1109,14 +1109,15 @@ Library.ui = {
           "sType": "no-sam",
           "mData": "parentSampleAlias" ,
           "mRender": function (data, type, full) {
-            return "<a href=\"/miso/sample/" + full.parentSampleId + "\">" + data + "(SAM" + full.id + ")</a>";
+            return "<a href=\"/miso/sample/" + full.parentSampleId + "\">" + data + " (SAM" + full.id + ")</a>";
           }
         },
         { 
           "sTitle": "QC Passed",
           "mData": "qcPassed",
           "mRender": function (data, type, full) {
-            return (data ? data : "Unknown");
+            // data is returned as "true", "false", or "null"
+            return (data != null ? (data ? "True" : "False") : "Unknown");
           }
         },
         { 
@@ -1125,6 +1126,11 @@ Library.ui = {
           "mRender": function (data, type, full) {
             return (data ? (full.tagBarcodeIndex2Label ? data + ", " + full.tagBarcodeIndex2Label : data) : "None");
           },
+          "bSortable": false
+        },
+        {
+          "sTitle": "Location",
+          "mData": "locationLabel",
           "bSortable": false
         },
         {
@@ -1144,14 +1150,14 @@ Library.ui = {
       "iDisplayStart": 0,
       "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>',
       "aaSorting": [
-        [(Sample.detailedSample ? 7 : 1), "desc"]
+        [(Sample.detailedSample ? 8 : 1), "desc"] // NB: this must get updated when adding new columns!!
       ],
       "sPaginationType": "full_numbers",
       "bProcessing": true,
       "bServerSide": true,
       "sAjaxSource": "/miso/rest/library/dt",
       "fnServerData": function (sSource, aoData, fnCallback) {
-        jQuery('#listingSamplesTable').addClass('disabled');
+        jQuery('#listingLibrariesTable').addClass('disabled');
         jQuery.ajax({
           "dataType": "json",
           "type": "GET",
@@ -1161,7 +1167,8 @@ Library.ui = {
         });
       },
       "fnDrawCallback": function (oSettings) {
-        jQuery('#listingSamplesTable').removeClass('disabled');
+        jQuery('#listingLibrariesTable').removeClass('disabled');
+        jQuery('#listingLibrariesTable_paginate').find('.fg-button').removeClass('fg-button');
       }
     }).fnSetFilteringDelay();
     jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");

@@ -383,6 +383,7 @@ Run.ui = {
       },
       "fnDrawCallback": function (oSettings) {
         jQuery('#listingRunsTable').removeClass('disabled');
+        jQuery('#listingRunsTable_paginate').find('.fg-button').removeClass('fg-button');
       }
     }).fnSetFilteringDelay();
     jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");

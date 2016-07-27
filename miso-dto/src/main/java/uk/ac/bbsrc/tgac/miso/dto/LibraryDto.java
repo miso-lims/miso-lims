@@ -20,6 +20,7 @@ public class LibraryDto {
   private Long libraryStrategyTypeId;
   private Long libraryTypeId;
   private String libraryTypeAlias;
+  private String locationLabel;
   private Boolean lowQuality;
   private String name;
   private Boolean paired;
@@ -83,8 +84,8 @@ public class LibraryDto {
     return libraryTypeAlias;
   }
 
-  public void setLibraryTypeAlias(String libraryTypeAlias) {
-    this.libraryTypeAlias = libraryTypeAlias;
+  public String getLocationLabel() {
+    return locationLabel;
   }
 
   public Boolean getLowQuality() {
@@ -185,8 +186,17 @@ public class LibraryDto {
     this.libraryStrategyTypeId = libraryStrategyTypeId;
   }
 
+  public void setLibraryTypeAlias(String libraryTypeAlias) {
+    this.libraryTypeAlias = libraryTypeAlias;
+  }
+
   public void setLibraryTypeId(Long libraryTypeId) {
     this.libraryTypeId = libraryTypeId;
+  }
+
+  @JsonSerialize(include = JsonSerialize.Inclusion.ALWAYS)
+  public void setLocationLabel(String locationLabel) {
+    this.locationLabel = locationLabel;
   }
 
   public void setLowQuality(Boolean lowQuality) {

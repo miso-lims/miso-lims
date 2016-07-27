@@ -37,7 +37,8 @@
     <form id="filter-form">Filter: <input name="filter" id="filter" value="" maxlength="30" size="30" type="text">
     </form>
     <br/>
-    <table class="list" id="table">
+    <div class="dataTables_wrapper" role="grid">
+    <table class="list" id="listingPlatesTable">
       <thead>
       <tr>
         <th>Name</th>
@@ -61,10 +62,11 @@
       </c:forEach>
       </tbody>
     </table>
+    </div>
     <script type="text/javascript">
       jQuery(document).ready(function () {
         writeTotalNo();
-        jQuery("#table").tablesorter({
+        jQuery("#listingPlatesTable").tablesorter({
           headers: {
             5: {
               sorter: false
@@ -74,7 +76,7 @@
       });
 
       jQuery(function () {
-        var theTable = jQuery("#table");
+        var theTable = jQuery("#listingPlatesTable");
 
         jQuery("#filter").keyup(function () {
           jQuery.uiTableFilter(theTable, this.value);
@@ -88,7 +90,7 @@
       });
 
       function writeTotalNo() {
-        jQuery('#totalCount').html(jQuery('#table>tbody>tr:visible').length.toString() + " Plates");
+        jQuery('#totalCount').html(jQuery('#listingPlatesTable>tbody>tr:visible').length.toString() + " Plates");
       }
     </script>
   </div>

@@ -461,4 +461,9 @@ public abstract class AbstractPool<P extends Poolable<?, ?>> extends AbstractBox
     this.notes = notes;
   }
 
+  @Override
+  public String getLocationBarcode() {
+    return "";
+  }
+
 }

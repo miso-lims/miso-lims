@@ -377,6 +377,7 @@ Container.ui = {
       },
       "fnDrawCallback": function (oSettings) {
         jQuery('#listingContainersTable').removeClass('disabled');
+        jQuery('#listingContainersTable_paginate').find('.fg-button').removeClass('fg-button');
       },
       "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
         Fluxion.doAjax(
