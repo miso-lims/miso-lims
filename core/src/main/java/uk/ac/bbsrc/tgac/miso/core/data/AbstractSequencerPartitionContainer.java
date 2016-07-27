@@ -25,6 +25,7 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -64,6 +65,7 @@ public abstract class AbstractSequencerPartitionContainer<T extends Partition> i
 
   private final Collection<ChangeLog> changeLog = new ArrayList<ChangeLog>();
   private User lastModifier;
+  private Date lastModified;
 
   @Override
   public User getLastModifier() {
@@ -73,6 +75,16 @@ public abstract class AbstractSequencerPartitionContainer<T extends Partition> i
   @Override
   public void setLastModifier(User lastModifier) {
     this.lastModifier = lastModifier;
+  }
+
+  @Override
+  public Date getLastModified() {
+    return lastModified;
+  }
+
+  @Override
+  public void setLastModified(Date lastModified) {
+    this.lastModified = lastModified;
   }
 
   @Override
