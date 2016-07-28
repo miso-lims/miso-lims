@@ -75,15 +75,15 @@ INSERT INTO KitDescriptor
   ('TruSeq_Stranded_TotalRNA', '0', 'TruSeq', '1', '0', 'Library', 'Illumina', 'Illumina Directional Whole Transcriptome Library');
 
 INSERT INTO TagBarcodeFamily(platformType, name) VALUES
-  ('Illumina', 'Agilent'),
-  ('Illumina', 'Illumina 6bp'),
-  ('Illumina', 'NEXTflex 6bp'),
-  ('Illumina', 'NEXTflex 8bp'),
-  ('Illumina', 'Nextera'),
-  ('Illumina', 'RBC1'),
-  ('Illumina', 'SureSelect XT2'),
-  ('Illumina', 'TCRindex2'),
-  ('Illumina', 'TruSeq smRNA');
+  ('ILLUMINA', 'Agilent'),
+  ('ILLUMINA', 'Illumina 6bp'),
+  ('ILLUMINA', 'NEXTflex 6bp'),
+  ('ILLUMINA', 'NEXTflex 8bp'),
+  ('ILLUMINA', 'Nextera'),
+  ('ILLUMINA', 'RBC1'),
+  ('ILLUMINA', 'SureSelect XT2'),
+  ('ILLUMINA', 'TCRindex2'),
+  ('ILLUMINA', 'TruSeq smRNA');
 
 INSERT INTO TagBarcodes (name, sequence, position, tagFamilyId) VALUES
   ('Index 01', 'AACGTGAT', 1, (SELECT tagFamilyId FROM TagBarcodeFamily WHERE name = 'NEXTflex 8bp')),
@@ -447,7 +447,7 @@ INSERT INTO TagBarcodes (name, sequence, position, tagFamilyId) VALUES
   ('D10', 'AAGAGATC', 1, (SELECT tagFamilyId FROM TagBarcodeFamily WHERE name = 'SureSelect XT2')),
   ('D11', 'CAAGACTA', 1, (SELECT tagFamilyId FROM TagBarcodeFamily WHERE name = 'SureSelect XT2')),
   ('D12', 'AAGACGGA', 1, (SELECT tagFamilyId FROM TagBarcodeFamily WHERE name = 'SureSelect XT2')),
-  ('E01', 'AAGACGGA', 1, (SELECT tagFamilyId FROM TagBarcodeFamily WHERE name = 'SureSelect XT2')),
+  ('E01', 'GCCAAGAC', 1, (SELECT tagFamilyId FROM TagBarcodeFamily WHERE name = 'SureSelect XT2')),
   ('E02', 'CGAACTTA', 1, (SELECT tagFamilyId FROM TagBarcodeFamily WHERE name = 'SureSelect XT2')),
   ('E03', 'ACCTCCAA', 1, (SELECT tagFamilyId FROM TagBarcodeFamily WHERE name = 'SureSelect XT2')),
   ('E04', 'CTGTAGCC', 1, (SELECT tagFamilyId FROM TagBarcodeFamily WHERE name = 'SureSelect XT2')),
@@ -687,28 +687,28 @@ INSERT INTO Lab (alias, instituteId, createdBy, creationDate, updatedBy, lastUpd
   ('Steve Gallinger', (SELECT instituteId FROM Institute WHERE alias = 'Sunnybrook Health Sciences Centre'),1,NOW(),1,NOW()),
   ('Steve Gallinger', (SELECT instituteId FROM Institute WHERE alias = 'University Health Network'),1,NOW(),1,NOW());
 
-INSERT INTO SampleClass (alias, sampleCategory, createdBy, creationDate, updatedBy, lastUpdated, suffix, isStock) VALUES
-  ('Identity','Identity',1,NOW(),1,NOW(),NULL,0),
-  ('Primary Tumor Tissue','Tissue',1,NOW(),1,NOW(),NULL,0),
-  ('Metastatic Tumor Tissue','Tissue',1,NOW(),1,NOW(),NULL,0),
-  ('Reference Tissue','Tissue',1,NOW(),1,NOW(),NULL,0),
-  ('Xenograft Tissue','Tissue',1,NOW(),1,NOW(),NULL,0),
-  ('Cell Line','Tissue',1,NOW(),1,NOW(),NULL,0),
-  ('CV Slide','Tissue Processing',1,NOW(),1,NOW(),'CV',0),
-  ('Curls','Tissue Processing',1,NOW(),1,NOW(),'C',0),
-  ('H E Slide','Tissue Processing',1,NOW(),1,NOW(),'HE',0),
-  ('LCM Tube','Tissue Processing',1,NOW(),1,NOW(),'LCM',0),
-  ('gDNA (stock)','Analyte',1,NOW(),1,NOW(),'D_S',1),
-  ('gDNA_wga (stock)','Analyte',1,NOW(),1,NOW(),'D_S',1),
-  ('whole RNA (stock)','Analyte',1,NOW(),1,NOW(),'R_S',1),
-  ('cDNA (stock)','Analyte',1,NOW(),1,NOW(),'D_S',1),
-  ('gDNA (aliquot)','Analyte',1,NOW(),1,NOW(),'D_',0),
-  ('gDNA_wga (aliquot)','Analyte',1,NOW(),1,NOW(),'D_',0),
-  ('whole RNA (aliquot)','Analyte',1,NOW(),1,NOW(),'R_',0),
-  ('smRNA','Analyte',1,NOW(),1,NOW(),'SM',0),
-  ('mRNA','Analyte',1,NOW(),1,NOW(),'MR',0),
-  ('rRNA_depleted','Analyte',1,NOW(),1,NOW(),'WT',0),
-  ('cDNA (aliquot)','Analyte',1,NOW(),1,NOW(),'D_',0);
+INSERT INTO SampleClass (alias, sampleCategory, createdBy, creationDate, updatedBy, lastUpdated, suffix) VALUES
+  ('Identity','Identity',1,NOW(),1,NOW(),NULL),
+  ('Primary Tumor Tissue','Tissue',1,NOW(),1,NOW(),NULL),
+  ('Metastatic Tumor Tissue','Tissue',1,NOW(),1,NOW(),NULL),
+  ('Reference Tissue','Tissue',1,NOW(),1,NOW(),NULL),
+  ('Xenograft Tissue','Tissue',1,NOW(),1,NOW(),NULL),
+  ('Cell Line','Tissue',1,NOW(),1,NOW(),NULL),
+  ('CV Slide','Tissue Processing',1,NOW(),1,NOW(),'CV'),
+  ('Curls','Tissue Processing',1,NOW(),1,NOW(),'C'),
+  ('H E Slide','Tissue Processing',1,NOW(),1,NOW(),'HE'),
+  ('LCM Tube','Tissue Processing',1,NOW(),1,NOW(),'LCM'),
+  ('gDNA (stock)','Analyte',1,NOW(),1,NOW(),'D_S'),
+  ('gDNA_wga (stock)','Analyte',1,NOW(),1,NOW(),'D_S'),
+  ('whole RNA (stock)','Analyte',1,NOW(),1,NOW(),'R_S'),
+  ('cDNA (stock)','Analyte',1,NOW(),1,NOW(),'D_S'),
+  ('gDNA (aliquot)','Analyte',1,NOW(),1,NOW(),'D_'),
+  ('gDNA_wga (aliquot)','Analyte',1,NOW(),1,NOW(),'D_'),
+  ('whole RNA (aliquot)','Analyte',1,NOW(),1,NOW(),'R_'),
+  ('smRNA','Analyte',1,NOW(),1,NOW(),'SM'),
+  ('mRNA','Analyte',1,NOW(),1,NOW(),'MR'),
+  ('rRNA_depleted','Analyte',1,NOW(),1,NOW(),'WT'),
+  ('cDNA (aliquot)','Analyte',1,NOW(),1,NOW(),'D_');
 
 INSERT INTO SampleValidRelationship (parentId, childId, createdBy, creationDate, updatedBy, lastUpdated) VALUES 
   ((SELECT sampleClassId FROM SampleClass WHERE alias = 'Identity'),(SELECT sampleClassId FROM SampleClass WHERE alias = 'Primary Tumor Tissue'),1,NOW(),1,NOW()),
