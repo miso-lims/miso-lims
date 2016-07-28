@@ -279,6 +279,10 @@ public class DefaultSampleService implements SampleService {
         created.setAlias(generatedAlias);
         needsUpdate = true;
       }
+      if (isStringBlankOrNull(sample.getAlias())) {
+        sample.setAlias(sample.getName());
+        needsUpdate = true;
+      }
       if (autoGenerateIdBarcodes) {
         autoGenerateIdBarcode(sample);
         needsUpdate = true;
