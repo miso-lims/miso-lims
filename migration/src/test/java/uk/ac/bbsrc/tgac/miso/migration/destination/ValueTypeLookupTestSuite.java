@@ -29,6 +29,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.persistence.HibernateSampleClassDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLabDao;
@@ -105,6 +106,11 @@ public class ValueTypeLookupTestSuite {
     List<LibrarySelectionType> lsts = new ArrayList<>();
     lsts.add(makeLibrarySelection(VALID_LONG, VALID_STRING));
     Mockito.when(libDao.listAllLibrarySelectionTypes()).thenReturn(lsts);
+    Mockito.when(mgr.getLibraryDao()).thenReturn(libDao);
+    
+    List<LibraryStrategyType> lstrats = new ArrayList<>();
+    lstrats.add(makeLibraryStrategy(VALID_LONG, VALID_STRING));
+    Mockito.when(libDao.listAllLibraryStrategyTypes()).thenReturn(lstrats);
     Mockito.when(mgr.getLibraryDao()).thenReturn(libDao);
     
     List<LibraryType> lts = new ArrayList<>();
@@ -278,9 +284,26 @@ public class ValueTypeLookupTestSuite {
     assertNull(sut.resolve(makeLibrarySelection(null, INVALID_STRING)));
   }
   
+  @Test
+  public void testResolveLibraryStrategy() {
+    assertNotNull(sut.resolve(makeLibraryStrategy(VALID_LONG, null)));
+    assertNotNull(sut.resolve(makeLibraryStrategy(null, VALID_STRING)));
+    assertNull(sut.resolve((LibraryStrategyType) null));
+    assertNull(sut.resolve(makeLibraryStrategy(null, null)));
+    assertNull(sut.resolve(makeLibraryStrategy(INVALID_LONG, null)));
+    assertNull(sut.resolve(makeLibraryStrategy(null, INVALID_STRING)));
+  }
+  
   private LibrarySelectionType makeLibrarySelection(Long id, String name) {
     LibrarySelectionType ls = new LibrarySelectionType();
     ls.setId(id == null ? LibrarySelectionType.UNSAVED_ID : id);
+    ls.setName(name);
+    return ls;
+  }
+  
+  private LibraryStrategyType makeLibraryStrategy(Long id, String name) {
+    LibraryStrategyType ls = new LibraryStrategyType();
+    ls.setId(id == null ? LibraryStrategyType.UNSAVED_ID : id);
     ls.setName(name);
     return ls;
   }

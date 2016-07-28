@@ -23,6 +23,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.migration.util.UniqueKeyHashMap;
@@ -51,6 +52,8 @@ public class ValueTypeLookup {
   private Map<String, TissueOrigin> tissueOriginsByDescription;
   private Map<Long, LibrarySelectionType> librarySelectionsById;
   private Map<String, LibrarySelectionType> librarySelectionsByName;
+  private Map<Long, LibraryStrategyType> libraryStrategiesById;
+  private Map<String, LibraryStrategyType> libraryStrategiesByName;
   private Map<Long, LibraryType> libraryTypeById;
   private Map<String, Map<String, LibraryType>> libraryTypeByPlatformAndDescription;
   private Map<Long, LibraryDesign> libraryDesignById;
@@ -73,6 +76,7 @@ public class ValueTypeLookup {
     setLabs(misoServiceManager.getLabDao().getLabs());
     setTissueOrigins(misoServiceManager.getTissueOriginDao().getTissueOrigin());
     setLibrarySelections(misoServiceManager.getLibraryDao().listAllLibrarySelectionTypes());
+    setLibraryStrategies(misoServiceManager.getLibraryDao().listAllLibraryStrategyTypes());
     setLibraryTypes(misoServiceManager.getLibraryDao().listAllLibraryTypes());
     setLibraryDesigns(misoServiceManager.getLibraryDesignDao().getLibraryDesigns());
     setTagBarcodes(misoServiceManager.getTagBarcodeDao().listAllTagBarcodes());
@@ -173,6 +177,17 @@ public class ValueTypeLookup {
     }
     this.librarySelectionsById = mapById;
     this.librarySelectionsByName = mapByName;
+  }
+  
+  private void setLibraryStrategies(Collection<LibraryStrategyType> libraryStrategies) {
+    Map<Long, LibraryStrategyType> mapById = new UniqueKeyHashMap<>();
+    Map<String, LibraryStrategyType> mapByName = new UniqueKeyHashMap<>();
+    for (LibraryStrategyType ls : libraryStrategies) {
+      mapById.put(ls.getId(), ls);
+      mapByName.put(ls.getName(), ls);
+    }
+    this.libraryStrategiesById = mapById;
+    this.libraryStrategiesByName = mapByName;
   }
   
   private void setLibraryTypes(Collection<LibraryType> libraryTypes) {
@@ -350,6 +365,22 @@ public class ValueTypeLookup {
   }
   
   /**
+   * Attempts to find an existing LibraryStrategyType
+   * 
+   * @param libraryStrategyType a partially-formed LibraryStrategyType, which must have its ID or name
+   * set in order for this method to resolve the LibraryStrategyType
+   * @return the existing LibraryStrategyType if a matching one is found; null otherwise
+   */
+  public LibraryStrategyType resolve(LibraryStrategyType libraryStrategyType) {
+    if (libraryStrategyType == null) return null;
+    if (libraryStrategyType.getId() != LibrarySelectionType.UNSAVED_ID) {
+      return libraryStrategiesById.get(libraryStrategyType.getId());
+    }
+    if (libraryStrategyType.getName() != null) return libraryStrategiesByName.get(libraryStrategyType.getName());
+    return null;
+  }
+  
+  /**
    * Attempts to find an existing LibraryType
    * 
    * @param libraryType a partially-formed LibraryType, which must have its ID or platform AND description
@@ -417,12 +448,11 @@ public class ValueTypeLookup {
       
       if (LimsUtils.isTissueSample(detailed)) {
         SampleTissue tissue = (SampleTissue) detailed;
-        if (tissue.getTissueOrigin() != null) { // TODO: make non-optional (must parse from name in Pinery source)
-          TissueOrigin to = resolve(tissue.getTissueOrigin());
-          if (to == null) throw new IOException(String.format("TissueOrigin not found: id=%d, alias=%s, description=%s",
-              tissue.getTissueOrigin().getId(), tissue.getTissueOrigin().getAlias(), tissue.getTissueOrigin().getDescription()));
-          tissue.setTissueOrigin(to);
-        }
+        
+        TissueOrigin to = resolve(tissue.getTissueOrigin());
+        if (to == null) throw new IOException(String.format("TissueOrigin not found: id=%d, alias=%s, description=%s",
+            tissue.getTissueOrigin().getId(), tissue.getTissueOrigin().getAlias(), tissue.getTissueOrigin().getDescription()));
+        tissue.setTissueOrigin(to);
         
         TissueType tt = resolve(tissue.getTissueType());
         if (tt == null) {
@@ -469,20 +499,22 @@ public class ValueTypeLookup {
    * @throws IOException if no value is found matching the available data in library
    */
   public void resolveAll(Library library) throws IOException {
-    if (library.getLibrarySelectionType() != null) { // optional field
-      LibrarySelectionType sel = resolve(library.getLibrarySelectionType());
-      if (sel == null) throw new IOException("LibrarySelectionType not found");
-      library.setLibrarySelectionType(sel);
+    LibrarySelectionType sel = resolve(library.getLibrarySelectionType());
+    if (sel == null) throw new IOException("LibrarySelectionType not found");
+    library.setLibrarySelectionType(sel);
+    
+    LibraryStrategyType strat = resolve(library.getLibraryStrategyType());
+    if (strat == null) throw new IOException("LibraryStrategyType not found");
+    library.setLibraryStrategyType(strat);
+    
+    LibraryType lt = resolve(library.getLibraryType());
+    if (lt == null) {
+      throw new IOException(String.format("LibraryType not found (id=%d OR (platform=%s AND description=%s))",
+          library.getLibraryType().getId(), library.getLibraryType().getPlatformType(),
+          library.getLibraryType().getDescription()));
     }
-    if (library.getLibraryType() != null) { // optional field
-      LibraryType lt = resolve(library.getLibraryType());
-      if (lt == null) {
-        throw new IOException(String.format("LibraryType not found (id=%d OR (platform=%s AND description=%s))",
-            library.getLibraryType().getId(), library.getLibraryType().getPlatformType(),
-            library.getLibraryType().getDescription()));
-      }
-      library.setLibraryType(lt);
-    }
+    library.setLibraryType(lt);
+    
     if (library.getTagBarcodes() != null && !library.getTagBarcodes().isEmpty()) {
       List<TagBarcode> resolvedBarcodes = new ArrayList<>();
       for (TagBarcode tb : library.getTagBarcodes()) {
@@ -498,16 +530,14 @@ public class ValueTypeLookup {
     if (library.getLibraryAdditionalInfo() != null) {
       LibraryAdditionalInfo lai = library.getLibraryAdditionalInfo();
       
-      if (lai.getPrepKit() != null) { // optional field
-        KitDescriptor kit = resolve(lai.getPrepKit());
-        if (kit == null) throw new IOException("KitDescriptor not found");
-        lai.setPrepKit(kit);
-      }
-      if (lai.getLibraryDesign() != null) { // optional field
-        LibraryDesign ld = resolve(lai.getLibraryDesign());
-        if (ld == null) throw new IOException("LibraryDesign not found");
-        lai.setLibraryDesign(ld);
-      }
+      KitDescriptor kit = resolve(lai.getPrepKit());
+      if (kit == null) throw new IOException(String.format("KitDescriptor not found (id=%d or name=%s)",
+          lai.getPrepKit().getId(), lai.getPrepKit().getName()));
+      lai.setPrepKit(kit);
+      
+      LibraryDesign ld = resolve(lai.getLibraryDesign());
+      if (ld == null) throw new IOException("LibraryDesign not found");
+      lai.setLibraryDesign(ld);
     }
   }
 
