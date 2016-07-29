@@ -436,48 +436,69 @@ Pool.ui = {
           "mData": "name",
           "mRender": function (data, type, full) {
             return "<a href=\"/miso/pool/" + full.id + "\">" + data + "</a>";
-          }
+          },
+          "iSortPriority" : 1
+
         },
         {
           "sTitle": "Alias",
           "mData": "alias",
           "mRender": function (data, type, full) {
             return "<a href=\"/miso/pool/" + full.id + "\">" + data + "</a>";
-          }
+          },
+          "iSortPriority" : 0
+
         },
         {
           "sTitle": "Date Created",
-          "mData": "creationDate"
+          "mData": "creationDate",
+          "iSortPriority" : 0
+
         },
         {
           "sTitle": "Elements",
           "mData": "pooledElements",
           "mRender": function (data, type, full) {
             var pooledEls = data.map(function (ld) {
-              return "<li><strong>" + ld.name + "</strong> " + "<a href=\"" + ld.url + "\">"
+              return "<li><strong>" + ld.name + "</strong> " + "<a href=\"" + ld.libraryUrl + "\">"
               + ld.library.alias + " (" + ld.library.name + ")</a>" + "</li>";
             });
             return "<ul>" + pooledEls.join('') + "</ul>";
           },
-          "bSortable": false
+          "bSortable": false,
+          "iSortPriority" : 0
+
         },
         {
           "sTitle": "Average Insert Size",
-          "mData": "id"
+          "mData": "id",
+          "iSortPriority" : 0
+
         },
         {
           "sTitle": "Conc. (" + poolConcentrationUnits + ")",
-          "mData": "concentration"
+          "mData": "concentration",
+          "iSortPriority" : 0
+
+        },
+        {
+          "sTitle": "Location",
+          "mData": "locationLabel",
+          "bSortable": false,
+          "iSortPriority" : 0
         },
         {
           "sTitle": "Last Updated",
           "mData": "lastModified",
-          "bVisible": (Sample.detailedSample ? "true" : "false")
+          "bVisible": (Sample.detailedSample ? "true" : "false"),
+          "iSortPriority" : 2
         },
         {
           "sTitle": "ID",
           "mData": "identificationBarcode",
-          "bVisible": false
+          "bVisible": false,
+          "iSortPriority" : 0
+
         }
       ],
       "bJQueryUI": true,
@@ -501,7 +522,7 @@ Pool.ui = {
         );
       },
       "aaSorting": [
-        [(Sample.detailedSample ? 6 : 0), "desc"]              
+        [(Sample.detailedSample ? 6 : 0) , "desc"] // NB: this must get updated when adding new columns
       ],
       "sPaginationType": "full_numbers",
       "bProcessing": true,
@@ -519,6 +540,7 @@ Pool.ui = {
       },
       "fnDrawCallback": function (oSettings) {
         jQuery('#'+table).removeClass('disabled');
+        jQuery('#'+table+'_paginate').find('.fg-button').removeClass('fg-button');
       }
     }).fnSetFilteringDelay();
   },

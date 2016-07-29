@@ -10,9 +10,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleCVSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleLCMTube;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 
@@ -37,7 +37,7 @@ public class SampleDto {
   private String description;
   // Skipped security profile
   private String identificationBarcode;
-  private String locationBarcode;
+  private String locationLabel;
   private String sampleType;
   private String receivedDate;
   private Boolean qcPassed;
@@ -102,12 +102,13 @@ public class SampleDto {
     this.identificationBarcode = identificationBarcode;
   }
 
-  public String getLocationBarcode() {
-    return locationBarcode;
+  public String getLocationLabel() {
+    return locationLabel;
   }
 
-  public void setLocationBarcode(String locationBarcode) {
-    this.locationBarcode = locationBarcode;
+  @JsonSerialize(include = JsonSerialize.Inclusion.ALWAYS)
+  public void setLocationLabel(String locationLabel) {
+    this.locationLabel = locationLabel;
   }
 
   public String getSampleType() {
