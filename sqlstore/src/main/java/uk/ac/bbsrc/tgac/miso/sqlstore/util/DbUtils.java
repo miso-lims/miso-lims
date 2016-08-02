@@ -30,6 +30,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -205,16 +206,23 @@ public class DbUtils {
   }
 
   public static <T> List<T> getByBarcodeList(JdbcTemplate template, List<String> barcodeList, String query, RowMapper<T> mapper) {
+    return getByGenericList(template, barcodeList, Types.VARCHAR, query, mapper);
+  }
+
+  public static <T, N> List<T> getByGenericList(JdbcTemplate template, List<N> needles, int needleType, String query, RowMapper<T> mapper) {
+    if (needles.isEmpty()) {
+      return Collections.emptyList();
+    }
     StringBuilder queryBuilder = new StringBuilder();
     queryBuilder.append(query);
-    for (int i = 0; i < barcodeList.size(); i++) {
+    for (int i = 0; i < needles.size(); i++) {
       if (i != 0) {
         queryBuilder.append(", ");
       }
       queryBuilder.append("?");
     }
     queryBuilder.append(")");
-    return template.query(queryBuilder.toString(), new Object[] { barcodeList }, new int[] { Types.VARCHAR }, mapper);
+    return template.query(queryBuilder.toString(), new Object[] { needles }, new int[] { needleType }, mapper);
   }
 
   public static Long hashCodeCacheKeyFor(Object... datas) {

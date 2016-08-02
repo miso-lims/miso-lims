@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -131,6 +132,8 @@ public class SQLPoolDAO implements PoolStore {
 
   public static final String POOL_SELECT_FROM_BARCODE_LIST = POOL_SELECT + " WHERE p.identificationBarcode IN (";
 
+  public static final String POOL_SELECT_FROM_ID_LIST = POOL_SELECT + " WHERE p.poolId IN (";
+
   public static final String POOL_SELECT_BY_BOX_POSITION_ID = POOL_SELECT + " WHERE p.boxPositionId = ?";
 
   public static final String POOL_COUNT_BY_PLATFORM_AND_SEARCH = POOL_COUNT + " WHERE p.platformType=? AND " + "(p.name LIKE ? OR "
@@ -170,20 +173,15 @@ public class SQLPoolDAO implements PoolStore {
       + "INNER JOIN Plate_Elements pe ON li.libraryId = pe.elementId " + "INNER JOIN Plate pl ON pl.plateId = pe.plate_plateId "
       + "LEFT JOIN Pool_Elements pld ON pld.elementId = pl.plateId " + "WHERE p.projectId= ? AND pld.elementType LIKE '%Plate')";
 
-  public static final String POOL_SELECT_BY_RELATED_LIBRARY = POOL_SELECT
-      + " WHERE p.poolId IN (SELECT COALESCE(pld.pool_poolId, ple.pool_poolId) FROM Library li "
-      + "INNER JOIN LibraryDilution ld ON ld.library_libraryId = li.libraryId "
-      + "LEFT JOIN emPCR e ON e.dilution_dilutionId = ld.dilutionId " + "LEFT JOIN emPCRDilution ed ON ed.emPCR_pcrId = e.pcrId "
-      + "LEFT JOIN Pool_Elements pld ON pld.elementId = ld.dilutionId " + "LEFT JOIN Pool_Elements ple ON ple.elementId = ed.dilutionId "
-      + "WHERE li.libraryId=?)";
+  public static final String POOL_ID_SELECT_BY_RELATED = "SELECT DISTINCT pool_poolId AS poolId FROM Pool_Elements, "
+      + "(SELECT dilutionId as elementId, library_libraryId as libraryId, 'uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution' as elementType FROM LibraryDilution "
+      + "UNION ALL SELECT emPCRDilution.dilutionId as elementId, library_libraryId as libraryId, 'uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution' as elementType "
+      + "FROM LibraryDilution JOIN emPCR ON LibraryDilution.dilutionId = emPCR.dilution_dilutionId JOIN emPCRDilution ON emPCR.pcrId = emPCRDilution.emPCR_pcrID"
+      + ") AS Contents WHERE Contents.elementType = Pool_Elements.elementType AND Contents.elementId = Pool_Elements.elementId ";
 
-  public static final String POOL_SELECT_BY_RELATED_SAMPLE = POOL_SELECT
-      + " WHERE p.poolId IN (SELECT COALESCE(ple.pool_poolId, pld.pool_poolId) FROM Sample s "
-      + "INNER JOIN Library li ON li.sample_sampleId = s.sampleId "
-      + "INNER JOIN LibraryDilution ld ON ld.library_libraryId = li.libraryId "
-      + "LEFT JOIN emPCR e ON e.dilution_dilutionId = ld.dilutionId " + "LEFT JOIN emPCRDilution ed ON ed.emPCR_pcrId = e.pcrId "
-      + "LEFT JOIN Pool_Elements pld ON pld.elementId = ld.dilutionId " + "LEFT JOIN Pool_Elements ple ON ple.elementId = ed.dilutionId "
-      + "WHERE s.sampleId=?)";
+  public static final String POOL_ID_SELECT_BY_RELATED_LIBRARY = POOL_ID_SELECT_BY_RELATED + "AND Contents.libraryId = ?";
+  public static final String POOL_ID_SELECT_BY_RELATED_SAMPLE = POOL_ID_SELECT_BY_RELATED
+      + "AND Contents.libraryId IN (SELECT libraryId FROM Library WHERE sample_sampleId = ?)";
 
   public static final String POOL_ELEMENT_DELETE_BY_POOL_ID = "DELETE FROM Pool_Elements " + "WHERE pool_poolId=:pool_poolId";
 
@@ -676,14 +674,19 @@ public class SQLPoolDAO implements PoolStore {
     return e;
   }
 
+  private Collection<Pool<? extends Poolable<?, ?>>> listByRelated(String query, long relatedId) throws IOException {
+    List<Long> poolIds = template.queryForList(query, Long.class, relatedId);
+    return DbUtils.getByGenericList(template, poolIds, Types.BIGINT, POOL_SELECT_FROM_ID_LIST, new PoolMapper(true));
+  }
+
   @Override
   public Collection<Pool<? extends Poolable<?, ?>>> listBySampleId(long sampleId) throws IOException {
-    return template.query(POOL_SELECT_BY_RELATED_SAMPLE, new Object[] { sampleId }, new PoolMapper());
+    return listByRelated(POOL_ID_SELECT_BY_RELATED_SAMPLE, sampleId);
   }
 
   @Override
   public Collection<Pool<? extends Poolable<?, ?>>> listByLibraryId(long libraryId) throws IOException {
-    return template.query(POOL_SELECT_BY_RELATED_LIBRARY, new Object[] { libraryId }, new PoolMapper());
+    return listByRelated(POOL_ID_SELECT_BY_RELATED_LIBRARY, libraryId);
   }
 
   @Override
