@@ -70,9 +70,13 @@
          "bJQueryUI": true,
          "bAutoWidth": false,
          "iDisplayLength": 25,
+         "sPaginationType": "full_numbers",
          "aaSorting": [
            [0, "desc"]
-         ]
+         ],
+         "fnDrawCallback": function (oSettings) {
+           jQuery('#listingPoolOrderTable_paginate').find('.fg-button').removeClass('fg-button');
+         }
        });
     </script>
   </div>

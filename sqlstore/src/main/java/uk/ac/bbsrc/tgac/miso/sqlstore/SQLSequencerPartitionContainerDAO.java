@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.sql.ResultSet;
@@ -30,8 +32,13 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.regex.Matcher;
 
 import javax.persistence.CascadeType;
+
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 
 import org.codehaus.jackson.type.TypeReference;
 import org.slf4j.Logger;
@@ -50,9 +57,6 @@ import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.Property;
 import com.googlecode.ehcache.annotations.TriggersRemove;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
@@ -81,31 +85,40 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 public class SQLSequencerPartitionContainerDAO implements SequencerPartitionContainerStore {
   private static final String TABLE_NAME = "SequencerPartitionContainer";
 
-  private static final String SEQUENCER_PARTITION_CONTAINER_SELECT = "SELECT containerId, platform, identificationBarcode, locationBarcode, validationBarcode, securityProfile_profileId, lastModifier FROM "
-      + TABLE_NAME;
+  private static final String SEQUENCER_PARTITION_CONTAINER_SELECT = "SELECT c.containerId, c.platform, c.identificationBarcode, c.locationBarcode, c.validationBarcode, c.securityProfile_profileId, c.lastModifier , cmod.lastModified FROM "
+      + TABLE_NAME + " c "
+      + "LEFT JOIN (SELECT containerId, MAX(changeTime) AS lastModified FROM SequencerPartitionContainerChangeLog GROUP BY containerId) cmod ON c.containerId = cmod.containerId";
 
-  public static final String SEQUENCER_PARTITION_CONTAINER_DELETE = "DELETE FROM " + TABLE_NAME + " WHERE containerId=:containerId";
+  private static final String SEQUENCER_PARTITION_CONTAINER_DELETE = "DELETE FROM " + TABLE_NAME + " WHERE containerId=:containerId";
 
-  private static final String SEQUENCER_PARTITION_CONTAINER_SELECT_BY_ID = SEQUENCER_PARTITION_CONTAINER_SELECT + " WHERE containerId=?";
+  private static final String SEQUENCER_PARTITION_CONTAINER_SELECT_BY_SEARCH = SEQUENCER_PARTITION_CONTAINER_SELECT
+      + " WHERE c.platform LIKE ? OR c.identificationBarcode LIKE ?";
 
-  private static final String SEQUENCER_PARTITION_CONTAINER_SELECT_BY_PARTITION_ID = "SELECT s.containerId, s.platform, s.identificationBarcode, s.locationBarcode, s.validationBarcode, s.securityProfile_profileId, s.lastModifier "
-      + "FROM " + TABLE_NAME + " s, SequencerPartitionContainer_Partition sp " + "WHERE s.containerId=sp.container_containerId "
-      + "AND sp.partitions_partitionId=?";
+  private static final String SEQUENCER_PARTITION_CONTAINER_SELECT_BY_ID = SEQUENCER_PARTITION_CONTAINER_SELECT + " WHERE c.containerId=?";
 
-  private static final String SEQUENCER_PARTITION_CONTAINER_SELECT_BY_RELATED_RUN = "SELECT DISTINCT f.containerId, f.platform, f.identificationBarcode, f.locationBarcode, f.validationBarcode, f.securityProfile_profileId, f.lastModifier "
-      + "FROM " + TABLE_NAME + " f, Run_SequencerPartitionContainer rf " + "WHERE f.containerId=rf.containers_containerId "
-      + "AND rf.run_runId=?";
+  private static final String SEQUENCER_PARTITION_CONTAINER_SELECT_BY_PARTITION_ID = "SELECT c.containerId, c.platform, c.identificationBarcode, c.locationBarcode, c.validationBarcode, c.securityProfile_profileId, c.lastModifier, cmod.lastModified "
+      + "FROM " + TABLE_NAME + " c "
+      + "LEFT JOIN (SELECT containerId, MAX(changeTime) AS lastModified FROM SequencerPartitionContainerChangeLog GROUP BY containerId) cmod ON c.containerId = cmod.containerId "
+      + "LEFT JOIN SequencerPartitionContainer_Partition sp ON c.containerId=sp.container_containerId "
+      + "WHERE sp.partitions_partitionId=?";
+
+  private static final String SEQUENCER_PARTITION_CONTAINER_SELECT_BY_RELATED_RUN = "SELECT DISTINCT c.containerId, c.platform, c.identificationBarcode, c.locationBarcode, c.validationBarcode, c.securityProfile_profileId, c.lastModifier, cmod.lastModified "
+      + "FROM " + TABLE_NAME + " c "
+      + "LEFT JOIN (SELECT containerId, MAX(changeTime) AS lastModified FROM SequencerPartitionContainerChangeLog GROUP BY containerId) cmod ON c.containerId = cmod.containerId "
+      + "LEFT JOIN Run_SequencerPartitionContainer rf ON c.containerId=rf.containers_containerId " + "WHERE rf.run_runId=?";
 
   private static final String SEQUENCER_PARTITION_CONTAINER_SELECT_BY_IDENTIFICATION_BARCODE = SEQUENCER_PARTITION_CONTAINER_SELECT
-      + " WHERE identificationBarcode=? ORDER BY containerId DESC";
+      + " WHERE c.identificationBarcode=? ORDER BY containerId DESC";
 
-  public static final String SEQUENCER_PARTITION_CONTAINER_PARTITION_DELETE_BY_SEQUENCER_PARTITION_CONTAINER_ID = "DELETE FROM SequencerPartitionContainer_Partition "
+  private static final String SEQUENCER_PARTITION_CONTAINER_PARTITION_DELETE_BY_SEQUENCER_PARTITION_CONTAINER_ID = "DELETE FROM SequencerPartitionContainer_Partition "
       + "WHERE container_containerId=:container_containerId";
 
-  public static final String RUN_SEQUENCER_PARTITION_CONTAINER_DELETE_BY_SEQUENCER_PARTITION_CONTAINER_ID = "DELETE FROM Run_SequencerPartitionContainer "
+  private static final String RUN_SEQUENCER_PARTITION_CONTAINER_DELETE_BY_SEQUENCER_PARTITION_CONTAINER_ID = "DELETE FROM Run_SequencerPartitionContainer "
       + "WHERE containers_containerId=:containers_containerId";
 
-  public static final String SEQUENCER_PARTITION_CONTAINER_UPDATE = "UPDATE " + TABLE_NAME + " "
+  private static final String SEQUENCER_PARTITION_CONTAINER_UPDATE = "UPDATE "
+      + TABLE_NAME
+      + " "
       + "SET platform=:platform, identificationBarcode=:identificationBarcode, locationBarcode=:locationBarcode, validationBarcode=:validationBarcode, securityProfile_profileId=:securityProfile_profileId, lastModifier=:lastModifier "
       + "WHERE containerId=:containerId";
 
@@ -284,8 +297,10 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
   }
 
   private void purgeListCache(SequencerPartitionContainer<SequencerPoolPartition> s, boolean replace) {
-    Cache cache = cacheManager.getCache("containerListCache");
-    DbUtils.updateListCache(cache, replace, s, SequencerPartitionContainer.class);
+    if (cacheManager != null) {
+      Cache cache = cacheManager.getCache("containerListCache");
+      DbUtils.updateListCache(cache, replace, s, SequencerPartitionContainer.class);
+    }
   }
 
   private void purgeListCache(SequencerPartitionContainer<SequencerPoolPartition> s) {
@@ -366,7 +381,7 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
     public SequencerPartitionContainer<SequencerPoolPartition> mapRow(ResultSet rs, int rowNum) throws SQLException {
       long id = rs.getLong("containerId");
 
-      if (isCacheEnabled() && lookupCache(cacheManager) != null) {
+      if (isCacheEnabled() && cacheManager != null && lookupCache(cacheManager) != null) {
         Element element;
         if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
           log.debug("Cache hit on map for SequencerPartitionContainer " + id);
@@ -394,6 +409,7 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
         s.setValidationBarcode(rs.getString("validationBarcode"));
         s.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
         s.setLastModifier(securityDAO.getUserById(rs.getLong("lastModifier")));
+        s.setLastModified(rs.getDate("lastModified"));
         s.getChangeLog().addAll(changeLogDAO.listAllById(TABLE_NAME, id));
       } catch (IOException e1) {
         log.error("partition container row mapper", e1);
@@ -413,8 +429,11 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
           @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
   public boolean remove(SequencerPartitionContainer container) throws IOException {
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
-    if (container.isDeletable() && (namedTemplate.update(SEQUENCER_PARTITION_CONTAINER_DELETE,
-        new MapSqlParameterSource().addValue("containerId", container.getId())) == 1)) {
+    if (container.isDeletable()) {
+      changeLogDAO.deleteAllById(TABLE_NAME, container.getId());
+    }
+    if (container.isDeletable() && (namedTemplate
+        .update(SEQUENCER_PARTITION_CONTAINER_DELETE, new MapSqlParameterSource().addValue("containerId", container.getId())) == 1)) {
 
       if (!container.getPartitions().isEmpty()) {
         for (SequencerPoolPartition partition : (Iterable<SequencerPoolPartition>) container.getPartitions()) {
@@ -449,6 +468,69 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
     return false;
   }
 
+  @Override
+  public long countContainers() throws IOException {
+    return Long.valueOf(count());
+  }
+
+  @Override
+  public long countBySearch(String querystr) throws IOException {
+    querystr = "%" + querystr.replaceAll("_", Matcher.quoteReplacement("\\_")) + "%";
+    return template.query(
+        SEQUENCER_PARTITION_CONTAINER_SELECT_BY_SEARCH,
+        new Object[] { querystr, querystr },
+        new SequencerPartitionContainerMapper(true)).size();
+  }
+
+  @Override
+  public List<SequencerPartitionContainer<SequencerPoolPartition>> listBySearchOffsetAndNumResults(int offset, int limit, String querystr,
+      String sortDir, String sortCol) throws IOException {
+    if (isStringEmptyOrNull(querystr)) {
+      return listByOffsetAndNumResults(offset, limit, sortDir, sortCol);
+    } else {
+      if (offset < 0 || limit < 0) throw new IOException("Limit and Offset must not be less than zero");
+      sortCol = updateSortCol(sortCol);
+      if (!"asc".equals(sortDir.toLowerCase()) && !"desc".equals(sortDir.toLowerCase())) sortDir = "desc";
+
+      querystr = "%" + querystr.replaceAll("_", Matcher.quoteReplacement("\\_")) + "%";
+      String query = SEQUENCER_PARTITION_CONTAINER_SELECT_BY_SEARCH + " ORDER BY " + sortCol + " " + sortDir + " LIMIT " + limit
+          + " OFFSET " + offset;
+      List<SequencerPartitionContainer<SequencerPoolPartition>> containers = template
+          .query(query, new Object[] { querystr, querystr }, new SequencerPartitionContainerMapper());
+      for (SequencerPartitionContainer<SequencerPoolPartition> container : containers) {
+        fillInRun(container);
+      }
+      return containers;
+    }
+  }
+
+  @Override
+  public List<SequencerPartitionContainer<SequencerPoolPartition>> listByOffsetAndNumResults(int offset, int limit, String sortDir,
+      String sortCol) throws IOException {
+    if (offset < 0 || limit < 0) throw new IOException("Limit and Offset must not be less than zero");
+    sortCol = updateSortCol(sortCol);
+    if (!"asc".equals(sortDir.toLowerCase()) && !"desc".equals(sortDir.toLowerCase())) sortDir = "desc";
+
+    String query = SEQUENCER_PARTITION_CONTAINER_SELECT + " ORDER BY " + sortCol + " " + sortDir + " LIMIT " + limit + " OFFSET " + offset;
+    List<SequencerPartitionContainer<SequencerPoolPartition>> containers = template.query(query, new SequencerPartitionContainerMapper());
+    for (SequencerPartitionContainer<SequencerPoolPartition> container : containers) {
+      fillInRun(container);
+    }
+    return containers;
+  }
+
+  public String updateSortCol(String sortCol) {
+    sortCol = sortCol.replaceAll("[^\\w]", "");
+    if ("lastModified".equals(sortCol)) {
+      sortCol = "cmod." + sortCol;
+    } else if ("id".equals(sortCol)) {
+      sortCol = "c.containerId";
+    } else {
+      sortCol = "c." + sortCol;
+    }
+    return sortCol;
+  }
+
   @CoverageIgnore
   public ChangeLogStore getChangeLogDAO() {
     return changeLogDAO;
@@ -468,4 +550,5 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
   public void setSecurityDAO(SecurityStore securityDAO) {
     this.securityDAO = securityDAO;
   }
+
 }

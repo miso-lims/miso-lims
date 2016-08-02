@@ -1030,7 +1030,8 @@ Sample.ui = {
           "mRender": function (data, type, full) {
             return "<input type=\"checkbox\" value=\"" + data + "\" class=\"bulkCheckbox\" id=\"bulk_" + data + "\">"
           },
-          "bSortable": false
+          "bSortable": false,
+          "iSortPriority": 0
         },
         {
           "sTitle": "Sample Name",
@@ -1038,14 +1039,16 @@ Sample.ui = {
           "mData": "name",
           "mRender": function (data, type, full) {
             return "<a href=\"/miso/sample/" + full.id + "\">" + data + "</a>";
-          }
+          },
+          "iSortPriority": 1
         },
         {
           "sTitle": "Alias",
           "mData": "alias",
           "mRender": function (data, type, full) {
             return "<a href=\"/miso/sample/" + full.id + "\">" + data + "</a>";
-          }
+          },
+          "iSortPriority": 1
         },
         (Sample.detailedSample ? {
           "sTitle": "Sample Class",
@@ -1053,41 +1056,54 @@ Sample.ui = {
           "mRender": function (data, type, full) {
             return Hot.getAliasFromId(data, Sample.sampleClasses) || "Plain";
           },
-          "bVisible": (Sample.detailedSample? "true" : "false")
+          "bVisible": (Sample.detailedSample? "true" : "false"),
+          "iSortPriority": 0
         } : null),
         {
           "sTitle": "Type",
-          "mData": "sampleType"
+          "mData": "sampleType",
+          "iSortPriority": 0
         },
         {
           "sTitle": "QC Passed",
           "mData": "qcPassed",
           "mRender": function (data, type, full) {
-            return (data ? data : "Unknown");
-          }
+            // data is returned as "true", "false", or "null"
+            return (data != null ? (data ? "True" : "False") : "Unknown");
+          },
+          "iSortPriority": 0
         },
         {
           "sTitle": "QC Result",
-          "mData": "id"
+          "mData": "id",
+          "iSortPriority": 0
+        },
+        {
+          "sTitle": "Location",
+          "mData": "locationLabel",
+          "bSortable": false,
+          "iSortPriority": 0
         },
         {
           "sTitle": "Last Updated",
           "mData": "lastModified",
-          "bVisible": (Sample.detailedSample ? "true" : "false")
+          "bVisible": (Sample.detailedSample ? "true" : "false"),
+          "iSortPriority": 2
         },
         {
           "sTitle": "ID",
           "mData": "identificationBarcode",
-          "bVisible": false
+          "bVisible": false,
+          "iSortPriority": 0
         }
-      ].filter(function(x) { return x; }),
+      ],
       "bJQueryUI": true,
       "bAutoWidth": false,
       "iDisplayLength": 25,
       "iDisplayStart": 0,
       "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>',
       "aaSorting": [
-        [(Sample.detailedSample ? 7 : 1), "desc"]
+        [(Sample.detailedSample ? 8 : 1), "desc"] // NB: this must get updated when adding new columns!!
       ],
       "sPaginationType": "full_numbers",
       "bProcessing": true,
@@ -1105,6 +1121,7 @@ Sample.ui = {
       },
       "fnDrawCallback": function (oSettings) {
         jQuery('#listingSamplesTable').removeClass('disabled');
+        jQuery('#listingSamplesTable_paginate').find('.fg-button').removeClass('fg-button');
       },
       "fnRowCallback": function(nRow, aData, iDisplayIndex, iDisplayIndexFull) {
         Fluxion.doAjax(

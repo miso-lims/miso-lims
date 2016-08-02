@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -35,10 +37,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 
 import javax.persistence.CascadeType;
-
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,6 +59,9 @@ import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.Property;
 import com.googlecode.ehcache.annotations.TriggersRemove;
 
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
@@ -98,18 +99,20 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.BridgeCollectionUpdater;
 public class SQLRunDAO implements RunStore {
   private static final String TABLE_NAME = "Run";
 
-  public static final String RUNS_SELECT = "SELECT runId, name, alias, description, accession, platformRunId, pairedEnd, cycles, filePath, securityProfile_profileId, platformType, status_statusId, sequencerReference_sequencerReferenceId, lastModifier, sequencingParameters_parametersId "
-      + "FROM " + TABLE_NAME;
+  public static final String RUNS_SELECT = "SELECT r.runId, r.name, r.alias, r.description, r.accession, r.platformRunId, r.pairedEnd, r.cycles, r.filePath, r.securityProfile_profileId, "
+      + "r.platformType, r.status_statusId, r.sequencerReference_sequencerReferenceId, r.lastModifier, rmod.lastUpdated, r.sequencingParameters_parametersId "
+      + "FROM " + TABLE_NAME + " r "
+      + " LEFT JOIN (SELECT runId, MAX(changeTime) AS lastUpdated FROM RunChangeLog GROUP BY runId) rmod ON r.runId = rmod.runId";
 
-  public static final String RUNS_SELECT_LIMIT = RUNS_SELECT + " ORDER BY runId DESC LIMIT ?";
+  public static final String RUNS_SELECT_LIMIT = RUNS_SELECT + " ORDER BY r.runId DESC LIMIT ?";
 
-  public static final String RUN_SELECT_BY_ID = RUNS_SELECT + " WHERE runId = ?";
+  public static final String RUN_SELECT_BY_ID = RUNS_SELECT + " WHERE r.runId = ?";
 
-  public static final String RUN_SELECT_BY_ALIAS = RUNS_SELECT + " WHERE alias = ?";
+  public static final String RUN_SELECT_BY_ALIAS = RUNS_SELECT + " WHERE r.alias = ?";
 
-  public static final String RUN_SELECT_BY_SEQUENCER_ID = RUNS_SELECT + " WHERE sequencerReference_sequencerReferenceId = ?";
+  public static final String RUN_SELECT_BY_SEQUENCER_ID = RUNS_SELECT + " WHERE r.sequencerReference_sequencerReferenceId = ?";
 
-  public static final String RUNS_SELECT_BY_SEARCH = RUNS_SELECT + " WHERE name LIKE ? OR alias LIKE ? OR description LIKE ? ";
+  public static final String RUNS_SELECT_BY_SEARCH = RUNS_SELECT + " WHERE r.name LIKE ? OR r.alias LIKE ? OR description LIKE ? ";
 
   public static final String RUN_UPDATE = "UPDATE " + TABLE_NAME + " "
       + "SET name=:name, alias=:alias, description=:description, accession=:accession, platformRunId=:platformRunId, "
@@ -121,18 +124,18 @@ public class SQLRunDAO implements RunStore {
 
   @Deprecated
   public static final String RUNS_SELECT_BY_RELATED_EXPERIMENT = RUNS_SELECT
-      + " WHERE runId IN (SELECT rf.Run_runId FROM Run_SequencerPartitionContainer rf "
+      + " WHERE r.runId IN (SELECT rf.Run_runId FROM Run_SequencerPartitionContainer rf "
       + "LEFT JOIN SequencerPartitionContainer f ON f.containerId = rf.containers_containerId "
       + "LEFT JOIN SequencerPartitionContainer_Partition fl ON f.containerId = fl.container_containerId "
       + "LEFT JOIN _Partition l ON fl.partitions_partitionId = l.partitionId WHERE l.experiment_experimentId = ?)";
 
   public static final String RUNS_SELECT_BY_PLATFORM_ID = RUNS_SELECT
-      + " WHERE sequencerReference_sequencerReferenceId IN (SELECT referenceId FROM SequencerReference WHERE platformId=?)";
+      + " WHERE r.sequencerReference_sequencerReferenceId IN (SELECT referenceId FROM SequencerReference WHERE platformId=?)";
 
   public static final String RUNS_SELECT_BY_STATUS_HEALTH = RUNS_SELECT
-      + " WHERE status_statusId IN (SELECT statusId FROM Status WHERE health=?)";
+      + " WHERE r.status_statusId IN (SELECT statusId FROM Status WHERE health=?)";
 
-  public static String RUNS_SELECT_BY_PROJECT_ID = RUNS_SELECT + " WHERE runId IN (SELECT rf.Run_runId FROM Project p "
+  public static String RUNS_SELECT_BY_PROJECT_ID = RUNS_SELECT + " WHERE r.runId IN (SELECT rf.Run_runId FROM Project p "
       + "INNER JOIN Study st ON st.project_projectId = p.projectId LEFT JOIN Experiment ex ON st.studyId = ex.study_studyId "
       + "INNER JOIN Pool_Experiment pex ON ex.experimentId = pex.experiments_experimentId "
       + "LEFT JOIN Pool pool ON pool.poolId = pex.pool_poolId " + "LEFT JOIN _Partition c ON pool.poolId = c.pool_poolId "
@@ -141,23 +144,23 @@ public class SQLRunDAO implements RunStore {
       + "LEFT JOIN SequencerPartitionContainer fa ON fc.container_containerId = fa.containerId "
       + "INNER JOIN Run_SequencerPartitionContainer rf ON fa.containerId = rf.containers_containerId WHERE p.projectId=?)";
 
-  public static String RUNS_SELECT_BY_POOL_ID = RUNS_SELECT + " WHERE runId IN (SELECT rf.Run_runId FROM Pool pool "
+  public static String RUNS_SELECT_BY_POOL_ID = RUNS_SELECT + " WHERE r.runId IN (SELECT rf.Run_runId FROM Pool pool "
       + "LEFT JOIN _Partition c ON pool.poolId = c.pool_poolId "
       + "LEFT JOIN SequencerPartitionContainer_Partition fc ON c.partitionId = fc.partitions_partitionId "
       + "LEFT JOIN SequencerPartitionContainer fa ON fc.container_containerId = fa.containerId "
       + "INNER JOIN Run_SequencerPartitionContainer rf ON fa.containerId = rf.containers_containerId WHERE pool.poolId=?)";
 
   public static String RUNS_SELECT_BY_SEQUENCER_PARTITION_CONTAINER_ID = RUNS_SELECT
-      + " WHERE runId IN (SELECT rf.Run_runId FROM Run_SequencerPartitionContainer rf WHERE rf.containers_containerId=?)";
+      + " WHERE r.runId IN (SELECT rf.Run_runId FROM Run_SequencerPartitionContainer rf WHERE rf.containers_containerId=?)";
 
   public static String LATEST_RUN_STARTED_SELECT_BY_SEQUENCER_PARTITION_CONTAINER_ID = RUNS_SELECT
-      + " INNER JOIN Status s ON status_statusId=s.statusId"
-      + " WHERE runId IN (SELECT Run_runId FROM Run_SequencerPartitionContainer WHERE containers_containerId=?)"
+      + " INNER JOIN Status s ON r.status_statusId=s.statusId"
+      + " WHERE r.runId IN (SELECT Run_runId FROM Run_SequencerPartitionContainer WHERE containers_containerId=?)"
       + " ORDER BY s.startDate DESC LIMIT 1";
 
   public static String LATEST_RUN_ID_SELECT_BY_SEQUENCER_PARTITION_CONTAINER_ID = RUNS_SELECT
-      + " WHERE runId IN (SELECT Run_runId FROM Run_SequencerPartitionContainer WHERE containers_containerId=?)"
-      + " ORDER BY runId DESC LIMIT 1";
+      + " WHERE r.runId IN (SELECT Run_runId FROM Run_SequencerPartitionContainer WHERE containers_containerId=?)"
+      + " ORDER BY r.runId DESC LIMIT 1";
 
   protected static final Logger log = LoggerFactory.getLogger(SQLRunDAO.class);
 
@@ -292,7 +295,7 @@ public class SQLRunDAO implements RunStore {
   @Override
   @TriggersRemove(cacheName = { "runCache",
       "lazyRunCache" }, keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
-          @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
+          @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public long save(Run run) throws IOException {
     Long securityProfileId = run.getSecurityProfile().getProfileId();
     if (securityProfileId == null || (this.cascadeType != null)) {// && this.cascadeType.equals(CascadeType.PERSIST))) {
@@ -462,8 +465,8 @@ public class SQLRunDAO implements RunStore {
               Number newId = insert.executeAndReturnKey(params);
               if (newId.longValue() != run.getId()) {
                 log.error("Expected Run ID doesn't match returned value from database insert: rolling back...");
-                new NamedParameterJdbcTemplate(template).update(RUN_DELETE,
-                    new MapSqlParameterSource().addValue("runId", newId.longValue()));
+                new NamedParameterJdbcTemplate(template)
+                    .update(RUN_DELETE, new MapSqlParameterSource().addValue("runId", newId.longValue()));
                 throw new IOException("Something bad happened. Expected Run ID doesn't match returned value from DB insert");
               }
               autoIncrement = newId.longValue() + 1;
@@ -589,8 +592,8 @@ public class SQLRunDAO implements RunStore {
 
   @Override
   public Run getLatestStartDateRunBySequencerPartitionContainerId(long containerId) throws IOException {
-    List<Run> eResults = template.query(LATEST_RUN_STARTED_SELECT_BY_SEQUENCER_PARTITION_CONTAINER_ID, new Object[] { containerId },
-        new RunMapper(true));
+    List<Run> eResults = template
+        .query(LATEST_RUN_STARTED_SELECT_BY_SEQUENCER_PARTITION_CONTAINER_ID, new Object[] { containerId }, new RunMapper(true));
     Run r = eResults.size() > 0 ? eResults.get(0) : null;
     if (r == null) {
       r = getLatestRunIdRunBySequencerPartitionContainerId(containerId);
@@ -600,14 +603,14 @@ public class SQLRunDAO implements RunStore {
 
   @Override
   public Run getLatestRunIdRunBySequencerPartitionContainerId(long containerId) throws IOException {
-    List<Run> eResults = template.query(LATEST_RUN_ID_SELECT_BY_SEQUENCER_PARTITION_CONTAINER_ID, new Object[] { containerId },
-        new RunMapper(true));
+    List<Run> eResults = template
+        .query(LATEST_RUN_ID_SELECT_BY_SEQUENCER_PARTITION_CONTAINER_ID, new Object[] { containerId }, new RunMapper());
     return eResults.size() > 0 ? eResults.get(0) : null;
   }
 
   @Override
   @Cacheable(cacheName = "runCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
-      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
+      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public Run get(long runId) throws IOException {
     List<Run> eResults = template.query(RUN_SELECT_BY_ID, new Object[] { runId }, new RunMapper());
     return eResults.size() > 0 ? eResults.get(0) : null;
@@ -628,9 +631,12 @@ public class SQLRunDAO implements RunStore {
   @Override
   @TriggersRemove(cacheName = { "runCache",
       "lazyRunCache" }, keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
-          @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
+          @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public boolean remove(Run r) throws IOException {
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
+    if (r.isDeletable()) {
+      changeLogDAO.deleteAllById(TABLE_NAME, r.getId());
+    }
     if (r.isDeletable() && (namedTemplate.update(RUN_DELETE, new MapSqlParameterSource().addValue("runId", r.getId())) == 1)) {
       purgeListCache(r, false);
       return true;
@@ -688,6 +694,7 @@ public class SQLRunDAO implements RunStore {
       r.setFilePath(rs.getString("filePath"));
       r.setPlatformType(PlatformType.get(rs.getString("platformType")));
       r.setSequencingParametersId(rs.getLong("sequencingParameters_parametersId"));
+      r.setLastUpdated(rs.getDate("lastUpdated"));
       if (rs.wasNull()) {
         r.setSequencingParametersId(null);
       }
@@ -739,4 +746,63 @@ public class SQLRunDAO implements RunStore {
   public Map<String, Integer> getRunColumnSizes() throws IOException {
     return DbUtils.getColumnSizes(template, TABLE_NAME);
   }
+
+  @Override
+  public long countRuns() throws IOException {
+    return Long.valueOf(listAll().size());
+  }
+
+  @Override
+  public List<Run> listBySearchOffsetAndNumResults(int offset, int limit, String querystr, String sortDir, String sortCol)
+      throws IOException {
+    if (isStringEmptyOrNull(querystr)) {
+      return listByOffsetAndNumResults(offset, limit, sortDir, sortCol);
+    } else {
+      if (offset < 0 || limit < 0) throw new IOException("Limit and Offset must not be less than zero");
+      sortCol = updateSortCol(sortCol);
+      if (!"asc".equals(sortDir.toLowerCase()) && !"desc".equals(sortDir.toLowerCase())) sortDir = "desc";
+
+      querystr = "%" + querystr.replaceAll("_", Matcher.quoteReplacement("\\_")) + "%";
+      String query = RUNS_SELECT_BY_SEARCH + " ORDER BY " + sortCol + " " + sortDir + " LIMIT " + limit + " OFFSET " + offset;
+      return template.query(query, new Object[] { querystr, querystr, querystr }, new RunMapper(true));
+    }
+  }
+
+  @Override
+  public List<Run> listByOffsetAndNumResults(int offset, int limit, String sortDir, String sortCol) throws IOException {
+    if (offset < 0 || limit < 0) throw new IOException("Limit and Offset must not be less than zero");
+    sortCol = updateSortCol(sortCol);
+    if (!"asc".equals(sortDir.toLowerCase()) && !"desc".equals(sortDir.toLowerCase())) sortDir = "desc";
+
+    String query = RUNS_SELECT + " ORDER BY " + sortCol + " " + sortDir + " LIMIT " + limit + " OFFSET " + offset;
+    return template.query(query, new RunMapper(true));
+  }
+
+  @Override
+  public long countBySearch(String querystr) throws IOException {
+    return listBySearch(querystr).size();
+  }
+
+  public String updateSortCol(String sortCol) {
+    sortCol = sortCol.replaceAll("[^\\w]", "");
+    if ("lastModified".equals(sortCol) || "lastUpdated".equals(sortCol)) {
+      // because for some reason, the field on Run is called "lastUpdated", unlike everything else.
+      sortCol = "rmod.lastUpdated";
+    } else {
+      switch (sortCol) {
+      case "id":
+        sortCol = "runId";
+        break;
+      case "name":
+        break;
+      case "alias":
+        break;
+      case "platformType":
+        break;
+      }
+      sortCol = "r." + sortCol;
+    }
+    return sortCol;
+  }
+
 }

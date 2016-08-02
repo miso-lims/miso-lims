@@ -105,9 +105,13 @@ Experiment.ui = {
           ],
           "bJQueryUI": true,
           "iDisplayLength": 25,
+          "sPaginationType": "full_numbers",
           "aaSorting": [
             [0, "desc"]
-          ]
+          ],
+          "fnDrawCallback": function (oSettings) {
+            jQuery('#listingExperimentsTable_paginate').find('.fg-button').removeClass('fg-button');
+          }
         });
       }
       }

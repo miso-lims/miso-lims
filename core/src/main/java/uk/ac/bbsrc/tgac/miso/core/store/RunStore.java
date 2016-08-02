@@ -41,8 +41,7 @@ public interface RunStore extends Store<Run>, Cascadable, Remover<Run>, NamingSc
   /**
    * Gets the latest Run, by start date, that is associated with the given container
    *
-   * @param containerId
-   *          long
+   * @param containerId long
    * @return Run
    * @throws IOException
    */
@@ -51,8 +50,7 @@ public interface RunStore extends Store<Run>, Cascadable, Remover<Run>, NamingSc
   /**
    * Gets the latest Run, by run ID, that is associated with the given container
    *
-   * @param containerId
-   *          long
+   * @param containerId long
    * @return Run
    * @throws IOException
    */
@@ -61,34 +59,28 @@ public interface RunStore extends Store<Run>, Cascadable, Remover<Run>, NamingSc
   /**
    * List all Runs with name, alias, or description containing the query string
    *
-   * @param query
-   *          String to search for
+   * @param query String to search for
    * @return Collection<Run>
    * @throws IOException
-   * @throws NullPointerException
-   *           if query is null
+   * @throws NullPointerException if query is null
    */
   Collection<Run> listBySearch(String query) throws IOException;
 
   /**
    * Retrieve a Run from an underlying data store given a Run alias
    *
-   * @param alias
-   *          of type String
+   * @param alias of type String
    * @return Run
-   * @throws IOException
-   *           when
+   * @throws IOException when
    */
   Run getByAlias(String alias) throws IOException;
 
   /**
    * List all Runs related to an Experiment given an Experiment ID
    *
-   * @param experimentId
-   *          of type long
+   * @param experimentId of type long
    * @return List<Run>
-   * @throws IOException
-   *           when
+   * @throws IOException when
    */
   @Deprecated
   List<Run> listByExperimentId(long experimentId) throws IOException;
@@ -96,52 +88,43 @@ public interface RunStore extends Store<Run>, Cascadable, Remover<Run>, NamingSc
   /**
    * List all Runs using a Pool given a Pool ID
    *
-   * @param poolId
-   *          of type long
+   * @param poolId of type long
    * @return List<Run>
-   * @throws IOException
-   *           when
+   * @throws IOException when
    */
   List<Run> listByPoolId(long poolId) throws IOException;
 
   /**
    * List all Runs using a Container given a Container ID
    *
-   * @param containerId
-   *          of type long
+   * @param containerId of type long
    * @return List<Run>
-   * @throws IOException
-   *           when
+   * @throws IOException when
    */
   List<Run> listBySequencerPartitionContainerId(long containerId) throws IOException;
 
   /**
    * List all Runs related to a Project given a Project ID
    *
-   * @param projectId
-   *          of type long
+   * @param projectId of type long
    * @return List<Run>
-   * @throws IOException
-   *           when
+   * @throws IOException when
    */
   List<Run> listByProjectId(long projectId) throws IOException;
 
   /**
    * List all Runs carried out on a Platform given a Platform ID
    *
-   * @param platformId
-   *          of type long
+   * @param platformId of type long
    * @return List<Run>
-   * @throws IOException
-   *           when
+   * @throws IOException when
    */
   List<Run> listByPlatformId(long platformId) throws IOException;
 
   /**
    * List all Runs by their health given a HealthType
    *
-   * @param health
-   *          status to search for
+   * @param health status to search for
    * @return all runs with matching status
    * @throws IOException
    */
@@ -151,26 +134,33 @@ public interface RunStore extends Store<Run>, Cascadable, Remover<Run>, NamingSc
    * List all runs for a given sequencer reference id
    * 
    * @param sequencerReferenceId id of the sequencer reference to get runs for
-   * @return all runs  with matching sequencer reference id
+   * @return all runs with matching sequencer reference id
    */
   List<Run> listBySequencerId(long sequencerReferenceId) throws IOException;
-  
+
   /**
    * List all persisted objects
    *
-   * @param the
-   *          maximum number of objects to return. If this is negative, no limit will be set
+   * @param the maximum number of objects to return. If this is negative, no limit will be set
    * @return Collection<Run>
-   * @throws IOException
-   *           when the objects cannot be retrieved
+   * @throws IOException when the objects cannot be retrieved
    */
   Collection<Run> listAllWithLimit(long limit) throws IOException;
 
   int[] saveAll(Collection<Run> runs) throws IOException;
-  
+
   /**
    * @return a map containing all column names and max lengths from the Run table
    * @throws IOException
    */
   public Map<String, Integer> getRunColumnSizes() throws IOException;
+
+  public long countRuns() throws IOException;
+
+  public List<Run> listBySearchOffsetAndNumResults(int offset, int limit, String querystr, String sortDir, String sortCol)
+      throws IOException;
+
+  public List<Run> listByOffsetAndNumResults(int ofset, int limit, String sortDir, String sortCol) throws IOException;
+
+  public long countBySearch(String querystr) throws IOException;
 }

@@ -295,6 +295,12 @@ VALUES (1,'RUN1','BC0JHTACXX',NULL,0,1,202,'/.mounts/labs/prod/archive/h1179/120
 (3,'RUN3','BC075RACXX',NULL,3,1,209,'/.mounts/labs/prod/archive/h1179/120412_h1179_0073_BC075RACXX',14,'Illumina',3,'120412_h1179_0073_BC075RACXX',1,1),
 (4,'RUN4','AC0KY7ACXX',NULL,8,1,209,'/.mounts/labs/prod/archive/h1179/120314_h1179_0068_AC0KY7ACXX',15,'Illumina',4,'120314_h1179_0068_AC0KY7ACXX',1,1);
 
+INSERT INTO `RunChangeLog`(`runId`, `columnsChanged`, `userId`, `message`, `changeTime`)
+VALUES (1, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:49'),
+(2, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:51'),
+(3, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:53'),
+(4, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:55');
+
 DELETE FROM RunQC;
 INSERT INTO `RunQc`(`run_runId`, `qcUserName`, `qcDate`, `qcMethod`, `information`, `doNotProcess`)
 VALUES ( 1, 'username1', '2016-01-26', 1, 'information1', 1),
@@ -381,6 +387,12 @@ VALUES (1,1,'admin','2015-08-27',1,5),(2,2,'admin','2015-08-27',1,5),(3,3,'admin
 DELETE FROM `SequencerPartitionContainer`;
 INSERT INTO `SequencerPartitionContainer`(`containerId`, `securityProfile_profileId`, `identificationBarcode`, `locationBarcode`, `platform`, `validationBarcode`, `lastModifier`) 
 VALUES (1,12,'C0JHTACXX','',16,'',1),(2,13,'D0VJ9ACXX','',16,'',1),(3,14,'C075RACXX','',16,'',1),(4,15,'C0KY7ACXX','',16,'',1);
+
+INSERT INTO `SequencerPartitionContainerChangeLog`(`containerId`, `columnsChanged`, `userId`, `message`, `changeTime`)
+VALUES (1, 'validationBarcode', 1, 'NULL -> real', '2016-07-07 13:30:47'),
+(2, 'validationBarcode', 1, 'NULL -> real', '2016-07-07 13:30:49'),
+(3, 'validationBarcode', 1, 'NULL -> real', '2016-07-07 13:30:51'),
+(4, 'validationBarcode', 1, 'NULL -> real', '2016-07-07 13:30:53');
 
 DELETE FROM `SequencingParameters`;
 DELETE FROM `Platform`;

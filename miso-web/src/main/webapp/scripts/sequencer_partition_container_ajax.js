@@ -321,37 +321,81 @@ Container.ui = {
   },
 
   createListingContainersTable: function () {
-    jQuery('#listingContainersTable').html("<img src='../styles/images/ajax-loader.gif'/>");
-    Fluxion.doAjax(
-      'containerControllerHelperService',
-      'listSequencePartitionContainersDataTable',
-      {
-        'url': ajaxurl
-      },
-      {
-        'doOnSuccess': function (json) {
-          jQuery('#listingContainersTable').html('');
-          jQuery('#listingContainersTable').dataTable({
-            "aaData": json.array,
-            "aoColumns": [
-              //{ "sTitle": "Name"},
-              { "sTitle": "ID Barcode"},
-              { "sTitle": "Platform"},
-              { "sTitle": "Last Associated Run"},
-              { "sTitle": "Last Sequencer Used"}
-            ],
-            "bJQueryUI": true,
-            "iDisplayLength": 25,
-            "aaSorting": [
-              [0, "desc"]
-            ],
-            "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>'
-          });
-          jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
-          jQuery("#toolbar").append("<button style=\"margin-left:5px;\" onclick=\"window.location.href='/miso/container/new';\" class=\"fg-button ui-state-default ui-corner-all\">Create Partition Container</button>");
+    jQuery('#listingContainersTable').html("");
+    jQuery('#listingContainersTable').dataTable({
+      "aoColumns": [
+        {
+          "sTitle": "ID Barcode",
+          "mData": "identificationBarcode",
+          "mRender": function (data, type, full) {
+            return "<a href=\"/miso/container/" + full.id + "\">" + data + "</a>";
+          }
+        },
+        {
+          "sTitle": "Platform",
+          "mData": "platform"
+        },
+        {
+          "sTitle": "Last Associated Run",
+          "mData": "lastRunAlias",
+          "mRender": function (data, type, full) {
+            return (data ? "<a href=\"/miso/run/" + full.lastRunId + "\">" + data + "</a>" : "");
+          },
+          "bSortable": false
+        },
+        {
+          "sTitle": "Last Sequencer Used",
+          "mData": "id",
+          "bSortable": false 
+        },
+        {
+          "sTitle": "Last Modified",
+          "mData": "lastModified"
         }
+      ],
+      "bJQueryUI": true,
+      "bAutoWidth": false,
+      "iDisplayLength": 25,
+      "iDisplayStart": 0,
+      "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>',
+      "aaSorting": [
+        [5, "desc"]
+      ],
+      "sPaginationType": "full_numbers",
+      "bProcessing": true,
+      "bServerSide": true,
+      "sAjaxSource": "/miso/rest/container/dt",
+      "fnServerData": function (sSource, aoData, fnCallback) {
+        jQuery('#listingContainersTable').addClass('disabled');
+        jQuery.ajax({
+          "dataType": "json",
+          "type": "GET",
+          "url": sSource,
+          "data": aoData,
+          "success": fnCallback // Do not alter this DataTables property
+        });
+      },
+      "fnDrawCallback": function (oSettings) {
+        jQuery('#listingContainersTable').removeClass('disabled');
+        jQuery('#listingContainersTable_paginate').find('.fg-button').removeClass('fg-button');
+      },
+      "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+        Fluxion.doAjax(
+          'containerControllerHelperService',
+          'getContainerLastRun',
+          {
+            'containerId': aData.id,
+            'url': ajaxurl
+          },{
+            'doOnSuccess': function (json) {
+              jQuery('td:eq(3)', nRow).html(json.response);
+            }
+          }
+        );
       }
-    );
+    }).fnSetFilteringDelay();
+    jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
+    jQuery("#toolbar").append("<button style=\"margin-left:5px;\" onclick=\"window.location.href='/miso/container/new';\" class=\"fg-button ui-state-default ui-corner-all\">Create Partition Container</button>");
   }
 };
 

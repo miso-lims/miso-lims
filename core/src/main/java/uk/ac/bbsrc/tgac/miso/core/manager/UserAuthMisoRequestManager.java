@@ -2581,4 +2581,85 @@ public class UserAuthMisoRequestManager implements RequestManager {
   public Long countLibrariesBySearch(String querystr) throws IOException {
     return backingManager.countLibrariesBySearch(querystr);
   }
+
+  @Override
+  public Long countRuns() throws IOException {
+    return backingManager.countRuns();
+  }
+
+  @Override
+  public List<Run> getRunsByPageSizeSearch(int offset, int limit, String querystr, String sortDir, String sortCol) throws IOException {
+    User user = getCurrentUser();
+    List<Run> accessibles = new ArrayList<>();
+    for (Run run : backingManager.getRunsByPageSizeSearch(offset, limit, querystr, sortDir, sortCol)) {
+      if (run.userCanRead(user)) {
+        accessibles.add(run);
+      }
+    }
+    return accessibles;
+  }
+
+  @Override
+  public List<Run> getRunsByPageAndSize(int offset, int limit, String sortDir, String sortCol) throws IOException {
+    User user = getCurrentUser();
+    List<Run> accessibles = new ArrayList<>();
+    for (Run run : backingManager.getRunsByPageAndSize(offset, limit, sortDir, sortCol)) {
+      if (run.userCanRead(user)) {
+        accessibles.add(run);
+      }
+    }
+    return accessibles;
+  }
+
+  @Override
+  public Long countRunsBySearch(String querystr) throws IOException {
+    return backingManager.countRunsBySearch(querystr);
+  }
+
+  @Override
+  public Run getLatestRunBySequencerPartitionContainerId(Long containerId) throws IOException {
+    Run o = backingManager.getLatestRunBySequencerPartitionContainerId(containerId);
+    if (readCheck(o))
+      return o;
+    else
+      throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Run " + o.getId());
+  }
+
+  @Override
+  public Long countContainers() throws IOException {
+    return backingManager.countContainers();
+  }
+
+  @Override
+  public List<SequencerPartitionContainer<SequencerPoolPartition>> getContainersByPageSizeSearch(int offset, int limit, String querystr,
+      String sortDir, String sortCol) throws IOException {
+    User user = getCurrentUser();
+    List<SequencerPartitionContainer<SequencerPoolPartition>> accessibles = new ArrayList<>();
+    for (SequencerPartitionContainer<SequencerPoolPartition> spc : backingManager
+        .getContainersByPageSizeSearch(offset, limit, querystr, sortDir, sortCol)) {
+      if (spc.userCanRead(user)) {
+        accessibles.add(spc);
+      }
+    }
+    return accessibles;
+  }
+
+  @Override
+  public List<SequencerPartitionContainer<SequencerPoolPartition>> getContainersByPageAndSize(int offset, int limit, String sortDir,
+      String sortCol) throws IOException {
+    User user = getCurrentUser();
+    List<SequencerPartitionContainer<SequencerPoolPartition>> accessibles = new ArrayList<>();
+    for (SequencerPartitionContainer<SequencerPoolPartition> spc : backingManager
+        .getContainersByPageAndSize(offset, limit, sortDir, sortCol)) {
+      if (spc.userCanRead(user)) {
+        accessibles.add(spc);
+      }
+    }
+    return accessibles;
+  }
+
+  @Override
+  public Long countContainersBySearch(String querystr) throws IOException {
+    return backingManager.countContainersBySearch(querystr);
+  }
 }

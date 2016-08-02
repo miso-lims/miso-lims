@@ -257,7 +257,6 @@ public class DefaultMigrationTarget implements MigrationTarget {
    * @throws IOException if any exception is thrown while in the transaction
    */
   private <T> T readInTransaction(TransactionWork<T> work) throws IOException {
-    // TODO: this won't actually roll back anything done via JdbcTemplate
     Transaction tx = sessionFactory.getCurrentSession().beginTransaction();
     try {
       T result = work.doWork();

@@ -2899,4 +2899,87 @@ public class MisoRequestManager implements RequestManager {
     }
   }
 
+  @Override
+  public Long countRuns() throws IOException {
+    if (runStore != null) {
+      return runStore.countRuns();
+    } else {
+      throw new IOException("No runStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public List<Run> getRunsByPageSizeSearch(int offset, int limit, String querystr, String sortDir, String sortCol) throws IOException {
+    if (runStore != null) {
+      return runStore.listBySearchOffsetAndNumResults(offset, limit, querystr, sortDir, sortCol);
+    } else {
+      throw new IOException("No runStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public List<Run> getRunsByPageAndSize(int offset, int limit, String sortDir, String sortCol) throws IOException {
+    if (runStore != null) {
+      return runStore.listByOffsetAndNumResults(offset, limit, sortDir, sortCol);
+    } else {
+      throw new IOException("No runStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public Long countRunsBySearch(String querystr) throws IOException {
+    if (runStore != null) {
+      return runStore.countBySearch(querystr);
+    } else {
+      throw new IOException("No runStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public Run getLatestRunBySequencerPartitionContainerId(Long containerId) throws IOException {
+    if (runStore != null) {
+      return runStore.getLatestRunIdRunBySequencerPartitionContainerId(containerId);
+    } else {
+      throw new IOException("No runStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public Long countContainers() throws IOException {
+    if (sequencerPartitionContainerStore != null) {
+      return sequencerPartitionContainerStore.countContainers();
+    } else {
+      throw new IOException("No sequencerPartitionContainerStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public List<SequencerPartitionContainer<SequencerPoolPartition>> getContainersByPageSizeSearch(int offset, int limit, String querystr,
+      String sortDir, String sortCol) throws IOException {
+    if (sequencerPartitionContainerStore != null) {
+      return sequencerPartitionContainerStore.listBySearchOffsetAndNumResults(offset, limit, querystr, sortDir, sortCol);
+    } else {
+      throw new IOException("No sequencerPartitionContainerStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public List<SequencerPartitionContainer<SequencerPoolPartition>> getContainersByPageAndSize(int offset, int limit, String sortDir,
+      String sortCol) throws IOException {
+    if (sequencerPartitionContainerStore != null) {
+      return sequencerPartitionContainerStore.listByOffsetAndNumResults(offset, limit, sortDir, sortCol);
+    } else {
+      throw new IOException("No sequencerPartitionContainerStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public Long countContainersBySearch(String querystr) throws IOException {
+    if (sequencerPartitionContainerStore != null) {
+      return sequencerPartitionContainerStore.countBySearch(querystr);
+    } else {
+      throw new IOException("No sequencerPartitionContainerStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
 }

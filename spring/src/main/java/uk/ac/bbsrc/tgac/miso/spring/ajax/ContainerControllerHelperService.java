@@ -60,6 +60,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
@@ -922,6 +923,20 @@ public class ContainerControllerHelperService {
     } catch (IOException e) {
       log.error("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
+    }
+  }
+
+  public JSONObject getContainerLastRun(HttpSession session, JSONObject json) throws IOException {
+    if (json.has("containerId")) {
+      Long containerId = json.getLong("containerId");
+      Run run = requestManager.getLatestRunBySequencerPartitionContainerId(containerId);
+      if (run != null && run.getSequencerReference() != null) {
+        return JSONUtils.SimpleJSONResponse(run.getSequencerReference().getName());
+      } else {
+        return JSONUtils.SimpleJSONResponse("");
+      }
+    } else {
+      return JSONUtils.SimpleJSONError("No containerId specified");
     }
   }
 
