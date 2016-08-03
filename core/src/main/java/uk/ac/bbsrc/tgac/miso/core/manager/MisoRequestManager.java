@@ -2982,4 +2982,9 @@ public class MisoRequestManager implements RequestManager {
     }
   }
 
+  @Override
+  public Library getAdjacentLibraryById(long libraryId, boolean before) throws IOException {
+    return libraryStore.getAdjacentLibrary(libraryId, before);
+  }
+
 }
