@@ -1012,16 +1012,6 @@ Sample.ui = {
     jQuery('#listingSamplesTable').html("<img src='../styles/images/ajax-loader.gif'/>");
 
     jQuery('#listingSamplesTable').html('');
-    jQuery.fn.dataTableExt.oSort['no-sam-asc'] = function (x, y) {
-      var a = parseInt(x.replace(/^SAM/i, ""));
-      var b = parseInt(y.replace(/^SAM/i, ""));
-      return ((a < b) ? -1 : ((a > b) ? 1 : 0));
-    };
-    jQuery.fn.dataTableExt.oSort['no-sam-desc'] = function (x, y) {
-      var a = parseInt(x.replace(/^SAM/i, ""));
-      var b = parseInt(y.replace(/^SAM/i, ""));
-      return ((a < b) ? 1 : ((a > b) ? -1 : 0));
-    };
     jQuery('#listingSamplesTable').dataTable({
       "aoColumns": [
         {
@@ -1035,10 +1025,9 @@ Sample.ui = {
         },
         {
           "sTitle": "Sample Name",
-          "sType": "no-sam",
-          "mData": "name",
+          "mData": "id",
           "mRender": function (data, type, full) {
-            return "<a href=\"/miso/sample/" + full.id + "\">" + data + "</a>";
+            return "<a href=\"/miso/sample/" + data + "\">" + full.name + "</a>";
           },
           "iSortPriority": 1
         },

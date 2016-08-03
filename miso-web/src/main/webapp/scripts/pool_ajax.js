@@ -417,28 +417,15 @@ Pool.ui = {
   createListingPoolsTable: function (platform, poolConcentrationUnits) {
     var table = 'listing' + platform + 'PoolsTable';
     jQuery('#'+table).html('');
-    
-    jQuery.fn.dataTableExt.oSort['no-po-asc'] = function(x, y) {
-      var a = parseInt(x.replace(/^.*PO/i, ""));
-      var b = parseInt(y.replace(/^.*PO/i, ""));
-      return ((a < b) ? -1 : ((a > b) ? 1 : 0));
-    };
-    jQuery.fn.dataTableExt.oSort['no-po-desc'] = function(x, y) {
-      var a = parseInt(x.replace(/^.*PO/i, ""));
-      var b = parseInt(y.replace(/^.*PO/i, ""));
-      return ((a < b) ? 1 : ((a > b) ? -1 : 0));
-    };
     jQuery('#'+table).dataTable({
       "aoColumns": [
         {
           "sTitle": "Name",
-          "sType": "no-po",
-          "mData": "name",
+          "mData": "id",
           "mRender": function (data, type, full) {
-            return "<a href=\"/miso/pool/" + full.id + "\">" + data + "</a>";
+            return "<a href=\"/miso/pool/" + data + "\">" + full.name + "</a>";
           },
           "iSortPriority" : 1
-
         },
         {
           "sTitle": "Alias",
@@ -447,13 +434,11 @@ Pool.ui = {
             return "<a href=\"/miso/pool/" + full.id + "\">" + data + "</a>";
           },
           "iSortPriority" : 0
-
         },
         {
           "sTitle": "Date Created",
           "mData": "creationDate",
           "iSortPriority" : 0
-
         },
         {
           "sTitle": "Elements",
@@ -467,19 +452,16 @@ Pool.ui = {
           },
           "bSortable": false,
           "iSortPriority" : 0
-
         },
         {
           "sTitle": "Average Insert Size",
           "mData": "id",
           "iSortPriority" : 0
-
         },
         {
           "sTitle": "Conc. (" + poolConcentrationUnits + ")",
           "mData": "concentration",
           "iSortPriority" : 0
-
         },
         {
           "sTitle": "Location",
@@ -498,7 +480,6 @@ Pool.ui = {
           "mData": "identificationBarcode",
           "bVisible": false,
           "iSortPriority" : 0
-
         }
       ],
       "bJQueryUI": true,
