@@ -1,6 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.util.Date;
 import java.util.TreeMap;
+
+import org.joda.time.format.ISODateTimeFormat;
 
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 
@@ -10,14 +13,6 @@ public class PoolOrderCompletionGroup extends TreeMap<HealthType, PoolOrderCompl
 
   public PoolOrderCompletionGroup() {
     super(HealthType.COMPARATOR);
-  }
-
-  public int getRemaining() {
-    int remaining = 0;
-    for (PoolOrderCompletion completion : values()) {
-      remaining += completion.getNumPartitions() * completion.getHealth().getMultiplier();
-    }
-    return remaining > 0 ? remaining : 0;
   }
 
   public void add(PoolOrderCompletion item) {
@@ -36,6 +31,28 @@ public class PoolOrderCompletionGroup extends TreeMap<HealthType, PoolOrderCompl
       empty.setHealth((HealthType) key);
       return empty;
     }
+  }
+
+  private Date getLastUpdated() {
+    Date latest = null;
+    for (PoolOrderCompletion completion : values()) {
+      if (latest == null || latest.before(completion.getLastUpdated())) {
+        latest = completion.getLastUpdated();
+      }
+    }
+    return latest;
+  }
+
+  public String getLastUpdatedISO() {
+    return ISODateTimeFormat.date().print(getLastUpdated().getTime());
+  }
+
+  public int getRemaining() {
+    int remaining = 0;
+    for (PoolOrderCompletion completion : values()) {
+      remaining += completion.getNumPartitions() * completion.getHealth().getMultiplier();
+    }
+    return remaining > 0 ? remaining : 0;
   }
 
 }

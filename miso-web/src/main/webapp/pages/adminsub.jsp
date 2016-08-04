@@ -56,7 +56,7 @@
         <li><a href="<c:url value="/miso/containers"/>">List Partition Containers</a></li>
         <li><a href="<c:url value="/miso/experiments"/>">List Experiments</a></li>
         <li><a href="<c:url value="/miso/pools"/>">List Pools</a></li>
-        <li><a href="<c:url value="/miso/poolorders/outstanding"/>">List Outstanding Orders</a></li>
+        <li><a href="<c:url value="/miso/poolorders"/>">List Orders</a></li>
         <li><a href="<c:url value="/miso/libraries"/>">List Libraries</a></li>
         <li><a href="<c:url value="/miso/samples"/>">List Samples</a></li>
         <li><a href="<c:url value="/miso/studies"/>">List Studies</a></li>
