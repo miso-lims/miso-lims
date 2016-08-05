@@ -1,7 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
 import java.net.URI;
-import java.util.Date;
 import java.util.Set;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
@@ -21,8 +20,9 @@ public class PoolDto {
   private Boolean qcPassed;
   private Integer avgInsertSize;
   private Set<DilutionDto> pooledElements;
-  private Date creationDate;
+  private String creationDate;
   private String lastModified;
+  private String description;
 
   public String getAlias() {
     return alias;
@@ -36,8 +36,12 @@ public class PoolDto {
     return concentration;
   }
 
-  public Date getCreationDate() {
+  public String getCreationDate() {
     return creationDate;
+  }
+
+  public String getDescription() {
+    return description;
   }
 
   public Long getId() {
@@ -88,8 +92,13 @@ public class PoolDto {
     this.concentration = concentration;
   }
 
-  public void setCreationDate(Date creationDate) {
+  public void setCreationDate(String creationDate) {
     this.creationDate = creationDate;
+  }
+
+  @JsonSerialize(include = JsonSerialize.Inclusion.ALWAYS)
+  public void setDescription(String description) {
+    this.description = description;
   }
 
   public void setId(Long id) {

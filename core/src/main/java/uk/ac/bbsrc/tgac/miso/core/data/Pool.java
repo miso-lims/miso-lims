@@ -290,4 +290,18 @@ public interface Pool<P extends Poolable> extends SecurableByProfile, Comparable
    */
   void setLastModified(Date lastModified);
 
+  /**
+   * Returns the description of this Pool object.
+   * 
+   * @return String description;
+   */
+  public String getDescription();
+
+  /**
+   * Adds the description of this Pool object
+   * 
+   * @param String description
+   */
+  void setDescription(String description);
+
 }
