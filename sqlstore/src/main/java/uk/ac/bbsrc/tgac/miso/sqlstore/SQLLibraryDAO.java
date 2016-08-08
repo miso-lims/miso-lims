@@ -715,7 +715,7 @@ public class SQLLibraryDAO implements LibraryStore {
       case "libraryTypeAlias":
         sortCol = "libraryType";
         break;
-      case "parentSampleAlias":
+      case "parentSampleId":
         sortCol = "sample_sampleId";
         break;
       }

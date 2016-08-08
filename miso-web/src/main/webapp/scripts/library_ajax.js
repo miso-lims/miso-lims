@@ -1054,27 +1054,6 @@ Library.ui = {
 
   createListingLibrariesTable: function () {
     jQuery('#listingLibrariesTable').html("");
-    jQuery.fn.dataTableExt.oSort['no-lib-asc'] = function (x, y) {
-      var a = parseInt(x.replace(/^LIB/i, ""));
-      var b = parseInt(y.replace(/^LIB/i, ""));
-      return ((a < b) ? -1 : ((a > b) ? 1 : 0));
-    };
-    jQuery.fn.dataTableExt.oSort['no-lib-desc'] = function (x, y) {
-      var a = parseInt(x.replace(/^LIB/i, ""));
-      var b = parseInt(y.replace(/^LIB/i, ""));
-      return ((a < b) ? 1 : ((a > b) ? -1 : 0));
-    };
-    jQuery.fn.dataTableExt.oSort['no-sam-asc'] = function (x, y) {
-      var a = parseInt(x.replace(/^SAM/i, ""));
-      var b = parseInt(y.replace(/^SAM/i, ""));
-      return ((a < b) ? -1 : ((a > b) ? 1 : 0));
-    };
-    jQuery.fn.dataTableExt.oSort['no-sam-desc'] = function (x, y) {
-      var a = parseInt(x.replace(/^SAM/i, ""));
-      var b = parseInt(y.replace(/^SAM/i, ""));
-      return ((a < b) ? 1 : ((a > b) ? -1 : 0));
-    };
-
     jQuery('#listingLibrariesTable').dataTable({
       "aoColumns": [
         { 
@@ -1086,11 +1065,10 @@ Library.ui = {
           "bSortable": false
         },
         { 
-          "sTitle": "Library Name", 
-          "sType": "no-lib",
-          "mData": "name",
+          "sTitle": "Library Name",
+          "mData": "id",
           "mRender": function (data, type, full) {
-            return "<a href=\"/miso/library/" + full.id + "\">" + data + "</a>";
+            return "<a href=\"/miso/library/" + data + "\">" + full.name + "</a>";
           }
         },
         { 
@@ -1107,9 +1085,9 @@ Library.ui = {
         { 
           "sTitle": "Sample Name", 
           "sType": "no-sam",
-          "mData": "parentSampleAlias" ,
+          "mData": "parentSampleId" ,
           "mRender": function (data, type, full) {
-            return "<a href=\"/miso/sample/" + full.parentSampleId + "\">" + data + " (SAM" + full.id + ")</a>";
+            return "<a href=\"/miso/sample/" + data + "\">" + full.parentSampleAlias + " (SAM" + data + ")</a>";
           }
         },
         { 
