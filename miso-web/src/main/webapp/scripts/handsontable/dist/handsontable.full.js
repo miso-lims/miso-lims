@@ -9798,7 +9798,7 @@ function offset(elem) {
     offsetTop += elem.offsetTop;
     lastElem = elem;
   }
-  if (lastElem && lastElem.style.position === 'fixed') {
+  if (lastElem && lastElem.style && lastElem.style.position === 'fixed') {
     offsetLeft += window.pageXOffset || docElem.scrollLeft;
     offsetTop += window.pageYOffset || docElem.scrollTop;
   }
@@ -12092,22 +12092,7 @@ function Autofill(instance) {
     wtOnCellMouseOver(event, coords, TD, wt);
   };
   this.instance.view.wt.wtSettings.settings.onCellCornerDblClick = function() {
-    // adds autofill for object-based source data as well as built-in autofill for array-based source data
-    if (instance.getSourceData()[0] instanceof Array) {
-      instance.autofill.selectAdjacent();
-    } else {
-      // hack
-      var autofillValue = instance.getValue();
-      var selectedIndices = instance.getSelected();
-      var selectedCell = instance.getCellMeta(selectedIndices[0], selectedIndices[1]);
-      var rowIndex = selectedCell.row;
-      var selectedProp = selectedCell.prop;
-      var numRows = instance.countRenderedRows();
-      // start at one row below selected cell and fill in everything below that
-      for (var i = rowIndex + 1; i < numRows; i++) {
-        instance.setDataAtRowProp(i, selectedProp, autofillValue);
-      }
-    }
+    instance.autofill.selectAdjacent();
   };
 }
 Autofill.prototype.init = function() {
@@ -12134,7 +12119,7 @@ Autofill.prototype.selectAdjacent = function() {
         break rows;
       }
     }
-    if (!!data[r][select[1] - 1] || !!data[r][select[3] + 1]) {
+    if (!!data[r][select[1] - 1] || !!data[r][select[3] + 1] || !(this.instance.getSourceDataAtRow(0) instanceof Array)) {
       maxR = r;
     }
   }

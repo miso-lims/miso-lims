@@ -54,7 +54,8 @@ Library.hot = {
       contextMenu: false,
       columns: Hot.colConf,
       data: Hot.startData,
-      dataSchema: Library.hot.dataSchema
+      dataSchema: Library.hot.dataSchema,
+      maxRows: startingValues.length
     });
     document.getElementById('hotContainer').style.display = '';
     
