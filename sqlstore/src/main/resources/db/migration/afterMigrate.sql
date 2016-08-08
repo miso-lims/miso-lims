@@ -1,6 +1,6 @@
+--StartNoTest
 DELIMITER //
 
---StartNoTest
 DROP FUNCTION IF EXISTS `nextval`//
 CREATE FUNCTION `nextval` (`seq_name` varchar(100))
 RETURNS bigint(20) NOT DETERMINISTIC
@@ -13,7 +13,6 @@ BEGIN
     END IF;
     RETURN cur_val;
 END//
---EndNoTest
 
 DROP TRIGGER IF EXISTS SampleChange//
 CREATE TRIGGER SampleChange BEFORE UPDATE ON Sample
@@ -725,6 +724,7 @@ FOR EACH ROW
   )//
 
 DELIMITER ;
+--EndNoTest
 
 DROP VIEW IF EXISTS CompletedPartitions;
 CREATE OR REPLACE VIEW RunPartitionsByHealth AS
