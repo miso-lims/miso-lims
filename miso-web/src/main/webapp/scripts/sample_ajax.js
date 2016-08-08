@@ -1085,7 +1085,7 @@ Sample.ui = {
           "bVisible": false,
           "iSortPriority": 0
         }
-      ],
+      ].filter(function (x) { return x; }),
       "bJQueryUI": true,
       "bAutoWidth": false,
       "iDisplayLength": 25,

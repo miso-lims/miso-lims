@@ -194,46 +194,13 @@ public class EditLibraryController {
     return detailedSample;
   }
 
-  public Map<String, Library> getAdjacentLibrariesInProject(Library l, Project p) throws IOException {
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    Library prevL = null;
-    Library nextL = null;
-
-    if (p != null) {
-      long projectId = p.getId();
-      if (p.getId() == projectId) {
-        List<Sample> samples = new ArrayList<>(requestManager.listAllSamplesByProjectId(projectId));
-        Collections.sort(samples);
-
-        List<Library> allLibs = new ArrayList<>();
-        Map<String, Library> ret = new HashMap<>();
-
-        for (Sample s : samples) {
-          List<Library> samLibs = new ArrayList<>(requestManager.listAllLibrariesBySampleId(s.getId()));
-          if (!samLibs.isEmpty()) {
-            Collections.sort(samLibs);
-            allLibs.addAll(samLibs);
-          }
-        }
-
-        for (int i = 0; i < allLibs.size(); i++) {
-          if (allLibs.get(i).equals(l)) {
-            if (i != 0 && allLibs.get(i - 1) != null) {
-              prevL = allLibs.get(i - 1);
-            }
-
-            if (i != allLibs.size() - 1 && allLibs.get(i + 1) != null) {
-              nextL = allLibs.get(i + 1);
-            }
-            break;
-          }
-        }
-        ret.put("previousLibrary", prevL);
-        ret.put("nextLibrary", nextL);
-        return ret;
-      }
+  public void addAdjacentLibraries(Library l, ModelMap model) throws IOException {
+    if (l.getId() == AbstractLibrary.UNSAVED_ID) {
+      return;
     }
-    return Collections.emptyMap();
+    model.put("previousLibrary", requestManager.getAdjacentLibraryById(l.getId(), true));
+    model.put("nextLibrary", requestManager.getAdjacentLibraryById(l.getId(), false));
+
   }
 
   public List<Pool<? extends Poolable<?, ?>>> getPoolsByLibrary(Library l) throws IOException {
@@ -702,11 +669,7 @@ public class EditLibraryController {
       model.put("emPcrDilutions", populateEmPcrDilutions(user, pcrs));
 
       populateAvailableTagBarcodeStrategies(library, model);
-      Map<String, Library> adjacentLibraries = getAdjacentLibrariesInProject(library, library.getSample().getProject());
-      if (!adjacentLibraries.isEmpty()) {
-        model.put("previousLibrary", adjacentLibraries.get("previousLibrary"));
-        model.put("nextLibrary", adjacentLibraries.get("nextLibrary"));
-      }
+      addAdjacentLibraries(library, model);
 
       List<Pool<? extends Poolable<?, ?>>> pools = getPoolsByLibrary(library);
       Map<Long, Library> poolLibraryMap = new HashMap<>();
@@ -802,11 +765,7 @@ public class EditLibraryController {
       model.put("emPcrDilutions", populateEmPcrDilutions(user, pcrs));
       populateAvailableTagBarcodeStrategies(library, model);
 
-      Map<String, Library> adjacentLibraries = getAdjacentLibrariesInProject(library, library.getSample().getProject());
-      if (!adjacentLibraries.isEmpty()) {
-        model.put("previousLibrary", adjacentLibraries.get("previousLibrary"));
-        model.put("nextLibrary", adjacentLibraries.get("nextLibrary"));
-      }
+      addAdjacentLibraries(library, model);
 
       List<Pool<? extends Poolable<?, ?>>> pools = getPoolsByLibrary(library);
       Map<Long, Library> poolLibraryMap = new HashMap<>();

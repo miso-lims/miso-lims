@@ -2635,8 +2635,8 @@ public class UserAuthMisoRequestManager implements RequestManager {
       String sortDir, String sortCol) throws IOException {
     User user = getCurrentUser();
     List<SequencerPartitionContainer<SequencerPoolPartition>> accessibles = new ArrayList<>();
-    for (SequencerPartitionContainer<SequencerPoolPartition> spc : backingManager
-        .getContainersByPageSizeSearch(offset, limit, querystr, sortDir, sortCol)) {
+    for (SequencerPartitionContainer<SequencerPoolPartition> spc : backingManager.getContainersByPageSizeSearch(offset, limit, querystr,
+        sortDir, sortCol)) {
       if (spc.userCanRead(user)) {
         accessibles.add(spc);
       }
@@ -2649,8 +2649,8 @@ public class UserAuthMisoRequestManager implements RequestManager {
       String sortCol) throws IOException {
     User user = getCurrentUser();
     List<SequencerPartitionContainer<SequencerPoolPartition>> accessibles = new ArrayList<>();
-    for (SequencerPartitionContainer<SequencerPoolPartition> spc : backingManager
-        .getContainersByPageAndSize(offset, limit, sortDir, sortCol)) {
+    for (SequencerPartitionContainer<SequencerPoolPartition> spc : backingManager.getContainersByPageAndSize(offset, limit, sortDir,
+        sortCol)) {
       if (spc.userCanRead(user)) {
         accessibles.add(spc);
       }
@@ -2661,5 +2661,12 @@ public class UserAuthMisoRequestManager implements RequestManager {
   @Override
   public Long countContainersBySearch(String querystr) throws IOException {
     return backingManager.countContainersBySearch(querystr);
+  }
+
+  @Override
+  public Library getAdjacentLibraryById(long libraryId, boolean before) throws IOException {
+    Library o = backingManager.getAdjacentLibraryById(libraryId, before);
+    // We don't throw because the user has no real control over this.
+    return readCheck(o) ? o : null;
   }
 }

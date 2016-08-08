@@ -262,4 +262,6 @@ public interface LibraryStore extends Store<Library>, Remover<Library>, NamingSc
    * @throws IOException
    */
   long countLibrariesBySearch(String querystr) throws IOException;
+
+  Library getAdjacentLibrary(long libraryId, boolean before) throws IOException;
 }

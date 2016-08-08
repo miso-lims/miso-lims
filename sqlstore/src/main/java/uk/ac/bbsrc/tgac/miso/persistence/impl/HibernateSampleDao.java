@@ -16,6 +16,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.type.LongType;
 import org.hibernate.type.StringType;
@@ -366,8 +367,15 @@ public class HibernateSampleDao implements SampleDao {
     criteria.setFirstResult(offset);
     criteria.setMaxResults(resultsPerPage);
     criteria.addOrder("asc".equals(sortDir) ? Order.asc(sortCol) : Order.desc(sortCol));
+    criteria.setProjection(Projections.property("id"));
     @SuppressWarnings("unchecked")
-    List<Sample> requestedPage = fetchSqlStore(criteria.list());
+    List<Long> ids = criteria.list();
+    // We do this in two steps to make a smaller query that that the database can optimise
+    Criteria query = currentSession().createCriteria(SampleImpl.class);
+    query.add(Restrictions.in("id", ids));
+    query.addOrder("asc".equals(sortDir) ? Order.asc(sortCol) : Order.desc(sortCol));
+    @SuppressWarnings("unchecked")
+    List<Sample> requestedPage = fetchSqlStore(query.list());
     return requestedPage;
   }
 

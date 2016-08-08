@@ -175,6 +175,8 @@ public interface RequestManager {
 
   public Library getLibraryByAlias(String alias) throws IOException;
 
+  public Library getAdjacentLibraryById(long libraryId, boolean before) throws IOException;
+
   public Dilution getDilutionByBarcode(String barcode) throws IOException;
 
   public Dilution getDilutionByIdAndPlatform(long dilutionid, PlatformType platformType) throws IOException;
