@@ -4,6 +4,7 @@ import java.util.Date;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.Subselect;
@@ -11,7 +12,7 @@ import org.hibernate.annotations.Synchronize;
 
 @Entity
 @Immutable
-@Subselect("SELECT sampleId, MAX(changeTime) as lastModified FROM SampleChangeLog GROUP BY sampleId")
+@Table(name = "SampleDerivedInfo")
 @Synchronize("Sample")
 public class SampleDerivedInfo {
 

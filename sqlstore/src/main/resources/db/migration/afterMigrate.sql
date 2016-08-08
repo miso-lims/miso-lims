@@ -745,3 +745,6 @@ CREATE OR REPLACE VIEW OrderCompletion AS
   (SELECT poolId, parametersId, num_partitions, health FROM RunPartitionsByHealth)
   UNION
   (SELECT poolId, parametersId, num_partitions, 'Requested' AS health FROM DesiredPartitions);
+
+CREATE OR REPLACE VIEW SampleDerivedInfo AS
+  SELECT sampleId, MAX(changeTime) as lastModified FROM SampleChangeLog GROUP BY sampleId;
