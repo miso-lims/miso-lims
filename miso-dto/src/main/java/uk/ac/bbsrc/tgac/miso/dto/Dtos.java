@@ -340,8 +340,7 @@ public class Dtos {
    * identity, which may or may not yet exist</li>
    * </ol>
    * 
-   * @param childDto
-   *          the DTO to take parent details from
+   * @param childDto the DTO to take parent details from
    * @return the parent details from the DTO, or null if there are none. A returned sample will also include its own parent if applicable.
    */
   private static SampleAdditionalInfo getParent(SampleAdditionalInfoDto childDto) {
@@ -772,16 +771,16 @@ public class Dtos {
 
   private static SampleCVSlideDto asCVSlideSampleDto(SampleCVSlide from) {
     SampleCVSlideDto dto = new SampleCVSlideDto();
-    dto.setCuts(from.getCuts());
+    dto.setSlides(from.getSlides());
     dto.setDiscards(from.getDiscards());
-    dto.setCutsRemaining(from.getCutsRemaining());
+    dto.setSlidesRemaining(from.getSlidesRemaining());
     dto.setThickness(from.getThickness());
     return dto;
   }
 
   private static SampleCVSlide toCVSlideSample(SampleCVSlideDto from) {
     SampleCVSlide to = new SampleCVSlideImpl();
-    to.setCuts(from.getCuts());
+    to.setSlides(from.getSlides());
     to.setDiscards(from.getDiscards());
     to.setThickness(from.getThickness());
     return to;
@@ -789,13 +788,13 @@ public class Dtos {
 
   private static SampleLCMTubeDto asLCMTubeSampleDto(SampleLCMTube from) {
     SampleLCMTubeDto dto = new SampleLCMTubeDto();
-    dto.setCutsConsumed(from.getCutsConsumed());
+    dto.setSlidesConsumed(from.getSlidesConsumed());
     return dto;
   }
 
   private static SampleLCMTube toLCMTubeSample(SampleLCMTubeDto from) {
     SampleLCMTube to = new SampleLCMTubeImpl();
-    to.setCutsConsumed(from.getCutsConsumed());
+    to.setSlidesConsumed(from.getSlidesConsumed());
     return to;
   }
 

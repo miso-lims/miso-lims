@@ -10,17 +10,17 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleLCMTube;
 public class SampleLCMTubeImpl extends SampleTissueProcessingImpl implements SampleLCMTube {
 
   private static final long serialVersionUID = 1L;
-  
-  private Integer cutsConsumed;
+
+  private Integer slidesConsumed;
 
   @Override
-  public Integer getCutsConsumed() {
-    return cutsConsumed;
+  public Integer getSlidesConsumed() {
+    return slidesConsumed;
   }
 
   @Override
-  public void setCutsConsumed(Integer cutsConsumed) {
-    this.cutsConsumed = cutsConsumed;
+  public void setSlidesConsumed(Integer slidesConsumed) {
+    this.slidesConsumed = slidesConsumed;
   }
 
 }

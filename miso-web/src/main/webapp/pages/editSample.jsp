@@ -537,12 +537,12 @@
           <h2>Tissue Processing</h2>
           <table class="in">
             <tr>
-              <td class="h">Cuts Remaining:</td>
-              <td id="cutsRemaining">${sample.cutsRemaining}</td>
+              <td class="h">Slides Remaining:</td>
+              <td id="slidesRemaining">${sample.slidesRemaining}</td>
             </tr>
             <tr>
-              <td class="h">Cuts:*</td>
-              <td><form:input id="cuts" path="cuts"/></td>
+              <td class="h">Slides:*</td>
+              <td><form:input id="slides" path="slides"/></td>
             </tr>
             <tr>
               <td class="h">Discards:*</td>
@@ -560,8 +560,8 @@
           <h2>Tissue Processing</h2>
           <table class="in">
             <tr>
-              <td class="h">Cuts Consumed:*</td>
-              <td><form:input id="cutsConsumed" path="cutsConsumed"/></td>
+              <td class="h">Slides Consumed:*</td>
+              <td><form:input id="slidesConsumed" path="slidesConsumed"/></td>
             </tr>
           </table>
         </div>

@@ -245,7 +245,7 @@ public class DefaultSampleService implements SampleService {
     } else {
       validateAliasUniqueness(sample.getAlias());
     }
-    if (isStockSample(sample) || isAliquotSample(sample)) {
+    if (isStockSample(sample) || isAliquotSample(sample) || isTissueProcessingSample(sample)) {
       SampleAdditionalInfo detailed = (SampleAdditionalInfo) sample;
       if (detailed.getParent() != null && detailed.getSiblingNumber() == null) {
         int siblingNumber = sampleDao.getNextSiblingNumber(detailed.getParent(), detailed.getSampleClass());
@@ -533,11 +533,11 @@ public class DefaultSampleService implements SampleService {
 
   public void applyChanges(SampleTissueProcessing target, SampleTissueProcessing source) {
     if (source instanceof SampleCVSlide) {
-      ((SampleCVSlide) target).setCuts(((SampleCVSlide) source).getCuts());
+      ((SampleCVSlide) target).setSlides(((SampleCVSlide) source).getSlides());
       ((SampleCVSlide) target).setDiscards(((SampleCVSlide) source).getDiscards());
       ((SampleCVSlide) target).setThickness(((SampleCVSlide) source).getThickness());
     } else if (source instanceof SampleLCMTube) {
-      ((SampleLCMTube) target).setCutsConsumed(((SampleLCMTube) source).getCutsConsumed());
+      ((SampleLCMTube) target).setSlidesConsumed(((SampleLCMTube) source).getSlidesConsumed());
     }
   }
 

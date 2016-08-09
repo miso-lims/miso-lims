@@ -4,11 +4,11 @@ public interface SampleCVSlide extends SampleTissueProcessing {
 
   public static final String SAMPLE_CLASS_NAME = "CV Slide";
 
-  Integer getCuts();
+  Integer getSlides();
 
-  void setCuts(Integer cuts);
+  void setSlides(Integer slides);
 
-  Integer getCutsRemaining();
+  Integer getSlidesRemaining();
 
   Integer getDiscards();
 
