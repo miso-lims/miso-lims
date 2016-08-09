@@ -118,8 +118,9 @@ public class HibernateSampleDao implements SampleDao {
 
   @Override
   public int getNextSiblingNumber(Sample parent, SampleClass childClass) throws IOException {
-    Query query = currentSession().createQuery("select max(siblingNumber) " + "from SampleAdditionalInfoImpl "
-        + "where parentId = :parentId " + "and sampleClassId = :sampleClassId");
+    Query query = currentSession().createQuery(
+        "select max(siblingNumber) " + "from SampleAdditionalInfoImpl " + "where parentId = :parentId "
+            + "and sampleClassId = :sampleClassId");
     query.setLong("parentId", parent.getId());
     query.setLong("sampleClassId", childClass.getId());
     Number result = ((Number) query.uniqueResult());
@@ -346,12 +347,24 @@ public class HibernateSampleDao implements SampleDao {
 
   @Override
   public Collection<Sample> listBySearch(String querystr) throws IOException {
-    Criteria criteria = currentSession().createCriteria(Sample.class);
-    criteria.add(Restrictions.or(Restrictions.ilike("identificationBarcode", "%" + querystr + "%"),
-        Restrictions.ilike("name", "%" + querystr + "%"), Restrictions.ilike("alias", "%" + querystr + "%")));
+    Criteria criteria = currentSession().createCriteria(SampleImpl.class);
+    criteria.add(Restrictions.or(
+        Restrictions.ilike("identificationBarcode", "%" + querystr + "%"),
+        Restrictions.ilike("name", "%" + querystr + "%"),
+        Restrictions.ilike("alias", "%" + querystr + "%")));
     @SuppressWarnings("unchecked")
     List<Sample> records = criteria.list();
     return fetchSqlStore(records);
+  }
+
+  @Override
+  public Long countBySearch(String querystr) throws IOException {
+    Criteria criteria = currentSession().createCriteria(SampleImpl.class);
+    criteria.add(Restrictions.or(
+        Restrictions.ilike("identificationBarcode", "%" + querystr + "%"),
+        Restrictions.ilike("name", "%" + querystr + "%"),
+        Restrictions.ilike("alias", "%" + querystr + "%")));
+    return (Long) criteria.setProjection(Projections.rowCount()).uniqueResult();
   }
 
   @Override
@@ -359,8 +372,10 @@ public class HibernateSampleDao implements SampleDao {
       throws IOException {
     if ("lastModified".equals(sortCol)) sortCol = "derivedInfo.lastModified";
     Criteria criteria = currentSession().createCriteria(SampleImpl.class);
-    criteria.add(Restrictions.or(Restrictions.ilike("identificationBarcode", querystr + "%"), Restrictions.ilike("name", querystr + "%"),
-        Restrictions.ilike("alias", querystr + "%")));
+    criteria.add(Restrictions.or(
+        Restrictions.ilike("identificationBarcode", "%" + querystr + "%"),
+        Restrictions.ilike("name", "%" + querystr + "%"),
+        Restrictions.ilike("alias", "%" + querystr + "%")));
     // I don't know why this alias is required, but without it, you can't sort by 'derivedInfo.lastModifier', which is the field on which we
     // want to sort most List X pages
     criteria.createAlias("derivedInfo", "derivedInfo");
@@ -374,6 +389,7 @@ public class HibernateSampleDao implements SampleDao {
     Criteria query = currentSession().createCriteria(SampleImpl.class);
     query.add(Restrictions.in("id", ids));
     query.addOrder("asc".equals(sortDir) ? Order.asc(sortCol) : Order.desc(sortCol));
+    query.createAlias("derivedInfo", "derivedInfo");
     @SuppressWarnings("unchecked")
     List<Sample> requestedPage = fetchSqlStore(query.list());
     return requestedPage;

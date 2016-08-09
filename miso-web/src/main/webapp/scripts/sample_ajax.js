@@ -1046,6 +1046,7 @@ Sample.ui = {
             return Hot.getAliasFromId(data, Sample.sampleClasses) || "Plain";
           },
           "bVisible": (Sample.detailedSample? "true" : "false"),
+          "bSortable": false,
           "iSortPriority": 0
         } : null),
         {
@@ -1065,6 +1066,7 @@ Sample.ui = {
         {
           "sTitle": "QC Result",
           "mData": "id",
+          "bSortable": false,
           "iSortPriority": 0
         },
         {
