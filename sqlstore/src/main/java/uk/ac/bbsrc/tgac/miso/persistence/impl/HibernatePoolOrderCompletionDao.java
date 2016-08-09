@@ -33,6 +33,19 @@ public class HibernatePoolOrderCompletionDao implements PoolOrderCompletionDao {
     return sessionFactory.getCurrentSession();
   }
 
+  private PoolOrderCompletion fetchSqlStore(PoolOrderCompletion completion) throws IOException {
+    completion.getSequencingParameters().setPlatform(platformStore.get(completion.getSequencingParameters().getPlatformId()));
+    completion.setPool(poolStore.get(completion.getPoolId()));
+    return completion;
+  }
+
+  private <T extends Iterable<PoolOrderCompletion>> T fetchSqlStore(T list) throws IOException {
+    for (PoolOrderCompletion completion : list) {
+      fetchSqlStore(completion);
+    }
+    return list;
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   public Collection<PoolOrderCompletion> getForPool(Long poolId) throws HibernateException, IOException {
@@ -48,16 +61,4 @@ public class HibernatePoolOrderCompletionDao implements PoolOrderCompletionDao {
     return fetchSqlStore(query.list());
   }
 
-  private Collection<PoolOrderCompletion> fetchSqlStore(Collection<PoolOrderCompletion> list) throws IOException {
-    for (PoolOrderCompletion completion : list) {
-      fetchSqlStore(completion);
-    }
-    return list;
-  }
-
-  private PoolOrderCompletion fetchSqlStore(PoolOrderCompletion completion) throws IOException {
-    completion.getSequencingParameters().setPlatform(platformStore.get(completion.getSequencingParameters().getPlatformId()));
-    completion.setPool(poolStore.get(completion.getPoolId()));
-    return completion;
-  }
 }

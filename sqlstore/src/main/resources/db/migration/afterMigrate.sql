@@ -728,7 +728,7 @@ DELIMITER ;
 
 DROP VIEW IF EXISTS CompletedPartitions;
 CREATE OR REPLACE VIEW RunPartitionsByHealth AS
-  SELECT pool_poolId AS poolId, sequencingParameters_parametersId as parametersId, COUNT(*) AS num_partitions, Status.health AS health
+  SELECT pool_poolId AS poolId, sequencingParameters_parametersId as parametersId, COUNT(*) AS num_partitions, Status.health AS health, MAX(Status.lastUpdated) as lastUpdated
     FROM Run JOIN Run_SequencerPartitionContainer ON Run.runId = Run_SequencerPartitionContainer.Run_runId
      JOIN SequencerPartitionContainer_Partition ON Run_SequencerPartitionContainer.containers_containerId = SequencerPartitionContainer_Partition.container_containerId
      JOIN _Partition ON SequencerPartitionContainer_Partition.partitions_partitionId = _Partition.partitionId
@@ -737,14 +737,14 @@ CREATE OR REPLACE VIEW RunPartitionsByHealth AS
     GROUP BY pool_poolId, sequencingParameters_parametersId, Status.health;
 
 CREATE OR REPLACE VIEW DesiredPartitions AS
-  SELECT poolId, parametersId, SUM(partitions) AS num_partitions
+  SELECT poolId, parametersId, SUM(partitions) AS num_partitions, MAX(lastUpdated) as lastUpdated
     FROM PoolOrder
     GROUP BY poolId, parametersId;
 
 CREATE OR REPLACE VIEW OrderCompletion AS
-  (SELECT poolId, parametersId, num_partitions, health FROM RunPartitionsByHealth)
+  (SELECT poolId, parametersId, num_partitions, health, lastUpdated FROM RunPartitionsByHealth)
   UNION
-  (SELECT poolId, parametersId, num_partitions, 'Requested' AS health FROM DesiredPartitions);
+  (SELECT poolId, parametersId, num_partitions, 'Requested' AS health, lastUpdated FROM DesiredPartitions);
 
 CREATE OR REPLACE VIEW SampleDerivedInfo AS
   SELECT sampleId, MAX(changeTime) as lastModified FROM SampleChangeLog GROUP BY sampleId;

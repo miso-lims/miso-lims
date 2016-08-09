@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -25,6 +26,7 @@ public class PoolOrderCompletion implements Serializable {
 
   @Enumerated(EnumType.STRING)
   private HealthType health;
+  private Date lastUpdated;
   private int num_partitions;
   @Id
   @ManyToOne(targetEntity = SequencingParametersImpl.class)
@@ -37,6 +39,10 @@ public class PoolOrderCompletion implements Serializable {
 
   public HealthType getHealth() {
     return health;
+  }
+
+  public Date getLastUpdated() {
+    return lastUpdated;
   }
 
   public int getNumPartitions() {
@@ -57,6 +63,10 @@ public class PoolOrderCompletion implements Serializable {
 
   public void setHealth(HealthType health) {
     this.health = health;
+  }
+
+  public void setLastUpdated(Date lastUpdated) {
+    this.lastUpdated = lastUpdated;
   }
 
   public void setPool(Pool<? extends Poolable<?, ?>> pool) {
