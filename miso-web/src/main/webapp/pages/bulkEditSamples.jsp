@@ -48,7 +48,7 @@
     <div id="hothelp_arrowclick" class="toggleLeft"></div>
   </div>
   <div id="hothelpdiv" class="note" style="display:none;">
-    <p>To fill all columns below with the value of your selected cell, <b>double-click</b> the square in the bottom right of your selected cell.
+    <p>To fill all empty cells in a column with the value of your selected cell(s), <b>double-click</b> the square in the bottom right of your selected cell(s).
       <br/>To fill a variable number of columns with the value of your selected cell,  <b>click</b> the square in the bottom right of your 
       filled-in selected cell and <b>drag</b> up or down. All selected columns will be filled in.
       <c:if test="${aliasGenerationEnabled}">

@@ -367,7 +367,8 @@ Sample.hot = {
       contextMenu: false,
       columns: Hot.colConf,
       data: Hot.startData,
-      dataSchema: Sample.hot.dataSchema
+      dataSchema: Sample.hot.dataSchema,
+      maxRows: startRowsNumber || startingValues.length
     });
     document.getElementById('hotContainer').style.display = '';
 
