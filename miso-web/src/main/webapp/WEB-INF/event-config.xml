@@ -28,6 +28,17 @@
        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
   default-autowire="byName">
 
+  <bean name="prometheusInterceptor" class="uk.ac.bbsrc.tgac.miso.webapp.context.PrometheusInterceptor" />
+   <bean id="prometheusAdvisor"
+      class="org.springframework.aop.support.RegexpMethodPointcutAdvisor">
+      <property name="advice">
+         <ref local="prometheusInterceptor"/>
+      </property>
+      <property name="pattern">
+         <value>uk\.ac\.bbsrc\.tgac\.miso\.(sqlstore\.SQL|persistence\.impl\.Hibernate).*</value>
+      </property>
+   </bean>
+
   <bean name="watchManager" class="uk.ac.bbsrc.tgac.miso.core.event.manager.WatchManager" />
 
   <bean id="userUpdateAspectBean" class="uk.ac.bbsrc.tgac.miso.core.event.impl.UserUpdateAspect">
