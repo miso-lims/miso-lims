@@ -79,6 +79,7 @@ public abstract class AbstractPool<P extends Poolable<?, ?>> extends AbstractBox
   private SecurityProfile securityProfile;
 
   private String name;
+  private String description;
 
   private final Collection<P> pooledElements = new HashSet<P>();
   private Collection<Experiment> experiments = new HashSet<Experiment>();
@@ -145,6 +146,16 @@ public abstract class AbstractPool<P extends Poolable<?, ?>> extends AbstractBox
   @Override
   public void setName(String name) {
     this.name = name;
+  }
+
+  @Override
+  public String getDescription() {
+    return description;
+  }
+
+  @Override
+  public void setDescription(String description) {
+    this.description = description;
   }
 
   @Override

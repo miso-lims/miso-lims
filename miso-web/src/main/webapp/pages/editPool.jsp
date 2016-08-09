@@ -136,6 +136,10 @@
     <td><form:input id="alias" path="alias"/><span id="aliasCounter" class="counter"></span></td>
   </tr>
   <tr>
+    <td class="h">Description:</td>
+    <td><form:input id="description" path="description"/><span id="descriptionCounter" class="counter"></span></td>
+  </tr>
+  <tr>
     <td>Platform Type:</td>
     <td>
       <c:choose>
@@ -565,6 +569,12 @@
       counter: '#aliasCounter',
       countType: 'characters',
       maxCount: ${maxLengths['alias']},
+      countDirection: 'down'
+    });
+    jQuery('#description').simplyCountable({
+      counter: '#descriptionCounter',
+      countType: 'characters',
+      maxCount: ${maxLengths['description']},
       countDirection: 'down'
     });
   });

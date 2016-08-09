@@ -1101,10 +1101,13 @@ public class Dtos {
     dto.setId(from.getId());
     dto.setName(from.getName());
     dto.setAlias(from.getAlias());
+    if (!isStringEmptyOrNull(from.getDescription())) {
+      dto.setDescription(from.getDescription());
+    }
     dto.setConcentration(from.getConcentration());
     dto.setReadyToRun(from.getReadyToRun());
     dto.setQcPassed(from.getQcPassed());
-    dto.setCreationDate(from.getCreationDate());
+    dto.setCreationDate(getDateAsString(from.getCreationDate()));
     if (from.getLastModified() != null) {
       dto.setLastModified(getDateAsString(from.getLastModified()));
     }
