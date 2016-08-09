@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.BoxUtils.extractBoxableInformation;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -359,12 +360,16 @@ public class HibernateSampleDao implements SampleDao {
 
   @Override
   public Long countBySearch(String querystr) throws IOException {
-    Criteria criteria = currentSession().createCriteria(SampleImpl.class);
-    criteria.add(Restrictions.or(
-        Restrictions.ilike("identificationBarcode", "%" + querystr + "%"),
-        Restrictions.ilike("name", "%" + querystr + "%"),
-        Restrictions.ilike("alias", "%" + querystr + "%")));
-    return (Long) criteria.setProjection(Projections.rowCount()).uniqueResult();
+    if (isStringEmptyOrNull(querystr)) {
+      return countAll();
+    } else {
+      Criteria criteria = currentSession().createCriteria(SampleImpl.class);
+      criteria.add(Restrictions.or(
+          Restrictions.ilike("identificationBarcode", "%" + querystr + "%"),
+          Restrictions.ilike("name", "%" + querystr + "%"),
+          Restrictions.ilike("alias", "%" + querystr + "%")));
+      return (Long) criteria.setProjection(Projections.rowCount()).uniqueResult();
+    }
   }
 
   @Override

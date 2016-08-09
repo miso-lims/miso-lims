@@ -588,24 +588,28 @@ public class DefaultSampleService implements SampleService {
     sample.setIdentificationBarcode(barcode);
   }
 
+  @CoverageIgnore
   @Override
   public List<Sample> getByPageAndSize(int offset, int size, String sortCol, String sortDir) throws IOException {
     Collection<Sample> samples = sampleDao.listByOffsetAndNumResults(offset, size, sortCol, sortDir);
     return authorizationManager.filterUnreadable(samples);
   }
 
+  @CoverageIgnore
   @Override
   public List<Sample> getByPageAndSizeAndSearch(int offset, int size, String querystr, String sortCol, String sortDir) throws IOException {
     Collection<Sample> samples = sampleDao.listBySearchOffsetAndNumResults(offset, size, querystr, sortCol, sortDir);
     return authorizationManager.filterUnreadable(samples);
   }
 
+  @CoverageIgnore
   @Override
   public List<Sample> getBySearch(String querystr) throws IOException {
     Collection<Sample> samples = sampleDao.listBySearch(querystr);
     return authorizationManager.filterUnreadable(samples);
   }
 
+  @CoverageIgnore
   @Override
   public Long countBySearch(String querystr) throws IOException {
     return sampleDao.countBySearch(querystr);
