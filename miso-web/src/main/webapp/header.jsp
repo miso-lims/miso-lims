@@ -145,7 +145,7 @@
 
     <sec:authorize access="isAuthenticated()">
       <li>
-        <a href="<c:url value="https://documentation.tgac.ac.uk/display/MISO/"/>"><span>Help</span></a>
+        <a href="<c:url value="http://tgac.github.io/miso-lims/"/>"><span>Help</span></a>
       </li>
     </sec:authorize>
 
