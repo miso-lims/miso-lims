@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -110,7 +111,7 @@ public class SQLPoolDAO implements PoolStore {
 
   public static final String POOL_COUNT_BY_PLATFORM = POOL_COUNT + " WHERE p.platformType=?";
 
-  private static final String POOL_SELECT = "SELECT p.poolId, p.concentration, p.identificationBarcode, p.name, p.alias, p.creationDate, "
+  private static final String POOL_SELECT = "SELECT p.poolId, p.concentration, p.identificationBarcode, p.name, p.alias, p.description, p.creationDate, "
       + "p.securityProfile_profileId, p.platformType, p.ready, p.qcPassed, p.lastModifier, pmod.lastModified, p.boxPositionId, p.volume, p.emptied, b.boxId, "
       + "b.alias AS boxAlias, b.locationBarcode AS boxLocation, bp.row AS boxRow, bp.column AS boxColumn " + "FROM " + TABLE_NAME + " p "
       + "LEFT JOIN BoxPosition bp ON bp.boxPositionId = p.boxPositionId " + "LEFT JOIN Box b ON b.boxId = bp.boxId "
@@ -121,7 +122,7 @@ public class SQLPoolDAO implements PoolStore {
   public static final String POOL_SELECT_BY_PLATFORM = POOL_SELECT + " WHERE p.platformType=?";
 
   public static final String POOL_SELECT_BY_PLATFORM_AND_SEARCH = POOL_SELECT + " WHERE p.platformType=? AND " + "(p.name LIKE ? OR "
-      + "p.alias LIKE ? OR " + "p.identificationBarcode LIKE ?) ";
+      + "p.alias LIKE ? OR " + "p.identificationBarcode LIKE ? OR p.description LIKE ?) ";
 
   public static final String POOL_SELECT_BY_PLATFORM_AND_READY = POOL_SELECT_BY_PLATFORM + " AND p.ready=1";
 
@@ -131,14 +132,16 @@ public class SQLPoolDAO implements PoolStore {
 
   public static final String POOL_SELECT_FROM_BARCODE_LIST = POOL_SELECT + " WHERE p.identificationBarcode IN (";
 
+  public static final String POOL_SELECT_FROM_ID_LIST = POOL_SELECT + " WHERE p.poolId IN (";
+
   public static final String POOL_SELECT_BY_BOX_POSITION_ID = POOL_SELECT + " WHERE p.boxPositionId = ?";
 
   public static final String POOL_COUNT_BY_PLATFORM_AND_SEARCH = POOL_COUNT + " WHERE p.platformType=? AND " + "(p.name LIKE ? OR "
-      + "p.alias LIKE ? OR " + "p.identificationBarcode LIKE ?) ";
+      + "p.alias LIKE ? OR " + "p.identificationBarcode LIKE ? OR p.description LIKE ?) ";
 
   public static final String POOL_UPDATE = "UPDATE " + TABLE_NAME + " "
       + "SET alias=:alias, concentration=:concentration, identificationBarcode=:identificationBarcode, creationDate=:creationDate, securityProfile_profileId=:securityProfile_profileId, "
-      + "platformType=:platformType, ready=:ready, qcPassed=:qcPassed, lastModifier=:lastModifier, emptied=:emptied, volume=:volume "
+      + "platformType=:platformType, ready=:ready, qcPassed=:qcPassed, lastModifier=:lastModifier, emptied=:emptied, volume=:volume, description=:description "
       + "WHERE poolId=:poolId";
 
   public static final String POOL_DELETE = "DELETE FROM " + TABLE_NAME + " WHERE poolId=:poolId";
@@ -170,20 +173,15 @@ public class SQLPoolDAO implements PoolStore {
       + "INNER JOIN Plate_Elements pe ON li.libraryId = pe.elementId " + "INNER JOIN Plate pl ON pl.plateId = pe.plate_plateId "
       + "LEFT JOIN Pool_Elements pld ON pld.elementId = pl.plateId " + "WHERE p.projectId= ? AND pld.elementType LIKE '%Plate')";
 
-  public static final String POOL_SELECT_BY_RELATED_LIBRARY = POOL_SELECT
-      + " WHERE p.poolId IN (SELECT COALESCE(pld.pool_poolId, ple.pool_poolId) FROM Library li "
-      + "INNER JOIN LibraryDilution ld ON ld.library_libraryId = li.libraryId "
-      + "LEFT JOIN emPCR e ON e.dilution_dilutionId = ld.dilutionId " + "LEFT JOIN emPCRDilution ed ON ed.emPCR_pcrId = e.pcrId "
-      + "LEFT JOIN Pool_Elements pld ON pld.elementId = ld.dilutionId " + "LEFT JOIN Pool_Elements ple ON ple.elementId = ed.dilutionId "
-      + "WHERE li.libraryId=?)";
+  public static final String POOL_ID_SELECT_BY_RELATED = "SELECT DISTINCT pool_poolId AS poolId FROM Pool_Elements, "
+      + "(SELECT dilutionId as elementId, library_libraryId as libraryId, 'uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution' as elementType FROM LibraryDilution "
+      + "UNION ALL SELECT emPCRDilution.dilutionId as elementId, library_libraryId as libraryId, 'uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution' as elementType "
+      + "FROM LibraryDilution JOIN emPCR ON LibraryDilution.dilutionId = emPCR.dilution_dilutionId JOIN emPCRDilution ON emPCR.pcrId = emPCRDilution.emPCR_pcrID"
+      + ") AS Contents WHERE Contents.elementType = Pool_Elements.elementType AND Contents.elementId = Pool_Elements.elementId ";
 
-  public static final String POOL_SELECT_BY_RELATED_SAMPLE = POOL_SELECT
-      + " WHERE p.poolId IN (SELECT COALESCE(ple.pool_poolId, pld.pool_poolId) FROM Sample s "
-      + "INNER JOIN Library li ON li.sample_sampleId = s.sampleId "
-      + "INNER JOIN LibraryDilution ld ON ld.library_libraryId = li.libraryId "
-      + "LEFT JOIN emPCR e ON e.dilution_dilutionId = ld.dilutionId " + "LEFT JOIN emPCRDilution ed ON ed.emPCR_pcrId = e.pcrId "
-      + "LEFT JOIN Pool_Elements pld ON pld.elementId = ld.dilutionId " + "LEFT JOIN Pool_Elements ple ON ple.elementId = ed.dilutionId "
-      + "WHERE s.sampleId=?)";
+  public static final String POOL_ID_SELECT_BY_RELATED_LIBRARY = POOL_ID_SELECT_BY_RELATED + "AND Contents.libraryId = ?";
+  public static final String POOL_ID_SELECT_BY_RELATED_SAMPLE = POOL_ID_SELECT_BY_RELATED
+      + "AND Contents.libraryId IN (SELECT libraryId FROM Library WHERE sample_sampleId = ?)";
 
   public static final String POOL_ELEMENT_DELETE_BY_POOL_ID = "DELETE FROM Pool_Elements " + "WHERE pool_poolId=:pool_poolId";
 
@@ -236,7 +234,8 @@ public class SQLPoolDAO implements PoolStore {
 
   public static final String EMPCR_POOL_SELECT_BY_POOL_ID = EMPCR_POOL_SELECT + " AND poolId = ?";
 
-  public static final String POOL_SELECT_BY_SEARCH = POOL_SELECT + " WHERE " + "p.name LIKE ? OR " + "p.alias LIKE ? ";
+  public static final String POOL_SELECT_BY_SEARCH = POOL_SELECT + " WHERE " + "p.name LIKE ? OR " + "p.alias LIKE ? OR "
+      + "p.description LIKE ?";
 
   public static final String POOL_SELECT_LIMIT = POOL_SELECT + " ORDER BY p.poolId DESC LIMIT ?";
 
@@ -452,6 +451,7 @@ public class SQLPoolDAO implements PoolStore {
     MapSqlParameterSource params = new MapSqlParameterSource();
     params.addValue("concentration", pool.getConcentration());
     params.addValue("alias", pool.getAlias());
+    params.addValue("description", pool.getDescription());
     params.addValue("creationDate", pool.getCreationDate());
     params.addValue("securityProfile_profileId", securityProfileId);
     params.addValue("platformType", pool.getPlatformType().getKey());
@@ -676,14 +676,19 @@ public class SQLPoolDAO implements PoolStore {
     return e;
   }
 
+  private Collection<Pool<? extends Poolable<?, ?>>> listByRelated(String query, long relatedId) throws IOException {
+    List<Long> poolIds = template.queryForList(query, Long.class, relatedId);
+    return DbUtils.getByGenericList(template, poolIds, Types.BIGINT, POOL_SELECT_FROM_ID_LIST, new PoolMapper(true));
+  }
+
   @Override
   public Collection<Pool<? extends Poolable<?, ?>>> listBySampleId(long sampleId) throws IOException {
-    return template.query(POOL_SELECT_BY_RELATED_SAMPLE, new Object[] { sampleId }, new PoolMapper());
+    return listByRelated(POOL_ID_SELECT_BY_RELATED_SAMPLE, sampleId);
   }
 
   @Override
   public Collection<Pool<? extends Poolable<?, ?>>> listByLibraryId(long libraryId) throws IOException {
-    return template.query(POOL_SELECT_BY_RELATED_LIBRARY, new Object[] { libraryId }, new PoolMapper());
+    return listByRelated(POOL_ID_SELECT_BY_RELATED_LIBRARY, libraryId);
   }
 
   @Override
@@ -732,7 +737,7 @@ public class SQLPoolDAO implements PoolStore {
     }
     query = "%" + query.replaceAll("_", Matcher.quoteReplacement("\\_")) + "%";
     return template
-        .query(POOL_SELECT_BY_PLATFORM_AND_SEARCH, new Object[] { platformType.getKey(), query, query, query }, new PoolMapper());
+        .query(POOL_SELECT_BY_PLATFORM_AND_SEARCH, new Object[] { platformType.getKey(), query, query, query, query }, new PoolMapper());
   }
 
   @Override
@@ -746,7 +751,7 @@ public class SQLPoolDAO implements PoolStore {
     String mySQLQuery = "%" + query.replaceAll("_", Matcher.quoteReplacement("\\_")) + "%";
     return template.query(
         POOL_SELECT_BY_PLATFORM_AND_READY_AND_SEARCH,
-        new Object[] { platformType.getKey(), mySQLQuery, mySQLQuery, mySQLQuery },
+        new Object[] { platformType.getKey(), mySQLQuery, mySQLQuery, mySQLQuery, mySQLQuery },
         new PoolMapper());
   }
 
@@ -849,6 +854,7 @@ public class SQLPoolDAO implements PoolStore {
         p.setId(id);
         p.setName(rs.getString("name"));
         p.setAlias(rs.getString("alias"));
+        p.setDescription(rs.getString("description"));
         p.setCreationDate(rs.getDate("creationDate"));
         p.setConcentration(rs.getDouble("concentration"));
         p.setIdentificationBarcode(rs.getString("identificationBarcode"));
@@ -950,7 +956,7 @@ public class SQLPoolDAO implements PoolStore {
       rtn = new ArrayList<>();
     } else {
       String mySQLQuery = "%" + query.replaceAll("_", Matcher.quoteReplacement("\\_")) + "%";
-      rtn = template.query(POOL_SELECT_BY_SEARCH, new Object[] { mySQLQuery, mySQLQuery }, new PoolMapper(true));
+      rtn = template.query(POOL_SELECT_BY_SEARCH, new Object[] { mySQLQuery, mySQLQuery, mySQLQuery }, new PoolMapper(true));
     }
     return rtn;
   }
@@ -976,8 +982,9 @@ public class SQLPoolDAO implements PoolStore {
       return (PlatformType.ILLUMINA.equals(platform) ? countPoolsByPlatform(platform) : count());
     } else {
       String mySQLQuery = "%" + querystr.replaceAll("_", Matcher.quoteReplacement("\\_")) + "%";
-      return template
-          .queryForLong(POOL_COUNT_BY_PLATFORM_AND_SEARCH, new Object[] { platform.getKey(), mySQLQuery, mySQLQuery, mySQLQuery });
+      return template.queryForLong(
+          POOL_COUNT_BY_PLATFORM_AND_SEARCH,
+          new Object[] { platform.getKey(), mySQLQuery, mySQLQuery, mySQLQuery, mySQLQuery });
     }
   }
 
@@ -1005,7 +1012,7 @@ public class SQLPoolDAO implements PoolStore {
       String query = POOL_SELECT_BY_PLATFORM_AND_SEARCH + " ORDER BY " + sortCol + " " + sortDir + " LIMIT " + resultsPerPage + " OFFSET "
           + offset;
       List<Pool<? extends Poolable<?, ?>>> rtn = template
-          .query(query, new Object[] { platform.getKey(), querystr, querystr, querystr }, new PoolMapper(true));
+          .query(query, new Object[] { platform.getKey(), querystr, querystr, querystr, querystr }, new PoolMapper(true));
       return rtn;
     }
   }

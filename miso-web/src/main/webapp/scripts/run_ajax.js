@@ -296,26 +296,14 @@ Run.ui = {
   },
 
   createListingRunsTable: function () {
-    jQuery('#listingRunsTable').html("");
-    jQuery.fn.dataTableExt.oSort['no-run-asc'] = function (x, y) {
-      var a = parseInt(x.replace(/^RUN/i, ""));
-      var b = parseInt(y.replace(/^RUN/i, ""));
-      return ((a < b) ? -1 : ((a > b) ? 1 : 0));
-    };
-    jQuery.fn.dataTableExt.oSort['no-run-desc'] = function (x, y) {
-      var a = parseInt(x.replace(/^RUN/i, ""));
-      var b = parseInt(y.replace(/^RUN/i, ""));
-      return ((a < b) ? 1 : ((a > b) ? -1 : 0));
-    };
-    
+    jQuery('#listingRunsTable').html("");    
     jQuery('#listingRunsTable').dataTable({
       "aoColumns": [
         {
           "sTitle": "Run Name",
-          "sType": "no-run",
-          "mData": "name",
+          "mData": "id",
           "mRender": function (data, type, full) {
-            return "<a href=\"/miso/run/" + full.id + "\">" + data + "</a>";
+            return "<a href=\"/miso/run/" + data + "\">" + full.name + "</a>";
           }
         },
         {

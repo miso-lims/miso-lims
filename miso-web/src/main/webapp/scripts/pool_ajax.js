@@ -417,28 +417,36 @@ Pool.ui = {
   createListingPoolsTable: function (platform, poolConcentrationUnits) {
     var table = 'listing' + platform + 'PoolsTable';
     jQuery('#'+table).html('');
-    
-    jQuery.fn.dataTableExt.oSort['no-po-asc'] = function(x, y) {
-      var a = parseInt(x.replace(/^.*PO/i, ""));
-      var b = parseInt(y.replace(/^.*PO/i, ""));
-      return ((a < b) ? -1 : ((a > b) ? 1 : 0));
-    };
-    jQuery.fn.dataTableExt.oSort['no-po-desc'] = function(x, y) {
-      var a = parseInt(x.replace(/^.*PO/i, ""));
-      var b = parseInt(y.replace(/^.*PO/i, ""));
-      return ((a < b) ? 1 : ((a > b) ? -1 : 0));
+
+    function pooledEls (data, type, full) {
+      var pooledEls = data.map(function (ld) {
+        return "<li><a href=\"/miso/library/" + ld.libraryId + "\">" + ld.library.alias 
+        + (ld.library.tagBarcodeIndex1Label ? "(" + ld.library.tagBarcodeIndex1Label + (ld.library.tagBarcodeIndex2Label ? ", " + ld.library.tagBarcodeIndex2Label + ")" : ")") : "") 
+        + "</a>" + "</li>";
+      });
+      var string;
+      if (pooledEls.length === 0) {
+        return "No elements";
+      } else {
+        var selector = "more_" + full.id;
+        var num = "" + pooledEls.length + " dilutions  ";
+        var more = "<span id=\"" + selector + "_fewer\"><a href=\"javascript:void(0);\" onclick=\"jQuery('." + selector + "').show();jQuery('#" + selector + "_fewer').hide();\">"
+          + "(See all...)</a></span>";
+        var els = "<div class='" + selector + "' style='display:none'><ul>" 
+          + pooledEls.join('')
+          + "</ul><span><a href=\"javascript:void(0);\" onclick=\"jQuery('." + selector + "').hide();jQuery('#" + selector + "_fewer').show();\">Hide all...</a></span></div>";
+        return num + more + els;
+      }
     };
     jQuery('#'+table).dataTable({
       "aoColumns": [
         {
           "sTitle": "Name",
-          "sType": "no-po",
-          "mData": "name",
+          "mData": "id",
           "mRender": function (data, type, full) {
-            return "<a href=\"/miso/pool/" + full.id + "\">" + data + "</a>";
+            return "<a href=\"/miso/pool/" + data + "\">" + full.name + "</a>";
           },
           "iSortPriority" : 1
-
         },
         {
           "sTitle": "Alias",
@@ -447,39 +455,35 @@ Pool.ui = {
             return "<a href=\"/miso/pool/" + full.id + "\">" + data + "</a>";
           },
           "iSortPriority" : 0
-
+        },
+        {
+          "sTitle": "Description",
+          "mData": "description",
+          "iSortPriority": 0
         },
         {
           "sTitle": "Date Created",
           "mData": "creationDate",
           "iSortPriority" : 0
-
         },
         {
           "sTitle": "Elements",
           "mData": "pooledElements",
           "mRender": function (data, type, full) {
-            var pooledEls = data.map(function (ld) {
-              return "<li><strong>" + ld.name + "</strong> " + "<a href=\"" + ld.libraryUrl + "\">"
-              + ld.library.alias + " (" + ld.library.name + ")</a>" + "</li>";
-            });
-            return "<ul>" + pooledEls.join('') + "</ul>";
+            return pooledEls(data, type, full);
           },
           "bSortable": false,
           "iSortPriority" : 0
-
         },
         {
           "sTitle": "Average Insert Size",
           "mData": "id",
           "iSortPriority" : 0
-
         },
         {
           "sTitle": "Conc. (" + poolConcentrationUnits + ")",
           "mData": "concentration",
           "iSortPriority" : 0
-
         },
         {
           "sTitle": "Location",
@@ -498,7 +502,6 @@ Pool.ui = {
           "mData": "identificationBarcode",
           "bVisible": false,
           "iSortPriority" : 0
-
         }
       ],
       "bJQueryUI": true,
@@ -516,13 +519,13 @@ Pool.ui = {
           },
           {
             'doOnSuccess': function(json) {
-              jQuery('td:eq(4)', nRow).html(json.response);
+              jQuery('td:eq(5)', nRow).html(json.response);
             }
           }
         );
       },
       "aaSorting": [
-        [(Sample.detailedSample ? 6 : 0) , "desc"] // NB: this must get updated when adding new columns
+        [(Sample.detailedSample ? 7 : 0) , "desc"] // NB: this must get updated when adding new columns
       ],
       "sPaginationType": "full_numbers",
       "bProcessing": true,

@@ -127,6 +127,16 @@ public class SQLLibraryDAO implements LibraryStore {
 
   public static final String LIBRARY_SELECT_BY_BOX_POSITION_ID = LIBRARIES_SELECT + " WHERE l.boxPositionId = ?";
 
+  private static final String LIBRARY_SELECT_BY_ADJACENT = LIBRARIES_SELECT + " JOIN Sample ON l.sample_sampleId = Sample.sampleId, "
+      + "Library TargetLibrary JOIN Sample TargetSample ON TargetLibrary.sample_sampleId = TargetSample.sampleId WHERE TargetLibrary.libraryId = ? "
+      + "AND Sample.project_projectId = TargetSample.project_projectId AND "
+      + "(Sample.sampleId %1$s TargetSample.sampleId OR Sample.sampleId = TargetSample.sampleId AND l.libraryId %1$s TargetLibrary.libraryId) "
+      + "ORDER BY Sample.sampleId, l.libraryId LIMIT 1";
+
+  public static final String LIBRARY_SELECT_BY_ADJACENT_BEFORE = String.format(LIBRARY_SELECT_BY_ADJACENT, "<");
+
+  public static final String LIBRARY_SELECT_BY_ADJACENT_AFTER = String.format(LIBRARY_SELECT_BY_ADJACENT, ">");
+
   public static final String LIBRARY_COUNT = "SELECT COUNT(*) " + "FROM " + TABLE_NAME + " l";
 
   public static final String LIBRARY_COUNT_BY_SEARCH = LIBRARY_COUNT
@@ -550,6 +560,13 @@ public class SQLLibraryDAO implements LibraryStore {
   }
 
   @Override
+  public Library getAdjacentLibrary(long libraryId, boolean before) throws IOException {
+    List<Library> results = template.query(before ? LIBRARY_SELECT_BY_ADJACENT_BEFORE : LIBRARY_SELECT_BY_ADJACENT_AFTER,
+        new Object[] { libraryId }, new LibraryMapper(true));
+    return results.size() > 0 ? results.get(0) : null;
+  }
+
+  @Override
   @Cacheable(cacheName = "libraryListCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
       @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public List<Library> listAll() throws IOException {
@@ -715,7 +732,7 @@ public class SQLLibraryDAO implements LibraryStore {
       case "libraryTypeAlias":
         sortCol = "libraryType";
         break;
-      case "parentSampleAlias":
+      case "parentSampleId":
         sortCol = "sample_sampleId";
         break;
       }

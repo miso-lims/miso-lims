@@ -166,7 +166,7 @@
   <div id="printServiceSelectDialog" title="Select a Printer"></div>
 </div>
 <div>
-  <table class="in">
+  <table class="in" <c:if test="${sample.isSynthetic()}">style="background-color: #ddd"</c:if>>
     <tr>
       <td class="h">Sample ID:</td>
       <td>
@@ -176,6 +176,7 @@
         </c:choose>
       </td>
     </tr>
+    <c:if test="${sample.isSynthetic()}"><tr><td colspan="2" style="font-size: 200%; font-weight:bold;">This entity does not exist except for sample tracking purposes!</td></tr></c:if>
     <tr>
       <td class="h">Location:</td>
       <td>

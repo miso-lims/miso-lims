@@ -29,55 +29,47 @@
 <div id="maincontent">
   <div id="contentcolumn">
     <h1>
-      Unfulfilled Pool Orders
+      Pool Orders
     </h1>
 
-    <div class="dataTables_wrapper" role="grid">
-    <table cellpadding="0" cellspacing="0" border="0" class="display dataTable" id="listingPoolOrderTable">
-       <thead><tr><th></th><th>Alias</th><th></th><th></th><th></th><th>Completed</th><th>Remaining</th></tr></thead>
-       <tbody>
-      </tbody>
-    </table>
-    </div>
+    <div id="tabs"></div>
     <script type="text/javascript">
-       jQuery('#listingPoolOrderTable').html('');
-       jQuery('#listingPoolOrderTable').dataTable({
-         "aaData": [
-           <c:forEach items="${ordercompletions}" var="poolGroup">
-            <c:forEach items="${poolGroup.value}" var="parameterGroup">[
-              '<a href="/miso/pool/${poolGroup.key.id}">${poolGroup.key.name}</a>', 
-              '<a href="/miso/pool/${poolGroup.key.id}">${poolGroup.key.alias}</a>',
-              '${parameterGroup.key.platform.nameAndModel}',
-              '${parameterGroup.key.name}',
-              <c:forEach items="${ordercompletionheadings}" var="heading">
-                '${parameterGroup.value[heading].numPartitions}',
-              </c:forEach>
-              '${parameterGroup.value.getRemaining()}'
-          ],
-           </c:forEach>
-         </c:forEach>
-         ],
-         "aoColumns": [
-           { "sTitle": "Pool Name"},
-           { "sTitle": "Alias"},
-           { "sTitle": "Platform"},
-           { "sTitle": "Sequencing Parameters"},
-           <c:forEach items="${ordercompletionheadings}" var="heading">
-           { "sTitle": "${heading.key}"},
-           </c:forEach>
-           { "sTitle": "Remaining"}
-         ],
-         "bJQueryUI": true,
-         "bAutoWidth": false,
-         "iDisplayLength": 25,
-         "sPaginationType": "full_numbers",
-         "aaSorting": [
-           [0, "desc"]
-         ],
-         "fnDrawCallback": function (oSettings) {
-           jQuery('#listingPoolOrderTable_paginate').find('.fg-button').removeClass('fg-button');
-         }
-       });
+       var ordercompletions = ${ordercompletionJSON};
+       var tabHeader = '<ul>' + ordercompletions.map(function(ocd) { return '<li><a href="#tab-' + ocd.htmlElement + '"><span>' + ocd.humanName + '</span></a></li>'; }).join('') + '</ul>';
+       var tabs = ordercompletions.map(function(ocd) {
+         return '<div id="tab-' + ocd.htmlElement + '"><h1><div>' + ocd.humanName + '</div></h1>' +
+           '<div class="dataTables_wrapper" role="grid"><table cellpadding="0" cellspacing="0" border="0" class="display dataTable" id="listingPoolOrderTable' +
+           ocd.htmlElement + '"><thead><tr><th></th><th>Alias</th><th></th><th></th><th></th><th>Completed</th><th>Remaining</th></tr></thead><tbody></tbody></table></div></div>';
+       }).join('');
+       document.getElementById('tabs').innerHTML = tabHeader + tabs;
+       for (var i = 0; i < ordercompletions.length; i++) {
+         jQuery('#listingPoolOrderTable' + ordercompletions[i].htmlElement).html('');
+         jQuery('#listingPoolOrderTable' + ordercompletions[i].htmlElement).dataTable({
+           "aaData": ordercompletions[i].data ,
+           "aoColumns": [
+             { "sTitle": "Pool Name"},
+             { "sTitle": "Alias"},
+             { "sTitle": "Platform"},
+             { "sTitle": "Sequencing Parameters"}
+           ].concat(ordercompletions[i].headings.map(function(name) { return { "sTitle": name }; })).concat([
+             { "sTitle": "Remaining"},
+             { "sTitle": "Last Updated"}
+           ]),
+           "bJQueryUI": true,
+           "bAutoWidth": false,
+           "iDisplayLength": 25,
+           "sPaginationType": "full_numbers",
+           "aaSorting": [
+             [0, "desc"]
+           ],
+           "fnDrawCallback": function (oSettings) {
+             jQuery('#listingPoolOrderTable' + ordercompletions[i].htmlElement + '_paginate').find('.fg-button').removeClass('fg-button');
+           }
+         });
+       }
+        jQuery(document).ready(function () {
+          jQuery("#tabs").tabs();
+        });
     </script>
   </div>
 </div>
