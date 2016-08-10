@@ -106,11 +106,11 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAliquo
 
   // TissueProcessingSample attributes
   // CV Slide
-  private Integer cuts;
+  private Integer slides;
   private Integer discards;
   private Integer thickness;
   // LCM Tube
-  private Integer cutsConsumed;
+  private Integer slidesConsumed;
 
   public DetailedSampleBuilder() {
     this(null);
@@ -530,17 +530,17 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAliquo
   }
 
   @Override
-  public Integer getCuts() {
-    return cuts;
+  public Integer getSlides() {
+    return slides;
   }
 
   @Override
-  public void setCuts(Integer cuts) {
-    this.cuts = cuts;
+  public void setSlides(Integer slides) {
+    this.slides = slides;
   }
 
   @Override
-  public Integer getCutsRemaining() {
+  public Integer getSlidesRemaining() {
     throw new UnsupportedOperationException("Method not implemented on builder");
   }
 
@@ -565,13 +565,13 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAliquo
   }
 
   @Override
-  public Integer getCutsConsumed() {
-    return cutsConsumed;
+  public Integer getSlidesConsumed() {
+    return slidesConsumed;
   }
 
   @Override
-  public void setCutsConsumed(Integer cutsConsumed) {
-    this.cutsConsumed = cutsConsumed;
+  public void setSlidesConsumed(Integer slidesConsumed) {
+    this.slidesConsumed = slidesConsumed;
   }
 
   @Override
@@ -810,13 +810,13 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAliquo
     case SampleTissueProcessing.CATEGORY_NAME:
       if (sampleClass.getAlias() == SampleCVSlide.SAMPLE_CLASS_NAME) {
         SampleCVSlide cvSlide = new SampleCVSlideImpl();
-        cvSlide.setCuts(cuts);
+        cvSlide.setSlides(slides);
         cvSlide.setDiscards(discards);
         cvSlide.setThickness(thickness);
         sample = cvSlide;
       } else if (sampleClass.getAlias() == SampleLCMTube.SAMPLE_CLASS_NAME) {
         SampleLCMTube lcmTube = new SampleLCMTubeImpl();
-        lcmTube.setCutsConsumed(cutsConsumed);
+        lcmTube.setSlidesConsumed(slidesConsumed);
         sample = lcmTube;
       } else {
         SampleTissueProcessing processing = new SampleTissueProcessingImpl();
