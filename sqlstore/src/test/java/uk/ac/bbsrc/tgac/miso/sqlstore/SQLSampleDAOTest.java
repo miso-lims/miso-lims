@@ -1,7 +1,11 @@
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
@@ -169,7 +173,8 @@ public class SQLSampleDAOTest extends AbstractDAOTest {
     for (Sample sample : samples) {
       if (previous != null) {
         log.debug("testing receivedDates " + previous + " comes before " + sample.getReceivedDate());
-        assertTrue("not ordered by received date descending",
+        assertTrue(
+            "not ordered by received date descending",
             previous.equals(sample.getReceivedDate()) || previous.after(sample.getReceivedDate()));
       }
       previous = sample.getReceivedDate();
@@ -211,19 +216,19 @@ public class SQLSampleDAOTest extends AbstractDAOTest {
     SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
     assertEquals("sample location type does not match", "2014-01-17", df.format(sample.getReceivedDate()));
   }
-  
+
   @Test
   public void testGetPlainSample() throws Exception {
     Sample sample = dao.get(1L);
     assertTrue(LimsUtils.isPlainSample(sample));
   }
-  
+
   @Test
   public void testGetDetailedSample() throws Exception {
     Sample sample = dao.get(15L);
     assertTrue(LimsUtils.isDetailedSample(sample));
   }
-  
+
   @Test
   public void testGetIdentitySample() throws Exception {
     Sample sample = dao.get(15L);
@@ -233,7 +238,7 @@ public class SQLSampleDAOTest extends AbstractDAOTest {
     assertEquals("INT1", identity.getInternalName());
     assertEquals("EXT1", identity.getExternalName());
   }
-  
+
   @Test
   public void testGetTissueSample() throws Exception {
     Sample sample = dao.get(16L);
@@ -267,8 +272,8 @@ public class SQLSampleDAOTest extends AbstractDAOTest {
   @Test
   public void testListAllSampleTypes() throws Exception {
     Collection<String> sampleTypes = dao.listAllSampleTypes();
-    List<String> types = Arrays.asList("NON GENOMIC", "GENOMIC", "OTHER", "VIRAL RNA", "SYNTHETIC", "TRANSCRIPTOMIC", "METAGENOMIC",
-        "METATRANSCRIPTOMIC");
+    List<String> types = Arrays
+        .asList("NON GENOMIC", "GENOMIC", "OTHER", "VIRAL RNA", "SYNTHETIC", "TRANSCRIPTOMIC", "METAGENOMIC", "METATRANSCRIPTOMIC");
 
     assertTrue("Did not find all sample types", sampleTypes.containsAll(types));
   }
@@ -306,6 +311,24 @@ public class SQLSampleDAOTest extends AbstractDAOTest {
     List<Sample> samples = dao.listBySearchOffsetAndNumResults(0, 10, "SaM1", "id", "desc");
     assertEquals(9, samples.size());
     assertEquals(17L, samples.get(0).getId());
+  }
+
+  @Test
+  public void countSamplesBySearch() throws IOException {
+    Long numSamples = dao.countBySearch("SAM1");
+    assertEquals(Long.valueOf(9L), numSamples);
+  }
+
+  @Test
+  public void countSamplesByBadSearch() throws IOException {
+    Long numSamples = dao.countBySearch(";DROP TABLE Sample;");
+    assertEquals(Long.valueOf(0), numSamples);
+  }
+
+  @Test
+  public void countSamplesByEmptySearch() throws IOException {
+    Long numSamples = dao.countBySearch("");
+    assertEquals(Long.valueOf(17L), numSamples);
   }
 
   private void mockAutoIncrement() throws IOException {

@@ -25,4 +25,6 @@ public interface SampleService {
 
   Long countAll() throws IOException;
 
+  Long countBySearch(String querystr) throws IOException;
+
 }
