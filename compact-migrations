@@ -1,0 +1,44 @@
+#!/bin/sh
+# Compact all 8xxx migrations into a single migration as part of the release process.
+
+set -eu
+
+cd "$(dirname $0)/sqlstore/src/main/resources/db/migration"
+
+# Determine the last migration in the working directory
+LAST="$(basename "$(ls V[0-5][0-9][0-9][0-9]_*.sql | sort | tail -n 1)")"
+echo "Previous migration is ${LAST}."
+LAST_ID="$(echo "${LAST}" | cut -c 2-5 | sed -e 's/^0*//')"
+
+# Determine if we are on the mainline branch or a site-specific branch.
+BRANCH="$(git for-each-ref --format='%(upstream:short)' "$(git symbolic-ref -q HEAD)")"
+if [ "${BRANCH#*/}" = "develop" ] && git remote show -n "${BRANCH%/*}" | grep "git@github.com:TGAC/miso-lims.git" > /dev/null
+then
+	echo "This is mainline"
+	TAIL="main"
+	ID=$(((${LAST_ID} / 10 + 1) * 10))
+else
+	echo "This is site-specific."
+	TAIL="site"
+	ID=$((${LAST_ID} + 1))
+	if [ $((${ID} % 10)) -eq 0 ]
+	then
+		echo "Too many site-specific releases since last mainline release."
+		exit 1
+	fi
+fi
+
+NEXT="V$(printf "%04d" ${ID})__auto_${TAIL}.sql"
+echo "Next migration will be ${NEXT}."
+
+# Concatenate all the 8xxx files and remove them from git
+rm -f "${NEXT}"
+for FILE in $(find . -name "V8[0-9][0-9][0-9]_*.sql")
+do
+	cat "${FILE}" >> "${NEXT}"
+	git rm "${FILE}"
+done
+if [ -f "${NEXT}" ]
+then
+	git add "${NEXT}"
+fi
