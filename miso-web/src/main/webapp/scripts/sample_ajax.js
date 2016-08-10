@@ -1064,12 +1064,6 @@ Sample.ui = {
           "iSortPriority": 0
         },
         {
-          "sTitle": "QC Result",
-          "mData": "id",
-          "bSortable": false,
-          "iSortPriority": 0
-        },
-        {
           "sTitle": "Location",
           "mData": "locationLabel",
           "bSortable": false,
@@ -1113,20 +1107,6 @@ Sample.ui = {
       "fnDrawCallback": function (oSettings) {
         jQuery('#listingSamplesTable').removeClass('disabled');
         jQuery('#listingSamplesTable_paginate').find('.fg-button').removeClass('fg-button');
-      },
-      "fnRowCallback": function(nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-        Fluxion.doAjax(
-          'sampleControllerHelperService',
-          'getSampleLastQCRequest',
-          {
-            'sampleId': aData.id,
-            'url': ajaxurl
-          },{
-            'doOnSuccess': function (json) {
-              jQuery('td:eq(6)', nRow).html(json.response);
-            }
-          }
-        );
       }
     }).fnSetFilteringDelay();
     jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");

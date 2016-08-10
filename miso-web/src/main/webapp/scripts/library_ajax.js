@@ -1079,10 +1079,6 @@ Library.ui = {
           }
         },
         { 
-          "sTitle": "Type",
-          "mData": "libraryTypeAlias"
-        },
-        { 
           "sTitle": "Sample Name", 
           "sType": "no-sam",
           "mData": "parentSampleId" ,
