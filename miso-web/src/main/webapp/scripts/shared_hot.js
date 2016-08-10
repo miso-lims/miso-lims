@@ -111,7 +111,7 @@ var Hot = {
     if (button.className.indexOf('disabled') == -1) {
       button.classList.add('disabled');
       button.setAttribute('disabled', 'disabled');
-      ajaxLoader = "<img id='ajaxLoader' src='/../styles/images/ajax-loader.gif'/>";
+      ajaxLoader = "<img id='ajaxLoader' src='/../styles/images/ajax-loader.gif' class='fg-button'/>";
       button.insertAdjacentHTML('afterend', ajaxLoader);
     } else {
       button.classList.remove('disabled');

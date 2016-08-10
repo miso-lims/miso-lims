@@ -42,7 +42,10 @@
 <div id="maincontent">
 <div id="contentcolumn">
 
-  <h1>${method} Libraries</h1>
+  <h1>
+    ${method} Libraries
+    <button id="saveLibraries" class="fg-button ui-state-default ui-corner-all">Save</button>
+  </h1>
   
   <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#hothelp_arrowclick'), 'hothelpdiv');">Quick Help
     <div id="hothelp_arrowclick" class="toggleLeft"></div>
@@ -67,13 +70,6 @@
        <p>The following rows failed to save:</p>
        <p id="errorMessages"></p>
      </div>
-   <button id="saveLibraries">Save</button>
-   <c:if test="${detailedSample}">
-   <!--  TODO: add these back in later
-      <button id="addQcs" onclick="Sample.hot.regenerateWithQcs();">Add QCs</button>
-     <button id="hideAddnalCols" onclick="Sample.hot.hideAdditionalCols();">Hide Extra Columns</button>
-  -->
-   </c:if>
    
    <div id="hotContainer"></div>
  
