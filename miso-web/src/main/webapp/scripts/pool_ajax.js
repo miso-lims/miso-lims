@@ -438,7 +438,7 @@ Pool.ui = {
         return num + more + els;
       }
     };
-    jQuery('#'+table).dataTable({
+    jQuery('#'+table).dataTable(Utils.setSortFromPriority({
       "aoColumns": [
         {
           "sTitle": "Name",
@@ -502,9 +502,6 @@ Pool.ui = {
       "iDisplayLength": 25,
       "iDisplayStart": 0,
       "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>',
-      "aaSorting": [
-        [(Sample.detailedSample ? 7 : 0) , "desc"] // NB: this must get updated when adding new columns
-      ],
       "sPaginationType": "full_numbers",
       "bProcessing": true,
       "bServerSide": true,
@@ -523,7 +520,7 @@ Pool.ui = {
         jQuery('#'+table).removeClass('disabled');
         jQuery('#'+table+'_paginate').find('.fg-button').removeClass('fg-button');
       }
-    }).fnSetFilteringDelay();
+    })).fnSetFilteringDelay();
   },
 
   getPoolableElementInfo : function(poolId, elementId) {

@@ -297,21 +297,23 @@ Run.ui = {
 
   createListingRunsTable: function () {
     jQuery('#listingRunsTable').html("");    
-    jQuery('#listingRunsTable').dataTable({
+    jQuery('#listingRunsTable').dataTable(Utils.setSortFromPriority({
       "aoColumns": [
         {
           "sTitle": "Run Name",
           "mData": "id",
           "mRender": function (data, type, full) {
             return "<a href=\"/miso/run/" + data + "\">" + full.name + "</a>";
-          }
+          },
+          "iSortPriority": 1
         },
         {
           "sTitle": "Alias",
           "mData": "alias",
           "mRender": function (data, type, full) {
             return "<a href=\"/miso/run/" + full.id + "\">" + data + "</a>";
-          }
+          },
+          "iSortPriority": 0
         },
         {
           "sTitle": "Status",
@@ -319,6 +321,7 @@ Run.ui = {
           "mRender": function (data, type, full) {
             return (data ? data : "");
           },
+          "iSortPriority": 0,
           "bSortable": false // status, start date and end date are pulled via status dao, not via run dao
         },
         {
@@ -327,6 +330,7 @@ Run.ui = {
           "mRender": function (data, type, full) {
             return (data ? data : "");
           },
+          "iSortPriority": 0,
           "bSortable": false
         },
         {
@@ -335,15 +339,18 @@ Run.ui = {
           "mRender": function (data, type, full) {
             return (data ? data : "");
           },
+          "iSortPriority": 0,
           "bSortable": false
         },
         {
           "sTitle": "Type",
-          "mData": "platformType"
+          "mData": "platformType",
+          "iSortPriority": 0
         },
         {
           "sTitle": "Last Updated",
           "mData": "lastUpdated",
+          "iSortPriority": 2,
           "bVisible": (Sample.detailedSample ? "true" : "false")
         }
       ],
@@ -352,9 +359,6 @@ Run.ui = {
       "iDisplayLength": 25,
       "iDisplayStart": 0,
       "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>',
-      "aaSorting": [
-        [(Sample.detailedSample ? 6 : 0), "desc"]
-      ],
       "sPaginationType": "full_numbers",
       "bProcessing": true,
       "bServerSide": true,
@@ -373,7 +377,7 @@ Run.ui = {
         jQuery('#listingRunsTable').removeClass('disabled');
         jQuery('#listingRunsTable_paginate').find('.fg-button').removeClass('fg-button');
       }
-    }).fnSetFilteringDelay();
+    })).fnSetFilteringDelay();
     jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
   },
 

@@ -1012,7 +1012,7 @@ Sample.ui = {
     jQuery('#listingSamplesTable').html("<img src='../styles/images/ajax-loader.gif'/>");
 
     jQuery('#listingSamplesTable').html('');
-    jQuery('#listingSamplesTable').dataTable({
+    jQuery('#listingSamplesTable').dataTable(Utils.setSortFromPriority({
       "aoColumns": [
         {
           "sTitle": "",
@@ -1087,9 +1087,6 @@ Sample.ui = {
       "iDisplayLength": 25,
       "iDisplayStart": 0,
       "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>',
-      "aaSorting": [
-        [(Sample.detailedSample ? 8 : 1), "desc"] // NB: this must get updated when adding new columns!!
-      ],
       "sPaginationType": "full_numbers",
       "bProcessing": true,
       "bServerSide": true,
@@ -1108,7 +1105,7 @@ Sample.ui = {
         jQuery('#listingSamplesTable').removeClass('disabled');
         jQuery('#listingSamplesTable_paginate').find('.fg-button').removeClass('fg-button');
       }
-    }).fnSetFilteringDelay();
+    })).fnSetFilteringDelay();
     jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
     jQuery("#toolbar").append("<button style=\"margin-left:5px;\" onclick=\"window.location.href='/miso/sample/new';\" class=\"fg-button ui-state-default ui-corner-all\">Add Sample</button>");
 
