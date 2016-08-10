@@ -8,13 +8,15 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
+import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 
 public abstract class AbstractBox implements Box {
+
   public static final Long UNSAVED_ID = 0L;
 
-  private SecurityProfile securityProfile = null;
+  private SecurityProfile securityProfile;
 
-  private long boxId = AbstractBox.UNSAVED_ID;
+  private long boxId;
   private String name;
   private String alias;
   private String description;
@@ -26,8 +28,15 @@ public abstract class AbstractBox implements Box {
   private BoxSize size;
   private BoxUse use;
   
-  private final Collection<ChangeLog> changeLog = new ArrayList<>();
+  private final Collection<ChangeLog> changeLog;
 
+  @CoverageIgnore
+  public AbstractBox() {
+	  securityProfile = null;
+	  boxId = AbstractBox.UNSAVED_ID;
+	  changeLog = new ArrayList<ChangeLog>();
+  }
+  
   @Override
   public User getLastModifier() {
     return lastModifier;
@@ -108,6 +117,7 @@ public abstract class AbstractBox implements Box {
     this.securityProfile = securityProfile;
   }
 
+  @CoverageIgnore
   @Override
   public void inheritPermissions(SecurableByProfile parent) throws SecurityException {
     if (parent.getSecurityProfile().getOwner() != null) {
@@ -118,11 +128,13 @@ public abstract class AbstractBox implements Box {
     }
   }
 
+  @CoverageIgnore
   @Override
   public boolean userCanRead(User user) {
     return securityProfile.userCanRead(user);
   }
 
+  @CoverageIgnore
   @Override
   public boolean userCanWrite(User user) {
     return securityProfile.userCanWrite(user);
