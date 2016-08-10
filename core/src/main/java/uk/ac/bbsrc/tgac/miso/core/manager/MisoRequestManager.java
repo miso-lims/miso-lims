@@ -2987,4 +2987,13 @@ public class MisoRequestManager implements RequestManager {
     return libraryStore.getAdjacentLibrary(libraryId, before);
   }
 
+  @Override
+  public Project lazyGetProjectById(long projectId) throws IOException {
+    if (projectStore != null) {
+      return projectStore.lazyGet(projectId);
+    } else {
+      throw new IOException("No projectStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
 }

@@ -14,6 +14,10 @@ var Hot = {
   },
   failedComplexValidation: [],
   saveButton: null,
+  buildDtoFunc: null,
+  saveOneFunc: null,
+  updateOneFunc: null,
+  propagateOrEdit: null,
 
   /**
    * Gets data needed to fill in dropdowns for various sample/library attributes. Callback is generally a "make table"-type function call.
@@ -102,6 +106,62 @@ var Hot = {
     };
     invokeNext(0)
   },
+  
+  /**
+   * Builds an array of objects or save functions for objects.
+   * Note: Hot.buildDtoFunc and Hot.saveOneFunc must be assigned before this is called.
+   */
+  getArrayOfNewObjects: function (data) {
+    // Returns a save function for a single line in the table.
+    function saveFunction(data, index, numberToSave) {
+      // The callback is called once the http request in saveOne completes.
+      return function(callback) {
+        Hot.saveOneFunc(data, index, numberToSave, callback);
+      };
+    }
+    var len = data.length;
+    var arrayOfObjects = [];
+    
+    // return an array of objects or saveFunctions for objects
+    for (var i = 0; i < len; i++) {
+      if (data[i].saved) continue;
+      
+      var newObj = Hot.buildDtoFunc(data[i]);
+      if (Hot.detailedSample) {
+        arrayOfObjects.push(saveFunction(JSON.stringify(newObj), i, len));
+      } else {
+        arrayOfObjects.push(newObj);
+      }
+    }
+    return arrayOfObjects;
+  },
+  
+  /**
+   * Builds an array of objects or save functions for objects.
+   * Note: Hot.buildDtoFunc and Hot.updateOneFunc must be assigned before this is called.
+   */
+  getArrayOfUpdatedObjects: function (data) {
+    // Returns a save function for a single line in the table.
+    function saveFunction(data, id, rowIndex, numberToSave) {
+      // The callback is called once the http request in saveOne completes.
+      return function(callback) {
+        Hot.updateOneFunc(data, id, rowIndex, numberToSave, callback);
+      };
+    }
+    var len = data.length;
+    var arrayOfObjects = [];
+
+    // return an array of objects or saveFunctions for objects
+    for (var i = 0; i < len; i++) {
+      if (data[i].saved) continue;
+
+      var newObj = Hot.buildDtoFunc(data[i]);
+
+      // all updated objects go through the REST WS
+      arrayOfObjects.push(saveFunction(JSON.stringify(newObj), newObj.id, i, len));
+    }
+    return arrayOfObjects;
+  },
 
   /**
    * Toggles loader gif and disabled styling and attribute of save button
@@ -134,23 +194,11 @@ var Hot = {
 
     var tableData = Hot.startData;
 
-    // if last row is empty, remove it before validation
-    Hot.removeEmptyBottomRows(tableData);
-
     // if there are no rows, add one back in and exit
     if (tableData.length === 0) {
       Hot.startData = [];
       Hot.validationFails();
       return false;
-    }
-  },
-
-  /**
-   * Removes bottom rows if bottom rows are empty (usually from the user dragging too far down)
-   */
-  removeEmptyBottomRows: function (tableData) {
-    while (Hot.startData.length > 1 && Hot.hotTable.isEmptyRow(tableData.length - 1)) {
-      Hot.hotTable.alter('remove_row', tableData.length - 1, keepEmptyRows = false);
     }
   },
 
@@ -165,6 +213,22 @@ var Hot = {
     } else {
       return false;
     }
+  },
+  
+  /**
+   * Saves table data
+   * @param attribute of type string ("alias" or "name")
+   */
+  saveTableData: function (attribute, action) {
+    // send table data through the parser to get a data array that isn't merely a reference to Hot.hotTable.getSourceData()
+    data = JSON.parse(JSON.parse(JSON.stringify(Hot.hotTable.getSourceData())));
+      
+    // add previously-saved (alias/name) to success message, and placeholders for items to be saved
+    Hot.messages.success = data.map(function (dil) { return (dil.saved === true ? dil[attribute] : null); });
+  
+    // Array of save functions, one for each line in the table
+    var saveArray = (action == "Edit" ? Hot.getArrayOfUpdatedObjects(data) : Hot.getArrayOfNewObjects(data));
+    Hot.serial(saveArray); // Execute saves serially  
   },
 
   /**
@@ -197,6 +261,37 @@ var Hot = {
         return cellProperties;
       }
     });
+  },
+  
+  /**
+   * Processes a failure to save (adds invalid attribute to cell, creates user message)
+   */
+  failSave: function (xhr, rowIndex, numberToSave) {
+    console.log(xhr);
+    var responseText = JSON.parse(xhr.responseText);
+    if (xhr.status >= 500 || responseText.detail == undefined) {
+      Hot.messages.failed.push("<b>Row " + (rowIndex + 1) + ": Something went terribly wrong. Please file a ticket with a screenshot or "
+          + "copy-paste of the data that you were trying to save.</b>");
+    } else {
+      var allColumnData = Hot.getValues('data', Hot.colConf);
+      var column, columnIndex;
+      if (responseText.data && responseText.data.constraintName) {
+        // if a column's constraint was violated, extract it here
+        column = responseText.data.constraintName;
+        columnIndex = allColumnData.indexOf(column);
+      }
+      console.log(rowIndex, columnIndex);
+      if (rowIndex !== undefined && columnIndex !== -1 && columnIndex !== undefined) {
+        Hot.hotTable.setCellMeta(rowIndex, columnIndex, 'valid', false);
+      }
+      // process error message if it was a SQL violation, and add any errors to the messages array
+      var reUserMessage = /could not execute .*?: (.*)/;
+      var extraCVEMessage = /(.*)ConstraintViolationException: (.*)/;
+      var errorMessage1 = responseText.detail.replace(reUserMessage, "$1");
+      var finalErrorMessage = errorMessage1.replace(extraCVEMessage, "$2");
+      Hot.messages.failed.push("Row "+ (rowIndex + 1) +": "+ finalErrorMessage);
+    }
+    Hot.addSuccessesAndErrors();
   },
 
   /**
