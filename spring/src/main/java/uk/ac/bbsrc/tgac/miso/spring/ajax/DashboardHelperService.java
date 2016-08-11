@@ -39,7 +39,6 @@ import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.authority.GrantedAuthorityImpl;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.ldap.userdetails.InetOrgPerson;
@@ -62,6 +61,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.event.Alert;
 import uk.ac.bbsrc.tgac.miso.core.event.type.AlertLevel;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.core.security.MisoAuthority;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 /**
@@ -98,14 +98,14 @@ public class DashboardHelperService {
               u.setPassword(details.getPassword());
               u.setActive(true);
 
-              if (details.getAuthorities().contains(new GrantedAuthorityImpl("ROLE_ADMIN"))) {
+              if (details.getAuthorities().contains(MisoAuthority.ROLE_ADMIN)) {
                 u.setAdmin(true);
               }
 
-              if (details.getAuthorities().contains(new GrantedAuthorityImpl("ROLE_INTERNAL"))) {
+              if (details.getAuthorities().contains(MisoAuthority.ROLE_INTERNAL)) {
                 u.setInternal(true);
                 u.setRoles(new String[] { "ROLE_INTERNAL" });
-              } else if (details.getAuthorities().contains(new GrantedAuthorityImpl("ROLE_EXTERNAL"))) {
+              } else if (details.getAuthorities().contains(MisoAuthority.ROLE_EXTERNAL)) {
                 u.setExternal(true);
                 u.setRoles(new String[] { "ROLE_EXTERNAL" });
               } else {
@@ -176,7 +176,6 @@ public class DashboardHelperService {
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
   }
-
 
   public JSONObject searchPool(HttpSession session, JSONObject json) {
     String searchStr = json.getString("str");

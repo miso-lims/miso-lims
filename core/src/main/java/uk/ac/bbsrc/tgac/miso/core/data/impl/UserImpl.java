@@ -44,6 +44,7 @@ import org.springframework.security.core.authority.GrantedAuthorityImpl;
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.security.MisoAuthority;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 /**
@@ -157,15 +158,15 @@ public class UserImpl implements User, Serializable, Comparable {
   public Collection<GrantedAuthority> getPermissionsAsAuthorities() {
     List<GrantedAuthority> auths = new ArrayList<GrantedAuthority>();
     if (isAdmin()) {
-      auths.add(new GrantedAuthorityImpl("ROLE_ADMIN"));
+      auths.add(MisoAuthority.ROLE_ADMIN);
     }
 
     if (isInternal()) {
-      auths.add(new GrantedAuthorityImpl("ROLE_INTERNAL"));
+      auths.add(MisoAuthority.ROLE_INTERNAL);
     }
 
     if (isExternal()) {
-      auths.add(new GrantedAuthorityImpl("ROLE_EXTERNAL"));
+      auths.add(MisoAuthority.ROLE_EXTERNAL);
     }
 
     return auths;
