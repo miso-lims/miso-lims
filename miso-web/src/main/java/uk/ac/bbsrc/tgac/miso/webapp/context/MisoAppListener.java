@@ -58,6 +58,7 @@ import org.springframework.web.context.support.XmlWebApplicationContext;
 
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
+import io.prometheus.client.hotspot.DefaultExports;
 import uk.ac.bbsrc.tgac.miso.core.data.TagBarcodeFamily;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.PoolAlertManager;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.ProjectAlertManager;
@@ -102,6 +103,9 @@ public class MisoAppListener implements ServletContextListener {
    */
   @Override
   public void contextInitialized(ServletContextEvent event) {
+    // Export all JVM HotSpot stats to Prometheus
+    DefaultExports.initialize();
+
     ServletContext application = event.getServletContext();
 
     // load logging system manually so that we get the placeholders ${} swapped out for real values
