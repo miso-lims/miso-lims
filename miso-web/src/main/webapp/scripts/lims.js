@@ -58,6 +58,11 @@ var Utils = Utils || {
       values.push(rowval);
     });
     return values;
+  },
+
+  setSortFromPriority: function (table) {
+    table.aaSorting = [ [ table.aoColumns.reduce(function(acc, curr, index) { return acc.iSortPriority > curr.iSortPriority ? acc : { iSortPriority : curr.iSortPriority, iPos : index }; }, { iSortPriority : -1, iPos : 0 }).iPos  , "desc" ] ];
+    return table;
   }
 };
 

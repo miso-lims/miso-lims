@@ -438,7 +438,7 @@ Pool.ui = {
         return num + more + els;
       }
     };
-    jQuery('#'+table).dataTable({
+    jQuery('#'+table).dataTable(Utils.setSortFromPriority({
       "aoColumns": [
         {
           "sTitle": "Name",
@@ -474,11 +474,6 @@ Pool.ui = {
           "iSortPriority" : 0
         },
         {
-          "sTitle": "Average Insert Size",
-          "mData": "id",
-          "iSortPriority" : 0
-        },
-        {
           "sTitle": "Conc. (" + poolConcentrationUnits + ")",
           "mData": "concentration",
           "iSortPriority" : 0
@@ -507,24 +502,6 @@ Pool.ui = {
       "iDisplayLength": 25,
       "iDisplayStart": 0,
       "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>',
-      "fnRowCallback": function(nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-        Fluxion.doAjax(
-          'poolControllerHelperService',
-          'checkAverageInsertSizeByPoolId',
-          {
-            'poolId':aData.id,
-            'url':ajaxurl
-          },
-          {
-            'doOnSuccess': function(json) {
-              jQuery('td:eq(5)', nRow).html(json.response);
-            }
-          }
-        );
-      },
-      "aaSorting": [
-        [(Sample.detailedSample ? 7 : 0) , "desc"] // NB: this must get updated when adding new columns
-      ],
       "sPaginationType": "full_numbers",
       "bProcessing": true,
       "bServerSide": true,
@@ -543,7 +520,7 @@ Pool.ui = {
         jQuery('#'+table).removeClass('disabled');
         jQuery('#'+table+'_paginate').find('.fg-button').removeClass('fg-button');
       }
-    }).fnSetFilteringDelay();
+    })).fnSetFilteringDelay();
   },
 
   getPoolableElementInfo : function(poolId, elementId) {

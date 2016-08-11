@@ -1054,7 +1054,7 @@ Library.ui = {
 
   createListingLibrariesTable: function () {
     jQuery('#listingLibrariesTable').html("");
-    jQuery('#listingLibrariesTable').dataTable({
+    jQuery('#listingLibrariesTable').dataTable(Utils.setSortFromPriority({
       "aoColumns": [
         { 
           "sTitle": "",
@@ -1062,11 +1062,13 @@ Library.ui = {
           "mRender": function (data, type, full) {
             return "<input type=\"checkbox\" value=\"" + data + "\" class=\"bulkCheckbox\" id=\"bulk_" + data + "\">"
           },
+          "iSortPriority": 0,
           "bSortable": false
         },
         { 
           "sTitle": "Library Name",
           "mData": "id",
+          "iSortPriority": 1,
           "mRender": function (data, type, full) {
             return "<a href=\"/miso/library/" + data + "\">" + full.name + "</a>";
           }
@@ -1074,18 +1076,16 @@ Library.ui = {
         { 
           "sTitle": "Alias",
           "mData": "alias",
+          "iSortPriority": 0,
           "mRender": function (data, type, full) {
             return "<a href=\"/miso/library/" + full.id + "\">" + data + "</a>";
           }
         },
         { 
-          "sTitle": "Type",
-          "mData": "libraryTypeAlias"
-        },
-        { 
           "sTitle": "Sample Name", 
           "sType": "no-sam",
           "mData": "parentSampleId" ,
+          "iSortPriority": 0,
           "mRender": function (data, type, full) {
             return "<a href=\"/miso/sample/" + data + "\">" + full.parentSampleAlias + " (SAM" + data + ")</a>";
           }
@@ -1093,6 +1093,7 @@ Library.ui = {
         { 
           "sTitle": "QC Passed",
           "mData": "qcPassed",
+          "iSortPriority": 0,
           "mRender": function (data, type, full) {
             // data is returned as "true", "false", or "null"
             return (data != null ? (data ? "True" : "False") : "Unknown");
@@ -1104,21 +1105,25 @@ Library.ui = {
           "mRender": function (data, type, full) {
             return (data ? (full.tagBarcodeIndex2Label ? data + ", " + full.tagBarcodeIndex2Label : data) : "None");
           },
+          "iSortPriority": 0,
           "bSortable": false
         },
         {
           "sTitle": "Location",
           "mData": "locationLabel",
+          "iSortPriority": 0,
           "bSortable": false
         },
         {
           "sTitle": "Last Updated",
           "mData": "lastModified",
+          "iSortPriority": 2,
           "bVisible": (Sample.detailedSample ? "true" : "false")
         },
         { 
           "sTitle": "ID",
           "mData": "identificationBarcode",
+          "iSortPriority": 0,
           "bVisible": false
         }
       ],
@@ -1127,9 +1132,6 @@ Library.ui = {
       "iDisplayLength": 25,
       "iDisplayStart": 0,
       "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>',
-      "aaSorting": [
-        [(Sample.detailedSample ? 8 : 1), "desc"] // NB: this must get updated when adding new columns!!
-      ],
       "sPaginationType": "full_numbers",
       "bProcessing": true,
       "bServerSide": true,
@@ -1148,7 +1150,7 @@ Library.ui = {
         jQuery('#listingLibrariesTable').removeClass('disabled');
         jQuery('#listingLibrariesTable_paginate').find('.fg-button').removeClass('fg-button');
       }
-    }).fnSetFilteringDelay();
+    })).fnSetFilteringDelay();
     jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
     
     jQuery("input[class='bulkCheckbox']").click(function () {
