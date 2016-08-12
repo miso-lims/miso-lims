@@ -469,7 +469,7 @@ public class ValueTypeLookup {
    */
   public QcType resolveForSample(QcType qcType) {
     if (qcType == null) return null;
-    if (qcType.getQcTypeId() != null) return sampleQcTypeById.get(qcType.getQcTypeId());
+    if (qcType.getQcTypeId() != QcType.UNSAVED_ID) return sampleQcTypeById.get(qcType.getQcTypeId());
     if (qcType.getName() != null) return sampleQcTypeByName.get(qcType.getName());
     return null;
   }
@@ -483,7 +483,7 @@ public class ValueTypeLookup {
    */
   public QcType resolveForLibrary(QcType qcType) {
     if (qcType == null) return null;
-    if (qcType.getQcTypeId() != null) return libraryQcTypeById.get(qcType.getQcTypeId());
+    if (qcType.getQcTypeId() != QcType.UNSAVED_ID) return libraryQcTypeById.get(qcType.getQcTypeId());
     if (qcType.getName() != null) return libraryQcTypeByName.get(qcType.getName());
     return null;
   }

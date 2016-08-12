@@ -31,6 +31,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.persistence.HibernateSampleClassDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLabDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDesignDao;
@@ -41,6 +42,8 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueOriginDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueTypeDao;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLKitDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryDAO;
+import uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryQCDAO;
+import uk.ac.bbsrc.tgac.miso.sqlstore.SQLSampleQCDAO;
 
 public class ValueTypeLookupTestSuite {
 
@@ -128,6 +131,18 @@ public class ValueTypeLookupTestSuite {
     tbs.add(makeTagBarcode(VALID_LONG, VALID_STRING, VALID_STRING));
     Mockito.when(tbDao.listAllTagBarcodes()).thenReturn(tbs);
     Mockito.when(mgr.getTagBarcodeDao()).thenReturn(tbDao);
+    
+    SQLSampleQCDAO sqcDao = Mockito.mock(SQLSampleQCDAO.class);
+    List<QcType> sqcs = new ArrayList<>();
+    sqcs.add(makeQcType(VALID_LONG, VALID_STRING));
+    Mockito.when(sqcDao.listAllSampleQcTypes()).thenReturn(sqcs);
+    Mockito.when(mgr.getSampleQcDao()).thenReturn(sqcDao);
+    
+    SQLLibraryQCDAO lqcDao = Mockito.mock(SQLLibraryQCDAO.class);
+    List<QcType> lqcs = new ArrayList<>();
+    lqcs.add(makeQcType(VALID_LONG, VALID_STRING));
+    Mockito.when(lqcDao.listAllLibraryQcTypes()).thenReturn(lqcs);
+    Mockito.when(mgr.getLibraryQcDao()).thenReturn(lqcDao);
     
     sut = new ValueTypeLookup(mgr);
   }
@@ -364,6 +379,33 @@ public class ValueTypeLookupTestSuite {
     tb.getFamily().setName(familyName);
     tb.setSequence(sequence);
     return tb;
+  }
+  
+  @Test
+  public void testResolveSampleQcType() {
+    assertNotNull(sut.resolveForSample(makeQcType(VALID_LONG, null)));
+    assertNotNull(sut.resolveForSample(makeQcType(null, VALID_STRING)));
+    assertNull(sut.resolveForSample((QcType) null));
+    assertNull(sut.resolveForSample(makeQcType(null, null)));
+    assertNull(sut.resolveForSample(makeQcType(INVALID_LONG, null)));
+    assertNull(sut.resolveForSample(makeQcType(null, INVALID_STRING)));
+  }
+  
+  @Test
+  public void testResolveLibraryQcType() {
+    assertNotNull(sut.resolveForLibrary(makeQcType(VALID_LONG, null)));
+    assertNotNull(sut.resolveForLibrary(makeQcType(null, VALID_STRING)));
+    assertNull(sut.resolveForLibrary((QcType) null));
+    assertNull(sut.resolveForLibrary(makeQcType(null, null)));
+    assertNull(sut.resolveForLibrary(makeQcType(INVALID_LONG, null)));
+    assertNull(sut.resolveForLibrary(makeQcType(null, INVALID_STRING)));
+  }
+  
+  private QcType makeQcType(Long id, String name) {
+    QcType qc = new QcType();
+    qc.setQcTypeId(id == null ? QcType.UNSAVED_ID : id);
+    qc.setName(name);
+    return qc;
   }
   
 }
