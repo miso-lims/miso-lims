@@ -85,10 +85,12 @@
       Library.hot.propagateOrEdit = "${method}";
       Library.designs = ${libraryDesignsJSON};
       Hot.autoGenerateIdBarcodes = ${autoGenerateIdBarcodes};
+      Library.hot.getLibraryTypeAliasLists();
 
       Library.hot.makeBulkCreateTable = function () {
         Library.hot.librariesJSON = Library.hot.prepLibrariesForTable(Library.hot.librariesJSON);
         Library.hot.makeHOT(Library.hot.librariesJSON);
+        Library.hot.addPlatformAndTBHooks();
       };
 
       // get SampleOptions and make the appropriate table

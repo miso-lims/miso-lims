@@ -83,6 +83,13 @@ var Hot = {
   },
 
   /**
+   * Gets array of qc values
+   */
+  getQcValues: function () {
+    return ['true', 'false', 'unknown'];
+  },
+  
+  /**
    * Concatenates and reduces arrays
    */
   concatArrays: function () {
