@@ -43,6 +43,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.eaglegenomics.simlims.core.User;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -59,9 +61,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.jackson.LibraryRecursionAvoidanceMixin;
 import uk.ac.bbsrc.tgac.miso.core.util.jackson.SampleProjectAvoidanceMixin;
 import uk.ac.bbsrc.tgac.miso.core.util.jackson.UserInfoMixin;
 import uk.ac.bbsrc.tgac.miso.service.SampleGroupService;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestException;
-
-import com.eaglegenomics.simlims.core.User;
 
 /**
  * A controller to handle all REST requests for Projects
@@ -172,10 +171,17 @@ public class ProjectRestController extends RestController {
     return mapper.writeValueAsString(lp);
   }
 
+  @RequestMapping(value = "lazy", method = RequestMethod.GET, produces = "application/json")
+  public @ResponseBody String lazyListAllProjects() throws IOException {
+    Collection<Project> lp = requestManager.listAllProjects();
+    ObjectMapper mapper = new ObjectMapper();
+    return mapper.writeValueAsString(lp);
+  }
+
   @RequestMapping(value = "{id}/groups", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public Collection<Integer> getProjectSampleGroups(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder, HttpServletResponse response)
-      throws IOException {
+  public Collection<Integer> getProjectSampleGroups(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
+      HttpServletResponse response) throws IOException {
     Set<Integer> groups = new HashSet<>();
     for (SampleGroupId sgi : sampleGroupService.getAllForProject(id)) {
       groups.add(sgi.getGroupId());

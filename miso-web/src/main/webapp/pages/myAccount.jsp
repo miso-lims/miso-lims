@@ -106,16 +106,11 @@
         <div class="portlet">
           <div class="portlet-header">Institute Defaults</div>
           <div class="portlet-content">
-            <a href="<c:url value='/miso/admin/instituteDefaults#tissueorigin'/>">Tissue Origins</a><br/>
-            <a href="<c:url value='/miso/admin/instituteDefaults#tissuetype'/>">Tissue Types</a><br/>
             <a href="<c:url value='/miso/admin/instituteDefaults#tissuematerial'/>">Tissue Materials</a><br/>
             <a href="<c:url value='/miso/admin/instituteDefaults#samplepurpose'/>">Sample Purposes</a><br/>
-            <a href="<c:url value='/miso/admin/instituteDefaults#qcpasseddetail'/>">QC Details</a><br/>
             <a href="<c:url value='/miso/admin/instituteDefaults#subproject'/>">Subprojects</a><br/>
             <a href="<c:url value='/miso/admin/instituteDefaults#institute'/>">Institutes</a><br/>
             <a href="<c:url value='/miso/admin/instituteDefaults#lab'/>">Labs</a><br/>
-            <a href="<c:url value='/miso/admin/instituteDefaults#sampleclass'/>">Sample Classes</a><br/>
-            <a href="<c:url value='/miso/admin/instituteDefaults#samplevalidrelationship'/>">Relationships between Sample Classes</a>
           </div>
         </div>
       </sec:authorize>

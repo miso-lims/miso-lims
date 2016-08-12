@@ -88,7 +88,6 @@
                 <jsSourceExclude>natural_sort.js</jsSourceExclude>
                 <jsSourceExclude>xregexp-all-min.js</jsSourceExclude>
                 <jsSourceExclude>runCalendar.js</jsSourceExclude>
-                <jsSourceExclude>sortable.js</jsSourceExclude>
               </jsSourceExcludes>
               <jsFinalFile>header_script.js</jsFinalFile>
             </configuration>
