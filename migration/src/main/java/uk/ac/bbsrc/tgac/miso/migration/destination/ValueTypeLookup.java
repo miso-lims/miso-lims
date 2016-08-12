@@ -602,10 +602,12 @@ public class ValueTypeLookup {
     if (library.getLibraryAdditionalInfo() != null) {
       LibraryAdditionalInfo lai = library.getLibraryAdditionalInfo();
       
-      KitDescriptor kit = resolve(lai.getPrepKit());
-      if (kit == null) throw new IOException(String.format("KitDescriptor not found (id=%d or name=%s)",
-          lai.getPrepKit().getId(), lai.getPrepKit().getName()));
-      lai.setPrepKit(kit);
+      if (lai.getPrepKit() != null) { // optional field
+        KitDescriptor kit = resolve(lai.getPrepKit());
+        if (kit == null) throw new IOException(String.format("KitDescriptor not found (id=%d or name=%s)",
+            lai.getPrepKit().getId(), lai.getPrepKit().getName()));
+        lai.setPrepKit(kit);
+      }
       
       LibraryDesign ld = resolve(lai.getLibraryDesign());
       if (ld == null) throw new IOException("LibraryDesign not found");
