@@ -153,6 +153,7 @@ Project.ui = {
             "aaData": json.projectsArray,
             "aoColumns": [
               { "sTitle": "Project Name", "sType": "no-pro"},
+              { "sTitle": "Short Name"},
               { "sTitle": "Alias"},
               { "sTitle": "Description"},
               { "sTitle": "Progress"},
@@ -169,12 +170,12 @@ Project.ui = {
                 'projectControllerHelperService',
                 'checkOverviewByProjectId',
                 {
-                  'projectId': aData[4],
+                  'projectId': aData[5],
                   'url': ajaxurl
                 },
                 {
                   'doOnSuccess': function (json) {
-                    jQuery('td:eq(4)', nRow).html(json.response);
+                    jQuery('td:eq(5)', nRow).html(json.response);
                   }
                 }
               );
