@@ -17,6 +17,8 @@ then
 	echo "This is mainline"
 	TAIL="main"
 	ID=$(((${LAST_ID} / 10 + 1) * 10))
+	START_BANNER=""
+	END_BANNER=""
 else
 	echo "This is site-specific."
 	TAIL="site"
@@ -26,6 +28,8 @@ else
 		echo "Too many site-specific releases since last mainline release."
 		exit 1
 	fi
+	START_BANNER="--StartNoTest"
+	END_BANNER="--EndNoTest"
 fi
 
 NEXT="V$(printf "%04d" ${ID})__auto_${TAIL}.sql"
@@ -33,9 +37,15 @@ echo "Next migration will be ${NEXT}."
 
 # Concatenate all the 8xxx files and remove them from git
 rm -f "${NEXT}"
-for FILE in $(find . -name "V8[0-9][0-9][0-9]_*.sql")
+for FILE in $(find . -name "V8[0-9][0-9][0-9]_*.sql" | sort)
 do
-	cat "${FILE}" >> "${NEXT}"
+	NAME=$(basename "${FILE}" .sql)
+	echo -- ${NAME#V*__} >> "${NEXT}"
+	echo ${START_BANNER} >> "${NEXT}"
+	# This sed command forces a newline at the end of the file
+	sed -e '$a\' "${FILE}" >> "${NEXT}"
+	echo ${END_BANNER} >> "${NEXT}"
+	echo >> "${NEXT}"
 	git rm "${FILE}"
 done
 if [ -f "${NEXT}" ]
