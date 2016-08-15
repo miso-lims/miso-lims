@@ -34,7 +34,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -76,7 +75,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.AbstractSampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.EntityGroup;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
-import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity.DonorSex;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -681,7 +679,8 @@ public class EditSampleController {
         model.put("title", "New Sample");
 
         if (projectId != null) {
-          Project project = requestManager.getProjectById(projectId);
+          Project project = requestManager.lazyGetProjectById(projectId);
+          if (project == null) throw new SecurityException("No such project.");
           model.addAttribute("project", project);
           sample.setProject(project);
 
@@ -706,7 +705,8 @@ public class EditSampleController {
         model.put("title", "Sample " + sampleId);
 
         if (projectId != null) {
-          Project project = requestManager.getProjectById(projectId);
+          Project project = requestManager.lazyGetProjectById(projectId);
+          if (project == null) throw new SecurityException("No such project.");
           model.addAttribute("project", project);
           sample.setProject(project);
           sample.inheritPermissions(project);

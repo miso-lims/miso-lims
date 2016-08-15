@@ -9,6 +9,9 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isTissueProcessingSample;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isTissueSample;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -62,6 +65,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstituteImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAdditionalInfoImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrderImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
@@ -274,11 +278,6 @@ public class Dtos {
     }
     if (from.getGroupDescription() != null) {
       dto.setGroupDescription(from.getGroupDescription());
-    }
-    if (from.getParent() != null) {
-      dto.setParentId(from.getParent().getId());
-      dto.setParentAlias(from.getParent().getAlias());
-      dto.setParentSampleClassId(from.getSampleClass().getId());
     }
     return dto;
   }
@@ -1093,6 +1092,25 @@ public class Dtos {
       dto.setIdentificationBarcode(from.getIdentificationBarcode());
     }
     return dto;
+  }
+
+  public static LibraryDilution to(DilutionDto from) {
+    LibraryDilution to = new LibraryDilution();
+    to.setId(from.getId());
+    to.setName(from.getName());
+    to.setIdentificationBarcode(from.getIdentificationBarcode());
+    to.setConcentration(from.getConcentration());
+    to.setLibrary(to(from.getLibrary()));
+    if (!isStringEmptyOrNull(from.getDilutionUserName())) {
+      to.setDilutionCreator(from.getDilutionUserName());
+    }
+    DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+    try {
+      to.setCreationDate(df.parse(from.getCreationDate()));
+    } catch (ParseException e) {
+      // do nothing because this shouldn't cause it to fail, and the Dtos class does not have a logger
+    }
+    return to;
   }
 
   public static PoolDto asDto(Pool<? extends Poolable<?, ?>> from) {

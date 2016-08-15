@@ -37,9 +37,6 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
-import net.sf.json.JSONObject;
-import net.sourceforge.fluxion.ajax.util.JSONUtils;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,6 +58,8 @@ import org.springframework.web.servlet.ModelAndView;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
+import net.sf.json.JSONObject;
+import net.sourceforge.fluxion.ajax.util.JSONUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractPool;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractProject;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSampleQC;
@@ -137,7 +136,7 @@ public class EditProjectController {
 
   public Map<Integer, String> populateProjectFiles(Long projectId) throws IOException {
     if (projectId != AbstractProject.UNSAVED_ID) {
-      Project p = requestManager.getProjectById(projectId);
+      Project p = requestManager.lazyGetProjectById(projectId);
       if (p != null) {
         Map<Integer, String> fileMap = new HashMap<Integer, String>();
         for (String s : filesManager.getFileNames(Project.class, projectId.toString())) {
@@ -168,12 +167,12 @@ public class EditProjectController {
   public String sampleQCUnits() throws IOException {
     return AbstractSampleQC.UNITS;
   }
-  
+
   @ModelAttribute("poolConcentrationUnits")
   public String poolConcentrationUnits() {
     return AbstractPool.CONCENTRATION_UNITS;
   }
-  
+
   @ModelAttribute("libraryDilutionUnits")
   public String libraryDilutionUnits() {
     return LibraryDilution.UNITS;
@@ -196,8 +195,9 @@ public class EditProjectController {
       Collections.sort(runs, new AliasComparator(Run.class));
       for (Run r : runs) {
         RunImpl ri = (RunImpl) r;
-        ri.setSequencerPartitionContainers(new ArrayList<SequencerPartitionContainer<SequencerPoolPartition>>(
-            requestManager.listSequencerPartitionContainersByRunId(r.getId())));
+        ri.setSequencerPartitionContainers(
+            new ArrayList<SequencerPartitionContainer<SequencerPoolPartition>>(
+                requestManager.listSequencerPartitionContainersByRunId(r.getId())));
       }
       return runs;
     } catch (NoSuchMethodException e) {
@@ -247,23 +247,16 @@ public class EditProjectController {
   }
 
   public boolean existsAnyEmPcrLibrary(Collection<LibraryDilution> projectLibraryDilutions) throws IOException {
-    boolean exists = false;
     for (LibraryDilution dil : projectLibraryDilutions) {
-      if (!dil.getLibrary().getPlatformName().equals(PlatformType.ILLUMINA.getKey())) {
-        exists = true;
+      if (PlatformType.valueOf(dil.getLibrary().getPlatformName().toUpperCase()).usesEmPCR()) {
+        return true;
       }
     }
-    return exists;
+    return false;
   }
 
   public boolean existsAnyEmPcrLibrary(long projectId) throws IOException {
-    boolean exists = false;
-    for (LibraryDilution dil : populateProjectLibraryDilutions(projectId)) {
-      if (!dil.getLibrary().getPlatformName().equals(PlatformType.ILLUMINA.getKey())) {
-        exists = true;
-      }
-    }
-    return exists;
+    return existsAnyEmPcrLibrary(populateProjectLibraryDilutions(projectId));
   }
 
   public Collection<emPCR> populateProjectEmPCRs(long projectId) throws IOException {

@@ -78,7 +78,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.LibraryAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
-import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
@@ -799,11 +798,7 @@ public class EditLibraryController {
   @RequestMapping(value = "/bulk/propagate/{sampleIds}", method = RequestMethod.GET)
   public ModelAndView editPropagateSamples(@PathVariable String sampleIds, ModelMap model) throws IOException {
     try {
-      String[] split = sampleIds.split(",");
-      List<Long> idList = new ArrayList<Long>();
-      for (int i = 0; i < split.length; i++) {
-        idList.add(Long.parseLong(split[i]));
-      }
+      List<Long> idList = getIdsFromString(sampleIds);
       JSONArray libraries = new JSONArray();
       SampleClass sampleClass = null;
       for (Sample sample : requestManager.getSamplesByIdList(idList)) {
@@ -852,11 +847,7 @@ public class EditLibraryController {
   @RequestMapping(value = "/bulk/edit/{libraryIds}", method = RequestMethod.GET)
   public ModelAndView editBulkLibraries(@PathVariable String libraryIds, ModelMap model) throws IOException {
     try {
-      String[] split = libraryIds.split(",");
-      List<Long> idList = new ArrayList<Long>();
-      for (int i = 0; i < split.length; i++) {
-        idList.add(Long.parseLong(split[i]));
-      }
+      List<Long> idList = getIdsFromString(libraryIds);
       JSONArray libraryDtos = new JSONArray();
       for (Library library : requestManager.getLibrariesByIdList(idList)) {
         LibraryAdditionalInfo lai = null;
@@ -876,6 +867,39 @@ public class EditLibraryController {
       }
       throw ex;
     }
+  }
+
+  @RequestMapping(value = "/dilutions/bulk/propagate/{libraryIds}", method = RequestMethod.GET)
+  public ModelAndView editPropagateDilutions(@PathVariable String libraryIds, ModelMap model) throws IOException {
+    try {
+      List<Long> idList = getIdsFromString(libraryIds);
+      JSONArray libraryDtos = new JSONArray();
+      for (Library library : requestManager.getLibrariesByIdList(idList)) {
+        LibraryAdditionalInfo lai = null;
+        if (isDetailedSampleEnabled()) {
+          lai = libraryAdditionalInfoService.get(library.getId());
+        }
+        libraryDtos.add(Dtos.asDto(library, lai));
+      }
+      model.put("title", "Bulk Create Dilutions");
+      model.put("librariesJSON", libraryDtos);
+      model.put("method", "Propagate");
+      return new ModelAndView("/pages/bulkEditDilutions.jsp", model);
+    } catch (IOException ex) {
+      if (log.isDebugEnabled()) {
+        log.error("Failed to get bulk libraries", ex);
+      }
+      throw ex;
+    }
+  }
+
+  public List<Long> getIdsFromString(String idString) {
+    String[] split = idString.split(",");
+    List<Long> idList = new ArrayList<Long>();
+    for (int i = 0; i < split.length; i++) {
+      idList.add(Long.parseLong(split[i]));
+    }
+    return idList;
   }
 
   @RequestMapping(method = RequestMethod.POST)

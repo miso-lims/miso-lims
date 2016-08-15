@@ -31,6 +31,11 @@ Library.hot = {
    * Makes create/edit libraries table
    */
   makeHOT: function (startingValues) {
+    // assign functions which will be required during save
+    Hot.buildDtoFunc = Library.hot.buildDtos;
+    Hot.saveOneFunc = Library.hot.saveOne;
+    Hot.updateOneFunc = Library.hot.saveOne;
+    
     Hot.colConf = Library.hot.setColumnData(Hot.detailedSample);
     
     if (!startingValues) {
@@ -486,7 +491,7 @@ Library.hot = {
   /**
    * Creates the Library Dtos to pass to the server
    */
-  buildLibraryDtosFromData: function (obj) {
+  buildDtos: function (obj) {
     var lib = {};
     
     if (obj.id) {
@@ -567,60 +572,18 @@ Library.hot = {
   /**
    * Posts a single library to server and processes result
    */
-  saveOneLibrary: function (data, rowIndex, numberToSave, callback) {
+  saveOne: function (data, rowIndex, numberToSave, callback) {
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function() {
       if (xhr.readyState === XMLHttpRequest.DONE) {
       callback(); // Indicate request has completed.
-        xhr.status === 201 ? Library.hot.successSave(xhr, rowIndex, numberToSave) : Library.hot.failSave(xhr, rowIndex, numberToSave);
+        xhr.status === 201 ? Library.hot.successSave(xhr, rowIndex, numberToSave) : Hot.failSave(xhr, rowIndex, numberToSave);
       }
     };
-    xhr.open('POST', '/miso/rest/library');
+    var restMethod = (Library.hot.propagateOrEdit == 'Edit' ? 'PUT' : 'POST');
+    xhr.open(restMethod, '/miso/rest/library');
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.send(data);
-  },
-  
-  /**
-   * Puts a single library to server and processes result
-   */
-  updateOneLibrary: function (data, libraryId, rowIndex, numberToSave, callback) {
-    var xhr = new XMLHttpRequest();
-    xhr.onreadystatechange = function () {
-      if (xhr.readyState === XMLHttpRequest.DONE) {
-        callback(); // Indicate request has completed.
-        xhr.status === 200 ? Library.hot.successSave(xhr, rowIndex, numberToSave) : Library.hot.failSave(xhr, rowIndex, numberToSave);
-      }
-    };
-    xhr.open('PUT', '/miso/rest/library/' + libraryId);
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.send(data);
-  },
-  
-  /**
-   * Processes a failure to save (adds invalid attribute to cell, creates user message)
-   */
-  failSave: function (xhr, rowIndex, numberToSave) {
-    console.log(xhr);
-    var responseText = JSON.parse(xhr.responseText);
-    if (xhr.status >= 500 || responseText.detail == undefined) {
-      Hot.messages.failed.push("<b>Row " + (rowIndex + 1) + ": Something went terribly wrong. Please file a ticket with a screenshot or "
-          + "copy-paste of the data that you were trying to save.</b>");
-    } else {
-      var allColumnData = Hot.getValues('data', Hot.colConf);
-      var column, columnIndex;
-      if (responseText.data && responseText.data.constraintName) {
-        // if a column's constraint was violated, extract it here
-        column = responseText.data.constraintName;
-        columnIndex = allColumnData.indexOf(column);
-      }
-      if (rowIndex !== undefined && columnIndex !== -1 && columnIndex !== undefined) {
-        Hot.hotTable.setCellMeta(rowIndex, columnIndex, 'valid', false);
-      }
-      // process error message if it was a SQL violation, and add any errors to the messages array
-      var reUserMessage = /could not execute .*?: (.*)/;
-      Hot.messages.failed.push("Row "+ (rowIndex + 1) +": "+ responseText.detail.replace(reUserMessage, "$1"));
-    }
-    Hot.addSuccessesAndErrors();
   },
   
   /**
@@ -648,106 +611,19 @@ Library.hot = {
   },
   
   /**
-   * Checks if cells are all valid. If yes, POSTs libraries that need to be saved.
+   * Checks if cells are all valid. If yes, saves libraries that need to be saved.
    */
-  createData: function () {
+  saveData: function () {
     var continueValidation = Hot.cleanRowsAndToggleSaveButton();
     if (continueValidation === false) return false;
     
     Hot.hotTable.validateCells(function (isValid) {
       if (isValid) {
-        // send it through the parser to get a sampleData array that isn't merely a reference to Hot.hotTable.getSourceData()
-        libsData = JSON.parse(JSON.parse(JSON.stringify(Hot.hotTable.getSourceData())));
-          
-        // add previously-saved aliases to success message, and placeholders for items to be saved
-        Hot.messages.success = libsData.map(function (lib) { return (lib.saved === true ? lib.alias : null); });
-    
-        // Array of save functions, one for each line in the table
-        var libsSaveArray = Library.hot.getArrayOfNewObjects(libsData);
-        Hot.serial(libsSaveArray); // Execute saves serially     
+        Hot.saveTableData("alias", Library.hot.propagateOrEdit); 
       } else {
         Hot.validationFails();
         return false;
       }
     });
-  },
-  
-  /**
-   * Checks if cells are all valid. If yes, PUTs libraries that need to be saved.
-   */
-  updateData: function () {
-    var continueValidation = Hot.cleanRowsAndToggleSaveButton();
-    if (continueValidation === false) return false;
-    
-    Hot.hotTable.validateCells(function (isValid) {
-      if (isValid) {
-        // send it through the parser to get a sampleData array that isn't merely a reference to Hot.hotTable.getSourceData()
-        libsData = JSON.parse(JSON.parse(JSON.stringify(Hot.hotTable.getSourceData())));
-        
-     // add previously-saved aliases to success message, and placeholders for items to be saved
-        Hot.messages.success = libsData.map(function (lib) { return (lib.saved === true ? lib.alias : null); });
-        
-        // Array of save functions, one for each line in the table
-        var libsSaveArray = Library.hot.getArrayOfUpdatedObjects(libsData);
-        Hot.serial(libsSaveArray); // Execute saves serially     
-      } else {
-        Hot.validationFails();
-        return false;
-      }
-    });
-  },
-  
-  /**
-   * Creates Library Dtos for libraries to be POSTed
-   */
-  getArrayOfNewObjects: function (libraryData) {
-    // Returns a save function for a single line in the table.
-    function librarySaveFunction(data, index, numberToSave) {
-      // The callback is called once the http request in saveOneLibrary completes.
-      return function(callback) {
-        Library.hot.saveOneLibrary(data, index, numberToSave, callback);
-      };
-    }
-    var len = libraryData.length;
-    var arrayOfObjects = [];
-    
-    // return an array of libraries or saveFunctions for libraries
-    for (var i = 0; i < len; i++) {
-      if (libraryData[i].saved) continue;
-      
-      var newLibrary = Library.hot.buildLibraryDtosFromData(libraryData[i]);
-      if (Hot.detailedSample) {
-        arrayOfObjects.push(librarySaveFunction(JSON.stringify(newLibrary), i, len));
-      } else {
-        arrayOfObjects.push(newLibrary);
-      }
-    }
-    return arrayOfObjects;
-  },
-  
-  /**
-   * Creates Library Dtos for libraries to be PUT-ed
-   */
-  getArrayOfUpdatedObjects: function (libraryData) {
-    // Returns a save function for a single line in the table.
-    function librarySaveFunction(data, id, rowIndex, numberToSave) {
-      // The callback is called once the http request in saveOneLibrary completes.
-      return function(callback) {
-        Library.hot.updateOneLibrary(data, id, rowIndex, numberToSave, callback);
-      };
-    }
-    var len = libraryData.length;
-    var arrayOfObjects = [];
-    
-    // return an array of samples or saveFunctions for samples
-    for (var i = 0; i < len; i++) {
-      if (libraryData[i].saved) continue;
-      
-      var newLibrary = Library.hot.buildLibraryDtosFromData(libraryData[i]);
-      
-      // all updated objects go through the REST WS
-      arrayOfObjects.push(librarySaveFunction(JSON.stringify(newLibrary), newLibrary.id, i, len));
-    }
-    return arrayOfObjects;
   }
 };

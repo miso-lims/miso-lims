@@ -337,13 +337,19 @@ public class HibernateSampleDao implements SampleDao {
     return fetchSqlStore(records);
   }
 
+  /**
+   * Lazy-gets samples associated with a given Project
+   * 
+   * @param Long projectId
+   * @return Collection<Sample> samples
+   */
   @Override
   public Collection<Sample> listByProjectId(long projectId) throws IOException {
     Query query = currentSession().createQuery("from SampleImpl where project.id like :id");
     query.setLong("id", projectId);
     @SuppressWarnings("unchecked")
     List<Sample> records = query.list();
-    return fetchSqlStore(records);
+    return records;
   }
 
   @Override

@@ -266,7 +266,7 @@ Library.dilution = {
                  return (a.alias > b.alias) - (a.alias < b.alias);
               });
             	jQuery.each(json.targetedResequencings, function(index, item) {
-            		selectElem.append(new Option(item.alias, item.targetedSequencingId));
+            		selectElem.append(new Option(item.alias, item.targetedResequencingId));
             	});
 	        	}
           }
@@ -1217,25 +1217,13 @@ Library.ui = {
     // window.location = "library/bulk/" + selectedIdsArray.join(',');
   },
   
-  // TODO: finish this, and the one in sample_ajax.js
   makeDilutionsFromSelectedItems: function () {
     var selectedIdsArray = Library.ui.getSelectedIds();
     if (selectedIdsArray.length === 0) {
       alert("Please select one or more Libraries to dilute.");
       return false;
     }
-    var cageDiv = '<div id="cageDialog"><span class="dialog">Look for this feature in the next release!<br>' 
-      + '<img src="http://images.mentalfloss.com/sites/default/files/styles/insert_main_wide_image/public/uncanny_valley.jpg"/></span></div>';
-    document.getElementById('go').insertAdjacentHTML('afterend', cageDiv);
-    jQuery('#cageDialog').dialog({
-      modal: true,
-      width: 640,
-      buttons: {
-        "Ok": function () {
-          jQuery(this).dialog("close");
-        }
-      }
-    });
+    window.location="library/dilutions/bulk/propagate/" + selectedIdsArray.join(',');
   },
   
   // TODO: finish this, and the one in sample_ajax.js
