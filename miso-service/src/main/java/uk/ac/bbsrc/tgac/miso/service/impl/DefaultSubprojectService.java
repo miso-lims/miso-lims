@@ -38,13 +38,12 @@ public class DefaultSubprojectService implements SubprojectService {
     authorizationManager.throwIfUnauthenticated();
     return subprojectDao.getSubproject(subprojectId);
   }
-  
 
   @Override
   public Long create(Subproject subproject, Long parentProjectId) throws IOException {
     authorizationManager.throwIfNonAdmin();
     User user = authorizationManager.getCurrentUser();
-    Project parentProject = sqlProjectDAO.get(parentProjectId);
+    Project parentProject = sqlProjectDAO.lazyGet(parentProjectId);
     subproject.setCreatedBy(user);
     subproject.setUpdatedBy(user);
     subproject.setParentProject(parentProject);
