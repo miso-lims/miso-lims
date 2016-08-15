@@ -50,6 +50,9 @@ public class LDAPSecurityManager extends LocalSecurityManager implements MisoSec
   /** Field log */
   protected static final Logger log = LoggerFactory.getLogger(LDAPSecurityManager.class);
 
+  private static final String SECURITY_METHOD = "security.method";
+  private static final String ACTIVE_DIRECTORY = "ad";
+
   @Autowired
   private LdapUserDetailsManager ldapUserManager;
 
@@ -146,12 +149,21 @@ public class LDAPSecurityManager extends LocalSecurityManager implements MisoSec
       }
       return jdbcUser.getUserId();
     } else {
-      if (!isStringEmptyOrNull(user.getPassword())) {
+      if (!isStringEmptyOrNull(user.getPassword()) || isActiveDirectoryAuthentication()) {
         log.info("Creating " + user.getLoginName() + " in LIMS");
         return super.saveUser(user);
       }
       throw new IOException("Cannot create new user with no password");
     }
+  }
+
+  /**
+   * Active Directory does not return a password.
+   * 
+   * @return True if authentication method is Active Directory
+   */
+  private boolean isActiveDirectoryAuthentication() {
+    return System.getProperty(SECURITY_METHOD).equals(ACTIVE_DIRECTORY);
   }
 
   @Override
