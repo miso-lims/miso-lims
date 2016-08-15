@@ -1,3 +1,5 @@
+-- standard_oicr_config
+--StartNoTest
 -- Standard values for an OICR MISO instance
 
 INSERT INTO BoxSize (`rows`, `columns`, scannable) VALUES
@@ -10,18 +12,6 @@ INSERT INTO BoxUse (alias) VALUES
   ('Tissue'),
   ('Sequencing'),
   ('Plate');
-
---DELETE FROM `LibraryDesignType`;
---INSERT INTO LibraryDesignType (name, description) VALUES
---  ('WG', 'Whole genome'),
---  ('EX', 'Exome'),
---  ('TS', 'Targeted sequencing'),
---  ('TR', 'Total RNA library (no selection)'),
---  ('WT', 'Whole transcriptome'),
---  ('SM', 'smRNA'),
---  ('MR', 'mRNA'),
---  ('CH', 'ChIP'),
---  ('BS', 'Bisulphite');
 
 INSERT INTO `LibraryType` (description, platformType) VALUES
   ('cDNA', 'PacBio'),
@@ -767,3 +757,168 @@ INSERT INTO ReferenceGenome (alias) VALUES
   ('S. aureus'),
   ('de novo assembly'),
   ('See comments');
+--EndNoTest
+
+-- oicr_sequencers
+--StartNoTest
+INSERT INTO SequencerReference (referenceId, name, ipAddress, platformId, available, serialNUmber, dateCommissioned, dateDecommissioned, upgradedSequencerReferenceId) VALUES 
+(1, 'D00331', UNHEX('7F000001'), 16, 1, 'HSQ-D00331', '2014-01-03', NULL, NULL),
+(2, 'D00343', UNHEX('7F000001'), 16, 1, 'D00343', '2014-01-15', NULL, NULL),
+(3, 'D00353', UNHEX('7F000001'), 16, 1, NULL, '2013-12-17', NULL, NULL),
+(4, 'D00355', UNHEX('7F000001'), 16, 1, NULL, '2014-01-15', NULL, NULL),
+(5, 'SN1068', UNHEX('7F000001'), 16, 1, 'HSQ-7001068', '2012-02-03', NULL, NULL),
+(6, 'SN1080', UNHEX('7F000001'), 16, 1, 'HSQ-7001080', '2011-10-18', NULL, NULL),
+(7, 'SN7001179', UNHEX('7F000001'), 16, 1, 'HSQ-7001179', '2012-02-22', NULL, NULL),
+(8, 'SN7001205', UNHEX('7F000001'), 16, 1, 'HSQ-7001205', '2015-10-30', NULL, NULL),
+(9, 'SN203', UNHEX('7F000001'), 16, 1, 'HSQ-700203N', '2010-07-23', NULL, NULL),
+(10, 'h203', UNHEX('7F000001'), 16, 1, 'HSQ-700203N', '2010-07-23', '2010-10-22', 9),
+(11, 'SN231', UNHEX('7F000001'), 16, 1, NULL, '2010-07-23', '2010-10-04', NULL),
+(12, 'h239', UNHEX('7F000001'), 16, 1, NULL, '2010-07-23', NULL, NULL),
+(13, 'SN393', UNHEX('7F000001'), 16, 1, NULL, '2010-10-19', '2011-11-18', NULL),
+(14, 'SN801', UNHEX('7F000001'), 16, 1, 'HSQ-700801', '2011-04-08', NULL, NULL),
+(15, 'SN802', UNHEX('7F000001'), 16, 1, 'HSQ-700802', '2011-04-08', NULL, NULL),
+(16, 'SN803', UNHEX('7F000001'), 16, 1, 'HSQ-700803', '2011-04-08', '2011-10-28', NULL),
+(17, 'SN804', UNHEX('7F000001'), 16, 1, 'HSQ-700804', '2011-04-08', NULL, NULL),
+(18, 'M00146', UNHEX('7F000001'), 24, 1, 'MSQ-M146', '2011-10-04', NULL, NULL),
+(19, 'M00753', UNHEX('7F000001'), 24, 1, NULL, '2012-05-30', NULL, NULL);
+--EndNoTest
+
+-- update_seqs_and_params
+--StartNoTest
+UPDATE SequencerReference SET platformId = 26 WHERE platformId = 16;
+
+UPDATE SequencingParameters SET platformId = 26 WHERE platformId IN (16, 25);
+UPDATE SequencingParameters SET name = 'v3 2×300', paired = 1 WHERE name = '300×200';
+--EndNoTest
+
+-- delete_ls454_and_solid
+--StartNoTest
+DELETE FROM KitDescriptor WHERE platformType IN ('LS454','Solid');
+DELETE FROM TagBarcodes WHERE tagFamilyId IN (SELECT tagFamilyId FROM TagBarcodeFamily WHERE platformType = 'LS454');
+DELETE FROM TagBarcodeFamily WHERE platformType = 'LS454';
+--EndNoTest
+
+-- library_design
+--StartNoTest
+INSERT INTO LibraryDesign(name, sampleClassId, libraryType, librarySelectionType, libraryStrategyType, suffix) VALUES
+  ('WG', (SELECT sampleClassId FROM SampleClass WHERE sampleCategory = 'Analyte' AND alias = 'gDNA (stock)'),  (SELECT libraryTypeId FROM LibraryType WHERE platformType = 'Illumina' AND description = 'Paired End'), (SELECT librarySelectionTypeId FROM LibrarySelectionType WHERE name = 'PCR'), (SELECT libraryStrategyTypeId FROM LibraryStrategyType WHERE name = 'WGS'), '_WG'),
+  ('TS (Hybrid Selection)', (SELECT sampleClassId FROM SampleClass WHERE sampleCategory = 'Analyte' AND alias = 'gDNA (stock)'),  (SELECT libraryTypeId FROM LibraryType WHERE platformType = 'Illumina' AND description = 'Paired End'), (SELECT librarySelectionTypeId FROM LibrarySelectionType WHERE name = 'Hybrid Selection'), (SELECT libraryStrategyTypeId FROM LibraryStrategyType WHERE name = 'AMPLICON'), '_TS'),
+  ('TS (PCR)', (SELECT sampleClassId FROM SampleClass WHERE sampleCategory = 'Analyte' AND alias = 'gDNA (stock)'),  (SELECT libraryTypeId FROM LibraryType WHERE platformType = 'Illumina' AND description = 'Paired End'), (SELECT librarySelectionTypeId FROM LibrarySelectionType WHERE name = 'PCR'), (SELECT libraryStrategyTypeId FROM LibraryStrategyType WHERE name = 'AMPLICON'), '_TS'),
+  ('EX', (SELECT sampleClassId FROM SampleClass WHERE sampleCategory = 'Analyte' AND alias = 'gDNA (stock)'),  (SELECT libraryTypeId FROM LibraryType WHERE platformType = 'Illumina' AND description = 'Paired End'), (SELECT librarySelectionTypeId FROM LibrarySelectionType WHERE name = 'Hybrid Selection'), (SELECT libraryStrategyTypeId FROM LibraryStrategyType WHERE name = 'WXS'), '_EX'),
+  ('SM', (SELECT sampleClassId FROM SampleClass WHERE sampleCategory = 'Analyte' AND alias = 'cDNA (stock)'),  (SELECT libraryTypeId FROM LibraryType WHERE platformType = 'Illumina' AND description = 'Small RNA'), (SELECT librarySelectionTypeId FROM LibrarySelectionType WHERE name = 'size fractionation'), (SELECT libraryStrategyTypeId FROM LibraryStrategyType WHERE name = 'RNA-Seq'), '_SM'),
+  ('WT', (SELECT sampleClassId FROM SampleClass WHERE sampleCategory = 'Analyte' AND alias = 'cDNA (stock)'),  (SELECT libraryTypeId FROM LibraryType WHERE platformType = 'Illumina' AND description = 'Whole Transcriptome'), (SELECT librarySelectionTypeId FROM LibrarySelectionType WHERE name = 'cDNA'), (SELECT libraryStrategyTypeId FROM LibraryStrategyType WHERE name = 'RNA-Seq'), '_WT'),
+  ('MR', (SELECT sampleClassId FROM SampleClass WHERE sampleCategory = 'Analyte' AND alias = 'cDNA (stock)'),  (SELECT libraryTypeId FROM LibraryType WHERE platformType = 'Illumina' AND description = 'mRNA Seq'), (SELECT librarySelectionTypeId FROM LibrarySelectionType WHERE name = 'cDNA'), (SELECT libraryStrategyTypeId FROM LibraryStrategyType WHERE name = 'RNA-Seq'), '_WT'),
+  ('CH', (SELECT sampleClassId FROM SampleClass WHERE sampleCategory = 'Analyte' AND alias = 'gDNA (stock)'),  (SELECT libraryTypeId FROM LibraryType WHERE platformType = 'Illumina' AND description = 'Single End'), (SELECT librarySelectionTypeId FROM LibrarySelectionType WHERE name = 'ChIP'), (SELECT libraryStrategyTypeId FROM LibraryStrategyType WHERE name = 'ChIP-Seq'), '_CH');
+--EndNoTest
+
+-- add_cbots
+--StartNoTest
+INSERT INTO Platform (name, instrumentModel, description, numContainers) VALUES ('Illumina', 'cBot 2', 'Cluster generation system', 1);
+INSERT INTO SequencerReference (name, ipAddress, platformId, available) VALUES 
+  ('cBot 3', UNHEX('7F000001'), (SELECT platformId FROM Platform WHERE instrumentModel = 'cBot 2'), 1),
+  ('cBot 4', UNHEX('7F000001'), (SELECT platformId FROM Platform WHERE instrumentModel = 'cBot 2'), 1),
+  ('cBot 5', UNHEX('7F000001'), (SELECT platformId FROM Platform WHERE instrumentModel = 'cBot 2'), 1),
+  ('cBot 6', UNHEX('7F000001'), (SELECT platformId FROM Platform WHERE instrumentModel = 'cBot 2'), 1);
+--EndNoTest
+
+-- add_more_SVRs
+--StartNoTest
+INSERT INTO SampleValidRelationship (parentId, childId, createdBy, creationDate, updatedBy, lastUpdated) VALUES 
+  ((SELECT sampleClassId FROM SampleClass WHERE alias = 'Primary Tumor Tissue'),(SELECT sampleClassId FROM SampleClass WHERE alias = 'gDNA (stock)'),1,NOW(),1,NOW()),
+  ((SELECT sampleClassId FROM SampleClass WHERE alias = 'Primary Tumor Tissue'),(SELECT sampleClassId FROM SampleClass WHERE alias = 'whole RNA (stock)'),1,NOW(),1,NOW()),
+  ((SELECT sampleClassId FROM SampleClass WHERE alias = 'Metastatic Tumor Tissue'),(SELECT sampleClassId FROM SampleClass WHERE alias = 'gDNA (stock)'),1,NOW(),1,NOW()),
+  ((SELECT sampleClassId FROM SampleClass WHERE alias = 'Metastatic Tumor Tissue'),(SELECT sampleClassId FROM SampleClass WHERE alias = 'whole RNA (stock)'),1,NOW(),1,NOW()),
+  ((SELECT sampleClassId FROM SampleClass WHERE alias = 'Reference Tissue'),(SELECT sampleClassId FROM SampleClass WHERE alias = 'gDNA (stock)'),1,NOW(),1,NOW()),
+  ((SELECT sampleClassId FROM SampleClass WHERE alias = 'Reference Tissue'),(SELECT sampleClassId FROM SampleClass WHERE alias = 'whole RNA (stock)'),1,NOW(),1,NOW()),
+  ((SELECT sampleClassId FROM SampleClass WHERE alias = 'Xenograft Tissue'),(SELECT sampleClassId FROM SampleClass WHERE alias = 'gDNA (stock)'),1,NOW(),1,NOW()),
+  ((SELECT sampleClassId FROM SampleClass WHERE alias = 'Xenograft Tissue'),(SELECT sampleClassId FROM SampleClass WHERE alias = 'whole RNA (stock)'),1,NOW(),1,NOW()),
+  ((SELECT sampleClassId FROM SampleClass WHERE alias = 'Cell Line'),(SELECT sampleClassId FROM SampleClass WHERE alias = 'gDNA (stock)'),1,NOW(),1,NOW()),
+  ((SELECT sampleClassId FROM SampleClass WHERE alias = 'Cell Line'),(SELECT sampleClassId FROM SampleClass WHERE alias = 'whole RNA (stock)'),1,NOW(),1,NOW());
+--EndNoTest
+
+-- refgen_comments
+--StartNoTest
+UPDATE ReferenceGenome SET alias = 'Special – Look in description' WHERE alias = 'See comments';
+--EndNoTest
+
+-- targeted_resequencing
+--StartNoTest
+insert into TargetedResequencing (alias, description, kitDescriptorId, createdBy, creationDate, updatedBy, lastUpdated) VALUES
+  ('BART_IAD40521_23', 'Used by the BART and BFS projects',(select kitDescriptorId from KitDescriptor where name = 'Ampliseq-Illumina V1'),1,NOW(),1,NOW()),
+  ('DYS_IAD78789_185', 'Used by the DYS project',(select kitDescriptorId from KitDescriptor where name = 'AmpliSeq-KAPA Hyper Prep V1'),1,NOW(),1,NOW()),
+  ('GECCO_IAD82491', 'Used by the GECCO project',(select kitDescriptorId from KitDescriptor where name = 'AmpliSeq-KAPA Hyper Prep V1'),1,NOW(),1,NOW());
+--EndNoTest
+
+-- box_size_use
+--StartNoTest
+INSERT INTO BoxSize (rows, columns, scannable) VALUES (9, 9, false);
+
+INSERT INTO BoxUse (`alias`)  VALUES ('Storage');
+INSERT INTO BoxUse (`alias`)  VALUES ('Libraries');
+
+UPDATE Box
+SET boxUseId = (SELECT boxUseId from BoxUse where BoxUse.`alias` = 'Libraries')
+WHERE Box.`boxUseId` = (SELECT boxUseId from BoxUse where BoxUse.`alias` = 'Plate');
+
+DELETE FROM BoxUse WHERE BoxUse.alias = 'Plate';
+--EndNoTest
+
+-- sequencer_update
+--StartNoTest
+DELETE FROM SequencingParameters WHERE SequencingParameters.name = 'v4 1×136';
+
+INSERT INTO Platform (name, instrumentModel, description, numContainers)
+VALUES ('Illumina', 'NextSeq 550', '4-channel flowgram', 1);
+
+INSERT INTO `SequencingParameters` (`platformId`, `name`, `createdBy`, `updatedBy`, `creationDate`, `lastUpdated`, `readLength`, `paired`, `xpath`)
+VALUES
+    ((SELECT platformId from Platform where Platform.`instrumentModel` = 'NextSeq 550'),'2×151', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 151, TRUE, '//PlannedRead1Cycles = 151 and //PlannedRead2Cycles = 151'),
+    ((SELECT platformId from Platform where Platform.`instrumentModel` = 'NextSeq 550'),'2×75', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 75, TRUE, '//PlannedRead1Cycles = 75 and //PlannedRead2Cycles = 75'),
+    ((SELECT platformId from Platform where Platform.`instrumentModel` = 'NextSeq 550'),'1×151', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 151, FALSE, '//PlannedRead1Cycles = 151 and not //PlannedRead2Cycles'),
+    ((SELECT platformId from Platform where Platform.`instrumentModel` = 'NextSeq 550'),'1×75', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 75, FALSE, '//PlannedRead1Cycles = 75 and not //PlannedRead2Cycles'),
+    ((SELECT platformId from Platform where Platform.`instrumentModel` = 'Illumina HiSeq 2500'),'2×251', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 251, TRUE, 'starts-with(//Flowcell, "HiSeq Rapid Flow Cell") and count(//Read[@NumCycles=251]) = 2'),
+    ((SELECT platformId from Platform where Platform.`instrumentModel` = 'Illumina MiSeq'),'1×51', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 51, FALSE, 'count(//RunInfoRead[@NumCycles=51]) = 1'),
+    ((SELECT platformId from Platform where Platform.`instrumentModel` = 'Illumina MiSeq'),'1×36', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 36, FALSE, 'count(//RunInfoRead[@NumCycles=36]) = 1'),
+    ((SELECT platformId from Platform where Platform.`instrumentModel` = 'Illumina MiSeq'),'1×151', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 151, FALSE, 'count(//RunInfoRead[@NumCycles=151]) = 1'),
+    ((SELECT platformId from Platform where Platform.`instrumentModel` = 'Illumina MiSeq'),'2x25', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 25, TRUE, 'count(//RunInfoRead[@NumCycles=25]) = 2'),
+    ((SELECT platformId from Platform where Platform.`instrumentModel` = 'Illumina MiSeq'),'2x251', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 251, TRUE, 'count(//RunInfoRead[@NumCycles=251]) = 2'),
+    ((SELECT platformId from Platform where Platform.`instrumentModel` = 'Illumina MiSeq'),'2x76', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 76, TRUE, 'count(//RunInfoRead[@NumCycles=76]) = 2'),
+    ((SELECT platformId from Platform where Platform.`instrumentModel` = 'Illumina MiSeq'),'2x301', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 301, TRUE, 'count(//RunInfoRead[@NumCycles=301]) = 2');
+
+DELETE FROM SequencerReference WHERE SequencerReference.name = 'p00118';
+
+INSERT INTO SequencerReference (name, ipAddress, platformId, available, serialNUmber, dateCommissioned, dateDecommissioned, upgradedSequencerReferenceId)
+VALUES 
+    ('NB551051', UNHEX('7F000001'), (SELECT platformId from Platform where Platform.`instrumentModel` = 'NextSeq 550'), 1, 'NB551051', '2016-04-26', NULL, NULL),
+    ('00118', UNHEX('7F000001'), (SELECT platformId from Platform where Platform.`instrumentModel` = 'PacBio RS'), 1, '00118', '2010-08-16', NULL, NULL);
+--EndNoTest
+
+-- add_barcodes
+--StartNoTest
+INSERT INTO TagBarcodeFamily(name, platformType) VALUES
+  ('454', 'LS454'),
+  ('iDES 8bp', 'ILLUMINA');
+
+INSERT INTO TagBarcodes(name, sequence, position, tagFamilyId) VALUES
+  ('Index 01', 'ATCACG', 1, (SELECT tagFamilyId FROM TagBarcodeFamily WHERE name = '454')),
+  ('Index 02', 'CGATGT', 1, (SELECT tagFamilyId FROM TagBarcodeFamily WHERE name = '454')),
+  ('Index 03', 'TTAGGC', 1, (SELECT tagFamilyId FROM TagBarcodeFamily WHERE name = '454')),
+  ('Index 04', 'TGACCA', 1, (SELECT tagFamilyId FROM TagBarcodeFamily WHERE name = '454')),
+  ('Index 05', 'ACAGTG', 1, (SELECT tagFamilyId FROM TagBarcodeFamily WHERE name = '454')),
+  ('Index 06', 'GCCAAT', 1, (SELECT tagFamilyId FROM TagBarcodeFamily WHERE name = '454')),
+  ('Index 07', 'CAGATC', 1, (SELECT tagFamilyId FROM TagBarcodeFamily WHERE name = '454')),
+  ('Index 08', 'ACTTGA', 1, (SELECT tagFamilyId FROM TagBarcodeFamily WHERE name = '454')),
+  ('Index 09', 'GATCAG', 1, (SELECT tagFamilyId FROM TagBarcodeFamily WHERE name = '454')),
+  ('Index 10', 'TAGCTT', 1, (SELECT tagFamilyId FROM TagBarcodeFamily WHERE name = '454')),
+
+  ('Index 01', 'ACGTCACA', 1, (SELECT tagFamilyId FROM TagBarcodeFamily WHERE name = 'iDES 8bp')),
+  ('Index 02', 'CTAAGTGG', 1, (SELECT tagFamilyId FROM TagBarcodeFamily WHERE name = 'iDES 8bp')),
+  ('Index 03', 'TGTAACCG', 1, (SELECT tagFamilyId FROM TagBarcodeFamily WHERE name = 'iDES 8bp')),
+  ('Index 04', 'TGACCATC', 1, (SELECT tagFamilyId FROM TagBarcodeFamily WHERE name = 'iDES 8bp')),
+  ('Index 05', 'AACTTGGC', 1, (SELECT tagFamilyId FROM TagBarcodeFamily WHERE name = 'iDES 8bp')),
+  ('Index 06', 'TCTCGGTT', 1, (SELECT tagFamilyId FROM TagBarcodeFamily WHERE name = 'iDES 8bp')),
+  ('Index 07', 'GTATGGAC', 1, (SELECT tagFamilyId FROM TagBarcodeFamily WHERE name = 'iDES 8bp')),
+  ('Index 08', 'TTCTGCCA', 1, (SELECT tagFamilyId FROM TagBarcodeFamily WHERE name = 'iDES 8bp')),
+  ('Index 09', 'CCAACGAA', 1, (SELECT tagFamilyId FROM TagBarcodeFamily WHERE name = 'iDES 8bp')),
+  ('Index 10', 'ACCACCTT', 1, (SELECT tagFamilyId FROM TagBarcodeFamily WHERE name = 'iDES 8bp'));
+--EndNoTest
