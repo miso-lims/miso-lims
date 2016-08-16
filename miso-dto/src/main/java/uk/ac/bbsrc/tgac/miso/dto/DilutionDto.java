@@ -10,7 +10,7 @@ public class DilutionDto {
   private String locationLabel;
   private Double concentration;
   private String creationDate;
-  private String dilutionUserName;
+  private String dilutionCreatorName;
   private Long targetedResequencingId;
   private LibraryDto library;
   private String libraryUrl;
@@ -66,11 +66,11 @@ public class DilutionDto {
   }
 
   public String getDilutionUserName() {
-    return dilutionUserName;
+    return dilutionCreatorName;
   }
 
   public void setDilutionUserName(String userName) {
-    this.dilutionUserName = userName;
+    this.dilutionCreatorName = userName;
   }
 
   public Long getTargetedResequencingId() {

@@ -88,15 +88,29 @@
       Library.hot.getLibraryTypeAliasLists();
 
       Library.hot.makeBulkCreateTable = function () {
-        Library.hot.librariesJSON = Library.hot.prepLibrariesForTable(Library.hot.librariesJSON);
+        Library.hot.librariesJSON = Library.hot.prepLibrariesForPropagate(Library.hot.librariesJSON);
         Library.hot.makeHOT(Library.hot.librariesJSON);
         Library.hot.addPlatformAndTBHooks();
+      };
+
+      Library.hot.makeBulkUpdateTable = function () {
+        Library.hot.librariesJSON = Library.hot.prepLibrariesForEdit(Library.hot.librariesJSON);
+        Library.hot.makeHOT(Library.hot.librariesJSON);
+        Library.hot.addPlatformAndTBHooks();
+
+        // source for barcode kit column depends on mandatory platform
+        var datalen = Hot.startData.length;
+        for (var i = 0; i < datalen; i++) {
+          Library.hot.updateTBFamilyCellsSources(i, Hot.startData[i].platformName);
+          Library.hot.updateTBCellsSources(i, Hot.startData[i].platformName, Hot.startData[i].tagBarcodeFamilyName);
+        }
       };
 
       // get SampleOptions and make the appropriate table
       // TODO: implement for plain sample
       if (Boolean(Hot.detailedSample)) {
         Hot.saveButton.addEventListener('click', Library.hot.saveData, true);
+        
         if (Library.hot.propagateOrEdit == 'Propagate') {
           Hot.fetchSampleOptions(Library.hot.makeBulkCreateTable);
   	    } else {

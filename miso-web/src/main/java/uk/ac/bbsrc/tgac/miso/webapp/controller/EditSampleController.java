@@ -42,9 +42,6 @@ import java.util.TreeSet;
 import javax.servlet.http.HttpServletResponse;
 
 import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,6 +66,8 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractPool;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSampleQC;
@@ -367,7 +366,7 @@ public class EditSampleController {
 
   // Handsontable
   @ModelAttribute("referenceDataJSON")
-  public JSONObject referenceDataJsonString() throws IOException, JSONException {
+  public JSONObject referenceDataJsonString() throws IOException {
     final JSONObject hot = new JSONObject();
     final List<String> sampleTypes = new ArrayList<String>(requestManager.listAllSampleTypes());
     final List<String> strStatuses = new ArrayList<String>();
@@ -378,7 +377,7 @@ public class EditSampleController {
       project.put("id", fullProject.getId());
       project.put("alias", fullProject.getAlias());
       project.put("name", fullProject.getName());
-      allProjects.put(project);
+      allProjects.add(project);
     }
     for (String strLabel : StrStatus.getLabels()) {
       strStatuses.add(strLabel);
@@ -752,11 +751,6 @@ public class EditSampleController {
     return requestManager.listAllChanges("Sample");
   }
 
-  @RequestMapping(value = "/bulk/dummy", method = RequestMethod.POST)
-  public String processSubmit() {
-    return null;
-  }
-
   /**
    * used to edit samples with ids from given {sampleIds} sends Dtos objects which will then be used for editing in grid
    */
@@ -769,7 +763,7 @@ public class EditSampleController {
         idList.add(Long.parseLong(split[i]));
       }
       ObjectMapper mapper = new ObjectMapper();
-      List<SampleDto> samplesDtos = new ArrayList<>();
+      JSONArray samplesDtos = new JSONArray();
       for (Sample sample : requestManager.getSamplesByIdList(idList)) {
         samplesDtos.add(Dtos.asDto(sample));
       }

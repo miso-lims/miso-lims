@@ -10,7 +10,7 @@ var Dilution = {
         };
       });
     },
-    
+
     /**
      * Make the Handsontable instance
      */
@@ -77,7 +77,27 @@ var Dilution = {
     getTarSeqs: function () {
       return Hot.sortByProperty(Dilution.hot.tarSeqs, 'targetedResequencingId').map(Hot.getAlias);
     },
-    
+
+    /**
+     * Gets the targeted resequencing alis for a given id
+     */
+    getTarSeqAliasFromId: function (tsID) {
+      var results = Dilution.hot.tarSeqs.filter(function (ts) {
+        return ts.targetedResequencingId == tsID;
+      });
+      return results.length > 0 ? results[0].alias : null;
+    },
+
+    /**
+     * Gets the targeted resequecing id for a given alias
+     */
+    getTarSeqIdFromAlias: function (tsAlias) {
+      var results = Dilution.hot.tarSeqs.filter(function (ts) {
+        return ts.alias == tsAlias;
+      });
+      return results.length > 0 ? results[0].targetedResequencingId : null;
+    },
+
     /**
      * Returns a list of the columns to be displayed for the current situation
      * params: string action: one of propagate or update
@@ -160,17 +180,25 @@ var Dilution = {
      */
     buildDtos: function (obj) {
       var dilution = {};
-      
-      if (obj.id) {
-        dilution.id = obj.id;
-        dilution.name = obj.name;
+
+      // wrap this in try/catch because this callback doesn't trigger error logging
+      try {
+        if (obj.id) {
+          dilution.id = obj.id;
+          dilution.name = obj.name;
+        }
+
+        dilution.library = obj.library;
+        dilution.identificationBarcode = obj.identificationBarcode;
+        dilution.concentration = obj.concentration;
+        dilution.creationDate = obj.creationDate;
+        if (Hot.detailedSample && obj.targetedResequencingAlias) {
+          dilution.targetedResequencingId = Dilution.hot.getTarSeqIdFromAlias(obj.targetedResequencingAlias);
+        }
+      } catch (e) {
+        console.log(e.error);
+        return null;
       }
-      
-      dilution.library = obj.library;
-      dilution.identificationBarcode = obj.identificationBarcode;
-      dilution.concentration = obj.concentration;
-      dilution.creationDate = obj.creationDate;
-      if (Hot.detailedSample) dilution.targetedResequencingId = Hot.getIdFromAlias(obj.targetedResequencingAlias, Dilution.hot.tarSeqs)
       return dilution;
     },
     
@@ -221,10 +249,6 @@ var Dilution = {
           return false;
         }
       });
-    },
-    
-    updateData: function () {
-      alert("Implement me!");
     },
     
     updateNameAndIDBC: function (xhr, rowIndex) {

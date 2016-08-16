@@ -945,12 +945,12 @@ public class Dtos {
       dto.setLastModified(getDateAsString(from.getLastModified()));
     }
     if (!from.getTagBarcodes().isEmpty()) {
-      dto.setTagBarcodeStrategyName(from.getTagBarcodes().get(0).getFamily().getName());
+      dto.setTagBarcodeFamilyName(from.getTagBarcodes().get(0).getFamily().getName());
       dto.setTagBarcodeIndex1Id(from.getTagBarcodes().get(0).getId());
       dto.setTagBarcodeIndex1Label(from.getTagBarcodes().get(0).getLabel());
       if (from.getTagBarcodes().size() > 1) {
         dto.setTagBarcodeIndex2Id(from.getTagBarcodes().get(1).getId());
-        dto.setTagBarcodeIndex2Label(from.getTagBarcodes().get(0).getLabel());
+        dto.setTagBarcodeIndex2Label(from.getTagBarcodes().get(1).getLabel());
       }
     }
     dto.setVolume(from.getVolume());

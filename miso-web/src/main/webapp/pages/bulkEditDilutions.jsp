@@ -87,38 +87,26 @@
         Dilution.hot.makeHOT(Dilution.hot.dilutionsJSON);
       };
 
-      Dilution.hot.makeBulkUpdateTable = function () {
-        alert("Implement me!");
-      };
-
+      Hot.saveButton.addEventListener('click', Dilution.hot.saveData, true);
+      // can only bulk create at this time, since no good way of selecting multiple dilutions to edit (no List Dilutions table)
       if (Hot.detailedSample) {
-	      if (Dilution.hot.propagateOrEdit == 'Propagate') {
-	        Hot.saveButton.addEventListener('click', Dilution.hot.createData, true);
-	        Fluxion.doAjax(
-	          'libraryControllerHelperService',
-	          'getTargetedResequencingTypes',
-	          {
-	            'url': ajaxurl
-	          },
-	          {
-	            'doOnSuccess': function (json) {
-	              Dilution.hot.tarSeqs = json.targetedResequencings;
-	              Dilution.hot.makeBulkCreateTable();
-	            }
-	          }
-	        );
-	      } else {
-	        Hot.saveButton.addEventListener('click', Dilution.hot.updateData, true);
-	        Dilution.hot.makeBulkUpdateTable();
-	      }
+       Hot.saveButton.addEventListener('click', Dilution.hot.createData, true);
+       Fluxion.doAjax(
+         'libraryControllerHelperService',
+         'getTargetedResequencingTypes',
+         {
+           'url': ajaxurl
+         },
+         {
+           'doOnSuccess': function (json) {
+             Dilution.hot.tarSeqs = json.targetedResequencings;
+             Dilution.hot.makeBulkCreateTable();
+           }
+         }
+       );
       } else {
-        if (Dilution.hot.propagateOrEdit == 'Propagate') {
-          Hot.saveButton.addEventListener('click', Dilution.hot.createData, true);
-          Dilution.hot.makeBulkCreateTable();
-        } else {
-          Hot.saveButton.addEventListener('click', Dilution.hot.updateData, true);
-          Dilution.hot.makeBulkUpdateTable();
-        }
+        // make standard table
+        Dilution.hot.makeBulkCreateTable();
       }
     });
   </script>
