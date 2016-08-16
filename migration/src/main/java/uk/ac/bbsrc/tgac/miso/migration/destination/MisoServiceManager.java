@@ -257,6 +257,7 @@ public class MisoServiceManager {
     if (sampleNamingScheme == null) {
       sampleNamingScheme = new OicrSampleNamingScheme();
       sampleNamingScheme.registerCustomNameGenerator("alias", new OicrSampleAliasGenerator());
+      sampleNamingScheme.setAllowDuplicateEntityName("alias", true);
     }
     return sampleNamingScheme;
   }
@@ -264,6 +265,7 @@ public class MisoServiceManager {
   private MisoNamingScheme<Library> getLibraryNamingScheme() {
     if (libraryNamingScheme == null) {
       libraryNamingScheme = new SimpleLibraryNamingScheme();
+      libraryNamingScheme.setAllowDuplicateEntityName("alias", true);
     }
     return libraryNamingScheme;
   }
