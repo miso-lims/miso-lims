@@ -9,14 +9,14 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleLCMTube;
 @JsonTypeName(value = SampleLCMTube.SAMPLE_CLASS_NAME)
 public class SampleLCMTubeDto extends SampleTissueProcessingDto {
 
-  private Integer cutsConsumed;
-  
-  public Integer getCutsConsumed() {
-    return cutsConsumed;
+  private Integer slidesConsumed;
+
+  public Integer getSlidesConsumed() {
+    return slidesConsumed;
   }
 
-  public void setCutsConsumed(Integer cutsConsumed) {
-    this.cutsConsumed = cutsConsumed;
+  public void setSlidesConsumed(Integer slidesConsumed) {
+    this.slidesConsumed = slidesConsumed;
   }
 
 }

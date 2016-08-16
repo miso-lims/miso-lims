@@ -38,12 +38,14 @@ import com.google.common.collect.Lists;
  * @since 0.0.2
  */
 public enum PlatformType {
-  ILLUMINA("Illumina"), LS454("LS454"), SOLID("Solid"), IONTORRENT("IonTorrent"), PACBIO("PacBio"), OXFORDNANOPORE("OxfordNanopore");
+  ILLUMINA("Illumina", false), LS454("LS454", true), SOLID("Solid", true), IONTORRENT("IonTorrent", false), PACBIO("PacBio",
+      false), OXFORDNANOPORE("OxfordNanopore", false);
 
   /**
    * Field key
    */
-  private String key;
+  private final String key;
+  private final boolean usesEmPCR;
   /**
    * Field lookup
    */
@@ -60,8 +62,9 @@ public enum PlatformType {
    * @param key
    *          of type String
    */
-  PlatformType(String key) {
+  PlatformType(String key, boolean usesEmPCR) {
     this.key = key;
+    this.usesEmPCR = usesEmPCR;
   }
 
   /**
@@ -103,5 +106,9 @@ public enum PlatformType {
       result.add(platformType.getKey());
     }
     return result;
+  }
+
+  public boolean usesEmPCR() {
+    return usesEmPCR;
   }
 }

@@ -27,11 +27,9 @@ public interface SampleDao extends SampleStore {
   /**
    * Determines whether an alias exists already
    * 
-   * @param alias
-   *          See if this alias already exists.
+   * @param alias See if this alias already exists.
    * @return True if the alias already exists.
-   * @throws IOException
-   *           If there are difficulties reading from the database.
+   * @throws IOException If there are difficulties reading from the database.
    */
   boolean aliasExists(String alias) throws IOException;
 
@@ -50,5 +48,7 @@ public interface SampleDao extends SampleStore {
       throws IOException;
 
   Long countAll() throws IOException;
+
+  Long countBySearch(String querystr) throws IOException;
 
 }

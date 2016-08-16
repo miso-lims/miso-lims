@@ -11,11 +11,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
@@ -25,6 +27,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.migration.util.UniqueKeyHashMap;
 
@@ -60,6 +63,10 @@ public class ValueTypeLookup {
   private Map<String, LibraryDesign> libraryDesignByName;
   private Map<Long, TagBarcode> tagBarcodeById;
   private Map<String, Map<String, TagBarcode>> tagBarcodeByFamilyAndSequence;
+  private Map<Long, QcType> sampleQcTypeById;
+  private Map<String, QcType> sampleQcTypeByName;
+  private Map<Long, QcType> libraryQcTypeById;
+  private Map<String, QcType> libraryQcTypeByName;
   
   /**
    * Create a ValueTypeLookup loaded with data from the provided MisoServiceManager
@@ -80,6 +87,8 @@ public class ValueTypeLookup {
     setLibraryTypes(misoServiceManager.getLibraryDao().listAllLibraryTypes());
     setLibraryDesigns(misoServiceManager.getLibraryDesignDao().getLibraryDesigns());
     setTagBarcodes(misoServiceManager.getTagBarcodeDao().listAllTagBarcodes());
+    setSampleQcTypes(misoServiceManager.getSampleQcDao().listAllSampleQcTypes());
+    setLibraryQcTypes(misoServiceManager.getLibraryQcDao().listAllLibraryQcTypes());
   }
   
   private void setSampleClasses(Collection<SampleClass> sampleClasses) {
@@ -229,6 +238,28 @@ public class ValueTypeLookup {
     }
     this.tagBarcodeById = mapById;
     this.tagBarcodeByFamilyAndSequence = mapByFamilyAndSequence;
+  }
+  
+  private void setSampleQcTypes(Collection<QcType> qcTypes) {
+    Map<Long, QcType> mapById = new UniqueKeyHashMap<>();
+    Map<String, QcType> mapByName = new UniqueKeyHashMap<>();
+    for (QcType qc : qcTypes) {
+      mapByName.put(qc.getName(), qc);
+      mapById.put(qc.getQcTypeId(), qc);
+    }
+    this.sampleQcTypeById = mapById;
+    this.sampleQcTypeByName = mapByName;
+  }
+  
+  private void setLibraryQcTypes(Collection<QcType> qcTypes) {
+    Map<Long, QcType> mapById = new UniqueKeyHashMap<>();
+    Map<String, QcType> mapByName = new UniqueKeyHashMap<>();
+    for (QcType qc : qcTypes) {
+      mapByName.put(qc.getName(), qc);
+      mapById.put(qc.getQcTypeId(), qc);
+    }
+    this.libraryQcTypeById = mapById;
+    this.libraryQcTypeByName = mapByName;
   }
   
   /**
@@ -430,6 +461,34 @@ public class ValueTypeLookup {
   }
   
   /**
+   * Attempts to find an existing Sample QcType
+   * 
+   * @param qcType a partially-formed QcType, which must have its ID or name set in order
+   * for this method to resolve the QcType
+   * @return the existing QcType if a matching one is found; null otherwise
+   */
+  public QcType resolveForSample(QcType qcType) {
+    if (qcType == null) return null;
+    if (qcType.getQcTypeId() != QcType.UNSAVED_ID) return sampleQcTypeById.get(qcType.getQcTypeId());
+    if (qcType.getName() != null) return sampleQcTypeByName.get(qcType.getName());
+    return null;
+  }
+  
+  /**
+   * Attempts to find an existing Library QcType
+   * 
+   * @param qcType a partially-formed QcType, which must have its ID or name set in order
+   * for this method to resolve the QcType
+   * @return the existing QcType if a matching one is found; null otherwise
+   */
+  public QcType resolveForLibrary(QcType qcType) {
+    if (qcType == null) return null;
+    if (qcType.getQcTypeId() != QcType.UNSAVED_ID) return libraryQcTypeById.get(qcType.getQcTypeId());
+    if (qcType.getName() != null) return libraryQcTypeByName.get(qcType.getName());
+    return null;
+  }
+  
+  /**
    * Resolves all value type entities for a Sample
    * 
    * @param sample the sample containing partially-formed value type entities
@@ -438,6 +497,13 @@ public class ValueTypeLookup {
    * @throws IOException if no value is found matching the available data in sample
    */
   public void resolveAll(Sample sample) throws IOException {
+    for (SampleQC qc : sample.getSampleQCs()) {
+      QcType type = resolveForSample(qc.getQcType());
+      if (type == null) throw new IOException(String.format("QcType not found: id=%d, name=%s",
+          qc.getQcType().getQcTypeId(), qc.getQcType().getName()));
+      qc.setQcType(type);
+    }
+    
     if (LimsUtils.isDetailedSample(sample)) {
       SampleAdditionalInfo detailed = (SampleAdditionalInfo) sample;
       
@@ -527,13 +593,21 @@ public class ValueTypeLookup {
       }
       library.setTagBarcodes(resolvedBarcodes);
     }
+    for (LibraryQC qc : library.getLibraryQCs()) {
+      QcType type = resolveForLibrary(qc.getQcType());
+      if (type == null) throw new IOException(String.format("QcType not found: id=%d, name=%s",
+          qc.getQcType().getQcTypeId(), qc.getQcType().getName()));
+      qc.setQcType(type);
+    }
     if (library.getLibraryAdditionalInfo() != null) {
       LibraryAdditionalInfo lai = library.getLibraryAdditionalInfo();
       
-      KitDescriptor kit = resolve(lai.getPrepKit());
-      if (kit == null) throw new IOException(String.format("KitDescriptor not found (id=%d or name=%s)",
-          lai.getPrepKit().getId(), lai.getPrepKit().getName()));
-      lai.setPrepKit(kit);
+      if (lai.getPrepKit() != null) { // optional field
+        KitDescriptor kit = resolve(lai.getPrepKit());
+        if (kit == null) throw new IOException(String.format("KitDescriptor not found (id=%d or name=%s)",
+            lai.getPrepKit().getId(), lai.getPrepKit().getName()));
+        lai.setPrepKit(kit);
+      }
       
       LibraryDesign ld = resolve(lai.getLibraryDesign());
       if (ld == null) throw new IOException("LibraryDesign not found");

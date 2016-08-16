@@ -26,7 +26,6 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -57,7 +56,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.LibraryAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
@@ -138,16 +136,10 @@ public class LibraryRestController extends RestController {
       tagBarcodes.add(tagBarcodeStrategyService.getTagBarcodeById(libraryDto.getTagBarcodeIndex2Id()));
     }
     library.setTagBarcodes(tagBarcodes);
-    Long id = requestManager.saveLibrary(library);
-    LibraryAdditionalInfo info = Dtos.to(libraryDto.getLibraryAdditionalInfo());
-    info.setLibrary(requestManager.getLibraryById(id));
-    if (create) {
-      libraryAdditionalInfoService.create(info, id);
-    } else {
-      info.setLibrary(library);
-      libraryAdditionalInfoService.update(info);
-    }
-    return id;
+    library.setLibraryAdditionalInfo(Dtos.to(libraryDto.getLibraryAdditionalInfo()));
+    library.getLibraryAdditionalInfo().setCreatedBy(user);
+    library.getLibraryAdditionalInfo().setUpdatedBy(user);
+    return requestManager.saveLibrary(library);
   }
 
   @RequestMapping(method = RequestMethod.POST, headers = { "Content-type=application/json" })

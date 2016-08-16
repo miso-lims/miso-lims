@@ -112,7 +112,7 @@ public class SampleController extends RestController {
 
       if (!isStringEmptyOrNull(sSearch)) {
         sampleSubset = sampleService.getByPageAndSizeAndSearch(iDisplayStart, iDisplayLength, sSearch, sortCol, sSortDir);
-        numMatches = new Long(sampleService.getBySearch(sSearch).size());
+        numMatches = sampleService.countBySearch(sSearch);
       } else {
         sampleSubset = sampleService.getByPageAndSize(iDisplayStart, iDisplayLength, sortCol, sSortDir);
         numMatches = numSamples;

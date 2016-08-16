@@ -181,6 +181,33 @@ The default configuration should work properly.
 For using LDAP, set the security method to `ldap`. Additional settings are
 needed for LDAP in the `security.properties`. Talk to your LDAP administrator.
 
+To use Active Directory, a specific kind of LDAP, set the security method to
+`ad`. Three additional settings are needed for Active Directory in the 
+`security.properties` file.
+
+| Property                    | Purpose                                                    |
+|-----------------------------|------------------------------------------------------------|
+|`security.ad.emailDomain`    | Domain added to username for lookup (e.g. ad.oicr.on.ca)   |
+|`security.ad.url`            | Url for Active Directory server (e.g. ldap://ad.oicr.on.ca)|
+|`security.ad.stripRolePrefix`| Prefix to be removed from group (e.g. MISO_)               |
+
+The search for a user is done against `userPrincipalName` which takes the form of
+an email address. To login the user will type their username and to do the lookup
+their username will be added to the domain specified in the property
+`security.ad.emailDomain`.
+
+Use the `security.ad.url` property to indicate the url for the Active Directory.
+Some valid examples are: `ad.oicr.on.ca`, `ldap://ad.oicr.on.ca:389` and
+`ldaps://ad.oicr.on.ca:636`.
+
+The groups used by MISO are `ROLE_INTERNAL` for regular users, `ROLE_EXTERNAL` for
+external collaborators and `ROLE_ADMIN` for administrators. If you find these names
+too general you may wish to add a prefix before adding these groups to your Active
+Directory. For example `MISO_ROLE_INTERNAL` gives a clearer indication as to what 
+the group is used for. In this case you will need to set the property
+`security.ad.stripRolePrefix` to the value `MISO_` to allow MISO to ignore the
+prefix.
+
 If using JDBC, once running, you should change the passwords of the `admin` and
 `notification` accounts.
 

@@ -367,6 +367,7 @@ public class ProjectControllerHelperService {
         JSONArray inner = new JSONArray();
 
         inner.add(TableHelper.hyperLinkify("/miso/project/" + project.getId(), project.getName()));
+        inner.add(TableHelper.hyperLinkify("/miso/project/" + project.getId(), project.getShortName()));
         inner.add(TableHelper.hyperLinkify("/miso/project/" + project.getId(), project.getAlias()));
         inner.add(project.getDescription());
         inner.add(project.getProgress().getKey());

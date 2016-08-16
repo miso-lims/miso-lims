@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Set;
+import java.util.TreeSet;
 
+import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 
 import com.eaglegenomics.simlims.core.Note;
@@ -36,12 +38,15 @@ import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.StrStatus;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
+import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleQcException;
 import uk.ac.bbsrc.tgac.miso.core.exception.ReportingException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAliquot, SampleStock, SampleTissue, SampleTissueProcessing,
     SampleCVSlide, SampleLCMTube, Identity {
+  
+  private static final Logger log = Logger.getLogger(DetailedSampleBuilder.class);
 
   @SuppressWarnings("unused")
   private static final long serialVersionUID = 1L;
@@ -67,6 +72,7 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAliquo
   private boolean emptied = false;
   private boolean isSynthetic = false;
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
+  private Collection<SampleQC> sampleQCs = new TreeSet<SampleQC>();
 
   // DetailedSample attributes
   private SampleAdditionalInfo parent;
@@ -106,11 +112,11 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAliquo
 
   // TissueProcessingSample attributes
   // CV Slide
-  private Integer cuts;
+  private Integer slides;
   private Integer discards;
   private Integer thickness;
   // LCM Tube
-  private Integer cutsConsumed;
+  private Integer slidesConsumed;
 
   public DetailedSampleBuilder() {
     this(null);
@@ -142,15 +148,25 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAliquo
   public void setProject(Project project) {
     this.project = project;
   }
-
+  
   @Override
-  public Collection<SampleQC> getSampleQCs() {
-    throw new UnsupportedOperationException("Method not implemented on builder");
+  public void addQc(SampleQC sampleQc) throws MalformedSampleQcException {
+    this.sampleQCs.add(sampleQc);
+    try {
+      sampleQc.setSample(this);
+    } catch (MalformedSampleException e) {
+      log.error("add QC", e);
+    }
   }
 
   @Override
-  public void setQCs(Collection<SampleQC> sampleQCs) {
-    throw new UnsupportedOperationException("Method not implemented on builder");
+  public Collection<SampleQC> getSampleQCs() {
+    return sampleQCs;
+  }
+
+  @Override
+  public void setQCs(Collection<SampleQC> qcs) {
+    this.sampleQCs = qcs;
   }
 
   @Override
@@ -530,17 +546,17 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAliquo
   }
 
   @Override
-  public Integer getCuts() {
-    return cuts;
+  public Integer getSlides() {
+    return slides;
   }
 
   @Override
-  public void setCuts(Integer cuts) {
-    this.cuts = cuts;
+  public void setSlides(Integer slides) {
+    this.slides = slides;
   }
 
   @Override
-  public Integer getCutsRemaining() {
+  public Integer getSlidesRemaining() {
     throw new UnsupportedOperationException("Method not implemented on builder");
   }
 
@@ -565,13 +581,13 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAliquo
   }
 
   @Override
-  public Integer getCutsConsumed() {
-    return cutsConsumed;
+  public Integer getSlidesConsumed() {
+    return slidesConsumed;
   }
 
   @Override
-  public void setCutsConsumed(Integer cutsConsumed) {
-    this.cutsConsumed = cutsConsumed;
+  public void setSlidesConsumed(Integer slidesConsumed) {
+    this.slidesConsumed = slidesConsumed;
   }
 
   @Override
@@ -621,11 +637,6 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAliquo
 
   @Override
   public void addNote(Note note) {
-    throw new UnsupportedOperationException("Method not implemented on builder");
-  }
-
-  @Override
-  public void addQc(SampleQC sampleQc) throws MalformedSampleQcException {
     throw new UnsupportedOperationException("Method not implemented on builder");
   }
 
@@ -810,13 +821,13 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAliquo
     case SampleTissueProcessing.CATEGORY_NAME:
       if (sampleClass.getAlias() == SampleCVSlide.SAMPLE_CLASS_NAME) {
         SampleCVSlide cvSlide = new SampleCVSlideImpl();
-        cvSlide.setCuts(cuts);
+        cvSlide.setSlides(slides);
         cvSlide.setDiscards(discards);
         cvSlide.setThickness(thickness);
         sample = cvSlide;
       } else if (sampleClass.getAlias() == SampleLCMTube.SAMPLE_CLASS_NAME) {
         SampleLCMTube lcmTube = new SampleLCMTubeImpl();
-        lcmTube.setCutsConsumed(cutsConsumed);
+        lcmTube.setSlidesConsumed(slidesConsumed);
         sample = lcmTube;
       } else {
         SampleTissueProcessing processing = new SampleTissueProcessingImpl();

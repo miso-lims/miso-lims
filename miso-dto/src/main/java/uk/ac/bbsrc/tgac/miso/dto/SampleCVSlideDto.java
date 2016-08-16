@@ -9,29 +9,29 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleCVSlide;
 @JsonTypeName(value = SampleCVSlide.SAMPLE_CLASS_NAME)
 public class SampleCVSlideDto extends SampleTissueProcessingDto {
 
-  private Integer cuts;
-  private Integer cutsRemaining;
+  private Integer slides;
+  private Integer slidesRemaining;
   private Integer discards;
   private Integer thickness;
 
-  public Integer getCuts() {
-    return cuts;
+  public Integer getSlides() {
+    return slides;
   }
 
-  public void setCuts(Integer cuts) {
-    this.cuts = cuts;
+  public void setSlides(Integer slides) {
+    this.slides = slides;
   }
 
-  public Integer getCutsRemaining() {
-    return cutsRemaining;
+  public Integer getSlidesRemaining() {
+    return slidesRemaining;
   }
 
-  public void setCutsRemaining(Integer cutsRemaining) {
-    this.cutsRemaining = cutsRemaining;
+  public void setSlidesRemaining(Integer slidesRemaining) {
+    this.slidesRemaining = slidesRemaining;
   }
 
-  public void setCutsRemaining() {
-    this.cutsRemaining = getCuts() - getDiscards();
+  public void setSlidesRemaining() {
+    this.slidesRemaining = getSlides() - getDiscards();
   }
 
   public Integer getDiscards() {

@@ -92,6 +92,15 @@
   </servlet-mapping>
 
   <filter>
+    <filter-name>metricsFilter</filter-name>
+    <filter-class>uk.ac.bbsrc.tgac.miso.webapp.context.PrometheusCollectionFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>metricsFilter</filter-name>
+    <url-pattern>/miso/*</url-pattern>
+  </filter-mapping>
+
+  <filter>
     <filter-name>exposeRequestUrlFilter</filter-name>
     <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
   </filter>
@@ -137,6 +146,18 @@
     <filter-name>springSecurityFilterChain</filter-name>
     <url-pattern>/*</url-pattern>
   </filter-mapping>
+  <!-- Prometheus monitoring servlet -->
+  <servlet>
+    <servlet-name>metrics</servlet-name>
+    <servlet-class>
+      io.prometheus.client.exporter.MetricsServlet
+    </servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>metrics</servlet-name>
+    <url-pattern>/metrics</url-pattern>
+  </servlet-mapping>
 
 
   <error-page>

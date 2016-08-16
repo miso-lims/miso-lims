@@ -13,31 +13,31 @@ public class SampleCVSlideImpl extends SampleTissueProcessingImpl implements Sam
 
   private static final long serialVersionUID = 1L;
 
-  private Integer cuts;
+  private Integer slides;
 
   private Integer discards;
 
   private Integer thickness;
 
   @Override
-  public Integer getCuts() {
-    return cuts;
+  public Integer getSlides() {
+    return slides;
   }
 
   @Override
-  public void setCuts(Integer cuts) {
-    this.cuts = cuts;
+  public void setSlides(Integer slides) {
+    this.slides = slides;
   }
 
   @Override
-  public Integer getCutsRemaining() {
-    int cutsConsumed = 0;
+  public Integer getSlidesRemaining() {
+    int slidesConsumed = 0;
     for (Sample child : getChildren()) {
-      if (child != null && child instanceof SampleLCMTube && ((SampleLCMTube) child).getCutsConsumed() != null) {
-        cutsConsumed += ((SampleLCMTube) child).getCutsConsumed();
+      if (child != null && child instanceof SampleLCMTube && ((SampleLCMTube) child).getSlidesConsumed() != null) {
+        slidesConsumed += ((SampleLCMTube) child).getSlidesConsumed();
       }
     }
-    return (getCuts() - getDiscards() - cutsConsumed);
+    return (getSlides() - getDiscards() - slidesConsumed);
   }
 
   @Override

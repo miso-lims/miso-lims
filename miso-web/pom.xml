@@ -88,7 +88,6 @@
                 <jsSourceExclude>natural_sort.js</jsSourceExclude>
                 <jsSourceExclude>xregexp-all-min.js</jsSourceExclude>
                 <jsSourceExclude>runCalendar.js</jsSourceExclude>
-                <jsSourceExclude>sortable.js</jsSourceExclude>
               </jsSourceExcludes>
               <jsFinalFile>header_script.js</jsFinalFile>
             </configuration>
@@ -583,6 +582,21 @@
     <dependency>
       <groupId>org.codehaus.jackson</groupId>
       <artifactId>jackson-mapper-asl</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.prometheus</groupId>
+      <artifactId>simpleclient</artifactId>
+      <version>0.0.15</version>
+    </dependency>
+    <dependency>
+      <groupId>io.prometheus</groupId>
+      <artifactId>simpleclient_hotspot</artifactId>
+      <version>0.0.15</version>
+    </dependency>
+    <dependency>
+      <groupId>io.prometheus</groupId>
+      <artifactId>simpleclient_servlet</artifactId>
+      <version>0.0.15</version>
     </dependency>
   </dependencies>
   <properties>

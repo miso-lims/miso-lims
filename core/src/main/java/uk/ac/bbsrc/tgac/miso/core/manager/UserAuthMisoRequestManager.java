@@ -2669,4 +2669,13 @@ public class UserAuthMisoRequestManager implements RequestManager {
     // We don't throw because the user has no real control over this.
     return readCheck(o) ? o : null;
   }
+
+  @Override
+  public Project lazyGetProjectById(long projectId) throws IOException {
+    Project o = backingManager.lazyGetProjectById(projectId);
+    if (readCheck(o))
+      return o;
+    else
+      throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Project " + projectId);
+  }
 }

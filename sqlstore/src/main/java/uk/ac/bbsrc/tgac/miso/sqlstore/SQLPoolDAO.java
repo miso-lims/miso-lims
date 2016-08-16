@@ -694,11 +694,11 @@ public class SQLPoolDAO implements PoolStore {
   @Override
   public Collection<Pool<? extends Poolable<?, ?>>> listByProjectId(long projectId) throws IOException {
     List<Pool<? extends Poolable<?, ?>>> lpools = template
-        .query(DILUTION_POOL_SELECT_BY_RELATED_PROJECT, new Object[] { projectId }, new PoolMapper());
+        .query(DILUTION_POOL_SELECT_BY_RELATED_PROJECT, new Object[] { projectId }, new PoolMapper(true));
     List<Pool<? extends Poolable<?, ?>>> epools = template
-        .query(EMPCR_POOL_SELECT_BY_RELATED_PROJECT, new Object[] { projectId }, new PoolMapper());
+        .query(EMPCR_POOL_SELECT_BY_RELATED_PROJECT, new Object[] { projectId }, new PoolMapper(true));
     List<Pool<? extends Poolable<?, ?>>> ppools = template
-        .query(PLATE_POOL_SELECT_BY_RELATED_PROJECT, new Object[] { projectId }, new PoolMapper());
+        .query(PLATE_POOL_SELECT_BY_RELATED_PROJECT, new Object[] { projectId }, new PoolMapper(true));
     lpools.addAll(epools);
     lpools.addAll(ppools);
     return lpools;
@@ -757,6 +757,10 @@ public class SQLPoolDAO implements PoolStore {
 
   public Collection<? extends Poolable<?, ?>> listPoolableElementsByPoolId(long poolId) throws IOException {
     return template.query(POOL_ELEMENT_SELECT_BY_POOL_ID, new Object[] { poolId }, new PoolableMapper());
+  }
+
+  public Collection<? extends Poolable<?, ?>> lazyListPoolableElementsByPoolId(long poolId) throws IOException {
+    return template.query(POOL_ELEMENT_SELECT_BY_POOL_ID, new Object[] { poolId }, new PoolableMapper(true));
   }
 
   @Override
@@ -847,7 +851,8 @@ public class SQLPoolDAO implements PoolStore {
         p.setPlatformType(pt);
 
         if (pt != null) {
-          Collection<? extends Poolable<?, ?>> poolables = listPoolableElementsByPoolId(id);
+          Collection<? extends Poolable<?, ?>> poolables = (isLazy() ? lazyListPoolableElementsByPoolId(id)
+              : listPoolableElementsByPoolId(id));
           p.setPoolableElements(poolables);
         }
 
@@ -910,7 +915,18 @@ public class SQLPoolDAO implements PoolStore {
     }
   }
 
-  public class PoolableMapper implements RowMapper<Poolable<?, ?>> {
+  public class PoolableMapper extends CacheAwareRowMapper<Poolable<?, ?>> {
+
+    public PoolableMapper() {
+      super((Class<Poolable<?, ?>>) ((ParameterizedType) new TypeReference<Poolable<?, ?>>() {
+      }.getType()).getRawType());
+    }
+
+    public PoolableMapper(boolean lazy) {
+      super((Class<Poolable<?, ?>>) ((ParameterizedType) new TypeReference<Poolable<?, ?>>() {
+      }.getType()).getRawType(), lazy);
+    }
+
     @Override
     public Poolable<?, ?> mapRow(ResultSet rs, int rowNum) throws SQLException {
       Long poolId = rs.getLong("pool_poolId");
@@ -923,7 +939,7 @@ public class SQLPoolDAO implements PoolStore {
         Store<? extends Poolable<?, ?>> dao = daoLookup.lookup(clz);
         if (dao != null) {
           log.debug("Mapping poolable -> " + poolId + " : " + type + " : " + elementId);
-          Poolable<?, ?> p = dao.get(elementId);
+          Poolable<?, ?> p = (isLazy() ? dao.lazyGet(elementId) : dao.get(elementId));
 
           if (p != null) {
             log.debug("\\_ got " + p.getId() + " : " + p.getName());

@@ -73,7 +73,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestExceptionHandler.RestErr
 @Controller
 @RequestMapping("/rest/run")
 @SessionAttributes("run")
-public class RunRestController {
+public class RunRestController extends RestController {
   protected static final Logger log = LoggerFactory.getLogger(RunRestController.class);
   @Autowired
   private com.eaglegenomics.simlims.core.manager.SecurityManager securityManager;

@@ -8,6 +8,10 @@ public class DilutionDto {
   private String name;
   private String identificationBarcode;
   private String locationLabel;
+  private Double concentration;
+  private String creationDate;
+  private String dilutionUserName;
+  private Long targetedResequencingId;
   private LibraryDto library;
   private String libraryUrl;
 
@@ -43,6 +47,38 @@ public class DilutionDto {
   @JsonSerialize(include = JsonSerialize.Inclusion.ALWAYS)
   public void setLocationLabel(String locationLabel) {
     this.locationLabel = locationLabel;
+  }
+
+  public Double getConcentration() {
+    return concentration;
+  }
+
+  public void setConcentration(Double concentration) {
+    this.concentration = concentration;
+  }
+
+  public String getCreationDate() {
+    return creationDate;
+  }
+
+  public void setCreationDate(String creationDate) {
+    this.creationDate = creationDate;
+  }
+
+  public String getDilutionUserName() {
+    return dilutionUserName;
+  }
+
+  public void setDilutionUserName(String userName) {
+    this.dilutionUserName = userName;
+  }
+
+  public Long getTargetedResequencingId() {
+    return targetedResequencingId;
+  }
+
+  public void setTargetedResequencingId(Long targetedResequencingId) {
+    this.targetedResequencingId = targetedResequencingId;
   }
 
   public LibraryDto getLibrary() {

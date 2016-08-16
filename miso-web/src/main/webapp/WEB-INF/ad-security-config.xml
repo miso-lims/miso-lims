@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:oauth="http://www.springframework.org/schema/security/oauth"
+  xmlns:security="http://www.springframework.org/schema/security"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+                           http://www.springframework.org/schema/security/oauth http://www.springframework.org/schema/security/spring-security-oauth-1.0.xsd
+                           http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd"
+  default-autowire="byName">
+
+  <!-- *** Declare Active Directory specific beans -->
+
+  <bean id="ldapActiveDirectoryAuthProvider" class="org.springframework.security.ldap.authentication.ad.ActiveDirectoryLdapAuthenticationProvider">
+    <constructor-arg value="${security.ad.emailDomain}" /> <!-- Domain name added to username during directory search for user -->
+    <constructor-arg value="${security.ad.url}" /> <!-- Directory url -->
+    <property name="authoritiesMapper" ref="grantedAuthoritiesMapper" />
+    <property name="convertSubErrorCodesToExceptions" value="true" />
+    <property name="userDetailsContextMapper">
+      <!-- Retrieve user as InetOrgPerson as this has details need to populate db User table. Otherwise will be sparse LdapUserDetail. -->
+      <bean class="org.springframework.security.ldap.userdetails.InetOrgPersonContextMapper" />
+    </property>
+  </bean>
+
+  <!-- Map group names with prefix to expected MISO group names. Removes prefix during Spring authentication. -->
+  <bean id="grantedAuthoritiesMapper" class="uk.ac.bbsrc.tgac.miso.core.security.ad.ActiveDirectoryAuthoritiesMapper" />
+
+  <!-- Load as bean to inject group name prefix. Removes prefix when populating database. -->
+  <bean class="uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils" />
+
+  <!-- *** Import existing ldap configuration. This one is used with openldap. -->
+
+  <import resource="ldap-security-config.xml" />
+
+  <!-- *** Override the general ldap authentication manager with the Active Directory authentication manager. -->
+  
+  <security:authentication-manager alias="authenticationManager">
+    <security:authentication-provider ref="ldapActiveDirectoryAuthProvider" />
+  </security:authentication-manager>
+
+</beans>

@@ -36,6 +36,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.GrantedAuthorityImpl;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 
+import uk.ac.bbsrc.tgac.miso.core.security.MisoAuthority;
+
 /**
  * uk.ac.bbsrc.tgac.miso.sqlstore.manager
  * <p/>
@@ -73,9 +75,9 @@ public class MisoJdbcUserDetailsManager extends JdbcUserDetailsManager {
             }
 
             try {
-              if (rs.getBoolean("admin")) roleList.add(new GrantedAuthorityImpl("ROLE_ADMIN"));
-              if (rs.getBoolean("external")) roleList.add(new GrantedAuthorityImpl("ROLE_EXTERNAL"));
-              if (rs.getBoolean("internal")) roleList.add(new GrantedAuthorityImpl("ROLE_INTERNAL"));
+              if (rs.getBoolean("admin")) roleList.add(MisoAuthority.ROLE_ADMIN);
+              if (rs.getBoolean("external")) roleList.add(MisoAuthority.ROLE_EXTERNAL);
+              if (rs.getBoolean("internal")) roleList.add(MisoAuthority.ROLE_INTERNAL);
             } catch (SQLException e) {
               log.error("Couldn't retrieve a user property to convert to a role", e);
             }

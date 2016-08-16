@@ -418,27 +418,27 @@ Pool.ui = {
     var table = 'listing' + platform + 'PoolsTable';
     jQuery('#'+table).html('');
 
-    function pooledEls (data, type, full) {
-      var pooledEls = data.map(function (ld) {
-        return "<li><a href=\"/miso/library/" + ld.libraryId + "\">" + ld.library.alias 
+    function renderPoolElements (data, type, full) {
+      var elements = data.map(function (ld) {
+        return "<li><a href=\"/miso/library/" + ld.library.id + "\">" + ld.library.alias
         + (ld.library.tagBarcodeIndex1Label ? "(" + ld.library.tagBarcodeIndex1Label + (ld.library.tagBarcodeIndex2Label ? ", " + ld.library.tagBarcodeIndex2Label + ")" : ")") : "") 
         + "</a>" + "</li>";
       });
       var string;
-      if (pooledEls.length === 0) {
+      if (elements.length === 0) {
         return "No elements";
       } else {
         var selector = "more_" + full.id;
-        var num = "" + pooledEls.length + " dilutions  ";
+        var num = "" + elements.length + " dilutions  ";
         var more = "<span id=\"" + selector + "_fewer\"><a href=\"javascript:void(0);\" onclick=\"jQuery('." + selector + "').show();jQuery('#" + selector + "_fewer').hide();\">"
           + "(See all...)</a></span>";
         var els = "<div class='" + selector + "' style='display:none'><ul>" 
-          + pooledEls.join('')
+          + elements.join('')
           + "</ul><span><a href=\"javascript:void(0);\" onclick=\"jQuery('." + selector + "').hide();jQuery('#" + selector + "_fewer').show();\">Hide all...</a></span></div>";
         return num + more + els;
       }
     };
-    jQuery('#'+table).dataTable({
+    jQuery('#'+table).dataTable(Utils.setSortFromPriority({
       "aoColumns": [
         {
           "sTitle": "Name",
@@ -469,15 +469,8 @@ Pool.ui = {
         {
           "sTitle": "Elements",
           "mData": "pooledElements",
-          "mRender": function (data, type, full) {
-            return pooledEls(data, type, full);
-          },
+          "mRender": renderPoolElements,
           "bSortable": false,
-          "iSortPriority" : 0
-        },
-        {
-          "sTitle": "Average Insert Size",
-          "mData": "id",
           "iSortPriority" : 0
         },
         {
@@ -509,24 +502,6 @@ Pool.ui = {
       "iDisplayLength": 25,
       "iDisplayStart": 0,
       "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>',
-      "fnRowCallback": function(nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-        Fluxion.doAjax(
-          'poolControllerHelperService',
-          'checkAverageInsertSizeByPoolId',
-          {
-            'poolId':aData.id,
-            'url':ajaxurl
-          },
-          {
-            'doOnSuccess': function(json) {
-              jQuery('td:eq(5)', nRow).html(json.response);
-            }
-          }
-        );
-      },
-      "aaSorting": [
-        [(Sample.detailedSample ? 7 : 0) , "desc"] // NB: this must get updated when adding new columns
-      ],
       "sPaginationType": "full_numbers",
       "bProcessing": true,
       "bServerSide": true,
@@ -545,7 +520,7 @@ Pool.ui = {
         jQuery('#'+table).removeClass('disabled');
         jQuery('#'+table+'_paginate').find('.fg-button').removeClass('fg-button');
       }
-    }).fnSetFilteringDelay();
+    })).fnSetFilteringDelay();
   },
 
   getPoolableElementInfo : function(poolId, elementId) {

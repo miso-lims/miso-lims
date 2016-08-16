@@ -31,9 +31,9 @@ import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.DefaultEntityNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.OicrLibraryNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.OicrSampleAliasGenerator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.OicrSampleNamingScheme;
+import uk.ac.bbsrc.tgac.miso.migration.util.SimpleLibraryNamingScheme;
 import uk.ac.bbsrc.tgac.miso.persistence.HibernateSampleClassDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateIdentityDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateInstituteDao;
@@ -263,7 +263,7 @@ public class MisoServiceManager {
 
   private MisoNamingScheme<Library> getLibraryNamingScheme() {
     if (libraryNamingScheme == null) {
-      libraryNamingScheme = new OicrLibraryNamingScheme();
+      libraryNamingScheme = new SimpleLibraryNamingScheme();
     }
     return libraryNamingScheme;
   }

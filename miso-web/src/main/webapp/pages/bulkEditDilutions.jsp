@@ -42,8 +42,8 @@
 <div id="contentcolumn">
 
   <h1>
-    ${method} Libraries
-    <button id="saveLibraries" class="fg-button ui-state-default ui-corner-all">Save</button>
+    ${method} Library Dilutions
+    <button id="saveDilutions" class="fg-button ui-state-default ui-corner-all">Save</button>
   </h1>
   
   <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#hothelp_arrowclick'), 'hothelpdiv');">Quick Help
@@ -76,32 +76,49 @@
   
   <script type="text/javascript">
     jQuery(document).ready(function () {
-      Library.hot.librariesJSON = ${librariesJSON};
-      Hot.dropdownRef = ${referenceDataJSON};
-      Hot.dropdownRef.tagBarcodes = ${tagBarcodes};
-      Hot.dropdownRef.barcodeKits = {};
+      Dilution.hot.librariesJSON = ${librariesJSON};
       Hot.detailedSample = JSON.parse(document.getElementById('HOTbulkForm').dataset.detailedSample);
-      Hot.saveButton = document.getElementById('saveLibraries');
-      Library.hot.propagateOrEdit = "${method}";
-      Library.designs = ${libraryDesignsJSON};
+      Hot.saveButton = document.getElementById('saveDilutions');
+      Dilution.hot.propagateOrEdit = "${method}";
       Hot.autoGenerateIdBarcodes = ${autoGenerateIdBarcodes};
-      Library.hot.getLibraryTypeAliasLists();
 
-      Library.hot.makeBulkCreateTable = function () {
-        Library.hot.librariesJSON = Library.hot.prepLibrariesForTable(Library.hot.librariesJSON);
-        Library.hot.makeHOT(Library.hot.librariesJSON);
-        Library.hot.addPlatformAndTBHooks();
+      Dilution.hot.makeBulkCreateTable = function () {
+        Dilution.hot.dilutionsJSON = Dilution.hot.modifyLibrariesForDilutions(Dilution.hot.librariesJSON);
+        Dilution.hot.makeHOT(Dilution.hot.dilutionsJSON);
       };
 
-      // get SampleOptions and make the appropriate table
-      // TODO: implement for plain sample
-      if (Boolean(Hot.detailedSample)) {
-        Hot.saveButton.addEventListener('click', Library.hot.saveData, true);
-        if (Library.hot.propagateOrEdit == 'Propagate') {
-          Hot.fetchSampleOptions(Library.hot.makeBulkCreateTable);
-  	    } else {
-  	      Hot.fetchSampleOptions(Library.hot.makeBulkUpdateTable);
+      Dilution.hot.makeBulkUpdateTable = function () {
+        alert("Implement me!");
+      };
+
+      if (Hot.detailedSample) {
+	      if (Dilution.hot.propagateOrEdit == 'Propagate') {
+	        Hot.saveButton.addEventListener('click', Dilution.hot.createData, true);
+	        Fluxion.doAjax(
+	          'libraryControllerHelperService',
+	          'getTargetedResequencingTypes',
+	          {
+	            'url': ajaxurl
+	          },
+	          {
+	            'doOnSuccess': function (json) {
+	              Dilution.hot.tarSeqs = json.targetedResequencings;
+	              Dilution.hot.makeBulkCreateTable();
+	            }
+	          }
+	        );
+	      } else {
+	        Hot.saveButton.addEventListener('click', Dilution.hot.updateData, true);
+	        Dilution.hot.makeBulkUpdateTable();
 	      }
+      } else {
+        if (Dilution.hot.propagateOrEdit == 'Propagate') {
+          Hot.saveButton.addEventListener('click', Dilution.hot.createData, true);
+          Dilution.hot.makeBulkCreateTable();
+        } else {
+          Hot.saveButton.addEventListener('click', Dilution.hot.updateData, true);
+          Dilution.hot.makeBulkUpdateTable();
+        }
       }
     });
   </script>

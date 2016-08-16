@@ -36,9 +36,9 @@ import java.util.TreeSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.ldap.core.DistinguishedName;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.GrantedAuthorityImpl;
 import org.springframework.security.ldap.userdetails.InetOrgPerson;
 import org.springframework.security.ldap.userdetails.LdapUserDetails;
 
@@ -46,6 +46,7 @@ import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.core.security.MisoAuthority;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
@@ -57,6 +58,14 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 public class LimsSecurityUtils {
   /** Field log */
   protected static final Logger log = LoggerFactory.getLogger(LimsSecurityUtils.class);
+
+  /** Prefix to be removed from each role. */
+  private static String rolePrefix = "";
+
+  @Value("${security.ad.stripRolePrefix}")
+  public void setRolePrefix(String rolePrefix) {
+    LimsSecurityUtils.rolePrefix = rolePrefix;
+  }
 
   /**
    * Converts a LDAP {@link org.springframework.security.ldap.userdetails.InetOrgPerson} object into a MISO user object
@@ -72,22 +81,31 @@ public class LimsSecurityUtils {
     // user and this user will inherit the already-persisted userID.
     final UserImpl user = new UserImpl();
 
+    final List<String> roles = new ArrayList<String>();
+    for (final GrantedAuthority ga : details.getAuthorities()) {
+      roles.add(removePrefix(ga.toString(), LimsSecurityUtils.rolePrefix));
+    }
+    user.setRoles(roles.toArray(new String[0]));
+
     user.setActive(details.isAccountNonExpired());
-    user.setAdmin(details.getAuthorities().contains(new GrantedAuthorityImpl("ROLE_ADMIN")));
-    user.setExternal(details.getAuthorities().contains(new GrantedAuthorityImpl("ROLE_EXTERNAL")));
-    user.setInternal(details.getAuthorities().contains(new GrantedAuthorityImpl("ROLE_INTERNAL")));
+    user.setAdmin(roles.contains(MisoAuthority.ROLE_ADMIN.name()));
+    user.setExternal(roles.contains(MisoAuthority.ROLE_EXTERNAL.name()));
+    user.setInternal(roles.contains(MisoAuthority.ROLE_INTERNAL.name()));
+
     user.setLoginName(details.getUsername().toLowerCase());
     user.setPassword(details.getPassword());
     user.setFullName(details.getDisplayName());
     user.setEmail(details.getMail());
 
-    final List<String> roles = new ArrayList<String>();
-    for (final GrantedAuthority ga : details.getAuthorities()) {
-      roles.add(ga.toString());
-    }
-    user.setRoles(roles.toArray(new String[0]));
-
     return user;
+  }
+
+  private static String removePrefix(String s, String prefix) {
+    String result = s;
+    if (s.startsWith(prefix)) {
+      result = s.substring(prefix.length());
+    }
+    return result;
   }
 
   /**

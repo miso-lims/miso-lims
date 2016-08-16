@@ -537,12 +537,12 @@
           <h2>Tissue Processing</h2>
           <table class="in">
             <tr>
-              <td class="h">Cuts Remaining:</td>
-              <td id="cutsRemaining">${sample.cutsRemaining}</td>
+              <td class="h">Slides Remaining:</td>
+              <td id="slidesRemaining">${sample.slidesRemaining}</td>
             </tr>
             <tr>
-              <td class="h">Cuts:*</td>
-              <td><form:input id="cuts" path="cuts"/></td>
+              <td class="h">Slides:*</td>
+              <td><form:input id="slides" path="slides"/></td>
             </tr>
             <tr>
               <td class="h">Discards:*</td>
@@ -560,8 +560,8 @@
           <h2>Tissue Processing</h2>
           <table class="in">
             <tr>
-              <td class="h">Cuts Consumed:*</td>
-              <td><form:input id="cutsConsumed" path="cutsConsumed"/></td>
+              <td class="h">Slides Consumed:*</td>
+              <td><form:input id="slidesConsumed" path="slidesConsumed"/></td>
             </tr>
           </table>
         </div>
@@ -705,7 +705,17 @@
 <c:if test="${sample.id == 0}">
 </div>
 <div id="tab-2">
-  <h1>Create Samples</h1>
+  <h1>
+    Create Samples
+     <c:choose>
+      <c:when test="${detailedSample}">
+        <button id="saveDetailed" class="disabled fg-button ui-state-default ui-corner-all" disabled="disabled" onclick="Sample.hot.saveDetailedData();">Save</button>
+      </c:when>
+      <c:otherwise>
+        <button id="savePlain" class="fg-button ui-state-default ui-corner-all" onclick="Sample.hot.savePlainData();">Save Bulk</button>
+      </c:otherwise>
+      </c:choose>   
+  </h1>
   <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#hothelp_arrowclick'), 'hothelpdiv');">Quick Help
     <div id="hothelp_arrowclick" class="toggleLeft"></div>
   </div>
@@ -739,16 +749,7 @@
 	      <button id="makeTable" class="disabled" disabled="disabled" onclick="Sample.hot.makeNewSamplesTable();">Make Table</button>
 	    </div>
 	  </div>
-    <div class="clear">
-      <c:choose>
-      <c:when test="${detailedSample}">
-        <button id="saveDetailed" class="disabled" disabled="disabled" onclick="Sample.hot.saveDetailedData();">Save</button>
-      </c:when>
-      <c:otherwise>
-        <button id="savePlain" onclick="Sample.hot.savePlainData();">Save Bulk</button>
-      </c:otherwise>
-      </c:choose>
-    </div>
+    <div class="clear"></div>
     <div id="hotContainer"></div>
  
     <script type="text/javascript">

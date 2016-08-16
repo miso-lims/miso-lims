@@ -43,11 +43,11 @@ Sample.hot = {
           if (sam.tissueMaterialId) {
             sam.tissueMaterialAlias = Hot.getAliasFromId(sam.tissueMaterialId, Hot.sampleOptions.tissueMaterialsDtos);
           }
-		  sam.tissueOriginAlias = Hot.getAliasFromId(sam.tissueOriginId, Hot.sampleOptions.tissueOriginsDtos);
-		  sam.tissueTypeAlias = Hot.getAliasFromId(sam.tissueTypeId, Hot.sampleOptions.tissueTypesDtos);
-		  if (sam.labId) {
-		    sam.labComposite = Sample.hot.getLabCompositeFromId(sam.labId, Hot.sampleOptions.labsDtos);
-		  }
+  		    sam.tissueOriginAlias = Hot.getAliasFromId(sam.tissueOriginId, Hot.sampleOptions.tissueOriginsDtos);
+  		    sam.tissueTypeAlias = Hot.getAliasFromId(sam.tissueTypeId, Hot.sampleOptions.tissueTypesDtos);
+  		    if (sam.labId) {
+  		      sam.labComposite = Sample.hot.getLabCompositeFromId(sam.labId, Hot.sampleOptions.labsDtos);
+  		    }
         }
         if (Sample.hot.getCategoryFromClassId(sam.sampleClassId) == 'Aliquot') {
           if (sam.samplePurposeId) {
@@ -339,6 +339,11 @@ Sample.hot = {
    * Makes create/edit samples table
    */
   makeHOT: function (startingValues, action, sourceSampleCategory, targetSampleCategory) {
+    // assign functions which will be required during save
+    Hot.buildDtoFunc = Sample.hot.buildDtos;
+    Hot.saveOneFunc = Sample.hot.saveOne;
+    Hot.updateOneFunc = Sample.hot.updateOne;
+    
     // are new samples parented to IDs being requested
     Sample.hot.generateColumnData = function(showQcs) { return Sample.hot.getAppropriateColumns(action, sourceSampleCategory, targetSampleCategory, showQcs); };
     Hot.colConf = Sample.hot.generateColumnData(false);
@@ -474,13 +479,6 @@ Sample.hot = {
   },
 
   /**
-   * Gets array of qc values
-   */
-  getQcValues: function () {
-    return Hot.dropdownRef['qcValues'].map(function (val) { if (val === '') val = 'unknown'; return val; });
-  },
-
-  /**
    * Gets array of STR statuses (detailed sample only)
    */
   getStrStatuses: function () {
@@ -573,8 +571,8 @@ Sample.hot = {
   getAppropriateColumns: function (action, sourceSampleCategory, targetSampleCategory, showQcs) {
     var isDetailed = targetSampleCategory != null;
     var sampleClassAlias = Hot.getAliasFromId(Sample.hot.sampleClassId, Hot.sampleOptions.sampleClassesDtos);
-	// We assume we have a linear progression of information that must be
-	// collected as a sample progressed through the hierarchy.
+	  // We assume we have a linear progression of information that must be
+	  // collected as a sample progressed through the hierarchy.
     var progression = ['Identity', 'Tissue', 'Tissue Processing', 'Stock', 'Aliquot'];
     // First, set all the groups of detailed columns we will show to off.
     var show = {};
@@ -598,10 +596,10 @@ Sample.hot = {
     for (i = startProgression; i <= endProgression && i != -1; i++) {
       show[progression[i]] = true;
     }
-	// If we aren't starting or finished with a tissue processing, hide those
-	// columns since we don't really want to show tissue processing unless the
-	// user specifically requested it.
-	if (sourceSampleCategory != 'Tissue Processing' && targetSampleCategory != 'Tissue Processing') {
+  	// If we aren't starting or finished with a tissue processing, hide those
+  	// columns since we don't really want to show tissue processing unless the
+  	// user specifically requested it.
+  	if (sourceSampleCategory != 'Tissue Processing' && targetSampleCategory != 'Tissue Processing') {
       show['Tissue Processing'] = false;
     }
 
@@ -871,7 +869,7 @@ Sample.hot = {
         data: 'qcValue',
         type: 'dropdown',
         trimDropdown: false,
-        source: Sample.hot.getQcValues(),
+        source: Hot.getQcValues(),
         validator: permitEmpty,
         include: showQcs || show['Stock']
       },
@@ -1036,7 +1034,7 @@ Sample.hot = {
   /**
    * Creates the SampleDtos to pass to the server
    */
-  buildSampleDtosFromData: function (obj) {
+  buildDtos: function (obj) {
     var sample = {};
 
     if (obj.id) {
@@ -1049,7 +1047,7 @@ Sample.hot = {
     sample.description = obj.description || '';
     sample.identificationBarcode = obj.identificationBarcode;
     sample.sampleType = obj.sampleType;
-    sample.qcPassed = '';
+    sample.qcPassed = (obj.qcPassed && obj.qcPassed != 'unknown' ? obj.qcPassed : '') || '';
     sample.alias = obj.alias || '';
     sample.projectId = (parseInt(obj.projectId) || parseInt(document.getElementById('projectSelect').value));
     sample.scientificName = obj.scientificName;
@@ -1069,26 +1067,25 @@ Sample.hot = {
     if (obj.externalName) {
       sample.externalName = obj.externalName;
       if (obj.donorSex && obj.donorSex.length) sample.donorSex = obj.donorSex;
-
-      if (obj.tissueOriginId && !obj.tissueOriginAlias) {
-        sample.tissueOriginId = obj.tissueOriginId;
-      } else {
-        sample.tissueOriginId = Hot.getIdFromAlias(obj.tissueOriginAlias, Hot.sampleOptions.tissueOriginsDtos);
-      }
-      if (obj.tissueTypeId && !obj.tissueTypeAlias) {
-        sample.tissueTypeId = obj.tissueTypeId;
-      } else {
-        sample.tissueTypeId = Hot.getIdFromAlias(obj.tissueTypeAlias, Hot.sampleOptions.tissueTypesDtos);
-      }
-      sample.passageNumber = (obj.passageNumber == '' ? null : parseInt(obj.passageNumber));
-      sample.timesReceived = parseInt(obj.timesReceived);
-      sample.tubeNumber = parseInt(obj.tubeNumber);
-      if (obj.labComposite && obj.labComposite.length) {
-        sample.labId = Sample.hot.getIdFromLabComposite(obj.labComposite, Hot.sampleOptions.labsDtos);
-      }
-      if (obj.externalInstituteIdentifier && obj.externalInstituteIdentifier.length) {
-        sample.externalInstituteIdentifier = obj.externalInstituteIdentifier;
-      }
+    }
+    if (obj.tissueOriginId && !obj.tissueOriginAlias) {
+      sample.tissueOriginId = obj.tissueOriginId;
+    } else {
+      sample.tissueOriginId = Hot.getIdFromAlias(obj.tissueOriginAlias, Hot.sampleOptions.tissueOriginsDtos);
+    }
+    if (obj.tissueTypeId && !obj.tissueTypeAlias) {
+      sample.tissueTypeId = obj.tissueTypeId;
+    } else {
+      sample.tissueTypeId = Hot.getIdFromAlias(obj.tissueTypeAlias, Hot.sampleOptions.tissueTypesDtos);
+    }
+    sample.passageNumber = (obj.passageNumber == '' ? null : parseInt(obj.passageNumber));
+    sample.timesReceived = parseInt(obj.timesReceived);
+    sample.tubeNumber = parseInt(obj.tubeNumber);
+    if (obj.labComposite && obj.labComposite.length) {
+      sample.labId = Sample.hot.getIdFromLabComposite(obj.labComposite, Hot.sampleOptions.labsDtos);
+    }
+    if (obj.externalInstituteIdentifier && obj.externalInstituteIdentifier.length) {
+      sample.externalInstituteIdentifier = obj.externalInstituteIdentifier;
     }
 
 
@@ -1151,10 +1148,6 @@ Sample.hot = {
       break;
     }
 
-    // TODO: add qcCols attributes to their objects:
-    if (obj.qcPassed) {
-      sample.qcPassed = (obj.qcPassed == 'unknown' ? '' : obj.qcPassed);
-    }
      // TODO: fix QCPD
      //sample.qcPassedDetailId = Hot.getIdFromAlias(obj.qcPassedDetailAlias, Hot.sampleOptions.qcPassedDetailsDtos);
     if (obj.volume) {
@@ -1184,12 +1177,12 @@ Sample.hot = {
   /**
    * Posts a single sample to server and processes result
    */
-  saveOneSample: function (data, rowIndex, numberToSave, callback) {
+  saveOne: function (data, rowIndex, numberToSave, callback) {
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function() {
       if (xhr.readyState === XMLHttpRequest.DONE) {
         callback(); // Indicate request has completed.
-        xhr.status === 201 ? Sample.hot.successSave(xhr, rowIndex, numberToSave) : Sample.hot.failSave(xhr, rowIndex, numberToSave);
+        xhr.status === 201 ? Sample.hot.successSave(xhr, rowIndex, numberToSave) : Hot.failSave(xhr, rowIndex, numberToSave);
       }
     };
     xhr.open('POST', '/miso/rest/tree/sample');
@@ -1200,48 +1193,17 @@ Sample.hot = {
   /**
    * Puts a single sample to server and processes result
    */
-  updateOneSample: function (data, sampleId, rowIndex, numberToSave, callback) {
+  updateOne: function (data, sampleId, rowIndex, numberToSave, callback) {
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function () {
       if (xhr.readyState === XMLHttpRequest.DONE) {
         callback(); // Indicate request has completed.
-        xhr.status === 200 ? Sample.hot.successSave(xhr, rowIndex, numberToSave) : Sample.hot.failSave(xhr, rowIndex, numberToSave);
+        xhr.status === 200 ? Sample.hot.successSave(xhr, rowIndex, numberToSave) : Hot.failSave(xhr, rowIndex, numberToSave);
       }
     };
     xhr.open('PUT', '/miso/rest/tree/sample/' + sampleId);
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.send(data);
-  },
-
-  /**
-   * Processes a failure to save (adds invalid attribute to cell, creates user message)
-   */
-  failSave: function (xhr, rowIndex, numberToSave) {
-    console.log(xhr);
-    var responseText = JSON.parse(xhr.responseText);
-    if (xhr.status >= 500 || responseText.detail == undefined) {
-      Hot.messages.failed.push("<b>Row " + (rowIndex + 1) + ": Something went terribly wrong. Please file a ticket with a screenshot or "
-          + "copy-paste of the data that you were trying to save.</b>");
-    } else {
-      var allColumnData = Hot.getValues('data', Hot.colConf);
-      var column, columnIndex;
-      if (responseText.data && responseText.data.constraintName) {
-        // if a column's constraint was violated, extract it here
-        column = responseText.data.constraintName;
-        columnIndex = allColumnData.indexOf(column);
-      }
-      console.log(rowIndex, columnIndex);
-      if (rowIndex !== undefined && columnIndex !== -1 && columnIndex !== undefined) {
-        Hot.hotTable.setCellMeta(rowIndex, columnIndex, 'valid', false);
-      }
-      // process error message if it was a SQL violation, and add any errors to the messages array
-      var reUserMessage = /could not execute .*?: (.*)/;
-      var extraCVEMessage = /(.*)ConstraintViolationException: (.*)/;
-      var errorMessage1 = responseText.detail.replace(reUserMessage, "$1");
-      var finalErrorMessage = errorMessage1.replace(extraCVEMessage, "$2");
-      Hot.messages.failed.push("Row "+ (rowIndex + 1) +": "+ finalErrorMessage);
-    }
-    Hot.addSuccessesAndErrors();
   },
 
   /**
@@ -1291,16 +1253,7 @@ Sample.hot = {
 
     Hot.hotTable.validateCells(function (isValid) {
       if (isValid) {
-        // send it through the parser to get a sampleData array that isn't merely a reference to Hot.hotTable.getSourceData()
-        var sampleData = JSON.parse(JSON.parse(JSON.stringify(Hot.hotTable.getSourceData())));
-
-        // add aliases of previously-saved items to the position corresponding to their row (zero-index data, one-index UI)
-        // aliases of successfully-saved items will be added after save
-        Hot.messages.success = sampleData.map(function (sample) { return (sample.saved === true ? sample.alias : null); });
-
-        // Array of save functions, one for each line in the table
-        var sampleSaveArray = Sample.hot.getArrayOfNewObjects(sampleData);
-        Hot.serial(sampleSaveArray); // Execute saves serially
+        Hot.saveTableData("alias", "Create");
       } else {
         Hot.validationFails();
         return false;
@@ -1308,59 +1261,7 @@ Sample.hot = {
     });
   },
 
-  /**
-   * Creates Sample Dtos for samples to be POSTed
-   */
-  getArrayOfNewObjects: function (sampleData) {
-    // Returns a save function for a single line in the table.
-    function sampleSaveFunction(data, index, numberToSave) {
-      // The callback is called once the http request in saveOneSample completes.
-      return function(callback) {
-        Sample.hot.saveOneSample(data, index, numberToSave, callback);
-      };
-    }
-    var len = sampleData.length;
-    var arrayOfObjects = [];
 
-    // return an array of samples or saveFunctions for samples
-    for (var i = 0; i < len; i++) {
-      if (sampleData[i].saved) continue;
-
-      var newSample = Sample.hot.buildSampleDtosFromData(sampleData[i]);
-      if (Hot.detailedSample) {
-        arrayOfObjects.push(sampleSaveFunction(JSON.stringify(newSample), i, len));
-      } else {
-        arrayOfObjects.push(newSample);
-      }
-    }
-    return arrayOfObjects;
-  },
-
-  /**
-   * Creates Sample Dtos for samples to be PUT-ed
-   */
-  getArrayOfUpdatedObjects: function (sampleData) {
-    // Returns a save function for a single line in the table.
-    function sampleSaveFunction(data, id, rowIndex, numberToSave) {
-      // The callback is called once the http request in saveOneSample completes.
-      return function(callback) {
-        Sample.hot.updateOneSample(data, id, rowIndex, numberToSave, callback);
-      };
-    }
-    var len = sampleData.length;
-    var arrayOfObjects = [];
-
-    // return an array of samples or saveFunctions for samples
-    for (var i = 0; i < len; i++) {
-      if (sampleData[i].saved) continue;
-
-      var newSample = Sample.hot.buildSampleDtosFromData(sampleData[i]);
-
-      // all updated objects go through the REST WS
-      arrayOfObjects.push(sampleSaveFunction(JSON.stringify(newSample), newSample.id, i, len));
-    }
-    return arrayOfObjects;
-  },
 
   /**
    * Creates a custom error message for invalid parent-child relationship
@@ -1397,7 +1298,7 @@ Sample.hot = {
         // send it through the parser to get a sampleData array that isn't merely a reference to Hot.hotTable.getSourceData()
         var sampleData = JSON.parse(JSON.parse(JSON.stringify(Hot.hotTable.getSourceData())));
 
-        var samplesArray = Sample.hot.getArrayOfNewObjects(sampleData);
+        var samplesArray = Hot.getArrayOfNewObjects(sampleData);
 
         Fluxion.doAjax(
           'sampleControllerHelperService',
@@ -1452,16 +1353,7 @@ Sample.hot = {
 
     Hot.hotTable.validateCells(function (isValid) {
       if (isValid) {
-        // no check for sampleValidRelationship, since the sampleClass is not editable
-        // send data through the parser to get a sampleData array that isn't merely a reference to Hot.hotTable.getSourceData()
-        var sampleData = JSON.parse(JSON.parse(JSON.stringify(Hot.hotTable.getSourceData())));
-
-        // add previously-saved aliases to success message, and placeholders for items to be saved
-        Hot.messages.success = sampleData.map(function (sample) { return (sample.saved === true ? sample.alias : null); });
-
-        // Array of save functions, one for each line in the table
-        var sampleSaveArray = Sample.hot.getArrayOfUpdatedObjects(sampleData);
-        Hot.serial(sampleSaveArray); // Execute saves serially
+        Hot.saveTableData("alias", "Edit");
       } else {
         Hot.validationFails();
         return false;
@@ -1488,13 +1380,7 @@ Sample.hot = {
 
     Hot.hotTable.validateCells(function (isValid) {
       if (isValid) {
-
-        // add previously-saved aliases to success message, and placeholders for items to be saved
-        Hot.messages.success = sampleData.map(function (sample) { return (sample.saved === true ? sample.alias : null); });
-
-        // Array of save functions, one for each line in the table
-        var sampleSaveArray = Sample.hot.getArrayOfNewObjects(sampleData);
-        Hot.serial(sampleSaveArray); // Execute saves serially
+        Hot.saveTableData("alias", "Create");
       } else {
         Hot.validationFails();
         return false;

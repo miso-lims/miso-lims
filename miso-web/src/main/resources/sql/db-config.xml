@@ -202,6 +202,9 @@
     <property name="libraryDAO" ref="sqlLibraryDAO" />
     <property name="targetedResequencingDAO" ref="sqlTargetedResequencingDAO" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />
+    <property name="autoGenerateIdentificationBarcodes">
+      <value>${miso.autoGenerateIdentificationBarcodes}</value>
+    </property>
   </bean>
   
   <bean id="sqlTargetedResequencingDAO" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLTargetedResequencingDAO">

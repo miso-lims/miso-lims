@@ -37,12 +37,14 @@
 <script src="<c:url value='/scripts/handsontable/dist/handsontable.full.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/handsontable_renderers.js'/>" type="text/javascript"></script>
 <link rel="stylesheet" media="screen" href="/scripts/handsontable/dist/handsontable.full.css">
-<script src="<c:url value='/scripts/sample_hot.js'/>" type="text/javascript"></script>
 
 <div id="maincontent">
 <div id="contentcolumn">
 
-	<h1>${method} Samples</h1>
+	<h1>
+	  ${method} Samples
+	  <button id="saveSamples" class="fg-button ui-state-default ui-corner-all">Save</button>
+	</h1>
 	
 	<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#hothelp_arrowclick'), 'hothelpdiv');">Quick Help
     <div id="hothelp_arrowclick" class="toggleLeft"></div>
@@ -70,7 +72,6 @@
 	      <p>The following rows failed to save:</p>
 	      <p id="errorMessages"></p>
 	    </div>
-		<button id="saveSamples">Save</button>
 		<c:if test="${detailedSample}">
 			<button id="addQcs" onclick="Sample.hot.regenerateWithQcs();">Show QCs Columns</button>
 		</c:if>

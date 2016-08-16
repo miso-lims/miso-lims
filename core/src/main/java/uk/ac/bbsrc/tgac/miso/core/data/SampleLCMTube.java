@@ -4,8 +4,8 @@ public interface SampleLCMTube extends SampleTissueProcessing {
 
   public static final String SAMPLE_CLASS_NAME = "LCM Tube";
 
-  Integer getCutsConsumed();
+  Integer getSlidesConsumed();
 
-  void setCutsConsumed(Integer cutsConsumed);
+  void setSlidesConsumed(Integer slidesConsumed);
 
 }

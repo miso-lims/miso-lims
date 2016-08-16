@@ -46,13 +46,6 @@ import java.util.regex.Pattern;
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpSession;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONException;
-import net.sf.json.JSONObject;
-import net.sf.json.JsonConfig;
-import net.sourceforge.fluxion.ajax.Ajaxified;
-import net.sourceforge.fluxion.ajax.util.JSONUtils;
-
 import org.krysalis.barcode4j.BarcodeDimension;
 import org.krysalis.barcode4j.BarcodeGenerator;
 import org.slf4j.Logger;
@@ -67,6 +60,12 @@ import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import com.google.common.collect.Maps;
 
+import net.sf.json.JSONArray;
+import net.sf.json.JSONException;
+import net.sf.json.JSONObject;
+import net.sf.json.JsonConfig;
+import net.sourceforge.fluxion.ajax.Ajaxified;
+import net.sourceforge.fluxion.ajax.util.JSONUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
@@ -629,18 +628,24 @@ public class LibraryControllerHelperService {
 
     try {
       Collection<TargetedResequencing> targetedResequencings = requestManager.listAllTargetedResequencing();
-      JSONArray targetedResequencingCollection = new JSONArray();
+      JSONArray fullTargetedResequencingCollection = new JSONArray();
+      JSONArray targetedResequencingByKit = new JSONArray();
       for (TargetedResequencing targetedResequencing : targetedResequencings) {
+        Map<String, Object> targetedResequencingMap = Maps.newHashMap();
+        targetedResequencingMap.put("targetedResequencingId", targetedResequencing.getTargetedResequencingId());
+        targetedResequencingMap.put("alias", targetedResequencing.getAlias());
+        targetedResequencingMap.put("kitDescriptorId", targetedResequencing.getKitDescriptor().getId());
+        fullTargetedResequencingCollection.add(targetedResequencingMap);
         if (libraryPrepKitId != null && libraryPrepKitId == targetedResequencing.getKitDescriptor().getId()) {
-          Map<String, Object> targetedResequencingMap = Maps.newHashMap();
-          targetedResequencingMap.put("targetedSequencingId", targetedResequencing.getTargetedResequencingId());
-          targetedResequencingMap.put("alias", targetedResequencing.getAlias());
-          targetedResequencingMap.put("kitDescriptorId", targetedResequencing.getKitDescriptor().getId());
-          targetedResequencingCollection.add(targetedResequencingMap);
+          targetedResequencingByKit.add(targetedResequencingMap);
         }
       }
       Map<String, Object> targetedResequencingMap = Maps.newHashMap();
-      targetedResequencingMap.put("targetedResequencings", targetedResequencingCollection);
+      if (libraryPrepKitId != null) {
+        targetedResequencingMap.put("targetedResequencings", targetedResequencingByKit);
+      } else {
+        targetedResequencingMap.put("targetedResequencings", fullTargetedResequencingCollection);
+      }
       return JSONUtils.JSONObjectResponse(targetedResequencingMap);
     } catch (IOException e) {
       log.error("Cannot list all Targeted Resequencing entries ", e);
