@@ -479,13 +479,6 @@ Sample.hot = {
   },
 
   /**
-   * Gets array of qc values
-   */
-  getQcValues: function () {
-    return Hot.dropdownRef['qcValues'].map(function (val) { if (val === '') val = 'unknown'; return val; });
-  },
-
-  /**
    * Gets array of STR statuses (detailed sample only)
    */
   getStrStatuses: function () {
@@ -876,7 +869,7 @@ Sample.hot = {
         data: 'qcValue',
         type: 'dropdown',
         trimDropdown: false,
-        source: Sample.hot.getQcValues(),
+        source: Hot.getQcValues(),
         validator: permitEmpty,
         include: showQcs || show['Stock']
       },
@@ -1054,7 +1047,7 @@ Sample.hot = {
     sample.description = obj.description || '';
     sample.identificationBarcode = obj.identificationBarcode;
     sample.sampleType = obj.sampleType;
-    sample.qcPassed = '';
+    sample.qcPassed = (obj.qcPassed && obj.qcPassed != 'unknown' ? obj.qcPassed : '') || '';
     sample.alias = obj.alias || '';
     sample.projectId = (parseInt(obj.projectId) || parseInt(document.getElementById('projectSelect').value));
     sample.scientificName = obj.scientificName;
@@ -1155,10 +1148,6 @@ Sample.hot = {
       break;
     }
 
-    // TODO: add qcCols attributes to their objects:
-    if (obj.qcPassed) {
-      sample.qcPassed = (obj.qcPassed == 'unknown' ? '' : obj.qcPassed);
-    }
      // TODO: fix QCPD
      //sample.qcPassedDetailId = Hot.getIdFromAlias(obj.qcPassedDetailAlias, Hot.sampleOptions.qcPassedDetailsDtos);
     if (obj.volume) {

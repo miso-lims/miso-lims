@@ -370,12 +370,8 @@ public class EditSampleController {
   public JSONObject referenceDataJsonString() throws IOException, JSONException {
     final JSONObject hot = new JSONObject();
     final List<String> sampleTypes = new ArrayList<String>(requestManager.listAllSampleTypes());
-    final List<String> qcValues = new ArrayList<String>();
     final List<String> strStatuses = new ArrayList<String>();
     final List<String> donorSexes = new ArrayList<String>();
-    qcValues.add("true");
-    qcValues.add("false");
-    qcValues.add("");
     JSONArray allProjects = new JSONArray();
     for (Project fullProject : requestManager.listAllProjects()) {
       JSONObject project = new JSONObject();
@@ -393,7 +389,6 @@ public class EditSampleController {
 
     hot.put("sampleTypes", sampleTypes);
     hot.put("projects", allProjects);
-    hot.put("qcValues", qcValues);
     hot.put("strStatuses", strStatuses);
     hot.put("donorSexes", donorSexes);
 

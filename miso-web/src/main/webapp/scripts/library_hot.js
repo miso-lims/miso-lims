@@ -5,6 +5,17 @@
 Library.hot = {
   libraryData: null,
   showQcs: false,
+  libraryTypeAliases: {},
+  
+  getLibraryTypeAliasLists: function () {
+    Hot.dropdownRef.libraryTypes.forEach(function (lt) {
+      if (Library.hot.libraryTypeAliases[lt.platform]) {
+        Library.hot.libraryTypeAliases[lt.platform].push(lt.alias);
+      } else {
+        Library.hot.libraryTypeAliases[lt.platform] = [lt.alias];
+      }
+    });
+  },
   
   /**
    * Modifies attributes of Library Dtos so Handsontable displays them correctly
@@ -64,30 +75,39 @@ Library.hot = {
     });
     document.getElementById('hotContainer').style.display = '';
     
-    // add listeners for platform and barcode changes
-    Handsontable.hooks.add('afterChange', function (changes, source) {
-      //TODO: change listeners.
-      if('edit' === source) {
-        var row = changes[0][0];
-        var col = changes[0][1];
-        var from = changes[0][2];
-        var to = changes[0][3];
-        if('platformName' === col) {
-            Library.hot.changePlatform(row, col, from, to);
-        }
-        if('tagBarcodeFamilyName' === col) {
-            Library.hot.changeBarcodeKit(row, col, from, to);
-        }
-      }
-    }, Hot.hotTable);
-    
+    Library.hot.ltIndex = Library.hot.getColIndex('libraryTypeAlias');
+    Library.hot.tbfIndex = Library.hot.getColIndex('tagBarcodeFamilyName');
+    Library.hot.tb1ColIndex = Library.hot.getColIndex('tagBarcodes["1"].alias');
+    Library.hot.tb2ColIndex = Library.hot.getColIndex('tagBarcodes["1"].alias');
+    Library.hot.pfIndex = Library.hot.getColIndex('platformName');
     // enable save button if it was disabled
     if (Hot.saveButton && Hot.saveButton.classList.contains('disabled')) Hot.toggleButtonAndLoaderImage(Hot.saveButton);
   },
   
   // TODO: add function regenerateWithQcs
   
-  // TODO: add function hideAdditionalCols
+  /**
+   * Bulk changes to Platform or Barcode Kit mean there need to be corresponding bulk changes to Indexes, etc. 
+   * This hook sets the correct source for dependent columns once Platform or Barcode Kit are changed.
+   */
+  addPlatformAndTBHooks: function () {
+    Hot.hotTable.addHook('afterChange', function (changes, source) {
+      // 'changes' is a variable-length array of arrays. Each inner array has the following structure:
+      // [rowIndex, colName, oldValue, newValue]
+      if (['edit', 'autofill'].indexOf(source)!= -1) {
+        for (var i = 0; i < changes.length; i++) {
+          switch (changes[i][1]) {
+            case 'platformName':
+              Library.hot.changePlatform(changes[i][0], changes[i][1], changes[i][2], changes[i][3]);
+              break;
+            case 'tagBarcodeFamilyName':
+              Library.hot.changeBarcodeKit(changes[i][0], changes[i][1], changes[i][2], changes[i][3]);
+              break;
+          }
+        }
+      }
+    });
+  },
   
   /**
    * Data schema for each row in table
@@ -280,7 +300,19 @@ Library.hot = {
           trimDropdown: false,
           source: [],
           validator: permitEmpty
-        } 
+        },{
+          header: 'QC Passed?',
+          data: 'qcValue',
+          type: 'dropdown',
+          trimDropdown: false,
+          source: Hot.getQcValues(),
+          validator: permitEmpty
+        },{
+          header: 'Volume',
+          data: 'volume',
+          type: 'numeric',
+          format: '0.0'
+        }
       ];
       
       return libCols;
@@ -301,22 +333,12 @@ Library.hot = {
     
     function setDetailedCols () {
       var additionalCols = [
-        {
+       {
           header: 'Kit',
           data: 'libraryAdditionalInfo.prepKit.alias',
           type: 'dropdown',
           trimDropdown: false,
           source: Library.hot.getKitDescriptors()
-        },{
-          header: 'Volume',
-          data: 'volume',
-          type: 'numeric',
-          format: '0.0'
-        },{
-          header: 'Conc.',
-          data: 'concentration',
-          type: 'numeric',
-          format: '0.00'
         }
       ];
       
@@ -371,38 +393,30 @@ Library.hot = {
   	  if (Hot.colConf[i].data == dataString) return i;
   	}
   },
-  
+
   /**
    * Detects Platform change for a row and clears out library types, tagBarcode kits, tagBarcodes
    */
   changePlatform: function (row, col, from, to) {
     // update library types
-    jQuery.get('../../libraryTypesJson', {platform: to},
-      function (data) {
-    	var libTypeColIndex = Library.hot.getColIndex('libraryTypeAlias');
-        Hot.hotTable.setDataAtCell(row, libTypeColIndex, '', 'platform change');
-        Hot.hotTable.getCellMeta(row, libTypeColIndex).source = data['libraryTypes'];
-      }    
-    );
+    Hot.startData[row].libraryTypeAlias = '';
+    Hot.hotTable.setCellMeta(row, Library.hot.ltIndex, 'source', Library.hot.libraryTypeAliases[to]);
+
     // update barcode kits
-    // use stored barcode kits if these have already been retrieved. 'to' -- platformName
-    var bcStratColIndex = Library.hot.getColIndex('tagBarcodeFamilyName');
+    // use stored barcode kits if these have already been retrieved. 'to' == platformName
     if (Hot.dropdownRef.barcodeKits[to]) {
-      Hot.hotTable.setDataAtCell(row, bcStratColIndex, '', 'platform change');
-      Hot.hotTable.getCellMeta(row, bcStratColIndex).source = Object.keys(Hot.dropdownRef.tagBarcodes[to]);
-    } else {
+      Hot.hotTable.setDataAtCell(row, Library.hot.tbfIndex, '', 'platform change');
+      Hot.hotTable.setCellMeta(row, Library.hot.tbfIndex, 'source', Object.keys(Hot.dropdownRef.tagBarcodes[to]));
+    } else if (to != '') {
       jQuery.get('../../tagBarcodeFamiliesJson', {platform: to},
         function (data) {
-          Hot.hotTable.setDataAtCell(row, bcStratColIndex, '', 'platform change');
-          Hot.hotTable.getCellMeta(row, bcStratColIndex).source = data['barcodeKits'];
+          Hot.hotTable.setDataAtCell(row, Library.hot.tbfIndex, '', 'platform change');
+          Hot.hotTable.setCellMeta(row, Library.hot.tbfIndex, 'source', data['barcodeKits']);
           Hot.dropdownRef.barcodeKits[to] = {};
           Hot.dropdownRef.barcodeKits[to] = data['barcodeKits'];
         }    
       );
     }
-    // clear tagBarcodes
-    Hot.hotTable.setDataAtCell(row, (bcStratColIndex + 1), '', 'platform change');
-    Hot.hotTable.setDataAtCell(row, (bcStratColIndex + 2), '', 'platform change');
   },
   
   /**
@@ -410,28 +424,25 @@ Library.hot = {
    */
   changeBarcodeKit: function (row, col, from, to) {
     // use stored barcodes if these have already been retrieved. 'to' == tagBarcodeFamily name
-    var bcStratColIndex = Library.hot.getColIndex('tagBarcodeFamilyName');
-  	var tb1ColIndex = bcStratColIndex + 1;
-  	var tb2ColIndex = bcStratColIndex + 2;
-    var pfName = Hot.hotTable.getDataAtCell(row, Library.hot.getColIndex('platformName'));
+    var pfName = Hot.hotTable.getDataAtCell(row, Library.hot.pfIndex);
 
     // clear out pre-existing tagBarcodes
-    Hot.hotTable.setDataAtCell(row, tb1ColIndex, '', 'barcode kit change');
-    Hot.hotTable.setDataAtCell(row, tb2ColIndex, '', 'barcode kit change');
+    Hot.startData[row]['tagBarcodes["1"].alias'] = '';
+    Hot.startData[row]['tagBarcodes["2"].alias'] = '';
     if (Hot.dropdownRef.tagBarcodes[pfName][to] && Hot.dropdownRef.tagBarcodes[pfName][to]['1']) {
-      Hot.hotTable.getCellMeta(row, tb1ColIndex).source = Library.hot.getBcComposites(Hot.dropdownRef.tagBarcodes[pfName][to]['1']);
+      Hot.hotTable.setCellMeta(row, Library.hot.tb1ColIndex, 'source', Library.hot.getBcComposites(Hot.dropdownRef.tagBarcodes[pfName][to]['1']));
       if (Hot.dropdownRef.tagBarcodes[pfName][to]['2']) {
-        Hot.hotTable.getCellMeta(row, tb2ColIndex).source = Library.hot.getBcComposites(Hot.dropdownRef.tagBarcodes[pfName][to]['2']);
+        Hot.hotTable.setCellMeta(row, Library.hot.tb2ColIndex, 'source', Library.hot.getBcComposites(Hot.dropdownRef.tagBarcodes[pfName][to]['2']));
       }
-    } else {
+    } else if (to != 'No barcode' && to != '') {
       // get barcodes from server
       jQuery.get("../../barcodePositionsJson", {strategy : to},
         function(posData) {
           // set tagBarcodeData
           jQuery.get('../../tagBarcodesJson', {strategy : to , position: 1},
             function (bc1Data) {
-              Hot.hotTable.setDataAtCell(row, tb1ColIndex, '', 'barcode kit change');
-              Hot.hotTable.getCellMeta(row, tb1ColIndex).source = Library.hot.getBcComposites(bc1Data.tagBarcodes);
+              Hot.hotTable.setDataAtCell(row, Library.hot.tb1ColIndex, '', 'barcode kit change');
+              Hot.hotTable.setCellMeta(row, Library.hot.tb1ColIndex, 'source', Library.hot.getBcComposites(bc1Data.tagBarcodes));
               Hot.dropdownRef.tagBarcodes[pfName][to] = {};
               Hot.dropdownRef.tagBarcodes[pfName][to]['1'] = bc1Data.tagBarcodes;
             }    
@@ -440,7 +451,7 @@ Library.hot = {
             jQuery.get('../../tagBarcodesJson', {strategy : to , position: 2},
               function (bc2Data) {
                 Hot.hotTable.setDataAtCell(row, tb2ColIndex, '', 'barcode kit change');
-                Hot.hotTable.getCellMeta(row, tb2ColIndex).source = Library.hot.getBcComposites(bc2Data.tagBarcodes);
+                Hot.hotTable.setCellMeta(row, tb2ColIndex, 'source', Library.hot.getBcComposites(bc2Data.tagBarcodes));
                 Hot.dropdownRef.tagBarcodes[pfName][to]['2'] = bc2Data.tagBarcodes;
               }    
             );
