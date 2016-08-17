@@ -707,7 +707,7 @@ Sample.hot = {
         header: 'Group ID',
         data: 'groupId',
         type: 'numeric',
-        validator: validateNumber,
+        validator: validateAlphanumeric,
         include: isDetailed
       },
       {
@@ -981,6 +981,15 @@ Sample.hot = {
 
     function validateNumber (value, callback) {
       if (value === '' || value === null || Handsontable.helper.isNumeric(value) && value > 0) {
+        return callback(true);
+      } else {
+        return callback(false);
+      }
+    }
+    
+    function validateAlphanumeric (value, callback) {
+      var alphanumRegex = /^[-\w]+$/;
+      if (value === '' || value === null || alphanumRegex.test(value)) {
         return callback(true);
       } else {
         return callback(false);

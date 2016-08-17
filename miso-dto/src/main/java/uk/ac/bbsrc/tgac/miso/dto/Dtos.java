@@ -834,12 +834,6 @@ public class Dtos {
   public static LibraryAdditionalInfoDto asDto(LibraryAdditionalInfo from) {
     LibraryAdditionalInfoDto dto = new LibraryAdditionalInfoDto();
     dto.setLibraryId(from.getLibraryId());
-    if (from.getGroupId() != null) {
-      dto.setGroupId(from.getGroupId());
-    }
-    if (from.getGroupDescription() != null) {
-      dto.setGroupDescription(from.getGroupDescription());
-    }
     if (from.getPrepKit() != null) {
       dto.setPrepKit(asDto(from.getPrepKit()));
     }
@@ -865,10 +859,6 @@ public class Dtos {
   public static LibraryAdditionalInfo to(LibraryAdditionalInfoDto from) {
     LibraryAdditionalInfo to = new LibraryAdditionalInfoImpl();
     to.setLibraryId(from.getLibraryId());
-    if (from.getGroupId() != null) {
-      to.setGroupId(from.getGroupId());
-      to.setGroupDescription(from.getGroupDescription());
-    }
     if (from.getPrepKit() != null) {
       to.setPrepKit(to(from.getPrepKit()));
     }

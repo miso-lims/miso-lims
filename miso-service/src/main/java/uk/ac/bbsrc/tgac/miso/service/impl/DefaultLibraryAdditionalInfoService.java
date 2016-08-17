@@ -13,7 +13,6 @@ import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryAdditionalInfo;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.persistence.LibraryAdditionalInfoDao;
@@ -59,11 +58,6 @@ public class DefaultLibraryAdditionalInfoService implements LibraryAdditionalInf
     if (libraryAdditionalInfo.getPrepKit() != null) {
       libraryAdditionalInfo.setPrepKit(kitStore.getKitDescriptorById(libraryAdditionalInfo.getPrepKit().getId()));
     }
-    SampleAdditionalInfo sample = (SampleAdditionalInfo) libraryAdditionalInfo.getLibrary().getSample();
-    if (sample.getGroupId() != null) {
-      libraryAdditionalInfo.setGroupId(sample.getGroupId());
-      libraryAdditionalInfo.setGroupDescription(sample.getGroupDescription());
-    }
     User user = authorizationManager.getCurrentUser();
     libraryAdditionalInfo.setCreatedBy(user);
     libraryAdditionalInfo.setUpdatedBy(user);
@@ -74,8 +68,6 @@ public class DefaultLibraryAdditionalInfoService implements LibraryAdditionalInf
   public void update(LibraryAdditionalInfo libraryAdditionalInfo) throws IOException {
     authorizationManager.throwIfNotWritable(libraryAdditionalInfo.getLibrary());
     LibraryAdditionalInfo updated = get(libraryAdditionalInfo.getLibraryId());
-    updated.setGroupId(libraryAdditionalInfo.getGroupId());
-    updated.setGroupDescription(libraryAdditionalInfo.getGroupDescription());
     if (libraryAdditionalInfo.getPrepKit() != null) {
       updated.setPrepKit(kitStore.getKitDescriptorById(libraryAdditionalInfo.getPrepKit().getId()));
     }
