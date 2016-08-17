@@ -1096,9 +1096,15 @@ public class Dtos {
 
   public static LibraryDilution to(DilutionDto from) {
     LibraryDilution to = new LibraryDilution();
-    to.setId(from.getId());
-    to.setName(from.getName());
-    to.setIdentificationBarcode(from.getIdentificationBarcode());
+    if (from.getId() != null) {
+      to.setId(from.getId());
+    }
+    if (!isStringEmptyOrNull(from.getName())) {
+      to.setName(from.getName());
+    }
+    if (!isStringEmptyOrNull(from.getIdentificationBarcode())) {
+      to.setIdentificationBarcode(from.getIdentificationBarcode());
+    }
     to.setConcentration(from.getConcentration());
     to.setLibrary(to(from.getLibrary()));
     if (!isStringEmptyOrNull(from.getDilutionUserName())) {
