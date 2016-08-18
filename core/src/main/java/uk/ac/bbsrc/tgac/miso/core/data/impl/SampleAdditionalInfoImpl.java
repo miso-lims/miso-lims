@@ -55,7 +55,7 @@ public class SampleAdditionalInfoImpl extends SampleImpl implements SampleAdditi
 
   private Integer siblingNumber;
 
-  private Long groupId;
+  private String groupId;
   private String groupDescription;
   private boolean isSynthetic = false;
 
@@ -152,12 +152,12 @@ public class SampleAdditionalInfoImpl extends SampleImpl implements SampleAdditi
   }
 
   @Override
-  public Long getGroupId() {
+  public String getGroupId() {
     return groupId;
   }
 
   @Override
-  public void setGroupId(Long groupId) {
+  public void setGroupId(String groupId) {
     this.groupId = groupId;
   }
 

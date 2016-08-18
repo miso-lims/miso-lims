@@ -404,9 +404,6 @@
     <td class="h">Tissue Type:</td>
     <td>${library.sampleTissue.tissueType.alias}</td>
   </tr>
-<c:choose>
-<c:when test="${library.id == 0}">
-
   <c:if test="${not empty library.sample.groupId}">
   <tr>
     <td class="h">Group ID:</td>
@@ -417,20 +414,6 @@
     <td>${library.sample.groupDescription}</td>
   </tr>
   </c:if>
-</c:when>
-<c:otherwise>
-  <c:if test="${not empty library.libraryAdditionalInfo.groupId}">
-  <tr>
-    <td class="h">Group ID:</td>
-    <td>${library.libraryAdditionalInfo.groupId}</td>
-  </tr>
-  <tr>
-    <td class="h">Group Description:</td>
-    <td>${library.libraryAdditionalInfo.groupDescription}</td>
-  </tr>
-  </c:if>
-</c:otherwise>
-</c:choose>
   <tr>
     <td class="h">Archived:</td>
     <td><form:checkbox id="archived" path="libraryAdditionalInfo.archived"/></td>

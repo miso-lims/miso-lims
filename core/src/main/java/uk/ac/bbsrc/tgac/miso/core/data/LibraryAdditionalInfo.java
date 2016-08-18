@@ -2,10 +2,11 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.util.Date;
 
+import org.codehaus.jackson.annotate.JsonBackReference;
+
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
-import org.codehaus.jackson.annotate.JsonBackReference;
 
 public interface LibraryAdditionalInfo {
 
@@ -17,14 +18,6 @@ public interface LibraryAdditionalInfo {
   Library getLibrary();
 
   void setLibrary(Library library);
-
-  Long getGroupId();
-
-  void setGroupId(Long groupId);
-
-  String getGroupDescription();
-
-  void setGroupDescription(String groupDescription);
 
   KitDescriptor getPrepKit();
 
