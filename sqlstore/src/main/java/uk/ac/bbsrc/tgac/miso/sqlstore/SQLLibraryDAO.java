@@ -843,6 +843,7 @@ public class SQLLibraryDAO implements LibraryStore {
       if (!rs.wasNull()) library.setBoxPosition(BoxUtils.getPositionString(row, rs.getInt("boxColumn")));
       library.setBoxLocation(rs.getString("boxLocation"));
       library.setQcPassed(rs.getBoolean("qcPassed"));
+      // rs.wasNull() needs to be directly after rs.getBoolean("qcPassed") as that's the value which gets checked for null
       if (rs.wasNull()) {
         library.setQcPassed(null);
       }
