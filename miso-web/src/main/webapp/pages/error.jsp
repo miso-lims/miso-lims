@@ -22,12 +22,13 @@
   ~
   ~ **********************************************************************
   --%>
+<%@ page import="uk.ac.bbsrc.tgac.miso.webapp.context.ApplicationContextProvider" %>
 
 <div id="maincontent">
   <div id="contentcolumn">
     <h1>Error</h1>
     Please copy the URL in the address bar and the <b>full</b> text below and raise a
-    <a href="http://tracker.tgac.ac.uk/browse/MISO">JIRA ticket in the MISO project</a>, describing what you were
+    <a href="${ApplicationContextProvider.getBugUrl()}">ticket</a>, describing what you were
     trying to do when this error occurred.<br/><br/>
 
     <h2>${pageContext.exception.message}</h2><br/>
