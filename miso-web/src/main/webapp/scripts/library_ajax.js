@@ -1213,8 +1213,7 @@ Library.ui = {
       alert("Please select one or more Libraries to update.");
       return false;
     }
-    alert("Check if controller methods have been implemented.");
-    // window.location = "library/bulk/" + selectedIdsArray.join(',');
+    window.location = "library/bulk/edit/" + selectedIdsArray.join(',');
   },
   
   makeDilutionsFromSelectedItems: function () {

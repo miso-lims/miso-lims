@@ -78,28 +78,29 @@ public class LibraryAdditionalInfoController extends RestController {
   private static LibraryAdditionalInfoDto writeUrls(LibraryAdditionalInfoDto libraryAdditionalInfoDto, UriComponentsBuilder uriBuilder) {
 
     URI baseUri = uriBuilder.build().toUri();
-    libraryAdditionalInfoDto.setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/library/additionalinfo/{id}")
-        .buildAndExpand(libraryAdditionalInfoDto.getId()).toUriString());
-    libraryAdditionalInfoDto.setCreatedByUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}")
-        .buildAndExpand(libraryAdditionalInfoDto.getCreatedById()).toUriString());
-    libraryAdditionalInfoDto.setUpdatedByUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}")
-        .buildAndExpand(libraryAdditionalInfoDto.getUpdatedById()).toUriString());
-    libraryAdditionalInfoDto.setLibraryUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/library/{id}")
-        .buildAndExpand(libraryAdditionalInfoDto.getLibraryId()).toUriString());
-    libraryAdditionalInfoDto.getTissueOrigin().setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/tissueorigin/{id}")
-        .buildAndExpand(libraryAdditionalInfoDto.getTissueOrigin().getId()).toUriString());
-    libraryAdditionalInfoDto.getTissueType().setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/tissuetype/{id}")
-        .buildAndExpand(libraryAdditionalInfoDto.getTissueType().getId()).toUriString());
+    libraryAdditionalInfoDto.setUrl(
+        UriComponentsBuilder.fromUri(baseUri).path("/rest/library/additionalinfo/{id}").buildAndExpand(libraryAdditionalInfoDto.getId())
+            .toUriString());
+    libraryAdditionalInfoDto.setCreatedByUrl(
+        UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}").buildAndExpand(libraryAdditionalInfoDto.getCreatedById())
+            .toUriString());
+    libraryAdditionalInfoDto.setUpdatedByUrl(
+        UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}").buildAndExpand(libraryAdditionalInfoDto.getUpdatedById())
+            .toUriString());
+    libraryAdditionalInfoDto.setLibraryUrl(
+        UriComponentsBuilder.fromUri(baseUri).path("/rest/library/{id}").buildAndExpand(libraryAdditionalInfoDto.getLibraryId())
+            .toUriString());
     if (libraryAdditionalInfoDto.getPrepKit() != null && libraryAdditionalInfoDto.getPrepKit().getId() != null) {
-      libraryAdditionalInfoDto.getPrepKit().setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/kitdescriptor/{id}")
-          .buildAndExpand(libraryAdditionalInfoDto.getPrepKit().getId()).toUriString());
+      libraryAdditionalInfoDto.getPrepKit().setUrl(
+          UriComponentsBuilder.fromUri(baseUri).path("/rest/kitdescriptor/{id}")
+              .buildAndExpand(libraryAdditionalInfoDto.getPrepKit().getId()).toUriString());
     }
     return libraryAdditionalInfoDto;
   }
 
   @RequestMapping(value = "/additionalinfos", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public Set<LibraryAdditionalInfoDto> getLibraryAdditionalInfos(UriComponentsBuilder uriBuilder, HttpServletResponse response) 
+  public Set<LibraryAdditionalInfoDto> getLibraryAdditionalInfos(UriComponentsBuilder uriBuilder, HttpServletResponse response)
       throws IOException {
     Set<LibraryAdditionalInfo> libraryAdditionalInfos = libraryAdditionalInfoService.getAll();
     Set<LibraryAdditionalInfoDto> libraryAdditionalInfoDtos = Dtos.asLibraryAdditionalInfoDtos(libraryAdditionalInfos);
@@ -111,8 +112,8 @@ public class LibraryAdditionalInfoController extends RestController {
 
   @RequestMapping(value = "/additionalinfo", method = RequestMethod.POST, headers = { "Content-type=application/json" })
   @ResponseBody
-  public ResponseEntity<?> createLibraryAdditionalInfo(@RequestBody LibraryAdditionalInfoDto libraryAdditionalInfoDto, UriComponentsBuilder b,
-      HttpServletResponse response) throws IOException {
+  public ResponseEntity<?> createLibraryAdditionalInfo(@RequestBody LibraryAdditionalInfoDto libraryAdditionalInfoDto,
+      UriComponentsBuilder b, HttpServletResponse response) throws IOException {
     LibraryAdditionalInfo libraryAdditionalInfo = Dtos.to(libraryAdditionalInfoDto);
     Long id = libraryAdditionalInfoService.create(libraryAdditionalInfo, libraryAdditionalInfoDto.getLibraryId());
     UriComponents uriComponents = b.path("/library/additionalinfo/{id}").buildAndExpand(id);

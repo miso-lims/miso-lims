@@ -93,7 +93,7 @@ public class LibraryRestController extends RestController {
   private AuthorizationManager authorizationManager;
 
   @Autowired
-  private TagBarcodeService tagBarcodeStrategyService;
+  private TagBarcodeService tagBarcodeFamilyService;
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
@@ -130,10 +130,10 @@ public class LibraryRestController extends RestController {
     library.setLibraryType(requestManager.getLibraryTypeById(libraryDto.getLibraryTypeId()));
     List<TagBarcode> tagBarcodes = new ArrayList<>();
     if (libraryDto.getTagBarcodeIndex1Id() != null) {
-      tagBarcodes.add(tagBarcodeStrategyService.getTagBarcodeById(libraryDto.getTagBarcodeIndex1Id()));
+      tagBarcodes.add(tagBarcodeFamilyService.getTagBarcodeById(libraryDto.getTagBarcodeIndex1Id()));
     }
     if (libraryDto.getTagBarcodeIndex2Id() != null) {
-      tagBarcodes.add(tagBarcodeStrategyService.getTagBarcodeById(libraryDto.getTagBarcodeIndex2Id()));
+      tagBarcodes.add(tagBarcodeFamilyService.getTagBarcodeById(libraryDto.getTagBarcodeIndex2Id()));
     }
     library.setTagBarcodes(tagBarcodes);
     library.setLibraryAdditionalInfo(Dtos.to(libraryDto.getLibraryAdditionalInfo()));
@@ -165,13 +165,14 @@ public class LibraryRestController extends RestController {
     return new ResponseEntity<>(headers, HttpStatus.CREATED);
   }
 
-  @RequestMapping(value = "/{libraryId}", method = RequestMethod.PUT, headers = { "Content-type=application/json" })
+  @RequestMapping(value = "/{id}", method = RequestMethod.PUT, headers = { "Content-type=application/json" })
   @ResponseBody
   public ResponseEntity<?> updateLibrary(@PathVariable("id") Long id, @RequestBody LibraryDto libraryDto) throws IOException {
     Library library = requestManager.getLibraryById(id);
     if (library == null) {
       throw new RestException("No such library.", Status.NOT_FOUND);
     }
+    library = Dtos.to(libraryDto, library);
     populateAndSaveLibraryFromDto(libraryDto, library, false);
     return new ResponseEntity<>(HttpStatus.OK);
   }
