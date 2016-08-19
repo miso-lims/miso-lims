@@ -18,6 +18,7 @@ public class LibraryAdditionalInfoDto {
   private String lastUpdated;
   private Boolean archived;
   private Long libraryDesignId;
+  private boolean nonStandardAlias;
 
   public Long getId() {
     return id;
@@ -123,12 +124,20 @@ public class LibraryAdditionalInfoDto {
     this.libraryDesignId = libraryDesignId;
   }
 
+  public boolean getNonStandardAlias() {
+    return nonStandardAlias;
+  }
+
+  public void setNonStandardAlias(boolean nonStandardAlias) {
+    this.nonStandardAlias = nonStandardAlias;
+  }
+
   @Override
   public String toString() {
-    return "LibraryAdditionalInfoDto [id=" + id + ", url=" + url + ", libraryId=" + libraryId + ", libraryUrl=" + libraryUrl
-        + ", prepKit=" + prepKit + ", createdById=" + createdById + ", createdByUrl=" + createdByUrl + ", creationDate="
-        + creationDate + ", updatedById=" + updatedById + ", updatedByUrl=" + updatedByUrl + ", lastUpdated=" + lastUpdated
-        + ", archived=" + archived + ", libraryDesignId=" + libraryDesignId + "]";
+    return "LibraryAdditionalInfoDto [id=" + id + ", url=" + url + ", libraryId=" + libraryId + ", libraryUrl=" + libraryUrl + ", prepKit="
+        + prepKit + ", createdById=" + createdById + ", createdByUrl=" + createdByUrl + ", creationDate=" + creationDate + ", updatedById="
+        + updatedById + ", updatedByUrl=" + updatedByUrl + ", lastUpdated=" + lastUpdated + ", archived=" + archived + ", libraryDesignId="
+        + libraryDesignId + ", nonStandardAlias=" + nonStandardAlias + "]";
   }
 
 }

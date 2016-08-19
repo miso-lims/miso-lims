@@ -231,6 +231,7 @@ public class DefaultSampleService implements SampleService {
         SampleAdditionalInfo detailed = (SampleAdditionalInfo) sample;
         try {
           detailed.setParent(findOrCreateParent(detailed));
+          detailed.setNonStandardAlias(detailed.getParent().hasNonStandardAlias());
         } catch (MisoNamingException e) {
           throw new IOException(e.getMessage(), e);
         }
@@ -240,7 +241,9 @@ public class DefaultSampleService implements SampleService {
 
     // pre-save field generation
     sample.setName(generateTemporaryName());
-    if (isStringEmptyOrNull(sample.getAlias()) && sampleNamingScheme.hasGeneratorFor("alias")) {
+    if (isDetailedSample(sample) && ((SampleAdditionalInfo) sample).hasNonStandardAlias()) {
+      // do not validate alias
+    } else if (isStringEmptyOrNull(sample.getAlias()) && sampleNamingScheme.hasGeneratorFor("alias")) {
       sample.setAlias(generateTemporaryName());
     } else {
       validateAliasUniqueness(sample.getAlias());
@@ -508,7 +511,10 @@ public class DefaultSampleService implements SampleService {
     target.setQcPassed(source.getQcPassed());
     target.setScientificName(source.getScientificName());
     target.setTaxonIdentifier(source.getTaxonIdentifier());
-    if (!target.getAlias().equals(source.getAlias())) {
+
+    // validate alias uniqueness only if the alias has changed and the sample does not have a non-standard alias
+    if (!target.getAlias().equals(source.getAlias())
+        && (!isDetailedSample(target) || (isDetailedSample(target) && !((SampleAdditionalInfo) target).hasNonStandardAlias()))) {
       validateAliasUniqueness(source.getAlias());
     }
     target.setAlias(source.getAlias());

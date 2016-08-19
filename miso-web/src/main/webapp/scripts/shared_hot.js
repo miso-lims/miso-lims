@@ -40,6 +40,39 @@ var Hot = {
   },
 
   /**
+   * Custom renderer to visually highlight a non-standard alias
+   */
+  nsAliasRenderer: function (instance, td, row, col, prop, value, cellProperties) {
+    td.setAttribute('style', 'background-color: #ffffcc');
+    td.innerHTML = value;
+    return td;
+  },
+
+  /**
+   * Custom renderer to visually highlight a read-only non-standard alias (generally for non-standard parent aliases)
+   */
+  nsAliasReadOnlyRenderer: function (instance, td, row, col, prop, value, cellProperties) {
+    td.setAttribute('style', 'background-color: #ffffcc');
+    td.classList.add('htDimmed');
+    td.innerHTML = value;
+    return td;
+  },
+  
+  /**
+   * Custom validator for fields that must contain data
+   */
+  requiredText: function (value, callback) {
+    return callback(value && value.length > 0);
+  },
+
+  /**
+   * Custom validator for fields that may remain empty
+   */
+  permitEmpty: function (value, callback) {
+    return callback(value === undefined || value === null || value === '' || value.length > 0);
+  },
+
+  /**
    * Gets item's alias
    */
   getAlias: function (obj) {
@@ -96,6 +129,15 @@ var Hot = {
    */
   getQcValues: function () {
     return ['true', 'false', 'unknown'];
+  },
+  
+  /**
+   * Gets the column index for a given attribute
+   */
+  getColIndex: function (attrName) {
+    for (var i = 0; i < Hot.colConf.length; i++) {
+      if (Hot.colConf[i].data == attrName) return i;
+    }
   },
   
   /**

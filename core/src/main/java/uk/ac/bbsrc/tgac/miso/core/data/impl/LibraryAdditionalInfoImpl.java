@@ -53,6 +53,9 @@ public class LibraryAdditionalInfoImpl implements LibraryAdditionalInfo {
   @Column(nullable = false)
   private Boolean archived = Boolean.FALSE;
 
+  @Column(nullable = false)
+  private boolean nonStandardAlias = false;
+
   @OneToOne
   @JoinColumn(name = "libraryDesign", nullable = true)
   private LibraryDesign libraryDesign;
@@ -157,6 +160,16 @@ public class LibraryAdditionalInfoImpl implements LibraryAdditionalInfo {
   @Override
   public void setLibraryDesign(LibraryDesign libraryDesign) {
     this.libraryDesign = libraryDesign;
+  }
+
+  @Override
+  public boolean hasNonStandardAlias() {
+    return nonStandardAlias;
+  }
+
+  @Override
+  public void setNonStandardAlias(boolean nonStandardAlias) {
+    this.nonStandardAlias = nonStandardAlias;
   }
 
 }

@@ -224,12 +224,24 @@
             (blank to auto-generate)
           </c:when>
           <c:otherwise>
-            *
+            *<c:if test="${detailedSample && sample.parent.hasNonStandardAlias()}">
+            (cannot auto-generate since parent has non-standard alias)
+            </c:if>
           </c:otherwise>
         </c:choose>
       </td>
-      <td><form:input id="alias" path="alias" name="alias" data-parsley-required='${!aliasGenerationEnabled || sample.id != 0}'/><span id="aliasCounter" class="counter"></span></td>
+      <td><form:input id="alias" path="alias" name="alias" data-parsley-required='${!aliasGenerationEnabled || sample.id != 0}'/><span id="aliasCounter" class="counter"></span>
         <%--<td><a href="void(0);" onclick="popup('help/sampleAlias.html');">Help</a></td>--%>
+        <c:if test="${detailedSample}">
+          <c:if test="${sample.hasNonStandardAlias() || sample.parent.hasNonStandardAlias()}">
+	          <ul class="parsley-errors-list filled" id="nonStandardAlias">
+	            <li class="parsley-custom-error-message">
+	            Double-check this alias -- it will be saved even if it (or the parent sample's alias) is duplicated or does not follow the naming standard!
+	            </li>
+	          </ul>
+	        </c:if>
+        </c:if>
+      </td>
     </tr>
     <tr>
       <td>Description:*</td>

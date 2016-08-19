@@ -59,6 +59,9 @@ public class SampleAdditionalInfoImpl extends SampleImpl implements SampleAdditi
   private String groupDescription;
   private boolean isSynthetic = false;
 
+  @Column(nullable = false)
+  private boolean nonStandardAlias = false;
+
   @Override
   public SampleAdditionalInfo getParent() {
     return parent;
@@ -181,5 +184,15 @@ public class SampleAdditionalInfoImpl extends SampleImpl implements SampleAdditi
     if (isSynthetic != null) {
       this.isSynthetic = isSynthetic;
     }
+  }
+
+  @Override
+  public boolean hasNonStandardAlias() {
+    return nonStandardAlias;
+  }
+
+  @Override
+  public void setNonStandardAlias(boolean nonStandardAlias) {
+    this.nonStandardAlias = nonStandardAlias;
   }
 }

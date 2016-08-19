@@ -1882,3 +1882,7 @@ button.disabled {
 .clear {
 	clear: both;
 }
+
+.table-note {
+	background-color: #ffffcc;
+}

@@ -212,14 +212,19 @@ var Sample = Sample || {
       },
       {
         'doOnSuccess': function(json) {
-          var regex = json.aliasRegex.split(' ').join('+');
-          jQuery('#alias').attr('data-parsley-pattern', regex);
-          // TODO: better error message than a regex..?
-          //       perhaps save a description and examples with the regex
-          jQuery('#alias').attr('data-parsley-error-message', 'Must match '+regex);
-          jQuery('#sample-form').parsley();
-          jQuery('#sample-form').parsley().validate();
-          Validate.updateWarningOrSubmit('#sample-form', Sample.validateSampleAlias);
+          // don't validate the alias if the sample or its parent has a nonstandard alias
+          if (jQuery('#nonStandardAlias')) {
+            jQuery('#sample-form').parsley();
+            jQuery('#sample-form').parsley().validate();
+            Validate.updateWarningOrSubmit('#sample-form');
+          } else {
+            var regex = json.aliasRegex.split(' ').join('+');
+            jQuery('#alias').attr('data-parsley-pattern', regex);
+            jQuery('#alias').attr('data-parsley-error-message', 'Must match '+regex);
+            jQuery('#sample-form').parsley();
+            jQuery('#sample-form').parsley().validate();
+            Validate.updateWarningOrSubmit('#sample-form', Sample.validateSampleAlias);
+          }
           return false;
         },
         'doOnError': function(json) {

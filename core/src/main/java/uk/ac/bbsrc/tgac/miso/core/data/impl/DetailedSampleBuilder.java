@@ -71,6 +71,7 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAliquo
   private Double volume;
   private boolean emptied = false;
   private boolean isSynthetic = false;
+  private boolean nonStandardAlias = false;
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
   private Collection<SampleQC> sampleQCs = new TreeSet<SampleQC>();
 
@@ -813,6 +814,16 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAliquo
     this.dnaseTreated = dnaseTreated;
   }
 
+  @Override
+  public boolean hasNonStandardAlias() {
+    return nonStandardAlias;
+  }
+
+  @Override
+  public void setNonStandardAlias(boolean nonStandardAlias) {
+    this.nonStandardAlias = nonStandardAlias;
+  }
+
   public SampleAdditionalInfo build() {
     if (sampleClass == null || sampleClass.getSampleCategory() == null) {
       throw new NullPointerException("Missing sample class or category");
@@ -907,6 +918,7 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAliquo
     sample.setGroupId(groupId);
     sample.setGroupDescription(groupDescription);
     sample.setSynthetic(isSynthetic);
+    sample.setNonStandardAlias(nonStandardAlias);
     sample.setSiblingNumber(siblingNumber);
 
     return sample;
