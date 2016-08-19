@@ -12,6 +12,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
+import uk.ac.bbsrc.tgac.miso.core.data.Platform;
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
@@ -19,6 +21,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
@@ -27,6 +32,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.migration.util.UniqueKeyHashMap;
@@ -67,6 +73,8 @@ public class ValueTypeLookup {
   private Map<String, QcType> sampleQcTypeByName;
   private Map<Long, QcType> libraryQcTypeById;
   private Map<String, QcType> libraryQcTypeByName;
+  private Map<Long, SequencerReference> sequencerById;
+  private Map<String, SequencerReference> sequencerByName;
   
   /**
    * Create a ValueTypeLookup loaded with data from the provided MisoServiceManager
@@ -89,6 +97,7 @@ public class ValueTypeLookup {
     setTagBarcodes(misoServiceManager.getTagBarcodeDao().listAllTagBarcodes());
     setSampleQcTypes(misoServiceManager.getSampleQcDao().listAllSampleQcTypes());
     setLibraryQcTypes(misoServiceManager.getLibraryQcDao().listAllLibraryQcTypes());
+    setSequencers(misoServiceManager.getSequencerReferenceDao().listAll());
   }
   
   private void setSampleClasses(Collection<SampleClass> sampleClasses) {
@@ -260,6 +269,17 @@ public class ValueTypeLookup {
     }
     this.libraryQcTypeById = mapById;
     this.libraryQcTypeByName = mapByName;
+  }
+  
+  private void setSequencers(Collection<SequencerReference> sequencers) {
+    Map<Long, SequencerReference> mapById = new UniqueKeyHashMap<>();
+    Map<String, SequencerReference> mapByName = new UniqueKeyHashMap<>();
+    for (SequencerReference sequencer : sequencers) {
+      mapByName.put(sequencer.getName(), sequencer);
+      mapById.put(sequencer.getId(), sequencer);
+    }
+    this.sequencerById = mapById;
+    this.sequencerByName = mapByName;
   }
   
   /**
@@ -489,6 +509,20 @@ public class ValueTypeLookup {
   }
   
   /**
+   * Attempts to find an existing SequencerReference
+   * 
+   * @param sequencer a partially-formed SequencerReference, which must have either its ID or its
+   * name set in order for this method to resolve the SequencerReference
+   * @return the existing SequencerReference if a matching one is found; null otherwise
+   */
+  public SequencerReference resolve(SequencerReference sequencer) {
+    if (sequencer == null) return null;
+    if (sequencer.getId() != TagBarcode.UNSAVED_ID) return sequencerById.get(sequencer.getId());
+    if (sequencer.getName() != null) return sequencerByName.get(sequencer.getName());
+    return null;
+  }
+  
+  /**
    * Resolves all value type entities for a Sample
    * 
    * @param sample the sample containing partially-formed value type entities
@@ -612,6 +646,41 @@ public class ValueTypeLookup {
       LibraryDesign ld = resolve(lai.getLibraryDesign());
       if (ld == null) throw new IOException("LibraryDesign not found");
       lai.setLibraryDesign(ld);
+    }
+  }
+  
+  /**
+   * Resolves all value type entities for a Run and its Pools
+   * 
+   * @param run the Run containing partially-formed value type entities
+   * to be resolved. Full, existing entities are loaded into run in place
+   * of the partially-formed entities
+   * @throws IOException if no value is found matching the available data in run
+   */
+  public void resolveAll(Run run) throws IOException {
+    SequencerReference sequencer = resolve(run.getSequencerReference());
+    if (sequencer == null) {
+      throw new IOException(String.format("SequencerReference not found (id=%d or name=%s)",
+          run.getSequencerReference() == null ? null : run.getSequencerReference().getId(),
+          run.getSequencerReference() == null ? null : run.getSequencerReference().getName()));
+    }
+    Platform platform = sequencer.getPlatform();
+    PlatformType platformType = platform.getPlatformType();
+    run.setSequencerReference(sequencer);
+    if (run.getPlatformType() == null) {
+      run.setPlatformType(platformType);
+    }
+    if (run.getSequencerPartitionContainers() != null) {
+      for (SequencerPartitionContainer<SequencerPoolPartition> flowcell : run.getSequencerPartitionContainers()) {
+        if (flowcell.getPlatform() == null) flowcell.setPlatform(platform);
+        if (flowcell.getPartitions() != null) {
+          for (SequencerPoolPartition lane : flowcell.getPartitions()) {
+            if (lane.getPool() != null && lane.getPool().getPlatformType() == null) {
+              lane.getPool().setPlatformType(platformType);
+            }
+          }
+        }
+      }
     }
   }
 
