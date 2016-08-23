@@ -10,11 +10,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.Institute;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
 import uk.ac.bbsrc.tgac.miso.core.data.TagBarcodeFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
@@ -24,6 +26,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.InstituteImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SamplePurposeImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
@@ -44,6 +47,7 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.SQLKitDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryQCDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLSampleQCDAO;
+import uk.ac.bbsrc.tgac.miso.sqlstore.SQLSequencerReferenceDAO;
 
 public class ValueTypeLookupTestSuite {
 
@@ -143,6 +147,12 @@ public class ValueTypeLookupTestSuite {
     lqcs.add(makeQcType(VALID_LONG, VALID_STRING));
     Mockito.when(lqcDao.listAllLibraryQcTypes()).thenReturn(lqcs);
     Mockito.when(mgr.getLibraryQcDao()).thenReturn(lqcDao);
+    
+    SQLSequencerReferenceDAO seqRefDao = Mockito.mock(SQLSequencerReferenceDAO.class);
+    List<SequencerReference> seqRefs = new ArrayList<>();
+    seqRefs.add(makeSequencer(VALID_LONG, VALID_STRING));
+    Mockito.when(seqRefDao.listAll()).thenReturn(seqRefs);
+    Mockito.when(mgr.getSequencerReferenceDao()).thenReturn(seqRefDao);
     
     sut = new ValueTypeLookup(mgr);
   }
@@ -406,6 +416,22 @@ public class ValueTypeLookupTestSuite {
     qc.setQcTypeId(id == null ? QcType.UNSAVED_ID : id);
     qc.setName(name);
     return qc;
+  }
+  
+  @Test
+  public void testResolveSequencer() {
+    assertNotNull(sut.resolve(makeSequencer(VALID_LONG, null)));
+    assertNotNull(sut.resolve(makeSequencer(null, VALID_STRING)));
+    assertNull(sut.resolve((SequencerReference) null));
+    assertNull(sut.resolve(makeSequencer(null, null)));
+    assertNull(sut.resolve(makeSequencer(INVALID_LONG, null)));
+    assertNull(sut.resolve(makeSequencer(null, INVALID_STRING)));
+  }
+  
+  private SequencerReference makeSequencer(Long id, String name) {
+    SequencerReference seq = new SequencerReferenceImpl(name, null, null);
+    seq.setId(id == null ? AbstractSequencerReference.UNSAVED_ID : id);
+    return seq;
   }
   
 }
