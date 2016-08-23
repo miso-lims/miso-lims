@@ -38,10 +38,13 @@ import java.util.regex.Matcher;
 
 import javax.persistence.CascadeType;
 
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -59,9 +62,6 @@ import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.Property;
 import com.googlecode.ehcache.annotations.TriggersRemove;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
@@ -84,8 +84,8 @@ import uk.ac.bbsrc.tgac.miso.core.store.StatusStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.core.store.WatcherStore;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
-import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.BridgeCollectionUpdater;
+import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 /**
  * uk.ac.bbsrc.tgac.miso.sqlstore
@@ -619,7 +619,8 @@ public class SQLRunDAO implements RunStore {
   @Override
   public Run getByAlias(String alias) throws IOException {
     List<Run> eResults = template.query(RUN_SELECT_BY_ALIAS, new Object[] { alias }, new RunMapper());
-    return eResults.size() > 0 ? eResults.get(0) : null;
+    if (eResults.size() > 1) throw new IOException("Found more than one run by this name");
+    return eResults.size() == 1 ? eResults.get(0) : null;
   }
 
   @Override
@@ -694,11 +695,11 @@ public class SQLRunDAO implements RunStore {
       r.setFilePath(rs.getString("filePath"));
       r.setPlatformType(PlatformType.get(rs.getString("platformType")));
       r.setSequencingParametersId(rs.getLong("sequencingParameters_parametersId"));
-      r.setLastUpdated(rs.getDate("lastUpdated"));
       if (rs.wasNull()) {
         r.setSequencingParametersId(null);
       }
-
+      r.setLastUpdated(rs.getDate("lastUpdated"));
+      
       try {
         r.setLastModifier(securityDAO.getUserById(rs.getLong("lastModifier")));
         r.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
