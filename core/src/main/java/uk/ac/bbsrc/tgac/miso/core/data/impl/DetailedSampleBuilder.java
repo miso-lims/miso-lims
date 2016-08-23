@@ -45,7 +45,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAliquot, SampleStock, SampleTissue, SampleTissueProcessing,
     SampleCVSlide, SampleLCMTube, Identity {
-  
+
   private static final Logger log = Logger.getLogger(DetailedSampleBuilder.class);
 
   @SuppressWarnings("unused")
@@ -82,7 +82,7 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAliquo
   private Long kitDescriptorId;
   private KitDescriptor prepKit;
   private Boolean archived = Boolean.FALSE;
-  private Long groupId;
+  private String groupId;
   private String groupDescription;
   private Integer siblingNumber;
 
@@ -148,7 +148,7 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAliquo
   public void setProject(Project project) {
     this.project = project;
   }
-  
+
   @Override
   public void addQc(SampleQC sampleQc) throws MalformedSampleQcException {
     this.sampleQCs.add(sampleQc);
@@ -496,12 +496,12 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAliquo
   }
 
   @Override
-  public Long getGroupId() {
+  public String getGroupId() {
     return groupId;
   }
 
   @Override
-  public void setGroupId(Long groupId) {
+  public void setGroupId(String groupId) {
     this.groupId = groupId;
   }
 

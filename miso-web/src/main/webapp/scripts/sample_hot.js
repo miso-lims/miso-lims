@@ -707,7 +707,7 @@ Sample.hot = {
         header: 'Group ID',
         data: 'groupId',
         type: 'numeric',
-        validator: validateNumber,
+        validator: validateAlphanumeric,
         include: isDetailed
       },
       {
@@ -986,6 +986,15 @@ Sample.hot = {
         return callback(false);
       }
     }
+    
+    function validateAlphanumeric (value, callback) {
+      var alphanumRegex = /^[-\w]+$/;
+      if (value === '' || value === null || alphanumRegex.test(value)) {
+        return callback(true);
+      } else {
+        return callback(false);
+      }
+    }
   },
 
   /**
@@ -1037,124 +1046,129 @@ Sample.hot = {
   buildDtos: function (obj) {
     var sample = {};
 
-    if (obj.id) {
-      sample.id = obj.id;
-      sample.name = obj.name;
-      sample.alias = obj.alias;
-    }
-
-    // add SampleDto attributes
-    sample.description = obj.description || '';
-    sample.identificationBarcode = obj.identificationBarcode;
-    sample.sampleType = obj.sampleType;
-    sample.qcPassed = (obj.qcPassed && obj.qcPassed != 'unknown' ? obj.qcPassed : '') || '';
-    sample.alias = obj.alias || '';
-    sample.projectId = (parseInt(obj.projectId) || parseInt(document.getElementById('projectSelect').value));
-    sample.scientificName = obj.scientificName;
-    if (obj.receivedDate && obj.receivedDate.length) {
-      sample.receivedDate = obj.receivedDate;
-    }
-
-    // if it's a plain sample, return now.
-    if (!Hot.detailedSample) {
-      sample.type = 'Plain';
-      return sample;
-    }
-
-    sample.rootSampleClassId = Sample.hot.getRootSampleClassId();
-
-    // add sample parent attributes, and all other attributes for the first receipt of a sample
-    if (obj.externalName) {
-      sample.externalName = obj.externalName;
-      if (obj.donorSex && obj.donorSex.length) sample.donorSex = obj.donorSex;
-    }
-    if (obj.tissueOriginId && !obj.tissueOriginAlias) {
-      sample.tissueOriginId = obj.tissueOriginId;
-    } else {
-      sample.tissueOriginId = Hot.getIdFromAlias(obj.tissueOriginAlias, Hot.sampleOptions.tissueOriginsDtos);
-    }
-    if (obj.tissueTypeId && !obj.tissueTypeAlias) {
-      sample.tissueTypeId = obj.tissueTypeId;
-    } else {
-      sample.tissueTypeId = Hot.getIdFromAlias(obj.tissueTypeAlias, Hot.sampleOptions.tissueTypesDtos);
-    }
-    sample.passageNumber = (obj.passageNumber == '' ? null : parseInt(obj.passageNumber));
-    sample.timesReceived = parseInt(obj.timesReceived);
-    sample.tubeNumber = parseInt(obj.tubeNumber);
-    if (obj.labComposite && obj.labComposite.length) {
-      sample.labId = Sample.hot.getIdFromLabComposite(obj.labComposite, Hot.sampleOptions.labsDtos);
-    }
-    if (obj.externalInstituteIdentifier && obj.externalInstituteIdentifier.length) {
-      sample.externalInstituteIdentifier = obj.externalInstituteIdentifier;
-    }
-
-
-    // if the table data couldn't have changed (no alias value) then use the original id;
-    // otherwise, generate id from alias (rather than calculating for each field whether the original id corresponds to the current alias
-    if (obj.sampleClassId && !obj.sampleClassAlias) {
-      sample.sampleClassId = obj.sampleClassId;
-    } else {
-      sample.sampleClassId = Hot.getIdFromAlias(obj.sampleClassAlias, Hot.sampleOptions.sampleClassesDtos);
-    }
-    sample.type = Sample.hot.getCategoryFromClassId(sample.sampleClassId);
-    // add optional attributes
-    if (obj.subprojectId && !obj.subprojectAlias) {
-      sample.subprojectId = obj.subprojectId;
-    } else if (obj.subprojectAlias){
-      sample.subprojectId = Hot.getIdFromAlias(obj.subprojectAlias, Hot.sampleOptions.subprojectsDtos);
-    } else if (document.getElementById('subprojectSelect') && document.getElementById('subprojectSelect').value > 0) {
-      sample.subprojectId = parseInt(document.getElementById('subprojectSelect').value);
-    }
-    if (obj.prepKitAlias && obj.prepKitAlias.length) {
-      sample.prepKitId = Hot.getIdFromAlias(obj.prepKitAlias, Sample.hot.kitDescriptorsDtos);
-    }
-    if (obj.parentId) {
-      sample.parentId = obj.parentId;
-    } else if (obj.parentSampleClassAlias) {
-      sample.parentSampleClassId = Hot.getIdFromAlias(obj.parentSampleClassAlias, Hot.sampleOptions.sampleClassesDtos);
-    }
-    if (obj.groupId) {
-      sample.groupId = obj.groupId;
-    }
-    if (obj.groupDescription && obj.groupDescription.length) {
-      sample.groupDescription = obj.groupDescription;
-    }
-
-    // add SampleCategory-specific attributes.
-    switch (Sample.hot.getCategoryFromClassId(sample.sampleClassId)) {
-    case 'Aliquot':
-      if (obj.samplePurposeAlias && obj.samplePurposeAlias.length) {
-        sample.samplePurposeId = Hot.getIdFromAlias(obj.samplePurposeAlias, Hot.sampleOptions.samplePurposesDtos);
+    // wrap this in try/catch because this callback doesn't trigger error logging
+    try {
+      if (obj.id) {
+        sample.id = obj.id;
+        sample.name = obj.name;
+        sample.alias = obj.alias;
       }
-      if (obj.sampleGroupComposite && obj.sampleGroupComposite.length) {
-        sample.sampleGroupId = Sample.hot.getIdFromSGComposite(obj.sampleGroupComposite, Hot.sampleOptions.sampleGroupsDtos);
-      }
-      break;
-    case 'Stock':
-      if (obj.strStatus && obj.strStatus.length) {
-        sample.strStatus = obj.strStatus;
-      }
-    case 'Tissue Processing':
-      if (obj.cuts) {
-        sample.cuts = obj.cuts;
-        sample.type = 'CV Slide'; // add type info for deserialization
-        sample.discards = (obj.discards ? obj.discards : 0);
-        if (obj.thickness) sample.thickness = obj.thickness;
-      }
-      if (obj.cutsConsumed) {
-        sample.cutsConsumed = obj.cutsConsumed;
-        sample.type = 'LCM Tube'; // add type info for deserialization
-      }
-      break;
-    }
 
-     // TODO: fix QCPD
-     //sample.qcPassedDetailId = Hot.getIdFromAlias(obj.qcPassedDetailAlias, Hot.sampleOptions.qcPassedDetailsDtos);
-    if (obj.volume) {
-      sample.volume = obj.volume;
-    }
-    if (obj.concentration) {
-      sample.concentration = obj.concentration;
+      // add SampleDto attributes
+      sample.description = obj.description || '';
+      sample.identificationBarcode = obj.identificationBarcode;
+      sample.sampleType = obj.sampleType;
+      sample.qcPassed = (obj.qcPassed && obj.qcPassed != 'unknown' ? obj.qcPassed : '') || '';
+      sample.alias = obj.alias || '';
+      sample.projectId = (parseInt(obj.projectId) || parseInt(document.getElementById('projectSelect').value));
+      sample.scientificName = obj.scientificName;
+      if (obj.receivedDate && obj.receivedDate.length) {
+        sample.receivedDate = obj.receivedDate;
+      }
+
+      // if it's a plain sample, return now.
+      if (!Hot.detailedSample) {
+        sample.type = 'Plain';
+        return sample;
+      }
+
+      sample.rootSampleClassId = Sample.hot.getRootSampleClassId();
+
+      // add sample parent attributes, and all other attributes for the first receipt of a sample
+      if (obj.externalName) {
+        sample.externalName = obj.externalName;
+        if (obj.donorSex && obj.donorSex.length) sample.donorSex = obj.donorSex;
+      }
+      if (obj.tissueOriginId && !obj.tissueOriginAlias) {
+        sample.tissueOriginId = obj.tissueOriginId;
+      } else {
+        sample.tissueOriginId = Hot.getIdFromAlias(obj.tissueOriginAlias, Hot.sampleOptions.tissueOriginsDtos);
+      }
+      if (obj.tissueTypeId && !obj.tissueTypeAlias) {
+        sample.tissueTypeId = obj.tissueTypeId;
+      } else {
+        sample.tissueTypeId = Hot.getIdFromAlias(obj.tissueTypeAlias, Hot.sampleOptions.tissueTypesDtos);
+      }
+      sample.passageNumber = (obj.passageNumber == '' ? null : parseInt(obj.passageNumber));
+      sample.timesReceived = parseInt(obj.timesReceived);
+      sample.tubeNumber = parseInt(obj.tubeNumber);
+      if (obj.labComposite && obj.labComposite.length) {
+        sample.labId = Sample.hot.getIdFromLabComposite(obj.labComposite, Hot.sampleOptions.labsDtos);
+      }
+      if (obj.externalInstituteIdentifier && obj.externalInstituteIdentifier.length) {
+        sample.externalInstituteIdentifier = obj.externalInstituteIdentifier;
+      }
+
+      // if the table data couldn't have changed (no alias value) then use the original id;
+      // otherwise, generate id from alias (rather than calculating for each field whether the original id corresponds to the current alias
+      if (obj.sampleClassId && !obj.sampleClassAlias) {
+        sample.sampleClassId = obj.sampleClassId;
+      } else {
+        sample.sampleClassId = Hot.getIdFromAlias(obj.sampleClassAlias, Hot.sampleOptions.sampleClassesDtos);
+      }
+      sample.type = Sample.hot.getCategoryFromClassId(sample.sampleClassId);
+      // add optional attributes
+      if (obj.subprojectId && !obj.subprojectAlias) {
+        sample.subprojectId = obj.subprojectId;
+      } else if (obj.subprojectAlias){
+        sample.subprojectId = Hot.getIdFromAlias(obj.subprojectAlias, Hot.sampleOptions.subprojectsDtos);
+      } else if (document.getElementById('subprojectSelect') && document.getElementById('subprojectSelect').value > 0) {
+        sample.subprojectId = parseInt(document.getElementById('subprojectSelect').value);
+      }
+      if (obj.prepKitAlias && obj.prepKitAlias.length) {
+        sample.prepKitId = Hot.getIdFromAlias(obj.prepKitAlias, Sample.hot.kitDescriptorsDtos);
+      }
+      if (obj.parentId) {
+        sample.parentId = obj.parentId;
+      } else if (obj.parentSampleClassAlias) {
+        sample.parentSampleClassId = Hot.getIdFromAlias(obj.parentSampleClassAlias, Hot.sampleOptions.sampleClassesDtos);
+      }
+      if (obj.groupId) {
+        sample.groupId = obj.groupId;
+      }
+      if (obj.groupDescription && obj.groupDescription.length) {
+        sample.groupDescription = obj.groupDescription;
+      }
+
+      // add SampleCategory-specific attributes.
+      switch (Sample.hot.getCategoryFromClassId(sample.sampleClassId)) {
+      case 'Aliquot':
+        if (obj.samplePurposeAlias && obj.samplePurposeAlias.length) {
+          sample.samplePurposeId = Hot.getIdFromAlias(obj.samplePurposeAlias, Hot.sampleOptions.samplePurposesDtos);
+        }
+        if (obj.sampleGroupComposite && obj.sampleGroupComposite.length) {
+          sample.sampleGroupId = Sample.hot.getIdFromSGComposite(obj.sampleGroupComposite, Hot.sampleOptions.sampleGroupsDtos);
+        }
+        break;
+      case 'Stock':
+        if (obj.strStatus && obj.strStatus.length) {
+          sample.strStatus = obj.strStatus;
+        }
+      case 'Tissue Processing':
+        if (obj.cuts) {
+          sample.cuts = obj.cuts;
+          sample.type = 'CV Slide'; // add type info for deserialization
+          sample.discards = (obj.discards ? obj.discards : 0);
+          if (obj.thickness) sample.thickness = obj.thickness;
+        }
+        if (obj.cutsConsumed) {
+          sample.cutsConsumed = obj.cutsConsumed;
+          sample.type = 'LCM Tube'; // add type info for deserialization
+        }
+        break;
+      }
+
+       // TODO: fix QCPD
+       //sample.qcPassedDetailId = Hot.getIdFromAlias(obj.qcPassedDetailAlias, Hot.sampleOptions.qcPassedDetailsDtos);
+      if (obj.volume) {
+        sample.volume = obj.volume;
+      }
+      if (obj.concentration) {
+        sample.concentration = obj.concentration;
+      }
+    } catch (e) {
+      console.log(e.error);
+      return null;
     }
     return sample;
   },
@@ -1262,6 +1276,22 @@ Sample.hot = {
   },
 
 
+  /**
+   * Checks if all cells are valid. If yes, PUTs samples that need to be saved.
+   */
+  updateData: function () {
+    var continueValidation = Hot.cleanRowsAndToggleSaveButton();
+    if (continueValidation === false) return false;
+
+    Hot.hotTable.validateCells(function (isValid) {
+      if (isValid) {
+        Hot.saveTableData("alias", "Edit");
+      } else {
+        Hot.validationFails();
+        return false;
+      }
+    });
+  },
 
   /**
    * Creates a custom error message for invalid parent-child relationship
@@ -1337,23 +1367,6 @@ Sample.hot = {
             }
           }
         );
-      } else {
-        Hot.validationFails();
-        return false;
-      }
-    });
-  },
-
-  /**
-   * Checks if all cells are valid. If yes, PUTs samples that need to be saved.
-   */
-  updateData: function () {
-    var continueValidation = Hot.cleanRowsAndToggleSaveButton();
-    if (continueValidation === false) return false;
-
-    Hot.hotTable.validateCells(function (isValid) {
-      if (isValid) {
-        Hot.saveTableData("alias", "Edit");
       } else {
         Hot.validationFails();
         return false;

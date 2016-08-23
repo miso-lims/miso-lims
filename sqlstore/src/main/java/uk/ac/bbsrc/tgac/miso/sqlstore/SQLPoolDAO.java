@@ -873,8 +873,9 @@ public class SQLPoolDAO implements PoolStore {
         int row = rs.getInt("boxRow");
         if (!rs.wasNull()) p.setBoxPosition(BoxUtils.getPositionString(row, rs.getInt("boxColumn")));
         p.setBoxLocation(rs.getString("boxLocation"));
-        p.setQcPassed(rs.getBoolean("qcPassed"));
         p.setLastModified(rs.getDate("lastModified"));
+        p.setQcPassed(rs.getBoolean("qcPassed"));
+        // rs.wasNull() needs to be directly after rs.getBoolean("qcPassed") as that's the value which gets checked for null
         if (rs.wasNull()) {
           p.setQcPassed(null);
         }

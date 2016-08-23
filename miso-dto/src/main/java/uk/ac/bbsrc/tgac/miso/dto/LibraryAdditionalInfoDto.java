@@ -9,10 +9,6 @@ public class LibraryAdditionalInfoDto {
   private String url;
   private Long libraryId;
   private String libraryUrl;
-  private TissueOriginDto tissueOrigin;
-  private TissueTypeDto tissueType;
-  private Long groupId;
-  private String groupDescription;
   private KitDescriptorDto prepKit;
   private Long createdById;
   private String createdByUrl;
@@ -53,38 +49,6 @@ public class LibraryAdditionalInfoDto {
 
   public void setLibraryUrl(String libraryUrl) {
     this.libraryUrl = libraryUrl;
-  }
-
-  public TissueOriginDto getTissueOrigin() {
-    return tissueOrigin;
-  }
-
-  public void setTissueOrigin(TissueOriginDto tissueOrigin) {
-    this.tissueOrigin = tissueOrigin;
-  }
-
-  public TissueTypeDto getTissueType() {
-    return tissueType;
-  }
-
-  public void setTissueType(TissueTypeDto tissueType) {
-    this.tissueType = tissueType;
-  }
-
-  public Long getGroupId() {
-    return groupId;
-  }
-
-  public void setGroupId(Long groupId) {
-    this.groupId = groupId;
-  }
-
-  public String getGroupDescription() {
-    return groupDescription;
-  }
-
-  public void setGroupDescription(String groupDescription) {
-    this.groupDescription = groupDescription;
   }
 
   public Long getCreatedById() {
@@ -162,10 +126,9 @@ public class LibraryAdditionalInfoDto {
   @Override
   public String toString() {
     return "LibraryAdditionalInfoDto [id=" + id + ", url=" + url + ", libraryId=" + libraryId + ", libraryUrl=" + libraryUrl
-        + ", tissueOrigin=" + tissueOrigin + ", tissueType=" + tissueType + ", groupId=" + groupId + ", groupDescription=" + groupDescription + ", prepKit=" + prepKit
-        + ", createdById=" + createdById + ", createdByUrl=" + createdByUrl + ", creationDate=" + creationDate + ", updatedById="
-        + updatedById + ", updatedByUrl=" + updatedByUrl + ", lastUpdated=" + lastUpdated + ", archived=" + archived + ", libraryDesignId="
-        + libraryDesignId + "]";
+        + ", prepKit=" + prepKit + ", createdById=" + createdById + ", createdByUrl=" + createdByUrl + ", creationDate="
+        + creationDate + ", updatedById=" + updatedById + ", updatedByUrl=" + updatedByUrl + ", lastUpdated=" + lastUpdated
+        + ", archived=" + archived + ", libraryDesignId=" + libraryDesignId + "]";
   }
 
 }

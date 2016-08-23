@@ -113,8 +113,15 @@ public class DefaultMigrationTarget implements MigrationTarget {
     saveSamples(data.getSamples());
     saveLibraries(data.getLibraries());
     saveLibraryDilutions(data.getDilutions());
-    savePools(data.getPools());
-    saveRuns(data.getRuns());
+    
+    // Resolution of run also resolves pool PlatformType
+    Collection<Pool<LibraryDilution>> pools = data.getPools();
+    Collection<Run> runs = data.getRuns();
+    for (Run run : runs) {
+      valueTypeLookup.resolveAll(run);
+    }
+    savePools(pools);
+    saveRuns(runs);
   }
 
   public void saveProjects(Collection<Project> projects) throws IOException {
@@ -224,6 +231,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
 
   public void savePools(final Collection<Pool<LibraryDilution>> pools) throws IOException {
     log.info("Migrating pools...");
+    
     User user = serviceManager.getAuthorizationManager().getCurrentUser();
     for (Pool<LibraryDilution> pool : pools) {
       pool.setCreationDate(timeStamp);
@@ -238,15 +246,50 @@ public class DefaultMigrationTarget implements MigrationTarget {
   public void saveRuns(final Collection<Run> runs) throws IOException {
     log.info("Migrating runs...");
     User user = serviceManager.getAuthorizationManager().getCurrentUser();
-    for (Run run : runs) {
+    for (Run newRun : runs) {
+      Run run = serviceManager.getRunDao().getByAlias(newRun.getAlias());
+      if (run == null) {
+        run = newRun;
+      } else {
+        updateRun(newRun, run);
+      }
       for (SequencerPartitionContainer<SequencerPoolPartition> container : run.getSequencerPartitionContainers()) {
         container.setLastModifier(user);
+        container.setId(serviceManager.getSequencerPartitionContainerDao().save(container));
       }
       run.setLastModifier(user);
       run.setId(serviceManager.getRunDao().save(run));
       log.debug("Saved run " + run.getAlias());
     }
     log.info(runs.size() + " runs migrated.");
+  }
+  
+  private void updateRun(Run from, Run to) throws IOException {
+    log.debug("Updating run " + to.getId());
+    to.getStatus().setCompletionDate(to.getStatus().getCompletionDate());
+    to.getStatus().setHealth(to.getStatus().getHealth());
+    if (to.getSequencerPartitionContainers().size() != 1) {
+      throw new IOException("Existing run " + to.getName() + " has unexpected number of sequencerPartitionContainers");
+    }
+    if (from.getSequencerPartitionContainers().size() != 1) {
+      throw new IOException("Migrating run " + from.getName() + " has unexpected number of sequencerPartitionContainers");
+    }
+    SequencerPartitionContainer<SequencerPoolPartition> fromFlowcell = from.getSequencerPartitionContainers().get(0);
+    SequencerPartitionContainer<SequencerPoolPartition> toFlowcell = to.getSequencerPartitionContainers().get(0);
+    for (SequencerPoolPartition fromPartition : fromFlowcell.getPartitions()) {
+      if (fromPartition.getPool() != null) {
+        for (SequencerPoolPartition toPartition : toFlowcell.getPartitions()) {
+          if (toPartition.getPartitionNumber().equals(fromPartition.getPartitionNumber())) {
+            if (toPartition.getPool() != null) {
+              throw new IOException("Migration includes a pool for a lane that already has a pool");
+            }
+            toPartition.setPool(fromPartition.getPool());
+            log.debug("added " + toPartition.getPool().getAlias() + " to run " + to.getId() + " lane " + toPartition.getPartitionNumber());
+            break;
+          }
+        }
+      }
+    }
   }
   
   /**

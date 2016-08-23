@@ -60,17 +60,16 @@ public interface SampleAdditionalInfo extends Sample {
   /**
    * Gets the Group ID string of this sample analyte.
    * 
-   * @return Long groupId
+   * @return String groupId
    */
-  Long getGroupId();
+  String getGroupId();
 
   /**
    * Sets the Group ID string of this sample analyte.
    * 
-   * @param Long
-   *          groupId
+   * @param Long groupId
    */
-  void setGroupId(Long groupId);
+  void setGroupId(String groupId);
 
   /**
    * Gets the Group Description string of this sample analyte.
@@ -82,8 +81,7 @@ public interface SampleAdditionalInfo extends Sample {
   /**
    * Sets the Group Description string of this sample analyte.
    * 
-   * @param String
-   *          groupDescription
+   * @param String groupDescription
    */
   void setGroupDescription(String groupDescription);
 

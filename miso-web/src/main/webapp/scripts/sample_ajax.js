@@ -122,7 +122,8 @@ var Sample = Sample || {
         
       // Group ID validation
       jQuery('#groupId').attr('class', 'form-control');
-      jQuery('#groupId').attr('data-parsley-type', 'integer');
+      jQuery('#groupId').attr('data-parsley-type', 'alphanum');
+      jQuery('#groupId').attr('data-parsley-maxlength', '10');
       
       // Group Description validation
       jQuery('#groupDescription').attr('class', 'form-control');

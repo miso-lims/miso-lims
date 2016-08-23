@@ -82,7 +82,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
 import uk.ac.bbsrc.tgac.miso.core.data.TagBarcodeFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAdditionalInfoImpl;
@@ -491,6 +490,7 @@ public class EditLibraryController {
       obj.put("id", tb.getId());
       obj.put("name", tb.getName());
       obj.put("sequence", tb.getSequence());
+      obj.put("label", tb.getLabel());
       rtnList.add(obj);
     }
     return rtnList;
@@ -529,16 +529,15 @@ public class EditLibraryController {
     JSONObject rtn;
     if (!isStringEmptyOrNull(tagBarcodeFamily)) {
       tagBarcodeFamily = tagBarcodeFamily.trim();
-      log.debug("tagBarcodeFamily = " + tagBarcodeFamily);
       final TagBarcodeFamily tbf = tagBarcodeService.getTagBarcodeFamilyByName(tagBarcodeFamily);
       if (tbf != null) {
         rtn = new JSONObject();
         rtn.put("numApplicableBarcodes", tbf.getMaximumNumber());
       } else {
-        rtn = JSONUtils.SimpleJSONError("No strategy found with the name: \"" + tagBarcodeFamily + "\"");
+        rtn = JSONUtils.SimpleJSONError("No family found with the name: \"" + tagBarcodeFamily + "\"");
       }
     } else {
-      rtn = JSONUtils.SimpleJSONError("No valid strategy given");
+      rtn = JSONUtils.SimpleJSONError("No valid family given");
     }
     return rtn;
   }
@@ -711,8 +710,8 @@ public class EditLibraryController {
         library = requestManager.getLibraryById(libraryId);
         model.put("title", "Library " + libraryId);
         if (library.getTagBarcodes() != null && !library.getTagBarcodes().isEmpty() && library.getTagBarcodes().get(1) != null) {
-          model.put("selectedTagBarcodeStrategy", library.getTagBarcodes().get(1).getFamily().getName());
-          model.put("availableTagBarcodeStrategyBarcodes", library.getTagBarcodes().get(1).getFamily().getBarcodes());
+          model.put("selectedTagBarcodeFamily", library.getTagBarcodes().get(1).getFamily().getName());
+          model.put("availableTagBarcodeFamilyBarcodes", library.getTagBarcodes().get(1).getFamily().getBarcodes());
         }
       }
 
@@ -814,7 +813,6 @@ public class EditLibraryController {
 
         if (isDetailedSampleEnabled()) {
           LibraryAdditionalInfoDto lai = new LibraryAdditionalInfoDto();
-          setTissueInfo(detailed, lai);
           library.setLibraryAdditionalInfo(lai);
         }
         libraries.add(library);
@@ -831,16 +829,6 @@ public class EditLibraryController {
         log.error("Failed to get bulk samples", ex);
       }
       throw ex;
-    }
-  }
-
-  public void setTissueInfo(SampleAdditionalInfo detailed, LibraryAdditionalInfoDto lai) {
-    for (SampleAdditionalInfo sai = detailed; sai != null; sai = sai.getParent()) {
-      if (sai instanceof SampleTissue) {
-        lai.setTissueOrigin(Dtos.asDto(((SampleTissue) sai).getTissueOrigin()));
-        lai.setTissueType(Dtos.asDto(((SampleTissue) sai).getTissueType()));
-        break;
-      }
     }
   }
 

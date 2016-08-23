@@ -20,7 +20,7 @@ public class SampleAdditionalInfoDto extends SampleDto {
   private String subprojectUrl;
   private Long prepKitId;
   private String prepKitUrl;
-  private Long groupId;
+  private String groupId;
   private String groupDescription;
   private Boolean isSynthetic;
 
@@ -120,11 +120,11 @@ public class SampleAdditionalInfoDto extends SampleDto {
     this.prepKitUrl = prepKitUrl;
   }
 
-  public Long getGroupId() {
+  public String getGroupId() {
     return groupId;
   }
 
-  public void setGroupId(Long groupId) {
+  public void setGroupId(String groupId) {
     this.groupId = groupId;
   }
 

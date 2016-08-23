@@ -834,12 +834,6 @@ public class Dtos {
   public static LibraryAdditionalInfoDto asDto(LibraryAdditionalInfo from) {
     LibraryAdditionalInfoDto dto = new LibraryAdditionalInfoDto();
     dto.setLibraryId(from.getLibraryId());
-    if (from.getGroupId() != null) {
-      dto.setGroupId(from.getGroupId());
-    }
-    if (from.getGroupDescription() != null) {
-      dto.setGroupDescription(from.getGroupDescription());
-    }
     if (from.getPrepKit() != null) {
       dto.setPrepKit(asDto(from.getPrepKit()));
     }
@@ -865,10 +859,6 @@ public class Dtos {
   public static LibraryAdditionalInfo to(LibraryAdditionalInfoDto from) {
     LibraryAdditionalInfo to = new LibraryAdditionalInfoImpl();
     to.setLibraryId(from.getLibraryId());
-    if (from.getGroupId() != null) {
-      to.setGroupId(from.getGroupId());
-      to.setGroupDescription(from.getGroupDescription());
-    }
     if (from.getPrepKit() != null) {
       to.setPrepKit(to(from.getPrepKit()));
     }
@@ -955,12 +945,12 @@ public class Dtos {
       dto.setLastModified(getDateAsString(from.getLastModified()));
     }
     if (!from.getTagBarcodes().isEmpty()) {
-      dto.setTagBarcodeStrategyName(from.getTagBarcodes().get(0).getFamily().getName());
+      dto.setTagBarcodeFamilyName(from.getTagBarcodes().get(0).getFamily().getName());
       dto.setTagBarcodeIndex1Id(from.getTagBarcodes().get(0).getId());
       dto.setTagBarcodeIndex1Label(from.getTagBarcodes().get(0).getLabel());
       if (from.getTagBarcodes().size() > 1) {
         dto.setTagBarcodeIndex2Id(from.getTagBarcodes().get(1).getId());
-        dto.setTagBarcodeIndex2Label(from.getTagBarcodes().get(0).getLabel());
+        dto.setTagBarcodeIndex2Label(from.getTagBarcodes().get(1).getLabel());
       }
     }
     dto.setVolume(from.getVolume());
@@ -1096,9 +1086,15 @@ public class Dtos {
 
   public static LibraryDilution to(DilutionDto from) {
     LibraryDilution to = new LibraryDilution();
-    to.setId(from.getId());
-    to.setName(from.getName());
-    to.setIdentificationBarcode(from.getIdentificationBarcode());
+    if (from.getId() != null) {
+      to.setId(from.getId());
+    }
+    if (!isStringEmptyOrNull(from.getName())) {
+      to.setName(from.getName());
+    }
+    if (!isStringEmptyOrNull(from.getIdentificationBarcode())) {
+      to.setIdentificationBarcode(from.getIdentificationBarcode());
+    }
     to.setConcentration(from.getConcentration());
     to.setLibrary(to(from.getLibrary()));
     if (!isStringEmptyOrNull(from.getDilutionUserName())) {

@@ -32,7 +32,7 @@ public class LibraryDto {
   private Long tagBarcodeIndex2Id;
   private String tagBarcodeIndex1Label;
   private String tagBarcodeIndex2Label;
-  private String tagBarcodeStrategyName;
+  private String tagBarcodeFamilyName;
   private String url;
   private Double volume;
 
@@ -132,8 +132,8 @@ public class LibraryDto {
     return tagBarcodeIndex2Label;
   }
 
-  public String getTagBarcodeStrategyName() {
-    return tagBarcodeStrategyName;
+  public String getTagBarcodeFamilyName() {
+    return tagBarcodeFamilyName;
   }
 
   public String getUrl() {
@@ -248,8 +248,9 @@ public class LibraryDto {
     this.tagBarcodeIndex2Label = tagBarcodeIndex2Label;
   }
 
-  public void setTagBarcodeStrategyName(String tagBarcodeStrategyName) {
-    this.tagBarcodeStrategyName = tagBarcodeStrategyName;
+  @JsonSerialize(include = JsonSerialize.Inclusion.ALWAYS)
+  public void setTagBarcodeFamilyName(String tagBarcodeFamilyName) {
+    this.tagBarcodeFamilyName = tagBarcodeFamilyName;
   }
 
   public void setUrl(String url) {

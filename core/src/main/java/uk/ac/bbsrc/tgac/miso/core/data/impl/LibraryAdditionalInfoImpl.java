@@ -6,7 +6,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.MapsId;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -31,9 +30,6 @@ public class LibraryAdditionalInfoImpl implements LibraryAdditionalInfo {
   // @MapsId
   @Transient
   private Library library;
-
-  private Long groupId;
-  private String groupDescription;
 
   private Long kitDescriptorId;
 
@@ -79,26 +75,6 @@ public class LibraryAdditionalInfoImpl implements LibraryAdditionalInfo {
   @Override
   public void setLibrary(Library library) {
     this.library = library;
-  }
-
-  @Override
-  public Long getGroupId() {
-    return groupId;
-  }
-
-  @Override
-  public void setGroupId(Long groupId) {
-    this.groupId = groupId;
-  }
-
-  @Override
-  public String getGroupDescription() {
-    return groupDescription;
-  }
-
-  @Override
-  public void setGroupDescription(String groupDescription) {
-    this.groupDescription = groupDescription;
   }
 
   @Override
