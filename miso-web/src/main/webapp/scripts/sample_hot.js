@@ -767,14 +767,14 @@ Sample.hot = {
         header: 'Times Received',
         data: 'timesReceived',
         type: 'numeric',
-        validator: requiredText,
+        validator: validatePosReqdNumber,
         include: show['Tissue']
       },
       {
         header: 'Tube Number',
         data: 'tubeNumber',
         type: 'numeric',
-        validator: requiredText,
+        validator: validatePosReqdNumber,
         include: show['Tissue']
       },
       {
@@ -990,6 +990,14 @@ Sample.hot = {
 
     function validateNumber (value, callback) {
       if (value === '' || value === null || Handsontable.helper.isNumeric(value) && value > 0) {
+        return callback(true);
+      } else {
+        return callback(false);
+      }
+    }
+    
+    function validatePosReqdNumber (value, callback) {
+      if (Handsontable.helper.isNumeric(value) && value > 0) {
         return callback(true);
       } else {
         return callback(false);
