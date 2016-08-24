@@ -17,7 +17,7 @@ import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 
 @Entity
-@Table(name = "SampleClass", uniqueConstraints = @UniqueConstraint(columnNames = { "alias", "sampleCategory" }) )
+@Table(name = "SampleClass", uniqueConstraints = @UniqueConstraint(columnNames = { "alias", "sampleCategory" }))
 public class SampleClassImpl implements SampleClass {
 
   @Id
@@ -46,6 +46,8 @@ public class SampleClassImpl implements SampleClass {
 
   @Column(nullable = false)
   private Date lastUpdated;
+
+  private Boolean dnaseTreatable;
 
   @Override
   public Long getId() {
@@ -125,5 +127,15 @@ public class SampleClassImpl implements SampleClass {
   @Override
   public void setSuffix(String suffix) {
     this.suffix = suffix;
+  }
+
+  @Override
+  public Boolean getDNAseTreatable() {
+    return dnaseTreatable;
+  }
+
+  @Override
+  public void setDNAseTreatable(Boolean treatable) {
+    dnaseTreatable = treatable;
   }
 }

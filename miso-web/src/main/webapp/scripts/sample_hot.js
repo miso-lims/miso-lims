@@ -570,6 +570,7 @@ Sample.hot = {
    */
   getAppropriateColumns: function (action, sourceSampleCategory, targetSampleCategory, showQcs) {
     var isDetailed = targetSampleCategory != null;
+    var sampleClass = Hot.getObjById(Sample.hot.sampleClassId, Hot.sampleOptions.sampleClassesDtos);
     var sampleClassAlias = Hot.getAliasFromId(Sample.hot.sampleClassId, Hot.sampleOptions.sampleClassesDtos);
 	  // We assume we have a linear progression of information that must be
 	  // collected as a sample progressed through the hierarchy.
@@ -846,6 +847,14 @@ Sample.hot = {
         trimDropdown: false,
         source: Sample.hot.getStrStatuses(),
         include: show['Stock']
+      },
+      {
+        header: 'DNAse',
+        data: 'dnaseTreated',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: [ 'true', 'false' ],
+        include: show['Stock'] && sampleClass.dnaseTreatable
 
       },
 
@@ -1144,6 +1153,8 @@ Sample.hot = {
         if (obj.strStatus && obj.strStatus.length) {
           sample.strStatus = obj.strStatus;
         }
+        sample.dnaseTreated = (obj.dnaseTreated == 'true');
+        break;
       case 'Tissue Processing':
         if (obj.cuts) {
           sample.cuts = obj.cuts;

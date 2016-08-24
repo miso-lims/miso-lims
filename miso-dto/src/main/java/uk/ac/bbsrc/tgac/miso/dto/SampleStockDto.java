@@ -11,6 +11,7 @@ public class SampleStockDto extends SampleTissueDto {
 
   private Double concentration;
   private String strStatus;
+  private Boolean dnaseTreated;
 
   public Double getConcentration() {
     return concentration;
@@ -26,6 +27,14 @@ public class SampleStockDto extends SampleTissueDto {
 
   public void setStrStatus(String strStatus) {
     this.strStatus = strStatus;
+  }
+
+  public Boolean getDnaseTreated() {
+    return dnaseTreated;
+  }
+
+  public void setDnaseTreated(Boolean dnaseTreated) {
+    this.dnaseTreated = dnaseTreated;
   }
 
 }

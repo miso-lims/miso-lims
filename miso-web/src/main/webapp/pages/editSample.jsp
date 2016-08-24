@@ -590,6 +590,12 @@
               <td class="h">Concentration (nM):</td>
               <td><form:input id="concentration" path="concentration"/></td>
             </tr>
+            <c:if test="${sample.sampleClass.DNAseTreatable}">
+              <tr>
+                <td class="h">DNAse Treated:</td>
+                <td><form:checkbox id="DNAseTreated" path="DNAseTreated"/></td>
+              </tr>
+            </c:if>
           </table>
         </div>
       </c:if>

@@ -35,4 +35,8 @@ public interface SampleStock extends SampleAdditionalInfo {
    */
   public void setStrStatus(String strStatus);
 
+  public Boolean getDNAseTreated();
+
+  public void setDNAseTreated(Boolean dnaseTreated);
+
 }
