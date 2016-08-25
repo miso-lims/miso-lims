@@ -5,6 +5,7 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -216,6 +217,9 @@ public class HibernateSampleDao implements SampleDao {
 
   @Override
   public Collection<Sample> getByIdList(List<Long> idList) throws IOException {
+    if (idList.isEmpty()) {
+      return Collections.emptyList();
+    }
     Query query = currentSession().createQuery("from SampleImpl where sampleId in (:ids)");
     query.setParameterList("ids", idList, LongType.INSTANCE);
     @SuppressWarnings("unchecked")
@@ -409,6 +413,9 @@ public class HibernateSampleDao implements SampleDao {
     criteria.setProjection(Projections.property("id"));
     @SuppressWarnings("unchecked")
     List<Long> ids = criteria.list();
+    if (ids.isEmpty()) {
+      return Collections.emptyList();
+    }
     // We do this in two steps to make a smaller query that that the database can optimise
     Criteria query = currentSession().createCriteria(SampleImpl.class);
     query.add(Restrictions.in("id", ids));
