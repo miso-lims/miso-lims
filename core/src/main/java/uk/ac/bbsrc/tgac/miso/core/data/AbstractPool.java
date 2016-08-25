@@ -69,7 +69,7 @@ public abstract class AbstractPool<P extends Poolable<?, ?>> extends AbstractBox
   protected static final Logger log = LoggerFactory.getLogger(AbstractPool.class);
 
   public static final Long UNSAVED_ID = 0L;
-  public static final String CONCENTRATION_UNITS = "nM";
+  public static final String CONCENTRATION_UNITS = "ng/µL";
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
