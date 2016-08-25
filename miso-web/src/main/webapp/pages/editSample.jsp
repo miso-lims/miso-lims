@@ -304,7 +304,7 @@
           <h2>Identity</h2>
           <table class="in">
             <tr>
-              <td class="h">External Name:*</td>
+              <td class="h">External Names (comma separated):*</td>
               <td>
                 <c:choose>
                   <c:when test="${sample.id == 0}">
