@@ -378,6 +378,13 @@ public class SQLRunDAO implements RunStore {
 
     if (this.cascadeType != null) {
       if (this.cascadeType.equals(CascadeType.PERSIST)) {
+        for (SequencerPartitionContainer<SequencerPoolPartition> l : run.getSequencerPartitionContainers()) {
+          l.setSecurityProfile(run.getSecurityProfile());
+          if (l.getPlatform() == null) {
+            l.setPlatform(run.getSequencerReference().getPlatform());
+          }
+          l.setId(sequencerPartitionContainerDAO.save(l));
+        }
         SEQ_PART_CONTAINER_WRITER.saveAll(template, run.getId(), run.getSequencerPartitionContainers());
       }
 
@@ -465,8 +472,8 @@ public class SQLRunDAO implements RunStore {
               Number newId = insert.executeAndReturnKey(params);
               if (newId.longValue() != run.getId()) {
                 log.error("Expected Run ID doesn't match returned value from database insert: rolling back...");
-                new NamedParameterJdbcTemplate(template)
-                    .update(RUN_DELETE, new MapSqlParameterSource().addValue("runId", newId.longValue()));
+                new NamedParameterJdbcTemplate(template).update(RUN_DELETE,
+                    new MapSqlParameterSource().addValue("runId", newId.longValue()));
                 throw new IOException("Something bad happened. Expected Run ID doesn't match returned value from DB insert");
               }
               autoIncrement = newId.longValue() + 1;
@@ -592,8 +599,8 @@ public class SQLRunDAO implements RunStore {
 
   @Override
   public Run getLatestStartDateRunBySequencerPartitionContainerId(long containerId) throws IOException {
-    List<Run> eResults = template
-        .query(LATEST_RUN_STARTED_SELECT_BY_SEQUENCER_PARTITION_CONTAINER_ID, new Object[] { containerId }, new RunMapper(true));
+    List<Run> eResults = template.query(LATEST_RUN_STARTED_SELECT_BY_SEQUENCER_PARTITION_CONTAINER_ID, new Object[] { containerId },
+        new RunMapper(true));
     Run r = eResults.size() > 0 ? eResults.get(0) : null;
     if (r == null) {
       r = getLatestRunIdRunBySequencerPartitionContainerId(containerId);
@@ -603,8 +610,8 @@ public class SQLRunDAO implements RunStore {
 
   @Override
   public Run getLatestRunIdRunBySequencerPartitionContainerId(long containerId) throws IOException {
-    List<Run> eResults = template
-        .query(LATEST_RUN_ID_SELECT_BY_SEQUENCER_PARTITION_CONTAINER_ID, new Object[] { containerId }, new RunMapper());
+    List<Run> eResults = template.query(LATEST_RUN_ID_SELECT_BY_SEQUENCER_PARTITION_CONTAINER_ID, new Object[] { containerId },
+        new RunMapper());
     return eResults.size() > 0 ? eResults.get(0) : null;
   }
 

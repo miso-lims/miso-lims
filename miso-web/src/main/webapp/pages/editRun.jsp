@@ -32,6 +32,10 @@
 
 
 <script type="text/javascript" src="<c:url value='/scripts/parsley/parsley.min.js'/>"></script>
+<script type="text/javascript">
+    <!-- Boolean to indicate if this is a detailed sample or not. Used by js at run time to hide features. -->
+    var detailedSample = ${detailedSample};
+</script>
 
 <c:choose>
   <c:when test="${not empty run.status}"><div id="maincontent" class="${run.status.health.key}"></c:when>
@@ -201,7 +205,8 @@
       </c:choose>
     </td>
   </tr>
-  <tr>
+
+  <tr id="runPairedEndRow">
     <td>Paired End:</td>
     <td>
       <c:choose>
@@ -211,6 +216,7 @@
       </c:choose>
     </td>
   </tr>
+
 
   <tr>
     <td valign="top">Status:</td>
@@ -511,12 +517,13 @@
                                                     or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
                   <a href="javascript:void(0);"
                      onclick="Run.ui.editContainerLocationBarcode(jQuery('#locationBarcode'), ${containerCount.index})">
-                    <span class="fg-button ui-icon ui-icon-pencil"></span>
+                    <span id="locationBarcodePencil" class="fg-button ui-icon ui-icon-pencil"></span>
                   </a>
                 </c:if>
               </td>
             </c:otherwise>
           </c:choose>
+          
         </tr>
         <tr>
           <c:choose>
@@ -532,8 +539,8 @@
                 <c:if test="${(container.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
                                                     or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
                   <a href="javascript:void(0);"
-                     onclick="editContainerValidationBarcode(jQuery('#validationBarcode'), 0)">
-                    <span class="fg-button ui-icon ui-icon-pencil"></span>
+                     onclick="Run.ui.editContainerValidationBarcode(jQuery('#validationBarcode'), 0)">
+                    <span id="validationBarcodePencil" class="fg-button ui-icon ui-icon-pencil"></span>
                   </a>
                 </c:if>
               </td>
@@ -546,6 +553,14 @@
           </tr>
           --%>
       </table>
+      <c:choose>
+          <c:when test="${not empty container.id}">
+              <input type='hidden' id='sequencerPartitionContainers[${containerCount.index}].id' name='sequencerPartitionContainers[${containerCount.index}].id' value='${container.id}' />
+          </c:when>
+          <c:otherwise>
+              <input type='hidden' id='sequencerPartitionContainers[${containerCount.index}].id' name='sequencerPartitionContainers[${containerCount.index}].id' value='0' />
+          </c:otherwise>
+      </c:choose>
       <div id='partitionErrorDiv' class="parsley-custom-error-message"></div>
       <div id="partitionDiv">
         <i class="italicInfo">Click in a partition box to beep/type in barcodes, or double click a

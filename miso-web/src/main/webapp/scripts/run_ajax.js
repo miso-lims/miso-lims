@@ -75,7 +75,21 @@ var Run = Run || {
     jQuery('#filePath').attr('class', 'form-control');
     jQuery('#filePath').attr('data-parsley-required', 'true');
     jQuery('#filePath').attr('data-parsley-maxlength', '100');
-
+    
+    if(jQuery('#sequencerPartitionContainers\\[0\\]\\.identificationBarcode')) {
+        jQuery('#sequencerPartitionContainers\\[0\\]\\.identificationBarcode').attr('class', 'form-control');
+        jQuery('#sequencerPartitionContainers\\[0\\]\\.identificationBarcode').attr('required', 'true');
+        jQuery('#sequencerPartitionContainers\\[0\\]\\.identificationBarcode').attr('data-parsley-error-message', 'ID is required.');
+        jQuery('#sequencerPartitionContainers\\[0\\]\\.identificationBarcode').attr('data-parsley-errors-container', '#partitionErrorDiv');
+    }
+    
+    if(jQuery('#partitionDiv')) {
+        jQuery('#lane2').attr('class', 'form-control');
+        jQuery('#lane2').attr('required', 'true');
+        jQuery('#lane2').attr('data-parsley-error-message', 'You must select the number of partitions.');
+        jQuery('#lane2').attr('data-parsley-errors-container', '#partitionDiv');
+        jQuery('#lane2').attr('data-parsley-class-handler', '#partitionDiv');
+    }
 
     jQuery('#run-form').parsley();
     jQuery('#run-form').parsley().validate();
@@ -99,6 +113,8 @@ var Run = Run || {
       alert(error);
       return ok;
     }
+    
+    Run.container.lookupContainerDuringSubmission(this, 0);
 
     jQuery('#run-form').submit();
     return ok;
@@ -254,6 +270,13 @@ Run.ui = {
   editContainerLocationBarcode: function (span, fc) {
     var s = jQuery(span);
     s.html("<input type='text' id='sequencerPartitionContainers[" + fc + "].locationBarcode' name='sequencerPartitionContainers[" + fc + "].locationBarcode' value='" + s.html() + "'/>");
+    if (jQuery('#locationBarcodePencil')) jQuery('#locationBarcodePencil').hide();
+  },
+  
+  editContainerValidationBarcode: function (span, fc) {
+    var s = jQuery(span);
+    s.html("<input type='text' id='sequencerPartitionContainers[" + fc + "].validationBarcode' name='sequencerPartitionContainers[" + fc + "].validationBarcode' value='" + s.html() + "'/>");
+    if (jQuery('#validationBarcodePencil')) jQuery('#validationBarcodePencil').hide();
   },
 
   changePlatformType: function (form, runId) {
@@ -613,9 +636,70 @@ Run.container = {
         'url': ajaxurl
       },
       {
-        'updateElement': 'containerdiv'
+        'updateElement': 'containerdiv',
+        'doOnSuccess': function () {
+            Run.container.removePaired();
+        }
       }
     );
+  },
+  
+  lookupContainerDuringSubmission: function (t, containerNum) {
+    var self = this;
+    var barcode = jQuery('#sequencerPartitionContainers\\[' + containerNum + '\\]\\.identificationBarcode').val();
+    if (!Utils.validation.isNullCheck(barcode)) {
+      Fluxion.doAjax(
+        'runControllerHelperService',
+        'lookupContainer',
+        {
+          'barcode': barcode,
+          'containerNum': containerNum,
+          'url': ajaxurl
+        },
+        {
+          'doOnSuccess': self.processLookupForSubmission,
+        }
+      );
+    } else {
+        // Submit without a container. Which is okay.
+        jQuery('#run-form').submit();
+    }
+  },
+  
+  processLookupForSubmission: function (json) {
+    if (json.err) {
+      if(json.err === "No containers with this barcode.") {
+        jQuery('#run-form').submit();
+      } else {
+        jQuery('#partitionErrorDiv').html(json.err);
+        return true;
+      }
+    } else {
+      if (json.verify) {
+        var dialogStr = "Container Properties\n\n";
+        for (var key in json.verify) {
+          if (json.verify.hasOwnProperty(key)) {
+            dialogStr += "Partition " + key + ": " + json.verify[key] + "\n";
+          }
+        }
+
+        if (confirm("Replace container with existing '" + json.barcode + " container?'. Current values will be overridden.\n\n" + dialogStr + "\n\n Choose cancel to save current container.")) {
+          jQuery('#partitionErrorDiv').html("");
+          jQuery('#partitionDiv').html(json.html);
+          jQuery("#sequencerPartitionContainers\\[0\\]\\.locationBarcode").val(json.location);
+          jQuery("#sequencerPartitionContainers\\[0\\]\\.validationBarcode").val(json.validation);
+          jQuery("#sequencerPartitionContainers\\[0\\]\\.id").val(json.partitionContainerId);
+          // After updating, submit form.
+          jQuery('#run-form').submit();
+        } else {
+           // User wants a new container. Make the name unique.
+           var currentId = jQuery("#sequencerPartitionContainers\\[0\\]\\.identificationBarcode").val();
+           currentId = currentId + "_" + Date.now();
+           jQuery("#sequencerPartitionContainers\\[0\\]\\.identificationBarcode").val(currentId);
+           jQuery('#run-form').submit();
+        }
+      }
+    }
   },
 
   lookupContainer: function (t, containerNum) {
@@ -653,6 +737,9 @@ Run.container = {
         if (confirm("Found container '" + json.barcode + "'. Import this container?\n\n" + dialogStr)) {
           jQuery('#partitionErrorDiv').html("");
           jQuery('#partitionDiv').html(json.html);
+          jQuery("#sequencerPartitionContainers\\[0\\]\\.locationBarcode").val(json.location);
+          jQuery("#sequencerPartitionContainers\\[0\\]\\.validationBarcode").val(json.validation);
+          jQuery("#sequencerPartitionContainers\\[0\\]\\.id").val(json.partitionContainerId);
         }
       }
     }
@@ -728,6 +815,7 @@ Run.container = {
   selectStudy: function (partition, poolId, projectId) {
     Utils.ui.disableButton('studySelectButton-' + partition + '_' + poolId);
     var studyId = jQuery("select[name='poolStudies" + partition + "_" + projectId + "'] :selected").val();
+    var platformId = jQuery("#sequencerReference").val();
 
     Fluxion.doAjax(
       'poolControllerHelperService',
@@ -736,6 +824,7 @@ Run.container = {
         'poolId': poolId,
         'studyId': studyId,
         'runId': jQuery("input[name='runId']").val(),
+        'platformId': platformId,
         'url': ajaxurl
       },
       {
@@ -785,5 +874,18 @@ Run.container = {
         }
       }
     );
+  },
+  
+  removePaired: function () {
+    if(detailedSample) {
+        jQuery('#pairedRow').hide();
+    }
   }
+  
 };
+
+
+jQuery( document ).ready(function() {
+    jQuery('#runPairedEndRow').hide();
+});
+

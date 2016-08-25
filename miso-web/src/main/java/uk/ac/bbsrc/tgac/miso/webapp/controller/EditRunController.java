@@ -99,6 +99,14 @@ public class EditRunController {
 
   private RunStatsManager runStatsManager;
 
+  @Value("${miso.detailed.sample.enabled}")
+  private Boolean detailedSample;
+
+  @ModelAttribute("detailedSample")
+  public Boolean isDetailedSampleEnabled() {
+    return detailedSample;
+  }
+
   @Autowired
   private SequencingParametersService sequencingParametersService;
 
@@ -335,6 +343,7 @@ public class EditRunController {
           container.setLastModifier(user);
         }
       }
+
       run.setLastModifier(user);
       for (SequencerPartitionContainer<? extends Partition> container : run.getSequencerPartitionContainers()) {
         container.setLastModifier(user);

@@ -134,6 +134,14 @@ var Container = Container || {
     jQuery('#identificationBarcode').attr('data-parsley-maxlength', '100');
     jQuery('#identificationBarcode').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
     
+    if(jQuery('#partitionDiv')) {
+        jQuery('#lane2').attr('class', 'form-control');
+        jQuery('#lane2').attr('required', 'true');
+        jQuery('#lane2').attr('data-parsley-error-message', 'You must select the number of partitions.');
+        jQuery('#lane2').attr('data-parsley-errors-container', '#partitionDiv');
+        jQuery('#lane2').attr('data-parsley-class-handler', '#partitionDiv');
+    }
+    
     jQuery('#container-form').parsley();
     jQuery('#container-form').parsley().validate();
     
@@ -172,6 +180,13 @@ Container.ui = {
   editContainerLocationBarcode: function (span) {
     var s = jQuery(span);
     s.html("<input type='text' id='locationBarcode' name='locationBarcode' value='" + s.html() + "'/>");
+    if (jQuery('#locationBarcodePencil')) jQuery('#locationBarcodePencil').hide();
+  },
+  
+  editContainerValidationBarcode: function (span) {
+    var s = jQuery(span);
+    s.html("<input type='text' id='validationBarcode' name='validationBarcode' value='" + s.html() + "'/>");
+    if (jQuery('#validationBarcodePencil')) jQuery('#validationBarcodePencil').hide();
   },
 
   populatePlatformTypes: function () {
@@ -241,7 +256,10 @@ Container.ui = {
         'url': ajaxurl
       },
       {
-        'updateElement': 'containerdiv'
+        'updateElement': 'containerdiv',
+        'doOnSuccess': function () {
+            Run.container.removePaired();
+        }
       }
     );
   },

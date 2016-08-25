@@ -45,11 +45,6 @@ import java.util.TreeSet;
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpSession;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-import net.sourceforge.fluxion.ajax.Ajaxified;
-import net.sourceforge.fluxion.ajax.util.JSONUtils;
-
 import org.apache.commons.codec.binary.Base64;
 import org.krysalis.barcode4j.BarcodeDimension;
 import org.krysalis.barcode4j.BarcodeGenerator;
@@ -62,6 +57,10 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import net.sourceforge.fluxion.ajax.Ajaxified;
+import net.sourceforge.fluxion.ajax.util.JSONUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
@@ -69,11 +68,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Plate;
 import uk.ac.bbsrc.tgac.miso.core.data.Plateable;
+import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.PrintJob;
-import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
@@ -475,49 +474,51 @@ public class PoolControllerHelperService {
 
   public JSONObject selectStudyForPool(HttpSession session, JSONObject json) {
     try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Long poolId = json.getLong("poolId");
-      Pool<? extends Poolable<?, ?>> p = requestManager.getPoolById(poolId);
+      Pool p = requestManager.getPoolById(poolId);
+      if (p == null) {
+        throw new Exception("Could not retrieve pool: " + poolId);
+      }
 
       Long studyId = json.getLong("studyId");
       Study s = requestManager.getStudyById(studyId);
-
-      if (json.has("runId") && json.get("runId") != null) {
-        Long runId = json.getLong("runId");
-        Run r = requestManager.getRunById(runId);
-        if (r != null) {
-          StringBuilder sb = new StringBuilder();
-
-          Experiment e = dataObjectFactory.getExperiment();
-          e.setAlias("EXP_AUTOGEN_" + s.getName() + "_" + s.getStudyType() + "_" + (s.getExperiments().size() + 1));
-          e.setTitle(s.getProject().getName() + " " + r.getPlatformType().getKey() + " " + s.getStudyType() + " experiment (Auto-gen)");
-          e.setDescription(s.getProject().getAlias());
-          e.setPlatform(r.getSequencerReference().getPlatform());
-          e.setStudy(s);
-          e.setSecurityProfile(s.getSecurityProfile());
-
-          try {
-            p.addExperiment(e);
-            e.setLastModifier(user);
-            requestManager.saveExperiment(e);
-          } catch (MalformedExperimentException e1) {
-            log.error("save experiment", e1);
-          }
-
-          sb.append("<i>");
-          sb.append("<span>" + s.getProject().getAlias() + " (" + e.getName() + ": " + p.getDilutions().size() + " dilutions)</span><br/>");
-          sb.append("</i>");
-
-          return JSONUtils.JSONObjectResponse("html", sb.toString());
-        } else {
-          return JSONUtils.SimpleJSONError("Could not find run with ID " + runId);
-        }
-      } else {
-        return JSONUtils.SimpleJSONError("Could not resolve Run ID. Please ensure the run is saved before adding Pools");
+      if (s == null) {
+        throw new Exception("Could not retrieve study: " + studyId);
       }
+
+      Long platformId = json.getLong("platformId");
+      Platform platform = requestManager.getPlatformById(platformId);
+      if (platform == null) {
+        throw new Exception("Could not retrieve Platform:" + platformId);
+      }
+
+      StringBuilder sb = new StringBuilder();
+
+      Experiment e = dataObjectFactory.getExperiment();
+      e.setAlias("EXP_AUTOGEN_" + s.getName() + "_" + s.getStudyType() + "_" + (s.getExperiments().size() + 1));
+      e.setTitle(s.getProject().getName() + " " + platform.getPlatformType().getKey() + " " + s.getStudyType() + " experiment (Auto-gen)");
+      e.setDescription(s.getProject().getAlias());
+      e.setPlatform(platform);
+      e.setStudy(s);
+      e.setSecurityProfile(s.getSecurityProfile());
+
+      try {
+        e.setLastModifier(securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName()));
+        p.addExperiment(e);
+        requestManager.saveExperiment(e);
+      } catch (MalformedExperimentException e1) {
+        log.error("failed to save experiment", e1);
+        return JSONUtils.SimpleJSONError("Failed to save experiment: " + e1.getMessage());
+      }
+
+      sb.append("<i>");
+      sb.append("<span>" + s.getProject().getAlias() + " (" + e.getName() + ": " + p.getDilutions().size() + " dilutions)</span><br/>");
+      sb.append("</i>");
+
+      return JSONUtils.JSONObjectResponse("html", sb.toString());
     } catch (Exception e) {
       log.error("select study for pool", e);
-      return JSONUtils.SimpleJSONError(e.getMessage());
+      return JSONUtils.SimpleJSONError("Failed " + e.getMessage());
     }
   }
 
