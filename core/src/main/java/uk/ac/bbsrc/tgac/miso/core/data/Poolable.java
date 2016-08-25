@@ -42,7 +42,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public interface Poolable<T extends Poolable<T, S>, S> extends Nameable, Comparable {
   @JsonIgnore
-  <S> Collection<S> getInternalPoolableElements();
+  Collection<S> getInternalPoolableElements();
 
   @JsonIgnore
   Set<Pool<T>> getPools();
