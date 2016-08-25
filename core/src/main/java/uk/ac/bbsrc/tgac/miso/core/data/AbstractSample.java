@@ -23,13 +23,12 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import static com.google.common.base.Preconditions.checkArgument;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.nullifyStringIfBlank;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Set;
 import java.util.TreeSet;
 
 import javax.persistence.GeneratedValue;
@@ -43,8 +42,6 @@ import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Transient;
 
 import org.codehaus.jackson.annotate.JsonManagedReference;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -53,7 +50,6 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
-import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleDerivedInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
@@ -61,7 +57,6 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleQcException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 /**
  * Skeleton implementation of a Sample
@@ -124,7 +119,6 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @OneToOne(targetEntity = SampleDerivedInfo.class)
   @PrimaryKeyJoinColumn
   private SampleDerivedInfo derivedInfo;
-
 
   @Override
   public User getLastModifier() {
@@ -203,7 +197,7 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
 
   @Override
   public void setTaxonIdentifier(String taxonIdentifier) {
-    this.taxonIdentifier = taxonIdentifier;
+    this.taxonIdentifier = nullifyStringIfBlank(taxonIdentifier);
   }
 
   @Override
@@ -223,7 +217,7 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
 
   @Override
   public void setIdentificationBarcode(String identificationBarcode) {
-    this.identificationBarcode = identificationBarcode;
+    this.identificationBarcode = nullifyStringIfBlank(identificationBarcode);
   }
 
   @Override
@@ -233,7 +227,7 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
 
   @Override
   public void setLocationBarcode(String locationBarcode) {
-    this.locationBarcode = locationBarcode;
+    this.locationBarcode = nullifyStringIfBlank(locationBarcode);
   }
 
   @Override
@@ -288,7 +282,7 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
 
   @Override
   public void setSampleType(String sampleType) {
-    this.sampleType = sampleType;
+    this.sampleType = nullifyStringIfBlank(sampleType);
   }
 
   @Override

@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.nullifyStringIfBlank;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -203,7 +205,7 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
 
   @Override
   public void setIdentificationBarcode(String identificationBarcode) {
-    this.identificationBarcode = identificationBarcode;
+    this.identificationBarcode = nullifyStringIfBlank(identificationBarcode);
   }
 
   @Override
@@ -213,7 +215,7 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
 
   @Override
   public void setLocationBarcode(String locationBarcode) {
-    this.locationBarcode = locationBarcode;
+    this.locationBarcode = nullifyStringIfBlank(locationBarcode);
   }
 
   @CoverageIgnore
@@ -333,7 +335,7 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
 
   @Override
   public void setPlatformName(String platformName) {
-    this.platformName = platformName;
+    this.platformName = nullifyStringIfBlank(platformName);
   }
 
   @Override

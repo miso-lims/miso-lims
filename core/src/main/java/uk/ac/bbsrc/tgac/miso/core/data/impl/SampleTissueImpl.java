@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.nullifyStringIfBlank;
+
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
@@ -88,7 +90,7 @@ public class SampleTissueImpl extends SampleAdditionalInfoImpl implements Sample
 
   @Override
   public void setExternalInstituteIdentifier(String externalInstituteIdentifier) {
-    this.externalInstituteIdentifier = externalInstituteIdentifier;
+    this.externalInstituteIdentifier = nullifyStringIfBlank(externalInstituteIdentifier);
   }
 
   @Override
@@ -103,7 +105,7 @@ public class SampleTissueImpl extends SampleAdditionalInfoImpl implements Sample
 
   @Override
   public void setRegion(String region) {
-    this.region = region;
+    this.region = nullifyStringIfBlank(region);
   }
 
   @Override

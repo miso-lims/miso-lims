@@ -156,13 +156,15 @@ public class LimsUtils {
     return s == null || "".equals(s.trim());
   }
 
+  public static String nullifyStringIfBlank(String s) {
+    return (isStringBlankOrNull(s) ? null : s);
+  }
+
   /**
    * Join a collection, akin to Perl's join(), using a given delimiter to produce a single String
    * 
-   * @param s
-   *          of type Collection
-   * @param delimiter
-   *          of type String
+   * @param s of type Collection
+   * @param delimiter of type String
    * @return String
    * @throws IllegalArgumentException
    */
@@ -184,10 +186,8 @@ public class LimsUtils {
   /**
    * Join an Array, akin to Perl's join(), using a given delimiter to produce a single String
    * 
-   * @param s
-   *          of type Object[]
-   * @param delimiter
-   *          of type String
+   * @param s of type Object[]
+   * @param delimiter of type String
    * @return String
    */
   public static String join(Object[] s, String delimiter) {
@@ -244,10 +244,8 @@ public class LimsUtils {
   /**
    * Computes the relative complement of two sets, i.e. those elements that are in A but not in B
    * 
-   * @param needles
-   *          of type Set
-   * @param haystack
-   *          of type Set
+   * @param needles of type Set
+   * @param haystack of type Set
    * @return Set
    */
   public static Set relativeComplement(Set needles, Set haystack) {
@@ -266,12 +264,9 @@ public class LimsUtils {
    * <p/>
    * If an exception occurs, null is returned.
    * 
-   * @param c
-   *          of type Class
-   * @param needles
-   *          of type Set
-   * @param haystack
-   *          of type Set
+   * @param c of type Class
+   * @param needles of type Set
+   * @param haystack of type Set
    * @return Set
    */
   public static Set relativeComplementByProperty(Class c, String methodName, Set needles, Set haystack) {
@@ -445,13 +440,10 @@ public class LimsUtils {
    * Checks that a directory exists. This method will attempt to create the directory if it doesn't exist and if the attemptMkdir flag is
    * true
    * 
-   * @param path
-   *          of type File
-   * @param attemptMkdir
-   *          of type boolean
+   * @param path of type File
+   * @param attemptMkdir of type boolean
    * @return boolean true if the directory exists/was created, false if not
-   * @throws IOException
-   *           when the directory exist check/creation could not be completed
+   * @throws IOException when the directory exist check/creation could not be completed
    */
   public static boolean checkDirectory(File path, boolean attemptMkdir) throws IOException {
     boolean storageOk;
@@ -482,11 +474,9 @@ public class LimsUtils {
   /**
    * Similar to checkDirectory, but for single files.
    * 
-   * @param path
-   *          of type File
+   * @param path of type File
    * @return boolean true if the file exists, false if not
-   * @throws IOException
-   *           when the file doesn't exist
+   * @throws IOException when the file doesn't exist
    */
   public static boolean checkFile(File path) throws IOException {
     boolean storageOk = path.exists();
@@ -502,11 +492,9 @@ public class LimsUtils {
   /**
    * Helper method to parse and store output from a given process' stdout and stderr
    * 
-   * @param process
-   *          of type Process
+   * @param process of type Process
    * @return Map<String, String>
-   * @throws IOException
-   *           when
+   * @throws IOException when
    */
   public static Map<String, String> checkPipes(Process process) throws IOException {
     HashMap<String, String> r = new HashMap<String, String>();
@@ -538,11 +526,9 @@ public class LimsUtils {
   /**
    * Reads the contents of an InputStream into a String
    * 
-   * @param in
-   *          of type InputStream
+   * @param in of type InputStream
    * @return String
-   * @throws IOException
-   *           when
+   * @throws IOException when
    */
   public static String inputStreamToString(InputStream in) throws IOException {
     StringBuilder sb = new StringBuilder();
@@ -557,11 +543,9 @@ public class LimsUtils {
   /**
    * Reads the contents of an File into a String
    * 
-   * @param f
-   *          of type File
+   * @param f of type File
    * @return String
-   * @throws IOException
-   *           when
+   * @throws IOException when
    */
   public static String fileToString(File f) throws IOException {
     StringBuilder sb = new StringBuilder();
@@ -583,11 +567,9 @@ public class LimsUtils {
   /**
    * Reads the contents of an InputStream into a byte[]
    * 
-   * @param in
-   *          of type InputStream
+   * @param in of type InputStream
    * @return byte[]
-   * @throws IOException
-   *           when
+   * @throws IOException when
    */
   public static byte[] inputStreamToByteArray(InputStream in) throws IOException {
     ByteArrayOutputStream buffer = new ByteArrayOutputStream();
@@ -603,11 +585,9 @@ public class LimsUtils {
   /**
    * Process stdout from a given Process and concat it to a single String
    * 
-   * @param p
-   *          of type Process
+   * @param p of type Process
    * @return String
-   * @throws IOException
-   *           when
+   * @throws IOException when
    */
   private static String processStdOut(Process p) throws IOException {
     return inputStreamToString(p.getInputStream());
@@ -616,11 +596,9 @@ public class LimsUtils {
   /**
    * Process stderr from a given Process and concat it to a single String
    * 
-   * @param p
-   *          of type Process
+   * @param p of type Process
    * @return String
-   * @throws IOException
-   *           when
+   * @throws IOException when
    */
   private static String processStdErr(Process p) throws IOException {
     return inputStreamToString(p.getErrorStream());
@@ -805,7 +783,9 @@ public class LimsUtils {
     if (!isDetailedSample(child) || !isDetailedSample(parent)) {
       return false;
     }
-    return isValidRelationship(relations, ((SampleAdditionalInfo) parent).getSampleClass(),
+    return isValidRelationship(
+        relations,
+        ((SampleAdditionalInfo) parent).getSampleClass(),
         ((SampleAdditionalInfo) child).getSampleClass());
   }
 
@@ -896,7 +876,7 @@ public class LimsUtils {
     if (!isDetailedSample(sample)) return false;
     return sample instanceof SampleTissue;
   }
-  
+
   public static boolean isTissueProcessingSample(Sample sample) {
     if (!isDetailedSample(sample)) return false;
     return sample instanceof SampleTissueProcessing;
