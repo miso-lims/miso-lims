@@ -1073,6 +1073,9 @@ Sample.hot = {
       if (obj.externalInstituteIdentifier && obj.externalInstituteIdentifier.length) {
         sample.externalInstituteIdentifier = obj.externalInstituteIdentifier;
       }
+      if (obj.tissueMaterialAlias && obj.tissueMaterialAlias.length) {
+        sample.tissueMaterialId = Hot.getIdFromAlias(obj.tissueMaterialAlias, Hot.sampleOptions.tissueMaterialsDtos);
+      }
 
       // if the table data couldn't have changed (no alias value) then use the original id;
       // otherwise, generate id from alias (rather than calculating for each field whether the original id corresponds to the current alias
