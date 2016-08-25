@@ -446,7 +446,7 @@
               <td>
                 <c:choose>
                   <c:when test="${sample.id == 0}">
-                    <miso:select id="tissueOrigin" path="tissueOrigin" items="${tissueOrigins}" itemLabel="description"
+                    <miso:select id="tissueOrigin" path="tissueOrigin" items="${tissueOrigins}" itemLabel="itemLabel"
                         itemValue="id" defaultLabel="SELECT" defaultValue=""/>
                   </c:when>
                   <c:otherwise>
@@ -460,14 +460,8 @@
               <td>
                 <c:choose>
                   <c:when test="${sample.id == 0}">
-                    <form:select id="tissueType" path="tissueType">
-                      <option value="">SELECT</option>
-                      <c:forEach items="${tissueTypes}" var="tissueType">
-                        <option value="${tissueType.id}" <c:if test="${tissueType.id == sample.tissueType.id}">selected="selected"</c:if>>
-                          ${fn:length(tissueType.description) lt 51 ? tissueType.description : fn:substring(tissueType.description,0,49) += '&hellip;'}
-                        </option>
-                      </c:forEach>
-                    </form:select>
+                    <miso:select id="tissueType" path="tissueType" items="${tissueTypes}" itemLabel="itemLabel"
+                        itemValue="id" defaultLabel="SELECT" defaultValue=""/>
                   </c:when>
                   <c:otherwise>
                     ${sample.tissueType.description}
@@ -500,14 +494,8 @@
             <tr>
               <td class="h">Lab:</td>
               <td>
-                <form:select id="lab" path="lab">
-                  <option value="">None</option>
-                  <c:forEach items="${labs}" var="lab">
-                    <option value="${lab.id}" <c:if test="${lab.id == sample.lab.id}">selected="selected"</c:if>>
-                        ${lab.alias} - ${lab.institute.alias}
-                    </option>
-                  </c:forEach>
-                </form:select>
+               <miso:select id="lab" path="lab" items="${labs}" itemLabel="itemLabel" itemValue="id" defaultLabel="SELECT" 
+                   defaultValue=""/>
               </td>
             </tr>
             <tr>
