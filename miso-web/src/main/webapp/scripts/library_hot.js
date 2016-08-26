@@ -123,12 +123,17 @@ Library.hot = {
       // [rowIndex, colName, oldValue, newValue]
       if (['edit', 'autofill', 'paste'].indexOf(source)!= -1) {
         for (var i = 0; i < changes.length; i++) {
+          // trigger only if old value is different from new value
           switch (changes[i][1]) {
             case 'platformName':
-              Library.hot.changePlatform(changes[i][0], changes[i][1], changes[i][2], changes[i][3]);
+              if (changes[i][2] != changes[i][3]) {
+                Library.hot.changePlatform(changes[i][0], changes[i][1], changes[i][2], changes[i][3]);
+              }
               break;
             case 'tagBarcodeFamilyName':
-              Library.hot.changeBarcodeKit(changes[i][0], changes[i][1], changes[i][2], changes[i][3]);
+              if (changes[i][2] != changes[i][3]) {
+                Library.hot.changeBarcodeKit(changes[i][0], changes[i][1], changes[i][2], changes[i][3]);
+              }
               break;
           }
         }
@@ -292,17 +297,19 @@ Library.hot = {
         },{
           header: 'Index 1',
           data: 'tagBarcodeIndex1Label',
-          type: 'dropdown',
+          type: 'autocomplete',
+          strict: true,
+          allowInvalid: true,
           trimDropdown: false,
-          source: [],
-          validator: Hot.permitEmpty
+          source: [""]
         },{
           header: 'Index 2',
           data: 'tagBarcodeIndex2Label',
-          type: 'dropdown',
+          type: 'autocomplete',
+          strict: true,
+          allowInvalid: true,
           trimDropdown: false,
-          source: [],
-          validator: Hot.permitEmpty
+          source: [""]
         },{
           header: 'QC Passed?',
           data: 'qcPassed',
@@ -388,8 +395,8 @@ Library.hot = {
   updateTBFamilyCellsSources: function (row, platformName) {
     // update barcode kits
     // use stored barcode kits if these have already been retrieved.
-    Hot.hotTable.setCellMeta(row, Library.hot.tb1ColIndex, 'source', []);
-    Hot.hotTable.setCellMeta(row, Library.hot.tb2ColIndex, 'source', []);
+    Hot.hotTable.setCellMeta(row, Library.hot.tb1ColIndex, 'source', [""]);
+    Hot.hotTable.setCellMeta(row, Library.hot.tb2ColIndex, 'source', [""]);
     if (Hot.dropdownRef.barcodeKits[platformName]) {
       Hot.hotTable.setCellMeta(row, Library.hot.tbfIndex, 'source', Object.keys(Hot.dropdownRef.tagBarcodes[platformName]));
     } else if (platformName) {
@@ -407,8 +414,11 @@ Library.hot = {
     function setTBSource (platformName, tbfName, pos, len) {
       Hot.hotTable.setCellMeta(row, Library.hot['tb' + pos + 'ColIndex'], 'source', Library.hot.getBcLabels(Hot.dropdownRef.tagBarcodes[platformName][tbfName][pos]));
       Hot.hotTable.setCellMeta(row, Library.hot['tb' + pos + 'ColIndex'], 'readOnly', false);
-      // make next barcode column readOnly in case there are no barcodes for this position
-      if (pos + 1 <= len) Hot.hotTable.setCellMeta(row, Library.hot['tb' + (pos + 1) + 'ColIndex'], 'readOnly', true);
+      // empty source array for barcode 2 column in case there are no barcodes for position 2
+      if (pos == 1) {
+        Hot.hotTable.setCellMeta(row, Library.hot['tb2ColIndex'], 'source', [""]);
+        Hot.hotTable.setCellMeta(row, Library.hot['tb2ColIndex'], 'readOnly', true);
+      }
     }
     if (Hot.dropdownRef.tagBarcodes[platformName] && Hot.dropdownRef.tagBarcodes[platformName][tbfName] && Hot.dropdownRef.tagBarcodes[platformName][tbfName]['1']) {
       // if tagBarcodes for this tagBarcodeFamily are already stored locally, use these
