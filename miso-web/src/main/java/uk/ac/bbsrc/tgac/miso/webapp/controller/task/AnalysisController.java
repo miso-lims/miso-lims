@@ -39,7 +39,6 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.eaglegenomics.simlims.core.User;
@@ -47,13 +46,13 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import net.sf.json.JSONObject;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
+import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
-import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.RunProcessingUtils;
@@ -137,8 +136,8 @@ public class AnalysisController {
             if (pable instanceof Dilution) {
               Library l = ((Dilution) pable).getLibrary();
               if ("RNA-Seq".equals(l.getLibraryStrategyType().getName())) naType = "rna";
-              for (TagBarcode tb : l.getTagBarcodes()) {
-                indexValue = Integer.toString(tb.getSequence().length());
+              for (Index index : l.getIndices()) {
+                indexValue = Integer.toString(index.getSequence().length());
               }
             }
           }
@@ -160,7 +159,8 @@ public class AnalysisController {
       map.put("lane-value", laneValue);
       map.put("nucleic-acid-type", naType);
 
-      map.put("sample-sheet-string",
+      map.put(
+          "sample-sheet-string",
           RunProcessingUtils.buildIlluminaDemultiplexCSV(run, f, "1.8.2", user.getFullName()).replaceAll("\n", "\\\n"));
 
       map.put("contaminant-list", "ecoli,phix_174,human_chr17,arabidopsis_chloroplast,vectors");

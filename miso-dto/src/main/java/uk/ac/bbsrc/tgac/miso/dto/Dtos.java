@@ -30,6 +30,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
+import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Institute;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -56,7 +57,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
-import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
@@ -958,13 +958,13 @@ public class Dtos {
     if (from.getLastModified() != null) {
       dto.setLastModified(getDateAsString(from.getLastModified()));
     }
-    if (!from.getTagBarcodes().isEmpty()) {
-      dto.setTagBarcodeFamilyName(from.getTagBarcodes().get(0).getFamily().getName());
-      dto.setTagBarcodeIndex1Id(from.getTagBarcodes().get(0).getId());
-      dto.setTagBarcodeIndex1Label(from.getTagBarcodes().get(0).getLabel());
-      if (from.getTagBarcodes().size() > 1) {
-        dto.setTagBarcodeIndex2Id(from.getTagBarcodes().get(1).getId());
-        dto.setTagBarcodeIndex2Label(from.getTagBarcodes().get(1).getLabel());
+    if (!from.getIndices().isEmpty()) {
+      dto.setIndexFamilyName(from.getIndices().get(0).getFamily().getName());
+      dto.setIndex1Id(from.getIndices().get(0).getId());
+      dto.setIndex1Label(from.getIndices().get(0).getLabel());
+      if (from.getIndices().size() > 1) {
+        dto.setIndex2Id(from.getIndices().get(1).getId());
+        dto.setIndex2Label(from.getIndices().get(1).getLabel());
       }
     }
     dto.setVolume(from.getVolume());
@@ -1005,17 +1005,17 @@ public class Dtos {
     to.setPaired(from.getPaired());
     to.setPlatformName(from.getPlatformName());
     to.setQcPassed(from.getQcPassed());
-    if (from.getTagBarcodeIndex1Id() != null) {
-      List<TagBarcode> tagBarcodes = new ArrayList<>();
-      TagBarcode tb1 = new TagBarcode();
-      tb1.setId(from.getTagBarcodeIndex1Id());
-      tagBarcodes.add(tb1);
-      if (from.getTagBarcodeIndex2Id() != null) {
-        TagBarcode tb2 = new TagBarcode();
-        tb2.setId(from.getTagBarcodeIndex2Id());
-        tagBarcodes.add(tb2);
+    if (from.getIndex1Id() != null) {
+      List<Index> indices = new ArrayList<>();
+      Index tb1 = new Index();
+      tb1.setId(from.getIndex1Id());
+      indices.add(tb1);
+      if (from.getIndex2Id() != null) {
+        Index tb2 = new Index();
+        tb2.setId(from.getIndex2Id());
+        indices.add(tb2);
       }
-      to.setTagBarcodes(tagBarcodes);
+      to.setIndices(indices);
     }
     to.setVolume(from.getVolume());
 

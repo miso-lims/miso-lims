@@ -32,9 +32,9 @@ import com.eaglegenomics.simlims.core.store.SecurityStore;
 
 import net.sf.ehcache.CacheManager;
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
+import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAdditionalInfoImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
@@ -44,11 +44,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.store.IndexStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
-import uk.ac.bbsrc.tgac.miso.core.store.TagBarcodeStore;
 import uk.ac.bbsrc.tgac.miso.persistence.LibraryAdditionalInfoDao;
 
 public class SQLLibraryDAOTest extends AbstractDAOTest {
@@ -70,7 +70,7 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
   @Mock
   private MisoNamingScheme<Library> libraryNamingSchema;
   @Mock
-  private TagBarcodeStore tagBarcodeStore;
+  private IndexStore indexStore;
   @Mock
   private SampleStore sampleStore;
   @Mock
@@ -89,7 +89,7 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
     MockitoAnnotations.initMocks(this);
     dao.setJdbcTemplate(jdbcTemplate);
     dao.setDataObjectFactory(new TgacDataObjectFactory());
-    when(tagBarcodeStore.getTagBarcodeById(Matchers.anyLong())).thenReturn(new TagBarcode());
+    when(indexStore.getIndexById(Matchers.anyLong())).thenReturn(new Index());
     when(sampleStore.get(Matchers.anyLong())).thenReturn(new SampleImpl());
     when(libraryAdditionalInfoDao.getLibraryAdditionalInfoByLibraryId(Matchers.anyLong())).thenReturn(new LibraryAdditionalInfoImpl());
   }

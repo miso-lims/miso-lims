@@ -229,7 +229,7 @@ Library.dilution = {
       jQuery('#libraryDilutionTable').attr("dilutionInProgress", "true");
 
       jQuery('#libraryDilutionTable')[0].insertRow(1);
-      //dilutionId    Done By   Dilution Date Barcode Results
+      //dilutionId    Done By   Dilution Date Results
       var column1 = jQuery('#libraryDilutionTable')[0].rows[1].insertCell(-1);
       column1.innerHTML = "<input id='name' name='name' type='hidden' value='Unsaved '/>Unsaved";
       var column2 = jQuery('#libraryDilutionTable')[0].rows[1].insertCell(-1);
@@ -721,85 +721,85 @@ Library.ui = {
 
   processPlatformChange: function (json) {
     jQuery('#libraryTypes').html(json.libraryTypes);
-    Library.barcodeFamilies = json.barcodeFamilies;
-    var box = jQuery('#tagBarcodeFamily').empty()[0];
-    for (var i = 0; i < Library.barcodeFamilies.length; i++) {
+    Library.indexFamilies = json.indexFamilies;
+    var box = jQuery('#indexFamily').empty()[0];
+    for (var i = 0; i < Library.indexFamilies.length; i++) {
       var option = document.createElement("option");
-      option.value = Library.barcodeFamilies[i].id;
-      option.text = Library.barcodeFamilies[i].name;
+      option.value = Library.indexFamilies[i].id;
+      option.text = Library.indexFamilies[i].name;
       box.appendChild(option);
     }
-    Library.ui.updateBarcodes();
+    Library.ui.updateIndices();
   },
 
-  updateBarcodes: function () {
-    jQuery('#tagBarcodesDiv').empty();
-    Library.lastBarcodePosition = 0;
-    Library.ui.createBarcodeNextBox();
+  updateIndices: function () {
+    jQuery('#indicesDiv').empty();
+    Library.lastIndexPosition = 0;
+    Library.ui.createIndexNextBox();
   },
 
-  createBarcodeBox: function(id) {
-    var selectedBarcode = Library.ui.getCurrentBarcodeFamily().barcodes.filter(function(barcode) { return barcode.id == id; })[0];
-    Library.ui.createBarcodeSelect(selectedBarcode.position, id);
+  createIndexBox: function(id) {
+    var selectedIndex = Library.ui.getCurrentIndexFamily().indices.filter(function(index) { return index.id == id; })[0];
+    Library.ui.createIndexSelect(selectedIndex.position, id);
   },
 
   maxOfArray: function(array) {
     return Math.max(0, Math.max.apply(Math, array));
   },
 
-  maxBarcodePositionInFamily: function(family) {
-    return Library.ui.maxOfArray(family.barcodes.map(function(barcode) { return barcode.position; }));
+  maxIndexPositionInFamily: function(family) {
+    return Library.ui.maxOfArray(family.indices.map(function(index) { return index.position; }));
   },
 
-  createBarcodeNextBox: function() {
-    var family = Library.ui.getCurrentBarcodeFamily();
-    var max = Library.ui.maxBarcodePositionInFamily(family);
-    if (Library.lastBarcodePosition < max) {
-      Library.ui.createBarcodeSelect(max, null);
+  createIndexNextBox: function() {
+    var family = Library.ui.getCurrentIndexFamily();
+    var max = Library.ui.maxIndexPositionInFamily(family);
+    if (Library.lastIndexPosition < max) {
+      Library.ui.createIndexSelect(max, null);
     } else {
-      var container = jQuery('#tagBarcodesDiv');
+      var container = jQuery('#indicesDiv');
       if (container.children().length == 0) {
-        container.text("No barcodes available.");
+        container.text("No indices available.");
       }
     }
-    var container = document.getElementById('tagBarcodesDiv');
-    // If this barcode family requires fewer barcodes than previously selected, we need to null them out in the form input or Spring will create an array with a mix of new and old barcodes.
-    var biggestMax = Library.ui.maxOfArray(Library.barcodeFamilies.map(Library.ui.maxBarcodePositionInFamily));
-    for (var j = Library.lastBarcodePosition; j < biggestMax; j++) {
+    var container = document.getElementById('indicesDiv');
+    // If this index family requires fewer indices than previously selected, we need to null them out in the form input or Spring will create an array with a mix of new and old indices.
+    var biggestMax = Library.ui.maxOfArray(Library.indexFamilies.map(Library.ui.maxIndexPositionInFamily));
+    for (var j = Library.lastIndexPosition; j < biggestMax; j++) {
        var nullInput = document.createElement("input");
        nullInput.type = "hidden";
        nullInput.value = "";
-       nullInput.name = "tagBarcodes[" + j + "]";
+       nullInput.name = "indices[" + j + "]";
        container.appendChild(nullInput);
     }
   },
 
-  getCurrentBarcodeFamily: function() {
-    var familyId = jQuery('#tagBarcodeFamily').val();
-    var families = Library.barcodeFamilies.filter(function(family) { return family.id == familyId; });
+  getCurrentIndexFamily: function() {
+    var familyId = jQuery('#indexFamily').val();
+    var families = Library.indexFamilies.filter(function(family) { return family.id == familyId; });
     if (families.length == 0) {
-      return { id : 0, barcodes :  [] };
+      return { id : 0, indices :  [] };
     } else {
       return families[0];
     }
   },
 
-  createBarcodeSelect: function(newPosition, selectedId) {
-    var container = document.getElementById('tagBarcodesDiv');
-    for (var position = Library.lastBarcodePosition + 1; position <= newPosition; position++) {
+  createIndexSelect: function(newPosition, selectedId) {
+    var container = document.getElementById('indicesDiv');
+    for (var position = Library.lastIndexPosition + 1; position <= newPosition; position++) {
       var widget = document.createElement("select");
-      widget.name = "tagBarcodes[" + (position - 1) + "]";
+      widget.name = "indices[" + (position - 1) + "]";
       if (position > 1) {
         var nullOption = document.createElement("option");
         nullOption.value = "";
         nullOption.text = "(None)";
         widget.appendChild(nullOption);
       }
-      var barcodes = Library.ui.getCurrentBarcodeFamily().barcodes.filter(function(barcode) { return barcode.position == position; });
-      for (var i = 0; i < barcodes.length; i++) {
+      var indices = Library.ui.getCurrentIndexFamily().indices.filter(function(index) { return index.position == position; });
+      for (var i = 0; i < indices.length; i++) {
         var option = document.createElement("option");
-        option.value = barcodes[i].id;
-        option.text = barcodes[i].name + " (" + barcodes[i].sequence + ")";
+        option.value = indices[i].id;
+        option.text = indices[i].name + " (" + indices[i].sequence + ")";
         widget.appendChild(option);
       }
       if (position == newPosition) {
@@ -807,10 +807,10 @@ Library.ui = {
       }
       container.appendChild(widget);
     }
-    Library.lastBarcodePosition = newPosition;
+    Library.lastIndexPosition = newPosition;
   },
 
-  fillDownTagBarcodeStrategySelects: function (tableselector, th) {
+  fillDownIndexFamilySelects: function (tableselector, th) {
     DatatableUtils.collapseInputs(tableselector);
     var tableObj = jQuery(tableselector);
     var table = tableObj.dataTable();
@@ -836,63 +836,55 @@ Library.ui = {
         table.fnUpdate(tdtext, table.fnGetPosition(this), col);
       });
 
-      Fluxion.doAjax(
-        'libraryControllerHelperService',
-        'getBarcodesPositions',
-        {
-          'strategy': tdtext,
-          'url': ajaxurl
-        },
-        {
-          'doOnSuccess': function (json) {
-            tableObj.find("tr:gt(" + frId + ")").each(function () {
-              var c = this.cells[col + 1];
-              jQuery(c).html("");
-              for (var i = 0; i < json.numApplicableBarcodes; i++) {
-                jQuery(c).append("<span class='tagBarcodeSelectDiv' position='" + (i + 1) + "' id='tagbarcodes" + (i + 1) + "'>- <i>Select...</i></span>");
-                if (json.numApplicableBarcodes > 1 && i === 0) {
-                  jQuery(c).append("|");
-                }
+      jQuery.get('../../library/indexPositionsJson', {indexFamily: tdtext}, {
+        success: function (json) {
+          tableObj.find("tr:gt(" + frId + ")").each(function () {
+            var c = this.cells[col + 1];
+            jQuery(c).html("");
+            for (var i = 0; i < json.numApplicableIndices; i++) {
+              jQuery(c).append("<span class='indexSelectDiv' position='" + (i + 1) + "' id='indices" + (i + 1) + "'>- <i>Select...</i></span>");
+              if (json.numApplicableIndices > 1 && i === 0) {
+                jQuery(c).append("|");
               }
-  
-              //bind editable to selects
-              jQuery("#cinput .tagBarcodeSelectDiv").editable(function (value, settings) {
-                return value;
-              },
-              {
-                loadurl: '../../library/barcodesForPosition',
-                loaddata: function (value, settings) {
-                  var ret = {};
-                  ret["position"] = jQuery(this).attr("position");
-                  if (!Utils.validation.isNullCheck(tdtext)) {
-                    ret['barcodeStrategy'] = tdtext;
-                  } else {
-                    ret['barcodeStrategy'] = '';
-                  }
-                  return ret;
-                },
-                type: 'select',
-                onblur: 'submit',
-                placeholder: '',
-                style: 'inherit',
-                submitdata: function (tvalue, tsettings) {
-                  return {
-                    "row_id": this.parentNode.getAttribute('id'),
-                    "column": table.fnGetPosition(this)[2]
-                  };
+            }
+
+            //bind editable to selects
+            jQuery("#cinput .indexSelectDiv").editable(function (value, settings) {
+              return value;
+            },
+            {
+              loadurl: '../../library/indicesForPosition',
+              loaddata: function (value, settings) {
+                var ret = {};
+                ret["position"] = jQuery(this).attr("position");
+                if (!Utils.validation.isNullCheck(tdtext)) {
+                  ret['indexFamily'] = tdtext;
+                } else {
+                  ret['indexFamily'] = '';
                 }
-              });
+                return ret;
+              },
+              type: 'select',
+              onblur: 'submit',
+              placeholder: '',
+              style: 'inherit',
+              submitdata: function (tvalue, tsettings) {
+                return {
+                  "row_id": this.parentNode.getAttribute('id'),
+                  "column": table.fnGetPosition(this)[2]
+                };
+              }
             });
-          }
+          });
         }
-      );
+      });
     }
     else {
       alert("Please select a row to use as the Fill Down template by clicking in the Select column for that row.");
     }
   },
 
-  fillDownTagBarcodeSelects: function (tableselector, th) {
+  fillDownIndexSelects: function (tableselector, th) {
     DatatableUtils.collapseInputs(tableselector);
     var tableObj = jQuery(tableselector);
     var table = tableObj.dataTable();
@@ -917,61 +909,52 @@ Library.ui = {
       var firstSelText = jQuery(aTrs[frId].cells[col - 1]).text();
 
       tableObj.find("tr:gt(" + frId + ")").each(function () {
-        var strat = this.cells[col - 1];
-        var stratText = jQuery(strat).text();
+        var ifam = this.cells[col - 1];
+        var ifamText = jQuery(ifam).text();
         var cell = jQuery(this.cells[col]);
 
-        if (stratText.trim()) {
+        if (ifamText.trim()) {
           //no select means empty or already filled
           if (firstSelText.indexOf("Select") === 0) {
-            //same strategy, just copy the cell
-            if (firstSelText === stratText) {
+            //same family, just copy the cell
+            if (firstSelText === ifamText) {
               cell.html(tdtext);
-            }
-            else {
-              Fluxion.doAjax(
-                'libraryControllerHelperService',
-                'getBarcodesPositions',
-                {
-                  'strategy': stratText,
-                  'url': ajaxurl
-                },
-                {
-                  'doOnSuccess': function (json) {
-                    cell.html("");
-                    for (var i = 0; i < json.numApplicableBarcodes; i++) {
-                      cell.append("<span class='tagBarcodeSelectDiv' position='" + (i + 1) + "' id='tagbarcodes" + (i + 1) + "'>- <i>Select...</i></span>");
-                      if (json.numApplicableBarcodes > 1 && i === 0) {
-                        cell.append("|");
-                      }
+            } else {
+              jQuery.get('../../library/indexPositionsJson', {indexFamily: ifamText}, {
+                success: function (json) {
+                  cell.html("");
+                  for (var i = 0; i < json.numApplicableIndices; i++) {
+                    cell.append("<span class='indexSelectDiv' position='" + (i + 1) + "' id='indices" + (i + 1) + "'>- <i>Select...</i></span>");
+                    if (json.numApplicableIndices > 1 && i === 0) {
+                      cell.append("|");
                     }
                   }
                 }
-              );
+              });
             }
           }
           else {
             //just copy select
-            if (firstSelText === stratText) {
+            if (firstSelText === ifamText) {
               cell.html(tdtext);
             }
           }
         }
 
         //bind editable to selects
-        jQuery("#cinput .tagBarcodeSelectDiv").editable(function (value, settings) {
+        jQuery("#cinput .indexSelectDiv").editable(function (value, settings) {
           return value;
         },
         {
-          loadurl: '../../library/barcodesForPosition',
+          loadurl: '../../library/indicesForPosition',
           loaddata: function (value, settings) {
             var ret = {};
             ret["position"] = jQuery(this).attr("position");
-            if (!Utils.validation.isNullCheck(stratText)) {
-              ret['barcodeStrategy'] = stratText;
+            if (!Utils.validation.isNullCheck(ifamText)) {
+              ret['indexFamily'] = ifamText;
             }
             else {
-              ret['barcodeStrategy'] = '';
+              ret['indexFamily'] = '';
             }
 
             return ret;
@@ -1100,10 +1083,10 @@ Library.ui = {
           }
         },
         { 
-          "sTitle": "Tag Barcode(s)",
-          "mData": "tagBarcodeIndex1Label",
+          "sTitle": "Index(es)",
+          "mData": "index1Label",
           "mRender": function (data, type, full) {
-            return (data ? (full.tagBarcodeIndex2Label ? data + ", " + full.tagBarcodeIndex2Label : data) : "None");
+            return (data ? (full.index2Label ? data + ", " + full.index2Label : data) : "None");
           },
           "iSortPriority": 0,
           "bSortable": false

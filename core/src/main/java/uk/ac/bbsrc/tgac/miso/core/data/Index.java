@@ -42,7 +42,7 @@ import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 /**
- * TagBarcodes represent adapter sequences that can be prepended to sequencable material in order to facilitate multiplexing.
+ * Indices represent adapter sequences that can be prepended to sequencable material in order to facilitate multiplexing.
  * 
  * @author Rob Davey
  * @date 10-May-2011
@@ -51,24 +51,24 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 @Entity
-@Table(name = "TagBarcodes")
-public class TagBarcode implements Nameable {
+@Table(name = "Indices")
+public class Index implements Nameable {
 
   public static final Long UNSAVED_ID = 0L;
 
-  public static void sort(final List<TagBarcode> barcodes) {
-    Collections.sort(barcodes, new Comparator<TagBarcode>() {
+  public static void sort(final List<Index> indices) {
+    Collections.sort(indices, new Comparator<Index>() {
       @Override
-      public int compare(TagBarcode o1, TagBarcode o2) {
+      public int compare(Index o1, Index o2) {
         return o1.getPosition() - o2.getPosition();
       }
     });
   }
 
   @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = "tagFamilyId", nullable = false)
+  @JoinColumn(name = "indexFamilyId", nullable = false)
   @JsonBackReference
-  private TagBarcodeFamily family;
+  private IndexFamily family;
   @Column(nullable = false)
   private String name;
   @Column(nullable = false)
@@ -78,15 +78,15 @@ public class TagBarcode implements Nameable {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private long tagId = UNSAVED_ID;
+  private long indexId = UNSAVED_ID;
 
-  public TagBarcodeFamily getFamily() {
+  public IndexFamily getFamily() {
     return family;
   }
 
   @Override
   public long getId() {
-    return tagId;
+    return indexId;
   }
 
   @Override
@@ -102,12 +102,12 @@ public class TagBarcode implements Nameable {
     return sequence;
   }
 
-  public void setFamily(TagBarcodeFamily family) {
+  public void setFamily(IndexFamily family) {
     this.family = family;
   }
 
   public void setId(long id) {
-    this.tagId = id;
+    this.indexId = id;
   }
 
   public void setName(String name) {

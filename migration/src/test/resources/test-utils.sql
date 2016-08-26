@@ -47,7 +47,7 @@ BEGIN
     DELETE FROM Pool_Elements;
     DELETE FROM LibraryDilution;
     DELETE FROM LibraryAdditionalInfo;
-    DELETE FROM Library_TagBarcode;
+    DELETE FROM Library_Index;
     DELETE FROM LibraryChangeLog;
     DELETE FROM Library;
     DELETE FROM Identity;

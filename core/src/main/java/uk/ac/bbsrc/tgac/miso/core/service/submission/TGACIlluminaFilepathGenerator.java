@@ -39,10 +39,10 @@ import org.slf4j.LoggerFactory;
 import net.sourceforge.fluxion.spi.ServiceProvider;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
+import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
-import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.SubmissionException;
 
@@ -75,16 +75,18 @@ public class TGACIlluminaFilepathGenerator implements FilePathGenerator {
         Experiment experiment = experiments.iterator().next();
         StringBuilder filePath = new StringBuilder();
         if (!isStringEmptyOrNull(basePath)) {
-          filePath.append(partition.getSequencerPartitionContainer().getRun().getFilePath() + "/Data/Intensities/BaseCalls/PAP/Project_"
-              + experiment.getStudy().getProject().getAlias() + "/Sample_" + l.getLibrary().getName() + "/" + l.getLibrary().getName());
+          filePath.append(
+              partition.getSequencerPartitionContainer().getRun().getFilePath() + "/Data/Intensities/BaseCalls/PAP/Project_"
+                  + experiment.getStudy().getProject().getAlias() + "/Sample_" + l.getLibrary().getName() + "/" + l.getLibrary().getName());
         } else {
-          filePath.append(basePath + "/" + experiment.getStudy().getProject().getAlias() + "/Sample_" + l.getLibrary().getName() + "/"
-              + l.getLibrary().getName());
+          filePath.append(
+              basePath + "/" + experiment.getStudy().getProject().getAlias() + "/Sample_" + l.getLibrary().getName() + "/"
+                  + l.getLibrary().getName());
         }
-        if (l.getLibrary().getTagBarcodes() != null && !l.getLibrary().getTagBarcodes().isEmpty()) {
+        if (l.getLibrary().getIndices() != null && !l.getLibrary().getIndices().isEmpty()) {
           filePath.append("_");
-          for (TagBarcode tb : l.getLibrary().getTagBarcodes()) {
-            filePath.append(tb.getSequence());
+          for (Index index : l.getLibrary().getIndices()) {
+            filePath.append(index.getSequence());
           }
         }
         filePath.append("_L00" + partition.getPartitionNumber() + "*.fastq.gz");

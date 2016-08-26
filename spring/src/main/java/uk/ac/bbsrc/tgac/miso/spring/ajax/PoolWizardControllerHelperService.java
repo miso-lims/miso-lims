@@ -48,11 +48,11 @@ import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
+import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
-import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
@@ -116,15 +116,15 @@ public class PoolWizardControllerHelperService {
           dils.add(requestManager.getDilutionByIdAndPlatform(id.longValue(), platformType));
         }
 
-        boolean barcodeCollision = false;
+        boolean indexCollision = false;
         if (dils.size() > 1) {
           for (Dilution d1 : dils) {
             if (d1 != null) {
               for (Dilution d2 : dils) {
                 if (d2 != null && !d1.equals(d2)) {
-                  if (!d1.getLibrary().getTagBarcodes().isEmpty() && !d2.getLibrary().getTagBarcodes().isEmpty()) {
-                    if (d1.getLibrary().getTagBarcodes().equals(d2.getLibrary().getTagBarcodes())) {
-                      barcodeCollision = true;
+                  if (!d1.getLibrary().getIndices().isEmpty() && !d2.getLibrary().getIndices().isEmpty()) {
+                    if (d1.getLibrary().getIndices().equals(d2.getLibrary().getIndices())) {
+                      indexCollision = true;
                     }
                   }
                 }
@@ -133,7 +133,7 @@ public class PoolWizardControllerHelperService {
           }
         }
 
-        if (!barcodeCollision) {
+        if (!indexCollision) {
           Pool pool;
           // TODO special type of pool for LibraryDilutions that will go on to be emPCRed as a whole
           if (dils.get(0) instanceof LibraryDilution
@@ -177,15 +177,17 @@ public class PoolWizardControllerHelperService {
           pool.setLastModifier(user);
           requestManager.savePool(pool);
 
-          sb.append("<a class='dashboardresult' href='/miso/pool/" + pool.getId()
-              + "' target='_blank'><div  onmouseover=\"this.className='dashboardhighlight ui-corner-all'\" onmouseout=\"this.className='dashboard ui-corner-all'\"  class='dashboard ui-corner-all' >");
+          sb.append(
+              "<a class='dashboardresult' href='/miso/pool/" + pool.getId()
+                  + "' target='_blank'><div  onmouseover=\"this.className='dashboardhighlight ui-corner-all'\" onmouseout=\"this.className='dashboard ui-corner-all'\"  class='dashboard ui-corner-all' >");
           sb.append("Pool ID: <b>" + pool.getId() + "</b><br/>");
           sb.append("Pool Name: <b>" + pool.getName() + "</b><br/>");
           sb.append("Platform Type: <b>" + pool.getPlatformType().name() + "</b><br/>");
           sb.append("Dilutions: <ul class='bullets'>");
           for (Dilution dl : (Collection<? extends Dilution>) pool.getDilutions()) {
-            sb.append("<li>" + dl.getName() + " (<a href='/miso/library/" + dl.getLibrary().getId() + "'>" + dl.getLibrary().getAlias()
-                + "</a>)</li>");
+            sb.append(
+                "<li>" + dl.getName() + " (<a href='/miso/library/" + dl.getLibrary().getId() + "'>" + dl.getLibrary().getAlias()
+                    + "</a>)</li>");
           }
           sb.append("</ul>");
 
@@ -199,7 +201,7 @@ public class PoolWizardControllerHelperService {
           sb.append("</div></a>");
         } else {
           throw new IOException(
-              "Tag barcode collision. Two or more selection dilutions have the same tag barcode and therefore cannot be pooled together.");
+              "Index collision. Two or more selection dilutions have the same index and therefore cannot be pooled together.");
         }
       } catch (IOException e) {
         log.error("Failed", e);
@@ -243,8 +245,9 @@ public class PoolWizardControllerHelperService {
       s.setLastModifier(user);
       requestManager.saveStudy(s);
 
-      sb.append("<a  class=\"dashboardresult\" href='/miso/study/" + s.getId()
-          + "' target='_blank'><div onmouseover=\"this.className='dashboardhighlight ui-corner-all'\" onmouseout=\"this.className='dashboard ui-corner-all'\"  class='dashboard ui-corner-all' >New Study Added:<br/>");
+      sb.append(
+          "<a  class=\"dashboardresult\" href='/miso/study/" + s.getId()
+              + "' target='_blank'><div onmouseover=\"this.className='dashboardhighlight ui-corner-all'\" onmouseout=\"this.className='dashboard ui-corner-all'\"  class='dashboard ui-corner-all' >New Study Added:<br/>");
       sb.append("Study ID: " + s.getId() + "<br/>");
       sb.append("Study Name: <b>" + s.getName() + "</b><br/>");
       sb.append("Study Alias: <b>" + s.getAlias() + "</b><br/>");
@@ -268,29 +271,31 @@ public class PoolWizardControllerHelperService {
       for (Dilution dl : dls) {
         if (dl.getLibrary().getQcPassed() != null) {
           if (dl.getLibrary().getQcPassed()) {
-            StringBuilder barcode = new StringBuilder();
-            if (!dl.getLibrary().getTagBarcodes().isEmpty()) {
+            StringBuilder indexsb = new StringBuilder();
+            if (!dl.getLibrary().getIndices().isEmpty()) {
               boolean first = true;
-              for (TagBarcode tb : dl.getLibrary().getTagBarcodes()) {
+              for (Index index : dl.getLibrary().getIndices()) {
                 if (first) {
                   first = false;
                 } else {
-                  barcode.append("-");
+                  indexsb.append("-");
                 }
-                barcode.append(tb.getName());
+                indexsb.append(index.getName());
               }
             }
 
             b.append("<tr id='" + dl.getId() + "'><td class='rowSelect'></td>");
             b.append("<td>" + dl.getName() + "</td>");
             b.append("<td>");
-            b.append(barcode);
+            b.append(indexsb);
             b.append("</td>");
             b.append("</tr>");
 
-            a.add(JSONObject.fromObject("{'id':" + dl.getId() + ",'name':'" + dl.getName() + "','concentration':'" + dl.getConcentration()
-                + "','description':'" + dl.getLibrary().getDescription() + "','library':'" + dl.getLibrary().getAlias()
-                + "','libraryBarcode':'" + barcode.toString() + "'}"));
+            a.add(
+                JSONObject.fromObject(
+                    "{'id':" + dl.getId() + ",'name':'" + dl.getName() + "','concentration':'" + dl.getConcentration() + "','description':'"
+                        + dl.getLibrary().getDescription() + "','library':'" + dl.getLibrary().getAlias() + "','libraryIndex':'"
+                        + indexsb.toString() + "'}"));
           }
         }
       }

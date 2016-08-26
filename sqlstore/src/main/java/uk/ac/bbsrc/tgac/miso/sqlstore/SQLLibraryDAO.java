@@ -60,11 +60,11 @@ import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
+import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
@@ -77,6 +77,7 @@ import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
+import uk.ac.bbsrc.tgac.miso.core.store.IndexStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
@@ -84,7 +85,6 @@ import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
-import uk.ac.bbsrc.tgac.miso.core.store.TagBarcodeStore;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.persistence.LibraryAdditionalInfoDao;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
@@ -185,19 +185,19 @@ public class SQLLibraryDAO implements LibraryStore {
   public static final String LIBRARIES_BY_RELATED_DILUTION_ID = LIBRARIES_SELECT
       + " WHERE l.libraryId IN (SELECT library_libraryId FROM LibraryDilution WHERE dilutionId=?)";
 
-  public static final String TAG_BARCODES_SELECT = "SELECT tagId, name, sequence, platformName, strategyName " + "FROM TagBarcodes";
+  public static final String INDEX_SELECT = "SELECT indexId, name, sequence, platformName, strategyName " + "FROM Indices";
 
-  public static final String TAG_BARCODE_SELECT_BY_NAME = TAG_BARCODES_SELECT + " WHERE name = ? ORDER by tagId";
+  public static final String INDEX_SELECT_BY_NAME = INDEX_SELECT + " WHERE name = ? ORDER by indexId";
 
-  public static final String TAG_BARCODE_SELECT_BY_LIBRARY_ID = "SELECT barcode_barcodeId FROM Library_TagBarcode WHERE library_libraryId = ?";
+  public static final String INDEX_SELECT_BY_LIBRARY_ID = "SELECT index_indexId FROM Library_Index WHERE library_libraryId = ?";
 
-  public static final String TAG_BARCODES_SELECT_BY_PLATFORM = TAG_BARCODES_SELECT + " WHERE platformName = ? ORDER by tagId";
+  public static final String INDICES_SELECT_BY_PLATFORM = INDEX_SELECT + " WHERE platformName = ? ORDER by indexId";
 
-  public static final String TAG_BARCODES_SELECT_BY_STRATEGY_NAME = TAG_BARCODES_SELECT + " WHERE strategyName = ? ORDER by tagId";
+  public static final String INDICES_SELECT_BY_STRATEGY_NAME = INDEX_SELECT + " WHERE strategyName = ? ORDER by indexId";
 
-  public static final String TAG_BARCODE_SELECT_BY_ID = TAG_BARCODES_SELECT + " WHERE tagId = ?";
+  public static final String INDEX_SELECT_BY_ID = INDEX_SELECT + " WHERE indexId = ?";
 
-  public static final String LIBRARY_TAGBARCODE_DELETE_BY_LIBRARY_ID = "DELETE FROM Library_TagBarcode "
+  public static final String LIBRARY_INDEX_DELETE_BY_LIBRARY_ID = "DELETE FROM Library_Index "
       + "WHERE library_libraryId=:library_libraryId";
 
   protected static final Logger log = LoggerFactory.getLogger(SQLLibraryDAO.class);
@@ -221,10 +221,10 @@ public class SQLLibraryDAO implements LibraryStore {
   }
 
   @Autowired
-  private TagBarcodeStore tagBarcodeStrategyStore;
+  private IndexStore indexStore;
 
-  public void setTagBarcodeStore(TagBarcodeStore tagBarcodeStore) {
-    this.tagBarcodeStrategyStore = tagBarcodeStore;
+  public void setIndexStore(IndexStore indexStore) {
+    this.indexStore = indexStore;
   }
 
   @Autowired
@@ -454,16 +454,16 @@ public class SQLLibraryDAO implements LibraryStore {
     MapSqlParameterSource libparams = new MapSqlParameterSource();
     libparams.addValue("library_libraryId", library.getId());
     NamedParameterJdbcTemplate libNamedTemplate = new NamedParameterJdbcTemplate(template);
-    libNamedTemplate.update(LIBRARY_TAGBARCODE_DELETE_BY_LIBRARY_ID, libparams);
+    libNamedTemplate.update(LIBRARY_INDEX_DELETE_BY_LIBRARY_ID, libparams);
 
-    if (library.getTagBarcodes() != null && !library.getTagBarcodes().isEmpty()) {
-      SimpleJdbcInsert eInsert = new SimpleJdbcInsert(template).withTableName("Library_TagBarcode");
+    if (library.getIndices() != null && !library.getIndices().isEmpty()) {
+      SimpleJdbcInsert eInsert = new SimpleJdbcInsert(template).withTableName("Library_Index");
 
-      for (TagBarcode t : library.getTagBarcodes()) {
-        if (t != null) {
+      for (Index index : library.getIndices()) {
+        if (index != null) {
           MapSqlParameterSource ltParams = new MapSqlParameterSource();
           ltParams.addValue("library_libraryId", library.getId());
-          ltParams.addValue("barcode_barcodeId", t.getId());
+          ltParams.addValue("index_indexId", index.getId());
           eInsert.execute(ltParams);
         }
       }
@@ -861,16 +861,16 @@ public class SQLLibraryDAO implements LibraryStore {
         library.setLibrarySelectionType(getLibrarySelectionTypeById(rs.getLong("librarySelectionType")));
         library.setLibraryStrategyType(getLibraryStrategyTypeById(rs.getLong("libraryStrategyType")));
 
-        final List<TagBarcode> barcodes = new ArrayList<>();
-        template.query(TAG_BARCODE_SELECT_BY_LIBRARY_ID, new Object[] { id }, new RowCallbackHandler() {
+        final List<Index> indices = new ArrayList<>();
+        template.query(INDEX_SELECT_BY_LIBRARY_ID, new Object[] { id }, new RowCallbackHandler() {
 
           @Override
           public void processRow(ResultSet brs) throws SQLException {
-            TagBarcode b = tagBarcodeStrategyStore.getTagBarcodeById(brs.getLong("barcode_barcodeId"));
-            barcodes.add(b);
+            Index i = indexStore.getIndexById(brs.getLong("index_indexId"));
+            indices.add(i);
           }
         });
-        library.setTagBarcodes(barcodes);
+        library.setIndices(indices);
 
         if (!isLazy()) {
           library.setSample(sampleDAO.get(rs.getLong("sample_sampleId")));

@@ -36,6 +36,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.OicrSampleNamingScheme;
 import uk.ac.bbsrc.tgac.miso.migration.util.SimpleLibraryNamingScheme;
 import uk.ac.bbsrc.tgac.miso.persistence.HibernateSampleClassDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateIdentityDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateIndexDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateInstituteDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLabDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryAdditionalInfoDao;
@@ -48,7 +49,6 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSamplePurposeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleTissueDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleValidRelationshipDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSubprojectDao;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTagBarcodeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueMaterialDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueOriginDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueTypeDao;
@@ -153,15 +153,13 @@ public class MisoServiceManager {
   private HibernateSampleValidRelationshipDao sampleValidRelationshipDao;
   private HibernateLibraryAdditionalInfoDao libraryAdditionalInfoDao;
   private HibernateLibraryDesignDao libraryDesignDao;
-  private HibernateTagBarcodeDao tagBarcodeDao;
+  private HibernateIndexDao indexDao;
 
   /**
    * Constructs a new MisoServiceManager with no services initialized
    * 
-   * @param jdbcTemplate
-   *          for JDBC access to the database
-   * @param sessionFactory
-   *          for Hibernate access to the database
+   * @param jdbcTemplate for JDBC access to the database
+   * @param sessionFactory for Hibernate access to the database
    */
   public MisoServiceManager(JdbcTemplate jdbcTemplate, SessionFactory sessionFactory) {
     this.jdbcTemplate = jdbcTemplate;
@@ -171,12 +169,9 @@ public class MisoServiceManager {
   /**
    * Factory method to create a MisoServiceManager with all services already created and wired
    * 
-   * @param jdbcTemplate
-   *          for JDBC access to the database
-   * @param sessionFactory
-   *          for Hibernate access to the database
-   * @param username
-   *          user to attribute migration to
+   * @param jdbcTemplate for JDBC access to the database
+   * @param sessionFactory for Hibernate access to the database
+   * @param username user to attribute migration to
    * @return
    * @throws IOException
    */
@@ -231,7 +226,7 @@ public class MisoServiceManager {
     m.setDefaultTissueTypeDao();
     m.setDefaultWatcherDao();
     m.setDefaultLibraryDesignDao();
-    m.setDefaultTagBarcodeDao();
+    m.setDefaultIndexDao();
 
     User migrationUser = m.getsecurityStore().getUserByLoginName(username);
     if (migrationUser == null) throw new IllegalArgumentException("User '" + username + "' not found");
@@ -649,7 +644,7 @@ public class MisoServiceManager {
     dao.setSecurityDAO(securityStore);
     dao.setSecurityProfileDAO(securityProfileDao);
     dao.setLibraryAdditionalInfoDao(libraryAdditionalInfoDao);
-    dao.setTagBarcodeStore(tagBarcodeDao);
+    dao.setIndexStore(indexDao);
     setLibraryDao(dao);
   }
 
@@ -1435,43 +1430,43 @@ public class MisoServiceManager {
   private void updateLibraryAdditionalInfoDaoDependencies() {
     if (libraryDao != null) libraryDao.setLibraryAdditionalInfoDao(libraryAdditionalInfoDao);
   }
-  
+
   public HibernateLibraryDesignDao getLibraryDesignDao() {
     return libraryDesignDao;
   }
-  
+
   public void setLibraryDesignDao(HibernateLibraryDesignDao libraryDesignDao) {
     this.libraryDesignDao = libraryDesignDao;
     updateLibraryDesignDaoDependencies();
   }
-  
+
   public void setDefaultLibraryDesignDao() {
     HibernateLibraryDesignDao dao = new HibernateLibraryDesignDao();
     dao.setSessionFactory(sessionFactory);
     setLibraryDesignDao(dao);
   }
-  
+
   private void updateLibraryDesignDaoDependencies() {
-    
+
   }
-  
-  public HibernateTagBarcodeDao getTagBarcodeDao() {
-    return tagBarcodeDao;
+
+  public HibernateIndexDao getIndexDao() {
+    return indexDao;
   }
-  
-  public void setTagBarcodeDao(HibernateTagBarcodeDao tagBarcodeDao) {
-    this.tagBarcodeDao = tagBarcodeDao;
-    updateTagBarcodeDaoDependencies();
+
+  public void setIndexDao(HibernateIndexDao indexDao) {
+    this.indexDao = indexDao;
+    updateIndexDaoDependencies();
   }
-  
-  public void setDefaultTagBarcodeDao() {
-    HibernateTagBarcodeDao dao = new HibernateTagBarcodeDao();
+
+  public void setDefaultIndexDao() {
+    HibernateIndexDao dao = new HibernateIndexDao();
     dao.setSessionFactory(sessionFactory);
-    setTagBarcodeDao(dao);
+    setIndexDao(dao);
   }
-  
-  private void updateTagBarcodeDaoDependencies() {
-    if (libraryDao != null) libraryDao.setTagBarcodeStore(tagBarcodeDao);
+
+  private void updateIndexDaoDependencies() {
+    if (libraryDao != null) libraryDao.setIndexStore(indexDao);
   }
 
 }

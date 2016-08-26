@@ -62,7 +62,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.PlatePool;
 import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
-import uk.ac.bbsrc.tgac.miso.core.service.TagBarcodeService;
+import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.util.FormUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -86,9 +86,9 @@ public class UploadController {
   @Autowired
   private MisoNamingScheme<Library> libraryNamingScheme;
   @Autowired
-  private TagBarcodeService tagBarcodeService;
+  private IndexService tagBarcodeService;
 
-  public void setTagBarcodeService(TagBarcodeService tagBarcodeService) {
+  public void setTagBarcodeService(IndexService tagBarcodeService) {
     this.tagBarcodeService = tagBarcodeService;
   }
 

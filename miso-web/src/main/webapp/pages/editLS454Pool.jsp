@@ -242,11 +242,11 @@
                     <c:choose>
                       <c:when test="${fn:length(pool.dilutions) > 1}">
                         <c:choose>
-                            <c:when test="${not empty dil.library.tagBarcodes}">
-                              <b>Barcodes:</b></br>
-                              <c:forEach items="${dil.library.tagBarcodes}" varStatus="status" var="barcodemap">
-                                ${status.count}: ${barcodemap.value.name} (${barcodemap.value.sequence})
-                                <c:if test="${status.count lt fn:length(dil.library.tagBarcodes)}">
+                            <c:when test="${not empty dil.library.indices}">
+                              <b>Indices:</b></br>
+                              <c:forEach items="${dil.library.indices}" varStatus="status" var="indexmap">
+                                ${status.count}: ${indexmap.value.name} (${indexmap.value.sequence})
+                                <c:if test="${status.count lt fn:length(dil.library.indices)}">
                                 <br/>
                                 </c:if>
                               </c:forEach>
@@ -256,7 +256,7 @@
                               </span>
                             </c:when>
                           <c:otherwise>
-                            <b>Barcode:</b> <a href="<c:url value="/miso/library/${dil.library.id}"/>">Choose tag barcode</a>
+                            <b>Index:</b> <a href="<c:url value="/miso/library/${dil.library.id}"/>">Choose index</a>
                             </span>
                             <span class="counter">
                               <img src="<c:url value='/styles/images/status/red.png'/>" border='0'>

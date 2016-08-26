@@ -41,11 +41,6 @@ import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpSession;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-import net.sourceforge.fluxion.ajax.Ajaxified;
-import net.sourceforge.fluxion.ajax.util.JSONUtils;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,14 +50,18 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import net.sourceforge.fluxion.ajax.Ajaxified;
+import net.sourceforge.fluxion.ajax.util.JSONUtils;
+import uk.ac.bbsrc.tgac.miso.core.data.Index;
+import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Plate;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
-import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
-import uk.ac.bbsrc.tgac.miso.core.data.TagBarcodeFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryQCImpl;
@@ -75,7 +74,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.InputFormException;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
-import uk.ac.bbsrc.tgac.miso.core.service.TagBarcodeService;
+import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
 import uk.ac.bbsrc.tgac.miso.core.util.FormUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
@@ -93,7 +92,7 @@ public class ImportExportControllerHelperService {
   @Autowired
   private RequestManager requestManager;
   @Autowired
-  private TagBarcodeService tagBarcodeService;
+  private IndexService indexService;
   @Autowired
   private MisoFilesManager misoFileManager;
   @Autowired
@@ -122,12 +121,14 @@ public class ImportExportControllerHelperService {
               || "TRANSCRIPTOMIC".equals(s.getSampleType()) || "METATRANSCRIPTOMIC".equals(s.getSampleType())) {
             dnaOrRNA = "R";
           }
-          b.append("<div id=\"sample" + s.getId()
-              + "\" onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" " + " "
-              + "class=\"dashboard\">");
-          b.append("<input type=\"hidden\" id=\"" + s.getId() + "\" name=\"" + s.getName() + "\" projectname=\"" + s.getProject().getName()
-              + "\" projectalias=\"" + s.getProject().getAlias() + "\" samplealias=\"" + s.getAlias() + "\" dnaOrRNA=\"" + dnaOrRNA
-              + "\"/>");
+          b.append(
+              "<div id=\"sample" + s.getId()
+                  + "\" onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" " + " "
+                  + "class=\"dashboard\">");
+          b.append(
+              "<input type=\"hidden\" id=\"" + s.getId() + "\" name=\"" + s.getName() + "\" projectname=\"" + s.getProject().getName()
+                  + "\" projectalias=\"" + s.getProject().getAlias() + "\" samplealias=\"" + s.getAlias() + "\" dnaOrRNA=\"" + dnaOrRNA
+                  + "\"/>");
           b.append("Name: <b>" + s.getName() + "</b><br/>");
           b.append("Alias: <b>" + s.getAlias() + "</b><br/>");
           b.append("From Project: <b>" + s.getProject().getName() + "</b><br/>");
@@ -149,7 +150,9 @@ public class ImportExportControllerHelperService {
   public JSONObject exportSampleForm(HttpSession session, JSONObject json) {
     try {
       JSONArray a = JSONArray.fromObject(json.getString("form"));
-      File f = misoFileManager.getNewFile(Sample.class, "forms",
+      File f = misoFileManager.getNewFile(
+          Sample.class,
+          "forms",
           "SampleExportForm-" + LimsUtils.getCurrentDateAsString(new SimpleDateFormat("yyyyMMdd-hhmmss")) + ".xlsx");
       FormUtils.createSampleExportForm(f, a);
       return JSONUtils.SimpleJSONResponse("" + f.getName().hashCode());
@@ -162,7 +165,9 @@ public class ImportExportControllerHelperService {
   public JSONObject generateCSVBAC(HttpSession session, JSONObject json) {
     try {
       JSONArray a = JSONArray.fromObject(json.getString("form"));
-      File f = misoFileManager.getNewFile(Plate.class, "csv",
+      File f = misoFileManager.getNewFile(
+          Plate.class,
+          "csv",
           "Illumina-Nextera-6x-384-barcode-" + LimsUtils.getCurrentDateAsString(new SimpleDateFormat("yyyyMMdd-hhmmss")) + ".csv");
       FormUtils.generateCSVBAC(f, a);
       return JSONUtils.SimpleJSONResponse("" + f.getName().hashCode());
@@ -174,11 +179,13 @@ public class ImportExportControllerHelperService {
 
   public JSONObject exportLibraryPoolForm(HttpSession session, JSONObject json) {
     try {
-      String barcodekit = json.getString("barcodekit");
+      String indexKit = json.getString("indexfamily");
       JSONArray a = JSONArray.fromObject(json.getString("form"));
-      File f = misoFileManager.getNewFile(Library.class, "forms",
+      File f = misoFileManager.getNewFile(
+          Library.class,
+          "forms",
           "LibraryPoolExportForm-" + LimsUtils.getCurrentDateAsString(new SimpleDateFormat("yyyyMMdd-hhmmss")) + ".xlsx");
-      FormUtils.createLibraryPoolExportFormFromWeb(f, a, barcodekit);
+      FormUtils.createLibraryPoolExportFormFromWeb(f, a, indexKit);
       return JSONUtils.SimpleJSONResponse("" + f.getName().hashCode());
     } catch (Exception e) {
       log.error("failed to get plate input form", e);
@@ -418,17 +425,17 @@ public class ImportExportControllerHelperService {
 
               if (jsonArrayElement.get(9) != null && !isStringEmptyOrNull(jsonArrayElement.getString(9))
                   && (library.getQcPassed() || library.getQcPassed() == null)) {
-                Iterable<TagBarcode> bcs = tagBarcodeService.getTagBarcodeFamilyByName(jsonArrayElement.getString(9)).getBarcodes();
-                if (bcs != null) {
+                Iterable<Index> index = indexService.getIndexFamilyByName(jsonArrayElement.getString(9)).getIndices();
+                if (index != null) {
                   String tags = jsonArrayElement.getString(10);
                   if (!isStringEmptyOrNull(tags)) {
-                    library.setTagBarcodes(FormUtils.matchBarcodesFromText(bcs, tags));
+                    library.setIndices(FormUtils.matchIndicesFromText(index, tags));
                   } else {
                     throw new InputFormException(
-                        "Barcode Kit specified but no tag barcodes entered for library '" + jsonArrayElement.getString(3) + "'.");
+                        "Index Family specified but no indices entered for library '" + jsonArrayElement.getString(3) + "'.");
                   }
                 } else {
-                  throw new InputFormException("No tag barcodes associated with the kit definition '" + jsonArrayElement.getString(9)
+                  throw new InputFormException("No indices associated with the index family '" + jsonArrayElement.getString(9)
                       + "' library '" + jsonArrayElement.getString(3) + "'.");
                 }
               }
@@ -581,14 +588,14 @@ public class ImportExportControllerHelperService {
           libsb.append("<option>" + platform + "-" + s.getDescription() + "</option>");
         }
 
-        StringBuilder tagsb = new StringBuilder();
-        tagsb.append("<option >No Barcode Strategy</option>");
-        for (TagBarcodeFamily tb : tagBarcodeService.getTagBarcodeFamiliesByPlatform(PlatformType.get(platform))) {
-          tagsb.append("<option>" + tb.getName() + "</option>");
+        StringBuilder indexFamilies = new StringBuilder();
+        indexFamilies.append("<option >No Index Family</option>");
+        for (IndexFamily ifam : indexService.getIndexFamiliesByPlatform(PlatformType.get(platform))) {
+          indexFamilies.append("<option>" + ifam.getName() + "</option>");
         }
 
         map.put("libraryTypes", libsb.toString());
-        map.put("tagBarcodeStrategies", tagsb.toString());
+        map.put("indexFamilies", indexFamilies.toString());
 
         return JSONUtils.JSONObjectResponse(map);
       }
@@ -611,8 +618,8 @@ public class ImportExportControllerHelperService {
     this.securityManager = securityManager;
   }
 
-  public void setTagBarcodeStrategyResolverService(TagBarcodeService tagBarcodeService) {
-    this.tagBarcodeService = tagBarcodeService;
+  public void setIndexService(IndexService indexService) {
+    this.indexService = indexService;
   }
 
 }

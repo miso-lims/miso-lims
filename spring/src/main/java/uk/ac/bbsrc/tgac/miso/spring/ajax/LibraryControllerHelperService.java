@@ -67,13 +67,13 @@ import net.sf.json.JsonConfig;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
+import uk.ac.bbsrc.tgac.miso.core.data.Index;
+import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.PrintJob;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
-import uk.ac.bbsrc.tgac.miso.core.data.TagBarcodeFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedResequencing;
@@ -92,7 +92,7 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
-import uk.ac.bbsrc.tgac.miso.core.store.TagBarcodeStore;
+import uk.ac.bbsrc.tgac.miso.core.store.IndexStore;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.integration.context.ApplicationContextProvider;
@@ -121,7 +121,7 @@ public class LibraryControllerHelperService {
   @Autowired
   private PrintManager<MisoPrintService, Queue<?>> printManager;
   @Autowired
-  private TagBarcodeStore tagBarcodeService;
+  private IndexStore indexStore;
   @Autowired
   private MisoNamingScheme<Sample> sampleNamingScheme;
   @Autowired
@@ -486,23 +486,22 @@ public class LibraryControllerHelperService {
               }
               library.setPaired(paired);
 
-              if (j.has("tagBarcodes") && !isStringEmptyOrNull(j.getString("tagBarcodes"))
-                  && !j.getString("tagBarcodes").contains("Select")) {
-                String[] codes = j.getString("tagBarcodes").split(Pattern.quote("|"));
-                List<TagBarcode> barcodes = new ArrayList<TagBarcode>();
+              if (j.has("indices") && !isStringEmptyOrNull(j.getString("indices")) && !j.getString("indices").contains("Select")) {
+                String[] codes = j.getString("indices").split(Pattern.quote("|"));
+                List<Index> indices = new ArrayList<Index>();
                 for (String code : codes) {
                   try {
                     long cl = Long.parseLong(code);
-                    TagBarcode bc = tagBarcodeService.getTagBarcodeById(cl);
-                    barcodes.add(bc);
+                    Index index = indexStore.getIndexById(cl);
+                    indices.add(index);
                   } catch (NumberFormatException e) {
                     log.error("cannot save library", e);
                     return JSONUtils.SimpleJSONError(
-                        "Cannot save Library. It looks like there are tag barcodes for the library of " + sample.getAlias()
+                        "Cannot save Library. It looks like there are indices for the library of " + sample.getAlias()
                             + ", but they cannot be processed");
                   }
                 }
-                library.setTagBarcodes(barcodes);
+                library.setIndices(indices);
               }
 
               saveSet.add(library);
@@ -544,7 +543,7 @@ public class LibraryControllerHelperService {
 
   public JSONObject changePlatformName(HttpSession session, JSONObject json) {
     // For whatever reason, Fluxion doesn't autowire this class correctly, so, we do it again.
-    if (tagBarcodeService == null) {
+    if (indexStore == null) {
       ApplicationContext ctxt = ApplicationContextProvider.getApplicationContext();
       ctxt.getAutowireCapableBeanFactory().autowireBean(this);
     }
@@ -564,9 +563,9 @@ public class LibraryControllerHelperService {
         JSONArray families = new JSONArray();
         JsonConfig config = new JsonConfig();
         config.setExcludes(new String[] { "family" });
-        families.add(TagBarcodeFamily.NULL);
-        families.addAll(tagBarcodeService.getTagBarcodeFamiliesByPlatform(PlatformType.get(platform)), config);
-        result.put("barcodeFamilies", families);
+        families.add(IndexFamily.NULL);
+        families.addAll(indexStore.getIndexFamiliesByPlatform(PlatformType.get(platform)), config);
+        result.put("indexFamilies", families);
 
         return result;
       }
@@ -577,30 +576,30 @@ public class LibraryControllerHelperService {
     return JSONUtils.SimpleJSONError("Cannot resolve LibraryType from selected Platform");
   }
 
-  public JSONObject getTagBarcodesForStrategy(HttpSession session, JSONObject json) {
-    if (json.has("strategy")) {
-      TagBarcodeFamily tbs = tagBarcodeService.getTagBarcodeFamilyByName(json.getString("strategy"));
-      if (tbs != null) {
+  public JSONObject getIndicesForFamily(HttpSession session, JSONObject json) {
+    if (json.has("indexFamily")) {
+      IndexFamily ifam = indexStore.getIndexFamilyByName(json.getString("indexFamily"));
+      if (ifam != null) {
         Map<String, Object> map = new HashMap<String, Object>();
-        StringBuilder tagsb = new StringBuilder();
-        for (int i = 1; i <= tbs.getMaximumNumber(); i++) {
+        StringBuilder indexsb = new StringBuilder();
+        for (int i = 1; i <= ifam.getMaximumNumber(); i++) {
           // select
-          tagsb.append("Barcode " + i + ": " + "<select id='tagBarcodes[\"" + i + "\"]' name='tagBarcodes[\"" + i + "\"]'>");
-          tagsb.append("<option value=''>No Barcode</option>");
-          for (TagBarcode tb : tbs.getBarcodesForPosition(i)) {
+          indexsb.append("Index " + i + ": " + "<select id='indices[\"" + i + "\"]' name='indices[\"" + i + "\"]'>");
+          indexsb.append("<option value=''>No Index</option>");
+          for (Index tb : ifam.getIndicesForPosition(i)) {
             // option
-            tagsb.append("<option value='" + tb.getId() + "'>" + tb.getName() + "</option>");
+            indexsb.append("<option value='" + tb.getId() + "'>" + tb.getName() + "</option>");
           }
-          tagsb.append("</select><br/>");
-          tagsb.append("<input type='hidden' value='on' name='_tagBarcodes[\"" + i + "\"]'/>");
+          indexsb.append("</select><br/>");
+          indexsb.append("<input type='hidden' value='on' name='indices[\"" + i + "\"]'/>");
         }
-        map.put("tagBarcodes", tagsb.toString());
+        map.put("indices", indexsb.toString());
         return JSONUtils.JSONObjectResponse(map);
       } else {
-        return JSONUtils.SimpleJSONError("No such TagBarcodeStrategy: " + json.getString("strategy"));
+        return JSONUtils.SimpleJSONError("No such Index Family: " + json.getString("indexFamily"));
       }
     } else {
-      return JSONUtils.SimpleJSONError("No valid TagBarcodeStrategy selected");
+      return JSONUtils.SimpleJSONError("No valid Index Family selected");
     }
   }
 
@@ -1282,7 +1281,7 @@ public class LibraryControllerHelperService {
     this.libraryNamingScheme = libraryNamingScheme;
   }
 
-  public void setTagBarcodeService(TagBarcodeStore tagBarcodeStore) {
-    this.tagBarcodeService = tagBarcodeStore;
+  public void setIndexStore(IndexStore indexStore) {
+    this.indexStore = indexStore;
   }
 }

@@ -47,7 +47,7 @@ function bulkLibraryQcTable(tableName) {
                           'description',
                           'libraryType',
                           'platform',
-      //'tagBarcode',
+      //'index',
                           'insertSize',
                           'qcPassed',
                           'qcDate',
