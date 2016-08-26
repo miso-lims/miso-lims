@@ -63,6 +63,10 @@
    <div id="nonStandardAliasNote" class="table-note hidden">
       <p>Aliases highlighted in yellow are non-standard, and any value you give them will be saved.</p>
     </div>
+
+   <div id="ctrlV" class="note">
+     <p>Paste values using Ctrl + V in Windows or Linux, or Command-V (&#8984;-V) on a Mac.</p>
+   </div>
  
    <div id="saveSuccesses"  class="parsley-success hidden">
      <p id="successMessages"></p>
