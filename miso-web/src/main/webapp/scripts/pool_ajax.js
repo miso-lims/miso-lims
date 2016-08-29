@@ -560,6 +560,7 @@ Pool.ui = {
               { "sTitle": "Concentration ("+libraryDilutionConcentrationUnits+")", "sType":"natural"},
               { "sTitle": "Library", "sType":"natural"},
               { "sTitle": "Sample", "sType":"natural"},
+              { "sTitle": "Barcodes", "sType":"natural"},
               { "sTitle": "Add"}
             ],
             "bJQueryUI": true,
