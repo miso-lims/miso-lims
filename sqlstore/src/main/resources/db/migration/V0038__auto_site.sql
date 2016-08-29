@@ -688,17 +688,17 @@ INSERT INTO SampleClass (alias, sampleCategory, createdBy, creationDate, updated
   ('Curls','Tissue Processing',1,NOW(),1,NOW(),'C'),
   ('H E Slide','Tissue Processing',1,NOW(),1,NOW(),'HE'),
   ('LCM Tube','Tissue Processing',1,NOW(),1,NOW(),'LCM'),
-  ('gDNA (stock)','Analyte',1,NOW(),1,NOW(),'D_S'),
-  ('gDNA_wga (stock)','Analyte',1,NOW(),1,NOW(),'D_S'),
-  ('whole RNA (stock)','Analyte',1,NOW(),1,NOW(),'R_S'),
-  ('cDNA (stock)','Analyte',1,NOW(),1,NOW(),'D_S'),
-  ('gDNA (aliquot)','Analyte',1,NOW(),1,NOW(),'D_'),
-  ('gDNA_wga (aliquot)','Analyte',1,NOW(),1,NOW(),'D_'),
-  ('whole RNA (aliquot)','Analyte',1,NOW(),1,NOW(),'R_'),
-  ('smRNA','Analyte',1,NOW(),1,NOW(),'SM'),
-  ('mRNA','Analyte',1,NOW(),1,NOW(),'MR'),
-  ('rRNA_depleted','Analyte',1,NOW(),1,NOW(),'WT'),
-  ('cDNA (aliquot)','Analyte',1,NOW(),1,NOW(),'D_');
+  ('gDNA (stock)','Stock',1,NOW(),1,NOW(),'D_S'),
+  ('gDNA_wga (stock)','Stock',1,NOW(),1,NOW(),'D_S'),
+  ('whole RNA (stock)','Stock',1,NOW(),1,NOW(),'R_S'),
+  ('cDNA (stock)','Stock',1,NOW(),1,NOW(),'D_S'),
+  ('gDNA (aliquot)','Aliquot',1,NOW(),1,NOW(),'D_'),
+  ('gDNA_wga (aliquot)','Aliquot',1,NOW(),1,NOW(),'D_'),
+  ('whole RNA (aliquot)','Aliquot',1,NOW(),1,NOW(),'R_'),
+  ('smRNA','Aliquot',1,NOW(),1,NOW(),'SM'),
+  ('mRNA','Aliquot',1,NOW(),1,NOW(),'MR'),
+  ('rRNA_depleted','Aliquot',1,NOW(),1,NOW(),'WT'),
+  ('cDNA (aliquot)','Aliquot',1,NOW(),1,NOW(),'D_');
 
 INSERT INTO SampleValidRelationship (parentId, childId, createdBy, creationDate, updatedBy, lastUpdated) VALUES 
   ((SELECT sampleClassId FROM SampleClass WHERE alias = 'Identity'),(SELECT sampleClassId FROM SampleClass WHERE alias = 'Primary Tumor Tissue'),1,NOW(),1,NOW()),
