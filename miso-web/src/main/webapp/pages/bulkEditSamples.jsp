@@ -66,6 +66,10 @@
 	    <p>Aliases highlighted in yellow are non-standard, and any value you enter will be saved.</p>
 	    <br/>
 	  </div>
+
+      <div id="ctrlV" class="note">
+        <p>Paste values using Ctrl + V in Windows or Linux, or Command-V (&#8984;-V) on a Mac.</p>
+      </div>
 	
 		<div id="saveSuccesses"  class="parsley-success hidden">
 	    <p id="successMessages"></p>
@@ -104,6 +108,15 @@
         Sample.hot.newSamplesJSON = Sample.hot.modifySamplesForPropagate(Sample.hot.samplesJSON);
         var targetSampleCategory = Sample.hot.getCategoryFromClassId(Sample.hot.newSamplesJSON[0].sampleClassId);
         Sample.hot.makeHOT(Sample.hot.newSamplesJSON, 'propagate', sourceSampleCategory, targetSampleCategory);
+        Hot.hotTable.updateSettings({
+          cells: function (row, col, prop) {
+            var cellProperties = {};
+            if (prop == 'sampleClassAlias') {
+              cellProperties.readOnly = false;
+            }
+            return cellProperties;
+          }
+        });
       };
 
 	    // get SampleOptions and make the appropriate table
