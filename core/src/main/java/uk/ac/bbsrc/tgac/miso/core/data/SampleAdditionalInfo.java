@@ -93,4 +93,12 @@ public interface SampleAdditionalInfo extends Sample {
 
   void setSynthetic(Boolean synthetic);
 
+  /**
+   * True if the sample's alias does not pass alias validation but cannot be changed (usually for historical reasons). Setting this to true
+   * means the sample will skip alias validation (and uniqueness validation, if enabled) during save.
+   */
+  boolean hasNonStandardAlias();
+
+  void setNonStandardAlias(boolean nonStandardAlias);
+
 }

@@ -281,6 +281,10 @@ public class Dtos {
     if (from.getGroupDescription() != null) {
       dto.setGroupDescription(from.getGroupDescription());
     }
+    if (from.isSynthetic() != null) {
+      dto.setSynthetic(from.isSynthetic());
+    }
+    dto.setNonStandardAlias(from.hasNonStandardAlias());
     return dto;
   }
 
@@ -323,9 +327,10 @@ public class Dtos {
       to.setGroupId(from.getGroupId());
       to.setGroupDescription(from.getGroupDescription());
     }
-    if (from.isSynthetic() != null) {
-      to.setSynthetic(from.isSynthetic());
+    if (from.getSynthetic() != null) {
+      to.setSynthetic(from.getSynthetic());
     }
+    to.setNonStandardAlias(from.getNonStandardAlias());
     to.setParent(getParent(from));
     return to;
   }
@@ -850,6 +855,7 @@ public class Dtos {
     if (from.getLibraryDesign() != null) {
       dto.setLibraryDesignId(from.getLibraryDesign().getId());
     }
+    dto.setNonStandardAlias(from.hasNonStandardAlias());
     return dto;
   }
 
@@ -868,6 +874,7 @@ public class Dtos {
       to.setPrepKit(to(from.getPrepKit()));
     }
     to.setArchived(from.getArchived());
+    to.setNonStandardAlias(from.getNonStandardAlias());
     return to;
   }
 

@@ -377,7 +377,9 @@ public class SQLLibraryDAO implements LibraryStore {
     params.addValue("qcPassed", library.getQcPassed());
 
     if (library.getId() == AbstractLibrary.UNSAVED_ID) {
-      if (!libraryNamingScheme.allowDuplicateEntityNameFor("alias") && getByAlias(library.getAlias()) != null) {
+      if (!libraryNamingScheme.allowDuplicateEntityNameFor("alias") && getByAlias(library.getAlias()) != null
+          && (library.getLibraryAdditionalInfo() != null ? library.getLibraryAdditionalInfo().hasNonStandardAlias() == false : true)) {
+        // throw if duplicate aliases are not allowed and the library has a standard alias (detailed sample only)
         throw new IOException("NEW: A library with this alias already exists in the database");
       } else {
         SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(TABLE_NAME).usingGeneratedKeyColumns("libraryId");
@@ -387,7 +389,8 @@ public class SQLLibraryDAO implements LibraryStore {
           String name = libraryNamingScheme.generateNameFor("name", library);
           library.setName(name);
           if (libraryNamingScheme.validateField("name", library.getName())
-              && libraryNamingScheme.validateField("alias", library.getAlias())) {
+              && (libraryNamingScheme.validateField("alias", library.getAlias())
+                  || (library.getLibraryAdditionalInfo() != null && library.getLibraryAdditionalInfo().hasNonStandardAlias()))) {
             if (autoGenerateIdentificationBarcodes) {
               autoGenerateIdBarcode(library);
             } // if !autoGenerateIdentificationBarcodes then the identificationBarcode is set by the user
@@ -416,8 +419,8 @@ public class SQLLibraryDAO implements LibraryStore {
       }
     } else {
       try {
-        if (libraryNamingScheme.validateField("name", library.getName())
-            && libraryNamingScheme.validateField("alias", library.getAlias())) {
+        if (libraryNamingScheme.validateField("name", library.getName()) && (libraryNamingScheme.validateField("alias", library.getAlias())
+            || (library.getLibraryAdditionalInfo() != null && library.getLibraryAdditionalInfo().hasNonStandardAlias()))) {
           params.addValue("libraryId", library.getId());
           params.addValue("name", library.getName());
           params.addValue("alias", library.getAlias());
@@ -561,8 +564,10 @@ public class SQLLibraryDAO implements LibraryStore {
 
   @Override
   public Library getAdjacentLibrary(long libraryId, boolean before) throws IOException {
-    List<Library> results = template.query(before ? LIBRARY_SELECT_BY_ADJACENT_BEFORE : LIBRARY_SELECT_BY_ADJACENT_AFTER,
-        new Object[] { libraryId }, new LibraryMapper(true));
+    List<Library> results = template.query(
+        before ? LIBRARY_SELECT_BY_ADJACENT_BEFORE : LIBRARY_SELECT_BY_ADJACENT_AFTER,
+        new Object[] { libraryId },
+        new LibraryMapper(true));
     return results.size() > 0 ? results.get(0) : null;
   }
 

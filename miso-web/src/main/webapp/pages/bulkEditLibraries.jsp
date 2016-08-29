@@ -60,6 +60,9 @@
   <br/>
 
  <div id="HOTbulkForm" data-detailed-sample="${detailedSample}">
+   <div id="nonStandardAliasNote" class="table-note hidden">
+      <p>Aliases highlighted in yellow are non-standard, and any value you give them will be saved.</p>
+    </div>
  
    <div id="saveSuccesses"  class="parsley-success hidden">
      <p id="successMessages"></p>

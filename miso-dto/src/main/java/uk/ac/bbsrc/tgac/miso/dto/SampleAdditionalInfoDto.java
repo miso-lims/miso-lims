@@ -23,6 +23,7 @@ public class SampleAdditionalInfoDto extends SampleDto {
   private String groupId;
   private String groupDescription;
   private Boolean isSynthetic;
+  private boolean nonStandardAlias;
 
   public Long getParentId() {
     return parentId;
@@ -136,12 +137,20 @@ public class SampleAdditionalInfoDto extends SampleDto {
     this.groupDescription = groupDescription;
   }
 
-  public Boolean isSynthetic() {
+  public Boolean getSynthetic() {
     return isSynthetic;
   }
 
   public void setSynthetic(Boolean isSynthetic) {
     this.isSynthetic = isSynthetic;
+  }
+
+  public boolean getNonStandardAlias() {
+    return nonStandardAlias;
+  }
+
+  public void setNonStandardAlias(boolean nonStandardAlias) {
+    this.nonStandardAlias = nonStandardAlias;
   }
 
   @Override

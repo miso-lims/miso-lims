@@ -55,4 +55,12 @@ public interface LibraryAdditionalInfo {
    */
   Long getHibernateKitDescriptorId();
 
+  /**
+   * True if the library's alias does not pass alias validation but cannot be changed (usually for historical reasons). Setting this to true
+   * means the library will skip alias validation (and uniqueness validation, if enabled) during save.
+   */
+  boolean hasNonStandardAlias();
+
+  void setNonStandardAlias(boolean nonStandardAlias);
+
 }

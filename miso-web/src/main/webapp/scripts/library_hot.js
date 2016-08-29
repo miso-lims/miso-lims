@@ -89,11 +89,24 @@ Library.hot = {
     });
     document.getElementById('hotContainer').style.display = '';
     
-    Library.hot.ltIndex = Library.hot.getColIndex('libraryTypeAlias');
-    Library.hot.tbfIndex = Library.hot.getColIndex('tagBarcodeFamilyName');
-    Library.hot.tb1ColIndex = Library.hot.getColIndex('tagBarcodeIndex1Label');
-    Library.hot.tb2ColIndex = Library.hot.getColIndex('tagBarcodeIndex2Label');
-    Library.hot.pfIndex = Library.hot.getColIndex('platformName');
+    Library.hot.ltIndex = Hot.getColIndex('libraryTypeAlias');
+    Library.hot.tbfIndex = Hot.getColIndex('tagBarcodeFamilyName');
+    Library.hot.tb1ColIndex = Hot.getColIndex('tagBarcodeIndex1Label');
+    Library.hot.tb2ColIndex = Hot.getColIndex('tagBarcodeIndex2Label');
+    Library.hot.pfIndex = Hot.getColIndex('platformName');
+    
+    var aliasColIndex = Hot.getColIndex('alias');
+    Hot.startData.forEach(function (library, index) {
+      if (!library.nonStandardAlias) {
+        Hot.hotTable.setCellMeta(index, aliasColIndex, 'validator', Library.hot.validateAlias);
+      } else {
+        Hot.hotTable.setCellMeta(index, aliasColIndex, 'renderer', Hot.nsAliasRenderer);
+        Hot.hotTable.setCellMeta(index, aliasColIndex, 'validator', Hot.requiredText);
+        jQuery('#nonStandardAliasNote').show();
+      }
+    });
+    Hot.hotTable.render();
+    
     // enable save button if it was disabled
     if (Hot.saveButton && Hot.saveButton.classList.contains('disabled')) Hot.toggleButtonAndLoaderImage(Hot.saveButton);
   },
@@ -187,13 +200,6 @@ Library.hot = {
   },
   
   /**
-   * Gets array of qc values
-   */
-  getQcValues: function () {
-    return Hot.dropdownRef['qcValues'].map(function (val) { if (val === '') val = 'unknown'; return val; });
-  },
-  
-  /**
    * Gets array of kit descriptor names
    */
   getKitDescriptors: function () {
@@ -251,7 +257,7 @@ Library.hot = {
           header: 'Description',
           data: 'description',
           type: 'text',
-          validator: requiredText
+          validator: Hot.requiredText
         },{
           header: 'Platform',
           data: 'platformName',
@@ -264,7 +270,7 @@ Library.hot = {
           type: 'dropdown',
           trimDropdown: false,
           source: '',
-          validator: requiredText
+          validator: Hot.requiredText
         },{
           header: 'Selection',
           data: 'librarySelectionTypeAlias',
@@ -289,20 +295,20 @@ Library.hot = {
           type: 'dropdown',
           trimDropdown: false,
           source: [],
-          validator: permitEmpty
+          validator: Hot.permitEmpty
         },{
           header: 'Index 2',
           data: 'tagBarcodeIndex2Label',
           type: 'dropdown',
           trimDropdown: false,
           source: [],
-          validator: permitEmpty
+          validator: Hot.permitEmpty
         },{
           header: 'QC Passed?',
           data: 'qcPassed',
           type: 'dropdown',
           trimDropdown: false,
-          source: Hot.getQcValues()
+          source: ['true', 'false', 'unknown']
         },{
           header: 'Volume',
           data: 'volume',
@@ -319,8 +325,7 @@ Library.hot = {
         {
           header: 'Library Alias',
           data: 'alias',
-          type: 'text',
-          validator: validateAlias
+          type: 'text'
         }
       ];
       
@@ -340,54 +345,29 @@ Library.hot = {
       
       return additionalCols;
     }
-    
-    function requiredText (value, callback) {
-      if (!value || value.length === 0) {
-        callback(false);
-      } else {
-        callback(true);
-      }
-    }
-    
-    function permitEmpty (value, callback) {
-      if (value === undefined || value === null || value.length > 0 || value === '') {
-        return callback(true);
-      } else {
-        return callback(false);
-      }
-    }
-    
-    function validateAlias (value, callback) {
-      if (value) {
-        Fluxion.doAjax(
-          'libraryControllerHelperService',
-          'validateLibraryAlias',
-          {
-            'alias': value,
-            'url': ajaxurl
-          },
-          {
-            'doOnSuccess': function () {
-              return callback(true);
-            },
-            'doOnError': function (json) {
-              return callback(false);
-            }
-          }
-        );
-      } else {
-        return callback(false);
-      }
-    }
   },
   
-  /**
-   * Gets the column index for a given attribute
-   */
-  getColIndex: function (dataString) {
-  	for (var i = 0; i < Hot.colConf.length; i++) {
-  	  if (Hot.colConf[i].data == dataString) return i;
-  	}
+  validateAlias: function (value, callback) {
+    if (value) {
+      Fluxion.doAjax(
+        'libraryControllerHelperService',
+        'validateLibraryAlias',
+        {
+          'alias': value,
+          'url': ajaxurl
+        },
+        {
+          'doOnSuccess': function () {
+            return callback(true);
+          },
+          'doOnError': function (json) {
+            return callback(false);
+          }
+        }
+      );
+    } else {
+      return callback(false);
+    }
   },
 
   /**
@@ -577,9 +557,10 @@ Library.hot = {
         } else {
           lib.libraryAdditionalInfo.archived = false;
         }
+        lib.libraryAdditionalInfo.nonStandardAlias = obj.libraryAdditionalInfo.nonStandardAlias;
       }
 
-      lib.qcPassed = obj.qcPassed;
+      lib.qcPassed = (obj.qcPassed && obj.qcPassed != 'unknown' ? obj.qcPassed : '') || '';
 
       // TODO: add qcCols
     } catch (e) {
