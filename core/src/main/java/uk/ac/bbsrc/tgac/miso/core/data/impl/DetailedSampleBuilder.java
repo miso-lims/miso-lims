@@ -109,6 +109,7 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAliquo
   // SampleStock attributes
   private StrStatus strStatus = StrStatus.NOT_SUBMITTED;
   private Double concentration;
+  private Boolean dnaseTreated;
 
   // TissueProcessingSample attributes
   // CV Slide
@@ -802,6 +803,16 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAliquo
     this.isSynthetic = isSynthetic;
   }
 
+  @Override
+  public Boolean getDNAseTreated() {
+    return dnaseTreated;
+  }
+
+  @Override
+  public void setDNAseTreated(Boolean dnaseTreated) {
+    this.dnaseTreated = dnaseTreated;
+  }
+
   public SampleAdditionalInfo build() {
     if (sampleClass == null || sampleClass.getSampleCategory() == null) {
       throw new NullPointerException("Missing sample class or category");
@@ -838,6 +849,7 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAliquo
       SampleStock stock = new SampleStockImpl();
       stock.setStrStatus(strStatus);
       stock.setConcentration(concentration);
+      stock.setDNAseTreated(dnaseTreated);
       sample = stock;
       break;
     case SampleAliquot.CATEGORY_NAME:

@@ -16,6 +16,7 @@ public class SampleClassDto {
   private Long updatedById;
   private String updatedByUrl;
   private String lastUpdated;
+  private Boolean dnaseTreatable;
 
   public Long getId() {
     return id;
@@ -105,11 +106,19 @@ public class SampleClassDto {
     this.suffix = suffix;
   }
 
+  public Boolean getDNAseTreatable() {
+    return dnaseTreatable;
+  }
+
+  public void setDNAseTreatable(Boolean dnaseTreatable) {
+    this.dnaseTreatable = dnaseTreatable;
+  }
+
   @Override
   public String toString() {
     return "SampleClassDto [id=" + id + ", url=" + url + ", alias=" + alias + ", sampleCategory=" + sampleCategory + ", suffix=" + suffix
         + ", createdById=" + createdById + ", createdByUrl=" + createdByUrl + ", creationDate=" + creationDate + ", updatedById="
-        + updatedById + ", updatedByUrl=" + updatedByUrl + ", lastUpdated=" + lastUpdated + "]";
+        + updatedById + ", updatedByUrl=" + updatedByUrl + ", lastUpdated=" + lastUpdated + ", dnaseTreatable=" + dnaseTreatable + "]";
   }
 
 }

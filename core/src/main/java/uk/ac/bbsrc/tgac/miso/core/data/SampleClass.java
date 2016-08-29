@@ -45,4 +45,8 @@ public interface SampleClass {
    * @param suffix
    */
   void setSuffix(String suffix);
+
+  Boolean getDNAseTreatable();
+
+  void setDNAseTreatable(Boolean treatable);
 }

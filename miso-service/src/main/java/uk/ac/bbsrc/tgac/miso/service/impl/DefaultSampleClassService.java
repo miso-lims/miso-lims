@@ -59,6 +59,7 @@ public class DefaultSampleClassService implements SampleClassService {
     updatedSampleClass.setAlias(sampleClass.getAlias());
     updatedSampleClass.setSampleCategory(sampleClass.getSampleCategory());
     updatedSampleClass.setSuffix(sampleClass.getSuffix());
+    updatedSampleClass.setDNAseTreatable(sampleClass.getDNAseTreatable());
     User user = authorizationManager.getCurrentUser();
     updatedSampleClass.setUpdatedBy(user);
     sampleClassDao.update(updatedSampleClass);

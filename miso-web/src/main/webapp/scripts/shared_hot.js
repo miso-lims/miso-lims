@@ -63,6 +63,15 @@ var Hot = {
   },
 
   /**
+   * Gets the object from a given id and collection
+   */
+  getObjById: function (id, referenceCollection) {
+    var results = referenceCollection.filter(function (item) {
+      return item.id == id;
+    });
+    return results.length > 0 ? results[0] : null;
+  },
+  /**
    * Gets the id of an object from a given alias and collection
    */
   getIdFromAlias: function (alias, referenceCollection) {
