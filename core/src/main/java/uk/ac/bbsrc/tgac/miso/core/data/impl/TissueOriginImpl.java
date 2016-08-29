@@ -113,6 +113,13 @@ public class TissueOriginImpl implements TissueOrigin {
     this.lastUpdated = lastUpdated;
   }
 
+  /**
+   * Get custom label for dropdown options
+   */
+  public String getItemLabel() {
+    return getAlias() + " (" + getDescription() + ")";
+  }
+
   @Override
   public String toString() {
     return "TissueOriginImpl [tissueOriginId=" + tissueOriginId + ", alias=" + alias + ", description=" + description + ", createdBy="

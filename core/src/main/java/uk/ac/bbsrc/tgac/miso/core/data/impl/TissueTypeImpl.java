@@ -113,6 +113,14 @@ public class TissueTypeImpl implements TissueType {
     this.lastUpdated = lastUpdated;
   }
 
+  /**
+   * Get custom label for dropdown options
+   */
+  public String getItemLabel() {
+    String label = getAlias() + " (" + getDescription() + ")";
+    return (label.length() < 51 ? label : label.substring(0, 49) + "\u2026");
+  }
+
   @Override
   public String toString() {
     return "TissueTypeImpl [tissueTypeId=" + tissueTypeId + ", alias=" + alias + ", description=" + description + ", createdBy=" + createdBy

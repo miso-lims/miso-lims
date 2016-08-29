@@ -430,7 +430,7 @@ public class EditSampleController {
     Collections.sort(list, new Comparator<TissueOrigin>() {
       @Override
       public int compare(TissueOrigin o1, TissueOrigin o2) {
-        return o1.getDescription().compareTo(o2.getDescription());
+        return o1.getAlias().compareTo(o2.getAlias());
       }
     });
     return list;
@@ -445,7 +445,8 @@ public class EditSampleController {
     Collections.sort(list, new Comparator<TissueType>() {
       @Override
       public int compare(TissueType o1, TissueType o2) {
-        return o1.getDescription().compareTo(o2.getDescription());
+        // reverse comparison as most frequently used tissue types are at bottom of alphabet
+        return o2.getAlias().compareTo(o1.getAlias());
       }
     });
     return list;

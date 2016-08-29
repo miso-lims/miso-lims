@@ -19,30 +19,30 @@ import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 @Entity
 @Table(name = "Lab")
 public class LabImpl implements Lab {
-  
+
   @Id
   @Column(name = "labId")
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
-  
+
   @OneToOne(targetEntity = InstituteImpl.class)
   @JoinColumn(name = "instituteId", nullable = false)
   private Institute institute;
-  
+
   @Column(nullable = false)
   private String alias;
-  
+
   @OneToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "createdBy", nullable = false)
   private User createdBy;
-  
+
   @Column(nullable = false)
   private Date creationDate;
-  
+
   @OneToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "updatedBy", nullable = false)
   private User updatedBy;
-  
+
   @Column(nullable = false)
   private Date lastUpdated;
 
@@ -114,6 +114,14 @@ public class LabImpl implements Lab {
   @Override
   public void setLastUpdated(Date lastUpdated) {
     this.lastUpdated = lastUpdated;
+  }
+
+  /**
+   * Get custom label for dropdown options
+   */
+  public String getItemLabel() {
+    String label = getAlias() + " (" + getInstitute().getAlias() + ")";
+    return (label.length() < 51 ? label : label.substring(0, 49) + "\u2026");
   }
 
 }
