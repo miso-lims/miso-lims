@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.nullifyStringIfBlank;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -161,7 +163,7 @@ public class SampleAdditionalInfoImpl extends SampleImpl implements SampleAdditi
 
   @Override
   public void setGroupId(String groupId) {
-    this.groupId = groupId;
+    this.groupId = nullifyStringIfBlank(groupId);
   }
 
   @Override
@@ -171,7 +173,7 @@ public class SampleAdditionalInfoImpl extends SampleImpl implements SampleAdditi
 
   @Override
   public void setGroupDescription(String groupDescription) {
-    this.groupDescription = groupDescription;
+    this.groupDescription = nullifyStringIfBlank(groupDescription);
   }
 
   @Override

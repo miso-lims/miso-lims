@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.nullifyStringIfBlank;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -255,7 +257,7 @@ public abstract class AbstractPool<P extends Poolable<?, ?>> extends AbstractBox
 
   @Override
   public void setIdentificationBarcode(String identificationBarcode) {
-    this.identificationBarcode = identificationBarcode;
+    this.identificationBarcode = nullifyStringIfBlank(identificationBarcode);
   }
 
   @Override
