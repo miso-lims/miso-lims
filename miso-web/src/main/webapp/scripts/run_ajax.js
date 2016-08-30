@@ -683,7 +683,7 @@ Run.container = {
           }
         }
 
-        if (confirm("Replace container with existing '" + json.barcode + " container?'. Current values will be overridden.\n\n" + dialogStr + "\n\n Choose cancel to save current container.")) {
+        if (confirm("Are you sure you wish to replace the container entered on the form with container '" + json.barcode + "?'.\n\n" + dialogStr + "\n\n Choose 'Cancel' to discard this change and preserve the container entered on the form.")) {
           jQuery('#partitionErrorDiv').html("");
           jQuery('#partitionDiv').html(json.html);
           jQuery("#sequencerPartitionContainers\\[0\\]\\.locationBarcode").val(json.location);
@@ -696,6 +696,7 @@ Run.container = {
            var currentId = jQuery("#sequencerPartitionContainers\\[0\\]\\.identificationBarcode").val();
            currentId = currentId + "_" + Date.now();
            jQuery("#sequencerPartitionContainers\\[0\\]\\.identificationBarcode").val(currentId);
+           jQuery("#sequencerPartitionContainers\\[0\\]\\.id").val(0);
            jQuery('#run-form').submit();
         }
       }
