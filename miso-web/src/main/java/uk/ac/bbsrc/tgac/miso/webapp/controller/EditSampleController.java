@@ -33,7 +33,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -431,7 +430,7 @@ public class EditSampleController {
     Collections.sort(list, new Comparator<TissueOrigin>() {
       @Override
       public int compare(TissueOrigin o1, TissueOrigin o2) {
-        return o1.getDescription().compareTo(o2.getDescription());
+        return o1.getAlias().compareTo(o2.getAlias());
       }
     });
     return list;
@@ -446,7 +445,8 @@ public class EditSampleController {
     Collections.sort(list, new Comparator<TissueType>() {
       @Override
       public int compare(TissueType o1, TissueType o2) {
-        return o1.getDescription().compareTo(o2.getDescription());
+        // reverse comparison as most frequently used tissue types are at bottom of alphabet
+        return o2.getAlias().compareTo(o1.getAlias());
       }
     });
     return list;
@@ -757,13 +757,9 @@ public class EditSampleController {
   @RequestMapping(value = "/bulk/edit/{sampleIds}", method = RequestMethod.GET)
   public ModelAndView editBulkSamples(@PathVariable String sampleIds, ModelMap model) throws IOException {
     try {
-      String[] split = sampleIds.split(",");
-      List<Long> idList = new ArrayList<Long>();
-      for (int i = 0; i < split.length; i++) {
-        idList.add(Long.parseLong(split[i]));
-      }
+      List<Long> idList = getIdsFromString(sampleIds);
       ObjectMapper mapper = new ObjectMapper();
-      JSONArray samplesDtos = new JSONArray();
+      List<SampleDto> samplesDtos = new ArrayList<SampleDto>();
       for (Sample sample : requestManager.getSamplesByIdList(idList)) {
         samplesDtos.add(Dtos.asDto(sample));
       }
@@ -787,12 +783,9 @@ public class EditSampleController {
   public ModelAndView createBulkSamples(@PathVariable String sampleIds, @PathVariable Long sampleClassId, ModelMap model)
       throws IOException {
     try {
-      String[] split = sampleIds.split(",");
-      List<Long> idList = new ArrayList<Long>();
-      for (int i = 0; i < split.length; i++) {
-        idList.add(Long.parseLong(split[i]));
-      }
-      Set<SampleDto> samplesDtos = new HashSet<>();
+      List<Long> idList = getIdsFromString(sampleIds);
+      ObjectMapper mapper = new ObjectMapper();
+      List<SampleDto> samplesDtos = new ArrayList<SampleDto>();
       for (Sample sample : requestManager.getSamplesByIdList(idList)) {
         samplesDtos.add(Dtos.asDto(sample));
       }
@@ -807,6 +800,15 @@ public class EditSampleController {
       }
       throw ex;
     }
+  }
+
+  public List<Long> getIdsFromString(String idString) {
+    String[] split = idString.split(",");
+    List<Long> idList = new ArrayList<Long>();
+    for (int i = 0; i < split.length; i++) {
+      idList.add(Long.parseLong(split[i]));
+    }
+    return idList;
   }
 
   @RequestMapping(method = RequestMethod.POST)

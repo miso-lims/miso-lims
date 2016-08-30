@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.nullifyStringIfBlank;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -40,7 +42,6 @@ import javax.persistence.Transient;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.map.annotate.JsonDeserialize;
-import org.hibernate.annotations.Formula;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -256,7 +257,7 @@ public abstract class AbstractPool<P extends Poolable<?, ?>> extends AbstractBox
 
   @Override
   public void setIdentificationBarcode(String identificationBarcode) {
-    this.identificationBarcode = identificationBarcode;
+    this.identificationBarcode = nullifyStringIfBlank(identificationBarcode);
   }
 
   @Override
@@ -477,4 +478,36 @@ public abstract class AbstractPool<P extends Poolable<?, ?>> extends AbstractBox
     return "";
   }
 
+  private boolean hasDuplicateBarcodes(Set<String> barcodes, P item) {
+    if (item instanceof Plate<?, ?>) {
+      for (Object child : item.getInternalPoolableElements()) {
+        @SuppressWarnings("unchecked")
+        P childP = (P) child;
+        if (hasDuplicateBarcodes(barcodes, childP)) {
+          return true;
+        }
+      }
+      return false;
+    } else if (item instanceof Dilution) {
+      Dilution d = (Dilution) item;
+      StringBuilder totalIndex = new StringBuilder();
+      for (TagBarcode barcode : d.getLibrary().getTagBarcodes()) {
+        totalIndex.append(barcode.getSequence());
+      }
+      return !barcodes.add(totalIndex.toString());
+    } else {
+      throw new UnsupportedOperationException();
+    }
+  }
+
+  @Override
+  public boolean hasDuplicateBarcodes() {
+    Set<String> barcodes = new HashSet<>();
+    for (P item : getPoolableElements()) {
+      if (hasDuplicateBarcodes(barcodes, item)) {
+        return true;
+      }
+    }
+    return false;
+  }
 }

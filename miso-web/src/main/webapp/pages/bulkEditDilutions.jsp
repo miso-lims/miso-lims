@@ -60,6 +60,9 @@
   <br/>
 
  <div id="HOTbulkForm" data-detailed-sample="${detailedSample}">
+   <div id="ctrlV" class="note">
+     <p>Paste values using Ctrl + V in Windows or Linux, or Command-V (&#8984;-V) on a Mac.</p>
+   </div>
  
    <div id="saveSuccesses"  class="parsley-success hidden">
      <p id="successMessages"></p>

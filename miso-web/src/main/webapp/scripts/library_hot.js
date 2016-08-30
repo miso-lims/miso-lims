@@ -89,11 +89,24 @@ Library.hot = {
     });
     document.getElementById('hotContainer').style.display = '';
     
-    Library.hot.ltIndex = Library.hot.getColIndex('libraryTypeAlias');
-    Library.hot.tbfIndex = Library.hot.getColIndex('tagBarcodeFamilyName');
-    Library.hot.tb1ColIndex = Library.hot.getColIndex('tagBarcodeIndex1Label');
-    Library.hot.tb2ColIndex = Library.hot.getColIndex('tagBarcodeIndex2Label');
-    Library.hot.pfIndex = Library.hot.getColIndex('platformName');
+    Library.hot.ltIndex = Hot.getColIndex('libraryTypeAlias');
+    Library.hot.tbfIndex = Hot.getColIndex('tagBarcodeFamilyName');
+    Library.hot.tb1ColIndex = Hot.getColIndex('tagBarcodeIndex1Label');
+    Library.hot.tb2ColIndex = Hot.getColIndex('tagBarcodeIndex2Label');
+    Library.hot.pfIndex = Hot.getColIndex('platformName');
+    
+    var aliasColIndex = Hot.getColIndex('alias');
+    Hot.startData.forEach(function (library, index) {
+      if (!library.nonStandardAlias) {
+        Hot.hotTable.setCellMeta(index, aliasColIndex, 'validator', Library.hot.validateAlias);
+      } else {
+        Hot.hotTable.setCellMeta(index, aliasColIndex, 'renderer', Hot.nsAliasRenderer);
+        Hot.hotTable.setCellMeta(index, aliasColIndex, 'validator', Hot.requiredText);
+        jQuery('#nonStandardAliasNote').show();
+      }
+    });
+    Hot.hotTable.render();
+    
     // enable save button if it was disabled
     if (Hot.saveButton && Hot.saveButton.classList.contains('disabled')) Hot.toggleButtonAndLoaderImage(Hot.saveButton);
   },
@@ -110,12 +123,17 @@ Library.hot = {
       // [rowIndex, colName, oldValue, newValue]
       if (['edit', 'autofill', 'paste'].indexOf(source)!= -1) {
         for (var i = 0; i < changes.length; i++) {
+          // trigger only if old value is different from new value
           switch (changes[i][1]) {
             case 'platformName':
-              Library.hot.changePlatform(changes[i][0], changes[i][1], changes[i][2], changes[i][3]);
+              if (changes[i][2] != changes[i][3]) {
+                Library.hot.changePlatform(changes[i][0], changes[i][1], changes[i][2], changes[i][3]);
+              }
               break;
             case 'tagBarcodeFamilyName':
-              Library.hot.changeBarcodeKit(changes[i][0], changes[i][1], changes[i][2], changes[i][3]);
+              if (changes[i][2] != changes[i][3]) {
+                Library.hot.changeBarcodeKit(changes[i][0], changes[i][1], changes[i][2], changes[i][3]);
+              }
               break;
           }
         }
@@ -187,13 +205,6 @@ Library.hot = {
   },
   
   /**
-   * Gets array of qc values
-   */
-  getQcValues: function () {
-    return Hot.dropdownRef['qcValues'].map(function (val) { if (val === '') val = 'unknown'; return val; });
-  },
-  
-  /**
    * Gets array of kit descriptor names
    */
   getKitDescriptors: function () {
@@ -251,7 +262,7 @@ Library.hot = {
           header: 'Description',
           data: 'description',
           type: 'text',
-          validator: requiredText
+          validator: Hot.requiredText
         },{
           header: 'Platform',
           data: 'platformName',
@@ -264,7 +275,7 @@ Library.hot = {
           type: 'dropdown',
           trimDropdown: false,
           source: '',
-          validator: requiredText
+          validator: Hot.requiredText
         },{
           header: 'Selection',
           data: 'librarySelectionTypeAlias',
@@ -286,23 +297,25 @@ Library.hot = {
         },{
           header: 'Index 1',
           data: 'tagBarcodeIndex1Label',
-          type: 'dropdown',
+          type: 'autocomplete',
+          strict: true,
+          allowInvalid: true,
           trimDropdown: false,
-          source: [],
-          validator: permitEmpty
+          source: [""]
         },{
           header: 'Index 2',
           data: 'tagBarcodeIndex2Label',
-          type: 'dropdown',
+          type: 'autocomplete',
+          strict: true,
+          allowInvalid: true,
           trimDropdown: false,
-          source: [],
-          validator: permitEmpty
+          source: [""]
         },{
           header: 'QC Passed?',
           data: 'qcPassed',
           type: 'dropdown',
           trimDropdown: false,
-          source: Hot.getQcValues()
+          source: ['true', 'false', 'unknown']
         },{
           header: 'Volume',
           data: 'volume',
@@ -319,8 +332,7 @@ Library.hot = {
         {
           header: 'Library Alias',
           data: 'alias',
-          type: 'text',
-          validator: validateAlias
+          type: 'text'
         }
       ];
       
@@ -340,54 +352,29 @@ Library.hot = {
       
       return additionalCols;
     }
-    
-    function requiredText (value, callback) {
-      if (!value || value.length === 0) {
-        callback(false);
-      } else {
-        callback(true);
-      }
-    }
-    
-    function permitEmpty (value, callback) {
-      if (value === undefined || value === null || value.length > 0 || value === '') {
-        return callback(true);
-      } else {
-        return callback(false);
-      }
-    }
-    
-    function validateAlias (value, callback) {
-      if (value) {
-        Fluxion.doAjax(
-          'libraryControllerHelperService',
-          'validateLibraryAlias',
-          {
-            'alias': value,
-            'url': ajaxurl
-          },
-          {
-            'doOnSuccess': function () {
-              return callback(true);
-            },
-            'doOnError': function (json) {
-              return callback(false);
-            }
-          }
-        );
-      } else {
-        return callback(false);
-      }
-    }
   },
   
-  /**
-   * Gets the column index for a given attribute
-   */
-  getColIndex: function (dataString) {
-  	for (var i = 0; i < Hot.colConf.length; i++) {
-  	  if (Hot.colConf[i].data == dataString) return i;
-  	}
+  validateAlias: function (value, callback) {
+    if (value) {
+      Fluxion.doAjax(
+        'libraryControllerHelperService',
+        'validateLibraryAlias',
+        {
+          'alias': value,
+          'url': ajaxurl
+        },
+        {
+          'doOnSuccess': function () {
+            return callback(true);
+          },
+          'doOnError': function (json) {
+            return callback(false);
+          }
+        }
+      );
+    } else {
+      return callback(false);
+    }
   },
 
   /**
@@ -408,8 +395,8 @@ Library.hot = {
   updateTBFamilyCellsSources: function (row, platformName) {
     // update barcode kits
     // use stored barcode kits if these have already been retrieved.
-    Hot.hotTable.setCellMeta(row, Library.hot.tb1ColIndex, 'source', []);
-    Hot.hotTable.setCellMeta(row, Library.hot.tb2ColIndex, 'source', []);
+    Hot.hotTable.setCellMeta(row, Library.hot.tb1ColIndex, 'source', [""]);
+    Hot.hotTable.setCellMeta(row, Library.hot.tb2ColIndex, 'source', [""]);
     if (Hot.dropdownRef.barcodeKits[platformName]) {
       Hot.hotTable.setCellMeta(row, Library.hot.tbfIndex, 'source', Object.keys(Hot.dropdownRef.tagBarcodes[platformName]));
     } else if (platformName) {
@@ -427,8 +414,11 @@ Library.hot = {
     function setTBSource (platformName, tbfName, pos, len) {
       Hot.hotTable.setCellMeta(row, Library.hot['tb' + pos + 'ColIndex'], 'source', Library.hot.getBcLabels(Hot.dropdownRef.tagBarcodes[platformName][tbfName][pos]));
       Hot.hotTable.setCellMeta(row, Library.hot['tb' + pos + 'ColIndex'], 'readOnly', false);
-      // make next barcode column readOnly in case there are no barcodes for this position
-      if (pos + 1 <= len) Hot.hotTable.setCellMeta(row, Library.hot['tb' + (pos + 1) + 'ColIndex'], 'readOnly', true);
+      // empty source array for barcode 2 column in case there are no barcodes for position 2
+      if (pos == 1) {
+        Hot.hotTable.setCellMeta(row, Library.hot['tb2ColIndex'], 'source', [""]);
+        Hot.hotTable.setCellMeta(row, Library.hot['tb2ColIndex'], 'readOnly', true);
+      }
     }
     if (Hot.dropdownRef.tagBarcodes[platformName] && Hot.dropdownRef.tagBarcodes[platformName][tbfName] && Hot.dropdownRef.tagBarcodes[platformName][tbfName]['1']) {
       // if tagBarcodes for this tagBarcodeFamily are already stored locally, use these
@@ -577,9 +567,10 @@ Library.hot = {
         } else {
           lib.libraryAdditionalInfo.archived = false;
         }
+        lib.libraryAdditionalInfo.nonStandardAlias = obj.libraryAdditionalInfo.nonStandardAlias;
       }
 
-      lib.qcPassed = obj.qcPassed;
+      lib.qcPassed = (obj.qcPassed && obj.qcPassed != 'unknown' ? obj.qcPassed : '') || '';
 
       // TODO: add qcCols
     } catch (e) {

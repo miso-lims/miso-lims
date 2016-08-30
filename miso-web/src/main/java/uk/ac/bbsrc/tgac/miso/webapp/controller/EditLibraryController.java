@@ -798,7 +798,8 @@ public class EditLibraryController {
   public ModelAndView editPropagateSamples(@PathVariable String sampleIds, ModelMap model) throws IOException {
     try {
       List<Long> idList = getIdsFromString(sampleIds);
-      JSONArray libraries = new JSONArray();
+      ObjectMapper mapper = new ObjectMapper();
+      List<LibraryDto> libraryDtos = new ArrayList<LibraryDto>();
       SampleClass sampleClass = null;
       for (Sample sample : requestManager.getSamplesByIdList(idList)) {
         SampleAdditionalInfo detailed = (SampleAdditionalInfo) sample;
@@ -813,12 +814,13 @@ public class EditLibraryController {
 
         if (isDetailedSampleEnabled()) {
           LibraryAdditionalInfoDto lai = new LibraryAdditionalInfoDto();
+          lai.setNonStandardAlias(((SampleAdditionalInfo) sample).hasNonStandardAlias());
           library.setLibraryAdditionalInfo(lai);
         }
-        libraries.add(library);
+        libraryDtos.add(library);
       }
       model.put("title", "Bulk Create Libraries");
-      model.put("librariesJSON", libraries);
+      model.put("librariesJSON", mapper.writeValueAsString(libraryDtos));
       JSONArray libraryDesigns = new JSONArray();
       libraryDesigns.addAll(requestManager.listLibraryDesignByClass(sampleClass));
       model.put("libraryDesignsJSON", libraryDesigns.toString());
@@ -836,7 +838,8 @@ public class EditLibraryController {
   public ModelAndView editBulkLibraries(@PathVariable String libraryIds, ModelMap model) throws IOException {
     try {
       List<Long> idList = getIdsFromString(libraryIds);
-      JSONArray libraryDtos = new JSONArray();
+      ObjectMapper mapper = new ObjectMapper();
+      List<LibraryDto> libraryDtos = new ArrayList<LibraryDto>();
       for (Library library : requestManager.getLibrariesByIdList(idList)) {
         LibraryAdditionalInfo lai = null;
         if (isDetailedSampleEnabled()) {
@@ -845,7 +848,7 @@ public class EditLibraryController {
         libraryDtos.add(Dtos.asDto(library, lai));
       }
       model.put("title", "Bulk Edit Libraries");
-      model.put("librariesJSON", libraryDtos);
+      model.put("librariesJSON", mapper.writeValueAsString(libraryDtos));
       model.put("method", "Edit");
       model.put("libraryDesignsJSON", "[]");
       return new ModelAndView("/pages/bulkEditLibraries.jsp", model);
@@ -861,7 +864,8 @@ public class EditLibraryController {
   public ModelAndView editPropagateDilutions(@PathVariable String libraryIds, ModelMap model) throws IOException {
     try {
       List<Long> idList = getIdsFromString(libraryIds);
-      JSONArray libraryDtos = new JSONArray();
+      ObjectMapper mapper = new ObjectMapper();
+      List<LibraryDto> libraryDtos = new ArrayList<LibraryDto>();
       for (Library library : requestManager.getLibrariesByIdList(idList)) {
         LibraryAdditionalInfo lai = null;
         if (isDetailedSampleEnabled()) {
@@ -870,7 +874,7 @@ public class EditLibraryController {
         libraryDtos.add(Dtos.asDto(library, lai));
       }
       model.put("title", "Bulk Create Dilutions");
-      model.put("librariesJSON", libraryDtos);
+      model.put("librariesJSON", mapper.writeValueAsString(libraryDtos));
       model.put("method", "Propagate");
       return new ModelAndView("/pages/bulkEditDilutions.jsp", model);
     } catch (IOException ex) {
@@ -940,7 +944,7 @@ public class EditLibraryController {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
 
       if (librariesDtos != null && librariesDtos.size() > 0) {
-        JSONArray savedLibraries = new JSONArray();
+        List<Long> savedLibraryIds = new ArrayList<Long>();
 
         for (Object lDto : librariesDtos) {
           ObjectMapper mapper = new ObjectMapper();
@@ -956,7 +960,6 @@ public class EditLibraryController {
           }
           library.setLastModifier(user);
 
-          // TODO: fix this hack
           if (libDto.getLibraryAdditionalInfo() != null) {
             library.setLibraryAdditionalInfo(Dtos.to(libDto.getLibraryAdditionalInfo()));
             if (library.getId() == AbstractLibrary.UNSAVED_ID) {
@@ -966,9 +969,9 @@ public class EditLibraryController {
           }
 
           Long savedId = requestManager.saveLibrary(library);
-          savedLibraries.add(savedId);
+          savedLibraryIds.add(savedId);
         }
-        return "redirect:/miso/library/bulk/edit/" + savedLibraries.toString();
+        return "redirect:/miso/library/bulk/edit/" + savedLibraryIds.toString();
       } else {
         throw new IOException("There are no libraries to save!");
       }

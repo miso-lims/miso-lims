@@ -745,15 +745,8 @@ public class PoolControllerHelperService {
               if (pool.getPoolableElements().size() > 1) {
                 if (!dilution.getLibrary().getTagBarcodes().isEmpty()) {
                   info.append("<b>Barcodes:</b></br>");
-                  for (TagBarcode tb : dilution.getLibrary().getTagBarcodes()) {
-                    info.append(tb.getPosition());
-                    info.append(":");
-                    info.append(tb.getName());
-                    info.append(" (");
-                    info.append(tb.getSequence());
-                    info.append(")<br/>");
-                    info.append("<span class='counter'><img src='/styles/images/status/green.png' border='0'></span>");
-                  }
+                  collectBarcodes(info, dilution);
+                  info.append("<span class='counter'><img src='/styles/images/status/green.png' border='0'></span>");
                 } else {
                   info.append("<b>Barcode:</b>");
                   info.append("<b>Library:</b> <a href='/miso/library/" + dilution.getLibrary().getId() + "'>Choose tag barcode</a>");
@@ -776,6 +769,17 @@ public class PoolControllerHelperService {
     }
   }
 
+  private void collectBarcodes(StringBuilder render, Dilution dilution) {
+    for (TagBarcode tb : dilution.getLibrary().getTagBarcodes()) {
+      render.append(tb.getPosition());
+      render.append(":");
+      render.append(tb.getName());
+      render.append(" (");
+      render.append(tb.getSequence());
+      render.append(")<br/>");
+    }
+  }
+
   public JSONObject createElementSelectDataTable(HttpSession session, JSONObject json) {
     if (json.has("platform") && !isStringEmptyOrNull(json.getString("platform"))) {
       try {
@@ -791,6 +795,9 @@ public class PoolControllerHelperService {
           pout.add(libraryDilution.getConcentration());
           pout.add(libraryDilution.getLibrary().getAlias() + " (" + libraryDilution.getLibrary().getName() + ")");
           pout.add(libraryDilution.getLibrary().getSample().getAlias() + " (" + libraryDilution.getLibrary().getSample().getName() + ")");
+          StringBuilder barcodes = new StringBuilder();
+          collectBarcodes(barcodes, libraryDilution);
+          pout.add(barcodes.toString());
           pout.add("<div style='cursor:pointer;' onmousedown=\"Pool.search.poolSearchSelectElement('" + libraryDilution.getId() + "', '"
               + libraryDilution.getName() + "')\"><span class=\"ui-icon ui-icon-plusthick\"></span></div>");
           arr.add(pout);

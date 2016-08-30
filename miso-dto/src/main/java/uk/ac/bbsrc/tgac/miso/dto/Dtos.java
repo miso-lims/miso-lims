@@ -195,6 +195,7 @@ public class Dtos {
     dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
     dto.setUpdatedById(from.getUpdatedBy().getUserId());
     dto.setLastUpdated(dateTimeFormatter.print(from.getLastUpdated().getTime()));
+    dto.setDNAseTreatable(from.getDNAseTreatable());
     return dto;
   }
 
@@ -211,6 +212,7 @@ public class Dtos {
     to.setAlias(from.getAlias());
     to.setSampleCategory(from.getSampleCategory());
     to.setSuffix(from.getSuffix());
+    to.setDNAseTreatable(from.getDNAseTreatable());
     return to;
   }
 
@@ -279,6 +281,10 @@ public class Dtos {
     if (from.getGroupDescription() != null) {
       dto.setGroupDescription(from.getGroupDescription());
     }
+    if (from.isSynthetic() != null) {
+      dto.setSynthetic(from.isSynthetic());
+    }
+    dto.setNonStandardAlias(from.hasNonStandardAlias());
     return dto;
   }
 
@@ -321,9 +327,10 @@ public class Dtos {
       to.setGroupId(from.getGroupId());
       to.setGroupDescription(from.getGroupDescription());
     }
-    if (from.isSynthetic() != null) {
-      to.setSynthetic(from.isSynthetic());
+    if (from.getSynthetic() != null) {
+      to.setSynthetic(from.getSynthetic());
     }
+    to.setNonStandardAlias(from.getNonStandardAlias());
     to.setParent(getParent(from));
     return to;
   }
@@ -339,7 +346,8 @@ public class Dtos {
    * identity, which may or may not yet exist</li>
    * </ol>
    * 
-   * @param childDto the DTO to take parent details from
+   * @param childDto
+   *          the DTO to take parent details from
    * @return the parent details from the DTO, or null if there are none. A returned sample will also include its own parent if applicable.
    */
   private static SampleAdditionalInfo getParent(SampleAdditionalInfoDto childDto) {
@@ -460,6 +468,7 @@ public class Dtos {
     SampleStockDto dto = new SampleStockDto();
     dto.setConcentration(from.getConcentration());
     dto.setStrStatus(from.getStrStatus().getLabel());
+    dto.setDnaseTreated(from.getDNAseTreated());
     return dto;
   }
 
@@ -469,6 +478,7 @@ public class Dtos {
     if (from.getStrStatus() != null) {
       to.setStrStatus(from.getStrStatus());
     }
+    to.setDNAseTreated(from.getDnaseTreated());
     return to;
   }
 
@@ -845,6 +855,7 @@ public class Dtos {
     if (from.getLibraryDesign() != null) {
       dto.setLibraryDesignId(from.getLibraryDesign().getId());
     }
+    dto.setNonStandardAlias(from.hasNonStandardAlias());
     return dto;
   }
 
@@ -863,6 +874,7 @@ public class Dtos {
       to.setPrepKit(to(from.getPrepKit()));
     }
     to.setArchived(from.getArchived());
+    to.setNonStandardAlias(from.getNonStandardAlias());
     return to;
   }
 

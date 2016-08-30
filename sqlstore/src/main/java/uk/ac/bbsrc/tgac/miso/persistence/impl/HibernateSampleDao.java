@@ -5,6 +5,7 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,8 @@ import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -38,6 +41,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
@@ -213,6 +217,9 @@ public class HibernateSampleDao implements SampleDao {
 
   @Override
   public Collection<Sample> getByIdList(List<Long> idList) throws IOException {
+    if (idList.isEmpty()) {
+      return Collections.emptyList();
+    }
     Query query = currentSession().createQuery("from SampleImpl where sampleId in (:ids)");
     query.setParameterList("ids", idList, LongType.INSTANCE);
     @SuppressWarnings("unchecked")
@@ -352,13 +359,29 @@ public class HibernateSampleDao implements SampleDao {
     return records;
   }
 
+  private static final String[] searchProperties = new String[] { "alias", "identificationBarcode", "name" };
+
+  /**
+   * Create a Hibernate criterion to search for all the properties our users want to search.
+   * 
+   * @param querystr
+   * @return
+   */
+  private Criterion searchRestrictions(String querystr) {
+    String str = querystr.trim().replaceAll("[\\s,%]+", " ");
+    Criterion[] criteria = new Criterion[searchProperties.length + 1];
+    for (int i = 0; i < searchProperties.length; i++) {
+      criteria[i] = Restrictions.ilike(searchProperties[i], str, MatchMode.ANYWHERE);
+    }
+    criteria[searchProperties.length] = Restrictions.and(Restrictions.eq("class", IdentityImpl.class),
+        Restrictions.ilike("externalName", str, MatchMode.ANYWHERE));
+    return Restrictions.or(criteria);
+  }
+
   @Override
   public Collection<Sample> listBySearch(String querystr) throws IOException {
     Criteria criteria = currentSession().createCriteria(SampleImpl.class);
-    criteria.add(Restrictions.or(
-        Restrictions.ilike("identificationBarcode", "%" + querystr + "%"),
-        Restrictions.ilike("name", "%" + querystr + "%"),
-        Restrictions.ilike("alias", "%" + querystr + "%")));
+    criteria.add(searchRestrictions(querystr));
     @SuppressWarnings("unchecked")
     List<Sample> records = criteria.list();
     return fetchSqlStore(records);
@@ -370,10 +393,7 @@ public class HibernateSampleDao implements SampleDao {
       return countAll();
     } else {
       Criteria criteria = currentSession().createCriteria(SampleImpl.class);
-      criteria.add(Restrictions.or(
-          Restrictions.ilike("identificationBarcode", "%" + querystr + "%"),
-          Restrictions.ilike("name", "%" + querystr + "%"),
-          Restrictions.ilike("alias", "%" + querystr + "%")));
+      criteria.add(searchRestrictions(querystr));
       return (Long) criteria.setProjection(Projections.rowCount()).uniqueResult();
     }
   }
@@ -383,10 +403,7 @@ public class HibernateSampleDao implements SampleDao {
       throws IOException {
     if ("lastModified".equals(sortCol)) sortCol = "derivedInfo.lastModified";
     Criteria criteria = currentSession().createCriteria(SampleImpl.class);
-    criteria.add(Restrictions.or(
-        Restrictions.ilike("identificationBarcode", "%" + querystr + "%"),
-        Restrictions.ilike("name", "%" + querystr + "%"),
-        Restrictions.ilike("alias", "%" + querystr + "%")));
+    criteria.add(searchRestrictions(querystr));
     // I don't know why this alias is required, but without it, you can't sort by 'derivedInfo.lastModifier', which is the field on which we
     // want to sort most List X pages
     criteria.createAlias("derivedInfo", "derivedInfo");
@@ -396,6 +413,9 @@ public class HibernateSampleDao implements SampleDao {
     criteria.setProjection(Projections.property("id"));
     @SuppressWarnings("unchecked")
     List<Long> ids = criteria.list();
+    if (ids.isEmpty()) {
+      return Collections.emptyList();
+    }
     // We do this in two steps to make a smaller query that that the database can optimise
     Criteria query = currentSession().createCriteria(SampleImpl.class);
     query.add(Restrictions.in("id", ids));

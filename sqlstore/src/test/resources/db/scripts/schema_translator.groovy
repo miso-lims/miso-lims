@@ -16,7 +16,7 @@ final File productionSchemaDir = new File(basedir + '/src/main/resources/db/migr
 println('Translating schema files from ' + productionSchemaDir.getAbsolutePath() + '...')
 
 // ignore V8000-series site-specific migrations as they will cause tests to fail
-final String productionScriptPattern = '^(V[0-79]\\d{3}_.*|afterMigrate)\\.sql$'
+final String productionScriptPattern = '^(V\\d{4}_.*|afterMigrate)\\.sql$'
 final String testSchemaDir = basedir + '/target/test-classes/db/test_migration/'
 
 Files.createDirectories(Paths.get(testSchemaDir))

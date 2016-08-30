@@ -54,15 +54,22 @@
       <br/>To fill a variable number of columns with the value of your selected cell,  <b>click</b> the square in the bottom right of your 
       filled-in selected cell and <b>drag</b> up or down. All selected columns will be filled in.
       <c:if test="${aliasGenerationEnabled}">
-        <br/>Leave <b>alias</b> cell blank to auto-generate an alias for this sample.
+        <br/>Leave <b>alias</b> cell blank to auto-generate an alias for this sample, provided it (and its parent) does not have a non-standard alias.
       </c:if>
     </p>
   </div>
   <div class="clear"></div>
   <br/>
-  <br/>
 
 	<div id="HOTbulkForm" data-detailed-sample="${detailedSample}">
+	  <div id="nonStandardAliasNote" class="table-note hidden">
+	    <p>Aliases highlighted in yellow are non-standard, and any value you enter will be saved.</p>
+	    <br/>
+	  </div>
+
+      <div id="ctrlV" class="note">
+        <p>Paste values using Ctrl + V in Windows or Linux, or Command-V (&#8984;-V) on a Mac.</p>
+      </div>
 	
 		<div id="saveSuccesses"  class="parsley-success hidden">
 	    <p id="successMessages"></p>

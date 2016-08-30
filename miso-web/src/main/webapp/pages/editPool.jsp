@@ -116,6 +116,13 @@
     </td>
   </tr>
   <tr>
+    <td colspan="2">
+    <c:if test="${pool.hasDuplicateBarcodes()}">
+      <p style="font-size:200%; font-weight:bold">This pool contains duplicate tag barcodes!</p>
+    </c:if>
+    </td>
+  </tr>
+  <tr>
     <td class="h">Location:</td>
     <td>
       <c:if test="${!empty pool.boxLocation}">${pool.boxLocation},</c:if>

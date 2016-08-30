@@ -95,6 +95,7 @@ Sample.hot = {
       newSam.passageNumber = sam.passageNumber;
       newSam.externalInstituteIdentifier = sam.externalInstituteIdentifier;
       newSam.labId = sam.labId;
+      newSam.nonStandardAlias = sam.nonStandardAlias;
       if (sam.groupId && sam.groupDescription && sam.groupDescription.length) {
         newSam.groupId = parseInt(sam.groupId);
         newSam.groupDescription = sam.groupDescription;
@@ -356,7 +357,6 @@ Sample.hot = {
       // stringify and parse to clone the default object (instead of using referential copies) if detailedSample is enabled
       var defaultObject = (Hot.detailedSample ? JSON.stringify(Sample.hot.getDefaultDetailedValues()) : null);
       Sample.hot.addEmptyRow((startRowsNumber - Hot.startData.length), defaultObject);
-
     } else {
       Hot.startData = startingValues;
     }
@@ -376,6 +376,23 @@ Sample.hot = {
       maxRows: startRowsNumber || startingValues.length
     });
     document.getElementById('hotContainer').style.display = '';
+    
+    // add alias validator for standard aliases
+    var aliasColIndex = Hot.getColIndex('alias');
+    var parentAliasColIndex = Hot.getColIndex('parentAlias');
+    Hot.startData.forEach(function (sample, index) {
+      if (sample.nonStandardAlias) {
+        Hot.hotTable.setCellMeta(index, aliasColIndex, 'renderer', Hot.nsAliasRenderer);
+        Hot.hotTable.setCellMeta(index, aliasColIndex, 'validator', Hot.requiredText);
+        jQuery('#nonStandardAliasNote').show();
+        if (parentAliasColIndex) {
+          Hot.hotTable.setCellMeta(index, parentAliasColIndex, 'renderer', Hot.nsAliasReadOnlyRenderer);
+        }
+      } else {
+        Hot.hotTable.setCellMeta(index, aliasColIndex, 'validator', Sample.hot.validateAlias);
+      }
+    });
+    Hot.hotTable.render();
 
     // enable save button if it was disabled
     if (Hot.saveButton && Hot.saveButton.classList.contains('disabled')) Hot.toggleButtonAndLoaderImage(Hot.saveButton);
@@ -570,7 +587,8 @@ Sample.hot = {
    */
   getAppropriateColumns: function (action, sourceSampleCategory, targetSampleCategory, showQcs) {
     var isDetailed = targetSampleCategory != null;
-    var sampleClassAlias = Hot.getAliasFromId(Sample.hot.sampleClassId, Hot.sampleOptions.sampleClassesDtos);
+    var sampleClass = Hot.getObjById(Sample.hot.sampleClassId, Hot.sampleOptions.sampleClassesDtos);
+    var sampleClassAlias = sampleClass.alias;
 	  // We assume we have a linear progression of information that must be
 	  // collected as a sample progressed through the hierarchy.
     var progression = ['Identity', 'Tissue', 'Tissue Processing', 'Stock', 'Aliquot'];
@@ -609,14 +627,13 @@ Sample.hot = {
         header: 'Sample Alias',
         data: 'alias',
         type: 'text',
-        validator: validateAlias,
         include: true
       },
       {
         header: 'Description',
         data: 'description',
         type: 'text',
-        validator: requiredText,
+        validator: Hot.requiredText,
         include: true
       },
       {
@@ -653,7 +670,7 @@ Sample.hot = {
         data: 'scientificName',
         type: 'text',
         source: Sample.hot.sciName,
-        validator: requiredText,
+        validator: Hot.requiredText,
         extraneous: true,
         include: !isDetailed || show['Tissue']
       },
@@ -681,7 +698,7 @@ Sample.hot = {
         header: 'External Name',
         data: 'externalName',
         type: 'text',
-        validator: requiredText,
+        validator: Hot.requiredText,
         include: show['Identity']
       },
       {
@@ -690,7 +707,7 @@ Sample.hot = {
         type: 'dropdown',
         trimDropdown: false,
         source: Sample.hot.getDonorSexes(),
-        validator: permitEmpty,
+        validator: Hot.permitEmpty,
         include: show['Identity']
       },
 
@@ -714,7 +731,7 @@ Sample.hot = {
         header: 'Group Desc.',
         data: 'groupDescription',
         type: 'text',
-        validator: permitEmpty,
+        validator: Hot.permitEmpty,
         include: isDetailed
       },
       {
@@ -723,7 +740,7 @@ Sample.hot = {
         type: 'dropdown',
         trimDropdown: false,
         source: Sample.hot.getKitDescriptors(),
-        validator: permitEmpty,
+        validator: Hot.permitEmpty,
         include: show['Aliquot']
       },
 
@@ -766,14 +783,14 @@ Sample.hot = {
         header: 'Times Received',
         data: 'timesReceived',
         type: 'numeric',
-        validator: requiredText,
+        validator: validatePosReqdNumber,
         include: show['Tissue']
       },
       {
         header: 'Tube Number',
         data: 'tubeNumber',
         type: 'numeric',
-        validator: requiredText,
+        validator: validatePosReqdNumber,
         include: show['Tissue']
       },
       {
@@ -782,7 +799,7 @@ Sample.hot = {
         type: 'dropdown',
         trimDropdown: false,
         source: Sample.hot.getLabs(),
-        validator: permitEmpty,
+        validator: Hot.permitEmpty,
         include: show['Tissue']
       },
       {
@@ -797,14 +814,14 @@ Sample.hot = {
         type: 'dropdown',
         trimDropdown: false,
         source: Sample.hot.getTissueMaterials(),
-        validator: permitEmpty,
+        validator: Hot.permitEmpty,
         include: show['Tissue']
       },
       {
         header: 'Region',
         data: 'region',
         type: 'text',
-        validator: permitEmpty,
+        validator: Hot.permitEmpty,
         include: show['Tissue']
       },
 
@@ -813,7 +830,7 @@ Sample.hot = {
         header: 'Cuts',
         data: 'cuts',
         type: 'numeric',
-        validator: requiredText,
+        validator: Hot.requiredText,
         include: show['Tissue Processing'] && sampleClassAlias == 'CV Slide'
       },
       {
@@ -834,7 +851,7 @@ Sample.hot = {
         header: 'Cuts Consumed',
         data: 'cutsConsumed',
         type: 'numeric',
-        validator: requiredText,
+        validator: Hot.requiredText,
         include: show['Tissue Processing'] && sampleClassAlias == 'LCM Tube'
       },
 
@@ -846,7 +863,14 @@ Sample.hot = {
         trimDropdown: false,
         source: Sample.hot.getStrStatuses(),
         include: show['Stock']
-
+      },
+      {
+        header: 'DNAse',
+        data: 'dnaseTreated',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: [ 'true', 'false' ],
+        include: show['Stock'] && sampleClass.dnaseTreatable
       },
 
       // QC columns
@@ -866,11 +890,11 @@ Sample.hot = {
       },
       {
         header: 'QC Passed?',
-        data: 'qcValue',
+        data: 'qcPassed',
         type: 'dropdown',
         trimDropdown: false,
-        source: Hot.getQcValues(),
-        validator: permitEmpty,
+        source: ['true', 'false', 'unknown'],
+        validator: Hot.permitEmpty,
         include: showQcs || show['Stock']
       },
       {
@@ -879,7 +903,7 @@ Sample.hot = {
         type: 'dropdown',
         trimDropdown: false,
         source: Sample.hot.getQcPassedDetails(),
-        validator: permitEmpty,
+        validator: Hot.permitEmpty,
         include: Sample.hot.showQcs || show['Stock']
       },
 
@@ -891,109 +915,59 @@ Sample.hot = {
         type: 'dropdown',
         trimDropdown: false,
         source: Sample.hot.getSamplePurposes(),
-        validator: permitEmpty,
+        validator: Hot.permitEmpty,
         include: show['Aliquot']
       }
     ].filter(function(x) { return x.include; });
 
-    function requiredText (value, callback) {
-      if (!value || value.length === 0) {
-        callback(false);
-      } else {
-        callback(true);
-      }
-    }
-
-    function permitEmpty (value, callback) {
-      if (value === undefined || value === null || value.length > 0 || value === '') {
-        return callback(true);
-      } else {
-        return callback(false);
-      }
-    }
-
-    function validateAlias (value, callback) {
-      if (value) {
-        var countAliases = 0;
-        for (var i=0; i<Hot.startData.length; i++) {
-          if (Hot.startData[i].alias == value) {
-            countAliases += 1;
-          }
-          // the first one will be the first to save, later ones will be unwanted duplicates
-          if (countAliases > 1) {
-            return callback(false);
-          }
-        }
-        Fluxion.doAjax(
-          'sampleControllerHelperService',
-          'validateSampleAlias',
-          {
-            'alias': value,
-            'url': ajaxurl
-          },
-          {
-            'doOnSuccess': function () {
-              return callback(true);
-            },
-            'doOnError': function (json) {
-              return callback(false);
-            }
-          }
-        );
-      } else if (Sample.hot.aliasGenerationEnabled) {
-        return callback(true);
-      } else {
-        return callback(false);
-      }
-    }
-
     function validateSampleTypes (value, callback) {
-      if (Sample.hot.getSampleTypes().indexOf(value) == -1) {
-        return callback(false);
-      } else {
-        return callback(true);
-      }
+      return callback(Sample.hot.getSampleTypes().indexOf(value) != -1);
     }
 
     function validateTissueClasses (value, callback) {
-      if (Sample.hot.getTissueClassesAliasOnly().indexOf(value) == -1) {
-        return callback(false);
-      } else {
-        return callback(true);
-      }
+      return callback(Sample.hot.getTissueClassesAliasOnly().indexOf(value) != -1);
     }
 
     function validateTissueOrigins (value, callback) {
-      if (Sample.hot.getTissueOrigins().indexOf(value) == -1) {
-        return callback(false);
-      } else {
-        return callback(true);
-      }
+      return callback(Sample.hot.getTissueOrigins().indexOf(value) != -1);
     }
 
     function validateTissueTypes (value, callback) {
-      if (Sample.hot.getTissueTypes().indexOf(value) == -1) {
-        return callback(false);
-      } else {
-        return callback(true);
-      }
+      return callback(Sample.hot.getTissueTypes().indexOf(value) != -1);
     }
 
     function validateNumber (value, callback) {
-      if (value === '' || value === null || Handsontable.helper.isNumeric(value) && value > 0) {
-        return callback(true);
-      } else {
-        return callback(false);
-      }
+      return callback(value === '' || value === null || Handsontable.helper.isNumeric(value) && value >= 0);
     }
     
     function validateAlphanumeric (value, callback) {
       var alphanumRegex = /^[-\w]+$/;
-      if (value === '' || value === null || alphanumRegex.test(value)) {
-        return callback(true);
-      } else {
-        return callback(false);
-      }
+      return callback(value === '' || value === null || alphanumRegex.test(value));
+    }
+  },
+  
+  validateAlias: function (value, callback) {
+    if (value) {
+      Fluxion.doAjax(
+        'sampleControllerHelperService',
+        'validateSampleAlias',
+        {
+          'alias': value,
+          'url': ajaxurl
+        },
+        {
+          'doOnSuccess': function () {
+            return callback(true);
+          },
+          'doOnError': function (json) {
+            return callback(false);
+          }
+        }
+      );
+    } else if (Sample.hot.aliasGenerationEnabled) {
+      return callback(true);
+    } else {
+      return callback(false);
     }
   },
 
@@ -1073,6 +1047,7 @@ Sample.hot = {
       }
 
       sample.rootSampleClassId = Sample.hot.getRootSampleClassId();
+      sample.nonStandardAlias = obj.nonStandardAlias;
 
       // add sample parent attributes, and all other attributes for the first receipt of a sample
       if (obj.externalName) {
@@ -1097,6 +1072,9 @@ Sample.hot = {
       }
       if (obj.externalInstituteIdentifier && obj.externalInstituteIdentifier.length) {
         sample.externalInstituteIdentifier = obj.externalInstituteIdentifier;
+      }
+      if (obj.tissueMaterialAlias && obj.tissueMaterialAlias.length) {
+        sample.tissueMaterialId = Hot.getIdFromAlias(obj.tissueMaterialAlias, Hot.sampleOptions.tissueMaterialsDtos);
       }
 
       // if the table data couldn't have changed (no alias value) then use the original id;
@@ -1144,6 +1122,8 @@ Sample.hot = {
         if (obj.strStatus && obj.strStatus.length) {
           sample.strStatus = obj.strStatus;
         }
+        sample.dnaseTreated = (obj.dnaseTreated == 'true');
+        break;
       case 'Tissue Processing':
         if (obj.cuts) {
           sample.cuts = obj.cuts;
@@ -1248,6 +1228,7 @@ Sample.hot = {
     var sample = JSON.parse(xhr.response);
     Hot.messages.success[rowIndex] = sample.alias;
     Hot.hotTable.setDataAtCell(rowIndex, 0, sample.alias);
+    if (Hot.startData[rowIndex].nonStandardAlias) Hot.hotTable.setCellMeta(rowIndex, 0, 'renderer', Hot.nsAliasReadOnlyRenderer);
     Hot.addSuccessesAndErrors();
   },
 
@@ -1423,13 +1404,8 @@ Sample.hot = {
    * Gets parent sampleClass and child sampleClass and checks to see if parent and child have an associated valid relationship
    */
   assessValidRelationships: function (sampleData) {
-    var col;
-    for (var j = 0; j < Hot.hotTable.countCols(); j++) {
-      if (Hot.hotTable.getCellMeta(0, j).prop == "sampleClassAlias") {
-        col = j;
-        break;
-      }
-    }
+    var col = Hot.getColIndex("sampleClassAlias");
+
     for (var i = 0; i < sampleData.length; i++) {
       var parentClassId = Hot.getIdFromAlias(sampleData[i].parentSampleClassAlias, Hot.sampleOptions.sampleClassesDtos);
       var childClassId = Hot.getIdFromAlias(sampleData[i].sampleClassAlias, Hot.sampleOptions.sampleClassesDtos);

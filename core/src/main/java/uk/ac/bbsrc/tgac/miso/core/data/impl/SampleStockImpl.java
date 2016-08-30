@@ -17,6 +17,8 @@ public class SampleStockImpl extends SampleAdditionalInfoImpl implements SampleS
 
   private Double concentration;
 
+  private Boolean dnaseTreated;
+
   @Override
   public Double getConcentration() {
     return concentration;
@@ -43,8 +45,18 @@ public class SampleStockImpl extends SampleAdditionalInfoImpl implements SampleS
   }
 
   @Override
+  public Boolean getDNAseTreated() {
+    return dnaseTreated;
+  }
+
+  @Override
+  public void setDNAseTreated(Boolean dnaseTreated) {
+    this.dnaseTreated = dnaseTreated;
+  }
+
+  @Override
   public String toString() {
-    return "SampleStockImpl [strStatus=" + strStatus + ", concentration=" + concentration + "]";
+    return "SampleStockImpl [strStatus=" + strStatus + ", concentration=" + concentration + ", dnaseTreated=" + dnaseTreated + "]";
   }
 
 }

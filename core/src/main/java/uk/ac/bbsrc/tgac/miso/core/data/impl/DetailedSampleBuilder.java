@@ -71,6 +71,7 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAliquo
   private Double volume;
   private boolean emptied = false;
   private boolean isSynthetic = false;
+  private boolean nonStandardAlias = false;
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
   private Collection<SampleQC> sampleQCs = new TreeSet<SampleQC>();
 
@@ -109,6 +110,7 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAliquo
   // SampleStock attributes
   private StrStatus strStatus = StrStatus.NOT_SUBMITTED;
   private Double concentration;
+  private Boolean dnaseTreated;
 
   // TissueProcessingSample attributes
   // CV Slide
@@ -802,6 +804,26 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAliquo
     this.isSynthetic = isSynthetic;
   }
 
+  @Override
+  public Boolean getDNAseTreated() {
+    return dnaseTreated;
+  }
+
+  @Override
+  public void setDNAseTreated(Boolean dnaseTreated) {
+    this.dnaseTreated = dnaseTreated;
+  }
+
+  @Override
+  public boolean hasNonStandardAlias() {
+    return nonStandardAlias;
+  }
+
+  @Override
+  public void setNonStandardAlias(boolean nonStandardAlias) {
+    this.nonStandardAlias = nonStandardAlias;
+  }
+
   public SampleAdditionalInfo build() {
     if (sampleClass == null || sampleClass.getSampleCategory() == null) {
       throw new NullPointerException("Missing sample class or category");
@@ -838,6 +860,7 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAliquo
       SampleStock stock = new SampleStockImpl();
       stock.setStrStatus(strStatus);
       stock.setConcentration(concentration);
+      stock.setDNAseTreated(dnaseTreated);
       sample = stock;
       break;
     case SampleAliquot.CATEGORY_NAME:
@@ -895,6 +918,7 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAliquo
     sample.setGroupId(groupId);
     sample.setGroupDescription(groupDescription);
     sample.setSynthetic(isSynthetic);
+    sample.setNonStandardAlias(nonStandardAlias);
     sample.setSiblingNumber(siblingNumber);
 
     return sample;

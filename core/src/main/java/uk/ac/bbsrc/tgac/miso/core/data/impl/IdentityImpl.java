@@ -49,7 +49,17 @@ public class IdentityImpl extends SampleAdditionalInfoImpl implements Identity {
 
   @Override
   public void setExternalName(String externalName) {
-    this.externalName = externalName;
+    StringBuilder buffer = new StringBuilder();
+    boolean first = true;
+    for (String part : externalName.split(",")) {
+      if (first) {
+        first = false;
+      } else {
+        buffer.append(",");
+      }
+      buffer.append(part.trim().replaceAll("\\s+", " "));
+    }
+    this.externalName = buffer.toString();
   }
 
   @Override

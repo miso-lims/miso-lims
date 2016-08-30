@@ -300,8 +300,11 @@ public interface Pool<P extends Poolable> extends SecurableByProfile, Comparable
   /**
    * Adds the description of this Pool object
    * 
-   * @param String description
+   * @param String
+   *          description
    */
   void setDescription(String description);
+
+  boolean hasDuplicateBarcodes();
 
 }

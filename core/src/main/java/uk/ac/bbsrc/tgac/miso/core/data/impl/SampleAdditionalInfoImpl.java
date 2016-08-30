@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.nullifyStringIfBlank;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -58,6 +60,9 @@ public class SampleAdditionalInfoImpl extends SampleImpl implements SampleAdditi
   private String groupId;
   private String groupDescription;
   private boolean isSynthetic = false;
+
+  @Column(nullable = false)
+  private boolean nonStandardAlias = false;
 
   @Override
   public SampleAdditionalInfo getParent() {
@@ -158,7 +163,7 @@ public class SampleAdditionalInfoImpl extends SampleImpl implements SampleAdditi
 
   @Override
   public void setGroupId(String groupId) {
-    this.groupId = groupId;
+    this.groupId = nullifyStringIfBlank(groupId);
   }
 
   @Override
@@ -168,7 +173,7 @@ public class SampleAdditionalInfoImpl extends SampleImpl implements SampleAdditi
 
   @Override
   public void setGroupDescription(String groupDescription) {
-    this.groupDescription = groupDescription;
+    this.groupDescription = nullifyStringIfBlank(groupDescription);
   }
 
   @Override
@@ -181,5 +186,15 @@ public class SampleAdditionalInfoImpl extends SampleImpl implements SampleAdditi
     if (isSynthetic != null) {
       this.isSynthetic = isSynthetic;
     }
+  }
+
+  @Override
+  public boolean hasNonStandardAlias() {
+    return nonStandardAlias;
+  }
+
+  @Override
+  public void setNonStandardAlias(boolean nonStandardAlias) {
+    this.nonStandardAlias = nonStandardAlias;
   }
 }

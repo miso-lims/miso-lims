@@ -224,12 +224,24 @@
             (blank to auto-generate)
           </c:when>
           <c:otherwise>
-            *
+            *<c:if test="${detailedSample && sample.parent.hasNonStandardAlias()}">
+            (cannot auto-generate since parent has non-standard alias)
+            </c:if>
           </c:otherwise>
         </c:choose>
       </td>
-      <td><form:input id="alias" path="alias" name="alias" data-parsley-required='${!aliasGenerationEnabled || sample.id != 0}'/><span id="aliasCounter" class="counter"></span></td>
+      <td><form:input id="alias" path="alias" name="alias" data-parsley-required='${!aliasGenerationEnabled || sample.id != 0}'/><span id="aliasCounter" class="counter"></span>
         <%--<td><a href="void(0);" onclick="popup('help/sampleAlias.html');">Help</a></td>--%>
+        <c:if test="${detailedSample}">
+          <c:if test="${sample.hasNonStandardAlias() || sample.parent.hasNonStandardAlias()}">
+	          <ul class="parsley-errors-list filled" id="nonStandardAlias">
+	            <li class="parsley-custom-error-message">
+	            Double-check this alias -- it will be saved even if it (or the parent sample's alias) is duplicated or does not follow the naming standard!
+	            </li>
+	          </ul>
+	        </c:if>
+        </c:if>
+      </td>
     </tr>
     <tr>
       <td>Description:*</td>
@@ -304,7 +316,7 @@
           <h2>Identity</h2>
           <table class="in">
             <tr>
-              <td class="h">External Name:*</td>
+              <td class="h">External Names (comma separated):*</td>
               <td>
                 <c:choose>
                   <c:when test="${sample.id == 0}">
@@ -434,7 +446,7 @@
               <td>
                 <c:choose>
                   <c:when test="${sample.id == 0}">
-                    <miso:select id="tissueOrigin" path="tissueOrigin" items="${tissueOrigins}" itemLabel="description"
+                    <miso:select id="tissueOrigin" path="tissueOrigin" items="${tissueOrigins}" itemLabel="itemLabel"
                         itemValue="id" defaultLabel="SELECT" defaultValue=""/>
                   </c:when>
                   <c:otherwise>
@@ -448,14 +460,8 @@
               <td>
                 <c:choose>
                   <c:when test="${sample.id == 0}">
-                    <form:select id="tissueType" path="tissueType">
-                      <option value="">SELECT</option>
-                      <c:forEach items="${tissueTypes}" var="tissueType">
-                        <option value="${tissueType.id}" <c:if test="${tissueType.id == sample.tissueType.id}">selected="selected"</c:if>>
-                          ${fn:length(tissueType.description) lt 51 ? tissueType.description : fn:substring(tissueType.description,0,49) += '&hellip;'}
-                        </option>
-                      </c:forEach>
-                    </form:select>
+                    <miso:select id="tissueType" path="tissueType" items="${tissueTypes}" itemLabel="itemLabel"
+                        itemValue="id" defaultLabel="SELECT" defaultValue=""/>
                   </c:when>
                   <c:otherwise>
                     ${sample.tissueType.description}
@@ -488,14 +494,8 @@
             <tr>
               <td class="h">Lab:</td>
               <td>
-                <form:select id="lab" path="lab">
-                  <option value="">None</option>
-                  <c:forEach items="${labs}" var="lab">
-                    <option value="${lab.id}" <c:if test="${lab.id == sample.lab.id}">selected="selected"</c:if>>
-                        ${lab.alias} - ${lab.institute.alias}
-                    </option>
-                  </c:forEach>
-                </form:select>
+               <miso:select id="lab" path="lab" items="${labs}" itemLabel="itemLabel" itemValue="id" defaultLabel="SELECT" 
+                   defaultValue=""/>
               </td>
             </tr>
             <tr>
@@ -590,6 +590,12 @@
               <td class="h">Concentration (nM):</td>
               <td><form:input id="concentration" path="concentration"/></td>
             </tr>
+            <c:if test="${sample.sampleClass.DNAseTreatable}">
+              <tr>
+                <td class="h">DNAse Treated:</td>
+                <td><form:checkbox id="DNAseTreated" path="DNAseTreated"/></td>
+              </tr>
+            </c:if>
           </table>
         </div>
       </c:if>
@@ -733,6 +739,9 @@
   <br/>
 
   <div id="HOTbulkForm" data-detailed-sample="${detailedSample}">
+    <div id="ctrlV" class="note">
+      <p>Paste values using Ctrl + V in Windows or Linux, or Command-V (&#8984;-V) on a Mac.</p>
+    </div>
     <div class="floatleft">
 	    <div>Project:<select id="projectSelect"></select></div>
 	    <div id="subpSelectOptions"></div>
