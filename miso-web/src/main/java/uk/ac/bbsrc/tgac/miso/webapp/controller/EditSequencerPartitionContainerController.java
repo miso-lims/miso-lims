@@ -29,6 +29,7 @@ import java.util.Collection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -41,6 +42,9 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
+
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
@@ -52,9 +56,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
-
-import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 @Controller
 @RequestMapping("/container")
@@ -81,6 +82,14 @@ public class EditSequencerPartitionContainerController {
 
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
+  }
+
+  @Value("${miso.detailed.sample.enabled}")
+  private Boolean detailedSample;
+
+  @ModelAttribute("detailedSample")
+  public Boolean isDetailedSampleEnabled() {
+    return detailedSample;
   }
 
   @RequestMapping(value = "/rest/changes", method = RequestMethod.GET)
@@ -129,8 +138,8 @@ public class EditSequencerPartitionContainerController {
   }
 
   @RequestMapping(method = RequestMethod.POST)
-  public String processSubmit(@ModelAttribute("container") SequencerPartitionContainer<SequencerPoolPartition> container, ModelMap model, SessionStatus session)
-      throws IOException, MalformedRunException {
+  public String processSubmit(@ModelAttribute("container") SequencerPartitionContainer<SequencerPoolPartition> container, ModelMap model,
+      SessionStatus session) throws IOException, MalformedRunException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       if (!container.userCanWrite(user)) {

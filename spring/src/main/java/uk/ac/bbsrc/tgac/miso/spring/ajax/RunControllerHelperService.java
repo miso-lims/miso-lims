@@ -257,8 +257,11 @@ public class RunControllerHelperService {
       b.append(
           "<tr><td>Location:</td><td><input type='text' id='sequencerPartitionContainers[0].locationBarcode' name='sequencerPartitionContainers[0].locationBarcode'/></td></tr>");
       b.append(
-          "<tr><td>Paired:</td><td><input type='checkbox' id='sequencerPartitionContainers[0].paired' name='sequencerPartitionContainers[0].paired' value='false'/></td></tr>");
+          "<tr><td>Validation:</td><td><input type='text' id='sequencerPartitionContainers[0].validationBarcode' name='sequencerPartitionContainers[0].validationBarcode'/><input type='hidden' value='on' name='_validationBarcode'></td></tr>");
+      b.append(
+          "<tr id='pairedRow'><td>Paired:</td><td><input type='checkbox' id='sequencerPartitionContainers[0].paired' name='sequencerPartitionContainers[0].paired' value='false'/></td></tr>");
       b.append("</table>");
+      b.append("<input type='hidden' id='sequencerPartitionContainers[0].id' name='sequencerPartitionContainers[0].id' value='0' />");
       b.append("<div id='partitionErrorDiv'> </div>");
       b.append("<div id='partitionDiv'>");
       b.append("<table class='in'>");
@@ -283,8 +286,11 @@ public class RunControllerHelperService {
       b.append(
           "<tr><td>Location:</td><td><input type='text' id='sequencerPartitionContainers[0].locationBarcode' name='sequencerPartitionContainers[0].locationBarcode'/></td></tr>");
       b.append(
-          "<tr><td>Paired:</td><td><input type='checkbox' id='sequencerPartitionContainers[0].paired' name='sequencerPartitionContainers[0].paired' value='false'/></td></tr>");
+          "<tr><td>Validation:</td><td><input type='text' id='sequencerPartitionContainers[0].validationBarcode' name='sequencerPartitionContainers[0].validationBarcode'/><input type='hidden' value='on' name='_validationBarcode'></td></tr>");
+      b.append(
+          "<tr id='pairedRow'><td>Paired:</td><td><input type='checkbox' id='sequencerPartitionContainers[0].paired' name='sequencerPartitionContainers[0].paired' value='false'/></td></tr>");
       b.append("</table>");
+      b.append("<input type='hidden' id='sequencerPartitionContainers[0].id' name='sequencerPartitionContainers[0].id' value='0' />");
       b.append("<div id='partitionErrorDiv'> </div>");
       b.append("<div id='partitionDiv'>");
       b.append("<input id='lane2' name='container0Select' onchange='Run.ui.changeIlluminaLane(this, 0);' type='radio' value='2'/>2 ");
@@ -305,9 +311,11 @@ public class RunControllerHelperService {
             + i + "].identificationBarcode' name='sequencerPartitionContainers[" + i + "].identificationBarcode'/></div></td></tr>");
         b.append("<tr><td>Location:</td><td><input type='text' id='sequencerPartitionContainers[" + i
             + "].locationBarcode' name='sequencerPartitionContainers[" + i + "].locationBarcode'/></td></tr>");
-        b.append("<tr><td>Paired:</td><td><input type='checkbox' id='sequencerPartitionContainers[" + i
+        b.append("<tr id='pairedRow'><td>Paired:</td><td><input type='checkbox' id='sequencerPartitionContainers[" + i
             + "].paired' name='sequencerPartitionContainers[" + i + "].paired' value='false'/></td></tr>");
         b.append("</table>");
+        b.append("<input type='hidden' id='sequencerPartitionContainers[" + i + "].id' name='sequencerPartitionContainers[" + i
+            + "].id' value='0' />");
         b.append("<div id='partitionErrorDiv'> </div>");
         b.append("<div id='partitionDiv'>");
         b.append("<table class='in'>");
@@ -390,9 +398,11 @@ public class RunControllerHelperService {
           + i + "].identificationBarcode' name='sequencerPartitionContainers[" + i + "].identificationBarcode'/></div></td></tr>");
       b.append("<tr><td>Location:</td><td><input type='text' id='sequencerPartitionContainers[" + i
           + "].locationBarcode' name='sequencerPartitionContainers[" + i + "].locationBarcode'/></td></tr>");
-      b.append("<tr><td>Paired:</td><td><input type='checkbox' id='sequencerPartitionContainers[" + i
+      b.append("<tr id='pairedRow'><td>Paired:</td><td><input type='checkbox' id='sequencerPartitionContainers[" + i
           + "].paired' name='sequencerPartitionContainers[" + i + "].paired'/></td></tr>");
       b.append("</table>");
+      b.append("<input type='hidden' id='sequencerPartitionContainers[" + i + "].id' name='sequencerPartitionContainers[" + i
+          + "].id' value='0' />");
       b.append("<div id='partitionErrorDiv'> </div>");
       b.append("<div id='partitionDiv'>");
       b.append("<input id='chamber1' name='container" + i + "Select' onchange='Run.ui.changeLS454Chamber(this, " + i
@@ -455,9 +465,11 @@ public class RunControllerHelperService {
           + i + "].identificationBarcode' name='sequencerPartitionContainers[" + i + "].identificationBarcode'/></div></td></tr>");
       b.append("<tr><td>Location:</td><td><input type='text' id='sequencerPartitionContainers[" + i
           + "].locationBarcode' name='sequencerPartitionContainers[" + i + "].locationBarcode'/></td></tr>");
-      b.append("<tr><td>Paired:</td><td><input type='checkbox' id='sequencerPartitionContainers[" + i
+      b.append("<tr id='pairedRow'><td>Paired:</td><td><input type='checkbox' id='sequencerPartitionContainers[" + i
           + "].paired' name='sequencerPartitionContainers[" + i + "].paired'/></td></tr>");
       b.append("</table>");
+      b.append("<input type='hidden' id='sequencerPartitionContainers[" + i + "].id' name='sequencerPartitionContainers[" + i
+          + "].id' value='0' />");
       b.append("<div id='partitionErrorDiv'> </div>");
       b.append("<div id='partitionDiv'>");
       if ("AB SOLiD 5500xl".equals(run.getSequencerReference().getPlatform().getInstrumentModel())) {
@@ -542,9 +554,11 @@ public class RunControllerHelperService {
           + i + "].identificationBarcode' name='sequencerPartitionContainers[" + i + "].identificationBarcode'/></div></td></tr>");
       b.append("<tr><td>Location:</td><td><input type='text' id='sequencerPartitionContainers[" + i
           + "].locationBarcode' name='sequencerPartitionContainers[" + i + "].locationBarcode'/></td></tr>");
-      b.append("<tr><td>Paired:</td><td><input type='checkbox' id='sequencerPartitionContainers[" + i
+      b.append("<tr id='pairedRow'><td>Paired:</td><td><input type='checkbox' id='sequencerPartitionContainers[" + i
           + "].paired' name='sequencerPartitionContainers[" + i + "].paired'/></td></tr>");
       b.append("</table>");
+      b.append("<input type='hidden' id='sequencerPartitionContainers[" + i + "].id' name='sequencerPartitionContainers[" + i
+          + "].id' value='0' />");
       b.append("<div id='partitionErrorDiv'> </div>");
       b.append("<div id='partitionDiv'>");
 
@@ -825,7 +839,8 @@ public class RunControllerHelperService {
                 sb.append("<div id='p_div_" + (p.getPartitionNumber() - 1) + "' class='elementListDroppableDiv'>");
                 sb.append("<ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + containerNum + "].partitions["
                     + (p.getPartitionNumber() - 1) + "].pool' partition='" + (p.getPartitionNumber() - 1)
-                    + "' ondblclick='Run.container.populatePartition(this, " + containerNum + ", " + (p.getPartitionNumber() - 1) + ");'></ul>");
+                    + "' ondblclick='Run.container.populatePartition(this, " + containerNum + ", " + (p.getPartitionNumber() - 1)
+                    + ");'></ul>");
                 sb.append("</div>");
               }
               sb.append("</td>");
@@ -834,8 +849,12 @@ public class RunControllerHelperService {
             sb.append("</table>");
             Map<String, Object> responseMap = new HashMap<String, Object>();
             responseMap.put("html", sb.toString());
+
             responseMap.put("barcode", f.getIdentificationBarcode());
             responseMap.put("verify", confirm);
+            responseMap.put("location", f.getLocationBarcode());
+            responseMap.put("validation", f.getValidationBarcode());
+            responseMap.put("partitionContainerId", f.getId());
             return JSONUtils.JSONObjectResponse(responseMap);
           } else {
             // choose container

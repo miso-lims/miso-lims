@@ -202,7 +202,7 @@ public class ContainerControllerHelperService {
     b.append(
         "<tr><td>Validation:</td><td><input type='text' id='validationBarcode' name='validationBarcode'/><input type='hidden' value='on' name='_validationBarcode'></td></tr>");
     b.append(
-        "<tr><td>Paired:</td><td><input type='checkbox' id='paired' name='paired' value='false'/><input type='hidden' value='on' name='_paired'></td></tr>");
+        "<tr id='pairedRow'><td>Paired:</td><td><input type='checkbox' id='paired' name='paired' value='false'/><input type='hidden' value='on' name='_paired'></td></tr>");
     b.append("</table>");
     b.append("<div id='partitionErrorDiv'> </div>");
     b.append("<div id='partitionDiv'>");
@@ -289,7 +289,7 @@ public class ContainerControllerHelperService {
     b.append(
         "<tr><td>Validation:</td><td><input type='text' id='validationBarcode' name='validationBarcode'/><input type='hidden' value='on' name='_validationBarcode'></td></tr>");
     b.append(
-        "<tr><td>Paired:</td><td><input type='checkbox' id='paired' name='paired'/><input type='hidden' value='on' name='_paired'></td></tr>");
+        "<tr id='pairedRow'><td>Paired:</td><td><input type='checkbox' id='paired' name='paired'/><input type='hidden' value='on' name='_paired'></td></tr>");
     b.append("</table>");
     b.append("<div id='partitionErrorDiv'> </div>");
     b.append("<div id='partitionDiv'>");
@@ -322,7 +322,7 @@ public class ContainerControllerHelperService {
       b.append(
           "<tr><td>Validation:</td><td><input type='text' id='validationBarcode' name='validationBarcode'/><input type='hidden' value='on' name='_validationBarcode'></td></tr>");
       b.append(
-          "<tr><td>Paired:</td><td><input type='checkbox' id='paired' name='paired'/><input type='hidden' value='on' name='_paired'></td></tr>");
+          "<tr id='pairedRow'><td>Paired:</td><td><input type='checkbox' id='paired' name='paired'/><input type='hidden' value='on' name='_paired'></td></tr>");
       b.append("</table>");
       b.append("<div id='partitionErrorDiv'> </div>");
       b.append("<div id='partitionDiv'>");
@@ -380,7 +380,7 @@ public class ContainerControllerHelperService {
     b.append(
         "<tr><td>Validation:</td><td><input type='text' id='validationBarcode' name='validationBarcode'/><input type='hidden' value='on' name='_validationBarcode'></td></tr>");
     b.append(
-        "<tr><td>Paired:</td><td><input type='checkbox' id='paired' name='paired'/><input type='hidden' value='on' name='_paired'></td></tr>");
+        "<tr id='pairedRow'><td>Paired:</td><td><input type='checkbox' id='paired' name='paired'/><input type='hidden' value='on' name='_paired'></td></tr>");
     b.append("</table>");
     b.append("<div id='partitionErrorDiv'> </div>");
     b.append("<div id='partitionDiv'>");

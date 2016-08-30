@@ -31,6 +31,10 @@
 <script src="<c:url value='/scripts/jquery/datatables/js/jquery.dataTables.min.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/parsley/parsley.min.js'/>" type="text/javascript"></script>
 <!--  sequencer_partition_container_ajax.js is already included in header -->
+<script type="text/javascript">
+    <!-- Boolean to indicate if this is a detailed sample or not. Used by js at run time to hide features. -->
+    var detailedSample = ${detailedSample};
+</script>
 
 <div id="maincontent">
 <div id="contentcolumn">
@@ -182,7 +186,7 @@
                                                     or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
                         <a href="javascript:void(0);"
                            onclick="Container.ui.editContainerLocationBarcode(jQuery('#locationBarcode'), 0)">
-                          <span class="fg-button ui-icon ui-icon-pencil"></span>
+                          <span id="locationBarcodePencil" class="fg-button ui-icon ui-icon-pencil"></span>
                         </a>
                       </c:if>
                     </td>
@@ -203,7 +207,7 @@
                                                     or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
                         <a href="javascript:void(0);"
                            onclick="Container.ui.editContainerValidationBarcode(jQuery('#validationBarcode'), 0)">
-                          <span class="fg-button ui-icon ui-icon-pencil"></span>
+                          <span id="validationBarcodePencil" class="fg-button ui-icon ui-icon-pencil"></span>
                         </a>
                       </c:if>
                     </td>
