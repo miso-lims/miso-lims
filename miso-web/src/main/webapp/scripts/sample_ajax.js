@@ -1377,7 +1377,8 @@ Sample.ui = {
   },
   
   /**
-   * Returns an array of SampleValidRelationships objects. Each SVR can be parented to at least one selected sample.
+   * Returns an array of SampleValidRelationships objects that have archived = false.
+   * Each SVR can be parented to at least one selected sample.
    */
   selectValidRelationships: function  () {
     // get unique sample class IDs
@@ -1386,9 +1387,9 @@ Sample.ui = {
       });
     selectedSCIDs = Sample.ui.getUniqueValues(selectedSCIDs);
 
-    // get unique sample class IDs of children that can be parented to sample classes of the selected samples
+    // get unique sample class IDs of children that can be parented to sample classes of the selected samples (and archived = false)
     var permittedChildSCIDs = Sample.validRelationships.filter(function (svr) {
-      return selectedSCIDs.indexOf(svr.parentId) != -1;
+      return selectedSCIDs.indexOf(svr.parentId) != -1 && !svr.archived;
     }).map(function (svr) {
       return svr.childId;
     });

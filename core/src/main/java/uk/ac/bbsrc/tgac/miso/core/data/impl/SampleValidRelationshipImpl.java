@@ -18,7 +18,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 
 @Entity
-@Table(name = "SampleValidRelationship", uniqueConstraints = @UniqueConstraint(columnNames = { "parentId", "childId" }) )
+@Table(name = "SampleValidRelationship", uniqueConstraints = @UniqueConstraint(columnNames = { "parentId", "childId" }))
 public class SampleValidRelationshipImpl implements SampleValidRelationship {
 
   @Id
@@ -46,6 +46,9 @@ public class SampleValidRelationshipImpl implements SampleValidRelationship {
 
   @Column(nullable = false)
   private Date lastUpdated;
+
+  @Column(nullable = false)
+  private Boolean archived;
 
   @Override
   public Long getId() {
@@ -115,6 +118,16 @@ public class SampleValidRelationshipImpl implements SampleValidRelationship {
   @Override
   public void setChild(SampleClass child) {
     this.child = child;
+  }
+
+  @Override
+  public Boolean getArchived() {
+    return archived;
+  }
+
+  @Override
+  public void setArchived(Boolean archived) {
+    this.archived = archived;
   }
 
 }
