@@ -939,7 +939,11 @@ Sample.hot = {
     function validateNumber (value, callback) {
       return callback(value === '' || value === null || Handsontable.helper.isNumeric(value) && value >= 0);
     }
-    
+
+    function validatePosReqdNumber (value, callback) {
+      return callback(Handsontable.helper.isNumeric(value) && value >=0);
+    }
+
     function validateAlphanumeric (value, callback) {
       var alphanumRegex = /^[-\w]+$/;
       return callback(value === '' || value === null || alphanumRegex.test(value));
