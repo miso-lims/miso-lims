@@ -210,7 +210,7 @@
     </c:choose>
 
     <span id="aliasCounter" class="counter"></span>
-    <c:if test="${detailedSample && library.hasNonStandardAlias()}">
+    <c:if test="${detailedSample && library.libraryAdditionalInfo.hasNonStandardAlias()}">
       <ul class="parsley-errors-list filled" id="nonStandardAlias">
         <li class="parsley-custom-error-message">
         Double-check this alias -- it will be saved even if it is duplicated or does not follow the naming standard!
