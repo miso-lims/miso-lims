@@ -34,4 +34,6 @@ public interface TissueOrigin {
 
   public void setLastUpdated(Date lastUpdated);
 
+  public String getItemLabel();
+
 }

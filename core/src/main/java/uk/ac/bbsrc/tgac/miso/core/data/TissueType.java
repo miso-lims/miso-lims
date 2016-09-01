@@ -34,4 +34,6 @@ public interface TissueType {
 
   public void setLastUpdated(Date lastUpdated);
 
+  public String getItemLabel();
+
 }

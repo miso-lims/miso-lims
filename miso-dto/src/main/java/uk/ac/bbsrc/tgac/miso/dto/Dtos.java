@@ -102,6 +102,7 @@ public class Dtos {
     dto.setId(from.getId());
     dto.setAlias(from.getAlias());
     dto.setDescription(from.getDescription());
+    dto.setLabel(from.getItemLabel());
     dto.setCreatedById(from.getCreatedBy().getUserId());
     dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
     dto.setUpdatedById(from.getUpdatedBy().getUserId());
@@ -130,6 +131,7 @@ public class Dtos {
     dto.setId(from.getId());
     dto.setAlias(from.getAlias());
     dto.setDescription(from.getDescription());
+    dto.setLabel(from.getItemLabel());
     dto.setCreatedById(from.getCreatedBy().getUserId());
     dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
     dto.setUpdatedById(from.getUpdatedBy().getUserId());
@@ -346,8 +348,7 @@ public class Dtos {
    * identity, which may or may not yet exist</li>
    * </ol>
    * 
-   * @param childDto
-   *          the DTO to take parent details from
+   * @param childDto the DTO to take parent details from
    * @return the parent details from the DTO, or null if there are none. A returned sample will also include its own parent if applicable.
    */
   private static SampleAdditionalInfo getParent(SampleAdditionalInfoDto childDto) {

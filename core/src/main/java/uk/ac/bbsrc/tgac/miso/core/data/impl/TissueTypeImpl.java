@@ -116,6 +116,7 @@ public class TissueTypeImpl implements TissueType {
   /**
    * Get custom label for dropdown options
    */
+  @Override
   public String getItemLabel() {
     String label = getAlias() + " (" + getDescription() + ")";
     return (label.length() < 51 ? label : label.substring(0, 49) + "\u2026");
