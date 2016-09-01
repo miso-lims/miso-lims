@@ -99,7 +99,7 @@
               <td>Plate Material Type:</td>
               <td>
                 <form:radiobuttons id="plateMaterialType" path="plateMaterialType"
-                                   onchange="Plate.tagbarcode.getPlateBarcodesByMaterialType(this);"/>
+                                   onchange="Plate.index.getPlateIndicesByMaterialType(this);"/>
               </td>
             </c:when>
             <c:otherwise>
@@ -109,7 +109,7 @@
           </c:choose>
         </tr>
         <tr>
-          <td id="plateBarcodeSelect">
+          <td id="plateIndexSelect">
             <i>Please choose a material type above...</i>
           </td>
         </tr>

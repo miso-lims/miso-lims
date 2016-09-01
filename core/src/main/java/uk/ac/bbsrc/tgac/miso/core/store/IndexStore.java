@@ -25,21 +25,21 @@ package uk.ac.bbsrc.tgac.miso.core.store;
 
 import java.util.List;
 
-import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
-import uk.ac.bbsrc.tgac.miso.core.data.TagBarcodeFamily;
+import uk.ac.bbsrc.tgac.miso.core.data.Index;
+import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
-public interface TagBarcodeStore {
+public interface IndexStore {
 
-  public TagBarcodeFamily getTagBarcodeFamilyByName(String name);
+  public IndexFamily getIndexFamilyByName(String name);
 
-  public List<TagBarcodeFamily> getTagBarcodeFamilies();
+  public List<IndexFamily> getIndexFamilies();
 
-  public List<TagBarcodeFamily> getTagBarcodeFamiliesByPlatform(PlatformType platformType);
+  public List<IndexFamily> getIndexFamiliesByPlatform(PlatformType platformType);
 
-  public TagBarcode getTagBarcodeById(long id);
+  public Index getIndexById(long id);
 
-  public List<TagBarcode> listAllTagBarcodes(PlatformType platformType);
-  
-  public List<TagBarcode> listAllTagBarcodes();
+  public List<Index> listAllIndices(PlatformType platformType);
+
+  public List<Index> listAllIndices();
 }

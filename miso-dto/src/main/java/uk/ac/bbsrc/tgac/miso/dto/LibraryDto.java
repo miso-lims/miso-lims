@@ -28,11 +28,11 @@ public class LibraryDto {
   private Long parentSampleId;
   private String platformName;
   private Boolean qcPassed;
-  private Long tagBarcodeIndex1Id;
-  private Long tagBarcodeIndex2Id;
-  private String tagBarcodeIndex1Label;
-  private String tagBarcodeIndex2Label;
-  private String tagBarcodeFamilyName;
+  private Long index1Id;
+  private Long index2Id;
+  private String index1Label;
+  private String index2Label;
+  private String indexFamilyName;
   private String url;
   private Double volume;
 
@@ -116,24 +116,24 @@ public class LibraryDto {
     return qcPassed;
   }
 
-  public Long getTagBarcodeIndex1Id() {
-    return tagBarcodeIndex1Id;
+  public Long getIndex1Id() {
+    return index1Id;
   }
 
-  public Long getTagBarcodeIndex2Id() {
-    return tagBarcodeIndex2Id;
+  public Long getIndex2Id() {
+    return index2Id;
   }
 
-  public String getTagBarcodeIndex1Label() {
-    return tagBarcodeIndex1Label;
+  public String getIndex1Label() {
+    return index1Label;
   }
 
-  public String getTagBarcodeIndex2Label() {
-    return tagBarcodeIndex2Label;
+  public String getIndex2Label() {
+    return index2Label;
   }
 
-  public String getTagBarcodeFamilyName() {
-    return tagBarcodeFamilyName;
+  public String getIndexFamilyName() {
+    return indexFamilyName;
   }
 
   public String getUrl() {
@@ -229,28 +229,28 @@ public class LibraryDto {
   }
 
   @JsonSerialize(include = JsonSerialize.Inclusion.ALWAYS)
-  public void setTagBarcodeIndex1Id(Long tagBarcodeIndex1Id) {
-    this.tagBarcodeIndex1Id = tagBarcodeIndex1Id;
+  public void setIndex1Id(Long index1Id) {
+    this.index1Id = index1Id;
   }
 
   @JsonSerialize(include = JsonSerialize.Inclusion.ALWAYS)
-  public void setTagBarcodeIndex2Id(Long tagBarcodeIndex2Id) {
-    this.tagBarcodeIndex2Id = tagBarcodeIndex2Id;
+  public void setIndex2Id(Long index2Id) {
+    this.index2Id = index2Id;
   }
 
   @JsonSerialize(include = JsonSerialize.Inclusion.ALWAYS)
-  public void setTagBarcodeIndex1Label(String tagBarcodeIndex1Label) {
-    this.tagBarcodeIndex1Label = tagBarcodeIndex1Label;
+  public void setIndex1Label(String index1Label) {
+    this.index1Label = index1Label;
   }
 
   @JsonSerialize(include = JsonSerialize.Inclusion.ALWAYS)
-  public void setTagBarcodeIndex2Label(String tagBarcodeIndex2Label) {
-    this.tagBarcodeIndex2Label = tagBarcodeIndex2Label;
+  public void setIndex2Label(String index2Label) {
+    this.index2Label = index2Label;
   }
 
   @JsonSerialize(include = JsonSerialize.Inclusion.ALWAYS)
-  public void setTagBarcodeFamilyName(String tagBarcodeFamilyName) {
-    this.tagBarcodeFamilyName = tagBarcodeFamilyName;
+  public void setIndexFamilyName(String indexFamilyName) {
+    this.indexFamilyName = indexFamilyName;
   }
 
   public void setUrl(String url) {

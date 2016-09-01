@@ -48,7 +48,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  * <p/>
  * Library properties are specified mainly by the SRA schema requirements, i.e. they have a {@link LibraryType}, a
  * {@link LibraryStrategyType} and a {@link LibrarySelectionType} which are SRA enumerations. Libraries also have a target {@link Platform}
- * and can be barcoded via {@link TagBarcode} objects for multiplexing purposes.
+ * and can be uniquely identified via {@link Index} objects for multiplexing purposes.
  * 
  * @author Rob Davey
  * @since 0.0.2
@@ -219,14 +219,14 @@ public interface Library extends SecurableByProfile, Comparable, Barcodable, Loc
   public void setLibraryStrategyType(LibraryStrategyType libraryStrategyType);
 
   /**
-   * Returns the position-indexed list of TagBarcodes for this Library object.
+   * Returns the position-indexed list of Indices for this Library object.
    */
-  public List<TagBarcode> getTagBarcodes();
+  public List<Index> getIndices();
 
   /**
-   * Sets the position-indexed list of TagBarcodes for this Library object.
+   * Sets the position-indexed list of Indices for this Library object.
    */
-  public void setTagBarcodes(List<TagBarcode> tagBarcodes);
+  public void setIndices(List<Index> indices);
 
   /**
    * Returns the platformName of this Library object.
@@ -328,7 +328,7 @@ public interface Library extends SecurableByProfile, Comparable, Barcodable, Loc
 
   public void setLibraryAdditionalInfo(LibraryAdditionalInfo libraryAdditionalInfo);
 
-  public TagBarcodeFamily getCurrentFamily();
+  public IndexFamily getCurrentFamily();
 
   void setLastModified(Date lastModified);
 }

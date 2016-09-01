@@ -45,8 +45,8 @@ Library.hot = {
           lib.libraryAdditionalInfo.prepKit = { id: '', alias: '' };
         }
       }
-      if (!lib.tagBarcodeFamilyName) {
-        lib.tagBarcodeFamilyName = 'No barcode';
+      if (!lib.indexFamilyName) {
+        lib.indexFamilyName = 'No index';
       }
       return lib;
     });
@@ -90,9 +90,9 @@ Library.hot = {
     document.getElementById('hotContainer').style.display = '';
     
     Library.hot.ltIndex = Hot.getColIndex('libraryTypeAlias');
-    Library.hot.tbfIndex = Hot.getColIndex('tagBarcodeFamilyName');
-    Library.hot.tb1ColIndex = Hot.getColIndex('tagBarcodeIndex1Label');
-    Library.hot.tb2ColIndex = Hot.getColIndex('tagBarcodeIndex2Label');
+    Library.hot.ifamIndex = Hot.getColIndex('indexFamilyName');
+    Library.hot.index1ColIndex = Hot.getColIndex('index1Label');
+    Library.hot.index2ColIndex = Hot.getColIndex('index2Label');
     Library.hot.pfIndex = Hot.getColIndex('platformName');
     
     var aliasColIndex = Hot.getColIndex('alias');
@@ -114,10 +114,10 @@ Library.hot = {
   // TODO: add function regenerateWithQcs
   
   /**
-   * Bulk changes to Platform or Barcode Kit mean there need to be corresponding bulk changes to Indexes, etc. 
-   * This hook sets the correct source for dependent columns once Platform or Barcode Kit are changed.
+   * Bulk changes to Platform or Index Family mean there need to be corresponding bulk changes to Indices, etc. 
+   * This hook sets the correct source for dependent columns once Platform or Index Family are changed.
    */
-  addPlatformAndTBHooks: function () {
+  addPlatformAndIndexHooks: function () {
     Hot.hotTable.addHook('afterChange', function (changes, source) {
       // 'changes' is a variable-length array of arrays. Each inner array has the following structure:
       // [rowIndex, colName, oldValue, newValue]
@@ -130,9 +130,9 @@ Library.hot = {
                 Library.hot.changePlatform(changes[i][0], changes[i][1], changes[i][2], changes[i][3]);
               }
               break;
-            case 'tagBarcodeFamilyName':
+            case 'indexFamilyName':
               if (changes[i][2] != changes[i][3]) {
-                Library.hot.changeBarcodeKit(changes[i][0], changes[i][1], changes[i][2], changes[i][3]);
+                Library.hot.changeIndexFamily(changes[i][0], changes[i][1], changes[i][2], changes[i][3]);
               }
               break;
           }
@@ -163,9 +163,9 @@ Library.hot = {
     libraryTypeAlias: '',
     lowQuality: null,
     platformName: '',
-    tagBarcodeFamilyName: '',
-    tagBarcodeIndex1Label: '',
-    tagBarcodeIndex2Label: '',
+    indexFamilyName: '',
+    index1Label: '',
+    index2Label: '',
     volume: null,
     libraryAdditionalInfo: {
       prepKit: {
@@ -214,21 +214,21 @@ Library.hot = {
   },
   
   /**
-   * Gets array of tagBarcode composites (name and sequence)
+   * Gets array of index labels (name and sequence)
    */
-  getBcLabels: function (bcCollection) {
-    return Hot.sortByProperty(bcCollection, 'id').map(function (bc) { return bc.label; });
+  getIndexLabels: function (indexCollection) {
+    return Hot.sortByProperty(indexCollection, 'id').map(function (index) { return index.label; });
   },
   
   /**
-   * Gets tagBarcode id associated with given barcode composite (name and sequence)
+   * Gets index id associated with given index label (name and sequence)
    */
-  getIdFromBcLabel: function (label, bcCollection) {
-    return bcCollection.filter(function (bc) {
-      return (bc.label == label); 
+  getIdFromIndexLabel: function (label, indexCollection) {
+    return indexCollection.filter(function (index) {
+      return (index.label == label); 
     })[0].id;
   },
-  
+
   /**
    * Sets columns for table
    */
@@ -289,14 +289,14 @@ Library.hot = {
           trimDropdown: false,
           source: Library.hot.getStrategyTypes()
         },{
-          header: 'Barcode Kit',
-          data: 'tagBarcodeFamilyName',
+          header: 'Index Kit',
+          data: 'indexFamilyName',
           type: 'dropdown',
           trimDropdown: false,
           source: ''
         },{
           header: 'Index 1',
-          data: 'tagBarcodeIndex1Label',
+          data: 'index1Label',
           type: 'autocomplete',
           strict: true,
           allowInvalid: true,
@@ -304,7 +304,7 @@ Library.hot = {
           source: [""]
         },{
           header: 'Index 2',
-          data: 'tagBarcodeIndex2Label',
+          data: 'index2Label',
           type: 'autocomplete',
           strict: true,
           allowInvalid: true,
@@ -378,115 +378,121 @@ Library.hot = {
   },
 
   /**
-   * Detects Platform change for a row and clears out library types, tagBarcode kits, tagBarcodes
+   * Detects Platform change for a row and clears out library type, index family, and indices as these are all platform-specific
    */
   changePlatform: function (row, col, from, to) {
     // update library types
     Hot.startData[row].libraryTypeAlias = '';
     Hot.hotTable.setCellMeta(row, Library.hot.ltIndex, 'source', Library.hot.libraryTypeAliases[to]);
 
-    Library.hot.updateTBFamilyCellsSources(row, to);
-    // clear tagBarcodeFamily and tagBarcodes
-    Hot.hotTable.setDataAtCell(row, Library.hot.tbfIndex, '', 'platform change');
-    Hot.startData[row].tagBarcodeIndex1Label = '';
-    Hot.startData[row].tagBarcodeIndex2Label = '';
+    Library.hot.updateIndexFamilyCellsSources(row, to);
+    // clear indexFamily and indices columns
+    Hot.hotTable.setDataAtCell(row, Library.hot.ifamIndex, '', 'platform change');
+    Hot.startData[row].index1Label = '';
+    Hot.startData[row].index2Label = '';
   },
-  
-  updateTBFamilyCellsSources: function (row, platformName) {
-    // update barcode kits
-    // use stored barcode kits if these have already been retrieved.
-    Hot.hotTable.setCellMeta(row, Library.hot.tb1ColIndex, 'source', [""]);
-    Hot.hotTable.setCellMeta(row, Library.hot.tb2ColIndex, 'source', [""]);
-    if (Hot.dropdownRef.barcodeKits[platformName]) {
-      Hot.hotTable.setCellMeta(row, Library.hot.tbfIndex, 'source', Object.keys(Hot.dropdownRef.tagBarcodes[platformName]));
+
+  /**
+   * Updates Index Family column source (usually triggered by Platform change)
+   */
+  updateIndexFamilyCellsSources: function (row, platformName) {
+    // update index family
+    // use stored index family if it has already been retrieved.
+    Hot.hotTable.setCellMeta(row, Library.hot.index1ColIndex, 'source', [""]);
+    Hot.hotTable.setCellMeta(row, Library.hot.index2ColIndex, 'source', [""]);
+    if (Hot.dropdownRef.indexFamily[platformName]) {
+      Hot.hotTable.setCellMeta(row, Library.hot.ifamIndex, 'source', Object.keys(Hot.dropdownRef.indices[platformName]));
     } else if (platformName) {
-      jQuery.get('../../tagBarcodeFamiliesJson', {platform: platformName},
+      jQuery.get('../../indexFamiliesJson', {platform: platformName},
         function (data) {
-          Hot.hotTable.setCellMeta(row, Library.hot.tbfIndex, 'source', data['barcodeKits']);
-          Hot.dropdownRef.barcodeKits[platformName] = {};
-          Hot.dropdownRef.barcodeKits[platformName] = data['barcodeKits'];
+          Hot.hotTable.setCellMeta(row, Library.hot.ifamIndex, 'source', data['indexFamilies']);
+          Hot.dropdownRef.indexFamilies[platformName] = {};
+          Hot.dropdownRef.indexFamilies[platformName] = data['indexFamilies'];
         }    
       );
     }
   },
-  
-  updateTBCellsSources: function (row, platformName, tbfName) {
-    function setTBSource (platformName, tbfName, pos, len) {
-      Hot.hotTable.setCellMeta(row, Library.hot['tb' + pos + 'ColIndex'], 'source', Library.hot.getBcLabels(Hot.dropdownRef.tagBarcodes[platformName][tbfName][pos]));
+
+  /**
+   * Updates the source arrays for index1Label and index2Label columns (usually triggered by Index Family change)
+   */
+  updateIndexCellsSources: function (row, platformName, ifam) {
+    function setIndexSource (platformName, ifam, pos, len) {
+      Hot.hotTable.setCellMeta(row, Library.hot['tb' + pos + 'ColIndex'], 'source', Library.hot.getIndexLabels(Hot.dropdownRef.indices[platformName][ifam][pos]));
       Hot.hotTable.setCellMeta(row, Library.hot['tb' + pos + 'ColIndex'], 'readOnly', false);
-      // empty source array for barcode 2 column in case there are no barcodes for position 2
+      // empty source array for index 2 column in case there are no indices for position 2
       if (pos == 1) {
-        Hot.hotTable.setCellMeta(row, Library.hot['tb2ColIndex'], 'source', [""]);
-        Hot.hotTable.setCellMeta(row, Library.hot['tb2ColIndex'], 'readOnly', true);
+        Hot.hotTable.setCellMeta(row, Library.hot['index2ColIndex'], 'source', [""]);
+        Hot.hotTable.setCellMeta(row, Library.hot['index2ColIndex'], 'readOnly', true);
       }
     }
-    if (Hot.dropdownRef.tagBarcodes[platformName] && Hot.dropdownRef.tagBarcodes[platformName][tbfName] && Hot.dropdownRef.tagBarcodes[platformName][tbfName]['1']) {
-      // if tagBarcodes for this tagBarcodeFamily are already stored locally, use these
-      var tbfNameKeysLength = Object.keys(Hot.dropdownRef.tagBarcodes[platformName][tbfName]).length;
-      for (var posn = 1; posn <= tbfNameKeysLength; posn++) {
-        setTBSource(platformName, tbfName, posn, tbfNameKeysLength);
+    if (Hot.dropdownRef.indices[platformName] && Hot.dropdownRef.indices[platformName][ifam] && Hot.dropdownRef.indices[platformName][ifam]['1']) {
+      // if indices for this indexFamily are already stored locally, use these
+      var ifamKeysLength = Object.keys(Hot.dropdownRef.indices[platformName][ifam]).length;
+      for (var posn = 1; posn <= ifamKeysLength; posn++) {
+        setIndexSource(platformName, ifam, posn, ifamKeysLength);
       }
-    } else if (tbfName != 'No barcode' && tbfName && platformName) {
-      // get tagBarcodes from server
-      jQuery.get("../../barcodePositionsJson", {tagBarcodeFamily: tbfName},
+    } else if (ifam != 'No index' && ifam && platformName) {
+      // get indices from server
+      jQuery.get("../../library/indexPositionsJson", {indexFamily: ifam},
         function(posData) {
-          for (var pos = 1; pos < posData['numApplicableBarcodes']; pos++) {
-            // set tagBarcodeData
-            Hot.dropdownRef.tagBarcodes[platformName][tbfName] = {};
-            jQuery.get('../../tagBarcodesJson', {tagBarcodeFamily: tbfName, position: pos},
-              function (bcData) {
-                Hot.dropdownRef.tagBarcodes[platformName][tbfName][pos] = bcData.tagBarcodes;
-                setTBSource(platformName, tbfName, pos, posData['numApplicableBarcodes']);
+          for (var pos = 1; pos < posData['numApplicableIndices']; pos++) {
+            // set indices in stored object
+            Hot.dropdownRef.indices[platformName][ifam] = {};
+            jQuery.get('../../library/indicesJson', {indexFamily: ifam, position: pos},
+              function (json) {
+                Hot.dropdownRef.indices[platformName][ifam][pos] = json.indices;
+                setIndexSource(platformName, ifam, pos, posData['numApplicableIndices']);
               }
             );
           }
         }
       );
-    } else if (tbfName == 'No barcode') {
-      Hot.hotTable.setCellMeta(row, Library.hot.tb1ColIndex, 'readOnly', true);
-      Hot.hotTable.setCellMeta(row, Library.hot.tb2ColIndex, 'readOnly', true);
+    } else if (ifam == 'No index') {
+      Hot.hotTable.setCellMeta(row, Library.hot.index1ColIndex, 'readOnly', true);
+      Hot.hotTable.setCellMeta(row, Library.hot.index2ColIndex, 'readOnly', true);
     }
   },
   
   /**
-   * Detects tagBarcode kit changes for a row and clears out tagBarcodes
+   * Detects index family change for a row and clears out indices
    */
-  changeBarcodeKit: function (row, col, from, to) {
-    // use stored barcodes if these have already been retrieved. 'to' == tagBarcodeFamily name
+  changeIndexFamily: function (row, col, from, to) {
+    // use stored indices if these have already been retrieved. 'to' == indexFamily name
     var pfName = Hot.hotTable.getDataAtCell(row, Library.hot.pfIndex);
 
-    // clear out pre-existing tagBarcodes
-    Hot.startData[row].tagBarcodeIndex1Label = '';
-    Hot.startData[row].tagBarcodeIndex2Label = '';
-    Hot.hotTable.setDataAtCell(row, Library.hot.tb1ColIndex, '', 'barcode kit change');
-    Hot.hotTable.setDataAtCell(row, Library.hot.tb2ColIndex, '', 'barcode kit change');
-    Library.hot.updateTBCellsSources(row, pfName, to);
+    // clear out pre-existing indices
+    Hot.startData[row].index1Label = '';
+    Hot.startData[row].index2Label = '';
+    Hot.hotTable.setDataAtCell(row, Library.hot.index1ColIndex, '', 'index family change');
+    Hot.hotTable.setDataAtCell(row, Library.hot.index2ColIndex, '', 'index family change');
+    Library.hot.updateIndexCellsSources(row, pfName, to);
   },
   
   /**
-   * Gets tagBarcode kits data from server
+   * Gets index families data from server
    */
-  getBarcodeKitsOnly: function (platformName) {
-    jQuery.get('../../tagBarcodeFamiliesJson', {platform: platformName},
+  getIndexFamiliesOnly: function (platformName) {
+    jQuery.get('../../indexFamiliesJson', {platform: platformName},
       function (data) {
-        Hot.dropdownRef.barcodeKits[platformName] = {};
-        Hot.dropdownRef.barcodeKits[platformName] = data['barcodeKits'];
+        Hot.dropdownRef.indexFamilies[platformName] = {};
+        Hot.dropdownRef.indexFamilies[platformName] = data['indexFamilies'];
       }    
     );
   },
   
   /**
-   * Gets tagBarcodes data from server
+   * Gets indices data from server
    */
-  getBarcodePositionsOnly: function (tbFamily) {
-    if (tbFamily) {
-      jQuery.get("../../barcodePositionsJson", {tagBarcodeFamily : tbFamily},
+  getIndexPositionsOnly: function (ifam) {
+    if (ifam) {
+      jQuery.get("../../indexPositionsJson", {indexFamily : ifam},
         function(posData) {
-          for (var pos = 1; pos <= posData['numApplicableBarcodes']; pos++) {
-            // set tagBarcodeData
-            jQuery.get('../../tagBarcodesJson', {tagBarcodeFamily : tbFamily , position: pos},
-              function (bcData) {
-                Hot.dropdownRef.tagBarcodes[tbFamily][pos] = bcData.tagBarcodes;
+          for (var pos = 1; pos <= posData['numApplicableIndices']; pos++) {
+            // store indices
+            jQuery.get('../../indicesJson', {indexFamily : ifam , position: pos},
+              function (json) {
+                Hot.dropdownRef.indices[ifam][pos] = json.indices;
               }    
             );
           }
@@ -535,18 +541,18 @@ Library.hot = {
         lib.lowQuality = false;
       }
 
-      if (obj.tagBarcodeFamilyName && obj.tagBarcodeFamilyName != 'No barcode') {
-        var tbfn = obj.tagBarcodeFamilyName;
-        lib.tagBarcodeFamilyName = tbfn;
-        if (obj.tagBarcodeIndex1Label) {
-          lib.tagBarcodeIndex1Id = Library.hot.getIdFromBcLabel(obj.tagBarcodeIndex1Label, Hot.dropdownRef.tagBarcodes[lib.platformName][tbfn]['1']);
+      if (obj.indexFamilyName && obj.indexFamilyName != 'No index') {
+        var ifam = obj.indexFamilyName;
+        lib.indexFamilyName = ifam;
+        if (obj.index1Label) {
+          lib.index1Id = Library.hot.getIdFromIndexLabel(obj.index1Label, Hot.dropdownRef.indices[lib.platformName][ifam]['1']);
         } else {
-          lib.tagBarcodeIndex1Id = undefined;
+          lib.index1Id = undefined;
         }
-        if (obj.tagBarcodeIndex2Label) {
-          lib.tagBarcodeIndex2Id = Library.hot.getIdFromBcLabel(obj.tagBarcodeIndex2Label, Hot.dropdownRef.tagBarcodes[lib.platformName][tbfn]['2']);
+        if (obj.index2Label) {
+          lib.index2Id = Library.hot.getIdFromIndexLabel(obj.index2Label, Hot.dropdownRef.indices[lib.platformName][ifam]['2']);
         } else {
-          lib.tagBarcodeIndex2Id = undefined;
+          lib.index2Id = undefined;
         }
       }
 

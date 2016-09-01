@@ -45,11 +45,6 @@ import java.util.TreeSet;
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpSession;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-import net.sourceforge.fluxion.ajax.Ajaxified;
-import net.sourceforge.fluxion.ajax.util.JSONUtils;
-
 import org.apache.commons.codec.binary.Base64;
 import org.krysalis.barcode4j.BarcodeDimension;
 import org.krysalis.barcode4j.BarcodeGenerator;
@@ -62,9 +57,14 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import net.sourceforge.fluxion.ajax.Ajaxified;
+import net.sourceforge.fluxion.ajax.util.JSONUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
+import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Plate;
@@ -76,7 +76,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.PrintJob;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
-import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
@@ -260,8 +259,9 @@ public class PoolControllerHelperService {
       }
     }
     sb.append("</div>");
-    sb.append("<a onclick='Utils.ui.checkAll(\"importdilslist\"); return false;' href='javascript:void(0);'>All</a> "
-        + "/ <a onclick='Utils.ui.uncheckAll(\"importdilslist\"); return false;' href='javascript:void(0);'>None</a>");
+    sb.append(
+        "<a onclick='Utils.ui.checkAll(\"importdilslist\"); return false;' href='javascript:void(0);'>All</a> "
+            + "/ <a onclick='Utils.ui.uncheckAll(\"importdilslist\"); return false;' href='javascript:void(0);'>None</a>");
     sb.append("<br/><button type='submit' class='br-button ui-state-default ui-corner-all'>Use</button>");
     return sb.toString();
   }
@@ -614,12 +614,16 @@ public class PoolControllerHelperService {
         Collection<? extends Dilution> dls = pool.getDilutions();
         for (Dilution dilution : dls) {
           info.append("<li><b>" + dilution.getName() + "</b>");
-          info.append("<br/><small><u><a href='/miso/project/" + dilution.getLibrary().getSample().getProject().getId() + "'>"
-              + dilution.getLibrary().getSample().getProject().getAlias() + "</a></u>");
-          info.append("<br/><a href='/miso/library/" + dilution.getLibrary().getId() + "'>" + dilution.getLibrary().getAlias() + " ("
-              + dilution.getLibrary().getName() + ")</a>");
-          info.append("<br/><a href='/miso/sample/" + dilution.getLibrary().getSample().getId() + "'>"
-              + dilution.getLibrary().getSample().getDescription() + " (" + dilution.getLibrary().getSample().getName() + ")</a></small>");
+          info.append(
+              "<br/><small><u><a href='/miso/project/" + dilution.getLibrary().getSample().getProject().getId() + "'>"
+                  + dilution.getLibrary().getSample().getProject().getAlias() + "</a></u>");
+          info.append(
+              "<br/><a href='/miso/library/" + dilution.getLibrary().getId() + "'>" + dilution.getLibrary().getAlias() + " ("
+                  + dilution.getLibrary().getName() + ")</a>");
+          info.append(
+              "<br/><a href='/miso/sample/" + dilution.getLibrary().getSample().getId() + "'>"
+                  + dilution.getLibrary().getSample().getDescription() + " (" + dilution.getLibrary().getSample().getName()
+                  + ")</a></small>");
           info.append("</li>");
         }
         info.append("</ul>");
@@ -630,13 +634,16 @@ public class PoolControllerHelperService {
           if (p instanceof Dilution) {
             Dilution dilution = (Dilution) p;
             info.append("<li><b>" + dilution.getName() + "</b>");
-            info.append("<br/><small><u><a href='/miso/project/" + dilution.getLibrary().getSample().getProject().getId() + "'>"
-                + dilution.getLibrary().getSample().getProject().getAlias() + "</a></u>");
-            info.append("<br/><a href='/miso/library/" + dilution.getLibrary().getId() + "'>" + dilution.getLibrary().getAlias() + " ("
-                + dilution.getLibrary().getName() + ")</a>");
-            info.append("<br/><a href='/miso/sample/" + dilution.getLibrary().getSample().getId() + "'>"
-                + dilution.getLibrary().getSample().getDescription() + " (" + dilution.getLibrary().getSample().getName()
-                + ")</a></small>");
+            info.append(
+                "<br/><small><u><a href='/miso/project/" + dilution.getLibrary().getSample().getProject().getId() + "'>"
+                    + dilution.getLibrary().getSample().getProject().getAlias() + "</a></u>");
+            info.append(
+                "<br/><a href='/miso/library/" + dilution.getLibrary().getId() + "'>" + dilution.getLibrary().getAlias() + " ("
+                    + dilution.getLibrary().getName() + ")</a>");
+            info.append(
+                "<br/><a href='/miso/sample/" + dilution.getLibrary().getSample().getId() + "'>"
+                    + dilution.getLibrary().getSample().getDescription() + " (" + dilution.getLibrary().getSample().getName()
+                    + ")</a></small>");
             info.append("</li>");
           } else if (p instanceof Plate) {
             Plate<LinkedList<Plateable>, Plateable> plate = (Plate<LinkedList<Plateable>, Plateable>) p;
@@ -647,25 +654,28 @@ public class PoolControllerHelperService {
               Plateable element = plate.getElements().getFirst();
               if (element instanceof Library) {
                 Library l = (Library) element;
-                info.append("<br/><small><u><a href='/miso/project/" + l.getSample().getProject().getId() + "'>"
-                    + l.getSample().getProject().getAlias() + " (" + l.getSample().getProject().getName() + ")</a></u>");
+                info.append(
+                    "<br/><small><u><a href='/miso/project/" + l.getSample().getProject().getId() + "'>"
+                        + l.getSample().getProject().getAlias() + " (" + l.getSample().getProject().getName() + ")</a></u>");
                 info.append("<br/>Platform: " + l.getPlatformName());
                 info.append("<br/>Type: " + l.getLibraryType().getDescription());
                 info.append("<br/>Selection: " + l.getLibrarySelectionType().getName());
                 info.append("<br/>Strategy: " + l.getLibraryStrategyType().getName());
               } else if (element instanceof Dilution) {
                 Dilution l = (Dilution) element;
-                info.append("<br/><small><u><a href='/miso/project/" + l.getLibrary().getSample().getProject().getId() + "'>"
-                    + l.getLibrary().getSample().getProject().getAlias() + " (" + l.getLibrary().getSample().getProject().getName()
-                    + ")</a></u>");
+                info.append(
+                    "<br/><small><u><a href='/miso/project/" + l.getLibrary().getSample().getProject().getId() + "'>"
+                        + l.getLibrary().getSample().getProject().getAlias() + " (" + l.getLibrary().getSample().getProject().getName()
+                        + ")</a></u>");
                 info.append("<br/>Platform: " + l.getLibrary().getPlatformName());
                 info.append("<br/>Type: " + l.getLibrary().getLibraryType().getDescription());
                 info.append("<br/>Selection: " + l.getLibrary().getLibrarySelectionType().getName());
                 info.append("<br/>Strategy: " + l.getLibrary().getLibraryStrategyType().getName());
               } else if (element instanceof Sample) {
                 Sample l = (Sample) element;
-                info.append("<br/><small><u><a href='/miso/project/" + l.getProject().getId() + "'>" + l.getProject().getAlias() + " ("
-                    + l.getProject().getName() + ")</a></u>");
+                info.append(
+                    "<br/><small><u><a href='/miso/project/" + l.getProject().getId() + "'>" + l.getProject().getAlias() + " ("
+                        + l.getProject().getName() + ")</a></u>");
               }
             }
             info.append("</li>");
@@ -728,28 +738,39 @@ public class PoolControllerHelperService {
                   info.append("<b>Internal Plate:</b> <a href='/miso/plate/" + plate.getId() + "'>" + plate.getName() + "</a><br/>");
                 } else if (p instanceof Library) {
                   Library library = (Library) plateable;
-                  info.append("<b>Library:</b> <a href='/miso/library/" + library.getId() + "'>" + library.getAlias() + "("
-                      + library.getName() + ")</a><br/>");
+                  info.append(
+                      "<b>Library:</b> <a href='/miso/library/" + library.getId() + "'>" + library.getAlias() + "(" + library.getName()
+                          + ")</a><br/>");
                 }
               }
             } else if (p instanceof Dilution) {
               Dilution dilution = (Dilution) p;
               if (dilution instanceof emPCRDilution) {
-                info.append("<b>emPCR:</b> <a href='/miso/empcr/" + ((emPCRDilution) dilution).getEmPCR().getId() + "'>"
-                    + ((emPCRDilution) dilution).getEmPCR().getName() + "<br/>");
+                info.append(
+                    "<b>emPCR:</b> <a href='/miso/empcr/" + ((emPCRDilution) dilution).getEmPCR().getId() + "'>"
+                        + ((emPCRDilution) dilution).getEmPCR().getName() + "<br/>");
               }
-              info.append("<b>Library:</b> <a href='/miso/library/" + dilution.getLibrary().getId() + "'>"
-                  + dilution.getLibrary().getAlias() + "(" + dilution.getLibrary().getName() + ")</a><br/>");
-              info.append("<b>Sample:</b> <a href='/miso/sample/" + dilution.getLibrary().getSample().getId() + "'>"
-                  + dilution.getLibrary().getSample().getAlias() + "(" + dilution.getLibrary().getSample().getName() + ")</a><br/>");
+              info.append(
+                  "<b>Library:</b> <a href='/miso/library/" + dilution.getLibrary().getId() + "'>" + dilution.getLibrary().getAlias() + "("
+                      + dilution.getLibrary().getName() + ")</a><br/>");
+              info.append(
+                  "<b>Sample:</b> <a href='/miso/sample/" + dilution.getLibrary().getSample().getId() + "'>"
+                      + dilution.getLibrary().getSample().getAlias() + "(" + dilution.getLibrary().getSample().getName() + ")</a><br/>");
               if (pool.getPoolableElements().size() > 1) {
-                if (!dilution.getLibrary().getTagBarcodes().isEmpty()) {
-                  info.append("<b>Barcodes:</b></br>");
-                  collectBarcodes(info, dilution);
-                  info.append("<span class='counter'><img src='/styles/images/status/green.png' border='0'></span>");
+                if (!dilution.getLibrary().getIndices().isEmpty()) {
+                  info.append("<b>Index(es):</b></br>");
+                  for (Index index : dilution.getLibrary().getIndices()) {
+                    info.append(index.getPosition());
+                    info.append(":");
+                    info.append(index.getName());
+                    info.append(" (");
+                    info.append(index.getSequence());
+                    info.append(")<br/>");
+                    info.append("<span class='counter'><img src='/styles/images/status/green.png' border='0'></span>");
+                  }
                 } else {
-                  info.append("<b>Barcode:</b>");
-                  info.append("<b>Library:</b> <a href='/miso/library/" + dilution.getLibrary().getId() + "'>Choose tag barcode</a>");
+                  info.append("<b>Index(es): None</b>");
+                  info.append("<b>Library:</b> <a href='/miso/library/" + dilution.getLibrary().getId() + "'>Choose index</a>");
                   info.append("<span class='counter'><img src='/styles/images/status/red.png' border='0'></span>");
                 }
               }
@@ -769,13 +790,13 @@ public class PoolControllerHelperService {
     }
   }
 
-  private void collectBarcodes(StringBuilder render, Dilution dilution) {
-    for (TagBarcode tb : dilution.getLibrary().getTagBarcodes()) {
-      render.append(tb.getPosition());
+  private void collectIndices(StringBuilder render, Dilution dilution) {
+    for (Index index : dilution.getLibrary().getIndices()) {
+      render.append(index.getPosition());
       render.append(":");
-      render.append(tb.getName());
+      render.append(index.getName());
       render.append(" (");
-      render.append(tb.getSequence());
+      render.append(index.getSequence());
       render.append(")<br/>");
     }
   }
@@ -795,11 +816,12 @@ public class PoolControllerHelperService {
           pout.add(libraryDilution.getConcentration());
           pout.add(libraryDilution.getLibrary().getAlias() + " (" + libraryDilution.getLibrary().getName() + ")");
           pout.add(libraryDilution.getLibrary().getSample().getAlias() + " (" + libraryDilution.getLibrary().getSample().getName() + ")");
-          StringBuilder barcodes = new StringBuilder();
-          collectBarcodes(barcodes, libraryDilution);
-          pout.add(barcodes.toString());
-          pout.add("<div style='cursor:pointer;' onmousedown=\"Pool.search.poolSearchSelectElement('" + libraryDilution.getId() + "', '"
-              + libraryDilution.getName() + "')\"><span class=\"ui-icon ui-icon-plusthick\"></span></div>");
+          StringBuilder indices = new StringBuilder();
+          collectIndices(indices, libraryDilution);
+          pout.add(indices.toString());
+          pout.add(
+              "<div style='cursor:pointer;' onmousedown=\"Pool.search.poolSearchSelectElement('" + libraryDilution.getId() + "', '"
+                  + libraryDilution.getName() + "')\"><span class=\"ui-icon ui-icon-plusthick\"></span></div>");
           arr.add(pout);
         }
         j.put("poolelements", arr);

@@ -122,7 +122,7 @@ public class FormUtilsTests {
       User u = new UserImpl();
       u.setLoginName("testBulkImportUser");
       List<Sample> samples = FormUtils.importSampleInputSpreadsheet(testSampleBulkInputOdsFile, u, new MockFormTestRequestManager(),
-          new DefaultLibraryNamingScheme(), new MockFormTestTagBarcodeStrategyService());
+          new DefaultLibraryNamingScheme(), new MockFormTestIndexService());
       log.info("Imported :: " + LimsUtils.join(samples, " | "));
     } catch (Exception e) {
       e.printStackTrace();
@@ -140,7 +140,7 @@ public class FormUtilsTests {
       User u = new UserImpl();
       u.setLoginName("testBulkImportUser");
       List<Sample> samples = FormUtils.importSampleInputSpreadsheet(testSampleBulkInputXlsFile, u, new MockFormTestRequestManager(),
-          new DefaultLibraryNamingScheme(), new MockFormTestTagBarcodeStrategyService());
+          new DefaultLibraryNamingScheme(), new MockFormTestIndexService());
       log.info("Imported :: " + LimsUtils.join(samples, " | "));
     } catch (Exception e) {
       e.printStackTrace();

@@ -85,8 +85,8 @@
     jQuery(document).ready(function () {
       Library.hot.librariesJSON = ${librariesJSON};
       Hot.dropdownRef = ${referenceDataJSON};
-      Hot.dropdownRef.tagBarcodes = ${tagBarcodes};
-      Hot.dropdownRef.barcodeKits = {};
+      Hot.dropdownRef.indices = ${indices};
+      Hot.dropdownRef.indexFamilies = {};
       Hot.detailedSample = JSON.parse(document.getElementById('HOTbulkForm').dataset.detailedSample);
       Hot.saveButton = document.getElementById('saveLibraries');
       Library.hot.propagateOrEdit = "${method}";
@@ -103,13 +103,13 @@
       Library.hot.makeBulkUpdateTable = function () {
         Library.hot.librariesJSON = Library.hot.prepLibrariesForEdit(Library.hot.librariesJSON);
         Library.hot.makeHOT(Library.hot.librariesJSON);
-        Library.hot.addPlatformAndTBHooks();
+        Library.hot.addPlatformAndIndexHooks();
 
-        // source for barcode kit column depends on mandatory platform
+        // source for index family column depends on mandatory platform
         var datalen = Hot.startData.length;
         for (var i = 0; i < datalen; i++) {
-          Library.hot.updateTBFamilyCellsSources(i, Hot.startData[i].platformName);
-          Library.hot.updateTBCellsSources(i, Hot.startData[i].platformName, Hot.startData[i].tagBarcodeFamilyName);
+          Library.hot.updateIndexFamilyCellsSources(i, Hot.startData[i].platformName);
+          Library.hot.updateIndexCellsSources(i, Hot.startData[i].platformName, Hot.startData[i].indexFamilyName);
         }
       };
 

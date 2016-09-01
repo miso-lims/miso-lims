@@ -138,7 +138,7 @@
                         <tr>
                             <td>Plate 1:</td>
                             <td><input type="text" name="Lane1Plate1" size="30"/></td>
-                            <td><select name="BarcodeLane1Plate1">
+                            <td><select name="IndexLane1Plate1">
                                 <option selected="selected">1+7</option>
                                 <option>1+9</option>
                                 <option>1+11</option>
@@ -151,7 +151,7 @@
                         <tr>
                             <td>Plate 2:</td>
                             <td><input type="text" name="Lane1Plate2" size="30"/></td>
-                            <td><select name="BarcodeLane1Plate2">
+                            <td><select name="IndexLane1Plate2">
                                 <option>1+7</option>
                                 <option selected="selected">1+9</option>
                                 <option>1+11</option>
@@ -164,7 +164,7 @@
                         <tr>
                             <td>Plate 3:</td>
                             <td><input type="text" name="Lane1Plate3" size="30"/></td>
-                            <td><select name="BarcodeLane1Plate3">
+                            <td><select name="IndexLane1Plate3">
                                 <option>1+7</option>
                                 <option>1+9</option>
                                 <option selected="selected">1+11</option>
@@ -177,7 +177,7 @@
                         <tr>
                             <td>Plate 4:</td>
                             <td><input type="text" name="Lane1Plate4" size="30"/></td>
-                            <td><select name="BarcodeLane1Plate4">
+                            <td><select name="IndexLane1Plate4">
                                 <option>1+7</option>
                                 <option>1+9</option>
                                 <option>1+11</option>
@@ -190,7 +190,7 @@
                         <tr>
                             <td>Plate 5:</td>
                             <td><input type="text" name="Lane1Plate5" size="30"/></td>
-                            <td><select name="BarcodeLane1Plate5">
+                            <td><select name="IndexLane1Plate5">
                                 <option>1+7</option>
                                 <option>1+9</option>
                                 <option>1+11</option>
@@ -203,7 +203,7 @@
                         <tr>
                             <td>Plate 6:</td>
                             <td><input type="text" name="Lane1Plate6" size="30"/></td>
-                            <td><select name="BarcodeLane1Plate6">
+                            <td><select name="IndexLane1Plate6">
                                 <option>1+7</option>
                                 <option>1+9</option>
                                 <option>1+11</option>
@@ -220,7 +220,7 @@
                         <tr>
                             <td>Plate 1:</td>
                             <td><input type="text" name="Lane2Plate1" size="30"/></td>
-                            <td><select name="BarcodeLane2Plate1">
+                            <td><select name="IndexLane2Plate1">
                                 <option selected="selected">1+7</option>
                                 <option>1+9</option>
                                 <option>1+11</option>
@@ -233,7 +233,7 @@
                         <tr>
                             <td>Plate 2:</td>
                             <td><input type="text" name="Lane2Plate2" size="30"/></td>
-                            <td><select name="BarcodeLane2Plate2">
+                            <td><select name="IndexLane2Plate2">
                                 <option>1+7</option>
                                 <option selected="selected">1+9</option>
                                 <option>1+11</option>
@@ -246,7 +246,7 @@
                         <tr>
                             <td>Plate 3:</td>
                             <td><input type="text" name="Lane2Plate3" size="30"/></td>
-                            <td><select name="BarcodeLane2Plate3">
+                            <td><select name="IndexLane2Plate3">
                                 <option>1+7</option>
                                 <option>1+9</option>
                                 <option selected="selected">1+11</option>
@@ -259,7 +259,7 @@
                         <tr>
                             <td>Plate 4:</td>
                             <td><input type="text" name="Lane2Plate4" size="30"/></td>
-                            <td><select name="BarcodeLane2Plate4">
+                            <td><select name="IndexLane2Plate4">
                                 <option>1+7</option>
                                 <option>1+9</option>
                                 <option>1+11</option>
@@ -272,7 +272,7 @@
                         <tr>
                             <td>Plate 5:</td>
                             <td><input type="text" name="Lane2Plate5" size="30"/></td>
-                            <td><select name="BarcodeLane2Plate5">
+                            <td><select name="IndexLane2Plate5">
                                 <option>1+7</option>
                                 <option>1+9</option>
                                 <option>1+11</option>
@@ -285,7 +285,7 @@
                         <tr>
                             <td>Plate 6:</td>
                             <td><input type="text" name="Lane2Plate6" size="30"/></td>
-                            <td><select name="BarcodeLane2Plate6">
+                            <td><select name="IndexLane2Plate6">
                                 <option>1+7</option>
                                 <option>1+9</option>
                                 <option>1+11</option>

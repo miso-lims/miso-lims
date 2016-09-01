@@ -11,14 +11,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
-import uk.ac.bbsrc.tgac.miso.core.data.TagBarcodeFamily;
+import uk.ac.bbsrc.tgac.miso.core.data.Index;
+import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.store.TagBarcodeStore;
+import uk.ac.bbsrc.tgac.miso.core.store.IndexStore;
 
 @Transactional(rollbackFor = Exception.class)
 @Repository
-public class HibernateTagBarcodeDao implements TagBarcodeStore {
+public class HibernateIndexDao implements IndexStore {
 
   protected static final Logger log = LoggerFactory.getLogger(HibernateSubprojectDao.class);
 
@@ -34,42 +34,42 @@ public class HibernateTagBarcodeDao implements TagBarcodeStore {
   }
 
   @Override
-  public TagBarcode getTagBarcodeById(long id) {
-    Query query = currentSession().createQuery("from TagBarcode where id = :id");
+  public Index getIndexById(long id) {
+    Query query = currentSession().createQuery("from Index where id = :id");
     query.setLong("id", id);
-    return (TagBarcode) query.uniqueResult();
+    return (Index) query.uniqueResult();
   }
 
   @Override
-  public List<TagBarcodeFamily> getTagBarcodeFamilies() {
-    Query query = currentSession().createQuery("from TagBarcodeFamily");
+  public List<IndexFamily> getIndexFamilies() {
+    Query query = currentSession().createQuery("from IndexFamily");
     @SuppressWarnings("unchecked")
-    List<TagBarcodeFamily> list = query.list();
+    List<IndexFamily> list = query.list();
     return list;
   }
 
   @Override
-  public List<TagBarcodeFamily> getTagBarcodeFamiliesByPlatform(PlatformType platformType) {
-    Query query = currentSession().createQuery("from TagBarcodeFamily where platformType = :platform");
+  public List<IndexFamily> getIndexFamiliesByPlatform(PlatformType platformType) {
+    Query query = currentSession().createQuery("from IndexFamily where platformType = :platform");
     query.setParameter("platform", platformType);
     @SuppressWarnings("unchecked")
-    List<TagBarcodeFamily> list = query.list();
+    List<IndexFamily> list = query.list();
     return list;
   }
 
   @Override
-  public TagBarcodeFamily getTagBarcodeFamilyByName(String name) {
-    Query query = currentSession().createQuery("from TagBarcodeFamily where name = :name");
+  public IndexFamily getIndexFamilyByName(String name) {
+    Query query = currentSession().createQuery("from IndexFamily where name = :name");
     query.setString("name", name);
-    return (TagBarcodeFamily) query.uniqueResult();
+    return (IndexFamily) query.uniqueResult();
   }
 
   @Override
-  public List<TagBarcode> listAllTagBarcodes(PlatformType platformType) {
-    Query query = currentSession().createQuery("from TagBarcode where family.platformType = :platform");
+  public List<Index> listAllIndices(PlatformType platformType) {
+    Query query = currentSession().createQuery("from Index where family.platformType = :platform");
     query.setParameter("platform", platformType);
     @SuppressWarnings("unchecked")
-    List<TagBarcode> list = query.list();
+    List<Index> list = query.list();
     return list;
   }
 
@@ -78,10 +78,10 @@ public class HibernateTagBarcodeDao implements TagBarcodeStore {
   }
 
   @Override
-  public List<TagBarcode> listAllTagBarcodes() {
-    Query query = currentSession().createQuery("from TagBarcode");
+  public List<Index> listAllIndices() {
+    Query query = currentSession().createQuery("from Index");
     @SuppressWarnings("unchecked")
-    List<TagBarcode> list = query.list();
+    List<Index> list = query.list();
     return list;
   }
 

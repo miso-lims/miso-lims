@@ -43,9 +43,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -68,15 +65,17 @@ import org.w3c.dom.Node;
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
+import uk.ac.bbsrc.tgac.miso.core.data.Index;
+import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Plate;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
-import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
-import uk.ac.bbsrc.tgac.miso.core.data.TagBarcodeFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryQCImpl;
@@ -95,7 +94,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.InputFormException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
-import uk.ac.bbsrc.tgac.miso.core.service.TagBarcodeService;
+import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.RequestManagerAwareNamingScheme;
 
@@ -185,29 +184,29 @@ public class FormUtils {
     String formReverseComplement = "";
     String formAdapter = "";
     String formLane1Plate1 = "";
-    String formBarcodeLane1Plate1 = "";
+    String formIndexLane1Plate1 = "";
     String formLane1Plate2 = "";
-    String formBarcodeLane1Plate2 = "";
+    String formIndexLane1Plate2 = "";
     String formLane1Plate3 = "";
-    String formBarcodeLane1Plate3 = "";
+    String formIndexLane1Plate3 = "";
     String formLane1Plate4 = "";
-    String formBarcodeLane1Plate4 = "";
+    String formIndexLane1Plate4 = "";
     String formLane1Plate5 = "";
-    String formBarcodeLane1Plate5 = "";
+    String formIndexLane1Plate5 = "";
     String formLane1Plate6 = "";
-    String formBarcodeLane1Plate6 = "";
+    String formIndexLane1Plate6 = "";
     String formLane2Plate1 = "";
-    String formBarcodeLane2Plate1 = "";
+    String formIndexLane2Plate1 = "";
     String formLane2Plate2 = "";
-    String formBarcodeLane2Plate2 = "";
+    String formIndexLane2Plate2 = "";
     String formLane2Plate3 = "";
-    String formBarcodeLane2Plate3 = "";
+    String formIndexLane2Plate3 = "";
     String formLane2Plate4 = "";
-    String formBarcodeLane2Plate4 = "";
+    String formIndexLane2Plate4 = "";
     String formLane2Plate5 = "";
-    String formBarcodeLane2Plate5 = "";
+    String formIndexLane2Plate5 = "";
     String formLane2Plate6 = "";
-    String formBarcodeLane2Plate6 = "";
+    String formIndexLane2Plate6 = "";
     for (JSONObject jsonObject : (Iterable<JSONObject>) jsonArray) {
       if ("IEMFileVersion".equals(jsonObject.getString("name"))) {
         formIEMFileVersion = jsonObject.getString("value");
@@ -287,41 +286,41 @@ public class FormUtils {
       if ("Lane2Plate6".equals(jsonObject.getString("name"))) {
         formLane2Plate6 = jsonObject.getString("value");
       }
-      if ("BarcodeLane1Plate1".equals(jsonObject.getString("name"))) {
-        formBarcodeLane1Plate1 = jsonObject.getString("value");
+      if ("IndexLane1Plate1".equals(jsonObject.getString("name"))) {
+        formIndexLane1Plate1 = jsonObject.getString("value");
       }
-      if ("BarcodeLane1Plate2".equals(jsonObject.getString("name"))) {
-        formBarcodeLane1Plate2 = jsonObject.getString("value");
+      if ("IndexLane1Plate2".equals(jsonObject.getString("name"))) {
+        formIndexLane1Plate2 = jsonObject.getString("value");
       }
-      if ("BarcodeLane1Plate3".equals(jsonObject.getString("name"))) {
-        formBarcodeLane1Plate3 = jsonObject.getString("value");
+      if ("IndexLane1Plate3".equals(jsonObject.getString("name"))) {
+        formIndexLane1Plate3 = jsonObject.getString("value");
       }
-      if ("BarcodeLane1Plate4".equals(jsonObject.getString("name"))) {
-        formBarcodeLane1Plate4 = jsonObject.getString("value");
+      if ("IndexLane1Plate4".equals(jsonObject.getString("name"))) {
+        formIndexLane1Plate4 = jsonObject.getString("value");
       }
-      if ("BarcodeLane1Plate5".equals(jsonObject.getString("name"))) {
-        formBarcodeLane1Plate5 = jsonObject.getString("value");
+      if ("IndexLane1Plate5".equals(jsonObject.getString("name"))) {
+        formIndexLane1Plate5 = jsonObject.getString("value");
       }
-      if ("BarcodeLane1Plate6".equals(jsonObject.getString("name"))) {
-        formBarcodeLane1Plate6 = jsonObject.getString("value");
+      if ("IndexLane1Plate6".equals(jsonObject.getString("name"))) {
+        formIndexLane1Plate6 = jsonObject.getString("value");
       }
-      if ("BarcodeLane2Plate1".equals(jsonObject.getString("name"))) {
-        formBarcodeLane2Plate1 = jsonObject.getString("value");
+      if ("IndexLane2Plate1".equals(jsonObject.getString("name"))) {
+        formIndexLane2Plate1 = jsonObject.getString("value");
       }
-      if ("BarcodeLane2Plate2".equals(jsonObject.getString("name"))) {
-        formBarcodeLane2Plate2 = jsonObject.getString("value");
+      if ("IndexLane2Plate2".equals(jsonObject.getString("name"))) {
+        formIndexLane2Plate2 = jsonObject.getString("value");
       }
-      if ("BarcodeLane2Plate3".equals(jsonObject.getString("name"))) {
-        formBarcodeLane2Plate3 = jsonObject.getString("value");
+      if ("IndexLane2Plate3".equals(jsonObject.getString("name"))) {
+        formIndexLane2Plate3 = jsonObject.getString("value");
       }
-      if ("BarcodeLane2Plate4".equals(jsonObject.getString("name"))) {
-        formBarcodeLane2Plate4 = jsonObject.getString("value");
+      if ("IndexLane2Plate4".equals(jsonObject.getString("name"))) {
+        formIndexLane2Plate4 = jsonObject.getString("value");
       }
-      if ("BarcodeLane2Plate5".equals(jsonObject.getString("name"))) {
-        formBarcodeLane2Plate5 = jsonObject.getString("value");
+      if ("IndexLane2Plate5".equals(jsonObject.getString("name"))) {
+        formIndexLane2Plate5 = jsonObject.getString("value");
       }
-      if ("BarcodeLane2Plate6".equals(jsonObject.getString("name"))) {
-        formBarcodeLane2Plate6 = jsonObject.getString("value");
+      if ("IndexLane2Plate6".equals(jsonObject.getString("name"))) {
+        formIndexLane2Plate6 = jsonObject.getString("value");
       }
     }
     sb.append("[Header],,,,,,,,,,\n");
@@ -350,27 +349,27 @@ public class FormUtils {
 
     // starting the plate part
 
-    sb.append(barcodeLanePlateCSV(formBarcodeLane1Plate1, "1", formLane1Plate1));
-    sb.append(barcodeLanePlateCSV(formBarcodeLane1Plate2, "1", formLane1Plate2));
-    sb.append(barcodeLanePlateCSV(formBarcodeLane1Plate3, "1", formLane1Plate3));
-    sb.append(barcodeLanePlateCSV(formBarcodeLane1Plate4, "1", formLane1Plate4));
-    sb.append(barcodeLanePlateCSV(formBarcodeLane1Plate5, "1", formLane1Plate5));
-    sb.append(barcodeLanePlateCSV(formBarcodeLane1Plate6, "1", formLane1Plate6));
+    sb.append(IndexLanePlateCSV(formIndexLane1Plate1, "1", formLane1Plate1));
+    sb.append(IndexLanePlateCSV(formIndexLane1Plate2, "1", formLane1Plate2));
+    sb.append(IndexLanePlateCSV(formIndexLane1Plate3, "1", formLane1Plate3));
+    sb.append(IndexLanePlateCSV(formIndexLane1Plate4, "1", formLane1Plate4));
+    sb.append(IndexLanePlateCSV(formIndexLane1Plate5, "1", formLane1Plate5));
+    sb.append(IndexLanePlateCSV(formIndexLane1Plate6, "1", formLane1Plate6));
 
-    sb.append(barcodeLanePlateCSV(formBarcodeLane2Plate1, "2", formLane2Plate1));
-    sb.append(barcodeLanePlateCSV(formBarcodeLane2Plate2, "2", formLane2Plate2));
-    sb.append(barcodeLanePlateCSV(formBarcodeLane2Plate3, "2", formLane2Plate3));
-    sb.append(barcodeLanePlateCSV(formBarcodeLane2Plate4, "2", formLane2Plate4));
-    sb.append(barcodeLanePlateCSV(formBarcodeLane2Plate5, "2", formLane2Plate5));
-    sb.append(barcodeLanePlateCSV(formBarcodeLane2Plate6, "2", formLane2Plate6));
+    sb.append(IndexLanePlateCSV(formIndexLane2Plate1, "2", formLane2Plate1));
+    sb.append(IndexLanePlateCSV(formIndexLane2Plate2, "2", formLane2Plate2));
+    sb.append(IndexLanePlateCSV(formIndexLane2Plate3, "2", formLane2Plate3));
+    sb.append(IndexLanePlateCSV(formIndexLane2Plate4, "2", formLane2Plate4));
+    sb.append(IndexLanePlateCSV(formIndexLane2Plate5, "2", formLane2Plate5));
+    sb.append(IndexLanePlateCSV(formIndexLane2Plate6, "2", formLane2Plate6));
 
     out.write(sb.toString());
     out.close();
 
   }
 
-  public static String barcodeLanePlateCSV(String barcode, String lane, String plateName) {
-    if ("1+7".equals(barcode)) {
+  public static String IndexLanePlateCSV(String index, String lane, String plateName) {
+    if ("1+7".equals(index)) {
       return lane + "," + plateName + "_A1,,,,AACCAACCG P7_index_9nt_1 ,AACCAACCG,AACCATGGA P5_index_9nt_3,AACCATGGA ,,\n" + lane + ","
           + plateName + "_A10,,,,CGCCTCGGT P7_index_9nt_243 ,CGCCTCGGT,AACCATGGA P5_index_9nt_3,AACCATGGA ,,\n" + lane + "," + plateName
           + "_A11,,,,CGGTTGGCG P7_index_9nt_256 ,CGGTTGGCG,AACCATGGA P5_index_9nt_3,AACCATGGA ,,\n" + lane + "," + plateName
@@ -755,7 +754,7 @@ public class FormUtils {
           + "_P7,,,,CAGAATGCT P7_index_9nt_173,CAGAATGCT,TTCGTAGAA P5_index_9nt_431,TTCGTAGAA,,\n" + lane + "," + plateName
           + "_P8,,,,CCATCTCCA P7_index_9nt_204,CCATCTCCA,TTCGTAGAA P5_index_9nt_431,TTCGTAGAA,,\n" + lane + "," + plateName
           + "_P9,,,,CCTGAACCA P7_index_9nt_225,CCTGAACCA,TTCGTAGAA P5_index_9nt_431,TTCGTAGAA,,\n";
-    } else if ("1+9".equals(barcode)) {
+    } else if ("1+9".equals(index)) {
       return lane + "," + plateName + "_A1,,,,AACCAACCG P7_index_9nt_1 ,AACCAACCG,AACCGCCAA P5_index_9nt_5,AACCGCCAA,,\n" + lane + ","
           + plateName + "_A10,,,,CGCCTCGGT P7_index_9nt_243 ,CGCCTCGGT,AACCGCCAA P5_index_9nt_5,AACCGCCAA,,\n" + lane + "," + plateName
           + "_A11,,,,CGGTTGGCG P7_index_9nt_256 ,CGGTTGGCG,AACCGCCAA P5_index_9nt_5,AACCGCCAA,,\n" + lane + "," + plateName
@@ -1140,7 +1139,7 @@ public class FormUtils {
           + "_P7,,,,CAGAATGCT P7_index_9nt_173,CAGAATGCT,TTGAGAGCG P5_index_9nt_436,TTGAGAGCG,,\n" + lane + "," + plateName
           + "_P8,,,,CCATCTCCA P7_index_9nt_204,CCATCTCCA,TTGAGAGCG P5_index_9nt_436,TTGAGAGCG,,\n" + lane + "," + plateName
           + "_P9,,,,CCTGAACCA P7_index_9nt_225,CCTGAACCA,TTGAGAGCG P5_index_9nt_436,TTGAGAGCG,,\n";
-    } else if ("1+11".equals(barcode)) {
+    } else if ("1+11".equals(index)) {
       return lane + "," + plateName + "_A1,,,,AACCAACCG P7_index_9nt_1 ,AACCAACCG,AACCGGTTG P5_index_9nt_6,AACCGGTTG ,,\n" + lane + ","
           + plateName + "_A10,,,,CGCCTCGGT P7_index_9nt_243 ,CGCCTCGGT,AACCGGTTG P5_index_9nt_6,AACCGGTTG ,,\n" + lane + "," + plateName
           + "_A11,,,,CGGTTGGCG P7_index_9nt_256 ,CGGTTGGCG,AACCGGTTG P5_index_9nt_6,AACCGGTTG ,,\n" + lane + "," + plateName
@@ -1525,7 +1524,7 @@ public class FormUtils {
           + "_P7,,,,CAGAATGCT P7_index_9nt_173,CAGAATGCT,TTGCTGCGT P5_index_9nt_437,TTGCTGCGT ,,\n" + lane + "," + plateName
           + "_P8,,,,CCATCTCCA P7_index_9nt_204,CCATCTCCA,TTGCTGCGT P5_index_9nt_437,TTGCTGCGT ,,\n" + lane + "," + plateName
           + "_P9,,,,CCTGAACCA P7_index_9nt_225,CCTGAACCA,TTGCTGCGT P5_index_9nt_437,TTGCTGCGT ,,\n";
-    } else if ("2+7".equals(barcode)) {
+    } else if ("2+7".equals(index)) {
       return lane + "," + plateName + "_A1,,,,AACCGAAGT P7_index_9nt_4,AACCGAAGT,AACCATGGA P5_index_9nt_3,AACCATGGA ,,\n" + lane + ","
           + plateName + "_A10,,,,CGCTAACGA P7_index_9nt_248,CGCTAACGA,AACCATGGA P5_index_9nt_3,AACCATGGA ,,\n" + lane + "," + plateName
           + "_A11,,,,CTCCGGTAT P7_index_9nt_273 ,CTCCGGTAT,AACCATGGA P5_index_9nt_3,AACCATGGA ,,\n" + lane + "," + plateName
@@ -1910,7 +1909,7 @@ public class FormUtils {
           + "_P7,,,,CAGAGGTAG P7_index_9nt_175,CAGAGGTAG,TTCGTAGAA P5_index_9nt_431,TTCGTAGAA,,\n" + lane + "," + plateName
           + "_P8,,,,CCTCAGAGA P7_index_9nt_222,CCTCAGAGA,TTCGTAGAA P5_index_9nt_431,TTCGTAGAA,,\n" + lane + "," + plateName
           + "_P9,,,,CCTTGGTAC P7_index_9nt_228,CCTTGGTAC,TTCGTAGAA P5_index_9nt_431,TTCGTAGAA,,\n";
-    } else if ("2+9".equals(barcode)) {
+    } else if ("2+9".equals(index)) {
       return lane + "," + plateName + "_A1,,,,AACCGAAGT P7_index_9nt_4,AACCGAAGT,AACCGCCAA P5_index_9nt_5,AACCGCCAA,,\n" + lane + ","
           + plateName + "_A10,,,,CGCTAACGA P7_index_9nt_248,CGCTAACGA,AACCGCCAA P5_index_9nt_5,AACCGCCAA,,\n" + lane + "," + plateName
           + "_A11,,,,CTCCGGTAT P7_index_9nt_273 ,CTCCGGTAT,AACCGCCAA P5_index_9nt_5,AACCGCCAA,,\n" + lane + "," + plateName
@@ -2295,7 +2294,7 @@ public class FormUtils {
           + "_P7,,,,CAGAGGTAG P7_index_9nt_175,CAGAGGTAG,TTGAGAGCG P5_index_9nt_436,TTGAGAGCG,,\n" + lane + "," + plateName
           + "_P8,,,,CCTCAGAGA P7_index_9nt_222,CCTCAGAGA,TTGAGAGCG P5_index_9nt_436,TTGAGAGCG,,\n" + lane + "," + plateName
           + "_P9,,,,CCTTGGTAC P7_index_9nt_228,CCTTGGTAC,TTGAGAGCG P5_index_9nt_436,TTGAGAGCG,,\n";
-    } else if ("2+11".equals(barcode)) {
+    } else if ("2+11".equals(index)) {
       return lane + "," + plateName + "_A1,,,,AACCGAAGT P7_index_9nt_4,AACCGAAGT,AACCGGTTG P5_index_9nt_6,AACCGGTTG ,,\n" + lane + ","
           + plateName + "_A10,,,,CGCTAACGA P7_index_9nt_248,CGCTAACGA,AACCGGTTG P5_index_9nt_6,AACCGGTTG ,,\n" + lane + "," + plateName
           + "_A11,,,,CTCCGGTAT P7_index_9nt_273 ,CTCCGGTAT,AACCGGTTG P5_index_9nt_6,AACCGGTTG ,,\n" + lane + "," + plateName
@@ -2740,7 +2739,7 @@ public class FormUtils {
 
   }
 
-  public static void createLibraryPoolExportFormFromWeb(File outpath, JSONArray jsonArray, String barcodekit) throws Exception {
+  public static void createLibraryPoolExportFormFromWeb(File outpath, JSONArray jsonArray, String indexFamily) throws Exception {
     InputStream in = null;
     in = FormUtils.class.getResourceAsStream("/forms/ods/export_libraries_pools.xlsx");
     if (in != null) {
@@ -2787,9 +2786,9 @@ public class FormUtils {
           cellD.setCellValue(sampleAlias);
           XSSFCell cellE = row.createCell(4);
           cellE.setCellValue(wellId);
-          if (barcodekit != null) {
+          if (indexFamily != null) {
             XSSFCell cellJ = row.createCell(9);
-            cellJ.setCellValue(barcodekit);
+            cellJ.setCellValue(indexFamily);
           }
           i++;
         }
@@ -2893,7 +2892,7 @@ public class FormUtils {
   // private static Map<String, Pool<Plate<LinkedList<Library>, Library>>> process384PlateInputODS(OdfSpreadsheetDocument oDoc, User u,
   // RequestManager manager, MisoNamingScheme<Library> libraryNamingScheme) throws Exception {
   private static Map<String, PlatePool> process384PlateInputODS(OdfSpreadsheetDocument oDoc, User u, RequestManager manager,
-      MisoNamingScheme<Library> libraryNamingScheme, TagBarcodeService tagBarcodeService) throws Exception {
+      MisoNamingScheme<Library> libraryNamingScheme, IndexService indexService) throws Exception {
     ((RequestManagerAwareNamingScheme) libraryNamingScheme).setRequestManager(manager);
 
     List<Sample> samples = new ArrayList<Sample>();
@@ -2967,7 +2966,7 @@ public class FormUtils {
     if (plateBarcode == null) {
       throw new InputFormException("Cannot resolve plate barcode from: '" + plateBarcodeCell.getStringValue() + "'");
     } else {
-      log.info("Got plate parcode: " + plateBarcode);
+      log.info("Got plate barcode: " + plateBarcode);
     }
 
     // process entries
@@ -3016,8 +3015,8 @@ public class FormUtils {
           OdfTableCell sampleQcCell = oTable.getCellByPosition(4, ri);
           // OdfTableCell sampleAmountCell = oTable.getCellByPosition(5, ri);
           // OdfTableCell sampleWaterAmountCell = oTable.getCellByPosition(6, ri);
-          OdfTableCell barcodeKitCell = oTable.getCellByPosition(7, ri);
-          OdfTableCell barcodeTagsCell = oTable.getCellByPosition(8, ri);
+          OdfTableCell indexFamilyCell = oTable.getCellByPosition(7, ri);
+          OdfTableCell indicesCell = oTable.getCellByPosition(8, ri);
           OdfTableCell libraryQcCell = oTable.getCellByPosition(9, ri);
           OdfTableCell libraryQcInsertSizeCell = oTable.getCellByPosition(10, ri);
           OdfTableCell libraryQcMolarityCell = oTable.getCellByPosition(11, ri);
@@ -3065,7 +3064,7 @@ public class FormUtils {
           }
 
           // if (!"".equals(libraryQcCell.getStringValue())) {
-          if (barcodeKitCell.getStringValue() != null && barcodeTagsCell.getStringValue() != null) {
+          if (indexFamilyCell.getStringValue() != null && indicesCell.getStringValue() != null) {
             // create library
             Library library = new LibraryImpl();
             library.setSample(s);
@@ -3128,19 +3127,18 @@ public class FormUtils {
                 }
               }
 
-              if (!isStringEmptyOrNull(barcodeKitCell.getStringValue())) {
-                TagBarcodeFamily bcs = tagBarcodeService.getTagBarcodeFamilyByName(barcodeKitCell.getStringValue());
-                if (bcs != null) {
-                  String tags = barcodeTagsCell.getStringValue();
+              if (!isStringEmptyOrNull(indexFamilyCell.getStringValue())) {
+                IndexFamily ifam = indexService.getIndexFamilyByName(indexFamilyCell.getStringValue());
+                if (ifam != null) {
+                  String tags = indicesCell.getStringValue();
                   if (!isStringEmptyOrNull(tags)) {
-                    library.setTagBarcodes(matchBarcodesFromText(bcs.getBarcodes(), tags));
+                    library.setIndices(matchIndicesFromText(ifam.getIndices(), tags));
                   } else {
                     throw new InputFormException(
-                        "Barcode Kit specified but no tag barcodes entered for: '" + sampleAliasCell.getStringValue() + "'.");
+                        "Index family specified but no indices entered for: '" + sampleAliasCell.getStringValue() + "'.");
                   }
                 } else {
-                  throw new InputFormException(
-                      "No tag barcodes associated with this kit definition: '" + barcodeKitCell.getStringValue() + "'.");
+                  throw new InputFormException("No indices associated with this index family: '" + indexFamilyCell.getStringValue() + "'.");
                 }
               }
 
@@ -3532,8 +3530,8 @@ public class FormUtils {
 
         // sample OK - good to go
         if (s != null) {
-          XSSFCell barcodeKitCell = row.getCell(9);
-          XSSFCell barcodeTagsCell = row.getCell(10);
+          XSSFCell indexFamilyCell = row.getCell(9);
+          XSSFCell indicesCell = row.getCell(10);
           XSSFCell libraryQubitCell = row.getCell(6);
           XSSFCell libraryQcInsertSizeCell = row.getCell(7);
           XSSFCell libraryQcMolarityCell = row.getCell(8);
@@ -3612,16 +3610,15 @@ public class FormUtils {
             rowsJSONArray.add("");
           }
 
-          if (getCellValueAsString(barcodeKitCell) != null
+          if (getCellValueAsString(indexFamilyCell) != null
               && ("A".equals(proceedKey) || "L".equals(proceedKey) || "U".equals(proceedKey))) {
-            rowsJSONArray.add(getCellValueAsString(barcodeKitCell));
+            rowsJSONArray.add(getCellValueAsString(indexFamilyCell));
           } else {
             rowsJSONArray.add("");
           }
 
-          if (getCellValueAsString(barcodeTagsCell) != null
-              && ("A".equals(proceedKey) || "L".equals(proceedKey) || "U".equals(proceedKey))) {
-            rowsJSONArray.add(getCellValueAsString(barcodeTagsCell));
+          if (getCellValueAsString(indicesCell) != null && ("A".equals(proceedKey) || "L".equals(proceedKey) || "U".equals(proceedKey))) {
+            rowsJSONArray.add(getCellValueAsString(indicesCell));
           } else {
             rowsJSONArray.add("");
           }
@@ -3664,7 +3661,7 @@ public class FormUtils {
     }
   }
 
-  public static String processLibraryPoolSheetImport(File inPath, User u, RequestManager manager, TagBarcodeService tagBarcodeService)
+  public static String processLibraryPoolSheetImport(File inPath, User u, RequestManager manager, IndexService indexService)
       throws Exception {
     if (inPath.getName().endsWith(".xlsx")) {
       XSSFWorkbook wb = new XSSFWorkbook(new FileInputStream(inPath));
@@ -3757,8 +3754,8 @@ public class FormUtils {
         // sample OK - good to go
         if (s != null) {
 
-          XSSFCell barcodeKitCell = row.getCell(9);
-          XSSFCell barcodeTagsCell = row.getCell(10);
+          XSSFCell indexFamilyCell = row.getCell(9);
+          XSSFCell indicesCell = row.getCell(10);
           XSSFCell libraryQubitCell = row.getCell(6);
           XSSFCell libraryQcInsertSizeCell = row.getCell(7);
           XSSFCell libraryQcMolarityCell = row.getCell(8);
@@ -3773,7 +3770,7 @@ public class FormUtils {
           LibraryDilution ldi = new LibraryDilution();
 
           Date date = new Date();
-          if (getCellValueAsString(barcodeKitCell) != null && getCellValueAsString(barcodeTagsCell) != null) {
+          if (getCellValueAsString(indexFamilyCell) != null && getCellValueAsString(indicesCell) != null) {
             // create library
             Library library = new LibraryImpl();
             library.setSample(s);
@@ -3894,17 +3891,17 @@ public class FormUtils {
                 }
               }
 
-              if (getCellValueAsString(barcodeKitCell) != null) {
-                TagBarcodeFamily bcs = tagBarcodeService.getTagBarcodeFamilyByName(getCellValueAsString(barcodeKitCell));
-                if (bcs != null) {
-                  String tags = getCellValueAsString(barcodeTagsCell);
+              if (getCellValueAsString(indexFamilyCell) != null) {
+                IndexFamily ifam = indexService.getIndexFamilyByName(getCellValueAsString(indexFamilyCell));
+                if (ifam != null) {
+                  String tags = getCellValueAsString(indicesCell);
                   if (!isStringEmptyOrNull(tags)) {
-                    library.setTagBarcodes(matchBarcodesFromText(bcs.getBarcodes(), tags));
+                    library.setIndices(matchIndicesFromText(ifam.getIndices(), tags));
                   } else {
-                    throw new InputFormException("Barcode Kit specified but no tag barcodes entered for: '" + s.getAlias() + "'.");
+                    throw new InputFormException("Index family specified but no indices entered for: '" + s.getAlias() + "'.");
                   }
                 } else {
-                  throw new InputFormException("No tag barcodes associated with the kit definition '" + getCellValueAsString(barcodeKitCell)
+                  throw new InputFormException("No indices associated with the index family '" + getCellValueAsString(indexFamilyCell)
                       + "' for sample: '" + s.getAlias() + "'.");
                 }
               }
@@ -3971,7 +3968,7 @@ public class FormUtils {
   }
 
   private static Map<String, PlatePool> process384PlateInputXLSX(XSSFWorkbook wb, User u, RequestManager manager,
-      MisoNamingScheme<Library> libraryNamingScheme, TagBarcodeService tagBarcodeService) throws Exception {
+      MisoNamingScheme<Library> libraryNamingScheme, IndexService indexService) throws Exception {
     ((RequestManagerAwareNamingScheme) libraryNamingScheme).setRequestManager(manager);
 
     List<Sample> samples = new ArrayList<Sample>();
@@ -4093,8 +4090,8 @@ public class FormUtils {
         XSSFCell poolNumberCell = row.getCell(3);
         XSSFCell sampleQcCell = row.getCell(4);
         XSSFCell libraryDescriptionCell = row.getCell(7);
-        XSSFCell barcodeKitCell = row.getCell(8);
-        XSSFCell barcodeTagsCell = row.getCell(9);
+        XSSFCell indexFamilyCell = row.getCell(8);
+        XSSFCell indicesCell = row.getCell(9);
         XSSFCell libraryQcCell = row.getCell(10);
         XSSFCell libraryQcInsertSizeCell = row.getCell(11);
         XSSFCell libraryQcMolarityCell = row.getCell(12);
@@ -4149,7 +4146,7 @@ public class FormUtils {
           }
         }
 
-        if (getCellValueAsString(barcodeKitCell) != null && getCellValueAsString(barcodeTagsCell) != null) {
+        if (getCellValueAsString(indexFamilyCell) != null && getCellValueAsString(indicesCell) != null) {
           // create library
           Library library = new LibraryImpl();
           library.setSample(s);
@@ -4210,17 +4207,17 @@ public class FormUtils {
               }
             }
 
-            if (getCellValueAsString(barcodeKitCell) != null) {
-              TagBarcodeFamily bcs = tagBarcodeService.getTagBarcodeFamilyByName(getCellValueAsString(barcodeKitCell));
-              if (bcs != null) {
-                String tags = getCellValueAsString(barcodeTagsCell);
+            if (getCellValueAsString(indexFamilyCell) != null) {
+              IndexFamily ifam = indexService.getIndexFamilyByName(getCellValueAsString(indexFamilyCell));
+              if (ifam != null) {
+                String tags = getCellValueAsString(indicesCell);
                 if (!isStringEmptyOrNull(tags)) {
-                  library.setTagBarcodes(matchBarcodesFromText(bcs.getBarcodes(), tags));
+                  library.setIndices(matchIndicesFromText(ifam.getIndices(), tags));
                 } else {
-                  throw new InputFormException("Barcode Kit specified but no tag barcodes entered for: '" + s.getAlias() + "'.");
+                  throw new InputFormException("Index family specified but no indices entered for: '" + s.getAlias() + "'.");
                 }
               } else {
-                throw new InputFormException("No tag barcodes associated with the kit definition '" + getCellValueAsString(barcodeKitCell)
+                throw new InputFormException("No indices associated with the index family '" + getCellValueAsString(indexFamilyCell)
                     + "' for sample: '" + s.getAlias() + "'.");
               }
 
@@ -4265,20 +4262,20 @@ public class FormUtils {
   }
 
   public static Map<String, PlatePool> importPlateInputSpreadsheet(File inPath, User u, RequestManager manager,
-      MisoNamingScheme<Library> libraryNamingScheme, TagBarcodeService tagBarcodeService) throws Exception {
+      MisoNamingScheme<Library> libraryNamingScheme, IndexService indexService) throws Exception {
     if (inPath.getName().endsWith(".xlsx")) {
       XSSFWorkbook wb = new XSSFWorkbook(new FileInputStream(inPath));
-      return process384PlateInputXLSX(wb, u, manager, libraryNamingScheme, tagBarcodeService);
+      return process384PlateInputXLSX(wb, u, manager, libraryNamingScheme, indexService);
     } else if (inPath.getName().endsWith(".ods")) {
       OdfSpreadsheetDocument oDoc = (OdfSpreadsheetDocument) OdfDocument.loadDocument(inPath);
-      return process384PlateInputODS(oDoc, u, manager, libraryNamingScheme, tagBarcodeService);
+      return process384PlateInputODS(oDoc, u, manager, libraryNamingScheme, indexService);
     } else {
       throw new UnsupportedOperationException("Cannot process bulk input files other than xls, xlsx, and ods.");
     }
   }
 
   private static List<Sample> processSampleInputODS(OdfSpreadsheetDocument oDoc, User u, RequestManager manager,
-      MisoNamingScheme<Library> libraryNamingScheme, TagBarcodeService tagBarcodeService) throws Exception {
+      MisoNamingScheme<Library> libraryNamingScheme, IndexService indexService) throws Exception {
     ((RequestManagerAwareNamingScheme) libraryNamingScheme).setRequestManager(manager);
 
     List<Sample> samples = new ArrayList<Sample>();
@@ -4388,8 +4385,8 @@ public class FormUtils {
           String poolNumberCell = oTable.getCellByPosition(3, ri).getStringValue();
           String sampleQcCell = oTable.getCellByPosition(4, ri).getStringValue();
           String libraryDescriptionCell = oTable.getCellByPosition(7, ri).getStringValue();
-          String barcodeKitCell = oTable.getCellByPosition(8, ri).getStringValue();
-          String barcodeTagsCell = oTable.getCellByPosition(9, ri).getStringValue();
+          String indexFamilyCell = oTable.getCellByPosition(8, ri).getStringValue();
+          String indicesCell = oTable.getCellByPosition(9, ri).getStringValue();
           String libraryQcCell = oTable.getCellByPosition(10, ri).getStringValue();
           String libraryQcInsertSizeCell = oTable.getCellByPosition(11, ri).getStringValue();
           String libraryQcMolarityCell = oTable.getCellByPosition(12, ri).getStringValue();
@@ -4402,11 +4399,20 @@ public class FormUtils {
           processPool(poolNumberCell, poolConvertedMolarityCell, pools);
           processSampleQC(sampleQcCell, s, u, manager);
 
-          Library library = processLibrary(libraryQcCell, libraryDescriptionCell, libraryQcPassFailCell, s, pt, lt, ls, lst, paired,
+          Library library = processLibrary(
+              libraryQcCell,
+              libraryDescriptionCell,
+              libraryQcPassFailCell,
+              s,
+              pt,
+              lt,
+              ls,
+              lst,
+              paired,
               libraryNamingScheme);
           if (library != null) {
             processLibraryQC(libraryQcCell, libraryQcMolarityCell, libraryQcInsertSizeCell, library, u, manager);
-            processBarcodes(barcodeKitCell, barcodeTagsCell, library, manager, tagBarcodeService);
+            processIndices(indexFamilyCell, indicesCell, library, manager, indexService);
             processDilutions(dilutionMolarityCell, library, pools.get(poolNumberCell), u);
             log.info("Added library: " + library.toString());
             s.addLibrary(library);
@@ -4420,7 +4426,7 @@ public class FormUtils {
   }
 
   private static List<Sample> processSampleInputXLSX(XSSFWorkbook wb, User u, RequestManager manager,
-      MisoNamingScheme<Library> libraryNamingScheme, TagBarcodeService tagBarcodeService) throws Exception {
+      MisoNamingScheme<Library> libraryNamingScheme, IndexService indexService) throws Exception {
     ((RequestManagerAwareNamingScheme) libraryNamingScheme).setRequestManager(manager);
 
     List<Sample> samples = new ArrayList<Sample>();
@@ -4534,8 +4540,8 @@ public class FormUtils {
         String poolNumberCell = getCellValueAsString(row.getCell(3));
         String sampleQcCell = getCellValueAsString(row.getCell(4));
         String libraryDescriptionCell = getCellValueAsString(row.getCell(7));
-        String barcodeKitCell = getCellValueAsString(row.getCell(8));
-        String barcodeTagsCell = getCellValueAsString(row.getCell(9));
+        String indexKitCell = getCellValueAsString(row.getCell(8));
+        String indexTagsCell = getCellValueAsString(row.getCell(9));
         String libraryQcCell = getCellValueAsString(row.getCell(10));
         String libraryQcInsertSizeCell = getCellValueAsString(row.getCell(11));
         String libraryQcMolarityCell = getCellValueAsString(row.getCell(12));
@@ -4548,11 +4554,20 @@ public class FormUtils {
         processPool(poolNumberCell, poolConvertedMolarityCell, pools);
         processSampleQC(sampleQcCell, s, u, manager);
 
-        Library library = processLibrary(libraryQcCell, libraryDescriptionCell, libraryQcPassFailCell, s, pt, lt, ls, lst, paired,
+        Library library = processLibrary(
+            libraryQcCell,
+            libraryDescriptionCell,
+            libraryQcPassFailCell,
+            s,
+            pt,
+            lt,
+            ls,
+            lst,
+            paired,
             libraryNamingScheme);
         if (library != null) {
           processLibraryQC(libraryQcCell, libraryQcMolarityCell, libraryQcInsertSizeCell, library, u, manager);
-          processBarcodes(barcodeKitCell, barcodeTagsCell, library, manager, tagBarcodeService);
+          processIndices(indexKitCell, indexTagsCell, library, manager, indexService);
           processDilutions(dilutionMolarityCell, library, pools.get(poolNumberCell), u);
           log.info("Added library: " + library.toString());
           s.addLibrary(library);
@@ -4610,7 +4625,7 @@ public class FormUtils {
 
   private static Library processLibrary(String libraryQc, String libraryDescription, String libraryQcPassFail, Sample s, PlatformType pt,
       LibraryType lt, LibrarySelectionType ls, LibraryStrategyType lst, boolean paired, MisoNamingScheme<Library> libraryNamingScheme)
-          throws Exception {
+      throws Exception {
     if (!isStringEmptyOrNull(libraryQc)) {
       // create library
       Library library = new LibraryImpl();
@@ -4690,18 +4705,18 @@ public class FormUtils {
     }
   }
 
-  private static void processBarcodes(String barcodeKit, String barcodeTags, Library library, RequestManager manager,
-      TagBarcodeService tagBarcodeService) throws Exception {
-    if (!isStringEmptyOrNull(barcodeKit)) {
-      TagBarcodeFamily bcs = tagBarcodeService.getTagBarcodeFamilyByName(barcodeKit);
-      if (bcs != null) {
-        if (!isStringEmptyOrNull(barcodeTags)) {
-          library.setTagBarcodes(matchBarcodesFromText(bcs.getBarcodes(), barcodeTags));
+  private static void processIndices(String indexKit, String indexTags, Library library, RequestManager manager, IndexService indexService)
+      throws Exception {
+    if (!isStringEmptyOrNull(indexKit)) {
+      IndexFamily ifam = indexService.getIndexFamilyByName(indexKit);
+      if (ifam != null) {
+        if (!isStringEmptyOrNull(indexTags)) {
+          library.setIndices(matchIndicesFromText(ifam.getIndices(), indexTags));
         } else {
-          throw new InputFormException("Barcode Kit specified but no tag barcodes entered for: '" + library.getSample().getAlias() + "'.");
+          throw new InputFormException("Index Kit specified but no indices entered for: '" + library.getSample().getAlias() + "'.");
         }
       } else {
-        throw new InputFormException("No tag barcodes associated with this kit definition: '" + library.getSample().getAlias() + "'.");
+        throw new InputFormException("No indices associated with this kit definition: '" + library.getSample().getAlias() + "'.");
       }
     }
   }
@@ -4731,13 +4746,13 @@ public class FormUtils {
   }
 
   public static List<Sample> importSampleInputSpreadsheet(File inPath, User u, RequestManager manager,
-      MisoNamingScheme<Library> libraryNamingScheme, TagBarcodeService tagBarcodeStrategyService) throws Exception {
+      MisoNamingScheme<Library> libraryNamingScheme, IndexService indexService) throws Exception {
     if (inPath.getName().endsWith(".xlsx")) {
       XSSFWorkbook wb = new XSSFWorkbook(new FileInputStream(inPath));
-      return processSampleInputXLSX(wb, u, manager, libraryNamingScheme, tagBarcodeStrategyService);
+      return processSampleInputXLSX(wb, u, manager, libraryNamingScheme, indexService);
     } else if (inPath.getName().endsWith(".ods")) {
       OdfSpreadsheetDocument oDoc = (OdfSpreadsheetDocument) OdfDocument.loadDocument(inPath);
-      return processSampleInputODS(oDoc, u, manager, libraryNamingScheme, tagBarcodeStrategyService);
+      return processSampleInputODS(oDoc, u, manager, libraryNamingScheme, indexService);
     } else {
       throw new UnsupportedOperationException("Cannot process bulk input files other than xls, xlsx, and ods.");
     }
@@ -4976,22 +4991,22 @@ public class FormUtils {
     }
   }
 
-  public static List<TagBarcode> matchBarcodesFromText(Iterable<TagBarcode> allowBarcodes, String tagText) throws InputFormException {
-    List<TagBarcode> matchedBarcodes = new ArrayList<TagBarcode>();
-    String[] splits = tagText.split("-");
+  public static List<Index> matchIndicesFromText(Iterable<Index> allowIndices, String indexText) throws InputFormException {
+    List<Index> matchedIndices = new ArrayList<Index>();
+    String[] splits = indexText.split("-");
     for (String tag : splits) {
       boolean success = false;
-      for (TagBarcode tb : allowBarcodes) {
-        if (tb.getName().equals(tag) || tb.getSequence().equals(tagText)) {
-          matchedBarcodes.add(tb);
+      for (Index index : allowIndices) {
+        if (index.getName().equals(tag) || index.getSequence().equals(indexText)) {
+          matchedIndices.add(index);
           success = true;
           break;
         }
         if (!success) {
-          throw new InputFormException("Unknown barcode: " + tag);
+          throw new InputFormException("Unknown index: " + tag);
         }
       }
     }
-    return matchedBarcodes;
+    return matchedIndices;
   }
 }

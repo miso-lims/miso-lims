@@ -36,10 +36,10 @@ import javax.persistence.Id;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlateMaterialType;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
@@ -66,7 +66,7 @@ public abstract class AbstractPlate<T extends List<S>, S extends Plateable> impl
   @Enumerated(EnumType.STRING)
   private PlateMaterialType plateMaterialType;
 
-  private TagBarcode tagBarcode;
+  private Index index;
   private String identificationBarcode;
   private String locationBarcode;
 
@@ -135,13 +135,13 @@ public abstract class AbstractPlate<T extends List<S>, S extends Plateable> impl
   }
 
   @Override
-  public TagBarcode getTagBarcode() {
-    return tagBarcode;
+  public Index getIndex() {
+    return index;
   }
 
   @Override
-  public void setTagBarcode(TagBarcode tagBarcode) {
-    this.tagBarcode = tagBarcode;
+  public void setIndex(Index index) {
+    this.index = index;
   }
 
   @Override
@@ -184,7 +184,7 @@ public abstract class AbstractPlate<T extends List<S>, S extends Plateable> impl
 
   @Override
   public String getLabelText() {
-    return getTagBarcode().getSequence() + "(" + getElementType().getSimpleName() + " " + getPlateMaterialType().getKey() + ")";
+    return getIndex().getSequence() + "(" + getElementType().getSimpleName() + " " + getPlateMaterialType().getKey() + ")";
   }
 
   @Override

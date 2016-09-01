@@ -917,8 +917,8 @@
                         </select></td>
                     </tr>
                     <tr>
-                        <td>Barcode Kit:</td>
-                        <td><select name="barcodekit" id="barcodekit">
+                        <td>Index Family:</td>
+                        <td><select name="indexfamily" id="indexfamily">
                         </select></td>
                     </tr>
                 </table>

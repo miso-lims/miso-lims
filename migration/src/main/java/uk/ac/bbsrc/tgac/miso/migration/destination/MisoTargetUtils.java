@@ -12,10 +12,10 @@ import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractProject;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
+import uk.ac.bbsrc.tgac.miso.core.data.Index;
+import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletion;
-import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
-import uk.ac.bbsrc.tgac.miso.core.data.TagBarcodeFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstituteImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
@@ -49,7 +49,7 @@ public class MisoTargetUtils {
   private MisoTargetUtils() {
     throw new AssertionError("Unintended instantiation of static utility class");
   }
-  
+
   public static DataSource makeDataSource(String url, String username, String password) {
     try {
       Class.forName("com.mysql.jdbc.Driver");
@@ -63,48 +63,20 @@ public class MisoTargetUtils {
     datasource.setPassword(password);
     return datasource;
   }
-  
+
   public static SessionFactory makeSessionFactory(DataSource datasource) throws IOException {
     LocalSessionFactoryBean bean = new LocalSessionFactoryBean();
     bean.setDataSource(datasource);
     // TODO: use setPackagesToScan instead after fixing annotations
     // bean.setPackagesToScan("uk.ac.bbsrc.tgac.miso.core.data");
-    bean.setAnnotatedClasses(new Class[]{
-        TissueOriginImpl.class,
-        TissueTypeImpl.class,
-        SampleClassImpl.class,
-        SubprojectImpl.class,
-        QcPassedDetailImpl.class,
-        SamplePurposeImpl.class,
-        SampleGroupImpl.class,
-        TissueMaterialImpl.class,
-        SampleAliquotImpl.class,
-        SampleStockImpl.class,
-        UserImpl.class,
-        AbstractSample.class,
-        IdentityImpl.class,
-        AbstractProject.class,
-        PoolOrderImpl.class,
-        PoolOrderCompletion.class,
-        ProjectImpl.class,
-        SampleImpl.class,
-        SampleDerivedInfo.class,
-        SampleAdditionalInfoImpl.class,
-        KitDescriptor.class,
-        SampleValidRelationshipImpl.class,
-        SampleNumberPerProjectImpl.class,
-        SampleTissueImpl.class,
-        SequencingParametersImpl.class,
-        InstituteImpl.class,
-        LabImpl.class,
-        ReferenceGenomeImpl.class,
-        AbstractLibrary.class,
-        LibraryAdditionalInfoImpl.class,
-        LibraryDesign.class,
-        LibraryType.class,
-        TagBarcode.class,
-        TagBarcodeFamily.class
-        });
+    bean.setAnnotatedClasses(
+        new Class[] { TissueOriginImpl.class, TissueTypeImpl.class, SampleClassImpl.class, SubprojectImpl.class, QcPassedDetailImpl.class,
+            SamplePurposeImpl.class, SampleGroupImpl.class, TissueMaterialImpl.class, SampleAliquotImpl.class, SampleStockImpl.class,
+            UserImpl.class, AbstractSample.class, IdentityImpl.class, AbstractProject.class, PoolOrderImpl.class, PoolOrderCompletion.class,
+            ProjectImpl.class, SampleImpl.class, SampleDerivedInfo.class, SampleAdditionalInfoImpl.class, KitDescriptor.class,
+            SampleValidRelationshipImpl.class, SampleNumberPerProjectImpl.class, SampleTissueImpl.class, SequencingParametersImpl.class,
+            InstituteImpl.class, LabImpl.class, ReferenceGenomeImpl.class, AbstractLibrary.class, LibraryAdditionalInfoImpl.class,
+            LibraryDesign.class, LibraryType.class, Index.class, IndexFamily.class });
     Properties properties = new Properties();
     properties.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQL5InnoDBDialect");
     properties.setProperty("hibernate.show_sql", "false");

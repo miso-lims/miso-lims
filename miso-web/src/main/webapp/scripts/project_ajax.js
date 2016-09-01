@@ -1459,7 +1459,7 @@ Project.barcode = {
 
       jQuery(tableId).find("tr:first").prepend("<th width='5%'>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\"" + tableId + "\", this);'></span></th>");
       jQuery(tableId).find("tr:gt(0)").prepend("<td width='5%' class='rowSelect'></td>");
-      //Library Name 	Library Alias 	Library Description 	Library Type 	Library Platform 	Tag Barcode 	Insert Size
+      //Library Name 	Library Alias 	Library Description 	Library Type 	Library Platform 	Index 	Insert Size
       var headers = ['rowsel',
                      'name',
                      'alias',
@@ -1467,7 +1467,7 @@ Project.barcode = {
                      'description',
                      'libraryType',
                      'platform',
-                     'tagBarcode',
+                     'index',
                      'insertSize'];
 
       var oTable = jQuery(tableId).dataTable({

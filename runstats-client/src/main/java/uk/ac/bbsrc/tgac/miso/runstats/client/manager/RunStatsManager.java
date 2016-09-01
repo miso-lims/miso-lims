@@ -38,13 +38,13 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
+import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
-import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
 import uk.ac.bbsrc.tgac.miso.runstats.client.RunStatsException;
 import uk.ac.tgac.statsdb.exception.ConsumerException;
 import uk.ac.tgac.statsdb.run.ReportTable;
@@ -155,14 +155,14 @@ public class RunStatsManager {
             Pool<? extends Poolable> pool = part.getPool();
             for (Dilution d : pool.getDilutions()) {
               Library l = d.getLibrary();
-              if (!l.getTagBarcodes().isEmpty()) {
-                for (TagBarcode tb : l.getTagBarcodes()) {
+              if (!l.getIndices().isEmpty()) {
+                for (Index index : l.getIndices()) {
                   map.remove(RunProperty.barcode);
                   try {
-                    map.put(RunProperty.barcode, tb.getSequence());
+                    map.put(RunProperty.barcode, index.getSequence());
                     rt = reports.getAverageValues(map);
                     if (rt != null) {
-                      partition.put(tb.getSequence(), JSONArray.fromObject(rt.toJSON()));
+                      partition.put(index.getSequence(), JSONArray.fromObject(rt.toJSON()));
                     }
                   } catch (SQLException e) {
                     log.error("get summary stats for run", e);
@@ -212,14 +212,14 @@ public class RunStatsManager {
             Pool<? extends Poolable> pool = part.getPool();
             for (Dilution d : pool.getDilutions()) {
               Library l = d.getLibrary();
-              if (!l.getTagBarcodes().isEmpty()) {
-                for (TagBarcode tb : l.getTagBarcodes()) {
+              if (!l.getIndices().isEmpty()) {
+                for (Index index : l.getIndices()) {
                   map.remove(RunProperty.barcode);
                   try {
-                    map.put(RunProperty.barcode, tb.getSequence());
+                    map.put(RunProperty.barcode, index.getSequence());
                     rt = reports.getAverageValues(map);
                     if (rt != null) {
-                      partition.put(tb.getSequence(), JSONArray.fromObject(rt.toJSON()));
+                      partition.put(index.getSequence(), JSONArray.fromObject(rt.toJSON()));
                     }
                   } catch (SQLException e) {
                     log.error("get summary stats for lane", e);

@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Institute;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -24,7 +25,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
-import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
@@ -67,15 +67,15 @@ public class ValueTypeLookup {
   private Map<String, Map<String, LibraryType>> libraryTypeByPlatformAndDescription;
   private Map<Long, LibraryDesign> libraryDesignById;
   private Map<String, LibraryDesign> libraryDesignByName;
-  private Map<Long, TagBarcode> tagBarcodeById;
-  private Map<String, Map<String, TagBarcode>> tagBarcodeByFamilyAndSequence;
+  private Map<Long, Index> indexById;
+  private Map<String, Map<String, Index>> indexByFamilyAndSequence;
   private Map<Long, QcType> sampleQcTypeById;
   private Map<String, QcType> sampleQcTypeByName;
   private Map<Long, QcType> libraryQcTypeById;
   private Map<String, QcType> libraryQcTypeByName;
   private Map<Long, SequencerReference> sequencerById;
   private Map<String, SequencerReference> sequencerByName;
-  
+
   /**
    * Create a ValueTypeLookup loaded with data from the provided MisoServiceManager
    * 
@@ -94,12 +94,12 @@ public class ValueTypeLookup {
     setLibraryStrategies(misoServiceManager.getLibraryDao().listAllLibraryStrategyTypes());
     setLibraryTypes(misoServiceManager.getLibraryDao().listAllLibraryTypes());
     setLibraryDesigns(misoServiceManager.getLibraryDesignDao().getLibraryDesigns());
-    setTagBarcodes(misoServiceManager.getTagBarcodeDao().listAllTagBarcodes());
+    setIndices(misoServiceManager.getIndexDao().listAllIndices());
     setSampleQcTypes(misoServiceManager.getSampleQcDao().listAllSampleQcTypes());
     setLibraryQcTypes(misoServiceManager.getLibraryQcDao().listAllLibraryQcTypes());
     setSequencers(misoServiceManager.getSequencerReferenceDao().listAll());
   }
-  
+
   private void setSampleClasses(Collection<SampleClass> sampleClasses) {
     Map<Long, SampleClass> mapById = new UniqueKeyHashMap<>();
     Map<String, SampleClass> mapByAlias = new UniqueKeyHashMap<>();
@@ -110,7 +110,7 @@ public class ValueTypeLookup {
     this.sampleClassByAlias = mapByAlias;
     this.sampleClassById = mapById;
   }
-  
+
   private void setTissueTypes(Collection<TissueType> tissueTypes) {
     Map<Long, TissueType> mapById = new UniqueKeyHashMap<>();
     Map<String, TissueType> mapByAlias = new UniqueKeyHashMap<>();
@@ -121,7 +121,7 @@ public class ValueTypeLookup {
     this.tissueTypeById = mapById;
     this.tissueTypeByAlias = mapByAlias;
   }
-  
+
   private void setTissueMaterials(Collection<TissueMaterial> tissueMaterials) {
     Map<Long, TissueMaterial> mapById = new UniqueKeyHashMap<>();
     Map<String, TissueMaterial> mapByAlias = new UniqueKeyHashMap<>();
@@ -132,7 +132,7 @@ public class ValueTypeLookup {
     this.tissueMaterialById = mapById;
     this.tissueMaterialByAlias = mapByAlias;
   }
-  
+
   private void setKits(Collection<KitDescriptor> kits) {
     Map<Long, KitDescriptor> mapById = new UniqueKeyHashMap<>();
     Map<String, KitDescriptor> mapByName = new UniqueKeyHashMap<>();
@@ -143,7 +143,7 @@ public class ValueTypeLookup {
     this.kitById = mapById;
     this.kitByName = mapByName;
   }
-  
+
   private void setSamplePurposes(Collection<SamplePurpose> samplePurposes) {
     Map<Long, SamplePurpose> mapById = new UniqueKeyHashMap<>();
     Map<String, SamplePurpose> mapByAlias = new UniqueKeyHashMap<>();
@@ -154,7 +154,7 @@ public class ValueTypeLookup {
     this.samplePurposeById = mapById;
     this.samplePurposeByAlias = mapByAlias;
   }
-  
+
   private void setLabs(Collection<Lab> labs) {
     Map<Long, Lab> labMapById = new UniqueKeyHashMap<>();
     Map<Long, Map<String, Lab>> labMapByInstituteId = new UniqueKeyHashMap<>();
@@ -171,7 +171,7 @@ public class ValueTypeLookup {
     this.labsByInstituteId = labMapByInstituteId;
     this.institutesByAlias = instMapByAlias;
   }
-  
+
   private void setTissueOrigins(Collection<TissueOrigin> tissueOrigins) {
     Map<Long, TissueOrigin> mapById = new UniqueKeyHashMap<>();
     Map<String, TissueOrigin> mapByAlias = new UniqueKeyHashMap<>();
@@ -185,7 +185,7 @@ public class ValueTypeLookup {
     this.tissueOriginsByAlias = mapByAlias;
     this.tissueOriginsByDescription = mapByDescription;
   }
-  
+
   private void setLibrarySelections(Collection<LibrarySelectionType> librarySelections) {
     Map<Long, LibrarySelectionType> mapById = new UniqueKeyHashMap<>();
     Map<String, LibrarySelectionType> mapByName = new UniqueKeyHashMap<>();
@@ -196,7 +196,7 @@ public class ValueTypeLookup {
     this.librarySelectionsById = mapById;
     this.librarySelectionsByName = mapByName;
   }
-  
+
   private void setLibraryStrategies(Collection<LibraryStrategyType> libraryStrategies) {
     Map<Long, LibraryStrategyType> mapById = new UniqueKeyHashMap<>();
     Map<String, LibraryStrategyType> mapByName = new UniqueKeyHashMap<>();
@@ -207,7 +207,7 @@ public class ValueTypeLookup {
     this.libraryStrategiesById = mapById;
     this.libraryStrategiesByName = mapByName;
   }
-  
+
   private void setLibraryTypes(Collection<LibraryType> libraryTypes) {
     Map<Long, LibraryType> mapById = new UniqueKeyHashMap<>();
     Map<String, Map<String, LibraryType>> mapByPlatformAndDesc = new UniqueKeyHashMap<>();
@@ -221,7 +221,7 @@ public class ValueTypeLookup {
     this.libraryTypeById = mapById;
     this.libraryTypeByPlatformAndDescription = mapByPlatformAndDesc;
   }
-  
+
   private void setLibraryDesigns(Collection<LibraryDesign> libraryDesigns) {
     Map<Long, LibraryDesign> mapById = new UniqueKeyHashMap<>();
     Map<String, LibraryDesign> mapByName = new UniqueKeyHashMap<>();
@@ -232,23 +232,23 @@ public class ValueTypeLookup {
     this.libraryDesignById = mapById;
     this.libraryDesignByName = mapByName;
   }
-  
-  private void setTagBarcodes(Collection<TagBarcode> tagBarcodes) {
-    Map<Long, TagBarcode> mapById = new UniqueKeyHashMap<>();
-    Map<String, Map<String, TagBarcode>> mapByFamilyAndSequence = new UniqueKeyHashMap<>();
-    for (TagBarcode tb : tagBarcodes) {
-      Map<String, TagBarcode> mapBySequence = mapByFamilyAndSequence.get(tb.getFamily().getName());
+
+  private void setIndices(Collection<Index> indices) {
+    Map<Long, Index> mapById = new UniqueKeyHashMap<>();
+    Map<String, Map<String, Index>> mapByFamilyAndSequence = new UniqueKeyHashMap<>();
+    for (Index index : indices) {
+      Map<String, Index> mapBySequence = mapByFamilyAndSequence.get(index.getFamily().getName());
       if (mapBySequence == null) {
-        mapBySequence = new UniqueKeyHashMap<String, TagBarcode>();
-        mapByFamilyAndSequence.put(tb.getFamily().getName(), mapBySequence);
+        mapBySequence = new UniqueKeyHashMap<String, Index>();
+        mapByFamilyAndSequence.put(index.getFamily().getName(), mapBySequence);
       }
-      mapBySequence.put(tb.getSequence(), tb);
-      mapById.put(tb.getId(), tb);
+      mapBySequence.put(index.getSequence(), index);
+      mapById.put(index.getId(), index);
     }
-    this.tagBarcodeById = mapById;
-    this.tagBarcodeByFamilyAndSequence = mapByFamilyAndSequence;
+    this.indexById = mapById;
+    this.indexByFamilyAndSequence = mapByFamilyAndSequence;
   }
-  
+
   private void setSampleQcTypes(Collection<QcType> qcTypes) {
     Map<Long, QcType> mapById = new UniqueKeyHashMap<>();
     Map<String, QcType> mapByName = new UniqueKeyHashMap<>();
@@ -259,7 +259,7 @@ public class ValueTypeLookup {
     this.sampleQcTypeById = mapById;
     this.sampleQcTypeByName = mapByName;
   }
-  
+
   private void setLibraryQcTypes(Collection<QcType> qcTypes) {
     Map<Long, QcType> mapById = new UniqueKeyHashMap<>();
     Map<String, QcType> mapByName = new UniqueKeyHashMap<>();
@@ -270,7 +270,7 @@ public class ValueTypeLookup {
     this.libraryQcTypeById = mapById;
     this.libraryQcTypeByName = mapByName;
   }
-  
+
   private void setSequencers(Collection<SequencerReference> sequencers) {
     Map<Long, SequencerReference> mapById = new UniqueKeyHashMap<>();
     Map<String, SequencerReference> mapByName = new UniqueKeyHashMap<>();
@@ -281,12 +281,12 @@ public class ValueTypeLookup {
     this.sequencerById = mapById;
     this.sequencerByName = mapByName;
   }
-  
+
   /**
    * Attempts to find an existing SampleClass
    * 
-   * @param sampleClass a partially-formed SampleClass, which must have its ID or alias set in
-   * order for this method to resolve the SampleClass
+   * @param sampleClass a partially-formed SampleClass, which must have its ID or alias set in order for this method to resolve the
+   * SampleClass
    * @return the existing SampleClass if a matching one is found; null otherwise
    */
   public SampleClass resolve(SampleClass sampleClass) {
@@ -295,12 +295,11 @@ public class ValueTypeLookup {
     if (sampleClass.getAlias() != null) return sampleClassByAlias.get(sampleClass.getAlias());
     return null;
   }
-  
+
   /**
    * Attempts to find an existing TissueType
    * 
-   * @param tissueType a partially-formed TissueType, which must have its ID or alias set in
-   * order for this method to resolve the TissueType
+   * @param tissueType a partially-formed TissueType, which must have its ID or alias set in order for this method to resolve the TissueType
    * @return the existing TissueType if a matching one is found; null otherwise
    */
   public TissueType resolve(TissueType tissueType) {
@@ -309,12 +308,12 @@ public class ValueTypeLookup {
     if (tissueType.getAlias() != null) return tissueTypeByAlias.get(tissueType.getAlias());
     return null;
   }
-  
+
   /**
    * Attempts to find an existing TissueMaterial
    * 
-   * @param tissueMaterial a partially-formed TissueMaterial, which must have its ID or alias
-   * set in order for this method to resolve the TissueMaterial
+   * @param tissueMaterial a partially-formed TissueMaterial, which must have its ID or alias set in order for this method to resolve the
+   * TissueMaterial
    * @return the existing TissueMaterial if a matching one is found; null otherwise
    */
   public TissueMaterial resolve(TissueMaterial tissueMaterial) {
@@ -323,12 +322,11 @@ public class ValueTypeLookup {
     if (tissueMaterial.getAlias() != null) return tissueMaterialByAlias.get(tissueMaterial.getAlias());
     return null;
   }
-  
+
   /**
    * Attempts to find an existing KitDescriptor
    * 
-   * @param kit a partially-formed KitDescriptor, which must have its ID or name set in order
-   * for this method to resolve the KitDescriptor
+   * @param kit a partially-formed KitDescriptor, which must have its ID or name set in order for this method to resolve the KitDescriptor
    * @return the existing KitDescriptor if a matching one is found; null otherwise
    */
   public KitDescriptor resolve(KitDescriptor kit) {
@@ -337,12 +335,12 @@ public class ValueTypeLookup {
     if (kit.getName() != null) return kitByName.get(kit.getName());
     return null;
   }
-  
+
   /**
    * Attempts to find an existing SamplePurpose
    * 
-   * @param samplePurpose a partially-formed SamplePurpose, which must have its ID or alias set in order
-   * for this method to resolve the SamplePurpose
+   * @param samplePurpose a partially-formed SamplePurpose, which must have its ID or alias set in order for this method to resolve the
+   * SamplePurpose
    * @return the existing SamplePurpose if a matching one is found; null otherwise
    */
   public SamplePurpose resolve(SamplePurpose samplePurpose) {
@@ -351,14 +349,13 @@ public class ValueTypeLookup {
     if (samplePurpose.getAlias() != null) return samplePurposeByAlias.get(samplePurpose.getAlias());
     return null;
   }
-  
+
   /**
    * Attempts to find an existing Lab
    * 
-   * @param lab a partially-formed Lab, which must have its ID, institute ID, or institute alias set in
-   * order for this method to resolve the Lab. The Lab's alias is used as well; if neither Lab ID nor
-   * Lab alias are set, the Lab alias 'Not Specified' is assumed, and the Institute is first resolved by
-   * ID or alias
+   * @param lab a partially-formed Lab, which must have its ID, institute ID, or institute alias set in order for this method to resolve the
+   * Lab. The Lab's alias is used as well; if neither Lab ID nor Lab alias are set, the Lab alias 'Not Specified' is assumed, and the
+   * Institute is first resolved by ID or alias
    * @return the existing Lab if a matching one is found; null otherwise
    */
   public Lab resolve(Lab lab) {
@@ -377,15 +374,15 @@ public class ValueTypeLookup {
         if (labsByAlias == null) return null;
         return labsByAlias.get(labAlias);
       }
-    } 
+    }
     return null;
   }
-  
+
   /**
    * Attempts to find an existing TissueOrigin
    * 
-   * @param tissueOrigin a partially-formed TissueOrigin, which must have its ID, alias, or description
-   * set in order for this method to resolve the TissueOrigin
+   * @param tissueOrigin a partially-formed TissueOrigin, which must have its ID, alias, or description set in order for this method to
+   * resolve the TissueOrigin
    * @return the existing TissueOrigin if a matching one is found; null otherwise
    */
   public TissueOrigin resolve(TissueOrigin tissueOrigin) {
@@ -398,12 +395,12 @@ public class ValueTypeLookup {
     if (tissueOrigin.getDescription() != null) return tissueOriginsByDescription.get(tissueOrigin.getDescription());
     return null;
   }
-  
+
   /**
    * Attempts to find an existing LibrarySelectionType
    * 
-   * @param librarySelectionType a partially-formed LibrarySelectionType, which must have its ID or name
-   * set in order for this method to resolve the LibrarySelectionType
+   * @param librarySelectionType a partially-formed LibrarySelectionType, which must have its ID or name set in order for this method to
+   * resolve the LibrarySelectionType
    * @return the existing LibrarySelectionType if a matching one is found; null otherwise
    */
   public LibrarySelectionType resolve(LibrarySelectionType librarySelectionType) {
@@ -414,12 +411,12 @@ public class ValueTypeLookup {
     if (librarySelectionType.getName() != null) return librarySelectionsByName.get(librarySelectionType.getName());
     return null;
   }
-  
+
   /**
    * Attempts to find an existing LibraryStrategyType
    * 
-   * @param libraryStrategyType a partially-formed LibraryStrategyType, which must have its ID or name
-   * set in order for this method to resolve the LibraryStrategyType
+   * @param libraryStrategyType a partially-formed LibraryStrategyType, which must have its ID or name set in order for this method to
+   * resolve the LibraryStrategyType
    * @return the existing LibraryStrategyType if a matching one is found; null otherwise
    */
   public LibraryStrategyType resolve(LibraryStrategyType libraryStrategyType) {
@@ -430,12 +427,12 @@ public class ValueTypeLookup {
     if (libraryStrategyType.getName() != null) return libraryStrategiesByName.get(libraryStrategyType.getName());
     return null;
   }
-  
+
   /**
    * Attempts to find an existing LibraryType
    * 
-   * @param libraryType a partially-formed LibraryType, which must have its ID or platform AND description
-   * set in order for this method to resolve the LibraryType
+   * @param libraryType a partially-formed LibraryType, which must have its ID or platform AND description set in order for this method to
+   * resolve the LibraryType
    * @return the existing LibraryType if a matching one is found; null otherwise
    */
   public LibraryType resolve(LibraryType libraryType) {
@@ -447,12 +444,12 @@ public class ValueTypeLookup {
     }
     return null;
   }
-  
+
   /**
    * Attempts to find an existing LibraryDesign
    * 
-   * @param libraryDesign a partially-formed LibraryDesign, which must have its ID or name set in order
-   * for this method to resolve the LibraryDesign
+   * @param libraryDesign a partially-formed LibraryDesign, which must have its ID or name set in order for this method to resolve the
+   * LibraryDesign
    * @return the existing LibraryDesign if a matching one is found; null otherwise
    */
   public LibraryDesign resolve(LibraryDesign libraryDesign) {
@@ -461,30 +458,28 @@ public class ValueTypeLookup {
     if (libraryDesign.getName() != null) return libraryDesignByName.get(libraryDesign.getName());
     return null;
   }
-  
+
   /**
-   * Attempts to find an existing TagBarcode
+   * Attempts to find an existing Index
    * 
-   * @param tagBarcode a partially-formed TagBarcode, which must have either its ID or its
-   * sequence AND family name set in order for this method to resolve the TagBarcode
-   * @return the existing TagBarcode if a matching one is found; null otherwise
+   * @param index a partially-formed Index, which must have either its ID or its sequence AND family name set in order for this method to
+   * resolve the Index
+   * @return the existing Index if a matching one is found; null otherwise
    */
-  public TagBarcode resolve(TagBarcode tagBarcode) {
-    if (tagBarcode == null) return null;
-    if (tagBarcode.getId() != TagBarcode.UNSAVED_ID) return tagBarcodeById.get(tagBarcode.getId());
-    if (tagBarcode.getFamily() != null && tagBarcode.getFamily().getName() != null
-        && tagBarcode.getSequence() != null) {
-      Map<String, TagBarcode> mapBySequence = tagBarcodeByFamilyAndSequence.get(tagBarcode.getFamily().getName());
-      return mapBySequence == null ? null : mapBySequence.get(tagBarcode.getSequence());
+  public Index resolve(Index index) {
+    if (index == null) return null;
+    if (index.getId() != Index.UNSAVED_ID) return indexById.get(index.getId());
+    if (index.getFamily() != null && index.getFamily().getName() != null && index.getSequence() != null) {
+      Map<String, Index> mapBySequence = indexByFamilyAndSequence.get(index.getFamily().getName());
+      return mapBySequence == null ? null : mapBySequence.get(index.getSequence());
     }
     return null;
   }
-  
+
   /**
    * Attempts to find an existing Sample QcType
    * 
-   * @param qcType a partially-formed QcType, which must have its ID or name set in order
-   * for this method to resolve the QcType
+   * @param qcType a partially-formed QcType, which must have its ID or name set in order for this method to resolve the QcType
    * @return the existing QcType if a matching one is found; null otherwise
    */
   public QcType resolveForSample(QcType qcType) {
@@ -493,12 +488,11 @@ public class ValueTypeLookup {
     if (qcType.getName() != null) return sampleQcTypeByName.get(qcType.getName());
     return null;
   }
-  
+
   /**
    * Attempts to find an existing Library QcType
    * 
-   * @param qcType a partially-formed QcType, which must have its ID or name set in order
-   * for this method to resolve the QcType
+   * @param qcType a partially-formed QcType, which must have its ID or name set in order for this method to resolve the QcType
    * @return the existing QcType if a matching one is found; null otherwise
    */
   public QcType resolveForLibrary(QcType qcType) {
@@ -507,160 +501,166 @@ public class ValueTypeLookup {
     if (qcType.getName() != null) return libraryQcTypeByName.get(qcType.getName());
     return null;
   }
-  
+
   /**
    * Attempts to find an existing SequencerReference
    * 
-   * @param sequencer a partially-formed SequencerReference, which must have either its ID or its
-   * name set in order for this method to resolve the SequencerReference
+   * @param sequencer a partially-formed SequencerReference, which must have either its ID or its name set in order for this method to
+   * resolve the SequencerReference
    * @return the existing SequencerReference if a matching one is found; null otherwise
    */
   public SequencerReference resolve(SequencerReference sequencer) {
     if (sequencer == null) return null;
-    if (sequencer.getId() != TagBarcode.UNSAVED_ID) return sequencerById.get(sequencer.getId());
+    if (sequencer.getId() != Index.UNSAVED_ID) return sequencerById.get(sequencer.getId());
     if (sequencer.getName() != null) return sequencerByName.get(sequencer.getName());
     return null;
   }
-  
+
   /**
    * Resolves all value type entities for a Sample
    * 
-   * @param sample the sample containing partially-formed value type entities
-   * to be resolved. Full, existing entities are loaded into sample in place
-   * of the partially-formed entities
+   * @param sample the sample containing partially-formed value type entities to be resolved. Full, existing entities are loaded into sample
+   * in place of the partially-formed entities
    * @throws IOException if no value is found matching the available data in sample
    */
   public void resolveAll(Sample sample) throws IOException {
     for (SampleQC qc : sample.getSampleQCs()) {
       QcType type = resolveForSample(qc.getQcType());
-      if (type == null) throw new IOException(String.format("QcType not found: id=%d, name=%s",
-          qc.getQcType().getQcTypeId(), qc.getQcType().getName()));
+      if (type == null)
+        throw new IOException(String.format("QcType not found: id=%d, name=%s", qc.getQcType().getQcTypeId(), qc.getQcType().getName()));
       qc.setQcType(type);
     }
-    
+
     if (LimsUtils.isDetailedSample(sample)) {
       SampleAdditionalInfo detailed = (SampleAdditionalInfo) sample;
-      
+
       SampleClass sc = resolve(detailed.getSampleClass());
-      if (sc == null) throw new IOException(String.format("SampleClass not found: id=%d, alias=%s", 
-          detailed.getSampleClass().getId(), detailed.getSampleClass().getAlias()));
+      if (sc == null) throw new IOException(
+          String.format("SampleClass not found: id=%d, alias=%s", detailed.getSampleClass().getId(), detailed.getSampleClass().getAlias()));
       detailed.setSampleClass(sc);
-      
+
       if (LimsUtils.isTissueSample(detailed)) {
         SampleTissue tissue = (SampleTissue) detailed;
-        
+
         TissueOrigin to = resolve(tissue.getTissueOrigin());
-        if (to == null) throw new IOException(String.format("TissueOrigin not found: id=%d, alias=%s, description=%s",
-            tissue.getTissueOrigin().getId(), tissue.getTissueOrigin().getAlias(), tissue.getTissueOrigin().getDescription()));
+        if (to == null) throw new IOException(String.format(
+            "TissueOrigin not found: id=%d, alias=%s, description=%s",
+            tissue.getTissueOrigin().getId(),
+            tissue.getTissueOrigin().getAlias(),
+            tissue.getTissueOrigin().getDescription()));
         tissue.setTissueOrigin(to);
-        
+
         TissueType tt = resolve(tissue.getTissueType());
         if (tt == null) {
-          if (tissue.getTissueType() != null) {throw new IOException(String.format("TissueType not found: id=%d, alias=%s",
-            tissue.getTissueType().getId(), tissue.getTissueType().getAlias()));
+          if (tissue.getTissueType() != null) {
+            throw new IOException(
+                String.format("TissueType not found: id=%d, alias=%s", tissue.getTissueType().getId(), tissue.getTissueType().getAlias()));
           } else {
             throw new IOException("Sample " + tissue.getAlias() + " is missing a tissueType");
           }
         }
         tissue.setTissueType(tt);
-        
+
         if (tissue.getLab() != null) { // optional field
           Lab lab = resolve(tissue.getLab());
           if (lab == null) throw new IOException("Lab not found");
           tissue.setLab(lab);
         }
-        
+
         if (tissue.getTissueMaterial() != null) { // optional field
           TissueMaterial tm = resolve(tissue.getTissueMaterial());
           if (tm == null) throw new IOException("TissueMaterial not found");
           tissue.setTissueMaterial(tm);
         }
       }
-      
+
       if (LimsUtils.isAliquotSample(detailed)) {
         SampleAliquot aliquot = (SampleAliquot) detailed;
-        
+
         if (aliquot.getSamplePurpose() != null) { // optional field
           SamplePurpose sp = resolve(aliquot.getSamplePurpose());
           if (sp == null) throw new IOException("SamplePurpose not found");
           aliquot.setSamplePurpose(sp);
         }
-        
+
       }
     }
   }
-  
+
   /**
    * Resolves all value type entities for a Library
    * 
-   * @param library the Library containing partially-formed value type entities
-   * to be resolved. Full, existing entities are loaded into library in place
-   * of the partially-formed entities
+   * @param library the Library containing partially-formed value type entities to be resolved. Full, existing entities are loaded into
+   * library in place of the partially-formed entities
    * @throws IOException if no value is found matching the available data in library
    */
   public void resolveAll(Library library) throws IOException {
     LibrarySelectionType sel = resolve(library.getLibrarySelectionType());
     if (sel == null) throw new IOException("LibrarySelectionType not found");
     library.setLibrarySelectionType(sel);
-    
+
     LibraryStrategyType strat = resolve(library.getLibraryStrategyType());
     if (strat == null) throw new IOException("LibraryStrategyType not found");
     library.setLibraryStrategyType(strat);
-    
+
     LibraryType lt = resolve(library.getLibraryType());
     if (lt == null) {
-      throw new IOException(String.format("LibraryType not found (id=%d OR (platform=%s AND description=%s))",
-          library.getLibraryType().getId(), library.getLibraryType().getPlatformType(),
+      throw new IOException(String.format(
+          "LibraryType not found (id=%d OR (platform=%s AND description=%s))",
+          library.getLibraryType().getId(),
+          library.getLibraryType().getPlatformType(),
           library.getLibraryType().getDescription()));
     }
     library.setLibraryType(lt);
-    
-    if (library.getTagBarcodes() != null && !library.getTagBarcodes().isEmpty()) {
-      List<TagBarcode> resolvedBarcodes = new ArrayList<>();
-      for (TagBarcode tb : library.getTagBarcodes()) {
-        TagBarcode resolvedBarcode = resolve(tb);
-        if (resolvedBarcode == null) {
-          throw new IOException(String.format("TagBarcode not found (family=%s, sequence=%s)",
-              tb.getFamily() == null ? null : tb.getFamily().getName(), tb.getSequence()));
+
+    if (library.getIndices() != null && !library.getIndices().isEmpty()) {
+      List<Index> resolvedIndices = new ArrayList<>();
+      for (Index index : library.getIndices()) {
+        Index resolvedIndex = resolve(index);
+        if (resolvedIndex == null) {
+          throw new IOException(String.format(
+              "Index not found (family=%s, sequence=%s)",
+              index.getFamily() == null ? null : index.getFamily().getName(),
+              index.getSequence()));
         }
-        resolvedBarcodes.add(resolvedBarcode);
+        resolvedIndices.add(resolvedIndex);
       }
-      library.setTagBarcodes(resolvedBarcodes);
+      library.setIndices(resolvedIndices);
     }
     for (LibraryQC qc : library.getLibraryQCs()) {
       QcType type = resolveForLibrary(qc.getQcType());
-      if (type == null) throw new IOException(String.format("QcType not found: id=%d, name=%s",
-          qc.getQcType().getQcTypeId(), qc.getQcType().getName()));
+      if (type == null)
+        throw new IOException(String.format("QcType not found: id=%d, name=%s", qc.getQcType().getQcTypeId(), qc.getQcType().getName()));
       qc.setQcType(type);
     }
     if (library.getLibraryAdditionalInfo() != null) {
       LibraryAdditionalInfo lai = library.getLibraryAdditionalInfo();
-      
+
       if (lai.getPrepKit() != null) { // optional field
         KitDescriptor kit = resolve(lai.getPrepKit());
-        if (kit == null) throw new IOException(String.format("KitDescriptor not found (id=%d or name=%s)",
-            lai.getPrepKit().getId(), lai.getPrepKit().getName()));
+        if (kit == null) throw new IOException(
+            String.format("KitDescriptor not found (id=%d or name=%s)", lai.getPrepKit().getId(), lai.getPrepKit().getName()));
         lai.setPrepKit(kit);
       }
-      
+
       LibraryDesign ld = resolve(lai.getLibraryDesign());
       if (ld == null) throw new IOException("LibraryDesign not found");
       lai.setLibraryDesign(ld);
     }
   }
-  
+
   /**
    * Resolves all value type entities for a Run and its Pools
    * 
-   * @param run the Run containing partially-formed value type entities
-   * to be resolved. Full, existing entities are loaded into run in place
+   * @param run the Run containing partially-formed value type entities to be resolved. Full, existing entities are loaded into run in place
    * of the partially-formed entities
    * @throws IOException if no value is found matching the available data in run
    */
   public void resolveAll(Run run) throws IOException {
     SequencerReference sequencer = resolve(run.getSequencerReference());
     if (sequencer == null) {
-      throw new IOException(String.format("SequencerReference not found (id=%d or name=%s)",
+      throw new IOException(String.format(
+          "SequencerReference not found (id=%d or name=%s)",
           run.getSequencerReference() == null ? null : run.getSequencerReference().getId(),
           run.getSequencerReference() == null ? null : run.getSequencerReference().getName()));
     }

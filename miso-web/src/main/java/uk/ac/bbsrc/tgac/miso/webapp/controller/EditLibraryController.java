@@ -73,6 +73,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractPool;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.Index;
+import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
@@ -82,8 +84,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
-import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
-import uk.ac.bbsrc.tgac.miso.core.data.TagBarcodeFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAdditionalInfoImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCR;
@@ -98,7 +98,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
-import uk.ac.bbsrc.tgac.miso.core.service.TagBarcodeService;
+import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignDao;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -123,10 +123,10 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 public class EditLibraryController {
   protected static final Logger log = LoggerFactory.getLogger(EditLibraryController.class);
 
-  private static final TagBarcodeFamily BARCODE_FAMILY_NEEDS_PLATFORM = new TagBarcodeFamily();
+  private static final IndexFamily INDEX_FAMILY_NEEDS_PLATFORM = new IndexFamily();
 
   static {
-    BARCODE_FAMILY_NEEDS_PLATFORM.setName("Please select a platform...");
+    INDEX_FAMILY_NEEDS_PLATFORM.setName("Please select a platform...");
   }
 
   @Autowired
@@ -139,7 +139,7 @@ public class EditLibraryController {
   private DataObjectFactory dataObjectFactory;
 
   @Autowired
-  private TagBarcodeService tagBarcodeService;
+  private IndexService indexService;
 
   @Autowired
   private LibraryAdditionalInfoService libraryAdditionalInfoService;
@@ -162,8 +162,8 @@ public class EditLibraryController {
     this.securityManager = securityManager;
   }
 
-  public void setTagBarcodeService(TagBarcodeService tagBarcodeService) {
-    this.tagBarcodeService = tagBarcodeService;
+  public void setIndexService(IndexService indexService) {
+    this.indexService = indexService;
   }
 
   public void setLibraryAdditionalInfoService(LibraryAdditionalInfoService libraryAdditionalInfoService) {
@@ -297,15 +297,15 @@ public class EditLibraryController {
     return LimsUtils.join(types, ",");
   }
 
-  public void populateAvailableTagBarcodeStrategies(Library library, ModelMap model) throws IOException {
+  public void populateAvailableIndexFamilies(Library library, ModelMap model) throws IOException {
     if (isStringEmptyOrNull(library.getPlatformName())) {
-      model.put("barcodeFamiliesJSON", "[]");
-      model.put("barcodeFamilies", Collections.singleton(BARCODE_FAMILY_NEEDS_PLATFORM));
+      model.put("indexFamiliesJSON", "[]");
+      model.put("indexFamilies", Collections.singleton(INDEX_FAMILY_NEEDS_PLATFORM));
     } else {
-      List<TagBarcodeFamily> visbileFamilies = new ArrayList<>();
-      visbileFamilies.add(TagBarcodeFamily.NULL);
-      visbileFamilies.addAll(tagBarcodeService.getTagBarcodeFamiliesByPlatform(PlatformType.get(library.getPlatformName())));
-      MisoWebUtils.populateListAndJson(model, "barcodeFamilies", visbileFamilies, "family");
+      List<IndexFamily> visbileFamilies = new ArrayList<>();
+      visbileFamilies.add(IndexFamily.NULL);
+      visbileFamilies.addAll(indexService.getIndexFamiliesByPlatform(PlatformType.get(library.getPlatformName())));
+      MisoWebUtils.populateListAndJson(model, "indexFamilies", visbileFamilies, "family");
     }
   }
 
@@ -424,88 +424,88 @@ public class EditLibraryController {
   }
 
   /* HOT */
-  @RequestMapping(value = "tagBarcodesJson", method = RequestMethod.GET)
-  public @ResponseBody JSONObject tagBarcodesJson(@RequestParam("tagBarcodeFamily") String tagBarcodeFamily,
-      @RequestParam("position") String position) throws IOException {
+  @RequestMapping(value = "indicesJson", method = RequestMethod.GET)
+  public @ResponseBody JSONObject indicesJson(@RequestParam("indexFamily") String indexFamily, @RequestParam("position") String position)
+      throws IOException {
     final JSONObject rtn = new JSONObject();
     List<JSONObject> rtnList = new ArrayList<JSONObject>();
     try {
-      if (!isStringEmptyOrNull(tagBarcodeFamily)) {
-        final TagBarcodeFamily tbf = tagBarcodeService.getTagBarcodeFamilyByName(tagBarcodeFamily);
-        if (tbf != null) {
-          rtnList = barcodesForPosition(tbf, Integer.parseInt(position));
+      if (!isStringEmptyOrNull(indexFamily)) {
+        final IndexFamily ifam = indexService.getIndexFamilyByName(indexFamily);
+        if (ifam != null) {
+          rtnList = indicesForPosition(ifam, Integer.parseInt(position));
         }
       }
     } catch (Exception e) {
-      log.error("Failed to get barcodes", e);
+      log.error("Failed to get indices", e);
     }
-    rtn.put("tagBarcodes", rtnList);
+    rtn.put("indices", rtnList);
     return rtn;
   }
 
   /**
-   * Each PlatformName holds a null TagBarcodeFamily.
+   * Each PlatformName holds a null IndexFamily.
    *
-   * Structure of this tagBarcodes object:
+   * Structure of this indices object:
    * 
    * <pre>
    *  {
    *    PlatformName : {
-   *      TagBarcodeFamilyName: {
+   *      IndexFamilyName: {
    *        1: [ { id: ##, name: AAAA, sequence: XXXXX }, ... ],
    *        ... },
    *      ... },
    *  ... }
    * </pre>
    * 
-   * @return tagBarcodes object
+   * @return indices object
    */
-  @ModelAttribute("tagBarcodes")
-  public JSONObject tagBarcodesString() {
-    final JSONObject tbo = new JSONObject();
+  @ModelAttribute("indices")
+  public JSONObject indicesString() {
+    final JSONObject io = new JSONObject();
     try {
       for (String pfName : requestManager.listDistinctPlatformNames()) {
         JSONObject pf = new JSONObject();
-        tbo.put(pfName, pf);
-        tbo.getJSONObject(pfName).put("No Barcode", nullBarcodeFamily());
+        io.put(pfName, pf);
+        io.getJSONObject(pfName).put("No Index", nullIndexFamily());
       }
-      for (TagBarcodeFamily tbf : tagBarcodeService.getTagBarcodeFamilies()) {
-        JSONObject tbfo = new JSONObject();
-        for (int i = 1; i <= tbf.getMaximumNumber(); i++) {
-          tbfo.put(Integer.toString(i), barcodesForPosition(tbf, i));
+      for (IndexFamily ifam : indexService.getIndexFamilies()) {
+        JSONObject ifamo = new JSONObject();
+        for (int i = 1; i <= ifam.getMaximumNumber(); i++) {
+          ifamo.put(Integer.toString(i), indicesForPosition(ifam, i));
         }
-        String platformKey = tbf.getPlatformType().getKey();
-        tbo.getJSONObject(platformKey).put(tbf.getName(), tbfo);
+        String platformKey = ifam.getPlatformType().getKey();
+        io.getJSONObject(platformKey).put(ifam.getName(), ifamo);
       }
     } catch (IOException e) {
       log.error("Failed to retrieve all platform names: " + e);
     }
-    return tbo;
+    return io;
   }
 
-  public List<JSONObject> barcodesForPosition(TagBarcodeFamily tbf, int position) {
+  public List<JSONObject> indicesForPosition(IndexFamily ifam, int position) {
     final List<JSONObject> rtnList = new ArrayList<JSONObject>();
-    for (final TagBarcode tb : tbf.getBarcodesForPosition(position)) {
+    for (final Index index : ifam.getIndicesForPosition(position)) {
       final JSONObject obj = new JSONObject();
-      obj.put("id", tb.getId());
-      obj.put("name", tb.getName());
-      obj.put("sequence", tb.getSequence());
-      obj.put("label", tb.getLabel());
+      obj.put("id", index.getId());
+      obj.put("name", index.getName());
+      obj.put("sequence", index.getSequence());
+      obj.put("label", index.getLabel());
       rtnList.add(obj);
     }
     return rtnList;
   }
 
-  public JSONObject nullBarcodeFamily() {
-    final JSONObject nullTBF = new JSONObject();
-    final JSONArray nullTBsList = new JSONArray();
-    final JSONObject nullTB = new JSONObject();
-    nullTB.put("id", TagBarcodeFamily.NULL.getId());
-    nullTB.put("name", TagBarcodeFamily.NULL.getName());
-    nullTB.put("sequence", "");
-    nullTBsList.add(nullTB);
-    nullTBF.put("1", nullTBsList);
-    return nullTBF;
+  public JSONObject nullIndexFamily() {
+    final JSONObject nullIndexFam = new JSONObject();
+    final JSONArray nullIndices = new JSONArray();
+    final JSONObject nullIndex = new JSONObject();
+    nullIndex.put("id", IndexFamily.NULL.getId());
+    nullIndex.put("name", IndexFamily.NULL.getName());
+    nullIndex.put("sequence", "");
+    nullIndices.add(nullIndex);
+    nullIndexFam.put("1", nullIndices);
+    return nullIndexFam;
   }
 
   /* HOT */
@@ -524,17 +524,16 @@ public class EditLibraryController {
   }
 
   /* HOT */
-  @RequestMapping(value = "barcodePositionsJson", method = RequestMethod.GET)
-  public @ResponseBody JSONObject barcodePositionsJson(@RequestParam("tagBarcodeFamily") String tagBarcodeFamily) {
+  @RequestMapping(value = "indexPositionsJson", method = RequestMethod.GET)
+  public @ResponseBody JSONObject indexPositionsJson(@RequestParam("indexFamily") String indexFamily) {
     JSONObject rtn;
-    if (!isStringEmptyOrNull(tagBarcodeFamily)) {
-      tagBarcodeFamily = tagBarcodeFamily.trim();
-      final TagBarcodeFamily tbf = tagBarcodeService.getTagBarcodeFamilyByName(tagBarcodeFamily);
-      if (tbf != null) {
+    if (!isStringEmptyOrNull(indexFamily)) {
+      final IndexFamily ifam = indexService.getIndexFamilyByName(indexFamily.trim());
+      if (ifam != null) {
         rtn = new JSONObject();
-        rtn.put("numApplicableBarcodes", tbf.getMaximumNumber());
+        rtn.put("numApplicableIndices", ifam.getMaximumNumber());
       } else {
-        rtn = JSONUtils.SimpleJSONError("No family found with the name: \"" + tagBarcodeFamily + "\"");
+        rtn = JSONUtils.SimpleJSONError("No family found with the name: \"" + indexFamily + "\"");
       }
     } else {
       rtn = JSONUtils.SimpleJSONError("No valid family given");
@@ -543,17 +542,17 @@ public class EditLibraryController {
   }
 
   /* HOT */
-  @RequestMapping(value = "tagBarcodeFamiliesJson", method = RequestMethod.GET)
-  public @ResponseBody JSONObject tagBarcodeFamiliesJson(@RequestParam("platform") String platform) throws IOException {
+  @RequestMapping(value = "indexFamiliesJson", method = RequestMethod.GET)
+  public @ResponseBody JSONObject indexFamiliesJson(@RequestParam("platform") String platform) throws IOException {
     final JSONObject rtn = new JSONObject();
 
     if (platform != null && !"".equals(platform)) {
-      final List<String> rtnTBFamily = new ArrayList<String>();
-      rtnTBFamily.add(TagBarcodeFamily.NULL.getName());
-      for (final TagBarcodeFamily tbf : tagBarcodeService.getTagBarcodeFamiliesByPlatform(PlatformType.get(platform))) {
-        rtnTBFamily.add(tbf.getName());
+      final List<String> indexFamilies = new ArrayList<String>();
+      indexFamilies.add(IndexFamily.NULL.getName());
+      for (final IndexFamily ifam : indexService.getIndexFamiliesByPlatform(PlatformType.get(platform))) {
+        indexFamilies.add(ifam.getName());
       }
-      rtn.put("barcodeKits", rtnTBFamily);
+      rtn.put("indexFamilies", indexFamilies);
     }
     return rtn;
   }
@@ -571,11 +570,11 @@ public class EditLibraryController {
     }
   }
 
-  @RequestMapping(value = "barcodeStrategies", method = RequestMethod.GET)
-  public @ResponseBody String jsonRestTagBarcodeFamilies(@RequestParam("platform") String platform) throws IOException {
+  @RequestMapping(value = "indexFamilies", method = RequestMethod.GET)
+  public @ResponseBody String jsonRestIndexFamilies(@RequestParam("platform") String platform) throws IOException {
     if (!isStringEmptyOrNull(platform)) {
       List<String> types = new ArrayList<String>();
-      for (TagBarcodeFamily t : tagBarcodeService.getTagBarcodeFamiliesByPlatform(PlatformType.get(platform))) {
+      for (IndexFamily t : indexService.getIndexFamiliesByPlatform(PlatformType.get(platform))) {
         types.add("\"" + t.getName() + "\"" + ":" + "\"" + t.getName() + "\"");
       }
       return "{" + LimsUtils.join(types, ",") + "}";
@@ -584,15 +583,15 @@ public class EditLibraryController {
     }
   }
 
-  @RequestMapping(value = "barcodesForPosition", method = RequestMethod.GET)
-  public @ResponseBody String jsonRestTagBarcodes(@RequestParam("tagBarcodeFamily") String tagBarcodeFamily,
-      @RequestParam("position") String position) throws IOException {
-    if (!isStringEmptyOrNull(tagBarcodeFamily)) {
-      TagBarcodeFamily tbf = tagBarcodeService.getTagBarcodeFamilyByName(tagBarcodeFamily);
-      if (tbf != null) {
+  @RequestMapping(value = "indicesForPosition", method = RequestMethod.GET)
+  public @ResponseBody String jsonRestIndices(@RequestParam("indexFamily") String indexFamily, @RequestParam("position") String position)
+      throws IOException {
+    if (!isStringEmptyOrNull(indexFamily)) {
+      IndexFamily ifam = indexService.getIndexFamilyByName(indexFamily);
+      if (ifam != null) {
         List<String> names = new ArrayList<String>();
-        for (TagBarcode tb : tbf.getBarcodesForPosition(Integer.parseInt(position))) {
-          names.add("\"" + tb.getId() + "\"" + ":" + "\"" + tb.getName() + " (" + tb.getSequence() + ")\"");
+        for (Index index : ifam.getIndicesForPosition(Integer.parseInt(position))) {
+          names.add("\"" + index.getId() + "\"" + ":" + "\"" + index.getName() + " (" + index.getSequence() + ")\"");
         }
         return "{" + LimsUtils.join(names, ",") + "}";
       } else {
@@ -666,7 +665,7 @@ public class EditLibraryController {
       model.put("emPCRs", pcrs);
       model.put("emPcrDilutions", populateEmPcrDilutions(user, pcrs));
 
-      populateAvailableTagBarcodeStrategies(library, model);
+      populateAvailableIndexFamilies(library, model);
       addAdjacentLibraries(library, model);
 
       List<Pool<? extends Poolable<?, ?>>> pools = getPoolsByLibrary(library);
@@ -709,9 +708,9 @@ public class EditLibraryController {
       } else {
         library = requestManager.getLibraryById(libraryId);
         model.put("title", "Library " + libraryId);
-        if (library.getTagBarcodes() != null && !library.getTagBarcodes().isEmpty() && library.getTagBarcodes().get(1) != null) {
-          model.put("selectedTagBarcodeFamily", library.getTagBarcodes().get(1).getFamily().getName());
-          model.put("availableTagBarcodeFamilyBarcodes", library.getTagBarcodes().get(1).getFamily().getBarcodes());
+        if (library.getIndices() != null && !library.getIndices().isEmpty() && library.getIndices().get(1) != null) {
+          model.put("selectedIndexFamily", library.getIndices().get(1).getFamily().getName());
+          model.put("availableIndexFamilyIndices", library.getIndices().get(1).getFamily().getIndices());
         }
       }
 
@@ -761,7 +760,7 @@ public class EditLibraryController {
       Collection<emPCR> pcrs = populateEmPcrs(user, library);
       model.put("emPCRs", pcrs);
       model.put("emPcrDilutions", populateEmPcrDilutions(user, pcrs));
-      populateAvailableTagBarcodeStrategies(library, model);
+      populateAvailableIndexFamilies(library, model);
 
       addAdjacentLibraries(library, model);
 

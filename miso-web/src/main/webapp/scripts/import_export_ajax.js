@@ -104,7 +104,7 @@ var ImportExport = ImportExport || {
       'importExportControllerHelperService',
       'exportLibraryPoolForm',
       {
-        'barcodekit': jQuery('#barcodekit :selected').text(),
+        'indexfamily': jQuery('#indexfamily :selected').text(),
         'form': jQuery('#sampleExportForm').serializeArray(),
         'url': ajaxurl
       },
@@ -219,8 +219,8 @@ var ImportExport = ImportExport || {
           { "sTitle": "Insert Size (bp)"},
           { "sTitle": "Molarity (nm)"},
           { "sTitle": "QC Passed"},
-          { "sTitle": "Barcode Kit"},
-          { "sTitle": "Barcode Tag"},
+          { "sTitle": "Index Family"},
+          { "sTitle": "Index"},
           { "sTitle": "LDI Conc"},
           { "sTitle": "Pool Name"},
           { "sTitle": "Pool Molarity (nm)"} ,
@@ -282,7 +282,7 @@ var ImportExport = ImportExport || {
       {
         'doOnSuccess': function (json){
           jQuery('#type').html(json.libraryTypes);
-          jQuery('#barcodekit').html(json.tagBarcodeStrategies);
+          jQuery('#indexfamily').html(json.indexFamilies);
         }
       }
     );

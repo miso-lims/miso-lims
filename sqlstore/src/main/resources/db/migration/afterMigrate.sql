@@ -282,7 +282,7 @@ FOR EACH ROW
     CASE WHEN NEW.plateMaterialType <> OLD.plateMaterialType THEN CONCAT('plate material: ', OLD.plateMaterialType, ' → ', NEW.plateMaterialType) END,
     CASE WHEN (NEW.locationBarcode IS NULL) <> (OLD.locationBarcode IS NULL) OR NEW.locationBarcode <> OLD.locationBarcode THEN CONCAT('location barcode: ', COALESCE(OLD.locationBarcode, 'n/a'), ' → ', COALESCE(NEW.locationBarcode, 'n/a')) END,
     CASE WHEN NEW.size <> OLD.size THEN CONCAT('size: ', OLD.size, ' → ', NEW.size) END,
-    CASE WHEN (NEW.tagBarcodeId IS NULL) <> (OLD.tagBarcodeId IS NULL) OR NEW.tagBarcodeId <> OLD.tagBarcodeId THEN CONCAT('tag barcode: ', COALESCE(OLD.tagBarcodeId, 'n/a'), ' → ', COALESCE(NEW.tagBarcodeId, 'n/a')) END,
+    CASE WHEN (NEW.indexId IS NULL) <> (OLD.indexId IS NULL) OR NEW.indexId <> OLD.indexId THEN CONCAT('index: ', COALESCE(OLD.indexId, 'n/a'), ' → ', COALESCE(NEW.indexId, 'n/a')) END,
     CASE WHEN NEW.description <> OLD.description THEN CONCAT('description: ', OLD.description, ' → ', NEW.description) END);
   IF log_message IS NOT NULL AND log_message <> '' THEN
     INSERT INTO PlateChangeLog(plateId, columnsChanged, userId, message) VALUES (
@@ -291,7 +291,7 @@ FOR EACH ROW
         CASE WHEN NEW.plateMaterialType <> OLD.plateMaterialType THEN 'plateMaterialType' END,
         CASE WHEN (NEW.locationBarcode IS NULL) <> (OLD.locationBarcode IS NULL) OR NEW.locationBarcode <> OLD.locationBarcode THEN 'locationBarcode' END,
         CASE WHEN NEW.size <> OLD.size THEN 'size' END,
-        CASE WHEN (NEW.tagBarcodeId IS NULL) <> (OLD.tagBarcodeId IS NULL) OR NEW.tagBarcodeId <> OLD.tagBarcodeId THEN 'tagBarcodeId' END,
+        CASE WHEN (NEW.indexId IS NULL) <> (OLD.indexId IS NULL) OR NEW.indexId <> OLD.indexId THEN 'indexId' END,
         CASE WHEN NEW.description <> OLD.description THEN 'description' END), ''),
       NEW.lastModifier,
       CONCAT(

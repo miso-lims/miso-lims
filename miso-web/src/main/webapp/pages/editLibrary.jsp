@@ -286,7 +286,7 @@
         jQuery(document).ready(function () {
           Library.ui.changePlatformName(function() {
             <c:if test="${not empty library.libraryType}">jQuery('#libraryTypes').val('${library.libraryType.id}');</c:if>
-            Library.setOriginalBarcodes();
+            Library.setOriginalIndices();
           });
         });
       </script>
@@ -335,10 +335,10 @@
   </c:choose>
 </tr>
 <tr>
-  <td>Barcoding Family:</td>
+  <td>Index Family:</td>
   <td>
-    <select name='tagBarcodeFamily' id='tagBarcodeFamily' onchange='Library.ui.updateBarcodes();'>
-      <c:forEach items="${barcodeFamilies}" var="family">
+    <select name='indexFamily' id='indexFamily' onchange='Library.ui.updateIndices();'>
+      <c:forEach items="${indexFamilies}" var="family">
         <option value="${family.id}" <c:if test="${library.currentFamily.id == family.id}">selected="selected"</c:if>>${family.name}</option>
       </c:forEach>
     </select>
@@ -346,22 +346,22 @@
 </tr>
 
 <tr>
-  <td>Barcodes:</td>
-  <td id="tagBarcodesDiv">
+  <td>Indices:</td>
+  <td id="indicesDiv">
   </td>
   <script type="text/javascript">
     Library = Library || {};
-    Library.barcodeFamilies = ${barcodeFamiliesJSON};
-    Library.setOriginalBarcodes = function() {
-      Library.lastBarcodePosition = 0;
-      jQuery('#tagBarcodesDiv').empty();
-      document.getElementById('tagBarcodeFamily').value = '${library.currentFamily.id}';
-      <c:forEach items="${library.tagBarcodes}" var="barcode">
-        Library.ui.createBarcodeBox(${barcode.id});
+    Library.indexFamilies = ${indexFamiliesJSON};
+    Library.setOriginalIndices = function() {
+      Library.lastIndexPosition = 0;
+      jQuery('#indicesDiv').empty();
+      document.getElementById('indexFamily').value = '${library.currentFamily.id}';
+      <c:forEach items="${library.indices}" var="index">
+        Library.ui.createIndexBox(${index.id});
       </c:forEach>
-      Library.ui.createBarcodeNextBox();
+      Library.ui.createIndexNextBox();
     };
-    Library.setOriginalBarcodes();
+    Library.setOriginalIndices();
   </script>
 </tr>
 
@@ -1029,15 +1029,15 @@
       <th style="width: 10%">Strategy <span header="strategyType" class="ui-icon ui-icon-arrowstop-1-s"
                                             style="float:right"
                                             onclick="DatatableUtils.fillDown('#cinput', this);"></span></th>
-      <th style="width: 10%">Barcode Kit <span header="barcodeStrategy" class="ui-icon ui-icon-arrowstop-1-s"
+      <th style="width: 10%">Index Family <span header="indexFamily" class="ui-icon ui-icon-arrowstop-1-s"
                                                style="float:right"
-                                               onclick="Library.ui.fillDownTagBarcodeStrategySelects('#cinput', this);"></span>
+                                               onclick="Library.ui.fillDownIndexFamilySelects('#cinput', this);"></span>
       </th>
-      <th style="width: 10%">Tag Barcodes <span header="tagBarcodes" class="ui-icon ui-icon-arrowstop-1-s"
+      <th style="width: 10%">Indices <span header="indices" class="ui-icon ui-icon-arrowstop-1-s"
                                                 style="float:right"
-                                                onclick="Library.ui.fillDownTagBarcodeSelects('#cinput', this);"></span>
+                                                onclick="Library.ui.fillDownIndexSelects('#cinput', this);"></span>
       </th>
-      <th style="width: 10%">Location Barcode <span header="locationBarcode" class="ui-icon ui-icon-arrowstop-1-s"
+      <th style="width: 10%">Location <span header="locationBarcode" class="ui-icon ui-icon-arrowstop-1-s"
                                                     style="float:right"
                                                     onclick="DatatableUtils.fillDown('#cinput', this);"></span>
       </th>
@@ -1060,8 +1060,8 @@ var headers = ['rowsel',
                'libraryType',
                'selectionType',
                'strategyType',
-               'barcodeStrategy',
-               'tagBarcodes',
+               'indexFamily',
+               'indices',
                'locationBarcode'];
 
 jQuery(document).ready(function () {
@@ -1159,11 +1159,11 @@ function fnClickAddRow(rowdata) {
     else if (headers[i] === "strategyType") {
       jQuery(nTr.cells[i]).addClass("strategyType");
     }
-    else if (headers[i] === "barcodeStrategy") {
-      jQuery(nTr.cells[i]).addClass("barcodeStrategy");
+    else if (headers[i] === "indexFamily") {
+      jQuery(nTr.cells[i]).addClass("indexFamily");
     }
-    else if (headers[i] === "tagBarcodes") {
-      jQuery(nTr.cells[i]).addClass("tagBarcodes");
+    else if (headers[i] === "indices") {
+      jQuery(nTr.cells[i]).addClass("indices");
     }
     else if (headers[i] === "paired") {
       jQuery(nTr.cells[i]).addClass("passedCheck");
@@ -1294,11 +1294,11 @@ function setEditables(datatable) {
     "width": "100%"
   });
 
-  jQuery("#cinput .barcodeStrategy").editable(function (value, settings) {
+  jQuery("#cinput .indexFamily").editable(function (value, settings) {
     return value;
   },
   {
-    loadurl: '../../library/barcodeStrategies',
+    loadurl: '../../library/indexFamilies',
     loaddata: function (value, settings) {
       DatatableUtils.collapseInputs('#cinput');
       var row = datatable.fnGetPosition(this)[0];
@@ -1322,53 +1322,47 @@ function setEditables(datatable) {
       var cell = datatable.fnGetPosition(this)[2];
       var nTr = datatable.fnSettings().aoData[aPos[0]].nTr;
 
-      Fluxion.doAjax(
-        'libraryControllerHelperService',
-        'getBarcodesPositions',
-        {'strategy': sValue,
-          'url': ajaxurl
-        },
-        {'doOnSuccess': function (json) {
-          var randomId = makeid();
-          jQuery(nTr.cells[cell + 1]).html("<div id='" + randomId + "'></div>");
-          for (var i = 0; i < json.numApplicableBarcodes; i++) {
-            jQuery('#' + randomId).append("<span class='tagBarcodeSelectDiv' position='" + (i + 1) + "' id='tagbarcodes" + (i + 1) + "'>- <i>Select...</i></span>");
-            if (json.numApplicableBarcodes > 1 && i == 0) {
-              jQuery('#' + randomId).append("|");
-            }
-          }
+      jQuery.ajax('../../library/indexPositionsJson', {
+        success: function (json) {
+         var randomId = makeid();
+         jQuery(nTr.cells[cell + 1]).html("<div id='" + randomId + "'></div>");
+         for (var i = 0; i < json.numApplicableIndices; i++) {
+           jQuery('#' + randomId).append("<span class='indexSelectDiv' position='" + (i + 1) + "' id='indices" + (i + 1) + "'>- <i>Select...</i></span>");
+           if (json.numApplicableIndices > 1 && i == 0) {
+             jQuery('#' + randomId).append("|");
+           }
+         }
 
-          //bind editable to selects
-          jQuery("#cinput .tagBarcodeSelectDiv").editable(function (value, settings) {
-            return value;
-          },
-          {
-            loadurl: '../../library/barcodesForPosition',
-            loaddata: function (value, settings) {
-              var ret = {};
-              ret["position"] = jQuery(this).attr("position");
-              if (!Utils.validation.isNullCheck(sValue)) {
-                ret['barcodeStrategy'] = sValue;
-              }
-              else {
-                ret['barcodeStrategy'] = '';
-              }
+         //bind editable to selects
+         jQuery("#cinput .indexSelectDiv").editable(function (value, settings) {
+           return value;
+         },
+         {
+           loadurl: '../../library/indicesForPosition',
+           loaddata: function (value, settings) {
+             var ret = {};
+             ret["position"] = jQuery(this).attr("position");
+             if (!Utils.validation.isNullCheck(sValue)) {
+               ret['indexFamily'] = sValue;
+             }
+             else {
+               ret['indexFamily'] = '';
+             }
 
-              return ret;
-            },
-            type: 'select',
-            onblur: 'submit',
-            placeholder: '',
-            style: 'inherit',
-            submitdata: function (tvalue, tsettings) {
-              return {
-                "row_id": this.parentNode.getAttribute('id'),
-                "column": datatable.fnGetPosition(this)[2]
-              };
-            }
-          });
-        }
-        });
+             return ret;
+           },
+           type: 'select',
+           onblur: 'submit',
+           placeholder: '',
+           style: 'inherit',
+           submitdata: function (tvalue, tsettings) {
+             return {
+               "row_id": this.parentNode.getAttribute('id'),
+               "column": datatable.fnGetPosition(this)[2]
+             };
+           }
+         });
+       });
     },
     submitdata: function (value, settings) {
       return {

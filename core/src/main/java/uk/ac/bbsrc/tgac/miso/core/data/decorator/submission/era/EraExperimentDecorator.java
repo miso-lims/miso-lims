@@ -34,10 +34,10 @@ import org.w3c.dom.Element;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
+import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Submittable;
-import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
 import uk.ac.bbsrc.tgac.miso.core.data.decorator.AbstractSubmittableDecorator;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
@@ -106,12 +106,12 @@ public class EraExperimentDecorator extends AbstractSubmittableDecorator<Documen
             pool.appendChild(member);
 
             Element readLabel = submission.createElementNS(null, "READ_LABEL");
-            if (!relevantLibrary.getTagBarcodes().isEmpty()) {
+            if (!relevantLibrary.getIndices().isEmpty()) {
               StringBuilder tsb = new StringBuilder();
               StringBuilder vsb = new StringBuilder();
-              for (TagBarcode tb : relevantLibrary.getTagBarcodes()) {
-                tsb.append(tb.getSequence());
-                vsb.append(tb.getName());
+              for (Index index : relevantLibrary.getIndices()) {
+                tsb.append(index.getSequence());
+                vsb.append(index.getName());
               }
               readLabel.setAttribute("read_group_tag", tsb.toString());
               readLabel.setTextContent(vsb.toString());

@@ -58,13 +58,13 @@ import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
+import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Plate;
 import uk.ac.bbsrc.tgac.miso.core.data.Plateable;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PrintJob;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PlatePool;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlateMaterialType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoPrintException;
@@ -232,13 +232,13 @@ public class PlateControllerHelperService {
     return JSONUtils.SimpleJSONResponse("Plate saved successfully");
   }
 
-  public JSONObject getTagBarcodesForMaterialType(HttpSession session, JSONObject json) {
+  public JSONObject getIndicesForMaterialType(HttpSession session, JSONObject json) {
     Map<String, Object> responseMap = new HashMap<String, Object>();
     if (json.has("materialType") && !isStringEmptyOrNull(json.getString("materialType"))) {
       String materialType = json.getString("materialType");
       StringBuilder srb = new StringBuilder();
-      srb.append("<select name='tagBarcode' id='tagBarcodes'>");
-      srb.append("<option value='0' selected='selected'>No barcode</option>");
+      srb.append("<select name='index' id='indices'>");
+      srb.append("<option value='0' selected='selected'>No Index</option>");
       srb.append("</select>");
 
       responseMap.put("plateBarcodes", srb.toString());
@@ -252,8 +252,8 @@ public class PlateControllerHelperService {
     if (json.has("documentFormat")) {
       String documentFormat = json.getString("documentFormat");
       try {
-        File f = misoFileManager.getNewFile(Plate.class, "forms",
-            "PlateInputForm-" + LimsUtils.getCurrentDateAsString() + "." + documentFormat);
+        File f = misoFileManager
+            .getNewFile(Plate.class, "forms", "PlateInputForm-" + LimsUtils.getCurrentDateAsString() + "." + documentFormat);
         FormUtils.createPlateInputSpreadsheet(f);
         return JSONUtils.SimpleJSONResponse("" + f.getName().hashCode());
       } catch (Exception e) {
@@ -362,22 +362,22 @@ public class PlateControllerHelperService {
           for (Plateable p : plate.getElements()) {
             if (p instanceof Library) {
               Library l = (Library) p;
-              String strategyName = "No barcode";
+              String strategyName = "No Index";
 
               StringBuilder seqbuilder = new StringBuilder();
-              if (!l.getTagBarcodes().isEmpty()) {
+              if (!l.getIndices().isEmpty()) {
                 boolean first = true;
-                for (TagBarcode tb : l.getTagBarcodes()) {
-                  seqbuilder.append(tb.getSequence());
+                for (Index index : l.getIndices()) {
+                  seqbuilder.append(index.getSequence());
                   if (first) {
-                    strategyName = tb.getFamily().getName();
+                    strategyName = index.getFamily().getName();
                     first = false;
                   } else {
                     seqbuilder.append("-");
                   }
                 }
               } else {
-                log.info("No tag barcodes!");
+                log.info("No indices!");
               }
               JSONArray inner = new JSONArray();
               inner.add(TableHelper.hyperLinkify("/miso/library/" + l.getId(), l.getName()));
@@ -442,11 +442,13 @@ public class PlateControllerHelperService {
         Collections.sort(samples);
         Collections.reverse(samples);
         for (Sample s : samples) {
-          b.append("<div id=\"sample" + s.getId()
-              + "\" onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" " + " "
-              + "class=\"dashboard\">");
-          b.append("<input type=\"hidden\" id=\"" + s.getId() + "\" name=\"" + s.getName() + "\" projectname=\"" + s.getProject().getName()
-              + "\" samplealias=\"" + s.getAlias() + "\"/>");
+          b.append(
+              "<div id=\"sample" + s.getId()
+                  + "\" onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" " + " "
+                  + "class=\"dashboard\">");
+          b.append(
+              "<input type=\"hidden\" id=\"" + s.getId() + "\" name=\"" + s.getName() + "\" projectname=\"" + s.getProject().getName()
+                  + "\" samplealias=\"" + s.getAlias() + "\"/>");
           b.append("Name: <b>" + s.getName() + "</b><br/>");
           b.append("Alias: <b>" + s.getAlias() + "</b><br/>");
           b.append("From Project: <b>" + s.getProject().getName() + "</b><br/>");

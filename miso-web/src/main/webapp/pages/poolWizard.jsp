@@ -196,7 +196,7 @@
                 <th>Concentration (${libraryDilutionUnits})</th>
                 <th>Parent Library</th>
                 <th>Description</th>
-                <th>Parent Library Barcode</th>
+                <th>Parent Library Index</th>
               </tr>
               </thead>
               <tbody id="dilutions">
@@ -221,7 +221,7 @@
   var ldselected = [];
   var dilutions;
   var oTable;
-  var headers = ['dilutionId', 'dilutionName', 'concentration', 'library', 'description', 'libraryBarcode'];
+  var headers = ['dilutionId', 'dilutionName', 'concentration', 'library', 'description', 'libraryIndex'];
 
   function addStudy(form) {
     if (jQuery('#studyDescription').val() == "") {
@@ -251,7 +251,7 @@
         table.fnClearTable();
         dilutions = json.dilutions;
         jQuery.each(dilutions, function (index, value) {
-          var a = table.fnAddData([value.id, value.name, value.concentration, value.library, value.description, value.libraryBarcode]);
+          var a = table.fnAddData([value.id, value.name, value.concentration, value.library, value.description, value.libraryIndex]);
           var nTr = table.fnSettings().aoData[a[0]].nTr;
         });
         ldselected = [];
@@ -352,7 +352,7 @@
         dilutions = json.dilutions;
 
         jQuery.each(dilutions, function (index, value) {
-          var a = oTable.fnAddData([value.id, value.name, value.concentration, value.library, value.description, value.libraryBarcode]);
+          var a = oTable.fnAddData([value.id, value.name, value.concentration, value.library, value.description, value.libraryIndex]);
           var nTr = oTable.fnSettings().aoData[a[0]].nTr;
         });
       }

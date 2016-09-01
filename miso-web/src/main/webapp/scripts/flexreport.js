@@ -509,7 +509,7 @@ Reports.ui = {
         { "sTitle": "Sample Type", "sType": "natural"},
         { "sTitle": "Library Name", "sType": "natural"},
         { "sTitle": "Dilution Name", "sType": "natural"},
-        { "sTitle": "Tag Barcode"},
+        { "sTitle": "Index"},
         { "sTitle": "Insert Size"} ,
         { "sTitle": "Run Alias", "sType": "natural"},
         { "sTitle": "Lane"}

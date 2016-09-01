@@ -117,8 +117,8 @@
   </tr>
   <tr>
     <td colspan="2">
-    <c:if test="${pool.hasDuplicateBarcodes()}">
-      <p style="font-size:200%; font-weight:bold">This pool contains duplicate tag barcodes!</p>
+    <c:if test="${pool.hasDuplicateIndices()}">
+      <p style="font-size:200%; font-weight:bold">This pool contains duplicate indices!</p>
     </c:if>
     </td>
   </tr>
@@ -415,55 +415,14 @@
         <div onMouseOver="this.className='dashboardhighlight'" onMouseOut="this.className='dashboard'"
              class="dashboard">
           <span style="float:left" id="element${dil.id}">
-          <input type="hidden" id="poolableElements${dil.id}" value="${dil.name}" name="poolableElements"/>
-          <b>Element:</b> ${dil.name}<br/>
-
-          <script type="text/javascript">
-            jQuery(document).ready(function () {
-              Pool.ui.getPoolableElementInfo('${pool.id}', '${dil.id}');
-            });
-          </script>
-            <%-- TODO how to get round this?
-          <c:catch var="dilcheck">${dil.emPCR}</c:catch>
-          <c:if test="${empty dilcheck}">
-            <b>emPCR:</b> ${dil.emPCR.name}<br/>
-          </c:if>
-          --%>
-
-          <%--
-          <b>Library:</b> <a href="<c:url value="/miso/library/${dil.library.id}"/>">${dil.library.alias} (${dil.library.name})</a><br/>
-          <b>Sample:</b> <a href="<c:url value="/miso/sample/${dil.library.sample.id}"/>">${dil.library.sample.alias} (${dil.library.sample.name})</a><br/>
-          <c:choose>
-            <c:when test="${fn:length(pool.poolableElements) > 1}">
-              <c:choose>
-                <c:when test="${not empty dil.library.tagBarcodes}">
-                  <b>Barcodes:</b></br>
-                  <c:forEach items="${dil.library.tagBarcodes}" varStatus="status" var="barcodemap">
-                    ${status.count}: ${barcodemap.value.name} (${barcodemap.value.sequence})
-                    <c:if test="${status.count lt fn:length(dil.library.tagBarcodes)}">
-                    <br/>
-                    </c:if>
-                  </c:forEach>
-                  </span>
-                  <span class="counter">
-                    <img src="<c:url value='/styles/images/status/green.png'/>" border='0'>
-                  </span>
-                </c:when>
-                <c:otherwise>
-                  <b>Barcode:</b>
-                  <a href="<c:url value="/miso/library/${dil.library.id}"/>">Choose tag barcode</a>
-                  </span>
-                  <span class="counter">
-                    <img src="<c:url value='/styles/images/status/red.png'/>" border='0'>
-                  </span>
-                </c:otherwise>
-              </c:choose>
-            </c:when>
-            <c:otherwise>
-              </span>
-            </c:otherwise>
-          </c:choose>
-          --%>
+	          <input type="hidden" id="poolableElements${dil.id}" value="${dil.name}" name="poolableElements"/>
+	          <b>Element:</b> ${dil.name}<br/>
+	
+	          <script type="text/javascript">
+	            jQuery(document).ready(function () {
+	              Pool.ui.getPoolableElementInfo('${pool.id}', '${dil.id}');
+	            });
+	          </script>
           </span>
           <span onclick='Utils.ui.confirmRemove(jQuery(this).parent());'
                 class='float-right ui-icon ui-icon-circle-close'></span>
@@ -493,41 +452,6 @@
         </c:choose>
     });
 </script>
-<%--<table class="in">--%>
-  <%--<tr>--%>
-    <%--<td width="30%" style="vertical-align:top">--%>
-      <%--<label for="searchElements"><b>Search poolable elements:</b></label><br/>--%>
-      <%--&lt;%&ndash; <input type="text" id='ldiInput' name="ldiInput" value="" onKeyup="Utils.timer.timedFunc(poolSearchLibraryDilution(this, 'ILLUMINA'),200);"/> &ndash;%&gt;--%>
-      <%--<input type="text" id='searchElements' name="searchElements"/>--%>
-
-      <%--<div id='searchElementsResult'></div>--%>
-    <%--</td>--%>
-    <%--<td width="30%" style="vertical-align:top">--%>
-      <%--<label for="ldiBarcodes"><b>Select elements by barcode(s):</b></label><br/>--%>
-      <%--<textarea id="ldiBarcodes" name="ldiBarcodes" rows="6" cols="40"></textarea><br/>--%>
-      <%--<button type="button" class="br-button ui-state-default ui-corner-all"--%>
-              <%--onclick="Pool.ui.selectElementsByBarcodes(jQuery('#ldiBarcodes').val());">Select--%>
-      <%--</button>--%>
-      <%--<div id="importlist"></div>--%>
-    <%--</td>--%>
-    <%--<td width="30%" style="vertical-align:top">--%>
-      <%--<b>Select elements by barcode file:</b><br/>--%>
-
-      <%--<form method='post'--%>
-            <%--id='ajax_upload_form'--%>
-            <%--action="<c:url value="/miso/upload/dilution-to-pool"/>"--%>
-            <%--enctype="multipart/form-data"--%>
-            <%--target="target_upload"--%>
-            <%--onsubmit="Pool.ui.dilutionFileUploadProgress();">--%>
-        <%--<input type="file" name="file"/><br/>--%>
-        <%--<button type="submit" class="br-button ui-state-default ui-corner-all">Upload</button>--%>
-      <%--</form>--%>
-      <%--<iframe id='target_upload' name='target_upload' src='' style='display: none'></iframe>--%>
-      <%--<div id="statusdiv"></div>--%>
-      <%--<div id="dilimportfile"></div>--%>
-    <%--</td>--%>
-  <%--</tr>--%>
-<%--</table>--%>
 </div>
 
 <c:if test="${not empty pool.changeLog}">
@@ -556,18 +480,6 @@
 
 <script type="text/javascript">
   Utils.ui.addMaxDatePicker("creationDate", 0);
-  <%--<c:choose>--%>
-  <%--<c:when test="${pool.id != 0}">--%>
-  <%--Utils.timer.typewatchFunc(jQuery('#searchElements'), function () {--%>
-    <%--Pool.search.poolSearchElements(jQuery('#searchElements'), '${pool.platformType.key}')--%>
-  <%--}, 300, 2);--%>
-  <%--</c:when>--%>
-  <%--<c:otherwise>--%>
-  <%--Utils.timer.typewatchFunc(jQuery('#searchElements'), function () {--%>
-    <%--Pool.search.poolSearchElements(jQuery('#searchElements'), jQuery('#platformType').val())--%>
-  <%--}, 300, 2);--%>
-  <%--</c:otherwise>--%>
-  <%--</c:choose>--%>
 </script>
 
 <script type="text/javascript">
