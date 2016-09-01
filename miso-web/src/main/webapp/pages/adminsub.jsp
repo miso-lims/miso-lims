@@ -46,14 +46,14 @@
 	<ul class="bullets">
 		<li><a href="<c:url value="/miso/pools/ready"/>">Ready to Run</a></li>
 		<li><a href="<c:url value="/miso/container/new"/>">Create New
-				Partition Container</a></li>
+				Sequencing Container</a></li>
 		<li><a href="<c:url value="/miso/run/new"/>">Create New Run</a></li>
 	</ul>
 
     <h2>Tracking</h2>
     <ul class="bullets">
         <li><a href="<c:url value="/miso/runs"/>">List Runs</a></li>
-        <li><a href="<c:url value="/miso/containers"/>">List Partition Containers</a></li>
+        <li><a href="<c:url value="/miso/containers"/>">List Sequencing Containers</a></li>
         <li><a href="<c:url value="/miso/experiments"/>">List Experiments</a></li>
         <li><a href="<c:url value="/miso/pools"/>">List Pools</a></li>
         <li><a href="<c:url value="/miso/poolorders"/>">List Orders</a></li>

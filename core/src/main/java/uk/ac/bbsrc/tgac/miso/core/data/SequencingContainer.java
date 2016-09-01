@@ -33,10 +33,11 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Lane;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
- * A SequencerPartitionContainer describes a collection of {@link Partition} objects that can be used as part of a sequencer {@link Run}.
+ * A SequencingContainer describes a collection of {@link Lane} objects that can be used as part of a sequencer {@link Run}.
  * 
  * @author Rob Davey
  * @date 14/05/12
@@ -45,14 +46,13 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 @JsonIgnoreProperties({ "securityProfile", "run" })
-public interface SequencerPartitionContainer<T extends Partition> extends SecurableByProfile, Deletable, Comparable, Barcodable, Locatable {
+public interface SequencingContainer<T extends Lane> extends SecurableByProfile, Deletable, Comparable, Barcodable, Locatable {
   public void setId(long id);
 
   /**
    * Sets the name of this Container object.
    * 
-   * @param name
-   *          name.
+   * @param name name.
    */
   public void setName(String name);
 
@@ -66,46 +66,44 @@ public interface SequencerPartitionContainer<T extends Partition> extends Secura
   /**
    * Sets the run of this Container object.
    * 
-   * @param run
-   *          The run of which this Container is a part.
+   * @param run The run of which this Container is a part.
    * 
    */
   void setRun(Run run);
 
   /**
-   * Get the list of {@link Partition} objects comprising this container
+   * Get the list of {@link Lane} objects comprising this container
    * 
-   * @return List<Partition> partitions
+   * @return List<Lane> lanes
    */
-  List<T> getPartitions();
+  List<T> getLanes();
 
   /**
-   * Set the list of {@link Partition} objects comprising this container
+   * Set the list of {@link Lane} objects comprising this container
    * 
-   * @param partitions
-   *          List<Partition>
+   * @param lanes List<Lane>
    */
-  void setPartitions(List<T> partitions);
+  void setLanes(List<T> lanes);
 
   /**
-   * Get a {@link Partition} at a given relative partition number index (base-1)
+   * Get a {@link Lane} at a given relative lane number index (base-1)
    * 
-   * @param partitionNumber
-   * @return the {@link Partition} at the given index
+   * @param laneNumber
+   * @return the {@link Lane} at the given index
    */
-  T getPartitionAt(int partitionNumber);
+  T getLaneAt(int laneNumber);
 
   /**
-   * Set the number of partitions that this container can hold
+   * Set the number of lanes that this container can hold
    * 
-   * @param partitionLimit
+   * @param laneLimit
    */
-  void setPartitionLimit(int partitionLimit);
+  void setLaneLimit(int laneLimit);
 
   /**
-   * Initialise this container with empty {@link Partition} objects of type T up to the specified partition limit
+   * Initialise this container with empty {@link Lane} objects of type T up to the specified lane limit
    */
-  void initEmptyPartitions();
+  void initEmptyLanes();
 
   /**
    * Returns the platform of this Container object.
@@ -117,8 +115,7 @@ public interface SequencerPartitionContainer<T extends Partition> extends Secura
   /**
    * Sets the platform of this Container object.
    * 
-   * @param platform
-   *          Platform.
+   * @param platform Platform.
    */
   public void setPlatform(Platform platform);
 
@@ -137,11 +134,11 @@ public interface SequencerPartitionContainer<T extends Partition> extends Secura
   public void setValidationBarcode(String validationBarcode);
 
   /**
-   * Add new partition
+   * Add new lane
    * 
    * 
    */
-  public void addNewPartition();
+  public void addNewLane();
 
   public User getLastModifier();
 

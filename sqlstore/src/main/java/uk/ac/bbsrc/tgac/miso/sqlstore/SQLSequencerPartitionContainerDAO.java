@@ -36,10 +36,6 @@ import java.util.regex.Matcher;
 
 import javax.persistence.CascadeType;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
-
 import org.codehaus.jackson.type.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,6 +53,9 @@ import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.Property;
 import com.googlecode.ehcache.annotations.TriggersRemove;
 
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
@@ -116,9 +115,7 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
   private static final String RUN_SEQUENCER_PARTITION_CONTAINER_DELETE_BY_SEQUENCER_PARTITION_CONTAINER_ID = "DELETE FROM Run_SequencerPartitionContainer "
       + "WHERE containers_containerId=:containers_containerId";
 
-  private static final String SEQUENCER_PARTITION_CONTAINER_UPDATE = "UPDATE "
-      + TABLE_NAME
-      + " "
+  private static final String SEQUENCER_PARTITION_CONTAINER_UPDATE = "UPDATE " + TABLE_NAME + " "
       + "SET platform=:platform, identificationBarcode=:identificationBarcode, locationBarcode=:locationBarcode, validationBarcode=:validationBarcode, securityProfile_profileId=:securityProfile_profileId, lastModifier=:lastModifier "
       + "WHERE containerId=:containerId";
 
@@ -207,9 +204,11 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
 
   @Override
   @Cacheable(cacheName = "sequencerPartitionContainerCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
-      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
+      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public SequencerPartitionContainer<SequencerPoolPartition> get(long sequencerPartitionContainerId) throws IOException {
-    List eResults = template.query(SEQUENCER_PARTITION_CONTAINER_SELECT_BY_ID, new Object[] { sequencerPartitionContainerId },
+    List eResults = template.query(
+        SEQUENCER_PARTITION_CONTAINER_SELECT_BY_ID,
+        new Object[] { sequencerPartitionContainerId },
         new SequencerPartitionContainerMapper());
     SequencerPartitionContainer<SequencerPoolPartition> f = eResults.size() > 0
         ? (SequencerPartitionContainer<SequencerPoolPartition>) eResults.get(0) : null;
@@ -219,7 +218,9 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
 
   @Override
   public SequencerPartitionContainer<SequencerPoolPartition> lazyGet(long sequencerPartitionContainerId) throws IOException {
-    List eResults = template.query(SEQUENCER_PARTITION_CONTAINER_SELECT_BY_ID, new Object[] { sequencerPartitionContainerId },
+    List eResults = template.query(
+        SEQUENCER_PARTITION_CONTAINER_SELECT_BY_ID,
+        new Object[] { sequencerPartitionContainerId },
         new SequencerPartitionContainerMapper(true));
     SequencerPartitionContainer<SequencerPoolPartition> f = eResults.size() > 0
         ? (SequencerPartitionContainer<SequencerPoolPartition>) eResults.get(0) : null;
@@ -230,10 +231,10 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
 
   @Override
   @Cacheable(cacheName = "containerListCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
-      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
+      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public Collection<SequencerPartitionContainer<SequencerPoolPartition>> listAll() throws IOException {
-    Collection<SequencerPartitionContainer<SequencerPoolPartition>> lp = template.query(SEQUENCER_PARTITION_CONTAINER_SELECT,
-        new SequencerPartitionContainerMapper(true));
+    Collection<SequencerPartitionContainer<SequencerPoolPartition>> lp = template
+        .query(SEQUENCER_PARTITION_CONTAINER_SELECT, new SequencerPartitionContainerMapper(true));
     for (SequencerPartitionContainer<SequencerPoolPartition> f : lp) {
       fillInRun(f);
     }
@@ -249,7 +250,8 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
   public List<SequencerPartitionContainer<SequencerPoolPartition>> listSequencerPartitionContainersByBarcode(String barcode)
       throws IOException {
     List<SequencerPartitionContainer<SequencerPoolPartition>> lp = template.query(
-        SEQUENCER_PARTITION_CONTAINER_SELECT_BY_IDENTIFICATION_BARCODE, new Object[] { barcode },
+        SEQUENCER_PARTITION_CONTAINER_SELECT_BY_IDENTIFICATION_BARCODE,
+        new Object[] { barcode },
         new SequencerPartitionContainerMapper(true));
     for (SequencerPartitionContainer<SequencerPoolPartition> f : lp) {
       fillInRun(f);
@@ -260,8 +262,8 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
   @Override
   public List<SequencerPartitionContainer<SequencerPoolPartition>> listAllSequencerPartitionContainersByRunId(long runId)
       throws IOException {
-    List<SequencerPartitionContainer<SequencerPoolPartition>> lp = template.query(SEQUENCER_PARTITION_CONTAINER_SELECT_BY_RELATED_RUN,
-        new Object[] { runId }, new SequencerPartitionContainerMapper(true));
+    List<SequencerPartitionContainer<SequencerPoolPartition>> lp = template
+        .query(SEQUENCER_PARTITION_CONTAINER_SELECT_BY_RELATED_RUN, new Object[] { runId }, new SequencerPartitionContainerMapper(true));
     for (SequencerPartitionContainer<SequencerPoolPartition> f : lp) {
       fillInRun(f, runId);
     }
@@ -277,7 +279,9 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
   @Override
   public SequencerPartitionContainer<SequencerPoolPartition> getSequencerPartitionContainerByPartitionId(long partitionId)
       throws IOException {
-    List eResults = template.query(SEQUENCER_PARTITION_CONTAINER_SELECT_BY_PARTITION_ID, new Object[] { partitionId },
+    List eResults = template.query(
+        SEQUENCER_PARTITION_CONTAINER_SELECT_BY_PARTITION_ID,
+        new Object[] { partitionId },
         new SequencerPartitionContainerMapper(true));
     SequencerPartitionContainer<SequencerPoolPartition> f = eResults.size() > 0
         ? (SequencerPartitionContainer<SequencerPoolPartition>) eResults.get(0) : null;
@@ -310,7 +314,7 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
   @Override
   @TriggersRemove(cacheName = { "sequencerPartitionContainerCache",
       "lazySequencerPartitionContainerCache" }, keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
-          @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
+          @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public synchronized long save(SequencerPartitionContainer<SequencerPoolPartition> sequencerPartitionContainer) throws IOException {
     Long securityProfileId = sequencerPartitionContainer.getSecurityProfile().getProfileId();
     if (securityProfileId == null || (this.cascadeType != null)) { // && this.cascadeType.equals(CascadeType.PERSIST))) {
@@ -412,7 +416,7 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
         s.setLastModified(rs.getDate("lastModified"));
         s.getChangeLog().addAll(changeLogDAO.listAllById(TABLE_NAME, id));
       } catch (IOException e1) {
-        log.error("partition container row mapper", e1);
+        log.error("sequencing container row mapper", e1);
       }
 
       if (isCacheEnabled() && lookupCache(cacheManager) != null) {
@@ -426,7 +430,7 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
   @Override
   @TriggersRemove(cacheName = { "sequencerPartitionContainerCache",
       "lazySequencerPartitionContainerCache" }, keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
-          @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
+          @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public boolean remove(SequencerPartitionContainer container) throws IOException {
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
     if (container.isDeletable()) {
@@ -452,7 +456,8 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
 
   public boolean removeContainerFromRun(SequencerPartitionContainer container) throws IOException {
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
-    if ((namedTemplate.update(RUN_SEQUENCER_PARTITION_CONTAINER_DELETE_BY_SEQUENCER_PARTITION_CONTAINER_ID,
+    if ((namedTemplate.update(
+        RUN_SEQUENCER_PARTITION_CONTAINER_DELETE_BY_SEQUENCER_PARTITION_CONTAINER_ID,
         new MapSqlParameterSource().addValue("containers_containerId", container.getId())) == 1)) {
       return true;
     }
@@ -461,7 +466,8 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
 
   public boolean removeContainerPartitionAssociations(SequencerPartitionContainer container) throws IOException {
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
-    if ((namedTemplate.update(SEQUENCER_PARTITION_CONTAINER_PARTITION_DELETE_BY_SEQUENCER_PARTITION_CONTAINER_ID,
+    if ((namedTemplate.update(
+        SEQUENCER_PARTITION_CONTAINER_PARTITION_DELETE_BY_SEQUENCER_PARTITION_CONTAINER_ID,
         new MapSqlParameterSource().addValue("container_containerId", container.getId())) == 1)) {
       return true;
     }
