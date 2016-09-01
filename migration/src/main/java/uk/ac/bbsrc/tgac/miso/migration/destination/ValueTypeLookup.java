@@ -14,6 +14,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.LibraryAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
+import uk.ac.bbsrc.tgac.miso.core.data.QcPassedDetail;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
@@ -25,6 +26,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
+import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
@@ -75,7 +77,11 @@ public class ValueTypeLookup {
   private Map<String, QcType> libraryQcTypeByName;
   private Map<Long, SequencerReference> sequencerById;
   private Map<String, SequencerReference> sequencerByName;
-
+  private Map<Long, Subproject> subprojectById;
+  private Map<String, Subproject> subprojectByAlias;
+  private Map<Long, QcPassedDetail> qcPassedDetailById;
+  private Map<String, QcPassedDetail> qcPassedDetailByDescription;
+  
   /**
    * Create a ValueTypeLookup loaded with data from the provided MisoServiceManager
    * 
@@ -98,6 +104,8 @@ public class ValueTypeLookup {
     setSampleQcTypes(misoServiceManager.getSampleQcDao().listAllSampleQcTypes());
     setLibraryQcTypes(misoServiceManager.getLibraryQcDao().listAllLibraryQcTypes());
     setSequencers(misoServiceManager.getSequencerReferenceDao().listAll());
+    setSubprojects(misoServiceManager.getSubprojectDao().getSubproject());
+    setQcPassedDetails(misoServiceManager.getQcPassedDetailDao().getQcPassedDetails());
   }
 
   private void setSampleClasses(Collection<SampleClass> sampleClasses) {
@@ -281,7 +289,29 @@ public class ValueTypeLookup {
     this.sequencerById = mapById;
     this.sequencerByName = mapByName;
   }
-
+  
+  private void setSubprojects(Collection<Subproject> subprojects) {
+    Map<Long, Subproject> mapById = new UniqueKeyHashMap<>();
+    Map<String, Subproject> mapByAlias = new UniqueKeyHashMap<>();
+    for (Subproject subproject : subprojects) {
+      mapByAlias.put(subproject.getAlias(), subproject);
+      mapById.put(subproject.getId(), subproject);
+    }
+    this.subprojectById = mapById;
+    this.subprojectByAlias = mapByAlias;
+  }
+  
+  private void setQcPassedDetails(Collection<QcPassedDetail> qcPassedDetails) {
+    Map<Long, QcPassedDetail> mapById = new UniqueKeyHashMap<>();
+    Map<String, QcPassedDetail> mapByDesc = new UniqueKeyHashMap<>();
+    for (QcPassedDetail qcPassedDetail : qcPassedDetails) {
+      mapByDesc.put(qcPassedDetail.getDescription(), qcPassedDetail);
+      mapById.put(qcPassedDetail.getId(), qcPassedDetail);
+    }
+    this.qcPassedDetailById = mapById;
+    this.qcPassedDetailByDescription = mapByDesc;
+  }
+  
   /**
    * Attempts to find an existing SampleClass
    * 
@@ -517,6 +547,34 @@ public class ValueTypeLookup {
   }
 
   /**
+   * Attempts to find an existing Subproject
+   * 
+   * @param subproject a partially-formed Subproject, which must have either its ID or its
+   * alias set in order for this method to resolve the Subproject
+   * @return the existing Subproject if a matching one is found; null otherwise
+   */
+  public Subproject resolve(Subproject subproject) {
+    if (subproject == null) return null;
+    if (subproject.getId() != null) return subprojectById.get(subproject.getId());
+    if (subproject.getAlias() != null) return subprojectByAlias.get(subproject.getAlias());
+    return null;
+  }
+  
+  /**
+   * Attempts to find an existing QcPassedDetail
+   * 
+   * @param qcPassedDetail a partially-formed QcPassedDetail, which must have either its ID or its
+   * description set in order for this method to resolve the QcPassedDetail
+   * @return the existing QcPassedDetail if a matching one is found; null otherwise
+   */
+  public QcPassedDetail resolve(QcPassedDetail qcPassedDetail) {
+    if (qcPassedDetail == null) return null;
+    if (qcPassedDetail.getId() != null) return qcPassedDetailById.get(qcPassedDetail.getId());
+    if (qcPassedDetail.getDescription() != null) return qcPassedDetailByDescription.get(qcPassedDetail.getDescription());
+    return null;
+  }
+  
+  /**
    * Resolves all value type entities for a Sample
    * 
    * @param sample the sample containing partially-formed value type entities to be resolved. Full, existing entities are loaded into sample
@@ -535,10 +593,22 @@ public class ValueTypeLookup {
       SampleAdditionalInfo detailed = (SampleAdditionalInfo) sample;
 
       SampleClass sc = resolve(detailed.getSampleClass());
-      if (sc == null) throw new IOException(
-          String.format("SampleClass not found: id=%d, alias=%s", detailed.getSampleClass().getId(), detailed.getSampleClass().getAlias()));
+      if (sc == null) throw new IOException(String.format("SampleClass not found: id=%d, alias=%s",
+          detailed.getSampleClass().getId(), detailed.getSampleClass().getAlias()));
       detailed.setSampleClass(sc);
-
+      
+      if (detailed.getSubproject() != null) { // Optional field
+        Subproject subproj = resolve(detailed.getSubproject());
+        if (subproj != null) { // may be a new subproject that needs saved
+          detailed.setSubproject(subproj);
+        }
+      }
+      
+      QcPassedDetail qcDet = resolve(detailed.getQcPassedDetail());
+      if (qcDet == null) throw new IOException(String.format("QcPassedDetail not found: id=%d, description=%s",
+          detailed.getQcPassedDetail().getId(), detailed.getQcPassedDetail().getDescription()));
+      detailed.setQcPassedDetail(qcDet);
+      
       if (LimsUtils.isTissueSample(detailed)) {
         SampleTissue tissue = (SampleTissue) detailed;
 
