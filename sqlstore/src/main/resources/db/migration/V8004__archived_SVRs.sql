@@ -1,0 +1,1 @@
+ALTER TABLE SampleValidRelationship ADD COLUMN archived BOOLEAN NOT NULL DEFAULT FALSE;

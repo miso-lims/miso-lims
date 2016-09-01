@@ -17,6 +17,7 @@ public class SampleValidRelationshipDto {
   private Long updatedById;
   private String updatedByUrl;
   private String lastUpdated;
+  private Boolean archived;
 
   public Long getId() {
     return id;
@@ -112,6 +113,14 @@ public class SampleValidRelationshipDto {
 
   public void setChildUrl(String childUrl) {
     this.childUrl = childUrl;
+  }
+
+  public Boolean getArchived() {
+    return archived;
+  }
+
+  public void setArchived(Boolean archived) {
+    this.archived = archived;
   }
 
 }
