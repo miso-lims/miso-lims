@@ -155,9 +155,10 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAliquo
   public void addQc(SampleQC sampleQc) throws MalformedSampleQcException {
     this.sampleQCs.add(sampleQc);
     try {
-      sampleQc.setSample(this);
+    sampleQc.setSample(this);
     } catch (MalformedSampleException e) {
-      log.error("add QC", e);
+      // This is never actually thrown
+      throw new RuntimeException(e);
     }
   }
 
@@ -876,6 +877,9 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAliquo
       sample.setParent(parent);
     } else if (!Identity.CATEGORY_NAME.equals(sampleClass.getSampleCategory())) {
       Identity identity = new IdentityImpl();
+      if (externalName == null) {
+        throw new NullPointerException("Missing externalName");
+      }
       identity.setExternalName(externalName);
       identity.setInternalName(internalName);
       identity.setDonorSex(donorSex);

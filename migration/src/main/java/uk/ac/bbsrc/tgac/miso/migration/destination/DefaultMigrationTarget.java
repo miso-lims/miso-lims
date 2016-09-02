@@ -27,6 +27,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
+import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.migration.MigrationData;
@@ -154,6 +155,13 @@ public class DefaultMigrationTarget implements MigrationTarget {
     }
     sample.inheritPermissions(sample.getProject());
     valueTypeLookup.resolveAll(sample);
+    if (LimsUtils.isDetailedSample(sample)) {
+      SampleAdditionalInfo detailed = (SampleAdditionalInfo) sample;
+      if (detailed.getSubproject() != null && detailed.getSubproject().getId() == null) {
+        // New subproject
+        createSubproject(detailed.getSubproject(), detailed.getProject().getReferenceGenomeId());
+      }
+    }
     if (replaceChangeLogs) {
       Collection<ChangeLog> changes = new ArrayList<>(sample.getChangeLog());
       sample.setId(serviceManager.getSampleService().create(sample));
@@ -163,6 +171,13 @@ public class DefaultMigrationTarget implements MigrationTarget {
       sample.setId(serviceManager.getSampleService().create(sample));
     }
     log.debug("Saved sample " + sample.getAlias());
+  }
+  
+  private void createSubproject(Subproject subproject, Long referenceGenomeId) {
+    subproject.setDescription(subproject.getAlias());
+    subproject.setPriority(Boolean.FALSE);
+    subproject.setReferenceGenomeId(referenceGenomeId);
+    subproject.setId(serviceManager.getSubprojectDao().addSubproject(subproject));
   }
   
   private static boolean hasParent(Sample sample) {
