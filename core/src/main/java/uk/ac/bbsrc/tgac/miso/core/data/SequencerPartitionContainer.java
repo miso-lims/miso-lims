@@ -37,7 +37,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.Lane;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
- * A SequencingContainer describes a collection of {@link Lane} objects that can be used as part of a sequencer {@link Run}.
+ * A SequencerPartitionContainer describes a collection of {@link Partition} objects that can be used as part of a sequencer {@link Run}.
  * 
  * @author Rob Davey
  * @date 14/05/12
@@ -46,7 +46,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 @JsonIgnoreProperties({ "securityProfile", "run" })
-public interface SequencingContainer<T extends Lane> extends SecurableByProfile, Deletable, Comparable, Barcodable, Locatable {
+public interface SequencerPartitionContainer<T extends Partition> extends SecurableByProfile, Deletable, Comparable, Barcodable, Locatable {
   public void setId(long id);
 
   /**
@@ -72,38 +72,38 @@ public interface SequencingContainer<T extends Lane> extends SecurableByProfile,
   void setRun(Run run);
 
   /**
-   * Get the list of {@link Lane} objects comprising this container
+   * Get the list of {@link Partition} objects comprising this container
    * 
-   * @return List<Lane> lanes
+   * @return List<Partition> partitions
    */
-  List<T> getLanes();
+  List<T> getPartitions();
 
   /**
-   * Set the list of {@link Lane} objects comprising this container
+   * Set the list of {@link Partition} objects comprising this container
    * 
-   * @param lanes List<Lane>
+   * @param partitions List<Partition>
    */
-  void setLanes(List<T> lanes);
+  void setPartitions(List<T> partitions);
 
   /**
-   * Get a {@link Lane} at a given relative lane number index (base-1)
+   * Get a {@link Partition} at a given relative partition number index (base-1)
    * 
-   * @param laneNumber
-   * @return the {@link Lane} at the given index
+   * @param partitionNumber
+   * @return the {@link Partition} at the given index
    */
-  T getLaneAt(int laneNumber);
+  T getPartitionAt(int partitionNumber);
 
   /**
-   * Set the number of lanes that this container can hold
+   * Set the number of partitions that this container can hold
    * 
-   * @param laneLimit
+   * @param partitionLimit
    */
-  void setLaneLimit(int laneLimit);
+  void setPartitionLimit(int partitionLimit);
 
   /**
-   * Initialise this container with empty {@link Lane} objects of type T up to the specified lane limit
+   * Initialise this container with empty {@link Lane} objects of type T up to the specified partition limit
    */
-  void initEmptyLanes();
+  void initEmptyPartitions();
 
   /**
    * Returns the platform of this Container object.
@@ -134,11 +134,11 @@ public interface SequencingContainer<T extends Lane> extends SecurableByProfile,
   public void setValidationBarcode(String validationBarcode);
 
   /**
-   * Add new lane
+   * Add new partition
    * 
    * 
    */
-  public void addNewLane();
+  public void addNewPartition();
 
   public User getLastModifier();
 
