@@ -174,13 +174,13 @@ Sample.hot = {
       document.getElementById('subpSelectOptions').style.display = 'none';
     }  else {
       var select = [];
-      select.push('Subproject: ');
+      select.push('<label>Subproject: ');
       select.push('<select id="subprojectSelect">');
       select.push('<option value="">None</option>');
       for (var i=0; i<filteredSubprojects.length; i++) {
         select.push('<option value="'+ filteredSubprojects[i].id +'">'+ filteredSubprojects[i].alias +'</option>');
       }
-      select.push('</select>');
+      select.push('</select></label>');
       var subprojectSelect = document.getElementById('subpSelectOptions');
       subprojectSelect.innerHTML = '';
       subprojectSelect.innerHTML = select.join('');
@@ -205,15 +205,14 @@ Sample.hot = {
   addClassSelect: function () {
     var select = [];
     var classes = Hot.sortByProperty(Hot.sampleOptions.sampleClassesDtos, 'id');
-    select.push('<select id="classDropdown">');
+    select.push('<label>Sample Class: <select id="classDropdown">');
     select.push('<option value="">Select class</option>');
     var classOptions = Sample.hot.getNewSampleClassOptions();
     for (var i=0; i<classOptions.length; i++) {
        select.push('<option value="'+ classOptions[i].id +'">'+ classOptions[i].alias +'</option>');
     }
-    select.push('</select>');
+    select.push('</select></label>');
     document.getElementById('classOptions').innerHTML = select.join('');
-    document.getElementById('classDropdown').addEventListener('change', Sample.hot.enableTableButton);
   },
 
   /**
@@ -263,23 +262,24 @@ Sample.hot = {
   },
 
   /**
-   * Enables "Make Table" button once required dropdowns are chosen
-   */
-  enableTableButton: function (event) {
-    if (event.target.value !== '') {
-      document.getElementById('makeTable').disabled = false;
-      document.getElementById('makeTable').classList.remove('disabled');
-    }
-  },
-
-  /**
    * Checks to see if table exists before creating a new one.
    */
   makeNewSamplesTable: function () {
     // if this is disabled, alert the user as to why
-    if (document.getElementById('makeTable').disabled || document.getElementById('projectSelect').value === '') {
-      var message = 'Please select a project ' + (Hot.detailedSample ? 'and sample class ' : '') + 'before creating the table.';
-      alert(message);
+    if (document.getElementById('projectSelect').value === '') {
+      alert('Please select a project.');
+      document.getElementById('projectSelect').focus();
+      return false;
+    }
+    if (Hot.detailedSample && document.getElementById('classDropdown').value === '') {
+      alert('Please select a sample class.');
+      document.getElementById('classDropdown').focus();
+      return false;
+    }
+    var numSamples = parseInt(document.getElementById('numSamples').value);
+    if (!numSamples > 0) {
+      alert('Please input number of samples to create.');
+      document.getElementById('numSamples').focus();
       return false;
     }
     // if table exists, confirm before obliterating it and creating a new one
@@ -301,6 +301,7 @@ Sample.hot = {
     // if detailedSample is enabled, re-store the selected sampleClassId for this table
     if (Hot.detailedSample) {
       Sample.hot.sampleClassId = document.getElementById('classDropdown').value;
+      Sample.hot.sampleCategory = Sample.hot.getCategoryFromClassId(Sample.hot.sampleClassId);
       Sample.hot.dataSchema.sampleClassAlias = Hot.getAliasFromId(Sample.hot.sampleClassId, Hot.sampleOptions.sampleClassesDtos);
     }
 
@@ -311,29 +312,6 @@ Sample.hot = {
       Sample.hot.dataSchema.scientificName = "Homo sapiens";
     }
     Sample.hot.makeHOT(null, 'create', null, sampleCategory);
-
-    // disable sampleClass dropdown so they can't change it midway through editing table values
-    if (document.getElementById('classDropdown')) {
-      document.getElementById('classDropdown').setAttribute('disabled', 'disabled');
-      document.getElementById('classDropdown').classList.add('disabled');
-    }
-  },
-
-  /**
-   * Gets number of rows to add to table
-   */
-  parseIntRows: function (message) {
-    var number = window.prompt(message + "How many samples would you like to create?");
-    if (number === null) {
-      document.getElementById('classDropdown').removeAttribute('disabled');
-      document.getElementById('classDropdown').classList.remove('disabled');
-      return false;
-    }
-    if (parseInt(number)) {
-      return parseInt(number);
-    } else {
-      Sample.hot.parseIntRows(number + " is not a number. Please enter a number.\n\n");
-    }
   },
 
   /**
@@ -344,6 +322,16 @@ Sample.hot = {
     Hot.buildDtoFunc = Sample.hot.buildDtos;
     Hot.saveOneFunc = Sample.hot.saveOne;
     Hot.updateOneFunc = Sample.hot.updateOne;
+    if (sourceSampleCategory) Sample.hot.sampleCategory = sourceSampleCategory;
+    
+    // reset params which track successes and errors
+    Hot.messages = {
+      success: {},
+      failed: {}
+    };
+    document.getElementById('saveSuccesses').classList.add('hidden');
+    document.getElementById('saveErrors').classList.add('hidden');
+    
     
     // are new samples parented to IDs being requested
     Sample.hot.generateColumnData = function(showQcs) { return Sample.hot.getAppropriateColumns(action, sourceSampleCategory, targetSampleCategory, showQcs); };
@@ -351,8 +339,7 @@ Sample.hot = {
 
     if (!startingValues) {
       // set initial number of rows to display.
-      var startRowsNumber = Sample.hot.parseIntRows("");
-      if (startRowsNumber === false) return false;
+      var startRowsNumber = parseInt(document.getElementById('numSamples').value);
 
       // stringify and parse to clone the default object (instead of using referential copies) if detailedSample is enabled
       var defaultObject = (Hot.detailedSample ? JSON.stringify(Sample.hot.getDefaultDetailedValues()) : null);
@@ -536,6 +523,12 @@ Sample.hot = {
   getSampleClasses: function () {
     return Hot.sortByProperty(Hot.sampleOptions.sampleClassesDtos, 'id').map(Hot.getAlias);
   },
+  
+  getSampleClassesByCategory: function () {
+    return Hot.sortByProperty(Hot.sampleOptions.sampleClassesDtos, 'id')
+              .filter(function (sc) { return sc.sampleCategory == Sample.hot.sampleCategory; })
+              .map(Hot.getAlias);
+  },
 
   /**
    * Gets array of sample class aliases that are a valid child of the given parent (detailed sample only)
@@ -717,7 +710,7 @@ Sample.hot = {
         data: 'sampleClassAlias',
         type: 'dropdown',
         trimDropdown: false,
-        source: sourceSampleCategory == null ? Sample.hot.getNewSampleClassOptionsAliasOnly() : Sample.hot.getSampleClasses(),
+        source: Sample.hot.getSampleClassesByCategory(),
         include: isDetailed
       },
       {
@@ -1241,8 +1234,8 @@ Sample.hot = {
    */
   saveDetailedData: function () {
     // check that a project and class have been declared
-    if (document.getElementById('projectSelect').value === '' || document.getElementById('classDropdown').value === '') {
-      Hot.messages.failed.push('Make sure both Project and Sample Class are selected before saving.');
+    if (document.getElementById('projectSelect').value === '') {
+      Hot.messages.failed.push('Select a Project before saving.');
       Hot.addErrors(Hot.messages);
       return false;
     }
