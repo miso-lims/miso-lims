@@ -3,10 +3,10 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 
 import com.eaglegenomics.simlims.core.Note;
@@ -46,8 +46,6 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAliquot, SampleStock, SampleTissue, SampleTissueProcessing,
     SampleCVSlide, SampleLCMTube, Identity {
 
-  private static final Logger log = Logger.getLogger(DetailedSampleBuilder.class);
-
   @SuppressWarnings("unused")
   private static final long serialVersionUID = 1L;
 
@@ -74,6 +72,7 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAliquo
   private boolean nonStandardAlias = false;
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
   private Collection<SampleQC> sampleQCs = new TreeSet<SampleQC>();
+  private Collection<Note> notes = new HashSet<Note>();
 
   // DetailedSample attributes
   private SampleAdditionalInfo parent;
@@ -174,12 +173,17 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAliquo
 
   @Override
   public Collection<Note> getNotes() {
-    throw new UnsupportedOperationException("Method not implemented on builder");
+    return notes;
+  }
+
+  @Override
+  public void addNote(Note note) {
+    this.notes.add(note);
   }
 
   @Override
   public void setNotes(Collection<Note> notes) {
-    throw new UnsupportedOperationException("Method not implemented on builder");
+    this.notes = notes;
   }
 
   public Document getSubmissionDocument() {
@@ -639,11 +643,6 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAliquo
   }
 
   @Override
-  public void addNote(Note note) {
-    throw new UnsupportedOperationException("Method not implemented on builder");
-  }
-
-  @Override
   public void inheritPermissions(SecurableByProfile parent) throws SecurityException {
     if (parent.getSecurityProfile().getOwner() != null) {
       setSecurityProfile(parent.getSecurityProfile());
@@ -862,6 +861,7 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAliquo
       stock.setStrStatus(strStatus);
       stock.setConcentration(concentration);
       stock.setDNAseTreated(dnaseTreated);
+      stock.setQCs(sampleQCs);
       sample = stock;
       break;
     case SampleAliquot.CATEGORY_NAME:
@@ -913,6 +913,7 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAliquo
     sample.setVolume(volume);
     sample.setEmpty(emptied);
     sample.getChangeLog().addAll(changeLog);
+    sample.setNotes(notes);
 
     sample.setSampleClass(sampleClass);
     sample.setQcPassedDetail(qcPassedDetail);
