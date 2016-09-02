@@ -121,7 +121,7 @@ public class RunRestController extends RestController {
     }
     Collection<SequencerPartitionContainer<SequencerPoolPartition>> conts = r.getSequencerPartitionContainers();
     if (conts.isEmpty() || conts.size() != 1) {
-      throw new RestException("Expected 1 partition container for run " + runAlias + ", but found " + (conts == null ? 0 : conts.size()));
+      throw new RestException("Expected 1 sequencing container for run " + runAlias + ", but found " + (conts == null ? 0 : conts.size()));
     }
     return RunProcessingUtils.buildIlluminaDemultiplexCSV(r, conts.iterator().next(), "1.8", user.getLoginName());
   }

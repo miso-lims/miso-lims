@@ -163,13 +163,13 @@ Once a Study has been saved, the following operations are available when visitin
 
 A MISO Experiment represents design information about the sequencing experiment. Each Experiment has a _prefix_ and an _ID_. The Experiment ID becomes the suffix of the Experiment's name_,_ e.g. **EXP1, EXP2**.
 
-Experiments are associated with Pools that are placed on Run partitions, which contain the actual sequencing results.
+Experiments are associated with Pools that are placed on Run lanes, which contain the actual sequencing results.
 
 #### Automatic Experiment Creation
 
 *   Whilst MISO supports creating Experiments manually (see below), it is often easier to allow MISO to generate and link an Experiment to a Pool for you.
-*   From the _Edit Run_ page, you are able to select Pools to be placed on Run partitions (lanes/chambers).
-*   When assigning a Pool to a partition, the following rules apply for Experiment creation:
+*   From the _Edit Run_ page, you are able to select Pools to be placed on Run lanes (lanes/chambers).
+*   When assigning a Pool to a lane, the following rules apply for Experiment creation:
     *   If the Pool has no Experiment already linked
     *   If there is at least one Study available on each of the Projects represented by the Pool's dilutions
 *   If these rules are valid, drop boxes will appear for each represented Project, letting you choose the Study on which to base the automatic Experiment creation.
@@ -316,7 +316,7 @@ Once a Library has been saved, the following operations are available when visit
 
 ## Library Dilutions and Pools
 
-A MISO Pool contains one or more Dilutions that are to be sequenced as part of an Experiment, in a sequencer instrument Run partition (lane/chamber). Pools with more than one Dilution are said to be multiplexed. Each pool has a _prefix_ based on the Platform Type and an _ID_. For Illumina pools, the prefix will be **IPO**, for 454 **LPO**, for SOLiD **SPO**. The pool ID becomes the suffix of the pool name_,_ e.g. **IPO1, LPO270**.
+A MISO Pool contains one or more Dilutions that are to be sequenced as part of an Experiment, in a sequencer instrument Run lanes (or chamber). Pools with more than one Dilution are said to be multiplexed. Each pool has a _prefix_ based on the Platform Type and an _ID_. For Illumina pools, the prefix will be **IPO**, for 454 **LPO**, for SOLiD **SPO**. The pool ID becomes the suffix of the pool name_,_ e.g. **IPO1, LPO270**.
 
 ### Create library dilutions
 
@@ -332,7 +332,7 @@ A library dilution is a diluted portion of a library ready to be added to a pool
 * Click _Save Dilutions_ in the upper right hand corner.
 
 ### Creating Pools
-A pool is one or more diluted libraries inside a tube that is loaded onto a partition container. A Pool is related to a specific Experiment and is tracked by a unique alias and identification barcode.
+A pool is one or more diluted libraries inside a tube that is loaded onto a sequencing container. A Pool is related to a specific Experiment and is tracked by a unique alias and identification barcode.
 
 * Click the _My Project_ tab and select the appropriate project from the list
 * Open the _Library Dilutions_ section and select _Create Pools_ from the Options menu.
@@ -344,34 +344,34 @@ A pool is one or more diluted libraries inside a tube that is loaded onto a part
   * Add QCs
   * Create orders
 
-## Partition Containers
+## Sequencing Containers
 
-Partition Containers represent a collection of Partitions (abstractions of lanes, chambers, etc) that are described by a parent Run object. Containers can be populated prior to a Run being entered manually or being imported by the Notification System. This means Containers can be barcoded and entered into MISO with their Pools populated ahead-of-time so that when Runs are added manually or automatically, the Containers can either be linked via a quick lookup or automatically, respectively.
+Sequencing Containers represent a collection of Lanes (which represent lanes, chambers, etc) that are described by a parent Run object. Containers can be populated prior to a Run being entered manually or being imported by the Notification System. This means Containers can be barcoded and entered into MISO with their Pools populated ahead-of-time so that when Runs are added manually or automatically, the Containers can either be linked via a quick lookup or automatically, respectively.
 
-#### Adding Partition Containers (outside a Run)
+#### Adding Sequencing Containers (outside a Run)
 
-*   Independent Container creation is accessed from the _Create New Partition Container_ link in the navigation area
+*   Independent Container creation is accessed from the _Create New Sequencing Container_ link in the navigation area
 *   Select a Platform for the Container from the _Platform_ radio buttons
-*   Select an available Sequencer Reference from the _Sequencer_ dropdown
-*   Select the number of Containers you want to add for the Platform (454 is the only multiple flowcell vendor. HiSeq's are effectively "single flowcell in twos", i.e. two run folders are created independently even though two flowcells can be run concurrently on the machine itself).
+*   Select an available Sequencer from the _Sequencer_ dropdown
+*   Select the number of Containers you want to add for the Platform (454 is the only multiple-flowcell vendor. HiSeq's are effectively "single flowcell in twos", i.e. two run folders are created independently even though two flowcells can be run concurrently on the machine itself).
 *   Enter in an ID for this Container. You can validate that this barcode hasn't been used before by using the _Lookup_ button.
 *   A location and validation barcode can also be entered, but are not compulsory.
-*   Double click on an empty partition and either beep in or type the barcode of the pool you wish to add to this Container
+*   Double click on an empty lane and either beep in or type the barcode of the pool you wish to add to this Container
 *   Click on the _Save_ button to save.
 
-#### Adding Partition Containers (within a Run)
+#### Adding Sequencing Containers (within a Run)
 
 *   Containers can also be created and edited from within a Run itself and the process is very similar to the above.
 *   Select the number of Containers you want to add for the Platform (454 is the only multiple flowcell vendor. HiSeq's are effectively "single flowcell in twos", i.e. two run folders are created independently even though two flowcells can be run concurrently on the machine itself).
 *   Enter in an ID for this Container. You can validate that this barcode hasn't been used before by using the _Lookup_ button.
 *   A location and validation barcode can also be entered, but are not compulsory.
-*   Pools are added to Container partitions from the Pool list on the right hand side of the page by double clicking on a Pool
+*   Pools are added to Container lanes from the Pool list on the right hand side of the page by double clicking on a Pool
 *   **NB** the chosen Pools will be added **sequentially** to the Container, as by this point, MISO will assess that as the run is already started, it should be fully populated.
 *   If you wish to retrospectively semi-populate a Container, use the method in the previous section ("outside a Run").
 
 ## Run
 
-A MISO Run contains the sequencing results from sequencing experiments. Each Run comprises one or more Partition Containers, that in turn comprise Partitions (abstractions of lanes, chambers, etc) which hold a Pool.
+A MISO Run contains the sequencing results from sequencing experiments. Each Run comprises one or more Sequencing Containers, that in turn comprise Lanes (representing lanes, chambers, etc) which hold a Pool.
 
 #### Automatic Run Notification
 
@@ -379,11 +379,11 @@ MISO is bundled with a separate Java application that can be run on a machine wi
 
 #### Adding a Run Manually
 
-*   A Run is related to Projects via the pooled Samples placed on its partitions and is tracked by a unique **alias**.
+*   A Run is related to Projects via the pooled Samples placed on its lanes and is tracked by a unique **alias**.
 *   An ID and name will be auto-generated for the Run upon saving.
 *   Select a Platform Type.
 *   Select a Sequencer Reference
-    *   Once a Sequencer Reference has been selected, you will be able to select and populate the Container(s). Please follow the information in the Partition Containers section above.
+    *   Once a Sequencer Reference has been selected, you will be able to select and populate the Container(s). Please follow the information in the Sequencing Containers section above.
 *   A Run alias, which should be the run name specified by the sequencer system, and usually relates to a run folder of the same name on the underlying filesystem of use.
 *   A Run description, giving a brief overview of what the Run represents.
 *   The Run path, which should be the run folder exposed by the sequencer itself or an intermediary storage filesystem or cluster.
@@ -400,9 +400,9 @@ Once a Run has been saved, either manually or via the Notification System, the f
 *   Setting the Status of the Run manually
     *   This is also helpful if the notification system fails to accurately record the status of a Run (some platforms don't expose this information in a coherent fashion).
 
-##### Editing Partition Containers
+##### Editing Sequencing Containers
 
-*   See the Partition Containers section above.
+*   See the Sequencing Containers section above.
 
 ##### Adding Notes
 
@@ -416,7 +416,7 @@ Once a Run has been saved, either manually or via the Notification System, the f
     *   The QC User that carried out the QC.
     *   The QC date.
     *   The QC Method relates to a conceptual or practical QC steps undertaken by one of two "actioners", i.e. SeqOps (_sequencing operations_) or SeqInfo (_sequence informatics_). The former is carried out after the physical run has completed and assessed for quality. The latter is carried out following a primary analysis stage to assess quality.
-    *   The Process Selection allows the QC to be related to a given subset of partitions, e.g. if lanes 1-4 were OK and should be processed, but lanes 5-8 were not, boxes 1-4 would be clicked to reflect this.
+    *   The Process Selection allows the QC to be related to a given subset of lanes, e.g. if lanes 1-4 were OK and should be processed, but lanes 5-8 were not, boxes 1-4 would be clicked to reflect this.
     *   Any other free-text information should be added in the Info field.
     *   Click on _Add_ to save.
 

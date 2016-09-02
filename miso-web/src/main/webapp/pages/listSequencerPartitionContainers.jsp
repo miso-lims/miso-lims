@@ -30,7 +30,7 @@
 <div id="maincontent">
   <div id="contentcolumn">
     <h1>
-      <div id="totalCount">Partition Containers</div>
+      <div id="totalCount">Sequencing Containers</div>
     </h1>
 
     <table cellpadding="0" cellspacing="0" border="0" class="display" id="listingContainersTable">
