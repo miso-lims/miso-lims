@@ -30,7 +30,6 @@
 <%@ include file="../header.jsp" %>
 <script src="<c:url value='/scripts/jquery/datatables/js/jquery.dataTables.min.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/parsley/parsley.min.js'/>" type="text/javascript"></script>
-<!--  sequencer_partition_container_ajax.js is already included in header -->
 
 <div id="maincontent">
 <div id="contentcolumn">
@@ -40,7 +39,7 @@
   <c:choose>
     <c:when test="${container.id != 0}">Edit</c:when>
     <c:otherwise>Create</c:otherwise>
-  </c:choose> Sequencer Partition Container
+  </c:choose> Sequencing Container
   <button class="fg-button ui-state-default ui-corner-all"
           onclick="return Container.validateContainer();">Save</button>
   <sec:authorize access="hasRole('ROLE_ADMIN')">
@@ -115,11 +114,11 @@
     <td width="50%" valign="top">
       <h2>Container Parameters</h2>
 
-      <div id="containerPartitions">
+      <div id="containerLanes">
         <div class="parsley-errors-list filled" id="containerError">
           <div class="parsley-required"></div>
         </div>
-        <c:if test="${container.id != 0}">
+        <c:if test="${lane.id != 0}">
           <div class="note ui-corner-all">
             <c:if test="${multiplexed and not empty container.identificationBarcode}">
               <ul class="sddm">
@@ -216,43 +215,43 @@
                 </tr>
                 --%>
             </table>
-            <div id='partitionErrorDiv'></div>
-            <div id="partitionDiv">
-              <i class="italicInfo">Click in a partition box to beep/type in barcodes, or double click a pool on the
+            <div id='laneErrorDiv'></div>
+            <div id="laneDiv">
+              <i class="italicInfo">Click in a lane box to beep/type in barcodes, or double click a pool on the
                 right to sequentially add pools to the container</i>
               <table class="in">
-                <th>Partition No.</th>
+                <th>Lane No.</th>
                 <th>Pool</th>
-                <c:forEach items="${container.partitions}" var="partition" varStatus="partitionCount">
+                <c:forEach items="${container.lanes}" var="lane" varStatus="laneCount">
                   <tr>
-                    <td>${partition.partitionNumber}</td>
+                    <td>${lane.laneNumber}</td>
                     <td width="90%">
                       <c:choose>
-                        <c:when test="${not empty partition.pool}">
-                          <ul partition="${partitionCount.index}" bind="partitions[${partitionCount.index}].pool"
-                              class="runPartitionDroppable">
+                        <c:when test="${not empty lane.pool}">
+                          <ul lane="${laneCount.index}" bind="lanes[${laneCount.index}].pool"
+                              class="runLaneDroppable">
                             <div class="dashboard" style="position:relative">
-                                <%-- <a href='<c:url value="/miso/pool/${fn:toLowerCase(container.platformType.key)}/${partition.pool.id}"/>'> --%>
-                              <a href='<c:url value="/miso/pool/${partition.pool.id}"/>'>
-                                  ${partition.pool.name}
-                                (${partition.pool.creationDate})
+                                <%-- <a href='<c:url value="/miso/pool/${fn:toLowerCase(container.platformType.key)}/${lane.pool.id}"/>'> --%>
+                              <a href='<c:url value="/miso/pool/${lane.pool.id}"/>'>
+                                  ${lane.pool.name}
+                                (${lane.pool.creationDate})
                               </a><br/>
-                              <span style="font-size:8pt" id='partition_span_${partitionCount.index}'>
+                              <span style="font-size:8pt" id='lane_span_${laneCount.index}'>
                               <c:choose>
-                                <c:when test="${not empty partition.pool.experiments}">
-                                  <i><c:forEach items="${partition.pool.experiments}" var="experiment">
-                                    ${experiment.study.project.alias} (${experiment.name}: ${fn:length(partition.pool.dilutions)} dilutions)<br/>
+                                <c:when test="${not empty lane.pool.experiments}">
+                                  <i><c:forEach items="${lane.pool.experiments}" var="experiment">
+                                    ${experiment.study.project.alias} (${experiment.name}: ${fn:length(lane.pool.dilutions)} dilutions)<br/>
                                   </c:forEach>
                                   </i>
                                   <script>
                                     jQuery(document).ready(function () {
-                                      Container.partition.checkPoolExperiment('#partition_span_${partitionCount.index}', ${partition.pool.id}, ${partitionCount.index});
+                                      Container.lane.checkPoolExperiment('#lane_span_${laneCount.index}', ${lane.pool.id}, ${laneCount.index});
                                     });
                                   </script>
                                   <input type="hidden"
-                                       name="partitions[${partitionCount.index}].pool"
-                                       id="pId${partitionCount.index}"
-                                       value="${partition.pool.id}"/>
+                                       name="lanes[${laneCount.index}].pool"
+                                       id="pId${laneCount.index}"
+                                       value="${lane.pool.id}"/>
                                 </c:when>
                                 <c:otherwise>
                                   <i>No experiment linked to this pool</i>
@@ -260,14 +259,14 @@
                               </c:choose>
                               </span>
                               <c:if test="${empty container.run or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-                              <span style='position: absolute; top: 0; right: 0;' onclick='Container.pool.confirmPoolRemove(this, "${partition.partitionNumber}");' class='float-right ui-icon ui-icon-circle-close'></span>
+                              <span style='position: absolute; top: 0; right: 0;' onclick='Container.pool.confirmPoolRemove(this, "${lane.laneNumber}");' class='float-right ui-icon ui-icon-circle-close'></span>
                               </c:if>
                             </div>
                           </ul>
                         </c:when>
                         <c:otherwise>
-                          <div id="p_div_${partitionCount.index}" class="elementListDroppableDiv">
-                            <ul class='runPartitionDroppable' bind='partitions[${partitionCount.index}].pool' partition='${partitionCount.index}' ondblclick='Container.partition.populatePartition(this);'></ul>
+                          <div id="p_div_${laneCount.index}" class="elementListDroppableDiv">
+                            <ul class='runLaneDroppable' bind='lanes[${laneCount.index}].pool' lane='${laneCount.index}' ondblclick='Container.lane.populateLane(this);'></ul>
                           </div>
                         </c:otherwise>
                       </c:choose>

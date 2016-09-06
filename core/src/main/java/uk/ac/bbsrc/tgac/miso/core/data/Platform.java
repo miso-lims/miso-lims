@@ -47,8 +47,7 @@ public interface Platform extends Comparable {
   /**
    * Sets the platformId of this Platform object.
    * 
-   * @param platformId
-   *          platformId.
+   * @param platformId platformId.
    */
   public void setId(Long platformId);
 
@@ -62,8 +61,7 @@ public interface Platform extends Comparable {
   /**
    * Sets the platformType of this Platform object.
    * 
-   * @param name
-   *          platformType.
+   * @param name platformType.
    */
   public void setPlatformType(PlatformType name);
 
@@ -77,8 +75,7 @@ public interface Platform extends Comparable {
   /**
    * Sets the description of this Platform object.
    * 
-   * @param description
-   *          description.
+   * @param description description.
    */
   public void setDescription(String description);
 
@@ -92,8 +89,7 @@ public interface Platform extends Comparable {
   /**
    * Sets the instrumentModel of this Platform object.
    * 
-   * @param instrumentModel
-   *          instrumentModel.
+   * @param instrumentModel instrumentModel.
    */
   public void setInstrumentModel(String instrumentModel);
 
@@ -105,17 +101,16 @@ public interface Platform extends Comparable {
   public String getNameAndModel();
 
   /**
-   * Returns the number of sequencer partition containers of this Platform object.
+   * Returns the number of sequencing containers of this Platform object.
    * 
    * @return Integer numContainers.
    */
   public Integer getNumContainers();
 
   /**
-   * Sets the number of sequencer partition containers of this Platform object.
+   * Sets the number of sequencing containers of this Platform object.
    * 
-   * @param numContainers
-   *          numContainers.
+   * @param numContainers numContainers.
    * 
    */
   public void setNumContainers(Integer numContainers);

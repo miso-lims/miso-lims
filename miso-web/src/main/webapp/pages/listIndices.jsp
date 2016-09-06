@@ -29,24 +29,24 @@
 <div id="maincontent">
   <div id="contentcolumn">
     <h1>
-      Tag Barcodes
+      Indices
     </h1>
 
     <div class="dataTables_wrapper" role="grid">
-    <table cellpadding="0" cellspacing="0" border="0" class="display dataTable" id="listingTagBarcodeTable">
+    <table cellpadding="0" cellspacing="0" border="0" class="display dataTable" id="listingIndicesTable">
     </table>
     </div>
     <script type="text/javascript">
-       jQuery('#listingTagBarcodeTable').html('');
-       jQuery('#listingTagBarcodeTable').dataTable({
+       jQuery('#listingIndicesTable').html('');
+       jQuery('#listingIndicesTable').dataTable({
          "aaData": [
-           <c:forEach items="${tagbarcodes}" var="barcode">[
-            '${barcode.family.platformType.key}', 
-            '${barcode.family.name}',
-            '${barcode.name}',
-            '${barcode.sequence}',
-            '${barcode.family.archived}',
-            '${barcode.id}'
+           <c:forEach items="${indices}" var="index">[
+            '${index.family.platformType.key}', 
+            '${index.family.name}',
+            '${index.name}',
+            '${index.sequence}',
+            '${index.family.archived}',
+            '${index.id}'
           ],
          </c:forEach>
          ],
@@ -68,7 +68,7 @@
            [2, "asc"]
          ],
          "fnDrawCallback": function (oSettings) {
-           jQuery('#listingTagBarcodeTable_paginate').find('.fg-button').removeClass('fg-button');
+           jQuery('#listingIndicesTable_paginate').find('.fg-button').removeClass('fg-button');
          }
        });
     </script>

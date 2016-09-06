@@ -55,12 +55,12 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
-import uk.ac.bbsrc.tgac.miso.core.service.TagBarcodeService;
+import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
 import uk.ac.bbsrc.tgac.miso.core.util.jackson.ProjectSampleRecursionAvoidanceMixin;
 import uk.ac.bbsrc.tgac.miso.core.util.jackson.SampleRecursionAvoidanceMixin;
 import uk.ac.bbsrc.tgac.miso.core.util.jackson.UserInfoMixin;
@@ -93,7 +93,7 @@ public class LibraryRestController extends RestController {
   private AuthorizationManager authorizationManager;
 
   @Autowired
-  private TagBarcodeService tagBarcodeFamilyService;
+  private IndexService indexService;
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
@@ -128,14 +128,14 @@ public class LibraryRestController extends RestController {
     library.setLibrarySelectionType(requestManager.getLibrarySelectionTypeById(libraryDto.getLibrarySelectionTypeId()));
     library.setLibraryStrategyType(requestManager.getLibraryStrategyTypeById(libraryDto.getLibraryStrategyTypeId()));
     library.setLibraryType(requestManager.getLibraryTypeById(libraryDto.getLibraryTypeId()));
-    List<TagBarcode> tagBarcodes = new ArrayList<>();
-    if (libraryDto.getTagBarcodeIndex1Id() != null) {
-      tagBarcodes.add(tagBarcodeFamilyService.getTagBarcodeById(libraryDto.getTagBarcodeIndex1Id()));
+    List<Index> indices = new ArrayList<>();
+    if (libraryDto.getIndex1Id() != null) {
+      indices.add(indexService.getIndexById(libraryDto.getIndex1Id()));
     }
-    if (libraryDto.getTagBarcodeIndex2Id() != null) {
-      tagBarcodes.add(tagBarcodeFamilyService.getTagBarcodeById(libraryDto.getTagBarcodeIndex2Id()));
+    if (libraryDto.getIndex2Id() != null) {
+      indices.add(indexService.getIndexById(libraryDto.getIndex2Id()));
     }
-    library.setTagBarcodes(tagBarcodes);
+    library.setIndices(indices);
     library.setLibraryAdditionalInfo(Dtos.to(libraryDto.getLibraryAdditionalInfo()));
     library.getLibraryAdditionalInfo().setCreatedBy(user);
     library.getLibraryAdditionalInfo().setUpdatedBy(user);

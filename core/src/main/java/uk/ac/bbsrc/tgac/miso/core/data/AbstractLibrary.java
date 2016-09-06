@@ -93,10 +93,10 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   private boolean lowQuality;
 
   @Transient
-  private TagBarcode tagBarcode;
+  private Index index;
 
   @Transient
-  private List<TagBarcode> tagBarcodes = new ArrayList<>();
+  private List<Index> indices = new ArrayList<>();
 
   private Boolean paired;
 
@@ -225,30 +225,30 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   }
 
   @Override
-  public List<TagBarcode> getTagBarcodes() {
-    return tagBarcodes;
+  public List<Index> getIndices() {
+    return indices;
   }
 
   @Override
-  public void setTagBarcodes(List<TagBarcode> tagBarcodes) {
-    TagBarcode.sort(tagBarcodes);
-    TagBarcodeFamily current = null;
-    for (TagBarcode barcode : tagBarcodes) {
-      if (barcode == null) continue;
+  public void setIndices(List<Index> indices) {
+    Index.sort(indices);
+    IndexFamily current = null;
+    for (Index index : indices) {
+      if (index == null) continue;
       if (current == null) {
-        current = barcode.getFamily();
+        current = index.getFamily();
       } else {
-        if (current.getId() != barcode.getFamily().getId()) {
+        if (current.getId() != index.getFamily().getId()) {
           throw new IllegalArgumentException(String.format(
-              "Barcodes not all from the same family. (%d:%s vs %d:%s)",
+              "Indices not all from the same family. (%d:%s vs %d:%s)",
               current.getId(),
               current.getName(),
-              barcode.getFamily().getId(),
-              barcode.getFamily().getName()));
+              index.getFamily().getId(),
+              index.getFamily().getName()));
         }
       }
     }
-    this.tagBarcodes = tagBarcodes;
+    this.indices = indices;
   }
 
   @Override
@@ -534,11 +534,11 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   }
 
   @Override
-  public TagBarcodeFamily getCurrentFamily() {
-    if (tagBarcodes == null || tagBarcodes.isEmpty()) {
-      return TagBarcodeFamily.NULL;
+  public IndexFamily getCurrentFamily() {
+    if (indices == null || indices.isEmpty()) {
+      return IndexFamily.NULL;
     } else {
-      return tagBarcodes.get(0).getFamily();
+      return indices.get(0).getFamily();
     }
   }
 

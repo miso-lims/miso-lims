@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.TreeSet;
 
 import javax.sql.DataSource;
 
@@ -15,6 +17,7 @@ import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy;
 import org.springframework.orm.hibernate4.HibernateTransactionManager;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
@@ -25,9 +28,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
+import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.migration.MigrationData;
 import uk.ac.bbsrc.tgac.miso.migration.MigrationProperties;
@@ -154,6 +160,17 @@ public class DefaultMigrationTarget implements MigrationTarget {
     }
     sample.inheritPermissions(sample.getProject());
     valueTypeLookup.resolveAll(sample);
+    
+    Collection<SampleQC> qcs = new TreeSet<>(sample.getSampleQCs());
+    Collection<Note> notes = new HashSet<>(sample.getNotes());
+    
+    if (LimsUtils.isDetailedSample(sample)) {
+      SampleAdditionalInfo detailed = (SampleAdditionalInfo) sample;
+      if (detailed.getSubproject() != null && detailed.getSubproject().getId() == null) {
+        // New subproject
+        createSubproject(detailed.getSubproject(), detailed.getProject().getReferenceGenomeId());
+      }
+    }
     if (replaceChangeLogs) {
       Collection<ChangeLog> changes = new ArrayList<>(sample.getChangeLog());
       sample.setId(serviceManager.getSampleService().create(sample));
@@ -162,7 +179,16 @@ public class DefaultMigrationTarget implements MigrationTarget {
     } else {
       sample.setId(serviceManager.getSampleService().create(sample));
     }
+    saveSampleQcs(sample, qcs);
+    saveSampleNotes(sample, notes);
     log.debug("Saved sample " + sample.getAlias());
+  }
+  
+  private void createSubproject(Subproject subproject, Long referenceGenomeId) {
+    subproject.setDescription(subproject.getAlias());
+    subproject.setPriority(Boolean.FALSE);
+    subproject.setReferenceGenomeId(referenceGenomeId);
+    subproject.setId(serviceManager.getSubprojectDao().addSubproject(subproject));
   }
   
   private static boolean hasParent(Sample sample) {
@@ -176,6 +202,40 @@ public class DefaultMigrationTarget implements MigrationTarget {
       change.setUserId(serviceManager.getAuthorizationManager().getCurrentUser().getUserId());
       serviceManager.getChangeLogDao().create("sample", sample.getId(), change);
     }
+  }
+  
+  private void saveSampleQcs(Sample sample, Collection<SampleQC> qcs) throws IOException {
+    User user = serviceManager.getAuthorizationManager().getCurrentUser();
+    Date date = (replaceChangeLogs && sample.getChangeLog() != null) ? getLatestChangeDate(sample) : timeStamp;
+    for (SampleQC qc : qcs) {
+      try {
+        qc.setSample(sample);
+      } catch (MalformedSampleException e) {
+        // Never actually gets thrown
+        throw new RuntimeException(e);
+      }
+      qc.setQcCreator(user.getFullName());
+      qc.setQcDate(date);
+      qc.setId(serviceManager.getSampleQcDao().save(qc));
+    }
+  }
+  
+  private void saveSampleNotes(Sample sample, Collection<Note> notes) throws IOException {
+    User user = serviceManager.getAuthorizationManager().getCurrentUser();
+    Date date = (replaceChangeLogs && sample.getChangeLog() != null) ? getLatestChangeDate(sample) : timeStamp;
+    for (Note note : notes) {
+      note.setCreationDate(date);
+      note.setOwner(user);
+      note.setNoteId(serviceManager.getNoteDao().saveSampleNote(sample, note));
+    }
+  }
+  
+  private static Date getLatestChangeDate(Sample sample) {
+    Date latest = null;
+    for (ChangeLog change : sample.getChangeLog()) {
+      if (latest == null || change.getTime().after(latest)) latest = change.getTime();
+    }
+    return latest;
   }
 
   public void saveLibraries(final Collection<Library> libraries) throws IOException {

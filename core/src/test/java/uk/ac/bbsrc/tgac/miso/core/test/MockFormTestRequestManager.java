@@ -9,8 +9,6 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
-import uk.ac.bbsrc.tgac.miso.core.data.TagBarcodeFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;

@@ -39,7 +39,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
  * A Plate represents a collection of sequenceable material, typed by that material object, usually a List of {@link Library} elements of a
- * given size. Plates can be described further by a {@link PlateMaterialType} and a plate-specific {@link TagBarcode}
+ * given size. Plates can be described further by a {@link PlateMaterialType} and a plate-specific {@link Index}
  * 
  * @author Rob Davey
  * @date 25-Jul-2011
@@ -55,16 +55,14 @@ public interface Plate<T extends List<S>, S>
   /**
    * Sets the ID of this Plate object.
    * 
-   * @param id
-   *          long.
+   * @param id long.
    */
   public void setId(long id);
 
   /**
    * Sets the name of this Plate object.
    * 
-   * @param name
-   *          name.
+   * @param name name.
    */
   public void setName(String name);
 
@@ -78,8 +76,7 @@ public interface Plate<T extends List<S>, S>
   /**
    * Sets the description of this Plate object.
    * 
-   * @param description
-   *          description.
+   * @param description description.
    */
   public void setDescription(String description);
 
@@ -93,8 +90,7 @@ public interface Plate<T extends List<S>, S>
   /**
    * Sets the creationDate of this Plate object.
    * 
-   * @param date
-   *          creationDate.
+   * @param date creationDate.
    */
   public void setCreationDate(Date date);
 
@@ -108,25 +104,23 @@ public interface Plate<T extends List<S>, S>
   /**
    * Sets the plateMaterialType of this Plate object.
    * 
-   * @param plateMaterialType
-   *          PlateMaterialType.
+   * @param plateMaterialType PlateMaterialType.
    */
   public void setPlateMaterialType(PlateMaterialType plateMaterialType);
 
   /**
-   * Returns the TagBarcode of this Plate object
+   * Returns the Index of this Plate object
    * 
-   * @return TagBarcode tagBarcode.
+   * @return Index index.
    */
-  public TagBarcode getTagBarcode();
+  public Index getIndex();
 
   /**
-   * Sets the TagBarcode of this Plate object.
+   * Sets the Index of this Plate object.
    * 
-   * @param tagBarcode
-   *          TagBarcode.
+   * @param index Index.
    */
-  public void setTagBarcode(TagBarcode tagBarcode);
+  public void setIndex(Index index);
 
   /**
    * Returns the Plate size
@@ -151,8 +145,7 @@ public interface Plate<T extends List<S>, S>
   /**
    * Adds an Element to this Plate object
    * 
-   * @param element
-   *          S.
+   * @param element S.
    */
   public void addElement(S element);
 

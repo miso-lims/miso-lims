@@ -3274,11 +3274,11 @@ public class UserAuthMisoRequestManagerTestSuite {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getTagBarcodeById(long)} .
+   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getIndexById(long)} .
    */
 
   @Test
-  public void testGetTagBarcodeById() throws IOException {
+  public void testGetIndexById() throws IOException {
     // TODO: Implement.
   }
 
@@ -3571,30 +3571,29 @@ public class UserAuthMisoRequestManagerTestSuite {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#listAllTagBarcodes()} .
+   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#listAllIndices()} .
    */
 
   @Test
-  public void testListAllTagBarcodes() throws IOException {
+  public void testListAllIndices() throws IOException {
     // TODO: Implement.
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#listAllTagBarcodesByPlatform(java.lang.String)} .
+   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#listAllIndicesByPlatform(java.lang.String)} .
    */
 
   @Test
-  public void testListAllTagBarcodesByPlatform() throws IOException {
+  public void testListAllIndicesByPlatform() throws IOException {
     // TODO: Implement.
   }
 
   /**
-   * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#listAllTagBarcodesByStrategyName(java.lang.String)} .
+   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#listAllIndicesByFamilyName(java.lang.String)} .
    */
 
   @Test
-  public void testListAllTagBarcodesByStrategyName() throws IOException {
+  public void testListAllIndicesByFamilyName() throws IOException {
     // TODO: Implement.
   }
 

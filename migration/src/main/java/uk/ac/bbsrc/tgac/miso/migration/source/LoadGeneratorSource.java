@@ -58,7 +58,7 @@ import uk.ac.bbsrc.tgac.miso.migration.MigrationProperties;
 /**
  * This MigrationSource is used for generating bulk data for load-testing. It creates projects, detailed samples, libraries, library
  * dilutions, pools, and runs. The detailed samples generated include identities, tissue, analyte stock, and aliquots. Runs include
- * sequencer partition containers with pools loaded
+ * sequencing containers with pools loaded
  */
 public class LoadGeneratorSource implements MigrationSource {
 
@@ -126,10 +126,9 @@ public class LoadGeneratorSource implements MigrationSource {
   /**
    * Creates a LoadGeneratorSource using the configuration found in properties.
    * 
-   * @param properties
-   *          contains options which include numbers of objects to generate, foreign key IDs from the migration target, and other settings
-   * @throws IllegalArgumentException
-   *           if any of the required properties are missing
+   * @param properties contains options which include numbers of objects to generate, foreign key IDs from the migration target, and other
+   * settings
+   * @throws IllegalArgumentException if any of the required properties are missing
    */
   public LoadGeneratorSource(MigrationProperties properties) {
     this.projectCount = properties.getRequiredInt(OPT_PROJECT_COUNT);
@@ -193,10 +192,16 @@ public class LoadGeneratorSource implements MigrationSource {
           + identitiesPerProject * tissuesPerIdentity * stocksPerTissue * aliquotsPerStock < samplesPerProject) {
         aliquotsPerStock++;
       }
-      log.info(String.format(
-          "Generating %d aliquots * %d stocks * %d tissues * %d identities * %d projects "
-              + "with a hard limit of %d total samples created...",
-          aliquotsPerStock, stocksPerTissue, tissuesPerIdentity, identitiesPerProject, projectCount, sampleCount));
+      log.info(
+          String.format(
+              "Generating %d aliquots * %d stocks * %d tissues * %d identities * %d projects "
+                  + "with a hard limit of %d total samples created...",
+              aliquotsPerStock,
+              stocksPerTissue,
+              tissuesPerIdentity,
+              identitiesPerProject,
+              projectCount,
+              sampleCount));
 
       SampleClass identityClass = makeSampleClass(rootSampleClassId, Identity.CATEGORY_NAME);
       SampleClass tissueClass = makeSampleClass(tissueSampleClassId, SampleTissue.CATEGORY_NAME);

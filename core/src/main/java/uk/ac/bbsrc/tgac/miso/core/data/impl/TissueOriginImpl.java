@@ -116,6 +116,7 @@ public class TissueOriginImpl implements TissueOrigin {
   /**
    * Get custom label for dropdown options
    */
+  @Override
   public String getItemLabel() {
     return getAlias() + " (" + getDescription() + ")";
   }

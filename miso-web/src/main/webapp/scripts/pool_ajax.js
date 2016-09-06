@@ -421,7 +421,7 @@ Pool.ui = {
     function renderPoolElements (data, type, full) {
       var elements = data.map(function (ld) {
         return "<li><a href=\"/miso/library/" + ld.library.id + "\">" + ld.library.alias
-        + (ld.library.tagBarcodeIndex1Label ? "(" + ld.library.tagBarcodeIndex1Label + (ld.library.tagBarcodeIndex2Label ? ", " + ld.library.tagBarcodeIndex2Label + ")" : ")") : "") 
+        + (ld.library.index1Label ? "(" + ld.library.index1Label + (ld.library.index2Label ? ", " + ld.library.index2Label + ")" : ")") : "") 
         + "</a>" + "</li>";
       });
       var string;
@@ -560,7 +560,7 @@ Pool.ui = {
               { "sTitle": "Concentration ("+libraryDilutionConcentrationUnits+")", "sType":"natural"},
               { "sTitle": "Library", "sType":"natural"},
               { "sTitle": "Sample", "sType":"natural"},
-              { "sTitle": "Barcodes", "sType":"natural"},
+              { "sTitle": "Indices", "sType":"natural"},
               { "sTitle": "Add"}
             ],
             "bJQueryUI": true,

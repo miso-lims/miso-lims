@@ -33,6 +33,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Lane;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
@@ -51,8 +52,7 @@ public interface SequencerPartitionContainer<T extends Partition> extends Secura
   /**
    * Sets the name of this Container object.
    * 
-   * @param name
-   *          name.
+   * @param name name.
    */
   public void setName(String name);
 
@@ -66,8 +66,7 @@ public interface SequencerPartitionContainer<T extends Partition> extends Secura
   /**
    * Sets the run of this Container object.
    * 
-   * @param run
-   *          The run of which this Container is a part.
+   * @param run The run of which this Container is a part.
    * 
    */
   void setRun(Run run);
@@ -82,8 +81,7 @@ public interface SequencerPartitionContainer<T extends Partition> extends Secura
   /**
    * Set the list of {@link Partition} objects comprising this container
    * 
-   * @param partitions
-   *          List<Partition>
+   * @param partitions List<Partition>
    */
   void setPartitions(List<T> partitions);
 
@@ -103,7 +101,7 @@ public interface SequencerPartitionContainer<T extends Partition> extends Secura
   void setPartitionLimit(int partitionLimit);
 
   /**
-   * Initialise this container with empty {@link Partition} objects of type T up to the specified partition limit
+   * Initialise this container with empty {@link Lane} objects of type T up to the specified partition limit
    */
   void initEmptyPartitions();
 
@@ -117,8 +115,7 @@ public interface SequencerPartitionContainer<T extends Partition> extends Secura
   /**
    * Sets the platform of this Container object.
    * 
-   * @param platform
-   *          Platform.
+   * @param platform Platform.
    */
   public void setPlatform(Platform platform);
 

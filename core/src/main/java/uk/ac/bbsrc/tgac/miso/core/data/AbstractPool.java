@@ -478,12 +478,12 @@ public abstract class AbstractPool<P extends Poolable<?, ?>> extends AbstractBox
     return "";
   }
 
-  private boolean hasDuplicateBarcodes(Set<String> barcodes, P item) {
+  private boolean hasDuplicateIndices(Set<String> indices, P item) {
     if (item instanceof Plate<?, ?>) {
       for (Object child : item.getInternalPoolableElements()) {
         @SuppressWarnings("unchecked")
         P childP = (P) child;
-        if (hasDuplicateBarcodes(barcodes, childP)) {
+        if (hasDuplicateIndices(indices, childP)) {
           return true;
         }
       }
@@ -491,20 +491,20 @@ public abstract class AbstractPool<P extends Poolable<?, ?>> extends AbstractBox
     } else if (item instanceof Dilution) {
       Dilution d = (Dilution) item;
       StringBuilder totalIndex = new StringBuilder();
-      for (TagBarcode barcode : d.getLibrary().getTagBarcodes()) {
-        totalIndex.append(barcode.getSequence());
+      for (Index index : d.getLibrary().getIndices()) {
+        totalIndex.append(index.getSequence());
       }
-      return !barcodes.add(totalIndex.toString());
+      return !indices.add(totalIndex.toString());
     } else {
       throw new UnsupportedOperationException();
     }
   }
 
   @Override
-  public boolean hasDuplicateBarcodes() {
-    Set<String> barcodes = new HashSet<>();
+  public boolean hasDuplicateIndices() {
+    Set<String> indices = new HashSet<>();
     for (P item : getPoolableElements()) {
-      if (hasDuplicateBarcodes(barcodes, item)) {
+      if (hasDuplicateIndices(indices, item)) {
         return true;
       }
     }

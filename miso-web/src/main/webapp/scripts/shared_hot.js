@@ -62,7 +62,7 @@ var Hot = {
    * Custom validator for fields that must contain data
    */
   requiredText: function (value, callback) {
-    return callback(value && value.length > 0);
+    return callback(value != undefined && value != null && value != '' && value.length > 0);
   },
 
   /**

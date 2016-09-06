@@ -1003,7 +1003,7 @@
             <th>Library Description</th>
             <th>Library Type</th>
             <th>Library Platform</th>
-            <th>Tag Barcodes</th>
+            <th>Indices</th>
             <th>Insert Size</th>
             <th>QC Passed</th>
             <sec:authorize access="hasRole('ROLE_ADMIN')">
@@ -1020,10 +1020,10 @@
               <td>${library.description}</td>
               <td>${library.libraryType.description}</td>
               <td>${library.platformName}</td>
-              <td><c:if test="${not empty library.tagBarcodes}">
-                <c:forEach items="${library.tagBarcodes}" varStatus="status" var="barcode">
+              <td><c:if test="${not empty library.indices}">
+                <c:forEach items="${library.indices}" varStatus="status" var="index">
                   <c:if test="${status.index gt 0}"><br/></c:if>
-                  ${status.count}: ${barcode.name} (${barcode.sequence})
+                  ${status.count}: ${index.name} (${index.sequence})
                 </c:forEach>
               </c:if></td>
               <td><c:forEach var="qc" items="${library.libraryQCs}" end="0">${qc.insertSize}</c:forEach></td>
@@ -1099,7 +1099,7 @@
                 <th>Library Description</th>
                 <th>Library Type</th>
                 <th>Library Platform</th>
-                <th>Tag Barcodes</th>
+                <th>Indices</th>
                 <th>Insert Size</th>
                 <th>QC Passed</th>
                 <sec:authorize access="hasRole('ROLE_ADMIN')">
@@ -1116,10 +1116,10 @@
                   <td>${grouplib.description}</td>
                   <td>${grouplib.libraryType.description}</td>
                   <td>${grouplib.platformName}</td>
-                  <td><c:if test="${not empty grouplib.tagBarcodes}">
-                    <c:forEach items="${grouplib.tagBarcodes}" varStatus="status" var="barcode">
+                  <td><c:if test="${not empty grouplib.indices}">
+                    <c:forEach items="${grouplib.indices}" varStatus="status" var="index">
                        <c:if test="${status.index gt 0}"><br/></c:if>
-                       ${status.count}: ${barcode.name} (${barcode.sequence})
+                       ${status.count}: ${index.name} (${index.sequence})
                     </c:forEach>
                   </c:if></td>
                   <td><c:forEach var="qc" items="${grouplib.libraryQCs}" end="0">${qc.insertSize}</c:forEach></td>
@@ -1216,7 +1216,7 @@
         <tr dilutionId="${dil.id}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
           <td><b><a href="<c:url value='/miso/library/${dil.library.id}'/>">${dil.name}</a></b></td>
           <td><a href="<c:url value='/miso/library/${dil.library.id}'/>">${dil.library.alias}</a>
-            <c:if test="${not empty dil.library.tagBarcodes}">(<c:forEach items="${dil.library.tagBarcodes}" varStatus="status" var="barcode"><c:if test="${status.index gt 0}">, </c:if>${barcode.name}</c:forEach>)</c:if>
+            <c:if test="${not empty dil.library.indices}">(<c:forEach items="${dil.library.indices}" varStatus="status" var="index"><c:if test="${status.index gt 0}">, </c:if>${index.name}</c:forEach>)</c:if>
           </td>
           <td>${dil.dilutionCreator}</td>
           <td>${dil.creationDate}</td>

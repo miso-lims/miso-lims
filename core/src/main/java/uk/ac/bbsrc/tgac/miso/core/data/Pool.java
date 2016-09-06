@@ -60,16 +60,14 @@ public interface Pool<P extends Poolable> extends SecurableByProfile, Comparable
   /**
    * Sets the ID of this Pool object.
    * 
-   * @param id
-   *          long.
+   * @param id long.
    */
   public void setId(long id);
 
   /**
    * Sets the name of this Pool object.
    * 
-   * @param name
-   *          name.
+   * @param name name.
    * 
    */
   public void setName(String name);
@@ -85,8 +83,7 @@ public interface Pool<P extends Poolable> extends SecurableByProfile, Comparable
   /**
    * Sets the alias of this Pool object.
    * 
-   * @param alias
-   *          alias.
+   * @param alias alias.
    * 
    */
   @Override
@@ -95,18 +92,15 @@ public interface Pool<P extends Poolable> extends SecurableByProfile, Comparable
   /**
    * Adds a Poolable element to this Pool
    * 
-   * @param poolable
-   *          element of type P
-   * @throws MalformedDilutionException
-   *           when the Dilution added is not valid
+   * @param poolable element of type P
+   * @throws MalformedDilutionException when the Dilution added is not valid
    */
   public void addPoolableElement(P poolable) throws MalformedDilutionException;
 
   /**
    * Sets the Poolable elements of this Pool object.
    * 
-   * @param poolables
-   *          poolables.
+   * @param poolables poolables.
    */
   public <T extends Poolable> void setPoolableElements(Collection<T> poolables);
 
@@ -127,18 +121,15 @@ public interface Pool<P extends Poolable> extends SecurableByProfile, Comparable
   /**
    * Registers an Experiment to this Pool
    * 
-   * @param experiment
-   *          of type Experiment
-   * @throws MalformedExperimentException
-   *           when
+   * @param experiment of type Experiment
+   * @throws MalformedExperimentException when
    */
   public void addExperiment(Experiment experiment) throws MalformedExperimentException;
 
   /**
    * Sets the experiments related to this Pool object.
    * 
-   * @param experiments
-   *          experiments.
+   * @param experiments experiments.
    */
   public void setExperiments(Collection<Experiment> experiments);
 
@@ -159,8 +150,7 @@ public interface Pool<P extends Poolable> extends SecurableByProfile, Comparable
   /**
    * Sets the creationDate of this Pool object.
    * 
-   * @param creationDate
-   *          creationDate.
+   * @param creationDate creationDate.
    */
   public void setCreationDate(Date creationDate);
 
@@ -174,8 +164,7 @@ public interface Pool<P extends Poolable> extends SecurableByProfile, Comparable
   /**
    * Sets the concentration of this Pool object.
    * 
-   * @param concentration
-   *          concentration.
+   * @param concentration concentration.
    */
   public void setConcentration(Double concentration);
 
@@ -189,8 +178,7 @@ public interface Pool<P extends Poolable> extends SecurableByProfile, Comparable
   /**
    * Sets the platformType of this Platform object.
    * 
-   * @param name
-   *          platformType.
+   * @param name platformType.
    */
   public void setPlatformType(PlatformType name);
 
@@ -204,18 +192,15 @@ public interface Pool<P extends Poolable> extends SecurableByProfile, Comparable
   /**
    * Sets the ready to run status of this Pool
    * 
-   * @param ready
-   *          Boolean.
+   * @param ready Boolean.
    */
   public void setReadyToRun(boolean ready);
 
   /**
    * Registers that a LibraryQC has been carried out on this Library
    * 
-   * @param poolQC
-   *          of type PoolQC
-   * @throws MalformedPoolQcException
-   *           when the PoolQC being added is not valid
+   * @param poolQC of type PoolQC
+   * @throws MalformedPoolQcException when the PoolQC being added is not valid
    */
   public void addQc(PoolQC poolQC) throws MalformedPoolQcException;
 
@@ -237,8 +222,7 @@ public interface Pool<P extends Poolable> extends SecurableByProfile, Comparable
    * Sets the qcPassed attribute of this Pool object. This should be true when a suitable QC has been carried out that passes a given
    * result.
    * 
-   * @param qcPassed
-   *          qcPassed.
+   * @param qcPassed qcPassed.
    */
   public void setQcPassed(Boolean qcPassed);
 
@@ -263,16 +247,14 @@ public interface Pool<P extends Poolable> extends SecurableByProfile, Comparable
   /**
    * Sets the notes of this Pool object.
    *
-   * @param notes
-   *          notes.
+   * @param notes notes.
    */
   public void setNotes(Collection<Note> notes);
 
   /**
    * Adds a Note to the Set of notes of this Pool object.
    *
-   * @param note
-   *          Note.
+   * @param note Note.
    */
   public void addNote(Note note);
 
@@ -300,11 +282,10 @@ public interface Pool<P extends Poolable> extends SecurableByProfile, Comparable
   /**
    * Adds the description of this Pool object
    * 
-   * @param String
-   *          description
+   * @param String description
    */
   void setDescription(String description);
 
-  boolean hasDuplicateBarcodes();
+  boolean hasDuplicateIndices();
 
 }

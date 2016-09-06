@@ -16,6 +16,9 @@ BEGIN
     UNION SELECT 'SampleLCMTubes',COUNT(*) FROM SampleLCMTube 
     UNION SELECT 'SampleTissues',COUNT(*) FROM SampleTissue
     UNION SELECT 'SampleChangeLogs',COUNT(*) FROM SampleChangeLog
+    UNION SELECT 'SampleQCs',COUNT(*) FROM SampleQC
+    UNION SELECT 'Sample_Notes',COUNT(*) FROM Sample_Note
+    UNION SELECT 'SampleChangeLogs',COUNT(*) FROM SampleChangeLog
     UNION SELECT 'Analyte Stocks',COUNT(*) FROM SampleStock
     UNION SELECT 'Analyte Aliquots',COUNT(*) FROM SampleAliquot
     UNION SELECT 'Libraries',COUNT(*) FROM Library
@@ -47,9 +50,11 @@ BEGIN
     DELETE FROM Pool_Elements;
     DELETE FROM LibraryDilution;
     DELETE FROM LibraryAdditionalInfo;
-    DELETE FROM Library_TagBarcode;
+    DELETE FROM Library_Index;
     DELETE FROM LibraryChangeLog;
     DELETE FROM Library;
+    DELETE FROM SampleQC;
+    DELETE FROM Sample_Note;
     DELETE FROM Identity;
     DELETE FROM SampleTissue;
     DELETE FROM SampleCVSlide;
@@ -62,6 +67,7 @@ BEGIN
     DELETE FROM Sample;
     DELETE FROM SampleNumberPerProject;
     DELETE FROM Project;
+    DELETE FROM Note;
     
 END//
 

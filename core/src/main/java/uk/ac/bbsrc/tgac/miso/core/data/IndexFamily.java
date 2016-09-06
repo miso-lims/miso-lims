@@ -43,58 +43,58 @@ import org.codehaus.jackson.annotate.JsonManagedReference;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 @Entity
-@Table(name = "TagBarcodeFamily")
-public class TagBarcodeFamily {
-  public static final TagBarcodeFamily NULL = new TagBarcodeFamily();
+@Table(name = "IndexFamily")
+public class IndexFamily {
+  public static final IndexFamily NULL = new IndexFamily();
 
   static {
     NULL.setId(0L);
-    NULL.setName("No barcode");
-    List<TagBarcode> empty = Collections.emptyList();
-    NULL.setBarcodes(empty);
+    NULL.setName("No index");
+    List<Index> empty = Collections.emptyList();
+    NULL.setIndices(empty);
   }
 
   private Boolean archived;
-  @OneToMany(targetEntity = TagBarcode.class, fetch = FetchType.EAGER)
-  @JoinColumn(name = "tagFamilyId")
+  @OneToMany(targetEntity = Index.class, fetch = FetchType.EAGER)
+  @JoinColumn(name = "indexFamilyId")
   @OrderBy("position, name")
   @JsonManagedReference
-  private List<TagBarcode> barcodes;
+  private List<Index> indices;
   @Column(nullable = false)
   private String name;
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   private PlatformType platformType;
   @Id
-  private Long tagFamilyId;
+  private Long indexFamilyId;
 
   public Boolean getArchived() {
     return archived;
   }
 
-  public List<TagBarcode> getBarcodes() {
-    return barcodes;
+  public List<Index> getIndices() {
+    return indices;
   }
 
-  public Iterable<TagBarcode> getBarcodesForPosition(int position) {
-    List<TagBarcode> selected = new ArrayList<>();
-    for (TagBarcode barcode : barcodes) {
-      if (barcode.getPosition() == position) {
-        selected.add(barcode);
+  public Iterable<Index> getIndicesForPosition(int position) {
+    List<Index> selected = new ArrayList<>();
+    for (Index index : indices) {
+      if (index.getPosition() == position) {
+        selected.add(index);
       }
     }
     return selected;
   }
 
   public Long getId() {
-    return tagFamilyId;
+    return indexFamilyId;
   }
 
   public int getMaximumNumber() {
     int max = 0;
-    for (TagBarcode barcode : barcodes) {
-      if (barcode.getPosition() > max) {
-        max = barcode.getPosition();
+    for (Index index : indices) {
+      if (index.getPosition() > max) {
+        max = index.getPosition();
       }
     }
     return max;
@@ -112,12 +112,12 @@ public class TagBarcodeFamily {
     this.archived = archived;
   }
 
-  public void setBarcodes(List<TagBarcode> barcodes) {
-    this.barcodes = barcodes;
+  public void setIndices(List<Index> indices) {
+    this.indices = indices;
   }
 
   public void setId(Long id) {
-    tagFamilyId = id;
+    indexFamilyId = id;
   }
 
   public void setName(String name) {

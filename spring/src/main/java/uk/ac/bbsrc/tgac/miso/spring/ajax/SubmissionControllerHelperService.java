@@ -442,7 +442,7 @@ public class SubmissionControllerHelperService {
             sb.append("<input type='hidden' id='RUN_" + r.getId() + "' name='RUN_" + r.getId() + "' value='" + r.getId() + "'/>");
             sb.append("<ul>");
 
-            // creates HTML list of partition containers for each run
+            // creates HTML list of sequencing containers for each run
             Collection<SequencerPartitionContainer<SequencerPoolPartition>> partitionContainers = requestManager
                 .listSequencerPartitionContainersByRunId(r.getId());
             for (SequencerPartitionContainer<SequencerPoolPartition> partitionContainer : partitionContainers) {
@@ -450,7 +450,7 @@ public class SubmissionControllerHelperService {
               sb.append("<b>" + partitionContainer.getIdentificationBarcode() + "</b> : " + partitionContainer.getId());
               sb.append("<ul>");
 
-              // creates HTML list of partitions for each partition container
+              // creates HTML list of partitions for each sequencing container
               Collection<SequencerPoolPartition> partitions = partitionContainer.getPartitions();
               for (SequencerPoolPartition part : partitions) {
 
@@ -468,9 +468,10 @@ public class SubmissionControllerHelperService {
 
                   if (partitionInvolved) {
                     // If the partition was involved in the project, it is listed
-                    sb.append("<li><input type='checkbox' id='" + r.getId() + "_" + partitionContainer.getId() + "_"
-                        + part.getPartitionNumber() + "' name='partition' " + "itemLabel='" + part.getPartitionNumber() + "' itemValue='PAR"
-                        + part.getId() + "' value='PAR" + part.getId() + "' onclick='Submission.ui.togglePartitionContents(this)'");
+                    sb.append(
+                        "<li><input type='checkbox' id='" + r.getId() + "_" + partitionContainer.getId() + "_" + part.getPartitionNumber()
+                            + "' name='partition' " + "itemLabel='" + part.getPartitionNumber() + "' itemValue='PAR" + part.getId()
+                            + "' value='PAR" + part.getId() + "' onclick='Submission.ui.togglePartitionContents(this)'");
 
                     if (sub != null) {
                       // checks checkboxes if the partition is in the submission
@@ -481,8 +482,9 @@ public class SubmissionControllerHelperService {
 
                     sb.append("/>");
                     // adds the Partition info: number, name, experiments etc.
-                    sb.append("<b>Partition " + part.getPartitionNumber() + "</b> : " + part.getPool().getName() + " ("
-                        + LimsUtils.join(involvedExperiments, ",") + ")");
+                    sb.append(
+                        "<b>Partition " + part.getPartitionNumber() + "</b> : " + part.getPool().getName() + " ("
+                            + LimsUtils.join(involvedExperiments, ",") + ")");
 
                     // creates HTML for list of library dilutions and corresponding datafiles.
                     // gets all the dilutions in that partition's pool.
@@ -499,8 +501,9 @@ public class SubmissionControllerHelperService {
                     sb.append("<ul>");
 
                     for (Poolable d : poolables) {
-                      sb.append("<li><input type='checkbox'  name='DIL_" + d.getId() + "' id='DIL" + d.getId() + "_PAR" + part.getId()
-                          + "' value='PAR_" + part.getId() + "' ");
+                      sb.append(
+                          "<li><input type='checkbox'  name='DIL_" + d.getId() + "' id='DIL" + d.getId() + "_PAR" + part.getId()
+                              + "' value='PAR_" + part.getId() + "' ");
 
                       if (sub != null && sub.getSubmissionElements().contains(part)) {
                         // checks dilution checkboxes if dilution is in the submission

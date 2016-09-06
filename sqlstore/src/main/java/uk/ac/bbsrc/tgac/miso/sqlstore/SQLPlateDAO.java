@@ -35,9 +35,6 @@ import java.util.Map;
 
 import javax.persistence.CascadeType;
 
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
-
 import org.codehaus.jackson.type.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,6 +52,8 @@ import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.Property;
 import com.googlecode.ehcache.annotations.TriggersRemove;
 
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractPlate;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -66,12 +65,12 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
+import uk.ac.bbsrc.tgac.miso.core.store.IndexStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PlateStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
-import uk.ac.bbsrc.tgac.miso.core.store.TagBarcodeStore;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DaoLookup;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
@@ -89,7 +88,7 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 public class SQLPlateDAO implements PlateStore {
   private static final String TABLE_NAME = "Plate";
 
-  public static final String PLATE_SELECT = "SELECT plateId, name, description, creationDate, plateMaterialType, identificationBarcode, locationBarcode, size, tagBarcodeId, securityProfile_profileId, lastModifier "
+  public static final String PLATE_SELECT = "SELECT plateId, name, description, creationDate, plateMaterialType, identificationBarcode, locationBarcode, size, indexId, securityProfile_profileId, lastModifier "
       + "FROM " + TABLE_NAME;
 
   public static final String PLATE_SELECT_BY_ID = PLATE_SELECT + " WHERE plateId = ?";
@@ -97,7 +96,7 @@ public class SQLPlateDAO implements PlateStore {
   public static final String PLATE_SELECT_BY_ID_BARCODE = PLATE_SELECT + " WHERE identificationBarcode = ?";
 
   public static final String PLATE_UPDATE = "UPDATE " + TABLE_NAME + " "
-      + "SET plateId=:plateId, name=:name, description=:description, creationDate=:creationDate, plateMaterialType=:plateMaterialType, identificationBarcode=:identificationBarcode, locationBarcode=:locationBarcode, size=:size, tagBarcodeId=:tagBarcodeId, securityProfile_profileId=:securityProfile_profileId, lastModifier=:lastModifier "
+      + "SET plateId=:plateId, name=:name, description=:description, creationDate=:creationDate, plateMaterialType=:plateMaterialType, identificationBarcode=:identificationBarcode, locationBarcode=:locationBarcode, size=:size, indexId=:indexId, securityProfile_profileId=:securityProfile_profileId, lastModifier=:lastModifier "
       + "WHERE plateId=:plateId";
 
   public static final String PLATE_DELETE = "DELETE FROM " + TABLE_NAME + " WHERE plateId=:plateId";
@@ -136,7 +135,7 @@ public class SQLPlateDAO implements PlateStore {
   private ChangeLogStore changeLogDAO;
   private SecurityStore securityDAO;
   @Autowired
-  private TagBarcodeStore tagBarcodeStrategyStore;
+  private IndexStore indexStore;
 
   @Autowired
   private DaoLookup daoLookup;
@@ -217,8 +216,8 @@ public class SQLPlateDAO implements PlateStore {
    */
   public void autoGenerateIdBarcode(Plate plate) {
     String barcode = "";
-    if (plate.getTagBarcode() != null) {
-      barcode = plate.getName() + "::" + plate.getTagBarcode();
+    if (plate.getIndex() != null) {
+      barcode = plate.getName() + "::" + plate.getIndex();
     } else {
       // TODO this should eventually be changed to alias (however, Plate does not have an alias field)
       barcode = plate.getName() + "::" + plate.getDescription();
@@ -228,25 +227,25 @@ public class SQLPlateDAO implements PlateStore {
 
   @Override
   public Plate<? extends List<? extends Plateable>, ? extends Plateable> lazyGet(long plateId) throws IOException {
-    List<Plate<? extends List<? extends Plateable>, ? extends Plateable>> eResults = template.query(PLATE_SELECT_BY_ID,
-        new Object[] { plateId }, new PlateMapper(true));
+    List<Plate<? extends List<? extends Plateable>, ? extends Plateable>> eResults = template
+        .query(PLATE_SELECT_BY_ID, new Object[] { plateId }, new PlateMapper(true));
     return eResults.size() > 0 ? eResults.get(0) : null;
   }
 
   @Override
   @Cacheable(cacheName = "plateCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
-      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
+      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public Plate<? extends List<? extends Plateable>, ? extends Plateable> get(long plateId) throws IOException {
-    List<Plate<? extends List<? extends Plateable>, ? extends Plateable>> eResults = template.query(PLATE_SELECT_BY_ID,
-        new Object[] { plateId }, new PlateMapper());
+    List<Plate<? extends List<? extends Plateable>, ? extends Plateable>> eResults = template
+        .query(PLATE_SELECT_BY_ID, new Object[] { plateId }, new PlateMapper());
     return eResults.size() > 0 ? eResults.get(0) : null;
   }
 
   @Override
   public Plate<? extends List<? extends Plateable>, ? extends Plateable> getPlateByIdentificationBarcode(String barcode)
       throws IOException {
-    List<Plate<? extends List<? extends Plateable>, ? extends Plateable>> eResults = template.query(PLATE_SELECT_BY_ID_BARCODE,
-        new Object[] { barcode }, new PlateMapper());
+    List<Plate<? extends List<? extends Plateable>, ? extends Plateable>> eResults = template
+        .query(PLATE_SELECT_BY_ID_BARCODE, new Object[] { barcode }, new PlateMapper());
     return eResults.size() > 0 ? eResults.get(0) : null;
   }
 
@@ -257,8 +256,8 @@ public class SQLPlateDAO implements PlateStore {
 
   @Override
   public List<Plate<? extends List<? extends Plateable>, ? extends Plateable>> listByProjectId(long projectId) throws IOException {
-    List<Plate<? extends List<? extends Plateable>, ? extends Plateable>> plates = template.query(PLATES_SELECT_BY_PROJECT_ID,
-        new Object[] { projectId }, new PlateMapper(true));
+    List<Plate<? extends List<? extends Plateable>, ? extends Plateable>> plates = template
+        .query(PLATES_SELECT_BY_PROJECT_ID, new Object[] { projectId }, new PlateMapper(true));
     Collections.sort(plates);
     return plates;
   }
@@ -280,7 +279,7 @@ public class SQLPlateDAO implements PlateStore {
   @Override
   @TriggersRemove(cacheName = { "plateCache",
       "lazyPlateCache" }, keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
-          @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
+          @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public long save(Plate<? extends List<? extends Plateable>, ? extends Plateable> plate) throws IOException {
     Long securityProfileId = plate.getSecurityProfile().getProfileId();
     if (securityProfileId == SecurityProfile.UNSAVED_ID || (this.cascadeType != null)) {
@@ -296,8 +295,8 @@ public class SQLPlateDAO implements PlateStore {
     params.addValue("securityProfile_profileId", securityProfileId);
     params.addValue("lastModifier", plate.getLastModifier().getUserId());
 
-    if (plate.getTagBarcode() != null) {
-      params.addValue("tagBarcodeId", plate.getTagBarcode().getId());
+    if (plate.getIndex() != null) {
+      params.addValue("indexId", plate.getIndex().getId());
     }
 
     if (plate.getId() == AbstractPlate.UNSAVED_ID) {
@@ -319,8 +318,8 @@ public class SQLPlateDAO implements PlateStore {
           Number newId = insert.executeAndReturnKey(params);
           if (newId.longValue() != plate.getId()) {
             log.error("Expected Plate ID doesn't match returned value from database insert: rolling back...");
-            new NamedParameterJdbcTemplate(template).update(PLATE_DELETE,
-                new MapSqlParameterSource().addValue("plateId", newId.longValue()));
+            new NamedParameterJdbcTemplate(template)
+                .update(PLATE_DELETE, new MapSqlParameterSource().addValue("plateId", newId.longValue()));
             throw new IOException("Something bad happened. Expected Plate ID doesn't match returned value from DB insert");
           }
         } else {
@@ -386,7 +385,7 @@ public class SQLPlateDAO implements PlateStore {
   @Override
   @TriggersRemove(cacheName = { "plateCache",
       "lazyPlateCache" }, keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
-          @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
+          @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public boolean remove(Plate plate) throws IOException {
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
     if (plate.isDeletable() && (namedTemplate.update(PLATE_DELETE, new MapSqlParameterSource().addValue("plateId", plate.getId())) == 1)) {
@@ -437,7 +436,7 @@ public class SQLPlateDAO implements PlateStore {
         plate.setLastModifier(securityDAO.getUserById(rs.getLong("lastModifier")));
         plate.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
         plate.setPlateMaterialType(PlateMaterialType.get(rs.getString("plateMaterialType")));
-        plate.setTagBarcode(tagBarcodeStrategyStore.getTagBarcodeById(rs.getLong("tagBarcodeId")));
+        plate.setIndex(indexStore.getIndexById(rs.getLong("indexId")));
 
         if (!isLazy()) {
           plate.setElements(resolvePlateElements(plate.getId()));

@@ -34,4 +34,8 @@ public interface SampleValidRelationship {
 
   void setChild(SampleClass child);
 
+  Boolean getArchived();
+
+  void setArchived(Boolean archived);
+
 }

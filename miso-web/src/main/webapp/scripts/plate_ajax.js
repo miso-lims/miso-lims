@@ -171,18 +171,18 @@ Plate.barcode = {
   }
 };
 
-Plate.tagbarcode = {
-  getPlateBarcodesByMaterialType: function (form) {
+Plate.index = {
+  getIndicesByMaterialType: function (form) {
     Fluxion.doAjax(
       'plateControllerHelperService',
-      'getTagBarcodesForMaterialType',
+      'getIndicesForMaterialType',
       {
         'materialType': form.value,
         'url': ajaxurl
       },
       {
         'doOnSuccess': function (json) {
-          jQuery('#plateBarcodeSelect').html(json.plateBarcodes);
+          jQuery('#plateIndexSelect').html(json.plateIndices);
         }
       }
     );
@@ -350,7 +350,7 @@ Plate.ui = {
           'description': jQuery('#description').val(),
           'creationDate': jQuery('#creationdatepicker').val(),
           'plateMaterialType': jQuery("input[name='plateMaterialType']:checked").val(),
-          'tagBarcode': jQuery("input[name='tagBarcode']:selected").val(),
+          'index': jQuery("input[name='index']:selected").val(),
           'elements': json,
           'url': ajaxurl
         },
@@ -403,8 +403,8 @@ Plate.ui = {
             "aoColumns": [
               { "sTitle": "Name", "sType": "no-pla"},
               { "sTitle": "Alias"},
-              { "sTitle": "Barcode Kit"},
-              { "sTitle": "Barcode Sequence"},
+              { "sTitle": "Index Family"},
+              { "sTitle": "Index Sequence"},
               { "sTitle": "Edit"}
             ],
             "bJQueryUI": true,

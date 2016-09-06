@@ -1,6 +1,6 @@
-DELETE FROM TagBarcodes;
-DELETE FROM TagBarcodeFamily;
-INSERT INTO TagBarcodeFamily(tagFamilyId, platformType, name) VALUES
+DELETE FROM Indices;
+DELETE FROM IndexFamily;
+INSERT INTO IndexFamily(indexFamilyId, platformType, name) VALUES
   (1, 'ILLUMINA', 'TruSeq Single Index'),
   (2, 'LS454', '454 Rapid Library'),
   (3, 'ILLUMINA', 'Nextera Dual Index'),
@@ -14,7 +14,7 @@ INSERT INTO TagBarcodeFamily(tagFamilyId, platformType, name) VALUES
   (11, 'ILLUMINA', 'SureSelect XT2'),
   (12, 'ILLUMINA', 'NEXTflex 6bp');
 
-INSERT INTO `TagBarcodes` (`tagId`, `name`, `sequence`, `tagFamilyId`)
+INSERT INTO `Indices` (`indexId`, `name`, `sequence`, `indexFamilyId`)
 VALUES
     (12,'Index 12','CTTGTA',1),
     (11,'Index 11','GGCTAC',1),
@@ -199,8 +199,8 @@ VALUES (1,1,'admin','2015-08-27',4,3,300),(2,2,'admin','2015-08-27',4,3,300),(3,
 (10,10,'admin','2015-08-27',4,3,300),(11,11,'admin','2015-08-27',4,3,300),(12,12,'admin','2015-08-27',4,3,300),
 (13,13,'admin','2015-08-27',4,3,300),(14,14,'admin','2015-08-27',4,3,300);
 
-DELETE FROM `Library_TagBarcode`;
-INSERT INTO `Library_TagBarcode` 
+DELETE FROM `Library_Index`;
+INSERT INTO `Library_Index` 
 VALUES (1,12),(2,11),(3,10),(4,9),(5,8),(6,7),(7,6),(8,5),(9,4),(10,3),(11,2),(12,1),(13,24),(14,23);
 
 DELETE FROM `Pool`;

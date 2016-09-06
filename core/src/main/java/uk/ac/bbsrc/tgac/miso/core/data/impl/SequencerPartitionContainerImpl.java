@@ -63,8 +63,7 @@ public class SequencerPartitionContainerImpl extends AbstractSequencerPartitionC
   /**
    * Construct a new SequencerPartitionContainer with a SecurityProfile owned by the given User
    * 
-   * @param user
-   *          of type User
+   * @param user of type User
    */
   public SequencerPartitionContainerImpl(User user) {
     setSecurityProfile(new SecurityProfile(user));
@@ -107,7 +106,7 @@ public class SequencerPartitionContainerImpl extends AbstractSequencerPartitionC
       partition.setSecurityProfile(getSecurityProfile());
       getPartitions().add(partition);
     } else {
-      log.warn("This partition container is limited to " + partitionLimit + " partitions");
+      log.warn("This sequencing container is limited to " + partitionLimit + " lanes");
     }
   }
 
@@ -119,10 +118,10 @@ public class SequencerPartitionContainerImpl extends AbstractSequencerPartitionC
         if (partition.getSecurityProfile() == null) partition.setSecurityProfile(getSecurityProfile());
         getPartitions().add(partition);
       } else {
-        log.warn("This partition container already contains that partition");
+        log.warn("This sequencing container already contains that lane");
       }
     } else {
-      log.warn("This partition container is limited to " + partitionLimit + " partitions");
+      log.warn("This sequencing container is limited to " + partitionLimit + " lanes");
     }
   }
 

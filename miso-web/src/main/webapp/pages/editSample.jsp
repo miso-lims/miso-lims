@@ -743,9 +743,10 @@
       <p>Paste values using Ctrl + V in Windows or Linux, or Command-V (&#8984;-V) on a Mac.</p>
     </div>
     <div class="floatleft">
-	    <div>Project:<select id="projectSelect"></select></div>
+	    <div><label>Project: <select id="projectSelect"></select></label></div>
 	    <div id="subpSelectOptions"></div>
 	    <div id="classOptions"></div>
+	    <div><label>Number of Samples: <input id="numSamples" type="text"/></label></div>
 	    <div id="saveSuccesses"  class="parsley-success hidden">
 	      <p id="successMessages"></p>
 	    </div>
@@ -755,7 +756,7 @@
 	      <p id="errorMessages"></p>
 	    </div>
 	    <div>
-	      <button id="makeTable" class="disabled" disabled="disabled" onclick="Sample.hot.makeNewSamplesTable();">Make Table</button>
+	      <button id="makeTable" onclick="Sample.hot.makeNewSamplesTable();">Make Table</button>
 	    </div>
 	  </div>
     <div class="clear"></div>
@@ -850,34 +851,6 @@
       </form>
     </span>
   <br/>
-  <%--
-      <h2 class="hrule">Upload SampleQC File</h2>
-      <table class="in">
-          <tr>
-              <td width="30%">
-                  <form method='post'
-                        id='ajax_upload_form'
-                        action="<c:url value="/miso/upload/sampleqc"/>"
-                        enctype="multipart/form-data"
-                        target="target_upload"
-                        onsubmit="Utils.fileUpload.fileUploadProgress('ajax_upload_form', 'statusdiv', Utils.page.pageReload);">
-                      <input type="hidden" name="sampleId" value="${sample.id}"/><br/>
-                      <input type="file" name="file"/><br/>
-                      <button type="submit" class="br-button ui-state-default ui-corner-all">Upload</button>
-                  </form>
-                  <iframe id='target_upload' name='target_upload' src='' style='display: none'></iframe>
-                  <div id="statusdiv"></div>
-              </td>
-          </tr>
-      </table>
-
-      <ul>
-          <c:forEach items="${qcFiles}" var="file">
-              <li><a href="<c:url value='/miso/download/sample/${sample.id}/qc/${file.key}'/>">${file.value}</a>
-              </li>
-          </c:forEach>
-      </ul>
-  --%>
   <a name="library"></a>
   
   <c:if test="${ !detailedSample or detailedSample and sampleCategory eq 'Aliquot' }">
