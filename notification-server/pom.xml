@@ -27,7 +27,7 @@
   <parent>
     <artifactId>miso</artifactId>
     <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-    <version>0.2.27-SNAPSHOT</version>
+    <version>0.2.28-SNAPSHOT</version>
   </parent>
 
   <artifactId>notification-server</artifactId>
