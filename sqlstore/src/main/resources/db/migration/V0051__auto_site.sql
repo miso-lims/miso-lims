@@ -1,3 +1,10 @@
+-- archived_SVRs
+--StartNoTest
+ALTER TABLE SampleValidRelationship ADD COLUMN archived BOOLEAN NOT NULL DEFAULT FALSE;
+--EndNoTest
+
+-- tagbarcode_to_index
+--StartNoTest
 --StartNoTest
 ALTER TABLE TagBarcodes DROP FOREIGN KEY `TagBarcodes_ibfk_1`;
 --EndNoTest
@@ -13,3 +20,5 @@ ALTER TABLE TagBarcodeFamily RENAME TO IndexFamily;
 ALTER TABLE Library_TagBarcode RENAME TO Library_Index;
 
 ALTER TABLE Indices ADD FOREIGN KEY (indexFamilyId) REFERENCES IndexFamily (indexFamilyId);
+--EndNoTest
+
