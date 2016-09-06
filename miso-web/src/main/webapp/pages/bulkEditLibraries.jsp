@@ -97,7 +97,7 @@
       Library.hot.makeBulkCreateTable = function () {
         Library.hot.librariesJSON = Library.hot.prepLibrariesForPropagate(Library.hot.librariesJSON);
         Library.hot.makeHOT(Library.hot.librariesJSON);
-        Library.hot.addPlatformAndTBHooks();
+        Library.hot.addPlatformAndIndexHooks();
       };
 
       Library.hot.makeBulkUpdateTable = function () {
