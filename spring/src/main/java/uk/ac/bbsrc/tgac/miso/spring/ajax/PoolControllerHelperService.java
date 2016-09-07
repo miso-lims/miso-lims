@@ -808,14 +808,12 @@ public class PoolControllerHelperService {
         JSONObject j = new JSONObject();
         JSONArray arr = new JSONArray();
         for (LibraryDilution libraryDilution : requestManager.listAllLibraryDilutionsByPlatform((PlatformType.get(platform)))) {
-          if (libraryDilution.getLibrary().isLowQuality()) {
-            continue;
-          }
           JSONArray pout = new JSONArray();
           pout.add(libraryDilution.getName());
           pout.add(libraryDilution.getConcentration());
           pout.add(libraryDilution.getLibrary().getAlias() + " (" + libraryDilution.getLibrary().getName() + ")");
           pout.add(libraryDilution.getLibrary().getSample().getAlias() + " (" + libraryDilution.getLibrary().getSample().getName() + ")");
+          pout.add(libraryDilution.getLibrary().isLowQuality() ? "⚠" : "");
           StringBuilder indices = new StringBuilder();
           collectIndices(indices, libraryDilution);
           pout.add(indices.toString());
