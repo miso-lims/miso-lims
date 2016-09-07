@@ -400,7 +400,7 @@ Library.hot = {
     // use stored index family if it has already been retrieved.
     Hot.hotTable.setCellMeta(row, Library.hot.index1ColIndex, 'source', [""]);
     Hot.hotTable.setCellMeta(row, Library.hot.index2ColIndex, 'source', [""]);
-    if (Hot.dropdownRef.indexFamily[platformName]) {
+    if (Hot.dropdownRef.indexFamilies[platformName]) {
       Hot.hotTable.setCellMeta(row, Library.hot.ifamIndex, 'source', Object.keys(Hot.dropdownRef.indices[platformName]));
     } else if (platformName) {
       jQuery.get('../../indexFamiliesJson', {platform: platformName},
@@ -418,8 +418,8 @@ Library.hot = {
    */
   updateIndexCellsSources: function (row, platformName, ifam) {
     function setIndexSource (platformName, ifam, pos, len) {
-      Hot.hotTable.setCellMeta(row, Library.hot['tb' + pos + 'ColIndex'], 'source', Library.hot.getIndexLabels(Hot.dropdownRef.indices[platformName][ifam][pos]));
-      Hot.hotTable.setCellMeta(row, Library.hot['tb' + pos + 'ColIndex'], 'readOnly', false);
+      Hot.hotTable.setCellMeta(row, Library.hot['index' + pos + 'ColIndex'], 'source', Library.hot.getIndexLabels(Hot.dropdownRef.indices[platformName][ifam][pos]));
+      Hot.hotTable.setCellMeta(row, Library.hot['index' + pos + 'ColIndex'], 'readOnly', false);
       // empty source array for index 2 column in case there are no indices for position 2
       if (pos == 1) {
         Hot.hotTable.setCellMeta(row, Library.hot['index2ColIndex'], 'source', [""]);
