@@ -50,11 +50,13 @@ import javax.imageio.ImageIO;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.krysalis.barcode4j.BarcodeDimension;
 import org.krysalis.barcode4j.BarcodeGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.eaglegenomics.simlims.core.Note;
@@ -689,6 +691,10 @@ public class SampleControllerHelperService {
       } else {
         return JSONUtils.SimpleJSONError("New identification barcode not recognized");
       }
+    } catch (DataIntegrityViolationException e) {
+      log.debug("Could not change Sample identificationBarcode. Duplicate barcode: " + ExceptionUtils.getRootCauseMessage(e));
+      return JSONUtils.SimpleJSONError(
+          String.format("Could not change Sample identification barcode to '%s'. This barcode is already in use.", idBarcode));
     } catch (IOException e) {
       log.debug("Could not change Sample identificationBarcode: " + e.getMessage());
       return JSONUtils.SimpleJSONError(e.getMessage());
