@@ -385,6 +385,7 @@
 	      <thead>
 	      <tr>
 	        <th>Summary</th>
+            <th>Login</th>
 	        <th>Time</th>
 	      </tr>
 	      </thead>
@@ -392,6 +393,7 @@
 	      <c:forEach items="${container.changeLog}" var="change">
 	        <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
 	          <td><b>${change.summary}</b></td>
+              <td>${change.user.loginName}</td>
 	          <td>${change.time}</td>
 	        </tr>
 	      </c:forEach>
