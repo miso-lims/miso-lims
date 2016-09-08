@@ -109,21 +109,18 @@ var Dilution = {
         {
           header: 'Dilution Name',
           data: 'name',
-          type: 'text',
           readOnly: true,
           include: true
         },
         {
           header: 'Matrix Barcode',
           data: 'identificationBarcode',
-          type: 'text',
           readOnly: (Hot.autoGenerateIdBarcodes ? true : false),
           include: true
         },
         {
           header: 'Library Alias',
           data: 'library.alias',
-          type: 'text',
           readOnly: true,
           include: true
         },
@@ -157,14 +154,6 @@ var Dilution = {
           include: isDetailed
         }
       ].filter(function(x) { return x.include; });
-      
-      function permitEmpty (value, callback) {
-        if (value === undefined || value === null || value.length > 0 || value === '') {
-          return callback(true);
-        } else {
-          return callback(false);
-        }
-      }
     },
     
     /**

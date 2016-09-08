@@ -48,6 +48,8 @@ Library.hot = {
       if (!lib.indexFamilyName) {
         lib.indexFamilyName = 'No index';
       }
+      if (!lib.index1Label) lib.index1Label = '';
+      if (!lib.index2Label) lib.index2Label = '';
       return lib;
     });
   },
@@ -256,12 +258,10 @@ Library.hot = {
         {
           header: 'Sample Alias',
           data: 'parentSampleAlias',
-          type: 'text',
           readOnly: true
         },{
           header: 'Description',
           data: 'description',
-          type: 'text',
           validator: Hot.requiredText
         },{
           header: 'Platform',
@@ -299,6 +299,7 @@ Library.hot = {
           data: 'index1Label',
           type: 'autocomplete',
           strict: true,
+          filter: false,
           allowInvalid: true,
           trimDropdown: false,
           source: [""]
@@ -307,6 +308,7 @@ Library.hot = {
           data: 'index2Label',
           type: 'autocomplete',
           strict: true,
+          filter: false,
           allowInvalid: true,
           trimDropdown: false,
           source: [""]
@@ -315,7 +317,7 @@ Library.hot = {
           data: 'qcPassed',
           type: 'dropdown',
           trimDropdown: false,
-          source: ['true', 'false', 'unknown']
+          source: ['unknown', 'true', 'false']
         },{
           header: 'Volume',
           data: 'volume',
@@ -332,7 +334,7 @@ Library.hot = {
         {
           header: 'Library Alias',
           data: 'alias',
-          type: 'text'
+          validator: Hot.requiredText
         }
       ];
       
