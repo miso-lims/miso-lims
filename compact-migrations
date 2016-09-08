@@ -34,7 +34,6 @@ fi
 
 NEXT="V$(printf "%04d" ${ID})__auto_${TAIL}.sql"
 echo "Next migration will be ${NEXT}."
-exit 1
 
 # Concatenate all the 8xxx files and remove them from git
 rm -f "${NEXT}"
