@@ -291,7 +291,7 @@ public class EditPoolController {
   private Collection<Platform> getFilteredPlatforms(PlatformType platformType) throws IOException {
     List<Platform> selected = new ArrayList<>();
     for (Platform p : requestManager.listAllPlatforms()) {
-      if (p.getPlatformType() == platformType) {
+      if (p.getPlatformType() == platformType && !sequencingParametersService.getForPlatform(p.getId()).isEmpty()) {
         selected.add(p);
       }
     }
