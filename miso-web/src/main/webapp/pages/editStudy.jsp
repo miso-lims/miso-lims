@@ -221,16 +221,16 @@
         <table class="list" id="changelog_table">
           <thead>
           <tr>
+            <th>Editor</th>
             <th>Summary</th>
-            <th>Login</th>
             <th>Time</th>
           </tr>
           </thead>
           <tbody>
           <c:forEach items="${study.changeLog}" var="change">
             <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
+              <td>${change.user.fullName} (${change.user.loginName})</td>
               <td><b>${change.summary}</b></td>
-              <td>${change.user.loginName}</td>
               <td>${change.time}</td>
             </tr>
           </c:forEach>
