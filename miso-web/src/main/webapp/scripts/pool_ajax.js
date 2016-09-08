@@ -1006,9 +1006,6 @@ Pool.orders = Pool.orders || {
        }).map(function(parameter) {
          return '<option value="' + parameter.id + '"' + ((parameter.id == selectedParameterId) ? " selected" : "") + '>' + parameter.name + '</option>';
        }).join('');
-    if (options == '') {
-      return '<option value="-1" selected>Default</option>';
-    }
     return options;
   },
 

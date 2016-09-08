@@ -61,7 +61,8 @@ public class DefaultPoolOrderService implements PoolOrderService {
 
   @Override
   public void update(PoolOrder poolOrder) throws IOException {
-    authorizationManager.throwIfNonAdmin();
+    Pool<?> owner = requestManager.getPoolById(poolOrder.getPoolId());
+    authorizationManager.throwIfNotWritable(owner);
     User user = authorizationManager.getCurrentUser();
     poolOrder.setCreatedBy(user);
     poolOrder.setUpdatedBy(user);
