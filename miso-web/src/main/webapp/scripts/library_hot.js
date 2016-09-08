@@ -25,7 +25,7 @@ Library.hot = {
       if (lib.libraryAdditionalInfo) {
         // if any members are null, fill them with empty objects otherwise things go poorly
         if (!lib.libraryAdditionalInfo.prepKit) {
-          lib.libraryAdditionalInfo.prepKit = { id: '', alias: '' };
+          lib.libraryAdditionalInfo.prepKit = { id: '', name: '' };
         }
       }
       return lib;
@@ -42,7 +42,7 @@ Library.hot = {
       if (lib.libraryAdditionalInfo) {
         // if any members are null, fill them with empty objects otherwise things go poorly
         if (!lib.libraryAdditionalInfo.prepKit) {
-          lib.libraryAdditionalInfo.prepKit = { id: '', alias: '' };
+          lib.libraryAdditionalInfo.prepKit = { id: '', name: '' };
         }
       }
       if (!lib.indexFamilyName) {
@@ -170,7 +170,7 @@ Library.hot = {
     libraryAdditionalInfo: {
       prepKit: {
         id: '',
-        alias: ''
+        name: ''
       },
       archived: false
     }
@@ -343,7 +343,7 @@ Library.hot = {
       var additionalCols = [
         {
           header: 'Kit',
-          data: 'libraryAdditionalInfo.prepKit.alias',
+          data: 'libraryAdditionalInfo.prepKit.name',
           type: 'dropdown',
           trimDropdown: false,
           source: Library.hot.getKitDescriptors()
@@ -564,9 +564,9 @@ Library.hot = {
 
       if (obj.libraryAdditionalInfo) {
         lib.libraryAdditionalInfo = {};
-        if (obj.libraryAdditionalInfo.prepKit.alias) {
-          var prepKitAlias = obj.libraryAdditionalInfo.prepKit.alias;
-          lib.libraryAdditionalInfo.prepKit = Hot.sampleOptions.kitDescriptorsDtos.filter(function (kd) { return (kd.name == prepKitAlias); })[0];
+        if (obj.libraryAdditionalInfo.prepKit.name) {
+          var prepKitName = obj.libraryAdditionalInfo.prepKit.name;
+          lib.libraryAdditionalInfo.prepKit = Hot.sampleOptions.kitDescriptorsDtos.filter(function (kd) { return (kd.name == prepKitName); })[0];
         }
         if (obj.libraryAdditionalInfo.archived) {
           lib.libraryAdditionalInfo.archived = obj.libraryAdditionalInfo.archived;
