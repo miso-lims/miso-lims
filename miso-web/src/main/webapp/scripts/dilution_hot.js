@@ -107,7 +107,7 @@ var Dilution = {
       return [
         // Basic columns
         {
-          header: 'Name',
+          header: 'Dilution Name',
           data: 'name',
           type: 'text',
           readOnly: true,
@@ -128,11 +128,11 @@ var Dilution = {
           include: true
         },
         {
-          header: 'Conc.',
+          header: 'Conc. (' + Dilution.hot.units + ')',
           data: 'concentration',
           type: 'numeric',
           format: '0.0',
-          validator: requiredText,
+          validator: Hot.requiredNumber,
           include: true
         },
         {
@@ -163,14 +163,6 @@ var Dilution = {
           return callback(true);
         } else {
           return callback(false);
-        }
-      }
-      
-      function requiredText (value, callback) {
-        if (!value || value.length === 0) {
-          callback(false);
-        } else {
-          callback(true);
         }
       }
     },
