@@ -123,9 +123,8 @@ public class ViewSequencerReferenceController {
   public ModelAndView viewServiceRecord(@PathVariable("recordId") Long recordId, ModelMap model) throws IOException {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     if (user.isAdmin()) {
-      return new ModelAndView("redirect:/miso/stats/sequencer/servicerecord/" + recordId);
-    }
-    else {
+      return new ModelAndView("redirect:/miso/sequencer/servicerecord/" + recordId);
+    } else {
       return editServiceRecordController.viewServiceRecord(recordId, model);
     }
   }
