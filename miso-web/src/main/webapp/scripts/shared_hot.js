@@ -71,6 +71,13 @@ var Hot = {
   permitEmpty: function (value, callback) {
     return callback(value === undefined || value === null || value === '' || value.length > 0);
   },
+  
+  /**
+   * Custom validator for required numeric fields
+   */
+  requiredNumber: function (value, callback) {
+    return callback(value != undefined && value != null && value != '' && Handsontable.helper.isNumeric(value));
+  },
 
   /**
    * Gets item's alias

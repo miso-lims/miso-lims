@@ -84,6 +84,7 @@
       Hot.saveButton = document.getElementById('saveDilutions');
       Dilution.hot.propagateOrEdit = "${method}";
       Hot.autoGenerateIdBarcodes = ${autoGenerateIdBarcodes};
+      Dilution.hot.units = "${libraryDilutionUnits}";
 
       Dilution.hot.makeBulkCreateTable = function () {
         Dilution.hot.dilutionsJSON = Dilution.hot.modifyLibrariesForDilutions(Dilution.hot.librariesJSON);
