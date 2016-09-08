@@ -1,9 +1,11 @@
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -12,52 +14,56 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
+import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 
 @Transactional(rollbackFor = Exception.class)
 public class SQLChangeLogDAO implements ChangeLogStore {
-  private static class ChangeLogMapper implements RowMapper<ChangeLog> {
+  private class ChangeLogMapper implements RowMapper<ChangeLog> {
 
     @Override
     public ChangeLog mapRow(ResultSet rs, int rownum) throws SQLException {
       ChangeLog cl = new ChangeLog();
       cl.setColumnsChanged(rs.getString("columnsChanged"));
       cl.setSummary(rs.getString("message"));
-      cl.setUserId(rs.getLong("userId"));
       cl.setTime(rs.getTimestamp("changeTime"));
+      try {
+        cl.setUser(sqlSecurityDAO.getUserById(rs.getLong("userId")));
+      } catch (IOException e) {
+        throw new SQLException(e);
+      }
       return cl;
     }
-
   }
 
   private static enum ChangeLogType {
-    BOX("BoxChangeLog", "boxId"),
-    EXPERIMENT("ExperimentChangeLog", "experimentId"),
-    KITDESCRIPTOR("KitDescriptorChangeLog", "kitDescriptorId"),
-    LIBRARY("LibraryChangeLog", "libraryId"),
-    PLATE("PlateChangeLog", "plateId"),
-    POOL("PoolChangeLog", "poolId"),
-    RUN("RunChangeLog", "runId"),
-    SAMPLE("SampleChangeLog", "sampleId"),
-    SEQUENCERPARTITIONCONTAINER("SequencerPartitionContainerChangeLog", "containerId"),
-    STUDY("StudyChangeLog", "studyId");
-    
+    BOX("BoxChangeLog", "boxId"), //
+    EXPERIMENT("ExperimentChangeLog", "experimentId"), //
+    KITDESCRIPTOR("KitDescriptorChangeLog", "kitDescriptorId"), //
+    LIBRARY("LibraryChangeLog", "libraryId"), //
+    PLATE("PlateChangeLog", "plateId"), //
+    POOL("PoolChangeLog", "poolId"), //
+    RUN("RunChangeLog", "runId"), //
+    SAMPLE("SampleChangeLog", "sampleId"), //
+    SEQUENCERPARTITIONCONTAINER("SequencerPartitionContainerChangeLog", "containerId"), //
+    STUDY("StudyChangeLog", "studyId");//
+
     private final String tableName;
     private final String idColumn;
-    
+
     private ChangeLogType(String tableName, String idColumn) {
       this.tableName = tableName;
       this.idColumn = idColumn;
     }
-    
+
     public String getTableName() {
       return tableName;
     }
-    
+
     public String getIdColumn() {
       return idColumn;
     }
-    
+
     public static ChangeLogType get(String type) {
       return ChangeLogType.valueOf(type.toUpperCase());
     }
@@ -68,6 +74,8 @@ public class SQLChangeLogDAO implements ChangeLogStore {
   public static final String CHANGELOG_DELETE_BY_ENTITY_ID = "DELETE FROM %s WHERE %s = ?";
 
   private JdbcTemplate template;
+  @Autowired
+  private SecurityStore sqlSecurityDAO;
 
   @CoverageIgnore
   public JdbcTemplate getJdbcTemplate() {
@@ -79,6 +87,14 @@ public class SQLChangeLogDAO implements ChangeLogStore {
     this.template = template;
   }
 
+  public SecurityStore getSecurityDAO() {
+    return sqlSecurityDAO;
+  }
+
+  public void setSecurityDAO(SecurityStore securityStore) {
+    this.sqlSecurityDAO = securityStore;
+  }
+
   @Override
   public List<ChangeLog> listAll(String type) {
     ChangeLogType cl = ChangeLogType.get(type);
@@ -88,14 +104,14 @@ public class SQLChangeLogDAO implements ChangeLogStore {
   @Override
   public List<ChangeLog> listAllById(String type, long id) {
     ChangeLogType cl = ChangeLogType.get(type);
-    return template.query(String.format(CHANGELOG_SELECT_WHERE, cl.getTableName(), cl.getIdColumn()),
-        new Object[] { id }, new ChangeLogMapper());
+    return template.query(String.format(CHANGELOG_SELECT_WHERE, cl.getTableName(), cl.getIdColumn()), new Object[] { id },
+        new ChangeLogMapper());
   }
-  
+
   @Override
   public void deleteAllById(String type, long id) {
     ChangeLogType cl = ChangeLogType.get(type);
-    template.update(String.format(CHANGELOG_DELETE_BY_ENTITY_ID, cl.getTableName(), cl.getIdColumn()), new Object[] {id});
+    template.update(String.format(CHANGELOG_DELETE_BY_ENTITY_ID, cl.getTableName(), cl.getIdColumn()), new Object[] { id });
   }
 
   @Override
@@ -104,7 +120,7 @@ public class SQLChangeLogDAO implements ChangeLogStore {
     MapSqlParameterSource params = new MapSqlParameterSource();
     params.addValue(cl.getIdColumn(), objectId);
     params.addValue("columnsChanged", changeLog.getColumnsChanged());
-    params.addValue("userId", changeLog.getUserId());
+    params.addValue("userId", changeLog.getUser().getUserId());
     params.addValue("message", changeLog.getSummary());
     params.addValue("changeTime", changeLog.getTime());
     SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(cl.getTableName());

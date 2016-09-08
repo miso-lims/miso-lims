@@ -949,6 +949,7 @@
     <table class="list" id="changelog_table">
       <thead>
       <tr>
+      <th>Editor</th>
       <th>Summary</th>
       <th>Time</th>
       </tr>
@@ -956,6 +957,7 @@
       <tbody>
       <c:forEach items="${library.changeLog}" var="change">
       <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
+        <td>${change.user.fullName} (${change.user.loginName})</td>
         <td><b>${change.summary}</b></td>
         <td>${change.time}</td>
       </tr>
