@@ -604,10 +604,12 @@ public class ValueTypeLookup {
         }
       }
       
-      QcPassedDetail qcDet = resolve(detailed.getQcPassedDetail());
-      if (qcDet == null) throw new IOException(String.format("QcPassedDetail not found: id=%d, description=%s",
-          detailed.getQcPassedDetail().getId(), detailed.getQcPassedDetail().getDescription()));
-      detailed.setQcPassedDetail(qcDet);
+      if (detailed.getQcPassedDetail() != null) { // Optional field
+        QcPassedDetail qcDet = resolve(detailed.getQcPassedDetail());
+        if (qcDet == null) throw new IOException(String.format("QcPassedDetail not found: id=%d, description=%s",
+            detailed.getQcPassedDetail().getId(), detailed.getQcPassedDetail().getDescription()));
+        detailed.setQcPassedDetail(qcDet);
+      }
       
       if (LimsUtils.isTissueSample(detailed)) {
         SampleTissue tissue = (SampleTissue) detailed;
@@ -665,12 +667,16 @@ public class ValueTypeLookup {
    * @throws IOException if no value is found matching the available data in library
    */
   public void resolveAll(Library library) throws IOException {
+    if (library.getLibrarySelectionType() == null) throw new IOException("LibrarySelectionType missing for Library " + library.getAlias());
     LibrarySelectionType sel = resolve(library.getLibrarySelectionType());
-    if (sel == null) throw new IOException("LibrarySelectionType not found");
+    if (sel == null) throw new IOException(String.format("LibrarySelectionType not found (id=%d or name=%s)",
+        library.getLibrarySelectionType().getId(), library.getLibrarySelectionType().getName()));
     library.setLibrarySelectionType(sel);
 
+    if (library.getLibraryStrategyType() == null) throw new IOException("LibraryStrategyType missing for Library " + library.getAlias());
     LibraryStrategyType strat = resolve(library.getLibraryStrategyType());
-    if (strat == null) throw new IOException("LibraryStrategyType not found");
+    if (strat == null) throw new IOException(String.format("LibraryStrategyType not found (id=%d or name=%s)",
+        library.getLibraryStrategyType().getId(), library.getLibraryStrategyType().getName()));
     library.setLibraryStrategyType(strat);
 
     LibraryType lt = resolve(library.getLibraryType());
