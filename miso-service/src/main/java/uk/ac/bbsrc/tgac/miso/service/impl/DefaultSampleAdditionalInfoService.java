@@ -1,22 +1,16 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import java.io.IOException;
-import java.util.Date;
 import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Sets;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.persistence.QcPassedDetailDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleAdditionalInfoDao;
@@ -106,6 +100,8 @@ public class DefaultSampleAdditionalInfoService implements SampleAdditionalInfoS
     if (source.getQcPassedDetail() != null) {
       target.setQcPassedDetail(qcPassedDetailDao.getQcPassedDetails(source.getQcPassedDetail().getId()));
       ServiceUtils.throwIfNull(target.getQcPassedDetail(), "qcPassedDetailId", source.getQcPassedDetail().getId());
+    } else {
+      target.setQcPassedDetail(null);
     }
     if (source.getPrepKit() != null) {
       target.setPrepKit(sqlKitDao.getKitDescriptorById(source.getPrepKit().getId()));
