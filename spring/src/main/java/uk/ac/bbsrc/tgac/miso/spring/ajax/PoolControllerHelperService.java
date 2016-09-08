@@ -808,9 +808,6 @@ public class PoolControllerHelperService {
         JSONObject j = new JSONObject();
         JSONArray arr = new JSONArray();
         for (LibraryDilution libraryDilution : requestManager.listAllLibraryDilutionsByPlatform((PlatformType.get(platform)))) {
-          if (libraryDilution.getLibrary().isLowQuality()) {
-            continue;
-          }
           JSONArray pout = new JSONArray();
           pout.add(libraryDilution.getName());
           pout.add(libraryDilution.getConcentration());
@@ -819,6 +816,7 @@ public class PoolControllerHelperService {
           StringBuilder indices = new StringBuilder();
           collectIndices(indices, libraryDilution);
           pout.add(indices.toString());
+          pout.add(libraryDilution.getLibrary().isLowQuality() ? "⚠" : "");
           pout.add(
               "<div style='cursor:pointer;' onmousedown=\"Pool.search.poolSearchSelectElement('" + libraryDilution.getId() + "', '"
                   + libraryDilution.getName() + "')\"><span class=\"ui-icon ui-icon-plusthick\"></span></div>");

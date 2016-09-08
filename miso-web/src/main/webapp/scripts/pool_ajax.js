@@ -561,6 +561,7 @@ Pool.ui = {
               { "sTitle": "Library", "sType":"natural"},
               { "sTitle": "Sample", "sType":"natural"},
               { "sTitle": "Indices", "sType":"natural"},
+              { "sTitle": "Low Quality", "bSortable": false},
               { "sTitle": "Add"}
             ],
             "bJQueryUI": true,
