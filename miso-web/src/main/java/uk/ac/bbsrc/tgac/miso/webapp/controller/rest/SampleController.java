@@ -136,6 +136,10 @@ public class SampleController extends RestController {
   @RequestMapping(value = "/sample", method = RequestMethod.POST, headers = { "Content-type=application/json" })
   @ResponseBody
   public ResponseEntity<?> createSample(@RequestBody SampleDto sampleDto, UriComponentsBuilder b) throws IOException {
+    if (sampleDto == null) {
+      log.error("Received null sampleDto from front end; cannot convert to Sample. Something likely went wrong in the JS DTO conversion.");
+      throw new RestException("Cannot convert null to Sample", Status.BAD_REQUEST);
+    }
     Long id = null;
     try {
       Sample sample = Dtos.to(sampleDto);
@@ -157,6 +161,10 @@ public class SampleController extends RestController {
   @RequestMapping(value = "/sample/{id}", method = RequestMethod.PUT, headers = { "Content-type=application/json" })
   @ResponseBody
   public ResponseEntity<?> updateSample(@PathVariable("id") Long id, @RequestBody SampleDto sampleDto) throws IOException {
+    if (sampleDto == null) {
+      log.error("Received null sampleDto from front end; cannot convert to Sample. Something likely went wrong in the JS DTO conversion.");
+      throw new RestException("Cannot convert null to Sample", Status.BAD_REQUEST);
+    }
     Sample sample = Dtos.to(sampleDto);
     sample.setId(id);
     sampleService.update(sample);

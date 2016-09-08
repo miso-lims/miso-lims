@@ -55,6 +55,11 @@ public class LibraryDilutionRestController extends RestController {
   @RequestMapping(method = RequestMethod.POST, headers = { "Content-type=application/json" })
   @ResponseBody
   public ResponseEntity<?> createDilution(@RequestBody DilutionDto dilutionDto, UriComponentsBuilder b) throws IOException {
+    if (dilutionDto == null) {
+      log.error(
+          "Received null dilutionDto from front end; cannot convert to Dilution. Something likely went wrong in the JS DTO conversion.");
+      throw new RestException("Cannot convert null to Dilution", Status.BAD_REQUEST);
+    }
     Long id = null;
     LibraryDilution dilution;
     try {
