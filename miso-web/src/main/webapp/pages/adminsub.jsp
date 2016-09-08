@@ -22,24 +22,12 @@
   --%>
 
 <div id="subcontent">
-	<h2>Navigation</h2>
-	<br />
-	<%--<h2>Search</h2>--%>
-	<%--<span class="inline">--%>
-	<%--<form action="/miso/search">--%>
-	<%--<input type="text" id="search" value="Search for..." onfocus="clearInputField(this);"/><input value="Search"--%>
-	<%--type="submit"/>--%>
-	<%--</form>--%>
-	<%--</span><br/>--%>
-
 	<h2>Sample Processing</h2>
 	<ul class="bullets">
 		<li><a href="<c:url value="/miso/sample/receipt"/>">Receive
 				Samples</a></li>
 		<li><a href="<c:url value="/miso/importexport"/>">Import &amp;
 				Export</a></li>
-		<%--<li><a href="<c:url value="/miso/plate/import"/>">Import Plate Sheet</a></li>--%>
-		<%--<li><a href="<c:url value="/miso/plate/export"/>">Export Plate Sheet</a></li>--%>
 	</ul>
 
 	<h2>Sequencing</h2>
@@ -52,19 +40,19 @@
 
     <h2>Tracking</h2>
     <ul class="bullets">
-        <li><a href="<c:url value="/miso/runs"/>">List Runs</a></li>
-        <li><a href="<c:url value="/miso/containers"/>">List Sequencing Containers</a></li>
-        <li><a href="<c:url value="/miso/experiments"/>">List Experiments</a></li>
+        <li><a href="<c:url value="/miso/samples"/>">List Samples</a></li>
+        <li><a href="<c:url value="/miso/libraries"/>">List Libraries</a></li>
         <li><a href="<c:url value="/miso/pools"/>">List Pools</a></li>
         <li><a href="<c:url value="/miso/poolorders"/>">List Orders</a></li>
-        <li><a href="<c:url value="/miso/libraries"/>">List Libraries</a></li>
-        <li><a href="<c:url value="/miso/samples"/>">List Samples</a></li>
-        <li><a href="<c:url value="/miso/studies"/>">List Studies</a></li>
-        <li><a href="<c:url value="/miso/kitdescriptors"/>">List Consumables</a></li>
-        <li><a href="<c:url value="/miso/plates"/>">List Plates</a></li>
+        <li><a href="<c:url value="/miso/containers"/>">List Sequencing Containers</a></li>
+        <li><a href="<c:url value="/miso/runs"/>">List Runs</a></li>
         <li><a href="<c:url value="/miso/boxes"/>">List Boxes</a></li>
+        <li><a href="<c:url value="/miso/plates"/>">List Plates</a></li>
         <li><a href="<c:url value="/miso/sequencers"/>">List Sequencers</a></li>
+        <li><a href="<c:url value="/miso/kitdescriptors"/>">List Kits</a></li>
         <li><a href="<c:url value="/miso/indices"/>">List Indices</a></li>
+        <li><a href="<c:url value="/miso/experiments"/>">List Experiments</a></li>
+        <li><a href="<c:url value="/miso/studies"/>">List Studies</a></li>
     </ul>
 
 	<h2>Print Jobs</h2>
