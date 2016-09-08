@@ -1053,12 +1053,12 @@ Sample.hot = {
       }
       if (obj.tissueOriginId && !obj.tissueOriginLabel) {
         sample.tissueOriginId = obj.tissueOriginId;
-      } else {
+      } else if (obj.tissueOriginLabel) {
         sample.tissueOriginId = Hot.sampleOptions.tissueOriginsDtos.filter(function (tod) { return tod.label == obj.tissueOriginLabel; })[0].id;
       }
       if (obj.tissueTypeId && !obj.tissueTypeLabel) {
         sample.tissueTypeId = obj.tissueTypeId;
-      } else {
+      } else if (obj.tissueTypeLabel) {
         sample.tissueTypeId = Hot.sampleOptions.tissueTypesDtos.filter(function (ttd) { return ttd.label == obj.tissueTypeLabel; })[0].id;
       }
       sample.passageNumber = (obj.passageNumber == '' ? null : parseInt(obj.passageNumber));
