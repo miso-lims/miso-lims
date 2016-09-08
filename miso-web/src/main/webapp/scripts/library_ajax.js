@@ -58,7 +58,6 @@ var Library = Library || {
     
     // Volume validation
     jQuery('#volume').attr('class', 'form-control');
-    jQuery('#volume').attr('data-parsley-required', 'true');
     jQuery('#volume').attr('data-parsley-maxlength', '10');
     jQuery('#volume').attr('data-parsley-type', 'number');
 
