@@ -154,6 +154,11 @@ public class EditBoxController {
         throw new SecurityException("Permission denied.");
       }
 
+      // The user may have modified the box contents while editing the form. Update the contents.
+      if (box.getId() != AbstractBox.UNSAVED_ID) {
+        Box original = requestManager.getBoxById(box.getId());
+        box.setBoxables(original.getBoxables());
+      }
       box.setLastModifier(user);
       requestManager.saveBox(box);
       session.setComplete();
