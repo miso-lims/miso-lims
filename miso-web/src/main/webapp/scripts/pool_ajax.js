@@ -560,8 +560,8 @@ Pool.ui = {
               { "sTitle": "Concentration ("+libraryDilutionConcentrationUnits+")", "sType":"natural"},
               { "sTitle": "Library", "sType":"natural"},
               { "sTitle": "Sample", "sType":"natural"},
-              { "sTitle": "Low Quality", "bSortable": false},
               { "sTitle": "Indices", "sType":"natural"},
+              { "sTitle": "Low Quality", "bSortable": false},
               { "sTitle": "Add"}
             ],
             "bJQueryUI": true,

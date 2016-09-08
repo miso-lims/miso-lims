@@ -813,10 +813,10 @@ public class PoolControllerHelperService {
           pout.add(libraryDilution.getConcentration());
           pout.add(libraryDilution.getLibrary().getAlias() + " (" + libraryDilution.getLibrary().getName() + ")");
           pout.add(libraryDilution.getLibrary().getSample().getAlias() + " (" + libraryDilution.getLibrary().getSample().getName() + ")");
-          pout.add(libraryDilution.getLibrary().isLowQuality() ? "⚠" : "");
           StringBuilder indices = new StringBuilder();
           collectIndices(indices, libraryDilution);
           pout.add(indices.toString());
+          pout.add(libraryDilution.getLibrary().isLowQuality() ? "⚠" : "");
           pout.add(
               "<div style='cursor:pointer;' onmousedown=\"Pool.search.poolSearchSelectElement('" + libraryDilution.getId() + "', '"
                   + libraryDilution.getName() + "')\"><span class=\"ui-icon ui-icon-plusthick\"></span></div>");
