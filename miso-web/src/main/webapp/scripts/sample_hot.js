@@ -322,7 +322,7 @@ Sample.hot = {
     Hot.buildDtoFunc = Sample.hot.buildDtos;
     Hot.saveOneFunc = Sample.hot.saveOne;
     Hot.updateOneFunc = Sample.hot.updateOne;
-    if (sourceSampleCategory) Sample.hot.sampleCategory = sourceSampleCategory;
+    if (targetSampleCategory) Sample.hot.sampleCategory = targetSampleCategory;
     
     // reset params which track successes and errors
     Hot.messages = {
@@ -619,13 +619,11 @@ Sample.hot = {
       {
         header: 'Sample Alias',
         data: 'alias',
-        type: 'text',
         include: true
       },
       {
         header: 'Description',
         data: 'description',
-        type: 'text',
         validator: Hot.requiredText,
         include: true
       },
@@ -645,7 +643,6 @@ Sample.hot = {
       {
         header: 'Matrix Barcode',
         data: 'identificationBarcode',
-        type: 'text',
         include: !Hot.autoGenerateIdBarcodes
       },
       {
@@ -661,7 +658,6 @@ Sample.hot = {
       {
         header: 'Sci. Name',
         data: 'scientificName',
-        type: 'text',
         source: Sample.hot.sciName,
         validator: Hot.requiredText,
         extraneous: true,
@@ -672,16 +668,12 @@ Sample.hot = {
       {
         header: 'Parent Alias',
         data: 'parentAlias',
-        type: 'text',
         readOnly: true,
         include: isDetailed && action == 'propagate'
       },
       {
         header: 'Parent Sample Class',
         data: 'parentSampleClassAlias',
-        type: 'dropdown',
-        trimDropdown: false,
-        source: Sample.hot.getSampleClasses(),
         readOnly: true,
         include: isDetailed && action == 'propagate'
       },
@@ -690,7 +682,6 @@ Sample.hot = {
       {
         header: 'External Name',
         data: 'externalName',
-        type: 'text',
         validator: Hot.requiredText,
         include: show['Identity']
       },
@@ -716,14 +707,12 @@ Sample.hot = {
       {
         header: 'Group ID',
         data: 'groupId',
-        type: 'numeric',
         validator: validateAlphanumeric,
         include: isDetailed
       },
       {
         header: 'Group Desc.',
         data: 'groupDescription',
-        type: 'text',
         validator: Hot.permitEmpty,
         include: isDetailed
       },
@@ -768,21 +757,18 @@ Sample.hot = {
       {
         header: 'Passage #',
         data: 'passageNumber',
-        type: 'text',
         validator: validateNumber,
         include: show['Tissue']
       },
       {
         header: 'Times Received',
         data: 'timesReceived',
-        type: 'numeric',
         validator: validatePosReqdNumber,
         include: show['Tissue']
       },
       {
         header: 'Tube Number',
         data: 'tubeNumber',
-        type: 'numeric',
         validator: validatePosReqdNumber,
         include: show['Tissue']
       },
@@ -798,7 +784,6 @@ Sample.hot = {
       {
         header: 'Ext. Inst. Identifier',
         data: 'externalInstituteIdentifier',
-        type: 'text',
         include: show['Tissue']
       },
       {
@@ -813,7 +798,6 @@ Sample.hot = {
       {
         header: 'Region',
         data: 'region',
-        type: 'text',
         validator: Hot.permitEmpty,
         include: show['Tissue']
       },
@@ -822,8 +806,7 @@ Sample.hot = {
       {
         header: 'Cuts',
         data: 'cuts',
-        type: 'numeric',
-        validator: Hot.requiredText,
+        validator: validatePosReqdNumber,
         include: show['Tissue Processing'] && sampleClassAlias == 'CV Slide'
       },
       {
@@ -843,8 +826,7 @@ Sample.hot = {
       {
         header: 'Cuts Consumed',
         data: 'cutsConsumed',
-        type: 'numeric',
-        validator: Hot.requiredText,
+        validator: validatePosReqdNumber,
         include: show['Tissue Processing'] && sampleClassAlias == 'LCM Tube'
       },
 
@@ -886,8 +868,7 @@ Sample.hot = {
         data: 'qcPassed',
         type: 'dropdown',
         trimDropdown: false,
-        source: ['true', 'false', 'unknown'],
-        validator: Hot.permitEmpty,
+        source: ['unknown', 'true', 'false'],
         include: showQcs || show['Stock']
       },
       {
