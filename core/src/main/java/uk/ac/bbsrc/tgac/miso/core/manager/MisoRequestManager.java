@@ -1677,9 +1677,11 @@ public class MisoRequestManager implements RequestManager {
           throw new IOException(
               "This library design is not valid for sample " + library.getSample().getName() + " because the class is not compatible.");
         }
+        library.getLibraryAdditionalInfo().setLibraryDesign(design);
         library.setLibrarySelectionType(libraryStore.getLibrarySelectionTypeById(design.getLibrarySelectionType()));
         library.setLibraryStrategyType(libraryStore.getLibraryStrategyTypeById(design.getLibraryStrategyType()));
         library.setLibraryType(design.getLibraryType());
+        library.setPlatformName(design.getLibraryType().getPlatformType());
       }
       return libraryStore.save(library);
     } else {

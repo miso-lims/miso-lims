@@ -1102,9 +1102,15 @@ Library.ui = {
           "iSortPriority": 2,
           "bVisible": (Sample.detailedSample ? "true" : "false")
         },
-        { 
+        {
           "sTitle": "ID",
           "mData": "identificationBarcode",
+          "iSortPriority": 0,
+          "bVisible": false
+        },
+        {
+          "sTitle": "sampleClass",
+          "mData": "sampleClass",
           "iSortPriority": 0,
           "bVisible": false
         }
