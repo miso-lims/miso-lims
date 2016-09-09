@@ -1778,7 +1778,7 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public void deleteSequencerServiceRecord(SequencerServiceRecord serviceRecord) throws IOException {
+  public void deleteSequencerServiceRecord(uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord serviceRecord) throws IOException {
     if (getCurrentUser().isAdmin()) {
       backingManager.deleteSequencerServiceRecord(serviceRecord);
     }
@@ -2374,7 +2374,11 @@ public class UserAuthMisoRequestManager implements RequestManager {
 
   @Override
   public long saveSequencerServiceRecord(SequencerServiceRecord record) throws IOException {
-    return backingManager.saveSequencerServiceRecord(record);
+    if (getCurrentUser().isAdmin()) {
+      return backingManager.saveSequencerServiceRecord(record);
+    } else {
+      throw new IOException("User " + getCurrentUser().getFullName() + " cannot write to this Service Record");
+    }
   }
 
   @Override
@@ -2631,8 +2635,8 @@ public class UserAuthMisoRequestManager implements RequestManager {
       String sortDir, String sortCol) throws IOException {
     User user = getCurrentUser();
     List<SequencerPartitionContainer<SequencerPoolPartition>> accessibles = new ArrayList<>();
-    for (SequencerPartitionContainer<SequencerPoolPartition> spc : backingManager
-        .getContainersByPageSizeSearch(offset, limit, querystr, sortDir, sortCol)) {
+    for (SequencerPartitionContainer<SequencerPoolPartition> spc : backingManager.getContainersByPageSizeSearch(offset, limit, querystr,
+        sortDir, sortCol)) {
       if (spc.userCanRead(user)) {
         accessibles.add(spc);
       }
@@ -2645,8 +2649,8 @@ public class UserAuthMisoRequestManager implements RequestManager {
       String sortCol) throws IOException {
     User user = getCurrentUser();
     List<SequencerPartitionContainer<SequencerPoolPartition>> accessibles = new ArrayList<>();
-    for (SequencerPartitionContainer<SequencerPoolPartition> spc : backingManager
-        .getContainersByPageAndSize(offset, limit, sortDir, sortCol)) {
+    for (SequencerPartitionContainer<SequencerPoolPartition> spc : backingManager.getContainersByPageAndSize(offset, limit, sortDir,
+        sortCol)) {
       if (spc.userCanRead(user)) {
         accessibles.add(spc);
       }

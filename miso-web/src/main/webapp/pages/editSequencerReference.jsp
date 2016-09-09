@@ -231,18 +231,21 @@
       </c:choose>
       <div id="records_arrowclick" class="toggleLeft"></div>
     </div>
-    <h1>Service Records</h1>
     <div id="recordsdiv" style="display:none;">
+      <h1>Service Records</h1>
       <ul class="sddm">
         <li>
-          <a onmouseover="mopen('recordmenu')" onmouseout="mclosetime()">
-            Options
-            <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
-          </a>
+          <c:if test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')
+            or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_TECH')}">
+              <a onmouseover="mopen('recordmenu')" onmouseout="mclosetime()">
+                Options
+                <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
+              </a>
+          </c:if>
           <div id="recordmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
             <c:choose>
               <c:when test="${sequencerReference.dateDecommissioned == null}">
-                <a href='<c:url value="/miso/sequencer/servicerecord/new/${sequencerReference.id}"/> '>Add new Service Record</a>
+                <a href='<c:url value="/miso/stats/sequencer/servicerecord/new/${sequencerReference.id}"/> '>Add new Service Record</a>
               </c:when>
               <c:otherwise>
                 <a class="disabled" onclick="alert('Cannot add Service Records to a retired Sequencer')">Add new Service Record</a>
@@ -259,7 +262,9 @@
               <th>Title</th>
               <th>Serviced By</th>
               <th>Reference Number</th>
-              <th class="fit">Delete</th>
+              <c:if test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+                <th class="fit">Delete</th>
+              </c:if>
             </tr>
           </thead>
           <tbody>
@@ -269,9 +274,11 @@
                 <td><a href='<c:url value="/miso/sequencer/servicerecord/${record.id}"/>'>${record.title}</a></td>
                 <td>${record.servicedByName}</td>
                 <td>${record.referenceNumber}</td>
-                <td class="misoicon" onclick="Sequencer.ui.deleteServiceRecord(${record.id}, Utils.page.pageReload);">
-                  <span class="ui-icon ui-icon-trash"></span>
-                </td>
+                <c:if test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+                  <td class="misoicon" onclick="Sequencer.ui.deleteServiceRecord(${record.id}, Utils.page.pageReload);">
+                    <span class="ui-icon ui-icon-trash"></span>
+                  </td>
+                </c:if>
               </tr>
             </c:forEach>
           </tbody>
@@ -288,8 +295,10 @@
             { "sType": 'date' },
             { "sType": 'string' },
             { "sType": 'string' },
-            { "sType": 'string' },
-            { "bSortable": false }
+            { "sType": 'string' }
+            <c:if test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+              ,{ "bSortable": false }
+            </c:if>
           ],
           "iDisplayLength": 50,
           "bJQueryUI": true,
