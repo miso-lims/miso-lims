@@ -1668,17 +1668,20 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public long saveLibrary(Library library) throws IOException {
     if (libraryStore != null) {
-      if (isDetailedSample(library.getSample())) {
-        SampleAdditionalInfo sample = (SampleAdditionalInfo) library.getSample();
-
-        if (LibraryDesign.validate(library, libraryDesignDao.getLibraryDesignByClass(sample.getSampleClass()))) {
-          return libraryStore.save(library);
-        } else {
-          throw new IOException("Invalid propagation.");
+      if (library.getLibraryAdditionalInfo() != null && library.getLibraryAdditionalInfo().getLibraryDesign() != null) {
+        if (!isDetailedSample(library.getSample())) {
+          throw new IOException("A library design can only be applied to a detailed sample.");
         }
-      } else {
-        return libraryStore.save(library);
+        LibraryDesign design = libraryDesignDao.getLibraryDesign(library.getLibraryAdditionalInfo().getLibraryDesign().getId());
+        if (((SampleAdditionalInfo) library.getSample()).getSampleClass().getId() != design.getSampleClass().getId()) {
+          throw new IOException(
+              "This library design is not valid for sample " + library.getSample().getName() + " because the class is not compatible.");
+        }
+        library.setLibrarySelectionType(libraryStore.getLibrarySelectionTypeById(design.getLibrarySelectionType()));
+        library.setLibraryStrategyType(libraryStore.getLibraryStrategyTypeById(design.getLibraryStrategyType()));
+        library.setLibraryType(design.getLibraryType());
       }
+      return libraryStore.save(library);
     } else {
       throw new IOException("No libraryStore available. Check that it has been declared in the Spring config.");
     }
