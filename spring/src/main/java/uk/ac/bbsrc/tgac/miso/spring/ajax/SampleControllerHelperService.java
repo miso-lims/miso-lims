@@ -50,13 +50,11 @@ import javax.imageio.ImageIO;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.krysalis.barcode4j.BarcodeDimension;
 import org.krysalis.barcode4j.BarcodeGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.eaglegenomics.simlims.core.Note;
@@ -69,6 +67,7 @@ import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
+import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.EntityGroup;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.PrintJob;
@@ -683,6 +682,16 @@ public class SampleControllerHelperService {
 
     try {
       if (!isStringEmptyOrNull(idBarcode)) {
+        List<Boxable> previouslyBarcodedItems = new ArrayList<Boxable>(requestManager.getBoxablesFromBarcodeList(Arrays.asList(idBarcode)));
+        if (!previouslyBarcodedItems.isEmpty()
+            && !(previouslyBarcodedItems.size() == 1 && previouslyBarcodedItems.get(0).getId() == sampleId)) {
+          Boxable previouslyBarcodedItem = previouslyBarcodedItems.get(0);
+          String error = String.format(
+              "Could not change sample identification barcode to '%s'. This barcode is already in use by an item with the name '%s' and the alias '%s'.",
+              idBarcode, previouslyBarcodedItem.getName(), previouslyBarcodedItem.getAlias());
+          log.debug(error);
+          return JSONUtils.SimpleJSONError(error);
+        }
         User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
         Sample sample = requestManager.getSampleById(sampleId);
         sample.setIdentificationBarcode(idBarcode);
@@ -691,10 +700,6 @@ public class SampleControllerHelperService {
       } else {
         return JSONUtils.SimpleJSONError("New identification barcode not recognized");
       }
-    } catch (DataIntegrityViolationException e) {
-      log.debug("Could not change Sample identificationBarcode. Duplicate barcode: " + ExceptionUtils.getRootCauseMessage(e));
-      return JSONUtils.SimpleJSONError(
-          String.format("Could not change Sample identification barcode to '%s'. This barcode is already in use.", idBarcode));
     } catch (IOException e) {
       log.debug("Could not change Sample identificationBarcode: " + e.getMessage());
       return JSONUtils.SimpleJSONError(e.getMessage());
