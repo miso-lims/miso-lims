@@ -213,7 +213,7 @@ var Sample = Sample || {
       {
         'doOnSuccess': function(json) {
           // don't validate the alias if the sample or its parent has a nonstandard alias
-          if (jQuery('#nonStandardAlias')) {
+          if (jQuery('#nonStandardAlias').length) {
             jQuery('#sample-form').parsley();
             jQuery('#sample-form').parsley().validate();
             Validate.updateWarningOrSubmit('#sample-form');
