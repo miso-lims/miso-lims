@@ -678,8 +678,7 @@ public class EditLibraryController {
       model.put("libraryPools", pools);
       model.put("libraryRuns", getRunsByLibraryPools(pools));
 
-      populateDesigns(
-          model,
+      populateDesigns(model,
           LimsUtils.isDetailedSample(library.getSample()) ? ((SampleAdditionalInfo) library.getSample()).getSampleClass() : null);
 
       model.put("owners", LimsSecurityUtils.getPotentialOwners(user, library, securityManager.listAllUsers()));
@@ -909,7 +908,7 @@ public class EditLibraryController {
 
           if (library.getLibraryAdditionalInfo().getLibraryDesign().getId() == -1) {
             library.getLibraryAdditionalInfo().setLibraryDesign(null);
-          } else {
+          } else if (library.getLibraryAdditionalInfo().getLibraryDesign() != null) {
             // If a design is selected, these form elements are disabled and therefore not submitted.
             LibraryDesign design = libraryDesignDao.getLibraryDesign(library.getLibraryAdditionalInfo().getLibraryDesign().getId());
             library.getLibraryAdditionalInfo().setLibraryDesign(design);
