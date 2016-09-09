@@ -1245,6 +1245,16 @@ Sample.ui = {
       jQuery('#errors').css('display', 'block');
       return false;
     }
+    // do another check for which samples have been selected
+    Sample.selectedIdsArray = Sample.ui.getSelectedIds();
+    if (Sample.selectedIdsArray.length === 0) {
+      alert("Please select one or more Samples.");
+      return false;
+    }
+    if (Sample.ui.getUniqueCategoriesForSelected().length !== 1) {
+      Sample.ui.displayMultipleCategoriesError();
+      return false;
+    }
     window.location="sample/bulk/create/" + Sample.selectedIdsArray.join(',') + "&scid=" + selectedClassId;
   },
   
