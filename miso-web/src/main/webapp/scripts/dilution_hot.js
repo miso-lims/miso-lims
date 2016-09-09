@@ -150,7 +150,7 @@ var Dilution = {
           type: 'dropdown',
           trimDropdown: false,
           source: Dilution.hot.getTarSeqs(),
-          validator: permitEmpty,
+          validator: Hot.permitEmpty,
           include: isDetailed
         }
       ].filter(function(x) { return x.include; });
