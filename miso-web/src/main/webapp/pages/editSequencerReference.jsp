@@ -231,21 +231,18 @@
       </c:choose>
       <div id="records_arrowclick" class="toggleLeft"></div>
     </div>
+    <h1>Service Records</h1>
     <div id="recordsdiv" style="display:none;">
-      <h1>Service Records</h1>
       <ul class="sddm">
         <li>
-          <c:if test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')
-            or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_TECH')}">
-              <a onmouseover="mopen('recordmenu')" onmouseout="mclosetime()">
-                Options
-                <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
-              </a>
-          </c:if>
+          <a onmouseover="mopen('recordmenu')" onmouseout="mclosetime()">
+            Options
+            <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
+          </a>
           <div id="recordmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
             <c:choose>
               <c:when test="${sequencerReference.dateDecommissioned == null}">
-                <a href='<c:url value="/miso/stats/sequencer/servicerecord/new/${sequencerReference.id}"/> '>Add new Service Record</a>
+                <a href='<c:url value="/miso/sequencer/servicerecord/new/${sequencerReference.id}"/> '>Add new Service Record</a>
               </c:when>
               <c:otherwise>
                 <a class="disabled" onclick="alert('Cannot add Service Records to a retired Sequencer')">Add new Service Record</a>
