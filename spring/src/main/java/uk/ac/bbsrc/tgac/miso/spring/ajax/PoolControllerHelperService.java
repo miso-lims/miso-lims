@@ -674,8 +674,9 @@ public class PoolControllerHelperService {
                 info.append("<br/>Strategy: " + l.getLibrary().getLibraryStrategyType().getName());
               } else if (element instanceof Sample) {
                 Sample l = (Sample) element;
-                info.append("<br/><small><u><a href='/miso/project/" + l.getProject().getId() + "'>" + l.getProject().getAlias() + " ("
-                    + l.getProject().getName() + ")</a></u>");
+                info.append(
+                    "<br/><small><u><a href='/miso/project/" + l.getProject().getId() + "'>" + l.getProject().getAlias() + " ("
+                        + l.getProject().getName() + ")</a></u>");
               }
             }
             info.append("</li>");
@@ -801,6 +802,7 @@ public class PoolControllerHelperService {
     if (json.has("platform") && !isStringEmptyOrNull(json.getString("platform"))) {
       try {
         String platform = json.getString("platform");
+        long poolId = json.has("poolId") ? json.getLong("poolId") : 0L;
         JSONObject j = new JSONObject();
         JSONArray arr = new JSONArray();
         for (LibraryDilution libraryDilution : requestManager.listAllLibraryDilutionsByPlatform((PlatformType.get(platform)))) {
@@ -813,8 +815,9 @@ public class PoolControllerHelperService {
           collectIndices(indices, libraryDilution);
           pout.add(indices.toString());
           pout.add(libraryDilution.getLibrary().isLowQuality() ? "⚠" : "");
-          pout.add("<div style='cursor:pointer;' onmousedown=\"Pool.search.poolSearchSelectElement('" + libraryDilution.getId() + "', '"
-              + libraryDilution.getName() + "')\"><span class=\"ui-icon ui-icon-plusthick\"></span></div>");
+          pout.add(
+              "<div style='cursor:pointer;' onmousedown=\"Pool.search.poolSearchSelectElement(" + poolId + ", '" + libraryDilution.getId()
+                  + "', '" + libraryDilution.getName() + "')\"><span class=\"ui-icon ui-icon-plusthick\"></span></div>");
           arr.add(pout);
         }
         j.put("poolelements", arr);
@@ -875,6 +878,61 @@ public class PoolControllerHelperService {
     }
 
     return JSONUtils.SimpleJSONResponse("Note saved successfully");
+  }
+
+  public <P extends Poolable<?, ?>> JSONObject addPoolableElement(HttpSession session, JSONObject json) {
+    Long poolId = json.getLong("poolId");
+    Long dilutionId = json.getLong("dilutionId");
+    try {
+      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+      @SuppressWarnings("unchecked")
+      Pool<P> pool = (Pool<P>) requestManager.getPoolById(poolId);
+      if (!pool.userCanWrite(user)) {
+        return JSONUtils.SimpleJSONError("Not authorized to modify pool.");
+      }
+      @SuppressWarnings("unchecked")
+      P target = (P) requestManager.getLibraryDilutionById(dilutionId);
+      if (target == null) {
+        return JSONUtils.SimpleJSONError("No such element.");
+      }
+      pool.getPoolableElements().add(target);
+      pool.setLastModified(new Date());
+      pool.setLastModifier(user);
+      requestManager.savePool(pool);
+      return JSONUtils.SimpleJSONResponse("Pool modified.");
+    } catch (IOException e) {
+      log.error("Add poolable element", e);
+      return JSONUtils.SimpleJSONError(e.getMessage());
+    }
+  }
+
+  public JSONObject removePoolableElement(HttpSession session, JSONObject json) {
+    Long poolId = json.getLong("poolId");
+    Long dilutionId = json.getLong("dilutionId");
+    try {
+      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+      Pool<? extends Poolable<?, ?>> pool = requestManager.getPoolById(poolId);
+      if (!pool.userCanWrite(user)) {
+        return JSONUtils.SimpleJSONError("Not authorized to modify pool.");
+      }
+      Poolable<?, ?> target = null;
+      for (Poolable<?, ?> element : pool.getPoolableElements()) {
+        if (element.getId() == dilutionId) {
+          target = element;
+          break;
+        }
+      }
+      if (target != null) {
+        pool.getPoolableElements().remove(target);
+        pool.setLastModified(new Date());
+        pool.setLastModifier(user);
+        requestManager.savePool(pool);
+      }
+      return JSONUtils.SimpleJSONResponse("Pool modified.");
+    } catch (IOException e) {
+      log.error("Remove poolable element", e);
+      return JSONUtils.SimpleJSONError(e.getMessage());
+    }
   }
 
   public void setSecurityManager(SecurityManager securityManager) {
