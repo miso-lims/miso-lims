@@ -1,3 +1,5 @@
+-- nebnext8bp_indices
+--StartNoTest
 INSERT INTO IndexFamily (name, platformType) VALUES ('NEBNext8bp', 'ILLUMINA');
 
 SELECT indexFamilyId INTO @familyId FROM IndexFamily WHERE name = 'NEBNext8bp';
@@ -98,3 +100,5 @@ INSERT INTO Indices (name, sequence, position, indexFamilyId) VALUES
 ('94_H10', 'CTCGACTT', 1, @familyId),
 ('95_H11', 'CTTCGGTT', 1, @familyId),
 ('96_H12', 'CCACAACA', 1, @familyId);
+--EndNoTest
+
