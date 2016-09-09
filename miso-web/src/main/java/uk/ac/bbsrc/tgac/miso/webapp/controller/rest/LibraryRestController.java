@@ -155,6 +155,7 @@ public class LibraryRestController extends RestController {
       Library library = Dtos.to(libraryDto);
       library.setCreationDate(new Date());
       library.setSample(requestManager.getSampleById(libraryDto.getParentSampleId()));
+      library.inheritPermissions(library.getSample());
       id = populateAndSaveLibraryFromDto(libraryDto, library, true);
     } catch (ConstraintViolationException | IllegalArgumentException e) {
       log.error("Error while creating library. ", e);

@@ -37,6 +37,7 @@ import com.eaglegenomics.simlims.core.store.SecurityStore;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
+import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
@@ -152,7 +153,7 @@ public class HibernateSampleDao implements SampleDao {
    * 
    * @returns the original object after mutation.
    */
-  private Sample fetchSqlStore(Sample sample) throws IOException {
+  private <T extends Sample> T fetchSqlStore(T sample) throws IOException {
     if (sample == null) return null;
     // Now we have to reconstitute all the things that aren't covered by Hibernate.
     sample.setSecurityProfile(securityDao.getSecurityProfileById(sample.getSecurityProfileId()));
@@ -373,8 +374,8 @@ public class HibernateSampleDao implements SampleDao {
     for (int i = 0; i < searchProperties.length; i++) {
       criteria[i] = Restrictions.ilike(searchProperties[i], str, MatchMode.ANYWHERE);
     }
-    criteria[searchProperties.length] = Restrictions.and(Restrictions.eq("class", IdentityImpl.class),
-        Restrictions.ilike("externalName", str, MatchMode.ANYWHERE));
+    criteria[searchProperties.length] = Restrictions
+        .and(Restrictions.eq("class", IdentityImpl.class), Restrictions.ilike("externalName", str, MatchMode.ANYWHERE));
     return Restrictions.or(criteria);
   }
 
@@ -544,5 +545,12 @@ public class HibernateSampleDao implements SampleDao {
   @Override
   public Map<String, Integer> getSampleColumnSizes() throws IOException {
     return DbUtils.getColumnSizes(template, "Sample");
+  }
+
+  @Override
+  public Identity getIdentityByExternalName(String externalName) throws IOException {
+    Query query = currentSession().createQuery("FROM IdentityImpl I WHERE I.externalName = :externalName");
+    query.setParameter("externalName", externalName);
+    return fetchSqlStore((Identity) query.uniqueResult());
   }
 }

@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.service;
 import java.io.IOException;
 import java.util.List;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 
 public interface SampleService {
@@ -26,5 +27,7 @@ public interface SampleService {
   Long countAll() throws IOException;
 
   Long countBySearch(String querystr) throws IOException;
+
+  Identity getIdentityByExternalName(String externalName) throws IOException;
 
 }
