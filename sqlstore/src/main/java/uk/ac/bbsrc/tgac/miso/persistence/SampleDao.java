@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
@@ -50,5 +51,7 @@ public interface SampleDao extends SampleStore {
   Long countAll() throws IOException;
 
   Long countBySearch(String querystr) throws IOException;
+
+  Identity getIdentityByExternalName(String externalName) throws IOException;
 
 }

@@ -1,6 +1,10 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.io.IOException;
 
 import org.hibernate.SessionFactory;
 import org.junit.Before;
@@ -15,8 +19,9 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.store.SecurityStore;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
+import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.DefaultSampleNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
@@ -59,7 +64,7 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
     sut.setSessionFactory(sessionFactory);
     sut.setJdbcTemplate(jdbcTemplate);
   }
-  
+
   @Test
   public void getSampleWithChildrenTest() throws Exception {
     Sample sample = sut.get(15L);
@@ -67,11 +72,12 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
     SampleAdditionalInfo detailed = (SampleAdditionalInfo) sample;
     assertNotNull(detailed.getChildren());
     assertEquals(2, detailed.getChildren().size());
-    for (@SuppressWarnings("unused") Sample child : detailed.getChildren()) {
+    for (@SuppressWarnings("unused")
+    Sample child : detailed.getChildren()) {
       // will throw ClassCastException if children are not correctly loaded as Samples
     }
   }
-  
+
   @Test
   public void getSampleWithParentTest() throws Exception {
     SampleImpl sample = (SampleImpl) sut.get(16L);
@@ -80,6 +86,13 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
     SampleAdditionalInfo detailed = (SampleAdditionalInfo) sample;
     assertNotNull(detailed.getParent());
     assertEquals(15L, detailed.getParent().getId());
+  }
+
+  @Test
+  public void testGetIdentityByExternalName() throws IOException {
+    Identity identity = sut.getIdentityByExternalName("EXT1");
+    assertEquals("EXT1", identity.getExternalName());
+    assertEquals("INT1", identity.getInternalName());
   }
 
 }

@@ -84,6 +84,7 @@
   <script type="text/javascript">
     jQuery(document).ready(function () {
       Library.hot.librariesJSON = ${librariesJSON};
+      Library.hot.librariesJSON = Hot.sortByProperty(Library.hot.librariesJSON, 'parentSampleAlias');
       Hot.dropdownRef = ${referenceDataJSON};
       Hot.dropdownRef.indices = ${indices};
       Hot.dropdownRef.indexFamilies = {};
@@ -97,7 +98,7 @@
       Library.hot.makeBulkCreateTable = function () {
         Library.hot.librariesJSON = Library.hot.prepLibrariesForPropagate(Library.hot.librariesJSON);
         Library.hot.makeHOT(Library.hot.librariesJSON);
-        Library.hot.addPlatformAndTBHooks();
+        Library.hot.addPlatformAndIndexHooks();
       };
 
       Library.hot.makeBulkUpdateTable = function () {

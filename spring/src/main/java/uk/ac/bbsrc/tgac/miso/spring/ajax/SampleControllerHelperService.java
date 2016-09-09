@@ -67,6 +67,7 @@ import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
+import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.EntityGroup;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.PrintJob;
@@ -681,6 +682,16 @@ public class SampleControllerHelperService {
 
     try {
       if (!isStringEmptyOrNull(idBarcode)) {
+        List<Boxable> previouslyBarcodedItems = new ArrayList<Boxable>(requestManager.getBoxablesFromBarcodeList(Arrays.asList(idBarcode)));
+        if (!previouslyBarcodedItems.isEmpty()
+            && !(previouslyBarcodedItems.size() == 1 && previouslyBarcodedItems.get(0).getId() == sampleId)) {
+          Boxable previouslyBarcodedItem = previouslyBarcodedItems.get(0);
+          String error = String.format(
+              "Could not change sample identification barcode to '%s'. This barcode is already in use by an item with the name '%s' and the alias '%s'.",
+              idBarcode, previouslyBarcodedItem.getName(), previouslyBarcodedItem.getAlias());
+          log.debug(error);
+          return JSONUtils.SimpleJSONError(error);
+        }
         User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
         Sample sample = requestManager.getSampleById(sampleId);
         sample.setIdentificationBarcode(idBarcode);

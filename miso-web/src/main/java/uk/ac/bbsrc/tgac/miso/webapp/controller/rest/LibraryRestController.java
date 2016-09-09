@@ -145,11 +145,17 @@ public class LibraryRestController extends RestController {
   @RequestMapping(method = RequestMethod.POST, headers = { "Content-type=application/json" })
   @ResponseBody
   public ResponseEntity<?> createLibrary(@RequestBody LibraryDto libraryDto, UriComponentsBuilder b) throws IOException {
+    if (libraryDto == null) {
+      log.error(
+          "Received null libraryDto from front end; cannot convert to Library. Something likely went wrong in the JS DTO conversion.");
+      throw new RestException("Cannot convert null to Library", Status.BAD_REQUEST);
+    }
     Long id = null;
     try {
       Library library = Dtos.to(libraryDto);
       library.setCreationDate(new Date());
       library.setSample(requestManager.getSampleById(libraryDto.getParentSampleId()));
+      library.inheritPermissions(library.getSample());
       id = populateAndSaveLibraryFromDto(libraryDto, library, true);
     } catch (ConstraintViolationException | IllegalArgumentException e) {
       log.error("Error while creating library. ", e);
@@ -168,6 +174,11 @@ public class LibraryRestController extends RestController {
   @RequestMapping(value = "/{id}", method = RequestMethod.PUT, headers = { "Content-type=application/json" })
   @ResponseBody
   public ResponseEntity<?> updateLibrary(@PathVariable("id") Long id, @RequestBody LibraryDto libraryDto) throws IOException {
+    if (libraryDto == null) {
+      log.error(
+          "Received null libraryDto from front end; cannot convert to Library. Something likely went wrong in the JS DTO conversion.");
+      throw new RestException("Cannot convert null to Library", Status.BAD_REQUEST);
+    }
     Library library = requestManager.getLibraryById(id);
     if (library == null) {
       throw new RestException("No such library.", Status.NOT_FOUND);

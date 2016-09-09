@@ -107,32 +107,29 @@ var Dilution = {
       return [
         // Basic columns
         {
-          header: 'Name',
+          header: 'Dilution Name',
           data: 'name',
-          type: 'text',
           readOnly: true,
           include: true
         },
         {
           header: 'Matrix Barcode',
           data: 'identificationBarcode',
-          type: 'text',
           readOnly: (Hot.autoGenerateIdBarcodes ? true : false),
           include: true
         },
         {
           header: 'Library Alias',
           data: 'library.alias',
-          type: 'text',
           readOnly: true,
           include: true
         },
         {
-          header: 'Conc.',
+          header: 'Conc. (' + Dilution.hot.units + ')',
           data: 'concentration',
           type: 'numeric',
           format: '0.0',
-          validator: requiredText,
+          validator: Hot.requiredNumber,
           include: true
         },
         {
@@ -153,26 +150,10 @@ var Dilution = {
           type: 'dropdown',
           trimDropdown: false,
           source: Dilution.hot.getTarSeqs(),
-          validator: permitEmpty,
+          validator: Hot.permitEmpty,
           include: isDetailed
         }
       ].filter(function(x) { return x.include; });
-      
-      function permitEmpty (value, callback) {
-        if (value === undefined || value === null || value.length > 0 || value === '') {
-          return callback(true);
-        } else {
-          return callback(false);
-        }
-      }
-      
-      function requiredText (value, callback) {
-        if (!value || value.length === 0) {
-          callback(false);
-        } else {
-          callback(true);
-        }
-      }
     },
     
     /**

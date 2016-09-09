@@ -25,7 +25,7 @@ Library.hot = {
       if (lib.libraryAdditionalInfo) {
         // if any members are null, fill them with empty objects otherwise things go poorly
         if (!lib.libraryAdditionalInfo.prepKit) {
-          lib.libraryAdditionalInfo.prepKit = { id: '', alias: '' };
+          lib.libraryAdditionalInfo.prepKit = { id: '', name: '' };
         }
       }
       return lib;
@@ -42,12 +42,14 @@ Library.hot = {
       if (lib.libraryAdditionalInfo) {
         // if any members are null, fill them with empty objects otherwise things go poorly
         if (!lib.libraryAdditionalInfo.prepKit) {
-          lib.libraryAdditionalInfo.prepKit = { id: '', alias: '' };
+          lib.libraryAdditionalInfo.prepKit = { id: '', name: '' };
         }
       }
       if (!lib.indexFamilyName) {
         lib.indexFamilyName = 'No index';
       }
+      if (!lib.index1Label) lib.index1Label = '';
+      if (!lib.index2Label) lib.index2Label = '';
       return lib;
     });
   },
@@ -170,7 +172,7 @@ Library.hot = {
     libraryAdditionalInfo: {
       prepKit: {
         id: '',
-        alias: ''
+        name: ''
       },
       archived: false
     }
@@ -256,12 +258,10 @@ Library.hot = {
         {
           header: 'Sample Alias',
           data: 'parentSampleAlias',
-          type: 'text',
           readOnly: true
         },{
           header: 'Description',
           data: 'description',
-          type: 'text',
           validator: Hot.requiredText
         },{
           header: 'Platform',
@@ -299,6 +299,7 @@ Library.hot = {
           data: 'index1Label',
           type: 'autocomplete',
           strict: true,
+          filter: false,
           allowInvalid: true,
           trimDropdown: false,
           source: [""]
@@ -307,6 +308,7 @@ Library.hot = {
           data: 'index2Label',
           type: 'autocomplete',
           strict: true,
+          filter: false,
           allowInvalid: true,
           trimDropdown: false,
           source: [""]
@@ -315,7 +317,7 @@ Library.hot = {
           data: 'qcPassed',
           type: 'dropdown',
           trimDropdown: false,
-          source: ['true', 'false', 'unknown']
+          source: ['unknown', 'true', 'false']
         },{
           header: 'Volume',
           data: 'volume',
@@ -332,7 +334,7 @@ Library.hot = {
         {
           header: 'Library Alias',
           data: 'alias',
-          type: 'text'
+          validator: Hot.requiredText
         }
       ];
       
@@ -343,7 +345,7 @@ Library.hot = {
       var additionalCols = [
         {
           header: 'Kit',
-          data: 'libraryAdditionalInfo.prepKit.alias',
+          data: 'libraryAdditionalInfo.prepKit.name',
           type: 'dropdown',
           trimDropdown: false,
           source: Library.hot.getKitDescriptors()
@@ -400,7 +402,7 @@ Library.hot = {
     // use stored index family if it has already been retrieved.
     Hot.hotTable.setCellMeta(row, Library.hot.index1ColIndex, 'source', [""]);
     Hot.hotTable.setCellMeta(row, Library.hot.index2ColIndex, 'source', [""]);
-    if (Hot.dropdownRef.indexFamily[platformName]) {
+    if (Hot.dropdownRef.indexFamilies[platformName]) {
       Hot.hotTable.setCellMeta(row, Library.hot.ifamIndex, 'source', Object.keys(Hot.dropdownRef.indices[platformName]));
     } else if (platformName) {
       jQuery.get('../../indexFamiliesJson', {platform: platformName},
@@ -418,8 +420,8 @@ Library.hot = {
    */
   updateIndexCellsSources: function (row, platformName, ifam) {
     function setIndexSource (platformName, ifam, pos, len) {
-      Hot.hotTable.setCellMeta(row, Library.hot['tb' + pos + 'ColIndex'], 'source', Library.hot.getIndexLabels(Hot.dropdownRef.indices[platformName][ifam][pos]));
-      Hot.hotTable.setCellMeta(row, Library.hot['tb' + pos + 'ColIndex'], 'readOnly', false);
+      Hot.hotTable.setCellMeta(row, Library.hot['index' + pos + 'ColIndex'], 'source', Library.hot.getIndexLabels(Hot.dropdownRef.indices[platformName][ifam][pos]));
+      Hot.hotTable.setCellMeta(row, Library.hot['index' + pos + 'ColIndex'], 'readOnly', false);
       // empty source array for index 2 column in case there are no indices for position 2
       if (pos == 1) {
         Hot.hotTable.setCellMeta(row, Library.hot['index2ColIndex'], 'source', [""]);
@@ -564,9 +566,9 @@ Library.hot = {
 
       if (obj.libraryAdditionalInfo) {
         lib.libraryAdditionalInfo = {};
-        if (obj.libraryAdditionalInfo.prepKit.alias) {
-          var prepKitAlias = obj.libraryAdditionalInfo.prepKit.alias;
-          lib.libraryAdditionalInfo.prepKit = Hot.sampleOptions.kitDescriptorsDtos.filter(function (kd) { return (kd.name == prepKitAlias); })[0];
+        if (obj.libraryAdditionalInfo.prepKit.name) {
+          var prepKitName = obj.libraryAdditionalInfo.prepKit.name;
+          lib.libraryAdditionalInfo.prepKit = Hot.sampleOptions.kitDescriptorsDtos.filter(function (kd) { return (kd.name == prepKitName); })[0];
         }
         if (obj.libraryAdditionalInfo.archived) {
           lib.libraryAdditionalInfo.archived = obj.libraryAdditionalInfo.archived;

@@ -80,10 +80,12 @@
   <script type="text/javascript">
     jQuery(document).ready(function () {
       Dilution.hot.librariesJSON = ${librariesJSON};
+      Dilution.hot.librariesJSON = Hot.sortByProperty(Dilution.hot.librariesJSON, 'alias');
       Hot.detailedSample = JSON.parse(document.getElementById('HOTbulkForm').dataset.detailedSample);
       Hot.saveButton = document.getElementById('saveDilutions');
       Dilution.hot.propagateOrEdit = "${method}";
       Hot.autoGenerateIdBarcodes = ${autoGenerateIdBarcodes};
+      Dilution.hot.units = "${libraryDilutionUnits}";
 
       Dilution.hot.makeBulkCreateTable = function () {
         Dilution.hot.dilutionsJSON = Dilution.hot.modifyLibrariesForDilutions(Dilution.hot.librariesJSON);

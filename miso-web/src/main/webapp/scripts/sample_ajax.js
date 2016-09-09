@@ -213,7 +213,7 @@ var Sample = Sample || {
       {
         'doOnSuccess': function(json) {
           // don't validate the alias if the sample or its parent has a nonstandard alias
-          if (jQuery('#nonStandardAlias')) {
+          if (jQuery('#nonStandardAlias').length) {
             jQuery('#sample-form').parsley();
             jQuery('#sample-form').parsley().validate();
             Validate.updateWarningOrSubmit('#sample-form');
@@ -1243,6 +1243,16 @@ Sample.ui = {
     if (!selectedClassId) {
       jQuery('#errors').html("Please select a sample class for child samples.");
       jQuery('#errors').css('display', 'block');
+      return false;
+    }
+    // do another check for which samples have been selected
+    Sample.selectedIdsArray = Sample.ui.getSelectedIds();
+    if (Sample.selectedIdsArray.length === 0) {
+      alert("Please select one or more Samples.");
+      return false;
+    }
+    if (Sample.ui.getUniqueCategoriesForSelected().length !== 1) {
+      Sample.ui.displayMultipleCategoriesError();
       return false;
     }
     window.location="sample/bulk/create/" + Sample.selectedIdsArray.join(',') + "&scid=" + selectedClassId;

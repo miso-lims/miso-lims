@@ -39,7 +39,7 @@ import uk.ac.bbsrc.tgac.miso.migration.MigrationData;
 import uk.ac.bbsrc.tgac.miso.migration.MigrationProperties;
 
 public class DefaultMigrationTarget implements MigrationTarget {
-  
+
   private static final Logger log = Logger.getLogger(DefaultMigrationTarget.class);
 
   private static final String OPT_DB_HOST = "target.db.host";
@@ -47,21 +47,21 @@ public class DefaultMigrationTarget implements MigrationTarget {
   private static final String OPT_DB_NAME = "target.db.name";
   private static final String OPT_DB_USER = "target.db.user";
   private static final String OPT_DB_PASS = "target.db.pass";
-  
+
   private static final String OPT_MISO_USER = "target.miso.user";
-  
+
   private static final String OPT_DRY_RUN = "target.dryrun";
   private static final String OPT_REPLACE_CHANGELOGS = "target.replaceChangeLogs";
-  
+
   private final SessionFactory sessionFactory;
   private final MisoServiceManager serviceManager;
   private final ValueTypeLookup valueTypeLookup;
-  
+
   private boolean dryrun = false;
   private boolean replaceChangeLogs = false;
-  
+
   private Date timeStamp;
-  
+
   public DefaultMigrationTarget(MigrationProperties properties) throws IOException {
     this.timeStamp = new Date();
     this.dryrun = properties.getBoolean(OPT_DRY_RUN, false);
@@ -70,8 +70,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
     DataSource dsProxy = new TransactionAwareDataSourceProxy(datasource);
     this.sessionFactory = MisoTargetUtils.makeSessionFactory(dsProxy);
     JdbcTemplate jdbcTemplate = new JdbcTemplate(datasource);
-    this.serviceManager = MisoServiceManager.buildWithDefaults(jdbcTemplate, sessionFactory,
-        properties.getRequiredString(OPT_MISO_USER));
+    this.serviceManager = MisoServiceManager.buildWithDefaults(jdbcTemplate, sessionFactory, properties.getRequiredString(OPT_MISO_USER));
     this.valueTypeLookup = readInTransaction(new TransactionWork<ValueTypeLookup>() {
       @Override
       public ValueTypeLookup doWork() throws IOException {
@@ -83,7 +82,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
     txManager.setHibernateManagedSession(true);
     TransactionSynchronizationManager.initSynchronization();
   }
-  
+
   private static DataSource makeDataSource(MigrationProperties properties) {
     String dbHost = properties.getRequiredString(OPT_DB_HOST);
     String dbPort = properties.getRequiredString(OPT_DB_PORT);
@@ -98,7 +97,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
   @Override
   public void migrate(final MigrationData data) throws IOException {
     log.info(dryrun ? "Doing a dry run" : "Changes will be saved");
-    
+
     Transaction tx = sessionFactory.getCurrentSession().beginTransaction();
     try {
       doMigration(data);
@@ -113,13 +112,13 @@ public class DefaultMigrationTarget implements MigrationTarget {
       throw e;
     }
   }
-  
+
   private void doMigration(MigrationData data) throws IOException {
     saveProjects(data.getProjects());
     saveSamples(data.getSamples());
     saveLibraries(data.getLibraries());
     saveLibraryDilutions(data.getDilutions());
-    
+
     // Resolution of run also resolves pool PlatformType
     Collection<Pool<LibraryDilution>> pools = data.getPools();
     Collection<Run> runs = data.getRuns();
@@ -148,7 +147,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
     }
     log.info(samples.size() + " samples migrated.");
   }
-  
+
   private void saveSample(Sample sample) throws IOException {
     if (sample.getId() != Sample.UNSAVED_ID) {
       // already saved
@@ -160,10 +159,10 @@ public class DefaultMigrationTarget implements MigrationTarget {
     }
     sample.inheritPermissions(sample.getProject());
     valueTypeLookup.resolveAll(sample);
-    
+
     Collection<SampleQC> qcs = new TreeSet<>(sample.getSampleQCs());
     Collection<Note> notes = new HashSet<>(sample.getNotes());
-    
+
     if (LimsUtils.isDetailedSample(sample)) {
       SampleAdditionalInfo detailed = (SampleAdditionalInfo) sample;
       if (detailed.getSubproject() != null && detailed.getSubproject().getId() == null) {
@@ -183,27 +182,27 @@ public class DefaultMigrationTarget implements MigrationTarget {
     saveSampleNotes(sample, notes);
     log.debug("Saved sample " + sample.getAlias());
   }
-  
+
   private void createSubproject(Subproject subproject, Long referenceGenomeId) {
     subproject.setDescription(subproject.getAlias());
     subproject.setPriority(Boolean.FALSE);
     subproject.setReferenceGenomeId(referenceGenomeId);
     subproject.setId(serviceManager.getSubprojectDao().addSubproject(subproject));
   }
-  
+
   private static boolean hasParent(Sample sample) {
     return LimsUtils.isDetailedSample(sample) && ((SampleAdditionalInfo) sample).getParent() != null;
   }
-  
+
   private void saveSampleChangeLog(Sample sample, Collection<ChangeLog> changes) throws IOException {
     if (changes == null || changes.isEmpty()) throw new IOException("Cannot save sample due to missing changelogs");
     serviceManager.getChangeLogDao().deleteAllById("sample", sample.getId());
     for (ChangeLog change : changes) {
-      change.setUserId(serviceManager.getAuthorizationManager().getCurrentUser().getUserId());
+      change.setUser(serviceManager.getAuthorizationManager().getCurrentUser());
       serviceManager.getChangeLogDao().create("sample", sample.getId(), change);
     }
   }
-  
+
   private void saveSampleQcs(Sample sample, Collection<SampleQC> qcs) throws IOException {
     User user = serviceManager.getAuthorizationManager().getCurrentUser();
     Date date = (replaceChangeLogs && sample.getChangeLog() != null) ? getLatestChangeDate(sample) : timeStamp;
@@ -219,7 +218,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
       qc.setId(serviceManager.getSampleQcDao().save(qc));
     }
   }
-  
+
   private void saveSampleNotes(Sample sample, Collection<Note> notes) throws IOException {
     User user = serviceManager.getAuthorizationManager().getCurrentUser();
     Date date = (replaceChangeLogs && sample.getChangeLog() != null) ? getLatestChangeDate(sample) : timeStamp;
@@ -229,7 +228,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
       note.setNoteId(serviceManager.getNoteDao().saveSampleNote(sample, note));
     }
   }
-  
+
   private static Date getLatestChangeDate(Sample sample) {
     Date latest = null;
     for (ChangeLog change : sample.getChangeLog()) {
@@ -261,12 +260,12 @@ public class DefaultMigrationTarget implements MigrationTarget {
     }
     log.info(libraries.size() + " libraries migrated.");
   }
-  
+
   private void saveLibraryChangeLog(Library library, Collection<ChangeLog> changes) throws IOException {
     if (changes == null || changes.isEmpty()) throw new IOException("Cannot save library due to missing changelogs");
     serviceManager.getChangeLogDao().deleteAllById("library", library.getId());
     for (ChangeLog change : changes) {
-      change.setUserId(serviceManager.getAuthorizationManager().getCurrentUser().getUserId());
+      change.setUser(serviceManager.getAuthorizationManager().getCurrentUser());
       serviceManager.getChangeLogDao().create("library", library.getId(), change);
     }
   }
@@ -282,7 +281,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
         ldi.setCreationDate(timeStamp);
         ldi.setLastModified(timeStamp);
       }
-      
+
       ldi.setId(serviceManager.getDilutionDao().save(ldi));
       log.debug("Saved library dilution " + ldi.getName());
     }
@@ -291,7 +290,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
 
   public void savePools(final Collection<Pool<LibraryDilution>> pools) throws IOException {
     log.info("Migrating pools...");
-    
+
     User user = serviceManager.getAuthorizationManager().getCurrentUser();
     for (Pool<LibraryDilution> pool : pools) {
       pool.setCreationDate(timeStamp);
@@ -323,7 +322,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
     }
     log.info(runs.size() + " runs migrated.");
   }
-  
+
   private void updateRun(Run from, Run to) throws IOException {
     log.debug("Updating run " + to.getId());
     to.getStatus().setCompletionDate(to.getStatus().getCompletionDate());
@@ -351,13 +350,14 @@ public class DefaultMigrationTarget implements MigrationTarget {
       }
     }
   }
-  
+
   /**
    * Performs work in a transaction, rolling back after it completes
    * 
    * @param work
    * @return
-   * @throws IOException if any exception is thrown while in the transaction
+   * @throws IOException
+   *           if any exception is thrown while in the transaction
    */
   private <T> T readInTransaction(TransactionWork<T> work) throws IOException {
     Transaction tx = sessionFactory.getCurrentSession().beginTransaction();
@@ -368,11 +368,12 @@ public class DefaultMigrationTarget implements MigrationTarget {
       tx.rollback();
     }
   }
-  
+
   /**
    * Functional interface for work to be done in a transaction
    * 
-   * @param <T> return type of work
+   * @param <T>
+   *          return type of work
    */
   private static interface TransactionWork<T> {
     public T doWork() throws IOException;

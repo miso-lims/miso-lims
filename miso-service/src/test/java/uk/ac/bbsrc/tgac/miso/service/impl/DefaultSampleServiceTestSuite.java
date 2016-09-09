@@ -21,6 +21,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Lists;
 
@@ -54,7 +55,6 @@ import uk.ac.bbsrc.tgac.miso.persistence.SubprojectDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueMaterialDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueOriginDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueTypeDao;
-import uk.ac.bbsrc.tgac.miso.service.IdentityService;
 import uk.ac.bbsrc.tgac.miso.service.SampleAdditionalInfoService;
 import uk.ac.bbsrc.tgac.miso.service.SampleNumberPerProjectService;
 import uk.ac.bbsrc.tgac.miso.service.SampleTissueService;
@@ -81,9 +81,6 @@ public class DefaultSampleServiceTestSuite {
 
   @Mock
   private SampleAdditionalInfoService sampleAdditionalInfoService;
-
-  @Mock
-  private IdentityService identityService;
 
   @Mock
   private SampleValidRelationshipService sampleValidRelationshipService;
@@ -166,7 +163,8 @@ public class DefaultSampleServiceTestSuite {
   @Test
   public void nullSampleObjectNameTest() throws Exception {
     Sample sample = null;
-    assertFalse("A null sample object does not contain a temporary name so must return false.",
+    assertFalse(
+        "A null sample object does not contain a temporary name so must return false.",
         DefaultSampleService.hasTemporaryName(sample));
   }
 
@@ -263,6 +261,8 @@ public class DefaultSampleServiceTestSuite {
 
     Identity shellParent = new IdentityImpl();
     shellParent.setExternalName(parent.getExternalName());
+    shellParent.setSecurityProfile(parent.getSecurityProfile());
+    shellParent.getSecurityProfile().setOwner(mockUser());
     child.setParent(shellParent);
 
     Long newId = 89L;
@@ -299,6 +299,8 @@ public class DefaultSampleServiceTestSuite {
     SampleTissue sample = makeUnsavedChildTissue();
     Identity fakeParent = new IdentityImpl();
     fakeParent.setExternalName("non-existing");
+    fakeParent.setSecurityProfile(new SecurityProfile(mockUser()));
+    fakeParent.getSecurityProfile().setOwner(mockUser());
     sample.setParent(fakeParent);
     mockShellProjectWithRealLookup(sample);
     mockUser();
@@ -446,12 +448,12 @@ public class DefaultSampleServiceTestSuite {
   private Identity makeParentIdentityWithLookup() throws IOException {
     Identity sample = makeUnsavedParentIdentity();
     Mockito.when(sampleDao.getSample(sample.getId())).thenReturn(sample);
-    Mockito.when(identityService.get(sample.getExternalName())).thenReturn(sample);
+    Mockito.when(sampleDao.getIdentityByExternalName(sample.getExternalName())).thenReturn(sample);
     Mockito.when(sampleClassDao.listByCategory(Mockito.eq(Identity.CATEGORY_NAME))).thenReturn(Lists.newArrayList(sample.getSampleClass()));
     return sample;
   }
 
-  private Identity makeUnsavedParentIdentity() {
+  private Identity makeUnsavedParentIdentity() throws IOException {
     Identity sample = new IdentityImpl();
     sample.setId(63L);
     sample.setSampleClass(new SampleClassImpl());
@@ -459,6 +461,8 @@ public class DefaultSampleServiceTestSuite {
     sample.getSampleClass().setAlias("identity");
     sample.getSampleClass().setSampleCategory(Identity.CATEGORY_NAME);
     sample.setExternalName("external");
+    sample.setSecurityProfile(new SecurityProfile(mockUser()));
+    sample.getSecurityProfile().setOwner(mockUser());
     return sample;
   }
 
@@ -505,8 +509,7 @@ public class DefaultSampleServiceTestSuite {
    * Adds a shell project to the provided Sample, and adds the real project to the mocked projectStore. The projectStore should be queried
    * to swap in the persisted object in place of the shell
    * 
-   * @param sample
-   *          the Sample to add shell project to
+   * @param sample the Sample to add shell project to
    * @return the "real" project that will be returned by the mock projectStore
    * @throws IOException
    */
@@ -519,6 +522,8 @@ public class DefaultSampleServiceTestSuite {
     Project project = new ProjectImpl();
     project.setId(shell.getId());
     project.setAlias("real_project");
+    project.setSecurityProfile(new SecurityProfile(mockUser()));
+    project.getSecurityProfile().setOwner(mockUser());
     Mockito.when(projectStore.get(shell.getId())).thenReturn(project);
     Mockito.when(projectStore.lazyGet(shell.getId())).thenReturn(project);
     return project;

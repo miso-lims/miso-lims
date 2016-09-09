@@ -46,6 +46,7 @@ BEGIN
     DELETE FROM _Partition;
     DELETE FROM Status;
     DELETE FROM Run;
+    DELETE FROM PoolOrder;
     DELETE FROM Pool;
     DELETE FROM Pool_Elements;
     DELETE FROM LibraryDilution;
@@ -66,6 +67,7 @@ BEGIN
     DELETE FROM SampleChangeLog;
     DELETE FROM Sample;
     DELETE FROM SampleNumberPerProject;
+    DELETE FROM Subproject;
     DELETE FROM Project;
     DELETE FROM Note;
     

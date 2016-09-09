@@ -424,7 +424,7 @@
 	            });
 	          </script>
           </span>
-          <span onclick='Utils.ui.confirmRemove(jQuery(this).parent());'
+          <span onclick='Pool.ui.removePoolableElement(${pool.id}, ${dil.id}, jQuery(this).parent());'
                 class='float-right ui-icon ui-icon-circle-close'></span>
         </div>
       </c:forEach>
@@ -442,14 +442,7 @@
 
 <script type="text/javascript">
     jQuery(document).ready(function () {
-        <c:choose>
-        <c:when test="${pool.id != 0}">
-        Pool.ui.createElementSelectDatatable('${pool.platformType.key}', '${libraryDilutionUnits}');
-        </c:when>
-        <c:otherwise>
-        Pool.ui.createElementSelectDatatable('Illumina', '${libraryDilutionUnits}');
-        </c:otherwise>
-        </c:choose>
+        Pool.ui.createElementSelectDatatable('<c:out value="${pool.platformType.key}" default="Illumina"/>', ${pool.id}, '${libraryDilutionUnits}');
     });
 </script>
 </div>
@@ -461,6 +454,7 @@
     <table class="list" id="changelog_table">
       <thead>
       <tr>
+        <th>Editor</th>
         <th>Summary</th>
         <th>Time</th>
       </tr>
@@ -468,6 +462,7 @@
       <tbody>
       <c:forEach items="${pool.changeLog}" var="change">
         <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
+          <td>${change.user.fullName} (${change.user.loginName})</td>
           <td><b>${change.summary}</b></td>
           <td>${change.time}</td>
         </tr>

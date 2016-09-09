@@ -54,11 +54,8 @@ FOR EACH ROW
         CASE WHEN (NEW.volume IS NULL) <> (OLD.volume IS NULL) OR NEW.volume <> OLD.volume THEN 'volume' END
   ), ''),
       NEW.lastModifier,
-      CONCAT(
-        (SELECT fullname FROM User WHERE userId = NEW.lastModifier),
-        ' has changed: ',
-        log_message
-      ));
+      log_message
+      );
   END IF;
   END//
 
@@ -92,11 +89,8 @@ FOR EACH ROW
         CASE WHEN (NEW.subprojectId IS NULL) <> (OLD.subprojectId IS NULL) OR NEW.subprojectId <> OLD.subprojectId THEN 'subprojectId' END
       ), ''),
       (SELECT lastModifier FROM Sample WHERE sampleId = NEW.sampleId),
-      CONCAT(
-        (SELECT fullname FROM User WHERE userId = (SELECT lastModifier FROM Sample WHERE sampleId = NEW.sampleId)),
-        ' has changed: ',
-        log_message
-      ));
+      log_message
+      );
   END IF;
   END//
 
@@ -114,11 +108,8 @@ FOR EACH ROW
         CASE WHEN (NEW.samplePurposeId IS NULL) <> (OLD.samplePurposeId IS NULL) OR NEW.samplePurposeId <> OLD.samplePurposeId THEN 'samplePurposeId' END
       ), ''),
       (SELECT lastModifier FROM Sample WHERE sampleId = NEW.sampleId),
-      CONCAT(
-        (SELECT fullname FROM User WHERE userId = (SELECT lastModifier FROM Sample WHERE sampleId = NEW.sampleId)),
-        ' has changed: ',
-        log_message
-      ));
+      log_message
+      );
   END IF;
   END//
 
@@ -140,11 +131,8 @@ FOR EACH ROW
         CASE WHEN (NEW.thickness IS NULL) <> (OLD.thickness IS NULL) OR NEW.thickness <> OLD.thickness THEN 'thickness' END
       ), ''),
       (SELECT lastModifier FROM Sample WHERE sampleId = NEW.sampleId),
-      CONCAT(
-        (SELECT fullname FROM User WHERE userId = (SELECT lastModifier FROM Sample WHERE sampleId = NEW.sampleId)),
-        ' has changed: ',
-        log_message
-      ));
+      log_message
+      );
   END IF;
   END//
 
@@ -162,11 +150,8 @@ FOR EACH ROW
         CASE WHEN NEW.slidesConsumed <> OLD.slidesConsumed THEN 'slides' END
       ), ''),
       (SELECT lastModifier FROM Sample WHERE sampleId = NEW.sampleId),
-      CONCAT(
-        (SELECT fullname FROM User WHERE userId = (SELECT lastModifier FROM Sample WHERE sampleId = NEW.sampleId)),
-        ' has changed: ',
-        log_message
-      ));
+      log_message
+      );
   END IF;
   END//
 
@@ -186,11 +171,8 @@ FOR EACH ROW
          CASE WHEN NEW.strStatus <> OLD.strStatus THEN 'strStatus' END
       ), ''),
       (SELECT lastModifier FROM Sample WHERE sampleId = NEW.sampleId),
-      CONCAT(
-        (SELECT fullname FROM User WHERE userId = (SELECT lastModifier FROM Sample WHERE sampleId = NEW.sampleId)),
-        ' has changed: ',
-        log_message
-      ));
+      log_message
+      );
   END IF;
   END//
 
@@ -222,11 +204,8 @@ FOR EACH ROW
          CASE WHEN (NEW.tubeNumber IS NULL) <> (OLD.tubeNumber IS NULL) OR NEW.tubeNumber <> OLD.tubeNumber THEN 'tubeNumber' END
       ), ''),
       (SELECT lastModifier FROM Sample WHERE sampleId = NEW.sampleId),
-      CONCAT(
-        (SELECT fullname FROM User WHERE userId = (SELECT lastModifier FROM Sample WHERE sampleId = NEW.sampleId)),
-        ' has changed: ',
-        log_message
-      ));
+      log_message
+      );
   END IF;
   END//
 
@@ -248,11 +227,8 @@ FOR EACH ROW
         CASE WHEN NEW.internalName <> OLD.internalName THEN 'internalName' END
       ), ''),
       (SELECT lastModifier FROM Sample WHERE sampleId = NEW.sampleId),
-      CONCAT(
-        (SELECT fullname FROM User WHERE userId = (SELECT lastModifier FROM Sample WHERE sampleId = NEW.sampleId)),
-        ' has changed: ',
-        log_message
-      ));
+      log_message
+      );
   END IF;
   END//
 
@@ -269,9 +245,7 @@ FOR EACH ROW
     NEW.sampleId,
     '',
     NEW.lastModifier,
-    CONCAT(
-      (SELECT fullname FROM User WHERE userId = NEW.lastModifier),
-      ' created sample.'))//
+    'Sample created.')//
 
 DROP TRIGGER IF EXISTS PlateChange//
 CREATE TRIGGER PlateChange BEFORE UPDATE ON Plate
@@ -294,10 +268,7 @@ FOR EACH ROW
         CASE WHEN (NEW.indexId IS NULL) <> (OLD.indexId IS NULL) OR NEW.indexId <> OLD.indexId THEN 'indexId' END,
         CASE WHEN NEW.description <> OLD.description THEN 'description' END), ''),
       NEW.lastModifier,
-      CONCAT(
-        (SELECT fullname FROM User WHERE userId = NEW.lastModifier),
-        ' has changed: ',
-        log_message));
+      log_message);
   END IF;
   END//
 
@@ -308,9 +279,7 @@ FOR EACH ROW
     NEW.plateId,
     '',
     NEW.lastModifier,
-    CONCAT(
-      (SELECT fullname FROM User WHERE userId = NEW.lastModifier),
-      ' created plate.'))//
+    'Plate created.')//
 
 DROP TRIGGER IF EXISTS RunChange//
 CREATE TRIGGER RunChange BEFORE UPDATE ON Run
@@ -344,10 +313,7 @@ FOR EACH ROW
         CASE WHEN (NEW.sequencerReference_sequencerReferenceId IS NULL) <> (OLD.sequencerReference_sequencerReferenceId IS NULL) OR NEW.sequencerReference_sequencerReferenceId <> OLD.sequencerReference_sequencerReferenceId THEN 'sequencerReference_sequencerReferenceId' END,
         CASE WHEN (NEW.status_statusId IS NULL) <> (OLD.status_statusId IS NULL) OR NEW.status_statusId <> OLD.status_statusId THEN 'status_statusId' END), ''),
       NEW.lastModifier,
-      CONCAT(
-        (SELECT fullname FROM User WHERE userId = NEW.lastModifier),
-        ' has changed: ',
-        log_message));
+      log_message);
   END IF;
   END//
 
@@ -358,9 +324,7 @@ FOR EACH ROW
     NEW.runId,
     '',
     NEW.lastModifier,
-    CONCAT(
-      (SELECT fullname FROM User WHERE userId = NEW.lastModifier),
-      ' created run.'))//
+    'Run created.')//
 
 DROP TRIGGER IF EXISTS BeforeInsertPool//
 CREATE TRIGGER BeforeInsertPool BEFORE INSERT ON Pool
@@ -394,10 +358,7 @@ FOR EACH ROW
         CASE WHEN (NEW.qcPassed IS NULL) <> (OLD.qcPassed IS NULL) OR NEW.qcPassed <> OLD.qcPassed THEN 'qcPassed' END,
         CASE WHEN NEW.ready <> OLD.ready THEN 'ready' END), ''),
       NEW.lastModifier,
-      CONCAT(
-        (SELECT fullname FROM User WHERE userId = NEW.lastModifier),
-        ' has changed: ',
-        log_message));
+      log_message);
   END IF;
   END//
 
@@ -408,9 +369,7 @@ FOR EACH ROW
     NEW.poolId,
     '',
     NEW.lastModifier,
-    CONCAT(
-      (SELECT fullname FROM User WHERE userId = NEW.lastModifier),
-      ' created pool.'))//
+    'Pool created.')//
 
 DROP TRIGGER IF EXISTS ExperimentChange//
 CREATE TRIGGER ExperimentChange BEFORE UPDATE ON Experiment
@@ -437,10 +396,7 @@ FOR EACH ROW
         CASE WHEN (NEW.study_studyId IS NULL) <> (OLD.study_studyId IS NULL) OR NEW.study_studyId <> OLD.study_studyId THEN 'study_studyId' END,
         CASE WHEN NEW.title <> OLD.title THEN 'title' END), ''),
       NEW.lastModifier,
-      CONCAT(
-        (SELECT fullname FROM User WHERE userId = NEW.lastModifier),
-        ' has changed: ',
-       log_message));
+      log_message);
   END IF;
   END//
 
@@ -451,9 +407,7 @@ FOR EACH ROW
     NEW.experimentId,
     '',
     NEW.lastModifier,
-    CONCAT(
-      (SELECT fullname FROM User WHERE userId = NEW.lastModifier),
-      ' created experiment.'))//
+    'Experiment created.')//
 
 DROP TRIGGER IF EXISTS LibraryChange//
 CREATE TRIGGER LibraryChange BEFORE UPDATE ON Library
@@ -498,11 +452,8 @@ FOR EACH ROW
         CASE WHEN (NEW.volume IS NULL) <> (OLD.volume IS NULL) OR NEW.volume <> OLD.volume THEN 'volume' END
   ), ''),
       NEW.lastModifier,
-      CONCAT(
-        (SELECT fullname FROM User WHERE userId = NEW.lastModifier),
-        ' has changed: ',
-        log_message
-       ));
+      log_message
+      );
   END IF;
   END//
 
@@ -524,11 +475,8 @@ FOR EACH ROW
         CASE WHEN (NEW.libraryDesign IS NULL) <> (OLD.libraryDesign IS NULL) OR NEW.libraryDesign <> OLD.libraryDesign THEN 'libraryDesign' END
       ), ''),
       (SELECT lastModifier FROM Library WHERE libraryId = NEW.libraryId),
-      CONCAT(
-        (SELECT fullname FROM User WHERE userId = (SELECT lastModifier FROM Library WHERE libraryId = NEW.libraryId)),
-        ' has changed: ',
-        log_message
-      ));
+      log_message
+      );
   END IF;
   END//
 
@@ -545,9 +493,7 @@ FOR EACH ROW
     NEW.libraryId,
     '',
     NEW.lastModifier,
-    CONCAT(
-      (SELECT fullname FROM User WHERE userId = NEW.lastModifier),
-      ' created library.'))//
+    'Library created.')//
 
 DROP TRIGGER IF EXISTS StudyChange//
 CREATE TRIGGER StudyChange BEFORE UPDATE ON Study
@@ -572,11 +518,8 @@ FOR EACH ROW
         CASE WHEN NEW.project_projectId <> OLD.project_projectId THEN 'project_projectId' END,
         CASE WHEN NEW.studyType <> OLD.studyType THEN 'studyType' END), ''),
       NEW.lastModifier,
-      CONCAT(
-        (SELECT fullname FROM User WHERE userId = NEW.lastModifier),
-        ' has changed: ',
-        log_message
-       ));
+      log_message
+      );
   END IF;
   END//
 
@@ -587,9 +530,7 @@ FOR EACH ROW
     NEW.studyId,
     '',
     NEW.lastModifier,
-    CONCAT(
-      (SELECT fullname FROM User WHERE userId = NEW.lastModifier),
-      ' created study.'))//
+    'Study created.')//
 
 
 DROP TRIGGER IF EXISTS SequencerPartitionContainerChange//
@@ -611,11 +552,8 @@ FOR EACH ROW
         CASE WHEN (NEW.platform IS NULL) <> (OLD.platform IS NULL) OR NEW.platform <> OLD.platform THEN 'platform' END,
         CASE WHEN (NEW.validationBarcode IS NULL) <> (OLD.validationBarcode IS NULL) OR NEW.validationBarcode <> OLD.validationBarcode THEN 'validationBarcode' END), ''),
       NEW.lastModifier,
-      CONCAT(
-        (SELECT fullname FROM User WHERE userId = NEW.lastModifier),
-        ' has changed: ',
-        log_message
-    ));
+      log_message
+    );
   END IF;
   END//
 
@@ -626,9 +564,7 @@ FOR EACH ROW
     NEW.containerId,
     '',
     NEW.lastModifier,
-    CONCAT(
-      (SELECT fullname FROM User WHERE userId = NEW.lastModifier),
-      ' created container.'))//
+    'Container created.')//
 
 DROP TRIGGER IF EXISTS BoxChange//
 CREATE TRIGGER BoxChange BEFORE UPDATE ON Box
@@ -650,11 +586,7 @@ FOR EACH ROW
         CASE WHEN (NEW.locationBarcode IS NULL) <> (OLD.locationBarcode IS NULL) OR NEW.locationBarcode <> OLD.locationBarcode THEN 'locationBarcode' END,
         CASE WHEN (NEW.description IS NULL) <> (OLD.description IS NULL) OR NEW.description <> OLD.description THEN 'description' END), ''),
       NEW.lastModifier,
-      CONCAT(
-        (SELECT fullname FROM User WHERE userId = NEW.lastModifier),
-        ' has changed: ',
-        log_message
-      )
+      log_message
     );
   END IF;
   END//
@@ -666,9 +598,7 @@ FOR EACH ROW
     NEW.boxId,
     '',
     NEW.lastModifier,
-    CONCAT(
-      (SELECT fullname FROM User WHERE userId = NEW.lastModifier),
-      ' created box.')
+    'Box created.'
   )//
 
 DROP TRIGGER IF EXISTS KitDescriptorChange//
@@ -698,11 +628,7 @@ FOR EACH ROW
         CASE WHEN NEW.platformType <> OLD.platformType THEN 'platformType' END,
         CASE WHEN (NEW.description IS NULL) <> (OLD.description IS NULL) OR NEW.description <> OLD.description THEN 'description' END), ''),
       NEW.lastModifier,
-      CONCAT(
-        (SELECT fullname FROM User WHERE userId = NEW.lastModifier),
-        ' has changed: ',
-        log_message
-      )
+      log_message
     );
   END IF;
   END//
@@ -714,10 +640,7 @@ FOR EACH ROW
     NEW.kitDescriptorId,
     '',
     NEW.lastModifier,
-    CONCAT(
-      (SELECT fullname FROM User WHERE userId = NEW.lastModifier),
-      ' created kit descriptor.')
-  )//
+    'Kit descriptor created.')//
 
 DELIMITER ;
 --EndNoTest

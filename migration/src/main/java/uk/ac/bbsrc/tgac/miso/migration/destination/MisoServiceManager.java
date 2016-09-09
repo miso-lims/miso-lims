@@ -35,7 +35,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.OicrSampleAliasGenerator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.OicrSampleNamingScheme;
 import uk.ac.bbsrc.tgac.miso.migration.util.SimpleLibraryNamingScheme;
 import uk.ac.bbsrc.tgac.miso.persistence.HibernateSampleClassDao;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateIdentityDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateIndexDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateInstituteDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLabDao;
@@ -52,7 +51,6 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSubprojectDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueMaterialDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueOriginDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueTypeDao;
-import uk.ac.bbsrc.tgac.miso.service.impl.DefaultIdentityService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultLabService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSampleAdditionalInfoService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSampleClassService;
@@ -129,7 +127,6 @@ public class MisoServiceManager {
 
   private DefaultSampleClassService sampleClassService;
   private DefaultSampleService sampleService;
-  private DefaultIdentityService identityService;
   private DefaultSampleTissueService sampleTissueService;
   private DefaultSampleAdditionalInfoService sampleAdditionalInfoService;
   private DefaultLabService labService;
@@ -139,7 +136,6 @@ public class MisoServiceManager {
   private HibernateSampleClassDao sampleClassDao;
   private HibernateSampleDao sampleDao;
   private HibernateSampleAdditionalInfoDao sampleAdditionalInfoDao;
-  private HibernateIdentityDao identityDao;
   private HibernateSampleTissueDao sampleTissueDao;
   private HibernateLabDao labDao;
   private HibernateInstituteDao instituteDao;
@@ -182,8 +178,6 @@ public class MisoServiceManager {
     m.setDefaultChangeLogDao();
     m.setDefaultDilutionDao();
     m.setDefaultExperimentDao();
-    m.setDefaultIdentityDao();
-    m.setDefaultIdentityService();
     m.setDefaultInstituteDao();
     m.setDefaultKitDao();
     m.setDefaultLabDao();
@@ -290,7 +284,6 @@ public class MisoServiceManager {
     if (sampleClassService != null) sampleClassService.setAuthorizationManager(authorizationManager);
     if (sampleService != null) sampleService.setAuthorizationManager(authorizationManager);
     if (sampleAdditionalInfoService != null) sampleAdditionalInfoService.setAuthorizationManager(authorizationManager);
-    if (identityService != null) identityService.setAuthorizationManager(authorizationManager);
     if (labService != null) labService.setAuthorizationManager(authorizationManager);
     if (sampleNumberPerProjectService != null) sampleNumberPerProjectService.setAuthorizationManager(authorizationManager);
     if (sampleValidRelationshipService != null) sampleValidRelationshipService.setAuthorizationManager(authorizationManager);
@@ -488,7 +481,6 @@ public class MisoServiceManager {
     svc.setSampleNamingScheme(getSampleNamingScheme());
     svc.setProjectStore(projectDao);
     svc.setSampleAdditionalInfoService(sampleAdditionalInfoService);
-    svc.setIdentityService(identityService);
     svc.setSampleTissueService(sampleTissueService);
     svc.setKitStore(kitDao);
     svc.setQcPassedDetailDao(qcPassedDetailDao);
@@ -1034,45 +1026,6 @@ public class MisoServiceManager {
 
   private void updateBoxDaoDependencies() {
     if (poolDao != null) poolDao.setBoxDAO(boxDao);
-  }
-
-  public DefaultIdentityService getIdentityService() {
-    return identityService;
-  }
-
-  public void setIdentityService(DefaultIdentityService identityService) {
-    this.identityService = identityService;
-    updateIdentityServiceDependencies();
-  }
-
-  public void setDefaultIdentityService() {
-    DefaultIdentityService svc = new DefaultIdentityService();
-    svc.setAuthorizationManager(authorizationManager);
-    svc.setIdentityDao(identityDao);
-    setIdentityService(svc);
-  }
-
-  private void updateIdentityServiceDependencies() {
-    if (sampleService != null) sampleService.setIdentityService(identityService);
-  }
-
-  public HibernateIdentityDao getIdentityDao() {
-    return identityDao;
-  }
-
-  public void setIdentityDao(HibernateIdentityDao identityDao) {
-    this.identityDao = identityDao;
-    updateIdentityDaoDependencies();
-  }
-
-  public void setDefaultIdentityDao() {
-    HibernateIdentityDao dao = new HibernateIdentityDao();
-    dao.setSessionFactory(sessionFactory);
-    setIdentityDao(dao);
-  }
-
-  private void updateIdentityDaoDependencies() {
-    if (identityService != null) identityService.setIdentityDao(identityDao);
   }
 
   public DefaultSampleTissueService getSampleTissueService() {

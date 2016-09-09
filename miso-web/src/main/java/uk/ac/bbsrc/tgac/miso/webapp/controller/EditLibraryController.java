@@ -41,6 +41,10 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import net.sourceforge.fluxion.ajax.util.JSONUtils;
+
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,9 +70,6 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-import net.sourceforge.fluxion.ajax.util.JSONUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractPool;
@@ -677,9 +678,8 @@ public class EditLibraryController {
       model.put("libraryPools", pools);
       model.put("libraryRuns", getRunsByLibraryPools(pools));
 
-      populateDesigns(
-          model,
-          LimsUtils.isDetailedSample(library.getSample()) ? null : ((SampleAdditionalInfo) library.getSample()).getSampleClass());
+      populateDesigns(model,
+          LimsUtils.isDetailedSample(library.getSample()) ? ((SampleAdditionalInfo) library.getSample()).getSampleClass() : null);
 
       model.put("owners", LimsSecurityUtils.getPotentialOwners(user, library, securityManager.listAllUsers()));
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, library, securityManager.listAllUsers()));
@@ -908,7 +908,7 @@ public class EditLibraryController {
 
           if (library.getLibraryAdditionalInfo().getLibraryDesign().getId() == -1) {
             library.getLibraryAdditionalInfo().setLibraryDesign(null);
-          } else {
+          } else if (library.getLibraryAdditionalInfo().getLibraryDesign() != null) {
             // If a design is selected, these form elements are disabled and therefore not submitted.
             LibraryDesign design = libraryDesignDao.getLibraryDesign(library.getLibraryAdditionalInfo().getLibraryDesign().getId());
             library.getLibraryAdditionalInfo().setLibraryDesign(design);

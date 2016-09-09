@@ -90,6 +90,7 @@
 	<script type="text/javascript">
 	  jQuery(document).ready(function () {
 	    Sample.hot.samplesJSON = ${samplesJSON};
+	    Sample.hot.samplesJSON = Hot.sortByProperty(Sample.hot.samplesJSON, 'alias');
 	    Hot.dropdownRef = ${referenceDataJSON};
 	    Sample.hot.aliasGenerationEnabled = ${aliasGenerationEnabled};
 	    Hot.detailedSample = JSON.parse(document.getElementById('HOTbulkForm').dataset.detailedSample);

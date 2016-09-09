@@ -62,6 +62,7 @@ import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
+import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
@@ -259,9 +260,8 @@ public class PoolControllerHelperService {
       }
     }
     sb.append("</div>");
-    sb.append(
-        "<a onclick='Utils.ui.checkAll(\"importdilslist\"); return false;' href='javascript:void(0);'>All</a> "
-            + "/ <a onclick='Utils.ui.uncheckAll(\"importdilslist\"); return false;' href='javascript:void(0);'>None</a>");
+    sb.append("<a onclick='Utils.ui.checkAll(\"importdilslist\"); return false;' href='javascript:void(0);'>All</a> "
+        + "/ <a onclick='Utils.ui.uncheckAll(\"importdilslist\"); return false;' href='javascript:void(0);'>None</a>");
     sb.append("<br/><button type='submit' class='br-button ui-state-default ui-corner-all'>Use</button>");
     return sb.toString();
   }
@@ -417,6 +417,16 @@ public class PoolControllerHelperService {
 
     try {
       if (!isStringEmptyOrNull(idBarcode)) {
+        List<Boxable> previouslyBarcodedItems = new ArrayList<Boxable>(requestManager.getBoxablesFromBarcodeList(Arrays.asList(idBarcode)));
+        if (!previouslyBarcodedItems.isEmpty()
+            && !(previouslyBarcodedItems.size() == 1 && previouslyBarcodedItems.get(0).getId() == poolId)) {
+          Boxable previouslyBarcodedItem = previouslyBarcodedItems.get(0);
+          String error = String.format(
+              "Could not change pool identification barcode to '%s'. This barcode is already in use by an item with the name '%s' and the alias '%s'.",
+              idBarcode, previouslyBarcodedItem.getName(), previouslyBarcodedItem.getAlias());
+          log.debug(error);
+          return JSONUtils.SimpleJSONError(error);
+        }
         Pool<? extends Poolable<?, ?>> pool = requestManager.getPoolById(poolId);
         User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
 
@@ -614,16 +624,12 @@ public class PoolControllerHelperService {
         Collection<? extends Dilution> dls = pool.getDilutions();
         for (Dilution dilution : dls) {
           info.append("<li><b>" + dilution.getName() + "</b>");
-          info.append(
-              "<br/><small><u><a href='/miso/project/" + dilution.getLibrary().getSample().getProject().getId() + "'>"
-                  + dilution.getLibrary().getSample().getProject().getAlias() + "</a></u>");
-          info.append(
-              "<br/><a href='/miso/library/" + dilution.getLibrary().getId() + "'>" + dilution.getLibrary().getAlias() + " ("
-                  + dilution.getLibrary().getName() + ")</a>");
-          info.append(
-              "<br/><a href='/miso/sample/" + dilution.getLibrary().getSample().getId() + "'>"
-                  + dilution.getLibrary().getSample().getDescription() + " (" + dilution.getLibrary().getSample().getName()
-                  + ")</a></small>");
+          info.append("<br/><small><u><a href='/miso/project/" + dilution.getLibrary().getSample().getProject().getId() + "'>"
+              + dilution.getLibrary().getSample().getProject().getAlias() + "</a></u>");
+          info.append("<br/><a href='/miso/library/" + dilution.getLibrary().getId() + "'>" + dilution.getLibrary().getAlias() + " ("
+              + dilution.getLibrary().getName() + ")</a>");
+          info.append("<br/><a href='/miso/sample/" + dilution.getLibrary().getSample().getId() + "'>"
+              + dilution.getLibrary().getSample().getDescription() + " (" + dilution.getLibrary().getSample().getName() + ")</a></small>");
           info.append("</li>");
         }
         info.append("</ul>");
@@ -634,16 +640,13 @@ public class PoolControllerHelperService {
           if (p instanceof Dilution) {
             Dilution dilution = (Dilution) p;
             info.append("<li><b>" + dilution.getName() + "</b>");
-            info.append(
-                "<br/><small><u><a href='/miso/project/" + dilution.getLibrary().getSample().getProject().getId() + "'>"
-                    + dilution.getLibrary().getSample().getProject().getAlias() + "</a></u>");
-            info.append(
-                "<br/><a href='/miso/library/" + dilution.getLibrary().getId() + "'>" + dilution.getLibrary().getAlias() + " ("
-                    + dilution.getLibrary().getName() + ")</a>");
-            info.append(
-                "<br/><a href='/miso/sample/" + dilution.getLibrary().getSample().getId() + "'>"
-                    + dilution.getLibrary().getSample().getDescription() + " (" + dilution.getLibrary().getSample().getName()
-                    + ")</a></small>");
+            info.append("<br/><small><u><a href='/miso/project/" + dilution.getLibrary().getSample().getProject().getId() + "'>"
+                + dilution.getLibrary().getSample().getProject().getAlias() + "</a></u>");
+            info.append("<br/><a href='/miso/library/" + dilution.getLibrary().getId() + "'>" + dilution.getLibrary().getAlias() + " ("
+                + dilution.getLibrary().getName() + ")</a>");
+            info.append("<br/><a href='/miso/sample/" + dilution.getLibrary().getSample().getId() + "'>"
+                + dilution.getLibrary().getSample().getDescription() + " (" + dilution.getLibrary().getSample().getName()
+                + ")</a></small>");
             info.append("</li>");
           } else if (p instanceof Plate) {
             Plate<LinkedList<Plateable>, Plateable> plate = (Plate<LinkedList<Plateable>, Plateable>) p;
@@ -654,19 +657,17 @@ public class PoolControllerHelperService {
               Plateable element = plate.getElements().getFirst();
               if (element instanceof Library) {
                 Library l = (Library) element;
-                info.append(
-                    "<br/><small><u><a href='/miso/project/" + l.getSample().getProject().getId() + "'>"
-                        + l.getSample().getProject().getAlias() + " (" + l.getSample().getProject().getName() + ")</a></u>");
+                info.append("<br/><small><u><a href='/miso/project/" + l.getSample().getProject().getId() + "'>"
+                    + l.getSample().getProject().getAlias() + " (" + l.getSample().getProject().getName() + ")</a></u>");
                 info.append("<br/>Platform: " + l.getPlatformName());
                 info.append("<br/>Type: " + l.getLibraryType().getDescription());
                 info.append("<br/>Selection: " + l.getLibrarySelectionType().getName());
                 info.append("<br/>Strategy: " + l.getLibraryStrategyType().getName());
               } else if (element instanceof Dilution) {
                 Dilution l = (Dilution) element;
-                info.append(
-                    "<br/><small><u><a href='/miso/project/" + l.getLibrary().getSample().getProject().getId() + "'>"
-                        + l.getLibrary().getSample().getProject().getAlias() + " (" + l.getLibrary().getSample().getProject().getName()
-                        + ")</a></u>");
+                info.append("<br/><small><u><a href='/miso/project/" + l.getLibrary().getSample().getProject().getId() + "'>"
+                    + l.getLibrary().getSample().getProject().getAlias() + " (" + l.getLibrary().getSample().getProject().getName()
+                    + ")</a></u>");
                 info.append("<br/>Platform: " + l.getLibrary().getPlatformName());
                 info.append("<br/>Type: " + l.getLibrary().getLibraryType().getDescription());
                 info.append("<br/>Selection: " + l.getLibrary().getLibrarySelectionType().getName());
@@ -738,24 +739,20 @@ public class PoolControllerHelperService {
                   info.append("<b>Internal Plate:</b> <a href='/miso/plate/" + plate.getId() + "'>" + plate.getName() + "</a><br/>");
                 } else if (p instanceof Library) {
                   Library library = (Library) plateable;
-                  info.append(
-                      "<b>Library:</b> <a href='/miso/library/" + library.getId() + "'>" + library.getAlias() + "(" + library.getName()
-                          + ")</a><br/>");
+                  info.append("<b>Library:</b> <a href='/miso/library/" + library.getId() + "'>" + library.getAlias() + "("
+                      + library.getName() + ")</a><br/>");
                 }
               }
             } else if (p instanceof Dilution) {
               Dilution dilution = (Dilution) p;
               if (dilution instanceof emPCRDilution) {
-                info.append(
-                    "<b>emPCR:</b> <a href='/miso/empcr/" + ((emPCRDilution) dilution).getEmPCR().getId() + "'>"
-                        + ((emPCRDilution) dilution).getEmPCR().getName() + "<br/>");
+                info.append("<b>emPCR:</b> <a href='/miso/empcr/" + ((emPCRDilution) dilution).getEmPCR().getId() + "'>"
+                    + ((emPCRDilution) dilution).getEmPCR().getName() + "<br/>");
               }
-              info.append(
-                  "<b>Library:</b> <a href='/miso/library/" + dilution.getLibrary().getId() + "'>" + dilution.getLibrary().getAlias() + "("
-                      + dilution.getLibrary().getName() + ")</a><br/>");
-              info.append(
-                  "<b>Sample:</b> <a href='/miso/sample/" + dilution.getLibrary().getSample().getId() + "'>"
-                      + dilution.getLibrary().getSample().getAlias() + "(" + dilution.getLibrary().getSample().getName() + ")</a><br/>");
+              info.append("<b>Library:</b> <a href='/miso/library/" + dilution.getLibrary().getId() + "'>"
+                  + dilution.getLibrary().getAlias() + "(" + dilution.getLibrary().getName() + ")</a><br/>");
+              info.append("<b>Sample:</b> <a href='/miso/sample/" + dilution.getLibrary().getSample().getId() + "'>"
+                  + dilution.getLibrary().getSample().getAlias() + "(" + dilution.getLibrary().getSample().getName() + ")</a><br/>");
               if (pool.getPoolableElements().size() > 1) {
                 if (!dilution.getLibrary().getIndices().isEmpty()) {
                   info.append("<b>Index(es):</b></br>");
@@ -805,12 +802,10 @@ public class PoolControllerHelperService {
     if (json.has("platform") && !isStringEmptyOrNull(json.getString("platform"))) {
       try {
         String platform = json.getString("platform");
+        long poolId = json.has("poolId") ? json.getLong("poolId") : 0L;
         JSONObject j = new JSONObject();
         JSONArray arr = new JSONArray();
         for (LibraryDilution libraryDilution : requestManager.listAllLibraryDilutionsByPlatform((PlatformType.get(platform)))) {
-          if (libraryDilution.getLibrary().isLowQuality()) {
-            continue;
-          }
           JSONArray pout = new JSONArray();
           pout.add(libraryDilution.getName());
           pout.add(libraryDilution.getConcentration());
@@ -819,9 +814,10 @@ public class PoolControllerHelperService {
           StringBuilder indices = new StringBuilder();
           collectIndices(indices, libraryDilution);
           pout.add(indices.toString());
+          pout.add(libraryDilution.getLibrary().isLowQuality() ? "⚠" : "");
           pout.add(
-              "<div style='cursor:pointer;' onmousedown=\"Pool.search.poolSearchSelectElement('" + libraryDilution.getId() + "', '"
-                  + libraryDilution.getName() + "')\"><span class=\"ui-icon ui-icon-plusthick\"></span></div>");
+              "<div style='cursor:pointer;' onmousedown=\"Pool.search.poolSearchSelectElement(" + poolId + ", '" + libraryDilution.getId()
+                  + "', '" + libraryDilution.getName() + "')\"><span class=\"ui-icon ui-icon-plusthick\"></span></div>");
           arr.add(pout);
         }
         j.put("poolelements", arr);
@@ -882,6 +878,61 @@ public class PoolControllerHelperService {
     }
 
     return JSONUtils.SimpleJSONResponse("Note saved successfully");
+  }
+
+  public <P extends Poolable<?, ?>> JSONObject addPoolableElement(HttpSession session, JSONObject json) {
+    Long poolId = json.getLong("poolId");
+    Long dilutionId = json.getLong("dilutionId");
+    try {
+      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+      @SuppressWarnings("unchecked")
+      Pool<P> pool = (Pool<P>) requestManager.getPoolById(poolId);
+      if (!pool.userCanWrite(user)) {
+        return JSONUtils.SimpleJSONError("Not authorized to modify pool.");
+      }
+      @SuppressWarnings("unchecked")
+      P target = (P) requestManager.getLibraryDilutionById(dilutionId);
+      if (target == null) {
+        return JSONUtils.SimpleJSONError("No such element.");
+      }
+      pool.getPoolableElements().add(target);
+      pool.setLastModified(new Date());
+      pool.setLastModifier(user);
+      requestManager.savePool(pool);
+      return JSONUtils.SimpleJSONResponse("Pool modified.");
+    } catch (IOException e) {
+      log.error("Add poolable element", e);
+      return JSONUtils.SimpleJSONError(e.getMessage());
+    }
+  }
+
+  public JSONObject removePoolableElement(HttpSession session, JSONObject json) {
+    Long poolId = json.getLong("poolId");
+    Long dilutionId = json.getLong("dilutionId");
+    try {
+      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+      Pool<? extends Poolable<?, ?>> pool = requestManager.getPoolById(poolId);
+      if (!pool.userCanWrite(user)) {
+        return JSONUtils.SimpleJSONError("Not authorized to modify pool.");
+      }
+      Poolable<?, ?> target = null;
+      for (Poolable<?, ?> element : pool.getPoolableElements()) {
+        if (element.getId() == dilutionId) {
+          target = element;
+          break;
+        }
+      }
+      if (target != null) {
+        pool.getPoolableElements().remove(target);
+        pool.setLastModified(new Date());
+        pool.setLastModifier(user);
+        requestManager.savePool(pool);
+      }
+      return JSONUtils.SimpleJSONResponse("Pool modified.");
+    } catch (IOException e) {
+      log.error("Remove poolable element", e);
+      return JSONUtils.SimpleJSONError(e.getMessage());
+    }
   }
 
   public void setSecurityManager(SecurityManager securityManager) {

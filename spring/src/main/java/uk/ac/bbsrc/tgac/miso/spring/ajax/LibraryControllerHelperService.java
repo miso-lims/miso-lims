@@ -31,6 +31,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -67,6 +68,7 @@ import net.sf.json.JsonConfig;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
+import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -150,9 +152,8 @@ public class LibraryControllerHelperService {
           return JSONUtils.SimpleJSONResponse("OK");
         } else {
           log.error("Library alias not valid: " + alias);
-          return JSONUtils.SimpleJSONError(
-              "The following Library alias doesn't conform to the chosen naming scheme (" + libraryNamingScheme.getValidationRegex("alias")
-                  + ") or already exists: " + json.getString("alias"));
+          return JSONUtils.SimpleJSONError("The following Library alias doesn't conform to the chosen naming scheme ("
+              + libraryNamingScheme.getValidationRegex("alias") + ") or already exists: " + json.getString("alias"));
         }
       } catch (MisoNamingException e) {
         log.error("Cannot validate Library alias " + json.getString("alias"), e);
@@ -395,6 +396,16 @@ public class LibraryControllerHelperService {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       if (!isStringEmptyOrNull(idBarcode)) {
+        List<Boxable> previouslyBarcodedItems = new ArrayList<Boxable>(requestManager.getBoxablesFromBarcodeList(Arrays.asList(idBarcode)));
+        if (!previouslyBarcodedItems.isEmpty()
+            && !(previouslyBarcodedItems.size() == 1 && previouslyBarcodedItems.get(0).getId() == libraryId)) {
+          Boxable previouslyBarcodedItem = previouslyBarcodedItems.get(0);
+          String error = String.format(
+              "Could not change library identification barcode to '%s'. This barcode is already in use by an item with the name '%s' and the alias '%s'.",
+              idBarcode, previouslyBarcodedItem.getName(), previouslyBarcodedItem.getAlias());
+          log.debug(error);
+          return JSONUtils.SimpleJSONError(error);
+        }
         Library library = requestManager.getLibraryById(libraryId);
         library.setIdentificationBarcode(idBarcode);
         library.setLastModifier(user);
@@ -496,9 +507,8 @@ public class LibraryControllerHelperService {
                     indices.add(index);
                   } catch (NumberFormatException e) {
                     log.error("cannot save library", e);
-                    return JSONUtils.SimpleJSONError(
-                        "Cannot save Library. It looks like there are indices for the library of " + sample.getAlias()
-                            + ", but they cannot be processed");
+                    return JSONUtils.SimpleJSONError("Cannot save Library. It looks like there are indices for the library of "
+                        + sample.getAlias() + ", but they cannot be processed");
                   }
                 }
                 library.setIndices(indices);
@@ -879,8 +889,8 @@ public class LibraryControllerHelperService {
       Long dilutionId = Long.parseLong(json.getString("dilutionId"));
       LibraryDilution dilution = requestManager.getLibraryDilutionById(dilutionId);
       response.put("results", "<input type='text' id='" + dilutionId + "' value='" + dilution.getConcentration() + "'/>");
-      response
-          .put("edit", "<a href='javascript:void(0);' onclick='Library.dilution.editLibraryDilution(\"" + dilutionId + "\");'>Save</a>");
+      response.put("edit",
+          "<a href='javascript:void(0);' onclick='Library.dilution.editLibraryDilution(\"" + dilutionId + "\");'>Save</a>");
       return response;
     } catch (Exception e) {
       log.error("Failed to display Library Dilution of this Library: ", e);
@@ -935,9 +945,8 @@ public class LibraryControllerHelperService {
           sb.append("<td>" + p.getPcrCreator() + "</td>");
           sb.append("<td>" + p.getCreationDate() + "</td>");
           sb.append("<td>" + p.getConcentration() + " " + p.getUnits() + "</td>");
-          sb.append(
-              "<td><a href='javascript:void(0);' onclick='Library.empcr.insertEmPcrDilutionRow(" + p.getId()
-                  + ");'>Add emPCR Dilution</a></td>");
+          sb.append("<td><a href='javascript:void(0);' onclick='Library.empcr.insertEmPcrDilutionRow(" + p.getId()
+              + ");'>Add emPCR Dilution</a></td>");
           sb.append("</tr>");
         }
         return JSONUtils.SimpleJSONResponse(sb.toString());
@@ -999,9 +1008,8 @@ public class LibraryControllerHelperService {
           }
           sb.append("</td>");
 
-          sb.append(
-              "<td><a href='/miso/poolwizard/new/" + pcr.getLibraryDilution().getLibrary().getSample().getProject().getProjectId()
-                  + "'>Construct New Pool</a></td>");
+          sb.append("<td><a href='/miso/poolwizard/new/" + pcr.getLibraryDilution().getLibrary().getSample().getProject().getProjectId()
+              + "'>Construct New Pool</a></td>");
           sb.append("</tr>");
         }
         return JSONUtils.SimpleJSONResponse(sb.toString());
@@ -1113,8 +1121,7 @@ public class LibraryControllerHelperService {
 
       response.put("results", "<input type='text' id='results" + qcId + "' value='" + libraryQc.getResults() + "'/>");
       response.put("insertSize", "<input type='text' id='insertSize" + qcId + "' value='" + libraryQc.getInsertSize() + "'/>");
-      response.put(
-          "edit",
+      response.put("edit",
           "<a href='javascript:void(0);' onclick='Library.qc.editLibraryQC(\"" + qcId + "\",\"" + libraryId + "\");'>Save</a>");
       return response;
     } catch (Exception e) {
