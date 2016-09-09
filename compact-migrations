@@ -12,7 +12,7 @@ LAST_ID="$(echo "${LAST}" | cut -c 2-5 | sed -e 's/^0*//')"
 
 # Determine if we are on the mainline branch or a site-specific branch.
 BRANCH="$(git for-each-ref --format='%(upstream:short)' "$(git symbolic-ref -q HEAD)")"
-if [ "${BRANCH#*/}" = "develop" ] && git remote show -n "${BRANCH%/*}" | grep "git@github.com:TGAC/miso-lims.git" > /dev/null
+if [ "${BRANCH#*/}" = "develop" ] && git remote show -n "${BRANCH%/*}" | grep "TGAC/miso-lims.git" > /dev/null
 then
 	echo "This is mainline"
 	TAIL="main"
