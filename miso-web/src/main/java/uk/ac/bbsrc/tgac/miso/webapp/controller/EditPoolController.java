@@ -371,12 +371,19 @@ public class EditPoolController {
   }
 
   @RequestMapping(method = RequestMethod.POST)
-  public String processSubmit(@ModelAttribute("pool") Pool<? extends Poolable> pool, ModelMap model, SessionStatus session)
+  public <P extends Poolable<?, ?>> String processSubmit(@ModelAttribute("pool") Pool<P> pool, ModelMap model, SessionStatus session)
       throws IOException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       if (!pool.userCanWrite(user)) {
         throw new SecurityException("Permission denied.");
+      }
+      // The pooled elements may have been modified asynchronously while the form was being edited. Since they can't be edited by form,
+      // update them to avoid reverting the state.
+      if (pool.getId() != AbstractPool.UNSAVED_ID) {
+        @SuppressWarnings("unchecked")
+        Pool<P> original = (Pool<P>) requestManager.getPoolById(pool.getId());
+        pool.setPoolableElements(original.getPoolableElements());
       }
 
       pool.setLastModifier(user);

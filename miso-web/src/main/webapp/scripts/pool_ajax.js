@@ -540,7 +540,7 @@ Pool.ui = {
     );
   },
 
-  createElementSelectDatatable : function(platform, libraryDilutionConcentrationUnits) {
+  createElementSelectDatatable : function(platform, poolId, libraryDilutionConcentrationUnits) {
     jQuery('#elementSelectDatatableDiv').html("<table cellpadding='0' width='100%' cellspacing='0' border='0' class='display' id='elementSelectDatatable'></table>");
     jQuery('#elementSelectDatatable').html("<img src='/styles/images/ajax-loader.gif'/>");
     Fluxion.doAjax(
@@ -548,6 +548,7 @@ Pool.ui = {
       'createElementSelectDataTable',
       {
         'url':ajaxurl,
+        'poolId':poolId,
         'platform':platform
       },
       {
@@ -577,6 +578,27 @@ Pool.ui = {
 
   prepareElements : function () {
     Pool.ui.createElementSelectDatatable(jQuery('#platformType').val());
+  },
+
+  removePoolableElement : function(poolId, dilutionId, uiElement) {
+    if (poolId) {
+	  if (confirm("Are you sure you want to delete this dilution?")) {
+	    Fluxion.doAjax(
+          'poolControllerHelperService',
+          'removePoolableElement',
+          {
+            'poolId':poolId,
+            'dilutionId':dilutionId,
+            'url':ajaxurl
+          },
+          {
+            'doOnSuccess': function() { uiElement.remove(); }
+          }
+        );
+      }
+    } else {
+      Utils.ui.confirmRemove(uiElement);
+    }
   },
 
   showPoolNoteDialog: function (poolId) {
@@ -737,17 +759,39 @@ Pool.search = {
     );
   },
 
-  poolSearchSelectElement : function(elementId, elementName) {
+  poolSearchSelectElement : function(poolId, elementId, elementName) {
     if (jQuery("#element" + elementId).length > 0) {
       alert("Element " + elementName + " is already part of this pool.");
+      jQuery('#searchElementsResult').css('visibility', 'hidden');
     } else {
-      var div = "<div onMouseOver='this.className=\"dashboardhighlight\"' onMouseOut='this.className=\"dashboard\"' class='dashboard'>";
-      div += "<span class='float-left' id='element"+elementId+"'><input type='hidden' id='poolableElements" + elementId + "' value='" + elementName + "' name='poolableElements'/>";
-      div += "<b>Element: " + elementName + "</b></span>";
-      div += "<span onclick='Utils.ui.confirmRemove(jQuery(this).parent());' class='float-right ui-icon ui-icon-circle-close'></span></div>";
-      jQuery('#dillist').append(div);
+      var addElement = function() {
+        var div = "<div onMouseOver='this.className=\"dashboardhighlight\"' onMouseOut='this.className=\"dashboard\"' class='dashboard'>";
+        div += "<span class='float-left' id='element"+elementId+"'>";
+        if (poolId == 0) {
+          div += "<input type='hidden' id='poolableElements" + elementId + "' value='" + elementName + "' name='poolableElements'/>";
+        }
+        div += "<b>Element: " + elementName + "</b></span>";
+        div += "<span onclick='Pool.ui.removePoolableElement(" + poolId + ", " + elementId + ", jQuery(this).parent());' class='float-right ui-icon ui-icon-circle-close'></span></div>";
+        jQuery('#dillist').append(div);
+        jQuery('#searchElementsResult').css('visibility', 'hidden');
+      };
+      if (poolId == 0) {
+        addElement();
+      } else {
+        Fluxion.doAjax(
+          'poolControllerHelperService',
+          'addPoolableElement',
+          {
+            'poolId':poolId,
+            'dilutionId':elementId,
+            'url':ajaxurl
+          },
+          {
+            'doOnSuccess': addElement
+          }
+        );
+      }
     }
-    jQuery('#searchElementsResult').css('visibility', 'hidden');
   }
 };
 
