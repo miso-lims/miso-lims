@@ -8,7 +8,6 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Table;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
@@ -156,7 +155,6 @@ public class IdentityImpl extends SampleAdditionalInfoImpl implements Identity {
     }
 
     public Sample build() {
-      checkArgument(user != null, "A User must be provided to create a Sample.");
       checkArgument(project != null, "A Project must be provided to create a Sample.");
       checkArgument(!LimsUtils.isStringEmptyOrNull(description), "Must provide a description to create a Sample");
       checkArgument(!LimsUtils.isStringEmptyOrNull(sampleType), "Must provide a sampleType to create a Sample");
@@ -173,11 +171,10 @@ public class IdentityImpl extends SampleAdditionalInfoImpl implements Identity {
       i.setSampleType(sampleType);
       i.setProject(project);
       i.setScientificName(scientificName);
-      i.setLastModifier(user);
-      i.setSecurityProfile(new SecurityProfile(user));
       i.setInternalName(internalName);
       i.setExternalName(externalName);
       i.setDonorSex(donorSex);
+      i.inheritPermissions(project);
 
       return i;
     }
