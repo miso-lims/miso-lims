@@ -54,7 +54,7 @@ import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 
 @Controller
-@RequestMapping("/stats/sequencer/servicerecord")
+@RequestMapping("/sequencer/servicerecord")
 @SessionAttributes("serviceRecord")
 public class EditServiceRecordController {
   
@@ -142,7 +142,7 @@ public class EditServiceRecordController {
     requestManager.saveSequencerServiceRecord(record);
     session.setComplete();
     model.clear();
-    return "redirect:/miso/stats/sequencer/servicerecord/" + record.getId();
+    return "redirect:/miso/sequencer/servicerecord/" + record.getId();
   }
   
   @InitBinder
