@@ -32,7 +32,7 @@
     jQuery("#tabs").tabs();
   });
 </script>
-<h1>Consumables</h1>
+<h1>Kits</h1>
 
 <div id="tabs">
 <ul>
@@ -361,11 +361,11 @@
     });
 
     function writeTotalNo() {
-      jQuery('#SequencingtotalCount').html(jQuery('#table1>tbody>tr:visible').length.toString() + " Sequencing Kit");
-      jQuery('#EMPCRtotalCount').html(jQuery('#table2>tbody>tr:visible').length.toString() + " EMPCR Kit");
-      jQuery('#LibrarytotalCount').html(jQuery('#table3>tbody>tr:visible').length.toString() + " Library Kit");
-      jQuery('#ClusteringtotalCount').html(jQuery('#table4>tbody>tr:visible').length.toString() + " Clustering Kit");
-      jQuery('#MultiplexingtotalCount').html(jQuery('#table5>tbody>tr:visible').length.toString() + " Multiplexing Kit");
+      var kits = ['Sequencing', 'EMPCR', 'Library', 'Clustering', 'Multiplexing'];
+      for (var i = 0; i < kits.length; i++) {
+        var num = jQuery('#table' + (i + 1) + '>tbody>tr').length;
+        jQuery('#' + kits[i] + 'totalCount').html(num + " " + kits[i] + " Kit" + (num == 1 ? "" : "s"));
+      }
     }
   </script>
 </div>
