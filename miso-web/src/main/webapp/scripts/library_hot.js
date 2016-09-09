@@ -235,125 +235,118 @@ Library.hot = {
    * Sets columns for table
    */
   setColumnData: function (detailedBool) {
-    var qcBool = Library.hot.showQcs;
-    var cols;
-    if (detailedBool) {
-      cols = Hot.concatArrays(setAliasCol(), setPlainCols(), setDetailedCols());
-    } else {
-      cols = Hot.concatArrays(setAliasCol(), setPlainCols());
-    }
-    // add the ID Barcode column if it is not auto-generated
-    if (!Hot.autoGenerateIdBarcodes) {
-      cols.splice(3, 0, {
-          header: 'Matrix Barcode',
-          data: 'identificationBarcode',
-          type: 'text'
-        }
-      );
-    }
-    return cols;
-    
-    function setPlainCols () {
-      var libCols = [
-        {
-          header: 'Sample Alias',
-          data: 'parentSampleAlias',
-          readOnly: true
-        },{
-          header: 'Description',
-          data: 'description',
-          validator: Hot.requiredText
-        },{
-          header: 'Platform',
-          data: 'platformName',
-          type: 'dropdown',
-          trimDropdown: false,
-          source: Library.hot.getPlatforms()
-        },{
-          header: 'Type',
-          data: 'libraryTypeAlias',
-          type: 'dropdown',
-          trimDropdown: false,
-          source: '',
-          validator: Hot.requiredText
-        },{
-          header: 'Selection',
-          data: 'librarySelectionTypeAlias',
-          type: 'dropdown',
-          trimDropdown: false,
-          source: Library.hot.getSelectionTypes()
-        },{
-          header: 'Strategy',
-          data: 'libraryStrategyTypeAlias',
-          type: 'dropdown',
-          trimDropdown: false,
-          source: Library.hot.getStrategyTypes()
-        },{
-          header: 'Index Kit',
-          data: 'indexFamilyName',
-          type: 'dropdown',
-          trimDropdown: false,
-          source: ''
-        },{
-          header: 'Index 1',
-          data: 'index1Label',
-          type: 'autocomplete',
-          strict: true,
-          filter: false,
-          allowInvalid: true,
-          trimDropdown: false,
-          source: [""]
-        },{
-          header: 'Index 2',
-          data: 'index2Label',
-          type: 'autocomplete',
-          strict: true,
-          filter: false,
-          allowInvalid: true,
-          trimDropdown: false,
-          source: [""]
-        },{
-          header: 'QC Passed?',
-          data: 'qcPassed',
-          type: 'dropdown',
-          trimDropdown: false,
-          source: ['unknown', 'true', 'false']
-        },{
-          header: 'Volume',
-          data: 'volume',
-          type: 'numeric',
-          format: '0.0'
-        }
-      ];
-      
-      return libCols;
-    }
-    
-    function setAliasCol () {
-      var aliasCol = [
-        {
-          header: 'Library Alias',
-          data: 'alias',
-          validator: Hot.requiredText
-        }
-      ];
-      
-      return aliasCol;
-    }
-    
-    function setDetailedCols () {
-      var additionalCols = [
-        {
-          header: 'Kit',
-          data: 'libraryAdditionalInfo.prepKit.name',
-          type: 'dropdown',
-          trimDropdown: false,
-          source: Library.hot.getKitDescriptors()
-        }
-      ];
-      
-      return additionalCols;
-    }
+    return [
+      {
+        header: 'Library Alias',
+        data: 'alias',
+        validator: Hot.requiredText,
+        include: true
+      },
+      {
+        header: 'Sample Alias',
+        data: 'parentSampleAlias',
+        readOnly: true,
+        include: true
+      },
+      {
+        header: 'Matrix Barcode',
+        data: 'identificationBarcode',
+        type: 'text',
+        include: !Hot.autoGenerateIdBarcodes
+      },
+      {
+        header: 'Description',
+        data: 'description',
+        validator: Hot.requiredText,
+        include: true
+      },
+      {
+        header: 'Platform',
+        data: 'platformName',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: Library.hot.getPlatforms(),
+        include: true
+      },
+      {
+        header: 'Type',
+        data: 'libraryTypeAlias',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: '',
+        validator: Hot.requiredText,
+        include: true
+      },
+      {
+        header: 'Selection',
+        data: 'librarySelectionTypeAlias',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: Library.hot.getSelectionTypes(),
+        include: true
+      },
+      {
+        header: 'Strategy',
+        data: 'libraryStrategyTypeAlias',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: Library.hot.getStrategyTypes(),
+        include: true
+      },
+      {
+        header: 'Index Kit',
+        data: 'indexFamilyName',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: '',
+        include: true
+      },
+      {
+        header: 'Index 1',
+        data: 'index1Label',
+        type: 'autocomplete',
+        strict: true,
+        filter: false,
+        allowInvalid: true,
+        trimDropdown: false,
+        source: [""],
+        include: true
+      },
+      {
+        header: 'Index 2',
+        data: 'index2Label',
+        type: 'autocomplete',
+        strict: true,
+        filter: false,
+        allowInvalid: true,
+        trimDropdown: false,
+        source: [""],
+        include: true
+      },
+      {
+        header: 'QC Passed?',
+        data: 'qcPassed',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: ['unknown', 'true', 'false'],
+        include: true
+      },
+      {
+        header: 'Volume',
+        data: 'volume',
+        type: 'numeric',
+        format: '0.0',
+        include: true
+      },
+      {
+        header: 'Kit',
+        data: 'libraryAdditionalInfo.prepKit.name',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: Library.hot.getKitDescriptors(),
+        include: detailedBool
+      }
+    ].filter(function(col) { return col.include; };
   },
   
   validateAlias: function (value, callback) {
