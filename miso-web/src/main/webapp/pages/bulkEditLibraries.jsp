@@ -84,6 +84,7 @@
   <script type="text/javascript">
     jQuery(document).ready(function () {
       Library.hot.librariesJSON = ${librariesJSON};
+      Library.hot.librariesJSON = Hot.sortByProperty(Library.hot.librariesJSON, 'parentSampleAlias');
       Hot.dropdownRef = ${referenceDataJSON};
       Hot.dropdownRef.indices = ${indices};
       Hot.dropdownRef.indexFamilies = {};

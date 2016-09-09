@@ -80,6 +80,7 @@
   <script type="text/javascript">
     jQuery(document).ready(function () {
       Dilution.hot.librariesJSON = ${librariesJSON};
+      Dilution.hot.librariesJSON = Hot.sortByProperty(Dilution.hot.librariesJSON, 'alias');
       Hot.detailedSample = JSON.parse(document.getElementById('HOTbulkForm').dataset.detailedSample);
       Hot.saveButton = document.getElementById('saveDilutions');
       Dilution.hot.propagateOrEdit = "${method}";
