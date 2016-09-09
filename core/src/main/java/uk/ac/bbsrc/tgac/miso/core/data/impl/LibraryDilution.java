@@ -46,7 +46,7 @@ public class LibraryDilution extends AbstractDilution implements Serializable {
   private Library library;
   private TargetedResequencing targetedResequencing;
   private Date lastModified;
-  public static final String UNITS = "nM";
+  public static final String UNITS = "ng/&#181;l";
 
   /**
    * Construct a new LibraryDilution with a default empty SecurityProfile
