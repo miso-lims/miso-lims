@@ -502,6 +502,9 @@ public class SQLRunDAO implements RunStore {
               l.setId(sequencerPartitionContainerDAO.save(l));
             }
             SEQ_PART_CONTAINER_WRITER.saveAll(template, run.getId(), run.getSequencerPartitionContainers());
+            for (SequencerPartitionContainer<SequencerPoolPartition> container : run.getSequencerPartitionContainers()) {
+              sequencerPartitionContainerDAO.save(container);
+            }
           }
 
           if (!run.getNotes().isEmpty()) {
