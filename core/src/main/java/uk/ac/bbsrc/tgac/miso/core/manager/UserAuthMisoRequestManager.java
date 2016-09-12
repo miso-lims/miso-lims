@@ -2374,11 +2374,7 @@ public class UserAuthMisoRequestManager implements RequestManager {
 
   @Override
   public long saveSequencerServiceRecord(SequencerServiceRecord record) throws IOException {
-    if (getCurrentUser().isAdmin()) {
-      return backingManager.saveSequencerServiceRecord(record);
-    } else {
-      throw new IOException("User " + getCurrentUser().getFullName() + " cannot write to this Service Record");
-    }
+    return backingManager.saveSequencerServiceRecord(record);
   }
 
   @Override
