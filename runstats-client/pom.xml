@@ -2,7 +2,7 @@
   <parent>
     <artifactId>miso</artifactId>
     <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-    <version>0.2.29</version>
+    <version>0.2.30</version>
   </parent>
 
   <artifactId>runstats-client</artifactId>
