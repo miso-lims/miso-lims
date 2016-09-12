@@ -318,6 +318,7 @@ public class MisoServiceManager {
     if (runDao != null) runDao.setSecurityDAO(securityStore);
     if (sequencerPartitionContainerDao != null) sequencerPartitionContainerDao.setSecurityDAO(securityStore);
     if (boxDao != null) boxDao.setSecurityDAO(securityStore);
+    if (changeLogDao != null) changeLogDao.setSecurityDAO(securityStore);
   }
 
   public SQLSecurityProfileDAO getSecurityProfileDao() {
@@ -550,6 +551,7 @@ public class MisoServiceManager {
   public void setDefaultChangeLogDao() {
     SQLChangeLogDAO dao = new SQLChangeLogDAO();
     dao.setJdbcTemplate(jdbcTemplate);
+    dao.setSecurityDAO(securityStore);
     setChangeLogDao(dao);
   }
 
