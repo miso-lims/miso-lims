@@ -26,6 +26,7 @@ public class LibraryDto {
   private Boolean paired;
   private String parentSampleAlias;
   private Long parentSampleId;
+  private Long parentSampleClassId;
   private String platformName;
   private Boolean qcPassed;
   private Long index1Id;
@@ -217,6 +218,14 @@ public class LibraryDto {
 
   public void setParentSampleId(Long parentSampleId) {
     this.parentSampleId = parentSampleId;
+  }
+
+  public Long getParentSampleClassId() {
+    return parentSampleClassId;
+  }
+
+  public void setParentSampleClassId(Long parentSampleClassId) {
+    this.parentSampleClassId = parentSampleClassId;
   }
 
   public void setPlatformName(String platformName) {

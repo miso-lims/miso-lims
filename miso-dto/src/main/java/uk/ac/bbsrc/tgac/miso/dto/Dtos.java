@@ -942,6 +942,9 @@ public class Dtos {
     dto.setName(from.getName());
     dto.setParentSampleId(from.getSample().getId());
     dto.setParentSampleAlias(from.getSample().getAlias());
+    if (from.getSample() instanceof SampleAdditionalInfo) {
+      dto.setParentSampleClassId(((SampleAdditionalInfo) from.getSample()).getSampleClass().getId());
+    }
     dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
     dto.setDescription(from.getDescription());
     dto.setId(from.getId());

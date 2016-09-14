@@ -1107,12 +1107,6 @@ Library.ui = {
           "mData": "identificationBarcode",
           "iSortPriority": 0,
           "bVisible": false
-        },
-        {
-          "sTitle": "sampleClass",
-          "mData": "sampleClass",
-          "iSortPriority": 0,
-          "bVisible": false
         }
       ],
       "bJQueryUI": true,
@@ -1131,7 +1125,10 @@ Library.ui = {
           "type": "GET",
           "url": sSource,
           "data": aoData,
-          "success": fnCallback // Do not alter this DataTables property
+          "success": function(d, s, x) {
+             Library.listData = d;
+             fnCallback(d, s, x);
+          }
         });
       },
       "fnDrawCallback": function (oSettings) {
@@ -1200,6 +1197,15 @@ Library.ui = {
     if (selectedIdsArray.length === 0) {
       alert("Please select one or more Libraries to update.");
       return false;
+    }
+    var sampleClasses = Library.listData.aaData
+      .filter(function(x) { return selectedIdsArray.indexOf("" + x.id) != -1; })
+      .map(function(x) { return x.parentSampleClassId; });
+    for(var i = 1; i < sampleClasses.length; i++) {
+      if (sampleClasses[i] != sampleClasses[0]) {
+        alert("All selected libraries must be made from samples of the same class.");
+        return false;
+      }
     }
     window.location = "library/bulk/edit/" + selectedIdsArray.join(',');
   },
