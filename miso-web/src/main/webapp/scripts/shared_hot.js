@@ -59,6 +59,39 @@ var Hot = {
   },
   
   /**
+   * Custom renderer to visually highlight a required text box if value is empty
+   */
+  requiredTextRenderer: function (instance, td, row, col, prop, value, cellProperties) {
+    Handsontable.renderers.TextRenderer.apply(this, arguments);
+  	if (value === undefined || value == null || value === '' || value.length === 0) {
+  	  td.setAttribute('style', 'background-color: #fff1f3')
+  	}
+  	return td;
+  },
+  
+  /**
+   * Custom renderer to visually highlight a required autocomplete box if value is empty
+   */
+  requiredAutocompleteRenderer: function (instance, td, row, col, prop, value, cellProperties) {
+    Handsontable.renderers.AutocompleteRenderer.apply(this, arguments);
+    if (value === undefined || value == null || value === '' || value.length === 0) {
+      td.setAttribute('style', 'background-color: #fff1f3');
+    }
+    return td;
+  },
+  
+  /**
+   * Custom renderer to visually highlight a required numeric box if value is empty
+   */
+  requiredNumericRenderer: function (instance, td, row, col, prop, value, cellProperties) {
+    Handsontable.renderers.NumericRenderer.apply(this, arguments);
+    if (value === undefined || value == null || value === '' || value.length === 0) {
+      td.setAttribute('style', 'background-color: #fff1f3')
+    }
+    return td;
+  },
+  
+  /**
    * Custom validator for fields that must contain data
    */
   requiredText: function (value, callback) {

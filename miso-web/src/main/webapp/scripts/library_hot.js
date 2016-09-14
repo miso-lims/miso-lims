@@ -251,6 +251,7 @@ Library.hot = {
         header: 'Library Alias',
         data: 'alias',
         validator: Hot.requiredText,
+        renderer: Hot.requiredTextRenderer,
         include: true
       },
       {
@@ -269,6 +270,7 @@ Library.hot = {
         header: 'Description',
         data: 'description',
         validator: Hot.requiredText,
+        renderer: Hot.requiredTextRenderer,
         include: true
       },
       {
@@ -285,6 +287,7 @@ Library.hot = {
         type: 'dropdown',
         trimDropdown: false,
         source: Library.hot.getPlatforms(),
+        renderer: Hot.requiredAutocompleteRenderer,
         include: true
       },
       {
@@ -302,6 +305,7 @@ Library.hot = {
         type: 'dropdown',
         trimDropdown: false,
         source: Library.hot.getSelectionTypes(),
+        renderer: Hot.requiredAutocompleteRenderer,
         include: true
       },
       {
@@ -310,6 +314,7 @@ Library.hot = {
         type: 'dropdown',
         trimDropdown: false,
         source: Library.hot.getStrategyTypes(),
+        renderer: Hot.requiredAutocompleteRenderer,
         include: true
       },
       {
@@ -363,6 +368,7 @@ Library.hot = {
         type: 'dropdown',
         trimDropdown: false,
         source: Library.hot.getKitDescriptors(),
+        renderer: Hot.requiredAutocompleteRenderer,
         include: detailedBool
       }
     ].filter(function(col) { return col.include; });
@@ -426,10 +432,12 @@ Library.hot = {
     // update library types
     Hot.startData[row].libraryTypeAlias = '';
     Hot.hotTable.setCellMeta(row, Library.hot.ltIndex, 'source', Library.hot.libraryTypeAliases[to]);
+    Hot.hotTable.setCellMeta(row, Library.hot.ltIndex, 'renderer', Hot.requiredAutocompleteRenderer);
 
     Library.hot.updateIndexFamilyCellsSources(row, to);
     // clear indexFamily and indices columns
     Hot.hotTable.setDataAtCell(row, Library.hot.ifamIndex, '', 'platform change');
+    Hot.hotTable.setCellMeta(row, Library.hot.ifamIndex, 'renderer', Hot.requiredAutocompleteRenderer);
     Hot.startData[row].index1Label = '';
     Hot.startData[row].index2Label = '';
   },
