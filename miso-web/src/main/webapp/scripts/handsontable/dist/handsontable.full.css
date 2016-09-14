@@ -475,7 +475,7 @@ AutocompleteRenderer down arrow
 .handsontable .htAutocompleteArrow {
   float: right;
   font-size: 10px;
-  color: #EEE;
+  color: #696969;
   cursor: default;
   width: 16px;
   text-align: center;
@@ -486,7 +486,7 @@ AutocompleteRenderer down arrow
 }
 
 .handsontable td.area .htAutocompleteArrow {
-  color: #d3d3d3;
+  color: #696969;
 }
 
 /*
