@@ -221,7 +221,12 @@ public class EditLibraryController {
   }
 
   public Collection<LibraryType> populateLibraryTypesByPlatform(String platform) throws IOException {
-    List<LibraryType> types = new ArrayList<LibraryType>(requestManager.listLibraryTypesByPlatform(platform));
+    List<LibraryType> types = new ArrayList<LibraryType>();
+    for (LibraryType type : requestManager.listLibraryTypesByPlatform(platform)) {
+      if (!type.getArchived()) {
+        types.add(type);
+      }
+    }
     Collections.sort(types);
     return types;
   }
@@ -515,7 +520,7 @@ public class EditLibraryController {
     final JSONObject rtn = new JSONObject();
     final List<String> rtnLibTypes = new ArrayList<String>();
     if (!isStringEmptyOrNull(platform)) {
-      final Collection<LibraryType> libTypes = populateLibraryTypesByPlatform(platform);
+      final Collection<LibraryType> libTypes = requestManager.listLibraryTypesByPlatform(platform);
       for (final LibraryType type : libTypes) {
         rtnLibTypes.add(type.getDescription());
       }

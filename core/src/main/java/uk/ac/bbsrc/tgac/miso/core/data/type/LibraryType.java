@@ -53,6 +53,7 @@ public class LibraryType implements Comparable, Serializable {
   private String description;
   /** Field platformType */
   private String platformType;
+  private Boolean archived;
 
   /**
    * Returns the libraryTypeId of this LibraryType object.
@@ -109,6 +110,14 @@ public class LibraryType implements Comparable, Serializable {
    */
   public void setPlatformType(String platformType) {
     this.platformType = platformType;
+  }
+
+  public Boolean getArchived() {
+    return archived;
+  }
+
+  public void setArchived(Boolean archived) {
+    this.archived = archived;
   }
 
   @Override
