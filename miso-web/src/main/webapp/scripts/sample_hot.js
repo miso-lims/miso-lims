@@ -437,10 +437,10 @@ Sample.hot = {
     region: null,
     tubeId: null,
     instituteTissueName: null,
-    cuts: null,
+    slides: null,
     discards: null,
     thickness: null,
-    cutsConsumed: null
+    slidesConsumed: null
   },
 
   /**
@@ -804,8 +804,8 @@ Sample.hot = {
 
       // Tissue Processing: CV Slides columns
       {
-        header: 'Cuts',
-        data: 'cuts',
+        header: 'Slides',
+        data: 'slides',
         validator: validatePosReqdNumber,
         include: show['Tissue Processing'] && sampleClassAlias == 'CV Slide'
       },
@@ -824,8 +824,8 @@ Sample.hot = {
 
       // Tissue Processing: LCM Tube columns
       {
-        header: 'Cuts Consumed',
-        data: 'cutsConsumed',
+        header: 'Slides Consumed',
+        data: 'slidesConsumed',
         validator: validatePosReqdNumber,
         include: show['Tissue Processing'] && sampleClassAlias == 'LCM Tube'
       },
@@ -1103,14 +1103,14 @@ Sample.hot = {
         sample.dnaseTreated = (obj.dnaseTreated == 'true');
         break;
       case 'Tissue Processing':
-        if (obj.cuts) {
-          sample.cuts = obj.cuts;
+        if (obj.slides) {
+          sample.slides = obj.slides;
           sample.type = 'CV Slide'; // add type info for deserialization
           sample.discards = (obj.discards ? obj.discards : 0);
           if (obj.thickness) sample.thickness = obj.thickness;
         }
-        if (obj.cutsConsumed) {
-          sample.cutsConsumed = obj.cutsConsumed;
+        if (obj.slidesConsumed) {
+          sample.slidesConsumed = obj.slidesConsumed;
           sample.type = 'LCM Tube'; // add type info for deserialization
         }
         break;

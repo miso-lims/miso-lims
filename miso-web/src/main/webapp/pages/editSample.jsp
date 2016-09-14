@@ -538,7 +538,7 @@
           <table class="in">
             <tr>
               <td class="h">Slides Remaining:</td>
-              <td id="slidesRemaining">${sample.slidesRemaining}</td>
+              <td id="slidesRemaining">${sample.getSlidesRemaining()}</td>
             </tr>
             <tr>
               <td class="h">Slides:*</td>
