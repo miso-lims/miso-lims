@@ -261,6 +261,9 @@ public class DefaultSampleService implements SampleService {
    * @throws IOException
    */
   private Sample save(Sample sample) throws IOException {
+    if (sample.isEmpty()) {
+      sample.setVolume(0.0);
+    }
     try {
       Long newId = sample.getId();
       if (newId == Sample.UNSAVED_ID) {

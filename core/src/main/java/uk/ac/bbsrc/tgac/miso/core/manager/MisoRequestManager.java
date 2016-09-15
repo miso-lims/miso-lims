@@ -1668,6 +1668,9 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public long saveLibrary(Library library) throws IOException {
     if (libraryStore != null) {
+      if (library.isEmpty()) {
+        library.setVolume(0.0);
+      }
       if (library.getLibraryAdditionalInfo() != null && library.getLibraryAdditionalInfo().getLibraryDesign() != null) {
         if (!isDetailedSample(library.getSample())) {
           throw new IOException("A library design can only be applied to a detailed sample.");
@@ -1753,6 +1756,9 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public long savePool(Pool pool) throws IOException {
     if (poolStore != null) {
+      if (pool.isEmpty()) {
+        pool.setVolume(0.0);
+      }
       return poolStore.save(pool);
     } else {
       throw new IOException("No poolStore available. Check that it has been declared in the Spring config.");
