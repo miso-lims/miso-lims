@@ -379,6 +379,7 @@ Run.ui = {
       }
     })).fnSetFilteringDelay();
     jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
+    jQuery("#toolbar").append("<button style=\"margin-left:5px;\" onclick=\"window.location.href='/miso/run/new';\" class=\"fg-button ui-state-default ui-corner-all\">Add Run</button>");
   },
 
   changeIlluminaLane: function (t, container) {
