@@ -109,6 +109,7 @@ var Box = Box || {
               jQuery('#updateSelected').prop('disabled', false).removeClass('disabled');
             }
             Box.ui.createListingBoxablesTable(Box.boxJSON);
+            jQuery('#updateSelected').focus();
           },
           'doOnError': function (json) {
             jQuery('#warningMessages').html('');
