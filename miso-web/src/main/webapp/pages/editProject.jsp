@@ -671,7 +671,7 @@
           </a>
 
           <div id="samplemenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
-            <a href='<c:url value="/miso/sample/new/${project.id}"/>'>Add Samples</a>
+            <a href='<c:url value="/miso/sample/new/${project.id}#tab-2"/>'>Add Samples</a>
             <a href="javascript:void(0);" onclick="getBulkSampleInputForm(${project.id});">Get Bulk Sample Input Form</a>
             <a href="javascript:void(0);" onclick="Project.ui.uploadBulkSampleInputForm();">Import Bulk Sample Input Form</a>
             <c:if test="${not empty project.samples}">
@@ -681,7 +681,7 @@
               <hr>
               <a href="javascript:void(0);" onclick="generateSampleDeliveryForm('#sample_table', ${project.id});">Get Information Form</a>
               <a href="javascript:void(0);" onclick="Project.ui.uploadSampleDeliveryForm();">Import Information Form</a>
-              <hr>
+             <hr>
               <a href="javascript:void(0);" onclick="Project.ui.receiveSamples('#sample_table');">Receive Samples</a>
               <a href="javascript:void(0);" onclick="bulkSampleQcTable('#sample_table');">QC Samples</a>
               <a href='<c:url value="/miso/library/new/${project.samples[0].id}#tab-2"/>'>Add Libraries</a>
