@@ -44,6 +44,9 @@ Library.hot = {
         if (!lib.libraryAdditionalInfo.prepKit) {
           lib.libraryAdditionalInfo.prepKit = { id: '', name: '' };
         }
+        if (lib.libraryAdditionalInfo.libraryDesignId) {
+          lib.libraryDesignAlias = Hot.maybeGetProperty(Hot.findFirstOrNull(Hot.idPredicate(lib.libraryAdditionalInfo.libraryDesignId), Library.designs), 'name');
+        }
       }
       if (!lib.indexFamilyName) {
         lib.indexFamilyName = 'No index';
@@ -106,6 +109,7 @@ Library.hot = {
         Hot.hotTable.setCellMeta(index, aliasColIndex, 'validator', Hot.requiredText);
         jQuery('#nonStandardAliasNote').show();
       }
+      Library.hot.changeDesign(index, 'libraryDesignAlias', null, library.libraryDesignAlias);
     });
     Hot.hotTable.render();
     
@@ -126,16 +130,19 @@ Library.hot = {
       if (['edit', 'autofill', 'paste'].indexOf(source)!= -1) {
         for (var i = 0; i < changes.length; i++) {
           // trigger only if old value is different from new value
+          if (changes[i][2] == changes[i][3]) {
+            continue;
+          }
           switch (changes[i][1]) {
             case 'platformName':
-              if (changes[i][2] != changes[i][3]) {
-                Library.hot.changePlatform(changes[i][0], changes[i][1], changes[i][2], changes[i][3]);
-              }
+              Library.hot.changePlatform(changes[i][0], changes[i][1], changes[i][2], changes[i][3]);
               break;
             case 'indexFamilyName':
-              if (changes[i][2] != changes[i][3]) {
-                Library.hot.changeIndexFamily(changes[i][0], changes[i][1], changes[i][2], changes[i][3]);
-              }
+              Library.hot.changeIndexFamily(changes[i][0], changes[i][1], changes[i][2], changes[i][3]);
+              break;
+            case 'libraryDesignAlias':
+              Library.hot.changeDesign(changes[i][0], changes[i][1], changes[i][2], changes[i][3]);
+              Library.hot.changePlatform(changes[i][0], 'platformName', null, Hot.hotTable.getDataAtCell(changes[i][0], Library.hot.pfIndex));
               break;
           }
         }
@@ -205,6 +212,10 @@ Library.hot = {
   getStrategyTypes: function () {
     return Hot.sortByProperty(Hot.dropdownRef['strategyTypes'], 'id').map(Hot.getAlias);
   },
+
+  getDesigns: function () {
+    return Hot.sortByProperty(Library.designs, 'id').map(Hot.getName);
+  },
   
   /**
    * Gets array of kit descriptor names
@@ -235,125 +246,126 @@ Library.hot = {
    * Sets columns for table
    */
   setColumnData: function (detailedBool) {
-    var qcBool = Library.hot.showQcs;
-    var cols;
-    if (detailedBool) {
-      cols = Hot.concatArrays(setAliasCol(), setPlainCols(), setDetailedCols());
-    } else {
-      cols = Hot.concatArrays(setAliasCol(), setPlainCols());
-    }
-    // add the ID Barcode column if it is not auto-generated
-    if (!Hot.autoGenerateIdBarcodes) {
-      cols.splice(3, 0, {
-          header: 'Matrix Barcode',
-          data: 'identificationBarcode',
-          type: 'text'
-        }
-      );
-    }
-    return cols;
-    
-    function setPlainCols () {
-      var libCols = [
-        {
-          header: 'Sample Alias',
-          data: 'parentSampleAlias',
-          readOnly: true
-        },{
-          header: 'Description',
-          data: 'description',
-          validator: Hot.requiredText
-        },{
-          header: 'Platform',
-          data: 'platformName',
-          type: 'dropdown',
-          trimDropdown: false,
-          source: Library.hot.getPlatforms()
-        },{
-          header: 'Type',
-          data: 'libraryTypeAlias',
-          type: 'dropdown',
-          trimDropdown: false,
-          source: '',
-          validator: Hot.requiredText
-        },{
-          header: 'Selection',
-          data: 'librarySelectionTypeAlias',
-          type: 'dropdown',
-          trimDropdown: false,
-          source: Library.hot.getSelectionTypes()
-        },{
-          header: 'Strategy',
-          data: 'libraryStrategyTypeAlias',
-          type: 'dropdown',
-          trimDropdown: false,
-          source: Library.hot.getStrategyTypes()
-        },{
-          header: 'Index Kit',
-          data: 'indexFamilyName',
-          type: 'dropdown',
-          trimDropdown: false,
-          source: ''
-        },{
-          header: 'Index 1',
-          data: 'index1Label',
-          type: 'autocomplete',
-          strict: true,
-          filter: false,
-          allowInvalid: true,
-          trimDropdown: false,
-          source: [""]
-        },{
-          header: 'Index 2',
-          data: 'index2Label',
-          type: 'autocomplete',
-          strict: true,
-          filter: false,
-          allowInvalid: true,
-          trimDropdown: false,
-          source: [""]
-        },{
-          header: 'QC Passed?',
-          data: 'qcPassed',
-          type: 'dropdown',
-          trimDropdown: false,
-          source: ['unknown', 'true', 'false']
-        },{
-          header: 'Volume',
-          data: 'volume',
-          type: 'numeric',
-          format: '0.0'
-        }
-      ];
-      
-      return libCols;
-    }
-    
-    function setAliasCol () {
-      var aliasCol = [
-        {
-          header: 'Library Alias',
-          data: 'alias',
-          validator: Hot.requiredText
-        }
-      ];
-      
-      return aliasCol;
-    }
-    
-    function setDetailedCols () {
-      var additionalCols = [
-        {
-          header: 'Kit',
-          data: 'libraryAdditionalInfo.prepKit.name',
-          type: 'dropdown',
-          trimDropdown: false,
-          source: Library.hot.getKitDescriptors()
-        }
-      ];
-      
-      return additionalCols;
-    }
+    return [
+      {
+        header: 'Library Alias',
+        data: 'alias',
+        validator: Hot.requiredText,
+        include: true
+      },
+      {
+        header: 'Sample Alias',
+        data: 'parentSampleAlias',
+        readOnly: true,
+        include: true
+      },
+      {
+        header: 'Matrix Barcode',
+        data: 'identificationBarcode',
+        type: 'text',
+        include: !Hot.autoGenerateIdBarcodes
+      },
+      {
+        header: 'Description',
+        data: 'description',
+        validator: Hot.requiredText,
+        include: true
+      },
+      {
+        header: 'Design',
+        data: 'libraryDesignAlias',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: Library.hot.getDesigns(),
+        include: detailedBool
+      },
+      {
+        header: 'Platform',
+        data: 'platformName',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: Library.hot.getPlatforms(),
+        include: true
+      },
+      {
+        header: 'Type',
+        data: 'libraryTypeAlias',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: '',
+        validator: Hot.requiredText,
+        include: true
+      },
+      {
+        header: 'Selection',
+        data: 'librarySelectionTypeAlias',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: Library.hot.getSelectionTypes(),
+        include: true
+      },
+      {
+        header: 'Strategy',
+        data: 'libraryStrategyTypeAlias',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: Library.hot.getStrategyTypes(),
+        include: true
+      },
+      {
+        header: 'Index Kit',
+        data: 'indexFamilyName',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: '',
+        include: true
+      },
+      {
+        header: 'Index 1',
+        data: 'index1Label',
+        type: 'autocomplete',
+        strict: true,
+        filter: false,
+        allowInvalid: true,
+        trimDropdown: false,
+        source: [""],
+        include: true
+      },
+      {
+        header: 'Index 2',
+        data: 'index2Label',
+        type: 'autocomplete',
+        strict: true,
+        filter: false,
+        allowInvalid: true,
+        trimDropdown: false,
+        source: [""],
+        include: true
+      },
+      {
+        header: 'QC Passed?',
+        data: 'qcPassed',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: ['unknown', 'true', 'false'],
+        include: true
+      },
+      {
+        header: 'Volume',
+        data: 'volume',
+        type: 'numeric',
+        format: '0.0',
+        include: true
+      },
+      {
+        header: 'Kit',
+        data: 'libraryAdditionalInfo.prepKit.name',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: Library.hot.getKitDescriptors(),
+        include: detailedBool
+      }
+    ].filter(function(col) { return col.include; });
   },
   
   validateAlias: function (value, callback) {
@@ -379,6 +391,34 @@ Library.hot = {
     }
   },
 
+  changeDesign: function (row, col, from, to) {
+    var design = Hot.findFirstOrNull(Hot.namePredicate(to), Library.designs);
+    [
+      {
+        columnName: 'platformName',
+        designToStr: function(design) { return design.libraryType.platformType; }
+      },
+      {
+        columnName: 'libraryTypeAlias',
+        designToStr: function(design) { return design.libraryType.description; },
+      },
+      {
+        columnName: 'librarySelectionTypeAlias',
+        designToStr: function(design) { return Hot.getAliasFromId(design.librarySelectionType, Hot.dropdownRef.selectionTypes); }
+
+      },
+      {
+        columnName: 'libraryStrategyTypeAlias',
+        designToStr: function(design) { return Hot.getAliasFromId(design.libraryStrategyType, Hot.dropdownRef.strategyTypes); }
+      }
+    ].forEach(
+      function (info) {
+        var columnIndex = Hot.getColIndex(info.columnName);
+        var newValue = design ? info.designToStr(design) : '';
+        Hot.hotTable.setDataAtCell(row, columnIndex, newValue, 'design change');
+        Hot.hotTable.setCellMeta(row, columnIndex, 'readOnly', !!design);
+      });
+  },
   /**
    * Detects Platform change for a row and clears out library type, index family, and indices as these are all platform-specific
    */
@@ -576,6 +616,9 @@ Library.hot = {
           lib.libraryAdditionalInfo.archived = false;
         }
         lib.libraryAdditionalInfo.nonStandardAlias = obj.libraryAdditionalInfo.nonStandardAlias;
+        if (obj.libraryDesignAlias) {
+          lib.libraryAdditionalInfo.libraryDesignId = Hot.maybeGetProperty(Hot.findFirstOrNull(Hot.namePredicate(obj.libraryDesignAlias), Library.designs), 'id');
+        }
       }
 
       lib.qcPassed = (obj.qcPassed && obj.qcPassed != 'unknown' ? obj.qcPassed : '') || '';

@@ -86,6 +86,10 @@ var Hot = {
     if (obj.alias) return obj.alias;
   },
 
+  getName: function (obj) {
+    if (obj.name) return obj.name;
+  },
+
   /**
    * Gets values for a given key
    */
@@ -102,33 +106,48 @@ var Hot = {
     });
   },
 
+  findFirstOrNull: function (predicate, referenceCollection) {
+    var results = referenceCollection.filter(predicate);
+    return results.length > 0 ? results[0] : null;
+  },
+  maybeGetProperty: function(obj, propertyName) {
+    return obj ? obj[propertyName] : null;
+  },
+  aliasPredicate: function (alias) {
+    return function (item) {
+      return item.alias == alias;
+    };
+  },
+  idPredicate: function (id) {
+    return function (item) {
+      return item.id == id;
+    };
+  },
+  namePredicate: function (name) {
+    return function (item) {
+      return item.name == name;
+    };
+  },
   /**
    * Gets the object from a given id and collection
    */
   getObjById: function (id, referenceCollection) {
-    var results = referenceCollection.filter(function (item) {
-      return item.id == id;
-    });
-    return results.length > 0 ? results[0] : null;
+    return Hot.findFirstOrNull(Hot.idPredicate(id), referenceCollection);
   },
   /**
    * Gets the id of an object from a given alias and collection
    */
   getIdFromAlias: function (alias, referenceCollection) {
-    var results = referenceCollection.filter(function (item) {
-      return item.alias == alias;
-    });
-    return results.length > 0 ? results[0].id : null;
+    return Hot.maybeGetProperty(
+      Hot.findFirstOrNull(Hot.aliasPredicate(alias), referenceCollection),
+      'id');
   },
 
   /**
    * Gets the alias of an object from a given id and collection
    */
   getAliasFromId: function (id, referenceCollection) {
-    var results = referenceCollection.filter(function (item) {
-      return item.id == id;
-    });
-    return results.length > 0 ? results[0].alias : null;
+    return Hot.maybeGetProperty(Hot.findFirstOrNull(Hot.idPredicate(id), referenceCollection), 'alias');
   },
 
   /**
