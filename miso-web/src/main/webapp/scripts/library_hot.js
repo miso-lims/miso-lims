@@ -468,7 +468,9 @@ Library.hot = {
    */
   updateIndexCellsSources: function (row, platformName, ifam) {
     function setIndexSource (platformName, ifam, pos, len) {
-      Hot.hotTable.setCellMeta(row, Library.hot['index' + pos + 'ColIndex'], 'source', Library.hot.getIndexLabels(Hot.dropdownRef.indices[platformName][ifam][pos]));
+      var indexLabels = Library.hot.getIndexLabels(Hot.dropdownRef.indices[platformName][ifam][pos]);
+      if (pos == 2) indexLabels.push('');
+      Hot.hotTable.setCellMeta(row, Library.hot['index' + pos + 'ColIndex'], 'source', indexLabels);
       Hot.hotTable.setCellMeta(row, Library.hot['index' + pos + 'ColIndex'], 'readOnly', false);
       // empty source array for index 2 column in case there are no indices for position 2
       if (pos == 1) {
