@@ -377,6 +377,9 @@ public class SQLRunDAO implements RunStore {
     }
 
     if (this.cascadeType != null) {
+      for (SequencerPartitionContainer<SequencerPoolPartition> container : run.getSequencerPartitionContainers()) {
+        container.setId(sequencerPartitionContainerDAO.save(container));
+      }
       if (this.cascadeType.equals(CascadeType.PERSIST)) {
         SEQ_PART_CONTAINER_WRITER.saveAll(template, run.getId(), run.getSequencerPartitionContainers());
       }
@@ -502,9 +505,6 @@ public class SQLRunDAO implements RunStore {
               l.setId(sequencerPartitionContainerDAO.save(l));
             }
             SEQ_PART_CONTAINER_WRITER.saveAll(template, run.getId(), run.getSequencerPartitionContainers());
-            for (SequencerPartitionContainer<SequencerPoolPartition> container : run.getSequencerPartitionContainers()) {
-              sequencerPartitionContainerDAO.save(container);
-            }
           }
 
           if (!run.getNotes().isEmpty()) {
