@@ -63,7 +63,21 @@ var Utils = Utils || {
   setSortFromPriority: function (table) {
     table.aaSorting = [ [ table.aoColumns.reduce(function(acc, curr, index) { return acc.iSortPriority > curr.iSortPriority ? acc : { iSortPriority : curr.iSortPriority, iPos : index }; }, { iSortPriority : -1, iPos : 0 }).iPos  , "desc" ] ];
     return table;
+  },
+
+  checkCommonSampleClasses: function(jqueryDataTableData, getSampleClassFromObject, selectedIdsArray, errorText) {
+    var sampleClasses = jqueryDataTableData.aaData
+      .filter(function(x) { return selectedIdsArray.indexOf("" + x.id) != -1; })
+      .map(getSampleClassFromObject);
+    for(var i = 1; i < sampleClasses.length; i++) {
+      if (sampleClasses[i] != sampleClasses[0]) {
+        alert(errorText);
+        return false;
+      }
+    }
+    return true;
   }
+
 };
 
 Utils.timer = {

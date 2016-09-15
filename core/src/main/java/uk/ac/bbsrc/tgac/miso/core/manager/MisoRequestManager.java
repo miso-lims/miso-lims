@@ -1678,10 +1678,26 @@ public class MisoRequestManager implements RequestManager {
               "This library design is not valid for sample " + library.getSample().getName() + " because the class is not compatible.");
         }
         library.getLibraryAdditionalInfo().setLibraryDesign(design);
-        library.setLibrarySelectionType(libraryStore.getLibrarySelectionTypeById(design.getLibrarySelectionType()));
-        library.setLibraryStrategyType(libraryStore.getLibraryStrategyTypeById(design.getLibraryStrategyType()));
-        library.setLibraryType(design.getLibraryType());
-        library.setPlatformName(design.getLibraryType().getPlatformType());
+        LibrarySelectionType selection = libraryStore.getLibrarySelectionTypeById(design.getLibrarySelectionType());
+        LibraryStrategyType strategy = libraryStore.getLibraryStrategyTypeById(design.getLibraryStrategyType());
+        LibraryType type = design.getLibraryType();
+        String platformName = design.getLibraryType().getPlatformType();
+        if (library.getLibrarySelectionType() != null && library.getLibrarySelectionType().getId() != selection.getId()) {
+          throw new IOException("Library selection doesn't match library design.");
+        }
+        if (library.getLibraryStrategyType() != null && library.getLibraryStrategyType().getId() != strategy.getId()) {
+          throw new IOException("Library strategy doesn't match library design.");
+        }
+        if (library.getLibraryType() != null && library.getLibraryType().getId() != type.getId()) {
+          throw new IOException("Library type doesn't match library design.");
+        }
+        if (library.getPlatformName() != null && !library.getPlatformName().equals(platformName)) {
+          throw new IOException("Library platform doesn't match library design.");
+        }
+        library.setLibrarySelectionType(selection);
+        library.setLibraryStrategyType(strategy);
+        library.setLibraryType(type);
+        library.setPlatformName(platformName);
       }
       return libraryStore.save(library);
     } else {

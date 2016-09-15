@@ -1198,14 +1198,8 @@ Library.ui = {
       alert("Please select one or more Libraries to update.");
       return false;
     }
-    var sampleClasses = Library.listData.aaData
-      .filter(function(x) { return selectedIdsArray.indexOf("" + x.id) != -1; })
-      .map(function(x) { return x.parentSampleClassId; });
-    for(var i = 1; i < sampleClasses.length; i++) {
-      if (sampleClasses[i] != sampleClasses[0]) {
-        alert("All selected libraries must be made from samples of the same class.");
-        return false;
-      }
+    if (!Utils.checkCommonSampleClasses(Library.listData, function(x) { return x.parentSampleClassId; }, selectedIdsArray, "All selected libraries must be made from samples of the same class.")) {
+      return false;
     }
     window.location = "library/bulk/edit/" + selectedIdsArray.join(',');
   },
