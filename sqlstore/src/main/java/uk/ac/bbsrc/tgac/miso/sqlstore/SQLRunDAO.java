@@ -377,10 +377,10 @@ public class SQLRunDAO implements RunStore {
     }
 
     if (this.cascadeType != null) {
-      for (SequencerPartitionContainer<SequencerPoolPartition> container : run.getSequencerPartitionContainers()) {
-        container.setId(sequencerPartitionContainerDAO.save(container));
-      }
       if (this.cascadeType.equals(CascadeType.PERSIST)) {
+        for (SequencerPartitionContainer<SequencerPoolPartition> container : run.getSequencerPartitionContainers()) {
+          container.setId(sequencerPartitionContainerDAO.save(container));
+        }
         SEQ_PART_CONTAINER_WRITER.saveAll(template, run.getId(), run.getSequencerPartitionContainers());
       }
 
