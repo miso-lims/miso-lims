@@ -36,6 +36,9 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
@@ -68,7 +71,7 @@ public class KitDescriptor implements Serializable {
   private Integer stockLevel = 0;
   private String description = "";
   @Transient
-  private Collection<ChangeLog> changelog = new ArrayList<>();
+  private final Collection<ChangeLog> changelog = new ArrayList<>();
   @Transient
   private User lastModifier;
 
@@ -284,5 +287,35 @@ public class KitDescriptor implements Serializable {
     sb.append(" : ");
     sb.append(getDescription());
     return sb.toString();
+  }
+
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder(21, 51)
+        .append(description)
+        .append(kitType)
+        .append(manufacturer)
+        .append(name)
+        .append(partNumber)
+        .append(platformType)
+        .append(version)
+        .toHashCode();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    KitDescriptor other = (KitDescriptor) obj;
+    return new EqualsBuilder()
+        .append(description, other.description)
+        .append(kitType, other.kitType)
+        .append(manufacturer, other.manufacturer)
+        .append(name, other.name)
+        .append(partNumber, other.partNumber)
+        .append(platformType, other.platformType)
+        .append(version, other.version)
+        .isEquals();
   }
 }

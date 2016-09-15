@@ -4,6 +4,9 @@ import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Transient;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+
 /*
  * Skeleton implementation of a Boxable item
  */
@@ -108,5 +111,33 @@ public abstract class AbstractBoxable implements Boxable {
   @Override
   public void setBoxLocation(String boxLocation) {
     this.boxLocation = boxLocation;
+  }
+
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder(1, 31)
+        .append(alias)
+        .append(boxAlias)
+        .append(boxLocation)
+        .append(empty)
+        .append(position)
+        .append(volume)
+        .toHashCode();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    AbstractBoxable other = (AbstractBoxable) obj;
+    return new EqualsBuilder()
+        .append(alias, other.alias)
+        .append(boxAlias, other.boxAlias)
+        .append(boxLocation, other.boxLocation)
+        .append(empty, other.empty)
+        .append(position, other.position)
+        .append(volume, other.volume)
+        .isEquals();
   }
 }

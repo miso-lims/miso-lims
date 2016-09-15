@@ -3,16 +3,11 @@
  */
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
-import static org.junit.Assert.fail;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,15 +26,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import static org.junit.Assert.assertEquals;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
-import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
@@ -47,7 +37,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.AllowAnythingEntityNamingScheme;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.EntityGroupStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
@@ -110,11 +99,11 @@ public class SQLProjectDAOTest extends AbstractDAOTest {
   private SQLProjectDAO projectDAO;
 
   // shared rules
-  private Authentication mockAuthentication = mock(Authentication.class);
-  private SecurityContext mockContext = mock(SecurityContext.class);
+  private final Authentication mockAuthentication = mock(Authentication.class);
+  private final SecurityContext mockContext = mock(SecurityContext.class);
 
   // a project to save
-  private Project project = new ProjectImpl();
+  private final Project project = new ProjectImpl();
 
   /**
    * @throws java.lang.Exception
@@ -143,12 +132,14 @@ public class SQLProjectDAOTest extends AbstractDAOTest {
   public void testSave() throws Exception {
     long autoIncrementId = nextAutoIncrementId;
     mockAutoIncrement(autoIncrementId);
+    final String testAlias = "test alias";
+    project.setAlias(testAlias);
 
     long savedProjectId = projectDAO.save(project);
     nextAutoIncrementId += 1;
 
     Project savedProject = projectDAO.get(savedProjectId);
-    assertEquals(project, savedProject);
+    assertEquals(testAlias, savedProject.getAlias());
   }
 
   /**
@@ -160,11 +151,14 @@ public class SQLProjectDAOTest extends AbstractDAOTest {
     long autoIncrementId = nextAutoIncrementId;
     mockAutoIncrement(autoIncrementId);
     project.getSecurityProfile().setProfileId(SecurityProfile.UNSAVED_ID);
+    final String testAlias = "test alias";
+    project.setAlias(testAlias);
+    
     long savedProjectId = projectDAO.save(project);
     nextAutoIncrementId += 1;
 
     Project savedProject = projectDAO.get(savedProjectId);
-    assertEquals(project, savedProject);
+    assertEquals(testAlias, savedProject.getAlias());
   }
 
   private void mockAutoIncrement(long value) {

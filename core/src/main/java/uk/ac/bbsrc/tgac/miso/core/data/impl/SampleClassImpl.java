@@ -12,6 +12,9 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
@@ -137,5 +140,29 @@ public class SampleClassImpl implements SampleClass {
   @Override
   public void setDNAseTreatable(Boolean treatable) {
     dnaseTreatable = treatable;
+  }
+
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder(19, 49)
+        .append(alias)
+        .append(dnaseTreatable)
+        .append(sampleCategory)
+        .append(suffix)
+        .toHashCode();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    SampleClassImpl other = (SampleClassImpl) obj;
+    return new EqualsBuilder()
+        .append(alias, other.alias)
+        .append(dnaseTreatable, other.dnaseTreatable)
+        .append(sampleCategory, other.sampleCategory)
+        .append(suffix, other.suffix)
+        .isEquals();
   }
 }
