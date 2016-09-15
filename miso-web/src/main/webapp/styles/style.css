@@ -1854,13 +1854,13 @@ textarea.parsley-error {
 }
 
 img.center {
-	display: block;
-	margin-left: auto;
-	margin-right: auto;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .warning {
-	color: #b23115;
+  color: #b23115;
 }
 
 button.disabled {
@@ -1868,21 +1868,28 @@ button.disabled {
 }
 
 .parsley-required, .parsley-custom-error-message {
-	color: #ff0000;
+  color: #ff0000;
 }
 
 .floatleft {
-	float: left;
+  float: left;
 }
 .rightfloatleft {
-	width: 80%;
-	margin-left: 15px;
+  width: 80%;
+  margin-left: 15px;
 }
 
 .clear {
-	clear: both;
+  clear: both;
 }
 
 .table-note {
-	background-color: #ffffcc;
+  background-color: #ffffcc;
+}
+
+.dataTables_paginate_numbers {
+  padding: 2px 3px;
+  margin: 0;
+  display: inline-block;
+  cursor: pointer;
 }
