@@ -326,7 +326,7 @@ Container.ui = {
     jQuery('#listingContainersTable').dataTable({
       "aoColumns": [
         {
-          "sTitle": "ID Barcode",
+          "sTitle": "Serial Number",
           "mData": "identificationBarcode",
           "mRender": function (data, type, full) {
             return "<a href=\"/miso/container/" + full.id + "\">" + data + "</a>";

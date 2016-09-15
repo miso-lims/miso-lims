@@ -52,6 +52,7 @@ public abstract class AbstractSequencerPartitionContainer<T extends Partition> i
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long containerId = AbstractSequencerPartitionContainer.UNSAVED_ID;
 
+  // identificationBarcode is displayed as "serial number" to the user
   private String identificationBarcode;
   private String locationBarcode;
   private Boolean paired = false;

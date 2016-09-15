@@ -253,7 +253,7 @@ public class RunControllerHelperService {
       b.append("<h2>Container 1</h2>");
       b.append("<table class='in'>");
       b.append(
-          "<tr><td>ID:</td><td><button onclick='Run.container.lookupContainer(this, 0);' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button><div style='overflow:hidden'><input type='text' id='sequencerPartitionContainers[0].identificationBarcode' name='sequencerPartitionContainers[0].identificationBarcode'/></div></td></tr>");
+          "<tr><td>Serial Number:</td><td><button onclick='Run.container.lookupContainer(this, 0);' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button><div style='overflow:hidden'><input type='text' id='sequencerPartitionContainers[0].identificationBarcode' name='sequencerPartitionContainers[0].identificationBarcode'/></div></td></tr>");
       b.append(
           "<tr><td>Location:</td><td><input type='text' id='sequencerPartitionContainers[0].locationBarcode' name='sequencerPartitionContainers[0].locationBarcode'/></td></tr>");
       b.append(
@@ -279,7 +279,7 @@ public class RunControllerHelperService {
       b.append("<h2>Container 1</h2>");
       b.append("<table class='in'>");
       b.append(
-          "<tr><td>ID:</td><td><button onclick='Run.container.lookupContainer(this, 0);' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button><div style='overflow:hidden'><input type='text' id='sequencerPartitionContainers[0].identificationBarcode' name='sequencerPartitionContainers[0].identificationBarcode'/></div></td></tr>");
+          "<tr><td>Serial Number:</td><td><button onclick='Run.container.lookupContainer(this, 0);' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button><div style='overflow:hidden'><input type='text' id='sequencerPartitionContainers[0].identificationBarcode' name='sequencerPartitionContainers[0].identificationBarcode'/></div></td></tr>");
       b.append(
           "<tr><td>Location:</td><td><input type='text' id='sequencerPartitionContainers[0].locationBarcode' name='sequencerPartitionContainers[0].locationBarcode'/></td></tr>");
       b.append(
@@ -300,7 +300,7 @@ public class RunControllerHelperService {
       for (int i = 0; i < numContainers; i++) {
         b.append("<h2>Container " + (i + 1) + "</h2>");
         b.append("<table class='in'>");
-        b.append("<tr><td>ID:</td><td><button onclick='Run.container.lookupContainer(this, " + i
+        b.append("<tr><td>Serial Number:</td><td><button onclick='Run.container.lookupContainer(this, " + i
             + ");' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button><div style='overflow:hidden'><input type='text' id='sequencerPartitionContainers["
             + i + "].identificationBarcode' name='sequencerPartitionContainers[" + i + "].identificationBarcode'/></div></td></tr>");
         b.append("<tr><td>Location:</td><td><input type='text' id='sequencerPartitionContainers[" + i
@@ -385,7 +385,7 @@ public class RunControllerHelperService {
     for (int i = 0; i < numContainers; i++) {
       b.append("<h2>Container " + (i + 1) + "</h2>");
       b.append("<table class='in'>");
-      b.append("<tr><td>ID:</td><td><button onclick='Run.container.lookupContainer(this, " + i
+      b.append("<tr><td>Serial Number:</td><td><button onclick='Run.container.lookupContainer(this, " + i
           + ");' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button><div style='overflow:hidden'><input type='text' id='sequencerPartitionContainers["
           + i + "].identificationBarcode' name='sequencerPartitionContainers[" + i + "].identificationBarcode'/></div></td></tr>");
       b.append("<tr><td>Location:</td><td><input type='text' id='sequencerPartitionContainers[" + i
@@ -450,7 +450,7 @@ public class RunControllerHelperService {
     for (int i = 0; i < numContainers; i++) {
       b.append("<h2>Container " + (i + 1) + "</h2>");
       b.append("<table class='in'>");
-      b.append("<tr><td>ID:</td><td><button onclick='Run.container.lookupContainer(this, " + i
+      b.append("<tr><td>Serial Number:</td><td><button onclick='Run.container.lookupContainer(this, " + i
           + ");' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button><div style='overflow:hidden'><input type='text' id='sequencerPartitionContainers["
           + i + "].identificationBarcode' name='sequencerPartitionContainers[" + i + "].identificationBarcode'/></div></td></tr>");
       b.append("<tr><td>Location:</td><td><input type='text' id='sequencerPartitionContainers[" + i
@@ -537,7 +537,7 @@ public class RunControllerHelperService {
     for (int i = 0; i < numContainers; i++) {
       b.append("<h2>Container " + (i + 1) + "</h2>");
       b.append("<table class='in'>");
-      b.append("<tr><td>ID:</td><td><button onclick='Run.container.lookupContainer(this, " + i
+      b.append("<tr><td>Serial Number:</td><td><button onclick='Run.container.lookupContainer(this, " + i
           + ");' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button><div style='overflow:hidden'><input type='text' id='sequencerPartitionContainers["
           + i + "].identificationBarcode' name='sequencerPartitionContainers[" + i + "].identificationBarcode'/></div></td></tr>");
       b.append("<tr><td>Location:</td><td><input type='text' id='sequencerPartitionContainers[" + i

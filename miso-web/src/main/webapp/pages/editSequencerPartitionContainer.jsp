@@ -145,7 +145,7 @@
               <tr>
                 <c:choose>
                   <c:when test="${empty container.identificationBarcode}">
-                    <td>ID Barcode:</td>
+                    <td>Serial Number:</td>
                     <td>
                       <button onclick="Container.lookupContainer(this);" type="button"
                               class="right-button ui-state-default ui-corner-all">Lookup
@@ -156,7 +156,7 @@
                     </td>
                   </c:when>
                   <c:otherwise>
-                    <td>ID Barcode:</td>
+                    <td>Serial Number:</td>
                     <td>
                       <span id="idBarcode">${container.identificationBarcode}</span>
                       <a href="javascript:void(0);"
