@@ -864,14 +864,14 @@ Sample.hot = {
 
       // QC columns
       {
-        header: 'Vol.',
+        header: 'Vol. (&#181;l)',
         data: 'volume',
         type: 'numeric',
         format: '0.00',
         include: showQcs || show['Stock']
       },
       {
-        header: 'Conc.',
+        header: 'Conc. (ng/&#181;l)',
         data: 'concentration',
         type: 'numeric',
         format: '0.00',

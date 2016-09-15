@@ -356,7 +356,7 @@ Library.hot = {
         include: true
       },
       {
-        header: 'Volume',
+        header: 'Vol. (&#181;l)',
         data: 'volume',
         type: 'numeric',
         format: '0.0',
