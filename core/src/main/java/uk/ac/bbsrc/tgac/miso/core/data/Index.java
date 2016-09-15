@@ -37,6 +37,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.codehaus.jackson.annotate.JsonBackReference;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
@@ -128,6 +130,30 @@ public class Index implements Nameable {
     } else {
       return null;
     }
+  }
+
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder(9, 39)
+        .append(family)
+        .append(name)
+        .append(sequence)
+        .append(position)
+        .toHashCode();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    Index other = (Index) obj;
+    return new EqualsBuilder()
+        .append(family, other.family)
+        .append(name, other.name)
+        .append(sequence, other.sequence)
+        .append(position, other.position)
+        .isEquals();
   }
 
 }

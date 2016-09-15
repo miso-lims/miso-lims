@@ -7,6 +7,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 
@@ -104,5 +107,33 @@ public class LibraryDesign {
     if (library.getLibrarySelectionType().getId() != librarySelectionType) return false;
     if (library.getLibraryStrategyType().getId() != libraryStrategyType) return false;
     return true;
+  }
+
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder(13, 43)
+        .append(librarySelectionType)
+        .append(libraryStrategyType)
+        .append(libraryType)
+        .append(name)
+        .append(sampleClass)
+        .append(suffix)
+        .toHashCode();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    LibraryDesign other = (LibraryDesign) obj;
+    return new EqualsBuilder()
+        .append(librarySelectionType, other.librarySelectionType)
+        .append(libraryStrategyType, other.libraryStrategyType)
+        .append(libraryType, other.libraryType)
+        .append(name, other.name)
+        .append(sampleClass, other.sampleClass)
+        .append(suffix, other.suffix)
+        .isEquals();
   }
 }

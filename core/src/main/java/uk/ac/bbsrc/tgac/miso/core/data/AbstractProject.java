@@ -40,6 +40,8 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.Transient;
 
 import org.apache.commons.lang.BooleanUtils;
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.TypeDefs;
@@ -52,13 +54,10 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
-import uk.ac.bbsrc.tgac.miso.core.data.visitor.SubmittableVisitor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressTypeUserType;
 import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
-import uk.ac.bbsrc.tgac.miso.core.event.listener.ProjectListener;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 /**
  * Skeleton implementation of a Project
@@ -197,7 +196,7 @@ public abstract class AbstractProject implements Project {
   @Override
   public ProjectOverview getOverviewById(Long overviewId) {
     for (ProjectOverview p : getOverviews()) {
-      if (p.getOverviewId().longValue() == overviewId) {
+      if (p.getId() == overviewId) {
         return p;
       }
     }
@@ -426,40 +425,6 @@ public abstract class AbstractProject implements Project {
     return getName();
   }
 
-  /**
-   * Equivalency is based on getProjectId() if set, otherwise on name, description and creation date.
-   */
-  @Override
-  public boolean equals(Object obj) {
-    if (obj == null) return false;
-    if (obj == this) return true;
-    if (!(obj instanceof AbstractProject)) return false;
-    AbstractProject them = (AbstractProject) obj;
-
-    if (getId() == AbstractProject.UNSAVED_ID || them.getId() == AbstractProject.UNSAVED_ID) {
-      if (getName() != null && them.getName() != null) {
-        return getName().equals(them.getName());
-      } else {
-        return getAlias().equals(them.getAlias());
-      }
-    } else {
-      return this.getId() == them.getId();
-    }
-  }
-
-  @Override
-  public int hashCode() {
-    if (getId() != 0L && getId() != AbstractProject.UNSAVED_ID) {
-      return (int) getId();
-    } else {
-      final int PRIME = 37;
-      int hashcode = 1;
-      if (getName() != null) hashcode = PRIME * hashcode + getName().hashCode();
-      if (getAlias() != null) hashcode = PRIME * hashcode + getAlias().hashCode();
-      return hashcode;
-    }
-  }
-
   @Override
   public int compareTo(Object o) {
     Project s = (Project) o;
@@ -496,6 +461,32 @@ public abstract class AbstractProject implements Project {
   @Override
   public void setReferenceGenomeId(Long referenceGenomeId) {
     this.referenceGenomeId = referenceGenomeId;
+  }
+
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder(5, 35)
+        .append(alias)
+        .append(description)
+        .append(progress)
+        .append(referenceGenomeId)
+        .append(shortName)
+        .toHashCode();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    AbstractProject other = (AbstractProject) obj;
+    return new EqualsBuilder()
+        .append(alias, other.alias)
+        .append(description, other.description)
+        .append(progress, other.progress)
+        .append(referenceGenomeId, other.referenceGenomeId)
+        .append(shortName, other.shortName)
+        .isEquals();
   }
 
 }
