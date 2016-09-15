@@ -1,6 +1,8 @@
 package uk.ac.bbsrc.tgac.miso.migration.destination;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.persistence.CascadeType;
 
@@ -33,6 +35,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.DefaultEntityNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.OicrSampleAliasGenerator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.OicrSampleNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.migration.util.SimpleLibraryNamingScheme;
 import uk.ac.bbsrc.tgac.miso.persistence.HibernateSampleClassDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateIndexDao;
@@ -68,6 +71,7 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryQCDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLNoteDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLPlatformDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLPoolDAO;
+import uk.ac.bbsrc.tgac.miso.sqlstore.SQLPoolQCDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLProjectDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLRunDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLRunQCDAO;
@@ -99,7 +103,7 @@ public class MisoServiceManager {
 
   private LocalSecurityManager securityManager; // Supports JDBC authentication only
   private MigrationAuthorizationManager authorizationManager;
-  private final DaoLookup daoLookup = null;
+  private DaoLookup daoLookup;
 
   private SQLSecurityDAO securityStore;
   private SQLSecurityProfileDAO securityProfileDao;
@@ -113,6 +117,7 @@ public class MisoServiceManager {
   private SQLLibraryDilutionDAO dilutionDao;
   private SQLTargetedResequencingDAO targetedResequencingDao;
   private SQLPoolDAO poolDao;
+  private SQLPoolQCDAO poolQcDao;
   private SQLExperimentDAO experimentDao;
   private SQLKitDAO kitDao;
   private SQLPlatformDAO platformDao;
@@ -221,6 +226,8 @@ public class MisoServiceManager {
     m.setDefaultWatcherDao();
     m.setDefaultLibraryDesignDao();
     m.setDefaultIndexDao();
+    m.setDefaultDaoLookup();
+    m.setDefaultPoolQcDao();
 
     User migrationUser = m.getsecurityStore().getUserByLoginName(username);
     if (migrationUser == null) throw new IllegalArgumentException("User '" + username + "' not found");
@@ -692,6 +699,7 @@ public class MisoServiceManager {
 
   private void updateDilutionDaoDependencies() {
     if (libraryDao != null) libraryDao.setDilutionDAO(dilutionDao);
+    if (daoLookup != null) daoLookup.setDaos(makeDaoLookupMap());
   }
 
   public SQLTargetedResequencingDAO getTargetedResequencingDao() {
@@ -738,6 +746,7 @@ public class MisoServiceManager {
     dao.setSecurityManager(securityManager);
     dao.setSecurityProfileDAO(securityProfileDao);
     dao.setWatcherDAO(watcherDao);
+    dao.setPoolQcDAO(poolQcDao);
     setPoolDao(dao);
   }
 
@@ -1422,6 +1431,52 @@ public class MisoServiceManager {
 
   private void updateIndexDaoDependencies() {
     if (libraryDao != null) libraryDao.setIndexStore(indexDao);
+  }
+
+  public DaoLookup getDaoLookup() {
+    return daoLookup;
+  }
+
+  public void setDaoLookup(DaoLookup daoLookup) {
+    this.daoLookup = daoLookup;
+    updateDaoLookupDependencies();
+  }
+
+  public void setDefaultDaoLookup() {
+    DaoLookup lookup = new DaoLookup();
+    lookup.setDaos(makeDaoLookupMap());
+    setDaoLookup(lookup);
+  }
+  
+  private Map<Class<?>, Store<?>> makeDaoLookupMap() {
+    Map<Class<?>, Store<?>> daoMap = new HashMap<>();
+    if (dilutionDao != null) daoMap.put(LibraryDilution.class, dilutionDao);
+    return daoMap;
+  }
+
+  private void updateDaoLookupDependencies() {
+    if (poolDao != null) poolDao.setDaoLookup(daoLookup);
+  }
+
+  public SQLPoolQCDAO getPoolQcDao() {
+    return poolQcDao;
+  }
+
+  public void setPoolQcDao(SQLPoolQCDAO poolQcDao) {
+    this.poolQcDao = poolQcDao;
+    updatePoolQcDaoDependencies();
+  }
+
+  public void setDefaultPoolQcDao() {
+    SQLPoolQCDAO dao = new SQLPoolQCDAO();
+    dao.setJdbcTemplate(jdbcTemplate);
+    dao.setDataObjectFactory(dataObjectFactory);
+    dao.setPoolDAO(poolDao);
+    setPoolQcDao(dao);
+  }
+
+  private void updatePoolQcDaoDependencies() {
+    if (poolDao != null) poolDao.setPoolQcDAO(poolQcDao);
   }
 
 }
