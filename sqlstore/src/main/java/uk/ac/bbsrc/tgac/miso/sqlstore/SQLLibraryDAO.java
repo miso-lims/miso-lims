@@ -118,8 +118,8 @@ public class SQLLibraryDAO implements LibraryStore {
 
   public static final String LIBRARY_SELECT_BY_ALIAS = LIBRARIES_SELECT + " WHERE l.alias = ?";
 
-  public static final String LIBRARIES_SELECT_BY_SEARCH = LIBRARIES_SELECT + " WHERE " + "l.identificationBarcode LIKE ? OR "
-      + "l.name LIKE ? OR " + "l.alias LIKE ? OR " + "l.description LIKE ? ";
+  public static final String LIBRARIES_SELECT_BY_SEARCH = LIBRARIES_SELECT + " WHERE UPPER(l.identificationBarcode) LIKE ? OR "
+      + "UPPER(l.name) LIKE ? OR UPPER(l.alias) LIKE ? OR UPPER(l.description) LIKE ? ";
 
   public static final String LIBRARY_SELECT_BY_IDENTIFICATION_BARCODE = LIBRARIES_SELECT + " WHERE l.identificationBarcode = ?";
 
@@ -140,7 +140,7 @@ public class SQLLibraryDAO implements LibraryStore {
   public static final String LIBRARY_COUNT = "SELECT COUNT(*) " + "FROM " + TABLE_NAME + " l";
 
   public static final String LIBRARY_COUNT_BY_SEARCH = LIBRARY_COUNT
-      + " WHERE (l.name LIKE ? OR l.alias LIKE ? OR l.identificationBarcode LIKE ? OR l.description LIKE ?)";
+      + " WHERE UPPER(l.name) LIKE ? OR UPPER(l.alias) LIKE ? OR UPPER(l.identificationBarcode) LIKE ? OR UPPER(l.description) LIKE ?";
 
   public static final String LIBRARY_UPDATE = "UPDATE " + TABLE_NAME
       + " SET name=:name, description=:description, alias=:alias, accession=:accession, securityProfile_profileId=:securityProfile_profileId, "
@@ -401,8 +401,8 @@ public class SQLLibraryDAO implements LibraryStore {
             Number newId = insert.executeAndReturnKey(params);
             if (newId.longValue() != library.getId()) {
               log.error("Expected library ID doesn't match returned value from database insert: rolling back...");
-              new NamedParameterJdbcTemplate(template)
-                  .update(LIBRARY_DELETE, new MapSqlParameterSource().addValue("libraryId", newId.longValue()));
+              new NamedParameterJdbcTemplate(template).update(LIBRARY_DELETE,
+                  new MapSqlParameterSource().addValue("libraryId", newId.longValue()));
               throw new IOException("Something bad happened. Expected library ID doesn't match returned value from DB insert");
             }
             if (library.getLibraryAdditionalInfo() != null) {
@@ -428,8 +428,8 @@ public class SQLLibraryDAO implements LibraryStore {
           if (autoGenerateIdentificationBarcodes) {
             autoGenerateIdBarcode(library);
           } // if !autoGenerateIdentificationBarcodes then the identificationBarcode is set by the user
-          params.addValue("identificationBarcode", library.getIdentificationBarcode())
-              .addValue("locationBarcode", library.getLocationBarcode());
+          params.addValue("identificationBarcode", library.getIdentificationBarcode()).addValue("locationBarcode",
+              library.getLocationBarcode());
           NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
           namedTemplate.update(LIBRARY_UPDATE, params);
           if (library.getLibraryAdditionalInfo() != null) {
@@ -564,10 +564,8 @@ public class SQLLibraryDAO implements LibraryStore {
 
   @Override
   public Library getAdjacentLibrary(long libraryId, boolean before) throws IOException {
-    List<Library> results = template.query(
-        before ? LIBRARY_SELECT_BY_ADJACENT_BEFORE : LIBRARY_SELECT_BY_ADJACENT_AFTER,
-        new Object[] { libraryId },
-        new LibraryMapper(true));
+    List<Library> results = template.query(before ? LIBRARY_SELECT_BY_ADJACENT_BEFORE : LIBRARY_SELECT_BY_ADJACENT_AFTER,
+        new Object[] { libraryId }, new LibraryMapper(true));
     return results.size() > 0 ? results.get(0) : null;
   }
 
@@ -590,9 +588,9 @@ public class SQLLibraryDAO implements LibraryStore {
 
   @Override
   public List<Library> listBySearch(String query) {
-    String mySQLQuery = "%" + query.replaceAll("_", Matcher.quoteReplacement("\\_")) + "%";
-    return template
-        .query(LIBRARIES_SELECT_BY_SEARCH, new Object[] { mySQLQuery, mySQLQuery, mySQLQuery, mySQLQuery }, new LibraryMapper(true));
+    String mySQLQuery = DbUtils.convertStringToSearchQuery(query);
+    return template.query(LIBRARIES_SELECT_BY_SEARCH, new Object[] { mySQLQuery, mySQLQuery, mySQLQuery, mySQLQuery },
+        new LibraryMapper(true));
   }
 
   @Override
@@ -663,9 +661,7 @@ public class SQLLibraryDAO implements LibraryStore {
 
   @Override
   public LibraryType getLibraryTypeByDescriptionAndPlatform(String description, PlatformType platformType) throws IOException {
-    List eResults = template.query(
-        LIBRARY_TYPE_SELECT_BY_DESCRIPTION_AND_PLATFORM,
-        new Object[] { description, platformType.getKey() },
+    List eResults = template.query(LIBRARY_TYPE_SELECT_BY_DESCRIPTION_AND_PLATFORM, new Object[] { description, platformType.getKey() },
         new LibraryTypeMapper());
     LibraryType e = eResults.size() > 0 ? (LibraryType) eResults.get(0) : null;
     return e;
@@ -673,8 +669,8 @@ public class SQLLibraryDAO implements LibraryStore {
 
   @Override
   public LibrarySelectionType getLibrarySelectionTypeById(long librarySelectionTypeId) throws IOException {
-    List eResults = template
-        .query(LIBRARY_SELECTION_TYPE_SELECT_BY_ID, new Object[] { librarySelectionTypeId }, new LibrarySelectionTypeMapper());
+    List eResults = template.query(LIBRARY_SELECTION_TYPE_SELECT_BY_ID, new Object[] { librarySelectionTypeId },
+        new LibrarySelectionTypeMapper());
     LibrarySelectionType e = eResults.size() > 0 ? (LibrarySelectionType) eResults.get(0) : null;
     return e;
   }
@@ -688,8 +684,8 @@ public class SQLLibraryDAO implements LibraryStore {
 
   @Override
   public LibraryStrategyType getLibraryStrategyTypeById(long libraryStrategyTypeId) throws IOException {
-    List eResults = template
-        .query(LIBRARY_STRATEGY_TYPE_SELECT_BY_ID, new Object[] { libraryStrategyTypeId }, new LibraryStrategyTypeMapper());
+    List eResults = template.query(LIBRARY_STRATEGY_TYPE_SELECT_BY_ID, new Object[] { libraryStrategyTypeId },
+        new LibraryStrategyTypeMapper());
     LibraryStrategyType e = eResults.size() > 0 ? (LibraryStrategyType) eResults.get(0) : null;
     return e;
   }
@@ -747,15 +743,15 @@ public class SQLLibraryDAO implements LibraryStore {
   }
 
   @Override
-  public List<Library> listBySearchOffsetAndNumResults(int offset, int limit, String querystr, String sortDir, String sortCol)
+  public List<Library> listBySearchOffsetAndNumResults(int offset, int limit, String search, String sortDir, String sortCol)
       throws IOException {
     if (offset < 0 || limit < 0) throw new IOException("Limit and Offset must be greater than zero");
-    if (isStringEmptyOrNull(querystr)) {
+    if (isStringEmptyOrNull(search)) {
       return listByOffsetAndNumResults(offset, limit, sortDir, sortCol);
     } else {
       sortCol = updateSortCol(sortCol);
       if (!"asc".equals(sortDir.toLowerCase()) && !"desc".equals(sortDir.toLowerCase())) sortDir = "desc";
-      querystr = "%" + querystr.replaceAll("_", Matcher.quoteReplacement("\\_")) + "%";
+      String querystr = DbUtils.convertStringToSearchQuery(search);
       String query = LIBRARIES_SELECT_BY_SEARCH + " ORDER BY " + sortCol + " " + sortDir + " LIMIT " + limit + " OFFSET " + offset;
       List<Library> rtn = template.query(query, new Object[] { querystr, querystr, querystr, querystr }, new LibraryMapper(true));
       return rtn;
@@ -772,11 +768,11 @@ public class SQLLibraryDAO implements LibraryStore {
   }
 
   @Override
-  public long countLibrariesBySearch(String querystr) throws IOException {
-    if (isStringEmptyOrNull(querystr)) {
+  public long countLibrariesBySearch(String search) throws IOException {
+    if (isStringEmptyOrNull(search)) {
       return (count());
     } else {
-      querystr = "%" + querystr.replaceAll("_", Matcher.quoteReplacement("\\_")) + "%";
+      String querystr = DbUtils.convertStringToSearchQuery(search);
       return template.queryForLong(LIBRARY_COUNT_BY_SEARCH, new Object[] { querystr, querystr, querystr, querystr });
     }
   }

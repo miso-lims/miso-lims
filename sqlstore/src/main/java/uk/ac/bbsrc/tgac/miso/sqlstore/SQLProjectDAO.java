@@ -104,8 +104,8 @@ public class SQLProjectDAO implements ProjectStore {
 
   public static final String PROJECT_SELECT_BY_ALIAS = PROJECTS_SELECT + " WHERE alias = ?";
 
-  public static final String PROJECTS_SELECT_BY_SEARCH = PROJECTS_SELECT + " WHERE " + "name LIKE ? OR " + "alias LIKE ? OR "
-      + "description LIKE ? ";
+  public static final String PROJECTS_SELECT_BY_SEARCH = PROJECTS_SELECT + " WHERE UPPER(name) LIKE ? OR UPPER(alias) LIKE ? OR "
+      + "UPPER(description) LIKE ? ";
 
   public static final String PROJECT_UPDATE = "UPDATE " + TABLE_NAME + " "
       + "SET name=:name, alias=:alias, shortName=:shortName, description=:description, creationDate=:creationDate, securityProfile_profileId=:securityProfile_profileId, progress=:progress, referenceGenomeId=:referenceGenomeId "
@@ -149,8 +149,8 @@ public class SQLProjectDAO implements ProjectStore {
 
   protected static final Logger log = LoggerFactory.getLogger(SQLProjectDAO.class);
 
-  private static final BridgeCollectionUpdater<String> ISSUE_KEY_WRITER = new BridgeCollectionUpdater<String>("Project_Issues", "project_projectId",
-      "issueKey") {
+  private static final BridgeCollectionUpdater<String> ISSUE_KEY_WRITER = new BridgeCollectionUpdater<String>("Project_Issues",
+      "project_projectId", "issueKey") {
 
     @Override
     protected Object getId(String item) {
@@ -296,7 +296,7 @@ public class SQLProjectDAO implements ProjectStore {
   @Override
   @TriggersRemove(cacheName = { "projectCache",
       "lazyProjectCache" }, keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
-          @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
+          @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public long save(Project project) throws IOException {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
 
@@ -443,7 +443,7 @@ public class SQLProjectDAO implements ProjectStore {
 
   @Override
   @Cacheable(cacheName = "projectListCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
-      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
+      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public List<Project> listAll() {
     return template.query(PROJECTS_SELECT, new ProjectMapper(true));
   }
@@ -461,7 +461,7 @@ public class SQLProjectDAO implements ProjectStore {
   @Override
   @TriggersRemove(cacheName = { "projectCache",
       "lazyProjectCache" }, keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
-          @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
+          @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public boolean remove(Project project) throws IOException {
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
     boolean ok = true;
@@ -500,7 +500,7 @@ public class SQLProjectDAO implements ProjectStore {
 
   @Override
   @Cacheable(cacheName = "projectCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
-      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
+      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public Project get(long projectId) throws IOException {
     List<Project> eResults = template.query(PROJECT_SELECT_BY_ID, new Object[] { projectId }, new ProjectMapper());
     return eResults.size() > 0 ? eResults.get(0) : null;
@@ -516,7 +516,7 @@ public class SQLProjectDAO implements ProjectStore {
   @Override
   @CoverageIgnore
   public List<Project> listBySearch(String query) {
-    String mySQLQuery = "%" + query.replaceAll("_", Matcher.quoteReplacement("\\_")) + "%";
+    String mySQLQuery = DbUtils.convertStringToSearchQuery(query);
     return template.query(PROJECTS_SELECT_BY_SEARCH, new Object[] { mySQLQuery, mySQLQuery, mySQLQuery }, new ProjectMapper(true));
   }
 

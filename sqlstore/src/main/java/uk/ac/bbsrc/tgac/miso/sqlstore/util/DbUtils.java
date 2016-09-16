@@ -34,6 +34,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,6 +66,13 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 public class DbUtils {
   protected static final Logger log = LoggerFactory.getLogger(DbUtils.class);
   private static final HashCodeCacheKeyGenerator hashCodeCacheKeyGenerator = new HashCodeCacheKeyGenerator();
+
+  public static String convertStringToSearchQuery(String input) {
+    if (input == null) {
+      return "%";
+    }
+    return "%" + input.trim().toUpperCase().replaceAll("[\\s,%]+", " ").replaceAll("_", Matcher.quoteReplacement("\\_")) + "%";
+  }
 
   public static long getAutoIncrement(JdbcTemplate template, String tableName) throws IOException {
     final String q = "SHOW TABLE STATUS LIKE '" + tableName + "'";

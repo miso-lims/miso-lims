@@ -160,12 +160,6 @@ public class SQLStudyDAOTest extends AbstractDAOTest {
   }
 
   @Test
-  public void testListBySearchNull() {
-    exception.expect(NullPointerException.class);
-    dao.listBySearch(null);
-  }
-
-  @Test
   public void testListByProjectId() throws IOException {
     List<Study> studies = dao.listByProjectId(1L);
     assertEquals(1, studies.size());

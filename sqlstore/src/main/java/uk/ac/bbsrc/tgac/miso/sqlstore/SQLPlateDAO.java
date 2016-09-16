@@ -118,7 +118,7 @@ public class SQLPlateDAO implements PlateStore {
       + "INNER JOIN Plate_Elements pe ON li.libraryId = pe.elementId " + "INNER JOIN Plate pl ON pl.plateId = pe.plate_plateId "
       + "WHERE p.projectId = ? AND pe.elementType = '" + Library.class.getName() + "'";
 
-  public static String PLATE_SELECT_BY_SEARCH = PLATE_SELECT + " WHERE name LIKE :search OR identificationBarcode LIKE :search";
+  public static String PLATE_SELECT_BY_SEARCH = PLATE_SELECT + " WHERE UPPER(name) LIKE :search OR UPPER(identificationBarcode) LIKE :search";
 
   protected static final Logger log = LoggerFactory.getLogger(SQLPlateDAO.class);
 
@@ -227,8 +227,8 @@ public class SQLPlateDAO implements PlateStore {
 
   @Override
   public Plate<? extends List<? extends Plateable>, ? extends Plateable> lazyGet(long plateId) throws IOException {
-    List<Plate<? extends List<? extends Plateable>, ? extends Plateable>> eResults = template
-        .query(PLATE_SELECT_BY_ID, new Object[] { plateId }, new PlateMapper(true));
+    List<Plate<? extends List<? extends Plateable>, ? extends Plateable>> eResults = template.query(PLATE_SELECT_BY_ID,
+        new Object[] { plateId }, new PlateMapper(true));
     return eResults.size() > 0 ? eResults.get(0) : null;
   }
 
@@ -236,16 +236,16 @@ public class SQLPlateDAO implements PlateStore {
   @Cacheable(cacheName = "plateCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
       @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public Plate<? extends List<? extends Plateable>, ? extends Plateable> get(long plateId) throws IOException {
-    List<Plate<? extends List<? extends Plateable>, ? extends Plateable>> eResults = template
-        .query(PLATE_SELECT_BY_ID, new Object[] { plateId }, new PlateMapper());
+    List<Plate<? extends List<? extends Plateable>, ? extends Plateable>> eResults = template.query(PLATE_SELECT_BY_ID,
+        new Object[] { plateId }, new PlateMapper());
     return eResults.size() > 0 ? eResults.get(0) : null;
   }
 
   @Override
   public Plate<? extends List<? extends Plateable>, ? extends Plateable> getPlateByIdentificationBarcode(String barcode)
       throws IOException {
-    List<Plate<? extends List<? extends Plateable>, ? extends Plateable>> eResults = template
-        .query(PLATE_SELECT_BY_ID_BARCODE, new Object[] { barcode }, new PlateMapper());
+    List<Plate<? extends List<? extends Plateable>, ? extends Plateable>> eResults = template.query(PLATE_SELECT_BY_ID_BARCODE,
+        new Object[] { barcode }, new PlateMapper());
     return eResults.size() > 0 ? eResults.get(0) : null;
   }
 
@@ -256,15 +256,15 @@ public class SQLPlateDAO implements PlateStore {
 
   @Override
   public List<Plate<? extends List<? extends Plateable>, ? extends Plateable>> listByProjectId(long projectId) throws IOException {
-    List<Plate<? extends List<? extends Plateable>, ? extends Plateable>> plates = template
-        .query(PLATES_SELECT_BY_PROJECT_ID, new Object[] { projectId }, new PlateMapper(true));
+    List<Plate<? extends List<? extends Plateable>, ? extends Plateable>> plates = template.query(PLATES_SELECT_BY_PROJECT_ID,
+        new Object[] { projectId }, new PlateMapper(true));
     Collections.sort(plates);
     return plates;
   }
 
   @Override
   public List<Plate<? extends List<? extends Plateable>, ? extends Plateable>> listBySearch(String query) throws IOException {
-    String squery = "%" + query + "%";
+    String squery = DbUtils.convertStringToSearchQuery(query);
     MapSqlParameterSource params = new MapSqlParameterSource();
     params.addValue("search", squery);
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
@@ -318,8 +318,8 @@ public class SQLPlateDAO implements PlateStore {
           Number newId = insert.executeAndReturnKey(params);
           if (newId.longValue() != plate.getId()) {
             log.error("Expected Plate ID doesn't match returned value from database insert: rolling back...");
-            new NamedParameterJdbcTemplate(template)
-                .update(PLATE_DELETE, new MapSqlParameterSource().addValue("plateId", newId.longValue()));
+            new NamedParameterJdbcTemplate(template).update(PLATE_DELETE,
+                new MapSqlParameterSource().addValue("plateId", newId.longValue()));
             throw new IOException("Something bad happened. Expected Plate ID doesn't match returned value from DB insert");
           }
         } else {
