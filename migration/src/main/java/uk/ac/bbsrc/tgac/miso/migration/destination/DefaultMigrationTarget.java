@@ -139,7 +139,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
       // Make sure there's a study
       if (project.getStudies() == null) project.setStudies(new HashSet<Study>());
       if (project.getStudies().isEmpty()) {
-        Study study = new StudyImpl(project, user);
+        Study study = new StudyImpl();
         study.setAlias(project.getShortName() + " study");
         study.setDescription("");
         study.setStudyType("Other");
@@ -148,6 +148,8 @@ public class DefaultMigrationTarget implements MigrationTarget {
       }
       project.setId(serviceManager.getProjectDao().save(project));
       for (Study study : project.getStudies()) {
+        study.setProject(project);
+        study.inheritPermissions(project);
         study.setId(serviceManager.getStudyDao().save(study));
       }
       log.debug("Saved project " + project.getAlias());
