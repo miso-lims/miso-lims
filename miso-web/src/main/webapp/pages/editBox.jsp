@@ -281,14 +281,14 @@
   });
 
   jQuery('#selectedBarcode').keyup(function(event) {
-    if(event.keyCode == 13){
-      Box.lookupBoxableByBarcode();
+    if(event.which == "13"){
+      jQuery('#lookupBarcode').click();
     }
   });
 
   jQuery('#selectedBarcode').on('paste', function(e) {
     window.setTimeout(function() {
-      Box.lookupBoxableByBarcode();
+      jQuery('#lookupBarcode').click();
     }, 100);
   });
 </script>
