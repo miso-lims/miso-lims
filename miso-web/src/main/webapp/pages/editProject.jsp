@@ -475,7 +475,11 @@
         ],
         "iDisplayLength": 50,
         "bJQueryUI": true,
-        "bRetrieve": true
+        "bRetrieve": true,
+        "sPaginationType": "full_numbers",
+        "fnDrawCallback": function (oSettings) {
+          jQuery('#overview_samplegroup_table_'+${overview.sampleGroup.id}+'_paginate').find('.fg-button').addClass('dataTables_paginate_numbers').removeClass('fg-button ui-button');
+        }
       });
     });
   </script>
@@ -641,7 +645,11 @@
           ],
           "iDisplayLength": 50,
           "bJQueryUI": true,
-          "bRetrieve": true
+          "bRetrieve": true,
+          "sPaginationType": "full_numbers",
+          "fnDrawCallback": function (oSettings) {
+            jQuery('#study_table_paginate').find('.fg-button').addClass('dataTables_paginate_numbers').removeClass('fg-button ui-button');
+          }
         });
       });
     </script>
@@ -819,7 +827,7 @@
               "iDisplayLength": 50,
               "bJQueryUI": true,
               "bRetrieve": true,
-
+              "sPaginationType": "full_numbers",
               "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
                 Fluxion.doAjax(
                   'sampleControllerHelperService',
@@ -833,6 +841,9 @@
                   }
                   }
                 );
+              },
+              "fnDrawCallback": function (oSettings) {
+                jQuery('#sample_table_paginate').find('.fg-button').addClass('dataTables_paginate_numbers').removeClass('fg-button ui-button');
               }
             });
           });
@@ -924,7 +935,7 @@
                     "iDisplayLength": 50,
                     "bJQueryUI": true,
                     "bRetrieve": true,
-
+                    "sPaginationType": "full_numbers",
                     "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
                       Fluxion.doAjax(
                         'sampleControllerHelperService',
@@ -938,6 +949,9 @@
                         }
                         }
                       );
+                    },
+                    "fnDrawCallback": function (oSettings) {
+                      jQuery('#overview_samplegroup_table_'+${overview.id}+'_paginate').find('.fg-button').addClass('dataTables_paginate_numbers').removeClass('fg-button ui-button');
                     }
                   });
                 });
@@ -1057,7 +1071,11 @@
               ],
               "iDisplayLength": 50,
               "bJQueryUI": true,
-              "bRetrieve": true
+              "bRetrieve": true,
+              "sPaginationType": "full_numbers",
+              "fnDrawCallback": function (oSettings) {
+                jQuery('#library_table_paginate').find('.fg-button').addClass('dataTables_paginate_numbers').removeClass('fg-button ui-button');
+              }
             });
           });
         </script>
@@ -1153,7 +1171,11 @@
                   ],
                   "iDisplayLength": 50,
                   "bJQueryUI": true,
-                  "bRetrieve": true
+                  "bRetrieve": true,
+                  "sPaginationType": "full_numbers",
+                  "fnDrawCallback": function (oSettings) {
+                    jQuery('#overview_librarygroup_table_'+${overview.id}+'_paginate').find('.fg-button').addClass('dataTables_paginate_numbers').removeClass('fg-button ui-button');
+                  }
                 });
               });
             </script>
@@ -1249,7 +1271,11 @@
           ],
           "iDisplayLength": 50,
           "bJQueryUI": true,
-          "bRetrieve": true
+          "bRetrieve": true,
+          "sPaginationType": "full_numbers",
+          "fnDrawCallback": function (oSettings) {
+            jQuery('#librarydils_table_paginate').find('.fg-button').addClass('dataTables_paginate_numbers').removeClass('fg-button ui-button');
+          }
         });
       });
     </script>
@@ -1328,7 +1354,11 @@
           ],
           "iDisplayLength": 50,
           "bJQueryUI": true,
-          "bRetrieve": true
+          "bRetrieve": true,
+          "sPaginationType": "full_numbers",
+          "fnDrawCallback": function (oSettings) {
+            jQuery('#pools_table_paginate').find('.fg-button').addClass('dataTables_paginate_numbers').removeClass('fg-button ui-button');
+          }
         });
       });
     </script>
@@ -1409,7 +1439,11 @@
           ],
           "iDisplayLength": 50,
           "bJQueryUI": true,
-          "bRetrieve": true
+          "bRetrieve": true,
+          "sPaginationType": "full_numbers",
+          "fnDrawCallback": function (oSettings) {
+            jQuery('#empcrs_table_paginate').find('.fg-button').addClass('dataTables_paginate_numbers').removeClass('fg-button ui-button');
+          }
         });
       });
     </script>
@@ -1482,7 +1516,11 @@
           ],
           "iDisplayLength": 50,
           "bJQueryUI": true,
-          "bRetrieve": true
+          "bRetrieve": true,
+          "sPaginationType": "full_numbers",
+          "fnDrawCallback": function (oSettings) {
+            jQuery('#empcrdils_table_paginate').find('.fg-button').addClass('dataTables_paginate_numbers').removeClass('fg-button ui-button');
+          }
         });
       });
     </script>
@@ -1553,7 +1591,11 @@
           ],
           "iDisplayLength": 50,
           "bJQueryUI": true,
-          "bRetrieve": true
+          "bRetrieve": true,
+          "sPaginationType": "full_numbers",
+          "fnDrawCallback": function (oSettings) {
+            jQuery('#plates_table_paginate').find('.fg-button').addClass('dataTables_paginate_numbers').removeClass('fg-button ui-button');
+          }
         });
       });
     </script>
@@ -1631,7 +1673,11 @@
         ],
         "iDisplayLength": 50,
         "bJQueryUI": true,
-        "bRetrieve": true
+        "bRetrieve": true,
+        "sPaginationType": "full_numbers",
+        "fnDrawCallback": function (oSettings) {
+          jQuery('#run_table_paginate').find('.fg-button').addClass('dataTables_paginate_numbers').removeClass('fg-button ui-button');
+        }
       });
     });
   </script>
