@@ -31,8 +31,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
+import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.migration.MigrationData;
@@ -134,7 +136,20 @@ public class DefaultMigrationTarget implements MigrationTarget {
     User user = serviceManager.getAuthorizationManager().getCurrentUser();
     for (Project project : projects) {
       project.setSecurityProfile(new SecurityProfile(user));
-      serviceManager.getProjectDao().save(project);
+      // Make sure there's a study
+      if (project.getStudies() == null) project.setStudies(new HashSet<Study>());
+      if (project.getStudies().isEmpty()) {
+        Study study = new StudyImpl(project, user);
+        study.setAlias(project.getShortName() + " study");
+        study.setDescription("");
+        study.setStudyType("Other");
+        study.setLastModifier(user);
+        project.getStudies().add(study);
+      }
+      project.setId(serviceManager.getProjectDao().save(project));
+      for (Study study : project.getStudies()) {
+        study.setId(serviceManager.getStudyDao().save(study));
+      }
       log.debug("Saved project " + project.getAlias());
     }
     log.info(projects.size() + " projects migrated.");
