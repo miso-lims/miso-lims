@@ -625,6 +625,7 @@ Sample.hot = {
         header: 'Description',
         data: 'description',
         validator: Hot.requiredText,
+        renderer: Hot.requiredTextRenderer,
         include: true
       },
       {
@@ -652,6 +653,7 @@ Sample.hot = {
         trimDropdown: false,
         source: Sample.hot.getSampleTypes(),
         validator: validateSampleTypes,
+        renderer: Hot.requiredAutocompleteRenderer,
         extraneous: true,
         include: true
       },
@@ -660,6 +662,7 @@ Sample.hot = {
         data: 'scientificName',
         source: Sample.hot.sciName,
         validator: Hot.requiredText,
+        renderer: Hot.requiredTextRenderer,
         extraneous: true,
         include: !isDetailed || show['Tissue']
       },
@@ -683,6 +686,7 @@ Sample.hot = {
         header: 'External Name',
         data: 'externalName',
         validator: Hot.requiredText,
+        renderer: Hot.requiredTextRenderer,
         include: show['Identity']
       },
       {
@@ -702,6 +706,7 @@ Sample.hot = {
         type: 'dropdown',
         trimDropdown: false,
         source: Sample.hot.getSampleClassesByCategory(),
+        renderer: Hot.requiredAutocompleteRenderer,
         include: isDetailed
       },
       {
@@ -716,15 +721,6 @@ Sample.hot = {
         validator: Hot.permitEmpty,
         include: isDetailed
       },
-      {
-        header: 'Kit',
-        data: 'prepKitAlias',
-        type: 'dropdown',
-        trimDropdown: false,
-        source: Sample.hot.getKitDescriptors(),
-        validator: Hot.permitEmpty,
-        include: show['Aliquot']
-      },
 
       // Tissue columns
       {
@@ -734,6 +730,7 @@ Sample.hot = {
         trimDropdown: false,
         source: Sample.hot.getTissueClassesAliasOnly(),
         validator: validateTissueClasses,
+        renderer: Hot.requiredAutocompleteRenderer,
         include: show['Tissue'] && targetSampleCategory != 'Tissue'
       },
       {
@@ -743,6 +740,7 @@ Sample.hot = {
         trimDropdown: false,
         source: Sample.hot.getTissueOrigins(),
         validator: validateTissueOrigins,
+        renderer: Hot.requiredAutocompleteRenderer,
         include: show['Tissue']
       },
       {
@@ -752,6 +750,7 @@ Sample.hot = {
         trimDropdown: false,
         source: Sample.hot.getTissueTypes(),
         validator: validateTissueTypes,
+        renderer: Hot.requiredAutocompleteRenderer,
         include: show['Tissue']
       },
       {
@@ -764,12 +763,14 @@ Sample.hot = {
         header: 'Times Received',
         data: 'timesReceived',
         validator: validatePosReqdNumber,
+        renderer: Hot.requiredNumericRenderer,
         include: show['Tissue']
       },
       {
         header: 'Tube Number',
         data: 'tubeNumber',
         validator: validatePosReqdNumber,
+        renderer: Hot.requiredNumericRenderer,
         include: show['Tissue']
       },
       {
@@ -807,6 +808,7 @@ Sample.hot = {
         header: 'Slides',
         data: 'slides',
         validator: validatePosReqdNumber,
+        renderer: Hot.requiredNumericRenderer,
         include: show['Tissue Processing'] && sampleClassAlias == 'CV Slide'
       },
       {
@@ -827,6 +829,7 @@ Sample.hot = {
         header: 'Slides Consumed',
         data: 'slidesConsumed',
         validator: validatePosReqdNumber,
+        renderer: Hot.requiredNumericRenderer,
         include: show['Tissue Processing'] && sampleClassAlias == 'LCM Tube'
       },
 
@@ -847,17 +850,28 @@ Sample.hot = {
         source: [ 'true', 'false' ],
         include: show['Stock'] && sampleClass.dnaseTreatable
       },
+      
+      // Aliquot columns
+      {
+        header: 'Kit',
+        data: 'prepKitAlias',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: Sample.hot.getKitDescriptors(),
+        validator: Hot.permitEmpty,
+        include: show['Aliquot']
+      },
 
       // QC columns
       {
-        header: 'Vol.',
+        header: 'Vol. (&#181;l)',
         data: 'volume',
         type: 'numeric',
         format: '0.00',
         include: showQcs || show['Stock']
       },
       {
-        header: 'Conc.',
+        header: 'Conc. (ng/&#181;l)',
         data: 'concentration',
         type: 'numeric',
         format: '0.00',

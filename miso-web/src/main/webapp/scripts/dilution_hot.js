@@ -130,6 +130,7 @@ var Dilution = {
           type: 'numeric',
           format: '0.0',
           validator: Hot.requiredNumber,
+          renderer: Hot.requiredNumericRenderer,
           include: true
         },
         {
@@ -142,6 +143,7 @@ var Dilution = {
             numberOfMonths: 1
           },
           allowEmpty: false,
+          validator: Hot.requiredAutocompleteRenderer,
           include: true
         },
         {
