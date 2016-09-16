@@ -289,6 +289,7 @@ Run.ui = {
         {
           'doOnSuccess': function (json) {
             jQuery('#runPartitions').html(json.partitions);
+            jQuery('#container1').click();
           }
         }
       );

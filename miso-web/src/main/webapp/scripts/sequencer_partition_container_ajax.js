@@ -223,6 +223,7 @@ Container.ui = {
             if (json.partitions) {
               jQuery('#containerPartitions').html(json.partitions);
             }
+            jQuery('#container1').click();
           }
         }
       );
