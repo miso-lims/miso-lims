@@ -1219,7 +1219,7 @@
     </li>
   </ul>
   <span style="clear:both">
-    <table class="list" id="librarydils_table">
+    <table cell-padding="0" width="100%" cellspacing="0" border="0" class="display" id="librarydils_table">
       <thead>
       <tr>
         <th>Dilution Name</th>

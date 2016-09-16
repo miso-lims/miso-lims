@@ -612,90 +612,6 @@ public class PoolControllerHelperService {
     }
   }
 
-  // TODO: delete this once we confirm it's no longer necessary
-  public JSONObject checkInfoByPoolId(HttpSession session, JSONObject json) {
-    try {
-      JSONObject j = new JSONObject();
-      Long poolId = json.getLong("poolId");
-      Pool<? extends Poolable<?, ?>> pool = requestManager.getPoolById(poolId);
-      StringBuilder info = new StringBuilder();
-      if (pool.getDilutions().size() > 0) {
-        info.append("<ul class=\"shorterbullets\">");
-        Collection<? extends Dilution> dls = pool.getDilutions();
-        for (Dilution dilution : dls) {
-          info.append("<li><b>" + dilution.getName() + "</b>");
-          info.append("<br/><small><u><a href='/miso/project/" + dilution.getLibrary().getSample().getProject().getId() + "'>"
-              + dilution.getLibrary().getSample().getProject().getAlias() + "</a></u>");
-          info.append("<br/><a href='/miso/library/" + dilution.getLibrary().getId() + "'>" + dilution.getLibrary().getAlias() + " ("
-              + dilution.getLibrary().getName() + ")</a>");
-          info.append("<br/><a href='/miso/sample/" + dilution.getLibrary().getSample().getId() + "'>"
-              + dilution.getLibrary().getSample().getDescription() + " (" + dilution.getLibrary().getSample().getName() + ")</a></small>");
-          info.append("</li>");
-        }
-        info.append("</ul>");
-      } else if (pool.getPoolableElements().size() > 0) {
-        info.append("<ul class=\"shorterbullets\">");
-        Collection<? extends Poolable<?, ?>> ds = pool.getPoolableElements();
-        for (Poolable<?, ?> p : ds) {
-          if (p instanceof Dilution) {
-            Dilution dilution = (Dilution) p;
-            info.append("<li><b>" + dilution.getName() + "</b>");
-            info.append("<br/><small><u><a href='/miso/project/" + dilution.getLibrary().getSample().getProject().getId() + "'>"
-                + dilution.getLibrary().getSample().getProject().getAlias() + "</a></u>");
-            info.append("<br/><a href='/miso/library/" + dilution.getLibrary().getId() + "'>" + dilution.getLibrary().getAlias() + " ("
-                + dilution.getLibrary().getName() + ")</a>");
-            info.append("<br/><a href='/miso/sample/" + dilution.getLibrary().getSample().getId() + "'>"
-                + dilution.getLibrary().getSample().getDescription() + " (" + dilution.getLibrary().getSample().getName()
-                + ")</a></small>");
-            info.append("</li>");
-          } else if (p instanceof Plate) {
-            Plate<LinkedList<Plateable>, Plateable> plate = (Plate<LinkedList<Plateable>, Plateable>) p;
-            info.append(
-                "<li><b><a href='/miso/plate/" + plate.getId() + "'>" + plate.getName() + "</b> [" + plate.getSize() + "-well]</a>");
-            if (!plate.getElements().isEmpty()) {
-              info.append("<br/><small><u>" + plate.getSize() + "-well " + plate.getElementType().getSimpleName() + " plate</u>");
-              Plateable element = plate.getElements().getFirst();
-              if (element instanceof Library) {
-                Library l = (Library) element;
-                info.append("<br/><small><u><a href='/miso/project/" + l.getSample().getProject().getId() + "'>"
-                    + l.getSample().getProject().getAlias() + " (" + l.getSample().getProject().getName() + ")</a></u>");
-                info.append("<br/>Platform: " + l.getPlatformName());
-                info.append("<br/>Type: " + l.getLibraryType().getDescription());
-                info.append("<br/>Selection: " + l.getLibrarySelectionType().getName());
-                info.append("<br/>Strategy: " + l.getLibraryStrategyType().getName());
-              } else if (element instanceof Dilution) {
-                Dilution l = (Dilution) element;
-                info.append("<br/><small><u><a href='/miso/project/" + l.getLibrary().getSample().getProject().getId() + "'>"
-                    + l.getLibrary().getSample().getProject().getAlias() + " (" + l.getLibrary().getSample().getProject().getName()
-                    + ")</a></u>");
-                info.append("<br/>Platform: " + l.getLibrary().getPlatformName());
-                info.append("<br/>Type: " + l.getLibrary().getLibraryType().getDescription());
-                info.append("<br/>Selection: " + l.getLibrary().getLibrarySelectionType().getName());
-                info.append("<br/>Strategy: " + l.getLibrary().getLibraryStrategyType().getName());
-              } else if (element instanceof Sample) {
-                Sample l = (Sample) element;
-                info.append(
-                    "<br/><small><u><a href='/miso/project/" + l.getProject().getId() + "'>" + l.getProject().getAlias() + " ("
-                        + l.getProject().getName() + ")</a></u>");
-              }
-            }
-            info.append("</li>");
-          } else {
-            info.append("<li><b>" + p.getName() + "</b>");
-          }
-        }
-        info.append("</ul>");
-      } else {
-        info.append("No pooled elements");
-      }
-      j.put("response", info.toString());
-      return j;
-    } catch (IOException e) {
-      log.debug("Failed", e);
-      return JSONUtils.SimpleJSONError(e.getMessage());
-    }
-  }
-
   public JSONObject deletePool(HttpSession session, JSONObject json) {
     User user;
     try {
@@ -723,78 +639,12 @@ public class PoolControllerHelperService {
     }
   }
 
-  public JSONObject getPoolableElementInfo(HttpSession session, JSONObject json) {
-    if (json.has("poolId") && json.has("elementId")) {
-      try {
-        Long poolId = json.getLong("poolId");
-        Long elementId = json.getLong("elementId");
-        Pool<? extends Poolable<?, ?>> pool = requestManager.getPoolById(poolId);
-        StringBuilder info = new StringBuilder();
-        for (Poolable<?, ?> p : pool.getPoolableElements()) {
-          if (p.getId() == elementId) {
-            if (p instanceof Plate) {
-              Plate<LinkedList<Plateable>, Plateable> plate = (Plate<LinkedList<Plateable>, Plateable>) p;
-              for (Plateable plateable : plate.getElements()) {
-                if (plateable instanceof Plate) {
-                  info.append("<b>Internal Plate:</b> <a href='/miso/plate/" + plate.getId() + "'>" + plate.getName() + "</a><br/>");
-                } else if (p instanceof Library) {
-                  Library library = (Library) plateable;
-                  info.append("<b>Library:</b> <a href='/miso/library/" + library.getId() + "'>" + library.getAlias() + "("
-                      + library.getName() + ")</a><br/>");
-                }
-              }
-            } else if (p instanceof Dilution) {
-              Dilution dilution = (Dilution) p;
-              if (dilution instanceof emPCRDilution) {
-                info.append("<b>emPCR:</b> <a href='/miso/empcr/" + ((emPCRDilution) dilution).getEmPCR().getId() + "'>"
-                    + ((emPCRDilution) dilution).getEmPCR().getName() + "<br/>");
-              }
-              info.append("<b>Library:</b> <a href='/miso/library/" + dilution.getLibrary().getId() + "'>"
-                  + dilution.getLibrary().getAlias() + "(" + dilution.getLibrary().getName() + ")</a><br/>");
-              info.append("<b>Sample:</b> <a href='/miso/sample/" + dilution.getLibrary().getSample().getId() + "'>"
-                  + dilution.getLibrary().getSample().getAlias() + "(" + dilution.getLibrary().getSample().getName() + ")</a><br/>");
-              if (pool.getPoolableElements().size() > 1) {
-                if (!dilution.getLibrary().getIndices().isEmpty()) {
-                  info.append("<b>Index(es):</b></br>");
-                  for (Index index : dilution.getLibrary().getIndices()) {
-                    info.append(index.getPosition());
-                    info.append(":");
-                    info.append(index.getName());
-                    info.append(" (");
-                    info.append(index.getSequence());
-                    info.append(")<br/>");
-                    info.append("<span class='counter'><img src='/styles/images/status/green.png' border='0'></span>");
-                  }
-                } else {
-                  info.append("<b>Index(es): None</b>");
-                  info.append("<b>Library:</b> <a href='/miso/library/" + dilution.getLibrary().getId() + "'>Choose index</a>");
-                  info.append("<span class='counter'><img src='/styles/images/status/red.png' border='0'></span>");
-                }
-              }
-            } else {
-              info.append("Unrecognised poolable element: " + p.getClass().getSimpleName());
-            }
-            break;
-          }
-        }
-        return JSONUtils.JSONObjectResponse("info", info.toString());
-      } catch (IOException e) {
-        log.debug("Failed", e);
-        return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
-      }
-    } else {
-      return JSONUtils.SimpleJSONError("No pool or element ID specified");
-    }
-  }
-
   private void collectIndices(StringBuilder render, Dilution dilution) {
     for (Index index : dilution.getLibrary().getIndices()) {
       render.append(index.getPosition());
-      render.append(":");
-      render.append(index.getName());
-      render.append(" (");
-      render.append(index.getSequence());
-      render.append(")<br/>");
+      render.append(": ");
+      render.append(index.getLabel());
+      render.append("<br/>");
     }
   }
 
@@ -808,7 +658,7 @@ public class PoolControllerHelperService {
         for (LibraryDilution libraryDilution : requestManager.listAllLibraryDilutionsByPlatform((PlatformType.get(platform)))) {
           JSONArray pout = new JSONArray();
           pout.add(libraryDilution.getName());
-          pout.add(libraryDilution.getConcentration());
+          pout.add(libraryDilution.getConcentration().toString());
           pout.add(libraryDilution.getLibrary().getAlias() + " (" + libraryDilution.getLibrary().getName() + ")");
           pout.add(libraryDilution.getLibrary().getSample().getAlias() + " (" + libraryDilution.getLibrary().getSample().getName() + ")");
           StringBuilder indices = new StringBuilder();
@@ -816,7 +666,7 @@ public class PoolControllerHelperService {
           pout.add(indices.toString());
           pout.add(libraryDilution.getLibrary().isLowQuality() ? "⚠" : "");
           pout.add(
-              "<div style='cursor:pointer;' onmousedown=\"Pool.search.poolSearchSelectElement(" + poolId + ", '" + libraryDilution.getId()
+              "<div style='cursor:inherit;' onclick=\"Pool.search.poolSearchSelectElement(" + poolId + ", '" + libraryDilution.getId()
                   + "', '" + libraryDilution.getName() + "')\"><span class=\"ui-icon ui-icon-plusthick\"></span></div>");
           arr.add(pout);
         }
@@ -906,7 +756,7 @@ public class PoolControllerHelperService {
     }
   }
 
-  public JSONObject removePoolableElement(HttpSession session, JSONObject json) {
+  public JSONObject removePooledElement(HttpSession session, JSONObject json) {
     Long poolId = json.getLong("poolId");
     Long dilutionId = json.getLong("dilutionId");
     try {
