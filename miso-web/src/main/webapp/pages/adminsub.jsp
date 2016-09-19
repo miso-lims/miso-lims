@@ -22,6 +22,7 @@
   --%>
 
 <div id="subcontent">
+  <!--
 	<h2>Sample Processing</h2>
 	<ul class="bullets">
 		<li><a href="<c:url value="/miso/sample/receipt"/>">Receive
@@ -37,7 +38,7 @@
 				Sequencing Container</a></li>
 		<li><a href="<c:url value="/miso/run/new"/>">Create New Run</a></li>
 	</ul>
-
+  -->
     <h2>Tracking</h2>
     <ul class="bullets">
         <li><a href="<c:url value="/miso/samples"/>">List Samples</a></li>
@@ -54,7 +55,7 @@
         <li><a href="<c:url value="/miso/experiments"/>">List Experiments</a></li>
         <li><a href="<c:url value="/miso/studies"/>">List Studies</a></li>
     </ul>
-
+  <!--
 	<h2>Print Jobs</h2>
 	<ul class="bullets">
 		<li><a href="<c:url value="/miso/printjobs"/>">My Print Jobs</a></li>
@@ -65,6 +66,7 @@
 				href="<c:url value="/miso/admin/configuration/printers"/>">Printers</a></li>
 		</sec:authorize>
 	</ul>
+  -->
 
 	<sec:authorize access="hasRole('ROLE_ADMIN')">
 		<h2>User Administration</h2>
