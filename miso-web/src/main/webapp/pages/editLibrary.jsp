@@ -1083,8 +1083,9 @@ jQuery(document).ready(function () {
     "sDom": '<<"toolbar">f>r<t>ip>'
   });
 
-  var sampleArray = new Array();
-  var sampleDescArray = new Array();
+  var sampleArray = [];
+  var sampleDescArray = [];
+
   <c:forEach items="${projectSamples}" var="s" varStatus="n">
   sampleArray.push("${s.alias}");
   sampleDescArray.push("${s.description}");
@@ -1102,7 +1103,8 @@ jQuery(document).ready(function () {
         "",
         "",
         "",
-        ""]
+        ""
+      ]
     );
   });
 
@@ -1126,8 +1128,7 @@ function fnClickAddRow(rowdata) {
   var a = [];
   if (rowdata && rowdata.length > 0) {
     a = table.fnAddData(rowdata);
-  }
-  else {
+  } else {
     a = table.fnAddData(
       [ "",
         "",
@@ -1326,45 +1327,46 @@ function setEditables(datatable) {
 
       jQuery.ajax('../../library/indexPositionsJson', {
         success: function (json) {
-         var randomId = makeid();
-         jQuery(nTr.cells[cell + 1]).html("<div id='" + randomId + "'></div>");
-         for (var i = 0; i < json.numApplicableIndices; i++) {
-           jQuery('#' + randomId).append("<span class='indexSelectDiv' position='" + (i + 1) + "' id='indices" + (i + 1) + "'>- <i>Select...</i></span>");
-           if (json.numApplicableIndices > 1 && i == 0) {
-             jQuery('#' + randomId).append("|");
-           }
-         }
+          var randomId = makeid();
+          jQuery(nTr.cells[cell + 1]).html("<div id='" + randomId + "'></div>");
+          for (var i = 0; i < json.numApplicableIndices; i++) {
+            jQuery('#' + randomId).append("<span class='indexSelectDiv' position='" + (i + 1) + "' id='indices" + (i + 1) + "'>- <i>Select...</i></span>");
+            if (json.numApplicableIndices > 1 && i == 0) {
+              jQuery('#' + randomId).append("|");
+            }
+          }
 
-         //bind editable to selects
-         jQuery("#cinput .indexSelectDiv").editable(function (value, settings) {
-           return value;
-         },
-         {
-           loadurl: '../../library/indicesForPosition',
-           loaddata: function (value, settings) {
-             var ret = {};
-             ret["position"] = jQuery(this).attr("position");
-             if (!Utils.validation.isNullCheck(sValue)) {
-               ret['indexFamily'] = sValue;
-             }
-             else {
-               ret['indexFamily'] = '';
-             }
+          //bind editable to selects
+          jQuery("#cinput .indexSelectDiv").editable(function (value, settings) {
+              return value;
+            },
+            {
+              loadurl: '../../library/indicesForPosition',
+              loaddata: function (value, settings) {
+                var ret = {};
+                ret["position"] = jQuery(this).attr("position");
+                if (!Utils.validation.isNullCheck(sValue)) {
+                  ret['indexFamily'] = sValue;
+                } else {
+                  ret['indexFamily'] = '';
+                }
 
-             return ret;
-           },
-           type: 'select',
-           onblur: 'submit',
-           placeholder: '',
-           style: 'inherit',
-           submitdata: function (tvalue, tsettings) {
-             return {
-               "row_id": this.parentNode.getAttribute('id'),
-               "column": datatable.fnGetPosition(this)[2]
-             };
-           }
-         });
-       });
+                return ret;
+              },
+              type: 'select',
+              onblur: 'submit',
+              placeholder: '',
+              style: 'inherit',
+              submitdata: function (tvalue, tsettings) {
+                return {
+                  "row_id": this.parentNode.getAttribute('id'),
+                  "column": datatable.fnGetPosition(this)[2]
+                };
+              }
+            }
+          );
+        }
+      });
     },
     submitdata: function (value, settings) {
       return {
@@ -1401,9 +1403,9 @@ function makeid() {
   var text = "";
   var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
-  for (var i = 0; i < 5; i++)
+  for (var i = 0; i < 5; i++) {
     text += possible.charAt(Math.floor(Math.random() * possible.length));
-
+  }
   return text;
 }
 
@@ -1430,8 +1432,7 @@ function submitBulkLibraries() {
         Utils.validation.isNullCheck(obj["strategyType"])) {
       ok = false;
       jQuery(nodes[i]).css('background', '#EE9966');
-    }
-    else {
+    } else {
       jQuery(nodes[i]).css('background', '#CCFF99');
       arr.push(JSON.stringify(obj));
     }
@@ -1449,8 +1450,7 @@ function submitBulkLibraries() {
         window.location.href = '<c:url value='/miso/project/${library.sample.project.id}'/>';
       }
       });
-  }
-  else {
+  } else {
     alert("Red data rows do not have one or more of the following: description, platform, library type, selection type or strategy type!");
   }
   jQuery('#bulkLibSaveButton').removeAttr('disabled');

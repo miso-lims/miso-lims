@@ -102,7 +102,7 @@ Library.hot = {
     
     var aliasColIndex = Hot.getColIndex('alias');
     Hot.startData.forEach(function (library, index) {
-      if (!library.nonStandardAlias) {
+      if (!library.libraryAdditionalInfo.nonStandardAlias) {
         Hot.hotTable.setCellMeta(index, aliasColIndex, 'validator', Library.hot.validateAlias);
       } else {
         Hot.hotTable.setCellMeta(index, aliasColIndex, 'renderer', Hot.nsAliasRenderer);
