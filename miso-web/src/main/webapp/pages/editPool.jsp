@@ -368,8 +368,13 @@
     <form id="neworder">
       Partitions: <input type="text" name="partitions" value="1" id="newOrderParitions" /><br/>
       Platform: <select id="newOrderPlatformId" onchange="Pool.orders.changePlatform(null)"><c:forEach items="${platforms}" var="platform"><option value="${platform.id}">${platform.nameAndModel}</option></c:forEach></select><br/>
-      Sequencing Parameters: <select id="newOrderParameterId"><c:forEach items="${sequencingParameters}" var="sp"><option value="${sp.id}">${sp.name}</option></c:forEach></select><br/>
+      Sequencing Parameters: <select id="newOrderParameterId"></select><br/>
       <input type="submit" class="br-button ui-state-default ui-corner-all" value="Add" onclick="return Pool.orders.addOrder(${pool.id})"/>
+	  <script type="text/javascript">
+	    jQuery(document).ready(function () {
+	      Pool.orders.changePlatform(null);
+	    });
+	  </script>
     </form>
   </div>
   <c:if test="${not empty ordercompletions}">
