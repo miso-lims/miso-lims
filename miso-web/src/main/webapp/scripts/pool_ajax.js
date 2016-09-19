@@ -1022,88 +1022,150 @@ Pool.barcode = {
 };
 
 Pool.orders = Pool.orders || {
-  'makeXhrRequest': function (method, endpoint, callback, data, callbackarg) {
-    var expectedStatus;
-    var unauthorizedStatus = 401;
-    if (method == 'POST') {
-      expectedStatus = [201, 200];
-    } else {
-      expectedStatus = [200];
-    }
-    var xhr = new XMLHttpRequest();
-    xhr.open(method, endpoint);
-    xhr.onreadystatechange = function() {
-      if (xhr.readyState === XMLHttpRequest.DONE) {
-        if (expectedStatus.indexOf(xhr.status) != -1) {
-          if (!callback) {
-            document.location.reload();
-          } else {
-            data ? ( callbackarg ? callback(callbackarg) : callback() ) : callback(xhr) ;
+  'showDialog': function() {
+     Pool.orders.dialog = jQuery( "#order-dialog" ).dialog({
+        autoOpen: true,
+        height: 400,
+        width: 350,
+        modal: true,
+        buttons: {
+          "Save": function() {
+            var method;
+            var url;
+            var order = { 'poolId': Pool.orders.poolId, 'partitions': document.getElementById('orderPartitions').value, 'parameters': { 'id': document.getElementById('orderParameterId').value } };
+            if (Pool.orders.editingOrderId == 0) {
+              method = 'POST';
+              url = '/miso/rest/poolorder';
+            } else {
+              method = 'PUT';
+              url = '/miso/rest/poolorder/' + Pool.orders.editingOrderId;
+            }
+            jQuery.ajax({
+              'type': method,
+              'url': url,
+              'contentType': "application/json; charset=utf-8",
+              'data': JSON.stringify(order)
+            }).done(function() {
+              Pool.orders.table.fnDestroy();
+              Pool.orders.makeTable(Pool.orders.poolId);
+              Pool.orders.dialog.dialog("close");
+            });
+          },
+          "Cancel": function() {
+            Pool.orders.dialog.dialog( "close" );
           }
-        } else if (xhr.status === unauthorizedStatus) {
-          alert("You are not authorized to view this page.");
-        } else {
-          alert("Sorry, something went wrong. Please try again. If the issue persists, contact your administrator.");
         }
-      }
-    };
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    data ? xhr.send(data) : xhr.send();
-  },
+      });
+    },
+	'makeTable': function(poolId) {
+      if (poolId == 0) return;
+      Pool.orders.poolId = poolId;
+      Pool.orders.table = jQuery('#edit-order-table').dataTable({
+      "aoColumns": [
+        {
+          "sTitle": "Platform",
+          "mData": "parameters.platformId",
+          "mRender": function (data, type, full) {
+            return Hot.maybeGetProperty(
+              Hot.findFirstOrNull(Hot.idPredicate(data), Defaults.all.platforms),
+              'nameAndModel');
+          }
 
-  'addOrder': function(poolId) {
-    Pool.orders.makeXhrRequest('POST', '/miso/rest/poolorder', Pool.orders.loadOrders, JSON.stringify({ 'poolId': poolId, 'partitions': document.getElementById('newOrderParitions').value, 'parameters': { 'id': document.getElementById('newOrderParameterId').value } }), poolId);
-    return false;
-  },
-
-  'loadOrders': function(poolId) {
-    Pool.orders.makeXhrRequest('GET', '/miso/rest/pool/' + poolId + '/orders', function(xhr) {
-      var orders = JSON.parse(xhr.responseText);
-      if (document.getElementById('orderlist')) {
-        document.getElementById('orderlist').innerHTML = orders.map(function(order) {
-          var platformOptions = Defaults.all.platforms.map(function(platform) {
-            return '<option value="' + platform.id + '"' + ((platform.id == order.parameters.platformId) ? " selected" : "") + '>' + platform.nameAndModel + '</option>';
-          }).join('');
-          var parameterOptions = Pool.orders.optionsForPlatform(function(parameter) {
-            return parameter.platformId == order.parameters.platformId;
-          }, order.parameters.id);
-          return ('<div id="order' + order.id + '" onmouseover="this.className=\'dashboardhighlight\'" onmouseout="this.className=\'dashboard\'" class="dashboard">' +
-            '<span class="float-left">' +
-            '<b>Partitions:</b> <input type="text" id="partitions' + order.id + '" value="' + order.partitions + '"/><br/>' +
-            '<b>Platform:</b> <select id="platforms' + order.id + '" onchange="Pool.orders.changePlatform(' + order.id + ')">' + platformOptions + '</select><br/>' +
-            '<b>Sequencing Parameters:</b> <select id="parameters' + order.id + '">' + parameterOptions + '</select><br/>' +
-            '<input type="submit" class="br-button ui-state-default ui-corner-all" onclick="return Pool.orders.saveOrder(' + order.id + ', ' + poolId + ')" value="Save" /></span>' +
-            '<span onclick="Pool.orders.removeOrder(' + order.id + ', ' + poolId + ');" class="float-right ui-icon ui-icon-circle-close"></span>' +
-            '</div>');
-        }).join('');
+        },
+        {
+          "sTitle": "Sequencing Parameters",
+          "mData": "parameters.id",
+          "mRender": function (data, type, full) {
+            return Hot.maybeGetProperty(
+              Hot.findFirstOrNull(Hot.idPredicate(data), Defaults.all.sequencingParameters),
+              'name');
+          }
+        },
+        {
+          "sTitle": "Partitions",
+          "mData": "partitions"
+        },
+        {
+          "sTitle": "Edit",
+          "mData": "id",
+          "mRender": function (data, type, full) {
+            return '<span onclick=\'Pool.orders.editOrder(' + JSON.stringify(full) + ')\' class="ui-icon ui-icon-pencil"></span>';
+          }
+        },
+        {
+          "sTitle": "Remove",
+          "mData": "id",
+          "mRender": function (data, type, full) {
+            return '<span onclick="Pool.orders.removeOrder(' + data + ')" class="ui-icon ui-icon-circle-close"></span>';
+          }
+        }
+      ],
+      "bJQueryUI": true,
+      "bAutoWidth": false,
+      "iDisplayLength": 25,
+      "iDisplayStart": 0,
+      "sPaginationType": "full_numbers",
+      "bProcessing": true,
+      "sAjaxSource": '/miso/rest/pool/' + poolId + '/orders',
+      "fnServerData": function (sSource, aoData, fnCallback) {
+        jQuery('#edit-order-table').addClass('disabled');
+        jQuery.ajax({
+          "dataType": "json",
+          "url": sSource,
+          "data": aoData,
+          "success": function(x) {
+            fnCallback ({ 'aaData': x } );
+          }
+        });
+      },
+      "fnDrawCallback": function (oSettings) {
+        jQuery('#edit-order-table').removeClass('disabled');
+        jQuery('#edit-order-table').find('.fg-button').removeClass('fg-button');
       }
     });
   },
 
-  'optionsForPlatform' : function(filterCallback, selectedParameterId) {
-    var options = Defaults.all.sequencingParameters.filter(filterCallback).sort(function(a, b) {
+  'setOptionsForPlatform': function(platformId, selectedParameterId) {
+	document.getElementById('orderPlatformId').value = platformId;
+    var options = Defaults.all.sequencingParameters.filter(function(parameter) {
+      return parameter.platformId == platformId;
+    }).sort(function(a, b) {
          return a.name < b.name ? -1 : (a.name == b.name ? 0 : 1);
        }).map(function(parameter) {
          return '<option value="' + parameter.id + '"' + ((parameter.id == selectedParameterId) ? " selected" : "") + '>' + parameter.name + '</option>';
        }).join('');
-    return options;
+    document.getElementById('orderParameterId').innerHTML = options;
   },
 
-  'changePlatform' : function(orderId) {
-    var platformId = document.getElementById(orderId == null ? 'newOrderPlatformId' : ('platforms' + orderId)).value;
-    document.getElementById(orderId == null ? 'newOrderParameterId' : ('parameters' + orderId)).innerHTML = Pool.orders.optionsForPlatform(function(parameter) {
-      return parameter.platformId == platformId;
-    }, null);
+  'changePlatform': function() {
+    var platformId = document.getElementById('orderPlatformId').value;
+     Pool.orders.setOptionsForPlatform(platformId, null);
   },
 
-  'saveOrder': function(orderId, poolId) {
-    Pool.orders.makeXhrRequest('PUT', '/miso/rest/poolorder/' + orderId, function() { Pool.orders.loadOrders(poolId); }, JSON.stringify({ 'partitions': document.getElementById('partitions' + orderId).value, 'parameters': { 'id': document.getElementById('parameters' + orderId).value } }));
-    return false;
+  'createOrder': function(order) {
+     document.getElementById('orderPartitions').value = 1;
+     Pool.orders.setOptionsForPlatform(Defaults.all.platforms[0].id, null);
+     Pool.orders.editingOrderId = 0;
+     Pool.orders.showDialog();
   },
 
-  'removeOrder': function(orderId, poolId) {
+  'editOrder': function(order) {
+     document.getElementById('orderPartitions').value = order.partitions;
+     Pool.orders.setOptionsForPlatform(order.parameters.platformId, order.parameters.id);
+     document.getElementById('orderParameterId').value = order.parameters.id;
+     Pool.orders.editingOrderId = order.id;
+     Pool.orders.showDialog();
+  },
+
+  'removeOrder': function(orderId) {
     if (confirm('Delete this order?')) {
-      Pool.orders.makeXhrRequest('DELETE', '/miso/rest/poolorder/' + orderId, function() { Pool.orders.loadOrders(poolId); }, null);
+        jQuery.ajax({
+          "type": "DELETE",
+          "url": '/miso/rest/poolorder/' + orderId,
+        }).done(function() {
+          Pool.orders.table.fnDestroy();
+          Pool.orders.makeTable(Pool.orders.poolId);
+        });
     }
     return false;
   }

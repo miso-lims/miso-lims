@@ -361,27 +361,15 @@
 
 <c:if test="${pool.id != 0}">
   <h1>Orders</h1>
+  <span onclick="Pool.orders.createOrder()" class="sddm fg-button ui-state-default ui-corner-all">Add Order</span>
 
-  <div class="note">
-    <div id="orderlist" class="elementList ui-corner-all">
-    </div>
-    <form id="neworder">
-      Partitions: <input type="text" name="partitions" value="1" id="newOrderParitions" /><br/>
-      Platform: <select id="newOrderPlatformId" onchange="Pool.orders.changePlatform(null)"><c:forEach items="${platforms}" var="platform"><option value="${platform.id}">${platform.nameAndModel}</option></c:forEach></select><br/>
-      Sequencing Parameters: <select id="newOrderParameterId"></select><br/>
-      <input type="submit" class="br-button ui-state-default ui-corner-all" value="Add" onclick="return Pool.orders.addOrder(${pool.id})"/>
-	  <script type="text/javascript">
-	    jQuery(document).ready(function () {
-	      Pool.orders.changePlatform(null);
-	    });
-	  </script>
-    </form>
-  </div>
+  <table cellpadding="0" cellspacing="0" border="0" class="display" id="edit-order-table"></table>
+
   <c:if test="${not empty ordercompletions}">
   <br/>
     <h1>Order Completion</h1>
     <span style="clear:both">
-      <table class="list" id="changelog_table">
+      <table class="list" id="completion_table">
         <thead>
         <tr>
           <th>Platform</th>
@@ -480,7 +468,6 @@
         Pool.ui.createElementSelectDatatable('<c:out value="${pool.platformType.key}" default="Illumina"/>', ${pool.id}, '${libraryDilutionUnits}');
     });
 </script>
-</div>
 
 <c:if test="${not empty pool.changeLog}">
   <br/>
@@ -506,13 +493,18 @@
     </table>
   </span>
 </c:if>
+
+<div id="order-dialog" title="Order" hidden="true">
+Partitions: <input type="text" name="partitions" value="1" id="orderPartitions" /><br/>
+Platform: <select id="orderPlatformId" onchange="Pool.orders.changePlatform()"><c:forEach items="${platforms}" var="platform"><option value="${platform.id}">${platform.nameAndModel}</option></c:forEach></select><br/>
+Sequencing Parameters: <select id="orderParameterId"></select>
+</div>
+
+</div>
 </div>
 
 <script type="text/javascript">
   Utils.ui.addMaxDatePicker("creationDate", 0);
-</script>
-
-<script type="text/javascript">
   jQuery(document).ready(function () {
     jQuery('#alias').simplyCountable({
       counter: '#aliasCounter',
@@ -530,7 +522,7 @@
   Defaults = { 'all': {}};
   Defaults.all.sequencingParameters = ${sequencingParametersJson};
   Defaults.all.platforms = [ <c:forEach items="${platforms}" var="platform">{ 'id' : ${platform.id}, 'nameAndModel' : '${platform.nameAndModel}'}, </c:forEach> ];
-  Pool.orders.loadOrders(${pool.id});
+  Pool.orders.makeTable(${pool.id});
 </script>
 
 <%@ include file="adminsub.jsp" %>
