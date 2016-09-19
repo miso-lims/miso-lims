@@ -71,7 +71,8 @@ public class DbUtils {
     if (input == null) {
       return "%";
     }
-    return "%" + input.trim().toUpperCase().replaceAll("[\\s,%]+", " ").replaceAll("_", Matcher.quoteReplacement("\\_")) + "%";
+    return "%" + input.trim().toUpperCase().replaceAll("(\\s|,)+", " ").replaceAll("_", Matcher.quoteReplacement("\\_")).replaceAll("%",
+        Matcher.quoteReplacement("\\%")) + "%";
   }
 
   public static long getAutoIncrement(JdbcTemplate template, String tableName) throws IOException {
