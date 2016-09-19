@@ -509,6 +509,7 @@ public class DefaultSampleService implements SampleService {
     target.setDescription(source.getDescription());
     target.setEmpty(source.isEmpty());
     target.setVolume(source.getVolume());
+    target.setIdentificationBarcode(source.getIdentificationBarcode());
     if (isDetailedSample(target)) {
       sampleAdditionalInfoService.applyChanges((SampleAdditionalInfo) target, (SampleAdditionalInfo) source);
       if (isIdentitySample(target)) {
