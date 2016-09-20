@@ -121,8 +121,8 @@ public class SQLPoolDAO implements PoolStore {
 
   public static final String POOL_SELECT_BY_PLATFORM = POOL_SELECT + " WHERE p.platformType=?";
 
-  public static final String POOL_SELECT_BY_PLATFORM_AND_SEARCH = POOL_SELECT + " WHERE p.platformType=? AND " + "(p.name LIKE ? OR "
-      + "p.alias LIKE ? OR " + "p.identificationBarcode LIKE ? OR p.description LIKE ?) ";
+  public static final String POOL_SELECT_BY_PLATFORM_AND_SEARCH = POOL_SELECT + " WHERE p.platformType=? AND " + "(UPPER(p.name) LIKE ? OR "
+      + "UPPER(p.alias) LIKE ? OR UPPER(p.identificationBarcode) LIKE ? OR UPPER(p.description) LIKE ?) ";
 
   public static final String POOL_SELECT_BY_PLATFORM_AND_READY = POOL_SELECT_BY_PLATFORM + " AND p.ready=1";
 
@@ -136,8 +136,8 @@ public class SQLPoolDAO implements PoolStore {
 
   public static final String POOL_SELECT_BY_BOX_POSITION_ID = POOL_SELECT + " WHERE p.boxPositionId = ?";
 
-  public static final String POOL_COUNT_BY_PLATFORM_AND_SEARCH = POOL_COUNT + " WHERE p.platformType=? AND " + "(p.name LIKE ? OR "
-      + "p.alias LIKE ? OR " + "p.identificationBarcode LIKE ? OR p.description LIKE ?) ";
+  public static final String POOL_COUNT_BY_PLATFORM_AND_SEARCH = POOL_COUNT + " WHERE p.platformType=? AND " + "(UPPER(p.name) LIKE ? OR "
+      + "UPPER(p.alias) LIKE ? OR UPPER(p.identificationBarcode) LIKE ? OR UPPER(p.description) LIKE ?) ";
 
   public static final String POOL_UPDATE = "UPDATE " + TABLE_NAME + " "
       + "SET alias=:alias, concentration=:concentration, identificationBarcode=:identificationBarcode, creationDate=:creationDate, securityProfile_profileId=:securityProfile_profileId, "
@@ -234,8 +234,8 @@ public class SQLPoolDAO implements PoolStore {
 
   public static final String EMPCR_POOL_SELECT_BY_POOL_ID = EMPCR_POOL_SELECT + " AND poolId = ?";
 
-  public static final String POOL_SELECT_BY_SEARCH = POOL_SELECT + " WHERE " + "p.name LIKE ? OR " + "p.alias LIKE ? OR "
-      + "p.description LIKE ?";
+  public static final String POOL_SELECT_BY_SEARCH = POOL_SELECT + " WHERE UPPER(p.name) LIKE ? OR UPPER(p.alias) LIKE ? OR "
+      + "UPPER(p.description) LIKE ?";
 
   public static final String POOL_SELECT_LIMIT = POOL_SELECT + " ORDER BY p.poolId DESC LIMIT ?";
 
@@ -418,16 +418,16 @@ public class SQLPoolDAO implements PoolStore {
   public Pool getPoolByExperiment(Experiment e) {
     if (e.getPlatform() != null) {
       if (e.getPlatform().getPlatformType().equals(PlatformType.ILLUMINA)) {
-        List<Pool<? extends Poolable<?, ?>>> eResults = template
-            .query(ILLUMINA_POOL_SELECT_BY_EXPERIMENT_ID, new Object[] { e.getId() }, new PoolMapper());
+        List<Pool<? extends Poolable<?, ?>>> eResults = template.query(ILLUMINA_POOL_SELECT_BY_EXPERIMENT_ID, new Object[] { e.getId() },
+            new PoolMapper());
         return eResults.size() > 0 ? eResults.get(0) : null;
       } else if (e.getPlatform().getPlatformType().equals(PlatformType.LS454)) {
-        List<Pool<? extends Poolable<?, ?>>> eResults = template
-            .query(LS454_POOL_SELECT_BY_EXPERIMENT_ID, new Object[] { e.getId() }, new PoolMapper());
+        List<Pool<? extends Poolable<?, ?>>> eResults = template.query(LS454_POOL_SELECT_BY_EXPERIMENT_ID, new Object[] { e.getId() },
+            new PoolMapper());
         return eResults.size() > 0 ? eResults.get(0) : null;
       } else if (e.getPlatform().getPlatformType().equals(PlatformType.SOLID)) {
-        List<Pool<? extends Poolable<?, ?>>> eResults = template
-            .query(SOLID_POOL_SELECT_BY_EXPERIMENT_ID, new Object[] { e.getId() }, new PoolMapper());
+        List<Pool<? extends Poolable<?, ?>>> eResults = template.query(SOLID_POOL_SELECT_BY_EXPERIMENT_ID, new Object[] { e.getId() },
+            new PoolMapper());
         return eResults.size() > 0 ? eResults.get(0) : null;
       }
     }
@@ -629,17 +629,14 @@ public class SQLPoolDAO implements PoolStore {
       } else {
         throw new NotImplementedException("Don't know how to pool: " + parts[0]);
       }
-      names.append(
-          template.query(
-              "SELECT name FROM " + parts[0] + " WHERE " + idColumn + " = ?",
-              new Object[] { Integer.parseInt(parts[1]) },
-              new ResultSetExtractor<String>() {
-                @Override
-                public String extractData(ResultSet rs) throws SQLException, DataAccessException {
-                  return rs.next() ? rs.getString("name") : null;
-                }
+      names.append(template.query("SELECT name FROM " + parts[0] + " WHERE " + idColumn + " = ?",
+          new Object[] { Integer.parseInt(parts[1]) }, new ResultSetExtractor<String>() {
+            @Override
+            public String extractData(ResultSet rs) throws SQLException, DataAccessException {
+              return rs.next() ? rs.getString("name") : null;
+            }
 
-              }));
+          }));
     }
     return names.toString();
   }
@@ -657,8 +654,8 @@ public class SQLPoolDAO implements PoolStore {
   @Override
   public Pool<? extends Poolable<?, ?>> getByBarcode(String barcode) {
     if (barcode == null) throw new NullPointerException("cannot look up null barcode");
-    List<Pool<? extends Poolable<?, ?>>> eResults = template
-        .query(POOL_SELECT_BY_IDENTIFICATION_BARCODE, new Object[] { barcode }, new PoolMapper(true));
+    List<Pool<? extends Poolable<?, ?>>> eResults = template.query(POOL_SELECT_BY_IDENTIFICATION_BARCODE, new Object[] { barcode },
+        new PoolMapper(true));
     Pool<? extends Poolable<?, ?>> e = eResults.size() > 0 ? (Pool<? extends Poolable<?, ?>>) eResults.get(0) : null;
     return e;
   }
@@ -670,8 +667,8 @@ public class SQLPoolDAO implements PoolStore {
 
   @Override
   public Boxable getByPositionId(long positionId) {
-    List<Pool<? extends Poolable<?, ?>>> eResults = template
-        .query(POOL_SELECT_BY_BOX_POSITION_ID, new Object[] { positionId }, new PoolMapper());
+    List<Pool<? extends Poolable<?, ?>>> eResults = template.query(POOL_SELECT_BY_BOX_POSITION_ID, new Object[] { positionId },
+        new PoolMapper());
     Pool<? extends Poolable<?, ?>> e = eResults.size() > 0 ? eResults.get(0) : null;
     return e;
   }
@@ -693,12 +690,12 @@ public class SQLPoolDAO implements PoolStore {
 
   @Override
   public Collection<Pool<? extends Poolable<?, ?>>> listByProjectId(long projectId) throws IOException {
-    List<Pool<? extends Poolable<?, ?>>> lpools = template
-        .query(DILUTION_POOL_SELECT_BY_RELATED_PROJECT, new Object[] { projectId }, new PoolMapper(true));
-    List<Pool<? extends Poolable<?, ?>>> epools = template
-        .query(EMPCR_POOL_SELECT_BY_RELATED_PROJECT, new Object[] { projectId }, new PoolMapper(true));
-    List<Pool<? extends Poolable<?, ?>>> ppools = template
-        .query(PLATE_POOL_SELECT_BY_RELATED_PROJECT, new Object[] { projectId }, new PoolMapper(true));
+    List<Pool<? extends Poolable<?, ?>>> lpools = template.query(DILUTION_POOL_SELECT_BY_RELATED_PROJECT, new Object[] { projectId },
+        new PoolMapper(true));
+    List<Pool<? extends Poolable<?, ?>>> epools = template.query(EMPCR_POOL_SELECT_BY_RELATED_PROJECT, new Object[] { projectId },
+        new PoolMapper(true));
+    List<Pool<? extends Poolable<?, ?>>> ppools = template.query(PLATE_POOL_SELECT_BY_RELATED_PROJECT, new Object[] { projectId },
+        new PoolMapper(true));
     lpools.addAll(epools);
     lpools.addAll(ppools);
     return lpools;
@@ -731,13 +728,10 @@ public class SQLPoolDAO implements PoolStore {
   }
 
   @Override
-  public List<Pool<? extends Poolable<?, ?>>> listAllByPlatformAndSearch(PlatformType platformType, String query) throws IOException {
-    if (query == null) {
-      query = "";
-    }
-    query = "%" + query.replaceAll("_", Matcher.quoteReplacement("\\_")) + "%";
-    return template
-        .query(POOL_SELECT_BY_PLATFORM_AND_SEARCH, new Object[] { platformType.getKey(), query, query, query, query }, new PoolMapper());
+  public List<Pool<? extends Poolable<?, ?>>> listAllByPlatformAndSearch(PlatformType platformType, String search) throws IOException {
+    String query = DbUtils.convertStringToSearchQuery(search);
+    return template.query(POOL_SELECT_BY_PLATFORM_AND_SEARCH, new Object[] { platformType.getKey(), query, query, query, query },
+        new PoolMapper());
   }
 
   @Override
@@ -746,13 +740,10 @@ public class SQLPoolDAO implements PoolStore {
   }
 
   @Override
-  public List<Pool<? extends Poolable<?, ?>>> listReadyByPlatformAndSearch(PlatformType platformType, String query) throws IOException {
-    if (query == null) query = "";
-    String mySQLQuery = "%" + query.replaceAll("_", Matcher.quoteReplacement("\\_")) + "%";
-    return template.query(
-        POOL_SELECT_BY_PLATFORM_AND_READY_AND_SEARCH,
-        new Object[] { platformType.getKey(), mySQLQuery, mySQLQuery, mySQLQuery, mySQLQuery },
-        new PoolMapper());
+  public List<Pool<? extends Poolable<?, ?>>> listReadyByPlatformAndSearch(PlatformType platformType, String search) throws IOException {
+    String mySQLQuery = DbUtils.convertStringToSearchQuery(search);
+    return template.query(POOL_SELECT_BY_PLATFORM_AND_READY_AND_SEARCH,
+        new Object[] { platformType.getKey(), mySQLQuery, mySQLQuery, mySQLQuery, mySQLQuery }, new PoolMapper());
   }
 
   public Collection<? extends Poolable<?, ?>> listPoolableElementsByPoolId(long poolId) throws IOException {
@@ -972,7 +963,7 @@ public class SQLPoolDAO implements PoolStore {
     if (isStringEmptyOrNull(query)) {
       rtn = new ArrayList<>();
     } else {
-      String mySQLQuery = "%" + query.replaceAll("_", Matcher.quoteReplacement("\\_")) + "%";
+      String mySQLQuery = DbUtils.convertStringToSearchQuery(query);
       rtn = template.query(POOL_SELECT_BY_SEARCH, new Object[] { mySQLQuery, mySQLQuery, mySQLQuery }, new PoolMapper(true));
     }
     return rtn;
@@ -998,9 +989,8 @@ public class SQLPoolDAO implements PoolStore {
     if (isStringEmptyOrNull(querystr)) {
       return (PlatformType.ILLUMINA.equals(platform) ? countPoolsByPlatform(platform) : count());
     } else {
-      String mySQLQuery = "%" + querystr.replaceAll("_", Matcher.quoteReplacement("\\_")) + "%";
-      return template.queryForLong(
-          POOL_COUNT_BY_PLATFORM_AND_SEARCH,
+      String mySQLQuery = DbUtils.convertStringToSearchQuery(querystr);
+      return template.queryForLong(POOL_COUNT_BY_PLATFORM_AND_SEARCH,
           new Object[] { platform.getKey(), mySQLQuery, mySQLQuery, mySQLQuery, mySQLQuery });
     }
   }
@@ -1017,19 +1007,19 @@ public class SQLPoolDAO implements PoolStore {
   }
 
   @Override
-  public List<Pool<? extends Poolable<?, ?>>> listBySearchOffsetAndNumResultsAndPlatform(int offset, int resultsPerPage, String querystr,
+  public List<Pool<? extends Poolable<?, ?>>> listBySearchOffsetAndNumResultsAndPlatform(int offset, int resultsPerPage, String search,
       String sortDir, String sortCol, PlatformType platform) throws IOException {
-    if (isStringEmptyOrNull(querystr)) {
+    if (isStringEmptyOrNull(search)) {
       return listByOffsetAndNumResults(offset, resultsPerPage, sortDir, sortCol, platform);
     } else {
       sortCol = updateSortCol(sortCol);
       if (offset < 0 || resultsPerPage < 0) throw new IOException("Limit and Offset must be greater than zero");
       if (!"asc".equals(sortDir.toLowerCase()) && !"desc".equals(sortDir.toLowerCase())) sortDir = "desc";
-      querystr = "%" + querystr.replaceAll("_", Matcher.quoteReplacement("\\_")) + "%";
+      String querystr = DbUtils.convertStringToSearchQuery(search);
       String query = POOL_SELECT_BY_PLATFORM_AND_SEARCH + " ORDER BY " + sortCol + " " + sortDir + " LIMIT " + resultsPerPage + " OFFSET "
           + offset;
-      List<Pool<? extends Poolable<?, ?>>> rtn = template
-          .query(query, new Object[] { platform.getKey(), querystr, querystr, querystr, querystr }, new PoolMapper(true));
+      List<Pool<? extends Poolable<?, ?>>> rtn = template.query(query,
+          new Object[] { platform.getKey(), querystr, querystr, querystr, querystr }, new PoolMapper(true));
       return rtn;
     }
   }

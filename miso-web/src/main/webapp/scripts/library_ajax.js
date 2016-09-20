@@ -1038,7 +1038,7 @@ Library.ui = {
     jQuery('#listingLibrariesTable').html("");
     jQuery('#listingLibrariesTable').dataTable(Utils.setSortFromPriority({
       "aoColumns": [
-        { 
+        {
           "sTitle": "",
           "mData": "id",
           "mRender": function (data, type, full) {
@@ -1047,7 +1047,7 @@ Library.ui = {
           "iSortPriority": 0,
           "bSortable": false
         },
-        { 
+        {
           "sTitle": "Library Name",
           "mData": "id",
           "iSortPriority": 1,
@@ -1055,7 +1055,7 @@ Library.ui = {
             return "<a href=\"/miso/library/" + data + "\">" + full.name + "</a>";
           }
         },
-        { 
+        {
           "sTitle": "Alias",
           "mData": "alias",
           "iSortPriority": 0,
@@ -1063,7 +1063,7 @@ Library.ui = {
             return "<a href=\"/miso/library/" + full.id + "\">" + data + "</a>";
           }
         },
-        { 
+        {
           "sTitle": "Sample Name", 
           "sType": "no-sam",
           "mData": "parentSampleId" ,
@@ -1072,7 +1072,7 @@ Library.ui = {
             return "<a href=\"/miso/sample/" + data + "\">" + full.parentSampleAlias + " (SAM" + data + ")</a>";
           }
         },
-        { 
+        {
           "sTitle": "QC Passed",
           "mData": "qcPassed",
           "iSortPriority": 0,
@@ -1081,7 +1081,7 @@ Library.ui = {
             return (data != null ? (data ? "True" : "False") : "Unknown");
           }
         },
-        { 
+        {
           "sTitle": "Index(es)",
           "mData": "index1Label",
           "mRender": function (data, type, full) {
@@ -1102,7 +1102,7 @@ Library.ui = {
           "iSortPriority": 2,
           "bVisible": (Sample.detailedSample ? "true" : "false")
         },
-        { 
+        {
           "sTitle": "ID",
           "mData": "identificationBarcode",
           "iSortPriority": 0,
@@ -1125,7 +1125,10 @@ Library.ui = {
           "type": "GET",
           "url": sSource,
           "data": aoData,
-          "success": fnCallback // Do not alter this DataTables property
+          "success": function(d, s, x) {
+             Library.listData = d;
+             fnCallback(d, s, x);
+          }
         });
       },
       "fnDrawCallback": function (oSettings) {
@@ -1193,6 +1196,9 @@ Library.ui = {
     var selectedIdsArray = Library.ui.getSelectedIds();
     if (selectedIdsArray.length === 0) {
       alert("Please select one or more Libraries to update.");
+      return false;
+    }
+    if (!Utils.checkCommonSampleClasses(Library.listData, function(x) { return x.parentSampleClassId; }, selectedIdsArray, "All selected libraries must be made from samples of the same class.")) {
       return false;
     }
     window.location = "library/bulk/edit/" + selectedIdsArray.join(',');

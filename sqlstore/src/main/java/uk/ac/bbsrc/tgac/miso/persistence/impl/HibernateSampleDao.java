@@ -124,9 +124,8 @@ public class HibernateSampleDao implements SampleDao {
 
   @Override
   public int getNextSiblingNumber(Sample parent, SampleClass childClass) throws IOException {
-    Query query = currentSession().createQuery(
-        "select max(siblingNumber) " + "from SampleAdditionalInfoImpl " + "where parentId = :parentId "
-            + "and sampleClassId = :sampleClassId");
+    Query query = currentSession().createQuery("select max(siblingNumber) " + "from SampleAdditionalInfoImpl "
+        + "where parentId = :parentId " + "and sampleClassId = :sampleClassId");
     query.setLong("parentId", parent.getId());
     query.setLong("sampleClassId", childClass.getId());
     Number result = ((Number) query.uniqueResult());
@@ -348,7 +347,8 @@ public class HibernateSampleDao implements SampleDao {
   /**
    * Lazy-gets samples associated with a given Project
    * 
-   * @param Long projectId
+   * @param Long
+   *          projectId
    * @return Collection<Sample> samples
    */
   @Override
@@ -369,13 +369,13 @@ public class HibernateSampleDao implements SampleDao {
    * @return
    */
   private Criterion searchRestrictions(String querystr) {
-    String str = querystr.trim().replaceAll("[\\s,%]+", " ");
+    String str = DbUtils.convertStringToSearchQuery(querystr);
     Criterion[] criteria = new Criterion[searchProperties.length + 1];
     for (int i = 0; i < searchProperties.length; i++) {
-      criteria[i] = Restrictions.ilike(searchProperties[i], str, MatchMode.ANYWHERE);
+      criteria[i] = Restrictions.ilike(searchProperties[i], str, MatchMode.EXACT);
     }
-    criteria[searchProperties.length] = Restrictions
-        .and(Restrictions.eq("class", IdentityImpl.class), Restrictions.ilike("externalName", str, MatchMode.ANYWHERE));
+    criteria[searchProperties.length] = Restrictions.and(Restrictions.eq("class", IdentityImpl.class),
+        Restrictions.ilike("externalName", str, MatchMode.EXACT));
     return Restrictions.or(criteria);
   }
 

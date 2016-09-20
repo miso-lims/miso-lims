@@ -68,6 +68,10 @@ BEGIN
     DELETE FROM Sample;
     DELETE FROM SampleNumberPerProject;
     DELETE FROM Subproject;
+    DELETE FROM Study;
+    DELETE FROM Project_ProjectOverview;
+    DELETE FROM ProjectOverview_Note;
+    DELETE FROM ProjectOverview;
     DELETE FROM Project;
     DELETE FROM Note;
     

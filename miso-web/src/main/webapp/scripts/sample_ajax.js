@@ -1104,7 +1104,10 @@ Sample.ui = {
           "type": "GET",
           "url": sSource,
           "data": aoData,
-          "success": fnCallback // Do not alter this DataTables property
+          "success": function(d, s, x) {
+             Sample.listData = d;
+             fnCallback(d, s, x);
+          }
         });
       },
       "fnDrawCallback": function (oSettings) {
@@ -1272,6 +1275,9 @@ Sample.ui = {
         jQuery('#errors').css('display', 'block');
         return false;
       }
+	  if (!Utils.checkCommonSampleClasses(Sample.listData, function(x) { return x.sampleClassId; }, Sample.selectedIdsArray, "All samples must be of the same class for library propagation.")) {
+	    return false;
+	  }
     }
     window.location="library/bulk/propagate/" + Sample.selectedIdsArray.join(',');
   },

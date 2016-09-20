@@ -114,12 +114,12 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
   public static String LIBRARY_DILUTION_SELECT_BY_SEARCH = "SELECT ld.dilutionId, ld.name, ld.concentration, ld.library_libraryId, "
       + "ld.identificationBarcode, ld.creationDate, ld.dilutionUserName, ld.securityProfile_profileId, ld.targetedResequencingId, "
       + "ld.lastUpdated " + "FROM LibraryDilution ld " + "JOIN Library l ON l.libraryId = ld.library_libraryId "
-      + "WHERE l.platformName = :platformName AND (ld.name LIKE :search OR ld.identificationBarcode LIKE :search)";
+      + "WHERE l.platformName = :platformName AND (UPPER(ld.name) LIKE :search OR UPPER(ld.identificationBarcode) LIKE :search)";
 
   public static String LIBRARY_DILUTION_SELECT_BY_SEARCH_ONLY = "SELECT ld.dilutionId, ld.name, ld.concentration, "
       + "ld.library_libraryId, ld.identificationBarcode, ld.creationDate, ld.dilutionUserName, ld.securityProfile_profileId, "
       + "ld.targetedResequencingId, ld.lastUpdated " + "FROM LibraryDilution ld "
-      + "WHERE ld.name LIKE :search OR ld.identificationBarcode LIKE :search";
+      + "WHERE UPPER(ld.name) LIKE :search OR UPPER(ld.identificationBarcode) LIKE :search";
 
   protected static final Logger log = LoggerFactory.getLogger(SQLLibraryDilutionDAO.class);
 
@@ -216,8 +216,7 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
 
   @Override
   public Collection<LibraryDilution> listAllLibraryDilutionsBySearchAndPlatform(String query, PlatformType platformType) {
-    if (query == null) query = "";
-    String squery = "%" + query + "%";
+    String squery = DbUtils.convertStringToSearchQuery(query);
     MapSqlParameterSource params = new MapSqlParameterSource();
     params.addValue("platformName", platformType.getKey());
     params.addValue("search", squery);
@@ -227,8 +226,7 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
 
   @Override
   public Collection<LibraryDilution> listAllLibraryDilutionsBySearchOnly(String query) {
-    if (query == null) query = "";
-    String squery = "%" + query + "%";
+    String squery = DbUtils.convertStringToSearchQuery(query);
     MapSqlParameterSource params = new MapSqlParameterSource();
     params.addValue("search", squery);
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
@@ -252,8 +250,8 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
 
   @Override
   public Collection<LibraryDilution> listAllLibraryDilutionsByPlatform(PlatformType platformType) throws IOException {
-    return template
-        .query(LIBRARY_DILUTION_SELECT_BY_LIBRARY_PLATFORM, new Object[] { platformType.getKey() }, new LibraryDilutionMapper(true));
+    return template.query(LIBRARY_DILUTION_SELECT_BY_LIBRARY_PLATFORM, new Object[] { platformType.getKey() },
+        new LibraryDilutionMapper(true));
   }
 
   @Override
@@ -264,9 +262,7 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
   @Override
   public Collection<LibraryDilution> listAllLibraryDilutionsByProjectAndPlatform(long projectId, PlatformType platformType)
       throws IOException {
-    return template.query(
-        LIBRARY_DILUTION_SELECT_BY_PROJECT_AND_LIBRARY_PLATFORM,
-        new Object[] { platformType.getKey(), projectId },
+    return template.query(LIBRARY_DILUTION_SELECT_BY_PROJECT_AND_LIBRARY_PLATFORM, new Object[] { platformType.getKey(), projectId },
         new LibraryDilutionMapper(true));
   }
 
@@ -294,8 +290,8 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
   @Cacheable(cacheName = "libraryDilutionCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
       @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public LibraryDilution get(long dilutionId) throws IOException {
-    List<LibraryDilution> eResults = template
-        .query(LIBRARY_DILUTION_SELECT_BY_DILUTION_ID, new Object[] { dilutionId }, new LibraryDilutionMapper());
+    List<LibraryDilution> eResults = template.query(LIBRARY_DILUTION_SELECT_BY_DILUTION_ID, new Object[] { dilutionId },
+        new LibraryDilutionMapper());
     LibraryDilution e = eResults.size() > 0 ? (LibraryDilution) eResults.get(0) : null;
     return e;
   }
@@ -305,8 +301,8 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
       @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
 
   public LibraryDilution lazyGet(long id) throws IOException {
-    List<LibraryDilution> eResults = template
-        .query(LIBRARY_DILUTION_SELECT_BY_DILUTION_ID, new Object[] { id }, new LibraryDilutionMapper(true));
+    List<LibraryDilution> eResults = template.query(LIBRARY_DILUTION_SELECT_BY_DILUTION_ID, new Object[] { id },
+        new LibraryDilutionMapper(true));
     LibraryDilution e = eResults.size() > 0 ? (LibraryDilution) eResults.get(0) : null;
     return e;
   }
@@ -314,8 +310,8 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
   @Override
   public LibraryDilution getLibraryDilutionByBarcode(String barcode) throws IOException {
     if (barcode == null) throw new NullPointerException("Cannot search for null barcode");
-    List<LibraryDilution> eResults = template
-        .query(LIBRARY_DILUTION_SELECT_BY_IDENTIFICATION_BARCODE, new Object[] { barcode }, new LibraryDilutionMapper());
+    List<LibraryDilution> eResults = template.query(LIBRARY_DILUTION_SELECT_BY_IDENTIFICATION_BARCODE, new Object[] { barcode },
+        new LibraryDilutionMapper());
     LibraryDilution e = eResults.size() > 0 ? (LibraryDilution) eResults.get(0) : null;
     return e;
   }
@@ -362,8 +358,8 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
           Number newId = insert.executeAndReturnKey(params);
           if (newId.longValue() != dilution.getId()) {
             log.error("Expected LibraryDilution ID doesn't match returned value from database insert: rolling back...");
-            new NamedParameterJdbcTemplate(template)
-                .update(LIBRARY_DILUTION_DELETE, new MapSqlParameterSource().addValue("dilutionId", newId.longValue()));
+            new NamedParameterJdbcTemplate(template).update(LIBRARY_DILUTION_DELETE,
+                new MapSqlParameterSource().addValue("dilutionId", newId.longValue()));
             throw new IOException("Something bad happened. Expected LibraryDilution ID doesn't match returned value from DB insert");
           }
         } else {

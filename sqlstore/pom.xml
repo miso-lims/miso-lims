@@ -28,7 +28,7 @@
   <parent>
     <artifactId>miso</artifactId>
     <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-    <version>0.2.30</version>
+    <version>0.2.31-SNAPSHOT</version>
   </parent>
 
   <artifactId>sqlstore</artifactId>
@@ -42,7 +42,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
-        <version>2.0</version>
         <executions>
           <execution>
             <id>copy</id>

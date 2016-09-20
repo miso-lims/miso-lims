@@ -41,6 +41,8 @@ import javax.persistence.OneToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Transient;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.codehaus.jackson.annotate.JsonManagedReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -369,43 +371,6 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
     return (derivedInfo == null ? null : derivedInfo.getLastModified());
   }
 
-  /**
-   * Equivalency is based on getSampleId() if set, otherwise on name, otherwise on alias
-   */
-  @Override
-  public boolean equals(Object obj) {
-    if (obj == null) return false;
-    if (obj == this) return true;
-    if (!(obj instanceof Sample)) return false;
-    Sample them = (Sample) obj;
-    // If not saved, then compare resolved actual objects. Otherwise
-    // just compare IDs.
-    if (getId() == AbstractSample.UNSAVED_ID || them.getId() == AbstractSample.UNSAVED_ID) {
-      if (getName() != null && them.getName() != null) {
-        return getName().equals(them.getName());
-      } else if (getAlias() != null && them.getAlias() != null) {
-        return getAlias().equals(them.getAlias());
-      } else {
-        return false;
-      }
-    } else {
-      return getId() == them.getId();
-    }
-  }
-
-  @Override
-  public int hashCode() {
-    if (getId() != 0L && getId() != AbstractSample.UNSAVED_ID) {
-      return (int) getId();
-    } else {
-      final int PRIME = 37;
-      int hashcode = 1;
-      if (getName() != null) hashcode = PRIME * hashcode + getName().hashCode();
-      if (getAlias() != null) hashcode = PRIME * hashcode + getAlias().hashCode();
-      return hashcode;
-    }
-  }
-
   @Override
   public int compareTo(Object o) {
     Sample s = (Sample) o;
@@ -446,6 +411,46 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @Override
   public void setSecurityProfileId(Long securityProfileId) {
     securityProfile_profileId = securityProfileId;
+  }
+
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder(7, 37)
+        .appendSuper(super.hashCode())
+        .append(accession)
+        .append(alias)
+        .append(description)
+        .append(identificationBarcode)
+        .append(locationBarcode)
+        .append(project)
+        .append(qcPassed)
+        .append(receivedDate)
+        .append(sampleType)
+        .append(scientificName)
+        .append(taxonIdentifier)
+        .toHashCode();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    AbstractSample other = (AbstractSample) obj;
+    return new EqualsBuilder()
+        .appendSuper(super.equals(obj))
+        .append(accession, other.accession)
+        .append(alias, other.alias)
+        .append(description, other.description)
+        .append(identificationBarcode, other.identificationBarcode)
+        .append(locationBarcode, other.locationBarcode)
+        .append(project, other.project)
+        .append(qcPassed, other.qcPassed)
+        .append(receivedDate, other.receivedDate)
+        .append(sampleType, other.sampleType)
+        .append(scientificName, other.scientificName)
+        .append(taxonIdentifier, other.taxonIdentifier)
+        .isEquals();
   }
 
 }

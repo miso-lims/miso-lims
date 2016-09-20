@@ -35,6 +35,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
@@ -84,9 +86,6 @@ public class ProjectOverview implements Watchable, Alertable, Nameable, Serializ
 
   private String principalInvestigator;
 
-  @Deprecated
-  private Collection<Sample> samples = new HashSet<>();
-
   private EntityGroup<ProjectOverview, Sample> sampleGroup;
 
   private Collection<Library> libraries = new HashSet<>();
@@ -102,7 +101,7 @@ public class ProjectOverview implements Watchable, Alertable, Nameable, Serializ
   private boolean allPoolsConstructed;
   private boolean allRunsCompleted;
   private boolean primaryAnalysisCompleted;
-  private Set<MisoListener> listeners = new HashSet<>();
+  private final Set<MisoListener> listeners = new HashSet<>();
   private Set<User> watchers = new HashSet<>();
   private Date lastUpdated;
 
@@ -422,20 +421,6 @@ public class ProjectOverview implements Watchable, Alertable, Nameable, Serializ
   }
 
   @Override
-  public int hashCode() {
-    if (this.getId() != ProjectOverview.UNSAVED_ID) {
-      return (int) this.getId();
-    } else {
-      int hashcode = this.getPrincipalInvestigator().hashCode();
-      if (getNumProposedSamples() != null) hashcode = 37 * hashcode + this.getNumProposedSamples().hashCode();
-      if (getStartDate() != null) hashcode = 37 * hashcode + this.getStartDate().hashCode();
-      if (getEndDate() != null) hashcode = 37 * hashcode + this.getEndDate().hashCode();
-      if (getNotes() != null) hashcode = 37 * hashcode + this.getNotes().hashCode();
-      return hashcode;
-    }
-  }
-
-  @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append(getId());
@@ -448,5 +433,43 @@ public class ProjectOverview implements Watchable, Alertable, Nameable, Serializ
       sb.append(" ] ");
     }
     return sb.toString();
+  }
+
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder(17, 47)
+        .append(allLibrariesQcPassed)
+        .append(allPoolsConstructed)
+        .append(allRunsCompleted)
+        .append(allSampleQcPassed)
+        .append(endDate)
+        .append(libraryPreparationComplete)
+        .append(locked)
+        .append(numProposedSamples)
+        .append(primaryAnalysisCompleted)
+        .append(principalInvestigator)
+        .append(startDate)
+        .toHashCode();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    ProjectOverview other = (ProjectOverview) obj;
+    return new EqualsBuilder()
+        .append(allLibrariesQcPassed, other.allLibrariesQcPassed)
+        .append(allPoolsConstructed, other.allPoolsConstructed)
+        .append(allRunsCompleted, other.allRunsCompleted)
+        .append(allSampleQcPassed, other.allSampleQcPassed)
+        .append(endDate, other.endDate)
+        .append(libraryPreparationComplete, other.libraryPreparationComplete)
+        .append(locked, other.locked)
+        .append(numProposedSamples, other.numProposedSamples)
+        .append(primaryAnalysisCompleted, other.primaryAnalysisCompleted)
+        .append(principalInvestigator, other.principalInvestigator)
+        .append(startDate, other.startDate)
+        .isEquals();
   }
 }

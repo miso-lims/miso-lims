@@ -1668,6 +1668,9 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public long saveLibrary(Library library) throws IOException {
     if (libraryStore != null) {
+      if (library.isEmpty()) {
+        library.setVolume(0.0);
+      }
       if (library.getLibraryAdditionalInfo() != null && library.getLibraryAdditionalInfo().getLibraryDesign() != null) {
         if (!isDetailedSample(library.getSample())) {
           throw new IOException("A library design can only be applied to a detailed sample.");
@@ -1677,9 +1680,27 @@ public class MisoRequestManager implements RequestManager {
           throw new IOException(
               "This library design is not valid for sample " + library.getSample().getName() + " because the class is not compatible.");
         }
-        library.setLibrarySelectionType(libraryStore.getLibrarySelectionTypeById(design.getLibrarySelectionType()));
-        library.setLibraryStrategyType(libraryStore.getLibraryStrategyTypeById(design.getLibraryStrategyType()));
-        library.setLibraryType(design.getLibraryType());
+        library.getLibraryAdditionalInfo().setLibraryDesign(design);
+        LibrarySelectionType selection = libraryStore.getLibrarySelectionTypeById(design.getLibrarySelectionType());
+        LibraryStrategyType strategy = libraryStore.getLibraryStrategyTypeById(design.getLibraryStrategyType());
+        LibraryType type = design.getLibraryType();
+        String platformName = design.getLibraryType().getPlatformType();
+        if (library.getLibrarySelectionType() != null && library.getLibrarySelectionType().getId() != selection.getId()) {
+          throw new IOException("Library selection doesn't match library design.");
+        }
+        if (library.getLibraryStrategyType() != null && library.getLibraryStrategyType().getId() != strategy.getId()) {
+          throw new IOException("Library strategy doesn't match library design.");
+        }
+        if (library.getLibraryType() != null && library.getLibraryType().getId() != type.getId()) {
+          throw new IOException("Library type doesn't match library design.");
+        }
+        if (library.getPlatformName() != null && !library.getPlatformName().equals(platformName)) {
+          throw new IOException("Library platform doesn't match library design.");
+        }
+        library.setLibrarySelectionType(selection);
+        library.setLibraryStrategyType(strategy);
+        library.setLibraryType(type);
+        library.setPlatformName(platformName);
       }
       return libraryStore.save(library);
     } else {
@@ -1735,6 +1756,9 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public long savePool(Pool pool) throws IOException {
     if (poolStore != null) {
+      if (pool.isEmpty()) {
+        pool.setVolume(0.0);
+      }
       return poolStore.save(pool);
     } else {
       throw new IOException("No poolStore available. Check that it has been declared in the Spring config.");

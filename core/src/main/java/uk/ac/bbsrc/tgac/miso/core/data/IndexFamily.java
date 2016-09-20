@@ -38,6 +38,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.codehaus.jackson.annotate.JsonManagedReference;
 
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
@@ -45,6 +47,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 @Entity
 @Table(name = "IndexFamily")
 public class IndexFamily {
+  // TODO: this is intended to be immutable, but it is not
   public static final IndexFamily NULL = new IndexFamily();
 
   static {
@@ -126,6 +129,28 @@ public class IndexFamily {
 
   public void setPlatformType(PlatformType platform) {
     this.platformType = platform;
+  }
+
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder(11, 41)
+        .append(archived)
+        .append(name)
+        .append(platformType)
+        .toHashCode();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    IndexFamily other = (IndexFamily) obj;
+    return new EqualsBuilder()
+        .append(archived, other.archived)
+        .append(name, other.name)
+        .append(platformType, other.platformType)
+        .isEquals();
   }
 
 }

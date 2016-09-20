@@ -836,6 +836,7 @@ public class EditLibraryController {
   @RequestMapping(value = "/bulk/edit/{libraryIds}", method = RequestMethod.GET)
   public ModelAndView editBulkLibraries(@PathVariable String libraryIds, ModelMap model) throws IOException {
     try {
+      SampleClass sampleClass = null;
       List<Long> idList = getIdsFromString(libraryIds);
       ObjectMapper mapper = new ObjectMapper();
       List<LibraryDto> libraryDtos = new ArrayList<LibraryDto>();
@@ -845,11 +846,24 @@ public class EditLibraryController {
           lai = libraryAdditionalInfoService.get(library.getId());
         }
         libraryDtos.add(Dtos.asDto(library, lai));
+        if (!isDetailedSampleEnabled()) {
+          // Do nothing about sample classes.
+        } else if (sampleClass == null) {
+          sampleClass = ((SampleAdditionalInfo) library.getSample()).getSampleClass();
+        } else if (((SampleAdditionalInfo) library.getSample()).getSampleClass().getId() != sampleClass.getId()) {
+          throw new IOException("Can only update libraries when samples all have the same class.");
+        }
       }
       model.put("title", "Bulk Edit Libraries");
       model.put("librariesJSON", mapper.writeValueAsString(libraryDtos));
       model.put("method", "Edit");
-      model.put("libraryDesignsJSON", "[]");
+
+      JSONArray libraryDesigns = new JSONArray();
+      if (sampleClass != null) {
+        libraryDesigns.addAll(requestManager.listLibraryDesignByClass(sampleClass));
+      }
+      model.put("libraryDesignsJSON", libraryDesigns.toString());
+
       return new ModelAndView("/pages/bulkEditLibraries.jsp", model);
     } catch (IOException ex) {
       if (log.isDebugEnabled()) {

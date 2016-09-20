@@ -41,6 +41,8 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.codehaus.jackson.annotate.JsonBackReference;
 import org.codehaus.jackson.annotate.JsonManagedReference;
 import org.hibernate.annotations.Cascade;
@@ -91,9 +93,6 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   private String alias;
   private Boolean qcPassed;
   private boolean lowQuality;
-
-  @Transient
-  private Index index;
 
   @Transient
   private List<Index> indices = new ArrayList<>();
@@ -445,43 +444,6 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
     }
   }
 
-  /**
-   * Equivalency is based on getProjectId() if set, otherwise on name, description and creation date.
-   */
-  @CoverageIgnore
-  @Override
-  public boolean equals(Object obj) {
-    if (obj == null) return false;
-    if (obj == this) return true;
-    if (!(obj instanceof AbstractLibrary)) return false;
-    final Library them = (Library) obj;
-    // If not saved, then compare resolved actual objects. Otherwise
-    // just compare IDs.
-    if (getId() == AbstractLibrary.UNSAVED_ID || them.getId() == AbstractLibrary.UNSAVED_ID) {
-      if (getName() != null && them.getName() != null) {
-        return getName().equals(them.getName());
-      } else {
-        return getAlias().equals(them.getAlias());
-      }
-    } else {
-      return getId() == them.getId();
-    }
-  }
-
-  @CoverageIgnore
-  @Override
-  public int hashCode() {
-    if (AbstractLibrary.UNSAVED_ID != getId()) {
-      return (int) getId();
-    } else {
-      final int PRIME = 37;
-      int hashcode = 1;
-      if (getName() != null) hashcode = PRIME * hashcode + getName().hashCode();
-      if (getAlias() != null) hashcode = PRIME * hashcode + getAlias().hashCode();
-      return hashcode;
-    }
-  }
-
   @CoverageIgnore
   @Override
   public int compareTo(Object o) {
@@ -551,5 +513,55 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
       }
     }
     return null;
+  }
+
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder(3, 33)
+        .appendSuper(super.hashCode())
+        .append(accession)
+        .append(alias)
+        .append(description)
+        .append(identificationBarcode)
+        .append(indices)
+        .append(initialConcentration)
+        .append(libraryAdditionalInfo)
+        .append(libraryQuant)
+        .append(librarySelectionType)
+        .append(libraryStrategyType)
+        .append(libraryType)
+        .append(locationBarcode)
+        .append(lowQuality)
+        .append(paired)
+        .append(platformName)
+        .append(qcPassed)
+        .toHashCode();
+  }
+  
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    AbstractLibrary other = (AbstractLibrary) obj;
+    return new EqualsBuilder()
+        .appendSuper(super.equals(obj))
+        .append(accession, other.accession)
+        .append(alias, other.alias)
+        .append(description, other.description)
+        .append(identificationBarcode, other.identificationBarcode)
+        .append(indices, other.indices)
+        .append(initialConcentration, other.initialConcentration)
+        .append(libraryAdditionalInfo, other.libraryAdditionalInfo)
+        .append(libraryQuant, other.libraryQuant)
+        .append(librarySelectionType, other.librarySelectionType)
+        .append(libraryStrategyType, other.libraryStrategyType)
+        .append(libraryType, other.libraryType)
+        .append(locationBarcode, other.locationBarcode)
+        .append(lowQuality, other.lowQuality)
+        .append(paired, other.paired)
+        .append(platformName, other.platformName)
+        .append(qcPassed, other.qcPassed)
+        .isEquals();
   }
 }

@@ -112,7 +112,11 @@ public class SQLRunDAO implements RunStore {
 
   public static final String RUN_SELECT_BY_SEQUENCER_ID = RUNS_SELECT + " WHERE r.sequencerReference_sequencerReferenceId = ?";
 
-  public static final String RUNS_SELECT_BY_SEARCH = RUNS_SELECT + " WHERE r.name LIKE ? OR r.alias LIKE ? OR description LIKE ? ";
+  private static final String SEARCH_WHERE = " WHERE UPPER(r.name) LIKE ? OR UPPER(r.alias) LIKE ? OR UPPER(description) LIKE ? ";
+
+  public static final String RUNS_SELECT_BY_SEARCH = RUNS_SELECT + SEARCH_WHERE;
+
+  public static final String RUNS_COUNT_BY_SEARCH = "SELECT COUNT(*) FROM " + TABLE_NAME + " r" + SEARCH_WHERE;
 
   public static final String RUN_UPDATE = "UPDATE " + TABLE_NAME + " "
       + "SET name=:name, alias=:alias, description=:description, accession=:accession, platformRunId=:platformRunId, "
@@ -378,6 +382,9 @@ public class SQLRunDAO implements RunStore {
 
     if (this.cascadeType != null) {
       if (this.cascadeType.equals(CascadeType.PERSIST)) {
+        for (SequencerPartitionContainer<SequencerPoolPartition> container : run.getSequencerPartitionContainers()) {
+          container.setId(sequencerPartitionContainerDAO.save(container));
+        }
         SEQ_PART_CONTAINER_WRITER.saveAll(template, run.getId(), run.getSequencerPartitionContainers());
       }
 
@@ -465,8 +472,8 @@ public class SQLRunDAO implements RunStore {
               Number newId = insert.executeAndReturnKey(params);
               if (newId.longValue() != run.getId()) {
                 log.error("Expected Run ID doesn't match returned value from database insert: rolling back...");
-                new NamedParameterJdbcTemplate(template)
-                    .update(RUN_DELETE, new MapSqlParameterSource().addValue("runId", newId.longValue()));
+                new NamedParameterJdbcTemplate(template).update(RUN_DELETE,
+                    new MapSqlParameterSource().addValue("runId", newId.longValue()));
                 throw new IOException("Something bad happened. Expected Run ID doesn't match returned value from DB insert");
               }
               autoIncrement = newId.longValue() + 1;
@@ -550,7 +557,7 @@ public class SQLRunDAO implements RunStore {
 
   @Override
   public List<Run> listBySearch(String query) {
-    String mySQLQuery = "%" + query.replaceAll("_", Matcher.quoteReplacement("\\_")) + "%";
+    String mySQLQuery = DbUtils.convertStringToSearchQuery(query);
     return template.query(RUNS_SELECT_BY_SEARCH, new Object[] { mySQLQuery, mySQLQuery, mySQLQuery }, new RunMapper(true));
   }
 
@@ -592,8 +599,8 @@ public class SQLRunDAO implements RunStore {
 
   @Override
   public Run getLatestStartDateRunBySequencerPartitionContainerId(long containerId) throws IOException {
-    List<Run> eResults = template
-        .query(LATEST_RUN_STARTED_SELECT_BY_SEQUENCER_PARTITION_CONTAINER_ID, new Object[] { containerId }, new RunMapper(true));
+    List<Run> eResults = template.query(LATEST_RUN_STARTED_SELECT_BY_SEQUENCER_PARTITION_CONTAINER_ID, new Object[] { containerId },
+        new RunMapper(true));
     Run r = eResults.size() > 0 ? eResults.get(0) : null;
     if (r == null) {
       r = getLatestRunIdRunBySequencerPartitionContainerId(containerId);
@@ -603,8 +610,8 @@ public class SQLRunDAO implements RunStore {
 
   @Override
   public Run getLatestRunIdRunBySequencerPartitionContainerId(long containerId) throws IOException {
-    List<Run> eResults = template
-        .query(LATEST_RUN_ID_SELECT_BY_SEQUENCER_PARTITION_CONTAINER_ID, new Object[] { containerId }, new RunMapper());
+    List<Run> eResults = template.query(LATEST_RUN_ID_SELECT_BY_SEQUENCER_PARTITION_CONTAINER_ID, new Object[] { containerId },
+        new RunMapper());
     return eResults.size() > 0 ? eResults.get(0) : null;
   }
 
@@ -699,7 +706,7 @@ public class SQLRunDAO implements RunStore {
         r.setSequencingParametersId(null);
       }
       r.setLastUpdated(rs.getDate("lastUpdated"));
-      
+
       try {
         r.setLastModifier(securityDAO.getUserById(rs.getLong("lastModifier")));
         r.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
@@ -754,16 +761,16 @@ public class SQLRunDAO implements RunStore {
   }
 
   @Override
-  public List<Run> listBySearchOffsetAndNumResults(int offset, int limit, String querystr, String sortDir, String sortCol)
+  public List<Run> listBySearchOffsetAndNumResults(int offset, int limit, String search, String sortDir, String sortCol)
       throws IOException {
-    if (isStringEmptyOrNull(querystr)) {
+    if (isStringEmptyOrNull(search)) {
       return listByOffsetAndNumResults(offset, limit, sortDir, sortCol);
     } else {
       if (offset < 0 || limit < 0) throw new IOException("Limit and Offset must not be less than zero");
       sortCol = updateSortCol(sortCol);
       if (!"asc".equals(sortDir.toLowerCase()) && !"desc".equals(sortDir.toLowerCase())) sortDir = "desc";
 
-      querystr = "%" + querystr.replaceAll("_", Matcher.quoteReplacement("\\_")) + "%";
+      String querystr = DbUtils.convertStringToSearchQuery(search);
       String query = RUNS_SELECT_BY_SEARCH + " ORDER BY " + sortCol + " " + sortDir + " LIMIT " + limit + " OFFSET " + offset;
       return template.query(query, new Object[] { querystr, querystr, querystr }, new RunMapper(true));
     }
@@ -781,7 +788,8 @@ public class SQLRunDAO implements RunStore {
 
   @Override
   public long countBySearch(String querystr) throws IOException {
-    return listBySearch(querystr).size();
+    String mySQLQuery = DbUtils.convertStringToSearchQuery(querystr);
+    return template.queryForLong(RUNS_COUNT_BY_SEARCH, new Object[] { mySQLQuery, mySQLQuery, mySQLQuery });
   }
 
   public String updateSortCol(String sortCol) {

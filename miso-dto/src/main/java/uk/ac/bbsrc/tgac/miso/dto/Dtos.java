@@ -35,6 +35,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Institute;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryAdditionalInfo;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
@@ -348,7 +349,8 @@ public class Dtos {
    * identity, which may or may not yet exist</li>
    * </ol>
    * 
-   * @param childDto the DTO to take parent details from
+   * @param childDto
+   *          the DTO to take parent details from
    * @return the parent details from the DTO, or null if there are none. A returned sample will also include its own parent if applicable.
    */
   private static SampleAdditionalInfo getParent(SampleAdditionalInfoDto childDto) {
@@ -875,6 +877,11 @@ public class Dtos {
     if (from.getPrepKit() != null) {
       to.setPrepKit(to(from.getPrepKit()));
     }
+    if (from.getLibraryDesignId() != null) {
+      LibraryDesign design = new LibraryDesign();
+      design.setId(from.getLibraryDesignId());
+      to.setLibraryDesign(design);
+    }
     to.setArchived(from.getArchived());
     to.setNonStandardAlias(from.getNonStandardAlias());
     return to;
@@ -935,6 +942,9 @@ public class Dtos {
     dto.setName(from.getName());
     dto.setParentSampleId(from.getSample().getId());
     dto.setParentSampleAlias(from.getSample().getAlias());
+    if (from.getSample() instanceof SampleAdditionalInfo) {
+      dto.setParentSampleClassId(((SampleAdditionalInfo) from.getSample()).getSampleClass().getId());
+    }
     dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
     dto.setDescription(from.getDescription());
     dto.setId(from.getId());

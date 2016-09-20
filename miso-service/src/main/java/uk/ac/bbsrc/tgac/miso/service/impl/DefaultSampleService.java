@@ -261,6 +261,9 @@ public class DefaultSampleService implements SampleService {
    * @throws IOException
    */
   private Sample save(Sample sample) throws IOException {
+    if (sample.isEmpty()) {
+      sample.setVolume(0.0);
+    }
     try {
       Long newId = sample.getId();
       if (newId == Sample.UNSAVED_ID) {
@@ -506,6 +509,7 @@ public class DefaultSampleService implements SampleService {
     target.setDescription(source.getDescription());
     target.setEmpty(source.isEmpty());
     target.setVolume(source.getVolume());
+    target.setIdentificationBarcode(source.getIdentificationBarcode());
     if (isDetailedSample(target)) {
       sampleAdditionalInfoService.applyChanges((SampleAdditionalInfo) target, (SampleAdditionalInfo) source);
       if (isIdentitySample(target)) {

@@ -88,8 +88,8 @@ public class SQLStudyDAO implements StudyStore {
 
   public static final String STUDY_SELECT_BY_ID = STUDIES_SELECT + " " + "WHERE studyId = ?";
 
-  public static final String STUDIES_SELECT_BY_SEARCH = STUDIES_SELECT + " WHERE " + "name LIKE ? OR " + "alias LIKE ? OR "
-      + "description LIKE ? ";
+  public static final String STUDIES_SELECT_BY_SEARCH = STUDIES_SELECT + " WHERE UPPER(name) LIKE ? OR UPPER(alias) LIKE ? OR "
+      + "UPPER(description) LIKE ? ";
 
   public static final String STUDY_UPDATE = "UPDATE " + TABLE_NAME + " "
       + "SET name=:name, description=:description, alias=:alias, accession=:accession, securityProfile_profileId=:securityProfile_profileId, project_projectId=:project_projectId, studyType=:studyType, lastModifier=:lastModifier "
@@ -122,8 +122,8 @@ public class SQLStudyDAO implements StudyStore {
 
   protected static final Logger log = LoggerFactory.getLogger(SQLStudyDAO.class);
 
-  private static final BridgeCollectionUpdater<Project> PROJECT_WRITER = new BridgeCollectionUpdater<Project>("Project_Study", "studies_studyId",
-      "Project_projectId") {
+  private static final BridgeCollectionUpdater<Project> PROJECT_WRITER = new BridgeCollectionUpdater<Project>("Project_Study",
+      "studies_studyId", "Project_projectId") {
     @Override
     protected Object getId(Project item) {
       return item.getProjectId();
@@ -210,7 +210,7 @@ public class SQLStudyDAO implements StudyStore {
   @Override
   @TriggersRemove(cacheName = { "studyCache",
       "lazyStudyCache" }, keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
-          @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
+          @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public long save(Study study) throws IOException {
     Long securityProfileId = study.getSecurityProfile().getProfileId();
     if (this.cascadeType != null) {
@@ -285,7 +285,7 @@ public class SQLStudyDAO implements StudyStore {
 
   @Override
   @Cacheable(cacheName = "studyListCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
-      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
+      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public List<Study> listAll() {
     return template.query(STUDIES_SELECT, new StudyMapper(true));
   }
@@ -302,14 +302,14 @@ public class SQLStudyDAO implements StudyStore {
 
   @Override
   public List<Study> listBySearch(String query) {
-    String mySQLQuery = "%" + query.replaceAll("_", Matcher.quoteReplacement("\\_")) + "%";
+    String mySQLQuery = DbUtils.convertStringToSearchQuery(query);
     return template.query(STUDIES_SELECT_BY_SEARCH, new Object[] { mySQLQuery, mySQLQuery, mySQLQuery }, new StudyMapper(true));
   }
 
   @Override
   @TriggersRemove(cacheName = { "studyCache",
       "lazyStudyCache" }, keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
-          @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
+          @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public boolean remove(Study study) throws IOException {
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
     if (study.isDeletable() && (namedTemplate.update(STUDY_DELETE, new MapSqlParameterSource().addValue("studyId", study.getId())) == 1)) {
@@ -331,7 +331,7 @@ public class SQLStudyDAO implements StudyStore {
 
   @Override
   @Cacheable(cacheName = "studyCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
-      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
+      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public Study get(long studyId) throws IOException {
     List<Study> eResults = template.query(STUDY_SELECT_BY_ID, new Object[] { studyId }, new StudyMapper());
     Study e = eResults.size() > 0 ? (Study) eResults.get(0) : null;

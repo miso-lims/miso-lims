@@ -10,6 +10,9 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -170,6 +173,31 @@ public class LibraryAdditionalInfoImpl implements LibraryAdditionalInfo {
   @Override
   public void setNonStandardAlias(boolean nonStandardAlias) {
     this.nonStandardAlias = nonStandardAlias;
+  }
+
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder(15, 45)
+        .append(archived)
+        .append(kitDescriptorId)
+        .append(libraryDesign)
+        .append(nonStandardAlias)
+        .append(prepKit)
+        .toHashCode();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    LibraryAdditionalInfoImpl other = (LibraryAdditionalInfoImpl) obj;
+    return new EqualsBuilder()
+        .append(archived, other.archived)
+        .append(libraryDesign, other.libraryDesign)
+        .append(nonStandardAlias, other.nonStandardAlias)
+        .append(prepKit, other.prepKit)
+        .isEquals();
   }
 
 }
