@@ -666,4 +666,4 @@ CREATE OR REPLACE VIEW OrderCompletion AS
   (SELECT poolId, parametersId, num_partitions, 'Requested' AS health, lastUpdated FROM DesiredPartitions);
 
 CREATE OR REPLACE VIEW SampleDerivedInfo AS
-  SELECT sampleId, MAX(changeTime) as lastModified FROM SampleChangeLog GROUP BY sampleId;
+  SELECT Sample.sampleId, (SELECT MAX(changeTime) FROM SampleChangeLog WHERE Sample.sampleId = SampleChangeLog.sampleId GROUP BY SampleChangeLog.sampleId) as lastModified FROM Sample;

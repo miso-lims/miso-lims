@@ -613,6 +613,9 @@ public class LimsUtils {
   }
 
   public static String getDateAsString(Date date) {
+    if (date == null) {
+      return null;
+    }
     DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
     return df.format(date);
   }
