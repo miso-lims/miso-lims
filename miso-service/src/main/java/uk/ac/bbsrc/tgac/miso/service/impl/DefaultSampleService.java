@@ -1,16 +1,10 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isAliquotSample;
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isDetailedSample;
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isIdentitySample;
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStockSample;
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringBlankOrNull;
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isTissueProcessingSample;
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isTissueSample;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -225,7 +219,9 @@ public class DefaultSampleService implements SampleService {
         try {
           detailed.setParent(findOrCreateParent(detailed));
           detailed.inheritPermissions(detailed.getParent());
-          detailed.setNonStandardAlias(detailed.getParent().hasNonStandardAlias());
+          if (detailed.getParent().hasNonStandardAlias()) {
+            detailed.setNonStandardAlias(true);
+          }
         } catch (MisoNamingException e) {
           throw new IOException(e.getMessage(), e);
         }
@@ -627,6 +623,11 @@ public class DefaultSampleService implements SampleService {
   @Transactional(propagation = Propagation.REQUIRED)
   public Identity getIdentityByExternalName(String externalName) throws IOException {
     return sampleDao.getIdentityByExternalName(externalName);
+  }
+
+  @Override
+  public List<Sample> getByAlias(String alias) throws IOException {
+    return new ArrayList<Sample>(sampleDao.listByAlias(alias));
   }
 
 }

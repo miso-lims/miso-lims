@@ -23,8 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.core.manager;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isDetailedSample;
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -2010,9 +2009,9 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Library getLibraryByAlias(String alias) throws IOException {
+  public Collection<Library> listLibrariesByAlias(String alias) throws IOException {
     if (libraryStore != null) {
-      return libraryStore.getByAlias(alias);
+      return libraryStore.listByAlias(alias);
     } else {
       throw new IOException("No libraryStore available. Check that it has been declared in the Spring config.");
     }

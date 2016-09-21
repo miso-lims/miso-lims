@@ -469,12 +469,14 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Library getLibraryByAlias(String alias) throws IOException {
-    Library o = backingManager.getLibraryByAlias(alias);
-    if (readCheck(o))
-      return o;
-    else
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Library " + o.getId());
+  public Collection<Library> listLibrariesByAlias(String alias) throws IOException {
+    Collection<Library> libraries = backingManager.listLibrariesByAlias(alias);
+    for (Library library : libraries) {
+      if (!readCheck(library)) {
+        throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Library " + library.getId());
+      }
+    }
+    return libraries;
   }
 
   @Override

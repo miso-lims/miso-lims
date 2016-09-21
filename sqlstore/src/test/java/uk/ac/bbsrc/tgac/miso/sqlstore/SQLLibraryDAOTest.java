@@ -1,19 +1,19 @@
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.persistence.CascadeType;
+
+import net.sf.ehcache.CacheManager;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -30,7 +30,6 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.store.SecurityStore;
 
-import net.sf.ehcache.CacheManager;
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -170,9 +169,10 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
   @Test
   public void testGetByAlias() throws Exception {
     String alias = "TEST_0006_Bn_R_PE_300_WG";
-    Library byAlias = dao.getByAlias(alias);
+    Collection<Library> byAlias = dao.listByAlias(alias);
     assertNotNull(byAlias);
-    assertEquals("alias name does not match", alias, byAlias.getAlias());
+    assertEquals(1, byAlias.size());
+    assertEquals("alias name does not match", alias, byAlias.iterator().next().getAlias());
   }
 
   @Test

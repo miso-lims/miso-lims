@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.TreeSet;
 
 import javax.sql.DataSource;
@@ -186,6 +187,17 @@ public class DefaultMigrationTarget implements MigrationTarget {
         // New subproject
         createSubproject(detailed.getSubproject(), detailed.getProject().getReferenceGenomeId());
       }
+      if (sample.getAlias() != null) {
+        // Check for duplicate alias
+        List<Sample> dupes = serviceManager.getSampleService().getByAlias(sample.getAlias());
+        if (!dupes.isEmpty()) {
+          for (Sample dupe : dupes) {
+            ((SampleAdditionalInfo) dupe).setNonStandardAlias(true);
+            serviceManager.getSampleService().update(dupe);
+          }
+          detailed.setNonStandardAlias(true);
+        }
+      }
     }
     if (replaceChangeLogs) {
       Collection<ChangeLog> changes = new ArrayList<>(sample.getChangeLog());
@@ -262,10 +274,21 @@ public class DefaultMigrationTarget implements MigrationTarget {
       valueTypeLookup.resolveAll(library);
       library.setLastModifier(user);
       library.setLastUpdated(timeStamp);
-      library.getLibraryAdditionalInfo().setCreatedBy(user);
-      library.getLibraryAdditionalInfo().setCreationDate(timeStamp);
-      library.getLibraryAdditionalInfo().setUpdatedBy(user);
-      library.getLibraryAdditionalInfo().setLastUpdated(timeStamp);
+      if (library.getLibraryAdditionalInfo() != null) {
+        library.getLibraryAdditionalInfo().setCreatedBy(user);
+        library.getLibraryAdditionalInfo().setCreationDate(timeStamp);
+        library.getLibraryAdditionalInfo().setUpdatedBy(user);
+        library.getLibraryAdditionalInfo().setLastUpdated(timeStamp);
+        // Check for duplicate alias
+        Collection<Library> dupes = serviceManager.getLibraryDao().listByAlias(library.getAlias());
+        if (!dupes.isEmpty()) {
+          for (Library dupe : dupes) {
+            dupe.getLibraryAdditionalInfo().setNonStandardAlias(true);
+            serviceManager.getLibraryDao().save(dupe);
+          }
+          library.getLibraryAdditionalInfo().setNonStandardAlias(true);
+        }
+      }
       if (replaceChangeLogs) {
         Collection<ChangeLog> changes = library.getChangeLog();
         library.setId(serviceManager.getLibraryDao().save(library));

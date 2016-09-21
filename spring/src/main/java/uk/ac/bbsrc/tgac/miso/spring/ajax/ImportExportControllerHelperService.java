@@ -41,6 +41,11 @@ import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpSession;
 
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import net.sourceforge.fluxion.ajax.Ajaxified;
+import net.sourceforge.fluxion.ajax.util.JSONUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,10 +55,6 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-import net.sourceforge.fluxion.ajax.Ajaxified;
-import net.sourceforge.fluxion.ajax.util.JSONUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -333,7 +334,12 @@ public class ImportExportControllerHelperService {
             if ("A".equals(proceedKey) || "L".equals(proceedKey)) {
               library.setAlias(jsonArrayElement.getString(3));
             } else if ("U".equals(proceedKey) || "P".equals(proceedKey)) {
-              library = requestManager.getLibraryByAlias(jsonArrayElement.getString(3));
+              Collection<Library> byAlias = requestManager.listLibrariesByAlias(jsonArrayElement.getString(3));
+              if (byAlias.size() == 1) {
+                library = byAlias.iterator().next();
+              } else {
+                throw new InputFormException(byAlias.size() + " Libraries found matching alias '" + jsonArrayElement.getString(3) + "'");
+              }
             }
 
             if ("A".equals(proceedKey) || "L".equals(proceedKey) || "U".equals(proceedKey)) {
