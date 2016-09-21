@@ -57,7 +57,7 @@
             <a href="<c:url value='/miso/'/>">Home</a>
           </li>
           <li>
-            <a href='<c:url value="/miso/sequencers"/>'>Sequencer References</a>
+            <a href='<c:url value="/miso/sequencers"/>'>Sequencers</a>
           </li>
           <li>
             <a href='<c:url value="/miso/sequencer/${serviceRecord.sequencerReference.id}"/>'>${serviceRecord.sequencerReference.name}</a>
@@ -90,7 +90,7 @@
           </td>
         </tr>
         <tr>
-          <td class="h">Sequencer Reference:</td>
+          <td class="h">Sequencer:</td>
           <td><a href='<c:url value="/miso/sequencer/${serviceRecord.sequencerReference.id}"/>'>${serviceRecord.sequencerReference.name}</a></td>
         </tr>
         <tr>
