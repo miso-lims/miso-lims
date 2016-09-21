@@ -1190,7 +1190,7 @@ Library.ui = {
   getSelectedIds: function () {
     return [].slice.call(document.getElementsByClassName('bulkCheckbox'))
              .filter(function (input) { return input.checked; })
-             .map(function (input) { return input.value; });
+             .map(function (input) { return parseInt(input.value); });
   },
   
   updateSelectedItems: function () {

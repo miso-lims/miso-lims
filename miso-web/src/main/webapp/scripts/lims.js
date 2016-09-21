@@ -67,7 +67,7 @@ var Utils = Utils || {
 
   checkCommonSampleClasses: function(jqueryDataTableData, getSampleClassFromObject, selectedIdsArray, errorText) {
     var sampleClasses = jqueryDataTableData.aaData
-      .filter(function(x) { return selectedIdsArray.indexOf("" + x.id) != -1; })
+      .filter(function(x) { return selectedIdsArray.indexOf(x.id) != -1; })
       .map(getSampleClassFromObject);
     for(var i = 1; i < sampleClasses.length; i++) {
       if (sampleClasses[i] != sampleClasses[0]) {
