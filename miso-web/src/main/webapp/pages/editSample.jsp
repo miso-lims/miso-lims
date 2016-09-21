@@ -166,7 +166,7 @@
   <div id="printServiceSelectDialog" title="Select a Printer"></div>
 </div>
 <div>
-  <table class="in" <c:if test="${sample.isSynthetic()}">style="background-color: #ddd"</c:if>>
+  <table class="in" <c:if test="${detailedSample && sample.isSynthetic()}">style="background-color: #ddd"</c:if>>
     <tr>
       <td class="h">Sample ID:</td>
       <td>
@@ -176,7 +176,7 @@
         </c:choose>
       </td>
     </tr>
-    <c:if test="${sample.isSynthetic()}"><tr><td colspan="2" style="font-size: 200%; font-weight:bold;">This entity does not exist except for sample tracking purposes!</td></tr></c:if>
+    <c:if test="${detailedSample && sample.isSynthetic()}"><tr><td colspan="2" style="font-size: 200%; font-weight:bold;">This entity does not exist except for sample tracking purposes!</td></tr></c:if>
     <tr>
       <td class="h">Location:</td>
       <td>
@@ -494,7 +494,7 @@
             <tr>
               <td class="h">Lab:</td>
               <td>
-               <miso:select id="lab" path="lab" items="${labs}" itemLabel="itemLabel" itemValue="id" defaultLabel="SELECT" 
+               <miso:select id="lab" path="lab" items="${labs}" itemLabel="itemLabel" itemValue="id" defaultLabel="SELECT"
                    defaultValue=""/>
               </td>
             </tr>
@@ -720,7 +720,7 @@
       <c:otherwise>
         <button id="savePlain" class="fg-button ui-state-default ui-corner-all" onclick="Sample.hot.savePlainData();">Save Bulk</button>
       </c:otherwise>
-      </c:choose>   
+      </c:choose>
   </h1>
   <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#hothelp_arrowclick'), 'hothelpdiv');">Quick Help
     <div id="hothelp_arrowclick" class="toggleLeft"></div>
@@ -761,7 +761,7 @@
 	  </div>
     <div class="clear"></div>
     <div id="hotContainer"></div>
- 
+
     <script type="text/javascript">
       Hot.dropdownRef = ${referenceDataJSON};
       Sample.hot.aliasGenerationEnabled = ${aliasGenerationEnabled};
@@ -852,7 +852,7 @@
     </span>
   <br/>
   <a name="library"></a>
-  
+
   <c:if test="${ !detailedSample or detailedSample and sampleCategory eq 'Aliquot' }">
 
   <h1>
