@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.TreeSet;
 
 import javax.sql.DataSource;
@@ -185,6 +186,17 @@ public class DefaultMigrationTarget implements MigrationTarget {
       if (detailed.getSubproject() != null && detailed.getSubproject().getId() == null) {
         // New subproject
         createSubproject(detailed.getSubproject(), detailed.getProject().getReferenceGenomeId());
+      }
+      if (sample.getAlias() != null) {
+        // Check for duplicate alias
+        List<Sample> dupes = serviceManager.getSampleService().getByAlias(sample.getAlias());
+        if (!dupes.isEmpty()) {
+          for (Sample dupe : dupes) {
+            ((SampleAdditionalInfo) dupe).setNonStandardAlias(true);
+            serviceManager.getSampleService().update(dupe);
+          }
+          detailed.setNonStandardAlias(true);
+        }
       }
     }
     if (replaceChangeLogs) {
