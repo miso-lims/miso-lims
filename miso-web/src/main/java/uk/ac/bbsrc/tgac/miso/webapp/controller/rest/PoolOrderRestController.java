@@ -2,11 +2,17 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
 
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.node.ArrayNode;
+import org.codehaus.jackson.node.ObjectNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,10 +30,15 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrder;
+import uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletion;
+import uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletionGroup;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
+import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.PoolOrderDto;
 import uk.ac.bbsrc.tgac.miso.dto.SequencingParametersDto;
+import uk.ac.bbsrc.tgac.miso.service.PoolOrderCompletionService;
 import uk.ac.bbsrc.tgac.miso.service.PoolOrderService;
 import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
 
@@ -42,6 +53,8 @@ public class PoolOrderRestController extends RestController {
   private PoolOrderService poolOrderService;
   @Autowired
   private SequencingParametersService sequencingParametersService;
+  @Autowired
+  private PoolOrderCompletionService poolOrderCompletionService;
 
   @RequestMapping(value = "/pool/{id}/orders", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
@@ -52,6 +65,35 @@ public class PoolOrderRestController extends RestController {
       writeUrls(dto, uriBuilder);
     }
     return dtos;
+  }
+
+  @RequestMapping(value = "/pool/{id}/completions", method = RequestMethod.GET, produces = { "application/json" })
+  @ResponseBody
+  public ObjectNode getCompletionsByPool(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder, HttpServletResponse response)
+      throws IOException {
+
+    Collection<PoolOrderCompletion> completions = poolOrderCompletionService.getOrderCompletionForPool(id);
+    ObjectMapper mapper = new ObjectMapper();
+    ObjectNode node = mapper.createObjectNode();
+    ArrayNode headings = mapper.createArrayNode();
+    for (HealthType health : LimsUtils.getUsedHealthTypes(completions)) {
+      headings.add(health.getKey());
+    }
+    node.put("headings", headings);
+    ArrayNode data = mapper.createArrayNode();
+    for (Entry<SequencingParameters, PoolOrderCompletionGroup> entry : LimsUtils.groupCompletions(completions).values().iterator().next()
+        .entrySet()) {
+      ObjectNode completion = mapper.createObjectNode();
+      completion.put("parametersId", entry.getKey().getId());
+      completion.put("Remaining", entry.getValue().getRemaining());
+      for (HealthType health : LimsUtils.getUsedHealthTypes(completions)) {
+        completion.put(health.getKey(), entry.getValue().get(health).getNumPartitions());
+      }
+      data.add(completion);
+    }
+    node.put("completions", data);
+
+    return node;
   }
 
   @RequestMapping(value = "/poolorder/{id}", method = RequestMethod.GET, produces = { "application/json" })

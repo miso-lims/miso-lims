@@ -365,36 +365,10 @@
 
   <table cellpadding="0" cellspacing="0" border="0" class="display" id="edit-order-table"></table>
 
-  <c:if test="${not empty ordercompletions}">
   <br/>
-    <h1>Order Completion</h1>
-    <span style="clear:both">
-      <table class="list" id="completion_table">
-        <thead>
-        <tr>
-          <th>Platform</th>
-          <th>Parameters</th>
-          <c:forEach items="${ordercompletionheadings}" var="heading">
-            <th>${heading.key}</th>
-          </c:forEach>
-          <th>Remaining</th>
-        </tr>
-        </thead>
-        <tbody>
-        <c:forEach items="${ordercompletions}" var="parameterGroup">
-          <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-            <td>${parameterGroup.key.platform.nameAndModel}</td>
-            <td>${parameterGroup.key.name}</td>
-            <c:forEach items="${ordercompletionheadings}" var="heading">
-              <td>${parameterGroup.value[heading].numPartitions}</td>
-            </c:forEach>
-            <td>${parameterGroup.value.getRemaining()}</td>
-          </tr>
-        </c:forEach>
-        </tbody>
-      </table>
-    </span>
-  </c:if>
+  <h1>Order Completion</h1>
+  <table cellpadding="0" cellspacing="0" border="0" class="display" id="order-completion-table"></table>
+  <br/>
 </c:if>
 
 <h1>Pooled Elements</h1>
