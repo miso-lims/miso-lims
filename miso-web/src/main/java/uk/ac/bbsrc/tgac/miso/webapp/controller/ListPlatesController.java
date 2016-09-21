@@ -62,7 +62,7 @@ public class ListPlatesController {
 
   @ModelAttribute("title")
   public String title() {
-    return "List Plates";
+    return "Plates";
   }
 
   @RequestMapping("/plates")

@@ -58,7 +58,7 @@ public class ListLibrariesController {
 
   @ModelAttribute("title")
   public String title() {
-    return "List Libraries";
+    return "Libraries";
   }
 
   @Deprecated

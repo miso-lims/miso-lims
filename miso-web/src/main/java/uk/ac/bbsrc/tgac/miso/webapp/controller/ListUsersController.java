@@ -57,7 +57,7 @@ public class ListUsersController {
 
   @ModelAttribute("title")
   public String title() {
-    return "List Users";
+    return "Users";
   }
 
   @RequestMapping("/admin/users")
