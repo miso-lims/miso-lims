@@ -523,23 +523,6 @@ Pool.ui = {
     })).fnSetFilteringDelay();
   },
 
-  getPoolableElementInfo : function(poolId, elementId) {
-    Fluxion.doAjax(
-      'poolControllerHelperService',
-      'getPoolableElementInfo',
-      {
-        'poolId':poolId,
-        'elementId':elementId,
-        'url':ajaxurl
-      },
-      {
-        'doOnSuccess': function(json) {
-          jQuery('#element'+elementId).append(json.info);
-        }
-      }
-    );
-  },
-
   createElementSelectDatatable : function(platform, poolId, libraryDilutionConcentrationUnits) {
     jQuery('#elementSelectDatatableDiv').html("<table cellpadding='0' width='100%' cellspacing='0' border='0' class='display' id='elementSelectDatatable'></table>");
     jQuery('#elementSelectDatatable').html("<img src='/styles/images/ajax-loader.gif'/>");
@@ -558,7 +541,7 @@ Pool.ui = {
             "aaData": json.poolelements,
             "aoColumns": [
               { "sTitle": "Dilution Name", "sType":"natural"},
-              { "sTitle": "Concentration ("+libraryDilutionConcentrationUnits+")", "sType":"natural"},
+              { "sTitle": "Conc. ("+libraryDilutionConcentrationUnits+")", "sType":"natural"},
               { "sTitle": "Library", "sType":"natural"},
               { "sTitle": "Sample", "sType":"natural"},
               { "sTitle": "Indices", "sType":"natural"},
@@ -567,9 +550,23 @@ Pool.ui = {
             ],
             "bJQueryUI": true,
             "iDisplayLength":  25,
+            "sPaginationType": "full_numbers",
             "aaSorting":[
               [0,"desc"]
-            ]
+            ],
+            "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+              jQuery(nRow).attr("id", "poolable_" + aData[0]);
+              if (jQuery('#pooled_' + aData[0]).length) {
+                jQuery('td:eq(6)', nRow).addClass('disabled');
+                jQuery('td:eq(6)', nRow).prop('disabled', true);
+                jQuery('td:eq(6)', nRow).css('cursor', 'default');
+              } else {
+                jQuery('td:eq(6)', nRow).css('cursor', 'pointer');
+              }
+            },
+            "fnDrawCallback": function () {
+              jQuery('#elementSelectDatatable_paginate').find('.fg-button').removeClass('fg-button');
+            } 
           });
         }
       }
@@ -580,19 +577,32 @@ Pool.ui = {
     Pool.ui.createElementSelectDatatable(jQuery('#platformType').val());
   },
 
-  removePoolableElement : function(poolId, dilutionId, uiElement) {
+  removePooledElement : function (poolId, dilutionId, elementName) {
     if (poolId) {
-	  if (confirm("Are you sure you want to delete this dilution?")) {
-	    Fluxion.doAjax(
+  	  if (confirm("Are you sure you want to remove " + elementName + " from this pool?")) {
+  	    Fluxion.doAjax(
           'poolControllerHelperService',
-          'removePoolableElement',
+          'removePooledElement',
           {
             'poolId':poolId,
             'dilutionId':dilutionId,
             'url':ajaxurl
           },
           {
-            'doOnSuccess': function() { uiElement.remove(); }
+            'doOnSuccess': function() {
+              function findByName (arrayElement, index, array) {
+                return arrayElement[0] == elementName;
+              }
+              var indexToDelete = jQuery('#pooledElementsDatatable').dataTable().fnGetData().findIndex(findByName);
+              // remove it from the Selected element(s) table
+              jQuery('#pooledElementsDatatable').dataTable().fnDeleteRow(indexToDelete);
+              // re-enable the Add button on Select poolable elements table if it's been disabled
+              if (jQuery('#poolable_' + elementName).length && jQuery('#poolable_' + elementName).children().last().hasClass('disabled')) {
+                jQuery('#poolable_' + elementName).children().last().removeClass('disabled');
+                jQuery('#poolable_' + elementName).children().last().prop('disabled', false);
+                jQuery('#poolable_' + elementName).children().last().css('cursor', 'pointer');
+              }
+            }
           }
         );
       }
@@ -760,23 +770,41 @@ Pool.search = {
   },
 
   poolSearchSelectElement : function(poolId, elementId, elementName) {
-    if (jQuery("#element" + elementId).length > 0) {
+    if (jQuery("#pooled_" + elementName).length > 0) {
       alert("Element " + elementName + " is already part of this pool.");
       jQuery('#searchElementsResult').css('visibility', 'hidden');
     } else {
-      var addElement = function() {
-        var div = "<div onMouseOver='this.className=\"dashboardhighlight\"' onMouseOut='this.className=\"dashboard\"' class='dashboard'>";
-        div += "<span class='float-left' id='element"+elementId+"'>";
-        if (poolId == 0) {
-          div += "<input type='hidden' id='poolableElements" + elementId + "' value='" + elementName + "' name='poolableElements'/>";
-        }
-        div += "<b>Element: " + elementName + "</b></span>";
-        div += "<span onclick='Pool.ui.removePoolableElement(" + poolId + ", " + elementId + ", jQuery(this).parent());' class='float-right ui-icon ui-icon-circle-close'></span></div>";
-        jQuery('#dillist').append(div);
+      function addElement () {
+        var addToPooled = [];
+        var poolable = jQuery('#poolable_' + elementName).clone();
+        poolable.children().each(function (index, value) {
+          addToPooled.push(jQuery(value).html());
+        });
+        addToPooled.pop();
+        addToPooled.push('<span onclick="Pool.ui.removePooledElement(' + poolId + ', ' + elementId + ', \'' + elementName + '\');" class="ui-icon ui-button ui-icon-circle-close"></span>');
+        jQuery('#pooledElementsDatatable').dataTable().fnAddData(addToPooled);
         jQuery('#searchElementsResult').css('visibility', 'hidden');
-      };
+      }
+      function disableAddAndFadeCheckmark (addRowId) {
+        // add checkmark beside plus button then fade out
+        var checkmark = '<div><img id="checkmark_' + addRowId + '" src="/styles/images/ok.png" height="25" width="25" /></div>';
+        var addTd = jQuery('#' + addRowId).children().last();
+        addTd.prop('disabled', true);
+        addTd.css('float', 'left');
+        addTd.children().last().append(checkmark);
+        jQuery('#checkmark_' + addRowId).fadeOut("slow", function () {
+          jQuery(this).parent().parent().parent().css('clear', 'both');
+          jQuery(this).parent().remove();
+          addTd.addClass('disabled');
+          addTd.css('cursor', 'default');
+        });
+      }
       if (poolId == 0) {
         addElement();
+        if (jQuery('#pooledElementsDatatable').css('visibility') == 'hidden') {
+          jQuery('#pooledElementsDatatable').css('visibility', '');
+          jQuery('#pooledElementsDatatable').dataTable().fnDraw();
+        }
       } else {
         Fluxion.doAjax(
           'poolControllerHelperService',
@@ -787,7 +815,13 @@ Pool.search = {
             'url':ajaxurl
           },
           {
-            'doOnSuccess': addElement
+            'doOnSuccess': function (json) {
+              // add row to Pooled elements table
+              addElement();
+              // add success checkmark and disable the 'Add' td in Select poolable elements table
+              var tableRowId = 'poolable_' + elementName;
+              disableAddAndFadeCheckmark(tableRowId);
+            }
           }
         );
       }
@@ -1025,22 +1059,24 @@ Pool.orders = Pool.orders || {
   'loadOrders': function(poolId) {
     Pool.orders.makeXhrRequest('GET', '/miso/rest/pool/' + poolId + '/orders', function(xhr) {
       var orders = JSON.parse(xhr.responseText);
-      document.getElementById('orderlist').innerHTML = orders.map(function(order) {
-        var platformOptions = Defaults.all.platforms.map(function(platform) {
-          return '<option value="' + platform.id + '"' + ((platform.id == order.parameters.platformId) ? " selected" : "") + '>' + platform.nameAndModel + '</option>';
+      if (document.getElementById('orderlist')) {
+        document.getElementById('orderlist').innerHTML = orders.map(function(order) {
+          var platformOptions = Defaults.all.platforms.map(function(platform) {
+            return '<option value="' + platform.id + '"' + ((platform.id == order.parameters.platformId) ? " selected" : "") + '>' + platform.nameAndModel + '</option>';
+          }).join('');
+          var parameterOptions = Pool.orders.optionsForPlatform(function(parameter) {
+            return parameter.platformId == order.parameters.platformId;
+          }, order.parameters.id);
+          return ('<div id="order' + order.id + '" onmouseover="this.className=\'dashboardhighlight\'" onmouseout="this.className=\'dashboard\'" class="dashboard">' +
+            '<span class="float-left">' +
+            '<b>Partitions:</b> <input type="text" id="partitions' + order.id + '" value="' + order.partitions + '"/><br/>' +
+            '<b>Platform:</b> <select id="platforms' + order.id + '" onchange="Pool.orders.changePlatform(' + order.id + ')">' + platformOptions + '</select><br/>' +
+            '<b>Sequencing Parameters:</b> <select id="parameters' + order.id + '">' + parameterOptions + '</select><br/>' +
+            '<input type="submit" class="br-button ui-state-default ui-corner-all" onclick="return Pool.orders.saveOrder(' + order.id + ', ' + poolId + ')" value="Save" /></span>' +
+            '<span onclick="Pool.orders.removeOrder(' + order.id + ', ' + poolId + ');" class="float-right ui-icon ui-icon-circle-close"></span>' +
+            '</div>');
         }).join('');
-        var parameterOptions = Pool.orders.optionsForPlatform(function(parameter) {
-          return parameter.platformId == order.parameters.platformId;
-        }, order.parameters.id);
-        return ('<div id="order' + order.id + '" onmouseover="this.className=\'dashboardhighlight\'" onmouseout="this.className=\'dashboard\'" class="dashboard">' +
-          '<span class="float-left">' +
-          '<b>Partitions:</b> <input type="text" id="partitions' + order.id + '" value="' + order.partitions + '"/><br/>' +
-          '<b>Platform:</b> <select id="platforms' + order.id + '" onchange="Pool.orders.changePlatform(' + order.id + ')">' + platformOptions + '</select><br/>' +
-          '<b>Sequencing Parameters:</b> <select id="parameters' + order.id + '">' + parameterOptions + '</select><br/>' +
-          '<input type="submit" class="br-button ui-state-default ui-corner-all" onclick="return Pool.orders.saveOrder(' + order.id + ', ' + poolId + ')" value="Save" /></span>' +
-          '<span onclick="Pool.orders.removeOrder(' + order.id + ', ' + poolId + ');" class="float-right ui-icon ui-icon-circle-close"></span>' +
-          '</div>');
-      }).join('');
+      }
     });
   },
 
