@@ -6,6 +6,7 @@ import org.codehaus.jackson.annotate.JsonSubTypes;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.annotate.JsonTypeName;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
+import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
@@ -51,6 +52,7 @@ public class SampleDto {
   private Boolean empty;
   private Long updatedById;
   private String updatedByUrl;
+  @JsonSerialize(include = Inclusion.ALWAYS)
   private String lastModified;
 
   public Long getId() {
