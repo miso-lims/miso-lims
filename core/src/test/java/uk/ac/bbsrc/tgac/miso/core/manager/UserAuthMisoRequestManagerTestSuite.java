@@ -1,12 +1,8 @@
 package uk.ac.bbsrc.tgac.miso.core.manager;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -31,6 +27,7 @@ import org.springframework.security.core.context.SecurityContextImpl;
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.EntityGroup;
@@ -1194,32 +1191,32 @@ public class UserAuthMisoRequestManagerTestSuite {
    * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getLibraryByAlias(java.lang.String)} .
    */
   @Test
-  public void testGetLibraryByAlias() throws IOException {
+  public void testListLibraryByAlias() throws IOException {
     String alias = "alias";
-    when(backingManager.getLibraryByAlias(alias)).thenReturn(library);
+    when(backingManager.listLibrariesByAlias(alias)).thenReturn(Sets.newHashSet(library));
     when(library.userCanRead(any(User.class))).thenReturn(true);
 
-    assertEquals(library, userAuthMisoRequestManager.getLibraryByAlias(alias));
+    assertEquals(library, userAuthMisoRequestManager.listLibrariesByAlias(alias).iterator().next());
 
-    verify(backingManager).getLibraryByAlias(alias);
+    verify(backingManager).listLibrariesByAlias(alias);
   }
 
   /**
    * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getLibraryByAlias(java.lang.String)} .
    */
   @Test
-  public void testGetLibraryByAliasThrows() throws IOException {
+  public void testListLibraryByAliasThrows() throws IOException {
     String alias = "alias";
-    when(backingManager.getLibraryByAlias(alias)).thenReturn(library);
+    when(backingManager.listLibrariesByAlias(alias)).thenReturn(Sets.newHashSet(library));
     when(library.userCanRead(any(User.class))).thenReturn(false);
     long libraryId = 1L;
     when(library.getId()).thenReturn(libraryId);
     thrown.expect(IOException.class);
     thrown.expectMessage("User null cannot read Library " + libraryId);
 
-    userAuthMisoRequestManager.getLibraryByAlias(alias);
+    userAuthMisoRequestManager.listLibrariesByAlias(alias);
 
-    verify(backingManager).getLibraryByAlias(alias);
+    verify(backingManager).listLibrariesByAlias(alias);
   }
 
   /**

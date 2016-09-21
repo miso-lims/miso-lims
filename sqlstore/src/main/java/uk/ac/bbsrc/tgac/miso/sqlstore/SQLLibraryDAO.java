@@ -30,11 +30,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
 
 import javax.persistence.CascadeType;
+
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,9 +59,6 @@ import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.Property;
 import com.googlecode.ehcache.annotations.TriggersRemove;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
@@ -377,8 +378,8 @@ public class SQLLibraryDAO implements LibraryStore {
     params.addValue("qcPassed", library.getQcPassed());
 
     if (library.getId() == AbstractLibrary.UNSAVED_ID) {
-      if (!libraryNamingScheme.allowDuplicateEntityNameFor("alias") && getByAlias(library.getAlias()) != null
-          && (library.getLibraryAdditionalInfo() != null ? library.getLibraryAdditionalInfo().hasNonStandardAlias() == false : true)) {
+      if (!libraryNamingScheme.allowDuplicateEntityNameFor("alias") && !listByAlias(library.getAlias()).isEmpty()
+          && (library.getLibraryAdditionalInfo() != null ? !library.getLibraryAdditionalInfo().hasNonStandardAlias() : true)) {
         // throw if duplicate aliases are not allowed and the library has a standard alias (detailed sample only)
         throw new IOException("NEW: A library with this alias already exists in the database");
       } else {
@@ -503,14 +504,14 @@ public class SQLLibraryDAO implements LibraryStore {
   @Cacheable(cacheName = "libraryCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
       @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public Library get(long libraryId) throws IOException {
-    List eResults = template.query(LIBRARY_SELECT_BY_ID, new Object[] { libraryId }, new LibraryMapper());
+    List<Library> eResults = template.query(LIBRARY_SELECT_BY_ID, new Object[] { libraryId }, new LibraryMapper());
     Library e = eResults.size() > 0 ? (Library) eResults.get(0) : null;
     return e;
   }
 
   @Override
   public Library getByBarcode(String barcode) throws IOException {
-    List eResults = template.query(LIBRARY_SELECT_BY_IDENTIFICATION_BARCODE, new Object[] { barcode }, new LibraryMapper());
+    List<Library> eResults = template.query(LIBRARY_SELECT_BY_IDENTIFICATION_BARCODE, new Object[] { barcode }, new LibraryMapper());
     Library e = eResults.size() > 0 ? (Library) eResults.get(0) : null;
     return e;
   }
@@ -521,10 +522,8 @@ public class SQLLibraryDAO implements LibraryStore {
   }
 
   @Override
-  public Library getByAlias(String alias) throws IOException {
-    List eResults = template.query(LIBRARY_SELECT_BY_ALIAS, new Object[] { alias }, new LibraryMapper());
-    Library e = eResults.size() > 0 ? (Library) eResults.get(0) : null;
-    return e;
+  public Collection<Library> listByAlias(String alias) throws IOException {
+    return template.query(LIBRARY_SELECT_BY_ALIAS, new Object[] { alias }, new LibraryMapper());
   }
 
   @Override
@@ -647,21 +646,21 @@ public class SQLLibraryDAO implements LibraryStore {
 
   @Override
   public LibraryType getLibraryTypeById(long libraryTypeId) throws IOException {
-    List eResults = template.query(LIBRARY_TYPE_SELECT_BY_ID, new Object[] { libraryTypeId }, new LibraryTypeMapper());
+    List<LibraryType> eResults = template.query(LIBRARY_TYPE_SELECT_BY_ID, new Object[] { libraryTypeId }, new LibraryTypeMapper());
     LibraryType e = eResults.size() > 0 ? (LibraryType) eResults.get(0) : null;
     return e;
   }
 
   @Override
   public LibraryType getLibraryTypeByDescription(String description) throws IOException {
-    List eResults = template.query(LIBRARY_TYPE_SELECT_BY_DESCRIPTION, new Object[] { description }, new LibraryTypeMapper());
+    List<LibraryType> eResults = template.query(LIBRARY_TYPE_SELECT_BY_DESCRIPTION, new Object[] { description }, new LibraryTypeMapper());
     LibraryType e = eResults.size() > 0 ? (LibraryType) eResults.get(0) : null;
     return e;
   }
 
   @Override
   public LibraryType getLibraryTypeByDescriptionAndPlatform(String description, PlatformType platformType) throws IOException {
-    List eResults = template.query(LIBRARY_TYPE_SELECT_BY_DESCRIPTION_AND_PLATFORM, new Object[] { description, platformType.getKey() },
+    List<LibraryType> eResults = template.query(LIBRARY_TYPE_SELECT_BY_DESCRIPTION_AND_PLATFORM, new Object[] { description, platformType.getKey() },
         new LibraryTypeMapper());
     LibraryType e = eResults.size() > 0 ? (LibraryType) eResults.get(0) : null;
     return e;
@@ -669,7 +668,7 @@ public class SQLLibraryDAO implements LibraryStore {
 
   @Override
   public LibrarySelectionType getLibrarySelectionTypeById(long librarySelectionTypeId) throws IOException {
-    List eResults = template.query(LIBRARY_SELECTION_TYPE_SELECT_BY_ID, new Object[] { librarySelectionTypeId },
+    List<LibrarySelectionType> eResults = template.query(LIBRARY_SELECTION_TYPE_SELECT_BY_ID, new Object[] { librarySelectionTypeId },
         new LibrarySelectionTypeMapper());
     LibrarySelectionType e = eResults.size() > 0 ? (LibrarySelectionType) eResults.get(0) : null;
     return e;
@@ -677,14 +676,14 @@ public class SQLLibraryDAO implements LibraryStore {
 
   @Override
   public LibrarySelectionType getLibrarySelectionTypeByName(String name) throws IOException {
-    List eResults = template.query(LIBRARY_SELECTION_TYPE_SELECT_BY_NAME, new Object[] { name }, new LibrarySelectionTypeMapper());
+    List<LibrarySelectionType> eResults = template.query(LIBRARY_SELECTION_TYPE_SELECT_BY_NAME, new Object[] { name }, new LibrarySelectionTypeMapper());
     LibrarySelectionType e = eResults.size() > 0 ? (LibrarySelectionType) eResults.get(0) : null;
     return e;
   }
 
   @Override
   public LibraryStrategyType getLibraryStrategyTypeById(long libraryStrategyTypeId) throws IOException {
-    List eResults = template.query(LIBRARY_STRATEGY_TYPE_SELECT_BY_ID, new Object[] { libraryStrategyTypeId },
+    List<LibraryStrategyType> eResults = template.query(LIBRARY_STRATEGY_TYPE_SELECT_BY_ID, new Object[] { libraryStrategyTypeId },
         new LibraryStrategyTypeMapper());
     LibraryStrategyType e = eResults.size() > 0 ? (LibraryStrategyType) eResults.get(0) : null;
     return e;
@@ -692,7 +691,7 @@ public class SQLLibraryDAO implements LibraryStore {
 
   @Override
   public LibraryStrategyType getLibraryStrategyTypeByName(String name) throws IOException {
-    List eResults = template.query(LIBRARY_STRATEGY_TYPE_SELECT_BY_NAME, new Object[] { name }, new LibraryStrategyTypeMapper());
+    List<LibraryStrategyType> eResults = template.query(LIBRARY_STRATEGY_TYPE_SELECT_BY_NAME, new Object[] { name }, new LibraryStrategyTypeMapper());
     LibraryStrategyType e = eResults.size() > 0 ? (LibraryStrategyType) eResults.get(0) : null;
     return e;
   }
