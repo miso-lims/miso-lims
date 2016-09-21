@@ -46,7 +46,7 @@ public class ListSequencerReferencesController {
 
   @ModelAttribute("title")
   public String title() {
-    return "List Sequencers";
+    return "Sequencers";
   }
   
   @RequestMapping(method = RequestMethod.GET)

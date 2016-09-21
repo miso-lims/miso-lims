@@ -68,7 +68,7 @@ public class ListDilutionsController {
 
   @ModelAttribute("title")
   public String title() {
-    return "List Dilutions";
+    return "Dilutions";
   }
 
   @RequestMapping("/dilutions")

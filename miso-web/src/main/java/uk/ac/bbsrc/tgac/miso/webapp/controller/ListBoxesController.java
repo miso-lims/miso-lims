@@ -39,7 +39,7 @@ public class ListBoxesController {
 
   @ModelAttribute("title")
   public String title() {
-    return "List Boxes";
+    return "Boxes";
   }
 
   @RequestMapping(value = "/boxes/rest/", method = RequestMethod.GET)

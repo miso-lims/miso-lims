@@ -107,6 +107,11 @@ public class PoolWizardController {
     return AbstractPool.CONCENTRATION_UNITS;
   }
 
+  @ModelAttribute("title")
+  public String title() {
+    return "Create Pool";
+  }
+
   @RequestMapping(value = "/new/{projectId}", method = RequestMethod.GET)
   public ModelAndView newAssignedProject(@PathVariable Long projectId, ModelMap model) throws IOException {
     try {

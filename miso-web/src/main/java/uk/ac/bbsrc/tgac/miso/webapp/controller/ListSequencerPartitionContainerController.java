@@ -57,7 +57,7 @@ public class ListSequencerPartitionContainerController {
 
   @ModelAttribute("title")
   public String title() {
-    return "List Sequencing Containers";
+    return "Sequencing Containers";
   }
 
   @RequestMapping("/containers")

@@ -21,7 +21,7 @@ public class ListIndicesController {
 
   @ModelAttribute("title")
   public String title() {
-    return "List Indices";
+    return "Indices";
   }
 
   @RequestMapping("/indices")
