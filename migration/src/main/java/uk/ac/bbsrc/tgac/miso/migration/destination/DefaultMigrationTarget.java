@@ -274,10 +274,21 @@ public class DefaultMigrationTarget implements MigrationTarget {
       valueTypeLookup.resolveAll(library);
       library.setLastModifier(user);
       library.setLastUpdated(timeStamp);
-      library.getLibraryAdditionalInfo().setCreatedBy(user);
-      library.getLibraryAdditionalInfo().setCreationDate(timeStamp);
-      library.getLibraryAdditionalInfo().setUpdatedBy(user);
-      library.getLibraryAdditionalInfo().setLastUpdated(timeStamp);
+      if (library.getLibraryAdditionalInfo() != null) {
+        library.getLibraryAdditionalInfo().setCreatedBy(user);
+        library.getLibraryAdditionalInfo().setCreationDate(timeStamp);
+        library.getLibraryAdditionalInfo().setUpdatedBy(user);
+        library.getLibraryAdditionalInfo().setLastUpdated(timeStamp);
+        // Check for duplicate alias
+        Collection<Library> dupes = serviceManager.getLibraryDao().listByAlias(library.getAlias());
+        if (!dupes.isEmpty()) {
+          for (Library dupe : dupes) {
+            dupe.getLibraryAdditionalInfo().setNonStandardAlias(true);
+            serviceManager.getLibraryDao().save(dupe);
+          }
+          library.getLibraryAdditionalInfo().setNonStandardAlias(true);
+        }
+      }
       if (replaceChangeLogs) {
         Collection<ChangeLog> changes = library.getChangeLog();
         library.setId(serviceManager.getLibraryDao().save(library));
