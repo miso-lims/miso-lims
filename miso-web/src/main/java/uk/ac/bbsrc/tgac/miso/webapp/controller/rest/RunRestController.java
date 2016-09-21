@@ -155,7 +155,7 @@ public class RunRestController extends RestController {
 
       if (!isStringEmptyOrNull(sSearch)) {
         runSubset = requestManager.getRunsByPageSizeSearch(iDisplayStart, iDisplayLength, sSearch, sSortDir, sortCol);
-        numMatches = Long.valueOf(requestManager.countLibrariesBySearch(sSearch));
+        numMatches = Long.valueOf(requestManager.countRunsBySearch(sSearch));
       } else {
         runSubset = requestManager.getRunsByPageAndSize(iDisplayStart, iDisplayLength, sSortDir, sortCol);
         numMatches = numRuns;
