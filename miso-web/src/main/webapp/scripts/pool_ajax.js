@@ -1046,7 +1046,6 @@ Pool.orders = Pool.orders || {
               'contentType': "application/json; charset=utf-8",
               'data': JSON.stringify(order)
             }).done(function() {
-              Pool.orders.table.fnDestroy();
               Pool.orders.makeTable(Pool.orders.poolId);
               Pool.orders.dialog.dialog("close");
             });
@@ -1059,6 +1058,12 @@ Pool.orders = Pool.orders || {
     },
 	'makeTable': function(poolId) {
       if (poolId == 0) return;
+      if (Pool.orders.table) {
+        Pool.orders.table.fnDestroy();
+      }
+      if (Pool.orders.completionTable) {
+        Pool.orders.completionTable.fnDestroy();
+      }
       Pool.orders.poolId = poolId;
       Pool.orders.table = jQuery('#edit-order-table').dataTable({
       "aoColumns": [
@@ -1123,6 +1128,53 @@ Pool.orders = Pool.orders || {
         jQuery('#edit-order-table').find('.fg-button').removeClass('fg-button');
       }
     });
+    jQuery.ajax({
+      'url': '/miso/rest/pool/' + poolId + '/completions',
+      'dataType': "json"
+    }).done(function(data) {
+      Pool.orders.completionTable = jQuery('#order-completion-table').dataTable({
+        "aoColumns":
+          [
+            {
+              "sTitle": "Platform",
+              "mData": "parametersId",
+              "mRender": function (data, type, full) {
+                var platformId = Hot.maybeGetProperty(
+                  Hot.findFirstOrNull(Hot.idPredicate(data), Defaults.all.sequencingParameters),
+                  'platformId');
+                if (!platformId) {
+                  return "N/A";
+                }
+                return Hot.maybeGetProperty(
+                  Hot.findFirstOrNull(Hot.idPredicate(platformId), Defaults.all.platforms),
+                  'nameAndModel');
+              }
+            },
+            {
+              "sTitle": "Sequencing Parameters",
+              "mData": "parametersId",
+              "mRender": function (data, type, full) {
+                return Hot.maybeGetProperty(
+                  Hot.findFirstOrNull(Hot.idPredicate(data), Defaults.all.sequencingParameters),
+                  'name');
+              }
+            }
+          ].concat(data.headings.map(function(heading) {
+            return { "sTitle": heading, "mData": heading };
+          })).concat([ { "sTitle": "Remaining", "mData": "Remaining" } ]),
+        "bJQueryUI": true,
+        "bAutoWidth": false,
+        "iDisplayLength": 25,
+        "iDisplayStart": 0,
+        "sPaginationType": "full_numbers",
+        "bProcessing": true,
+        "aaData": data.completions,
+        "fnDrawCallback": function (oSettings) {
+          jQuery('#edit-order-table').removeClass('disabled');
+          jQuery('#edit-order-table').find('.fg-button').removeClass('fg-button');
+        }
+      });
+    });
   },
 
   'setOptionsForPlatform': function(platformId, selectedParameterId) {
@@ -1163,7 +1215,6 @@ Pool.orders = Pool.orders || {
           "type": "DELETE",
           "url": '/miso/rest/poolorder/' + orderId,
         }).done(function() {
-          Pool.orders.table.fnDestroy();
           Pool.orders.makeTable(Pool.orders.poolId);
         });
     }

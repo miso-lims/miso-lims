@@ -104,9 +104,6 @@ public class EditPoolController {
   @Autowired
   private JdbcTemplate interfaceTemplate;
 
-  @Autowired
-  private PoolOrderCompletionService poolOrderCompletionService;
-
   public void setInterfaceTemplate(JdbcTemplate interfaceTemplate) {
     this.interfaceTemplate = interfaceTemplate;
   }
@@ -229,9 +226,6 @@ public class EditPoolController {
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, pool, securityManager.listAllUsers()));
       model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, pool, securityManager.listAllGroups()));
       model.put("platforms", getFilteredPlatforms(pool.getPlatformType()));
-      Collection<PoolOrderCompletion> completions = poolOrderCompletionService.getOrderCompletionForPool(poolId);
-      model.put("ordercompletionheadings", LimsUtils.getUsedHealthTypes(completions));
-      model.put("ordercompletions", LimsUtils.groupCompletions(completions).get(pool));
 
       return new ModelAndView("/pages/editPool.jsp", model);
     } catch (IOException ex) {
@@ -277,7 +271,6 @@ public class EditPoolController {
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, pool, securityManager.listAllUsers()));
       model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, pool, securityManager.listAllGroups()));
       model.put("platforms", getFilteredPlatforms(pool.getPlatformType()));
-      model.put("ordercompletions", poolOrderCompletionService.getOrderCompletionForPool(poolId));
 
       return new ModelAndView("/pages/editPool.jsp", model);
     } catch (IOException ex) {
