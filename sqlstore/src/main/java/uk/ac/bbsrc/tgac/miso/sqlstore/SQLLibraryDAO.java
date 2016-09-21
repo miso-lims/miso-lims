@@ -157,7 +157,7 @@ public class SQLLibraryDAO implements LibraryStore {
   public static String LIBRARIES_SELECT_BY_PROJECT_ID = LIBRARIES_SELECT
       + " WHERE l.sample_sampleId IN (SELECT sampleId FROM Sample WHERE project_projectId = ?)";
 
-  public static final String LIBRARY_TYPES_SELECT = "SELECT libraryTypeId, description, platformType " + "FROM LibraryType";
+  public static final String LIBRARY_TYPES_SELECT = "SELECT libraryTypeId, description, platformType, archived FROM LibraryType";
 
   public static final String LIBRARY_TYPE_SELECT_BY_ID = LIBRARY_TYPES_SELECT + " WHERE libraryTypeId = ?";
 
@@ -166,8 +166,7 @@ public class SQLLibraryDAO implements LibraryStore {
   public static final String LIBRARY_TYPE_SELECT_BY_DESCRIPTION_AND_PLATFORM = LIBRARY_TYPES_SELECT
       + " WHERE description = ? AND platformType = ?";
 
-  public static final String LIBRARY_TYPES_SELECT_BY_PLATFORM = "SELECT libraryTypeId, description, platformType " + "FROM LibraryType "
-      + "WHERE platformType=?";
+  public static final String LIBRARY_TYPES_SELECT_BY_PLATFORM = LIBRARY_TYPES_SELECT + " WHERE platformType=?";
 
   public static final String LIBRARY_SELECTION_TYPES_SELECT = "SELECT librarySelectionTypeId, name, description "
       + "FROM LibrarySelectionType";
@@ -907,6 +906,7 @@ public class SQLLibraryDAO implements LibraryStore {
       lt.setId(rs.getLong("libraryTypeId"));
       lt.setDescription(rs.getString("description"));
       lt.setPlatformType(rs.getString("platformType"));
+      lt.setArchived(rs.getBoolean("archived"));
       return lt;
     }
   }

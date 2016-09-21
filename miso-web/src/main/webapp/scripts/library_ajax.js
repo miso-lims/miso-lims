@@ -697,13 +697,14 @@ Library.barcode = {
 };
 
 Library.ui = {
-  changePlatformName: function (callback) {
+  changePlatformName: function (originalLibraryTypeId, callback) {
     var self = this;
     var platform = jQuery('#platformNames').val();
     Fluxion.doAjax(
       'libraryControllerHelperService',
       'changePlatformName',
       {
+        'originalLibraryTypeId': originalLibraryTypeId,
         'platform': platform,
         'url': ajaxurl
       },
@@ -1255,7 +1256,7 @@ Library.ui = {
     });
   },
 
-  changeDesign: function() {
+  changeDesign: function(originalLibraryTypeId, callback) {
     var designSelect = document.getElementById('libraryDesignTypes');
     var selection = document.getElementById('librarySelectionTypes');
     var strategy = document.getElementById('libraryStrategyTypes');
@@ -1266,6 +1267,7 @@ Library.ui = {
       strategy.disabled = false;
       libraryType.disabled = false;
       platform.disabled = false;
+      callback();
     } else {
       var matchedDesigns = Library.designs.filter(function (rule) { return rule.id == designSelect.value; });
       if (matchedDesigns.length == 1) {
@@ -1273,23 +1275,30 @@ Library.ui = {
         selection.disabled = true;
         strategy.value = matchedDesigns[0].libraryStrategyType;
         strategy.disabled = true;
-        platform.value = matchedDesigns[0].libraryType.platformType;
         platform.disabled = true;
-        Fluxion.doAjax(
-          'libraryControllerHelperService',
-          'changePlatformName',
-          {
-            'platform': platform.value,
-            'url': ajaxurl
-          },
-          {
-            'doOnSuccess': function(data) {
-              Library.ui.processPlatformChange(data);
-              libraryType.value = matchedDesigns[0].libraryType.id;
-              libraryType.disabled = true;
+        libraryType.disabled = true;
+        if (platform.value != matchedDesigns[0].libraryType.platformType) {
+          platform.value = matchedDesigns[0].libraryType.platformType;
+          Fluxion.doAjax(
+            'libraryControllerHelperService',
+            'changePlatformName',
+            {
+              'originalLibraryTypeId': originalLibraryTypeId,
+              'platform': platform.value,
+              'url': ajaxurl
+            },
+            {
+              'doOnSuccess': function(data) {
+                Library.ui.processPlatformChange(data);
+                libraryType.value = matchedDesigns[0].libraryType.id;
+                callback();
+              }
             }
-          }
-        );
+          );
+        } else {
+          libraryType.value = matchedDesigns[0].libraryType.id;
+          callback();
+        }
       }
     }
   }

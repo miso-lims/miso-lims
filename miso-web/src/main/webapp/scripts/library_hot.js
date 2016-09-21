@@ -8,12 +8,16 @@ Library.hot = {
   libraryTypeAliases: {},
   
   getLibraryTypeAliasLists: function () {
-    Hot.dropdownRef.libraryTypes.forEach(function (lt) {
-      if (Library.hot.libraryTypeAliases[lt.platform]) {
-        Library.hot.libraryTypeAliases[lt.platform].push(lt.alias);
-      } else {
-        Library.hot.libraryTypeAliases[lt.platform] = [lt.alias];
+    var usedTypes = Library.hot.librariesJSON.map(function (lib) {
+      return lib.libraryTypeId;
+    });
+    Hot.dropdownRef.libraryTypes.filter(function (lt) {
+      return !lt.archived || usedType.indexOf(lt.id) != -1;
+    }).forEach(function (lt) {
+      if (!Library.hot.libraryTypeAliases[lt.platform]) {
+        Library.hot.libraryTypeAliases[lt.platform] = [];
       }
+      Library.hot.libraryTypeAliases[lt.platform].push(lt.alias);
     });
   },
   
@@ -109,7 +113,11 @@ Library.hot = {
         Hot.hotTable.setCellMeta(index, aliasColIndex, 'validator', Hot.requiredText);
         jQuery('#nonStandardAliasNote').show();
       }
-      Library.hot.changeDesign(index, 'libraryDesignAlias', null, library.libraryDesignAlias);
+      if (library.libraryDesignAlias) {
+        Library.hot.changeDesign(index, 'libraryDesignAlias', null, library.libraryDesignAlias);
+      } else {
+        Hot.hotTable.setCellMeta(index, Library.hot.ltIndex, 'source', Library.hot.libraryTypeAliases[library.platformName]);
+      }
     });
     Hot.hotTable.render();
     
@@ -141,8 +149,12 @@ Library.hot = {
               Library.hot.changeIndexFamily(changes[i][0], changes[i][1], changes[i][2], changes[i][3]);
               break;
             case 'libraryDesignAlias':
+              var oldPlatfrom = Hot.hotTable.getDataAtCell(changes[i][0], Library.hot.pfIndex);
               Library.hot.changeDesign(changes[i][0], changes[i][1], changes[i][2], changes[i][3]);
-              Library.hot.changePlatform(changes[i][0], 'platformName', null, Hot.hotTable.getDataAtCell(changes[i][0], Library.hot.pfIndex));
+              var newPlatform = Hot.hotTable.getDataAtCell(changes[i][0], Library.hot.pfIndex);
+              if (oldPlatfrom != newPlatform) {
+              	Library.hot.changePlatform(changes[i][0], 'platformName', oldPlatfrom, newPlatform);
+              }
               break;
           }
         }
@@ -190,13 +202,6 @@ Library.hot = {
    */
   getPlatforms: function () {
     return Hot.dropdownRef['platformNames'];
-  },
-  
-  /**
-   * Gets array of library types
-   */
-  getLibraryTypes: function () {
-    return Hot.sortByProperty(Hot.dropdownRef['libraryTypes'], 'id').map(Hot.getAlias);
   },
   
   /**
@@ -278,6 +283,7 @@ Library.hot = {
         data: 'libraryDesignAlias',
         type: 'dropdown',
         trimDropdown: false,
+        validator: Hot.permitEmpty,
         source: Library.hot.getDesigns(),
         include: detailedBool
       },
@@ -295,7 +301,7 @@ Library.hot = {
         data: 'libraryTypeAlias',
         type: 'dropdown',
         trimDropdown: false,
-        source: '',
+        source: [''],
         validator: Hot.requiredText,
         include: true
       },

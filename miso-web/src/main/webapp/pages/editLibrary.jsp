@@ -269,7 +269,7 @@
 <c:if test="${!empty library.sample && !empty library.libraryAdditionalInfo}">
   <tr>
     <td>Library Design:</td>
-    <td><miso:select id="libraryDesignTypes" path="libraryAdditionalInfo.libraryDesign" items="${libraryDesigns}" itemLabel="name" itemValue="id" defaultLabel="(None)" defaultValue="-1" onchange="Library.ui.changeDesign()"/></td>
+    <td><miso:select id="libraryDesignTypes" path="libraryAdditionalInfo.libraryDesign" items="${libraryDesigns}" itemLabel="name" itemValue="id" defaultLabel="(None)" defaultValue="-1" onchange="Library.ui.changeDesign(${empty library.libraryType.id ? 0 : library.libraryType.id}, function(){})"/></td>
   </tr>
 </c:if>
 <tr>
@@ -284,7 +284,7 @@
       </td>
       <script type="text/javascript">
         jQuery(document).ready(function () {
-          Library.ui.changePlatformName(function() {
+          Library.ui.changePlatformName(<c:out value="${library.libraryType.id}" default="0"/>, function() {
             <c:if test="${not empty library.libraryType}">jQuery('#libraryTypes').val('${library.libraryType.id}');</c:if>
             Library.setOriginalIndices();
           });
@@ -337,11 +337,7 @@
 <tr>
   <td>Index Family:</td>
   <td>
-    <select name='indexFamily' id='indexFamily' onchange='Library.ui.updateIndices();'>
-      <c:forEach items="${indexFamilies}" var="family">
-        <option value="${family.id}" <c:if test="${library.currentFamily.id == family.id}">selected="selected"</c:if>>${family.name}</option>
-      </c:forEach>
-    </select>
+    <miso:select id='indexFamily' name='indexFamily' path="currentFamily" items="${indexFamilies}" itemLabel="name" itemValue="id" onchange='Library.ui.updateIndices();'/>
   </td>
 </tr>
 
@@ -355,7 +351,7 @@
     Library.setOriginalIndices = function() {
       Library.lastIndexPosition = 0;
       jQuery('#indicesDiv').empty();
-      document.getElementById('indexFamily').value = '${library.currentFamily.id}';
+      document.getElementById('indexFamily').value = '${library.getCurrentFamily().id}';
       <c:forEach items="${library.indices}" var="index">
         Library.ui.createIndexBox(${index.id});
       </c:forEach>
@@ -1464,7 +1460,9 @@ function submitBulkLibraries() {
 <script type="text/javascript">
   Library.designs = ${libraryDesignsJSON};
   jQuery(document).ready(function () {
-    Library.ui.changeDesign();
+    Library.ui.changeDesign(<c:out value="${library.libraryType.id}" default="0"/>, function() {
+      Library.setOriginalIndices();
+    });
     jQuery('#alias').simplyCountable({
       counter: '#aliasCounter',
       countType: 'characters',
