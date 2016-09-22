@@ -1082,7 +1082,7 @@ Sample.ui = {
           "iSortPriority": 2
         },
         {
-          "sTitle": "ID",
+          "sTitle": "Barcode",
           "mData": "identificationBarcode",
           "bVisible": false,
           "iSortPriority": 0

@@ -236,7 +236,7 @@ Box.scan = {
 Box.ui = {
   changeBoxListing : function (alias) {
     var table = jQuery('#listingBoxesTable').dataTable();
-    table.fnFilter(alias, 6);
+    table.fnFilter(alias, 5);
   },
 
   createListingBoxesTable: function () {
@@ -254,14 +254,14 @@ Box.ui = {
           jQuery('#listingBoxesTable').dataTable({
             "aaData": json.array,
             "aoColumns": [
-              { "sTitle" : "Box Name" },
+              { "sTitle" : "Box Name", "iDataSort": 7 },
               { "sTitle" : "Alias" },
               { "sTitle" : "Location" },
               { "sTitle" : "Items/Capacity" },
               { "sTitle" : "Size" },
-              { "sTitle" : "Barcode" },
               { "sTitle" : "Box Use" },
-              { "sTitle" : "ID", "bVisible": false }
+              { "sTitle" : "Barcode", "bVisible": false },
+              { "sTitle": "ID", "bVisible": false }
             ],
             "bJQueryUI": true,
             "bAutoWidth": false,
