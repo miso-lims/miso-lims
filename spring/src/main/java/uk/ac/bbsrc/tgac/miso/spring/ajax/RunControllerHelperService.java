@@ -243,6 +243,24 @@ public class RunControllerHelperService {
     }
     return JSONUtils.SimpleJSONError("No platform specified");
   }
+  
+  public String containerInfoHtml(PlatformType platformType) {
+    StringBuilder sb = new StringBuilder();
+    sb.append("<table class='in'>");
+    sb.append(
+        "<tr><td>Serial Number:</td><td><button onclick='Run.lookupContainer(this);' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button><div style='overflow:hidden'>" 
+        + "<input type='text' id='identificationBarcode' name='identificationBarcode'/><input type='hidden' value='on' name='_identificationBarcode'></div></td></tr>");
+    sb.append(
+        "<tr><td>Location:</td><td><input type='text' id='locationBarcode' name='locationBarcode'/><input type='hidden' value='on' name='_locationBarcode'></td></tr>");
+    sb.append(
+        "<tr><td>Validation:</td><td><input type='text' id='validationBarcode' name='validationBarcode'/><input type='hidden' value='on' name='_validationBarcode'></td></tr>");
+    sb.append(
+        "<tr><td>Paired:</td><td><input type='checkbox' id='paired' name='paired' value='false'/><input type='hidden' value='on' name='_paired'></td></tr>");
+    sb.append("</table>");
+    sb.append("<div id='partitionErrorDiv'> </div>");
+    sb.append("<div id='partitionDiv'>");
+    return sb.toString();
+  }
 
   public JSONObject changeIlluminaContainer(HttpSession session, JSONObject json) {
     StringBuilder b = new StringBuilder();
@@ -250,19 +268,10 @@ public class RunControllerHelperService {
     run.getSequencerPartitionContainers().clear();
     String instrumentModel = run.getSequencerReference().getPlatform().getInstrumentModel();
     if ("Illumina MiSeq".equals(instrumentModel) || "Illumina NextSeq 500".equals(instrumentModel)) {
-      b.append("<h2>Container 1</h2>");
+      b.append("<h2>" + PlatformType.ILLUMINA.getContainerName() + " 1</h2>");
+      b.append(containerInfoHtml(PlatformType.ILLUMINA));
       b.append("<table class='in'>");
-      b.append(
-          "<tr><td>Serial Number:</td><td><button onclick='Run.container.lookupContainer(this, 0);' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button><div style='overflow:hidden'><input type='text' id='sequencerPartitionContainers[0].identificationBarcode' name='sequencerPartitionContainers[0].identificationBarcode'/></div></td></tr>");
-      b.append(
-          "<tr><td>Location:</td><td><input type='text' id='sequencerPartitionContainers[0].locationBarcode' name='sequencerPartitionContainers[0].locationBarcode'/></td></tr>");
-      b.append(
-          "<tr><td>Paired:</td><td><input type='checkbox' id='sequencerPartitionContainers[0].paired' name='sequencerPartitionContainers[0].paired' value='false'/></td></tr>");
-      b.append("</table>");
-      b.append("<div id='partitionErrorDiv'> </div>");
-      b.append("<div id='partitionDiv'>");
-      b.append("<table class='in'>");
-      b.append("<th>Lane No.</th>");
+      b.append("<th>" + PlatformType.ILLUMINA.getPartitionName() +" No.</th>");
       b.append("<th>Pool</th>");
 
       b.append(
@@ -276,17 +285,8 @@ public class RunControllerHelperService {
       f.initEmptyPartitions();
       run.addSequencerPartitionContainer(f);
     } else if ("Illumina HiSeq 2500".equals(run.getSequencerReference().getPlatform().getInstrumentModel())) {
-      b.append("<h2>Container 1</h2>");
-      b.append("<table class='in'>");
-      b.append(
-          "<tr><td>Serial Number:</td><td><button onclick='Run.container.lookupContainer(this, 0);' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button><div style='overflow:hidden'><input type='text' id='sequencerPartitionContainers[0].identificationBarcode' name='sequencerPartitionContainers[0].identificationBarcode'/></div></td></tr>");
-      b.append(
-          "<tr><td>Location:</td><td><input type='text' id='sequencerPartitionContainers[0].locationBarcode' name='sequencerPartitionContainers[0].locationBarcode'/></td></tr>");
-      b.append(
-          "<tr><td>Paired:</td><td><input type='checkbox' id='sequencerPartitionContainers[0].paired' name='sequencerPartitionContainers[0].paired' value='false'/></td></tr>");
-      b.append("</table>");
-      b.append("<div id='partitionErrorDiv'> </div>");
-      b.append("<div id='partitionDiv'>");
+      b.append("<h2>" + PlatformType.ILLUMINA.getContainerName() + " 1</h2>");
+      b.append(containerInfoHtml(PlatformType.ILLUMINA));
       b.append("<input id='lane2' name='container0Select' onchange='Run.ui.changeIlluminaLane(this, 0);' type='radio' value='2'/>2 ");
       b.append("<input id='lane8' name='container0Select' onchange='Run.ui.changeIlluminaLane(this, 0);' type='radio' value='8'/>8 ");
       b.append("<div id='containerdiv0'> </div>");
@@ -298,7 +298,7 @@ public class RunControllerHelperService {
       int numContainers = json.getInt("numContainers");
       run.getSequencerPartitionContainers().clear();
       for (int i = 0; i < numContainers; i++) {
-        b.append("<h2>Container " + (i + 1) + "</h2>");
+        b.append("<h2>" + PlatformType.ILLUMINA.getContainerName() + " " + (i + 1) + "</h2>");
         b.append("<table class='in'>");
         b.append("<tr><td>Serial Number:</td><td><button onclick='Run.container.lookupContainer(this, " + i
             + ");' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button><div style='overflow:hidden'><input type='text' id='sequencerPartitionContainers["
@@ -311,7 +311,7 @@ public class RunControllerHelperService {
         b.append("<div id='partitionErrorDiv'> </div>");
         b.append("<div id='partitionDiv'>");
         b.append("<table class='in'>");
-        b.append("<th>Lane No.</th>");
+        b.append("<th>" + PlatformType.ILLUMINA.getPartitionName() + " No.</th>");
         b.append("<th>Pool</th>");
 
         b.append("<tr><td>1 </td><td width='90%'><div id='p_div_" + i
@@ -355,7 +355,7 @@ public class RunControllerHelperService {
     int container = json.getInt("container");
     StringBuilder b = new StringBuilder();
     b.append("<table class='in'>");
-    b.append("<th>Lane No.</th>");
+    b.append("<th>" + PlatformType.ILLUMINA.getPartitionName() + " No.</th>");
     b.append("<th>Pool</th>");
 
     IlluminaRun run = (IlluminaRun) session.getAttribute("run_" + json.getString("run_cId"));
@@ -383,7 +383,7 @@ public class RunControllerHelperService {
     run.getSequencerPartitionContainers().clear();
 
     for (int i = 0; i < numContainers; i++) {
-      b.append("<h2>Container " + (i + 1) + "</h2>");
+      b.append("<h2>" + PlatformType.LS454.getContainerName() + " " + (i + 1) + "</h2>");
       b.append("<table class='in'>");
       b.append("<tr><td>Serial Number:</td><td><button onclick='Run.container.lookupContainer(this, " + i
           + ");' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button><div style='overflow:hidden'><input type='text' id='sequencerPartitionContainers["
@@ -420,7 +420,7 @@ public class RunControllerHelperService {
     int container = json.getInt("container");
     StringBuilder b = new StringBuilder();
     b.append("<table class='in'>");
-    b.append("<th>Chamber No.</th>");
+    b.append("<th>" + PlatformType.LS454.getPartitionName() + " No.</th>");
     b.append("<th>Pool</th>");
 
     LS454Run run = (LS454Run) session.getAttribute("run_" + json.getString("run_cId"));
@@ -448,7 +448,7 @@ public class RunControllerHelperService {
     run.getSequencerPartitionContainers().clear();
 
     for (int i = 0; i < numContainers; i++) {
-      b.append("<h2>Container " + (i + 1) + "</h2>");
+      b.append("<h2>" + PlatformType.SOLID.getContainerName() + " " + (i + 1) + "</h2>");
       b.append("<table class='in'>");
       b.append("<tr><td>Serial Number:</td><td><button onclick='Run.container.lookupContainer(this, " + i
           + ");' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button><div style='overflow:hidden'><input type='text' id='sequencerPartitionContainers["
@@ -462,7 +462,7 @@ public class RunControllerHelperService {
       b.append("<div id='partitionDiv'>");
       if ("AB SOLiD 5500xl".equals(run.getSequencerReference().getPlatform().getInstrumentModel())) {
         b.append("<table class='in'>");
-        b.append("<th>Chamber No.</th>");
+        b.append("<th>" + PlatformType.SOLID.getPartitionName() + " No.</th>");
         b.append("<th>Pool</th>");
 
         b.append("<tr><td>1 </td><td width='90%'><div id='p_div_" + i
@@ -515,7 +515,7 @@ public class RunControllerHelperService {
 
     StringBuilder b = new StringBuilder();
     b.append("<table class='in'>");
-    b.append("<th>Chamber No.</th>");
+    b.append("<th>" + PlatformType.SOLID.getPartitionName() + " No.</th>");
     b.append("<th>Pool</th>");
     for (int i = 0; i < numChambers; i++) {
       b.append("<tr><td>" + (i + 1) + "</td>");
@@ -535,7 +535,7 @@ public class RunControllerHelperService {
     run.getSequencerPartitionContainers().clear();
 
     for (int i = 0; i < numContainers; i++) {
-      b.append("<h2>Container " + (i + 1) + "</h2>");
+      b.append("<h2>" + PlatformType.PACBIO.getContainerName() + " " + (i + 1) + "</h2>");
       b.append("<table class='in'>");
       b.append("<tr><td>Serial Number:</td><td><button onclick='Run.container.lookupContainer(this, " + i
           + ");' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button><div style='overflow:hidden'><input type='text' id='sequencerPartitionContainers["
@@ -586,7 +586,7 @@ public class RunControllerHelperService {
 
     StringBuilder b = new StringBuilder();
     b.append("<table class='in'>");
-    b.append("<th>Chamber No.</th>");
+    b.append("<th>" + PlatformType.PACBIO.getPartitionName() + " No.</th>");
     b.append("<th>Pool</th>");
     for (int i = 0; i < numChambers; i++) {
       b.append("<tr><td>" + (i + 1) + "</td>");

@@ -419,24 +419,17 @@
 <div id="runPartitions">
 <c:choose>
 <c:when test="${empty run.sequencerPartitionContainers}">
-  Container:
-  <c:choose>
-    <c:when test="${not empty run.sequencerReference}">
-      <c:forEach var="platformContainerCount" begin="1"
-                 end="${run.sequencerReference.platform.numContainers}" step="1"
-                 varStatus="platformContainer">
-        <input id='container${platformContainerCount}select' name='containerselect'
-               onchange="Run.container.changeContainer(this.value, '${run.platformType.key}', ${run.sequencerReference.id});"
-               type='radio'
-               value='${platformContainerCount}'/>${platformContainerCount}
-      </c:forEach>
-    </c:when>
-    <c:otherwise>
-      <input id='container1select' name='containerselect'
-             onchange="Run.container.changeContainer(this.value, '${run.platformType.key}', ${run.sequencerReference.id});"
-             type='radio' value='1'/>1
-    </c:otherwise>
-  </c:choose>
+  <if test="${not empty run.sequencerReference}">
+    Container:
+     <c:forEach var="platformContainerCount" begin="1"
+                end="${run.sequencerReference.platform.numContainers}" step="1"
+                varStatus="platformContainer">
+       <input id='container${platformContainerCount}select' name='containerselect'
+              onchange="Run.container.changeContainer(this.value, '${run.platformType.key}', ${run.sequencerReference.id});"
+              type='radio'
+              value='${platformContainerCount}'/>${platformContainerCount}
+     </c:forEach>
+   </if>
   <br/>
 
   <div id='containerdiv' class="note ui-corner-all"></div>
@@ -770,7 +763,7 @@
 <c:if test="${not empty run.changeLog}">
   <br/>
   <h1>Changes</h1>
-  <span style="clear:both">
+  <div style="clear:both">
     <table class="list" id="changelog_table">
       <thead>
       <tr>
@@ -789,7 +782,7 @@
       </c:forEach>
       </tbody>
     </table>
-  </span>
+  </div>
 </c:if>
 </div>
 
