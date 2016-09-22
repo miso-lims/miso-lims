@@ -667,17 +667,19 @@ public class ValueTypeLookup {
    * @throws IOException if no value is found matching the available data in library
    */
   public void resolveAll(Library library) throws IOException {
-    if (library.getLibrarySelectionType() == null) throw new IOException("LibrarySelectionType missing for Library " + library.getAlias());
-    LibrarySelectionType sel = resolve(library.getLibrarySelectionType());
-    if (sel == null) throw new IOException(String.format("LibrarySelectionType not found (id=%d or name=%s)",
-        library.getLibrarySelectionType().getId(), library.getLibrarySelectionType().getName()));
-    library.setLibrarySelectionType(sel);
+    if (library.getLibrarySelectionType() != null) { // optional field
+      LibrarySelectionType sel = resolve(library.getLibrarySelectionType());
+      if (sel == null) throw new IOException(String.format("LibrarySelectionType not found (id=%d or name=%s)",
+          library.getLibrarySelectionType().getId(), library.getLibrarySelectionType().getName()));
+      library.setLibrarySelectionType(sel);
+    }
 
-    if (library.getLibraryStrategyType() == null) throw new IOException("LibraryStrategyType missing for Library " + library.getAlias());
-    LibraryStrategyType strat = resolve(library.getLibraryStrategyType());
-    if (strat == null) throw new IOException(String.format("LibraryStrategyType not found (id=%d or name=%s)",
-        library.getLibraryStrategyType().getId(), library.getLibraryStrategyType().getName()));
-    library.setLibraryStrategyType(strat);
+    if (library.getLibraryStrategyType() != null) { // optional field
+      LibraryStrategyType strat = resolve(library.getLibraryStrategyType());
+      if (strat == null) throw new IOException(String.format("LibraryStrategyType not found (id=%d or name=%s)",
+          library.getLibraryStrategyType().getId(), library.getLibraryStrategyType().getName()));
+      library.setLibraryStrategyType(strat);
+    }
 
     LibraryType lt = resolve(library.getLibraryType());
     if (lt == null) {
@@ -719,9 +721,11 @@ public class ValueTypeLookup {
         lai.setPrepKit(kit);
       }
 
-      LibraryDesign ld = resolve(lai.getLibraryDesign());
-      if (ld == null) throw new IOException("LibraryDesign not found");
-      lai.setLibraryDesign(ld);
+      if (lai.getLibraryDesign() != null) { // optional field
+        LibraryDesign ld = resolve(lai.getLibraryDesign());
+        if (ld == null) throw new IOException("LibraryDesign not found");
+        lai.setLibraryDesign(ld);
+      }
     }
   }
 
