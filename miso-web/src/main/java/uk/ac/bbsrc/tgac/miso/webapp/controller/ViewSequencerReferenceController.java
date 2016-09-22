@@ -43,7 +43,7 @@ import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 /**
- * Controller for View (read-only) Sequencer Reference and Service Record pages. Redirects to /stats for 
+ * Controller for View (read-only) Sequencer and Service Record pages. Redirects to /stats for 
  * write access if user is admin
  */
 @Controller
