@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.dto;
 
 public class ContainerDto {
   private Long id;
+  // identificationBarcode is displayed as "serial number" to the user
   private String identificationBarcode;
   private String url;
   private String platform;
