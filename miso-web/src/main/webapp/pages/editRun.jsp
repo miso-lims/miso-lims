@@ -444,7 +444,7 @@
 <c:otherwise>
   <c:forEach items="${run.sequencerPartitionContainers}" var="container" varStatus="containerCount">
     <div class="note ui-corner-all">
-      <h2>Container ${containerCount.count}</h2>
+      <h2>${run.platformType.containerName} ${containerCount.count}</h2>
       <c:if test="${not empty container.identificationBarcode}">
         <ul class="sddm">
           <li>
@@ -548,11 +548,11 @@
       </table>
       <div id='partitionErrorDiv' class="parsley-custom-error-message"></div>
       <div id="partitionDiv">
-        <i class="italicInfo">Click in a partition box to beep/type in barcodes, or double click a
-          pool on the right to sequentially add pools to the container</i>
+        <i class="italicInfo">Click in a ${run.platformType.partitionName} box to beep/type in barcodes, or double click a
+          pool on the right to sequentially add pools to the ${run.platformType.containerName}</i>
         <table class="in">
           <tr>
-	          <th>Partition No.</th>
+	          <th>${run.platformType.partitionName} No.</th>
 	          <th>Pool</th>
 	          <c:if test="${statsAvailable}">
 	            <th>Stats</th>
