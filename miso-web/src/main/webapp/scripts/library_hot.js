@@ -123,6 +123,8 @@ Library.hot = {
     
     // enable save button if it was disabled
     if (Hot.saveButton && Hot.saveButton.classList.contains('disabled')) Hot.toggleButtonAndLoaderImage(Hot.saveButton);
+    
+    Library.hot.addPlatformAndIndexHooks();
   },
   
   // TODO: add function regenerateWithQcs

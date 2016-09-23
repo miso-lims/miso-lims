@@ -37,7 +37,11 @@ Sample.hot = {
         if (sam.labId) sam.labComposite = Sample.hot.getLabCompositeFromId(sam.labId, Hot.sampleOptions.labsDtos);
         if (sam.prepKitId) sam.prepKitAlias = Hot.getAliasFromId(sam.prepKitId, Hot.sampleOptions.kitDescriptorsDtos);
         if (sam.subprojectId) sam.subprojectAlias = Hot.getAliasFromId(sam.subprojectId, Hot.sampleOptions.subprojectsDtos);
-
+        if (sam.detailedQcStatusId) {
+          sam.detailedQcStatusDescription = Hot.maybeGetProperty(Hot.findFirstOrNull(Hot.idPredicate(sam.detailedQcStatusId), Hot.sampleOptions.detailedQcStatusesDtos), 'description');
+        } else {
+          sam.detailedQcStatusDescription = 'Not Ready';
+        }
         // add sampleAnalyte values, if applicable
         if (Sample.hot.getCategoryFromClassId(sam.sampleClassId) == 'Tissue') {
           if (sam.tissueMaterialId) {
@@ -383,6 +387,43 @@ Sample.hot = {
 
     // enable save button if it was disabled
     if (Hot.saveButton && Hot.saveButton.classList.contains('disabled')) Hot.toggleButtonAndLoaderImage(Hot.saveButton);
+    
+    Sample.hot.addDetailedQcHooks();
+  },
+  
+  /**
+   * This hook applies changes to the QC Note column based on changes to the QC Status column (if both exist)
+   */
+  addDetailedQcHooks: function () {
+    Hot.hotTable.addHook('afterChange', function (changes, source) {
+      // 'changes' is a variable-length array of arrays. Each inner array has the following structure:
+      // [rowIndex, colName, oldValue, newValue]
+      if (['edit', 'autofill', 'paste'].indexOf(source) != -1) {
+        for (var i = 0; i < changes.length; i++) {
+          // trigger only if old value is different from new value
+          if (changes[i][2] == changes[i][3]) {
+            continue;
+          }
+          switch (changes[i][1]) {
+            case 'detailedQcStatusDescription':
+              var qcpd = Hot.findFirstOrNull(Hot.descriptionPredicate(changes[i][3]), Hot.sampleOptions.detailedQcStatusesDtos);
+              var row = changes[i][0];
+              Hot.startData[row].detailedQcStatusNote = '';
+              Sample.hot.dqcsNoteIndex = Hot.getColIndex('detailedQcStatusNote');
+              if (qcpd === null || !qcpd.noteRequired) {
+                Hot.hotTable.setCellMeta(row, Sample.hot.dqcsNoteIndex, 'readOnly', true);
+                Hot.hotTable.setCellMeta(row, Sample.hot.dqcsNoteIndex, 'validator', Hot.permitEmpty);
+                Hot.hotTable.setCellMeta(row, Sample.hot.dqcsNoteIndex, 'renderer', Hot.alwaysValidRenderer);
+              } else {
+                Hot.hotTable.setCellMeta(row, Sample.hot.dqcsNoteIndex, 'readOnly', false);
+                Hot.hotTable.setCellMeta(row, Sample.hot.dqcsNoteIndex, 'validator', Hot.requiredText);
+                Hot.hotTable.setCellMeta(row, Sample.hot.dqcsNoteIndex, 'renderer', Hot.requiredTextRenderer);
+              }
+          }
+        }
+        Hot.hotTable.render();
+      }
+    });
   },
 
   /**
@@ -400,12 +441,12 @@ Sample.hot = {
   dataSchema: {
     project: null,
     id: null,
-    description: null,
+    description: '',
     receivedDate: null,
     identificationBarcode: null,
     scientificName: this.sciName,
     sampleType: null,
-    alias: null,
+    alias: '',
     qcPassed: '',
     volume: null,
     externalName: null,
@@ -426,7 +467,9 @@ Sample.hot = {
     prepKitId: null,
     prepKitAlias: null,
     concentration: null,
-    qcPassedDetailId: null,
+    detailedQcStatusId: null,
+    detailedQcStatusDescription: null,
+    detailedQcStatusNote: '',
     groupId: null,
     groupDescription:null,
     samplePurposeId: null,
@@ -548,11 +591,10 @@ Sample.hot = {
   },
 
   /**
-   * Gets array of qc passed details descriptions (detailed sample only)
-   * TODO: remove??
+   * Gets array of detailed QC status descriptions (detailed sample only)
    */
-  getQcPassedDetails: function () {
-    return Hot.sortByProperty(Hot.sampleOptions.qcPassedDetailsDtos, 'id').map(function (qcpd) { return qcpd.description; });
+  getDetailedQcStatuses: function () {
+    return Hot.sortByProperty(Hot.sampleOptions.detailedQcStatusesDtos, 'id').map(function (dqcs) { return dqcs.description; });
   },
 
   /**
@@ -883,16 +925,22 @@ Sample.hot = {
         type: 'dropdown',
         trimDropdown: false,
         source: ['unknown', 'true', 'false'],
-        include: showQcs || show['Stock']
+        include: !isDetailed
       },
       {
-        header: 'QC Detail',
-        data: 'qcPassedDetailAlias',
+        header: 'QC Status',
+        data: 'detailedQcStatusDescription',
         type: 'dropdown',
         trimDropdown: false,
-        source: Sample.hot.getQcPassedDetails(),
+        source: Sample.hot.getDetailedQcStatuses(),
+        include: isDetailed
+      },
+      {
+        header: 'QC Note',
+        data: 'detailedQcStatusNote',
+        readOnly: true,
         validator: Hot.permitEmpty,
-        include: Sample.hot.showQcs || show['Stock']
+        include: isDetailed
       },
 
 
@@ -1130,8 +1178,9 @@ Sample.hot = {
         break;
       }
 
-       // TODO: fix QCPD
-       //sample.qcPassedDetailId = Hot.getIdFromAlias(obj.qcPassedDetailAlias, Hot.sampleOptions.qcPassedDetailsDtos);
+      sample.detailedQcStatusId = Hot.maybeGetProperty(Hot.findFirstOrNull(Hot.descriptionPredicate(obj.detailedQcStatusDescription), Hot.sampleOptions.detailedQcStatusesDtos), 'id');
+      sample.detailedQcStatusNote = obj.detailedQcStatusNote;
+
       if (obj.volume) {
         sample.volume = obj.volume;
       }

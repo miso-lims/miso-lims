@@ -46,7 +46,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-import uk.ac.bbsrc.tgac.miso.persistence.QcPassedDetailDao;
+import uk.ac.bbsrc.tgac.miso.persistence.DetailedQcStatusDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleClassDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleGroupDao;
@@ -101,7 +101,7 @@ public class DefaultSampleServiceTestSuite {
   private TissueTypeDao tissueTypeDao;
 
   @Mock
-  private QcPassedDetailDao qcPassedDetailDao;
+  private DetailedQcStatusDao detailedQcStatusDao;
 
   @Mock
   private SubprojectDao subProjectDao;

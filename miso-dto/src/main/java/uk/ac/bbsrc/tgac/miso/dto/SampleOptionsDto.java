@@ -14,7 +14,7 @@ public class SampleOptionsDto {
   private Set<SamplePurposeDto> samplePurposes;
   private Set<SampleGroupDto> sampleGroups;
   private Set<TissueMaterialDto> tissueMaterials;
-  private Set<QcPassedDetailDto> qcPassedDetails;
+  private Set<DetailedQcStatusDto> detailedQcStatuses;
   private Set<SampleValidRelationshipDto> sampleValidRelationships;
   private Set<InstituteDto> institutes;
   private Set<LabDto> labs;
@@ -76,12 +76,12 @@ public class SampleOptionsDto {
     this.tissueMaterials = tissueMaterials;
   }
 
-  public Set<QcPassedDetailDto> getQcPassedDetailsDtos() {
-    return qcPassedDetails;
+  public Set<DetailedQcStatusDto> getDetailedQcStatusesDtos() {
+    return detailedQcStatuses;
   }
 
-  public void setQcPassedDetailsDtos(Set<QcPassedDetailDto> qcPassedDetails) {
-    this.qcPassedDetails = qcPassedDetails;
+  public void setDetailedQcStatusesDtos(Set<DetailedQcStatusDto> detailedQcStatuses) {
+    this.detailedQcStatuses = detailedQcStatuses;
   }
 
   public Set<SampleValidRelationshipDto> getSampleValidRelationshipsDtos() {

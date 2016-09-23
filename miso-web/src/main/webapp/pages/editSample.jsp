@@ -279,14 +279,38 @@
       <td>Sample Type:*</td>
       <td><form:select id="sampleTypes" path="sampleType" items="${sampleTypes}"/></td>
     </tr>
-    <tr bgcolor="yellow">
-      <td>QC Passed:</td>
-      <td>
-        <form:radiobutton path="qcPassed" value="" label="Unknown"/>
-        <form:radiobutton path="qcPassed" value="true" label="True"/>
-        <form:radiobutton path="qcPassed" value="false" label="False"/>
-      </td>
-    </tr>
+    <c:choose>
+    <c:when test="${not detailedSample}">
+	  <tr bgcolor="yellow">
+	    <td>QC Passed:</td>
+	    <td>
+	      <form:radiobutton path="qcPassed" value="" label="Unknown"/>
+	      <form:radiobutton path="qcPassed" value="true" label="True"/>
+	      <form:radiobutton path="qcPassed" value="false" label="False"/>
+	    </td>
+	  </tr>
+    </c:when>
+    <c:otherwise>
+      <tr>
+        <td>QC Status*:</td>
+        <td>
+          <miso:select id="detailedQcStatus" path="detailedQcStatus" items="${detailedQcStatuses}" itemLabel="description"
+                      itemValue="id" defaultLabel="Not Ready" defaultValue="" onchange="Sample.ui.detailedQcStatusChanged();"/>
+        </td>
+      </tr>
+      <tr id="qcStatusNote" style="display:none">
+        <td>QC Status Note*:</td>
+        <td><form:input id="detailedQcStatusNote" path="detailedQcStatusNote"/></td>
+      </tr> 
+      <c:if test="${not empty sample.detailedQcStatusNote}">
+	    <script type="text/javascript">
+	      jQuery(document).ready(function () {
+	        jQuery('#qcStatusNote').show('fast');
+	      });
+	    </script>
+      </c:if>
+    </c:otherwise>
+    </c:choose>
     <tr>
       <td>Volume (&#181;l):</td>
       <td><form:input id="volume" path="volume"/></td>
@@ -380,13 +404,6 @@
                 ${sample.sampleClass.alias}
               </c:otherwise>
             </c:choose>
-          </td>
-        </tr>
-        <tr>
-          <td class="h">QC Details:</td>
-          <td>
-            <miso:select id="qcPassedDetail" path="qcPassedDetail" items="${qcPassedDetails}" itemLabel="description"
-                    itemValue="id" defaultLabel="None" defaultValue=""/>
           </td>
         </tr>
         <tr>
@@ -695,7 +712,7 @@
                 <c:if test="${(note.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
                                 or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
                 <span style="color:#000000"><a href='#' onclick="Sample.ui.deleteSampleNote('${sample.id}', '${note.noteId}');">
-                  <span class="ui-icon ui-icon-trash" style="clear: both; position: relative; float: right; margin-top: -15px;"/></a></span>
+                  <span class="ui-icon ui-icon-trash" style="clear: both; position: relative; float: right; margin-top: -15px;"></span></a></span>
                 </c:if>
               </span>
             </div>
@@ -785,7 +802,7 @@
   <a name="sampleqc"></a>
 
   <h1>
-    <div id="qcsTotalCount"></div>
+    <span id="qcsTotalCount"></span> QCs
   </h1>
   <ul class="sddm">
     <li>
@@ -801,17 +818,12 @@
       </div>
     </li>
   </ul>
-    <span style="clear:both">
+    <div style="clear:both">
       <div id="addSampleQC"></div>
       <form id='addQcForm'>
         <table class="list in" id="sampleQcTable">
           <thead>
           <tr>
-              <%--
-              <sec:authorize access="hasRole('ROLE_ADMIN')">
-                  <th class="fit">ID</th>
-              </sec:authorize>
-              --%>
             <th>QCed By</th>
             <th>QC Date</th>
             <th>Method</th>
@@ -826,11 +838,6 @@
           <c:if test="${not empty sample.sampleQCs}">
             <c:forEach items="${sample.sampleQCs}" var="qc">
               <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-                  <%--
-                  <sec:authorize access="hasRole('ROLE_ADMIN')">
-                      <td class="fit">${qc.id}</td>
-                  </sec:authorize>
-                  --%>
                 <td>${qc.qcCreator}</td>
                 <td><fmt:formatDate value="${qc.qcDate}"/></td>
                 <td>${qc.qcType.name}</td>
@@ -849,15 +856,14 @@
         </table>
         <input type='hidden' id='sampleId' name='id' value='${sample.id}'/>
       </form>
-    </span>
+    </div>
   <br/>
   <a name="library"></a>
 
   <c:if test="${ !detailedSample or detailedSample and sampleCategory eq 'Aliquot' }">
 
   <h1>
-    <div id="librariesTotalCount">
-    </div>
+    <span id="librariesTotalCount"></span> Libraries
   </h1>
   <ul class="sddm">
     <li>
@@ -879,7 +885,7 @@
       </div>
     </li>
   </ul>
-    <span style="clear:both">
+    <div style="clear:both">
       <table class="list" id="library_table">
         <thead>
         <tr>
@@ -901,7 +907,7 @@
         </c:forEach>
         </tbody>
       </table>
-    </span>
+    </div>
   <script type="text/javascript">
     jQuery(document).ready(function () {
     	// display sample QCs table, and count samples and libraries
@@ -942,7 +948,7 @@
       </li>
     </ul>
 
-    <span style="clear:both">
+    <div style="clear:both">
       <table class="list" id="pools_table">
         <thead>
         <tr>
@@ -958,7 +964,7 @@
         </thead>
         <tbody>
         <c:forEach items="${samplePools}" var="pool">
-          <tr poolId="${pool.id}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
+          <tr data-poolId="${pool.id}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
             <td><b><a href='<c:url value="/miso/pool/${pool.id}"/>'>${pool.name}</a></b></td>
             <td><a href='<c:url value="/miso/pool/${pool.id}"/>'>${pool.alias}</a></td>
             <td>${pool.platformType.key}</td>
@@ -966,7 +972,7 @@
             <td>${pool.concentration}</td>
             <sec:authorize access="hasRole('ROLE_ADMIN')">
               <td class="misoicon" onclick="Pool.deletePool(${pool.id}, Utils.page.pageReload);">
-                <span class="ui-icon ui-icon-trash"/>
+                <span class="ui-icon ui-icon-trash"></span>
               </td>
             </sec:authorize>
           </tr>
@@ -994,7 +1000,7 @@
           });
         });
       </script>
-    </span>
+    </div>
   </c:if>
 
   <c:if test="${not empty sampleRuns}">
@@ -1015,7 +1021,7 @@
       </thead>
       <tbody>
       <c:forEach items="${sampleRuns}" var="run" varStatus="runCount">
-        <tr runId="${run.id}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
+        <tr data-runId="${run.id}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
           <td><b><a href='<c:url value="/miso/run/${run.id}"/>'>${run.name}</a></b></td>
           <td><a href='<c:url value="/miso/run/${run.id}"/>'>${run.alias}</a></td>
           <td>
@@ -1050,7 +1056,7 @@
           <td>${run.status.health}</td>
           <sec:authorize access="hasRole('ROLE_ADMIN')">
             <td class="misoicon" onclick="Run.deleteRun(${run.id}, Utils.page.pageReload);">
-              <span class="ui-icon ui-icon-trash"/>
+              <span class="ui-icon ui-icon-trash"></span>
             </td>
           </sec:authorize>
         </tr>
@@ -1082,7 +1088,7 @@
   <c:if test="${not empty sample.changeLog}">
     <br/>
     <h1>Changes</h1>
-    <span style="clear:both">
+    <div style="clear:both">
       <table class="list" id="changelog_table">
         <thead>
         <tr>
@@ -1101,7 +1107,7 @@
         </c:forEach>
         </tbody>
       </table>
-    </span>
+    </div>
   </c:if>
 </c:if>
 </div>

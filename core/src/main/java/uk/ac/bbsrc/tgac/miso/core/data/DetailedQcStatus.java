@@ -4,11 +4,11 @@ import java.util.Date;
 
 import com.eaglegenomics.simlims.core.User;
 
-public interface QcPassedDetail {
+public interface DetailedQcStatus {
 
   Long getId();
 
-  void setId(Long qcPassedDetailsId);
+  void setId(Long detailedQcStatusId);
 
   User getCreatedBy();
 
@@ -26,9 +26,9 @@ public interface QcPassedDetail {
 
   void setLastUpdated(Date lastUpdated);
 
-  String getStatus();
+  Boolean getStatus();
 
-  void setStatus(String status);
+  void setStatus(Boolean status);
 
   String getDescription();
 

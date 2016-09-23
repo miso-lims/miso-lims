@@ -29,9 +29,9 @@ public interface DetailedSample extends Sample {
 
   void setArchived(Boolean archived);
 
-  QcPassedDetail getQcPassedDetail();
+  DetailedQcStatus getDetailedQcStatus();
 
-  void setQcPassedDetail(QcPassedDetail qcPassedDetail);
+  void setDetailedQcStatus(DetailedQcStatus detailedQcStatus);
 
   KitDescriptor getPrepKit();
 
@@ -100,5 +100,9 @@ public interface DetailedSample extends Sample {
   boolean hasNonStandardAlias();
 
   void setNonStandardAlias(boolean nonStandardAlias);
+
+  String getDetailedQcStatusNote();
+
+  void setDetailedQcStatusNote(String detailedQcStatusNote);
 
 }

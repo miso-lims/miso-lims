@@ -1,6 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isAliquotSample;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isDetailedSample;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isIdentitySample;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStockSample;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringBlankOrNull;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isTissueProcessingSample;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isTissueSample;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -40,7 +47,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-import uk.ac.bbsrc.tgac.miso.persistence.QcPassedDetailDao;
+import uk.ac.bbsrc.tgac.miso.persistence.DetailedQcStatusDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleClassDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SamplePurposeDao;
@@ -93,7 +100,7 @@ public class DefaultSampleService implements SampleService {
   private TissueTypeDao tissueTypeDao;
 
   @Autowired
-  private QcPassedDetailDao qcPassedDetailDao;
+  private DetailedQcStatusDao detailedQcStatusDao;
 
   @Autowired
   private SubprojectDao subProjectDao;
@@ -159,8 +166,8 @@ public class DefaultSampleService implements SampleService {
     this.tissueTypeDao = tissueTypeDao;
   }
 
-  public void setQcPassedDetailDao(QcPassedDetailDao qcPassedDetailDao) {
-    this.qcPassedDetailDao = qcPassedDetailDao;
+  public void setDetailedQcStatusDao(DetailedQcStatusDao detailedQcStatusDao) {
+    this.detailedQcStatusDao = detailedQcStatusDao;
   }
 
   public void setSubProjectDao(SubprojectDao subProjectDao) {
@@ -226,6 +233,10 @@ public class DefaultSampleService implements SampleService {
           throw new IOException(e.getMessage(), e);
         }
         validateHierarchy(detailed);
+
+        if (detailed.getDetailedQcStatus() != null) {
+          detailed.setQcPassed(detailed.getDetailedQcStatus().getStatus());
+        }
       }
     }
 
@@ -410,8 +421,8 @@ public class DefaultSampleService implements SampleService {
       if (sai.getSampleClass() != null && sai.getSampleClass().getId() != null) {
         sai.setSampleClass(sampleClassDao.getSampleClass(sai.getSampleClass().getId()));
       }
-      if (sai.getQcPassedDetail() != null && sai.getQcPassedDetail().getId() != null) {
-        sai.setQcPassedDetail(qcPassedDetailDao.getQcPassedDetails(sai.getQcPassedDetail().getId()));
+      if (sai.getDetailedQcStatus() != null && sai.getDetailedQcStatus().getId() != null) {
+        sai.setDetailedQcStatus(detailedQcStatusDao.getDetailedQcStatus(sai.getDetailedQcStatus().getId()));
       }
       if (sai.getSubproject() != null && sai.getSubproject().getId() != null) {
         sai.setSubproject(subProjectDao.getSubproject(sai.getSubproject().getId()));
@@ -475,6 +486,9 @@ public class DefaultSampleService implements SampleService {
       if (detailedUpdated.getParent() != null) {
         detailedUpdated.setParent((DetailedSample) get(detailedUpdated.getParent().getId()));
         validateHierarchy(detailedUpdated);
+      }
+      if (detailedUpdated.getDetailedQcStatus() != null) {
+        detailedUpdated.setQcPassed(detailedUpdated.getDetailedQcStatus().getStatus());
       }
     }
 
