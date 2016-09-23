@@ -365,8 +365,10 @@ public class SQLLibraryDAO implements LibraryStore {
     params.addValue("sample_sampleId", library.getSample().getId());
     params.addValue("securityProfile_profileId", securityProfileId);
     params.addValue("libraryType", library.getLibraryType().getId());
-    params.addValue("librarySelectionType", library.getLibrarySelectionType().getId());
-    params.addValue("libraryStrategyType", library.getLibraryStrategyType().getId());
+    params.addValue("librarySelectionType",
+        library.getLibrarySelectionType() == null ? null : library.getLibrarySelectionType().getId());
+    params.addValue("libraryStrategyType",
+        library.getLibraryStrategyType() == null ? null : library.getLibraryStrategyType().getId());
     params.addValue("platformName", library.getPlatformName());
     params.addValue("concentration", library.getInitialConcentration());
     params.addValue("creationDate", library.getCreationDate());
