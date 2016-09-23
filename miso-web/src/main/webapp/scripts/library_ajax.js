@@ -1104,7 +1104,7 @@ Library.ui = {
           "bVisible": (Sample.detailedSample ? "true" : "false")
         },
         {
-          "sTitle": "ID",
+          "sTitle": "Barcode",
           "mData": "identificationBarcode",
           "iSortPriority": 0,
           "bVisible": false

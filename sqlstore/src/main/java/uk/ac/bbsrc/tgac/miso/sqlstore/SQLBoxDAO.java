@@ -37,6 +37,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
@@ -84,20 +85,25 @@ public class SQLBoxDAO implements BoxStore {
             long positionId = inner_rs.getLong("boxPositionId");
             int row = inner_rs.getInt("row");
             int column = inner_rs.getInt("column");
-            Boxable item = libraryDAO.getByPositionId(positionId);
-            if (item == null) {
-              try {
-                item = sampleDAO.getByPositionId(positionId);
-              } catch (IOException e) {
-                throw new SQLException("Could not get sample.", e);
+            Boxable item;
+            if (isLazy()) {
+              // don't really care what the item is, but do want an accurate count of how many boxables are in the box
+              item = new SampleImpl();
+            } else {
+              item = libraryDAO.getByPositionId(positionId);
+              if (item == null) {
+                try {
+                  item = sampleDAO.getByPositionId(positionId);
+                } catch (IOException e) {
+                  throw new SQLException("Could not get sample.", e);
+                }
               }
-            }
-            if (item == null) {
-              item = poolDAO.getByPositionId(positionId);
+              if (item == null) {
+                item = poolDAO.getByPositionId(positionId);
+              }
             }
             box.getBoxables().put(BoxUtils.getPositionString(row, column), item);
           }
-
         }, box.getId());
         box.getChangeLog().addAll(changeLogDAO.listAllById(TABLE_NAME, rs.getLong("boxId")));
       } catch (IOException e) {
@@ -330,7 +336,7 @@ public class SQLBoxDAO implements BoxStore {
 
   @Override
   public Collection<Box> listAll() throws IOException {
-    return template.query(BOX_SELECT, new BoxMapper());
+    return template.query(BOX_SELECT, new BoxMapper(true));
   }
 
   @Override
