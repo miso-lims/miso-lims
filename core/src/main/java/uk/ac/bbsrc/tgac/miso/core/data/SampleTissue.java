@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-public interface SampleTissue extends SampleAdditionalInfo {
+public interface SampleTissue extends DetailedSample {
 
   public static final String CATEGORY_NAME = "Tissue";
 

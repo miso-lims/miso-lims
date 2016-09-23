@@ -16,24 +16,24 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import uk.ac.bbsrc.tgac.miso.core.data.QcPassedDetail;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 
 @Entity
-@Table(name = "SampleAdditionalInfo")
+@Table(name = "DetailedSample")
 @Inheritance(strategy = InheritanceType.JOINED)
-public class SampleAdditionalInfoImpl extends SampleImpl implements SampleAdditionalInfo {
+public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
 
   private static final long serialVersionUID = 1L;
 
-  @ManyToOne(optional = true, targetEntity = SampleAdditionalInfoImpl.class)
+  @ManyToOne(optional = true, targetEntity = DetailedSampleImpl.class)
   @JoinColumn(name = "parentId", nullable = true)
-  private SampleAdditionalInfo parent;
+  private DetailedSample parent;
 
   @Transient
-  private Set<SampleAdditionalInfo> children = new HashSet<>();
+  private Set<DetailedSample> children = new HashSet<>();
 
   @OneToOne(targetEntity = SampleClassImpl.class)
   @JoinColumn(name = "sampleClassId", nullable = false)
@@ -65,22 +65,22 @@ public class SampleAdditionalInfoImpl extends SampleImpl implements SampleAdditi
   private boolean nonStandardAlias = false;
 
   @Override
-  public SampleAdditionalInfo getParent() {
+  public DetailedSample getParent() {
     return parent;
   }
 
   @Override
-  public void setParent(SampleAdditionalInfo parent) {
+  public void setParent(DetailedSample parent) {
     this.parent = parent;
   }
 
   @Override
-  public Set<SampleAdditionalInfo> getChildren() {
+  public Set<DetailedSample> getChildren() {
     return children;
   }
 
   @Override
-  public void setChildren(Set<SampleAdditionalInfo> children) {
+  public void setChildren(Set<DetailedSample> children) {
     this.children = children;
   }
 

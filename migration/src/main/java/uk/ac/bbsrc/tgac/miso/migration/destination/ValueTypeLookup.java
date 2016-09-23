@@ -17,7 +17,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.QcPassedDetail;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
@@ -590,7 +590,7 @@ public class ValueTypeLookup {
     }
 
     if (LimsUtils.isDetailedSample(sample)) {
-      SampleAdditionalInfo detailed = (SampleAdditionalInfo) sample;
+      DetailedSample detailed = (DetailedSample) sample;
 
       SampleClass sc = resolve(detailed.getSampleClass());
       if (sc == null) throw new IOException(String.format("SampleClass not found: id=%d, alias=%s",

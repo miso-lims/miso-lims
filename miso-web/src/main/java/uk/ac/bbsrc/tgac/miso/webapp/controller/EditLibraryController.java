@@ -83,7 +83,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAdditionalInfoImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
@@ -684,7 +684,7 @@ public class EditLibraryController {
       model.put("libraryRuns", getRunsByLibraryPools(pools));
 
       populateDesigns(model,
-          LimsUtils.isDetailedSample(library.getSample()) ? ((SampleAdditionalInfo) library.getSample()).getSampleClass() : null);
+          LimsUtils.isDetailedSample(library.getSample()) ? ((DetailedSample) library.getSample()).getSampleClass() : null);
 
       model.put("owners", LimsSecurityUtils.getPotentialOwners(user, library, securityManager.listAllUsers()));
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, library, securityManager.listAllUsers()));
@@ -729,7 +729,7 @@ public class EditLibraryController {
         library.setSample(sample);
         model.put("sample", sample);
         if (LimsUtils.isDetailedSample(sample)) {
-          SampleAdditionalInfo detailed = (SampleAdditionalInfo) sample;
+          DetailedSample detailed = (DetailedSample) sample;
           sampleClass = detailed.getSampleClass();
         }
 
@@ -806,7 +806,7 @@ public class EditLibraryController {
       List<LibraryDto> libraryDtos = new ArrayList<LibraryDto>();
       SampleClass sampleClass = null;
       for (Sample sample : requestManager.getSamplesByIdList(idList)) {
-        SampleAdditionalInfo detailed = (SampleAdditionalInfo) sample;
+        DetailedSample detailed = (DetailedSample) sample;
         if (sampleClass == null) {
           sampleClass = detailed.getSampleClass();
         } else if (sampleClass.getId() != detailed.getSampleClass().getId()) {
@@ -818,7 +818,7 @@ public class EditLibraryController {
 
         if (isDetailedSampleEnabled()) {
           LibraryAdditionalInfoDto lai = new LibraryAdditionalInfoDto();
-          lai.setNonStandardAlias(((SampleAdditionalInfo) sample).hasNonStandardAlias());
+          lai.setNonStandardAlias(((DetailedSample) sample).hasNonStandardAlias());
           library.setLibraryAdditionalInfo(lai);
         }
         libraryDtos.add(library);
@@ -854,8 +854,8 @@ public class EditLibraryController {
         if (!isDetailedSampleEnabled()) {
           // Do nothing about sample classes.
         } else if (sampleClass == null) {
-          sampleClass = ((SampleAdditionalInfo) library.getSample()).getSampleClass();
-        } else if (((SampleAdditionalInfo) library.getSample()).getSampleClass().getId() != sampleClass.getId()) {
+          sampleClass = ((DetailedSample) library.getSample()).getSampleClass();
+        } else if (((DetailedSample) library.getSample()).getSampleClass().getId() != sampleClass.getId()) {
           throw new IOException("Can only update libraries when samples all have the same class.");
         }
       }

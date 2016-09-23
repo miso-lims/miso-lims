@@ -10,7 +10,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 @Entity
 @Table(name = "SampleTissueProcessing")
 @Inheritance(strategy = InheritanceType.JOINED)
-public class SampleTissueProcessingImpl extends SampleAdditionalInfoImpl implements SampleTissueProcessing {
+public class SampleTissueProcessingImpl extends DetailedSampleImpl implements SampleTissueProcessing {
 
   private static final long serialVersionUID = 1L;
 

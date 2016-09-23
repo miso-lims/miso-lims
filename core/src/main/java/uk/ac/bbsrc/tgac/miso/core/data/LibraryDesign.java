@@ -101,8 +101,8 @@ public class LibraryDesign {
   }
 
   public boolean validate(Library library) {
-    if (!(library.getSample() instanceof SampleAdditionalInfo)) return true;
-    if (((SampleAdditionalInfo) library.getSample()).getSampleClass().getId() != sampleClass.getId()) return false;
+    if (!(library.getSample() instanceof DetailedSample)) return true;
+    if (((DetailedSample) library.getSample()).getSampleClass().getId() != sampleClass.getId()) return false;
     if (library.getLibraryType().getId() != libraryType.getId()) return false;
     if (library.getLibrarySelectionType().getId() != librarySelectionType) return false;
     if (library.getLibraryStrategyType().getId() != libraryStrategyType) return false;

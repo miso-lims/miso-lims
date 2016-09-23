@@ -17,7 +17,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
@@ -264,7 +264,7 @@ public class LoadGeneratorSource implements MigrationSource {
 
   private static final String TISSUE_DESC = "tissue";
 
-  private SampleTissue createTissue(SampleClass sampleClass, Project project, SampleAdditionalInfo parent, int timesReceived) {
+  private SampleTissue createTissue(SampleClass sampleClass, Project project, DetailedSample parent, int timesReceived) {
     SampleTissue sample = new SampleTissueImpl();
     sample.setDescription(TISSUE_DESC);
     sample.setSampleType(DEFAULT_SAMPLE_TYPE);
@@ -286,7 +286,7 @@ public class LoadGeneratorSource implements MigrationSource {
 
   private static final String STOCK_DESC = "stock";
 
-  private SampleStock createStock(SampleClass sampleClass, Project project, SampleAdditionalInfo parent, int siblingNumber) {
+  private SampleStock createStock(SampleClass sampleClass, Project project, DetailedSample parent, int siblingNumber) {
     SampleStock sample = new SampleStockImpl();
     sample.setDescription(STOCK_DESC);
     sample.setSampleType(DEFAULT_SAMPLE_TYPE);
@@ -300,7 +300,7 @@ public class LoadGeneratorSource implements MigrationSource {
 
   private static final String ALIQUOT_DESC = "aliquot";
 
-  private SampleAliquot createAliquot(SampleClass sampleClass, Project project, SampleAdditionalInfo parent, int siblingNumber) {
+  private SampleAliquot createAliquot(SampleClass sampleClass, Project project, DetailedSample parent, int siblingNumber) {
     SampleAliquot sample = new SampleAliquotImpl();
     sample.setDescription(ALIQUOT_DESC);
     sample.setSampleType(DEFAULT_SAMPLE_TYPE);
@@ -319,7 +319,7 @@ public class LoadGeneratorSource implements MigrationSource {
       List<Library> libraries = new ArrayList<>();
       while (libraries.size() < libraryCount) {
         for (Sample s : getSamples()) {
-          SampleAdditionalInfo sample = (SampleAdditionalInfo) s;
+          DetailedSample sample = (DetailedSample) s;
           if (sample.getSampleClass().getId() == aliquotSampleClassId) {
             libraries.add(createLibrary(sample, libraries.size() + 1));
             if (libraries.size() >= libraryCount) break;
@@ -335,7 +335,7 @@ public class LoadGeneratorSource implements MigrationSource {
     return this.libraries;
   }
 
-  private Library createLibrary(SampleAdditionalInfo sample, int libraryNum) {
+  private Library createLibrary(DetailedSample sample, int libraryNum) {
     Library lib = new LibraryImpl();
 
     lib.setDescription("library");
@@ -367,8 +367,8 @@ public class LoadGeneratorSource implements MigrationSource {
     return lib;
   }
 
-  private static SampleAdditionalInfo getRootSample(SampleAdditionalInfo sample) {
-    SampleAdditionalInfo root = sample;
+  private static DetailedSample getRootSample(DetailedSample sample) {
+    DetailedSample root = sample;
     while (root.getParent() != null) {
       root = root.getParent();
     }

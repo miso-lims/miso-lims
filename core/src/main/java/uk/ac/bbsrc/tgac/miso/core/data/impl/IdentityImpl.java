@@ -18,7 +18,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 @Entity
 @Table(name = "Identity")
-public class IdentityImpl extends SampleAdditionalInfoImpl implements Identity {
+public class IdentityImpl extends DetailedSampleImpl implements Identity {
 
   private static final long serialVersionUID = 1L;
 

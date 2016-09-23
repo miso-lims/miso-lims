@@ -8,7 +8,7 @@ BEGIN
     
     SELECT 'Projects' AS 'Entity',COUNT(*) AS 'Rows' FROM Project 
     UNION SELECT 'Samples',COUNT(*) FROM Sample 
-    UNION SELECT 'SampleAdditionalInfo',COUNT(*) FROM SampleAdditionalInfo 
+    UNION SELECT 'DetailedSample',COUNT(*) FROM DetailedSample 
     UNION SELECT 'Identities',COUNT(*) FROM Identity 
     UNION SELECT 'SampleTissues',COUNT(*) FROM SampleTissue 
     UNION SELECT 'SampleTissueProcessings',COUNT(*) FROM SampleTissueProcessing 
@@ -63,7 +63,7 @@ BEGIN
     DELETE FROM SampleTissueProcessing;
     DELETE FROM SampleStock;
     DELETE FROM SampleAliquot;
-    DELETE FROM SampleAdditionalInfo;
+    DELETE FROM DetailedSample;
     DELETE FROM SampleChangeLog;
     DELETE FROM Sample;
     DELETE FROM SampleNumberPerProject;

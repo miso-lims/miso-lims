@@ -6,16 +6,16 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 
-public interface SampleAdditionalInfo extends Sample {
+public interface DetailedSample extends Sample {
 
-  public SampleAdditionalInfo getParent();
+  public DetailedSample getParent();
 
-  public void setParent(SampleAdditionalInfo parent);
+  public void setParent(DetailedSample parent);
 
-  public Set<SampleAdditionalInfo> getChildren();
+  public Set<DetailedSample> getChildren();
 
   @JsonIgnore
-  public void setChildren(Set<SampleAdditionalInfo> children);
+  public void setChildren(Set<DetailedSample> children);
 
   SampleClass getSampleClass();
 

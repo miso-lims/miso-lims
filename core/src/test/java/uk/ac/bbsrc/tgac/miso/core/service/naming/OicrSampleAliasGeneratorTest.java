@@ -10,7 +10,7 @@ import org.junit.rules.ExpectedException;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleLCMTube;
@@ -98,7 +98,7 @@ public class OicrSampleAliasGeneratorTest {
   }
 
   private SampleAliquot makeAliquotFromStock() throws Exception {
-    SampleAdditionalInfo lcm = makeLcmTube();
+    DetailedSample lcm = makeLcmTube();
     lcm.setAlias("PROJ_0001_nn_n_nn_1-1_LCM02");
 
     SampleStock stock = new SampleStockImpl();
@@ -133,7 +133,7 @@ public class OicrSampleAliasGeneratorTest {
 
   private Sample makeStockFromProcessing() throws Exception {
     SampleStock stock = new SampleStockImpl();
-    SampleAdditionalInfo lcmTube = makeLcmTube();
+    DetailedSample lcmTube = makeLcmTube();
     lcmTube.setAlias("PROJ_0001_nn_n_nn_1-1_LCM02");
     stock.setParent(lcmTube);
     SampleClass sc = new SampleClassImpl();

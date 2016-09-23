@@ -24,7 +24,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrderImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.QcPassedDetailImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAdditionalInfoImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleDerivedInfo;
@@ -73,7 +73,7 @@ public class MisoTargetUtils {
         new Class[] { TissueOriginImpl.class, TissueTypeImpl.class, SampleClassImpl.class, SubprojectImpl.class, QcPassedDetailImpl.class,
             SamplePurposeImpl.class, SampleGroupImpl.class, TissueMaterialImpl.class, SampleAliquotImpl.class, SampleStockImpl.class,
             UserImpl.class, AbstractSample.class, IdentityImpl.class, AbstractProject.class, PoolOrderImpl.class, PoolOrderCompletion.class,
-            ProjectImpl.class, SampleImpl.class, SampleDerivedInfo.class, SampleAdditionalInfoImpl.class, KitDescriptor.class,
+            ProjectImpl.class, SampleImpl.class, SampleDerivedInfo.class, DetailedSampleImpl.class, KitDescriptor.class,
             SampleValidRelationshipImpl.class, SampleNumberPerProjectImpl.class, SampleTissueImpl.class, SequencingParametersImpl.class,
             InstituteImpl.class, LabImpl.class, ReferenceGenomeImpl.class, AbstractLibrary.class, LibraryAdditionalInfoImpl.class,
             LibraryDesign.class, LibraryType.class, Index.class, IndexFamily.class });

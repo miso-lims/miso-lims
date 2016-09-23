@@ -42,7 +42,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.QcPassedDetail;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleCVSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
@@ -71,7 +71,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrderImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.QcPassedDetailImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAdditionalInfoImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleCVSlideImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
@@ -248,8 +248,8 @@ public class Dtos {
     return to;
   }
 
-  private static SampleAdditionalInfoDto asDetailedSampleDto(SampleAdditionalInfo from) {
-    SampleAdditionalInfoDto dto = null;
+  private static DetailedSampleDto asDetailedSampleDto(DetailedSample from) {
+    DetailedSampleDto dto = null;
     if (isIdentitySample(from)) {
       dto = asIdentitySampleDto((Identity) from);
     } else if (isTissueSample(from)) {
@@ -291,8 +291,8 @@ public class Dtos {
     return dto;
   }
 
-  private static SampleAdditionalInfo toDetailedSample(SampleAdditionalInfoDto from) {
-    SampleAdditionalInfo to = null;
+  private static DetailedSample toDetailedSample(DetailedSampleDto from) {
+    DetailedSample to = null;
     if (from.getClass() == SampleIdentityDto.class) {
       to = toIdentitySample((SampleIdentityDto) from);
     } else if (from.getClass() == SampleTissueDto.class) {
@@ -304,7 +304,7 @@ public class Dtos {
     } else if (from.getClass() == SampleAliquotDto.class) {
       to = toAliquotSample((SampleAliquotDto) from);
     } else {
-      to = new SampleAdditionalInfoImpl();
+      to = new DetailedSampleImpl();
     }
     if (from.getQcPassedDetailId() != null) {
       QcPassedDetail qcpassedDetail = new QcPassedDetailImpl();
@@ -353,11 +353,11 @@ public class Dtos {
    *          the DTO to take parent details from
    * @return the parent details from the DTO, or null if there are none. A returned sample will also include its own parent if applicable.
    */
-  private static SampleAdditionalInfo getParent(SampleAdditionalInfoDto childDto) {
-    SampleAdditionalInfo parent = null;
+  private static DetailedSample getParent(DetailedSampleDto childDto) {
+    DetailedSample parent = null;
     if (childDto.getParentId() != null) {
       // Case 1
-      parent = new SampleAdditionalInfoImpl();
+      parent = new DetailedSampleImpl();
       parent.setId(childDto.getParentId());
     } else if (childDto instanceof SampleIdentityDto && childDto.getClass() != SampleIdentityDto.class) {
       // Case 2 or 3 require Identity details
@@ -498,7 +498,7 @@ public class Dtos {
     SampleDto dto = null;
 
     if (isDetailedSample(from)) {
-      dto = asDetailedSampleDto((SampleAdditionalInfo) from);
+      dto = asDetailedSampleDto((DetailedSample) from);
     } else {
       dto = new SampleDto();
     }
@@ -545,8 +545,8 @@ public class Dtos {
 
   public static Sample to(SampleDto from) {
     Sample to = null;
-    if (from instanceof SampleAdditionalInfoDto) {
-      to = toDetailedSample((SampleAdditionalInfoDto) from);
+    if (from instanceof DetailedSampleDto) {
+      to = toDetailedSample((DetailedSampleDto) from);
     } else {
       to = new SampleImpl();
     }
@@ -942,8 +942,8 @@ public class Dtos {
     dto.setName(from.getName());
     dto.setParentSampleId(from.getSample().getId());
     dto.setParentSampleAlias(from.getSample().getAlias());
-    if (from.getSample() instanceof SampleAdditionalInfo) {
-      dto.setParentSampleClassId(((SampleAdditionalInfo) from.getSample()).getSampleClass().getId());
+    if (from.getSample() instanceof DetailedSample) {
+      dto.setParentSampleClassId(((DetailedSample) from.getSample()).getSampleClass().getId());
     }
     dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
     dto.setDescription(from.getDescription());

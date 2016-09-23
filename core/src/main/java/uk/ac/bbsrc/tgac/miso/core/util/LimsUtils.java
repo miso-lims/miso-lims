@@ -87,7 +87,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletion;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletionGroup;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
@@ -785,8 +785,8 @@ public class LimsUtils {
     }
     return isValidRelationship(
         relations,
-        ((SampleAdditionalInfo) parent).getSampleClass(),
-        ((SampleAdditionalInfo) child).getSampleClass());
+        ((DetailedSample) parent).getSampleClass(),
+        ((DetailedSample) child).getSampleClass());
   }
 
   public static boolean isValidRelationship(Iterable<SampleValidRelationship> relations, SampleClass parent, SampleClass child) {
@@ -860,7 +860,7 @@ public class LimsUtils {
   }
 
   public static boolean isDetailedSample(Sample sample) {
-    return sample instanceof SampleAdditionalInfo;
+    return sample instanceof DetailedSample;
   }
 
   public static boolean isPlainSample(Sample sample) {

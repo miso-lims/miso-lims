@@ -28,7 +28,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
@@ -173,7 +173,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
     }
     if (hasParent(sample)) {
       // save parent first to generate ID
-      saveSample(((SampleAdditionalInfo) sample).getParent());
+      saveSample(((DetailedSample) sample).getParent());
     }
     sample.inheritPermissions(sample.getProject());
     valueTypeLookup.resolveAll(sample);
@@ -182,7 +182,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
     Collection<Note> notes = new HashSet<>(sample.getNotes());
 
     if (LimsUtils.isDetailedSample(sample)) {
-      SampleAdditionalInfo detailed = (SampleAdditionalInfo) sample;
+      DetailedSample detailed = (DetailedSample) sample;
       if (detailed.getSubproject() != null && detailed.getSubproject().getId() == null) {
         // New subproject
         createSubproject(detailed.getSubproject(), detailed.getProject().getReferenceGenomeId());
@@ -192,7 +192,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
         List<Sample> dupes = serviceManager.getSampleService().getByAlias(sample.getAlias());
         if (!dupes.isEmpty()) {
           for (Sample dupe : dupes) {
-            ((SampleAdditionalInfo) dupe).setNonStandardAlias(true);
+            ((DetailedSample) dupe).setNonStandardAlias(true);
             serviceManager.getSampleService().update(dupe);
           }
           detailed.setNonStandardAlias(true);
@@ -220,7 +220,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
   }
 
   private static boolean hasParent(Sample sample) {
-    return LimsUtils.isDetailedSample(sample) && ((SampleAdditionalInfo) sample).getParent() != null;
+    return LimsUtils.isDetailedSample(sample) && ((DetailedSample) sample).getParent() != null;
   }
 
   private void saveSampleChangeLog(Sample sample, Collection<ChangeLog> changes) throws IOException {

@@ -10,7 +10,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
 
 @Entity
 @Table(name = "SampleAliquot")
-public class SampleAliquotImpl extends SampleAdditionalInfoImpl implements SampleAliquot {
+public class SampleAliquotImpl extends DetailedSampleImpl implements SampleAliquot {
 
   @OneToOne(targetEntity = SamplePurposeImpl.class)
   @JoinColumn(name = "samplePurposeId")
