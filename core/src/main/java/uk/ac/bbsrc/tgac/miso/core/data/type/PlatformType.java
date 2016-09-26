@@ -38,14 +38,17 @@ import com.google.common.collect.Lists;
  * @since 0.0.2
  */
 public enum PlatformType {
-  ILLUMINA("Illumina", false), LS454("LS454", true), SOLID("Solid", true), IONTORRENT("IonTorrent", false), PACBIO("PacBio",
-      false), OXFORDNANOPORE("OxfordNanopore", false);
+  ILLUMINA("Illumina", false, "Flow Cell", "Lane"), LS454("LS454", true, "Plate", "Lane"), SOLID("Solid", true, "Slide", "Lane"),
+  IONTORRENT("IonTorrent", false, "Chip", "Chip"), PACBIO("PacBio", false, "SMRT Cell", "SMRT Cell"),
+  OXFORDNANOPORE("OxfordNanopore",false, "Flow Cell", "Flow Cell");
 
   /**
    * Field key
    */
   private final String key;
   private final boolean usesEmPCR;
+  private final String containerName;
+  private final String partitionName;
   /**
    * Field lookup
    */
@@ -62,9 +65,11 @@ public enum PlatformType {
    * @param key
    *          of type String
    */
-  PlatformType(String key, boolean usesEmPCR) {
+  PlatformType(String key, boolean usesEmPCR, String containerName, String partitionName) {
     this.key = key;
     this.usesEmPCR = usesEmPCR;
+    this.containerName = containerName;
+    this.partitionName = partitionName;
   }
 
   /**
@@ -110,5 +115,13 @@ public enum PlatformType {
 
   public boolean usesEmPCR() {
     return usesEmPCR;
+  }
+  
+  public String getContainerName() {
+    return containerName;
+  }
+  
+  public String getPartitionName() {
+    return partitionName;
   }
 }
