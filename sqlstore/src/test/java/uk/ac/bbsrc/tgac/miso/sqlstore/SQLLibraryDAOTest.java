@@ -88,6 +88,7 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
     MockitoAnnotations.initMocks(this);
     dao.setJdbcTemplate(jdbcTemplate);
     dao.setDataObjectFactory(new TgacDataObjectFactory());
+    dao.setDetailedSampleEnabled(false);
     when(indexStore.getIndexById(Matchers.anyLong())).thenReturn(new Index());
     when(sampleStore.get(Matchers.anyLong())).thenReturn(new SampleImpl());
     when(libraryAdditionalInfoDao.getLibraryAdditionalInfoByLibraryId(Matchers.anyLong())).thenReturn(new LibraryAdditionalInfoImpl());

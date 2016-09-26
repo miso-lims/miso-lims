@@ -630,6 +630,7 @@ public class MisoServiceManager {
 
   public void setDefaultLibraryDao() {
     SQLLibraryDAO dao = new SQLLibraryDAO();
+    dao.setDetailedSampleEnabled(true);
     dao.setAutoGenerateIdentificationBarcodes(autoGenerateIdBarcodes);
     dao.setBoxDAO(boxDao);
     dao.setChangeLogDAO(changeLogDao);
