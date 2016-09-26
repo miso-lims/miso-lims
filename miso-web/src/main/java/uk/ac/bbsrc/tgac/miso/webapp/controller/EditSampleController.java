@@ -83,7 +83,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.QcPassedDetail;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
@@ -692,9 +692,9 @@ public class EditSampleController {
       } else {
         sample = requestManager.getSampleById(sampleId);
         if (sample == null) throw new SecurityException("No such sample.");
-        model.put("sampleCategory", detailedSample ? ((SampleAdditionalInfo) sample).getSampleClass().getSampleCategory() : "plain");
+        model.put("sampleCategory", detailedSample ? ((DetailedSample) sample).getSampleClass().getSampleCategory() : "plain");
         if (detailedSample) {
-          model.put("sampleClass", ((SampleAdditionalInfo) sample).getSampleClass().getAlias());
+          model.put("sampleClass", ((DetailedSample) sample).getSampleClass().getAlias());
         }
         model.put("title", "Sample " + sampleId);
 

@@ -365,7 +365,7 @@ DELETE FROM `LibraryDesign`;
 INSERT INTO `LibraryDesign`(`libraryDesignId`, `name`, `sampleClassId`, `librarySelectionType`, `libraryStrategyType`, `suffix`, `libraryType`)
 VALUES (1, 'DESIGN1', 1, 1, 1, 'D1', 1), (2, 'DESIGN2', 2, 1, 1, 'D2', 1);
 
-INSERT INTO `SampleAdditionalInfo`(`sampleId`, `sampleClassId`, `archived`, `parentId`)
+INSERT INTO `DetailedSample`(`sampleId`, `sampleClassId`, `archived`, `parentId`)
 VALUES (15,1,0,NULL),
 (16,2,0,15),
 (17,2,0,15);

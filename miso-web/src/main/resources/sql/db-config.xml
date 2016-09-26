@@ -55,7 +55,7 @@
         <value>uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletion</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl</value>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAdditionalInfoImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleValidRelationshipImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleNumberPerProjectImpl</value>
@@ -488,7 +488,7 @@
     </property>
   </bean>
   
-  <bean id="hibernateSampleAdditionalInfoDao" class="uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleAdditionalInfoDao">
+  <bean id="hibernateDetailedSampleDao" class="uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateDetailedSampleDao">
     <property name="kitStore" ref="sqlKitDAO" />
   </bean>
   

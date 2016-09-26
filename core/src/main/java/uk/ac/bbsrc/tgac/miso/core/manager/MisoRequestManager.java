@@ -64,7 +64,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
@@ -1675,7 +1675,7 @@ public class MisoRequestManager implements RequestManager {
           throw new IOException("A library design can only be applied to a detailed sample.");
         }
         LibraryDesign design = libraryDesignDao.getLibraryDesign(library.getLibraryAdditionalInfo().getLibraryDesign().getId());
-        if (((SampleAdditionalInfo) library.getSample()).getSampleClass().getId() != design.getSampleClass().getId()) {
+        if (((DetailedSample) library.getSample()).getSampleClass().getId() != design.getSampleClass().getId()) {
           throw new IOException(
               "This library design is not valid for sample " + library.getSample().getName() + " because the class is not compatible.");
         }

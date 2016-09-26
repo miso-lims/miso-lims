@@ -22,9 +22,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleCVSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
@@ -48,8 +48,8 @@ import uk.ac.bbsrc.tgac.miso.persistence.SubprojectDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueMaterialDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueOriginDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueTypeDao;
+import uk.ac.bbsrc.tgac.miso.service.DetailedSampleService;
 import uk.ac.bbsrc.tgac.miso.service.LabService;
-import uk.ac.bbsrc.tgac.miso.service.SampleAdditionalInfoService;
 import uk.ac.bbsrc.tgac.miso.service.SampleNumberPerProjectService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.SampleTissueService;
@@ -72,7 +72,7 @@ public class DefaultSampleService implements SampleService {
   private SampleClassDao sampleClassDao;
 
   @Autowired
-  private SampleAdditionalInfoService sampleAdditionalInfoService;
+  private DetailedSampleService detailedSampleService;
 
   @Autowired
   private SampleValidRelationshipService sampleValidRelationshipService;
@@ -131,8 +131,8 @@ public class DefaultSampleService implements SampleService {
     this.sampleClassDao = sampleClassDao;
   }
 
-  public void setSampleAdditionalInfoService(SampleAdditionalInfoService sampleAdditionalInfoService) {
-    this.sampleAdditionalInfoService = sampleAdditionalInfoService;
+  public void setDetailedSampleService(DetailedSampleService detailedSampleService) {
+    this.detailedSampleService = detailedSampleService;
   }
 
   public void setSampleValidRelationshipService(SampleValidRelationshipService sampleValidRelationshipService) {
@@ -215,7 +215,7 @@ public class DefaultSampleService implements SampleService {
     setChangeDetails(sample);
     if (isDetailedSample(sample)) {
       if (!isIdentitySample(sample)) {
-        SampleAdditionalInfo detailed = (SampleAdditionalInfo) sample;
+        DetailedSample detailed = (DetailedSample) sample;
         try {
           detailed.setParent(findOrCreateParent(detailed));
           detailed.inheritPermissions(detailed.getParent());
@@ -231,7 +231,7 @@ public class DefaultSampleService implements SampleService {
 
     // pre-save field generation
     sample.setName(generateTemporaryName());
-    if (isDetailedSample(sample) && ((SampleAdditionalInfo) sample).hasNonStandardAlias()) {
+    if (isDetailedSample(sample) && ((DetailedSample) sample).hasNonStandardAlias()) {
       // do not validate alias
     } else if (isStringEmptyOrNull(sample.getAlias()) && sampleNamingScheme.hasGeneratorFor("alias")) {
       sample.setAlias(generateTemporaryName());
@@ -239,7 +239,7 @@ public class DefaultSampleService implements SampleService {
       validateAliasUniqueness(sample.getAlias());
     }
     if (isStockSample(sample) || isAliquotSample(sample) || isTissueProcessingSample(sample)) {
-      SampleAdditionalInfo detailed = (SampleAdditionalInfo) sample;
+      DetailedSample detailed = (DetailedSample) sample;
       if (detailed.getParent() != null && detailed.getSiblingNumber() == null) {
         int siblingNumber = sampleDao.getNextSiblingNumber(detailed.getParent(), detailed.getSampleClass());
         detailed.setSiblingNumber(siblingNumber);
@@ -321,7 +321,7 @@ public class DefaultSampleService implements SampleService {
   /**
    * Finds an existing parent Sample or creates a new one if necessary
    * 
-   * @param sample must contain parent (via {@link SampleAdditionalInfo#getParent() getParent}), including externalName if a new parent is
+   * @param sample must contain parent (via {@link DetailedSample#getParent() getParent}), including externalName if a new parent is
    * to be created. An existing parent may be specified by including its sampleId or externalName
    * 
    * @return
@@ -329,7 +329,7 @@ public class DefaultSampleService implements SampleService {
    * @throws SQLException
    * @throws MisoNamingException
    */
-  private SampleAdditionalInfo findOrCreateParent(SampleAdditionalInfo sample) throws IOException, MisoNamingException {
+  private DetailedSample findOrCreateParent(DetailedSample sample) throws IOException, MisoNamingException {
     if (sample.getParent() == null) {
       throw new IllegalArgumentException("Detailed sample is missing parent identifier");
     }
@@ -339,7 +339,7 @@ public class DefaultSampleService implements SampleService {
       if (parent == null)
         throw new IllegalArgumentException("Parent sample does not exist");
       else
-        return (SampleAdditionalInfo) parent;
+        return (DetailedSample) parent;
     } else if (isIdentitySample(tempParent) && !isStringEmptyOrNull(((Identity) tempParent).getExternalName())) {
       Identity parentIdentity = sampleDao.getIdentityByExternalName(((Identity) tempParent).getExternalName());
       if (parentIdentity != null) return parentIdentity;
@@ -354,7 +354,7 @@ public class DefaultSampleService implements SampleService {
     throw new IllegalArgumentException("Could not resolve parent sample");
   }
 
-  private SampleTissue createParentTissue(SampleTissue tissue, SampleAdditionalInfo child) throws IOException {
+  private SampleTissue createParentTissue(SampleTissue tissue, DetailedSample child) throws IOException {
     log.debug("Creating a new Tissue to use as a parent.");
     tissue.setProject(child.getProject());
     tissue.setDescription("Tissue");
@@ -366,7 +366,7 @@ public class DefaultSampleService implements SampleService {
     return tissue;
   }
 
-  private Identity createParentIdentity(SampleAdditionalInfo sample) throws IOException, MisoNamingException, SQLException {
+  private Identity createParentIdentity(DetailedSample sample) throws IOException, MisoNamingException, SQLException {
     log.debug("Creating a new Identity to use as a parent.");
     List<SampleClass> identityClasses = sampleClassDao.listByCategory(Identity.CATEGORY_NAME);
     if (identityClasses.size() != 1) {
@@ -404,9 +404,9 @@ public class DefaultSampleService implements SampleService {
     if (sample.getProject() != null) {
       sample.setProject(projectStore.lazyGet(sample.getProject().getId()));
     }
-    // TODO: move these to public methods in other DAOs (e.g. sampleAdditionalInfoDao.loadChildEntities(SampleAdditionalInfo))
+    // TODO: move these to public methods in other DAOs (e.g. detailedSampleDao.loadChildEntities(DetailedSample))
     if (isDetailedSample(sample)) {
-      SampleAdditionalInfo sai = (SampleAdditionalInfo) sample;
+      DetailedSample sai = (DetailedSample) sample;
       if (sai.getSampleClass() != null && sai.getSampleClass().getId() != null) {
         sai.setSampleClass(sampleClassDao.getSampleClass(sai.getSampleClass().getId()));
       }
@@ -443,7 +443,7 @@ public class DefaultSampleService implements SampleService {
     }
   }
 
-  private void validateHierarchy(SampleAdditionalInfo sample) throws IOException {
+  private void validateHierarchy(DetailedSample sample) throws IOException {
     Set<SampleValidRelationship> sampleValidRelationships = sampleValidRelationshipService.getAll();
     if (!LimsUtils.isValidRelationship(sampleValidRelationships, sample.getParent(), sample)) {
       throw new IllegalArgumentException("Parent " + sample.getParent().getSampleClass().getAlias()
@@ -471,9 +471,9 @@ public class DefaultSampleService implements SampleService {
     setChangeDetails(updatedSample);
     loadChildEntities(updatedSample);
     if (isDetailedSample(updatedSample)) {
-      SampleAdditionalInfo detailedUpdated = (SampleAdditionalInfo) updatedSample;
+      DetailedSample detailedUpdated = (DetailedSample) updatedSample;
       if (detailedUpdated.getParent() != null) {
-        detailedUpdated.setParent((SampleAdditionalInfo) get(detailedUpdated.getParent().getId()));
+        detailedUpdated.setParent((DetailedSample) get(detailedUpdated.getParent().getId()));
         validateHierarchy(detailedUpdated);
       }
     }
@@ -498,7 +498,7 @@ public class DefaultSampleService implements SampleService {
 
     // validate alias uniqueness only if the alias has changed and the sample does not have a non-standard alias
     if (!target.getAlias().equals(source.getAlias())
-        && (!isDetailedSample(target) || (isDetailedSample(target) && !((SampleAdditionalInfo) target).hasNonStandardAlias()))) {
+        && (!isDetailedSample(target) || (isDetailedSample(target) && !((DetailedSample) target).hasNonStandardAlias()))) {
       validateAliasUniqueness(source.getAlias());
     }
     target.setAlias(source.getAlias());
@@ -507,7 +507,7 @@ public class DefaultSampleService implements SampleService {
     target.setVolume(source.getVolume());
     target.setIdentificationBarcode(source.getIdentificationBarcode());
     if (isDetailedSample(target)) {
-      sampleAdditionalInfoService.applyChanges((SampleAdditionalInfo) target, (SampleAdditionalInfo) source);
+      detailedSampleService.applyChanges((DetailedSample) target, (DetailedSample) source);
       if (isIdentitySample(target)) {
         Identity iTarget = (Identity) target;
         Identity iSource = (Identity) source;

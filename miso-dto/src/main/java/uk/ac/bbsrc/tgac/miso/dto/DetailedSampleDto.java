@@ -6,7 +6,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
-public class SampleAdditionalInfoDto extends SampleDto {
+public class DetailedSampleDto extends SampleDto {
 
   private Long parentId;
   private String parentUrl;

@@ -11,24 +11,24 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.collect.Sets;
 
-import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.persistence.QcPassedDetailDao;
-import uk.ac.bbsrc.tgac.miso.persistence.SampleAdditionalInfoDao;
+import uk.ac.bbsrc.tgac.miso.persistence.DetailedSampleDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleClassDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SubprojectDao;
-import uk.ac.bbsrc.tgac.miso.service.SampleAdditionalInfoService;
+import uk.ac.bbsrc.tgac.miso.service.DetailedSampleService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLKitDAO;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
-public class DefaultSampleAdditionalInfoService implements SampleAdditionalInfoService {
+public class DefaultDetailedSampleService implements DetailedSampleService {
 
-  protected static final Logger log = LoggerFactory.getLogger(DefaultSampleAdditionalInfoService.class);
+  protected static final Logger log = LoggerFactory.getLogger(DefaultDetailedSampleService.class);
 
   @Autowired
-  private SampleAdditionalInfoDao sampleAdditionalInfoDao;
+  private DetailedSampleDao detailedSampleDao;
 
   @Autowired
   private SampleDao sampleDao;
@@ -48,8 +48,8 @@ public class DefaultSampleAdditionalInfoService implements SampleAdditionalInfoS
   @Autowired
   private AuthorizationManager authorizationManager;
 
-  public void setSampleAdditionalInfoDao(SampleAdditionalInfoDao sampleAdditionalInfoDao) {
-    this.sampleAdditionalInfoDao = sampleAdditionalInfoDao;
+  public void setDetailedSampleDao(DetailedSampleDao detailedSampleDao) {
+    this.detailedSampleDao = detailedSampleDao;
   }
 
   public void setSampleDao(SampleDao sampleDao) {
@@ -77,13 +77,13 @@ public class DefaultSampleAdditionalInfoService implements SampleAdditionalInfoS
   }
 
   @Override
-  public SampleAdditionalInfo get(Long sampleAdditionalInfoId) throws IOException {
+  public DetailedSample get(Long detailedSampleId) throws IOException {
     authorizationManager.throwIfUnauthenticated();
-    return sampleAdditionalInfoDao.getSampleAdditionalInfo(sampleAdditionalInfoId);
+    return detailedSampleDao.getDetailedSample(detailedSampleId);
   }
 
   @Override
-  public void applyChanges(SampleAdditionalInfo target, SampleAdditionalInfo source) throws IOException {
+  public void applyChanges(DetailedSample target, DetailedSample source) throws IOException {
     target.setArchived(source.getArchived());
     target.setGroupDescription(source.getGroupDescription());
     target.setGroupId(source.getGroupId());
@@ -91,12 +91,12 @@ public class DefaultSampleAdditionalInfoService implements SampleAdditionalInfoS
   }
 
   @Override
-  public void loadMembers(SampleAdditionalInfo target) throws IOException {
+  public void loadMembers(DetailedSample target) throws IOException {
     loadMembers(target, target);
   }
 
   @Override
-  public void loadMembers(SampleAdditionalInfo target, SampleAdditionalInfo source) throws IOException {
+  public void loadMembers(DetailedSample target, DetailedSample source) throws IOException {
     if (source.getQcPassedDetail() != null) {
       target.setQcPassedDetail(qcPassedDetailDao.getQcPassedDetails(source.getQcPassedDetail().getId()));
       ServiceUtils.throwIfNull(target.getQcPassedDetail(), "qcPassedDetailId", source.getQcPassedDetail().getId());
@@ -118,16 +118,16 @@ public class DefaultSampleAdditionalInfoService implements SampleAdditionalInfoS
   }
 
   @Override
-  public Set<SampleAdditionalInfo> getAll() throws IOException {
+  public Set<DetailedSample> getAll() throws IOException {
     authorizationManager.throwIfUnauthenticated();
-    return Sets.newHashSet(sampleAdditionalInfoDao.getSampleAdditionalInfo());
+    return Sets.newHashSet(detailedSampleDao.getDetailedSample());
   }
 
   @Override
-  public void delete(Long sampleAdditionalInfoId) throws IOException {
+  public void delete(Long detailedSampleId) throws IOException {
     authorizationManager.throwIfNonAdmin();
-    SampleAdditionalInfo sampleAdditionalInfo = get(sampleAdditionalInfoId);
-    sampleAdditionalInfoDao.deleteSampleAdditionalInfo(sampleAdditionalInfo);
+    DetailedSample detailedSample = get(detailedSampleId);
+    detailedSampleDao.deleteDetailedSample(detailedSample);
   }
 
 }

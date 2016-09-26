@@ -40,7 +40,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
@@ -124,7 +124,7 @@ public class HibernateSampleDao implements SampleDao {
 
   @Override
   public int getNextSiblingNumber(Sample parent, SampleClass childClass) throws IOException {
-    Query query = currentSession().createQuery("select max(siblingNumber) " + "from SampleAdditionalInfoImpl "
+    Query query = currentSession().createQuery("select max(siblingNumber) " + "from DetailedSampleImpl "
         + "where parentId = :parentId " + "and sampleClassId = :sampleClassId");
     query.setLong("parentId", parent.getId());
     query.setLong("sampleClassId", childClass.getId());
@@ -170,7 +170,7 @@ public class HibernateSampleDao implements SampleDao {
     sample.getChangeLog().addAll(changeLogDao.listAllById("Sample", sample.getId()));
 
     if (LimsUtils.isDetailedSample(sample)) {
-      ((SampleAdditionalInfo) sample).setChildren(listByParentId(sample.getId()));
+      ((DetailedSample) sample).setChildren(listByParentId(sample.getId()));
     }
 
     extractBoxableInformation(template, sample);
@@ -451,12 +451,12 @@ public class HibernateSampleDao implements SampleDao {
     return fetchSqlStore(records);
   }
 
-  private Set<SampleAdditionalInfo> listByParentId(long parentId) {
+  private Set<DetailedSample> listByParentId(long parentId) {
     Query query = currentSession().createQuery("select s from SampleImpl s " + "join s.parent p " + "where p.sampleId = :id");
     query.setLong("id", parentId);
     @SuppressWarnings("unchecked")
-    List<SampleAdditionalInfo> samples = query.list();
-    return new HashSet<SampleAdditionalInfo>(samples);
+    List<DetailedSample> samples = query.list();
+    return new HashSet<DetailedSample>(samples);
   }
 
   /**

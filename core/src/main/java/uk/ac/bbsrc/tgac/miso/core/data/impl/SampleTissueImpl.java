@@ -15,7 +15,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 
 @Entity
 @Table(name = "SampleTissue")
-public class SampleTissueImpl extends SampleAdditionalInfoImpl implements SampleTissue {
+public class SampleTissueImpl extends DetailedSampleImpl implements SampleTissue {
 
   private String externalInstituteIdentifier;
 

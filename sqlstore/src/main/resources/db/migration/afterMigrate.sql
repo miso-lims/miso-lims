@@ -60,7 +60,8 @@ FOR EACH ROW
   END//
 
 DROP TRIGGER IF EXISTS SampleAdditionalInfoChange//
-CREATE TRIGGER SampleAdditionalInfoChange BEFORE UPDATE ON SampleAdditionalInfo
+DROP TRIGGER IF EXISTS DetailedSampleChange//
+CREATE TRIGGER DetailedSampleChange BEFORE UPDATE ON DetailedSample
 FOR EACH ROW
   BEGIN
   DECLARE log_message varchar(500) CHARACTER SET utf8;

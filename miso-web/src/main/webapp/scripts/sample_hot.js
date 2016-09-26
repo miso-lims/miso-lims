@@ -27,7 +27,7 @@ Sample.hot = {
     Sample.hot.sampleClassId = samplesArray[0].sampleClassId;
     return samplesArray.map(function (sam) {
 
-      // add sampleAdditionalInfo values
+      // add detailedSample values
       if (sam.type != 'Plain') {
         // add attributes if it's a first receipt
         sam.sampleClassAlias = Hot.getAliasFromId(sam.sampleClassId, Hot.sampleOptions.sampleClassesDtos);
