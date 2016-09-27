@@ -1,1 +1,0 @@
-ALTER TABLE SampleAdditionalInfo RENAME TO DetailedSample;

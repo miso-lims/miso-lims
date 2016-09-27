@@ -1,1 +1,0 @@
-ALTER TABLE LibraryType ADD COLUMN archived boolean NOT NULL DEFAULT FALSE;
