@@ -128,7 +128,7 @@ public class EditServiceRecordController {
   public ModelAndView newServiceRecord(@PathVariable(value = "sequencerReferenceId") Long sequencerReferenceId, ModelMap model) throws IOException {
     SequencerReference sequencer = requestManager.getSequencerReferenceById(sequencerReferenceId);
     if (sequencer == null) {
-      throw new IOException("No such Sequencer Reference");
+      throw new IOException("No such Sequencer.");
     }
     SequencerServiceRecord record = dataObjectFactory.getSequencerServiceRecord();
     record.setSequencerReference(sequencer);

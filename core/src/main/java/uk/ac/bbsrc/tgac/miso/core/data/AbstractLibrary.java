@@ -506,9 +506,9 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
 
   @Override
   public SampleTissue getSampleTissue() {
-    if (this.getSample() instanceof SampleAdditionalInfo) {
+    if (this.getSample() instanceof DetailedSample) {
 
-      for (SampleAdditionalInfo parent = (SampleAdditionalInfo) this.getSample(); parent != null; parent = parent.getParent()) {
+      for (DetailedSample parent = (DetailedSample) this.getSample(); parent != null; parent = parent.getParent()) {
         if (parent instanceof SampleTissue) return (SampleTissue) parent;
       }
     }

@@ -59,7 +59,7 @@ public class ListKitDescriptorsController {
 
   @ModelAttribute("title")
   public String title() {
-    return "List Consumables";
+    return "Kits";
   }
 
   @RequestMapping("/kitdescriptors")

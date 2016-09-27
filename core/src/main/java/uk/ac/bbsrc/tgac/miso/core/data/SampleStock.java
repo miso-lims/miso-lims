@@ -5,7 +5,7 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import uk.ac.bbsrc.tgac.miso.core.data.type.StrStatus;
 
 @JsonIgnoreProperties({ "sample" })
-public interface SampleStock extends SampleAdditionalInfo {
+public interface SampleStock extends DetailedSample {
 
   public static String CATEGORY_NAME = "Stock";
 

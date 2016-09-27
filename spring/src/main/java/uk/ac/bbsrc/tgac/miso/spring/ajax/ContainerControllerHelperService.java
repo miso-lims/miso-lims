@@ -158,7 +158,7 @@ public class ContainerControllerHelperService {
 
   private String getContainerOptions(SequencerReference sr) throws IOException {
     StringBuilder b = new StringBuilder();
-    b.append("<span id='containerspan'>Containers: ");
+    b.append("<span id='containerspan'>" + sr.getPlatform().getPlatformType().getContainerName() + "s: ");
     PlatformType pt = sr.getPlatform().getPlatformType();
     for (int i = 0; i < sr.getPlatform().getNumContainers(); i++) {
       b.append(
@@ -191,32 +191,38 @@ public class ContainerControllerHelperService {
     }
     return JSONUtils.SimpleJSONError("No platform specified");
   }
+  
+  public String containerInfoHtml(PlatformType platformType) {
+    StringBuilder sb = new StringBuilder();
+    sb.append("<h2>" + platformType.getContainerName() + "</h2>");
+    sb.append("<table class='in'>");
+    sb.append(
+        "<tr><td>Serial Number:</td><td><button onclick='Container.lookupContainer(this);' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button><div style='overflow:hidden'><input type='text' id='identificationBarcode' name='identificationBarcode'/><input type='hidden' value='on' name='_identificationBarcode'></div></td></tr>");
+    sb.append(
+        "<tr><td>Location:</td><td><input type='text' id='locationBarcode' name='locationBarcode'/><input type='hidden' value='on' name='_locationBarcode'></td></tr>");
+    sb.append(
+        "<tr><td>Validation:</td><td><input type='text' id='validationBarcode' name='validationBarcode'/><input type='hidden' value='on' name='_validationBarcode'></td></tr>");
+    sb.append(
+        "<tr><td>Paired:</td><td><input type='checkbox' id='paired' name='paired' value='false'/><input type='hidden' value='on' name='_paired'></td></tr>");
+    sb.append("</table>");
+    sb.append("<div id='partitionErrorDiv'> </div>");
+    sb.append("<div id='partitionDiv'>");
+    return sb.toString();
+  }
 
   public JSONObject changeIlluminaContainer(HttpSession session, JSONObject json) {
     long seqRefId = json.getLong("sequencerReferenceId");
     StringBuilder b = new StringBuilder();
-    b.append("<h2>Container</h2>");
-    b.append("<table class='in'>");
-    b.append(
-        "<tr><td>ID:</td><td><button onclick='Container.lookupContainer(this);' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button><div style='overflow:hidden'><input type='text' id='identificationBarcode' name='identificationBarcode'/><input type='hidden' value='on' name='_identificationBarcode'></div></td></tr>");
-    b.append(
-        "<tr><td>Location:</td><td><input type='text' id='locationBarcode' name='locationBarcode'/><input type='hidden' value='on' name='_locationBarcode'></td></tr>");
-    b.append(
-        "<tr><td>Validation:</td><td><input type='text' id='validationBarcode' name='validationBarcode'/><input type='hidden' value='on' name='_validationBarcode'></td></tr>");
-    b.append(
-        "<tr><td>Paired:</td><td><input type='checkbox' id='paired' name='paired' value='false'/><input type='hidden' value='on' name='_paired'></td></tr>");
-    b.append("</table>");
-    b.append("<div id='partitionErrorDiv'> </div>");
-    b.append("<div id='partitionDiv'>");
+    b.append(containerInfoHtml(PlatformType.ILLUMINA));
 
     try {
       SequencerReference sr = requestManager.getSequencerReferenceById(seqRefId);
       String instrumentModel = sr.getPlatform().getInstrumentModel();
       if ("Illumina MiSeq".equals(instrumentModel) || "Illumina NextSeq 500".equals(instrumentModel)) {
         b.append(
-            "<i class='italicInfo'>Click in a lane box to beep/type in barcodes, or double click a pool on the right to sequentially add pools to the container</i>");
+            "<i class='italicInfo'>Click in a " + PlatformType.get("Illumina").getPartitionName() + " box to beep/type in barcodes, or double click a pool on the right to sequentially add pools to the " + PlatformType.get("Illumina").getContainerName() + "</i>");
         b.append("<table class='in'>");
-        b.append("<th>Lane No.</th>");
+        b.append("<th>" + PlatformType.get("Illumina").getPartitionName() + " No.</th>");
         b.append("<th>Pool</th>");
 
         b.append(
@@ -241,9 +247,9 @@ public class ContainerControllerHelperService {
         b.append("<div id='containerdiv0'> </div>");
       } else {
         b.append(
-            "<i class='italicInfo'>Click in a lane box to beep/type in barcodes, or double click a pool on the right to sequentially add pools to the container</i>");
+            "<i class='italicInfo'>Click in a " + PlatformType.get("Illumina").getPartitionName() + " box to beep/type in barcodes, or double click a pool on the right to sequentially add pools to the " + PlatformType.get("Illumina").getContainerName() + "</i>");
         b.append("<table class='in'>");
-        b.append("<th>Lane No.</th>");
+        b.append("<th>" + PlatformType.get("Illumina").getPartitionName() + " No.</th>");
         b.append("<th>Pool</th>");
 
         b.append(
@@ -282,19 +288,7 @@ public class ContainerControllerHelperService {
 
   public JSONObject changeLS454Container(HttpSession session, JSONObject json) {
     StringBuilder b = new StringBuilder();
-    b.append("<h2>Container</h2>");
-    b.append("<table class='in'>");
-    b.append(
-        "<tr><td>ID:</td><td><input type='text' id='identificationBarcode' name='identificationBarcode'/><input type='hidden' value='on' name='_identificationBarcode'><button onclick='Container.lookupContainer(this);' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button></td></tr>");
-    b.append(
-        "<tr><td>Location:</td><td><input type='text' id='locationBarcode' name='locationBarcode'/><input type='hidden' value='on' name='_locationBarcode'></td></tr>");
-    b.append(
-        "<tr><td>Validation:</td><td><input type='text' id='validationBarcode' name='validationBarcode'/><input type='hidden' value='on' name='_validationBarcode'></td></tr>");
-    b.append(
-        "<tr><td>Paired:</td><td><input type='checkbox' id='paired' name='paired'/><input type='hidden' value='on' name='_paired'></td></tr>");
-    b.append("</table>");
-    b.append("<div id='partitionErrorDiv'> </div>");
-    b.append("<div id='partitionDiv'>");
+    b.append(containerInfoHtml(PlatformType.LS454));
     b.append(
         "<input id='chamber1' name='container0Select' onchange='Container.ui.changeContainerLS454Chamber(this, 0);' type='radio' value='1'/>1 ");
     b.append(
@@ -315,22 +309,10 @@ public class ContainerControllerHelperService {
     StringBuilder b = new StringBuilder();
     try {
       SequencerReference sr = requestManager.getSequencerReferenceById(seqRefId);
-      b.append("<h2>Container</h2>");
-      b.append("<table class='in'>");
-      b.append(
-          "<tr><td>ID:</td><td><button onclick='Container.lookupContainer(this);' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button><div style='overflow:hidden'><input type='text' id='identificationBarcode' name='identificationBarcode'/><input type='hidden' value='on' name='_identificationBarcode'></div></td></tr>");
-      b.append(
-          "<tr><td>Location:</td><td><input type='text' id='locationBarcode' name='locationBarcode'/><input type='hidden' value='on' name='_locationBarcode'></td></tr>");
-      b.append(
-          "<tr><td>Validation:</td><td><input type='text' id='validationBarcode' name='validationBarcode'/><input type='hidden' value='on' name='_validationBarcode'></td></tr>");
-      b.append(
-          "<tr><td>Paired:</td><td><input type='checkbox' id='paired' name='paired'/><input type='hidden' value='on' name='_paired'></td></tr>");
-      b.append("</table>");
-      b.append("<div id='partitionErrorDiv'> </div>");
-      b.append("<div id='partitionDiv'>");
+      b.append(containerInfoHtml(PlatformType.SOLID));
       if ("AB SOLiD 5500xl".equals(sr.getPlatform().getInstrumentModel())) {
         b.append("<table class='in'>");
-        b.append("<th>Chamber No.</th>");
+        b.append("<th>" + PlatformType.SOLID.getPartitionName() + " No.</th>");
         b.append("<th>Pool</th>");
 
         b.append(
@@ -373,19 +355,7 @@ public class ContainerControllerHelperService {
 
   public JSONObject changePacBioContainer(HttpSession session, JSONObject json) {
     StringBuilder b = new StringBuilder();
-    b.append("<h2>Container</h2>");
-    b.append("<table class='in'>");
-    b.append(
-        "<tr><td>ID:</td><td><input type='text' id='identificationBarcode' name='identificationBarcode'/><input type='hidden' value='on' name='_identificationBarcode'><button onclick='Container.lookupContainer(this);' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button></td></tr>");
-    b.append(
-        "<tr><td>Location:</td><td><input type='text' id='locationBarcode' name='locationBarcode'/><input type='hidden' value='on' name='_locationBarcode'></td></tr>");
-    b.append(
-        "<tr><td>Validation:</td><td><input type='text' id='validationBarcode' name='validationBarcode'/><input type='hidden' value='on' name='_validationBarcode'></td></tr>");
-    b.append(
-        "<tr><td>Paired:</td><td><input type='checkbox' id='paired' name='paired'/><input type='hidden' value='on' name='_paired'></td></tr>");
-    b.append("</table>");
-    b.append("<div id='partitionErrorDiv'> </div>");
-    b.append("<div id='partitionDiv'>");
+    b.append(containerInfoHtml(PlatformType.PACBIO));
     b.append(
         "<input id='chamber1' name='container0Select' onchange='Container.ui.changeContainerPacBioChamber(this, 0);' type='radio' value='1'/>1 ");
     b.append(
@@ -408,17 +378,19 @@ public class ContainerControllerHelperService {
     return JSONUtils.SimpleJSONResponse(b.toString());
   }
 
-  public JSONObject changeChamber(HttpSession session, JSONObject json) {
+  public JSONObject changePartition(HttpSession session, JSONObject json) {
     if (json.has("platform")) {
       String platform = json.getString("platform");
       PlatformType pt = PlatformType.get(platform);
       if (pt != null) {
-        if (pt.equals(PlatformType.LS454)) {
-          return changeLS454Chamber(session, json);
+        if (pt.equals(PlatformType.ILLUMINA)) {
+          return changePlatformTypePartition(PlatformType.ILLUMINA, session, json);
+        } else if (pt.equals(PlatformType.LS454)) {
+          return changePlatformTypePartition(PlatformType.LS454, session, json);
         } else if (pt.equals(PlatformType.SOLID)) {
-          return changeSolidChamber(session, json);
+          return changePlatformTypePartition(PlatformType.SOLID, session, json);
         } else if (pt.equals(PlatformType.PACBIO)) {
-          return changePacBioChamber(session, json);
+          return changePlatformTypePartition(PlatformType.PACBIO, session, json);
         } else {
           return JSONUtils.SimpleJSONError("Unrecognised platform type: " + platform);
         }
@@ -426,24 +398,33 @@ public class ContainerControllerHelperService {
     }
     return JSONUtils.SimpleJSONError("No platform specified");
   }
-
-  public JSONObject changeIlluminaLane(HttpSession session, JSONObject json) {
-    int numLanes = json.getInt("numLanes");
+  
+  public JSONObject changePlatformTypePartition(PlatformType platformType, HttpSession session, JSONObject json) {
+    String partitionsLabel;
+    if (platformType.equals(PlatformType.ILLUMINA)) {
+      partitionsLabel = "numLanes";
+    } else if (platformType.equals(PlatformType.LS454) || platformType.equals(PlatformType.SOLID) || platformType.equals(PlatformType.PACBIO)){
+      partitionsLabel = "numChambers";
+    } else {
+      return JSONUtils.SimpleJSONError("Unknown platform; cannot derive label.");
+    }
+    int numPartitions = json.getInt(partitionsLabel);
     int container = json.getInt("container");
+    
     StringBuilder b = new StringBuilder();
     b.append(
-        "<i class='italicInfo'>Click in a lane box to beep/type in barcodes, or double click a pool on the right to sequentially add pools to the container</i>");
+        "<i class='italicInfo'>Click in a " + platformType.getPartitionName() + " box to beep/type in barcodes, or double click a pool on the right to sequentially add pools to the " + platformType.getContainerName() + "</i>");
     b.append("<table class='in'>");
-    b.append("<th>Lane No.</th>");
+    b.append("<th>" + platformType.getPartitionName() + " No.</th>");
     b.append("<th>Pool</th>");
 
     SequencerPartitionContainer<SequencerPoolPartition> lf = (SequencerPartitionContainer<SequencerPoolPartition>) session
         .getAttribute("container_" + json.getString("container_cId"));
-    lf.setPartitionLimit(numLanes);
+    lf.setPartitionLimit(numPartitions);
     lf.initEmptyPartitions();
     session.setAttribute("container_" + json.getString("container_cId"), lf);
 
-    for (int i = 0; i < numLanes; i++) {
+    for (int i = 0; i < numPartitions; i++) {
       b.append("<tr><td>" + (i + 1) + "</td>");
       b.append(
           "<td width='90%'><div id='p_div_" + container + "-" + i
@@ -453,93 +434,7 @@ public class ContainerControllerHelperService {
       b.append("</tr>");
     }
     b.append("</table>");
-
-    return JSONUtils.SimpleJSONResponse(b.toString());
-  }
-
-  public JSONObject changeLS454Chamber(HttpSession session, JSONObject json) {
-    int numChambers = json.getInt("numChambers");
-    int container = json.getInt("container");
-    StringBuilder b = new StringBuilder();
-    b.append(
-        "<i class='italicInfo'>Click in a partition box to beep/type in barcodes, or double click a pool on the right to sequentially add pools to the container</i>");
-    b.append("<table class='in'>");
-    b.append("<th>Chamber No.</th>");
-    b.append("<th>Pool</th>");
-
-    SequencerPartitionContainer<SequencerPoolPartition> lf = (SequencerPartitionContainer<SequencerPoolPartition>) session
-        .getAttribute("container_" + json.getString("container_cId"));
-    lf.setPartitionLimit(numChambers);
-    lf.initEmptyPartitions();
-    session.setAttribute("container_" + json.getString("container_cId"), lf);
-
-    for (int i = 0; i < numChambers; i++) {
-      b.append("<tr><td>" + (i + 1) + "</td>");
-      b.append(
-          "<td width='90%'><div id='p_div_" + container + "-" + i
-              + "' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='partitions[" + i + "].pool' partition='" + i
-              + "' ondblclick='Container.partition.populatePartition(this);'>");
-      b.append("</ul></div></td>");
-      b.append("</tr>");
-    }
-    b.append("</table>");
-    return JSONUtils.SimpleJSONResponse(b.toString());
-  }
-
-  public JSONObject changeSolidChamber(HttpSession session, JSONObject json) {
-    int numChambers = json.getInt("numChambers");
-    int container = json.getInt("container");
-    StringBuilder b = new StringBuilder();
-    b.append(
-        "<i class='italicInfo'>Click in a partition box to beep/type in barcodes, or double click a pool on the right to sequentially add pools to the container</i>");
-    b.append("<table class='in'>");
-    b.append("<th>Chamber No.</th>");
-    b.append("<th>Pool</th>");
-
-    SequencerPartitionContainer<SequencerPoolPartition> lf = (SequencerPartitionContainer<SequencerPoolPartition>) session
-        .getAttribute("container_" + json.getString("container_cId"));
-    lf.setPartitionLimit(numChambers);
-    lf.initEmptyPartitions();
-    session.setAttribute("container_" + json.getString("container_cId"), lf);
-
-    for (int i = 0; i < numChambers; i++) {
-      b.append("<tr><td>" + (i + 1) + "</td>");
-      b.append(
-          "<td width='90%'><div id='p_div_" + container + "-" + i
-              + "' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='partitions[" + i + "].pool' partition='" + i
-              + "' ondblclick='Container.partition.populatePartition(this);'>");
-      b.append("</ul></div></td>");
-      b.append("</tr>");
-    }
-    b.append("</table>");
-    return JSONUtils.SimpleJSONResponse(b.toString());
-  }
-
-  public JSONObject changePacBioChamber(HttpSession session, JSONObject json) {
-    int numChambers = json.getInt("numChambers");
-    int container = json.getInt("container");
-    StringBuilder b = new StringBuilder();
-    b.append(
-        "<i class='italicInfo'>Click in a partition box to beep/type in barcodes, or double click a pool on the right to sequentially add pools to the container</i>");
-    b.append("<table class='in'>");
-    b.append("<th>Chamber No.</th>");
-    b.append("<th>Pool</th>");
-
-    SequencerPartitionContainer<SequencerPoolPartition> lf = (SequencerPartitionContainer<SequencerPoolPartition>) session
-        .getAttribute("container_" + json.getString("container_cId"));
-    lf.setPartitionLimit(numChambers);
-    lf.initEmptyPartitions();
-    session.setAttribute("container_" + json.getString("container_cId"), lf);
-
-    for (int i = 0; i < numChambers; i++) {
-      b.append("<tr><td>" + (i + 1) + "</td>");
-      b.append(
-          "<td width='90%'><div id='p_div_" + container + "-" + i
-              + "' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='partitions[" + i + "].pool' partition='" + i
-              + "' ondblclick='Container.partition.populatePartition(this);'>");
-      b.append("</tr>");
-    }
-    b.append("</table>");
+    
     return JSONUtils.SimpleJSONResponse(b.toString());
   }
 

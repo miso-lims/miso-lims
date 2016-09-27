@@ -6,7 +6,7 @@ import org.junit.Test;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
@@ -67,7 +67,7 @@ public class DtosTestSuite {
 
     assertNotNull(analyte.getParent());
     assertTrue(LimsUtils.isDetailedSample(analyte.getParent()));
-    SampleAdditionalInfo parent = analyte.getParent();
+    DetailedSample parent = analyte.getParent();
     assertEquals(6L, parent.getId());
 
     assertNull(parent.getParent());

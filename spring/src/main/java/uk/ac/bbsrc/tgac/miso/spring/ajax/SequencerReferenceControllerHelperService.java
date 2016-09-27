@@ -151,13 +151,13 @@ public class SequencerReferenceControllerHelperService {
         Long refId = json.getLong("refId");
         try {
           requestManager.deleteSequencerReference(requestManager.getSequencerReferenceById(refId));
-          return JSONUtils.SimpleJSONResponse("Sequencer Reference deleted");
+          return JSONUtils.SimpleJSONResponse("Sequencer deleted");
         } catch (IOException e) {
           log.error("cannot delete sequencer reference", e);
           return JSONUtils.SimpleJSONError("Cannot delete sequencer reference: " + e.getMessage());
         }
       } else {
-        return JSONUtils.SimpleJSONError("No Sequencer Reference specified to delete.");
+        return JSONUtils.SimpleJSONError("No Sequencer specified to delete.");
       }
     } else {
       return JSONUtils.SimpleJSONError("Only admins can delete objects.");

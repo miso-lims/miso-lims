@@ -27,6 +27,7 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.nullifyStringIfBlank;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -82,7 +83,7 @@ public abstract class AbstractPool<P extends Poolable<?, ?>> extends AbstractBox
   private String name;
   private String description;
 
-  private final Collection<P> pooledElements = new HashSet<P>();
+  private Collection<P> pooledElements = new HashSet<P>();
   private Collection<Experiment> experiments = new HashSet<Experiment>();
   private Date creationDate;
   private Double concentration;
@@ -164,22 +165,14 @@ public abstract class AbstractPool<P extends Poolable<?, ?>> extends AbstractBox
     pooledElements.add(poolable);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   @JsonDeserialize(using = PooledElementDeserializer.class)
   public <T extends Poolable> void setPoolableElements(Collection<T> poolables) {
-    this.pooledElements.clear();
-    if (poolables != null && !poolables.isEmpty()) {
-      for (T poolable : poolables) {
-        if (poolable != null) {
-          if (poolable instanceof Poolable) {
-            this.pooledElements.add((P) poolable);
-          } else {
-            log.error(poolable.getClass().getName());
-          }
-        } else {
-          log.error("Null poolable");
-        }
-      }
+    if (poolables == null) {
+      this.pooledElements = Collections.emptySet();
+    } else {
+      this.pooledElements = (Collection<P>) poolables;
     }
   }
 

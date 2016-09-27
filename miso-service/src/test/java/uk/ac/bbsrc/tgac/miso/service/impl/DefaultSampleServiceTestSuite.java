@@ -28,7 +28,7 @@ import com.google.common.collect.Lists;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
@@ -55,7 +55,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.SubprojectDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueMaterialDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueOriginDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueTypeDao;
-import uk.ac.bbsrc.tgac.miso.service.SampleAdditionalInfoService;
+import uk.ac.bbsrc.tgac.miso.service.DetailedSampleService;
 import uk.ac.bbsrc.tgac.miso.service.SampleNumberPerProjectService;
 import uk.ac.bbsrc.tgac.miso.service.SampleTissueService;
 import uk.ac.bbsrc.tgac.miso.service.SampleValidRelationshipService;
@@ -80,7 +80,7 @@ public class DefaultSampleServiceTestSuite {
   private SampleClassDao sampleClassDao;
 
   @Mock
-  private SampleAdditionalInfoService sampleAdditionalInfoService;
+  private DetailedSampleService detailedSampleService;
 
   @Mock
   private SampleValidRelationshipService sampleValidRelationshipService;
@@ -236,7 +236,7 @@ public class DefaultSampleServiceTestSuite {
     child.getParent().setId(parent.getId());
 
     Long newId = 89L;
-    SampleAdditionalInfo postSave = makeUnsavedChildTissue();
+    DetailedSample postSave = makeUnsavedChildTissue();
     postSave.setId(newId);
     postSave.setParent(parent);
 

@@ -1082,7 +1082,7 @@ Sample.ui = {
           "iSortPriority": 2
         },
         {
-          "sTitle": "ID",
+          "sTitle": "Barcode",
           "mData": "identificationBarcode",
           "bVisible": false,
           "iSortPriority": 0
@@ -1265,13 +1265,12 @@ Sample.ui = {
    * Create new libraries from the selected samples
    */
   propagateLibSelectedItems: function () {
-    jQuery('#go').attr('disabled', 'disabled');
     if (Sample.detailedSample) {
       // rejects propagation if samples are not of aliquot category
       // TODO: add a more detailed check, or library designs?
       var category = Sample.ui.getUniqueCategoriesForSelected();
-      if (category.length != 1 && category[0] !== 'Aliquot') {
-        jQuery('#errors').html("Identity, Tissue, Tissue Processing, and Stock samples cannot be propagated to libraries.");
+      if (category.length !== 1 || category[0] !== 'Aliquot') {
+        jQuery('#errors').html("Only Aliquot samples can be propagated to libraries.");
         jQuery('#errors').css('display', 'block');
         return false;
       }

@@ -21,7 +21,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.QcPassedDetail;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleCVSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
@@ -43,7 +43,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleQcException;
 import uk.ac.bbsrc.tgac.miso.core.exception.ReportingException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
-public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAliquot, SampleStock, SampleTissue, SampleTissueProcessing,
+public class DetailedSampleBuilder implements DetailedSample, SampleAliquot, SampleStock, SampleTissue, SampleTissueProcessing,
     SampleCVSlide, SampleLCMTube, Identity {
 
   @SuppressWarnings("unused")
@@ -75,7 +75,7 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAliquo
   private Collection<Note> notes = new HashSet<Note>();
 
   // DetailedSample attributes
-  private SampleAdditionalInfo parent;
+  private DetailedSample parent;
   private SampleClass sampleClass;
   private QcPassedDetail qcPassedDetail;
   private Subproject subproject;
@@ -335,22 +335,22 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAliquo
   }
 
   @Override
-  public SampleAdditionalInfo getParent() {
+  public DetailedSample getParent() {
     return parent;
   }
 
   @Override
-  public void setParent(SampleAdditionalInfo parent) {
+  public void setParent(DetailedSample parent) {
     this.parent = parent;
   }
 
   @Override
-  public Set<SampleAdditionalInfo> getChildren() {
+  public Set<DetailedSample> getChildren() {
     throw new UnsupportedOperationException("Method not implemented on builder");
   }
 
   @Override
-  public void setChildren(Set<SampleAdditionalInfo> children) {
+  public void setChildren(Set<DetailedSample> children) {
     throw new UnsupportedOperationException("Method not implemented on builder");
   }
 
@@ -824,11 +824,11 @@ public class DetailedSampleBuilder implements SampleAdditionalInfo, SampleAliquo
     this.nonStandardAlias = nonStandardAlias;
   }
 
-  public SampleAdditionalInfo build() {
+  public DetailedSample build() {
     if (sampleClass == null || sampleClass.getSampleCategory() == null) {
       throw new NullPointerException("Missing sample class or category");
     }
-    SampleAdditionalInfo sample = null;
+    DetailedSample sample = null;
     switch (sampleClass.getSampleCategory()) {
     case Identity.CATEGORY_NAME:
       Identity identity = new IdentityImpl();

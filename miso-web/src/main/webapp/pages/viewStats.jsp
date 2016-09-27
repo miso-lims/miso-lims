@@ -134,10 +134,10 @@
       </c:when>
       <c:otherwise>
         <c:if test="${empty referenceId}">
-          <h1>${platformtype} Sequencer References</h1>
+          <h1>${platformtype} Sequencers</h1>
           <c:if test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
             <a href='javascript:void(0);' class="add" onclick="Sequencer.ui.insertSequencerReferenceRow(); return false;">Add
-              Sequencer Reference</a><br/>
+              Sequencer</a><br/>
           </c:if>
 
           <div id="addSequencerReference"></div>
@@ -179,6 +179,9 @@
                             <td><a href="<c:url value="/miso/stats/solid/${ref.id}"/>">View</a> (<a
                                     href="http://${ref.FQDN}${path}">SETS</a>)
                             </td>
+                          </c:when>
+                          <c:when test="${ref.platform.platformType.key eq 'PacBio'}">
+                            <td><a href="<c:url value="/miso/stats/pacbio/${ref.id}"/>">View</a></td>
                           </c:when>
                           <c:otherwise>
                             <td><a href="http://${ref.FQDN}${path}">View</a></td>

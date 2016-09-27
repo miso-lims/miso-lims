@@ -419,24 +419,17 @@
 <div id="runPartitions">
 <c:choose>
 <c:when test="${empty run.sequencerPartitionContainers}">
-  Container:
-  <c:choose>
-    <c:when test="${not empty run.sequencerReference}">
-      <c:forEach var="platformContainerCount" begin="1"
-                 end="${run.sequencerReference.platform.numContainers}" step="1"
-                 varStatus="platformContainer">
-        <input id='container${platformContainerCount}select' name='containerselect'
-               onchange="Run.container.changeContainer(this.value, '${run.platformType.key}', ${run.sequencerReference.id});"
-               type='radio'
-               value='${platformContainerCount}'/>${platformContainerCount}
-      </c:forEach>
-    </c:when>
-    <c:otherwise>
-      <input id='container1select' name='containerselect'
-             onchange="Run.container.changeContainer(this.value, '${run.platformType.key}', ${run.sequencerReference.id});"
-             type='radio' value='1'/>1
-    </c:otherwise>
-  </c:choose>
+  <if test="${not empty run.sequencerReference}">
+    Container:
+     <c:forEach var="platformContainerCount" begin="1"
+                end="${run.sequencerReference.platform.numContainers}" step="1"
+                varStatus="platformContainer">
+       <input id='container${platformContainerCount}select' name='containerselect'
+              onchange="Run.container.changeContainer(this.value, '${run.platformType.key}', ${run.sequencerReference.id});"
+              type='radio'
+              value='${platformContainerCount}'/>${platformContainerCount}
+     </c:forEach>
+   </if>
   <br/>
 
   <div id='containerdiv' class="note ui-corner-all"></div>
@@ -444,7 +437,7 @@
 <c:otherwise>
   <c:forEach items="${run.sequencerPartitionContainers}" var="container" varStatus="containerCount">
     <div class="note ui-corner-all">
-      <h2>Container ${containerCount.count}</h2>
+      <h2>${run.platformType.containerName} ${containerCount.count}</h2>
       <c:if test="${not empty container.identificationBarcode}">
         <ul class="sddm">
           <li>
@@ -472,7 +465,7 @@
         <tr>
           <c:choose>
             <c:when test="${empty container.identificationBarcode}">
-              <td>ID:</td>
+              <td>Serial Number:</td>
               <td>
                 <button id="pencil" onclick='Run.container.lookupContainer(this, ${containerCount.index});'
                         type='button' class='right-button ui-state-default ui-corner-all'>
@@ -485,7 +478,7 @@
               </td>
             </c:when>
             <c:otherwise>
-              <td>ID:</td>
+              <td>Serial Number:</td>
               <td>
                 <span id="idBarcode">${container.identificationBarcode}</span>
                 <a href="javascript:void(0);"
@@ -548,11 +541,11 @@
       </table>
       <div id='partitionErrorDiv' class="parsley-custom-error-message"></div>
       <div id="partitionDiv">
-        <i class="italicInfo">Click in a partition box to beep/type in barcodes, or double click a
-          pool on the right to sequentially add pools to the container</i>
+        <i class="italicInfo">Click in a ${run.platformType.partitionName} box to beep/type in barcodes, or double click a
+          pool on the right to sequentially add pools to the ${run.platformType.containerName}</i>
         <table class="in">
           <tr>
-	          <th>Partition No.</th>
+	          <th>${run.platformType.partitionName} No.</th>
 	          <th>Pool</th>
 	          <c:if test="${statsAvailable}">
 	            <th>Stats</th>
@@ -770,7 +763,7 @@
 <c:if test="${not empty run.changeLog}">
   <br/>
   <h1>Changes</h1>
-  <span style="clear:both">
+  <div style="clear:both">
     <table class="list" id="changelog_table">
       <thead>
       <tr>
@@ -789,7 +782,7 @@
       </c:forEach>
       </tbody>
     </table>
-  </span>
+  </div>
 </c:if>
 </div>
 

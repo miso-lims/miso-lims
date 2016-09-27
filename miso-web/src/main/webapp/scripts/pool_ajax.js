@@ -491,7 +491,7 @@ Pool.ui = {
           "iSortPriority" : 2
         },
         {
-          "sTitle": "ID",
+          "sTitle": "Barcode",
           "mData": "identificationBarcode",
           "bVisible": false,
           "iSortPriority" : 0
@@ -523,23 +523,6 @@ Pool.ui = {
     })).fnSetFilteringDelay();
   },
 
-  getPoolableElementInfo : function(poolId, elementId) {
-    Fluxion.doAjax(
-      'poolControllerHelperService',
-      'getPoolableElementInfo',
-      {
-        'poolId':poolId,
-        'elementId':elementId,
-        'url':ajaxurl
-      },
-      {
-        'doOnSuccess': function(json) {
-          jQuery('#element'+elementId).append(json.info);
-        }
-      }
-    );
-  },
-
   createElementSelectDatatable : function(platform, poolId, libraryDilutionConcentrationUnits) {
     jQuery('#elementSelectDatatableDiv').html("<table cellpadding='0' width='100%' cellspacing='0' border='0' class='display' id='elementSelectDatatable'></table>");
     jQuery('#elementSelectDatatable').html("<img src='/styles/images/ajax-loader.gif'/>");
@@ -558,7 +541,7 @@ Pool.ui = {
             "aaData": json.poolelements,
             "aoColumns": [
               { "sTitle": "Dilution Name", "sType":"natural"},
-              { "sTitle": "Concentration ("+libraryDilutionConcentrationUnits+")", "sType":"natural"},
+              { "sTitle": "Conc. ("+libraryDilutionConcentrationUnits+")", "sType":"natural"},
               { "sTitle": "Library", "sType":"natural"},
               { "sTitle": "Sample", "sType":"natural"},
               { "sTitle": "Indices", "sType":"natural"},
@@ -567,9 +550,23 @@ Pool.ui = {
             ],
             "bJQueryUI": true,
             "iDisplayLength":  25,
+            "sPaginationType": "full_numbers",
             "aaSorting":[
               [0,"desc"]
-            ]
+            ],
+            "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+              jQuery(nRow).attr("id", "poolable_" + aData[0]);
+              if (jQuery('#pooled_' + aData[0]).length) {
+                jQuery('td:eq(6)', nRow).addClass('disabled');
+                jQuery('td:eq(6)', nRow).prop('disabled', true);
+                jQuery('td:eq(6)', nRow).css('cursor', 'default');
+              } else {
+                jQuery('td:eq(6)', nRow).css('cursor', 'pointer');
+              }
+            },
+            "fnDrawCallback": function () {
+              jQuery('#elementSelectDatatable_paginate').find('.fg-button').removeClass('fg-button');
+            } 
           });
         }
       }
@@ -580,19 +577,32 @@ Pool.ui = {
     Pool.ui.createElementSelectDatatable(jQuery('#platformType').val());
   },
 
-  removePoolableElement : function(poolId, dilutionId, uiElement) {
+  removePooledElement : function (poolId, dilutionId, elementName) {
     if (poolId) {
-	  if (confirm("Are you sure you want to delete this dilution?")) {
-	    Fluxion.doAjax(
+  	  if (confirm("Are you sure you want to remove " + elementName + " from this pool?")) {
+  	    Fluxion.doAjax(
           'poolControllerHelperService',
-          'removePoolableElement',
+          'removePooledElement',
           {
             'poolId':poolId,
             'dilutionId':dilutionId,
             'url':ajaxurl
           },
           {
-            'doOnSuccess': function() { uiElement.remove(); }
+            'doOnSuccess': function() {
+              function findByName (arrayElement, index, array) {
+                return arrayElement[0] == elementName;
+              }
+              var indexToDelete = jQuery('#pooledElementsDatatable').dataTable().fnGetData().findIndex(findByName);
+              // remove it from the Selected element(s) table
+              jQuery('#pooledElementsDatatable').dataTable().fnDeleteRow(indexToDelete);
+              // re-enable the Add button on Select poolable elements table if it's been disabled
+              if (jQuery('#poolable_' + elementName).length && jQuery('#poolable_' + elementName).children().last().hasClass('disabled')) {
+                jQuery('#poolable_' + elementName).children().last().removeClass('disabled');
+                jQuery('#poolable_' + elementName).children().last().prop('disabled', false);
+                jQuery('#poolable_' + elementName).children().last().css('cursor', 'pointer');
+              }
+            }
           }
         );
       }
@@ -760,23 +770,41 @@ Pool.search = {
   },
 
   poolSearchSelectElement : function(poolId, elementId, elementName) {
-    if (jQuery("#element" + elementId).length > 0) {
+    if (jQuery("#pooled_" + elementName).length > 0) {
       alert("Element " + elementName + " is already part of this pool.");
       jQuery('#searchElementsResult').css('visibility', 'hidden');
     } else {
-      var addElement = function() {
-        var div = "<div onMouseOver='this.className=\"dashboardhighlight\"' onMouseOut='this.className=\"dashboard\"' class='dashboard'>";
-        div += "<span class='float-left' id='element"+elementId+"'>";
-        if (poolId == 0) {
-          div += "<input type='hidden' id='poolableElements" + elementId + "' value='" + elementName + "' name='poolableElements'/>";
-        }
-        div += "<b>Element: " + elementName + "</b></span>";
-        div += "<span onclick='Pool.ui.removePoolableElement(" + poolId + ", " + elementId + ", jQuery(this).parent());' class='float-right ui-icon ui-icon-circle-close'></span></div>";
-        jQuery('#dillist').append(div);
+      function addElement () {
+        var addToPooled = [];
+        var poolable = jQuery('#poolable_' + elementName).clone();
+        poolable.children().each(function (index, value) {
+          addToPooled.push(jQuery(value).html());
+        });
+        addToPooled.pop();
+        addToPooled.push('<span onclick="Pool.ui.removePooledElement(' + poolId + ', ' + elementId + ', \'' + elementName + '\');" class="ui-icon ui-button ui-icon-circle-close"></span>');
+        jQuery('#pooledElementsDatatable').dataTable().fnAddData(addToPooled);
         jQuery('#searchElementsResult').css('visibility', 'hidden');
-      };
+      }
+      function disableAddAndFadeCheckmark (addRowId) {
+        // add checkmark beside plus button then fade out
+        var checkmark = '<div><img id="checkmark_' + addRowId + '" src="/styles/images/ok.png" height="25" width="25" /></div>';
+        var addTd = jQuery('#' + addRowId).children().last();
+        addTd.prop('disabled', true);
+        addTd.css('float', 'left');
+        addTd.children().last().append(checkmark);
+        jQuery('#checkmark_' + addRowId).fadeOut("slow", function () {
+          jQuery(this).parent().parent().parent().css('clear', 'both');
+          jQuery(this).parent().remove();
+          addTd.addClass('disabled');
+          addTd.css('cursor', 'default');
+        });
+      }
       if (poolId == 0) {
         addElement();
+        if (jQuery('#pooledElementsDatatable').css('visibility') == 'hidden') {
+          jQuery('#pooledElementsDatatable').css('visibility', '');
+          jQuery('#pooledElementsDatatable').dataTable().fnDraw();
+        }
       } else {
         Fluxion.doAjax(
           'poolControllerHelperService',
@@ -787,7 +815,13 @@ Pool.search = {
             'url':ajaxurl
           },
           {
-            'doOnSuccess': addElement
+            'doOnSuccess': function (json) {
+              // add row to Pooled elements table
+              addElement();
+              // add success checkmark and disable the 'Add' td in Select poolable elements table
+              var tableRowId = 'poolable_' + elementName;
+              disableAddAndFadeCheckmark(tableRowId);
+            }
           }
         );
       }
@@ -988,86 +1022,201 @@ Pool.barcode = {
 };
 
 Pool.orders = Pool.orders || {
-  'makeXhrRequest': function (method, endpoint, callback, data, callbackarg) {
-    var expectedStatus;
-    var unauthorizedStatus = 401;
-    if (method == 'POST') {
-      expectedStatus = [201, 200];
-    } else {
-      expectedStatus = [200];
-    }
-    var xhr = new XMLHttpRequest();
-    xhr.open(method, endpoint);
-    xhr.onreadystatechange = function() {
-      if (xhr.readyState === XMLHttpRequest.DONE) {
-        if (expectedStatus.indexOf(xhr.status) != -1) {
-          if (!callback) {
-            document.location.reload();
-          } else {
-            data ? ( callbackarg ? callback(callbackarg) : callback() ) : callback(xhr) ;
+  'showDialog': function() {
+     Pool.orders.dialog = jQuery( "#order-dialog" ).dialog({
+        autoOpen: true,
+        height: 400,
+        width: 350,
+        modal: true,
+        buttons: {
+          "Save": function() {
+            var method;
+            var url;
+            var order = { 'poolId': Pool.orders.poolId, 'partitions': document.getElementById('orderPartitions').value, 'parameters': { 'id': document.getElementById('orderParameterId').value } };
+            if (Pool.orders.editingOrderId == 0) {
+              method = 'POST';
+              url = '/miso/rest/poolorder';
+            } else {
+              method = 'PUT';
+              url = '/miso/rest/poolorder/' + Pool.orders.editingOrderId;
+            }
+            jQuery.ajax({
+              'type': method,
+              'url': url,
+              'contentType': "application/json; charset=utf-8",
+              'data': JSON.stringify(order)
+            }).done(function() {
+              Pool.orders.makeTable(Pool.orders.poolId);
+              Pool.orders.dialog.dialog("close");
+            });
+          },
+          "Cancel": function() {
+            Pool.orders.dialog.dialog( "close" );
           }
-        } else if (xhr.status === unauthorizedStatus) {
-          alert("You are not authorized to view this page.");
-        } else {
-          alert("Sorry, something went wrong. Please try again. If the issue persists, contact your administrator.");
         }
+      });
+    },
+	'makeTable': function(poolId) {
+      if (poolId == 0) return;
+      if (Pool.orders.table) {
+        Pool.orders.table.fnDestroy();
       }
-    };
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    data ? xhr.send(data) : xhr.send();
-  },
+      if (Pool.orders.completionTable) {
+        Pool.orders.completionTable.fnDestroy();
+      }
+      Pool.orders.poolId = poolId;
+      Pool.orders.table = jQuery('#edit-order-table').dataTable({
+      "aoColumns": [
+        {
+          "sTitle": "Platform",
+          "mData": "parameters.platformId",
+          "mRender": function (data, type, full) {
+            return Hot.maybeGetProperty(
+              Hot.findFirstOrNull(Hot.idPredicate(data), Defaults.all.platforms),
+              'nameAndModel');
+          }
 
-  'addOrder': function(poolId) {
-    Pool.orders.makeXhrRequest('POST', '/miso/rest/poolorder', Pool.orders.loadOrders, JSON.stringify({ 'poolId': poolId, 'partitions': document.getElementById('newOrderParitions').value, 'parameters': { 'id': document.getElementById('newOrderParameterId').value } }), poolId);
-    return false;
-  },
-
-  'loadOrders': function(poolId) {
-    Pool.orders.makeXhrRequest('GET', '/miso/rest/pool/' + poolId + '/orders', function(xhr) {
-      var orders = JSON.parse(xhr.responseText);
-      document.getElementById('orderlist').innerHTML = orders.map(function(order) {
-        var platformOptions = Defaults.all.platforms.map(function(platform) {
-          return '<option value="' + platform.id + '"' + ((platform.id == order.parameters.platformId) ? " selected" : "") + '>' + platform.nameAndModel + '</option>';
-        }).join('');
-        var parameterOptions = Pool.orders.optionsForPlatform(function(parameter) {
-          return parameter.platformId == order.parameters.platformId;
-        }, order.parameters.id);
-        return ('<div id="order' + order.id + '" onmouseover="this.className=\'dashboardhighlight\'" onmouseout="this.className=\'dashboard\'" class="dashboard">' +
-          '<span class="float-left">' +
-          '<b>Partitions:</b> <input type="text" id="partitions' + order.id + '" value="' + order.partitions + '"/><br/>' +
-          '<b>Platform:</b> <select id="platforms' + order.id + '" onchange="Pool.orders.changePlatform(' + order.id + ')">' + platformOptions + '</select><br/>' +
-          '<b>Sequencing Parameters:</b> <select id="parameters' + order.id + '">' + parameterOptions + '</select><br/>' +
-          '<input type="submit" class="br-button ui-state-default ui-corner-all" onclick="return Pool.orders.saveOrder(' + order.id + ', ' + poolId + ')" value="Save" /></span>' +
-          '<span onclick="Pool.orders.removeOrder(' + order.id + ', ' + poolId + ');" class="float-right ui-icon ui-icon-circle-close"></span>' +
-          '</div>');
-      }).join('');
+        },
+        {
+          "sTitle": "Sequencing Parameters",
+          "mData": "parameters.id",
+          "mRender": function (data, type, full) {
+            return Hot.maybeGetProperty(
+              Hot.findFirstOrNull(Hot.idPredicate(data), Defaults.all.sequencingParameters),
+              'name');
+          }
+        },
+        {
+          "sTitle": "Partitions",
+          "mData": "partitions"
+        },
+        {
+          "sTitle": "Edit",
+          "mData": "id",
+          "mRender": function (data, type, full) {
+            return '<span onclick=\'Pool.orders.editOrder(' + JSON.stringify(full) + ')\' class="ui-icon ui-icon-pencil"></span>';
+          }
+        },
+        {
+          "sTitle": "Remove",
+          "mData": "id",
+          "mRender": function (data, type, full) {
+            return '<span onclick="Pool.orders.removeOrder(' + data + ')" class="ui-icon ui-icon-circle-close"></span>';
+          }
+        }
+      ],
+      "bJQueryUI": true,
+      "bAutoWidth": false,
+      "iDisplayLength": 25,
+      "iDisplayStart": 0,
+      "sPaginationType": "full_numbers",
+      "bProcessing": true,
+      "sAjaxSource": '/miso/rest/pool/' + poolId + '/orders',
+      "fnServerData": function (sSource, aoData, fnCallback) {
+        jQuery('#edit-order-table').addClass('disabled');
+        jQuery.ajax({
+          "dataType": "json",
+          "url": sSource,
+          "data": aoData,
+          "success": function(x) {
+            fnCallback ({ 'aaData': x } );
+          }
+        });
+      },
+      "fnDrawCallback": function (oSettings) {
+        jQuery('#edit-order-table').removeClass('disabled');
+        jQuery('#edit-order-table').find('.fg-button').removeClass('fg-button');
+      }
+    });
+    jQuery.ajax({
+      'url': '/miso/rest/pool/' + poolId + '/completions',
+      'dataType': "json"
+    }).done(function(data) {
+      Pool.orders.completionTable = jQuery('#order-completion-table').dataTable({
+        "aoColumns":
+          [
+            {
+              "sTitle": "Platform",
+              "mData": "parametersId",
+              "mRender": function (data, type, full) {
+                var platformId = Hot.maybeGetProperty(
+                  Hot.findFirstOrNull(Hot.idPredicate(data), Defaults.all.sequencingParameters),
+                  'platformId');
+                if (!platformId) {
+                  return "N/A";
+                }
+                return Hot.maybeGetProperty(
+                  Hot.findFirstOrNull(Hot.idPredicate(platformId), Defaults.all.platforms),
+                  'nameAndModel');
+              }
+            },
+            {
+              "sTitle": "Sequencing Parameters",
+              "mData": "parametersId",
+              "mRender": function (data, type, full) {
+                return Hot.maybeGetProperty(
+                  Hot.findFirstOrNull(Hot.idPredicate(data), Defaults.all.sequencingParameters),
+                  'name');
+              }
+            }
+          ].concat(data.headings.map(function(heading) {
+            return { "sTitle": heading, "mData": heading };
+          })).concat([ { "sTitle": "Remaining", "mData": "Remaining" } ]),
+        "bJQueryUI": true,
+        "bAutoWidth": false,
+        "iDisplayLength": 25,
+        "iDisplayStart": 0,
+        "sPaginationType": "full_numbers",
+        "bProcessing": true,
+        "aaData": data.completions,
+        "fnDrawCallback": function (oSettings) {
+          jQuery('#edit-order-table').removeClass('disabled');
+          jQuery('#edit-order-table').find('.fg-button').removeClass('fg-button');
+        }
+      });
     });
   },
 
-  'optionsForPlatform' : function(filterCallback, selectedParameterId) {
-    var options = Defaults.all.sequencingParameters.filter(filterCallback).sort(function(a, b) {
+  'setOptionsForPlatform': function(platformId, selectedParameterId) {
+	document.getElementById('orderPlatformId').value = platformId;
+    var options = Defaults.all.sequencingParameters.filter(function(parameter) {
+      return parameter.platformId == platformId;
+    }).sort(function(a, b) {
          return a.name < b.name ? -1 : (a.name == b.name ? 0 : 1);
        }).map(function(parameter) {
          return '<option value="' + parameter.id + '"' + ((parameter.id == selectedParameterId) ? " selected" : "") + '>' + parameter.name + '</option>';
        }).join('');
-    return options;
+    document.getElementById('orderParameterId').innerHTML = options;
   },
 
-  'changePlatform' : function(orderId) {
-    var platformId = document.getElementById(orderId == null ? 'newOrderPlatformId' : ('platforms' + orderId)).value;
-    document.getElementById(orderId == null ? 'newOrderParameterId' : ('parameters' + orderId)).innerHTML = Pool.orders.optionsForPlatform(function(parameter) {
-      return parameter.platformId == platformId;
-    }, null);
+  'changePlatform': function() {
+    var platformId = document.getElementById('orderPlatformId').value;
+     Pool.orders.setOptionsForPlatform(platformId, null);
   },
 
-  'saveOrder': function(orderId, poolId) {
-    Pool.orders.makeXhrRequest('PUT', '/miso/rest/poolorder/' + orderId, function() { Pool.orders.loadOrders(poolId); }, JSON.stringify({ 'partitions': document.getElementById('partitions' + orderId).value, 'parameters': { 'id': document.getElementById('parameters' + orderId).value } }));
-    return false;
+  'createOrder': function(order) {
+     document.getElementById('orderPartitions').value = 1;
+     Pool.orders.setOptionsForPlatform(Defaults.all.platforms[0].id, null);
+     Pool.orders.editingOrderId = 0;
+     Pool.orders.showDialog();
   },
 
-  'removeOrder': function(orderId, poolId) {
+  'editOrder': function(order) {
+     document.getElementById('orderPartitions').value = order.partitions;
+     Pool.orders.setOptionsForPlatform(order.parameters.platformId, order.parameters.id);
+     document.getElementById('orderParameterId').value = order.parameters.id;
+     Pool.orders.editingOrderId = order.id;
+     Pool.orders.showDialog();
+  },
+
+  'removeOrder': function(orderId) {
     if (confirm('Delete this order?')) {
-      Pool.orders.makeXhrRequest('DELETE', '/miso/rest/poolorder/' + orderId, function() { Pool.orders.loadOrders(poolId); }, null);
+        jQuery.ajax({
+          "type": "DELETE",
+          "url": '/miso/rest/poolorder/' + orderId,
+        }).done(function() {
+          Pool.orders.makeTable(Pool.orders.poolId);
+        });
     }
     return false;
   }

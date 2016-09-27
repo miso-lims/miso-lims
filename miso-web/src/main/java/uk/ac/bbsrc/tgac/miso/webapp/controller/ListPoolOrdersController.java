@@ -31,7 +31,7 @@ public class ListPoolOrdersController {
 
   @ModelAttribute("title")
   public String title() {
-    return "List Orders";
+    return "Orders";
   }
 
   private SortedSet<HealthType> generateHealths(Map<Pool<?>, Map<SequencingParameters, PoolOrderCompletionGroup>> groups) {

@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -591,6 +592,7 @@ public class SQLPoolDAOTest extends AbstractDAOTest {
     User user = new UserImpl();
     user.setUserId(1L);
     oldPool.setLastModifier(user);
+    oldPool.setPoolableElements(null);
     Mockito.when(namingScheme.validateField(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
 
     assertEquals(1L, dao.save(oldPool));

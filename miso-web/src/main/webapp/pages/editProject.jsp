@@ -57,27 +57,6 @@
   information about a Project proposal.
 </div>
 
-<c:if test="${project.id != 0}">
-  <div id="trafdiv" class="ui-corner-all" onclick="location.href='#';">
-    <div id="pro${project.id}traf"></div>
-    <script type="text/javascript">
-      jQuery(document).ready(function () {
-        Project.ui.editProjectTrafficLight(${project.id});
-
-        jQuery("#trafdiv").colorbox({width: "90%", inline: true, href: "#trafpanel"});
-      });
-    </script>
-  </div>
-  <div style='display:none'>
-    <div id="trafpanel">
-      <div id="trafresultgraph">
-        <div id="chart"></div>
-      </div>
-    </div>
-  </div>
-
-</c:if>
-
 <div class="bs-callout bs-callout-warning hidden">
   <h2>Oh snap!</h2>
   <p>This form seems to be invalid!</p>
@@ -1219,7 +1198,7 @@
     </li>
   </ul>
   <span style="clear:both">
-    <table class="list" id="librarydils_table">
+    <table cell-padding="0" width="100%" cellspacing="0" border="0" class="display" id="librarydils_table">
       <thead>
       <tr>
         <th>Dilution Name</th>
@@ -1733,13 +1712,6 @@ jQuery(document).ready(function () {
     </script>
 </c:if>
 
-<c:if test="${project.id != 0}">
-    <script type="text/javascript">
-        projectId_d3graph = ${project.id};
-        getProjectD3Json();
-    </script>
-
-</c:if>
 </div>
 </div>
 </div>

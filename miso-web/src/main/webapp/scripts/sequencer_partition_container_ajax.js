@@ -223,6 +223,7 @@ Container.ui = {
             if (json.partitions) {
               jQuery('#containerPartitions').html(json.partitions);
             }
+            jQuery('#container1').click();
           }
         }
       );
@@ -249,7 +250,7 @@ Container.ui = {
   changeContainerIlluminaLane: function (t, container) {
     Fluxion.doAjax(
       'containerControllerHelperService',
-      'changeIlluminaLane',
+      'changePartition',
       {
         'platform': 'Illumina',
         'container_cId': jQuery('input[name=container_cId]').val(),
@@ -266,7 +267,7 @@ Container.ui = {
   changeContainerLS454Chamber: function (t, container) {
     Fluxion.doAjax(
       'containerControllerHelperService',
-      'changeChamber',
+      'changePartition',
       {
         'platform': 'LS454',
         'container_cId': jQuery('input[name=container_cId]').val(),
@@ -283,7 +284,7 @@ Container.ui = {
   changeContainerSolidChamber: function (t, container) {
     Fluxion.doAjax(
       'containerControllerHelperService',
-      'changeChamber',
+      'changePartition',
       {
         'platform': 'Solid',
         'container_cId': jQuery('input[name=container_cId]').val(),
@@ -300,7 +301,7 @@ Container.ui = {
   changeContainerPacBioChamber: function (t, container) {
     Fluxion.doAjax(
       'containerControllerHelperService',
-      'changeChamber',
+      'changePartition',
       {
         'platform': 'PacBio',
         'container_cId': jQuery('input[name=container_cId]').val(),
@@ -325,7 +326,7 @@ Container.ui = {
     jQuery('#listingContainersTable').dataTable({
       "aoColumns": [
         {
-          "sTitle": "ID Barcode",
+          "sTitle": "Serial Number",
           "mData": "identificationBarcode",
           "mRender": function (data, type, full) {
             return "<a href=\"/miso/container/" + full.id + "\">" + data + "</a>";

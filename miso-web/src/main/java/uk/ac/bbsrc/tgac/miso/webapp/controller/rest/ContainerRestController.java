@@ -157,13 +157,13 @@ public class ContainerRestController extends RestController {
       String sortColIndex = request.getParameter("iSortCol_0");
       String sortCol = request.getParameter("mDataProp_" + sortColIndex);
 
-      // get requested subset of libraries
+      // get requested subset of containers
       Collection<SequencerPartitionContainer<SequencerPoolPartition>> containerSubset;
       Long numMatches;
 
       if (!isStringEmptyOrNull(sSearch)) {
         containerSubset = requestManager.getContainersByPageSizeSearch(iDisplayStart, iDisplayLength, sSearch, sSortDir, sortCol);
-        numMatches = Long.valueOf(requestManager.countLibrariesBySearch(sSearch));
+        numMatches = Long.valueOf(requestManager.countContainersBySearch(sSearch));
       } else {
         containerSubset = requestManager.getContainersByPageAndSize(iDisplayStart, iDisplayLength, sSortDir, sortCol);
         numMatches = numContainers;

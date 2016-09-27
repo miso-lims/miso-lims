@@ -30,15 +30,20 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
 
 import javax.persistence.CascadeType;
+
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.RowMapper;
@@ -55,9 +60,6 @@ import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.Property;
 import com.googlecode.ehcache.annotations.TriggersRemove;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
@@ -86,6 +88,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.persistence.LibraryAdditionalInfoDao;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
@@ -156,7 +159,7 @@ public class SQLLibraryDAO implements LibraryStore {
   public static String LIBRARIES_SELECT_BY_PROJECT_ID = LIBRARIES_SELECT
       + " WHERE l.sample_sampleId IN (SELECT sampleId FROM Sample WHERE project_projectId = ?)";
 
-  public static final String LIBRARY_TYPES_SELECT = "SELECT libraryTypeId, description, platformType " + "FROM LibraryType";
+  public static final String LIBRARY_TYPES_SELECT = "SELECT libraryTypeId, description, platformType, archived FROM LibraryType";
 
   public static final String LIBRARY_TYPE_SELECT_BY_ID = LIBRARY_TYPES_SELECT + " WHERE libraryTypeId = ?";
 
@@ -165,8 +168,7 @@ public class SQLLibraryDAO implements LibraryStore {
   public static final String LIBRARY_TYPE_SELECT_BY_DESCRIPTION_AND_PLATFORM = LIBRARY_TYPES_SELECT
       + " WHERE description = ? AND platformType = ?";
 
-  public static final String LIBRARY_TYPES_SELECT_BY_PLATFORM = "SELECT libraryTypeId, description, platformType " + "FROM LibraryType "
-      + "WHERE platformType=?";
+  public static final String LIBRARY_TYPES_SELECT_BY_PLATFORM = LIBRARY_TYPES_SELECT + " WHERE platformType=?";
 
   public static final String LIBRARY_SELECTION_TYPES_SELECT = "SELECT librarySelectionTypeId, name, description "
       + "FROM LibrarySelectionType";
@@ -213,6 +215,14 @@ public class SQLLibraryDAO implements LibraryStore {
   private ChangeLogStore changeLogDAO;
   private SecurityStore securityDAO;
   private BoxStore boxDAO;
+  
+  @Value("${miso.detailed.sample.enabled:false}")
+  private Boolean detailedSampleEnabled;
+  
+  public void setDetailedSampleEnabled(Boolean detailedSampleEnabled) {
+    this.detailedSampleEnabled = detailedSampleEnabled;
+  }
+  
   @Autowired
   private LibraryAdditionalInfoDao libraryAdditionalInfoDAO;
 
@@ -351,6 +361,11 @@ public class SQLLibraryDAO implements LibraryStore {
     if (this.cascadeType != null) {
       securityProfileId = securityProfileDAO.save(library.getSecurityProfile());
     }
+    
+    if (detailedSampleEnabled && !LimsUtils.isAliquotSample(library.getSample())) {
+      throw new IllegalArgumentException("A Library must have an aliquot Sample as its parent.");
+    }
+    
     if (library.isEmpty()) {
       boxDAO.removeBoxableFromBox(library);
       library.setVolume(0D);
@@ -365,8 +380,10 @@ public class SQLLibraryDAO implements LibraryStore {
     params.addValue("sample_sampleId", library.getSample().getId());
     params.addValue("securityProfile_profileId", securityProfileId);
     params.addValue("libraryType", library.getLibraryType().getId());
-    params.addValue("librarySelectionType", library.getLibrarySelectionType().getId());
-    params.addValue("libraryStrategyType", library.getLibraryStrategyType().getId());
+    params.addValue("librarySelectionType",
+        library.getLibrarySelectionType() == null ? null : library.getLibrarySelectionType().getId());
+    params.addValue("libraryStrategyType",
+        library.getLibraryStrategyType() == null ? null : library.getLibraryStrategyType().getId());
     params.addValue("platformName", library.getPlatformName());
     params.addValue("concentration", library.getInitialConcentration());
     params.addValue("creationDate", library.getCreationDate());
@@ -377,8 +394,8 @@ public class SQLLibraryDAO implements LibraryStore {
     params.addValue("qcPassed", library.getQcPassed());
 
     if (library.getId() == AbstractLibrary.UNSAVED_ID) {
-      if (!libraryNamingScheme.allowDuplicateEntityNameFor("alias") && getByAlias(library.getAlias()) != null
-          && (library.getLibraryAdditionalInfo() != null ? library.getLibraryAdditionalInfo().hasNonStandardAlias() == false : true)) {
+      if (!libraryNamingScheme.allowDuplicateEntityNameFor("alias") && !listByAlias(library.getAlias()).isEmpty()
+          && (library.getLibraryAdditionalInfo() != null ? !library.getLibraryAdditionalInfo().hasNonStandardAlias() : true)) {
         // throw if duplicate aliases are not allowed and the library has a standard alias (detailed sample only)
         throw new IOException("NEW: A library with this alias already exists in the database");
       } else {
@@ -472,13 +489,13 @@ public class SQLLibraryDAO implements LibraryStore {
     if (this.cascadeType != null) {
       if (this.cascadeType.equals(CascadeType.PERSIST)) {
         // total fudge to clear out the pool cache if this library is used in any pool by way of a dilution
-        for (Pool p : poolDAO.listByLibraryId(library.getId())) {
+        for (Pool<?> p : poolDAO.listByLibraryId(library.getId())) {
           DbUtils.updateCaches(cacheManager, p, Pool.class);
         }
 
         sampleDAO.save(library.getSample());
       } else if (this.cascadeType.equals(CascadeType.REMOVE)) {
-        for (Pool p : poolDAO.listByLibraryId(library.getId())) {
+        for (Pool<?> p : poolDAO.listByLibraryId(library.getId())) {
           DbUtils.updateCaches(cacheManager, p, Pool.class);
         }
 
@@ -503,14 +520,14 @@ public class SQLLibraryDAO implements LibraryStore {
   @Cacheable(cacheName = "libraryCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
       @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public Library get(long libraryId) throws IOException {
-    List eResults = template.query(LIBRARY_SELECT_BY_ID, new Object[] { libraryId }, new LibraryMapper());
+    List<Library> eResults = template.query(LIBRARY_SELECT_BY_ID, new Object[] { libraryId }, new LibraryMapper());
     Library e = eResults.size() > 0 ? (Library) eResults.get(0) : null;
     return e;
   }
 
   @Override
   public Library getByBarcode(String barcode) throws IOException {
-    List eResults = template.query(LIBRARY_SELECT_BY_IDENTIFICATION_BARCODE, new Object[] { barcode }, new LibraryMapper());
+    List<Library> eResults = template.query(LIBRARY_SELECT_BY_IDENTIFICATION_BARCODE, new Object[] { barcode }, new LibraryMapper());
     Library e = eResults.size() > 0 ? (Library) eResults.get(0) : null;
     return e;
   }
@@ -521,10 +538,8 @@ public class SQLLibraryDAO implements LibraryStore {
   }
 
   @Override
-  public Library getByAlias(String alias) throws IOException {
-    List eResults = template.query(LIBRARY_SELECT_BY_ALIAS, new Object[] { alias }, new LibraryMapper());
-    Library e = eResults.size() > 0 ? (Library) eResults.get(0) : null;
-    return e;
+  public Collection<Library> listByAlias(String alias) throws IOException {
+    return template.query(LIBRARY_SELECT_BY_ALIAS, new Object[] { alias }, new LibraryMapper());
   }
 
   @Override
@@ -619,12 +634,12 @@ public class SQLLibraryDAO implements LibraryStore {
     if (library.isDeletable()
         && (namedTemplate.update(LIBRARY_DELETE, new MapSqlParameterSource().addValue("libraryId", library.getId())) == 1)) {
       if (this.cascadeType.equals(CascadeType.PERSIST)) {
-        for (Pool p : poolDAO.listByLibraryId(library.getId())) {
+        for (Pool<?> p : poolDAO.listByLibraryId(library.getId())) {
           DbUtils.updateCaches(cacheManager, p, Pool.class);
         }
         sampleDAO.save(library.getSample());
       } else if (this.cascadeType.equals(CascadeType.REMOVE)) {
-        for (Pool p : poolDAO.listByLibraryId(library.getId())) {
+        for (Pool<?> p : poolDAO.listByLibraryId(library.getId())) {
           DbUtils.updateCaches(cacheManager, p, Pool.class);
         }
 
@@ -647,21 +662,21 @@ public class SQLLibraryDAO implements LibraryStore {
 
   @Override
   public LibraryType getLibraryTypeById(long libraryTypeId) throws IOException {
-    List eResults = template.query(LIBRARY_TYPE_SELECT_BY_ID, new Object[] { libraryTypeId }, new LibraryTypeMapper());
+    List<LibraryType> eResults = template.query(LIBRARY_TYPE_SELECT_BY_ID, new Object[] { libraryTypeId }, new LibraryTypeMapper());
     LibraryType e = eResults.size() > 0 ? (LibraryType) eResults.get(0) : null;
     return e;
   }
 
   @Override
   public LibraryType getLibraryTypeByDescription(String description) throws IOException {
-    List eResults = template.query(LIBRARY_TYPE_SELECT_BY_DESCRIPTION, new Object[] { description }, new LibraryTypeMapper());
+    List<LibraryType> eResults = template.query(LIBRARY_TYPE_SELECT_BY_DESCRIPTION, new Object[] { description }, new LibraryTypeMapper());
     LibraryType e = eResults.size() > 0 ? (LibraryType) eResults.get(0) : null;
     return e;
   }
 
   @Override
   public LibraryType getLibraryTypeByDescriptionAndPlatform(String description, PlatformType platformType) throws IOException {
-    List eResults = template.query(LIBRARY_TYPE_SELECT_BY_DESCRIPTION_AND_PLATFORM, new Object[] { description, platformType.getKey() },
+    List<LibraryType> eResults = template.query(LIBRARY_TYPE_SELECT_BY_DESCRIPTION_AND_PLATFORM, new Object[] { description, platformType.getKey() },
         new LibraryTypeMapper());
     LibraryType e = eResults.size() > 0 ? (LibraryType) eResults.get(0) : null;
     return e;
@@ -669,7 +684,7 @@ public class SQLLibraryDAO implements LibraryStore {
 
   @Override
   public LibrarySelectionType getLibrarySelectionTypeById(long librarySelectionTypeId) throws IOException {
-    List eResults = template.query(LIBRARY_SELECTION_TYPE_SELECT_BY_ID, new Object[] { librarySelectionTypeId },
+    List<LibrarySelectionType> eResults = template.query(LIBRARY_SELECTION_TYPE_SELECT_BY_ID, new Object[] { librarySelectionTypeId },
         new LibrarySelectionTypeMapper());
     LibrarySelectionType e = eResults.size() > 0 ? (LibrarySelectionType) eResults.get(0) : null;
     return e;
@@ -677,14 +692,14 @@ public class SQLLibraryDAO implements LibraryStore {
 
   @Override
   public LibrarySelectionType getLibrarySelectionTypeByName(String name) throws IOException {
-    List eResults = template.query(LIBRARY_SELECTION_TYPE_SELECT_BY_NAME, new Object[] { name }, new LibrarySelectionTypeMapper());
+    List<LibrarySelectionType> eResults = template.query(LIBRARY_SELECTION_TYPE_SELECT_BY_NAME, new Object[] { name }, new LibrarySelectionTypeMapper());
     LibrarySelectionType e = eResults.size() > 0 ? (LibrarySelectionType) eResults.get(0) : null;
     return e;
   }
 
   @Override
   public LibraryStrategyType getLibraryStrategyTypeById(long libraryStrategyTypeId) throws IOException {
-    List eResults = template.query(LIBRARY_STRATEGY_TYPE_SELECT_BY_ID, new Object[] { libraryStrategyTypeId },
+    List<LibraryStrategyType> eResults = template.query(LIBRARY_STRATEGY_TYPE_SELECT_BY_ID, new Object[] { libraryStrategyTypeId },
         new LibraryStrategyTypeMapper());
     LibraryStrategyType e = eResults.size() > 0 ? (LibraryStrategyType) eResults.get(0) : null;
     return e;
@@ -692,7 +707,7 @@ public class SQLLibraryDAO implements LibraryStore {
 
   @Override
   public LibraryStrategyType getLibraryStrategyTypeByName(String name) throws IOException {
-    List eResults = template.query(LIBRARY_STRATEGY_TYPE_SELECT_BY_NAME, new Object[] { name }, new LibraryStrategyTypeMapper());
+    List<LibraryStrategyType> eResults = template.query(LIBRARY_STRATEGY_TYPE_SELECT_BY_NAME, new Object[] { name }, new LibraryStrategyTypeMapper());
     LibraryStrategyType e = eResults.size() > 0 ? (LibraryStrategyType) eResults.get(0) : null;
     return e;
   }
@@ -908,6 +923,7 @@ public class SQLLibraryDAO implements LibraryStore {
       lt.setId(rs.getLong("libraryTypeId"));
       lt.setDescription(rs.getString("description"));
       lt.setPlatformType(rs.getString("platformType"));
+      lt.setArchived(rs.getBoolean("archived"));
       return lt;
     }
   }

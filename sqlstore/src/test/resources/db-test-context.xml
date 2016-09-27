@@ -60,7 +60,7 @@
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrderImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl</value>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAdditionalInfoImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingParametersImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleValidRelationshipImpl</value>

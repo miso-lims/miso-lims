@@ -560,10 +560,17 @@ public class LibraryControllerHelperService {
     try {
       if (json.has("platform") && !isStringEmptyOrNull(json.getString("platform"))) {
         String platform = json.getString("platform");
+        long originalLibraryTypeId = json.has("originalLibraryTypeId") ? json.getLong("originalLibraryTypeId") : 0L;
+
         JSONObject result = new JSONObject();
 
         StringBuilder libsb = new StringBuilder();
-        List<LibraryType> types = new ArrayList<LibraryType>(requestManager.listLibraryTypesByPlatform(platform));
+        List<LibraryType> types = new ArrayList<LibraryType>();
+        for (LibraryType type : requestManager.listLibraryTypesByPlatform(platform)) {
+          if (!type.getArchived() || type.getId() == originalLibraryTypeId) {
+            types.add(type);
+          }
+        }
         Collections.sort(types);
         for (LibraryType s : types) {
           libsb.append("<option value='" + s.getId() + "'>" + s.getDescription() + "</option>");

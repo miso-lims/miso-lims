@@ -102,9 +102,9 @@ public class BoxControllerHelperService {
         inner.add(box.getLocationBarcode());
         inner.add(box.getTubeCount() + "/" + box.getPositionCount());
         inner.add(box.getSize().getRows() + "x" + box.getSize().getColumns());
-        inner.add(isStringEmptyOrNull(box.getLocationBarcode()) ? "" : box.getLocationBarcode());
         inner.add(box.getUse().getAlias());
         inner.add(isStringEmptyOrNull(box.getIdentificationBarcode()) ? "" : box.getIdentificationBarcode());
+        inner.add(box.getId());
         
         jsonArray.add(inner);
       }

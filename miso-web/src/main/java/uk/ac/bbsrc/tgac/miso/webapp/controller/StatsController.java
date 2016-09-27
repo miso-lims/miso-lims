@@ -185,7 +185,7 @@ public class StatsController {
       return "redirect:/miso/stats/sequencer/" + srId;
     } catch (IOException ex) {
       if (log.isDebugEnabled()) {
-        log.debug("Failed to save Sequencer Reference", ex);
+        log.debug("Failed to save Sequencer.", ex);
       }
       throw ex;
     }

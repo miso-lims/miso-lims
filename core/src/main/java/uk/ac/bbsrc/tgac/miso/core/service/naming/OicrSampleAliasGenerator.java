@@ -8,7 +8,7 @@ import net.sourceforge.fluxion.spi.ServiceProvider;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -32,10 +32,11 @@ public class OicrSampleAliasGenerator implements NameGenerator<Sample> {
     if (!LimsUtils.isDetailedSample(t)) {
       throw new IllegalArgumentException("Can only generate an alias for detailed samples");
     }
-    SampleAdditionalInfo detailed = (SampleAdditionalInfo) t;
+    DetailedSample detailed = (DetailedSample) t;
     
-    for (SampleAdditionalInfo parent = (SampleAdditionalInfo) detailed.getParent(); parent != null;
-        parent = (SampleAdditionalInfo) parent.getParent()) {
+    for (DetailedSample parent = detailed.getParent(); parent != null;
+        parent = parent.getParent()) {
+      if (parent.hasNonStandardAlias()) throw new IllegalArgumentException("Cannot generate alias due to nonstandard alias on a parent");
       if (isAliquotSample(parent)) {
         return parent.getAlias() + getSiblingTag(detailed);
       }
@@ -71,7 +72,7 @@ public class OicrSampleAliasGenerator implements NameGenerator<Sample> {
     return sb.toString();
   }
   
-  private String getSiblingTag(SampleAdditionalInfo sample) {
+  private String getSiblingTag(DetailedSample sample) {
     SampleClass sc = sample.getSampleClass();
     if (sc == null || sc.getSuffix() == null) {
       throw new InvalidParameterException("Unexpected null SampleClass or suffix");

@@ -21,7 +21,7 @@ import com.eaglegenomics.simlims.core.store.SecurityStore;
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.DefaultSampleNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
@@ -69,7 +69,7 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
   public void getSampleWithChildrenTest() throws Exception {
     Sample sample = sut.get(15L);
     assertTrue(LimsUtils.isDetailedSample(sample));
-    SampleAdditionalInfo detailed = (SampleAdditionalInfo) sample;
+    DetailedSample detailed = (DetailedSample) sample;
     assertNotNull(detailed.getChildren());
     assertEquals(2, detailed.getChildren().size());
     for (@SuppressWarnings("unused")
@@ -83,7 +83,7 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
     SampleImpl sample = (SampleImpl) sut.get(16L);
     assertNotNull(sample);
     assertTrue(LimsUtils.isDetailedSample(sample));
-    SampleAdditionalInfo detailed = (SampleAdditionalInfo) sample;
+    DetailedSample detailed = (DetailedSample) sample;
     assertNotNull(detailed.getParent());
     assertEquals(15L, detailed.getParent().getId());
   }

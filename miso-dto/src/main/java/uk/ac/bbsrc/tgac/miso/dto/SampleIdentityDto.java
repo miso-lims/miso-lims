@@ -9,7 +9,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @JsonTypeName(value = Identity.CATEGORY_NAME)
-public class SampleIdentityDto extends SampleAdditionalInfoDto {
+public class SampleIdentityDto extends DetailedSampleDto {
 
   private String internalName;
   private String externalName;

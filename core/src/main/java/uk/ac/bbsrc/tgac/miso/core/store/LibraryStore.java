@@ -63,13 +63,13 @@ public interface LibraryStore extends Store<Library>, Remover<Library>, NamingSc
   Collection<Library> listBySearch(String query) throws IOException;
 
   /**
-   * Get a Library given a Library alias
+   * Get all Library with a given Library alias
    * 
    * @param alias of type String
-   * @return Library
-   * @throws IOException when
+   * @return all libraries with the given alias
+   * @throws IOException
    */
-  Library getByAlias(String alias) throws IOException;
+  Collection<Library> listByAlias(String alias) throws IOException;
 
   /**
    * List all Libraries generated from a Sample given a parent Sample ID

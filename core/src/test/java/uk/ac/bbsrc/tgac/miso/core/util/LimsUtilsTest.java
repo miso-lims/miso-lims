@@ -14,10 +14,10 @@ public class LimsUtilsTest {
 
   @Test
   public void testValidateRelationshipForSimpleSample() throws Exception {
-    Sample child = new SampleImpl(); // Simple sample has no SampleAdditionalInfo.
+    Sample child = new SampleImpl(); // Simple sample has no DetailedSample attributes.
     Sample parent = null; // Simple sample has no parent.
     assertTrue(
-        "Simple sample with a null parent and null SampleAdditionalInfo is a valid relationship",
+        "Simple sample with a null parent and null DetailedSample is a valid relationship",
         LimsUtils.isValidRelationship(null, parent, child));
   }
 

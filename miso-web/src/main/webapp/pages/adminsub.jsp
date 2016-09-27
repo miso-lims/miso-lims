@@ -64,21 +64,11 @@
 		</sec:authorize>
 	</ul>
   -->
-
 	<sec:authorize access="hasRole('ROLE_ADMIN')">
-		<h2>User Administration</h2>
-		<ul class="bullets">
-			<li><a href="<c:url value="/miso/admin/users"/>">List Users</a></li>
-			<li><a href="<c:url value="/miso/admin/user/new"/>">Create
-					User</a></li>
-		</ul>
-
-		<h2>Group Administration</h2>
-		<ul class="bullets">
-			<li><a href="<c:url value="/miso/admin/groups"/>">List
-					Groups</a></li>
-			<li><a href="<c:url value="/miso/admin/group/new"/>">Create
-					Group</a></li>
-		</ul>
-	</sec:authorize>
+	  <h2>User Administration</h2>
+      <ul class="bullets">
+        <li><a href="<c:url value="/miso/admin/users"/>">Users</a></li>
+        <li><a href="<c:url value="/miso/admin/groups"/>">Groups</a></li>
+      </ul>
+    </sec:authorize>
 </div>

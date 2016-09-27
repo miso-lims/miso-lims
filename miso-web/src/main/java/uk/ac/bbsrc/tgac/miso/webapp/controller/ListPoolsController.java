@@ -84,7 +84,7 @@ public class ListPoolsController {
 
   @ModelAttribute("title")
   public String title() {
-    return "List Pools";
+    return "Pools";
   }
 
   @RequestMapping("/pools")

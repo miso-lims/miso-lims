@@ -88,15 +88,15 @@ public class DefaultSampleTissueService implements SampleTissueService {
   public void loadMembers(SampleTissue target, SampleTissue source) throws IOException {
     if (source.getTissueOrigin() != null) {
       target.setTissueOrigin(tissueOriginDao.getTissueOrigin(source.getTissueOrigin().getId()));
-      ServiceUtils.throwIfNull(target.getTissueOrigin(), "SampleAdditionalInfo.tissueOriginId", source.getTissueOrigin().getId());
+      ServiceUtils.throwIfNull(target.getTissueOrigin(), "DetailedSample.tissueOriginId", source.getTissueOrigin().getId());
     }
     if (source.getTissueType() != null) {
       target.setTissueType(tissueTypeDao.getTissueType(source.getTissueType().getId()));
-      ServiceUtils.throwIfNull(target.getTissueType(), "SampleAdditionalInfo.tissueTypeId", source.getTissueType().getId());
+      ServiceUtils.throwIfNull(target.getTissueType(), "DetailedSample.tissueTypeId", source.getTissueType().getId());
     }
     if (source.getLab() != null) {
       target.setLab(labService.get(source.getLab().getId()));
-      ServiceUtils.throwIfNull(target.getLab(), "sampleAdditionalInfo.labId", source.getLab().getId());
+      ServiceUtils.throwIfNull(target.getLab(), "DetailedSample.labId", source.getLab().getId());
     }
     if (source.getTissueMaterial() != null) {
       target.setTissueMaterial(tissueMaterialService.get(source.getTissueMaterial().getId()));

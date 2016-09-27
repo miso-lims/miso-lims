@@ -10,7 +10,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.StrStatus;
 
 @Entity
 @Table(name = "SampleStock")
-public class SampleStockImpl extends SampleAdditionalInfoImpl implements SampleStock {
+public class SampleStockImpl extends DetailedSampleImpl implements SampleStock {
 
   @Enumerated(EnumType.STRING)
   private StrStatus strStatus = StrStatus.NOT_SUBMITTED;

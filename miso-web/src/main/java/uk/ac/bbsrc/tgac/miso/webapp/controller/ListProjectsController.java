@@ -55,7 +55,7 @@ public class ListProjectsController {
 
   @ModelAttribute("title")
   public String title() {
-    return "List Projects";
+    return "Projects";
   }
 
   @RequestMapping("/projects")

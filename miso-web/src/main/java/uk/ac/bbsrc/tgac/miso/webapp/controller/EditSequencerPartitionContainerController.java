@@ -41,6 +41,9 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
+
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
@@ -52,9 +55,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
-
-import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 @Controller
 @RequestMapping("/container")
@@ -113,7 +113,7 @@ public class EditSequencerPartitionContainerController {
         model.put("title", "New Container");
       } else {
         container = requestManager.getSequencerPartitionContainerById(containerId);
-        model.put("title", "Container " + containerId);
+        model.put("title", container.getPlatform().getPlatformType().getContainerName() + " " + containerId);
       }
 
       model.put("formObj", container);

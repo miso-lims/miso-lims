@@ -1,3 +1,25 @@
+-- archive_library_type
+--StartNoTest
+UPDATE LibraryType SET archived = TRUE WHERE platformType = 'Illumina' AND description NOT IN ('Paired End', 'Mate Pair', 'Single End');
+--EndNoTest
+
+-- change_seqparam_names
+--StartNoTest
+UPDATE SequencingParameters SET name = REPLACE(name, 'x', '×');
+--EndNoTest
+
+-- archived_rna_valid_relationships
+--StartNoTest
+SET @time = NOW();
+SELECT userId INTO @user FROM User WHERE loginName = 'admin';
+SELECT sampleClassId INTO @rnaStockId FROM SampleClass WHERE alias = 'whole RNA (stock)';
+INSERT INTO SampleValidRelationship  (parentId, childId, createdBy, creationDate, updatedBy, lastUpdated, archived) VALUES 
+  (@rnaStockId,(SELECT sampleClassId FROM SampleClass WHERE alias = 'smRNA'),@user,@time,@user,@time,1),
+  (@rnaStockId,(SELECT sampleClassId FROM SampleClass WHERE alias = 'mRNA'),@user,@time,@user,@time,1);
+--EndNoTest
+
+-- nextera_pcr_atac_seq_indices
+--StartNoTest
 INSERT INTO IndexFamily (name, platformType, archived)
 VALUES ('Nextera PCR ATAC-seq', 'ILLUMINA', 0);
 
@@ -27,3 +49,5 @@ INSERT INTO Indices (name, sequence, position, indexFamilyId) VALUES
 ('Ad2-22', 'TGGTCACA', 1, @famId),
 ('Ad2-23', 'TTGACCCT', 1, @famId),
 ('Ad2-24', 'CCACTCCT', 1, @famId);
+--EndNoTest
+

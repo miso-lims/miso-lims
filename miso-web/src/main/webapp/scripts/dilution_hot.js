@@ -143,7 +143,8 @@ var Dilution = {
             numberOfMonths: 1
           },
           allowEmpty: false,
-          validator: Hot.requiredAutocompleteRenderer,
+          validator: Hot.requiredText,
+          renderer: Hot.requiredAutocompleteRenderer,
           include: true
         },
         {

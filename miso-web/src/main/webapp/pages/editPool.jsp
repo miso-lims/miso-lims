@@ -361,78 +361,75 @@
 
 <c:if test="${pool.id != 0}">
   <h1>Orders</h1>
+  <span onclick="Pool.orders.createOrder()" class="sddm fg-button ui-state-default ui-corner-all">Add Order</span>
 
-  <div class="note">
-    <div id="orderlist" class="elementList ui-corner-all">
-    </div>
-    <form id="neworder">
-      Partitions: <input type="text" name="partitions" value="1" id="newOrderParitions" /><br/>
-      Platform: <select id="newOrderPlatformId" onchange="Pool.orders.changePlatform(null)"><c:forEach items="${platforms}" var="platform"><option value="${platform.id}">${platform.nameAndModel}</option></c:forEach></select><br/>
-      Sequencing Parameters: <select id="newOrderParameterId"><c:forEach items="${sequencingParameters}" var="sp"><option value="${sp.id}">${sp.name}</option></c:forEach></select><br/>
-      <input type="submit" class="br-button ui-state-default ui-corner-all" value="Add" onclick="return Pool.orders.addOrder(${pool.id})"/>
-    </form>
-  </div>
-  <c:if test="${not empty ordercompletions}">
+  <table cellpadding="0" cellspacing="0" border="0" class="display" id="edit-order-table"></table>
+
   <br/>
-    <h1>Order Completion</h1>
-    <span style="clear:both">
-      <table class="list" id="changelog_table">
-        <thead>
-        <tr>
-          <th>Platform</th>
-          <th>Parameters</th>
-          <c:forEach items="${ordercompletionheadings}" var="heading">
-            <th>${heading.key}</th>
-          </c:forEach>
-          <th>Remaining</th>
-        </tr>
-        </thead>
-        <tbody>
-        <c:forEach items="${ordercompletions}" var="parameterGroup">
-          <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-            <td>${parameterGroup.key.platform.nameAndModel}</td>
-            <td>${parameterGroup.key.name}</td>
-            <c:forEach items="${ordercompletionheadings}" var="heading">
-              <td>${parameterGroup.value[heading].numPartitions}</td>
-            </c:forEach>
-            <td>${parameterGroup.value.getRemaining()}</td>
-          </tr>
-        </c:forEach>
-        </tbody>
-      </table>
-    </span>
-  </c:if>
+  <h1>Order Completion</h1>
+  <table cellpadding="0" cellspacing="0" border="0" class="display" id="order-completion-table"></table>
+  <br/>
 </c:if>
 
 <h1>Pooled Elements</h1>
 
-<div class="note">
-  <h2>Selected elements(s):</h2>
-
-  <div id="dillist" class="elementList ui-corner-all">
-    <c:if test="${not empty pool.poolableElements}">
-      <c:forEach items="${pool.poolableElements}" var="dil">
-        <div onMouseOver="this.className='dashboardhighlight'" onMouseOut="this.className='dashboard'"
-             class="dashboard">
-          <span style="float:left" id="element${dil.id}">
-	          <input type="hidden" id="poolableElements${dil.id}" value="${dil.name}" name="poolableElements"/>
-	          <b>Element:</b> ${dil.name}<br/>
-	
-	          <script type="text/javascript">
-	            jQuery(document).ready(function () {
-	              Pool.ui.getPoolableElementInfo('${pool.id}', '${dil.id}');
-	            });
-	          </script>
-          </span>
-          <span onclick='Pool.ui.removePoolableElement(${pool.id}, ${dil.id}, jQuery(this).parent());'
-                class='float-right ui-icon ui-icon-circle-close'></span>
-        </div>
-      </c:forEach>
-    </c:if>
-  </div>
+  <h2>Selected element(s):</h2>
+<div id="pooledList">
+  <table cell-padding="0" width="100%" cellspacing="0" border="0" class="display" id="pooledElementsDatatable">
+	<thead>
+	<tr>
+	  <th>Dilution Name</th>
+	  <th>Concentration (${libraryDilutionUnits})</th>
+	  <th>Library</th>
+	  <th>Sample</th>
+	  <th>Indices</th>
+	  <th>Low Quality</th>
+	  <th>Remove</th>
+	</tr>
+	</thead>
+	<tbody>
+	  <c:if test="${not empty pool.poolableElements}">
+		<c:forEach items="${pool.poolableElements}" var="dil">
+		  <tr id="pooled_${dil.name}">
+		    <td>${dil.name}</td>
+		    <td>${dil.concentration}</td>
+		    <td><a href="<c:url value="/miso/library/${dil.library.id}"/>">${dil.library.alias} (${dil.library.name})</a></td>
+		    <td><a href="<c:url value="/miso/sample/${dil.library.sample.id}"/>">${dil.library.sample.alias} (${dil.library.sample.name})</a></td>
+		    <td><c:forEach items="${dil.library.indices}" var="index" varStatus="iCount">
+		      <c:if test="${iCount.count gt 1}"><br/></c:if>${iCount.count}: ${index.label}
+		      </c:forEach></td>
+		    <td><c:if test="${dil.library.lowQuality}">&#9888;</c:if></td>
+		    <td><span onclick='Pool.ui.removePooledElement(${pool.id}, ${dil.id}, "${dil.name}");' class="ui-icon ui-icon-circle-close ui-button"></span></td>
+		  </tr>
+		</c:forEach>
+	  </c:if>
+	</tbody>
+  </table>
 </div>
 <input type="hidden" value="on" name="_poolableElements"/>
 </form:form>
+<script type="text/javascript">
+  jQuery(document).ready(function () {
+    jQuery('#pooledElementsDatatable').dataTable({
+      "aaSorting": [
+        [0, 'desc']              
+      ],
+      "aoColumns": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "iDisplayLength": 50,
+      "bJQueryUI": true,
+      "bRetrieve": true,
+      "sPaginationType": "full_numbers"
+    });
+  });
+</script>
 
 <h2 class="hrule">Select poolable elements:</h2>
 
@@ -445,7 +442,6 @@
         Pool.ui.createElementSelectDatatable('<c:out value="${pool.platformType.key}" default="Illumina"/>', ${pool.id}, '${libraryDilutionUnits}');
     });
 </script>
-</div>
 
 <c:if test="${not empty pool.changeLog}">
   <br/>
@@ -471,13 +467,18 @@
     </table>
   </span>
 </c:if>
+
+<div id="order-dialog" title="Order" hidden="true">
+Partitions: <input type="text" name="partitions" value="1" id="orderPartitions" /><br/>
+Platform: <select id="orderPlatformId" onchange="Pool.orders.changePlatform()"><c:forEach items="${platforms}" var="platform"><option value="${platform.id}">${platform.nameAndModel}</option></c:forEach></select><br/>
+Sequencing Parameters: <select id="orderParameterId"></select>
+</div>
+
+</div>
 </div>
 
 <script type="text/javascript">
   Utils.ui.addMaxDatePicker("creationDate", 0);
-</script>
-
-<script type="text/javascript">
   jQuery(document).ready(function () {
     jQuery('#alias').simplyCountable({
       counter: '#aliasCounter',
@@ -495,7 +496,7 @@
   Defaults = { 'all': {}};
   Defaults.all.sequencingParameters = ${sequencingParametersJson};
   Defaults.all.platforms = [ <c:forEach items="${platforms}" var="platform">{ 'id' : ${platform.id}, 'nameAndModel' : '${platform.nameAndModel}'}, </c:forEach> ];
-  Pool.orders.loadOrders(${pool.id});
+  Pool.orders.makeTable(${pool.id});
 </script>
 
 <%@ include file="adminsub.jsp" %>

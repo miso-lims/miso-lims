@@ -27,7 +27,7 @@
   <parent>
     <artifactId>miso</artifactId>
     <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-    <version>0.2.31</version>
+    <version>0.2.32</version>
   </parent>
 
   <artifactId>demo-notification-client</artifactId>

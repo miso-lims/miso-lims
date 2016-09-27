@@ -173,7 +173,7 @@ public interface RequestManager {
 
   public Library getLibraryByBarcode(String barcode) throws IOException;
 
-  public Library getLibraryByAlias(String alias) throws IOException;
+  public Collection<Library> listLibrariesByAlias(String alias) throws IOException;
 
   public Library getAdjacentLibraryById(long libraryId, boolean before) throws IOException;
 

@@ -79,7 +79,7 @@ public class ListSamplesController {
 
   @ModelAttribute("title")
   public String title() {
-    return "List Samples";
+    return "Samples";
   }
 
   @RequestMapping(value = "/samples/rest/", method = RequestMethod.GET)

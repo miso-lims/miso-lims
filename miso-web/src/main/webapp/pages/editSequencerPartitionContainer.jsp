@@ -112,7 +112,7 @@
   <tbody>
   <tr>
     <td width="50%" valign="top">
-      <h2>Container Parameters</h2>
+      <h2>${container.platform.platformType.containerName} Parameters</h2>
 
       <div id="containerPartitions">
         <div class="parsley-errors-list filled" id="containerError">
@@ -145,7 +145,7 @@
               <tr>
                 <c:choose>
                   <c:when test="${empty container.identificationBarcode}">
-                    <td>ID Barcode:</td>
+                    <td>Serial Number:</td>
                     <td>
                       <button onclick="Container.lookupContainer(this);" type="button"
                               class="right-button ui-state-default ui-corner-all">Lookup
@@ -156,7 +156,7 @@
                     </td>
                   </c:when>
                   <c:otherwise>
-                    <td>ID Barcode:</td>
+                    <td>Serial Number:</td>
                     <td>
                       <span id="idBarcode">${container.identificationBarcode}</span>
                       <a href="javascript:void(0);"
@@ -217,10 +217,10 @@
             </table>
             <div id='partitionErrorDiv'></div>
             <div id="partitionDiv">
-              <i class="italicInfo">Click in a lane box to beep/type in barcodes, or double click a pool on the
-                right to sequentially add pools to the container</i>
+              <i class="italicInfo">Click in a ${container.platform.platformType.partitionName} box to beep/type in barcodes, or double click a pool on the
+                right to sequentially add pools to the ${container.platform.platformType.containerName}</i>
               <table class="in">
-                <th>Lane No.</th>
+                <th>${container.platform.platformType.partitionName} No.</th>
                 <th>Pool</th>
                 <c:forEach items="${container.partitions}" var="partition" varStatus="partitionCount">
                   <tr>

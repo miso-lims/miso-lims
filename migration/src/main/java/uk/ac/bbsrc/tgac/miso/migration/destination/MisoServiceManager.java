@@ -38,13 +38,13 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.OicrSampleNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.migration.util.SimpleLibraryNamingScheme;
 import uk.ac.bbsrc.tgac.miso.persistence.HibernateSampleClassDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateDetailedSampleDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateIndexDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateInstituteDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLabDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryAdditionalInfoDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDesignDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateQcPassedDetailDao;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleAdditionalInfoDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleNumberPerProjectDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSamplePurposeDao;
@@ -54,8 +54,8 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSubprojectDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueMaterialDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueOriginDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueTypeDao;
+import uk.ac.bbsrc.tgac.miso.service.impl.DefaultDetailedSampleService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultLabService;
-import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSampleAdditionalInfoService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSampleClassService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSampleNumberPerProjectService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSampleService;
@@ -133,14 +133,14 @@ public class MisoServiceManager {
   private DefaultSampleClassService sampleClassService;
   private DefaultSampleService sampleService;
   private DefaultSampleTissueService sampleTissueService;
-  private DefaultSampleAdditionalInfoService sampleAdditionalInfoService;
+  private DefaultDetailedSampleService detailedSampleService;
   private DefaultLabService labService;
   private DefaultSampleNumberPerProjectService sampleNumberPerProjectService;
   private DefaultSampleValidRelationshipService sampleValidRelationshipService;
 
   private HibernateSampleClassDao sampleClassDao;
   private HibernateSampleDao sampleDao;
-  private HibernateSampleAdditionalInfoDao sampleAdditionalInfoDao;
+  private HibernateDetailedSampleDao detailedSampleDao;
   private HibernateSampleTissueDao sampleTissueDao;
   private HibernateLabDao labDao;
   private HibernateInstituteDao instituteDao;
@@ -198,8 +198,8 @@ public class MisoServiceManager {
     m.setDefaultQcPassedDetailDao();
     m.setDefaultRunDao();
     m.setDefaultRunQcDao();
-    m.setDefaultSampleAdditionalInfoDao();
-    m.setDefaultSampleAdditionalInfoService();
+    m.setDefaultDetailedSampleDao();
+    m.setDefaultDetailedSampleService();
     m.setDefaultSampleClassDao();
     m.setDefaultSampleClassService();
     m.setDefaultSampleDao();
@@ -290,7 +290,7 @@ public class MisoServiceManager {
   private void updateAuthorizationManagerDependencies() {
     if (sampleClassService != null) sampleClassService.setAuthorizationManager(authorizationManager);
     if (sampleService != null) sampleService.setAuthorizationManager(authorizationManager);
-    if (sampleAdditionalInfoService != null) sampleAdditionalInfoService.setAuthorizationManager(authorizationManager);
+    if (detailedSampleService != null) detailedSampleService.setAuthorizationManager(authorizationManager);
     if (labService != null) labService.setAuthorizationManager(authorizationManager);
     if (sampleNumberPerProjectService != null) sampleNumberPerProjectService.setAuthorizationManager(authorizationManager);
     if (sampleValidRelationshipService != null) sampleValidRelationshipService.setAuthorizationManager(authorizationManager);
@@ -447,7 +447,7 @@ public class MisoServiceManager {
 
   private void updateSampleClassDaoDependencies() {
     if (sampleClassService != null) sampleClassService.setSampleClassDao(sampleClassDao);
-    if (sampleAdditionalInfoService != null) sampleAdditionalInfoService.setSampleClassDao(sampleClassDao);
+    if (detailedSampleService != null) detailedSampleService.setSampleClassDao(sampleClassDao);
     if (sampleService != null) sampleService.setSampleClassDao(sampleClassDao);
     if (sampleValidRelationshipService != null) sampleValidRelationshipService.setSampleClassDao(sampleClassDao);
   }
@@ -488,7 +488,7 @@ public class MisoServiceManager {
     svc.setNamingScheme(getNameableNamingScheme(Sample.class));
     svc.setSampleNamingScheme(getSampleNamingScheme());
     svc.setProjectStore(projectDao);
-    svc.setSampleAdditionalInfoService(sampleAdditionalInfoService);
+    svc.setDetailedSampleService(detailedSampleService);
     svc.setSampleTissueService(sampleTissueService);
     svc.setKitStore(kitDao);
     svc.setQcPassedDetailDao(qcPassedDetailDao);
@@ -542,7 +542,7 @@ public class MisoServiceManager {
     if (libraryDao != null) libraryDao.setSampleDAO(sampleDao);
     if (experimentDao != null) experimentDao.setSampleDAO(sampleDao);
     if (boxDao != null) boxDao.setSampleDAO(sampleDao);
-    if (sampleAdditionalInfoService != null) sampleAdditionalInfoService.setSampleDao(sampleDao);
+    if (detailedSampleService != null) detailedSampleService.setSampleDao(sampleDao);
     if (projectDao != null) projectDao.setSampleDAO(sampleDao);
   }
 
@@ -630,6 +630,7 @@ public class MisoServiceManager {
 
   public void setDefaultLibraryDao() {
     SQLLibraryDAO dao = new SQLLibraryDAO();
+    dao.setDetailedSampleEnabled(true);
     dao.setAutoGenerateIdentificationBarcodes(autoGenerateIdBarcodes);
     dao.setBoxDAO(boxDao);
     dao.setChangeLogDAO(changeLogDao);
@@ -809,7 +810,7 @@ public class MisoServiceManager {
   private void updateKitDaoDependencies() {
     if (experimentDao != null) experimentDao.setKitDAO(kitDao);
     if (sampleService != null) sampleService.setKitStore(kitDao);
-    if (sampleAdditionalInfoService != null) sampleAdditionalInfoService.setSqlKitDao(kitDao);
+    if (detailedSampleService != null) detailedSampleService.setSqlKitDao(kitDao);
     if (libraryAdditionalInfoDao != null) libraryAdditionalInfoDao.setKitStore(kitDao);
   }
 
@@ -1078,49 +1079,49 @@ public class MisoServiceManager {
     if (sampleTissueService != null) sampleTissueService.setSampleTissueDao(sampleTissueDao);
   }
 
-  public HibernateSampleAdditionalInfoDao getSampleAdditionalInfoDao() {
-    return sampleAdditionalInfoDao;
+  public HibernateDetailedSampleDao getDetailedSampleDao() {
+    return detailedSampleDao;
   }
 
-  public void setSampleAdditionalInfoDao(HibernateSampleAdditionalInfoDao sampleAdditionalInfoDao) {
-    this.sampleAdditionalInfoDao = sampleAdditionalInfoDao;
-    updateSampleAdditionalInfoDaoDependencies();
+  public void setDetailedSampleDao(HibernateDetailedSampleDao detailedSampleDao) {
+    this.detailedSampleDao = detailedSampleDao;
+    updateDetailedSampleDaoDependencies();
   }
 
-  public void setDefaultSampleAdditionalInfoDao() {
-    HibernateSampleAdditionalInfoDao dao = new HibernateSampleAdditionalInfoDao();
+  public void setDefaultDetailedSampleDao() {
+    HibernateDetailedSampleDao dao = new HibernateDetailedSampleDao();
     dao.setKitStore(kitDao);
     dao.setSessionFactory(sessionFactory);
-    setSampleAdditionalInfoDao(dao);
+    setDetailedSampleDao(dao);
   }
 
-  private void updateSampleAdditionalInfoDaoDependencies() {
-    if (sampleAdditionalInfoService != null) sampleAdditionalInfoService.setSampleAdditionalInfoDao(sampleAdditionalInfoDao);
+  private void updateDetailedSampleDaoDependencies() {
+    if (detailedSampleService != null) detailedSampleService.setDetailedSampleDao(detailedSampleDao);
   }
 
-  public DefaultSampleAdditionalInfoService getSampleAdditionalInfoService() {
-    return sampleAdditionalInfoService;
+  public DefaultDetailedSampleService getDetailedSampleService() {
+    return detailedSampleService;
   }
 
-  public void setSampleAdditionalInfoService(DefaultSampleAdditionalInfoService sampleAdditionalInfoService) {
-    this.sampleAdditionalInfoService = sampleAdditionalInfoService;
-    updateSampleAdditionalInfoServiceDependencies();
+  public void setDetailedSampleService(DefaultDetailedSampleService detailedSampleService) {
+    this.detailedSampleService = detailedSampleService;
+    updateDetailedSampleServiceDependencies();
   }
 
-  public void setDefaultSampleAdditionalInfoService() {
-    DefaultSampleAdditionalInfoService svc = new DefaultSampleAdditionalInfoService();
+  public void setDefaultDetailedSampleService() {
+    DefaultDetailedSampleService svc = new DefaultDetailedSampleService();
     svc.setAuthorizationManager(authorizationManager);
     svc.setQcPassedDetailDao(qcPassedDetailDao);
-    svc.setSampleAdditionalInfoDao(sampleAdditionalInfoDao);
+    svc.setDetailedSampleDao(detailedSampleDao);
     svc.setSampleClassDao(sampleClassDao);
     svc.setSampleDao(sampleDao);
     svc.setSqlKitDao(kitDao);
     svc.setSubprojectDao(subprojectDao);
-    setSampleAdditionalInfoService(svc);
+    setDetailedSampleService(svc);
   }
 
-  private void updateSampleAdditionalInfoServiceDependencies() {
-    if (sampleService != null) sampleService.setSampleAdditionalInfoService(sampleAdditionalInfoService);
+  private void updateDetailedSampleServiceDependencies() {
+    if (sampleService != null) sampleService.setDetailedSampleService(detailedSampleService);
   }
 
   public DefaultLabService getLabService() {
@@ -1199,7 +1200,7 @@ public class MisoServiceManager {
   }
 
   private void updateQcPassedDetailDaoDependencies() {
-    if (sampleAdditionalInfoService != null) sampleAdditionalInfoService.setQcPassedDetailDao(qcPassedDetailDao);
+    if (detailedSampleService != null) detailedSampleService.setQcPassedDetailDao(qcPassedDetailDao);
     if (sampleService != null) sampleService.setQcPassedDetailDao(qcPassedDetailDao);
   }
 
@@ -1219,7 +1220,7 @@ public class MisoServiceManager {
   }
 
   private void updateSubprojectDaoDependencies() {
-    if (sampleAdditionalInfoService != null) sampleAdditionalInfoService.setSubprojectDao(subprojectDao);
+    if (detailedSampleService != null) detailedSampleService.setSubprojectDao(subprojectDao);
     if (sampleService != null) sampleService.setSubProjectDao(subprojectDao);
   }
 
