@@ -31,7 +31,7 @@ Sample.hot = {
       if (sam.type != 'Plain') {
         // add attributes if it's a first receipt
         sam.sampleClassAlias = Hot.getAliasFromId(sam.sampleClassId, Hot.sampleOptions.sampleClassesDtos);
-        if (sam.parentSampleClassId) sam.parentSampleClassAlias = Hot.getAliasFromId(sam.parentSampleClassId, Hot.sampleOptions.sampleClassesDtos);
+        if (sam.parentTissueSampleClassId) sam.parentTissueSampleClassAlias = Hot.getAliasFromId(sam.parentTissueSampleClassId, Hot.sampleOptions.sampleClassesDtos);
         if (sam.tissueOriginId) sam.tissueOriginLabel = Hot.sampleOptions.tissueOriginsDtos.filter(function (tod) { return tod.id == sam.tissueOriginId; })[0].label;
         if (sam.tissueTypeId) sam.tissueTypeLabel = Hot.sampleOptions.tissueTypesDtos.filter(function (ttd) { return ttd.id == sam.tissueTypeId; })[0].label;
         if (sam.labId) sam.labComposite = Sample.hot.getLabCompositeFromId(sam.labId, Hot.sampleOptions.labsDtos);
@@ -84,8 +84,8 @@ Sample.hot = {
       newSam.sampleType = sam.sampleType;
       newSam.projectId = sam.projectId;
       newSam.scientificName = sam.scientificName;
-      newSam.parentSampleClassId = sam.sampleClassId;
-      newSam.parentSampleClassAlias = Hot.getAliasFromId(newSam.parentSampleClassId, Hot.sampleOptions.sampleClassesDtos);
+      newSam.parentTissueSampleClassId = sam.sampleClassId;
+      newSam.parentTissueSampleClassAlias = Hot.getAliasFromId(newSam.parentTissueSampleClassId, Hot.sampleOptions.sampleClassesDtos);
       newSam.sampleClassId = Sample.hot.sampleClassId;
       newSam.sampleClassAlias = Hot.getAliasFromId(newSam.sampleClassId, Hot.sampleOptions.sampleClassesDtos);
       newSam.parentId = parseInt(sam.id);
@@ -220,38 +220,18 @@ Sample.hot = {
   },
 
   /**
-   * Returns true if a new sample of the provided SampleClass can be created without an existing parent
-   */
-  canCreateNew: function (sampleClass) {
-    return sampleClass.sampleCategory === "Tissue" || sampleClass.sampleCategory === "Stock";
-  },
-
-  /**
    * Returns the SampleClasses which may be created without an existing parent
    */
   getNewSampleClassOptions: function () {
     var classes = Hot.sortByProperty(Hot.sampleOptions.sampleClassesDtos, 'id');
-    var options = [];
-    for (var i=0; i<classes.length; i++) {
-      if (Sample.hot.canCreateNew(classes[i])) {
-        options.push(classes[i]);
-      }
-    }
-    return options;
+    return classes.filter(function(sc) { return sc.canCreateNew; });
   },
 
   /**
    * Returns the alias of each SampleClass which may be created without an existing parent
    */
   getNewSampleClassOptionsAliasOnly: function () {
-    var classes = Hot.sortByProperty(Hot.sampleOptions.sampleClassesDtos, 'id');
-    var options = [];
-    for (var i=0; i<classes.length; i++) {
-      if (Sample.hot.canCreateNew(classes[i])) {
-        options.push(classes[i].alias);
-      }
-    }
-    return options;
+    return Sample.hot.getNewSampleClassOptions().map(function(sc) { return sc.alias; })
   },
 
   getTissueClassesAliasOnly: function () {
@@ -505,7 +485,7 @@ Sample.hot = {
     var sampleCategory = Sample.hot.getCategoryFromClassId(Sample.hot.sampleClassId);
     return {
       'sampleClassAlias': sampleClassAlias,
-      'parentSampleClassId': rootSampleClassId,
+      'parentTissueSampleClassId': rootSampleClassId,
       'strStatus': sampleCategory === 'Stock' ? 'Not Submitted' : null,
       'scientificName': Sample.hot.sciName
     };
@@ -577,9 +557,9 @@ Sample.hot = {
    * Gets array of sample class aliases that are a valid child of the given parent (detailed sample only)
    */
   getValidClassesForParent: function (parentScId) {
-    var parentSampleClassId = parentScId;
+    var parentTissueSampleClassId = parentScId;
     return Hot.sortByProperty(Hot.sampleOptions.sampleValidRelationshipsDtos, 'id')
-               .filter(function (rel) { return rel.parentId == parentSampleClassId; })
+               .filter(function (rel) { return rel.parentId == parentTissueSampleClassId; })
                .map(function (rel) { return Hot.getAliasFromId(rel.childId, Hot.sampleOptions.sampleClassesDtos); });
   },
 
@@ -718,7 +698,7 @@ Sample.hot = {
       },
       {
         header: 'Parent Sample Class',
-        data: 'parentSampleClassAlias',
+        data: 'parentTissueSampleClassAlias',
         readOnly: true,
         include: isDetailed && action == 'propagate'
       },
@@ -767,7 +747,7 @@ Sample.hot = {
       // Tissue columns
       {
         header: 'Tissue Class',
-        data: 'parentSampleClassAlias',
+        data: 'parentTissueSampleClassAlias',
         type: 'dropdown',
         trimDropdown: false,
         source: Sample.hot.getTissueClassesAliasOnly(),
@@ -1138,8 +1118,8 @@ Sample.hot = {
       }
       if (obj.parentId) {
         sample.parentId = obj.parentId;
-      } else if (obj.parentSampleClassAlias) {
-        sample.parentSampleClassId = Hot.getIdFromAlias(obj.parentSampleClassAlias, Hot.sampleOptions.sampleClassesDtos);
+      } else if (obj.parentTissueSampleClassAlias) {
+        sample.parentTissueSampleClassId = Hot.getIdFromAlias(obj.parentTissueSampleClassAlias, Hot.sampleOptions.sampleClassesDtos);
       }
       if (obj.groupId) {
         sample.groupId = obj.groupId;
@@ -1448,7 +1428,7 @@ Sample.hot = {
     var col = Hot.getColIndex("sampleClassAlias");
 
     for (var i = 0; i < sampleData.length; i++) {
-      var parentClassId = Hot.getIdFromAlias(sampleData[i].parentSampleClassAlias, Hot.sampleOptions.sampleClassesDtos);
+      var parentClassId = Hot.getIdFromAlias(sampleData[i].parentTissueSampleClassAlias, Hot.sampleOptions.sampleClassesDtos);
       var childClassId = Hot.getIdFromAlias(sampleData[i].sampleClassAlias, Hot.sampleOptions.sampleClassesDtos);
       var validRelationship = Sample.hot.findMatchingRelationship(parentClassId, childClassId);
       if (validRelationship.length === 0) {

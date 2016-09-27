@@ -342,6 +342,8 @@ public class DefaultSampleService implements SampleService {
       }
     } else if (isTissueSample(tempParent)) {
       return createParentTissue((SampleTissue) tempParent, sample);
+    } else if (isStockSample(tempParent)) {
+      return createParentStock((SampleStock) tempParent, sample);
     }
     throw new IllegalArgumentException("Could not resolve parent sample");
   }
@@ -356,6 +358,18 @@ public class DefaultSampleService implements SampleService {
     tissue.setSynthetic(true);
     create(tissue);
     return tissue;
+  }
+
+  private SampleStock createParentStock(SampleStock stock, DetailedSample child) throws IOException {
+    log.debug("Creating a new Stock to use as a parent.");
+    stock.setProject(child.getProject());
+    stock.setDescription("Stock");
+    stock.setSampleType(child.getSampleType());
+    stock.setScientificName(child.getScientificName());
+    stock.setVolume(0D);
+    stock.setSynthetic(true);
+    create(stock);
+    return stock;
   }
 
   private Identity createParentIdentity(DetailedSample sample) throws IOException, MisoNamingException, SQLException {

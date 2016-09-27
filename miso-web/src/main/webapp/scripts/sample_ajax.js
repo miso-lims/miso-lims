@@ -774,6 +774,7 @@ Sample.ui = {
     jQuery('#detailedSampleAliquot').hide();
     jQuery('#detailedSampleStock').hide();
     jQuery('#tissueClassRow').hide();
+    jQuery('#stockClassRow').hide();
     jQuery('#tissueClass').val('');
     jQuery('#detailedSampleTissue').show();
   },
@@ -783,14 +784,16 @@ Sample.ui = {
       jQuery(this).val('');
     });
     jQuery('#tissueClassRow').show();
+    jQuery('#stockClassRow').show();
+    jQuery('#detailedSampleStock').show();
     jQuery('#detailedSampleAliquot').show();
-    jQuery('#detailedSampleStock').hide();
   },
    setUpForStock: function() {
     jQuery('#detailedSampleAliquot').find(':input').each(function() {
       jQuery(this).val('');
     });
     jQuery('#tissueClassRow').show();
+    jQuery('#stockClassRow').hide();
     jQuery('#detailedSampleStock').show();
     jQuery('#detailedSampleAliquot').hide();
   },
@@ -1379,7 +1382,7 @@ Sample.ui = {
   insertSampleClassDropdown: function () {
     jQuery('#go').attr('disabled', 'disabled');   
     if (Sample.ui.getUniqueCategoriesForSelected().length == 1) {
-      var classes = Sample.ui.getChildSampleClasses(Sample.ui.selectValidRelationships());
+      var classes = Sample.ui.getChildSampleClasses(Sample.ui.getSampleClassesForSelected());
       var select = [];
       select.push('<select id="classDropdown">');
       select.push('<option value="">-- Select child class</option>');
@@ -1404,30 +1407,14 @@ Sample.ui = {
   /**
    * Returns an array of sample classes that correspond to given sample class IDs (for child samples)
    */
-  getChildSampleClasses: function (sampleClassIDs) {
-    return Sample.sampleClasses.filter(function (sc) {
-      return sampleClassIDs.indexOf(sc.id) != -1;
-    });
-  },
-  
-  /**
-   * Returns an array of SampleValidRelationships objects that have archived = false.
-   * Each SVR can be parented to at least one selected sample.
-   */
-  selectValidRelationships: function  () {
-    // get unique sample class IDs
-    var selectedSCIDs = Sample.ui.getSampleClassesForSelected().map(function (sc) {
-        return sc.id;
+  getChildSampleClasses: function (sampleClasses) {
+    return Sample.sampleClasses.filter(function (childClass) {
+      return sampleClasses.every(function(parentClass) {
+        return Sample.validRelationships.some(function (svr) {
+          return svr.parentId == parentClass.id && svr.childId == childClass.id && !svr.archived;
+        });
       });
-    selectedSCIDs = Sample.ui.getUniqueValues(selectedSCIDs);
-
-    // get unique sample class IDs of children that can be parented to sample classes of the selected samples (and archived = false)
-    var permittedChildSCIDs = Sample.validRelationships.filter(function (svr) {
-      return selectedSCIDs.indexOf(svr.parentId) != -1 && !svr.archived;
-    }).map(function (svr) {
-      return svr.childId;
     });
-    return Sample.ui.getUniqueValues(permittedChildSCIDs);
   },
 
   /**

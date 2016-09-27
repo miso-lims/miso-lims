@@ -51,9 +51,13 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.dto.SampleAliquotDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
+import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 
 @Controller
@@ -65,6 +69,9 @@ public class SampleController extends RestController {
 
   @Autowired
   private SampleService sampleService;
+
+  @Autowired
+  private SampleClassService sampleClassService;
 
   @RequestMapping(value = "/sample/{id}", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
@@ -122,7 +129,7 @@ public class SampleController extends RestController {
         sampleDto.writeUrls(uriBuilder);
       }
 
-      DataTablesResponseDto<SampleDto> dtResponse = new DataTablesResponseDto<SampleDto>();
+      DataTablesResponseDto<SampleDto> dtResponse = new DataTablesResponseDto<>();
       dtResponse.setITotalRecords(numSamples);
       dtResponse.setITotalDisplayRecords(numMatches);
       dtResponse.setAaData(sampleDtos);
@@ -142,6 +149,24 @@ public class SampleController extends RestController {
     }
     Long id = null;
     try {
+      if (sampleDto instanceof SampleAliquotDto) {
+        SampleAliquotDto dto = (SampleAliquotDto) sampleDto;
+        if (dto.getParentId() != null) {
+          // Pass
+        } else if (dto.getSampleClassId() == null) {
+          throw new RestException("No parent and no target sample class.", Status.BAD_REQUEST);
+        } else {
+          SampleClass sampleClass = sampleClassService.get(dto.getSampleClassId());
+          if (sampleClass == null) {
+            throw new RestException("Cannot find sample class: " + dto.getSampleClassId(), Status.BAD_REQUEST);
+          }
+          if (!sampleClass.getSampleCategory().equals(SampleAliquot.CATEGORY_NAME)) {
+            throw new RestException("Class and type mismatch.", Status.BAD_REQUEST);
+          }
+          SampleClass stockClass = sampleClassService.inferStockFromAliquot(sampleClass);
+          dto.setStockClassId(stockClass.getId());
+        }
+      }
       Sample sample = Dtos.to(sampleDto);
       id = sampleService.create(sample);
     } catch (ConstraintViolationException | IllegalArgumentException e) {
