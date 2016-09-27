@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.hasStockParent;
 
 import java.beans.PropertyEditorSupport;
 import java.io.IOException;
@@ -84,10 +85,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
@@ -118,6 +121,7 @@ import uk.ac.bbsrc.tgac.miso.service.LabService;
 import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.service.SamplePurposeService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
+import uk.ac.bbsrc.tgac.miso.service.SampleValidRelationshipService;
 import uk.ac.bbsrc.tgac.miso.service.TissueMaterialService;
 import uk.ac.bbsrc.tgac.miso.service.TissueOriginService;
 import uk.ac.bbsrc.tgac.miso.service.TissueTypeService;
@@ -148,6 +152,9 @@ public class EditSampleController {
 
   @Autowired
   private SampleService sampleService;
+
+  @Autowired
+  private SampleValidRelationshipService sampleValidRelationshipService;
 
   public void setSampleOptionsController(SampleOptionsController sampleOptionsController) {
     this.sampleOptionsController = sampleOptionsController;
@@ -406,19 +413,26 @@ public class EditSampleController {
   private void populateSampleClasses(ModelMap model) throws IOException {
     List<SampleClass> sampleClasses = new ArrayList<>();
     List<SampleClass> tissueClasses = new ArrayList<>();
-    // Can only create Tissues and Analyte Stock from this page, so remove other classes
+    List<SampleClass> stockClasses = new ArrayList<>();
+    Collection<SampleValidRelationship> relationships = sampleValidRelationshipService.getAll();
+    // Can only create Tissues, Stocks, and Aliquots from this page, so remove other classes
     for (SampleClass sc : sampleClassService.getAll()) {
       if (SampleTissue.CATEGORY_NAME.equals(sc.getSampleCategory())) {
         tissueClasses.add(sc);
         sampleClasses.add(sc);
       } else if (SampleStock.CATEGORY_NAME.equals(sc.getSampleCategory())) {
+        stockClasses.add(sc);
+        sampleClasses.add(sc);
+      } else if (SampleAliquot.CATEGORY_NAME.equals(sc.getSampleCategory()) && hasStockParent(sc.getId(), relationships)) {
         sampleClasses.add(sc);
       }
     }
     Collections.sort(sampleClasses, SAMPLECLASS_ALIAS);
     Collections.sort(tissueClasses, SAMPLECLASS_ALIAS);
+    Collections.sort(stockClasses, SAMPLECLASS_ALIAS);
     model.put("sampleClasses", sampleClasses);
     model.put("tissueClasses", tissueClasses);
+    model.put("stockClasses", stockClasses);
   }
 
   @Autowired
@@ -825,6 +839,9 @@ public class EditSampleController {
       builder.setSampleClass(sampleClassService.get(builder.getSampleClass().getId()));
       if (builder.getTissueClass() != null) {
         builder.setTissueClass(sampleClassService.get(builder.getTissueClass().getId()));
+      }
+      if (builder.getParent() == null && builder.getSampleClass().getSampleCategory().equals(SampleAliquot.CATEGORY_NAME)) {
+        builder.setStockClass(sampleClassService.inferStockFromAliquot(builder.getSampleClass()));
       }
       sample = builder.build();
     }

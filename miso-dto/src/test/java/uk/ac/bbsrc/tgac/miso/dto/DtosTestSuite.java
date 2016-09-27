@@ -1,12 +1,17 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+import java.io.IOException;
 
 import org.junit.Test;
 
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
@@ -18,7 +23,7 @@ public class DtosTestSuite {
   public void testToStockWithNewParents() {
     SampleStockDto dto = new SampleStockDto();
     dto.setRootSampleClassId(1L);
-    dto.setParentSampleClassId(2L);
+    dto.setParentTissueSampleClassId(2L);
     dto.setSampleClassId(3L);
     dto.setExternalName("externalName");
     dto.setTissueOriginId(4L);
@@ -48,10 +53,49 @@ public class DtosTestSuite {
   }
 
   @Test
+  public void testToAliquotWithNewParents() {
+    SampleAliquotDto dto = new SampleAliquotDto();
+    dto.setRootSampleClassId(1L);
+    dto.setParentTissueSampleClassId(2L);
+    dto.setSampleClassId(4L);
+    dto.setExternalName("externalName");
+    dto.setTissueOriginId(4L);
+    dto.setTissueTypeId(5L);
+    dto.setStockClassId(3L);
+
+    Sample sample = Dtos.to(dto);
+    assertNotNull(sample);
+    assertTrue(LimsUtils.isAliquotSample(sample));
+    SampleAliquot aliquot = (SampleAliquot) sample;
+    assertNotNull(aliquot.getSampleClass());
+    assertEquals(Long.valueOf(4L), aliquot.getSampleClass().getId());
+
+    assertNotNull(aliquot.getParent());
+    assertTrue(LimsUtils.isStockSample(aliquot.getParent()));
+    SampleStock stock = (SampleStock) aliquot.getParent();
+    assertEquals(Long.valueOf(3L), stock.getSampleClass().getId());
+
+    assertNotNull(stock.getParent());
+    assertTrue(LimsUtils.isTissueSample(stock.getParent()));
+    SampleTissue tissue = (SampleTissue) stock.getParent();
+    assertNotNull(tissue.getSampleClass());
+    assertEquals(Long.valueOf(2L), tissue.getSampleClass().getId());
+    assertNotNull(tissue.getTissueOrigin());
+    assertEquals(Long.valueOf(4L), tissue.getTissueOrigin().getId());
+    assertNotNull(tissue.getTissueType());
+    assertEquals(Long.valueOf(5L), tissue.getTissueType().getId());
+
+    assertNotNull(tissue.getParent());
+    assertTrue(LimsUtils.isIdentitySample(tissue.getParent()));
+    Identity identity = (Identity) tissue.getParent();
+    assertEquals("externalName", identity.getExternalName());
+  }
+
+  @Test
   public void testToAliquotWithExistingParent() {
     SampleAliquotDto dto = new SampleAliquotDto();
     dto.setRootSampleClassId(1L);
-    dto.setParentSampleClassId(2L);
+    dto.setParentTissueSampleClassId(2L);
     dto.setSampleClassId(3L);
     dto.setExternalName("externalName");
     dto.setTissueOriginId(4L);
