@@ -43,6 +43,7 @@ import net.sf.ehcache.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.RowMapper;
@@ -87,6 +88,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.persistence.LibraryAdditionalInfoDao;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
@@ -213,6 +215,14 @@ public class SQLLibraryDAO implements LibraryStore {
   private ChangeLogStore changeLogDAO;
   private SecurityStore securityDAO;
   private BoxStore boxDAO;
+  
+  @Value("${miso.detailed.sample.enabled:false}")
+  private Boolean detailedSampleEnabled;
+  
+  public void setDetailedSampleEnabled(Boolean detailedSampleEnabled) {
+    this.detailedSampleEnabled = detailedSampleEnabled;
+  }
+  
   @Autowired
   private LibraryAdditionalInfoDao libraryAdditionalInfoDAO;
 
@@ -351,6 +361,11 @@ public class SQLLibraryDAO implements LibraryStore {
     if (this.cascadeType != null) {
       securityProfileId = securityProfileDAO.save(library.getSecurityProfile());
     }
+    
+    if (detailedSampleEnabled && !LimsUtils.isAliquotSample(library.getSample())) {
+      throw new IllegalArgumentException("A Library must have an aliquot Sample as its parent.");
+    }
+    
     if (library.isEmpty()) {
       boxDAO.removeBoxableFromBox(library);
       library.setVolume(0D);
@@ -474,13 +489,13 @@ public class SQLLibraryDAO implements LibraryStore {
     if (this.cascadeType != null) {
       if (this.cascadeType.equals(CascadeType.PERSIST)) {
         // total fudge to clear out the pool cache if this library is used in any pool by way of a dilution
-        for (Pool p : poolDAO.listByLibraryId(library.getId())) {
+        for (Pool<?> p : poolDAO.listByLibraryId(library.getId())) {
           DbUtils.updateCaches(cacheManager, p, Pool.class);
         }
 
         sampleDAO.save(library.getSample());
       } else if (this.cascadeType.equals(CascadeType.REMOVE)) {
-        for (Pool p : poolDAO.listByLibraryId(library.getId())) {
+        for (Pool<?> p : poolDAO.listByLibraryId(library.getId())) {
           DbUtils.updateCaches(cacheManager, p, Pool.class);
         }
 
@@ -619,12 +634,12 @@ public class SQLLibraryDAO implements LibraryStore {
     if (library.isDeletable()
         && (namedTemplate.update(LIBRARY_DELETE, new MapSqlParameterSource().addValue("libraryId", library.getId())) == 1)) {
       if (this.cascadeType.equals(CascadeType.PERSIST)) {
-        for (Pool p : poolDAO.listByLibraryId(library.getId())) {
+        for (Pool<?> p : poolDAO.listByLibraryId(library.getId())) {
           DbUtils.updateCaches(cacheManager, p, Pool.class);
         }
         sampleDAO.save(library.getSample());
       } else if (this.cascadeType.equals(CascadeType.REMOVE)) {
-        for (Pool p : poolDAO.listByLibraryId(library.getId())) {
+        for (Pool<?> p : poolDAO.listByLibraryId(library.getId())) {
           DbUtils.updateCaches(cacheManager, p, Pool.class);
         }
 
