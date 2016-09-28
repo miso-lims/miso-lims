@@ -111,15 +111,13 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
 
   public static final String LIBRARY_DILUTION_DELETE = "DELETE FROM LibraryDilution WHERE dilutionId=:dilutionId";
 
-  public static String LIBRARY_DILUTION_SELECT_BY_SEARCH = "SELECT ld.dilutionId, ld.name, ld.concentration, ld.library_libraryId, "
-      + "ld.identificationBarcode, ld.creationDate, ld.dilutionUserName, ld.securityProfile_profileId, ld.targetedResequencingId, "
-      + "ld.lastUpdated " + "FROM LibraryDilution ld " + "JOIN Library l ON l.libraryId = ld.library_libraryId "
-      + "WHERE l.platformName = :platformName AND (UPPER(ld.name) LIKE :search OR UPPER(ld.identificationBarcode) LIKE :search)";
-
   public static String LIBRARY_DILUTION_SELECT_BY_SEARCH_ONLY = "SELECT ld.dilutionId, ld.name, ld.concentration, "
       + "ld.library_libraryId, ld.identificationBarcode, ld.creationDate, ld.dilutionUserName, ld.securityProfile_profileId, "
-      + "ld.targetedResequencingId, ld.lastUpdated " + "FROM LibraryDilution ld "
-      + "WHERE UPPER(ld.name) LIKE :search OR UPPER(ld.identificationBarcode) LIKE :search";
+      + "ld.targetedResequencingId, ld.lastUpdated " + "FROM LibraryDilution ld JOIN Library l ON l.libraryId = ld.library_libraryId "
+      + "WHERE (UPPER(ld.name) LIKE :search OR UPPER(ld.identificationBarcode) LIKE :search OR "
+      + "UPPER(l.name) LIKE :search OR UPPER(l.alias) LIKE :search OR UPPER(l.description) LIKE :search)";
+
+  public static String LIBRARY_DILUTION_SELECT_BY_SEARCH = LIBRARY_DILUTION_SELECT_BY_SEARCH_ONLY + " AND l.platformName = :platformName";
 
   protected static final Logger log = LoggerFactory.getLogger(SQLLibraryDilutionDAO.class);
 
