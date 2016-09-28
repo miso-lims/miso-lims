@@ -1057,6 +1057,18 @@ table td.headertable {
     cursor: pointer;
 }
 
+td.headertable #instanceName {
+    font: Helvetica;
+    padding: 0 30px;
+    color: #666666;
+    display: inline;
+    font-size: 40px;
+}
+
+td.headertable img {
+	vertical-align: top;
+}
+
 .bubbleInfo {
     position: relative;
     top: 0px;
