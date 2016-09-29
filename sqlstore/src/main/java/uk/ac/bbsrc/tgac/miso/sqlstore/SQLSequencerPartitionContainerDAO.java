@@ -32,7 +32,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.regex.Matcher;
 
 import javax.persistence.CascadeType;
 
@@ -429,9 +428,12 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
           @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public boolean remove(SequencerPartitionContainer container) throws IOException {
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
+
     if (container.isDeletable()) {
       changeLogDAO.deleteAllById(TABLE_NAME, container.getId());
     }
+    removeContainerFromRun(container);
+    removeContainerPartitionAssociations(container);
     if (container.isDeletable() && (namedTemplate.update(SEQUENCER_PARTITION_CONTAINER_DELETE,
         new MapSqlParameterSource().addValue("containerId", container.getId())) == 1)) {
 
@@ -440,9 +442,6 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
           partitionDAO.remove(partition);
         }
       }
-
-      removeContainerPartitionAssociations(container);
-      removeContainerFromRun(container);
 
       purgeListCache(container, false);
       return true;

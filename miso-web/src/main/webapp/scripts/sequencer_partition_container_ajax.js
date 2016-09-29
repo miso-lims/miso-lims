@@ -137,17 +137,51 @@ var Container = Container || {
     jQuery('#container-form').parsley();
     jQuery('#container-form').parsley().validate();
     
-    console.log(jQuery('div[id^="studySelectDiv"]'));
+    if(jQuery("#identificationBarcode").length == 0) {
+    	// Serial number is not being modified.
+        Validate.updateWarningOrSubmit('#container-form', Container.validateStudyAdded);
+    } else {
+    	// Ensure provided serial number is unique.
+    	var serialNumber = jQuery("#identificationBarcode").val();
+    	var containerId = null;
+		if(jQuery("#containerId").length > 0) {
+		  containerId = jQuery("#containerId").val();
+		}
+
+	    Fluxion.doAjax(
+        'containerControllerHelperService',
+        'isSerialNumberUnique',
+        {
+          'serialNumber': serialNumber,
+          'containerId': containerId,
+          'url': ajaxurl
+        },
+        {
+          'doOnSuccess': function(json) {
+        	  if(json.isSerialNumberUnique === "true") {
+                  Validate.updateWarningOrSubmit('#container-form', Container.validateStudyAdded);
+        	  } else {
+        		  // Serial number is not unique.
+                  var serialNumberField = jQuery('#identificationBarcode').parsley();
+            	  window.ParsleyUI.addError(serialNumberField, "serialNumberError", 'This serial number is already in use. Please choose another.');
+            	  return false;
+        	  }
+          },
+          'doOnError': function(json) {
+        	// Unable to perform lookup.
+        	alert(json.error);
+        	window.ParsleyUI.addError(serialNumberField, "serialNumberError", 'Unable to determine if serial number is unique.');
+        	return false;
+           }
+        }
+      );
+    }
     
-    Validate.updateWarningOrSubmit('#container-form', Container.validateStudyAdded);
-    return false;
   },
   
   validateStudyAdded: function () {
     var ok = true;
     if (jQuery('div[id^="studySelectDiv"]').length > 0) {
-      console.log(jQuery('div[id^="studySelectDiv"]'));
-      console.log("whoops");
       if (!confirm("You haven't selected a study for one or more pools. Are you sure you still want to save?")) {
         alert("Please select a Study for each Pool added.\n");
         ok = false;

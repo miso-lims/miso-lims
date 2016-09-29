@@ -792,17 +792,17 @@ public class ContainerControllerHelperService {
             return JSONUtils.JSONObjectResponse(responseMap);
           } else {
             // choose container
-            return JSONUtils.SimpleJSONError("Multiple containers found with barcode " + barcode);
+            return JSONUtils.SimpleJSONError("Multiple containers found with serial number " + barcode);
           }
         } else {
-          return JSONUtils.JSONObjectResponse("error", "No containers with this barcode.");
+          return JSONUtils.JSONObjectResponse("error", "No containers with this serial number.");
         }
       } catch (IOException e) {
-        log.error("unable to lookup barcode", e);
-        return JSONUtils.JSONObjectResponse("error", "Unable to lookup barcode.");
+        log.error("unable to lookup serial number", e);
+        return JSONUtils.JSONObjectResponse("error", "Unable to lookup serial number.");
       }
     } else {
-      return JSONUtils.SimpleJSONError("Please supply a barcode to lookup.");
+      return JSONUtils.SimpleJSONError("Please supply a serial number to lookup.");
     }
   }
 
@@ -930,5 +930,39 @@ public class ContainerControllerHelperService {
 
   public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
     this.dataObjectFactory = dataObjectFactory;
+  }
+
+  public JSONObject isSerialNumberUnique(HttpSession session, JSONObject json) {
+    if (!json.has("serialNumber") || (json.has("serialNumber") && isStringEmptyOrNull(json.getString("serialNumber")))) {
+      return JSONUtils.SimpleJSONError("Please supply a serial number to lookup.");
+    }
+
+    String serialNumber = json.getString("serialNumber"); // Want to know if a container with this serial number already exists.
+    String containerId = json.getString("containerId"); // Id of the container the serial number will be applied to. Might be null.
+    Map<String, Object> responseMap = new HashMap<String, Object>();
+    try {
+      Collection<SequencerPartitionContainer<SequencerPoolPartition>> containers = requestManager
+          .listSequencerPartitionContainersByBarcode(serialNumber);
+      if (containers.isEmpty()) {
+        responseMap.put("isSerialNumberUnique", true);
+      } else {
+        SequencerPartitionContainer<SequencerPoolPartition> container = new ArrayList<>(containers).get(0);
+
+        if (containerId != null && !containerId.equals("null") && Long.valueOf(containerId).longValue() == container.getId()) {
+          // The serial number is unique. Lookup returned the container being edited.
+          responseMap.put("isSerialNumberUnique", true);
+        } else {
+          responseMap.put("isSerialNumberUnique", false);
+        }
+      }
+      return JSONUtils.JSONObjectResponse(responseMap);
+    } catch (IOException e) {
+      String err = String.format("Unable to lookup serial number %s.", serialNumber);
+      log.error(err, e);
+      responseMap.put("error", err);
+      responseMap.put("isSerialNumberUnique", false); // Uniqueness is unknown. Enter the error state to be safe.
+      return JSONUtils.JSONObjectResponse(responseMap);
+    }
+
   }
 }
