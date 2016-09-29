@@ -75,8 +75,8 @@ public class DetailedSampleBuilder
   private boolean isSynthetic = false;
   private boolean nonStandardAlias = false;
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
-  private Collection<SampleQC> sampleQCs = new TreeSet<SampleQC>();
-  private Collection<Note> notes = new HashSet<Note>();
+  private Collection<SampleQC> sampleQCs = new TreeSet<>();
+  private Collection<Note> notes = new HashSet<>();
 
   // DetailedSample attributes
   private DetailedSample parent;
@@ -89,9 +89,9 @@ public class DetailedSampleBuilder
   private String groupDescription;
   private Integer siblingNumber;
   private Long preMigrationId;
+  private Long identityId;
 
   // Identity attributes
-  private String internalName;
   private String externalName;
   private DonorSex donorSex = DonorSex.UNKNOWN;
 
@@ -520,16 +520,6 @@ public class DetailedSampleBuilder
   }
 
   @Override
-  public String getInternalName() {
-    return internalName;
-  }
-
-  @Override
-  public void setInternalName(String internalName) {
-    this.internalName = internalName;
-  }
-
-  @Override
   public String getExternalName() {
     return externalName;
   }
@@ -834,6 +824,16 @@ public class DetailedSampleBuilder
     this.preMigrationId = preMigrationId;
   }
 
+  @Override
+  public Long getIdentityId() {
+    return identityId;
+  }
+
+  @Override
+  public void setIdentityId(Long identityId) {
+    this.identityId = identityId;
+  }
+
   public DetailedSample build() {
     if (sampleClass == null || sampleClass.getSampleCategory() == null) {
       throw new NullPointerException("Missing sample class or category");
@@ -884,8 +884,13 @@ public class DetailedSampleBuilder
       if (categoryIndex < 0) {
         throw new IllegalArgumentException("Sample has no parent and cannot infer order from sample category.");
       }
-      if (categoryIndex > 0 && externalName != null) {
-        parent = buildIdentity();
+      if (categoryIndex > 0) {
+        if (identityId == null && externalName != null) {
+          parent = buildIdentity();
+        } else if (identityId != null) {
+          parent = new IdentityImpl();
+          parent.setId(identityId);
+        }
       }
       if (categoryIndex > 1 && tissueClass != null) {
         SampleTissue tissue = buildTissue();
@@ -943,7 +948,6 @@ public class DetailedSampleBuilder
       throw new NullPointerException("Missing externalName");
     }
     Identity identity = new IdentityImpl();
-    identity.setInternalName(internalName);
     identity.setExternalName(externalName);
     identity.setDonorSex(donorSex);
     return identity;

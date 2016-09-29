@@ -25,6 +25,7 @@ public class DetailedSampleDto extends SampleDto {
   private String groupDescription;
   private Boolean isSynthetic;
   private boolean nonStandardAlias;
+  private Long identityId;
 
   public Long getParentId() {
     return parentId;
@@ -161,6 +162,14 @@ public class DetailedSampleDto extends SampleDto {
 
   public void setDetailedQcStatusNote(String detailedQcStatusNote) {
     this.detailedQcStatusNote = detailedQcStatusNote;
+  }
+
+  public Long getIdentityId() {
+    return identityId;
+  }
+
+  public void setIdentityId(Long identityId) {
+    this.identityId = identityId;
   }
 
   @Override

@@ -26,8 +26,11 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -50,9 +53,14 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+
+import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SampleAliquotDto;
@@ -201,6 +209,48 @@ public class SampleController extends RestController {
   public ResponseEntity<?> deleteSample(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
     sampleService.delete(id);
     return new ResponseEntity<>(HttpStatus.OK);
+  }
+
+  /**
+   * 
+   * @param identitiesSearches
+   *          String externalNames or Identity aliases
+   * @param response
+   * @return
+   * @throws IOException
+   */
+  @RequestMapping(value = "/identities", method = RequestMethod.POST, headers = { "Content-type=application/json" })
+  @ResponseBody
+  public JSONObject getIdentitiesBySearch(@RequestBody JSONObject identitiesSearches,
+      HttpServletResponse response) throws IOException {
+    if (identitiesSearches.size() == 0) {
+      throw new RestException("Must give search terms to look up identities");
+    }
+    Integer requestCounter = (Integer) identitiesSearches.get("requestCounter");
+    List<Set<SampleDto>> identitiesResults = new ArrayList<>();
+
+    JSONArray searchTerms = JSONArray.fromObject(identitiesSearches.get("identitiesSearches"));
+    for (int i = 0; i < searchTerms.size(); i++) {
+      Set<Sample> resultsForOneParent = new HashSet<>();
+      Set<SampleDto> resultsForOneParentDtos = new HashSet<>();
+
+      for (String term : IdentityImpl.getSetFromString(((String) searchTerms.get(i)).replaceAll(";", ","))) {
+        Collection<Identity> selectedIdentities = sampleService.getIdentitiesByExternalNameOrAlias(term);
+        for (Identity selectedIdentity : selectedIdentities) {
+          if (resultsForOneParent.contains(selectedIdentity)) {
+            continue;
+          } else {
+            resultsForOneParentDtos.add(Dtos.asDto(selectedIdentity));
+            resultsForOneParent.add(selectedIdentity);
+          }
+        }
+      }
+      identitiesResults.add(resultsForOneParentDtos);
+    }
+    JSONObject allIdentities = new JSONObject();
+    allIdentities.put("requestCounter", requestCounter);
+    allIdentities.put("identitiesResults", identitiesResults);
+    return allIdentities;
   }
 
 }

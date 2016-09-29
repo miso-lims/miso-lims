@@ -61,6 +61,9 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
   
   private Long preMigrationId;
 
+  @Transient
+  private Long identityId;
+
   @Override
   public DetailedSample getParent() {
     return parent;
@@ -192,4 +195,15 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
   public void setPreMigrationId(Long preMigrationId) {
     this.preMigrationId = preMigrationId;
   }
+
+  @Override
+  public Long getIdentityId() {
+    return identityId;
+  }
+
+  @Override
+  public void setIdentityId(Long identityId) {
+    this.identityId = identityId;
+  }
+
 }

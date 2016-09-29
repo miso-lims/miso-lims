@@ -98,4 +98,13 @@ public interface DetailedSample extends Sample {
 
   void setDetailedQcStatusNote(String detailedQcStatusNote);
 
+  /**
+   * Transient field for storing the ID of the identity which will be at the root of the hierarchy for this Detailed Sample
+   * 
+   * @return Long identityId
+   */
+  Long getIdentityId();
+
+  void setIdentityId(Long identityId);
+
 }

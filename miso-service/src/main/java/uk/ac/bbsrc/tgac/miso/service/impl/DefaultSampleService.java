@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -33,6 +34,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl.IdentityBuilder;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
@@ -107,6 +109,8 @@ public class DefaultSampleService implements SampleService {
   @Value("${miso.autoGenerateIdentificationBarcodes}")
   private Boolean autoGenerateIdBarcodes;
 
+  private Boolean uniqueExternalNameWithinProjectRequired = true;
+
   public void setSampleDao(SampleDao sampleDao) {
     this.sampleDao = sampleDao;
   }
@@ -175,6 +179,16 @@ public class DefaultSampleService implements SampleService {
   @CoverageIgnore
   public void setAutoGenerateIdBarcodes(Boolean autoGenerateIdBarcodes) {
     this.autoGenerateIdBarcodes = autoGenerateIdBarcodes;
+  }
+
+  @CoverageIgnore
+  public Boolean isUniqueExternalNameWithinProjectRequired() {
+    return uniqueExternalNameWithinProjectRequired;
+  }
+
+  @CoverageIgnore
+  public void setUniqueExternalNameWithinProjectRequired(Boolean uniqueExternalNameWithinProjectRequired) {
+    this.uniqueExternalNameWithinProjectRequired = uniqueExternalNameWithinProjectRequired;
   }
 
   @Override
@@ -295,6 +309,36 @@ public class DefaultSampleService implements SampleService {
   }
 
   /**
+   * Checks whether the given external name(s) (may be multiple comma-separated names) is required to be unique within a project,
+   * then if it actually is unique within a project.
+   * This method should be called <b>before</b> saving an Identity.
+   * 
+   * @param newExternalName
+   *          the String to validate
+   * @param project
+   *          the project that will be associated with the Identity
+   * @throws ConstraintViolationException
+   *           if the external name is already used in this project
+   * @throws IOException
+   */
+  @Override
+  public void confirmExternalNameUniqueForProjectIfRequired(String newExternalName, Sample sample)
+      throws IOException, ConstraintViolationException {
+    if (!isUniqueExternalNameWithinProjectRequired()) return;
+    for (Identity existingIdentity : getIdentitiesByExternalNameOrAlias(newExternalName)) {
+        // not an issue if it matches an identity from another project
+      if (existingIdentity.getProject().getId() != sample.getProject().getId()) continue;
+      Set<String> intersection = new HashSet<>(IdentityImpl.getSetFromString(newExternalName));
+      intersection.retainAll(IdentityImpl.getSetFromString(existingIdentity.getExternalName()));
+      if (intersection.size() != 0) {
+        throw new ConstraintViolationException("Duplicate external names not allowed within a project: External name " + newExternalName
+            + " is already associated with Identity " + existingIdentity.getAlias() + " (" + existingIdentity.getExternalName() + ")",
+            null, "externalName");
+      }
+    }
+  }
+
+  /**
    * Finds an existing parent Sample or creates a new one if necessary
    * 
    * @param sample must contain parent (via {@link DetailedSample#getParent() getParent}), including externalName if a new parent is
@@ -305,7 +349,7 @@ public class DefaultSampleService implements SampleService {
    * @throws SQLException
    * @throws MisoNamingException
    */
-  private DetailedSample findOrCreateParent(DetailedSample sample) throws IOException, MisoNamingException {
+  private DetailedSample findOrCreateParent(DetailedSample sample) throws IOException, MisoNamingException, ConstraintViolationException {
     if (sample.getParent() == null) {
       throw new IllegalArgumentException("Detailed sample is missing parent identifier");
     }
@@ -316,13 +360,15 @@ public class DefaultSampleService implements SampleService {
         throw new IllegalArgumentException("Parent sample does not exist");
       else
         return (DetailedSample) parent;
-    } else if (isIdentitySample(tempParent) && !isStringEmptyOrNull(((Identity) tempParent).getExternalName())) {
-      Identity parentIdentity = sampleDao.getIdentityByExternalName(((Identity) tempParent).getExternalName());
-      if (parentIdentity != null) return parentIdentity;
-      try {
-        return createParentIdentity(sample);
-      } catch (SQLException e) {
-        throw new IOException(e);
+    } else if (isIdentitySample(tempParent)) {
+      if (sample.getIdentityId() != null) {
+        return (DetailedSample) sampleDao.getSample(sample.getIdentityId());
+      } else {
+        try {
+          return createParentIdentity(sample);
+        } catch (SQLException e) {
+          throw new IOException(e);
+        }
       }
     } else if (isTissueSample(tempParent)) {
       return createParentTissue((SampleTissue) tempParent, sample);
@@ -340,6 +386,7 @@ public class DefaultSampleService implements SampleService {
     tissue.setScientificName(child.getScientificName());
     tissue.setVolume(0D);
     tissue.setSynthetic(true);
+    if (child.getIdentityId() != null) tissue.setIdentityId(child.getIdentityId());
     create(tissue);
     return tissue;
   }
@@ -352,6 +399,7 @@ public class DefaultSampleService implements SampleService {
     stock.setScientificName(child.getScientificName());
     stock.setVolume(0D);
     stock.setSynthetic(true);
+    if (child.getIdentityId() != null) stock.setIdentityId(child.getIdentityId());
     create(stock);
     return stock;
   }
@@ -370,10 +418,12 @@ public class DefaultSampleService implements SampleService {
     String internalName = sample.getProject().getShortName() + "_" + number;
     Identity shellParent = (Identity) sample.getParent();
 
+    confirmExternalNameUniqueForProjectIfRequired(shellParent.getExternalName(), sample);
+
     Sample identitySample = new IdentityBuilder().user(authorizationManager.getCurrentUser()).project(sample.getProject())
         .description("Identity").sampleType(sample.getSampleType()).scientificName(sample.getScientificName()).name(generateTemporaryName())
         .alias(internalName).rootSampleClass(rootSampleClass).volume(0D).externalName(shellParent.getExternalName())
-        .internalName(internalName).donorSex(shellParent.getDonorSex()).build();
+        .donorSex(shellParent.getDonorSex()).build();
 
     setChangeDetails(identitySample);
     return (Identity) save(identitySample);
@@ -503,7 +553,9 @@ public class DefaultSampleService implements SampleService {
       if (isIdentitySample(target)) {
         Identity iTarget = (Identity) target;
         Identity iSource = (Identity) source;
-        iTarget.setInternalName(iSource.getInternalName());
+        if (!iSource.getExternalName().equals(iTarget.getExternalName())) {
+          confirmExternalNameUniqueForProjectIfRequired(iSource.getExternalName(), iTarget);
+        }
         iTarget.setExternalName(iSource.getExternalName());
       }
       if (isTissueSample(target)) {
@@ -621,13 +673,13 @@ public class DefaultSampleService implements SampleService {
 
   @Override
   @Transactional(propagation = Propagation.REQUIRED)
-  public Identity getIdentityByExternalName(String externalName) throws IOException {
-    return sampleDao.getIdentityByExternalName(externalName);
+  public Collection<Identity> getIdentitiesByExternalNameOrAlias(String externalName) throws IOException {
+    return sampleDao.getIdentitiesByExternalNameOrAlias(externalName);
   }
 
   @Override
   public List<Sample> getByAlias(String alias) throws IOException {
-    return new ArrayList<Sample>(sampleDao.listByAlias(alias));
+    return new ArrayList<>(sampleDao.listByAlias(alias));
   }
 
 }
