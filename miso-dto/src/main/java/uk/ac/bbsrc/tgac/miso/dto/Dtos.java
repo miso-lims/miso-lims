@@ -28,6 +28,7 @@ import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
@@ -42,7 +43,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.QcPassedDetail;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleCVSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
@@ -62,6 +62,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstituteImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
@@ -71,7 +72,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrderImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.QcPassedDetailImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleCVSlideImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
@@ -590,7 +590,6 @@ public class Dtos {
 
   private static SampleIdentityDto asIdentitySampleDto(Identity from) {
     SampleIdentityDto dto = new SampleIdentityDto();
-    dto.setInternalName(from.getInternalName());
     dto.setExternalName(from.getExternalName());
     dto.setDonorSex(from.getDonorSex().getLabel());
     return dto;
@@ -598,7 +597,6 @@ public class Dtos {
 
   private static Identity toIdentitySample(SampleIdentityDto from) {
     Identity to = new IdentityImpl();
-    to.setInternalName(from.getInternalName());
     to.setExternalName(from.getExternalName());
     if (from.getDonorSex() != null) {
       to.setDonorSex(from.getDonorSex());

@@ -217,15 +217,13 @@ FOR EACH ROW
   DECLARE log_message varchar(500) CHARACTER SET utf8;
   SET log_message = CONCAT_WS(', ',
      CASE WHEN NEW.donorSex <> OLD.donorSex THEN CONCAT('donor sex: ', OLD.donorSex, ' → ', NEW.donorSex) END,
-     CASE WHEN NEW.externalName <> OLD.externalName THEN CONCAT('external name: ', OLD.externalName, ' → ', NEW.externalName) END,
-     CASE WHEN NEW.internalName <> OLD.internalName THEN CONCAT('internal name: ', OLD.internalName, ' → ', NEW.internalName) END);
+     CASE WHEN NEW.externalName <> OLD.externalName THEN CONCAT('external name: ', OLD.externalName, ' → ', NEW.externalName) END);
   IF log_message IS NOT NULL AND log_message <> '' THEN
     INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message) VALUES (
       NEW.sampleId,
       COALESCE(CONCAT_WS(',',
         CASE WHEN NEW.donorSex <> OLD.donorSex THEN 'donorSex' END,
-        CASE WHEN NEW.externalName <> OLD.externalName THEN 'externalName' END,
-        CASE WHEN NEW.internalName <> OLD.internalName THEN 'internalName' END
+        CASE WHEN NEW.externalName <> OLD.externalName THEN 'externalName' END
       ), ''),
       (SELECT lastModifier FROM Sample WHERE sampleId = NEW.sampleId),
       log_message

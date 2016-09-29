@@ -4,16 +4,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public interface Identity extends DetailedSample {
   
   public static final String CATEGORY_NAME = "Identity";
 
-  String getInternalName();
-
-  void setInternalName(String internalName);
-
   String getExternalName();
+
+  Set<String> getExternalNameSet();
 
   void setExternalName(String externalName);
 
