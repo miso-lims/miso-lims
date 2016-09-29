@@ -30,8 +30,6 @@ UPDATE DetailedSample ds
     WHERE s.qcPassed = false);
 
 ALTER TABLE DetailedSample ADD COLUMN detailedQcStatusNote VARCHAR(500) DEFAULT NULL;
-UPDATE DetailedSample SET detailedQcStatusNote = 'Default Note' WHERE qcPassedDetailId IN (
-  SELECT qcPassedDetailId FROM QcPassedDetail WHERE noteRequired = true);
 
 ALTER TABLE QcPassedDetail RENAME TO DetailedQcStatus;
 ALTER TABLE DetailedQcStatus CHANGE COLUMN qcPassedDetailId detailedQcStatusId BIGINT(20) NOT NULL AUTO_INCREMENT;
