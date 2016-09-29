@@ -417,6 +417,7 @@ public class EditLibraryController {
       libType.put("id", lt.getId());
       libType.put("alias", lt.getDescription());
       libType.put("platform", lt.getPlatformType());
+      libType.put("archived", lt.getArchived());
       libraryTypes.add(libType);
     }
 
