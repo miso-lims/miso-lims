@@ -52,6 +52,6 @@ public interface SampleDao extends SampleStore {
 
   Long countBySearch(String querystr) throws IOException;
 
-  Identity getIdentityByExternalName(String externalName) throws IOException;
+  Collection<Identity> getIdentitiesByExternalNameOrAlias(String externalName) throws IOException;
 
 }

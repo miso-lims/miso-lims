@@ -2,10 +2,16 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.JoinColumn;
 import javax.persistence.Table;
 
 import com.eaglegenomics.simlims.core.User;
@@ -22,43 +28,44 @@ public class IdentityImpl extends DetailedSampleImpl implements Identity {
 
   private static final long serialVersionUID = 1L;
 
-  @Column(unique = true, nullable = false)
-  private String internalName;
-
-  @Column(nullable = false, unique = true)
-  private String externalName;
+  @ElementCollection
+  @CollectionTable(name = "Identity_ExternalName", joinColumns = @JoinColumn(name = "sampleId"))
+  @Column(name = "externalName", nullable = false)
+  private Set<String> externalName;
 
   @Enumerated(EnumType.STRING)
   private DonorSex donorSex = DonorSex.UNKNOWN;
 
   @Override
-  public String getInternalName() {
-    return internalName;
-  }
-
-  @Override
-  public void setInternalName(String internalName) {
-    this.internalName = internalName;
-  }
-
-  @Override
   public String getExternalName() {
-    return externalName;
-  }
-
-  @Override
-  public void setExternalName(String externalName) {
-    StringBuilder buffer = new StringBuilder();
+    StringBuilder sb = new StringBuilder();
     boolean first = true;
-    for (String part : externalName.split(",")) {
+    for (String part : externalName) {
       if (first) {
         first = false;
       } else {
-        buffer.append(",");
+        sb.append(",");
       }
-      buffer.append(part.trim().replaceAll("\\s+", " "));
+      sb.append(part);
     }
-    this.externalName = buffer.toString();
+    return sb.toString();
+  }
+
+  @Override
+  public Set<String> getExternalNameSet() {
+    return externalName;
+  }
+
+  /**
+   * 
+   */
+  @Override
+  public void setExternalName(String externalName) {
+    Set<String> externalNames = new HashSet<String>();
+    for (String part : externalName.split(",")) {
+      externalNames.add(part.trim().replaceAll("\\s+", " "));
+    }
+    this.externalName = externalNames;
   }
 
   @Override
@@ -90,7 +97,6 @@ public class IdentityImpl extends DetailedSampleImpl implements Identity {
     /** User is needed to create a SecurityProfile. */
     private User user;
 
-    private String internalName;
     private String externalName;
     private DonorSex donorSex;
 
@@ -139,11 +145,6 @@ public class IdentityImpl extends DetailedSampleImpl implements Identity {
       return this;
     }
 
-    public IdentityBuilder internalName(String internalName) {
-      this.internalName = internalName;
-      return this;
-    }
-
     public IdentityBuilder externalName(String externalName) {
       this.externalName = externalName;
       return this;
@@ -171,7 +172,6 @@ public class IdentityImpl extends DetailedSampleImpl implements Identity {
       i.setSampleType(sampleType);
       i.setProject(project);
       i.setScientificName(scientificName);
-      i.setInternalName(internalName);
       i.setExternalName(externalName);
       i.setDonorSex(donorSex);
       i.inheritPermissions(project);

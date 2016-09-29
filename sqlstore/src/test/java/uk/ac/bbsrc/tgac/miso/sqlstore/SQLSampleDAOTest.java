@@ -235,8 +235,7 @@ public class SQLSampleDAOTest extends AbstractDAOTest {
     assertTrue(LimsUtils.isDetailedSample(sample));
     assertTrue(LimsUtils.isIdentitySample(sample));
     Identity identity = (Identity) sample;
-    assertEquals("INT1", identity.getInternalName());
-    assertEquals("EXT1", identity.getExternalName());
+    assertEquals("EXT15,15_EXT15", identity.getExternalName());
   }
 
   @Test
@@ -329,6 +328,31 @@ public class SQLSampleDAOTest extends AbstractDAOTest {
   public void countSamplesByEmptySearch() throws IOException {
     Long numSamples = dao.countBySearch("");
     assertEquals(Long.valueOf(17L), numSamples);
+  }
+
+  @Test
+  public void testGetIdentityByExternalName() throws IOException {
+    List<Identity> identity = (List<Identity>) dao.getIdentitiesByExternalNameOrAlias("EXT15");
+    assertTrue(identity.get(0).getExternalName().contains("EXT15"));
+  }
+
+  @Test
+  public void getIdentityByAlias() throws IOException {
+    Collection<Identity> identities = dao.getIdentitiesByExternalNameOrAlias("TEST_0001_IDENTITY_1");
+    assertEquals(1, identities.size());
+    assertEquals("TEST_0001_IDENTITY_1", identities.iterator().next().getAlias());
+  }
+
+  @Test
+  public void getIdentityByNullAlias() throws IOException {
+    Collection<Identity> identities = dao.getIdentitiesByExternalNameOrAlias(null);
+    assertTrue(identities.isEmpty());
+  }
+
+  @Test
+  public void getIdentityByNonIdentityAlias() throws IOException {
+    Collection<Identity> identities = dao.getIdentitiesByExternalNameOrAlias("TEST_0001_Bn_P_nn_1-1_D_1");
+    assertTrue(identities.isEmpty());
   }
 
   private void mockAutoIncrement() throws IOException {

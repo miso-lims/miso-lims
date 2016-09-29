@@ -16,12 +16,12 @@ import com.google.common.collect.Lists;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.QcPassedDetail;
-import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleCVSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
@@ -87,7 +87,6 @@ public class DetailedSampleBuilder implements DetailedSample, SampleAliquot, Sam
   private Integer siblingNumber;
 
   // Identity attributes
-  private String internalName;
   private String externalName;
   private DonorSex donorSex = DonorSex.UNKNOWN;
 
@@ -523,18 +522,13 @@ public class DetailedSampleBuilder implements DetailedSample, SampleAliquot, Sam
   }
 
   @Override
-  public String getInternalName() {
-    return internalName;
-  }
-
-  @Override
-  public void setInternalName(String internalName) {
-    this.internalName = internalName;
-  }
-
-  @Override
   public String getExternalName() {
     return externalName;
+  }
+
+  @Override
+  public Set<String> getExternalNameSet() {
+    throw new UnsupportedOperationException("Method not implemented on builder");
   }
 
   @Override
@@ -832,7 +826,6 @@ public class DetailedSampleBuilder implements DetailedSample, SampleAliquot, Sam
     switch (sampleClass.getSampleCategory()) {
     case Identity.CATEGORY_NAME:
       Identity identity = new IdentityImpl();
-      identity.setInternalName(internalName);
       identity.setExternalName(externalName);
       identity.setDonorSex(donorSex);
       sample = identity;
@@ -881,7 +874,6 @@ public class DetailedSampleBuilder implements DetailedSample, SampleAliquot, Sam
         throw new NullPointerException("Missing externalName");
       }
       identity.setExternalName(externalName);
-      identity.setInternalName(internalName);
       identity.setDonorSex(donorSex);
       if (SampleTissue.CATEGORY_NAME.equals(sampleClass.getSampleCategory())) {
         sample.setParent(identity);
