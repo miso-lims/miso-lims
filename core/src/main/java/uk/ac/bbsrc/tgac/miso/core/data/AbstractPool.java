@@ -172,7 +172,9 @@ public abstract class AbstractPool<P extends Poolable<?, ?>> extends AbstractBox
   @JsonDeserialize(using = PooledElementDeserializer.class)
   public <T extends Poolable> void setPoolableElements(Collection<T> poolables) {
     if (poolables == null) {
-      this.pooledElements = Collections.emptySet();
+      if (this.pooledElements == null) {
+        this.pooledElements = Collections.emptySet();
+      }
     } else {
       this.pooledElements = (Collection<P>) poolables;
     }
