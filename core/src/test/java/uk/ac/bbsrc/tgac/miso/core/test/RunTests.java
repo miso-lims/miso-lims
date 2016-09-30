@@ -70,17 +70,14 @@ public class RunTests {
 
     Set<ResponderService> responders = new HashSet<ResponderService>();
     MockRunResponderService runResponder = new MockRunResponderService();
-    MockStatusChangedResponderService statusResponder = new MockStatusChangedResponderService();
 
     Set<AlerterService> alerters = new HashSet<AlerterService>();
     MockLogAlerterService logAlerter = new MockLogAlerterService();
     alerters.add(logAlerter);
 
     runResponder.setAlerterServices(alerters);
-    statusResponder.setAlerterServices(alerters);
 
     responders.add(runResponder);
-    responders.add(statusResponder);
 
     foo.setResponderServices(responders);
     r.addListener(foo);
