@@ -64,6 +64,8 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
 
   @Column(nullable = false)
   private boolean nonStandardAlias = false;
+  
+  private Long preMigrationId;
 
   @Override
   public DetailedSample getParent() {
@@ -207,5 +209,15 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
   @Override
   public void setDetailedQcStatusNote(String detailedQcStatusNote) {
     this.detailedQcStatusNote = detailedQcStatusNote;
+  }
+  
+  @Override
+  public Long getPreMigrationId() {
+    return preMigrationId;
+  }
+
+  @Override
+  public void setPreMigrationId(Long preMigrationId) {
+    this.preMigrationId = preMigrationId;
   }
 }

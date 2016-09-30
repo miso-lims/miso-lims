@@ -31,6 +31,9 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,8 +49,6 @@ import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.Property;
 import com.googlecode.ehcache.annotations.TriggersRemove;
 
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
@@ -78,13 +79,13 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
       + "INNER JOIN emPCRDilution ed ON ed.library_libraryId = l.libraryId " + "WHERE ld.dilutionId = ? OR ed.dilutionId = ? "
       + "AND l.platformName = ?";
 
-  public static String LIBRARY_DILUTION_SELECT = "SELECT dilutionId, name, concentration, library_libraryId, "
+  public static String LIBRARY_DILUTION_SELECT = "SELECT dilutionId, name, concentration, preMigrationId, library_libraryId, "
       + "identificationBarcode, creationDate, dilutionUserName, securityProfile_profileId, targetedResequencingId, " + "lastUpdated "
       + "FROM LibraryDilution";
 
   public static final String LIBRARY_DILUTIONS_SELECT_LIMIT = LIBRARY_DILUTION_SELECT + " ORDER BY dilutionId DESC LIMIT ?";
 
-  public static String LIBRARY_DILUTION_SELECT_BY_LIBRARY_PLATFORM = "SELECT ld.dilutionId, ld.name, ld.concentration, "
+  public static String LIBRARY_DILUTION_SELECT_BY_LIBRARY_PLATFORM = "SELECT ld.dilutionId, ld.name, ld.concentration, ld.preMigrationId, "
       + "ld.library_libraryId, ld.identificationBarcode, ld.creationDate, ld.dilutionUserName, ld.securityProfile_profileId, "
       + "ld.targetedResequencingId, l.platformName, ld.lastUpdated " + "FROM LibraryDilution ld, Library l "
       + "WHERE ld.library_libraryId = l.libraryId " + "AND l.platformName = ?";
@@ -104,14 +105,14 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
   public static final String LIBRARY_DILUTION_SELECT_BY_IDENTIFICATION_BARCODE = LIBRARY_DILUTION_SELECT + " WHERE identificationBarcode=?";
 
   public static final String LIBRARY_DILUTION_UPDATE = "UPDATE LibraryDilution "
-      + "SET name=:name, concentration=:concentration, library_libraryId=:library_libraryId, "
+      + "SET name=:name, concentration=:concentration, preMigrationId=:preMigrationId, library_libraryId=:library_libraryId, "
       + "identificationBarcode=:identificationBarcode, creationDate=:creationDate, "
       + "securityProfile_profileId=:securityProfile_profileId, targetedResequencingId=:targetedResequencingId, "
       + "lastUpdated=:lastUpdated " + "WHERE dilutionId=:dilutionId";
 
   public static final String LIBRARY_DILUTION_DELETE = "DELETE FROM LibraryDilution WHERE dilutionId=:dilutionId";
 
-  public static String LIBRARY_DILUTION_SELECT_BY_SEARCH_ONLY = "SELECT ld.dilutionId, ld.name, ld.concentration, "
+  public static String LIBRARY_DILUTION_SELECT_BY_SEARCH_ONLY = "SELECT ld.dilutionId, ld.name, ld.concentration, ld.preMigrationId, "
       + "ld.library_libraryId, ld.identificationBarcode, ld.creationDate, ld.dilutionUserName, ld.securityProfile_profileId, "
       + "ld.targetedResequencingId, ld.lastUpdated " + "FROM LibraryDilution ld JOIN Library l ON l.libraryId = ld.library_libraryId "
       + "WHERE (UPPER(ld.name) LIKE :search OR UPPER(ld.identificationBarcode) LIKE :search OR "
@@ -326,6 +327,7 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
 
     MapSqlParameterSource params = new MapSqlParameterSource();
     params.addValue("concentration", dilution.getConcentration());
+    params.addValue("preMigrationId", dilution.getPreMigrationId());
     params.addValue("library_libraryId", dilution.getLibrary().getId());
     params.addValue("creationDate", dilution.getCreationDate());
     params.addValue("securityProfile_profileId", securityProfileId);
@@ -460,6 +462,7 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
       libraryDilution.setId(id);
       libraryDilution.setName(rs.getString("name"));
       libraryDilution.setConcentration(rs.getDouble("concentration"));
+      libraryDilution.setPreMigrationId(rs.getLong("preMigrationId"));
       libraryDilution.setIdentificationBarcode(rs.getString("identificationBarcode"));
       libraryDilution.setCreationDate(rs.getDate("creationDate"));
       libraryDilution.setDilutionCreator(rs.getString("dilutionUserName"));
