@@ -10,6 +10,7 @@ INSERT INTO QcPassedDetail (status, description, noteRequired, createdBy, creati
   WHERE NOT EXISTS (SELECT description FROM QcPassedDetail WHERE description = 'Failed: QC' LIMIT 1);
 
 -- remove unnecessary 'Not Ready' option, as it will be represented by NULL.
+ALTER TABLE DetailedSample DROP FOREIGN KEY `FKa2t38wms0eer896xo4fw76tw0`;
 UPDATE DetailedSample SET qcPassedDetailId = NULL WHERE qcPassedDetailId = (
   SELECT qcPassedDetailId FROM QcPassedDetail WHERE description = 'Not Ready'
 );
@@ -38,3 +39,4 @@ ALTER TABLE DetailedSample ADD COLUMN detailedQcStatusNote VARCHAR(500) DEFAULT 
 ALTER TABLE QcPassedDetail RENAME TO DetailedQcStatus;
 ALTER TABLE DetailedQcStatus CHANGE COLUMN qcPassedDetailId detailedQcStatusId BIGINT(20) NOT NULL AUTO_INCREMENT;
 ALTER TABLE DetailedSample CHANGE COLUMN qcPassedDetailId detailedQcStatusId BIGINT(20) DEFAULT NULL;
+ALTER TABLE DetailedSample ADD CONSTRAINT `FK_detailedQcStatus` FOREIGN KEY (detailedQcStatusId) REFERENCES DetailedQcStatus (detailedQcStatusId);
