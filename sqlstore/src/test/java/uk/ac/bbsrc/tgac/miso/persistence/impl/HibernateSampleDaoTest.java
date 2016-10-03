@@ -4,8 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.IOException;
-
 import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,9 +17,8 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.store.SecurityStore;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
-import uk.ac.bbsrc.tgac.miso.core.data.Identity;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.DefaultSampleNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
@@ -86,13 +83,6 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
     DetailedSample detailed = (DetailedSample) sample;
     assertNotNull(detailed.getParent());
     assertEquals(15L, detailed.getParent().getId());
-  }
-
-  @Test
-  public void testGetIdentityByExternalName() throws IOException {
-    Identity identity = sut.getIdentityByExternalName("EXT1");
-    assertEquals("EXT1", identity.getExternalName());
-    assertEquals("INT1", identity.getInternalName());
   }
 
 }

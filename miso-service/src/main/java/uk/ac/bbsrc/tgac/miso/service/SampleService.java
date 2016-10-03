@@ -1,7 +1,10 @@
 package uk.ac.bbsrc.tgac.miso.service;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
+
+import org.hibernate.exception.ConstraintViolationException;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -30,6 +33,7 @@ public interface SampleService {
 
   Long countBySearch(String querystr) throws IOException;
 
-  Identity getIdentityByExternalName(String externalName) throws IOException;
+  Collection<Identity> getIdentitiesByExternalName(String externalName) throws IOException;
 
+  boolean confirmExternalNameUniqueForProject(String externalNames, Sample sample) throws IOException, ConstraintViolationException;
 }

@@ -37,10 +37,10 @@ import com.eaglegenomics.simlims.core.store.SecurityStore;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
@@ -370,12 +370,12 @@ public class HibernateSampleDao implements SampleDao {
    */
   private Criterion searchRestrictions(String querystr) {
     String str = DbUtils.convertStringToSearchQuery(querystr);
-    Criterion[] criteria = new Criterion[searchProperties.length + 1];
+    Criterion[] criteria = new Criterion[searchProperties.length]; // +1
     for (int i = 0; i < searchProperties.length; i++) {
-      criteria[i] = Restrictions.ilike(searchProperties[i], str, MatchMode.EXACT);
+      criteria[i] = Restrictions.ilike(searchProperties[i], str, MatchMode.ANYWHERE);
     }
-    criteria[searchProperties.length] = Restrictions.and(Restrictions.eq("class", IdentityImpl.class),
-        Restrictions.ilike("externalName", str, MatchMode.EXACT));
+    // criteria[searchProperties.length] = Restrictions.and(Restrictions.eq("class", IdentityImpl.class),
+    // Restrictions.in("externalName." + CollectionPropertyNames.COLLECTION_ELEMENTS, str));
     return Restrictions.or(criteria);
   }
 
@@ -548,9 +548,17 @@ public class HibernateSampleDao implements SampleDao {
   }
 
   @Override
-  public Identity getIdentityByExternalName(String externalName) throws IOException {
-    Query query = currentSession().createQuery("FROM IdentityImpl I WHERE I.externalName = :externalName");
-    query.setParameter("externalName", externalName);
-    return fetchSqlStore((Identity) query.uniqueResult());
+  public Collection<Identity> getIdentitiesByExternalNameOrAlias(String externalName) throws IOException {
+    if (isStringEmptyOrNull(externalName)) return Collections.emptySet();
+    String str = DbUtils.convertStringToSearchQuery(externalName);
+    Criteria criteria = currentSession().createCriteria(IdentityImpl.class);
+    criteria.createAlias("externalName", "en");
+    criteria.add(Restrictions.or(Restrictions.ilike("en.elements", str), Restrictions.ilike("alias", str)));
+    criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+    @SuppressWarnings("unchecked")
+    Collection<Identity> records = criteria.list();
+    // return without fetching all associated SQL items
+    return records;
   }
+
 }
