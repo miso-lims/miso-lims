@@ -72,6 +72,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.EntityGroup;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity.DonorSex;
@@ -83,7 +84,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
@@ -461,7 +461,13 @@ public class EditSampleController {
     Collections.sort(list, new Comparator<DetailedQcStatus>() {
       @Override
       public int compare(DetailedQcStatus o1, DetailedQcStatus o2) {
-        return o1.getId().compareTo(o2.getId());
+        if (o1.getStatus() == null) {
+          return (o2.getStatus() == null ? 0 : -1);
+        } else if (o2.getStatus() == null) {
+          return 1;
+        } else {
+          return o1.getStatus().compareTo(o2.getStatus());
+        }
       }
     });
     return list;

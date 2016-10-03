@@ -9,6 +9,9 @@ INSERT INTO QcPassedDetail (status, description, noteRequired, createdBy, creati
 
 -- remove unnecessary option, as it will be the null case.
 ALTER TABLE DetailedSample DROP FOREIGN KEY `FKa2t38wms0eer896xo4fw76tw0`;
+UPDATE DetailedSample SET qcPassedDetailId = NULL WHERE qcPassedDetailId = (
+  SELECT qcPassedDetailId FROM QcPassedDetail WHERE description = 'Not Ready'
+);
 DELETE FROM QcPassedDetail WHERE description = 'Not Ready';
 UPDATE QcPassedDetail SET noteRequired = false WHERE description IN ('Waiting: Path Report', 'Failed: QC'); 
 

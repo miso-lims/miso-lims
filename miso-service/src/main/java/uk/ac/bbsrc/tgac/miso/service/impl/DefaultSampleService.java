@@ -233,10 +233,6 @@ public class DefaultSampleService implements SampleService {
           throw new IOException(e.getMessage(), e);
         }
         validateHierarchy(detailed);
-
-        if (detailed.getDetailedQcStatus() != null) {
-          detailed.setQcPassed(detailed.getDetailedQcStatus().getStatus());
-        }
       }
     }
 
@@ -486,9 +482,6 @@ public class DefaultSampleService implements SampleService {
       if (detailedUpdated.getParent() != null) {
         detailedUpdated.setParent((DetailedSample) get(detailedUpdated.getParent().getId()));
         validateHierarchy(detailedUpdated);
-      }
-      if (detailedUpdated.getDetailedQcStatus() != null) {
-        detailedUpdated.setQcPassed(detailedUpdated.getDetailedQcStatus().getStatus());
       }
     }
 
