@@ -40,6 +40,8 @@ import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.map.annotate.JsonDeserialize;
@@ -406,28 +408,32 @@ public abstract class AbstractPool<P extends Poolable<?, ?>> extends AbstractBox
   public boolean equals(Object obj) {
     if (obj == null) return false;
     if (obj == this) return true;
-    if (!(obj instanceof Pool)) return false;
-    Pool<? extends Poolable<?, ?>> them = (Pool<? extends Poolable<?, ?>>) obj;
-    // If not saved, then compare resolved actual objects. Otherwise
-    // just compare IDs.
-    if (getId() == AbstractPool.UNSAVED_ID || them.getId() == AbstractPool.UNSAVED_ID) {
-      return getPlatformType().equals(them.getPlatformType()) && getCreationDate().equals(them.getCreationDate());
-    } else {
-      return getId() == them.getId();
-    }
+    if (!(obj instanceof AbstractPool<?>)) return false;
+    AbstractPool<?> other = (AbstractPool<?>) obj;
+    return new EqualsBuilder()
+        .appendSuper(super.equals(obj))
+        .append(description, other.description)
+        .append(pooledElements, other.pooledElements)
+        .append(experiments, other.experiments)
+        .append(concentration, other.concentration)
+        .append(identificationBarcode, other.identificationBarcode)
+        .append(readyToRun, other.readyToRun)
+        .append(qcPassed, other.qcPassed)
+        .isEquals();
   }
 
   @Override
   public int hashCode() {
-    if (getId() != AbstractPool.UNSAVED_ID) {
-      return (int) getId();
-    } else {
-      final int PRIME = 37;
-      int hashcode = -1;
-      if (getPlatformType() != null) hashcode = PRIME * hashcode + getPlatformType().hashCode();
-      if (getCreationDate() != null) hashcode = PRIME * hashcode + getCreationDate().hashCode();
-      return hashcode;
-    }
+    return new HashCodeBuilder(23, 47)
+        .appendSuper(super.hashCode())
+        .append(description)
+        .append(pooledElements)
+        .append(experiments)
+        .append(concentration)
+        .append(identificationBarcode)
+        .append(readyToRun)
+        .append(qcPassed)
+        .toHashCode();
   }
 
   @Override
