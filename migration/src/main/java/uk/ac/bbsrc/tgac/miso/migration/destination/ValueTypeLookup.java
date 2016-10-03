@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Institute;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
@@ -14,7 +15,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.LibraryAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
-import uk.ac.bbsrc.tgac.miso.core.data.QcPassedDetail;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
@@ -79,8 +79,8 @@ public class ValueTypeLookup {
   private Map<String, SequencerReference> sequencerByName;
   private Map<Long, Subproject> subprojectById;
   private Map<String, Subproject> subprojectByAlias;
-  private Map<Long, QcPassedDetail> qcPassedDetailById;
-  private Map<String, QcPassedDetail> qcPassedDetailByDescription;
+  private Map<Long, DetailedQcStatus> detailedQcStatusById;
+  private Map<String, DetailedQcStatus> detailedQcStatusByDescription;
   
   /**
    * Create a ValueTypeLookup loaded with data from the provided MisoServiceManager
@@ -105,7 +105,7 @@ public class ValueTypeLookup {
     setLibraryQcTypes(misoServiceManager.getLibraryQcDao().listAllLibraryQcTypes());
     setSequencers(misoServiceManager.getSequencerReferenceDao().listAll());
     setSubprojects(misoServiceManager.getSubprojectDao().getSubproject());
-    setQcPassedDetails(misoServiceManager.getQcPassedDetailDao().getQcPassedDetails());
+    setDetailedQcStatuses(misoServiceManager.getDetailedQcStatusDao().getDetailedQcStatus());
   }
 
   private void setSampleClasses(Collection<SampleClass> sampleClasses) {
@@ -301,15 +301,15 @@ public class ValueTypeLookup {
     this.subprojectByAlias = mapByAlias;
   }
   
-  private void setQcPassedDetails(Collection<QcPassedDetail> qcPassedDetails) {
-    Map<Long, QcPassedDetail> mapById = new UniqueKeyHashMap<>();
-    Map<String, QcPassedDetail> mapByDesc = new UniqueKeyHashMap<>();
-    for (QcPassedDetail qcPassedDetail : qcPassedDetails) {
-      mapByDesc.put(qcPassedDetail.getDescription(), qcPassedDetail);
-      mapById.put(qcPassedDetail.getId(), qcPassedDetail);
+  private void setDetailedQcStatuses(Collection<DetailedQcStatus> detailedQcStatuses) {
+    Map<Long, DetailedQcStatus> mapById = new UniqueKeyHashMap<>();
+    Map<String, DetailedQcStatus> mapByDesc = new UniqueKeyHashMap<>();
+    for (DetailedQcStatus detailedQcStatus : detailedQcStatuses) {
+      mapByDesc.put(detailedQcStatus.getDescription(), detailedQcStatus);
+      mapById.put(detailedQcStatus.getId(), detailedQcStatus);
     }
-    this.qcPassedDetailById = mapById;
-    this.qcPassedDetailByDescription = mapByDesc;
+    this.detailedQcStatusById = mapById;
+    this.detailedQcStatusByDescription = mapByDesc;
   }
   
   /**
@@ -561,16 +561,17 @@ public class ValueTypeLookup {
   }
   
   /**
-   * Attempts to find an existing QcPassedDetail
+   * Attempts to find an existing DetailedQcStatus
    * 
-   * @param qcPassedDetail a partially-formed QcPassedDetail, which must have either its ID or its
-   * description set in order for this method to resolve the QcPassedDetail
-   * @return the existing QcPassedDetail if a matching one is found; null otherwise
+   * @param DetailedQcStatus
+   *          a partially-formed DetailedQcStatus, which must have either its ID or its description set in order for this method to resolve
+   *          the DetailedQcStatus
+   * @return the existing DetailedQcStatus if a matching one is found; null otherwise
    */
-  public QcPassedDetail resolve(QcPassedDetail qcPassedDetail) {
-    if (qcPassedDetail == null) return null;
-    if (qcPassedDetail.getId() != null) return qcPassedDetailById.get(qcPassedDetail.getId());
-    if (qcPassedDetail.getDescription() != null) return qcPassedDetailByDescription.get(qcPassedDetail.getDescription());
+  public DetailedQcStatus resolve(DetailedQcStatus detailedQcStatus) {
+    if (detailedQcStatus == null) return null;
+    if (detailedQcStatus.getId() != null) return detailedQcStatusById.get(detailedQcStatus.getId());
+    if (detailedQcStatus.getDescription() != null) return detailedQcStatusByDescription.get(detailedQcStatus.getDescription());
     return null;
   }
   
@@ -604,11 +605,11 @@ public class ValueTypeLookup {
         }
       }
       
-      if (detailed.getQcPassedDetail() != null) { // Optional field
-        QcPassedDetail qcDet = resolve(detailed.getQcPassedDetail());
-        if (qcDet == null) throw new IOException(String.format("QcPassedDetail not found: id=%d, description=%s",
-            detailed.getQcPassedDetail().getId(), detailed.getQcPassedDetail().getDescription()));
-        detailed.setQcPassedDetail(qcDet);
+      if (detailed.getDetailedQcStatus() != null) { // Optional field
+        DetailedQcStatus qcDet = resolve(detailed.getDetailedQcStatus());
+        if (qcDet == null) throw new IOException(String.format("DetailedQcStatus not found: id=%d, description=%s",
+            detailed.getDetailedQcStatus().getId(), detailed.getDetailedQcStatus().getDescription()));
+        detailed.setDetailedQcStatus(qcDet);
       }
       
       if (LimsUtils.isTissueSample(detailed)) {

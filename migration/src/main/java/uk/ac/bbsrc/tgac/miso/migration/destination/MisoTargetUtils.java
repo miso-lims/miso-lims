@@ -22,7 +22,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAdditionalInfoImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrderImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.QcPassedDetailImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotImpl;
@@ -70,7 +70,7 @@ public class MisoTargetUtils {
     // TODO: use setPackagesToScan instead after fixing annotations
     // bean.setPackagesToScan("uk.ac.bbsrc.tgac.miso.core.data");
     bean.setAnnotatedClasses(
-        new Class[] { TissueOriginImpl.class, TissueTypeImpl.class, SampleClassImpl.class, SubprojectImpl.class, QcPassedDetailImpl.class,
+        new Class[] { TissueOriginImpl.class, TissueTypeImpl.class, SampleClassImpl.class, SubprojectImpl.class, DetailedQcStatusImpl.class,
             SamplePurposeImpl.class, SampleGroupImpl.class, TissueMaterialImpl.class, SampleAliquotImpl.class, SampleStockImpl.class,
             UserImpl.class, AbstractSample.class, IdentityImpl.class, AbstractProject.class, PoolOrderImpl.class, PoolOrderCompletion.class,
             ProjectImpl.class, SampleImpl.class, SampleDerivedInfo.class, DetailedSampleImpl.class, KitDescriptor.class,

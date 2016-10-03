@@ -17,7 +17,7 @@ import uk.ac.bbsrc.tgac.miso.dto.SampleOptionsDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.InstituteController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.KitDescriptorController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.LabController;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.QcPassedDetailController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.DetailedQcStatusController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.SampleClassController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.SampleGroupController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.SamplePurposeController;
@@ -48,7 +48,7 @@ public class SampleOptionsController {
   @Autowired
   private TissueMaterialController tissueMaterialController;
   @Autowired
-  private QcPassedDetailController qcPassedDetailController;
+  private DetailedQcStatusController detailedQcStatusController;
   @Autowired
   private SampleValidRelationshipController sampleValidRelationshipController;
   @Autowired
@@ -69,7 +69,7 @@ public class SampleOptionsController {
     sampleOptionsDto.setSamplePurposesDtos(samplePurposeController.getSamplePurposes(uriBuilder, response));
     sampleOptionsDto.setSampleGroupsDtos(sampleGroupController.getSampleGroups(uriBuilder, response));
     sampleOptionsDto.setTissueMaterialsDtos(tissueMaterialController.getTissueMaterials(uriBuilder, response));
-    sampleOptionsDto.setQcPassedDetailsDtos(qcPassedDetailController.getQcPassedDetails(uriBuilder, response));
+    sampleOptionsDto.setDetailedQcStatusesDtos(detailedQcStatusController.getDetailedQcStatuses(uriBuilder, response));
     sampleOptionsDto.setSampleValidRelationshipsDtos(sampleValidRelationshipController.getSampleValidRelationships(uriBuilder, response));
     sampleOptionsDto.setInstitutesDtos(instituteController.getInstitutes(uriBuilder));
     sampleOptionsDto.setLabsDtos(labController.getLabs(uriBuilder));

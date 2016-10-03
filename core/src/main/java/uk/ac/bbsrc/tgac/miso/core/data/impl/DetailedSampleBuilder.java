@@ -16,12 +16,12 @@ import com.google.common.collect.Lists;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
-import uk.ac.bbsrc.tgac.miso.core.data.QcPassedDetail;
-import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleCVSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
@@ -77,7 +77,8 @@ public class DetailedSampleBuilder implements DetailedSample, SampleAliquot, Sam
   // DetailedSample attributes
   private DetailedSample parent;
   private SampleClass sampleClass;
-  private QcPassedDetail qcPassedDetail;
+  private DetailedQcStatus detailedQcStatus;
+  private String detailedQcStatusNote;
   private Subproject subproject;
   private Long kitDescriptorId;
   private KitDescriptor prepKit;
@@ -385,13 +386,23 @@ public class DetailedSampleBuilder implements DetailedSample, SampleAliquot, Sam
   }
 
   @Override
-  public QcPassedDetail getQcPassedDetail() {
-    return qcPassedDetail;
+  public DetailedQcStatus getDetailedQcStatus() {
+    return detailedQcStatus;
   }
 
   @Override
-  public void setQcPassedDetail(QcPassedDetail qcPassedDetail) {
-    this.qcPassedDetail = qcPassedDetail;
+  public void setDetailedQcStatus(DetailedQcStatus detaildQcStatus) {
+    this.detailedQcStatus = detaildQcStatus;
+  }
+
+  @Override
+  public String getDetailedQcStatusNote() {
+    return detailedQcStatusNote;
+  }
+
+  @Override
+  public void setDetailedQcStatusNote(String detaildQcStatusNote) {
+    this.detailedQcStatusNote = detaildQcStatusNote;
   }
 
   @Override
@@ -916,7 +927,8 @@ public class DetailedSampleBuilder implements DetailedSample, SampleAliquot, Sam
     sample.setNotes(notes);
 
     sample.setSampleClass(sampleClass);
-    sample.setQcPassedDetail(qcPassedDetail);
+    sample.setDetailedQcStatus(detailedQcStatus);
+    sample.setDetailedQcStatusNote(detailedQcStatusNote);
     sample.setSubproject(subproject);
     sample.setPrepKit(prepKit);
     sample.setArchived(archived);

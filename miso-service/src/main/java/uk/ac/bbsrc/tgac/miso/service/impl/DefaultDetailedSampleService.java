@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
-import uk.ac.bbsrc.tgac.miso.persistence.QcPassedDetailDao;
+import uk.ac.bbsrc.tgac.miso.persistence.DetailedQcStatusDao;
 import uk.ac.bbsrc.tgac.miso.persistence.DetailedSampleDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleClassDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleDao;
@@ -34,7 +34,7 @@ public class DefaultDetailedSampleService implements DetailedSampleService {
   private SampleDao sampleDao;
 
   @Autowired
-  private QcPassedDetailDao qcPassedDetailDao;
+  private DetailedQcStatusDao detailedQcStatusDao;
 
   @Autowired
   private SubprojectDao subprojectDao;
@@ -56,8 +56,8 @@ public class DefaultDetailedSampleService implements DetailedSampleService {
     this.sampleDao = sampleDao;
   }
 
-  public void setQcPassedDetailDao(QcPassedDetailDao qcPassedDetailDao) {
-    this.qcPassedDetailDao = qcPassedDetailDao;
+  public void setDetailedQcStatusDao(DetailedQcStatusDao detailedQcStatusDao) {
+    this.detailedQcStatusDao = detailedQcStatusDao;
   }
 
   public void setSubprojectDao(SubprojectDao subprojectDao) {
@@ -87,6 +87,7 @@ public class DefaultDetailedSampleService implements DetailedSampleService {
     target.setArchived(source.getArchived());
     target.setGroupDescription(source.getGroupDescription());
     target.setGroupId(source.getGroupId());
+    target.setDetailedQcStatusNote(source.getDetailedQcStatusNote());
     loadMembers(target, source);
   }
 
@@ -97,11 +98,11 @@ public class DefaultDetailedSampleService implements DetailedSampleService {
 
   @Override
   public void loadMembers(DetailedSample target, DetailedSample source) throws IOException {
-    if (source.getQcPassedDetail() != null) {
-      target.setQcPassedDetail(qcPassedDetailDao.getQcPassedDetails(source.getQcPassedDetail().getId()));
-      ServiceUtils.throwIfNull(target.getQcPassedDetail(), "qcPassedDetailId", source.getQcPassedDetail().getId());
+    if (source.getDetailedQcStatus() != null) {
+      target.setDetailedQcStatus(detailedQcStatusDao.getDetailedQcStatus(source.getDetailedQcStatus().getId()));
+      ServiceUtils.throwIfNull(target.getDetailedQcStatus(), "detailedQcStatusId", source.getDetailedQcStatus().getId());
     } else {
-      target.setQcPassedDetail(null);
+      target.setDetailedQcStatus(null);
     }
     if (source.getPrepKit() != null) {
       target.setPrepKit(sqlKitDao.getKitDescriptorById(source.getPrepKit().getId()));

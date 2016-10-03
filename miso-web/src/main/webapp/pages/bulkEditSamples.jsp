@@ -133,13 +133,6 @@
       }
 	  });
 	</script>
-	
-	<div>
-    <c:forEach items="${samples}" var="sample">
-        <h2>${sample.name}</h2>
-        <p>id: ${sample.id}</p>
-    </c:forEach>
-	</div>
 
 </div>
 </div>

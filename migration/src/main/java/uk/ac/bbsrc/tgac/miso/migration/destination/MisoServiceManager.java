@@ -38,13 +38,13 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.OicrSampleNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.migration.util.SimpleLibraryNamingScheme;
 import uk.ac.bbsrc.tgac.miso.persistence.HibernateSampleClassDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateDetailedQcStatusDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateDetailedSampleDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateIndexDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateInstituteDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLabDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryAdditionalInfoDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDesignDao;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateQcPassedDetailDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleNumberPerProjectDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSamplePurposeDao;
@@ -144,7 +144,7 @@ public class MisoServiceManager {
   private HibernateSampleTissueDao sampleTissueDao;
   private HibernateLabDao labDao;
   private HibernateInstituteDao instituteDao;
-  private HibernateQcPassedDetailDao qcPassedDetailDao;
+  private HibernateDetailedQcStatusDao detailedQcStatusDao;
   private HibernateSubprojectDao subprojectDao;
   private HibernateTissueOriginDao tissueOriginDao;
   private HibernateTissueTypeDao tissueTypeDao;
@@ -195,7 +195,7 @@ public class MisoServiceManager {
     m.setDefaultPlatformDao();
     m.setDefaultPoolDao();
     m.setDefaultProjectDao();
-    m.setDefaultQcPassedDetailDao();
+    m.setDefaultDetailedQcStatusDao();
     m.setDefaultRunDao();
     m.setDefaultRunQcDao();
     m.setDefaultDetailedSampleDao();
@@ -491,7 +491,7 @@ public class MisoServiceManager {
     svc.setDetailedSampleService(detailedSampleService);
     svc.setSampleTissueService(sampleTissueService);
     svc.setKitStore(kitDao);
-    svc.setQcPassedDetailDao(qcPassedDetailDao);
+    svc.setDetailedQcStatusDao(detailedQcStatusDao);
     svc.setSampleClassDao(sampleClassDao);
     svc.setSampleNumberPerProjectService(sampleNumberPerProjectService);
     svc.setSamplePurposeDao(samplePurposeDao);
@@ -1111,7 +1111,7 @@ public class MisoServiceManager {
   public void setDefaultDetailedSampleService() {
     DefaultDetailedSampleService svc = new DefaultDetailedSampleService();
     svc.setAuthorizationManager(authorizationManager);
-    svc.setQcPassedDetailDao(qcPassedDetailDao);
+    svc.setDetailedQcStatusDao(detailedQcStatusDao);
     svc.setDetailedSampleDao(detailedSampleDao);
     svc.setSampleClassDao(sampleClassDao);
     svc.setSampleDao(sampleDao);
@@ -1184,24 +1184,24 @@ public class MisoServiceManager {
     if (labService != null) labService.setInstituteDao(instituteDao);
   }
 
-  public HibernateQcPassedDetailDao getQcPassedDetailDao() {
-    return qcPassedDetailDao;
+  public HibernateDetailedQcStatusDao getDetailedQcStatusDao() {
+    return detailedQcStatusDao;
   }
 
-  public void setQcPassedDetailDao(HibernateQcPassedDetailDao qcPassedDetailDao) {
-    this.qcPassedDetailDao = qcPassedDetailDao;
-    updateQcPassedDetailDaoDependencies();
+  public void setDetailedQcStatusDao(HibernateDetailedQcStatusDao detailedQcStatus) {
+    this.detailedQcStatusDao = detailedQcStatus;
+    updateDetailedQcStatusDaoDependencies();
   }
 
-  public void setDefaultQcPassedDetailDao() {
-    HibernateQcPassedDetailDao dao = new HibernateQcPassedDetailDao();
+  public void setDefaultDetailedQcStatusDao() {
+    HibernateDetailedQcStatusDao dao = new HibernateDetailedQcStatusDao();
     dao.setSessionFactory(sessionFactory);
-    setQcPassedDetailDao(dao);
+    setDetailedQcStatusDao(dao);
   }
 
-  private void updateQcPassedDetailDaoDependencies() {
-    if (detailedSampleService != null) detailedSampleService.setQcPassedDetailDao(qcPassedDetailDao);
-    if (sampleService != null) sampleService.setQcPassedDetailDao(qcPassedDetailDao);
+  private void updateDetailedQcStatusDaoDependencies() {
+    if (detailedSampleService != null) detailedSampleService.setDetailedQcStatusDao(detailedQcStatusDao);
+    if (sampleService != null) sampleService.setDetailedQcStatusDao(detailedQcStatusDao);
   }
 
   public HibernateSubprojectDao getSubprojectDao() {

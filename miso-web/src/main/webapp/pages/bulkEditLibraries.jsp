@@ -98,13 +98,11 @@
       Library.hot.makeBulkCreateTable = function () {
         Library.hot.librariesJSON = Library.hot.prepLibrariesForPropagate(Library.hot.librariesJSON);
         Library.hot.makeHOT(Library.hot.librariesJSON);
-        Library.hot.addPlatformAndIndexHooks();
       };
 
       Library.hot.makeBulkUpdateTable = function () {
         Library.hot.librariesJSON = Library.hot.prepLibrariesForEdit(Library.hot.librariesJSON);
         Library.hot.makeHOT(Library.hot.librariesJSON);
-        Library.hot.addPlatformAndIndexHooks();
 
         // source for index family column depends on mandatory platform
         var datalen = Hot.startData.length;

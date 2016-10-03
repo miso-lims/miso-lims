@@ -14,18 +14,18 @@ import javax.persistence.UniqueConstraint;
 
 import com.eaglegenomics.simlims.core.User;
 
-import uk.ac.bbsrc.tgac.miso.core.data.QcPassedDetail;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 
 @Entity
-@Table(name = "QcPassedDetail", uniqueConstraints = @UniqueConstraint(columnNames = { "status", "description" }) )
-public class QcPassedDetailImpl implements QcPassedDetail {
+@Table(name = "DetailedQcStatus", uniqueConstraints = @UniqueConstraint(columnNames = { "status", "description" }))
+public class DetailedQcStatusImpl implements DetailedQcStatus {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long qcPassedDetailId;
+  private Long detailedQcStatusId;
 
-  @Column(nullable = false)
-  private String status;
+  @Column
+  private Boolean status;
 
   @Column(nullable = false)
   private String description;
@@ -49,12 +49,12 @@ public class QcPassedDetailImpl implements QcPassedDetail {
 
   @Override
   public Long getId() {
-    return qcPassedDetailId;
+    return detailedQcStatusId;
   }
 
   @Override
-  public void setId(Long qcPassedDetailId) {
-    this.qcPassedDetailId = qcPassedDetailId;
+  public void setId(Long detailedQcStatusId) {
+    this.detailedQcStatusId = detailedQcStatusId;
   }
 
   @Override
@@ -98,12 +98,12 @@ public class QcPassedDetailImpl implements QcPassedDetail {
   }
 
   @Override
-  public String getStatus() {
+  public Boolean getStatus() {
     return status;
   }
 
   @Override
-  public void setStatus(String status) {
+  public void setStatus(Boolean status) {
     this.status = status;
   }
 
@@ -129,7 +129,7 @@ public class QcPassedDetailImpl implements QcPassedDetail {
 
   @Override
   public String toString() {
-    return "QcPassedDetailImpl [qcPassedDetailId=" + qcPassedDetailId + ", status=" + status + ", description=" + description 
+    return "DetailedQcStatusImpl [detailedQcStatusId=" + detailedQcStatusId + ", status=" + status + ", description=" + description
         + ", noteRequired=" + noteRequired + ", createdBy=" + createdBy + ", creationDate=" + creationDate + ", updatedBy=" + updatedBy 
         + ", lastUpdated=" + lastUpdated + "]"; 
   }

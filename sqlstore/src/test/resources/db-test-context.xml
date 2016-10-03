@@ -43,7 +43,7 @@
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl</value>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.QcPassedDetailImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SamplePurposeImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleGroupImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl</value>

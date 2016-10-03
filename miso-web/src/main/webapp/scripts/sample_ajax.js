@@ -130,10 +130,6 @@ var Sample = Sample || {
       jQuery('#groupDescription').attr('data-parsley-maxlength', '255');
       jQuery('#groupDescription').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
       
-      // Cellularity validation
-      jQuery('#cellularity').attr('class', 'form-control');
-      jQuery('#cellularity').attr('data-parsley-type', 'integer');
-      
       // TissueOrigin validation
       jQuery('#tissueOrigin').attr('class', 'form-control');
       jQuery('#tissueOrigin').attr('data-parsley-required', 'true');
@@ -160,7 +156,13 @@ var Sample = Sample || {
       jQuery('#tubeNumber').attr('class', 'form-control');
       jQuery('#tubeNumber').attr('data-parsley-required', 'true');
       jQuery('#tubeNumber').attr('data-parsley-type', 'integer');
-      
+
+      if (jQuery('#detailedQcStatusNote').is(':visible')) {
+        jQuery('#detailedQcStatusNote').attr('class', 'form-control');
+        jQuery('#detailedQcStatusNote').attr('data-parsley-required', 'true');
+        jQuery('#detailedQcStatusNote').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+      }
+
       var selectedId = jQuery('#sampleClass').is('select') ? jQuery('#sampleClass option:selected').val() : jQuery('#sampleClass').val();
       var sampleCategory = Sample.options.getSampleCategoryByClassId(selectedId);
       // assign sample class alias based on whether text or dropdown menu are present
@@ -213,7 +215,7 @@ var Sample = Sample || {
       {
         'doOnSuccess': function(json) {
           // don't validate the alias if the sample or its parent has a nonstandard alias
-          if (jQuery('#nonStandardAlias').length) {
+          if (jQuery('#nonStandardAlias').length > 0) {
             jQuery('#sample-form').parsley();
             jQuery('#sample-form').parsley().validate();
             Validate.updateWarningOrSubmit('#sample-form');
@@ -742,6 +744,23 @@ Sample.ui = {
     default:
       Sample.ui.setUpForTissue();
       break;
+    }
+  },
+  
+  /**
+   * Update display with note required (or not) for QC Status
+   */
+  detailedQcStatusChanged: function () {
+    // delete everything from the note
+    jQuery('#detailedQcStatusNote').val('');
+    
+    // find the selected detailedQcStatus
+    var dqcsId = jQuery('#detailedQcStatus option:selected').val();
+    var selectedDQCS = Hot.findFirstOrNull(Hot.idPredicate(dqcsId), Sample.options.all.detailedQcStatusesDtos);
+    if (selectedDQCS !== null && selectedDQCS.noteRequired) {
+      jQuery('#qcStatusNote').show();
+    }  else {
+      jQuery('#qcStatusNote').hide();
     }
   },
   

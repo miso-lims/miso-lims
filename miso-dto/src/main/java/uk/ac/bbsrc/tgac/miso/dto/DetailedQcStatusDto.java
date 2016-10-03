@@ -3,11 +3,11 @@ package uk.ac.bbsrc.tgac.miso.dto;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
-public class QcPassedDetailDto {
+public class DetailedQcStatusDto {
 
   private Long id;
   private String url;
-  private String status;
+  private Boolean status;
   private String description;
   private boolean noteRequired;
   private Long createdById;
@@ -89,11 +89,11 @@ public class QcPassedDetailDto {
     this.updatedById = updatedById;
   }
 
-  public String getStatus() {
+  public Boolean getStatus() {
     return status;
   }
 
-  public void setStatus(String status) {
+  public void setStatus(Boolean status) {
     this.status = status;
   }
 
