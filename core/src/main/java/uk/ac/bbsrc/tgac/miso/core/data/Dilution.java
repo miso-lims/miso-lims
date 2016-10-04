@@ -110,4 +110,12 @@ public interface Dilution extends SecurableByProfile, Barcodable, Comparable, De
    */
   @JsonBackReference(value = "library")
   public Library getLibrary();
+  
+  /**
+   * @return the old LIMS' ID for this dilution prior to being migrated to MISO
+   */
+  Long getPreMigrationId();
+  
+  void setPreMigrationId(Long preMigrationId);
+  
 }

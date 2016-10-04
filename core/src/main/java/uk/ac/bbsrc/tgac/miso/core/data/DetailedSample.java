@@ -100,6 +100,13 @@ public interface DetailedSample extends Sample {
   boolean hasNonStandardAlias();
 
   void setNonStandardAlias(boolean nonStandardAlias);
+  
+  /**
+   * @return the old LIMS' ID for this sample prior to being migrated to MISO
+   */
+  Long getPreMigrationId();
+  
+  void setPreMigrationId(Long preMigrationId);
 
   String getDetailedQcStatusNote();
 

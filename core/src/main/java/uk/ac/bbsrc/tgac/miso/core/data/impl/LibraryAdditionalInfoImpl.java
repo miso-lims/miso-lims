@@ -62,6 +62,8 @@ public class LibraryAdditionalInfoImpl implements LibraryAdditionalInfo {
   @OneToOne
   @JoinColumn(name = "libraryDesign", nullable = true)
   private LibraryDesign libraryDesign;
+  
+  private Long preMigrationId;
 
   @Override
   public Long getLibraryId() {
@@ -176,6 +178,16 @@ public class LibraryAdditionalInfoImpl implements LibraryAdditionalInfo {
   }
 
   @Override
+  public Long getPreMigrationId() {
+    return preMigrationId;
+  }
+
+  @Override
+  public void setPreMigrationId(Long preMigrationId) {
+    this.preMigrationId = preMigrationId;
+  }
+
+  @Override
   public int hashCode() {
     return new HashCodeBuilder(15, 45)
         .append(archived)
@@ -183,6 +195,7 @@ public class LibraryAdditionalInfoImpl implements LibraryAdditionalInfo {
         .append(libraryDesign)
         .append(nonStandardAlias)
         .append(prepKit)
+        .append(preMigrationId)
         .toHashCode();
   }
 
@@ -197,6 +210,7 @@ public class LibraryAdditionalInfoImpl implements LibraryAdditionalInfo {
         .append(libraryDesign, other.libraryDesign)
         .append(nonStandardAlias, other.nonStandardAlias)
         .append(prepKit, other.prepKit)
+        .append(preMigrationId, other.preMigrationId)
         .isEquals();
   }
 

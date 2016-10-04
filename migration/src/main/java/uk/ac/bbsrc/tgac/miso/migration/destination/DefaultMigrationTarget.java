@@ -22,7 +22,9 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractPool;
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -178,9 +180,20 @@ public class DefaultMigrationTarget implements MigrationTarget {
       // already saved
       return;
     }
-    if (hasParent(sample)) {
-      // save parent first to generate ID
-      saveSample(((DetailedSample) sample).getParent());
+    if (LimsUtils.isDetailedSample(sample)) {
+      DetailedSample detailed = (DetailedSample) sample;
+      if (hasUnsavedParent(detailed)) {
+        if (detailed.getParent().getSampleClass() == null && detailed.getParent().getPreMigrationId() != null) {
+          // find previously-migrated parent
+          detailed.setParent((DetailedSample) serviceManager.getSampleDao().getByPreMigrationId(detailed.getParent().getPreMigrationId()));
+          if (detailed.getParent() == null) {
+            throw new IOException("No Sample found with pre-migration ID " + detailed.getParent().getPreMigrationId());
+          }
+        } else {
+          // save parent first to generate ID
+          saveSample(((DetailedSample) sample).getParent());
+        }
+      }
     }
     sample.inheritPermissions(sample.getProject());
     valueTypeLookup.resolveAll(sample);
@@ -226,8 +239,8 @@ public class DefaultMigrationTarget implements MigrationTarget {
     subproject.setId(serviceManager.getSubprojectDao().addSubproject(subproject));
   }
 
-  private static boolean hasParent(Sample sample) {
-    return LimsUtils.isDetailedSample(sample) && ((DetailedSample) sample).getParent() != null;
+  private static boolean hasUnsavedParent(DetailedSample sample) {
+    return sample.getParent() != null && sample.getParent().getId() == AbstractSample.UNSAVED_ID;
   }
 
   private void saveSampleChangeLog(Sample sample, Collection<ChangeLog> changes) throws IOException {
@@ -274,6 +287,15 @@ public class DefaultMigrationTarget implements MigrationTarget {
   public void saveLibraries(final Collection<Library> libraries) throws IOException {
     log.info("Migrating libraries...");
     for (Library library : libraries) {
+      if (LimsUtils.isDetailedSample(library.getSample())) {
+        DetailedSample sample = (DetailedSample) library.getSample();
+        if (sample.getId() == AbstractSample.UNSAVED_ID && sample.getPreMigrationId() != null) {
+          library.setSample(serviceManager.getSampleDao().getByPreMigrationId(sample.getPreMigrationId()));
+          if (library.getSample() == null) {
+            throw new IOException("No Sample found with pre-migration ID " + sample.getPreMigrationId());
+          }
+        }
+      }
       library.inheritPermissions(library.getSample());
       valueTypeLookup.resolveAll(library);
       library.setLastModifier(migrationUser);
@@ -325,7 +347,16 @@ public class DefaultMigrationTarget implements MigrationTarget {
         ldi.setCreationDate(timeStamp);
         ldi.setLastModified(timeStamp);
       }
-
+      
+      if (ldi.getLibrary().getId() == AbstractDilution.UNSAVED_ID && ldi.getLibrary().getLibraryAdditionalInfo() != null
+          && ldi.getLibrary().getLibraryAdditionalInfo().getPreMigrationId() != null) {
+        ldi.setLibrary(serviceManager.getLibraryDao().getByPreMigrationId(ldi.getLibrary().getLibraryAdditionalInfo().getPreMigrationId()));
+        if (ldi.getLibrary() == null) {
+          throw new IOException("No Library found with pre-migration ID "
+              + ldi.getLibrary().getLibraryAdditionalInfo().getPreMigrationId());
+        }
+      }
+      
       ldi.setId(serviceManager.getDilutionDao().save(ldi));
       log.debug("Saved library dilution " + ldi.getName());
     }

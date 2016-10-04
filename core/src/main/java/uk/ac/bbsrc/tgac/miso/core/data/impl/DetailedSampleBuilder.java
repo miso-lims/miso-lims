@@ -86,6 +86,7 @@ public class DetailedSampleBuilder implements DetailedSample, SampleAliquot, Sam
   private String groupId;
   private String groupDescription;
   private Integer siblingNumber;
+  private Long preMigrationId;
 
   // Identity attributes
   private String internalName;
@@ -835,6 +836,16 @@ public class DetailedSampleBuilder implements DetailedSample, SampleAliquot, Sam
     this.nonStandardAlias = nonStandardAlias;
   }
 
+  @Override
+  public Long getPreMigrationId() {
+    return preMigrationId;
+  }
+
+  @Override
+  public void setPreMigrationId(Long preMigrationId) {
+    this.preMigrationId = preMigrationId;
+  }
+
   public DetailedSample build() {
     if (sampleClass == null || sampleClass.getSampleCategory() == null) {
       throw new NullPointerException("Missing sample class or category");
@@ -937,6 +948,7 @@ public class DetailedSampleBuilder implements DetailedSample, SampleAliquot, Sam
     sample.setSynthetic(isSynthetic);
     sample.setNonStandardAlias(nonStandardAlias);
     sample.setSiblingNumber(siblingNumber);
+    sample.setPreMigrationId(preMigrationId);
 
     return sample;
   }

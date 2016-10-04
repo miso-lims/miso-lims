@@ -30,11 +30,19 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
+
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheException;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Ehcache;
+import net.sf.ehcache.Element;
+import net.sf.ehcache.constructs.blocking.BlockingCache;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,12 +54,6 @@ import org.springframework.jdbc.support.MetaDataAccessException;
 
 import com.googlecode.ehcache.annotations.key.HashCodeCacheKeyGenerator;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheException;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Ehcache;
-import net.sf.ehcache.Element;
-import net.sf.ehcache.constructs.blocking.BlockingCache;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
@@ -303,5 +305,18 @@ public class DbUtils {
       }
       return l;
     }
+  }
+  
+  /**
+   * Ensures that a query by unique field has performed as expected, returning 0 or 1 item
+   * 
+   * @param results the query results
+   * @return the single entry if {@code (results.size() == 0)}; null if {@code (results.isEmpty())}
+   * @throws IOException if {@code (results.size() > 1)}
+   */
+  public static <T> T getUniqueResult(Collection<T> results) throws IOException {
+    if (results.isEmpty()) return null;
+    if (results.size() > 1) throw new IOException("More than one record found matching unique field value.");
+    return results.iterator().next();
   }
 }
