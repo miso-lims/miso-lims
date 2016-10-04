@@ -859,6 +859,9 @@ public class SQLLibraryDAO implements LibraryStore {
       library.setPlatformName(rs.getString("platformName"));
       library.setLowQuality(rs.getBoolean("lowQuality"));
       library.setVolume(rs.getDouble("volume"));
+      if (rs.wasNull()) {
+        library.setVolume(null);
+      }
       library.setDiscarded(rs.getBoolean("discarded"));
       library.setBoxPositionId(rs.getLong("boxPositionId"));
       library.setBoxAlias(rs.getString("boxAlias"));
