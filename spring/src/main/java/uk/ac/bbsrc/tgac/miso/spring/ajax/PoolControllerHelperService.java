@@ -659,8 +659,10 @@ public class PoolControllerHelperService {
           JSONArray pout = new JSONArray();
           pout.add(libraryDilution.getName());
           pout.add(libraryDilution.getConcentration().toString());
-          pout.add(libraryDilution.getLibrary().getAlias() + " (" + libraryDilution.getLibrary().getName() + ")");
-          pout.add(libraryDilution.getLibrary().getSample().getAlias() + " (" + libraryDilution.getLibrary().getSample().getName() + ")");
+          pout.add(String.format("<a href='/miso/library/%d'>%s (%s)</a>", libraryDilution.getLibrary().getId(),
+              libraryDilution.getLibrary().getAlias(), libraryDilution.getLibrary().getName()));
+          pout.add(String.format("<a href='/miso/sample/%d'>%s (%s)</a>", libraryDilution.getLibrary().getSample().getId(),
+              libraryDilution.getLibrary().getSample().getAlias(), libraryDilution.getLibrary().getSample().getName()));
           StringBuilder indices = new StringBuilder();
           collectIndices(indices, libraryDilution);
           pout.add(indices.toString());
