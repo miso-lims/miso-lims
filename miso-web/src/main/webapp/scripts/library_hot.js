@@ -616,11 +616,7 @@ Library.hot = {
         }
       }
 
-      if (obj.volume) {
-        lib.volume = obj.volume;
-      } else {
-        lib.volume = 0;
-      }
+      lib.volume = obj.volume;
 
       if (obj.libraryAdditionalInfo) {
         lib.libraryAdditionalInfo = {};
