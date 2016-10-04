@@ -62,5 +62,12 @@ public interface LibraryAdditionalInfo {
   boolean hasNonStandardAlias();
 
   void setNonStandardAlias(boolean nonStandardAlias);
+  
+  /**
+   * @return the old LIMS' ID for this library prior to being migrated to MISO
+   */
+  Long getPreMigrationId();
+  
+  void setPreMigrationId(Long preMigrationId);
 
 }

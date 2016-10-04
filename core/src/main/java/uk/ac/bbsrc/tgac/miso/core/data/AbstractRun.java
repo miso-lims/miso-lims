@@ -56,7 +56,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.visitor.SubmittableVisitor;
 import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
 import uk.ac.bbsrc.tgac.miso.core.event.model.RunEvent;
-import uk.ac.bbsrc.tgac.miso.core.event.model.StatusChangedEvent;
 import uk.ac.bbsrc.tgac.miso.core.event.type.MisoEventType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunQcException;
@@ -409,11 +408,19 @@ public abstract class AbstractRun implements Run {
   }
 
   protected void fireStatusChangedEvent() {
-    if (this.getId() != 0L) {
-      StatusChangedEvent<Run> event = new StatusChangedEvent<Run>(this, getStatus());
-      for (MisoListener listener : getListeners()) {
-        listener.stateChanged(event);
-      }
+    switch (getStatus().getHealth()) {
+    case Started:
+      fireRunStartedEvent();
+      break;
+    case Completed:
+      fireRunCompletedEvent();
+      break;
+    case Failed:
+      fireRunFailedEvent();
+      break;
+    default:
+      break;
+
     }
   }
 

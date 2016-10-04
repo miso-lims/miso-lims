@@ -12,7 +12,7 @@ Library.hot = {
       return lib.libraryTypeId;
     });
     Hot.dropdownRef.libraryTypes.filter(function (lt) {
-      return !lt.archived || usedType.indexOf(lt.id) != -1;
+      return !lt.archived || usedTypes.indexOf(lt.id) != -1;
     }).forEach(function (lt) {
       if (!Library.hot.libraryTypeAliases[lt.platform]) {
         Library.hot.libraryTypeAliases[lt.platform] = [];
@@ -123,6 +123,8 @@ Library.hot = {
     
     // enable save button if it was disabled
     if (Hot.saveButton && Hot.saveButton.classList.contains('disabled')) Hot.toggleButtonAndLoaderImage(Hot.saveButton);
+    
+    Library.hot.addPlatformAndIndexHooks();
   },
   
   // TODO: add function regenerateWithQcs

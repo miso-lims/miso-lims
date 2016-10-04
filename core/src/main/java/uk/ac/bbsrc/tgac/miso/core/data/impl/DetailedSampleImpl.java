@@ -15,7 +15,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import uk.ac.bbsrc.tgac.miso.core.data.QcPassedDetail;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
@@ -39,9 +39,10 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
   @JoinColumn(name = "sampleClassId", nullable = false)
   private SampleClass sampleClass;
 
-  @OneToOne(targetEntity = QcPassedDetailImpl.class)
-  @JoinColumn(name = "qcPassedDetailId")
-  private QcPassedDetail qcPassedDetail;
+  @OneToOne(targetEntity = DetailedQcStatusImpl.class)
+  @JoinColumn(name = "detailedQcStatusId")
+  private DetailedQcStatus detailedQcStatus;
+  private String detailedQcStatusNote;
 
   @OneToOne(targetEntity = SubprojectImpl.class)
   @JoinColumn(name = "subprojectId")
@@ -63,6 +64,8 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
 
   @Column(nullable = false)
   private boolean nonStandardAlias = false;
+  
+  private Long preMigrationId;
 
   @Override
   public DetailedSample getParent() {
@@ -115,13 +118,13 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
   }
 
   @Override
-  public QcPassedDetail getQcPassedDetail() {
-    return qcPassedDetail;
+  public DetailedQcStatus getDetailedQcStatus() {
+    return detailedQcStatus;
   }
 
   @Override
-  public void setQcPassedDetail(QcPassedDetail qcPassedDetail) {
-    this.qcPassedDetail = qcPassedDetail;
+  public void setDetailedQcStatus(DetailedQcStatus detailedQcStatus) {
+    this.detailedQcStatus = detailedQcStatus;
   }
 
   @Override
@@ -196,5 +199,25 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
   @Override
   public void setNonStandardAlias(boolean nonStandardAlias) {
     this.nonStandardAlias = nonStandardAlias;
+  }
+
+  @Override
+  public String getDetailedQcStatusNote() {
+    return detailedQcStatusNote;
+  }
+
+  @Override
+  public void setDetailedQcStatusNote(String detailedQcStatusNote) {
+    this.detailedQcStatusNote = detailedQcStatusNote;
+  }
+  
+  @Override
+  public Long getPreMigrationId() {
+    return preMigrationId;
+  }
+
+  @Override
+  public void setPreMigrationId(Long preMigrationId) {
+    this.preMigrationId = preMigrationId;
   }
 }

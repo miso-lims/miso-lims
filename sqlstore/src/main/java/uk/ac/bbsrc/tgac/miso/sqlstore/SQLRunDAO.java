@@ -122,7 +122,7 @@ public class SQLRunDAO implements RunStore {
       + "SET name=:name, alias=:alias, description=:description, accession=:accession, platformRunId=:platformRunId, "
       + "pairedEnd=:pairedEnd, cycles=:cycles, filePath=:filePath, securityProfile_profileId=:securityProfile_profileId, "
       + "platformType=:platformType, status_statusId=:status_statusId, sequencerReference_sequencerReferenceId=:sequencerReference_sequencerReferenceId, "
-      + "sequencingParameters_parametersId = :sequencingParameters_parametersId " + "WHERE runId=:runId";
+      + "sequencingParameters_parametersId = :sequencingParameters_parametersId, lastModifier=:lastModifier " + "WHERE runId=:runId";
 
   public static final String RUN_DELETE = "DELETE FROM " + TABLE_NAME + " WHERE runId=:runId";
 
@@ -697,8 +697,14 @@ public class SQLRunDAO implements RunStore {
       r.setName(rs.getString("name"));
       r.setDescription(rs.getString("description"));
       r.setPlatformRunId(rs.getInt("platformRunId"));
+      if (rs.wasNull()) {
+        r.setPlatformRunId(null);
+      }
       r.setPairedEnd(rs.getBoolean("pairedEnd"));
       r.setCycles(rs.getInt("cycles"));
+      if (rs.wasNull()) {
+        r.setCycles(null);
+      }
       r.setFilePath(rs.getString("filePath"));
       r.setPlatformType(PlatformType.get(rs.getString("platformType")));
       r.setSequencingParametersId(rs.getLong("sequencingParameters_parametersId"));

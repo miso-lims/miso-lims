@@ -28,6 +28,8 @@ import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
@@ -39,10 +41,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
-import uk.ac.bbsrc.tgac.miso.core.data.QcPassedDetail;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleCVSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
@@ -62,6 +62,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstituteImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
@@ -70,8 +72,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrderImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.QcPassedDetailImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleCVSlideImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
@@ -219,8 +219,8 @@ public class Dtos {
     return to;
   }
 
-  public static QcPassedDetailDto asDto(QcPassedDetail from) {
-    QcPassedDetailDto dto = new QcPassedDetailDto();
+  public static DetailedQcStatusDto asDto(DetailedQcStatus from) {
+    DetailedQcStatusDto dto = new DetailedQcStatusDto();
     dto.setId(from.getId());
     dto.setStatus(from.getStatus());
     dto.setDescription(from.getDescription());
@@ -232,16 +232,16 @@ public class Dtos {
     return dto;
   }
 
-  public static Set<QcPassedDetailDto> asQcPassedDetailDtos(Set<QcPassedDetail> from) {
-    Set<QcPassedDetailDto> dtoSet = Sets.newHashSet();
-    for (QcPassedDetail qcPassedDetail : from) {
-      dtoSet.add(asDto(qcPassedDetail));
+  public static Set<DetailedQcStatusDto> asDetailedQcStatusDtos(Set<DetailedQcStatus> from) {
+    Set<DetailedQcStatusDto> dtoSet = Sets.newHashSet();
+    for (DetailedQcStatus detailedQcStatus : from) {
+      dtoSet.add(asDto(detailedQcStatus));
     }
     return dtoSet;
   }
 
-  public static QcPassedDetail to(QcPassedDetailDto from) {
-    QcPassedDetail to = new QcPassedDetailImpl();
+  public static DetailedQcStatus to(DetailedQcStatusDto from) {
+    DetailedQcStatus to = new DetailedQcStatusImpl();
     to.setStatus(from.getStatus());
     to.setDescription(from.getDescription());
     to.setNoteRequired(from.isNoteRequired());
@@ -264,8 +264,8 @@ public class Dtos {
       throw new IllegalArgumentException();
     }
     dto.setSampleClassId(from.getSampleClass().getId());
-    if (from.getQcPassedDetail() != null) {
-      dto.setQcPassedDetailId(from.getQcPassedDetail().getId());
+    if (from.getDetailedQcStatus() != null) {
+      dto.setDetailedQcStatusId(from.getDetailedQcStatus().getId());
     }
     if (from.getSubproject() != null) {
       dto.setSubprojectId(from.getSubproject().getId());
@@ -288,6 +288,12 @@ public class Dtos {
       dto.setSynthetic(from.isSynthetic());
     }
     dto.setNonStandardAlias(from.hasNonStandardAlias());
+    if (from.getDetailedQcStatus() != null) {
+      dto.setDetailedQcStatusId(from.getDetailedQcStatus().getId());
+    }
+    if (!isStringEmptyOrNull(from.getDetailedQcStatusNote())) {
+      dto.setDetailedQcStatusNote(from.getDetailedQcStatusNote());
+    }
     return dto;
   }
 
@@ -306,10 +312,13 @@ public class Dtos {
     } else {
       to = new DetailedSampleImpl();
     }
-    if (from.getQcPassedDetailId() != null) {
-      QcPassedDetail qcpassedDetail = new QcPassedDetailImpl();
-      qcpassedDetail.setId(from.getQcPassedDetailId());
-      to.setQcPassedDetail(qcpassedDetail);
+    if (from.getDetailedQcStatusId() != null) {
+      DetailedQcStatus detailedQcStatus = new DetailedQcStatusImpl();
+      detailedQcStatus.setId(from.getDetailedQcStatusId());
+      to.setDetailedQcStatus(detailedQcStatus);
+    }
+    if (!isStringEmptyOrNull(from.getDetailedQcStatusNote())) {
+      to.setDetailedQcStatusNote(from.getDetailedQcStatusNote());
     }
     if (from.getSubprojectId() != null) {
       Subproject subproject = new SubprojectImpl();

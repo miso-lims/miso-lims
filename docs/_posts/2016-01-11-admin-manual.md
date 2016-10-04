@@ -115,11 +115,15 @@ and populate it with the following information:
       username="tgaclims"
       password="tgaclims"/>
       <Parameter name="miso.propertiesFile" value="file:${CATALINA_HOME}/conf/Catalina/localhost/miso.properties" override="false"/>
+      <Parameter name="miso.name" value="Test"/>
     </Context>
 
 Make sure the database path in `ROOT.xml` is correct for your install:
 
     url="jdbc:mysql://your.database.server:3306/lims"
+
+Also, set the `miso.name` parameter to something to help distinguish testing
+and production copies of MISO.
 
 If your Tomcat install has the `autoDeploy="true"` flag set in `server.xml`, if
 you delete the `webapps/ROOT` directory and the `ROOT.war` file, Tomcat will

@@ -40,7 +40,7 @@
   <%-- timestamp to force browser to reload javascript --%>
   <jsp:useBean id="timestamp" class="java.util.Date" scope="request"/>
 
-  <title><c:if test="${not empty title}">${title} &mdash; </c:if>MISO LIMS</title>
+  <title><c:if test="${not empty title}">${title} &mdash; </c:if>MISO LIMS ${initParam['miso.name']}</title>
   <script type="text/javascript" src="<c:url value='/scripts/scriptaculous/prototype.js'/>"></script>
   <script type="text/javascript"
           src="<c:url value='/scripts/fluxion-ajax/fluxion-ajax.js'/>"></script>
@@ -98,6 +98,7 @@
     <td class="headertable" align="left" onclick="window.location.href='<c:url value='/'/>'">
       <img src="<c:url value='/styles/images/miso_bowl1_logo-tm.png'/>" alt="MISO Logo" name="logo"
            border="0" id="misologo"/>
+       <span id="instanceName">${initParam['miso.name']}</span>
     </td>
     <td class="headertable" align="right" onclick="window.location.href='<c:url value='/'/>'">
       <img src="<c:url value='/styles/images/brand_logo.png'/>" alt="Brand Logo" name="logo"

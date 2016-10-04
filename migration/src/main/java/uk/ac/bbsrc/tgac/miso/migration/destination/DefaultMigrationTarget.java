@@ -22,13 +22,16 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractPool;
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
@@ -55,6 +58,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
 
   private static final String OPT_DRY_RUN = "target.dryrun";
   private static final String OPT_REPLACE_CHANGELOGS = "target.replaceChangeLogs";
+  private static final String OPT_MERGE_RUN_POOLS = "target.mergeRunPools";
 
   private final SessionFactory sessionFactory;
   private final MisoServiceManager serviceManager;
@@ -62,13 +66,16 @@ public class DefaultMigrationTarget implements MigrationTarget {
 
   private boolean dryrun = false;
   private boolean replaceChangeLogs = false;
+  private boolean mergeRunPools = false;
 
   private Date timeStamp;
+  private User migrationUser;
 
   public DefaultMigrationTarget(MigrationProperties properties) throws IOException {
     this.timeStamp = new Date();
     this.dryrun = properties.getBoolean(OPT_DRY_RUN, false);
     this.replaceChangeLogs = properties.getBoolean(OPT_REPLACE_CHANGELOGS, false);
+    this.mergeRunPools = properties.getBoolean(OPT_MERGE_RUN_POOLS, false);
     DataSource datasource = makeDataSource(properties);
     DataSource dsProxy = new TransactionAwareDataSourceProxy(datasource);
     this.sessionFactory = MisoTargetUtils.makeSessionFactory(dsProxy);
@@ -80,6 +87,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
         return new ValueTypeLookup(serviceManager);
       }
     });
+    this.migrationUser = serviceManager.getAuthorizationManager().getCurrentUser();
     HibernateTransactionManager txManager = new HibernateTransactionManager(sessionFactory);
     txManager.setDataSource(datasource);
     txManager.setHibernateManagedSession(true);
@@ -122,21 +130,22 @@ public class DefaultMigrationTarget implements MigrationTarget {
     saveLibraries(data.getLibraries());
     saveLibraryDilutions(data.getDilutions());
 
-    // Resolution of run also resolves pool PlatformType
+    // Resolution of run also resolves pool PlatformType. Note: this currently assumes that all pools are
+    // included in runs. Any pool not attached to a run will not have its value types resolved
     Collection<Pool<LibraryDilution>> pools = data.getPools();
     Collection<Run> runs = data.getRuns();
     for (Run run : runs) {
       valueTypeLookup.resolveAll(run);
     }
+    if (mergeRunPools) holdExistingPartialPools(runs, pools);
     savePools(pools);
     saveRuns(runs);
   }
 
   public void saveProjects(Collection<Project> projects) throws IOException {
     log.info("Migrating projects...");
-    User user = serviceManager.getAuthorizationManager().getCurrentUser();
     for (Project project : projects) {
-      project.setSecurityProfile(new SecurityProfile(user));
+      project.setSecurityProfile(new SecurityProfile(migrationUser));
       // Make sure there's a study
       if (project.getStudies() == null) project.setStudies(new HashSet<Study>());
       if (project.getStudies().isEmpty()) {
@@ -144,7 +153,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
         study.setAlias(project.getShortName() + " study");
         study.setDescription("");
         study.setStudyType("Other");
-        study.setLastModifier(user);
+        study.setLastModifier(migrationUser);
         project.getStudies().add(study);
       }
       project.setId(serviceManager.getProjectDao().save(project));
@@ -171,9 +180,20 @@ public class DefaultMigrationTarget implements MigrationTarget {
       // already saved
       return;
     }
-    if (hasParent(sample)) {
-      // save parent first to generate ID
-      saveSample(((DetailedSample) sample).getParent());
+    if (LimsUtils.isDetailedSample(sample)) {
+      DetailedSample detailed = (DetailedSample) sample;
+      if (hasUnsavedParent(detailed)) {
+        if (detailed.getParent().getSampleClass() == null && detailed.getParent().getPreMigrationId() != null) {
+          // find previously-migrated parent
+          detailed.setParent((DetailedSample) serviceManager.getSampleDao().getByPreMigrationId(detailed.getParent().getPreMigrationId()));
+          if (detailed.getParent() == null) {
+            throw new IOException("No Sample found with pre-migration ID " + detailed.getParent().getPreMigrationId());
+          }
+        } else {
+          // save parent first to generate ID
+          saveSample(((DetailedSample) sample).getParent());
+        }
+      }
     }
     sample.inheritPermissions(sample.getProject());
     valueTypeLookup.resolveAll(sample);
@@ -219,21 +239,20 @@ public class DefaultMigrationTarget implements MigrationTarget {
     subproject.setId(serviceManager.getSubprojectDao().addSubproject(subproject));
   }
 
-  private static boolean hasParent(Sample sample) {
-    return LimsUtils.isDetailedSample(sample) && ((DetailedSample) sample).getParent() != null;
+  private static boolean hasUnsavedParent(DetailedSample sample) {
+    return sample.getParent() != null && sample.getParent().getId() == AbstractSample.UNSAVED_ID;
   }
 
   private void saveSampleChangeLog(Sample sample, Collection<ChangeLog> changes) throws IOException {
     if (changes == null || changes.isEmpty()) throw new IOException("Cannot save sample due to missing changelogs");
     serviceManager.getChangeLogDao().deleteAllById("sample", sample.getId());
     for (ChangeLog change : changes) {
-      change.setUser(serviceManager.getAuthorizationManager().getCurrentUser());
+      change.setUser(migrationUser);
       serviceManager.getChangeLogDao().create("sample", sample.getId(), change);
     }
   }
 
   private void saveSampleQcs(Sample sample, Collection<SampleQC> qcs) throws IOException {
-    User user = serviceManager.getAuthorizationManager().getCurrentUser();
     Date date = (replaceChangeLogs && sample.getChangeLog() != null) ? getLatestChangeDate(sample) : timeStamp;
     for (SampleQC qc : qcs) {
       try {
@@ -242,18 +261,17 @@ public class DefaultMigrationTarget implements MigrationTarget {
         // Never actually gets thrown
         throw new RuntimeException(e);
       }
-      qc.setQcCreator(user.getFullName());
+      qc.setQcCreator(migrationUser.getFullName());
       qc.setQcDate(date);
       qc.setId(serviceManager.getSampleQcDao().save(qc));
     }
   }
 
   private void saveSampleNotes(Sample sample, Collection<Note> notes) throws IOException {
-    User user = serviceManager.getAuthorizationManager().getCurrentUser();
     Date date = (replaceChangeLogs && sample.getChangeLog() != null) ? getLatestChangeDate(sample) : timeStamp;
     for (Note note : notes) {
       note.setCreationDate(date);
-      note.setOwner(user);
+      note.setOwner(migrationUser);
       note.setNoteId(serviceManager.getNoteDao().saveSampleNote(sample, note));
     }
   }
@@ -268,16 +286,24 @@ public class DefaultMigrationTarget implements MigrationTarget {
 
   public void saveLibraries(final Collection<Library> libraries) throws IOException {
     log.info("Migrating libraries...");
-    User user = serviceManager.getAuthorizationManager().getCurrentUser();
     for (Library library : libraries) {
+      if (LimsUtils.isDetailedSample(library.getSample())) {
+        DetailedSample sample = (DetailedSample) library.getSample();
+        if (sample.getId() == AbstractSample.UNSAVED_ID && sample.getPreMigrationId() != null) {
+          library.setSample(serviceManager.getSampleDao().getByPreMigrationId(sample.getPreMigrationId()));
+          if (library.getSample() == null) {
+            throw new IOException("No Sample found with pre-migration ID " + sample.getPreMigrationId());
+          }
+        }
+      }
       library.inheritPermissions(library.getSample());
       valueTypeLookup.resolveAll(library);
-      library.setLastModifier(user);
+      library.setLastModifier(migrationUser);
       library.setLastUpdated(timeStamp);
       if (library.getLibraryAdditionalInfo() != null) {
-        library.getLibraryAdditionalInfo().setCreatedBy(user);
+        library.getLibraryAdditionalInfo().setCreatedBy(migrationUser);
         library.getLibraryAdditionalInfo().setCreationDate(timeStamp);
-        library.getLibraryAdditionalInfo().setUpdatedBy(user);
+        library.getLibraryAdditionalInfo().setUpdatedBy(migrationUser);
         library.getLibraryAdditionalInfo().setLastUpdated(timeStamp);
         // Check for duplicate alias
         Collection<Library> dupes = serviceManager.getLibraryDao().listByAlias(library.getAlias());
@@ -305,7 +331,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
     if (changes == null || changes.isEmpty()) throw new IOException("Cannot save library due to missing changelogs");
     serviceManager.getChangeLogDao().deleteAllById("library", library.getId());
     for (ChangeLog change : changes) {
-      change.setUser(serviceManager.getAuthorizationManager().getCurrentUser());
+      change.setUser(migrationUser);
       serviceManager.getChangeLogDao().create("library", library.getId(), change);
     }
   }
@@ -321,30 +347,91 @@ public class DefaultMigrationTarget implements MigrationTarget {
         ldi.setCreationDate(timeStamp);
         ldi.setLastModified(timeStamp);
       }
-
+      
+      if (ldi.getLibrary().getId() == AbstractDilution.UNSAVED_ID && ldi.getLibrary().getLibraryAdditionalInfo() != null
+          && ldi.getLibrary().getLibraryAdditionalInfo().getPreMigrationId() != null) {
+        ldi.setLibrary(serviceManager.getLibraryDao().getByPreMigrationId(ldi.getLibrary().getLibraryAdditionalInfo().getPreMigrationId()));
+        if (ldi.getLibrary() == null) {
+          throw new IOException("No Library found with pre-migration ID "
+              + ldi.getLibrary().getLibraryAdditionalInfo().getPreMigrationId());
+        }
+      }
+      
       ldi.setId(serviceManager.getDilutionDao().save(ldi));
       log.debug("Saved library dilution " + ldi.getName());
     }
     log.info(libraryDilutions.size() + " library dilutions migrated.");
   }
 
+  /**
+   * Examines existing runs with existing pools to see if a pool has already been partially migrated.
+   * If an existing pool is found on the same run and lane as a pool in the migration, the migrating
+   * pool is removed from the pools collection to avoid saving it as a new pool. It will be merged
+   * with the existing Pool when the run is saved.
+   * 
+   * @param runs all of the Runs being migrated
+   * @throws IOException
+   */
+  private void holdExistingPartialPools(final Collection<Run> runs, final Collection<Pool<LibraryDilution>> pools) throws IOException {
+    for (Run newRun : runs) {
+      if (newRun.getSequencerPartitionContainers().size() != 1) {
+        throw new IOException(String.format("Migrating run %s has unexpected number of sequencerPartitionContainers (%d)",
+            newRun.getAlias(), newRun.getSequencerPartitionContainers().size()));
+      }
+      Run existingRun = serviceManager.getRunDao().getByAlias(newRun.getAlias());
+      if (existingRun != null) {
+        if (existingRun.getSequencerPartitionContainers().size() != 1) {
+          throw new IOException(String.format("Existing run %s has unexpected number of sequencerPartitionContainers (%d)",
+              existingRun.getAlias(), existingRun.getSequencerPartitionContainers().size()));
+        }
+        SequencerPartitionContainer<SequencerPoolPartition> existingLanes = existingRun.getSequencerPartitionContainers().get(0);
+        for (SequencerPoolPartition newLane : newRun.getSequencerPartitionContainers().get(0).getPartitions()) {
+          Pool<?> existingPool = null;
+          for (SequencerPoolPartition existingLane : existingLanes.getPartitions()) {
+            if (existingLane.getPartitionNumber() == newLane.getPartitionNumber()) {
+              existingPool = existingLane.getPool();
+            }
+          }
+          if (newLane.getPool() != null && existingPool != null) {
+            log.debug(String.format("Holding pool %s from run %s lane %d to merge with existing pool",
+                newLane.getPool().getAlias(),
+                newRun.getAlias(),
+                newLane.getPartitionNumber()));
+            pools.remove(newLane.getPool());
+          }
+        }
+      }
+    }
+  }
+  
   public void savePools(final Collection<Pool<LibraryDilution>> pools) throws IOException {
     log.info("Migrating pools...");
-
-    User user = serviceManager.getAuthorizationManager().getCurrentUser();
     for (Pool<LibraryDilution> pool : pools) {
-      pool.setCreationDate(timeStamp);
-      pool.setLastModifier(user);
-      pool.setLastUpdated(timeStamp);
+      Collection<Note> notes = pool.getNotes();
+      setPoolModifiedDetails(pool);
       pool.setId(serviceManager.getPoolDao().save(pool));
+      savePoolNotes(pool, notes);
       log.debug("Saved pool " + pool.getAlias());
     }
     log.info(pools.size() + " pools migrated.");
   }
+  
+  private void setPoolModifiedDetails(Pool<?> pool) throws IOException {
+    if (pool.getId() == AbstractPool.UNSAVED_ID) pool.setCreationDate(timeStamp);
+    pool.setLastModifier(migrationUser);
+    pool.setLastUpdated(timeStamp);
+  }
+  
+  private void savePoolNotes(Pool<?> pool, Collection<Note> notes) throws IOException {
+    for (Note note : notes) {
+      note.setCreationDate(timeStamp);
+      note.setOwner(migrationUser);
+      note.setNoteId(serviceManager.getNoteDao().savePoolNote(pool, note));
+    }
+  }
 
   public void saveRuns(final Collection<Run> runs) throws IOException {
     log.info("Migrating runs...");
-    User user = serviceManager.getAuthorizationManager().getCurrentUser();
     for (Run newRun : runs) {
       Run run = serviceManager.getRunDao().getByAlias(newRun.getAlias());
       if (run == null) {
@@ -353,10 +440,10 @@ public class DefaultMigrationTarget implements MigrationTarget {
         updateRun(newRun, run);
       }
       for (SequencerPartitionContainer<SequencerPoolPartition> container : run.getSequencerPartitionContainers()) {
-        container.setLastModifier(user);
+        container.setLastModifier(migrationUser);
         container.setId(serviceManager.getSequencerPartitionContainerDao().save(container));
       }
-      run.setLastModifier(user);
+      run.setLastModifier(migrationUser);
       run.setId(serviceManager.getRunDao().save(run));
       log.debug("Saved run " + run.getAlias());
     }
@@ -368,10 +455,12 @@ public class DefaultMigrationTarget implements MigrationTarget {
     to.getStatus().setCompletionDate(to.getStatus().getCompletionDate());
     to.getStatus().setHealth(to.getStatus().getHealth());
     if (to.getSequencerPartitionContainers().size() != 1) {
-      throw new IOException("Existing run " + to.getName() + " has unexpected number of sequencerPartitionContainers");
+      throw new IOException(String.format("Existing run %s has unexpected number of sequencerPartitionContainers (%d)",
+          to.getAlias(), to.getSequencerPartitionContainers().size()));
     }
     if (from.getSequencerPartitionContainers().size() != 1) {
-      throw new IOException("Migrating run " + from.getName() + " has unexpected number of sequencerPartitionContainers");
+      throw new IOException(String.format("Migrating run %s has unexpected number of sequencerPartitionContainers (%d)",
+          from.getAlias(), from.getSequencerPartitionContainers().size()));
     }
     SequencerPartitionContainer<SequencerPoolPartition> fromFlowcell = from.getSequencerPartitionContainers().get(0);
     SequencerPartitionContainer<SequencerPoolPartition> toFlowcell = to.getSequencerPartitionContainers().get(0);
@@ -380,10 +469,25 @@ public class DefaultMigrationTarget implements MigrationTarget {
         for (SequencerPoolPartition toPartition : toFlowcell.getPartitions()) {
           if (toPartition.getPartitionNumber().equals(fromPartition.getPartitionNumber())) {
             if (toPartition.getPool() != null) {
-              throw new IOException("Migration includes a pool for a lane that already has a pool");
+              if (!mergeRunPools) throw new IOException("A pool already exists for lane " + toPartition.getPartitionNumber());
+              @SuppressWarnings("unchecked")
+              Pool<LibraryDilution> toPool = (Pool<LibraryDilution>) toPartition.getPool();
+              // Merge pools
+              @SuppressWarnings("unchecked")
+              Collection<LibraryDilution> fromPoolables = (Collection<LibraryDilution>) fromPartition.getPool().getPoolableElements();
+              Collection<LibraryDilution> toPoolables = toPool.getPoolableElements();
+              toPoolables.addAll(fromPoolables);
+              setPoolModifiedDetails(toPool);
+              serviceManager.getPoolDao().save(toPool);
+              savePoolNotes(toPool, fromPartition.getPool().getNotes());
+              log.debug(String.format("Merged new pool %s with existing pool '%s' in run %d lane %d",
+                  fromPartition.getPool().getAlias(), toPool.getAlias(), to.getId(), toPartition.getPartitionNumber()));
+            } else {
+              // Add new pool
+              toPartition.setPool(fromPartition.getPool());
+              setPoolModifiedDetails(fromPartition.getPool());
+              log.debug("added " + toPartition.getPool().getAlias() + " to run " + to.getId() + " lane " + toPartition.getPartitionNumber());
             }
-            toPartition.setPool(fromPartition.getPool());
-            log.debug("added " + toPartition.getPool().getAlias() + " to run " + to.getId() + " lane " + toPartition.getPartitionNumber());
             break;
           }
         }

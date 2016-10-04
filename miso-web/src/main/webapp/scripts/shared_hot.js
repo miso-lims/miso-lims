@@ -40,6 +40,15 @@ var Hot = {
   },
 
   /**
+   * Custom renderer to show a cell as being immediately valid (in case it had been marked invalid earlier)
+   */
+  alwaysValidRenderer: function (instance, td, row, col, prop, value, cellProperties) {
+    td.setAttribute('style', 'background-color: #ffffff');
+    td.innerHTML = value;
+    return td;
+  },
+
+  /**
    * Custom renderer to visually highlight a non-standard alias
    */
   nsAliasRenderer: function (instance, td, row, col, prop, value, cellProperties) {
@@ -160,6 +169,11 @@ var Hot = {
     return function (item) {
       return item.name == name;
     };
+  },
+  descriptionPredicate: function (description) {
+    return function (item) {
+      return item.description == description;
+    }
   },
   /**
    * Gets the object from a given id and collection

@@ -13,6 +13,9 @@ import java.util.Set;
 
 import javax.persistence.CascadeType;
 
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -34,13 +37,11 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.store.SecurityStore;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
@@ -552,5 +553,12 @@ public class HibernateSampleDao implements SampleDao {
     Query query = currentSession().createQuery("FROM IdentityImpl I WHERE I.externalName = :externalName");
     query.setParameter("externalName", externalName);
     return fetchSqlStore((Identity) query.uniqueResult());
+  }
+
+  @Override
+  public Sample getByPreMigrationId(Long id) throws IOException {
+    Query query = currentSession().createQuery("FROM DetailedSampleImpl ds WHERE ds.preMigrationId = :id");
+    query.setParameter("id", id);
+    return fetchSqlStore((Sample) query.uniqueResult());
   }
 }

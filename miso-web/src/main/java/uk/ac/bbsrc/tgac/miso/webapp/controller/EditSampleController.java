@@ -71,6 +71,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.AbstractPool;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.EntityGroup;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity.DonorSex;
@@ -80,10 +82,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
-import uk.ac.bbsrc.tgac.miso.core.data.QcPassedDetail;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
@@ -92,11 +92,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleBuilder;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.QcPassedDetailImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SamplePurposeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl;
@@ -113,8 +113,8 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
+import uk.ac.bbsrc.tgac.miso.service.DetailedQcStatusService;
 import uk.ac.bbsrc.tgac.miso.service.LabService;
-import uk.ac.bbsrc.tgac.miso.service.QcPassedDetailService;
 import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.service.SamplePurposeService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
@@ -453,15 +453,21 @@ public class EditSampleController {
   }
 
   @Autowired
-  private QcPassedDetailService qcpassedDetailService;
+  private DetailedQcStatusService detailedQcStatusService;
 
-  @ModelAttribute("qcPassedDetails")
-  public List<QcPassedDetail> getQcPassedDetails() throws IOException {
-    List<QcPassedDetail> list = new ArrayList<>(qcpassedDetailService.getAll());
-    Collections.sort(list, new Comparator<QcPassedDetail>() {
+  @ModelAttribute("detailedQcStatuses")
+  public List<DetailedQcStatus> getDetailedQcStatuses() throws IOException {
+    List<DetailedQcStatus> list = new ArrayList<>(detailedQcStatusService.getAll());
+    Collections.sort(list, new Comparator<DetailedQcStatus>() {
       @Override
-      public int compare(QcPassedDetail o1, QcPassedDetail o2) {
-        return o1.getDescription().compareTo(o2.getDescription());
+      public int compare(DetailedQcStatus o1, DetailedQcStatus o2) {
+        if (o1.getStatus() == null) {
+          return (o2.getStatus() == null ? 0 : -1);
+        } else if (o2.getStatus() == null) {
+          return 1;
+        } else {
+          return o1.getStatus().compareTo(o2.getStatus());
+        }
       }
     });
     return list;
@@ -569,13 +575,13 @@ public class EditSampleController {
       }
     });
 
-    binder.registerCustomEditor(QcPassedDetail.class, new PropertyEditorSupport() {
+    binder.registerCustomEditor(DetailedQcStatus.class, new PropertyEditorSupport() {
       @Override
       public void setAsText(String text) throws IllegalArgumentException {
         if (isStringEmptyOrNull(text)) {
           setValue(null);
         } else {
-          QcPassedDetail qcpd = new QcPassedDetailImpl();
+          DetailedQcStatus qcpd = new DetailedQcStatusImpl();
           qcpd.setId(Long.valueOf(text));
           setValue(qcpd);
         }

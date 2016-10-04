@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.migration.destination;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -11,12 +12,12 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerReference;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.Institute;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
-import uk.ac.bbsrc.tgac.miso.core.data.QcPassedDetail;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
@@ -24,9 +25,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstituteImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.QcPassedDetailImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SamplePurposeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
@@ -40,10 +41,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.persistence.HibernateSampleClassDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateDetailedQcStatusDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateIndexDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLabDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDesignDao;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateQcPassedDetailDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSamplePurposeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSubprojectDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueMaterialDao;
@@ -160,11 +161,11 @@ public class ValueTypeLookupTestSuite {
     Mockito.when(seqRefDao.listAll()).thenReturn(seqRefs);
     Mockito.when(mgr.getSequencerReferenceDao()).thenReturn(seqRefDao);
     
-    HibernateQcPassedDetailDao qcDetDao = Mockito.mock(HibernateQcPassedDetailDao.class);
-    List<QcPassedDetail> qcDets = new ArrayList<>();
-    qcDets.add(makeQcPassedDetail(VALID_LONG, VALID_STRING));
-    Mockito.when(qcDetDao.getQcPassedDetails()).thenReturn(qcDets);
-    Mockito.when(mgr.getQcPassedDetailDao()).thenReturn(qcDetDao);
+    HibernateDetailedQcStatusDao detQcStatusDao = Mockito.mock(HibernateDetailedQcStatusDao.class);
+    List<DetailedQcStatus> qcStatuses = new ArrayList<>();
+    qcStatuses.add(makeDetailedQcStatus(VALID_LONG, VALID_STRING));
+    Mockito.when(detQcStatusDao.getDetailedQcStatus()).thenReturn(qcStatuses);
+    Mockito.when(mgr.getDetailedQcStatusDao()).thenReturn(detQcStatusDao);
     
     HibernateSubprojectDao subProjDao = Mockito.mock(HibernateSubprojectDao.class);
     List<Subproject> subprojs = new ArrayList<>();
@@ -453,17 +454,17 @@ public class ValueTypeLookupTestSuite {
   }
   
   @Test
-  public void testResolveQcPassedDetail() {
-    assertNotNull(sut.resolve(makeQcPassedDetail(VALID_LONG, null)));
-    assertNotNull(sut.resolve(makeQcPassedDetail(null, VALID_STRING)));
-    assertNull(sut.resolve((QcPassedDetail) null));
-    assertNull(sut.resolve(makeQcPassedDetail(null, null)));
-    assertNull(sut.resolve(makeQcPassedDetail(INVALID_LONG, null)));
-    assertNull(sut.resolve(makeQcPassedDetail(null, INVALID_STRING)));
+  public void testResolveDetailedQcStatus() {
+    assertNotNull(sut.resolve(makeDetailedQcStatus(VALID_LONG, null)));
+    assertNotNull(sut.resolve(makeDetailedQcStatus(null, VALID_STRING)));
+    assertNull(sut.resolve((DetailedQcStatus) null));
+    assertNull(sut.resolve(makeDetailedQcStatus(null, null)));
+    assertNull(sut.resolve(makeDetailedQcStatus(INVALID_LONG, null)));
+    assertNull(sut.resolve(makeDetailedQcStatus(null, INVALID_STRING)));
   }
   
-  private QcPassedDetail makeQcPassedDetail(Long id, String description) {
-    QcPassedDetail qcDet = new QcPassedDetailImpl();
+  private DetailedQcStatus makeDetailedQcStatus(Long id, String description) {
+    DetailedQcStatus qcDet = new DetailedQcStatusImpl();
     qcDet.setId(id);
     qcDet.setDescription(description);
     return qcDet;

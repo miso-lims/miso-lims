@@ -535,7 +535,13 @@ public class SQLPoolDAO implements PoolStore {
         ldc = cacheManager.getCache("lazy" + type + "Cache");
       }
 
+      Set<String> previouslySeenElementIds = new HashSet<>();
       for (Poolable<?, ?> d : pool.getPoolableElements()) {
+        String uid = d.getClass().getName() + ":" + d.getId();
+        if (previouslySeenElementIds.contains(uid)) {
+          continue;
+        }
+        previouslySeenElementIds.add(uid);
         newIds.add(d.getClass().getSimpleName() + ":" + d.getId());
         MapSqlParameterSource esParams = new MapSqlParameterSource();
         esParams.addValue("elementId", d.getId());

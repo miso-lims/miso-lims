@@ -61,6 +61,7 @@ public abstract class AbstractDilution implements Dilution, Comparable {
   private String identificationBarcode;
   private String dilutionUserName;
   private final Set<Pool<Dilution>> pools = new HashSet<Pool<Dilution>>();
+  private Long preMigrationId;
 
   @Override
   public long getId() {
@@ -147,6 +148,16 @@ public abstract class AbstractDilution implements Dilution, Comparable {
   @Override
   public void setSecurityProfile(SecurityProfile profile) {
     this.securityProfile = profile;
+  }
+
+  @Override
+  public Long getPreMigrationId() {
+    return preMigrationId;
+  }
+
+  @Override
+  public void setPreMigrationId(Long preMigrationId) {
+    this.preMigrationId = preMigrationId;
   }
 
   @Override

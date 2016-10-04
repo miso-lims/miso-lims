@@ -14,8 +14,9 @@ public class DetailedSampleDto extends SampleDto {
   private Long parentSampleClassId;
   private Long sampleClassId;
   private String sampleClassUrl;
-  private Long qcPassedDetailId;
-  private String qcPassedDetailUrl;
+  private Long detailedQcStatusId;
+  private String detailedQcStatusUrl;
+  private String detailedQcStatusNote;
   private Long subprojectId;
   private String subprojectUrl;
   private Long prepKitId;
@@ -57,20 +58,21 @@ public class DetailedSampleDto extends SampleDto {
     this.parentSampleClassId = parentSampleClassId;
   }
 
-  public Long getQcPassedDetailId() {
-    return qcPassedDetailId;
+  public Long getDetailedQcStatusId() {
+    return detailedQcStatusId;
   }
 
-  public void setQcPassedDetailId(Long qcPassedDetailId) {
-    this.qcPassedDetailId = qcPassedDetailId;
+  @JsonSerialize(include = JsonSerialize.Inclusion.ALWAYS)
+  public void setDetailedQcStatusId(Long detailedQcStatusId) {
+    this.detailedQcStatusId = detailedQcStatusId;
   }
 
-  public String getQcPassedDetailUrl() {
-    return qcPassedDetailUrl;
+  public String getDetailedQcStatusUrl() {
+    return detailedQcStatusUrl;
   }
 
-  public void setQcPassedDetailUrl(String qcPassedDetailUrl) {
-    this.qcPassedDetailUrl = qcPassedDetailUrl;
+  public void setDetailedQcStatusUrl(String detailedQcStatusUrl) {
+    this.detailedQcStatusUrl = detailedQcStatusUrl;
   }
 
   public Long getSubprojectId() {
@@ -153,6 +155,14 @@ public class DetailedSampleDto extends SampleDto {
     this.nonStandardAlias = nonStandardAlias;
   }
 
+  public String getDetailedQcStatusNote() {
+    return detailedQcStatusNote;
+  }
+
+  public void setDetailedQcStatusNote(String detailedQcStatusNote) {
+    this.detailedQcStatusNote = detailedQcStatusNote;
+  }
+
   @Override
   public void writeUrls(URI baseUri) {
     super.writeUrls(baseUri);
@@ -161,9 +171,9 @@ public class DetailedSampleDto extends SampleDto {
       setSampleClassUrl(
           UriComponentsBuilder.fromUri(baseUri).path("/rest/sampleclass/{id}").buildAndExpand(getSampleClassId()).toUriString());
     }
-    if (getQcPassedDetailId() != null) {
-      setQcPassedDetailUrl(
-          UriComponentsBuilder.fromUri(baseUri).path("/rest/qcpasseddetail/{id}").buildAndExpand(getQcPassedDetailId()).toUriString());
+    if (getDetailedQcStatusId() != null) {
+      setDetailedQcStatusUrl(
+          UriComponentsBuilder.fromUri(baseUri).path("/rest/detailedqcstatus/{id}").buildAndExpand(getDetailedQcStatusId()).toUriString());
     }
     if (getSubprojectId() != null) {
       setSubprojectUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/subproject/{id}").buildAndExpand(getSubprojectId()).toUriString());

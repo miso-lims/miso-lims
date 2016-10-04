@@ -29,9 +29,9 @@ public interface DetailedSample extends Sample {
 
   void setArchived(Boolean archived);
 
-  QcPassedDetail getQcPassedDetail();
+  DetailedQcStatus getDetailedQcStatus();
 
-  void setQcPassedDetail(QcPassedDetail qcPassedDetail);
+  void setDetailedQcStatus(DetailedQcStatus detailedQcStatus);
 
   KitDescriptor getPrepKit();
 
@@ -100,5 +100,16 @@ public interface DetailedSample extends Sample {
   boolean hasNonStandardAlias();
 
   void setNonStandardAlias(boolean nonStandardAlias);
+  
+  /**
+   * @return the old LIMS' ID for this sample prior to being migrated to MISO
+   */
+  Long getPreMigrationId();
+  
+  void setPreMigrationId(Long preMigrationId);
+
+  String getDetailedQcStatusNote();
+
+  void setDetailedQcStatusNote(String detailedQcStatusNote);
 
 }
