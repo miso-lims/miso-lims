@@ -774,7 +774,7 @@ Pool.search = {
           addToPooled.push(jQuery(value).html());
         });
         addToPooled.pop();
-        addToPooled.push('<span onclick="Pool.ui.removePooledElement(' + poolId + ', ' + elementId + ', \'' + elementName + '\');" class="ui-icon ui-button ui-icon-circle-close"></span>');
+        addToPooled.push('<span id="pooled_' + elementName + '" onclick="Pool.ui.removePooledElement(' + poolId + ', ' + elementId + ', \'' + elementName + '\');" class="ui-icon ui-button ui-icon-circle-close"></span>');
         jQuery('#pooledElementsDatatable').dataTable().fnAddData(addToPooled);
         jQuery('#searchElementsResult').css('visibility', 'hidden');
       }
