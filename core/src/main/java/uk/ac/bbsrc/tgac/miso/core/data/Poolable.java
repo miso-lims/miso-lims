@@ -32,7 +32,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 /**
  * A simple interface to describe objects that can be placed in a {@link Pool}. A Poolable is typed by, and references, a {@link Collection}
- * of elements, e.g. {@link Dilution} or {@link Plate} objects.
+ * of elements, e.g. {@link Dilution} objects.
  * 
  * @author Rob Davey
  * @date 11/05/12

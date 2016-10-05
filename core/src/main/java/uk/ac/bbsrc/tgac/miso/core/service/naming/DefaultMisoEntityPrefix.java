@@ -1,17 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.core.service.naming;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.springframework.util.NumberUtils;
-
-import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 /**
  * This enum represents the set of prefixes for MISO objects, used in naming schemes
@@ -21,7 +13,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
  * @since 0.1.7
  */
 public enum DefaultMisoEntityPrefix {
-  BOX("Box"), EMP("emPCR"), EDI("emPCRDilution"), EPO("Pool"), EXP("Experiment"), LIB("Library"), LDI("LibraryDilution"), PLA("Plate"), PRO(
+  BOX("Box"), EMP("emPCR"), EDI("emPCRDilution"), EPO("Pool"), EXP("Experiment"), LIB("Library"), LDI("LibraryDilution"), PRO(
       "Project"), UPO("Pool"), RUN("Run"), SAM("Sample"), SPC("SequencerPartitionContainer"), STU("Study"), IPO("Pool"), PPO(
           "PacBioPool"), SUB("Submission");
 
@@ -32,8 +24,8 @@ public enum DefaultMisoEntityPrefix {
   /**
    * Field lookup
    */
-  private static final Map<String, DefaultMisoEntityPrefix> lookup = new HashMap<String, DefaultMisoEntityPrefix>();
-  private static final Map<String, DefaultMisoEntityPrefix> names = new HashMap<String, DefaultMisoEntityPrefix>();
+  private static final Map<String, DefaultMisoEntityPrefix> lookup = new HashMap<>();
+  private static final Map<String, DefaultMisoEntityPrefix> names = new HashMap<>();
 
   static {
     for (DefaultMisoEntityPrefix s : EnumSet.allOf(DefaultMisoEntityPrefix.class)) {
@@ -82,7 +74,7 @@ public enum DefaultMisoEntityPrefix {
    * @return ArrayList<String> keys.
    */
   public static ArrayList<String> getKeys() {
-    ArrayList<String> keys = new ArrayList<String>();
+    ArrayList<String> keys = new ArrayList<>();
     for (DefaultMisoEntityPrefix h : DefaultMisoEntityPrefix.values()) {
       keys.add(h.getKey());
     }

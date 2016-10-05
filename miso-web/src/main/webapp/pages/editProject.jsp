@@ -728,31 +728,6 @@
           </table>
         </div>
 
-        <div id="plateformdiv" class="simplebox" style="display:none;">
-          <table class="in">
-            <tr>
-              <td>
-                <form method='post'
-                      id='plateform_upload_form'
-                      action='<c:url value="/miso/upload/project/plate-form"/>'
-                      enctype="multipart/form-data"
-                      target="plateform_target_upload"
-                      onsubmit="Utils.fileUpload.fileUploadProgress('plateform_upload_form', 'plateform_statusdiv', Project.ui.plateInputFormUploadSuccess);">
-                  <input type="hidden" name="projectId" value="${project.id}"/>
-                  <input type="file" name="file"/>
-                  <button type="submit" class="br-button ui-state-default ui-corner-all">Upload</button>
-                  <button type="button" class="br-button ui-state-default ui-corner-all" onclick="Project.ui.cancelPlateInputFormUpload();">
-                    Cancel
-                  </button>
-                </form>
-                <iframe id='plateform_target_upload' name='plateform_target_upload' style='display: none'></iframe>
-                <div id="plateform_statusdiv"></div>
-                <div id="plateform_import"></div>
-              </td>
-            </tr>
-          </table>
-        </div>
-
         <table class="list" id="sample_table">
           <thead>
           <tr>
@@ -1506,81 +1481,6 @@
   </span>
 </div>
 
-<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#plates_arrowclick'), 'platesdiv');">
-  ${fn:length(projectPlates)} Plates
-  <div id="plates_arrowclick" class="toggleLeft"></div>
-</div>
-<div id="platesdiv" style="display:none;">
-  <a name="plate"></a>
-
-  <h1>${fn:length(projectPlates)} Plates</h1>
-  <ul class="sddm">
-    <li>
-      <a onmouseover="mopen('platesmenu')" onmouseout="mclosetime()">Options
-        <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
-      </a>
-
-      <div id="platesmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
-        <a href="<c:url value="/miso/plate/import"/>">Import Plate Sheet</a>
-        <c:if test="${not empty projectPlates}">
-          <a href="javascript:void(0);" onclick="Plate.barcode.selectPlateBarcodesToPrint('#plates_table');">Print Barcodes ...</a>
-        </c:if>
-      </div>
-    </li>
-  </ul>
-  <span style="clear:both">
-    <table class="list" id="plates_table">
-      <thead>
-      <tr>
-        <th>Plate Name</th>
-        <th>Plate Size</th>
-        <th>Plate Creation Date</th>
-        <sec:authorize access="hasRole('ROLE_ADMIN')">
-          <th class="fit">DELETE</th>
-        </sec:authorize>
-      </tr>
-      </thead>
-      <tbody>
-      <c:forEach items="${projectPlates}" var="plate">
-        <tr poolId="${plate.id}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-          <td><b><a href="<c:url value='/miso/plate/${plate.id}'/>">${plate.name}</a></b></td>
-          <td>${plate.size}</td>
-          <td>${plate.creationDate}</td>
-          <sec:authorize access="hasRole('ROLE_ADMIN')">
-            <td class="misoicon" onclick="Plate.deletePlate(${plate.id}, Utils.page.pageReload);">
-              <span class="ui-icon ui-icon-trash"/>
-            </td>
-          </sec:authorize>
-        </tr>
-      </c:forEach>
-      </tbody>
-    </table>
-    <script type="text/javascript">
-      jQuery(document).ready(function () {
-        jQuery('#plates_table').dataTable({
-          "aaSorting": [
-            [0, 'asc'],
-            [2, 'asc']
-          ],
-          "aoColumns": [
-            null,
-            null,
-            null
-            <sec:authorize access="hasRole('ROLE_ADMIN')">, null</sec:authorize>
-          ],
-          "iDisplayLength": 50,
-          "bJQueryUI": true,
-          "bRetrieve": true,
-          "sPaginationType": "full_numbers",
-          "fnDrawCallback": function (oSettings) {
-            jQuery('#plates_table_paginate').find('.fg-button').addClass('dataTables_paginate_numbers').removeClass('fg-button ui-button');
-          }
-        });
-      });
-    </script>
-  </span>
-</div>
-
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#runs_arrowclick'), 'runsdiv');">
   ${fn:length(projectRuns)} Runs
   <div id="runs_arrowclick" class="toggleLeft"></div>
@@ -1667,7 +1567,6 @@
 <div id="addProjectOverviewDialog" title="Create new Overview"></div>
 <div id="addProjectOverviewNoteDialog" title="Create new Note"></div>
 <div id="getBulkSampleInputFormDialog" title="Get Bulk Sample Input Form"></div>
-<div id="getPlateInputFormDialog" title="Get Plate Input Form"></div>
 
 <script type="text/javascript">
 jQuery(document).ready(function () {

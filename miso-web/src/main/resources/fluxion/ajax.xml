@@ -35,9 +35,6 @@
   <bean id="boxControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.BoxControllerHelperService">
   </bean>
 
-  <bean id="plateControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.PlateControllerHelperService">
-    </bean>
-
   <bean id="poolControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.PoolControllerHelperService">
     </bean>
 

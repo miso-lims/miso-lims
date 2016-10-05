@@ -286,7 +286,7 @@ function generateSampleDeliveryForm(tableName, projectId) {
       }
     });
 
-    jQuery("div.toolbar").html("Plate: <input type='radio' name='plateinformationform' value='yes'/>Yes |<input type='radio' name='plateinformationform' value='no' checked='checked'/>No " + "<button type='button' onclick=\"Project.ui.processSampleDeliveryForm('"+tableName+"', " + projectId + ");\" class=\"fg-button ui-state-default ui-corner-all\">Generate Form</button>");
+    jQuery("div.toolbar").html("<button type='button' onclick=\"Project.ui.processSampleDeliveryForm('"+tableName+"', " + projectId + ");\" class=\"fg-button ui-state-default ui-corner-all\">Generate Form</button>");
   }
 }
 
@@ -308,33 +308,6 @@ function getBulkSampleInputForm(projectId) {
     buttons: {
       "Get Form": function () {
         Project.ui.downloadBulkSampleInputForm(projectId, jQuery('input[name=formType]:checked').val());
-        jQuery(this).dialog('close');
-      },
-      "Cancel": function () {
-        jQuery(this).dialog('close');
-      }
-    }
-  });
-}
-
-function getPlateInputForm(projectId) {
-  jQuery('#getPlateInputFormDialog')
-          .html("<form>" +
-                "<fieldset class='dialog'>" +
-                "<p>Select desired document format</p><br/>" +
-                "<label for='formTypeOds'>OpenOffice (ODS)</label>" +
-                "<input type='radio' name='formType' id='formTypeOds' class='text ui-widget-content ui-corner-all' value='ods'/>" +
-                "<label for='formTypeXlsx'>Excel (XLSX)</label>" +
-                "<input type='radio' name='formType' id='formTypeXls' class='text ui-widget-content ui-corner-all' value='xlsx'/>" +
-                "</fieldset></form>");
-
-  jQuery('#getPlateInputFormDialog').dialog({
-    width: 400,
-    modal: true,
-    resizable: false,
-    buttons: {
-      "Get Form": function () {
-        Project.ui.downloadPlateInputForm(projectId, jQuery('input[name=formType]:checked').val());
         jQuery(this).dialog('close');
       },
       "Cancel": function () {

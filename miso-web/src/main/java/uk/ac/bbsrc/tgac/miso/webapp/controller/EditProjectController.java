@@ -66,8 +66,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.AbstractSampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
-import uk.ac.bbsrc.tgac.miso.core.data.Plate;
-import uk.ac.bbsrc.tgac.miso.core.data.Plateable;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
@@ -195,9 +193,8 @@ public class EditProjectController {
       Collections.sort(runs, new AliasComparator(Run.class));
       for (Run r : runs) {
         RunImpl ri = (RunImpl) r;
-        ri.setSequencerPartitionContainers(
-            new ArrayList<SequencerPartitionContainer<SequencerPoolPartition>>(
-                requestManager.listSequencerPartitionContainersByRunId(r.getId())));
+        ri.setSequencerPartitionContainers(new ArrayList<SequencerPartitionContainer<SequencerPoolPartition>>(
+            requestManager.listSequencerPartitionContainersByRunId(r.getId())));
       }
       return runs;
     } catch (NoSuchMethodException e) {
@@ -278,14 +275,6 @@ public class EditProjectController {
     List<emPCRDilution> dilutions = new ArrayList<emPCRDilution>(requestManager.listAllEmPCRDilutionsByProjectId(projectId));
     Collections.sort(dilutions);
     return dilutions;
-  }
-
-  public Collection<Plate<? extends List<? extends Plateable>, ? extends Plateable>> populateProjectPlates(long projectId)
-      throws IOException {
-    List<Plate<? extends List<? extends Plateable>, ? extends Plateable>> plates = new ArrayList<Plate<? extends List<? extends Plateable>, ? extends Plateable>>(
-        requestManager.listAllPlatesByProjectId(projectId));
-    Collections.sort(plates);
-    return plates;
   }
 
   public Map<Long, Collection<Library>> populateLibraryGroupMap(Project project, Collection<Library> projectLibraries) throws IOException {
@@ -412,7 +401,6 @@ public class EditProjectController {
         model.put("projectEmPcrDilutions", populateProjectEmPcrDilutions(emPcrs));
 
         model.put("projectPools", populateProjectPools(projectId));
-        model.put("projectPlates", populateProjectPlates(projectId));
 
         model.put("libraryGroupMap", populateLibraryGroupMap(project, libraries));
 

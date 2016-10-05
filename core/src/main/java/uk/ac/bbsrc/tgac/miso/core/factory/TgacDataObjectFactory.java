@@ -23,8 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.core.factory;
 
-import java.util.LinkedList;
-
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.User;
 
@@ -32,8 +30,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
-import uk.ac.bbsrc.tgac.miso.core.data.Plate;
-import uk.ac.bbsrc.tgac.miso.core.data.Plateable;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
@@ -55,7 +51,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.PlateImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
@@ -186,16 +181,6 @@ public class TgacDataObjectFactory extends DataObjectFactory {
   @Override
   public emPCR getEmPCR(User user) {
     return new emPCR(user);
-  }
-
-  @Override
-  public Plate<LinkedList<Plateable>, Plateable> getPlateOfSize(int size) {
-    return new PlateImpl<Plateable>(size);
-  }
-
-  @Override
-  public Plate<LinkedList<Plateable>, Plateable> getPlateOfSize(int size, User user) {
-    return new PlateImpl<Plateable>(size, user);
   }
 
   @Override

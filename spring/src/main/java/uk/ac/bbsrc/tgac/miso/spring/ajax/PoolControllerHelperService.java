@@ -68,8 +68,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
-import uk.ac.bbsrc.tgac.miso.core.data.Plate;
-import uk.ac.bbsrc.tgac.miso.core.data.Plateable;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
@@ -667,9 +665,8 @@ public class PoolControllerHelperService {
           collectIndices(indices, libraryDilution);
           pout.add(indices.toString());
           pout.add(libraryDilution.getLibrary().isLowQuality() ? "⚠" : "");
-          pout.add(
-              "<div style='cursor:inherit;' onclick=\"Pool.search.poolSearchSelectElement(" + poolId + ", '" + libraryDilution.getId()
-                  + "', '" + libraryDilution.getName() + "')\"><span class=\"ui-icon ui-icon-plusthick\"></span></div>");
+          pout.add("<div style='cursor:inherit;' onclick=\"Pool.search.poolSearchSelectElement(" + poolId + ", '" + libraryDilution.getId()
+              + "', '" + libraryDilution.getName() + "')\"><span class=\"ui-icon ui-icon-plusthick\"></span></div>");
           arr.add(pout);
         }
         j.put("poolelements", arr);

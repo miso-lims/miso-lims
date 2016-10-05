@@ -134,7 +134,6 @@
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.LibraryQC" value-ref="libraryQcStore" />
         <entry key="com.eaglegenomics.simlims.core.Note" value-ref="noteStore" />
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.Partition" value-ref="partitionStore" />
-        <entry key="uk.ac.bbsrc.tgac.miso.core.data.Plate" value-ref="plateStore" />
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.Platform" value-ref="platformStore" />
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.Pool" value-ref="poolStore" />
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.PoolQC" value-ref="poolQcStore" />
@@ -435,22 +434,6 @@
     <property name="changeLogDAO" ref="sqlChangeLogDAO" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />
     <property name="securityDAO" ref="sqlSecurityDAO" />
-  </bean>
-
-  <bean id="sqlPlateDAO" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLPlateDAO">
-    <property name="cascadeType">
-      <value type="javax.persistence.CascadeType">PERSIST</value>
-    </property>
-    <property name="securityDAO" ref="sqlSecurityDAO" />
-    <property name="changeLogDAO" ref="sqlChangeLogDAO" />
-    <property name="libraryDAO" ref="sqlLibraryDAO" />
-    <property name="sampleDAO" ref="hibernateSampleDao" />
-    <property name="dilutionDAO" ref="sqlLibraryDilutionDAO" />
-    <property name="securityProfileDAO" ref="sqlSecurityProfileDAO" />
-    <property name="jdbcTemplate" ref="interfaceTemplate" />
-    <property name="autoGenerateIdentificationBarcodes">
-      <value>${miso.autoGenerateIdentificationBarcodes}</value>
-    </property>
   </bean>
 
   <bean id="sqlAlertDAO" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLAlertDAO">
@@ -807,17 +790,6 @@
     <property name="interceptorNames">
       <list>
         <value>sqlKitDAO</value>
-      </list>
-    </property>
-  </bean>
-
-  <bean name="plateStore" class="org.springframework.aop.framework.ProxyFactoryBean">
-    <property name="proxyInterfaces">
-      <value>uk.ac.bbsrc.tgac.miso.core.store.PlateStore</value>
-    </property>
-    <property name="interceptorNames">
-      <list>
-        <value>sqlPlateDAO</value>
       </list>
     </property>
   </bean>
