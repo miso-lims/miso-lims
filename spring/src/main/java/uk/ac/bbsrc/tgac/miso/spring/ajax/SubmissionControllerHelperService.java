@@ -55,7 +55,6 @@ import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
-import uk.ac.bbsrc.tgac.miso.core.data.Plate;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -103,7 +102,7 @@ public class SubmissionControllerHelperService {
   @Autowired
   private FilePathGeneratorResolverService filePathGeneratorResolverService;
 
-  private DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+  private final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
   // Saves a new submission to the DB, or updates an existing submission, based on details sent vie AJAX from
   // editSubmission.jsp
@@ -468,10 +467,9 @@ public class SubmissionControllerHelperService {
 
                   if (partitionInvolved) {
                     // If the partition was involved in the project, it is listed
-                    sb.append(
-                        "<li><input type='checkbox' id='" + r.getId() + "_" + partitionContainer.getId() + "_" + part.getPartitionNumber()
-                            + "' name='partition' " + "itemLabel='" + part.getPartitionNumber() + "' itemValue='PAR" + part.getId()
-                            + "' value='PAR" + part.getId() + "' onclick='Submission.ui.togglePartitionContents(this)'");
+                    sb.append("<li><input type='checkbox' id='" + r.getId() + "_" + partitionContainer.getId() + "_"
+                        + part.getPartitionNumber() + "' name='partition' " + "itemLabel='" + part.getPartitionNumber() + "' itemValue='PAR"
+                        + part.getId() + "' value='PAR" + part.getId() + "' onclick='Submission.ui.togglePartitionContents(this)'");
 
                     if (sub != null) {
                       // checks checkboxes if the partition is in the submission
@@ -482,9 +480,8 @@ public class SubmissionControllerHelperService {
 
                     sb.append("/>");
                     // adds the Partition info: number, name, experiments etc.
-                    sb.append(
-                        "<b>Partition " + part.getPartitionNumber() + "</b> : " + part.getPool().getName() + " ("
-                            + LimsUtils.join(involvedExperiments, ",") + ")");
+                    sb.append("<b>Partition " + part.getPartitionNumber() + "</b> : " + part.getPool().getName() + " ("
+                        + LimsUtils.join(involvedExperiments, ",") + ")");
 
                     // creates HTML for list of library dilutions and corresponding datafiles.
                     // gets all the dilutions in that partition's pool.
@@ -501,9 +498,8 @@ public class SubmissionControllerHelperService {
                     sb.append("<ul>");
 
                     for (Poolable d : poolables) {
-                      sb.append(
-                          "<li><input type='checkbox'  name='DIL_" + d.getId() + "' id='DIL" + d.getId() + "_PAR" + part.getId()
-                              + "' value='PAR_" + part.getId() + "' ");
+                      sb.append("<li><input type='checkbox'  name='DIL_" + d.getId() + "' id='DIL" + d.getId() + "_PAR" + part.getId()
+                          + "' value='PAR_" + part.getId() + "' ");
 
                       if (sub != null && sub.getSubmissionElements().contains(part)) {
                         // checks dilution checkboxes if dilution is in the submission
@@ -532,8 +528,6 @@ public class SubmissionControllerHelperService {
                           return JSONUtils.SimpleJSONError("Failed to populate project for submission");
                         }
                         sb.append("</ul>");
-                      } else if (d instanceof Plate) {
-                        sb.append(">" + partitionContainer.getId() + "_" + d.getName() + ": ");
                       }
 
                       sb.append("</li>");

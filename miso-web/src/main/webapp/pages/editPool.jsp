@@ -49,9 +49,9 @@
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
   <div id="note_arrowclick" class="toggleLeft"></div>
 </div>
-<div id="notediv" class="note" style="display:none;">A Pool contains <b>one or more</b> Dilutions or Plates that are
+<div id="notediv" class="note" style="display:none;">A Pool contains <b>one or more</b> Dilutions that are
   to be placed, as part of an Experiment, in a sequencer instrument Run partition (lane/chamber/cell). Pools
-  with more than one Dilution or a Plate with multiple libraries are said to be multiplexed.
+  with more than one Dilution are said to be multiplexed.
 </div>
 
 <div class="bs-callout bs-callout-warning hidden">

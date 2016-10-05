@@ -32,8 +32,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
-import uk.ac.bbsrc.tgac.miso.core.data.Plate;
-import uk.ac.bbsrc.tgac.miso.core.data.Plateable;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
@@ -132,10 +130,6 @@ public abstract class DataObjectFactory {
   public abstract emPCR getEmPCR();
 
   public abstract emPCR getEmPCR(User user);
-
-  public abstract Plate<LinkedList<Plateable>, Plateable> getPlateOfSize(int size);
-
-  public abstract Plate<LinkedList<Plateable>, Plateable> getPlateOfSize(int size, User user);
 
   public abstract Pool<? extends Poolable<?, ?>> getPool();
 

@@ -57,7 +57,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 @JsonTypeName("library")
 @JsonIgnoreProperties({ "securityProfile" })
 @PrintableBarcode
-public interface Library extends SecurableByProfile, Comparable, Barcodable, Locatable, Deletable, Plateable, Boxable {
+public interface Library extends SecurableByProfile, Comparable, Barcodable, Locatable, Deletable, Boxable {
 
   /** Field PREFIX */
   public static final String PREFIX = "LIB";
@@ -67,7 +67,8 @@ public interface Library extends SecurableByProfile, Comparable, Barcodable, Loc
   /**
    * Sets the name of this Library object.
    * 
-   * @param name name.
+   * @param name
+   *          name.
    */
   public void setName(String name);
 
@@ -81,7 +82,8 @@ public interface Library extends SecurableByProfile, Comparable, Barcodable, Loc
   /**
    * Sets the description of this Library object.
    * 
-   * @param description description.
+   * @param description
+   *          description.
    */
   public void setDescription(String description);
 
@@ -95,7 +97,8 @@ public interface Library extends SecurableByProfile, Comparable, Barcodable, Loc
   /**
    * Sets the accession of this Library object.
    * 
-   * @param accession accession.
+   * @param accession
+   *          accession.
    */
   public void setAccession(String accession);
 
@@ -109,7 +112,8 @@ public interface Library extends SecurableByProfile, Comparable, Barcodable, Loc
   /**
    * Sets the sample of this Library object.
    * 
-   * @param sample sample.
+   * @param sample
+   *          sample.
    */
   public void setSample(Sample sample);
 
@@ -121,7 +125,8 @@ public interface Library extends SecurableByProfile, Comparable, Barcodable, Loc
   /**
    * Sets the notes of this Library object.
    * 
-   * @param notes notes.
+   * @param notes
+   *          notes.
    */
   public void setNotes(Collection<Note> notes);
 
@@ -135,8 +140,10 @@ public interface Library extends SecurableByProfile, Comparable, Barcodable, Loc
   /**
    * Registers that a LibraryQC has been carried out on this Library
    * 
-   * @param libraryQC of type LibraryQC
-   * @throws MalformedLibraryQcException when the LibraryQC being added is not valid
+   * @param libraryQC
+   *          of type LibraryQC
+   * @throws MalformedLibraryQcException
+   *           when the LibraryQC being added is not valid
    */
   public void addQc(LibraryQC libraryQC) throws MalformedLibraryQcException;
 
@@ -150,8 +157,10 @@ public interface Library extends SecurableByProfile, Comparable, Barcodable, Loc
   /**
    * Registers that a LibraryDilution has been carried out using this Library
    * 
-   * @param libraryDilution of type LibraryDilution
-   * @throws MalformedDilutionException when the LibraryDilution being added is not valid
+   * @param libraryDilution
+   *          of type LibraryDilution
+   * @throws MalformedDilutionException
+   *           when the LibraryDilution being added is not valid
    */
   public void addDilution(LibraryDilution libraryDilution) throws MalformedDilutionException;
 
@@ -172,7 +181,8 @@ public interface Library extends SecurableByProfile, Comparable, Barcodable, Loc
   /**
    * Sets the paired attribute of this Library object, i.e. true is paired, false is single.
    * 
-   * @param paired paired.
+   * @param paired
+   *          paired.
    */
   void setPaired(Boolean paired);
 
@@ -186,7 +196,8 @@ public interface Library extends SecurableByProfile, Comparable, Barcodable, Loc
   /**
    * Sets the libraryType of this Library object.
    * 
-   * @param libraryType libraryType.
+   * @param libraryType
+   *          libraryType.
    */
   public void setLibraryType(LibraryType libraryType);
 
@@ -200,7 +211,8 @@ public interface Library extends SecurableByProfile, Comparable, Barcodable, Loc
   /**
    * Sets the librarySelectionType of this Library object.
    * 
-   * @param librarySelectionType LibrarySelectionType.
+   * @param librarySelectionType
+   *          LibrarySelectionType.
    */
   public void setLibrarySelectionType(LibrarySelectionType librarySelectionType);
 
@@ -214,7 +226,8 @@ public interface Library extends SecurableByProfile, Comparable, Barcodable, Loc
   /**
    * Sets the libraryStrategyType of this Library object.
    * 
-   * @param libraryStrategyType LibraryStrategyType.
+   * @param libraryStrategyType
+   *          LibraryStrategyType.
    */
   public void setLibraryStrategyType(LibraryStrategyType libraryStrategyType);
 
@@ -238,7 +251,8 @@ public interface Library extends SecurableByProfile, Comparable, Barcodable, Loc
   /**
    * Sets the platformName of this Library object.
    * 
-   * @param platformName platformName.
+   * @param platformName
+   *          platformName.
    * 
    */
   public void setPlatformName(String platformName);
@@ -253,7 +267,8 @@ public interface Library extends SecurableByProfile, Comparable, Barcodable, Loc
   /**
    * Sets the initialConcentration of this Library object.
    * 
-   * @param initialConcentration initialConcentration.
+   * @param initialConcentration
+   *          initialConcentration.
    */
   public void setInitialConcentration(Double initialConcentration);
 
@@ -267,7 +282,8 @@ public interface Library extends SecurableByProfile, Comparable, Barcodable, Loc
   /**
    * Sets the creationDate of this Library object.
    * 
-   * @param date creationDate.
+   * @param date
+   *          creationDate.
    */
   public void setCreationDate(Date date);
 
@@ -281,7 +297,8 @@ public interface Library extends SecurableByProfile, Comparable, Barcodable, Loc
   /**
    * Sets the libraryQuant of this Library object.
    * 
-   * @param libraryQuant libraryQuant.
+   * @param libraryQuant
+   *          libraryQuant.
    * 
    */
   public void setLibraryQuant(Integer libraryQuant);
@@ -297,7 +314,8 @@ public interface Library extends SecurableByProfile, Comparable, Barcodable, Loc
    * Sets the qcPassed attribute of this Library object. This should be true when a suitable QC has been carried out that passes a given
    * result.
    * 
-   * @param qcPassed qcPassed.
+   * @param qcPassed
+   *          qcPassed.
    */
   public void setQcPassed(Boolean qcPassed);
 

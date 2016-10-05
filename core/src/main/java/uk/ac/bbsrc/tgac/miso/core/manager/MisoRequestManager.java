@@ -54,8 +54,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
-import uk.ac.bbsrc.tgac.miso.core.data.Plate;
-import uk.ac.bbsrc.tgac.miso.core.data.Plateable;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
@@ -101,7 +99,6 @@ import uk.ac.bbsrc.tgac.miso.core.store.LibraryQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PartitionStore;
-import uk.ac.bbsrc.tgac.miso.core.store.PlateStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PlatformStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
@@ -151,8 +148,6 @@ public class MisoRequestManager implements RequestManager {
   private NoteStore noteStore;
   @Autowired
   private PartitionStore partitionStore;
-  @Autowired
-  private PlateStore plateStore;
   @Autowired
   private PlatformStore platformStore;
   @Autowired
@@ -244,10 +239,6 @@ public class MisoRequestManager implements RequestManager {
 
   public void setPartitionStore(PartitionStore partitionStore) {
     this.partitionStore = partitionStore;
-  }
-
-  public void setPlateStore(PlateStore plateStore) {
-    this.plateStore = plateStore;
   }
 
   public void setPlatformStore(PlatformStore platformStore) {
@@ -1277,34 +1268,6 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Plate<? extends List<? extends Plateable>, ? extends Plateable>> listAllPlates() throws IOException {
-    if (plateStore != null) {
-      return plateStore.listAll();
-    } else {
-      throw new IOException("No plateStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<Plate<? extends List<? extends Plateable>, ? extends Plateable>> listAllPlatesByProjectId(long projectId)
-      throws IOException {
-    if (plateStore != null) {
-      return plateStore.listByProjectId(projectId);
-    } else {
-      throw new IOException("No plateStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<Plate<? extends List<? extends Plateable>, ? extends Plateable>> listAllPlatesBySearch(String str) throws IOException {
-    if (plateStore != null) {
-      return plateStore.listBySearch(str);
-    } else {
-      throw new IOException("No plateStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
   public Collection<Alert> listUnreadAlertsByUserId(long userId) throws IOException {
     if (alertStore != null) {
       return alertStore.listUnreadByUserId(userId);
@@ -1505,17 +1468,6 @@ public class MisoRequestManager implements RequestManager {
       }
     } else {
       throw new IOException("No runStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public void deletePlate(Plate plate) throws IOException {
-    if (plateStore != null) {
-      if (!plateStore.remove(plate)) {
-        throw new IOException("Unable to delete Plate.");
-      }
-    } else {
-      throw new IOException("No plateStore available. Check that it has been declared in the Spring config.");
     }
   }
 
@@ -1878,15 +1830,6 @@ public class MisoRequestManager implements RequestManager {
       return kitStore.saveKitDescriptor(kitDescriptor);
     } else {
       throw new IOException("No kitStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public <T extends List<S>, S extends Plateable> long savePlate(Plate<T, S> plate) throws IOException {
-    if (plateStore != null) {
-      return plateStore.save(plate);
-    } else {
-      throw new IOException("No plateStore available. Check that it has been declared in the Spring config.");
     }
   }
 
@@ -2489,24 +2432,6 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Plate<? extends List<? extends Plateable>, ? extends Plateable> getPlateById(long plateId) throws IOException {
-    if (plateStore != null) {
-      return plateStore.get(plateId);
-    } else {
-      throw new IOException("No plateStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public <T extends List<S>, S extends Plateable> Plate<T, S> getPlateByBarcode(String barcode) throws IOException {
-    if (plateStore != null) {
-      return plateStore.<T, S> getPlateByIdentificationBarcode(barcode);
-    } else {
-      throw new IOException("No plateStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
   public Alert getAlertById(long alertId) throws IOException {
     if (alertStore != null) {
       return alertStore.get(alertId);
@@ -2725,15 +2650,6 @@ public class MisoRequestManager implements RequestManager {
       return libraryStore.getLibraryColumnSizes();
     } else {
       throw new IOException("No libraryStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Map<String, Integer> getPlateColumnSizes() throws IOException {
-    if (plateStore != null) {
-      return plateStore.getPlateColumnSizes();
-    } else {
-      throw new IOException("No plateStore available. Check that it has been declared in the Spring config.");
     }
   }
 

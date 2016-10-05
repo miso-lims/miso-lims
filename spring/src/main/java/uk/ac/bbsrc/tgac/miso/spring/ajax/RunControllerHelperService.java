@@ -59,7 +59,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
-import uk.ac.bbsrc.tgac.miso.core.data.Plate;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
@@ -244,13 +243,13 @@ public class RunControllerHelperService {
     }
     return JSONUtils.SimpleJSONError("No platform specified");
   }
-  
+
   public String containerInfoHtml(PlatformType platformType) {
     StringBuilder sb = new StringBuilder();
     sb.append("<table class='in'>");
     sb.append(
-        "<tr><td>Serial Number:</td><td><button onclick='Run.lookupContainer(this);' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button><div style='overflow:hidden'>" 
-        + "<input type='text' id='identificationBarcode' name='identificationBarcode'/><input type='hidden' value='on' name='_identificationBarcode'></div></td></tr>");
+        "<tr><td>Serial Number:</td><td><button onclick='Run.lookupContainer(this);' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button><div style='overflow:hidden'>"
+            + "<input type='text' id='identificationBarcode' name='identificationBarcode'/><input type='hidden' value='on' name='_identificationBarcode'></div></td></tr>");
     sb.append(
         "<tr><td>Location:</td><td><input type='text' id='locationBarcode' name='locationBarcode'/><input type='hidden' value='on' name='_locationBarcode'></td></tr>");
     sb.append(
@@ -272,7 +271,7 @@ public class RunControllerHelperService {
       b.append("<h2>" + PlatformType.ILLUMINA.getContainerName() + " 1</h2>");
       b.append(containerInfoHtml(PlatformType.ILLUMINA));
       b.append("<table class='in'>");
-      b.append("<th>" + PlatformType.ILLUMINA.getPartitionName() +" No.</th>");
+      b.append("<th>" + PlatformType.ILLUMINA.getPartitionName() + " No.</th>");
       b.append("<th>Pool</th>");
 
       b.append(
@@ -832,7 +831,8 @@ public class RunControllerHelperService {
                 sb.append("<div id='p_div_" + (p.getPartitionNumber() - 1) + "' class='elementListDroppableDiv'>");
                 sb.append("<ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + containerNum + "].partitions["
                     + (p.getPartitionNumber() - 1) + "].pool' partition='" + (p.getPartitionNumber() - 1)
-                    + "' ondblclick='Run.container.populatePartition(this, " + containerNum + ", " + (p.getPartitionNumber() - 1) + ");'></ul>");
+                    + "' ondblclick='Run.container.populatePartition(this, " + containerNum + ", " + (p.getPartitionNumber() - 1)
+                    + ");'></ul>");
                 sb.append("</div>");
               }
               sb.append("</td>");
@@ -1023,21 +1023,6 @@ public class RunControllerHelperService {
                 pooledProjects.add(stu.getProject());
               }
             }
-          } else if (d instanceof Plate) {
-            Plate plate = (Plate) d;
-            if (!plate.getElements().isEmpty()) {
-              if (plate.getElementType().equals(Library.class)) {
-                Library l = (Library) plate.getElements().get(0);
-                Collection<Study> studies = requestManager.listAllStudiesByLibraryId(l.getId());
-                if (studies.isEmpty()) {
-                  pooledProjects.add(l.getSample().getProject());
-                } else {
-                  for (Study stu : studies) {
-                    pooledProjects.add(stu.getProject());
-                  }
-                }
-              }
-            }
           }
         }
 
@@ -1052,14 +1037,6 @@ public class RunControllerHelperService {
         for (Poolable d : ds) {
           if (d instanceof Dilution) {
             pooledProjects.add(((Dilution) d).getLibrary().getSample().getProject());
-          } else if (d instanceof Plate) {
-            Plate plate = (Plate) d;
-            if (!plate.getElements().isEmpty()) {
-              if (plate.getElementType().equals(Library.class)) {
-                Library l = (Library) plate.getElements().get(0);
-                pooledProjects.add(l.getSample().getProject());
-              }
-            }
           }
         }
       }

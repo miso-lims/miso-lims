@@ -34,7 +34,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.EntityGroup;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
-import uk.ac.bbsrc.tgac.miso.core.data.Plate;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -123,8 +122,6 @@ public class UserAuthMisoRequestManagerTestSuite {
   private ProjectOverview projectOverview;
   @Mock
   private Status status;
-  @Mock
-  private Plate plate;
   @Mock
   private Project project1;
   @Mock
@@ -2087,70 +2084,6 @@ public class UserAuthMisoRequestManagerTestSuite {
     userAuthMisoRequestManager.getSubmissionById(id);
 
     verify(backingManager).getSubmissionById(id);
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getPlateById(long)} .
-   */
-  @Test
-  public void testGetPlateById() throws IOException {
-    long id = 1L;
-
-    when(backingManager.getPlateById(id)).thenReturn(plate);
-    when(plate.userCanRead(any(User.class))).thenReturn(true);
-
-    assertEquals(plate, userAuthMisoRequestManager.getPlateById(id));
-
-    verify(backingManager).getPlateById(id);
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getPlateById(long)} .
-   */
-  @Test
-  public void testGetPlateByIdThrows() throws IOException {
-    long id = 1L;
-
-    when(backingManager.getPlateById(id)).thenReturn(plate);
-    when(plate.userCanRead(any(User.class))).thenReturn(false);
-
-    thrown.expect(IOException.class);
-    thrown.expectMessage("User null cannot read Plate " + id);
-
-    userAuthMisoRequestManager.getPlateById(id);
-
-    verify(backingManager).getPlateById(id);
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getPlateByBarcode(java.lang.String)} .
-   */
-  @Test
-  public void testGetPlateByBarcode() throws IOException {
-    String barcode = "barcode";
-    when(backingManager.getPlateByBarcode(barcode)).thenReturn(plate);
-    when(plate.userCanRead(any(User.class))).thenReturn(true);
-
-    assertEquals(plate, userAuthMisoRequestManager.getPlateByBarcode(barcode));
-
-    verify(backingManager).getPlateByBarcode(barcode);
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getPlateByBarcode(java.lang.String)} .
-   */
-  @Test
-  public void testGetPlateByBarcodeThrows() throws IOException {
-    String barcode = "barcode";
-    when(backingManager.getPlateByBarcode(barcode)).thenReturn(plate);
-    when(plate.userCanRead(any(User.class))).thenReturn(false);
-
-    thrown.expect(IOException.class);
-    thrown.expectMessage("User null cannot read Plate ");
-
-    userAuthMisoRequestManager.getPlateByBarcode(barcode);
-
-    verify(backingManager).getPlateByBarcode(barcode);
   }
 
   /**

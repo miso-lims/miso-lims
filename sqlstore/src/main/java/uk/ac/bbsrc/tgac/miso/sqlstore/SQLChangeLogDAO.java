@@ -41,7 +41,6 @@ public class SQLChangeLogDAO implements ChangeLogStore {
     EXPERIMENT("ExperimentChangeLog", "experimentId"), //
     KITDESCRIPTOR("KitDescriptorChangeLog", "kitDescriptorId"), //
     LIBRARY("LibraryChangeLog", "libraryId"), //
-    PLATE("PlateChangeLog", "plateId"), //
     POOL("PoolChangeLog", "poolId"), //
     RUN("RunChangeLog", "runId"), //
     SAMPLE("SampleChangeLog", "sampleId"), //

@@ -27,7 +27,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +34,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 
 import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.type.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,12 +51,10 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
-import uk.ac.bbsrc.tgac.miso.core.data.Plate;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.PlatePool;
 import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
@@ -66,7 +62,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.util.FormUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-import uk.ac.bbsrc.tgac.miso.core.util.jackson.SampleRecursionAvoidanceMixin;
 import uk.ac.bbsrc.tgac.miso.webapp.service.forms.MisoFormsService;
 
 @Controller
@@ -205,77 +200,6 @@ public class UploadController {
       }
     } catch (Exception e) {
       log.error("SAMPLE IMPORT FAIL", e);
-    }
-  }
-
-  @RequestMapping(value = "/project/plate-form", method = RequestMethod.POST)
-  public void uploadProjectPlateInputForm(MultipartHttpServletRequest request, HttpServletResponse response) throws IOException {
-    String projectId = request.getParameter("projectId");
-    if (projectId == null) {
-      throw new IOException("Cannot upload file - projectId parameter missing or null");
-    } else if (requestManager.getProjectById(Long.valueOf(projectId)) == null) {
-      throw new IOException("Cannot upload file - project does not exist");
-    }
-
-    try {
-      JSONArray a = new JSONArray();
-      JSONObject o = new JSONObject();
-
-      for (MultipartFile fileItem : getMultipartFiles(request)) {
-        uploadFile(Project.class, projectId, fileItem);
-        File f = filesManager.getFile(Project.class, projectId, fileItem.getOriginalFilename().replaceAll("\\s+", "_"));
-        User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-        Map<String, PlatePool> pooledPlates = FormUtils.importPlateInputSpreadsheet(f, user, requestManager, libraryNamingScheme,
-            tagBarcodeService);
-
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.getSerializationConfig().addMixInAnnotations(Sample.class, SampleRecursionAvoidanceMixin.class);
-
-        String s = mapper.writerWithType(new TypeReference<Collection<PlatePool>>() {
-        }).writeValueAsString(pooledPlates.values());
-        a.add(JSONArray.fromObject(s));
-      }
-      o.put("pools", a);
-      log.info(o.toString());
-
-      response.setContentType("text/html");
-
-      PrintWriter out = response.getWriter();
-      out.println("<input type='hidden' id='uploadresponsebody' value='" + o.toString() + "'/>");
-    } catch (Exception e) {
-      log.error("upload project plate", e);
-    }
-  }
-
-  @RequestMapping(value = "/plate/plate-form", method = RequestMethod.POST)
-  public void uploadPlateInputForm(MultipartHttpServletRequest request, HttpServletResponse response) throws IOException {
-    try {
-      JSONArray a = new JSONArray();
-      JSONObject o = new JSONObject();
-
-      for (MultipartFile fileItem : getMultipartFiles(request)) {
-        uploadFile(Plate.class, "forms", fileItem);
-        File f = filesManager.getFile(Plate.class, "forms", fileItem.getOriginalFilename().replaceAll("\\s+", "_"));
-        User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-        Map<String, PlatePool> pooledPlates = FormUtils.importPlateInputSpreadsheet(f, user, requestManager, libraryNamingScheme,
-            tagBarcodeService);
-
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.getSerializationConfig().addMixInAnnotations(Sample.class, SampleRecursionAvoidanceMixin.class);
-
-        String s = mapper.writerWithType(new TypeReference<Collection<PlatePool>>() {
-        }).writeValueAsString(pooledPlates.values());
-        a.add(JSONArray.fromObject(s));
-      }
-      o.put("pools", a);
-      log.info(o.toString());
-
-      response.setContentType("text/html");
-
-      PrintWriter out = response.getWriter();
-      out.println("<input type='hidden' id='uploadresponsebody' value='" + o.toString() + "'/>");
-    } catch (Exception e) {
-      log.error("upload plate input", e);
     }
   }
 

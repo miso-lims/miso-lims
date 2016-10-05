@@ -286,24 +286,5 @@ var ImportExport = ImportExport || {
         }
       }
     );
-  },
-
-  generateCSVBAC:function(){
-    Utils.ui.disableButton("generateCSVBACButton");
-    console.info(jQuery('#generateCSVBACForm').serializeArray());
-    Fluxion.doAjax(
-      'importExportControllerHelperService',
-      'generateCSVBAC',
-      {
-        'form': jQuery('#generateCSVBACForm').serializeArray(),
-        'url': ajaxurl
-      },
-      {
-        'doOnSuccess': function (json) {
-          Utils.page.pageRedirect('/miso/download/plate/csv/' + json.response);
-        }
-      }
-    );
-    Utils.ui.reenableButton("generateCSVBACButton", "Generate CSV");
   }
 };

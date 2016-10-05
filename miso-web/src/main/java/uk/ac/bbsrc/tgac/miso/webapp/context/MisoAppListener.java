@@ -272,8 +272,6 @@ public class MisoAppListener implements ServletContextListener {
         log.info("" + rm.listAllEmPCRDilutions().size());
         log.info("\\_ pools...");
         log.info("" + rm.listAllPools().size());
-        log.info("\\_ plates...");
-        log.info("" + rm.listAllPlates().size());
         log.info("\\_ sequencing containers...");
         log.info("" + rm.listAllSequencerPartitionContainers().size());
         log.info("\\_ runs...");

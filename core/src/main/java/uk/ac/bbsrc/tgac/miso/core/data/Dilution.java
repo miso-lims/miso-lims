@@ -43,7 +43,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 @JsonIgnoreProperties({ "securityProfile", "internalPoolableElements" })
 @PrintableBarcode
-public interface Dilution extends SecurableByProfile, Barcodable, Comparable, Deletable, Poolable<Dilution, Dilution>, Plateable {
+public interface Dilution extends SecurableByProfile, Barcodable, Comparable, Deletable, Poolable<Dilution, Dilution> {
 
   /**
    * Method setName sets the name of this Dilution object.
@@ -110,12 +110,12 @@ public interface Dilution extends SecurableByProfile, Barcodable, Comparable, De
    */
   @JsonBackReference(value = "library")
   public Library getLibrary();
-  
+
   /**
    * @return the old LIMS' ID for this dilution prior to being migrated to MISO
    */
   Long getPreMigrationId();
-  
+
   void setPreMigrationId(Long preMigrationId);
-  
+
 }

@@ -85,27 +85,27 @@ public abstract class AbstractPool<P extends Poolable<?, ?>> extends AbstractBox
   private String name;
   private String description;
 
-  private Collection<P> pooledElements = new HashSet<P>();
-  private Collection<Experiment> experiments = new HashSet<Experiment>();
+  private Collection<P> pooledElements = new HashSet<>();
+  private Collection<Experiment> experiments = new HashSet<>();
   private Date creationDate;
   private Double concentration;
   private String identificationBarcode;
   private boolean readyToRun = false;
 
-  private final Collection<PoolQC> poolQCs = new TreeSet<PoolQC>();
+  private final Collection<PoolQC> poolQCs = new TreeSet<>();
   private Boolean qcPassed;
 
   private Date lastUpdated;
 
   // listeners
-  private final Set<MisoListener> listeners = new HashSet<MisoListener>();
-  private Set<User> watchers = new HashSet<User>();
-  private final Collection<ChangeLog> changeLog = new ArrayList<ChangeLog>();
+  private final Set<MisoListener> listeners = new HashSet<>();
+  private Set<User> watchers = new HashSet<>();
+  private final Collection<ChangeLog> changeLog = new ArrayList<>();
   private User lastModifier;
   private Date lastModified;
 
   @Transient
-  private Collection<Note> notes = new HashSet<Note>();
+  private Collection<Note> notes = new HashSet<>();
 
   @Override
   public User getLastModifier() {
@@ -186,14 +186,14 @@ public abstract class AbstractPool<P extends Poolable<?, ?>> extends AbstractBox
   }
 
   /**
-   * Convenience method to return Dilutions from this Pool given that the Pooled Elements may well either be a set of single dilutions, or a
-   * single plate comprising a number of dilutions within that plate, or something else entirely
+   * Convenience method to return Dilutions from this Pool given that the Pooled Elements may well either be a set of single dilutions, or
+   * something else entirely
    * 
    * @return Collection<Dilution> dilutions.
    */
   @Override
   public Collection<? extends Dilution> getDilutions() {
-    Set<Dilution> allDilutions = new HashSet<Dilution>();
+    Set<Dilution> allDilutions = new HashSet<>();
     for (Poolable<?, ?> poolable : getPoolableElements()) {
       if (poolable instanceof Dilution) {
         allDilutions.add((Dilution) poolable);
@@ -412,30 +412,16 @@ public abstract class AbstractPool<P extends Poolable<?, ?>> extends AbstractBox
     if (obj == this) return true;
     if (!(obj instanceof AbstractPool<?>)) return false;
     AbstractPool<?> other = (AbstractPool<?>) obj;
-    return new EqualsBuilder()
-        .appendSuper(super.equals(obj))
-        .append(description, other.description)
-        .append(pooledElements, other.pooledElements)
-        .append(experiments, other.experiments)
-        .append(concentration, other.concentration)
-        .append(identificationBarcode, other.identificationBarcode)
-        .append(readyToRun, other.readyToRun)
-        .append(qcPassed, other.qcPassed)
+    return new EqualsBuilder().appendSuper(super.equals(obj)).append(description, other.description)
+        .append(pooledElements, other.pooledElements).append(experiments, other.experiments).append(concentration, other.concentration)
+        .append(identificationBarcode, other.identificationBarcode).append(readyToRun, other.readyToRun).append(qcPassed, other.qcPassed)
         .isEquals();
   }
 
   @Override
   public int hashCode() {
-    return new HashCodeBuilder(23, 47)
-        .appendSuper(super.hashCode())
-        .append(description)
-        .append(pooledElements)
-        .append(experiments)
-        .append(concentration)
-        .append(identificationBarcode)
-        .append(readyToRun)
-        .append(qcPassed)
-        .toHashCode();
+    return new HashCodeBuilder(23, 47).appendSuper(super.hashCode()).append(description).append(pooledElements).append(experiments)
+        .append(concentration).append(identificationBarcode).append(readyToRun).append(qcPassed).toHashCode();
   }
 
   @Override
@@ -480,16 +466,7 @@ public abstract class AbstractPool<P extends Poolable<?, ?>> extends AbstractBox
   }
 
   private boolean hasDuplicateIndices(Set<String> indices, P item) {
-    if (item instanceof Plate<?, ?>) {
-      for (Object child : item.getInternalPoolableElements()) {
-        @SuppressWarnings("unchecked")
-        P childP = (P) child;
-        if (hasDuplicateIndices(indices, childP)) {
-          return true;
-        }
-      }
-      return false;
-    } else if (item instanceof Dilution) {
+    if (item instanceof Dilution) {
       Dilution d = (Dilution) item;
       StringBuilder totalIndex = new StringBuilder();
       for (Index index : d.getLibrary().getIndices()) {
