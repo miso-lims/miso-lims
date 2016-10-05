@@ -353,7 +353,9 @@
       jQuery('#indicesDiv').empty();
       document.getElementById('indexFamily').value = '${library.getCurrentFamily().id}';
       <c:forEach items="${library.indices}" var="index">
-        Library.ui.createIndexBox(${index.id});
+        <c:if test="${index.id != 0}">
+          Library.ui.createIndexBox(${index.id});
+        </c:if>
       </c:forEach>
       Library.ui.createIndexNextBox();
     };
