@@ -47,7 +47,7 @@
     <c:when test="${run.id != 0}">Edit</c:when>
     <c:otherwise>Create</c:otherwise>
   </c:choose> Run
-  <button onclick="return Run.validateRun();" class="fg-button ui-state-default ui-corner-all">Save</button>
+  <button type="button" onclick="return Run.validateRun();" class="fg-button ui-state-default ui-corner-all">Save</button>
 </h1>
 
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help

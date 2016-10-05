@@ -76,12 +76,48 @@ var Run = Run || {
     jQuery('#filePath').attr('data-parsley-required', 'true');
     jQuery('#filePath').attr('data-parsley-maxlength', '100');
 
-
     jQuery('#run-form').parsley();
     jQuery('#run-form').parsley().validate();
 
-    Validate.updateWarningOrSubmit('#run-form', Run.checkStudiesSelected);
-    return false;
+    if(jQuery("#sequencerPartitionContainers\\[0\\]\\.identificationBarcode").length == 0) {
+    	// Serial number is not being modified.
+        Validate.updateWarningOrSubmit('#run-form', Run.checkStudiesSelected);
+    } else {
+    	// Ensure provided serial number is unique.
+    	var serialNumber = jQuery("#sequencerPartitionContainers\\[0\\]\\.identificationBarcode").val();
+    	var containerId = null;
+		if(jQuery("#sequencerPartitionContainers0").length > 0) {
+		  containerId = jQuery("#sequencerPartitionContainers0").val();
+		}
+
+	    Fluxion.doAjax(
+        'containerControllerHelperService',
+        'isSerialNumberUnique',
+        {
+          'serialNumber': serialNumber,
+          'containerId': containerId,
+          'url': ajaxurl
+        },
+        {
+          'doOnSuccess': function(json) {
+        	  if(json.isSerialNumberUnique === "true") {
+                  Validate.updateWarningOrSubmit('#run-form', Run.checkStudiesSelected);
+        	  } else {
+        		  // Serial number is not unique.
+                  var serialNumberField = jQuery('#sequencerPartitionContainers\\[0\\]\\.identificationBarcode').parsley();
+            	  window.ParsleyUI.addError(serialNumberField, "serialNumberError", 'This serial number is already in use. Please choose another.');
+            	  return false;
+        	  }
+          },
+          'doOnError': function(json) {
+          	// Unable to perform lookup.
+          	alert(json.error);
+          	window.ParsleyUI.addError(serialNumberField, "serialNumberError", 'Unable to determine if serial number is unique.');
+          	return false;
+           }
+        }
+      );
+    }
   },
   
   checkStudiesSelected: function () {
