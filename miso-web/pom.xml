@@ -152,18 +152,6 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-war-plugin</artifactId>
             <version>2.3</version>
-            <configuration>
-              <webResources>
-                <resource>
-                  <directory>src/main/resources/sql</directory>
-                  <targetPath>WEB-INF</targetPath>
-                  <filtering>true</filtering>
-                  <includes>
-                    <include>db-config.xml</include>
-                  </includes>
-                </resource>
-              </webResources>
-            </configuration>
           </plugin>
         </plugins>
 
@@ -171,9 +159,6 @@
           <resource>
             <directory>src/main/resources</directory>
             <filtering>true</filtering>
-            <excludes>
-              <exclude>db4o/*</exclude>
-            </excludes>
           </resource>
         </resources>
       </build>
@@ -184,59 +169,6 @@
         <spring-version>3.1.3.RELEASE</spring-version>
       </properties>
 
-    </profile>
-
-    <profile>
-      <id>db4o</id>
-      <activation>
-        <property>
-          <name>database</name>
-          <value>db4o</value>
-        </property>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-war-plugin</artifactId>
-            <version>2.3</version>
-            <configuration>
-              <webResources>
-                <resource>
-                  <directory>src/main/resources/db4o</directory>
-                  <targetPath>WEB-INF</targetPath>
-                  <filtering>true</filtering>
-                  <includes>
-                    <include>db-config.xml</include>
-                  </includes>
-                </resource>
-              </webResources>
-            </configuration>
-          </plugin>
-        </plugins>
-
-        <resources>
-          <resource>
-            <directory>src/main/resources</directory>
-            <filtering>true</filtering>
-            <excludes>
-              <exclude>sql/*</exclude>
-            </excludes>
-          </resource>
-        </resources>
-      </build>
-
-      <dependencies>
-        <dependency>
-          <groupId>${project.parent.groupId}</groupId>
-          <artifactId>db4ostore</artifactId>
-          <version>${project.parent.version}</version>
-        </dependency>
-      </dependencies>
-
-      <properties>
-        <spring-version>3.1.3.RELEASE</spring-version>
-      </properties>
     </profile>
 
     <profile>
@@ -260,19 +192,9 @@
                   <targetPath>WEB-INF/classes</targetPath>
                   <filtering>true</filtering>
                   <excludes>
-                    <exclude>sql/*</exclude>
                     <exclude>internal/*</exclude>
                     <exclude>external/*</exclude>
-                    <exclude>db4o/*</exclude>
                   </excludes>
-                </resource>
-                <resource>
-                  <directory>src/main/resources/sql</directory>
-                  <targetPath>WEB-INF</targetPath>
-                  <filtering>true</filtering>
-                  <includes>
-                    <include>db-config.xml</include>
-                  </includes>
                 </resource>
               </webResources>
             </configuration>
@@ -287,7 +209,6 @@
             </includes>
             <excludes>
               <exclude>../internal/*</exclude>
-              <exclude>../db4o/*</exclude>
             </excludes>
           </resource>
           <resource>
@@ -298,10 +219,8 @@
               <include>status/</include>
             </includes>
             <excludes>
-              <exclude>../sql/*</exclude>
               <exclude>../internal/*</exclude>
               <exclude>../external/*</exclude>
-              <exclude>../db4o/*</exclude>
             </excludes>
           </resource>
         </resources>
