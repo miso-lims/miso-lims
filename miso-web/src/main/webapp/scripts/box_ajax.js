@@ -518,7 +518,7 @@ Box.ui = {
   
   emptyOneItem: function() {
     var selectedPosition = Box.utils.getPositionString(Box.visual.selected.row, Box.visual.selected.col);
-    if(confirm("Are you sure you wish to trash this tube?")) {
+    if(confirm("Are you sure you wish to discard this tube?")) {
       jQuery('#updateSelected, #emptySelected, #removeSelected').prop('disabled', true).addClass('disabled');
       
       Fluxion.doAjax(
@@ -541,7 +541,7 @@ Box.ui = {
   },
 
   emptyEntireBox: function (boxId) {
-    if(confirm("Are you sure you wish to trash all tubes in this box?")) {      
+    if(confirm("Are you sure you wish to discard all tubes in this box?")) {      
       Fluxion.doAjax(
         'boxControllerHelperService',
         'emptyEntireBox',
