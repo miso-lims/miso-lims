@@ -191,7 +191,7 @@
     <td><form:input id="volume" path="volume"/></td>
   </tr>
   <tr>
-    <td>Emptied:</td>
+    <td>Discarded:</td>
     <td><form:checkbox id="empty" path="empty"/></td>
   </tr>
 
