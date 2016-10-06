@@ -205,7 +205,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
       DetailedSample detailed = (DetailedSample) sample;
       if (detailed.getSubproject() != null && detailed.getSubproject().getId() == null) {
         // New subproject
-        createSubproject(detailed.getSubproject(), detailed.getProject().getReferenceGenomeId());
+        createSubproject(detailed.getSubproject(), detailed.getProject());
       }
       if (sample.getAlias() != null) {
         // Check for duplicate alias
@@ -232,11 +232,17 @@ public class DefaultMigrationTarget implements MigrationTarget {
     log.debug("Saved sample " + sample.getAlias());
   }
 
-  private void createSubproject(Subproject subproject, Long referenceGenomeId) {
+  private void createSubproject(Subproject subproject, Project project) {
+    subproject.setParentProject(project);
     subproject.setDescription(subproject.getAlias());
     subproject.setPriority(Boolean.FALSE);
-    subproject.setReferenceGenomeId(referenceGenomeId);
+    subproject.setReferenceGenomeId(project.getReferenceGenomeId());
+    subproject.setCreatedBy(migrationUser);
+    subproject.setCreationDate(timeStamp);
+    subproject.setUpdatedBy(migrationUser);
+    subproject.setLastUpdated(timeStamp);
     subproject.setId(serviceManager.getSubprojectDao().addSubproject(subproject));
+    valueTypeLookup.addSubproject(subproject);
   }
 
   private static boolean hasUnsavedParent(DetailedSample sample) {
