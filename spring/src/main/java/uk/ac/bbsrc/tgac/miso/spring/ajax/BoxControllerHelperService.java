@@ -18,11 +18,6 @@ import java.util.TreeMap;
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpSession;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-import net.sourceforge.fluxion.ajax.Ajaxified;
-import net.sourceforge.fluxion.ajax.util.JSONUtils;
-
 import org.codehaus.jackson.map.ObjectMapper;
 import org.krysalis.barcode4j.BarcodeDimension;
 import org.krysalis.barcode4j.BarcodeGenerator;
@@ -33,6 +28,10 @@ import org.springframework.dao.DuplicateKeyException;
 
 import com.eaglegenomics.simlims.core.User;
 
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import net.sourceforge.fluxion.ajax.Ajaxified;
+import net.sourceforge.fluxion.ajax.util.JSONUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
@@ -58,7 +57,7 @@ import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 @Ajaxified
 public class BoxControllerHelperService {
   protected static final Logger log = LoggerFactory.getLogger(BoxControllerHelperService.class);
-  
+
   @Autowired
   private AuthorizationManager authorizationManager;
 
@@ -70,24 +69,26 @@ public class BoxControllerHelperService {
 
   @Autowired
   private MisoNamingScheme<Box> boxNamingScheme;
-  
+
   @Autowired
   private BarcodeFactory barcodeFactory;
-  
+
   @Autowired
   private MisoFilesManager misoFileManager;
-  
+
   @Autowired
   private PrintManager<MisoPrintService, Queue<?>> printManager;
-  
+
   @Autowired
   private BoxScanner boxScanner;
 
   /**
    * Returns a JSONObject of HTML for making the /miso/boxes table
    * 
-   * @param HttpSession session
-   * @param JSONObject json
+   * @param HttpSession
+   *          session
+   * @param JSONObject
+   *          json
    * @return JSONObject data for all boxes
    */
   public JSONObject listAllBoxesTable(HttpSession session, JSONObject json) {
@@ -96,7 +97,7 @@ public class BoxControllerHelperService {
       JSONArray jsonArray = new JSONArray();
       for (Box box : requestManager.listAllBoxes()) {
         JSONArray inner = new JSONArray();
-        
+
         inner.add(TableHelper.hyperLinkify("/miso/box/" + box.getId(), box.getName()));
         inner.add(TableHelper.hyperLinkify("/miso/box/" + box.getId(), box.getAlias()));
         inner.add(box.getLocationBarcode());
@@ -105,13 +106,12 @@ public class BoxControllerHelperService {
         inner.add(box.getUse().getAlias());
         inner.add(isStringEmptyOrNull(box.getIdentificationBarcode()) ? "" : box.getIdentificationBarcode());
         inner.add(box.getId());
-        
+
         jsonArray.add(inner);
       }
       j.put("array", jsonArray);
       return j;
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
@@ -122,9 +122,9 @@ public class BoxControllerHelperService {
    * 
    * @param String
    * @return Boxable (sample or library)
-   * @throws IOException 
+   * @throws IOException
    */
-  public Boxable getBoxableByBarcode(String barcode) throws IOException, DuplicateKeyException { 
+  public Boxable getBoxableByBarcode(String barcode) throws IOException, DuplicateKeyException {
     Boxable sample;
     Boxable library;
     Boxable pool;
@@ -133,24 +133,30 @@ public class BoxControllerHelperService {
     pool = requestManager.getPoolByIdBarcode(barcode);
     if ((sample == null ? 0 : 1) + (library == null ? 0 : 1) + (pool == null ? 0 : 1) > 1) {
       String errorMessage = "";
-      if (sample != null && library != null) errorMessage = "Duplicate barcodes found for both sample " + sample.getName() + " and library " + library.getName();
-      if (sample != null && pool != null) errorMessage = "Duplicate barcodes found for both sample " + sample.getName() + " and pool " + pool.getName();
-      if (library != null && pool != null) errorMessage = "Duplicate barcodes found for both library " + library.getName() + " and pool " + pool.getName();
+      if (sample != null && library != null)
+        errorMessage = "Duplicate barcodes found for both sample " + sample.getName() + " and library " + library.getName();
+      if (sample != null && pool != null)
+        errorMessage = "Duplicate barcodes found for both sample " + sample.getName() + " and pool " + pool.getName();
+      if (library != null && pool != null)
+        errorMessage = "Duplicate barcodes found for both library " + library.getName() + " and pool " + pool.getName();
       throw new DuplicateKeyException(errorMessage);
-    } 
-    else if (sample != null) return sample;
-    else if (library != null) return library;
-    else if (pool != null) return pool;
-    else return null;
+    } else if (sample != null)
+      return sample;
+    else if (library != null)
+      return library;
+    else if (pool != null)
+      return pool;
+    else
+      return null;
   }
-  
+
   /**
-   * Return one boxable associated with a particular barcode.
-   * json must contain the following entries:
-   *    "barcode": barcode
-   *    
-   * @param HttpSession session
-   * @param JSONObject json
+   * Return one boxable associated with a particular barcode. json must contain the following entries: "barcode": barcode
+   * 
+   * @param HttpSession
+   *          session
+   * @param JSONObject
+   *          json
    * @return JSONObject Boxable
    */
   public JSONObject lookupBoxableByBarcode(HttpSession session, JSONObject json) {
@@ -175,7 +181,7 @@ public class BoxControllerHelperService {
 
       response.put("boxable", Dtos.asDto(boxable));
       if (boxable.isEmpty())
-        response.put("trashed", boxable.getName() + " (" + boxable.getAlias() + ") has been trashed, and can not be added to the box.");
+        response.put("trashed", boxable.getName() + " (" + boxable.getAlias() + ") has been discarded, and can not be added to the box.");
       return response;
     } else {
       return JSONUtils.SimpleJSONError("Please enter a barcode.");
@@ -186,49 +192,48 @@ public class BoxControllerHelperService {
    * Deletes a box from the database. Requires admin permissions.
    * 
    * @param session
-   * @param json must contain the entry "boxId"
+   * @param json
+   *          must contain the entry "boxId"
    * @return message indicating success or error
    */
   public JSONObject deleteBox(HttpSession session, JSONObject json) {
     User user;
     try {
       user = authorizationManager.getCurrentUser();
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       log.debug("Error getting currently logged in user", e);
       return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
     }
 
-    if (user != null ){ //&& user.isAdmin()) {
+    if (user != null) { // && user.isAdmin()) {
       if (json.has("boxId")) {
         Long boxId = json.getLong("boxId");
         try {
           requestManager.deleteBox(requestManager.getBoxById(boxId));
           return JSONUtils.SimpleJSONResponse("Box deleted");
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
           log.debug("Cannot delete box", e);
           return JSONUtils.SimpleJSONError("Cannot delete box: " + e.getMessage());
         }
-      }
-      else {
+      } else {
         log.debug("No box specified to delete");
         return JSONUtils.SimpleJSONError("No box specified to delete.");
       }
-    }
-    else {
+    } else {
       log.debug("Only logged-in admins can delete objects.");
       return JSONUtils.SimpleJSONError("Only logged-in admins can delete objects.");
     }
   }
-  
+
   /**
-   * Saves the relationships between box positions and the boxables within them. Note: this method will delete everything that was 
-   * previously in the box, and then replace them with the boxables as per the input json (all modifications happen in BoxPosition table). 
+   * Saves the relationships between box positions and the boxables within them. Note: this method will delete everything that was
+   * previously in the box, and then replace them with the boxables as per the input json (all modifications happen in BoxPosition table).
    * The boxables themselves are not modified in the database.
-   *  
-   * @param HttpSession session
-   * @param JSONObject json
+   * 
+   * @param HttpSession
+   *          session
+   * @param JSONObject
+   *          json
    * @return JSON message indicating success or error
    */
   public JSONObject saveBoxContents(HttpSession session, JSONObject json) {
@@ -236,7 +241,7 @@ public class BoxControllerHelperService {
       return JSONUtils.SimpleJSONError("Invalid box given");
     }
     JSONObject boxJson = json.getJSONObject("boxJSON");
-    
+
     Box box = null;
     long boxId = boxJson.getLong("id");
     try {
@@ -246,7 +251,7 @@ public class BoxControllerHelperService {
       log.debug("Error getting box with ID " + boxId, e);
       return JSONUtils.SimpleJSONError("Error looking up this box: " + e.getMessage());
     }
-    
+
     try {
       Map<String, Boxable> newBoxables = loadBoxables(boxJson);
       box.setBoxables(newBoxables);
@@ -256,19 +261,18 @@ public class BoxControllerHelperService {
     } catch (DuplicateKeyException k) {
       return JSONUtils.SimpleJSONError("Multiple items have this barcode: " + k.getMessage());
     }
-    
+
     try {
       box.setLastModifier(authorizationManager.getCurrentUser());
-      requestManager.saveBox(box); 
-    }
-    catch (IOException e) { 
+      requestManager.saveBox(box);
+    } catch (IOException e) {
       log.debug("Error saving box", e);
       return JSONUtils.SimpleJSONError("Error saving box contents: " + e.getMessage());
     }
-    
+
     return JSONUtils.SimpleJSONResponse("Box was successfully saved");
   }
-  
+
   private Map<String, Boxable> loadBoxables(JSONObject boxJson) throws DuplicateKeyException, IOException {
     JSONObject boxablesJson = boxJson.getJSONObject("boxables");
     Map<String, Boxable> map = new HashMap<>();
@@ -284,51 +288,58 @@ public class BoxControllerHelperService {
   }
 
   /**
-   * Confirms that a box has an alias. 
+   * Confirms that a box has an alias.
    * 
-   * @param HttpSession session
-   * @param JSONObject json
+   * @param HttpSession
+   *          session
+   * @param JSONObject
+   *          json
    * @return JSON message indicating success or error
    */
   public JSONObject validateBoxInput(HttpSession session, JSONObject json) {
     if (json.has("alias")) {
-        String alias = json.getString("alias");
-        if (alias.equals("")) {
-          log.error("Alias field cannot be empty!");
-          return JSONUtils.SimpleJSONError("The Alias cannot be empty!");
-        }
-        else {
-          return JSONUtils.SimpleJSONResponse("OK");
-        }
-    }
-    else {
+      String alias = json.getString("alias");
+      if (alias.equals("")) {
+        log.error("Alias field cannot be empty!");
+        return JSONUtils.SimpleJSONError("The Alias cannot be empty!");
+      } else {
+        return JSONUtils.SimpleJSONResponse("OK");
+      }
+    } else {
       return JSONUtils.SimpleJSONError("Please specify a box alias.");
     }
   }
 
   /**
-   * <p>Scans an individual item (using handheld scanner or keyboard) and:
-   *  <br>a) if the item doesn't exist in the box: add the item to the selected position
-   *  <br>b) if the item does exist in the box, but in a different location: move the item to the selected position</p>
-   *  
-   * <p>Note: this method saves all box contents to the database.</p>
+   * <p>
+   * Scans an individual item (using handheld scanner or keyboard) and: <br>
+   * a) if the item doesn't exist in the box: add the item to the selected position <br>
+   * b) if the item does exist in the box, but in a different location: move the item to the selected position
+   * </p>
+   * 
+   * <p>
+   * Note: this method saves all box contents to the database.
+   * </p>
    *
    * @param session
-   * @param json must contain the following entries:<ul>
-   *   <li>"boxId"    : boxId</li>
-   *   <li>"barcode"  : barcode of boxable to store in the position</li>
-   *   <li>"position" : a String representing the box row and column to store the boxable in. eg. "H12"</li></ul>
+   * @param json
+   *          must contain the following entries:
+   *          <ul>
+   *          <li>"boxId" : boxId</li>
+   *          <li>"barcode" : barcode of boxable to store in the position</li>
+   *          <li>"position" : a String representing the box row and column to store the boxable in. eg. "H12"</li>
+   *          </ul>
    * @return JSONObject message indicating success or error
    */
   public JSONObject updateOneItem(HttpSession session, JSONObject json) {
     if (!json.has("boxId") || !json.has("barcode") || !json.has("position")) {
       return JSONUtils.SimpleJSONError("Invalid boxId, barcode or position given.");
     }
-    
+
     long boxId = json.getLong("boxId");
     String barcode = json.getString("barcode");
     String position = json.getString("position");
-    
+
     Box box = null;
     try {
       box = requestManager.getBoxById(boxId);
@@ -337,7 +348,7 @@ public class BoxControllerHelperService {
       log.debug("Error getting box with ID " + boxId, e);
       return JSONUtils.SimpleJSONError("Error looking up this box: " + e.getMessage());
     }
-    
+
     if (!box.isValidPosition(position)) return JSONUtils.SimpleJSONError("Invalid position given!");
 
     // get the requested Sample/Library from the db
@@ -350,47 +361,52 @@ public class BoxControllerHelperService {
     } catch (DuplicateKeyException k) {
       return JSONUtils.SimpleJSONError("Multiple items have this barcode: " + k.getMessage());
     }
-    
-    if (boxable == null) return JSONUtils.SimpleJSONError("Could not find sample, library or pool with barcode " + barcode + ". Please associate this barcode with a sample, library or pool before retrying.");     
-    if (boxable.isEmpty()) return JSONUtils.SimpleJSONError(boxable.getName() + " (" + boxable.getAlias() + ") has been trashed, and can not be added to the box.");
-    
+
+    if (boxable == null) return JSONUtils.SimpleJSONError("Could not find sample, library or pool with barcode " + barcode
+        + ". Please associate this barcode with a sample, library or pool before retrying.");
+    if (boxable.isEmpty()) return JSONUtils
+        .SimpleJSONError(boxable.getName() + " (" + boxable.getAlias() + ") has been discarded, and can not be added to the box.");
+
     // if the selected item is already in the box, remove it here and add it to the correct position in next step
     if (box.boxableExists(boxable)) box.removeBoxable(boxable);
-    
+
     // if an item already exists at this position, its location will be set to unknown.
     box.setBoxable(position, boxable);
     log.info("Adding " + boxable.getName() + " to " + box.getName());
-    
+
     Map<String, Object> response = new HashMap<String, Object>();
     try {
       box.setLastModifier(authorizationManager.getCurrentUser());
-      requestManager.saveBox(box); 
-      
+      requestManager.saveBox(box);
+
       ObjectMapper mapper = new ObjectMapper();
       response.put("boxJSON", mapper.writer().writeValueAsString(box));
       response.put("addedToBox", boxable.getName() + " was successfully added to position " + position);
-    }
-    catch (IOException e) { 
+    } catch (IOException e) {
       log.debug("Error updating one boxable item", e);
       return JSONUtils.SimpleJSONError("Error updating one item:" + e.getMessage());
     }
     return JSONUtils.JSONObjectResponse(response);
   }
-  
+
   /**
    * Removes one Boxable element from box (sets its location to unknown)
    * 
    * @param session
-   * @param json must contain the following fields:
-   *   <ul><li>"boxId": boxId</li>
-   *   <li>"position": a String representing the box row and column to store the boxable in. eg. "H12"</li></ul></p>
+   * @param json
+   *          must contain the following fields:
+   *          <ul>
+   *          <li>"boxId": boxId</li>
+   *          <li>"position": a String representing the box row and column to store the boxable in. eg. "H12"</li>
+   *          </ul>
+   *          </p>
    * @return JSONObject message indicating failure or success
    */
   public JSONObject removeTubeFromBox(HttpSession session, JSONObject json) {
     if (!json.has("boxId") || !json.has("position")) {
       return JSONUtils.SimpleJSONError("Invalid boxId or position given.");
     }
-    
+
     long boxId = json.getLong("boxId");
     Box box = null;
     try {
@@ -400,36 +416,34 @@ public class BoxControllerHelperService {
       log.debug("Error getting box with ID " + boxId, e);
       return JSONUtils.SimpleJSONError("Error looking up this box: " + e.getMessage());
     }
-    
+
     String position = json.getString("position");
     if (!box.isValidPosition(position)) return JSONUtils.SimpleJSONError("Invalid position given!");
-    
+
     box.removeBoxable(box.getBoxable(position));
-    
+
     try {
       box.setLastModifier(authorizationManager.getCurrentUser());
-      requestManager.saveBox(box); 
-      
+      requestManager.saveBox(box);
+
       Map<String, Object> response = new HashMap<String, Object>();
       ObjectMapper mapper = new ObjectMapper();
       response.put("boxJSON", mapper.writer().writeValueAsString(box));
       return JSONUtils.JSONObjectResponse(response);
-    }
-    catch (IOException e) { 
+    } catch (IOException e) {
       log.debug("Error removing one boxable item", e);
       return JSONUtils.SimpleJSONError("Error removing one item: " + e.getMessage());
     }
   }
-  
+
   /**
    * Modifies one Boxable element for the purpose of being thrown out by the user. Sets boxable.volume to 0, boxable.emptied to true, and
    * removes the boxable element from the box.
    * 
-   * Note: json must contain the following key-value pairs:
-   *   "boxId": boxId,
-   *   "position": position
+   * Note: json must contain the following key-value pairs: "boxId": boxId, "position": position
    * 
-   * @param HttpSession session, JSONObject json
+   * @param HttpSession
+   *          session, JSONObject json
    * @returns JSONObject message indicating failure or success
    */
   public JSONObject emptySingleTube(HttpSession session, JSONObject json) {
@@ -438,38 +452,35 @@ public class BoxControllerHelperService {
     JSONObject response = new JSONObject();
     try {
       user = authorizationManager.getCurrentUser();
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
     }
-    
+
     if (user != null) {
       if (json.has("boxId") && json.has("position")) {
         String position = json.getString("position");
         Long boxId = json.getLong("boxId");
         try {
           box = requestManager.getBoxById(boxId);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
           log.debug("Error: ", e);
           return JSONUtils.SimpleJSONError("Cannot get the Box: " + e.getMessage());
         }
-        
+
         if (box.isFreePosition(position)) {
           return JSONUtils.SimpleJSONError("No item to delete at position " + position + "!");
         }
         if (!box.isValidPosition(position)) {
           return JSONUtils.SimpleJSONError("Invalid position selected!");
         }
-        
+
         try {
           requestManager.emptySingleTube(box, position);
           box = requestManager.getBoxById(boxId);
           ObjectMapper mapper = new ObjectMapper();
           response.put("boxJSON", mapper.writer().writeValueAsString(box));
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
           log.debug("Failed to empty single tube", e);
           return JSONUtils.SimpleJSONError("Failed to empty single tube: " + e.getMessage());
         }
@@ -482,12 +493,12 @@ public class BoxControllerHelperService {
   }
 
   /**
-   * Modifies all Boxable elements to be thrown in the trash. For each boxable element, boxable.volume is set to 0, boxable.emptied to true, 
-   * and all boxable elements are removed from the box.
-   * Note: json must contain the key-value pair of "boxId" : boxId
+   * Modifies all Boxable elements to be thrown in the trash. For each boxable element, boxable.volume is set to 0, boxable.emptied to true,
+   * and all boxable elements are removed from the box. Note: json must contain the key-value pair of "boxId" : boxId
    *
    * @param session
-   * @param json must contain a "boxId" field
+   * @param json
+   *          must contain a "boxId" field
    * @returns JSONObject message indicating failure or success
    */
   public JSONObject emptyEntireBox(HttpSession session, JSONObject json) {
@@ -496,8 +507,7 @@ public class BoxControllerHelperService {
     JSONObject response = new JSONObject();
     try {
       user = authorizationManager.getCurrentUser();
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
     }
@@ -507,36 +517,34 @@ public class BoxControllerHelperService {
         Long boxId = json.getLong("boxId");
         try {
           box = requestManager.getBoxById(boxId);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
           log.debug("Error", e);
           return JSONUtils.SimpleJSONError("Error getting box: " + e.getMessage());
         }
-        
+
         try {
           requestManager.emptyAllTubes(box); // box save is performed as part of this method
           box = requestManager.getBoxById(boxId);
           ObjectMapper mapper = new ObjectMapper();
           response.put("boxJSON", mapper.writer().writeValueAsString(box));
           return response;
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
           log.debug("Error emptying box", e);
           return JSONUtils.SimpleJSONError("Error emptying box: " + e.getMessage());
         }
-      }
-      else {
+      } else {
         return JSONUtils.SimpleJSONError("No box specified to empty.");
       }
-    }
-    else {
+    } else {
       return JSONUtils.SimpleJSONError("Only logged-in admins can empty boxes.");
     }
   }
-  
+
   /**
    * Changes the Box's location to a user-entered value.
-   * @param HttpSession session, JSONObject json 
+   * 
+   * @param HttpSession
+   *          session, JSONObject json
    * @return JSON message indicating success or error
    */
   public JSONObject changeBoxLocation(HttpSession session, JSONObject json) {
@@ -550,22 +558,22 @@ public class BoxControllerHelperService {
         box.setLocationBarcode(newLocation);
         box.setLastModifier(authorizationManager.getCurrentUser());
         requestManager.saveBox(box);
-      }
-      else {
+      } else {
         return JSONUtils.SimpleJSONError("New location cannot be blank.");
       }
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       log.debug("Failed to save new box location", e);
       return JSONUtils.SimpleJSONError("Error saving new location. Please try again.");
     }
 
     return JSONUtils.SimpleJSONResponse("Box successfully moved.");
   }
-  
+
   /**
    * Generates the printable 2D identificationBarcode for the Box.
-   * @param HttpSession session, JSONObject json
+   * 
+   * @param HttpSession
+   *          session, JSONObject json
    * @return JSON response containing the name of the newly-generated 2D identificationBarcode image on disk
    */
   public JSONObject getBoxBarcode(HttpSession session, JSONObject json) {
@@ -585,12 +593,10 @@ public class BoxControllerHelperService {
         BarcodeGenerator bg = BarcodeFactory.lookupGenerator(json.getString("barcodeGenerator"));
         if (bg != null) {
           bi = barcodeFactory.generateBarcode(box, bg, dim);
-        }
-        else {
+        } else {
           return JSONUtils.SimpleJSONError("'" + json.getString("barcodeGenerator") + "' is not a valid barcode generator type");
         }
-      }
-      else {
+      } else {
         bi = barcodeFactory.generateSquareDataMatrix(box, 400);
       }
 
@@ -600,20 +606,20 @@ public class BoxControllerHelperService {
           return JSONUtils.JSONObjectResponse("img", tempimage.getName());
         }
         return JSONUtils.SimpleJSONError("Writing temp image file failed.");
-      }
-      else {
+      } else {
         return JSONUtils.SimpleJSONError("Sample has no parseable barcode");
       }
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError(e.getMessage() + ": Cannot seem to access " + temploc.getAbsolutePath());
     }
   }
-  
+
   /**
    * Send 2D identificationBarcode to printer.
-   * @param HttpSession session, JSONObject json
+   * 
+   * @param HttpSession
+   *          session, JSONObject json
    * @return JSON message indicating success or error
    */
   public JSONObject printBoxBarcodes(HttpSession session, JSONObject json) {
@@ -631,14 +637,14 @@ public class BoxControllerHelperService {
         if (services.size() == 1) {
           mps = services.iterator().next();
           if (mps == null) {
-            return JSONUtils.SimpleJSONError("Unable to resolve a print service for Boxes. A service seems to be recognised but cannot be resolved.");
+            return JSONUtils
+                .SimpleJSONError("Unable to resolve a print service for Boxes. A service seems to be recognised but cannot be resolved.");
           }
+        } else {
+          return JSONUtils
+              .SimpleJSONError("No serviceName specified, but more than one available service able to print this barcode type.");
         }
-        else {
-          return JSONUtils.SimpleJSONError("No serviceName specified, but more than one available service able to print this barcode type.");
-        }
-      }
-      else {
+      } else {
         mps = printManager.getPrintService(serviceName);
         if (mps == null) {
           return JSONUtils.SimpleJSONError("Unable to resolve a print service for Boxes with the name '" + serviceName + "'.");
@@ -651,15 +657,14 @@ public class BoxControllerHelperService {
         try {
           Long boxId = s.getLong("boxId");
           Box box = requestManager.getBoxById(boxId);
-          //autosave the barcode if none has been previously generated
+          // autosave the barcode if none has been previously generated
           if (box.getIdentificationBarcode() == null || "".equals(box.getIdentificationBarcode())) {
             box.setLastModifier(authorizationManager.getCurrentUser());
             requestManager.saveBox(box);
           }
           File f = mps.getLabelFor(box);
           if (f != null) thingsToPrint.add(f);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
           log.debug("Failed to print barcodes", e);
           return JSONUtils.SimpleJSONError("Error printing barcodes: " + e.getMessage());
         }
@@ -667,27 +672,26 @@ public class BoxControllerHelperService {
 
       PrintJob pj = printManager.print(thingsToPrint, mps.getName(), user);
       return JSONUtils.SimpleJSONResponse("Job " + pj.getId() + " : Barcodes printed.");
-    }
-    catch (MisoPrintException e) {
+    } catch (MisoPrintException e) {
       log.debug("Failed to print barcodes", e);
       return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       log.debug("Failed to print barcodes", e);
       return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
     }
   }
-  
+
   /**
    * Change the box identificationBarcode to a user-entered value. Only valid if autogenerateIdentificationBarcode = true in miso.properties
    * 
-   * @param HttpSession session, JSONObject json
+   * @param HttpSession
+   *          session, JSONObject json
    * @return JSON message indicating success or error
    */
   public JSONObject changeBoxIdBarcode(HttpSession session, JSONObject json) {
     Long boxId = json.getLong("boxId");
     String idBarcode = json.getString("identificationBarcode");
-    
+
     try {
       if (!"".equals(idBarcode)) {
         Box box = requestManager.getBoxById(boxId);
@@ -697,24 +701,23 @@ public class BoxControllerHelperService {
       } else {
         return JSONUtils.SimpleJSONError("New identification barcode cannot be blank.");
       }
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       log.debug("Error getting or saving box", e);
       return JSONUtils.SimpleJSONError("Error saving new box barcode. Please try again.");
     }
-    
+
     return JSONUtils.SimpleJSONResponse("New identification barcode successfully assigned.");
   }
- 
+
   /**
    * Prepares the associated Box Scanner for scanning.
    * 
-   * Note: json must contain the following key-value pairs:
-   *   "rows": rows in box
-   *   "columns": columns in box
-   *   
-   * @param HttpSession session
-   * @param JSONObject json
+   * Note: json must contain the following key-value pairs: "rows": rows in box "columns": columns in box
+   * 
+   * @param HttpSession
+   *          session
+   * @param JSONObject
+   *          json
    * @return JSON message indicating success or error
    */
   public JSONObject prepareBoxScanner(HttpSession session, JSONObject json) {
@@ -723,12 +726,10 @@ public class BoxControllerHelperService {
       int columns = json.getInt("columns");
       try {
         boxScanner.prepareScan(rows, columns);
-      } 
-      catch (IntegrationException e){
+      } catch (IntegrationException e) {
         log.debug("Integration error preparing scanner", e);
         return JSONUtils.SimpleJSONError("Error: could not find the scanner");
-      }
-      catch (Exception e) {
+      } catch (Exception e) {
         log.debug("General error preparing scanner", e);
         return JSONUtils.SimpleJSONError("Error: could not find the scanner");
       }
@@ -737,16 +738,15 @@ public class BoxControllerHelperService {
       return JSONUtils.SimpleJSONError("Could not determine box size. Please save box and try again.");
     }
   }
-  
+
   /**
    * Gets the Box Scanner scan results (map of box positions and barcodes) and returns a serialized box object containing the Boxable item
    * linked with each barcode at each position indicated by the scan results. Any errors are returned with a message containing the type of
    * error (unable to read at certain positions; multiple items associated with a single barcode; unable to find box scanner), a message
-   * about the error, the positions that were successfully read (if applicable) and the positions at which the error was triggered (if 
+   * about the error, the positions that were successfully read (if applicable) and the positions at which the error was triggered (if
    * applicable).
    * 
-   * Note: json must contain the following key-value pairs:
-   *   "boxId": boxId
+   * Note: json must contain the following key-value pairs: "boxId": boxId
    * 
    * @param session
    * @param json
@@ -760,26 +760,26 @@ public class BoxControllerHelperService {
       JSONArray errorPositions = new JSONArray();
       JSONArray successPositions = new JSONArray();
       ArrayList<String> barcodeList = new ArrayList<String>();
-      
+
       // get scan
       try {
         BoxScan scan = boxScanner.getScan();
         if (scan == null) {
           return JSONUtils.SimpleJSONError("The scanner did not detect a box!");
         }
-        
+
         String noTube = scan.getNoTubeLabel();
         String barcodePlaceholder = "UnknownBarcode";
-        
+
         // create a map of found positions and a list of barcodes to search for
         Map<String, String> mapPositionsAndBarcodes = scan.getBarcodesMap();
-        for (Map.Entry<String, String> entry: mapPositionsAndBarcodes.entrySet()) {
+        for (Map.Entry<String, String> entry : mapPositionsAndBarcodes.entrySet()) {
           if (!entry.getValue().equals(noTube)) {
             barcodeList.add(entry.getValue());
-            boxables.put(entry.getKey(), barcodePlaceholder); 
+            boxables.put(entry.getKey(), barcodePlaceholder);
           }
         }
-        
+
         // exits early if read errors are present
         if (scan.hasReadErrors()) {
           for (String position : scan.getReadErrorPositions()) {
@@ -791,18 +791,18 @@ public class BoxControllerHelperService {
             String position = positions.next();
             successPositions.add(position);
           }
-          errors.put("message", "The scanner can not read some positions. Please remove or fix and then rescan: " + 
-              errorPositions.join(", "));
+          errors.put("message",
+              "The scanner can not read some positions. Please remove or fix and then rescan: " + errorPositions.join(", "));
           errors.put("errorPositions", errorPositions);
           errors.put("successPositions", successPositions);
           errors.put("type", "Read Error");
           scanResults.put("errors", errors);
-          return scanResults; 
+          return scanResults;
         }
-        
+
         // get boxables from db according to their barcodes
         Collection<Boxable> barcodedBoxables = requestManager.getBoxablesFromBarcodeList(barcodeList);
-        
+
         // check that there are not more returned results than requested results. There is a later check for too few.
         if (barcodedBoxables.size() > barcodeList.size()) {
           String warning = "Several items have the same barcodes. Please move to new barcoded tubes and then retry: ";
@@ -810,8 +810,8 @@ public class BoxControllerHelperService {
           JSONArray duplicatedBarcodes = new JSONArray();
           for (Boxable boxable : barcodedBoxables) {
             String currentBarcode = boxable.getIdentificationBarcode();
-            if (barcodesWithBoxables.containsKey(currentBarcode)){ 
-              warning += boxable.getName() +" ("+ boxable.getAlias() +"). ";
+            if (barcodesWithBoxables.containsKey(currentBarcode)) {
+              warning += boxable.getName() + " (" + boxable.getAlias() + "). ";
               duplicatedBarcodes.add(currentBarcode);
             } else {
               barcodesWithBoxables.put(currentBarcode, boxable);
@@ -829,25 +829,24 @@ public class BoxControllerHelperService {
             }
           }
 
-          errors.put("message", warning); 
+          errors.put("message", warning);
           errors.put("errorPositions", errorPositions);
           errors.put("successPositions", successPositions);
           errors.put("type", "Duplicated Barcode");
           scanResults.put("errors", errors);
           return scanResults; // exit early as at least two items have the same barcode
         }
-        
+
         Box box;
         try {
           box = requestManager.getBoxById(json.getLong("boxId"));
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
           log.debug("Error: ", e);
           return JSONUtils.SimpleJSONError("Cannot get the Box: " + e.getMessage());
         }
-        
+
         box.removeAllBoxables();
-        
+
         // match barcodedBoxables with their position in the scan and add to boxableItems
         for (Map.Entry<String, String> entry : mapPositionsAndBarcodes.entrySet()) {
           // use only positions where there was a barcode in the scan
@@ -863,7 +862,7 @@ public class BoxControllerHelperService {
             }
           }
         }
-        
+
         // return an error if some barcodes were not found in database
         @SuppressWarnings("unchecked")
         Iterator<String> positions = boxables.keys();
@@ -877,36 +876,34 @@ public class BoxControllerHelperService {
         }
         if (errorPositions.size() > 0) {
           errors.put("message", "The box scanner has found some unknown tubes. "
-                     + "Please assiociate these barcodes with samples/libraries/pools before retrying: " + errorPositions.join(", "));
+              + "Please assiociate these barcodes with samples/libraries/pools before retrying: " + errorPositions.join(", "));
           errors.put("errorPositions", errorPositions);
           errors.put("successPositions", successPositions);
           errors.put("type", "Unknown Barcode");
           scanResults.put("errors", errors);
           return scanResults;
         }
-        
+
         ObjectMapper mapper = new ObjectMapper();
         scanResults.put("boxJSON", mapper.writer().writeValueAsString(box));
-      }
-      catch (IntegrationException e) {
+      } catch (IntegrationException e) {
         log.info(e.getMessage());
         return JSONUtils.SimpleJSONError("Error scanning box: " + e.getMessage());
       } catch (IOException e) {
         e.printStackTrace();
-      } 
+      }
       return scanResults;
     } else {
       return JSONUtils.SimpleJSONError("Cannot find box");
     }
   }
-  
+
   /**
-   * Creates an Excel spreadsheet that contains the list of all Boxable items located in a particular position. Empty positions are not 
+   * Creates an Excel spreadsheet that contains the list of all Boxable items located in a particular position. Empty positions are not
    * listed.
    * 
-   * Note: json must contain the following key-value pairs:
-   *   "boxId": boxId
-   *   
+   * Note: json must contain the following key-value pairs: "boxId": boxId
+   * 
    * @param session
    * @param json
    * @return JSON message indicating success (and hash code of newly-created file name on disk) or error
@@ -925,14 +922,10 @@ public class BoxControllerHelperService {
           array.add(arrayEntry);
         }
 
-        File f = misoFileManager.getNewFile(
-            Box.class, 
-            "forms", 
-            "BoxContentsForm-" + LimsUtils.getCurrentDateAsString() + ".xlsx");
+        File f = misoFileManager.getNewFile(Box.class, "forms", "BoxContentsForm-" + LimsUtils.getCurrentDateAsString() + ".xlsx");
         FormUtils.createBoxContentsSpreadsheet(f, array);
         return JSONUtils.SimpleJSONResponse("" + f.getName().hashCode());
-      }
-      catch (Exception e) {
+      } catch (Exception e) {
         log.debug("failed to create box contents form");
         return JSONUtils.SimpleJSONError("Failed to get box contents form: " + e.getMessage());
       }
@@ -940,7 +933,7 @@ public class BoxControllerHelperService {
       return JSONUtils.SimpleJSONError("Missing boxId");
     }
   }
-  
+
   @CoverageIgnore
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
@@ -965,12 +958,12 @@ public class BoxControllerHelperService {
   public void setPrintManager(PrintManager<MisoPrintService, Queue<?>> printManager) {
     this.printManager = printManager;
   }
-  
+
   @CoverageIgnore
   public void setBoxScanner(BoxScanner boxScanner) {
     this.boxScanner = boxScanner;
   }
-  
+
   @CoverageIgnore
   public void setAuthorizationManager(AuthorizationManager authorizationManager) {
     this.authorizationManager = authorizationManager;
