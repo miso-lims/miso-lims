@@ -676,7 +676,7 @@ public class ValueTypeLookup {
 
         if (aliquot.getSamplePurpose() != null) { // optional field
           SamplePurpose sp = resolve(aliquot.getSamplePurpose());
-          if (sp == null) throw new IOException("SamplePurpose not found");
+          if (sp == null) throw new IOException("SamplePurpose not found: " + aliquot.getSamplePurpose().getAlias());
           aliquot.setSamplePurpose(sp);
         }
 
