@@ -7,7 +7,7 @@ public class BoxableDto {
 
   private String boxPosition;
 
-  private Boolean empty;
+  private Boolean discarded;
 
   /**
    * This is the object's ID (e.g., sampleId, libraryId) used to located it when used in conjunction with the name to determine the type or
@@ -33,8 +33,8 @@ public class BoxableDto {
     return boxPosition;
   }
 
-  public Boolean getEmpty() {
-    return empty;
+  public Boolean getDiscarded() {
+    return discarded;
   }
 
   public Long getId() {
@@ -65,8 +65,8 @@ public class BoxableDto {
     this.boxPosition = boxPosition;
   }
 
-  public void setEmpty(Boolean empty) {
-    this.empty = empty;
+  public void setDiscarded(Boolean discarded) {
+    this.discarded = discarded;
   }
 
   public void setId(Long id) {

@@ -538,7 +538,7 @@ public class Dtos {
       dto.setTaxonIdentifier(from.getTaxonIdentifier());
     }
     dto.setVolume(from.getVolume());
-    dto.setEmpty(from.isEmpty());
+    dto.setDiscarded(from.isDiscarded());
     dto.setLastModified(getDateAsString(from.getLastModified()));
 
     return dto;
@@ -589,7 +589,7 @@ public class Dtos {
     to.setAlias(from.getAlias());
     to.setDescription(from.getDescription());
     to.setVolume(from.getVolume());
-    if (from.getEmpty() != null) to.setEmpty(from.getEmpty());
+    if (from.getDiscarded() != null) to.setDiscarded(from.getDiscarded());
     if (from.getProjectId() != null) {
       to.setProject(new ProjectImpl());
       to.getProject().setProjectId(from.getProjectId());
@@ -1071,7 +1071,7 @@ public class Dtos {
     dto.setAlias(from.getAlias());
     dto.setBoxAlias(from.getBoxAlias());
     dto.setBoxPosition(BoxUtils.makeLocationLabel(from));
-    dto.setEmpty(from.isEmpty());
+    dto.setDiscarded(from.isDiscarded());
     dto.setIdentificationBarcode(from.getIdentificationBarcode());
     dto.setName(from.getName());
     dto.setVolume(from.getVolume());
@@ -1090,7 +1090,7 @@ public class Dtos {
   public static Boxable to(BoxableDto item, Boxable to) {
     to.setAlias(item.getAlias());
     to.setVolume(item.getVolume());
-    to.setEmpty(item.getEmpty());
+    to.setDiscarded(item.getDiscarded());
     return to;
   }
 

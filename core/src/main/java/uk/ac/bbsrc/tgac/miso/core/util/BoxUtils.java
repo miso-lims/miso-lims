@@ -179,7 +179,7 @@ public class BoxUtils {
   }
 
   public static String makeLocationLabel(Boxable b) {
-    if (b.isEmpty()) {
+    if (b.isDiscarded()) {
       return "EMPTY";
     } else if (!isStringEmptyOrNull(b.getBoxAlias()) && !isStringEmptyOrNull(b.getBoxPosition())
         && !isStringEmptyOrNull(b.getBoxLocation())) {

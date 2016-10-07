@@ -400,13 +400,13 @@ public class SQLBoxDAO implements BoxStore {
       }
 
       if (library != null) {
-        library.setEmpty(true);
+        library.setDiscarded(true);
         libraryDAO.save(library);
       } else if (sample != null) {
-        sample.setEmpty(true);
+        sample.setDiscarded(true);
         sampleDAO.save(sample);
       } else if (pool != null) {
-        pool.setEmpty(true);
+        pool.setDiscarded(true);
         poolDAO.save(pool);
       }
     }
@@ -429,21 +429,21 @@ public class SQLBoxDAO implements BoxStore {
     for (String barcode : boxableBarcodes) {
       Sample sample = sampleDAO.getByBarcode(barcode);
       if (sample != null) {
-        sample.setEmpty(true);
+        sample.setDiscarded(true);
         sampleDAO.save(sample);
         continue;
       }
 
       Library library = libraryDAO.getByBarcode(barcode);
       if (library != null) {
-        library.setEmpty(true);
+        library.setDiscarded(true);
         libraryDAO.save(library);
         continue;
       }
 
       Pool<? extends Poolable<?,?>> pool = poolDAO.getByBarcode(barcode);
       if (pool != null) {
-        pool.setEmpty(true);
+        pool.setDiscarded(true);
         poolDAO.save(pool);
         continue;
       }

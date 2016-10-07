@@ -36,7 +36,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
 
 import javax.persistence.CascadeType;
 
@@ -66,6 +65,7 @@ import com.googlecode.ehcache.annotations.TriggersRemove;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
+
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractPool;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
@@ -112,7 +112,7 @@ public class SQLPoolDAO implements PoolStore {
   public static final String POOL_COUNT_BY_PLATFORM = POOL_COUNT + " WHERE p.platformType=?";
 
   private static final String POOL_SELECT = "SELECT p.poolId, p.concentration, p.identificationBarcode, p.name, p.alias, p.description, p.creationDate, "
-      + "p.securityProfile_profileId, p.platformType, p.ready, p.qcPassed, p.lastModifier, pmod.lastModified, p.boxPositionId, p.volume, p.emptied, b.boxId, "
+      + "p.securityProfile_profileId, p.platformType, p.ready, p.qcPassed, p.lastModifier, pmod.lastModified, p.boxPositionId, p.volume, p.discarded, b.boxId, "
       + "b.alias AS boxAlias, b.locationBarcode AS boxLocation, bp.row AS boxRow, bp.column AS boxColumn " + "FROM " + TABLE_NAME + " p "
       + "LEFT JOIN BoxPosition bp ON bp.boxPositionId = p.boxPositionId " + "LEFT JOIN Box b ON b.boxId = bp.boxId "
       + "LEFT JOIN (SELECT poolId, MAX(changeTime) AS lastModified FROM PoolChangeLog GROUP BY poolId) pmod ON p.poolId = pmod.poolId";
@@ -141,7 +141,7 @@ public class SQLPoolDAO implements PoolStore {
 
   public static final String POOL_UPDATE = "UPDATE " + TABLE_NAME + " "
       + "SET alias=:alias, concentration=:concentration, identificationBarcode=:identificationBarcode, creationDate=:creationDate, securityProfile_profileId=:securityProfile_profileId, "
-      + "platformType=:platformType, ready=:ready, qcPassed=:qcPassed, lastModifier=:lastModifier, emptied=:emptied, volume=:volume, description=:description "
+      + "platformType=:platformType, ready=:ready, qcPassed=:qcPassed, lastModifier=:lastModifier, discarded=:discarded, volume=:volume, description=:description "
       + "WHERE poolId=:poolId";
 
   public static final String POOL_DELETE = "DELETE FROM " + TABLE_NAME + " WHERE poolId=:poolId";
@@ -443,7 +443,7 @@ public class SQLPoolDAO implements PoolStore {
     if (securityProfileId == null || (this.cascadeType != null)) {
       securityProfileId = securityProfileDAO.save(pool.getSecurityProfile());
     }
-    if (pool.isEmpty()) {
+    if (pool.isDiscarded()) {
       boxDAO.removeBoxableFromBox(pool);
       pool.setVolume(0D);
     }
@@ -456,7 +456,7 @@ public class SQLPoolDAO implements PoolStore {
     params.addValue("securityProfile_profileId", securityProfileId);
     params.addValue("platformType", pool.getPlatformType().getKey());
     params.addValue("ready", pool.getReadyToRun());
-    params.addValue("emptied", pool.isEmpty());
+    params.addValue("discarded", pool.isDiscarded());
     params.addValue("volume", pool.getVolume());
     params.addValue("lastModifier", pool.getLastModifier().getUserId());
     params.addValue("qcPassed", pool.getQcPassed());
@@ -508,7 +508,7 @@ public class SQLPoolDAO implements PoolStore {
       }
     }
 
-    Set<String> oldIds = new HashSet<String>(
+    Set<String> oldIds = new HashSet<>(
         template.query(POOL_ELEMENT_SELECT_BY_POOL_ID, new Object[] { pool.getId() }, new RowMapper<String>() {
           @Override
           public String mapRow(ResultSet rs, int pos) throws SQLException {
@@ -516,7 +516,7 @@ public class SQLPoolDAO implements PoolStore {
             return parts[parts.length - 1] + ":" + rs.getLong("elementId");
           }
         }));
-    Set<String> newIds = new HashSet<String>();
+    Set<String> newIds = new HashSet<>();
     MapSqlParameterSource delparams = new MapSqlParameterSource();
     delparams.addValue("pool_poolId", pool.getId());
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
@@ -862,7 +862,7 @@ public class SQLPoolDAO implements PoolStore {
         p.setIdentificationBarcode(rs.getString("identificationBarcode"));
         p.setReadyToRun(rs.getBoolean("ready"));
         p.setVolume(rs.getDouble("volume"));
-        p.setEmpty(rs.getBoolean("emptied"));
+        p.setDiscarded(rs.getBoolean("discarded"));
         p.setBoxPositionId(rs.getLong("boxPositionId"));
         p.setBoxAlias(rs.getString("boxAlias"));
         p.setBoxId(rs.getLong("boxId"));
@@ -878,7 +878,7 @@ public class SQLPoolDAO implements PoolStore {
         }
 
         p.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
-        p.setWatchers(new HashSet<User>(watcherDAO.getWatchersByEntityName(p.getWatchableIdentifier())));
+        p.setWatchers(new HashSet<>(watcherDAO.getWatchersByEntityName(p.getWatchableIdentifier())));
         if (p.getSecurityProfile() != null && p.getSecurityProfile().getOwner() != null) {
           p.addWatcher(p.getSecurityProfile().getOwner());
         }

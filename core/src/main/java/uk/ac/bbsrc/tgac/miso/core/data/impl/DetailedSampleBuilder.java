@@ -67,7 +67,7 @@ public class DetailedSampleBuilder implements DetailedSample, SampleAliquot, Sam
   private Long securityProfile_profileId;
   private User lastModifier;
   private Double volume;
-  private boolean emptied = false;
+  private boolean discarded = false;
   private boolean isSynthetic = false;
   private boolean nonStandardAlias = false;
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
@@ -714,13 +714,13 @@ public class DetailedSampleBuilder implements DetailedSample, SampleAliquot, Sam
   }
 
   @Override
-  public void setEmpty(boolean emptied) {
-    this.emptied = emptied;
+  public void setDiscarded(boolean discarded) {
+    this.discarded = discarded;
   }
 
   @Override
-  public boolean isEmpty() {
-    return emptied;
+  public boolean isDiscarded() {
+    return discarded;
   }
 
   @Override
@@ -933,7 +933,7 @@ public class DetailedSampleBuilder implements DetailedSample, SampleAliquot, Sam
     sample.setAlias(alias);
     sample.setLastModifier(lastModifier);
     sample.setVolume(volume);
-    sample.setEmpty(emptied);
+    sample.setDiscarded(discarded);
     sample.getChangeLog().addAll(changeLog);
     sample.setNotes(notes);
 
