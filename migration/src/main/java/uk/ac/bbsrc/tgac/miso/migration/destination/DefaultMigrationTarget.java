@@ -195,6 +195,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
         }
       }
     }
+    log.debug("Saving sample " + sample.getAlias());
     sample.inheritPermissions(sample.getProject());
     valueTypeLookup.resolveAll(sample);
 
