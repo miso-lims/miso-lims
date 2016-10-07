@@ -61,14 +61,14 @@ public interface Boxable extends Nameable, Barcodable {
    * @param boolean
    *          emptied
    */
-  public void setEmpty(boolean emptied);
+  public void setDiscarded(boolean emptied);
 
   /**
    * Returns whether or not the Implementor has been emptied
    * 
    * @return emptied
    */
-  public boolean isEmpty();
+  public boolean isDiscarded();
 
   /**
    * Returns the volume of the Implementor

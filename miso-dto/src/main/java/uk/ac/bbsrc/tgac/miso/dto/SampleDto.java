@@ -48,7 +48,7 @@ public class SampleDto {
   private Long rootSampleClassId;
   private String rootSampleClassUrl;
   private Double volume;
-  private Boolean empty;
+  private Boolean discarded;
   private Long updatedById;
   private String updatedByUrl;
   private String lastModified;
@@ -192,12 +192,12 @@ public class SampleDto {
     this.volume = volume;
   }
 
-  public Boolean getEmpty() {
-    return empty;
+  public Boolean getDiscarded() {
+    return discarded;
   }
 
-  public void setEmpty(Boolean empty) {
-    this.empty = empty;
+  public void setDiscarded(Boolean discarded) {
+    this.discarded = discarded;
   }
 
   public Long getUpdatedById() {

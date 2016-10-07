@@ -13,8 +13,8 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 @MappedSuperclass
 public abstract class AbstractBoxable implements Boxable {
 
-  @Column(name = "emptied")
-  private boolean empty;
+  @Column(name = "discarded")
+  private boolean discarded;
   @Column(nullable = true)
   private Double volume;
   @Transient
@@ -53,14 +53,14 @@ public abstract class AbstractBoxable implements Boxable {
   }
 
   @Override
-  public boolean isEmpty() {
-    return empty;
+  public boolean isDiscarded() {
+    return discarded;
   }
 
   @Override
-  public void setEmpty(boolean empty) {
-    if (empty) volume = 0.0;
-    this.empty = empty;
+  public void setDiscarded(boolean disarded) {
+    if (disarded) volume = 0.0;
+    this.discarded = disarded;
   }
 
   @Override
@@ -119,7 +119,7 @@ public abstract class AbstractBoxable implements Boxable {
         .append(alias)
         .append(boxAlias)
         .append(boxLocation)
-        .append(empty)
+        .append(discarded)
         .append(position)
         .append(volume)
         .toHashCode();
@@ -135,7 +135,7 @@ public abstract class AbstractBoxable implements Boxable {
         .append(alias, other.alias)
         .append(boxAlias, other.boxAlias)
         .append(boxLocation, other.boxLocation)
-        .append(empty, other.empty)
+        .append(discarded, other.discarded)
         .append(position, other.position)
         .append(volume, other.volume)
         .isEquals();

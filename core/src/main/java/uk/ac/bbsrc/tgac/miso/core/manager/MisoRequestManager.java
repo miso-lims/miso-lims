@@ -1667,7 +1667,7 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public long saveLibrary(Library library) throws IOException {
     if (libraryStore != null) {
-      if (library.isEmpty()) {
+      if (library.isDiscarded()) {
         library.setVolume(0.0);
       }
       if (library.getLibraryAdditionalInfo() != null && library.getLibraryAdditionalInfo().getLibraryDesign() != null) {
@@ -1755,7 +1755,7 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public long savePool(Pool pool) throws IOException {
     if (poolStore != null) {
-      if (pool.isEmpty()) {
+      if (pool.isDiscarded()) {
         pool.setVolume(0.0);
       }
       return poolStore.save(pool);

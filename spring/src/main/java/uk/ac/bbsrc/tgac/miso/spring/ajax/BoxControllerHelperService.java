@@ -32,6 +32,7 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
@@ -180,7 +181,7 @@ public class BoxControllerHelperService {
       }
 
       response.put("boxable", Dtos.asDto(boxable));
-      if (boxable.isEmpty())
+      if (boxable.isDiscarded())
         response.put("trashed", boxable.getName() + " (" + boxable.getAlias() + ") has been discarded, and can not be added to the box.");
       return response;
     } else {
@@ -364,7 +365,7 @@ public class BoxControllerHelperService {
 
     if (boxable == null) return JSONUtils.SimpleJSONError("Could not find sample, library or pool with barcode " + barcode
         + ". Please associate this barcode with a sample, library or pool before retrying.");
-    if (boxable.isEmpty()) return JSONUtils
+    if (boxable.isDiscarded()) return JSONUtils
         .SimpleJSONError(boxable.getName() + " (" + boxable.getAlias() + ") has been discarded, and can not be added to the box.");
 
     // if the selected item is already in the box, remove it here and add it to the correct position in next step
@@ -374,7 +375,7 @@ public class BoxControllerHelperService {
     box.setBoxable(position, boxable);
     log.info("Adding " + boxable.getName() + " to " + box.getName());
 
-    Map<String, Object> response = new HashMap<String, Object>();
+    Map<String, Object> response = new HashMap<>();
     try {
       box.setLastModifier(authorizationManager.getCurrentUser());
       requestManager.saveBox(box);
@@ -426,7 +427,7 @@ public class BoxControllerHelperService {
       box.setLastModifier(authorizationManager.getCurrentUser());
       requestManager.saveBox(box);
 
-      Map<String, Object> response = new HashMap<String, Object>();
+      Map<String, Object> response = new HashMap<>();
       ObjectMapper mapper = new ObjectMapper();
       response.put("boxJSON", mapper.writer().writeValueAsString(box));
       return JSONUtils.JSONObjectResponse(response);
@@ -437,7 +438,7 @@ public class BoxControllerHelperService {
   }
 
   /**
-   * Modifies one Boxable element for the purpose of being thrown out by the user. Sets boxable.volume to 0, boxable.emptied to true, and
+   * Modifies one Boxable element for the purpose of being thrown out by the user. Sets boxable.volume to 0, boxable.discarded to true, and
    * removes the boxable element from the box.
    * 
    * Note: json must contain the following key-value pairs: "boxId": boxId, "position": position
@@ -493,7 +494,8 @@ public class BoxControllerHelperService {
   }
 
   /**
-   * Modifies all Boxable elements to be thrown in the trash. For each boxable element, boxable.volume is set to 0, boxable.emptied to true,
+   * Modifies all Boxable elements to be thrown in the trash. For each boxable element, boxable.volume is set to 0, boxable.discarded to
+   * true,
    * and all boxable elements are removed from the box. Note: json must contain the key-value pair of "boxId" : boxId
    *
    * @param session
@@ -651,7 +653,7 @@ public class BoxControllerHelperService {
         }
       }
 
-      Queue<File> thingsToPrint = new LinkedList<File>();
+      Queue<File> thingsToPrint = new LinkedList<>();
       JSONArray ss = JSONArray.fromObject(json.getString("boxes"));
       for (JSONObject s : (Iterable<JSONObject>) ss) {
         try {
@@ -759,7 +761,7 @@ public class BoxControllerHelperService {
       JSONObject errors = new JSONObject();
       JSONArray errorPositions = new JSONArray();
       JSONArray successPositions = new JSONArray();
-      ArrayList<String> barcodeList = new ArrayList<String>();
+      ArrayList<String> barcodeList = new ArrayList<>();
 
       // get scan
       try {
@@ -806,7 +808,7 @@ public class BoxControllerHelperService {
         // check that there are not more returned results than requested results. There is a later check for too few.
         if (barcodedBoxables.size() > barcodeList.size()) {
           String warning = "Several items have the same barcodes. Please move to new barcoded tubes and then retry: ";
-          Map<String, Boxable> barcodesWithBoxables = new HashMap<String, Boxable>();
+          Map<String, Boxable> barcodesWithBoxables = new HashMap<>();
           JSONArray duplicatedBarcodes = new JSONArray();
           for (Boxable boxable : barcodedBoxables) {
             String currentBarcode = boxable.getIdentificationBarcode();
@@ -912,11 +914,11 @@ public class BoxControllerHelperService {
     if (json.has("boxId")) {
       Long boxId = json.getLong("boxId");
       try {
-        ArrayList<String> array = new ArrayList<String>();
+        ArrayList<String> array = new ArrayList<>();
 
         Box box = requestManager.getBoxById(boxId);
         array.add(box.getName() + ":" + box.getAlias());
-        Map<String, Boxable> boxableItems = new TreeMap<String, Boxable>(box.getBoxables()); // sorted by position
+        Map<String, Boxable> boxableItems = new TreeMap<>(box.getBoxables()); // sorted by position
         for (Map.Entry<String, Boxable> entry : boxableItems.entrySet()) {
           String arrayEntry = entry.getKey() + ":" + entry.getValue().getName() + ":" + entry.getValue().getAlias();
           array.add(arrayEntry);

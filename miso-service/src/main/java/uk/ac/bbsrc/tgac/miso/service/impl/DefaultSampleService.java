@@ -249,7 +249,7 @@ public class DefaultSampleService implements SampleService {
    * @throws IOException
    */
   private Sample save(Sample sample) throws IOException {
-    if (sample.isEmpty()) {
+    if (sample.isDiscarded()) {
       sample.setVolume(0.0);
     }
     try {
@@ -495,7 +495,7 @@ public class DefaultSampleService implements SampleService {
     }
     target.setAlias(source.getAlias());
     target.setDescription(source.getDescription());
-    target.setEmpty(source.isEmpty());
+    target.setDiscarded(source.isDiscarded());
     target.setVolume(source.getVolume());
     target.setIdentificationBarcode(source.getIdentificationBarcode());
     if (isDetailedSample(target)) {
