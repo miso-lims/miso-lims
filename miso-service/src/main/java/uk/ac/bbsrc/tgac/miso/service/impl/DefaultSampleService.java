@@ -1,13 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isAliquotSample;
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isDetailedSample;
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isIdentitySample;
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStockSample;
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringBlankOrNull;
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isTissueProcessingSample;
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isTissueSample;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -59,7 +52,6 @@ import uk.ac.bbsrc.tgac.miso.service.DetailedSampleService;
 import uk.ac.bbsrc.tgac.miso.service.LabService;
 import uk.ac.bbsrc.tgac.miso.service.SampleNumberPerProjectService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
-import uk.ac.bbsrc.tgac.miso.service.SampleTissueService;
 import uk.ac.bbsrc.tgac.miso.service.SampleValidRelationshipService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
@@ -86,9 +78,6 @@ public class DefaultSampleService implements SampleService {
 
   @Autowired
   private SampleNumberPerProjectService sampleNumberPerProjectService;
-
-  @Autowired
-  private SampleTissueService sampleTissueService;
 
   @Autowired
   private ProjectStore projectStore;
@@ -148,10 +137,6 @@ public class DefaultSampleService implements SampleService {
 
   public void setSampleNumberPerProjectService(SampleNumberPerProjectService sampleNumberPerProjectService) {
     this.sampleNumberPerProjectService = sampleNumberPerProjectService;
-  }
-
-  public void setSampleTissueService(SampleTissueService sampleTissueService) {
-    this.sampleTissueService = sampleTissueService;
   }
 
   public void setProjectStore(ProjectStore projectStore) {
@@ -522,7 +507,7 @@ public class DefaultSampleService implements SampleService {
         iTarget.setExternalName(iSource.getExternalName());
       }
       if (isTissueSample(target)) {
-        sampleTissueService.applyChanges((SampleTissue) target, (SampleTissue) source);
+        applyChanges((SampleTissue) target, (SampleTissue) source);
       }
       if (isTissueProcessingSample(target)) {
         applyChanges((SampleTissueProcessing) target, (SampleTissueProcessing) source);
@@ -540,6 +525,14 @@ public class DefaultSampleService implements SampleService {
         ssTarget.setDNAseTreated(ssSource.getDNAseTreated());
       }
     }
+  }
+
+  public void applyChanges(SampleTissue target, SampleTissue source) {
+    target.setPassageNumber(source.getPassageNumber());
+    target.setTimesReceived(source.getTimesReceived());
+    target.setTubeNumber(source.getTubeNumber());
+    target.setExternalInstituteIdentifier(source.getExternalInstituteIdentifier());
+    target.setRegion(source.getRegion());
   }
 
   public void applyChanges(SampleTissueProcessing target, SampleTissueProcessing source) {
