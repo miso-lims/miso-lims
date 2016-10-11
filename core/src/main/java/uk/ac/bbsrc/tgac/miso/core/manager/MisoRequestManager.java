@@ -2628,18 +2628,18 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public void emptySingleTube(Box box, String position) throws IOException {
+  public void discardSingleTube(Box box, String position) throws IOException {
     if (boxStore != null) {
-      boxStore.emptySingleTube(box, position);
+      boxStore.discardSingleTube(box, position);
     } else {
       throw new IOException("No boxStore available. Check that it has been declared in the Spring config.");
     }
   }
 
   @Override
-  public void emptyAllTubes(Box box) throws IOException {
+  public void discardAllTubes(Box box) throws IOException {
     if (boxStore != null) {
-      boxStore.emptyAllTubes(box);
+      boxStore.discardAllTubes(box);
     } else {
       throw new IOException("No boxStore available. Check that it has been declared in the Spring config.");
     }

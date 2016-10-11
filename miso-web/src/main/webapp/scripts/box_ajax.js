@@ -516,14 +516,14 @@ Box.ui = {
     } 
   },
   
-  emptyOneItem: function() {
+  discardOneItem: function() {
     var selectedPosition = Box.utils.getPositionString(Box.visual.selected.row, Box.visual.selected.col);
     if(confirm("Are you sure you wish to discard this tube?")) {
       jQuery('#updateSelected, #emptySelected, #removeSelected').prop('disabled', true).addClass('disabled');
       
       Fluxion.doAjax(
         'boxControllerHelperService',
-        'emptySingleTube',
+        'discardSingleTube',
         {
           'boxId': Box.boxId,
           'position': selectedPosition,
@@ -540,11 +540,11 @@ Box.ui = {
     } 
   },
 
-  emptyEntireBox: function (boxId) {
+  discardEntireBox: function (boxId) {
     if(confirm("Are you sure you wish to discard all tubes in this box?")) {      
       Fluxion.doAjax(
         'boxControllerHelperService',
-        'emptyEntireBox',
+        'discardEntireBox',
         {
           'boxId': boxId,
           'url': ajaxurl

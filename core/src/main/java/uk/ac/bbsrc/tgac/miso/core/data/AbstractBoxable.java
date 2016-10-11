@@ -58,9 +58,9 @@ public abstract class AbstractBoxable implements Boxable {
   }
 
   @Override
-  public void setDiscarded(boolean disarded) {
-    if (disarded) volume = 0.0;
-    this.discarded = disarded;
+  public void setDiscarded(boolean discarded) {
+    if (discarded) volume = 0.0;
+    this.discarded = discarded;
   }
 
   @Override

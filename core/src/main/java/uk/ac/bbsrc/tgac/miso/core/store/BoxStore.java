@@ -73,9 +73,9 @@ public interface BoxStore extends Store<Box>, Remover<Box>, NamingSchemeAware<Bo
 
   Collection<BoxSize> listAllBoxSizes() throws IOException;
 
-  void emptySingleTube(Box box, String position) throws IOException;
+  void discardSingleTube(Box box, String position) throws IOException;
 
-  void emptyAllTubes(Box box) throws IOException;
+  void discardAllTubes(Box box) throws IOException;
   
   void removeBoxableFromBox(Boxable boxable) throws IOException;
 

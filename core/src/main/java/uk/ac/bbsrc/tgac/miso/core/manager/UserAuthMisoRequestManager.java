@@ -2347,9 +2347,9 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public void emptySingleTube(Box box, String position) throws IOException {
+  public void discardSingleTube(Box box, String position) throws IOException {
     if (writeCheck(box)) {
-      backingManager.emptySingleTube(box, position);
+      backingManager.discardSingleTube(box, position);
     } else {
       throw new IOException("User " + getCurrentUser().getFullName() + " cannot change Box " + box.getAlias());
     }
@@ -2357,9 +2357,9 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public void emptyAllTubes(Box box) throws IOException {
+  public void discardAllTubes(Box box) throws IOException {
     if (writeCheck(box)) {
-      backingManager.emptyAllTubes(box);
+      backingManager.discardAllTubes(box);
     } else {
       throw new IOException("User " + getCurrentUser().getFullName() + " cannot change Box " + box.getAlias());
     }

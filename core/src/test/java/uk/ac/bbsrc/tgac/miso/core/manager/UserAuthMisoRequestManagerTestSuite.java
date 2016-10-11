@@ -3846,7 +3846,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 
   /**
    * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#emptySingleTube(uk.ac.bbsrc.tgac.miso.core.data.Box, java.lang.String)}
+   * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#discardSingleTube(uk.ac.bbsrc.tgac.miso.core.data.Box, java.lang.String)}
    * .
    */
 
@@ -3857,7 +3857,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 
   /**
    * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#emptyAllTubes(uk.ac.bbsrc.tgac.miso.core.data.Box)} .
+   * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#discardAllTubes(uk.ac.bbsrc.tgac.miso.core.data.Box)} .
    */
 
   @Test
