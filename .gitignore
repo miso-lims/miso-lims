@@ -3,7 +3,6 @@ test_file.txt
 # Eclipse IDE files and directories.
 .classpath
 .project
-.settings
 .idea
 
 # Maven build directory.
@@ -16,3 +15,8 @@ sqlstore/flyway.properties
 core/test_file.txt
 notification-server/metrixDaemon.log
 
+# Ignore Eclipse Web Standard Tools settings files.
+.settings/org.eclipse.wst.common.component
+.settings/org.eclipse.wst.common.project.facet.core.prefs.xml
+.settings/org.eclipse.wst.common.project.facet.core.xml
+.settings/org.eclipse.wst.validation.prefs

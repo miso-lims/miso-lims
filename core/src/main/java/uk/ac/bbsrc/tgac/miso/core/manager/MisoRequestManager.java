@@ -1667,7 +1667,7 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public long saveLibrary(Library library) throws IOException {
     if (libraryStore != null) {
-      if (library.isEmpty()) {
+      if (library.isDiscarded()) {
         library.setVolume(0.0);
       }
       if (library.getLibraryAdditionalInfo() != null && library.getLibraryAdditionalInfo().getLibraryDesign() != null) {
@@ -1755,7 +1755,7 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public long savePool(Pool pool) throws IOException {
     if (poolStore != null) {
-      if (pool.isEmpty()) {
+      if (pool.isDiscarded()) {
         pool.setVolume(0.0);
       }
       return poolStore.save(pool);
@@ -2628,18 +2628,18 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public void emptySingleTube(Box box, String position) throws IOException {
+  public void discardSingleTube(Box box, String position) throws IOException {
     if (boxStore != null) {
-      boxStore.emptySingleTube(box, position);
+      boxStore.discardSingleTube(box, position);
     } else {
       throw new IOException("No boxStore available. Check that it has been declared in the Spring config.");
     }
   }
 
   @Override
-  public void emptyAllTubes(Box box) throws IOException {
+  public void discardAllTubes(Box box) throws IOException {
     if (boxStore != null) {
-      boxStore.emptyAllTubes(box);
+      boxStore.discardAllTubes(box);
     } else {
       throw new IOException("No boxStore available. Check that it has been declared in the Spring config.");
     }

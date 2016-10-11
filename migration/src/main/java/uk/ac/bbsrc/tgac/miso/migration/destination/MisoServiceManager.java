@@ -48,7 +48,6 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDesignDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleNumberPerProjectDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSamplePurposeDao;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleTissueDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleValidRelationshipDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSubprojectDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueMaterialDao;
@@ -59,7 +58,6 @@ import uk.ac.bbsrc.tgac.miso.service.impl.DefaultLabService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSampleClassService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSampleNumberPerProjectService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSampleService;
-import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSampleTissueService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSampleValidRelationshipService;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLBoxDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLChangeLogDAO;
@@ -132,7 +130,6 @@ public class MisoServiceManager {
 
   private DefaultSampleClassService sampleClassService;
   private DefaultSampleService sampleService;
-  private DefaultSampleTissueService sampleTissueService;
   private DefaultDetailedSampleService detailedSampleService;
   private DefaultLabService labService;
   private DefaultSampleNumberPerProjectService sampleNumberPerProjectService;
@@ -141,7 +138,6 @@ public class MisoServiceManager {
   private HibernateSampleClassDao sampleClassDao;
   private HibernateSampleDao sampleDao;
   private HibernateDetailedSampleDao detailedSampleDao;
-  private HibernateSampleTissueDao sampleTissueDao;
   private HibernateLabDao labDao;
   private HibernateInstituteDao instituteDao;
   private HibernateDetailedQcStatusDao detailedQcStatusDao;
@@ -207,8 +203,6 @@ public class MisoServiceManager {
     m.setDefaultSamplePurposeDao();
     m.setDefaultSampleQcDao();
     m.setDefaultSampleService();
-    m.setDefaultSampleTissueDao();
-    m.setDefaultSampleTissueService();
     m.setDefaultSampleValidRelationshipDao();
     m.setDefaultSampleValidRelationshipService();
     m.setDefaultSecurityManager();
@@ -380,7 +374,6 @@ public class MisoServiceManager {
     if (projectDao != null) projectDao.setSecurityManager(securityManager);
     if (poolDao != null) poolDao.setSecurityManager(securityManager);
     if (runDao != null) runDao.setSecurityManager(securityManager);
-    if (sampleTissueService != null) sampleTissueService.setSecurityManager(securityManager);
   }
 
   public SQLWatcherDAO getWatcherDao() {
@@ -489,7 +482,6 @@ public class MisoServiceManager {
     svc.setSampleNamingScheme(getSampleNamingScheme());
     svc.setProjectStore(projectDao);
     svc.setDetailedSampleService(detailedSampleService);
-    svc.setSampleTissueService(sampleTissueService);
     svc.setKitStore(kitDao);
     svc.setDetailedQcStatusDao(detailedQcStatusDao);
     svc.setSampleClassDao(sampleClassDao);
@@ -1040,45 +1032,6 @@ public class MisoServiceManager {
     if (poolDao != null) poolDao.setBoxDAO(boxDao);
   }
 
-  public DefaultSampleTissueService getSampleTissueService() {
-    return sampleTissueService;
-  }
-
-  public void setSampleTissueService(DefaultSampleTissueService sampleTissueService) {
-    this.sampleTissueService = sampleTissueService;
-    updateSampleTissueServiceDependencies();
-  }
-
-  public void setDefaultSampleTissueService() {
-    DefaultSampleTissueService svc = new DefaultSampleTissueService();
-    svc.setSecurityManager(securityManager);
-    svc.setSampleTissueDao(sampleTissueDao);
-    setSampleTissueService(sampleTissueService);
-  }
-
-  private void updateSampleTissueServiceDependencies() {
-    if (sampleService != null) sampleService.setSampleTissueService(sampleTissueService);
-  }
-
-  public HibernateSampleTissueDao getSampleTissueDao() {
-    return sampleTissueDao;
-  }
-
-  public void setSampleTissueDao(HibernateSampleTissueDao sampleTissueDao) {
-    this.sampleTissueDao = sampleTissueDao;
-    updateSampleTissueDaoDependencies();
-  }
-
-  public void setDefaultSampleTissueDao() {
-    HibernateSampleTissueDao dao = new HibernateSampleTissueDao();
-    dao.setSessionFactory(sessionFactory);
-    setSampleTissueDao(dao);
-  }
-
-  private void updateSampleTissueDaoDependencies() {
-    if (sampleTissueService != null) sampleTissueService.setSampleTissueDao(sampleTissueDao);
-  }
-
   public HibernateDetailedSampleDao getDetailedSampleDao() {
     return detailedSampleDao;
   }
@@ -1142,7 +1095,6 @@ public class MisoServiceManager {
   }
 
   private void updateLabServiceDependencies() {
-    if (sampleTissueService != null) sampleTissueService.setLabService(labService);
     if (sampleService != null) sampleService.setLabService(labService);
   }
 
@@ -1240,7 +1192,6 @@ public class MisoServiceManager {
   }
 
   private void updateTissueOriginDaoDependencies() {
-    if (sampleTissueService != null) sampleTissueService.setTissueOriginDao(tissueOriginDao);
     if (sampleService != null) sampleService.setTissueOriginDao(tissueOriginDao);
   }
 
@@ -1260,7 +1211,6 @@ public class MisoServiceManager {
   }
 
   private void updateTissueTypeDaoDependencies() {
-    if (sampleTissueService != null) sampleTissueService.setTissueTypeDao(tissueTypeDao);
     if (sampleService != null) sampleService.setTissueTypeDao(tissueTypeDao);
   }
 

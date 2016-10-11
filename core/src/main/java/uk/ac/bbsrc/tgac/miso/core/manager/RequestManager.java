@@ -568,9 +568,9 @@ public interface RequestManager {
 
   public Collection<Alert> listAlertsByUserId(long userId, long limit) throws IOException;
 
-  public void emptySingleTube(Box box, String position) throws IOException;
+  public void discardSingleTube(Box box, String position) throws IOException;
 
-  public void emptyAllTubes(Box box) throws IOException;
+  public void discardAllTubes(Box box) throws IOException;
 
   // DELETES
   public void deleteProject(Project project) throws IOException;

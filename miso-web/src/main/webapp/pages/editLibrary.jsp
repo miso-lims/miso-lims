@@ -353,7 +353,9 @@
       jQuery('#indicesDiv').empty();
       document.getElementById('indexFamily').value = '${library.getCurrentFamily().id}';
       <c:forEach items="${library.indices}" var="index">
-        Library.ui.createIndexBox(${index.id});
+        <c:if test="${index.id != 0}">
+          Library.ui.createIndexBox(${index.id});
+        </c:if>
       </c:forEach>
       Library.ui.createIndexNextBox();
     };
@@ -382,10 +384,11 @@
   <td><form:input id="volume" path="volume"/></td>
 </tr>
 <tr>
-  <td>Emptied:</td>
-  <td><form:checkbox id="empty" path="empty"/></td>
+  <td>Discarded:</td>
+  <td><form:checkbox id="discarded" path="discarded"/></td>
 </tr>
 </table>
+<%@ include file="volumeControl.jspf" %>
 
 <c:if test="${detailedSample}">
 <br/>

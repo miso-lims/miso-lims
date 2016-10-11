@@ -213,7 +213,7 @@
       </a>
       <div id="actionsmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
         <a onclick="Box.ui.exportBox(${box.id});" href="javascript:void(0);" class="add">Export Box to Excel</a>
-        <a onclick="Box.ui.emptyEntireBox(${box.id});" href="javascript:void(0);" class="add">Trash All Tubes</a>
+        <a onclick="Box.ui.discardEntireBox(${box.id});" href="javascript:void(0);" class="add">Discard All Tubes</a>
         <c:if test="${(scannerEnabled) && (box.size.scannable)}"><a onclick="Box.initScan();" href="javascript:void(0);">Scan Box</a></c:if>
       </div>
     </li>
@@ -245,7 +245,7 @@
 	      <td></td>
 	    </tr>
 	    <tr><td><button id="removeSelected" class="ui-state-default" onclick="Box.ui.removeOneItem()">Remove Tube</button>
-	      <button id="emptySelected"  class="ui-state-default" onclick="Box.ui.emptyOneItem();">Trash Tube</button>
+	      <button id="emptySelected"  class="ui-state-default" onclick="Box.ui.discardOneItem();">Discard Tube</button>
 	      </td>
 	    </tr>
     </table>

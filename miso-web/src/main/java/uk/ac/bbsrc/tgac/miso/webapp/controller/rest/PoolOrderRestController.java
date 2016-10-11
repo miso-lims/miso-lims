@@ -81,15 +81,17 @@ public class PoolOrderRestController extends RestController {
     }
     node.put("headings", headings);
     ArrayNode data = mapper.createArrayNode();
-    for (Entry<SequencingParameters, PoolOrderCompletionGroup> entry : LimsUtils.groupCompletions(completions).values().iterator().next()
-        .entrySet()) {
-      ObjectNode completion = mapper.createObjectNode();
-      completion.put("parametersId", entry.getKey().getId());
-      completion.put("Remaining", entry.getValue().getRemaining());
-      for (HealthType health : LimsUtils.getUsedHealthTypes(completions)) {
-        completion.put(health.getKey(), entry.getValue().get(health).getNumPartitions());
+    if (!completions.isEmpty()) {
+      for (Entry<SequencingParameters, PoolOrderCompletionGroup> entry : LimsUtils.groupCompletions(completions).values().iterator().next()
+          .entrySet()) {
+        ObjectNode completion = mapper.createObjectNode();
+        completion.put("parametersId", entry.getKey().getId());
+        completion.put("Remaining", entry.getValue().getRemaining());
+        for (HealthType health : LimsUtils.getUsedHealthTypes(completions)) {
+          completion.put(health.getKey(), entry.getValue().get(health).getNumPartitions());
+        }
+        data.add(completion);
       }
-      data.add(completion);
     }
     node.put("completions", data);
 

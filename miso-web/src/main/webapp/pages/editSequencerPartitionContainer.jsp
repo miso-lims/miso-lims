@@ -40,7 +40,7 @@
     <c:when test="${container.id != 0}">Edit</c:when>
     <c:otherwise>Create</c:otherwise>
   </c:choose> Sequencing Container
-  <button class="fg-button ui-state-default ui-corner-all"
+  <button type="button" class="fg-button ui-state-default ui-corner-all"
           onclick="return Container.validateContainer();">Save</button>
   <sec:authorize access="hasRole('ROLE_ADMIN')">
       <c:if test="${container.id != 0}">

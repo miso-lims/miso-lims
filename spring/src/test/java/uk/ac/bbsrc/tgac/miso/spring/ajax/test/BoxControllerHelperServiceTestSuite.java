@@ -271,12 +271,12 @@ public class BoxControllerHelperServiceTestSuite {
     json.put("position", "A01");
     
     assertNotNull(box.getBoxable("A01"));
-    assertFalse(sample.isEmpty());
+    assertFalse(sample.isDiscarded());
     
-    JSONObject response = boxControllerHelperService.emptySingleTube(null, json);
+    JSONObject response = boxControllerHelperService.discardSingleTube(null, json);
     assertFalse(response.has("error"));
     assertTrue(response.has("boxJSON"));
-    verify(requestManager).emptySingleTube(box, "A01");
+    verify(requestManager).discardSingleTube(box, "A01");
   }
   
   @Test
@@ -332,7 +332,7 @@ public class BoxControllerHelperServiceTestSuite {
   @Test
   public void testLookupBoxableByBarcodeTrashed() throws Exception {
     Sample sample = makeSample();
-    sample.setEmpty(true);
+    sample.setDiscarded(true);
     when(requestManager.getSampleByBarcode(sample.getIdentificationBarcode())).thenReturn(sample);
     
     JSONObject json = new JSONObject();
@@ -378,8 +378,8 @@ public class BoxControllerHelperServiceTestSuite {
     Library library = makeLibrary();
     box.setBoxable("A02", library);
     assertEquals(2, box.getTubeCount());
-    assertFalse(sample.isEmpty());
-    assertFalse(library.isEmpty());
+    assertFalse(sample.isDiscarded());
+    assertFalse(library.isDiscarded());
     when(requestManager.getBoxById(box.getId())).thenReturn(box);
     
     JSONObject json = new JSONObject();
@@ -389,11 +389,11 @@ public class BoxControllerHelperServiceTestSuite {
     user.setAdmin(true);
     when(authorizationManager.getCurrentUser()).thenReturn(user);
     
-    JSONObject response = boxControllerHelperService.emptyEntireBox(null, json);
+    JSONObject response = boxControllerHelperService.discardEntireBox(null, json);
     System.out.println(response.toString(2));
     assertFalse(response.has("error"));
     assertTrue(response.has("boxJSON"));
-    verify(requestManager).emptyAllTubes(box);
+    verify(requestManager).discardAllTubes(box);
     // box DAO is responsible for actually emptying and removing the tubes
   }
   
@@ -403,7 +403,7 @@ public class BoxControllerHelperServiceTestSuite {
     sample.setAlias("sample");
     sample.setIdentificationBarcode("1111");
     sample.setBoxPositionId(1L);
-    sample.setEmpty(false);
+    sample.setDiscarded(false);
     return sample;
   }
   
@@ -413,7 +413,7 @@ public class BoxControllerHelperServiceTestSuite {
     library.setAlias("library");
     library.setIdentificationBarcode("2222");
     library.setBoxPositionId(2L);
-    library.setEmpty(false);
+    library.setDiscarded(false);
     return library;
   }
   

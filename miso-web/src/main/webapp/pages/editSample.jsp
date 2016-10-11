@@ -316,10 +316,11 @@
       <td><form:input id="volume" path="volume"/></td>
     </tr>
     <tr>
-      <td>Emptied:</td>
-      <td><form:checkbox id="empty" path="empty"/></td>
+      <td>Discarded:</td>
+      <td><form:checkbox id="discarded" path="discarded"/></td>
     </tr>
   </table>
+  <%@ include file="volumeControl.jspf" %>
   <c:if test="${detailedSample}">
 
     <script type="text/javascript">

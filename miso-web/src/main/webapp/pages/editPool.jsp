@@ -154,7 +154,7 @@
           ${pool.platformType.key}
         </c:when>
         <c:otherwise>
-          <form:select id="platformType" path="platformType" onchange="Pool.ui.prepareElements();" items="${platformTypes}"/>
+          <form:select id="platformType" path="platformType" items="${platformTypes}"/>
         </c:otherwise>
       </c:choose>
     </td>
@@ -191,11 +191,12 @@
     <td><form:input id="volume" path="volume"/></td>
   </tr>
   <tr>
-    <td>Emptied:</td>
-    <td><form:checkbox id="empty" path="empty"/></td>
+    <td>Discarded:</td>
+    <td><form:checkbox id="discarded" path="discarded"/></td>
   </tr>
 
 </table>
+<%@ include file="volumeControl.jspf" %>
 <%@ include file="permissions.jsp" %>
 <br/>
 
@@ -369,45 +370,53 @@
   <h1>Order Completion</h1>
   <table cellpadding="0" cellspacing="0" border="0" class="display" id="order-completion-table"></table>
   <br/>
+
 </c:if>
 
 <h1>Pooled Elements</h1>
-
+<c:choose>
+<c:when test="${pool.id == 0}">
+<p>Please save the pool before adding elements.</p>
+</c:when>
+<c:otherwise>
   <h2>Selected element(s):</h2>
-<div id="pooledList">
-  <table cell-padding="0" width="100%" cellspacing="0" border="0" class="display" id="pooledElementsDatatable">
-	<thead>
-	<tr>
-	  <th>Dilution Name</th>
-	  <th>Concentration (${libraryDilutionUnits})</th>
-	  <th>Library</th>
-	  <th>Sample</th>
-	  <th>Indices</th>
-	  <th>Low Quality</th>
-	  <th>Remove</th>
-	</tr>
-	</thead>
-	<tbody>
-	  <c:if test="${not empty pool.poolableElements}">
-		<c:forEach items="${pool.poolableElements}" var="dil">
-		  <tr id="pooled_${dil.name}">
-		    <td>${dil.name}</td>
-		    <td>${dil.concentration}</td>
-		    <td><a href="<c:url value="/miso/library/${dil.library.id}"/>">${dil.library.alias} (${dil.library.name})</a></td>
-		    <td><a href="<c:url value="/miso/sample/${dil.library.sample.id}"/>">${dil.library.sample.alias} (${dil.library.sample.name})</a></td>
-		    <td><c:forEach items="${dil.library.indices}" var="index" varStatus="iCount">
-		      <c:if test="${iCount.count gt 1}"><br/></c:if>${iCount.count}: ${index.label}
-		      </c:forEach></td>
-		    <td><c:if test="${dil.library.lowQuality}">&#9888;</c:if></td>
-		    <td><span onclick='Pool.ui.removePooledElement(${pool.id}, ${dil.id}, "${dil.name}");' class="ui-icon ui-icon-circle-close ui-button"></span></td>
-		  </tr>
-		</c:forEach>
-	  </c:if>
-	</tbody>
-  </table>
-</div>
-<input type="hidden" value="on" name="_poolableElements"/>
+  <div id="pooledList">
+    <table cell-padding="0" width="100%" cellspacing="0" border="0" class="display" id="pooledElementsDatatable">
+	  <thead>
+	  <tr>
+	    <th>Dilution Name</th>
+	    <th>Concentration (${libraryDilutionUnits})</th>
+	    <th>Library</th>
+	    <th>Sample</th>
+	    <th>Indices</th>
+	    <th>Low Quality</th>
+	    <th>Remove</th>
+	  </tr>
+	  </thead>
+	  <tbody>
+	    <c:if test="${not empty pool.poolableElements}">
+		  <c:forEach items="${pool.poolableElements}" var="dil">
+		    <tr id="pooled_${dil.name}">
+		      <td>${dil.name}</td>
+		      <td>${dil.concentration}</td>
+		      <td><a href="<c:url value="/miso/library/${dil.library.id}"/>">${dil.library.alias} (${dil.library.name})</a></td>
+		      <td><a href="<c:url value="/miso/sample/${dil.library.sample.id}"/>">${dil.library.sample.alias} (${dil.library.sample.name})</a></td>
+		      <td><c:forEach items="${dil.library.indices}" var="index" varStatus="iCount">
+		        <c:if test="${iCount.count gt 1}"><br/></c:if>${iCount.count}: ${index.label}
+		        </c:forEach></td>
+		      <td><c:if test="${dil.library.lowQuality}">&#9888;</c:if></td>
+		      <td><span onclick='Pool.ui.removePooledElement(${pool.id}, ${dil.id}, "${dil.name}");' class="ui-icon ui-icon-circle-close ui-button"></span></td>
+		    </tr>
+		  </c:forEach>
+	    </c:if>
+	  </tbody>
+    </table>
+  </div>
+</c:otherwise>
+</c:choose>
 </form:form>
+
+<c:if test="${pool.id != 0}">
 <script type="text/javascript">
   jQuery(document).ready(function () {
     jQuery('#pooledElementsDatatable').dataTable({
@@ -439,9 +448,10 @@
 
 <script type="text/javascript">
     jQuery(document).ready(function () {
-        Pool.ui.createElementSelectDatatable('<c:out value="${pool.platformType.key}" default="Illumina"/>', ${pool.id}, '${libraryDilutionUnits}');
+        Pool.ui.createElementSelectDatatable('${pool.platformType.key}', ${pool.id}, '${libraryDilutionUnits}');
     });
 </script>
+</c:if>
 
 <c:if test="${not empty pool.changeLog}">
   <br/>

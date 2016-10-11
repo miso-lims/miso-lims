@@ -248,7 +248,7 @@ public class SQLBoxDAOTest extends AbstractDAOTest {
     Box box = dao.get(1);
 
     assertTrue("precondition failed", box.getBoxables().values().size() > 0);
-    dao.emptyAllTubes(box);
+    dao.discardAllTubes(box);
     assertTrue(box.getBoxables().values().size() == 0);
 
   }
@@ -261,7 +261,7 @@ public class SQLBoxDAOTest extends AbstractDAOTest {
     Box box = dao.get(1);
 
     assertTrue("precondition failed", box.getBoxables().values().size() > 0);
-    dao.emptySingleTube(box, "B02");
+    dao.discardSingleTube(box, "B02");
     assertTrue(box.getBoxables().values().size() == 0);
 
   }
