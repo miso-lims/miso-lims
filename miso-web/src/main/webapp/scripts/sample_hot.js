@@ -146,7 +146,7 @@ Sample.hot = {
    * Creates the project dorpdown and adds it to the page
    */
   addProjectSelect: function () {
-    Sample.hot.projectsArray = Hot.sortByProperty(Hot.dropdownRef.projects, 'id');
+    Sample.hot.projectsArray = Hot.sortByProperty(Hot.dropdownRef.projects, 'alias');
     var select = [];
     select.push('<option value="">Select project</option>');
     for (var i=0; i<Sample.hot.projectsArray.length; i++) {
@@ -172,7 +172,7 @@ Sample.hot = {
       return null;
     }
     var projectId = document.getElementById('projectSelect').value;
-    var filteredSubprojects = Hot.sortByProperty(Sample.hot.filterSubprojectsByProjectId(projectId), 'id');
+    var filteredSubprojects = Hot.sortByProperty(Sample.hot.filterSubprojectsByProjectId(projectId), 'alias');
     // display nothing if project has no subprojects
     if (filteredSubprojects.length === 0) {
       document.getElementById('subpSelectOptions').style.display = 'none';
@@ -203,6 +203,11 @@ Sample.hot = {
     return rtn;
   },
 
+  compareSampleClass: function(a, b) {
+    var categories = ['Identity', 'Tissue', 'Tissue Processing', 'Stock', 'Aliquot'];
+    return (categories.indexOf(a.sampleCategory) - categories.indexOf(b.sampleCategory)) || a.alias.localeCompare(b.alias);
+  },
+
   /**
    * Creates dropdown for sample classes
    */
@@ -223,7 +228,7 @@ Sample.hot = {
    * Returns the SampleClasses which may be created without an existing parent
    */
   getNewSampleClassOptions: function () {
-    var classes = Hot.sortByProperty(Hot.sampleOptions.sampleClassesDtos, 'id');
+    var classes = Hot.sampleOptions.sampleClassesDtos.sort(Sample.hot.compareSampleClass);
     return classes.filter(function(sc) { return sc.canCreateNew; });
   },
 
@@ -235,7 +240,7 @@ Sample.hot = {
   },
 
   getTissueClassesAliasOnly: function () {
-    var classes = Hot.sortByProperty(Hot.sampleOptions.sampleClassesDtos, 'id');
+    var classes = Hot.sampleOptions.sampleClassesDtos.sort(Sample.hot.compareSampleClass);
     var options = [];
     for (var i=0; i<classes.length; i++) {
       if (classes[i].sampleCategory === 'Tissue') {
@@ -495,7 +500,7 @@ Sample.hot = {
    * Gets array of subproject aliases (detailed sample only)
    */
   getSubprojects: function() {
-    return Hot.sortByProperty(Hot.sampleOptions.subprojectsDtos, 'id').map(Hot.getAlias);
+    return Hot.sortByProperty(Hot.sampleOptions.subprojectsDtos, 'alias').map(Hot.getAlias);
   },
 
   /**
@@ -530,27 +535,27 @@ Sample.hot = {
    * Gets array of tissue type aliases (detailed sample only)
    */
   getTissueTypes: function () {
-    return Hot.sortByProperty(Hot.sampleOptions.tissueTypesDtos, 'alias').map(function (to) { return to.label; });
+    return Hot.sortByProperty(Hot.sampleOptions.tissueTypesDtos, 'alias').reverse().map(function (to) { return to.label; });
   },
 
   /**
    * Gets array of tissue material aliases (detailed sample only)
    */
   getTissueMaterials: function () {
-    return Hot.sortByProperty(Hot.sampleOptions.tissueMaterialsDtos, 'id').map(Hot.getAlias);
+    return Hot.sortByProperty(Hot.sampleOptions.tissueMaterialsDtos, 'alias').map(Hot.getAlias);
   },
 
   /**
    * Gets array of sample class aliases (detailed sample only)
    */
   getSampleClasses: function () {
-    return Hot.sortByProperty(Hot.sampleOptions.sampleClassesDtos, 'id').map(Hot.getAlias);
+    return Hot.sampleOptions.sampleClassesDtos.sort(Sample.hot.compareSampleClass).map(Hot.getAlias);
   },
   
   getSampleClassesByCategory: function () {
-    return Hot.sortByProperty(Hot.sampleOptions.sampleClassesDtos, 'id')
-              .filter(function (sc) { return sc.sampleCategory == Sample.hot.sampleCategory; })
-              .map(Hot.getAlias);
+    return (Hot.sampleOptions.sampleClassesDtos.sort(Sample.hot.compareSampleClass)
+               .filter(function (sc) { return sc.sampleCategory == Sample.hot.sampleCategory; })
+               .map(Hot.getAlias));
   },
 
   /**
@@ -558,7 +563,7 @@ Sample.hot = {
    */
   getValidClassesForParent: function (parentScId) {
     var parentTissueSampleClassId = parentScId;
-    return Hot.sortByProperty(Hot.sampleOptions.sampleValidRelationshipsDtos, 'id')
+    return Hot.sortByProperty(Hot.sampleOptions.sampleValidRelationshipsDtos, 'alias')
                .filter(function (rel) { return rel.parentId == parentTissueSampleClassId; })
                .map(function (rel) { return Hot.getAliasFromId(rel.childId, Hot.sampleOptions.sampleClassesDtos); });
   },
@@ -567,7 +572,7 @@ Sample.hot = {
    * Gets array of sample purpose aliases (detailed sample only)
    */
   getSamplePurposes: function () {
-    return Hot.sortByProperty(Hot.sampleOptions.samplePurposesDtos, 'id').map(Hot.getAlias);
+    return Hot.sortByProperty(Hot.sampleOptions.samplePurposesDtos, 'alias').map(Hot.getAlias);
   },
 
   /**
@@ -581,7 +586,7 @@ Sample.hot = {
    * Gets array of lab custom aliases (with institute alias) (detailed sample only)
    */
   getLabs: function () {
-    return Hot.sortByProperty(Hot.sampleOptions.labsDtos,'id').map(function (lab) { return lab.alias +' - '+ lab.instituteAlias; });
+    return Hot.sortByProperty(Hot.sampleOptions.labsDtos,'alias').map(function (lab) { return lab.alias +' - '+ lab.instituteAlias; });
   },
 
   /**

@@ -76,6 +76,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.EntityGroup;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
+import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity.DonorSex;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -90,6 +91,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
@@ -403,9 +405,14 @@ public class EditSampleController {
   @Autowired
   private SampleClassService sampleClassService;
 
-  private static final Comparator<SampleClass> SAMPLECLASS_ALIAS = new Comparator<SampleClass>() {
+  private static final List<String> CATEGORIES = Arrays.asList(Identity.CATEGORY_NAME, SampleTissue.CATEGORY_NAME,
+      SampleTissueProcessing.CATEGORY_NAME, SampleStock.CATEGORY_NAME, SampleAliquot.CATEGORY_NAME);
+
+  private static final Comparator<SampleClass> SAMPLECLASS_CATEGORY_ALIAS = new Comparator<SampleClass>() {
     @Override
     public int compare(SampleClass o1, SampleClass o2) {
+      int categoryOrder = CATEGORIES.indexOf(o1.getSampleCategory()) - CATEGORIES.indexOf(o2.getSampleCategory());
+      if (categoryOrder != 0) return categoryOrder;
       return o1.getAlias().compareTo(o2.getAlias());
     }
   };
@@ -427,9 +434,9 @@ public class EditSampleController {
         sampleClasses.add(sc);
       }
     }
-    Collections.sort(sampleClasses, SAMPLECLASS_ALIAS);
-    Collections.sort(tissueClasses, SAMPLECLASS_ALIAS);
-    Collections.sort(stockClasses, SAMPLECLASS_ALIAS);
+    Collections.sort(sampleClasses, SAMPLECLASS_CATEGORY_ALIAS);
+    Collections.sort(tissueClasses, SAMPLECLASS_CATEGORY_ALIAS);
+    Collections.sort(stockClasses, SAMPLECLASS_CATEGORY_ALIAS);
     model.put("sampleClasses", sampleClasses);
     model.put("tissueClasses", tissueClasses);
     model.put("stockClasses", stockClasses);
