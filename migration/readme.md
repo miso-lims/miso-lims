@@ -37,8 +37,10 @@ mvn clean install
 From the migration directory after building:
 
 ```
-java -jar target/migration-{version}-jar-with-dependencies.jar {properties-file}
+java -Dlog4j.configuration=load-generator.log4j.properties -jar target/migration-{version}-jar-with-dependencies.jar {properties-file}
 ```
 
-Replace `{version}` with the MISO version. Replace `{properties-file}` with the path to the properties file 
-containing configuration for the migration you wish to perform
+Replace `{version}` with the MISO version. Replace `{properties-file}` with the path to the properties file containing configuration 
+for the migration you wish to perform. You may provide a different log4j configuration file, or choose not to use one at all, in which
+case there will be very little output. The configuration file referenced above is included
+[here](src/main/resources/load-generator.log4j.properties)
