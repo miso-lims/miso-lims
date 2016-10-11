@@ -273,10 +273,10 @@ public class BoxControllerHelperServiceTestSuite {
     assertNotNull(box.getBoxable("A01"));
     assertFalse(sample.isDiscarded());
     
-    JSONObject response = boxControllerHelperService.emptySingleTube(null, json);
+    JSONObject response = boxControllerHelperService.discardSingleTube(null, json);
     assertFalse(response.has("error"));
     assertTrue(response.has("boxJSON"));
-    verify(requestManager).emptySingleTube(box, "A01");
+    verify(requestManager).discardSingleTube(box, "A01");
   }
   
   @Test
@@ -389,11 +389,11 @@ public class BoxControllerHelperServiceTestSuite {
     user.setAdmin(true);
     when(authorizationManager.getCurrentUser()).thenReturn(user);
     
-    JSONObject response = boxControllerHelperService.emptyEntireBox(null, json);
+    JSONObject response = boxControllerHelperService.discardEntireBox(null, json);
     System.out.println(response.toString(2));
     assertFalse(response.has("error"));
     assertTrue(response.has("boxJSON"));
-    verify(requestManager).emptyAllTubes(box);
+    verify(requestManager).discardAllTubes(box);
     // box DAO is responsible for actually emptying and removing the tubes
   }
   

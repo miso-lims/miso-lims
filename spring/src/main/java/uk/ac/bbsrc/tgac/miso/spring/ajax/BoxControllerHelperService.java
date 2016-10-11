@@ -447,7 +447,7 @@ public class BoxControllerHelperService {
    *          session, JSONObject json
    * @returns JSONObject message indicating failure or success
    */
-  public JSONObject emptySingleTube(HttpSession session, JSONObject json) {
+  public JSONObject discardSingleTube(HttpSession session, JSONObject json) {
     User user;
     Box box;
     JSONObject response = new JSONObject();
@@ -470,24 +470,24 @@ public class BoxControllerHelperService {
         }
 
         if (box.isFreePosition(position)) {
-          return JSONUtils.SimpleJSONError("No item to delete at position " + position + "!");
+          return JSONUtils.SimpleJSONError("No item to discard at position " + position + "!");
         }
         if (!box.isValidPosition(position)) {
           return JSONUtils.SimpleJSONError("Invalid position selected!");
         }
 
         try {
-          requestManager.emptySingleTube(box, position);
+          requestManager.discardSingleTube(box, position);
           box = requestManager.getBoxById(boxId);
           ObjectMapper mapper = new ObjectMapper();
           response.put("boxJSON", mapper.writer().writeValueAsString(box));
         } catch (IOException e) {
-          log.debug("Failed to empty single tube", e);
-          return JSONUtils.SimpleJSONError("Failed to empty single tube: " + e.getMessage());
+          log.debug("Failed to discard single tube", e);
+          return JSONUtils.SimpleJSONError("Failed to discard single tube: " + e.getMessage());
         }
 
       } else {
-        return JSONUtils.SimpleJSONError("Please select a position to empty");
+        return JSONUtils.SimpleJSONError("Please select a position to discard");
       }
     }
     return response;
@@ -503,7 +503,7 @@ public class BoxControllerHelperService {
    *          must contain a "boxId" field
    * @returns JSONObject message indicating failure or success
    */
-  public JSONObject emptyEntireBox(HttpSession session, JSONObject json) {
+  public JSONObject discardEntireBox(HttpSession session, JSONObject json) {
     User user;
     Box box;
     JSONObject response = new JSONObject();
@@ -525,20 +525,20 @@ public class BoxControllerHelperService {
         }
 
         try {
-          requestManager.emptyAllTubes(box); // box save is performed as part of this method
+          requestManager.discardAllTubes(box); // box save is performed as part of this method
           box = requestManager.getBoxById(boxId);
           ObjectMapper mapper = new ObjectMapper();
           response.put("boxJSON", mapper.writer().writeValueAsString(box));
           return response;
         } catch (IOException e) {
-          log.debug("Error emptying box", e);
-          return JSONUtils.SimpleJSONError("Error emptying box: " + e.getMessage());
+          log.debug("Error discarding box", e);
+          return JSONUtils.SimpleJSONError("Error discarding box: " + e.getMessage());
         }
       } else {
-        return JSONUtils.SimpleJSONError("No box specified to empty.");
+        return JSONUtils.SimpleJSONError("No box specified to discard.");
       }
     } else {
-      return JSONUtils.SimpleJSONError("Only logged-in admins can empty boxes.");
+      return JSONUtils.SimpleJSONError("Only logged-in admins can discard boxes.");
     }
   }
 
