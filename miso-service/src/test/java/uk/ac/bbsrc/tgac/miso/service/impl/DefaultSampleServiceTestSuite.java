@@ -1,10 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.util.Date;
@@ -25,10 +21,10 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Lists;
 
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
@@ -57,7 +53,6 @@ import uk.ac.bbsrc.tgac.miso.persistence.TissueOriginDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueTypeDao;
 import uk.ac.bbsrc.tgac.miso.service.DetailedSampleService;
 import uk.ac.bbsrc.tgac.miso.service.SampleNumberPerProjectService;
-import uk.ac.bbsrc.tgac.miso.service.SampleTissueService;
 import uk.ac.bbsrc.tgac.miso.service.SampleValidRelationshipService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLProjectDAO;
@@ -87,9 +82,6 @@ public class DefaultSampleServiceTestSuite {
 
   @Mock
   private SampleNumberPerProjectService sampleNumberPerProjectService;
-
-  @Mock
-  private SampleTissueService sampleTissueService;
 
   @Mock
   private ProjectStore projectStore;

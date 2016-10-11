@@ -16,20 +16,23 @@ import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletion;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstituteImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAdditionalInfoImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrderImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleCVSlideImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleDerivedInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleGroupImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleLCMTubeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleNumberPerProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SamplePurposeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleStockImpl;
@@ -70,13 +73,45 @@ public class MisoTargetUtils {
     // TODO: use setPackagesToScan instead after fixing annotations
     // bean.setPackagesToScan("uk.ac.bbsrc.tgac.miso.core.data");
     bean.setAnnotatedClasses(
-        new Class[] { TissueOriginImpl.class, TissueTypeImpl.class, SampleClassImpl.class, SubprojectImpl.class, DetailedQcStatusImpl.class,
-            SamplePurposeImpl.class, SampleGroupImpl.class, TissueMaterialImpl.class, SampleAliquotImpl.class, SampleStockImpl.class,
-            UserImpl.class, AbstractSample.class, IdentityImpl.class, AbstractProject.class, PoolOrderImpl.class, PoolOrderCompletion.class,
-            ProjectImpl.class, SampleImpl.class, SampleDerivedInfo.class, DetailedSampleImpl.class, KitDescriptor.class,
-            SampleValidRelationshipImpl.class, SampleNumberPerProjectImpl.class, SampleTissueImpl.class, SequencingParametersImpl.class,
-            InstituteImpl.class, LabImpl.class, ReferenceGenomeImpl.class, AbstractLibrary.class, LibraryAdditionalInfoImpl.class,
-            LibraryDesign.class, LibraryType.class, Index.class, IndexFamily.class });
+        new Class[] {
+            TissueOriginImpl.class,
+            TissueTypeImpl.class,
+            SampleClassImpl.class,
+            SubprojectImpl.class,
+            DetailedQcStatusImpl.class,
+            SamplePurposeImpl.class,
+            SampleGroupImpl.class,
+            TissueMaterialImpl.class,
+            SampleAliquotImpl.class,
+            SampleStockImpl.class,
+            UserImpl.class,
+            AbstractSample.class,
+            IdentityImpl.class,
+            AbstractProject.class,
+            PoolOrderImpl.class,
+            PoolOrderCompletion.class,
+            ProjectImpl.class,
+            SampleImpl.class,
+            SampleDerivedInfo.class,
+            DetailedSampleImpl.class,
+            KitDescriptor.class,
+            SampleValidRelationshipImpl.class,
+            SampleNumberPerProjectImpl.class,
+            SampleTissueImpl.class,
+            SampleTissueProcessing.class,
+            SampleCVSlideImpl.class,
+            SampleLCMTubeImpl.class,
+            SequencingParametersImpl.class,
+            InstituteImpl.class,
+            LabImpl.class,
+            ReferenceGenomeImpl.class,
+            AbstractLibrary.class,
+            LibraryAdditionalInfoImpl.class,
+            LibraryDesign.class,
+            LibraryType.class,
+            Index.class,
+            IndexFamily.class
+        });
     Properties properties = new Properties();
     properties.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQL5InnoDBDialect");
     properties.setProperty("hibernate.show_sql", "false");
