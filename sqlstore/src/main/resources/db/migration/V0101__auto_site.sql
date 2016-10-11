@@ -1,3 +1,11 @@
+-- add_truseq_methylation_kit
+--StartNoTest
+INSERT INTO KitDescriptor(name, version, manufacturer, partNumber, stockLevel, kitType, platformType, description, lastModifier)
+VALUES ('TruSeq Methylation Epic Exome', 0, 'Illumina', 1, 0, 'Library', 'Illumina', 'n/a', 1);
+--EndNoTest
+
+-- missing_things_archived_svrs
+--StartNoTest
 --StartNoTest
 SET @time = NOW();
 SELECT userId INTO @user FROM User WHERE loginName = 'admin';
@@ -20,3 +28,15 @@ VALUES (
   @user, @time, @user, @time, 1
 );
 --EndNoTest
+--EndNoTest
+
+-- remove_unintended_svrs
+--StartNoTest
+--StartNoTest
+DELETE svr FROM SampleValidRelationship svr
+JOIN SampleClass parent ON parent.sampleClassId = svr.parentId
+JOIN SampleClass child ON child.sampleClassId = svr.childId
+WHERE parent.sampleCategory = 'Identity' AND child.sampleCategory <> 'Tissue';
+--EndNoTest
+--EndNoTest
+

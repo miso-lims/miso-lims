@@ -2,10 +2,8 @@ package uk.ac.bbsrc.tgac.miso.sqlstore;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasEntry;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
@@ -55,7 +53,7 @@ public class SQLKitDAOTest extends AbstractDAOTest {
   @Mock
   private ChangeLogStore changeLogDAO;
 
-  private User user = new UserImpl();
+  private final User user = new UserImpl();
 
   @Before
   public void setUp() throws Exception {
@@ -171,27 +169,27 @@ public class SQLKitDAOTest extends AbstractDAOTest {
   @Test
   public void testListAllKitDescriptors() throws IOException {
     List<KitDescriptor> kitDescriptors = dao.listAllKitDescriptors();
-    assertThat(kitDescriptors.size(), is(122));
+    assertThat(kitDescriptors.size(), is(121));
   }
 
   @Test
   public void testListKitDescriptorsByType() throws IOException {
     List<KitDescriptor> kitDescriptors = dao.listKitDescriptorsByType(KitType.LIBRARY);
-    assertThat(kitDescriptors.size(), is(35));
+    assertThat(kitDescriptors.size(), is(34));
   }
 
   @Test
   public void testListKitDescriptorsByPlatform() throws IOException {
     List<KitDescriptor> kitDescriptors = dao.listKitDescriptorsByPlatform(PlatformType.ILLUMINA);
-    assertThat(kitDescriptors.size(), is(2));
+    assertThat(kitDescriptors.size(), is(1));
   }
 
   @Test
   public void testSaveKitDescriptor() throws IOException {
     KitDescriptor newKitDescriptor = makeNewKitDescriptor();
     newKitDescriptor.setLastModifier(user);
-    assertThat(dao.saveKitDescriptor(newKitDescriptor), is(123L));
-    KitDescriptor savedKitDescriptor = dao.getKitDescriptorById(123L);
+    assertThat(dao.saveKitDescriptor(newKitDescriptor), is(122L));
+    KitDescriptor savedKitDescriptor = dao.getKitDescriptorById(122L);
     assertThat(newKitDescriptor.getName(), is(savedKitDescriptor.getName()));
   }
 
