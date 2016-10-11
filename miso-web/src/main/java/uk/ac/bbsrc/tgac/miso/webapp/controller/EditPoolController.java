@@ -153,17 +153,6 @@ public class EditPoolController {
     return requestManager.getPoolColumnSizes();
   }
 
-  private List<? extends Dilution> populateAvailableDilutions(Pool pool) throws IOException {
-    ArrayList<LibraryDilution> libs = new ArrayList<LibraryDilution>();
-    for (Dilution l : requestManager.listAllLibraryDilutionsByPlatform(PlatformType.ILLUMINA)) {
-      if (!pool.getDilutions().contains(l)) {
-        libs.add((LibraryDilution) l);
-      }
-    }
-    Collections.sort(libs);
-    return libs;
-  }
-
   public Collection<Experiment> populateExperiments(Long experimentId, Pool p) throws IOException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
@@ -220,7 +209,6 @@ public class EditPoolController {
 
       model.put("formObj", pool);
       model.put("pool", pool);
-      model.put("availableDilutions", populateAvailableDilutions(pool));
       model.put("accessibleExperiments", populateExperiments(null, pool));
       model.put("owners", LimsSecurityUtils.getPotentialOwners(user, pool, securityManager.listAllUsers()));
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, pool, securityManager.listAllUsers()));
@@ -265,8 +253,6 @@ public class EditPoolController {
 
       model.put("formObj", pool);
       model.put("pool", pool);
-      model.put("availableDilutions", populateAvailableDilutions(pool));
-
       model.put("owners", LimsSecurityUtils.getPotentialOwners(user, pool, securityManager.listAllUsers()));
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, pool, securityManager.listAllUsers()));
       model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, pool, securityManager.listAllGroups()));
@@ -297,50 +283,6 @@ public class EditPoolController {
 
     });
     return selected;
-  }
-
-  @Deprecated
-  @RequestMapping(value = "/new/dilution/{dilutionId}/platform/{platform}", method = RequestMethod.GET)
-  public ModelAndView setupFormWithDilution(@PathVariable Long dilutionId, String platform, ModelMap model) throws IOException {
-    try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Pool pool = dataObjectFactory.getPool(user);
-      model.put("title", "New Pool");
-
-      if (pool == null) {
-        throw new SecurityException("No such Pool");
-      }
-
-      if (!pool.userCanRead(user)) {
-        throw new SecurityException("Permission denied.");
-      }
-
-      if (dilutionId != null) {
-        Dilution ld = requestManager.getDilutionByIdAndPlatform(dilutionId, PlatformType.get(platform));
-        if (ld != null) {
-          pool.addPoolableElement(ld);
-        }
-      }
-
-      model.put("formObj", pool);
-      model.put("pool", pool);
-      model.put("availableDilutions", populateAvailableDilutions(pool));
-      model.put("accessibleExperiments", populateExperiments(null, pool));
-      model.put("owners", LimsSecurityUtils.getPotentialOwners(user, pool, securityManager.listAllUsers()));
-      model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, pool, securityManager.listAllUsers()));
-      model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, pool, securityManager.listAllGroups()));
-      model.put("platforms", getFilteredPlatforms(pool.getPlatformType()));
-
-      return new ModelAndView("/pages/editPool.jsp", model);
-    } catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to show pool", ex);
-      }
-      throw ex;
-    } catch (MalformedDilutionException e) {
-      log.error("setup form with dilution", e);
-      throw new IOException(e);
-    }
   }
 
   @RequestMapping(value = "/import", method = RequestMethod.POST)
