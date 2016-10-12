@@ -406,7 +406,7 @@ public class SQLPoolDAO implements PoolStore {
   private void purgeListCache(Pool p, boolean replace) {
     if (cacheManager != null) {
       Cache cache = cacheManager.getCache("poolListCache");
-      DbUtils.updateListCache(cache, replace, p, Pool.class);
+      DbUtils.updateListCache(cache, replace, p);
     }
   }
 

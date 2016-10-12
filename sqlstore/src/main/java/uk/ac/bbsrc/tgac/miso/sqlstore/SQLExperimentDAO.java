@@ -51,6 +51,7 @@ import com.googlecode.ehcache.annotations.TriggersRemove;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
+
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractExperiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
@@ -71,8 +72,8 @@ import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.core.store.StudyStore;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
-import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.BridgeCollectionUpdater;
+import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 /**
  * A data access object designed for retrieving Experiments from the LIMS database. This DAO should be configured with a spring
@@ -270,7 +271,7 @@ public class SQLExperimentDAO implements ExperimentStore {
   @CoverageIgnore
   private void purgeListCache(Experiment experiment, boolean replace) {
     Cache cache = cacheManager.getCache("experimentListCache");
-    DbUtils.updateListCache(cache, replace, experiment, Experiment.class);
+    DbUtils.updateListCache(cache, replace, experiment);
   }
 
   @CoverageIgnore
