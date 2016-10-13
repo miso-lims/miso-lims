@@ -34,13 +34,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
 
 import javax.persistence.CascadeType;
-
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,6 +56,10 @@ import com.googlecode.ehcache.annotations.Cacheable;
 import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.Property;
 import com.googlecode.ehcache.annotations.TriggersRemove;
+
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
@@ -289,7 +288,7 @@ public class SQLRunDAO implements RunStore {
     if (cacheManager == null) return;
 
     Cache cache = cacheManager.getCache("runListCache");
-    DbUtils.updateListCache(cache, replace, run, Run.class);
+    DbUtils.updateListCache(cache, replace, run);
   }
 
   private void purgeListCache(Run run) {

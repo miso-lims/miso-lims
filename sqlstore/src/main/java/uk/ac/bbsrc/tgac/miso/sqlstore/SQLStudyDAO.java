@@ -28,7 +28,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
 
 import javax.persistence.CascadeType;
 
@@ -51,6 +50,7 @@ import com.googlecode.ehcache.annotations.TriggersRemove;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
+
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractStudy;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -66,8 +66,8 @@ import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.core.store.StudyStore;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
-import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.BridgeCollectionUpdater;
+import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 /**
  * uk.ac.bbsrc.tgac.miso.sqlstore
@@ -199,7 +199,7 @@ public class SQLStudyDAO implements StudyStore {
 
   private void purgeListCache(Study s, boolean replace) {
     Cache cache = cacheManager.getCache("studyListCache");
-    DbUtils.updateListCache(cache, replace, s, Study.class);
+    DbUtils.updateListCache(cache, replace, s);
   }
 
   @CoverageIgnore

@@ -9,18 +9,11 @@ package uk.ac.bbsrc.tgac.miso.core.data;
  * @date 13/09/12
  * @since 0.1.8
  */
-public interface Nameable {
+public interface Nameable extends Identifiable {
   /**
    * Returns the name of this Nameable object.
    * 
    * @return String name.
    */
   public String getName();
-
-  /**
-   * Returns the unique ID of this Nameable object.
-   * 
-   * @return long id.
-   */
-  public long getId();
 }

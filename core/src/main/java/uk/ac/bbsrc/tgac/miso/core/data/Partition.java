@@ -41,7 +41,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 @JsonIgnoreProperties({ "securityProfile", "submissionDocument" })
-public interface Partition extends SecurableByProfile, Comparable {
+public interface Partition extends SecurableByProfile, Identifiable, Comparable {
   /**
    * Returns the sequencerPartitionContainer of this Partition object.
    * 
@@ -56,13 +56,6 @@ public interface Partition extends SecurableByProfile, Comparable {
    *          sequencerPartitionContainer.
    */
   void setSequencerPartitionContainer(SequencerPartitionContainer sequencerPartitionContainer);
-
-  /**
-   * Returns the id of this Partition object.
-   * 
-   * @return Long id.
-   */
-  long getId();
 
   /**
    * Sets the id of this Partition object.

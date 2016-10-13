@@ -348,7 +348,7 @@ public class SQLLibraryDAO implements LibraryStore {
   private void purgeListCache(Library l, boolean replace) {
     if (cacheManager != null) {
       Cache cache = cacheManager.getCache("libraryListCache");
-      DbUtils.updateListCache(cache, replace, l, Library.class);
+      DbUtils.updateListCache(cache, replace, l);
     }
   }
 

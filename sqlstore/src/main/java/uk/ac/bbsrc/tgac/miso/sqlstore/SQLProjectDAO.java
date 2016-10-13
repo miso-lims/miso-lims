@@ -30,13 +30,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
 
 import javax.persistence.CascadeType;
-
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,6 +51,10 @@ import com.googlecode.ehcache.annotations.Cacheable;
 import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.Property;
 import com.googlecode.ehcache.annotations.TriggersRemove;
+
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractProject;
 import uk.ac.bbsrc.tgac.miso.core.data.EntityGroup;
@@ -80,8 +79,8 @@ import uk.ac.bbsrc.tgac.miso.core.store.WatcherStore;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.persistence.ReferenceGenomeDao;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
-import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.BridgeCollectionUpdater;
+import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 /**
  * uk.ac.bbsrc.tgac.miso.sqlstore
@@ -284,7 +283,7 @@ public class SQLProjectDAO implements ProjectStore {
   private void purgeListCache(Project p, boolean replace) {
     if (cacheManager != null) {
       Cache cache = cacheManager.getCache("projectListCache");
-      DbUtils.updateListCache(cache, replace, p, Project.class);
+      DbUtils.updateListCache(cache, replace, p);
     }
   }
 
