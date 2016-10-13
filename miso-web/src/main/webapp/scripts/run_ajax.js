@@ -282,7 +282,8 @@ Run.qc = {
 Run.ui = {
   editContainerIdBarcode: function (span, fc) {
     var s = jQuery(span);
-    s.html("<input type='text' id='sequencerPartitionContainers[" + fc + "].identificationBarcode' name='sequencerPartitionContainers[" + fc + "].identificationBarcode' value='" + s.html() + "'/>" +
+    var barcodeText = jQuery('a[title="idBarcode"]').text();
+    s.html("<input type='text' id='sequencerPartitionContainers[" + fc + "].identificationBarcode' name='sequencerPartitionContainers[" + fc + "].identificationBarcode' value='" + barcodeText + "'/>" +
            "<button onclick='Run.container.lookupContainer(this, " + fc + ");' type='button' class='fg-button ui-state-default ui-corner-all'>Lookup</button>");
     if (jQuery('#pencil')) jQuery('#pencil').hide();
   },
