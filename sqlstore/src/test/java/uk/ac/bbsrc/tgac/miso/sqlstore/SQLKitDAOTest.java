@@ -1,20 +1,16 @@
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
-import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.Matchers.hasEntry;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.when;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-
-import com.eaglegenomics.simlims.core.User;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -25,6 +21,8 @@ import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import com.eaglegenomics.simlims.core.User;
+
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
@@ -33,8 +31,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.LibraryKit;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
+import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
 
 public class SQLKitDAOTest extends AbstractDAOTest {
@@ -55,7 +53,7 @@ public class SQLKitDAOTest extends AbstractDAOTest {
   @Mock
   private ChangeLogStore changeLogDAO;
 
-  private User user = new UserImpl();
+  private final User user = new UserImpl();
 
   @Before
   public void setUp() throws Exception {
@@ -171,27 +169,28 @@ public class SQLKitDAOTest extends AbstractDAOTest {
   @Test
   public void testListAllKitDescriptors() throws IOException {
     List<KitDescriptor> kitDescriptors = dao.listAllKitDescriptors();
-    assertThat(kitDescriptors.size(), is(121));
+    assertThat(kitDescriptors.size(), not(0));
   }
 
   @Test
   public void testListKitDescriptorsByType() throws IOException {
     List<KitDescriptor> kitDescriptors = dao.listKitDescriptorsByType(KitType.LIBRARY);
-    assertThat(kitDescriptors.size(), is(34));
+    assertThat(kitDescriptors.size(), not(0));
   }
 
   @Test
   public void testListKitDescriptorsByPlatform() throws IOException {
     List<KitDescriptor> kitDescriptors = dao.listKitDescriptorsByPlatform(PlatformType.ILLUMINA);
-    assertThat(kitDescriptors.size(), is(1));
+    assertThat(kitDescriptors.size(), not(0));
   }
 
   @Test
   public void testSaveKitDescriptor() throws IOException {
     KitDescriptor newKitDescriptor = makeNewKitDescriptor();
     newKitDescriptor.setLastModifier(user);
-    assertThat(dao.saveKitDescriptor(newKitDescriptor), is(122L));
-    KitDescriptor savedKitDescriptor = dao.getKitDescriptorById(122L);
+    long id = dao.saveKitDescriptor(newKitDescriptor);
+    assertThat(id, not(0L));
+    KitDescriptor savedKitDescriptor = dao.getKitDescriptorById(id);
     assertThat(newKitDescriptor.getName(), is(savedKitDescriptor.getName()));
   }
 
