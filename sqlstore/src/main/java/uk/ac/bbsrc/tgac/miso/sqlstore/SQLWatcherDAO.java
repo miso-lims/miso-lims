@@ -129,7 +129,7 @@ public class SQLWatcherDAO implements WatcherStore {
         fInsert.execute(fcParams);
         log.debug("DAO insert of " + user.getUserId() + " on " + watchable.getWatchableIdentifier());
       } catch (DuplicateKeyException dke) {
-        log.error("This Watcher combination already exists - not inserting", dke);
+        // user is already watching this entity, so error doesn't change behaviour
       }
     }
   }
