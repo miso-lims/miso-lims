@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.google.common.collect.Lists;
@@ -52,7 +53,7 @@ public enum PlatformType {
   /**
    * Field lookup
    */
-  private static final Map<String, PlatformType> lookup = new HashMap<String, PlatformType>();
+  private static final Map<String, PlatformType> lookup = new HashMap<>();
 
   static {
     for (PlatformType s : EnumSet.allOf(PlatformType.class))
@@ -98,15 +99,15 @@ public enum PlatformType {
    * @return ArrayList<String> keys.
    */
   public static ArrayList<String> getKeys() {
-    ArrayList<String> keys = new ArrayList<String>();
+    ArrayList<String> keys = new ArrayList<>();
     for (PlatformType r : PlatformType.values()) {
       keys.add(r.getKey());
     }
     return keys;
   }
 
-  public static Collection<String> platformTypeNames(Collection<PlatformType> platformTypes) {
-    Collection<String> result = Lists.newArrayList();
+  public static List<String> platformTypeNames(Collection<PlatformType> platformTypes) {
+    List<String> result = Lists.newArrayList();
     for (PlatformType platformType : platformTypes) {
       result.add(platformType.getKey());
     }
