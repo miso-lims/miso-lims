@@ -36,7 +36,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl.IdentityBuilder;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
-import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -89,9 +88,6 @@ public class DefaultSampleService implements SampleService {
 
   @Autowired
   private SubprojectDao subProjectDao;
-
-  @Autowired
-  private KitStore kitStore;
 
   @Autowired
   private SamplePurposeDao samplePurposeDao;
@@ -149,10 +145,6 @@ public class DefaultSampleService implements SampleService {
 
   public void setSubProjectDao(SubprojectDao subProjectDao) {
     this.subProjectDao = subProjectDao;
-  }
-
-  public void setKitStore(KitStore kitStore) {
-    this.kitStore = kitStore;
   }
 
   public void setSamplePurposeDao(SamplePurposeDao samplePurposeDao) {
@@ -412,9 +404,6 @@ public class DefaultSampleService implements SampleService {
       }
       if (sai.getSubproject() != null && sai.getSubproject().getId() != null) {
         sai.setSubproject(subProjectDao.getSubproject(sai.getSubproject().getId()));
-      }
-      if (sai.getPrepKit() != null && sai.getPrepKit().getId() != null) {
-        sai.setPrepKit(kitStore.getKitDescriptorById(sai.getPrepKit().getId()));
       }
       if (isAliquotSample(sai)) {
         SampleAliquot sa = (SampleAliquot) sai;

@@ -473,7 +473,6 @@ public class MisoServiceManager {
     svc.setNamingScheme(getNameableNamingScheme(Sample.class));
     svc.setSampleNamingScheme(getSampleNamingScheme());
     svc.setProjectStore(projectDao);
-    svc.setKitStore(kitDao);
     svc.setDetailedQcStatusDao(detailedQcStatusDao);
     svc.setSampleClassDao(sampleClassDao);
     svc.setSampleNumberPerProjectService(sampleNumberPerProjectService);
@@ -791,7 +790,6 @@ public class MisoServiceManager {
 
   private void updateKitDaoDependencies() {
     if (experimentDao != null) experimentDao.setKitDAO(kitDao);
-    if (sampleService != null) sampleService.setKitStore(kitDao);
     if (libraryAdditionalInfoDao != null) libraryAdditionalInfoDao.setKitStore(kitDao);
   }
 
