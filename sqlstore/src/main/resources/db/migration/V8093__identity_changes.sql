@@ -1,1 +1,0 @@
-ALTER TABLE `Identity` DROP COLUMN internalName;

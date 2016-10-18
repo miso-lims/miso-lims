@@ -1,3 +1,10 @@
+-- identity_changes
+
+ALTER TABLE `Identity` DROP COLUMN internalName;
+
+
+-- unique_kitDescriptors
+
 /*
 * This migration cleans up some data that was added in a previous migration (V0002), merging/removing KitDescriptors with
 * duplicate names. If any other duplicates have been added, they must be resolved manually before this migration will succeed.
@@ -123,3 +130,5 @@ DROP FUNCTION kitExists;
 ALTER TABLE KitDescriptor ADD CONSTRAINT uk_kitDescriptor_name UNIQUE (name);
 
 --EndNoTest
+
+
