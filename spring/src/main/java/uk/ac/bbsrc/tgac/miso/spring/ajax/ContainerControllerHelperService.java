@@ -50,6 +50,7 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
+
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
@@ -101,7 +102,7 @@ public class ContainerControllerHelperService {
     PlatformType pt = PlatformType.get(newContainerType);
     try {
 
-      Map<String, Object> responseMap = new HashMap<String, Object>();
+      Map<String, Object> responseMap = new HashMap<>();
       if (pt != null) {
         StringBuilder srb = new StringBuilder();
         srb.append("<select name='sequencer' id='sequencerReference' onchange='Container.ui.populateContainerOptions(this);'>");
@@ -203,7 +204,7 @@ public class ContainerControllerHelperService {
     sb.append(
         "<tr><td>Validation:</td><td><input type='text' id='validationBarcode' name='validationBarcode'/><input type='hidden' value='on' name='_validationBarcode'></td></tr>");
     sb.append(
-        "<tr><td>Paired:</td><td><input type='checkbox' id='paired' name='paired' value='false'/><input type='hidden' value='on' name='_paired'></td></tr>");
+        "<tr><td>Paired End:</td><td><input type='checkbox' id='paired' name='paired' value='false'/><input type='hidden' value='on' name='_paired'></td></tr>");
     sb.append("</table>");
     sb.append("<div id='partitionErrorDiv'> </div>");
     sb.append("<div id='partitionDiv'>");
@@ -240,6 +241,7 @@ public class ContainerControllerHelperService {
             .getAttribute("container_" + json.getString("container_cId"));
         lf.setPlatform(sr.getPlatform());
 
+        b.append("Number of " + PlatformType.ILLUMINA.getPartitionName() + "s:");
         b.append(
             "<input id='lane2' name='container0Select' onchange='Container.ui.changeContainerIlluminaLane(this, 0);' type='radio' value='2'/>2 ");
         b.append(
@@ -289,6 +291,8 @@ public class ContainerControllerHelperService {
   public JSONObject changeLS454Container(HttpSession session, JSONObject json) {
     StringBuilder b = new StringBuilder();
     b.append(containerInfoHtml(PlatformType.LS454));
+
+    b.append("Number of " + PlatformType.LS454.getPartitionName() + "s:");
     b.append(
         "<input id='chamber1' name='container0Select' onchange='Container.ui.changeContainerLS454Chamber(this, 0);' type='radio' value='1'/>1 ");
     b.append(
@@ -335,6 +339,8 @@ public class ContainerControllerHelperService {
         lf.initEmptyPartitions();
         session.setAttribute("container_" + json.getString("container_cId"), lf);
       } else {
+
+        b.append("Number of " + PlatformType.SOLID.getPartitionName() + "s:");
         b.append(
             "<input id='chamber1' name='container0Select' onchange='Container.ui.changeContainerSolidChamber(this, 0);' type='radio' value='1'/>1 ");
         b.append(
@@ -356,6 +362,7 @@ public class ContainerControllerHelperService {
   public JSONObject changePacBioContainer(HttpSession session, JSONObject json) {
     StringBuilder b = new StringBuilder();
     b.append(containerInfoHtml(PlatformType.PACBIO));
+    b.append("Number of " + PlatformType.PACBIO.getPartitionName() + "s:");
     b.append(
         "<input id='chamber1' name='container0Select' onchange='Container.ui.changeContainerPacBioChamber(this, 0);' type='radio' value='1'/>1 ");
     b.append(
@@ -472,7 +479,7 @@ public class ContainerControllerHelperService {
       Pool<? extends Poolable> p = requestManager.getPoolById(poolId);
       StringBuilder sb = new StringBuilder();
 
-      Set<Project> pooledProjects = new HashSet<Project>();
+      Set<Project> pooledProjects = new HashSet<>();
 
       if (p.getExperiments().size() != 0) {
         // check if each poolable has been in a study for this pool already
@@ -571,7 +578,7 @@ public class ContainerControllerHelperService {
       }
 
       Collection<? extends Poolable> ds = p.getPoolableElements();
-      Set<Project> pooledProjects = new HashSet<Project>();
+      Set<Project> pooledProjects = new HashSet<>();
       for (Poolable d : ds) {
         if (d instanceof Dilution) {
           pooledProjects.add(((Dilution) d).getLibrary().getSample().getProject());
@@ -784,7 +791,7 @@ public class ContainerControllerHelperService {
             }
             sb.append("</table>");
 
-            Map<String, Object> responseMap = new HashMap<String, Object>();
+            Map<String, Object> responseMap = new HashMap<>();
             responseMap.put("html", sb.toString());
             responseMap.put("barcode", f.getIdentificationBarcode());
             responseMap.put("containerId", f.getId());
@@ -939,7 +946,7 @@ public class ContainerControllerHelperService {
 
     String serialNumber = json.getString("serialNumber"); // Want to know if a container with this serial number already exists.
     String containerId = json.getString("containerId"); // Id of the container the serial number will be applied to. Might be null.
-    Map<String, Object> responseMap = new HashMap<String, Object>();
+    Map<String, Object> responseMap = new HashMap<>();
     try {
       Collection<SequencerPartitionContainer<SequencerPoolPartition>> containers = requestManager
           .listSequencerPartitionContainersByBarcode(serialNumber);
