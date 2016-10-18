@@ -48,7 +48,6 @@ import uk.ac.bbsrc.tgac.miso.persistence.SubprojectDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueMaterialDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueOriginDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueTypeDao;
-import uk.ac.bbsrc.tgac.miso.service.DetailedSampleService;
 import uk.ac.bbsrc.tgac.miso.service.LabService;
 import uk.ac.bbsrc.tgac.miso.service.SampleNumberPerProjectService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
@@ -69,9 +68,6 @@ public class DefaultSampleService implements SampleService {
 
   @Autowired
   private SampleClassDao sampleClassDao;
-
-  @Autowired
-  private DetailedSampleService detailedSampleService;
 
   @Autowired
   private SampleValidRelationshipService sampleValidRelationshipService;
@@ -125,10 +121,6 @@ public class DefaultSampleService implements SampleService {
 
   public void setSampleClassDao(SampleClassDao sampleClassDao) {
     this.sampleClassDao = sampleClassDao;
-  }
-
-  public void setDetailedSampleService(DetailedSampleService detailedSampleService) {
-    this.detailedSampleService = detailedSampleService;
   }
 
   public void setSampleValidRelationshipService(SampleValidRelationshipService sampleValidRelationshipService) {
@@ -410,7 +402,6 @@ public class DefaultSampleService implements SampleService {
     if (sample.getProject() != null) {
       sample.setProject(projectStore.lazyGet(sample.getProject().getId()));
     }
-    // TODO: move these to public methods in other DAOs (e.g. detailedSampleDao.loadChildEntities(DetailedSample))
     if (isDetailedSample(sample)) {
       DetailedSample sai = (DetailedSample) sample;
       if (sai.getSampleClass() != null && sai.getSampleClass().getId() != null) {
@@ -513,7 +504,13 @@ public class DefaultSampleService implements SampleService {
     target.setVolume(source.getVolume());
     target.setIdentificationBarcode(source.getIdentificationBarcode());
     if (isDetailedSample(target)) {
-      detailedSampleService.applyChanges((DetailedSample) target, (DetailedSample) source);
+      DetailedSample dTarget = (DetailedSample) target;
+      DetailedSample dSource = (DetailedSample) source;
+      dTarget.setArchived(dSource.getArchived());
+      dTarget.setGroupDescription(dSource.getGroupDescription());
+      dTarget.setGroupId(dSource.getGroupId());
+      dTarget.setDetailedQcStatusNote(dSource.getDetailedQcStatusNote());
+
       if (isIdentitySample(target)) {
         Identity iTarget = (Identity) target;
         Identity iSource = (Identity) source;
