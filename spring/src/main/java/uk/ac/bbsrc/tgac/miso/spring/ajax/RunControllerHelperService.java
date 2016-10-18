@@ -53,6 +53,7 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
+
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
@@ -125,7 +126,7 @@ public class RunControllerHelperService {
 
       if (json.has("runId") && !isStringEmptyOrNull(json.getString("runId"))) {
         // edit existing run
-        Map<String, Object> responseMap = new HashMap<String, Object>();
+        Map<String, Object> responseMap = new HashMap<>();
         runId = Long.parseLong(json.getString("runId"));
         Run storedRun = requestManager.getRunById(runId);
         String storedPlatformType = storedRun.getPlatformType().getKey();
@@ -156,7 +157,7 @@ public class RunControllerHelperService {
         return JSONUtils.JSONObjectResponse(responseMap);
       } else {
         // new run
-        Map<String, Object> responseMap = new HashMap<String, Object>();
+        Map<String, Object> responseMap = new HashMap<>();
 
         PlatformType newPt = PlatformType.get(newRuntype);
         if (newPt != null) {
@@ -186,7 +187,7 @@ public class RunControllerHelperService {
     try {
       SequencerReference sr = requestManager.getSequencerReferenceById(sequencerReferenceId);
       PlatformType pt = sr.getPlatform().getPlatformType();
-      Map<String, Object> responseMap = new HashMap<String, Object>();
+      Map<String, Object> responseMap = new HashMap<>();
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
 
       Run run = dataObjectFactory.getRunOfType(pt, user);
@@ -255,7 +256,7 @@ public class RunControllerHelperService {
     sb.append(
         "<tr><td>Validation:</td><td><input type='text' id='validationBarcode' name='validationBarcode'/><input type='hidden' value='on' name='_validationBarcode'></td></tr>");
     sb.append(
-        "<tr><td>Paired:</td><td><input type='checkbox' id='paired' name='paired' value='false'/><input type='hidden' value='on' name='_paired'></td></tr>");
+        "<tr><td>Paired End:</td><td><input type='checkbox' id='paired' name='paired' value='false'/><input type='hidden' value='on' name='_paired'></td></tr>");
     sb.append("</table>");
     sb.append("<div id='partitionErrorDiv'> </div>");
     sb.append("<div id='partitionDiv'>");
@@ -287,6 +288,7 @@ public class RunControllerHelperService {
     } else if ("Illumina HiSeq 2500".equals(run.getSequencerReference().getPlatform().getInstrumentModel())) {
       b.append("<h2>" + PlatformType.ILLUMINA.getContainerName() + " 1</h2>");
       b.append(containerInfoHtml(PlatformType.ILLUMINA));
+      b.append("Number of " + PlatformType.ILLUMINA.getPartitionName() + "s:");
       b.append("<input id='lane2' name='container0Select' onchange='Run.ui.changeIlluminaLane(this, 0);' type='radio' value='2'/>2 ");
       b.append("<input id='lane8' name='container0Select' onchange='Run.ui.changeIlluminaLane(this, 0);' type='radio' value='8'/>8 ");
       b.append("<div id='containerdiv0'> </div>");
@@ -305,7 +307,7 @@ public class RunControllerHelperService {
             + i + "].identificationBarcode' name='sequencerPartitionContainers[" + i + "].identificationBarcode'/></div></td></tr>");
         b.append("<tr><td>Location:</td><td><input type='text' id='sequencerPartitionContainers[" + i
             + "].locationBarcode' name='sequencerPartitionContainers[" + i + "].locationBarcode'/></td></tr>");
-        b.append("<tr><td>Paired:</td><td><input type='checkbox' id='sequencerPartitionContainers[" + i
+        b.append("<tr><td>Paired End:</td><td><input type='checkbox' id='sequencerPartitionContainers[" + i
             + "].paired' name='sequencerPartitionContainers[" + i + "].paired' value='false'/></td></tr>");
         b.append("</table>");
         b.append("<div id='partitionErrorDiv'> </div>");
@@ -390,11 +392,13 @@ public class RunControllerHelperService {
           + i + "].identificationBarcode' name='sequencerPartitionContainers[" + i + "].identificationBarcode'/></div></td></tr>");
       b.append("<tr><td>Location:</td><td><input type='text' id='sequencerPartitionContainers[" + i
           + "].locationBarcode' name='sequencerPartitionContainers[" + i + "].locationBarcode'/></td></tr>");
-      b.append("<tr><td>Paired:</td><td><input type='checkbox' id='sequencerPartitionContainers[" + i
+      b.append("<tr><td>Paired End:</td><td><input type='checkbox' id='sequencerPartitionContainers[" + i
           + "].paired' name='sequencerPartitionContainers[" + i + "].paired'/></td></tr>");
       b.append("</table>");
       b.append("<div id='partitionErrorDiv'> </div>");
       b.append("<div id='partitionDiv'>");
+
+      b.append("Number of " + PlatformType.LS454.getPartitionName() + "s:");
       b.append("<input id='chamber1' name='container" + i + "Select' onchange='Run.ui.changeLS454Chamber(this, " + i
           + ");' type='radio' value='1'/>1 ");
       b.append("<input id='chamber2' name='container" + i + "Select' onchange='Run.ui.changeLS454Chamber(this, " + i
@@ -455,7 +459,7 @@ public class RunControllerHelperService {
           + i + "].identificationBarcode' name='sequencerPartitionContainers[" + i + "].identificationBarcode'/></div></td></tr>");
       b.append("<tr><td>Location:</td><td><input type='text' id='sequencerPartitionContainers[" + i
           + "].locationBarcode' name='sequencerPartitionContainers[" + i + "].locationBarcode'/></td></tr>");
-      b.append("<tr><td>Paired:</td><td><input type='checkbox' id='sequencerPartitionContainers[" + i
+      b.append("<tr><td>Paired End:</td><td><input type='checkbox' id='sequencerPartitionContainers[" + i
           + "].paired' name='sequencerPartitionContainers[" + i + "].paired'/></td></tr>");
       b.append("</table>");
       b.append("<div id='partitionErrorDiv'> </div>");
@@ -485,6 +489,8 @@ public class RunControllerHelperService {
             + "].partitions[5].pool' partition='" + i + "_5'></ul></div></td></tr>");
         b.append("</table>");
       } else {
+
+        b.append("Number of " + PlatformType.SOLID.getPartitionName() + "s:");
         b.append("<input id='chamber1' name='container" + i + "Select' onchange='Run.ui.changeSolidChamber(this, " + i
             + ");' type='radio' value='1'/>1 ");
         b.append("<input id='chamber4' name='container" + i + "Select' onchange='Run.ui.changeSolidChamber(this, " + i
@@ -542,12 +548,13 @@ public class RunControllerHelperService {
           + i + "].identificationBarcode' name='sequencerPartitionContainers[" + i + "].identificationBarcode'/></div></td></tr>");
       b.append("<tr><td>Location:</td><td><input type='text' id='sequencerPartitionContainers[" + i
           + "].locationBarcode' name='sequencerPartitionContainers[" + i + "].locationBarcode'/></td></tr>");
-      b.append("<tr><td>Paired:</td><td><input type='checkbox' id='sequencerPartitionContainers[" + i
+      b.append("<tr><td>Paired End:</td><td><input type='checkbox' id='sequencerPartitionContainers[" + i
           + "].paired' name='sequencerPartitionContainers[" + i + "].paired'/></td></tr>");
       b.append("</table>");
       b.append("<div id='partitionErrorDiv'> </div>");
       b.append("<div id='partitionDiv'>");
 
+      b.append("Number of " + PlatformType.PACBIO.getPartitionName() + "s:");
       b.append("<input id='chamber1' name='container" + i + "Select' onchange='Run.ui.changePacBioChamber(this, " + i
           + ");' type='radio' value='1'/>1 ");
       b.append("<input id='chamber2' name='container" + i + "Select' onchange='Run.ui.changePacBioChamber(this, " + i
@@ -616,7 +623,7 @@ public class RunControllerHelperService {
 
   public JSONObject getRunQCUsers(HttpSession session, JSONObject json) {
     try {
-      Collection<String> users = new HashSet<String>();
+      Collection<String> users = new HashSet<>();
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       users.add(user.getFullName());
 
@@ -624,7 +631,7 @@ public class RunControllerHelperService {
       for (String name : users) {
         sb.append("<option value='" + name + "'>" + name + "</option>");
       }
-      Map<String, Object> map = new HashMap<String, Object>();
+      Map<String, Object> map = new HashMap<>();
       map.put("qcUserOptions", sb.toString());
       map.put("runId", json.getString("runId"));
       return JSONUtils.JSONObjectResponse(map);
@@ -641,7 +648,7 @@ public class RunControllerHelperService {
       for (QcType s : types) {
         sb.append("<option value='" + s.getQcTypeId() + "'>" + s.getName() + "</option>");
       }
-      Map<String, Object> map = new HashMap<String, Object>();
+      Map<String, Object> map = new HashMap<>();
       map.put("types", sb.toString());
       return JSONUtils.JSONObjectResponse(map);
     } catch (IOException e) {
@@ -667,7 +674,7 @@ public class RunControllerHelperService {
           sb.append("</tr></table>");
         }
 
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
         map.put("processSelection", sb.toString());
         return JSONUtils.JSONObjectResponse(map);
       }
@@ -689,8 +696,8 @@ public class RunControllerHelperService {
         Long runId = Long.parseLong(json.getString("runId"));
         Run run = requestManager.getRunById(runId);
 
-        List<String> processSelections = new ArrayList<String>();
-        List<Partition> partitionSelections = new ArrayList<Partition>();
+        List<String> processSelections = new ArrayList<>();
+        List<Partition> partitionSelections = new ArrayList<>();
         JSONArray a = JSONArray.fromObject(json.getString("processSelection"));
         for (JSONObject s : (Iterable<JSONObject>) a) {
           String id = s.getString("id");
@@ -785,7 +792,7 @@ public class RunControllerHelperService {
           StringBuilder sb = new StringBuilder();
           if (fs.size() == 1) {
             // replace container div
-            SequencerPartitionContainer<SequencerPoolPartition> f = new ArrayList<SequencerPartitionContainer<SequencerPoolPartition>>(fs)
+            SequencerPartitionContainer<SequencerPoolPartition> f = new ArrayList<>(fs)
                 .get(0);
             sb.append("<table class='in'>");
             sb.append("<th>Partition No.</th>");
@@ -832,7 +839,7 @@ public class RunControllerHelperService {
               sb.append("</tr>");
             }
             sb.append("</table>");
-            Map<String, Object> responseMap = new HashMap<String, Object>();
+            Map<String, Object> responseMap = new HashMap<>();
             responseMap.put("html", sb.toString());
             responseMap.put("barcode", f.getIdentificationBarcode());
             responseMap.put("verify", confirm);
@@ -1001,7 +1008,7 @@ public class RunControllerHelperService {
       Pool<? extends Poolable> p = requestManager.getPoolById(poolId);
       StringBuilder sb = new StringBuilder();
 
-      Set<Project> pooledProjects = new HashSet<Project>();
+      Set<Project> pooledProjects = new HashSet<>();
 
       if (p.getExperiments().size() != 0) {
         // check if each poolable has been in a study for this pool already
@@ -1106,7 +1113,7 @@ public class RunControllerHelperService {
       b.append("</i>");
 
       if (p.getExperiments().size() == 0) {
-        Set<Project> pooledProjects = new HashSet<Project>();
+        Set<Project> pooledProjects = new HashSet<>();
         for (Dilution d : ds) {
           pooledProjects.add(d.getLibrary().getSample().getProject());
         }

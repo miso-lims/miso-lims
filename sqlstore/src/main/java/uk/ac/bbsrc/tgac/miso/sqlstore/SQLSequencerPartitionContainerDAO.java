@@ -55,6 +55,7 @@ import com.googlecode.ehcache.annotations.TriggersRemove;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
+
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
@@ -298,7 +299,7 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
   private void purgeListCache(SequencerPartitionContainer<SequencerPoolPartition> s, boolean replace) {
     if (cacheManager != null) {
       Cache cache = cacheManager.getCache("containerListCache");
-      DbUtils.updateListCache(cache, replace, s, SequencerPartitionContainer.class);
+      DbUtils.updateListCache(cache, replace, s);
     }
   }
 

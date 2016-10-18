@@ -488,10 +488,6 @@
     </property>
   </bean>
   
-  <bean id="hibernateDetailedSampleDao" class="uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateDetailedSampleDao">
-    <property name="kitStore" ref="sqlKitDAO" />
-  </bean>
-  
   <bean id="hibernateLibraryAdditionalInfoDao" class="uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryAdditionalInfoDao">
     <property name="kitStore" ref="sqlKitDAO" />
   </bean>

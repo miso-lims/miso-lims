@@ -17,4 +17,6 @@ public interface SampleClassService {
 
   void delete(Long sampleClassId) throws IOException;
 
+  public SampleClass inferStockFromAliquot(SampleClass sampleClass);
+
 }

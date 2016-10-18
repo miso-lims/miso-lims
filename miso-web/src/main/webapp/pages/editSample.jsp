@@ -340,12 +340,19 @@
         <div id="detailedSampleIdentity">
           <h2>Identity</h2>
           <table class="in">
+            <c:if test="${sample.id == 0}">
+              <tr>
+                <td class="h">Parent:</td>
+                <td id="parentAliasTd"><span id="parentAlias"></span><form:input type="hidden" id="identityId" path="identityId"/></td>
+              </tr>
+            </c:if>
             <tr>
               <td class="h">External Names (comma separated):*</td>
               <td>
                 <c:choose>
                   <c:when test="${sample.id == 0}">
-                    <form:input id="externalName" path="externalName"/>
+                    <span id="externalNameVal"></span>  <span id="externalNameDialog" title="Find or Create Identity"></span><button type="button" onclick="Sample.ui.showExternalNameChangeDialog()">Find or Create Identity</button>
+                    <form:input type="hidden" id="externalName" path="externalName"/>
                   </c:when>
                   <c:otherwise>
                     ${sample.externalName}
@@ -488,7 +495,7 @@
               </td>
             </tr>
             <tr>
-              <td class="h">Tissue Material:*</td>
+              <td class="h">Tissue Material:</td>
               <td>
                 <c:choose>
                   <c:when test="${sample.id == 0}">
@@ -760,7 +767,7 @@
     <div id="ctrlV" class="note">
       <p>Paste values using Ctrl + V in Windows or Linux, or Command-V (&#8984;-V) on a Mac.</p>
     </div>
-    <div class="floatleft">
+    <div class="floatleft" id="tableProps">
 	    <div><label>Project: <select id="projectSelect"></select></label></div>
 	    <div id="subpSelectOptions"></div>
 	    <div id="classOptions"></div>
@@ -775,6 +782,7 @@
 	    </div>
 	    <div>
 	      <button id="makeTable" onclick="Sample.hot.makeNewSamplesTable();">Make Table</button>
+          <button id="lookupIdentities" onclick="Sample.hot.lookupIdentities();" disabled="disabled">Look up Identities</button>
 	    </div>
 	  </div>
     <div class="clear"></div>

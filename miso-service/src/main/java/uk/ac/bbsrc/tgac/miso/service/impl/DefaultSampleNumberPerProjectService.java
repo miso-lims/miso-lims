@@ -92,4 +92,10 @@ public class DefaultSampleNumberPerProjectService implements SampleNumberPerProj
     return sampleNumberPerProjectDao.nextNumber(project, user);
   }
 
+  @Override
+  public SampleNumberPerProject getByProject(Project project) throws IOException {
+    authorizationManager.throwIfNotReadable(project);
+    return sampleNumberPerProjectDao.getByProject(project);
+  }
+
 }

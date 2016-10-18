@@ -39,6 +39,7 @@ import com.eaglegenomics.simlims.core.store.SecurityStore;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -235,8 +236,7 @@ public class SQLSampleDAOTest extends AbstractDAOTest {
     assertTrue(LimsUtils.isDetailedSample(sample));
     assertTrue(LimsUtils.isIdentitySample(sample));
     Identity identity = (Identity) sample;
-    assertEquals("INT1", identity.getInternalName());
-    assertEquals("EXT1", identity.getExternalName());
+    assertEquals("15_EXT15,EXT15", identity.getExternalName());
   }
 
   @Test
@@ -329,6 +329,54 @@ public class SQLSampleDAOTest extends AbstractDAOTest {
   public void countSamplesByEmptySearch() throws IOException {
     Long numSamples = dao.countBySearch("");
     assertEquals(Long.valueOf(17L), numSamples);
+  }
+
+  @Test
+  public void testGetIdentityByExternalName() throws IOException {
+    List<Identity> identity = (List<Identity>) dao.getIdentitiesByExternalNameOrAlias("EXT15");
+    assertTrue(identity.get(0).getExternalName().contains("EXT15"));
+  }
+
+  @Test
+  public void getIdentityByAlias() throws IOException {
+    Collection<Identity> identities = dao.getIdentitiesByExternalNameOrAlias("TEST_0001_IDENTITY_1");
+    assertEquals(1, identities.size());
+    assertEquals("TEST_0001_IDENTITY_1", identities.iterator().next().getAlias());
+  }
+
+  @Test
+  public void getIdentityByNullAlias() throws IOException {
+    Collection<Identity> identities = dao.getIdentitiesByExternalNameOrAlias(null);
+    assertTrue(identities.isEmpty());
+  }
+
+  @Test
+  public void getIdentityByNonIdentityAlias() throws IOException {
+    Collection<Identity> identities = dao.getIdentitiesByExternalNameOrAlias("TEST_0001_Bn_P_nn_1-1_D_1");
+    assertTrue(identities.isEmpty());
+  }
+
+  @Test
+  public void getSampleWithChildrenTest() throws Exception {
+    Sample sample = dao.get(15L);
+    assertTrue(LimsUtils.isDetailedSample(sample));
+    DetailedSample detailed = (DetailedSample) sample;
+    assertNotNull(detailed.getChildren());
+    assertEquals(2, detailed.getChildren().size());
+    for (@SuppressWarnings("unused")
+    Sample child : detailed.getChildren()) {
+      // will throw ClassCastException if children are not correctly loaded as Samples
+    }
+  }
+
+  @Test
+  public void getSampleWithParentTest() throws Exception {
+    SampleImpl sample = (SampleImpl) dao.get(16L);
+    assertNotNull(sample);
+    assertTrue(LimsUtils.isDetailedSample(sample));
+    DetailedSample detailed = (DetailedSample) sample;
+    assertNotNull(detailed.getParent());
+    assertEquals(15L, detailed.getParent().getId());
   }
 
   private void mockAutoIncrement() throws IOException {

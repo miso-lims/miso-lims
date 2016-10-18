@@ -890,4 +890,13 @@ public class LimsUtils {
     return sample instanceof SampleAliquot;
   }
 
+  public static boolean hasStockParent(Long id, Iterable<SampleValidRelationship> relationships) throws IOException {
+    for (SampleValidRelationship relationship : relationships) {
+      if (!relationship.getArchived() && relationship.getChild().getId() == id
+          && relationship.getParent().getSampleCategory().equals(SampleStock.CATEGORY_NAME)) {
+        return true;
+      }
+    }
+    return false;
+  }
 }

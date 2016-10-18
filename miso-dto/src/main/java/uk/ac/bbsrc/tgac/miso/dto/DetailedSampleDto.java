@@ -11,7 +11,7 @@ public class DetailedSampleDto extends SampleDto {
   private Long parentId;
   private String parentUrl;
   private String parentAlias;
-  private Long parentSampleClassId;
+  private Long parentTissueSampleClassId;
   private Long sampleClassId;
   private String sampleClassUrl;
   private Long detailedQcStatusId;
@@ -25,6 +25,7 @@ public class DetailedSampleDto extends SampleDto {
   private String groupDescription;
   private Boolean isSynthetic;
   private boolean nonStandardAlias;
+  private Long identityId;
 
   public Long getParentId() {
     return parentId;
@@ -50,12 +51,12 @@ public class DetailedSampleDto extends SampleDto {
     this.parentAlias = parentAlias;
   }
 
-  public Long getParentSampleClassId() {
-    return parentSampleClassId;
+  public Long getParentTissueSampleClassId() {
+    return parentTissueSampleClassId;
   }
 
-  public void setParentSampleClassId(Long parentSampleClassId) {
-    this.parentSampleClassId = parentSampleClassId;
+  public void setParentTissueSampleClassId(Long parentSampleClassId) {
+    this.parentTissueSampleClassId = parentSampleClassId;
   }
 
   public Long getDetailedQcStatusId() {
@@ -161,6 +162,14 @@ public class DetailedSampleDto extends SampleDto {
 
   public void setDetailedQcStatusNote(String detailedQcStatusNote) {
     this.detailedQcStatusNote = detailedQcStatusNote;
+  }
+
+  public Long getIdentityId() {
+    return identityId;
+  }
+
+  public void setIdentityId(Long identityId) {
+    this.identityId = identityId;
   }
 
   @Override

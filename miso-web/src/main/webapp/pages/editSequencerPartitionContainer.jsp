@@ -37,9 +37,9 @@
 <sessionConversation:insertSessionConversationId attributeName="container"/>
 <h1>
   <c:choose>
-    <c:when test="${container.id != 0}">Edit</c:when>
-    <c:otherwise>Create</c:otherwise>
-  </c:choose> Sequencing Container
+    <c:when test="${container.id != 0}">Edit ${container.platform.platformType.containerName}</c:when>
+    <c:otherwise>Create Sequencing Container</c:otherwise>
+  </c:choose>
   <button type="button" class="fg-button ui-state-default ui-corner-all"
           onclick="return Container.validateContainer();">Save</button>
   <sec:authorize access="hasRole('ROLE_ADMIN')">

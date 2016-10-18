@@ -370,8 +370,9 @@ VALUES (15,1,0,NULL),
 (16,2,0,15),
 (17,2,0,15);
 
-INSERT INTO `Identity`(`sampleId`, `internalName`, `externalName`)
-VALUES (15,'INT1','EXT1');
+DELETE FROM `Identity`;
+INSERT INTO `Identity` (`sampleId`, `externalName`,`donorSex`)
+VALUES (15, '15_EXT15,EXT15','UNKNOWN');
 
 INSERT INTO `SampleTissue`(`sampleId`)
 VALUES (16),

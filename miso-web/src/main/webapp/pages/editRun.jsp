@@ -480,7 +480,7 @@
             <c:otherwise>
               <td>Serial Number:</td>
               <td>
-                <span id="idBarcode">${container.identificationBarcode}</span>
+                <span id="idBarcode"><a href='<c:url value="/miso/container/${container.id}"/>' title='idBarcode'>${container.identificationBarcode}</a></span>
                 <a href="javascript:void(0);"
                    onclick="Run.ui.editContainerIdBarcode(jQuery('#idBarcode'), ${containerCount.index})">
                   <span id="pencil" class="fg-button ui-icon ui-icon-pencil"></span>

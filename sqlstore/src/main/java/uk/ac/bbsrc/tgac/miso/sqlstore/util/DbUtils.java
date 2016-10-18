@@ -37,13 +37,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheException;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Ehcache;
-import net.sf.ehcache.Element;
-import net.sf.ehcache.constructs.blocking.BlockingCache;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -54,6 +47,14 @@ import org.springframework.jdbc.support.MetaDataAccessException;
 
 import com.googlecode.ehcache.annotations.key.HashCodeCacheKeyGenerator;
 
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheException;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Ehcache;
+import net.sf.ehcache.Element;
+import net.sf.ehcache.constructs.blocking.BlockingCache;
+
+import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
@@ -200,20 +201,52 @@ public class DbUtils {
     }
   }
 
-  public static <T> void updateListCache(Cache cache, boolean replace, T obj, Class<T> cacheClass) {
+  /**
+   * Updates a single object in a cached list. Exact function depends on whether {@code obj.getId()} is found in the cache, and the value of
+   * {@code replace}:
+   * <ul>
+   * <li>if {@code obj.getId()} is not found, obj is added to the cache. replace parameter is ignored</li>
+   * <li>if {@code obj.getId()} is found and {@code replace == false}, the matching object is removed from the cache</li>
+   * <li>if {@code obj.getId()} is found and {@code replace == true}, the matching object is removed from the cache, and {@code obj} is
+   * added</li>
+   * </ul>
+   * 
+   * @param cache the cache to update. Expected to contain one List
+   * @param replace whether or not {@code obj} should be cached <b>IF</b> a previously-cached object matching its ID was found and removed
+   * @param obj the object which should be added, updated, or removed in the cache, by ID
+   */
+  public static <T extends Identifiable> void updateListCache(Cache cache, boolean replace, T obj) {
     if (cache != null && cache.getKeys().size() > 0) {
       BlockingCache c = new BlockingCache(cache);
       Object cachekey = c.getKeys().get(0);
-      List<T> e = (List<T>) c.get(cachekey).getObjectValue();
-      if (e.remove(obj)) {
+      @SuppressWarnings("unchecked")
+      List<T> cachedList = (List<T>) c.get(cachekey).getObjectValue();
+      if (removeFromCachedList(cachedList, obj)) {
         if (replace) {
-          e.add(obj);
+          cachedList.add(obj);
         }
       } else {
-        e.add(obj);
+        cachedList.add(obj);
       }
-      c.put(new Element(cachekey, e));
+      c.put(new Element(cachekey, cachedList));
     }
+  }
+
+  /**
+   * Removes the first object with an ID matching {@code obj.getId()} from {@code list}, if any
+   * 
+   * @param list the list to search
+   * @param obj the object to remove from list if found
+   * @return true if a matching object was found and removed; false otherwise
+   */
+  private static <T extends Identifiable> boolean removeFromCachedList(List<T> list, T obj) {
+    for (int i = 0; i < list.size(); i++) {
+      if (list.get(i).getId() == obj.getId()) {
+        list.remove(i);
+        return true;
+      }
+    }
+    return false;
   }
 
   public static <T> List<T> getByBarcodeList(JdbcTemplate template, List<String> barcodeList, String query, RowMapper<T> mapper) {
