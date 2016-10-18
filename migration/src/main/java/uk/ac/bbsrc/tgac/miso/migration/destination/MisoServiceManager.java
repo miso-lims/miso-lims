@@ -194,6 +194,7 @@ public class MisoServiceManager {
     m.setDefaultSampleClassService();
     m.setDefaultSampleDao();
     m.setDefaultSampleNumberPerProjectService();
+    m.setDefaultSampleNumberPerProjectDao();
     m.setDefaultSamplePurposeDao();
     m.setDefaultSampleQcDao();
     m.setDefaultSampleService();
@@ -1220,6 +1221,12 @@ public class MisoServiceManager {
   public void setSampleNumberPerProjectDao(HibernateSampleNumberPerProjectDao sampleNumberPerProjectDao) {
     this.sampleNumberPerProjectDao = sampleNumberPerProjectDao;
     updateSampleNumberPerProjectDaoDependencies();
+  }
+
+  public void setDefaultSampleNumberPerProjectDao() {
+    HibernateSampleNumberPerProjectDao dao = new HibernateSampleNumberPerProjectDao();
+    dao.setSessionFactory(sessionFactory);
+    setSampleNumberPerProjectDao(dao);
   }
 
   private void updateSampleNumberPerProjectDaoDependencies() {

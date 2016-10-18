@@ -69,9 +69,7 @@ public class HibernateSampleNumberPerProjectDao implements SampleNumberPerProjec
 
   @Override
   public synchronized String nextNumber(Project project, User user) {
-    Query query = currentSession().createQuery("from SampleNumberPerProjectImpl sn where sn.project = :project");
-    query.setParameter("project", project);
-    SampleNumberPerProject sampleNumberPerProject = (SampleNumberPerProject) query.uniqueResult();
+    SampleNumberPerProject sampleNumberPerProject = getByProject(project);
     if (sampleNumberPerProject == null) {
       sampleNumberPerProject = createSampleNumberPerProject(project, user);
     }
@@ -111,6 +109,13 @@ public class HibernateSampleNumberPerProjectDao implements SampleNumberPerProjec
 
   public void setSessionFactory(SessionFactory sessionFactory) {
     this.sessionFactory = sessionFactory;
+  }
+
+  @Override
+  public SampleNumberPerProject getByProject(Project project) {
+    Query query = currentSession().createQuery("from SampleNumberPerProjectImpl sn where sn.project = :project");
+    query.setParameter("project", project);
+    return (SampleNumberPerProject) query.uniqueResult();
   }
 
 }

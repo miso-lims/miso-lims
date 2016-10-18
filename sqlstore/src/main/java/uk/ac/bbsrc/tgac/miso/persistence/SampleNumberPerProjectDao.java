@@ -13,6 +13,8 @@ public interface SampleNumberPerProjectDao {
 
   SampleNumberPerProject getSampleNumberPerProject(Long id);
 
+  SampleNumberPerProject getByProject(Project project);
+
   Long addSampleNumberPerProject(SampleNumberPerProject sampleNumberPerProject);
 
   void deleteSampleNumberPerProject(SampleNumberPerProject sampleNumberPerProject);
