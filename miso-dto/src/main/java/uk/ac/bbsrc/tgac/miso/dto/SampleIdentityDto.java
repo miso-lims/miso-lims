@@ -11,21 +11,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 @JsonTypeName(value = Identity.CATEGORY_NAME)
 public class SampleIdentityDto extends DetailedSampleDto {
 
-  private String internalName;
   private String externalName;
   private String donorSex;
 
   @Override
   public void writeUrls(URI baseUri) {
     super.writeUrls(baseUri);
-  }
-
-  public String getInternalName() {
-    return internalName;
-  }
-
-  public void setInternalName(String internalName) {
-    this.internalName = internalName;
   }
 
   public String getExternalName() {
@@ -46,8 +37,7 @@ public class SampleIdentityDto extends DetailedSampleDto {
 
   @Override
   public String toString() {
-    return "SampleIdentityDto [internalName=" + internalName
-        + ", externalName=" + externalName + ", donorSex=" + donorSex
+    return "SampleIdentityDto [externalName=" + externalName + ", donorSex=" + donorSex
         + ", super=" + super.toString() + "]";
   }
 

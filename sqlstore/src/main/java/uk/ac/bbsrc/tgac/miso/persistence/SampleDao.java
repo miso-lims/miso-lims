@@ -54,6 +54,16 @@ public interface SampleDao extends SampleStore {
 
   Long countBySearch(String querystr) throws IOException;
 
-  Identity getIdentityByExternalName(String externalName) throws IOException;
+  /**
+   * List all the identities which have at least one external name which (partially) matches the input String.
+   * The input String must be a single non-comma-separated external name or alias. If there are multiple comma-separated external names to
+   * search against, they must each be queried through this function.
+   * 
+   * @param externalName
+   *          a single external name/alias string
+   * @return Collection<Identity> set of Identities which have an external name which matches the input string
+   * @throws IOException
+   */
+  Collection<Identity> getIdentitiesByExternalNameOrAlias(String externalName) throws IOException;
 
 }

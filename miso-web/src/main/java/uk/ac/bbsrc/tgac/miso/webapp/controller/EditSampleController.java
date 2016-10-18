@@ -23,8 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.hasStockParent;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 
 import java.beans.PropertyEditorSupport;
 import java.io.IOException;
@@ -68,6 +67,7 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractPool;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSampleQC;
@@ -274,7 +274,7 @@ public class EditSampleController {
   public Collection<Project> populateProjects(@RequestParam(value = "projectId", required = false) Long projectId) throws IOException {
     try {
       if (projectId != null) {
-        Collection<Project> ps = new ArrayList<Project>();
+        Collection<Project> ps = new ArrayList<>();
         for (Project p : requestManager.listAllProjects()) {
           if (!p.getProjectId().equals(projectId)) {
             ps.add(p);
@@ -337,8 +337,8 @@ public class EditSampleController {
 
   @ModelAttribute("sampleTypesString")
   public String sampleTypesString() throws IOException {
-    List<String> types = new ArrayList<String>();
-    List<String> sampleTypes = new ArrayList<String>(requestManager.listAllSampleTypes());
+    List<String> types = new ArrayList<>();
+    List<String> sampleTypes = new ArrayList<>(requestManager.listAllSampleTypes());
     Collections.sort(sampleTypes);
     for (String s : sampleTypes) {
       types.add("\"" + s + "\"" + ":" + "\"" + s + "\"");
@@ -363,8 +363,8 @@ public class EditSampleController {
 
   @ModelAttribute("libraryQcTypesString")
   public String libraryTypesString() throws IOException {
-    List<String> types = new ArrayList<String>();
-    List<QcType> libraryQcTypes = new ArrayList<QcType>(requestManager.listAllLibraryQcTypes());
+    List<String> types = new ArrayList<>();
+    List<QcType> libraryQcTypes = new ArrayList<>(requestManager.listAllLibraryQcTypes());
     Collections.sort(libraryQcTypes);
     for (QcType s : libraryQcTypes) {
       types.add("\"" + s.getQcTypeId() + "\"" + ":" + "\"" + s.getName() + "\"");
@@ -376,15 +376,16 @@ public class EditSampleController {
   @ModelAttribute("referenceDataJSON")
   public JSONObject referenceDataJsonString() throws IOException {
     final JSONObject hot = new JSONObject();
-    final List<String> sampleTypes = new ArrayList<String>(requestManager.listAllSampleTypes());
-    final List<String> strStatuses = new ArrayList<String>();
-    final List<String> donorSexes = new ArrayList<String>();
+    final List<String> sampleTypes = new ArrayList<>(requestManager.listAllSampleTypes());
+    final List<String> strStatuses = new ArrayList<>();
+    final List<String> donorSexes = new ArrayList<>();
     JSONArray allProjects = new JSONArray();
     for (Project fullProject : requestManager.listAllProjects()) {
       JSONObject project = new JSONObject();
       project.put("id", fullProject.getId());
       project.put("alias", fullProject.getAlias());
       project.put("name", fullProject.getName());
+      project.put("shortname", fullProject.getShortName());
       allProjects.add(project);
     }
     for (String strLabel : StrStatus.getLabels()) {
@@ -786,7 +787,7 @@ public class EditSampleController {
     try {
       List<Long> idList = getIdsFromString(sampleIds);
       ObjectMapper mapper = new ObjectMapper();
-      List<SampleDto> samplesDtos = new ArrayList<SampleDto>();
+      List<SampleDto> samplesDtos = new ArrayList<>();
       for (Sample sample : requestManager.getSamplesByIdList(idList)) {
         samplesDtos.add(Dtos.asDto(sample));
       }
@@ -812,7 +813,7 @@ public class EditSampleController {
     try {
       List<Long> idList = getIdsFromString(sampleIds);
       ObjectMapper mapper = new ObjectMapper();
-      List<SampleDto> samplesDtos = new ArrayList<SampleDto>();
+      List<SampleDto> samplesDtos = new ArrayList<>();
       for (Sample sample : requestManager.getSamplesByIdList(idList)) {
         samplesDtos.add(Dtos.asDto(sample));
       }
@@ -831,7 +832,7 @@ public class EditSampleController {
 
   public List<Long> getIdsFromString(String idString) {
     String[] split = idString.split(",");
-    List<Long> idList = new ArrayList<Long>();
+    List<Long> idList = new ArrayList<>();
     for (int i = 0; i < split.length; i++) {
       idList.add(Long.parseLong(split[i]));
     }

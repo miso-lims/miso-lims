@@ -327,6 +327,9 @@ public class Dtos {
     if (from.getSynthetic() != null) {
       to.setSynthetic(from.getSynthetic());
     }
+    if (from.getIdentityId() != null) {
+      to.setIdentityId(from.getIdentityId());
+    }
     to.setNonStandardAlias(from.getNonStandardAlias());
     to.setParent(getParent(from));
     return to;
@@ -591,7 +594,6 @@ public class Dtos {
 
   private static SampleIdentityDto asIdentitySampleDto(Identity from) {
     SampleIdentityDto dto = new SampleIdentityDto();
-    dto.setInternalName(from.getInternalName());
     dto.setExternalName(from.getExternalName());
     dto.setDonorSex(from.getDonorSex().getLabel());
     return dto;
@@ -599,7 +601,6 @@ public class Dtos {
 
   private static Identity toIdentitySample(SampleIdentityDto from) {
     Identity to = new IdentityImpl();
-    to.setInternalName(from.getInternalName());
     to.setExternalName(from.getExternalName());
     if (from.getDonorSex() != null) {
       to.setDonorSex(from.getDonorSex());

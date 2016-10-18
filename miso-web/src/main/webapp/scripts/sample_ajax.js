@@ -194,6 +194,8 @@ var Sample = Sample || {
         }
         break;
       case 'Stock':
+        // fall-though to aliquot case (identical restrictions)
+      case 'Aliquot':
         // Region validation
         jQuery('#region').attr('class', 'form-control');
         jQuery('#region').attr('data-parsley-maxlength', '255');
@@ -963,6 +965,87 @@ Sample.ui = {
         }
       );
     }
+  },
+  
+  showExternalNameChangeDialog: function () {
+    jQuery('#externalNameDialog')
+      .html("<form>" +
+            "<fieldset class='dialog'>" +
+            "<strong><label for='externalNameInput'>External Name(s):</label></strong>" +
+            "<input type='text' id='externalNameInput' class='text ui-widget-content ui-corner-all' required/>" +
+            "<div id='parentSelectDiv'></div>  <span id='selectButton'></span>" +
+            "</fieldset></form>");
+    var oldExternalName = jQuery('#externalName').val();
+
+    jQuery('#externalNameDialog').dialog({
+      width: 400,
+      modal: true,
+      resizable: true,
+      buttons: {
+        "Validate External Name(s)": function () {
+          jQuery('#externalNameVal').val(jQuery('#externalNameInput').val());
+          jQuery('#externalName').val(jQuery('#externalNameInput').val());
+          jQuery('#externalNameInput').after('<img id="ajaxLoader" src="/../styles/images/ajax-loader.gif" class="fg-button"/>');
+          jQuery.ajax({
+            url:"/miso/rest/tree/identities",
+            data: "{\"identitiesSearches\":" + JSON.stringify([jQuery('#externalNameInput').val()]) 
+                     + ", \"requestCounter\":1}", 
+            contentType:'application/json; charset=utf8',
+            dataType: 'json',
+            type: 'POST'
+          }).complete(function (data) {
+            console.log(data);
+          }).success(function (data) {
+            var identitiesResults = data.identitiesResults[0];
+            var parentSelect = Sample.ui.createParentSelect(identitiesResults);
+            jQuery('#ajaxLoader').remove();
+            jQuery('#parentSelectDiv').html(parentSelect);
+            var selectParent = function () {
+              jQuery('#parentAlias').html(jQuery('#parentSelect option:selected').text());
+              jQuery('#identityId').val(jQuery('#parentSelect option:selected').val());
+              var externalName;
+              if (jQuery('#parentSelect').val() === '') {
+                externalName = jQuery('#externalNameInput').val();
+              } else {
+                externalName = Hot.maybeGetProperty(Hot.findFirstOrNull(Hot.idPredicate(jQuery('#parentSelect').val()), identitiesResults), 'externalName');
+              }
+              jQuery('#externalNameVal').html(externalName);
+              jQuery('#externalName').html(externalName);
+            };
+            jQuery('#selectButton').html('<button type="button" id="chooseParent" class="ui-state-default" style="padding:5px;margin:8px 0px;">Select</button>')
+            jQuery('#chooseParent').click(function () {
+              selectParent();
+              jQuery('#externalNameDialog').dialog('close');
+            });
+          }).fail(function (data) {
+            jQuery('#externalNameVal').val(oldExternalName);
+            jQuery('#externalName').val(oldExternalName);
+            jQuery('#externalNameDialog').dialog('close');
+          });
+        },
+        "Cancel": function () {
+          jQuery(this).dialog('close');
+        }
+      }
+    });
+  },
+  
+  createParentSelect: function (identities) {
+    var selectedProjectId = jQuery('#project').val();
+    var sortedIdentities = identities.sort(function (a, b) {
+      var aSortId = a.projectId == selectedProjectId ? 0 : a.projectId;
+      var bSortId = b.projectId == selectedProjectId ? 0 : b.projectId;
+      return aSortId - bSortId;
+    });
+    var hasIdentityInProject = (sortedIdentities.length > 0 && sortedIdentities[0].projectId == selectedProjectId);
+    var parentSelect = ['<select id="parentSelect" style="padding:3px;">'];
+    var projShortName = Hot.maybeGetProperty(Hot.findFirstOrNull(Hot.idPredicate(selectedProjectId), Hot.dropdownRef.projects), 'shortname');
+    if (!hasIdentityInProject) parentSelect.push('<option value="0">First Receipt' + (projShortName ? ' (' + projShortName + ')' : '') + '</option>');
+    for (var i = 0; i < sortedIdentities.length; i++) {
+      parentSelect.push('<option value="' + sortedIdentities[i].id + '">' + Sample.hot.getIdentityLabel(sortedIdentities[i]) + '</option>');
+    }
+    parentSelect.push('</select>');
+    return parentSelect.join('');
   },
 
   receiveSample: function (input) {

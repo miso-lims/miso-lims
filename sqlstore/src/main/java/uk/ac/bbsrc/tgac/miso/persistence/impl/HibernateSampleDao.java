@@ -13,9 +13,6 @@ import java.util.Set;
 
 import javax.persistence.CascadeType;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -37,6 +34,8 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.store.SecurityStore;
 
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
@@ -125,8 +124,8 @@ public class HibernateSampleDao implements SampleDao {
 
   @Override
   public int getNextSiblingNumber(Sample parent, SampleClass childClass) throws IOException {
-    Query query = currentSession().createQuery("select max(siblingNumber) " + "from DetailedSampleImpl "
-        + "where parentId = :parentId " + "and sampleClassId = :sampleClassId");
+    Query query = currentSession().createQuery(
+        "select max(siblingNumber) " + "from DetailedSampleImpl " + "where parentId = :parentId " + "and sampleClassId = :sampleClassId");
     query.setLong("parentId", parent.getId());
     query.setLong("sampleClassId", childClass.getId());
     Number result = ((Number) query.uniqueResult());
@@ -371,12 +370,14 @@ public class HibernateSampleDao implements SampleDao {
    */
   private Criterion searchRestrictions(String querystr) {
     String str = DbUtils.convertStringToSearchQuery(querystr);
+
     Criterion[] criteria = new Criterion[searchProperties.length + 1];
     for (int i = 0; i < searchProperties.length; i++) {
-      criteria[i] = Restrictions.ilike(searchProperties[i], str, MatchMode.EXACT);
+      criteria[i] = Restrictions.ilike(searchProperties[i], str, MatchMode.ANYWHERE);
     }
+    
     criteria[searchProperties.length] = Restrictions.and(Restrictions.eq("class", IdentityImpl.class),
-        Restrictions.ilike("externalName", str, MatchMode.EXACT));
+        Restrictions.ilike("externalName", str, MatchMode.ANYWHERE));
     return Restrictions.or(criteria);
   }
 
@@ -549,10 +550,15 @@ public class HibernateSampleDao implements SampleDao {
   }
 
   @Override
-  public Identity getIdentityByExternalName(String externalName) throws IOException {
-    Query query = currentSession().createQuery("FROM IdentityImpl I WHERE I.externalName = :externalName");
-    query.setParameter("externalName", externalName);
-    return fetchSqlStore((Identity) query.uniqueResult());
+  public Collection<Identity> getIdentitiesByExternalNameOrAlias(String externalName) throws IOException {
+    if (isStringEmptyOrNull(externalName)) return Collections.emptySet();
+    String str = DbUtils.convertStringToSearchQuery(externalName);
+    Criteria criteria = currentSession().createCriteria(IdentityImpl.class);
+    criteria.add(Restrictions.or(Restrictions.ilike("externalName", str), Restrictions.ilike("alias", str)));
+    @SuppressWarnings("unchecked")
+    Collection<Identity> records = criteria.list();
+    // return without fetching all associated SQL items
+    return records;
   }
 
   @Override

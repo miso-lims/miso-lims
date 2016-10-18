@@ -4,10 +4,11 @@
 
 Sample.hot = {
   projectsArray: null,
-  selectedProjectId: null,
   sampleClassId: null,
   sciName: null,
   sampleData: null,
+  identityRequestCounter: 0,
+  selectedProjectId: null,
 
   /**
    * Additional sample-specific processing.
@@ -152,15 +153,20 @@ Sample.hot = {
     for (var i=0; i<Sample.hot.projectsArray.length; i++) {
       select.push('<option value="'+ Sample.hot.projectsArray[i].id +'"');
       select.push(Sample.hot.projectsArray[i].id == Sample.hot.selectedProjectId ? ' selected' : '');
-      select.push('>'+ Sample.hot.projectsArray[i].alias +' ('+ Sample.hot.projectsArray[i].name +')</option>');
+      select.push('>'+ Sample.hot.projectsArray[i].shortname +' ('+ Sample.hot.projectsArray[i].name +')</option>');
     }
     document.getElementById('projectSelect').insertAdjacentHTML('beforeend', select.join(''));
+    document.getElementById('projectSelect').addEventListener('change', Sample.hot.updateSelectedProjectId);
 
     // if detailedSample is selected, add subproject dropdown
     if (Hot.detailedSample && Sample.hot.selectedProjectId) {
       Sample.hot.addSubprojectSelect();
       document.getElementById('projectSelect').addEventListener('change', Sample.hot.addSubprojectSelect);
     }
+  },
+  
+  updateSelectedProjectId: function () {
+    Sample.hot.selectedProjectId = jQuery('#projectSelect').val();
   },
 
   /**
@@ -301,6 +307,9 @@ Sample.hot = {
       Sample.hot.dataSchema.scientificName = "Homo sapiens";
     }
     Sample.hot.makeHOT(null, 'create', null, sampleCategory);
+    if (document.getElementById('lookupIdentities') && document.getElementById('lookupIdentities').hasAttribute('disabled')) {
+      document.getElementById('lookupIdentities').removeAttribute('disabled');
+    }
   },
 
   /**
@@ -434,6 +443,7 @@ Sample.hot = {
     alias: '',
     qcPassed: '',
     volume: null,
+    identityAlias: null,
     externalName: null,
     donorSex: null,
     sampleClassId: null,
@@ -710,9 +720,18 @@ Sample.hot = {
 
       // Identity columns
       {
+        header: 'Identity Alias',
+        data: 'identityAlias',
+        type: 'dropdown',
+        trimDropdown: false,
+        strict: true,
+        allowInvalid: true,
+        include: show['Identity']
+      },
+      {
         header: 'External Name',
         data: 'externalName',
-        validator: Hot.requiredText,
+        validator: Hot.noSpecialChars,
         renderer: Hot.requiredTextRenderer,
         include: show['Identity']
       },
@@ -1034,12 +1053,11 @@ Sample.hot = {
    */
   getRootSampleClassId: function () {
     return Hot.sampleOptions.sampleClassesDtos.filter(function (sampleClass) {
-      // TODO: make this configurable in case an institute wants a root sample class with a different name
       return sampleClass.alias == 'Identity';
     })[0].id;
   },
-
-  /**
+ 
+ /**
    * Creates the SampleDtos to pass to the server
    */
   buildDtos: function (obj) {
@@ -1076,6 +1094,7 @@ Sample.hot = {
 
       // add sample parent attributes, and all other attributes for the first receipt of a sample
       if (obj.externalName) {
+        sample.identityId =  Sample.hot.getParentIdFromIdentityLabel(obj.identityAlias);
         sample.externalName = obj.externalName;
         if (obj.donorSex && obj.donorSex.length) sample.donorSex = obj.donorSex;
       }
@@ -1264,7 +1283,13 @@ Sample.hot = {
   saveDetailedData: function () {
     // check that a project and class have been declared
     if (document.getElementById('projectSelect').value === '') {
-      Hot.messages.failed.push('Select a Project before saving.');
+      Hot.messages.failed = ['Select a Project before saving.'];
+      Hot.addErrors(Hot.messages);
+      return false;
+    }
+    
+    if (document.getElementById('lookupIdentities') && Sample.hot.identityRequestCounter == 0) {
+      Hot.messages.failed = ['Click "Look up Identities" and select parent identities before saving.'];
       Hot.addErrors(Hot.messages);
       return false;
     }
@@ -1442,5 +1467,105 @@ Sample.hot = {
       }
     }
     return (Hot.messages.failed.length ? false : true);
+  },
+  
+  /**
+   * Take the data in the external names column and send it to the server to find matching identities
+   */
+  lookupIdentities: function () {
+    var lookupButton = document.getElementById('lookupIdentities');
+    lookupButton.setAttribute('disabled', 'disabled');
+    var identitiesSearches = [];
+    var blankRows = []
+    var externalName;
+    for (var i = 0; i < Hot.startData.length; i++) {
+      externalName = Hot.startData[i].externalName;
+      if (externalName == null || externalName == undefined || externalName.length == 0) {
+        blankRows.push(i + 1);
+      } else {
+        externalName = externalName.replace(",", ";");
+        identitiesSearches.push(externalName);
+      }
+    }
+    if (blankRows.length || !Hot.startData.length) {
+      var msg = "Rows " + blankRows.join(", ") + ": External name can not be blank";
+      Hot.addErrors({ failed: [msg] });
+      lookupButton.removeAttribute('disabled');
+      return false;
+    } else {
+      Sample.hot.identityRequestCounter++;
+      jQuery.ajax({
+        url:"/miso/rest/tree/identities",
+        data: "{\"identitiesSearches\":" + JSON.stringify(identitiesSearches) 
+                 + ", \"requestCounter\":" + Sample.hot.identityRequestCounter + "}", 
+        contentType:'application/json; charset=utf8',
+        dataType: 'json',
+        type: 'POST'
+      }).complete(function (data) {
+        console.log(data);
+        lookupButton.removeAttribute('disabled');
+      }).success(function (data) {
+        // make sure there haven't been any newer requests sent while we were fetching data
+        if (data.requestCounter == Sample.hot.identityRequestCounter) {
+          Sample.hot.foundIdentities = data.identitiesResults;
+          Sample.hot.flattenedIdentities = [].concat.apply([], Sample.hot.foundIdentities);
+          Sample.hot.setIdentitySources();
+          Sample.hot.displayCheckmark();
+        }
+      });
+    }
+  },
+  
+  /**
+   * Processes returned AJAX data for identities and sets source for cells in table
+   */
+  setIdentitySources: function () {
+    var identityColIndex = Hot.getColIndex('identityAlias');
+    var rowCount = Sample.hot.foundIdentities.length;
+    var selectedProjectId = Sample.hot.selectedProjectId;
+    for (var i = 0; i < rowCount; i++) {
+      var sortedIdentities = Sample.hot.foundIdentities[i].sort(function (a, b) {
+        var aSortId = a.projectId == selectedProjectId ? 0 : a.projectId;
+        var bSortId = b.projectId == selectedProjectId ? 0 : b.projectId;
+        return aSortId - bSortId;
+      });
+      var hasIdentityInProject = (sortedIdentities.length > 0 && sortedIdentities[0].projectId == selectedProjectId);
+      var identityItems = sortedIdentities.map(Sample.hot.getIdentityLabel);
+      if (!hasIdentityInProject) {
+        var projShortName = Hot.maybeGetProperty(Hot.findFirstOrNull(Hot.idPredicate(selectedProjectId), Hot.dropdownRef.projects), 'shortname');
+        identityItems.unshift("First Receipt" + (projShortName ? " (" + projShortName + ")" : ""));
+      }
+      Hot.hotTable.setCellMeta(i, identityColIndex, 'source', identityItems);
+    }
+  },
+  
+  /**
+   * Custom identity label for Handsontable
+   * Sample Alias -- External Name(s)
+   */
+  getIdentityLabel: function (obj) {
+    if (obj.alias) {
+      return obj.alias + " -- " + obj.externalName;
+    } else {
+      return "First receipt";
+    }
+  },
+  
+  identityLabelPredicate: function (identityLabel) {
+    return function (item) {
+      return item.alias +" -- "+ item.externalName == identityLabel;
+    }
+  },
+  
+  getParentIdFromIdentityLabel: function (identityLabel) {
+    return Hot.maybeGetProperty(Hot.findFirstOrNull(Sample.hot.identityLabelPredicate(identityLabel), Sample.hot.flattenedIdentities), 'id');
+  },
+  
+  displayCheckmark: function () {
+    var checkmark = '<div><img id="checkmark" src="/styles/images/ok.png" style="float:left"/></div><div class="clear"></div>';
+    jQuery('#tableProps').after(checkmark);
+    jQuery('#checkmark').fadeOut("slow", function() {
+      jQuery(this).remove();
+    });
   }
 };
