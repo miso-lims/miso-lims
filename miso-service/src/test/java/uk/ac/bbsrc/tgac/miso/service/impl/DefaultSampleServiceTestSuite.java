@@ -25,14 +25,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleStockImpl;
@@ -53,7 +51,6 @@ import uk.ac.bbsrc.tgac.miso.persistence.SubprojectDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueMaterialDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueOriginDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueTypeDao;
-import uk.ac.bbsrc.tgac.miso.service.DetailedSampleService;
 import uk.ac.bbsrc.tgac.miso.service.SampleNumberPerProjectService;
 import uk.ac.bbsrc.tgac.miso.service.SampleValidRelationshipService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
@@ -75,9 +72,6 @@ public class DefaultSampleServiceTestSuite {
 
   @Mock
   private SampleClassDao sampleClassDao;
-
-  @Mock
-  private DetailedSampleService detailedSampleService;
 
   @Mock
   private SampleValidRelationshipService sampleValidRelationshipService;
