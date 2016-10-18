@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.migration.destination;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -7,6 +9,8 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.sql.DataSource;
 
@@ -32,15 +36,16 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleNumberPerProject;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleNumberPerProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.migration.MigrationData;
 import uk.ac.bbsrc.tgac.miso.migration.MigrationProperties;
 
@@ -180,7 +185,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
       // already saved
       return;
     }
-    if (LimsUtils.isDetailedSample(sample)) {
+    if (isDetailedSample(sample)) {
       DetailedSample detailed = (DetailedSample) sample;
       if (hasUnsavedParent(detailed)) {
         if (detailed.getParent().getSampleClass() == null && detailed.getParent().getPreMigrationId() != null) {
@@ -202,7 +207,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
     Collection<SampleQC> qcs = new TreeSet<>(sample.getSampleQCs());
     Collection<Note> notes = new HashSet<>(sample.getNotes());
 
-    if (LimsUtils.isDetailedSample(sample)) {
+    if (isDetailedSample(sample)) {
       DetailedSample detailed = (DetailedSample) sample;
       if (detailed.getSubproject() != null && detailed.getSubproject().getId() == null) {
         // New subproject
@@ -219,6 +224,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
           detailed.setNonStandardAlias(true);
         }
       }
+      if (isIdentitySample(detailed)) updateSampleNumberPerProject(detailed);
     }
     if (replaceChangeLogs) {
       Collection<ChangeLog> changes = new ArrayList<>(sample.getChangeLog());
@@ -231,6 +237,30 @@ public class DefaultMigrationTarget implements MigrationTarget {
     saveSampleQcs(sample, qcs);
     saveSampleNotes(sample, notes);
     log.debug("Saved sample " + sample.getAlias());
+  }
+
+  private void updateSampleNumberPerProject(DetailedSample sample) throws IOException {
+    if (sample.hasNonStandardAlias()) return;
+    Matcher m = Pattern.compile("^\\w{3,5}_(\\d+).*").matcher(sample.getAlias());
+    if (!m.matches()) throw new IllegalArgumentException("Sample alias must be in expected format unless nonStandardAlias is set");
+    int number = Integer.parseInt(m.group(1));
+    SampleNumberPerProject sn = serviceManager.getSampleNumberPerProjectService().getByProject(sample.getProject());
+    if (sn == null) {
+      sn = new SampleNumberPerProjectImpl();
+      sn.setProject(sample.getProject());
+      sn.setPadding(m.group(1).length());
+      sn.setHighestSampleNumber(number);
+      sn.setCreatedBy(migrationUser);
+      sn.setCreationDate(timeStamp);
+      sn.setUpdatedBy(migrationUser);
+      sn.setLastUpdated(timeStamp);
+      serviceManager.getSampleNumberPerProjectService().create(sn, sn.getProject().getId());
+    } else if (number > sn.getHighestSampleNumber()) {
+      sn.setHighestSampleNumber(number);
+      sn.setUpdatedBy(migrationUser);
+      sn.setLastUpdated(timeStamp);
+      serviceManager.getSampleNumberPerProjectService().update(sn);
+    }
   }
 
   private void createSubproject(Subproject subproject, Project project) {
@@ -294,7 +324,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
   public void saveLibraries(final Collection<Library> libraries) throws IOException {
     log.info("Migrating libraries...");
     for (Library library : libraries) {
-      if (LimsUtils.isDetailedSample(library.getSample())) {
+      if (isDetailedSample(library.getSample())) {
         DetailedSample sample = (DetailedSample) library.getSample();
         if (sample.getId() == AbstractSample.UNSAVED_ID && sample.getPreMigrationId() != null) {
           library.setSample(serviceManager.getSampleDao().getByPreMigrationId(sample.getPreMigrationId()));
