@@ -14,10 +14,6 @@ public interface SamplePurpose {
 
   void setAlias(String alias);
 
-  String getDescription();
-
-  void setDescription(String description);
-
   User getCreatedBy();
 
   void setCreatedBy(User createdBy);

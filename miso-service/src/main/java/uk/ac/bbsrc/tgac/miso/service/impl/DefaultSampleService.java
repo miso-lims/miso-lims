@@ -381,7 +381,6 @@ public class DefaultSampleService implements SampleService {
   private SampleTissue createParentTissue(SampleTissue tissue, DetailedSample child) throws IOException {
     log.debug("Creating a new Tissue to use as a parent.");
     tissue.setProject(child.getProject());
-    tissue.setDescription("Tissue");
     tissue.setSampleType(child.getSampleType());
     tissue.setScientificName(child.getScientificName());
     tissue.setVolume(0D);
@@ -394,7 +393,6 @@ public class DefaultSampleService implements SampleService {
   private SampleStock createParentStock(SampleStock stock, DetailedSample child) throws IOException {
     log.debug("Creating a new Stock to use as a parent.");
     stock.setProject(child.getProject());
-    stock.setDescription("Stock");
     stock.setSampleType(child.getSampleType());
     stock.setScientificName(child.getScientificName());
     stock.setVolume(0D);
@@ -420,8 +418,8 @@ public class DefaultSampleService implements SampleService {
 
     confirmExternalNameUniqueForProjectIfRequired(shellParent.getExternalName(), sample);
 
-    Sample identitySample = new IdentityBuilder().user(authorizationManager.getCurrentUser()).project(sample.getProject())
-        .description("Identity").sampleType(sample.getSampleType()).scientificName(sample.getScientificName()).name(generateTemporaryName())
+    Sample identitySample = new IdentityBuilder().project(sample.getProject())
+        .sampleType(sample.getSampleType()).scientificName(sample.getScientificName()).name(generateTemporaryName())
         .alias(internalName).rootSampleClass(rootSampleClass).volume(0D).externalName(shellParent.getExternalName())
         .donorSex(shellParent.getDonorSex()).build();
 

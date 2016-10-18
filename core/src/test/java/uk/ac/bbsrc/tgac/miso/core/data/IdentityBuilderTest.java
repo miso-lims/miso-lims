@@ -8,8 +8,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.eaglegenomics.simlims.core.User;
-
 import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl.IdentityBuilder;
 
 public class IdentityBuilderTest {
@@ -37,9 +35,8 @@ public class IdentityBuilderTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void test_description_must_be_provided() throws Exception {
-    User mockedUser = mock(User.class);
     Project mockedProject = mock(Project.class);
-    new IdentityBuilder().user(mockedUser).project(mockedProject).build();
+    new IdentityBuilder().project(mockedProject).build();
   }
 
 }

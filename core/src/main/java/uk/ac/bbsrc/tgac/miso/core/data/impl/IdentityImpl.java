@@ -11,8 +11,6 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Table;
 
-import com.eaglegenomics.simlims.core.User;
-
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -91,9 +89,6 @@ public class IdentityImpl extends DetailedSampleImpl implements Identity {
     private Project project;
     private String scientificName;
 
-    /** User is needed to create a SecurityProfile. */
-    private User user;
-
     private String externalName;
     private DonorSex donorSex;
 
@@ -137,11 +132,6 @@ public class IdentityImpl extends DetailedSampleImpl implements Identity {
       return this;
     }
 
-    public IdentityBuilder user(User user) {
-      this.user = user;
-      return this;
-    }
-
     public IdentityBuilder externalName(String externalName) {
       this.externalName = externalName;
       return this;
@@ -154,7 +144,6 @@ public class IdentityImpl extends DetailedSampleImpl implements Identity {
 
     public Sample build() {
       checkArgument(project != null, "A Project must be provided to create a Sample.");
-      checkArgument(!LimsUtils.isStringEmptyOrNull(description), "Must provide a description to create a Sample");
       checkArgument(!LimsUtils.isStringEmptyOrNull(sampleType), "Must provide a sampleType to create a Sample");
       checkArgument(!LimsUtils.isStringEmptyOrNull(scientificName), "Must provide a scientificName to create a Sample");
       checkArgument(rootSampleClass != null, "A root SampleClass must be provided to create an Identity Sample.");

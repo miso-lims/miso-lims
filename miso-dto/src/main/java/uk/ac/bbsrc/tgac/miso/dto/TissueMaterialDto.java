@@ -8,7 +8,6 @@ public class TissueMaterialDto {
   private Long id;
   private String url;
   private String alias;
-  private String description;
   private Long createdById;
   private String createdByUrl;
   private String creationDate;
@@ -38,14 +37,6 @@ public class TissueMaterialDto {
 
   public void setAlias(String alias) {
     this.alias = alias;
-  }
-
-  public String getDescription() {
-    return description;
-  }
-
-  public void setDescription(String description) {
-    this.description = description;
   }
 
   public String getCreatedByUrl() {
@@ -98,7 +89,7 @@ public class TissueMaterialDto {
 
   @Override
   public String toString() {
-    return "TissueTypeDto [id=" + id + ", url=" + url + ", alias=" + alias + ", description=" + description + ", createdById=" + createdById
+    return "TissueTypeDto [id=" + id + ", url=" + url + ", alias=" + alias + ", createdById=" + createdById
         + ", createdByUrl=" + createdByUrl + ", creationDate=" + creationDate + ", updatedById=" + updatedById + ", updatedByUrl="
         + updatedByUrl + ", lastUpdated=" + lastUpdated + "]";
   }

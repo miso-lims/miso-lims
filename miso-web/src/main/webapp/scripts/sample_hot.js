@@ -435,7 +435,7 @@ Sample.hot = {
   dataSchema: {
     project: null,
     id: null,
-    description: '',
+    description: null,
     receivedDate: null,
     identificationBarcode: null,
     scientificName: this.sciName,
@@ -664,8 +664,6 @@ Sample.hot = {
       {
         header: 'Description',
         data: 'description',
-        validator: Hot.requiredText,
-        renderer: Hot.requiredTextRenderer,
         include: true
       },
       {
