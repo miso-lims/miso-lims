@@ -123,13 +123,6 @@
     </td>
   </tr>
   <tr>
-    <td class="h">Location:</td>
-    <td>
-      <c:if test="${!empty pool.boxLocation}">${pool.boxLocation},</c:if>
-      <c:if test="${!empty pool.boxPosition}"><a href='<c:url value="/miso/box/${pool.boxId}"/>'>${pool.boxAlias}, ${pool.boxPosition}</a></c:if>
-    </td>
-  </tr>
-  <tr>
     <td class="h">Name:</td>
     <td>
       <c:choose>
@@ -194,7 +187,13 @@
     <td>Discarded:</td>
     <td><form:checkbox id="discarded" path="discarded"/></td>
   </tr>
-
+  <tr>
+    <td class="h">Location:</td>
+    <td>
+      <c:if test="${!empty pool.boxLocation}">${pool.boxLocation},</c:if>
+      <c:if test="${!empty pool.boxPosition}"><a href='<c:url value="/miso/box/${pool.boxId}"/>'>${pool.boxAlias}, ${pool.boxPosition}</a></c:if>
+    </td>
+  </tr>
 </table>
 <%@ include file="volumeControl.jspf" %>
 <%@ include file="permissions.jsp" %>
@@ -314,7 +313,8 @@
           }
         });
 
-        jQuery('#qcsTotalCount').html(jQuery('#poolQcTable>tbody>tr:visible').length.toString() + " QCs");
+        var qcsCount = jQuery('#poolQcTable>tbody>tr:visible').length;
+        jQuery('#qcsTotalCount').html(qcsCount + (qcsCount == 1 ? ' QC' : ' QCs'));
       });
     </script>
   </span>

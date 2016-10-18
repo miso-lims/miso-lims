@@ -2145,18 +2145,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Box> listAllBoxesByAlias(String alias) throws IOException {
-    User user = getCurrentUser();
-    Collection<Box> accessibles = new HashSet<>();
-    for (Box o : backingManager.listAllBoxesByAlias(alias)) {
-      if (o.userCanRead(user)) {
-        accessibles.add(o);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
   public Collection<ChangeLog> listAllChanges(String type) throws IOException {
     if (getCurrentUser().isInternal()) return backingManager.listAllChanges(type);
     return null;
@@ -2230,11 +2218,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   @Override
   public Collection<BoxUse> listAllBoxUses() throws IOException {
     return backingManager.listAllBoxUses();
-  }
-
-  @Override
-  public Collection<String> listAllBoxUsesStrings() throws IOException {
-    return backingManager.listAllBoxUsesStrings();
   }
 
   @Override

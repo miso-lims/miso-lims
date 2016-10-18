@@ -355,11 +355,6 @@ public class SQLBoxDAO implements BoxStore {
   }
 
   @Override
-  public Collection<Box> listByAlias(String alias) throws IOException {
-    return template.query(BOX_SELECT_BY_ALIAS, new Object[] { alias }, new BoxMapper(true));
-  }
-
-  @Override
   public Collection<Box> listWithLimit(long limit) throws IOException {
     return template.query(BOX_SELECT_LIMIT, new Object[] { limit }, new BoxMapper(true));
   }

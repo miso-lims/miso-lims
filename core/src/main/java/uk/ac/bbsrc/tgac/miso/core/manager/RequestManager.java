@@ -323,8 +323,6 @@ public interface RequestManager {
 
   public Collection<Box> listAllBoxesWithLimit(long limit) throws IOException;
 
-  public Collection<Box> listAllBoxesByAlias(String alias) throws IOException;
-
   public Collection<Run> listAllRuns() throws IOException;
 
   public Collection<Run> listAllRunsWithLimit(long limit) throws IOException;
@@ -502,8 +500,6 @@ public interface RequestManager {
    * Obtain a list of all of the Box attributes (uses, sizes)
    */
   public Collection<BoxUse> listAllBoxUses() throws IOException;
-
-  public Collection<String> listAllBoxUsesStrings() throws IOException;
 
   public Collection<BoxSize> listAllBoxSizes() throws IOException;
 

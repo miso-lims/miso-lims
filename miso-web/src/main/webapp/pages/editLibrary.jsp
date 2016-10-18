@@ -169,13 +169,6 @@
   </td>
 </tr>
 <tr>
-  <td class="h">Location:</td>
-  <td>
-    <c:if test="${!empty library.boxLocation}">${library.boxLocation},</c:if>
-    <c:if test="${!empty library.boxPosition}"><a href='<c:url value="/miso/box/${library.boxId}"/>'>${library.boxAlias}, ${library.boxPosition}</a></c:if>
-  </td>
-</tr>
-<tr>
   <td class="h">Name:</td>
   <td>
     <c:choose>
@@ -387,6 +380,13 @@
   <td>Discarded:</td>
   <td><form:checkbox id="discarded" path="discarded"/></td>
 </tr>
+<tr>
+  <td class="h">Location:</td>
+  <td>
+    <c:if test="${!empty library.boxLocation}">${library.boxLocation},</c:if>
+    <c:if test="${!empty library.boxPosition}"><a href='<c:url value="/miso/box/${library.boxId}"/>'>${library.boxAlias}, ${library.boxPosition}</a></c:if>
+  </td>
+</tr>
 </table>
 <%@ include file="volumeControl.jspf" %>
 
@@ -590,8 +590,10 @@
       }
     });
 
-    jQuery('#qcsTotalCount').html(jQuery('#libraryQcTable>tbody>tr:visible').length.toString() + " QCs");
-    jQuery('#ldsTotalCount').html(jQuery('#libraryDilutionTable>tbody>tr:visible').length.toString() + " Library Dilutions");
+    var qcsCount = jQuery('#libraryQcTable>tbody>tr:visible').length;
+    jQuery('#qcsTotalCount').html(qcsCount + (qcsCount == 1 ? ' QC' : ' QCs'));
+    var libDilsCount = jQuery('#libraryDilutionTable>tbody>tr:visible').length;
+    jQuery('#ldsTotalCount').html(libDilsCount + (libDilsCount == 1 ? ' Library Dilution' : ' Library Dilutions'));
   });
 </script>
 
@@ -791,7 +793,7 @@
 
   <c:if test="${not empty libraryPools}">
     <br/>
-    <h1>${fn:length(libraryPools)} Pools</h1>
+    <h1>${fn:length(libraryPools)} Pool<c:if test="${fn:length(libraryPools) ne 1}">s</c:if></h1>
     <ul class="sddm">
       <li>
         <a onmouseover="mopen('poolsmenu')" onmouseout="mclosetime()">Options
