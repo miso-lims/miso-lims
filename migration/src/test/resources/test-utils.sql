@@ -47,8 +47,8 @@ BEGIN
     DELETE FROM Status;
     DELETE FROM Run;
     DELETE FROM PoolOrder;
-    DELETE FROM Pool;
     DELETE FROM Pool_Elements;
+    DELETE FROM Pool;
     DELETE FROM LibraryDilution;
     DELETE FROM LibraryAdditionalInfo;
     DELETE FROM Library_Index;

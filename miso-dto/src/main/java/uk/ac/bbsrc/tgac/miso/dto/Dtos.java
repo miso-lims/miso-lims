@@ -263,9 +263,6 @@ public class Dtos {
     if (from.getSubproject() != null) {
       dto.setSubprojectId(from.getSubproject().getId());
     }
-    if (from.getPrepKit() != null) {
-      dto.setPrepKitId(from.getPrepKit().getId());
-    }
     if (from.getParent() != null) {
       dto.setParentId(from.getParent().getId());
       dto.setParentAlias(from.getParent().getAlias());
@@ -317,11 +314,6 @@ public class Dtos {
       Subproject subproject = new SubprojectImpl();
       subproject.setId(from.getSubprojectId());
       to.setSubproject(subproject);
-    }
-    if (from.getPrepKitId() != null) {
-      KitDescriptor prepKit = new KitDescriptor();
-      prepKit.setId(from.getPrepKitId());
-      to.setPrepKit(prepKit);
     }
     if (from.getSampleClassId() != null) {
       SampleClass sampleClass = new SampleClassImpl();

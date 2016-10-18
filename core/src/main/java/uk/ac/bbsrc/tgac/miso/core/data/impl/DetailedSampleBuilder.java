@@ -37,7 +37,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.StrStatus;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
@@ -85,8 +84,6 @@ public class DetailedSampleBuilder
   private DetailedQcStatus detailedQcStatus;
   private String detailedQcStatusNote;
   private Subproject subproject;
-  private Long kitDescriptorId;
-  private KitDescriptor prepKit;
   private Boolean archived = Boolean.FALSE;
   private String groupId;
   private String groupDescription;
@@ -442,24 +439,6 @@ public class DetailedSampleBuilder
     this.lab = lab;
   }
 
-  public Long getKitDescriptorId() {
-    return kitDescriptorId;
-  }
-
-  public void setKitDescriptorId(Long kitDescriptorId) {
-    this.kitDescriptorId = kitDescriptorId;
-  }
-
-  @Override
-  public KitDescriptor getPrepKit() {
-    return prepKit;
-  }
-
-  @Override
-  public void setPrepKit(KitDescriptor prepKit) {
-    this.prepKit = prepKit;
-  }
-
   @Override
   public Integer getPassageNumber() {
     return passageNumber;
@@ -793,11 +772,6 @@ public class DetailedSampleBuilder
   }
 
   @Override
-  public Long getHibernateKitDescriptorId() {
-    return this.kitDescriptorId;
-  }
-
-  @Override
   public void addLibrary(Library library) throws MalformedLibraryException {
     throw new UnsupportedOperationException("Method not implemented on builder");
   }
@@ -953,7 +927,6 @@ public class DetailedSampleBuilder
     sample.setDetailedQcStatus(detailedQcStatus);
     sample.setDetailedQcStatusNote(detailedQcStatusNote);
     sample.setSubproject(subproject);
-    sample.setPrepKit(prepKit);
     sample.setArchived(archived);
     sample.setGroupId(groupId);
     sample.setGroupDescription(groupDescription);

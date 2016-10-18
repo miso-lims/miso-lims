@@ -4,8 +4,6 @@ import java.util.Set;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
 
-import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
-
 public interface DetailedSample extends Sample {
 
   public DetailedSample getParent();
@@ -32,18 +30,6 @@ public interface DetailedSample extends Sample {
   DetailedQcStatus getDetailedQcStatus();
 
   void setDetailedQcStatus(DetailedQcStatus detailedQcStatus);
-
-  KitDescriptor getPrepKit();
-
-  void setPrepKit(KitDescriptor prepKit);
-
-  /**
-   * This method should ONLY be used for load/save coordination between the Hibernate and old SQL DAOs. For all other purposes, use
-   * getPrepKit().getKitDescriptorId()
-   * 
-   * @return the Kit Descriptor ID loaded by/for Hibernate
-   */
-  Long getHibernateKitDescriptorId();
 
   /**
    * @return the number of this Sample amongst Samples of the same SampleClass sharing the same parent

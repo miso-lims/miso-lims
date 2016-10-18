@@ -19,7 +19,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 
 @Entity
 @Table(name = "DetailedSample")
@@ -47,11 +46,6 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
   @OneToOne(targetEntity = SubprojectImpl.class)
   @JoinColumn(name = "subprojectId")
   private Subproject subproject;
-
-  private Long kitDescriptorId;
-
-  @Transient
-  private KitDescriptor prepKit;
 
   @Column(nullable = false)
   private Boolean archived = Boolean.FALSE;
@@ -125,28 +119,6 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
   @Override
   public void setDetailedQcStatus(DetailedQcStatus detailedQcStatus) {
     this.detailedQcStatus = detailedQcStatus;
-  }
-
-  @Override
-  public KitDescriptor getPrepKit() {
-    return prepKit;
-  }
-
-  @Override
-  public void setPrepKit(KitDescriptor prepKit) {
-    this.prepKit = prepKit;
-
-    // Keep kitDescriptorId field consistent for Hibernate persistence
-    if (prepKit == null) {
-      this.kitDescriptorId = null;
-    } else {
-      this.kitDescriptorId = prepKit.getId();
-    }
-  }
-
-  @Override
-  public Long getHibernateKitDescriptorId() {
-    return kitDescriptorId;
   }
 
   @Override
