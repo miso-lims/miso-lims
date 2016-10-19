@@ -46,6 +46,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.EntityGroup;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
@@ -57,12 +58,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
-import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
@@ -330,7 +329,7 @@ public class MisoRequestManager implements RequestManager {
 
   @SuppressWarnings("rawtypes")
   @Override
-  public Collection<Pool<? extends Poolable<?, ?>>> listAllPoolsBySearch(String query) throws IOException {
+  public Collection<Pool> listAllPoolsBySearch(String query) throws IOException {
     if (poolStore != null) {
       return poolStore.listBySearch(query);
     } else {
@@ -340,7 +339,7 @@ public class MisoRequestManager implements RequestManager {
 
   @SuppressWarnings("rawtypes")
   @Override
-  public Collection<Pool<? extends Poolable<?, ?>>> listAllPoolsWithLimit(int limit) throws IOException {
+  public Collection<Pool> listAllPoolsWithLimit(int limit) throws IOException {
     if (poolStore != null) {
       return poolStore.listAllPoolsWithLimit(limit);
     } else {
@@ -414,7 +413,7 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public Collection<Run> listAllLS454Runs() throws IOException {
     if (runStore != null) {
-      Collection<Run> accessibleRuns = new HashSet<Run>();
+      Collection<Run> accessibleRuns = new HashSet<>();
       for (Run run : runStore.listAll()) {
         if (run.getPlatformType() == PlatformType.LS454) {
           accessibleRuns.add(run);
@@ -429,7 +428,7 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public Collection<Run> listAllIlluminaRuns() throws IOException {
     if (runStore != null) {
-      Collection<Run> accessibleRuns = new HashSet<Run>();
+      Collection<Run> accessibleRuns = new HashSet<>();
       for (Run run : runStore.listAll()) {
         if (run.getPlatformType() == PlatformType.ILLUMINA) {
           accessibleRuns.add(run);
@@ -444,7 +443,7 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public Collection<Run> listAllSolidRuns() throws IOException {
     if (runStore != null) {
-      Collection<Run> accessibleRuns = new HashSet<Run>();
+      Collection<Run> accessibleRuns = new HashSet<>();
       for (Run run : runStore.listAll()) {
         if (run.getPlatformType() == PlatformType.SOLID) {
           accessibleRuns.add(run);
@@ -620,7 +619,7 @@ public class MisoRequestManager implements RequestManager {
 
   @Override
   public Collection<Boxable> getBoxablesFromBarcodeList(List<String> barcodeList) throws IOException {
-    List<Boxable> boxables = new ArrayList<Boxable>();
+    List<Boxable> boxables = new ArrayList<>();
     if (sampleStore != null && libraryStore != null) {
       boxables.addAll(sampleStore.getByBarcodeList(barcodeList));
       boxables.addAll(libraryStore.getByBarcodeList(barcodeList));
@@ -633,7 +632,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Pool<? extends Poolable<?, ?>>> listAllPools() throws IOException {
+  public Collection<Pool> listAllPools() throws IOException {
     if (poolStore != null) {
       return poolStore.listAll();
     } else {
@@ -642,7 +641,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Pool<? extends Poolable<?, ?>>> listAllPoolsByPlatform(PlatformType platformType) throws IOException {
+  public Collection<Pool> listAllPoolsByPlatform(PlatformType platformType) throws IOException {
     if (poolStore != null) {
       return poolStore.listAllByPlatform(platformType);
     } else {
@@ -651,7 +650,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Pool<? extends Poolable<?, ?>>> listAllPoolsByPlatformAndSearch(PlatformType platformType, String query)
+  public Collection<Pool> listAllPoolsByPlatformAndSearch(PlatformType platformType, String query)
       throws IOException {
     if (poolStore != null) {
       return poolStore.listAllByPlatformAndSearch(platformType, query);
@@ -661,7 +660,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Pool<? extends Poolable<?, ?>>> listReadyPoolsByPlatform(PlatformType platformType) throws IOException {
+  public Collection<Pool> listReadyPoolsByPlatform(PlatformType platformType) throws IOException {
     if (poolStore != null) {
       return poolStore.listReadyByPlatform(platformType);
     } else {
@@ -670,7 +669,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Pool<? extends Poolable<?, ?>>> listReadyPoolsByPlatformAndSearch(PlatformType platformType, String query)
+  public Collection<Pool> listReadyPoolsByPlatformAndSearch(PlatformType platformType, String query)
       throws IOException {
     if (poolStore != null) {
       return poolStore.listReadyByPlatformAndSearch(platformType, query);
@@ -680,7 +679,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Pool<? extends Poolable<?, ?>>> listPoolsByProjectId(long projectId) throws IOException {
+  public Collection<Pool> listPoolsByProjectId(long projectId) throws IOException {
     if (poolStore != null) {
       return poolStore.listByProjectId(projectId);
     } else {
@@ -689,7 +688,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Pool<? extends Poolable<?, ?>>> listPoolsByLibraryId(long libraryId) throws IOException {
+  public Collection<Pool> listPoolsByLibraryId(long libraryId) throws IOException {
     if (poolStore != null) {
       return poolStore.listByLibraryId(libraryId);
     } else {
@@ -698,7 +697,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Pool<? extends Poolable<?, ?>>> listPoolsBySampleId(long sampleId) throws IOException {
+  public Collection<Pool> listPoolsBySampleId(long sampleId) throws IOException {
     if (poolStore != null) {
       return poolStore.listBySampleId(sampleId);
     } else {
@@ -753,7 +752,7 @@ public class MisoRequestManager implements RequestManager {
 
   @Override
   public Collection<Dilution> listAllLibraryDilutionsBySearchAndPlatform(String query, PlatformType platformType) throws IOException {
-    List<Dilution> dilutions = new ArrayList<Dilution>();
+    List<Dilution> dilutions = new ArrayList<>();
     for (Dilution d : libraryDilutionStore.listAllLibraryDilutionsBySearchAndPlatform(query, platformType)) {
       dilutions.add(d);
     }
@@ -766,7 +765,7 @@ public class MisoRequestManager implements RequestManager {
 
   @Override
   public Collection<Dilution> listAllDilutionsByProjectAndPlatform(long projectId, PlatformType platformType) throws IOException {
-    List<Dilution> dilutions = new ArrayList<Dilution>();
+    List<Dilution> dilutions = new ArrayList<>();
     for (Dilution d : libraryDilutionStore.listAllLibraryDilutionsByProjectAndPlatform(projectId, platformType)) {
       dilutions.add(d);
     }
@@ -1092,7 +1091,7 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public Collection<Platform> listPlatformsOfType(PlatformType platformType) throws IOException {
     if (platformStore != null) {
-      Collection<Platform> platforms = new TreeSet<Platform>();
+      Collection<Platform> platforms = new TreeSet<>();
       for (Platform platform : platformStore.listAll()) {
         if (platform.getPlatformType().equals(platformType)) {
           platforms.add(platform);
@@ -2156,7 +2155,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Pool<? extends Poolable<?, ?>> getPoolById(long poolId) throws IOException {
+  public Pool getPoolById(long poolId) throws IOException {
     if (poolStore != null) {
       return poolStore.get(poolId);
     } else {
@@ -2174,7 +2173,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Pool<? extends Poolable<?, ?>> getPoolByBarcode(String barcode, PlatformType platformType) throws IOException {
+  public Pool getPoolByBarcode(String barcode, PlatformType platformType) throws IOException {
     if (poolStore != null) {
       return poolStore.getPoolByBarcode(barcode, platformType);
     } else {
@@ -2183,7 +2182,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Pool<? extends Poolable<?, ?>> getPoolByBarcode(String barcode) throws IOException {
+  public Pool getPoolByBarcode(String barcode) throws IOException {
     String[] s = barcode.split("::");
     if (s.length > 1) {
       String platformKey = s[1];
@@ -2198,7 +2197,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Pool<? extends Poolable<?, ?>> getPoolByIdBarcode(String barcode) throws IOException {
+  public Pool getPoolByIdBarcode(String barcode) throws IOException {
     if (poolStore != null) {
       return poolStore.getByBarcode(barcode);
     } else {
@@ -2767,7 +2766,7 @@ public class MisoRequestManager implements RequestManager {
   };
 
   @Override
-  public List<Pool<? extends Poolable<?, ?>>> getPoolsByPageSizeSearchPlatform(int offset, int limit, String querystr, String sortDir,
+  public List<Pool> getPoolsByPageSizeSearchPlatform(int offset, int limit, String querystr, String sortDir,
       String sortCol, PlatformType platform) throws IOException {
     if (poolStore != null) {
       return poolStore.listBySearchOffsetAndNumResultsAndPlatform(offset, limit, querystr, sortDir, sortCol, platform);
@@ -2777,7 +2776,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public List<Pool<? extends Poolable<?, ?>>> getPoolsByPageAndSize(int offset, int limit, String sortDir, String sortCol,
+  public List<Pool> getPoolsByPageAndSize(int offset, int limit, String sortDir, String sortCol,
       PlatformType platform) throws IOException {
     if (poolStore != null) {
       return poolStore.listByOffsetAndNumResults(offset, limit, sortDir, sortCol, platform);

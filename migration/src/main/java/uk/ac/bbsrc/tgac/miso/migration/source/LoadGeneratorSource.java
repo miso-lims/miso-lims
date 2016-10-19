@@ -3,13 +3,16 @@ package uk.ac.bbsrc.tgac.miso.migration.source;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.springframework.format.datetime.DateFormatter;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
+import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryAdditionalInfo;
@@ -118,7 +121,7 @@ public class LoadGeneratorSource implements MigrationSource {
   private List<Sample> samples = null;
   private List<Library> libraries = null;
   private List<LibraryDilution> libraryDilutions = null;
-  private List<Pool<LibraryDilution>> pools = null;
+  private List<Pool> pools = null;
   private List<Run> runs = null;
 
   private static final String DEFAULT_SAMPLE_TYPE = "OTHER";
@@ -395,13 +398,13 @@ public class LoadGeneratorSource implements MigrationSource {
     return ldi;
   }
 
-  public List<Pool<LibraryDilution>> getPools() {
+  public List<Pool> getPools() {
     if (this.pools == null) {
       log.info("Generating " + poolCount + " pools, each containing " + poolSize + " dilutions...");
-      List<Pool<LibraryDilution>> pools = new ArrayList<>();
+      List<Pool> pools = new ArrayList<>();
       List<LibraryDilution> libraryDilutions = getLibraryDilutions();
       for (int poolNum = 1, libNum = 0; poolNum <= poolCount; poolNum++) {
-        List<LibraryDilution> ldis = new ArrayList<>();
+        Set<Dilution> ldis = new HashSet<>();
         while (ldis.size() < poolSize) {
           ldis.add(libraryDilutions.get(libNum));
           libNum++;
@@ -415,8 +418,8 @@ public class LoadGeneratorSource implements MigrationSource {
     return this.pools;
   }
 
-  private Pool<LibraryDilution> createPool(Collection<LibraryDilution> libraryDilutions, int poolNum) {
-    Pool<LibraryDilution> p = new PoolImpl<LibraryDilution>();
+  private Pool createPool(Set<Dilution> libraryDilutions, int poolNum) {
+    Pool p = new PoolImpl();
     p.setAlias("Test_Pool_" + poolNum);
     p.setPoolableElements(libraryDilutions);
     p.setConcentration(2D);
@@ -429,9 +432,9 @@ public class LoadGeneratorSource implements MigrationSource {
     if (this.runs == null) {
       log.info("Generating " + runCount + " runs, each with a flowcell containing " + runSize + " pools...");
       List<Run> runs = new ArrayList<>();
-      List<Pool<LibraryDilution>> pools = getPools();
+      List<Pool> pools = getPools();
       for (int runNum = 1, poolNum = 0; runNum <= runCount; runNum++) {
-        List<Pool<LibraryDilution>> runPools = new ArrayList<>();
+        List<Pool> runPools = new ArrayList<>();
         while (runPools.size() < runSize) {
           runPools.add(pools.get(poolNum));
           poolNum++;
@@ -449,7 +452,7 @@ public class LoadGeneratorSource implements MigrationSource {
   private static final String RUN_DATE_STRING = new DateFormatter("yyyyMMdd").print(RUN_DATE, Locale.ENGLISH);
   private static final String RUN_INSTRUMENT_NAME = "Instrument";
 
-  private Run createRun(List<Pool<LibraryDilution>> pools, int runNum) {
+  private Run createRun(List<Pool> pools, int runNum) {
     int runNumPadding = Math.max(Integer.toString(runNum).length(), 4);
     String runNumPadded = Integer.toString(runNum);
     while (runNumPadded.length() < runNumPadding) {

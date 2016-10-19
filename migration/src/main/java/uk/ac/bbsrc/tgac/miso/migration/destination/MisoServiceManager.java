@@ -21,7 +21,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -256,7 +255,7 @@ public class MisoServiceManager {
   }
 
   private <T extends Nameable> MisoNamingScheme<T> getNameableNamingScheme(Class<T> clazz) {
-    return new DefaultEntityNamingScheme<T>(clazz);
+    return new DefaultEntityNamingScheme<>(clazz);
   }
 
   public <T extends MisoNamingScheme<Nameable>> void setNameableNamingScheme(Class<T> clazz) {
@@ -723,7 +722,7 @@ public class MisoServiceManager {
     dao.setDataObjectFactory(dataObjectFactory);
     dao.setExperimentDAO(experimentDao);
     dao.setJdbcTemplate(jdbcTemplate);
-    dao.setNamingScheme(new DefaultEntityNamingScheme<Pool<? extends Poolable<?, ?>>>()); // TODO: config
+    dao.setNamingScheme(new DefaultEntityNamingScheme<Pool>()); // TODO: config
     dao.setNoteDAO(noteDao);
     dao.setSecurityDAO(securityStore);
     dao.setSecurityManager(securityManager);

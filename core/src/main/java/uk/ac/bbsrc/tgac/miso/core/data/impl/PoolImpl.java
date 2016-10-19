@@ -29,7 +29,6 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractPool;
-import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 /**
@@ -38,7 +37,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
  * @author Rob Davey
  * @since 0.0.2
  */
-public class PoolImpl<P extends Poolable<?, ?>> extends AbstractPool<P> implements Serializable {
+public class PoolImpl extends AbstractPool implements Serializable {
 
   private static final long serialVersionUID = 1L;
 

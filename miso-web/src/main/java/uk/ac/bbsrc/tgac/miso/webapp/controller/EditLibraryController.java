@@ -81,7 +81,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
@@ -202,18 +201,18 @@ public class EditLibraryController {
 
   }
 
-  public List<Pool<? extends Poolable<?, ?>>> getPoolsByLibrary(Library l) throws IOException {
+  public List<Pool> getPoolsByLibrary(Library l) throws IOException {
     if (!l.getLibraryDilutions().isEmpty()) {
-      List<Pool<? extends Poolable<?, ?>>> pools = new ArrayList<>(requestManager.listPoolsByLibraryId(l.getId()));
+      List<Pool> pools = new ArrayList<>(requestManager.listPoolsByLibraryId(l.getId()));
       Collections.sort(pools);
       return pools;
     }
     return Collections.emptyList();
   }
 
-  public Set<Run> getRunsByLibraryPools(List<Pool<? extends Poolable<?, ?>>> pools) throws IOException {
+  public Set<Run> getRunsByLibraryPools(List<Pool> pools) throws IOException {
     Set<Run> runs = new TreeSet<>();
-    for (Pool<? extends Poolable<?, ?>> pool : pools) {
+    for (Pool pool : pools) {
       Collection<Run> prs = requestManager.listRunsByPoolId(pool.getId());
       runs.addAll(prs);
     }
@@ -648,9 +647,9 @@ public class EditLibraryController {
       populateAvailableIndexFamilies(library, model);
       addAdjacentLibraries(library, model);
 
-      List<Pool<? extends Poolable<?, ?>>> pools = getPoolsByLibrary(library);
+      List<Pool> pools = getPoolsByLibrary(library);
       Map<Long, Library> poolLibraryMap = new HashMap<>();
-      for (Pool<? extends Poolable<?, ?>> pool : pools) {
+      for (Pool pool : pools) {
         poolLibraryMap.put(pool.getId(), library);
       }
       model.put("poolLibraryMap", poolLibraryMap);
@@ -744,9 +743,9 @@ public class EditLibraryController {
 
       addAdjacentLibraries(library, model);
 
-      List<Pool<? extends Poolable<?, ?>>> pools = getPoolsByLibrary(library);
+      List<Pool> pools = getPoolsByLibrary(library);
       Map<Long, Library> poolLibraryMap = new HashMap<>();
-      for (Pool<? extends Poolable<?, ?>> pool : pools) {
+      for (Pool pool : pools) {
         poolLibraryMap.put(pool.getId(), library);
       }
       model.put("poolLibraryMap", poolLibraryMap);

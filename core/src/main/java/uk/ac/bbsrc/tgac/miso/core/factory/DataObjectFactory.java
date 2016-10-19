@@ -23,8 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.core.factory;
 
-import java.util.LinkedList;
-
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.User;
 
@@ -35,7 +33,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
-import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
@@ -131,11 +128,11 @@ public abstract class DataObjectFactory {
 
   public abstract emPCR getEmPCR(User user);
 
-  public abstract Pool<? extends Poolable<?, ?>> getPool();
+  public abstract Pool getPool();
 
-  public abstract Pool<? extends Poolable<?, ?>> getPool(User user);
+  public abstract Pool getPool(User user);
 
-  public abstract Pool<? extends Poolable<?, ?>> getPoolOfType(PlatformType platformType, User user);
+  public abstract Pool getPoolOfType(PlatformType platformType, User user);
 
   public abstract PoolQC getPoolQC();
 

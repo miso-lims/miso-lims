@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.servlet.http.HttpSession;
@@ -44,12 +43,10 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
-import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -73,20 +70,20 @@ public class PoolSearchService {
   private RequestManager requestManager;
 
   private abstract class PoolSearch {
-    public abstract Collection<Pool<? extends Poolable<?, ?>>> all(PlatformType type) throws IOException;
+    public abstract Collection<Pool> all(PlatformType type) throws IOException;
 
-    public abstract Collection<Pool<? extends Poolable<?, ?>>> search(PlatformType type, String query) throws IOException;
+    public abstract Collection<Pool> search(PlatformType type, String query) throws IOException;
   }
 
   private class ReadyPools extends PoolSearch {
 
     @Override
-    public Collection<Pool<? extends Poolable<?, ?>>> all(PlatformType type) throws IOException {
+    public Collection<Pool> all(PlatformType type) throws IOException {
       return requestManager.listReadyPoolsByPlatform(type);
     }
 
     @Override
-    public Collection<Pool<? extends Poolable<?, ?>>> search(PlatformType type, String query) throws IOException {
+    public Collection<Pool> search(PlatformType type, String query) throws IOException {
       return requestManager.listReadyPoolsByPlatformAndSearch(type, query);
     }
   }
@@ -94,12 +91,12 @@ public class PoolSearchService {
   private class AllPools extends PoolSearch {
 
     @Override
-    public Collection<Pool<? extends Poolable<?, ?>>> all(PlatformType type) throws IOException {
+    public Collection<Pool> all(PlatformType type) throws IOException {
       return requestManager.listAllPoolsByPlatform(type);
     }
 
     @Override
-    public Collection<Pool<? extends Poolable<?, ?>>> search(PlatformType type, String query) throws IOException {
+    public Collection<Pool> search(PlatformType type, String query) throws IOException {
       return requestManager.listAllPoolsByPlatformAndSearch(type, query);
     }
 
@@ -112,7 +109,7 @@ public class PoolSearchService {
       PlatformType platformType = PlatformType.valueOf(json.getString("platformType").toUpperCase());
       boolean readyOnly = json.getBoolean("readyOnly");
       try {
-        Collection<Pool<? extends Poolable<?, ?>>> pools;
+        Collection<Pool> pools;
         PoolSearch search = readyOnly ? new ReadyPools() : new AllPools();
         if (!isStringEmptyOrNull(searchStr)) {
           pools = search.search(platformType, searchStr);
@@ -124,9 +121,9 @@ public class PoolSearchService {
           pools = search.all(platformType);
         }
         if (pools.size() > 0) {
-          List<Pool<? extends Poolable<?, ?>>> rPools = new ArrayList<>(pools);
+          List<Pool> rPools = new ArrayList<>(pools);
           Collections.reverse(rPools);
-          for (Pool<? extends Poolable<?, ?>> pool : rPools) {
+          for (Pool pool : rPools) {
             b.append(poolHtml(pool));
           }
         } else {
@@ -147,11 +144,11 @@ public class PoolSearchService {
     try {
       if (searchStr.length() > 1) {
         StringBuilder b = new StringBuilder();
-        List<? extends Dilution> dilutions = new ArrayList<Dilution>(
+        List<? extends Dilution> dilutions = new ArrayList<>(
             requestManager.listAllLibraryDilutionsBySearchAndPlatform(searchStr, PlatformType.valueOf(platformType)));
         if (dilutions.isEmpty()) {
           // Base64-encoded string, most likely a barcode image beeped in. decode and search
-          dilutions = new ArrayList<Dilution>(requestManager
+          dilutions = new ArrayList<>(requestManager
               .listAllLibraryDilutionsBySearchAndPlatform(new String(Base64.decodeBase64(searchStr)), PlatformType.valueOf(platformType)));
 
         }
@@ -180,7 +177,7 @@ public class PoolSearchService {
     }
   }
 
-  private String poolHtml(Pool<? extends Poolable<?, ?>> p) {
+  private String poolHtml(Pool p) {
     StringBuilder b = new StringBuilder();
     String lowquality = p.getHasLowQualityMembers() ? " lowquality" : "";
     b.append("<div style='position:relative' onMouseOver='this.className=\"dashboardhighlight" + lowquality
@@ -191,23 +188,19 @@ public class PoolSearchService {
       b.append("<div style=\"float:left\"><b>" + p.getName() + " (" + p.getAlias() + ") : " + p.getCreationDate() + "</b><br/>");
     }
 
-    Collection<? extends Poolable<?, ?>> ds = p.getPoolableElements();
-    for (Poolable d : ds) {
-      if (d instanceof Dilution) {
-        b.append("<span" + (((Dilution) d).getLibrary().isLowQuality() ? " class='lowquality'" : "") + ">" + d.getName() + " ("
-            + ((Dilution) d).getLibrary().getSample().getProject().getAlias() + ") : " + ((Dilution) d).getConcentration() + " "
-            + ((Dilution) d).getUnits() + "</span><br/>");
-      } else {
-        b.append("<span" + (d instanceof Library && ((Library) d).isLowQuality() ? " class='lowquality'" : "") + ">" + d.getName()
-            + "</span><br/>");
-      }
+    Collection<Dilution> ds = p.getPoolableElements();
+    for (Dilution d : ds) {
+      b.append("<span" + (d.getLibrary().isLowQuality() ? " class='lowquality'" : "") + ">" + d.getName() + " ("
+          + d.getLibrary().getSample().getProject().getAlias() + ") : " + d.getConcentration() + " "
+          + d.getUnits() + "</span><br/>");
     }
 
     b.append("<br/><i>");
     Collection<Experiment> exprs = p.getExperiments();
     for (Experiment e : exprs) {
       b.append(
-          "<span>" + e.getStudy().getProject().getAlias() + "(" + e.getName() + ": " + p.getDilutions().size() + " dilutions)</span><br/>");
+          "<span>" + e.getStudy().getProject().getAlias() + "(" + e.getName() + ": " + p.getPoolableElements().size()
+              + " dilutions)</span><br/>");
     }
     b.append("</i>");
 

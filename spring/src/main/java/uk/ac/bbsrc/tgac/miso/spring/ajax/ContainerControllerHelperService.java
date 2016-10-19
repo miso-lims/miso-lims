@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
@@ -54,13 +53,10 @@ import net.sourceforge.fluxion.ajax.util.JSONUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
-import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
@@ -475,23 +471,21 @@ public class ContainerControllerHelperService {
     try {
       String partition = json.getString("partition");
       Long poolId = json.getLong("poolId");
-      Pool<? extends Poolable> p = requestManager.getPoolById(poolId);
+      Pool p = requestManager.getPoolById(poolId);
       StringBuilder sb = new StringBuilder();
 
       Set<Project> pooledProjects = new HashSet<>();
 
       if (p.getExperiments().size() != 0) {
         // check if each poolable has been in a study for this pool already
-        Collection<? extends Poolable> ds = p.getPoolableElements();
-        for (Poolable d : ds) {
-          if (d instanceof Dilution) {
-            Collection<Study> studies = requestManager.listAllStudiesByLibraryId(((Dilution) d).getLibrary().getId());
-            if (studies.isEmpty()) {
-              pooledProjects.add(((Dilution) d).getLibrary().getSample().getProject());
-            } else {
-              for (Study stu : studies) {
-                pooledProjects.add(stu.getProject());
-              }
+        Collection<Dilution> ds = p.getPoolableElements();
+        for (Dilution d : ds) {
+          Collection<Study> studies = requestManager.listAllStudiesByLibraryId(d.getLibrary().getId());
+          if (studies.isEmpty()) {
+            pooledProjects.add(d.getLibrary().getSample().getProject());
+          } else {
+            for (Study stu : studies) {
+              pooledProjects.add(stu.getProject());
             }
           }
         }
@@ -503,11 +497,9 @@ public class ContainerControllerHelperService {
           }
         }
       } else {
-        Collection<? extends Poolable> ds = p.getPoolableElements();
-        for (Poolable d : ds) {
-          if (d instanceof Dilution) {
-            pooledProjects.add(((Dilution) d).getLibrary().getSample().getProject());
-          }
+        Collection<Dilution> ds = p.getPoolableElements();
+        for (Dilution d : ds) {
+          pooledProjects.add(d.getLibrary().getSample().getProject());
         }
       }
       sb.append("<div style='float:left; clear:both'>");
@@ -539,7 +531,7 @@ public class ContainerControllerHelperService {
     }
   }
 
-  private String poolHtml(Pool<? extends Poolable> p, int partition) {
+  private String poolHtml(Pool p, int partition) {
     StringBuilder b = new StringBuilder();
     try {
       b.append(
@@ -550,22 +542,18 @@ public class ContainerControllerHelperService {
         b.append("<div style=\"float:left\"><b>" + p.getName() + " (" + p.getAlias() + ") : " + p.getCreationDate() + "</b><br/>");
       }
 
-      Collection<? extends Poolable> ds = p.getPoolableElements();
+      Collection<Dilution> ds = p.getPoolableElements();
       Set<Project> pooledProjects = new HashSet<>();
-      for (Poolable d : ds) {
-        if (d instanceof Dilution) {
-          pooledProjects.add(((Dilution) d).getLibrary().getSample().getProject());
-          b.append("<span>" + d.getName() + " (" + ((Dilution) d).getLibrary().getSample().getProject().getAlias() + ") : "
-              + ((Dilution) d).getConcentration() + " " + ((Dilution) d).getUnits() + "</span><br/>");
-        } else {
-          b.append("<span>" + d.getName() + "</span><br/>");
-        }
+      for (Dilution d : ds) {
+        pooledProjects.add(d.getLibrary().getSample().getProject());
+        b.append("<span>" + d.getName() + " (" + d.getLibrary().getSample().getProject().getAlias() + ") : "
+            + d.getConcentration() + " " + d.getUnits() + "</span><br/>");
       }
 
       b.append("<br/><i>");
       Collection<Experiment> exprs = p.getExperiments();
       for (Experiment e : exprs) {
-        b.append("<span>" + e.getStudy().getProject().getAlias() + "(" + e.getName() + ": " + p.getDilutions().size()
+        b.append("<span>" + e.getStudy().getProject().getAlias() + "(" + e.getName() + ": " + p.getPoolableElements().size()
             + " dilutions)</span><br/>");
       }
       b.append("</i>");
@@ -649,7 +637,8 @@ public class ContainerControllerHelperService {
       }
 
       sb.append("<i>");
-      sb.append("<span>" + s.getProject().getAlias() + " (" + e.getName() + ": " + p.getDilutions().size() + " dilutions)</span><br/>");
+      sb.append(
+          "<span>" + s.getProject().getAlias() + " (" + e.getName() + ": " + p.getPoolableElements().size() + " dilutions)</span><br/>");
       sb.append("</i>");
 
       return JSONUtils.JSONObjectResponse("html", sb.toString());
@@ -710,7 +699,7 @@ public class ContainerControllerHelperService {
                 if (!p.getPool().getExperiments().isEmpty()) {
                   sb.append("<i>");
                   for (Experiment e : p.getPool().getExperiments()) {
-                    sb.append(e.getStudy().getProject().getAlias() + " (" + e.getName() + ": " + p.getPool().getDilutions().size()
+                    sb.append(e.getStudy().getProject().getAlias() + " (" + e.getName() + ": " + p.getPool().getPoolableElements().size()
                         + " dilutions)<br/>");
                   }
                   sb.append("</i>");

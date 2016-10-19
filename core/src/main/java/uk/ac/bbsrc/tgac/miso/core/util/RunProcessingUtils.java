@@ -26,7 +26,6 @@ package uk.ac.bbsrc.tgac.miso.core.util;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
@@ -61,9 +60,9 @@ public class RunProcessingUtils {
 
     for (SequencerPoolPartition l : f.getPartitions()) {
       int count = 0;
-      Pool<? extends Poolable> p = l.getPool();
+      Pool p = l.getPool();
       if (p != null) {
-        for (Dilution ld : p.getDilutions()) {
+        for (Dilution ld : p.getPoolableElements()) {
           count++;
           sb.append(f.getIdentificationBarcode()).append(",").append(l.getPartitionNumber()).append(",").append(f.getId()).append("_")
               .append(ld.getLibrary().getName()).append("_").append(ld.getName()).append(",")

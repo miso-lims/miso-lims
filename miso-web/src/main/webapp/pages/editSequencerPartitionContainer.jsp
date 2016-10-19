@@ -240,7 +240,7 @@
                               <c:choose>
                                 <c:when test="${not empty partition.pool.experiments}">
                                   <i><c:forEach items="${partition.pool.experiments}" var="experiment">
-                                    ${experiment.study.project.alias} (${experiment.name}: ${fn:length(partition.pool.dilutions)} dilutions)<br/>
+                                    ${experiment.study.project.alias} (${experiment.name}: ${fn:length(partition.pool.poolableElements)} dilutions)<br/>
                                   </c:forEach>
                                   </i>
                                   <script>

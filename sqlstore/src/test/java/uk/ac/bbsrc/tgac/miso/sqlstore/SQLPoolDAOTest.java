@@ -1,15 +1,10 @@
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +30,6 @@ import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ExperimentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PlatformImpl;
@@ -84,7 +78,7 @@ public class SQLPoolDAOTest extends AbstractDAOTest {
   @Mock
   private com.eaglegenomics.simlims.core.manager.SecurityManager securityManager;
   @Mock
-  private MisoNamingScheme<Pool<? extends Poolable<?, ?>>> namingScheme;
+  private MisoNamingScheme<Pool> namingScheme;
 
   @InjectMocks
   private SQLPoolDAO dao;
@@ -125,7 +119,7 @@ public class SQLPoolDAOTest extends AbstractDAOTest {
 
   @Test
   public void testGet() throws IOException {
-    Pool<?> pool = dao.get(1L);
+    Pool pool = dao.get(1L);
     assertNotNull(pool);
     assertEquals(1L, pool.getId());
   }
@@ -137,7 +131,7 @@ public class SQLPoolDAOTest extends AbstractDAOTest {
 
   @Test
   public void testLazyGet() throws IOException {
-    Pool<?> pool = dao.lazyGet(1L);
+    Pool pool = dao.lazyGet(1L);
     assertNotNull(pool);
     assertEquals(1L, pool.getId());
   }
@@ -370,7 +364,7 @@ public class SQLPoolDAOTest extends AbstractDAOTest {
 
   @Test
   public void testListByIlluminaSearchWithLimit() throws IOException {
-    List<Pool<? extends Poolable<?, ?>>> pools = dao
+    List<Pool> pools = dao
         .listBySearchOffsetAndNumResultsAndPlatform(5, 3, "IPO", "asc", "id", PlatformType.ILLUMINA);
     assertEquals(3, pools.size());
     assertEquals(6L, pools.get(0).getId());
@@ -378,21 +372,21 @@ public class SQLPoolDAOTest extends AbstractDAOTest {
 
   @Test
   public void testListByIlluminaEmptySearchWithLimit() throws IOException {
-    List<Pool<? extends Poolable<?, ?>>> pools = dao
+    List<Pool> pools = dao
         .listBySearchOffsetAndNumResultsAndPlatform(5, 3, "", "asc", "id", PlatformType.ILLUMINA);
     assertEquals(3L, pools.size());
   }
 
   @Test
   public void testListByIlluminaBadSearchWithLimit() throws IOException {
-    List<Pool<? extends Poolable<?, ?>>> pools = dao
+    List<Pool> pools = dao
         .listBySearchOffsetAndNumResultsAndPlatform(5, 3, "; DROP TABLE Pool;", "asc", "id", PlatformType.ILLUMINA);
     assertEquals(0L, pools.size());
   }
 
   @Test
   public void testListByIlluminaOffsetBadSortDir() throws IOException {
-    List<Pool<? extends Poolable<?, ?>>> pools = dao.listByOffsetAndNumResults(5, 3, "BARK", "id", PlatformType.ILLUMINA);
+    List<Pool> pools = dao.listByOffsetAndNumResults(5, 3, "BARK", "id", PlatformType.ILLUMINA);
     assertEquals(3, pools.size());
   }
 
@@ -404,14 +398,14 @@ public class SQLPoolDAOTest extends AbstractDAOTest {
 
   @Test
   public void testListIlluminaOffsetThreeWithThreeSamplesPerPageOrderLastMod() throws IOException {
-    List<Pool<? extends Poolable<?, ?>>> pools = dao.listByOffsetAndNumResults(3, 3, "desc", "lastModified", PlatformType.ILLUMINA);
+    List<Pool> pools = dao.listByOffsetAndNumResults(3, 3, "desc", "lastModified", PlatformType.ILLUMINA);
     assertEquals(3, pools.size());
     assertEquals(7, pools.get(0).getId());
   }
 
   @Test
   public void testAutoGenerateIdBarcode() {
-    Pool<LibraryDilution> p = new PoolImpl<>();
+    Pool p = new PoolImpl();
     p.setName("name");
     p.setPlatformType(PlatformType.ILLUMINA);
     dao.autoGenerateIdBarcode(p);
@@ -425,7 +419,7 @@ public class SQLPoolDAOTest extends AbstractDAOTest {
     Platform plat = new PlatformImpl();
     plat.setPlatformType(PlatformType.ILLUMINA);
     exp.setPlatform(plat);
-    Pool<?> p = dao.getPoolByExperiment(exp);
+    Pool p = dao.getPoolByExperiment(exp);
     assertNotNull(p);
   }
 
@@ -515,13 +509,13 @@ public class SQLPoolDAOTest extends AbstractDAOTest {
   }
 
   @Test
-  public void testGetByBarcodeListNull() {
+  public void testGetByBarcodeListNull() throws IOException {
     expectedException.expect(NullPointerException.class);
     dao.getByBarcodeList(null);
   }
 
   @Test
-  public void testGetByBarcodeListEmpty() {
+  public void testGetByBarcodeListEmpty() throws IOException {
     assertEquals(0, dao.getByBarcodeList(new ArrayList<String>()).size());
   }
 
@@ -537,7 +531,7 @@ public class SQLPoolDAOTest extends AbstractDAOTest {
 
   @Test
   public void testRemove() throws Exception {
-    Pool<? extends Poolable<?, ?>> pool = new PoolImpl();
+    Pool pool = new PoolImpl();
     String poolName = "IPO111";
     pool.setName(poolName);
     pool.setAlias("poolAlias");
@@ -552,7 +546,7 @@ public class SQLPoolDAOTest extends AbstractDAOTest {
     when(namingScheme.validateField("name", pool.getName())).thenReturn(true);
 
     long poolId = dao.save(pool);
-    Pool<? extends Poolable<?, ?>> insertedPool = dao.get(poolId);
+    Pool insertedPool = dao.get(poolId);
     assertNotNull(insertedPool);
     insertedPool.setExperiments(new ArrayList<Experiment>());
     insertedPool.setPoolableElements(null);
@@ -566,7 +560,7 @@ public class SQLPoolDAOTest extends AbstractDAOTest {
   public void testSaveNew() throws IOException, MisoNamingException {
     long autoIncrementId = nextAutoIncrementId;
     assertNull(dao.get(autoIncrementId));
-    Pool<LibraryDilution> pool = new PoolImpl<>();
+    Pool pool = new PoolImpl();
     pool.setAlias("Test Pool");
     pool.setPlatformType(PlatformType.ILLUMINA);
     User user = new UserImpl();
@@ -582,7 +576,7 @@ public class SQLPoolDAOTest extends AbstractDAOTest {
 
   @Test
   public void testSaveEdit() throws IOException, MisoNamingException {
-    Pool<? extends Poolable<?, ?>> oldPool = dao.get(1L);
+    Pool oldPool = dao.get(1L);
     assertNotNull(oldPool);
     oldPool.setAlias("New Alias");
     oldPool.setVolume(20.5D);
@@ -596,7 +590,7 @@ public class SQLPoolDAOTest extends AbstractDAOTest {
     Mockito.when(namingScheme.validateField(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
 
     assertEquals(1L, dao.save(oldPool));
-    Pool<? extends Poolable<?, ?>> newPool = dao.get(1L);
+    Pool newPool = dao.get(1L);
     assertNotNull(newPool);
     assertEquals(oldPool.getAlias(), newPool.getAlias());
     assertEquals(oldPool.getVolume(), newPool.getVolume());

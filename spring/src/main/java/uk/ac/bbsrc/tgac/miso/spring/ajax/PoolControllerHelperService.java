@@ -61,22 +61,19 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
-import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
-import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.PrintJob;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
@@ -120,7 +117,7 @@ public class PoolControllerHelperService {
       for (QcType s : types) {
         sb.append("<option units='" + s.getUnits() + "' value='" + s.getQcTypeId() + "'>" + s.getName() + "</option>");
       }
-      Map<String, Object> map = new HashMap<String, Object>();
+      Map<String, Object> map = new HashMap<>();
       map.put("types", sb.toString());
       return JSONUtils.JSONObjectResponse(map);
     } catch (IOException e) {
@@ -139,7 +136,7 @@ public class PoolControllerHelperService {
       }
       if (json.has("poolId") && !isStringEmptyOrNull(json.getString("poolId"))) {
         Long poolId = Long.parseLong(json.getString("poolId"));
-        Pool<? extends Poolable<?, ?>> pool = requestManager.getPoolById(poolId);
+        Pool pool = requestManager.getPoolById(poolId);
         PoolQC newQc = dataObjectFactory.getPoolQC();
         if (json.has("qcPassed") && json.getString("qcPassed").equals("true")) {
           pool.setQcPassed(true);
@@ -191,7 +188,7 @@ public class PoolControllerHelperService {
 
       // persist
       if (ok) {
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
         JSONArray a = new JSONArray();
         for (JSONObject qc : (Iterable<JSONObject>) qcs) {
           JSONObject j = addPoolQC(session, qc);
@@ -273,7 +270,7 @@ public class PoolControllerHelperService {
 
         // make sure there are no duplicates and order the strings
         // by putitng the codes in a treeset
-        TreeSet<String> hcodes = new TreeSet<String>();
+        TreeSet<String> hcodes = new TreeSet<>();
         hcodes.addAll(Arrays.asList((String[]) a.toArray(new String[0])));
 
         StringBuilder sb = new StringBuilder();
@@ -301,7 +298,7 @@ public class PoolControllerHelperService {
 
         // make sure there are no duplicates and order the strings
         // by putitng the codes in a treeset
-        TreeSet<String> hcodes = new TreeSet<String>();
+        TreeSet<String> hcodes = new TreeSet<>();
         hcodes.addAll(Arrays.asList(codes));
 
         StringBuilder sb = new StringBuilder();
@@ -325,7 +322,7 @@ public class PoolControllerHelperService {
     Long poolId = json.getLong("poolId");
     File temploc = getBarcodeFileLocation(session);
     try {
-      Pool<? extends Poolable<?, ?>> pool = requestManager.getPoolById(poolId);
+      Pool pool = requestManager.getPoolById(poolId);
       barcodeFactory.setPointPixels(1.5f);
       barcodeFactory.setBitmapResolution(600);
 
@@ -384,11 +381,11 @@ public class PoolControllerHelperService {
         mps = printManager.getPrintService(serviceName);
       }
 
-      Queue<File> thingsToPrint = new LinkedList<File>();
+      Queue<File> thingsToPrint = new LinkedList<>();
       for (JSONObject p : (Iterable<JSONObject>) ss) {
         try {
           Long poolId = p.getLong("poolId");
-          Pool<? extends Poolable<?, ?>> pool = requestManager.getPoolById(poolId);
+          Pool pool = requestManager.getPoolById(poolId);
 
           File f = mps.getLabelFor(pool);
           if (f != null) thingsToPrint.add(f);
@@ -415,7 +412,7 @@ public class PoolControllerHelperService {
 
     try {
       if (!isStringEmptyOrNull(idBarcode)) {
-        List<Boxable> previouslyBarcodedItems = new ArrayList<Boxable>(requestManager.getBoxablesFromBarcodeList(Arrays.asList(idBarcode)));
+        List<Boxable> previouslyBarcodedItems = new ArrayList<>(requestManager.getBoxablesFromBarcodeList(Arrays.asList(idBarcode)));
         if (!previouslyBarcodedItems.isEmpty()
             && !(previouslyBarcodedItems.size() == 1 && previouslyBarcodedItems.get(0).getId() == poolId)) {
           Boxable previouslyBarcodedItem = previouslyBarcodedItems.get(0);
@@ -425,7 +422,7 @@ public class PoolControllerHelperService {
           log.debug(error);
           return JSONUtils.SimpleJSONError(error);
         }
-        Pool<? extends Poolable<?, ?>> pool = requestManager.getPoolById(poolId);
+        Pool pool = requestManager.getPoolById(poolId);
         User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
 
         pool.setIdentificationBarcode(idBarcode);
@@ -449,7 +446,7 @@ public class PoolControllerHelperService {
       if (searchStr.length() > 1) {
         String str = searchStr.toLowerCase();
         StringBuilder b = new StringBuilder();
-        List<Experiment> experiments = new ArrayList<Experiment>(requestManager.listAllExperiments());
+        List<Experiment> experiments = new ArrayList<>(requestManager.listAllExperiments());
         int numMatches = 0;
         for (Experiment e : experiments) {
           if (e.getPlatform().getPlatformType().equals(PlatformType.valueOf(platformType))) {
@@ -485,7 +482,7 @@ public class PoolControllerHelperService {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Long poolId = json.getLong("poolId");
-      Pool<? extends Poolable<?, ?>> p = requestManager.getPoolById(poolId);
+      Pool p = requestManager.getPoolById(poolId);
 
       Long studyId = json.getLong("studyId");
       Study s = requestManager.getStudyById(studyId);
@@ -513,7 +510,8 @@ public class PoolControllerHelperService {
           }
 
           sb.append("<i>");
-          sb.append("<span>" + s.getProject().getAlias() + " (" + e.getName() + ": " + p.getDilutions().size() + " dilutions)</span><br/>");
+          sb.append("<span>" + s.getProject().getAlias() + " (" + e.getName() + ": " + p.getPoolableElements().size()
+              + " dilutions)</span><br/>");
           sb.append("</i>");
 
           return JSONUtils.JSONObjectResponse("html", sb.toString());
@@ -532,15 +530,15 @@ public class PoolControllerHelperService {
   public JSONObject listPoolAverageInsertSizes(HttpSession session, JSONObject json) {
     try {
       JSONObject j = new JSONObject();
-      for (Pool<? extends Poolable<?, ?>> pool : requestManager.listAllPools()) {
+      for (Pool pool : requestManager.listAllPools()) {
 
         StringBuilder b = new StringBuilder();
-        Collection<? extends Dilution> dls = pool.getDilutions();
+        Collection<? extends Dilution> dls = pool.getPoolableElements();
         if (dls.size() > 0) {
           int sum = 0;
           int count = 0;
           for (Dilution ld : dls) {
-            List<LibraryQC> libraryQCs = new ArrayList<LibraryQC>(requestManager.listAllLibraryQCsByLibraryId(ld.getLibrary().getId()));
+            List<LibraryQC> libraryQCs = new ArrayList<>(requestManager.listAllLibraryQCsByLibraryId(ld.getLibrary().getId()));
             if (libraryQCs.size() > 0) {
               LibraryQC libraryQC = libraryQCs.get(libraryQCs.size() - 1);
               sum += libraryQC.getInsertSize();
@@ -566,14 +564,14 @@ public class PoolControllerHelperService {
     try {
       JSONObject j = new JSONObject();
       Long poolId = json.getLong("poolId");
-      Pool<? extends Poolable<?, ?>> pool = requestManager.getPoolById(poolId);
+      Pool pool = requestManager.getPoolById(poolId);
       StringBuilder b = new StringBuilder();
-      Collection<? extends Dilution> dls = pool.getDilutions();
+      Collection<? extends Dilution> dls = pool.getPoolableElements();
       if (dls.size() > 0) {
         int sum = 0;
         int count = 0;
         for (Dilution ld : dls) {
-          List<LibraryQC> libraryQCs = new ArrayList<LibraryQC>(requestManager.listAllLibraryQCsByLibraryId(ld.getLibrary().getId()));
+          List<LibraryQC> libraryQCs = new ArrayList<>(requestManager.listAllLibraryQCsByLibraryId(ld.getLibrary().getId()));
           if (libraryQCs.size() > 0) {
             LibraryQC libraryQC = libraryQCs.get(libraryQCs.size() - 1);
             sum += libraryQC.getInsertSize();
@@ -600,7 +598,7 @@ public class PoolControllerHelperService {
     try {
       JSONObject j = new JSONObject();
       Long poolId = json.getLong("poolId");
-      Pool<? extends Poolable<?, ?>> pool = requestManager.getPoolById(poolId);
+      Pool pool = requestManager.getPoolById(poolId);
       double concentration = pool.getConcentration();
       j.put("response", concentration);
       return j;
@@ -685,7 +683,7 @@ public class PoolControllerHelperService {
     Long noteId = json.getLong("noteId");
 
     try {
-      Pool<? extends Poolable<?, ?>> pool = requestManager.getPoolById(poolId);
+      Pool pool = requestManager.getPoolById(poolId);
       Note note = requestManager.getNoteById(noteId);
       if (pool.getNotes().contains(note)) {
         pool.getNotes().remove(note);
@@ -708,7 +706,7 @@ public class PoolControllerHelperService {
 
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Pool<? extends Poolable<?, ?>> pool = requestManager.getPoolById(poolId);
+      Pool pool = requestManager.getPoolById(poolId);
       Note note = new Note();
 
       internalOnly = internalOnly.equals("on") ? "true" : "false";
@@ -729,18 +727,17 @@ public class PoolControllerHelperService {
     return JSONUtils.SimpleJSONResponse("Note saved successfully");
   }
 
-  public <P extends Poolable<?, ?>> JSONObject addPoolableElement(HttpSession session, JSONObject json) {
+  public JSONObject addPoolableElement(HttpSession session, JSONObject json) {
     Long poolId = json.getLong("poolId");
     Long dilutionId = json.getLong("dilutionId");
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      @SuppressWarnings("unchecked")
-      Pool<P> pool = (Pool<P>) requestManager.getPoolById(poolId);
+      Pool pool = requestManager.getPoolById(poolId);
       if (!pool.userCanWrite(user)) {
         return JSONUtils.SimpleJSONError("Not authorized to modify pool.");
       }
       @SuppressWarnings("unchecked")
-      P target = (P) requestManager.getLibraryDilutionById(dilutionId);
+      Dilution target = requestManager.getLibraryDilutionById(dilutionId);
       if (target == null) {
         return JSONUtils.SimpleJSONError("No such element.");
       }
@@ -760,12 +757,12 @@ public class PoolControllerHelperService {
     Long dilutionId = json.getLong("dilutionId");
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Pool<? extends Poolable<?, ?>> pool = requestManager.getPoolById(poolId);
+      Pool pool = requestManager.getPoolById(poolId);
       if (!pool.userCanWrite(user)) {
         return JSONUtils.SimpleJSONError("Not authorized to modify pool.");
       }
-      Poolable<?, ?> target = null;
-      for (Poolable<?, ?> element : pool.getPoolableElements()) {
+      Dilution target = null;
+      for (Dilution element : pool.getPoolableElements()) {
         if (element.getId() == dilutionId) {
           target = element;
           break;

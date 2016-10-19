@@ -51,10 +51,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.sourceforge.fluxion.spi.ServiceProvider;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.SubmissionException;
@@ -97,11 +97,11 @@ public class IRODSFilepathGenerator implements FilePathGenerator {
 
   @Override
   public Set<File> generateFilePath(SequencerPoolPartition partition, Dilution l) throws SubmissionException {
-    Pool<? extends Poolable> pool = partition.getPool();
+    Pool pool = partition.getPool();
     if (pool != null) {
       if (pool.getExperiments() != null) {
-        List<String> filePaths = new ArrayList<String>();
-        Set<File> fps = new HashSet<File>();
+        List<String> filePaths = new ArrayList<>();
+        Set<File> fps = new HashSet<>();
         try {
           IRODSGenQueryBuilder builder = new IRODSGenQueryBuilder(true, null);
           try {
@@ -150,12 +150,12 @@ public class IRODSFilepathGenerator implements FilePathGenerator {
 
   @Override
   public Set<File> generateFilePaths(SequencerPoolPartition partition) throws SubmissionException {
-    Set<File> filePaths = new HashSet<File>();
+    Set<File> filePaths = new HashSet<>();
     if ((partition.getSequencerPartitionContainer().getRun().getFilePath()) == null) {
       throw new SubmissionException("No valid run filepath!");
     }
 
-    Pool<? extends Poolable> pool = partition.getPool();
+    Pool pool = partition.getPool();
     if (pool == null) {
       throw new SubmissionException("partition.getPool=null!");
     } else {
@@ -163,7 +163,7 @@ public class IRODSFilepathGenerator implements FilePathGenerator {
       if (experiments.isEmpty()) {
         throw new SubmissionException("Collection or experiments is empty");
       } else {
-        Collection<? extends Dilution> libraryDilutions = pool.getDilutions();
+        Collection<? extends Dilution> libraryDilutions = pool.getPoolableElements();
         if (libraryDilutions.isEmpty()) {
           throw new SubmissionException("Collection of libraryDilutions is empty");
         } else {

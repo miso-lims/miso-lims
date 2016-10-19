@@ -51,8 +51,8 @@ import com.eaglegenomics.simlims.core.User;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
@@ -83,7 +83,7 @@ public class PoolRestController extends RestController {
   @RequestMapping(value = "{poolId}", method = RequestMethod.GET, produces = "application/json")
   public @ResponseBody String getPoolById(@PathVariable Long poolId) throws IOException {
     ObjectMapper mapper = new ObjectMapper();
-    Pool<? extends Poolable<?, ?>> p = requestManager.getPoolById(poolId);
+    Pool p = requestManager.getPoolById(poolId);
     if (p == null) {
       throw new RestException("No pool found with ID: " + poolId, Status.NOT_FOUND);
     }
@@ -96,7 +96,7 @@ public class PoolRestController extends RestController {
   public List<PoolDto> getPoolsByPlatform(@PathVariable("platform") String platform, HttpServletRequest request,
       HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
     if (PlatformType.getKeys().contains(platform)) {
-      Collection<Pool<? extends Poolable<?, ?>>> pools = new ArrayList<Pool<? extends Poolable<?, ?>>>();
+      Collection<Pool> pools = new ArrayList<>();
       PlatformType platformType = PlatformType.get(platform);
       pools = requestManager.listAllPoolsByPlatform(platformType);
       return serializePools(pools, uriBuilder);
@@ -121,7 +121,7 @@ public class PoolRestController extends RestController {
       String sortCol = request.getParameter("mDataProp_" + sortColIndex);
 
       // get requested subset of pools
-      Collection<Pool<? extends Poolable<?, ?>>> poolSubset;
+      Collection<Pool> poolSubset;
       Long numMatches;
 
       if (!isStringEmptyOrNull(sSearch)) {
@@ -134,7 +134,7 @@ public class PoolRestController extends RestController {
       }
       List<PoolDto> poolDtos = serializePools(poolSubset, uriBuilder);
 
-      DataTablesResponseDto<PoolDto> dtResponse = new DataTablesResponseDto<PoolDto>();
+      DataTablesResponseDto<PoolDto> dtResponse = new DataTablesResponseDto<>();
       dtResponse.setITotalRecords(numPools);
       dtResponse.setITotalDisplayRecords(numMatches);
       dtResponse.setAaData(poolDtos);
@@ -145,7 +145,7 @@ public class PoolRestController extends RestController {
     }
   }
 
-  public List<PoolDto> serializePools(Collection<Pool<? extends Poolable<?, ?>>> pools, UriComponentsBuilder uriBuilder)
+  public List<PoolDto> serializePools(Collection<Pool> pools, UriComponentsBuilder uriBuilder)
       throws IOException {
     List<PoolDto> poolDtos = Dtos.asPoolDtos(pools);
     for (PoolDto poolDto : poolDtos) {
@@ -158,7 +158,7 @@ public class PoolRestController extends RestController {
   public @ResponseBody JSONObject ldRest() throws IOException {
     Collection<LibraryDilution> lds = requestManager.listAllLibraryDilutions();
 
-    List<String> types = new ArrayList<String>(requestManager.listDistinctPlatformNames());
+    List<String> types = new ArrayList<>(requestManager.listDistinctPlatformNames());
     Collections.sort(types);
 
     JSONArray platformTypeArray = new JSONArray();
@@ -182,8 +182,8 @@ public class PoolRestController extends RestController {
 
   @RequestMapping(value = "/wizard/platformtypes", method = RequestMethod.GET, produces = "application/json")
   public @ResponseBody String platformTypesRest() throws IOException {
-    List<String> names = new ArrayList<String>();
-    List<String> types = new ArrayList<String>(requestManager.listDistinctPlatformNames());
+    List<String> names = new ArrayList<>();
+    List<String> types = new ArrayList<>(requestManager.listDistinctPlatformNames());
     for (String name : types) {
       names.add("\"" + name + "\"");
     }
