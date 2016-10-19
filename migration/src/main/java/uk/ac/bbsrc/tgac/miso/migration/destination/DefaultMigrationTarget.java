@@ -189,10 +189,11 @@ public class DefaultMigrationTarget implements MigrationTarget {
       DetailedSample detailed = (DetailedSample) sample;
       if (hasUnsavedParent(detailed)) {
         if (detailed.getParent().getSampleClass() == null && detailed.getParent().getPreMigrationId() != null) {
+          Long preMigrationId = detailed.getParent().getPreMigrationId();
           // find previously-migrated parent
           detailed.setParent((DetailedSample) serviceManager.getSampleDao().getByPreMigrationId(detailed.getParent().getPreMigrationId()));
           if (detailed.getParent() == null) {
-            throw new IOException("No Sample found with pre-migration ID " + detailed.getParent().getPreMigrationId());
+            throw new IOException("No Sample found with pre-migration ID " + preMigrationId);
           }
         } else {
           // save parent first to generate ID
