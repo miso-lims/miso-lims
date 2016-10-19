@@ -37,7 +37,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -67,7 +66,7 @@ import com.eaglegenomics.simlims.core.User;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -111,7 +110,7 @@ public class FormUtils {
   private static final Pattern samplePattern = Pattern.compile("([A-z0-9]+)_S([A-z0-9]+)_(.*)");
 
   public static void createSampleInputSpreadsheet(Collection<Sample> samples, File outpath) throws Exception {
-    Collections.sort(new ArrayList<Sample>(samples), new AliasComparator(Sample.class));
+    Collections.sort(new ArrayList<>(samples), new AliasComparator(Sample.class));
 
     InputStream in = null;
     if (outpath.getName().endsWith(".xlsx")) {
@@ -3430,7 +3429,7 @@ public class FormUtils {
         log.info("Got library strategy type: " + lst.getName());
       }
 
-      Map<String, Pool> pools = new HashMap<String, Pool>();
+      Map<String, Pool> pools = new HashMap<>();
       int rows = sheet.getPhysicalNumberOfRows();
       for (int ri = 6; ri < rows; ri++) {
         XSSFRow row = sheet.getRow(ri);
@@ -3675,7 +3674,7 @@ public class FormUtils {
       MisoNamingScheme<Library> libraryNamingScheme, IndexService indexService) throws Exception {
     ((RequestManagerAwareNamingScheme) libraryNamingScheme).setRequestManager(manager);
 
-    List<Sample> samples = new ArrayList<Sample>();
+    List<Sample> samples = new ArrayList<>();
     OdfTable oTable = oDoc.getTableList().get(0);
 
     // process global headers
@@ -3741,7 +3740,7 @@ public class FormUtils {
     }
 
     // process entries
-    Map<String, Pool<Dilution>> pools = new HashMap<String, Pool<Dilution>>();
+    Map<String, Pool> pools = new HashMap<>();
     for (OdfTableRow row : oTable.getRowList()) {
       int ri = row.getRowIndex();
       if (ri > 3) {
@@ -3812,7 +3811,7 @@ public class FormUtils {
       MisoNamingScheme<Library> libraryNamingScheme, IndexService indexService) throws Exception {
     ((RequestManagerAwareNamingScheme) libraryNamingScheme).setRequestManager(manager);
 
-    List<Sample> samples = new ArrayList<Sample>();
+    List<Sample> samples = new ArrayList<>();
     XSSFSheet sheet = wb.getSheetAt(0);
     int rows = sheet.getPhysicalNumberOfRows();
 
@@ -3881,7 +3880,7 @@ public class FormUtils {
     }
 
     // process entries
-    Map<String, Pool<Dilution>> pools = new HashMap<String, Pool<Dilution>>();
+    Map<String, Pool> pools = new HashMap<>();
 
     for (int ri = 4; ri < rows; ri++) {
       XSSFRow row = sheet.getRow(ri);
@@ -3947,17 +3946,17 @@ public class FormUtils {
     return samples;
   }
 
-  private static void processPool(String poolAlias, String poolConvertedMolarity, Map<String, Pool<Dilution>> pools) throws Exception {
+  private static void processPool(String poolAlias, String poolConvertedMolarity, Map<String, Pool> pools) throws Exception {
     if (!isStringEmptyOrNull(poolAlias)) {
       if (!pools.containsKey(poolAlias)) {
-        Pool<Dilution> pool = new PoolImpl<Dilution>();
+        Pool pool = new PoolImpl();
         pool.setAlias(poolAlias);
         pools.put(poolAlias, pool);
         log.info("Added pool: " + poolAlias);
       }
 
       if (!isStringEmptyOrNull(poolConvertedMolarity)) {
-        Pool<Dilution> p = pools.get(poolAlias);
+        Pool p = pools.get(poolAlias);
         if (p != null) {
           log.info("Retrieved pool " + poolAlias);
           try {
@@ -4090,7 +4089,7 @@ public class FormUtils {
     }
   }
 
-  private static void processDilutions(String dilutionMolarity, Library library, Pool<Dilution> p, User u) throws Exception {
+  private static void processDilutions(String dilutionMolarity, Library library, Pool p, User u) throws Exception {
     if (!isStringEmptyOrNull(dilutionMolarity)) {
       try {
         LibraryDilution ldi = new LibraryDilution();
@@ -4247,7 +4246,7 @@ public class FormUtils {
   }
 
   public static List<Sample> importSampleDeliveryForm(File inPath) throws Exception {
-    List<Sample> samples = new ArrayList<Sample>();
+    List<Sample> samples = new ArrayList<>();
     OdfTextDocument oDoc = (OdfTextDocument) OdfDocument.loadDocument(inPath);
     OdfTable sampleTable = oDoc.getTableList().get(1);
 
@@ -4361,7 +4360,7 @@ public class FormUtils {
   }
 
   public static List<Index> matchIndicesFromText(Iterable<Index> allowIndices, String indexText) throws InputFormException {
-    List<Index> matchedIndices = new ArrayList<Index>();
+    List<Index> matchedIndices = new ArrayList<>();
     String[] splits = indexText.split("-");
     for (String tag : splits) {
       boolean success = false;

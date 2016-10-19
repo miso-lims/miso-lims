@@ -33,7 +33,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
-import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
@@ -184,13 +183,13 @@ public class TgacDataObjectFactory extends DataObjectFactory {
   }
 
   @Override
-  public Pool<? extends Poolable<?, ?>> getPool() {
-    return new PoolImpl<Poolable<?, ?>>();
+  public Pool getPool() {
+    return new PoolImpl();
   }
 
   @Override
-  public Pool<? extends Poolable<?, ?>> getPool(User user) {
-    return new PoolImpl<Poolable<?, ?>>(user);
+  public Pool getPool(User user) {
+    return new PoolImpl(user);
   }
 
   @Override
@@ -416,9 +415,9 @@ public class TgacDataObjectFactory extends DataObjectFactory {
   }
 
   @Override
-  public Pool<? extends Poolable<?, ?>> getPoolOfType(PlatformType platformtype, User user) throws IllegalArgumentException {
+  public Pool getPoolOfType(PlatformType platformtype, User user) throws IllegalArgumentException {
     if (platformtype != null) {
-      Pool<? extends Poolable<?, ?>> p = getPool(user);
+      Pool p = getPool(user);
       p.setPlatformType(platformtype);
       return p;
     } else {

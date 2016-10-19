@@ -44,7 +44,7 @@ public class DefaultPoolOrderService implements PoolOrderService {
 
   @Override
   public Long create(PoolOrderDto poolOrderDto) throws IOException {
-    Pool<?> pool = requestManager.getPoolById(poolOrderDto.getPoolId());
+    Pool pool = requestManager.getPoolById(poolOrderDto.getPoolId());
     authorizationManager.throwIfNotWritable(pool);
     if (pool == null) {
       throw new IOException("No such pool: " + poolOrderDto.getPoolId());
@@ -61,7 +61,7 @@ public class DefaultPoolOrderService implements PoolOrderService {
 
   @Override
   public void update(PoolOrder poolOrder) throws IOException {
-    Pool<?> owner = requestManager.getPoolById(poolOrder.getPoolId());
+    Pool owner = requestManager.getPoolById(poolOrder.getPoolId());
     authorizationManager.throwIfNotWritable(owner);
     User user = authorizationManager.getCurrentUser();
     poolOrder.setCreatedBy(user);
@@ -78,14 +78,14 @@ public class DefaultPoolOrderService implements PoolOrderService {
   @Override
   public void delete(Long poolOrderId) throws IOException {
     PoolOrder poolOrder = poolOrderDao.getPoolOrder(poolOrderId);
-    Pool<?> pool = requestManager.getPoolById(poolOrder.getPoolId());
+    Pool pool = requestManager.getPoolById(poolOrder.getPoolId());
     authorizationManager.throwIfNotWritable(pool);
     if (poolOrder != null) poolOrderDao.deletePoolOrder(poolOrder);
   }
 
   @Override
   public Set<PoolOrder> getByPool(Long id) throws AuthorizationException, IOException {
-    Pool<?> pool = requestManager.getPoolById(id);
+    Pool pool = requestManager.getPoolById(id);
     authorizationManager.throwIfNotReadable(pool);
     return Sets.newHashSet(poolOrderDao.getByPool(id));
   }

@@ -28,7 +28,6 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -47,6 +46,7 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
@@ -87,7 +87,7 @@ public class PoolWizardControllerHelperService {
     StringBuilder sb = new StringBuilder();
     List<Integer> ids = JSONArray.fromObject(json.getString("dilutions"));
 
-    List<PoolQC> pqcs = new ArrayList<PoolQC>();
+    List<PoolQC> pqcs = new ArrayList<>();
     JSONArray qcs = JSONArray.fromObject(json.get("qcs"));
     for (JSONObject q : (Iterable<JSONObject>) qcs) {
       PoolQC s = dataObjectFactory.getPoolQC();
@@ -111,7 +111,7 @@ public class PoolWizardControllerHelperService {
       try {
         User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
 
-        List<Dilution> dils = new ArrayList<Dilution>();
+        List<Dilution> dils = new ArrayList<>();
         for (Integer id : ids) {
           dils.add(requestManager.getDilutionByIdAndPlatform(id.longValue(), platformType));
         }
@@ -184,7 +184,7 @@ public class PoolWizardControllerHelperService {
           sb.append("Pool Name: <b>" + pool.getName() + "</b><br/>");
           sb.append("Platform Type: <b>" + pool.getPlatformType().name() + "</b><br/>");
           sb.append("Dilutions: <ul class='bullets'>");
-          for (Dilution dl : (Collection<? extends Dilution>) pool.getDilutions()) {
+          for (Dilution dl : pool.getPoolableElements()) {
             sb.append(
                 "<li>" + dl.getName() + " (<a href='/miso/library/" + dl.getLibrary().getId() + "'>" + dl.getLibrary().getAlias()
                     + "</a>)</li>");
@@ -192,7 +192,7 @@ public class PoolWizardControllerHelperService {
           sb.append("</ul>");
 
           sb.append("QCs: <ul class='bullets'>");
-          for (PoolQC qc : (Collection<PoolQC>) pool.getPoolQCs()) {
+          for (PoolQC qc : pool.getPoolQCs()) {
             sb.append("<li>").append(qc.getResults()).append(" ").append(qc.getQcType().getUnits()).append(" (")
                 .append(qc.getQcType().getName()).append(")</li>");
           }
@@ -266,7 +266,7 @@ public class PoolWizardControllerHelperService {
       StringBuilder b = new StringBuilder();
 
       JSONArray a = new JSONArray();
-      List<Dilution> dls = new ArrayList<Dilution>(requestManager.listAllDilutionsByProjectAndPlatform(projectId, platformType));
+      List<Dilution> dls = new ArrayList<>(requestManager.listAllDilutionsByProjectAndPlatform(projectId, platformType));
       Collections.sort(dls);
       for (Dilution dl : dls) {
         if (dl.getLibrary().getQcPassed() != null) {

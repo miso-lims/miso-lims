@@ -53,10 +53,10 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -127,7 +127,7 @@ public class SubmissionControllerHelperService {
 
         // sets the title, alias and description based on form contents
         JSONArray form = JSONArray.fromObject(json.get("form"));
-        Set<SequencerPoolPartition> newPartitions = new HashSet<SequencerPoolPartition>();
+        Set<SequencerPoolPartition> newPartitions = new HashSet<>();
 
         for (JSONObject j : (Iterable<JSONObject>) form) {
           if (j.getString("name").equals("title")) {
@@ -149,9 +149,9 @@ public class SubmissionControllerHelperService {
             // if the partition is not already in the set of newPartitions:
             if (newPartitions.add(newPartition)) {
               // a new pool is created
-              Pool<Dilution> newPool = new PoolImpl<Dilution>();
+              Pool newPool = new PoolImpl();
               // details of the original partition's pool are copied to the new one
-              Pool<? extends Poolable> oldPool = requestManager.getSequencerPoolPartitionById(partitionId).getPool();
+              Pool oldPool = requestManager.getSequencerPoolPartitionById(partitionId).getPool();
               newPool.setExperiments(oldPool.getExperiments());
               newPool.setPlatformType(oldPool.getPlatformType());
               // the new pool is added to the partition
@@ -238,7 +238,7 @@ public class SubmissionControllerHelperService {
         dateStr = "_" + df.format(latestDate);
       }
 
-      Set<File> filesToZip = new HashSet<File>();
+      Set<File> filesToZip = new HashSet<>();
       for (File f : files) {
         if (!isStringEmptyOrNull(dateStr) && f.getName().contains(dateStr) && f.getName().endsWith(".xml")) {
           filesToZip.add(f);
@@ -376,11 +376,11 @@ public class SubmissionControllerHelperService {
     try {
       if (json.has("submissionId") && !isStringEmptyOrNull(json.getString("submissionId"))) {
         Long submissionId = json.getLong("submissionId");
-        Map<String, Object> responseMap = new HashMap<String, Object>();
+        Map<String, Object> responseMap = new HashMap<>();
 
         // TODO - get projects from submission
         Submission sub = requestManager.getSubmissionById(submissionId);
-        Set<Long> projectIds = new HashSet<Long>();
+        Set<Long> projectIds = new HashSet<>();
         for (Object o : sub.getSubmissionElements()) {
           if (o instanceof Project) {
             projectIds.add(((Project) o).getProjectId());
@@ -429,7 +429,7 @@ public class SubmissionControllerHelperService {
           s.setExperiments(experiments);
         }
         // gets the runs for the project
-        List<Run> runs = new ArrayList<Run>(requestManager.listAllRunsByProjectId(projectId));
+        List<Run> runs = new ArrayList<>(requestManager.listAllRunsByProjectId(projectId));
         Collections.sort(runs);
 
         // creates HTML list of runs
@@ -457,7 +457,7 @@ public class SubmissionControllerHelperService {
                 boolean partitionInvolved = false;
                 if (part.getPool() != null) {
                   Collection<Experiment> exps = part.getPool().getExperiments();
-                  List<String> involvedExperiments = new ArrayList<String>();
+                  List<String> involvedExperiments = new ArrayList<>();
                   for (Experiment e : exps) {
                     if (e.getStudy().getProject().getProjectId().equals(p.getProjectId())) {
                       involvedExperiments.add(e.getStudy().getProject().getAlias());
@@ -485,7 +485,7 @@ public class SubmissionControllerHelperService {
 
                     // creates HTML for list of library dilutions and corresponding datafiles.
                     // gets all the dilutions in that partition's pool.
-                    List<? extends Poolable> poolables = new ArrayList<Poolable>(part.getPool().getPoolableElements());
+                    List<Dilution> poolables = new ArrayList<>(part.getPool().getPoolableElements());
                     Collections.sort(poolables);
 
                     FilePathGenerator fpg = filePathGeneratorResolverService.getFilePathGenerator(r.getPlatformType());
@@ -497,7 +497,7 @@ public class SubmissionControllerHelperService {
 
                     sb.append("<ul>");
 
-                    for (Poolable d : poolables) {
+                    for (Dilution d : poolables) {
                       sb.append("<li><input type='checkbox'  name='DIL_" + d.getId() + "' id='DIL" + d.getId() + "_PAR" + part.getId()
                           + "' value='PAR_" + part.getId() + "' ");
 
@@ -506,7 +506,7 @@ public class SubmissionControllerHelperService {
                         for (Object o : sub.getSubmissionElements()) {
                           if (o.equals(part)) {
                             SequencerPoolPartition subPart = (SequencerPoolPartition) o;
-                            for (Poolable bla : subPart.getPool().getPoolableElements()) {
+                            for (Dilution bla : subPart.getPool().getPoolableElements()) {
                               if (bla.getClass().equals(d.getClass()) && bla.getId() == d.getId()) {
                                 sb.append(" checked='checked' ");
                               }
@@ -517,10 +517,10 @@ public class SubmissionControllerHelperService {
 
                       if (d instanceof Dilution) {
                         sb.append(
-                            ">" + partitionContainer.getId() + "_" + ((Dilution) d).getLibrary().getName() + "_" + d.getName() + ": ");
+                            ">" + partitionContainer.getId() + "_" + d.getLibrary().getName() + "_" + d.getName() + ": ");
                         sb.append("<ul>");
                         try {
-                          for (File f : fpg.generateFilePath(part, (Dilution) d)) {
+                          for (File f : fpg.generateFilePath(part, d)) {
                             sb.append("<li>" + f.getName() + "</li>");
                           }
                         } catch (SubmissionException e1) {

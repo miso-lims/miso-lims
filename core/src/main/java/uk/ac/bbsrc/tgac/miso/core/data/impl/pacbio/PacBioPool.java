@@ -26,7 +26,6 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl.pacbio;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
@@ -39,7 +38,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
  * @since 0.1.6
  */
 @Deprecated
-public class PacBioPool extends PoolImpl<LibraryDilution> {
+public class PacBioPool extends PoolImpl {
   public static final String PREFIX = "PPO";
   private final String units = "nM";
 

@@ -47,7 +47,6 @@ import org.w3c.dom.Document;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
@@ -278,7 +277,7 @@ public class SQLTgacSubmissionDAO implements SubmissionStore, NamingSchemeAware<
               }
             }
 
-            Collection<? extends Dilution> dils = l.getPool().getDilutions();
+            Collection<? extends Dilution> dils = l.getPool().getPoolableElements();
             for (Dilution dil : dils) {
               Sample sample = dil.getLibrary().getSample();
               SimpleJdbcInsert sInsert = new SimpleJdbcInsert(template).withTableName("Submission_Sample");
@@ -388,12 +387,12 @@ public class SQLTgacSubmissionDAO implements SubmissionStore, NamingSchemeAware<
           newPartition.setSequencerPartitionContainer(partition.getSequencerPartitionContainer());
           newPartition.setPartitionNumber(partition.getPartitionNumber());
 
-          Pool<Dilution> newPool = new PoolImpl<Dilution>();
-          Pool<? extends Poolable> oldPool = partition.getPool();
+          Pool newPool = new PoolImpl();
+          Pool oldPool = partition.getPool();
           newPool.setId(oldPool.getId());
           newPool.setExperiments(oldPool.getExperiments());
 
-          List<Run> runs = new ArrayList<Run>(
+          List<Run> runs = new ArrayList<>(
               runDAO.listBySequencerPartitionContainerId(partition.getSequencerPartitionContainer().getId()));
           // if there is 1 run for the flowcell/container, sets the run for that container to the first on on the list
           if (runs.size() == 1) {
@@ -427,7 +426,7 @@ public class SQLTgacSubmissionDAO implements SubmissionStore, NamingSchemeAware<
 
           // adds the partition to the submission
           log.debug("submission " + t.getId() + " new partition " + newPartition.getId() + " contains dilutions "
-              + newPartition.getPool().getDilutions().toString());
+              + newPartition.getPool().getPoolableElements().toString());
           t.addSubmissionElement(newPartition);
         }
       } catch (IOException ie) {

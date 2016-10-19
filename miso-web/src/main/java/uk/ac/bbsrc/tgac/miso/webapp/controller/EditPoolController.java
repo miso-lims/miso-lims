@@ -54,14 +54,12 @@ import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import net.sf.json.JSONArray;
+
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractPool;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
-import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletion;
-import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
@@ -69,10 +67,8 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedDilutionException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SequencingParametersDto;
-import uk.ac.bbsrc.tgac.miso.service.PoolOrderCompletionService;
 import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
 
 /**
@@ -214,7 +210,7 @@ public class EditPoolController {
 
   @RequestMapping(value = "/import", method = RequestMethod.POST)
   public String importDilutionsToPool(HttpServletRequest request, ModelMap model) throws IOException {
-    Pool<Dilution> p = (PoolImpl) model.get("pool");
+    Pool p = (PoolImpl) model.get("pool");
     String[] dils = request.getParameterValues("importdilslist");
     for (String s : dils) {
       Dilution ld = requestManager.getDilutionByBarcodeAndPlatform(s, p.getPlatformType());
@@ -233,7 +229,7 @@ public class EditPoolController {
   }
 
   @RequestMapping(method = RequestMethod.POST)
-  public <P extends Poolable<?, ?>> String processSubmit(@ModelAttribute("pool") Pool<P> pool, ModelMap model, SessionStatus session)
+  public String processSubmit(@ModelAttribute("pool") Pool pool, ModelMap model, SessionStatus session)
       throws IOException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
@@ -244,7 +240,7 @@ public class EditPoolController {
       // update them to avoid reverting the state.
       if (pool.getId() != AbstractPool.UNSAVED_ID) {
         @SuppressWarnings("unchecked")
-        Pool<P> original = (Pool<P>) requestManager.getPoolById(pool.getId());
+        Pool original = requestManager.getPoolById(pool.getId());
         pool.setPoolableElements(original.getPoolableElements());
       }
 

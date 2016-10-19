@@ -195,8 +195,8 @@ public class ExternalRestController extends RestController {
               if (spc.getPartitions().size() > 0) {
                 for (SequencerPoolPartition spp : spc.getPartitions()) {
                   if (spp.getPool() != null) {
-                    if (spp.getPool().getDilutions().size() > 0) {
-                      for (Dilution dilution : spp.getPool().getDilutions()) {
+                    if (spp.getPool().getPoolableElements().size() > 0) {
+                      for (Dilution dilution : spp.getPool().getPoolableElements()) {
                         Sample sample = dilution.getLibrary().getSample();
                         if (sample.getProject().equals(p)) {
                           runSamples.add(sample.getAlias());

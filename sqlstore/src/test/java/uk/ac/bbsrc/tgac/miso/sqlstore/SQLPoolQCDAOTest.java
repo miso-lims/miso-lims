@@ -1,9 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.util.Calendar;
@@ -25,7 +22,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
@@ -158,7 +154,7 @@ public class SQLPoolQCDAOTest extends AbstractDAOTest {
   public void testSaveNew() throws IOException, MalformedPoolException {
     long autoIncrementId = nextAutoIncrementId;
     PoolQC qc = new PoolQCImpl();
-    Pool<LibraryDilution> pool = new PoolImpl<>();
+    Pool pool = new PoolImpl();
     pool.setId(1L);
     qc.setPool(pool);
     qc.setQcCreator("me");
@@ -180,7 +176,7 @@ public class SQLPoolQCDAOTest extends AbstractDAOTest {
     assertNotNull(qc);
     qc.setQcCreator("me");
     qc.setResults(99.99);
-    Pool<LibraryDilution> pool = new PoolImpl<>();
+    Pool pool = new PoolImpl();
     pool.setId(1L);
     qc.setPool(pool);
     QcType type = new QcType();

@@ -27,7 +27,6 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 /**
@@ -39,7 +38,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
  * @since 0.0.2
  */
 @Deprecated
-public class SolidPool extends PoolImpl<emPCRDilution> {
+public class SolidPool extends PoolImpl {
   public static final String PREFIX = "SPO";
 
   private final String units = "beads/&#181;l";

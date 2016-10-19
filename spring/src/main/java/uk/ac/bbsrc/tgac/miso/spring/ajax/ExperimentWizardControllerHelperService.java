@@ -43,10 +43,10 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ExperimentImpl;
@@ -211,7 +211,7 @@ public class ExperimentWizardControllerHelperService {
         Platform platform = requestManager.getPlatformById(platformId);
         if (platform != null) {
           PlatformType pt = platform.getPlatformType();
-          List<Pool<? extends Poolable>> pools = new ArrayList<Pool<? extends Poolable>>(requestManager.listAllPoolsByPlatform(pt));
+          List<Pool> pools = new ArrayList<>(requestManager.listAllPoolsByPlatform(pt));
           Collections.sort(pools);
           for (Pool p : pools) {
             a.append("<div bind='" + p.getId()
@@ -223,7 +223,7 @@ public class ExperimentWizardControllerHelperService {
             }
             a.append(">");
             a.append("<span style='float:left'>");
-            a.append("<b>" + p.getName() + "</b> <i>" + p.getDilutions().size() + " dilution(s)</i>");
+            a.append("<b>" + p.getName() + "</b> <i>" + p.getPoolableElements().size() + " dilution(s)</i>");
             a.append("</span>");
             a.append("<span class='pType' style='float: right; font-size: 24px; font-weight: bold; color:#BBBBBB'>"
                 + p.getPlatformType().getKey() + "</span>");

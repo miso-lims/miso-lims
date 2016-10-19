@@ -46,11 +46,13 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
+
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractPool;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.illumina.IlluminaPool;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
@@ -58,9 +60,6 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedDilutionException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
-
-import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 /**
  * com.eaglegenomics.miso.web
@@ -104,9 +103,9 @@ public class EditIlluminaPoolController {
   }
 
   private List<? extends Dilution> populateAvailableDilutions(Pool pool) throws IOException {
-    ArrayList<LibraryDilution> libs = new ArrayList<LibraryDilution>();
+    ArrayList<LibraryDilution> libs = new ArrayList<>();
     for (Dilution l : requestManager.listAllLibraryDilutionsByPlatform(PlatformType.ILLUMINA)) {
-      if (!pool.getDilutions().contains(l)) {
+      if (!pool.getPoolableElements().contains(l)) {
         libs.add((LibraryDilution) l);
       }
     }
@@ -117,7 +116,7 @@ public class EditIlluminaPoolController {
   public Collection<Experiment> populateExperiments(Long experimentId, Pool p) throws IOException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Collection<Experiment> es = new ArrayList<Experiment>();
+      Collection<Experiment> es = new ArrayList<>();
       for (Experiment e : requestManager.listAllExperiments()) {
         if (e.getPlatform().getPlatformType().equals(p.getPlatformType())) {
           if (experimentId != null) {
@@ -189,7 +188,7 @@ public class EditIlluminaPoolController {
       throws IOException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Pool<? extends Poolable> pool = null;
+      Pool pool = null;
       if (poolId == AbstractPool.UNSAVED_ID) {
         pool = dataObjectFactory.getPool(user);
         pool.setPlatformType(PlatformType.ILLUMINA);

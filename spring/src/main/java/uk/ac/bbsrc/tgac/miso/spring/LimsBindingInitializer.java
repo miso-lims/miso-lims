@@ -68,7 +68,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -519,7 +518,7 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
       }
 
     };
-    new BindingConverterByPrefixDispatch<Dilution>(Dilution.class).add(ldiResolver).add(ediResolver).register(binder).register(binder,
+    new BindingConverterByPrefixDispatch<>(Dilution.class).add(ldiResolver).add(ediResolver).register(binder).register(binder,
         Set.class, "dilutions");
 
     new BindingConverterById<LibraryDilution>(LibraryDilution.class) {
@@ -656,7 +655,7 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
       }
     }.register(binder).register(binder, Set.class, "kitDescriptors");
 
-    new BindingConverterByPrefixDispatch<>(Poolable.class).add(ldiResolver).add(ediResolver).register(binder, Set.class,
+    new BindingConverterByPrefixDispatch<>(Dilution.class).add(ldiResolver).add(ediResolver).register(binder, Set.class,
         "poolableElements");
 
     binder.registerCustomEditor(LibraryDesign.class, new PropertyEditorSupport() {

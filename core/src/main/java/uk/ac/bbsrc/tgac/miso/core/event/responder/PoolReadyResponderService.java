@@ -32,7 +32,6 @@ import org.slf4j.LoggerFactory;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.event.Alert;
 import uk.ac.bbsrc.tgac.miso.core.event.AlerterService;
 import uk.ac.bbsrc.tgac.miso.core.event.impl.AbstractResponderService;
@@ -54,7 +53,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 public class PoolReadyResponderService extends AbstractResponderService<PoolEvent> {
   protected static final Logger log = LoggerFactory.getLogger(PoolReadyResponderService.class);
 
-  private Set<AlerterService> alerterServices = new HashSet<AlerterService>();
+  private Set<AlerterService> alerterServices = new HashSet<>();
 
   public PoolReadyResponderService() {
   }
@@ -71,7 +70,7 @@ public class PoolReadyResponderService extends AbstractResponderService<PoolEven
 
   @Override
   public boolean respondsTo(PoolEvent event) {
-    Pool<? extends Poolable<?, ?>> p = event.getEventObject();
+    Pool p = event.getEventObject();
     if (event.getEventType().equals(MisoEventType.POOL_READY) && p.getReadyToRun()) {
       return true;
     }
@@ -80,7 +79,7 @@ public class PoolReadyResponderService extends AbstractResponderService<PoolEven
 
   @Override
   public void generateResponse(PoolEvent event) {
-    Pool<? extends Poolable<?, ?>> p = event.getEventObject();
+    Pool p = event.getEventObject();
     for (User user : p.getWatchers()) {
       Alert a = new DefaultAlert(user);
       if (!LimsUtils.isStringEmptyOrNull(p.getAlias())) {

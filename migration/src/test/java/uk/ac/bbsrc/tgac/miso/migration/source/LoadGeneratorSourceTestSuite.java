@@ -1,7 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.migration.source;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -13,7 +12,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.migration.MigrationData;
 import uk.ac.bbsrc.tgac.miso.migration.MigrationProperties;
 
@@ -45,9 +43,9 @@ public class LoadGeneratorSourceTestSuite {
     
     assertNotNull(data.getPools());
     assertEquals(100, data.getPools().size());
-    Pool<LibraryDilution> p = data.getPools().iterator().next();
-    assertNotNull(p.getDilutions());
-    assertEquals(5, p.getDilutions().size());
+    Pool p = data.getPools().iterator().next();
+    assertNotNull(p.getPoolableElements());
+    assertEquals(5, p.getPoolableElements().size());
     
     assertNotNull(data.getRuns());
     assertEquals(100, data.getRuns().size());

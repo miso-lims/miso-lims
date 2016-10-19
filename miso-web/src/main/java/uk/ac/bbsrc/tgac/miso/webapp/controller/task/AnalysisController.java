@@ -45,11 +45,11 @@ import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import net.sf.json.JSONObject;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
@@ -112,7 +112,7 @@ public class AnalysisController {
 
       model.put("run", run);
 
-      Map<String, String> map = new HashMap<String, String>();
+      Map<String, String> map = new HashMap<>();
       map.put("RunAccession", run.getAlias());
       map.put("basecall-path", run.getFilePath() + "/Data/Intensities/BaseCalls");
 
@@ -129,16 +129,14 @@ public class AnalysisController {
 
       if (f != null && f.getPartitions().size() != 0) {
         laneValue = String.valueOf(f.getPartitions().size());
-        Pool<? extends Poolable> p = f.getPartitionAt(1).getPool();
+        Pool p = f.getPartitionAt(1).getPool();
         if (p != null) {
           if (!p.getPoolableElements().isEmpty()) {
-            Poolable pable = p.getPoolableElements().iterator().next();
-            if (pable instanceof Dilution) {
-              Library l = ((Dilution) pable).getLibrary();
-              if ("RNA-Seq".equals(l.getLibraryStrategyType().getName())) naType = "rna";
-              for (Index index : l.getIndices()) {
-                indexValue = Integer.toString(index.getSequence().length());
-              }
+            Dilution d = p.getPoolableElements().iterator().next();
+            Library l = d.getLibrary();
+            if ("RNA-Seq".equals(l.getLibraryStrategyType().getName())) naType = "rna";
+            for (Index index : l.getIndices()) {
+              indexValue = Integer.toString(index.getSequence().length());
             }
           }
         } else {
@@ -177,7 +175,7 @@ public class AnalysisController {
 
       model.put("defaultRunValues", map);
 
-      List<String> pipelineNames = new ArrayList<String>();
+      List<String> pipelineNames = new ArrayList<>();
       for (JSONObject pipeline : (Iterable<JSONObject>) queryService.getPipelines()) {
         pipelineNames.add(pipeline.getString("name"));
       }

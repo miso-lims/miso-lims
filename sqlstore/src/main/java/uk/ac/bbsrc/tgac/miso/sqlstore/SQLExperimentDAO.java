@@ -131,11 +131,12 @@ public class SQLExperimentDAO implements ExperimentStore {
     }
 
   };
-  private static final BridgeCollectionUpdater<Pool<?>> POOL_WRITER = new BridgeCollectionUpdater<Pool<?>>("Pool_Experiment", "experiments_experimentId",
+  private static final BridgeCollectionUpdater<Pool> POOL_WRITER = new BridgeCollectionUpdater<Pool>("Pool_Experiment",
+      "experiments_experimentId",
       "pool_poolId") {
 
     @Override
-    protected Object getId(Pool<?> item) {
+    protected Object getId(Pool item) {
       return item.getId();
     }
   };

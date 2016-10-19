@@ -204,7 +204,7 @@ public interface Experiment extends SecurableByProfile, Submittable<Document>, C
    * @return Pool pool.
    */
   @JsonBackReference(value = "pool")
-  public Pool<? extends Poolable> getPool();
+  public Pool getPool();
 
   /**
    * Sets the kits of this Experiment object.

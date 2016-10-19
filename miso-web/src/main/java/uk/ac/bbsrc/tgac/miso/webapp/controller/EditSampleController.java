@@ -82,7 +82,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -306,11 +305,11 @@ public class EditSampleController {
     }
   }
 
-  private Set<Pool<? extends Poolable<?, ?>>> getPoolsBySample(Sample s) throws IOException {
+  private Set<Pool> getPoolsBySample(Sample s) throws IOException {
     if (!s.getLibraries().isEmpty()) {
-      Set<Pool<? extends Poolable<?, ?>>> pools = new TreeSet<>();
+      Set<Pool> pools = new TreeSet<>();
       for (Library l : s.getLibraries()) {
-        List<Pool<? extends Poolable<?, ?>>> prs = new ArrayList<>(requestManager.listPoolsByLibraryId(l.getId()));
+        List<Pool> prs = new ArrayList<>(requestManager.listPoolsByLibraryId(l.getId()));
         pools.addAll(prs);
       }
       return pools;
@@ -318,10 +317,10 @@ public class EditSampleController {
     return Collections.emptySet();
   }
 
-  private Set<Run> getRunsBySamplePools(Set<Pool<? extends Poolable<?, ?>>> pools) throws IOException {
+  private Set<Run> getRunsBySamplePools(Set<Pool> pools) throws IOException {
     if (!pools.isEmpty()) {
       Set<Run> runs = new TreeSet<>();
-      for (Pool<? extends Poolable<?, ?>> pool : pools) {
+      for (Pool pool : pools) {
         Collection<Run> prs = requestManager.listRunsByPoolId(pool.getId());
         runs.addAll(prs);
       }
@@ -742,7 +741,7 @@ public class EditSampleController {
           model.put("accessibleProjects", populateProjects(null));
         }
 
-        Set<Pool<? extends Poolable<?, ?>>> pools = getPoolsBySample(sample);
+        Set<Pool> pools = getPoolsBySample(sample);
         Map<Long, Sample> poolSampleMap = new HashMap<>();
         for (Pool pool : pools) {
           poolSampleMap.put(pool.getId(), sample);

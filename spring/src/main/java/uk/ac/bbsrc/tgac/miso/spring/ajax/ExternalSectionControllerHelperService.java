@@ -41,6 +41,7 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
@@ -85,7 +86,7 @@ public class ExternalSectionControllerHelperService {
       if (projectCollection == null) {
         b.append("You have no project.");
       } else {
-        List<Project> projects = new ArrayList<Project>(projectCollection);
+        List<Project> projects = new ArrayList<>(projectCollection);
         Collections.sort(projects);
         for (Project p : projects) {
           b.append("<a class=\"dashboardresult\" onclick=\"showProjectStatus(" + p.getProjectId()
@@ -259,8 +260,8 @@ public class ExternalSectionControllerHelperService {
               if (spc.getPartitions().size() > 0) {
                 for (SequencerPoolPartition spp : spc.getPartitions()) {
                   if (spp.getPool() != null) {
-                    if (spp.getPool().getDilutions().size() > 0) {
-                      for (Dilution dilution : spp.getPool().getDilutions()) {
+                    if (spp.getPool().getPoolableElements().size() > 0) {
+                      for (Dilution dilution : spp.getPool().getPoolableElements()) {
                         Sample sample = dilution.getLibrary().getSample();
                         if (sample.getProject().equals(requestManager.getProjectById(projectId))) {
                           sb.append("<li>");

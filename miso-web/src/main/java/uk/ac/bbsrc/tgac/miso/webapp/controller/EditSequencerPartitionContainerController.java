@@ -48,7 +48,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
@@ -139,7 +138,7 @@ public class EditSequencerPartitionContainerController {
 
       for (SequencerPoolPartition partition : container.getPartitions()) {
         if (partition.getPool() != null) {
-          Pool<? extends Poolable> pool = partition.getPool();
+          Pool pool = partition.getPool();
           pool.setLastModifier(user);
         }
       }

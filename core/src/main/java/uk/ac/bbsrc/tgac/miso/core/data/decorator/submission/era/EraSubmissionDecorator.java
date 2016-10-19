@@ -34,8 +34,8 @@ import java.util.Set;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
-import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
@@ -83,13 +83,13 @@ public class EraSubmissionDecorator extends AbstractSubmittableDecorator<Documen
 
       SubmissionActionType sat = sub.getSubmissionActionType();
 
-      Map<String, List<Submittable<Document>>> map = new HashMap<String, List<Submittable<Document>>>();
+      Map<String, List<Submittable<Document>>> map = new HashMap<>();
       map.put("study", new ArrayList<Submittable<Document>>());
       map.put("sample", new ArrayList<Submittable<Document>>());
       map.put("experiment", new ArrayList<Submittable<Document>>());
       map.put("run", new ArrayList<Submittable<Document>>());
 
-      Map<SequencerPoolPartition, Collection<? extends Poolable>> dataFilePoolables = new HashMap<SequencerPoolPartition, Collection<? extends Poolable>>();
+      Map<SequencerPoolPartition, Collection<Dilution>> dataFilePoolables = new HashMap<>();
 
       Set<Submittable<Document>> subs = sub.getSubmissionElements();
       for (Submittable<Document> subtype : subs) {
