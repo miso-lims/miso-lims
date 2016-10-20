@@ -502,7 +502,8 @@ Sample.hot = {
       'sampleClassAlias': sampleClassAlias,
       'parentTissueSampleClassId': rootSampleClassId,
       'strStatus': sampleCategory === 'Stock' ? 'Not Submitted' : null,
-      'scientificName': Sample.hot.sciName
+      'scientificName': Sample.hot.sciName,
+      'detailedQcStatusDescription': 'Not Ready'
     };
   },
 
@@ -589,7 +590,9 @@ Sample.hot = {
    * Gets array of detailed QC status descriptions (detailed sample only)
    */
   getDetailedQcStatuses: function () {
-    return Hot.sortByProperty(Hot.sampleOptions.detailedQcStatusesDtos, 'id').map(function (dqcs) { return dqcs.description; });
+    var statuses = Hot.sortByProperty(Hot.sampleOptions.detailedQcStatusesDtos, 'id').map(function (dqcs) { return dqcs.description; });
+    statuses.unshift("Not Ready");
+    return statuses;
   },
 
   /**
