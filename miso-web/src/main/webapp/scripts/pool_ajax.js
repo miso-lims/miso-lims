@@ -52,8 +52,7 @@ var Pool = Pool || {
 
     // Description input field validation
     jQuery('#description').attr('class', 'form-control');
-    jQuery('#description').attr('data-parsley-required', 'true');
-    jQuery('#description').attr('data-parsley-maxlength', '100');
+    jQuery('#description').attr('data-parsley-maxlength', '255');
     jQuery('#description').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
     
     // Platform Type input select validation
@@ -76,7 +75,6 @@ var Pool = Pool || {
     
     // Volume validation
     jQuery('#volume').attr('class', 'form-control');
-    jQuery('#volume').attr('data-parsley-required', 'true');
     jQuery('#volume').attr('data-parsley-maxlength', '10');
     jQuery('#volume').attr('data-parsley-type', 'number');
 

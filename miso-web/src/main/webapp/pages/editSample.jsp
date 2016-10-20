@@ -237,7 +237,7 @@
       </td>
     </tr>
     <tr>
-      <td>Description:*</td>
+      <td>Description:</td>
       <td><form:input id="description" path="description"/><span id="descriptionCounter" class="counter"></span>
       </td>
         <%--<td><a href="void(0);" onclick="popup('help/sampleDescription.html');">Help</a></td>--%>

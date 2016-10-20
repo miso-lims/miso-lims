@@ -384,7 +384,6 @@ public class Dtos {
     TissueMaterialDto dto = new TissueMaterialDto();
     dto.setId(from.getId());
     dto.setAlias(from.getAlias());
-    dto.setDescription(from.getDescription());
     dto.setCreatedById(from.getCreatedBy().getUserId());
     dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
     dto.setUpdatedById(from.getUpdatedBy().getUserId());
@@ -403,7 +402,6 @@ public class Dtos {
   public static TissueMaterial to(TissueMaterialDto from) {
     TissueMaterial to = new TissueMaterialImpl();
     to.setAlias(from.getAlias());
-    to.setDescription(from.getDescription());
     return to;
   }
 
@@ -411,7 +409,6 @@ public class Dtos {
     SamplePurposeDto dto = new SamplePurposeDto();
     dto.setId(from.getId());
     dto.setAlias(from.getAlias());
-    dto.setDescription(from.getDescription());
     dto.setCreatedById(from.getCreatedBy().getUserId());
     dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
     dto.setUpdatedById(from.getUpdatedBy().getUserId());
@@ -430,7 +427,6 @@ public class Dtos {
   public static SamplePurpose to(SamplePurposeDto from) {
     SamplePurpose to = new SamplePurposeImpl();
     to.setAlias(from.getAlias());
-    to.setDescription(from.getDescription());
     return to;
   }
 

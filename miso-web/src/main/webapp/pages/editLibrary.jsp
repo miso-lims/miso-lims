@@ -213,7 +213,7 @@
   </td>
 </tr>
 <tr>
-  <td>Description:*</td>
+  <td>Description:</td>
   <td>
     <%-- FIX MISO-107
     <c:choose>

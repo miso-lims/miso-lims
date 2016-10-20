@@ -49,8 +49,7 @@ var Study = Study || {
     // Description input field validation
     jQuery('#description').attr('class', 'form-control');
     jQuery('#description').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
-    jQuery('#description').attr('data-parsley-required', 'true');
-    jQuery('#description').attr('data-parsley-maxlength', '65535');
+    jQuery('#description').attr('data-parsley-maxlength', '255');
     
     jQuery('#study-form').parsley();
     jQuery('#study-form').parsley().validate();

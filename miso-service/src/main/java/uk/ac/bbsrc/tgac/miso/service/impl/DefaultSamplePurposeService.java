@@ -49,7 +49,6 @@ public class DefaultSamplePurposeService implements SamplePurposeService {
     authorizationManager.throwIfNonAdmin();
     SamplePurpose updatedSamplePurpose = get(samplePurpose.getId());
     updatedSamplePurpose.setAlias(samplePurpose.getAlias());
-    updatedSamplePurpose.setDescription(samplePurpose.getDescription());
     User user = authorizationManager.getCurrentUser();
     updatedSamplePurpose.setUpdatedBy(user);
     samplePurposeDao.update(updatedSamplePurpose);
