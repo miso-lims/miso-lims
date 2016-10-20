@@ -1145,14 +1145,6 @@ Library.ui = {
     })).fnSetFilteringDelay();
     jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
     
-    jQuery("input[class='bulkCheckbox']").click(function () {
-      if (jQuery(this).parent().parent().hasClass('row_selected')) {
-        jQuery(this).parent().parent().removeClass('row_selected');
-      } else if (!jQuery(this).parent().parent().hasClass('row_selected')) {
-        jQuery(this).parent().parent().addClass('row_selected');
-      }
-    });
-    
     var selectAll = '<label><input type="checkbox" onchange="Library.ui.checkAll(this)" id="checkAll">Select All</label>';
     document.getElementById('listingLibrariesTable').insertAdjacentHTML('beforebegin', selectAll);
     
