@@ -325,6 +325,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
   public void saveLibraries(final Collection<Library> libraries) throws IOException {
     log.info("Migrating libraries...");
     for (Library library : libraries) {
+      log.debug("Saving library " + library.getAlias());
       if (isDetailedSample(library.getSample())) {
         DetailedSample sample = (DetailedSample) library.getSample();
         if (sample.getId() == AbstractSample.UNSAVED_ID && sample.getPreMigrationId() != null) {
@@ -377,6 +378,11 @@ public class DefaultMigrationTarget implements MigrationTarget {
   public void saveLibraryDilutions(final Collection<LibraryDilution> libraryDilutions) throws IOException {
     log.info("Migrating library dilutions...");
     for (LibraryDilution ldi : libraryDilutions) {
+      String friendlyName = " of " + ldi.getLibrary().getAlias();
+      if (ldi.getPreMigrationId() != null) {
+        friendlyName += " with pre-migration id " + ldi.getPreMigrationId();
+      }
+      log.debug("Saving library dilution " + friendlyName);
       if (replaceChangeLogs) {
         if (ldi.getCreationDate() == null || ldi.getLastModified() == null) {
           throw new IOException("Cannot save dilution due to missing timestamps");
@@ -396,7 +402,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
       }
       
       ldi.setId(serviceManager.getDilutionDao().save(ldi));
-      log.debug("Saved library dilution " + ldi.getName());
+      log.debug("Saved library dilution " + friendlyName);
     }
     log.info(libraryDilutions.size() + " library dilutions migrated.");
   }
