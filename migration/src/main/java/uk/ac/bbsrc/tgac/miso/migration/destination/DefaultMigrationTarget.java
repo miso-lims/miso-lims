@@ -394,10 +394,10 @@ public class DefaultMigrationTarget implements MigrationTarget {
       
       if (ldi.getLibrary().getId() == AbstractDilution.UNSAVED_ID && ldi.getLibrary().getLibraryAdditionalInfo() != null
           && ldi.getLibrary().getLibraryAdditionalInfo().getPreMigrationId() != null) {
-        ldi.setLibrary(serviceManager.getLibraryDao().getByPreMigrationId(ldi.getLibrary().getLibraryAdditionalInfo().getPreMigrationId()));
+        Long preMigrationId = ldi.getLibrary().getLibraryAdditionalInfo().getPreMigrationId();
+        ldi.setLibrary(serviceManager.getLibraryDao().getByPreMigrationId(preMigrationId));
         if (ldi.getLibrary() == null) {
-          throw new IOException("No Library found with pre-migration ID "
-              + ldi.getLibrary().getLibraryAdditionalInfo().getPreMigrationId());
+          throw new IOException("No Library found with pre-migration ID " + preMigrationId);
         }
       }
       
