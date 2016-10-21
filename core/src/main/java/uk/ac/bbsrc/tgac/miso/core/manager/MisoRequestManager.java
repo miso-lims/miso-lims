@@ -2936,4 +2936,9 @@ public class MisoRequestManager implements RequestManager {
     return libraryDilutionStore.countAllBySearchAndPlatform(search, platform);
   }
 
+  @Override
+  public List<Run> getRunsByPool(Pool pool) throws IOException {
+    return runStore.listByPoolId(pool.getId());
+  }
+
 }

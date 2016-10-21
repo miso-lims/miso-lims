@@ -2604,4 +2604,15 @@ public class UserAuthMisoRequestManager implements RequestManager {
   public Integer countLibraryDilutionsBySearchAndPlatform(String search, PlatformType platform) throws IOException {
     return backingManager.countLibraryDilutionsBySearchAndPlatform(search, platform);
   }
+
+  @Override
+  public List<Run> getRunsByPool(Pool pool) throws IOException {
+    List<Run> runs = backingManager.getRunsByPool(pool);
+    List<Run> authorizedRuns = new ArrayList<>();
+    for (Run run : runs) {
+      if (readCheck(run))
+        authorizedRuns.add(run);
+    }
+    return authorizedRuns;
+  }
 }

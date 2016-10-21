@@ -483,7 +483,7 @@ public interface RequestManager {
 
   /**
    * PlatformTypes with existing sequencers.
-   *
+   * 
    * @throws IOException
    */
   public Collection<PlatformType> listActivePlatformTypes() throws IOException;
@@ -672,5 +672,7 @@ public interface RequestManager {
   public Project lazyGetProjectById(long projectId) throws IOException;
 
   public Integer countLibraryDilutionsBySearchAndPlatform(String search, PlatformType platform) throws IOException;
+
+  public List<Run> getRunsByPool(Pool pool) throws IOException;
 
 }

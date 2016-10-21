@@ -451,6 +451,49 @@
         Pool.ui.createElementSelectDatatable('${pool.platformType.key}', ${pool.id}, '${libraryDilutionUnits}');
     });
 </script>
+
+<script type="text/javascript">
+  jQuery(document).ready(function () {
+    jQuery('#runsDatatable').dataTable({
+      "aaData": ${runsJSON},
+      "aaSorting": [
+        [0, 'desc']
+      ],
+      "aoColumns": [
+        {
+          "sTitle" : "Name",
+          "mData" : "name",
+          "mRender": function (data, type, full) {
+            return "<a href=\"/miso/run/" + full.id + "\">" + data + "</a>";
+          }
+        },
+        {
+          "sTitle" : "Alias",
+          "mData" : "alias",
+          "mRender": function (data, type, full) {
+            return "<a href=\"/miso/run/" + full.id + "\">" + data + "</a>";
+          }
+        },
+        { "sTitle" : "Status", "mData" : "status" },
+        { "sTitle" : "Start Date", "mData" : "startDate" },
+        { "sTitle" : "End Date", "mData" : "endDate" },
+        { "sTitle" : "Type", "mData" : "platformType" },
+        { "sTitle" : "Last Modified", "mData" : "lastUpdated" }
+      ],
+      "iDisplayLength": 50,
+      "bJQueryUI": true,
+      "bRetrieve": true,
+      "sPaginationType": "full_numbers"
+    });
+  });
+</script>
+
+<br/>
+<h1>Runs</h1>
+<div id="runsDatatableDiv">
+    <table cell-padding="0" width="100%" cellspacing="0" border="0" class="display" id="runsDatatable">
+    </table>
+</div>
 </c:if>
 
 <c:if test="${not empty pool.changeLog}">
