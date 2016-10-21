@@ -34,6 +34,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -184,6 +185,10 @@ public class EditPoolController {
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, pool, securityManager.listAllUsers()));
       model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, pool, securityManager.listAllGroups()));
       model.put("platforms", getFilteredPlatforms(pool.getPlatformType()));
+
+      ObjectMapper mapper = new ObjectMapper();
+      model.put("runsJSON", mapper.writeValueAsString(
+          poolId == AbstractPool.UNSAVED_ID ? Collections.emptyList() : Dtos.asRunDtos(requestManager.getRunsByPool(pool))));
 
       return new ModelAndView("/pages/editPool.jsp", model);
     } catch (IOException ex) {
