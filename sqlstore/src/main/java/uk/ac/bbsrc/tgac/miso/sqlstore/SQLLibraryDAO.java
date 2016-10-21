@@ -119,7 +119,7 @@ public class SQLLibraryDAO implements LibraryStore {
   
   public static final String LIBRARY_SELECT_BY_PRE_MIGRATION_ID = LIBRARIES_SELECT
       + " JOIN LibraryAdditionalInfo lai ON lai.libraryId = l.libraryId"
-      + "WHERE lai.preMigrationId = ?";
+      + " WHERE lai.preMigrationId = ?";
 
   public static final String LIBRARY_SELECT_FROM_ID_LIST = LIBRARIES_SELECT + " WHERE l.libraryId in (";
 
