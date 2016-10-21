@@ -535,23 +535,23 @@ Pool.ui = {
 
 	        },
 	        "aoColumns": [
+	          { "sTitle": "Add", "bSortable": false},
 	          { "sTitle": "Dilution Name", "sType":"natural"},
 	          { "sTitle": "Conc. ("+libraryDilutionConcentrationUnits+")", "sType":"natural"},
 	          { "sTitle": "Library", "sType":"natural", "bSortable": false},
 	          { "sTitle": "Sample", "sType":"natural", "bSortable": false},
 	          { "sTitle": "Indices", "sType":"natural", "bSortable": false},
-	          { "sTitle": "Low Quality", "bSortable": false},
-	          { "sTitle": "Add", "bSortable": false}
+	          { "sTitle": "Low Quality", "bSortable": false}
 	        ],
 	        "bJQueryUI": true,
 	        "iDisplayLength":  25,
 	        "sPaginationType": "full_numbers",
 	        "aaSorting":[
-	          [0,"desc"]
+	          [1,"desc"]
 	        ],
 	        "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-	          jQuery(nRow).attr("id", "poolable_" + aData[0]);
-	          if (jQuery('#pooled_' + aData[0]).length) {
+	          jQuery(nRow).attr("id", "poolable_" + aData[1]);
+	          if (jQuery('#pooled_' + aData[1]).length) {
 	            jQuery('td:eq(6)', nRow).addClass('disabled');
 	            jQuery('td:eq(6)', nRow).prop('disabled', true);
 	            jQuery('td:eq(6)', nRow).css('cursor', 'default');
@@ -579,7 +579,7 @@ Pool.ui = {
         {
           'doOnSuccess': function() {
             function findByName (arrayElement, index, array) {
-              return arrayElement[0] == elementName;
+              return arrayElement[1] == elementName;
             }
             var indexToDelete = jQuery('#pooledElementsDatatable').dataTable().fnGetData().findIndex(findByName);
             // remove it from the Selected element(s) table
@@ -761,19 +761,20 @@ Pool.search = {
     } else {
       function addElement () {
         var addToPooled = [];
+        addToPooled.push('<span id="pooled_' + elementName + '" onclick="Pool.ui.removePooledElement(' + poolId + ', ' + elementId + ', \'' + elementName + '\');" class="ui-icon ui-button ui-icon-circle-close"></span>');
         var poolable = jQuery('#poolable_' + elementName).clone();
         poolable.children().each(function (index, value) {
-          addToPooled.push(jQuery(value).html());
+          if (index > 0) {
+            addToPooled.push(jQuery(value).html());
+          }
         });
-        addToPooled.pop();
-        addToPooled.push('<span id="pooled_' + elementName + '" onclick="Pool.ui.removePooledElement(' + poolId + ', ' + elementId + ', \'' + elementName + '\');" class="ui-icon ui-button ui-icon-circle-close"></span>');
         jQuery('#pooledElementsDatatable').dataTable().fnAddData(addToPooled);
         jQuery('#searchElementsResult').css('visibility', 'hidden');
       }
       function disableAddAndFadeCheckmark (addRowId) {
         // add checkmark beside plus button then fade out
         var checkmark = '<div><img id="checkmark_' + addRowId + '" src="/styles/images/ok.png" height="25" width="25" /></div>';
-        var addTd = jQuery('#' + addRowId).children().last();
+        var addTd = jQuery('#' + addRowId).children().first();
         addTd.prop('disabled', true);
         addTd.css('float', 'left');
         addTd.children().last().append(checkmark);

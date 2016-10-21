@@ -384,19 +384,20 @@
     <table cell-padding="0" width="100%" cellspacing="0" border="0" class="display" id="pooledElementsDatatable">
 	  <thead>
 	  <tr>
+	    <th>Remove</th>
 	    <th>Dilution Name</th>
 	    <th>Concentration (${libraryDilutionUnits})</th>
 	    <th>Library</th>
 	    <th>Sample</th>
 	    <th>Indices</th>
 	    <th>Low Quality</th>
-	    <th>Remove</th>
 	  </tr>
 	  </thead>
 	  <tbody>
 	    <c:if test="${not empty pool.poolableElements}">
 		  <c:forEach items="${pool.poolableElements}" var="dil">
 		    <tr id="pooled_${dil.name}">
+		      <td><span onclick='Pool.ui.removePooledElement(${pool.id}, ${dil.id}, "${dil.name}");' class="ui-icon ui-icon-circle-close ui-button"></span></td>
 		      <td>${dil.name}</td>
 		      <td>${dil.concentration}</td>
 		      <td><a href="<c:url value="/miso/library/${dil.library.id}"/>">${dil.library.alias} (${dil.library.name})</a></td>
@@ -405,7 +406,6 @@
 		        <c:if test="${iCount.count gt 1}"><br/></c:if>${iCount.count}: ${index.label}
 		        </c:forEach></td>
 		      <td><c:if test="${dil.library.lowQuality}">&#9888;</c:if></td>
-		      <td><span onclick='Pool.ui.removePooledElement(${pool.id}, ${dil.id}, "${dil.name}");' class="ui-icon ui-icon-circle-close ui-button"></span></td>
 		    </tr>
 		  </c:forEach>
 	    </c:if>
@@ -421,7 +421,7 @@
   jQuery(document).ready(function () {
     jQuery('#pooledElementsDatatable').dataTable({
       "aaSorting": [
-        [0, 'desc']              
+        [1, 'desc']
       ],
       "aoColumns": [
         null,

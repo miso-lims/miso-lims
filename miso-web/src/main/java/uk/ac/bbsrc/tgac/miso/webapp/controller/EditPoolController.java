@@ -57,6 +57,7 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractPool;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
@@ -239,6 +240,8 @@ public class EditPoolController {
 
     for (LibraryDilution dil : dils) {
       JSONArray inner = new JSONArray();
+      inner.add("<div style='cursor:inherit;' onclick=\"Pool.search.poolSearchSelectElement(" + poolInt + ", '" + dil.getId() + "', '"
+          + dil.getName() + "')\"><span class=\"ui-icon ui-icon-plusthick\"></span></div>");
       inner.add(dil.getName());
       inner.add(dil.getConcentration());
       inner.add(String.format("<a href='/miso/library/%d'>%s (%s)</a>", dil.getLibrary().getId(), dil.getLibrary().getAlias(),
@@ -249,8 +252,6 @@ public class EditPoolController {
       collectIndices(indices, dil);
       inner.add(indices.toString());
       inner.add(dil.getLibrary().isLowQuality() ? "⚠" : "");
-      inner.add("<div style='cursor:inherit;' onclick=\"Pool.search.poolSearchSelectElement(" + poolInt + ", '" + dil.getId() + "', '"
-          + dil.getName() + "')\"><span class=\"ui-icon ui-icon-plusthick\"></span></div>");
       data.add(inner);
     }
     rtn.put("iTotalRecords", allDilutionsCount);
