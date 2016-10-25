@@ -12,8 +12,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import net.sf.ehcache.CacheManager;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +25,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.store.SecurityStore;
+
+import net.sf.ehcache.CacheManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBox;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
@@ -355,11 +355,6 @@ public class SQLBoxDAO implements BoxStore {
   }
 
   @Override
-  public Collection<Box> listByAlias(String alias) throws IOException {
-    return template.query(BOX_SELECT_BY_ALIAS, new Object[] { alias }, new BoxMapper(true));
-  }
-
-  @Override
   public Collection<Box> listWithLimit(long limit) throws IOException {
     return template.query(BOX_SELECT_LIMIT, new Object[] { limit }, new BoxMapper(true));
   }
@@ -372,7 +367,7 @@ public class SQLBoxDAO implements BoxStore {
   }
 
   @Override
-  public void emptySingleTube(Box box, String position) throws IOException {
+  public void discardSingleTube(Box box, String position) throws IOException {
     String barcode = box.getBoxable(position).getIdentificationBarcode();
     Sample sample = sampleDAO.getByBarcode(barcode);
     Library library = libraryDAO.getByBarcode(barcode);
@@ -390,7 +385,7 @@ public class SQLBoxDAO implements BoxStore {
     } else if (sample == null && library == null && pool == null) {
       throw new IOException("Could not find a sample or library or pool with barcode " + barcode);
     } else {
-      // save before emptying item to trigger cache update for item
+      // save before discarding item to trigger cache update for item
       try {
         box.removeBoxable(position);
         save(box);
@@ -400,21 +395,21 @@ public class SQLBoxDAO implements BoxStore {
       }
 
       if (library != null) {
-        library.setEmpty(true);
+        library.setDiscarded(true);
         libraryDAO.save(library);
       } else if (sample != null) {
-        sample.setEmpty(true);
+        sample.setDiscarded(true);
         sampleDAO.save(sample);
       } else if (pool != null) {
-        pool.setEmpty(true);
+        pool.setDiscarded(true);
         poolDAO.save(pool);
       }
     }
   }
 
   @Override
-  public void emptyAllTubes(Box box) throws IOException {
-    List<String> boxableBarcodes = new ArrayList<String>();
+  public void discardAllTubes(Box box) throws IOException {
+    List<String> boxableBarcodes = new ArrayList<>();
     for (Boxable boxable : box.getBoxables().values()) {
       boxableBarcodes.add(boxable.getIdentificationBarcode());
     }
@@ -422,28 +417,28 @@ public class SQLBoxDAO implements BoxStore {
       box.removeAllBoxables();
       save(box);
     } catch (IOException e) {
-      log.debug("Error emptying box", e);
-      throw new IOException("Error emptying box: " + e.getMessage());
+      log.debug("Error discarding box", e);
+      throw new IOException("Error discardinging box: " + e.getMessage());
     }
 
     for (String barcode : boxableBarcodes) {
       Sample sample = sampleDAO.getByBarcode(barcode);
       if (sample != null) {
-        sample.setEmpty(true);
+        sample.setDiscarded(true);
         sampleDAO.save(sample);
         continue;
       }
 
       Library library = libraryDAO.getByBarcode(barcode);
       if (library != null) {
-        library.setEmpty(true);
+        library.setDiscarded(true);
         libraryDAO.save(library);
         continue;
       }
 
       Pool<? extends Poolable<?,?>> pool = poolDAO.getByBarcode(barcode);
       if (pool != null) {
-        pool.setEmpty(true);
+        pool.setDiscarded(true);
         poolDAO.save(pool);
         continue;
       }

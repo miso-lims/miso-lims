@@ -120,6 +120,13 @@ var Hot = {
   requiredNumber: function (value, callback) {
     return callback(value != undefined && value != null && value != '' && Handsontable.helper.isNumeric(value));
   },
+  
+  /**
+   * Custom validator for text fields that fails on extra-special characters
+   */
+  noSpecialChars: function (value, callback) {
+    return callback(!/[;'"\\]+/g.test(value) && value != undefined && value != null && value != '' && value.length > 0);
+  },
 
   /**
    * Gets item's alias

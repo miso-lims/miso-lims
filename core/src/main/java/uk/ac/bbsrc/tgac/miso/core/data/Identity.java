@@ -9,10 +9,6 @@ public interface Identity extends DetailedSample {
   
   public static final String CATEGORY_NAME = "Identity";
 
-  String getInternalName();
-
-  void setInternalName(String internalName);
-
   String getExternalName();
 
   void setExternalName(String externalName);

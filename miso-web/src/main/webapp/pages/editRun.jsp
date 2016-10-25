@@ -107,7 +107,7 @@
   <tr>
     <c:choose>
       <c:when test="${run.id == 0}">
-        <td>Platform:</td>
+        <td>Platform:*</td>
         <td>
           <div id="platformButtons">
           <c:choose>
@@ -129,7 +129,7 @@
   </tr>
   <c:if test="${run.id != 0}">
     <tr>
-      <td>Sequencing Parameters</td>
+      <td>Sequencing Parameters:</td>
       <td><form:select id="sequencingParametersId" path="sequencingParametersId" items="${sequencingParameters}" itemLabel="name" itemValue="id"/></td>
     </tr>
   </c:if>
@@ -150,7 +150,7 @@
         </td>
       </c:when>
       <c:otherwise>
-        <td>Sequencer</td>
+        <td>Sequencer:*</td>
         <td>${run.sequencerReference.name} - ${run.sequencerReference.platform.instrumentModel}</td>
       </c:otherwise>
     </c:choose>
@@ -175,7 +175,7 @@
       <%--<td><a href="void(0);" onclick="popup('help/runName.html');">Help</a></td>--%>
   </tr>
   <tr>
-    <td class="h">Alias:</td>
+    <td class="h">Alias:*</td>
     <td><form:input path="alias" class="validateable"/><span id="aliascounter" class="counter"></span>
     </td>
       <%--<td><a href="void(0);" onclick="popup('help/runAlias.html');">Help</a></td>--%>
@@ -193,7 +193,7 @@
       <%--<td><a href="void(0);" onclick="popup('help/runDescription.html');">Help</a></td>--%>
   </tr>
   <tr>
-    <td>Run Path:</td>
+    <td>Run Path:*</td>
     <td>
       <c:choose>
         <c:when test="${not empty run.filePath}">${run.filePath}</c:when>
@@ -480,7 +480,7 @@
             <c:otherwise>
               <td>Serial Number:</td>
               <td>
-                <span id="idBarcode">${container.identificationBarcode}</span>
+                <span id="idBarcode"><a href='<c:url value="/miso/container/${container.id}"/>' title='idBarcode'>${container.identificationBarcode}</a></span>
                 <a href="javascript:void(0);"
                    onclick="Run.ui.editContainerIdBarcode(jQuery('#idBarcode'), ${containerCount.index})">
                   <span id="pencil" class="fg-button ui-icon ui-icon-pencil"></span>

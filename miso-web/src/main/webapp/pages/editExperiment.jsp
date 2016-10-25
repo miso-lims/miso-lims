@@ -112,12 +112,12 @@
   </td>
 </tr>
 <tr>
-  <td class="h">Title:</td>
+  <td class="h">Title:*</td>
   <td><form:input path="title"/><span id="titlecounter" class="counter"></span></td>
     <%--<td><a href="void(0);" onclick="popup('help/experimentTitle.html');">Help</a></td>--%>
 </tr>
 <tr>
-  <td class="h">Alias:</td>
+  <td class="h">Alias:*</td>
   <td><form:input path="alias" class="validateable"/><span id="aliascounter" class="counter"></span></td>
     <%--<td><a href="void(0);" onclick="popup('help/experimentAlias.html');">Help</a></td>--%>
 </tr>

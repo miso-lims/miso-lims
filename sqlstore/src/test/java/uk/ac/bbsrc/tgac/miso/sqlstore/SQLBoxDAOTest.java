@@ -61,7 +61,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
@@ -76,7 +75,6 @@ import uk.ac.bbsrc.tgac.miso.core.store.SequencerReferenceStore;
 import uk.ac.bbsrc.tgac.miso.core.store.StatusStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.core.store.WatcherStore;
-import uk.ac.bbsrc.tgac.miso.persistence.SampleDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleDao;
 
 public class SQLBoxDAOTest extends AbstractDAOTest {
@@ -213,20 +211,6 @@ public class SQLBoxDAOTest extends AbstractDAOTest {
   }
 
   @Test
-  public void testListByAlias() throws Exception {
-    Collection<Box> boxes = dao.listByAlias("box2alias");
-    assertTrue(boxes.size() == 1);
-    Box box = boxes.iterator().next();
-    assertEquals("box2alias", box.getAlias());
-    assertEquals("box2", box.getName());
-    assertEquals(2, box.getId());
-    assertEquals("barcode2", box.getIdentificationBarcode());
-    assertEquals(4, box.getSize().getRows());
-    assertEquals("boxuse2", box.getUse().getAlias());
-
-  }
-
-  @Test
   public void testListWithLimit() throws Exception {
     Collection<Box> boxes = dao.listWithLimit(1);
     assertTrue(boxes.size() == 1);
@@ -248,7 +232,7 @@ public class SQLBoxDAOTest extends AbstractDAOTest {
     Box box = dao.get(1);
 
     assertTrue("precondition failed", box.getBoxables().values().size() > 0);
-    dao.emptyAllTubes(box);
+    dao.discardAllTubes(box);
     assertTrue(box.getBoxables().values().size() == 0);
 
   }
@@ -261,7 +245,7 @@ public class SQLBoxDAOTest extends AbstractDAOTest {
     Box box = dao.get(1);
 
     assertTrue("precondition failed", box.getBoxables().values().size() > 0);
-    dao.emptySingleTube(box, "B02");
+    dao.discardSingleTube(box, "B02");
     assertTrue(box.getBoxables().values().size() == 0);
 
   }

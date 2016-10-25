@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.hasStockParent;
+
 import java.io.IOException;
 import java.net.URI;
 import java.util.Set;
@@ -46,7 +48,10 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SampleClassDto;
@@ -93,10 +98,17 @@ public class SampleClassController extends RestController {
   @RequestMapping(value = "/sampleclasses", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
   public Set<SampleClassDto> getSampleClasses(UriComponentsBuilder uriBuilder, HttpServletResponse response) throws IOException {
+    Iterable<SampleValidRelationship> relationships = sampleValidRelationshipService.getAll();
     Set<SampleClass> sampleClasss = sampleClassService.getAll();
     Set<SampleClassDto> sampleClassDtos = Dtos.asSampleClassDtos(sampleClasss);
     for (SampleClassDto sampleClassDto : sampleClassDtos) {
       sampleClassDto = writeUrls(sampleClassDto, uriBuilder);
+      if (sampleClassDto.getSampleCategory().equals(SampleTissue.CATEGORY_NAME)
+          || sampleClassDto.getSampleCategory().equals(SampleStock.CATEGORY_NAME)
+          || sampleClassDto.getSampleCategory().equals(SampleAliquot.CATEGORY_NAME)
+              && hasStockParent(sampleClassDto.getId(), relationships)) {
+        sampleClassDto.setCanCreateNew(true);
+      }
     }
     return sampleClassDtos;
   }

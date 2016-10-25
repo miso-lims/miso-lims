@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.migration.destination;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -7,6 +9,8 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.sql.DataSource;
 
@@ -32,15 +36,16 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleNumberPerProject;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleNumberPerProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.migration.MigrationData;
 import uk.ac.bbsrc.tgac.miso.migration.MigrationProperties;
 
@@ -180,14 +185,15 @@ public class DefaultMigrationTarget implements MigrationTarget {
       // already saved
       return;
     }
-    if (LimsUtils.isDetailedSample(sample)) {
+    if (isDetailedSample(sample)) {
       DetailedSample detailed = (DetailedSample) sample;
       if (hasUnsavedParent(detailed)) {
         if (detailed.getParent().getSampleClass() == null && detailed.getParent().getPreMigrationId() != null) {
+          Long preMigrationId = detailed.getParent().getPreMigrationId();
           // find previously-migrated parent
           detailed.setParent((DetailedSample) serviceManager.getSampleDao().getByPreMigrationId(detailed.getParent().getPreMigrationId()));
           if (detailed.getParent() == null) {
-            throw new IOException("No Sample found with pre-migration ID " + detailed.getParent().getPreMigrationId());
+            throw new IOException("No Sample found with pre-migration ID " + preMigrationId);
           }
         } else {
           // save parent first to generate ID
@@ -195,17 +201,18 @@ public class DefaultMigrationTarget implements MigrationTarget {
         }
       }
     }
+    log.debug("Saving sample " + sample.getAlias());
     sample.inheritPermissions(sample.getProject());
     valueTypeLookup.resolveAll(sample);
 
     Collection<SampleQC> qcs = new TreeSet<>(sample.getSampleQCs());
     Collection<Note> notes = new HashSet<>(sample.getNotes());
 
-    if (LimsUtils.isDetailedSample(sample)) {
+    if (isDetailedSample(sample)) {
       DetailedSample detailed = (DetailedSample) sample;
       if (detailed.getSubproject() != null && detailed.getSubproject().getId() == null) {
         // New subproject
-        createSubproject(detailed.getSubproject(), detailed.getProject().getReferenceGenomeId());
+        createSubproject(detailed.getSubproject(), detailed.getProject());
       }
       if (sample.getAlias() != null) {
         // Check for duplicate alias
@@ -218,6 +225,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
           detailed.setNonStandardAlias(true);
         }
       }
+      if (isIdentitySample(detailed)) updateSampleNumberPerProject(detailed);
     }
     if (replaceChangeLogs) {
       Collection<ChangeLog> changes = new ArrayList<>(sample.getChangeLog());
@@ -232,11 +240,41 @@ public class DefaultMigrationTarget implements MigrationTarget {
     log.debug("Saved sample " + sample.getAlias());
   }
 
-  private void createSubproject(Subproject subproject, Long referenceGenomeId) {
+  private void updateSampleNumberPerProject(DetailedSample sample) throws IOException {
+    if (sample.hasNonStandardAlias()) return;
+    Matcher m = Pattern.compile("^\\w{3,5}_(\\d+).*").matcher(sample.getAlias());
+    if (!m.matches()) throw new IllegalArgumentException("Sample alias must be in expected format unless nonStandardAlias is set");
+    int number = Integer.parseInt(m.group(1));
+    SampleNumberPerProject sn = serviceManager.getSampleNumberPerProjectService().getByProject(sample.getProject());
+    if (sn == null) {
+      sn = new SampleNumberPerProjectImpl();
+      sn.setProject(sample.getProject());
+      sn.setPadding(m.group(1).length());
+      sn.setHighestSampleNumber(number);
+      sn.setCreatedBy(migrationUser);
+      sn.setCreationDate(timeStamp);
+      sn.setUpdatedBy(migrationUser);
+      sn.setLastUpdated(timeStamp);
+      serviceManager.getSampleNumberPerProjectService().create(sn, sn.getProject().getId());
+    } else if (number > sn.getHighestSampleNumber()) {
+      sn.setHighestSampleNumber(number);
+      sn.setUpdatedBy(migrationUser);
+      sn.setLastUpdated(timeStamp);
+      serviceManager.getSampleNumberPerProjectService().update(sn);
+    }
+  }
+
+  private void createSubproject(Subproject subproject, Project project) {
+    subproject.setParentProject(project);
     subproject.setDescription(subproject.getAlias());
     subproject.setPriority(Boolean.FALSE);
-    subproject.setReferenceGenomeId(referenceGenomeId);
+    subproject.setReferenceGenomeId(project.getReferenceGenomeId());
+    subproject.setCreatedBy(migrationUser);
+    subproject.setCreationDate(timeStamp);
+    subproject.setUpdatedBy(migrationUser);
+    subproject.setLastUpdated(timeStamp);
     subproject.setId(serviceManager.getSubprojectDao().addSubproject(subproject));
+    valueTypeLookup.addSubproject(subproject);
   }
 
   private static boolean hasUnsavedParent(DetailedSample sample) {
@@ -287,7 +325,8 @@ public class DefaultMigrationTarget implements MigrationTarget {
   public void saveLibraries(final Collection<Library> libraries) throws IOException {
     log.info("Migrating libraries...");
     for (Library library : libraries) {
-      if (LimsUtils.isDetailedSample(library.getSample())) {
+      log.debug("Saving library " + library.getAlias());
+      if (isDetailedSample(library.getSample())) {
         DetailedSample sample = (DetailedSample) library.getSample();
         if (sample.getId() == AbstractSample.UNSAVED_ID && sample.getPreMigrationId() != null) {
           library.setSample(serviceManager.getSampleDao().getByPreMigrationId(sample.getPreMigrationId()));
@@ -339,6 +378,11 @@ public class DefaultMigrationTarget implements MigrationTarget {
   public void saveLibraryDilutions(final Collection<LibraryDilution> libraryDilutions) throws IOException {
     log.info("Migrating library dilutions...");
     for (LibraryDilution ldi : libraryDilutions) {
+      String friendlyName = " of " + ldi.getLibrary().getAlias();
+      if (ldi.getPreMigrationId() != null) {
+        friendlyName += " with pre-migration id " + ldi.getPreMigrationId();
+      }
+      log.debug("Saving library dilution " + friendlyName);
       if (replaceChangeLogs) {
         if (ldi.getCreationDate() == null || ldi.getLastModified() == null) {
           throw new IOException("Cannot save dilution due to missing timestamps");
@@ -350,15 +394,15 @@ public class DefaultMigrationTarget implements MigrationTarget {
       
       if (ldi.getLibrary().getId() == AbstractDilution.UNSAVED_ID && ldi.getLibrary().getLibraryAdditionalInfo() != null
           && ldi.getLibrary().getLibraryAdditionalInfo().getPreMigrationId() != null) {
-        ldi.setLibrary(serviceManager.getLibraryDao().getByPreMigrationId(ldi.getLibrary().getLibraryAdditionalInfo().getPreMigrationId()));
+        Long preMigrationId = ldi.getLibrary().getLibraryAdditionalInfo().getPreMigrationId();
+        ldi.setLibrary(serviceManager.getLibraryDao().getByPreMigrationId(preMigrationId));
         if (ldi.getLibrary() == null) {
-          throw new IOException("No Library found with pre-migration ID "
-              + ldi.getLibrary().getLibraryAdditionalInfo().getPreMigrationId());
+          throw new IOException("No Library found with pre-migration ID " + preMigrationId);
         }
       }
       
       ldi.setId(serviceManager.getDilutionDao().save(ldi));
-      log.debug("Saved library dilution " + ldi.getName());
+      log.debug("Saved library dilution " + friendlyName);
     }
     log.info(libraryDilutions.size() + " library dilutions migrated.");
   }

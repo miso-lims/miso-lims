@@ -52,8 +52,7 @@ var Library = Library || {
 
     // Description input field validation
     jQuery('#description').attr('class', 'form-control');
-    jQuery('#description').attr('data-parsley-required', 'true');
-    jQuery('#description').attr('data-parsley-maxlength', '100');
+    jQuery('#description').attr('data-parsley-maxlength', '255');
     jQuery('#description').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
     
     // Volume validation
@@ -73,14 +72,21 @@ var Library = Library || {
       },
       {
         'doOnSuccess': function(json) {
-          var regex = json.aliasRegex.split(' ').join('+');
-          jQuery('#alias').attr('data-parsley-pattern', regex);
-          // TODO: better error message than a regex..?
-          //       perhaps save a description and examples with the regex
-          jQuery('#alias').attr('data-parsley-error-message', 'Must match '+regex);
-          jQuery('#library-form').parsley();
-          jQuery('#library-form').parsley().validate();
-          Validate.updateWarningOrSubmit('#library-form', Library.validateLibraryExtra);
+          // don't validate the alias if the library or its parent has a nonstandard alias
+          if (jQuery('#nonStandardAlias').length > 0) {
+            jQuery('#library-form').parsley();
+            jQuery('#library-form').parsley().validate();
+            Validate.updateWarningOrSubmit('#library-form');
+          } else {
+            var regex = json.aliasRegex.split(' ').join('+');
+            jQuery('#alias').attr('data-parsley-pattern', regex);
+            // TODO: better error message than a regex..?
+            //       perhaps save a description and examples with the regex
+            jQuery('#alias').attr('data-parsley-error-message', 'Must match '+regex);
+            jQuery('#library-form').parsley();
+            jQuery('#library-form').parsley().validate();
+            Validate.updateWarningOrSubmit('#library-form', Library.validateLibraryExtra);
+          }
           return false;
         },
         'doOnError': function(json) {
@@ -1138,14 +1144,6 @@ Library.ui = {
       }
     })).fnSetFilteringDelay();
     jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
-    
-    jQuery("input[class='bulkCheckbox']").click(function () {
-      if (jQuery(this).parent().parent().hasClass('row_selected')) {
-        jQuery(this).parent().parent().removeClass('row_selected');
-      } else if (!jQuery(this).parent().parent().hasClass('row_selected')) {
-        jQuery(this).parent().parent().addClass('row_selected');
-      }
-    });
     
     var selectAll = '<label><input type="checkbox" onchange="Library.ui.checkAll(this)" id="checkAll">Select All</label>';
     document.getElementById('listingLibrariesTable').insertAdjacentHTML('beforebegin', selectAll);

@@ -46,7 +46,7 @@
     <table id="allMaterialsTable" class="clear default-table" data-sortable>
       <thead>
         <tr>
-          <th>Alias</th><th>Description</th>
+          <th>Alias</th>
         </tr>
       </thead>
       <tbody id="allMaterials" class="TM"></tbody>
@@ -62,7 +62,7 @@
     <table id="allPurposesTable" class="clear default-table" data-sortable>
       <thead>
         <tr>
-          <th>Alias</th><th>Description</th>
+          <th>Alias</th>
         </tr>
       </thead>
       <tbody id="allPurposes" class="SP"></tbody>

@@ -56,8 +56,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
-import uk.ac.bbsrc.tgac.miso.core.data.Plate;
-import uk.ac.bbsrc.tgac.miso.core.data.Plateable;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
@@ -102,7 +100,6 @@ import uk.ac.bbsrc.tgac.miso.core.store.LibraryQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PartitionStore;
-import uk.ac.bbsrc.tgac.miso.core.store.PlateStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PlatformStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
@@ -152,8 +149,6 @@ public class MisoRequestManager implements RequestManager {
   private NoteStore noteStore;
   @Autowired
   private PartitionStore partitionStore;
-  @Autowired
-  private PlateStore plateStore;
   @Autowired
   private PlatformStore platformStore;
   @Autowired
@@ -245,10 +240,6 @@ public class MisoRequestManager implements RequestManager {
 
   public void setPartitionStore(PartitionStore partitionStore) {
     this.partitionStore = partitionStore;
-  }
-
-  public void setPlateStore(PlateStore plateStore) {
-    this.plateStore = plateStore;
   }
 
   public void setPlatformStore(PlatformStore platformStore) {
@@ -1278,34 +1269,6 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Plate<? extends List<? extends Plateable>, ? extends Plateable>> listAllPlates() throws IOException {
-    if (plateStore != null) {
-      return plateStore.listAll();
-    } else {
-      throw new IOException("No plateStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<Plate<? extends List<? extends Plateable>, ? extends Plateable>> listAllPlatesByProjectId(long projectId)
-      throws IOException {
-    if (plateStore != null) {
-      return plateStore.listByProjectId(projectId);
-    } else {
-      throw new IOException("No plateStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<Plate<? extends List<? extends Plateable>, ? extends Plateable>> listAllPlatesBySearch(String str) throws IOException {
-    if (plateStore != null) {
-      return plateStore.listBySearch(str);
-    } else {
-      throw new IOException("No plateStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
   public Collection<Alert> listUnreadAlertsByUserId(long userId) throws IOException {
     if (alertStore != null) {
       return alertStore.listUnreadByUserId(userId);
@@ -1510,17 +1473,6 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public void deletePlate(Plate plate) throws IOException {
-    if (plateStore != null) {
-      if (!plateStore.remove(plate)) {
-        throw new IOException("Unable to delete Plate.");
-      }
-    } else {
-      throw new IOException("No plateStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
   public void deleteEntityGroup(EntityGroup<? extends Nameable, ? extends Nameable> entityGroup) throws IOException {
     if (entityGroupStore != null) {
       if (!entityGroupStore.remove(entityGroup)) {
@@ -1668,7 +1620,7 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public long saveLibrary(Library library) throws IOException {
     if (libraryStore != null) {
-      if (library.isEmpty()) {
+      if (library.isDiscarded()) {
         library.setVolume(0.0);
       }
       if (library.getLibraryAdditionalInfo() != null && library.getLibraryAdditionalInfo().getLibraryDesign() != null) {
@@ -1756,7 +1708,7 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public long savePool(Pool pool) throws IOException {
     if (poolStore != null) {
-      if (pool.isEmpty()) {
+      if (pool.isDiscarded()) {
         pool.setVolume(0.0);
       }
       return poolStore.save(pool);
@@ -1879,15 +1831,6 @@ public class MisoRequestManager implements RequestManager {
       return kitStore.saveKitDescriptor(kitDescriptor);
     } else {
       throw new IOException("No kitStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public <T extends List<S>, S extends Plateable> long savePlate(Plate<T, S> plate) throws IOException {
-    if (plateStore != null) {
-      return plateStore.save(plate);
-    } else {
-      throw new IOException("No plateStore available. Check that it has been declared in the Spring config.");
     }
   }
 
@@ -2490,24 +2433,6 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Plate<? extends List<? extends Plateable>, ? extends Plateable> getPlateById(long plateId) throws IOException {
-    if (plateStore != null) {
-      return plateStore.get(plateId);
-    } else {
-      throw new IOException("No plateStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public <T extends List<S>, S extends Plateable> Plate<T, S> getPlateByBarcode(String barcode) throws IOException {
-    if (plateStore != null) {
-      return plateStore.<T, S> getPlateByIdentificationBarcode(barcode);
-    } else {
-      throw new IOException("No plateStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
   public Alert getAlertById(long alertId) throws IOException {
     if (alertStore != null) {
       return alertStore.get(alertId);
@@ -2593,24 +2518,6 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Box> listAllBoxesByAlias(String alias) throws IOException {
-    if (boxStore != null) {
-      return boxStore.listByAlias(alias);
-    } else {
-      throw new IOException("No boxStore available. Check that is has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<String> listAllBoxUsesStrings() throws IOException {
-    if (boxStore != null) {
-      return boxStore.listAllBoxUsesStrings();
-    } else {
-      throw new IOException("No boxStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
   public Collection<BoxSize> listAllBoxSizes() throws IOException {
     if (boxStore != null) {
       return boxStore.listAllBoxSizes();
@@ -2629,18 +2536,18 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public void emptySingleTube(Box box, String position) throws IOException {
+  public void discardSingleTube(Box box, String position) throws IOException {
     if (boxStore != null) {
-      boxStore.emptySingleTube(box, position);
+      boxStore.discardSingleTube(box, position);
     } else {
       throw new IOException("No boxStore available. Check that it has been declared in the Spring config.");
     }
   }
 
   @Override
-  public void emptyAllTubes(Box box) throws IOException {
+  public void discardAllTubes(Box box) throws IOException {
     if (boxStore != null) {
-      boxStore.emptyAllTubes(box);
+      boxStore.discardAllTubes(box);
     } else {
       throw new IOException("No boxStore available. Check that it has been declared in the Spring config.");
     }
@@ -2744,15 +2651,6 @@ public class MisoRequestManager implements RequestManager {
       return libraryStore.getLibraryColumnSizes();
     } else {
       throw new IOException("No libraryStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Map<String, Integer> getPlateColumnSizes() throws IOException {
-    if (plateStore != null) {
-      return plateStore.getPlateColumnSizes();
-    } else {
-      throw new IOException("No plateStore available. Check that it has been declared in the Spring config.");
     }
   }
 

@@ -26,9 +26,6 @@ public class SamplePurposeImpl implements SamplePurpose {
   @Column(unique = true, nullable = false)
   private String alias;
 
-  @Column(nullable = false)
-  private String description;
-
   @OneToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "createdBy", nullable = false)
   private User createdBy;
@@ -61,16 +58,6 @@ public class SamplePurposeImpl implements SamplePurpose {
   @Override
   public void setAlias(String alias) {
     this.alias = alias;
-  }
-
-  @Override
-  public String getDescription() {
-    return description;
-  }
-
-  @Override
-  public void setDescription(String description) {
-    this.description = description;
   }
 
   @Override

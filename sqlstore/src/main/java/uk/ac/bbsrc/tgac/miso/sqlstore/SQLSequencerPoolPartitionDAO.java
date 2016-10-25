@@ -31,10 +31,6 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +45,10 @@ import com.googlecode.ehcache.annotations.Cacheable;
 import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.Property;
 import com.googlecode.ehcache.annotations.TriggersRemove;
+
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
@@ -160,7 +160,7 @@ public class SQLSequencerPoolPartitionDAO implements PartitionStore {
 
   private void purgeListCache(SequencerPoolPartition s, boolean replace) {
     Cache cache = cacheManager.getCache("partitionListCache");
-    DbUtils.updateListCache(cache, replace, s, SequencerPoolPartition.class);
+    DbUtils.updateListCache(cache, replace, s);
   }
 
   private void purgeListCache(SequencerPoolPartition s) {

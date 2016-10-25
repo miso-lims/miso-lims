@@ -53,16 +53,6 @@ public interface BoxStore extends Store<Box>, Remover<Box>, NamingSchemeAware<Bo
    */
   Collection<Box> listWithLimit(long limit) throws IOException;
 
-  /**
-   * List all the boxes by alias
-   * 
-   * @param String
-   *          alias
-   * @returns Collection<Box> boxes
-   * @throws IOException
-   */
-  Collection<Box> listByAlias(String alias) throws IOException;
-
   BoxUse getUseById(long id) throws IOException;
 
   BoxSize getSizeById(long id) throws IOException;
@@ -73,9 +63,9 @@ public interface BoxStore extends Store<Box>, Remover<Box>, NamingSchemeAware<Bo
 
   Collection<BoxSize> listAllBoxSizes() throws IOException;
 
-  void emptySingleTube(Box box, String position) throws IOException;
+  void discardSingleTube(Box box, String position) throws IOException;
 
-  void emptyAllTubes(Box box) throws IOException;
+  void discardAllTubes(Box box) throws IOException;
   
   void removeBoxableFromBox(Boxable boxable) throws IOException;
 

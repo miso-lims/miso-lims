@@ -42,7 +42,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
-import uk.ac.bbsrc.tgac.miso.core.data.Plate;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
@@ -98,20 +97,11 @@ public class DownloadController {
       throw new SecurityException("Access denied");
     }
   }
-  
+
   @RequestMapping(value = "/servicerecord/{id}/{hashcode}", method = RequestMethod.GET)
-  protected void downloadServiceRecordFile(@PathVariable Long id, @PathVariable Integer hashcode, HttpServletResponse response) throws Exception {
+  protected void downloadServiceRecordFile(@PathVariable Long id, @PathVariable Integer hashcode, HttpServletResponse response)
+      throws Exception {
     lookupAndRetrieveFile(SequencerServiceRecord.class, id.toString(), hashcode, response);
-  }
-
-  @RequestMapping(value = "/plate/forms/{hashcode}", method = RequestMethod.GET)
-  protected void downloadPlateExportFile(@PathVariable Integer hashcode, HttpServletResponse response) throws Exception {
-    lookupAndRetrieveFile(Plate.class, "forms", hashcode, response);
-  }
-
-  @RequestMapping(value = "/plate/csv/{hashcode}", method = RequestMethod.GET)
-  protected void downloadPlateCSVExportFile(@PathVariable Integer hashcode, HttpServletResponse response) throws Exception {
-    lookupAndRetrieveFile(Plate.class, "csv", hashcode, response);
   }
 
   @RequestMapping(value = "/sample/forms/{hashcode}", method = RequestMethod.GET)

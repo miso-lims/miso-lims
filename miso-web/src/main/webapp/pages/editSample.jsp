@@ -178,13 +178,6 @@
     </tr>
     <c:if test="${detailedSample && sample.isSynthetic()}"><tr><td colspan="2" style="font-size: 200%; font-weight:bold;">This entity does not exist except for sample tracking purposes!</td></tr></c:if>
     <tr>
-      <td class="h">Location:</td>
-      <td>
-        <c:if test="${!empty sample.boxLocation}">${sample.boxLocation},</c:if>
-        <c:if test="${!empty sample.boxPosition}"><a href='<c:url value="/miso/box/${sample.boxId}"/>'>${sample.boxAlias}, ${sample.boxPosition}</a></c:if>
-      </td>
-    </tr>
-    <tr>
       <td>Project:*</td>
       <c:choose>
         <c:when test="${empty sample.project}">
@@ -244,7 +237,7 @@
       </td>
     </tr>
     <tr>
-      <td>Description:*</td>
+      <td>Description:</td>
       <td><form:input id="description" path="description"/><span id="descriptionCounter" class="counter"></span>
       </td>
         <%--<td><a href="void(0);" onclick="popup('help/sampleDescription.html');">Help</a></td>--%>
@@ -316,10 +309,18 @@
       <td><form:input id="volume" path="volume"/></td>
     </tr>
     <tr>
-      <td>Emptied:</td>
-      <td><form:checkbox id="empty" path="empty"/></td>
+      <td>Discarded:</td>
+      <td><form:checkbox id="discarded" path="discarded"/></td>
+    </tr>
+    <tr>
+      <td class="h">Location:</td>
+      <td>
+        <c:if test="${!empty sample.boxLocation}">${sample.boxLocation},</c:if>
+        <c:if test="${!empty sample.boxPosition}"><a href='<c:url value="/miso/box/${sample.boxId}"/>'>${sample.boxAlias}, ${sample.boxPosition}</a></c:if>
+      </td>
     </tr>
   </table>
+  <%@ include file="volumeControl.jspf" %>
   <c:if test="${detailedSample}">
 
     <script type="text/javascript">
@@ -339,12 +340,19 @@
         <div id="detailedSampleIdentity">
           <h2>Identity</h2>
           <table class="in">
+            <c:if test="${sample.id == 0}">
+              <tr>
+                <td class="h">Parent:</td>
+                <td id="parentAliasTd"><span id="parentAlias"></span><form:input type="hidden" id="identityId" path="identityId"/></td>
+              </tr>
+            </c:if>
             <tr>
               <td class="h">External Names (comma separated):*</td>
               <td>
                 <c:choose>
                   <c:when test="${sample.id == 0}">
-                    <form:input id="externalName" path="externalName"/>
+                    <span id="externalNameVal"></span>  <span id="externalNameDialog" title="Find or Create Identity"></span><button type="button" onclick="Sample.ui.showExternalNameChangeDialog()">Find or Create Identity</button>
+                    <form:input type="hidden" id="externalName" path="externalName"/>
                   </c:when>
                   <c:otherwise>
                     ${sample.externalName}
@@ -487,7 +495,7 @@
               </td>
             </tr>
             <tr>
-              <td class="h">Tissue Material:*</td>
+              <td class="h">Tissue Material:</td>
               <td>
                 <c:choose>
                   <c:when test="${sample.id == 0}">
@@ -759,7 +767,7 @@
     <div id="ctrlV" class="note">
       <p>Paste values using Ctrl + V in Windows or Linux, or Command-V (&#8984;-V) on a Mac.</p>
     </div>
-    <div class="floatleft">
+    <div class="floatleft" id="tableProps">
 	    <div><label>Project: <select id="projectSelect"></select></label></div>
 	    <div id="subpSelectOptions"></div>
 	    <div id="classOptions"></div>
@@ -774,6 +782,7 @@
 	    </div>
 	    <div>
 	      <button id="makeTable" onclick="Sample.hot.makeNewSamplesTable();">Make Table</button>
+          <button id="lookupIdentities" onclick="Sample.hot.lookupIdentities();" disabled="disabled">Look up Identities</button>
 	    </div>
 	  </div>
     <div class="clear"></div>
@@ -802,7 +811,7 @@
   <a name="sampleqc"></a>
 
   <h1>
-    <span id="qcsTotalCount"></span> QCs
+    <span id="qcsTotalCount"></span>
   </h1>
   <ul class="sddm">
     <li>
@@ -863,7 +872,7 @@
   <c:if test="${ !detailedSample or detailedSample and sampleCategory eq 'Aliquot' }">
 
   <h1>
-    <span id="librariesTotalCount"></span> Libraries
+    <span id="librariesTotalCount"></span>
   </h1>
   <ul class="sddm">
     <li>
@@ -912,8 +921,10 @@
     jQuery(document).ready(function () {
     	// display sample QCs table, and count samples and libraries
       jQuery('#sampleQcTable').tablesorter();
-      jQuery('#qcsTotalCount').html(jQuery('#sampleQcTable>tbody>tr:visible').length.toString() + ' QCs');
-      jQuery('#librariesTotalCount').html(jQuery('#library_table>tbody>tr:visible').length.toString() + ' Libraries');
+      var totalQcsCount = jQuery('#sampleQcTable>tbody>tr:visible').length;
+      jQuery('#qcsTotalCount').html(totalQcsCount + (totalQcsCount == 1 ? ' QC' : ' QCs'));
+      var visibleLibsCount = jQuery('#library_table>tbody>tr:visible').length;
+      jQuery('#librariesTotalCount').html(visibleLibsCount + (visibleLibsCount == 1 ? ' Library' : ' Libraries'));
 
       jQuery('#library_table').dataTable({
         "aaSorting": [
@@ -935,7 +946,7 @@
 
   <c:if test="${not empty samplePools}">
     <br/>
-    <h1>${fn:length(samplePools)} Pools</h1>
+    <h1>${fn:length(samplePools)} Pool<c:if test="${fn:length(samplePools) ne 1}">s</c:if></h1>
     <ul class="sddm">
       <li>
         <a onmouseover="mopen('poolsmenu')" onmouseout="mclosetime()">Options

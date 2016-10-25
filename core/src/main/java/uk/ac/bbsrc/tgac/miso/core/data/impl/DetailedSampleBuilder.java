@@ -1,9 +1,11 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -35,7 +37,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.StrStatus;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
@@ -43,11 +44,14 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleQcException;
 import uk.ac.bbsrc.tgac.miso.core.exception.ReportingException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
-public class DetailedSampleBuilder implements DetailedSample, SampleAliquot, SampleStock, SampleTissue, SampleTissueProcessing,
-    SampleCVSlide, SampleLCMTube, Identity {
+public class DetailedSampleBuilder
+    implements DetailedSample, SampleAliquot, SampleStock, SampleTissue, SampleTissueProcessing, SampleCVSlide, SampleLCMTube, Identity {
 
   @SuppressWarnings("unused")
   private static final long serialVersionUID = 1L;
+
+  private static final List<String> CATEGORY_ORDER = Arrays.asList(Identity.CATEGORY_NAME, SampleTissue.CATEGORY_NAME,
+      SampleStock.CATEGORY_NAME, SampleAliquot.CATEGORY_NAME);
 
   // Sample attributes
   private long sampleId = AbstractSample.UNSAVED_ID;
@@ -67,12 +71,12 @@ public class DetailedSampleBuilder implements DetailedSample, SampleAliquot, Sam
   private Long securityProfile_profileId;
   private User lastModifier;
   private Double volume;
-  private boolean emptied = false;
+  private boolean discarded = false;
   private boolean isSynthetic = false;
   private boolean nonStandardAlias = false;
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
-  private Collection<SampleQC> sampleQCs = new TreeSet<SampleQC>();
-  private Collection<Note> notes = new HashSet<Note>();
+  private Collection<SampleQC> sampleQCs = new TreeSet<>();
+  private Collection<Note> notes = new HashSet<>();
 
   // DetailedSample attributes
   private DetailedSample parent;
@@ -80,16 +84,14 @@ public class DetailedSampleBuilder implements DetailedSample, SampleAliquot, Sam
   private DetailedQcStatus detailedQcStatus;
   private String detailedQcStatusNote;
   private Subproject subproject;
-  private Long kitDescriptorId;
-  private KitDescriptor prepKit;
   private Boolean archived = Boolean.FALSE;
   private String groupId;
   private String groupDescription;
   private Integer siblingNumber;
   private Long preMigrationId;
+  private Long identityId;
 
   // Identity attributes
-  private String internalName;
   private String externalName;
   private DonorSex donorSex = DonorSex.UNKNOWN;
 
@@ -109,6 +111,7 @@ public class DetailedSampleBuilder implements DetailedSample, SampleAliquot, Sam
   private SamplePurpose samplePurpose;
 
   // SampleStock attributes
+  private SampleClass stockClass;
   private StrStatus strStatus = StrStatus.NOT_SUBMITTED;
   private Double concentration;
   private Boolean dnaseTreated;
@@ -156,7 +159,7 @@ public class DetailedSampleBuilder implements DetailedSample, SampleAliquot, Sam
   public void addQc(SampleQC sampleQc) throws MalformedSampleQcException {
     this.sampleQCs.add(sampleQc);
     try {
-    sampleQc.setSample(this);
+      sampleQc.setSample(this);
     } catch (MalformedSampleException e) {
       // This is never actually thrown
       throw new RuntimeException(e);
@@ -436,24 +439,6 @@ public class DetailedSampleBuilder implements DetailedSample, SampleAliquot, Sam
     this.lab = lab;
   }
 
-  public Long getKitDescriptorId() {
-    return kitDescriptorId;
-  }
-
-  public void setKitDescriptorId(Long kitDescriptorId) {
-    this.kitDescriptorId = kitDescriptorId;
-  }
-
-  @Override
-  public KitDescriptor getPrepKit() {
-    return prepKit;
-  }
-
-  @Override
-  public void setPrepKit(KitDescriptor prepKit) {
-    this.prepKit = prepKit;
-  }
-
   @Override
   public Integer getPassageNumber() {
     return passageNumber;
@@ -532,16 +517,6 @@ public class DetailedSampleBuilder implements DetailedSample, SampleAliquot, Sam
   @Override
   public void setGroupDescription(String groupDescription) {
     this.groupDescription = groupDescription;
-  }
-
-  @Override
-  public String getInternalName() {
-    return internalName;
-  }
-
-  @Override
-  public void setInternalName(String internalName) {
-    this.internalName = internalName;
   }
 
   @Override
@@ -629,6 +604,14 @@ public class DetailedSampleBuilder implements DetailedSample, SampleAliquot, Sam
     this.tissueMaterial = tissueMaterial;
   }
 
+  public SampleClass getStockClass() {
+    return stockClass;
+  }
+
+  public void setStockClass(SampleClass stockClass) {
+    this.stockClass = stockClass;
+  }
+
   @Override
   public StrStatus getStrStatus() {
     return strStatus;
@@ -714,13 +697,13 @@ public class DetailedSampleBuilder implements DetailedSample, SampleAliquot, Sam
   }
 
   @Override
-  public void setEmpty(boolean emptied) {
-    this.emptied = emptied;
+  public void setDiscarded(boolean discarded) {
+    this.discarded = discarded;
   }
 
   @Override
-  public boolean isEmpty() {
-    return emptied;
+  public boolean isDiscarded() {
+    return discarded;
   }
 
   @Override
@@ -776,11 +759,6 @@ public class DetailedSampleBuilder implements DetailedSample, SampleAliquot, Sam
   @Override
   public void setStrStatus(String strStatus) {
     this.strStatus = StrStatus.get(strStatus);
-  }
-
-  @Override
-  public Long getHibernateKitDescriptorId() {
-    return this.kitDescriptorId;
   }
 
   @Override
@@ -846,6 +824,16 @@ public class DetailedSampleBuilder implements DetailedSample, SampleAliquot, Sam
     this.preMigrationId = preMigrationId;
   }
 
+  @Override
+  public Long getIdentityId() {
+    return identityId;
+  }
+
+  @Override
+  public void setIdentityId(Long identityId) {
+    this.identityId = identityId;
+  }
+
   public DetailedSample build() {
     if (sampleClass == null || sampleClass.getSampleCategory() == null) {
       throw new NullPointerException("Missing sample class or category");
@@ -853,10 +841,7 @@ public class DetailedSampleBuilder implements DetailedSample, SampleAliquot, Sam
     DetailedSample sample = null;
     switch (sampleClass.getSampleCategory()) {
     case Identity.CATEGORY_NAME:
-      Identity identity = new IdentityImpl();
-      identity.setInternalName(internalName);
-      identity.setExternalName(externalName);
-      identity.setDonorSex(donorSex);
+      Identity identity = buildIdentity();
       sample = identity;
       break;
     case SampleTissue.CATEGORY_NAME:
@@ -879,11 +864,7 @@ public class DetailedSampleBuilder implements DetailedSample, SampleAliquot, Sam
       }
       break;
     case SampleStock.CATEGORY_NAME:
-      SampleStock stock = new SampleStockImpl();
-      stock.setStrStatus(strStatus);
-      stock.setConcentration(concentration);
-      stock.setDNAseTreated(dnaseTreated);
-      stock.setQCs(sampleQCs);
+      SampleStock stock = buildStock();
       sample = stock;
       break;
     case SampleAliquot.CATEGORY_NAME:
@@ -897,23 +878,33 @@ public class DetailedSampleBuilder implements DetailedSample, SampleAliquot, Sam
 
     if (parent != null) {
       sample.setParent(parent);
-    } else if (!Identity.CATEGORY_NAME.equals(sampleClass.getSampleCategory())) {
-      Identity identity = new IdentityImpl();
-      if (externalName == null) {
-        throw new NullPointerException("Missing externalName");
+    } else {
+      DetailedSample parent = null;
+      int categoryIndex = CATEGORY_ORDER.indexOf(sampleClass.getSampleCategory());
+      if (categoryIndex < 0) {
+        throw new IllegalArgumentException("Sample has no parent and cannot infer order from sample category.");
       }
-      identity.setExternalName(externalName);
-      identity.setInternalName(internalName);
-      identity.setDonorSex(donorSex);
-      if (SampleTissue.CATEGORY_NAME.equals(sampleClass.getSampleCategory())) {
-        sample.setParent(identity);
-      } else {
-        if (tissueClass == null) throw new NullPointerException("Missing tissue class");
+      if (categoryIndex > 0) {
+        if (identityId == null && externalName != null) {
+          parent = buildIdentity();
+        } else if (identityId != null) {
+          parent = new IdentityImpl();
+          parent.setId(identityId);
+        }
+      }
+      if (categoryIndex > 1 && tissueClass != null) {
         SampleTissue tissue = buildTissue();
+        tissue.setParent(parent);
         tissue.setSampleClass(tissueClass);
-        tissue.setParent(identity);
-        sample.setParent(tissue);
+        parent = tissue;
       }
+      if (categoryIndex > 2 && stockClass != null) {
+        SampleStock stock = buildStock();
+        stock.setParent(parent);
+        stock.setSampleClass(stockClass);
+        parent = stock;
+      }
+      sample.setParent(parent);
     }
 
     sample.setId(sampleId);
@@ -933,7 +924,7 @@ public class DetailedSampleBuilder implements DetailedSample, SampleAliquot, Sam
     sample.setAlias(alias);
     sample.setLastModifier(lastModifier);
     sample.setVolume(volume);
-    sample.setEmpty(emptied);
+    sample.setDiscarded(discarded);
     sample.getChangeLog().addAll(changeLog);
     sample.setNotes(notes);
 
@@ -941,7 +932,6 @@ public class DetailedSampleBuilder implements DetailedSample, SampleAliquot, Sam
     sample.setDetailedQcStatus(detailedQcStatus);
     sample.setDetailedQcStatusNote(detailedQcStatusNote);
     sample.setSubproject(subproject);
-    sample.setPrepKit(prepKit);
     sample.setArchived(archived);
     sample.setGroupId(groupId);
     sample.setGroupDescription(groupDescription);
@@ -951,6 +941,25 @@ public class DetailedSampleBuilder implements DetailedSample, SampleAliquot, Sam
     sample.setPreMigrationId(preMigrationId);
 
     return sample;
+  }
+
+  private Identity buildIdentity() {
+    if (externalName == null) {
+      throw new NullPointerException("Missing externalName");
+    }
+    Identity identity = new IdentityImpl();
+    identity.setExternalName(externalName);
+    identity.setDonorSex(donorSex);
+    return identity;
+  }
+
+  private SampleStock buildStock() {
+    SampleStock stock = new SampleStockImpl();
+    stock.setStrStatus(strStatus);
+    stock.setConcentration(concentration);
+    stock.setDNAseTreated(dnaseTreated);
+    stock.setQCs(sampleQCs);
+    return stock;
   }
 
   private SampleTissue buildTissue() {

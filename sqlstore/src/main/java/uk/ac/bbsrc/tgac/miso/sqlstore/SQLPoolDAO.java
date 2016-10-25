@@ -36,7 +36,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
 
 import javax.persistence.CascadeType;
 
@@ -66,10 +65,10 @@ import com.googlecode.ehcache.annotations.TriggersRemove;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
+
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractPool;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
-import uk.ac.bbsrc.tgac.miso.core.data.Plate;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
@@ -112,7 +111,7 @@ public class SQLPoolDAO implements PoolStore {
   public static final String POOL_COUNT_BY_PLATFORM = POOL_COUNT + " WHERE p.platformType=?";
 
   private static final String POOL_SELECT = "SELECT p.poolId, p.concentration, p.identificationBarcode, p.name, p.alias, p.description, p.creationDate, "
-      + "p.securityProfile_profileId, p.platformType, p.ready, p.qcPassed, p.lastModifier, pmod.lastModified, p.boxPositionId, p.volume, p.emptied, b.boxId, "
+      + "p.securityProfile_profileId, p.platformType, p.ready, p.qcPassed, p.lastModifier, pmod.lastModified, p.boxPositionId, p.volume, p.discarded, b.boxId, "
       + "b.alias AS boxAlias, b.locationBarcode AS boxLocation, bp.row AS boxRow, bp.column AS boxColumn " + "FROM " + TABLE_NAME + " p "
       + "LEFT JOIN BoxPosition bp ON bp.boxPositionId = p.boxPositionId " + "LEFT JOIN Box b ON b.boxId = bp.boxId "
       + "LEFT JOIN (SELECT poolId, MAX(changeTime) AS lastModified FROM PoolChangeLog GROUP BY poolId) pmod ON p.poolId = pmod.poolId";
@@ -141,7 +140,7 @@ public class SQLPoolDAO implements PoolStore {
 
   public static final String POOL_UPDATE = "UPDATE " + TABLE_NAME + " "
       + "SET alias=:alias, concentration=:concentration, identificationBarcode=:identificationBarcode, creationDate=:creationDate, securityProfile_profileId=:securityProfile_profileId, "
-      + "platformType=:platformType, ready=:ready, qcPassed=:qcPassed, lastModifier=:lastModifier, emptied=:emptied, volume=:volume, description=:description "
+      + "platformType=:platformType, ready=:ready, qcPassed=:qcPassed, lastModifier=:lastModifier, discarded=:discarded, volume=:volume, description=:description "
       + "WHERE poolId=:poolId";
 
   public static final String POOL_DELETE = "DELETE FROM " + TABLE_NAME + " WHERE poolId=:poolId";
@@ -165,13 +164,6 @@ public class SQLPoolDAO implements PoolStore {
       + "INNER JOIN LibraryDilution ld ON ld.library_libraryId = li.libraryId "
       + "LEFT JOIN Pool_Elements pld ON pld.elementId = ld.dilutionId "
       + "WHERE p.projectId = ? AND pld.elementType = 'uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution')";
-
-  public static final String PLATE_POOL_SELECT_BY_RELATED_PROJECT = POOL_SELECT
-      + " WHERE p.poolId IN (SELECT DISTINCT pool_poolId FROM Project p "
-
-      + "INNER JOIN Sample sa ON sa.project_projectId = p.projectId " + "INNER JOIN Library li ON li.sample_sampleId = sa.sampleId "
-      + "INNER JOIN Plate_Elements pe ON li.libraryId = pe.elementId " + "INNER JOIN Plate pl ON pl.plateId = pe.plate_plateId "
-      + "LEFT JOIN Pool_Elements pld ON pld.elementId = pl.plateId " + "WHERE p.projectId= ? AND pld.elementType LIKE '%Plate')";
 
   public static final String POOL_ID_SELECT_BY_RELATED = "SELECT DISTINCT pool_poolId AS poolId FROM Pool_Elements, "
       + "(SELECT dilutionId as elementId, library_libraryId as libraryId, 'uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution' as elementType FROM LibraryDilution "
@@ -406,7 +398,7 @@ public class SQLPoolDAO implements PoolStore {
   private void purgeListCache(Pool p, boolean replace) {
     if (cacheManager != null) {
       Cache cache = cacheManager.getCache("poolListCache");
-      DbUtils.updateListCache(cache, replace, p, Pool.class);
+      DbUtils.updateListCache(cache, replace, p);
     }
   }
 
@@ -443,7 +435,7 @@ public class SQLPoolDAO implements PoolStore {
     if (securityProfileId == null || (this.cascadeType != null)) {
       securityProfileId = securityProfileDAO.save(pool.getSecurityProfile());
     }
-    if (pool.isEmpty()) {
+    if (pool.isDiscarded()) {
       boxDAO.removeBoxableFromBox(pool);
       pool.setVolume(0D);
     }
@@ -456,7 +448,7 @@ public class SQLPoolDAO implements PoolStore {
     params.addValue("securityProfile_profileId", securityProfileId);
     params.addValue("platformType", pool.getPlatformType().getKey());
     params.addValue("ready", pool.getReadyToRun());
-    params.addValue("emptied", pool.isEmpty());
+    params.addValue("discarded", pool.isDiscarded());
     params.addValue("volume", pool.getVolume());
     params.addValue("lastModifier", pool.getLastModifier().getUserId());
     params.addValue("qcPassed", pool.getQcPassed());
@@ -508,7 +500,7 @@ public class SQLPoolDAO implements PoolStore {
       }
     }
 
-    Set<String> oldIds = new HashSet<String>(
+    Set<String> oldIds = new HashSet<>(
         template.query(POOL_ELEMENT_SELECT_BY_POOL_ID, new Object[] { pool.getId() }, new RowMapper<String>() {
           @Override
           public String mapRow(ResultSet rs, int pos) throws SQLException {
@@ -516,7 +508,7 @@ public class SQLPoolDAO implements PoolStore {
             return parts[parts.length - 1] + ":" + rs.getLong("elementId");
           }
         }));
-    Set<String> newIds = new HashSet<String>();
+    Set<String> newIds = new HashSet<>();
     MapSqlParameterSource delparams = new MapSqlParameterSource();
     delparams.addValue("pool_poolId", pool.getId());
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
@@ -557,10 +549,6 @@ public class SQLPoolDAO implements PoolStore {
               dao.save(d);
             }
           } else if (this.cascadeType.equals(CascadeType.REMOVE)) {
-            if (d instanceof Plate && cacheManager != null) {
-              dc = cacheManager.getCache("plateCache");
-              ldc = cacheManager.getCache("lazyPlateCache");
-            }
             if (dc != null) DbUtils.updateCaches(cacheManager, d, Poolable.class);
             if (ldc != null) DbUtils.updateCaches(cacheManager, d, Poolable.class);
           }
@@ -630,8 +618,6 @@ public class SQLPoolDAO implements PoolStore {
       String idColumn;
       if (parts[0].equals("LibraryDilution")) {
         idColumn = "dilutionId";
-      } else if (parts[0].equals("Plate")) {
-        idColumn = "plateId";
       } else {
         throw new NotImplementedException("Don't know how to pool: " + parts[0]);
       }
@@ -700,10 +686,7 @@ public class SQLPoolDAO implements PoolStore {
         new PoolMapper(true));
     List<Pool<? extends Poolable<?, ?>>> epools = template.query(EMPCR_POOL_SELECT_BY_RELATED_PROJECT, new Object[] { projectId },
         new PoolMapper(true));
-    List<Pool<? extends Poolable<?, ?>>> ppools = template.query(PLATE_POOL_SELECT_BY_RELATED_PROJECT, new Object[] { projectId },
-        new PoolMapper(true));
     lpools.addAll(epools);
-    lpools.addAll(ppools);
     return lpools;
   }
 
@@ -790,10 +773,6 @@ public class SQLPoolDAO implements PoolStore {
               dao.save(d);
             }
           } else if (this.cascadeType.equals(CascadeType.REMOVE)) {
-            if (d instanceof Plate) {
-              dc = cacheManager.getCache("plateCache");
-              ldc = cacheManager.getCache("lazyPlateCache");
-            }
             if (dc != null) DbUtils.updateCaches(cacheManager, d, Poolable.class);
             if (ldc != null) DbUtils.updateCaches(cacheManager, d, Poolable.class);
           }
@@ -862,7 +841,7 @@ public class SQLPoolDAO implements PoolStore {
         p.setIdentificationBarcode(rs.getString("identificationBarcode"));
         p.setReadyToRun(rs.getBoolean("ready"));
         p.setVolume(rs.getDouble("volume"));
-        p.setEmpty(rs.getBoolean("emptied"));
+        p.setDiscarded(rs.getBoolean("discarded"));
         p.setBoxPositionId(rs.getLong("boxPositionId"));
         p.setBoxAlias(rs.getString("boxAlias"));
         p.setBoxId(rs.getLong("boxId"));
@@ -878,7 +857,7 @@ public class SQLPoolDAO implements PoolStore {
         }
 
         p.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
-        p.setWatchers(new HashSet<User>(watcherDAO.getWatchersByEntityName(p.getWatchableIdentifier())));
+        p.setWatchers(new HashSet<>(watcherDAO.getWatchersByEntityName(p.getWatchableIdentifier())));
         if (p.getSecurityProfile() != null && p.getSecurityProfile().getOwner() != null) {
           p.addWatcher(p.getSecurityProfile().getOwner());
         }

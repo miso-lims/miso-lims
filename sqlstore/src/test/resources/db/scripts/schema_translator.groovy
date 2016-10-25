@@ -15,7 +15,6 @@ final String basedir = "${project.basedir}"
 final File productionSchemaDir = new File(basedir + '/src/main/resources/db/migration/')
 println('Translating schema files from ' + productionSchemaDir.getAbsolutePath() + '...')
 
-// ignore V8000-series site-specific migrations as they will cause tests to fail
 final String productionScriptPattern = '^(V\\d{4}_.*|afterMigrate)\\.sql$'
 final String testSchemaDir = basedir + '/target/test-classes/db/test_migration/'
 

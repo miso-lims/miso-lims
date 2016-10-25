@@ -41,10 +41,6 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-import net.sourceforge.fluxion.ajax.util.JSONUtils;
-
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,10 +66,15 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import net.sourceforge.fluxion.ajax.util.JSONUtils;
+
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractPool;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -83,7 +84,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAdditionalInfoImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
@@ -221,7 +221,7 @@ public class EditLibraryController {
   }
 
   public Collection<LibraryType> populateLibraryTypesByPlatform(String platform) throws IOException {
-    List<LibraryType> types = new ArrayList<LibraryType>();
+    List<LibraryType> types = new ArrayList<>();
     for (LibraryType type : requestManager.listLibraryTypesByPlatform(platform)) {
       if (!type.getArchived()) {
         types.add(type);
@@ -232,7 +232,7 @@ public class EditLibraryController {
   }
 
   public Collection<LibraryType> populateLibraryTypes() throws IOException {
-    List<LibraryType> types = new ArrayList<LibraryType>(requestManager.listAllLibraryTypes());
+    List<LibraryType> types = new ArrayList<>(requestManager.listAllLibraryTypes());
     Collections.sort(types);
     return types;
   }
@@ -242,66 +242,32 @@ public class EditLibraryController {
     return requestManager.getLibraryColumnSizes();
   }
 
-  @ModelAttribute("platformNames")
-  public Collection<String> populatePlatformNames() throws IOException {
+  private Collection<String> populatePlatformNames(List<String> current) throws IOException {
     List<String> types = new ArrayList<>(PlatformType.platformTypeNames(requestManager.listActivePlatformTypes()));
+    for (String s : current) {
+      if (s != null && !types.contains(s)) {
+        types.add(s);
+      }
+    }
     Collections.sort(types);
     return types;
-  }
-
-  @ModelAttribute("platformNamesString")
-  public String platformNamesString() throws IOException {
-    List<String> names = new ArrayList<String>();
-    List<String> pn = new ArrayList<String>(populatePlatformNames());
-    for (String name : pn) {
-      names.add("\"" + name + "\"" + ":" + "\"" + name + "\"");
-    }
-    if (!pn.isEmpty()) {
-      names.add("\"selected\":" + "\"" + pn.get(0) + "\"");
-    }
-    return LimsUtils.join(names, ",");
-  }
-
-  @ModelAttribute("libraryTypesString")
-  public String libraryTypesString() throws IOException {
-    List<String> types = new ArrayList<String>();
-    for (LibraryType t : populateLibraryTypes()) {
-      types.add("\"" + t.getDescription() + "\"" + ":" + "\"" + t.getDescription() + "\"");
-    }
-    return LimsUtils.join(types, ",");
   }
 
   @ModelAttribute("librarySelectionTypes")
   public Collection<LibrarySelectionType> populateLibrarySelectionTypes() throws IOException {
-    List<LibrarySelectionType> types = new ArrayList<LibrarySelectionType>(requestManager.listAllLibrarySelectionTypes());
+    List<LibrarySelectionType> types = new ArrayList<>(requestManager.listAllLibrarySelectionTypes());
     Collections.sort(types);
     return types;
   }
 
-  @ModelAttribute("librarySelectionTypesString")
-  public String librarySelectionTypesString() throws IOException {
-    List<String> types = new ArrayList<String>();
-    for (LibrarySelectionType t : populateLibrarySelectionTypes()) {
-      types.add("\"" + t.getName() + "\"" + ":" + "\"" + t.getName() + "\"");
-    }
-    return LimsUtils.join(types, ",");
-  }
 
   @ModelAttribute("libraryStrategyTypes")
   public Collection<LibraryStrategyType> populateLibraryStrategyTypes() throws IOException {
-    List<LibraryStrategyType> types = new ArrayList<LibraryStrategyType>(requestManager.listAllLibraryStrategyTypes());
+    List<LibraryStrategyType> types = new ArrayList<>(requestManager.listAllLibraryStrategyTypes());
     Collections.sort(types);
     return types;
   }
 
-  @ModelAttribute("libraryStrategyTypesString")
-  public String libraryStrategyTypesString() throws IOException {
-    List<String> types = new ArrayList<String>();
-    for (LibraryStrategyType t : populateLibraryStrategyTypes()) {
-      types.add("\"" + t.getName() + "\"" + ":" + "\"" + t.getName() + "\"");
-    }
-    return LimsUtils.join(types, ",");
-  }
 
   public void populateAvailableIndexFamilies(Library library, ModelMap model) throws IOException {
     if (isStringEmptyOrNull(library.getPlatformName())) {
@@ -393,7 +359,7 @@ public class EditLibraryController {
   @ModelAttribute("referenceDataJSON")
   public JSONObject referenceDataJsonString() throws IOException {
     final JSONObject hot = new JSONObject();
-    final List<String> qcValues = new ArrayList<String>();
+    final List<String> qcValues = new ArrayList<>();
     qcValues.add("true");
     qcValues.add("false");
     qcValues.add("");
@@ -420,11 +386,18 @@ public class EditLibraryController {
       libType.put("archived", lt.getArchived());
       libraryTypes.add(libType);
     }
+    JSONArray platformTypes = new JSONArray();
+    Collection<PlatformType> activePlatforms = requestManager.listActivePlatformTypes();
+    for (final PlatformType platformType : PlatformType.values()) {
+      JSONObject platformTypeJson = new JSONObject();
+      platformTypeJson.put("id", platformType.getKey());
+      platformTypeJson.put("active", activePlatforms.contains(platformType));
+      platformTypes.add(platformTypeJson);
+    }
 
     hot.put("qcValues", qcValues);
     hot.put("selectionTypes", selectionTypes);
     hot.put("strategyTypes", strategyTypes);
-    hot.put("platformNames", populatePlatformNames());
     hot.put("libraryTypes", libraryTypes);
 
     return hot;
@@ -435,7 +408,7 @@ public class EditLibraryController {
   public @ResponseBody JSONObject indicesJson(@RequestParam("indexFamily") String indexFamily, @RequestParam("position") String position)
       throws IOException {
     final JSONObject rtn = new JSONObject();
-    List<JSONObject> rtnList = new ArrayList<JSONObject>();
+    List<JSONObject> rtnList = new ArrayList<>();
     try {
       if (!isStringEmptyOrNull(indexFamily)) {
         final IndexFamily ifam = indexService.getIndexFamilyByName(indexFamily);
@@ -491,7 +464,7 @@ public class EditLibraryController {
   }
 
   public List<JSONObject> indicesForPosition(IndexFamily ifam, int position) {
-    final List<JSONObject> rtnList = new ArrayList<JSONObject>();
+    final List<JSONObject> rtnList = new ArrayList<>();
     for (final Index index : ifam.getIndicesForPosition(position)) {
       final JSONObject obj = new JSONObject();
       obj.put("id", index.getId());
@@ -519,7 +492,7 @@ public class EditLibraryController {
   @RequestMapping(value = "libraryTypesJson", method = RequestMethod.GET)
   public @ResponseBody JSONObject libraryTypesJson(@RequestParam("platform") String platform) throws IOException {
     final JSONObject rtn = new JSONObject();
-    final List<String> rtnLibTypes = new ArrayList<String>();
+    final List<String> rtnLibTypes = new ArrayList<>();
     if (!isStringEmptyOrNull(platform)) {
       final Collection<LibraryType> libTypes = requestManager.listLibraryTypesByPlatform(platform);
       for (final LibraryType type : libTypes) {
@@ -554,7 +527,7 @@ public class EditLibraryController {
     final JSONObject rtn = new JSONObject();
 
     if (platform != null && !"".equals(platform)) {
-      final List<String> indexFamilies = new ArrayList<String>();
+      final List<String> indexFamilies = new ArrayList<>();
       indexFamilies.add(IndexFamily.NULL.getName());
       for (final IndexFamily ifam : indexService.getIndexFamiliesByPlatform(PlatformType.get(platform))) {
         indexFamilies.add(ifam.getName());
@@ -567,7 +540,7 @@ public class EditLibraryController {
   @RequestMapping(value = "librarytypes", method = RequestMethod.GET)
   public @ResponseBody String jsonRestLibraryTypes(@RequestParam("platform") String platform) throws IOException {
     if (!isStringEmptyOrNull(platform)) {
-      List<String> types = new ArrayList<String>();
+      List<String> types = new ArrayList<>();
       for (LibraryType t : populateLibraryTypesByPlatform(platform)) {
         types.add("\"" + t.getDescription() + "\"" + ":" + "\"" + t.getDescription() + "\"");
       }
@@ -580,7 +553,7 @@ public class EditLibraryController {
   @RequestMapping(value = "indexFamilies", method = RequestMethod.GET)
   public @ResponseBody String jsonRestIndexFamilies(@RequestParam("platform") String platform) throws IOException {
     if (!isStringEmptyOrNull(platform)) {
-      List<String> types = new ArrayList<String>();
+      List<String> types = new ArrayList<>();
       for (IndexFamily t : indexService.getIndexFamiliesByPlatform(PlatformType.get(platform))) {
         types.add("\"" + t.getName() + "\"" + ":" + "\"" + t.getName() + "\"");
       }
@@ -596,7 +569,7 @@ public class EditLibraryController {
     if (!isStringEmptyOrNull(indexFamily)) {
       IndexFamily ifam = indexService.getIndexFamilyByName(indexFamily);
       if (ifam != null) {
-        List<String> names = new ArrayList<String>();
+        List<String> names = new ArrayList<>();
         for (Index index : ifam.getIndicesForPosition(Integer.parseInt(position))) {
           names.add("\"" + index.getId() + "\"" + ":" + "\"" + index.getName() + " (" + index.getSequence() + ")\"");
         }
@@ -615,7 +588,7 @@ public class EditLibraryController {
   }
 
   public Collection<emPCR> populateEmPcrs(User user, Library library) throws IOException {
-    Collection<emPCR> pcrs = new HashSet<emPCR>();
+    Collection<emPCR> pcrs = new HashSet<>();
     for (emPCR pcr : requestManager.listAllEmPCRs()) {
       for (LibraryDilution ldil : library.getLibraryDilutions()) {
         if (pcr.getLibraryDilution().getId() == ldil.getId()) {
@@ -627,7 +600,7 @@ public class EditLibraryController {
   }
 
   public Collection<emPCRDilution> populateEmPcrDilutions(User user, Collection<emPCR> pcrs) throws IOException {
-    Collection<emPCRDilution> dilutions = new HashSet<emPCRDilution>();
+    Collection<emPCRDilution> dilutions = new HashSet<>();
     for (emPCR pcr : pcrs) {
       for (emPCRDilution dilution : requestManager.listAllEmPCRDilutionsByEmPcrId(pcr.getId())) {
         dilution.setEmPCR(pcr);
@@ -671,7 +644,7 @@ public class EditLibraryController {
       Collection<emPCR> pcrs = populateEmPcrs(user, library);
       model.put("emPCRs", pcrs);
       model.put("emPcrDilutions", populateEmPcrDilutions(user, pcrs));
-
+      model.put("platformNames", populatePlatformNames(Arrays.asList(library.getPlatformName())));
       populateAvailableIndexFamilies(library, model);
       addAdjacentLibraries(library, model);
 
@@ -734,7 +707,7 @@ public class EditLibraryController {
           sampleClass = detailed.getSampleClass();
         }
 
-        List<Sample> projectSamples = new ArrayList<Sample>(requestManager.listAllSamplesByProjectId(sample.getProject().getProjectId()));
+        List<Sample> projectSamples = new ArrayList<>(requestManager.listAllSamplesByProjectId(sample.getProject().getProjectId()));
         Collections.sort(projectSamples, new AliasComparator(Sample.class));
         model.put("projectSamples", projectSamples);
 
@@ -766,6 +739,7 @@ public class EditLibraryController {
       Collection<emPCR> pcrs = populateEmPcrs(user, library);
       model.put("emPCRs", pcrs);
       model.put("emPcrDilutions", populateEmPcrDilutions(user, pcrs));
+      model.put("platformNames", populatePlatformNames(Arrays.asList(library.getPlatformName())));
       populateAvailableIndexFamilies(library, model);
 
       addAdjacentLibraries(library, model);
@@ -804,7 +778,7 @@ public class EditLibraryController {
     try {
       List<Long> idList = getIdsFromString(sampleIds);
       ObjectMapper mapper = new ObjectMapper();
-      List<LibraryDto> libraryDtos = new ArrayList<LibraryDto>();
+      List<LibraryDto> libraryDtos = new ArrayList<>();
       SampleClass sampleClass = null;
       for (Sample sample : requestManager.getSamplesByIdList(idList)) {
         DetailedSample detailed = (DetailedSample) sample;
@@ -826,6 +800,7 @@ public class EditLibraryController {
       }
       model.put("title", "Bulk Create Libraries");
       model.put("librariesJSON", mapper.writeValueAsString(libraryDtos));
+      model.put("platformNames", mapper.writeValueAsString(populatePlatformNames(Collections.<String> emptyList())));
       JSONArray libraryDesigns = new JSONArray();
       libraryDesigns.addAll(requestManager.listLibraryDesignByClass(sampleClass));
       model.put("libraryDesignsJSON", libraryDesigns.toString());
@@ -845,13 +820,15 @@ public class EditLibraryController {
       SampleClass sampleClass = null;
       List<Long> idList = getIdsFromString(libraryIds);
       ObjectMapper mapper = new ObjectMapper();
-      List<LibraryDto> libraryDtos = new ArrayList<LibraryDto>();
+      List<LibraryDto> libraryDtos = new ArrayList<>();
+      List<String> currentPlatforms = new ArrayList<>();
       for (Library library : requestManager.getLibrariesByIdList(idList)) {
         LibraryAdditionalInfo lai = null;
         if (isDetailedSampleEnabled()) {
           lai = libraryAdditionalInfoService.get(library.getId());
         }
         libraryDtos.add(Dtos.asDto(library, lai));
+        currentPlatforms.add(library.getPlatformName());
         if (!isDetailedSampleEnabled()) {
           // Do nothing about sample classes.
         } else if (sampleClass == null) {
@@ -869,6 +846,7 @@ public class EditLibraryController {
         libraryDesigns.addAll(requestManager.listLibraryDesignByClass(sampleClass));
       }
       model.put("libraryDesignsJSON", libraryDesigns.toString());
+      model.put("platformNames", mapper.writeValueAsString(populatePlatformNames(currentPlatforms)));
 
       return new ModelAndView("/pages/bulkEditLibraries.jsp", model);
     } catch (IOException ex) {
@@ -884,7 +862,7 @@ public class EditLibraryController {
     try {
       List<Long> idList = getIdsFromString(libraryIds);
       ObjectMapper mapper = new ObjectMapper();
-      List<LibraryDto> libraryDtos = new ArrayList<LibraryDto>();
+      List<LibraryDto> libraryDtos = new ArrayList<>();
       for (Library library : requestManager.getLibrariesByIdList(idList)) {
         LibraryAdditionalInfo lai = null;
         if (isDetailedSampleEnabled()) {
@@ -906,7 +884,7 @@ public class EditLibraryController {
 
   public List<Long> getIdsFromString(String idString) {
     String[] split = idString.split(",");
-    List<Long> idList = new ArrayList<Long>();
+    List<Long> idList = new ArrayList<>();
     for (int i = 0; i < split.length; i++) {
       idList.add(Long.parseLong(split[i]));
     }
@@ -963,7 +941,7 @@ public class EditLibraryController {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
 
       if (librariesDtos != null && librariesDtos.size() > 0) {
-        List<Long> savedLibraryIds = new ArrayList<Long>();
+        List<Long> savedLibraryIds = new ArrayList<>();
 
         for (Object lDto : librariesDtos) {
           ObjectMapper mapper = new ObjectMapper();

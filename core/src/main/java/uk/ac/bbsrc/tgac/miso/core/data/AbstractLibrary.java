@@ -229,7 +229,13 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   }
 
   @Override
-  public void setIndices(List<Index> indices) {
+  public void setIndices(List<Index> originalIndices) {
+    List<Index> indices = new ArrayList<>();
+    for (Index index : originalIndices) {
+      if (index != null) {
+        indices.add(index);
+      }
+    }
     Index.sort(indices);
     IndexFamily current = null;
     for (Index index : indices) {
@@ -497,11 +503,15 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
 
   @Override
   public IndexFamily getCurrentFamily() {
-    if (indices == null || indices.isEmpty()) {
+    if (indices == null) {
       return IndexFamily.NULL;
-    } else {
-      return indices.get(0).getFamily();
     }
+    for (Index index : indices) {
+      if (index != null) {
+        return index.getFamily();
+      }
+    }
+    return IndexFamily.NULL;
   }
 
   @Override

@@ -52,8 +52,7 @@ var Pool = Pool || {
 
     // Description input field validation
     jQuery('#description').attr('class', 'form-control');
-    jQuery('#description').attr('data-parsley-required', 'true');
-    jQuery('#description').attr('data-parsley-maxlength', '100');
+    jQuery('#description').attr('data-parsley-maxlength', '255');
     jQuery('#description').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
 
     // Platform Type input select validation
@@ -76,7 +75,6 @@ var Pool = Pool || {
 
     // Volume validation
     jQuery('#volume').attr('class', 'form-control');
-    jQuery('#volume').attr('data-parsley-required', 'true');
     jQuery('#volume').attr('data-parsley-maxlength', '10');
     jQuery('#volume').attr('data-parsley-type', 'number');
 
@@ -567,41 +565,34 @@ Pool.ui = {
 	      });
 	  },
 
-  prepareElements : function () {
-    Pool.ui.createElementSelectDatatable(jQuery('#platformType').val());
-  },
-
   removePooledElement : function (poolId, dilutionId, elementName) {
-    if (poolId) {
-  	  if (confirm("Are you sure you want to remove " + elementName + " from this pool?")) {
-  	    Fluxion.doAjax(
-          'poolControllerHelperService',
-          'removePooledElement',
-          {
-            'poolId':poolId,
-            'dilutionId':dilutionId,
-            'url':ajaxurl
-          },
-          {
-            'doOnSuccess': function() {
-              function findByName (arrayElement, index, array) {
-                return arrayElement[0] == elementName;
-              }
-              var indexToDelete = jQuery('#pooledElementsDatatable').dataTable().fnGetData().findIndex(findByName);
-              // remove it from the Selected element(s) table
-              jQuery('#pooledElementsDatatable').dataTable().fnDeleteRow(indexToDelete);
-              // re-enable the Add button on Select poolable elements table if it's been disabled
-              if (jQuery('#poolable_' + elementName).length && jQuery('#poolable_' + elementName).children().last().hasClass('disabled')) {
-                jQuery('#poolable_' + elementName).children().last().removeClass('disabled');
-                jQuery('#poolable_' + elementName).children().last().prop('disabled', false);
-                jQuery('#poolable_' + elementName).children().last().css('cursor', 'pointer');
-              }
+    var extra = (jQuery('#pooledElementsDatatable').dataTable().fnGetData().length == 1) ? '\n\nDeleting this item would make the pool empty.' : '';
+    if (confirm("Are you sure you want to remove " + elementName + " from this pool?" + extra)) {
+      Fluxion.doAjax(
+        'poolControllerHelperService',
+        'removePooledElement',
+        {
+          'poolId':poolId,
+          'dilutionId':dilutionId,
+          'url':ajaxurl
+        },
+        {
+          'doOnSuccess': function() {
+            function findByName (arrayElement, index, array) {
+              return arrayElement[0] == elementName;
+            }
+            var indexToDelete = jQuery('#pooledElementsDatatable').dataTable().fnGetData().findIndex(findByName);
+            // remove it from the Selected element(s) table
+            jQuery('#pooledElementsDatatable').dataTable().fnDeleteRow(indexToDelete);
+            // re-enable the Add button on Select poolable elements table if it's been disabled
+            if (jQuery('#poolable_' + elementName).length && jQuery('#poolable_' + elementName).children().last().hasClass('disabled')) {
+              jQuery('#poolable_' + elementName).children().last().removeClass('disabled');
+              jQuery('#poolable_' + elementName).children().last().prop('disabled', false);
+              jQuery('#poolable_' + elementName).children().last().css('cursor', 'pointer');
             }
           }
-        );
-      }
-    } else {
-      Utils.ui.confirmRemove(uiElement);
+        }
+      );
     }
   },
 
@@ -775,7 +766,7 @@ Pool.search = {
           addToPooled.push(jQuery(value).html());
         });
         addToPooled.pop();
-        addToPooled.push('<span onclick="Pool.ui.removePooledElement(' + poolId + ', ' + elementId + ', \'' + elementName + '\');" class="ui-icon ui-button ui-icon-circle-close"></span>');
+        addToPooled.push('<span id="pooled_' + elementName + '" onclick="Pool.ui.removePooledElement(' + poolId + ', ' + elementId + ', \'' + elementName + '\');" class="ui-icon ui-button ui-icon-circle-close"></span>');
         jQuery('#pooledElementsDatatable').dataTable().fnAddData(addToPooled);
         jQuery('#searchElementsResult').css('visibility', 'hidden');
       }
@@ -793,32 +784,24 @@ Pool.search = {
           addTd.css('cursor', 'default');
         });
       }
-      if (poolId == 0) {
-        addElement();
-        if (jQuery('#pooledElementsDatatable').css('visibility') == 'hidden') {
-          jQuery('#pooledElementsDatatable').css('visibility', '');
-          jQuery('#pooledElementsDatatable').dataTable().fnDraw();
-        }
-      } else {
-        Fluxion.doAjax(
-          'poolControllerHelperService',
-          'addPoolableElement',
-          {
-            'poolId':poolId,
-            'dilutionId':elementId,
-            'url':ajaxurl
-          },
-          {
-            'doOnSuccess': function (json) {
-              // add row to Pooled elements table
-              addElement();
-              // add success checkmark and disable the 'Add' td in Select poolable elements table
-              var tableRowId = 'poolable_' + elementName;
-              disableAddAndFadeCheckmark(tableRowId);
-            }
+      Fluxion.doAjax(
+        'poolControllerHelperService',
+        'addPoolableElement',
+        {
+          'poolId':poolId,
+          'dilutionId':elementId,
+          'url':ajaxurl
+        },
+        {
+          'doOnSuccess': function (json) {
+            // add row to Pooled elements table
+            addElement();
+            // add success checkmark and disable the 'Add' td in Select poolable elements table
+            var tableRowId = 'poolable_' + elementName;
+            disableAddAndFadeCheckmark(tableRowId);
           }
-        );
-      }
+        }
+      );
     }
   }
 };

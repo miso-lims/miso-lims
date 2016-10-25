@@ -1,22 +1,20 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.hibernate.exception.ConstraintViolationException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -25,10 +23,10 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Lists;
 
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
@@ -55,9 +53,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.SubprojectDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueMaterialDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueOriginDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueTypeDao;
-import uk.ac.bbsrc.tgac.miso.service.DetailedSampleService;
 import uk.ac.bbsrc.tgac.miso.service.SampleNumberPerProjectService;
-import uk.ac.bbsrc.tgac.miso.service.SampleTissueService;
 import uk.ac.bbsrc.tgac.miso.service.SampleValidRelationshipService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLProjectDAO;
@@ -80,16 +76,10 @@ public class DefaultSampleServiceTestSuite {
   private SampleClassDao sampleClassDao;
 
   @Mock
-  private DetailedSampleService detailedSampleService;
-
-  @Mock
   private SampleValidRelationshipService sampleValidRelationshipService;
 
   @Mock
   private SampleNumberPerProjectService sampleNumberPerProjectService;
-
-  @Mock
-  private SampleTissueService sampleTissueService;
 
   @Mock
   private ProjectStore projectStore;
@@ -263,6 +253,8 @@ public class DefaultSampleServiceTestSuite {
     shellParent.setExternalName(parent.getExternalName());
     shellParent.setSecurityProfile(parent.getSecurityProfile());
     shellParent.getSecurityProfile().setOwner(mockUser());
+    Long shellParentId = 88L;
+    shellParent.setId(shellParentId);
     child.setParent(shellParent);
 
     Long newId = 89L;
@@ -272,6 +264,7 @@ public class DefaultSampleServiceTestSuite {
 
     Mockito.when(sampleDao.addSample(Mockito.any(Sample.class))).thenReturn(newId);
     Mockito.when(sampleDao.getSample(newId)).thenReturn(postSave);
+    Mockito.when(sampleDao.getSample(shellParentId)).thenReturn(parent);
     mockValidRelationship(parent.getSampleClass(), child.getSampleClass());
 
     sut.create(child);
@@ -342,6 +335,7 @@ public class DefaultSampleServiceTestSuite {
 
     Identity shellIdentity = new IdentityImpl();
     shellIdentity.setExternalName(identity.getExternalName());
+    shellIdentity.setId(identity.getId());
     tissue.setParent(shellIdentity);
 
     SampleStock analyte = makeUnsavedChildStock();
@@ -437,6 +431,53 @@ public class DefaultSampleServiceTestSuite {
     assertEquals("Sample name should NOT be modifiable", old.getName(), result.getName());
   }
 
+  @Test
+  public void testUniqueExternalNamePerProjectTest() throws IOException {
+    Project project = new ProjectImpl();
+    project.setId(1L);
+    Set<Identity> idList = new HashSet<Identity>();
+    Identity id1 = new IdentityImpl();
+    id1.setExternalName("String1,String2");
+    id1.setProject(project);
+    idList.add(id1);
+    Mockito.when(sut.getIdentitiesByExternalNameOrAlias(Matchers.anyString())).thenReturn(idList);
+    Sample newSample = new SampleImpl();
+    newSample.setProject(project);
+    sut.confirmExternalNameUniqueForProjectIfRequired("String3", newSample);
+  }
+
+  @Test
+  public void testNonUniqueExternalNamePerProjectFailTest() throws IOException {
+    Project project = new ProjectImpl();
+    project.setId(1L);
+    Set<Identity> idList = new HashSet<Identity>();
+    Identity id1 = new IdentityImpl();
+    id1.setExternalName("String1,String2");
+    id1.setProject(project);
+    idList.add(id1);
+    Mockito.when(sut.getIdentitiesByExternalNameOrAlias(Matchers.anyString())).thenReturn(idList);
+    Sample newSample = new SampleImpl();
+    newSample.setProject(project);
+    exception.expect(ConstraintViolationException.class);
+    sut.confirmExternalNameUniqueForProjectIfRequired("String1", newSample);
+  }
+
+  @Test
+  public void testNonUniqueExternalNamePerProjectPassTest() throws IOException {
+    Project project = new ProjectImpl();
+    project.setId(1L);
+    Set<Identity> idList = new HashSet<Identity>();
+    Identity id1 = new IdentityImpl();
+    id1.setExternalName("String1,String2");
+    id1.setProject(project);
+    idList.add(id1);
+    sut.setUniqueExternalNameWithinProjectRequired(false);
+    Mockito.when(sut.getIdentitiesByExternalNameOrAlias(Matchers.anyString())).thenReturn(idList);
+    Sample newSample = new SampleImpl();
+    newSample.setProject(project);
+    sut.confirmExternalNameUniqueForProjectIfRequired("String1", newSample);
+  }
+
   private Sample makePlainSample() {
     Sample sample = new SampleImpl();
     sample.setId(77L);
@@ -448,7 +489,6 @@ public class DefaultSampleServiceTestSuite {
   private Identity makeParentIdentityWithLookup() throws IOException {
     Identity sample = makeUnsavedParentIdentity();
     Mockito.when(sampleDao.getSample(sample.getId())).thenReturn(sample);
-    Mockito.when(sampleDao.getIdentityByExternalName(sample.getExternalName())).thenReturn(sample);
     Mockito.when(sampleClassDao.listByCategory(Mockito.eq(Identity.CATEGORY_NAME))).thenReturn(Lists.newArrayList(sample.getSampleClass()));
     return sample;
   }

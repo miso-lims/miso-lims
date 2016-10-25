@@ -44,8 +44,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
-import uk.ac.bbsrc.tgac.miso.core.data.Plate;
-import uk.ac.bbsrc.tgac.miso.core.data.Plateable;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
@@ -143,8 +141,6 @@ public interface RequestManager {
   public long saveKit(Kit kit) throws IOException;
 
   public long saveKitDescriptor(KitDescriptor kitDescriptor) throws IOException;
-
-  public <T extends List<S>, S extends Plateable> long savePlate(Plate<T, S> plate) throws IOException;
 
   public long saveAlert(Alert alert) throws IOException;
 
@@ -282,10 +278,6 @@ public interface RequestManager {
 
   public QcType getPoolQcTypeByName(String qcName) throws IOException;
 
-  public Plate<? extends List<? extends Plateable>, ? extends Plateable> getPlateById(long plateId) throws IOException;
-
-  public <T extends List<S>, S extends Plateable> Plate<T, S> getPlateByBarcode(String barcode) throws IOException;
-
   public Alert getAlertById(long alertId) throws IOException;
 
   public EntityGroup<? extends Nameable, ? extends Nameable> getEntityGroupById(long entityGroupId) throws IOException;
@@ -327,8 +319,6 @@ public interface RequestManager {
   public Collection<Box> listAllBoxes() throws IOException;
 
   public Collection<Box> listAllBoxesWithLimit(long limit) throws IOException;
-
-  public Collection<Box> listAllBoxesByAlias(String alias) throws IOException;
 
   public Collection<Run> listAllRuns() throws IOException;
 
@@ -508,8 +498,6 @@ public interface RequestManager {
    */
   public Collection<BoxUse> listAllBoxUses() throws IOException;
 
-  public Collection<String> listAllBoxUsesStrings() throws IOException;
-
   public Collection<BoxSize> listAllBoxSizes() throws IOException;
 
   /**
@@ -560,22 +548,15 @@ public interface RequestManager {
 
   public Collection<Status> listAllStatusBySequencerName(String sequencerName) throws IOException;
 
-  public Collection<Plate<? extends List<? extends Plateable>, ? extends Plateable>> listAllPlates() throws IOException;
-
-  public Collection<Plate<? extends List<? extends Plateable>, ? extends Plateable>> listAllPlatesByProjectId(long projectId)
-      throws IOException;
-
-  public Collection<Plate<? extends List<? extends Plateable>, ? extends Plateable>> listAllPlatesBySearch(String str) throws IOException;
-
   public Collection<Alert> listUnreadAlertsByUserId(long userId) throws IOException;
 
   public Collection<Alert> listAlertsByUserId(long userId) throws IOException;
 
   public Collection<Alert> listAlertsByUserId(long userId, long limit) throws IOException;
 
-  public void emptySingleTube(Box box, String position) throws IOException;
+  public void discardSingleTube(Box box, String position) throws IOException;
 
-  public void emptyAllTubes(Box box) throws IOException;
+  public void discardAllTubes(Box box) throws IOException;
 
   // DELETES
   public void deleteProject(Project project) throws IOException;
@@ -610,8 +591,6 @@ public interface RequestManager {
 
   public void deletePool(Pool pool) throws IOException;
 
-  public void deletePlate(Plate plate) throws IOException;
-
   public void deleteEntityGroup(EntityGroup<? extends Nameable, ? extends Nameable> entityGroup) throws IOException;
 
   public void deletePartition(SequencerPoolPartition partition) throws IOException;
@@ -633,8 +612,6 @@ public interface RequestManager {
   public Map<String, Integer> getKitDescriptorColumnSizes() throws IOException;
 
   public Map<String, Integer> getLibraryColumnSizes() throws IOException;
-
-  public Map<String, Integer> getPlateColumnSizes() throws IOException;
 
   public Map<String, Integer> getProjectColumnSizes() throws IOException;
 

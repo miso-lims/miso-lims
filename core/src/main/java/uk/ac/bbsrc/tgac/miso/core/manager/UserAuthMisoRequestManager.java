@@ -55,8 +55,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
-import uk.ac.bbsrc.tgac.miso.core.data.Plate;
-import uk.ac.bbsrc.tgac.miso.core.data.Plateable;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
@@ -707,24 +705,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
       return o;
     else
       throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Submission " + submissionId);
-  }
-
-  @Override
-  public Plate<? extends List<? extends Plateable>, ? extends Plateable> getPlateById(long plateId) throws IOException {
-    Plate<? extends List<? extends Plateable>, ? extends Plateable> p = backingManager.getPlateById(plateId);
-    if (readCheck(p))
-      return p;
-    else
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Plate " + plateId);
-  }
-
-  @Override
-  public <T extends List<S>, S extends Plateable> Plate<T, S> getPlateByBarcode(String barcode) throws IOException {
-    Plate<T, S> p = backingManager.<T, S> getPlateByBarcode(barcode);
-    if (readCheck(p))
-      return p;
-    else
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Plate " + p.getId());
   }
 
   @Override
@@ -1650,43 +1630,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
     return accessibles;
   }
 
-  @Override
-  public Collection<Plate<? extends List<? extends Plateable>, ? extends Plateable>> listAllPlates() throws IOException {
-    User user = getCurrentUser();
-    Collection<Plate<? extends List<? extends Plateable>, ? extends Plateable>> accessibles = new HashSet<>();
-    for (Plate<? extends List<? extends Plateable>, ? extends Plateable> plate : backingManager.listAllPlates()) {
-      if (plate.userCanRead(user)) {
-        accessibles.add(plate);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Collection<Plate<? extends List<? extends Plateable>, ? extends Plateable>> listAllPlatesByProjectId(long projectId)
-      throws IOException {
-    User user = getCurrentUser();
-    Collection<Plate<? extends List<? extends Plateable>, ? extends Plateable>> accessibles = new HashSet<>();
-    for (Plate<? extends List<? extends Plateable>, ? extends Plateable> plate : backingManager.listAllPlatesByProjectId(projectId)) {
-      if (plate.userCanRead(user)) {
-        accessibles.add(plate);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Collection<Plate<? extends List<? extends Plateable>, ? extends Plateable>> listAllPlatesBySearch(String str) throws IOException {
-    User user = getCurrentUser();
-    Collection<Plate<? extends List<? extends Plateable>, ? extends Plateable>> accessibles = new HashSet<>();
-    for (Plate<? extends List<? extends Plateable>, ? extends Plateable> plate : backingManager.listAllPlatesBySearch(str)) {
-      if (plate.userCanRead(user)) {
-        accessibles.add(plate);
-      }
-    }
-    return accessibles;
-  }
-
   /* deletes */
   @Override
   public void deleteProject(Project project) throws IOException {
@@ -1797,13 +1740,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   public void deletePoolQC(PoolQC poolQc) throws IOException {
     if (getCurrentUser().isAdmin()) {
       backingManager.deletePoolQC(poolQc);
-    }
-  }
-
-  @Override
-  public void deletePlate(Plate plate) throws IOException {
-    if (getCurrentUser().isAdmin()) {
-      backingManager.deletePlate(plate);
     }
   }
 
@@ -1921,15 +1857,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
       return backingManager.saveKitDescriptor(kitDescriptor);
     } else {
       throw new IOException("User " + getCurrentUser().getFullName() + " cannot write to this KitDescriptor");
-    }
-  }
-
-  @Override
-  public <T extends List<S>, S extends Plateable> long savePlate(Plate<T, S> plate) throws IOException {
-    if (writeCheck(plate)) {
-      return backingManager.savePlate(plate);
-    } else {
-      throw new IOException("User " + getCurrentUser().getFullName() + " cannot write to this Status");
     }
   }
 
@@ -2145,18 +2072,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Box> listAllBoxesByAlias(String alias) throws IOException {
-    User user = getCurrentUser();
-    Collection<Box> accessibles = new HashSet<>();
-    for (Box o : backingManager.listAllBoxesByAlias(alias)) {
-      if (o.userCanRead(user)) {
-        accessibles.add(o);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
   public Collection<ChangeLog> listAllChanges(String type) throws IOException {
     if (getCurrentUser().isInternal()) return backingManager.listAllChanges(type);
     return null;
@@ -2230,11 +2145,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   @Override
   public Collection<BoxUse> listAllBoxUses() throws IOException {
     return backingManager.listAllBoxUses();
-  }
-
-  @Override
-  public Collection<String> listAllBoxUsesStrings() throws IOException {
-    return backingManager.listAllBoxUsesStrings();
   }
 
   @Override
@@ -2347,9 +2257,9 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public void emptySingleTube(Box box, String position) throws IOException {
+  public void discardSingleTube(Box box, String position) throws IOException {
     if (writeCheck(box)) {
-      backingManager.emptySingleTube(box, position);
+      backingManager.discardSingleTube(box, position);
     } else {
       throw new IOException("User " + getCurrentUser().getFullName() + " cannot change Box " + box.getAlias());
     }
@@ -2357,9 +2267,9 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public void emptyAllTubes(Box box) throws IOException {
+  public void discardAllTubes(Box box) throws IOException {
     if (writeCheck(box)) {
-      backingManager.emptyAllTubes(box);
+      backingManager.discardAllTubes(box);
     } else {
       throw new IOException("User " + getCurrentUser().getFullName() + " cannot change Box " + box.getAlias());
     }
@@ -2422,11 +2332,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   @Override
   public Map<String, Integer> getLibraryColumnSizes() throws IOException {
     return backingManager.getLibraryColumnSizes();
-  }
-
-  @Override
-  public Map<String, Integer> getPlateColumnSizes() throws IOException {
-    return backingManager.getPlateColumnSizes();
   }
 
   @Override

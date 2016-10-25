@@ -36,10 +36,6 @@ import java.util.Map;
 
 import javax.persistence.CascadeType;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +55,10 @@ import com.googlecode.ehcache.annotations.Cacheable;
 import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.Property;
 import com.googlecode.ehcache.annotations.TriggersRemove;
+
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
@@ -108,7 +108,7 @@ public class SQLLibraryDAO implements LibraryStore {
   public static final String LIBRARIES_SELECT = "SELECT l.libraryId, l.name, l.description, l.alias, l.accession, "
       + "l.securityProfile_profileId, l.sample_sampleId, l.identificationBarcode, l.locationBarcode, l.paired, l.libraryType, "
       + "l.librarySelectionType, l.libraryStrategyType, l.platformName, l.concentration, l.creationDate, l.qcPassed, l.lastModifier, "
-      + "lmod.lastModified, l.lowQuality, l.boxPositionId, l.volume, l.emptied, b.boxId, b.alias AS boxAlias, b.locationBarcode AS boxLocation, "
+      + "lmod.lastModified, l.lowQuality, l.boxPositionId, l.volume, l.discarded, b.boxId, b.alias AS boxAlias, b.locationBarcode AS boxLocation, "
       + "bp.row AS boxRow, bp.column AS boxColumn " + "FROM " + TABLE_NAME + " l "
       + "LEFT JOIN BoxPosition bp ON bp.boxPositionId = l.boxPositionId " + "LEFT JOIN Box b ON b.boxId = bp.boxId "
       + "LEFT JOIN (SELECT libraryId, MAX(changeTime) AS lastModified FROM LibraryChangeLog GROUP BY libraryId) lmod ON l.libraryId = lmod.libraryId";
@@ -119,7 +119,7 @@ public class SQLLibraryDAO implements LibraryStore {
   
   public static final String LIBRARY_SELECT_BY_PRE_MIGRATION_ID = LIBRARIES_SELECT
       + " JOIN LibraryAdditionalInfo lai ON lai.libraryId = l.libraryId"
-      + "WHERE lai.preMigrationId = ?";
+      + " WHERE lai.preMigrationId = ?";
 
   public static final String LIBRARY_SELECT_FROM_ID_LIST = LIBRARIES_SELECT + " WHERE l.libraryId in (";
 
@@ -153,7 +153,7 @@ public class SQLLibraryDAO implements LibraryStore {
       + " SET name=:name, description=:description, alias=:alias, accession=:accession, securityProfile_profileId=:securityProfile_profileId, "
       + "sample_sampleId=:sample_sampleId, identificationBarcode=:identificationBarcode,  locationBarcode=:locationBarcode, "
       + "paired=:paired, libraryType=:libraryType, librarySelectionType=:librarySelectionType, libraryStrategyType=:libraryStrategyType, "
-      + "platformName=:platformName, concentration=:concentration, creationDate=:creationDate, qcPassed=:qcPassed, lastModifier=:lastModifier, lowQuality=:lowQuality, emptied=:emptied, volume=:volume "
+      + "platformName=:platformName, concentration=:concentration, creationDate=:creationDate, qcPassed=:qcPassed, lastModifier=:lastModifier, lowQuality=:lowQuality, discarded=:discarded, volume=:volume "
       + "WHERE libraryId=:libraryId";
 
   public static final String LIBRARY_DELETE = "DELETE FROM " + TABLE_NAME + " WHERE libraryId=:libraryId";
@@ -348,7 +348,7 @@ public class SQLLibraryDAO implements LibraryStore {
   private void purgeListCache(Library l, boolean replace) {
     if (cacheManager != null) {
       Cache cache = cacheManager.getCache("libraryListCache");
-      DbUtils.updateListCache(cache, replace, l, Library.class);
+      DbUtils.updateListCache(cache, replace, l);
     }
   }
 
@@ -370,7 +370,7 @@ public class SQLLibraryDAO implements LibraryStore {
       throw new IllegalArgumentException("A Library must have an aliquot Sample as its parent.");
     }
     
-    if (library.isEmpty()) {
+    if (library.isDiscarded()) {
       boxDAO.removeBoxableFromBox(library);
       library.setVolume(0D);
     }
@@ -394,7 +394,7 @@ public class SQLLibraryDAO implements LibraryStore {
     params.addValue("lastModifier", library.getLastModifier().getUserId());
     params.addValue("lowQuality", library.isLowQuality());
     params.addValue("volume", library.getVolume());
-    params.addValue("emptied", library.isEmpty());
+    params.addValue("discarded", library.isDiscarded());
     params.addValue("qcPassed", library.getQcPassed());
 
     if (library.getId() == AbstractLibrary.UNSAVED_ID) {
@@ -859,7 +859,10 @@ public class SQLLibraryDAO implements LibraryStore {
       library.setPlatformName(rs.getString("platformName"));
       library.setLowQuality(rs.getBoolean("lowQuality"));
       library.setVolume(rs.getDouble("volume"));
-      library.setEmpty(rs.getBoolean("emptied"));
+      if (rs.wasNull()) {
+        library.setVolume(null);
+      }
+      library.setDiscarded(rs.getBoolean("discarded"));
       library.setBoxPositionId(rs.getLong("boxPositionId"));
       library.setBoxAlias(rs.getString("boxAlias"));
       library.setBoxId(rs.getLong("boxId"));

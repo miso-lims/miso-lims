@@ -155,6 +155,11 @@ public class EditPoolController {
     return requestManager.getPoolColumnSizes();
   }
 
+  @RequestMapping(value = "/new", method = RequestMethod.GET)
+  public ModelAndView newUnassignedPool(ModelMap model) throws IOException {
+    return setupForm(AbstractPool.UNSAVED_ID, model);
+  }
+
   private List<? extends Dilution> populateAvailableDilutions(Pool pool) throws IOException {
     ArrayList<LibraryDilution> libs = new ArrayList<LibraryDilution>();
     for (Dilution l : requestManager.listAllLibraryDilutionsByPlatform(PlatformType.ILLUMINA)) {
@@ -190,11 +195,6 @@ public class EditPoolController {
     }
   }
 
-  @RequestMapping(value = "/new", method = RequestMethod.GET)
-  public ModelAndView newUnassignedPool(ModelMap model) throws IOException {
-    return setupForm(AbstractPool.UNSAVED_ID, model);
-  }
-
   @RequestMapping(value = "/new/{experimentId}", method = RequestMethod.GET)
   public ModelAndView newAssignedPool(@PathVariable Long experimentId, ModelMap model) throws IOException {
     return setupFormWithExperiment(AbstractPool.UNSAVED_ID, experimentId, model);
@@ -222,7 +222,6 @@ public class EditPoolController {
 
       model.put("formObj", pool);
       model.put("pool", pool);
-      model.put("availableDilutions", populateAvailableDilutions(pool));
       model.put("accessibleExperiments", populateExperiments(null, pool));
       model.put("owners", LimsSecurityUtils.getPotentialOwners(user, pool, securityManager.listAllUsers()));
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, pool, securityManager.listAllUsers()));

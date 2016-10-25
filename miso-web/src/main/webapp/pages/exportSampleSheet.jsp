@@ -31,7 +31,7 @@
 <div id="maincontent">
 
 <h1>
-    Export Samples or Library & Pool Sheet
+    Export Samples or Library &amp; Pool Sheet
 </h1>
 
 
@@ -60,9 +60,6 @@
     </script>
 </div>
 
-<p>Sample Sheet Type: <input type="radio" id="selectplateform" name="selectForm" onclick="selectForm('plate');"/>Plate
-    | <input type="radio" id="selecttubeform" name="selectForm" onclick="selectForm('tube');"/> Tubes</p>
-
 <form id="sampleExportForm">
 
 </form>
@@ -89,18 +86,10 @@
 
     function selectForm(selection) {
         ImportExport.searchSamples(jQuery('#searchSamples').val());
-        if (selection == 'tube') {
-            jQuery('#sampleExportForm').html(jQuery('#tubeformholder').html() + jQuery('#librarySelectionHolder').html());
-            showPlatforms();
-            showLibraryStrategyTypesString();
-            showLibrarySelectionString();
-        }
-        else if (selection == 'plate') {
-            jQuery('#sampleExportForm').html(jQuery('#plateformholder').html() + jQuery('#librarySelectionHolder').html());
-            showPlatforms();
-            showLibraryStrategyTypesString();
-            showLibrarySelectionString();
-        }
+        jQuery('#sampleExportForm').html(jQuery('#tubeformholder').html() + jQuery('#librarySelectionHolder').html());
+        showPlatforms();
+        showLibraryStrategyTypesString();
+        showLibrarySelectionString();
         jQuery('#exportButtons').show();
     }
 

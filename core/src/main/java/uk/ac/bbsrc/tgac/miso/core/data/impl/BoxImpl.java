@@ -120,7 +120,6 @@ public class BoxImpl extends AbstractBox implements Serializable {
 
   @Override
   public void removeBoxable(Boxable boxable) {
-    // boxable.setLocationBarcode(""); // TODO: GLT-219
     boxableItems.values().remove(boxable);
   }
 

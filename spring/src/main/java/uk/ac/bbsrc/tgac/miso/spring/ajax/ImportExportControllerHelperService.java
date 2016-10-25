@@ -59,7 +59,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
-import uk.ac.bbsrc.tgac.miso.core.data.Plate;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
@@ -122,14 +121,12 @@ public class ImportExportControllerHelperService {
               || "TRANSCRIPTOMIC".equals(s.getSampleType()) || "METATRANSCRIPTOMIC".equals(s.getSampleType())) {
             dnaOrRNA = "R";
           }
-          b.append(
-              "<div id=\"sample" + s.getId()
-                  + "\" onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" " + " "
-                  + "class=\"dashboard\">");
-          b.append(
-              "<input type=\"hidden\" id=\"" + s.getId() + "\" name=\"" + s.getName() + "\" projectname=\"" + s.getProject().getName()
-                  + "\" projectalias=\"" + s.getProject().getAlias() + "\" samplealias=\"" + s.getAlias() + "\" dnaOrRNA=\"" + dnaOrRNA
-                  + "\"/>");
+          b.append("<div id=\"sample" + s.getId()
+              + "\" onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" " + " "
+              + "class=\"dashboard\">");
+          b.append("<input type=\"hidden\" id=\"" + s.getId() + "\" name=\"" + s.getName() + "\" projectname=\"" + s.getProject().getName()
+              + "\" projectalias=\"" + s.getProject().getAlias() + "\" samplealias=\"" + s.getAlias() + "\" dnaOrRNA=\"" + dnaOrRNA
+              + "\"/>");
           b.append("Name: <b>" + s.getName() + "</b><br/>");
           b.append("Alias: <b>" + s.getAlias() + "</b><br/>");
           b.append("From Project: <b>" + s.getProject().getName() + "</b><br/>");
@@ -151,26 +148,9 @@ public class ImportExportControllerHelperService {
   public JSONObject exportSampleForm(HttpSession session, JSONObject json) {
     try {
       JSONArray a = JSONArray.fromObject(json.getString("form"));
-      File f = misoFileManager.getNewFile(
-          Sample.class,
-          "forms",
+      File f = misoFileManager.getNewFile(Sample.class, "forms",
           "SampleExportForm-" + LimsUtils.getCurrentDateAsString(new SimpleDateFormat("yyyyMMdd-hhmmss")) + ".xlsx");
       FormUtils.createSampleExportForm(f, a);
-      return JSONUtils.SimpleJSONResponse("" + f.getName().hashCode());
-    } catch (Exception e) {
-      log.error("failed to get plate input form", e);
-      return JSONUtils.SimpleJSONError("Failed to get plate input form: " + e.getMessage());
-    }
-  }
-
-  public JSONObject generateCSVBAC(HttpSession session, JSONObject json) {
-    try {
-      JSONArray a = JSONArray.fromObject(json.getString("form"));
-      File f = misoFileManager.getNewFile(
-          Plate.class,
-          "csv",
-          "Illumina-Nextera-6x-384-barcode-" + LimsUtils.getCurrentDateAsString(new SimpleDateFormat("yyyyMMdd-hhmmss")) + ".csv");
-      FormUtils.generateCSVBAC(f, a);
       return JSONUtils.SimpleJSONResponse("" + f.getName().hashCode());
     } catch (Exception e) {
       log.error("failed to get plate input form", e);
@@ -182,9 +162,7 @@ public class ImportExportControllerHelperService {
     try {
       String indexKit = json.getString("indexfamily");
       JSONArray a = JSONArray.fromObject(json.getString("form"));
-      File f = misoFileManager.getNewFile(
-          Library.class,
-          "forms",
+      File f = misoFileManager.getNewFile(Library.class, "forms",
           "LibraryPoolExportForm-" + LimsUtils.getCurrentDateAsString(new SimpleDateFormat("yyyyMMdd-hhmmss")) + ".xlsx");
       FormUtils.createLibraryPoolExportFormFromWeb(f, a, indexKit);
       return JSONUtils.SimpleJSONResponse("" + f.getName().hashCode());

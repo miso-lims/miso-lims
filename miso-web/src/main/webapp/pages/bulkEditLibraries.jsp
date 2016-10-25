@@ -86,6 +86,7 @@
       Library.hot.librariesJSON = ${librariesJSON};
       Library.hot.librariesJSON = Hot.sortByProperty(Library.hot.librariesJSON, 'parentSampleAlias');
       Hot.dropdownRef = ${referenceDataJSON};
+      Hot.dropdownRef.platformNames = ${platformNames};
       Hot.dropdownRef.indices = ${indices};
       Hot.dropdownRef.indexFamilies = {};
       Hot.detailedSample = JSON.parse(document.getElementById('HOTbulkForm').dataset.detailedSample);

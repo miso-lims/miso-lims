@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Institute;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
@@ -17,7 +18,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
@@ -301,6 +301,17 @@ public class ValueTypeLookup {
     this.subprojectByAlias = mapByAlias;
   }
   
+  /**
+   * Add a subproject to the lookup. Should be called when a new Subclass is saved and the same ValueTypeLookup is being used
+   * 
+   * @param subproject the new (already saved) Subproject
+   */
+  public void addSubproject(Subproject subproject) {
+    if (subproject.getId() == null || subproject.getAlias() == null) throw new IllegalArgumentException("Subproject is not saved");
+    subprojectById.put(subproject.getId(), subproject);
+    subprojectByAlias.put(subproject.getAlias(), subproject);
+  }
+
   private void setDetailedQcStatuses(Collection<DetailedQcStatus> detailedQcStatuses) {
     Map<Long, DetailedQcStatus> mapById = new UniqueKeyHashMap<>();
     Map<String, DetailedQcStatus> mapByDesc = new UniqueKeyHashMap<>();
@@ -636,7 +647,20 @@ public class ValueTypeLookup {
 
         if (tissue.getLab() != null) { // optional field
           Lab lab = resolve(tissue.getLab());
-          if (lab == null) throw new IOException("Lab not found");
+          if (lab == null) {
+            Long labId = null, instituteId = null;
+            String labAlias = null, instituteAlias = null;
+            if (tissue.getLab() != null) {
+              labId = tissue.getLab().getId();
+              labAlias = tissue.getLab().getAlias();
+              if (tissue.getLab().getInstitute() != null) {
+                instituteId = tissue.getLab().getInstitute().getId();
+                instituteAlias = tissue.getLab().getInstitute().getAlias();
+              }
+            }
+            throw new IOException(String.format("Lab not found: labId=%d, labAlias=%s, instituteId=%d, instituteAlias=%s",
+                labId, labAlias, instituteId, instituteAlias));
+          }
           tissue.setLab(lab);
         }
 
@@ -652,7 +676,7 @@ public class ValueTypeLookup {
 
         if (aliquot.getSamplePurpose() != null) { // optional field
           SamplePurpose sp = resolve(aliquot.getSamplePurpose());
-          if (sp == null) throw new IOException("SamplePurpose not found");
+          if (sp == null) throw new IOException("SamplePurpose not found: " + aliquot.getSamplePurpose().getAlias());
           aliquot.setSamplePurpose(sp);
         }
 

@@ -49,7 +49,6 @@ public class DefaultTissueMaterialService implements TissueMaterialService {
     authorizationManager.throwIfNonAdmin();
     TissueMaterial updatedTissueMaterial = get(tissueMaterial.getId());
     updatedTissueMaterial.setAlias(tissueMaterial.getAlias());
-    updatedTissueMaterial.setDescription(tissueMaterial.getDescription());
     User user = authorizationManager.getCurrentUser();
     updatedTissueMaterial.setUpdatedBy(user);
     tissueMaterialDao.update(updatedTissueMaterial);
