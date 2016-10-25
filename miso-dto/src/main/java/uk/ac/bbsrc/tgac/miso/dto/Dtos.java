@@ -33,7 +33,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.LibraryAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrder;
-import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
@@ -384,7 +383,6 @@ public class Dtos {
     TissueMaterialDto dto = new TissueMaterialDto();
     dto.setId(from.getId());
     dto.setAlias(from.getAlias());
-    dto.setDescription(from.getDescription());
     dto.setCreatedById(from.getCreatedBy().getUserId());
     dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
     dto.setUpdatedById(from.getUpdatedBy().getUserId());
@@ -403,7 +401,6 @@ public class Dtos {
   public static TissueMaterial to(TissueMaterialDto from) {
     TissueMaterial to = new TissueMaterialImpl();
     to.setAlias(from.getAlias());
-    to.setDescription(from.getDescription());
     return to;
   }
 
@@ -411,7 +408,6 @@ public class Dtos {
     SamplePurposeDto dto = new SamplePurposeDto();
     dto.setId(from.getId());
     dto.setAlias(from.getAlias());
-    dto.setDescription(from.getDescription());
     dto.setCreatedById(from.getCreatedBy().getUserId());
     dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
     dto.setUpdatedById(from.getUpdatedBy().getUserId());
@@ -430,7 +426,6 @@ public class Dtos {
   public static SamplePurpose to(SamplePurposeDto from) {
     SamplePurpose to = new SamplePurposeImpl();
     to.setAlias(from.getAlias());
-    to.setDescription(from.getDescription());
     return to;
   }
 
@@ -1135,7 +1130,7 @@ public class Dtos {
     return to;
   }
 
-  public static PoolDto asDto(Pool<? extends Poolable<?, ?>> from) {
+  public static PoolDto asDto(Pool from) {
     PoolDto dto = new PoolDto();
     dto.setId(from.getId());
     dto.setName(from.getName());
@@ -1151,7 +1146,7 @@ public class Dtos {
       dto.setLastModified(getDateAsString(from.getLastModified()));
     }
     Set<DilutionDto> pooledElements = new HashSet<>();
-    for (Dilution ld : from.getDilutions()) {
+    for (Dilution ld : from.getPoolableElements()) {
       if (ld != null) {
         pooledElements.add(asDto(ld));
       }
@@ -1164,9 +1159,9 @@ public class Dtos {
     return dto;
   }
 
-  public static List<PoolDto> asPoolDtos(Collection<Pool<? extends Poolable<?, ?>>> poolSubset) {
+  public static List<PoolDto> asPoolDtos(Collection<Pool> poolSubset) {
     List<PoolDto> dtoList = new ArrayList<>();
-    for (Pool<? extends Poolable<?, ?>> pool : poolSubset) {
+    for (Pool pool : poolSubset) {
       dtoList.add(asDto(pool));
     }
     return dtoList;

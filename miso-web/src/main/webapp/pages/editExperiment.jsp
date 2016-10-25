@@ -112,12 +112,12 @@
   </td>
 </tr>
 <tr>
-  <td class="h">Title:</td>
+  <td class="h">Title:*</td>
   <td><form:input path="title"/><span id="titlecounter" class="counter"></span></td>
     <%--<td><a href="void(0);" onclick="popup('help/experimentTitle.html');">Help</a></td>--%>
 </tr>
 <tr>
-  <td class="h">Alias:</td>
+  <td class="h">Alias:*</td>
   <td><form:input path="alias" class="validateable"/><span id="aliascounter" class="counter"></span></td>
     <%--<td><a href="void(0);" onclick="popup('help/experimentAlias.html');">Help</a></td>--%>
 </tr>
@@ -216,7 +216,7 @@
                    onMouseOut="this.className='dashboard'" class="dashboard"
                    ondblclick="Experiment.pool.experimentSelectPool(this);">
                       <span style="float:left">
-                        <b>${p.name}</b> (${fn:length(p.dilutions)} dilutions)
+                        <b>${p.name}</b> (${fn:length(p.poolableElements)} dilutions)
                       </span>
                 <span class='pType'
                       style='float: right; font-size: 24px; font-weight: bold; color:#BBBBBB'>${p.platformType.key}</span>
@@ -240,7 +240,7 @@
                     href='<c:url value="/miso/pool/${experiment.pool.id}"/>'>${experiment.pool.name}</a><br/>
                 <b>Dilutions:</b><br/>
                 <i>
-                  <c:forEach items="${experiment.pool.dilutions}" var="dil">
+                  <c:forEach items="${experiment.pool.poolableElements}" var="dil">
                     ${dil.library.alias} (${dil.library.name})<br/>
                   </c:forEach>
                 </i>
@@ -265,7 +265,7 @@
   <a href='javascript:void(0);' class="add"
      onclick="Experiment.kit.showLibraryKitDialog(${experiment.id},
      <c:choose>
-     <c:when test="${fn:length(experiment.pool.dilutions) > 1}">
+     <c:when test="${fn:length(experiment.pool.poolableElements) > 1}">
          true
      </c:when>
      <c:otherwise>

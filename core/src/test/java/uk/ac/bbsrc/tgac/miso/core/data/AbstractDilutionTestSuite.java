@@ -3,13 +3,8 @@
  */
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
-
-import java.util.Collection;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -45,16 +40,6 @@ public class AbstractDilutionTestSuite {
       }
     };
     ad.setName("MyAbstractDilution");
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.data.AbstractDilution#getInternalPoolableElements()}.
-   */
-  @Test
-  public final void testGetInternalPoolableElements() {
-    final Collection<Dilution> dil = ad.getInternalPoolableElements();
-    assertEquals(1, dil.size());
-    assertTrue(dil.contains(ad));
   }
 
   @Test

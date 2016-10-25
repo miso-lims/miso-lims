@@ -246,38 +246,7 @@ FOR EACH ROW
     'Sample created.')//
 
 DROP TRIGGER IF EXISTS PlateChange//
-CREATE TRIGGER PlateChange BEFORE UPDATE ON Plate
-FOR EACH ROW
-  BEGIN
-  DECLARE log_message varchar(500) CHARACTER SET utf8;
-  SET log_message = CONCAT_WS(', ',
-    CASE WHEN NEW.plateMaterialType <> OLD.plateMaterialType THEN CONCAT('plate material: ', OLD.plateMaterialType, ' → ', NEW.plateMaterialType) END,
-    CASE WHEN (NEW.locationBarcode IS NULL) <> (OLD.locationBarcode IS NULL) OR NEW.locationBarcode <> OLD.locationBarcode THEN CONCAT('location barcode: ', COALESCE(OLD.locationBarcode, 'n/a'), ' → ', COALESCE(NEW.locationBarcode, 'n/a')) END,
-    CASE WHEN NEW.size <> OLD.size THEN CONCAT('size: ', OLD.size, ' → ', NEW.size) END,
-    CASE WHEN (NEW.indexId IS NULL) <> (OLD.indexId IS NULL) OR NEW.indexId <> OLD.indexId THEN CONCAT('index: ', COALESCE(OLD.indexId, 'n/a'), ' → ', COALESCE(NEW.indexId, 'n/a')) END,
-    CASE WHEN NEW.description <> OLD.description THEN CONCAT('description: ', OLD.description, ' → ', NEW.description) END);
-  IF log_message IS NOT NULL AND log_message <> '' THEN
-    INSERT INTO PlateChangeLog(plateId, columnsChanged, userId, message) VALUES (
-      NEW.plateId,
-      COALESCE(CONCAT_WS(',',
-        CASE WHEN NEW.plateMaterialType <> OLD.plateMaterialType THEN 'plateMaterialType' END,
-        CASE WHEN (NEW.locationBarcode IS NULL) <> (OLD.locationBarcode IS NULL) OR NEW.locationBarcode <> OLD.locationBarcode THEN 'locationBarcode' END,
-        CASE WHEN NEW.size <> OLD.size THEN 'size' END,
-        CASE WHEN (NEW.indexId IS NULL) <> (OLD.indexId IS NULL) OR NEW.indexId <> OLD.indexId THEN 'indexId' END,
-        CASE WHEN NEW.description <> OLD.description THEN 'description' END), ''),
-      NEW.lastModifier,
-      log_message);
-  END IF;
-  END//
-
 DROP TRIGGER IF EXISTS PlateInsert//
-CREATE TRIGGER PlateInsert AFTER INSERT ON Plate
-FOR EACH ROW
-  INSERT INTO PlateChangeLog(plateId, columnsChanged, userId, message) VALUES (
-    NEW.plateId,
-    '',
-    NEW.lastModifier,
-    'Plate created.')//
 
 DROP TRIGGER IF EXISTS RunChange//
 CREATE TRIGGER RunChange BEFORE UPDATE ON Run

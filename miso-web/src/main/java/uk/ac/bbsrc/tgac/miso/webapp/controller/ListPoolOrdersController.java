@@ -16,9 +16,9 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletionGroup;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletion;
+import uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletionGroup;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -34,7 +34,7 @@ public class ListPoolOrdersController {
     return "Orders";
   }
 
-  private SortedSet<HealthType> generateHealths(Map<Pool<?>, Map<SequencingParameters, PoolOrderCompletionGroup>> groups) {
+  private SortedSet<HealthType> generateHealths(Map<Pool, Map<SequencingParameters, PoolOrderCompletionGroup>> groups) {
     SortedSet<HealthType> healths = new TreeSet<>(HealthType.COMPARATOR);
 
     for (Map<SequencingParameters, PoolOrderCompletionGroup> parameterGroup : groups.values()) {
@@ -46,9 +46,9 @@ public class ListPoolOrdersController {
   }
 
   private ArrayNode convertToJSON(ObjectMapper mapper, SortedSet<HealthType> headings,
-      Map<Pool<?>, Map<SequencingParameters, PoolOrderCompletionGroup>> input) {
+      Map<Pool, Map<SequencingParameters, PoolOrderCompletionGroup>> input) {
     ArrayNode result = mapper.createArrayNode();
-    for (Entry<Pool<?>, Map<SequencingParameters, PoolOrderCompletionGroup>> poolEntry : input.entrySet()) {
+    for (Entry<Pool, Map<SequencingParameters, PoolOrderCompletionGroup>> poolEntry : input.entrySet()) {
       for (Entry<SequencingParameters, PoolOrderCompletionGroup> paramGroup : poolEntry.getValue().entrySet()) {
         ArrayNode row = mapper.createArrayNode();
         row.add(String.format("<a href=\"/miso/pool/%s\">%s</a>", poolEntry.getKey().getId(), poolEntry.getKey().getName()));
@@ -67,7 +67,7 @@ public class ListPoolOrdersController {
   }
 
   private ObjectNode convertToJSON(ObjectMapper mapper, String htmlName, String humanName,
-      Map<Pool<?>, Map<SequencingParameters, PoolOrderCompletionGroup>> input) {
+      Map<Pool, Map<SequencingParameters, PoolOrderCompletionGroup>> input) {
     ObjectNode result = mapper.createObjectNode();
     SortedSet<HealthType> healths = generateHealths(input);
     result.put("data", convertToJSON(mapper, healths, input));
@@ -85,8 +85,8 @@ public class ListPoolOrdersController {
     ModelAndView model = new ModelAndView("/pages/listPoolOrders.jsp");
     Collection<PoolOrderCompletion> orders = poolOrderCompletionService.getAllOrders();
 
-    Map<Pool<?>, Map<SequencingParameters, PoolOrderCompletionGroup>> allGroups = LimsUtils.groupCompletions(orders);
-    Map<Pool<?>, Map<SequencingParameters, PoolOrderCompletionGroup>> unfulfilledGroups = LimsUtils.filterUnfulfilledCompletions(allGroups);
+    Map<Pool, Map<SequencingParameters, PoolOrderCompletionGroup>> allGroups = LimsUtils.groupCompletions(orders);
+    Map<Pool, Map<SequencingParameters, PoolOrderCompletionGroup>> unfulfilledGroups = LimsUtils.filterUnfulfilledCompletions(allGroups);
 
     ObjectMapper mapper = new ObjectMapper();
     ArrayNode results = mapper.createArrayNode();

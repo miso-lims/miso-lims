@@ -34,7 +34,7 @@
         <c:choose>
           <c:when test="${(formObj.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
                     or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-            <form:select path="securityProfile.owner">
+            <form:select path="securityProfile.owner" id="securityProfile_owner">
               <form:option value="" label="Select..."/>
               <form:options items="${owners}" itemLabel="fullName" itemValue="userId"/>
             </form:select>

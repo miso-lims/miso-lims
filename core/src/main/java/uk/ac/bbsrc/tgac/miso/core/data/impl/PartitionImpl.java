@@ -31,7 +31,6 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 
 /**
@@ -50,7 +49,7 @@ public class PartitionImpl extends AbstractPartition implements SequencerPoolPar
 
   private static final long serialVersionUID = 1L;
 
-  Pool<? extends Poolable<?,?>> pool = null;
+  Pool pool = null;
 
   public PartitionImpl() {
   }
@@ -60,12 +59,12 @@ public class PartitionImpl extends AbstractPartition implements SequencerPoolPar
   }
 
   @Override
-  public Pool<? extends Poolable<?,?>> getPool() {
+  public Pool getPool() {
     return pool;
   }
 
   @Override
-  public void setPool(Pool<? extends Poolable<?,?>> pool) {
+  public void setPool(Pool pool) {
     this.pool = pool;
   }
 

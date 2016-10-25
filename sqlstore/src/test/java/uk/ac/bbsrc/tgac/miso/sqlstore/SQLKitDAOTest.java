@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
-import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;
@@ -169,27 +169,28 @@ public class SQLKitDAOTest extends AbstractDAOTest {
   @Test
   public void testListAllKitDescriptors() throws IOException {
     List<KitDescriptor> kitDescriptors = dao.listAllKitDescriptors();
-    assertThat(kitDescriptors.size(), is(121));
+    assertThat(kitDescriptors.size(), not(0));
   }
 
   @Test
   public void testListKitDescriptorsByType() throws IOException {
     List<KitDescriptor> kitDescriptors = dao.listKitDescriptorsByType(KitType.LIBRARY);
-    assertThat(kitDescriptors.size(), is(34));
+    assertThat(kitDescriptors.size(), not(0));
   }
 
   @Test
   public void testListKitDescriptorsByPlatform() throws IOException {
     List<KitDescriptor> kitDescriptors = dao.listKitDescriptorsByPlatform(PlatformType.ILLUMINA);
-    assertThat(kitDescriptors.size(), is(1));
+    assertThat(kitDescriptors.size(), not(0));
   }
 
   @Test
   public void testSaveKitDescriptor() throws IOException {
     KitDescriptor newKitDescriptor = makeNewKitDescriptor();
     newKitDescriptor.setLastModifier(user);
-    assertThat(dao.saveKitDescriptor(newKitDescriptor), is(122L));
-    KitDescriptor savedKitDescriptor = dao.getKitDescriptorById(122L);
+    long id = dao.saveKitDescriptor(newKitDescriptor);
+    assertThat(id, not(0L));
+    KitDescriptor savedKitDescriptor = dao.getKitDescriptorById(id);
     assertThat(newKitDescriptor.getName(), is(savedKitDescriptor.getName()));
   }
 

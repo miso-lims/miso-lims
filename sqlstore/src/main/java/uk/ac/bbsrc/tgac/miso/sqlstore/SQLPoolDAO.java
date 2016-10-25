@@ -26,7 +26,6 @@ package uk.ac.bbsrc.tgac.miso.sqlstore;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import java.io.IOException;
-import java.lang.reflect.ParameterizedType;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
@@ -40,7 +39,6 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 
 import org.apache.commons.lang.NotImplementedException;
-import org.codehaus.jackson.type.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,11 +66,10 @@ import net.sf.ehcache.Element;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractPool;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
+import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
-import uk.ac.bbsrc.tgac.miso.core.data.Plate;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
-import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.PoolAlertManager;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolQcException;
@@ -165,13 +162,6 @@ public class SQLPoolDAO implements PoolStore {
       + "INNER JOIN LibraryDilution ld ON ld.library_libraryId = li.libraryId "
       + "LEFT JOIN Pool_Elements pld ON pld.elementId = ld.dilutionId "
       + "WHERE p.projectId = ? AND pld.elementType = 'uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution')";
-
-  public static final String PLATE_POOL_SELECT_BY_RELATED_PROJECT = POOL_SELECT
-      + " WHERE p.poolId IN (SELECT DISTINCT pool_poolId FROM Project p "
-
-      + "INNER JOIN Sample sa ON sa.project_projectId = p.projectId " + "INNER JOIN Library li ON li.sample_sampleId = sa.sampleId "
-      + "INNER JOIN Plate_Elements pe ON li.libraryId = pe.elementId " + "INNER JOIN Plate pl ON pl.plateId = pe.plate_plateId "
-      + "LEFT JOIN Pool_Elements pld ON pld.elementId = pl.plateId " + "WHERE p.projectId= ? AND pld.elementType LIKE '%Plate')";
 
   public static final String POOL_ID_SELECT_BY_RELATED = "SELECT DISTINCT pool_poolId AS poolId FROM Pool_Elements, "
       + "(SELECT dilutionId as elementId, library_libraryId as libraryId, 'uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution' as elementType FROM LibraryDilution "
@@ -280,17 +270,17 @@ public class SQLPoolDAO implements PoolStore {
   }
 
   @Autowired
-  private MisoNamingScheme<Pool<? extends Poolable<?, ?>>> namingScheme;
+  private MisoNamingScheme<Pool> namingScheme;
 
   @Override
   @CoverageIgnore
-  public MisoNamingScheme<Pool<? extends Poolable<?, ?>>> getNamingScheme() {
+  public MisoNamingScheme<Pool> getNamingScheme() {
     return namingScheme;
   }
 
   @Override
   @CoverageIgnore
-  public void setNamingScheme(MisoNamingScheme<Pool<? extends Poolable<?, ?>>> namingScheme) {
+  public void setNamingScheme(MisoNamingScheme<Pool> namingScheme) {
     this.namingScheme = namingScheme;
   }
 
@@ -418,15 +408,15 @@ public class SQLPoolDAO implements PoolStore {
   public Pool getPoolByExperiment(Experiment e) {
     if (e.getPlatform() != null) {
       if (e.getPlatform().getPlatformType().equals(PlatformType.ILLUMINA)) {
-        List<Pool<? extends Poolable<?, ?>>> eResults = template.query(ILLUMINA_POOL_SELECT_BY_EXPERIMENT_ID, new Object[] { e.getId() },
+        List<Pool> eResults = template.query(ILLUMINA_POOL_SELECT_BY_EXPERIMENT_ID, new Object[] { e.getId() },
             new PoolMapper());
         return eResults.size() > 0 ? eResults.get(0) : null;
       } else if (e.getPlatform().getPlatformType().equals(PlatformType.LS454)) {
-        List<Pool<? extends Poolable<?, ?>>> eResults = template.query(LS454_POOL_SELECT_BY_EXPERIMENT_ID, new Object[] { e.getId() },
+        List<Pool> eResults = template.query(LS454_POOL_SELECT_BY_EXPERIMENT_ID, new Object[] { e.getId() },
             new PoolMapper());
         return eResults.size() > 0 ? eResults.get(0) : null;
       } else if (e.getPlatform().getPlatformType().equals(PlatformType.SOLID)) {
-        List<Pool<? extends Poolable<?, ?>>> eResults = template.query(SOLID_POOL_SELECT_BY_EXPERIMENT_ID, new Object[] { e.getId() },
+        List<Pool> eResults = template.query(SOLID_POOL_SELECT_BY_EXPERIMENT_ID, new Object[] { e.getId() },
             new PoolMapper());
         return eResults.size() > 0 ? eResults.get(0) : null;
       }
@@ -438,7 +428,7 @@ public class SQLPoolDAO implements PoolStore {
   @TriggersRemove(cacheName = { "poolCache",
       "lazyPoolCache" }, keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
           @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
-  public long save(Pool<? extends Poolable<?, ?>> pool) throws IOException {
+  public long save(Pool pool) throws IOException {
     Long securityProfileId = pool.getSecurityProfile().getProfileId();
     if (securityProfileId == null || (this.cascadeType != null)) {
       securityProfileId = securityProfileDAO.save(pool.getSecurityProfile());
@@ -536,7 +526,7 @@ public class SQLPoolDAO implements PoolStore {
       }
 
       Set<String> previouslySeenElementIds = new HashSet<>();
-      for (Poolable<?, ?> d : pool.getPoolableElements()) {
+      for (Dilution d : pool.getPoolableElements()) {
         String uid = d.getClass().getName() + ":" + d.getId();
         if (previouslySeenElementIds.contains(uid)) {
           continue;
@@ -552,17 +542,13 @@ public class SQLPoolDAO implements PoolStore {
 
         if (this.cascadeType != null) {
           if (this.cascadeType.equals(CascadeType.PERSIST)) {
-            Store<? super Poolable<?, ?>> dao = daoLookup.lookup(d.getClass());
+            Store<? super Dilution> dao = daoLookup.lookup(d.getClass());
             if (dao != null) {
               dao.save(d);
             }
           } else if (this.cascadeType.equals(CascadeType.REMOVE)) {
-            if (d instanceof Plate && cacheManager != null) {
-              dc = cacheManager.getCache("plateCache");
-              ldc = cacheManager.getCache("lazyPlateCache");
-            }
-            if (dc != null) DbUtils.updateCaches(cacheManager, d, Poolable.class);
-            if (ldc != null) DbUtils.updateCaches(cacheManager, d, Poolable.class);
+            if (dc != null) DbUtils.updateCaches(cacheManager, d, Dilution.class);
+            if (ldc != null) DbUtils.updateCaches(cacheManager, d, Dilution.class);
           }
         }
       }
@@ -630,8 +616,6 @@ public class SQLPoolDAO implements PoolStore {
       String idColumn;
       if (parts[0].equals("LibraryDilution")) {
         idColumn = "dilutionId";
-      } else if (parts[0].equals("Plate")) {
-        idColumn = "plateId";
       } else {
         throw new NotImplementedException("Don't know how to pool: " + parts[0]);
       }
@@ -648,115 +632,112 @@ public class SQLPoolDAO implements PoolStore {
   }
 
   @Override
-  public Pool<? extends Poolable<?, ?>> getPoolByBarcode(String barcode, PlatformType platformType) throws IOException {
+  public Pool getPoolByBarcode(String barcode, PlatformType platformType) throws IOException {
     if (barcode == null) throw new NullPointerException("cannot look up null barcode");
     if (platformType == null) {
       return getByBarcode(barcode);
     }
-    List<Pool<? extends Poolable<?, ?>>> pools = listAllByPlatformAndSearch(platformType, barcode);
+    List<Pool> pools = listAllByPlatformAndSearch(platformType, barcode);
     return pools.size() == 1 ? pools.get(0) : null;
   }
 
   @Override
-  public Pool<? extends Poolable<?, ?>> getByBarcode(String barcode) {
+  public Pool getByBarcode(String barcode) {
     if (barcode == null) throw new NullPointerException("cannot look up null barcode");
-    List<Pool<? extends Poolable<?, ?>>> eResults = template.query(POOL_SELECT_BY_IDENTIFICATION_BARCODE, new Object[] { barcode },
+    List<Pool> eResults = template.query(POOL_SELECT_BY_IDENTIFICATION_BARCODE, new Object[] { barcode },
         new PoolMapper(true));
-    Pool<? extends Poolable<?, ?>> e = eResults.size() > 0 ? (Pool<? extends Poolable<?, ?>>) eResults.get(0) : null;
+    Pool e = eResults.size() > 0 ? (Pool) eResults.get(0) : null;
     return e;
   }
 
   @Override
-  public List<Pool<? extends Poolable<?, ?>>> getByBarcodeList(List<String> barcodeList) {
+  public List<Pool> getByBarcodeList(List<String> barcodeList) {
     return DbUtils.getByBarcodeList(template, barcodeList, POOL_SELECT_FROM_BARCODE_LIST, new PoolMapper(true));
   }
 
   @Override
   public Boxable getByPositionId(long positionId) {
-    List<Pool<? extends Poolable<?, ?>>> eResults = template.query(POOL_SELECT_BY_BOX_POSITION_ID, new Object[] { positionId },
+    List<Pool> eResults = template.query(POOL_SELECT_BY_BOX_POSITION_ID, new Object[] { positionId },
         new PoolMapper());
-    Pool<? extends Poolable<?, ?>> e = eResults.size() > 0 ? eResults.get(0) : null;
+    Pool e = eResults.size() > 0 ? eResults.get(0) : null;
     return e;
   }
 
-  private Collection<Pool<? extends Poolable<?, ?>>> listByRelated(String query, long relatedId) throws IOException {
+  private Collection<Pool> listByRelated(String query, long relatedId) throws IOException {
     List<Long> poolIds = template.queryForList(query, Long.class, relatedId);
     return DbUtils.getByGenericList(template, poolIds, Types.BIGINT, POOL_SELECT_FROM_ID_LIST, new PoolMapper(true));
   }
 
   @Override
-  public Collection<Pool<? extends Poolable<?, ?>>> listBySampleId(long sampleId) throws IOException {
+  public Collection<Pool> listBySampleId(long sampleId) throws IOException {
     return listByRelated(POOL_ID_SELECT_BY_RELATED_SAMPLE, sampleId);
   }
 
   @Override
-  public Collection<Pool<? extends Poolable<?, ?>>> listByLibraryId(long libraryId) throws IOException {
+  public Collection<Pool> listByLibraryId(long libraryId) throws IOException {
     return listByRelated(POOL_ID_SELECT_BY_RELATED_LIBRARY, libraryId);
   }
 
   @Override
-  public Collection<Pool<? extends Poolable<?, ?>>> listByProjectId(long projectId) throws IOException {
-    List<Pool<? extends Poolable<?, ?>>> lpools = template.query(DILUTION_POOL_SELECT_BY_RELATED_PROJECT, new Object[] { projectId },
+  public Collection<Pool> listByProjectId(long projectId) throws IOException {
+    List<Pool> lpools = template.query(DILUTION_POOL_SELECT_BY_RELATED_PROJECT, new Object[] { projectId },
         new PoolMapper(true));
-    List<Pool<? extends Poolable<?, ?>>> epools = template.query(EMPCR_POOL_SELECT_BY_RELATED_PROJECT, new Object[] { projectId },
-        new PoolMapper(true));
-    List<Pool<? extends Poolable<?, ?>>> ppools = template.query(PLATE_POOL_SELECT_BY_RELATED_PROJECT, new Object[] { projectId },
+    List<Pool> epools = template.query(EMPCR_POOL_SELECT_BY_RELATED_PROJECT, new Object[] { projectId },
         new PoolMapper(true));
     lpools.addAll(epools);
-    lpools.addAll(ppools);
     return lpools;
   }
 
   @Override
   @Cacheable(cacheName = "poolCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
       @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
-  public Pool<? extends Poolable<?, ?>> get(long poolId) throws IOException {
-    List<Pool<? extends Poolable<?, ?>>> eResults = template.query(POOL_SELECT_BY_POOL_ID, new Object[] { poolId }, new PoolMapper());
+  public Pool get(long poolId) throws IOException {
+    List<Pool> eResults = template.query(POOL_SELECT_BY_POOL_ID, new Object[] { poolId }, new PoolMapper());
     return eResults.size() > 0 ? eResults.get(0) : null;
   }
 
   @Override
-  public Pool<? extends Poolable<?, ?>> lazyGet(long poolId) throws IOException {
-    List<Pool<? extends Poolable<?, ?>>> eResults = template.query(POOL_SELECT_BY_POOL_ID, new Object[] { poolId }, new PoolMapper(true));
+  public Pool lazyGet(long poolId) throws IOException {
+    List<Pool> eResults = template.query(POOL_SELECT_BY_POOL_ID, new Object[] { poolId }, new PoolMapper(true));
     return eResults.size() > 0 ? eResults.get(0) : null;
   }
 
   @Override
   @Cacheable(cacheName = "poolListCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
       @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
-  public Collection<Pool<? extends Poolable<?, ?>>> listAll() throws IOException {
+  public Collection<Pool> listAll() throws IOException {
     return template.query(POOL_SELECT, new PoolMapper());
   }
 
   @Override
-  public List<Pool<? extends Poolable<?, ?>>> listAllByPlatform(PlatformType platformType) throws IOException {
+  public List<Pool> listAllByPlatform(PlatformType platformType) throws IOException {
     return template.query(POOL_SELECT_BY_PLATFORM, new Object[] { platformType.getKey() }, new PoolMapper());
   }
 
   @Override
-  public List<Pool<? extends Poolable<?, ?>>> listAllByPlatformAndSearch(PlatformType platformType, String search) throws IOException {
+  public List<Pool> listAllByPlatformAndSearch(PlatformType platformType, String search) throws IOException {
     String query = DbUtils.convertStringToSearchQuery(search);
     return template.query(POOL_SELECT_BY_PLATFORM_AND_SEARCH, new Object[] { platformType.getKey(), query, query, query, query },
         new PoolMapper());
   }
 
   @Override
-  public List<Pool<? extends Poolable<?, ?>>> listReadyByPlatform(PlatformType platformType) throws IOException {
+  public List<Pool> listReadyByPlatform(PlatformType platformType) throws IOException {
     return template.query(POOL_SELECT_BY_PLATFORM_AND_READY, new Object[] { platformType.getKey() }, new PoolMapper());
   }
 
   @Override
-  public List<Pool<? extends Poolable<?, ?>>> listReadyByPlatformAndSearch(PlatformType platformType, String search) throws IOException {
+  public List<Pool> listReadyByPlatformAndSearch(PlatformType platformType, String search) throws IOException {
     String mySQLQuery = DbUtils.convertStringToSearchQuery(search);
     return template.query(POOL_SELECT_BY_PLATFORM_AND_READY_AND_SEARCH,
         new Object[] { platformType.getKey(), mySQLQuery, mySQLQuery, mySQLQuery, mySQLQuery }, new PoolMapper());
   }
 
-  public Collection<? extends Poolable<?, ?>> listPoolableElementsByPoolId(long poolId) throws IOException {
+  public Collection<Dilution> listPoolableElementsByPoolId(long poolId) throws IOException {
     return template.query(POOL_ELEMENT_SELECT_BY_POOL_ID, new Object[] { poolId }, new PoolableMapper());
   }
 
-  public Collection<? extends Poolable<?, ?>> lazyListPoolableElementsByPoolId(long poolId) throws IOException {
+  public Collection<Dilution> lazyListPoolableElementsByPoolId(long poolId) throws IOException {
     return template.query(POOL_ELEMENT_SELECT_BY_POOL_ID, new Object[] { poolId }, new PoolableMapper(true));
   }
 
@@ -764,7 +745,7 @@ public class SQLPoolDAO implements PoolStore {
   @TriggersRemove(cacheName = { "poolCache",
       "lazyPoolCache" }, keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
           @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
-  public boolean remove(Pool<? extends Poolable<?, ?>> pool) throws IOException {
+  public boolean remove(Pool pool) throws IOException {
     MapSqlParameterSource poolparams = new MapSqlParameterSource();
     poolparams.addValue("pool_poolId", pool.getId());
     poolparams.addValue("poolId", pool.getId());
@@ -775,8 +756,8 @@ public class SQLPoolDAO implements PoolStore {
       changeLogDAO.deleteAllById(TABLE_NAME, pool.getId());
     }
     if (pool.isDeletable() && poolNamedTemplate.update(POOL_DELETE, poolparams) == 1) {
-      if (!pool.getDilutions().isEmpty()) {
-        Poolable<?, ?> d = pool.getPoolableElements().iterator().next();
+      if (!pool.getPoolableElements().isEmpty()) {
+        Dilution d = pool.getPoolableElements().iterator().next();
         ok = (poolNamedTemplate.update(POOL_ELEMENT_DELETE_BY_POOL_ID, poolparams) == 1);
         String type = d.getClass().getSimpleName();
         String lc = type.substring(0, 1).toLowerCase() + type.substring(1);
@@ -785,17 +766,13 @@ public class SQLPoolDAO implements PoolStore {
 
         if (this.cascadeType != null) {
           if (this.cascadeType.equals(CascadeType.PERSIST)) {
-            Store<? super Poolable<?, ?>> dao = daoLookup.lookup(d.getClass());
+            Store<? super Dilution> dao = daoLookup.lookup(d.getClass());
             if (dao != null) {
               dao.save(d);
             }
           } else if (this.cascadeType.equals(CascadeType.REMOVE)) {
-            if (d instanceof Plate) {
-              dc = cacheManager.getCache("plateCache");
-              ldc = cacheManager.getCache("lazyPlateCache");
-            }
-            if (dc != null) DbUtils.updateCaches(cacheManager, d, Poolable.class);
-            if (ldc != null) DbUtils.updateCaches(cacheManager, d, Poolable.class);
+            if (dc != null) DbUtils.updateCaches(cacheManager, d, Dilution.class);
+            if (ldc != null) DbUtils.updateCaches(cacheManager, d, Dilution.class);
           }
         }
       }
@@ -818,39 +795,37 @@ public class SQLPoolDAO implements PoolStore {
     return false;
   }
 
-  public class PoolMapper extends CacheAwareRowMapper<Pool<? extends Poolable<?, ?>>> {
+  public class PoolMapper extends CacheAwareRowMapper<Pool> {
     public PoolMapper() {
-      super((Class<Pool<? extends Poolable<?, ?>>>) ((ParameterizedType) new TypeReference<Pool<? extends Poolable<?, ?>>>() {
-      }.getType()).getRawType());
+      super(Pool.class);
     }
 
     public PoolMapper(boolean lazy) {
-      super((Class<Pool<? extends Poolable<?, ?>>>) ((ParameterizedType) new TypeReference<Pool<? extends Poolable<?, ?>>>() {
-      }.getType()).getRawType(), lazy);
+      super(Pool.class, lazy);
     }
 
     @Override
-    public Pool<? extends Poolable<?, ?>> mapRow(ResultSet rs, int rowNum) throws SQLException {
+    public Pool mapRow(ResultSet rs, int rowNum) throws SQLException {
       long id = rs.getLong("poolId");
 
       if (isCacheEnabled() && lookupCache(cacheManager) != null) {
         Element element;
         if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
           log.debug("Cache hit on map for Pool " + id);
-          return (Pool<? extends Poolable<?, ?>>) element.getObjectValue();
+          return (Pool) element.getObjectValue();
         }
       }
 
-      Pool<? extends Poolable<?, ?>> p = null;
+      Pool p = null;
       try {
         p = dataObjectFactory.getPool();
         PlatformType pt = PlatformType.get(rs.getString("platformType"));
         p.setPlatformType(pt);
 
         if (pt != null) {
-          Collection<? extends Poolable<?, ?>> poolables = (isLazy() ? lazyListPoolableElementsByPoolId(id)
+          Collection<Dilution> poolables = (isLazy() ? lazyListPoolableElementsByPoolId(id)
               : listPoolableElementsByPoolId(id));
-          p.setPoolableElements(poolables);
+          p.setPoolableElements(new HashSet<>(poolables));
         }
 
         p.setId(id);
@@ -913,31 +888,28 @@ public class SQLPoolDAO implements PoolStore {
     }
   }
 
-  public class PoolableMapper extends CacheAwareRowMapper<Poolable<?, ?>> {
+  public class PoolableMapper extends CacheAwareRowMapper<Dilution> {
 
     public PoolableMapper() {
-      super((Class<Poolable<?, ?>>) ((ParameterizedType) new TypeReference<Poolable<?, ?>>() {
-      }.getType()).getRawType());
+      super(Dilution.class);
     }
 
     public PoolableMapper(boolean lazy) {
-      super((Class<Poolable<?, ?>>) ((ParameterizedType) new TypeReference<Poolable<?, ?>>() {
-      }.getType()).getRawType(), lazy);
+      super(Dilution.class, lazy);
     }
 
     @Override
-    public Poolable<?, ?> mapRow(ResultSet rs, int rowNum) throws SQLException {
+    public Dilution mapRow(ResultSet rs, int rowNum) throws SQLException {
       Long poolId = rs.getLong("pool_poolId");
       Long elementId = rs.getLong("elementId");
       String type = rs.getString("elementType");
 
       try {
-        @SuppressWarnings("unchecked")
-        Class<? extends Poolable<?, ?>> clz = (Class<? extends Poolable<?, ?>>) Class.forName(type).asSubclass(Poolable.class);
-        Store<? extends Poolable<?, ?>> dao = daoLookup.lookup(clz);
+        Class<? extends Dilution> clz = Class.forName(type).asSubclass(Dilution.class);
+        Store<? extends Dilution> dao = daoLookup.lookup(clz);
         if (dao != null) {
           log.debug("Mapping poolable -> " + poolId + " : " + type + " : " + elementId);
-          Poolable<?, ?> p = (isLazy() ? dao.lazyGet(elementId) : dao.get(elementId));
+          Dilution p = (isLazy() ? dao.lazyGet(elementId) : dao.get(elementId));
 
           if (p != null) {
             log.debug("\\_ got " + p.getId() + " : " + p.getName());
@@ -964,8 +936,8 @@ public class SQLPoolDAO implements PoolStore {
   @Deprecated
   @Override
   @CoverageIgnore
-  public List<Pool<? extends Poolable<?, ?>>> listBySearch(String query) {
-    List<Pool<? extends Poolable<?, ?>>> rtn;
+  public List<Pool> listBySearch(String query) {
+    List<Pool> rtn;
     if (isStringEmptyOrNull(query)) {
       rtn = new ArrayList<>();
     } else {
@@ -976,7 +948,7 @@ public class SQLPoolDAO implements PoolStore {
   }
 
   @Override
-  public List<Pool<? extends Poolable<?, ?>>> listAllPoolsWithLimit(int limit) throws IOException {
+  public List<Pool> listAllPoolsWithLimit(int limit) throws IOException {
     return template.query(POOL_SELECT_LIMIT, new Object[] { limit }, new PoolMapper(true));
   }
 
@@ -1013,7 +985,7 @@ public class SQLPoolDAO implements PoolStore {
   }
 
   @Override
-  public List<Pool<? extends Poolable<?, ?>>> listBySearchOffsetAndNumResultsAndPlatform(int offset, int resultsPerPage, String search,
+  public List<Pool> listBySearchOffsetAndNumResultsAndPlatform(int offset, int resultsPerPage, String search,
       String sortDir, String sortCol, PlatformType platform) throws IOException {
     if (isStringEmptyOrNull(search)) {
       return listByOffsetAndNumResults(offset, resultsPerPage, sortDir, sortCol, platform);
@@ -1024,14 +996,14 @@ public class SQLPoolDAO implements PoolStore {
       String querystr = DbUtils.convertStringToSearchQuery(search);
       String query = POOL_SELECT_BY_PLATFORM_AND_SEARCH + " ORDER BY " + sortCol + " " + sortDir + " LIMIT " + resultsPerPage + " OFFSET "
           + offset;
-      List<Pool<? extends Poolable<?, ?>>> rtn = template.query(query,
+      List<Pool> rtn = template.query(query,
           new Object[] { platform.getKey(), querystr, querystr, querystr, querystr }, new PoolMapper(true));
       return rtn;
     }
   }
 
   @Override
-  public List<Pool<? extends Poolable<?, ?>>> listByOffsetAndNumResults(int offset, int limit, String sortDir, String sortCol,
+  public List<Pool> listByOffsetAndNumResults(int offset, int limit, String sortDir, String sortCol,
       PlatformType platform) throws IOException {
     sortCol = updateSortCol(sortCol);
     if (offset < 0 || limit < 0) throw new IOException("Limit and Offset must be greater than zero");

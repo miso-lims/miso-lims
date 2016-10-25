@@ -66,10 +66,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
-import uk.ac.bbsrc.tgac.miso.core.data.Plate;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -119,7 +117,8 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
   /**
    * Simplified interface to convert form data to fields.
    * 
-   * @param <T> The target type of the conversion.
+   * @param <T>
+   *          The target type of the conversion.
    */
   public static abstract class BindingConverter<T> {
     private final PropertyEditorSupport editor = new PropertyEditorSupport() {
@@ -147,8 +146,10 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
     /**
      * Register this conversion with a Spring binder.
      * 
-     * @param binder The binder to receive the registration
-     * @param fields The field names allowed. I'm not sure why this is needed.
+     * @param binder
+     *          The binder to receive the registration
+     * @param fields
+     *          The field names allowed. I'm not sure why this is needed.
      * @return
      */
     public BindingConverter<T> register(WebDataBinder binder, String... fields) {
@@ -162,9 +163,12 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
     /**
      * Register this conversion for a collection with a Spring binder.
      * 
-     * @param binder The binder to receive the registration
-     * @param collection The target type of the collection (i.e., the type of the field)
-     * @param field The name of the field
+     * @param binder
+     *          The binder to receive the registration
+     * @param collection
+     *          The target type of the collection (i.e., the type of the field)
+     * @param field
+     *          The name of the field
      * @return
      */
     @SuppressWarnings("rawtypes")
@@ -188,9 +192,12 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
     /**
      * Register this conversion for a map with a Spring binder.
      * 
-     * @param binder The binder to receive the registration
-     * @param collection The target type of the map (i.e., the type of the field)
-     * @param field The name of the field
+     * @param binder
+     *          The binder to receive the registration
+     * @param collection
+     *          The target type of the map (i.e., the type of the field)
+     * @param field
+     *          The name of the field
      * @return
      */
     @SuppressWarnings("rawtypes")
@@ -326,7 +333,8 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
   /**
    * Sets the requestManager of this LimsBindingInitializer object.
    * 
-   * @param requestManager requestManager.
+   * @param requestManager
+   *          requestManager.
    */
   public void setRequestManager(RequestManager requestManager) {
     assert (requestManager != null);
@@ -336,7 +344,8 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
   /**
    * Sets the protocolManager of this LimsBindingInitializer object.
    * 
-   * @param protocolManager protocolManager.
+   * @param protocolManager
+   *          protocolManager.
    */
   public void setProtocolManager(ProtocolManager protocolManager) {
     assert (protocolManager != null);
@@ -346,7 +355,8 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
   /**
    * Sets the securityManager of this LimsBindingInitializer object.
    * 
-   * @param securityManager securityManager.
+   * @param securityManager
+   *          securityManager.
    */
   public void setSecurityManager(SecurityManager securityManager) {
     assert (securityManager != null);
@@ -356,8 +366,10 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
   /**
    * Init this binder, registering all the custom editors to class types
    * 
-   * @param binder of type WebDataBinder
-   * @param req of type WebRequest
+   * @param binder
+   *          of type WebDataBinder
+   * @param req
+   *          of type WebRequest
    */
   @Override
   public void initBinder(WebDataBinder binder, WebRequest req) {
@@ -365,8 +377,7 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
     binder.registerCustomEditor(Long.class, new CustomNumberEditor(Long.class, false));
 
-    binder.registerCustomEditor(
-        Boolean.class,
+    binder.registerCustomEditor(Boolean.class,
         new CustomBooleanEditor(CustomBooleanEditor.VALUE_TRUE, CustomBooleanEditor.VALUE_FALSE, true));
 
     binder.registerCustomEditor(Date.class, new CustomDateEditor(new SimpleDateFormat("dd/MM/yyyy"), true));
@@ -507,8 +518,8 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
       }
 
     };
-    new BindingConverterByPrefixDispatch<Dilution>(Dilution.class).add(ldiResolver).add(ediResolver).register(binder)
-        .register(binder, Set.class, "dilutions");
+    new BindingConverterByPrefixDispatch<>(Dilution.class).add(ldiResolver).add(ediResolver).register(binder).register(binder,
+        Set.class, "dilutions");
 
     new BindingConverterById<LibraryDilution>(LibraryDilution.class) {
       @Override
@@ -644,19 +655,8 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
       }
     }.register(binder).register(binder, Set.class, "kitDescriptors");
 
-    new BindingConverterByPrefixDispatch<>(Poolable.class).add(ldiResolver).add(ediResolver).add(new Resolver<Plate>() {
-
-      @Override
-      public String getPrefix() {
-        return "PLA";
-      }
-
-      @Override
-      public Plate resolve(long id) throws Exception {
-        return requestManager.getPlateById(id);
-      }
-
-    }).register(binder, Set.class, "poolableElements");
+    new BindingConverterByPrefixDispatch<>(Dilution.class).add(ldiResolver).add(ediResolver).register(binder, Set.class,
+        "poolableElements");
 
     binder.registerCustomEditor(LibraryDesign.class, new PropertyEditorSupport() {
       @Override

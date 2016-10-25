@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
@@ -54,15 +53,10 @@ import net.sourceforge.fluxion.ajax.util.JSONUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
-import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.Plate;
-import uk.ac.bbsrc.tgac.miso.core.data.Plateable;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
@@ -89,9 +83,8 @@ public class ContainerControllerHelperService {
   public JSONObject getPlatformTypes(HttpSession session, JSONObject json) throws IOException {
     StringBuilder b = new StringBuilder();
     for (String p : PlatformType.platformTypeNames(requestManager.listActivePlatformTypes())) {
-      b.append(
-          "<input type='radio' name='platformTypes' id='platformTypes" + p + "' value='" + p
-              + "' onchange='Container.ui.changeContainerPlatformType(this);'/>");
+      b.append("<input type='radio' name='platformTypes' id='platformTypes" + p + "' value='" + p
+          + "' onchange='Container.ui.changeContainerPlatformType(this);'/>");
       b.append("<label for='platformTypes" + p + "'>" + p + "</label>");
     }
     return JSONUtils.JSONObjectResponse("html", b.toString());
@@ -162,10 +155,9 @@ public class ContainerControllerHelperService {
     b.append("<span id='containerspan'>" + sr.getPlatform().getPlatformType().getContainerName() + "s: ");
     PlatformType pt = sr.getPlatform().getPlatformType();
     for (int i = 0; i < sr.getPlatform().getNumContainers(); i++) {
-      b.append(
-          "<input id='container" + (i + 1) + "' name='containerselect' onchange='Container.ui.changeContainer("
-              + sr.getPlatform().getNumContainers() + ", \"" + pt.getKey() + "\", " + sr.getId() + ");' type='radio' value='" + (i + 1)
-              + "'/>" + (i + 1));
+      b.append("<input id='container" + (i + 1) + "' name='containerselect' onchange='Container.ui.changeContainer("
+          + sr.getPlatform().getNumContainers() + ", \"" + pt.getKey() + "\", " + sr.getId() + ");' type='radio' value='" + (i + 1) + "'/>"
+          + (i + 1));
     }
     b.append("</span><br/>");
     b.append("<div id='containerdiv' class='note ui-corner-all'> </div>");
@@ -192,7 +184,7 @@ public class ContainerControllerHelperService {
     }
     return JSONUtils.SimpleJSONError("No platform specified");
   }
-  
+
   public String containerInfoHtml(PlatformType platformType) {
     StringBuilder sb = new StringBuilder();
     sb.append("<h2>" + platformType.getContainerName() + "</h2>");
@@ -220,8 +212,9 @@ public class ContainerControllerHelperService {
       SequencerReference sr = requestManager.getSequencerReferenceById(seqRefId);
       String instrumentModel = sr.getPlatform().getInstrumentModel();
       if ("Illumina MiSeq".equals(instrumentModel) || "Illumina NextSeq 500".equals(instrumentModel)) {
-        b.append(
-            "<i class='italicInfo'>Click in a " + PlatformType.get("Illumina").getPartitionName() + " box to beep/type in barcodes, or double click a pool on the right to sequentially add pools to the " + PlatformType.get("Illumina").getContainerName() + "</i>");
+        b.append("<i class='italicInfo'>Click in a " + PlatformType.get("Illumina").getPartitionName()
+            + " box to beep/type in barcodes, or double click a pool on the right to sequentially add pools to the "
+            + PlatformType.get("Illumina").getContainerName() + "</i>");
         b.append("<table class='in'>");
         b.append("<th>" + PlatformType.get("Illumina").getPartitionName() + " No.</th>");
         b.append("<th>Pool</th>");
@@ -248,8 +241,9 @@ public class ContainerControllerHelperService {
             "<input id='lane8' name='container0Select' onchange='Container.ui.changeContainerIlluminaLane(this, 0);' type='radio' value='8'/>8 ");
         b.append("<div id='containerdiv0'> </div>");
       } else {
-        b.append(
-            "<i class='italicInfo'>Click in a " + PlatformType.get("Illumina").getPartitionName() + " box to beep/type in barcodes, or double click a pool on the right to sequentially add pools to the " + PlatformType.get("Illumina").getContainerName() + "</i>");
+        b.append("<i class='italicInfo'>Click in a " + PlatformType.get("Illumina").getPartitionName()
+            + " box to beep/type in barcodes, or double click a pool on the right to sequentially add pools to the "
+            + PlatformType.get("Illumina").getContainerName() + "</i>");
         b.append("<table class='in'>");
         b.append("<th>" + PlatformType.get("Illumina").getPartitionName() + " No.</th>");
         b.append("<th>Pool</th>");
@@ -405,22 +399,24 @@ public class ContainerControllerHelperService {
     }
     return JSONUtils.SimpleJSONError("No platform specified");
   }
-  
+
   public JSONObject changePlatformTypePartition(PlatformType platformType, HttpSession session, JSONObject json) {
     String partitionsLabel;
     if (platformType.equals(PlatformType.ILLUMINA)) {
       partitionsLabel = "numLanes";
-    } else if (platformType.equals(PlatformType.LS454) || platformType.equals(PlatformType.SOLID) || platformType.equals(PlatformType.PACBIO)){
+    } else if (platformType.equals(PlatformType.LS454) || platformType.equals(PlatformType.SOLID)
+        || platformType.equals(PlatformType.PACBIO)) {
       partitionsLabel = "numChambers";
     } else {
       return JSONUtils.SimpleJSONError("Unknown platform; cannot derive label.");
     }
     int numPartitions = json.getInt(partitionsLabel);
     int container = json.getInt("container");
-    
+
     StringBuilder b = new StringBuilder();
-    b.append(
-        "<i class='italicInfo'>Click in a " + platformType.getPartitionName() + " box to beep/type in barcodes, or double click a pool on the right to sequentially add pools to the " + platformType.getContainerName() + "</i>");
+    b.append("<i class='italicInfo'>Click in a " + platformType.getPartitionName()
+        + " box to beep/type in barcodes, or double click a pool on the right to sequentially add pools to the "
+        + platformType.getContainerName() + "</i>");
     b.append("<table class='in'>");
     b.append("<th>" + platformType.getPartitionName() + " No.</th>");
     b.append("<th>Pool</th>");
@@ -433,15 +429,14 @@ public class ContainerControllerHelperService {
 
     for (int i = 0; i < numPartitions; i++) {
       b.append("<tr><td>" + (i + 1) + "</td>");
-      b.append(
-          "<td width='90%'><div id='p_div_" + container + "-" + i
-              + "' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='partitions[" + i + "].pool' partition='" + i
-              + "' ondblclick='Container.partition.populatePartition(this);'>");
+      b.append("<td width='90%'><div id='p_div_" + container + "-" + i
+          + "' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='partitions[" + i + "].pool' partition='" + i
+          + "' ondblclick='Container.partition.populatePartition(this);'>");
       b.append("</ul></div></td>");
       b.append("</tr>");
     }
     b.append("</table>");
-    
+
     return JSONUtils.SimpleJSONResponse(b.toString());
   }
 
@@ -476,38 +471,21 @@ public class ContainerControllerHelperService {
     try {
       String partition = json.getString("partition");
       Long poolId = json.getLong("poolId");
-      Pool<? extends Poolable> p = requestManager.getPoolById(poolId);
+      Pool p = requestManager.getPoolById(poolId);
       StringBuilder sb = new StringBuilder();
 
       Set<Project> pooledProjects = new HashSet<>();
 
       if (p.getExperiments().size() != 0) {
         // check if each poolable has been in a study for this pool already
-        Collection<? extends Poolable> ds = p.getPoolableElements();
-        for (Poolable d : ds) {
-          if (d instanceof Dilution) {
-            Collection<Study> studies = requestManager.listAllStudiesByLibraryId(((Dilution) d).getLibrary().getId());
-            if (studies.isEmpty()) {
-              pooledProjects.add(((Dilution) d).getLibrary().getSample().getProject());
-            } else {
-              for (Study stu : studies) {
-                pooledProjects.add(stu.getProject());
-              }
-            }
-          } else if (d instanceof Plate) {
-            Plate plate = (Plate) d;
-            if (!plate.getElements().isEmpty()) {
-              if (plate.getElementType().equals(Library.class)) {
-                Library l = (Library) plate.getElements().get(0);
-                Collection<Study> studies = requestManager.listAllStudiesByLibraryId(l.getId());
-                if (studies.isEmpty()) {
-                  pooledProjects.add(l.getSample().getProject());
-                } else {
-                  for (Study stu : studies) {
-                    pooledProjects.add(stu.getProject());
-                  }
-                }
-              }
+        Collection<Dilution> ds = p.getPoolableElements();
+        for (Dilution d : ds) {
+          Collection<Study> studies = requestManager.listAllStudiesByLibraryId(d.getLibrary().getId());
+          if (studies.isEmpty()) {
+            pooledProjects.add(d.getLibrary().getSample().getProject());
+          } else {
+            for (Study stu : studies) {
+              pooledProjects.add(stu.getProject());
             }
           }
         }
@@ -519,42 +497,29 @@ public class ContainerControllerHelperService {
           }
         }
       } else {
-        Collection<? extends Poolable> ds = p.getPoolableElements();
-        for (Poolable d : ds) {
-          if (d instanceof Dilution) {
-            pooledProjects.add(((Dilution) d).getLibrary().getSample().getProject());
-          } else if (d instanceof Plate) {
-            Plate plate = (Plate) d;
-            if (!plate.getElements().isEmpty()) {
-              if (plate.getElementType().equals(Library.class)) {
-                Library l = (Library) plate.getElements().get(0);
-                pooledProjects.add(l.getSample().getProject());
-              }
-            }
-          }
+        Collection<Dilution> ds = p.getPoolableElements();
+        for (Dilution d : ds) {
+          pooledProjects.add(d.getLibrary().getSample().getProject());
         }
       }
       sb.append("<div style='float:left; clear:both'>");
       for (Project project : pooledProjects) {
         sb.append("<div id='studySelectDiv" + partition + "_" + project.getProjectId() + "'>");
-        sb.append(
-            project.getAlias() + ": <select name='poolStudies" + partition + "_" + project.getProjectId() + "' id='poolStudies" + partition
-                + "_" + project.getProjectId() + "'>");
+        sb.append(project.getAlias() + ": <select name='poolStudies" + partition + "_" + project.getProjectId() + "' id='poolStudies"
+            + partition + "_" + project.getProjectId() + "'>");
         Collection<Study> studies = requestManager.listAllStudiesByProjectId(project.getProjectId());
         if (studies.isEmpty()) {
-          return JSONUtils.SimpleJSONError(
-              "No studies available on project " + project.getName()
-                  + ". At least one study must be available for each project associated with this Pool.");
+          return JSONUtils.SimpleJSONError("No studies available on project " + project.getName()
+              + ". At least one study must be available for each project associated with this Pool.");
         } else {
           for (Study s : studies) {
             sb.append("<option value='" + s.getId() + "'>" + s.getName() + " - " + s.getStudyType() + "</option>");
           }
         }
         sb.append("</select>");
-        sb.append(
-            "<input id='studySelectButton-" + partition + "_" + p.getId()
-                + "' type='button' onclick=\"Container.partition.selectContainerStudy('" + partition + "', " + p.getId() + ","
-                + project.getProjectId() + ");\" class=\"ui-state-default ui-corner-all\" value='Select Study'/>");
+        sb.append("<input id='studySelectButton-" + partition + "_" + p.getId()
+            + "' type='button' onclick=\"Container.partition.selectContainerStudy('" + partition + "', " + p.getId() + ","
+            + project.getProjectId() + ");\" class=\"ui-state-default ui-corner-all\" value='Select Study'/>");
         sb.append("</div><br/>");
       }
       sb.append("</div>");
@@ -566,7 +531,7 @@ public class ContainerControllerHelperService {
     }
   }
 
-  private String poolHtml(Pool<? extends Poolable> p, int partition) {
+  private String poolHtml(Pool p, int partition) {
     StringBuilder b = new StringBuilder();
     try {
       b.append(
@@ -577,45 +542,19 @@ public class ContainerControllerHelperService {
         b.append("<div style=\"float:left\"><b>" + p.getName() + " (" + p.getAlias() + ") : " + p.getCreationDate() + "</b><br/>");
       }
 
-      Collection<? extends Poolable> ds = p.getPoolableElements();
+      Collection<Dilution> ds = p.getPoolableElements();
       Set<Project> pooledProjects = new HashSet<>();
-      for (Poolable d : ds) {
-        if (d instanceof Dilution) {
-          pooledProjects.add(((Dilution) d).getLibrary().getSample().getProject());
-          b.append(
-              "<span>" + d.getName() + " (" + ((Dilution) d).getLibrary().getSample().getProject().getAlias() + ") : "
-                  + ((Dilution) d).getConcentration() + " " + ((Dilution) d).getUnits() + "</span><br/>");
-        } else if (d instanceof Plate) {
-          Plate<LinkedList<Plateable>, Plateable> plate = (Plate<LinkedList<Plateable>, Plateable>) d;
-          if (!plate.getElements().isEmpty()) {
-            // TODO - should we look through all plate elements to get all projects?
-            Plateable element = plate.getElements().getFirst();
-            if (element instanceof Library) {
-              Library l = (Library) element;
-              pooledProjects.add(l.getSample().getProject());
-              b.append(
-                  "<span>" + d.getName() + " [" + plate.getSize() + "-well] (" + l.getSample().getProject().getAlias() + ")</span><br/>");
-            } else if (element instanceof Dilution) {
-              Dilution dl = (Dilution) element;
-              b.append(
-                  "<span>" + dl.getName() + " [" + plate.getSize() + "-well] (" + dl.getLibrary().getSample().getProject().getAlias()
-                      + ")</span><br/>");
-            } else if (element instanceof Sample) {
-              Sample s = (Sample) element;
-              b.append("<span>" + s.getName() + " [" + plate.getSize() + "-well] (" + s.getProject().getAlias() + ")</span><br/>");
-            }
-          }
-        } else {
-          b.append("<span>" + d.getName() + "</span><br/>");
-        }
+      for (Dilution d : ds) {
+        pooledProjects.add(d.getLibrary().getSample().getProject());
+        b.append("<span>" + d.getName() + " (" + d.getLibrary().getSample().getProject().getAlias() + ") : "
+            + d.getConcentration() + " " + d.getUnits() + "</span><br/>");
       }
 
       b.append("<br/><i>");
       Collection<Experiment> exprs = p.getExperiments();
       for (Experiment e : exprs) {
-        b.append(
-            "<span>" + e.getStudy().getProject().getAlias() + "(" + e.getName() + ": " + p.getDilutions().size()
-                + " dilutions)</span><br/>");
+        b.append("<span>" + e.getStudy().getProject().getAlias() + "(" + e.getName() + ": " + p.getPoolableElements().size()
+            + " dilutions)</span><br/>");
       }
       b.append("</i>");
 
@@ -623,9 +562,8 @@ public class ContainerControllerHelperService {
         b.append("<div style='float:left; clear:both'>");
         for (Project project : pooledProjects) {
           b.append("<div id='studySelectDiv" + partition + "_" + project.getProjectId() + "'>");
-          b.append(
-              project.getAlias() + ": <select name='poolStudies" + partition + "_" + project.getProjectId() + "' id='poolStudies"
-                  + partition + "_" + project.getProjectId() + "'>");
+          b.append(project.getAlias() + ": <select name='poolStudies" + partition + "_" + project.getProjectId() + "' id='poolStudies"
+              + partition + "_" + project.getProjectId() + "'>");
           Collection<Study> studies = requestManager.listAllStudiesByProjectId(project.getProjectId());
           if (studies.isEmpty()) {
             throw new Exception("No studies available on project " + project.getName()
@@ -636,10 +574,9 @@ public class ContainerControllerHelperService {
             }
           }
           b.append("</select>");
-          b.append(
-              "<input id='studySelectButton-" + partition + "_" + p.getId()
-                  + "' type='button' onclick=\"Container.partition.selectContainerStudy('" + partition + "', " + p.getId() + ","
-                  + project.getProjectId() + ");\" class=\"ui-state-default ui-corner-all\" value='Select Study'/>");
+          b.append("<input id='studySelectButton-" + partition + "_" + p.getId()
+              + "' type='button' onclick=\"Container.partition.selectContainerStudy('" + partition + "', " + p.getId() + ","
+              + project.getProjectId() + ");\" class=\"ui-state-default ui-corner-all\" value='Select Study'/>");
           b.append("</div><br/>");
         }
         b.append("</div>");
@@ -647,9 +584,8 @@ public class ContainerControllerHelperService {
 
       b.append(
           "<input type='hidden' name='partitions[" + partition + "].pool' id='pId" + p.getId() + "' value='" + p.getId() + "'/></div>");
-      b.append(
-          "<div style='position: absolute; bottom: 0; right: 0; font-size: 24px; font-weight: bold; color:#BBBBBB'>"
-              + p.getPlatformType().getKey() + "</div>");
+      b.append("<div style='position: absolute; bottom: 0; right: 0; font-size: 24px; font-weight: bold; color:#BBBBBB'>"
+          + p.getPlatformType().getKey() + "</div>");
       b.append(
           "<span style='position: absolute; top: 0; right: 0;' onclick='Container.pool.confirmPoolRemove(this);' class='float-right ui-icon ui-icon-circle-close'></span>");
       b.append("</div>");
@@ -701,7 +637,8 @@ public class ContainerControllerHelperService {
       }
 
       sb.append("<i>");
-      sb.append("<span>" + s.getProject().getAlias() + " (" + e.getName() + ": " + p.getDilutions().size() + " dilutions)</span><br/>");
+      sb.append(
+          "<span>" + s.getProject().getAlias() + " (" + e.getName() + ": " + p.getPoolableElements().size() + " dilutions)</span><br/>");
       sb.append("</i>");
 
       return JSONUtils.JSONObjectResponse("html", sb.toString());
@@ -753,9 +690,8 @@ public class ContainerControllerHelperService {
               if (p.getPool() != null) {
                 confirm.put(p.getPartitionNumber(), p.getPool().getName());
 
-                sb.append(
-                    "<ul partition='" + (p.getPartitionNumber() - 1) + "' bind='partitions[" + (p.getPartitionNumber() - 1)
-                        + "].pool' class='runPartitionDroppable'>");
+                sb.append("<ul partition='" + (p.getPartitionNumber() - 1) + "' bind='partitions[" + (p.getPartitionNumber() - 1)
+                    + "].pool' class='runPartitionDroppable'>");
                 sb.append("<div class='dashboard'>");
                 sb.append(p.getPool().getName());
                 sb.append("(" + p.getPool().getCreationDate() + ")<br/>");
@@ -763,14 +699,12 @@ public class ContainerControllerHelperService {
                 if (!p.getPool().getExperiments().isEmpty()) {
                   sb.append("<i>");
                   for (Experiment e : p.getPool().getExperiments()) {
-                    sb.append(
-                        e.getStudy().getProject().getAlias() + " (" + e.getName() + ": " + p.getPool().getDilutions().size()
-                            + " dilutions)<br/>");
+                    sb.append(e.getStudy().getProject().getAlias() + " (" + e.getName() + ": " + p.getPool().getPoolableElements().size()
+                        + " dilutions)<br/>");
                   }
                   sb.append("</i>");
-                  sb.append(
-                      "<input type='hidden' name='partitions[" + (p.getPartitionNumber() - 1) + "].pool' id='pId"
-                          + (p.getPartitionNumber() - 1) + "' value='" + p.getPool().getId() + "'/>");
+                  sb.append("<input type='hidden' name='partitions[" + (p.getPartitionNumber() - 1) + "].pool' id='pId"
+                      + (p.getPartitionNumber() - 1) + "' value='" + p.getPool().getId() + "'/>");
                 } else {
                   sb.append("<i>No experiment linked to this pool</i>");
                 }
@@ -781,9 +715,8 @@ public class ContainerControllerHelperService {
                 confirm.put(p.getPartitionNumber(), "Empty");
 
                 sb.append("<div id='p_div-" + (p.getPartitionNumber() - 1) + "' class='elementListDroppableDiv'>");
-                sb.append(
-                    "<ul class='runPartitionDroppable' bind='partitions[" + (p.getPartitionNumber() - 1) + "].pool' partition='"
-                        + (p.getPartitionNumber() - 1) + "' ondblclick='Container.partition.populatePartition(this);'></ul>");
+                sb.append("<ul class='runPartitionDroppable' bind='partitions[" + (p.getPartitionNumber() - 1) + "].pool' partition='"
+                    + (p.getPartitionNumber() - 1) + "' ondblclick='Container.partition.populatePartition(this);'></ul>");
                 sb.append("</div>");
               }
               sb.append("</td>");
@@ -823,8 +756,7 @@ public class ContainerControllerHelperService {
         if (spc.getRun() != null) {
           run = TableHelper.hyperLinkify("/miso/run/" + spc.getRun().getId(), spc.getRun().getAlias());
           if (spc.getRun().getSequencerReference() != null) {
-            sequencer = TableHelper.hyperLinkify(
-                "/miso/sequencer/" + spc.getRun().getSequencerReference().getId(),
+            sequencer = TableHelper.hyperLinkify("/miso/sequencer/" + spc.getRun().getSequencerReference().getId(),
                 spc.getRun().getSequencerReference().getPlatform().getNameAndModel());
           }
         }

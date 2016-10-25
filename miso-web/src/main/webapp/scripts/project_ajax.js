@@ -53,6 +53,11 @@ var Project = Project || {
     jQuery('#progress').attr('data-parsley-error-message', 'You must select a progress status.');
     jQuery('#progress1').attr('data-parsley-errors-container', '#progressSelectError');
     jQuery('#progress').attr('data-parsley-class-handler', '#progressButtons');
+    
+    if (jQuery('#securityProfile_owner').length > 0) {
+      jQuery('#securityProfile_owner').attr('class', 'form-control');
+      jQuery('#securityProfile_owner').attr('required', 'true');
+    }
 
     jQuery('#project-form').parsley();
     jQuery('#project-form').parsley().validate();
@@ -284,150 +289,6 @@ Project.ui = {
 
   cancelBulkSampleInputFormUpload: function () {
     jQuery('#inputformdiv').css("display", "none");
-  },
-
-  downloadPlateInputForm: function (projectId, documentFormat) {
-    Fluxion.doAjax(
-      'projectControllerHelperService',
-      'downloadPlateInputForm',
-      {
-        'projectId': projectId,
-        'documentFormat': documentFormat,
-        'url': ajaxurl
-      },
-      {
-        'doOnSuccess': function (json) {
-          Utils.page.pageRedirect('/miso/download/project/' + projectId + '/' + json.response);
-        }
-      }
-    );
-  },
-
-  uploadPlateInputForm: function () {
-    jQuery('#plateformdiv').css("display", "block");
-  },
-
-  cancelPlateInputFormUpload: function () {
-    jQuery('#plateformdiv').css("display", "none");
-  },
-
-  plateInputFormUploadSuccess: function (json) {
-    jQuery('#plateform_statusdiv').html("Processing...");
-    Project.ui.processPlateUpload(json.frameId);
-  },
-
-  processPlateUpload: function (frameId) {
-    var iframe = document.getElementById(frameId);
-    var iframedoc = iframe.document;
-    if (iframe.contentDocument) {
-      iframedoc = iframe.contentDocument;
-    } else if (iframe.contentWindow) {
-      iframedoc = iframe.contentWindow.document;
-    }
-    var response = jQuery(iframedoc).contents().find('body:first').find('#uploadresponsebody').val();
-    if (!Utils.validation.isNullCheck(response)) {
-      var json = jQuery.parseJSON(response);
-      if (!Utils.validation.isNullCheck(json.pools)) {
-        jQuery('#plateform_statusdiv').html("Processing... complete.");
-        for (var i = 0; i < json.pools.length; i++) {
-          jQuery.each(json.pools[i], function (key, value) {
-            jQuery('#plateform_import').append("<div id='importbox-" + key + "' class='simplebox backwhite'>");
-            var pool = value;
-            var impb = jQuery('#importbox-' + key);
-            impb.append("<span style='float:right;'><button type='button' class='fg-button ui-state-default ui-corner-all' onclick='Project.ui.removeImportBox(this);'>Cancel</button>");
-            impb.append("<button type='button' class='fg-button ui-state-default ui-corner-all' onclick='Project.ui.saveImportedElements(\"" + frameId + "\");'>Import</button></span>");
-            impb.append("Pool alias: <b>" + pool.alias + "</b></br>");
-            for (var j = 0; j < pool.poolableElements.length; j++) {
-              var plate = pool.poolableElements[j];
-              impb.append(plate.elements.length + "-well plate: <b>" + plate.identificationBarcode + "</b>");
-              impb.append("<ul>");
-              for (var k = 0; k < plate.elements.length; k++) {
-                var library = plate.elements[k];
-                impb.append("<li>" + library.alias + "</li>");
-              }
-              impb.append("</ul>");
-            }
-            impb.append("</div>");
-          });
-        }
-      }
-    } else {
-      setTimeout(function () {
-        Project.ui.processPlateUpload(frameId);
-      }, 2000);
-    }
-  },
-
-  removeImportBox: function (button) {
-    if (confirm("Are you sure you want to cancel the plate import?")) {
-      jQuery(button).parent().parent().remove();
-    }
-  },
-
-  saveImportedElements: function (frameId) {
-    var iframe = document.getElementById(frameId);
-    var iframedoc = iframe.document;
-    if (iframe.contentDocument) {
-      iframedoc = iframe.contentDocument;
-    } else if (iframe.contentWindow) {
-      iframedoc = iframe.contentWindow.document;
-    }
-    var response = jQuery(iframedoc).contents().find('body:first').find('#uploadresponsebody').val();
-    if (!Utils.validation.isNullCheck(response)) {
-      var json = jQuery.parseJSON(response);
-      Fluxion.doAjax(
-        'projectControllerHelperService',
-        'saveImportedElements',
-        {
-          'elements': json,
-          'url': ajaxurl
-        },
-        {
-          'doOnSuccess': Project.ui.createPlateElementsTable()
-        }
-      );
-    }
-  },
-
-  createPlateElementsTable: function () {
-    jQuery('#plateElementsTable').html("<img src='../styles/images/ajax-loader.gif'/>");
-    jQuery.fn.dataTableExt.oSort['no-pla-asc'] = function (x, y) {
-      var a = parseInt(x.replace(/^PLA/i, ""));
-      var b = parseInt(y.replace(/^PLA/i, ""));
-      return ((a < b) ? -1 : ((a > b) ? 1 : 0));
-    };
-    jQuery.fn.dataTableExt.oSort['no-pla-desc'] = function (x, y) {
-      var a = parseInt(x.replace(/^PLA/i, ""));
-      var b = parseInt(y.replace(/^PLA/i, ""));
-      return ((a < b) ? 1 : ((a > b) ? -1 : 0));
-    };
-    Fluxion.doAjax(
-      'projectControllerHelperService',
-      'plateElementsDataTable',
-      {
-        'url': ajaxurl
-      },
-      {
-        'doOnSuccess': function (json) {
-          jQuery('#plateElementsTable').html('');
-          jQuery('#plateElementsTable').dataTable({
-            "aaData": json.elementsArray,
-            "aoColumns": [
-              { "sTitle": "Name", "sType": "no-pla"},
-              { "sTitle": "Alias"},
-              { "sTitle": "Description"}
-            ],
-            "bJQueryUI": true,
-            "iDisplayLength": 25,
-            "aaSorting": [
-              [0, "desc"]
-            ],
-            "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>'
-          });
-          jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
-        }
-      }
-    );
   },
 
   addPoolEmPCR: function (tableId) {

@@ -44,12 +44,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
-import uk.ac.bbsrc.tgac.miso.core.data.Plate;
-import uk.ac.bbsrc.tgac.miso.core.data.Plateable;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
-import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
@@ -144,8 +141,6 @@ public interface RequestManager {
 
   public long saveKitDescriptor(KitDescriptor kitDescriptor) throws IOException;
 
-  public <T extends List<S>, S extends Plateable> long savePlate(Plate<T, S> plate) throws IOException;
-
   public long saveAlert(Alert alert) throws IOException;
 
   public long saveEntityGroup(EntityGroup<? extends Nameable, ? extends Nameable> entityGroup) throws IOException;
@@ -159,13 +154,13 @@ public interface RequestManager {
 
   public Experiment getExperimentById(long experimentId) throws IOException;
 
-  public Pool<? extends Poolable<?, ?>> getPoolById(long poolId) throws IOException;
+  public Pool getPoolById(long poolId) throws IOException;
 
-  public Pool<? extends Poolable<?, ?>> getPoolByBarcode(String barcode) throws IOException;
+  public Pool getPoolByBarcode(String barcode) throws IOException;
 
-  public Pool<? extends Poolable<?, ?>> getPoolByBarcode(String barcode, PlatformType platformType) throws IOException;
+  public Pool getPoolByBarcode(String barcode, PlatformType platformType) throws IOException;
 
-  public Pool<? extends Poolable<?, ?>> getPoolByIdBarcode(String barcode) throws IOException;
+  public Pool getPoolByIdBarcode(String barcode) throws IOException;
 
   public PoolQC getPoolQCById(long poolQcId) throws IOException;
 
@@ -188,6 +183,11 @@ public interface RequestManager {
   public LibraryDilution getLibraryDilutionById(long dilutionId) throws IOException;
 
   public LibraryDilution getLibraryDilutionByBarcode(String barcode) throws IOException;
+
+  public Integer countLibraryDilutionsByPlatform(PlatformType platform) throws IOException;
+
+  public List<LibraryDilution> getLibraryDilutionsForPoolDataTable(int offset, int limit, String search, String sortDir, String sortCol,
+      PlatformType platform) throws IOException;
 
   public LibraryQC getLibraryQCById(long qcId) throws IOException;
 
@@ -277,10 +277,6 @@ public interface RequestManager {
 
   public QcType getPoolQcTypeByName(String qcName) throws IOException;
 
-  public Plate<? extends List<? extends Plateable>, ? extends Plateable> getPlateById(long plateId) throws IOException;
-
-  public <T extends List<S>, S extends Plateable> Plate<T, S> getPlateByBarcode(String barcode) throws IOException;
-
   public Alert getAlertById(long alertId) throws IOException;
 
   public EntityGroup<? extends Nameable, ? extends Nameable> getEntityGroupById(long entityGroupId) throws IOException;
@@ -322,8 +318,6 @@ public interface RequestManager {
   public Collection<Box> listAllBoxes() throws IOException;
 
   public Collection<Box> listAllBoxesWithLimit(long limit) throws IOException;
-
-  public Collection<Box> listAllBoxesByAlias(String alias) throws IOException;
 
   public Collection<Run> listAllRuns() throws IOException;
 
@@ -448,27 +442,27 @@ public interface RequestManager {
 
   public Collection<emPCR> listAllEmPCRsByProjectId(long projectId) throws IOException;
 
-  public Collection<Pool<? extends Poolable<?, ?>>> listAllPools() throws IOException;
+  public Collection<Pool> listAllPools() throws IOException;
 
-  public Collection<Pool<? extends Poolable<?, ?>>> listAllPoolsBySearch(String query) throws IOException;
+  public Collection<Pool> listAllPoolsBySearch(String query) throws IOException;
 
-  public Collection<Pool<? extends Poolable<?, ?>>> listAllPoolsWithLimit(int limit) throws IOException;
+  public Collection<Pool> listAllPoolsWithLimit(int limit) throws IOException;
 
-  public Collection<Pool<? extends Poolable<?, ?>>> listAllPoolsByPlatform(PlatformType platformType) throws IOException;
+  public Collection<Pool> listAllPoolsByPlatform(PlatformType platformType) throws IOException;
 
-  public Collection<Pool<? extends Poolable<?, ?>>> listAllPoolsByPlatformAndSearch(PlatformType platformType, String query)
+  public Collection<Pool> listAllPoolsByPlatformAndSearch(PlatformType platformType, String query)
       throws IOException;
 
-  public Collection<Pool<? extends Poolable<?, ?>>> listReadyPoolsByPlatform(PlatformType platformType) throws IOException;
+  public Collection<Pool> listReadyPoolsByPlatform(PlatformType platformType) throws IOException;
 
-  public Collection<Pool<? extends Poolable<?, ?>>> listReadyPoolsByPlatformAndSearch(PlatformType platformType, String query)
+  public Collection<Pool> listReadyPoolsByPlatformAndSearch(PlatformType platformType, String query)
       throws IOException;
 
-  public Collection<Pool<? extends Poolable<?, ?>>> listPoolsByProjectId(long projectId) throws IOException;
+  public Collection<Pool> listPoolsByProjectId(long projectId) throws IOException;
 
-  public Collection<Pool<? extends Poolable<?, ?>>> listPoolsByLibraryId(long libraryId) throws IOException;
+  public Collection<Pool> listPoolsByLibraryId(long libraryId) throws IOException;
 
-  public Collection<Pool<? extends Poolable<?, ?>>> listPoolsBySampleId(long sampleId) throws IOException;
+  public Collection<Pool> listPoolsBySampleId(long sampleId) throws IOException;
 
   public Collection<PoolQC> listAllPoolQCsByPoolId(long poolId) throws IOException;
 
@@ -502,8 +496,6 @@ public interface RequestManager {
    * Obtain a list of all of the Box attributes (uses, sizes)
    */
   public Collection<BoxUse> listAllBoxUses() throws IOException;
-
-  public Collection<String> listAllBoxUsesStrings() throws IOException;
 
   public Collection<BoxSize> listAllBoxSizes() throws IOException;
 
@@ -555,13 +547,6 @@ public interface RequestManager {
 
   public Collection<Status> listAllStatusBySequencerName(String sequencerName) throws IOException;
 
-  public Collection<Plate<? extends List<? extends Plateable>, ? extends Plateable>> listAllPlates() throws IOException;
-
-  public Collection<Plate<? extends List<? extends Plateable>, ? extends Plateable>> listAllPlatesByProjectId(long projectId)
-      throws IOException;
-
-  public Collection<Plate<? extends List<? extends Plateable>, ? extends Plateable>> listAllPlatesBySearch(String str) throws IOException;
-
   public Collection<Alert> listUnreadAlertsByUserId(long userId) throws IOException;
 
   public Collection<Alert> listAlertsByUserId(long userId) throws IOException;
@@ -605,8 +590,6 @@ public interface RequestManager {
 
   public void deletePool(Pool pool) throws IOException;
 
-  public void deletePlate(Plate plate) throws IOException;
-
   public void deleteEntityGroup(EntityGroup<? extends Nameable, ? extends Nameable> entityGroup) throws IOException;
 
   public void deletePartition(SequencerPoolPartition partition) throws IOException;
@@ -629,8 +612,6 @@ public interface RequestManager {
 
   public Map<String, Integer> getLibraryColumnSizes() throws IOException;
 
-  public Map<String, Integer> getPlateColumnSizes() throws IOException;
-
   public Map<String, Integer> getProjectColumnSizes() throws IOException;
 
   public Map<String, Integer> getRunColumnSizes() throws IOException;
@@ -651,10 +632,10 @@ public interface RequestManager {
 
   public Long countPoolsByPlatform(PlatformType platform) throws IOException;
 
-  public List<Pool<? extends Poolable<?, ?>>> getPoolsByPageSizeSearchPlatform(int offset, int limit, String querystr, String sortDir,
+  public List<Pool> getPoolsByPageSizeSearchPlatform(int offset, int limit, String querystr, String sortDir,
       String sortCol, PlatformType platform) throws IOException;
 
-  public List<Pool<? extends Poolable<?, ?>>> getPoolsByPageAndSize(int offset, int limit, String sortDir, String sortCol,
+  public List<Pool> getPoolsByPageAndSize(int offset, int limit, String sortDir, String sortCol,
       PlatformType platform) throws IOException;
 
   public Long getNumPoolsBySearch(PlatformType platform, String querystr) throws IOException;
@@ -689,5 +670,9 @@ public interface RequestManager {
   public Long countContainersBySearch(String querystr) throws IOException;
 
   public Project lazyGetProjectById(long projectId) throws IOException;
+
+  public Integer countLibraryDilutionsBySearchAndPlatform(String search, PlatformType platform) throws IOException;
+
+  public List<Run> getRunsByPool(Pool pool) throws IOException;
 
 }

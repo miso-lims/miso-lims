@@ -37,11 +37,11 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
@@ -97,7 +97,7 @@ public class RunStatsManager {
   }
 
   public boolean hasStatsForRun(Run run) throws RunStatsException {
-    Map<RunProperty, String> map = new HashMap<RunProperty, String>();
+    Map<RunProperty, String> map = new HashMap<>();
     map.put(RunProperty.run, run.getAlias());
     try {
       ReportTable rt = reports.getAverageValues(map);
@@ -112,7 +112,7 @@ public class RunStatsManager {
     JSONObject report = new JSONObject();
     ReportTable rt;
 
-    Map<RunProperty, String> map = new HashMap<RunProperty, String>();
+    Map<RunProperty, String> map = new HashMap<>();
     map.put(RunProperty.run, run.getAlias());
     try {
       rt = reports.getAverageValues(map);
@@ -152,8 +152,8 @@ public class RunStatsManager {
           // clear any previous barcode query
           map.remove(RunProperty.barcode);
           if (part.getPool() != null) {
-            Pool<? extends Poolable> pool = part.getPool();
-            for (Dilution d : pool.getDilutions()) {
+            Pool pool = part.getPool();
+            for (Dilution d : pool.getPoolableElements()) {
               Library l = d.getLibrary();
               if (!l.getIndices().isEmpty()) {
                 for (Index index : l.getIndices()) {
@@ -185,7 +185,7 @@ public class RunStatsManager {
   }
 
   public JSONObject getSummaryStatsForLane(Run run, int laneNumber) throws RunStatsException {
-    Map<RunProperty, String> map = new HashMap<RunProperty, String>();
+    Map<RunProperty, String> map = new HashMap<>();
     map.put(RunProperty.run, run.getAlias());
     map.put(RunProperty.lane, String.valueOf(laneNumber));
     ReportTable rt;
@@ -209,8 +209,8 @@ public class RunStatsManager {
         SequencerPoolPartition part = container.getPartitionAt(laneNumber);
         if (part.getPartitionNumber() == laneNumber) {
           if (part.getPool() != null) {
-            Pool<? extends Poolable> pool = part.getPool();
-            for (Dilution d : pool.getDilutions()) {
+            Pool pool = part.getPool();
+            for (Dilution d : pool.getPoolableElements()) {
               Library l = d.getLibrary();
               if (!l.getIndices().isEmpty()) {
                 for (Index index : l.getIndices()) {

@@ -57,12 +57,9 @@ import net.sourceforge.fluxion.ajax.util.JSONUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
-import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
-import uk.ac.bbsrc.tgac.miso.core.data.Plate;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
@@ -244,13 +241,13 @@ public class RunControllerHelperService {
     }
     return JSONUtils.SimpleJSONError("No platform specified");
   }
-  
+
   public String containerInfoHtml(PlatformType platformType) {
     StringBuilder sb = new StringBuilder();
     sb.append("<table class='in'>");
     sb.append(
-        "<tr><td>Serial Number:</td><td><button onclick='Run.lookupContainer(this);' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button><div style='overflow:hidden'>" 
-        + "<input type='text' id='identificationBarcode' name='identificationBarcode'/><input type='hidden' value='on' name='_identificationBarcode'></div></td></tr>");
+        "<tr><td>Serial Number:</td><td><button onclick='Run.lookupContainer(this);' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button><div style='overflow:hidden'>"
+            + "<input type='text' id='identificationBarcode' name='identificationBarcode'/><input type='hidden' value='on' name='_identificationBarcode'></div></td></tr>");
     sb.append(
         "<tr><td>Location:</td><td><input type='text' id='locationBarcode' name='locationBarcode'/><input type='hidden' value='on' name='_locationBarcode'></td></tr>");
     sb.append(
@@ -272,7 +269,7 @@ public class RunControllerHelperService {
       b.append("<h2>" + PlatformType.ILLUMINA.getContainerName() + " 1</h2>");
       b.append(containerInfoHtml(PlatformType.ILLUMINA));
       b.append("<table class='in'>");
-      b.append("<th>" + PlatformType.ILLUMINA.getPartitionName() +" No.</th>");
+      b.append("<th>" + PlatformType.ILLUMINA.getPartitionName() + " No.</th>");
       b.append("<th>Pool</th>");
 
       b.append(
@@ -813,7 +810,7 @@ public class RunControllerHelperService {
                 if (!p.getPool().getExperiments().isEmpty()) {
                   sb.append("<i>");
                   for (Experiment e : p.getPool().getExperiments()) {
-                    sb.append(e.getStudy().getProject().getAlias() + " (" + e.getName() + ": " + p.getPool().getDilutions().size()
+                    sb.append(e.getStudy().getProject().getAlias() + " (" + e.getName() + ": " + p.getPool().getPoolableElements().size()
                         + " dilutions)<br/>");
                   }
                   sb.append("</i>");
@@ -832,7 +829,8 @@ public class RunControllerHelperService {
                 sb.append("<div id='p_div_" + (p.getPartitionNumber() - 1) + "' class='elementListDroppableDiv'>");
                 sb.append("<ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + containerNum + "].partitions["
                     + (p.getPartitionNumber() - 1) + "].pool' partition='" + (p.getPartitionNumber() - 1)
-                    + "' ondblclick='Run.container.populatePartition(this, " + containerNum + ", " + (p.getPartitionNumber() - 1) + ");'></ul>");
+                    + "' ondblclick='Run.container.populatePartition(this, " + containerNum + ", " + (p.getPartitionNumber() - 1)
+                    + ");'></ul>");
                 sb.append("</div>");
               }
               sb.append("</td>");
@@ -976,7 +974,7 @@ public class RunControllerHelperService {
       PlatformType pt = json.has("platform") && !isStringEmptyOrNull(json.getString("platform"))
           ? PlatformType.get(json.getString("platform")) : r.getPlatformType();
 
-      Pool<? extends Poolable> p = requestManager.getPoolByBarcode(barcode, pt);
+      Pool p = requestManager.getPoolByBarcode(barcode, pt);
       // Base64-encoded string, most likely a barcode image beeped in. decode and search
       if (p == null) {
         p = requestManager.getPoolByBarcode(new String(Base64.decodeBase64(barcode)), pt);
@@ -1005,38 +1003,21 @@ public class RunControllerHelperService {
     try {
       String partition = json.getString("partition");
       Long poolId = json.getLong("poolId");
-      Pool<? extends Poolable> p = requestManager.getPoolById(poolId);
+      Pool p = requestManager.getPoolById(poolId);
       StringBuilder sb = new StringBuilder();
 
       Set<Project> pooledProjects = new HashSet<>();
 
       if (p.getExperiments().size() != 0) {
         // check if each poolable has been in a study for this pool already
-        Collection<? extends Poolable> ds = p.getPoolableElements();
-        for (Poolable d : ds) {
-          if (d instanceof Dilution) {
-            Collection<Study> studies = requestManager.listAllStudiesByLibraryId(((Dilution) d).getLibrary().getId());
-            if (studies.isEmpty()) {
-              pooledProjects.add(((Dilution) d).getLibrary().getSample().getProject());
-            } else {
-              for (Study stu : studies) {
-                pooledProjects.add(stu.getProject());
-              }
-            }
-          } else if (d instanceof Plate) {
-            Plate plate = (Plate) d;
-            if (!plate.getElements().isEmpty()) {
-              if (plate.getElementType().equals(Library.class)) {
-                Library l = (Library) plate.getElements().get(0);
-                Collection<Study> studies = requestManager.listAllStudiesByLibraryId(l.getId());
-                if (studies.isEmpty()) {
-                  pooledProjects.add(l.getSample().getProject());
-                } else {
-                  for (Study stu : studies) {
-                    pooledProjects.add(stu.getProject());
-                  }
-                }
-              }
+        Collection<Dilution> ds = p.getPoolableElements();
+        for (Dilution d : ds) {
+          Collection<Study> studies = requestManager.listAllStudiesByLibraryId(d.getLibrary().getId());
+          if (studies.isEmpty()) {
+            pooledProjects.add(d.getLibrary().getSample().getProject());
+          } else {
+            for (Study stu : studies) {
+              pooledProjects.add(stu.getProject());
             }
           }
         }
@@ -1048,19 +1029,8 @@ public class RunControllerHelperService {
           }
         }
       } else {
-        Collection<? extends Poolable> ds = p.getPoolableElements();
-        for (Poolable d : ds) {
-          if (d instanceof Dilution) {
-            pooledProjects.add(((Dilution) d).getLibrary().getSample().getProject());
-          } else if (d instanceof Plate) {
-            Plate plate = (Plate) d;
-            if (!plate.getElements().isEmpty()) {
-              if (plate.getElementType().equals(Library.class)) {
-                Library l = (Library) plate.getElements().get(0);
-                pooledProjects.add(l.getSample().getProject());
-              }
-            }
-          }
+        for (Dilution d : p.getPoolableElements()) {
+          pooledProjects.add(d.getLibrary().getSample().getProject());
         }
       }
       sb.append("<div style='float:left; clear:both'>");
@@ -1092,14 +1062,14 @@ public class RunControllerHelperService {
     }
   }
 
-  private String poolHtml(Pool<? extends Poolable> p, int container, int partition) {
+  private String poolHtml(Pool p, int container, int partition) {
     StringBuilder b = new StringBuilder();
     try {
       b.append(
           "<div style='position:relative' onMouseOver='this.className=\"dashboardhighlight\"' onMouseOut='this.className=\"dashboard\"' class='dashboard'>");
       b.append("<div style=\"float:left\"><b>" + p.getName() + " (" + LimsUtils.getDateAsString(p.getCreationDate()) + ")</b><br/>");
 
-      Collection<? extends Dilution> ds = p.getDilutions();
+      Collection<Dilution> ds = p.getPoolableElements();
       for (Dilution d : ds) {
         b.append("<span>" + d.getName() + " (" + d.getLibrary().getSample().getProject().getAlias() + ")</span><br/>");
       }
@@ -1107,7 +1077,7 @@ public class RunControllerHelperService {
       b.append("<br/><i>");
       Collection<Experiment> exprs = p.getExperiments();
       for (Experiment e : exprs) {
-        b.append("<span>" + e.getStudy().getProject().getAlias() + "(" + e.getName() + ": " + p.getDilutions().size()
+        b.append("<span>" + e.getStudy().getProject().getAlias() + "(" + e.getName() + ": " + p.getPoolableElements().size()
             + " dilutions)</span><br/>");
       }
       b.append("</i>");

@@ -55,12 +55,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
-import uk.ac.bbsrc.tgac.miso.core.data.Plate;
-import uk.ac.bbsrc.tgac.miso.core.data.Plateable;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
-import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
@@ -405,8 +402,8 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Pool<? extends Poolable<?, ?>> getPoolById(long poolId) throws IOException {
-    Pool<? extends Poolable<?, ?>> o = backingManager.getPoolById(poolId);
+  public Pool getPoolById(long poolId) throws IOException {
+    Pool o = backingManager.getPoolById(poolId);
     if (readCheck(o))
       return o;
     else
@@ -414,8 +411,8 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Pool<? extends Poolable<?, ?>> getPoolByBarcode(String barcode, PlatformType platformType) throws IOException {
-    Pool<? extends Poolable<?, ?>> o = backingManager.getPoolByBarcode(barcode, platformType);
+  public Pool getPoolByBarcode(String barcode, PlatformType platformType) throws IOException {
+    Pool o = backingManager.getPoolByBarcode(barcode, platformType);
     if (readCheck(o))
       return o;
     else
@@ -423,8 +420,8 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Pool<? extends Poolable<?, ?>> getPoolByIdBarcode(String barcode) throws IOException {
-    Pool<? extends Poolable<?, ?>> o = backingManager.getPoolByIdBarcode(barcode);
+  public Pool getPoolByIdBarcode(String barcode) throws IOException {
+    Pool o = backingManager.getPoolByIdBarcode(barcode);
     if (readCheck(o))
       return o;
     else
@@ -432,8 +429,8 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Pool<? extends Poolable<?, ?>> getPoolByBarcode(String barcode) throws IOException {
-    Pool<? extends Poolable<?, ?>> o = backingManager.getPoolByBarcode(barcode);
+  public Pool getPoolByBarcode(String barcode) throws IOException {
+    Pool o = backingManager.getPoolByBarcode(barcode);
     if (readCheck(o))
       return o;
     else
@@ -707,24 +704,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
       return o;
     else
       throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Submission " + submissionId);
-  }
-
-  @Override
-  public Plate<? extends List<? extends Plateable>, ? extends Plateable> getPlateById(long plateId) throws IOException {
-    Plate<? extends List<? extends Plateable>, ? extends Plateable> p = backingManager.getPlateById(plateId);
-    if (readCheck(p))
-      return p;
-    else
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Plate " + plateId);
-  }
-
-  @Override
-  public <T extends List<S>, S extends Plateable> Plate<T, S> getPlateByBarcode(String barcode) throws IOException {
-    Plate<T, S> p = backingManager.<T, S> getPlateByBarcode(barcode);
-    if (readCheck(p))
-      return p;
-    else
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Plate " + p.getId());
   }
 
   @Override
@@ -1364,10 +1343,10 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Pool<? extends Poolable<?, ?>>> listAllPools() throws IOException {
+  public Collection<Pool> listAllPools() throws IOException {
     User user = getCurrentUser();
-    ArrayList<Pool<? extends Poolable<?, ?>>> accessibles = new ArrayList<>();
-    for (Pool<? extends Poolable<?, ?>> pool : backingManager.listAllPools()) {
+    ArrayList<Pool> accessibles = new ArrayList<>();
+    for (Pool pool : backingManager.listAllPools()) {
       if (pool.userCanRead(user)) {
         accessibles.add(pool);
       }
@@ -1377,10 +1356,10 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Pool<? extends Poolable<?, ?>>> listAllPoolsByPlatform(PlatformType platformType) throws IOException {
+  public Collection<Pool> listAllPoolsByPlatform(PlatformType platformType) throws IOException {
     User user = getCurrentUser();
-    ArrayList<Pool<? extends Poolable<?, ?>>> accessibles = new ArrayList<>();
-    for (Pool<? extends Poolable<?, ?>> pool : backingManager.listAllPoolsByPlatform(platformType)) {
+    ArrayList<Pool> accessibles = new ArrayList<>();
+    for (Pool pool : backingManager.listAllPoolsByPlatform(platformType)) {
       if (pool.userCanRead(user)) {
         accessibles.add(pool);
       }
@@ -1390,11 +1369,11 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Pool<? extends Poolable<?, ?>>> listAllPoolsByPlatformAndSearch(PlatformType platformType, String query)
+  public Collection<Pool> listAllPoolsByPlatformAndSearch(PlatformType platformType, String query)
       throws IOException {
     User user = getCurrentUser();
-    ArrayList<Pool<? extends Poolable<?, ?>>> accessibles = new ArrayList<>();
-    for (Pool<? extends Poolable<?, ?>> pool : backingManager.listAllPoolsByPlatformAndSearch(platformType, query)) {
+    ArrayList<Pool> accessibles = new ArrayList<>();
+    for (Pool pool : backingManager.listAllPoolsByPlatformAndSearch(platformType, query)) {
       if (pool.userCanRead(user)) {
         accessibles.add(pool);
       }
@@ -1404,10 +1383,10 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Pool<? extends Poolable<?, ?>>> listReadyPoolsByPlatform(PlatformType platformType) throws IOException {
+  public Collection<Pool> listReadyPoolsByPlatform(PlatformType platformType) throws IOException {
     User user = getCurrentUser();
-    ArrayList<Pool<? extends Poolable<?, ?>>> accessibles = new ArrayList<>();
-    for (Pool<? extends Poolable<?, ?>> pool : backingManager.listReadyPoolsByPlatform(platformType)) {
+    ArrayList<Pool> accessibles = new ArrayList<>();
+    for (Pool pool : backingManager.listReadyPoolsByPlatform(platformType)) {
       if (pool.userCanRead(user)) {
         accessibles.add(pool);
       }
@@ -1417,11 +1396,11 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Pool<? extends Poolable<?, ?>>> listReadyPoolsByPlatformAndSearch(PlatformType platformType, String query)
+  public Collection<Pool> listReadyPoolsByPlatformAndSearch(PlatformType platformType, String query)
       throws IOException {
     User user = getCurrentUser();
-    ArrayList<Pool<? extends Poolable<?, ?>>> accessibles = new ArrayList<>();
-    for (Pool<? extends Poolable<?, ?>> pool : backingManager.listReadyPoolsByPlatformAndSearch(platformType, query)) {
+    ArrayList<Pool> accessibles = new ArrayList<>();
+    for (Pool pool : backingManager.listReadyPoolsByPlatformAndSearch(platformType, query)) {
       if (pool.userCanRead(user)) {
         accessibles.add(pool);
       }
@@ -1431,10 +1410,10 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public List<Pool<? extends Poolable<?, ?>>> listPoolsByLibraryId(long libraryId) throws IOException {
+  public List<Pool> listPoolsByLibraryId(long libraryId) throws IOException {
     User user = getCurrentUser();
-    ArrayList<Pool<? extends Poolable<?, ?>>> accessibles = new ArrayList<>();
-    for (Pool<? extends Poolable<?, ?>> pool : backingManager.listPoolsByLibraryId(libraryId)) {
+    ArrayList<Pool> accessibles = new ArrayList<>();
+    for (Pool pool : backingManager.listPoolsByLibraryId(libraryId)) {
       if (pool.userCanRead(user)) {
         accessibles.add(pool);
       }
@@ -1444,10 +1423,10 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public List<Pool<? extends Poolable<?, ?>>> listPoolsBySampleId(long sampleId) throws IOException {
+  public List<Pool> listPoolsBySampleId(long sampleId) throws IOException {
     User user = getCurrentUser();
-    ArrayList<Pool<? extends Poolable<?, ?>>> accessibles = new ArrayList<>();
-    for (Pool<? extends Poolable<?, ?>> pool : backingManager.listPoolsBySampleId(sampleId)) {
+    ArrayList<Pool> accessibles = new ArrayList<>();
+    for (Pool pool : backingManager.listPoolsBySampleId(sampleId)) {
       if (pool.userCanRead(user)) {
         accessibles.add(pool);
       }
@@ -1650,43 +1629,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
     return accessibles;
   }
 
-  @Override
-  public Collection<Plate<? extends List<? extends Plateable>, ? extends Plateable>> listAllPlates() throws IOException {
-    User user = getCurrentUser();
-    Collection<Plate<? extends List<? extends Plateable>, ? extends Plateable>> accessibles = new HashSet<>();
-    for (Plate<? extends List<? extends Plateable>, ? extends Plateable> plate : backingManager.listAllPlates()) {
-      if (plate.userCanRead(user)) {
-        accessibles.add(plate);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Collection<Plate<? extends List<? extends Plateable>, ? extends Plateable>> listAllPlatesByProjectId(long projectId)
-      throws IOException {
-    User user = getCurrentUser();
-    Collection<Plate<? extends List<? extends Plateable>, ? extends Plateable>> accessibles = new HashSet<>();
-    for (Plate<? extends List<? extends Plateable>, ? extends Plateable> plate : backingManager.listAllPlatesByProjectId(projectId)) {
-      if (plate.userCanRead(user)) {
-        accessibles.add(plate);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Collection<Plate<? extends List<? extends Plateable>, ? extends Plateable>> listAllPlatesBySearch(String str) throws IOException {
-    User user = getCurrentUser();
-    Collection<Plate<? extends List<? extends Plateable>, ? extends Plateable>> accessibles = new HashSet<>();
-    for (Plate<? extends List<? extends Plateable>, ? extends Plateable> plate : backingManager.listAllPlatesBySearch(str)) {
-      if (plate.userCanRead(user)) {
-        accessibles.add(plate);
-      }
-    }
-    return accessibles;
-  }
-
   /* deletes */
   @Override
   public void deleteProject(Project project) throws IOException {
@@ -1797,13 +1739,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   public void deletePoolQC(PoolQC poolQc) throws IOException {
     if (getCurrentUser().isAdmin()) {
       backingManager.deletePoolQC(poolQc);
-    }
-  }
-
-  @Override
-  public void deletePlate(Plate plate) throws IOException {
-    if (getCurrentUser().isAdmin()) {
-      backingManager.deletePlate(plate);
     }
   }
 
@@ -1921,15 +1856,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
       return backingManager.saveKitDescriptor(kitDescriptor);
     } else {
       throw new IOException("User " + getCurrentUser().getFullName() + " cannot write to this KitDescriptor");
-    }
-  }
-
-  @Override
-  public <T extends List<S>, S extends Plateable> long savePlate(Plate<T, S> plate) throws IOException {
-    if (writeCheck(plate)) {
-      return backingManager.savePlate(plate);
-    } else {
-      throw new IOException("User " + getCurrentUser().getFullName() + " cannot write to this Status");
     }
   }
 
@@ -2145,18 +2071,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Box> listAllBoxesByAlias(String alias) throws IOException {
-    User user = getCurrentUser();
-    Collection<Box> accessibles = new HashSet<>();
-    for (Box o : backingManager.listAllBoxesByAlias(alias)) {
-      if (o.userCanRead(user)) {
-        accessibles.add(o);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
   public Collection<ChangeLog> listAllChanges(String type) throws IOException {
     if (getCurrentUser().isInternal()) return backingManager.listAllChanges(type);
     return null;
@@ -2198,10 +2112,10 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Pool<? extends Poolable<?, ?>>> listPoolsByProjectId(long projectId) throws IOException {
-    Collection<Pool<? extends Poolable<?, ?>>> pools = backingManager.listPoolsByProjectId(projectId);
-    Collection<Pool<? extends Poolable<?, ?>>> accessible = new ArrayList<>();
-    for (Pool<? extends Poolable<?, ?>> p : pools) {
+  public Collection<Pool> listPoolsByProjectId(long projectId) throws IOException {
+    Collection<Pool> pools = backingManager.listPoolsByProjectId(projectId);
+    Collection<Pool> accessible = new ArrayList<>();
+    for (Pool p : pools) {
       if (p.userCanRead(getCurrentUser())) accessible.add(p);
     }
     return accessible;
@@ -2230,11 +2144,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   @Override
   public Collection<BoxUse> listAllBoxUses() throws IOException {
     return backingManager.listAllBoxUses();
-  }
-
-  @Override
-  public Collection<String> listAllBoxUsesStrings() throws IOException {
-    return backingManager.listAllBoxUsesStrings();
   }
 
   @Override
@@ -2425,11 +2334,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Map<String, Integer> getPlateColumnSizes() throws IOException {
-    return backingManager.getPlateColumnSizes();
-  }
-
-  @Override
   public Map<String, Integer> getProjectColumnSizes() throws IOException {
     return backingManager.getProjectColumnSizes();
   }
@@ -2486,10 +2390,10 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public List<Pool<? extends Poolable<?, ?>>> listAllPoolsBySearch(String query) throws IOException {
+  public List<Pool> listAllPoolsBySearch(String query) throws IOException {
     User user = getCurrentUser();
-    List<Pool<? extends Poolable<?, ?>>> accessibles = new ArrayList<>();
-    for (Pool<? extends Poolable<?, ?>> pool : backingManager.listAllPoolsBySearch(query)) {
+    List<Pool> accessibles = new ArrayList<>();
+    for (Pool pool : backingManager.listAllPoolsBySearch(query)) {
       if (pool.userCanRead(user)) {
         accessibles.add(pool);
       }
@@ -2498,10 +2402,10 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public List<Pool<? extends Poolable<?, ?>>> listAllPoolsWithLimit(int limit) throws IOException {
+  public List<Pool> listAllPoolsWithLimit(int limit) throws IOException {
     User user = getCurrentUser();
-    List<Pool<? extends Poolable<?, ?>>> accessibles = new ArrayList<>();
-    for (Pool<? extends Poolable<?, ?>> pool : backingManager.listAllPoolsWithLimit(limit)) {
+    List<Pool> accessibles = new ArrayList<>();
+    for (Pool pool : backingManager.listAllPoolsWithLimit(limit)) {
       if (pool.userCanRead(user)) {
         accessibles.add(pool);
       }
@@ -2520,10 +2424,10 @@ public class UserAuthMisoRequestManager implements RequestManager {
   };
 
   @Override
-  public List<Pool<? extends Poolable<?, ?>>> getPoolsByPageSizeSearchPlatform(int offset, int limit, String querystr, String sortDir,
+  public List<Pool> getPoolsByPageSizeSearchPlatform(int offset, int limit, String querystr, String sortDir,
       String sortCol, PlatformType platform) throws IOException {
     User user = getCurrentUser();
-    List<Pool<? extends Poolable<?, ?>>> accessibles = new ArrayList<>();
+    List<Pool> accessibles = new ArrayList<>();
     for (Pool pool : backingManager.getPoolsByPageSizeSearchPlatform(offset, limit, querystr, sortDir, sortCol, platform)) {
       if (pool.userCanRead(user)) {
         accessibles.add(pool);
@@ -2533,11 +2437,11 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public List<Pool<? extends Poolable<?, ?>>> getPoolsByPageAndSize(int offset, int limit, String sortDir, String sortCol,
+  public List<Pool> getPoolsByPageAndSize(int offset, int limit, String sortDir, String sortCol,
       PlatformType platform) throws IOException {
     User user = getCurrentUser();
-    List<Pool<? extends Poolable<?, ?>>> accessibles = new ArrayList<>();
-    for (Pool<? extends Poolable<?, ?>> pool : backingManager.getPoolsByPageAndSize(offset, limit, sortDir, sortCol, platform)) {
+    List<Pool> accessibles = new ArrayList<>();
+    for (Pool pool : backingManager.getPoolsByPageAndSize(offset, limit, sortDir, sortCol, platform)) {
       if (pool.userCanRead(user)) {
         accessibles.add(pool);
       }
@@ -2675,5 +2579,40 @@ public class UserAuthMisoRequestManager implements RequestManager {
       return o;
     else
       throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Project " + projectId);
+  }
+
+  @Override
+  public List<LibraryDilution> getLibraryDilutionsForPoolDataTable(int offset, int limit, String search, String sortDir, String sortCol,
+      PlatformType platform) throws IOException {
+    List<LibraryDilution> rtn = new ArrayList<>();
+    List<LibraryDilution> results = backingManager.getLibraryDilutionsForPoolDataTable(offset, limit, search, sortDir, sortCol, platform);
+    User currentUser = getCurrentUser();
+    for (LibraryDilution ld : results){
+      if (ld.userCanRead(currentUser)) {
+        rtn.add(ld);
+      }
+    }
+    return rtn;
+  }
+
+  @Override
+  public Integer countLibraryDilutionsByPlatform(PlatformType platform) throws IOException {
+    return backingManager.countLibraryDilutionsByPlatform(platform);
+  }
+
+  @Override
+  public Integer countLibraryDilutionsBySearchAndPlatform(String search, PlatformType platform) throws IOException {
+    return backingManager.countLibraryDilutionsBySearchAndPlatform(search, platform);
+  }
+
+  @Override
+  public List<Run> getRunsByPool(Pool pool) throws IOException {
+    List<Run> runs = backingManager.getRunsByPool(pool);
+    List<Run> authorizedRuns = new ArrayList<>();
+    for (Run run : runs) {
+      if (readCheck(run))
+        authorizedRuns.add(run);
+    }
+    return authorizedRuns;
   }
 }

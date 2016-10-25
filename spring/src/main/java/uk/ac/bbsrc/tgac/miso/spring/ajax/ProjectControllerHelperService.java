@@ -53,6 +53,7 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.EntityGroup;
@@ -256,8 +257,8 @@ public class ProjectControllerHelperService {
 
   public JSONObject previewIssues(HttpSession session, JSONObject json) {
     if (issueTrackerManager != null) {
-      final List<JSONObject> issueList = new ArrayList<JSONObject>();
-      final List<String> errorList = new ArrayList<String>();
+      final List<JSONObject> issueList = new ArrayList<>();
+      final List<String> errorList = new ArrayList<>();
       final JSONArray issues = JSONArray.fromObject(json.getString("issues"));
       for (final JSONObject issueKey : (Iterable<JSONObject>) issues) {
         JSONObject issue = null;
@@ -290,7 +291,7 @@ public class ProjectControllerHelperService {
         final Project project = requestManager.getProjectById(projectId);
         final JSONObject j = new JSONObject();
         if (project != null) {
-          final List<JSONObject> issueList = new ArrayList<JSONObject>();
+          final List<JSONObject> issueList = new ArrayList<>();
 
           if (project.getIssueKeys() != null) {
             for (final String issueKey : project.getIssueKeys()) {
@@ -496,7 +497,7 @@ public class ProjectControllerHelperService {
         mps = printManager.getPrintService(serviceName);
       }
 
-      final Queue<File> thingsToPrint = new LinkedList<File>();
+      final Queue<File> thingsToPrint = new LinkedList<>();
       final Collection<Sample> samples = requestManager.listAllSamplesByProjectId(projectId);
       for (final Sample sample : samples) {
         // autosave the barcode if none has been previously generated
@@ -541,7 +542,7 @@ public class ProjectControllerHelperService {
         mps = printManager.getPrintService(serviceName);
       }
 
-      final Queue<File> thingsToPrint = new LinkedList<File>();
+      final Queue<File> thingsToPrint = new LinkedList<>();
       for (final JSONObject p : (Iterable<JSONObject>) ss) {
         final Long sampleId = p.getLong("sampleId");
         final Sample sample = requestManager.getSampleById(sampleId);
@@ -586,7 +587,7 @@ public class ProjectControllerHelperService {
         mps = printManager.getPrintService(serviceName);
       }
 
-      final Queue<File> thingsToPrint = new LinkedList<File>();
+      final Queue<File> thingsToPrint = new LinkedList<>();
       final Collection<Library> libraries = requestManager.listAllLibrariesByProjectId(projectId);
       for (final Library library : libraries) {
         // autosave the barcode if none has been previously generated
@@ -631,7 +632,7 @@ public class ProjectControllerHelperService {
         mps = printManager.getPrintService(serviceName);
       }
 
-      final Queue<File> thingsToPrint = new LinkedList<File>();
+      final Queue<File> thingsToPrint = new LinkedList<>();
       for (final JSONObject p : (Iterable<JSONObject>) ss) {
         final Long libraryId = p.getLong("libraryId");
         final Library library = requestManager.getLibraryById(libraryId);
@@ -677,7 +678,7 @@ public class ProjectControllerHelperService {
         mps = printManager.getPrintService(serviceName);
       }
 
-      final Queue<File> thingsToPrint = new LinkedList<File>();
+      final Queue<File> thingsToPrint = new LinkedList<>();
       final Collection<LibraryDilution> libraryDilutions = requestManager.listAllLibraryDilutionsByProjectId(projectId);
       for (final LibraryDilution libraryDilution : libraryDilutions) {
         // autosave the barcode if none has been previously generated
@@ -721,7 +722,7 @@ public class ProjectControllerHelperService {
         mps = printManager.getPrintService(serviceName);
       }
 
-      final Queue<File> thingsToPrint = new LinkedList<File>();
+      final Queue<File> thingsToPrint = new LinkedList<>();
       for (final JSONObject p : (Iterable<JSONObject>) ss) {
         final Long dilutionId = p.getLong("dilutionId");
         final LibraryDilution libraryDilution = requestManager.getLibraryDilutionById(dilutionId);
@@ -749,7 +750,7 @@ public class ProjectControllerHelperService {
       plate = true;
     }
     final Long projectId = json.getLong("projectId");
-    final List<Sample> samples = new ArrayList<Sample>();
+    final List<Sample> samples = new ArrayList<>();
     if (json.has("samples")) {
       try {
         final JSONArray a = JSONArray.fromObject(json.get("samples"));
@@ -812,22 +813,12 @@ public class ProjectControllerHelperService {
           sb.append("Name: <b>" + s.getName() + "</b><br/>");
           sb.append("Alias: <b>" + s.getAlias() + "</b><br/>");
 
-          final Set<Pool> pools = new HashSet<Pool>();
-
-          for (final Library l : s.getLibraries()) {
-            if (!l.getLibraryDilutions().isEmpty()) {
-              for (final Dilution ld : l.getLibraryDilutions()) {
-                if (!ld.getPools().isEmpty()) {
-                  pools.addAll(ld.getPools());
-                }
-              }
-            }
-          }
+          final Set<Pool> pools = new HashSet<>();
 
           if (!pools.isEmpty()) {
             sb.append("Pools: <ul>");
             for (final Pool p : pools) {
-              sb.append("<li>").append(p.getName()).append(" (").append(p.getAlias()).append(") - ").append(p.getDilutions().size())
+              sb.append("<li>").append(p.getName()).append(" (").append(p.getAlias()).append(") - ").append(p.getPoolableElements().size())
                   .append(" dilutions<li>");
             }
             sb.append("</ul><br/>");

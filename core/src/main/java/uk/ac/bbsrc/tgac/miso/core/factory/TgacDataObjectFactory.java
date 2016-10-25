@@ -23,8 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.core.factory;
 
-import java.util.LinkedList;
-
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.User;
 
@@ -32,12 +30,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
-import uk.ac.bbsrc.tgac.miso.core.data.Plate;
-import uk.ac.bbsrc.tgac.miso.core.data.Plateable;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
-import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
@@ -55,7 +50,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.PlateImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
@@ -189,23 +183,13 @@ public class TgacDataObjectFactory extends DataObjectFactory {
   }
 
   @Override
-  public Plate<LinkedList<Plateable>, Plateable> getPlateOfSize(int size) {
-    return new PlateImpl<Plateable>(size);
+  public Pool getPool() {
+    return new PoolImpl();
   }
 
   @Override
-  public Plate<LinkedList<Plateable>, Plateable> getPlateOfSize(int size, User user) {
-    return new PlateImpl<Plateable>(size, user);
-  }
-
-  @Override
-  public Pool<? extends Poolable<?, ?>> getPool() {
-    return new PoolImpl<Poolable<?, ?>>();
-  }
-
-  @Override
-  public Pool<? extends Poolable<?, ?>> getPool(User user) {
-    return new PoolImpl<Poolable<?, ?>>(user);
+  public Pool getPool(User user) {
+    return new PoolImpl(user);
   }
 
   @Override
@@ -431,9 +415,9 @@ public class TgacDataObjectFactory extends DataObjectFactory {
   }
 
   @Override
-  public Pool<? extends Poolable<?, ?>> getPoolOfType(PlatformType platformtype, User user) throws IllegalArgumentException {
+  public Pool getPoolOfType(PlatformType platformtype, User user) throws IllegalArgumentException {
     if (platformtype != null) {
-      Pool<? extends Poolable<?, ?>> p = getPool(user);
+      Pool p = getPool(user);
       p.setPlatformType(platformtype);
       return p;
     } else {

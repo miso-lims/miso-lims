@@ -276,8 +276,6 @@ Library.hot = {
       {
         header: 'Description',
         data: 'description',
-        validator: Hot.requiredText,
-        renderer: Hot.requiredTextRenderer,
         include: true
       },
       {

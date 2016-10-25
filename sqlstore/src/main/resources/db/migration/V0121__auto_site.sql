@@ -1,3 +1,20 @@
+-- add_archived_SVR
+--StartNoTest
+--StartNoTest
+SELECT userId INTO @user FROM User WHERE loginName = 'admin';
+SET @time = NOW();
+
+INSERT INTO SampleValidRelationship (parentId, childId, createdBy, creationDate, updatedBy, lastUpdated, archived)
+VALUES (
+    (SELECT sampleClassId FROM SampleClass WHERE alias = 'gDNA (aliquot)'),
+    (SELECT sampleClassId FROM SampleClass WHERE alias = 'gDNA_wga (aliquot)'),
+    @user, @time, @user, @time, 1
+);
+--EndNoTest
+--EndNoTest
+
+-- more_kits
+--StartNoTest
 --StartNoTest
 INSERT INTO KitDescriptor (name, description, version, manufacturer, partNumber, stockLevel, kitType, platformType, lastModifier) VALUES
 ('Genome Analyzer Kit','Prep Kit for Illumina Genome Analyzer Templates',0,'Illumina',0,0,'Library','Illumina',1),
@@ -39,3 +56,33 @@ INSERT INTO KitDescriptor (name, description, version, manufacturer, partNumber,
 ('Roche SeqCap EZ Exome v3','Roche SeqCap EZ Exome v3.0',3,'Roche',0,0,'Library','Illumina',1),
 ('Smarter Stranded Total Pico Mammalian','A unique, sensitive, and ligation-free method to generate stranded, Illumina-ready cDNA libraries from an input range of 250 pg–10 ng of total mammalian RNA in about 5 hours',0,'Illumina',0,0,'Library','Illumina',1);
 --EndNoTest
+--EndNoTest
+
+-- archived_lcm_relationships
+--StartNoTest
+--StartNoTest
+SELECT userId INTO @user FROM User WHERE loginName = 'admin';
+SET @time = NOW();
+
+INSERT INTO SampleValidRelationship (parentId, childId, createdBy, creationDate, updatedBy, lastUpdated, archived)
+VALUES (
+    (SELECT sampleClassId FROM SampleClass WHERE alias = 'Primary Tumor Tissue'),
+    (SELECT sampleClassId FROM SampleClass WHERE alias = 'LCM Tube'),
+    @user, @time, @user, @time, 1
+);
+
+INSERT INTO SampleValidRelationship (parentId, childId, createdBy, creationDate, updatedBy, lastUpdated, archived)
+VALUES (
+    (SELECT sampleClassId FROM SampleClass WHERE alias = 'Xenograft Tissue'),
+    (SELECT sampleClassId FROM SampleClass WHERE alias = 'LCM Tube'),
+    @user, @time, @user, @time, 1
+);
+--EndNoTest
+--EndNoTest
+
+-- ga_truseq_lib_kit
+--StartNoTest
+INSERT INTO KitDescriptor(name, version, manufacturer, partNumber, stockLevel, kitType, platformType, description, lastModifier)
+ VALUES ('GA_TruSeq_Library', 0, 'Illumina', 1, 0, 'Library', 'Illumina', 'TruSeq Genomic Library prep kit', 1);
+--EndNoTest
+

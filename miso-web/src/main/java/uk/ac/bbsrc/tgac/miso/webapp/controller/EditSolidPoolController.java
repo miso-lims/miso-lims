@@ -47,6 +47,9 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
+
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractPool;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
@@ -59,9 +62,6 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
-
-import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 /**
  * com.eaglegenomics.miso.web
@@ -105,10 +105,10 @@ public class EditSolidPoolController {
   }
 
   private List<? extends Dilution> populateAvailableDilutions(User user, Pool pool) throws IOException {
-    ArrayList<emPCRDilution> libs = new ArrayList<emPCRDilution>();
+    ArrayList<emPCRDilution> libs = new ArrayList<>();
     for (emPCRDilution l : requestManager.listAllEmPCRDilutions()) {
       if (l.getEmPCR().getLibraryDilution().getLibrary().getPlatformName().equals(PlatformType.SOLID.getKey())) {
-        if (!pool.getDilutions().contains(l)) {
+        if (!pool.getPoolableElements().contains(l)) {
           if (l.userCanRead(user)) {
             libs.add(l);
           }
@@ -123,7 +123,7 @@ public class EditSolidPoolController {
       throws IOException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Collection<Experiment> es = new ArrayList<Experiment>();
+      Collection<Experiment> es = new ArrayList<>();
       for (Experiment e : requestManager.listAllExperiments()) {
         if (e.getPlatform().getPlatformType().equals(p.getPlatformType())) {
           if (experimentId != null) {

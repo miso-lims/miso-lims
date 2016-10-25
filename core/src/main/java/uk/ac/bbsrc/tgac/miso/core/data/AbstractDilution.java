@@ -23,10 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import java.util.Collection;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.GeneratedValue;
@@ -60,7 +57,6 @@ public abstract class AbstractDilution implements Dilution, Comparable {
   private Double concentration;
   private String identificationBarcode;
   private String dilutionUserName;
-  private final Set<Pool<Dilution>> pools = new HashSet<Pool<Dilution>>();
   private Long preMigrationId;
 
   @Override
@@ -126,18 +122,6 @@ public abstract class AbstractDilution implements Dilution, Comparable {
   @CoverageIgnore
   public String getLabelText() {
     return getLibrary().getAlias();
-  }
-
-  @Override
-  public Collection<Dilution> getInternalPoolableElements() {
-    final Set<Dilution> dil = new HashSet<Dilution>();
-    dil.add(this);
-    return dil;
-  }
-
-  @Override
-  public Set<Pool<Dilution>> getPools() {
-    return pools;
   }
 
   @Override

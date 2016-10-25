@@ -45,8 +45,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
-import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
@@ -115,11 +115,11 @@ public class ContainerRestController extends RestController {
           // dilutions
           sb.append("\"poolableElements\":[");
           int id = 0;
-          for (Poolable poolable : partition.getPool().getPoolableElements()) {
+          for (Dilution poolable : partition.getPool().getPoolableElements()) {
             id++;
             ObjectMapper mapperd = new ObjectMapper();
             sb.append(mapperd.writeValueAsString(poolable));
-            if (id < partition.getPool().getDilutions().size()) {
+            if (id < partition.getPool().getPoolableElements().size()) {
               sb.append(",");
             }
 
@@ -176,7 +176,7 @@ public class ContainerRestController extends RestController {
                 .buildAndExpand(containerDto.getIdentificationBarcode()).toUriString());
       }
 
-      DataTablesResponseDto<ContainerDto> dtResponse = new DataTablesResponseDto<ContainerDto>();
+      DataTablesResponseDto<ContainerDto> dtResponse = new DataTablesResponseDto<>();
       dtResponse.setITotalRecords(numContainers);
       dtResponse.setITotalDisplayRecords(numMatches);
       dtResponse.setAaData(containerDtos);

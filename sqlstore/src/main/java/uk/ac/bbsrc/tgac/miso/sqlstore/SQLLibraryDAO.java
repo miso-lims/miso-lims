@@ -119,7 +119,7 @@ public class SQLLibraryDAO implements LibraryStore {
   
   public static final String LIBRARY_SELECT_BY_PRE_MIGRATION_ID = LIBRARIES_SELECT
       + " JOIN LibraryAdditionalInfo lai ON lai.libraryId = l.libraryId"
-      + "WHERE lai.preMigrationId = ?";
+      + " WHERE lai.preMigrationId = ?";
 
   public static final String LIBRARY_SELECT_FROM_ID_LIST = LIBRARIES_SELECT + " WHERE l.libraryId in (";
 
@@ -493,13 +493,13 @@ public class SQLLibraryDAO implements LibraryStore {
     if (this.cascadeType != null) {
       if (this.cascadeType.equals(CascadeType.PERSIST)) {
         // total fudge to clear out the pool cache if this library is used in any pool by way of a dilution
-        for (Pool<?> p : poolDAO.listByLibraryId(library.getId())) {
+        for (Pool p : poolDAO.listByLibraryId(library.getId())) {
           DbUtils.updateCaches(cacheManager, p, Pool.class);
         }
 
         sampleDAO.save(library.getSample());
       } else if (this.cascadeType.equals(CascadeType.REMOVE)) {
-        for (Pool<?> p : poolDAO.listByLibraryId(library.getId())) {
+        for (Pool p : poolDAO.listByLibraryId(library.getId())) {
           DbUtils.updateCaches(cacheManager, p, Pool.class);
         }
 
@@ -643,12 +643,12 @@ public class SQLLibraryDAO implements LibraryStore {
     if (library.isDeletable()
         && (namedTemplate.update(LIBRARY_DELETE, new MapSqlParameterSource().addValue("libraryId", library.getId())) == 1)) {
       if (this.cascadeType.equals(CascadeType.PERSIST)) {
-        for (Pool<?> p : poolDAO.listByLibraryId(library.getId())) {
+        for (Pool p : poolDAO.listByLibraryId(library.getId())) {
           DbUtils.updateCaches(cacheManager, p, Pool.class);
         }
         sampleDAO.save(library.getSample());
       } else if (this.cascadeType.equals(CascadeType.REMOVE)) {
-        for (Pool<?> p : poolDAO.listByLibraryId(library.getId())) {
+        for (Pool p : poolDAO.listByLibraryId(library.getId())) {
           DbUtils.updateCaches(cacheManager, p, Pool.class);
         }
 

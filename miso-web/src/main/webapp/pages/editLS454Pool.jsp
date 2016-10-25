@@ -231,7 +231,7 @@
           <div class="note">
             <h2>Selected dilution(s):</h2>
             <div id="dillist" class="elementList ui-corner-all">
-              <c:forEach items="${pool.dilutions}" var="dil">
+              <c:forEach items="${pool.poolableElements}" var="dil">
                 <div onMouseOver="this.className='dashboardhighlight'" onMouseOut="this.className='dashboard'" class="dashboard">
                   <span style="float:left">
                     <input type="hidden" id="dilutions${dil.id}" value="${dil.name}" name="dilutions"/>
@@ -240,7 +240,7 @@
                     <b>Library:</b> <a href="<c:url value="/miso/library/${dil.library.id}"/>">${dil.library.alias} (${dil.library.name})</a><br/>
                     <b>Sample:</b> <a href="<c:url value="/miso/sample/${dil.library.sample.id}"/>">${dil.library.sample.alias} (${dil.library.sample.name})</a><br/>
                     <c:choose>
-                      <c:when test="${fn:length(pool.dilutions) > 1}">
+                      <c:when test="${fn:length(pool.poolableElements) > 1}">
                         <c:choose>
                             <c:when test="${not empty dil.library.indices}">
                               <b>Indices:</b></br>

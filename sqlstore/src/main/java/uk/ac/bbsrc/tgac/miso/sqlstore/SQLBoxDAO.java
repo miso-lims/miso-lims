@@ -35,7 +35,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
@@ -355,11 +354,6 @@ public class SQLBoxDAO implements BoxStore {
   }
 
   @Override
-  public Collection<Box> listByAlias(String alias) throws IOException {
-    return template.query(BOX_SELECT_BY_ALIAS, new Object[] { alias }, new BoxMapper(true));
-  }
-
-  @Override
   public Collection<Box> listWithLimit(long limit) throws IOException {
     return template.query(BOX_SELECT_LIMIT, new Object[] { limit }, new BoxMapper(true));
   }
@@ -376,7 +370,7 @@ public class SQLBoxDAO implements BoxStore {
     String barcode = box.getBoxable(position).getIdentificationBarcode();
     Sample sample = sampleDAO.getByBarcode(barcode);
     Library library = libraryDAO.getByBarcode(barcode);
-    Pool<? extends Poolable<?,?>> pool = poolDAO.getByBarcode(barcode);
+    Pool pool = poolDAO.getByBarcode(barcode);
 
     if ((sample == null ? 0 : 1) + (library == null ? 0 : 1) + (pool == null ? 0 : 1) > 1) {
       String errorMessage = "";
@@ -441,7 +435,7 @@ public class SQLBoxDAO implements BoxStore {
         continue;
       }
 
-      Pool<? extends Poolable<?,?>> pool = poolDAO.getByBarcode(barcode);
+      Pool pool = poolDAO.getByBarcode(barcode);
       if (pool != null) {
         pool.setDiscarded(true);
         poolDAO.save(pool);

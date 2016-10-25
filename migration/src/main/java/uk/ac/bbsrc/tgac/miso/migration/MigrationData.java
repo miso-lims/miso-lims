@@ -15,7 +15,7 @@ public class MigrationData {
   private Collection<Sample> samples;
   private Collection<Library> libraries;
   private Collection<LibraryDilution> dilutions;
-  private Collection<Pool<LibraryDilution>> pools;
+  private Collection<Pool> pools;
   private Collection<Run> runs;
 
   /**
@@ -69,11 +69,11 @@ public class MigrationData {
    * @return all Pools to be migrated. Note: Saving these will likely require that LibraryDilutions
    * have been saved first in order to generate foreign keys
    */
-  public Collection<Pool<LibraryDilution>> getPools() {
+  public Collection<Pool> getPools() {
     return pools;
   }
 
-  public void setPools(Collection<Pool<LibraryDilution>> pools) {
+  public void setPools(Collection<Pool> pools) {
     this.pools = pools;
   }
 

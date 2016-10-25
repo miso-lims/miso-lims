@@ -89,12 +89,12 @@ public class EraExperimentDecorator extends AbstractSubmittableDecorator<Documen
       Library relevantLibrary = null;
 
       if (e.getPool() != null) {
-        if (e.getPool().getDilutions().size() > 1) {
+        if (e.getPool().getPoolableElements().size() > 1) {
           // multiplexed pool
           Element pool = submission.createElementNS(null, "POOL");
           sampleDescriptor.appendChild(pool);
 
-          for (Dilution dil : e.getPool().getDilutions()) {
+          for (Dilution dil : e.getPool().getPoolableElements()) {
             relevantLibrary = dil.getLibrary();
             Element member = submission.createElementNS(null, "MEMBER");
             member.setAttribute("member_name", dil.getName());
@@ -119,7 +119,7 @@ public class EraExperimentDecorator extends AbstractSubmittableDecorator<Documen
             member.appendChild(readLabel);
           }
         } else {
-          for (Dilution dil : e.getPool().getDilutions()) {
+          for (Dilution dil : e.getPool().getPoolableElements()) {
             relevantLibrary = dil.getLibrary();
             sampleDescriptor.setAttribute("refname", relevantLibrary.getSample().getAlias());
             sampleDescriptor.setAttribute("refcenter", submissionProperties.getProperty("submission.centreName"));
@@ -167,7 +167,7 @@ public class EraExperimentDecorator extends AbstractSubmittableDecorator<Documen
         if (relevantLibrary.getPaired()) {
           layout = submission.createElementNS(null, "PAIRED");
           if (!relevantLibrary.getLibraryQCs().isEmpty()) {
-            List<LibraryQC> qcs = new ArrayList<LibraryQC>(relevantLibrary.getLibraryQCs());
+            List<LibraryQC> qcs = new ArrayList<>(relevantLibrary.getLibraryQCs());
             int insert = 0;
             for (LibraryQC qc : qcs) {
               insert += qc.getInsertSize();
@@ -185,7 +185,7 @@ public class EraExperimentDecorator extends AbstractSubmittableDecorator<Documen
 
       Element poolingStrategy = submission.createElementNS(null, "POOLING_STRATEGY");
       if (e.getPool() != null) {
-        if (e.getPool().getDilutions().size() > 1) {
+        if (e.getPool().getPoolableElements().size() > 1) {
           poolingStrategy.setTextContent("multiplexed libraries");
         } else {
           poolingStrategy.setTextContent("none");

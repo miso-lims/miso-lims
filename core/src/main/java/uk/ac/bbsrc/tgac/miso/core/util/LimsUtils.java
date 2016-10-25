@@ -82,12 +82,12 @@ import org.slf4j.LoggerFactory;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletion;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletionGroup;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
@@ -206,7 +206,7 @@ public class LimsUtils {
     if (list == null) throw new NullPointerException("'list' must not be null");
     if (!(size > 0)) throw new IllegalArgumentException("'size' must be greater than 0");
 
-    return new Partition<T>(list, size);
+    return new Partition<>(list, size);
   }
 
   private static class Partition<T> extends AbstractList<List<T>> {
@@ -497,7 +497,7 @@ public class LimsUtils {
    * @throws IOException when
    */
   public static Map<String, String> checkPipes(Process process) throws IOException {
-    HashMap<String, String> r = new HashMap<String, String>();
+    HashMap<String, String> r = new HashMap<>();
     String error = LimsUtils.processStdErr(process);
     if (isStringEmptyOrNull(error)) {
       String out = LimsUtils.processStdOut(process);
@@ -743,7 +743,7 @@ public class LimsUtils {
     if (cls == null) {
       return null;
     }
-    List<Class<?>> list = new ArrayList<Class<?>>();
+    List<Class<?>> list = new ArrayList<>();
     while (cls != null) {
       Class[] interfaces = cls.getInterfaces();
       for (int i = 0; i < interfaces.length; i++) {
@@ -816,9 +816,9 @@ public class LimsUtils {
     }
   }
 
-  public static Map<Pool<?>, Map<SequencingParameters, PoolOrderCompletionGroup>> groupCompletions(
+  public static Map<Pool, Map<SequencingParameters, PoolOrderCompletionGroup>> groupCompletions(
       Iterable<PoolOrderCompletion> completions) {
-    Map<Pool<?>, Map<SequencingParameters, PoolOrderCompletionGroup>> poolGroups = new TreeMap<>();
+    Map<Pool, Map<SequencingParameters, PoolOrderCompletionGroup>> poolGroups = new TreeMap<>();
     for (PoolOrderCompletion completion : completions) {
       Map<SequencingParameters, PoolOrderCompletionGroup> parametersGroup;
       if (poolGroups.containsKey(completion.getPool())) {
@@ -839,10 +839,10 @@ public class LimsUtils {
     return poolGroups;
   }
 
-  public static Map<Pool<?>, Map<SequencingParameters, PoolOrderCompletionGroup>> filterUnfulfilledCompletions(
-      Map<Pool<?>, Map<SequencingParameters, PoolOrderCompletionGroup>> groups) {
-    Map<Pool<?>, Map<SequencingParameters, PoolOrderCompletionGroup>> poolGroups = new TreeMap<>();
-    for (Entry<Pool<?>, Map<SequencingParameters, PoolOrderCompletionGroup>> poolEntry : groups.entrySet()) {
+  public static Map<Pool, Map<SequencingParameters, PoolOrderCompletionGroup>> filterUnfulfilledCompletions(
+      Map<Pool, Map<SequencingParameters, PoolOrderCompletionGroup>> groups) {
+    Map<Pool, Map<SequencingParameters, PoolOrderCompletionGroup>> poolGroups = new TreeMap<>();
+    for (Entry<Pool, Map<SequencingParameters, PoolOrderCompletionGroup>> poolEntry : groups.entrySet()) {
       for (Entry<SequencingParameters, PoolOrderCompletionGroup> parameterEntry : poolEntry.getValue().entrySet()) {
         if (parameterEntry.getValue().getRemaining() < 1) continue;
 

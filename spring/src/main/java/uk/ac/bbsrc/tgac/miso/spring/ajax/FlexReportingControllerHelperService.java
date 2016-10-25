@@ -51,6 +51,7 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
@@ -198,10 +199,10 @@ public class FlexReportingControllerHelperService {
     try {
       JSONObject response = new JSONObject();
       JSONArray a = JSONArray.fromObject(json.get("form"));
-      List<Project> projects = new ArrayList<Project>();
+      List<Project> projects = new ArrayList<>();
       JSONArray statusList = new JSONArray();
 
-      Map<String, Integer> map = new HashMap<String, Integer>();
+      Map<String, Integer> map = new HashMap<>();
       JSONArray jsonArray = new JSONArray();
 
       for (JSONObject j : (Iterable<JSONObject>) a) {
@@ -250,7 +251,7 @@ public class FlexReportingControllerHelperService {
     JSONArray jsonArray = new JSONArray();
     try {
       for (Project project : projects) {
-        Set<Library> librariesInRun = new HashSet<Library>();
+        Set<Library> librariesInRun = new HashSet<>();
         for (Run run : requestManager.listAllRunsByProjectId(project.getProjectId())) {
           Collection<SequencerPartitionContainer<SequencerPoolPartition>> spcs = requestManager
               .listSequencerPartitionContainersByRunId(run.getId());
@@ -260,8 +261,8 @@ public class FlexReportingControllerHelperService {
               if (spc.getPartitions().size() > 0) {
                 for (SequencerPoolPartition spp : spc.getPartitions()) {
                   if (spp.getPool() != null) {
-                    if (spp.getPool().getDilutions().size() > 0) {
-                      for (Dilution dilution : spp.getPool().getDilutions()) {
+                    if (spp.getPool().getPoolableElements().size() > 0) {
+                      for (Dilution dilution : spp.getPool().getPoolableElements()) {
                         Library libraryInRun = dilution.getLibrary();
                         if (libraryInRun.getSample().getProject().equals(requestManager.getProjectById(project.getProjectId()))) {
                           if (librariesInRun.add(libraryInRun)) {
@@ -407,7 +408,7 @@ public class FlexReportingControllerHelperService {
       JSONObject response = new JSONObject();
       JSONArray a = JSONArray.fromObject(json.get("form"));
       Project p = null;
-      List<Run> runs = new ArrayList<Run>();
+      List<Run> runs = new ArrayList<>();
 
       for (JSONObject j : (Iterable<JSONObject>) a) {
         if (j.getString("name").equals("projectId")) {
@@ -434,7 +435,7 @@ public class FlexReportingControllerHelperService {
     StringBuilder sb = new StringBuilder();
     try {
 
-      Set<Library> librariesInRun = new HashSet<Library>();
+      Set<Library> librariesInRun = new HashSet<>();
       for (Run run : runs) {
         Collection<SequencerPartitionContainer<SequencerPoolPartition>> spcs = requestManager
             .listSequencerPartitionContainersByRunId(run.getId());
@@ -444,8 +445,8 @@ public class FlexReportingControllerHelperService {
             if (spc.getPartitions().size() > 0) {
               for (SequencerPoolPartition spp : spc.getPartitions()) {
                 if (spp.getPool() != null) {
-                  if (spp.getPool().getDilutions().size() > 0) {
-                    for (Dilution dilution : spp.getPool().getDilutions()) {
+                  if (spp.getPool().getPoolableElements().size() > 0) {
+                    for (Dilution dilution : spp.getPool().getPoolableElements()) {
                       Library libraryInRun = dilution.getLibrary();
                       if (libraryInRun.getSample().getProject().equals(requestManager.getProjectById(project.getProjectId()))) {
                         if (librariesInRun.add(libraryInRun)) {
@@ -564,9 +565,9 @@ public class FlexReportingControllerHelperService {
     try {
       JSONObject response = new JSONObject();
       JSONArray a = JSONArray.fromObject(json.get("form"));
-      ArrayList<Sample> samples = new ArrayList<Sample>();
+      ArrayList<Sample> samples = new ArrayList<>();
 
-      Map<String, Integer> typeMap = new HashMap<String, Integer>();
+      Map<String, Integer> typeMap = new HashMap<>();
       JSONArray overviewRelationArray = new JSONArray();
       JSONArray graphArray = new JSONArray();
       JSONArray qcGraphArray = new JSONArray();
@@ -725,10 +726,10 @@ public class FlexReportingControllerHelperService {
     try {
       JSONObject response = new JSONObject();
       JSONArray a = JSONArray.fromObject(json.get("form"));
-      ArrayList<Library> libraries = new ArrayList<Library>();
+      ArrayList<Library> libraries = new ArrayList<>();
 
-      Map<String, Integer> typeMap = new HashMap<String, Integer>();
-      Map<String, Integer> platformMap = new HashMap<String, Integer>();
+      Map<String, Integer> typeMap = new HashMap<>();
+      Map<String, Integer> platformMap = new HashMap<>();
       JSONArray overviewRelationArray = new JSONArray();
       JSONArray graphArray = new JSONArray();
       JSONArray qcGraphArray = new JSONArray();
@@ -940,10 +941,10 @@ public class FlexReportingControllerHelperService {
     try {
       JSONObject response = new JSONObject();
       JSONArray a = JSONArray.fromObject(json.get("form"));
-      ArrayList<Run> runs = new ArrayList<Run>();
+      ArrayList<Run> runs = new ArrayList<>();
 
-      Map<String, Integer> platformTypeMap = new HashMap<String, Integer>();
-      Map<String, Integer> statusMap = new HashMap<String, Integer>();
+      Map<String, Integer> platformTypeMap = new HashMap<>();
+      Map<String, Integer> statusMap = new HashMap<>();
       JSONArray overviewArray = new JSONArray();
       JSONArray graphArray = new JSONArray();
       JSONArray platformGraphArray = new JSONArray();
@@ -1022,16 +1023,16 @@ public class FlexReportingControllerHelperService {
               for (SequencerPoolPartition spp : spc.getPartitions()) {
                 if (spp.getPool() != null) {
                   Pool pool = spp.getPool();
-                  if (spp.getPool().getDilutions().size() > 0) {
-                    Map<String, Integer> projectMap = new HashMap<String, Integer>();
-                    for (Dilution dilution : spp.getPool().getDilutions()) {
+                  if (spp.getPool().getPoolableElements().size() > 0) {
+                    Map<String, Integer> projectMap = new HashMap<>();
+                    for (Dilution dilution : spp.getPool().getPoolableElements()) {
                       int count = projectMap.containsKey(dilution.getLibrary().getSample().getProject().getName())
                           ? projectMap.get(dilution.getLibrary().getSample().getProject().getName()) : 0;
                       count++;
                       projectMap.put(dilution.getLibrary().getSample().getProject().getName(), count);
                     }
-                    Map<String, Integer> projectMapDisplayed = new HashMap<String, Integer>();
-                    for (Dilution dilution : spp.getPool().getDilutions()) {
+                    Map<String, Integer> projectMapDisplayed = new HashMap<>();
+                    for (Dilution dilution : spp.getPool().getPoolableElements()) {
                       if (!projectMapDisplayed.containsKey(dilution.getLibrary().getSample().getProject().getName())) {
                         jsonArray.add(
                             JsonSanitizer.sanitize(
@@ -1040,7 +1041,7 @@ public class FlexReportingControllerHelperService {
                                     + pool.getName() + "\",\"" + spp.getPartitionNumber() + "\",\""
                                     + dilution.getLibrary().getSample().getProject().getName() + "\",\""
                                     + projectMap.get(dilution.getLibrary().getSample().getProject().getName()) + "\",\""
-                                    + spp.getPool().getDilutions().size() + "\"]"));
+                                    + spp.getPool().getPoolableElements().size() + "\"]"));
                         projectMapDisplayed.put(dilution.getLibrary().getSample().getProject().getName(), 1);
                       }
                     }

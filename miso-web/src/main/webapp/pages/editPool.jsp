@@ -49,9 +49,9 @@
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
   <div id="note_arrowclick" class="toggleLeft"></div>
 </div>
-<div id="notediv" class="note" style="display:none;">A Pool contains <b>one or more</b> Dilutions or Plates that are
+<div id="notediv" class="note" style="display:none;">A Pool contains <b>one or more</b> Dilutions that are
   to be placed, as part of an Experiment, in a sequencer instrument Run partition (lane/chamber/cell). Pools
-  with more than one Dilution or a Plate with multiple libraries are said to be multiplexed.
+  with more than one Dilution are said to be multiplexed.
 </div>
 
 <div class="bs-callout bs-callout-warning hidden">
@@ -123,13 +123,6 @@
     </td>
   </tr>
   <tr>
-    <td class="h">Location:</td>
-    <td>
-      <c:if test="${!empty pool.boxLocation}">${pool.boxLocation},</c:if>
-      <c:if test="${!empty pool.boxPosition}"><a href='<c:url value="/miso/box/${pool.boxId}"/>'>${pool.boxAlias}, ${pool.boxPosition}</a></c:if>
-    </td>
-  </tr>
-  <tr>
     <td class="h">Name:</td>
     <td>
       <c:choose>
@@ -194,7 +187,13 @@
     <td>Discarded:</td>
     <td><form:checkbox id="discarded" path="discarded"/></td>
   </tr>
-
+  <tr>
+    <td class="h">Location:</td>
+    <td>
+      <c:if test="${!empty pool.boxLocation}">${pool.boxLocation},</c:if>
+      <c:if test="${!empty pool.boxPosition}"><a href='<c:url value="/miso/box/${pool.boxId}"/>'>${pool.boxAlias}, ${pool.boxPosition}</a></c:if>
+    </td>
+  </tr>
 </table>
 <%@ include file="volumeControl.jspf" %>
 <%@ include file="permissions.jsp" %>
@@ -314,7 +313,8 @@
           }
         });
 
-        jQuery('#qcsTotalCount').html(jQuery('#poolQcTable>tbody>tr:visible').length.toString() + " QCs");
+        var qcsCount = jQuery('#poolQcTable>tbody>tr:visible').length;
+        jQuery('#qcsTotalCount').html(qcsCount + (qcsCount == 1 ? ' QC' : ' QCs'));
       });
     </script>
   </span>
@@ -451,6 +451,49 @@
         Pool.ui.createElementSelectDatatable('${pool.platformType.key}', ${pool.id}, '${libraryDilutionUnits}');
     });
 </script>
+
+<script type="text/javascript">
+  jQuery(document).ready(function () {
+    jQuery('#runsDatatable').dataTable({
+      "aaData": ${runsJSON},
+      "aaSorting": [
+        [0, 'desc']
+      ],
+      "aoColumns": [
+        {
+          "sTitle" : "Name",
+          "mData" : "name",
+          "mRender": function (data, type, full) {
+            return "<a href=\"/miso/run/" + full.id + "\">" + data + "</a>";
+          }
+        },
+        {
+          "sTitle" : "Alias",
+          "mData" : "alias",
+          "mRender": function (data, type, full) {
+            return "<a href=\"/miso/run/" + full.id + "\">" + data + "</a>";
+          }
+        },
+        { "sTitle" : "Status", "mData" : "status" },
+        { "sTitle" : "Start Date", "mData" : "startDate" },
+        { "sTitle" : "End Date", "mData" : "endDate" },
+        { "sTitle" : "Type", "mData" : "platformType" },
+        { "sTitle" : "Last Modified", "mData" : "lastUpdated" }
+      ],
+      "iDisplayLength": 50,
+      "bJQueryUI": true,
+      "bRetrieve": true,
+      "sPaginationType": "full_numbers"
+    });
+  });
+</script>
+
+<br/>
+<h1>Runs</h1>
+<div id="runsDatatableDiv">
+    <table cell-padding="0" width="100%" cellspacing="0" border="0" class="display" id="runsDatatable">
+    </table>
+</div>
 </c:if>
 
 <c:if test="${not empty pool.changeLog}">

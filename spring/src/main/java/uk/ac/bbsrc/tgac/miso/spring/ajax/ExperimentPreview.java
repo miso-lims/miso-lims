@@ -37,6 +37,7 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
@@ -72,7 +73,7 @@ public class ExperimentPreview {
 
       StringBuilder sb = new StringBuilder();
       if (e.getPool() != null) {
-        for (Dilution dil : e.getPool().getDilutions()) {
+        for (Dilution dil : e.getPool().getPoolableElements()) {
           Sample s = dil.getLibrary().getSample();
           sb.append("<li><a href='/miso/sample/").append(s.getId()).append("'>").append(s.getName()).append("</a></li>");
         }

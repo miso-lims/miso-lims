@@ -59,7 +59,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
@@ -146,7 +145,7 @@ public class EditRunController {
     if (run != null && run.getId() != AbstractRun.UNSAVED_ID) {
       for (SequencerPartitionContainer<SequencerPoolPartition> f : run.getSequencerPartitionContainers()) {
         for (SequencerPoolPartition p : f.getPartitions()) {
-          if (p.getPool() != null && p.getPool().getDilutions().size() > 1) {
+          if (p.getPool() != null && p.getPool().getPoolableElements().size() > 1) {
             return true;
           }
         }
@@ -185,12 +184,12 @@ public class EditRunController {
     return false;
   }
 
-  public Collection<Pool<? extends Poolable<?, ?>>> populateAvailablePools(User user) throws IOException {
+  public Collection<Pool> populateAvailablePools(User user) throws IOException {
     return requestManager.listAllPools();
   }
 
-  public Collection<Pool<? extends Poolable<?, ?>>> populateAvailablePools(PlatformType platformType, User user) throws IOException {
-    List<Pool<? extends Poolable<?, ?>>> pools = new ArrayList<Pool<? extends Poolable<?, ?>>>(
+  public Collection<Pool> populateAvailablePools(PlatformType platformType, User user) throws IOException {
+    List<Pool> pools = new ArrayList<>(
         requestManager.listAllPoolsByPlatform(platformType));
     Collections.sort(pools);
     return pools;
@@ -201,7 +200,7 @@ public class EditRunController {
   }
 
   public Collection<Experiment> populateAvailableExperiments(PlatformType platformType, User user) throws IOException {
-    List<Experiment> exps = new ArrayList<Experiment>();
+    List<Experiment> exps = new ArrayList<>();
     for (Experiment e : requestManager.listAllExperiments()) {
       if (e.getPlatform() != null && e.getPlatform().getPlatformType().equals(platformType)) {
         exps.add(e);
@@ -306,7 +305,7 @@ public class EditRunController {
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, run, securityManager.listAllUsers()));
       model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, run, securityManager.listAllGroups()));
 
-      Map<Long, String> runMap = new HashMap<Long, String>();
+      Map<Long, String> runMap = new HashMap<>();
       if (run.getWatchers().contains(user)) {
         runMap.put(run.getId(), user.getLoginName());
       }

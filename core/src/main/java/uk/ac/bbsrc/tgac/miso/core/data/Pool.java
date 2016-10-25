@@ -25,6 +25,7 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.Set;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
@@ -44,7 +45,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  * provide the link between the {@link Sample} tree and the {@link Run} tree of the MISO data model, which means that multiple samples from
  * multiple {@link Project}s can be pooled together.
  * <p/>
- * Pools are typed by the {@link Poolable} interface type they can accept, and as such, Pools can accept {@link Dilution} and {@link Plate}
+ * Pools are typed by the {@link Poolable} interface type they can accept, and as such, Pools can accept {@link Dilution}
  * objects at present. At creation time, a Pool is said to be "ready to run", which makes it easy to categorise and list Pools according to
  * whether they have been placed on a {@link SequencerPoolPartition} (at which point ready to run becomes false) or not.
  * 
@@ -55,7 +56,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 @JsonIgnoreProperties({ "securityProfile", "dilutions" })
 @PrintableBarcode
-public interface Pool<P extends Poolable> extends SecurableByProfile, Comparable, Barcodable, Watchable, Deletable, Alertable, Boxable {
+public interface Pool extends SecurableByProfile, Comparable, Barcodable, Watchable, Deletable, Alertable, Boxable {
 
   /**
    * Sets the ID of this Pool object.
@@ -90,33 +91,22 @@ public interface Pool<P extends Poolable> extends SecurableByProfile, Comparable
   public void setAlias(String alias);
 
   /**
-   * Adds a Poolable element to this Pool
+   * Adds a dilution to this Pool
    * 
    * @param poolable element of type P
    * @throws MalformedDilutionException when the Dilution added is not valid
    */
-  public void addPoolableElement(P poolable) throws MalformedDilutionException;
+  public void addPoolableElement(Dilution poolable) throws MalformedDilutionException;
 
   /**
-   * Sets the Poolable elements of this Pool object.
-   * 
-   * @param poolables poolables.
+   * Sets the elements of this Pool object.
    */
-  public <T extends Poolable> void setPoolableElements(Collection<T> poolables);
+  public void setPoolableElements(Set<Dilution> dilutions);
 
   /**
-   * Returns the Poolable elements of this Pool object.
-   * 
-   * @return Collection<D> poolables.
+   * Returns the elements of this Pool object.
    */
-  public Collection<P> getPoolableElements();
-
-  /**
-   * Convenience method to return Dilutions from this Pool given that the Pooled Elements may well
-   * 
-   * @return Collection<D> poolables.
-   */
-  public Collection<? extends Dilution> getDilutions();
+  public Set<Dilution> getPoolableElements();
 
   /**
    * Registers an Experiment to this Pool

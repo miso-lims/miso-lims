@@ -33,9 +33,9 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.Submittable;
@@ -70,7 +70,7 @@ public class EraRunDecorator extends AbstractSubmittableDecorator<Document> {
     SequencerPoolPartition p = (SequencerPoolPartition) submittable;
 
     if (p.getPool() != null) {
-      Pool<? extends Poolable> pool = p.getPool();
+      Pool pool = p.getPool();
 
       // TODO - fix this. not great.
       Run r = p.getSequencerPartitionContainer().getRun();
@@ -78,9 +78,9 @@ public class EraRunDecorator extends AbstractSubmittableDecorator<Document> {
       if (r == null) r = this.r;
 
       if (r != null) {
-        Collection<? extends Poolable> poolables = pool.getPoolableElements();
+        Collection<Dilution> poolables = pool.getPoolableElements();
 
-        for (Poolable poolable : poolables) {
+        for (Dilution poolable : poolables) {
           Element run = submission.createElementNS(null, "RUN");
           run.setAttribute("alias", "L00" + p.getPartitionNumber() + ":" + poolable.getName() + ":" + r.getAlias());
           run.setAttribute("run_center", submissionProperties.getProperty("submission.centreName"));

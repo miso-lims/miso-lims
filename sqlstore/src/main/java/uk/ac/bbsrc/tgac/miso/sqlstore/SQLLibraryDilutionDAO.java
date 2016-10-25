@@ -26,13 +26,11 @@ package uk.ac.bbsrc.tgac.miso.sqlstore;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
 import javax.persistence.CascadeType;
-
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +47,8 @@ import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.Property;
 import com.googlecode.ehcache.annotations.TriggersRemove;
 
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
@@ -61,6 +61,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.core.store.TargetedResequencingStore;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
@@ -88,7 +89,10 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
   public static String LIBRARY_DILUTION_SELECT_BY_LIBRARY_PLATFORM = "SELECT ld.dilutionId, ld.name, ld.concentration, ld.preMigrationId, "
       + "ld.library_libraryId, ld.identificationBarcode, ld.creationDate, ld.dilutionUserName, ld.securityProfile_profileId, "
       + "ld.targetedResequencingId, l.platformName, ld.lastUpdated " + "FROM LibraryDilution ld, Library l "
-      + "WHERE ld.library_libraryId = l.libraryId " + "AND l.platformName = ?";
+      + "WHERE ld.library_libraryId = l.libraryId " + "AND l.platformName = ? ";
+
+  public static String LIBRARY_DILUTION_COUNT_BY_LIBRARY_PLATFORM = "SELECT COUNT(*) FROM LibraryDilution ld, Library l "
+      + "WHERE ld.library_libraryId = l.libraryId " + "AND l.platformName = ? ";
 
   public static String LIBRARY_DILUTION_SELECT_BY_PROJECT_AND_LIBRARY_PLATFORM = "SELECT ld.* FROM Project p "
       + "INNER JOIN Sample sa ON sa.project_projectId = p.projectId " + "INNER JOIN Library li ON li.sample_sampleId = sa.sampleId "
@@ -118,7 +122,12 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
       + "WHERE (UPPER(ld.name) LIKE :search OR UPPER(ld.identificationBarcode) LIKE :search OR "
       + "UPPER(l.name) LIKE :search OR UPPER(l.alias) LIKE :search OR UPPER(l.description) LIKE :search)";
 
+  public static String LIBRARY_DILUTION_COUNT_BY_SEARCH_ONLY = "SELECT COUNT(*) FROM LibraryDilution ld JOIN Library l ON l.libraryId = ld.library_libraryId "
+      + "WHERE (UPPER(ld.name) LIKE :search OR UPPER(ld.identificationBarcode) LIKE :search OR "
+      + "UPPER(l.name) LIKE :search OR UPPER(l.alias) LIKE :search OR UPPER(l.description) LIKE :search)";
+
   public static String LIBRARY_DILUTION_SELECT_BY_SEARCH = LIBRARY_DILUTION_SELECT_BY_SEARCH_ONLY + " AND l.platformName = :platformName";
+  public static String LIBRARY_DILUTION_COUNT_BY_SEARCH = LIBRARY_DILUTION_COUNT_BY_SEARCH_ONLY + " AND l.platformName = :platformName";
 
   protected static final Logger log = LoggerFactory.getLogger(SQLLibraryDilutionDAO.class);
 
@@ -205,7 +214,7 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
 
   /**
    * Generates a unique barcode. Note that the barcode will change when the alias is changed.
-   * 
+   *
    * @param library
    */
   public void autoGenerateIdBarcode(LibraryDilution dilution) {
@@ -411,6 +420,62 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
     return template.queryForInt("SELECT count(*) FROM LibraryDilution");
   }
 
+  /*
+   * To be used in conjunction with listBySearchOffsetAndNumResultsAndPlatform as datatables requires a count of all dilutions available
+   * from the query to enable paginating.
+   */
+  @Override
+  public Integer countAllBySearchAndPlatform(String search, PlatformType platform) throws IOException {
+    Integer rtn;
+    if (LimsUtils.isStringEmptyOrNull(search)) {
+      rtn = template.queryForInt(LIBRARY_DILUTION_COUNT_BY_LIBRARY_PLATFORM, platform.getKey());
+    } else {
+      final String querystr = DbUtils.convertStringToSearchQuery(search);
+      final MapSqlParameterSource params = new MapSqlParameterSource();
+      final NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
+      params.addValue("platformName", platform.getKey());
+      params.addValue("search", querystr);
+      rtn = namedTemplate.queryForInt(LIBRARY_DILUTION_COUNT_BY_SEARCH, params);
+    }
+    return rtn;
+  }
+
+  @Override
+  public List<LibraryDilution> listBySearchOffsetAndNumResultsAndPlatform(int offset, int limit, String search, String sortDir,
+      String sortCol, PlatformType platform) throws IOException {
+    List<LibraryDilution> rtn;
+    if (offset < 0 || limit < 0) {
+      throw new IOException("Limit and Offset must be greater than -1");
+    }
+    if (!Arrays.asList("DESC", "ASC").contains(sortDir.toUpperCase())) {
+      throw new IOException("Bad value in sortDir");
+    }
+    if (LimsUtils.isStringEmptyOrNull(search)) {
+
+      final String query = LIBRARY_DILUTION_SELECT_BY_LIBRARY_PLATFORM + " ORDER BY " + sortCol + " " + sortDir + " LIMIT " + limit
+          + " OFFSET " + offset;
+      rtn = template.query(query, new Object[] { platform.getKey() }, new LibraryDilutionMapper(true));
+    } else {
+      final String querystr = DbUtils.convertStringToSearchQuery(search);
+      final String query = LIBRARY_DILUTION_SELECT_BY_SEARCH + " ORDER BY " + sortCol + " " + sortDir + " LIMIT " + limit + " OFFSET "
+          + offset;
+
+      final MapSqlParameterSource params = new MapSqlParameterSource();
+      params.addValue("platformName", platform.getKey());
+      params.addValue("search", querystr);
+      final NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
+      rtn = namedTemplate.query(query, params, new LibraryDilutionMapper(true));
+
+    }
+    return rtn;
+  }
+
+  @Override
+  public int countByPlatform(PlatformType platform) throws IOException {
+    return template.queryForInt(
+        "SELECT COUNT(*) from LibraryDilution ld INNER JOIN Library l ON ld.library_libraryId = l.libraryId WHERE l.platformName LIKE '"
+            + platform.getKey() + "';");
+  }
   @Override
   @TriggersRemove(cacheName = { "libraryDilutionCache",
       "lazyLibraryDilutionCache" }, keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {

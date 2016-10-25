@@ -70,8 +70,7 @@ var Sample = Sample || {
 
     // Description input field validation
     jQuery('#description').attr('class', 'form-control');
-    jQuery('#description').attr('data-parsley-required', 'true');
-    jQuery('#description').attr('data-parsley-maxlength', '100');
+    jQuery('#description').attr('data-parsley-maxlength', '255');
     jQuery('#description').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
 
     // Project validation
@@ -1218,18 +1217,13 @@ Sample.ui = {
       "fnDrawCallback": function (oSettings) {
         jQuery('#listingSamplesTable').removeClass('disabled');
         jQuery('#listingSamplesTable_paginate').find('.fg-button').removeClass('fg-button');
+        jQuery("input[class='bulkCheckbox']").on('click', function () {
+          Sample.ui.checkForPropagate(document.getElementById('dropdownActions'));
+        });
       }
     })).fnSetFilteringDelay();
     jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
     jQuery("#toolbar").append("<button style=\"margin-left:5px;\" onclick=\"window.location.href='/miso/sample/new';\" class=\"fg-button ui-state-default ui-corner-all\">Add Sample</button>");
-
-    jQuery("input[class='bulkCheckbox']").click(function () {
-      if (jQuery(this).parent().parent().hasClass('row_selected')) {
-        jQuery(this).parent().parent().removeClass('row_selected');
-      } else if (!jQuery(this).parent().parent().hasClass('row_selected')) {
-        jQuery(this).parent().parent().addClass('row_selected');
-      }
-    });
 
     var selectAll = '<label><input type="checkbox" onchange="Sample.ui.checkAll(this)" id="checkAll">Select All</label>';
     document.getElementById('listingSamplesTable').insertAdjacentHTML('beforebegin', selectAll);
@@ -1274,10 +1268,6 @@ Sample.ui = {
   checkForPropagate: function (el) {
     jQuery('#errors').hide();
     Sample.selectedIdsArray = Sample.ui.getSelectedIds();
-    if (Sample.selectedIdsArray.length === 0) {
-      alert("Please select one or more Samples.");
-      return false;
-    }
     if (jQuery('#classDropdown')) jQuery('#classDropdown').hide();
     var selectedValue = el.options[el.selectedIndex].value;
     if (selectedValue == 'propagateSams') {
@@ -1318,8 +1308,12 @@ Sample.ui = {
    * Bulk edit selected samples after GO button is clicked.
    */
   updateSelectedItems: function () {
+    if (Sample.selectedIdsArray.length === 0) {
+      alert("Please select one or more Samples.");
+      return false;
+    }
     var cats = Sample.ui.getUniqueCategoriesForSelected();
-    if (!Sample.detailedSample || cats.length === 1) {
+    if (!Sample.detailedSample || cats.length <= 1) {
       if (cats[0] == 'Tissue Processing') {
         // requires special consideration as not all Tissue Processing sample classes require the same columns
         var classes = Sample.ui.getSampleClassesForSelected().map(function (sc) {
@@ -1347,6 +1341,10 @@ Sample.ui = {
    * Action after GO button is clicked.
    */
   propagateSamSelectedItems: function () {
+    if (Sample.selectedIdsArray.length === 0) {
+      alert("Please select one or more Samples.");
+      return false;
+    }
     var selectedClassId = document.getElementById('classDropdown').value;
     if (!selectedClassId) {
       jQuery('#errors').html("Please select a sample class for child samples.");
@@ -1359,7 +1357,7 @@ Sample.ui = {
       alert("Please select one or more Samples.");
       return false;
     }
-    if (Sample.ui.getUniqueCategoriesForSelected().length !== 1) {
+    if (Sample.ui.getUniqueCategoriesForSelected().length > 1) {
       Sample.ui.displayMultipleCategoriesError();
       return false;
     }
@@ -1370,6 +1368,10 @@ Sample.ui = {
    * Create new libraries from the selected samples
    */
   propagateLibSelectedItems: function () {
+    if (Sample.selectedIdsArray.length === 0) {
+      alert("Please select one or more Samples.");
+      return false;
+    }
     if (Sample.detailedSample) {
       // rejects propagation if samples are not of aliquot category
       // TODO: add a more detailed check, or library designs?
@@ -1388,6 +1390,10 @@ Sample.ui = {
   
   // TODO: finish this, and the one in library_ajax.js . This will require writing the controller and db methods...
   emptySelectedItems: function () {
+    if (Sample.selectedIdsArray.length === 0) {
+      alert("Please select one or more Samples.");
+      return false;
+    }
     Sample.selectedIdsArray;
     var cageDiv = '<div id="cageDialog"><span class="dialog">Look for this feature in the next release!<br>' 
                   + '<img src="http://images.mentalfloss.com/sites/default/files/styles/insert_main_wide_image/public/tumblr_m3fc1bghyt1rq84v4o1_1280.png"/></span></div>';
@@ -1405,6 +1411,10 @@ Sample.ui = {
   
   // TODO: finish this, and the one in library_ajax.js . This will require writing the controller and db methods...
   archiveSelectedItems: function () {
+    if (Sample.selectedIdsArray.length === 0) {
+      alert("Please select one or more Samples.");
+      return false;
+    }
     Sample.selectedIdsArray;
     var cageDiv = '<div id="cageDialog"><span class="dialog">Look for this feature in the next release!<br>' 
       + '<img src="http://dorkshelf.com/wordpress/wp-content/uploads//2012/02/Raising-Arizona-Nicolas-Cage-2.jpg"/></span></div>';
@@ -1464,7 +1474,7 @@ Sample.ui = {
    */
   insertSampleClassDropdown: function () {
     jQuery('#go').attr('disabled', 'disabled');   
-    if (Sample.ui.getUniqueCategoriesForSelected().length == 1) {
+    if (Sample.ui.getUniqueCategoriesForSelected().length <= 1) {
       var classes = Sample.ui.getChildSampleClasses(Sample.ui.getSampleClassesForSelected());
       var select = [];
       select.push('<select id="classDropdown">');

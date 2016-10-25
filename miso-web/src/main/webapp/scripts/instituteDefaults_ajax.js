@@ -55,7 +55,7 @@ var Defaults = Defaults || {
 var Tissue = Tissue || {
   createTissueMaterialsTable: function (xhr) {
     var TMtable = [];
-    var id, alias, description, endpoint, temp, rowId;
+    var id, alias, endpoint, temp, rowId;
     
     // if data is coming in from AJAX request, store it in Defaults.all
     if (xhr) Defaults.all.tissueMaterialsDtos = JSON.parse(xhr.responseText);
@@ -64,7 +64,7 @@ var Tissue = Tissue || {
 
   createSamplePurposesTable: function (xhr) {
     var SPtable = [];
-    var id, alias, description, endpoint, temp, rowId;
+    var id, alias, endpoint, temp, rowId;
     // if data is coming in from AJAX request, store it in Defaults.all
     if (xhr) Defaults.all.samplePurposesDtos = JSON.parse(xhr.responseText);
     Tissue.createTable(Defaults.all.samplePurposesDtos, 'SP', 'allPurposes', 'Purpose', SPtable);
@@ -83,15 +83,12 @@ var Tissue = Tissue || {
       for (var i=0; i<data.length; i++) {
         id = data[i].id;
         alias = data[i].alias;
-        description = data[i].description;
         endpoint = data[i].url;
         temp = endpoint.split('/');
     	rowId = temp[temp.length - 2] + id;
 
         table.push('<tr id="'+ rowId +'"><td>');
         table.push(Options.createTextInput(option+'_alias_'+id, alias));
-        table.push('</td><td>');
-        table.push(Options.createTextInput(option+'_description_'+id, description));
         table.push('</td><td>');
         table.push(Options.createButton('Update', "Tissue.update('"+endpoint+"', "+id+", '"+option+"')", "save_" + tableBodyId + "Table"));
         table.push('</td><td>');
@@ -118,13 +115,12 @@ var Tissue = Tissue || {
 
   update: function (endpoint, suffix, option, givenMethod) {
     var alias = document.getElementById(option+'_alias_'+ suffix).value;
-    var description = document.getElementById(option+'_description_'+suffix).value;
-    if (!alias || !description) {
-      alert("Neither alias nor description can be blank.");
+    if (!alias) {
+      alert("Alias cannot be blank.");
       return null;
     }
     var method = givenMethod || 'PUT';
-    Options.makeXhrRequest(method, endpoint, Options.reloadTable, JSON.stringify({ 'alias': alias, 'description': description }), option);
+    Options.makeXhrRequest(method, endpoint, Options.reloadTable, JSON.stringify({ 'alias': alias }), option);
   },
 
   addNew: function (option) {
@@ -147,8 +143,6 @@ var Tissue = Tissue || {
       
       row.push('<tr><td>');
       row.push(Options.createTextInput(option+'_alias_new'));
-      row.push('</td><td>');
-      row.push(Options.createTextInput(option+'_description_new'));
       row.push('</td><td>');
       row.push(Options.createButton('Add', "Tissue.addNew('"+option+"')", "save_" + tableBodyId));
       row.push('</td></tr>');
@@ -304,8 +298,8 @@ var Subproject = Subproject || {
     var priority = document.getElementById('subP_priority_'+suffix).value;
     var parentProjectId = parseInt(document.getElementById('subP_parentProject_'+suffix).value);
     var referenceGenomeId = document.getElementById('subP_refGenome_'+suffix).value;
-    if (!alias || !description || !priority) {
-      alert("Neither alias, description, nor priority can be blank.");
+    if (!alias || !priority) {
+      alert("Neither alias nor priority can be blank.");
       return null;
     }
     var method = givenMethod || 'PUT';
