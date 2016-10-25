@@ -253,7 +253,7 @@ public class EditPoolController {
       StringBuilder indices = new StringBuilder();
       collectIndices(indices, dil);
       inner.add(indices.toString());
-      inner.add(dil.getLibrary().isLowQuality() ? "⚠" : "");
+      inner.add(dil.getLibrary().isLowQuality() ? "&#9888;" : "");
       inner.add("<div style='cursor:inherit;' onclick=\"Pool.search.poolSearchSelectElement(" + poolInt + ", '" + dil.getId() + "', '"
           + dil.getName() + "')\"><span class=\"ui-icon ui-icon-plusthick\"></span></div>");
       data.add(inner);
@@ -261,7 +261,7 @@ public class EditPoolController {
     rtn.put("iTotalRecords", allDilutionsCount);
     rtn.put("iTotalDisplayRecords", requestManager.countLibraryDilutionsBySearchAndPlatform(search, platformType));
     rtn.put("sEcho", "" + draw);
-    rtn.put("aaData", "" + data);
+    rtn.put("aaData", data);
     return rtn.toString();
   }
 
