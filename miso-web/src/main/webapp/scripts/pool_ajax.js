@@ -39,7 +39,7 @@ var Pool = Pool || {
       );
     }
   },
-  
+
   validatePool: function () {
     Validate.cleanFields('#pool-form');
     jQuery('#pool-form').parsley().destroy();
@@ -54,7 +54,7 @@ var Pool = Pool || {
     jQuery('#description').attr('class', 'form-control');
     jQuery('#description').attr('data-parsley-maxlength', '255');
     jQuery('#description').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
-    
+
     // Platform Type input select validation
     jQuery('#platformType').attr('class', 'form-control');
     jQuery('#platformType').attr('required', 'true');
@@ -72,7 +72,7 @@ var Pool = Pool || {
     jQuery('#creationDate').attr('data-parsley-pattern', Utils.validation.dateRegex);
     jQuery('#creationDate').attr('data-date-format', 'DD/MM/YYYY');
     jQuery('#creationDate').attr('data-parsley-error-message', 'Date must be of form DD/MM/YYYY');
-    
+
     // Volume validation
     jQuery('#volume').attr('class', 'form-control');
     jQuery('#volume').attr('data-parsley-maxlength', '10');
@@ -419,7 +419,7 @@ Pool.ui = {
     function renderPoolElements (data, type, full) {
       var elements = data.map(function (ld) {
         return "<li><a href=\"/miso/library/" + ld.library.id + "\">" + ld.library.alias
-        + (ld.library.index1Label ? "(" + ld.library.index1Label + (ld.library.index2Label ? ", " + ld.library.index2Label + ")" : ")") : "") 
+        + (ld.library.index1Label ? "(" + ld.library.index1Label + (ld.library.index2Label ? ", " + ld.library.index2Label + ")" : ")") : "")
         + "</a>" + "</li>";
       });
       var string;
@@ -430,7 +430,7 @@ Pool.ui = {
         var num = "" + elements.length + " dilutions  ";
         var more = "<span id=\"" + selector + "_fewer\"><a href=\"javascript:void(0);\" onclick=\"jQuery('." + selector + "').show();jQuery('#" + selector + "_fewer').hide();\">"
           + "(See all...)</a></span>";
-        var els = "<div class='" + selector + "' style='display:none'><ul>" 
+        var els = "<div class='" + selector + "' style='display:none'><ul>"
           + elements.join('')
           + "</ul><span><a href=\"javascript:void(0);\" onclick=\"jQuery('." + selector + "').hide();jQuery('#" + selector + "_fewer').show();\">Hide all...</a></span></div>";
         return num + more + els;
@@ -522,54 +522,48 @@ Pool.ui = {
   },
 
   createElementSelectDatatable : function(platform, poolId, libraryDilutionConcentrationUnits) {
-    jQuery('#elementSelectDatatableDiv').html("<table cellpadding='0' width='100%' cellspacing='0' border='0' class='display' id='elementSelectDatatable'></table>");
-    jQuery('#elementSelectDatatable').html("<img src='/styles/images/ajax-loader.gif'/>");
-    Fluxion.doAjax(
-      'poolControllerHelperService',
-      'createElementSelectDataTable',
-      {
-        'url':ajaxurl,
-        'poolId':poolId,
-        'platform':platform
-      },
-      {
-        'doOnSuccess': function(json) {
-          jQuery('#elementSelectDatatable').html('');
-          jQuery('#elementSelectDatatable').dataTable({
-            "aaData": json.poolelements,
-            "aoColumns": [
-              { "sTitle": "Dilution Name", "sType":"natural"},
-              { "sTitle": "Conc. ("+libraryDilutionConcentrationUnits+")", "sType":"natural"},
-              { "sTitle": "Library", "sType":"natural"},
-              { "sTitle": "Sample", "sType":"natural"},
-              { "sTitle": "Indices", "sType":"natural"},
-              { "sTitle": "Low Quality", "bSortable": false},
-              { "sTitle": "Add"}
-            ],
-            "bJQueryUI": true,
-            "iDisplayLength":  25,
-            "sPaginationType": "full_numbers",
-            "aaSorting":[
-              [0,"desc"]
-            ],
-            "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-              jQuery(nRow).attr("id", "poolable_" + aData[0]);
-              if (jQuery('#pooled_' + aData[0]).length) {
-                jQuery('td:eq(6)', nRow).addClass('disabled');
-                jQuery('td:eq(6)', nRow).prop('disabled', true);
-                jQuery('td:eq(6)', nRow).css('cursor', 'default');
-              } else {
-                jQuery('td:eq(6)', nRow).css('cursor', 'pointer');
-              }
-            },
-            "fnDrawCallback": function () {
-              jQuery('#elementSelectDatatable_paginate').find('.fg-button').removeClass('fg-button');
-            } 
-          });
-        }
-      }
-    );
-  },
+
+		jQuery('#elementSelectDatatableDiv').html("<table cellpadding='0' width='100%' cellspacing='0' border='0' class='display' id='elementSelectDatatable'></table>");
+
+	    jQuery('#elementSelectDatatable').dataTable({
+	    	"bProcessing": true,
+	    	"bServerSide": true,
+	    	"sAjaxSource": "/miso/pool/elementSelectDataTable",
+	        "fnServerParams": function ( aoData ) {
+	            aoData.push( { "name": "poolId", "value": poolId } );
+	            aoData.push( { "name": "platform", "value": platform } );
+
+	        },
+	        "aoColumns": [
+	          { "sTitle": "Dilution Name", "sType":"natural"},
+	          { "sTitle": "Conc. ("+libraryDilutionConcentrationUnits+")", "sType":"natural"},
+	          { "sTitle": "Library", "sType":"natural", "bSortable": false},
+	          { "sTitle": "Sample", "sType":"natural", "bSortable": false},
+	          { "sTitle": "Indices", "sType":"natural", "bSortable": false},
+	          { "sTitle": "Low Quality", "bSortable": false},
+	          { "sTitle": "Add", "bSortable": false}
+	        ],
+	        "bJQueryUI": true,
+	        "iDisplayLength":  25,
+	        "sPaginationType": "full_numbers",
+	        "aaSorting":[
+	          [0,"desc"]
+	        ],
+	        "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+	          jQuery(nRow).attr("id", "poolable_" + aData[0]);
+	          if (jQuery('#pooled_' + aData[0]).length) {
+	            jQuery('td:eq(6)', nRow).addClass('disabled');
+	            jQuery('td:eq(6)', nRow).prop('disabled', true);
+	            jQuery('td:eq(6)', nRow).css('cursor', 'default');
+	          } else {
+	            jQuery('td:eq(6)', nRow).css('cursor', 'pointer');
+	          }
+	        },
+	        "fnDrawCallback": function () {
+	          jQuery('#elementSelectDatatable_paginate').find('.fg-button').removeClass('fg-button');
+	        }
+	      });
+	  },
 
   removePooledElement : function (poolId, dilutionId, elementName) {
     var extra = (jQuery('#pooledElementsDatatable').dataTable().fnGetData().length == 1) ? '\n\nDeleting this item would make the pool empty.' : '';
@@ -653,7 +647,7 @@ Pool.ui = {
         'deletePoolNote',
         {
           'poolId': poolId,
-          'noteId': noteId, 
+          'noteId': noteId,
           'url': ajaxurl
         },
         {

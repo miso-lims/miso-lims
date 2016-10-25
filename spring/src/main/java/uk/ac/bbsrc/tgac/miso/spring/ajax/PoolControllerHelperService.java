@@ -65,18 +65,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
-import uk.ac.bbsrc.tgac.miso.core.data.Index;
-import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.PrintJob;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
@@ -93,7 +88,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
  * uk.ac.bbsrc.tgac.miso.spring.ajax
  * <p/>
  * Info
- * 
+ *
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -634,49 +629,6 @@ public class PoolControllerHelperService {
       }
     } else {
       return JSONUtils.SimpleJSONError("Only logged-in admins can delete objects.");
-    }
-  }
-
-  private void collectIndices(StringBuilder render, Dilution dilution) {
-    for (Index index : dilution.getLibrary().getIndices()) {
-      render.append(index.getPosition());
-      render.append(": ");
-      render.append(index.getLabel());
-      render.append("<br/>");
-    }
-  }
-
-  public JSONObject createElementSelectDataTable(HttpSession session, JSONObject json) {
-    if (json.has("platform") && !isStringEmptyOrNull(json.getString("platform"))) {
-      try {
-        String platform = json.getString("platform");
-        long poolId = json.has("poolId") ? json.getLong("poolId") : 0L;
-        JSONObject j = new JSONObject();
-        JSONArray arr = new JSONArray();
-        for (LibraryDilution libraryDilution : requestManager.listAllLibraryDilutionsByPlatform((PlatformType.get(platform)))) {
-          JSONArray pout = new JSONArray();
-          pout.add(libraryDilution.getName());
-          pout.add(libraryDilution.getConcentration().toString());
-          pout.add(String.format("<a href='/miso/library/%d'>%s (%s)</a>", libraryDilution.getLibrary().getId(),
-              libraryDilution.getLibrary().getAlias(), libraryDilution.getLibrary().getName()));
-          pout.add(String.format("<a href='/miso/sample/%d'>%s (%s)</a>", libraryDilution.getLibrary().getSample().getId(),
-              libraryDilution.getLibrary().getSample().getAlias(), libraryDilution.getLibrary().getSample().getName()));
-          StringBuilder indices = new StringBuilder();
-          collectIndices(indices, libraryDilution);
-          pout.add(indices.toString());
-          pout.add(libraryDilution.getLibrary().isLowQuality() ? "⚠" : "");
-          pout.add("<div style='cursor:inherit;' onclick=\"Pool.search.poolSearchSelectElement(" + poolId + ", '" + libraryDilution.getId()
-              + "', '" + libraryDilution.getName() + "')\"><span class=\"ui-icon ui-icon-plusthick\"></span></div>");
-          arr.add(pout);
-        }
-        j.put("poolelements", arr);
-        return j;
-      } catch (IOException e) {
-        log.debug("Failed", e);
-        return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
-      }
-    } else {
-      return JSONUtils.SimpleJSONError("No platform specified");
     }
   }
 
