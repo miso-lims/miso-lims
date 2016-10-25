@@ -1,3 +1,12 @@
+-- remove_externalName_unique_constraint
+
+--StartNoTest
+ALTER TABLE Identity DROP INDEX `externalName_UNIQUE`;
+--EndNoTest
+
+
+-- nullable_descriptions
+
 ALTER TABLE Sample MODIFY description varchar(255) NULL;
 ALTER TABLE Library MODIFY description varchar(255) NULL;
 ALTER TABLE Pool MODIFY description varchar(255) NULL;
@@ -20,3 +29,13 @@ ALTER TABLE Run MODIFY alias varchar(255) NOT NULL;
 
 ALTER TABLE SamplePurpose DROP COLUMN description;
 ALTER TABLE TissueMaterial DROP COLUMN description;
+
+
+-- delete_plates
+
+DELETE FROM Pool_Elements WHERE elementType LIKE '%Plate%';
+DROP TABLE Plate_Library;
+DROP TABLE Plate_Elements;
+DROP TABLE Plate;
+
+
