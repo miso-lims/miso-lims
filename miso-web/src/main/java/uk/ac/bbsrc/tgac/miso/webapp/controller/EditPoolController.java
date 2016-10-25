@@ -25,6 +25,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -45,6 +46,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
@@ -54,13 +56,14 @@ import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractPool;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
+import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletion;
 import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
@@ -72,14 +75,13 @@ import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SequencingParametersDto;
-import uk.ac.bbsrc.tgac.miso.service.PoolOrderCompletionService;
 import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.controller
  * <p/>
  * Info
- * 
+ *
  * @author Rob Davey
  * @since 0.1.9
  */
@@ -234,6 +236,72 @@ public class EditPoolController {
       }
       throw ex;
     }
+  }
+
+  private void collectIndices(StringBuilder render, Dilution dilution) {
+    for (final Index index : dilution.getLibrary().getIndices()) {
+      render.append(index.getPosition());
+      render.append(": ");
+      render.append(index.getLabel());
+      render.append("<br/>");
+    }
+  }
+
+  @RequestMapping(value = "/elementSelectDataTable", method = RequestMethod.GET, produces = "application/json")
+  public @ResponseBody String elementSelectDataTable(@RequestParam String sEcho, @RequestParam String iDisplayStart,
+      @RequestParam String iDisplayLength, @RequestParam String poolId, @RequestParam String platform, @RequestParam String sSearch,
+      @RequestParam String iSortCol_0, @RequestParam String sSortDir_0) throws IOException {
+
+    String search = LimsUtils.isStringEmptyOrNull(sSearch) ? null : sSearch;
+    int draw = Integer.valueOf(sEcho);
+    int start = Integer.valueOf(iDisplayStart);
+    int length = Integer.valueOf(iDisplayLength);
+    int poolInt = Integer.valueOf(poolId);
+    int sortColIndex = Integer.valueOf(iSortCol_0);
+    String sortCol;
+    switch (sortColIndex) {
+    case 0:
+      sortCol = "ld.name";
+      break;
+    case 1:
+      sortCol = "ld.concentration";
+      break;
+    default:
+      throw new IOException("Unexpected value in elementSelectDataTable sortCol " + sortColIndex);
+    }
+    if (!Arrays.asList("asc", "desc").contains(sSortDir_0)) {
+      throw new IOException("Unexpected value in elementSelectDataTable sortDir " + sSortDir_0);
+    }
+    PlatformType platformType = PlatformType.get(platform);
+
+    JSONObject rtn = new JSONObject();
+    JSONArray data = new JSONArray();
+
+    List<LibraryDilution> dils = requestManager.getLibraryDilutionsForPoolDataTable(start, length, search, sSortDir_0, sortCol,
+        platformType);
+    int allDilutionsCount = requestManager.countLibraryDilutionsByPlatform(PlatformType.ILLUMINA);
+
+    for (LibraryDilution dil : dils) {
+      JSONArray inner = new JSONArray();
+      inner.add(dil.getName());
+      inner.add(dil.getConcentration());
+      inner.add(String.format("<a href='/miso/library/%d'>%s (%s)</a>", dil.getLibrary().getId(), dil.getLibrary().getAlias(),
+          dil.getLibrary().getName()));
+      inner.add(String.format("<a href='/miso/sample/%d'>%s (%s)</a>", dil.getLibrary().getSample().getId(),
+          dil.getLibrary().getSample().getAlias(), dil.getLibrary().getSample().getName()));
+      StringBuilder indices = new StringBuilder();
+      collectIndices(indices, dil);
+      inner.add(indices.toString());
+      inner.add(dil.getLibrary().isLowQuality() ? "⚠" : "");
+      inner.add("<div style='cursor:inherit;' onclick=\"Pool.search.poolSearchSelectElement(" + poolInt + ", '" + dil.getId() + "', '"
+          + dil.getName() + "')\"><span class=\"ui-icon ui-icon-plusthick\"></span></div>");
+      data.add(inner);
+    }
+    rtn.put("iTotalRecords", allDilutionsCount);
+    rtn.put("iTotalDisplayRecords", requestManager.countLibraryDilutionsBySearchAndPlatform(search, platformType));
+    rtn.put("sEcho", "" + draw);
+    rtn.put("aaData", "" + data);
+    return rtn.toString();
   }
 
   @RequestMapping(value = "/{poolId}/experiment/{experimentId}", method = RequestMethod.GET)
