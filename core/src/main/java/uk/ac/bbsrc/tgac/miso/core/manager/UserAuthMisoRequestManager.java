@@ -2580,4 +2580,28 @@ public class UserAuthMisoRequestManager implements RequestManager {
     else
       throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Project " + projectId);
   }
+
+  @Override
+  public List<LibraryDilution> getLibraryDilutionsForPoolDataTable(int offset, int limit, String search, String sortDir, String sortCol,
+      PlatformType platform) throws IOException {
+    List<LibraryDilution> rtn = new ArrayList<>();
+    List<LibraryDilution> results = backingManager.getLibraryDilutionsForPoolDataTable(offset, limit, search, sortDir, sortCol, platform);
+    User currentUser = getCurrentUser();
+    for (LibraryDilution ld : results){
+      if (ld.userCanRead(currentUser)) {
+        rtn.add(ld);
+      }
+    }
+    return rtn;
+  }
+
+  @Override
+  public Integer countLibraryDilutionsByPlatform(PlatformType platform) throws IOException {
+    return backingManager.countLibraryDilutionsByPlatform(platform);
+  }
+
+  @Override
+  public Integer countLibraryDilutionsBySearchAndPlatform(String search, PlatformType platform) throws IOException {
+    return backingManager.countLibraryDilutionsBySearchAndPlatform(search, platform);
+  }
 }

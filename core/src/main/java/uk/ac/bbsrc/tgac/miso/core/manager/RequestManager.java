@@ -184,6 +184,11 @@ public interface RequestManager {
 
   public LibraryDilution getLibraryDilutionByBarcode(String barcode) throws IOException;
 
+  public Integer countLibraryDilutionsByPlatform(PlatformType platform) throws IOException;
+
+  public List<LibraryDilution> getLibraryDilutionsForPoolDataTable(int offset, int limit, String search, String sortDir, String sortCol,
+      PlatformType platform) throws IOException;
+
   public LibraryQC getLibraryQCById(long qcId) throws IOException;
 
   public LibraryType getLibraryTypeById(long libraryId) throws IOException;
@@ -478,7 +483,7 @@ public interface RequestManager {
 
   /**
    * PlatformTypes with existing sequencers.
-   * 
+   *
    * @throws IOException
    */
   public Collection<PlatformType> listActivePlatformTypes() throws IOException;
@@ -665,5 +670,7 @@ public interface RequestManager {
   public Long countContainersBySearch(String querystr) throws IOException;
 
   public Project lazyGetProjectById(long projectId) throws IOException;
+
+  public Integer countLibraryDilutionsBySearchAndPlatform(String search, PlatformType platform) throws IOException;
 
 }

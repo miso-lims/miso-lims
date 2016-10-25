@@ -635,49 +635,6 @@ public class PoolControllerHelperService {
     }
   }
 
-  private void collectIndices(StringBuilder render, Dilution dilution) {
-    for (Index index : dilution.getLibrary().getIndices()) {
-      render.append(index.getPosition());
-      render.append(": ");
-      render.append(index.getLabel());
-      render.append("<br/>");
-    }
-  }
-
-  public JSONObject createElementSelectDataTable(HttpSession session, JSONObject json) {
-    if (json.has("platform") && !isStringEmptyOrNull(json.getString("platform"))) {
-      try {
-        String platform = json.getString("platform");
-        long poolId = json.has("poolId") ? json.getLong("poolId") : 0L;
-        JSONObject j = new JSONObject();
-        JSONArray arr = new JSONArray();
-        for (LibraryDilution libraryDilution : requestManager.listAllLibraryDilutionsByPlatform((PlatformType.get(platform)))) {
-          JSONArray pout = new JSONArray();
-          pout.add(libraryDilution.getName());
-          pout.add(libraryDilution.getConcentration().toString());
-          pout.add(String.format("<a href='/miso/library/%d'>%s (%s)</a>", libraryDilution.getLibrary().getId(),
-              libraryDilution.getLibrary().getAlias(), libraryDilution.getLibrary().getName()));
-          pout.add(String.format("<a href='/miso/sample/%d'>%s (%s)</a>", libraryDilution.getLibrary().getSample().getId(),
-              libraryDilution.getLibrary().getSample().getAlias(), libraryDilution.getLibrary().getSample().getName()));
-          StringBuilder indices = new StringBuilder();
-          collectIndices(indices, libraryDilution);
-          pout.add(indices.toString());
-          pout.add(libraryDilution.getLibrary().isLowQuality() ? "⚠" : "");
-          pout.add("<div style='cursor:inherit;' onclick=\"Pool.search.poolSearchSelectElement(" + poolId + ", '" + libraryDilution.getId()
-              + "', '" + libraryDilution.getName() + "')\"><span class=\"ui-icon ui-icon-plusthick\"></span></div>");
-          arr.add(pout);
-        }
-        j.put("poolelements", arr);
-        return j;
-      } catch (IOException e) {
-        log.debug("Failed", e);
-        return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
-      }
-    } else {
-      return JSONUtils.SimpleJSONError("No platform specified");
-    }
-  }
-
   public JSONObject deletePoolNote(HttpSession session, JSONObject json) {
     Long poolId = json.getLong("poolId");
     Long noteId = json.getLong("noteId");

@@ -23,7 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.core.manager;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isDetailedSample;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -2917,6 +2918,22 @@ public class MisoRequestManager implements RequestManager {
     } else {
       throw new IOException("No projectStore available. Check that it has been declared in the Spring config.");
     }
+  }
+
+  @Override
+  public List<LibraryDilution> getLibraryDilutionsForPoolDataTable(int offset, int limit, String search, String sortDir, String sortCol,
+      PlatformType platform) throws IOException {
+    return libraryDilutionStore.listBySearchOffsetAndNumResultsAndPlatform(offset, limit, search, sortDir, sortCol, platform);
+  }
+
+  @Override
+  public Integer countLibraryDilutionsByPlatform(PlatformType platform) throws IOException {
+    return libraryDilutionStore.countByPlatform(platform);
+  }
+
+  @Override
+  public Integer countLibraryDilutionsBySearchAndPlatform(String search, PlatformType platform) throws IOException {
+    return libraryDilutionStore.countAllBySearchAndPlatform(search, platform);
   }
 
 }

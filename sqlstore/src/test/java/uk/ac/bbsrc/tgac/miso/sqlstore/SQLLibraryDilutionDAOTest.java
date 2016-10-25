@@ -8,6 +8,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Before;
@@ -73,14 +74,14 @@ public class SQLLibraryDilutionDAOTest extends AbstractDAOTest {
   }
 
   private void mockAutoIncrement(long value) {
-    Map<String, Object> rs = new HashMap<>();
+    final Map<String, Object> rs = new HashMap<>();
     rs.put("Auto_increment", value);
     Mockito.doReturn(rs).when(jdbcTemplate).queryForMap(Matchers.anyString());
   }
 
   @Test
   public void testGet() throws IOException {
-    LibraryDilution ld = dao.get(1L);
+    final LibraryDilution ld = dao.get(1L);
     assertNotNull(ld);
     assertEquals(1L, ld.getId());
   }
@@ -92,7 +93,7 @@ public class SQLLibraryDilutionDAOTest extends AbstractDAOTest {
 
   @Test
   public void testLazyGet() throws IOException {
-    LibraryDilution ld = dao.lazyGet(1L);
+    final LibraryDilution ld = dao.lazyGet(1L);
     assertNotNull(ld);
     assertEquals(1L, ld.getId());
   }
@@ -109,13 +110,13 @@ public class SQLLibraryDilutionDAOTest extends AbstractDAOTest {
 
   @Test
   public void testGetLibraryDilutionByBarcode() throws IOException {
-    LibraryDilution ld = dao.getLibraryDilutionByBarcode("LDI2::TEST_0001_Bn_R_PE_300_WG");
+    final LibraryDilution ld = dao.getLibraryDilutionByBarcode("LDI2::TEST_0001_Bn_R_PE_300_WG");
     assertNotNull(ld);
   }
 
   @Test
   public void testGetLibraryDilutionByBarcodeNone() throws IOException {
-    LibraryDilution ld = dao.getLibraryDilutionByBarcode("nonexistant barcode");
+    final LibraryDilution ld = dao.getLibraryDilutionByBarcode("nonexistant barcode");
     assertNull(ld);
   }
 
@@ -182,14 +183,14 @@ public class SQLLibraryDilutionDAOTest extends AbstractDAOTest {
 
   @Test
   public void testListAllLibraryDilutionsBySearchByName() throws IOException {
-    Collection<LibraryDilution> list = dao.listAllLibraryDilutionsBySearchAndPlatform("LDI3", PlatformType.ILLUMINA);
+    final Collection<LibraryDilution> list = dao.listAllLibraryDilutionsBySearchAndPlatform("LDI3", PlatformType.ILLUMINA);
     assertEquals(1, list.size());
     assertEquals("LDI3", list.iterator().next().getName());
   }
 
   @Test
   public void testListAllLibraryDilutionsBySearchByIdentificationBarcode() throws IOException {
-    Collection<LibraryDilution> list = dao.listAllLibraryDilutionsBySearchAndPlatform("LDI1::TEST_0001_Bn_P_PE_300_WG",
+    final Collection<LibraryDilution> list = dao.listAllLibraryDilutionsBySearchAndPlatform("LDI1::TEST_0001_Bn_P_PE_300_WG",
         PlatformType.ILLUMINA);
     assertEquals(1, list.size());
     assertEquals("LDI1::TEST_0001_Bn_P_PE_300_WG", list.iterator().next().getIdentificationBarcode());
@@ -296,7 +297,7 @@ public class SQLLibraryDilutionDAOTest extends AbstractDAOTest {
   @Test
   public void testRemove() throws IOException {
     dao.setCascadeType(javax.persistence.CascadeType.REFRESH);
-    LibraryDilution ld = dao.get(1L);
+    final LibraryDilution ld = dao.get(1L);
     assertNotNull(ld);
     assertTrue(dao.remove(ld));
     assertNull(dao.get(1L));
@@ -304,17 +305,17 @@ public class SQLLibraryDilutionDAOTest extends AbstractDAOTest {
 
   @Test
   public void testSaveNew() throws IOException {
-    long autoIncrementId = nextAutoIncrementId;
+    final long autoIncrementId = nextAutoIncrementId;
     assertNull(dao.get(autoIncrementId));
 
-    LibraryDilution ld = new LibraryDilution();
-    Library lib = new LibraryImpl();
+    final LibraryDilution ld = new LibraryDilution();
+    final Library lib = new LibraryImpl();
     lib.setId(1L);
     ld.setLibrary(lib);
     ld.setConcentration(12.5D);
     mockAutoIncrement(autoIncrementId);
     assertEquals(autoIncrementId, dao.save(ld));
-    LibraryDilution saved = dao.get(autoIncrementId);
+    final LibraryDilution saved = dao.get(autoIncrementId);
     assertNotNull(saved);
     assertEquals(Double.valueOf(12.5D), saved.getConcentration());
     nextAutoIncrementId++;
@@ -322,22 +323,54 @@ public class SQLLibraryDilutionDAOTest extends AbstractDAOTest {
 
   @Test
   public void testSaveEdit() throws IOException {
-    LibraryDilution oldLd = dao.get(1L);
+    final LibraryDilution oldLd = dao.get(1L);
     oldLd.setConcentration(1.23D);
     oldLd.setSecurityProfile(new SecurityProfile());
-    Library lib = new LibraryImpl();
+    final Library lib = new LibraryImpl();
     lib.setId(1L);
     oldLd.setLibrary(lib);
     assertEquals(oldLd.getId(), dao.save(oldLd));
-    LibraryDilution newLd = dao.get(1L);
+    final LibraryDilution newLd = dao.get(1L);
     assertEquals(oldLd.getId(), newLd.getId());
     assertEquals(oldLd.getConcentration(), newLd.getConcentration());
   }
 
+  @Test
+  public void testListBySearchOffsetAndNumResultsAndPlatformNoSearch_100() throws IOException {
+    final List<LibraryDilution> results = dao.listBySearchOffsetAndNumResultsAndPlatform(0, 100, null, "DESC", "name",
+        PlatformType.ILLUMINA);
+    assertNotNull(results);
+    assertEquals(14, results.size());
+  }
+
+  @Test
+  public void testListBySearchOffsetAndNumResultsAndPlatformNoSearch_5() throws IOException {
+    final List<LibraryDilution> results = dao.listBySearchOffsetAndNumResultsAndPlatform(0, 5, null, "DESC", "name", PlatformType.ILLUMINA);
+    assertNotNull(results);
+    assertEquals(5, results.size());
+  }
+
+  @Test
+  public void testListBySearchOffsetAndNumResultsAndPlatformSearchGeneral() throws IOException {
+    final List<LibraryDilution> results = dao.listBySearchOffsetAndNumResultsAndPlatform(0, 100, "LDI", "ASC", "name",
+        PlatformType.ILLUMINA);
+    assertNotNull(results);
+    assertEquals(14, results.size());
+  }
+
+  @Test
+  public void testListBySearchOffsetAndNumResultsAndPlatformSearch_1() throws IOException {
+    final List<LibraryDilution> results = dao.listBySearchOffsetAndNumResultsAndPlatform(0, 100, "LDI2", "ASC", "name",
+        PlatformType.ILLUMINA);
+    assertNotNull(results);
+    assertEquals(1, results.size());
+  }
+
   private void mockIlluminaLibraryDao() throws IOException {
-    Library lib = new LibraryImpl();
+    final Library lib = new LibraryImpl();
     lib.setPlatformName("Illumina");
     Mockito.when(libraryDAO.get(Mockito.anyLong())).thenReturn(lib);
   }
+
 
 }
