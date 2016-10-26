@@ -62,6 +62,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
 
   private static final String OPT_MISO_USER = "target.miso.user";
 
+  private static final String OPT_TOLERATE_ERRORS = "target.tolerateErrors";
   private static final String OPT_DRY_RUN = "target.dryrun";
   private static final String OPT_REPLACE_CHANGELOGS = "target.replaceChangeLogs";
   private static final String OPT_MERGE_RUN_POOLS = "target.mergeRunPools";
@@ -70,6 +71,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
   private final MisoServiceManager serviceManager;
   private final ValueTypeLookup valueTypeLookup;
 
+  private boolean tolerateErrors = false;
   private boolean dryrun = false;
   private boolean replaceChangeLogs = false;
   private boolean mergeRunPools = false;
@@ -79,6 +81,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
 
   public DefaultMigrationTarget(MigrationProperties properties) throws IOException {
     this.timeStamp = new Date();
+    this.tolerateErrors = properties.getBoolean(OPT_TOLERATE_ERRORS, false);
     this.dryrun = properties.getBoolean(OPT_DRY_RUN, false);
     this.replaceChangeLogs = properties.getBoolean(OPT_REPLACE_CHANGELOGS, false);
     this.mergeRunPools = properties.getBoolean(OPT_MERGE_RUN_POOLS, false);
@@ -120,7 +123,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
       doMigration(data);
       if (dryrun) {
         tx.rollback();
-        log.info("Dry run successful and rolled back.");
+        log.info("Dry run completed and rolled back.");
       } else {
         tx.commit();
       }
@@ -176,7 +179,11 @@ public class DefaultMigrationTarget implements MigrationTarget {
   public void saveSamples(final Collection<Sample> samples) throws IOException {
     log.info("Migrating samples...");
     for (Sample sample : samples) {
-      saveSample(sample);
+      try {
+        saveSample(sample);
+      } catch (Exception e) {
+        handleException(e);
+      }
     }
     log.info(samples.size() + " samples migrated.");
   }
@@ -192,7 +199,8 @@ public class DefaultMigrationTarget implements MigrationTarget {
         if (detailed.getParent().getSampleClass() == null && detailed.getParent().getPreMigrationId() != null) {
           Long preMigrationId = detailed.getParent().getPreMigrationId();
           // find previously-migrated parent
-          detailed.setParent((DetailedSample) serviceManager.getSampleDao().getByPreMigrationId(detailed.getParent().getPreMigrationId()));
+          detailed
+              .setParent((DetailedSample) serviceManager.getSampleDao().getByPreMigrationId(detailed.getParent().getPreMigrationId()));
           if (detailed.getParent() == null) {
             throw new IOException("No Sample found with pre-migration ID " + preMigrationId);
           }
@@ -566,6 +574,14 @@ public class DefaultMigrationTarget implements MigrationTarget {
    */
   private static interface TransactionWork<T> {
     public T doWork() throws IOException;
+  }
+
+  private void handleException(Exception e) throws IOException {
+    if (tolerateErrors) {
+      log.error("Error during save", e);
+      sessionFactory.getCurrentSession().clear();
+    }
+    else throw new IOException(e);
   }
 
 }
