@@ -279,7 +279,7 @@ public interface Run extends SecurableByProfile, Submittable<Document>, Comparab
    */
   public void setLastModifier(User user);
 
-  public Long getSequencingParametersId();
+  public SequencingParameters getSequencingParameters();
 
-  public void setSequencingParametersId(Long id);
+  public void setSequencingParameters(SequencingParameters parameters);
 }

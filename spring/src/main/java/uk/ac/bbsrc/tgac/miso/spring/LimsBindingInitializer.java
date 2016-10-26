@@ -74,6 +74,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.Submittable;
@@ -88,6 +89,7 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignDao;
+import uk.ac.bbsrc.tgac.miso.persistence.SequencingParametersDao;
 
 /**
  * Class that binds all the MISO model datatypes to the Spring form path types
@@ -113,6 +115,9 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
   @Autowired
   private IndexService indexService;
+
+  @Autowired
+  private SequencingParametersDao sequencingParametersDao;
 
   /**
    * Simplified interface to convert form data to fields.
@@ -557,6 +562,14 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
       }
 
     }.register(binder).registerMap(binder, HashMap.class, "indices");
+
+    new BindingConverterById<SequencingParameters>(SequencingParameters.class) {
+      @Override
+      public SequencingParameters resolveById(long id) throws Exception {
+        return sequencingParametersDao.getSequencingParameters(id);
+      }
+
+    }.register(binder);
 
     new BindingConverterById<emPCRDilution>(emPCRDilution.class) {
       @Override

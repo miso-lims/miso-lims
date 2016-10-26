@@ -55,6 +55,7 @@ import org.xml.sax.SAXException;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
@@ -326,7 +327,7 @@ public class IlluminaNotificationMessageConsumerMechanism
                     .listSequencerPartitionContainersByBarcode(run.getString("containerId"));
                 if (!pfs.isEmpty()) {
                   if (pfs.size() == 1) {
-                    SequencerPartitionContainer<SequencerPoolPartition> lf = new ArrayList<SequencerPartitionContainer<SequencerPoolPartition>>(
+                    SequencerPartitionContainer<SequencerPoolPartition> lf = new ArrayList<>(
                         pfs).get(0);
                     if (lf.getSecurityProfile() != null && r.getSecurityProfile() == null) {
                       r.setSecurityProfile(lf.getSecurityProfile());
@@ -406,7 +407,7 @@ public class IlluminaNotificationMessageConsumerMechanism
                         f.getName() + ":: WARNING - number of partitions found (" + f.getPartitions().size()
                             + ") doesn't match usual number of GA/HiSeq partitions (8)");
                     log.warn("Attempting fix...");
-                    Map<Integer, Partition> parts = new HashMap<Integer, Partition>();
+                    Map<Integer, Partition> parts = new HashMap<>();
                     Partition notNullPart = f.getPartitions().get(0);
                     long notNullPartID = notNullPart.getId();
                     int notNullPartNum = notNullPart.getPartitionNumber();
@@ -469,7 +470,7 @@ public class IlluminaNotificationMessageConsumerMechanism
   }
 
   public void processRunParams(JSONObject run, Run r) {
-    if (run.has(IlluminaTransformer.JSON_RUN_PARAMS) && r.getSequencingParametersId() == null) {
+    if (run.has(IlluminaTransformer.JSON_RUN_PARAMS) && r.getSequencingParameters() == null) {
       Document document;
       try {
         document = DocumentBuilderFactory.newInstance().newDocumentBuilder()
@@ -480,7 +481,7 @@ public class IlluminaNotificationMessageConsumerMechanism
 
           if (parameters.getPlatformId() == r.getSequencerReference().getPlatform().getId() && parameters.matches(document)) {
             log.debug("Matched run " + run.getString(IlluminaTransformer.JSON_RUN_NAME) + " to parameters " + parameters.getName());
-            r.setSequencingParametersId(parameters.getId());
+            r.setSequencingParameters(parameters);
             break;
           }
         }
