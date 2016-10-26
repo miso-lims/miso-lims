@@ -23,12 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
@@ -56,6 +51,7 @@ import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.store.SecurityStore;
 
 import net.sf.ehcache.CacheManager;
+
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
@@ -355,7 +351,7 @@ public class SQLRunDAOTest extends AbstractDAOTest {
     run.setFilePath("/far/far/away");
     run.setName("AwesomeRun");
     run.setLastModifier(user);
-    run.setSequencingParametersId(null);
+    run.setSequencingParameters(null);
 
     Mockito.when(namingScheme.validateField(Matchers.anyString(), Matchers.anyString())).thenReturn(true);
 

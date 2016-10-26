@@ -98,9 +98,9 @@ public abstract class AbstractRun implements Run {
   @OneToOne(targetEntity = StatusImpl.class, cascade = CascadeType.ALL)
   private Status status;
 
-  private Collection<RunQC> runQCs = new TreeSet<RunQC>();
+  private Collection<RunQC> runQCs = new TreeSet<>();
 
-  private Collection<Note> notes = new HashSet<Note>();
+  private Collection<Note> notes = new HashSet<>();
 
   @Transient
   @Enumerated(EnumType.STRING)
@@ -108,11 +108,11 @@ public abstract class AbstractRun implements Run {
   private SequencerReference sequencerReference;
 
   // listeners
-  private final Set<MisoListener> listeners = new HashSet<MisoListener>();
-  private Set<User> watchers = new HashSet<User>();
+  private final Set<MisoListener> listeners = new HashSet<>();
+  private Set<User> watchers = new HashSet<>();
   private User lastModifier;
 
-  private Long sequencingParametersId;
+  private SequencingParameters sequencingParameters;
 
   @Override
   public User getLastModifier() {
@@ -316,13 +316,13 @@ public abstract class AbstractRun implements Run {
   }
 
   @Override
-  public Long getSequencingParametersId() {
-    return sequencingParametersId;
+  public SequencingParameters getSequencingParameters() {
+    return sequencingParameters;
   }
 
   @Override
-  public void setSequencingParametersId(Long id) {
-    this.sequencingParametersId = id;
+  public void setSequencingParameters(SequencingParameters parameters) {
+    this.sequencingParameters = parameters;
   }
 
   public Document getSubmissionData() {
