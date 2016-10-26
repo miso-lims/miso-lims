@@ -222,7 +222,8 @@ public class EditPoolController {
     String sortCol;
     switch (sortColIndex) {
     case 0:
-      sortCol = "ld.name";
+      // sorting directly on name doesn't make sense in the UI
+      sortCol = "ld.dilutionId";
       break;
     case 1:
       sortCol = "ld.concentration";
