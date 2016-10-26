@@ -45,6 +45,7 @@ public abstract class BridgeCollectionUpdater<T> {
     }
 
     for (T item : collection) {
+      if (item == null) continue;
       MapSqlParameterSource params = new MapSqlParameterSource();
       params.addValue(parentColumn, targetId);
       Object id = getId(item);
