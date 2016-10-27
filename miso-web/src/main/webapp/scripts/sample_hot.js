@@ -754,6 +754,7 @@ Sample.hot = {
         trimDropdown: false,
         source: Sample.hot.getSampleClassesByCategory(),
         renderer: Hot.requiredAutocompleteRenderer,
+        readOnly: action == 'update',
         include: isDetailed
       },
       {
