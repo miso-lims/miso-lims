@@ -242,7 +242,11 @@ public class EditLibraryController {
   }
 
   private Collection<String> populatePlatformNames(List<String> current) throws IOException {
-    List<String> types = new ArrayList<>(PlatformType.platformTypeNames(requestManager.listActivePlatformTypes()));
+    Collection<PlatformType> base = requestManager.listActivePlatformTypes();
+    if (base.isEmpty()) {
+      base = Arrays.asList(PlatformType.values());
+    }
+    List<String> types = new ArrayList<>(PlatformType.platformTypeNames(base));
     for (String s : current) {
       if (s != null && !types.contains(s)) {
         types.add(s);
@@ -390,7 +394,7 @@ public class EditLibraryController {
     for (final PlatformType platformType : PlatformType.values()) {
       JSONObject platformTypeJson = new JSONObject();
       platformTypeJson.put("id", platformType.getKey());
-      platformTypeJson.put("active", activePlatforms.contains(platformType));
+      platformTypeJson.put("active", activePlatforms.isEmpty() || activePlatforms.contains(platformType));
       platformTypes.add(platformTypeJson);
     }
 
