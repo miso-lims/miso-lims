@@ -745,6 +745,7 @@ Library.ui = {
   },
 
   createIndexBox: function(id) {
+    if (typeof id == 'undefined') return;
     var selectedIndex = Library.ui.getCurrentIndexFamily().indices.filter(function(index) { return index.id == id; })[0];
     Library.ui.createIndexSelect(selectedIndex.position, id);
   },
