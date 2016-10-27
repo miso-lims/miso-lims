@@ -869,6 +869,7 @@ public class Dtos {
   }
 
   public static LibraryAdditionalInfo to(LibraryAdditionalInfoDto from) {
+    if (from == null) return null;
     LibraryAdditionalInfo to = new LibraryAdditionalInfoImpl();
     to.setLibraryId(from.getLibraryId());
     if (from.getPrepKit() != null) {

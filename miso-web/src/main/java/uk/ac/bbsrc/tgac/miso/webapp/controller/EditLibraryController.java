@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -263,14 +263,12 @@ public class EditLibraryController {
     return types;
   }
 
-
   @ModelAttribute("libraryStrategyTypes")
   public Collection<LibraryStrategyType> populateLibraryStrategyTypes() throws IOException {
     List<LibraryStrategyType> types = new ArrayList<>(requestManager.listAllLibraryStrategyTypes());
     Collections.sort(types);
     return types;
   }
-
 
   public void populateAvailableIndexFamilies(Library library, ModelMap model) throws IOException {
     if (isStringEmptyOrNull(library.getPlatformName())) {
@@ -783,12 +781,17 @@ public class EditLibraryController {
       ObjectMapper mapper = new ObjectMapper();
       List<LibraryDto> libraryDtos = new ArrayList<>();
       SampleClass sampleClass = null;
+      boolean hasPlain = false;
       for (Sample sample : requestManager.getSamplesByIdList(idList)) {
-        DetailedSample detailed = (DetailedSample) sample;
-        if (sampleClass == null) {
-          sampleClass = detailed.getSampleClass();
-        } else if (sampleClass.getId() != detailed.getSampleClass().getId()) {
-          throw new IOException("Can only create libraries when samples all have the same class.");
+        if (sample instanceof DetailedSample) {
+          DetailedSample detailed = (DetailedSample) sample;
+          if (sampleClass == null) {
+            sampleClass = detailed.getSampleClass();
+          } else if (sampleClass.getId() != detailed.getSampleClass().getId()) {
+            throw new IOException("Can only create libraries when samples all have the same class.");
+          }
+        } else {
+          hasPlain = true;
         }
         LibraryDto library = new LibraryDto();
         library.setParentSampleId(sample.getId());
@@ -801,6 +804,10 @@ public class EditLibraryController {
         }
         libraryDtos.add(library);
       }
+      if (hasPlain && sampleClass != null) {
+        throw new IOException("Cannot mix plain and detailed samples.");
+      }
+
       model.put("title", "Bulk Create Libraries");
       model.put("librariesJSON", mapper.writeValueAsString(libraryDtos));
       model.put("platformNames", mapper.writeValueAsString(populatePlatformNames(Collections.<String> emptyList())));

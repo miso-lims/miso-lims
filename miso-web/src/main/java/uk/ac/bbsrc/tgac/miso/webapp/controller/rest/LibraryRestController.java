@@ -57,6 +57,7 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
@@ -136,9 +137,12 @@ public class LibraryRestController extends RestController {
       indices.add(indexService.getIndexById(libraryDto.getIndex2Id()));
     }
     library.setIndices(indices);
-    library.setLibraryAdditionalInfo(Dtos.to(libraryDto.getLibraryAdditionalInfo()));
-    library.getLibraryAdditionalInfo().setCreatedBy(user);
-    library.getLibraryAdditionalInfo().setUpdatedBy(user);
+    LibraryAdditionalInfo lai = Dtos.to(libraryDto.getLibraryAdditionalInfo());
+    if (lai != null) {
+      library.setLibraryAdditionalInfo(lai);
+      library.getLibraryAdditionalInfo().setCreatedBy(user);
+      library.getLibraryAdditionalInfo().setUpdatedBy(user);
+    }
     return requestManager.saveLibrary(library);
   }
 
@@ -218,7 +222,7 @@ public class LibraryRestController extends RestController {
         libraryDto.writeUrls(uriBuilder);
       }
 
-      DataTablesResponseDto<LibraryDto> dtResponse = new DataTablesResponseDto<LibraryDto>();
+      DataTablesResponseDto<LibraryDto> dtResponse = new DataTablesResponseDto<>();
       dtResponse.setITotalRecords(numLibraries);
       dtResponse.setITotalDisplayRecords(numMatches);
       dtResponse.setAaData(libraryDtos);
