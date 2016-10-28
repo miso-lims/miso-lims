@@ -1312,8 +1312,12 @@ Sample.ui = {
       alert("Please select one or more Samples.");
       return false;
     }
-    var cats = Sample.ui.getUniqueCategoriesForSelected();
-    if (!Sample.detailedSample || cats.length <= 1) {
+    if (Sample.detailedSample) {
+      var cats = Sample.ui.getUniqueCategoriesForSelected();
+      if (cats.length > 1) {
+        Sample.ui.displayMultipleCategoriesError();
+        return false;
+      }
       if (cats[0] == 'Tissue Processing') {
         // requires special consideration as not all Tissue Processing sample classes require the same columns
         var classes = Sample.ui.getSampleClassesForSelected().map(function (sc) {
@@ -1330,11 +1334,8 @@ Sample.ui = {
           return false;
         }
       }
-      window.location="sample/bulk/edit/" + Sample.selectedIdsArray.join(',');
-    } else {
-      Sample.ui.displayMultipleCategoriesError();
-      return false;
     }
+    window.location="sample/bulk/edit/" + Sample.selectedIdsArray.join(',');
   },
 
   /**

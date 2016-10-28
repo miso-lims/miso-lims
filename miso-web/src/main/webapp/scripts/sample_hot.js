@@ -15,7 +15,9 @@ Sample.hot = {
    */
   processSampleOptionsFurther: function () {
     Sample.hot.addInstituteAliasToLab();
-    Sample.hot.sciName = 'Homo sapiens';
+    if (Hot.detailedSample) {
+      Sample.hot.sciName = 'Homo sapiens';
+    }
     if (document.getElementById('projectSelect')) {
       Sample.hot.addProjectEtcDropdowns();
     }
@@ -380,7 +382,8 @@ Sample.hot = {
     Hot.hotTable.render();
 
     // enable save button if it was disabled
-    if (Hot.saveButton && Hot.saveButton.classList.contains('disabled')) Hot.toggleButtonAndLoaderImage(Hot.saveButton);
+    var saveButton = document.getElementById('saveSamples');
+    if (saveButton.classList.contains('disabled')) Hot.toggleButtonAndLoaderImage(saveButton);
     
     Sample.hot.addDetailedQcHooks();
   },
@@ -620,8 +623,8 @@ Sample.hot = {
    */
   getAppropriateColumns: function (action, sourceSampleCategory, targetSampleCategory, showQcs) {
     var isDetailed = targetSampleCategory != null;
-    var sampleClass = Hot.getObjById(Sample.hot.sampleClassId, Hot.sampleOptions.sampleClassesDtos);
-    var sampleClassAlias = sampleClass.alias;
+    var sampleClass = Hot.detailedSample ? Hot.getObjById(Sample.hot.sampleClassId, Hot.sampleOptions.sampleClassesDtos) : null;
+    var sampleClassAlias = sampleClass ? sampleClass.alias : null;
 	  // We assume we have a linear progression of information that must be
 	  // collected as a sample progressed through the hierarchy.
     var progression = ['Identity', 'Tissue', 'Tissue Processing', 'Stock', 'Aliquot'];
@@ -1281,7 +1284,7 @@ Sample.hot = {
   /**
    * Checks if cells are all valid. If yes, POSTs samples that need to be saved. (detailed sample only)
    */
-  saveDetailedData: function () {
+  saveData: function () {
     // check that a project and class have been declared
     if (document.getElementById('projectSelect').value === '') {
       Hot.messages.failed = ['Select a Project before saving.'];
@@ -1337,74 +1340,6 @@ Sample.hot = {
       return sampleClass.id == childClassId;
     })[0].alias;
     return parentClassAlias + ' is not a valid parent for ' + childClassAlias + '.';
-  },
-
-  /**
-   * Checks if all cells are valid. If yes, POSTs samples that need to be saved. (plain sample only)
-   */
-  savePlainData: function () {
-    // check that a project has been declared
-    if (document.getElementById('projectSelect').value === '') {
-      Hot.messages.failed.push('Make sure that a Project is selected before saving.');
-      Hot.addErrors(Hot.messages);
-      return false;
-    }
-
-    var continueValidation = Hot.cleanRowsAndToggleSaveButton();
-    if (continueValidation === false) return false;
-
-    Hot.hotTable.validateCells(function (isValid) {
-      if (isValid) {
-        document.getElementById('errorMessages').innerHTML = '';
-        document.getElementById('saveErrors').classList.add('hidden');
-
-        // send it through the parser to get a sampleData array that isn't merely a reference to Hot.hotTable.getSourceData()
-        var sampleData = JSON.parse(JSON.parse(JSON.stringify(Hot.hotTable.getSourceData())));
-
-        var samplesArray = Hot.getArrayOfNewObjects(sampleData);
-
-        Fluxion.doAjax(
-          'sampleControllerHelperService',
-          'bulkSaveSamples',
-          {
-            'projectId': Sample.hot.selectedProjectId,
-            'samples': samplesArray,
-            'url': ajaxurl
-          },
-          {
-            'doOnSuccess': function (json) {
-              var taxonErrorSamples = json.taxonErrorSamples;
-              var savedSamples = json.savedSamples; // array of saved samples aliases
-
-              for (var j=0; j<sampleData.length; j++) {
-                // yell if a row's alias is not present in the returned (saved) data
-                if (savedSamples.indexOf(sampleData[j].alias) == -1) {
-                  Hot.messages.failed.push("Row " + (j+1) +": "+ " Sample did not save. Please check that the sample alias is unique!");
-                } else {
-                  for (var k=0; k<Hot.startData.length; k++) {
-                    if (Hot.startData[k].alias == sampleData[j].alias) {
-                      Hot.startData[k].saved = true;
-                      Hot.messages.success.push(Hot.startData[k].alias);
-                      break;
-                    }
-                  }
-                }
-              }
-              // display error/success messages
-              Hot.addSuccessesAndErrors();
-            },
-            'doOnError': function (json) {
-              Hot.messages.failed.push(json.error);
-              Hot.addErrors(Hot.messages);
-              return false;
-            }
-          }
-        );
-      } else {
-        Hot.validationFails();
-        return false;
-      }
-    });
   },
 
   /**

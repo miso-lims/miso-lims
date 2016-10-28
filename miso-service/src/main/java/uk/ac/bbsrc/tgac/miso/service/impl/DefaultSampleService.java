@@ -217,6 +217,9 @@ public class DefaultSampleService implements SampleService {
         }
         validateHierarchy(detailed);
       }
+    } else {
+      sample.setProject(projectStore.get(sample.getProject().getId()));
+      sample.inheritPermissions(sample.getProject());
     }
 
     // pre-save field generation
