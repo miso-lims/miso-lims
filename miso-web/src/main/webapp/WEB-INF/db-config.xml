@@ -73,6 +73,7 @@
         <value>uk.ac.bbsrc.tgac.miso.core.data.Index</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.IndexFamily</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleDerivedInfo</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode</value>
       </list>
     </property>
     <property name="hibernateProperties">

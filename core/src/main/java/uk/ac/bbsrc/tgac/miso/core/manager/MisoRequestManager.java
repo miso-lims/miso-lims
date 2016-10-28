@@ -23,8 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.core.manager;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isDetailedSample;
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -54,6 +53,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
@@ -93,6 +93,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.EmPCRStore;
 import uk.ac.bbsrc.tgac.miso.core.store.EntityGroupStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ExperimentStore;
 import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
+import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignCodeDao;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignDao;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryQcStore;
@@ -188,6 +189,8 @@ public class MisoRequestManager implements RequestManager {
   private SecurityStore securityStore;
   @Autowired
   private LibraryDesignDao libraryDesignDao;
+  @Autowired
+  private LibraryDesignCodeDao libraryDesignCodeDao;
 
   public void setSecurityStore(SecurityStore securityStore) {
     this.securityStore = securityStore;
@@ -223,6 +226,10 @@ public class MisoRequestManager implements RequestManager {
 
   public void setKitStore(KitStore kitStore) {
     this.kitStore = kitStore;
+  }
+
+  public void setLibraryDesignCodeDao(LibraryDesignCodeDao libraryDesignCodeDao) {
+    this.libraryDesignCodeDao = libraryDesignCodeDao;
   }
 
   public void setLibraryStore(LibraryStore libraryStore) {
@@ -1632,26 +1639,22 @@ public class MisoRequestManager implements RequestManager {
               "This library design is not valid for sample " + library.getSample().getName() + " because the class is not compatible.");
         }
         library.getLibraryAdditionalInfo().setLibraryDesign(design);
-        LibrarySelectionType selection = libraryStore.getLibrarySelectionTypeById(design.getLibrarySelectionType());
-        LibraryStrategyType strategy = libraryStore.getLibraryStrategyTypeById(design.getLibraryStrategyType());
-        LibraryType type = design.getLibraryType();
-        String platformName = design.getLibraryType().getPlatformType();
+        LibrarySelectionType selection = libraryStore.getLibrarySelectionTypeById(design.getLibrarySelectionType().getId());
+        LibraryStrategyType strategy = libraryStore.getLibraryStrategyTypeById(design.getLibraryStrategyType().getId());
         if (library.getLibrarySelectionType() != null && library.getLibrarySelectionType().getId() != selection.getId()) {
           throw new IOException("Library selection doesn't match library design.");
         }
         if (library.getLibraryStrategyType() != null && library.getLibraryStrategyType().getId() != strategy.getId()) {
           throw new IOException("Library strategy doesn't match library design.");
         }
-        if (library.getLibraryType() != null && library.getLibraryType().getId() != type.getId()) {
-          throw new IOException("Library type doesn't match library design.");
-        }
-        if (library.getPlatformName() != null && !library.getPlatformName().equals(platformName)) {
-          throw new IOException("Library platform doesn't match library design.");
+        if (library.getLibraryAdditionalInfo().getLibraryDesignCode().getId() != null
+            && library.getLibraryAdditionalInfo().getLibraryDesign().getId() != null
+            && library.getLibraryAdditionalInfo().getLibraryDesignCode().getId() != library.getLibraryAdditionalInfo().getLibraryDesign()
+                .getLibraryDesignCode().getId()) {
+          throw new IOException("Selected library design code does not match library design code for selected library design.");
         }
         library.setLibrarySelectionType(selection);
         library.setLibraryStrategyType(strategy);
-        library.setLibraryType(type);
-        library.setPlatformName(platformName);
       }
       return libraryStore.save(library);
     } else {
@@ -2728,6 +2731,11 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public Collection<LibraryDesign> listLibraryDesignByClass(SampleClass sampleClass) throws IOException {
     return libraryDesignDao.getLibraryDesignByClass(sampleClass);
+  }
+
+  @Override
+  public Collection<LibraryDesignCode> listLibraryDesignCodes() throws IOException {
+    return libraryDesignCodeDao.getLibraryDesignCodes();
   }
 
   @Override

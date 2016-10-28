@@ -68,7 +68,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.jackson.UserInfoMixin;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
-import uk.ac.bbsrc.tgac.miso.service.LibraryAdditionalInfoService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 /**
@@ -86,9 +85,6 @@ public class LibraryRestController extends RestController {
 
   @Autowired
   private RequestManager requestManager;
-
-  @Autowired
-  private LibraryAdditionalInfoService libraryAdditionalInfoService;
 
   @Autowired
   private AuthorizationManager authorizationManager;

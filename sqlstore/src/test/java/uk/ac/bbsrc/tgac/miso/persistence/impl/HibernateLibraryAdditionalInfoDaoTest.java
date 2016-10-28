@@ -20,6 +20,7 @@ import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryAdditionalInfo;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAdditionalInfoImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
@@ -81,6 +82,9 @@ public class HibernateLibraryAdditionalInfoDaoTest extends AbstractDAOTest {
     info.setLastUpdated(now);
     KitDescriptor kit = mockKitDescriptorInStore(1L);
     info.setPrepKit(kit);
+    LibraryDesignCode code = new LibraryDesignCode();
+    code.setId(1L);
+    info.setLibraryDesignCode(code);
     Library library = new LibraryImpl();
     library.setId(2L);
     info.setLibrary(library);

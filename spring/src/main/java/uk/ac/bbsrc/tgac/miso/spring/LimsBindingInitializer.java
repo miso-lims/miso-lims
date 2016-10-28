@@ -678,7 +678,12 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
         if (id == -1) {
           setValue(null);
         } else {
-          setValue(libraryDesignDao.getLibraryDesign(id));
+          try {
+            setValue(libraryDesignDao.getLibraryDesign(id));
+          } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+          }
         }
       }
 
