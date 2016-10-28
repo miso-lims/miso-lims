@@ -192,6 +192,7 @@ public class DefaultSampleServiceTestSuite {
   @Test
   public void testPlainSampleAliasGeneration() throws Exception {
     Sample sample = new SampleImpl();
+    mockShellProjectWithRealLookup(sample);
     String expectedAlias = "generated_alias";
     Mockito.when(sampleNamingScheme.hasGeneratorFor(Mockito.eq("alias"))).thenReturn(true);
     Mockito.when(sampleNamingScheme.generateNameFor(Mockito.eq("alias"), (Sample) Mockito.any())).thenReturn(expectedAlias);
@@ -207,6 +208,7 @@ public class DefaultSampleServiceTestSuite {
   @Test
   public void testPlainSampleIdentificationBarcodeGeneration() throws Exception {
     Sample sample = new SampleImpl();
+    mockShellProjectWithRealLookup(sample);
     assertNull("identificationBarcode should be null before save for test", sample.getIdentificationBarcode());
     sut.setAutoGenerateIdBarcodes(true);
     Mockito.when(sampleDao.getSample(Mockito.anyLong())).thenReturn(sample);
@@ -435,7 +437,7 @@ public class DefaultSampleServiceTestSuite {
   public void testUniqueExternalNamePerProjectTest() throws IOException {
     Project project = new ProjectImpl();
     project.setId(1L);
-    Set<Identity> idList = new HashSet<Identity>();
+    Set<Identity> idList = new HashSet<>();
     Identity id1 = new IdentityImpl();
     id1.setExternalName("String1,String2");
     id1.setProject(project);
@@ -450,7 +452,7 @@ public class DefaultSampleServiceTestSuite {
   public void testNonUniqueExternalNamePerProjectFailTest() throws IOException {
     Project project = new ProjectImpl();
     project.setId(1L);
-    Set<Identity> idList = new HashSet<Identity>();
+    Set<Identity> idList = new HashSet<>();
     Identity id1 = new IdentityImpl();
     id1.setExternalName("String1,String2");
     id1.setProject(project);
@@ -466,7 +468,7 @@ public class DefaultSampleServiceTestSuite {
   public void testNonUniqueExternalNamePerProjectPassTest() throws IOException {
     Project project = new ProjectImpl();
     project.setId(1L);
-    Set<Identity> idList = new HashSet<Identity>();
+    Set<Identity> idList = new HashSet<>();
     Identity id1 = new IdentityImpl();
     id1.setExternalName("String1,String2");
     id1.setProject(project);
