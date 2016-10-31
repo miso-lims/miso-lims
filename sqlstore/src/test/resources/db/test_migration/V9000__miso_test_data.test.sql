@@ -366,7 +366,7 @@ INSERT INTO `LibraryDesignCode`(`code`,`description`)
 VALUES ('TT', 'TEST');
 
 DELETE FROM `LibraryDesign`;
-INSERT INTO `LibraryDesign`(`libraryDesignId`, `name`, `sampleClassId`, `librarySelectionType`, `libraryStrategyType`, `libraryDesignCode`)
+INSERT INTO `LibraryDesign`(`libraryDesignId`, `name`, `sampleClassId`, `librarySelectionType`, `libraryStrategyType`, `libraryDesignCodeId`)
 VALUES (1, 'DESIGN1', 1, 1, 1, 1), 
 (2, 'DESIGN2', 2, 1, 1, 1);
 
@@ -579,5 +579,5 @@ INSERT INTO `TissueType`(`tissueTypeId`, `alias`, `description`, `createdBy`, `c
 VALUES (1,'Test Type','for testing',1,'2016-02-19 11:28:00',1,'2016-02-19 11:28:00');
 
 DELETE FROM `LibraryAdditionalInfo`;
-INSERT INTO `LibraryAdditionalInfo`(`libraryId`, `kitDescriptorId`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`, `libraryDesignCode`)
+INSERT INTO `LibraryAdditionalInfo`(`libraryId`, `kitDescriptorId`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`, `libraryDesignCodeId`)
 VALUES (1,1,1,'2016-02-19 11:28:00',1,'2016-02-19 11:28:00',1);

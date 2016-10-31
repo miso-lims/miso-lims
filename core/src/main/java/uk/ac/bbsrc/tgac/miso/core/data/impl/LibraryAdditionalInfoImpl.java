@@ -65,7 +65,7 @@ public class LibraryAdditionalInfoImpl implements LibraryAdditionalInfo {
   private LibraryDesign libraryDesign;
   
   @OneToOne
-  @JoinColumn(name = "libraryDesignCode", nullable = false)
+  @JoinColumn(name = "libraryDesignCodeId", nullable = false)
   private LibraryDesignCode libraryDesignCode;
 
   private Long preMigrationId;

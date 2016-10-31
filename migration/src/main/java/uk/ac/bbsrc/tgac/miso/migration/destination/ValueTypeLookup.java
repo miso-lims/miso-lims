@@ -14,6 +14,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
@@ -68,7 +69,9 @@ public class ValueTypeLookup {
   private Map<Long, LibraryType> libraryTypeById;
   private Map<String, Map<String, LibraryType>> libraryTypeByPlatformAndDescription;
   private Map<Long, LibraryDesign> libraryDesignById;
-  private Map<String, LibraryDesign> libraryDesignByName;
+  private Map<String, Map<String, LibraryDesign>> libraryDesignBySampleClassAliasAndName;
+  private Map<Long, LibraryDesignCode> libraryDesignCodeById;
+  private Map<String, LibraryDesignCode> libraryDesignCodeByCode;
   private Map<Long, Index> indexById;
   private Map<String, Map<String, Index>> indexByFamilyAndSequence;
   private Map<Long, QcType> sampleQcTypeById;
@@ -100,6 +103,7 @@ public class ValueTypeLookup {
     setLibraryStrategies(misoServiceManager.getLibraryDao().listAllLibraryStrategyTypes());
     setLibraryTypes(misoServiceManager.getLibraryDao().listAllLibraryTypes());
     setLibraryDesigns(misoServiceManager.getLibraryDesignDao().getLibraryDesigns());
+    setLibraryDesignCodes(misoServiceManager.getLibraryDesignCodeDao().getLibraryDesignCodes());
     setIndices(misoServiceManager.getIndexDao().listAllIndices());
     setSampleQcTypes(misoServiceManager.getSampleQcDao().listAllSampleQcTypes());
     setLibraryQcTypes(misoServiceManager.getLibraryQcDao().listAllLibraryQcTypes());
@@ -232,13 +236,29 @@ public class ValueTypeLookup {
 
   private void setLibraryDesigns(Collection<LibraryDesign> libraryDesigns) {
     Map<Long, LibraryDesign> mapById = new UniqueKeyHashMap<>();
-    Map<String, LibraryDesign> mapByName = new UniqueKeyHashMap<>();
+    Map<String, Map<String, LibraryDesign>> mapBySampleClassAliasAndName = new UniqueKeyHashMap<>();
     for (LibraryDesign ld : libraryDesigns) {
+      Map<String, LibraryDesign> mapByName = mapBySampleClassAliasAndName.get(ld.getSampleClass().getAlias());
+      if (mapByName == null) {
+        mapByName = new UniqueKeyHashMap<>();
+        mapBySampleClassAliasAndName.put(ld.getSampleClass().getAlias(), mapByName);
+      }
       mapByName.put(ld.getName(), ld);
       mapById.put(ld.getId(), ld);
     }
     this.libraryDesignById = mapById;
-    this.libraryDesignByName = mapByName;
+    this.libraryDesignBySampleClassAliasAndName = mapBySampleClassAliasAndName;
+  }
+
+  private void setLibraryDesignCodes(Collection<LibraryDesignCode> libraryDesignCodes) {
+    Map<Long, LibraryDesignCode> mapById = new UniqueKeyHashMap<>();
+    Map<String, LibraryDesignCode> mapByCode = new UniqueKeyHashMap<>();
+    for (LibraryDesignCode ldc : libraryDesignCodes) {
+      mapByCode.put(ldc.getCode(), ldc);
+      mapById.put(ldc.getId(), ldc);
+    }
+    this.libraryDesignCodeById = mapById;
+    this.libraryDesignCodeByCode = mapByCode;
   }
 
   private void setIndices(Collection<Index> indices) {
@@ -247,7 +267,7 @@ public class ValueTypeLookup {
     for (Index index : indices) {
       Map<String, Index> mapBySequence = mapByFamilyAndSequence.get(index.getFamily().getName());
       if (mapBySequence == null) {
-        mapBySequence = new UniqueKeyHashMap<String, Index>();
+        mapBySequence = new UniqueKeyHashMap<>();
         mapByFamilyAndSequence.put(index.getFamily().getName(), mapBySequence);
       }
       mapBySequence.put(index.getSequence(), index);
@@ -496,7 +516,25 @@ public class ValueTypeLookup {
   public LibraryDesign resolve(LibraryDesign libraryDesign) {
     if (libraryDesign == null) return null;
     if (libraryDesign.getId() != null) return libraryDesignById.get(libraryDesign.getId());
-    if (libraryDesign.getName() != null) return libraryDesignByName.get(libraryDesign.getName());
+    if (libraryDesign.getSampleClass() != null && libraryDesign.getSampleClass().getAlias() != null && libraryDesign.getName() != null) {
+      Map<String, LibraryDesign> mapByName = libraryDesignBySampleClassAliasAndName.get(libraryDesign.getSampleClass().getAlias());
+      return mapByName == null ? null : mapByName.get(libraryDesign.getName());
+    }
+    return null;
+  }
+
+  /**
+   * Attempts to find an existing LibraryDesignCode
+   * 
+   * @param LibraryDesignCode
+   *          a partially-formed LibraryDesignCode, which must have either its ID or its code set in order for this method to resolve the
+   *          LibraryDesignCode
+   * @return the existing LibraryDesignCode if a matching one is found; null otherwise
+   */
+  public LibraryDesignCode resolve(LibraryDesignCode libraryDesignCode) {
+    if (libraryDesignCode == null) return null;
+    if (libraryDesignCode.getId() != null) return libraryDesignCodeById.get(libraryDesignCode.getId());
+    if (libraryDesignCode.getCode() != null) return libraryDesignCodeByCode.get(libraryDesignCode.getCode());
     return null;
   }
 
@@ -585,12 +623,12 @@ public class ValueTypeLookup {
     if (detailedQcStatus.getDescription() != null) return detailedQcStatusByDescription.get(detailedQcStatus.getDescription());
     return null;
   }
-  
+
   /**
    * Resolves all value type entities for a Sample
    * 
    * @param sample the sample containing partially-formed value type entities to be resolved. Full, existing entities are loaded into sample
-   * in place of the partially-formed entities
+   *          in place of the partially-formed entities
    * @throws IOException if no value is found matching the available data in sample
    */
   public void resolveAll(Sample sample) throws IOException {
@@ -748,9 +786,14 @@ public class ValueTypeLookup {
 
       if (lai.getLibraryDesign() != null) { // optional field
         LibraryDesign ld = resolve(lai.getLibraryDesign());
-        if (ld == null) throw new IOException("LibraryDesign not found");
+        if (ld == null) throw new IOException(String.format("LibraryDesign not found (name=%s, sampleClass=%s)",
+            lai.getLibraryDesign().getName(), ((DetailedSample) lai.getLibrary().getSample()).getSampleClass().getAlias()));
         lai.setLibraryDesign(ld);
       }
+
+      LibraryDesignCode ldc = resolve(lai.getLibraryDesignCode());
+      if (ldc == null) throw new IOException(String.format("LibraryDesignCode %s not found", lai.getLibraryDesignCode().getCode()));
+      lai.setLibraryDesignCode(ldc);
     }
   }
 

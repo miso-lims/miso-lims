@@ -476,6 +476,10 @@
     <property name="kitStore" ref="sqlKitDAO" />
   </bean>
 
+  <bean name="hibernateLibraryDesignDao" class="uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDesignDao">
+    <property name="libraryDao" ref="sqlLibraryDAO" />
+  </bean>
+
   <bean name="projectStore" class="org.springframework.aop.framework.ProxyFactoryBean">
     <property name="proxyInterfaces">
       <value>uk.ac.bbsrc.tgac.miso.core.store.ProjectStore</value>

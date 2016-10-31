@@ -93,6 +93,7 @@
       Hot.saveButton = document.getElementById('saveLibraries');
       Library.hot.propagateOrEdit = "${method}";
       Library.designs = ${libraryDesignsJSON};
+      Hot.dropdownRef.libraryDesignCodes = ${libraryDesignCodesJSON};
       Hot.autoGenerateIdBarcodes = ${autoGenerateIdBarcodes};
       Library.hot.getLibraryTypeAliasLists();
 

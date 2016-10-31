@@ -47,7 +47,7 @@ public class LibraryDesign {
   @JoinColumn(name = "sampleClassId", nullable = false)
   private SampleClass sampleClass;
   @OneToOne(targetEntity = LibraryDesignCode.class)
-  @JoinColumn(name = "libraryDesignCode")
+  @JoinColumn(name = "libraryDesignCodeId")
   private LibraryDesignCode libraryDesignCode;
 
   public Long getId() {

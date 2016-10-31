@@ -259,12 +259,7 @@
 	</tr>
   </c:otherwise>
 </c:choose>
-<c:if test="${!empty library.sample && !empty library.libraryAdditionalInfo}">
-  <tr>
-    <td>Library Design:</td>
-    <td><miso:select id="libraryDesignTypes" path="libraryAdditionalInfo.libraryDesign" items="${libraryDesigns}" itemLabel="name" itemValue="id" defaultLabel="(None)" defaultValue="-1" onchange="Library.ui.changeDesign(${empty library.libraryType.id ? 0 : library.libraryType.id}, function(){})"/></td>
-  </tr>
-</c:if>
+
 <tr>
   <c:choose>
     <c:when test="${library.id == 0 or empty library.libraryType or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')
@@ -291,6 +286,15 @@
   </c:choose>
 </tr>
 <tr>
+<c:if test="${!empty library.sample && !empty library.libraryAdditionalInfo}">
+  <tr>
+    <td>Library Design:</td>
+    <td>
+      <miso:select id="libraryDesignTypes" path="libraryAdditionalInfo.libraryDesign" items="${libraryDesigns}" itemLabel="name" itemValue="id" defaultLabel="(None)" defaultValue="-1" onchange="Library.ui.changeDesign()"/>
+      &nbsp;&nbsp;&nbsp;Design Code: <miso:select id="libraryDesignCodes" path="libraryAdditionalInfo.libraryDesignCode" items="${libraryDesignCodes}" itemLabel="code" itemValue="id" defaultLabel="(None)" defaultValue="-1"/>
+    </td>
+  </tr>
+</c:if>
   <c:choose>
     <c:when test="${library.id == 0
                   or empty library.librarySelectionType
@@ -299,7 +303,7 @@
       <td>Library Selection Type:</td>
       <td>
         <form:select id="librarySelectionTypes" path="librarySelectionType" items="${librarySelectionTypes}"
-                     itemLabel="name" itemValue="id"/>
+                     itemLabel="name" itemValue="id" defaultLabel="(None)" defaultValue="-1" />
       </td>
     </c:when>
     <c:otherwise>
@@ -318,7 +322,7 @@
       <td>Library Strategy Type:</td>
       <td>
         <form:select id="libraryStrategyTypes" path="libraryStrategyType" items="${libraryStrategyTypes}"
-                     itemLabel="name" itemValue="id"/>
+                     itemLabel="name" itemValue="id" defaultLabel="(None)" defaultValue="-1" />
       </td>
     </c:when>
     <c:otherwise>
@@ -402,14 +406,6 @@
           itemValue="id" defaultLabel="SELECT" defaultValue=""/>
     </td>
   </tr>
-    <tr>
-    <td class="h">Tissue Origin:</td>
-    <td>${library.sampleTissue.tissueOrigin.alias}</td>
-  </tr>
-  <tr>
-    <td class="h">Tissue Type:</td>
-    <td>${library.sampleTissue.tissueType.alias}</td>
-  </tr>
   <c:if test="${not empty library.sample.groupId}">
   <tr>
     <td class="h">Group ID:</td>
@@ -425,6 +421,11 @@
     <td><form:checkbox id="archived" path="libraryAdditionalInfo.archived"/></td>
   </tr>
 </table>
+<script type="text/javascript">
+ jQuery(document).ready(function () {
+   Hot.detailedSample = ${detailedSample};
+ });
+</script>
 </c:if>
 
 <c:choose>

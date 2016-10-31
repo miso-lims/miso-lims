@@ -122,8 +122,12 @@ public class LibraryRestController extends RestController {
   private Long populateAndSaveLibraryFromDto(LibraryDto libraryDto, Library library, boolean create) throws IOException {
     User user = authorizationManager.getCurrentUser();
     library.setLastModifier(user);
-    library.setLibrarySelectionType(requestManager.getLibrarySelectionTypeById(libraryDto.getLibrarySelectionTypeId()));
-    library.setLibraryStrategyType(requestManager.getLibraryStrategyTypeById(libraryDto.getLibraryStrategyTypeId()));
+    if (libraryDto.getLibrarySelectionTypeId() != null) {
+      library.setLibrarySelectionType(requestManager.getLibrarySelectionTypeById(libraryDto.getLibrarySelectionTypeId()));
+    }
+    if (libraryDto.getLibraryStrategyTypeId() != null) {
+      library.setLibraryStrategyType(requestManager.getLibraryStrategyTypeById(libraryDto.getLibraryStrategyTypeId()));
+    }
     library.setLibraryType(requestManager.getLibraryTypeById(libraryDto.getLibraryTypeId()));
     List<Index> indices = new ArrayList<>();
     if (libraryDto.getIndex1Id() != null) {

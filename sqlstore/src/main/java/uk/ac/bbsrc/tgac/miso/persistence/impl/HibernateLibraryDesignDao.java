@@ -11,7 +11,6 @@ import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
@@ -19,9 +18,18 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignDao;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 
-@Repository
+/**
+ * This is the Hibernate DAO for LibraryDesigns and serves as the bridge between Hibernate and the existing SqlStore persistence layers.
+ * 
+ * The data from the LibraryDesign table is loaded via Hibernate, but Hibernate cannot follow the references to LibrarySelectionType and
+ * LibraryStrategyType from a LibraryDesign.
+ * Therefore, this implementation loads a LibraryDesign via Hibernate, then calls into the SqlStore persistence layer to gather the
+ * remaining data that Hibernate cannot access. Similarly, it then follows any necessary links on save. All the SqlStore-populated fields
+ * are marked “transient” in the LibraryDesign class.
+ */
 @Transactional(rollbackFor = Exception.class)
 public class HibernateLibraryDesignDao implements LibraryDesignDao {
+
   protected static final Logger log = LoggerFactory.getLogger(HibernateLibraryDesignDao.class);
 
   @Autowired
@@ -35,11 +43,10 @@ public class HibernateLibraryDesignDao implements LibraryDesignDao {
     this.sessionFactory = sessionFactory;
   }
 
-  @Autowired
-  private LibraryStore libraryStore;
+  private LibraryStore libraryDao;
 
-  public void setLibraryStore(LibraryStore libraryStore) {
-    this.libraryStore = libraryStore;
+  public void setLibraryDao(LibraryStore libraryDao) {
+    this.libraryDao = libraryDao;
   }
 
   @Override
@@ -71,10 +78,10 @@ public class HibernateLibraryDesignDao implements LibraryDesignDao {
 
   private LibraryDesign fetchSqlStore(LibraryDesign libraryDesign) throws IOException {
     if (libraryDesign != null && libraryDesign.getHibernateLibrarySelectionTypeId() != null) {
-      libraryDesign.setLibrarySelectionType(libraryStore.getLibrarySelectionTypeById(libraryDesign.getHibernateLibrarySelectionTypeId()));
+      libraryDesign.setLibrarySelectionType(libraryDao.getLibrarySelectionTypeById(libraryDesign.getHibernateLibrarySelectionTypeId()));
     }
     if (libraryDesign != null && libraryDesign.getHibernateLibraryStrategyTypeId() != null) {
-      libraryDesign.setLibraryStrategyType(libraryStore.getLibraryStrategyTypeById(libraryDesign.getHibernateLibrarySelectionTypeId()));
+      libraryDesign.setLibraryStrategyType(libraryDao.getLibraryStrategyTypeById(libraryDesign.getHibernateLibraryStrategyTypeId()));
     }
     return libraryDesign;
   }
