@@ -36,7 +36,7 @@ Library.hot = {
     });
   },
 
-/**
+  /**
    * Modifies attributes of LibraryDtos so Handsontable displays them for edit
    */
   prepLibrariesForEdit: function (libraries) {
@@ -106,7 +106,7 @@ Library.hot = {
     
     var aliasColIndex = Hot.getColIndex('alias');
     Hot.startData.forEach(function (library, index) {
-      if (!library.libraryAdditionalInfo.nonStandardAlias) {
+      if (!Hot.detailedSample || !library.libraryAdditionalInfo.nonStandardAlias) {
         Hot.hotTable.setCellMeta(index, aliasColIndex, 'validator', Library.hot.validateAlias);
       } else {
         Hot.hotTable.setCellMeta(index, aliasColIndex, 'renderer', Hot.nsAliasRenderer);
@@ -190,13 +190,13 @@ Library.hot = {
     index1Label: '',
     index2Label: '',
     volume: null,
-    libraryAdditionalInfo: {
+    libraryAdditionalInfo: Hot.detailedSample ? {
       prepKit: {
         id: '',
         name: ''
       },
       archived: false
-    }
+    } : null,
   },
   
   /**

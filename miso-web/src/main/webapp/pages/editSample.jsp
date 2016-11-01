@@ -499,11 +499,11 @@
               <td>
                 <c:choose>
                   <c:when test="${sample.id == 0}">
-                    <miso:select id="tissueMaterial" path="tissueMaterial" items="${tissueMaterials}" itemLabel="description"
+                    <miso:select id="tissueMaterial" path="tissueMaterial" items="${tissueMaterials}" itemLabel="alias"
                         itemValue="id" defaultLabel="SELECT" defaultValue=""/>
                   </c:when>
                   <c:otherwise>
-                    ${sample.tissueMaterial.description}
+                    ${sample.tissueMaterial.alias}
                   </c:otherwise>
                 </c:choose>
               </td>
@@ -738,14 +738,7 @@
 <div id="tab-2">
   <h1>
     Create Samples
-     <c:choose>
-      <c:when test="${detailedSample}">
-        <button id="saveDetailed" class="disabled fg-button ui-state-default ui-corner-all" disabled="disabled" onclick="Sample.hot.saveDetailedData();">Save</button>
-      </c:when>
-      <c:otherwise>
-        <button id="savePlain" class="fg-button ui-state-default ui-corner-all" onclick="Sample.hot.savePlainData();">Save Bulk</button>
-      </c:otherwise>
-      </c:choose>
+    <button id="saveSamples" class="disabled fg-button ui-state-default ui-corner-all" disabled="disabled" onclick="Sample.hot.saveData();">Save</button>
   </h1>
   <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#hothelp_arrowclick'), 'hothelpdiv');">Quick Help
     <div id="hothelp_arrowclick" class="toggleLeft"></div>
@@ -782,7 +775,9 @@
 	    </div>
 	    <div>
 	      <button id="makeTable" onclick="Sample.hot.makeNewSamplesTable();">Make Table</button>
-          <button id="lookupIdentities" onclick="Sample.hot.lookupIdentities();" disabled="disabled">Look up Identities</button>
+          <c:if test="${detailedSample}">
+            <button id="lookupIdentities" onclick="Sample.hot.lookupIdentities();" disabled="disabled">Look up Identities</button>
+          </c:if>
 	    </div>
 	  </div>
     <div class="clear"></div>
@@ -792,15 +787,9 @@
       Hot.dropdownRef = ${referenceDataJSON};
       Sample.hot.aliasGenerationEnabled = ${aliasGenerationEnabled};
       Hot.autoGenerateIdBarcodes = ${autoGenerateIdBarcodes};
-      Sample.hot.selectedProjectId = parseInt('${sample.project.id}') || null;
+      Sample.hot.selectedProjectId = <c:out value="${sample.project.id}" default="null"/>;
       Hot.detailedSample = JSON.parse(document.getElementById('HOTbulkForm').dataset.detailedSample);
-      if (Boolean(Hot.detailedSample)) {
-        Hot.fetchSampleOptions(Sample.hot.processSampleOptionsFurther);
-        Hot.saveButton = document.getElementById('saveDetailed');
-      } else {
-        Sample.hot.addProjectEtcDropdowns();
-        Hot.saveButton = document.getElementById('savePlain');
-      }
+      Hot.fetchSampleOptions(Sample.hot.processSampleOptionsFurther);
     </script>
   </div>
 </div>

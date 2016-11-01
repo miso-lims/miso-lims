@@ -114,15 +114,12 @@
       };
 
       // get SampleOptions and make the appropriate table
-      // TODO: implement for plain sample
-      if (Boolean(Hot.detailedSample)) {
-        Hot.saveButton.addEventListener('click', Library.hot.saveData, true);
-        
-        if (Library.hot.propagateOrEdit == 'Propagate') {
-          Hot.fetchSampleOptions(Library.hot.makeBulkCreateTable);
-  	    } else {
-  	      Hot.fetchSampleOptions(Library.hot.makeBulkUpdateTable);
-	      }
+      Hot.saveButton.addEventListener('click', Library.hot.saveData, true);
+
+      if (Library.hot.propagateOrEdit == 'Propagate') {
+        Hot.fetchSampleOptions(Library.hot.makeBulkCreateTable);
+      } else {
+        Hot.fetchSampleOptions(Library.hot.makeBulkUpdateTable);
       }
     });
   </script>

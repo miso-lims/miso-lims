@@ -265,11 +265,7 @@ var Hot = {
       if (data[i].saved) continue;
       
       var newObj = Hot.buildDtoFunc(data[i]);
-      if (Hot.detailedSample) {
-        arrayOfObjects.push(saveFunction(JSON.stringify(newObj), i, len));
-      } else {
-        arrayOfObjects.push(newObj);
-      }
+      arrayOfObjects.push(saveFunction(JSON.stringify(newObj), i, len));
     }
     return arrayOfObjects;
   },

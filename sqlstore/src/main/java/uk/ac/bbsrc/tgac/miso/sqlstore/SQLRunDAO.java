@@ -82,6 +82,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.SequencerReferenceStore;
 import uk.ac.bbsrc.tgac.miso.core.store.StatusStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.core.store.WatcherStore;
+import uk.ac.bbsrc.tgac.miso.persistence.SequencingParametersDao;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.BridgeCollectionUpdater;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
@@ -188,6 +189,8 @@ public class SQLRunDAO implements RunStore {
   private CascadeType cascadeType;
   private ChangeLogStore changeLogDAO;
   private SecurityStore securityDAO;
+  @Autowired
+  private SequencingParametersDao sequencingParametersDao;
 
   @Autowired
   private RunAlertManager runAlertManager;
@@ -339,7 +342,8 @@ public class SQLRunDAO implements RunStore {
     params.addValue("status_statusId", statusId);
     params.addValue("sequencerReference_sequencerReferenceId", run.getSequencerReference().getId());
     params.addValue("lastModifier", run.getLastModifier().getUserId());
-    params.addValue("sequencingParameters_parametersId", run.getSequencingParametersId());
+    params.addValue("sequencingParameters_parametersId",
+        run.getSequencingParameters() == null ? null : run.getSequencingParameters().getId());
 
     if (run.getId() == AbstractRun.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(TABLE_NAME).usingGeneratedKeyColumns("runId");
@@ -411,7 +415,7 @@ public class SQLRunDAO implements RunStore {
   public synchronized int[] saveAll(Collection<Run> runs) throws IOException {
     log.debug(">>> Entering saveAll with " + runs.size() + " runs");
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
-    List<SqlParameterSource> batch = new ArrayList<SqlParameterSource>();
+    List<SqlParameterSource> batch = new ArrayList<>();
     long autoIncrement = DbUtils.getAutoIncrement(template, TABLE_NAME);
 
     for (Run run : runs) {
@@ -455,7 +459,8 @@ public class SQLRunDAO implements RunStore {
         params.addValue("status_statusId", statusId);
         params.addValue("sequencerReference_sequencerReferenceId", run.getSequencerReference().getId());
         params.addValue("lastModifier", run.getLastModifier().getUserId());
-        params.addValue("sequencingParameters_parametersId", run.getSequencingParametersId());
+        params.addValue("sequencingParameters_parametersId",
+            run.getSequencingParameters() == null ? null : run.getSequencingParameters().getId());
 
         if (run.getId() == AbstractRun.UNSAVED_ID) {
           SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(TABLE_NAME).usingGeneratedKeyColumns("runId");
@@ -706,20 +711,22 @@ public class SQLRunDAO implements RunStore {
       }
       r.setFilePath(rs.getString("filePath"));
       r.setPlatformType(PlatformType.get(rs.getString("platformType")));
-      r.setSequencingParametersId(rs.getLong("sequencingParameters_parametersId"));
-      if (rs.wasNull()) {
-        r.setSequencingParametersId(null);
-      }
       r.setLastUpdated(rs.getDate("lastUpdated"));
 
       try {
         r.setLastModifier(securityDAO.getUserById(rs.getLong("lastModifier")));
         r.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
         r.setStatus(statusDAO.get(rs.getLong("status_statusId")));
-        r.setWatchers(new HashSet<User>(watcherDAO.getWatchersByEntityName(r.getWatchableIdentifier())));
+        r.setWatchers(new HashSet<>(watcherDAO.getWatchersByEntityName(r.getWatchableIdentifier())));
         if (r.getSecurityProfile() != null && r.getSecurityProfile().getOwner() != null) r.addWatcher(r.getSecurityProfile().getOwner());
         for (User u : watcherDAO.getWatchersByWatcherGroup("RunWatchers")) {
           r.addWatcher(u);
+        }
+        long parameterId = rs.getLong("sequencingParameters_parametersId");
+        if (rs.wasNull()) {
+          r.setSequencingParameters(null);
+        } else {
+          r.setSequencingParameters(sequencingParametersDao.getSequencingParameters(parameterId));
         }
 
         if (!isLazy()) {

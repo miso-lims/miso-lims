@@ -130,7 +130,7 @@
   <c:if test="${run.id != 0}">
     <tr>
       <td>Sequencing Parameters:</td>
-      <td><form:select id="sequencingParametersId" path="sequencingParametersId" items="${sequencingParameters}" itemLabel="name" itemValue="id"/></td>
+      <td><miso:select id="sequencingParameters" path="sequencingParameters" items="${sequencingParameters}" itemLabel="name" itemValue="id" defaultLabel="(None)" defaultValue="" /></td>
     </tr>
   </c:if>
   <tr>

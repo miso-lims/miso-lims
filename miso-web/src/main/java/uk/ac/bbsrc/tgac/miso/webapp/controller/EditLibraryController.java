@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -242,7 +242,11 @@ public class EditLibraryController {
   }
 
   private Collection<String> populatePlatformNames(List<String> current) throws IOException {
-    List<String> types = new ArrayList<>(PlatformType.platformTypeNames(requestManager.listActivePlatformTypes()));
+    Collection<PlatformType> base = requestManager.listActivePlatformTypes();
+    if (base.isEmpty()) {
+      base = Arrays.asList(PlatformType.values());
+    }
+    List<String> types = new ArrayList<>(PlatformType.platformTypeNames(base));
     for (String s : current) {
       if (s != null && !types.contains(s)) {
         types.add(s);
@@ -252,6 +256,28 @@ public class EditLibraryController {
     return types;
   }
 
+  @ModelAttribute("platformNamesString")
+  public String platformNamesString() throws IOException {
+    List<String> names = new ArrayList<>();
+    List<String> pn = new ArrayList<>(populatePlatformNames(Collections.<String> emptyList()));
+    for (String name : pn) {
+      names.add("\"" + name + "\"" + ":" + "\"" + name + "\"");
+    }
+    if (!pn.isEmpty()) {
+      names.add("\"selected\":" + "\"" + pn.get(0) + "\"");
+    }
+    return LimsUtils.join(names, ",");
+  }
+
+  @ModelAttribute("libraryTypesString")
+  public String libraryTypesString() throws IOException {
+    List<String> types = new ArrayList<>();
+    for (LibraryType t : populateLibraryTypes()) {
+      types.add("\"" + t.getDescription() + "\"" + ":" + "\"" + t.getDescription() + "\"");
+    }
+    return LimsUtils.join(types, ",");
+  }
+
   @ModelAttribute("librarySelectionTypes")
   public Collection<LibrarySelectionType> populateLibrarySelectionTypes() throws IOException {
     List<LibrarySelectionType> types = new ArrayList<>(requestManager.listAllLibrarySelectionTypes());
@@ -259,6 +285,14 @@ public class EditLibraryController {
     return types;
   }
 
+  @ModelAttribute("librarySelectionTypesString")
+  public String librarySelectionTypesString() throws IOException {
+    List<String> types = new ArrayList<>();
+    for (LibrarySelectionType t : populateLibrarySelectionTypes()) {
+      types.add("\"" + t.getName() + "\"" + ":" + "\"" + t.getName() + "\"");
+    }
+    return LimsUtils.join(types, ",");
+  }
 
   @ModelAttribute("libraryStrategyTypes")
   public Collection<LibraryStrategyType> populateLibraryStrategyTypes() throws IOException {
@@ -267,6 +301,14 @@ public class EditLibraryController {
     return types;
   }
 
+  @ModelAttribute("libraryStrategyTypesString")
+  public String libraryStrategyTypesString() throws IOException {
+    List<String> types = new ArrayList<>();
+    for (LibraryStrategyType t : populateLibraryStrategyTypes()) {
+      types.add("\"" + t.getName() + "\"" + ":" + "\"" + t.getName() + "\"");
+    }
+    return LimsUtils.join(types, ",");
+  }
 
   public void populateAvailableIndexFamilies(Library library, ModelMap model) throws IOException {
     if (isStringEmptyOrNull(library.getPlatformName())) {
@@ -390,7 +432,7 @@ public class EditLibraryController {
     for (final PlatformType platformType : PlatformType.values()) {
       JSONObject platformTypeJson = new JSONObject();
       platformTypeJson.put("id", platformType.getKey());
-      platformTypeJson.put("active", activePlatforms.contains(platformType));
+      platformTypeJson.put("active", activePlatforms.isEmpty() || activePlatforms.contains(platformType));
       platformTypes.add(platformTypeJson);
     }
 
@@ -779,12 +821,17 @@ public class EditLibraryController {
       ObjectMapper mapper = new ObjectMapper();
       List<LibraryDto> libraryDtos = new ArrayList<>();
       SampleClass sampleClass = null;
+      boolean hasPlain = false;
       for (Sample sample : requestManager.getSamplesByIdList(idList)) {
-        DetailedSample detailed = (DetailedSample) sample;
-        if (sampleClass == null) {
-          sampleClass = detailed.getSampleClass();
-        } else if (sampleClass.getId() != detailed.getSampleClass().getId()) {
-          throw new IOException("Can only create libraries when samples all have the same class.");
+        if (sample instanceof DetailedSample) {
+          DetailedSample detailed = (DetailedSample) sample;
+          if (sampleClass == null) {
+            sampleClass = detailed.getSampleClass();
+          } else if (sampleClass.getId() != detailed.getSampleClass().getId()) {
+            throw new IOException("Can only create libraries when samples all have the same class.");
+          }
+        } else {
+          hasPlain = true;
         }
         LibraryDto library = new LibraryDto();
         library.setParentSampleId(sample.getId());
@@ -797,6 +844,10 @@ public class EditLibraryController {
         }
         libraryDtos.add(library);
       }
+      if (hasPlain && sampleClass != null) {
+        throw new IOException("Cannot mix plain and detailed samples.");
+      }
+
       model.put("title", "Bulk Create Libraries");
       model.put("librariesJSON", mapper.writeValueAsString(libraryDtos));
       model.put("platformNames", mapper.writeValueAsString(populatePlatformNames(Collections.<String> emptyList())));
