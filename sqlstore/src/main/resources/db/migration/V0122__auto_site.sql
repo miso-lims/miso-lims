@@ -1,3 +1,15 @@
+-- TRAT_lab_and_organism_
+--StartNoTest
+--StartNoTest
+SET @time = NOW();
+SELECT userId INTO @user FROM User WHERE loginName = 'admin';
+INSERT INTO Lab (alias, instituteId, createdBy, creationDate, updatedBy, lastUpdated) VALUES
+  ('Paul Boutros', (SELECT instituteId FROM Institute WHERE alias = 'Ontario Institute for Cancer Research'), @user, @time, @user, @time);
+--EndNoTest
+--EndNoTest
+
+-- add_old_sequencers
+--StartNoTest
 --StartNoTest
 -- get rid of duplicate Ion Torrent PGM
 DELETE FROM Platform WHERE platformId = 21;
@@ -28,3 +40,5 @@ INSERT INTO SequencerReference (name, ipAddress, platformId, available, serialNu
 ('x016', UNHEX('7F000001'), (SELECT platformId FROM Platform WHERE  instrumentModel = 'AB SOLiD 5500xl'), 0, '23303-016', '2011-08-22', '2011-08-22', NULL),
 ('NB551056', UNHEX('7F000001'), (SELECT platformId FROM Platform WHERE  instrumentModel = 'NextSeq 550'), 1, 'NB551056', '2016-08-08', NULL, NULL);
 --EndNoTest
+--EndNoTest
+
