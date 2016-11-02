@@ -125,13 +125,14 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
 
   @Override
   public int getNextSiblingNumber(String partialAlias) throws IOException {
+    // Find highest existing siblingNumber matching this partialAlias
     Query query = currentSession().createQuery("select max(siblingNumber) from DetailedSampleImpl as ds"
             + " where alias IN (concat(:alias, ds.siblingNumber), concat(:alias, '0', ds.siblingNumber))");
     query.setString("alias", partialAlias);
     Number result = ((Number) query.uniqueResult());
     int next = result == null ? 0 : result.intValue();
 
-    // verify uniqueness and fix siblingNumbers for existing samples if necessary
+    // Increment and verify uniqueness. If alias is used, fix siblingNumber for existing sample. Repeat until unique
     Query verifyQuery = null;
     do {
       next++;

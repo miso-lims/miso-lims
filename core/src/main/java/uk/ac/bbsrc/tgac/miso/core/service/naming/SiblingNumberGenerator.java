@@ -9,7 +9,7 @@ public interface SiblingNumberGenerator {
    * be appended to the end of the partialAlias to form the complete alias
    * 
    * @param partialAlias the Sample alias being generated, missing only a siblingNumber
-   * @return the next siblingNumber that may be used for a new sample based on the provided partialAlias
+   * @return the lowest useable siblingNumber where the alias formed by {@code (partialAlias + siblingNumber)} does not yet exist
    * @throws IOException
    */
   public int getNextSiblingNumber(String partialAlias) throws IOException;
