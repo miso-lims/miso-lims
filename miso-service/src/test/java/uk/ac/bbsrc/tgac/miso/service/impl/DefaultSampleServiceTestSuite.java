@@ -26,6 +26,7 @@ import com.google.common.collect.Lists;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
@@ -33,6 +34,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleStockImpl;
@@ -433,10 +435,18 @@ public class DefaultSampleServiceTestSuite {
     assertEquals("Sample name should NOT be modifiable", old.getName(), result.getName());
   }
 
+  private ReferenceGenome humanReferenceGenome() {
+    ReferenceGenome referenceGenome = new ReferenceGenomeImpl();
+    referenceGenome.setAlias("hg19");
+    referenceGenome.setId(1L);
+    return referenceGenome;
+  }
+
   @Test
   public void testUniqueExternalNamePerProjectTest() throws IOException {
     Project project = new ProjectImpl();
     project.setId(1L);
+    project.setReferenceGenome(humanReferenceGenome());
     Set<Identity> idList = new HashSet<>();
     Identity id1 = new IdentityImpl();
     id1.setExternalName("String1,String2");
@@ -452,6 +462,7 @@ public class DefaultSampleServiceTestSuite {
   public void testNonUniqueExternalNamePerProjectFailTest() throws IOException {
     Project project = new ProjectImpl();
     project.setId(1L);
+    project.setReferenceGenome(humanReferenceGenome());
     Set<Identity> idList = new HashSet<>();
     Identity id1 = new IdentityImpl();
     id1.setExternalName("String1,String2");
@@ -468,6 +479,7 @@ public class DefaultSampleServiceTestSuite {
   public void testNonUniqueExternalNamePerProjectPassTest() throws IOException {
     Project project = new ProjectImpl();
     project.setId(1L);
+    project.setReferenceGenome(humanReferenceGenome());
     Set<Identity> idList = new HashSet<>();
     Identity id1 = new IdentityImpl();
     id1.setExternalName("String1,String2");

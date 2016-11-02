@@ -130,7 +130,7 @@
   <tr>
     <td>Reference Genome :*</td>
     <td>
-        <form:select id="referenceGenome" path="referenceGenomeId">
+        <form:select id="referenceGenome" path="referenceGenome">
             <form:options items="${referenceGenome}" itemValue="id" itemLabel="alias"/>
         </form:select>
     </td>

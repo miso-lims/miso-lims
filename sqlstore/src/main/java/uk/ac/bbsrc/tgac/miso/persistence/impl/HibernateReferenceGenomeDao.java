@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl;
 import uk.ac.bbsrc.tgac.miso.persistence.ReferenceGenomeDao;
 
 @Repository
@@ -28,11 +29,21 @@ public class HibernateReferenceGenomeDao implements ReferenceGenomeDao {
     return sessionFactory.getCurrentSession();
   }
 
+  public void setSessionFactory(SessionFactory sessionFactory) {
+    this.sessionFactory = sessionFactory;
+  }
+
   @Override
   public Collection<ReferenceGenome> listAllReferenceGenomeTypes() {
     Query query = currentSession().createQuery("from ReferenceGenomeImpl");
+    @SuppressWarnings("unchecked")
     List<ReferenceGenome> records = query.list();
     return records;
+  }
+
+  @Override
+  public ReferenceGenome getReferenceGenome(Long id) {
+    return (ReferenceGenome) currentSession().get(ReferenceGenomeImpl.class, id);
   }
 
 }

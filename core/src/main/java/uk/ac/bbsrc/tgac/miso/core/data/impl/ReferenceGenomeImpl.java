@@ -7,6 +7,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+
 import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
 
 @Entity
@@ -43,6 +46,24 @@ public class ReferenceGenomeImpl implements ReferenceGenome {
   @Override
   public String toString() {
     return "ReferenceGenomeImpl [referenceGenomeId=" + referenceGenomeId + ", alias=" + alias + "]";
+  }
+
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder(9, 335)
+        .append(alias)
+        .toHashCode();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    ReferenceGenomeImpl other = (ReferenceGenomeImpl) obj;
+    return new EqualsBuilder()
+        .append(alias, other.alias)
+        .isEquals();
   }
 
 }

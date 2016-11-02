@@ -70,6 +70,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
@@ -92,6 +93,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignCodeDao;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SequencingParametersDao;
+import uk.ac.bbsrc.tgac.miso.service.ReferenceGenomeService;
 
 /**
  * Class that binds all the MISO model datatypes to the Spring form path types
@@ -117,6 +119,9 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
   @Autowired
   private BoxStore sqlBoxDAO;
+
+  @Autowired
+  private ReferenceGenomeService referenceGenomeService;
 
   @Autowired
   private IndexService indexService;
@@ -673,8 +678,17 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
       }
     }.register(binder).register(binder, Set.class, "kitDescriptors");
 
+    new BindingConverterById<ReferenceGenome>(ReferenceGenome.class) {
+
+      @Override
+      public ReferenceGenome resolveById(long id) throws Exception {
+        return referenceGenomeService.get(id);
+      }
+    }.register(binder).register(binder, Set.class, "referenceGenomes");
+
     new BindingConverterByPrefixDispatch<>(Dilution.class).add(ldiResolver).add(ediResolver).register(binder, Set.class,
         "poolableElements");
+
 
     binder.registerCustomEditor(LibraryDesign.class, new PropertyEditorSupport() {
       @Override
