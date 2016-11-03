@@ -33,7 +33,7 @@ public class HibernateSequencingParametersDao implements SequencingParametersDao
   private PlatformStore platformStore;
 
   private SequencingParameters fetchSqlStore(SequencingParameters sp) throws IOException {
-    sp.setPlatform(platformStore.get(sp.getPlatformId()));
+    sp.setPlatform(getPlatformStore().get(sp.getPlatformId()));
     return sp;
   }
 
@@ -93,6 +93,18 @@ public class HibernateSequencingParametersDao implements SequencingParametersDao
       log.error("Failed to get sequencing parameters", e);
       return Collections.emptyIterator();
     }
+  }
+
+  public void setSessionFactory(SessionFactory sessionFactory) {
+    this.sessionFactory = sessionFactory;
+  }
+
+  public PlatformStore getPlatformStore() {
+    return platformStore;
+  }
+
+  public void setPlatformStore(PlatformStore platformStore) {
+    this.platformStore = platformStore;
   }
 
 }

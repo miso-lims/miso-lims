@@ -726,7 +726,7 @@ public class SQLRunDAO implements RunStore {
         if (rs.wasNull()) {
           r.setSequencingParameters(null);
         } else {
-          r.setSequencingParameters(sequencingParametersDao.getSequencingParameters(parameterId));
+          r.setSequencingParameters(getSequencingParametersDao().getSequencingParameters(parameterId));
         }
 
         if (!isLazy()) {
@@ -824,6 +824,14 @@ public class SQLRunDAO implements RunStore {
       sortCol = "r." + sortCol;
     }
     return sortCol;
+  }
+
+  public SequencingParametersDao getSequencingParametersDao() {
+    return sequencingParametersDao;
+  }
+
+  public void setSequencingParametersDao(SequencingParametersDao sequencingParametersDao) {
+    this.sequencingParametersDao = sequencingParametersDao;
   }
 
 }
