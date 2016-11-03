@@ -869,6 +869,7 @@ public class MisoServiceManager {
     dao.setSequencerReferenceDAO(sequencerReferenceDao);
     dao.setStatusDAO(statusDao);
     dao.setWatcherDAO(watcherDao);
+    dao.setSequencingParametersDao(sequencingParametersDao);
     dao.setCascadeType(CascadeType.PERSIST);
     setRunDao(dao);
   }
@@ -1392,10 +1393,10 @@ public class MisoServiceManager {
 
   public void setSequencingParametersDao(HibernateSequencingParametersDao sequencingParametersDao) {
     this.sequencingParametersDao = sequencingParametersDao;
-    updateSequencingParametersDao();
+    updateSequencingParametersDaoDependencies();
   }
 
-  private void updateSequencingParametersDao() {
+  private void updateSequencingParametersDaoDependencies() {
     if (runDao != null) {
       runDao.setSequencingParametersDao(getSequencingParametersDao());
     }
