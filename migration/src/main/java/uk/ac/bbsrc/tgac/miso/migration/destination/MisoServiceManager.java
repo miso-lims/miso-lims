@@ -47,6 +47,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleNumberPerProjectDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSamplePurposeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleValidRelationshipDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSequencingParametersDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSubprojectDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueMaterialDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueOriginDao;
@@ -146,6 +147,7 @@ public class MisoServiceManager {
   private HibernateLibraryAdditionalInfoDao libraryAdditionalInfoDao;
   private HibernateLibraryDesignDao libraryDesignDao;
   private HibernateIndexDao indexDao;
+  private HibernateSequencingParametersDao sequencingParametersDao;
 
   /**
    * Constructs a new MisoServiceManager with no services initialized
@@ -216,6 +218,7 @@ public class MisoServiceManager {
     m.setDefaultIndexDao();
     m.setDefaultDaoLookup();
     m.setDefaultPoolQcDao();
+    m.setDefaultSequencingParametersDao();
 
     User migrationUser = m.getsecurityStore().getUserByLoginName(username);
     if (migrationUser == null) throw new IllegalArgumentException("User '" + username + "' not found");
@@ -866,6 +869,7 @@ public class MisoServiceManager {
     dao.setSequencerReferenceDAO(sequencerReferenceDao);
     dao.setStatusDAO(statusDao);
     dao.setWatcherDAO(watcherDao);
+    dao.setSequencingParametersDao(sequencingParametersDao);
     dao.setCascadeType(CascadeType.PERSIST);
     setRunDao(dao);
   }
@@ -1374,6 +1378,28 @@ public class MisoServiceManager {
 
   private void updatePoolQcDaoDependencies() {
     if (poolDao != null) poolDao.setPoolQcDAO(poolQcDao);
+  }
+
+  private void setDefaultSequencingParametersDao() {
+    HibernateSequencingParametersDao dao = new HibernateSequencingParametersDao();
+    dao.setSessionFactory(sessionFactory);
+    dao.setPlatformStore(platformDao);
+    setSequencingParametersDao(dao);
+  }
+
+  public HibernateSequencingParametersDao getSequencingParametersDao() {
+    return sequencingParametersDao;
+  }
+
+  public void setSequencingParametersDao(HibernateSequencingParametersDao sequencingParametersDao) {
+    this.sequencingParametersDao = sequencingParametersDao;
+    updateSequencingParametersDaoDependencies();
+  }
+
+  private void updateSequencingParametersDaoDependencies() {
+    if (runDao != null) {
+      runDao.setSequencingParametersDao(getSequencingParametersDao());
+    }
   }
 
 }
