@@ -68,7 +68,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.jackson.UserInfoMixin;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
-import uk.ac.bbsrc.tgac.miso.service.LibraryAdditionalInfoService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 /**
@@ -86,9 +85,6 @@ public class LibraryRestController extends RestController {
 
   @Autowired
   private RequestManager requestManager;
-
-  @Autowired
-  private LibraryAdditionalInfoService libraryAdditionalInfoService;
 
   @Autowired
   private AuthorizationManager authorizationManager;
@@ -126,8 +122,12 @@ public class LibraryRestController extends RestController {
   private Long populateAndSaveLibraryFromDto(LibraryDto libraryDto, Library library, boolean create) throws IOException {
     User user = authorizationManager.getCurrentUser();
     library.setLastModifier(user);
-    library.setLibrarySelectionType(requestManager.getLibrarySelectionTypeById(libraryDto.getLibrarySelectionTypeId()));
-    library.setLibraryStrategyType(requestManager.getLibraryStrategyTypeById(libraryDto.getLibraryStrategyTypeId()));
+    if (libraryDto.getLibrarySelectionTypeId() != null) {
+      library.setLibrarySelectionType(requestManager.getLibrarySelectionTypeById(libraryDto.getLibrarySelectionTypeId()));
+    }
+    if (libraryDto.getLibraryStrategyTypeId() != null) {
+      library.setLibraryStrategyType(requestManager.getLibraryStrategyTypeById(libraryDto.getLibraryStrategyTypeId()));
+    }
     library.setLibraryType(requestManager.getLibraryTypeById(libraryDto.getLibraryTypeId()));
     List<Index> indices = new ArrayList<>();
     if (libraryDto.getIndex1Id() != null) {

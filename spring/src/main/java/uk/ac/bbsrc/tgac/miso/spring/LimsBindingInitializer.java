@@ -66,6 +66,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -88,6 +89,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
+import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignCodeDao;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SequencingParametersDao;
 
@@ -109,6 +111,9 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
   @Autowired
   private LibraryDesignDao libraryDesignDao;
+
+  @Autowired
+  private LibraryDesignCodeDao libraryDesignCodeDao;
 
   @Autowired
   private BoxStore sqlBoxDAO;
@@ -678,11 +683,29 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
         if (id == -1) {
           setValue(null);
         } else {
-          setValue(libraryDesignDao.getLibraryDesign(id));
+          try {
+            setValue(libraryDesignDao.getLibraryDesign(id));
+          } catch (IOException e) {
+            log.error("Fetching LibraryDesign " + id, e);
+            throw new IllegalArgumentException("Cannot find library design with id " + element);
+          }
         }
       }
 
     });
+
+    binder.registerCustomEditor(LibraryDesignCode.class, new PropertyEditorSupport() {
+      @Override
+      public void setAsText(String element) throws IllegalArgumentException {
+        long id = Long.parseLong(element);
+        if (id == -1) {
+          setValue(null);
+        } else {
+          setValue(libraryDesignCodeDao.getLibraryDesignCode(id));
+        }
+      }
+    });
+
     binder.registerCustomEditor(BoxUse.class, new PropertyEditorSupport() {
       @Override
       public void setAsText(String element) throws IllegalArgumentException {

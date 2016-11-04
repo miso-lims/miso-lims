@@ -95,6 +95,10 @@ public class HibernateSequencingParametersDao implements SequencingParametersDao
     }
   }
 
+  public SessionFactory getSessionFactory() {
+    return sessionFactory;
+  }
+
   public void setSessionFactory(SessionFactory sessionFactory) {
     this.sessionFactory = sessionFactory;
   }

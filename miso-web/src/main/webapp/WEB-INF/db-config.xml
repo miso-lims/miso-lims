@@ -73,6 +73,7 @@
         <value>uk.ac.bbsrc.tgac.miso.core.data.Index</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.IndexFamily</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleDerivedInfo</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode</value>
       </list>
     </property>
     <property name="hibernateProperties">
@@ -473,6 +474,10 @@
   
   <bean id="hibernateLibraryAdditionalInfoDao" class="uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryAdditionalInfoDao">
     <property name="kitStore" ref="sqlKitDAO" />
+  </bean>
+
+  <bean name="hibernateLibraryDesignDao" class="uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDesignDao">
+    <property name="libraryDao" ref="sqlLibraryDAO" />
   </bean>
 
   <bean name="projectStore" class="org.springframework.aop.framework.ProxyFactoryBean">

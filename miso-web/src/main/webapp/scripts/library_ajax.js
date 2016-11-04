@@ -60,9 +60,14 @@ var Library = Library || {
     jQuery('#volume').attr('data-parsley-maxlength', '10');
     jQuery('#volume').attr('data-parsley-type', 'number');
 
-    // Prep Kit validation
-    jQuery('#libraryKit').attr('class', 'form-control');
-    jQuery('#libraryKit').attr('data-parsley-required', 'true');
+    if (Hot.detailedSample) {
+      // Prep Kit validation
+      jQuery('#libraryKit').attr('class', 'form-control');
+      jQuery('#libraryKit').attr('data-parsley-required', 'true');
+      
+      jQuery('#libraryDesignCodes').attr('class', 'form-control');
+      jQuery('#libraryDesignCodes').attr('data-parsley-required', 'true');
+    }
 
     Fluxion.doAjax(
       'libraryControllerHelperService',
@@ -1255,49 +1260,25 @@ Library.ui = {
     });
   },
 
-  changeDesign: function(originalLibraryTypeId, callback) {
+  changeDesign: function(callback) {
     var designSelect = document.getElementById('libraryDesignTypes');
     var selection = document.getElementById('librarySelectionTypes');
     var strategy = document.getElementById('libraryStrategyTypes');
-    var libraryType = document.getElementById('libraryTypes');
-    var platform = document.getElementById('platformNames');
+    var code = document.getElementById('libraryDesignCodes');
     if (designSelect == null || designSelect.value == -1) {
       selection.disabled = false;
       strategy.disabled = false;
-      libraryType.disabled = false;
-      platform.disabled = false;
-      callback();
+      code.disabled = false;
+      if (typeof callback == 'function') callback();
     } else {
       var matchedDesigns = Library.designs.filter(function (rule) { return rule.id == designSelect.value; });
       if (matchedDesigns.length == 1) {
-        selection.value = matchedDesigns[0].librarySelectionType;
+        selection.value = matchedDesigns[0].librarySelectionType.id;
         selection.disabled = true;
-        strategy.value = matchedDesigns[0].libraryStrategyType;
+        strategy.value = matchedDesigns[0].libraryStrategyType.id;
         strategy.disabled = true;
-        platform.disabled = true;
-        libraryType.disabled = true;
-        if (platform.value != matchedDesigns[0].libraryType.platformType) {
-          platform.value = matchedDesigns[0].libraryType.platformType;
-          Fluxion.doAjax(
-            'libraryControllerHelperService',
-            'changePlatformName',
-            {
-              'originalLibraryTypeId': originalLibraryTypeId,
-              'platform': platform.value,
-              'url': ajaxurl
-            },
-            {
-              'doOnSuccess': function(data) {
-                Library.ui.processPlatformChange(data);
-                libraryType.value = matchedDesigns[0].libraryType.id;
-                callback();
-              }
-            }
-          );
-        } else {
-          libraryType.value = matchedDesigns[0].libraryType.id;
-          callback();
-        }
+        code.value = matchedDesigns[0].libraryDesignCode.id;
+        code.disabled = true;
       }
     }
   }

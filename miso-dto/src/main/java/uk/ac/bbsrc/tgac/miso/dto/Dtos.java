@@ -31,6 +31,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
@@ -842,6 +843,22 @@ public class Dtos {
     return to;
   }
 
+  public static LibraryDesignCodeDto asDto(LibraryDesignCode from) {
+    LibraryDesignCodeDto dto = new LibraryDesignCodeDto();
+    dto.setId(from.getId());
+    dto.setCode(from.getCode());
+    dto.setDescription(from.getDescription());
+    return dto;
+  }
+
+  public static LibraryDesignCode to(LibraryDesignCodeDto from) {
+    LibraryDesignCode to = new LibraryDesignCode();
+    if (from.getId() != null) to.setId(from.getId());
+    to.setCode(from.getCode());
+    to.setDescription(from.getDescription());
+    return to;
+  }
+
   public static LibraryAdditionalInfoDto asDto(LibraryAdditionalInfo from) {
     LibraryAdditionalInfoDto dto = new LibraryAdditionalInfoDto();
     dto.setLibraryId(from.getLibraryId());
@@ -856,6 +873,7 @@ public class Dtos {
     if (from.getLibraryDesign() != null) {
       dto.setLibraryDesignId(from.getLibraryDesign().getId());
     }
+    dto.setLibraryDesignCodeId(from.getLibraryDesignCode().getId());
     dto.setNonStandardAlias(from.hasNonStandardAlias());
     return dto;
   }
@@ -880,6 +898,9 @@ public class Dtos {
       design.setId(from.getLibraryDesignId());
       to.setLibraryDesign(design);
     }
+    LibraryDesignCode ldCode = new LibraryDesignCode();
+    ldCode.setId(from.getLibraryDesignCodeId());
+    to.setLibraryDesignCode(ldCode);
     to.setArchived(from.getArchived());
     to.setNonStandardAlias(from.getNonStandardAlias());
     return to;

@@ -6,10 +6,10 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sourceforge.fluxion.spi.ServiceProvider;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import net.sourceforge.fluxion.spi.ServiceProvider;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
@@ -20,9 +20,9 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 public class OicrLibraryNamingScheme implements RequestManagerAwareNamingScheme<Library> {
   protected static final Logger log = LoggerFactory.getLogger(OicrLibraryNamingScheme.class);
 
-  private final Map<String, Boolean> allowDuplicateMap = new HashMap<String, Boolean>();
-  private final Map<String, Pattern> validationMap = new HashMap<String, Pattern>();
-  private final Map<String, NameGenerator<Library>> customNameGeneratorMap = new HashMap<String, NameGenerator<Library>>();
+  private final Map<String, Boolean> allowDuplicateMap = new HashMap<>();
+  private final Map<String, Pattern> validationMap = new HashMap<>();
+  private final Map<String, NameGenerator<Library>> customNameGeneratorMap = new HashMap<>();
   private RequestManager requestManager;
 
   public static final String DEFAULT_NAME_REGEX = "([A-Z]{3})([0-9]+)";
@@ -86,14 +86,8 @@ public class OicrLibraryNamingScheme implements RequestManagerAwareNamingScheme<
             } else if (l.getLibraryType().getDescription().equals("Single End")) {
               libraryType = "SE";
             }
-            String sourceTemplateType = "??";
-            if (l.getLibraryStrategyType().getName().equals("WGS")) {
-              sourceTemplateType = "WG";
-            } else if (l.getLibraryStrategyType().getName().equals("AMPLICON")) {
-              sourceTemplateType = "TS";
-            }
-            String estimateInsertSize = "???";
-            estimateInsertSize = "300";
+            String libraryDesignCode = l.getLibraryAdditionalInfo().getLibraryDesignCode().getCode();
+            String estimateInsertSize = "300";
             StringBuilder sb = new StringBuilder();
             sb.append(m.group(1)); // PCSI (project name)
             sb.append("_").append(m.group(2)); // 0123 (patient number)
@@ -101,7 +95,7 @@ public class OicrLibraryNamingScheme implements RequestManagerAwareNamingScheme<
             sb.append("_").append(m.group(4)); // R (tissue type)
             sb.append("_").append(libraryType); // PE (library type)
             sb.append("_").append(estimateInsertSize); // 300 (estimated insert size)
-            sb.append("_").append(sourceTemplateType); // WG (source template type)
+            sb.append("_").append(libraryDesignCode); // WG (source template type)
             String libraryAlias = sb.toString();
             // String la = m.group(1) + "_" + m.group(2) + "-" + (numLibs + 1) + "_" + m.group(3);
             if (validateField("alias", libraryAlias)) {

@@ -16,8 +16,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.LibraryAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.persistence.LibraryAdditionalInfoDao;
-import uk.ac.bbsrc.tgac.miso.persistence.TissueOriginDao;
-import uk.ac.bbsrc.tgac.miso.persistence.TissueTypeDao;
 import uk.ac.bbsrc.tgac.miso.service.LibraryAdditionalInfoService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
@@ -32,12 +30,6 @@ public class DefaultLibraryAdditionalInfoService implements LibraryAdditionalInf
 
   @Autowired
   private LibraryStore libraryStore;
-
-  @Autowired
-  private TissueOriginDao tissueOriginDao;
-
-  @Autowired
-  private TissueTypeDao tissueTypeDao;
 
   @Autowired
   private KitStore kitStore;
