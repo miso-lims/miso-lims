@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import uk.ac.bbsrc.tgac.miso.migration.destination.DefaultMigrationTarget;
+import uk.ac.bbsrc.tgac.miso.migration.destination.MigrationCompleteListener;
 import uk.ac.bbsrc.tgac.miso.migration.destination.MigrationTarget;
 import uk.ac.bbsrc.tgac.miso.migration.source.LoadGeneratorSource;
 import uk.ac.bbsrc.tgac.miso.migration.source.MigrationException;
@@ -23,6 +24,10 @@ public class Migration {
   }
   
   public static void migrate(MigrationSource source, MigrationProperties properties) {
+    migrate(source, properties, null);
+  }
+
+  public static void migrate(MigrationSource source, MigrationProperties properties, MigrationCompleteListener listener) {
     Migration.properties = properties;
     MigrationTarget target = null;
     try {
@@ -38,7 +43,7 @@ public class Migration {
       System.out.println("Data collected.");
       
       System.out.println("Loading data into target...");
-      target.migrate(data);
+      target.migrate(data, listener);
       System.out.println("Migration complete.");
     } catch (MigrationException e) {
       System.err.println("Error converting source data");

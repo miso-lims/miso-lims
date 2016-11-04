@@ -115,7 +115,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
   }
 
   @Override
-  public void migrate(final MigrationData data) throws IOException {
+  public void migrate(final MigrationData data, MigrationCompleteListener listener) throws IOException {
     log.info(dryrun ? "Doing a dry run" : "Changes will be saved");
 
     Transaction tx = sessionFactory.getCurrentSession().beginTransaction();
@@ -126,6 +126,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
         log.info("Dry run completed and rolled back.");
       } else {
         tx.commit();
+        if (listener != null) listener.onMigrationComplete(valueTypeLookup);
       }
     } catch (Exception e) {
       tx.rollback();
@@ -523,10 +524,8 @@ public class DefaultMigrationTarget implements MigrationTarget {
           if (toPartition.getPartitionNumber().equals(fromPartition.getPartitionNumber())) {
             if (toPartition.getPool() != null) {
               if (!mergeRunPools) throw new IOException("A pool already exists for lane " + toPartition.getPartitionNumber());
-              @SuppressWarnings("unchecked")
               Pool toPool = toPartition.getPool();
               // Merge pools
-              @SuppressWarnings("unchecked")
               Collection<Dilution> fromPoolables = fromPartition.getPool().getPoolableElements();
               Collection<Dilution> toPoolables = toPool.getPoolableElements();
               toPoolables.addAll(fromPoolables);
