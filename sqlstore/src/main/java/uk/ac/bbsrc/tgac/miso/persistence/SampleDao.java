@@ -7,7 +7,6 @@ import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
 
@@ -24,8 +23,6 @@ public interface SampleDao extends SampleStore {
   void deleteSample(Sample sample);
 
   void update(Sample sample) throws IOException;
-
-  int getNextSiblingNumber(Sample parent, SampleClass childClass) throws IOException;
 
   /**
    * Determines whether an alias exists already

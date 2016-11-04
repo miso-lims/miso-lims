@@ -2,19 +2,26 @@ package uk.ac.bbsrc.tgac.miso.core.service.naming;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 
+import java.io.IOException;
 import java.security.InvalidParameterException;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 import net.sourceforge.fluxion.spi.ServiceProvider;
 
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
+import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 @ServiceProvider
 public class OicrSampleAliasGenerator implements NameGenerator<Sample> {
+
+  @Autowired
+  private SiblingNumberGenerator siblingNumberGenerator;
 
   private static final String SEPARATOR = "_";
   private static final String DASH = "-";
@@ -22,31 +29,42 @@ public class OicrSampleAliasGenerator implements NameGenerator<Sample> {
   private static final String TISSUE_ORIGIN_UNKNOWN = "nn";
   private static final String TISSUE_TYPE_UNKNOWN = "n";
 
+  public void setSiblingNumberGenerator(SiblingNumberGenerator siblingNumberGenerator) {
+    this.siblingNumberGenerator = siblingNumberGenerator;
+  }
+
+  public SiblingNumberGenerator getSiblingNumberGenerator() {
+    return siblingNumberGenerator;
+  }
+
   @Override
   public String getGeneratorName() {
     return "OicrSampleAliasGenerator";
   }
 
   @Override
-  public String generateName(Sample t) {
+  public String generateName(Sample t) throws MisoNamingException {
     if (!LimsUtils.isDetailedSample(t)) {
       throw new IllegalArgumentException("Can only generate an alias for detailed samples");
     }
     DetailedSample detailed = (DetailedSample) t;
     
-    for (DetailedSample parent = detailed.getParent(); parent != null;
-        parent = parent.getParent()) {
-      if (parent.hasNonStandardAlias()) throw new IllegalArgumentException("Cannot generate alias due to nonstandard alias on a parent");
-      if (isAliquotSample(parent)) {
-        return parent.getAlias() + getSiblingTag(detailed);
+    try {
+      for (DetailedSample parent = detailed.getParent(); parent != null; parent = parent.getParent()) {
+        if (parent.hasNonStandardAlias()) throw new IllegalArgumentException("Cannot generate alias due to nonstandard alias on a parent");
+        if (isAliquotSample(parent)) {
+          return addSiblingTag(parent.getAlias(), detailed);
+        }
+        if (isTissueSample(parent)) {
+          return addSiblingTag(parent.getAlias(), detailed);
+        }
+        if (isIdentitySample(parent)) {
+          if (!isTissueSample(detailed)) throw new IllegalArgumentException("Missing parent tissue");
+          return generateTissueAlias((SampleTissue) detailed, (Identity) parent);
+        }
       }
-      if (isTissueSample(parent)) {
-        return parent.getAlias() + getSiblingTag(detailed);
-      }
-      if (isIdentitySample(parent)) {
-        if (!isTissueSample(detailed)) throw new IllegalArgumentException("Missing parent tissue");
-        return generateTissueAlias((SampleTissue) detailed, (Identity) parent);
-      }
+    } catch (IOException e) {
+      throw new MisoNamingException("Failed to determine next sibling number", e);
     }
     // Identity name generation requires access to SampleNumberPerProjectDao
     throw new IllegalArgumentException("Cannot generate alias for Identities");
@@ -72,20 +90,21 @@ public class OicrSampleAliasGenerator implements NameGenerator<Sample> {
     return sb.toString();
   }
   
-  private String getSiblingTag(DetailedSample sample) {
+  private String addSiblingTag(String parentAlias, DetailedSample sample) throws IOException {
     SampleClass sc = sample.getSampleClass();
     if (sc == null || sc.getSuffix() == null) {
       throw new InvalidParameterException("Unexpected null SampleClass or suffix");
     }
+    String partialAlias = parentAlias + SEPARATOR + sc.getSuffix();
     if (sample.getSiblingNumber() == null) {
-      throw new InvalidParameterException("Cannot generate alias for " + sc.getAlias() + " without a siblingNumber");
+      sample.setSiblingNumber(siblingNumberGenerator.getNextSiblingNumber(partialAlias));
     }
     String siblingNum = sample.getSiblingNumber().toString();
     // Sibling number is only padded for Tissue Processing
     if (isTissueProcessingSample(sample)) {
       while (siblingNum.length() < 2) siblingNum = "0" + siblingNum;
     }
-    return SEPARATOR + sc.getSuffix() + siblingNum;
+    return partialAlias + siblingNum;
   }
 
   @Override

@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.webapp.context;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+import io.prometheus.client.hotspot.DefaultExports;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -52,14 +53,12 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
-import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.context.support.XmlWebApplicationContext;
 
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
-import io.prometheus.client.hotspot.DefaultExports;
-import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.PoolAlertManager;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.ProjectAlertManager;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.RunAlertManager;
@@ -79,7 +78,6 @@ import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
 import uk.ac.bbsrc.tgac.miso.core.store.RunQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
-import uk.ac.bbsrc.tgac.miso.core.store.IndexStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.runstats.client.manager.RunStatsManager;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoPropertyExporter;
@@ -136,72 +134,18 @@ public class MisoAppListener implements ServletContextListener {
     // set headless property so JFreeChart doesn't try to use the X rendering system to generate images
     System.setProperty("java.awt.headless", "true");
 
-    // set up naming schemes
-    MisoEntityNamingSchemeResolverService entityNamingSchemeResolverService = (MisoEntityNamingSchemeResolverService) context
-        .getBean("entityNamingSchemeResolverService");
-    Collection<MisoNamingScheme<?>> mnss = entityNamingSchemeResolverService.getNamingSchemes();
-
-    MisoNameGeneratorResolverService nameGeneratorResolverService = (MisoNameGeneratorResolverService) context
-        .getBean("nameGeneratorResolverService");
-    Collection<NameGenerator<?>> ngs = nameGeneratorResolverService.getNameGenerators();
-
-    for (MisoNamingScheme<?> mns : mnss) {
-      log.info("Got naming scheme: " + mns.getSchemeName());
-      String classname = mns.namingSchemeFor().getSimpleName().toLowerCase();
-
-      if (misoProperties.containsKey("miso.naming.scheme." + classname)
-          && misoProperties.get("miso.naming.scheme." + classname).equals(mns.getSchemeName())) {
-        for (String key : misoProperties.keySet()) {
-          if (key.startsWith("miso.naming.generator." + classname)) {
-            String genprop = key.substring(key.lastIndexOf(".") + 1);
-            NameGenerator ng = nameGeneratorResolverService
-                .getNameGenerator(misoProperties.get("miso.naming.generator." + classname + "." + genprop));
-            if (ng != null) {
-              mns.registerCustomNameGenerator(genprop, ng);
-            }
-          }
-        }
-
-        if ("nameable".equals(classname)) {
-          log.info("Replacing default global namingScheme with " + mns.getSchemeName());
-          ((DefaultListableBeanFactory) context.getBeanFactory()).removeBeanDefinition("namingScheme");
-          context.getBeanFactory().registerSingleton("namingScheme", mns);
-        } else {
-          log.info("Replacing default " + classname + "NamingScheme with " + mns.getSchemeName());
-          ((DefaultListableBeanFactory) context.getBeanFactory()).removeBeanDefinition(classname + "NamingScheme");
-          context.getBeanFactory().registerSingleton(classname + "NamingScheme", mns);
-        }
-      }
-
-      for (String key : misoProperties.keySet()) {
-        if (key.startsWith("miso.naming.validation." + classname)) {
-          String prop = key.substring(key.lastIndexOf(".") + 1);
-
-          try {
-            mns.setValidationRegex(prop, misoProperties.get("miso.naming.validation." + classname + "." + prop));
-          } catch (MisoNamingException e) {
-            log.error("Cannot set new validation regex for field '" + prop + "'. Reverting to default.", e);
-          }
-        }
-
-        if (key.startsWith("miso.naming.duplicates." + classname)) {
-          String prop = key.substring(key.lastIndexOf(".") + 1);
-          mns.setAllowDuplicateEntityName(prop,
-              Boolean.parseBoolean(misoProperties.get("miso.naming.duplicates." + classname + "." + prop)));
-        }
-      }
-    }
+    initializeNamingSchemes(context, misoProperties);
 
     // set up printers
-    PrintManager printManager = (PrintManager) context.getBean("printManager");
+    PrintManager<?, ?> printManager = (PrintManager<?, ?>) context.getBean("printManager");
     Collection<PrintContext> pcs = printManager.getPrintContexts();
-    for (PrintContext pc : pcs) {
+    for (PrintContext<?> pc : pcs) {
       log.info(pc.getName() + " : " + pc.getDescription());
     }
 
     try {
       Collection<MisoPrintService> mpss = printManager.listAllPrintServices();
-      for (MisoPrintService mps : mpss) {
+      for (MisoPrintService<?, ?, ?> mps : mpss) {
         log.info("Got print service: " + mps.toString());
       }
     } catch (Exception e) {
@@ -230,11 +174,6 @@ public class MisoAppListener implements ServletContextListener {
       PoolAlertManager poam = (PoolAlertManager) context.getBean("poolAlertManager");
       poam.setRequestManager(rm);
       poam.setSecurityManager(sm);
-    }
-
-    if (misoProperties.containsKey("miso.db.caching.mappers.enabled")) {
-      boolean mapperCachingEnabled = Boolean.parseBoolean(misoProperties.get("miso.db.caching.mappers.enabled"));
-      // TODO do something with this - probably set caching throughout DAOs
     }
 
     if ("true".equals(misoProperties.get("miso.db.caching.precache.enabled"))) {
@@ -338,6 +277,63 @@ public class MisoAppListener implements ServletContextListener {
     }
   }
 
+  private void initializeNamingSchemes(XmlWebApplicationContext context, Map<String, String> misoProperties) {
+    // set up naming schemes
+    MisoEntityNamingSchemeResolverService entityNamingSchemeResolverService = (MisoEntityNamingSchemeResolverService) context
+        .getBean("entityNamingSchemeResolverService");
+
+    MisoNameGeneratorResolverService nameGeneratorResolverService = (MisoNameGeneratorResolverService) context
+        .getBean("nameGeneratorResolverService");
+
+    for (MisoNamingScheme<?> scheme : entityNamingSchemeResolverService.getNamingSchemes()) {
+      log.info("Got naming scheme: " + scheme.getSchemeName());
+      String classname = scheme.namingSchemeFor().getSimpleName().toLowerCase();
+
+      if (misoProperties.containsKey("miso.naming.scheme." + classname)
+          && misoProperties.get("miso.naming.scheme." + classname).equals(scheme.getSchemeName())) {
+        for (String key : misoProperties.keySet()) {
+          if (key.startsWith("miso.naming.generator." + classname)) {
+            String genProp = key.substring(key.lastIndexOf(".") + 1);
+            NameGenerator generator = nameGeneratorResolverService
+                .getNameGenerator(misoProperties.get("miso.naming.generator." + classname + "." + genProp));
+            SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(generator);
+            if (generator != null) {
+              scheme.registerCustomNameGenerator(genProp, generator);
+            }
+          }
+        }
+
+        if ("nameable".equals(classname)) {
+          log.info("Replacing default global namingScheme with " + scheme.getSchemeName());
+          ((DefaultListableBeanFactory) context.getBeanFactory()).removeBeanDefinition("namingScheme");
+          context.getBeanFactory().registerSingleton("namingScheme", scheme);
+        } else {
+          log.info("Replacing default " + classname + "NamingScheme with " + scheme.getSchemeName());
+          ((DefaultListableBeanFactory) context.getBeanFactory()).removeBeanDefinition(classname + "NamingScheme");
+          context.getBeanFactory().registerSingleton(classname + "NamingScheme", scheme);
+        }
+      }
+
+      for (String key : misoProperties.keySet()) {
+        if (key.startsWith("miso.naming.validation." + classname)) {
+          String prop = key.substring(key.lastIndexOf(".") + 1);
+
+          try {
+            scheme.setValidationRegex(prop, misoProperties.get("miso.naming.validation." + classname + "." + prop));
+          } catch (MisoNamingException e) {
+            log.error("Cannot set new validation regex for field '" + prop + "'. Reverting to default.", e);
+          }
+        }
+
+        if (key.startsWith("miso.naming.duplicates." + classname)) {
+          String prop = key.substring(key.lastIndexOf(".") + 1);
+          scheme.setAllowDuplicateEntityName(prop,
+              Boolean.parseBoolean(misoProperties.get("miso.naming.duplicates." + classname + "." + prop)));
+        }
+      }
+    }
+  }
+
   /**
    * Called on webapp destruction
    * 
@@ -346,8 +342,6 @@ public class MisoAppListener implements ServletContextListener {
    */
   @Override
   public void contextDestroyed(ServletContextEvent event) {
-    ServletContext application = event.getServletContext();
-    WebApplicationContext context = WebApplicationContextUtils.getRequiredWebApplicationContext(application);
     log.info("MISO Application Context Destroyed: " + new Date());
   }
 }

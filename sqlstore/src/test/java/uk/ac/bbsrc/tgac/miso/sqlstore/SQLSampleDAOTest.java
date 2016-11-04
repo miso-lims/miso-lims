@@ -1,11 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
@@ -390,6 +386,20 @@ public class SQLSampleDAOTest extends AbstractDAOTest {
     max++;
     Map<String, Object> rs = new HashMap<>();
     rs.put("Auto_increment", max);
+  }
+
+  @Test
+  public void getNextSiblingNumberTest() throws Exception {
+    // sibling numbers are missing. getNextSiblingNumber should fix these and return first truly available number
+    DetailedSample s1 = (DetailedSample) dao.get(16L);
+    DetailedSample s2 = (DetailedSample) dao.get(17L);
+    assertNull(s1.getSiblingNumber());
+    assertNull(s2.getSiblingNumber());
+    assertEquals(3, dao.getNextSiblingNumber("TEST_0001_TISSUE_"));
+    sessionFactory.getCurrentSession().refresh(s1);
+    sessionFactory.getCurrentSession().refresh(s2);
+    assertEquals(new Integer(1), s1.getSiblingNumber());
+    assertEquals(new Integer(2), s2.getSiblingNumber());
   }
 
 }
