@@ -777,10 +777,10 @@ Pool.search = {
         addTd.prop('disabled', true);
         addTd.css('float', 'left');
         addTd.children().last().append(checkmark);
+        addTd.addClass('disabled');
         jQuery('#checkmark_' + addRowId).fadeOut("slow", function () {
           jQuery(this).parent().parent().parent().css('clear', 'both');
           jQuery(this).parent().remove();
-          addTd.addClass('disabled');
           addTd.css('cursor', 'default');
         });
       }
