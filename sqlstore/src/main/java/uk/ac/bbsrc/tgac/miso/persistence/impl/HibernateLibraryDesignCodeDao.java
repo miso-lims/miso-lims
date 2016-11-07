@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.hibernate.Query;
@@ -32,12 +33,12 @@ public class HibernateLibraryDesignCodeDao implements LibraryDesignCodeDao {
   }
 
   @Override
-  public LibraryDesignCode getLibraryDesignCode(Long id) {
+  public LibraryDesignCode getLibraryDesignCode(Long id) throws IOException {
     return (LibraryDesignCode) currentSession().get(LibraryDesignCode.class, id);
   }
 
   @Override
-  public List<LibraryDesignCode> getLibraryDesignCodes() {
+  public List<LibraryDesignCode> getLibraryDesignCodes() throws IOException {
     Query query = currentSession().createQuery("from LibraryDesignCode");
     @SuppressWarnings("unchecked")
     List<LibraryDesignCode> libraryDesignCodes = query.list();
