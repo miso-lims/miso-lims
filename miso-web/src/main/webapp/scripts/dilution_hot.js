@@ -128,7 +128,7 @@ var Dilution = {
           header: 'Conc. (' + Dilution.hot.units + ')',
           data: 'concentration',
           type: 'numeric',
-          format: '0.0',
+          format: '0.00',
           validator: Hot.requiredNumber,
           renderer: Hot.requiredNumericRenderer,
           include: true
