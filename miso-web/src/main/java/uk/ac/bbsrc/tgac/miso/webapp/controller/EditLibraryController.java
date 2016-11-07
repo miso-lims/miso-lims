@@ -973,18 +973,20 @@ public class EditLibraryController {
 
           if (library.getLibraryAdditionalInfo().getLibraryDesign().getId() == -1) {
             library.getLibraryAdditionalInfo().setLibraryDesign(null);
+            if (library.getLibraryAdditionalInfo().getLibraryDesignCode() != null) {
+              LibraryDesignCode ldCode = libraryDesignCodeDao
+                  .getLibraryDesignCode(library.getLibraryAdditionalInfo().getLibraryDesignCode().getId());
+              library.getLibraryAdditionalInfo().setLibraryDesignCode(ldCode);
+            }
           } else {
             // If a design is selected, these form elements are disabled and therefore not submitted.
             LibraryDesign design = libraryDesignDao.getLibraryDesign(library.getLibraryAdditionalInfo().getLibraryDesign().getId());
             library.getLibraryAdditionalInfo().setLibraryDesign(design);
             library.setLibrarySelectionType(requestManager.getLibrarySelectionTypeById(design.getLibrarySelectionType().getId()));
             library.setLibraryStrategyType(requestManager.getLibraryStrategyTypeById(design.getLibraryStrategyType().getId()));
+            library.getLibraryAdditionalInfo().setLibraryDesignCode(libraryDesignCodeDao
+                .getLibraryDesignCode(library.getLibraryAdditionalInfo().getLibraryDesign().getLibraryDesignCode().getId()));
           }
-        }
-        if (library.getLibraryAdditionalInfo().getLibraryDesignCode() != null) {
-          LibraryDesignCode ldCode = libraryDesignCodeDao
-              .getLibraryDesignCode(library.getLibraryAdditionalInfo().getLibraryDesignCode().getId());
-          library.getLibraryAdditionalInfo().setLibraryDesignCode(ldCode);
         }
         if (library.getId() == AbstractLibrary.UNSAVED_ID) {
           library.getLibraryAdditionalInfo().setCreatedBy(user);

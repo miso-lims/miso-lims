@@ -786,8 +786,7 @@ public class ValueTypeLookup {
 
       if (lai.getLibraryDesign() != null) { // optional field
         LibraryDesign ld = resolve(lai.getLibraryDesign());
-        if (ld == null) throw new IOException(String.format("LibraryDesign not found (name=%s, sampleClass=%s)",
-            lai.getLibraryDesign().getName(), ((DetailedSample) lai.getLibrary().getSample()).getSampleClass().getAlias()));
+        // LibraryDesign may be null, as all combinations of values are valid but only some correspond to LibraryDesigns
         lai.setLibraryDesign(ld);
       }
 
