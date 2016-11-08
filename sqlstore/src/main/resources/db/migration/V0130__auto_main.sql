@@ -1,3 +1,5 @@
+-- libraryDesignCode_changes
+
 CREATE TABLE `LibraryDesignCode` (
   `libraryDesignCodeId` BIGINT(20) NOT NULL AUTO_INCREMENT,
   `code` VARCHAR(2) NOT NULL,
@@ -57,3 +59,5 @@ DROP PROCEDURE IF EXISTS update_libraryDesignCode;
 ALTER TABLE LibraryAdditionalInfo MODIFY COLUMN `libraryDesignCodeId` BIGINT(20) NOT NULL;
 ALTER TABLE LibraryDesign MODIFY COLUMN `libraryDesignCodeId` BIGINT(20) NOT NULL;
 ALTER TABLE LibraryDesign DROP COLUMN `suffix`;
+
+
