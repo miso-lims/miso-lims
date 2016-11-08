@@ -15,6 +15,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletion;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl;
@@ -108,6 +109,7 @@ public class MisoTargetUtils {
             AbstractLibrary.class,
             LibraryAdditionalInfoImpl.class,
             LibraryDesign.class,
+            LibraryDesignCode.class,
             LibraryType.class,
             Index.class,
             IndexFamily.class

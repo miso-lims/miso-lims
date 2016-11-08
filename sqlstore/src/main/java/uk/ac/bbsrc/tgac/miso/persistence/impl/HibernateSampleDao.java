@@ -36,15 +36,16 @@ import com.eaglegenomics.simlims.core.store.SecurityStore;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.SiblingNumberGenerator;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
@@ -63,7 +64,7 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
  * “transient” in the Sample class.
  */
 @Transactional(rollbackFor = Exception.class)
-public class HibernateSampleDao implements SampleDao {
+public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
 
   protected static final Logger log = LoggerFactory.getLogger(HibernateSampleDao.class);
 
@@ -123,13 +124,24 @@ public class HibernateSampleDao implements SampleDao {
   }
 
   @Override
-  public int getNextSiblingNumber(Sample parent, SampleClass childClass) throws IOException {
-    Query query = currentSession().createQuery(
-        "select max(siblingNumber) " + "from DetailedSampleImpl " + "where parentId = :parentId " + "and sampleClassId = :sampleClassId");
-    query.setLong("parentId", parent.getId());
-    query.setLong("sampleClassId", childClass.getId());
+  public int getNextSiblingNumber(String partialAlias) throws IOException {
+    // Find highest existing siblingNumber matching this partialAlias
+    Query query = currentSession().createQuery("select max(siblingNumber) from DetailedSampleImpl as ds"
+            + " where alias IN (concat(:alias, ds.siblingNumber), concat(:alias, '0', ds.siblingNumber))");
+    query.setString("alias", partialAlias);
     Number result = ((Number) query.uniqueResult());
-    return result == null ? 1 : result.intValue() + 1;
+    int next = result == null ? 0 : result.intValue();
+
+    // Increment and verify uniqueness. If alias is used, fix siblingNumber for existing sample. Repeat until unique
+    Query verifyQuery = null;
+    do {
+      next++;
+      verifyQuery = currentSession().createQuery("update DetailedSampleImpl ds set ds.siblingNumber = :siblingNumber"
+          + " where alias IN (concat(:alias, :siblingNumber), concat(:alias, '0', :siblingNumber))");
+      verifyQuery.setString("alias", partialAlias).setString("siblingNumber", String.valueOf(next));
+    } while (verifyQuery.executeUpdate() > 0);
+
+    return next;
   }
 
   @Override

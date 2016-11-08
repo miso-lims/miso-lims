@@ -1,7 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.migration.destination;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -18,6 +17,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.Institute;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
@@ -44,6 +44,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.HibernateSampleClassDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateDetailedQcStatusDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateIndexDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLabDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDesignCodeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDesignDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSamplePurposeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSubprojectDao;
@@ -136,6 +137,12 @@ public class ValueTypeLookupTestSuite {
     lds.add(makeLibraryDesign(VALID_LONG, VALID_STRING));
     Mockito.when(ldDao.getLibraryDesigns()).thenReturn(lds);
     Mockito.when(mgr.getLibraryDesignDao()).thenReturn(ldDao);
+
+    HibernateLibraryDesignCodeDao ldcDao = Mockito.mock(HibernateLibraryDesignCodeDao.class);
+    List<LibraryDesignCode> ldcs = new ArrayList<>();
+    ldcs.add(makeLibraryDesignCode(VALID_LONG, VALID_STRING));
+    Mockito.when(ldcDao.getLibraryDesignCodes()).thenReturn(ldcs);
+    Mockito.when(mgr.getLibraryDesignCodeDao()).thenReturn(ldcDao);
 
     HibernateIndexDao iDao = Mockito.mock(HibernateIndexDao.class);
     List<Index> inds = new ArrayList<>();
@@ -386,7 +393,25 @@ public class ValueTypeLookupTestSuite {
     LibraryDesign ld = new LibraryDesign();
     ld.setId(id);
     ld.setName(name);
+    ld.setSampleClass(makeSampleClass(VALID_LONG, VALID_STRING));
     return ld;
+  }
+
+  @Test
+  public void testResolveLibraryDesignCode() {
+    assertNotNull(sut.resolve(makeLibraryDesignCode(VALID_LONG, null)));
+    assertNotNull(sut.resolve(makeLibraryDesignCode(null, VALID_STRING)));
+    assertNull(sut.resolve((LibraryDesignCode) null));
+    assertNull(sut.resolve(makeLibraryDesignCode(null, null)));
+    assertNull(sut.resolve(makeLibraryDesignCode(INVALID_LONG, null)));
+    assertNull(sut.resolve(makeLibraryDesignCode(null, INVALID_STRING)));
+  }
+
+  private LibraryDesignCode makeLibraryDesignCode(Long id, String code) {
+    LibraryDesignCode ldc = new LibraryDesignCode();
+    ldc.setId(id);
+    ldc.setCode(code);
+    return ldc;
   }
 
   @Test

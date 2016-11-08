@@ -231,13 +231,6 @@ public class DefaultSampleService implements SampleService {
     } else {
       validateAliasUniqueness(sample.getAlias());
     }
-    if (isStockSample(sample) || isAliquotSample(sample) || isTissueProcessingSample(sample)) {
-      DetailedSample detailed = (DetailedSample) sample;
-      if (detailed.getParent() != null && detailed.getSiblingNumber() == null) {
-        int siblingNumber = sampleDao.getNextSiblingNumber(detailed.getParent(), detailed.getSampleClass());
-        detailed.setSiblingNumber(siblingNumber);
-      }
-    }
     return save(sample).getId();
   }
 

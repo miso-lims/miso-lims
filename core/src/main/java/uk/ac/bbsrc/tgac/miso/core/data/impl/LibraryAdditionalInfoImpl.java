@@ -18,6 +18,7 @@ import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 
 @Entity
@@ -63,6 +64,10 @@ public class LibraryAdditionalInfoImpl implements LibraryAdditionalInfo {
   @JoinColumn(name = "libraryDesign", nullable = true)
   private LibraryDesign libraryDesign;
   
+  @OneToOne
+  @JoinColumn(name = "libraryDesignCodeId", nullable = false)
+  private LibraryDesignCode libraryDesignCode;
+
   private Long preMigrationId;
 
   @Override
@@ -168,6 +173,16 @@ public class LibraryAdditionalInfoImpl implements LibraryAdditionalInfo {
   }
 
   @Override
+  public LibraryDesignCode getLibraryDesignCode() {
+    return libraryDesignCode;
+  }
+
+  @Override
+  public void setLibraryDesignCode(LibraryDesignCode libraryDesignCode) {
+    this.libraryDesignCode = libraryDesignCode;
+  }
+
+  @Override
   public boolean hasNonStandardAlias() {
     return nonStandardAlias;
   }
@@ -208,6 +223,7 @@ public class LibraryAdditionalInfoImpl implements LibraryAdditionalInfo {
     return new EqualsBuilder()
         .append(archived, other.archived)
         .append(libraryDesign, other.libraryDesign)
+        .append(libraryDesignCode, other.libraryDesignCode)
         .append(nonStandardAlias, other.nonStandardAlias)
         .append(prepKit, other.prepKit)
         .append(preMigrationId, other.preMigrationId)

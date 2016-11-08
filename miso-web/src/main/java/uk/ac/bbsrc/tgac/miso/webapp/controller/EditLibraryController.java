@@ -80,6 +80,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -99,6 +100,7 @@ import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
+import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignCodeDao;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignDao;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -149,6 +151,9 @@ public class EditLibraryController {
 
   @Autowired
   private LibraryDesignDao libraryDesignDao;
+
+  @Autowired
+  private LibraryDesignCodeDao libraryDesignCodeDao;
 
   public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
     this.dataObjectFactory = dataObjectFactory;
@@ -377,6 +382,10 @@ public class EditLibraryController {
 
   private void populateDesigns(ModelMap model, SampleClass sampleClass) throws IOException {
     MisoWebUtils.populateListAndJson(model, "libraryDesigns", requestManager.listLibraryDesignByClass(sampleClass), "sampleClass");
+  }
+
+  private void populateDesignCodes(ModelMap model) throws IOException {
+    MisoWebUtils.populateListAndJson(model, "libraryDesignCodes", requestManager.listLibraryDesignCodes());
   }
 
   /**
@@ -700,6 +709,7 @@ public class EditLibraryController {
 
       populateDesigns(model,
           LimsUtils.isDetailedSample(library.getSample()) ? ((DetailedSample) library.getSample()).getSampleClass() : null);
+      populateDesignCodes(model);
 
       model.put("owners", LimsSecurityUtils.getPotentialOwners(user, library, securityManager.listAllUsers()));
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, library, securityManager.listAllUsers()));
@@ -774,6 +784,7 @@ public class EditLibraryController {
       }
 
       populateDesigns(model, sampleClass);
+      populateDesignCodes(model);
 
       model.put("formObj", library);
       model.put("library", library);
@@ -854,6 +865,9 @@ public class EditLibraryController {
       JSONArray libraryDesigns = new JSONArray();
       libraryDesigns.addAll(requestManager.listLibraryDesignByClass(sampleClass));
       model.put("libraryDesignsJSON", libraryDesigns.toString());
+      JSONArray libraryDesignCodes = new JSONArray();
+      libraryDesignCodes.addAll(requestManager.listLibraryDesignCodes());
+      model.put("libraryDesignCodesJSON", libraryDesignCodes.toString());
       model.put("method", "Propagate");
       return new ModelAndView("/pages/bulkEditLibraries.jsp", model);
     } catch (IOException ex) {
@@ -896,6 +910,9 @@ public class EditLibraryController {
         libraryDesigns.addAll(requestManager.listLibraryDesignByClass(sampleClass));
       }
       model.put("libraryDesignsJSON", libraryDesigns.toString());
+      JSONArray libraryDesignCodes = new JSONArray();
+      libraryDesignCodes.addAll(requestManager.listLibraryDesignCodes());
+      model.put("libraryDesignCodesJSON", libraryDesignCodes.toString());
       model.put("platformNames", mapper.writeValueAsString(populatePlatformNames(currentPlatforms)));
 
       return new ModelAndView("/pages/bulkEditLibraries.jsp", model);
@@ -956,14 +973,19 @@ public class EditLibraryController {
 
           if (library.getLibraryAdditionalInfo().getLibraryDesign().getId() == -1) {
             library.getLibraryAdditionalInfo().setLibraryDesign(null);
-          } else if (library.getLibraryAdditionalInfo().getLibraryDesign() != null) {
+            if (library.getLibraryAdditionalInfo().getLibraryDesignCode() != null) {
+              LibraryDesignCode ldCode = libraryDesignCodeDao
+                  .getLibraryDesignCode(library.getLibraryAdditionalInfo().getLibraryDesignCode().getId());
+              library.getLibraryAdditionalInfo().setLibraryDesignCode(ldCode);
+            }
+          } else {
             // If a design is selected, these form elements are disabled and therefore not submitted.
             LibraryDesign design = libraryDesignDao.getLibraryDesign(library.getLibraryAdditionalInfo().getLibraryDesign().getId());
             library.getLibraryAdditionalInfo().setLibraryDesign(design);
-            library.setLibrarySelectionType(requestManager.getLibrarySelectionTypeById(design.getLibrarySelectionType()));
-            library.setLibraryStrategyType(requestManager.getLibraryStrategyTypeById(design.getLibraryStrategyType()));
-            library.setLibraryType(design.getLibraryType());
-            library.setPlatformName(design.getLibraryType().getPlatformType());
+            library.setLibrarySelectionType(requestManager.getLibrarySelectionTypeById(design.getLibrarySelectionType().getId()));
+            library.setLibraryStrategyType(requestManager.getLibraryStrategyTypeById(design.getLibraryStrategyType().getId()));
+            library.getLibraryAdditionalInfo().setLibraryDesignCode(libraryDesignCodeDao
+                .getLibraryDesignCode(library.getLibraryAdditionalInfo().getLibraryDesign().getLibraryDesignCode().getId()));
           }
         }
         if (library.getId() == AbstractLibrary.UNSAVED_ID) {

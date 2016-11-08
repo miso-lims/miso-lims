@@ -6,12 +6,14 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 
 @Entity
 @Table(name = "LibraryDesign")
@@ -28,36 +30,36 @@ public class LibraryDesign {
 
   @Id
   private Long libraryDesignId;
-  @Column(nullable = false)
-  private Long librarySelectionType;
-  @Column(nullable = false)
-  private Long libraryStrategyType;
-  @OneToOne(targetEntity = LibraryType.class)
-  @JoinColumn(name = "libraryType", nullable = false)
-  private LibraryType libraryType;
+
+  @Column(name = "librarySelectionType")
+  private Long librarySelectionTypeId;
+  @Transient
+  private LibrarySelectionType librarySelectionType;
+
+  @Column(name = "libraryStrategyType")
+  private Long libraryStrategyTypeId;
+  @Transient
+  private LibraryStrategyType libraryStrategyType;
+
   @Column(nullable = false)
   private String name;
-
   @OneToOne(targetEntity = SampleClassImpl.class)
   @JoinColumn(name = "sampleClassId", nullable = false)
   private SampleClass sampleClass;
-  @Column(nullable = false)
-  private String suffix;
+  @OneToOne(targetEntity = LibraryDesignCode.class)
+  @JoinColumn(name = "libraryDesignCodeId")
+  private LibraryDesignCode libraryDesignCode;
 
   public Long getId() {
     return libraryDesignId;
   }
 
-  public Long getLibrarySelectionType() {
+  public LibrarySelectionType getLibrarySelectionType() {
     return librarySelectionType;
   }
 
-  public Long getLibraryStrategyType() {
+  public LibraryStrategyType getLibraryStrategyType() {
     return libraryStrategyType;
-  }
-
-  public LibraryType getLibraryType() {
-    return libraryType;
   }
 
   public String getName() {
@@ -68,24 +70,42 @@ public class LibraryDesign {
     return sampleClass;
   }
 
-  public String getSuffix() {
-    return suffix;
+  public LibraryDesignCode getLibraryDesignCode() {
+    return libraryDesignCode;
   }
 
   public void setId(Long libraryDesignId) {
     this.libraryDesignId = libraryDesignId;
   }
 
-  public void setLibrarySelectionType(Long librarySelectionType) {
+  public void setLibrarySelectionType(LibrarySelectionType librarySelectionType) {
     this.librarySelectionType = librarySelectionType;
+
+    // keep librarySelectionTypeId field consistent for Hibernate purposes
+    if (librarySelectionType == null) {
+      this.librarySelectionTypeId = null;
+    } else {
+      this.librarySelectionTypeId = librarySelectionType.getId();
+    }
   }
 
-  public void setLibraryStrategyType(Long libraryStrategyType) {
+  public void setLibraryStrategyType(LibraryStrategyType libraryStrategyType) {
     this.libraryStrategyType = libraryStrategyType;
+
+    // keep libraryStrategyTypeId field consistent for Hibernate purposes
+    if (libraryStrategyType == null) {
+      this.libraryStrategyTypeId = null;
+    } else {
+      this.libraryStrategyTypeId = libraryStrategyType.getId();
+    }
   }
 
-  public void setLibraryType(LibraryType libraryType) {
-    this.libraryType = libraryType;
+  public Long getHibernateLibrarySelectionTypeId() {
+    return librarySelectionTypeId;
+  }
+
+  public Long getHibernateLibraryStrategyTypeId() {
+    return libraryStrategyTypeId;
   }
 
   public void setName(String name) {
@@ -96,16 +116,15 @@ public class LibraryDesign {
     this.sampleClass = sampleClass;
   }
 
-  public void setSuffix(String suffix) {
-    this.suffix = suffix;
+  public void setLibraryDesignCode(LibraryDesignCode libraryDesignCode) {
+    this.libraryDesignCode = libraryDesignCode;
   }
 
   public boolean validate(Library library) {
     if (!(library.getSample() instanceof DetailedSample)) return true;
     if (((DetailedSample) library.getSample()).getSampleClass().getId() != sampleClass.getId()) return false;
-    if (library.getLibraryType().getId() != libraryType.getId()) return false;
-    if (library.getLibrarySelectionType().getId() != librarySelectionType) return false;
-    if (library.getLibraryStrategyType().getId() != libraryStrategyType) return false;
+    if (library.getLibrarySelectionType().getId() != librarySelectionType.getId()) return false;
+    if (library.getLibraryStrategyType().getId() != libraryStrategyType.getId()) return false;
     return true;
   }
 
@@ -114,10 +133,9 @@ public class LibraryDesign {
     return new HashCodeBuilder(13, 43)
         .append(librarySelectionType)
         .append(libraryStrategyType)
-        .append(libraryType)
         .append(name)
         .append(sampleClass)
-        .append(suffix)
+        .append(libraryDesignCode)
         .toHashCode();
   }
 
@@ -130,10 +148,9 @@ public class LibraryDesign {
     return new EqualsBuilder()
         .append(librarySelectionType, other.librarySelectionType)
         .append(libraryStrategyType, other.libraryStrategyType)
-        .append(libraryType, other.libraryType)
         .append(name, other.name)
         .append(sampleClass, other.sampleClass)
-        .append(suffix, other.suffix)
+        .append(libraryDesignCode, other.libraryDesignCode)
         .isEquals();
   }
 }

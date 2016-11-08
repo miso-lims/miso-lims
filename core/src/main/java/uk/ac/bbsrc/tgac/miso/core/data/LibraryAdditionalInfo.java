@@ -70,4 +70,8 @@ public interface LibraryAdditionalInfo {
   
   void setPreMigrationId(Long preMigrationId);
 
+  LibraryDesignCode getLibraryDesignCode();
+
+  void setLibraryDesignCode(LibraryDesignCode libraryDesignCode);
+
 }

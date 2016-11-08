@@ -73,11 +73,12 @@
         <value>uk.ac.bbsrc.tgac.miso.core.data.Index</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.IndexFamily</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleDerivedInfo</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode</value>
       </list>
     </property>
     <property name="hibernateProperties">
       <props>
-        <prop key="hibernate.dialect">org.hibernate.dialect.MySQL5InnoDBDialect</prop>
+        <prop key="hibernate.dialect">org.hibernate.dialect.H2Dialect</prop>
         <prop key="hibernate.show_sql">true</prop>
       </props>
     </property>

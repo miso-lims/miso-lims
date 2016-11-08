@@ -1,3 +1,4 @@
+--StartNoTest
 SET @time = NOW();
 SELECT userId INTO @user FROM User WHERE loginName = 'admin';
 
@@ -8,3 +9,4 @@ SELECT kitDescriptorId INTO @kapa FROM KitDescriptor WHERE name = "KAPA Hyper Pr
 
 INSERT INTO TargetedResequencing (alias, description, createdBy, creationDate, updatedBy, lastUpdated, kitDescriptorId) VALUES
 ('xGen Lockdown AML', 'xGen Lockdown AML', @user, @time, @user, @time, @kapa);
+--EndNoTest

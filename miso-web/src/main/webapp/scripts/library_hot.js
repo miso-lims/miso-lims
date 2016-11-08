@@ -41,16 +41,17 @@ Library.hot = {
    */
   prepLibrariesForEdit: function (libraries) {
     return libraries.map(function (lib) {
-      lib.librarySelectionTypeAlias = Hot.getAliasFromId(lib.librarySelectionTypeId, Hot.dropdownRef.selectionTypes);
-      lib.libraryStrategyTypeAlias = Hot.getAliasFromId(lib.libraryStrategyTypeId, Hot.dropdownRef.strategyTypes);
+      lib.librarySelectionTypeAlias = Hot.getAliasFromId(lib.librarySelectionTypeId, Hot.dropdownRef.selectionTypes) || '(None)';
+      lib.libraryStrategyTypeAlias = Hot.getAliasFromId(lib.libraryStrategyTypeId, Hot.dropdownRef.strategyTypes) || '(None)';
       if (lib.libraryAdditionalInfo) {
         // if any members are null, fill them with empty objects otherwise things go poorly
         if (!lib.libraryAdditionalInfo.prepKit) {
           lib.libraryAdditionalInfo.prepKit = { id: '', name: '' };
         }
         if (lib.libraryAdditionalInfo.libraryDesignId) {
-          lib.libraryDesignAlias = Hot.maybeGetProperty(Hot.findFirstOrNull(Hot.idPredicate(lib.libraryAdditionalInfo.libraryDesignId), Library.designs), 'name');
+          lib.libraryDesignAlias = Hot.maybeGetProperty(Hot.findFirstOrNull(Hot.idPredicate(lib.libraryAdditionalInfo.libraryDesignId), Library.designs), 'name') || '(None)';
         }
+        lib.libraryDesignCode = Hot.maybeGetProperty(Hot.findFirstOrNull(Hot.idPredicate(lib.libraryAdditionalInfo.libraryDesignCode), Hot.dropdownRef.libraryDesignCodes), 'code');
       }
       if (!lib.indexFamilyName) {
         lib.indexFamilyName = 'No index';
@@ -151,12 +152,7 @@ Library.hot = {
               Library.hot.changeIndexFamily(changes[i][0], changes[i][1], changes[i][2], changes[i][3]);
               break;
             case 'libraryDesignAlias':
-              var oldPlatfrom = Hot.hotTable.getDataAtCell(changes[i][0], Library.hot.pfIndex);
               Library.hot.changeDesign(changes[i][0], changes[i][1], changes[i][2], changes[i][3]);
-              var newPlatform = Hot.hotTable.getDataAtCell(changes[i][0], Library.hot.pfIndex);
-              if (oldPlatfrom != newPlatform) {
-              	Library.hot.changePlatform(changes[i][0], 'platformName', oldPlatfrom, newPlatform);
-              }
               break;
           }
         }
@@ -210,18 +206,28 @@ Library.hot = {
    * Gets array of library selection types
    */
   getSelectionTypes: function () {
-    return Hot.sortByProperty(Hot.dropdownRef['selectionTypes'], 'id').map(Hot.getAlias);
+    var selections = Hot.sortByProperty(Hot.dropdownRef['selectionTypes'], 'id').map(Hot.getAlias);
+    selections.push('(None)');
+    return selections;
   },
   
   /**
    * Gets array of library strategy types
    */
   getStrategyTypes: function () {
-    return Hot.sortByProperty(Hot.dropdownRef['strategyTypes'], 'id').map(Hot.getAlias);
+    var strategies = Hot.sortByProperty(Hot.dropdownRef['strategyTypes'], 'id').map(Hot.getAlias);
+    strategies.push('(None)');
+    return strategies;
   },
 
   getDesigns: function () {
-    return Hot.sortByProperty(Library.designs, 'id').map(Hot.getName);
+    var designs = Hot.sortByProperty(Library.designs, 'id').map(Hot.getName);
+    designs.push('(None)');
+    return designs;
+  },
+  
+  getDesignCodes: function () {
+    return Hot.sortByProperty(Hot.dropdownRef.libraryDesignCodes, 'id').map(function (ldCode) { return ldCode.code; });
   },
   
   /**
@@ -285,6 +291,15 @@ Library.hot = {
         trimDropdown: false,
         validator: Hot.permitEmpty,
         source: Library.hot.getDesigns(),
+        include: detailedBool
+      },
+      {
+        header: 'Code',
+        data: 'libraryDesignCode',
+        type: 'dropdown',
+        trimDropdown: false,
+        validator: Hot.requiredText,
+        source: Library.hot.getDesignCodes(),
         include: detailedBool
       },
       {
@@ -407,28 +422,25 @@ Library.hot = {
     var design = Hot.findFirstOrNull(Hot.namePredicate(to), Library.designs);
     [
       {
-        columnName: 'platformName',
-        designToStr: function(design) { return design.libraryType.platformType; }
-      },
-      {
-        columnName: 'libraryTypeAlias',
-        designToStr: function(design) { return design.libraryType.description; },
-      },
-      {
         columnName: 'librarySelectionTypeAlias',
-        designToStr: function(design) { return Hot.getAliasFromId(design.librarySelectionType, Hot.dropdownRef.selectionTypes); }
+        designToStr: (design ? design.librarySelectionType.name : '(None)')
 
       },
       {
         columnName: 'libraryStrategyTypeAlias',
-        designToStr: function(design) { return Hot.getAliasFromId(design.libraryStrategyType, Hot.dropdownRef.strategyTypes); }
+        designToStr: (design ? design.libraryStrategyType.name : '(None)')
+      },
+      {
+        columnName: 'libraryDesignCode',
+        designToStr: (design ? design.libraryDesignCode.code : 'WG')
       }
     ].forEach(
       function (info) {
         var columnIndex = Hot.getColIndex(info.columnName);
-        var newValue = design ? info.designToStr(design) : '';
-        Hot.hotTable.setDataAtCell(row, columnIndex, newValue, 'design change');
+        var newValue = design ? info.designToStr : Hot.hotTable.getDataAtCell(row, columnIndex);
+        if (design) Hot.hotTable.setDataAtCell(row, columnIndex, newValue, 'design change');
         Hot.hotTable.setCellMeta(row, columnIndex, 'readOnly', !!design);
+        Hot.hotTable.render();
       });
   },
   /**
@@ -575,7 +587,7 @@ Library.hot = {
         lib.alias = obj.alias;
       }
 
-      lib.paired = true;
+      lib.paired = lib.paired || (obj.libraryTypeAlias.indexOf("Pair") != -1 ? true : false);
 
       // add basic library attributes
       lib.description = obj.description;
@@ -589,8 +601,16 @@ Library.hot = {
 
       lib.platformName = obj.platformName;
 
-      lib.librarySelectionTypeId = Hot.getIdFromAlias(obj.librarySelectionTypeAlias, Hot.dropdownRef['selectionTypes']);
-      lib.libraryStrategyTypeId = Hot.getIdFromAlias(obj.libraryStrategyTypeAlias, Hot.dropdownRef['strategyTypes']);
+      if (obj.librarySelectionTypeAlias == '(None)') {
+        lib.librarySelectionTypeId = undefined;
+      } else {
+        lib.librarySelectionTypeId = Hot.getIdFromAlias(obj.librarySelectionTypeAlias, Hot.dropdownRef['selectionTypes']);
+      }
+      if (obj.libraryStrategyTypeAlias == '(None)') {
+        lib.libraryStrategyTypeId = undefined;
+      } else {
+        lib.libraryStrategyTypeId = Hot.getIdFromAlias(obj.libraryStrategyTypeAlias, Hot.dropdownRef['strategyTypes']);
+      }
       lib.libraryTypeId = Hot.getIdFromAlias(obj.libraryTypeAlias, Hot.dropdownRef['libraryTypes']);
 
       if (obj.lowQuality !== undefined) {
@@ -628,9 +648,12 @@ Library.hot = {
           lib.libraryAdditionalInfo.archived = false;
         }
         lib.libraryAdditionalInfo.nonStandardAlias = obj.libraryAdditionalInfo.nonStandardAlias;
-        if (obj.libraryDesignAlias) {
+        if (obj.libraryDesignAlias == '(None)') {
+          lib.libraryAdditionalInfo.libraryDesignId = undefined;
+        } else {
           lib.libraryAdditionalInfo.libraryDesignId = Hot.maybeGetProperty(Hot.findFirstOrNull(Hot.namePredicate(obj.libraryDesignAlias), Library.designs), 'id');
         }
+        lib.libraryAdditionalInfo.libraryDesignCodeId = Hot.maybeGetProperty(Hot.findFirstOrNull(function (ldCode) { return ldCode.code == obj.libraryDesignCode; }, Hot.dropdownRef.libraryDesignCodes), 'id');
       }
 
       lib.qcPassed = (obj.qcPassed && obj.qcPassed != 'unknown' ? obj.qcPassed : '') || '';

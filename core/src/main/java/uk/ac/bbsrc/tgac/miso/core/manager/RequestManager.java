@@ -42,6 +42,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
@@ -629,6 +630,8 @@ public interface RequestManager {
   public Map<String, Integer> getGroupColumnSizes() throws IOException;
 
   public Collection<LibraryDesign> listLibraryDesignByClass(SampleClass sampleClass) throws IOException;
+
+  public Collection<LibraryDesignCode> listLibraryDesignCodes() throws IOException;
 
   public Long countPoolsByPlatform(PlatformType platform) throws IOException;
 
