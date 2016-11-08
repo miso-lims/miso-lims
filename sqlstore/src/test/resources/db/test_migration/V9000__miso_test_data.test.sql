@@ -174,6 +174,13 @@ INSERT INTO `Kit`(`kitId`,`identificationBarcode`,`locationBarcode`,`lotNumber`,
 (1,'1234','Freezer2','LOT34',NOW(),1),
 (2,'5678','Freezer3','LOT35',NOW(),2);
 
+DELETE FROM `TargetedResequencing`;
+INSERT INTO `TargetedResequencing`(`targetedResequencingId`,`alias`,`description`,`kitDescriptorId`, `archived`, `createdBy`,`creationDate`,`updatedBy`,`lastUpdated`) VALUES
+(1,'HALO_IBP','Master Chief',1,0,1,NOW(),1,NOW()),
+(2,'Thunderbolts','of lightening, very very frightening',1,0,1,NOW(),1,NOW()),
+(3,'Thunderbolts','of lightening, very very frightening',2,0,1,NOW(),1,NOW());
+
+
 DELETE FROM `LibraryDilution`;
 INSERT INTO `LibraryDilution`(`dilutionId`, `concentration`, `library_libraryId`, `identificationBarcode`, `creationDate`, `dilutionUserName`, `name`, `securityProfile_profileId`) 
 VALUES (1,2,1,'LDI1::TEST_0001_Bn_P_PE_300_WG','2015-08-27','admin','LDI1',1),
