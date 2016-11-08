@@ -856,7 +856,9 @@ public class ValueTypeLookup {
         // LibraryDesign may be null, as all combinations of values are valid but only some correspond to LibraryDesigns
         lai.setLibraryDesign(ld);
       }
-
+      if (lai.getLibraryDesignCode() == null) {
+        throw new IOException(String.format("LibraryDesignCode missing for library %d", lai.getPreMigrationId()));
+      }
       LibraryDesignCode ldc = resolve(lai.getLibraryDesignCode());
       if (ldc == null) throw new IOException(String.format("LibraryDesignCode %s not found", lai.getLibraryDesignCode().getCode()));
       lai.setLibraryDesignCode(ldc);
