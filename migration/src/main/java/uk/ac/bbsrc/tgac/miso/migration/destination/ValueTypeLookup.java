@@ -357,6 +357,10 @@ public class ValueTypeLookup {
     return null;
   }
 
+  public boolean isValidSampleClass(String alias) {
+    return sampleClassByAlias.containsKey(alias);
+  }
+
   /**
    * Attempts to find an existing TissueType
    * 
@@ -368,6 +372,10 @@ public class ValueTypeLookup {
     if (tissueType.getId() != null) return tissueTypeById.get(tissueType.getId());
     if (tissueType.getAlias() != null) return tissueTypeByAlias.get(tissueType.getAlias());
     return null;
+  }
+
+  public boolean isValidTissueType(String alias) {
+    return tissueTypeByAlias.containsKey(alias);
   }
 
   /**
@@ -384,6 +392,10 @@ public class ValueTypeLookup {
     return null;
   }
 
+  public boolean isValidTissueMaterial(String alias) {
+    return tissueMaterialByAlias.containsKey(alias);
+  }
+
   /**
    * Attempts to find an existing KitDescriptor
    * 
@@ -395,6 +407,10 @@ public class ValueTypeLookup {
     if (kit.getId() != KitDescriptor.UNSAVED_ID) return kitById.get(kit.getId());
     if (kit.getName() != null) return kitByName.get(kit.getName());
     return null;
+  }
+
+  public boolean isValidKitDescriptor(String name) {
+    return kitByName.containsKey(name);
   }
 
   /**
@@ -409,6 +425,10 @@ public class ValueTypeLookup {
     if (samplePurpose.getId() != null) return samplePurposeById.get(samplePurpose.getId());
     if (samplePurpose.getAlias() != null) return samplePurposeByAlias.get(samplePurpose.getAlias());
     return null;
+  }
+
+  public boolean isValidSamplePurpose(String alias) {
+    return samplePurposeByAlias.containsKey(alias);
   }
 
   /**
@@ -439,6 +459,11 @@ public class ValueTypeLookup {
     return null;
   }
 
+  public boolean isValidLab(String labAlias, String instituteAlias) {
+    return institutesByAlias.containsKey(instituteAlias)
+        && labsByInstituteId.get(institutesByAlias.get(instituteAlias).getId()).containsKey(labAlias);
+  }
+
   /**
    * Attempts to find an existing TissueOrigin
    * 
@@ -457,6 +482,10 @@ public class ValueTypeLookup {
     return null;
   }
 
+  public boolean isValidTissueOrigin(String aliasOrDescription) {
+    return tissueOriginsByAlias.containsKey(aliasOrDescription) || tissueOriginsByDescription.containsKey(aliasOrDescription);
+  }
+
   /**
    * Attempts to find an existing LibrarySelectionType
    * 
@@ -471,6 +500,10 @@ public class ValueTypeLookup {
     }
     if (librarySelectionType.getName() != null) return librarySelectionsByName.get(librarySelectionType.getName());
     return null;
+  }
+
+  public boolean isValidLibrarySelectionType(String name) {
+    return librarySelectionsByName.containsKey(name);
   }
 
   /**
@@ -489,6 +522,10 @@ public class ValueTypeLookup {
     return null;
   }
 
+  public boolean isValidLibraryStrategyType(String name) {
+    return libraryStrategiesByName.containsKey(name);
+  }
+
   /**
    * Attempts to find an existing LibraryType
    * 
@@ -504,6 +541,11 @@ public class ValueTypeLookup {
       return mapByDesc == null ? null : mapByDesc.get(libraryType.getDescription());
     }
     return null;
+  }
+
+  public boolean isValidLibraryType(String description, String platformType) {
+    return libraryTypeByPlatformAndDescription.containsKey(platformType)
+        && libraryTypeByPlatformAndDescription.get(platformType).containsKey(description);
   }
 
   /**
@@ -555,6 +597,11 @@ public class ValueTypeLookup {
     return null;
   }
 
+  public boolean isValidIndex(String familyName, String sequence) {
+    return indexByFamilyAndSequence.containsKey(familyName)
+        && indexByFamilyAndSequence.get(familyName).containsKey(sequence);
+  }
+
   /**
    * Attempts to find an existing Sample QcType
    * 
@@ -568,6 +615,10 @@ public class ValueTypeLookup {
     return null;
   }
 
+  public boolean isValidSampleQcType(String name) {
+    return sampleQcTypeByName.containsKey(name);
+  }
+
   /**
    * Attempts to find an existing Library QcType
    * 
@@ -579,6 +630,10 @@ public class ValueTypeLookup {
     if (qcType.getQcTypeId() != QcType.UNSAVED_ID) return libraryQcTypeById.get(qcType.getQcTypeId());
     if (qcType.getName() != null) return libraryQcTypeByName.get(qcType.getName());
     return null;
+  }
+
+  public boolean isValidLibraryQcType(String name) {
+    return libraryQcTypeByName.containsKey(name);
   }
 
   /**
@@ -595,6 +650,10 @@ public class ValueTypeLookup {
     return null;
   }
 
+  public boolean isValidSequencerReference(String name) {
+    return sequencerByName.containsKey(name);
+  }
+
   /**
    * Attempts to find an existing Subproject
    * 
@@ -609,6 +668,10 @@ public class ValueTypeLookup {
     return null;
   }
   
+  public boolean isValidSubproject(String alias) {
+    return subprojectByAlias.containsKey(alias);
+  }
+
   /**
    * Attempts to find an existing DetailedQcStatus
    * 
@@ -622,6 +685,10 @@ public class ValueTypeLookup {
     if (detailedQcStatus.getId() != null) return detailedQcStatusById.get(detailedQcStatus.getId());
     if (detailedQcStatus.getDescription() != null) return detailedQcStatusByDescription.get(detailedQcStatus.getDescription());
     return null;
+  }
+  
+  public boolean isValidDetailedQcStatus(String description) {
+    return detailedQcStatusByDescription.containsKey(description);
   }
 
   /**
