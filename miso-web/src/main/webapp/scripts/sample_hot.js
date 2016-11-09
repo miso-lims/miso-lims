@@ -1447,6 +1447,7 @@ Sample.hot = {
           Sample.hot.foundIdentities = data.identitiesResults;
           Sample.hot.flattenedIdentities = [].concat.apply([], Sample.hot.foundIdentities);
           Sample.hot.setIdentitySources();
+          Hot.hotTable.render();
           Sample.hot.displayCheckmark();
         }
       });
@@ -1473,6 +1474,7 @@ Sample.hot = {
         identityItems.unshift("First Receipt" + (projShortName ? " (" + projShortName + ")" : ""));
       }
       Hot.hotTable.setCellMeta(i, identityColIndex, 'source', identityItems);
+      Hot.hotTable.setCellMeta(i, identityColIndex, 'renderer', Hot.requiredAutocompleteRenderer);
     }
   },
   
