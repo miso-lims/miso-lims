@@ -164,11 +164,6 @@
       <artifactId>core</artifactId>
       <version>${project.parent.version}</version>
     </dependency>
-    <dependency>
-      <groupId>com.eaglegenomics.simlims</groupId>
-      <artifactId>simlims-sqlstore</artifactId>
-      <version>${simlims-version}</version>
-    </dependency>
 
     <dependency>
       <groupId>mysql</groupId>
