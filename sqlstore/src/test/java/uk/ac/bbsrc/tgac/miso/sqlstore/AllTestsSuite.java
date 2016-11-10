@@ -44,7 +44,7 @@ import org.junit.runners.Suite;
     SQLProjectDAOTest.class, SQLNoteDAOTest.class, SQLSequencerReferenceDAOTest.class, SQLRunQCDAOTest.class, SQLEmPCRDAOTest.class,
     SQLSecurityDAOTest.class, SQLSequencerPartitionContainerDAOTest.class, SQLBoxDAOTest.class, SQLSequencerServiceRecordDAOTest.class,
     SQLExperimentDAOTest.class, SQLPlatformDAOTest.class, SQLSequencerServiceRecordDAOTest.class, SQLPoolDAOTest.class,
-    SQLLibraryDAOTest.class, SQLLibraryDilutionDAOTest.class, SQLChangeLogDAOTest.class, SQLPrintJobDAOTest.class })
+    SQLLibraryDAOTest.class, SQLLibraryDilutionDAOTest.class, SQLChangeLogDAOTest.class, SQLPrintJobDAOTest.class, SQLSecurityProfileDAOTest.class })
 
 public class AllTestsSuite {
 }
