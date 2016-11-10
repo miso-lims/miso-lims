@@ -1462,6 +1462,7 @@ Sample.hot = {
     var rowCount = Sample.hot.foundIdentities.length;
     var selectedProjectId = Sample.hot.selectedProjectId;
     for (var i = 0; i < rowCount; i++) {
+      if (Hot.startData[i].id) continue;
       var sortedIdentities = Sample.hot.foundIdentities[i].sort(function (a, b) {
         var aSortId = a.projectId == selectedProjectId ? 0 : a.projectId;
         var bSortId = b.projectId == selectedProjectId ? 0 : b.projectId;
