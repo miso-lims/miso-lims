@@ -80,7 +80,7 @@ public class SQLNoteDAOTest extends AbstractDAOTest {
     Note note = new Note();
     note.setText("projectOverviewNote");
     note.setCreationDate(new Date());
-    note.setOwner(new com.eaglegenomics.simlims.core.UserImpl());
+    note.setOwner(new UserImpl());
     note.setInternalOnly(false);
     ProjectOverview projectOverview = new ProjectOverview();
     long saveId = dao.saveProjectOverviewNote(projectOverview, note);
@@ -98,7 +98,7 @@ public class SQLNoteDAOTest extends AbstractDAOTest {
     Note note = new Note();
     note.setText("kitenote");
     note.setCreationDate(new Date());
-    note.setOwner(new com.eaglegenomics.simlims.core.UserImpl());
+    note.setOwner(new UserImpl());
     note.setInternalOnly(true);
     LibraryKit kit = new LibraryKit();
     long saveId = dao.saveKitNote(kit, note);
@@ -116,7 +116,7 @@ public class SQLNoteDAOTest extends AbstractDAOTest {
     Note note = new Note();
     note.setText("samplenote");
     note.setCreationDate(new Date());
-    note.setOwner(new com.eaglegenomics.simlims.core.UserImpl());
+    note.setOwner(new UserImpl());
     note.setInternalOnly(true);
     Sample sample = new SampleImpl();
     long saveId = dao.saveSampleNote(sample, note);
@@ -134,7 +134,7 @@ public class SQLNoteDAOTest extends AbstractDAOTest {
     Note note = new Note();
     note.setText("librarynote");
     note.setCreationDate(new Date());
-    note.setOwner(new com.eaglegenomics.simlims.core.UserImpl());
+    note.setOwner(new UserImpl());
     note.setInternalOnly(false);
     Library library = new LibraryImpl();
     long saveId = dao.saveLibraryNote(library, note);
@@ -153,7 +153,7 @@ public class SQLNoteDAOTest extends AbstractDAOTest {
     Note note = new Note();
     note.setText("runnote");
     note.setCreationDate(new Date());
-    note.setOwner(new com.eaglegenomics.simlims.core.UserImpl());
+    note.setOwner(new UserImpl());
     note.setInternalOnly(true);
     Run run = new RunImpl();
     long saveId = dao.saveRunNote(run, note);
@@ -172,7 +172,7 @@ public class SQLNoteDAOTest extends AbstractDAOTest {
     Note note = new Note();
     note.setText("poolnote");
     note.setCreationDate(new Date());
-    note.setOwner(new com.eaglegenomics.simlims.core.UserImpl());
+    note.setOwner(new UserImpl());
     note.setInternalOnly(true);
     Pool pool = new PoolImpl();
     long saveId = dao.savePoolNote(pool, note);
