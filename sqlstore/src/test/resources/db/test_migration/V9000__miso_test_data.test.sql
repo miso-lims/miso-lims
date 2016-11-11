@@ -588,3 +588,8 @@ VALUES (1,'Test Type','for testing',1,'2016-02-19 11:28:00',1,'2016-02-19 11:28:
 DELETE FROM `LibraryAdditionalInfo`;
 INSERT INTO `LibraryAdditionalInfo`(`libraryId`, `kitDescriptorId`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`, `libraryDesignCodeId`)
 VALUES (1,1,1,'2016-02-19 11:28:00',1,'2016-02-19 11:28:00',1);
+
+DELETE FROM `PrintJob`;
+DELETE FROM `PrintService`;
+INSERT INTO PrintService(serviceId, serviceName, contextName, contextFields, enabled, printServiceFor, printSchema) VALUES (1, 'foo', 'bar', '{}', TRUE, 'uk.ac.bbsrc.tgac.miso.core.data.Sample', 'bradyCustomStandardTubeBarcodeLabelSchema');
+INSERT INTO PrintJob(jobId, printServiceName, printDate, jobCreator_userId, printedElements, status) VALUES (1, 'foo', '2016-02-19', 1, '', 'OK');
