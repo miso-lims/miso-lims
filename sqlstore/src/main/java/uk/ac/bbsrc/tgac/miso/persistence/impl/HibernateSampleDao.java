@@ -195,7 +195,7 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
    * 
    * @return the original collection, having had it's contents mutated
    */
-  private <T extends Iterable<Sample>> T fetchSqlStore(T iterable) throws IOException {
+  private <T extends Iterable<U>, U extends Sample> T fetchSqlStore(T iterable) throws IOException {
     for (Sample s : iterable) {
       fetchSqlStore(s);
     }
@@ -470,7 +470,7 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
     query.setLong("id", parentId);
     @SuppressWarnings("unchecked")
     List<DetailedSample> samples = query.list();
-    return new HashSet<DetailedSample>(samples);
+    return new HashSet<>(samples);
   }
 
   /**
@@ -569,8 +569,20 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
     criteria.add(Restrictions.or(Restrictions.ilike("externalName", str), Restrictions.ilike("alias", str)));
     @SuppressWarnings("unchecked")
     Collection<Identity> records = criteria.list();
-    // return without fetching all associated SQL items
-    return records;
+    return fetchSqlStore(records);
+  }
+
+  @Override
+  public Collection<Identity> getIdentitiesByExternalNameAndProject(String externalName, Long projectId) throws IOException {
+    if (isStringEmptyOrNull(externalName)) return Collections.emptySet();
+    if (projectId == null) throw new IllegalArgumentException("Must provide a projectId in search");
+    String str = DbUtils.convertStringToSearchQuery(externalName);
+    Criteria criteria = currentSession().createCriteria(IdentityImpl.class);
+    criteria.add(Restrictions.eq("project.id", projectId));
+    criteria.add(Restrictions.or(Restrictions.ilike("externalName", str), Restrictions.ilike("alias", str)));
+    @SuppressWarnings("unchecked")
+    Collection<Identity> records = criteria.list();
+    return fetchSqlStore(records);
   }
 
   @Override

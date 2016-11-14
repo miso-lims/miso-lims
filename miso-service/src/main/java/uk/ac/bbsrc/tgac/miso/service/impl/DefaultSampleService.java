@@ -360,10 +360,26 @@ public class DefaultSampleService implements SampleService {
       if (sample.getIdentityId() != null) {
         return (DetailedSample) sampleDao.getSample(sample.getIdentityId());
       } else {
-        try {
-          return createParentIdentity(sample);
-        } catch (SQLException e) {
-          throw new IOException(e);
+        // If samples are being bulk received for the same new donor, they will all have a null parentId.
+        // After the new donor's Identity is created, the following samples need to be parented to that now-existing Identity.
+        Collection<Identity> newlyCreated = getIdentitiesByExternalNameAndProject(((Identity) tempParent).getExternalName(),
+            sample.getProject().getId());
+        if (newlyCreated.size() > 1) {
+          throw new IllegalArgumentException(
+              "IdentityId is required since there are multiple identities with external name " + ((Identity) tempParent).getExternalName()
+                  + " in project " + sample.getProject().getId());
+        } else if (newlyCreated.size() == 1) {
+          Sample parent = newlyCreated.iterator().next();
+          if (parent == null)
+            throw new IllegalArgumentException("Parent sample does not exist");
+          else
+            return (DetailedSample) parent;
+        } else {
+          try {
+            return createParentIdentity(sample);
+          } catch (SQLException e) {
+            throw new IOException(e);
+          }
         }
       }
     } else if (isTissueSample(tempParent)) {
@@ -669,6 +685,12 @@ public class DefaultSampleService implements SampleService {
   @Transactional(propagation = Propagation.REQUIRED)
   public Collection<Identity> getIdentitiesByExternalNameOrAlias(String externalName) throws IOException {
     return sampleDao.getIdentitiesByExternalNameOrAlias(externalName);
+  }
+
+  @Override
+  @Transactional(propagation = Propagation.REQUIRED)
+  public Collection<Identity> getIdentitiesByExternalNameAndProject(String externalName, Long projectId) throws IOException {
+    return sampleDao.getIdentitiesByExternalNameAndProject(externalName, projectId);
   }
 
   @Override
