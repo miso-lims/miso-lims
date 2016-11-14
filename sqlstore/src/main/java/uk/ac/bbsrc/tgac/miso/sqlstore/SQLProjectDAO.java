@@ -104,7 +104,7 @@ public class SQLProjectDAO implements ProjectStore {
   public static final String PROJECT_SELECT_BY_ALIAS = PROJECTS_SELECT + " WHERE alias = ?";
 
   public static final String PROJECTS_SELECT_BY_SEARCH = PROJECTS_SELECT + " WHERE UPPER(name) LIKE ? OR UPPER(alias) LIKE ? OR "
-      + "UPPER(description) LIKE ? ";
+      + "UPPER(description) LIKE ? OR UPPER(shortName) LIKE ? ";
 
   public static final String PROJECT_UPDATE = "UPDATE " + TABLE_NAME + " "
       + "SET name=:name, alias=:alias, shortName=:shortName, description=:description, creationDate=:creationDate, securityProfile_profileId=:securityProfile_profileId, progress=:progress, referenceGenomeId=:referenceGenomeId "
@@ -516,7 +516,8 @@ public class SQLProjectDAO implements ProjectStore {
   @CoverageIgnore
   public List<Project> listBySearch(String query) {
     String mySQLQuery = DbUtils.convertStringToSearchQuery(query);
-    return template.query(PROJECTS_SELECT_BY_SEARCH, new Object[] { mySQLQuery, mySQLQuery, mySQLQuery }, new ProjectMapper(true));
+    return template.query(PROJECTS_SELECT_BY_SEARCH, new Object[] { mySQLQuery, mySQLQuery, mySQLQuery, mySQLQuery },
+        new ProjectMapper(true));
   }
 
   @Override
@@ -591,7 +592,7 @@ public class SQLProjectDAO implements ProjectStore {
         try {
           project.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
           project.setIssueKeys(listIssueKeysByProjectId(id));
-          project.setWatchers(new HashSet<User>(watcherDAO.getWatchersByEntityName(project.getWatchableIdentifier())));
+          project.setWatchers(new HashSet<>(watcherDAO.getWatchersByEntityName(project.getWatchableIdentifier())));
           if (project.getSecurityProfile() != null && project.getSecurityProfile().getOwner() != null)
             project.addWatcher(project.getSecurityProfile().getOwner());
           for (User u : watcherDAO.getWatchersByWatcherGroup("ProjectWatchers")) {
