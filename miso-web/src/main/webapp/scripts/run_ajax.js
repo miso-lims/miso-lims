@@ -155,6 +155,31 @@ var Run = Run || {
         }
       }
     }
+  },
+
+  makePacBioUrl: function (pbDashboardUrl, runName, startString, instrumentName) {
+    function zeroPad (number, size) {
+      number = number.toString();
+      while (number.length < size) number = "0" + number;
+      return number;
+    }
+    // runName format [givenName]_[numberOfTimesMachineHasBeenRun]. The PBDashboard stores the run name without the numberOfTimesMachineHasBeenRun
+    var truncatedRunName = runName.split("_").slice(0, -1).join("_");
+    // startString format YYYY-MM-DD; need YYYYMMDD
+    var sd = startString.split("-");
+    var startDate = new Date(sd[0], (parseInt(sd[1]) - 1), sd[2]);
+    // day before start in format YYYYMMDD-000000
+    var before = new Date(startDate.getTime() - 86400000);
+    var from = "" + before.getFullYear() + zeroPad(before.getMonth() + 1, 2) + zeroPad(before.getDate(), 2) + "-" + zeroPad(0, 6);
+    var after = new Date(startDate.getTime() + 86400000);
+    var to = "" + after.getFullYear() + zeroPad(after.getMonth() + 1, 2) + zeroPad(after.getDate(), 2) + "-" + zeroPad(0, 6);
+    var url = pbDashboardUrl
+              + "?instrument=" + (instrumentName ? instrumentName : "")
+              + "&run=" + truncatedRunName
+              + "&from=" + from
+              + "&to=" + to;
+    var pbDashTd = jQuery('#pbDashLink');
+    pbDashTd.html('<a href="' + url + '" target="_blank">Run Report (opens in new tab)</a>');
   }
 };
 
