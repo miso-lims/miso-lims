@@ -256,15 +256,10 @@ Sequencer.ui = {
             "aaSorting": [
               [0, "asc"]
             ]
-          });
-          Sequencer.ui.changeSequencerListingActive("true");
+          }).fnFilter(true, 5);
+          // filter for active sequencers
         }
       }
     )
-  },
-  
-  changeSequencerListingActive : function(active) {
-    jQuery('#listingSequencersTable').dataTable().fnFilter(active, 6);
-  }
-  
+  }  
 };
