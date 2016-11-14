@@ -201,6 +201,17 @@
       </c:choose>
     </td>
   </tr>
+  <c:if test="${run.id != 0 && run.platformType.key == 'PacBio' && pacBioDashboardUrl != null}">
+  <tr>
+    <td>PacBio Dashboard:</td>
+    <td><span id="pbDashLink"></span>
+    <script type="text/javascript">
+    jQuery(document).ready(function() {
+      Run.makePacBioUrl('${pacBioDashboardUrl}', '${run.alias}', '${run.sequencerReference.name}');
+    });
+    </script>
+  </tr>
+  </c:if>
   <tr>
     <td>Paired End:</td>
     <td>

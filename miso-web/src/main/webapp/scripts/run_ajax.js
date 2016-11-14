@@ -155,6 +155,27 @@ var Run = Run || {
         }
       }
     }
+  },
+
+  makePacBioUrl: function (pbDashboardUrl, runName, instrumentName) {
+    function zeroPad (number, size) {
+      number = number.toString();
+      while (number.length < size) number = "0" + number;
+      return number;
+    }
+    var today = new Date();
+    // today in format YYYYMMDD-000000
+    var todayString = "" + today.getFullYear() + zeroPad(today.getMonth() + 1, 2) + zeroPad(today.getDate(), 2) + "-" + zeroPad(0, 6);
+    var yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    var yesterdayString = "" + yesterday.getFullYear() + zeroPad(yesterday.getMonth() + 1, 2) + zeroPad(yesterday.getDate(), 2) + "-" + zeroPad(0, 6);
+    var url = pbDashboardUrl
+              + "?instrument=" + (instrumentName ? instrumentName : "")
+              + "&run=" + runName
+              + "&from=" + yesterdayString
+              + "&to=" + todayString;
+    var pbDashTd = jQuery('#pbDashLink');
+    pbDashTd.html('<a href="' + url + '" target="_blank">Dashboard Link (opens in new tab)</a>');
   }
 };
 
