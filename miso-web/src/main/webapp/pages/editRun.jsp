@@ -204,10 +204,10 @@
   <c:if test="${run.id != 0 && run.platformType.key == 'PacBio' && pacBioDashboardUrl != null}">
   <tr>
     <td>PacBio Dashboard:</td>
-    <td><span id="pbDashLink"></span>
+    <td><span id="pbDashLink"></span></td>
     <script type="text/javascript">
     jQuery(document).ready(function() {
-      Run.makePacBioUrl('${pacBioDashboardUrl}', '${run.alias}', '${run.sequencerReference.name}');
+      Run.makePacBioUrl('${pacBioDashboardUrl}', '${run.alias}', '${run.status.startDate}', '${run.sequencerReference.name}');
     });
     </script>
   </tr>

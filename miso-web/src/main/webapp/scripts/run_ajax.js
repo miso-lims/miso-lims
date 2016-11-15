@@ -163,15 +163,13 @@ var Run = Run || {
       while (number.length < size) number = "0" + number;
       return number;
     }
-    // format DD/MM/YYYY; need YYYYMMDD
-    var sd = startString.split("/");
-    var startDate = new Date(sd[2], sd[1], sd[0]);
+    // format YYYY-MM-DD; need YYYYMMDD
+    var sd = startString.split("-");
+    var startDate = new Date(sd[0], (parseInt(sd[1]) - 1), sd[2]);
     // day before start in format YYYYMMDD-000000
-    var before = new Date();
-    before = startDate.getDate() - 1;
+    var before = new Date(startDate.getTime() - 86400000);
     var from = "" + before.getFullYear() + zeroPad(before.getMonth() + 1, 2) + zeroPad(before.getDate(), 2) + "-" + zeroPad(0, 6);
-    var after = new Date();
-    after.setDate(startDate.getDate() + 1);
+    var after = new Date(startDate.getTime() + 86400000);
     var to = "" + after.getFullYear() + zeroPad(after.getMonth() + 1, 2) + zeroPad(after.getDate(), 2) + "-" + zeroPad(0, 6);
     var url = pbDashboardUrl
               + "?instrument=" + (instrumentName ? instrumentName : "")
