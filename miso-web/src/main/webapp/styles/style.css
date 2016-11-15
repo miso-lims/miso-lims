@@ -1286,7 +1286,7 @@ div.experimentwizard li {
     display: inline-block;
     margin: 0;
     padding: 5px 10px;
-    width: 119px;
+    width: auto;
     white-space: nowrap;
     text-align: right;
     text-decoration: none;
@@ -1298,6 +1298,12 @@ div.experimentwizard li {
 .sddm div a:hover {
     background: #49A3FF;
     color: #FFFFFF;
+}
+
+#sddm-noh1 {
+  margin: 25px 0px;
+  font: 80% "Trebuchet MS", Helvetica;
+  cursor:default;
 }
 
 .barcode-ddm {
@@ -1904,4 +1910,15 @@ button.disabled {
   margin: 0;
   display: inline-block;
   cursor: pointer;
+}
+
+.element-right {
+  float: right;
+  margin-top: 3px;
+  margin-right: 3px;
+  padding: 1px;
+}
+
+.wide-padding {
+  padding: 2px 15px;
 }
