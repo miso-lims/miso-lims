@@ -858,17 +858,8 @@ public class ValueTypeLookup {
       }
 
       LibraryDesignCode ldc = resolve(lai.getLibraryDesignCode());
-      if (ldc == null) {
-        if (library.getAlias().length() >= 2) {
-          LibraryDesignCode codeFromName = new LibraryDesignCode();
-          codeFromName.setCode(library.getAlias().substring(library.getAlias().length() - 2));
-          ldc = resolve(codeFromName);
-        }
-      }
-      if (ldc == null) {
-        throw new IOException(String.format("LibraryDesignCode %s not found, and cannot infer it from alias %s",
-            lai.getLibraryDesignCode().getCode(), library.getAlias()));
-      }
+      if (ldc == null) throw new IOException(String.format("LibraryDesignCode %s not found, and cannot infer it from alias %s",
+          lai.getLibraryDesignCode().getCode(), library.getAlias()));
       lai.setLibraryDesignCode(ldc);
     }
   }
