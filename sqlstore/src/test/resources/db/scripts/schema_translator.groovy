@@ -20,7 +20,14 @@ final String testSchemaDir = basedir + '/target/test-classes/db/test_migration/'
 
 Files.createDirectories(Paths.get(testSchemaDir))
 for (File file : productionSchemaDir.listFiles()) {
-  if (file.isFile() && file.getName().matches(productionScriptPattern)) {
+  if (!file.isFile()) {
+    continue
+  }
+  if (file.getName().contains(" ")) {
+    println("File name has spaces : " + file.getName())
+    System.exit(1)
+  }
+  if (file.getName().matches(productionScriptPattern)) {
     println('Translating file: ' + file.getAbsolutePath())
     Path srcPath = file.toPath()
     Path dstPath = Paths.get(testSchemaDir + file.getName().replaceFirst('\\.sql$', '.test.sql'))
