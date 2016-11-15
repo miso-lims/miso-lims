@@ -345,7 +345,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
           }
         }
       }
-      library.inheritPermissions(library.getSample());
+      library.inheritPermissions(library.getSample().getProject());
       valueTypeLookup.resolveAll(library);
       library.setLastModifier(migrationUser);
       library.setLastUpdated(timeStamp);

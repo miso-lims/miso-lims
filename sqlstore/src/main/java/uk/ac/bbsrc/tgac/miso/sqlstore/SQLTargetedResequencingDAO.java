@@ -7,9 +7,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +21,9 @@ import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import com.eaglegenomics.simlims.core.store.SecurityStore;
 
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
+
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedResequencing;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
@@ -35,14 +35,14 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 @Transactional(rollbackFor = Exception.class)
 public class SQLTargetedResequencingDAO implements TargetedResequencingStore {
 
-  private static String SELECT = "SELECT targetedResequencingId, alias, description, kitDescriptorId, "
+  private static String SELECT = "SELECT targetedResequencingId, alias, description, kitDescriptorId, archived, "
       + "createdBy, creationDate, updatedBy, lastUpdated  FROM TargetedResequencing";
 
   private static final String SELECT_BY_ID = SELECT + " WHERE targetedResequencingId=?";
 
   private static final String UPDATE = "UPDATE TargetedResequencing "
       + "SET targetedResequencingId=:targetedResequencingId, alias=:alias, description=:description, kitDescriptorId=:kitDescriptorId, "
-      + "createdBy=:createdBy, creationDate=:creationDate, updatedBy=:updatedBy WHERE dilutionId=:dilutionId";
+      + "archived=:archived, createdBy=:createdBy, creationDate=:creationDate, updatedBy=:updatedBy WHERE dilutionId=:dilutionId";
 
   protected static final Logger log = LoggerFactory.getLogger(SQLTargetedResequencingDAO.class);
 
@@ -67,8 +67,18 @@ public class SQLTargetedResequencingDAO implements TargetedResequencingStore {
   }
 
   @CoverageIgnore
+  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
+    this.dataObjectFactory = dataObjectFactory;
+  }
+
+  @CoverageIgnore
   public void setSecurityDAO(SecurityStore securityDAO) {
     this.securityDAO = securityDAO;
+  }
+
+  @CoverageIgnore
+  public void setSecurityManager(SecurityManager securityManager) {
+    this.securityManager = securityManager;
   }
 
   @Override
@@ -80,6 +90,7 @@ public class SQLTargetedResequencingDAO implements TargetedResequencingStore {
     params.addValue("alias", targetedResequencing.getAlias());
     params.addValue("description", targetedResequencing.getDescription());
     params.addValue("kitDescriptorId", targetedResequencing.getKitDescriptor().getId());
+    params.addValue("archived", targetedResequencing.isArchived());
     params.addValue("lastUpdated", now);
     params.addValue("updatedBy", currentUser);
     if (targetedResequencing.getTargetedResequencingId() == TargetedResequencing.UNSAVED_ID) {
@@ -150,6 +161,7 @@ public class SQLTargetedResequencingDAO implements TargetedResequencingStore {
       targetedResequencing.setTargetedResequencingId(id);
       targetedResequencing.setAlias(rs.getString("alias"));
       targetedResequencing.setDescription(rs.getString("description"));
+      targetedResequencing.setArchived(rs.getBoolean("archived"));
       targetedResequencing.setCreationDate(rs.getDate("creationDate"));
       targetedResequencing.setLastUpdated(rs.getDate("lastUpdated"));
 

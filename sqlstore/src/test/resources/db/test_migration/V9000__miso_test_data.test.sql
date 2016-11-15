@@ -174,6 +174,13 @@ INSERT INTO `Kit`(`kitId`,`identificationBarcode`,`locationBarcode`,`lotNumber`,
 (1,'1234','Freezer2','LOT34',NOW(),1),
 (2,'5678','Freezer3','LOT35',NOW(),2);
 
+DELETE FROM `TargetedResequencing`;
+INSERT INTO `TargetedResequencing`(`targetedResequencingId`,`alias`,`description`,`kitDescriptorId`, `archived`, `createdBy`,`creationDate`,`updatedBy`,`lastUpdated`) VALUES
+(1,'HALO_IBP','Master Chief',1,0,1,NOW(),1,NOW()),
+(2,'Thunderbolts','of lightening, very very frightening',1,0,1,NOW(),1,NOW()),
+(3,'Thunderbolts','of lightening, very very frightening',2,0,1,NOW(),1,NOW());
+
+
 DELETE FROM `LibraryDilution`;
 INSERT INTO `LibraryDilution`(`dilutionId`, `concentration`, `library_libraryId`, `identificationBarcode`, `creationDate`, `dilutionUserName`, `name`, `securityProfile_profileId`) 
 VALUES (1,2,1,'LDI1::TEST_0001_Bn_P_PE_300_WG','2015-08-27','admin','LDI1',1),
@@ -440,8 +447,17 @@ INSERT INTO `Watcher`(`entityName`, `userId`)
 VALUES ('IPO1',1),('IPO10',1),('IPO2',1),('IPO3',1),('IPO4',1),('IPO5',1),('IPO6',1),('IPO7',1),('IPO8',1),('IPO9',1);
 
 DELETE FROM `SecurityProfile`;
+DELETE FROM `SecurityProfile_ReadGroup`;
+DELETE FROM `SecurityProfile_WriteGroup`;
+DELETE FROM `SecurityProfile_ReadUser`;
+DELETE FROM `SecurityProfile_WriteUser`;
 INSERT INTO `SecurityProfile`(`profileId`, `allowAllInternal`, `owner_userId`) 
 VALUES (1,1,1),(2,1,1),(3,1,1),(4,1,1),(5,1,1),(6,1,1),(7,1,1),(8,1,1),(9,1,1),(10,1,1),(11,1,1),(12,1,NULL),(13,1,NULL),(14,1,NULL),(15,1,NULL);
+
+INSERT INTO SecurityProfile_ReadUser(SecurityProfile_profileId, readUser_userId) VALUES (1, 1);
+INSERT INTO SecurityProfile_WriteUser(SecurityProfile_profileId, writeUser_userId) VALUES (2, 1);
+INSERT INTO SecurityProfile_ReadGroup(SecurityProfile_profileId, readGroup_groupId) VALUES (3, 2);
+INSERT INTO SecurityProfile_WriteGroup(SecurityProfile_profileId, writeGroup_groupId) VALUES (4, 2);
 
 DELETE FROM `Institute`;
 INSERT INTO `Institute`(`instituteId`, `alias`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
@@ -587,3 +603,8 @@ VALUES (1,'Test Type','for testing',1,'2016-02-19 11:28:00',1,'2016-02-19 11:28:
 DELETE FROM `LibraryAdditionalInfo`;
 INSERT INTO `LibraryAdditionalInfo`(`libraryId`, `kitDescriptorId`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`, `libraryDesignCodeId`)
 VALUES (1,1,1,'2016-02-19 11:28:00',1,'2016-02-19 11:28:00',1);
+
+DELETE FROM `PrintJob`;
+DELETE FROM `PrintService`;
+INSERT INTO PrintService(serviceId, serviceName, contextName, contextFields, enabled, printServiceFor, printSchema) VALUES (1, 'foo', 'bar', '{}', TRUE, 'uk.ac.bbsrc.tgac.miso.core.data.Sample', 'bradyCustomStandardTubeBarcodeLabelSchema');
+INSERT INTO PrintJob(jobId, printServiceName, printDate, jobCreator_userId, printedElements, status) VALUES (1, 'foo', '2016-02-19', 1, '', 'OK');

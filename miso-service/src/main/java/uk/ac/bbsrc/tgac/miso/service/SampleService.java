@@ -36,4 +36,6 @@ public interface SampleService {
   Collection<Identity> getIdentitiesByExternalNameOrAlias(String externalName) throws IOException;
 
   void confirmExternalNameUniqueForProjectIfRequired(String externalNames, Sample sample) throws IOException, ConstraintViolationException;
+
+  Collection<Identity> getIdentitiesByExternalNameAndProject(String externalName, Long projectId) throws IOException;
 }

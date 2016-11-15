@@ -63,4 +63,15 @@ public interface SampleDao extends SampleStore {
    */
   Collection<Identity> getIdentitiesByExternalNameOrAlias(String externalName) throws IOException;
 
+  /**
+   * List all the identities associated with a given project which have at least one external name which exactly matches the input String.
+   * The input String must be a single non-comma-separated external name.
+   * 
+   * @param externalName a single external name String
+   * @param projectId Long
+   * @return Collection<Sample> set of Identities belonging to a given project which have an external name that matches the input string
+   * @throws IOException
+   */
+  Collection<Identity> getIdentitiesByExternalNameAndProject(String externalName, Long projectId) throws IOException;
+
 }

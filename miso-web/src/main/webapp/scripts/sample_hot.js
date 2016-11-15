@@ -1447,6 +1447,7 @@ Sample.hot = {
           Sample.hot.foundIdentities = data.identitiesResults;
           Sample.hot.flattenedIdentities = [].concat.apply([], Sample.hot.foundIdentities);
           Sample.hot.setIdentitySources();
+          Hot.hotTable.render();
           Sample.hot.displayCheckmark();
         }
       });
@@ -1461,6 +1462,7 @@ Sample.hot = {
     var rowCount = Sample.hot.foundIdentities.length;
     var selectedProjectId = Sample.hot.selectedProjectId;
     for (var i = 0; i < rowCount; i++) {
+      if (Hot.startData[i].id) continue;
       var sortedIdentities = Sample.hot.foundIdentities[i].sort(function (a, b) {
         var aSortId = a.projectId == selectedProjectId ? 0 : a.projectId;
         var bSortId = b.projectId == selectedProjectId ? 0 : b.projectId;
@@ -1473,6 +1475,7 @@ Sample.hot = {
         identityItems.unshift("First Receipt" + (projShortName ? " (" + projShortName + ")" : ""));
       }
       Hot.hotTable.setCellMeta(i, identityColIndex, 'source', identityItems);
+      Hot.hotTable.setCellMeta(i, identityColIndex, 'renderer', Hot.requiredAutocompleteRenderer);
     }
   },
   

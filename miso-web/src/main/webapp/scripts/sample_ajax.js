@@ -1039,7 +1039,7 @@ Sample.ui = {
     var hasIdentityInProject = (sortedIdentities.length > 0 && sortedIdentities[0].projectId == selectedProjectId);
     var parentSelect = ['<select id="parentSelect" style="padding:3px;">'];
     var projShortName = Hot.maybeGetProperty(Hot.findFirstOrNull(Hot.idPredicate(selectedProjectId), Hot.dropdownRef.projects), 'shortname');
-    if (!hasIdentityInProject) parentSelect.push('<option value="0">First Receipt' + (projShortName ? ' (' + projShortName + ')' : '') + '</option>');
+    if (!hasIdentityInProject) parentSelect.push('<option value="">First Receipt' + (projShortName ? ' (' + projShortName + ')' : '') + '</option>');
     for (var i = 0; i < sortedIdentities.length; i++) {
       parentSelect.push('<option value="' + sortedIdentities[i].id + '">' + Sample.hot.getIdentityLabel(sortedIdentities[i]) + '</option>');
     }

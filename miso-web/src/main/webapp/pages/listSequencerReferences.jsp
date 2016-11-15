@@ -35,16 +35,17 @@
     <div id="tabs">
       <ul>
         <li>
-          <a href="#tab-1" onclick="Sequencer.ui.changeSequencerListingActive('true')"><span>Current</span></a>
+          <a href="#tab-1"><span>Current</span></a>
         </li>
         <li>
-          <a href="#tab-2" onclick="Sequencer.ui.changeSequencerListingActive('false')"><span>Retired</span></a>
+          <a href="#tab-2"><span>Retired</span></a>
         </li>
       </ul>
       
       <div id="tab">
-        <table cellpadding="0" cellspacing="0" border="0" class="display" id="listingSequencersTable">
-        </table>
+        <div id="tab-1"></div>
+        <div id="tab-2"></div>
+        <table cellpadding="0" cellspacing="0" border="0" class="display" id="listingSequencersTable"></table>      
       </div>
     </div>
     
@@ -53,7 +54,12 @@
 
 <script type="text/javascript">
   jQuery(document).ready(function () {
-    jQuery("#tabs").tabs();
+    jQuery("#tabs").tabs({
+      select: function (event, ui) {
+        // filter by active sequencers (active in tab-1, inactive in tab-2)
+        jQuery('#listingSequencersTable').dataTable().fnFilter((ui.index == 0 ? true : false), 5);
+      }
+    });
     Sequencer.ui.createListingSequencersTable();
   });
 </script>

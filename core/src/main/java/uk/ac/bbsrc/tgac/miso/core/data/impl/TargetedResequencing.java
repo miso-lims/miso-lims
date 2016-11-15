@@ -21,6 +21,8 @@ public class TargetedResequencing {
   /** The kit chosen will restrict the targeted resequencing that is available. */
   private KitDescriptor kitDescriptor;
 
+  private boolean archived;
+
   private User createdBy;
 
   private Date creationDate;
@@ -91,6 +93,14 @@ public class TargetedResequencing {
 
   public void setLastUpdated(Date lastUpdated) {
     this.lastUpdated = lastUpdated;
+  }
+
+  public boolean isArchived() {
+    return archived;
+  }
+
+  public void setArchived(boolean archived) {
+    this.archived = archived;
   }
 
 }

@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -31,8 +31,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import net.sf.ehcache.CacheManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +51,8 @@ import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.Property;
 import com.googlecode.ehcache.annotations.TriggersRemove;
 
+import net.sf.ehcache.CacheManager;
+
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 
 /**
@@ -70,18 +70,6 @@ public class SQLSecurityProfileDAO implements Store<SecurityProfile> {
   public static final String PROFILES_SELECT = "SELECT profileId, allowAllInternal, owner_userId " + "FROM " + TABLE_NAME;
 
   public static final String PROFILE_SELECT_BY_ID = PROFILES_SELECT + " WHERE profileId = ?";
-
-  public static final String PROFILE_USERS_GROUPS_DELETE = "DELETE sp, spru, spwu, sprg, spwg FROM " + TABLE_NAME + " sp "
-      + "LEFT JOIN SecurityProfile_ReadUser AS spru ON sp.profileId = spru.SecurityProfile_profileId "
-      + "LEFT JOIN SecurityProfile_WriteUser AS spwu ON sp.profileId = spwu.SecurityProfile_profileId "
-      + "LEFT JOIN SecurityProfile_ReadGroup AS sprg ON sp.profileId = sprg.SecurityProfile_profileId "
-      + "LEFT JOIN SecurityProfile_WriteGroup AS spwg ON sp.profileId = spwg.SecurityProfile_profileId " + "WHERE sp.profileId=:profileId";
-
-  public static final String USERS_GROUPS_SELECT_BY_PROFILE_ID = "SELECT sp.profileId, spru.readUser_userId, spwu.writeUser_userId, sprg.readGroup_groupId, spwg.writeGroup_groupId "
-      + "FROM " + TABLE_NAME + " sp " + "LEFT JOIN SecurityProfile_ReadUser spru ON sp.profileId = spru.SecurityProfile_profileId "
-      + "LEFT JOIN SecurityProfile_WriteUser spwu ON sp.profileId = spwu.SecurityProfile_profileId "
-      + "LEFT JOIN SecurityProfile_ReadGroup sprg ON sp.profileId = sprg.SecurityProfile_profileId "
-      + "LEFT JOIN SecurityProfile_WriteGroup spwg ON sp.profileId = spwg.SecurityProfile_profileId " + "WHERE sp.profileId=?";
 
   protected static final Logger log = LoggerFactory.getLogger(SQLSecurityProfileDAO.class);
 
@@ -126,7 +114,13 @@ public class SQLSecurityProfileDAO implements Store<SecurityProfile> {
       MapSqlParameterSource delparams = new MapSqlParameterSource();
       delparams.addValue("profileId", securityProfile.getProfileId());
       NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
-      namedTemplate.update(PROFILE_USERS_GROUPS_DELETE, delparams);
+      for (String deleteQuery : new String[] { "DELETE FROM " + TABLE_NAME + " WHERE profileId=:profileId",
+          "DELETE FROM SecurityProfile_ReadUser WHERE SecurityProfile_profileId=:profileId",
+          "DELETE FROM SecurityProfile_WriteUser WHERE SecurityProfile_profileId=:profileId",
+          "DELETE FROM SecurityProfile_ReadGroup WHERE SecurityProfile_profileId=:profileId",
+          "DELETE FROM SecurityProfile_WriteGroup WHERE SecurityProfile_profileId=:profileId" }) {
+        namedTemplate.update(deleteQuery, delparams);
+      }
 
       List<SecurityProfile> results = template.query(PROFILE_SELECT_BY_ID, new Object[] { securityProfile.getProfileId() },
           new SecurityProfileMapper());
@@ -207,8 +201,8 @@ public class SQLSecurityProfileDAO implements Store<SecurityProfile> {
   @Cacheable(cacheName = "securityProfileCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
       @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public SecurityProfile get(long id) throws IOException {
-    List results = template.query(PROFILE_SELECT_BY_ID, new Object[] { id }, new SecurityProfileMapper());
-    SecurityProfile sp = results.size() > 0 ? (SecurityProfile) results.get(0) : null;
+    List<SecurityProfile> results = template.query(PROFILE_SELECT_BY_ID, new Object[] { id }, new SecurityProfileMapper());
+    SecurityProfile sp = results.size() > 0 ? results.get(0) : null;
 
     if (sp != null) {
       fillOutSecurityProfile(sp);
@@ -224,40 +218,19 @@ public class SQLSecurityProfileDAO implements Store<SecurityProfile> {
     return get(id);
   }
 
+  private List<Long> getIds(long id, String query) {
+    return template.queryForList(query, Long.class, id);
+  }
+
   private void fillOutSecurityProfile(SecurityProfile sp) throws IOException {
-    List<Map<String, Object>> results = template.queryForList(USERS_GROUPS_SELECT_BY_PROFILE_ID, sp.getProfileId());
-    Set<Long> ruIds = new HashSet<Long>();
-    Set<Long> wuIds = new HashSet<Long>();
-    Set<Long> rgIds = new HashSet<Long>();
-    Set<Long> wgIds = new HashSet<Long>();
-
-    for (Map<String, Object> row : results) {
-      Long ur = (Long) row.get("readUser_userId");
-      Long uw = (Long) row.get("writeUser_userId");
-      Long gr = (Long) row.get("readGroup_groupId");
-      Long gw = (Long) row.get("writeGroup_groupId");
-
-      if (ur != null) {
-        ruIds.add(ur);
-      }
-
-      if (uw != null) {
-        wuIds.add(uw);
-      }
-
-      if (gr != null) {
-        rgIds.add(gr);
-      }
-
-      if (gw != null) {
-        wgIds.add(gw);
-      }
-    }
-
-    sp.getReadUsers().addAll(securityManager.listUsersByIds(ruIds));
-    sp.getWriteUsers().addAll(securityManager.listUsersByIds(wuIds));
-    sp.getReadGroups().addAll(securityManager.listGroupsByIds(rgIds));
-    sp.getWriteGroups().addAll(securityManager.listGroupsByIds(wgIds));
+    sp.getReadUsers().addAll(securityManager.listUsersByIds(
+        getIds(sp.getProfileId(), "SELECT readUser_userId FROM SecurityProfile_ReadUser WHERE SecurityProfile_profileId=?")));
+    sp.getWriteUsers().addAll(securityManager.listUsersByIds(
+        getIds(sp.getProfileId(), "SELECT writeUser_userId FROM SecurityProfile_WriteUser WHERE SecurityProfile_profileId=?")));
+    sp.getReadGroups().addAll(securityManager.listGroupsByIds(
+        getIds(sp.getProfileId(), "SELECT readGroup_groupId FROM SecurityProfile_ReadGroup WHERE SecurityProfile_profileId=?")));
+    sp.getWriteGroups().addAll(securityManager.listGroupsByIds(
+        getIds(sp.getProfileId(), "SELECT writeGroup_groupId FROM SecurityProfile_WriteGroup WHERE SecurityProfile_profileId=?")));
   }
 
   public class SecurityProfileMapper implements RowMapper<SecurityProfile> {
