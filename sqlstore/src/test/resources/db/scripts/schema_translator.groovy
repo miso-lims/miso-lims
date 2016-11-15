@@ -34,7 +34,7 @@ for (File file : productionSchemaDir.listFiles()) {
     String text = new String(Files.readAllBytes(srcPath))
     
     String translated = text
-        .replaceAll('(?s)--StartNoTest(.*?)--EndNoTest', '--') // Delete blocks containing non-standard delimiters
+        .replaceAll('(?s)-- ?StartNoTest(.*?)-- ?EndNoTest', '--') // Delete blocks containing non-standard delimiters
         .replaceAll('b\'0\'', '0') // bit representation
         .replaceAll('b\'1\'', '1') // bit representation
         .replaceAll('DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP', 'AS CURRENT_TIMESTAMP') // syntax difference, same result
