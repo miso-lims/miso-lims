@@ -1,3 +1,21 @@
+# 0.2.39
+
+Changes:
+
+ * search by project shortName in home page widget (#538)
+ * Add tests for SQLSecurityProfileDAO
+ * filter sequencers list
+ * Add tests for SQLPrintJobDAO
+ * Added archive field to TargetedResequencing. (#528)
+ * Fix identity lookup (#532)
+ * Use newly-created identities if receiving multiple samples from same new donor
+ * add protocolManager to fix deployment
+ * Copy required parts of the simlims package for MISO (#530)
+ * visually highlight identities column after lookup
+ * fix error when creating first receipt sample
+ * Avoid NPE when design code is missing
+ * in migration, Library SecurityProfile is set using its parent Sample's Project, not the Sample itself.
+
 # 0.2.38
 Changes:
 
