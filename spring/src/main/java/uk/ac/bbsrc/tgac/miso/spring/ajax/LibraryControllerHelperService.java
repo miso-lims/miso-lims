@@ -59,6 +59,7 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import net.sf.json.JSONArray;
@@ -67,6 +68,7 @@ import net.sf.json.JSONObject;
 import net.sf.json.JsonConfig;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
@@ -274,7 +276,7 @@ public class LibraryControllerHelperService {
         mps = printManager.getPrintService(serviceName);
       }
 
-      Queue<File> thingsToPrint = new LinkedList<File>();
+      Queue<File> thingsToPrint = new LinkedList<>();
 
       JSONArray ls = JSONArray.fromObject(json.getString("libraries"));
       for (JSONObject l : (Iterable<JSONObject>) ls) {
@@ -327,7 +329,7 @@ public class LibraryControllerHelperService {
         mps = printManager.getPrintService(serviceName);
       }
 
-      Queue<File> thingsToPrint = new LinkedList<File>();
+      Queue<File> thingsToPrint = new LinkedList<>();
 
       JSONArray ls = JSONArray.fromObject(json.getString("dilutions"));
       for (JSONObject l : (Iterable<JSONObject>) ls) {
@@ -396,7 +398,7 @@ public class LibraryControllerHelperService {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       if (!isStringEmptyOrNull(idBarcode)) {
-        List<Boxable> previouslyBarcodedItems = new ArrayList<Boxable>(requestManager.getBoxablesFromBarcodeList(Arrays.asList(idBarcode)));
+        List<Boxable> previouslyBarcodedItems = new ArrayList<>(requestManager.getBoxablesFromBarcodeList(Arrays.asList(idBarcode)));
         if (!previouslyBarcodedItems.isEmpty()
             && !(previouslyBarcodedItems.size() == 1 && previouslyBarcodedItems.get(0).getId() == libraryId)) {
           Boxable previouslyBarcodedItem = previouslyBarcodedItems.get(0);
@@ -450,7 +452,7 @@ public class LibraryControllerHelperService {
         User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
         Project p = requestManager.getProjectById(json.getLong("projectId"));
         JSONArray a = JSONArray.fromObject(json.get("libraries"));
-        Set<Library> saveSet = new HashSet<Library>();
+        Set<Library> saveSet = new HashSet<>();
 
         for (JSONObject j : (Iterable<JSONObject>) a) {
           try {
@@ -499,7 +501,7 @@ public class LibraryControllerHelperService {
 
               if (j.has("indices") && !isStringEmptyOrNull(j.getString("indices")) && !j.getString("indices").contains("Select")) {
                 String[] codes = j.getString("indices").split(Pattern.quote("|"));
-                List<Index> indices = new ArrayList<Index>();
+                List<Index> indices = new ArrayList<>();
                 for (String code : codes) {
                   try {
                     long cl = Long.parseLong(code);
@@ -531,7 +533,7 @@ public class LibraryControllerHelperService {
         }
 
         try {
-          List<Library> sortedList = new ArrayList<Library>(saveSet);
+          List<Library> sortedList = new ArrayList<>(saveSet);
           Collections.sort(sortedList, new AliasComparator(Library.class));
           for (Library library : sortedList) {
             requestManager.saveLibrary(library);
@@ -565,7 +567,7 @@ public class LibraryControllerHelperService {
         JSONObject result = new JSONObject();
 
         StringBuilder libsb = new StringBuilder();
-        List<LibraryType> types = new ArrayList<LibraryType>();
+        List<LibraryType> types = new ArrayList<>();
         for (LibraryType type : requestManager.listLibraryTypesByPlatform(platform)) {
           if (!type.getArchived() || type.getId() == originalLibraryTypeId) {
             types.add(type);
@@ -597,7 +599,7 @@ public class LibraryControllerHelperService {
     if (json.has("indexFamily")) {
       IndexFamily ifam = indexStore.getIndexFamilyByName(json.getString("indexFamily"));
       if (ifam != null) {
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
         StringBuilder indexsb = new StringBuilder();
         for (int i = 1; i <= ifam.getMaximumNumber(); i++) {
           // select
@@ -627,7 +629,7 @@ public class LibraryControllerHelperService {
       for (QcType s : types) {
         sb.append("<option units='" + s.getUnits() + "' value='" + s.getQcTypeId() + "'>" + s.getName() + "</option>");
       }
-      Map<String, Object> map = new HashMap<String, Object>();
+      Map<String, Object> map = new HashMap<>();
       map.put("types", sb.toString());
       return JSONUtils.JSONObjectResponse(map);
     } catch (IOException e) {
@@ -643,7 +645,8 @@ public class LibraryControllerHelperService {
     }
 
     try {
-      Collection<TargetedResequencing> targetedResequencings = requestManager.listAllTargetedResequencing();
+      Collection<TargetedResequencing> targetedResequencings = getNonArchivedTargetedResequencing(
+          requestManager.listAllTargetedResequencing());
       JSONArray fullTargetedResequencingCollection = new JSONArray();
       JSONArray targetedResequencingByKit = new JSONArray();
       for (TargetedResequencing targetedResequencing : targetedResequencings) {
@@ -667,6 +670,16 @@ public class LibraryControllerHelperService {
       log.error("Cannot list all Targeted Resequencing entries ", e);
     }
     return JSONUtils.SimpleJSONError("Cannot list all Targeted Resequencing entries");
+  }
+
+  private Collection<TargetedResequencing> getNonArchivedTargetedResequencing(Collection<TargetedResequencing> targetedResequencings) {
+    List<TargetedResequencing> result = Lists.newArrayList();
+    for (TargetedResequencing targetedResequencing : targetedResequencings) {
+      if (!targetedResequencing.isArchived()) {
+        result.add(targetedResequencing);
+      }
+    }
+    return result;
   }
 
   public JSONObject addLibraryQC(HttpSession session, JSONObject json) {
@@ -733,7 +746,7 @@ public class LibraryControllerHelperService {
 
       // persist
       if (ok) {
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
         JSONArray a = new JSONArray();
         JSONArray errors = new JSONArray();
         for (JSONObject qc : (Iterable<JSONObject>) qcs) {
@@ -861,7 +874,7 @@ public class LibraryControllerHelperService {
 
       // persist
       if (ok) {
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
         JSONArray a = new JSONArray();
         JSONArray errors = new JSONArray();
         for (JSONObject dil : (Iterable<JSONObject>) dilutions) {
@@ -1045,7 +1058,7 @@ public class LibraryControllerHelperService {
 
       // persist
       if (ok) {
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
         JSONArray a = new JSONArray();
         JSONArray errors = new JSONArray();
         for (JSONObject pcr : (Iterable<JSONObject>) pcrs) {
@@ -1090,7 +1103,7 @@ public class LibraryControllerHelperService {
 
       // persist
       if (ok) {
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
         JSONArray a = new JSONArray();
         JSONArray errors = new JSONArray();
         for (JSONObject dil : (Iterable<JSONObject>) dilutions) {
