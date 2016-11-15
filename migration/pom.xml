@@ -3,7 +3,7 @@
   <parent>
     <groupId>uk.ac.bbsrc.tgac.miso</groupId>
     <artifactId>miso</artifactId>
-    <version>0.2.38</version>
+    <version>0.2.39-SNAPSHOT</version>
   </parent>
   <artifactId>migration</artifactId>
   
