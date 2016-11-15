@@ -38,13 +38,36 @@ import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 
-@Suite.SuiteClasses({ SQLAlertDAOTest.class, SQLLibraryQCDAOTest.class, SQLTargetedResequencingDAOTest.class, SQLRunDAOTest.class,
-    SQLPoolQCDAOTest.class, SQLStatusDAOTest.class,
-    SQLStudyDAOTest.class, SQLKitDAOTest.class, SQLSampleDAOTest.class, SQLSampleQCDAOTest.class, SQLSequencerServiceRecordDAOTest.class,
-    SQLProjectDAOTest.class, SQLNoteDAOTest.class, SQLSequencerReferenceDAOTest.class, SQLRunQCDAOTest.class, SQLEmPCRDAOTest.class,
-    SQLSecurityDAOTest.class, SQLSequencerPartitionContainerDAOTest.class, SQLBoxDAOTest.class, SQLSequencerServiceRecordDAOTest.class,
-    SQLExperimentDAOTest.class, SQLPlatformDAOTest.class, SQLSequencerServiceRecordDAOTest.class, SQLPoolDAOTest.class,
-    SQLLibraryDAOTest.class, SQLLibraryDilutionDAOTest.class, SQLChangeLogDAOTest.class, SQLPrintJobDAOTest.class, SQLSecurityProfileDAOTest.class })
+@Suite.SuiteClasses({
+    SQLAlertDAOTest.class, //
+    SQLBoxDAOTest.class, //
+    SQLChangeLogDAOTest.class, //
+    SQLEmPCRDAOTest.class, //
+    SQLExperimentDAOTest.class, //
+    SQLKitDAOTest.class, //
+    SQLLibraryDAOTest.class, //
+    SQLLibraryDilutionDAOTest.class, //
+    SQLLibraryQCDAOTest.class, //
+    SQLNoteDAOTest.class, //
+    SQLPlatformDAOTest.class, //
+    SQLPoolDAOTest.class, //
+    SQLPoolQCDAOTest.class, //
+    SQLPrintJobDAOTest.class, //
+    SQLPrintServiceDAOTest.class, //
+    SQLProjectDAOTest.class, //
+    SQLRunDAOTest.class, //
+    SQLRunQCDAOTest.class, //
+    SQLSampleDAOTest.class, //
+    SQLSampleQCDAOTest.class, //
+    SQLSecurityDAOTest.class, //
+    SQLSecurityProfileDAOTest.class, //
+    SQLSequencerPartitionContainerDAOTest.class, //
+    SQLSequencerReferenceDAOTest.class, //
+    SQLSequencerServiceRecordDAOTest.class, //
+    SQLStatusDAOTest.class, //
+    SQLStudyDAOTest.class, //
+    SQLTargetedResequencingDAOTest.class //
+})
 
 public class AllTestsSuite {
 }
