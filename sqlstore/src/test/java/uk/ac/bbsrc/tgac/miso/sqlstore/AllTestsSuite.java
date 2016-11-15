@@ -62,6 +62,7 @@ import org.junit.runners.Suite;
     SQLSecurityDAOTest.class, //
     SQLSecurityProfileDAOTest.class, //
     SQLSequencerPartitionContainerDAOTest.class, //
+    SQLSequencerPoolPartitionDAOTest.class, //
     SQLSequencerReferenceDAOTest.class, //
     SQLSequencerServiceRecordDAOTest.class, //
     SQLStatusDAOTest.class, //

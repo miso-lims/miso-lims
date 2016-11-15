@@ -93,15 +93,6 @@ public class SQLSequencerPoolPartitionDAO implements PartitionStore {
 
   public static final String PARTITIONS_BY_RELATED_POOL = PARTITIONS_SELECT + " WHERE pool_poolId = ?";
 
-  public static String PARTITIONS_BY_RELATED_PROJECT = "SELECT l.* " + "FROM Project p, " + TABLE_NAME + " l "
-      + "INNER JOIN Study st ON st.project_projectId = p.projectId " + "LEFT JOIN Experiment ex ON st.studyId = ex.study_studyId "
-      + "INNER JOIN Pool_Experiment pex ON ex.experimentId = pex.experiments_experimentId "
-      + "LEFT JOIN Pool pool ON pool.poolId = pex.pool_poolId " + "LEFT JOIN " + TABLE_NAME + " l ON pool.poolId = l.pool_poolId "
-      + "LEFT JOIN SequencerPartitionContainer_Partition fl ON l.partitionId = fl.partitions_partitionId "
-      + "LEFT JOIN SequencerPartitionContainer fa ON fl.container_containerId = fa.containerId " +
-
-  "INNER JOIN Run_SequencerPartitionContainer rf ON fa.containerId = rf.containers_containerId "
-      + "LEFT JOIN Run ra ON rf.Run_runId = ra.runId " + "WHERE p.projectId=?";
   // just changed this bit to see if it fixes the missing partition problem...
   public static final String PARTITIONS_BY_RELATED_SUBMISSION = "SELECT l.partitionId, l.partitionNumber, l.pool_poolId, l.securityProfile_profileId "
       + "FROM " + TABLE_NAME + " l, Submission_Partition_Dilution sl " + "WHERE l.partitionId=sl.partition_partitionId "
@@ -159,8 +150,10 @@ public class SQLSequencerPoolPartitionDAO implements PartitionStore {
   }
 
   private void purgeListCache(SequencerPoolPartition s, boolean replace) {
-    Cache cache = cacheManager.getCache("partitionListCache");
-    DbUtils.updateListCache(cache, replace, s);
+    if (cacheManager != null) {
+      Cache cache = cacheManager.getCache("partitionListCache");
+      DbUtils.updateListCache(cache, replace, s);
+    }
   }
 
   private void purgeListCache(SequencerPoolPartition s) {
@@ -255,10 +248,6 @@ public class SQLSequencerPoolPartitionDAO implements PartitionStore {
   @Override
   public List<SequencerPoolPartition> listBySubmissionId(long submissionId) throws IOException {
     return template.query(PARTITIONS_BY_RELATED_SUBMISSION, new Object[] { submissionId }, new PartitionMapper());
-  }
-
-  public List<SequencerPoolPartition> listByProjectId(long projectId) throws IOException {
-    return template.query(PARTITIONS_BY_RELATED_PROJECT, new Object[] { projectId }, new PartitionMapper(true));
   }
 
   public class PartitionMapper extends CacheAwareRowMapper<SequencerPoolPartition> {
