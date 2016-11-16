@@ -95,7 +95,8 @@ Library.hot = {
       columns: Hot.colConf,
       data: Hot.startData,
       dataSchema: Library.hot.dataSchema,
-      maxRows: startingValues.length
+      maxRows: startingValues.length,
+      beforeAutofill: Hot.incrementingAutofill,
     });
     document.getElementById('hotContainer').style.display = '';
     

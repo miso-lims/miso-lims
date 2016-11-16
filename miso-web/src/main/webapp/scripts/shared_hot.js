@@ -478,5 +478,124 @@ var Hot = {
     } else {
       document.getElementById('saveSuccesses').classList.add('hidden');
     }
+  },
+   _newData: [],
+  incrementingAutofill: function(start, end, rows) {
+    var incrementingContentColumns = {};
+    var valid = true;
+    (function() {
+      // validation check
+      var cols = rows[rows.length - 1];
+      if (cols.length !== (end.col - start.col) + 1) {
+        valid = false;
+        return;
+      }
+      if (rows.length !== 2) {
+        valid = false;
+        return;
+      }
+      if (!cols) {
+        valid = false;
+        return;
+      }
+      for (var cols_i = 0; cols_i < cols.length; cols_i++) {
+        if (!cols[cols_i]) {
+          valid = false;
+          return;
+        }
+      }
+    })();
+    if (!valid) {
+      // allow default functionality to take over.
+      return;
+    }
+    (function() {
+      // prepare data
+      var rows_i = 0;
+      var cols = rows[rows_i];
+      for (var cols_i = 0; cols_i < cols.length; cols_i++) {
+        var cellContents = "" + cols[cols_i];
+        // regex iterative with /g, so it will return an array of matches.
+        var numbersInCell = cellContents.match(/\d+/g);
+        var template = cellContents;
+        if (!numbersInCell) {
+          break;
+        }
+        for (var placeHolder_i = 0; placeHolder_i < numbersInCell.length; placeHolder_i++) {
+          template = template.replace(numbersInCell[placeHolder_i], "{" + placeHolder_i + "}");
+        }
+        for (var numbersInCell_i = 0; numbersInCell_i < numbersInCell.length; numbersInCell_i++) {
+          var incrementing = false;
+          var currentNumber = numbersInCell[numbersInCell_i];
+          var nextRow_i = 1;
+          var nextContents = "" + rows[nextRow_i][cols_i];
+          var nextNumbersInCell = nextContents.match(/\d+/g);
+          if (!nextNumbersInCell) {
+            break;
+          }
+          var nextNumber = nextNumbersInCell[numbersInCell_i];
+          if (nextNumber == (parseInt(currentNumber) + 1)) {
+            incrementing = true;
+          } else {
+            template = template.replace("{" + numbersInCell_i + "}", currentNumber);
+            if (!incrementingContentColumns[key]) {
+              incrementingContentColumns[key] = {};
+              incrementingContentColumns[key]["template"] = template;
+              incrementingContentColumns[key]["lastContents"] = [];
+            } else {
+              incrementingContentColumns[key]["template"] = template;
+            }
+            incrementing = false;
+            continue;
+          }
+          if (incrementing) {
+            var key = cols_i;
+            if (!incrementingContentColumns[key]) {
+              incrementingContentColumns[key] = {};
+              incrementingContentColumns[key]["template"] = template;
+              incrementingContentColumns[key]["lastContents"] = [];
+            }
+            incrementingContentColumns[key]["lastContents"].push(nextNumber);
+          }
+        }
+      }
+    })();
+    if (jQuery.isEmptyObject(incrementingContentColumns)) {
+      //obj is empt!
+      return;
+    }
+    (function() {
+      // add changes to _newData
+      Hot._newData = [];
+      var startRow = start["row"];
+      var endRow = end["row"];
+      var rowsToFill = (endRow - startRow) + 1;
+      for (var row_i = 0; row_i < rowsToFill; row_i++) {
+        var currentRow = start["row"] + row_i;
+        for (var icc_i = 0; icc_i < (end["col"] - start["col"]) + 1; icc_i++) {
+          var currentCol = start["col"] + icc_i;
+          var icc = incrementingContentColumns[icc_i];
+          if (!icc) {
+            continue;
+          }
+          var template = icc["template"];
+          var placeholders = template.match(/{\d+}/g);
+          for (var placeholder_i = 0; placeholder_i < placeholders.length; placeholder_i++) {
+            var placeholder = placeholders[placeholder_i];
+            template = template.replace(placeholder,
+              parseInt(icc["lastContents"][placeholder_i]) + row_i + 1);
+          }
+          Hot._newData.push([currentRow, currentCol, template]);
+        }
+      }
+    })();
+
+    function customReload() {
+      // apply changes to table
+      Hot.hotTable.setDataAtCell(Hot._newData);
+    }
+    (function() {
+      setTimeout(customReload, 200);
+    })();
   }
 };

@@ -747,6 +747,8 @@
     <p>To fill all columns below with the value of your selected cell, <b>double-click</b> the square in the bottom right of your selected cell.
       <br/>To fill a variable number of columns with the value of your selected cell,  <b>click</b> the square in the bottom right of your
       filled-in selected cell and <b>drag</b> up or down. All selected columns will be filled in.
+      <br/>To fill down a column with values following an incremental (+1) pattern, select two adjacent cells in a 
+      column and then either drag down, or double-click the square in the bottom right of the selected cells.
 	    <c:if test="${aliasGenerationEnabled}">
 	      <br/>Leave <b>alias</b> cell blank to auto-generate an alias for this sample.
 	    </c:if>

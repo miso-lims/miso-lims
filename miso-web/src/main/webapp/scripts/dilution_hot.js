@@ -44,7 +44,8 @@ var Dilution = {
         columns: Hot.colConf,
         data: Hot.startData,
         dataSchema: Dilution.hot.dataSchema,
-        maxRows: startingValues.length
+        maxRows: startingValues.length,
+        beforeAutofill: Hot.incrementingAutofill,
       });
       document.getElementById('hotContainer').style.display = '';
       
