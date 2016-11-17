@@ -52,7 +52,7 @@ public class Migration {
     } catch (IOException e) {
       System.err.println("Error saving data in destination");
       e.printStackTrace();
-      System.exit(1)
+      System.exit(1);
     }
   }
   
