@@ -345,6 +345,9 @@ public class DefaultMigrationTarget implements MigrationTarget {
           }
         }
       }
+      if (library.getSample() == null || library.getSample().getId() == AbstractSample.UNSAVED_ID) {
+        throw new IOException("Library does not have a parent sample set");
+      }
       library.inheritPermissions(library.getSample().getProject());
       valueTypeLookup.resolveAll(library);
       library.setLastModifier(migrationUser);
