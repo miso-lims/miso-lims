@@ -792,6 +792,7 @@
       Sample.hot.selectedProjectId = <c:out value="${sample.project.id}" default="null"/>;
       Hot.detailedSample = JSON.parse(document.getElementById('HOTbulkForm').dataset.detailedSample);
       Hot.fetchSampleOptions(Sample.hot.processSampleOptionsFurther);
+      Hot.saveButton = document.getElementById('saveSamples');
     </script>
   </div>
 </div>

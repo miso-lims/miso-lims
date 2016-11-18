@@ -222,7 +222,7 @@ var Dilution = {
     /**
      * Check if cells are all valid. If yes, POSTs dilutions that need to be saved.
      */
-    createData: function () {
+    saveData: function () {
       var continueValidation = Hot.cleanRowsAndToggleSaveButton();
       if (continueValidation === false) return false;
       
