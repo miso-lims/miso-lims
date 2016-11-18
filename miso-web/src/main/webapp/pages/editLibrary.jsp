@@ -600,7 +600,9 @@
         <th>Done By</th>
         <th>Date</th>
         <th>Concentration (${libraryDilutionUnits})</th>
-        <th>Targeted Resequencing</th>
+        <c:if test="${detailedSample}">
+          <th>Targeted Resequencing</th>
+        </c:if>
         <th>ID Barcode</th>
           <%-- <th>Location Barcode</th> --%>
         <c:if test="${(dil.dilutionCreator eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
@@ -620,14 +622,16 @@
                           value="${dil.concentration}"
                           maxFractionDigits="2" />
             <td id="results${dil.id}">${concentrationRounded}</td>
-            <td>
-              <c:if test="${empty dil.targetedResequencing}">
-                NONE
-              </c:if>
-              <c:if test="${not empty dil.targetedResequencing}">
-                ${dil.targetedResequencing.alias}
-              </c:if>
-            </td>
+            <c:if test="${detailedSample}">
+              <td id="tarSeq${dil.id}">
+                <c:if test="${empty dil.targetedResequencing}">
+                  NONE
+                </c:if>
+                <c:if test="${not empty dil.targetedResequencing}">
+                  ${dil.targetedResequencing.alias}
+                </c:if>
+              </td>
+            </c:if>
             <td class="fit">
               <c:if test="${not empty dil.identificationBarcode}">
                 <div class="barcodes">

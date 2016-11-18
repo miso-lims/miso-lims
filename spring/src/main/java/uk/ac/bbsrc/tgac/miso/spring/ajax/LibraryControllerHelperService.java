@@ -644,32 +644,36 @@ public class LibraryControllerHelperService {
       libraryPrepKitId = json.getLong("libraryPrepKitId");
     }
 
+    Map<String, Object> targetedResequencingTypes = Maps.newHashMap();
     try {
-      Collection<TargetedResequencing> targetedResequencings = getNonArchivedTargetedResequencing(
-          requestManager.listAllTargetedResequencing());
-      JSONArray fullTargetedResequencingCollection = new JSONArray();
-      JSONArray targetedResequencingByKit = new JSONArray();
-      for (TargetedResequencing targetedResequencing : targetedResequencings) {
-        Map<String, Object> targetedResequencingMap = Maps.newHashMap();
-        targetedResequencingMap.put("targetedResequencingId", targetedResequencing.getTargetedResequencingId());
-        targetedResequencingMap.put("alias", targetedResequencing.getAlias());
-        targetedResequencingMap.put("kitDescriptorId", targetedResequencing.getKitDescriptor().getId());
-        fullTargetedResequencingCollection.add(targetedResequencingMap);
-        if (libraryPrepKitId != null && libraryPrepKitId == targetedResequencing.getKitDescriptor().getId()) {
-          targetedResequencingByKit.add(targetedResequencingMap);
-        }
-      }
-      Map<String, Object> targetedResequencingMap = Maps.newHashMap();
-      if (libraryPrepKitId != null) {
-        targetedResequencingMap.put("targetedResequencings", targetedResequencingByKit);
-      } else {
-        targetedResequencingMap.put("targetedResequencings", fullTargetedResequencingCollection);
-      }
-      return JSONUtils.JSONObjectResponse(targetedResequencingMap);
+        targetedResequencingTypes.put("targetedResequencings", getTargetedResequencingTypes(libraryPrepKitId));
+      return JSONUtils.JSONObjectResponse(targetedResequencingTypes);
     } catch (IOException e) {
       log.error("Cannot list all Targeted Resequencing entries ", e);
     }
     return JSONUtils.SimpleJSONError("Cannot list all Targeted Resequencing entries");
+  }
+
+  public JSONArray getTargetedResequencingTypes(Long libraryPrepKitId) throws IOException {
+    Collection<TargetedResequencing> targetedResequencings = getNonArchivedTargetedResequencing(
+        requestManager.listAllTargetedResequencing());
+    JSONArray fullTargetedResequencingCollection = new JSONArray();
+    JSONArray targetedResequencingByKit = new JSONArray();
+    for (TargetedResequencing targetedResequencing : targetedResequencings) {
+      Map<String, Object> targetedResequencingMap = Maps.newHashMap();
+      targetedResequencingMap.put("targetedResequencingId", targetedResequencing.getTargetedResequencingId());
+      targetedResequencingMap.put("alias", targetedResequencing.getAlias());
+      targetedResequencingMap.put("kitDescriptorId", targetedResequencing.getKitDescriptor().getId());
+      fullTargetedResequencingCollection.add(targetedResequencingMap);
+      if (libraryPrepKitId != null && libraryPrepKitId.equals(targetedResequencing.getKitDescriptor().getId())) {
+        targetedResequencingByKit.add(targetedResequencingMap);
+      }
+    }
+    if (libraryPrepKitId != null) {
+      return targetedResequencingByKit;
+    } else {
+      return fullTargetedResequencingCollection;
+    }
   }
 
   private Collection<TargetedResequencing> getNonArchivedTargetedResequencing(Collection<TargetedResequencing> targetedResequencings) {
@@ -791,17 +795,23 @@ public class LibraryControllerHelperService {
         newDilution.setCreationDate(new SimpleDateFormat("dd/MM/yyyy").parse(json.getString("dilutionDate")));
         newDilution.setLastModified(newDilution.getCreationDate());
         newDilution.setConcentration(Double.parseDouble(json.getString("results")));
-        Long libraryDilutionTargetedResequencingId = Long.parseLong(json.getString("libraryDilutionTargetedResequencing"));
-        if (libraryDilutionTargetedResequencingId > 0) {
-          TargetedResequencing targetedResequencing = requestManager.getTargetedResequencingById(libraryDilutionTargetedResequencingId);
-          newDilution.setTargetedResequencing(targetedResequencing);
+        if (json.has("targetedResequencing")) {
+          Long libraryDilutionTargetedResequencingId = Long.parseLong(json.getString("libraryDilutionTargetedResequencing"));
+          if (libraryDilutionTargetedResequencingId > 0) {
+            TargetedResequencing targetedResequencing = requestManager.getTargetedResequencingById(libraryDilutionTargetedResequencingId);
+            newDilution.setTargetedResequencing(targetedResequencing);
+          }
         }
         library.addDilution(newDilution);
         requestManager.saveLibraryDilution(newDilution);
 
         StringBuilder sb = new StringBuilder();
         sb.append("<tr>");
-        sb.append("<th>LD Name</th><th>Done By</th><th>Date</th><th>Results</th><th>Targeted Resequencing</th><th>ID barcode</th>");
+        sb.append("<th>LD Name</th><th>Done By</th><th>Date</th><th>Results</th>");
+        if (json.has("targetedResequencing")) {
+          sb.append("<th>Targeted Resequencing</th>");
+        }
+        sb.append("<th>ID barcode</th>");
         if (!library.getPlatformName().equals("Illumina")) {
           sb.append("<th>Add emPCR</th>");
         }
@@ -815,13 +825,15 @@ public class LibraryControllerHelperService {
           sb.append("<td>" + dil.getDilutionCreator() + "</td>");
           sb.append("<td>" + date.format(dil.getCreationDate()) + "</td>");
           sb.append("<td>" + LimsUtils.round(dil.getConcentration(), 2) + " " + dil.getUnits() + "</td>");
-          sb.append("<td>");
-          if (dil.getTargetedResequencing() == null) {
-            sb.append("NONE");
-          } else {
-            sb.append(dil.getTargetedResequencing().getAlias());
+          if (json.has("targetedResequencing")) {
+            sb.append("<td>");
+            if (dil.getTargetedResequencing() == null) {
+              sb.append("NONE");
+            } else {
+              sb.append(dil.getTargetedResequencing().getAlias());
+            }
+            sb.append("</td>");
           }
-          sb.append("</td>");
           sb.append("<td>");
 
           try {
@@ -909,8 +921,14 @@ public class LibraryControllerHelperService {
       Long dilutionId = Long.parseLong(json.getString("dilutionId"));
       LibraryDilution dilution = requestManager.getLibraryDilutionById(dilutionId);
       response.put("results", "<input type='text' id='" + dilutionId + "' value='" + dilution.getConcentration() + "'/>");
+      if (dilution.getLibrary().getLibraryAdditionalInfo() != null && dilution.getLibrary().getLibraryAdditionalInfo().getPrepKit() != null
+          && dilution.getLibrary().getLibraryAdditionalInfo().getPrepKit().getId() != null && json.getBoolean("detailedSample")) {
+        response.put("targetedResequencings",
+            getTargetedResequencingTypes(dilution.getLibrary().getLibraryAdditionalInfo().getPrepKit().getId()));
+      }
       response.put("edit",
-          "<a href='javascript:void(0);' onclick='Library.dilution.editLibraryDilution(\"" + dilutionId + "\");'>Save</a>");
+          "<a href='javascript:void(0);' onclick='Library.dilution.editLibraryDilution(\"" + dilutionId + "\", "
+              + json.getBoolean("autoGenerateIdBarcodes") + ", " + json.getBoolean("detailedSample") + ");'>Save</a>");
       return response;
     } catch (Exception e) {
       log.error("Failed to display Library Dilution of this Library: ", e);
@@ -924,6 +942,9 @@ public class LibraryControllerHelperService {
         Long dilutionId = Long.parseLong(json.getString("dilutionId"));
         LibraryDilution dilution = requestManager.getLibraryDilutionById(dilutionId);
         dilution.setConcentration(Double.parseDouble(json.getString("result")));
+        if (json.has("targetedResequencing") && json.getLong("targetedResequencing") > 0) {
+          dilution.setTargetedResequencing(requestManager.getTargetedResequencingById(json.getLong("targetedResequencing")));
+        }
         dilution.setLastModified(new Date());
         requestManager.saveLibraryDilution(dilution);
         return JSONUtils.SimpleJSONResponse("OK");
