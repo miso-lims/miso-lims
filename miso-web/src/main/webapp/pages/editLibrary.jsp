@@ -581,7 +581,7 @@
     </a>
 
     <div id="ldmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
-      <a href='javascript:void(0);' class="add" onclick="Library.dilution.insertLibraryDilutionRow(${library.id}, ${libraryPrepKitId}); return false;">
+      <a href='javascript:void(0);' class="add" onclick="Library.dilution.insertLibraryDilutionRow(${library.id}, ${libraryPrepKitId}, ${autoGenerateIdBarcodes}); return false;">
         Add Library Dilution
       </a>
       <c:if test="${not empty library.libraryDilutions}">
@@ -632,7 +632,7 @@
                 </c:if>
               </td>
             </c:if>
-            <td class="fit">
+            <td class="fit" id="idBarcode${dil.id}">
               <c:if test="${not empty dil.identificationBarcode}">
                 <div class="barcodes">
                   <div class="barcodeArea ui-corner-all">
@@ -673,7 +673,7 @@
             <c:if test="${(sample.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
                         or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
               <td id="edit${dil.id}" align="center">
-                <a href="javascript:void(0);" onclick="Library.dilution.changeLibraryDilutionRow('${dil.id}','${library.id}')">
+                <a href="javascript:void(0);" onclick="Library.dilution.changeLibraryDilutionRow('${dil.id}',${autoGenerateIdBarcodes}, ${detailedSample})">
                   <span class="ui-icon ui-icon-pencil"></span>
                 </a>
               </td>

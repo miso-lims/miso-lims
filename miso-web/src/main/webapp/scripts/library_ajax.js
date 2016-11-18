@@ -234,7 +234,7 @@ Library.qc = {
 };
 
 Library.dilution = {
-  insertLibraryDilutionRow: function (libraryId, libraryPrepKitId) {
+  insertLibraryDilutionRow: function (libraryId, libraryPrepKitId, autoGenerateIdBarcodes) {
     if (!jQuery('#libraryDilutionTable').attr("dilutionInProgress")) {
       jQuery('#libraryDilutionTable').attr("dilutionInProgress", "true");
 
@@ -253,9 +253,13 @@ Library.dilution = {
         column7.innerHTML = "<select id='libraryDilutionTargetedResequencing' name='libraryDilutionTargetedResequencing'/>"
       }
       var column8 = jQuery('#libraryDilutionTable')[0].rows[1].insertCell(-1);
-      column8.innerHTML = "<i>Generated on save</i>";
+      if (autoGenerateIdBarcodes) {
+        column8.innerHTML = "<i>Generated on save</i>";
+      } else {
+        column8.innerHTML = "<input id='libraryDilutionIdBarcode' name='libraryDilutionIdBarcode' type='text'/>";
+      }
       var column9 = jQuery('#libraryDilutionTable')[0].rows[1].insertCell(-1);
-      column9.innerHTML = "<a href='javascript:void(0);' onclick='Library.dilution.addLibraryDilution();'/>Add</a>";
+      column9.innerHTML = "<a href='javascript:void(0);' onclick='Library.dilution.addLibraryDilution(" + autoGenerateIdBarcodes + ");'/>Add</a>";
 
       Utils.ui.addMaxDatePicker("libraryDilutionDate", 0);
       
@@ -291,7 +295,7 @@ Library.dilution = {
     }
   },
 
-  addLibraryDilution: function () {
+  addLibraryDilution: function (autoGenerateIdBarcodes) {
     var f = Utils.mappifyForm("addDilutionForm");
     var params = {
       'libraryId': f.id,
@@ -311,6 +315,9 @@ Library.dilution = {
       }
       params['targetedResequencing'] = f.libraryDilutionTargetedResequencing;
 	  }
+ 	  if (!autoGenerateIdBarcodes) {
+ 	    params['idBarcode'] = f.libraryDilutionIdBarcode;
+ 	  }
 
     Fluxion.doAjax(
       'libraryControllerHelperService',
@@ -325,12 +332,13 @@ Library.dilution = {
     );
   },
 
-  changeLibraryDilutionRow: function (dilutionId) {
+  changeLibraryDilutionRow: function (dilutionId, autoGenerateIdBarcodes, detailedSample) {
     Fluxion.doAjax(
       'libraryControllerHelperService',
       'changeLibraryDilutionRow',
       {
         'dilutionId': dilutionId,
+        'autoGenerateIdBarcodes': autoGenerateIdBarcodes,
         'detailedSample': detailedSample,
         'url': ajaxurl
       },
@@ -341,18 +349,20 @@ Library.dilution = {
           if (detailedSample) {
             jQuery('#tarSeq' + dilutionId).html(Library.dilution.makeTargetedResequencingsDropdown(json.targetedResequencings, dilutionId));
           }
+          if (!autoGenerateIdBarcodes) jQuery('#idBarcode' + dilutionId).html(json.idBarcode);
         }
       }
     );
   },
 
-  editLibraryDilution: function (dilutionId) {
+  editLibraryDilution: function (dilutionId, autoGenerateIdBarcodes, detailedSample) {
     var params = {
         'dilutionId': dilutionId,
         'result': jQuery('#' + dilutionId).val(),
         'url': ajaxurl
     };
     if (detailedSample) params['targetedResequencing'] = jQuery('#targetedResequencing' + dilutionId).val();
+    if (!autoGenerateIdBarcodes) params['idBarcode'] = jQuery('#idBarcodeValue' + dilutionId).val();
     
     Fluxion.doAjax(
       'libraryControllerHelperService',

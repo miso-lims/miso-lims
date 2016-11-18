@@ -802,6 +802,9 @@ public class LibraryControllerHelperService {
             newDilution.setTargetedResequencing(targetedResequencing);
           }
         }
+        if (json.has("idBarcode")) {
+          newDilution.setIdentificationBarcode(json.getString("idBarcode"));
+        }
         library.addDilution(newDilution);
         requestManager.saveLibraryDilution(newDilution);
 
@@ -921,6 +924,11 @@ public class LibraryControllerHelperService {
       Long dilutionId = Long.parseLong(json.getString("dilutionId"));
       LibraryDilution dilution = requestManager.getLibraryDilutionById(dilutionId);
       response.put("results", "<input type='text' id='" + dilutionId + "' value='" + dilution.getConcentration() + "'/>");
+      if (!json.getBoolean("autoGenerateIdBarcodes")) {
+        response.put("idBarcode",
+            "<input type='text' id='idBarcodeValue" + dilutionId + "' value='"
+                + (isStringEmptyOrNull(dilution.getIdentificationBarcode()) ? "" : dilution.getIdentificationBarcode()) + "'/>");
+      }
       if (dilution.getLibrary().getLibraryAdditionalInfo() != null && dilution.getLibrary().getLibraryAdditionalInfo().getPrepKit() != null
           && dilution.getLibrary().getLibraryAdditionalInfo().getPrepKit().getId() != null && json.getBoolean("detailedSample")) {
         response.put("targetedResequencings",
@@ -945,6 +953,7 @@ public class LibraryControllerHelperService {
         if (json.has("targetedResequencing") && json.getLong("targetedResequencing") > 0) {
           dilution.setTargetedResequencing(requestManager.getTargetedResequencingById(json.getLong("targetedResequencing")));
         }
+        if (json.has("idBarcode")) dilution.setIdentificationBarcode(json.getString("idBarcode"));
         dilution.setLastModified(new Date());
         requestManager.saveLibraryDilution(dilution);
         return JSONUtils.SimpleJSONResponse("OK");
