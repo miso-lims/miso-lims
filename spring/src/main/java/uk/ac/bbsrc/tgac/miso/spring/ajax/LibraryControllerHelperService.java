@@ -796,7 +796,7 @@ public class LibraryControllerHelperService {
         newDilution.setLastModified(newDilution.getCreationDate());
         newDilution.setConcentration(Double.parseDouble(json.getString("results")));
         if (json.has("targetedResequencing")) {
-          Long libraryDilutionTargetedResequencingId = Long.parseLong(json.getString("libraryDilutionTargetedResequencing"));
+          Long libraryDilutionTargetedResequencingId = Long.parseLong(json.getString("targetedResequencing"));
           if (libraryDilutionTargetedResequencingId > 0) {
             TargetedResequencing targetedResequencing = requestManager.getTargetedResequencingById(libraryDilutionTargetedResequencingId);
             newDilution.setTargetedResequencing(targetedResequencing);
@@ -950,8 +950,12 @@ public class LibraryControllerHelperService {
         Long dilutionId = Long.parseLong(json.getString("dilutionId"));
         LibraryDilution dilution = requestManager.getLibraryDilutionById(dilutionId);
         dilution.setConcentration(Double.parseDouble(json.getString("result")));
-        if (json.has("targetedResequencing") && json.getLong("targetedResequencing") > 0) {
-          dilution.setTargetedResequencing(requestManager.getTargetedResequencingById(json.getLong("targetedResequencing")));
+        if (json.has("targetedResequencing")) {
+          if (isStringEmptyOrNull(json.getString("targetedResequencing"))) {
+            dilution.setTargetedResequencing(null);
+          } else {
+            dilution.setTargetedResequencing(requestManager.getTargetedResequencingById(json.getLong("targetedResequencing")));
+          }
         }
         if (json.has("idBarcode")) dilution.setIdentificationBarcode(json.getString("idBarcode"));
         dilution.setLastModified(new Date());
