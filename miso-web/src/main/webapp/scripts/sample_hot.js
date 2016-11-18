@@ -360,7 +360,8 @@ Sample.hot = {
       columns: Hot.colConf,
       data: Hot.startData,
       dataSchema: Sample.hot.dataSchema,
-      maxRows: startRowsNumber || startingValues.length
+      maxRows: startRowsNumber || startingValues.length,
+      beforeAutofill: Hot.incrementingAutofill,
     });
     document.getElementById('hotContainer').style.display = '';
     
