@@ -274,17 +274,14 @@ Library.dilution = {
           {
             'doOnSuccess': function (json) {
   	        	var selectElem = jQuery('#libraryDilutionTargetedResequencing');
-  	        	if (json.targetedResequencings.length == 0) {
-  	        		selectElem.append(new Option('NONE', 0));
-  	        	} else {
-  	        		selectElem.append(new Option('--- select'));
-  	        		selectElem.append(new Option('NONE', 0));
+  	        	selectElem.append(new Option('NONE', 0));
+  	        	if (json.targetedResequencings.length > 0) {
                 json.targetedResequencings.sort(function(a, b) {
-                   return (a.alias > b.alias) - (a.alias < b.alias);
+                   return a.alias.localeCompare(b.alias);
                 });
-              	jQuery.each(json.targetedResequencings, function(index, item) {
-              		selectElem.append(new Option(item.alias, item.targetedResequencingId));
-              	});
+               jQuery.each(json.targetedResequencings, function(index, item) {
+               	 selectElem.append(new Option(item.alias, item.targetedResequencingId));
+               });
   	        	}
             }
           }
