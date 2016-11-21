@@ -1499,7 +1499,7 @@ Sample.ui = {
     }
   },
   /**
-   * Returns an array of sample classes that correspond to given sample class IDs (for child samples)
+   * Returns an array of sample classes that correspond to given sample class IDs (of parent samples)
    */
   getChildSampleClasses: function (sampleClasses) {
     return Sample.sampleClasses.filter(function (childClass) {

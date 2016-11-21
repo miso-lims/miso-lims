@@ -350,6 +350,19 @@ var Hot = {
   },
   
   /**
+   * Adds a menu near the element with the provided id with options for bulk actions
+   */
+  addBulkMenu: function (elementId, optionsfunc) {
+    var menu = ['<ul id="menu" class="sddm">'];
+    menu.push('<li>');
+    menu.push('<a onmouseover="mopen(\'bulkmenu\')" onmouseout="mclosetime()" id="sddm-noh1">Bulk actions<span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span></a>');
+    menu.push('<div id="bulkmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">');
+    menu.push(optionsfunc());
+    menu.push('</div></li></ul>');
+    document.getElementById(elementId).insertAdjacentHTML('afterend', menu.join('')); 
+  },
+  
+  /**
    * Saves table data
    * @param attribute of type string ("alias" or "name")
    */
@@ -466,6 +479,9 @@ var Hot = {
 
       // enable the save button
       if (Hot.saveButton && Hot.saveButton.classList.contains('disabled')) Hot.toggleButtonAndLoaderImage(Hot.saveButton);
+      
+      // optional function that can be used to add "Edit/Propagate All" buttons, etc.
+      if (Hot.afterAllSucceed != undefined) Hot.afterAllSucceed();
     }
 
     // add success messages
