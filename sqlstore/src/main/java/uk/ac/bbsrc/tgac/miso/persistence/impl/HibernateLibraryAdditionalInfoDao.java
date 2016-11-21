@@ -83,10 +83,10 @@ public class HibernateLibraryAdditionalInfoDao implements LibraryAdditionalInfoD
 
   @Override
   public Long addLibraryAdditionalInfo(LibraryAdditionalInfo libraryAdditionalInfo) {
-      Date now = new Date();
-      libraryAdditionalInfo.setCreationDate(now);
-      libraryAdditionalInfo.setLastUpdated(now);
-      return (Long) currentSession().save(libraryAdditionalInfo);
+    Date now = new Date();
+    if (libraryAdditionalInfo.getCreationDate() == null) libraryAdditionalInfo.setCreationDate(now);
+    if (libraryAdditionalInfo.getLastUpdated() == null) libraryAdditionalInfo.setLastUpdated(now);
+    return (Long) currentSession().save(libraryAdditionalInfo);
   }
   
   @Override
