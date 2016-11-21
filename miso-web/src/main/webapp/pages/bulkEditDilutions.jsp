@@ -113,6 +113,7 @@
        );
       } else {
         // make standard table
+        Dilution.hot.tarSeqs = [];
         Dilution.hot.makeBulkCreateTable();
       }
     });

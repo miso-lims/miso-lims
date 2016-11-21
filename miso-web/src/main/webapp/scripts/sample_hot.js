@@ -383,8 +383,7 @@ Sample.hot = {
     Hot.hotTable.render();
 
     // enable save button if it was disabled
-    var saveButton = document.getElementById('saveSamples');
-    if (saveButton.classList.contains('disabled')) Hot.toggleButtonAndLoaderImage(saveButton);
+    if (Hot.saveButton.classList.contains('disabled')) Hot.toggleButtonAndLoaderImage(saveButton);
     
     Sample.hot.addDetailedQcHooks();
   },
