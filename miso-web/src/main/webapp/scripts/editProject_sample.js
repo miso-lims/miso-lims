@@ -286,7 +286,7 @@ function generateSampleDeliveryForm(tableName, projectId) {
       }
     });
 
-    jQuery("div.toolbar").html("<button type='button' onclick=\"Project.ui.processSampleDeliveryForm('"+tableName+"', " + projectId + ");\" class=\"fg-button ui-state-default ui-corner-all\">Generate Form</button>");
+    jQuery("div.toolbar").html("Plate: <input type='radio' name='plateinformationform' value='yes'/>Yes |<input type='radio' name='plateinformationform' value='no' checked='checked'/>No " + "<button type='button' onclick=\"Project.ui.processSampleDeliveryForm('"+tableName+"', " + projectId + ");\" class=\"fg-button ui-state-default ui-corner-all\">Generate Form</button>");
   }
 }
 
