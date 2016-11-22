@@ -740,6 +740,35 @@
     Create Samples
     <button id="saveSamples" class="disabled fg-button ui-state-default ui-corner-all" disabled="disabled" onclick="Sample.hot.saveData();">Save</button>
   </h1>
+  <c:if test="${not empty sample.project}">
+	  <div class="breadcrumbs">
+	    <ul>
+	      <li>
+	        <a href="/">Home</a>
+	      </li>
+	      <li>
+	        <div class="breadcrumbsbubbleInfo">
+	          <div class="trigger">
+	            <a href='<c:url value="/miso/project/${sample.project.id}"/>'>${sample.project.alias}</a>
+	          </div>
+	          <div class="breadcrumbspopup">
+	              ${sample.project.name}
+	          </div>
+	        </div>
+	      </li>
+	    </ul>
+	    <c:if test="${not empty nextSample}">
+	      <span style="float:right; padding-top: 5px; padding-left: 6px">
+	        <a class='arrowright' href='<c:url value="/miso/sample/${nextSample.id}"/>'>Next Sample <b>${nextSample.name}</b></a>
+	      </span>
+	    </c:if>
+	    <c:if test="${not empty previousSample}">
+	      <span style="float:right; padding-top: 5px">
+	        <a class='arrowleft' href='<c:url value="/miso/sample/${previousSample.id}"/>'>Previous Sample <b>${previousSample.name}</b></a>
+	      </span>
+	    </c:if>
+	  </div>
+  </c:if>
   <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#hothelp_arrowclick'), 'hothelpdiv');">Quick Help
     <div id="hothelp_arrowclick" class="toggleLeft"></div>
   </div>
