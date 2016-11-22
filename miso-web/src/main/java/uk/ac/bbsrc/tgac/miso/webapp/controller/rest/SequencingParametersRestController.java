@@ -2,7 +2,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.Set;
+import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
@@ -52,10 +52,9 @@ public class SequencingParametersRestController extends RestController {
 
   @RequestMapping(value = "/sequencingparameters", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public Set<SequencingParametersDto> getSequencingParametersAlll(UriComponentsBuilder uriBuilder, HttpServletResponse response)
+  public List<SequencingParametersDto> getSequencingParametersAlll(UriComponentsBuilder uriBuilder, HttpServletResponse response)
       throws IOException {
-    Set<SequencingParameters> result = sequencingParametersService.getAll();
-    Set<SequencingParametersDto> dtos = Dtos.asSequencingParametersDtos(result);
+    List<SequencingParametersDto> dtos = Dtos.asSequencingParametersDtos(sequencingParametersService.getAll());
     for (SequencingParametersDto dto : dtos) {
       writeUrls(dto, uriBuilder);
     }

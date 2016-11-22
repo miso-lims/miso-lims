@@ -7,6 +7,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -941,18 +942,19 @@ public class Dtos {
     return dto;
   }
 
-  public static Set<SequencingParametersDto> asSequencingParametersDtos(Collection<SequencingParameters> from) {
-    Set<SequencingParametersDto> dtoSet = Sets.newTreeSet(new Comparator<SequencingParametersDto>() {
+  public static List<SequencingParametersDto> asSequencingParametersDtos(Collection<SequencingParameters> from) {
+    List<SequencingParametersDto> dtoList = new ArrayList<>();
+    for (SequencingParameters sp : from) {
+      dtoList.add(asDto(sp));
+    }
+    Collections.sort(dtoList, new Comparator<SequencingParametersDto>() {
 
       @Override
       public int compare(SequencingParametersDto o1, SequencingParametersDto o2) {
         return o1.getName().compareTo(o2.getName());
       }
     });
-    for (SequencingParameters sp : from) {
-      dtoSet.add(asDto(sp));
-    }
-    return dtoSet;
+    return dtoList;
   }
 
   public static LibraryDto asDto(Library from, LibraryAdditionalInfo infoFrom) {

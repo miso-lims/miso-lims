@@ -1,9 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.Set;
-import java.util.TreeSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.User;
-import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.persistence.SequencingParametersDao;
@@ -52,8 +51,8 @@ public class DefaultSequencingParametersService implements SequencingParametersS
   }
 
   @Override
-  public Set<SequencingParameters> getAll() throws IOException {
-    return Sets.newTreeSet(sequencingParametersDao.getSequencingParameters());
+  public Collection<SequencingParameters> getAll() throws IOException {
+    return sequencingParametersDao.getSequencingParameters();
   }
 
   @Override
@@ -65,11 +64,11 @@ public class DefaultSequencingParametersService implements SequencingParametersS
   }
 
   @Override
-  public Set<SequencingParameters> getForPlatform(Long platformId) throws IOException {
+  public Collection<SequencingParameters> getForPlatform(Long platformId) throws IOException {
     if (platformId == null) {
-      return Collections.emptySet();
+      return Collections.emptyList();
     }
-    Set<SequencingParameters> results = new TreeSet<>();
+    Collection<SequencingParameters> results = new ArrayList<>();
     for (SequencingParameters sp : sequencingParametersDao.getSequencingParameters()) {
       if (sp.getPlatformId() == platformId) {
         results.add(sp);
