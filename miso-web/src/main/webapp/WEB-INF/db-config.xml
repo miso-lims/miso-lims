@@ -479,6 +479,10 @@
   <bean name="hibernateLibraryDesignDao" class="uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDesignDao">
     <property name="libraryDao" ref="sqlLibraryDAO" />
   </bean>
+  
+  <bean name="hibernateSequencingParametersDao" class="uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSequencingParametersDao">
+    <property name="platformStore" ref="sqlPlatformDAO" />
+  </bean>
 
   <bean name="projectStore" class="org.springframework.aop.framework.ProxyFactoryBean">
     <property name="proxyInterfaces">
