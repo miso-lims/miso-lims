@@ -76,7 +76,7 @@ public class ListPoolsController {
   public Collection<String> populatePlatformTypes() throws IOException {
     Collection<PlatformType> platforms = requestManager.listActivePlatformTypes();
     if (platforms.size() > 0) {
-      return PlatformType.platformTypeNames(requestManager.listActivePlatformTypes());
+      return PlatformType.platformTypeNames(platforms);
     } else {
       return requestManager.listDistinctPlatformNames();
     }
