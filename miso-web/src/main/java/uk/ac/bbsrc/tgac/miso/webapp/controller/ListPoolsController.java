@@ -74,7 +74,12 @@ public class ListPoolsController {
 
   @ModelAttribute("platformTypes")
   public Collection<String> populatePlatformTypes() throws IOException {
-    return PlatformType.platformTypeNames(requestManager.listActivePlatformTypes());
+    Collection<PlatformType> platforms = requestManager.listActivePlatformTypes();
+    if (platforms.size() > 0) {
+      return PlatformType.platformTypeNames(requestManager.listActivePlatformTypes());
+    } else {
+      return requestManager.listDistinctPlatformNames();
+    }
   }
 
   @ModelAttribute("poolConcentrationUnits")
@@ -100,8 +105,8 @@ public class ListPoolsController {
       Map<String, List<Pool>> usedPoolMap = new HashMap<>();
 
       for (PlatformType pt : PlatformType.values()) {
-        List<Pool> pools = new ArrayList<Pool>();
-        List<Pool> poolsUsed = new ArrayList<Pool>();
+        List<Pool> pools = new ArrayList<>();
+        List<Pool> poolsUsed = new ArrayList<>();
         for (Pool p : requestManager.listReadyPoolsByPlatform(pt)) {
           if (requestManager.listRunsByPoolId(p.getId()).isEmpty()) {
             pools.add(p);
