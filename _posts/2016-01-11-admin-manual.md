@@ -301,3 +301,27 @@ Updating the database (or setting it up initially) will apply patches to the dat
     rm -f lib/sqlstore-*.jar
     unzip -xjo $CATALINA_HOME/webapps/ROOT.war 'WEB-INF/lib/sqlstore-*.jar' -d lib
     ./flyway -user=$MISO_DB_USER -password=$MISO_DB_PASS -url=$MISO_DB_URL -outOfOrder=true -locations=classpath:db/migration migrate
+
+
+
+# Building the Docker image
+
+Pull the tag or snapshot that you want to build and package it:
+
+    export version="0.2.35-SNAPSHOT"
+    git checkout "tags/${version}"
+    mvn -P external clean install package 
+    docker build -t "misolims/miso-lims:${version}" --build-arg version="${version}" --no-cache .
+
+Once the build completes, test it by launching it:
+
+    docker run -p 8090:8080 --name "miso${version}" -t "misolims/miso-lims:${version}"
+
+Navigate to http://localhost:8090 and login with the credentials admin:admin.
+
+Once satisfied, push the image to Docker Hub. Note that only members of the [misolims](https://hub.docker.com/u/misolims/) organisation can push:
+
+    docker login
+    docker push "misolims/miso-lims:${version}"
+    
+
