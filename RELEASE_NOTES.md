@@ -1,3 +1,24 @@
+# 0.2.40
+
+Changes:
+
+ * Attempt to avoid NPE that shouldn't exist
+ * always display some platform tabs in Pools page (#553)
+ * Fix missing Sequencing Parameters (#552)
+ * Re-add plate option for sample delivery form (#551)
+ * Add edit sample breadcrumbs back in.
+ * Add tests for SequencerPoolPartitionDAO
+ * bulk actions for after bulk save (#544)
+ * make TargetedResequencing user editable (#549)
+ * add GNU GPL 3 license (#543)
+ * Migration exits with exit codes on exception
+ * Remove plate reference from PoolControllerHelperService.generateSampleDeliveryForm.
+ * Add hot auto increment
+ * added check for parent sample when migrating library (#545)
+ * Allow SQL no test sections be regular comments for mySQL client
+ * Raise an error if a migration has a space in it
+ * Add test of SQLPrintServiceDAO (#540)
+
 # 0.2.39
 
 Changes:
