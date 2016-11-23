@@ -48,9 +48,11 @@ public class Migration {
     } catch (MigrationException e) {
       System.err.println("Error converting source data");
       e.printStackTrace();
+      System.exit(1);
     } catch (IOException e) {
       System.err.println("Error saving data in destination");
       e.printStackTrace();
+      System.exit(1);
     }
   }
   

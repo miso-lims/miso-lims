@@ -29,9 +29,6 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 
-import net.sf.json.JSONException;
-import net.sf.json.JSONObject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +40,9 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
+
+import net.sf.json.JSONException;
+import net.sf.json.JSONObject;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
@@ -80,8 +80,8 @@ public class SQLPrintServiceDAO implements PrintServiceStore {
   public static final String PRINT_SERVICES_SELECT_BY_CLASS = PRINT_SERVICE_SELECT + " WHERE printServiceFor = ?";
 
   public static final String PRINT_SERVICE_UPDATE = "UPDATE " + TABLE_NAME + " "
-      + "SET contextName=:contextName, contextFields=:contextFields, enabled=:enabled, printServiceFor=:printServiceFor, printSchema=:printSchema "
-      + "WHERE serviceName=:serviceName";
+      + "SET serviceName=:serviceName, contextName=:contextName, contextFields=:contextFields, enabled=:enabled, printServiceFor=:printServiceFor, printSchema=:printSchema "
+      + "WHERE serviceId=:serviceId";
 
   protected static final Logger log = LoggerFactory.getLogger(SQLPrintServiceDAO.class);
   private JdbcTemplate template;

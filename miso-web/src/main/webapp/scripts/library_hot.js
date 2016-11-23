@@ -70,6 +70,7 @@ Library.hot = {
     Hot.buildDtoFunc = Library.hot.buildDtos;
     Hot.saveOneFunc = Library.hot.saveOne;
     Hot.updateOneFunc = Library.hot.updateOne;
+    Hot.afterAllSucceed = function () { Hot.addBulkMenu('saveLibraries', Library.hot.getBulkActions); };
     
     Hot.colConf = Library.hot.setColumnData(Hot.detailedSample);
     
@@ -95,7 +96,8 @@ Library.hot = {
       columns: Hot.colConf,
       data: Hot.startData,
       dataSchema: Library.hot.dataSchema,
-      maxRows: startingValues.length
+      maxRows: startingValues.length,
+      beforeAutofill: Hot.incrementingAutofill,
     });
     document.getElementById('hotContainer').style.display = '';
     
@@ -735,5 +737,42 @@ Library.hot = {
         return false;
       }
     });
+  },
+
+  /**
+   * Adds buttons: "Update Libraries", "Propagate Dilutions"
+   */
+  getBulkActions: function () {
+    var actions = [];
+    actions.push('<a onclick="Library.hot.bulkUpdate();" href="javascript:void(0);">Update selected</a>');
+    actions.push('<a onclick="Library.hot.propagateDilutions();" href="javascript:void(0);">Propagate dilutions</a>');
+    return actions.join('');
+  },
+  
+  /**
+   * Takes libraries from the current table and redirects to page for updating them
+   */
+  bulkUpdate: function () {
+    var libraryIds = Hot.startData.map(function (s) { return s.id; });
+    if (libraryIds.indexOf(undefined) != -1) {
+      alert("Libraries must all be saved before updating.");
+      return;
+    } else {
+      window.location = window.location.origin + "/miso/library/bulk/edit/" + libraryIds.join(',');
+    }
+  },
+  
+  /**
+   * Takes libraries from current table and redirects to page for creating dilutions parented to these libraries
+   */
+  propagateDilutions: function () {
+    var libraryIds = Hot.startData.map(function (s) { return s.id; });
+    if (libraryIds.indexOf(undefined) != -1) {
+      alert("Libraries must all be saved before propagating dilutions.");
+      return;
+    } else {
+      window.location = window.location.origin + "/miso/library/dilutions/bulk/propagate/" + libraryIds.join(',');
+    }
   }
+  
 };

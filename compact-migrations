@@ -28,8 +28,8 @@ else
 		echo "Too many site-specific releases since last mainline release."
 		exit 1
 	fi
-	START_BANNER="--StartNoTest"
-	END_BANNER="--EndNoTest"
+	START_BANNER="-- StartNoTest"
+	END_BANNER="-- EndNoTest"
 fi
 
 NEXT="V$(printf "%04d" ${ID})__auto_${TAIL}.sql"

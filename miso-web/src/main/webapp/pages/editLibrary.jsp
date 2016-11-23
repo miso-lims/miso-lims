@@ -581,7 +581,7 @@
     </a>
 
     <div id="ldmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
-      <a href='javascript:void(0);' class="add" onclick="Library.dilution.insertLibraryDilutionRow(${library.id}, ${libraryPrepKitId}); return false;">
+      <a href='javascript:void(0);' class="add" onclick="Library.dilution.insertLibraryDilutionRow(${library.id}, ${libraryPrepKitId}, ${autoGenerateIdBarcodes}); return false;">
         Add Library Dilution
       </a>
       <c:if test="${not empty library.libraryDilutions}">
@@ -600,7 +600,9 @@
         <th>Done By</th>
         <th>Date</th>
         <th>Concentration (${libraryDilutionUnits})</th>
-        <th>Targeted Resequencing</th>
+        <c:if test="${detailedSample}">
+          <th>Targeted Resequencing</th>
+        </c:if>
         <th>ID Barcode</th>
           <%-- <th>Location Barcode</th> --%>
         <c:if test="${(dil.dilutionCreator eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
@@ -620,15 +622,17 @@
                           value="${dil.concentration}"
                           maxFractionDigits="2" />
             <td id="results${dil.id}">${concentrationRounded}</td>
-            <td>
-              <c:if test="${empty dil.targetedResequencing}">
-                NONE
-              </c:if>
-              <c:if test="${not empty dil.targetedResequencing}">
-                ${dil.targetedResequencing.alias}
-              </c:if>
-            </td>
-            <td class="fit">
+            <c:if test="${detailedSample}">
+              <td id="tarSeq${dil.id}">
+                <c:if test="${empty dil.targetedResequencing}">
+                  NONE
+                </c:if>
+                <c:if test="${not empty dil.targetedResequencing}">
+                  ${dil.targetedResequencing.alias}
+                </c:if>
+              </td>
+            </c:if>
+            <td class="fit" id="idBarcode${dil.id}">
               <c:if test="${not empty dil.identificationBarcode}">
                 <div class="barcodes">
                   <div class="barcodeArea ui-corner-all">
@@ -669,7 +673,7 @@
             <c:if test="${(sample.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
                         or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
               <td id="edit${dil.id}" align="center">
-                <a href="javascript:void(0);" onclick="Library.dilution.changeLibraryDilutionRow('${dil.id}','${library.id}')">
+                <a href="javascript:void(0);" onclick="Library.dilution.changeLibraryDilutionRow('${dil.id}',${autoGenerateIdBarcodes}, ${detailedSample})">
                   <span class="ui-icon ui-icon-pencil"></span>
                 </a>
               </td>

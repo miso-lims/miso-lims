@@ -99,7 +99,7 @@ Sample.hot = {
       newSam.tissueTypeLabel = sam.tissueTypeLabel;
       newSam.timesReceived = sam.timesReceived;
       newSam.tubeNumber = sam.tubeNumber;
-      newSam.passageNumber = sam.passageNumber;
+      newSam.passageNumber = sam.passageNumber || null;
       newSam.externalInstituteIdentifier = sam.externalInstituteIdentifier;
       newSam.labId = sam.labId;
       newSam.nonStandardAlias = sam.nonStandardAlias;
@@ -322,6 +322,7 @@ Sample.hot = {
     Hot.buildDtoFunc = Sample.hot.buildDtos;
     Hot.saveOneFunc = Sample.hot.saveOne;
     Hot.updateOneFunc = Sample.hot.updateOne;
+    Hot.afterAllSucceed = function () { Hot.addBulkMenu('saveSamples', Sample.hot.getBulkActions); };
     if (targetSampleCategory) Sample.hot.sampleCategory = targetSampleCategory;
     
     // reset params which track successes and errors
@@ -360,7 +361,8 @@ Sample.hot = {
       columns: Hot.colConf,
       data: Hot.startData,
       dataSchema: Sample.hot.dataSchema,
-      maxRows: startRowsNumber || startingValues.length
+      maxRows: startRowsNumber || startingValues.length,
+      beforeAutofill: Hot.incrementingAutofill,
     });
     document.getElementById('hotContainer').style.display = '';
     
@@ -382,8 +384,7 @@ Sample.hot = {
     Hot.hotTable.render();
 
     // enable save button if it was disabled
-    var saveButton = document.getElementById('saveSamples');
-    if (saveButton.classList.contains('disabled')) Hot.toggleButtonAndLoaderImage(saveButton);
+    if (Hot.saveButton.classList.contains('disabled')) Hot.toggleButtonAndLoaderImage(Hot.saveButton);
     
     Sample.hot.addDetailedQcHooks();
   },
@@ -1405,7 +1406,82 @@ Sample.hot = {
     }
     return (Hot.messages.failed.length ? false : true);
   },
+
+  /**
+   * Checks whether the provided sample class alias 
+   */
+  canSampleClassPropagateLibraries: function (sampleClassAlias) {
+    var libraryable = Hot.sampleOptions.sampleClassesDtos.filter(function (sc) { return sc.sampleCategory == 'Aliquot' && sc.alias != 'whole RNA (aliquot)'; });
+    var canPropagate = libraryable.filter(function (sc) { return sc.alias == sampleClassAlias; });
+    return canPropagate.size == 1;
+  },
   
+  /**
+   * Adds buttons: "Update Samples", "Propagate Samples", "Propagate Libraries" (if appropriate)
+   */
+  getBulkActions: function () {
+    var actions = [];
+    actions.push('<a onclick="Sample.hot.bulkUpdate();" href="javascript:void(0);">Update selected</a>');
+    if (Hot.detailedSample) {
+      Sample.sampleClasses = Hot.sampleOptions.sampleClassesDtos;
+      Sample.validRelationships = Hot.sampleOptions.sampleValidRelationshipsDtos;
+      var uniqueParentScAliases = Sample.ui.getUniqueValues(
+          Hot.startData.map(function (sam) { return sam.sampleClassAlias; })
+      );
+      var uniqueParentSCs = Sample.sampleClasses.filter(function (sc) { return uniqueParentScAliases.indexOf(sc.alias) != -1; });
+      var validChildren = Sample.ui.getChildSampleClasses(uniqueParentSCs);
+      if (validChildren.length > 0) {
+        for (var i = 0; i < validChildren.length; i++) {
+          actions.push('<a onclick="Sample.hot.propagateSamples(' + validChildren[i].id + ')" href="javascript:void(0);">Propagate ' + validChildren[i].alias + '</a>');
+        }
+      }
+    }
+    if (!Hot.detailedSample || Sample.hot.canSampleClassPropagateLibraries(Hot.startData[0].sampleClassAlias)) {
+      actions.push('<a onclick="Sample.hot.propagateLibraries();" href="javascript:void(0);">Propagate libraries</a>');
+    }
+    return actions.join('');
+},
+
+  /**
+   * Takes samples from current table and redirects to page for updating them
+   */
+  bulkUpdate: function () {
+    var sampleIds = Hot.startData.map(function (s) { return s.id; });
+    if (sampleIds.indexOf(undefined) != -1) {
+      alert("Samples must all be saved before updating.");
+      return;
+    } else {
+      window.location = window.location.origin + "/miso/sample/bulk/edit/" + sampleIds.join(',');
+    }
+  },
+  
+  /**
+   * Takes samples from current table and redirects to page for creating libraries parented to these samples
+   */
+  propagateLibraries: function () {
+    var sampleIds = Hot.startData.map(function (s) { return s.id; });
+    if (sampleIds.indexOf(undefined) != -1) {
+      alert("Samples must all be saved before propagating libraries.");
+      return;
+    } else {
+      window.location = window.location.origin + "/miso/library/bulk/propagate/" + sampleIds.join(',');
+    }
+  },
+  
+  /**
+   * Takes samples from current table and redirects to page for creating child samples of the parameter sampleClass parented to these samples
+   */
+  propagateSamples: function (childClassId) {
+    var sampleIds = Hot.startData.map(function (s) { return s.id; });
+    if (sampleIds.indexOf(undefined) != -1) {
+      alert("Samples must all be saved before propagating new samples.");
+      return;
+    } else {
+      window.location = window.location.origin + "/miso/sample/bulk/create/" + sampleIds.join(',') + "&scid=" + childClassId;
+    }
+  },
+  
+
   /**
    * Take the data in the external names column and send it to the server to find matching identities
    */

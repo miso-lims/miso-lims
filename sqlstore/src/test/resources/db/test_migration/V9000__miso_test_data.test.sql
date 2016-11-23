@@ -505,6 +505,9 @@ VALUES
 (2, '2012-04-20', '2012-04-20', 1, 'test description 2', 'name 2', 'title 2', 'accession 2', 'alias 2', 1),
 (3, '2012-04-20', '2012-04-20', 0, 'test description 3', 'name 3', 'title 3', 'accession 3', 'alias 3', 0);
 
+DELETE FROM Submission_Partition_Dilution;
+INSERT INTO Submission_Partition_Dilution(submission_submissionId, partition_partitionId, dilution_dilutionId) VALUES (3, 1, 1);
+
 DELETE FROM Submission_Experiment;
 INSERT INTO `Submission_Experiment` (`submission_submissionId`, `experiments_experimentId`)
 VALUES
@@ -606,5 +609,5 @@ VALUES (1,1,1,'2016-02-19 11:28:00',1,'2016-02-19 11:28:00',1);
 
 DELETE FROM `PrintJob`;
 DELETE FROM `PrintService`;
-INSERT INTO PrintService(serviceId, serviceName, contextName, contextFields, enabled, printServiceFor, printSchema) VALUES (1, 'foo', 'bar', '{}', TRUE, 'uk.ac.bbsrc.tgac.miso.core.data.Sample', 'bradyCustomStandardTubeBarcodeLabelSchema');
+INSERT INTO PrintService(serviceId, serviceName, contextName, contextFields, enabled, printServiceFor, printSchema) VALUES (1, 'foo', 'mach4-type-ftp-printer', '{}', TRUE, 'uk.ac.bbsrc.tgac.miso.core.data.Sample', 'bradyCustomStandardTubeBarcodeLabelSchema');
 INSERT INTO PrintJob(jobId, printServiceName, printDate, jobCreator_userId, printedElements, status) VALUES (1, 'foo', '2016-02-19', 1, '', 'OK');

@@ -44,7 +44,8 @@ var Dilution = {
         columns: Hot.colConf,
         data: Hot.startData,
         dataSchema: Dilution.hot.dataSchema,
-        maxRows: startingValues.length
+        maxRows: startingValues.length,
+        beforeAutofill: Hot.incrementingAutofill,
       });
       document.getElementById('hotContainer').style.display = '';
       
@@ -221,7 +222,7 @@ var Dilution = {
     /**
      * Check if cells are all valid. If yes, POSTs dilutions that need to be saved.
      */
-    createData: function () {
+    saveData: function () {
       var continueValidation = Hot.cleanRowsAndToggleSaveButton();
       if (continueValidation === false) return false;
       

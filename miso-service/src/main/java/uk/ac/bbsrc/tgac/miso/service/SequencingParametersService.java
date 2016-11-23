@@ -1,7 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.service;
 
 import java.io.IOException;
-import java.util.Set;
+import java.util.Collection;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 
@@ -13,9 +13,9 @@ public interface SequencingParametersService {
 
   SequencingParameters get(Long sequencingParametersId) throws IOException;
 
-  Set<SequencingParameters> getAll() throws IOException;
+  Collection<SequencingParameters> getAll() throws IOException;
 
-  Set<SequencingParameters> getForPlatform(Long platformId) throws IOException;
+  Collection<SequencingParameters> getForPlatform(Long platformId) throws IOException;
 
   void update(SequencingParameters sequencingParameters) throws IOException;
 }

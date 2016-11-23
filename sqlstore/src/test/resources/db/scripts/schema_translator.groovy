@@ -20,14 +20,21 @@ final String testSchemaDir = basedir + '/target/test-classes/db/test_migration/'
 
 Files.createDirectories(Paths.get(testSchemaDir))
 for (File file : productionSchemaDir.listFiles()) {
-  if (file.isFile() && file.getName().matches(productionScriptPattern)) {
+  if (!file.isFile()) {
+    continue
+  }
+  if (file.getName().contains(" ")) {
+    println("File name has spaces : " + file.getName())
+    System.exit(1)
+  }
+  if (file.getName().matches(productionScriptPattern)) {
     println('Translating file: ' + file.getAbsolutePath())
     Path srcPath = file.toPath()
     Path dstPath = Paths.get(testSchemaDir + file.getName().replaceFirst('\\.sql$', '.test.sql'))
     String text = new String(Files.readAllBytes(srcPath))
     
     String translated = text
-        .replaceAll('(?s)--StartNoTest(.*?)--EndNoTest', '--') // Delete blocks containing non-standard delimiters
+        .replaceAll('(?s)-- ?StartNoTest(.*?)-- ?EndNoTest', '--') // Delete blocks containing non-standard delimiters
         .replaceAll('b\'0\'', '0') // bit representation
         .replaceAll('b\'1\'', '1') // bit representation
         .replaceAll('DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP', 'AS CURRENT_TIMESTAMP') // syntax difference, same result
