@@ -197,10 +197,12 @@ public class PoolSearchService {
 
     b.append("<br/><i>");
     Collection<Experiment> exprs = p.getExperiments();
-    for (Experiment e : exprs) {
-      b.append(
-          "<span>" + e.getStudy().getProject().getAlias() + "(" + e.getName() + ": " + p.getPoolableElements().size()
-              + " dilutions)</span><br/>");
+    if (exprs != null) {
+      for (Experiment e : exprs) {
+        b.append(
+            "<span>" + e.getStudy().getProject().getAlias() + "(" + e.getName() + ": " + p.getPoolableElements().size()
+                + " dilutions)</span><br/>");
+      }
     }
     b.append("</i>");
 
