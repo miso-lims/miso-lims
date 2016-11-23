@@ -319,7 +319,7 @@ Once the build completes, test it by launching it:
 
 Navigate to http://localhost:8090 and login with the credentials admin:admin.
 
-Once satisfied, push the image to Docker Hub:
+Once satisfied, push the image to Docker Hub. Note that only members of the [misolims](https://hub.docker.com/u/misolims/) organisation can push:
 
     docker login
     docker push "misolims/miso-lims:${version}"
