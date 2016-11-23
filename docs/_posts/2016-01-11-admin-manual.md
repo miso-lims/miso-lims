@@ -315,7 +315,7 @@ Pull the tag or snapshot that you want to build and package it:
 
 Once the build completes, test it by launching it:
 
-    docker run -p 8090:8080 -d -t "misolims/miso-lims:${version}"
+    docker run -p 8090:8080 --name "miso${version}" -t "misolims/miso-lims:${version}"
 
 Navigate to http://localhost:8090 and login with the credentials admin:admin.
 
