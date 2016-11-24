@@ -126,7 +126,7 @@
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.impl.emPCR" value-ref="emPCRStore" />
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution" value-ref="emPCRDilutionStore" />
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution" value-ref="libraryDilutionStore" />
-        <entry key="uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedResequencing" value-ref="targetedResequencingStore" />
+        <entry key="uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing" value-ref="targetedSequencingStore" />
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.Box" value-ref="boxStore" />
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.Experiment" value-ref="experimentStore" />
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.EntityGroup" value-ref="entityGroupStore" />
@@ -200,14 +200,14 @@
     </property>
     <property name="securityProfileDAO" ref="sqlSecurityProfileDAO" />
     <property name="libraryDAO" ref="sqlLibraryDAO" />
-    <property name="targetedResequencingDAO" ref="sqlTargetedResequencingDAO" />
+    <property name="targetedSequencingDAO" ref="sqlTargetedSequencingDAO" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />
     <property name="autoGenerateIdentificationBarcodes">
       <value>${miso.autoGenerateIdentificationBarcodes}</value>
     </property>
   </bean>
   
-  <bean id="sqlTargetedResequencingDAO" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLTargetedResequencingDAO">
+  <bean id="sqlTargetedSequencingDAO" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLTargetedSequencingDAO">
     <property name="securityDAO" ref="sqlSecurityDAO" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />
   </bean>
@@ -539,13 +539,13 @@
     </property>
   </bean>
   
-  <bean name="targetedResequencingStore" class="org.springframework.aop.framework.ProxyFactoryBean">
+  <bean name="targetedSequencingStore" class="org.springframework.aop.framework.ProxyFactoryBean">
     <property name="proxyInterfaces">
-      <value>uk.ac.bbsrc.tgac.miso.core.store.TargetedResequencingStore</value>
+      <value>uk.ac.bbsrc.tgac.miso.core.store.TargetedSequencingStore</value>
     </property>
     <property name="interceptorNames">
       <list>
-        <value>sqlTargetedResequencingDAO</value>
+        <value>sqlTargetedSequencingDAO</value>
       </list>
     </property>
   </bean>

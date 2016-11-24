@@ -601,7 +601,7 @@
         <th>Date</th>
         <th>Concentration (${libraryDilutionUnits})</th>
         <c:if test="${detailedSample}">
-          <th>Targeted Resequencing</th>
+          <th>Targeted Sequencing</th>
         </c:if>
         <th>ID Barcode</th>
           <%-- <th>Location Barcode</th> --%>
@@ -624,11 +624,11 @@
             <td id="results${dil.id}">${concentrationRounded}</td>
             <c:if test="${detailedSample}">
               <td id="tarSeq${dil.id}">
-                <c:if test="${empty dil.targetedResequencing}">
+                <c:if test="${empty dil.targetedSequencing}">
                   NONE
                 </c:if>
-                <c:if test="${not empty dil.targetedResequencing}">
-                  ${dil.targetedResequencing.alias}
+                <c:if test="${not empty dil.targetedSequencing}">
+                  ${dil.targetedSequencing.alias}
                 </c:if>
               </td>
             </c:if>

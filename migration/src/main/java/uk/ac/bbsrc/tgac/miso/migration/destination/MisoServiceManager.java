@@ -80,7 +80,7 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.SQLSequencerPoolPartitionDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLSequencerReferenceDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLStatusDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLStudyDAO;
-import uk.ac.bbsrc.tgac.miso.sqlstore.SQLTargetedResequencingDAO;
+import uk.ac.bbsrc.tgac.miso.sqlstore.SQLTargetedSequencingDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLWatcherDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DaoLookup;
 
@@ -112,7 +112,7 @@ public class MisoServiceManager {
   private SQLLibraryDAO libraryDao;
   private SQLLibraryQCDAO libraryQcDao;
   private SQLLibraryDilutionDAO dilutionDao;
-  private SQLTargetedResequencingDAO targetedResequencingDao;
+  private SQLTargetedSequencingDAO targetedSequencingDao;
   private SQLPoolDAO poolDao;
   private SQLPoolQCDAO poolQcDao;
   private SQLExperimentDAO experimentDao;
@@ -211,7 +211,7 @@ public class MisoServiceManager {
     m.setDefaultStatusDao();
     m.setDefaultStudyDao();
     m.setDefaultSubprojectDao();
-    m.setDefaultTargetedResequencingDao();
+    m.setDefaultTargetedSequencingDao();
     m.setDefaultTissueMaterialDao();
     m.setDefaultTissueOriginDao();
     m.setDefaultTissueTypeDao();
@@ -310,7 +310,7 @@ public class MisoServiceManager {
     if (sampleDao != null) sampleDao.setSecurityDao(securityStore);
     if (noteDao != null) noteDao.setSecurityDAO(securityStore);
     if (libraryDao != null) libraryDao.setSecurityDAO(securityStore);
-    if (targetedResequencingDao != null) targetedResequencingDao.setSecurityDAO(securityStore);
+    if (targetedSequencingDao != null) targetedSequencingDao.setSecurityDAO(securityStore);
     if (poolDao != null) poolDao.setSecurityDAO(securityStore);
     if (experimentDao != null) experimentDao.setSecurityDAO(securityStore);
     if (kitDao != null) kitDao.setSecurityDAO(securityStore);
@@ -682,7 +682,7 @@ public class MisoServiceManager {
     dao.setLibraryDAO(libraryDao);
     dao.setNamingScheme(getNameableNamingScheme(LibraryDilution.class));
     dao.setSecurityProfileDAO(securityProfileDao);
-    dao.setTargetedResequencingDAO(targetedResequencingDao);
+    dao.setTargetedSequencingDAO(targetedSequencingDao);
     setDilutionDao(dao);
   }
 
@@ -691,24 +691,24 @@ public class MisoServiceManager {
     if (daoLookup != null) daoLookup.setDaos(makeDaoLookupMap());
   }
 
-  public SQLTargetedResequencingDAO getTargetedResequencingDao() {
-    return targetedResequencingDao;
+  public SQLTargetedSequencingDAO getTargetedSequencingDao() {
+    return targetedSequencingDao;
   }
 
-  public void setTargetedResequencingDao(SQLTargetedResequencingDAO targetedResequencingDao) {
-    this.targetedResequencingDao = targetedResequencingDao;
-    updateTargetedResequencingDaoDependencies();
+  public void setTargetedSequencingDao(SQLTargetedSequencingDAO targetedSequencingDao) {
+    this.targetedSequencingDao = targetedSequencingDao;
+    updateTargetedSequencingDaoDependencies();
   }
 
-  public void setDefaultTargetedResequencingDao() {
-    SQLTargetedResequencingDAO dao = new SQLTargetedResequencingDAO();
+  public void setDefaultTargetedSequencingDao() {
+    SQLTargetedSequencingDAO dao = new SQLTargetedSequencingDAO();
     dao.setJdbcTemplate(jdbcTemplate);
     dao.setSecurityDAO(securityStore);
-    setTargetedResequencingDao(dao);
+    setTargetedSequencingDao(dao);
   }
 
-  private void updateTargetedResequencingDaoDependencies() {
-    if (dilutionDao != null) dilutionDao.setTargetedResequencingDAO(targetedResequencingDao);
+  private void updateTargetedSequencingDaoDependencies() {
+    if (dilutionDao != null) dilutionDao.setTargetedSequencingDAO(targetedSequencingDao);
   }
 
   public SQLPoolDAO getPoolDao() {

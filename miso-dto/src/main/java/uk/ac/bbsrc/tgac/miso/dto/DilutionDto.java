@@ -11,7 +11,7 @@ public class DilutionDto {
   private Double concentration;
   private String creationDate;
   private String dilutionCreatorName;
-  private Long targetedResequencingId;
+  private Long targetedSequencingId;
   private LibraryDto library;
   private String libraryUrl;
 
@@ -73,12 +73,12 @@ public class DilutionDto {
     this.dilutionCreatorName = userName;
   }
 
-  public Long getTargetedResequencingId() {
-    return targetedResequencingId;
+  public Long getTargetedSequencingId() {
+    return targetedSequencingId;
   }
 
-  public void setTargetedResequencingId(Long targetedResequencingId) {
-    this.targetedResequencingId = targetedResequencingId;
+  public void setTargetedSequencingId(Long targetedSequencingId) {
+    this.targetedSequencingId = targetedSequencingId;
   }
 
   public LibraryDto getLibrary() {

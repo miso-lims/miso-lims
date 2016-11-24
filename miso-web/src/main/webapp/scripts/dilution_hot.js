@@ -63,8 +63,8 @@ var Dilution = {
       locationLabel: null,
       concentration: null,
       dilutionuserName: null,
-      targetedResequencingId: null,
-      targetedResequencingAlias: null,
+      targetedSequencingId: null,
+      targetedSequencingAlias: null,
       library: {
         id: '',
         alias: ''
@@ -73,18 +73,18 @@ var Dilution = {
     },
     
     /**
-     * Get targeted resequencing aliases (all or by id) (detailed sample only)
+     * Get targeted sequencing aliases (all or by id) (detailed sample only)
      */
     getTarSeqs: function () {
-      return Hot.sortByProperty(Dilution.hot.tarSeqs, 'targetedResequencingId').map(Hot.getAlias);
+      return Hot.sortByProperty(Dilution.hot.tarSeqs, 'targetedSequencingId').map(Hot.getAlias);
     },
 
     /**
-     * Gets the targeted resequencing alis for a given id
+     * Gets the targeted sequencing alias for a given id
      */
     getTarSeqAliasFromId: function (tsID) {
       var results = Dilution.hot.tarSeqs.filter(function (ts) {
-        return ts.targetedResequencingId == tsID;
+        return ts.targetedSequencingId == tsID;
       });
       return results.length > 0 ? results[0].alias : null;
     },
@@ -96,7 +96,7 @@ var Dilution = {
       var results = Dilution.hot.tarSeqs.filter(function (ts) {
         return ts.alias == tsAlias;
       });
-      return results.length > 0 ? results[0].targetedResequencingId : null;
+      return results.length > 0 ? results[0].targetedSequencingId : null;
     },
 
     /**
@@ -149,8 +149,8 @@ var Dilution = {
           include: true
         },
         {
-          header: 'Targeted Resequencing',
-          data: 'targetedResequencingAlias',
+          header: 'Targeted Sequencing',
+          data: 'targetedSequencingAlias',
           type: 'dropdown',
           trimDropdown: false,
           source: Dilution.hot.getTarSeqs(),
@@ -177,8 +177,8 @@ var Dilution = {
         dilution.identificationBarcode = obj.identificationBarcode;
         dilution.concentration = obj.concentration;
         dilution.creationDate = obj.creationDate;
-        if (Hot.detailedSample && obj.targetedResequencingAlias) {
-          dilution.targetedResequencingId = Dilution.hot.getTarSeqIdFromAlias(obj.targetedResequencingAlias);
+        if (Hot.detailedSample && obj.targetedSequencingAlias) {
+          dilution.targetedSequencingId = Dilution.hot.getTarSeqIdFromAlias(obj.targetedSequencingAlias);
         }
       } catch (e) {
         console.log(e.error);

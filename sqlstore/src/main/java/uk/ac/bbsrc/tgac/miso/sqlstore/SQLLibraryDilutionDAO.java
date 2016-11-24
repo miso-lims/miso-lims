@@ -49,6 +49,7 @@ import com.googlecode.ehcache.annotations.TriggersRemove;
 
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
+
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
@@ -59,7 +60,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
-import uk.ac.bbsrc.tgac.miso.core.store.TargetedResequencingStore;
+import uk.ac.bbsrc.tgac.miso.core.store.TargetedSequencingStore;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
@@ -81,14 +82,14 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
       + "AND l.platformName = ?";
 
   public static String LIBRARY_DILUTION_SELECT = "SELECT dilutionId, name, concentration, preMigrationId, library_libraryId, "
-      + "identificationBarcode, creationDate, dilutionUserName, securityProfile_profileId, targetedResequencingId, " + "lastUpdated "
+      + "identificationBarcode, creationDate, dilutionUserName, securityProfile_profileId, targetedSequencingId, " + "lastUpdated "
       + "FROM LibraryDilution";
 
   public static final String LIBRARY_DILUTIONS_SELECT_LIMIT = LIBRARY_DILUTION_SELECT + " ORDER BY dilutionId DESC LIMIT ?";
 
   public static String LIBRARY_DILUTION_SELECT_BY_LIBRARY_PLATFORM = "SELECT ld.dilutionId, ld.name, ld.concentration, ld.preMigrationId, "
       + "ld.library_libraryId, ld.identificationBarcode, ld.creationDate, ld.dilutionUserName, ld.securityProfile_profileId, "
-      + "ld.targetedResequencingId, l.platformName, ld.lastUpdated " + "FROM LibraryDilution ld, Library l "
+      + "ld.targetedSequencingId, l.platformName, ld.lastUpdated " + "FROM LibraryDilution ld, Library l "
       + "WHERE ld.library_libraryId = l.libraryId " + "AND l.platformName = ? ";
 
   public static String LIBRARY_DILUTION_COUNT_BY_LIBRARY_PLATFORM = "SELECT COUNT(*) FROM LibraryDilution ld, Library l "
@@ -111,14 +112,14 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
   public static final String LIBRARY_DILUTION_UPDATE = "UPDATE LibraryDilution "
       + "SET name=:name, concentration=:concentration, preMigrationId=:preMigrationId, library_libraryId=:library_libraryId, "
       + "identificationBarcode=:identificationBarcode, creationDate=:creationDate, "
-      + "securityProfile_profileId=:securityProfile_profileId, targetedResequencingId=:targetedResequencingId, "
+      + "securityProfile_profileId=:securityProfile_profileId, targetedSequencingId=:targetedSequencingId, "
       + "lastUpdated=:lastUpdated " + "WHERE dilutionId=:dilutionId";
 
   public static final String LIBRARY_DILUTION_DELETE = "DELETE FROM LibraryDilution WHERE dilutionId=:dilutionId";
 
   public static String LIBRARY_DILUTION_SELECT_BY_SEARCH_ONLY = "SELECT ld.dilutionId, ld.name, ld.concentration, ld.preMigrationId, "
       + "ld.library_libraryId, ld.identificationBarcode, ld.creationDate, ld.dilutionUserName, ld.securityProfile_profileId, "
-      + "ld.targetedResequencingId, ld.lastUpdated " + "FROM LibraryDilution ld JOIN Library l ON l.libraryId = ld.library_libraryId "
+      + "ld.targetedSequencingId, ld.lastUpdated " + "FROM LibraryDilution ld JOIN Library l ON l.libraryId = ld.library_libraryId "
       + "WHERE (UPPER(ld.name) LIKE :search OR UPPER(ld.identificationBarcode) LIKE :search OR "
       + "UPPER(l.name) LIKE :search OR UPPER(l.alias) LIKE :search OR UPPER(l.description) LIKE :search)";
 
@@ -135,7 +136,7 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
   private LibraryStore libraryDAO;
   private Store<SecurityProfile> securityProfileDAO;
   private CascadeType cascadeType;
-  private TargetedResequencingStore targetedResequencingDAO;
+  private TargetedSequencingStore targetedSequencingDAO;
   private boolean autoGenerateIdentificationBarcodes;
 
   @Autowired
@@ -200,8 +201,8 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
   }
 
   @CoverageIgnore
-  public void setTargetedResequencingDAO(TargetedResequencingStore targetedResequencingDAO) {
-    this.targetedResequencingDAO = targetedResequencingDAO;
+  public void setTargetedSequencingDAO(TargetedSequencingStore targetedSequencingDAO) {
+    this.targetedSequencingDAO = targetedSequencingDAO;
   }
 
   public void setAutoGenerateIdentificationBarcodes(boolean autoGenerateIdentificationBarcodes) {
@@ -342,10 +343,10 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
     params.addValue("securityProfile_profileId", securityProfileId);
     params.addValue("dilutionUserName", dilution.getDilutionCreator());
     params.addValue("lastUpdated", dilution.getLastModified());
-    if (dilution.getTargetedResequencing() != null) {
-      params.addValue("targetedResequencingId", dilution.getTargetedResequencing().getTargetedResequencingId());
+    if (dilution.getTargetedSequencing() != null) {
+      params.addValue("targetedSequencingId", dilution.getTargetedSequencing().getTargetedSequencingId());
     } else {
-      params.addValue("targetedResequencingId", null);
+      params.addValue("targetedSequencingId", null);
     }
 
     if (dilution.getId() == AbstractDilution.UNSAVED_ID) {
@@ -382,10 +383,10 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
         if (namingScheme.validateField("name", dilution.getName())) {
           params.addValue("dilutionId", dilution.getId());
           params.addValue("name", dilution.getName());
-          if (dilution.getTargetedResequencing() != null) {
-            params.addValue("targetedResequencingId", dilution.getTargetedResequencing().getTargetedResequencingId());
+          if (dilution.getTargetedSequencing() != null) {
+            params.addValue("targetedSequencingId", dilution.getTargetedSequencing().getTargetedSequencingId());
           } else {
-            params.addValue("targetedResequencingId", null);
+            params.addValue("targetedSequencingId", null);
           }
           if (autoGenerateIdentificationBarcodes) {
             autoGenerateIdBarcode(dilution);
@@ -537,10 +538,10 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
         libraryDilution.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
 
         if (!isLazy()) {
-          libraryDilution.setTargetedResequencing(targetedResequencingDAO.get(rs.getLong("targetedResequencingId")));
+          libraryDilution.setTargetedSequencing(targetedSequencingDAO.get(rs.getLong("targetedSequencingId")));
           libraryDilution.setLibrary(libraryDAO.get(rs.getLong("library_libraryId")));
         } else {
-          libraryDilution.setTargetedResequencing(targetedResequencingDAO.lazyGet(rs.getLong("targetedResequencingId")));
+          libraryDilution.setTargetedSequencing(targetedSequencingDAO.lazyGet(rs.getLong("targetedSequencingId")));
           libraryDilution.setLibrary(libraryDAO.lazyGet(rs.getLong("library_libraryId")));
         }
       } catch (IOException e1) {

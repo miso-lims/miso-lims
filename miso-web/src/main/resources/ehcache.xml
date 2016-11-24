@@ -70,10 +70,10 @@
       retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
   </cache>
   
-  <cache name="targetedResequencingCache" eternal="true" overflowToDisk="true" statistics="true" maxBytesLocalHeap="30M" maxBytesLocalDisk="100M">
+  <cache name="targetedSequencingCache" eternal="true" overflowToDisk="true" statistics="true" maxBytesLocalHeap="30M" maxBytesLocalDisk="100M">
   </cache>
 
-  <cache name="lazyTargetedResequencingCache" eternal="true" overflowToDisk="true" statistics="true" maxBytesLocalHeap="5M"
+  <cache name="lazyTargetedSequencingCache" eternal="true" overflowToDisk="true" statistics="true" maxBytesLocalHeap="5M"
     maxBytesLocalDisk="75M">
   </cache>
 

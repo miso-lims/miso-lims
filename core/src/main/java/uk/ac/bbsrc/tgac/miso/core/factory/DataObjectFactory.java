@@ -46,7 +46,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedResequencing;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCR;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRPool;
@@ -118,7 +118,7 @@ public abstract class DataObjectFactory {
 
   public abstract LibraryDilution getLibraryDilution(User user);
 
-  public abstract TargetedResequencing getTargetedResequencing();
+  public abstract TargetedSequencing getTargetedSequencing();
 
   public abstract emPCRDilution getEmPCRDilution();
 

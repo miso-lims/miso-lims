@@ -74,7 +74,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedResequencing;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCR;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
@@ -116,7 +116,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.StatusStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.core.store.StudyStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SubmissionStore;
-import uk.ac.bbsrc.tgac.miso.core.store.TargetedResequencingStore;
+import uk.ac.bbsrc.tgac.miso.core.store.TargetedSequencingStore;
 
 /**
  * Implementation of a RequestManager to facilitate persistence operations on MISO model objects
@@ -164,7 +164,7 @@ public class MisoRequestManager implements RequestManager {
   @Autowired
   private SampleStore sampleStore;
   @Autowired
-  private TargetedResequencingStore targetedResequencingStore;
+  private TargetedSequencingStore targetedSequencingStore;
   @Autowired
   private SampleQcStore sampleQcStore;
   @Autowired
@@ -2739,20 +2739,20 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<TargetedResequencing> listAllTargetedResequencing() throws IOException {
-    if (targetedResequencingStore != null) {
-      return targetedResequencingStore.listAll();
+  public Collection<TargetedSequencing> listAllTargetedSequencing() throws IOException {
+    if (targetedSequencingStore != null) {
+      return targetedSequencingStore.listAll();
     } else {
-      throw new IOException("No targetedResequencingStore available. Check that it has been declared in the Spring config.");
+      throw new IOException("No targetedSequencingStore available. Check that it has been declared in the Spring config.");
     }
   }
 
   @Override
-  public TargetedResequencing getTargetedResequencingById(long targetedResequencingId) throws IOException {
-    if (targetedResequencingStore != null) {
-      return targetedResequencingStore.get(targetedResequencingId);
+  public TargetedSequencing getTargetedSequencingById(long targetedSequencingId) throws IOException {
+    if (targetedSequencingStore != null) {
+      return targetedSequencingStore.get(targetedSequencingId);
     } else {
-      throw new IOException("No securityStore available. Check that it has been declared in the Spring config.");
+      throw new IOException("No targetedSequencingStore available. Check that it has been declared in the Spring config.");
     }
   }
 

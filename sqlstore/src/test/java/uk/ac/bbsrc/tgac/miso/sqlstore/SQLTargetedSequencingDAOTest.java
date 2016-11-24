@@ -15,11 +15,11 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.Authentication;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedResequencing;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
 
-public class SQLTargetedResequencingDAOTest extends AbstractDAOTest {
+public class SQLTargetedSequencingDAOTest extends AbstractDAOTest {
 
   @Autowired
   private JdbcTemplate template;
@@ -37,7 +37,7 @@ public class SQLTargetedResequencingDAOTest extends AbstractDAOTest {
   private KitStore kitDao;
 
   @InjectMocks
-  private SQLTargetedResequencingDAO dao;
+  private SQLTargetedSequencingDAO dao;
 
   @Before
   public void setUp() throws Exception {
@@ -48,20 +48,20 @@ public class SQLTargetedResequencingDAOTest extends AbstractDAOTest {
 
   @Test
   public void testListAllCountIsAtLeastThree() throws Exception {
-    Collection<TargetedResequencing> targetedResequencingList = dao.listAll();
-    assertThat("count of all targeted resequencing items", targetedResequencingList.size(), is(greaterThanOrEqualTo(3)));
+    Collection<TargetedSequencing> targetedSequencingList = dao.listAll();
+    assertThat("count of all targeted sequencing items", targetedSequencingList.size(), is(greaterThanOrEqualTo(3)));
   }
 
   @Test
   public void testGetByIdOneAliasIsHalo() throws Exception {
     Long idOne = 1L;
-    TargetedResequencing actual = dao.get(idOne);
-    assertThat("alias for targeted resequencing with id 1", actual.getAlias(), is("HALO_IBP"));
+    TargetedSequencing actual = dao.get(idOne);
+    assertThat("alias for targeted sequencing with id 1", actual.getAlias(), is("HALO_IBP"));
   }
 
   @Test
   public void testCountIsAtLeastThree() throws Exception {
     int actual = dao.count();
-    assertThat("count of targeted resequencing entries", actual, is(greaterThanOrEqualTo(3)));
+    assertThat("count of targeted sequencing entries", actual, is(greaterThanOrEqualTo(3)));
   }
 }
