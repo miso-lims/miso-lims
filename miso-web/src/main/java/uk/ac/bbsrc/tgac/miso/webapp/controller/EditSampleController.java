@@ -246,6 +246,10 @@ public class EditSampleController {
     Sample nextS = null;
 
     if (p != null && p.getId() == projectId) {
+      if (p.getSamples().isEmpty()) {
+        // if p was lazy loaded then it doesn't have samples.
+        p = requestManager.getProjectById(p.getId());
+      }
       if (!p.getSamples().isEmpty()) {
         Map<String, Sample> ret = new HashMap<>();
         List<Sample> ss = new ArrayList<>(p.getSamples());
@@ -551,7 +555,7 @@ public class EditSampleController {
 
   /**
    * Translates foreign keys to entity objects with only the ID set, to be used in service layer to reload persisted child objects
-   * 
+   *
    * @param binder
    */
   @InitBinder
