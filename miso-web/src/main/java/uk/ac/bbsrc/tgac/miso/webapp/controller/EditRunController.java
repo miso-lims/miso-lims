@@ -162,6 +162,21 @@ public class EditRunController {
     return metrixEnabled;
   }
 
+  @Value("${miso.pacbio.dashboard.connected}")
+  private Boolean isPacBioDashboardConnected;
+
+  @Value("${miso.pacbio.dashboard.url}")
+  private String pacBioDashboardUrl;
+
+  @ModelAttribute("pacBioDashboardUrl")
+  public String getPacBioDashboardUrl() {
+    if (isPacBioDashboardConnected) {
+      return pacBioDashboardUrl + (pacBioDashboardUrl.endsWith("/") ? "" : "/") + "Metrics/RSRunReport";
+    } else {
+      return null;
+    }
+  }
+
   public Boolean hasOperationsQcPassed(Run run) throws IOException {
     if (run != null && run.getId() != AbstractRun.UNSAVED_ID) {
       for (RunQC qc : run.getRunQCs()) {
