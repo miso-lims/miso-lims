@@ -91,7 +91,6 @@ import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.RequestManagerAwareNamingScheme;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.util
@@ -3672,8 +3671,6 @@ public class FormUtils {
 
   private static List<Sample> processSampleInputODS(OdfSpreadsheetDocument oDoc, User u, RequestManager manager,
       MisoNamingScheme<Library> libraryNamingScheme, IndexService indexService) throws Exception {
-    ((RequestManagerAwareNamingScheme) libraryNamingScheme).setRequestManager(manager);
-
     List<Sample> samples = new ArrayList<>();
     OdfTable oTable = oDoc.getTableList().get(0);
 
@@ -3809,8 +3806,6 @@ public class FormUtils {
 
   private static List<Sample> processSampleInputXLSX(XSSFWorkbook wb, User u, RequestManager manager,
       MisoNamingScheme<Library> libraryNamingScheme, IndexService indexService) throws Exception {
-    ((RequestManagerAwareNamingScheme) libraryNamingScheme).setRequestManager(manager);
-
     List<Sample> samples = new ArrayList<>();
     XSSFSheet sheet = wb.getSheetAt(0);
     int rows = sheet.getPhysicalNumberOfRows();

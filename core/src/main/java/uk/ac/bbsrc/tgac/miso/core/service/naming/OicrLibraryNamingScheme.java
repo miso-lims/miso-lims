@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import net.sourceforge.fluxion.spi.ServiceProvider;
 
@@ -17,12 +18,14 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 @ServiceProvider
-public class OicrLibraryNamingScheme implements RequestManagerAwareNamingScheme<Library> {
+public class OicrLibraryNamingScheme implements MisoNamingScheme<Library> {
   protected static final Logger log = LoggerFactory.getLogger(OicrLibraryNamingScheme.class);
 
   private final Map<String, Boolean> allowDuplicateMap = new HashMap<>();
   private final Map<String, Pattern> validationMap = new HashMap<>();
   private final Map<String, NameGenerator<Library>> customNameGeneratorMap = new HashMap<>();
+
+  @Autowired
   private RequestManager requestManager;
 
   public static final String DEFAULT_NAME_REGEX = "([A-Z]{3})([0-9]+)";
@@ -185,12 +188,6 @@ public class OicrLibraryNamingScheme implements RequestManagerAwareNamingScheme<
     return null;
   }
 
-  @Override
-  public RequestManager getRequestManager() {
-    return requestManager;
-  }
-
-  @Override
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
   }

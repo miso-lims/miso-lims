@@ -8,8 +8,10 @@ import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import net.sourceforge.fluxion.spi.ServiceProvider;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
@@ -25,12 +27,14 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
  * @since 0.1.7
  */
 @ServiceProvider
-public class DefaultSampleNamingScheme implements RequestManagerAwareNamingScheme<Sample> {
+public class DefaultSampleNamingScheme implements MisoNamingScheme<Sample> {
   protected static final Logger log = LoggerFactory.getLogger(DefaultSampleNamingScheme.class);
 
-  private Map<String, Boolean> allowDuplicateMap = new HashMap<String, Boolean>();
-  private Map<String, Pattern> validationMap = new HashMap<String, Pattern>();
-  private Map<String, NameGenerator<Sample>> customNameGeneratorMap = new HashMap<String, NameGenerator<Sample>>();
+  private final Map<String, Boolean> allowDuplicateMap = new HashMap<String, Boolean>();
+  private final Map<String, Pattern> validationMap = new HashMap<String, Pattern>();
+  private final Map<String, NameGenerator<Sample>> customNameGeneratorMap = new HashMap<String, NameGenerator<Sample>>();
+
+  @Autowired
   private RequestManager requestManager;
 
   public DefaultSampleNamingScheme() {
@@ -148,12 +152,6 @@ public class DefaultSampleNamingScheme implements RequestManagerAwareNamingSchem
     return null;
   }
 
-  @Override
-  public RequestManager getRequestManager() {
-    return requestManager;
-  }
-
-  @Override
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
   }

@@ -64,24 +64,6 @@ public class MisoEntityNamingSchemeResolverService implements EntityNamingScheme
         }
       }
 
-      consumerLoader = ServiceLoader.load(RequestManagerAwareNamingScheme.class);
-      consumerIterator = consumerLoader.iterator();
-
-      while (consumerIterator.hasNext()) {
-        MisoNamingScheme p = consumerIterator.next();
-
-        if (!contextMap.containsKey(p.getSchemeName())) {
-          contextMap.put(p.getSchemeName(), p);
-        } else {
-          if (contextMap.get(p.getSchemeName()) != p) {
-            String msg = "Multiple different NamingSchemes with the same scheme name " + "('" + p.getSchemeName()
-                + "') are present on the classpath. Scheme names must be unique.";
-            log.error(msg);
-            throw new ServiceConfigurationError(msg);
-          }
-        }
-      }
-
       log.info("Loaded " + contextMap.values().size() + " known naming schemes");
     }
 
