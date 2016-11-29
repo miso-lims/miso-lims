@@ -1,3 +1,15 @@
+# 0.2.41
+
+Changes:
+
+ * rename TargetedResequencing to TargetedSequencing (#559)
+ * Speed up bulk add samples
+ * add PacBio dashboard link on Run page (#554)
+ * Add tests for SQLWatcherDAO
+ * Update Sample Information Form
+ * Move the Dockerfile into the main repository (#557)
+ * Changed to next development version
+
 # 0.2.40
 
 Changes:

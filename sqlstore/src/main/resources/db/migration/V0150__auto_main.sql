@@ -1,3 +1,5 @@
+-- tarReseq_to_tarSeq
+
 --StartNoTest because FK was never named in the original migration
 SELECT CONSTRAINT_NAME INTO @constraint
     FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
@@ -12,3 +14,5 @@ ALTER TABLE TargetedResequencing CHANGE `targetedResequencingId` `targetedSequen
 ALTER TABLE TargetedResequencing RENAME TO TargetedSequencing;
 ALTER TABLE LibraryDilution CHANGE `targetedResequencingId` `targetedSequencingId` BIGINT(20) DEFAULT NULL;
 ALTER TABLE LibraryDilution ADD CONSTRAINT `FK_ld_targetedSequencing_targetedSequencingId` FOREIGN KEY (`targetedSequencingId`) REFERENCES TargetedSequencing (`targetedSequencingId`);
+
+
