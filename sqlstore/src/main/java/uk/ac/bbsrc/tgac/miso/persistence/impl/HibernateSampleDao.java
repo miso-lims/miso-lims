@@ -57,7 +57,7 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 /**
  * This is the Hibernate DAO for Samples and serves as the bridge between Hibernate and the existing SqlStore persistence layers.
- * 
+ *
  * The data from the Sample table is loaded via Hibernate, but Hibernate cannot follow the references to Libraries and such from a Sample.
  * Therefore, this implementation loads a Sample via Hibernate, then calls into the SqlStore persistence layer to gather the remaining data
  * that Hibernate cannot access. Similarly, it then follows any necessary links on save. All the SqlStore-populated fields are marked
@@ -161,7 +161,7 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
 
   /**
    * Fix up a Sample loaded by Hibernate by gathering the SqlStore-persisted information and mutating the object.
-   * 
+   *
    * @returns the original object after mutation.
    */
   private <T extends Sample> T fetchSqlStore(T sample) throws IOException {
@@ -192,7 +192,7 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
 
   /**
    * Fixup a collection of Samples loaded by Hibernate. This mutates the collection's contents.
-   * 
+   *
    * @return the original collection, having had it's contents mutated
    */
   private <T extends Iterable<U>, U extends Sample> T fetchSqlStore(T iterable) throws IOException {
@@ -358,17 +358,15 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
 
   /**
    * Lazy-gets samples associated with a given Project
-   * 
+   *
    * @param Long
    *          projectId
    * @return Collection<Sample> samples
    */
   @Override
   public Collection<Sample> listByProjectId(long projectId) throws IOException {
-    Query query = currentSession().createQuery("from SampleImpl where project.id like :id");
-    query.setLong("id", projectId);
     @SuppressWarnings("unchecked")
-    List<Sample> records = query.list();
+    List<Sample> records = currentSession().createCriteria(SampleImpl.class).add(Restrictions.eq("project.id", projectId)).list();
     return records;
   }
 
@@ -376,7 +374,7 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
 
   /**
    * Create a Hibernate criterion to search for all the properties our users want to search.
-   * 
+   *
    * @param querystr
    * @return
    */
@@ -387,7 +385,7 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
     for (int i = 0; i < searchProperties.length; i++) {
       criteria[i] = Restrictions.ilike(searchProperties[i], str, MatchMode.ANYWHERE);
     }
-    
+
     criteria[searchProperties.length] = Restrictions.and(Restrictions.eq("class", IdentityImpl.class),
         Restrictions.ilike("externalName", str, MatchMode.ANYWHERE));
     return Restrictions.or(criteria);
