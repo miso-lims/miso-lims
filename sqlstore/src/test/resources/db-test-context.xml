@@ -75,6 +75,7 @@
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleDerivedInfo</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.event.impl.DefaultAlert</value>
       </list>
     </property>
     <property name="hibernateProperties">
