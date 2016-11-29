@@ -23,7 +23,6 @@
   ~
   ~ **********************************************************************
   --%>
-<script type="text/javascript" src="<c:url value='/scripts/parsley/parsley.min.js'/>"></script>
 
 <div id="maincontent">
   <div id="contentcolumn">

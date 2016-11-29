@@ -34,8 +34,6 @@
 <script src="<c:url value='/scripts/jquery/datatables/js/jquery.dataTables.min.js'/>" type="text/javascript"></script>
 <link href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" rel="stylesheet" type="text/css">
 
-<script type="text/javascript" src="<c:url value='/scripts/parsley/parsley.min.js'/>"></script>
-
 <div id="maincontent">
 <div id="contentcolumn">
 <c:if test="${library.id == 0}">

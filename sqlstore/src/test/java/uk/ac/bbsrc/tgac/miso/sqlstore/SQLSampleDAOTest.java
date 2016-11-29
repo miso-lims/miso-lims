@@ -42,7 +42,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
@@ -75,9 +76,7 @@ public class SQLSampleDAOTest extends AbstractDAOTest {
   @Mock
   private NoteStore noteStore;
   @Mock
-  private MisoNamingScheme<Sample> namingScheme;
-  @Mock
-  private MisoNamingScheme<Sample> sampleNamingScheme;
+  private NamingScheme namingScheme;
 
   @InjectMocks
   private HibernateSampleDao dao;
@@ -91,7 +90,6 @@ public class SQLSampleDAOTest extends AbstractDAOTest {
     dao.setSessionFactory(sessionFactory);
     dao.setJdbcTemplate(template);
     dao.setSecurityProfileDao(securityProfileDAO);
-    dao.setNamingScheme(sampleNamingScheme);
   }
 
   @Test
@@ -115,8 +113,9 @@ public class SQLSampleDAOTest extends AbstractDAOTest {
     sample.setLastModifier(user);
 
     mockAutoIncrement();
-    when(sampleNamingScheme.generateNameFor(anyString(), any(Sample.class))).thenReturn(sampleName);
-    when(sampleNamingScheme.validateField(anyString(), anyString())).thenReturn(true);
+    when(namingScheme.generateNameFor(any(Sample.class))).thenReturn(sampleName);
+    when(namingScheme.validateName(anyString())).thenReturn(ValidationResult.success());
+    when(namingScheme.validateSampleAlias(anyString())).thenReturn(ValidationResult.success());
     when(securityProfileDAO.save(any(SecurityProfile.class))).thenReturn(3L);
 
     int sizeBefore = dao.listAll().size();
@@ -146,8 +145,9 @@ public class SQLSampleDAOTest extends AbstractDAOTest {
     user.setUserId(1L);
     sample.setLastModifier(user);
 
-    when(sampleNamingScheme.generateNameFor(anyString(), any(Sample.class))).thenReturn(sampleName);
-    when(sampleNamingScheme.validateField(anyString(), anyString())).thenReturn(true);
+    when(namingScheme.generateNameFor(any(Sample.class))).thenReturn(sampleName);
+    when(namingScheme.validateName(anyString())).thenReturn(ValidationResult.success());
+    when(namingScheme.validateSampleAlias(anyString())).thenReturn(ValidationResult.success());
 
     int sizeBefore = dao.listAll().size();
     long id = dao.save(sample);

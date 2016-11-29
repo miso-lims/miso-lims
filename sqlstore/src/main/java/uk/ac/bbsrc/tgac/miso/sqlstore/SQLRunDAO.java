@@ -72,7 +72,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.RunAlertManager;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
 import uk.ac.bbsrc.tgac.miso.core.store.RunQcStore;
@@ -200,15 +200,14 @@ public class SQLRunDAO implements RunStore {
   }
 
   @Autowired
-  private MisoNamingScheme<Run> namingScheme;
+  private NamingScheme namingScheme;
 
-  @Override
-  public MisoNamingScheme<Run> getNamingScheme() {
+  public NamingScheme getNamingScheme() {
     return namingScheme;
   }
 
   @Override
-  public void setNamingScheme(MisoNamingScheme<Run> namingScheme) {
+  public void setNamingScheme(NamingScheme namingScheme) {
     this.namingScheme = namingScheme;
   }
 
@@ -350,37 +349,27 @@ public class SQLRunDAO implements RunStore {
       try {
         run.setId(DbUtils.getAutoIncrement(template, TABLE_NAME));
 
-        String name = namingScheme.generateNameFor("name", run);
+        String name = namingScheme.generateNameFor(run);
         run.setName(name);
 
-        if (namingScheme.validateField("name", run.getName())) {
-          params.addValue("name", name);
+        DbUtils.validateNameOrThrow(run, namingScheme);
+        params.addValue("name", name);
 
-          Number newId = insert.executeAndReturnKey(params);
-          if (newId.longValue() != run.getId()) {
-            log.error("Expected Run ID doesn't match returned value from database insert: rolling back...");
-            new NamedParameterJdbcTemplate(template).update(RUN_DELETE, new MapSqlParameterSource().addValue("runId", newId.longValue()));
-            throw new IOException("Something bad happened. Expected Run ID doesn't match returned value from DB insert");
-          }
-        } else {
-          throw new IOException("Cannot save Run - invalid field:" + run.toString());
+        Number newId = insert.executeAndReturnKey(params);
+        if (newId.longValue() != run.getId()) {
+          log.error("Expected Run ID doesn't match returned value from database insert: rolling back...");
+          new NamedParameterJdbcTemplate(template).update(RUN_DELETE, new MapSqlParameterSource().addValue("runId", newId.longValue()));
+          throw new IOException("Something bad happened. Expected Run ID doesn't match returned value from DB insert");
         }
       } catch (MisoNamingException e) {
         throw new IOException("Cannot save Run - issue with naming scheme", e);
       }
     } else {
-      try {
-        if (namingScheme.validateField("name", run.getName())) {
-          params.addValue("runId", run.getId());
-          params.addValue("name", run.getName());
-          NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
-          namedTemplate.update(RUN_UPDATE, params);
-        } else {
-          throw new IOException("Cannot save Run - invalid field:" + run.toString());
-        }
-      } catch (MisoNamingException e) {
-        throw new IOException("Cannot save Run - issue with naming scheme", e);
-      }
+      DbUtils.validateNameOrThrow(run, namingScheme);
+      params.addValue("runId", run.getId());
+      params.addValue("name", run.getName());
+      NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
+      namedTemplate.update(RUN_UPDATE, params);
     }
 
     if (this.cascadeType != null) {
@@ -467,40 +456,30 @@ public class SQLRunDAO implements RunStore {
           try {
             run.setId(autoIncrement);
 
-            String name = namingScheme.generateNameFor("name", run);
+            String name = namingScheme.generateNameFor(run);
             run.setName(name);
 
-            if (namingScheme.validateField("name", run.getName())) {
-              params.addValue("name", name);
+            DbUtils.validateNameOrThrow(run, namingScheme);
+            params.addValue("name", name);
 
-              Number newId = insert.executeAndReturnKey(params);
-              if (newId.longValue() != run.getId()) {
-                log.error("Expected Run ID doesn't match returned value from database insert: rolling back...");
-                new NamedParameterJdbcTemplate(template).update(RUN_DELETE,
-                    new MapSqlParameterSource().addValue("runId", newId.longValue()));
-                throw new IOException("Something bad happened. Expected Run ID doesn't match returned value from DB insert");
-              }
-              autoIncrement = newId.longValue() + 1;
-              log.debug(run.getName() + ":: Inserted as ID " + run.getId());
-            } else {
-              throw new IOException("Cannot save Run - invalid field:" + run.toString());
+            Number newId = insert.executeAndReturnKey(params);
+            if (newId.longValue() != run.getId()) {
+              log.error("Expected Run ID doesn't match returned value from database insert: rolling back...");
+              new NamedParameterJdbcTemplate(template).update(RUN_DELETE,
+                  new MapSqlParameterSource().addValue("runId", newId.longValue()));
+              throw new IOException("Something bad happened. Expected Run ID doesn't match returned value from DB insert");
             }
+            autoIncrement = newId.longValue() + 1;
+            log.debug(run.getName() + ":: Inserted as ID " + run.getId());
           } catch (MisoNamingException e) {
             throw new IOException("Cannot save Run - issue with naming scheme", e);
           }
         } else {
-          try {
-            if (namingScheme.validateField("name", run.getName())) {
-              params.addValue("runId", run.getId());
-              params.addValue("name", run.getName());
-              log.debug(run.getName() + ":: Updating as ID " + run.getId());
-              batch.add(params);
-            } else {
-              throw new IOException("Cannot save Run - invalid field:" + run.toString());
-            }
-          } catch (MisoNamingException e) {
-            throw new IOException("Cannot save Run - issue with naming scheme", e);
-          }
+          DbUtils.validateNameOrThrow(run, namingScheme);
+          params.addValue("runId", run.getId());
+          params.addValue("name", run.getName());
+          log.debug(run.getName() + ":: Updating as ID " + run.getId());
+          batch.add(params);
         }
 
         if (this.cascadeType != null) {

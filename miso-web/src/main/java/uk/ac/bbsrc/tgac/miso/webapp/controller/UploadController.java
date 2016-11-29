@@ -49,6 +49,7 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -59,7 +60,7 @@ import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.util.FormUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.service.forms.MisoFormsService;
@@ -79,7 +80,7 @@ public class UploadController {
   @Autowired
   public MisoFormsService misoFormsService;
   @Autowired
-  private MisoNamingScheme<Library> libraryNamingScheme;
+  private NamingScheme namingScheme;
   @Autowired
   private IndexService tagBarcodeService;
 
@@ -107,15 +108,11 @@ public class UploadController {
     this.misoFormsService = misoFormsService;
   }
 
-  public void setLibraryNamingScheme(MisoNamingScheme<Library> libraryNamingScheme) {
-    this.libraryNamingScheme = libraryNamingScheme;
+  public void setLibraryNamingScheme(NamingScheme namingScheme) {
+    this.namingScheme = namingScheme;
   }
 
-  private Class lookupCoreClass(String className) throws ClassNotFoundException {
-    return this.getClass().getClassLoader().loadClass("uk.ac.bbsrc.tgac.miso.core." + className);
-  }
-
-  public void uploadFile(Class type, String qualifier, MultipartFile fileItem) throws IOException {
+  public void uploadFile(Class<?> type, String qualifier, MultipartFile fileItem) throws IOException {
     File dir = new File(
         filesManager.getFileStorageDirectory() + File.separator + type.getSimpleName().toLowerCase() + File.separator + qualifier);
     if (LimsUtils.checkDirectory(dir, true)) {
@@ -184,7 +181,7 @@ public class UploadController {
         uploadFile(Project.class, projectId, fileItem);
         File f = filesManager.getFile(Project.class, projectId, fileItem.getOriginalFilename().replaceAll("\\s+", "_"));
         User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-        List<Sample> samples = FormUtils.importSampleInputSpreadsheet(f, user, requestManager, libraryNamingScheme, tagBarcodeService);
+        List<Sample> samples = FormUtils.importSampleInputSpreadsheet(f, user, requestManager, namingScheme, tagBarcodeService);
 
         ObjectMapper mapper = new ObjectMapper();
 

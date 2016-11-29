@@ -3,10 +3,7 @@
  */
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.when;
 
@@ -34,8 +31,10 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCR;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution;
 import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.AllowAnythingEntityNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.EmPCRDilutionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
@@ -60,6 +59,10 @@ public class SQLEmPCRDAOTest extends AbstractDAOTest {
 
   @Mock
   private EmPCRDilutionStore emPCRDilutionDAO;
+
+  @Mock
+  private NamingScheme namingScheme;
+
   @InjectMocks
   private SQLEmPCRDAO dao;
 
@@ -71,6 +74,8 @@ public class SQLEmPCRDAOTest extends AbstractDAOTest {
     MockitoAnnotations.initMocks(this);
     dao.setJdbcTemplate(jdbcTemplate);
     dao.setDataObjectFactory(new TgacDataObjectFactory());
+    when(namingScheme.generateNameFor(Matchers.any(emPCRDilution.class))).thenReturn("EDI123");
+    when(namingScheme.validateName(Matchers.anyString())).thenReturn(ValidationResult.success());
   }
 
   /**
@@ -84,7 +89,6 @@ public class SQLEmPCRDAOTest extends AbstractDAOTest {
     LibraryDilution libraryDilution = Mockito.mock(LibraryDilution.class);
     when(libraryDilution.getId()).thenReturn(1L);
     em.setLibraryDilution(libraryDilution);
-    dao.setNamingScheme(new AllowAnythingEntityNamingScheme<emPCR>());
     mockAutoIncrement(nextAutoIncrementId);
     dao.save(em);
     nextAutoIncrementId += 1;

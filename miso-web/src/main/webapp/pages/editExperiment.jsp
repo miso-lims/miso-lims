@@ -32,9 +32,6 @@
 
 <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.breadcrumbs.popup.js'/>"></script>
 
-
-<script type="text/javascript" src="<c:url value='/scripts/parsley/parsley.min.js'/>"></script>
-
 <div id="maincontent">
 <div id="contentcolumn">
 <form:form id="experiment-form" data-parsley-validate="" action="/miso/experiment" method="POST" commandName="experiment"

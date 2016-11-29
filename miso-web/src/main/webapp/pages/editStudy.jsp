@@ -32,8 +32,6 @@
 <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.breadcrumbs.popup.js'/>"></script>
 <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.popup.js'/>"></script>
 
-<script type="text/javascript" src="<c:url value='/scripts/parsley/parsley.min.js'/>"></script>
-
 <div id="maincontent">
   <div id="contentcolumn">
     <form:form id="study-form" data-parsley-validate="" action="/miso/study" method="POST" commandName="study" autocomplete="off">

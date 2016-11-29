@@ -60,14 +60,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ExperimentStore;
 import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PlatformStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
-import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
-import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.core.store.StudyStore;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
@@ -142,8 +141,6 @@ public class SQLExperimentDAO implements ExperimentStore {
   };
 
   private StudyStore studyDAO;
-  private SampleStore sampleDAO;
-  private RunStore runDAO;
   private PoolStore poolDAO;
   private PlatformStore platformDAO;
   private KitStore kitDAO;
@@ -153,17 +150,14 @@ public class SQLExperimentDAO implements ExperimentStore {
   private SecurityStore securityDAO;
 
   @Autowired
-  private MisoNamingScheme<Experiment> namingScheme;
+  private NamingScheme namingScheme;
 
-  @Override
-  @CoverageIgnore
-  public MisoNamingScheme<Experiment> getNamingScheme() {
+  public NamingScheme getNamingScheme() {
     return namingScheme;
   }
 
   @Override
-  @CoverageIgnore
-  public void setNamingScheme(MisoNamingScheme<Experiment> namingScheme) {
+  public void setNamingScheme(NamingScheme namingScheme) {
     this.namingScheme = namingScheme;
   }
 
@@ -186,16 +180,6 @@ public class SQLExperimentDAO implements ExperimentStore {
   @CoverageIgnore
   public void setStudyDAO(StudyStore studyDAO) {
     this.studyDAO = studyDAO;
-  }
-
-  @CoverageIgnore
-  public void setSampleDAO(SampleStore sampleDAO) {
-    this.sampleDAO = sampleDAO;
-  }
-
-  @CoverageIgnore
-  public void setRunDAO(RunStore runDAO) {
-    this.runDAO = runDAO;
   }
 
   @CoverageIgnore
@@ -311,10 +295,11 @@ public class SQLExperimentDAO implements ExperimentStore {
       try {
         experiment.setId(DbUtils.getAutoIncrement(template, TABLE_NAME));
 
-        String name = namingScheme.generateNameFor("name", experiment);
+        String name = namingScheme.generateNameFor(experiment);
         experiment.setName(name);
 
-        if (namingScheme.validateField("name", experiment.getName())) {
+        ValidationResult nameValidation = namingScheme.validateName(experiment.getName());
+        if (nameValidation.isValid()) {
           params.addValue("name", name);
 
           Number newId = insert.executeAndReturnKey(params);
@@ -325,23 +310,20 @@ public class SQLExperimentDAO implements ExperimentStore {
             throw new IOException("Something bad happened. Expected Experiment ID doesn't match returned value from DB insert");
           }
         } else {
-          throw new IOException("Cannot save Experiment - invalid field:" + experiment.toString());
+          throw new IOException("Cannot save Experiment - invalid name:" + nameValidation.getMessage());
         }
       } catch (MisoNamingException e) {
         throw new IOException("Cannot save Experiment - issue with naming scheme", e);
       }
     } else {
-      try {
-        if (namingScheme.validateField("name", experiment.getName())) {
-          params.addValue("experimentId", experiment.getId());
-          params.addValue("name", experiment.getName());
-          NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
-          namedTemplate.update(EXPERIMENT_UPDATE, params);
-        } else {
-          throw new IOException("Cannot save Experiment - invalid field:" + experiment.toString());
-        }
-      } catch (MisoNamingException e) {
-        throw new IOException("Cannot save Experiment - issue with naming scheme", e);
+      ValidationResult nameValidation = namingScheme.validateName(experiment.getName());
+      if (nameValidation.isValid()) {
+        params.addValue("experimentId", experiment.getId());
+        params.addValue("name", experiment.getName());
+        NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
+        namedTemplate.update(EXPERIMENT_UPDATE, params);
+      } else {
+        throw new IOException("Cannot save Experiment - invalid name:" + nameValidation.getMessage());
       }
     }
 
@@ -399,9 +381,8 @@ public class SQLExperimentDAO implements ExperimentStore {
 
   @Override
   public List<Experiment> listByStudyId(long studyId) {
-    List results = template.query(EXPERIMENTS_BY_RELATED_STUDY, new Object[] { studyId }, new ExperimentMapper());
-    List<Experiment> es = results;
-    return es;
+    List<Experiment> results = template.query(EXPERIMENTS_BY_RELATED_STUDY, new Object[] { studyId }, new ExperimentMapper());
+    return results;
   }
 
   @Override
@@ -418,14 +399,14 @@ public class SQLExperimentDAO implements ExperimentStore {
   @Cacheable(cacheName = "experimentCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
       @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
   public Experiment get(long experimentId) throws IOException {
-    List eResults = template.query(EXPERIMENT_SELECT_BY_ID, new Object[] { experimentId }, new ExperimentMapper());
+    List<Experiment> eResults = template.query(EXPERIMENT_SELECT_BY_ID, new Object[] { experimentId }, new ExperimentMapper());
     Experiment e = eResults.size() > 0 ? (Experiment) eResults.get(0) : null;
     return e;
   }
 
   @Override
   public Experiment lazyGet(long experimentId) throws IOException {
-    List eResults = template.query(EXPERIMENT_SELECT_BY_ID, new Object[] { experimentId }, new ExperimentMapper(true));
+    List<Experiment> eResults = template.query(EXPERIMENT_SELECT_BY_ID, new Object[] { experimentId }, new ExperimentMapper(true));
     Experiment e = eResults.size() > 0 ? (Experiment) eResults.get(0) : null;
     return e;
   }

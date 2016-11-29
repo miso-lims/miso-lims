@@ -80,7 +80,8 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedDilutionException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryQcException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.IndexStore;
@@ -248,26 +249,14 @@ public class SQLLibraryDAO implements LibraryStore {
   }
 
   @Autowired
-  private MisoNamingScheme<Library> libraryNamingScheme;
+  private NamingScheme namingScheme;
 
-  public MisoNamingScheme<Library> getLibraryNamingScheme() {
-    return libraryNamingScheme;
-  }
-
-  public void setLibraryNamingScheme(MisoNamingScheme<Library> libraryNamingScheme) {
-    this.libraryNamingScheme = libraryNamingScheme;
-  }
-
-  @Autowired
-  private MisoNamingScheme<Library> namingScheme;
-
-  @Override
-  public MisoNamingScheme<Library> getNamingScheme() {
+  public NamingScheme getNamingScheme() {
     return namingScheme;
   }
 
   @Override
-  public void setNamingScheme(MisoNamingScheme<Library> namingScheme) {
+  public void setNamingScheme(NamingScheme namingScheme) {
     this.namingScheme = namingScheme;
   }
 
@@ -404,7 +393,7 @@ public class SQLLibraryDAO implements LibraryStore {
     params.addValue("qcPassed", library.getQcPassed());
 
     if (library.getId() == AbstractLibrary.UNSAVED_ID) {
-      if (!libraryNamingScheme.allowDuplicateEntityNameFor("alias") && !listByAlias(library.getAlias()).isEmpty()
+      if (!namingScheme.duplicateLibraryAliasAllowed() && !listByAlias(library.getAlias()).isEmpty()
           && (library.getLibraryAdditionalInfo() != null ? !library.getLibraryAdditionalInfo().hasNonStandardAlias() : true)) {
         // throw if duplicate aliases are not allowed and the library has a standard alias (detailed sample only)
         throw new IOException("NEW: A library with this alias already exists in the database");
@@ -413,62 +402,51 @@ public class SQLLibraryDAO implements LibraryStore {
         try {
           library.setId(DbUtils.getAutoIncrement(template, TABLE_NAME));
 
-          String name = libraryNamingScheme.generateNameFor("name", library);
+          String name = namingScheme.generateNameFor(library);
           library.setName(name);
-          if (libraryNamingScheme.validateField("name", library.getName())
-              && (libraryNamingScheme.validateField("alias", library.getAlias())
-                  || (library.getLibraryAdditionalInfo() != null && library.getLibraryAdditionalInfo().hasNonStandardAlias()))) {
-            if (autoGenerateIdentificationBarcodes) {
-              autoGenerateIdBarcode(library);
-            } // if !autoGenerateIdentificationBarcodes then the identificationBarcode is set by the user
-            params.addValue("name", name);
+          DbUtils.validateNameOrThrow(library, namingScheme);
+          validateAliasOrThrow(library);
+          if (autoGenerateIdentificationBarcodes) {
+            autoGenerateIdBarcode(library);
+          } // if !autoGenerateIdentificationBarcodes then the identificationBarcode is set by the user
+          params.addValue("name", name);
 
-            params.addValue("identificationBarcode", library.getIdentificationBarcode());
+          params.addValue("identificationBarcode", library.getIdentificationBarcode());
 
-            Number newId = insert.executeAndReturnKey(params);
-            if (newId.longValue() != library.getId()) {
-              log.error("Expected library ID doesn't match returned value from database insert: rolling back...");
-              new NamedParameterJdbcTemplate(template).update(LIBRARY_DELETE,
-                  new MapSqlParameterSource().addValue("libraryId", newId.longValue()));
-              throw new IOException("Something bad happened. Expected library ID doesn't match returned value from DB insert");
-            }
-            if (library.getLibraryAdditionalInfo() != null) {
-              library.getLibraryAdditionalInfo().setLibrary(library);
-              library.getLibraryAdditionalInfo().setLibraryId(newId.longValue());
-              libraryAdditionalInfoDAO.addLibraryAdditionalInfo(library.getLibraryAdditionalInfo());
-            }
-          } else {
-            throw new IOException("Cannot save library - invalid field:" + library.toString());
+          Number newId = insert.executeAndReturnKey(params);
+          if (newId.longValue() != library.getId()) {
+            log.error("Expected library ID doesn't match returned value from database insert: rolling back...");
+            new NamedParameterJdbcTemplate(template).update(LIBRARY_DELETE,
+                new MapSqlParameterSource().addValue("libraryId", newId.longValue()));
+            throw new IOException("Something bad happened. Expected library ID doesn't match returned value from DB insert");
+          }
+          if (library.getLibraryAdditionalInfo() != null) {
+            library.getLibraryAdditionalInfo().setLibrary(library);
+            library.getLibraryAdditionalInfo().setLibraryId(newId.longValue());
+            libraryAdditionalInfoDAO.addLibraryAdditionalInfo(library.getLibraryAdditionalInfo());
           }
         } catch (MisoNamingException e) {
           throw new IOException("Cannot save library - issue with naming scheme", e);
         }
       }
     } else {
-      try {
-        if (libraryNamingScheme.validateField("name", library.getName()) && (libraryNamingScheme.validateField("alias", library.getAlias())
-            || (library.getLibraryAdditionalInfo() != null && library.getLibraryAdditionalInfo().hasNonStandardAlias()))) {
-          params.addValue("libraryId", library.getId());
-          params.addValue("name", library.getName());
-          params.addValue("alias", library.getAlias());
-          params.addValue("description", library.getDescription());
-          if (autoGenerateIdentificationBarcodes) {
-            autoGenerateIdBarcode(library);
-          } // if !autoGenerateIdentificationBarcodes then the identificationBarcode is set by the user
-          params.addValue("identificationBarcode", library.getIdentificationBarcode()).addValue("locationBarcode",
-              library.getLocationBarcode());
-          NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
-          namedTemplate.update(LIBRARY_UPDATE, params);
-          if (library.getLibraryAdditionalInfo() != null) {
-            library.getLibraryAdditionalInfo().setLibrary(library);
-            library.getLibraryAdditionalInfo().setLibraryId(library.getId());
-            libraryAdditionalInfoDAO.update(library.getLibraryAdditionalInfo());
-          }
-        } else {
-          throw new IOException("Cannot save library - invalid field:" + library.toString());
-        }
-      } catch (MisoNamingException e) {
-        throw new IOException("Cannot save library - issue with naming scheme", e);
+      DbUtils.validateNameOrThrow(library, namingScheme);
+      validateAliasOrThrow(library);
+      params.addValue("libraryId", library.getId());
+      params.addValue("name", library.getName());
+      params.addValue("alias", library.getAlias());
+      params.addValue("description", library.getDescription());
+      if (autoGenerateIdentificationBarcodes) {
+        autoGenerateIdBarcode(library);
+      } // if !autoGenerateIdentificationBarcodes then the identificationBarcode is set by the user
+      params.addValue("identificationBarcode", library.getIdentificationBarcode()).addValue("locationBarcode",
+          library.getLocationBarcode());
+      NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
+      namedTemplate.update(LIBRARY_UPDATE, params);
+      if (library.getLibraryAdditionalInfo() != null) {
+        library.getLibraryAdditionalInfo().setLibrary(library);
+        library.getLibraryAdditionalInfo().setLibraryId(library.getId());
+        libraryAdditionalInfoDAO.update(library.getLibraryAdditionalInfo());
       }
     }
 
@@ -524,6 +502,13 @@ public class SQLLibraryDAO implements LibraryStore {
     }
 
     return library.getId();
+  }
+
+  private void validateAliasOrThrow(Library library) throws IOException {
+    ValidationResult val = namingScheme.validateLibraryAlias(library.getAlias());
+    if (!val.isValid() && (library.getLibraryAdditionalInfo() == null || !library.getLibraryAdditionalInfo().hasNonStandardAlias())) {
+      throw new IOException("Cannot save library - invalid alias:" + val.getMessage());
+    }
   }
 
   @Override

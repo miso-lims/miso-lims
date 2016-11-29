@@ -40,8 +40,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface PoolStore extends Store<Pool>, Remover<Pool>,
-    NamingSchemeAware<Pool> {
+public interface PoolStore extends Store<Pool>, Remover<Pool>, NamingSchemeAware {
   /**
    * Get a Pool given a barcode and its platform
    *

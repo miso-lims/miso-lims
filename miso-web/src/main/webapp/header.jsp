@@ -74,7 +74,10 @@
   <!-- high charts -->
   <script type="text/javascript" src="<c:url value='/scripts/highcharts/highcharts.js'/>"></script>
   <script type="text/javascript" src="<c:url value='/scripts/highcharts/highcharts-more.js'/>"></script>
-          
+
+  <!-- Parsley for form validation -->
+  <script type="text/javascript" src="<c:url value='/scripts/parsley/parsley.min.js'/>"></script>
+
   <!-- concatenated MISO stylesheets and scripts -->
   <link rel="stylesheet" href="<c:url value='/styles/style.css'/>" type="text/css">
   <script type="text/javascript" src="<c:url value='/scripts/header_script.js'/>"></script>

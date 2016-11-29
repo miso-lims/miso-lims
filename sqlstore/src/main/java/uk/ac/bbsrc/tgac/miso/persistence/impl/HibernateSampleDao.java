@@ -44,7 +44,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.SiblingNumberGenerator;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
@@ -90,30 +89,6 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
 
   @Autowired
   private CacheManager cacheManager;
-
-  @Autowired
-  private MisoNamingScheme<Sample> sampleNamingScheme;
-
-  public MisoNamingScheme<Sample> getSampleNamingScheme() {
-    return sampleNamingScheme;
-  }
-
-  public void setSampleNamingScheme(MisoNamingScheme<Sample> sampleNamingScheme) {
-    this.sampleNamingScheme = sampleNamingScheme;
-  }
-
-  @Autowired
-  private MisoNamingScheme<Sample> namingScheme;
-
-  @Override
-  public MisoNamingScheme<Sample> getNamingScheme() {
-    return namingScheme;
-  }
-
-  @Override
-  public void setNamingScheme(MisoNamingScheme<Sample> namingScheme) {
-    this.namingScheme = namingScheme;
-  }
 
   @Override
   public Long addSample(final Sample sample) throws IOException {

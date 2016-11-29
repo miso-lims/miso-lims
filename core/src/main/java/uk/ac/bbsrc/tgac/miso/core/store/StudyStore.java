@@ -36,7 +36,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
  * @author Rob Davey
  * @since version
  */
-public interface StudyStore extends Store<Study>, Cascadable, Remover<Study>, NamingSchemeAware<Study> {
+public interface StudyStore extends Store<Study>, Cascadable, Remover<Study>, NamingSchemeAware {
   /**
    * List all Studies that match a search criteria
    * 

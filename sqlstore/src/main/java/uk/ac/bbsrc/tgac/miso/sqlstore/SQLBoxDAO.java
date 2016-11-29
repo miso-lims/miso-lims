@@ -39,7 +39,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
@@ -192,7 +193,7 @@ public class SQLBoxDAO implements BoxStore {
   @Autowired
   private DataObjectFactory dataObjectFactory;
   @Autowired
-  private MisoNamingScheme<Box> namingScheme;
+  private NamingScheme namingScheme;
   private Store<SecurityProfile> securityProfileDAO;
   private SecurityStore securityDAO;
   private SampleStore sampleDAO;
@@ -273,11 +274,6 @@ public class SQLBoxDAO implements BoxStore {
     return securityProfileDAO;
   }
 
-  @Override
-  public MisoNamingScheme<Box> getNamingScheme() {
-    return namingScheme;
-  }
-
   public void setChangeLogDAO(ChangeLogStore changeLogDAO) {
     this.changeLogDAO = changeLogDAO;
   }
@@ -311,7 +307,7 @@ public class SQLBoxDAO implements BoxStore {
   }
 
   @Override
-  public void setNamingScheme(MisoNamingScheme<Box> namingScheme) {
+  public void setNamingScheme(NamingScheme namingScheme) {
     this.namingScheme = namingScheme;
   }
 
@@ -472,10 +468,11 @@ public class SQLBoxDAO implements BoxStore {
       try {
         box.setId(DbUtils.getAutoIncrement(template, TABLE_NAME));
 
-        String name = namingScheme.generateNameFor("name", box);
+        String name = namingScheme.generateNameFor(box);
         box.setName(name);
 
-        if (namingScheme.validateField("name", box.getName())) {
+        ValidationResult nameValidation = namingScheme.validateName(box.getName());
+        if (nameValidation.isValid()) {
           params.addValue("name", name);
 
           if (autoGenerateIdentificationBarcodes) {
@@ -490,29 +487,26 @@ public class SQLBoxDAO implements BoxStore {
             throw new IOException("Something bad happened. Expected Box ID doesn't match returned value from DB insert");
           }
         } else {
-          throw new IOException("Cannot save Box - invalid field:" + box.toString());
+          throw new IOException("Cannot save Box - invalid name:" + nameValidation.getMessage());
         }
       } catch (MisoNamingException e) {
         throw new IOException("Cannot save Box - issue with naming scheme", e);
       }
 
     } else {
-      try {
-        if (namingScheme.validateField("name", box.getName())) {
-          if (autoGenerateIdentificationBarcodes) {
-            autoGenerateIdBarcode(box);
-          } // if !autoGenerateIdentificationBarcodes then the identificationBarcode is set by the user
+      ValidationResult nameValidation = namingScheme.validateName(box.getName());
+      if (nameValidation.isValid()) {
+        if (autoGenerateIdentificationBarcodes) {
+          autoGenerateIdBarcode(box);
+        } // if !autoGenerateIdentificationBarcodes then the identificationBarcode is set by the user
 
-          params.addValue("boxId", box.getId());
-          params.addValue("name", box.getName());
-          params.addValue("identificationBarcode", box.getIdentificationBarcode());
-          NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
-          namedTemplate.update(BOX_UPDATE, params);
-        } else {
-          throw new IOException("Cannot save Box - invalid field:" + box.toString());
-        }
-      } catch (MisoNamingException e) {
-        throw new IOException("Cannot save Box - issue with naming scheme", e);
+        params.addValue("boxId", box.getId());
+        params.addValue("name", box.getName());
+        params.addValue("identificationBarcode", box.getIdentificationBarcode());
+        NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
+        namedTemplate.update(BOX_UPDATE, params);
+      } else {
+        throw new IOException("Cannot save Box - invalid name:" + nameValidation.getMessage());
       }
     }
 

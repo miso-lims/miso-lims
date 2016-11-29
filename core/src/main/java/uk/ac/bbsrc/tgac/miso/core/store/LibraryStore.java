@@ -43,7 +43,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface LibraryStore extends Store<Library>, Remover<Library>, NamingSchemeAware<Library> {
+public interface LibraryStore extends Store<Library>, Remover<Library>, NamingSchemeAware {
 
   /**
    * Get a Library given a ID barcode

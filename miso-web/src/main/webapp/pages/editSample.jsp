@@ -46,7 +46,6 @@
 <script src="<c:url value='/scripts/handsontable_renderers.js'/>" type="text/javascript"></script>
 <link rel="stylesheet" media="screen" href="/scripts/handsontable/dist/handsontable.full.css">
 <script src="<c:url value='/scripts/sample_hot.js'/>" type="text/javascript"></script>
-<script type="text/javascript" src="<c:url value='/scripts/parsley/parsley.min.js'/>"></script>
 
 <div id="maincontent">
 <div id="contentcolumn">

@@ -38,7 +38,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.AllowAnythingEntityNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.EntityGroupStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
@@ -88,6 +89,9 @@ public class SQLProjectDAOTest extends AbstractDAOTest {
   @Mock
   private NoteStore noteDAO;
 
+  @Mock
+  private NamingScheme namingScheme;
+
   /*
    * @Mock private CacheManager cacheManager;
    */
@@ -117,7 +121,6 @@ public class SQLProjectDAOTest extends AbstractDAOTest {
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
-    projectDAO.setNamingScheme(new AllowAnythingEntityNamingScheme<Project>());
     DataObjectFactory dataObjectFactory = new TgacDataObjectFactory();
     projectDAO.setDataObjectFactory(dataObjectFactory);
 
@@ -127,6 +130,9 @@ public class SQLProjectDAOTest extends AbstractDAOTest {
     when(securityProfileDAO.save(any(SecurityProfile.class))).thenReturn(1L);
     
     projectDAO.setReferenceGenomeDao(referenceGenomeDao);
+
+    when(namingScheme.generateNameFor(Matchers.any(Project.class))).thenReturn("EDI123");
+    when(namingScheme.validateName(Matchers.anyString())).thenReturn(ValidationResult.success());
 
     project.setProgress(ProgressType.ACTIVE);
     ReferenceGenome referenceGenome = new ReferenceGenomeImpl();

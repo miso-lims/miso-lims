@@ -190,7 +190,6 @@
     </property>
     <property name="securityProfileDAO" ref="sqlSecurityProfileDAO" />
     <property name="emPcrDAO" ref="sqlEmPCRDAO" />
-    <property name="libraryDAO" ref="sqlLibraryDAO" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />
   </bean>
 
@@ -236,8 +235,6 @@
     <property name="securityDAO" ref="sqlSecurityDAO" />
     <property name="changeLogDAO" ref="sqlChangeLogDAO" />
     <property name="studyDAO" ref="sqlStudyDAO" />
-    <property name="sampleDAO" ref="hibernateSampleDao" />
-    <property name="runDAO" ref="sqlRunDAO" />
     <property name="poolDAO" ref="sqlPoolDAO" />
     <property name="platformDAO" ref="sqlPlatformDAO" />
     <property name="kitDAO" ref="sqlKitDAO" />

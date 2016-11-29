@@ -36,7 +36,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface EmPCRDilutionStore extends Store<emPCRDilution>, Remover<emPCRDilution>, NamingSchemeAware<emPCRDilution> {
+public interface EmPCRDilutionStore extends Store<emPCRDilution>, Remover<emPCRDilution>, NamingSchemeAware {
   /**
    * List all Dilutions prepared for a given PlatformType and search query
    * 
