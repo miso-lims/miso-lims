@@ -100,13 +100,13 @@
        Hot.saveButton.addEventListener('click', Dilution.hot.createData, true);
        Fluxion.doAjax(
          'libraryControllerHelperService',
-         'getTargetedResequencingTypes',
+         'getTargetedSequencingTypes',
          {
            'url': ajaxurl
          },
          {
            'doOnSuccess': function (json) {
-             Dilution.hot.tarSeqs = json.targetedResequencings;
+             Dilution.hot.tarSeqs = json.targetedSequencings;
              Dilution.hot.makeBulkCreateTable();
            }
          }

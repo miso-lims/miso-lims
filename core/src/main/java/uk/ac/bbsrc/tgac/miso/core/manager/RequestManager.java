@@ -63,7 +63,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedResequencing;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCR;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
@@ -288,7 +288,7 @@ public interface RequestManager {
 
   public Box getBoxByAlias(String alias) throws IOException;
 
-  public TargetedResequencing getTargetedResequencingById(long targetedResequencingId) throws IOException;
+  public TargetedSequencing getTargetedSequencingById(long targetedSequencingId) throws IOException;
 
   // LISTS
   /**
@@ -421,7 +421,7 @@ public interface RequestManager {
   public Collection<LibraryDilution> listAllLibraryDilutionsByProjectAndPlatform(long projectId, PlatformType platformType)
       throws IOException;
 
-  public Collection<TargetedResequencing> listAllTargetedResequencing() throws IOException;
+  public Collection<TargetedSequencing> listAllTargetedSequencing() throws IOException;
 
   public Collection<emPCRDilution> listAllEmPCRDilutions() throws IOException;
 

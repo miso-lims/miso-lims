@@ -44,7 +44,7 @@ public class LibraryDilution extends AbstractDilution implements Serializable {
 
   private static final long serialVersionUID = 1L;
   private Library library;
-  private TargetedResequencing targetedResequencing;
+  private TargetedSequencing targetedSequencing;
   private Date lastModified;
   public static final String UNITS = "ng/&#181;l";
 
@@ -79,12 +79,12 @@ public class LibraryDilution extends AbstractDilution implements Serializable {
     return UNITS;
   }
 
-  public TargetedResequencing getTargetedResequencing() {
-    return targetedResequencing;
+  public TargetedSequencing getTargetedSequencing() {
+    return targetedSequencing;
   }
 
-  public void setTargetedResequencing(TargetedResequencing targetedResequencing) {
-    this.targetedResequencing = targetedResequencing;
+  public void setTargetedSequencing(TargetedSequencing targetedSequencing) {
+    this.targetedSequencing = targetedSequencing;
   }
 
   public Date getLastModified() {
@@ -102,7 +102,7 @@ public class LibraryDilution extends AbstractDilution implements Serializable {
     result = prime * result + ((library == null) ? 0 : library.hashCode());
     result = prime
         * result
-        + ((targetedResequencing == null) ? 0 : targetedResequencing.hashCode());
+        + ((targetedSequencing == null) ? 0 : targetedSequencing.hashCode());
     return result;
   }
 
@@ -121,11 +121,11 @@ public class LibraryDilution extends AbstractDilution implements Serializable {
     }
     else if (!library.equals(other.library))
       return false;
-    if (targetedResequencing == null) {
-      if (other.targetedResequencing != null)
+    if (targetedSequencing == null) {
+      if (other.targetedSequencing != null)
         return false;
     }
-    else if (!targetedResequencing.equals(other.targetedResequencing))
+    else if (!targetedSequencing.equals(other.targetedSequencing))
       return false;
     return true;
   }
