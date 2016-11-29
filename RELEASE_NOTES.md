@@ -1,3 +1,13 @@
+# 0.2.42
+
+Changes:
+
+ * GLT-1345 fix duplicate entry for dilutions error
+ * Merge pull request #567 from oicr-gsi/cervix_and_thymus
+ * Add new tissue types for cervix and thymus to naming scheme
+ * re-add surprisingly necessary ehcache lines
+ * Changed to next development version
+
 # 0.2.41
 
 Changes:
@@ -9,6 +19,11 @@ Changes:
  * Update Sample Information Form
  * Move the Dockerfile into the main repository (#557)
  * Changed to next development version
+
+Bad: 
+ * missing some necessary ehcache lines; will build but fails to load pools & dilutions
+ * updating a LibraryDilution from the Edit Library page will cause the next LibraryDilution save to fail
+ * OICR only: additional Tissue Origins not entered in the OicrSampleNamingScheme
 
 # 0.2.40
 
