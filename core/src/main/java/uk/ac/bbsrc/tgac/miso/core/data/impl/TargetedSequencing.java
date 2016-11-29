@@ -6,19 +6,19 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 
-public class TargetedResequencing {
+public class TargetedSequencing {
 
   public static final Long UNSAVED_ID = 0L;
 
-  private Long targetedResequencingId;
+  private Long targetedSequencingId;
 
-  /** Name displayed in UI and associated with targeted resequencing bed file. */
+  /** Name displayed in UI and associated with targeted sequencing bed file. */
   private String alias;
 
-  /** Description used to make purpose of targeted resequencing clearer to user. */
+  /** Description used to make purpose of targeted sequencing clearer to user. */
   private String description;
 
-  /** The kit chosen will restrict the targeted resequencing that is available. */
+  /** The kit chosen will restrict the targeted sequencing that is available. */
   private KitDescriptor kitDescriptor;
 
   private boolean archived;
@@ -31,12 +31,12 @@ public class TargetedResequencing {
 
   private Date lastUpdated;
 
-  public Long getTargetedResequencingId() {
-    return targetedResequencingId;
+  public Long getTargetedSequencingId() {
+    return targetedSequencingId;
   }
 
-  public void setTargetedResequencingId(Long targetedResequencingId) {
-    this.targetedResequencingId = targetedResequencingId;
+  public void setTargetedSequencingId(Long targetedSequencingId) {
+    this.targetedSequencingId = targetedSequencingId;
   }
 
   public String getAlias() {

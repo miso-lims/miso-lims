@@ -69,13 +69,6 @@
       writeCoalescing="false" writeBatching="false" writeBatchSize="1"
       retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
   </cache>
-  
-  <cache name="targetedResequencingCache" eternal="true" overflowToDisk="true" statistics="true" maxBytesLocalHeap="30M" maxBytesLocalDisk="100M">
-  </cache>
-
-  <cache name="lazyTargetedResequencingCache" eternal="true" overflowToDisk="true" statistics="true" maxBytesLocalHeap="5M"
-    maxBytesLocalDisk="75M">
-  </cache>
 
   <!-- <cache name="emPCRDilutionCache" maxElementsInMemory="10000" eternal="true" overflowToDisk="false" statistics="true"> -->
   <cache name="emPCRDilutionCache" eternal="true" overflowToDisk="true" statistics="true" maxBytesLocalHeap="30M" maxBytesLocalDisk="100M">
@@ -153,19 +146,6 @@
 
   <cache name="lazySequencerPoolPartitionCache" eternal="true" overflowToDisk="true" statistics="true" maxBytesLocalHeap="5M"
     maxBytesLocalDisk="75M">
-    <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
-      writeCoalescing="false" writeBatching="false" writeBatchSize="1"
-      retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
-  </cache>
-
-  <!-- <cache name="plateCache" maxElementsInMemory="10000" eternal="true" overflowToDisk="false" statistics="true"> -->
-  <cache name="plateCache" eternal="true" overflowToDisk="true" statistics="true" maxBytesLocalHeap="10M" maxBytesLocalDisk="500M">
-    <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
-      writeCoalescing="false" writeBatching="false" writeBatchSize="1"
-      retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
-  </cache>
-
-  <cache name="lazyPlateCache" eternal="true" overflowToDisk="true" statistics="true" maxBytesLocalHeap="5M" maxBytesLocalDisk="75M">
     <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
       writeCoalescing="false" writeBatching="false" writeBatchSize="1"
       retryAttempts="0" retryAttemptDelaySeconds="0"/> -->

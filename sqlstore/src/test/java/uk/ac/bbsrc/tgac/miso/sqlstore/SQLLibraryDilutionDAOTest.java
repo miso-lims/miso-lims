@@ -37,7 +37,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.EmPCRStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
-import uk.ac.bbsrc.tgac.miso.core.store.TargetedResequencingStore;
+import uk.ac.bbsrc.tgac.miso.core.store.TargetedSequencingStore;
 
 public class SQLLibraryDilutionDAOTest extends AbstractDAOTest {
 
@@ -52,7 +52,7 @@ public class SQLLibraryDilutionDAOTest extends AbstractDAOTest {
   @Mock
   private LibraryStore libraryDAO;
   @Mock
-  private TargetedResequencingStore targetedResequencingDAO;
+  private TargetedSequencingStore targetedSequencingDAO;
   @Mock
   private Store<SecurityProfile> securityProfileDAO;
   @Mock
@@ -69,7 +69,7 @@ public class SQLLibraryDilutionDAOTest extends AbstractDAOTest {
     MockitoAnnotations.initMocks(this);
     dao.setJdbcTemplate(jdbcTemplate);
     dao.setDataObjectFactory(new TgacDataObjectFactory());
-    dao.setTargetedResequencingDAO(targetedResequencingDAO);
+    dao.setTargetedSequencingDAO(targetedSequencingDAO);
     Mockito.when(namingScheme.validateField(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
   }
 

@@ -74,7 +74,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedResequencing;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCR;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution;
@@ -2386,13 +2386,13 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<TargetedResequencing> listAllTargetedResequencing() throws IOException {
-    return backingManager.listAllTargetedResequencing();
+  public Collection<TargetedSequencing> listAllTargetedSequencing() throws IOException {
+    return backingManager.listAllTargetedSequencing();
   }
 
   @Override
-  public TargetedResequencing getTargetedResequencingById(long targetedResequencingId) throws IOException {
-    return backingManager.getTargetedResequencingById(targetedResequencingId);
+  public TargetedSequencing getTargetedSequencingById(long targetedSequencingId) throws IOException {
+    return backingManager.getTargetedSequencingById(targetedSequencingId);
   }
 
   @Override
