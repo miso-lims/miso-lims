@@ -10,6 +10,10 @@ Changes:
  * Move the Dockerfile into the main repository (#557)
  * Changed to next development version
 
+Bad:
+
+ * `develop` only: missing some necessary ehcache lines; will build but fails to load pools & dilutions
+
 # 0.2.40
 
 Changes:
