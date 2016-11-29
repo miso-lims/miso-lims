@@ -10,6 +10,12 @@ Changes:
  * Move the Dockerfile into the main repository (#557)
  * Changed to next development version
 
+Bad:
+
+ * `develop` only: missing some necessary ehcache lines; will build but fails to load pools & dilutions
+ * all: updating a LibraryDilution from the Edit Library page will cause the next LibraryDilution save to fail.
+ * `oicr` only: additional Tissue Origins not entered in the OicrSampleNamingScheme
+
 # 0.2.40
 
 Changes:
