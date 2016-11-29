@@ -10,5 +10,5 @@ INSERT INTO KitDescriptor (name, version, manufacturer, partNumber, stockLevel, 
 
 SELECT kitDescriptorId INTO @kapaXgen FROM KitDescriptor WHERE name = "KAPA Hyper Prep & IDT xGen";
 
-UPDATE TargetedResequencing SET kitDescriptorId = @kapaXgen WHERE alias = 'xGen Lockdown AML';
+UPDATE TargetedSequencing SET kitDescriptorId = @kapaXgen WHERE alias = 'xGen Lockdown AML';
 --EndNoTest

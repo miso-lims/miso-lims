@@ -6,7 +6,7 @@ INSERT INTO KitDescriptor (name, version, manufacturer, partNumber, stockLevel, 
 
 SELECT kitDescriptorId INTO @kapa FROM KitDescriptor WHERE name = "KAPA Hyper Prep & SureSelect XT";
 
-INSERT INTO TargetedResequencing (alias, description, createdBy, creationDate, updatedBy, lastUpdated, kitDescriptorId) VALUES
+INSERT INTO TargetedSequencing (alias, description, createdBy, creationDate, updatedBy, lastUpdated, kitDescriptorId) VALUES
 ('Agilent SureSelect Human All Exon V5 + UTRs', 'Agilent SureSelect Human All Exon V5 + UTRs', @user, CURRENT_TIMESTAMP, @user, CURRENT_TIMESTAMP, @kapa),
 ('Agilent SureSelect Human All Exon V6 Cosmic', 'Agilent SureSelect Human All Exon V6 Cosmic', @user, CURRENT_TIMESTAMP, @user, CURRENT_TIMESTAMP, @kapa);
 --EndNoTest
