@@ -2179,21 +2179,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Kit> listKitsByExperimentId(long experimentId) throws IOException {
-    return backingManager.listKitsByExperimentId(experimentId);
-  }
-
-  @Override
-  public Collection<Kit> listKitsByManufacturer(String manufacturer) throws IOException {
-    return backingManager.listKitsByManufacturer(manufacturer);
-  }
-
-  @Override
-  public Collection<Kit> listKitsByType(KitType kitType) throws IOException {
-    return backingManager.listKitsByType(kitType);
-  }
-
-  @Override
   public Collection<KitDescriptor> listKitDescriptorsByType(KitType kitType) throws IOException {
     return backingManager.listKitDescriptorsByType(kitType);
   }

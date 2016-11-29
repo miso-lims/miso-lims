@@ -24,6 +24,7 @@ import com.eaglegenomics.simlims.core.Note;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
+import uk.ac.bbsrc.tgac.miso.core.data.KitImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
@@ -34,7 +35,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.LibraryKit;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
 
@@ -100,7 +100,7 @@ public class SQLNoteDAOTest extends AbstractDAOTest {
     note.setCreationDate(new Date());
     note.setOwner(new UserImpl());
     note.setInternalOnly(true);
-    LibraryKit kit = new LibraryKit();
+    Kit kit = new KitImpl();
     long saveId = dao.saveKitNote(kit, note);
 
     assertTrue(saveId > 0);
