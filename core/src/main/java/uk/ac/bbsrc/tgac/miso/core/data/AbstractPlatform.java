@@ -23,12 +23,13 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import javax.persistence.Entity;
+import javax.persistence.Column;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import javax.persistence.MappedSuperclass;
 
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
@@ -38,30 +39,26 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
  * @author Rob Davey
  * @since 0.0.2
  */
-@Entity
-@Table(name = "`Platform`")
+@MappedSuperclass
 public abstract class AbstractPlatform implements Platform {
   public static final Long UNSAVED_ID = 0L;
 
+  @Enumerated(EnumType.STRING)
+  @Column(name = "name")
   private PlatformType platformType;
+
+  @Column(nullable = true)
   private String description;
+
+  @Column(nullable = false)
   private String instrumentModel;
+
+  @Column(nullable = false)
   private Integer numContainers;
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long platformId = AbstractPlatform.UNSAVED_ID;
-
-  @OneToOne(targetEntity = AbstractRun.class, mappedBy = "platform")
-  private Run run;
-
-  public Run getRun() {
-    return run;
-  }
-
-  public void setRun(Run run) {
-    this.run = run;
-  }
 
   @Override
   public Long getId() {

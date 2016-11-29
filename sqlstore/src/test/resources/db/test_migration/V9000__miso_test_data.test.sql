@@ -410,7 +410,7 @@ VALUES (1, 'validationBarcode', 1, 'NULL -> real', '2016-07-07 13:30:47'),
 DELETE FROM `SequencingParameters`;
 DELETE FROM `Platform`;
 INSERT INTO `Platform`(`platformId`, `name`, `instrumentModel`, `description`, `numContainers`) 
-VALUES (16,'Illumina','Illumina HiSeq 2000','4-channel flowgram',1),(17,'Illumina','Illumina MiSeq','Tiny Seq',1),(18,'PacBio','PacBio RS','Long Seq',1);
+VALUES (16,'ILLUMINA','Illumina HiSeq 2000','4-channel flowgram',1),(17,'ILLUMINA','Illumina MiSeq','Tiny Seq',1),(18,'PACBIO','PacBio RS','Long Seq',1);
 
 DELETE FROM `SequencerPartitionContainer_Partition`;
 INSERT INTO `SequencerPartitionContainer_Partition`(`container_containerId`, `partitions_partitionId`) 

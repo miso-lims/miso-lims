@@ -37,6 +37,7 @@
     <property name="dataSource" ref="dataSource" />
     <property name="annotatedClasses">
       <list>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractPlatform</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractProject</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractSample</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.Index</value>
@@ -51,6 +52,7 @@
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.InstituteImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAdditionalInfoImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.PlatformImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrderImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl</value>
@@ -345,7 +347,7 @@
     <property name="jdbcTemplate" ref="interfaceTemplate" />
   </bean>
 
-  <bean id="platformStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLPlatformDAO">
+  <bean id="platformStore" class="uk.ac.bbsrc.tgac.miso.persistence.impl.HibernatePlatformDao">
     <property name="jdbcTemplate" ref="interfaceTemplate" />
   </bean>
 

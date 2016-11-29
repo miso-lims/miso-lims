@@ -1,0 +1,1 @@
+UPDATE Platform SET name = UPPER(name);

@@ -31,6 +31,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLabDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryAdditionalInfoDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDesignCodeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDesignDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernatePlatformDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateReferenceGenomeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleNumberPerProjectDao;
@@ -54,7 +55,6 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryDilutionDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryQCDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLNoteDAO;
-import uk.ac.bbsrc.tgac.miso.sqlstore.SQLPlatformDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLPoolDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLPoolQCDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLProjectDAO;
@@ -104,7 +104,7 @@ public class MisoServiceManager {
   private SQLPoolQCDAO poolQcDao;
   private SQLExperimentDAO experimentDao;
   private HibernateKitDao kitDao;
-  private SQLPlatformDAO platformDao;
+  private HibernatePlatformDao platformDao;
   private SQLStudyDAO studyDao;
   private SQLRunDAO runDao;
   private SQLRunQCDAO runQcDao;
@@ -213,7 +213,6 @@ public class MisoServiceManager {
     m.setDefaultDaoLookup();
     m.setDefaultPoolQcDao();
     m.setDefaultSequencingParametersDao();
-
 
     User migrationUser = m.getsecurityStore().getUserByLoginName(username);
     if (migrationUser == null) throw new IllegalArgumentException("User '" + username + "' not found");
@@ -754,6 +753,8 @@ public class MisoServiceManager {
   public void setDefaultKitDao() {
     HibernateKitDao dao = new HibernateKitDao();
     dao.setJdbcTemplate(jdbcTemplate);
+    dao.setNoteDAO(noteDao);
+    dao.setSecurityDAO(securityStore);
     setKitDao(dao);
   }
 
@@ -762,18 +763,17 @@ public class MisoServiceManager {
     if (libraryAdditionalInfoDao != null) libraryAdditionalInfoDao.setKitStore(kitDao);
   }
 
-  public SQLPlatformDAO getPlatformDao() {
+  public HibernatePlatformDao getPlatformDao() {
     return platformDao;
   }
 
-  public void setPlatformDao(SQLPlatformDAO platformDao) {
+  public void setPlatformDao(HibernatePlatformDao platformDao) {
     this.platformDao = platformDao;
     updatePlatformDaoDependencies();
   }
 
   public void setDefaultPlatformDao() {
-    SQLPlatformDAO dao = new SQLPlatformDAO();
-    dao.setDataObjectFactory(dataObjectFactory);
+    HibernatePlatformDao dao = new HibernatePlatformDao();
     dao.setJdbcTemplate(jdbcTemplate);
     setPlatformDao(dao);
   }
@@ -1414,8 +1414,6 @@ public class MisoServiceManager {
     this.sequencingParametersDao = sequencingParametersDao;
     updateSequencingParametersDaoDependencies();
   }
-
-
 
   private void updateSequencingParametersDaoDependencies() {
     if (runDao != null) runDao.setSequencingParametersDao(sequencingParametersDao);
