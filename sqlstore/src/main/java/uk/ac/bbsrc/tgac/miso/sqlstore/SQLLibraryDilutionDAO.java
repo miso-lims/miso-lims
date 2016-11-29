@@ -529,6 +529,7 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
       libraryDilution.setName(rs.getString("name"));
       libraryDilution.setConcentration(rs.getDouble("concentration"));
       libraryDilution.setPreMigrationId(rs.getLong("preMigrationId"));
+      if (rs.wasNull()) libraryDilution.setPreMigrationId(null);
       libraryDilution.setIdentificationBarcode(rs.getString("identificationBarcode"));
       libraryDilution.setCreationDate(rs.getDate("creationDate"));
       libraryDilution.setDilutionCreator(rs.getString("dilutionUserName"));
