@@ -13,6 +13,7 @@ Changes:
 Bad:
 
  * `develop` only: missing some necessary ehcache lines; will build but fails to load pools & dilutions
+ * all: updating a LibraryDilution from the Edit Library page will cause the next LibraryDilution save to fail.
 
 # 0.2.40
 
