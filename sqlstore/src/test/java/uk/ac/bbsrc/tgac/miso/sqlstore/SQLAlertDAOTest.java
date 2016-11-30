@@ -67,7 +67,7 @@ public class SQLAlertDAOTest extends AbstractDAOTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLAlertDAO#remove(uk.ac.bbsrc.tgac.miso.core.event.Alert)}.
+   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.HibernateAlertDao#remove(uk.ac.bbsrc.tgac.miso.core.event.Alert)}.
    * 
    * @throws IOException
    */
@@ -84,7 +84,7 @@ public class SQLAlertDAOTest extends AbstractDAOTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLAlertDAO#save(uk.ac.bbsrc.tgac.miso.core.event.Alert)}.
+   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.HibernateAlertDao#save(uk.ac.bbsrc.tgac.miso.core.event.Alert)}.
    * 
    * @throws IOException
    */
@@ -119,7 +119,7 @@ public class SQLAlertDAOTest extends AbstractDAOTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLAlertDAO#get(long)}.
+   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.HibernateAlertDao#get(long)}.
    * 
    * @throws IOException
    * @throws ParseException
@@ -137,7 +137,7 @@ public class SQLAlertDAOTest extends AbstractDAOTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLAlertDAO#lazyGet(long)}.
+   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.HibernateAlertDao#lazyGet(long)}.
    * 
    * @throws IOException
    */
@@ -151,7 +151,7 @@ public class SQLAlertDAOTest extends AbstractDAOTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLAlertDAO#listAll()}.
+   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.HibernateAlertDao#listAll()}.
    * 
    * @throws IOException
    */
@@ -163,7 +163,7 @@ public class SQLAlertDAOTest extends AbstractDAOTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLAlertDAO#count()}.
+   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.HibernateAlertDao#count()}.
    * 
    * @throws IOException
    */
@@ -174,7 +174,7 @@ public class SQLAlertDAOTest extends AbstractDAOTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLAlertDAO#listByUserId(long)}.
+   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.HibernateAlertDao#listByUserId(long)}.
    * 
    * @throws IOException
    */
@@ -186,7 +186,7 @@ public class SQLAlertDAOTest extends AbstractDAOTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLAlertDAO#listByUserId(long, long)}.
+   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.HibernateAlertDao#listByUserId(long, long)}.
    * 
    * @throws IOException
    */
@@ -198,7 +198,8 @@ public class SQLAlertDAOTest extends AbstractDAOTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLAlertDAO#listByAlertLevel(uk.ac.bbsrc.tgac.miso.core.event.type.AlertLevel)}.
+   * Test method for
+   * {@link uk.ac.bbsrc.tgac.miso.sqlstore.HibernateAlertDao#listByAlertLevel(uk.ac.bbsrc.tgac.miso.core.event.type.AlertLevel)}.
    * 
    * @throws IOException
    */
@@ -210,7 +211,7 @@ public class SQLAlertDAOTest extends AbstractDAOTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLAlertDAO#listUnreadByUserId(long)}.
+   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.HibernateAlertDao#listUnreadByUserId(long)}.
    * 
    * @throws IOException
    */
@@ -224,7 +225,7 @@ public class SQLAlertDAOTest extends AbstractDAOTest {
 
   /**
    * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLAlertDAO#listUnreadByAlertLevel(uk.ac.bbsrc.tgac.miso.core.event.type.AlertLevel)}.
+   * {@link uk.ac.bbsrc.tgac.miso.sqlstore.HibernateAlertDao#listUnreadByAlertLevel(uk.ac.bbsrc.tgac.miso.core.event.type.AlertLevel)}.
    * 
    * @throws IOException
    */
