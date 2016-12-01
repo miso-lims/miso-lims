@@ -1909,11 +1909,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public SequencerReference getSequencerReferenceByRunId(long runId) throws IOException {
-    return backingManager.getSequencerReferenceByRunId(runId);
-  }
-
-  @Override
   public Kit getKitById(long kitId) throws IOException {
     Kit o = backingManager.getKitById(kitId);
     if (getCurrentUser().isInternal())

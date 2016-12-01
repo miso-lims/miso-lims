@@ -37,16 +37,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
  * @since 0.0.2
  */
 public interface SequencerReferenceStore extends Store<SequencerReference>, Remover<SequencerReference> {
-  /**
-   * Get a SequencerReference that holds information about a Run given a Run ID
-   * 
-   * @param runId
-   *          of type long
-   * @return SequencerReference
-   * @throws IOException
-   *           when
-   */
-  SequencerReference getByRunId(long runId) throws IOException;
 
   /**
    * Get a SequencerReference by a given name

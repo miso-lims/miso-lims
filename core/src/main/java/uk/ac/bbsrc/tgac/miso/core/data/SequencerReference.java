@@ -23,6 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.net.UnknownHostException;
 import java.util.Date;
 
 import org.codehaus.jackson.annotate.JsonBackReference;
@@ -31,14 +32,30 @@ import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 /**
- * A SequencerReference is a {@link HardwareReference} specifically designated with a {@link Platform}
+ * A SequencerReference is a {@link SequencerReference} specifically designated with a {@link Platform}
  * 
  * @author Rob Davey
  * @since 0.0.2
  */
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public interface SequencerReference extends HardwareReference, Deletable {
+public interface SequencerReference extends Nameable, Deletable {
+  /**
+   * Sets the id of this SequencerReference object.
+   * 
+   * @param id
+   *          id.
+   */
+  void setId(Long id);
+
+  /**
+   * Sets the name of this SequencerReference object.
+   * 
+   * @param name
+   *          name.
+   */
+  void setName(String name);
+
   /**
    * Sets the platform of this SequencerReference object.
    * 
@@ -54,10 +71,43 @@ public interface SequencerReference extends HardwareReference, Deletable {
    */
   Platform getPlatform();
   
+  /**
+   * Sets the serial number of this SequencerReference object.
+   * 
+   * @param serialNumber of type String
+   */
   public void setSerialNumber(String serialNumber);
   
+  /**
+   * Returns the serial number of this SequencerReference object.
+   * 
+   * @return String serialNumber
+   */
   public String getSerialNumber();
-  
+
+  /**
+   * Sets the ipAddress of this SequencerReference object.
+   * 
+   * @param ip of type String
+   */
+  void setIpAddress(String ip);
+
+  /**
+   * Returns the String ipAddress of this SequencerReference object.
+   * 
+   * @return String ipAddress.
+   * @throws UnknownHostException
+   */
+  String getIpAddress() throws UnknownHostException;
+
+  /**
+   * Returns the fully qualified domain name (FQDN) of this SequencerReference object.
+   * 
+   * @return String FQDN.
+   * @throws UnknownHostException
+   */
+  String getFQDN() throws UnknownHostException;
+
   /**
    * Sets the date when use of this sequencer began
    * 

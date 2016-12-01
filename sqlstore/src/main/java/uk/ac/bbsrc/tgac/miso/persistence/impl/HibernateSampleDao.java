@@ -128,7 +128,6 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
   @Override
   public void deleteSample(Sample sample) {
     currentSession().delete(sample);
-
   }
 
   /**
