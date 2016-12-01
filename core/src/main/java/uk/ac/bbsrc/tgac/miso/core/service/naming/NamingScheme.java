@@ -8,42 +8,144 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.generation.NameGenerator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.NameValidator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 
+/**
+ * Master naming scheme to coordinate all name generation and validation
+ */
 public interface NamingScheme {
 
+  /**
+   * Optional method. Sets a generator to be used for all {@link Nameable} object names
+   * 
+   * @param generator
+   * @throws UnsupportedOperationException if this NamingScheme does not accept custom {@link Nameable} name generators
+   */
   public void setNameGenerator(NameGenerator<Nameable> generator);
   
+  /**
+   * @return true if name generation for {@link Nameable} objects is supported; false otherwise
+   */
   public boolean hasNameGenerator();
   
+  /**
+   * Generates a name for a {@link Nameable} object
+   * 
+   * @param nameable the object to generate a name for
+   * @return the generated name
+   * @throws MisoNamingException if name generation fails
+   * @throws UnsupportedOperationException if name generation is not supported. this can be avoided by checking {@link #hasNameGenerator()}
+   *           first
+   */
   public String generateNameFor(Nameable nameable) throws MisoNamingException;
   
+  /**
+   * Optional method. Sets a validator to be used for all {@link Nameable} object names
+   * 
+   * @param validator
+   * @throws UnsupportedOperationException if this NamingScheme does not accept custom {@link Nameable} name validators
+   */
   public void setNameValidator(NameValidator validator);
   
+  /**
+   * Checks that the provided name conforms to the naming scheme
+   * 
+   * @param name
+   * @return the {@link ValidationResult}
+   */
   public ValidationResult validateName(String name);
   
+  /**
+   * @return true if duplicate {@link Nameable} names are allowed by this NamingScheme
+   */
   public boolean duplicateNamesAllowed();
 
+  /**
+   * Optional method. Sets a generator to be used for {@link Sample} aliases
+   * 
+   * @param generator
+   * @throws UnsupportedOperationException if this NamingScheme does not accept custom {@link Sample} alias generators
+   */
   public void setSampleAliasGenerator(NameGenerator<Sample> generator);
   
+  /**
+   * @return true if {@link Sample} alias generation is supported; false otherwise
+   */
   public boolean hasSampleAliasGenerator();
   
+  /**
+   * Generates a {@link Sample} alias
+   * 
+   * @param sample the {@link Sample} to generate an alias for
+   * @return the generated alias
+   * @throws MisoNamingException if alias generation fails
+   * @throws UnsupportedOperationException if {@link Sample} alias generation is not supported. this can be avoided by checking
+   *           {@link #hasSampleAliasGenerator()} first
+   */
   public String generateSampleAlias(Sample sample) throws MisoNamingException;
 
+  /**
+   * Optional method. Sets a validator to be used for {@link Sample} aliases
+   * 
+   * @param validator
+   * @throws UnsupportedOperationException if this NamingScheme does not accept custom {@link Sample} alias validators
+   */
   public void setSampleAliasValidator(NameValidator validator);
 
+  /**
+   * Checks that the provided {@link Sample} alias conforms to the naming scheme
+   * 
+   * @param alias
+   * @return the {@link ValidationResult}
+   */
   public ValidationResult validateSampleAlias(String alias);
 
+  /**
+   * @return true if duplicate {@link Sample} aliases are allowed by this NamingScheme
+   */
   public boolean duplicateSampleAliasAllowed();
 
+  /**
+   * Optional method. Sets a generator to be used for {@link Library} aliases
+   * 
+   * @param generator
+   * @throws UnsupportedOperationException if this NamingScheme does not accept custom {@link Library} alias generators
+   */
   public void setLibraryAliasGenerator(NameGenerator<Library> generator);
 
+  /**
+   * @return true if {@link Library} alias generation is supported; false otherwise
+   */
   public boolean hasLibraryAliasGenerator();
 
+  /**
+   * Generates a {@link Library} alias
+   * 
+   * @param library the {@link Library} to generate an alias for
+   * @return the generated alias
+   * @throws MisoNamingException if alias generation fails
+   * @throws UnsupportedOperationException if {@link Library} alias generation is not supported. this can be avoided by checking
+   *           {@link #hasLibraryAliasGenerator()} first
+   */
   public String generateLibraryAlias(Library library) throws MisoNamingException;
 
+  /**
+   * Optional method. Sets a validator to be used for {@link Library} aliases
+   * 
+   * @param validator
+   * @throws UnsupportedOperationException if this NamingScheme does not accept custom {@link Library} alias validators
+   */
   public void setLibraryAliasValidator(NameValidator validator);
 
+  /**
+   * Checks that the provided {@link Library} alias conforms to the naming scheme
+   * 
+   * @param alias
+   * @return the {@link ValidationResult}
+   */
   public ValidationResult validateLibraryAlias(String alias);
   
+  /**
+   * @return true if duplicate {@link Library} aliases are allowed by this NamingScheme
+   */
   public boolean duplicateLibraryAliasAllowed();
 
 }

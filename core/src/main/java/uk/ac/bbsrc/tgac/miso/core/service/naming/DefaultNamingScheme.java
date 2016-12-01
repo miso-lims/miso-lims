@@ -11,6 +11,9 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.DefaultNameValidator
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.DefaultSampleAliasValidator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.NameValidator;
 
+/**
+ * Customizeable NamingScheme which defaults to all default generators and validators
+ */
 public class DefaultNamingScheme extends AbstractNamingScheme {
 
   private NameValidator nameValidator = new DefaultNameValidator();

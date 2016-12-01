@@ -12,6 +12,9 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.NameValidator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.OicrLibraryAliasValidator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.OicrSampleAliasValidator;
 
+/**
+ * Non-customizeable NamingScheme which conforms to OICR's standard naming scheme
+ */
 public class OicrNamingScheme extends AbstractNamingScheme {
 
   private final NameValidator nameValidator = new DefaultNameValidator();

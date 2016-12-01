@@ -7,6 +7,9 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.generation.NameGenerator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.NameValidator;
 
+/**
+ * Interface used for loading NamingSchemes, NameGenerators, and NameValidators by name
+ */
 public interface NamingSchemeResolverService {
   NamingScheme getNamingScheme(String schemeName);
 

@@ -26,6 +26,9 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.NameValidator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.OicrLibraryAliasValidator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.OicrSampleAliasValidator;
 
+/**
+ * Resolves NamingSchemes, NameGenerators, and NameValidators using statically-defined mappings
+ */
 public class StaticMappedNamingSchemeResolverService implements NamingSchemeResolverService {
   protected static final Logger log = LoggerFactory.getLogger(StaticMappedNamingSchemeResolverService.class);
 
