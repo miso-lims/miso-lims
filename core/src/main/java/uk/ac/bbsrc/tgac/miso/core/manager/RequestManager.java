@@ -25,6 +25,7 @@ package uk.ac.bbsrc.tgac.miso.core.manager;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -377,6 +378,7 @@ public interface RequestManager {
 
   public Collection<SampleQC> listAllSampleQCsBySampleId(long sampleId) throws IOException;
 
+  @Deprecated // massively detremental to performance.
   public Collection<Library> listAllLibraries() throws IOException;
 
   public Collection<Library> listAllLibrariesWithLimit(long limit) throws IOException;
@@ -484,7 +486,7 @@ public interface RequestManager {
 
   /**
    * PlatformTypes with existing sequencers.
-   * 
+   *
    * @throws IOException
    */
   public Collection<PlatformType> listActivePlatformTypes() throws IOException;
@@ -644,6 +646,8 @@ public interface RequestManager {
   public Long getNumPoolsBySearch(PlatformType platform, String querystr) throws IOException;
 
   public int countLibraries() throws IOException;
+
+  public List<Library> getLibrariesByCreationDate(Date from, Date to) throws IOException;
 
   public List<Library> getLibrariesByPageSizeSearch(int offset, int limit, String querystr, String sortDir, String sortCol)
       throws IOException;

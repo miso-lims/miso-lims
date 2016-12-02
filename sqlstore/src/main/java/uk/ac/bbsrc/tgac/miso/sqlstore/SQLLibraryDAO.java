@@ -26,11 +26,14 @@ package uk.ac.bbsrc.tgac.miso.sqlstore;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -41,6 +44,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -116,7 +120,7 @@ public class SQLLibraryDAO implements LibraryStore {
   public static final String LIBRARIES_SELECT_LIMIT = LIBRARIES_SELECT + " ORDER BY l.libraryId DESC LIMIT ?";
 
   public static final String LIBRARY_SELECT_BY_ID = LIBRARIES_SELECT + " WHERE l.libraryId = ?";
-  
+
   public static final String LIBRARY_SELECT_BY_PRE_MIGRATION_ID = LIBRARIES_SELECT
       + " JOIN LibraryAdditionalInfo lai ON lai.libraryId = l.libraryId"
       + " WHERE lai.preMigrationId = ?";
@@ -127,6 +131,8 @@ public class SQLLibraryDAO implements LibraryStore {
 
   public static final String LIBRARIES_SELECT_BY_SEARCH = LIBRARIES_SELECT + " WHERE UPPER(l.identificationBarcode) LIKE ? OR "
       + "UPPER(l.name) LIKE ? OR UPPER(l.alias) LIKE ? OR UPPER(l.description) LIKE ? ";
+
+  public static final String LIBRARIES_SEARCH_BY_CREATED_DATE = LIBRARIES_SELECT + " WHERE l.creationDate BETWEEN ? AND ? ";
 
   public static final String LIBRARY_SELECT_BY_IDENTIFICATION_BARCODE = LIBRARIES_SELECT + " WHERE l.identificationBarcode = ?";
 
@@ -219,14 +225,14 @@ public class SQLLibraryDAO implements LibraryStore {
   private ChangeLogStore changeLogDAO;
   private SecurityStore securityDAO;
   private BoxStore boxDAO;
-  
+
   @Value("${miso.detailed.sample.enabled:false}")
   private Boolean detailedSampleEnabled;
-  
+
   public void setDetailedSampleEnabled(Boolean detailedSampleEnabled) {
     this.detailedSampleEnabled = detailedSampleEnabled;
   }
-  
+
   @Autowired
   private LibraryAdditionalInfoDao libraryAdditionalInfoDAO;
 
@@ -337,7 +343,7 @@ public class SQLLibraryDAO implements LibraryStore {
 
   /**
    * Generates a unique barcode. Note that the barcode will change when the alias is changed.
-   * 
+   *
    * @param library
    */
   public void autoGenerateIdBarcode(Library library) {
@@ -365,11 +371,11 @@ public class SQLLibraryDAO implements LibraryStore {
     if (this.cascadeType != null) {
       securityProfileId = securityProfileDAO.save(library.getSecurityProfile());
     }
-    
+
     if (detailedSampleEnabled && !LimsUtils.isAliquotSample(library.getSample())) {
       throw new IllegalArgumentException("A Library must have an aliquot Sample as its parent.");
     }
-    
+
     if (library.isDiscarded()) {
       boxDAO.removeBoxableFromBox(library);
       library.setVolume(0D);
@@ -528,7 +534,7 @@ public class SQLLibraryDAO implements LibraryStore {
     Library e = eResults.size() > 0 ? eResults.get(0) : null;
     return e;
   }
-  
+
   public Library getByPreMigrationId(long id) throws IOException {
     List<Library> eResults = template.query(LIBRARY_SELECT_BY_PRE_MIGRATION_ID, new Object[] { id }, new LibraryMapper());
     return DbUtils.getUniqueResult(eResults);
@@ -599,6 +605,21 @@ public class SQLLibraryDAO implements LibraryStore {
   public List<Library> listAll() throws IOException {
     return template.query(LIBRARIES_SELECT, new LibraryMapper(true));
   }
+
+  @Override
+  public List<Library> searchByCreationDate(final Date from, final Date to) throws IOException {
+    List<Library> results = template.query(new PreparedStatementCreator() {
+      @Override
+      public PreparedStatement createPreparedStatement(Connection conn) throws SQLException {
+        PreparedStatement statement = conn.prepareStatement(LIBRARIES_SEARCH_BY_CREATED_DATE);
+        statement.setDate(1, new java.sql.Date(from.getTime()));
+        statement.setDate(2, new java.sql.Date(to.getTime()));
+        return statement;
+      }
+    }, new LibraryMapper(true));
+    return results;
+  }
+
 
   @Override
   public List<Library> listAllWithLimit(long limit) throws IOException {
