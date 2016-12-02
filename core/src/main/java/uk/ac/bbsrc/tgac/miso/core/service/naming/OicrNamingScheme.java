@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.service.naming;
 
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -17,12 +19,31 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.OicrSampleAliasValid
  */
 public class OicrNamingScheme extends AbstractNamingScheme {
 
-  private final NameValidator nameValidator = new DefaultNameValidator();
-  private final NameGenerator<Nameable> nameGenerator = new DefaultNameGenerator();
-  private final NameValidator sampleAliasValidator = new OicrSampleAliasValidator();
-  private final NameGenerator<Sample> sampleAliasGenerator = new OicrSampleAliasGenerator();
-  private final NameValidator libraryAliasValidator = new OicrLibraryAliasValidator();
-  private final NameGenerator<Library> libraryAliasGenerator = new OicrLibraryAliasGenerator();
+  private final DefaultNameValidator nameValidator = new DefaultNameValidator();
+  private final DefaultNameGenerator nameGenerator = new DefaultNameGenerator();
+  private final OicrSampleAliasValidator sampleAliasValidator = new OicrSampleAliasValidator();
+  private final OicrSampleAliasGenerator sampleAliasGenerator = new OicrSampleAliasGenerator();
+  private final OicrLibraryAliasValidator libraryAliasValidator = new OicrLibraryAliasValidator();
+  private final OicrLibraryAliasGenerator libraryAliasGenerator = null;
+
+  /**
+   * Creates a new OicrNamingScheme and attempts to autowire all of its validators' and generators' dependencies. If no
+   * WebApplicationContext is available, wiring will be skipped, and setters within this class (e.g.
+   * {@link #setSiblingNumberGenerator(SiblingNumberGenerator)}) should be used to complete the necessary wiring manually
+   */
+  public OicrNamingScheme() {
+    SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(sampleAliasGenerator);
+  }
+
+  /**
+   * Sets the SiblingNumberGenerator to use in generating {@link Sample} aliases. Within a Spring context, this will be autowired. This
+   * method exists for cases where the OicrNamingScheme is not a Spring-managed bean
+   * 
+   * @param siblingNumberGenerator
+   */
+  public void setSiblingNumberGenerator(SiblingNumberGenerator siblingNumberGenerator) {
+    sampleAliasGenerator.setSiblingNumberGenerator(siblingNumberGenerator);
+  }
 
   @Override
   public void setNameGenerator(NameGenerator<Nameable> generator) {

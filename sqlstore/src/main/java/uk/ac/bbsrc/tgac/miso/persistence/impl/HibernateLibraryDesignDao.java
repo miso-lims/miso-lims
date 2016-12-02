@@ -43,6 +43,7 @@ public class HibernateLibraryDesignDao implements LibraryDesignDao {
     this.sessionFactory = sessionFactory;
   }
 
+  @Autowired
   private LibraryStore libraryDao;
 
   public void setLibraryDao(LibraryStore libraryDao) {

@@ -86,6 +86,9 @@ public class OicrSampleAliasGenerator implements NameGenerator<Sample> {
     }
     String partialAlias = parentAlias + SEPARATOR + sc.getSuffix();
     if (sample.getSiblingNumber() == null) {
+      if (siblingNumberGenerator == null) {
+        throw new IllegalStateException("No SiblingNumberGenerator configured");
+      }
       sample.setSiblingNumber(siblingNumberGenerator.getNextSiblingNumber(partialAlias));
     }
     String siblingNum = sample.getSiblingNumber().toString();
