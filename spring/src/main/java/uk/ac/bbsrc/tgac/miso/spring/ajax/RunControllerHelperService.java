@@ -144,7 +144,10 @@ public class RunControllerHelperService {
           srb.append("<select name='sequencer' id='sequencerReference' onchange='Run.ui.populateRunOptions(this);'>");
           srb.append("<option value='0' selected='selected'>Please select...</option>");
           for (SequencerReference sr : requestManager.listSequencerReferencesByPlatformType(newPt)) {
-            srb.append("<option value='" + sr.getId() + "'>" + sr.getName() + " (" + sr.getPlatform().getInstrumentModel() + ")</option>");
+            if (sr.isActive()) {
+              srb.append(
+                  "<option value='" + sr.getId() + "'>" + sr.getName() + " (" + sr.getPlatform().getInstrumentModel() + ")</option>");
+            }
           }
           srb.append("</select>");
           responseMap.put("sequencers", srb.toString());
@@ -162,7 +165,10 @@ public class RunControllerHelperService {
           srb.append("<select name='sequencer' id='sequencerReference' onchange='Run.ui.populateRunOptions(this);'>");
           srb.append("<option value='0' selected='selected'>Please select...</option>");
           for (SequencerReference sr : requestManager.listSequencerReferencesByPlatformType(newPt)) {
-            srb.append("<option value='" + sr.getId() + "'>" + sr.getName() + " (" + sr.getPlatform().getInstrumentModel() + ")</option>");
+            if (sr.isActive()) {
+              srb.append(
+                  "<option value='" + sr.getId() + "'>" + sr.getName() + " (" + sr.getPlatform().getInstrumentModel() + ")</option>");
+            }
           }
           srb.append("</select>");
           responseMap.put("sequencers", srb.toString());
