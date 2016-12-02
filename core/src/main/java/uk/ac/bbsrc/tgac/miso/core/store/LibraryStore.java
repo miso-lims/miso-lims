@@ -25,6 +25,7 @@ package uk.ac.bbsrc.tgac.miso.core.store;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -38,7 +39,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
 
 /**
  * Defines a DAO interface for storing Libraries
- * 
+ *
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -46,7 +47,7 @@ public interface LibraryStore extends Store<Library>, Remover<Library>, NamingSc
 
   /**
    * Get a Library given a ID barcode
-   * 
+   *
    * @param barcode of type String
    * @return Library
    * @throws IOException when
@@ -55,7 +56,7 @@ public interface LibraryStore extends Store<Library>, Remover<Library>, NamingSc
 
   /**
    * List all Libraries that match a search criteria
-   * 
+   *
    * @param query of type String
    * @return Collection<Library>
    * @throws IOException when
@@ -64,7 +65,7 @@ public interface LibraryStore extends Store<Library>, Remover<Library>, NamingSc
 
   /**
    * Get all Library with a given Library alias
-   * 
+   *
    * @param alias of type String
    * @return all libraries with the given alias
    * @throws IOException
@@ -73,7 +74,7 @@ public interface LibraryStore extends Store<Library>, Remover<Library>, NamingSc
 
   /**
    * List all Libraries generated from a Sample given a parent Sample ID
-   * 
+   *
    * @param sampleId of type long
    * @return Collection<Library>
    * @throws IOException when
@@ -82,7 +83,7 @@ public interface LibraryStore extends Store<Library>, Remover<Library>, NamingSc
 
   /**
    * List all Libraries that are related to a Project given a Project ID
-   * 
+   *
    * @param projectId of type long
    * @return Collection<Library>
    * @throws IOException when
@@ -91,7 +92,7 @@ public interface LibraryStore extends Store<Library>, Remover<Library>, NamingSc
 
   /**
    * List all Libraries associated with ids from the given id list
-   * 
+   *
    * @return Collection<Library>
    * @throws IOException when the objects cannot be retrieved or read
    */
@@ -99,7 +100,7 @@ public interface LibraryStore extends Store<Library>, Remover<Library>, NamingSc
 
   /**
    * Get a LibraryType given a LibraryType ID
-   * 
+   *
    * @param libraryTypeId of type long
    * @return LibraryType
    * @throws IOException when
@@ -108,7 +109,7 @@ public interface LibraryStore extends Store<Library>, Remover<Library>, NamingSc
 
   /**
    * Get a LibraryType given a LibraryType description
-   * 
+   *
    * @param description of type String
    * @return LibraryType
    * @throws IOException when
@@ -117,7 +118,7 @@ public interface LibraryStore extends Store<Library>, Remover<Library>, NamingSc
 
   /**
    * Get a LibraryType given a LibraryType description and platform
-   * 
+   *
    * @param description of type String
    * @param platformType of type PlatformType
    * @return LibraryType
@@ -127,7 +128,7 @@ public interface LibraryStore extends Store<Library>, Remover<Library>, NamingSc
 
   /**
    * Get a LibrarySelectionType given a LibrarySelectionType ID
-   * 
+   *
    * @param librarySelectionTypeId of type long
    * @return LibrarySelectionType
    * @throws IOException when
@@ -136,7 +137,7 @@ public interface LibraryStore extends Store<Library>, Remover<Library>, NamingSc
 
   /**
    * Get a LibrarySelectionType given a LibrarySelectionType name
-   * 
+   *
    * @param name of type String
    * @return LibrarySelectionType
    * @throws IOException when
@@ -145,7 +146,7 @@ public interface LibraryStore extends Store<Library>, Remover<Library>, NamingSc
 
   /**
    * Get a LibraryStrategyType given a LibraryStrategyType ID
-   * 
+   *
    * @param libraryStrategyTypeId of type long
    * @return LibraryStrategyType
    * @throws IOException when
@@ -154,7 +155,7 @@ public interface LibraryStore extends Store<Library>, Remover<Library>, NamingSc
 
   /**
    * Get a LibraryStrategyType given a LibraryStrategyType name
-   * 
+   *
    * @param name of type String
    * @return LibraryStrategyType
    * @throws IOException when
@@ -163,7 +164,7 @@ public interface LibraryStore extends Store<Library>, Remover<Library>, NamingSc
 
   /**
    * List all LibraryTypes
-   * 
+   *
    * @return Collection<LibraryType>
    * @throws IOException when
    */
@@ -171,7 +172,7 @@ public interface LibraryStore extends Store<Library>, Remover<Library>, NamingSc
 
   /**
    * List all LibraryTypes available to a given platform
-   * 
+   *
    * @param platformName of type String
    * @return Collection<LibraryType>
    * @throws IOException when
@@ -180,7 +181,7 @@ public interface LibraryStore extends Store<Library>, Remover<Library>, NamingSc
 
   /**
    * List all LibrarySelectionTypes
-   * 
+   *
    * @return Collection<LibrarySelectionType>
    * @throws IOException when
    */
@@ -188,7 +189,7 @@ public interface LibraryStore extends Store<Library>, Remover<Library>, NamingSc
 
   /**
    * List all LibraryStrategyTypes
-   * 
+   *
    * @return Collection<LibraryStrategyType>
    * @throws IOException when
    */
@@ -196,7 +197,7 @@ public interface LibraryStore extends Store<Library>, Remover<Library>, NamingSc
 
   /**
    * List all libraries related to a given LibraryDilution given a LibraryDilution ID
-   * 
+   *
    * @param dilutionId of type long
    * @return Collection<Library>
    * @throws IOException when
@@ -205,7 +206,7 @@ public interface LibraryStore extends Store<Library>, Remover<Library>, NamingSc
 
   /**
    * List all persisted objects
-   * 
+   *
    * @return Collection<Library>
    * @throws IOException when the objects cannot be retrieved
    */
@@ -213,7 +214,7 @@ public interface LibraryStore extends Store<Library>, Remover<Library>, NamingSc
 
   /**
    * Return the Library associated with a given positionId
-   * 
+   *
    * @param positionId of type long
    * @return Boxable
    */
@@ -221,7 +222,7 @@ public interface LibraryStore extends Store<Library>, Remover<Library>, NamingSc
 
   /**
    * List all libraries associated with an identificationBarcode from given list of identificationBarcodes (from scan)
-   * 
+   *
    * @param barcodeList
    * @return Collection<Library>
    * @throws IOException when the objects cannot be retrieved
@@ -235,7 +236,7 @@ public interface LibraryStore extends Store<Library>, Remover<Library>, NamingSc
   public Map<String, Integer> getLibraryColumnSizes() throws IOException;
 
   /**
-   * 
+   *
    * @param offset of type int
    * @param resultsPerPage of type int
    * @param querystr of type String
@@ -246,7 +247,7 @@ public interface LibraryStore extends Store<Library>, Remover<Library>, NamingSc
   List<Library> listBySearchOffsetAndNumResults(int offset, int limit, String querystr, String sortDir, String sortCol) throws IOException;
 
   /**
-   * 
+   *
    * @param offset of type int
    * @param limit of type int
    * @param sortDir of type String
@@ -256,7 +257,7 @@ public interface LibraryStore extends Store<Library>, Remover<Library>, NamingSc
   List<Library> listByOffsetAndNumResults(int offset, int limit, String sortDir, String sortCol) throws IOException;
 
   /**
-   * 
+   *
    * @param querystr of type String
    * @return a count of how many libraries match the querystr
    * @throws IOException
@@ -264,4 +265,6 @@ public interface LibraryStore extends Store<Library>, Remover<Library>, NamingSc
   long countLibrariesBySearch(String querystr) throws IOException;
 
   Library getAdjacentLibrary(long libraryId, boolean before) throws IOException;
+
+  List<Library> searchByCreationDate(Date from, Date to) throws IOException;
 }
