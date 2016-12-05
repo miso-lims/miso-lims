@@ -1413,7 +1413,7 @@ Sample.hot = {
   canSampleClassPropagateLibraries: function (sampleClassAlias) {
     var libraryable = Hot.sampleOptions.sampleClassesDtos.filter(function (sc) { return sc.sampleCategory == 'Aliquot' && sc.alias != 'whole RNA (aliquot)'; });
     var canPropagate = libraryable.filter(function (sc) { return sc.alias == sampleClassAlias; });
-    return canPropagate.size == 1;
+    return canPropagate.length == 1;
   },
   
   /**
