@@ -130,13 +130,13 @@
       scm:git:ssh://www.github.com/TGAC/miso-lims
     </developerConnection>
     <url>
-      https://www.github.com/TGAC/miso-lims
+      http://www.github.com/TGAC/miso-lims
     </url>
   </scm>
 
   <!-- Maven repository deploy -->
   <distributionManagement>
-    <downloadUrl>https://repos.tgac.ac.uk/maven/repo</downloadUrl>
+    <downloadUrl>http://repos.tgac.ac.uk/maven/repo</downloadUrl>
     <repository>
       <id>miso-releases</id>
       <name>MISO repository</name>
@@ -160,7 +160,7 @@
     <repository>
       <id>tgac-repo</id>
       <name>TGAC Maven Repository</name>
-      <url>https://repos.tgac.ac.uk/maven/repo</url>
+      <url>http://repos.tgac.ac.uk/maven/repo</url>
       <releases>
         <enabled>true</enabled>
         <updatePolicy>always</updatePolicy>
@@ -174,7 +174,7 @@
     <repository>
       <id>tgac-snapshots-repo</id>
       <name>TGAC Maven Snapshots Repository</name>
-      <url>https://repos.tgac.ac.uk/maven/miso/snapshots</url>
+      <url>http://repos.tgac.ac.uk/maven/miso/snapshots</url>
       <releases>
         <enabled>false</enabled>
         <updatePolicy>always</updatePolicy>
@@ -188,7 +188,7 @@
     <repository>
       <id>tgac-releases-repo</id>
       <name>TGAC Maven Releases Repository</name>
-      <url>https://repos.tgac.ac.uk/maven/miso/releases</url>
+      <url>http://repos.tgac.ac.uk/maven/miso/releases</url>
       <releases>
         <enabled>true</enabled>
         <updatePolicy>always</updatePolicy>
@@ -239,7 +239,7 @@
     <repository>
       <id>fluxion-snapshots-repo</id>
       <name>TGAC Fluxion Snapshots Repository</name>
-      <url>https://repos.tgac.ac.uk/maven/fluxion/snapshots</url>
+      <url>http://repos.tgac.ac.uk/maven/fluxion/snapshots</url>
       <releases>
         <enabled>false</enabled>
         <updatePolicy>always</updatePolicy>
@@ -253,7 +253,7 @@
     <repository>
       <id>fluxion-releases-repo</id>
       <name>TGAC Fluxion Releases Repository</name>
-      <url>https://repos.tgac.ac.uk/maven/fluxion/releases</url>
+      <url>http://repos.tgac.ac.uk/maven/fluxion/releases</url>
       <releases>
         <enabled>true</enabled>
         <updatePolicy>always</updatePolicy>
@@ -275,7 +275,7 @@
     <pluginRepository>
       <id>miso-releases</id>
       <name>MISO repository</name>
-      <url>https://repos.tgac.ac.uk/maven/miso/releases</url>
+      <url>http://repos.tgac.ac.uk/maven/miso/releases</url>
       <releases>
         <enabled>true</enabled>
         <updatePolicy>always</updatePolicy>
@@ -285,7 +285,7 @@
     <pluginRepository>
       <id>miso-snapshots</id>
       <name>MISO snapshot repository</name>
-      <url>https://repos.tgac.ac.uk/maven/miso/snapshots</url>
+      <url>http://repos.tgac.ac.uk/maven/miso/snapshots</url>
       <snapshots>
         <enabled>true</enabled>
         <updatePolicy>always</updatePolicy>
