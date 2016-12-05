@@ -28,9 +28,9 @@ import java.util.Collection;
 import java.util.List;
 
 import org.hibernate.Criteria;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -179,8 +179,8 @@ public class HibernateAlertDao implements AlertStore {
 
   @Override
   public int count() throws IOException {
-    Query query = currentSession().createQuery("select count(*) from DefaultAlert");
-    return ((Long) query.uniqueResult()).intValue();
+    long c = (Long) currentSession().createCriteria(DefaultAlert.class).setProjection(Projections.rowCount()).uniqueResult();
+    return (int) c;
   }
 
   @Override
