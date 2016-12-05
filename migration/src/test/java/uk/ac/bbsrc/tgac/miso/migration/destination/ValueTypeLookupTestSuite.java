@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.migration.destination;
 
+import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
@@ -10,6 +11,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import com.google.common.collect.Lists;
+
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
@@ -18,6 +21,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Institute;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
+import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
@@ -28,6 +32,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstituteImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SamplePurposeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
@@ -51,6 +56,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSubprojectDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueMaterialDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueOriginDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueTypeDao;
+import uk.ac.bbsrc.tgac.miso.service.impl.DefaultReferenceGenomeService;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLKitDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryQCDAO;
@@ -180,6 +186,12 @@ public class ValueTypeLookupTestSuite {
     Mockito.when(subProjDao.getSubproject()).thenReturn(subprojs);
     Mockito.when(mgr.getSubprojectDao()).thenReturn(subProjDao);
     
+    DefaultReferenceGenomeService referenceGenomeService = Mockito.mock(DefaultReferenceGenomeService.class);
+    List<ReferenceGenome> referenceGenomes = Lists.newArrayList();
+    referenceGenomes.add(makeReferenceGenome(VALID_LONG, VALID_STRING));
+    Mockito.when(referenceGenomeService.listAllReferenceGenomeTypes()).thenReturn(referenceGenomes);
+    Mockito.when(mgr.getReferenceGenomeService()).thenReturn(referenceGenomeService);
+
     sut = new ValueTypeLookup(mgr);
   }
 
@@ -512,4 +524,20 @@ public class ValueTypeLookupTestSuite {
     return sp;
   }
   
+  @Test
+  public void testResolveReferenceGenome() throws Exception {
+    assertThat("ref with valid alias", sut.resolve(makeReferenceGenome(VALID_LONG, VALID_STRING)), is(notNullValue()));
+    assertThat("ref with valid alias", sut.resolve(makeReferenceGenome(null, VALID_STRING)), is(notNullValue()));
+    assertThat("ref with valid alias", sut.resolve(makeReferenceGenome(INVALID_LONG, VALID_STRING)), is(notNullValue()));
+    assertThat("ref with non-existent alias", sut.resolve(makeReferenceGenome(null, INVALID_STRING)), is(nullValue()));
+    assertThat("ref with null alias", sut.resolve(makeReferenceGenome(null, null)), is(nullValue()));
+  }
+
+  private ReferenceGenome makeReferenceGenome(Long id, String alias) {
+    ReferenceGenome referenceGenome = new ReferenceGenomeImpl();
+    referenceGenome.setId(id);
+    referenceGenome.setAlias(alias);
+    return referenceGenome;
+  }
+
 }

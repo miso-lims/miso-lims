@@ -44,6 +44,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLabDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryAdditionalInfoDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDesignCodeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDesignDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateReferenceGenomeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleNumberPerProjectDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSamplePurposeDao;
@@ -54,6 +55,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueMaterialDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueOriginDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueTypeDao;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultLabService;
+import uk.ac.bbsrc.tgac.miso.service.impl.DefaultReferenceGenomeService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSampleClassService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSampleNumberPerProjectService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSampleService;
@@ -132,6 +134,7 @@ public class MisoServiceManager {
   private DefaultLabService labService;
   private DefaultSampleNumberPerProjectService sampleNumberPerProjectService;
   private DefaultSampleValidRelationshipService sampleValidRelationshipService;
+  private DefaultReferenceGenomeService referenceGenomeService;
 
   private HibernateSampleClassDao sampleClassDao;
   private HibernateSampleDao sampleDao;
@@ -150,6 +153,7 @@ public class MisoServiceManager {
   private HibernateLibraryDesignCodeDao libraryDesignCodeDao;
   private HibernateIndexDao indexDao;
   private HibernateSequencingParametersDao sequencingParametersDao;
+  private HibernateReferenceGenomeDao referenceGenomeDao;
 
   /**
    * Constructs a new MisoServiceManager with no services initialized
@@ -189,6 +193,8 @@ public class MisoServiceManager {
     m.setDefaultPartitionDao();
     m.setDefaultPlatformDao();
     m.setDefaultPoolDao();
+    m.setDefaultReferenceGenomeDao();
+    m.setDefaultReferenceGenomeService();
     m.setDefaultProjectDao();
     m.setDefaultDetailedQcStatusDao();
     m.setDefaultRunDao();
@@ -222,6 +228,7 @@ public class MisoServiceManager {
     m.setDefaultDaoLookup();
     m.setDefaultPoolQcDao();
     m.setDefaultSequencingParametersDao();
+
 
     User migrationUser = m.getsecurityStore().getUserByLoginName(username);
     if (migrationUser == null) throw new IllegalArgumentException("User '" + username + "' not found");
@@ -287,6 +294,7 @@ public class MisoServiceManager {
     if (labService != null) labService.setAuthorizationManager(authorizationManager);
     if (sampleNumberPerProjectService != null) sampleNumberPerProjectService.setAuthorizationManager(authorizationManager);
     if (sampleValidRelationshipService != null) sampleValidRelationshipService.setAuthorizationManager(authorizationManager);
+    if (referenceGenomeService != null) referenceGenomeService.setAuthorizationManager(authorizationManager);
   }
 
   public SQLSecurityDAO getsecurityStore() {
@@ -414,6 +422,7 @@ public class MisoServiceManager {
     dao.setNamingScheme(getNameableNamingScheme(Project.class));
     dao.setWatcherDAO(watcherDao);
     dao.setDataObjectFactory(dataObjectFactory);
+    dao.setReferenceGenomeDao(referenceGenomeDao);
     setProjectDao(dao);
   }
 
@@ -1261,6 +1270,41 @@ public class MisoServiceManager {
     if (sampleService != null) sampleService.setSampleValidRelationshipService(sampleValidRelationshipService);
   }
 
+  public DefaultReferenceGenomeService getReferenceGenomeService() {
+    return referenceGenomeService;
+  }
+
+  private void setReferenceGenomeService(DefaultReferenceGenomeService referenceGenomeService) {
+    this.referenceGenomeService = referenceGenomeService;
+  }
+
+  public void setDefaultReferenceGenomeService() {
+    DefaultReferenceGenomeService svc = new DefaultReferenceGenomeService();
+    svc.setAuthorizationManager(authorizationManager);
+    svc.setReferenceGenomeDao(referenceGenomeDao);
+    setReferenceGenomeService(svc);
+  }
+
+  public HibernateReferenceGenomeDao getReferenceGenomeDao() {
+    return referenceGenomeDao;
+  }
+
+  public void setReferenceGenomeDao(HibernateReferenceGenomeDao referenceGenomeDao) {
+    this.referenceGenomeDao = referenceGenomeDao;
+    updateReferenceGenomeDaoDependencies();
+  }
+
+  public void setDefaultReferenceGenomeDao() {
+    HibernateReferenceGenomeDao dao = new HibernateReferenceGenomeDao();
+    dao.setSessionFactory(sessionFactory);
+    setReferenceGenomeDao(dao);
+  }
+
+  private void updateReferenceGenomeDaoDependencies() {
+    if (projectDao != null) projectDao.setReferenceGenomeDao(referenceGenomeDao);
+    if (referenceGenomeService != null) referenceGenomeService.setReferenceGenomeDao(referenceGenomeDao);
+  }
+
   public HibernateSampleValidRelationshipDao getSampleValidRelationshipDao() {
     return sampleValidRelationshipDao;
   }
@@ -1419,6 +1463,8 @@ public class MisoServiceManager {
     this.sequencingParametersDao = sequencingParametersDao;
     updateSequencingParametersDaoDependencies();
   }
+
+
 
   private void updateSequencingParametersDaoDependencies() {
     if (runDao != null) runDao.setSequencingParametersDao(sequencingParametersDao);

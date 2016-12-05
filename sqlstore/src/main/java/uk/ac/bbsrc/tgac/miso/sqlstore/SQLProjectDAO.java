@@ -213,6 +213,10 @@ public class SQLProjectDAO implements ProjectStore {
   @Autowired
   private ReferenceGenomeDao referenceGenomeDao;
 
+  public void setReferenceGenomeDao(ReferenceGenomeDao referenceGenomeDao) {
+    this.referenceGenomeDao = referenceGenomeDao;
+  }
+
   @CoverageIgnore
   public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
     this.dataObjectFactory = dataObjectFactory;
@@ -311,7 +315,7 @@ public class SQLProjectDAO implements ProjectStore {
     params.addValue("creationDate", project.getCreationDate());
     params.addValue("securityProfile_profileId", securityProfileId);
     params.addValue("progress", project.getProgress().getKey());
-    params.addValue("referenceGenomeId", project.getReferenceGenomeId());
+    params.addValue("referenceGenomeId", project.getReferenceGenome().getId());
 
     if (project.getId() == AbstractProject.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(TABLE_NAME).usingGeneratedKeyColumns("projectId");
@@ -587,7 +591,7 @@ public class SQLProjectDAO implements ProjectStore {
         project.setCreationDate(rs.getDate("creationDate"));
         project.setProgress(ProgressType.get(rs.getString("progress")));
         project.setLastUpdated(rs.getTimestamp("lastUpdated"));
-        project.setReferenceGenomeId(rs.getLong("referenceGenomeId"));
+        project.setReferenceGenome(referenceGenomeDao.getReferenceGenome(rs.getLong("referenceGenomeId")));
 
         try {
           project.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));

@@ -156,6 +156,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
     log.info("Migrating projects...");
     for (Project project : projects) {
       project.setSecurityProfile(new SecurityProfile(migrationUser));
+      valueTypeLookup.resolveAll(project);
       // Make sure there's a study
       if (project.getStudies() == null) project.setStudies(new HashSet<Study>());
       if (project.getStudies().isEmpty()) {
@@ -278,7 +279,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
     subproject.setParentProject(project);
     subproject.setDescription(subproject.getAlias());
     subproject.setPriority(Boolean.FALSE);
-    subproject.setReferenceGenomeId(project.getReferenceGenomeId());
+    subproject.setReferenceGenomeId(project.getReferenceGenome().getId());
     subproject.setCreatedBy(migrationUser);
     subproject.setCreationDate(timeStamp);
     subproject.setUpdatedBy(migrationUser);

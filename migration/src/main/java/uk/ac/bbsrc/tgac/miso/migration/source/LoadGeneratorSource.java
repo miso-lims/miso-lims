@@ -19,6 +19,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.LibraryAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
@@ -39,6 +40,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PlatformImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
@@ -168,7 +170,7 @@ public class LoadGeneratorSource implements MigrationSource {
         project.setProgress(ProgressType.ACTIVE);
         project.setCreationDate(now);
         project.setLastUpdated(now);
-        project.setReferenceGenomeId(1L);
+        project.setReferenceGenome(createReferenceGenome());
         projects.add(project);
       }
       this.projects = projects;
@@ -497,6 +499,12 @@ public class LoadGeneratorSource implements MigrationSource {
     containers.add(container);
     run.setSequencerPartitionContainers(containers);
     return run;
+  }
+
+  private ReferenceGenome createReferenceGenome() {
+    ReferenceGenome referenceGenome = new ReferenceGenomeImpl();
+    referenceGenome.setAlias("Human hg19");
+    return referenceGenome;
   }
 
   @Override

@@ -31,8 +31,10 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
@@ -46,6 +48,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.core.store.StudyStore;
 import uk.ac.bbsrc.tgac.miso.core.store.WatcherStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.persistence.ReferenceGenomeDao;
 
 /**
  * @author Chris Salt
@@ -95,6 +98,9 @@ public class SQLProjectDAOTest extends AbstractDAOTest {
   @Mock
   private LibraryStore libraryDAO;
 
+  @Mock
+  private ReferenceGenomeDao referenceGenomeDao;
+
   @InjectMocks
   private SQLProjectDAO projectDAO;
 
@@ -119,9 +125,14 @@ public class SQLProjectDAOTest extends AbstractDAOTest {
     when(mockAuthentication.getName()).thenReturn("some name");
     SecurityContextHolder.setContext(mockContext);
     when(securityProfileDAO.save(any(SecurityProfile.class))).thenReturn(1L);
+    
+    projectDAO.setReferenceGenomeDao(referenceGenomeDao);
 
     project.setProgress(ProgressType.ACTIVE);
-    project.setReferenceGenomeId(1L);
+    ReferenceGenome referenceGenome = new ReferenceGenomeImpl();
+    referenceGenome.setId(1L);
+    referenceGenome.setAlias("hg19");
+    project.setReferenceGenome(referenceGenome);
 
   }
 
