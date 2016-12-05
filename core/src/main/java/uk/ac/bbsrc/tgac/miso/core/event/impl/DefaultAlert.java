@@ -34,7 +34,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import com.eaglegenomics.simlims.core.User;
@@ -71,7 +71,7 @@ public class DefaultAlert implements Alert, Serializable {
   @Column(name = "text", nullable = false)
   private String alertText;
 
-  @OneToOne(targetEntity = UserImpl.class)
+  @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "userId", nullable = false)
   private User user;
 

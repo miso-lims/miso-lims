@@ -46,7 +46,6 @@ import uk.ac.bbsrc.tgac.miso.core.event.Alert;
 import uk.ac.bbsrc.tgac.miso.core.event.impl.DefaultAlert;
 import uk.ac.bbsrc.tgac.miso.core.event.type.AlertLevel;
 import uk.ac.bbsrc.tgac.miso.core.store.AlertStore;
-import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 
 /**
  * uk.ac.bbsrc.tgac.miso.hibernate.persistence.impl
@@ -71,17 +70,14 @@ public class HibernateAlertDao implements AlertStore {
   @Autowired
   private CacheManager cacheManager;
 
-  @CoverageIgnore
   public SecurityStore getSecurityDao() {
     return securityDao;
   }
 
-  @CoverageIgnore
   public void setSecurityStore(SecurityStore securityStore) {
     this.securityDao = securityStore;
   }
 
-  @CoverageIgnore
   public SessionFactory getSessionFactory() {
     return sessionFactory;
   }
@@ -90,27 +86,22 @@ public class HibernateAlertDao implements AlertStore {
     return getSessionFactory().getCurrentSession();
   }
 
-  @CoverageIgnore
   public void setSessionFactory(SessionFactory sessionFactory) {
     this.sessionFactory = sessionFactory;
   }
 
-  @CoverageIgnore
   public JdbcTemplate getJdbcTemplate() {
     return template;
   }
 
-  @CoverageIgnore
   public void setJdbcTemplate(JdbcTemplate template) {
     this.template = template;
   }
 
-  @CoverageIgnore
   public CacheManager getCacheManager() {
     return cacheManager;
   }
 
-  @CoverageIgnore
   public void setCacheManager(CacheManager cacheManager) {
     this.cacheManager = cacheManager;
   }
