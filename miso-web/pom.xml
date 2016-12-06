@@ -236,9 +236,8 @@
 
   <dependencies>
     <dependency>
-      <groupId>${project.parent.groupId}</groupId>
+      <groupId>uk.ac.bbsrc.tgac.miso</groupId>
       <artifactId>spring</artifactId>
-      <version>${project.parent.version}</version>
       <exclusions>
         <exclusion>
           <groupId>stax</groupId>
@@ -247,14 +246,12 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>${project.parent.groupId}</groupId>
+      <groupId>uk.ac.bbsrc.tgac.miso</groupId>
       <artifactId>integration-tools</artifactId>
-      <version>${project.parent.version}</version>
     </dependency>
     <dependency>
-      <groupId>${project.parent.groupId}</groupId>
+      <groupId>uk.ac.bbsrc.tgac.miso</groupId>
       <artifactId>runstats-client</artifactId>
-      <version>${project.parent.version}</version>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
@@ -320,17 +317,14 @@
     <dependency>
       <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
       <artifactId>oauth-signature</artifactId>
-      <version>1.19</version>
     </dependency>
     <dependency>
       <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
       <artifactId>oauth-client</artifactId>
-      <version>1.19</version>
     </dependency>
     <dependency>
       <groupId>com.sun.jersey.contribs</groupId>
       <artifactId>jersey-apache-client</artifactId>
-      <version>1.19</version>
     </dependency>
     <dependency>
       <groupId>uk.ac.bbsrc.tgac.miso</groupId>
@@ -343,12 +337,10 @@
     <dependency>
       <groupId>io.prometheus</groupId>
       <artifactId>simpleclient</artifactId>
-      <version>0.0.15</version>
     </dependency>
     <dependency>
       <groupId>io.prometheus</groupId>
       <artifactId>simpleclient_hotspot</artifactId>
-      <version>0.0.15</version>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
@@ -361,7 +353,6 @@
     <dependency>
       <groupId>aopalliance</groupId>
       <artifactId>aopalliance</artifactId>
-      <version>1.0</version>
     </dependency>
     <dependency>
       <groupId>org.codehaus.jackson</groupId>
@@ -370,7 +361,6 @@
     <dependency>
       <groupId>com.sun.jersey</groupId>
       <artifactId>jersey-client</artifactId>
-      <version>1.19</version>
     </dependency>
     <dependency>
       <groupId>org.hibernate</groupId>
@@ -391,7 +381,6 @@
     <dependency>
       <groupId>javax.ws.rs</groupId>
       <artifactId>jsr311-api</artifactId>
-      <version>1.1.1</version>
     </dependency>
     <dependency>
       <groupId>uk.ac.bbsrc.tgac.miso</groupId>
@@ -430,7 +419,6 @@
     <dependency>
       <groupId>commons-httpclient</groupId>
       <artifactId>commons-httpclient</artifactId>
-      <version>3.1</version>
     </dependency>
   </dependencies>
 </project>
