@@ -237,6 +237,7 @@ and populate it with the following information:</p>
   username="tgaclims"
   password="tgaclims"/&gt;
   &lt;Parameter name="miso.propertiesFile" value="file:${CATALINA_HOME}/conf/Catalina/localhost/miso.properties" override="false"/&gt;
+  &lt;Parameter name="miso.name" value="Test"/&gt;
 &lt;/Context&gt;
 </code></pre>
 
@@ -244,6 +245,9 @@ and populate it with the following information:</p>
 
 <pre><code>url="jdbc:mysql://your.database.server:3306/lims"
 </code></pre>
+
+<p>Also, set the <code>miso.name</code> parameter to something to help distinguish testing<br />
+and production copies of MISO.</p>
 
 <p>If your Tomcat install has the <code>autoDeploy="true"</code> flag set in <code>server.xml</code>, if<br />
 you delete the <code>webapps/ROOT</code> directory and the <code>ROOT.war</code> file, Tomcat will<br />
@@ -330,19 +334,287 @@ The default configuration should work properly.</p>
 <p>For using LDAP, set the security method to <code>ldap</code>. Additional settings are<br />
 needed for LDAP in the <code>security.properties</code>. Talk to your LDAP administrator.</p>
 
+<p>To use Active Directory, a specific kind of LDAP, set the security method to<br />
+<code>ad</code>. Three additional settings are needed for Active Directory in the <br />
+<code>security.properties</code> file.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Property</th>
+      <th>Purpose</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>security.ad.emailDomain</code></td>
+      <td>Domain added to username for lookup (e.g. ad.oicr.on.ca)</td>
+    </tr>
+    <tr>
+      <td><code>security.ad.url</code></td>
+      <td>Url for Active Directory server (e.g. ldap://ad.oicr.on.ca)</td>
+    </tr>
+    <tr>
+      <td><code>security.ad.stripRolePrefix</code></td>
+      <td>Prefix to be removed from group (e.g. MISO_)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>The search for a user is done against <code>userPrincipalName</code> which takes the form of<br />
+an email address. To login the user will type their username and to do the lookup<br />
+their username will be added to the domain specified in the property<br />
+<code>security.ad.emailDomain</code>.</p>
+
+<p>Use the <code>security.ad.url</code> property to indicate the url for the Active Directory.<br />
+Some valid examples are: <code>ad.oicr.on.ca</code>, <code>ldap://ad.oicr.on.ca:389</code> and<br />
+<code>ldaps://ad.oicr.on.ca:636</code>.</p>
+
+<p>The groups used by MISO are <code>ROLE_INTERNAL</code> for regular users, <code>ROLE_EXTERNAL</code> for<br />
+external collaborators and <code>ROLE_ADMIN</code> for administrators. If you find these names<br />
+too general you may wish to add a prefix before adding these groups to your Active<br />
+Directory. For example <code>MISO_ROLE_INTERNAL</code> gives a clearer indication as to what <br />
+the group is used for. In this case you will need to set the property<br />
+<code>security.ad.stripRolePrefix</code> to the value <code>MISO_</code> to allow MISO to ignore the<br />
+prefix.</p>
+
 <p>If using JDBC, once running, you should change the passwords of the <code>admin</code> and<br />
 <code>notification</code> accounts.</p>
 
 <h2 id="naming-schemes">Naming Schemes</h2>
 <p>MISO Naming Schemes are used to validate and generate entity String fields. They are<br />
-used for all <code>name</code> fields, and some <code>alias</code> fields. There are configuration options<br />
-for three naming schemes in <code>miso.properties</code>:</p>
+used for all <code>name</code> fields, and some <code>alias</code> fields. You may configure a base naming<br />
+scheme, and customize it by switching validators and generators in <code>miso.properties</code>.</p>
 
-<ul>
-  <li><code>miso.naming.scheme.sample</code></li>
-  <li><code>miso.naming.scheme.library</code></li>
-  <li><code>miso.naming.scheme.nameable</code> (used for anything not covered above)</li>
-</ul>
+<p>The options for <code>miso.naming.scheme</code> are <code>default</code> and <code>oicr</code>, which have these<br />
+default configurations:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th> </th>
+      <th>default</th>
+      <th>oicr</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Name generator</td>
+      <td>DefaultNameGenerator</td>
+      <td>DefaultNameGenerator</td>
+    </tr>
+    <tr>
+      <td>Name Validator</td>
+      <td>DefaultNameValidator</td>
+      <td>DefaultNameValidator</td>
+    </tr>
+    <tr>
+      <td>Sample Alias Generator</td>
+      <td>none</td>
+      <td>OicrSampleAliasGenerator</td>
+    </tr>
+    <tr>
+      <td>Sample Alias Validator</td>
+      <td>DefaultSampleAliasValidator</td>
+      <td>OicrSampleAliasValidator</td>
+    </tr>
+    <tr>
+      <td>Library Alias Generator</td>
+      <td>DefaultLibraryAliasGenerator</td>
+      <td>none</td>
+    </tr>
+    <tr>
+      <td>Library Alias Validator</td>
+      <td>DefaultLibraryAliasValidator</td>
+      <td>oicrLibraryAliasValidator</td>
+    </tr>
+    <tr>
+      <td>Configurable components</td>
+      <td>all</td>
+      <td>none</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>If the naming scheme you’ve selected has configurable components, you may configure them<br />
+as follows.</p>
+
+<p><code>miso.naming.generator.nameable.name</code></p>
+
+<table>
+  <tbody>
+    <tr>
+      <td>Option</td>
+      <td>Example</td>
+    </tr>
+    <tr>
+      <td>default</td>
+      <td>SAM1</td>
+    </tr>
+    <tr>
+      <td>classname</td>
+      <td>SampleImpl1</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><code>miso.naming.generator.sample.alias</code></p>
+
+<table>
+  <tbody>
+    <tr>
+      <td>Option</td>
+      <td>Example</td>
+      <td>Note</td>
+    </tr>
+    <tr>
+      <td>oicr</td>
+      <td>PROJ_0001_Ad_P_nn_1-1</td>
+      <td>for use with DetailedSample only</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><code>miso.naming.generator.library.alias</code></p>
+
+<table>
+  <tbody>
+    <tr>
+      <td>Option</td>
+      <td>Example</td>
+      <td>Note</td>
+    </tr>
+    <tr>
+      <td>default</td>
+      <td>XX_LYY-1</td>
+      <td>XX and YY taken from sample alias - depends on sample alias passing default validator with default regex</td>
+    </tr>
+    <tr>
+      <td>oicr</td>
+      <td>PROJ_0001_Ad_P_PE_300_WG</td>
+      <td>for use with DetailedSample only. depends on sample alias passing oicr validator</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><code>miso.naming.validator.nameable.name</code></p>
+
+<table>
+  <tbody>
+    <tr>
+      <td>Option</td>
+      <td>Detail</td>
+      <td>Allow null</td>
+      <td>Allow duplicates</td>
+      <td>Custom Regex</td>
+      <td>Custom Duplication</td>
+    </tr>
+    <tr>
+      <td>default</td>
+      <td>Matches ‘default’ generator, or custom regex</td>
+      <td>no</td>
+      <td>no</td>
+      <td>yes</td>
+      <td>yes</td>
+    </tr>
+    <tr>
+      <td>allowany</td>
+      <td>Only checks that the name is not null</td>
+      <td>no</td>
+      <td>no</td>
+      <td>no</td>
+      <td>no</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><code>miso.naming.validator.sample.alias</code></p>
+
+<table>
+  <tbody>
+    <tr>
+      <td>Option</td>
+      <td>Detail</td>
+      <td>Allow null</td>
+      <td>Allow duplicates</td>
+      <td>Custom Regex</td>
+      <td>Custom Duplication</td>
+    </tr>
+    <tr>
+      <td>default</td>
+      <td>Default regex: <code>([A-z0-9]+)_S([A-z0-9]+)_(.*)</code></td>
+      <td>no</td>
+      <td>no</td>
+      <td>yes</td>
+      <td>no</td>
+    </tr>
+    <tr>
+      <td>allowany</td>
+      <td>Only checks that the alias is not null</td>
+      <td>no</td>
+      <td>no</td>
+      <td>no</td>
+      <td>no</td>
+    </tr>
+    <tr>
+      <td>oicr</td>
+      <td>Matches ‘oicr’ generator</td>
+      <td>no</td>
+      <td>no</td>
+      <td>no</td>
+      <td>no</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><code>miso.naming.validator.library.alias</code></p>
+
+<table>
+  <tbody>
+    <tr>
+      <td>Option</td>
+      <td>Detail</td>
+      <td>Allow null</td>
+      <td>Allow duplicates</td>
+      <td>Custom Regex</td>
+      <td>Custom Duplication</td>
+    </tr>
+    <tr>
+      <td>default</td>
+      <td>Matches ‘default’ generator</td>
+      <td>no</td>
+      <td>no</td>
+      <td>yes</td>
+      <td>no</td>
+    </tr>
+    <tr>
+      <td>allowany</td>
+      <td>Only checks that the alias is not null</td>
+      <td>no</td>
+      <td>no</td>
+      <td>no</td>
+      <td>no</td>
+    </tr>
+    <tr>
+      <td>oicr</td>
+      <td>Matches ‘oicr’ generator</td>
+      <td>no</td>
+      <td>no</td>
+      <td>no</td>
+      <td>no</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>If a validator accepts custom regex, it can be configured via <code>&lt;base property&gt;.regex</code>.<br />
+e.g. <code>miso.naming.validator.nameable.name.regex:.*</code> to allow any name. A custom validator<br />
+must be specified for this property to be enabled - the naming scheme’s default validator<br />
+will not be altered.</p>
+
+<p>If a validator accepts custom duplication, that can be configured via<br />
+<code>&lt;base property&gt;.duplicates</code>. e.g. <code>miso.naming.validator.library.alias.duplicates:true</code><br />
+to allow duplicate library aliases. A custom validator must be specified for this<br />
+property to be enabled - the naming scheme’s default validator will not be altered.</p>
 
 <p>Existing naming schemes:</p>
 
@@ -471,6 +743,30 @@ rm -f lib/sqlstore-*.jar
 unzip -xjo $CATALINA_HOME/webapps/ROOT.war 'WEB-INF/lib/sqlstore-*.jar' -d lib
 ./flyway -user=$MISO_DB_USER -password=$MISO_DB_PASS -url=$MISO_DB_URL -outOfOrder=true -locations=classpath:db/migration migrate
 </code></pre>
+
+<h1 id="building-the-docker-image">Building the Docker image</h1>
+
+<p>Pull the tag or snapshot that you want to build and package it:</p>
+
+<pre><code>export version="0.2.35-SNAPSHOT"
+git checkout "tags/${version}"
+mvn -P external clean install package 
+docker build -t "misolims/miso-lims:${version}" --build-arg version="${version}" --no-cache .
+</code></pre>
+
+<p>Once the build completes, test it by launching it:</p>
+
+<pre><code>docker run -p 8090:8080 --name "miso${version}" -t "misolims/miso-lims:${version}"
+</code></pre>
+
+<p>Navigate to http://localhost:8090 and login with the credentials admin:admin.</p>
+
+<p>Once satisfied, push the image to Docker Hub. Note that only members of the <a href="https://hub.docker.com/u/misolims/">misolims</a> organisation can push:</p>
+
+<pre><code>docker login
+docker push "misolims/miso-lims:${version}"
+</code></pre>
+
 
 
                     </div>
