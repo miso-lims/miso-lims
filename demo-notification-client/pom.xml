@@ -45,16 +45,6 @@
       <artifactId>core</artifactId>
       <version>${project.parent.version}</version>
     </dependency>
-    <dependency>
-      <groupId>${project.parent.groupId}</groupId>
-      <artifactId>run-tools</artifactId>
-      <version>${project.parent.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.parent.groupId}</groupId>
-      <artifactId>notification-consumer-services</artifactId>
-      <version>${project.parent.version}</version>
-    </dependency>
 
     <dependency>
       <groupId>org.springframework</groupId>
@@ -88,13 +78,14 @@
 	</dependency>
     
     <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
+      <groupId>net.sf.json-lib</groupId>
+      <artifactId>json-lib</artifactId>
+        <classifier>jdk15</classifier>
     </dependency>
 
     <dependency>
       <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
+      <artifactId>slf4j-api</artifactId>
     </dependency>
   </dependencies>
 
