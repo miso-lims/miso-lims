@@ -896,9 +896,19 @@
     <pluginManagement>
       <plugins>
         <plugin>
+          <groupId>com.jolira</groupId>
+          <artifactId>onejar-maven-plugin</artifactId>
+          <version>1.4.4</version>
+        </plugin>
+        <plugin>
+          <groupId>com.samaxes.maven</groupId>
+          <artifactId>minify-maven-plugin</artifactId>
+          <version>1.7.4</version>
+        </plugin>
+        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-site-plugin</artifactId>
-          <version>2.1.1</version>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <version>2.5.5</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -912,24 +922,9 @@
           </configuration>
         </plugin>
         <plugin>
-          <groupId>org.mortbay.jetty</groupId>
-          <artifactId>jetty-maven-plugin</artifactId>
-          <version>7.2.0.v20101020</version>
-        </plugin>
-        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-assembly-plugin</artifactId>
-          <version>2.5.5</version>
-        </plugin>
-        <plugin>
-          <groupId>com.samaxes.maven</groupId>
-          <artifactId>minify-maven-plugin</artifactId>
-          <version>1.7.4</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-war-plugin</artifactId>
-          <version>2.3</version>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <version>2.8</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -937,9 +932,9 @@
           <version>2.4</version>
         </plugin>
         <plugin>
-          <groupId>com.jolira</groupId>
-          <artifactId>onejar-maven-plugin</artifactId>
-          <version>1.4.4</version>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-site-plugin</artifactId>
+          <version>2.1.1</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -948,8 +943,13 @@
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-dependency-plugin</artifactId>
-          <version>2.8</version>
+          <artifactId>maven-war-plugin</artifactId>
+          <version>2.3</version>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.gmaven</groupId>
+          <artifactId>groovy-maven-plugin</artifactId>
+          <version>2.0</version>
         </plugin>
         <plugin>
           <groupId>org.flywaydb</groupId>
@@ -957,22 +957,13 @@
           <version>3.2.1</version>
         </plugin>
         <plugin>
-          <groupId>org.codehaus.gmaven</groupId>
-          <artifactId>groovy-maven-plugin</artifactId>
-          <version>2.0</version>
+          <groupId>org.mortbay.jetty</groupId>
+          <artifactId>jetty-maven-plugin</artifactId>
+          <version>7.2.0.v20101020</version>
         </plugin>
       </plugins>
     </pluginManagement>
     <plugins>
-      <plugin>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.5</version>
-        <configuration>
-          <includes>
-            <include>**/*Suite.java</include>
-          </includes>
-        </configuration>
-      </plugin>
       <!-- <plugin> <groupId>com.atlassian.maven.plugins</groupId> <artifactId>maven-clover2-plugin</artifactId>
         <version>3.1.2</version> <configuration> <licenseLocation>clover.license</licenseLocation>
         </configuration> </plugin> -->
@@ -982,6 +973,15 @@
         <version>2.9</version>
         <configuration>
           <stylesheetfile>${basedir}/src/main/javadoc/stylesheet.css</stylesheetfile>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.5</version>
+        <configuration>
+          <includes>
+            <include>**/*Suite.java</include>
+          </includes>
         </configuration>
       </plugin>
       <plugin>
