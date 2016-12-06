@@ -400,6 +400,7 @@
     <module>notification-server</module>
     <module>runstats-client</module>
     <module>notification-consumer-services</module>
+    <module>miso-external-web</module>
   </modules>
 
   <dependencyManagement>
@@ -440,6 +441,21 @@
         <version>${jackson.version}</version>
       </dependency>
 
+      <dependency>
+        <groupId>uk.ac.tgac.fluxion.ajax</groupId>
+        <artifactId>fluxion-ajax-3</artifactId>
+        <version>1.0</version>
+      </dependency>
+      <dependency>
+        <groupId>uk.ac.tgac.fluxion.ajax</groupId>
+        <artifactId>fluxion-ajax-js</artifactId>
+        <version>1.0</version>
+      </dependency>
+      <dependency>
+        <groupId>uk.ac.tgac.fluxion.ajax.beans</groupId>
+        <artifactId>fluxion-ajax-beans</artifactId>
+        <version>1.0</version>
+      </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-beans</artifactId>
@@ -493,6 +509,11 @@
       </dependency>
       <dependency>
         <groupId>org.springframework.security</groupId>
+        <artifactId>spring-security-taglibs</artifactId>
+        <version>${spring-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.security</groupId>
         <artifactId>spring-security-core</artifactId>
         <version>${spring-version}</version>
       </dependency>
@@ -508,6 +529,26 @@
       </dependency>
       <dependency>
         <groupId>org.springframework.integration</groupId>
+        <artifactId>spring-integration-http</artifactId>
+        <version>${spring-integration-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.integration</groupId>
+        <artifactId>spring-integration-xml</artifactId>
+        <version>${spring-integration-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.integration</groupId>
+        <artifactId>spring-integration-ip</artifactId>
+        <version>${spring-integration-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.security</groupId>
+        <artifactId>spring-security-web</artifactId>
+        <version>${spring-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.integration</groupId>
         <artifactId>spring-integration-file</artifactId>
         <version>${spring-integration-version}</version>
       </dependency>
@@ -516,6 +557,17 @@
         <artifactId>aspectjrt</artifactId>
         <version>1.6.12</version>
       </dependency>
+    <dependency>
+      <groupId>org.springframework.security.oauth</groupId>
+      <artifactId>spring-security-oauth</artifactId>
+      <version>1.0.0.RELEASE</version>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-codec</groupId>
+          <artifactId>commons-codec</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
 
       <dependency>
         <groupId>xml-apis</groupId>
@@ -569,6 +621,12 @@
         </exclusions>
       </dependency>
       <dependency>
+        <groupId>org.jdom</groupId>
+        <artifactId>jdom</artifactId>
+        <version>1.1</version>
+      </dependency>
+
+      <dependency>
         <groupId>net.sf.json-lib</groupId>
         <artifactId>json-lib</artifactId>
         <version>2.4</version>
@@ -601,6 +659,23 @@
         <scope>provided</scope>
       </dependency>
       <dependency>
+        <groupId>javax.servlet</groupId>
+        <artifactId>jstl</artifactId>
+        <version>1.2</version>
+      </dependency>
+      <dependency>
+        <groupId>javax.servlet</groupId>
+        <artifactId>jsp-api</artifactId>
+        <version>2.0</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>javassist</groupId>
+        <artifactId>javassist</artifactId>
+        <version>3.8.0.GA</version>
+      </dependency>
+
+      <dependency>
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpclient</artifactId>
         <version>4.5.2</version>
@@ -618,7 +693,7 @@
       <dependency>
         <groupId>commons-codec</groupId>
         <artifactId>commons-codec</artifactId>
-        <version>1.4</version>
+        <version>1.7</version>
       </dependency>
       <dependency>
         <groupId>commons-net</groupId>

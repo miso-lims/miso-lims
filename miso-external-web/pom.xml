@@ -6,11 +6,11 @@
   <parent>
     <artifactId>miso</artifactId>
     <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-    <version>0.2.1-SNAPSHOT</version>
+    <version>0.2.43-SNAPSHOT</version>
   </parent>
   <groupId>miso-external-web</groupId>
   <artifactId>miso-external-web</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>0.2.43-SNAPSHOT</version>
   <packaging>war</packaging>
   <name>miso-external-web</name>
 
@@ -61,22 +61,18 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-webmvc</artifactId>
-      <version>${spring-version}</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-taglibs</artifactId>
-      <version>${spring-security-version}</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-web</artifactId>
-      <version>${spring-security-version}</version>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-core</artifactId>
-      <version>${spring-version}</version>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
@@ -86,143 +82,109 @@
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-core</artifactId>
-      <version>${spring-security-version}</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-config</artifactId>
-      <version>${spring-security-version}</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-ldap</artifactId>
-      <version>${spring-security-version}</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.security.oauth</groupId>
       <artifactId>spring-security-oauth</artifactId>
-      <version>1.0.0.RELEASE</version>
-      <exclusions>
+      <!--<exclusions>
         <exclusion>
           <groupId>commons-codec</groupId>
           <artifactId>commons-codec</artifactId>
         </exclusion>
-      </exclusions>
+      </exclusions>-->
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-tx</artifactId>
-      <version>${spring-version}</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.integration</groupId>
       <artifactId>spring-integration-core</artifactId>
-      <version>${spring-integration-version}</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.integration</groupId>
       <artifactId>spring-integration-http</artifactId>
-      <version>${spring-integration-version}</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.integration</groupId>
       <artifactId>spring-integration-xml</artifactId>
-      <version>${spring-integration-version}</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.integration</groupId>
       <artifactId>spring-integration-ip</artifactId>
-      <version>${spring-integration-version}</version>
     </dependency>
 
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>3.8.1</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>uk.ac.tgac.fluxion.ajax</groupId>
       <artifactId>fluxion-ajax-3</artifactId>
-      <version>1.0</version>
     </dependency>
     <dependency>
       <groupId>uk.ac.tgac.fluxion.ajax</groupId>
       <artifactId>fluxion-ajax-js</artifactId>
-      <version>1.0</version>
     </dependency>
     <dependency>
       <groupId>uk.ac.tgac.fluxion.ajax.beans</groupId>
       <artifactId>fluxion-ajax-beans</artifactId>
-      <version>1.0</version>
     </dependency>
 
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>jstl</artifactId>
-      <version>${jstl-version}</version>
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>
-      <version>2.5</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>jsp-api</artifactId>
-      <version>2.0</version>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>javassist</groupId>
       <artifactId>javassist</artifactId>
-      <version>${javassist-version}</version>
     </dependency>
 
     <dependency>
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
-      <version>${log4j-version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.jdom</groupId>
       <artifactId>jdom</artifactId>
-      <version>${jdom-version}</version>
     </dependency>
 
     <dependency>
       <groupId>net.sf.json-lib</groupId>
       <artifactId>json-lib</artifactId>
-      <version>2.4</version>
       <classifier>jdk15</classifier>
     </dependency>
 
     <dependency>
       <groupId>commons-codec</groupId>
       <artifactId>commons-codec</artifactId>
-      <version>1.7</version>
     </dependency>
     <dependency>
       <groupId>commons-net</groupId>
       <artifactId>commons-net</artifactId>
-      <version>2.0</version>
     </dependency>
 
   </dependencies>
-
-  <properties>
-    <jdom-version>1.1</jdom-version>
-    <jstl-version>1.2</jstl-version>
-    <javassist-version>3.8.0.GA</javassist-version>
-    <log4j-version>1.2.16</log4j-version>
-    <slf4j-log4j-version>1.6.0</slf4j-log4j-version>
-    <jetty-version>6.1.7</jetty-version>
-    <spring-version>3.1.3.RELEASE</spring-version>
-    <spring-security-version>3.1.3.RELEASE</spring-security-version>
-    <spring-integration-version>2.2.0.RELEASE</spring-integration-version>
-  </properties>
 </project>
