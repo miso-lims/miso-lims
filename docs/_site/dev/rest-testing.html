@@ -116,18 +116,15 @@
 
 <p>During development a developer can set the constant <code>UNAUTHENTICATED_MODE</code> to <code>true</code> allowing REST resources to be accessed without authentication. This is useful for manual testing and exploration. This constant is found in the class <code>uk.ac.bbsrc.tgac.miso.webapp.context.RestSignatureHeaderFilter</code> and should only be set to <code>true</code> during development. A second constant, <code>UNAUTHENTICATED_MODE_USER</code>, found in the same class specifies which existing user resources will be associated with when created or modified in <code>UNAUTHENTICATED_MODE</code>.</p>
 
-<div class="highlighter-coderay"><div class="CodeRay">
-  <div class="code"><pre><span class="line-numbers"><a href="#n1" name="n1">1</a></span><span style="color:#088;font-weight:bold">public</span> <span style="color:#339;font-weight:bold">class</span> <span style="color:#B06;font-weight:bold">RestSignatureHeaderFilter</span> <span style="color:#088;font-weight:bold">extends</span> OncePerRequestFilter {
-<span class="line-numbers"><a href="#n2" name="n2">2</a></span>...
-<span class="line-numbers"><a href="#n3" name="n3">3</a></span>  <span style="color:#777">/** Used during development only. Set this to true to use REST resources without authentication. Good for manual testing/exploration. */</span>
-<span class="line-numbers"><a href="#n4" name="n4">4</a></span>  private <span style="color:#088;font-weight:bold">static</span> <span style="color:#339;font-weight:bold">boolean</span> UNAUTHENTICATED_MODE = <span style="color:#069">true</span>;
-<span class="line-numbers"><a href="#n5" name="n5">5</a></span>  <span style="color:#777">/** Resources created (POST) and modified (PUT) will be associated with this user in UNAUTHENTICATED_MODE. This user must exist. */</span>
-<span class="line-numbers"><a href="#n6" name="n6">6</a></span>  <span style="color:#088;font-weight:bold">private</span> <span style="color:#088;font-weight:bold">static</span> <span style="color:#0a8;font-weight:bold">String</span> UNAUTHENTICATED_MODE_USER = <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">admin</span><span style="color:#710">&quot;</span></span>;
-<span class="line-numbers"><a href="#n7" name="n7">7</a></span>...
-<span class="line-numbers"><a href="#n8" name="n8">8</a></span>}
-</pre></div>
-</div>
-</div>
+<pre><code class="language-java">public class RestSignatureHeaderFilter extends OncePerRequestFilter {
+...
+  /** Used during development only. Set this to true to use REST resources without authentication. Good for manual testing/exploration. */
+  private static boolean UNAUTHENTICATED_MODE = true;
+  /** Resources created (POST) and modified (PUT) will be associated with this user in UNAUTHENTICATED_MODE. This user must exist. */
+  private static String UNAUTHENTICATED_MODE_USER = "admin";
+...
+}
+</code></pre>
 
 <p>When <code>UNAUTHENTICATED_MODE</code> is set to <code>true</code> the following message will be displayed in the error log as a reminder that <code>UNAUTHENTICATED_MODE</code> is active<code>.</code></p>
 
