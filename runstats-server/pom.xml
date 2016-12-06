@@ -98,10 +98,11 @@
       <groupId>${project.parent.groupId}</groupId>
       <artifactId>run-tools</artifactId>
     </dependency>
+<dependency><groupId>uk.ac.bbsrc.tgac.miso</groupId><artifactId>core</artifactId></dependency>
+<dependency><groupId>org.springframework.integration</groupId><artifactId>spring-integration-file</artifactId></dependency>
+<dependency><groupId>org.slf4j</groupId><artifactId>slf4j-api</artifactId></dependency>
+<dependency><groupId>org.springframework</groupId><artifactId>spring-context</artifactId></dependency>
+<dependency><groupId>org.springframework.integration</groupId><artifactId>spring-integration-core</artifactId></dependency>
 
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-core</artifactId>
-    </dependency>
   </dependencies>
 </project>
