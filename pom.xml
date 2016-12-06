@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- ~ Copyright (c) 2010. The Genome Analysis Centre, Norwich, UK ~ MISO
-  project contacts: Robert Davey, Mario Caccamo @ TGAC ~ ~ **********************************************************************
+  project contacts: Robert Davey @ TGAC/EI, Morgan Taschuk @ OICR ~ ~ **********************************************************************
   ~ ~ This file is part of MISO. ~ ~ MISO is free software: you can redistribute
   it and/or modify ~ it under the terms of the GNU General Public License as
   published by ~ the Free Software Foundation, either version 3 of the License,
@@ -81,9 +81,22 @@
     <developer>
       <id>davey</id>
       <name>Rob Davey</name>
-      <email>robert.davey@tgac.ac.uk</email>
-      <organization>TGAC</organization>
-      <organizationUrl>http://www.tgac.ac.uk/bioinformatics/sequencing-informatics/</organizationUrl>
+      <email>robert.davey@earlham.ac.uk</email>
+      <organization>EI</organization>
+      <organizationUrl>http://www.earlham.ac.uk/davey-group</organizationUrl>
+      <roles>
+        <role>administrator</role>
+        <role>Developer</role>
+      </roles>
+      <timezone>0</timezone>
+    </developer>
+
+    <developer>
+      <id>frankie13</id>
+      <name>Christopher Salt</name>
+      <email>christopher.salt@earlham.ac.uk</email>
+      <organization>EI</organization>
+      <organizationUrl>http://www.earlham.ac.uk/davey-group</organizationUrl>
       <roles>
         <role>administrator</role>
         <role>Developer</role>
@@ -93,30 +106,67 @@
     </developer>
 
     <developer>
-      <id>bianx</id>
-      <name>Xingdong Bian</name>
-      <email>xingdong.bian@tgac.ac.uk</email>
-      <organization>TGAC</organization>
-      <organizationUrl>http://www.tgac.ac.uk/bioinformatics/sequence-informatics/core-bioinformatics/</organizationUrl>
+      <id>mtaschuk</id>
+      <name>Morgan Taschuk</name>
+      <email>morgan.taschuk@oicr.on.ca</email>
+      <organization>OICR</organization>
+      <organizationUrl>https://labs.oicr.on.ca/genome-sequence-informatics</organizationUrl>
       <roles>
-        <role>administrator</role>
-        <role>Developer</role>
+        <role>project contact</role>
       </roles>
-      <timezone>0</timezone>
+      <timezone>-5</timezone>
       <properties />
     </developer>
-
+    
     <developer>
-      <id>thankia</id>
-      <name>Anil Thanki</name>
-      <email>anil.thanki@tgac.ac.uk</email>
-      <organization>TGAC</organization>
-      <organizationUrl>http://www.tgac.ac.uk/bioinformatics/sequence-informatics/core-bioinformatics/</organizationUrl>
+      <id>tdebat</id>
+      <name>Tony Debat</name>
+      <email>tony.debat@oicr.on.ca</email>
+      <organization>OICR</organization>
+      <organizationUrl>https://labs.oicr.on.ca/genome-sequence-informatics</organizationUrl>
       <roles>
-        <role>administrator</role>
         <role>Developer</role>
       </roles>
-      <timezone>0</timezone>
+      <timezone>-5</timezone>
+      <properties />
+    </developer>
+    
+    <developer>
+      <id>amasella</id>
+      <name>Andre Masella</name>
+      <email>andre.masella@oicr.on.ca</email>
+      <organization>OICR</organization>
+      <organizationUrl>https://labs.oicr.on.ca/genome-sequence-informatics</organizationUrl>
+      <roles>
+        <role>Developer</role>
+      </roles>
+      <timezone>-5</timezone>
+      <properties />
+    </developer>
+    
+    <developer>
+      <id>dcooke</id>
+      <name>Dillan Cooke</name>
+      <email>dillan.cooke@oicr.on.ca</email>
+      <organization>OICR</organization>
+      <organizationUrl>https://labs.oicr.on.ca/genome-sequence-informatics</organizationUrl>
+      <roles>
+        <role>Developer</role>
+      </roles>
+      <timezone>-5</timezone>
+      <properties />
+    </developer>
+    
+    <developer>
+      <id>harmstrong</id>
+      <name>Heather Armstrong</name>
+      <email>heather.armstrong@oicr.on.ca</email>
+      <organization>OICR</organization>
+      <organizationUrl>https://labs.oicr.on.ca/genome-sequence-informatics</organizationUrl>
+      <roles>
+        <role>Developer</role>
+      </roles>
+      <timezone>-5</timezone>
       <properties />
     </developer>
   </developers>
