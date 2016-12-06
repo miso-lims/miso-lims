@@ -1032,22 +1032,17 @@
     <dependency>
       <groupId>io.prometheus</groupId>
       <artifactId>simpleclient</artifactId>
-      <version>0.0.15</version>
+      <version>${prometheus.version}</version>
     </dependency>
     <dependency>
       <groupId>io.prometheus</groupId>
       <artifactId>simpleclient_hotspot</artifactId>
-      <version>0.0.15</version>
+      <version>${prometheus.version}</version>
     </dependency>
     <dependency>
       <groupId>aopalliance</groupId>
       <artifactId>aopalliance</artifactId>
       <version>1.0</version>
-    </dependency>
-    <dependency>
-      <groupId>com.sun.jersey</groupId>
-      <artifactId>jersey-client</artifactId>
-      <version>1.19</version>
     </dependency>
     <dependency>
       <groupId>javax.ws.rs</groupId>
@@ -1060,19 +1055,24 @@
       <version>3.1</version>
     </dependency>
     <dependency>
+      <groupId>com.sun.jersey</groupId>
+      <artifactId>jersey-client</artifactId>
+      <version>${jersey.version}</version>
+    </dependency>
+    <dependency>
       <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
       <artifactId>oauth-signature</artifactId>
-      <version>1.19</version>
+      <version>${jersey.version}</version>
     </dependency>
     <dependency>
       <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
       <artifactId>oauth-client</artifactId>
-      <version>1.19</version>
+      <version>${jersey.version}</version>
     </dependency>
     <dependency>
       <groupId>com.sun.jersey.contribs</groupId>
       <artifactId>jersey-apache-client</artifactId>
-      <version>1.19</version>
+      <version>${jersey.version}</version>
     </dependency>
     
     
@@ -1108,6 +1108,8 @@
     <junit.version>4.12</junit.version>
     <mockito.verison>1.10.19</mockito.verison>
     <slf4j.version>1.6.1</slf4j.version>
+    <jersey.version>1.19</jersey.version>
+    <prometheus.version>0.0.15</prometheus.version>
     <!-- Note: Jackson 1 versions beyond 1.9.4 are not compatible with
       recursive type parameters, such as in the Poolable interface -->
     <jackson.version>1.9.4</jackson.version>
