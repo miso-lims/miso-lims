@@ -42,7 +42,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
-        <version>2.8</version>
         <configuration>
             <usedDependencies>
                 <usedDependency>mysql:mysql-connector-java</usedDependency>
@@ -82,7 +81,6 @@
 
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.5</version>
         <configuration>
           <includes>
             <include>**/*Suite.java</include>
@@ -93,7 +91,6 @@
       <plugin>
         <groupId>org.flywaydb</groupId>
         <artifactId>flyway-maven-plugin</artifactId>
-        <version>3.2.1</version>
         <configuration>
           <!--
             Do not modify these placeholder database credentials and risk committing them to git. Instead create a "flyway.properties"
@@ -114,7 +111,6 @@
       <plugin>
         <groupId>org.codehaus.gmaven</groupId>
         <artifactId>groovy-maven-plugin</artifactId>
-        <version>2.0</version>
         <executions>
           <execution>
             <id>translate-schema</id>
@@ -318,7 +314,6 @@
         <plugins>
           <plugin>
             <artifactId>maven-surefire-plugin</artifactId>
-            <version>2.5</version>
             <configuration>
               <skip>false</skip>
 

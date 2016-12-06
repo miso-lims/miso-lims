@@ -41,7 +41,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>2.4</version>
         <configuration>
           <archive>
             <manifest>
@@ -54,7 +53,6 @@
       <plugin>
         <groupId>com.jolira</groupId>
         <artifactId>onejar-maven-plugin</artifactId>
-        <version>1.4.4</version>
         <executions>
           <execution>
             <configuration>
