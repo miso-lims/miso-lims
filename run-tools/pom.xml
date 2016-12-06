@@ -24,21 +24,65 @@
   ~
   ~ **********************************************************************
 -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
   <parent>
     <artifactId>miso</artifactId>
     <groupId>uk.ac.bbsrc.tgac.miso</groupId>
     <version>0.2.43-SNAPSHOT</version>
   </parent>
-
   <artifactId>run-tools</artifactId>
-
   <packaging>jar</packaging>
   <name>MISO Run Tools</name>
-  <modelVersion>4.0.0</modelVersion>
   <url>http://maven.apache.org</url>
-
+  <dependencies>
+    <dependency>
+      <groupId>${project.parent.groupId}</groupId>
+      <artifactId>core</artifactId>
+      <version>${project.parent.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>net.sourceforge.fluxion</groupId>
+      <artifactId>fluxion-spi</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.irods.jargon</groupId>
+      <artifactId>jargon-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.integration</groupId>
+      <artifactId>spring-integration-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.integration</groupId>
+      <artifactId>spring-integration-file</artifactId>
+    </dependency>
+  </dependencies>
+  <repositories>
+    <repository>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <id>hasbanana-repo</id>
+      <url>http://www.hasbanana.com/maven/repo</url>
+    </repository>
+    <repository>
+      <id>renci.public</id>
+      <url>http://ci-dev.renci.org/nexus/content/repositories/releases</url>
+    </repository>
+  </repositories>
   <build>
     <plugins>
       <plugin>
@@ -47,56 +91,4 @@
       </plugin>
     </plugins>
   </build>
-
-  <repositories>
-    <repository>
-      <id>hasbanana-repo</id>
-      <url>http://www.hasbanana.com/maven/repo</url>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
-
-    <repository>
-      <id>renci.public</id>
-      <url>http://ci-dev.renci.org/nexus/content/repositories/releases</url>
-    </repository>
-  </repositories>
-
-  <dependencies>
-    <dependency>
-		<groupId>${project.parent.groupId}</groupId>
-        <artifactId>core</artifactId>
-        <version>${project.parent.version}</version>
-    </dependency>
-  	<dependency>
-  		<groupId>commons-logging</groupId>
-  		<artifactId>commons-logging</artifactId>
-  	</dependency>
-  	<dependency>
-  		<groupId>org.springframework</groupId>
-  		<artifactId>spring-core</artifactId>
-  	</dependency>
-    <dependency>
-        <groupId>org.springframework.integration</groupId>
-        <artifactId>spring-integration-core</artifactId>
-    </dependency>
-    <dependency>
-        <groupId>org.springframework.integration</groupId>
-        <artifactId>spring-integration-file</artifactId>
-    </dependency>
-	<dependency>
-		<groupId>net.sourceforge.fluxion</groupId>
-		<artifactId>fluxion-spi</artifactId>
-	</dependency>
-    <dependency>
-      <groupId>org.irods.jargon</groupId>
-      <artifactId>jargon-core</artifactId>
-    </dependency>
-      <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-api</artifactId>
-      </dependency>
-  </dependencies>
-
 </project>

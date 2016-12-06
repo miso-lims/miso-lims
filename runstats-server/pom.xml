@@ -24,29 +24,59 @@
   ~
   ~ **********************************************************************
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
   <parent>
     <artifactId>miso</artifactId>
     <groupId>uk.ac.bbsrc.tgac.miso</groupId>
     <version>0.2.43-SNAPSHOT</version>
   </parent>
-
   <artifactId>runstats-server</artifactId>
-
-  <name>runstats-server</name>
   <version>0.2.43-SNAPSHOT</version>
   <packaging>jar</packaging>
+  <name>runstats-server</name>
   <url>http://maven.apache.org</url>
-  <modelVersion>4.0.0</modelVersion>
-
+  <dependencies>
+    <dependency>
+      <groupId>${project.parent.groupId}</groupId>
+      <artifactId>run-tools</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.integration</groupId>
+      <artifactId>spring-integration-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.integration</groupId>
+      <artifactId>spring-integration-file</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>uk.ac.bbsrc.tgac.miso</groupId>
+      <artifactId>core</artifactId>
+    </dependency>
+  </dependencies>
+  <repositories>
+    <repository>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <id>hasbanana-repo</id>
+      <url>http://www.hasbanana.com/maven/repo</url>
+    </repository>
+  </repositories>
   <build>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
       </plugin>
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
@@ -59,13 +89,15 @@
           </archive>
         </configuration>
       </plugin>
-
       <plugin>
         <groupId>com.jolira</groupId>
         <artifactId>onejar-maven-plugin</artifactId>
         <version>1.4.4</version>
         <executions>
           <execution>
+            <goals>
+              <goal>one-jar</goal>
+            </goals>
             <configuration>
               <!-- Optional -->
               <onejarVersion>0.97</onejarVersion>
@@ -74,35 +106,9 @@
               <!-- Optional, default is "onejar" -->
               <classifier>onejar</classifier>
             </configuration>
-            <goals>
-              <goal>one-jar</goal>
-            </goals>
           </execution>
         </executions>
       </plugin>
     </plugins>
   </build>
-
-  <repositories>
-    <repository>
-      <id>hasbanana-repo</id>
-      <url>http://www.hasbanana.com/maven/repo</url>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
-
-  <dependencies>
-    <dependency>
-      <groupId>${project.parent.groupId}</groupId>
-      <artifactId>run-tools</artifactId>
-    </dependency>
-<dependency><groupId>uk.ac.bbsrc.tgac.miso</groupId><artifactId>core</artifactId></dependency>
-<dependency><groupId>org.springframework.integration</groupId><artifactId>spring-integration-file</artifactId></dependency>
-<dependency><groupId>org.slf4j</groupId><artifactId>slf4j-api</artifactId></dependency>
-<dependency><groupId>org.springframework</groupId><artifactId>spring-context</artifactId></dependency>
-<dependency><groupId>org.springframework.integration</groupId><artifactId>spring-integration-core</artifactId></dependency>
-
-  </dependencies>
 </project>

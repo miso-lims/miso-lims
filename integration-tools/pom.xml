@@ -24,58 +24,17 @@
   ~
   ~ **********************************************************************
 -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
   <parent>
     <artifactId>miso</artifactId>
     <groupId>uk.ac.bbsrc.tgac.miso</groupId>
     <version>0.2.43-SNAPSHOT</version>
   </parent>
-
   <artifactId>integration-tools</artifactId>
-
   <packaging>jar</packaging>
   <name>MISO Integration Tools</name>
   <url>http://maven.apache.org</url>
-  <modelVersion>4.0.0</modelVersion>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </build>
-
-  <repositories>
-    <repository>
-      <id>hasbanana-repo</id>
-      <url>http://www.hasbanana.com/maven/repo</url>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
-
-    <repository>
-      <id>renci.public</id>
-      <url>http://ci-dev.renci.org/nexus/content/repositories/releases</url>
-    </repository>
-
-    <repository>
-      <id>tgac-repo</id>
-      <name>TGAC Maven Repository</name>
-      <url>http://repos.tgac.ac.uk/maven/repo</url>
-      <releases>
-        <updatePolicy>always</updatePolicy>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-        <updatePolicy>always</updatePolicy>
-      </snapshots>
-    </repository>
-  </repositories>
-
   <dependencies>
     <dependency>
       <groupId>${project.parent.groupId}</groupId>
@@ -83,16 +42,12 @@
       <version>${project.parent.version}</version>
     </dependency>
     <dependency>
+      <groupId>ca.on.oicr.gsi</groupId>
+      <artifactId>visionmate</artifactId>
+    </dependency>
+    <dependency>
       <groupId>commons-codec</groupId>
       <artifactId>commons-codec</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-beans</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-context</artifactId>
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
@@ -105,10 +60,6 @@
       <classifier>jdk15</classifier>
     </dependency>
     <dependency>
-      <groupId>ca.on.oicr.gsi</groupId>
-      <artifactId>visionmate</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpclient</artifactId>
     </dependency>
@@ -116,10 +67,50 @@
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpcore</artifactId>
     </dependency>
-      <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-api</artifactId>
-      </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-beans</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context</artifactId>
+    </dependency>
   </dependencies>
-
+  <repositories>
+    <repository>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <id>hasbanana-repo</id>
+      <url>http://www.hasbanana.com/maven/repo</url>
+    </repository>
+    <repository>
+      <id>renci.public</id>
+      <url>http://ci-dev.renci.org/nexus/content/repositories/releases</url>
+    </repository>
+    <repository>
+      <releases>
+        <updatePolicy>always</updatePolicy>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+        <updatePolicy>always</updatePolicy>
+      </snapshots>
+      <id>tgac-repo</id>
+      <name>TGAC Maven Repository</name>
+      <url>http://repos.tgac.ac.uk/maven/repo</url>
+    </repository>
+  </repositories>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
 </project>

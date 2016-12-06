@@ -25,56 +25,24 @@
   ~ **********************************************************************
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
   <parent>
     <artifactId>miso</artifactId>
     <groupId>uk.ac.bbsrc.tgac.miso</groupId>
     <version>0.2.43-SNAPSHOT</version>
   </parent>
-
   <artifactId>runstats-client</artifactId>
-
   <packaging>jar</packaging>
   <name>MISO StatsDB Client</name>
   <url>http://maven.apache.org</url>
-  <modelVersion>4.0.0</modelVersion>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </build>
-
-  <repositories>
-    <repository>
-      <id>tgac-repo</id>
-      <name>TGAC Maven Repository</name>
-      <url>http://repos.tgac.ac.uk/maven/repo</url>
-    </repository>
-  </repositories>
-
   <dependencies>
     <dependency>
       <groupId>${project.parent.groupId}</groupId>
       <artifactId>core</artifactId>
     </dependency>
     <dependency>
-      <groupId>uk.ac.tgac.statsdb</groupId>
-      <artifactId>statsdb-api</artifactId>
-    </dependency>
-    <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
-    </dependency>
-  	<dependency>
-  	  <groupId>org.springframework</groupId>
-  	  <artifactId>spring-beans</artifactId>
-  	</dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-jdbc</artifactId>
     </dependency>
     <dependency>
       <groupId>net.sf.json-lib</groupId>
@@ -85,6 +53,32 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-beans</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-jdbc</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>uk.ac.tgac.statsdb</groupId>
+      <artifactId>statsdb-api</artifactId>
+    </dependency>
   </dependencies>
-
+  <repositories>
+    <repository>
+      <id>tgac-repo</id>
+      <name>TGAC Maven Repository</name>
+      <url>http://repos.tgac.ac.uk/maven/repo</url>
+    </repository>
+  </repositories>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
 </project>

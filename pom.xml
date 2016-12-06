@@ -23,57 +23,14 @@
   ~ along with MISO. If not, see <http://www.gnu.org/licenses />.
   ~
   ~ ********************************************************************** -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>uk.ac.bbsrc.tgac.miso</groupId>
   <artifactId>miso</artifactId>
-  <packaging>pom</packaging>
   <version>0.2.43-SNAPSHOT</version>
+  <packaging>pom</packaging>
   <name>MISO Framework</name>
   <url>http://www.tgac.ac.uk/miso</url>
-
-  <!-- Reporting/Documentation output -->
-  <reporting>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.9</version>
-        <configuration>
-          <stylesheetfile>${basedir}/src/main/javadoc/stylesheet.css</stylesheetfile>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-project-info-reports-plugin</artifactId>
-        <version>2.2</version>
-        <reportSets>
-          <reportSet>
-            <reports>
-              <!-- <report>dependencies</report> -->
-              <report>project-team</report>
-              <report>mailing-list</report>
-              <report>cim</report>
-              <report>issue-tracking</report>
-              <report>license</report>
-              <report>scm</report>
-              <report>index</report>
-            </reports>
-          </reportSet>
-        </reportSets>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-release-plugin</artifactId>
-        <version>2.1</version>
-        <configuration>
-          <preparationGoals>clean verify install</preparationGoals>
-        </configuration>
-      </plugin>
-    </plugins>
-  </reporting>
-
   <!-- Licensing -->
   <licenses>
     <license>
@@ -82,13 +39,6 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
-
-  <!-- Bug Tracker -->
-  <issueManagement>
-    <system>jira</system>
-    <url>http://jira.tgac.bbsrc.ac.uk/browse/MISO</url>
-  </issueManagement>
-
   <!-- Developer Listing -->
   <developers>
     <developer>
@@ -103,7 +53,6 @@
       </roles>
       <timezone>0</timezone>
     </developer>
-
     <developer>
       <id>frankie13</id>
       <name>Christopher Salt</name>
@@ -115,9 +64,8 @@
         <role>Developer</role>
       </roles>
       <timezone>0</timezone>
-      <properties />
+      <properties></properties>
     </developer>
-
     <developer>
       <id>mtaschuk</id>
       <name>Morgan Taschuk</name>
@@ -128,9 +76,8 @@
         <role>project contact</role>
       </roles>
       <timezone>-5</timezone>
-      <properties />
+      <properties></properties>
     </developer>
-    
     <developer>
       <id>tdebat</id>
       <name>Tony Debat</name>
@@ -141,9 +88,8 @@
         <role>Developer</role>
       </roles>
       <timezone>-5</timezone>
-      <properties />
+      <properties></properties>
     </developer>
-    
     <developer>
       <id>amasella</id>
       <name>Andre Masella</name>
@@ -154,9 +100,8 @@
         <role>Developer</role>
       </roles>
       <timezone>-5</timezone>
-      <properties />
+      <properties></properties>
     </developer>
-    
     <developer>
       <id>dcooke</id>
       <name>Dillan Cooke</name>
@@ -167,9 +112,8 @@
         <role>Developer</role>
       </roles>
       <timezone>-5</timezone>
-      <properties />
+      <properties></properties>
     </developer>
-    
     <developer>
       <id>harmstrong</id>
       <name>Heather Armstrong</name>
@@ -180,26 +124,38 @@
         <role>Developer</role>
       </roles>
       <timezone>-5</timezone>
-      <properties />
+      <properties></properties>
     </developer>
   </developers>
-
+  <modules>
+    <module>integration-tools</module>
+    <module>core</module>
+    <module>run-tools</module>
+    <module>spring</module>
+    <module>miso-web</module>
+    <module>miso-service</module>
+    <module>sqlstore</module>
+    <module>miso-dto</module>
+    <module>notification-server</module>
+    <module>runstats-client</module>
+    <module>notification-consumer-services</module>
+    <module>miso-external-web</module>
+    <module>runstats-server</module>
+    <module>demo-notification-client</module>
+  </modules>
   <!-- SVN connection -->
   <scm>
-    <connection>
-      scm:git:https://www.github.com/TGAC/miso-lims
-    </connection>
-    <developerConnection>
-      scm:git:ssh://www.github.com/TGAC/miso-lims
-    </developerConnection>
-    <url>
-      http://www.github.com/TGAC/miso-lims
-    </url>
+    <connection>scm:git:https://www.github.com/TGAC/miso-lims</connection>
+    <developerConnection>scm:git:ssh://www.github.com/TGAC/miso-lims</developerConnection>
+    <url>http://www.github.com/TGAC/miso-lims</url>
   </scm>
-
+  <!-- Bug Tracker -->
+  <issueManagement>
+    <system>jira</system>
+    <url>http://jira.tgac.bbsrc.ac.uk/browse/MISO</url>
+  </issueManagement>
   <!-- Maven repository deploy -->
   <distributionManagement>
-    <downloadUrl>http://repos.tgac.ac.uk/maven/repo</downloadUrl>
     <repository>
       <id>miso-releases</id>
       <name>MISO repository</name>
@@ -210,8 +166,587 @@
       <name>MISO snapshot repository</name>
       <url>scp://repos.tgac.ac.uk/storage/html/maven/miso/snapshots</url>
     </snapshotRepository>
+    <downloadUrl>http://repos.tgac.ac.uk/maven/repo</downloadUrl>
   </distributionManagement>
-
+  <properties>
+    <spring-version>3.1.3.RELEASE</spring-version>
+    <spring-integration-version>2.2.0.RELEASE</spring-integration-version>
+    <hibernate.version>4.2.21.Final</hibernate.version>
+    <joda-time.version>2.9</joda-time.version>
+    <hamcrest.version>1.3</hamcrest.version>
+    <junit.version>4.12</junit.version>
+    <mockito.verison>1.10.19</mockito.verison>
+    <slf4j.version>1.6.1</slf4j.version>
+    <jersey.version>1.19</jersey.version>
+    <prometheus.version>0.0.15</prometheus.version>
+    <!-- Note: Jackson 1 versions beyond 1.9.4 are not compatible with
+      recursive type parameters, such as in the Poolable interface -->
+    <jackson.version>1.9.4</jackson.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>aopalliance</groupId>
+        <artifactId>aopalliance</artifactId>
+        <version>1.0</version>
+      </dependency>
+      <dependency>
+        <groupId>ca.on.oicr.gsi</groupId>
+        <artifactId>metrix</artifactId>
+        <version>1.2-2016</version>
+      </dependency>
+      <dependency>
+        <groupId>ca.on.oicr.gsi</groupId>
+        <artifactId>oscore</artifactId>
+        <version>2.2.7</version>
+      </dependency>
+      <dependency>
+        <groupId>ca.on.oicr.gsi</groupId>
+        <artifactId>visionmate</artifactId>
+        <version>1.0.0</version>
+      </dependency>
+      <dependency>
+        <groupId>cglib</groupId>
+        <artifactId>cglib-nodep</artifactId>
+        <version>2.2.2</version>
+      </dependency>
+      <dependency>
+        <groupId>com.google.guava</groupId>
+        <artifactId>guava</artifactId>
+        <version>r08</version>
+      </dependency>
+      <dependency>
+        <groupId>com.googlecode.ehcache-spring-annotations</groupId>
+        <artifactId>ehcache-spring-annotations</artifactId>
+        <version>1.2.0</version>
+      </dependency>
+      <dependency>
+        <groupId>com.googlecode.json-simple</groupId>
+        <artifactId>json-simple</artifactId>
+        <version>1.1.1</version>
+      </dependency>
+      <dependency>
+        <groupId>com.h2database</groupId>
+        <artifactId>h2</artifactId>
+        <version>1.4.190</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>com.lowagie</groupId>
+        <artifactId>itext</artifactId>
+        <version>2.1.7</version>
+      </dependency>
+      <dependency>
+        <groupId>com.mikesamuel</groupId>
+        <artifactId>json-sanitizer</artifactId>
+        <version>[1.0,)</version>
+      </dependency>
+      <dependency>
+        <groupId>com.sun.jersey</groupId>
+        <artifactId>jersey-client</artifactId>
+        <version>${jersey.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.sun.jersey.contribs</groupId>
+        <artifactId>jersey-apache-client</artifactId>
+        <version>${jersey.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
+        <artifactId>oauth-client</artifactId>
+        <version>${jersey.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
+        <artifactId>oauth-signature</artifactId>
+        <version>${jersey.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>commons-codec</groupId>
+        <artifactId>commons-codec</artifactId>
+        <version>1.7</version>
+      </dependency>
+      <dependency>
+        <groupId>commons-fileupload</groupId>
+        <artifactId>commons-fileupload</artifactId>
+        <version>1.2.1</version>
+      </dependency>
+      <dependency>
+        <groupId>commons-httpclient</groupId>
+        <artifactId>commons-httpclient</artifactId>
+        <version>3.1</version>
+      </dependency>
+      <dependency>
+        <groupId>commons-io</groupId>
+        <artifactId>commons-io</artifactId>
+        <version>2.1</version>
+      </dependency>
+      <dependency>
+        <groupId>commons-lang</groupId>
+        <artifactId>commons-lang</artifactId>
+        <version>2.5</version>
+      </dependency>
+      <dependency>
+        <groupId>commons-logging</groupId>
+        <artifactId>commons-logging</artifactId>
+        <version>1.1.1</version>
+      </dependency>
+      <dependency>
+        <groupId>commons-net</groupId>
+        <artifactId>commons-net</artifactId>
+        <version>2.0</version>
+      </dependency>
+      <dependency>
+        <groupId>fr.opensagres</groupId>
+        <artifactId>org.odftoolkit.odfdom.converter</artifactId>
+        <version>0.9.1</version>
+      </dependency>
+      <dependency>
+        <groupId>io.prometheus</groupId>
+        <artifactId>simpleclient</artifactId>
+        <version>${prometheus.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.prometheus</groupId>
+        <artifactId>simpleclient_hotspot</artifactId>
+        <version>${prometheus.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.prometheus</groupId>
+        <artifactId>simpleclient_servlet</artifactId>
+        <version>${prometheus.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>javassist</groupId>
+        <artifactId>javassist</artifactId>
+        <version>3.8.0.GA</version>
+      </dependency>
+      <dependency>
+        <groupId>javax.mail</groupId>
+        <artifactId>mail</artifactId>
+        <version>1.4.1</version>
+      </dependency>
+      <dependency>
+        <groupId>javax.servlet</groupId>
+        <artifactId>jsp-api</artifactId>
+        <version>2.0</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>javax.servlet</groupId>
+        <artifactId>jstl</artifactId>
+        <version>1.2</version>
+      </dependency>
+      <dependency>
+        <groupId>javax.servlet</groupId>
+        <artifactId>servlet-api</artifactId>
+        <version>2.5</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>javax.ws.rs</groupId>
+        <artifactId>jsr311-api</artifactId>
+        <version>1.1.1</version>
+      </dependency>
+      <dependency>
+        <groupId>jfree</groupId>
+        <artifactId>jcommon</artifactId>
+        <version>1.0.16</version>
+      </dependency>
+      <dependency>
+        <groupId>jfree</groupId>
+        <artifactId>jfreechart</artifactId>
+        <version>1.0.13</version>
+      </dependency>
+      <dependency>
+        <groupId>joda-time</groupId>
+        <artifactId>joda-time</artifactId>
+        <version>${joda-time.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>${junit.version}</version>
+        <exclusions>
+          <exclusion>
+            <artifactId>hamcrest-core</artifactId>
+            <groupId>org.hamcrest</groupId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>log4j</groupId>
+        <artifactId>log4j</artifactId>
+        <version>1.2.16</version>
+      </dependency>
+      <dependency>
+        <groupId>mysql</groupId>
+        <artifactId>mysql-connector-java</artifactId>
+        <version>5.1.13</version>
+      </dependency>
+      <dependency>
+        <groupId>net.sf.barcode4j</groupId>
+        <artifactId>barcode4j</artifactId>
+        <version>2.0</version>
+      </dependency>
+      <dependency>
+        <groupId>net.sf.ehcache</groupId>
+        <artifactId>ehcache</artifactId>
+        <version>2.6.3</version>
+        <type>pom</type>
+      </dependency>
+      <dependency>
+        <groupId>net.sf.ehcache</groupId>
+        <artifactId>ehcache-core</artifactId>
+        <version>2.6.8</version>
+      </dependency>
+      <dependency>
+        <groupId>net.sf.json-lib</groupId>
+        <artifactId>json-lib</artifactId>
+        <version>2.4</version>
+        <classifier>jdk15</classifier>
+      </dependency>
+      <dependency>
+        <groupId>net.sourceforge.fluxion</groupId>
+        <artifactId>fluxion-spi</artifactId>
+        <version>1.0-alpha-3</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-dbcp2</artifactId>
+        <version>2.1.1</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpclient</artifactId>
+        <version>4.5.2</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpcore</artifactId>
+        <version>4.0.1</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpmime</artifactId>
+        <version>4.0.1</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.poi</groupId>
+        <artifactId>poi</artifactId>
+        <version>3.6</version>
+        <type>jar</type>
+        <scope>compile</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.poi</groupId>
+        <artifactId>poi-ooxml</artifactId>
+        <version>3.6</version>
+        <exclusions>
+          <exclusion>
+            <artifactId>dom4j</artifactId>
+            <groupId>dom4j</groupId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.aspectj</groupId>
+        <artifactId>aspectjrt</artifactId>
+        <version>1.6.12</version>
+      </dependency>
+      <dependency>
+        <groupId>org.aspectj</groupId>
+        <artifactId>aspectjweaver</artifactId>
+        <version>1.6.12</version>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.jackson</groupId>
+        <artifactId>jackson-core-asl</artifactId>
+        <version>1.9.4</version>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.jackson</groupId>
+        <artifactId>jackson-mapper-asl</artifactId>
+        <version>${jackson.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.flywaydb</groupId>
+        <artifactId>flyway-core</artifactId>
+        <version>3.2.1</version>
+      </dependency>
+      <dependency>
+        <groupId>org.hamcrest</groupId>
+        <artifactId>hamcrest-all</artifactId>
+        <version>${hamcrest.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.hibernate</groupId>
+        <artifactId>hibernate-core</artifactId>
+        <version>${hibernate.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.hibernate.javax.persistence</groupId>
+        <artifactId>hibernate-jpa-2.0-api</artifactId>
+        <version>1.0.1.Final</version>
+      </dependency>
+      <dependency>
+        <groupId>org.irods.jargon</groupId>
+        <artifactId>jargon-core</artifactId>
+        <version>3.1.4</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jdom</groupId>
+        <artifactId>jdom</artifactId>
+        <version>1.1</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-all</artifactId>
+        <version>1.10.19</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-core</artifactId>
+        <version>${mockito.verison}</version>
+        <exclusions>
+          <exclusion>
+            <artifactId>hamcrest-core</artifactId>
+            <groupId>org.hamcrest</groupId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.odftoolkit</groupId>
+        <artifactId>odfdom-java</artifactId>
+        <version>0.8.7</version>
+      </dependency>
+      <dependency>
+        <groupId>org.reflections</groupId>
+        <artifactId>reflections</artifactId>
+        <version>0.9.5</version>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>${slf4j.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-log4j12</artifactId>
+        <version>${slf4j.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-beans</artifactId>
+        <version>${spring-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-context</artifactId>
+        <version>${spring-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-core</artifactId>
+        <version>${spring-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-expression</artifactId>
+        <version>${spring-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-jdbc</artifactId>
+        <version>${spring-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-orm</artifactId>
+        <version>${spring-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-test</artifactId>
+        <version>3.2.0.RELEASE</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-tx</artifactId>
+        <version>${spring-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-web</artifactId>
+        <version>${spring-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-webmvc</artifactId>
+        <version>${spring-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.batch</groupId>
+        <artifactId>spring-batch-core</artifactId>
+        <version>2.1.2.RELEASE</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.integration</groupId>
+        <artifactId>spring-integration-core</artifactId>
+        <version>${spring-integration-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.integration</groupId>
+        <artifactId>spring-integration-file</artifactId>
+        <version>${spring-integration-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.integration</groupId>
+        <artifactId>spring-integration-http</artifactId>
+        <version>${spring-integration-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.integration</groupId>
+        <artifactId>spring-integration-ip</artifactId>
+        <version>${spring-integration-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.integration</groupId>
+        <artifactId>spring-integration-xml</artifactId>
+        <version>${spring-integration-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.ldap</groupId>
+        <artifactId>spring-ldap-core</artifactId>
+        <version>1.3.1.RELEASE</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.security</groupId>
+        <artifactId>spring-security-config</artifactId>
+        <version>${spring-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.security</groupId>
+        <artifactId>spring-security-core</artifactId>
+        <version>${spring-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.security</groupId>
+        <artifactId>spring-security-ldap</artifactId>
+        <version>${spring-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.security</groupId>
+        <artifactId>spring-security-taglibs</artifactId>
+        <version>${spring-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.security</groupId>
+        <artifactId>spring-security-web</artifactId>
+        <version>${spring-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.security.oauth</groupId>
+        <artifactId>spring-security-oauth</artifactId>
+        <version>1.0.0.RELEASE</version>
+        <exclusions>
+          <exclusion>
+            <artifactId>commons-codec</artifactId>
+            <groupId>commons-codec</groupId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>uk.ac.bbsrc.tgac.miso</groupId>
+        <artifactId>core</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>uk.ac.bbsrc.tgac.miso</groupId>
+        <artifactId>integration-tools</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>uk.ac.bbsrc.tgac.miso</groupId>
+        <artifactId>miso-dto</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>uk.ac.bbsrc.tgac.miso</groupId>
+        <artifactId>miso-service</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>uk.ac.bbsrc.tgac.miso</groupId>
+        <artifactId>notification-server</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>uk.ac.bbsrc.tgac.miso</groupId>
+        <artifactId>run-tools</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>uk.ac.bbsrc.tgac.miso</groupId>
+        <artifactId>runstats-client</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>uk.ac.bbsrc.tgac.miso</groupId>
+        <artifactId>spring</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>uk.ac.bbsrc.tgac.miso</groupId>
+        <artifactId>sqlstore</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>uk.ac.tgac.fluxion.ajax</groupId>
+        <artifactId>fluxion-ajax-3</artifactId>
+        <version>1.0</version>
+      </dependency>
+      <dependency>
+        <groupId>uk.ac.tgac.fluxion.ajax</groupId>
+        <artifactId>fluxion-ajax-js</artifactId>
+        <version>1.0</version>
+      </dependency>
+      <dependency>
+        <groupId>uk.ac.tgac.fluxion.ajax.beans</groupId>
+        <artifactId>fluxion-ajax-beans</artifactId>
+        <version>1.0</version>
+      </dependency>
+      <dependency>
+        <groupId>uk.ac.tgac.statsdb</groupId>
+        <artifactId>statsdb-api</artifactId>
+        <version>1.1</version>
+        <exclusions>
+          <exclusion>
+            <artifactId>jackson-mapper-asl</artifactId>
+            <groupId>org.codehaus.jackson</groupId>
+          </exclusion>
+          <exclusion>
+            <artifactId>jackson-core-asl</artifactId>
+            <groupId>org.codehaus.jackson</groupId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>xml-apis</groupId>
+        <artifactId>xml-apis</artifactId>
+        <version>1.3.04</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
   <!-- Maven repository download -->
   <repositories>
     <repository>
@@ -219,63 +754,57 @@
       <name>hasbanana Maven Repository</name>
       <url>http://www.hasbanana.com/maven/repo</url>
     </repository>
-
     <repository>
+      <releases>
+        <enabled>true</enabled>
+        <updatePolicy>always</updatePolicy>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+        <updatePolicy>always</updatePolicy>
+      </snapshots>
       <id>tgac-repo</id>
       <name>TGAC Maven Repository</name>
       <url>http://repos.tgac.ac.uk/maven/repo</url>
+    </repository>
+    <repository>
       <releases>
-        <enabled>true</enabled>
+        <enabled>false</enabled>
         <updatePolicy>always</updatePolicy>
       </releases>
       <snapshots>
         <enabled>true</enabled>
         <updatePolicy>always</updatePolicy>
       </snapshots>
-    </repository>
-
-    <repository>
       <id>tgac-snapshots-repo</id>
       <name>TGAC Maven Snapshots Repository</name>
       <url>http://repos.tgac.ac.uk/maven/miso/snapshots</url>
+    </repository>
+    <repository>
       <releases>
-        <enabled>false</enabled>
+        <enabled>true</enabled>
         <updatePolicy>always</updatePolicy>
       </releases>
       <snapshots>
-        <enabled>true</enabled>
+        <enabled>false</enabled>
         <updatePolicy>always</updatePolicy>
       </snapshots>
-    </repository>
-
-    <repository>
       <id>tgac-releases-repo</id>
       <name>TGAC Maven Releases Repository</name>
       <url>http://repos.tgac.ac.uk/maven/miso/releases</url>
-      <releases>
-        <enabled>true</enabled>
-        <updatePolicy>always</updatePolicy>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-        <updatePolicy>always</updatePolicy>
-      </snapshots>
     </repository>
-
     <repository>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
       <id>spring-snapshot</id>
       <name>Spring Portfolio Milestone Repository</name>
       <url>http://maven.springframework.org/snapshot</url>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
     </repository>
-
     <repository>
       <id>Atlassian Maven Repository</id>
       <url>https://maven.atlassian.com/public</url>
     </repository>
-
     <repository>
       <id>spring-maven-release</id>
       <name>Springframework Maven Repository</name>
@@ -298,124 +827,72 @@
       <id>springsource-snapshot</id>
       <url>http://repository.springsource.com/maven/bundles/snapshot</url>
     </repository>
-
     <repository>
+      <releases>
+        <enabled>false</enabled>
+        <updatePolicy>always</updatePolicy>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+        <updatePolicy>always</updatePolicy>
+      </snapshots>
       <id>fluxion-snapshots-repo</id>
       <name>TGAC Fluxion Snapshots Repository</name>
       <url>http://repos.tgac.ac.uk/maven/fluxion/snapshots</url>
+    </repository>
+    <repository>
       <releases>
-        <enabled>false</enabled>
+        <enabled>true</enabled>
         <updatePolicy>always</updatePolicy>
       </releases>
       <snapshots>
-        <enabled>true</enabled>
+        <enabled>false</enabled>
         <updatePolicy>always</updatePolicy>
       </snapshots>
-    </repository>
-
-    <repository>
       <id>fluxion-releases-repo</id>
       <name>TGAC Fluxion Releases Repository</name>
       <url>http://repos.tgac.ac.uk/maven/fluxion/releases</url>
-      <releases>
-        <enabled>true</enabled>
-        <updatePolicy>always</updatePolicy>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-        <updatePolicy>always</updatePolicy>
-      </snapshots>
     </repository>
-        
     <repository>
       <id>seqwaremaven.oicr.on.ca</id>
       <name>seqwaremaven.oicr.on.ca-releases</name>
       <url>https://seqwaremaven.oicr.on.ca/artifactory/gsi-dependencies</url>
     </repository>
   </repositories>
-
   <pluginRepositories>
     <pluginRepository>
-      <id>miso-releases</id>
-      <name>MISO repository</name>
-      <url>http://repos.tgac.ac.uk/maven/miso/releases</url>
       <releases>
         <enabled>true</enabled>
         <updatePolicy>always</updatePolicy>
       </releases>
+      <id>miso-releases</id>
+      <name>MISO repository</name>
+      <url>http://repos.tgac.ac.uk/maven/miso/releases</url>
     </pluginRepository>
-
     <pluginRepository>
-      <id>miso-snapshots</id>
-      <name>MISO snapshot repository</name>
-      <url>http://repos.tgac.ac.uk/maven/miso/snapshots</url>
       <snapshots>
         <enabled>true</enabled>
         <updatePolicy>always</updatePolicy>
       </snapshots>
+      <id>miso-snapshots</id>
+      <name>MISO snapshot repository</name>
+      <url>http://repos.tgac.ac.uk/maven/miso/snapshots</url>
     </pluginRepository>
-
     <pluginRepository>
-      <id>apache-snapshots</id>
-      <name>apache snapshots repository</name>
-      <url>http://repository.apache.org/snapshots</url>
       <snapshots>
         <updatePolicy>never</updatePolicy>
       </snapshots>
+      <id>apache-snapshots</id>
+      <name>apache snapshots repository</name>
+      <url>http://repository.apache.org/snapshots</url>
     </pluginRepository>
-
     <pluginRepository>
       <id>Atlassian Maven Repository</id>
       <url>https://maven.atlassian.com/public</url>
     </pluginRepository>
-
   </pluginRepositories>
-
   <!-- Required Build Plugins -->
   <build>
-    <plugins>
-      <plugin>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.5</version>
-        <configuration>
-          <includes>
-            <include>**/*Suite.java</include>
-          </includes>
-        </configuration>
-      </plugin>
-
-      <!-- <plugin> <groupId>com.atlassian.maven.plugins</groupId> <artifactId>maven-clover2-plugin</artifactId>
-        <version>3.1.2</version> <configuration> <licenseLocation>clover.license</licenseLocation>
-        </configuration> </plugin> -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.9</version>
-        <configuration>
-          <stylesheetfile>${basedir}/src/main/javadoc/stylesheet.css</stylesheetfile>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>cobertura-maven-plugin</artifactId>
-        <version>2.7</version>
-        <configuration>
-          <formats>
-            <format>html</format>
-            <format>xml</format>
-          </formats>
-          <aggregate>true</aggregate>
-          <instrumentation>
-            <!-- <excludes> <exclude>**/Abstract*.*</exclude> </excludes> -->
-            <ignoreTrivial>true</ignoreTrivial>
-            <ignoreMethodAnnotations>
-              <ignoreMethodAnnotation>uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore</ignoreMethodAnnotation>
-            </ignoreMethodAnnotations>
-          </instrumentation>
-        </configuration>
-      </plugin>
-    </plugins>
-
     <pluginManagement>
       <plugins>
         <plugin>
@@ -486,613 +963,97 @@
         </plugin>
       </plugins>
     </pluginManagement>
+    <plugins>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.5</version>
+        <configuration>
+          <includes>
+            <include>**/*Suite.java</include>
+          </includes>
+        </configuration>
+      </plugin>
+      <!-- <plugin> <groupId>com.atlassian.maven.plugins</groupId> <artifactId>maven-clover2-plugin</artifactId>
+        <version>3.1.2</version> <configuration> <licenseLocation>clover.license</licenseLocation>
+        </configuration> </plugin> -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.9</version>
+        <configuration>
+          <stylesheetfile>${basedir}/src/main/javadoc/stylesheet.css</stylesheetfile>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>cobertura-maven-plugin</artifactId>
+        <version>2.7</version>
+        <configuration>
+          <formats>
+            <format>html</format>
+            <format>xml</format>
+          </formats>
+          <aggregate>true</aggregate>
+          <instrumentation>
+            <!-- <excludes> <exclude>**/Abstract*.*</exclude> </excludes> -->
+            <ignoreTrivial>true</ignoreTrivial>
+            <ignoreMethodAnnotations>
+              <ignoreMethodAnnotation>uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore</ignoreMethodAnnotation>
+            </ignoreMethodAnnotations>
+          </instrumentation>
+        </configuration>
+      </plugin>
+    </plugins>
   </build>
-
-  <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
-
- 
-  </dependencies>
-
-  <modules>
-    <module>integration-tools</module>
-
-    <module>core</module>
-    <module>run-tools</module>
-
-    <module>spring</module>
-    <module>miso-web</module>
-
-    <module>miso-service</module>
-    <module>sqlstore</module>
-    <module>miso-dto</module>
-    
-    <module>notification-server</module>
-    <module>runstats-client</module>
-    <module>notification-consumer-services</module>
-    <module>miso-external-web</module>
-    <module>runstats-server</module>
-        <module>demo-notification-client</module>
-  </modules>
-
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-        <artifactId>sqlstore</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-        <artifactId>miso-service</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-        <artifactId>miso-dto</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-        <artifactId>core</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-        <artifactId>notification-server</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-        <artifactId>runstats-client</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-        <artifactId>integration-tools</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-        <artifactId>run-tools</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-        <artifactId>spring</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>joda-time</groupId>
-        <artifactId>joda-time</artifactId>
-        <version>${joda-time.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.codehaus.jackson</groupId>
-        <artifactId>jackson-mapper-asl</artifactId>
-        <version>${jackson.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>uk.ac.tgac.fluxion.ajax</groupId>
-        <artifactId>fluxion-ajax-3</artifactId>
-        <version>1.0</version>
-      </dependency>
-      <dependency>
-        <groupId>uk.ac.tgac.fluxion.ajax</groupId>
-        <artifactId>fluxion-ajax-js</artifactId>
-        <version>1.0</version>
-      </dependency>
-      <dependency>
-        <groupId>uk.ac.tgac.fluxion.ajax.beans</groupId>
-        <artifactId>fluxion-ajax-beans</artifactId>
-        <version>1.0</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-beans</artifactId>
-        <version>${spring-version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-context</artifactId>
-        <version>${spring-version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-core</artifactId>
-        <version>${spring-version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-expression</artifactId>
-        <version>${spring-version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-jdbc</artifactId>
-        <version>${spring-version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-orm</artifactId>
-        <version>${spring-version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-tx</artifactId>
-        <version>${spring-version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-web</artifactId>
-        <version>${spring-version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-webmvc</artifactId>
-        <version>${spring-version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.springframework.ldap</groupId>
-        <artifactId>spring-ldap-core</artifactId>
-        <version>1.3.1.RELEASE</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework.security</groupId>
-        <artifactId>spring-security-config</artifactId>
-        <version>${spring-version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework.security</groupId>
-        <artifactId>spring-security-taglibs</artifactId>
-        <version>${spring-version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework.security</groupId>
-        <artifactId>spring-security-core</artifactId>
-        <version>${spring-version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework.security</groupId>
-        <artifactId>spring-security-ldap</artifactId>
-        <version>${spring-version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework.integration</groupId>
-        <artifactId>spring-integration-core</artifactId>
-        <version>${spring-integration-version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework.integration</groupId>
-        <artifactId>spring-integration-http</artifactId>
-        <version>${spring-integration-version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework.integration</groupId>
-        <artifactId>spring-integration-xml</artifactId>
-        <version>${spring-integration-version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework.integration</groupId>
-        <artifactId>spring-integration-ip</artifactId>
-        <version>${spring-integration-version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework.security</groupId>
-        <artifactId>spring-security-web</artifactId>
-        <version>${spring-version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework.integration</groupId>
-        <artifactId>spring-integration-file</artifactId>
-        <version>${spring-integration-version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework.batch</groupId>
-        <artifactId>spring-batch-core</artifactId>
-        <version>2.1.2.RELEASE</version>
-      </dependency>
-      
-      <dependency>
-        <groupId>org.aspectj</groupId>
-        <artifactId>aspectjrt</artifactId>
-        <version>1.6.12</version>
-      </dependency>
-      <dependency>
-        <groupId>org.aspectj</groupId>
-        <artifactId>aspectjweaver</artifactId>
-        <version>1.6.12</version>
-      </dependency>
-    <dependency>
-      <groupId>org.springframework.security.oauth</groupId>
-      <artifactId>spring-security-oauth</artifactId>
-      <version>1.0.0.RELEASE</version>
-      <exclusions>
-        <exclusion>
-          <groupId>commons-codec</groupId>
-          <artifactId>commons-codec</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-      <dependency>
-        <groupId>xml-apis</groupId>
-        <artifactId>xml-apis</artifactId>
-        <version>1.3.04</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.httpcomponents</groupId>
-        <artifactId>httpcore</artifactId>
-        <version>4.0.1</version>
-      </dependency>
-	  <dependency>
-	    <groupId>org.apache.poi</groupId>
-	    <artifactId>poi</artifactId>
-	    <version>3.6</version>
-	    <scope>compile</scope>
-	    <type>jar</type>
-	  </dependency>
-      <dependency>
-        <groupId>jfree</groupId>
-        <artifactId>jcommon</artifactId>
-        <version>1.0.16</version>
-      </dependency>
-      <dependency>
-        <groupId>org.codehaus.jackson</groupId>
-        <artifactId>jackson-core-asl</artifactId>
-        <version>1.9.4</version>
-      </dependency>
-      <dependency>
-        <groupId>com.google.guava</groupId>
-        <artifactId>guava</artifactId>
-        <version>r08</version>
-      </dependency>
-      <dependency>
-        <groupId>com.googlecode.json-simple</groupId>
-        <artifactId>json-simple</artifactId>
-        <version>1.1.1</version>
-      </dependency>
-      <dependency>
-        <groupId>com.googlecode.ehcache-spring-annotations</groupId>
-        <artifactId>ehcache-spring-annotations</artifactId>
-        <version>1.2.0</version>
-      </dependency>
-	  <dependency>
-        <groupId>net.sf.ehcache</groupId>
-        <artifactId>ehcache</artifactId>
-        <type>pom</type>
-        <version>2.6.3</version>
-      </dependency>
-      <dependency>
-        <groupId>commons-io</groupId>
-        <artifactId>commons-io</artifactId>
+  <!-- Reporting/Documentation output -->
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.9</version>
+        <configuration>
+          <stylesheetfile>${basedir}/src/main/javadoc/stylesheet.css</stylesheetfile>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <version>2.2</version>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <!-- <report>dependencies</report> -->
+              <report>project-team</report>
+              <report>mailing-list</report>
+              <report>cim</report>
+              <report>issue-tracking</report>
+              <report>license</report>
+              <report>scm</report>
+              <report>index</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
         <version>2.1</version>
-      </dependency>
-      <dependency>
-        <groupId>commons-lang</groupId>
-        <artifactId>commons-lang</artifactId>
-        <version>2.5</version>
-      </dependency>
-      <dependency>
-        <groupId>commons-logging</groupId>
-        <artifactId>commons-logging</artifactId>
-        <version>1.1.1</version>
-      </dependency>
-      <dependency>
-        <groupId>org.hibernate.javax.persistence</groupId>
-        <artifactId>hibernate-jpa-2.0-api</artifactId>
-        <version>1.0.1.Final</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.poi</groupId>
-        <artifactId>poi-ooxml</artifactId>
-        <version>3.6</version>
-        <exclusions>
-          <exclusion>
-            <groupId>dom4j</groupId>
-            <artifactId>dom4j</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.jdom</groupId>
-        <artifactId>jdom</artifactId>
-        <version>1.1</version>
-      </dependency>
-      <dependency>
-        <groupId>org.flywaydb</groupId>
-        <artifactId>flyway-core</artifactId>
-        <version>3.2.1</version>
-      </dependency>
-      <dependency>
-        <groupId>com.h2database</groupId>
-        <artifactId>h2</artifactId>
-        <version>1.4.190</version>
-        <scope>test</scope>
-      </dependency>
-
-      <dependency>
-        <groupId>cglib</groupId>
-        <artifactId>cglib-nodep</artifactId>
-        <version>2.2.2</version>
-      </dependency>
-      <dependency>
-        <groupId>net.sf.json-lib</groupId>
-        <artifactId>json-lib</artifactId>
-        <version>2.4</version>
-        <classifier>jdk15</classifier>
-      </dependency>
-      <dependency>
-        <groupId>net.sf.barcode4j</groupId>
-        <artifactId>barcode4j</artifactId>
-        <version>2.0</version>
-      </dependency>
-      <dependency>
-        <groupId>net.sourceforge.fluxion</groupId>
-        <artifactId>fluxion-spi</artifactId>
-        <version>1.0-alpha-3</version>
-      </dependency>
-      <dependency>
-        <groupId>com.lowagie</groupId>
-        <artifactId>itext</artifactId>
-        <version>2.1.7</version>
-      </dependency>
-      <dependency>
-        <groupId>javax.mail</groupId>
-        <artifactId>mail</artifactId>
-        <version>1.4.1</version>
-      </dependency>
-      <dependency>
-        <groupId>javax.servlet</groupId>
-        <artifactId>servlet-api</artifactId>
-        <version>2.5</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>javax.servlet</groupId>
-        <artifactId>jstl</artifactId>
-        <version>1.2</version>
-      </dependency>
-      <dependency>
-        <groupId>javax.servlet</groupId>
-        <artifactId>jsp-api</artifactId>
-        <version>2.0</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>javassist</groupId>
-        <artifactId>javassist</artifactId>
-        <version>3.8.0.GA</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.apache.httpcomponents</groupId>
-        <artifactId>httpclient</artifactId>
-        <version>4.5.2</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.httpcomponents</groupId>
-        <artifactId>httpmime</artifactId>
-        <version>4.0.1</version>
-      </dependency>    
-      <dependency>
-        <groupId>org.irods.jargon</groupId>
-        <artifactId>jargon-core</artifactId>
-        <version>3.1.4</version>
-      </dependency>
-      <dependency>
-        <groupId>commons-codec</groupId>
-        <artifactId>commons-codec</artifactId>
-        <version>1.7</version>
-      </dependency>
-      <dependency>
-        <groupId>commons-net</groupId>
-        <artifactId>commons-net</artifactId>
-        <version>2.0</version>
-      </dependency>
-      <dependency>
-        <groupId>ca.on.oicr.gsi</groupId>
-        <artifactId>metrix</artifactId>
-        <version>1.2-2016</version>
-      </dependency>
-      <dependency>
-        <groupId>ca.on.oicr.gsi</groupId>
-        <artifactId>oscore</artifactId>
-        <version>2.2.7</version>
-      </dependency>
-      <dependency>
-        <groupId>ca.on.oicr.gsi</groupId>
-        <artifactId>visionmate</artifactId>
-        <version>1.0.0</version>
-      </dependency>
-      <dependency>
-        <groupId>jfree</groupId>
-        <artifactId>jfreechart</artifactId>
-        <version>1.0.13</version>
-      </dependency>
-      <dependency>
-        <groupId>org.odftoolkit</groupId>
-        <artifactId>odfdom-java</artifactId>
-        <version>0.8.7</version>
-      </dependency>
-      <dependency>
-        <groupId>fr.opensagres</groupId>
-        <artifactId>org.odftoolkit.odfdom.converter</artifactId>
-        <version>0.9.1</version>
-      </dependency>
-      <dependency>
-        <groupId>org.reflections</groupId>
-        <artifactId>reflections</artifactId>
-        <version>0.9.5</version>
-      </dependency>
-      <dependency>
-        <groupId>net.sf.ehcache</groupId>
-        <artifactId>ehcache-core</artifactId>
-        <version>2.6.8</version>
-      </dependency>
-      
-      
-      <dependency>
-        <groupId>org.hamcrest</groupId>
-        <artifactId>hamcrest-all</artifactId>
-        <version>${hamcrest.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>junit</groupId>
-        <artifactId>junit</artifactId>
-        <version>${junit.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest-core</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>    
-      <dependency>
-        <groupId>org.mockito</groupId>
-        <artifactId>mockito-all</artifactId>
-        <version>1.10.19</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.mockito</groupId>
-        <artifactId>mockito-core</artifactId>
-        <version>${mockito.verison}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest-core</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-   
-      <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-api</artifactId>
-        <version>${slf4j.version}</version>
-      </dependency>
-    
-      <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-log4j12</artifactId>
-        <version>${slf4j.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>log4j</groupId>
-        <artifactId>log4j</artifactId>
-        <version>1.2.16</version>
-      </dependency>
-      <dependency>
-        <groupId>org.hibernate</groupId>
-        <artifactId>hibernate-core</artifactId>
-        <version>${hibernate.version}</version>
-      </dependency> 
-      
-      <dependency>
-        <groupId>uk.ac.tgac.statsdb</groupId>
-        <artifactId>statsdb-api</artifactId>
-        <version>1.1</version>
-        <exclusions>
-          <exclusion>
-            <artifactId>jackson-mapper-asl</artifactId>
-            <groupId>org.codehaus.jackson</groupId>
-          </exclusion>
-          <exclusion>
-            <artifactId>jackson-core-asl</artifactId>
-            <groupId>org.codehaus.jackson</groupId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      
-      <dependency>
-        <groupId>mysql</groupId>
-        <artifactId>mysql-connector-java</artifactId>
-        <version>5.1.13</version>
-      </dependency>
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-dbcp2</artifactId>
-      <version>2.1.1</version>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-test</artifactId>
-      <version>3.2.0.RELEASE</version>
-    </dependency>
-    <dependency>
-      <groupId>com.mikesamuel</groupId>
-      <artifactId>json-sanitizer</artifactId>
-      <version>[1.0,)</version>
-    </dependency>
-    <dependency>
-      <groupId>commons-fileupload</groupId>
-      <artifactId>commons-fileupload</artifactId>
-      <version>1.2.1</version>
-    </dependency>
-    <dependency>
-      <groupId>io.prometheus</groupId>
-      <artifactId>simpleclient</artifactId>
-      <version>${prometheus.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.prometheus</groupId>
-      <artifactId>simpleclient_hotspot</artifactId>
-      <version>${prometheus.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.prometheus</groupId>
-      <artifactId>simpleclient_servlet</artifactId>
-      <version>${prometheus.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>aopalliance</groupId>
-      <artifactId>aopalliance</artifactId>
-      <version>1.0</version>
-    </dependency>
-    <dependency>
-      <groupId>javax.ws.rs</groupId>
-      <artifactId>jsr311-api</artifactId>
-      <version>1.1.1</version>
-    </dependency>
-    <dependency>
-      <groupId>commons-httpclient</groupId>
-      <artifactId>commons-httpclient</artifactId>
-      <version>3.1</version>
-    </dependency>
-    <dependency>
-      <groupId>com.sun.jersey</groupId>
-      <artifactId>jersey-client</artifactId>
-      <version>${jersey.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
-      <artifactId>oauth-signature</artifactId>
-      <version>${jersey.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
-      <artifactId>oauth-client</artifactId>
-      <version>${jersey.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.sun.jersey.contribs</groupId>
-      <artifactId>jersey-apache-client</artifactId>
-      <version>${jersey.version}</version>
-    </dependency>
-    
-    
-    </dependencies>
-  </dependencyManagement>
-
+        <configuration>
+          <preparationGoals>clean verify install</preparationGoals>
+        </configuration>
+      </plugin>
+    </plugins>
+  </reporting>
   <profiles>
     <profile>
       <id>external</id>
+      <activation>
+        <property>
+          <name>release</name>
+          <value>external</value>
+        </property>
+      </activation>
       <modules>
         <module>sqlstore</module>
         <module>runstats-client</module>
@@ -1101,30 +1062,6 @@
         <module>demo-notification-client</module>
         <module>migration</module>
       </modules>
-      <activation>
-        <property>
-          <name>release</name>
-          <value>external</value>
-        </property>
-      </activation>
     </profile>
   </profiles>
-
-  <properties>
-    <spring-version>3.1.3.RELEASE</spring-version>
-    <spring-integration-version>2.2.0.RELEASE</spring-integration-version>
-    <hibernate.version>4.2.21.Final</hibernate.version>
-    <joda-time.version>2.9</joda-time.version>
-    <hamcrest.version>1.3</hamcrest.version>
-    <junit.version>4.12</junit.version>
-    <mockito.verison>1.10.19</mockito.verison>
-    <slf4j.version>1.6.1</slf4j.version>
-    <jersey.version>1.19</jersey.version>
-    <prometheus.version>0.0.15</prometheus.version>
-    <!-- Note: Jackson 1 versions beyond 1.9.4 are not compatible with
-      recursive type parameters, such as in the Poolable interface -->
-    <jackson.version>1.9.4</jackson.version>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
-
 </project>
