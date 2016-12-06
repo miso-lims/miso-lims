@@ -439,26 +439,6 @@
         <artifactId>jackson-mapper-asl</artifactId>
         <version>${jackson.version}</version>
       </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-core</artifactId>
-        <version>${spring-version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-webmvc</artifactId>
-        <version>${spring-version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-orm</artifactId>
-        <version>${spring-version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework.security</groupId>
-        <artifactId>spring-security-config</artifactId>
-        <version>${spring-version}</version>
-      </dependency>
 
       <dependency>
         <groupId>org.springframework</groupId>
@@ -467,20 +447,50 @@
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
-        <artifactId>spring-web</artifactId>
+        <artifactId>spring-context</artifactId>
         <version>${spring-version}</version>
       </dependency>
       <dependency>
-        <groupId>org.springframework.ldap</groupId>
-        <artifactId>spring-ldap-core</artifactId>
-        <version>1.3.1.RELEASE</version>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-core</artifactId>
+        <version>${spring-version}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-jdbc</artifactId>
         <version>${spring-version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-orm</artifactId>
+        <version>${spring-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-tx</artifactId>
+        <version>${spring-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-web</artifactId>
+        <version>${spring-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-webmvc</artifactId>
+        <version>${spring-version}</version>
+      </dependency>
 
+      <dependency>
+        <groupId>org.springframework.ldap</groupId>
+        <artifactId>spring-ldap-core</artifactId>
+        <version>1.3.1.RELEASE</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.security</groupId>
+        <artifactId>spring-security-config</artifactId>
+        <version>${spring-version}</version>
+      </dependency>
       <dependency>
         <groupId>org.springframework.security</groupId>
         <artifactId>spring-security-core</artifactId>
@@ -497,16 +507,15 @@
         <version>${spring-integration-version}</version>
       </dependency>
       <dependency>
+        <groupId>org.springframework.integration</groupId>
+        <artifactId>spring-integration-file</artifactId>
+        <version>${spring-integration-version}</version>
+      </dependency>
+      <dependency>
         <groupId>org.aspectj</groupId>
         <artifactId>aspectjrt</artifactId>
         <version>1.6.12</version>
       </dependency>
-
-
-
-
-
-
 
       <dependency>
         <groupId>xml-apis</groupId>
@@ -586,14 +595,25 @@
         <version>1.4.1</version>
       </dependency>
       <dependency>
+        <groupId>javax.servlet</groupId>
+        <artifactId>servlet-api</artifactId>
+        <version>2.5</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpclient</artifactId>
-        <version>4.0.2</version>
+        <version>4.5.2</version>
       </dependency>
       <dependency>
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpmime</artifactId>
         <version>4.0.1</version>
+      </dependency>    
+      <dependency>
+        <groupId>org.irods.jargon</groupId>
+        <artifactId>jargon-core</artifactId>
+        <version>3.1.4</version>
       </dependency>
       <dependency>
         <groupId>commons-codec</groupId>
@@ -609,6 +629,11 @@
         <groupId>ca.on.oicr.gsi</groupId>
         <artifactId>oscore</artifactId>
         <version>2.2.7</version>
+      </dependency>
+      <dependency>
+        <groupId>ca.on.oicr.gsi</groupId>
+        <artifactId>visionmate</artifactId>
+        <version>1.0.0</version>
       </dependency>
       <dependency>
         <groupId>jfree</groupId>
@@ -665,7 +690,6 @@
         </exclusions>
       </dependency>
    
-    
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
@@ -678,11 +702,37 @@
         <version>${slf4j.version}</version>
       </dependency>
       <dependency>
+        <groupId>log4j</groupId>
+        <artifactId>log4j</artifactId>
+        <version>1.2.16</version>
+      </dependency>
+      <dependency>
         <groupId>org.hibernate</groupId>
         <artifactId>hibernate-core</artifactId>
         <version>${hibernate.version}</version>
       </dependency> 
       
+      <dependency>
+        <groupId>uk.ac.tgac.statsdb</groupId>
+        <artifactId>statsdb-api</artifactId>
+        <version>1.1</version>
+        <exclusions>
+          <exclusion>
+            <artifactId>jackson-mapper-asl</artifactId>
+            <groupId>org.codehaus.jackson</groupId>
+          </exclusion>
+          <exclusion>
+            <artifactId>jackson-core-asl</artifactId>
+            <groupId>org.codehaus.jackson</groupId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      
+      <dependency>
+        <groupId>mysql</groupId>
+        <artifactId>mysql-connector-java</artifactId>
+        <version>5.1.13</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 

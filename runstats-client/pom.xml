@@ -29,14 +29,6 @@
 
   <repositories>
     <repository>
-      <id>hasbanana-repo</id>
-      <url>http://www.hasbanana.com/maven/repo</url>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
-
-    <repository>
       <id>tgac-repo</id>
       <name>TGAC Maven Repository</name>
       <url>http://repos.tgac.ac.uk/maven/repo</url>
@@ -57,43 +49,28 @@
     <dependency>
       <groupId>uk.ac.tgac.statsdb</groupId>
       <artifactId>statsdb-api</artifactId>
-      <version>1.1</version>
-      <exclusions>
-        <exclusion>
-          <artifactId>jackson-mapper-asl</artifactId>
-          <groupId>org.codehaus.jackson</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>jackson-core-asl</artifactId>
-          <groupId>org.codehaus.jackson</groupId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
-      <version>5.1.13</version>
     </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-tx</artifactId>
-      <version>${spring-version}</version>
-    </dependency>
+  	<dependency>
+  	  <groupId>org.springframework</groupId>
+  	  <artifactId>spring-beans</artifactId>
+  	</dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-jdbc</artifactId>
-      <version>${spring-version}</version>
     </dependency>
     <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-orm</artifactId>
+      <groupId>net.sf.json-lib</groupId>
+      <artifactId>json-lib</artifactId>
+      <classifier>jdk15</classifier>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
     </dependency>
   </dependencies>
 
-  <properties>
-    <spring-version>3.1.3.RELEASE</spring-version>
-    <junit-version>4.5</junit-version>
-    <commons-logging-version>1.1</commons-logging-version>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
 </project>
