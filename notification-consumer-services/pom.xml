@@ -47,18 +47,15 @@
     <dependency>
       <groupId>${project.parent.groupId}</groupId>
       <artifactId>integration-tools</artifactId>
-      <version>${project.parent.version}</version>
     </dependency>
     <dependency>
       <groupId>${project.parent.groupId}</groupId>
       <artifactId>run-tools</artifactId>
-      <version>${project.parent.version}</version>
     </dependency>
 
     <dependency>
       <groupId>${project.parent.groupId}</groupId>
       <artifactId>core</artifactId>
-      <version>${project.parent.version}</version>
     </dependency>
     <dependency>
     	<groupId>uk.ac.bbsrc.tgac.miso</groupId>
