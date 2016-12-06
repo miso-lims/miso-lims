@@ -70,19 +70,6 @@
       <artifactId>spring-integration-file</artifactId>
     </dependency>
   </dependencies>
-  <repositories>
-    <repository>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-      <id>hasbanana-repo</id>
-      <url>http://www.hasbanana.com/maven/repo</url>
-    </repository>
-    <repository>
-      <id>renci.public</id>
-      <url>http://ci-dev.renci.org/nexus/content/repositories/releases</url>
-    </repository>
-  </repositories>
   <build>
     <plugins>
       <plugin>

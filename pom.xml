@@ -750,6 +750,14 @@
   <!-- Maven repository download -->
   <repositories>
     <repository>
+      <releases>
+        <enabled>true</enabled>
+        <updatePolicy>always</updatePolicy>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+        <updatePolicy>always</updatePolicy>
+      </snapshots>
       <id>hasbanana-repo</id>
       <name>hasbanana Maven Repository</name>
       <url>http://www.hasbanana.com/maven/repo</url>
@@ -854,30 +862,35 @@
       <url>http://repos.tgac.ac.uk/maven/fluxion/releases</url>
     </repository>
     <repository>
-      <id>seqwaremaven.oicr.on.ca</id>
-      <name>seqwaremaven.oicr.on.ca-releases</name>
-      <url>https://seqwaremaven.oicr.on.ca/artifactory/gsi-dependencies</url>
-    </repository>
-  </repositories>
-  <pluginRepositories>
-    <pluginRepository>
       <releases>
         <enabled>true</enabled>
         <updatePolicy>always</updatePolicy>
       </releases>
-      <id>miso-releases</id>
-      <name>MISO repository</name>
-      <url>http://repos.tgac.ac.uk/maven/miso/releases</url>
-    </pluginRepository>
-    <pluginRepository>
       <snapshots>
-        <enabled>true</enabled>
+        <enabled>false</enabled>
         <updatePolicy>always</updatePolicy>
       </snapshots>
-      <id>miso-snapshots</id>
-      <name>MISO snapshot repository</name>
-      <url>http://repos.tgac.ac.uk/maven/miso/snapshots</url>
-    </pluginRepository>
+      <id>dependencies.gsi</id>
+      <name>OICR GSI Dependencies repository</name>
+      <url>https://seqwaremaven.oicr.on.ca/artifactory/gsi-dependencies</url>
+    </repository>
+    <repository>
+      <id>sonatype-sourceforge-snapshots</id>
+      <name>Sonatype SF Repository</name>
+      <url>http://oss.sonatype.org/content/repositories/sourceforge-snapshots/</url>
+    </repository>
+    <repository>
+      <id>renci.public</id>
+      <url>http://ci-dev.renci.org/nexus/content/repositories/releases</url>
+    </repository>
+    <repository>
+      <id>maven2-repository.dev.java.net</id>
+      <name>Java.net Repository for Maven</name>
+      <url>http://download.java.net/maven/2/</url>
+      <!--<layout>default</layout>-->
+    </repository>
+  </repositories>
+  <pluginRepositories>
     <pluginRepository>
       <snapshots>
         <updatePolicy>never</updatePolicy>
@@ -889,6 +902,18 @@
     <pluginRepository>
       <id>Atlassian Maven Repository</id>
       <url>https://maven.atlassian.com/public</url>
+    </pluginRepository>
+    <pluginRepository>
+      <releases>
+        <updatePolicy>daily</updatePolicy>
+        <checksumPolicy>warn</checksumPolicy>
+      </releases>
+      <snapshots>
+        <updatePolicy>daily</updatePolicy>
+        <checksumPolicy>warn</checksumPolicy>
+      </snapshots>
+      <id>unto.net</id>
+      <url>http://repository.unto.net/maven/</url>
     </pluginRepository>
   </pluginRepositories>
   <!-- Required Build Plugins -->

@@ -66,13 +66,6 @@
       <artifactId>statsdb-api</artifactId>
     </dependency>
   </dependencies>
-  <repositories>
-    <repository>
-      <id>tgac-repo</id>
-      <name>TGAC Maven Repository</name>
-      <url>http://repos.tgac.ac.uk/maven/repo</url>
-    </repository>
-  </repositories>
   <build>
     <plugins>
       <plugin>
