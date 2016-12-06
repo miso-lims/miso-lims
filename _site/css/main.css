@@ -99,3 +99,9 @@ body.rtl .row-fluid [class*="span"]:first-child {
 body.rtl ul, body.rtl ol {
     margin: 0 5px 10px 0;
 }
+table, th, td {
+    border: 1px solid black;
+}
+th, td {
+    padding: 6px;
+}
