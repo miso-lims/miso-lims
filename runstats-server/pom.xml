@@ -3,12 +3,13 @@
   <parent>
     <artifactId>miso</artifactId>
     <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-    <version>0.2.1-SNAPSHOT</version>
+    <version>0.2.43-SNAPSHOT</version>
   </parent>
 
   <artifactId>runstats-server</artifactId>
 
   <name>runstats-server</name>
+  <version>0.2.43-SNAPSHOT</version>
   <packaging>jar</packaging>
   <url>http://maven.apache.org</url>
   <modelVersion>4.0.0</modelVersion>
@@ -70,18 +71,11 @@
     <dependency>
       <groupId>${project.parent.groupId}</groupId>
       <artifactId>run-tools</artifactId>
-      <version>${project.parent.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-core</artifactId>
-      <version>${spring-version}</version>
     </dependency>
   </dependencies>
-
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <spring-version>3.1.3.RELEASE</spring-version>
-  </properties>
 </project>

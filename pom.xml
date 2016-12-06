@@ -452,6 +452,7 @@
     <module>runstats-client</module>
     <module>notification-consumer-services</module>
     <module>miso-external-web</module>
+    <module>runstats-server</module>
   </modules>
 
   <dependencyManagement>
@@ -459,6 +460,11 @@
       <dependency>
         <groupId>uk.ac.bbsrc.tgac.miso</groupId>
         <artifactId>sqlstore</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>uk.ac.bbsrc.tgac.miso</groupId>
+        <artifactId>run-tools</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
