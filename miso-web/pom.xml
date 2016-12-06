@@ -241,21 +241,6 @@
       <artifactId>xml-apis</artifactId>
     </dependency>
   </dependencies>
-  <repositories>
-    <repository>
-      <id>hasbanana-repo</id>
-      <name>hasBanana Repository</name>
-      <url>http://www.hasbanana.com/maven/repo</url>
-    </repository>
-    <repository>
-      <id>Atlassian Maven Repository</id>
-      <url>https://maven.atlassian.com/public</url>
-    </repository>
-    <repository>
-      <id>Java.Net Maven Repository</id>
-      <url>http://download.java.net/maven/2</url>
-    </repository>
-  </repositories>
   <build>
     <finalName>ROOT</finalName>
     <plugins>

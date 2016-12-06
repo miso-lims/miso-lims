@@ -62,15 +62,6 @@
       <artifactId>core</artifactId>
     </dependency>
   </dependencies>
-  <repositories>
-    <repository>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-      <id>hasbanana-repo</id>
-      <url>http://www.hasbanana.com/maven/repo</url>
-    </repository>
-  </repositories>
   <build>
     <plugins>
       <plugin>

@@ -80,31 +80,6 @@
       <artifactId>spring-context</artifactId>
     </dependency>
   </dependencies>
-  <repositories>
-    <repository>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-      <id>hasbanana-repo</id>
-      <url>http://www.hasbanana.com/maven/repo</url>
-    </repository>
-    <repository>
-      <id>renci.public</id>
-      <url>http://ci-dev.renci.org/nexus/content/repositories/releases</url>
-    </repository>
-    <repository>
-      <releases>
-        <updatePolicy>always</updatePolicy>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-        <updatePolicy>always</updatePolicy>
-      </snapshots>
-      <id>tgac-repo</id>
-      <name>TGAC Maven Repository</name>
-      <url>http://repos.tgac.ac.uk/maven/repo</url>
-    </repository>
-  </repositories>
   <build>
     <plugins>
       <plugin>
