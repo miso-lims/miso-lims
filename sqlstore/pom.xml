@@ -157,14 +157,12 @@
     <dependency>
       <groupId>org.aspectj</groupId>
       <artifactId>aspectjweaver</artifactId>
-      <version>1.6.12</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>${project.parent.groupId}</groupId>
       <artifactId>core</artifactId>
-      <version>${project.parent.version}</version>
     </dependency>
 
     <dependency>

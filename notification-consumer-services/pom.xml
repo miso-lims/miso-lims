@@ -90,5 +90,13 @@
       <groupId>${project.parent.groupId}</groupId>
       <artifactId>core</artifactId>
     </dependency>
+    <dependency>
+      <groupId>${project.parent.groupId}</groupId>
+      <artifactId>run-tools</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.parent.groupId}</groupId>
+      <artifactId>notification-server</artifactId>
+    </dependency>
   </dependencies>
 </project>
