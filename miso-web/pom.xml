@@ -229,14 +229,6 @@
       <url>http://www.hasbanana.com/maven/repo</url>
     </repository>
 
-    <!--
-    <repository>
-      <id>sonatype-sourceforge-snapshots</id>
-      <name>Sonatype SF Repository</name>
-      <url>http://oss.sonatype.org/content/repositories/sourceforge-snapshots/</url>
-    </repository>
-    -->
-
     <repository>
       <id>Atlassian Maven Repository</id>
       <url>https://maven.atlassian.com/public</url>
@@ -265,42 +257,16 @@
       <artifactId>integration-tools</artifactId>
       <version>${project.parent.version}</version>
     </dependency>
-<!--     <dependency>
-      <groupId>${project.parent.groupId}</groupId>
-      <artifactId>run-tools</artifactId>
-      <version>${project.parent.version}</version>
-    </dependency> -->
     <dependency>
       <groupId>${project.parent.groupId}</groupId>
       <artifactId>runstats-client</artifactId>
       <version>${project.parent.version}</version>
     </dependency>
-<!--     <dependency>
-      <groupId>${project.parent.groupId}</groupId>
-      <artifactId>notification-consumer-services</artifactId>
-      <version>${project.parent.version}</version>
-    </dependency> -->
-
-<!--     <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-aop</artifactId>
-      <version>${spring-version}</version>
-    </dependency> -->
 
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-webmvc</artifactId>
     </dependency>
-<!--     <dependency>
-      <groupId>org.springframework.security</groupId>
-      <artifactId>spring-security-taglibs</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>org.springframework</groupId>
-          <artifactId>spring-aop</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency> -->
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-web</artifactId>
@@ -323,60 +289,14 @@
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-core</artifactId>
     </dependency>
-<!--     <dependency>
-      <groupId>org.springframework.security</groupId>
-      <artifactId>spring-security-config</artifactId>
-    </dependency> -->
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-ldap</artifactId>
     </dependency>
-<!--     <dependency>
-      <groupId>org.springframework.security.oauth</groupId>
-      <artifactId>spring-security-oauth</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>commons-codec</groupId>
-          <artifactId>commons-codec</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency> -->
-<!--     <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-tx</artifactId>
-    </dependency> -->
-<!--     <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-test</artifactId>
-        <version>3.2.0.RELEASE</version>
-    </dependency> -->
-<!--     <dependency>
-      <groupId>commons-dbcp</groupId>
-      <artifactId>commons-dbcp</artifactId>
-      <version>1.4</version>
-      <scope>test</scope>
-    </dependency> -->
     <dependency>
       <groupId>org.springframework.integration</groupId>
       <artifactId>spring-integration-core</artifactId>
     </dependency>
-<!--     <dependency>
-      <groupId>org.springframework.integration</groupId>
-      <artifactId>spring-integration-http</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.integration</groupId>
-      <artifactId>spring-integration-xml</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.integration</groupId>
-      <artifactId>spring-integration-ip</artifactId>
-    </dependency> -->
-
-<!--     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>jstl</artifactId>
-    </dependency> -->
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>
@@ -387,28 +307,6 @@
       <artifactId>jsp-api</artifactId>
       <scope>provided</scope>
     </dependency>
-<!--     <dependency>
-      <groupId>cglib</groupId>
-      <artifactId>cglib-nodep</artifactId>
-      <version>2.2.2</version>
-    </dependency> -->
-
-<!--     <dependency>
-      <groupId>net.sf.ehcache</groupId>
-      <artifactId>ehcache</artifactId>
-      <type>pom</type>
-      <version>2.8.2</version>
-    </dependency>
-
-    <dependency>
-      <groupId>net.sf.ehcache</groupId>
-      <artifactId>ehcache-core</artifactId>
-    </dependency> -->
-
-<!--     <dependency>
-      <groupId>javassist</groupId>
-      <artifactId>javassist</artifactId>
-    </dependency> -->
 
     <dependency>
       <groupId>log4j</groupId>
@@ -424,21 +322,12 @@
       <groupId>uk.ac.tgac.fluxion.ajax</groupId>
       <artifactId>fluxion-ajax-3</artifactId>
     </dependency>
-<!--     <dependency>
-      <groupId>uk.ac.tgac.fluxion.ajax</groupId>
-      <artifactId>fluxion-ajax-js</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>uk.ac.tgac.fluxion.ajax.beans</groupId>
-      <artifactId>fluxion-ajax-beans</artifactId>
-    </dependency> -->
 
     <dependency>
       <groupId>net.sf.json-lib</groupId>
       <artifactId>json-lib</artifactId>
       <classifier>jdk15</classifier>
     </dependency>
-
 
     <dependency>
       <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
@@ -457,13 +346,6 @@
       <artifactId>jersey-apache-client</artifactId>
       <version>1.19</version>
     </dependency>
-    <!--
-    <dependency>
-      <groupId>org.atmosphere</groupId>
-      <artifactId>atmosphere-jquery</artifactId>
-      <version>0.8.2</version>
-    </dependency>
-    -->
     <dependency>
       <groupId>uk.ac.bbsrc.tgac.miso</groupId>
       <artifactId>miso-service</artifactId>
@@ -482,11 +364,6 @@
       <artifactId>simpleclient_hotspot</artifactId>
       <version>0.0.15</version>
     </dependency>
-<!--     <dependency>
-      <groupId>io.prometheus</groupId>
-      <artifactId>simpleclient_servlet</artifactId>
-      <version>0.0.15</version>
-    </dependency> -->
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-jdbc</artifactId>
@@ -569,10 +446,5 @@
       <artifactId>commons-httpclient</artifactId>
       <version>3.1</version>
     </dependency>
-<!--     <dependency>
-      <groupId>stax</groupId>
-      <artifactId>stax-api</artifactId>
-      <version>1.0.1</version>
-    </dependency> -->
   </dependencies>
 </project>
