@@ -58,7 +58,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubmissionImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
 import uk.ac.bbsrc.tgac.miso.core.store.ExperimentStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
@@ -78,7 +78,7 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
  * @since 0.0.2
  */
 @Transactional(rollbackFor = Exception.class)
-public class SQLTgacSubmissionDAO implements SubmissionStore, NamingSchemeAware<Submission> {
+public class SQLTgacSubmissionDAO implements SubmissionStore, NamingSchemeAware {
   private static final String TABLE_NAME = "Submission";
 
   public static final String SUBMISSION_SELECT = "SELECT submissionId, creationDate, submittedDate, name, alias, title, description, accession, verified, completed "
@@ -113,15 +113,14 @@ public class SQLTgacSubmissionDAO implements SubmissionStore, NamingSchemeAware<
   private SampleStore sampleDAO;
 
   @Autowired
-  private MisoNamingScheme<Submission> namingScheme;
+  private NamingScheme namingScheme;
 
-  @Override
-  public MisoNamingScheme<Submission> getNamingScheme() {
+  public NamingScheme getNamingScheme() {
     return namingScheme;
   }
 
   @Override
-  public void setNamingScheme(MisoNamingScheme<Submission> namingScheme) {
+  public void setNamingScheme(NamingScheme namingScheme) {
     this.namingScheme = namingScheme;
   }
 
@@ -181,44 +180,34 @@ public class SQLTgacSubmissionDAO implements SubmissionStore, NamingSchemeAware<
     // if a submission already exists then delete all the old rows first, and repopulate.
     // easier than trying to work out which rows need to be updated and which don't
     if (submission.getId() != Submission.UNSAVED_ID) {
-      try {
-        if (namingScheme.validateField("name", submission.getName())) {
-          MapSqlParameterSource delparams = new MapSqlParameterSource();
-          delparams.addValue("submissionId", submission.getId());
-          NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
-          log.debug("Deleting Submission elements for " + submission.getId());
-          namedTemplate.update(SUBMISSION_ELEMENTS_DELETE, delparams);
+      DbUtils.validateNameOrThrow(submission, namingScheme);
+      MapSqlParameterSource delparams = new MapSqlParameterSource();
+      delparams.addValue("submissionId", submission.getId());
+      NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
+      log.debug("Deleting Submission elements for " + submission.getId());
+      namedTemplate.update(SUBMISSION_ELEMENTS_DELETE, delparams);
 
-          params.addValue("submissionId", submission.getId());
-          params.addValue("name", submission.getName());
-          namedTemplate.update(SUBMISSION_UPDATE, params);
-        } else {
-          throw new IOException("Cannot save Submission - invalid field:" + submission.toString());
-        }
-      } catch (MisoNamingException e) {
-        throw new IOException("Cannot save Submission - issue with naming scheme", e);
-      }
+      params.addValue("submissionId", submission.getId());
+      params.addValue("name", submission.getName());
+      namedTemplate.update(SUBMISSION_UPDATE, params);
     } else {
       insert.usingGeneratedKeyColumns("submissionId");
       try {
         submission.setId(DbUtils.getAutoIncrement(template, TABLE_NAME));
 
-        String name = namingScheme.generateNameFor("name", submission);
+        String name = namingScheme.generateNameFor(submission);
         submission.setName(name);
 
-        if (namingScheme.validateField("name", submission.getName())) {
-          params.addValue("name", name);
-          params.addValue("creationDate", new Date());
+        DbUtils.validateNameOrThrow(submission, namingScheme);
+        params.addValue("name", name);
+        params.addValue("creationDate", new Date());
 
-          Number newId = insert.executeAndReturnKey(params);
-          if (newId.longValue() != submission.getId()) {
-            log.error("Expected Submission ID doesn't match returned value from database insert: rolling back...");
-            new NamedParameterJdbcTemplate(template).update(SUBMISSION_DELETE,
-                new MapSqlParameterSource().addValue("submissionId", newId.longValue()));
-            throw new IOException("Something bad happened. Expected Submission ID doesn't match returned value from DB insert");
-          }
-        } else {
-          throw new IOException("Cannot save Submission - invalid field:" + submission.toString());
+        Number newId = insert.executeAndReturnKey(params);
+        if (newId.longValue() != submission.getId()) {
+          log.error("Expected Submission ID doesn't match returned value from database insert: rolling back...");
+          new NamedParameterJdbcTemplate(template).update(SUBMISSION_DELETE,
+              new MapSqlParameterSource().addValue("submissionId", newId.longValue()));
+          throw new IOException("Something bad happened. Expected Submission ID doesn't match returned value from DB insert");
         }
       } catch (MisoNamingException e) {
         throw new IOException("Cannot save Submission - issue with naming scheme", e);

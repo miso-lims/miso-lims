@@ -21,6 +21,33 @@
  * *********************************************************************
  */
 
+// Custom Parsley validator to validate Sample alias server-side
+window.Parsley.addValidator('sampleAlias', {
+  validateString: function(value) {
+    var deferred = new jQuery.Deferred();
+    Fluxion.doAjax(
+      'sampleControllerHelperService',
+      'validateSampleAlias',
+      {
+        'alias': value,
+        'url': ajaxurl
+      },
+      {
+        'doOnSuccess': function(json) {
+          deferred.resolve();
+        },
+        'doOnError': function(json) {
+          deferred.reject(json.error);
+        }
+      }
+    );
+    return deferred.promise();
+  },
+  messages: {
+    en: 'Alias must conform to the naming scheme.'
+  }
+});
+
 var Sample = Sample || {
   deleteSample: function (sampleId, successfunc) {
     if (confirm("Are you sure you really want to delete SAM" + sampleId + "? This operation is permanent!")) {
@@ -67,6 +94,9 @@ var Sample = Sample || {
     // 'data-parsley-required' attribute is set in JSP based on whether alias generation is enabled
     jQuery('#alias').attr('class', 'form-control');
     jQuery('#alias').attr('data-parsley-maxlength', '100');
+    jQuery('#alias').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+    jQuery('#alias').attr('data-parsley-sample-alias', '');
+    jQuery('#alias').attr('data-parsley-debounce', '500');
 
     // Description input field validation
     jQuery('#description').attr('class', 'form-control');
@@ -207,55 +237,10 @@ var Sample = Sample || {
       }
     }
     
-    Fluxion.doAjax(
-      'sampleControllerHelperService',
-      'getSampleAliasRegex',
-      { 
-        'url': ajaxurl
-      },
-      {
-        'doOnSuccess': function(json) {
-          // don't validate the alias if the sample or its parent has a nonstandard alias
-          if (jQuery('#nonStandardAlias').length > 0) {
-            jQuery('#sample-form').parsley();
-            jQuery('#sample-form').parsley().validate();
-            Validate.updateWarningOrSubmit('#sample-form');
-          } else {
-            var regex = json.aliasRegex.split(' ').join('+');
-            jQuery('#alias').attr('data-parsley-pattern', regex);
-            jQuery('#alias').attr('data-parsley-error-message', 'Must match '+regex);
-            jQuery('#sample-form').parsley();
-            jQuery('#sample-form').parsley().validate();
-            Validate.updateWarningOrSubmit('#sample-form', Sample.validateSampleAlias);
-          }
-          return false;
-        },
-        'doOnError': function(json) {
-          alert(json.error);
-        }
-      }
-    );
-  },
-  
-  validateSampleAlias: function () {
-    Fluxion.doAjax(
-      'sampleControllerHelperService',
-      'validateSampleAlias',
-      {
-        'alias': jQuery('#alias').val(),
-        'url': ajaxurl
-      },
-      {
-        'doOnSuccess': function(json) {
-          if (json.response === "OK") {
-            jQuery('#sample-form').submit();
-          }
-        },
-        'doOnError': function(json) {
-          alert(json.error);
-        }
-      }
-    );
+    jQuery('#sample-form').parsley();
+    jQuery('#sample-form').parsley().validate();
+    
+    Validate.updateWarningOrSubmit('#sample-form');
   },
   
   validateNCBITaxon: function () {

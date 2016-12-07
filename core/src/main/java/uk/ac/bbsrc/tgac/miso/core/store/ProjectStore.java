@@ -37,7 +37,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface ProjectStore extends Store<Project>, Cascadable, Remover<Project>, NamingSchemeAware<Project> {
+public interface ProjectStore extends Store<Project>, Cascadable, Remover<Project>, NamingSchemeAware {
   /**
    * Get a Project given an alias
    * 

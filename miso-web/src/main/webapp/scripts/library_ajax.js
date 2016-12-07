@@ -21,6 +21,33 @@
  * *********************************************************************
  */
 
+//Custom Parsley validator to validate Library alias server-side
+window.Parsley.addValidator('libraryAlias', {
+  validateString: function(value) {
+    var deferred = new jQuery.Deferred();
+    Fluxion.doAjax(
+      'libraryControllerHelperService',
+      'validateLibraryAlias',
+      {
+        'alias': value,
+        'url': ajaxurl
+      },
+      {
+        'doOnSuccess': function(json) {
+          deferred.resolve();
+        },
+        'doOnError': function(json) {
+          deferred.reject(json.error);
+        }
+      }
+    );
+    return deferred.promise();
+  },
+  messages: {
+    en: 'Alias must conform to the naming scheme.'
+  }
+});
+
 var Library = Library || {
   deleteLibrary: function (libraryId) {
     if (confirm("Are you sure you really want to delete LIB" + libraryId + "? This operation is permanent!")) {
@@ -49,6 +76,8 @@ var Library = Library || {
     jQuery('#alias').attr('data-parsley-required', 'true');
     jQuery('#alias').attr('data-parsley-maxlength', '100');
     jQuery('#alias').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+    jQuery('#alias').attr('data-parsley-library-alias', '');
+    jQuery('#alias').attr('data-parsley-debounce', '500');
 
     // Description input field validation
     jQuery('#description').attr('class', 'form-control');
@@ -69,58 +98,12 @@ var Library = Library || {
       jQuery('#libraryDesignCodes').attr('data-parsley-required', 'true');
     }
 
-    Fluxion.doAjax(
-      'libraryControllerHelperService',
-      'getLibraryAliasRegex',
-      {
-        'url': ajaxurl
-      },
-      {
-        'doOnSuccess': function(json) {
-          // don't validate the alias if the library or its parent has a nonstandard alias
-          if (jQuery('#nonStandardAlias').length > 0) {
-            jQuery('#library-form').parsley();
-            jQuery('#library-form').parsley().validate();
-            Validate.updateWarningOrSubmit('#library-form');
-          } else {
-            var regex = json.aliasRegex.split(' ').join('+');
-            jQuery('#alias').attr('data-parsley-pattern', regex);
-            // TODO: better error message than a regex..?
-            //       perhaps save a description and examples with the regex
-            jQuery('#alias').attr('data-parsley-error-message', 'Must match '+regex);
-            jQuery('#library-form').parsley();
-            jQuery('#library-form').parsley().validate();
-            Validate.updateWarningOrSubmit('#library-form', Library.validateLibraryExtra);
-          }
-          return false;
-        },
-        'doOnError': function(json) {
-          alert(json.error);
-        }
-      }
-    );
+    jQuery('#library-form').parsley();
+    jQuery('#library-form').parsley().validate();
+    
+    Validate.updateWarningOrSubmit('#library-form');
   },
 
-  validateLibraryExtra: function () {
-    Fluxion.doAjax(
-      'libraryControllerHelperService',
-      'validateLibraryAlias',
-      {
-        'alias': jQuery('#alias').val(),
-        'url': ajaxurl
-      },
-      {
-        'doOnSuccess': function(json) {
-          if (json.response === "OK") {
-            jQuery('#library-form').submit();
-          }
-        },
-        'doOnError': function(json) {
-          alert(json.error);
-        }
-      }
-    );
-  }
 };
 
 Library.qc = {

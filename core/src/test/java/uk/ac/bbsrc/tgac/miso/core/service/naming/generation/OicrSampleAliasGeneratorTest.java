@@ -1,4 +1,4 @@
-package uk.ac.bbsrc.tgac.miso.core.service.naming;
+package uk.ac.bbsrc.tgac.miso.core.service.naming.generation;
 
 import static org.junit.Assert.assertEquals;
 
@@ -7,10 +7,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleLCMTube;
@@ -27,6 +27,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleStockImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.generation.OicrSampleAliasGenerator;
 
 public class OicrSampleAliasGeneratorTest {
 
@@ -45,43 +46,43 @@ public class OicrSampleAliasGeneratorTest {
     // Cannot generate alias for Identity
     Sample identity = makeIdentity();
     exception.expect(IllegalArgumentException.class);
-    sut.generateName(identity);
+    sut.generate(identity);
   }
 
   @Test
   public void generateForTissueTest() throws Exception {
-    assertEquals("PROJ_0001_nn_n_nn_1-1", sut.generateName(makeMinimalTissue()));
-    assertEquals("PROJ_0001_Bn_P_32_2-3", sut.generateName(makeFullTissue()));
+    assertEquals("PROJ_0001_nn_n_nn_1-1", sut.generate(makeMinimalTissue()));
+    assertEquals("PROJ_0001_Bn_P_32_2-3", sut.generate(makeFullTissue()));
   }
 
   @Test
   public void generateForTissueProcessingTest() throws Exception {
-    assertEquals("PROJ_0001_nn_n_nn_1-1_LCM02", sut.generateName(makeLcmTube()));
+    assertEquals("PROJ_0001_nn_n_nn_1-1_LCM02", sut.generate(makeLcmTube()));
   }
 
   @Test
   public void generateForStockFromTissueTest() throws Exception {
-    assertEquals("PROJ_0001_nn_n_nn_1-1_D_S4", sut.generateName(makeStockFromTissue()));
+    assertEquals("PROJ_0001_nn_n_nn_1-1_D_S4", sut.generate(makeStockFromTissue()));
   }
 
   @Test
   public void generateForStockFromProcessingTest() throws Exception {
-    assertEquals("PROJ_0001_nn_n_nn_1-1_D_S4", sut.generateName(makeStockFromProcessing()));
+    assertEquals("PROJ_0001_nn_n_nn_1-1_D_S4", sut.generate(makeStockFromProcessing()));
   }
 
   @Test
   public void generateForStockFromStockTest() throws Exception {
-    assertEquals("PROJ_0001_nn_n_nn_1-1_D_S6", sut.generateName(makeStockFromStock()));
+    assertEquals("PROJ_0001_nn_n_nn_1-1_D_S6", sut.generate(makeStockFromStock()));
   }
 
   @Test
   public void generateForAliquotFromStockTest() throws Exception {
-    assertEquals("PROJ_0001_nn_n_nn_1-1_R_12", sut.generateName(makeAliquotFromStock()));
+    assertEquals("PROJ_0001_nn_n_nn_1-1_R_12", sut.generate(makeAliquotFromStock()));
   }
 
   @Test
   public void generateForAliquotFromAliquotTest() throws Exception {
-    assertEquals("PROJ_0001_nn_n_nn_1-1_R_12_MR_2", sut.generateName(makeAliquotFromAliquot()));
+    assertEquals("PROJ_0001_nn_n_nn_1-1_R_12_MR_2", sut.generate(makeAliquotFromAliquot()));
   }
 
   private SampleAliquot makeAliquotFromAliquot() throws Exception {

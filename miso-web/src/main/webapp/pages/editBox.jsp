@@ -38,8 +38,6 @@
 <script src="<c:url value='/scripts/datatables_utils.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/natural_sort.js'/>" type="text/javascript"></script>
 
-<script type="text/javascript" src="<c:url value='/scripts/parsley/parsley.min.js'/>"></script>
-
 <div id="maincontent">
 <div id="contentcolumn">
 

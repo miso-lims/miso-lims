@@ -113,7 +113,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
@@ -146,7 +146,7 @@ public class EditSampleController {
   private DataObjectFactory dataObjectFactory;
 
   @Autowired
-  private MisoNamingScheme<Sample> sampleNamingScheme;
+  private NamingScheme namingScheme;
 
   @Autowired
   private SampleOptionsController sampleOptionsController;
@@ -175,7 +175,7 @@ public class EditSampleController {
 
   @ModelAttribute("aliasGenerationEnabled")
   public Boolean isAliasGenerationEnabled() {
-    return sampleNamingScheme != null && sampleNamingScheme.hasGeneratorFor("alias");
+    return namingScheme != null && namingScheme.hasSampleAliasGenerator();
   }
 
   @Value("${miso.notification.interop.enabled}")

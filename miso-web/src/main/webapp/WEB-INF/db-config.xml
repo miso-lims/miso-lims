@@ -156,683 +156,308 @@
     </property>
   </bean>
 
-  <bean id="sqlProjectDAO" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLProjectDAO">
+  <bean id="projectStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLProjectDAO">
     <property name="cascadeType">
       <value type="javax.persistence.CascadeType">PERSIST</value>
     </property>
     <property name="securityManager" ref="securityManager" />
-    <property name="studyDAO" ref="sqlStudyDAO" />
-    <property name="sampleDAO" ref="hibernateSampleDao" />
-    <property name="entityGroupDAO" ref="sqlEntityGroupDAO" />
-    <property name="libraryDAO" ref="sqlLibraryDAO" />
-    <property name="runDAO" ref="sqlRunDAO" />
-    <property name="noteDAO" ref="sqlNoteDAO" />
-    <property name="watcherDAO" ref="sqlWatcherDAO" />
-    <property name="securityProfileDAO" ref="sqlSecurityProfileDAO" />
+    <property name="studyDAO" ref="studyStore" />
+    <property name="sampleDAO" ref="sampleStore" />
+    <property name="entityGroupDAO" ref="entityGroupStore" />
+    <property name="libraryDAO" ref="libraryStore" />
+    <property name="runDAO" ref="runStore" />
+    <property name="noteDAO" ref="noteStore" />
+    <property name="watcherDAO" ref="watcherStore" />
+    <property name="securityProfileDAO" ref="securityProfileStore" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />
   </bean>
 
-  <bean id="sqlStudyDAO" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLStudyDAO">
+  <bean id="studyStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLStudyDAO">
     <property name="cascadeType">
       <value type="javax.persistence.CascadeType">REMOVE</value>
     </property>
-    <property name="securityDAO" ref="sqlSecurityDAO" />
-    <property name="changeLogDAO" ref="sqlChangeLogDAO" />
-    <property name="projectDAO" ref="sqlProjectDAO" />
-    <property name="experimentDAO" ref="sqlExperimentDAO" />
-    <property name="securityProfileDAO" ref="sqlSecurityProfileDAO" />
+    <property name="securityDAO" ref="securityStore" />
+    <property name="changeLogDAO" ref="changeLogStore" />
+    <property name="projectDAO" ref="projectStore" />
+    <property name="experimentDAO" ref="experimentStore" />
+    <property name="securityProfileDAO" ref="securityProfileStore" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />
   </bean>
 
-  <bean id="sqlEmPCRDilutionDAO" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLEmPCRDilutionDAO">
+  <bean id="emPCRDilutionStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLEmPCRDilutionDAO">
     <property name="cascadeType">
       <value type="javax.persistence.CascadeType">REMOVE</value>
     </property>
-    <property name="securityProfileDAO" ref="sqlSecurityProfileDAO" />
-    <property name="emPcrDAO" ref="sqlEmPCRDAO" />
-    <property name="libraryDAO" ref="sqlLibraryDAO" />
+    <property name="securityProfileDAO" ref="securityProfileStore" />
+    <property name="emPcrDAO" ref="emPCRStore" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />
   </bean>
 
-  <bean id="sqlLibraryDilutionDAO" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryDilutionDAO">
+  <bean id="libraryDilutionStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryDilutionDAO">
     <property name="cascadeType">
       <value type="javax.persistence.CascadeType">REMOVE</value>
     </property>
-    <property name="securityProfileDAO" ref="sqlSecurityProfileDAO" />
-    <property name="libraryDAO" ref="sqlLibraryDAO" />
-    <property name="targetedSequencingDAO" ref="sqlTargetedSequencingDAO" />
+    <property name="securityProfileDAO" ref="securityProfileStore" />
+    <property name="libraryDAO" ref="libraryStore" />
+    <property name="targetedSequencingDAO" ref="targetedSequencingStore" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />
     <property name="autoGenerateIdentificationBarcodes">
       <value>${miso.autoGenerateIdentificationBarcodes}</value>
     </property>
   </bean>
   
-  <bean id="sqlTargetedSequencingDAO" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLTargetedSequencingDAO">
-    <property name="securityDAO" ref="sqlSecurityDAO" />
+  <bean id="targetedSequencingStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLTargetedSequencingDAO">
+    <property name="securityDAO" ref="securityStore" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />
   </bean>
 
-  <bean id="sqlEmPCRDAO" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLEmPCRDAO">
+  <bean id="emPCRStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLEmPCRDAO">
     <property name="cascadeType">
       <value type="javax.persistence.CascadeType">REMOVE</value>
     </property>
-    <property name="securityProfileDAO" ref="sqlSecurityProfileDAO" />
-    <property name="libraryDilutionDAO" ref="sqlLibraryDilutionDAO" />
-    <property name="emPCRDilutionDAO" ref="sqlEmPCRDilutionDAO" />
+    <property name="securityProfileDAO" ref="securityProfileStore" />
+    <property name="libraryDilutionDAO" ref="libraryDilutionStore" />
+    <property name="emPCRDilutionDAO" ref="emPCRDilutionStore" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />
   </bean>
 
-  <bean id="sqlEntityGroupDAO" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLEntityGroupDAO">
+  <bean id="entityGroupStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLEntityGroupDAO">
     <property name="cascadeType">
       <value type="javax.persistence.CascadeType">REMOVE</value>
     </property>
     <property name="jdbcTemplate" ref="interfaceTemplate" />
   </bean>
 
-  <bean id="sqlExperimentDAO" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLExperimentDAO">
+  <bean id="experimentStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLExperimentDAO">
     <property name="cascadeType">
       <value type="javax.persistence.CascadeType">REMOVE</value>
     </property>
-    <property name="securityDAO" ref="sqlSecurityDAO" />
-    <property name="changeLogDAO" ref="sqlChangeLogDAO" />
-    <property name="studyDAO" ref="sqlStudyDAO" />
-    <property name="sampleDAO" ref="hibernateSampleDao" />
-    <property name="runDAO" ref="sqlRunDAO" />
-    <property name="poolDAO" ref="sqlPoolDAO" />
-    <property name="platformDAO" ref="sqlPlatformDAO" />
-    <property name="kitDAO" ref="sqlKitDAO" />
-    <property name="securityProfileDAO" ref="sqlSecurityProfileDAO" />
+    <property name="securityDAO" ref="securityStore" />
+    <property name="changeLogDAO" ref="changeLogStore" />
+    <property name="studyDAO" ref="studyStore" />
+    <property name="poolDAO" ref="poolStore" />
+    <property name="platformDAO" ref="platformStore" />
+    <property name="kitDAO" ref="kitStore" />
+    <property name="securityProfileDAO" ref="securityProfileStore" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />
   </bean>
 
-  <bean id="hibernateSampleDao" class="uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleDao">
+  <bean id="sampleStore" class="uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleDao">
     <property name="jdbcTemplate" ref="interfaceTemplate" />
-    <property name="changeLogDao" ref="sqlChangeLogDAO" />
-    <property name="libraryDao" ref="sqlLibraryDAO" />
-    <property name="noteDao" ref="sqlNoteDAO" />
-    <property name="sampleQcDao" ref="sqlSampleQCDAO" />
-    <property name="securityDao" ref="sqlSecurityDAO" />
-    <property name="securityProfileDao" ref="sqlSecurityProfileDAO" />
+    <property name="changeLogDao" ref="changeLogStore" />
+    <property name="libraryDao" ref="libraryStore" />
+    <property name="noteDao" ref="noteStore" />
+    <property name="sampleQcDao" ref="sampleQcStore" />
+    <property name="securityDao" ref="securityStore" />
+    <property name="securityProfileDao" ref="securityProfileStore" />
     <property name="autoGenerateIdentificationBarcodes">
       <value>${miso.autoGenerateIdentificationBarcodes}</value>
     </property>
   </bean>
 
-  <bean id="sqlSampleQCDAO" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLSampleQCDAO">
+  <bean id="sampleQcStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLSampleQCDAO">
     <property name="cascadeType">
       <value type="javax.persistence.CascadeType">ALL</value>
     </property>
-    <property name="sampleDAO" ref="hibernateSampleDao" />
+    <property name="sampleDAO" ref="sampleStore" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />
   </bean>
 
-  <bean id="sqlLibraryQCDAO" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryQCDAO">
+  <bean id="libraryQcStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryQCDAO">
     <property name="cascadeType">
       <value type="javax.persistence.CascadeType">ALL</value>
     </property>
-    <property name="libraryDAO" ref="sqlLibraryDAO" />
+    <property name="libraryDAO" ref="libraryStore" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />
   </bean>
 
-  <bean id="sqlRunDAO" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLRunDAO">
+  <bean id="runStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLRunDAO">
     <property name="cascadeType">
       <value type="javax.persistence.CascadeType">PERSIST</value>
     </property>
-    <property name="securityDAO" ref="sqlSecurityDAO" />
-    <property name="changeLogDAO" ref="sqlChangeLogDAO" />
+    <property name="securityDAO" ref="securityStore" />
+    <property name="changeLogDAO" ref="changeLogStore" />
     <property name="securityManager" ref="securityManager" />
-    <property name="sequencerPartitionContainerDAO" ref="sqlSequencerPartitionContainerDAO" />
-    <property name="securityProfileDAO" ref="sqlSecurityProfileDAO" />
-    <property name="sequencerReferenceDAO" ref="sqlSequencerReferenceDAO" />
-    <property name="statusDAO" ref="sqlStatusDAO" />
-    <property name="runQcDAO" ref="sqlRunQCDAO" />
-    <property name="noteDAO" ref="sqlNoteDAO" />
-    <property name="watcherDAO" ref="sqlWatcherDAO" />
+    <property name="sequencerPartitionContainerDAO" ref="sequencerPartitionContainerStore" />
+    <property name="securityProfileDAO" ref="securityProfileStore" />
+    <property name="sequencerReferenceDAO" ref="sequencerReferenceStore" />
+    <property name="statusDAO" ref="statusStore" />
+    <property name="runQcDAO" ref="runQcStore" />
+    <property name="noteDAO" ref="noteStore" />
+    <property name="watcherDAO" ref="watcherStore" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />
   </bean>
 
-  <bean id="sqlRunQCDAO" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLRunQCDAO">
+  <bean id="runQcStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLRunQCDAO">
     <property name="cascadeType">
       <value type="javax.persistence.CascadeType">ALL</value>
     </property>
-    <property name="runDAO" ref="sqlRunDAO" />
-    <property name="sequencerPartitionContainerDAO" ref="sqlSequencerPartitionContainerDAO" />
+    <property name="runDAO" ref="runStore" />
+    <property name="sequencerPartitionContainerDAO" ref="sequencerPartitionContainerStore" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />
   </bean>
 
-  <bean id="sqlSequencerPartitionContainerDAO" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLSequencerPartitionContainerDAO">
+  <bean id="sequencerPartitionContainerStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLSequencerPartitionContainerDAO">
     <property name="cascadeType">
       <value type="javax.persistence.CascadeType">PERSIST</value>
     </property>
-    <property name="securityDAO" ref="sqlSecurityDAO" />
-    <property name="changeLogDAO" ref="sqlChangeLogDAO" />
-    <property name="partitionDAO" ref="sqlPartitionDAO" />
-    <property name="runDAO" ref="sqlRunDAO" />
-    <property name="platformDAO" ref="sqlPlatformDAO" />
-    <property name="securityProfileDAO" ref="sqlSecurityProfileDAO" />
+    <property name="securityDAO" ref="securityStore" />
+    <property name="changeLogDAO" ref="changeLogStore" />
+    <property name="partitionDAO" ref="partitionStore" />
+    <property name="runDAO" ref="runStore" />
+    <property name="platformDAO" ref="platformStore" />
+    <property name="securityProfileDAO" ref="securityProfileStore" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />
   </bean>
 
-  <bean id="sqlPartitionDAO" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLSequencerPoolPartitionDAO">
+  <bean id="partitionStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLSequencerPoolPartitionDAO">
     <property name="cascadeType">
       <value type="javax.persistence.CascadeType">PERSIST</value>
     </property>
-    <property name="sequencerPartitionContainerDAO" ref="sqlSequencerPartitionContainerDAO" />
-    <property name="poolDAO" ref="sqlPoolDAO" />
-    <property name="securityProfileDAO" ref="sqlSecurityProfileDAO" />
+    <property name="sequencerPartitionContainerDAO" ref="sequencerPartitionContainerStore" />
+    <property name="poolDAO" ref="poolStore" />
+    <property name="securityProfileDAO" ref="securityProfileStore" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />
   </bean>
 
-  <bean id="sqlLibraryDAO" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryDAO">
+  <bean id="libraryStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryDAO">
     <property name="cascadeType">
       <value type="javax.persistence.CascadeType">REMOVE</value>
     </property>
-    <property name="securityDAO" ref="sqlSecurityDAO" />
-    <property name="changeLogDAO" ref="sqlChangeLogDAO" />
-    <property name="noteDAO" ref="sqlNoteDAO" />
-    <property name="poolDAO" ref="sqlPoolDAO" />
-    <property name="sampleDAO" ref="hibernateSampleDao" />
-    <property name="dilutionDAO" ref="sqlLibraryDilutionDAO" />
-    <property name="libraryQcDAO" ref="sqlLibraryQCDAO" />
-    <property name="securityProfileDAO" ref="sqlSecurityProfileDAO" />
-    <property name="boxDAO" ref="sqlBoxDAO" />
+    <property name="securityDAO" ref="securityStore" />
+    <property name="changeLogDAO" ref="changeLogStore" />
+    <property name="noteDAO" ref="noteStore" />
+    <property name="poolDAO" ref="poolStore" />
+    <property name="sampleDAO" ref="sampleStore" />
+    <property name="dilutionDAO" ref="libraryDilutionStore" />
+    <property name="libraryQcDAO" ref="libraryQcStore" />
+    <property name="securityProfileDAO" ref="securityProfileStore" />
+    <property name="boxDAO" ref="boxStore" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />
     <property name="autoGenerateIdentificationBarcodes">
       <value>${miso.autoGenerateIdentificationBarcodes}</value>
     </property>
   </bean>
 
-  <bean id="sqlNoteDAO" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLNoteDAO">
-    <property name="securityDAO" ref="sqlSecurityDAO" />
+  <bean id="noteStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLNoteDAO">
+    <property name="securityDAO" ref="securityStore" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />
   </bean>
 
-  <bean id="sqlPlatformDAO" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLPlatformDAO">
+  <bean id="platformStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLPlatformDAO">
     <property name="jdbcTemplate" ref="interfaceTemplate" />
   </bean>
 
-  <bean id="sqlPoolDAO" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLPoolDAO">
+  <bean id="poolStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLPoolDAO">
     <property name="cascadeType">
       <value type="javax.persistence.CascadeType">REMOVE</value>
     </property>
-    <property name="securityDAO" ref="sqlSecurityDAO" />
-    <property name="changeLogDAO" ref="sqlChangeLogDAO" />
+    <property name="securityDAO" ref="securityStore" />
+    <property name="changeLogDAO" ref="changeLogStore" />
     <property name="securityManager" ref="securityManager" />
-    <property name="securityProfileDAO" ref="sqlSecurityProfileDAO" />
-    <property name="experimentDAO" ref="sqlExperimentDAO" />
-    <property name="poolQcDAO" ref="sqlPoolQCDAO" />
-    <property name="watcherDAO" ref="sqlWatcherDAO" />
-    <property name="boxDAO" ref="sqlBoxDAO" />
+    <property name="securityProfileDAO" ref="securityProfileStore" />
+    <property name="experimentDAO" ref="experimentStore" />
+    <property name="poolQcDAO" ref="poolQcStore" />
+    <property name="watcherDAO" ref="watcherStore" />
+    <property name="boxDAO" ref="boxStore" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />
-    <property name="noteDAO" ref="sqlNoteDAO" />
+    <property name="noteDAO" ref="noteStore" />
     <property name="autoGenerateIdentificationBarcodes">
       <value>${miso.autoGenerateIdentificationBarcodes}</value>
     </property>
   </bean>
 
-  <bean id="sqlPoolQCDAO" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLPoolQCDAO">
+  <bean id="poolQcStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLPoolQCDAO">
     <property name="cascadeType">
       <value type="javax.persistence.CascadeType">ALL</value>
     </property>
-    <property name="poolDAO" ref="sqlPoolDAO" />
+    <property name="poolDAO" ref="poolStore" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />
   </bean>
 
-  <bean id="sqlPrintJobDAO" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLPrintJobDAO">
+  <bean id="printJobStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLPrintJobDAO">
     <property name="securityManager" ref="securityManager" />
     <property name="printManager" ref="printManager" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />
   </bean>
 
-  <bean id="sqlPrintServiceDAO" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLPrintServiceDAO">
+  <bean id="printServiceStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLPrintServiceDAO">
     <property name="printManager" ref="printManager" />
     <property name="securityManager" ref="securityManager" />
     <property name="misoFilesManager" ref="misoFileManager" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />
   </bean>
 
-  <bean id="sqlStatusDAO" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLStatusDAO">
+  <bean id="statusStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLStatusDAO">
     <property name="jdbcTemplate" ref="interfaceTemplate" />
   </bean>
 
-  <bean id="sqlSecurityProfileDAO" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLSecurityProfileDAO">
+  <bean id="securityProfileStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLSecurityProfileDAO">
     <property name="securityManager" ref="securityManager" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />
   </bean>
 
-  <bean id="sqlSecurityDAO" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLSecurityDAO">
-    <property name="securityProfileDAO" ref="sqlSecurityProfileDAO" />
+  <bean id="securityStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLSecurityDAO">
+    <property name="securityProfileDAO" ref="securityProfileStore" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />
   </bean>
 
-  <bean id="sqlSubmissionDAO" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLTgacSubmissionDAO">
-    <property name="dilutionDAO" ref="sqlLibraryDilutionDAO" />
-    <property name="experimentDAO" ref="sqlExperimentDAO" />
-    <property name="partitionDAO" ref="sqlPartitionDAO" />
-    <property name="sampleDAO" ref="hibernateSampleDao" />
-    <property name="studyDAO" ref="sqlStudyDAO" />
-    <property name="runDAO" ref="sqlRunDAO" />
+  <bean id="submissionStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLTgacSubmissionDAO">
+    <property name="dilutionDAO" ref="libraryDilutionStore" />
+    <property name="experimentDAO" ref="experimentStore" />
+    <property name="partitionDAO" ref="partitionStore" />
+    <property name="sampleDAO" ref="sampleStore" />
+    <property name="studyDAO" ref="studyStore" />
+    <property name="runDAO" ref="runStore" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />
   </bean>
 
-  <bean id="sqlSequencerReferenceDAO" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLSequencerReferenceDAO">
-    <property name="platformDAO" ref="sqlPlatformDAO" />
+  <bean id="sequencerReferenceStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLSequencerReferenceDAO">
+    <property name="platformDAO" ref="platformStore" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />
   </bean>
 
-  <bean id="sqlSequencerServiceRecordDAO"
-        class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLSequencerServiceRecordDAO">
-    <property name="sequencerReferenceDAO" ref="sqlSequencerReferenceDAO"/>
+  <bean id="sequencerServiceRecordStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLSequencerServiceRecordDAO">
+    <property name="sequencerReferenceDAO" ref="sequencerReferenceStore"/>
     <property name="jdbcTemplate" ref="interfaceTemplate"/>
     <property name="misoFilesManager" ref="misoFileManager"/>
   </bean>
 
-  <bean id="sqlKitDAO" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLKitDAO">
+  <bean id="kitStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLKitDAO">
     <property name="cascadeType">
       <value type="javax.persistence.CascadeType">PERSIST</value>
     </property>
-    <property name="noteDAO" ref="sqlNoteDAO" />
-    <property name="changeLogDAO" ref="sqlChangeLogDAO" />
+    <property name="noteDAO" ref="noteStore" />
+    <property name="changeLogDAO" ref="changeLogStore" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />
-    <property name="securityDAO" ref="sqlSecurityDAO" />
+    <property name="securityDAO" ref="securityStore" />
   </bean>
 
-  <bean id="sqlAlertDAO" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLAlertDAO">
+  <bean id="alertStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLAlertDAO">
     <property name="jdbcTemplate" ref="interfaceTemplate" />
     <property name="securityManager" ref="securityManager" />
   </bean>
 
-  <bean id="sqlWatcherDAO" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLWatcherDAO">
+  <bean id="watcherStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLWatcherDAO">
     <property name="securityManager" ref="securityManager" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />
   </bean>
 
-  <bean id="sqlChangeLogDAO" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLChangeLogDAO">
+  <bean id="changeLogStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLChangeLogDAO">
     <property name="jdbcTemplate" ref="interfaceTemplate" />
   </bean>
 
-  <bean id="sqlBoxDAO" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLBoxDAO">
-    <property name="securityDAO" ref="sqlSecurityDAO" />
-    <property name="changeLogDAO" ref="sqlChangeLogDAO" />
-    <property name="libraryDAO" ref="sqlLibraryDAO" />
-    <property name="poolDAO" ref="sqlPoolDAO" />
-    <property name="sampleDAO" ref="hibernateSampleDao" />
-    <property name="securityProfileDAO" ref="sqlSecurityProfileDAO" />
+  <bean id="boxStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLBoxDAO">
+    <property name="securityDAO" ref="securityStore" />
+    <property name="changeLogDAO" ref="changeLogStore" />
+    <property name="libraryDAO" ref="libraryStore" />
+    <property name="poolDAO" ref="poolStore" />
+    <property name="sampleDAO" ref="sampleStore" />
+    <property name="securityProfileDAO" ref="securityProfileStore" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />
   </bean>
-
-  <bean name="boxStore" class="org.springframework.aop.framework.ProxyFactoryBean">
-    <property name="proxyInterfaces">
-      <value>uk.ac.bbsrc.tgac.miso.core.store.BoxStore</value>
-    </property>
-    <property name="interceptorNames">
-      <list>
-        <value>sqlBoxDAO</value>
-      </list>
-    </property>
-  </bean>
   
-  <bean id="hibernateLibraryAdditionalInfoDao" class="uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryAdditionalInfoDao">
-    <property name="kitStore" ref="sqlKitDAO" />
-  </bean>
-
-  <bean name="hibernateLibraryDesignDao" class="uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDesignDao">
-    <property name="libraryDao" ref="sqlLibraryDAO" />
-  </bean>
-  
-  <bean name="hibernateSequencingParametersDao" class="uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSequencingParametersDao">
-    <property name="platformStore" ref="sqlPlatformDAO" />
-  </bean>
-
-  <bean name="projectStore" class="org.springframework.aop.framework.ProxyFactoryBean">
-    <property name="proxyInterfaces">
-      <value>uk.ac.bbsrc.tgac.miso.core.store.ProjectStore</value>
-    </property>
-    <property name="interceptorNames">
-      <list>
-        <value>sqlProjectDAO</value>
-      </list>
-    </property>
-  </bean>
-
-  <bean name="studyStore" class="org.springframework.aop.framework.ProxyFactoryBean">
-    <property name="proxyInterfaces">
-      <value>uk.ac.bbsrc.tgac.miso.core.store.StudyStore</value>
-    </property>
-    <property name="interceptorNames">
-      <list>
-        <value>sqlStudyDAO</value>
-      </list>
-    </property>
-  </bean>
-
-  <bean name="emPCRDilutionStore" class="org.springframework.aop.framework.ProxyFactoryBean">
-    <property name="proxyInterfaces">
-      <value>uk.ac.bbsrc.tgac.miso.core.store.EmPCRDilutionStore</value>
-    </property>
-    <property name="interceptorNames">
-      <list>
-        <value>sqlEmPCRDilutionDAO</value>
-      </list>
-    </property>
-  </bean>
-
-  <bean name="entityGroupStore" class="org.springframework.aop.framework.ProxyFactoryBean">
-    <property name="proxyInterfaces">
-      <value>uk.ac.bbsrc.tgac.miso.core.store.EntityGroupStore</value>
-    </property>
-    <property name="interceptorNames">
-      <list>
-        <value>sqlEntityGroupDAO</value>
-      </list>
-    </property>
-  </bean>
-
-  <bean name="libraryDilutionStore" class="org.springframework.aop.framework.ProxyFactoryBean">
-    <property name="proxyInterfaces">
-      <value>uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore</value>
-    </property>
-    <property name="interceptorNames">
-      <list>
-        <value>sqlLibraryDilutionDAO</value>
-      </list>
-    </property>
-  </bean>
-  
-  <bean name="targetedSequencingStore" class="org.springframework.aop.framework.ProxyFactoryBean">
-    <property name="proxyInterfaces">
-      <value>uk.ac.bbsrc.tgac.miso.core.store.TargetedSequencingStore</value>
-    </property>
-    <property name="interceptorNames">
-      <list>
-        <value>sqlTargetedSequencingDAO</value>
-      </list>
-    </property>
-  </bean>
-
-  <bean name="emPCRStore" class="org.springframework.aop.framework.ProxyFactoryBean">
-    <property name="proxyInterfaces">
-      <value>uk.ac.bbsrc.tgac.miso.core.store.EmPCRStore</value>
-    </property>
-    <property name="interceptorNames">
-      <list>
-        <value>sqlEmPCRDAO</value>
-      </list>
-    </property>
-  </bean>
-
-  <bean name="experimentStore" class="org.springframework.aop.framework.ProxyFactoryBean">
-    <property name="proxyInterfaces">
-      <value>uk.ac.bbsrc.tgac.miso.core.store.ExperimentStore</value>
-    </property>
-    <property name="interceptorNames">
-      <list>
-        <value>sqlExperimentDAO</value>
-      </list>
-    </property>
-  </bean>
-
-  <bean name="sampleStore" class="org.springframework.aop.framework.ProxyFactoryBean">
-    <property name="proxyInterfaces">
-      <value>uk.ac.bbsrc.tgac.miso.core.store.SampleStore</value>
-    </property>
-    <property name="interceptorNames">
-      <list>
-        <value>hibernateSampleDao</value>
-      </list>
-    </property>
-  </bean>
-
-  <bean name="sampleQcStore" class="org.springframework.aop.framework.ProxyFactoryBean">
-    <property name="proxyInterfaces">
-      <value>uk.ac.bbsrc.tgac.miso.core.store.SampleQcStore</value>
-    </property>
-    <property name="interceptorNames">
-      <list>
-        <value>sqlSampleQCDAO</value>
-      </list>
-    </property>
-  </bean>
-
-  <bean name="runStore" class="org.springframework.aop.framework.ProxyFactoryBean">
-    <property name="proxyInterfaces">
-      <value>uk.ac.bbsrc.tgac.miso.core.store.RunStore</value>
-    </property>
-    <property name="interceptorNames">
-      <list>
-        <value>sqlRunDAO</value>
-      </list>
-    </property>
-  </bean>
-
-  <bean name="runQcStore" class="org.springframework.aop.framework.ProxyFactoryBean">
-    <property name="proxyInterfaces">
-      <value>uk.ac.bbsrc.tgac.miso.core.store.RunQcStore</value>
-    </property>
-    <property name="interceptorNames">
-      <list>
-        <value>sqlRunQCDAO</value>
-      </list>
-    </property>
-  </bean>
-
-  <bean name="partitionStore" class="org.springframework.aop.framework.ProxyFactoryBean">
-    <property name="proxyInterfaces">
-      <value>uk.ac.bbsrc.tgac.miso.core.store.PartitionStore</value>
-    </property>
-    <property name="interceptorNames">
-      <list>
-        <value>sqlPartitionDAO</value>
-      </list>
-    </property>
-  </bean>
-
-  <bean name="sequencerPartitionContainerStore" class="org.springframework.aop.framework.ProxyFactoryBean">
-    <property name="proxyInterfaces">
-      <value>uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore</value>
-    </property>
-    <property name="interceptorNames">
-      <list>
-        <value>sqlSequencerPartitionContainerDAO</value>
-      </list>
-    </property>
-  </bean>
-
-  <bean name="noteStore" class="org.springframework.aop.framework.ProxyFactoryBean">
-    <property name="proxyInterfaces">
-      <value>uk.ac.bbsrc.tgac.miso.core.store.NoteStore</value>
-    </property>
-    <property name="interceptorNames">
-      <list>
-        <value>sqlNoteDAO</value>
-      </list>
-    </property>
-  </bean>
-  
-  <bean name="poolStore" class="org.springframework.aop.framework.ProxyFactoryBean">
-    <property name="proxyInterfaces">
-      <value>uk.ac.bbsrc.tgac.miso.core.store.PoolStore</value>
-    </property>
-    <property name="interceptorNames">
-      <list>
-        <value>sqlPoolDAO</value>
-      </list>
-    </property>
-  </bean>
-
-  <bean name="poolQcStore" class="org.springframework.aop.framework.ProxyFactoryBean">
-    <property name="proxyInterfaces">
-      <value>uk.ac.bbsrc.tgac.miso.core.store.PoolQcStore</value>
-    </property>
-    <property name="interceptorNames">
-      <list>
-        <value>sqlPoolQCDAO</value>
-      </list>
-    </property>
-  </bean>
-
-  <bean name="platformStore" class="org.springframework.aop.framework.ProxyFactoryBean">
-    <property name="proxyInterfaces">
-      <value>uk.ac.bbsrc.tgac.miso.core.store.PlatformStore</value>
-    </property>
-    <property name="interceptorNames">
-      <list>
-        <value>sqlPlatformDAO</value>
-      </list>
-    </property>
-  </bean>
-
-  <bean name="printJobStore" class="org.springframework.aop.framework.ProxyFactoryBean">
-    <property name="proxyInterfaces">
-      <value>uk.ac.bbsrc.tgac.miso.core.store.PrintJobStore</value>
-    </property>
-    <property name="interceptorNames">
-      <list>
-        <value>sqlPrintJobDAO</value>
-      </list>
-    </property>
-  </bean>
-
-  <bean name="printServiceStore" class="org.springframework.aop.framework.ProxyFactoryBean">
-    <property name="proxyInterfaces">
-      <value>uk.ac.bbsrc.tgac.miso.core.store.PrintServiceStore</value>
-    </property>
-    <property name="interceptorNames">
-      <list>
-        <value>sqlPrintServiceDAO</value>
-      </list>
-    </property>
-  </bean>
-
-  <bean name="statusStore" class="org.springframework.aop.framework.ProxyFactoryBean">
-    <property name="proxyInterfaces">
-      <value>uk.ac.bbsrc.tgac.miso.core.store.StatusStore</value>
-    </property>
-    <property name="interceptorNames">
-      <list>
-        <value>sqlStatusDAO</value>
-      </list>
-    </property>
-  </bean>
-
-  <bean name="securityProfileStore" class="org.springframework.aop.framework.ProxyFactoryBean">
-    <property name="proxyInterfaces">
-      <value>uk.ac.bbsrc.tgac.miso.core.store.Store</value>
-    </property>
-    <property name="interceptorNames">
-      <list>
-        <value>sqlSecurityProfileDAO</value>
-      </list>
-    </property>
-  </bean>
-
-  <bean name="securityStore" class="org.springframework.aop.framework.ProxyFactoryBean">
-    <property name="proxyInterfaces">
-      <value>uk.ac.bbsrc.tgac.miso.core.store.SecurityStore</value>
-    </property>
-    <property name="interceptorNames">
-      <list>
-        <value>sqlSecurityDAO</value>
-      </list>
-    </property>
-  </bean>
-
-  <bean name="libraryStore" class="org.springframework.aop.framework.ProxyFactoryBean">
-    <property name="proxyInterfaces">
-      <value>uk.ac.bbsrc.tgac.miso.core.store.LibraryStore</value>
-    </property>
-    <property name="interceptorNames">
-      <list>
-        <value>sqlLibraryDAO</value>
-      </list>
-    </property>
-  </bean>
-
-  <bean name="libraryQcStore" class="org.springframework.aop.framework.ProxyFactoryBean">
-    <property name="proxyInterfaces">
-      <value>uk.ac.bbsrc.tgac.miso.core.store.LibraryQcStore</value>
-    </property>
-    <property name="interceptorNames">
-      <list>
-        <value>sqlLibraryQCDAO</value>
-      </list>
-    </property>
-  </bean>
-
-  <bean name="submissionStore" class="org.springframework.aop.framework.ProxyFactoryBean">
-    <property name="proxyInterfaces">
-      <value>uk.ac.bbsrc.tgac.miso.core.store.SubmissionStore</value>
-    </property>
-    <property name="interceptorNames">
-      <list>
-        <value>sqlSubmissionDAO</value>
-      </list>
-    </property>
-  </bean>
-
-  <bean name="sequencerReferenceStore" class="org.springframework.aop.framework.ProxyFactoryBean">
-    <property name="proxyInterfaces">
-      <value>uk.ac.bbsrc.tgac.miso.core.store.SequencerReferenceStore</value>
-    </property>
-    <property name="interceptorNames">
-      <list>
-        <value>sqlSequencerReferenceDAO</value>
-      </list>
-    </property>
-  </bean>
-
-  <bean name="sequencerServiceRecordStore" class="org.springframework.aop.framework.ProxyFactoryBean">
-    <property name="proxyInterfaces">
-      <value>uk.ac.bbsrc.tgac.miso.core.store.SequencerServiceRecordStore</value>
-    </property>
-    <property name="interceptorNames">
-      <list>
-        <value>sqlSequencerServiceRecordDAO</value>
-      </list>
-    </property>
-  </bean>
-
-  <bean name="kitStore" class="org.springframework.aop.framework.ProxyFactoryBean">
-    <property name="proxyInterfaces">
-      <value>uk.ac.bbsrc.tgac.miso.core.store.KitStore</value>
-    </property>
-    <property name="interceptorNames">
-      <list>
-        <value>sqlKitDAO</value>
-      </list>
-    </property>
-  </bean>
-
-  <bean name="alertStore" class="org.springframework.aop.framework.ProxyFactoryBean">
-    <property name="proxyInterfaces">
-      <value>uk.ac.bbsrc.tgac.miso.core.store.AlertStore</value>
-    </property>
-    <property name="interceptorNames">
-      <list>
-        <value>sqlAlertDAO</value>
-      </list>
-    </property>
-  </bean>
-
-  <bean name="watcherStore" class="org.springframework.aop.framework.ProxyFactoryBean">
-    <property name="proxyInterfaces">
-      <value>uk.ac.bbsrc.tgac.miso.core.store.WatcherStore</value>
-    </property>
-    <property name="interceptorNames">
-      <list>
-        <value>sqlWatcherDAO</value>
-      </list>
-    </property>
-  </bean>
-
-  <bean name="changeLogStore" class="org.springframework.aop.framework.ProxyFactoryBean">
-    <property name="proxyInterfaces">
-      <value>uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore</value>
-    </property>
-    <property name="interceptorNames">
-      <list>
-        <value>sqlChangeLogDAO</value>
-      </list>
-    </property>
+  <bean name="libraryDesignStore" class="uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDesignDao">
+    <property name="libraryDao" ref="libraryStore" />
   </bean>
 </beans>

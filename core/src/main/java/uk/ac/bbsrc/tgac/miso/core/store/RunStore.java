@@ -37,7 +37,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface RunStore extends Store<Run>, Cascadable, Remover<Run>, NamingSchemeAware<Run> {
+public interface RunStore extends Store<Run>, Cascadable, Remover<Run>, NamingSchemeAware {
   /**
    * Gets the latest Run, by start date, that is associated with the given container
    *

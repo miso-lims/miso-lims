@@ -32,9 +32,6 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,16 +47,19 @@ import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.Property;
 import com.googlecode.ehcache.annotations.TriggersRemove;
 
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
+
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCR;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.EmPCRDilutionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.EmPCRStore;
-import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
@@ -120,20 +120,18 @@ public class SQLEmPCRDilutionDAO implements EmPCRDilutionStore {
 
   private JdbcTemplate template;
   private EmPCRStore emPcrDAO;
-  private LibraryStore libraryDAO;
   private Store<SecurityProfile> securityProfileDAO;
   private CascadeType cascadeType;
 
   @Autowired
-  private MisoNamingScheme<emPCRDilution> namingScheme;
+  private NamingScheme namingScheme;
 
-  @Override
-  public MisoNamingScheme<emPCRDilution> getNamingScheme() {
+  public NamingScheme getNamingScheme() {
     return namingScheme;
   }
 
   @Override
-  public void setNamingScheme(MisoNamingScheme<emPCRDilution> namingScheme) {
+  public void setNamingScheme(NamingScheme namingScheme) {
     this.namingScheme = namingScheme;
   }
 
@@ -157,10 +155,6 @@ public class SQLEmPCRDilutionDAO implements EmPCRDilutionStore {
 
   public void setJdbcTemplate(JdbcTemplate template) {
     this.template = template;
-  }
-
-  public void setLibraryDAO(LibraryStore libraryDAO) {
-    this.libraryDAO = libraryDAO;
   }
 
   public void setEmPcrDAO(EmPCRStore emPcrDAO) {
@@ -245,7 +239,8 @@ public class SQLEmPCRDilutionDAO implements EmPCRDilutionStore {
   @Cacheable(cacheName = "emPCRDilutionCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
       @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
   public emPCRDilution get(long dilutionId) throws IOException {
-    List eResults = template.query(EMPCR_DILUTION_SELECT_BY_DILUTION_ID, new Object[] { dilutionId }, new EmPCRDilutionMapper(true));
+    List<emPCRDilution> eResults = template.query(EMPCR_DILUTION_SELECT_BY_DILUTION_ID, new Object[] { dilutionId },
+        new EmPCRDilutionMapper(true));
     emPCRDilution e = eResults.size() > 0 ? (emPCRDilution) eResults.get(0) : null;
     return e;
   }
@@ -257,7 +252,7 @@ public class SQLEmPCRDilutionDAO implements EmPCRDilutionStore {
 
   @Override
   public emPCRDilution getEmPcrDilutionByBarcode(String barcode) throws IOException {
-    List eResults = template.query(EMPCR_DILUTION_SELECT_BY_IDENTIFICATION_BARCODE, new Object[] { barcode },
+    List<emPCRDilution> eResults = template.query(EMPCR_DILUTION_SELECT_BY_IDENTIFICATION_BARCODE, new Object[] { barcode },
         new EmPCRDilutionMapper(true));
     emPCRDilution e = eResults.size() > 0 ? (emPCRDilution) eResults.get(0) : null;
     return e;
@@ -284,9 +279,10 @@ public class SQLEmPCRDilutionDAO implements EmPCRDilutionStore {
       try {
         dilution.setId(DbUtils.getAutoIncrement(template, "emPCRDilution"));
 
-        String name = namingScheme.generateNameFor("name", dilution);
+        String name = namingScheme.generateNameFor(dilution);
         dilution.setName(name);
-        if (namingScheme.validateField("name", dilution.getName())) {
+        ValidationResult nameValidation = namingScheme.validateName(dilution.getName());
+        if (nameValidation.isValid()) {
           String barcode = name + "::" + dilution.getEmPCR().getName();
           params.addValue("name", name);
 
@@ -300,24 +296,21 @@ public class SQLEmPCRDilutionDAO implements EmPCRDilutionStore {
             throw new IOException("Something bad happened. Expected emPCRDilution ID doesn't match returned value from DB insert");
           }
         } else {
-          throw new IOException("Cannot save emPCRDilution - invalid field:" + dilution.toString());
+          throw new IOException("Cannot save emPCRDilution - invalid name:" + nameValidation.getMessage());
         }
       } catch (MisoNamingException e) {
         throw new IOException("Cannot save emPCRDilution - issue with naming scheme", e);
       }
     } else {
-      try {
-        if (namingScheme.validateField("name", dilution.getName())) {
-          params.addValue("dilutionId", dilution.getId());
-          params.addValue("name", dilution.getName());
-          params.addValue("identificationBarcode", dilution.getName() + "::" + dilution.getLibrary().getAlias());
-          NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
-          namedTemplate.update(EMPCR_DILUTION_UPDATE, params);
-        } else {
-          throw new IOException("Cannot save emPCRDilution - invalid field:" + dilution.toString());
-        }
-      } catch (MisoNamingException e) {
-        throw new IOException("Cannot save emPCRDilution - issue with naming scheme", e);
+      ValidationResult nameValidation = namingScheme.validateName(dilution.getName());
+      if (nameValidation.isValid()) {
+        params.addValue("dilutionId", dilution.getId());
+        params.addValue("name", dilution.getName());
+        params.addValue("identificationBarcode", dilution.getName() + "::" + dilution.getLibrary().getAlias());
+        NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
+        namedTemplate.update(EMPCR_DILUTION_UPDATE, params);
+      } else {
+        throw new IOException("Cannot save emPCRDilution - invalid name:" + nameValidation.getMessage());
       }
     }
 

@@ -35,7 +35,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface EmPCRStore extends Store<emPCR>, Remover<emPCR>, NamingSchemeAware<emPCR> {
+public interface EmPCRStore extends Store<emPCR>, Remover<emPCR>, NamingSchemeAware {
   /**
    * List all EmPCRs by a parent {@link uk.ac.bbsrc.tgac.miso.core.data.Dilution} ID
    * 

@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.persistence.CascadeType;
-import javax.print.attribute.standard.MediaSize.Other;
 
 import org.junit.Before;
 import org.junit.Ignore;
@@ -32,14 +31,12 @@ import com.eaglegenomics.simlims.core.store.SecurityStore;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
-import uk.ac.bbsrc.tgac.miso.core.data.Platform;
-import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ExperimentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PlatformImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.AllowAnythingEntityNamingScheme;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PlatformStore;
@@ -73,14 +70,19 @@ public class SQLExperimentDAOTest extends AbstractDAOTest {
   private PoolStore poolDAO;
   @Mock
   private KitStore kitDAO;
+  @Mock
+  private NamingScheme namingScheme;
+
   @InjectMocks
   private SQLExperimentDAO dao;
 
   @Before
-  public void setup() {
+  public void setup() throws Exception {
     MockitoAnnotations.initMocks(this);
     dao.setJdbcTemplate(jdbcTemplate);
     dao.setDataObjectFactory(new TgacDataObjectFactory());
+    when(namingScheme.generateNameFor(Matchers.any(Experiment.class))).thenReturn("EDI123");
+    when(namingScheme.validateName(Matchers.anyString())).thenReturn(ValidationResult.success());
   }
 
   /**
@@ -97,7 +99,6 @@ public class SQLExperimentDAOTest extends AbstractDAOTest {
     when(mockUser.getUserId()).thenReturn(1L);
 
     experiment.setLastModifier(mockUser);
-    dao.setNamingScheme(new AllowAnythingEntityNamingScheme<Experiment>());
     long autoIncrementId = nextAutoIncrementId;
     mockAutoIncrement(autoIncrementId);
 

@@ -90,8 +90,7 @@ import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.RequestManagerAwareNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.util
@@ -3671,9 +3670,7 @@ public class FormUtils {
   }
 
   private static List<Sample> processSampleInputODS(OdfSpreadsheetDocument oDoc, User u, RequestManager manager,
-      MisoNamingScheme<Library> libraryNamingScheme, IndexService indexService) throws Exception {
-    ((RequestManagerAwareNamingScheme) libraryNamingScheme).setRequestManager(manager);
-
+      NamingScheme namingScheme, IndexService indexService) throws Exception {
     List<Sample> samples = new ArrayList<>();
     OdfTable oTable = oDoc.getTableList().get(0);
 
@@ -3791,7 +3788,7 @@ public class FormUtils {
           processSampleQC(sampleQcCell, s, u, manager);
 
           Library library = processLibrary(libraryQcCell, libraryDescriptionCell, libraryQcPassFailCell, s, pt, lt, ls, lst, paired,
-              libraryNamingScheme);
+              namingScheme);
           if (library != null) {
             processLibraryQC(libraryQcCell, libraryQcMolarityCell, libraryQcInsertSizeCell, library, u, manager);
             processIndices(indexFamilyCell, indicesCell, library, manager, indexService);
@@ -3808,9 +3805,7 @@ public class FormUtils {
   }
 
   private static List<Sample> processSampleInputXLSX(XSSFWorkbook wb, User u, RequestManager manager,
-      MisoNamingScheme<Library> libraryNamingScheme, IndexService indexService) throws Exception {
-    ((RequestManagerAwareNamingScheme) libraryNamingScheme).setRequestManager(manager);
-
+      NamingScheme namingScheme, IndexService indexService) throws Exception {
     List<Sample> samples = new ArrayList<>();
     XSSFSheet sheet = wb.getSheetAt(0);
     int rows = sheet.getPhysicalNumberOfRows();
@@ -3932,7 +3927,7 @@ public class FormUtils {
         processSampleQC(sampleQcCell, s, u, manager);
 
         Library library = processLibrary(libraryQcCell, libraryDescriptionCell, libraryQcPassFailCell, s, pt, lt, ls, lst, paired,
-            libraryNamingScheme);
+            namingScheme);
         if (library != null) {
           processLibraryQC(libraryQcCell, libraryQcMolarityCell, libraryQcInsertSizeCell, library, u, manager);
           processIndices(indexKitCell, indexTagsCell, library, manager, indexService);
@@ -3992,7 +3987,7 @@ public class FormUtils {
   }
 
   private static Library processLibrary(String libraryQc, String libraryDescription, String libraryQcPassFail, Sample s, PlatformType pt,
-      LibraryType lt, LibrarySelectionType ls, LibraryStrategyType lst, boolean paired, MisoNamingScheme<Library> libraryNamingScheme)
+      LibraryType lt, LibrarySelectionType ls, LibraryStrategyType lst, boolean paired, NamingScheme namingScheme)
       throws Exception {
     if (!isStringEmptyOrNull(libraryQc)) {
       // create library
@@ -4015,7 +4010,7 @@ public class FormUtils {
         library.setQcPassed(Boolean.parseBoolean(libraryQcPassFail));
       }
 
-      String libAlias = libraryNamingScheme.generateNameFor("alias", library);
+      String libAlias = namingScheme.generateLibraryAlias(library);
 
       library.setAlias(libAlias);
 
@@ -4114,13 +4109,13 @@ public class FormUtils {
   }
 
   public static List<Sample> importSampleInputSpreadsheet(File inPath, User u, RequestManager manager,
-      MisoNamingScheme<Library> libraryNamingScheme, IndexService indexService) throws Exception {
+      NamingScheme namingScheme, IndexService indexService) throws Exception {
     if (inPath.getName().endsWith(".xlsx")) {
       XSSFWorkbook wb = new XSSFWorkbook(new FileInputStream(inPath));
-      return processSampleInputXLSX(wb, u, manager, libraryNamingScheme, indexService);
+      return processSampleInputXLSX(wb, u, manager, namingScheme, indexService);
     } else if (inPath.getName().endsWith(".ods")) {
       OdfSpreadsheetDocument oDoc = (OdfSpreadsheetDocument) OdfDocument.loadDocument(inPath);
-      return processSampleInputODS(oDoc, u, manager, libraryNamingScheme, indexService);
+      return processSampleInputODS(oDoc, u, manager, namingScheme, indexService);
     } else {
       throw new UnsupportedOperationException("Cannot process bulk input files other than xls, xlsx, and ods.");
     }

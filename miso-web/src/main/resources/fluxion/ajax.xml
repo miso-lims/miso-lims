@@ -31,6 +31,8 @@
     <bean class="net.sourceforge.fluxion.ajax.controller.AjaxController">
     <property name="invalidSessionUrl" value="/login.jsp" />
     </bean>
+    
+  <context:annotation-config/>
 
   <bean id="boxControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.BoxControllerHelperService">
   </bean>

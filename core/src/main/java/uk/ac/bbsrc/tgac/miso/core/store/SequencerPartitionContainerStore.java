@@ -29,7 +29,6 @@ import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
 
 /**
  * Defines a DAO interface for storing SequencerPartitionContainers
@@ -38,7 +37,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
  * @since 0.1.6
  */
 public interface SequencerPartitionContainerStore extends Store<SequencerPartitionContainer<SequencerPoolPartition>>,
-    NamingSchemeAware<SequencerPartitionContainer<SequencerPoolPartition>>, Remover<SequencerPartitionContainer<SequencerPoolPartition>> {
+    Remover<SequencerPartitionContainer<SequencerPoolPartition>> {
   /**
    * Get the SequencerPartitionContainer that contains a given {@link SequencerPoolPartition}
    * 

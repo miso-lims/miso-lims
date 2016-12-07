@@ -66,7 +66,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.ProjectAlertManager;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.EntityGroupStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
@@ -177,17 +177,14 @@ public class SQLProjectDAO implements ProjectStore {
   }
 
   @Autowired
-  private MisoNamingScheme<Project> namingScheme;
+  private NamingScheme namingScheme;
 
-  @Override
-  @CoverageIgnore
-  public MisoNamingScheme<Project> getNamingScheme() {
+  public NamingScheme getNamingScheme() {
     return namingScheme;
   }
 
   @Override
-  @CoverageIgnore
-  public void setNamingScheme(MisoNamingScheme<Project> namingScheme) {
+  public void setNamingScheme(NamingScheme namingScheme) {
     this.namingScheme = namingScheme;
   }
 
@@ -322,39 +319,29 @@ public class SQLProjectDAO implements ProjectStore {
       try {
         project.setId(DbUtils.getAutoIncrement(template, TABLE_NAME));
 
-        String name = namingScheme.generateNameFor("name", project);
+        String name = namingScheme.generateNameFor(project);
         project.setName(name);
 
-        if (namingScheme.validateField("name", project.getName())) {
-          params.addValue("name", name);
+        DbUtils.validateNameOrThrow(project, namingScheme);
+        params.addValue("name", name);
 
-          Number newId = insert.executeAndReturnKey(params);
-          if (newId.longValue() != project.getId()) {
-            log.error("Expected Project ID ('" + project.getId() + "') doesn't match returned value ('" + newId.longValue()
-                + "') from database insert: rolling back...");
-            new NamedParameterJdbcTemplate(template).update(PROJECT_DELETE,
-                new MapSqlParameterSource().addValue("projectId", newId.longValue()));
-            throw new IOException("Something bad happened. Expected Project ID doesn't match returned value from DB insert");
-          }
-        } else {
-          throw new IOException("Cannot save Project - invalid field:" + project.toString());
+        Number newId = insert.executeAndReturnKey(params);
+        if (newId.longValue() != project.getId()) {
+          log.error("Expected Project ID ('" + project.getId() + "') doesn't match returned value ('" + newId.longValue()
+              + "') from database insert: rolling back...");
+          new NamedParameterJdbcTemplate(template).update(PROJECT_DELETE,
+              new MapSqlParameterSource().addValue("projectId", newId.longValue()));
+          throw new IOException("Something bad happened. Expected Project ID doesn't match returned value from DB insert");
         }
       } catch (MisoNamingException e) {
         throw new IOException("Cannot save Project - issue with naming scheme", e);
       }
     } else {
-      try {
-        if (namingScheme.validateField("name", project.getName())) {
-          params.addValue("projectId", project.getId());
-          params.addValue("name", project.getName());
-          NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
-          namedTemplate.update(PROJECT_UPDATE, params);
-        } else {
-          throw new IOException("Cannot save Project - invalid field:" + project.toString());
-        }
-      } catch (MisoNamingException e) {
-        throw new IOException("Cannot save Project - issue with naming scheme", e);
-      }
+      DbUtils.validateNameOrThrow(project, namingScheme);
+      params.addValue("projectId", project.getId());
+      params.addValue("name", project.getName());
+      NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
+      namedTemplate.update(PROJECT_UPDATE, params);
     }
 
     if (this.cascadeType != null) {

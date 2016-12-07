@@ -37,7 +37,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl.IdentityBuilder;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -101,10 +102,7 @@ public class DefaultSampleService implements SampleService {
   private LabService labService;
 
   @Autowired
-  private MisoNamingScheme<Sample> sampleNamingScheme;
-
-  @Autowired
-  private MisoNamingScheme<Sample> namingScheme;
+  private NamingScheme namingScheme;
 
   @Value("${miso.autoGenerateIdentificationBarcodes}")
   private Boolean autoGenerateIdBarcodes;
@@ -163,11 +161,7 @@ public class DefaultSampleService implements SampleService {
     this.labService = labService;
   }
 
-  public void setSampleNamingScheme(MisoNamingScheme<Sample> sampleNamingScheme) {
-    this.sampleNamingScheme = sampleNamingScheme;
-  }
-
-  public void setNamingScheme(MisoNamingScheme<Sample> namingScheme) {
+  public void setNamingScheme(NamingScheme namingScheme) {
     this.namingScheme = namingScheme;
   }
 
@@ -226,7 +220,7 @@ public class DefaultSampleService implements SampleService {
     sample.setName(generateTemporaryName());
     if (isDetailedSample(sample) && ((DetailedSample) sample).hasNonStandardAlias()) {
       // do not validate alias
-    } else if (isStringEmptyOrNull(sample.getAlias()) && sampleNamingScheme.hasGeneratorFor("alias")) {
+    } else if (isStringEmptyOrNull(sample.getAlias()) && namingScheme.hasSampleAliasGenerator()) {
       sample.setAlias(generateTemporaryName());
     } else {
       validateAliasUniqueness(sample.getAlias());
@@ -253,16 +247,19 @@ public class DefaultSampleService implements SampleService {
       } else {
         sampleDao.update(sample);
       }
+      if (!hasTemporaryAlias(sample)) {
+        validateAlias(sample);
+      }
       Sample created = sampleDao.getSample(newId);
 
       // post-save field generation
       boolean needsUpdate = false;
       if (hasTemporaryName(sample)) {
-        created.setName(namingScheme.generateNameFor("name", created));
+        created.setName(namingScheme.generateNameFor(created));
         needsUpdate = true;
       }
       if (hasTemporaryAlias(sample)) {
-        String generatedAlias = sampleNamingScheme.generateNameFor("alias", created);
+        String generatedAlias = namingScheme.generateSampleAlias(created);
         validateAliasUniqueness(generatedAlias);
         created.setAlias(generatedAlias);
         needsUpdate = true;
@@ -275,7 +272,10 @@ public class DefaultSampleService implements SampleService {
         autoGenerateIdBarcode(sample);
         needsUpdate = true;
       } // if !autoGenerateIdentificationBarcodes then the identificationBarcode is set by the user
-      if (needsUpdate) sampleDao.update(created);
+      if (needsUpdate) {
+        validateAlias(sample);
+        sampleDao.update(created);
+      }
 
       return created;
     } catch (MisoNamingException e) {
@@ -290,6 +290,21 @@ public class DefaultSampleService implements SampleService {
   }
 
   /**
+   * Checks whether sample's alias conforms to the naming scheme. Validation is skipped for DetailedSamples
+   * {@code if (sample.hasNonStandardAlias())}
+   * 
+   * @param sample
+   */
+  private void validateAlias(Sample sample) {
+    if (!isDetailedSample(sample) || !((DetailedSample) sample).hasNonStandardAlias()) {
+      ValidationResult aliasValidation = namingScheme.validateSampleAlias(sample.getAlias());
+      if (!aliasValidation.isValid()) {
+        throw new IllegalArgumentException("Invalid sample alias: '" + sample.getAlias() + "' - " + aliasValidation.getMessage());
+      }
+    }
+  }
+
+  /**
    * Checks whether the configured naming scheme allows duplicate alias. If not, checks to see whether an alias is already in use, in order
    * to prevent duplicates. This method should be called <b>before</b> saving a new Sample
    * 
@@ -298,7 +313,7 @@ public class DefaultSampleService implements SampleService {
    * @throws IOException
    */
   private void validateAliasUniqueness(String alias) throws ConstraintViolationException, IOException {
-    if (!sampleNamingScheme.allowDuplicateEntityNameFor("alias") && sampleDao.aliasExists(alias)) {
+    if (!namingScheme.duplicateSampleAliasAllowed() && sampleDao.aliasExists(alias)) {
       throw new ConstraintViolationException(String.format("A sample with this alias '%s' already exists in the database", alias), null,
           "alias");
     }

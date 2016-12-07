@@ -56,6 +56,8 @@ import net.sf.ehcache.constructs.blocking.BlockingCache;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 /**
@@ -351,5 +353,10 @@ public class DbUtils {
     if (results.isEmpty()) return null;
     if (results.size() > 1) throw new IOException("More than one record found matching unique field value.");
     return results.iterator().next();
+  }
+
+  public static void validateNameOrThrow(Nameable object, NamingScheme namingScheme) throws IOException {
+    ValidationResult val = namingScheme.validateName(object.getName());
+    if (!val.isValid()) throw new IOException("Save failed - invalid name:" + val.getMessage());
   }
 }

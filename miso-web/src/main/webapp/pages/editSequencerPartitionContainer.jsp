@@ -29,7 +29,6 @@
  --%>
 <%@ include file="../header.jsp" %>
 <script src="<c:url value='/scripts/jquery/datatables/js/jquery.dataTables.min.js'/>" type="text/javascript"></script>
-<script src="<c:url value='/scripts/parsley/parsley.min.js'/>" type="text/javascript"></script>
 
 <div id="maincontent">
 <div id="contentcolumn">

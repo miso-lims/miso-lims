@@ -37,7 +37,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface LibraryDilutionStore extends Store<LibraryDilution>, Remover<LibraryDilution>, NamingSchemeAware<LibraryDilution> {
+public interface LibraryDilutionStore extends Store<LibraryDilution>, Remover<LibraryDilution>, NamingSchemeAware {
   /**
    * List all LibraryDilutions by a given parent library ID
    *

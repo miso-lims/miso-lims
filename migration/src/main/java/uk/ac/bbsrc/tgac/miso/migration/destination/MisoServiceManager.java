@@ -16,26 +16,12 @@ import org.springframework.security.core.context.SecurityContextImpl;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.LocalSecurityManager;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Box;
-import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
-import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
-import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.Project;
-import uk.ac.bbsrc.tgac.miso.core.data.Run;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
-import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.DefaultEntityNamingScheme;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.OicrSampleAliasGenerator;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.OicrSampleNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.OicrNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
-import uk.ac.bbsrc.tgac.miso.migration.util.SimpleLibraryNamingScheme;
 import uk.ac.bbsrc.tgac.miso.persistence.HibernateSampleClassDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateDetailedQcStatusDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateIndexDao;
@@ -97,8 +83,7 @@ public class MisoServiceManager {
 
   private final DataObjectFactory dataObjectFactory = new TgacDataObjectFactory();
   private final boolean autoGenerateIdBarcodes = false; // TODO: config option
-  private MisoNamingScheme<Sample> sampleNamingScheme;
-  private MisoNamingScheme<Library> libraryNamingScheme;
+  private NamingScheme namingScheme;
 
   private LocalSecurityManager securityManager; // Supports JDBC authentication only
   private MigrationAuthorizationManager authorizationManager;
@@ -250,29 +235,11 @@ public class MisoServiceManager {
   }
 
   // TODO: Add naming scheme config instead of hard-coding
-  private MisoNamingScheme<Sample> getSampleNamingScheme() {
-    if (sampleNamingScheme == null) {
-      sampleNamingScheme = new OicrSampleNamingScheme();
-      sampleNamingScheme.registerCustomNameGenerator("alias", new OicrSampleAliasGenerator());
-      sampleNamingScheme.setAllowDuplicateEntityName("alias", true);
+  private NamingScheme getNamingScheme() {
+    if (namingScheme == null) {
+      namingScheme = new OicrNamingScheme();
     }
-    return sampleNamingScheme;
-  }
-
-  private MisoNamingScheme<Library> getLibraryNamingScheme() {
-    if (libraryNamingScheme == null) {
-      libraryNamingScheme = new SimpleLibraryNamingScheme();
-      libraryNamingScheme.setAllowDuplicateEntityName("alias", true);
-    }
-    return libraryNamingScheme;
-  }
-
-  private <T extends Nameable> MisoNamingScheme<T> getNameableNamingScheme(Class<T> clazz) {
-    return new DefaultEntityNamingScheme<>(clazz);
-  }
-
-  public <T extends MisoNamingScheme<Nameable>> void setNameableNamingScheme(Class<T> clazz) {
-
+    return namingScheme;
   }
 
   public MigrationAuthorizationManager getAuthorizationManager() {
@@ -419,7 +386,7 @@ public class MisoServiceManager {
     dao.setJdbcTemplate(jdbcTemplate);
     dao.setSecurityManager(securityManager);
     dao.setSecurityProfileDAO(securityProfileDao);
-    dao.setNamingScheme(getNameableNamingScheme(Project.class));
+    dao.setNamingScheme(getNamingScheme());
     dao.setWatcherDAO(watcherDao);
     dao.setDataObjectFactory(dataObjectFactory);
     dao.setReferenceGenomeDao(referenceGenomeDao);
@@ -485,8 +452,7 @@ public class MisoServiceManager {
     DefaultSampleService svc = new DefaultSampleService();
     svc.setAuthorizationManager(authorizationManager);
     svc.setAutoGenerateIdBarcodes(autoGenerateIdBarcodes);
-    svc.setNamingScheme(getNameableNamingScheme(Sample.class));
-    svc.setSampleNamingScheme(getSampleNamingScheme());
+    svc.setNamingScheme(getNamingScheme());
     svc.setProjectStore(projectDao);
     svc.setDetailedQcStatusDao(detailedQcStatusDao);
     svc.setSampleClassDao(sampleClassDao);
@@ -522,10 +488,7 @@ public class MisoServiceManager {
     dao.setChangeLogDao(changeLogDao);
     dao.setJdbcTemplate(jdbcTemplate);
     dao.setLibraryDao(libraryDao);
-    dao.setNamingScheme(getNameableNamingScheme(Sample.class));
     dao.setNoteDao(noteDao);
-    dao.setSampleNamingScheme(getSampleNamingScheme());
-    dao.getSampleNamingScheme().registerCustomNameGenerator("alias", new OicrSampleAliasGenerator());
     dao.setSampleQcDao(sampleQcDao);
     dao.setSecurityDao(securityStore);
     dao.setSecurityProfileDao(securityProfileDao);
@@ -537,7 +500,6 @@ public class MisoServiceManager {
     if (sampleService != null) sampleService.setSampleDao(sampleDao);
     if (sampleQcDao != null) sampleQcDao.setSampleDAO(sampleDao);
     if (libraryDao != null) libraryDao.setSampleDAO(sampleDao);
-    if (experimentDao != null) experimentDao.setSampleDAO(sampleDao);
     if (boxDao != null) boxDao.setSampleDAO(sampleDao);
     if (projectDao != null) projectDao.setSampleDAO(sampleDao);
   }
@@ -633,9 +595,8 @@ public class MisoServiceManager {
     dao.setDataObjectFactory(dataObjectFactory);
     dao.setDilutionDAO(dilutionDao);
     dao.setJdbcTemplate(jdbcTemplate);
-    dao.setLibraryNamingScheme(getLibraryNamingScheme());
     dao.setLibraryQcDAO(libraryQcDao);
-    dao.setNamingScheme(getNameableNamingScheme(Library.class));
+    dao.setNamingScheme(getNamingScheme());
     dao.setNoteDAO(noteDao);
     dao.setPoolDAO(poolDao);
     dao.setSampleDAO(sampleDao);
@@ -689,7 +650,7 @@ public class MisoServiceManager {
     dao.setDataObjectFactory(dataObjectFactory);
     dao.setJdbcTemplate(jdbcTemplate);
     dao.setLibraryDAO(libraryDao);
-    dao.setNamingScheme(getNameableNamingScheme(LibraryDilution.class));
+    dao.setNamingScheme(getNamingScheme());
     dao.setSecurityProfileDAO(securityProfileDao);
     dao.setTargetedSequencingDAO(targetedSequencingDao);
     setDilutionDao(dao);
@@ -738,7 +699,7 @@ public class MisoServiceManager {
     dao.setDataObjectFactory(dataObjectFactory);
     dao.setExperimentDAO(experimentDao);
     dao.setJdbcTemplate(jdbcTemplate);
-    dao.setNamingScheme(new DefaultEntityNamingScheme<Pool>()); // TODO: config
+    dao.setNamingScheme(getNamingScheme());
     dao.setNoteDAO(noteDao);
     dao.setSecurityDAO(securityStore);
     dao.setSecurityManager(securityManager);
@@ -770,11 +731,9 @@ public class MisoServiceManager {
     dao.setDataObjectFactory(dataObjectFactory);
     dao.setJdbcTemplate(jdbcTemplate);
     dao.setKitDAO(kitDao);
-    dao.setNamingScheme(getNameableNamingScheme(Experiment.class));
+    dao.setNamingScheme(getNamingScheme());
     dao.setPlatformDAO(platformDao);
     dao.setPoolDAO(poolDao);
-    dao.setRunDAO(runDao);
-    dao.setSampleDAO(sampleDao);
     dao.setSecurityDAO(securityStore);
     dao.setSecurityProfileDAO(securityProfileDao);
     dao.setStudyDAO(studyDao);
@@ -846,7 +805,7 @@ public class MisoServiceManager {
     dao.setDataObjectFactory(dataObjectFactory);
     dao.setExperimentDAO(experimentDao);
     dao.setJdbcTemplate(jdbcTemplate);
-    dao.setNamingScheme(getNameableNamingScheme(Study.class));
+    dao.setNamingScheme(getNamingScheme());
     dao.setProjectDAO(projectDao);
     dao.setSecurityDAO(securityStore);
     dao.setSecurityProfileDAO(securityProfileDao);
@@ -872,7 +831,7 @@ public class MisoServiceManager {
     dao.setChangeLogDAO(changeLogDao);
     dao.setDataObjectFactory(dataObjectFactory);
     dao.setJdbcTemplate(jdbcTemplate);
-    dao.setNamingScheme(getNameableNamingScheme(Run.class));
+    dao.setNamingScheme(getNamingScheme());
     dao.setNoteDAO(noteDao);
     dao.setRunQcDAO(runQcDao);
     dao.setSecurityDAO(securityStore);
@@ -888,7 +847,6 @@ public class MisoServiceManager {
   }
 
   private void updateRunDaoDependencies() {
-    if (experimentDao != null) experimentDao.setRunDAO(runDao);
     if (runQcDao != null) runQcDao.setRunDAO(runDao);
     if (sequencerPartitionContainerDao != null) sequencerPartitionContainerDao.setRunDAO(runDao);
   }
@@ -929,7 +887,6 @@ public class MisoServiceManager {
     dao.setChangeLogDAO(changeLogDao);
     dao.setDataObjectFactory(dataObjectFactory);
     dao.setJdbcTemplate(jdbcTemplate);
-    dao.setNamingScheme(new DefaultEntityNamingScheme<SequencerPartitionContainer<SequencerPoolPartition>>()); // TODO: naming scheme config
     dao.setPartitionDAO(partitionDao);
     dao.setPlatformDAO(platformDao);
     dao.setRunDAO(runDao);
@@ -1024,7 +981,7 @@ public class MisoServiceManager {
     dao.setDataObjectFactory(dataObjectFactory);
     dao.setJdbcTemplate(jdbcTemplate);
     dao.setLibraryDAO(libraryDao);
-    dao.setNamingScheme(getNameableNamingScheme(Box.class));
+    dao.setNamingScheme(getNamingScheme());
     dao.setPoolDAO(poolDao);
     dao.setSampleDAO(sampleDao);
     dao.setSecurityDAO(securityStore);

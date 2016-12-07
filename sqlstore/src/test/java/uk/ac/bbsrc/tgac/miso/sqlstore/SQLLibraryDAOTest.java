@@ -13,8 +13,6 @@ import java.util.Map;
 
 import javax.persistence.CascadeType;
 
-import net.sf.ehcache.CacheManager;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -30,6 +28,8 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.store.SecurityStore;
 
+import net.sf.ehcache.CacheManager;
+
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -42,7 +42,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.IndexStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
@@ -67,7 +68,7 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
   @Mock
   private NoteStore noteStore;
   @Mock
-  private MisoNamingScheme<Library> libraryNamingSchema;
+  private NamingScheme namingScheme;
   @Mock
   private IndexStore indexStore;
   @Mock
@@ -119,8 +120,9 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
     library.setLastModifier(mockUser);
 
     mockAutoIncrement(nextAutoIncrementId);
-    when(libraryNamingSchema.validateField(anyString(), anyString())).thenReturn(true);
-    when(libraryNamingSchema.generateNameFor("name", library)).thenReturn(libraryName);
+    when(namingScheme.validateName(anyString())).thenReturn(ValidationResult.success());
+    when(namingScheme.generateNameFor(library)).thenReturn(libraryName);
+    when(namingScheme.validateLibraryAlias(anyString())).thenReturn(ValidationResult.success());
 
     long libraryId = dao.save(library);
     Library insertedLibrary = dao.get(libraryId);
@@ -214,7 +216,7 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
   @Test
   public void testListByProjectId() throws Exception {
     List<Library> libraries = dao.listByProjectId(1);
-    List libraryIds = Arrays.asList(1l, 2l, 3l, 4l, 5l, 6l, 7l, 8l, 9l, 10l, 11l, 12l, 13l, 14l);
+    List<Long> libraryIds = Arrays.asList(1l, 2l, 3l, 4l, 5l, 6l, 7l, 8l, 9l, 10l, 11l, 12l, 13l, 14l);
     assertEquals(14, libraries.size());
     for (Library library : libraries) {
       assertTrue("bad library found", libraryIds.contains(library.getId()));
@@ -224,7 +226,7 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
   @Test
   public void testListAll() throws Exception {
     List<Library> libraries = dao.listAll();
-    List libraryIds = Arrays.asList(1l, 2l, 3l, 4l, 5l, 6l, 7l, 8l, 9l, 10l, 11l, 12l, 13l, 14l);
+    List<Long> libraryIds = Arrays.asList(1l, 2l, 3l, 4l, 5l, 6l, 7l, 8l, 9l, 10l, 11l, 12l, 13l, 14l);
     assertEquals(14, libraries.size());
     for (Library library : libraries) {
       assertTrue("bad library found", libraryIds.contains(library.getId()));
@@ -330,9 +332,9 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
     library.setLastModifier(mockUser);
 
     mockAutoIncrement(nextAutoIncrementId);
-    when(libraryNamingSchema.generateNameFor("name", library)).thenReturn(libraryName);
-    when(libraryNamingSchema.validateField("name", library.getName())).thenReturn(true);
-    when(libraryNamingSchema.validateField("alias", library.getAlias())).thenReturn(true);
+    when(namingScheme.generateNameFor(library)).thenReturn(libraryName);
+    when(namingScheme.validateName(library.getName())).thenReturn(ValidationResult.success());
+    when(namingScheme.validateLibraryAlias(library.getAlias())).thenReturn(ValidationResult.success());
 
     long libraryId = dao.save(library);
     Library insertedLibrary = dao.get(libraryId);
