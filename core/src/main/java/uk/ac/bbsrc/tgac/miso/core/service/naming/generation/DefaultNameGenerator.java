@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.service.naming.generation;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
@@ -9,7 +10,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 public class DefaultNameGenerator implements NameGenerator<Nameable> {
 
-  private static final Logger log = Logger.getLogger(DefaultNameGenerator.class);
+  private static final Logger log = LoggerFactory.getLogger(DefaultNameGenerator.class);
 
   @Override
   public String generate(Nameable nameable) throws MisoNamingException {
