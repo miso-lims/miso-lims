@@ -42,7 +42,7 @@
 <h1><c:choose><c:when
     test="${project.id != 0}">Edit</c:when><c:otherwise>Create</c:otherwise></c:choose>
   Project
-  <button type="button" class="fg-button ui-state-default ui-corner-all" onclick="return Project.validateProject();">
+  <button type="button" class="fg-button ui-state-default ui-corner-all" onclick="Project.validateProject();">
     Save
   </button>
 </h1>

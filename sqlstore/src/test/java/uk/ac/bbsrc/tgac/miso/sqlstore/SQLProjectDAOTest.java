@@ -133,6 +133,7 @@ public class SQLProjectDAOTest extends AbstractDAOTest {
 
     when(namingScheme.generateNameFor(Matchers.any(Project.class))).thenReturn("EDI123");
     when(namingScheme.validateName(Matchers.anyString())).thenReturn(ValidationResult.success());
+    when(namingScheme.validateProjectShortName(Matchers.anyString())).thenReturn(ValidationResult.success());
 
     project.setProgress(ProgressType.ACTIVE);
     ReferenceGenome referenceGenome = new ReferenceGenomeImpl();

@@ -67,6 +67,7 @@ import uk.ac.bbsrc.tgac.miso.core.event.manager.ProjectAlertManager;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.EntityGroupStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
@@ -305,6 +306,8 @@ public class SQLProjectDAO implements ProjectStore {
       securityProfileId = securityProfileDAO.save(project.getSecurityProfile());
     }
 
+    validateShortNameOrThrow(project);
+
     MapSqlParameterSource params = new MapSqlParameterSource();
     params.addValue("alias", project.getAlias());
     params.addValue("shortName", project.getShortName());
@@ -364,6 +367,13 @@ public class SQLProjectDAO implements ProjectStore {
     }
 
     return project.getProjectId();
+  }
+
+  private void validateShortNameOrThrow(Project project) throws IOException {
+    ValidationResult shortNameValidation = namingScheme.validateProjectShortName(project.getShortName());
+    if (!shortNameValidation.isValid()) {
+      throw new IOException("Cannot save project - invalid shortName: " + shortNameValidation.getMessage());
+    }
   }
 
   @Override

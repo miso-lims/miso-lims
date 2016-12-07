@@ -24,6 +24,33 @@
 // these variables are set on the editProject page if the project has samples/libraries
 var projectId_sample, sampleQcTypesString, libraryQcTypesString, projectId_d3graph;
 
+//Custom Parsley validator to validate Project shortName server-side
+window.Parsley.addValidator('projectShortName', {
+  validateString: function(value) {
+    var deferred = new jQuery.Deferred();
+    Fluxion.doAjax(
+      'projectControllerHelperService',
+      'validateProjectShortName',
+      {
+        'shortName': value,
+        'url': ajaxurl
+      },
+      {
+        'doOnSuccess': function(json) {
+          deferred.resolve();
+        },
+        'doOnError': function(json) {
+          deferred.reject(json.error);
+        }
+      }
+    );
+    return deferred.promise();
+  },
+  messages: {
+    en: 'Short name must conform to the naming scheme.'
+  }
+});
+
 var Project = Project || {
   validateProject: function () {
     Validate.cleanFields('#project-form');
@@ -37,13 +64,14 @@ var Project = Project || {
 
     // Short name input field validation
     jQuery('#shortName').attr('class', 'form-control');
-    jQuery('#shortName').attr('data-parsley-required', 'true');
     jQuery('#shortName').attr('data-parsley-maxlength', '5');
-    jQuery('#shortName').attr('data-parsley-pattern', Utils.validation.shortNameRegex);
+    jQuery('#shortName').attr('data-parsley-validate-if-empty', '');
+    jQuery('#shortName').attr('data-parsley-project-short-name', '');
+    jQuery('#shortName').attr('data-parsley-debounce', '500');
 
     // Description input field validation
     jQuery('#description').attr('class', 'form-control');
-    jQuery('#description').attr('data-parsley-maxlength', '100');
+    jQuery('#description').attr('data-parsley-maxlength', '255');
     jQuery('#description').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
 
     // Radio button validation: ensure a button is selected (assumes there is one progress button, no other way to check because of dynamic
@@ -63,7 +91,6 @@ var Project = Project || {
     jQuery('#project-form').parsley().validate();
 
     Validate.updateWarningOrSubmit('#project-form');
-    return false;
   },
   
   validate_sample_qcs: function (json) {

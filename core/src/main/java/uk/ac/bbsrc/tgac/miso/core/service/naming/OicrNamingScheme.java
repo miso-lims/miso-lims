@@ -12,6 +12,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.generation.OicrSampleAliasGener
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.DefaultNameValidator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.NameValidator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.OicrLibraryAliasValidator;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.OicrProjectShortNameValidator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.OicrSampleAliasValidator;
 
 /**
@@ -25,6 +26,7 @@ public class OicrNamingScheme extends AbstractNamingScheme {
   private final OicrSampleAliasGenerator sampleAliasGenerator = new OicrSampleAliasGenerator();
   private final OicrLibraryAliasValidator libraryAliasValidator = new OicrLibraryAliasValidator();
   private final OicrLibraryAliasGenerator libraryAliasGenerator = null;
+  private final OicrProjectShortNameValidator projectShortNameValidator = new OicrProjectShortNameValidator();
 
   /**
    * Creates a new OicrNamingScheme and attempts to autowire all of its validators' and generators' dependencies. If no
@@ -75,6 +77,11 @@ public class OicrNamingScheme extends AbstractNamingScheme {
     throwUnsupported();
   }
 
+  @Override
+  public void setProjectShortNameValidator(NameValidator validator) {
+    throwUnsupported();
+  }
+
   private void throwUnsupported() {
     throw new UnsupportedOperationException("runtime customization not supported by this naming scheme");
   }
@@ -107,6 +114,11 @@ public class OicrNamingScheme extends AbstractNamingScheme {
   @Override
   protected NameGenerator<Library> getLibraryAliasGenerator() {
     return libraryAliasGenerator;
+  }
+
+  @Override
+  protected NameValidator getProjectShortNameValidator() {
+    return projectShortNameValidator;
   }
 
 }

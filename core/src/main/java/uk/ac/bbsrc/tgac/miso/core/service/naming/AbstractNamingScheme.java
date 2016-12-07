@@ -81,6 +81,22 @@ public abstract class AbstractNamingScheme implements NamingScheme {
     return getLibraryAliasValidator() == null ? true : getLibraryAliasValidator().duplicatesAllowed();
   }
 
+  @Override
+  public ValidationResult validateProjectShortName(String shortName) {
+    if (getProjectShortNameValidator() == null) return ValidationResult.success();
+    return getProjectShortNameValidator().validate(shortName);
+  }
+
+  @Override
+  public boolean duplicateProjectShortNamesAllowed() {
+    return getProjectShortNameValidator() == null ? null : getProjectShortNameValidator().duplicatesAllowed();
+  }
+
+  @Override
+  public boolean nullProjectShortNameAllowed() {
+    return getProjectShortNameValidator() == null ? false : getProjectShortNameValidator().nullsAllowed();
+  }
+
   protected abstract NameValidator getNameValidator();
 
   protected abstract NameGenerator<Nameable> getNameGenerator();
@@ -92,5 +108,7 @@ public abstract class AbstractNamingScheme implements NamingScheme {
   protected abstract NameValidator getLibraryAliasValidator();
 
   protected abstract NameGenerator<Library> getLibraryAliasGenerator();
+
+  protected abstract NameValidator getProjectShortNameValidator();
 
 }

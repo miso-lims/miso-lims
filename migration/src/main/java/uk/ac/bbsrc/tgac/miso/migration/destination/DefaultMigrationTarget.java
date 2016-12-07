@@ -161,7 +161,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
       if (project.getStudies() == null) project.setStudies(new HashSet<Study>());
       if (project.getStudies().isEmpty()) {
         Study study = new StudyImpl();
-        study.setAlias(project.getShortName() + " study");
+        study.setAlias((project.getShortName() == null ? project.getAlias() : project.getShortName()) + " study");
         study.setDescription("");
         study.setStudyType("Other");
         study.setLastModifier(migrationUser);

@@ -148,4 +148,30 @@ public interface NamingScheme {
    */
   public boolean duplicateLibraryAliasAllowed();
 
+  /**
+   * Optional method. Sets a validator to be used for {@link Project} short names
+   * 
+   * @param validator
+   * @throws UnsupportedOperationException if this NamingScheme does not accept custom {@link Project} short name validators
+   */
+  public void setProjectShortNameValidator(NameValidator validator);
+
+  /**
+   * Checks that the provided {@link Project} short name conforms to the naming scheme
+   * 
+   * @param name
+   * @return the {@link ValidationResult}
+   */
+  public ValidationResult validateProjectShortName(String shortName);
+
+  /**
+   * @return true if duplicate {@link Project} short names are allowed by this NamingScheme
+   */
+  public boolean duplicateProjectShortNamesAllowed();
+
+  /**
+   * @return true if {@link Project} shortName is a mandatory field; false if null is allowed
+   */
+  public boolean nullProjectShortNameAllowed();
+
 }
