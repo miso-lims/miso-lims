@@ -6,6 +6,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.generation.DefaultLibraryAliasGenerator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.generation.DefaultNameGenerator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.generation.NameGenerator;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.AllowAnythingValidator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.DefaultLibraryAliasValidator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.DefaultNameValidator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.DefaultSampleAliasValidator;
@@ -22,6 +23,7 @@ public class DefaultNamingScheme extends AbstractNamingScheme {
   private NameGenerator<Sample> sampleAliasGenerator = null;
   private NameValidator libraryAliasValidator = new DefaultLibraryAliasValidator();
   private NameGenerator<Library> libraryAliasGenerator = new DefaultLibraryAliasGenerator();
+  private NameValidator projectShortNameValidator = new AllowAnythingValidator();
 
   @Override
   public void setNameGenerator(NameGenerator<Nameable> generator) {
@@ -86,6 +88,16 @@ public class DefaultNamingScheme extends AbstractNamingScheme {
   @Override
   protected NameGenerator<Library> getLibraryAliasGenerator() {
     return libraryAliasGenerator;
+  }
+
+  @Override
+  public void setProjectShortNameValidator(NameValidator validator) {
+    this.projectShortNameValidator = validator;
+  }
+
+  @Override
+  protected NameValidator getProjectShortNameValidator() {
+    return projectShortNameValidator;
   }
 
 }

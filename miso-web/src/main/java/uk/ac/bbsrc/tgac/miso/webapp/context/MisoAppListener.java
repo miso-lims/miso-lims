@@ -333,6 +333,12 @@ public class MisoAppListener implements ServletContextListener {
       setUpValidator(validator, misoProperties, "miso.naming.validator.library.alias");
       scheme.setLibraryAliasValidator(validator);
     }
+
+    if ((currentPropertyValue = getStringPropertyOrNull("miso.naming.validator.project.shortName", misoProperties)) != null) {
+      NameValidator validator = resolver.getLibraryAliasValidator(currentPropertyValue);
+      setUpValidator(validator, misoProperties, "miso.naming.validator.library.alias");
+      scheme.setLibraryAliasValidator(validator);
+    }
   }
 
   private String getStringPropertyOrNull(String key, Map<String, String> misoProperties) {

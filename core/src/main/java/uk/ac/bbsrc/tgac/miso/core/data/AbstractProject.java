@@ -23,8 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringBlankOrNull;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -141,13 +139,6 @@ public abstract class AbstractProject implements Project {
 
   @Override
   public String getShortName() {
-    if (isStringBlankOrNull(shortName)) {
-      String syntheticShortName = alias.toUpperCase().replaceAll("[^A-Z0-9]", "");
-      if (syntheticShortName.length() > 5) {
-        syntheticShortName = syntheticShortName.substring(0, 5);
-      }
-      return syntheticShortName;
-    }
     return shortName;
   }
 

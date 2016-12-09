@@ -575,6 +575,7 @@ public class DefaultSampleServiceTestSuite {
     Project project = new ProjectImpl();
     project.setId(shell.getId());
     project.setAlias("real_project");
+    project.setShortName("PROJ");
     project.setSecurityProfile(new SecurityProfile(mockUser()));
     project.getSecurityProfile().setOwner(mockUser());
     Mockito.when(projectStore.get(shell.getId())).thenReturn(project);

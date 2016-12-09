@@ -440,6 +440,9 @@ public class DefaultSampleService implements SampleService {
 
     String number = sampleNumberPerProjectService.nextNumber(sample.getProject());
     // Cannot generate identity alias via sampleNameGenerator because of dependence on SampleNumberPerProjectService
+    if (sample.getProject().getShortName() == null) {
+      throw new NullPointerException("Project shortname required to generate Identity alias");
+    }
     String internalName = sample.getProject().getShortName() + "_" + number;
     Identity shellParent = (Identity) sample.getParent();
 

@@ -24,4 +24,6 @@ public interface NamingSchemeResolverService {
   NameValidator getSampleAliasValidator(String validatorName);
 
   NameValidator getLibraryAliasValidator(String validatorName);
+
+  NameValidator getProjectShortNameValidator(String validatorName);
 }

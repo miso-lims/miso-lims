@@ -24,6 +24,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.DefaultNameValidator
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.DefaultSampleAliasValidator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.NameValidator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.OicrLibraryAliasValidator;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.OicrProjectShortNameValidator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.OicrSampleAliasValidator;
 
 /**
@@ -39,6 +40,7 @@ public class StaticMappedNamingSchemeResolverService implements NamingSchemeReso
   private static final Map<String, Class<? extends NameValidator>> nameValidators = new HashMap<>();
   private static final Map<String, Class<? extends NameValidator>> sampleAliasValidators = new HashMap<>();
   private static final Map<String, Class<? extends NameValidator>> libraryAliasValidators = new HashMap<>();
+  private static final Map<String, Class<? extends NameValidator>> projectShortNameValidators = new HashMap<>();
 
   static {
     // Add new naming schemes/generators/validators to the relevant map(s). Use only lowercase for keys
@@ -64,6 +66,9 @@ public class StaticMappedNamingSchemeResolverService implements NamingSchemeReso
     libraryAliasValidators.put("default", DefaultLibraryAliasValidator.class);
     libraryAliasValidators.put("allowany", AllowAnythingValidator.class);
     libraryAliasValidators.put("oicr", OicrLibraryAliasValidator.class);
+
+    projectShortNameValidators.put("allowany", AllowAnythingValidator.class);
+    projectShortNameValidators.put("oicr", OicrProjectShortNameValidator.class);
   }
 
   @Override
@@ -106,6 +111,12 @@ public class StaticMappedNamingSchemeResolverService implements NamingSchemeReso
   public NameValidator getLibraryAliasValidator(String validatorName) {
     Class<? extends NameValidator> clazz = libraryAliasValidators.get(validatorName.toLowerCase());
     return loadClass(clazz, "library alias validator", validatorName);
+  }
+
+  @Override
+  public NameValidator getProjectShortNameValidator(String validatorName) {
+    Class<? extends NameValidator> clazz = projectShortNameValidators.get(validatorName.toLowerCase());
+    return loadClass(clazz, "project short name validator", validatorName);
   }
 
   private <T> T loadClass(Class<T> clazz, String property, String value) {
