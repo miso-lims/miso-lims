@@ -86,7 +86,7 @@ var Sample = Sample || {
     }
   },
   
-  validateSample: function (isDetailedSample, isNewSample) {
+  validateSample: function (isDetailedSample, skipAliasValidation, isNewSample) {
     Validate.cleanFields('#sample-form');
     jQuery('#sample-form').parsley().destroy();
 
@@ -95,8 +95,12 @@ var Sample = Sample || {
     jQuery('#alias').attr('class', 'form-control');
     jQuery('#alias').attr('data-parsley-maxlength', '100');
     jQuery('#alias').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
-    jQuery('#alias').attr('data-parsley-sample-alias', '');
-    jQuery('#alias').attr('data-parsley-debounce', '500');
+    if (skipAliasValidation) {
+      jQuery('#alias').attr('data-parsley-required', 'true');
+    } else {
+      jQuery('#alias').attr('data-parsley-sample-alias', '');
+      jQuery('#alias').attr('data-parsley-debounce', '500');
+    }
 
     // Description input field validation
     jQuery('#description').attr('class', 'form-control');

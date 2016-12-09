@@ -69,7 +69,7 @@
     <c:otherwise><span id="status" data-status="create">Create</span></c:otherwise>
   </c:choose> Sample
   <button type="button" class="fg-button ui-state-default ui-corner-all"
-          onclick="return Sample.validateSample(${detailedSample}, ${sample.id == 0});">Save
+          onclick="return Sample.validateSample(${detailedSample}, (${sample.hasNonStandardAlias() || sample.parent.hasNonStandardAlias()}), ${sample.id == 0});">Save
   </button>
 </h1>
 
