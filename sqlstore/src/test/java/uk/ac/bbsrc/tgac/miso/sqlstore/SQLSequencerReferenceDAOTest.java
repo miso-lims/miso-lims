@@ -7,6 +7,7 @@ import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.util.Collection;
 
+import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -23,6 +24,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernatePlatformDao;
 
 public class SQLSequencerReferenceDAOTest extends AbstractDAOTest {
 
@@ -34,7 +36,10 @@ public class SQLSequencerReferenceDAOTest extends AbstractDAOTest {
 
   private final DataObjectFactory dataObjectFactory = new TgacDataObjectFactory();
 
-  private SQLPlatformDAO platformDAO;
+  private HibernatePlatformDao platformDAO;
+
+  @Autowired
+  private SessionFactory sessionFactory;
 
   @InjectMocks
   private SQLSequencerReferenceDAO dao;
@@ -42,9 +47,9 @@ public class SQLSequencerReferenceDAOTest extends AbstractDAOTest {
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    platformDAO = new SQLPlatformDAO();
-    platformDAO.setDataObjectFactory(dataObjectFactory);
+    platformDAO = new HibernatePlatformDao();
     platformDAO.setJdbcTemplate(template);
+    platformDAO.setSessionFactory(sessionFactory);
     dao.setJdbcTemplate(template);
     dao.setPlatformDAO(platformDAO);
     dao.setDataObjectFactory(dataObjectFactory);
