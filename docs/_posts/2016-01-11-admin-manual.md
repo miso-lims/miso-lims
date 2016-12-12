@@ -217,12 +217,71 @@ If using JDBC, once running, you should change the passwords of the `admin` and
 
 ## Naming Schemes
 MISO Naming Schemes are used to validate and generate entity String fields. They are
-used for all `name` fields, and some `alias` fields. There are configuration options
-for three naming schemes in `miso.properties`:
+used for all `name` fields, and some `alias` fields. You may configure a base naming
+scheme, and customize it by switching validators and generators in `miso.properties`.
 
-* `miso.naming.scheme.sample`
-* `miso.naming.scheme.library`
-* `miso.naming.scheme.nameable` (used for anything not covered above)
+The options for `miso.naming.scheme` are `default` and `oicr`, which have these
+default configurations:
+
+|                         | default                      | oicr                      |
+|------------------------------------------------------------------------------------|
+| Name generator          | DefaultNameGenerator         | DefaultNameGenerator      |
+| Name Validator          | DefaultNameValidator         | DefaultNameValidator      |
+| Sample Alias Generator  | none                         | OicrSampleAliasGenerator  |
+| Sample Alias Validator  | DefaultSampleAliasValidator  | OicrSampleAliasValidator  |
+| Library Alias Generator | DefaultLibraryAliasGenerator | none                      |
+| Library Alias Validator | DefaultLibraryAliasValidator | oicrLibraryAliasValidator |
+| Configurable components | all                          | none                      |
+
+If the naming scheme you’ve selected has configurable components, you may configure them
+as follows.
+
+`miso.naming.generator.nameable.name`
+
+| Option    | Example     |
+| default   | SAM1        |
+| classname | SampleImpl1 |
+
+`miso.naming.generator.sample.alias`
+
+| Option  | Example               | Note                             |
+| oicr    | PROJ_0001_Ad_P_nn_1-1 | for use with DetailedSample only |
+
+`miso.naming.generator.library.alias`
+
+| Option  | Example                  | Note                                                                                                     |
+| default | XX_LYY-1                 | XX and YY taken from sample alias - depends on sample alias passing default validator with default regex |
+| oicr    | PROJ_0001_Ad_P_PE_300_WG | for use with DetailedSample only. depends on sample alias passing oicr validator                         |
+
+`miso.naming.validator.nameable.name`
+
+| Option   | Detail                                       | Allow null | Allow duplicates | Custom Regex | Custom Duplication |
+| default  | Matches 'default' generator, or custom regex | no         | no               | yes          | yes                |
+| allowany | Only checks that the name is not null        | yes        | yes              | no           | no                 |
+
+`miso.naming.validator.sample.alias`
+
+| Option   | Detail                                         | Allow null | Allow duplicates | Custom Regex | Custom Duplication |
+| default  | Default regex: `([A-z0-9]+)_S([A-z0-9]+)_(.*)` | no         | no               | yes          | no                 |
+| allowany | Only checks that the alias is not null         | yes        | yes              | no           | no                 |
+| oicr     | Matches 'oicr' generator                       | no         | no               | no           | no                 |
+
+`miso.naming.validator.library.alias`
+
+| Option   | Detail                                 | Allow null | Allow duplicates | Custom Regex | Custom Duplication |
+| default  | Matches 'default' generator            | no         | no               | yes          | no                 |
+| allowany | Only checks that the alias is not null | yes        | yes              | no           | no                 |
+| oicr     | Matches 'oicr' generator               | no         | no               | no           | no                 |
+
+If a validator accepts custom regex, it can be configured via `<base property>.regex`.
+e.g. `miso.naming.validator.nameable.name.regex:.*` to allow any name. A custom validator
+must be specified for this property to be enabled - the naming scheme’s default validator
+will not be altered.
+
+If a validator accepts custom duplication, that can be configured via
+`<base property>.duplicates`. e.g. `miso.naming.validator.library.alias.duplicates:true`
+to allow duplicate library aliases. A custom validator must be specified for this
+property to be enabled - the naming scheme’s default validator will not be altered.
 
 Existing naming schemes:
 

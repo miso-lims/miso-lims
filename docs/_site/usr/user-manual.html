@@ -299,7 +299,7 @@
 
 <ul>
   <li>Whilst MISO supports creating Experiments manually (see below), it is often easier to allow MISO to generate and link an Experiment to a Pool for you.</li>
-  <li>From the <em>Edit Run</em> page, you are able to select Pools to be placed on Run lanes (or chambers).</li>
+  <li>From the <em>Edit Run</em> page, you are able to select Pools to be placed on Run lanes (lanes/chambers).</li>
   <li>When assigning a Pool to a lane, the following rules apply for Experiment creation:
     <ul>
       <li>If the Pool has no Experiment already linked</li>
@@ -490,7 +490,7 @@
 
 <h2 id="library-dilutions-and-pools">Library Dilutions and Pools</h2>
 
-<p>A MISO Pool contains one or more Dilutions that are to be sequenced as part of an Experiment, in a sequencer instrument Run lane (or chamber). Pools with more than one Dilution are said to be multiplexed. Each pool has a <em>prefix</em> based on the Platform Type and an <em>ID</em>. For Illumina pools, the prefix will be <strong>IPO</strong>, for 454 <strong>LPO</strong>, for SOLiD <strong>SPO</strong>. The pool ID becomes the suffix of the pool name_,_ e.g. <strong>IPO1, LPO270</strong>.</p>
+<p>A MISO Pool contains one or more Dilutions that are to be sequenced as part of an Experiment, in a sequencer instrument Run lanes (or chamber). Pools with more than one Dilution are said to be multiplexed. Each pool has a <em>prefix</em> based on the Platform Type and an <em>ID</em>. For Illumina pools, the prefix will be <strong>IPO</strong>, for 454 <strong>LPO</strong>, for SOLiD <strong>SPO</strong>. The pool ID becomes the suffix of the pool name_,_ e.g. <strong>IPO1, LPO270</strong>.</p>
 
 <h3 id="create-library-dilutions">Create library dilutions</h3>
 
@@ -527,15 +527,15 @@
 
 <h2 id="sequencing-containers">Sequencing Containers</h2>
 
-<p>Sequencing Containers represent a collection of Lanes (representing lanes, chambers, etc) that are described by a parent Run object. Containers can be populated prior to a Run being entered manually or being imported by the Notification System. This means Containers can be barcoded and entered into MISO with their Pools populated ahead-of-time so that when Runs are added manually or automatically, the Containers can either be linked via a quick lookup or automatically, respectively.</p>
+<p>Sequencing Containers represent a collection of Lanes (which represent lanes, chambers, etc) that are described by a parent Run object. Containers can be populated prior to a Run being entered manually or being imported by the Notification System. This means Containers can be barcoded and entered into MISO with their Pools populated ahead-of-time so that when Runs are added manually or automatically, the Containers can either be linked via a quick lookup or automatically, respectively.</p>
 
 <h4 id="adding-sequencing-containers-outside-a-run">Adding Sequencing Containers (outside a Run)</h4>
 
 <ul>
   <li>Independent Container creation is accessed from the <em>Create New Sequencing Container</em> link in the navigation area</li>
   <li>Select a Platform for the Container from the <em>Platform</em> radio buttons</li>
-  <li>Select an available Sequencer Reference from the <em>Sequencer</em> dropdown</li>
-  <li>Select the number of Containers you want to add for the Platform (454 is the only multiple flowcell vendor. HiSeq’s are effectively “single flowcell in twos”, i.e. two run folders are created independently even though two flowcells can be run concurrently on the machine itself).</li>
+  <li>Select an available Sequencer from the <em>Sequencer</em> dropdown</li>
+  <li>Select the number of Containers you want to add for the Platform (454 is the only multiple-flowcell vendor. HiSeq’s are effectively “single flowcell in twos”, i.e. two run folders are created independently even though two flowcells can be run concurrently on the machine itself).</li>
   <li>Enter in an ID for this Container. You can validate that this barcode hasn’t been used before by using the <em>Lookup</em> button.</li>
   <li>A location and validation barcode can also be entered, but are not compulsory.</li>
   <li>Double click on an empty lane and either beep in or type the barcode of the pool you wish to add to this Container</li>
