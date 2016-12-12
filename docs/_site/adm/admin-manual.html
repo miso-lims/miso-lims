@@ -426,7 +426,12 @@ default configurations:</p>
     <tr>
       <td>Library Alias Validator</td>
       <td>DefaultLibraryAliasValidator</td>
-      <td>oicrLibraryAliasValidator</td>
+      <td>OicrLibraryAliasValidator</td>
+    </tr>
+    <tr>
+      <td>Project ShortName Validator</td>
+      <td>AllowAnythingValidator</td>
+      <td>OicrProjectShortNameValidator</td>
     </tr>
     <tr>
       <td>Configurable components</td>
@@ -439,7 +444,7 @@ default configurations:</p>
 <p>If the naming scheme you’ve selected has configurable components, you may configure them<br />
 as follows.</p>
 
-<p><code>miso.naming.generator.nameable.name</code></p>
+<h3 id="misonaminggeneratornameablename"><code>miso.naming.generator.nameable.name</code></h3>
 
 <table>
   <tbody>
@@ -458,7 +463,7 @@ as follows.</p>
   </tbody>
 </table>
 
-<p><code>miso.naming.generator.sample.alias</code></p>
+<h3 id="misonaminggeneratorsamplealias"><code>miso.naming.generator.sample.alias</code></h3>
 
 <table>
   <tbody>
@@ -475,7 +480,7 @@ as follows.</p>
   </tbody>
 </table>
 
-<p><code>miso.naming.generator.library.alias</code></p>
+<h3 id="misonaminggeneratorlibraryalias"><code>miso.naming.generator.library.alias</code></h3>
 
 <table>
   <tbody>
@@ -497,7 +502,7 @@ as follows.</p>
   </tbody>
 </table>
 
-<p><code>miso.naming.validator.nameable.name</code></p>
+<h3 id="misonamingvalidatornameablename"><code>miso.naming.validator.nameable.name</code></h3>
 
 <table>
   <tbody>
@@ -520,15 +525,15 @@ as follows.</p>
     <tr>
       <td>allowany</td>
       <td>Only checks that the name is not null</td>
-      <td>no</td>
-      <td>no</td>
+      <td>yes</td>
+      <td>yes</td>
       <td>no</td>
       <td>no</td>
     </tr>
   </tbody>
 </table>
 
-<p><code>miso.naming.validator.sample.alias</code></p>
+<h3 id="misonamingvalidatorsamplealias"><code>miso.naming.validator.sample.alias</code></h3>
 
 <table>
   <tbody>
@@ -551,8 +556,8 @@ as follows.</p>
     <tr>
       <td>allowany</td>
       <td>Only checks that the alias is not null</td>
-      <td>no</td>
-      <td>no</td>
+      <td>yes</td>
+      <td>yes</td>
       <td>no</td>
       <td>no</td>
     </tr>
@@ -567,7 +572,7 @@ as follows.</p>
   </tbody>
 </table>
 
-<p><code>miso.naming.validator.library.alias</code></p>
+<h3 id="misonamingvalidatorlibraryalias"><code>miso.naming.validator.library.alias</code></h3>
 
 <table>
   <tbody>
@@ -590,14 +595,45 @@ as follows.</p>
     <tr>
       <td>allowany</td>
       <td>Only checks that the alias is not null</td>
-      <td>no</td>
-      <td>no</td>
+      <td>yes</td>
+      <td>yes</td>
       <td>no</td>
       <td>no</td>
     </tr>
     <tr>
       <td>oicr</td>
       <td>Matches ‘oicr’ generator</td>
+      <td>no</td>
+      <td>no</td>
+      <td>no</td>
+      <td>no</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="misonamingvalidatorprojectshortname"><code>miso.naming.validator.project.shortName</code></h3>
+
+<table>
+  <tbody>
+    <tr>
+      <td>Option</td>
+      <td>Detail</td>
+      <td>Allow null</td>
+      <td>Allow duplicates</td>
+      <td>Custom Regex</td>
+      <td>Custom Duplication</td>
+    </tr>
+    <tr>
+      <td>allowany</td>
+      <td>Optional field, no format specified</td>
+      <td>yes</td>
+      <td>yes</td>
+      <td>no</td>
+      <td>no</td>
+    </tr>
+    <tr>
+      <td>oicr</td>
+      <td>3-5 characters, CAPS and numbers only</td>
       <td>no</td>
       <td>no</td>
       <td>no</td>
