@@ -121,7 +121,7 @@
       </c:if>
       <tr>
         <td>Study Type:</td>
-        <td><form:select items="${studyTypes}" path="studyType"/></td>
+        <td><miso:select id="studyType" path="studyType" items="${studyTypes}" itemLabel="name" itemValue="id" /></td>
       </tr>
       <c:choose>
         <c:when test="${!empty project and study.securityProfile.profileId eq project.securityProfile.profileId}">

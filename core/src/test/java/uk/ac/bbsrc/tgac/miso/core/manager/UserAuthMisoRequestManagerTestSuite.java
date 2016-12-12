@@ -2732,15 +2732,6 @@ public class UserAuthMisoRequestManagerTestSuite {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#listAllStudiesByLibraryId(long)} .
-   */
-
-  @Test
-  public void testListAllStudiesByLibraryId() throws IOException {
-    // TODO: Implement.
-  }
-
-  /**
    * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#listAllSequencerPoolPartitions()} .
    */
 

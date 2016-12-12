@@ -72,6 +72,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
+import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
@@ -1003,15 +1004,6 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Study> listAllStudiesByLibraryId(long libraryId) throws IOException {
-    if (studyStore != null) {
-      return studyStore.listByLibraryId(libraryId);
-    } else {
-      throw new IOException("No studyStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
   public Collection<Study> listAllStudiesByProjectId(long projectId) throws IOException {
     if (studyStore != null) {
       return studyStore.listByProjectId(projectId);
@@ -1113,7 +1105,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<String> listAllStudyTypes() throws IOException {
+  public Collection<StudyType> listAllStudyTypes() throws IOException {
     if (studyStore != null) {
       return studyStore.listAllStudyTypes();
     } else {

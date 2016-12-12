@@ -43,6 +43,7 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PlatformImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
@@ -62,7 +63,7 @@ public abstract class AbstractExperiment implements Experiment {
   @Transient
   public Document submissionDocument;
 
-  @ManyToOne(targetEntity = AbstractStudy.class, cascade = CascadeType.ALL)
+  @ManyToOne(targetEntity = StudyImpl.class, cascade = CascadeType.ALL)
   private Study study = null;
 
   // defines a pool on which this experiment will operate. This contains one or more dilutions of a sample
@@ -84,8 +85,8 @@ public abstract class AbstractExperiment implements Experiment {
   @OneToOne(targetEntity = PlatformImpl.class, cascade = CascadeType.ALL)
   private Platform platform;
 
-  private Collection<Kit> kits = new HashSet<Kit>();
-  private final List<ChangeLog> changeLog = new ArrayList<ChangeLog>();
+  private Collection<Kit> kits = new HashSet<>();
+  private final List<ChangeLog> changeLog = new ArrayList<>();
   private User lastModifier;
 
   @Override
@@ -230,7 +231,7 @@ public abstract class AbstractExperiment implements Experiment {
 
   @Override
   public Collection<Kit> getKitsByKitType(KitType kitType) {
-    final ArrayList<Kit> ks = new ArrayList<Kit>();
+    final ArrayList<Kit> ks = new ArrayList<>();
     for (final Kit k : kits) {
       if (k.getKitDescriptor().getKitType().equals(kitType)) {
         ks.add(k);

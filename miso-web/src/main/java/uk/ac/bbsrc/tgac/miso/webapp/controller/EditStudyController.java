@@ -43,18 +43,19 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractStudy;
+import com.eaglegenomics.simlims.core.SecurityProfile;
+import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
+
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
+import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-
-import com.eaglegenomics.simlims.core.SecurityProfile;
-import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 @Controller
 @RequestMapping("/study")
@@ -105,13 +106,13 @@ public class EditStudyController {
   }
 
   @ModelAttribute("studyTypes")
-  public Collection<String> populateStudyTypes() throws IOException {
+  public Collection<StudyType> populateStudyTypes() throws IOException {
     return requestManager.listAllStudyTypes();
   }
 
   @RequestMapping(value = "/new/{projectId}", method = RequestMethod.GET)
   public ModelAndView newAssignedProject(@PathVariable Long projectId, ModelMap model) throws IOException {
-    return setupForm(AbstractStudy.UNSAVED_ID, projectId, model);
+    return setupForm(StudyImpl.UNSAVED_ID, projectId, model);
   }
 
   @RequestMapping(value = "/rest/{studyId}", method = RequestMethod.GET)
@@ -154,7 +155,7 @@ public class EditStudyController {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Study study = null;
-      if (studyId == AbstractStudy.UNSAVED_ID) {
+      if (studyId == StudyImpl.UNSAVED_ID) {
         study = dataObjectFactory.getStudy(user);
         model.put("title", "New Study");
       } else {

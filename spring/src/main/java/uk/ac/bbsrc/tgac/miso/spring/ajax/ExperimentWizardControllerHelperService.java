@@ -49,6 +49,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
+import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ExperimentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
@@ -83,8 +84,8 @@ public class ExperimentWizardControllerHelperService {
 
     StringBuilder b = new StringBuilder();
     try {
-      for (String st : requestManager.listAllStudyTypes()) {
-        b.append("<option value=\"" + st + "\">" + st + "</option>");
+      for (StudyType st : requestManager.listAllStudyTypes()) {
+        b.append("<option value=\"" + st.getId() + "\">" + st.getName() + "</option>");
       }
     } catch (IOException e) {
       log.debug("Failed to change ReportType", e);

@@ -42,15 +42,16 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
-
-import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 @Controller
 @RequestMapping("/experimentwizard")
@@ -80,7 +81,7 @@ public class ExperimentWizardController {
   }
 
   @ModelAttribute("studyTypes")
-  public Collection<String> populateStudyTypes() throws IOException {
+  public Collection<StudyType> populateStudyTypes() throws IOException {
     return requestManager.listAllStudyTypes();
   }
 
@@ -97,7 +98,7 @@ public class ExperimentWizardController {
   public Collection<? extends Pool> populateAvailablePools(Experiment experiment) throws IOException {
     if (experiment.getPlatform() != null) {
       PlatformType platformType = experiment.getPlatform().getPlatformType();
-      ArrayList<Pool> pools = new ArrayList<Pool>();
+      ArrayList<Pool> pools = new ArrayList<>();
       for (Pool p : requestManager.listAllPoolsByPlatform(platformType)) {
         if (experiment.getPool() == null || !experiment.getPool().equals(p)) {
           pools.add(p);
@@ -121,8 +122,8 @@ public class ExperimentWizardController {
         a.append("<option value=\"" + platform.getId() + "\">" + platform.getNameAndModel() + "</option>");
       }
 
-      for (String st : requestManager.listAllStudyTypes()) {
-        b.append("<option value=\"" + st + "\">" + st + "</option>");
+      for (StudyType st : requestManager.listAllStudyTypes()) {
+        b.append("<option value=\"" + st.getId() + "\">" + st.getName() + "</option>");
       }
 
       model.put("projectId", projectId);

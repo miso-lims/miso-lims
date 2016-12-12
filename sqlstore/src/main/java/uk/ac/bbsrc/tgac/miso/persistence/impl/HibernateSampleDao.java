@@ -102,7 +102,7 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
   public int getNextSiblingNumber(String partialAlias) throws IOException {
     // Find highest existing siblingNumber matching this partialAlias
     Query query = currentSession().createQuery("select max(siblingNumber) from DetailedSampleImpl as ds"
-            + " where alias IN (concat(:alias, ds.siblingNumber), concat(:alias, '0', ds.siblingNumber))");
+        + " where alias IN (concat(:alias, ds.siblingNumber), concat(:alias, '0', ds.siblingNumber))");
     query.setString("alias", partialAlias);
     Number result = ((Number) query.uniqueResult());
     int next = result == null ? 0 : result.intValue();
@@ -345,8 +345,6 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
     return records;
   }
 
-  private static final String[] searchProperties = new String[] { "alias", "identificationBarcode", "name" };
-
   /**
    * Create a Hibernate criterion to search for all the properties our users want to search.
    *
@@ -354,16 +352,12 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
    * @return
    */
   private Criterion searchRestrictions(String querystr) {
+    Criterion search = DbUtils.searchRestrictions(querystr, "alias", "identificationBarcode", "name");
+
     String str = DbUtils.convertStringToSearchQuery(querystr);
-
-    Criterion[] criteria = new Criterion[searchProperties.length + 1];
-    for (int i = 0; i < searchProperties.length; i++) {
-      criteria[i] = Restrictions.ilike(searchProperties[i], str, MatchMode.ANYWHERE);
-    }
-
-    criteria[searchProperties.length] = Restrictions.and(Restrictions.eq("class", IdentityImpl.class),
+    Criterion classCheck = Restrictions.and(Restrictions.eq("class", IdentityImpl.class),
         Restrictions.ilike("externalName", str, MatchMode.ANYWHERE));
-    return Restrictions.or(criteria);
+    return Restrictions.or(search, classCheck);
   }
 
   @Override
