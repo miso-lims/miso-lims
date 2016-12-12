@@ -4,7 +4,17 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashSet;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 
 /**
  * Copyright (C) 2009 The Genome Analysis Center, Norwich, UK.
@@ -31,16 +41,30 @@ public class SecurityProfile implements Serializable {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long profileId = SecurityProfile.UNSAVED_ID;
-  @ManyToOne
+  @ManyToOne(targetEntity = UserImpl.class)
+  @JoinColumn(name = "owner_userId")
   private User owner = null;
-  @ManyToMany
-  private Collection<User> readUsers = new HashSet<User>();
-  @ManyToMany
-  private Collection<User> writeUsers = new HashSet<User>();
-  @ManyToMany
-  private Collection<Group> readGroups = new HashSet<Group>();
-  @ManyToMany
-  private Collection<Group> writeGroups = new HashSet<Group>();
+
+  @ManyToMany(targetEntity = UserImpl.class)
+  @JoinTable(name = "SecurityProfile_ReadUser", joinColumns = { @JoinColumn(name = "readUser_userId") }, inverseJoinColumns = {
+      @JoinColumn(name = "SecurityProfile_profileId") })
+  private Collection<User> readUsers = new HashSet<>();
+
+  @ManyToMany(targetEntity = UserImpl.class)
+  @JoinTable(name = "SecurityProfile_WriteUser", joinColumns = { @JoinColumn(name = "writeUser_userId") }, inverseJoinColumns = {
+      @JoinColumn(name = "SecurityProfile_profileId") })
+  private Collection<User> writeUsers = new HashSet<>();
+
+  @ManyToMany(targetEntity = Group.class)
+  @JoinTable(name = "SecurityProfile_ReadGroup", joinColumns = { @JoinColumn(name = "readGroup_groupId") }, inverseJoinColumns = {
+      @JoinColumn(name = "SecurityProfile_profileId") })
+  private Collection<Group> readGroups = new HashSet<>();
+
+  @ManyToMany(targetEntity = Group.class)
+  @JoinTable(name = "SecurityProfile_WriteGroup", joinColumns = { @JoinColumn(name = "writeGroup_groupId") }, inverseJoinColumns = {
+      @JoinColumn(name = "SecurityProfile_profileId") })
+  private Collection<Group> writeGroups = new HashSet<>();
+
   private boolean allowAllInternal = true;
 
   public SecurityProfile() {
@@ -130,8 +154,8 @@ public class SecurityProfile implements Serializable {
       return true;
     }
     return getReadUsers().contains(user) ||
-           intersects(getReadGroups(), user.getGroups()) ||
-           userCanWrite(user);
+        intersects(getReadGroups(), user.getGroups()) ||
+        userCanWrite(user);
   }
 
   /**
@@ -154,7 +178,7 @@ public class SecurityProfile implements Serializable {
       return true;
     }
     return getWriteUsers().contains(user) ||
-           intersects(getWriteGroups(), user.getGroups());
+        intersects(getWriteGroups(), user.getGroups());
   }
 
   /**
@@ -185,12 +209,11 @@ public class SecurityProfile implements Serializable {
     if (getProfileId() == SecurityProfile.UNSAVED_ID
         || them.getProfileId() == SecurityProfile.UNSAVED_ID) {
       return this.getOwner().equals(them.getOwner())
-             && this.getReadGroups().equals(them.getReadGroups())
-             && this.getWriteGroups().equals(them.getWriteGroups())
-             && this.getReadUsers().equals(them.getReadUsers())
-             && this.getWriteUsers().equals(them.getWriteUsers());
-    }
-    else {
+          && this.getReadGroups().equals(them.getReadGroups())
+          && this.getWriteGroups().equals(them.getWriteGroups())
+          && this.getReadUsers().equals(them.getReadUsers())
+          && this.getWriteUsers().equals(them.getWriteUsers());
+    } else {
       return this.getProfileId() == them.getProfileId();
     }
   }
@@ -199,8 +222,7 @@ public class SecurityProfile implements Serializable {
   public int hashCode() {
     if (this.getProfileId() != SecurityProfile.UNSAVED_ID) {
       return this.getProfileId().intValue();
-    }
-    else {
+    } else {
       System.out.println(this.toString());
       int hashcode = 1;
       if (this.getOwner() != null) hashcode = 37 * hashcode + this.getOwner().hashCode();

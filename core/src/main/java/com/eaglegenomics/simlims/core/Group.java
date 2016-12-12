@@ -8,8 +8,12 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 
 /**
  * Copyright (C) 2009 The Genome Analysis Center, Norwich, UK.
@@ -20,7 +24,7 @@ import javax.persistence.Table;
  * @since 0.0.1
  */
 @Entity
-@Table(name = "`Group`")
+@Table(name = "_Group")
 public class Group implements Serializable, Comparable {
 
   private static final long serialVersionUID = 1L;
@@ -32,8 +36,11 @@ public class Group implements Serializable, Comparable {
 
   private String description = "";
   private String name = "";
-  @ManyToMany(mappedBy = "groups")
-  private Collection<User> users = new HashSet<User>();
+  @ManyToMany(targetEntity = UserImpl.class)
+  @JoinTable(name = "User_Group", joinColumns = { @JoinColumn(name = "users_userId") }, inverseJoinColumns = {
+      @JoinColumn(name = "groups_groupId")
+  })
+  private Collection<User> users = new HashSet<>();
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long groupId = Group.UNSAVED_ID;
@@ -101,6 +108,7 @@ public class Group implements Serializable, Comparable {
     return getName();
   }
 
+  @Override
   public int compareTo(Object o) {
     return this.equals(o) ? 0 : 1;
   }
