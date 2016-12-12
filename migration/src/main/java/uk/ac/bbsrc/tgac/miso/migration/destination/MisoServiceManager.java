@@ -26,6 +26,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.HibernateSampleClassDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateDetailedQcStatusDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateIndexDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateInstituteDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateKitDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLabDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryAdditionalInfoDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDesignCodeDao;
@@ -49,7 +50,6 @@ import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSampleValidRelationshipService;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLBoxDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLChangeLogDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLExperimentDAO;
-import uk.ac.bbsrc.tgac.miso.sqlstore.SQLKitDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryDilutionDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryQCDAO;
@@ -103,7 +103,7 @@ public class MisoServiceManager {
   private SQLPoolDAO poolDao;
   private SQLPoolQCDAO poolQcDao;
   private SQLExperimentDAO experimentDao;
-  private SQLKitDAO kitDao;
+  private HibernateKitDao kitDao;
   private SQLPlatformDAO platformDao;
   private SQLStudyDAO studyDao;
   private SQLRunDAO runDao;
@@ -288,7 +288,6 @@ public class MisoServiceManager {
     if (targetedSequencingDao != null) targetedSequencingDao.setSecurityDAO(securityStore);
     if (poolDao != null) poolDao.setSecurityDAO(securityStore);
     if (experimentDao != null) experimentDao.setSecurityDAO(securityStore);
-    if (kitDao != null) kitDao.setSecurityDAO(securityStore);
     if (studyDao != null) studyDao.setSecurityDAO(securityStore);
     if (runDao != null) runDao.setSecurityDAO(securityStore);
     if (sequencerPartitionContainerDao != null) sequencerPartitionContainerDao.setSecurityDAO(securityStore);
@@ -525,7 +524,6 @@ public class MisoServiceManager {
     if (libraryDao != null) libraryDao.setChangeLogDAO(changeLogDao);
     if (poolDao != null) poolDao.setChangeLogDAO(changeLogDao);
     if (experimentDao != null) experimentDao.setChangeLogDAO(changeLogDao);
-    if (kitDao != null) kitDao.setChangeLogDAO(changeLogDao);
     if (studyDao != null) studyDao.setChangeLogDAO(changeLogDao);
     if (sequencerPartitionContainerDao != null) sequencerPartitionContainerDao.setChangeLogDAO(changeLogDao);
     if (boxDao != null) boxDao.setChangeLogDAO(changeLogDao);
@@ -552,7 +550,6 @@ public class MisoServiceManager {
     if (sampleDao != null) sampleDao.setNoteDao(noteDao);
     if (libraryDao != null) libraryDao.setNoteDAO(noteDao);
     if (poolDao != null) poolDao.setNoteDAO(noteDao);
-    if (kitDao != null) kitDao.setNoteDAO(noteDao);
     if (runDao != null) runDao.setNoteDAO(noteDao);
   }
 
@@ -745,21 +742,18 @@ public class MisoServiceManager {
     if (studyDao != null) studyDao.setExperimentDAO(experimentDao);
   }
 
-  public SQLKitDAO getKitDao() {
+  public HibernateKitDao getKitDao() {
     return kitDao;
   }
 
-  public void setKitDao(SQLKitDAO kitDao) {
+  public void setKitDao(HibernateKitDao kitDao) {
     this.kitDao = kitDao;
     updateKitDaoDependencies();
   }
 
   public void setDefaultKitDao() {
-    SQLKitDAO dao = new SQLKitDAO();
-    dao.setChangeLogDAO(changeLogDao);
+    HibernateKitDao dao = new HibernateKitDao();
     dao.setJdbcTemplate(jdbcTemplate);
-    dao.setNoteDAO(noteDao);
-    dao.setSecurityDAO(securityStore);
     setKitDao(dao);
   }
 

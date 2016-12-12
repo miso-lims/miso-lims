@@ -16,7 +16,7 @@ public class AbstractKitTestSuite {
     /*
      * A basic unit test to exercise the class. Mainly for cobertura coverage.
      */
-    final AbstractKit kit = new AbstractKit() {
+    final KitImpl kit = new KitImpl() {
     };
     assertNotNull(kit);
   }

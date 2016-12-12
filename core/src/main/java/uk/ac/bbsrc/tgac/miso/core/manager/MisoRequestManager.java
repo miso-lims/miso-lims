@@ -1177,33 +1177,6 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Kit> listKitsByExperimentId(long experimentId) throws IOException {
-    if (kitStore != null) {
-      return kitStore.listByExperiment(experimentId);
-    } else {
-      throw new IOException("No kitStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<Kit> listKitsByManufacturer(String manufacturer) throws IOException {
-    if (kitStore != null) {
-      return kitStore.listByManufacturer(manufacturer);
-    } else {
-      throw new IOException("No kitStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<Kit> listKitsByType(KitType kitType) throws IOException {
-    if (kitStore != null) {
-      return kitStore.listKitsByType(kitType);
-    } else {
-      throw new IOException("No kitStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
   public Collection<KitDescriptor> listAllKitDescriptors() throws IOException {
     if (kitStore != null) {
       return kitStore.listAllKitDescriptors();

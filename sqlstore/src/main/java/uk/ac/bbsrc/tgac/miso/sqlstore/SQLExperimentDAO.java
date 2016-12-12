@@ -143,6 +143,7 @@ public class SQLExperimentDAO implements ExperimentStore {
   private StudyStore studyDAO;
   private PoolStore poolDAO;
   private PlatformStore platformDAO;
+  @Autowired
   private KitStore kitDAO;
   private Store<SecurityProfile> securityProfileDAO;
   private CascadeType cascadeType;
@@ -501,7 +502,6 @@ public class SQLExperimentDAO implements ExperimentStore {
 
         if (!isLazy()) {
           e.setPool(poolDAO.getPoolByExperiment(e));
-          e.setKits(kitDAO.listByExperiment(rs.getLong("experimentId")));
         }
         e.getChangeLog().addAll(getChangeLogDAO().listAllById(TABLE_NAME, id));
       } catch (IOException e1) {

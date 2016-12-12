@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -27,12 +27,15 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
+import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Transient;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 import com.eaglegenomics.simlims.core.Note;
 
@@ -45,19 +48,25 @@ import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
  * @author Rob Davey
  * @since 0.0.2
  */
-public abstract class AbstractKit implements Kit {
+@Entity
+@Table(name = "Kit")
+public class KitImpl implements Kit {
   public static final Long UNSAVED_ID = 0L;
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private long kitId = AbstractKit.UNSAVED_ID;
+  private long kitId = KitImpl.UNSAVED_ID;
   private String identificationBarcode;
   private String locationBarcode;
 
-  @Transient
-  @Enumerated(EnumType.STRING)
-  private Collection<Note> notes = new HashSet<Note>();
+  @OneToMany(targetEntity = Note.class)
+  @JoinTable(name = "Kit_Note", joinColumns = {
+      @JoinColumn(name = "kit_kitId", nullable = false, updatable = false) }, inverseJoinColumns = {
+          @JoinColumn(name = "notes_noteId", nullable = false, updatable = false) })
+  private Collection<Note> notes = new HashSet<>();
   private String lotNumber;
   private Date kitDate;
+  @ManyToOne(targetEntity = KitDescriptor.class)
+  @JoinColumn(name = "kitDescriptorId", nullable = false)
   private KitDescriptor kitDescriptor;
 
   @Override

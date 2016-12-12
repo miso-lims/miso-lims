@@ -46,16 +46,11 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.ClusterKit;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.EmPcrKit;
+import uk.ac.bbsrc.tgac.miso.core.data.KitImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.LibraryKit;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.SequencingKit;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 
@@ -178,7 +173,7 @@ public class ExperimentControllerHelperService {
 
         KitDescriptor kitDescriptor = requestManager.getKitDescriptorByPartNumber(partNumber);
         if (kitDescriptor != null) {
-          Map<String, Object> m = new HashMap<String, Object>();
+          Map<String, Object> m = new HashMap<>();
           m.put("id", kitDescriptor.getId());
           m.put("name", kitDescriptor.getName());
           return JSONUtils.JSONObjectResponse(m);
@@ -229,7 +224,7 @@ public class ExperimentControllerHelperService {
           mkits.append("]");
         }
 
-        Map<String, Object> m = new HashMap<String, Object>();
+        Map<String, Object> m = new HashMap<>();
         m.put("experimentId", experimentId);
         m.put("multiplexed", multiplexed);
         m.put("libraryKitDescriptors", JSONArray.fromObject(lkits.toString()));
@@ -246,33 +241,7 @@ public class ExperimentControllerHelperService {
   }
 
   public JSONObject addLibraryKit(HttpSession session, JSONObject json) {
-    try {
-      if (json.has("experimentId")) {
-        String experimentId = json.getString("experimentId");
-        String kitDescriptor = json.getString("kitDescriptor");
-        String lotNumber = json.getString("lotNumber");
-
-        LibraryKit lk = new LibraryKit();
-        KitDescriptor kd = requestManager.getKitDescriptorById(new Long(kitDescriptor));
-        lk.setKitDescriptor(kd);
-        lk.setLotNumber(lotNumber);
-        if (!json.has("kitDate") || isStringEmptyOrNull(json.getString("kitDate"))) {
-          lk.setKitDate(new Date());
-        }
-
-        Experiment e = requestManager.getExperimentById(new Long(experimentId));
-        e.addKit(lk);
-        e.setLastModifier(securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName()));
-        requestManager.saveExperiment(e);
-        Integer newStock = kd.getStockLevel() - 1;
-        kd.setStockLevel(newStock);
-        requestManager.saveKitDescriptor(kd);
-      }
-      return JSONUtils.SimpleJSONResponse("Saved kit!");
-    } catch (IOException e) {
-      log.error("add library kit", e);
-      return JSONUtils.SimpleJSONError("Failed to save library kit");
-    }
+    return addKit(session, json, KitType.LIBRARY);
   }
 
   // empcr
@@ -295,7 +264,7 @@ public class ExperimentControllerHelperService {
         }
         sb.append("]");
 
-        Map<String, Object> m = new HashMap<String, Object>();
+        Map<String, Object> m = new HashMap<>();
         m.put("experimentId", experimentId);
         m.put("emPcrKitDescriptors", JSONArray.fromObject(sb.toString()));
         return JSONUtils.JSONObjectResponse(m);
@@ -308,33 +277,7 @@ public class ExperimentControllerHelperService {
   }
 
   public JSONObject addEmPcrKit(HttpSession session, JSONObject json) {
-    try {
-      if (json.has("experimentId")) {
-        String experimentId = json.getString("experimentId");
-        String kitDescriptor = json.getString("kitDescriptor");
-        String lotNumber = json.getString("lotNumber");
-
-        EmPcrKit lk = new EmPcrKit();
-        KitDescriptor kd = requestManager.getKitDescriptorById(new Long(kitDescriptor));
-        lk.setKitDescriptor(kd);
-        lk.setLotNumber(lotNumber);
-        if (!json.has("kitDate") || isStringEmptyOrNull(json.getString("kitDate"))) {
-          lk.setKitDate(new Date());
-        }
-
-        Experiment e = requestManager.getExperimentById(new Long(experimentId));
-        e.addKit(lk);
-        e.setLastModifier(securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName()));
-        requestManager.saveExperiment(e);
-        Integer newStock = kd.getStockLevel() - 1;
-        kd.setStockLevel(newStock);
-        requestManager.saveKitDescriptor(kd);
-      }
-      return JSONUtils.SimpleJSONResponse("Saved kit!");
-    } catch (IOException e) {
-      log.error("add EmPCR kit", e);
-      return JSONUtils.SimpleJSONError("Failed to save EmPCR kit");
-    }
+    return addKit(session, json, KitType.EMPCR);
   }
 
   // clustering
@@ -357,7 +300,7 @@ public class ExperimentControllerHelperService {
         }
         sb.append("]");
 
-        Map<String, Object> m = new HashMap<String, Object>();
+        Map<String, Object> m = new HashMap<>();
         m.put("experimentId", experimentId);
         m.put("clusteringKitDescriptors", JSONArray.fromObject(sb.toString()));
         return JSONUtils.JSONObjectResponse(m);
@@ -369,15 +312,23 @@ public class ExperimentControllerHelperService {
     return JSONUtils.SimpleJSONError("Cannot select clustering kits");
   }
 
+
   public JSONObject addClusteringKit(HttpSession session, JSONObject json) {
+    return addKit(session, json, KitType.CLUSTERING);
+  }
+
+  private JSONObject addKit(HttpSession session, JSONObject json, KitType type) {
     try {
       if (json.has("experimentId")) {
         String experimentId = json.getString("experimentId");
         String kitDescriptor = json.getString("kitDescriptor");
         String lotNumber = json.getString("lotNumber");
 
-        ClusterKit lk = new ClusterKit();
+        Kit lk = new KitImpl();
         KitDescriptor kd = requestManager.getKitDescriptorById(new Long(kitDescriptor));
+        if (kd.getKitType() != type) {
+          return JSONUtils.SimpleJSONError("Not a " + type.getKey() + " kit");
+        }
         lk.setKitDescriptor(kd);
         lk.setLotNumber(lotNumber);
         if (!json.has("kitDate") || isStringEmptyOrNull(json.getString("kitDate"))) {
@@ -394,9 +345,10 @@ public class ExperimentControllerHelperService {
       }
       return JSONUtils.SimpleJSONResponse("Saved kit!");
     } catch (IOException e) {
-      log.error("failed to save clustering kit", e);
-      return JSONUtils.SimpleJSONError("Failed to save clustering kit");
+      log.error("failed to save " + type.getKey() + " kit", e);
+      return JSONUtils.SimpleJSONError("Failed to save " + type.getKey() + " kit");
     }
+
   }
 
   // sequencing
@@ -419,7 +371,7 @@ public class ExperimentControllerHelperService {
         }
         sb.append("]");
 
-        Map<String, Object> m = new HashMap<String, Object>();
+        Map<String, Object> m = new HashMap<>();
         m.put("experimentId", experimentId);
         m.put("sequencingKitDescriptors", JSONArray.fromObject(sb.toString()));
         return JSONUtils.JSONObjectResponse(m);
@@ -432,33 +384,7 @@ public class ExperimentControllerHelperService {
   }
 
   public JSONObject addSequencingKit(HttpSession session, JSONObject json) {
-    try {
-      if (json.has("experimentId")) {
-        String experimentId = json.getString("experimentId");
-        String kitDescriptor = json.getString("kitDescriptor");
-        String lotNumber = json.getString("lotNumber");
-
-        SequencingKit lk = new SequencingKit();
-        KitDescriptor kd = requestManager.getKitDescriptorById(new Long(kitDescriptor));
-        lk.setKitDescriptor(kd);
-        lk.setLotNumber(lotNumber);
-        if (!json.has("kitDate") || isStringEmptyOrNull(json.getString("kitDate"))) {
-          lk.setKitDate(new Date());
-        }
-
-        Experiment e = requestManager.getExperimentById(new Long(experimentId));
-        e.addKit(lk);
-        e.setLastModifier(securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName()));
-        requestManager.saveExperiment(e);
-        Integer newStock = kd.getStockLevel() - 1;
-        kd.setStockLevel(newStock);
-        requestManager.saveKitDescriptor(kd);
-      }
-      return JSONUtils.SimpleJSONResponse("Saved kit!");
-    } catch (IOException e) {
-      log.error("failed to save sequencing kit", e);
-      return JSONUtils.SimpleJSONError("Failed to save sequencing kit");
-    }
+    return addKit(session, json, KitType.SEQUENCING);
   }
 
   public JSONObject listExperimentsDataTable(HttpSession session, JSONObject json) {

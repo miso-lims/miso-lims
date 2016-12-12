@@ -528,12 +528,6 @@ public interface RequestManager {
 
   public Collection<Kit> listAllKits() throws IOException;
 
-  public Collection<Kit> listKitsByExperimentId(long experimentId) throws IOException;
-
-  public Collection<Kit> listKitsByManufacturer(String manufacturer) throws IOException;
-
-  public Collection<Kit> listKitsByType(KitType kitType) throws IOException;
-
   public Collection<KitDescriptor> listKitDescriptorsByType(KitType kitType) throws IOException;
 
   public Collection<KitDescriptor> listAllKitDescriptors() throws IOException;

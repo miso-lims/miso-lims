@@ -3,19 +3,16 @@ package uk.ac.bbsrc.tgac.miso.sqlstore;
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.when;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,34 +21,25 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
-import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
+import uk.ac.bbsrc.tgac.miso.core.data.KitImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.LibraryKit;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
-import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
-import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateKitDao;
 
 public class SQLKitDAOTest extends AbstractDAOTest {
 
   @InjectMocks
-  private SQLKitDAO dao;
+  private HibernateKitDao dao;
 
   @Autowired
   @Spy
   private JdbcTemplate jdbcTemplate;
 
-  @Mock
-  private NoteStore noteDAO;
-
-  @Mock
-  private SecurityStore securityDAO;
-
-  @Mock
-  private ChangeLogStore changeLogDAO;
+  @Autowired
+  private SessionFactory sessionFactory;
 
   private final User user = new UserImpl();
 
@@ -59,9 +47,8 @@ public class SQLKitDAOTest extends AbstractDAOTest {
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
     dao.setJdbcTemplate(jdbcTemplate);
+    dao.setSessionFactory(sessionFactory);
     user.setUserId(1L);
-    when(securityDAO.getUserById(anyLong())).thenReturn(user);
-    when(changeLogDAO.listAllById(anyString(), anyLong())).thenReturn(new ArrayList<ChangeLog>());
   }
 
   @Test
@@ -100,18 +87,6 @@ public class SQLKitDAOTest extends AbstractDAOTest {
   }
 
   @Test
-  public void testListByExperiment() throws IOException {
-    List<Kit> kits = dao.listByExperiment(1L);
-    assertThat(kits.size(), is(0));
-  }
-
-  @Test
-  public void testListByManufacturer() throws IOException {
-    List<Kit> kit = dao.listByManufacturer("Roche");
-    assertThat(kit.size(), is(2));
-  }
-
-  @Test
   public void testListKitsByType() throws IOException {
     List<Kit> kit = dao.listKitsByType(KitType.SEQUENCING);
     assertThat(kit.size(), is(2));
@@ -135,7 +110,7 @@ public class SQLKitDAOTest extends AbstractDAOTest {
   }
 
   private Kit makeNewKit() throws IOException {
-    Kit kit = new LibraryKit();
+    Kit kit = new KitImpl();
     kit.setIdentificationBarcode("KittVsCarr");
     KitDescriptor kitDescriptor = dao.getKitDescriptorById(1L);
     kit.setKitDescriptor(kitDescriptor);
@@ -175,12 +150,6 @@ public class SQLKitDAOTest extends AbstractDAOTest {
   @Test
   public void testListKitDescriptorsByType() throws IOException {
     List<KitDescriptor> kitDescriptors = dao.listKitDescriptorsByType(KitType.LIBRARY);
-    assertThat(kitDescriptors.size(), not(0));
-  }
-
-  @Test
-  public void testListKitDescriptorsByPlatform() throws IOException {
-    List<KitDescriptor> kitDescriptors = dao.listKitDescriptorsByPlatform(PlatformType.ILLUMINA);
     assertThat(kitDescriptors.size(), not(0));
   }
 
