@@ -890,7 +890,8 @@ public class ValueTypeLookup {
         throw new IOException(String.format("LibraryDesignCode missing for library %d", lai.getPreMigrationId()));
       }
       LibraryDesignCode ldc = resolve(lai.getLibraryDesignCode());
-      if (ldc == null) throw new IOException(String.format("LibraryDesignCode %s not found", lai.getLibraryDesignCode().getCode()));
+      if (ldc == null) throw new IOException(String.format("LibraryDesignCode %s not found, and cannot infer it from alias %s",
+          lai.getLibraryDesignCode().getCode(), library.getAlias()));
       lai.setLibraryDesignCode(ldc);
     }
   }
