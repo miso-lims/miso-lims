@@ -480,14 +480,7 @@ public class ContainerControllerHelperService {
         // check if each poolable has been in a study for this pool already
         Collection<Dilution> ds = p.getPoolableElements();
         for (Dilution d : ds) {
-          Collection<Study> studies = requestManager.listAllStudiesByLibraryId(d.getLibrary().getId());
-          if (studies.isEmpty()) {
-            pooledProjects.add(d.getLibrary().getSample().getProject());
-          } else {
-            for (Study stu : studies) {
-              pooledProjects.add(stu.getProject());
-            }
-          }
+          pooledProjects.add(d.getLibrary().getSample().getProject());
         }
 
         for (Experiment poolExp : p.getExperiments()) {

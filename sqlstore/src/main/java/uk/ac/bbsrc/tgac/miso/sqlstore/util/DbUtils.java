@@ -37,6 +37,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -334,7 +337,7 @@ public class DbUtils {
     @Override
     public Object processMetaData(DatabaseMetaData dbmd) throws SQLException {
       ResultSet rs = dbmd.getColumns(catalog, null, table, null);
-      Map<String, Integer> l = new HashMap<String, Integer>();
+      Map<String, Integer> l = new HashMap<>();
       while (rs.next()) {
         l.put(rs.getString("COLUMN_NAME"), rs.getInt("COLUMN_SIZE"));
       }
@@ -359,4 +362,21 @@ public class DbUtils {
     ValidationResult val = namingScheme.validateName(object.getName());
     if (!val.isValid()) throw new IOException("Save failed - invalid name:" + val.getMessage());
   }
+
+  /**
+   * Create a Hibernate criterion to search for all the properties our users want to search.
+   *
+   * @param querystr
+   * @return
+   */
+  public static Criterion searchRestrictions(String querystr, String... searchProperties) {
+    String str = DbUtils.convertStringToSearchQuery(querystr);
+
+    Criterion[] criteria = new Criterion[searchProperties.length];
+    for (int i = 0; i < searchProperties.length; i++) {
+      criteria[i] = Restrictions.ilike(searchProperties[i], str, MatchMode.ANYWHERE);
+    }
+    return Restrictions.or(criteria);
+  }
+
 }

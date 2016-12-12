@@ -349,4 +349,5 @@ public interface Library extends SecurableByProfile, Comparable, Barcodable, Loc
   public IndexFamily getCurrentFamily();
 
   void setLastModified(Date lastModified);
+
 }

@@ -359,10 +359,6 @@ public class SQLTgacSubmissionDAO implements SubmissionStore, NamingSchemeAware 
 
       try {
         // process submittables
-        for (Study study : studyDAO.listBySubmissionId(rs.getLong("submissionId"))) {
-          t.addSubmissionElement(study);
-          log.debug(t.getName() + ": added " + study.getName());
-        }
 
         for (Sample sample : sampleDAO.listBySubmissionId(rs.getLong("submissionId"))) {
           t.addSubmissionElement(sample);

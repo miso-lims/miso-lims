@@ -46,6 +46,7 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractPool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
@@ -86,7 +87,7 @@ public class PoolWizardController {
   }
 
   @ModelAttribute("studyTypes")
-  public Collection<String> populateStudyTypes() throws IOException {
+  public Collection<StudyType> populateStudyTypes() throws IOException {
     return requestManager.listAllStudyTypes();
   }
 
@@ -122,8 +123,8 @@ public class PoolWizardController {
       }
 
       StringBuilder b = new StringBuilder();
-      for (String st : requestManager.listAllStudyTypes()) {
-        b.append("<option value=\"" + st + "\">" + st + "</option>");
+      for (StudyType st : requestManager.listAllStudyTypes()) {
+        b.append("<option value=\"" + st.getId() + "\">" + st.getName() + "</option>");
       }
 
       model.put("project", p);

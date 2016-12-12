@@ -6,11 +6,10 @@ import static org.junit.Assert.*;
 import static org.junit.matchers.JUnitMatchers.hasItem;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.persistence.CascadeType;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -29,14 +28,12 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.store.SecurityStore;
 
-import net.sf.ehcache.CacheManager;
-
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
+import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
-import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
@@ -72,7 +69,7 @@ public class SQLStudyDAOTest extends AbstractDAOTest {
   private NamingScheme namingScheme;
 
   @InjectMocks
-  private SQLStudyDAO dao;
+  private HibernateStudyDao dao;
 
   // Auto-increment sequence doesn't roll back with transactions, so must be tracked
   private static long nextAutoIncrementId = 5L;
@@ -81,11 +78,10 @@ public class SQLStudyDAOTest extends AbstractDAOTest {
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
     dao.setJdbcTemplate(jdbcTemplate);
-    dao.setDataObjectFactory(new TgacDataObjectFactory());
   }
 
   @Test
-  public void testSaveNull() throws IOException {
+  public void testSaveNull() throws IOException, MisoNamingException {
     exception.expect(NullPointerException.class);
     dao.save(null);
   }
@@ -176,18 +172,6 @@ public class SQLStudyDAOTest extends AbstractDAOTest {
   }
 
   @Test
-  public void testListByLibraryIdNone() throws IOException {
-    List<Study> studies = dao.listByLibraryId(9999L);
-    assertEquals(0, studies.size());
-  }
-
-  @Test
-  public void testListBySubmissionId() throws IOException {
-    List<Study> studies = dao.listBySubmissionId(22L);
-    assertEquals(0, studies.size());
-  }
-
-  @Test
   public void testGetStudyColumnSizes() throws Exception {
     Map<String, Integer> columnSizes = dao.getStudyColumnSizes();
     assertThat("Column size contains", columnSizes, hasEntry("name", 255));
@@ -195,17 +179,11 @@ public class SQLStudyDAOTest extends AbstractDAOTest {
 
   @Test
   public void testListAllStudyTypes() throws Exception {
-    assertThat(dao.listAllStudyTypes(), hasItem("Cancer Genomics"));
-  }
-
-  @Test
-  public void testGetByExperimentId() throws Exception {
-    assertThat(dao.getByExperimentId(9).getName(), is("STU1"));
-  }
-
-  @Test
-  public void testGetByExperimentIdNull() throws Exception {
-    assertNull(dao.getByExperimentId(9999));
+    List<String> names = new ArrayList<>();
+    for (StudyType type : dao.listAllStudyTypes()) {
+      names.add(type.getName());
+    }
+    assertThat(names, hasItem("Cancer Genomics"));
   }
 
   private void mockAutoIncrement(long value) {
@@ -219,21 +197,9 @@ public class SQLStudyDAOTest extends AbstractDAOTest {
     Study study = dao.get(1);
     assertNotNull(study);
 
-    dao.setCascadeType(CascadeType.ALL);
-
-    CacheManager cacheManager = Mockito.mock(CacheManager.class);
-    Mockito.when(cacheManager.getCache(Matchers.anyString())).thenReturn(null);
-    dao.setCacheManager(cacheManager);
-
     assertTrue(dao.remove(study));
     assertNull(dao.get(1L));
     assertThat(dao.count(), is(3));
-  }
-
-  @Test
-  public void testGetByStudyType() throws Exception {
-    List<Study> studies = dao.getByStudyType(1L);
-    assertThat("Number of studies of type 'Other'.", studies.size(), is(4));
   }
 
   private Study makeStudy() {

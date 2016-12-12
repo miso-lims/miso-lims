@@ -61,6 +61,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
+import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
@@ -309,8 +310,6 @@ public interface RequestManager {
 
   public Collection<Study> listAllStudiesBySearch(String query) throws IOException;
 
-  public Collection<Study> listAllStudiesByLibraryId(long libraryId) throws IOException;
-
   public Collection<Experiment> listAllExperiments() throws IOException;
 
   public Collection<Experiment> listAllExperimentsWithLimit(long limit) throws IOException;
@@ -505,7 +504,7 @@ public interface RequestManager {
   /**
    * Obtain a list of all the StudyTypes
    */
-  public Collection<String> listAllStudyTypes() throws IOException;
+  public Collection<StudyType> listAllStudyTypes() throws IOException;
 
   public Collection<Submission> listAllSubmissions() throws IOException;
 

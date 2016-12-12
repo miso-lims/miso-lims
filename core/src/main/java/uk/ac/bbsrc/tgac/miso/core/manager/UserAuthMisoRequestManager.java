@@ -72,6 +72,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
+import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
@@ -1547,18 +1548,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Study> listAllStudiesByLibraryId(long libraryId) throws IOException {
-    User user = getCurrentUser();
-    Collection<Study> accessibles = new HashSet<>();
-    for (Study study : backingManager.listAllStudiesByLibraryId(libraryId)) {
-      if (study.userCanRead(user)) {
-        accessibles.add(study);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
   public Collection<SequencerPoolPartition> listAllSequencerPoolPartitions() throws IOException {
     User user = getCurrentUser();
     Collection<SequencerPoolPartition> accessibles = new HashSet<>();
@@ -2154,7 +2143,7 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<String> listAllStudyTypes() throws IOException {
+  public Collection<StudyType> listAllStudyTypes() throws IOException {
     return backingManager.listAllStudyTypes();
   }
 
