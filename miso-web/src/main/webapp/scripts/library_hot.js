@@ -662,7 +662,7 @@ Library.hot = {
 
       // TODO: add qcCols
     } catch (e) {
-      console.log(e.error);
+      console.log(e);
       return null;
     }
     return lib;
