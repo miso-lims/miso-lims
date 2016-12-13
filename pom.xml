@@ -139,8 +139,6 @@
     <module>notification-server</module>
     <module>runstats-client</module>
     <module>notification-consumer-services</module>
-    <module>miso-external-web</module>
-    <module>runstats-server</module>
     <module>demo-notification-client</module>
   </modules>
   <!-- SVN connection -->
