@@ -32,4 +32,18 @@ public class DefaultReferenceGenomeService implements ReferenceGenomeService {
     return referenceGenomeDao.listAllReferenceGenomeTypes();
   }
 
+  @Override
+  public ReferenceGenome get(Long id) throws IOException {
+    authorizationManager.throwIfUnauthenticated();
+    return referenceGenomeDao.getReferenceGenome(id);
+  }
+
+  public void setAuthorizationManager(AuthorizationManager authorizationManager) {
+    this.authorizationManager = authorizationManager;
+  }
+
+  public void setReferenceGenomeDao(ReferenceGenomeDao referenceGenomeDao) {
+    this.referenceGenomeDao = referenceGenomeDao;
+  }
+
 }

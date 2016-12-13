@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -31,9 +31,6 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,11 +46,15 @@ import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.Property;
 import com.googlecode.ehcache.annotations.TriggersRemove;
 
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
+
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCR;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.EmPCRDilutionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.EmPCRStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
@@ -101,24 +102,20 @@ public class SQLEmPCRDAO implements EmPCRStore {
   private Store<SecurityProfile> securityProfileDAO;
 
   @Autowired
-  private MisoNamingScheme<emPCR> namingScheme;
+  private NamingScheme namingScheme;
 
-  @Override
-  @CoverageIgnore
-  public MisoNamingScheme<emPCR> getNamingScheme() {
+  public NamingScheme getNamingScheme() {
     return namingScheme;
   }
 
   @Override
-  @CoverageIgnore
-  public void setNamingScheme(MisoNamingScheme<emPCR> namingScheme) {
+  public void setNamingScheme(NamingScheme namingScheme) {
     this.namingScheme = namingScheme;
   }
 
   @Autowired
   private CacheManager cacheManager;
 
-  @CoverageIgnore
   public void setCacheManager(CacheManager cacheManager) {
     this.cacheManager = cacheManager;
   }
@@ -126,42 +123,34 @@ public class SQLEmPCRDAO implements EmPCRStore {
   @Autowired
   private DataObjectFactory dataObjectFactory;
 
-  @CoverageIgnore
   public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
     this.dataObjectFactory = dataObjectFactory;
   }
 
-  @CoverageIgnore
   public JdbcTemplate getJdbcTemplate() {
     return template;
   }
 
-  @CoverageIgnore
   public void setJdbcTemplate(JdbcTemplate template) {
     this.template = template;
   }
 
-  @CoverageIgnore
   public void setLibraryDilutionDAO(LibraryDilutionStore libraryDilutionDAO) {
     this.libraryDilutionDAO = libraryDilutionDAO;
   }
 
-  @CoverageIgnore
   public void setEmPCRDilutionDAO(EmPCRDilutionStore emPCRDilutionDAO) {
     this.emPCRDilutionDAO = emPCRDilutionDAO;
   }
 
-  @CoverageIgnore
   public void setCascadeType(CascadeType cascadeType) {
     this.cascadeType = cascadeType;
   }
 
-  @CoverageIgnore
   public Store<SecurityProfile> getSecurityProfileDAO() {
     return securityProfileDAO;
   }
 
-  @CoverageIgnore
   public void setSecurityProfileDAO(Store<SecurityProfile> securityProfileDAO) {
     this.securityProfileDAO = securityProfileDAO;
   }
@@ -188,10 +177,11 @@ public class SQLEmPCRDAO implements EmPCRStore {
       try {
         pcr.setId(DbUtils.getAutoIncrement(template, TABLE_NAME));
 
-        String name = namingScheme.generateNameFor("name", pcr);
+        String name = namingScheme.generateNameFor(pcr);
         pcr.setName(name);
 
-        if (namingScheme.validateField("name", pcr.getName())) {
+        ValidationResult nameValidation = namingScheme.validateName(pcr.getName());
+        if (nameValidation.isValid()) {
           params.addValue("name", name);
 
           Number newId = insert.executeAndReturnKey(params);
@@ -201,23 +191,20 @@ public class SQLEmPCRDAO implements EmPCRStore {
             throw new IOException("Something bad happened. Expected emPCR ID doesn't match returned value from DB insert");
           }
         } else {
-          throw new IOException("Cannot save emPCR - invalid field:" + pcr.toString());
+          throw new IOException("Cannot save emPCR - invalid name:" + nameValidation.getMessage());
         }
       } catch (MisoNamingException e) {
         throw new IOException("Cannot save emPCR - issue with naming scheme", e);
       }
     } else {
-      try {
-        if (namingScheme.validateField("name", pcr.getName())) {
-          params.addValue("pcrId", pcr.getId());
-          params.addValue("name", pcr.getName());
-          NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
-          namedTemplate.update(EMPCR_UPDATE, params);
-        } else {
-          throw new IOException("Cannot save emPCR - invalid field:" + pcr.toString());
-        }
-      } catch (MisoNamingException e) {
-        throw new IOException("Cannot save emPCR - issue with naming scheme", e);
+      ValidationResult nameValidation = namingScheme.validateName(pcr.getName());
+      if (nameValidation.isValid()) {
+        params.addValue("pcrId", pcr.getId());
+        params.addValue("name", pcr.getName());
+        NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
+        namedTemplate.update(EMPCR_UPDATE, params);
+      } else {
+        throw new IOException("Cannot save emPCR - invalid name:" + nameValidation.getMessage());
       }
     }
 
@@ -239,14 +226,14 @@ public class SQLEmPCRDAO implements EmPCRStore {
   @Cacheable(cacheName = "emPCRCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
       @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
   public emPCR get(long pcrId) throws IOException {
-    List eResults = template.query(EMPCR_SELECT_BY_PCR_ID, new Object[] { pcrId }, new EmPCRMapper());
+    List<emPCR> eResults = template.query(EMPCR_SELECT_BY_PCR_ID, new Object[] { pcrId }, new EmPCRMapper());
     emPCR e = eResults.size() > 0 ? (emPCR) eResults.get(0) : null;
     return e;
   }
 
   @Override
   public emPCR lazyGet(long pcrId) throws IOException {
-    List eResults = template.query(EMPCR_SELECT_BY_PCR_ID, new Object[] { pcrId }, new EmPCRMapper(true));
+    List<emPCR> eResults = template.query(EMPCR_SELECT_BY_PCR_ID, new Object[] { pcrId }, new EmPCRMapper(true));
     emPCR e = eResults.size() > 0 ? (emPCR) eResults.get(0) : null;
     return e;
   }

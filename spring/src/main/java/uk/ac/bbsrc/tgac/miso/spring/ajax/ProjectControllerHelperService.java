@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -73,6 +73,8 @@ import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.PrintManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
 import uk.ac.bbsrc.tgac.miso.core.util.FormUtils;
@@ -101,6 +103,12 @@ public class ProjectControllerHelperService {
   private MisoFilesManager misoFileManager;
   @Autowired
   private WatchManager watchManager;
+  @Autowired
+  private NamingScheme namingScheme;
+
+  public void setNamingScheme(NamingScheme namingScheme) {
+    this.namingScheme = namingScheme;
+  }
 
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
@@ -124,6 +132,22 @@ public class ProjectControllerHelperService {
 
   public void setWatchManager(WatchManager watchManager) {
     this.watchManager = watchManager;
+  }
+
+  public JSONObject validateProjectShortName(HttpSession session, JSONObject json) {
+    if (!json.has("shortName")) {
+      return JSONUtils.SimpleJSONError("No shortName specified");
+    } else {
+      String shortName = json.getString("shortName");
+      ValidationResult shortNameValidation = namingScheme.validateProjectShortName(shortName);
+      if (shortNameValidation.isValid()) {
+        log.info("Project shortName OK!");
+        return JSONUtils.SimpleJSONResponse("OK");
+      } else {
+        log.error("Project shortName not valid: " + shortName);
+        return JSONUtils.SimpleJSONError(shortNameValidation.getMessage());
+      }
+    }
   }
 
   public JSONObject addProjectOverview(HttpSession session, JSONObject json) {

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -2620,5 +2621,16 @@ public class UserAuthMisoRequestManager implements RequestManager {
         authorizedRuns.add(run);
     }
     return authorizedRuns;
+  }
+
+  @Override
+  public List<Library> getLibrariesByCreationDate(Date from, Date to) throws IOException {
+    List<Library> libraries = backingManager.getLibrariesByCreationDate(from, to);
+    List<Library> authorizedLibs = new ArrayList<>();
+    for (Library lib : libraries) {
+      if (readCheck(lib))
+        authorizedLibs.add(lib);
+    }
+    return authorizedLibs;
   }
 }

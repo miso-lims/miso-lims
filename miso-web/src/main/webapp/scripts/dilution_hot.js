@@ -181,7 +181,7 @@ var Dilution = {
           dilution.targetedSequencingId = Dilution.hot.getTarSeqIdFromAlias(obj.targetedSequencingAlias);
         }
       } catch (e) {
-        console.log(e.error);
+        console.log(e);
         return null;
       }
       return dilution;

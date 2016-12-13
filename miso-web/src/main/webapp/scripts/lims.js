@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -252,7 +252,6 @@ Utils.validation = {
   dateRegex: '^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/(19|20)[0-9]{2}$',
   dateTimeRegex: '^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/(19|20)[0-9]{2} ([01][0-9]|2[0-3]):[0-5][0-9]$',
   sanitizeRegex: '^[^<>\'\"\/&]+$',
-  shortNameRegex: '^[A-Z0-9]{1,5}$',
   unicodeWordRegex: '^[\\p{L}0-9_\\^\\-\\.\\s]+$',
   _unicodeWord: XRegExp('^[\\p{L}0-9_\\^\\-\\.\\s]+$'),
 

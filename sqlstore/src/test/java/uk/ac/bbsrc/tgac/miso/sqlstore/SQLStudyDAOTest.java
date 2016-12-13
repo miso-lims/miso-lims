@@ -2,11 +2,7 @@ package uk.ac.bbsrc.tgac.miso.sqlstore;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasEntry;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.junit.matchers.JUnitMatchers.hasItem;
 
 import java.io.IOException;
@@ -34,13 +30,15 @@ import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.store.SecurityStore;
 
 import net.sf.ehcache.CacheManager;
+
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ExperimentStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
@@ -71,7 +69,7 @@ public class SQLStudyDAOTest extends AbstractDAOTest {
   private ExperimentStore experimentDAO;
 
   @Mock
-  private MisoNamingScheme<Study> namingScheme;
+  private NamingScheme namingScheme;
 
   @InjectMocks
   private SQLStudyDAO dao;
@@ -97,7 +95,7 @@ public class SQLStudyDAOTest extends AbstractDAOTest {
     long autoIncrementId = nextAutoIncrementId;
     Study newStudy = makeStudy();
     mockAutoIncrement(autoIncrementId);
-    Mockito.when(namingScheme.validateField(Matchers.anyString(), Matchers.anyString())).thenReturn(true);
+    Mockito.when(namingScheme.validateName(Matchers.anyString())).thenReturn(ValidationResult.success());
 
     assertEquals(autoIncrementId, dao.save(newStudy));
 

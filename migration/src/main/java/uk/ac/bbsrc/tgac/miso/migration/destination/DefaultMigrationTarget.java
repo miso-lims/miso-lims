@@ -126,12 +126,12 @@ public class DefaultMigrationTarget implements MigrationTarget {
         log.info("Dry run completed and rolled back.");
       } else {
         tx.commit();
-        if (listener != null) listener.onMigrationComplete(valueTypeLookup);
       }
     } catch (Exception e) {
-      tx.rollback();
+      if (tx.isActive()) tx.rollback();
       throw e;
     }
+    if (listener != null && tx.wasCommitted()) listener.onMigrationComplete(valueTypeLookup);
   }
 
   private void doMigration(MigrationData data) throws IOException {
@@ -156,11 +156,12 @@ public class DefaultMigrationTarget implements MigrationTarget {
     log.info("Migrating projects...");
     for (Project project : projects) {
       project.setSecurityProfile(new SecurityProfile(migrationUser));
+      valueTypeLookup.resolveAll(project);
       // Make sure there's a study
       if (project.getStudies() == null) project.setStudies(new HashSet<Study>());
       if (project.getStudies().isEmpty()) {
         Study study = new StudyImpl();
-        study.setAlias(project.getShortName() + " study");
+        study.setAlias((project.getShortName() == null ? project.getAlias() : project.getShortName()) + " study");
         study.setDescription("");
         study.setStudyType("Other");
         study.setLastModifier(migrationUser);
@@ -278,7 +279,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
     subproject.setParentProject(project);
     subproject.setDescription(subproject.getAlias());
     subproject.setPriority(Boolean.FALSE);
-    subproject.setReferenceGenomeId(project.getReferenceGenomeId());
+    subproject.setReferenceGenomeId(project.getReferenceGenome().getId());
     subproject.setCreatedBy(migrationUser);
     subproject.setCreationDate(timeStamp);
     subproject.setUpdatedBy(migrationUser);
@@ -332,6 +333,22 @@ public class DefaultMigrationTarget implements MigrationTarget {
     return latest;
   }
 
+  private static Date getLatestChangeDate(Library library) {
+    Date latest = null;
+    for (ChangeLog change : library.getChangeLog()) {
+      if (latest == null || change.getTime().after(latest)) latest = change.getTime();
+    }
+    return latest;
+  }
+
+  private static Date getEarliestChangeDate(Library library) {
+    Date earliest = null;
+    for (ChangeLog change : library.getChangeLog()) {
+      if (earliest == null || change.getTime().before(earliest)) earliest = change.getTime();
+    }
+    return earliest;
+  }
+
   public void saveLibraries(final Collection<Library> libraries) throws IOException {
     log.info("Migrating libraries...");
     for (Library library : libraries) {
@@ -369,6 +386,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
       }
       if (replaceChangeLogs) {
         Collection<ChangeLog> changes = library.getChangeLog();
+        copyTimestampsFromChangelog(library);
         library.setId(serviceManager.getLibraryDao().save(library));
         saveLibraryChangeLog(library, changes);
       } else {
@@ -377,6 +395,14 @@ public class DefaultMigrationTarget implements MigrationTarget {
       log.debug("Saved library " + library.getAlias());
     }
     log.info(libraries.size() + " libraries migrated.");
+  }
+
+  private void copyTimestampsFromChangelog(Library library) {
+    Date earliest = getEarliestChangeDate(library);
+    Date latest = getLatestChangeDate(library);
+    library.getLibraryAdditionalInfo().setCreationDate(earliest);
+    library.getLibraryAdditionalInfo().setLastUpdated(latest);
+    library.setLastUpdated(latest);
   }
 
   private void saveLibraryChangeLog(Library library, Collection<ChangeLog> changes) throws IOException {

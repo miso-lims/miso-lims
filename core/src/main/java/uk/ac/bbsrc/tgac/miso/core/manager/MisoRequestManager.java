@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -28,6 +28,7 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -2947,6 +2948,11 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public List<Run> getRunsByPool(Pool pool) throws IOException {
     return runStore.listByPoolId(pool.getId());
+  }
+
+  @Override
+  public List<Library> getLibrariesByCreationDate(Date from, Date to) throws IOException {
+    return libraryStore.searchByCreationDate(from, to);
   }
 
 }

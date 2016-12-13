@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~ Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
-  ~ MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+  ~ MISO project contacts: Robert Davey @ TGAC
   ~ **********************************************************************
   ~
   ~ This file is part of MISO.
@@ -75,13 +75,9 @@
 
   <bean name="issueTrackerManager" class="uk.ac.bbsrc.tgac.miso.core.manager.DummyIssueTrackerManager" />
 
-  <bean id="entityNamingSchemeResolverService" name="entityNamingSchemeResolverService" class="uk.ac.bbsrc.tgac.miso.core.service.naming.MisoEntityNamingSchemeResolverService" />
+  <bean id="namingSchemeResolverService" name="namingSchemeResolverService" class="uk.ac.bbsrc.tgac.miso.core.service.naming.resolvers.StaticMappedNamingSchemeResolverService" />
 
-  <bean id="namingScheme" name="namingScheme" class="uk.ac.bbsrc.tgac.miso.core.service.naming.DefaultEntityNamingScheme"/>
-  <bean id="sampleNamingScheme" name="sampleNamingScheme" class="uk.ac.bbsrc.tgac.miso.core.service.naming.OicrSampleNamingScheme"/>
-  <bean id="libraryNamingScheme" name="libraryNamingScheme" class="uk.ac.bbsrc.tgac.miso.core.service.naming.OicrLibraryNamingScheme"/>
-
-  <bean id="nameGeneratorResolverService" name="nameGeneratorResolverService" class="uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNameGeneratorResolverService" />
+  <bean id="namingScheme" name="namingScheme" class="uk.ac.bbsrc.tgac.miso.core.service.naming.DefaultNamingScheme"/>
 
   <bean id="filePathGeneratorResolverService" name="filePathGeneratorResolverService" class="uk.ac.bbsrc.tgac.miso.core.service.submission.MisoFilePathGeneratorResolverService" />
 

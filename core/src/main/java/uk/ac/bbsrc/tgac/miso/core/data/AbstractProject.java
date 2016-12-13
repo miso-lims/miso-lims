@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -23,8 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringBlankOrNull;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -36,7 +34,9 @@ import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 
 import org.apache.commons.lang.BooleanUtils;
@@ -53,6 +53,7 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressTypeUserType;
 import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
@@ -87,33 +88,34 @@ public abstract class AbstractProject implements Project {
   private long projectId = AbstractProject.UNSAVED_ID;
 
   @Transient
-  private Collection<Request> requests = new HashSet<Request>();
+  private Collection<Request> requests = new HashSet<>();
 
   @Transient
-  private Collection<Sample> samples = new HashSet<Sample>();
+  private Collection<Sample> samples = new HashSet<>();
   @Transient
-  private Collection<Run> runs = new HashSet<Run>();
+  private Collection<Run> runs = new HashSet<>();
   @Transient
-  private Collection<Study> studies = new HashSet<Study>();
+  private Collection<Study> studies = new HashSet<>();
   @Transient
-  private Collection<ProjectOverview> overviews = new HashSet<ProjectOverview>();
+  private Collection<ProjectOverview> overviews = new HashSet<>();
   @Transient
-  private Collection<String> issueKeys = new HashSet<String>();
+  private Collection<String> issueKeys = new HashSet<>();
 
   @Column
   @Type(type = "progressTypeUserType")
   private ProgressType progress;
 
-  @Column
-  private Long referenceGenomeId;
+  @OneToOne(targetEntity = ReferenceGenomeImpl.class)
+  @JoinColumn(name = "referenceGenomeId", referencedColumnName = "referenceGenomeId", nullable = false)
+  private ReferenceGenome referenceGenome;
 
   @Transient
   private SecurityProfile securityProfile = null;
   @Transient
-  private final Set<MisoListener> listeners = new HashSet<MisoListener>();
+  private final Set<MisoListener> listeners = new HashSet<>();
   private Date lastUpdated;
   @Transient
-  private Set<User> watchers = new HashSet<User>();
+  private Set<User> watchers = new HashSet<>();
 
   @Override
   public Date getCreationDate() {
@@ -137,13 +139,6 @@ public abstract class AbstractProject implements Project {
 
   @Override
   public String getShortName() {
-    if (isStringBlankOrNull(shortName)) {
-      String syntheticShortName = alias.toUpperCase().replaceAll("[^A-Z0-9]", "");
-      if (syntheticShortName.length() > 5) {
-        syntheticShortName = syntheticShortName.substring(0, 5);
-      }
-      return syntheticShortName;
-    }
     return shortName;
   }
 
@@ -454,13 +449,13 @@ public abstract class AbstractProject implements Project {
   }
 
   @Override
-  public Long getReferenceGenomeId() {
-    return referenceGenomeId;
+  public ReferenceGenome getReferenceGenome() {
+    return referenceGenome;
   }
 
   @Override
-  public void setReferenceGenomeId(Long referenceGenomeId) {
-    this.referenceGenomeId = referenceGenomeId;
+  public void setReferenceGenome(ReferenceGenome referenceGenome) {
+    this.referenceGenome = referenceGenome;
   }
 
   @Override
@@ -469,7 +464,7 @@ public abstract class AbstractProject implements Project {
         .append(alias)
         .append(description)
         .append(progress)
-        .append(referenceGenomeId)
+        .append(referenceGenome)
         .append(shortName)
         .toHashCode();
   }
@@ -484,7 +479,7 @@ public abstract class AbstractProject implements Project {
         .append(alias, other.alias)
         .append(description, other.description)
         .append(progress, other.progress)
-        .append(referenceGenomeId, other.referenceGenomeId)
+        .append(referenceGenome, other.referenceGenome)
         .append(shortName, other.shortName)
         .isEquals();
   }

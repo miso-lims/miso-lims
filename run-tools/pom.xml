@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2010. The Genome Analysis Centre, Norwich, UK
-  ~ MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+  ~ Copyright (c) 2017. Earlham Institute, Norwich, UK, and
+  ~ the Ontario Institute for Cancer Research, Ontario, Canada. 
+  ~ MISO project contacts: Robert Davey @ EI (formerly TGAC), 
+  ~ Morgan Taschuk @ OICR 
   ~
   ~ **********************************************************************
   ~
@@ -22,98 +24,58 @@
   ~
   ~ **********************************************************************
 -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
   <parent>
     <artifactId>miso</artifactId>
     <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-    <version>0.2.43-oicr-SNAPSHOT</version>
+    <version>0.2.45-oicr-SNAPSHOT</version>
   </parent>
-
-  <groupId>${parent.groupId}</groupId>
   <artifactId>run-tools</artifactId>
-
   <packaging>jar</packaging>
   <name>MISO Run Tools</name>
-  <modelVersion>4.0.0</modelVersion>
   <url>http://maven.apache.org</url>
-
+  <dependencies>
+    <dependency>
+      <groupId>${project.parent.groupId}</groupId>
+      <artifactId>core</artifactId>
+      <version>${project.parent.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>net.sourceforge.fluxion</groupId>
+      <artifactId>fluxion-spi</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.irods.jargon</groupId>
+      <artifactId>jargon-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.integration</groupId>
+      <artifactId>spring-integration-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.integration</groupId>
+      <artifactId>spring-integration-file</artifactId>
+    </dependency>
+  </dependencies>
   <build>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.1</version>
-        <configuration>
-          <source>1.7</source>
-          <target>1.7</target>
-          <encoding>${project.build.sourceEncoding}</encoding>
-        </configuration>
       </plugin>
     </plugins>
   </build>
-
-  <repositories>
-    <repository>
-      <id>hasbanana-repo</id>
-      <url>http://www.hasbanana.com/maven/repo</url>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
-
-    <repository>
-      <id>renci.public</id>
-      <url>http://ci-dev.renci.org/nexus/content/repositories/releases</url>
-    </repository>
-  </repositories>
-
-  <dependencies>
-    <dependency>
-        <groupId>${project.parent.groupId}</groupId>
-        <artifactId>core</artifactId>
-        <version>${project.parent.version}</version>
-    </dependency>
-
-    <dependency>
-        <groupId>org.springframework.integration</groupId>
-        <artifactId>spring-integration-core</artifactId>
-        <version>${spring-integration-version}</version>
-    </dependency>
-    <dependency>
-        <groupId>org.springframework.integration</groupId>
-        <artifactId>spring-integration-http</artifactId>
-        <version>${spring-integration-version}</version>
-    </dependency>
-    <dependency>
-        <groupId>org.springframework.integration</groupId>
-        <artifactId>spring-integration-xml</artifactId>
-        <version>${spring-integration-version}</version>
-    </dependency>
-    <dependency>
-        <groupId>org.springframework.integration</groupId>
-        <artifactId>spring-integration-file</artifactId>
-        <version>${spring-integration-version}</version>
-    </dependency>
-    <dependency>
-        <groupId>org.springframework.integration</groupId>
-        <artifactId>spring-integration-ip</artifactId>
-        <version>${spring-integration-version}</version>
-    </dependency>
-    <dependency>
-        <groupId>org.springframework.integration</groupId>
-        <artifactId>spring-integration-event</artifactId>
-        <version>${spring-integration-version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.irods.jargon</groupId>
-      <artifactId>jargon-core</artifactId>
-      <version>3.1.4</version>
-    </dependency>
-  </dependencies>
-
-  <properties>
-    <spring-integration-version>2.2.0.RELEASE</spring-integration-version>
-  </properties>
 </project>

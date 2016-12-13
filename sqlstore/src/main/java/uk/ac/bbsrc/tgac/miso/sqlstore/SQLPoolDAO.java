@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -75,7 +75,7 @@ import uk.ac.bbsrc.tgac.miso.core.event.manager.PoolAlertManager;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolQcException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ExperimentStore;
@@ -270,17 +270,14 @@ public class SQLPoolDAO implements PoolStore {
   }
 
   @Autowired
-  private MisoNamingScheme<Pool> namingScheme;
+  private NamingScheme namingScheme;
 
-  @Override
-  @CoverageIgnore
-  public MisoNamingScheme<Pool> getNamingScheme() {
+  public NamingScheme getNamingScheme() {
     return namingScheme;
   }
 
   @Override
-  @CoverageIgnore
-  public void setNamingScheme(MisoNamingScheme<Pool> namingScheme) {
+  public void setNamingScheme(NamingScheme namingScheme) {
     this.namingScheme = namingScheme;
   }
 
@@ -456,46 +453,36 @@ public class SQLPoolDAO implements PoolStore {
       try {
         pool.setId(DbUtils.getAutoIncrement(template, TABLE_NAME));
 
-        String name = namingScheme.generateNameFor("name", pool);
+        String name = namingScheme.generateNameFor(pool);
         pool.setName(name);
 
-        if (namingScheme.validateField("name", pool.getName())) {
-          if (autoGenerateIdentificationBarcodes) {
-            autoGenerateIdBarcode(pool);
-          } // if !autoGenerateIdentificationBarcodes then the identificationBarcode is set by the user
+        DbUtils.validateNameOrThrow(pool, namingScheme);
+        if (autoGenerateIdentificationBarcodes) {
+          autoGenerateIdBarcode(pool);
+        } // if !autoGenerateIdentificationBarcodes then the identificationBarcode is set by the user
 
-          params.addValue("name", name);
-          params.addValue("identificationBarcode", pool.getIdentificationBarcode());
+        params.addValue("name", name);
+        params.addValue("identificationBarcode", pool.getIdentificationBarcode());
 
-          Number newId = insert.executeAndReturnKey(params);
-          if (newId.longValue() != pool.getId()) {
-            log.error("Expected Pool ID doesn't match returned value from database insert: rolling back...");
-            new NamedParameterJdbcTemplate(template).update(POOL_DELETE, new MapSqlParameterSource().addValue("poolId", newId.longValue()));
-            throw new IOException("Something bad happened. Expected Pool ID doesn't match returned value from DB insert");
-          }
-        } else {
-          throw new IOException("Cannot save Pool - invalid field:" + pool.toString());
+        Number newId = insert.executeAndReturnKey(params);
+        if (newId.longValue() != pool.getId()) {
+          log.error("Expected Pool ID doesn't match returned value from database insert: rolling back...");
+          new NamedParameterJdbcTemplate(template).update(POOL_DELETE, new MapSqlParameterSource().addValue("poolId", newId.longValue()));
+          throw new IOException("Something bad happened. Expected Pool ID doesn't match returned value from DB insert");
         }
       } catch (MisoNamingException e) {
         throw new IOException("Cannot save Pool - issue with naming scheme", e);
       }
     } else {
-      try {
-        if (namingScheme.validateField("name", pool.getName())) {
-          params.addValue("poolId", pool.getId()).addValue("name", pool.getName());
+      DbUtils.validateNameOrThrow(pool, namingScheme);
+      params.addValue("poolId", pool.getId()).addValue("name", pool.getName());
 
-          if (autoGenerateIdentificationBarcodes) {
-            autoGenerateIdBarcode(pool);
-          } // if !autoGenerateIdentificationBarcodes then the identificationBarcode is set by the user
-          params.addValue("identificationBarcode", pool.getIdentificationBarcode());
-          NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
-          namedTemplate.update(POOL_UPDATE, params);
-        } else {
-          throw new IOException("Cannot save Pool - invalid field:" + pool.toString());
-        }
-      } catch (MisoNamingException e) {
-        throw new IOException("Cannot save Pool - issue with naming scheme", e);
-      }
+      if (autoGenerateIdentificationBarcodes) {
+        autoGenerateIdBarcode(pool);
+      } // if !autoGenerateIdentificationBarcodes then the identificationBarcode is set by the user
+      params.addValue("identificationBarcode", pool.getIdentificationBarcode());
+      NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
+      namedTemplate.update(POOL_UPDATE, params);
     }
 
     Set<String> oldIds = new HashSet<>(

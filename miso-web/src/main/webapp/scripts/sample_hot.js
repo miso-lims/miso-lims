@@ -1100,10 +1100,25 @@ Sample.hot = {
 
       // add sample parent attributes, and all other attributes for the first receipt of a sample
       if (obj.externalName) {
-        sample.identityId =  Sample.hot.getParentIdFromIdentityLabel(obj.identityAlias);
+        if (obj.sampleClassAlias != 'Identity') {
+          sample.identityId = Sample.hot.getParentIdFromIdentityLabel(obj.identityAlias);
+        }
         sample.externalName = obj.externalName;
         if (obj.donorSex && obj.donorSex.length) sample.donorSex = obj.donorSex;
       }
+
+      // if the table data couldn't have changed (no sample class (sc) alias value) then use the original sc id;
+      // otherwise, generate sc id from sc alias (rather than calculating for each field whether the original sc id corresponds to the current sc alias
+      if (obj.sampleClassId && !obj.sampleClassAlias) {
+        sample.sampleClassId = obj.sampleClassId;
+      } else {
+        sample.sampleClassId = Hot.getIdFromAlias(obj.sampleClassAlias, Hot.sampleOptions.sampleClassesDtos);
+      }
+      sample.type = Sample.hot.getCategoryFromClassId(sample.sampleClassId);
+
+      // if it's an identity, return now.
+      if (obj.sampleClassAlias == 'Identity') return sample;
+
       if (obj.tissueOriginId && !obj.tissueOriginLabel) {
         sample.tissueOriginId = obj.tissueOriginId;
       } else if (obj.tissueOriginLabel) {
@@ -1126,15 +1141,7 @@ Sample.hot = {
       if (obj.tissueMaterialAlias && obj.tissueMaterialAlias.length) {
         sample.tissueMaterialId = Hot.getIdFromAlias(obj.tissueMaterialAlias, Hot.sampleOptions.tissueMaterialsDtos);
       }
-
-      // if the table data couldn't have changed (no alias value) then use the original id;
-      // otherwise, generate id from alias (rather than calculating for each field whether the original id corresponds to the current alias
-      if (obj.sampleClassId && !obj.sampleClassAlias) {
-        sample.sampleClassId = obj.sampleClassId;
-      } else {
-        sample.sampleClassId = Hot.getIdFromAlias(obj.sampleClassAlias, Hot.sampleOptions.sampleClassesDtos);
-      }
-      sample.type = Sample.hot.getCategoryFromClassId(sample.sampleClassId);
+      
       // add optional attributes
       if (obj.subprojectId && !obj.subprojectAlias) {
         sample.subprojectId = obj.subprojectId;
@@ -1198,7 +1205,7 @@ Sample.hot = {
         sample.concentration = obj.concentration;
       }
     } catch (e) {
-      console.log(e.error);
+      console.log(e);
       return null;
     }
     return sample;
@@ -1413,7 +1420,7 @@ Sample.hot = {
   canSampleClassPropagateLibraries: function (sampleClassAlias) {
     var libraryable = Hot.sampleOptions.sampleClassesDtos.filter(function (sc) { return sc.sampleCategory == 'Aliquot' && sc.alias != 'whole RNA (aliquot)'; });
     var canPropagate = libraryable.filter(function (sc) { return sc.alias == sampleClassAlias; });
-    return canPropagate.size == 1;
+    return canPropagate.length == 1;
   },
   
   /**

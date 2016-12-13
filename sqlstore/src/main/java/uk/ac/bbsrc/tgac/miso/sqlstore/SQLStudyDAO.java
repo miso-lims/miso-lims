@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -58,7 +58,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ExperimentStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
@@ -139,16 +139,14 @@ public class SQLStudyDAO implements StudyStore {
   private SecurityStore securityDAO;
 
   @Autowired
-  private MisoNamingScheme<Study> namingScheme;
+  private NamingScheme namingScheme;
 
-  @CoverageIgnore
-  @Override
-  public MisoNamingScheme<Study> getNamingScheme() {
+  public NamingScheme getNamingScheme() {
     return namingScheme;
   }
 
   @Override
-  public void setNamingScheme(MisoNamingScheme<Study> namingScheme) {
+  public void setNamingScheme(NamingScheme namingScheme) {
     this.namingScheme = namingScheme;
   }
 
@@ -231,21 +229,18 @@ public class SQLStudyDAO implements StudyStore {
       try {
         study.setId(DbUtils.getAutoIncrement(template, TABLE_NAME));
 
-        String name = namingScheme.generateNameFor("name", study);
+        String name = namingScheme.generateNameFor(study);
         study.setName(name);
 
-        if (namingScheme.validateField("name", study.getName())) {
-          params.addValue("name", name);
+        DbUtils.validateNameOrThrow(study, namingScheme);
+        params.addValue("name", name);
 
-          Number newId = insert.executeAndReturnKey(params);
-          if (newId.longValue() != study.getId()) {
-            log.error("Expected Study ID doesn't match returned value from database insert: rolling back...");
-            new NamedParameterJdbcTemplate(template).update(STUDY_DELETE,
-                new MapSqlParameterSource().addValue("studyId", newId.longValue()));
-            throw new IOException("Something bad happened. Expected Study ID doesn't match returned value from DB insert");
-          }
-        } else {
-          throw new IOException("Cannot save Study - invalid field:" + study.toString());
+        Number newId = insert.executeAndReturnKey(params);
+        if (newId.longValue() != study.getId()) {
+          log.error("Expected Study ID doesn't match returned value from database insert: rolling back...");
+          new NamedParameterJdbcTemplate(template).update(STUDY_DELETE,
+              new MapSqlParameterSource().addValue("studyId", newId.longValue()));
+          throw new IOException("Something bad happened. Expected Study ID doesn't match returned value from DB insert");
         }
       } catch (MisoNamingException e) {
         throw new IOException("Cannot save Study - issue with naming scheme", e);
@@ -253,18 +248,11 @@ public class SQLStudyDAO implements StudyStore {
 
       PROJECT_WRITER.saveOne(template, study.getId(), study.getProject());
     } else {
-      try {
-        if (namingScheme.validateField("name", study.getName())) {
-          params.addValue("studyId", study.getId());
-          params.addValue("name", study.getName());
-          NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
-          namedTemplate.update(STUDY_UPDATE, params);
-        } else {
-          throw new IOException("Cannot save Study - invalid field:" + study.toString());
-        }
-      } catch (MisoNamingException e) {
-        throw new IOException("Cannot save Study - issue with naming scheme", e);
-      }
+      DbUtils.validateNameOrThrow(study, namingScheme);
+      params.addValue("studyId", study.getId());
+      params.addValue("name", study.getName());
+      NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
+      namedTemplate.update(STUDY_UPDATE, params);
     }
 
     if (this.cascadeType != null) {

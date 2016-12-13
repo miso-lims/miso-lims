@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -56,7 +56,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
@@ -140,17 +140,14 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
   private boolean autoGenerateIdentificationBarcodes;
 
   @Autowired
-  private MisoNamingScheme<LibraryDilution> namingScheme;
+  private NamingScheme namingScheme;
 
-  @Override
-  @CoverageIgnore
-  public MisoNamingScheme<LibraryDilution> getNamingScheme() {
+  public NamingScheme getNamingScheme() {
     return namingScheme;
   }
 
   @Override
-  @CoverageIgnore
-  public void setNamingScheme(MisoNamingScheme<LibraryDilution> namingScheme) {
+  public void setNamingScheme(NamingScheme namingScheme) {
     this.namingScheme = namingScheme;
   }
 
@@ -354,52 +351,42 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
       try {
         dilution.setId(DbUtils.getAutoIncrement(template, "LibraryDilution"));
 
-        String name = namingScheme.generateNameFor("name", dilution);
+        String name = namingScheme.generateNameFor(dilution);
         dilution.setName(name);
 
-        if (namingScheme.validateField("name", dilution.getName())) {
-          if (autoGenerateIdentificationBarcodes) {
-            autoGenerateIdBarcode(dilution);
-          } // if !autoGenerateIdentificationBarcodes then the identificationBarcode is set by the user
-          params.addValue("name", name);
+        DbUtils.validateNameOrThrow(dilution, namingScheme);
+        if (autoGenerateIdentificationBarcodes) {
+          autoGenerateIdBarcode(dilution);
+        } // if !autoGenerateIdentificationBarcodes then the identificationBarcode is set by the user
+        params.addValue("name", name);
 
-          params.addValue("identificationBarcode", dilution.getIdentificationBarcode());
+        params.addValue("identificationBarcode", dilution.getIdentificationBarcode());
 
-          Number newId = insert.executeAndReturnKey(params);
-          if (newId.longValue() != dilution.getId()) {
-            log.error("Expected LibraryDilution ID doesn't match returned value from database insert: rolling back...");
-            new NamedParameterJdbcTemplate(template).update(LIBRARY_DILUTION_DELETE,
-                new MapSqlParameterSource().addValue("dilutionId", newId.longValue()));
-            throw new IOException("Something bad happened. Expected LibraryDilution ID doesn't match returned value from DB insert");
-          }
-        } else {
-          throw new IOException("Cannot save LibraryDilution - invalid field:" + dilution.toString());
+        Number newId = insert.executeAndReturnKey(params);
+        if (newId.longValue() != dilution.getId()) {
+          log.error("Expected LibraryDilution ID doesn't match returned value from database insert: rolling back...");
+          new NamedParameterJdbcTemplate(template).update(LIBRARY_DILUTION_DELETE,
+              new MapSqlParameterSource().addValue("dilutionId", newId.longValue()));
+          throw new IOException("Something bad happened. Expected LibraryDilution ID doesn't match returned value from DB insert");
         }
       } catch (MisoNamingException e) {
         throw new IOException("Cannot save LibraryDilution - issue with naming scheme", e);
       }
     } else {
-      try {
-        if (namingScheme.validateField("name", dilution.getName())) {
-          params.addValue("dilutionId", dilution.getId());
-          params.addValue("name", dilution.getName());
-          if (dilution.getTargetedSequencing() != null) {
-            params.addValue("targetedSequencingId", dilution.getTargetedSequencing().getTargetedSequencingId());
-          } else {
-            params.addValue("targetedSequencingId", null);
-          }
-          if (autoGenerateIdentificationBarcodes) {
-            autoGenerateIdBarcode(dilution);
-          } // if !autoGenerateIdentificationBarcodes then the identificationBarcode is set by the user
-          params.addValue("identificationBarcode", dilution.getIdentificationBarcode());
-          NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
-          namedTemplate.update(LIBRARY_DILUTION_UPDATE, params);
-        } else {
-          throw new IOException("Cannot save LibraryDilution - invalid field:" + dilution.toString());
-        }
-      } catch (MisoNamingException e) {
-        throw new IOException("Cannot save LibraryDilution - issue with naming scheme", e);
+      DbUtils.validateNameOrThrow(dilution, namingScheme);
+      params.addValue("dilutionId", dilution.getId());
+      params.addValue("name", dilution.getName());
+      if (dilution.getTargetedSequencing() != null) {
+        params.addValue("targetedSequencingId", dilution.getTargetedSequencing().getTargetedSequencingId());
+      } else {
+        params.addValue("targetedSequencingId", null);
       }
+      if (autoGenerateIdentificationBarcodes) {
+        autoGenerateIdBarcode(dilution);
+      } // if !autoGenerateIdentificationBarcodes then the identificationBarcode is set by the user
+      params.addValue("identificationBarcode", dilution.getIdentificationBarcode());
+      NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
+      namedTemplate.update(LIBRARY_DILUTION_UPDATE, params);
     }
 
     if (this.cascadeType != null) {

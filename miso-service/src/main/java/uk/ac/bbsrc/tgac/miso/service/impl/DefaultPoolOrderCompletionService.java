@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Collection;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,7 +23,6 @@ public class DefaultPoolOrderCompletionService implements PoolOrderCompletionSer
   private PoolOrderCompletionDao poolOrderCompletionDao;
 
   @Autowired
-  @Qualifier("sqlPoolDAO")
   private PoolStore poolDao;
 
   @Autowired

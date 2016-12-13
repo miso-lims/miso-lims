@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -23,7 +23,12 @@
 
 package uk.ac.bbsrc.tgac.miso.core.test;
 
-import com.eaglegenomics.simlims.core.User;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import junit.framework.Assert;
 
@@ -32,18 +37,16 @@ import org.junit.Test;
 import org.odftoolkit.odfdom.doc.OdfTextDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.eaglegenomics.simlims.core.User;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.DefaultLibraryNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.DefaultNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.util.FormUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-
-import java.io.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.test
@@ -122,7 +125,7 @@ public class FormUtilsTests {
       User u = new UserImpl();
       u.setLoginName("testBulkImportUser");
       List<Sample> samples = FormUtils.importSampleInputSpreadsheet(testSampleBulkInputOdsFile, u, new MockFormTestRequestManager(),
-          new DefaultLibraryNamingScheme(), new MockFormTestIndexService());
+          new DefaultNamingScheme(), new MockFormTestIndexService());
       log.info("Imported :: " + LimsUtils.join(samples, " | "));
     } catch (Exception e) {
       e.printStackTrace();
@@ -140,7 +143,7 @@ public class FormUtilsTests {
       User u = new UserImpl();
       u.setLoginName("testBulkImportUser");
       List<Sample> samples = FormUtils.importSampleInputSpreadsheet(testSampleBulkInputXlsFile, u, new MockFormTestRequestManager(),
-          new DefaultLibraryNamingScheme(), new MockFormTestIndexService());
+          new DefaultNamingScheme(), new MockFormTestIndexService());
       log.info("Imported :: " + LimsUtils.join(samples, " | "));
     } catch (Exception e) {
       e.printStackTrace();

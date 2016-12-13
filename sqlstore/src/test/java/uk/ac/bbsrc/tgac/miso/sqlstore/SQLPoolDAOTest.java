@@ -38,7 +38,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ExperimentStore;
@@ -78,7 +79,7 @@ public class SQLPoolDAOTest extends AbstractDAOTest {
   @Mock
   private com.eaglegenomics.simlims.core.manager.SecurityManager securityManager;
   @Mock
-  private MisoNamingScheme<Pool> namingScheme;
+  private NamingScheme namingScheme;
 
   @InjectMocks
   private SQLPoolDAO dao;
@@ -542,8 +543,8 @@ public class SQLPoolDAOTest extends AbstractDAOTest {
     pool.setLastModifier(mockUser);
 
     mockAutoIncrement(nextAutoIncrementId);
-    when(namingScheme.generateNameFor("name", pool)).thenReturn(poolName);
-    when(namingScheme.validateField("name", pool.getName())).thenReturn(true);
+    when(namingScheme.generateNameFor(pool)).thenReturn(poolName);
+    when(namingScheme.validateName(pool.getName())).thenReturn(ValidationResult.success());
 
     long poolId = dao.save(pool);
     Pool insertedPool = dao.get(poolId);
@@ -566,7 +567,7 @@ public class SQLPoolDAOTest extends AbstractDAOTest {
     User user = new UserImpl();
     user.setUserId(1L);
     pool.setLastModifier(user);
-    Mockito.when(namingScheme.validateField(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
+    Mockito.when(namingScheme.validateName(Mockito.anyString())).thenReturn(ValidationResult.success());
     mockAutoIncrement(autoIncrementId);
     Long poolId = dao.save(pool);
     assertEquals(Long.valueOf(autoIncrementId), Long.valueOf(poolId));
@@ -587,7 +588,7 @@ public class SQLPoolDAOTest extends AbstractDAOTest {
     user.setUserId(1L);
     oldPool.setLastModifier(user);
     oldPool.setPoolableElements(null);
-    Mockito.when(namingScheme.validateField(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
+    Mockito.when(namingScheme.validateName(Mockito.anyString())).thenReturn(ValidationResult.success());
 
     assertEquals(1L, dao.save(oldPool));
     Pool newPool = dao.get(1L);

@@ -14,7 +14,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
  * This interface defines a DAO for storing Boxes
  * 
  */
-public interface BoxStore extends Store<Box>, Remover<Box>, NamingSchemeAware<Box> {
+public interface BoxStore extends Store<Box>, Remover<Box>, NamingSchemeAware {
   /**
    * Retrieve a Box from data store given a Box alias.
    * 

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -689,10 +689,13 @@ public class FlexReportingControllerHelperService {
     JSONArray jsonArray = new JSONArray();
     try {
       Collection<Library> libraries = null;
+      DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+      Date startDate = df.parse(from);
+      Date endDate = df.parse(to);
       if (!isStringEmptyOrNull(searchStr)) {
         libraries = requestManager.listAllLibrariesBySearch(searchStr);
       } else {
-        libraries = requestManager.listAllLibraries();
+        libraries = requestManager.getLibrariesByCreationDate(startDate, endDate);
       }
 
       for (Library library : libraries) {
@@ -701,9 +704,6 @@ public class FlexReportingControllerHelperService {
 
           if (!isStringEmptyOrNull(from) && !isStringEmptyOrNull(to) && library.getCreationDate() != null) {
 
-            DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
-            Date startDate = df.parse(from);
-            Date endDate = df.parse(to);
             Date receivedDate = library.getCreationDate();
             if ((receivedDate.after(startDate) && receivedDate.before(endDate)) || receivedDate.equals(startDate)
                 || receivedDate.equals(endDate)) {

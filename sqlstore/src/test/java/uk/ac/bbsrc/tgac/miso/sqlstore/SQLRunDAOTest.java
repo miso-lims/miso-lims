@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -63,7 +63,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
 import uk.ac.bbsrc.tgac.miso.core.store.RunQcStore;
@@ -83,7 +84,7 @@ public class SQLRunDAOTest extends AbstractDAOTest {
   private JdbcTemplate jdbcTemplate;
 
   @Mock
-  private MisoNamingScheme<Run> namingScheme;
+  private NamingScheme namingScheme;
   @Mock
   private SecurityStore securityDAO;
   @Mock
@@ -325,8 +326,8 @@ public class SQLRunDAOTest extends AbstractDAOTest {
     run.setLastModifier(mockUser);
 
     mockAutoIncrement(nextAutoIncrementId);
-    when(namingScheme.generateNameFor("name", run)).thenReturn(runName);
-    when(namingScheme.validateField(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
+    when(namingScheme.generateNameFor(run)).thenReturn(runName);
+    when(namingScheme.validateName(Mockito.anyString())).thenReturn(ValidationResult.success());
 
     long runId = dao.save(run);
     Run insertedRun = dao.get(runId);
@@ -353,7 +354,7 @@ public class SQLRunDAOTest extends AbstractDAOTest {
     run.setLastModifier(user);
     run.setSequencingParameters(null);
 
-    Mockito.when(namingScheme.validateField(Matchers.anyString(), Matchers.anyString())).thenReturn(true);
+    Mockito.when(namingScheme.validateName(Matchers.anyString())).thenReturn(ValidationResult.success());
 
     assertEquals(1L, dao.save(run));
     Run savedRun = dao.get(1L);
@@ -368,7 +369,7 @@ public class SQLRunDAOTest extends AbstractDAOTest {
     assertNull(dao.get(nextAutoIncrementId));
     Run newRun = makeRun("TestRun");
     mockAutoIncrement(nextAutoIncrementId);
-    Mockito.when(namingScheme.validateField(Matchers.anyString(), Matchers.anyString())).thenReturn(true);
+    Mockito.when(namingScheme.validateName(Matchers.anyString())).thenReturn(ValidationResult.success());
 
     assertEquals(nextAutoIncrementId, dao.save(newRun));
 
@@ -392,7 +393,7 @@ public class SQLRunDAOTest extends AbstractDAOTest {
     runs.add(run1);
     runs.add(run2);
     mockAutoIncrement(autoIncrementId);
-    Mockito.when(namingScheme.validateField(Matchers.anyString(), Matchers.anyString())).thenReturn(true);
+    Mockito.when(namingScheme.validateName(Matchers.anyString())).thenReturn(ValidationResult.success());
 
     assertNull(dao.get(autoIncrementId));
     assertNull(dao.get(autoIncrementId + 1L));

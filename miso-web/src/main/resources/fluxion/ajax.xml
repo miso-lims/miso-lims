@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~ Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
-  ~ MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+  ~ MISO project contacts: Robert Davey @ TGAC
   ~ **********************************************************************
   ~
   ~ This file is part of MISO.
@@ -31,6 +31,8 @@
     <bean class="net.sourceforge.fluxion.ajax.controller.AjaxController">
     <property name="invalidSessionUrl" value="/login.jsp" />
     </bean>
+    
+  <context:annotation-config/>
 
   <bean id="boxControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.BoxControllerHelperService">
   </bean>

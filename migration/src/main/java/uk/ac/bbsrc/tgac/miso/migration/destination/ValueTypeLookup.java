@@ -6,6 +6,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.annotations.VisibleForTesting;
+
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
@@ -17,6 +19,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
+import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
@@ -84,6 +88,7 @@ public class ValueTypeLookup {
   private Map<String, Subproject> subprojectByAlias;
   private Map<Long, DetailedQcStatus> detailedQcStatusById;
   private Map<String, DetailedQcStatus> detailedQcStatusByDescription;
+  private Map<String, ReferenceGenome> referenceGenomeByAlias;
   
   /**
    * Create a ValueTypeLookup loaded with data from the provided MisoServiceManager
@@ -110,6 +115,7 @@ public class ValueTypeLookup {
     setSequencers(misoServiceManager.getSequencerReferenceDao().listAll());
     setSubprojects(misoServiceManager.getSubprojectDao().getSubproject());
     setDetailedQcStatuses(misoServiceManager.getDetailedQcStatusDao().getDetailedQcStatus());
+    setReferenceGenomes(misoServiceManager.getReferenceGenomeService().listAllReferenceGenomeTypes());
   }
 
   private void setSampleClasses(Collection<SampleClass> sampleClasses) {
@@ -343,6 +349,14 @@ public class ValueTypeLookup {
     this.detailedQcStatusByDescription = mapByDesc;
   }
   
+  private void setReferenceGenomes(Collection<ReferenceGenome> referenceGenomes) {
+    Map<String, ReferenceGenome> mapByAlias = new UniqueKeyHashMap<>();
+    for (ReferenceGenome referenceGenome : referenceGenomes) {
+      mapByAlias.put(referenceGenome.getAlias(), referenceGenome);
+    }
+    this.referenceGenomeByAlias = mapByAlias;
+  }
+
   /**
    * Attempts to find an existing SampleClass
    * 
@@ -350,7 +364,8 @@ public class ValueTypeLookup {
    * SampleClass
    * @return the existing SampleClass if a matching one is found; null otherwise
    */
-  public SampleClass resolve(SampleClass sampleClass) {
+  @VisibleForTesting
+  SampleClass resolve(SampleClass sampleClass) {
     if (sampleClass == null) return null;
     if (sampleClass.getId() != null) return sampleClassById.get(sampleClass.getId());
     if (sampleClass.getAlias() != null) return sampleClassByAlias.get(sampleClass.getAlias());
@@ -367,7 +382,8 @@ public class ValueTypeLookup {
    * @param tissueType a partially-formed TissueType, which must have its ID or alias set in order for this method to resolve the TissueType
    * @return the existing TissueType if a matching one is found; null otherwise
    */
-  public TissueType resolve(TissueType tissueType) {
+  @VisibleForTesting
+  TissueType resolve(TissueType tissueType) {
     if (tissueType == null) return null;
     if (tissueType.getId() != null) return tissueTypeById.get(tissueType.getId());
     if (tissueType.getAlias() != null) return tissueTypeByAlias.get(tissueType.getAlias());
@@ -385,7 +401,8 @@ public class ValueTypeLookup {
    * TissueMaterial
    * @return the existing TissueMaterial if a matching one is found; null otherwise
    */
-  public TissueMaterial resolve(TissueMaterial tissueMaterial) {
+  @VisibleForTesting
+  TissueMaterial resolve(TissueMaterial tissueMaterial) {
     if (tissueMaterial == null) return null;
     if (tissueMaterial.getId() != null) return tissueMaterialById.get(tissueMaterial.getId());
     if (tissueMaterial.getAlias() != null) return tissueMaterialByAlias.get(tissueMaterial.getAlias());
@@ -402,7 +419,8 @@ public class ValueTypeLookup {
    * @param kit a partially-formed KitDescriptor, which must have its ID or name set in order for this method to resolve the KitDescriptor
    * @return the existing KitDescriptor if a matching one is found; null otherwise
    */
-  public KitDescriptor resolve(KitDescriptor kit) {
+  @VisibleForTesting
+  KitDescriptor resolve(KitDescriptor kit) {
     if (kit == null) return null;
     if (kit.getId() != KitDescriptor.UNSAVED_ID) return kitById.get(kit.getId());
     if (kit.getName() != null) return kitByName.get(kit.getName());
@@ -420,7 +438,8 @@ public class ValueTypeLookup {
    * SamplePurpose
    * @return the existing SamplePurpose if a matching one is found; null otherwise
    */
-  public SamplePurpose resolve(SamplePurpose samplePurpose) {
+  @VisibleForTesting
+  SamplePurpose resolve(SamplePurpose samplePurpose) {
     if (samplePurpose == null) return null;
     if (samplePurpose.getId() != null) return samplePurposeById.get(samplePurpose.getId());
     if (samplePurpose.getAlias() != null) return samplePurposeByAlias.get(samplePurpose.getAlias());
@@ -439,7 +458,8 @@ public class ValueTypeLookup {
    * Institute is first resolved by ID or alias
    * @return the existing Lab if a matching one is found; null otherwise
    */
-  public Lab resolve(Lab lab) {
+  @VisibleForTesting
+  Lab resolve(Lab lab) {
     if (lab == null) return null;
     if (lab.getId() != null) return labsById.get(lab.getId());
     if (lab.getInstitute() != null) {
@@ -471,7 +491,8 @@ public class ValueTypeLookup {
    * resolve the TissueOrigin
    * @return the existing TissueOrigin if a matching one is found; null otherwise
    */
-  public TissueOrigin resolve(TissueOrigin tissueOrigin) {
+  @VisibleForTesting
+  TissueOrigin resolve(TissueOrigin tissueOrigin) {
     if (tissueOrigin == null) return null;
     if (tissueOrigin.getId() != null) return tissueOriginsById.get(tissueOrigin.getId());
     if (tissueOrigin.getAlias() != null) {
@@ -493,7 +514,8 @@ public class ValueTypeLookup {
    * resolve the LibrarySelectionType
    * @return the existing LibrarySelectionType if a matching one is found; null otherwise
    */
-  public LibrarySelectionType resolve(LibrarySelectionType librarySelectionType) {
+  @VisibleForTesting
+  LibrarySelectionType resolve(LibrarySelectionType librarySelectionType) {
     if (librarySelectionType == null) return null;
     if (librarySelectionType.getId() != LibrarySelectionType.UNSAVED_ID) {
       return librarySelectionsById.get(librarySelectionType.getId());
@@ -513,7 +535,8 @@ public class ValueTypeLookup {
    * resolve the LibraryStrategyType
    * @return the existing LibraryStrategyType if a matching one is found; null otherwise
    */
-  public LibraryStrategyType resolve(LibraryStrategyType libraryStrategyType) {
+  @VisibleForTesting
+  LibraryStrategyType resolve(LibraryStrategyType libraryStrategyType) {
     if (libraryStrategyType == null) return null;
     if (libraryStrategyType.getId() != LibrarySelectionType.UNSAVED_ID) {
       return libraryStrategiesById.get(libraryStrategyType.getId());
@@ -533,7 +556,8 @@ public class ValueTypeLookup {
    * resolve the LibraryType
    * @return the existing LibraryType if a matching one is found; null otherwise
    */
-  public LibraryType resolve(LibraryType libraryType) {
+  @VisibleForTesting
+  LibraryType resolve(LibraryType libraryType) {
     if (libraryType == null) return null;
     if (libraryType.getId() != LibraryType.UNSAVED_ID) return libraryTypeById.get(libraryType.getId());
     if (libraryType.getDescription() != null && libraryType.getPlatformType() != null) {
@@ -555,7 +579,8 @@ public class ValueTypeLookup {
    * LibraryDesign
    * @return the existing LibraryDesign if a matching one is found; null otherwise
    */
-  public LibraryDesign resolve(LibraryDesign libraryDesign) {
+  @VisibleForTesting
+  LibraryDesign resolve(LibraryDesign libraryDesign) {
     if (libraryDesign == null) return null;
     if (libraryDesign.getId() != null) return libraryDesignById.get(libraryDesign.getId());
     if (libraryDesign.getSampleClass() != null && libraryDesign.getSampleClass().getAlias() != null && libraryDesign.getName() != null) {
@@ -573,7 +598,8 @@ public class ValueTypeLookup {
    *          LibraryDesignCode
    * @return the existing LibraryDesignCode if a matching one is found; null otherwise
    */
-  public LibraryDesignCode resolve(LibraryDesignCode libraryDesignCode) {
+  @VisibleForTesting
+  LibraryDesignCode resolve(LibraryDesignCode libraryDesignCode) {
     if (libraryDesignCode == null) return null;
     if (libraryDesignCode.getId() != null) return libraryDesignCodeById.get(libraryDesignCode.getId());
     if (libraryDesignCode.getCode() != null) return libraryDesignCodeByCode.get(libraryDesignCode.getCode());
@@ -587,7 +613,8 @@ public class ValueTypeLookup {
    * resolve the Index
    * @return the existing Index if a matching one is found; null otherwise
    */
-  public Index resolve(Index index) {
+  @VisibleForTesting
+  Index resolve(Index index) {
     if (index == null) return null;
     if (index.getId() != Index.UNSAVED_ID) return indexById.get(index.getId());
     if (index.getFamily() != null && index.getFamily().getName() != null && index.getSequence() != null) {
@@ -643,7 +670,8 @@ public class ValueTypeLookup {
    * resolve the SequencerReference
    * @return the existing SequencerReference if a matching one is found; null otherwise
    */
-  public SequencerReference resolve(SequencerReference sequencer) {
+  @VisibleForTesting
+  SequencerReference resolve(SequencerReference sequencer) {
     if (sequencer == null) return null;
     if (sequencer.getId() != Index.UNSAVED_ID) return sequencerById.get(sequencer.getId());
     if (sequencer.getName() != null) return sequencerByName.get(sequencer.getName());
@@ -661,7 +689,8 @@ public class ValueTypeLookup {
    * alias set in order for this method to resolve the Subproject
    * @return the existing Subproject if a matching one is found; null otherwise
    */
-  public Subproject resolve(Subproject subproject) {
+  @VisibleForTesting
+  Subproject resolve(Subproject subproject) {
     if (subproject == null) return null;
     if (subproject.getId() != null) return subprojectById.get(subproject.getId());
     if (subproject.getAlias() != null) return subprojectByAlias.get(subproject.getAlias());
@@ -680,7 +709,8 @@ public class ValueTypeLookup {
    *          the DetailedQcStatus
    * @return the existing DetailedQcStatus if a matching one is found; null otherwise
    */
-  public DetailedQcStatus resolve(DetailedQcStatus detailedQcStatus) {
+  @VisibleForTesting
+  DetailedQcStatus resolve(DetailedQcStatus detailedQcStatus) {
     if (detailedQcStatus == null) return null;
     if (detailedQcStatus.getId() != null) return detailedQcStatusById.get(detailedQcStatus.getId());
     if (detailedQcStatus.getDescription() != null) return detailedQcStatusByDescription.get(detailedQcStatus.getDescription());
@@ -898,6 +928,25 @@ public class ValueTypeLookup {
         }
       }
     }
+  }
+
+  public void resolveAll(Project project) {
+    ReferenceGenome referenceGenome = resolve(project.getReferenceGenome());
+    project.setReferenceGenome(referenceGenome);
+  }
+
+  /**
+   * Attempts to find an existing ReferenceGenome by alias
+   * 
+   * @param referenceGenome a partially-formed ReferenceGenome, which must have its alias set in order for this method to resolve the
+   *          ReferenceGenome. (This resolve method does not support lookup by id.)
+   * @return the existing ReferenceGenome if a matching one is found; null otherwise
+   */
+  @VisibleForTesting
+  ReferenceGenome resolve(ReferenceGenome referenceGenome) {
+    if (referenceGenome == null) return null;
+    if (referenceGenome.getAlias() != null) return referenceGenomeByAlias.get(referenceGenome.getAlias());
+    return null;
   }
 
 }

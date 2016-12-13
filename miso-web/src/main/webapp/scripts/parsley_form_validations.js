@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -38,20 +38,22 @@ var Validate = Validate || {
       Utils.validation.clean_input_field(jQuery(this));
     });
   },
-
-  // Update warning message and submit if form is valid
-  updateWarningOrSubmit: function (formSelector, extraValidationsFunction) {
-    if (jQuery(formSelector).parsley().isValid()) {
-      jQuery('.bs-callout-warning').addClass('hidden');
-      // submit if form is valid
-      if (extraValidationsFunction) { 
-        extraValidationsFunction(jQuery(formSelector));
-      } else {
-        jQuery(formSelector).submit();
-      }
-    } else {
-      jQuery('.bs-callout-warning').removeClass('hidden');
-      return false;
-    }
+  
+  updateWarningOrSubmit: function(formSelector, extraValidationsFunction) {
+    jQuery(formSelector).parsley().whenValidate()
+      .done(function() {
+        jQuery('.bs-callout-warning').addClass('hidden');
+        // submit if form is valid
+        if (extraValidationsFunction) { 
+          extraValidationsFunction(jQuery(formSelector));
+        } else {
+          jQuery(formSelector).submit();
+        }
+      })
+      .fail(function() {
+        jQuery('.bs-callout-warning').removeClass('hidden');
+        return false;
+      });
   }
+  
 };

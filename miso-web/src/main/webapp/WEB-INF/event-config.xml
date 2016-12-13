@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~ Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
-  ~ MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+  ~ MISO project contacts: Robert Davey @ TGAC
   ~ **********************************************************************
   ~
   ~ This file is part of MISO.
@@ -49,7 +49,7 @@
 
   <!-- ALERTERS -->
   <bean name="daoAlerterService" class="uk.ac.bbsrc.tgac.miso.core.event.alerter.DaoAlerterService">
-    <property name="alertStore" ref="sqlAlertDAO" />
+    <property name="alertStore" ref="alertStore" />
   </bean>
 
   <bean name="emailAlerterService" class="uk.ac.bbsrc.tgac.miso.core.event.alerter.EmailAlerterService">

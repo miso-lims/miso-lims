@@ -26,6 +26,7 @@ import com.google.common.collect.Lists;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
@@ -33,13 +34,15 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleStockImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleValidRelationshipImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
@@ -112,10 +115,7 @@ public class DefaultSampleServiceTestSuite {
   private TissueMaterialDao tissueMaterialDao;
 
   @Mock
-  private MisoNamingScheme<Sample> sampleNamingScheme;
-
-  @Mock
-  private MisoNamingScheme<Sample> namingScheme;
+  private NamingScheme namingScheme;
 
   @InjectMocks
   private DefaultSampleService sut;
@@ -127,6 +127,7 @@ public class DefaultSampleServiceTestSuite {
     MockitoAnnotations.initMocks(this);
     sut.setAutoGenerateIdBarcodes(false);
     relationships = new HashSet<>();
+    Mockito.when(namingScheme.validateSampleAlias(Matchers.anyString())).thenReturn(ValidationResult.success());
   }
 
   @Test
@@ -166,8 +167,8 @@ public class DefaultSampleServiceTestSuite {
     Project expectedProject = mockShellProjectWithRealLookup(sample);
     User expectedLastModifier = mockUser();
     String expectedName = "generated_name";
-    Mockito.when(namingScheme.generateNameFor(Mockito.eq("name"), (Sample) Mockito.any())).thenReturn(expectedName);
-    Mockito.when(sampleNamingScheme.generateNameFor(Mockito.eq("alias"), (Sample) Mockito.any())).thenReturn("bad");
+    Mockito.when(namingScheme.generateNameFor((Sample) Mockito.any())).thenReturn(expectedName);
+    Mockito.when(namingScheme.generateSampleAlias((Sample) Mockito.any())).thenReturn("bad");
     Mockito.when(sampleDao.getSample(Mockito.anyLong())).thenReturn(sample);
     sut.create(sample);
 
@@ -194,8 +195,8 @@ public class DefaultSampleServiceTestSuite {
     Sample sample = new SampleImpl();
     mockShellProjectWithRealLookup(sample);
     String expectedAlias = "generated_alias";
-    Mockito.when(sampleNamingScheme.hasGeneratorFor(Mockito.eq("alias"))).thenReturn(true);
-    Mockito.when(sampleNamingScheme.generateNameFor(Mockito.eq("alias"), (Sample) Mockito.any())).thenReturn(expectedAlias);
+    Mockito.when(namingScheme.hasSampleAliasGenerator()).thenReturn(true);
+    Mockito.when(namingScheme.generateSampleAlias((Sample) Mockito.any())).thenReturn(expectedAlias);
     Mockito.when(sampleDao.getSample(Mockito.anyLong())).thenReturn(sample);
     sut.create(sample);
 
@@ -433,10 +434,18 @@ public class DefaultSampleServiceTestSuite {
     assertEquals("Sample name should NOT be modifiable", old.getName(), result.getName());
   }
 
+  private ReferenceGenome humanReferenceGenome() {
+    ReferenceGenome referenceGenome = new ReferenceGenomeImpl();
+    referenceGenome.setAlias("hg19");
+    referenceGenome.setId(1L);
+    return referenceGenome;
+  }
+
   @Test
   public void testUniqueExternalNamePerProjectTest() throws IOException {
     Project project = new ProjectImpl();
     project.setId(1L);
+    project.setReferenceGenome(humanReferenceGenome());
     Set<Identity> idList = new HashSet<>();
     Identity id1 = new IdentityImpl();
     id1.setExternalName("String1,String2");
@@ -452,6 +461,7 @@ public class DefaultSampleServiceTestSuite {
   public void testNonUniqueExternalNamePerProjectFailTest() throws IOException {
     Project project = new ProjectImpl();
     project.setId(1L);
+    project.setReferenceGenome(humanReferenceGenome());
     Set<Identity> idList = new HashSet<>();
     Identity id1 = new IdentityImpl();
     id1.setExternalName("String1,String2");
@@ -468,6 +478,7 @@ public class DefaultSampleServiceTestSuite {
   public void testNonUniqueExternalNamePerProjectPassTest() throws IOException {
     Project project = new ProjectImpl();
     project.setId(1L);
+    project.setReferenceGenome(humanReferenceGenome());
     Set<Identity> idList = new HashSet<>();
     Identity id1 = new IdentityImpl();
     id1.setExternalName("String1,String2");
@@ -564,6 +575,7 @@ public class DefaultSampleServiceTestSuite {
     Project project = new ProjectImpl();
     project.setId(shell.getId());
     project.setAlias("real_project");
+    project.setShortName("PROJ");
     project.setSecurityProfile(new SecurityProfile(mockUser()));
     project.getSecurityProfile().setOwner(mockUser());
     Mockito.when(projectStore.get(shell.getId())).thenReturn(project);

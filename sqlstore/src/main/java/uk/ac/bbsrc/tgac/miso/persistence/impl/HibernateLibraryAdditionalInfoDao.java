@@ -11,6 +11,7 @@ import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryAdditionalInfo;
@@ -18,6 +19,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAdditionalInfoImpl;
 import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
 import uk.ac.bbsrc.tgac.miso.persistence.LibraryAdditionalInfoDao;
 
+@Repository
 @Transactional(rollbackFor = Exception.class)
 public class HibernateLibraryAdditionalInfoDao implements LibraryAdditionalInfoDao {
   
@@ -81,10 +83,10 @@ public class HibernateLibraryAdditionalInfoDao implements LibraryAdditionalInfoD
 
   @Override
   public Long addLibraryAdditionalInfo(LibraryAdditionalInfo libraryAdditionalInfo) {
-      Date now = new Date();
-      libraryAdditionalInfo.setCreationDate(now);
-      libraryAdditionalInfo.setLastUpdated(now);
-      return (Long) currentSession().save(libraryAdditionalInfo);
+    Date now = new Date();
+    if (libraryAdditionalInfo.getCreationDate() == null) libraryAdditionalInfo.setCreationDate(now);
+    if (libraryAdditionalInfo.getLastUpdated() == null) libraryAdditionalInfo.setLastUpdated(now);
+    return (Long) currentSession().save(libraryAdditionalInfo);
   }
   
   @Override

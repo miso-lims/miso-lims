@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -61,7 +61,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PartitionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PlatformStore;
@@ -133,21 +132,6 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
   private PlatformStore platformDAO;
   private ChangeLogStore changeLogDAO;
   private SecurityStore securityDAO;
-
-  @Autowired
-  private MisoNamingScheme<SequencerPartitionContainer<SequencerPoolPartition>> namingScheme;
-
-  @Override
-  @CoverageIgnore
-  public MisoNamingScheme<SequencerPartitionContainer<SequencerPoolPartition>> getNamingScheme() {
-    return namingScheme;
-  }
-
-  @Override
-  @CoverageIgnore
-  public void setNamingScheme(MisoNamingScheme<SequencerPartitionContainer<SequencerPoolPartition>> namingScheme) {
-    this.namingScheme = namingScheme;
-  }
 
   @Autowired
   private CacheManager cacheManager;

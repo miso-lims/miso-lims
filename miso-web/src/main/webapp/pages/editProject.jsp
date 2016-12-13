@@ -1,6 +1,6 @@
 <%--
   ~ Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
-  ~ MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+  ~ MISO project contacts: Robert Davey @ TGAC
   ~ **********************************************************************
   ~
   ~ This file is part of MISO.
@@ -35,8 +35,6 @@
 <link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" type="text/css">
 <link rel="stylesheet" href="<c:url value='/styles/progress.css'/>" type="text/css">
 
-<script type="text/javascript" src="<c:url value='/scripts/parsley/parsley.min.js'/>"></script>
-
 <div id="maincontent">
 <div id="contentcolumn">
 <form:form id="project-form" data-parsley-validate="" action="/miso/project" method="POST" commandName="project" autocomplete="off">
@@ -44,7 +42,7 @@
 <h1><c:choose><c:when
     test="${project.id != 0}">Edit</c:when><c:otherwise>Create</c:otherwise></c:choose>
   Project
-  <button type="button" class="fg-button ui-state-default ui-corner-all" onclick="return Project.validateProject();">
+  <button type="button" class="fg-button ui-state-default ui-corner-all" onclick="Project.validateProject();">
     Save
   </button>
 </h1>
@@ -130,7 +128,7 @@
   <tr>
     <td>Reference Genome :*</td>
     <td>
-        <form:select id="referenceGenome" path="referenceGenomeId">
+        <form:select id="referenceGenome" path="referenceGenome">
             <form:options items="${referenceGenome}" itemValue="id" itemLabel="alias"/>
         </form:select>
     </td>

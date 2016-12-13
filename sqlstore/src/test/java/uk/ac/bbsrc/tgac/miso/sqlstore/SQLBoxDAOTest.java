@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -23,12 +23,9 @@
 
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -56,6 +53,7 @@ import com.eaglegenomics.simlims.core.store.SecurityStore;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
+
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
@@ -66,7 +64,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
 import uk.ac.bbsrc.tgac.miso.core.store.RunQcStore;
@@ -87,7 +86,7 @@ public class SQLBoxDAOTest extends AbstractDAOTest {
   private JdbcTemplate jdbcTemplate;
 
   @Mock
-  private MisoNamingScheme<Box> namingScheme;
+  private NamingScheme namingScheme;
   @Mock
   private SecurityStore securityDAO;
   @Mock
@@ -131,7 +130,7 @@ public class SQLBoxDAOTest extends AbstractDAOTest {
     user.setUserId(1l);
     when(securityDAO.getUserById(anyLong())).thenReturn(user);
 
-    when(namingScheme.validateField(anyString(), anyString())).thenReturn(true);
+    when(namingScheme.validateName(anyString())).thenReturn(ValidationResult.success());
 
     CacheManager cacheManager = mock(CacheManager.class);
     Mockito.when(cacheManager.getCache(Matchers.anyString())).thenReturn(mock(Cache.class));
@@ -286,7 +285,7 @@ public class SQLBoxDAOTest extends AbstractDAOTest {
     long autoIncrementId = nextAutoIncrementId;
     mockAutoIncrement(autoIncrementId);
 
-    when(namingScheme.generateNameFor("name", box)).thenReturn("newbox");
+    when(namingScheme.generateNameFor(box)).thenReturn("newbox");
     long boxId = dao.save(box);
 
     Box retrieved = dao.get(boxId);

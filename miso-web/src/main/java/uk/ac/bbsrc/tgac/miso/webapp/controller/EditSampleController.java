@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -113,7 +113,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
@@ -146,7 +146,7 @@ public class EditSampleController {
   private DataObjectFactory dataObjectFactory;
 
   @Autowired
-  private MisoNamingScheme<Sample> sampleNamingScheme;
+  private NamingScheme namingScheme;
 
   @Autowired
   private SampleOptionsController sampleOptionsController;
@@ -175,7 +175,7 @@ public class EditSampleController {
 
   @ModelAttribute("aliasGenerationEnabled")
   public Boolean isAliasGenerationEnabled() {
-    return sampleNamingScheme != null && sampleNamingScheme.hasGeneratorFor("alias");
+    return namingScheme != null && namingScheme.hasSampleAliasGenerator();
   }
 
   @Value("${miso.notification.interop.enabled}")
@@ -246,6 +246,10 @@ public class EditSampleController {
     Sample nextS = null;
 
     if (p != null && p.getId() == projectId) {
+      if (p.getSamples().isEmpty()) {
+        // if p was lazy loaded then it doesn't have samples.
+        p = requestManager.getProjectById(p.getId());
+      }
       if (!p.getSamples().isEmpty()) {
         Map<String, Sample> ret = new HashMap<>();
         List<Sample> ss = new ArrayList<>(p.getSamples());
@@ -551,7 +555,7 @@ public class EditSampleController {
 
   /**
    * Translates foreign keys to entity objects with only the ID set, to be used in service layer to reload persisted child objects
-   * 
+   *
    * @param binder
    */
   @InitBinder

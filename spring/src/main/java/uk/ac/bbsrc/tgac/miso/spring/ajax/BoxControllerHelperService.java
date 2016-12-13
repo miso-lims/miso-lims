@@ -43,7 +43,6 @@ import uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.PrintManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
@@ -69,16 +68,13 @@ public class BoxControllerHelperService {
   private DataObjectFactory dataObjectFactory;
 
   @Autowired
-  private MisoNamingScheme<Box> boxNamingScheme;
-
-  @Autowired
   private BarcodeFactory barcodeFactory;
 
   @Autowired
   private MisoFilesManager misoFileManager;
 
   @Autowired
-  private PrintManager<MisoPrintService, Queue<?>> printManager;
+  private PrintManager<MisoPrintService<?, ?, ?>, Queue<?>> printManager;
 
   @Autowired
   private BoxScanner boxScanner;
@@ -957,7 +953,7 @@ public class BoxControllerHelperService {
   }
 
   @CoverageIgnore
-  public void setPrintManager(PrintManager<MisoPrintService, Queue<?>> printManager) {
+  public void setPrintManager(PrintManager<MisoPrintService<?, ?, ?>, Queue<?>> printManager) {
     this.printManager = printManager;
   }
 

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -66,7 +66,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.ProjectAlertManager;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.EntityGroupStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
@@ -177,17 +178,14 @@ public class SQLProjectDAO implements ProjectStore {
   }
 
   @Autowired
-  private MisoNamingScheme<Project> namingScheme;
+  private NamingScheme namingScheme;
 
-  @Override
-  @CoverageIgnore
-  public MisoNamingScheme<Project> getNamingScheme() {
+  public NamingScheme getNamingScheme() {
     return namingScheme;
   }
 
   @Override
-  @CoverageIgnore
-  public void setNamingScheme(MisoNamingScheme<Project> namingScheme) {
+  public void setNamingScheme(NamingScheme namingScheme) {
     this.namingScheme = namingScheme;
   }
 
@@ -212,6 +210,10 @@ public class SQLProjectDAO implements ProjectStore {
 
   @Autowired
   private ReferenceGenomeDao referenceGenomeDao;
+
+  public void setReferenceGenomeDao(ReferenceGenomeDao referenceGenomeDao) {
+    this.referenceGenomeDao = referenceGenomeDao;
+  }
 
   @CoverageIgnore
   public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
@@ -304,6 +306,8 @@ public class SQLProjectDAO implements ProjectStore {
       securityProfileId = securityProfileDAO.save(project.getSecurityProfile());
     }
 
+    validateShortNameOrThrow(project);
+
     MapSqlParameterSource params = new MapSqlParameterSource();
     params.addValue("alias", project.getAlias());
     params.addValue("shortName", project.getShortName());
@@ -311,46 +315,36 @@ public class SQLProjectDAO implements ProjectStore {
     params.addValue("creationDate", project.getCreationDate());
     params.addValue("securityProfile_profileId", securityProfileId);
     params.addValue("progress", project.getProgress().getKey());
-    params.addValue("referenceGenomeId", project.getReferenceGenomeId());
+    params.addValue("referenceGenomeId", project.getReferenceGenome().getId());
 
     if (project.getId() == AbstractProject.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(TABLE_NAME).usingGeneratedKeyColumns("projectId");
       try {
         project.setId(DbUtils.getAutoIncrement(template, TABLE_NAME));
 
-        String name = namingScheme.generateNameFor("name", project);
+        String name = namingScheme.generateNameFor(project);
         project.setName(name);
 
-        if (namingScheme.validateField("name", project.getName())) {
-          params.addValue("name", name);
+        DbUtils.validateNameOrThrow(project, namingScheme);
+        params.addValue("name", name);
 
-          Number newId = insert.executeAndReturnKey(params);
-          if (newId.longValue() != project.getId()) {
-            log.error("Expected Project ID ('" + project.getId() + "') doesn't match returned value ('" + newId.longValue()
-                + "') from database insert: rolling back...");
-            new NamedParameterJdbcTemplate(template).update(PROJECT_DELETE,
-                new MapSqlParameterSource().addValue("projectId", newId.longValue()));
-            throw new IOException("Something bad happened. Expected Project ID doesn't match returned value from DB insert");
-          }
-        } else {
-          throw new IOException("Cannot save Project - invalid field:" + project.toString());
+        Number newId = insert.executeAndReturnKey(params);
+        if (newId.longValue() != project.getId()) {
+          log.error("Expected Project ID ('" + project.getId() + "') doesn't match returned value ('" + newId.longValue()
+              + "') from database insert: rolling back...");
+          new NamedParameterJdbcTemplate(template).update(PROJECT_DELETE,
+              new MapSqlParameterSource().addValue("projectId", newId.longValue()));
+          throw new IOException("Something bad happened. Expected Project ID doesn't match returned value from DB insert");
         }
       } catch (MisoNamingException e) {
         throw new IOException("Cannot save Project - issue with naming scheme", e);
       }
     } else {
-      try {
-        if (namingScheme.validateField("name", project.getName())) {
-          params.addValue("projectId", project.getId());
-          params.addValue("name", project.getName());
-          NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
-          namedTemplate.update(PROJECT_UPDATE, params);
-        } else {
-          throw new IOException("Cannot save Project - invalid field:" + project.toString());
-        }
-      } catch (MisoNamingException e) {
-        throw new IOException("Cannot save Project - issue with naming scheme", e);
-      }
+      DbUtils.validateNameOrThrow(project, namingScheme);
+      params.addValue("projectId", project.getId());
+      params.addValue("name", project.getName());
+      NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
+      namedTemplate.update(PROJECT_UPDATE, params);
     }
 
     if (this.cascadeType != null) {
@@ -373,6 +367,13 @@ public class SQLProjectDAO implements ProjectStore {
     }
 
     return project.getProjectId();
+  }
+
+  private void validateShortNameOrThrow(Project project) throws IOException {
+    ValidationResult shortNameValidation = namingScheme.validateProjectShortName(project.getShortName());
+    if (!shortNameValidation.isValid()) {
+      throw new IOException("Cannot save project - invalid shortName: " + shortNameValidation.getMessage());
+    }
   }
 
   @Override
@@ -587,7 +588,7 @@ public class SQLProjectDAO implements ProjectStore {
         project.setCreationDate(rs.getDate("creationDate"));
         project.setProgress(ProgressType.get(rs.getString("progress")));
         project.setLastUpdated(rs.getTimestamp("lastUpdated"));
-        project.setReferenceGenomeId(rs.getLong("referenceGenomeId"));
+        project.setReferenceGenome(referenceGenomeDao.getReferenceGenome(rs.getLong("referenceGenomeId")));
 
         try {
           project.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));

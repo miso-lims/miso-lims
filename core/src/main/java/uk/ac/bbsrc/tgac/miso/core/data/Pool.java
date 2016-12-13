@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -56,7 +56,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 @JsonIgnoreProperties({ "securityProfile", "dilutions" })
 @PrintableBarcode
-public interface Pool extends SecurableByProfile, Comparable, Barcodable, Watchable, Deletable, Alertable, Boxable {
+public interface Pool extends SecurableByProfile, Comparable, Barcodable, Watchable, Deletable, Alertable, Boxable, Nameable {
 
   /**
    * Sets the ID of this Pool object.

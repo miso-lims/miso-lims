@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -86,14 +86,14 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
-import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoPrintException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.PrintManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
 import uk.ac.bbsrc.tgac.miso.core.store.IndexStore;
@@ -123,43 +123,22 @@ public class LibraryControllerHelperService {
   @Autowired
   private MisoFilesManager misoFileManager;
   @Autowired
-  private PrintManager<MisoPrintService, Queue<?>> printManager;
+  private PrintManager<MisoPrintService<?, ?, ?>, Queue<?>> printManager;
   @Autowired
   private IndexStore indexStore;
   @Autowired
-  private MisoNamingScheme<Sample> sampleNamingScheme;
-  @Autowired
-  private MisoNamingScheme<Library> libraryNamingScheme;
-
-  /**
-   * Returns a JSONObject containing the alias regex used by the current library naming scheme
-   */
-  public JSONObject getLibraryAliasRegex(HttpSession session, JSONObject json) {
-    try {
-      JSONObject response = new JSONObject();
-      response.put("aliasRegex", libraryNamingScheme.getValidationRegex("alias"));
-      return response;
-    } catch (MisoNamingException e) {
-      log.error("Could not retrieve library alias regex from server!");
-      return JSONUtils.SimpleJSONError("Could not retrieve library alias regex from server!");
-    }
-  }
+  private NamingScheme namingScheme;
 
   public JSONObject validateLibraryAlias(HttpSession session, JSONObject json) {
     if (json.has("alias")) {
       String alias = json.getString("alias");
-      try {
-        if (libraryNamingScheme.validateField("alias", alias)) {
-          log.debug("Library alias OK!");
-          return JSONUtils.SimpleJSONResponse("OK");
-        } else {
-          log.error("Library alias not valid: " + alias);
-          return JSONUtils.SimpleJSONError("The following Library alias doesn't conform to the chosen naming scheme ("
-              + libraryNamingScheme.getValidationRegex("alias") + ") or already exists: " + json.getString("alias"));
-        }
-      } catch (MisoNamingException e) {
-        log.error("Cannot validate Library alias " + json.getString("alias"), e);
-        return JSONUtils.SimpleJSONError("Cannot validate Library alias " + json.getString("alias") + ": " + e.getMessage());
+      ValidationResult aliasValidation = namingScheme.validateLibraryAlias(alias);
+      if (aliasValidation.isValid()) {
+        log.debug("Library alias OK!");
+        return JSONUtils.SimpleJSONResponse("OK");
+      } else {
+        log.error("Library alias not valid: " + alias);
+        return JSONUtils.SimpleJSONError(aliasValidation.getMessage());
       }
     } else {
       return JSONUtils.SimpleJSONError("No alias specified");
@@ -479,7 +458,7 @@ public class LibraryControllerHelperService {
               Library library = new LibraryImpl();
               library.setSample(sample);
 
-              String libAlias = libraryNamingScheme.generateNameFor("alias", library);
+              String libAlias = namingScheme.generateLibraryAlias(library);
 
               library.setAlias(libAlias);
               library.setSecurityProfile(sp);
@@ -518,9 +497,7 @@ public class LibraryControllerHelperService {
 
               saveSet.add(library);
             } else {
-              throw new IOException(
-                  "Could not process a selected Sample to generate Libraries. Please check that all selected samples' aliases conform to the chosen naming convention ("
-                      + sampleNamingScheme.getValidationRegex("alias") + ")");
+              throw new IOException("Could not find a selected Sample to generate Libraries.");
             }
           } catch (IOException e) {
             log.error("cannot save library", e);
@@ -1330,16 +1307,12 @@ public class LibraryControllerHelperService {
     this.misoFileManager = misoFileManager;
   }
 
-  public void setPrintManager(PrintManager<MisoPrintService, Queue<?>> printManager) {
+  public void setPrintManager(PrintManager<MisoPrintService<?, ?, ?>, Queue<?>> printManager) {
     this.printManager = printManager;
   }
 
-  public void setSampleNamingScheme(MisoNamingScheme<Sample> sampleNamingScheme) {
-    this.sampleNamingScheme = sampleNamingScheme;
-  }
-
-  public void setLibraryNamingScheme(MisoNamingScheme<Library> libraryNamingScheme) {
-    this.libraryNamingScheme = libraryNamingScheme;
+  public void setLibraryNamingScheme(NamingScheme namingScheme) {
+    this.namingScheme = namingScheme;
   }
 
   public void setIndexStore(IndexStore indexStore) {

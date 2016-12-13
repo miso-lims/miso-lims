@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -200,7 +200,7 @@ public interface Project extends com.eaglegenomics.simlims.core.Project, Compara
 
   void setLastUpdated(Date lastUpdated);
 
-  Long getReferenceGenomeId();
+  public ReferenceGenome getReferenceGenome();
 
-  void setReferenceGenomeId(Long referenceGenome);
+  public void setReferenceGenome(ReferenceGenome referenceGenome);
 }

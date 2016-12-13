@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -60,6 +60,7 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
+
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractPool;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractProject;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSampleQC;
@@ -136,7 +137,7 @@ public class EditProjectController {
     if (projectId != AbstractProject.UNSAVED_ID) {
       Project p = requestManager.lazyGetProjectById(projectId);
       if (p != null) {
-        Map<Integer, String> fileMap = new HashMap<Integer, String>();
+        Map<Integer, String> fileMap = new HashMap<>();
         for (String s : filesManager.getFileNames(Project.class, projectId.toString())) {
           fileMap.put(s.hashCode(), s);
         }
@@ -153,7 +154,7 @@ public class EditProjectController {
 
   @ModelAttribute("sampleQcTypesString")
   public String sampleTypesString() throws IOException {
-    List<String> types = new ArrayList<String>();
+    List<String> types = new ArrayList<>();
     for (QcType s : requestManager.listAllSampleQcTypes()) {
       types.add("\"" + s.getQcTypeId() + "\"" + ":" + "\"" + s.getName() + "\"");
     }
@@ -178,8 +179,8 @@ public class EditProjectController {
 
   @ModelAttribute("libraryQcTypesString")
   public String libraryTypesString() throws IOException {
-    List<String> types = new ArrayList<String>();
-    List<QcType> libraryQcTypes = new ArrayList<QcType>(requestManager.listAllLibraryQcTypes());
+    List<String> types = new ArrayList<>();
+    List<QcType> libraryQcTypes = new ArrayList<>(requestManager.listAllLibraryQcTypes());
     Collections.sort(libraryQcTypes);
     for (QcType s : libraryQcTypes) {
       types.add("\"" + s.getQcTypeId() + "\"" + ":" + "\"" + s.getName() + "\"");
@@ -188,12 +189,12 @@ public class EditProjectController {
   }
 
   public Collection<Run> populateProjectRuns(long projectId) throws IOException {
-    List<Run> runs = new ArrayList<Run>(requestManager.listAllRunsByProjectId(projectId));
+    List<Run> runs = new ArrayList<>(requestManager.listAllRunsByProjectId(projectId));
     try {
       Collections.sort(runs, new AliasComparator(Run.class));
       for (Run r : runs) {
         RunImpl ri = (RunImpl) r;
-        ri.setSequencerPartitionContainers(new ArrayList<SequencerPartitionContainer<SequencerPoolPartition>>(
+        ri.setSequencerPartitionContainers(new ArrayList<>(
             requestManager.listSequencerPartitionContainersByRunId(r.getId())));
       }
       return runs;
@@ -203,7 +204,7 @@ public class EditProjectController {
   }
 
   public Collection<Library> populateProjectLibraries(long projectId) throws IOException {
-    List<Library> libraries = new ArrayList<Library>(requestManager.listAllLibrariesByProjectId(projectId));
+    List<Library> libraries = new ArrayList<>(requestManager.listAllLibrariesByProjectId(projectId));
     try {
       Collections.sort(libraries, new AliasComparator(Library.class));
       for (Library l : libraries) {
@@ -223,7 +224,7 @@ public class EditProjectController {
   }
 
   public Collection<LibraryDilution> populateProjectLibraryDilutions(Collection<Library> projectLibraries) throws IOException {
-    List<LibraryDilution> dilutions = new ArrayList<LibraryDilution>();
+    List<LibraryDilution> dilutions = new ArrayList<>();
     for (Library l : projectLibraries) {
       dilutions.addAll(requestManager.listAllLibraryDilutionsByLibraryId(l.getId()));
     }
@@ -232,13 +233,13 @@ public class EditProjectController {
   }
 
   public Collection<LibraryDilution> populateProjectLibraryDilutions(long projectId) throws IOException {
-    List<LibraryDilution> dilutions = new ArrayList<LibraryDilution>(requestManager.listAllLibraryDilutionsByProjectId(projectId));
+    List<LibraryDilution> dilutions = new ArrayList<>(requestManager.listAllLibraryDilutionsByProjectId(projectId));
     Collections.sort(dilutions);
     return dilutions;
   }
 
   public Collection<Pool> populateProjectPools(long projectId) throws IOException {
-    List<Pool> pools = new ArrayList<Pool>(requestManager.listPoolsByProjectId(projectId));
+    List<Pool> pools = new ArrayList<>(requestManager.listPoolsByProjectId(projectId));
     Collections.sort(pools);
     return pools;
   }
@@ -257,13 +258,13 @@ public class EditProjectController {
   }
 
   public Collection<emPCR> populateProjectEmPCRs(long projectId) throws IOException {
-    List<emPCR> pcrs = new ArrayList<emPCR>(requestManager.listAllEmPCRsByProjectId(projectId));
+    List<emPCR> pcrs = new ArrayList<>(requestManager.listAllEmPCRsByProjectId(projectId));
     Collections.sort(pcrs);
     return pcrs;
   }
 
   public Collection<emPCRDilution> populateProjectEmPcrDilutions(Collection<emPCR> projectEmPCRs) throws IOException {
-    List<emPCRDilution> dilutions = new ArrayList<emPCRDilution>();
+    List<emPCRDilution> dilutions = new ArrayList<>();
     for (emPCR e : projectEmPCRs) {
       dilutions.addAll(requestManager.listAllEmPCRDilutionsByEmPcrId(e.getId()));
     }
@@ -272,7 +273,7 @@ public class EditProjectController {
   }
 
   public Collection<emPCRDilution> populateProjectEmPcrDilutions(long projectId) throws IOException {
-    List<emPCRDilution> dilutions = new ArrayList<emPCRDilution>(requestManager.listAllEmPCRDilutionsByProjectId(projectId));
+    List<emPCRDilution> dilutions = new ArrayList<>(requestManager.listAllEmPCRDilutionsByProjectId(projectId));
     Collections.sort(dilutions);
     return dilutions;
   }
@@ -422,7 +423,7 @@ public class EditProjectController {
       model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, project, securityManager.listAllGroups()));
       model.put("overviews", project.getOverviews());
 
-      Map<Long, String> overviewMap = new HashMap<Long, String>();
+      Map<Long, String> overviewMap = new HashMap<>();
       for (ProjectOverview po : project.getOverviews()) {
         if (po.getWatchers().contains(user)) {
           overviewMap.put(po.getId(), user.getLoginName());
