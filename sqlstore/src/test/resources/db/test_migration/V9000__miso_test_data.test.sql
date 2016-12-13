@@ -309,7 +309,7 @@ VALUES (1, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:49'),
 (4, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:55');
 
 DELETE FROM RunQC;
-INSERT INTO `RunQc`(`run_runId`, `qcUserName`, `qcDate`, `qcMethod`, `information`, `doNotProcess`)
+INSERT INTO `RunQC`(`run_runId`, `qcUserName`, `qcDate`, `qcMethod`, `information`, `doNotProcess`)
 VALUES ( 1, 'username1', '2016-01-26', 1, 'information1', 1),
 ( 2, 'username2', '2016-02-26', 2, 'information2', 0),
 ( 3, 'username3', '2015-03-26', 3, 'information3', 1);

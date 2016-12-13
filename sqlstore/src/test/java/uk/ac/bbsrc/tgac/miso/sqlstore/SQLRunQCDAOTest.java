@@ -13,6 +13,7 @@ import java.util.Locale;
 
 import javax.persistence.CascadeType;
 
+import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -20,25 +21,23 @@ import org.junit.rules.ExpectedException;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
-import org.mockito.stubbing.OngoingStubbing;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.datetime.DateFormatter;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
-import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
+import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
+import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateRunQcDao;
 
 public class SQLRunQCDAOTest extends AbstractDAOTest {
 
@@ -46,24 +45,21 @@ public class SQLRunQCDAOTest extends AbstractDAOTest {
   public final ExpectedException exception = ExpectedException.none();
 
   @InjectMocks
-  private SQLRunQCDAO dao;
+  private HibernateRunQcDao dao;
 
   @Mock
-  private SQLRunDAO runDAO;
+  private RunStore runDAO;
   @Mock
-  private SQLSequencerPartitionContainerDAO sequencerPartitionContainerDAO;
+  private SequencerPartitionContainerStore sequencerPartitionContainerDAO;
 
   @Autowired
-  @Spy
-  private JdbcTemplate jdbcTemplate;
-
+  SessionFactory sessionFactory;
 
   @Before
   public void setup() throws IOException, MisoNamingException {
     MockitoAnnotations.initMocks(this);
-    dao.setJdbcTemplate(jdbcTemplate);
-    dao.setDataObjectFactory(new TgacDataObjectFactory());
-
+    dao.setSessionFactory(sessionFactory);
+    dao.setRunDao(runDAO);
     SequencerPartitionContainer spp = new SequencerPartitionContainerImpl();
     List<Partition> partitionList = new ArrayList();
     Partition partition = new PartitionImpl();

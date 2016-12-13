@@ -43,6 +43,7 @@
         <value>com.eaglegenomics.simlims.core.SecurityProfile</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractPlatform</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractProject</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractRunQC</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractSample</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractSampleQC</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerReference</value>
@@ -61,6 +62,7 @@
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrderImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.RunQCImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleCVSlideImpl</value>
