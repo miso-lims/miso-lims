@@ -27,9 +27,7 @@ UPDATE Pool_Elements SET elementType = CASE elementType WHEN 'uk.ac.bbsrc.tgac.m
 ALTER TABLE SequencerReference ADD COLUMN ip VARCHAR(50) NOT NULL DEFAULT 'localhost';
 -- H2 doesn't have INET_NTOA function
 -- StartNoTest
-UPDATE SequencerReference tabl SET ip = (
-  SELECT INET_NTOA(ipAddress) FROM (SELECT * FROM SequencerReference) sr 
-  WHERE sr.referenceId = tabl.referenceId);
+UPDATE SequencerReference SET ip = INET_NTOA(ipAddress);
 --EndNoTest
 ALTER TABLE SequencerReference DROP COLUMN available;
 ALTER TABLE SequencerReference DROP COLUMN ipAddress;
