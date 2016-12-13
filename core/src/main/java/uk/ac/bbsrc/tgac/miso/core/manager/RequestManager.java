@@ -38,14 +38,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
-import uk.ac.bbsrc.tgac.miso.core.data.EntityGroup;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
-import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
@@ -145,8 +143,6 @@ public interface RequestManager {
   public long saveKitDescriptor(KitDescriptor kitDescriptor) throws IOException;
 
   public long saveAlert(Alert alert) throws IOException;
-
-  public long saveEntityGroup(EntityGroup<? extends Nameable, ? extends Nameable> entityGroup) throws IOException;
 
   public long saveBox(Box box) throws IOException;
 
@@ -281,8 +277,6 @@ public interface RequestManager {
   public QcType getPoolQcTypeByName(String qcName) throws IOException;
 
   public Alert getAlertById(long alertId) throws IOException;
-
-  public EntityGroup<? extends Nameable, ? extends Nameable> getEntityGroupById(long entityGroupId) throws IOException;
 
   public Box getBoxById(long boxId) throws IOException;
 
@@ -585,8 +579,6 @@ public interface RequestManager {
   public void deleteSequencerServiceRecord(SequencerServiceRecord serviceRecord) throws IOException;
 
   public void deletePool(Pool pool) throws IOException;
-
-  public void deleteEntityGroup(EntityGroup<? extends Nameable, ? extends Nameable> entityGroup) throws IOException;
 
   public void deletePartition(SequencerPoolPartition partition) throws IOException;
 

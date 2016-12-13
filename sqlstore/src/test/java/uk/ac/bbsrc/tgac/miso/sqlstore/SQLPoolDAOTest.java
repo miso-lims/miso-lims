@@ -47,7 +47,6 @@ import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.core.store.WatcherStore;
-import uk.ac.bbsrc.tgac.miso.sqlstore.util.DaoLookup;
 
 public class SQLPoolDAOTest extends AbstractDAOTest {
 
@@ -75,8 +74,6 @@ public class SQLPoolDAOTest extends AbstractDAOTest {
   @Mock
   private BoxStore boxDAO;
   @Mock
-  private DaoLookup daoLookup;
-  @Mock
   private com.eaglegenomics.simlims.core.manager.SecurityManager securityManager;
   @Mock
   private NamingScheme namingScheme;
@@ -98,7 +95,6 @@ public class SQLPoolDAOTest extends AbstractDAOTest {
   private void mockLibraryDilutionStore() throws IOException {
     @SuppressWarnings("unchecked")
     Store<LibraryDilution> ldiStore = Mockito.mock(Store.class);
-    Mockito.when(daoLookup.lookup(LibraryDilution.class)).thenReturn(ldiStore);
     Mockito.when(ldiStore.get(Mockito.anyLong())).thenReturn(new LibraryDilution());
   }
 

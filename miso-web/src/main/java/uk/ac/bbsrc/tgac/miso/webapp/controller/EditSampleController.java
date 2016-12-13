@@ -74,13 +74,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.AbstractSampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
-import uk.ac.bbsrc.tgac.miso.core.data.EntityGroup;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity.DonorSex;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
@@ -203,40 +201,6 @@ public class EditSampleController {
   @ModelAttribute("sampleOptions")
   public String getSampleOptions(UriComponentsBuilder uriBuilder, HttpServletResponse response) throws IOException {
     return mapper.writeValueAsString(sampleOptionsController.getSampleOptions(uriBuilder, response));
-  }
-
-  public Map<String, Sample> getAdjacentSamplesInGroup(Sample s, @RequestParam(value = "entityGroupId", required = true) Long entityGroupId)
-      throws IOException {
-    Project p = s.getProject();
-    EntityGroup<? extends Nameable, Sample> sgroup = (EntityGroup<? extends Nameable, Sample>) requestManager
-        .getEntityGroupById(entityGroupId);
-
-    Sample prevS = null;
-    Sample nextS = null;
-
-    if (p != null) {
-      if (!sgroup.getEntities().isEmpty()) {
-        Map<String, Sample> ret = new HashMap<>();
-        List<Sample> ss = new ArrayList<>(sgroup.getEntities());
-        Collections.sort(ss);
-        for (int i = 0; i < ss.size(); i++) {
-          if (ss.get(i).equals(s)) {
-            if (i != 0 && ss.get(i - 1) != null) {
-              prevS = ss.get(i - 1);
-            }
-
-            if (i != ss.size() - 1 && ss.get(i + 1) != null) {
-              nextS = ss.get(i + 1);
-            }
-            break;
-          }
-        }
-        ret.put("previousSample", prevS);
-        ret.put("nextSample", nextS);
-        return ret;
-      }
-    }
-    return Collections.emptyMap();
   }
 
   public Map<String, Sample> getAdjacentSamplesInProject(Sample s, @RequestParam(value = "projectId", required = false) Long projectId)

@@ -417,7 +417,7 @@
     </li>
   </ul>
   <span style="clear:both">
-    <table class="list" id="overview_samplegroup_table_${overview.sampleGroup.id}">
+    <table class="list" id="overview_samplegroup_table_${overview.id}">
       <thead>
       <tr>
         <th>Sample Name</th>
@@ -426,12 +426,12 @@
       </tr>
       </thead>
       <tbody>
-      <c:forEach items="${overview.sampleGroup.entities}" var="sample">
+      <c:forEach items="${overview.samples}" var="sample">
         <tr sampleId="${sample.id}" onMouseOver="this.className='highlightrow'"
             onMouseOut="this.className='normalrow'">
           <td><b><a href="<c:url value='/miso/sample/${sample.id}'/>">${sample.name}</a></b></td>
           <td><a href="<c:url value='/miso/sample/${sample.id}'/>">${sample.alias}</a></td>
-          <td class="misoicon" onclick="Sample.removeSampleFromGroup(${sample.id}, ${overview.sampleGroup.id}, Utils.page.pageReload);">
+          <td class="misoicon" onclick="Sample.removeSampleFromOverview(${sample.id}, ${overview.id}, Utils.page.pageReload);">
             <span class="ui-icon ui-icon-trash"/>
           </td>
         </tr>

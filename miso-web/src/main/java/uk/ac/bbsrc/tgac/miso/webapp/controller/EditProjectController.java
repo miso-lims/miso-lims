@@ -71,8 +71,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
@@ -282,9 +280,9 @@ public class EditProjectController {
     Map<Long, Collection<Library>> libraryGroupMap = new HashMap<>();
 
     for (ProjectOverview po : project.getOverviews()) {
-      if (po.getSampleGroup() != null && !po.getSampleGroup().getEntities().isEmpty()) {
+      if (po.getSampleGroup() != null && !po.getSamples().isEmpty()) {
         Set<Library> libs = new HashSet<>();
-        for (Sample s : po.getSampleGroup().getEntities()) {
+        for (Sample s : po.getSamples()) {
           for (Library pl : projectLibraries) {
             if (pl.getSample().equals(s)) {
               libs.add(pl);

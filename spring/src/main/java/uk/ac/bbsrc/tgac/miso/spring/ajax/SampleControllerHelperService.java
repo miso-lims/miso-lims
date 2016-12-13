@@ -69,8 +69,6 @@ import net.sourceforge.fluxion.ajax.util.JSONUtils;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
-import uk.ac.bbsrc.tgac.miso.core.data.EntityGroup;
-import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.PrintJob;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -151,7 +149,7 @@ public class SampleControllerHelperService {
         Project p = requestManager.getProjectById(json.getLong("projectId"));
         SecurityProfile sp = p.getSecurityProfile();
         JSONArray a = JSONArray.fromObject(json.get("samples"));
-        Set<Sample> saveSet = new HashSet<Sample>();
+        Set<Sample> saveSet = new HashSet<>();
 
         for (JSONObject j : (Iterable<JSONObject>) a) {
           try {
@@ -210,14 +208,14 @@ public class SampleControllerHelperService {
           }
         }
 
-        Set<Sample> samples = new HashSet<Sample>(requestManager.listAllSamples());
+        Set<Sample> samples = new HashSet<>(requestManager.listAllSamples());
         // relative complement to find objects that aren't already persisted
         Set<Sample> complement = LimsUtils.relativeComplementByProperty(Sample.class, "getAlias", saveSet, samples);
 
         if (complement != null && !complement.isEmpty()) {
-          List<Sample> sortedList = new ArrayList<Sample>(complement);
-          List<String> savedSamples = new ArrayList<String>();
-          List<String> taxonErrorSamples = new ArrayList<String>();
+          List<Sample> sortedList = new ArrayList<>(complement);
+          List<String> savedSamples = new ArrayList<>();
+          List<String> taxonErrorSamples = new ArrayList<>();
           Collections.sort(sortedList, new AliasComparator(Sample.class));
 
           for (Sample sample : sortedList) {
@@ -240,7 +238,7 @@ public class SampleControllerHelperService {
             }
           }
 
-          Map<String, Object> response = new HashMap<String, Object>();
+          Map<String, Object> response = new HashMap<>();
           response.put("savedSamples", JSONArray.fromObject(savedSamples));
           response.put("taxonErrorSamples", JSONArray.fromObject(taxonErrorSamples));
 
@@ -263,7 +261,7 @@ public class SampleControllerHelperService {
 
   public JSONObject getSampleQCUsers(HttpSession session, JSONObject json) {
     try {
-      Collection<String> users = new HashSet<String>();
+      Collection<String> users = new HashSet<>();
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       users.add(user.getFullName());
 
@@ -275,7 +273,7 @@ public class SampleControllerHelperService {
         if (p.userCanRead(user)) {
           for (ProjectOverview po : p.getOverviews()) {
             if (po.getSampleGroup() != null) {
-              if (po.getSampleGroup().getEntities().contains(sample)) {
+              if (po.getSamples().contains(sample)) {
                 users.add(po.getPrincipalInvestigator());
               }
             }
@@ -286,7 +284,7 @@ public class SampleControllerHelperService {
       for (String name : users) {
         sb.append("<option value='" + name + "'>" + name + "</option>");
       }
-      Map<String, Object> map = new HashMap<String, Object>();
+      Map<String, Object> map = new HashMap<>();
       map.put("qcUserOptions", sb.toString());
       map.put("sampleId", json.getString("sampleId"));
       return JSONUtils.JSONObjectResponse(map);
@@ -303,7 +301,7 @@ public class SampleControllerHelperService {
       for (QcType s : types) {
         sb.append("<option units='" + s.getUnits() + "' value='" + s.getQcTypeId() + "'>" + s.getName() + "</option>");
       }
-      Map<String, Object> map = new HashMap<String, Object>();
+      Map<String, Object> map = new HashMap<>();
       map.put("types", sb.toString());
       return JSONUtils.JSONObjectResponse(map);
     } catch (IOException e) {
@@ -406,7 +404,7 @@ public class SampleControllerHelperService {
 
       // persist
       if (ok) {
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
         JSONArray a = new JSONArray();
         JSONArray errors = new JSONArray();
         for (JSONObject qc : (Iterable<JSONObject>) qcs) {
@@ -598,7 +596,7 @@ public class SampleControllerHelperService {
         }
       }
 
-      Queue<File> thingsToPrint = new LinkedList<File>();
+      Queue<File> thingsToPrint = new LinkedList<>();
       JSONArray ss = JSONArray.fromObject(json.getString("samples"));
       for (JSONObject s : (Iterable<JSONObject>) ss) {
         try {
@@ -666,7 +664,7 @@ public class SampleControllerHelperService {
 
     try {
       if (!isStringEmptyOrNull(idBarcode)) {
-        List<Boxable> previouslyBarcodedItems = new ArrayList<Boxable>(requestManager.getBoxablesFromBarcodeList(Arrays.asList(idBarcode)));
+        List<Boxable> previouslyBarcodedItems = new ArrayList<>(requestManager.getBoxablesFromBarcodeList(Arrays.asList(idBarcode)));
         if (!previouslyBarcodedItems.isEmpty()
             && !(previouslyBarcodedItems.size() == 1 && previouslyBarcodedItems.get(0).getId() == sampleId)) {
           Boxable previouslyBarcodedItem = previouslyBarcodedItems.get(0);
@@ -729,7 +727,7 @@ public class SampleControllerHelperService {
     }
   }
 
-  public JSONObject removeSampleFromGroup(HttpSession session, JSONObject json) {
+  public JSONObject removeSampleFromOverview(HttpSession session, JSONObject json) {
     User user;
     try {
       user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
@@ -739,15 +737,15 @@ public class SampleControllerHelperService {
     }
 
     if (user != null) {
-      if (json.has("sampleId") && json.has("sampleGroupId")) {
+      if (json.has("sampleId") && json.has("overviewId")) {
         Long sampleId = json.getLong("sampleId");
-        Long sampleGroupId = json.getLong("sampleGroupId");
+        Long overviewId = json.getLong("overviewId");
         try {
+          ProjectOverview overview = requestManager.getProjectOverviewById(overviewId);
           Sample s = requestManager.getSampleById(sampleId);
-          EntityGroup<? extends Nameable, ? extends Nameable> osg = requestManager.getEntityGroupById(sampleGroupId);
-          if (osg.getEntities().contains(s)) {
-            if (osg.getEntities().remove(s)) {
-              requestManager.saveEntityGroup(osg);
+          if (overview.getSamples().contains(s)) {
+            if (overview.getSamples().remove(s)) {
+              requestManager.saveProjectOverview(overview);
 
               cacheHelperService.evictObjectFromCache(s.getProject(), Project.class);
               return JSONUtils.SimpleJSONResponse("Sample removed from group");

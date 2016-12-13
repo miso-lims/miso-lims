@@ -1,8 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.migration.destination;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.persistence.CascadeType;
 
@@ -16,11 +14,9 @@ import org.springframework.security.core.context.SecurityContextImpl;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.LocalSecurityManager;
 
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
-import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.migration.util.OicrMigrationNamingScheme;
 import uk.ac.bbsrc.tgac.miso.persistence.HibernateSampleClassDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateDetailedQcStatusDao;
@@ -70,7 +66,6 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.SQLSequencerReferenceDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLStatusDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLTargetedSequencingDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLWatcherDAO;
-import uk.ac.bbsrc.tgac.miso.sqlstore.util.DaoLookup;
 
 /**
  * This class is used to simplify creation and wiring of MISO services. Some of the config is currently hardcoded - mainly naming schemes
@@ -87,7 +82,6 @@ public class MisoServiceManager {
 
   private LocalSecurityManager securityManager; // Supports JDBC authentication only
   private MigrationAuthorizationManager authorizationManager;
-  private DaoLookup daoLookup;
 
   private HibernateSecurityDao securityStore;
   private HibernateSecurityProfileDao securityProfileDao;
@@ -210,7 +204,6 @@ public class MisoServiceManager {
     m.setDefaultLibraryDesignDao();
     m.setDefaultLibraryDesignCodeDao();
     m.setDefaultIndexDao();
-    m.setDefaultDaoLookup();
     m.setDefaultPoolQcDao();
     m.setDefaultSequencingParametersDao();
 
@@ -640,7 +633,6 @@ public class MisoServiceManager {
 
   private void updateDilutionDaoDependencies() {
     if (libraryDao != null) libraryDao.setDilutionDAO(dilutionDao);
-    if (daoLookup != null) daoLookup.setDaos(makeDaoLookupMap());
   }
 
   public SQLTargetedSequencingDAO getTargetedSequencingDao() {
@@ -677,7 +669,6 @@ public class MisoServiceManager {
     dao.setAutoGenerateIdentificationBarcodes(autoGenerateIdBarcodes);
     dao.setBoxDAO(boxDao);
     dao.setChangeLogDAO(changeLogDao);
-    dao.setDaoLookup(daoLookup);
     dao.setDataObjectFactory(dataObjectFactory);
     dao.setExperimentDAO(experimentDao);
     dao.setJdbcTemplate(jdbcTemplate);
@@ -1328,31 +1319,6 @@ public class MisoServiceManager {
 
   private void updateIndexDaoDependencies() {
     if (libraryDao != null) libraryDao.setIndexStore(indexDao);
-  }
-
-  public DaoLookup getDaoLookup() {
-    return daoLookup;
-  }
-
-  public void setDaoLookup(DaoLookup daoLookup) {
-    this.daoLookup = daoLookup;
-    updateDaoLookupDependencies();
-  }
-
-  public void setDefaultDaoLookup() {
-    DaoLookup lookup = new DaoLookup();
-    lookup.setDaos(makeDaoLookupMap());
-    setDaoLookup(lookup);
-  }
-  
-  private Map<Class<?>, Store<?>> makeDaoLookupMap() {
-    Map<Class<?>, Store<?>> daoMap = new HashMap<>();
-    if (dilutionDao != null) daoMap.put(LibraryDilution.class, dilutionDao);
-    return daoMap;
-  }
-
-  private void updateDaoLookupDependencies() {
-    if (poolDao != null) poolDao.setDaoLookup(daoLookup);
   }
 
   public SQLPoolQCDAO getPoolQcDao() {
