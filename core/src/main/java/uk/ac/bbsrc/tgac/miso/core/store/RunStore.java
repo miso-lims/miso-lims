@@ -160,7 +160,7 @@ public interface RunStore extends Store<Run>, Cascadable, Remover<Run>, NamingSc
   public List<Run> listBySearchOffsetAndNumResults(int offset, int limit, String querystr, String sortDir, String sortCol)
       throws IOException;
 
-  public List<Run> listByOffsetAndNumResults(int ofset, int limit, String sortDir, String sortCol) throws IOException;
+  public List<Run> listByOffsetAndNumResults(int offset, int limit, String sortDir, String sortCol) throws IOException;
 
   public long countBySearch(String querystr) throws IOException;
 }

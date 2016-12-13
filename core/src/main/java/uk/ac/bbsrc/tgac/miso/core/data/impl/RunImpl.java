@@ -28,7 +28,9 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.persistence.CascadeType;
-import javax.persistence.OneToMany;
+import javax.persistence.Entity;
+import javax.persistence.ManyToMany;
+import javax.persistence.Table;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,10 +52,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
  * @author Rob Davey
  * @since 0.1.0
  */
+@Entity
+@Table(name = "Run")
 public class RunImpl extends AbstractRun implements Serializable {
   protected static final Logger log = LoggerFactory.getLogger(RunImpl.class);
 
-  @OneToMany(cascade = CascadeType.ALL)
+  @ManyToMany(targetEntity = SequencerPartitionContainerImpl.class, cascade = CascadeType.ALL)
   private List<SequencerPartitionContainer<SequencerPoolPartition>> containers = new AutoPopulatingList<SequencerPartitionContainer<SequencerPoolPartition>>(
       SequencerPartitionContainerImpl.class);
 
