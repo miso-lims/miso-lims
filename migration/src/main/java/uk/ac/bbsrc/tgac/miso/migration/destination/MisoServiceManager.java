@@ -39,6 +39,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSecurityDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSecurityProfileDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSequencerReferenceDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSequencingParametersDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateStatusDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateStudyDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSubprojectDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTargetedSequencingDao;
@@ -64,7 +65,6 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.SQLProjectDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLRunDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLSequencerPartitionContainerDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLSequencerPoolPartitionDAO;
-import uk.ac.bbsrc.tgac.miso.sqlstore.SQLStatusDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLWatcherDAO;
 
 /**
@@ -104,7 +104,7 @@ public class MisoServiceManager {
   private HibernateRunQcDao runQcDao;
   private SQLSequencerPartitionContainerDAO sequencerPartitionContainerDao;
   private SQLSequencerPoolPartitionDAO partitionDao;
-  private SQLStatusDAO statusDao;
+  private HibernateStatusDao statusDao;
   private HibernateSequencerReferenceDao sequencerReferenceDao;
   private SQLBoxDAO boxDao;
 
@@ -880,18 +880,17 @@ public class MisoServiceManager {
     if (sequencerPartitionContainerDao != null) sequencerPartitionContainerDao.setPartitionDAO(partitionDao);
   }
 
-  public SQLStatusDAO getStatusDao() {
+  public HibernateStatusDao getStatusDao() {
     return statusDao;
   }
 
-  public void setStatusDao(SQLStatusDAO statusDao) {
+  public void setStatusDao(HibernateStatusDao statusDao) {
     this.statusDao = statusDao;
     updateStatusDaoDependencies();
   }
 
   public void setDefaultStatusDao() {
-    SQLStatusDAO dao = new SQLStatusDAO();
-    dao.setDataObjectFactory(dataObjectFactory);
+    HibernateStatusDao dao = new HibernateStatusDao();
     dao.setJdbcTemplate(jdbcTemplate);
     setStatusDao(dao);
   }

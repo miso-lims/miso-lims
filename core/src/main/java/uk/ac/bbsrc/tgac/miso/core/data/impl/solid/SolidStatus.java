@@ -23,6 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data.impl.solid;
 
+import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -110,13 +111,16 @@ public class SolidStatus extends StatusImpl {
 
         setRunName(runName);
         setHealth(HealthType.Unknown);
+
+        setXml(statusXml);
       }
-      setXml(statusXml);
     } catch (ParserConfigurationException e) {
       log.error("parse status XML", e);
     } catch (TransformerException e) {
       log.error("parse status XML", e);
     } catch (ParseException e) {
+      log.error("parse status XML", e);
+    } catch (UnsupportedEncodingException e) {
       log.error("parse status XML", e);
     }
   }

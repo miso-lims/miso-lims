@@ -23,6 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Date;
 
 import org.codehaus.jackson.annotate.JsonTypeInfo;
@@ -61,16 +62,18 @@ public interface Status extends Securable {
    * files, this field is null.
    * 
    * @return String xml.
+   * @throws UnsupportedEncodingException
    */
-  public String getXml();
+  public String getXml() throws UnsupportedEncodingException;
 
   /**
    * Sets the underlying XML status string of this Status object. Illumina for example produces Status.xml files.
    * 
    * @param xml
    *          String.
+   * @throws UnsupportedEncodingException
    */
-  public void setXml(String xml);
+  public void setXml(String xml) throws UnsupportedEncodingException;
 
   /**
    * Returns the health of this Status object.

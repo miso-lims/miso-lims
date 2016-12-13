@@ -80,6 +80,7 @@
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleValidRelationshipImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingParametersImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl</value>
