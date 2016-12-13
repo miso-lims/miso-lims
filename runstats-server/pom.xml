@@ -29,10 +29,10 @@
   <parent>
     <artifactId>miso</artifactId>
     <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-    <version>0.2.43-SNAPSHOT</version>
+    <version>0.2.43</version>
   </parent>
   <artifactId>runstats-server</artifactId>
-  <version>0.2.43-SNAPSHOT</version>
+  <version>0.2.43</version>
   <packaging>jar</packaging>
   <name>runstats-server</name>
   <url>http://maven.apache.org</url>
