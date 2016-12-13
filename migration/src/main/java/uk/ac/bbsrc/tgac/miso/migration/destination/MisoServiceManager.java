@@ -38,6 +38,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleNumberPerProjectDao
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSamplePurposeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleQcDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleValidRelationshipDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSecurityDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSequencingParametersDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateStudyDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSubprojectDao;
@@ -62,7 +63,6 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.SQLPoolQCDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLProjectDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLRunDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLRunQCDAO;
-import uk.ac.bbsrc.tgac.miso.sqlstore.SQLSecurityDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLSecurityProfileDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLSequencerPartitionContainerDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLSequencerPoolPartitionDAO;
@@ -89,7 +89,7 @@ public class MisoServiceManager {
   private MigrationAuthorizationManager authorizationManager;
   private DaoLookup daoLookup;
 
-  private SQLSecurityDAO securityStore;
+  private HibernateSecurityDao securityStore;
   private SQLSecurityProfileDAO securityProfileDao;
   private SQLWatcherDAO watcherDao;
   private SQLProjectDAO projectDao;
@@ -263,17 +263,17 @@ public class MisoServiceManager {
     if (referenceGenomeService != null) referenceGenomeService.setAuthorizationManager(authorizationManager);
   }
 
-  public SQLSecurityDAO getsecurityStore() {
+  public HibernateSecurityDao getsecurityStore() {
     return securityStore;
   }
 
-  public void setSecurityStore(SQLSecurityDAO securityStore) {
+  public void setSecurityStore(HibernateSecurityDao securityStore) {
     this.securityStore = securityStore;
     updateSecurityStoreDependencies();
   }
 
   public void setDefaultSecurityStore() {
-    SQLSecurityDAO store = new SQLSecurityDAO();
+    HibernateSecurityDao store = new HibernateSecurityDao();
     store.setJdbcTemplate(jdbcTemplate);
     store.setSecurityProfileDAO(securityProfileDao);
     setSecurityStore(store);

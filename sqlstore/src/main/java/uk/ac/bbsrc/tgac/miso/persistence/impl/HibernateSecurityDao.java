@@ -21,7 +21,7 @@
  * *********************************************************************
  */
 
-package uk.ac.bbsrc.tgac.miso.sqlstore;
+package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -40,6 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.Group;
@@ -60,11 +61,12 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
  * @since 0.0.2
  */
 @Transactional(rollbackFor = Exception.class)
-public class SQLSecurityDAO implements SecurityStore {
+@Repository
+public class HibernateSecurityDao implements SecurityStore {
   private static final String USER_TABLE_NAME = "User";
   private static final String GROUP_TABLE_NAME = "_Group";
 
-  protected static final Logger log = LoggerFactory.getLogger(SQLSecurityDAO.class);
+  protected static final Logger log = LoggerFactory.getLogger(HibernateSecurityDao.class);
 
   @Autowired
   private SessionFactory sessionFactory;

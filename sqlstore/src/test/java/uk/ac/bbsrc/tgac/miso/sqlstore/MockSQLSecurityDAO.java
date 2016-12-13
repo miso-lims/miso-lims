@@ -9,6 +9,8 @@ import java.util.Map;
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSecurityDao;
+
 /**
  * uk.ac.bbsrc.tgac.miso.sqlstore
  * <p/>
@@ -18,7 +20,7 @@ import com.eaglegenomics.simlims.core.User;
  * @date 08/10/12
  * @since 0.1.9
  */
-public class MockSQLSecurityDAO extends SQLSecurityDAO {
+public class MockSQLSecurityDAO extends HibernateSecurityDao {
   private final Map<Long, User> usermap = Collections.synchronizedMap(new HashMap<Long, User>());
   private final Map<Long, Collection<Group>> groupmap = Collections.synchronizedMap(new HashMap<Long, Collection<Group>>());
 
