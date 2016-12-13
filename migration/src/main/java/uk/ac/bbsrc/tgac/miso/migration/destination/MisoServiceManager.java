@@ -753,8 +753,6 @@ public class MisoServiceManager {
   public void setDefaultKitDao() {
     HibernateKitDao dao = new HibernateKitDao();
     dao.setJdbcTemplate(jdbcTemplate);
-    dao.setNoteDAO(noteDao);
-    dao.setSecurityDAO(securityStore);
     setKitDao(dao);
   }
 
