@@ -1,3 +1,9 @@
+# 0.2.44
+
+Changes:
+
+ * Changed to next development version
+
 # 0.2.43
 
 Changes:
