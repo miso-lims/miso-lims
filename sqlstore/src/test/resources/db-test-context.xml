@@ -42,6 +42,7 @@
         <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractPlatform</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractProject</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractSample</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractSampleQC</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.Index</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.IndexFamily</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.KitImpl</value>
@@ -66,8 +67,7 @@
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleLCMTubeImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleNumberPerProjectImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SamplePurposeImpl</value>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleGroupImpl</value>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleQCImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleStockImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl</value>
@@ -79,22 +79,9 @@
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl</value>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractSample</value>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl</value>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractProject</value>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl</value>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrderImpl</value>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl</value>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl</value>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingParametersImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor</value>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleValidRelationshipImpl</value>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleNumberPerProjectImpl</value>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.InstituteImpl</value>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl</value>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAdditionalInfoImpl</value>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.type.QcType</value>
         <value>uk.ac.bbsrc.tgac.miso.core.event.impl.DefaultAlert</value>
       </list>
     </property>

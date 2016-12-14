@@ -36,6 +36,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateReferenceGenomeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleNumberPerProjectDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSamplePurposeDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleQcDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleValidRelationshipDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSequencingParametersDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateStudyDao;
@@ -61,7 +62,6 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.SQLPoolQCDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLProjectDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLRunDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLRunQCDAO;
-import uk.ac.bbsrc.tgac.miso.sqlstore.SQLSampleQCDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLSecurityDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLSecurityProfileDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLSequencerPartitionContainerDAO;
@@ -95,7 +95,7 @@ public class MisoServiceManager {
   private SQLProjectDAO projectDao;
   private SQLChangeLogDAO changeLogDao;
   private SQLNoteDAO noteDao;
-  private SQLSampleQCDAO sampleQcDao;
+  private HibernateSampleQcDao sampleQcDao;
   private SQLLibraryDAO libraryDao;
   private SQLLibraryQCDAO libraryQcDao;
   private SQLLibraryDilutionDAO dilutionDao;
@@ -484,7 +484,6 @@ public class MisoServiceManager {
     dao.setJdbcTemplate(jdbcTemplate);
     dao.setLibraryDao(libraryDao);
     dao.setNoteDao(noteDao);
-    dao.setSampleQcDao(sampleQcDao);
     dao.setSecurityDao(securityStore);
     dao.setSecurityProfileDao(securityProfileDao);
     dao.setSessionFactory(sessionFactory);
@@ -493,7 +492,6 @@ public class MisoServiceManager {
 
   private void updateSampleDaoDependencies() {
     if (sampleService != null) sampleService.setSampleDao(sampleDao);
-    if (sampleQcDao != null) sampleQcDao.setSampleDAO(sampleDao);
     if (libraryDao != null) libraryDao.setSampleDAO(sampleDao);
     if (boxDao != null) boxDao.setSampleDAO(sampleDao);
     if (projectDao != null) projectDao.setSampleDAO(sampleDao);
@@ -548,25 +546,21 @@ public class MisoServiceManager {
     if (runDao != null) runDao.setNoteDAO(noteDao);
   }
 
-  public SQLSampleQCDAO getSampleQcDao() {
+  public HibernateSampleQcDao getSampleQcDao() {
     return sampleQcDao;
   }
 
-  public void setSampleQcDao(SQLSampleQCDAO sampleQcDao) {
+  public void setSampleQcDao(HibernateSampleQcDao sampleQcDao) {
     this.sampleQcDao = sampleQcDao;
     updateSampleQcDaoDependencies();
   }
 
   public void setDefaultSampleQcDao() {
-    SQLSampleQCDAO dao = new SQLSampleQCDAO();
-    dao.setDataObjectFactory(dataObjectFactory);
-    dao.setJdbcTemplate(jdbcTemplate);
-    dao.setSampleDAO(sampleDao);
+    HibernateSampleQcDao dao = new HibernateSampleQcDao();
     setSampleQcDao(dao);
   }
 
   private void updateSampleQcDaoDependencies() {
-    if (sampleDao != null) sampleDao.setSampleQcDao(sampleQcDao);
   }
 
   public SQLLibraryDAO getLibraryDao() {

@@ -35,8 +35,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Transient;
@@ -54,6 +56,7 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleDerivedInfo;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
@@ -80,17 +83,20 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   private Project project;
 
   @Transient
-  private final Collection<Experiment> experiments = new HashSet<Experiment>();
+  private final Collection<Experiment> experiments = new HashSet<>();
 
   @Transient
   @JsonManagedReference
-  private final Collection<Library> libraries = new HashSet<Library>();
+  private final Collection<Library> libraries = new HashSet<>();
 
-  @Transient
-  private Collection<SampleQC> sampleQCs = new TreeSet<SampleQC>();
+  @OneToMany(targetEntity = SampleQCImpl.class)
+  private Collection<SampleQC> sampleQCs = new TreeSet<>();
 
-  @Transient
-  private Collection<Note> notes = new HashSet<Note>();
+  @OneToMany(targetEntity = Note.class)
+  @JoinTable(name = "Sample_Note", joinColumns = {
+      @JoinColumn(name = "sample_sampleId", nullable = false, updatable = false) }, inverseJoinColumns = {
+          @JoinColumn(name = "notes_noteId", nullable = false, updatable = false) })
+  private Collection<Note> notes = new HashSet<>();
 
   @Transient
   private final Collection<ChangeLog> changeLog = new ArrayList<>();

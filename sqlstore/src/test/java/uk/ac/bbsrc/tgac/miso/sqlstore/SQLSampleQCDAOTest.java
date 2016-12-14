@@ -22,17 +22,13 @@
 
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
 
-import javax.persistence.CascadeType;
-
+import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -41,9 +37,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -51,9 +45,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
-import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
-
 import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleQcDao;
 
 public class SQLSampleQCDAOTest extends AbstractDAOTest {
 
@@ -61,20 +54,18 @@ public class SQLSampleQCDAOTest extends AbstractDAOTest {
   public final ExpectedException exception = ExpectedException.none();
 
   @Autowired
-  @Spy
-  private JdbcTemplate jdbcTemplate;
+  private SessionFactory sessionFactory;
 
   @Mock
   private SampleStore sampleDAO;
   
   @InjectMocks
-  private SQLSampleQCDAO dao;
+  private HibernateSampleQcDao dao;
 
   @Before
   public void setup() throws IOException {
     MockitoAnnotations.initMocks(this);
-    dao.setJdbcTemplate(jdbcTemplate);
-    dao.setDataObjectFactory(new TgacDataObjectFactory());
+    dao.setSessionFactory(sessionFactory);
   }
   
   @Test
@@ -206,7 +197,6 @@ public class SQLSampleQCDAOTest extends AbstractDAOTest {
   public void testRemove() throws IOException {
     SampleQC sampleQC = dao.get(1L);
     assertNotNull(sampleQC);
-    dao.setCascadeType(CascadeType.REMOVE);
     dao.remove(sampleQC);
     assertNull(dao.get(1L));
   }

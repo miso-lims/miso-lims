@@ -23,6 +23,11 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import javax.persistence.ManyToOne;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.PrimaryKeyJoinColumn;
+
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
 
 /**
@@ -31,10 +36,14 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
  * @author Rob Davey
  * @since 0.0.2
  */
+@MappedSuperclass
 public abstract class AbstractSampleQC extends AbstractQC implements SampleQC {
   public static final String UNITS = "ng/&#181;l";
 
   private Double results;
+
+  @ManyToOne(targetEntity = SampleImpl.class)
+  @PrimaryKeyJoinColumn
   private Sample sample;
 
   @Override
