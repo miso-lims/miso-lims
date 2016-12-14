@@ -193,6 +193,7 @@
     </td>
   </tr>
 </table>
+
 <%@ include file="volumeControl.jspf" %>
 <%@ include file="permissions.jsp" %>
 <br/>
@@ -203,6 +204,7 @@
     Validate.attachParsley('#pool-form');
   });
 </script>
+</form:form>
 
 <!--notes start -->
 <c:if test="${pool.id != 0}">
@@ -249,6 +251,11 @@
 <!-- notes end -->
 
 <c:if test="${pool.id != 0}">
+  <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#qcs_arrowclick'), 'qcs');">
+    QCs
+    <div id="qcs_arrowclick" class="toggleLeftDown"></div>
+  </div>
+  <div id="qcs" style="display:none;">
   <h1>
     <div id="qcsTotalCount">
     </div>
@@ -316,8 +323,14 @@
       });
     </script>
   </span>
+  </div>
 </c:if>
 
+<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#experiments_arrowclick'), 'experiments');")>
+  Experiments
+  <div id="experiments_arrowclick" class="toggleLeftDown"></div>
+</div>
+<div id="experiments" style="display:none;">
 <h1>Experiments</h1>
 
 <div class="note">
@@ -356,9 +369,15 @@
     </td>
   </tr>
 </table>
+</div>
 <br/>
 
 <c:if test="${pool.id != 0}">
+<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#orders_arrowclick'), 'orders');">
+  Orders
+  <div id="orders_arrowclick" class="toggleLeftDown"></div>
+</div>
+<div id="orders" style="display:block">
   <h1>Orders</h1>
   <span onclick="Pool.orders.createOrder()" class="sddm fg-button ui-state-default ui-corner-all">Add Order</span>
 
@@ -367,10 +386,16 @@
   <br/>
   <h1>Order Completion</h1>
   <table cellpadding="0" cellspacing="0" border="0" class="display" id="order-completion-table"></table>
+</div>
   <br/>
 
 </c:if>
 
+<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#pooled_arrowclick'), 'pooled');">
+  Pooled Elements
+  <div id="pooled_arrowclick" class="toggleLeftDown"></div>
+</div>
+<div id="pooled" style="display:block">
 <h1>Pooled Elements</h1>
 <c:choose>
 <c:when test="${pool.id == 0}">
@@ -410,87 +435,91 @@
 	  </tbody>
     </table>
   </div>
+
+  <script type="text/javascript">
+    jQuery(document).ready(function () {
+      jQuery('#pooledElementsDatatable').dataTable({
+        "aaSorting": [
+          [0, 'desc']              
+        ],
+        "aoColumns": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "iDisplayLength": 50,
+        "bJQueryUI": true,
+        "bRetrieve": true,
+        "sPaginationType": "full_numbers"
+      });
+    });
+  </script>
+  
+  <h2 class="hrule">Select poolable elements:</h2>
+  
+  <div id="elementSelectDatatableDiv"></div>
+  
+  <script type="text/javascript">
+      jQuery(document).ready(function () {
+          Pool.ui.createElementSelectDatatable('${pool.platformType.key}', ${pool.id}, '${libraryDilutionUnits}');
+      });
+  </script>
+
+  <script type="text/javascript">
+    jQuery(document).ready(function () {
+      jQuery('#runsDatatable').dataTable({
+        "aaData": ${runsJSON},
+        "aaSorting": [
+          [0, 'desc']
+        ],
+        "aoColumns": [
+          {
+            "sTitle" : "Name",
+            "mData" : "name",
+            "mRender": function (data, type, full) {
+              return "<a href=\"/miso/run/" + full.id + "\">" + data + "</a>";
+            }
+          },
+          {
+            "sTitle" : "Alias",
+            "mData" : "alias",
+            "mRender": function (data, type, full) {
+              return "<a href=\"/miso/run/" + full.id + "\">" + data + "</a>";
+            }
+          },
+          { "sTitle" : "Status", "mData" : "status" },
+          { "sTitle" : "Start Date", "mData" : "startDate" },
+          { "sTitle" : "End Date", "mData" : "endDate" },
+          { "sTitle" : "Type", "mData" : "platformType" },
+          { "sTitle" : "Last Modified", "mData" : "lastUpdated" }
+        ],
+        "iDisplayLength": 50,
+        "bJQueryUI": true,
+        "bRetrieve": true,
+        "sPaginationType": "full_numbers"
+      });
+    });
+  </script>
 </c:otherwise>
 </c:choose>
-</form:form>
-
-<c:if test="${pool.id != 0}">
-<script type="text/javascript">
-  jQuery(document).ready(function () {
-    jQuery('#pooledElementsDatatable').dataTable({
-      "aaSorting": [
-        [0, 'desc']              
-      ],
-      "aoColumns": [
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null
-      ],
-      "iDisplayLength": 50,
-      "bJQueryUI": true,
-      "bRetrieve": true,
-      "sPaginationType": "full_numbers"
-    });
-  });
-</script>
-
-<h2 class="hrule">Select poolable elements:</h2>
-
-<div id="elementSelectDatatableDiv">
-
 </div>
 
-<script type="text/javascript">
-    jQuery(document).ready(function () {
-        Pool.ui.createElementSelectDatatable('${pool.platformType.key}', ${pool.id}, '${libraryDilutionUnits}');
-    });
-</script>
-
-<script type="text/javascript">
-  jQuery(document).ready(function () {
-    jQuery('#runsDatatable').dataTable({
-      "aaData": ${runsJSON},
-      "aaSorting": [
-        [0, 'desc']
-      ],
-      "aoColumns": [
-        {
-          "sTitle" : "Name",
-          "mData" : "name",
-          "mRender": function (data, type, full) {
-            return "<a href=\"/miso/run/" + full.id + "\">" + data + "</a>";
-          }
-        },
-        {
-          "sTitle" : "Alias",
-          "mData" : "alias",
-          "mRender": function (data, type, full) {
-            return "<a href=\"/miso/run/" + full.id + "\">" + data + "</a>";
-          }
-        },
-        { "sTitle" : "Status", "mData" : "status" },
-        { "sTitle" : "Start Date", "mData" : "startDate" },
-        { "sTitle" : "End Date", "mData" : "endDate" },
-        { "sTitle" : "Type", "mData" : "platformType" },
-        { "sTitle" : "Last Modified", "mData" : "lastUpdated" }
-      ],
-      "iDisplayLength": 50,
-      "bJQueryUI": true,
-      "bRetrieve": true,
-      "sPaginationType": "full_numbers"
-    });
-  });
-</script>
-
-<br/>
-<h1>Runs</h1>
-<div id="runsDatatableDiv">
-    <table cell-padding="0" width="100%" cellspacing="0" border="0" class="display" id="runsDatatable">
-    </table>
+<c:if test="${pool.id != 0}">
+<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#runs_arrowclick'), 'runs');">
+  Runs
+  <div id="runs_arrowclick" class="toggleLeftDown"></div>
+</div>
+<div id="runs" style="display:block;">
+  <br/>
+  <h1>Runs</h1>
+  <div id="runsDatatableDiv">
+      <table cell-padding="0" width="100%" cellspacing="0" border="0" class="display" id="runsDatatable">
+      </table>
+  </div>
 </div>
 </c:if>
 
