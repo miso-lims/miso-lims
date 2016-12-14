@@ -21,7 +21,7 @@
  * *********************************************************************
  */
 
-package uk.ac.bbsrc.tgac.miso.sqlstore;
+package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
 import java.util.List;
