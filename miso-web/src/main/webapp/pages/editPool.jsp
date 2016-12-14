@@ -174,7 +174,14 @@
   </tr>
   <tr>
     <td class="h">Ready To Run</td>
-    <td><form:checkbox path="readyToRun"/></td>
+    <c:choose>
+    <c:when test="${pool.id != 0}">
+      <td><form:checkbox path="readyToRun"/></td>
+    </c:when>
+    <c:otherwise>
+      <td><form:checkbox path="readyToRun" checked="checked" /></td>
+    </c:otherwise>
+    </c:choose>
   </tr>
   
   <tr>
