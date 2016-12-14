@@ -66,6 +66,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 
 /**
  * Created by IntelliJ IDEA. User: davey Date: 25-May-2010 Time: 16:39:52
@@ -79,6 +80,8 @@ public class ContainerControllerHelperService {
   private RequestManager requestManager;
   @Autowired
   private DataObjectFactory dataObjectFactory;
+  @Autowired
+  private ExperimentService experimentService;
 
   public JSONObject getPlatformTypes(HttpSession session, JSONObject json) throws IOException {
     StringBuilder b = new StringBuilder();
@@ -623,7 +626,7 @@ public class ContainerControllerHelperService {
       try {
         e.setLastModifier(securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName()));
         p.addExperiment(e);
-        requestManager.saveExperiment(e);
+        experimentService.save(e);
       } catch (MalformedExperimentException e1) {
         log.error("failed to save experiment", e1);
         return JSONUtils.SimpleJSONError("Failed to save experiment: " + e1.getMessage());

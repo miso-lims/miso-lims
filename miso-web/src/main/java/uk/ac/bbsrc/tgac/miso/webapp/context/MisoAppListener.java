@@ -24,7 +24,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.context;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
-import io.prometheus.client.hotspot.DefaultExports;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -84,6 +83,8 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.runstats.client.manager.RunStatsManager;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoPropertyExporter;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
+
+import io.prometheus.client.hotspot.DefaultExports;
 
 /**
  * The custom MISO context listener class. On webapp context init, we can do some startup checks, e.g. checking the existence of required
@@ -202,8 +203,6 @@ public class MisoAppListener implements ServletContextListener {
         log.info("" + rm.listAllProjects().size());
         log.info("\\_ studies...");
         log.info("" + rm.listAllStudies().size());
-        log.info("\\_ experiments...");
-        log.info("" + rm.listAllExperiments().size());
         log.info("\\_ samples...");
         log.info("" + rm.listAllSamples().size());
         log.info("\\_ libraries...");

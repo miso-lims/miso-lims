@@ -45,7 +45,7 @@ import org.w3c.dom.Document;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractExperiment;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ExperimentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -69,7 +69,7 @@ public class StudyImpl implements Study, Serializable {
   @ManyToOne(cascade = CascadeType.ALL)
   private Project project = null;
 
-  @OneToMany(targetEntity = AbstractExperiment.class, cascade = CascadeType.ALL)
+  @OneToMany(targetEntity = ExperimentImpl.class, cascade = CascadeType.ALL)
   private Collection<Experiment> experiments = new HashSet<>();
 
   @Id

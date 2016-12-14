@@ -28,7 +28,6 @@ import java.util.Collection;
 import java.util.Map;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
 
 /**
  * Defines a DAO interface for storing Experiments
@@ -36,7 +35,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface ExperimentStore extends Store<Experiment>, Cascadable, Remover<Experiment>, NamingSchemeAware {
+public interface ExperimentStore extends Store<Experiment>, Remover<Experiment> {
   /**
    * List all Experiments that match a search criteria
    * 
@@ -58,28 +57,6 @@ public interface ExperimentStore extends Store<Experiment>, Cascadable, Remover<
    *           when
    */
   Collection<Experiment> listByStudyId(long studyId) throws IOException;
-
-  /**
-   * List all Experiments that are part of a Submission given a Submission ID
-   * 
-   * @param submissionId
-   *          of type long
-   * @return Collection<Experiment>
-   * @throws IOException
-   *           when
-   */
-  Collection<Experiment> listBySubmissionId(long submissionId) throws IOException;
-
-  /**
-   * List all Experiments that are related to a given Pool given a Pool ID
-   * 
-   * @param poolId
-   *          of type long
-   * @return Collection<Experiment>
-   * @throws IOException
-   *           when
-   */
-  Collection<Experiment> listByPoolId(long poolId) throws IOException;
 
   /**
    * List all persisted objects

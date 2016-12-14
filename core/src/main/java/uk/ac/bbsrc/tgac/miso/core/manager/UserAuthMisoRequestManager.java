@@ -49,7 +49,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
-import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
@@ -333,15 +332,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public long saveExperiment(Experiment experiment) throws IOException {
-    if (writeCheck(experiment)) {
-      return backingManager.saveExperiment(experiment);
-    } else {
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot write to this Experiment");
-    }
-  }
-
-  @Override
   public long saveStudy(Study study) throws IOException {
     if (writeCheck(study)) {
       return backingManager.saveStudy(study);
@@ -389,14 +379,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
       throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Partition " + partitionId);
   }
 
-  @Override
-  public Experiment getExperimentById(long experimentId) throws IOException {
-    Experiment o = backingManager.getExperimentById(experimentId);
-    if (readCheck(o))
-      return o;
-    else
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Experiment " + experimentId);
-  }
 
   @Override
   public Pool getPoolById(long poolId) throws IOException {
@@ -1440,55 +1422,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
     Collections.sort(accessibles);
     return accessibles;
   }
-
-  @Override
-  public Collection<Experiment> listAllExperiments() throws IOException {
-    User user = getCurrentUser();
-    Collection<Experiment> accessibles = new HashSet<>();
-    for (Experiment experiment : backingManager.listAllExperiments()) {
-      if (experiment.userCanRead(user)) {
-        accessibles.add(experiment);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Collection<Experiment> listAllExperimentsWithLimit(long limit) throws IOException {
-    User user = getCurrentUser();
-    Collection<Experiment> accessibles = new HashSet<>();
-    for (Experiment experiment : backingManager.listAllExperimentsWithLimit(limit)) {
-      if (experiment.userCanRead(user)) {
-        accessibles.add(experiment);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Collection<Experiment> listAllExperimentsBySearch(String query) throws IOException {
-    User user = getCurrentUser();
-    Collection<Experiment> accessibles = new HashSet<>();
-    for (Experiment experiment : backingManager.listAllExperimentsBySearch(query)) {
-      if (experiment.userCanRead(user)) {
-        accessibles.add(experiment);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Collection<Experiment> listAllExperimentsByStudyId(long studyId) throws IOException {
-    User user = getCurrentUser();
-    Collection<Experiment> accessibles = new HashSet<>();
-    for (Experiment experiment : backingManager.listAllExperimentsByStudyId(studyId)) {
-      if (experiment.userCanRead(user)) {
-        accessibles.add(experiment);
-      }
-    }
-    return accessibles;
-  }
-
   @Override
   public Collection<Study> listAllStudies() throws IOException {
     User user = getCurrentUser();
@@ -1609,13 +1542,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   public void deleteStudy(Study study) throws IOException {
     if (getCurrentUser().isAdmin()) {
       backingManager.deleteStudy(study);
-    }
-  }
-
-  @Override
-  public void deleteExperiment(Experiment experiment) throws IOException {
-    if (getCurrentUser().isAdmin()) {
-      backingManager.deleteExperiment(experiment);
     }
   }
 
@@ -2261,10 +2187,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
     return backingManager.getBoxColumnSizes();
   }
 
-  @Override
-  public Map<String, Integer> getExperimentColumnSizes() throws IOException {
-    return backingManager.getExperimentColumnSizes();
-  }
 
   @Override
   public Map<String, Integer> getPoolColumnSizes() throws IOException {

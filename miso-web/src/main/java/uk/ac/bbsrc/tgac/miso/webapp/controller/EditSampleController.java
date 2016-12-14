@@ -116,6 +116,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 import uk.ac.bbsrc.tgac.miso.service.DetailedQcStatusService;
+import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.LabService;
 import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.service.SamplePurposeService;
@@ -154,6 +155,9 @@ public class EditSampleController {
 
   @Autowired
   private SampleValidRelationshipService sampleValidRelationshipService;
+
+  @Autowired
+  private ExperimentService experimentService;
 
   public void setSampleOptionsController(SampleOptionsController sampleOptionsController) {
     this.sampleOptionsController = sampleOptionsController;
@@ -261,7 +265,7 @@ public class EditSampleController {
   public Experiment populateExperiment(@RequestParam(value = "experimentId", required = false) Long experimentId) throws IOException {
     try {
       if (experimentId != null) {
-        return requestManager.getExperimentById(experimentId);
+        return experimentService.get(experimentId);
       } else {
         return dataObjectFactory.getExperiment();
       }

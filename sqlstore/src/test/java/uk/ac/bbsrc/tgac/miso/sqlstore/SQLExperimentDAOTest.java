@@ -11,8 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.CascadeType;
-
+import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -25,24 +24,16 @@ import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.store.SecurityStore;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ExperimentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PlatformImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
-import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
-import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
-import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
-import uk.ac.bbsrc.tgac.miso.core.store.PlatformStore;
-import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
-import uk.ac.bbsrc.tgac.miso.core.store.Store;
-import uk.ac.bbsrc.tgac.miso.core.store.StudyStore;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateExperimentDao;
 
 /**
  * @author Chris Salt
@@ -56,37 +47,26 @@ public class SQLExperimentDAOTest extends AbstractDAOTest {
   @Spy
   private JdbcTemplate jdbcTemplate;
 
-  @Mock
-  private SecurityStore securityDAO;
-  @Mock
-  private Store<SecurityProfile> securityProfileDAO;
-  @Mock
-  private StudyStore studyDAO;
-  @Mock
-  private PlatformStore platformDAO;
-  @Mock
-  private ChangeLogStore changeLogDAO;
-  @Mock
-  private PoolStore poolDAO;
-  @Mock
-  private KitStore kitDAO;
+  @Autowired
+  private SessionFactory sessionFactory;
+
   @Mock
   private NamingScheme namingScheme;
 
   @InjectMocks
-  private SQLExperimentDAO dao;
+  private HibernateExperimentDao dao;
 
   @Before
   public void setup() throws Exception {
     MockitoAnnotations.initMocks(this);
     dao.setJdbcTemplate(jdbcTemplate);
-    dao.setDataObjectFactory(new TgacDataObjectFactory());
+    dao.setSessionFactory(sessionFactory);
     when(namingScheme.generateNameFor(Matchers.any(Experiment.class))).thenReturn("EDI123");
     when(namingScheme.validateName(Matchers.anyString())).thenReturn(ValidationResult.success());
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLExperimentDAO#save(uk.ac.bbsrc.tgac.miso.core.data.Experiment)} .
+   * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateExperimentDao#save(uk.ac.bbsrc.tgac.miso.core.data.Experiment)} .
    * 
    * @throws IOException
    */
@@ -113,7 +93,7 @@ public class SQLExperimentDAOTest extends AbstractDAOTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLExperimentDAO#listAll()}.
+   * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateExperimentDao#listAll()}.
    */
   @Test
   public void testListAll() {
@@ -122,7 +102,7 @@ public class SQLExperimentDAOTest extends AbstractDAOTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLExperimentDAO#listAllWithLimit(long)} .
+   * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateExperimentDao#listAllWithLimit(long)} .
    * 
    * @throws IOException
    */
@@ -133,7 +113,7 @@ public class SQLExperimentDAOTest extends AbstractDAOTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLExperimentDAO#count()}.
+   * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateExperimentDao#count()}.
    * 
    * @throws IOException
    */
@@ -144,7 +124,7 @@ public class SQLExperimentDAOTest extends AbstractDAOTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLExperimentDAO#listBySearch(java.lang.String)} .
+   * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateExperimentDao#listBySearch(java.lang.String)} .
    */
   @Ignore
   @Test
@@ -153,7 +133,7 @@ public class SQLExperimentDAOTest extends AbstractDAOTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLExperimentDAO#listByStudyId(long)} .
+   * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateExperimentDao#listByStudyId(long)} .
    */
   @Test
   public void testListByStudyId() {
@@ -162,27 +142,7 @@ public class SQLExperimentDAOTest extends AbstractDAOTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLExperimentDAO#listBySubmissionId(long)} .
-   * 
-   * @throws IOException
-   */
-  @Test
-  public void testListBySubmissionId() throws IOException {
-    List<Experiment> experiments = dao.listBySubmissionId(1L);
-    assertEquals(1, experiments.size());
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLExperimentDAO#listByPoolId(long)} .
-   */
-  @Test
-  public void testListByPoolId() {
-    List<Experiment> experiments = dao.listByPoolId(1L);
-    assertEquals(1, experiments.size());
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLExperimentDAO#get(long)}.
+   * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateExperimentDao#get(long)}.
    * 
    * @throws IOException
    */
@@ -196,7 +156,7 @@ public class SQLExperimentDAOTest extends AbstractDAOTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLExperimentDAO#lazyGet(long)}.
+   * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateExperimentDao#lazyGet(long)}.
    * 
    * @throws IOException
    */
@@ -210,14 +170,13 @@ public class SQLExperimentDAOTest extends AbstractDAOTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLExperimentDAO#remove(uk.ac.bbsrc.tgac.miso.core.data.Experiment)} .
+   * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateExperimentDao#remove(uk.ac.bbsrc.tgac.miso.core.data.Experiment)} .
    * 
    * @throws IOException
    */
   @Test
   public void testRemove() throws IOException {
     Experiment experiment = dao.lazyGet(1L);
-    dao.setCascadeType(CascadeType.PERSIST);
     dao.remove(experiment);
     assertEquals(31, dao.listAll().size());
   }

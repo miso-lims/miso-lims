@@ -52,7 +52,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
-import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
@@ -97,7 +96,6 @@ import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.EmPCRDilutionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.EmPCRStore;
-import uk.ac.bbsrc.tgac.miso.core.store.ExperimentStore;
 import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignCodeDao;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignDao;
@@ -141,8 +139,6 @@ public class MisoRequestManager implements RequestManager {
   private LibraryDilutionStore libraryDilutionStore;
   @Autowired
   private EmPCRStore emPCRStore;
-  @Autowired
-  private ExperimentStore experimentStore;
   @Autowired
   private KitStore kitStore;
   @Autowired
@@ -220,10 +216,6 @@ public class MisoRequestManager implements RequestManager {
 
   public void setEmPCRStore(EmPCRStore emPCRStore) {
     this.emPCRStore = emPCRStore;
-  }
-
-  public void setExperimentStore(ExperimentStore experimentStore) {
-    this.experimentStore = experimentStore;
   }
 
   public void setKitStore(KitStore kitStore) {
@@ -945,42 +937,6 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Experiment> listAllExperiments() throws IOException {
-    if (experimentStore != null) {
-      return experimentStore.listAll();
-    } else {
-      throw new IOException("No experimentStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<Experiment> listAllExperimentsWithLimit(long limit) throws IOException {
-    if (experimentStore != null) {
-      return experimentStore.listAllWithLimit(limit);
-    } else {
-      throw new IOException("No experimentStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<Experiment> listAllExperimentsBySearch(String query) throws IOException {
-    if (experimentStore != null) {
-      return experimentStore.listBySearch(query);
-    } else {
-      throw new IOException("No experimentStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<Experiment> listAllExperimentsByStudyId(long studyId) throws IOException {
-    if (experimentStore != null) {
-      return experimentStore.listByStudyId(studyId);
-    } else {
-      throw new IOException("No experimentStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
   public Collection<Study> listAllStudies() throws IOException {
     if (studyStore != null) {
       return studyStore.listAll();
@@ -1281,17 +1237,6 @@ public class MisoRequestManager implements RequestManager {
       }
     } else {
       throw new IOException("No studyStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public void deleteExperiment(Experiment experiment) throws IOException {
-    if (experimentStore != null) {
-      if (!experimentStore.remove(experiment)) {
-        throw new IOException("Unable to delete Experiment. Make sure the experiment has no child entitites.");
-      }
-    } else {
-      throw new IOException("No experimentStore available. Check that it has been declared in the Spring config.");
     }
   }
 
@@ -1701,15 +1646,6 @@ public class MisoRequestManager implements RequestManager {
       return noteStore.savePoolNote(pool, note);
     } else {
       throw new IOException("No noteStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public long saveExperiment(Experiment experiment) throws IOException {
-    if (experimentStore != null) {
-      return experimentStore.save(experiment);
-    } else {
-      throw new IOException("No experimentStore available. Check that it has been declared in the Spring config.");
     }
   }
 
@@ -2169,15 +2105,6 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Experiment getExperimentById(long experimentId) throws IOException {
-    if (experimentStore != null) {
-      return experimentStore.get(experimentId);
-    } else {
-      throw new IOException("No experimentStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
   public Study getStudyById(long studyId) throws IOException {
     if (studyStore != null) {
       return studyStore.get(studyId);
@@ -2540,15 +2467,6 @@ public class MisoRequestManager implements RequestManager {
       return sequencerServiceRecordStore.get(id);
     } else {
       throw new IOException("No sequencerServiceRecordStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Map<String, Integer> getExperimentColumnSizes() throws IOException {
-    if (experimentStore != null) {
-      return experimentStore.getExperimentColumnSizes();
-    } else {
-      throw new IOException("No experimentStore available. Check that it has been declared in the Spring config.");
     }
   }
 

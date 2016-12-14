@@ -39,6 +39,7 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -51,6 +52,7 @@ import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.PrintManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService;
+import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 
 /**
  * uk.ac.bbsrc.tgac.miso.spring.ajax
@@ -75,6 +77,8 @@ public class ProjectTreeControllerHelperService {
   private MisoFilesManager misoFileManager;
   @Autowired
   private WatchManager watchManager;
+  @Autowired
+  private ExperimentService experimentService;
 
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
@@ -315,7 +319,7 @@ public class ProjectTreeControllerHelperService {
         substudyJSON.put("id", study.getId());
         substudyJSON.put("show", "STUDY");
 
-        Collection<Experiment> experiments = requestManager.listAllExperimentsByStudyId(study.getId());
+        Collection<Experiment> experiments = experimentService.listAllByStudyId(study.getId());
         substudyJSON.put("subs", experiments.size());
         childArray.add(substudyJSON);
       }
@@ -338,7 +342,7 @@ public class ProjectTreeControllerHelperService {
 
       long studyId = json.getLong("id");
 
-      Collection<Experiment> experiments = requestManager.listAllExperimentsByStudyId(studyId);
+      Collection<Experiment> experiments = experimentService.listAllByStudyId(studyId);
       JSONArray experimentsArray = new JSONArray();
       for (Experiment e : experiments) {
         experimentsArray.add(JSONObject.fromObject("{'name': '" + e.getName() + "','description':'" + e.getAlias() + "','color': '2'}"));

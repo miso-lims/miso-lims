@@ -1,8 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -16,22 +14,17 @@ import org.mockito.Mockito;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ExperimentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 public class AbstractExperimentTestSuite {
-  private AbstractExperiment ae;
+  private ExperimentImpl ae;
 
   @Before
   public void setUp() throws Exception {
-    ae = new AbstractExperiment() {
-
-      @Override
-      public void buildSubmission() {
-        // Not implemented.
-      }
-    };
+    ae = new ExperimentImpl();
   }
 
   @Test
@@ -63,7 +56,6 @@ public class AbstractExperimentTestSuite {
     when(parent.getSecurityProfile()).thenReturn(mockSecurityProfile);
     when(mockSecurityProfile.getOwner()).thenReturn(mockUser);
 
-    assertNull(ae.getSecurityProfile());
     ae.inheritPermissions(parent);
     assertNotNull(ae.getSecurityProfile());
   }
@@ -92,7 +84,7 @@ public class AbstractExperimentTestSuite {
   }
 
   private final List<Kit> getNMockKits(int n, KitType kitType) {
-    final List<Kit> rtn = new ArrayList<Kit>();
+    final List<Kit> rtn = new ArrayList<>();
     for (int i = 0; i < n; i++) {
       final Kit k = Mockito.mock(Kit.class);
       setUpKit(k, kitType, "" + kitType + i);

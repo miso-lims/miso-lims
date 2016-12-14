@@ -44,6 +44,9 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
@@ -57,9 +60,7 @@ import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.SubmissionManager;
-
-import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 
 @Controller
 @RequestMapping("/submission")
@@ -81,6 +82,9 @@ public class EditSubmissionController {
 
   @Autowired
   private SubmissionManager submissionManager;
+
+  @Autowired
+  private ExperimentService experimentService;
 
   public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
     this.dataObjectFactory = dataObjectFactory;
@@ -109,7 +113,7 @@ public class EditSubmissionController {
 
   @ModelAttribute("projects")
   public Collection<Project> populateProjects() throws IOException {
-    List<Project> projects = new ArrayList<Project>(requestManager.listAllProjects());
+    List<Project> projects = new ArrayList<>(requestManager.listAllProjects());
     Collections.sort(projects);
     return projects;
   }
@@ -131,12 +135,12 @@ public class EditSubmissionController {
 
   @ModelAttribute("experiments")
   public Collection<Experiment> populateExperiments() throws IOException {
-    return requestManager.listAllExperiments();
+    return experimentService.listAll();
   }
 
   @ModelAttribute("availableElements")
   public Collection<Submittable> populateElements() throws IOException {
-    ArrayList<Submittable> list = new ArrayList<Submittable>();
+    ArrayList<Submittable> list = new ArrayList<>();
     list.addAll(populateSamples());
     list.addAll(populateStudies());
     list.addAll(populateExperiments());

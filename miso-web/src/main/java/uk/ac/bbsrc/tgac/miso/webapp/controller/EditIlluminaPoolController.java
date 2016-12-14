@@ -60,6 +60,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedDilutionException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
+import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 
 /**
  * com.eaglegenomics.miso.web
@@ -84,6 +85,9 @@ public class EditIlluminaPoolController {
 
   @Autowired
   private DataObjectFactory dataObjectFactory;
+
+  @Autowired
+  private ExperimentService experimentService;
 
   public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
     this.dataObjectFactory = dataObjectFactory;
@@ -117,7 +121,7 @@ public class EditIlluminaPoolController {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Collection<Experiment> es = new ArrayList<>();
-      for (Experiment e : requestManager.listAllExperiments()) {
+      for (Experiment e : experimentService.listAll()) {
         if (e.getPlatform().getPlatformType().equals(p.getPlatformType())) {
           if (experimentId != null) {
             if (e.getId() != experimentId) {

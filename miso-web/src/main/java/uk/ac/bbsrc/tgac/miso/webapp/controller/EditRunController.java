@@ -75,6 +75,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
 import uk.ac.bbsrc.tgac.miso.runstats.client.RunStatsException;
 import uk.ac.bbsrc.tgac.miso.runstats.client.manager.RunStatsManager;
+import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
@@ -100,6 +101,9 @@ public class EditRunController {
 
   @Autowired
   private SequencingParametersService sequencingParametersService;
+
+  @Autowired
+  private ExperimentService experimentService;
 
   public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
     this.dataObjectFactory = dataObjectFactory;
@@ -211,12 +215,12 @@ public class EditRunController {
   }
 
   public Collection<Experiment> populateAvailableExperiments(User user) throws IOException {
-    return requestManager.listAllExperiments();
+    return experimentService.listAll();
   }
 
   public Collection<Experiment> populateAvailableExperiments(PlatformType platformType, User user) throws IOException {
     List<Experiment> exps = new ArrayList<>();
-    for (Experiment e : requestManager.listAllExperiments()) {
+    for (Experiment e : experimentService.listAll()) {
       if (e.getPlatform() != null && e.getPlatform().getPlatformType().equals(platformType)) {
         exps.add(e);
       }

@@ -66,14 +66,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
-import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
 import uk.ac.bbsrc.tgac.miso.core.data.PrintJob;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
@@ -85,6 +83,7 @@ import uk.ac.bbsrc.tgac.miso.core.manager.PrintManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
+import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 
 /**
  * uk.ac.bbsrc.tgac.miso.spring.ajax
@@ -109,6 +108,8 @@ public class PoolControllerHelperService {
   private BarcodeFactory barcodeFactory;
   @Autowired
   private PrintManager<MisoPrintService, Queue<?>> printManager;
+  @Autowired
+  private ExperimentService experimentService;
 
   public JSONObject getPoolQcTypes(HttpSession session, JSONObject json) {
     try {
@@ -446,7 +447,7 @@ public class PoolControllerHelperService {
       if (searchStr.length() > 1) {
         String str = searchStr.toLowerCase();
         StringBuilder b = new StringBuilder();
-        List<Experiment> experiments = new ArrayList<>(requestManager.listAllExperiments());
+        List<Experiment> experiments = new ArrayList<>(experimentService.listAll());
         int numMatches = 0;
         for (Experiment e : experiments) {
           if (e.getPlatform().getPlatformType().equals(PlatformType.valueOf(platformType))) {
@@ -504,7 +505,7 @@ public class PoolControllerHelperService {
           try {
             p.addExperiment(e);
             e.setLastModifier(user);
-            requestManager.saveExperiment(e);
+            experimentService.save(e);
           } catch (MalformedExperimentException e1) {
             log.error("save experiment", e1);
           }

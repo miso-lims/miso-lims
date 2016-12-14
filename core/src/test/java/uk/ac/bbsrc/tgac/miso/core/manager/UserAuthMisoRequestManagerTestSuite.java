@@ -718,35 +718,6 @@ public class UserAuthMisoRequestManagerTestSuite {
   }
 
   /**
-   * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveExperiment(uk.ac.bbsrc.tgac.miso.core.data.Experiment)} .
-   */
-  @Test
-  public void testSaveExperiment() throws IOException {
-    final long expectedReturn = 1L;
-    when(experiment.userCanWrite(any(User.class))).thenReturn(true);
-    when(backingManager.saveExperiment(experiment)).thenReturn(expectedReturn);
-
-    assertEquals(expectedReturn, userAuthMisoRequestManager.saveExperiment(experiment));
-    verify(backingManager).saveExperiment(experiment);
-  }
-
-  /**
-   * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveExperiment(uk.ac.bbsrc.tgac.miso.core.data.Experiment)} .
-   */
-  @Test
-  public void testSaveExperimentThrows() throws IOException {
-    when(experiment.userCanWrite(any(User.class))).thenReturn(false);
-
-    thrown.expect(IOException.class);
-    thrown.expectMessage("User null cannot write to this Experiment");
-    userAuthMisoRequestManager.saveExperiment(experiment);
-
-    verify(backingManager, never()).saveExperiment(experiment);
-  }
-
-  /**
    * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveStudy(uk.ac.bbsrc.tgac.miso.core.data.Study)}
    * .
    */
@@ -897,37 +868,6 @@ public class UserAuthMisoRequestManagerTestSuite {
     userAuthMisoRequestManager.getSequencerPoolPartitionById(inputId);
 
     verify(backingManager).getSequencerPoolPartitionById(inputId);
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getExperimentById(long)} .
-   */
-  @Test
-  public void testGetExperimentById() throws IOException {
-    long inputId = 1L;
-    when(backingManager.getExperimentById(inputId)).thenReturn(experiment);
-    when(experiment.userCanRead(any(User.class))).thenReturn(true);
-
-    assertEquals(experiment, userAuthMisoRequestManager.getExperimentById(inputId));
-
-    verify(backingManager).getExperimentById(inputId);
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getExperimentById(long)} .
-   */
-  @Test
-  public void testGetExperimentByIdThrows() throws IOException {
-    long inputId = 1L;
-    when(backingManager.getExperimentById(inputId)).thenReturn(experiment);
-    when(experiment.userCanRead(any(User.class))).thenReturn(false);
-
-    thrown.expect(IOException.class);
-    thrown.expectMessage("User null cannot read Experiment " + inputId);
-
-    userAuthMisoRequestManager.getExperimentById(inputId);
-
-    verify(backingManager).getExperimentById(inputId);
   }
 
   /**
