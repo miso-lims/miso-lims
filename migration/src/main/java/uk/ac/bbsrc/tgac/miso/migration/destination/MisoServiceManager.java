@@ -287,8 +287,6 @@ public class MisoServiceManager {
     if (targetedSequencingDao != null) targetedSequencingDao.setSecurityDAO(securityStore);
     if (poolDao != null) poolDao.setSecurityDAO(securityStore);
     if (experimentDao != null) experimentDao.setSecurityDAO(securityStore);
-    if (kitDao != null) kitDao.setSecurityDAO(securityStore);
-    if (studyDao != null) studyDao.setSecurityDAO(securityStore);
     if (runDao != null) runDao.setSecurityDAO(securityStore);
     if (sequencerPartitionContainerDao != null) sequencerPartitionContainerDao.setSecurityDAO(securityStore);
     if (boxDao != null) boxDao.setSecurityDAO(securityStore);
@@ -319,7 +317,6 @@ public class MisoServiceManager {
     if (dilutionDao != null) dilutionDao.setSecurityProfileDAO(securityProfileDao);
     if (poolDao != null) poolDao.setSecurityProfileDAO(securityProfileDao);
     if (experimentDao != null) experimentDao.setSecurityProfileDAO(securityProfileDao);
-    if (studyDao != null) studyDao.setSecurityProfileDAO(securityProfileDao);
     if (runDao != null) runDao.setSecurityProfileDAO(securityProfileDao);
     if (sequencerPartitionContainerDao != null) sequencerPartitionContainerDao.setSecurityProfileDAO(securityProfileDao);
     if (partitionDao != null) partitionDao.setSecurityProfileDAO(securityProfileDao);
@@ -393,7 +390,6 @@ public class MisoServiceManager {
   }
 
   private void updateProjectDaoDependencies() {
-    if (studyDao != null) studyDao.setProjectDAO(projectDao);
     if (sampleNumberPerProjectService != null) sampleNumberPerProjectService.setSqlProjectDAO(projectDao);
   }
 
@@ -524,8 +520,6 @@ public class MisoServiceManager {
     if (libraryDao != null) libraryDao.setChangeLogDAO(changeLogDao);
     if (poolDao != null) poolDao.setChangeLogDAO(changeLogDao);
     if (experimentDao != null) experimentDao.setChangeLogDAO(changeLogDao);
-    if (kitDao != null) kitDao.setChangeLogDAO(changeLogDao);
-    if (studyDao != null) studyDao.setChangeLogDAO(changeLogDao);
     if (sequencerPartitionContainerDao != null) sequencerPartitionContainerDao.setChangeLogDAO(changeLogDao);
     if (boxDao != null) boxDao.setChangeLogDAO(changeLogDao);
   }
@@ -551,7 +545,6 @@ public class MisoServiceManager {
     if (sampleDao != null) sampleDao.setNoteDao(noteDao);
     if (libraryDao != null) libraryDao.setNoteDAO(noteDao);
     if (poolDao != null) poolDao.setNoteDAO(noteDao);
-    if (kitDao != null) kitDao.setNoteDAO(noteDao);
     if (runDao != null) runDao.setNoteDAO(noteDao);
   }
 
@@ -741,7 +734,6 @@ public class MisoServiceManager {
 
   private void updateExperimentDaoDependencies() {
     if (poolDao != null) poolDao.setExperimentDAO(experimentDao);
-    if (studyDao != null) studyDao.setExperimentDAO(experimentDao);
   }
 
   public HibernateKitDao getKitDao() {
@@ -796,14 +788,8 @@ public class MisoServiceManager {
 
   public void setDefaultStudyDao() {
     HibernateStudyDao dao = new HibernateStudyDao();
-    dao.setChangeLogDAO(changeLogDao);
-    dao.setDataObjectFactory(dataObjectFactory);
-    dao.setExperimentDAO(experimentDao);
     dao.setJdbcTemplate(jdbcTemplate);
     dao.setNamingScheme(getNamingScheme());
-    dao.setProjectDAO(projectDao);
-    dao.setSecurityDAO(securityStore);
-    dao.setSecurityProfileDAO(securityProfileDao);
     setStudyDao(dao);
   }
 
