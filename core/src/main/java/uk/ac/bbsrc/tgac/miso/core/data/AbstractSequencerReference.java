@@ -23,6 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Date;
@@ -37,7 +38,6 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 
-import org.apache.commons.validator.routines.InetAddressValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -112,8 +112,10 @@ public abstract class AbstractSequencerReference implements SequencerReference {
   }
 
   @Override
-  public void setIpAddress(String ip) {
-    this.ip = (InetAddressValidator.getInstance().isValid(ip) ? ip : null);
+  public void setIpAddress(String ip) throws IOException {
+    if (ip == null) throw new IOException("IP address cannot be null");
+    InetAddress inet = InetAddress.getByName(ip);
+    this.ip = (inet != null ? inet.getHostAddress() : null);
   }
 
   @Override

@@ -298,11 +298,6 @@
         <version>2.0</version>
       </dependency>
       <dependency>
-        <groupId>commons-validator</groupId>
-        <artifactId>commons-validator</artifactId>
-        <version>1.4.0</version>
-      </dependency>
-      <dependency>
         <groupId>fr.opensagres</groupId>
         <artifactId>org.odftoolkit.odfdom.converter</artifactId>
         <version>0.9.1</version>
