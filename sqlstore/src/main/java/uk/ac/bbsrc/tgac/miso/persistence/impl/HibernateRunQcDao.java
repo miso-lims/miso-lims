@@ -18,9 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractRun;
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractRunQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
-import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
@@ -48,7 +47,7 @@ public class HibernateRunQcDao implements RunQcStore {
   @Override
   public long save(RunQC runQc) throws IOException {
     long id;
-    if (runQc.getId() == AbstractRun.UNSAVED_ID) {
+    if (runQc.getId() == AbstractRunQC.UNSAVED_ID) {
       id = (long) currentSession().save(runQc);
     } else {
       currentSession().update(runQc);
