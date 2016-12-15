@@ -25,12 +25,12 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.util.List;
 
+import javax.persistence.Column;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToMany;
-import javax.persistence.PrimaryKeyJoinColumn;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunException;
@@ -46,7 +46,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 public abstract class AbstractRunQC extends AbstractQC implements RunQC {
 
   @ManyToOne(targetEntity = RunImpl.class)
-  @PrimaryKeyJoinColumn
+  @Column(name = "run_runId")
   private Run run;
   private String information;
 
