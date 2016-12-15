@@ -11,6 +11,7 @@ import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
@@ -27,6 +28,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
  * remaining data that Hibernate cannot access. Similarly, it then follows any necessary links on save. All the SqlStore-populated fields
  * are marked “transient” in the LibraryDesign class.
  */
+@Repository
 @Transactional(rollbackFor = Exception.class)
 public class HibernateLibraryDesignDao implements LibraryDesignDao {
 
