@@ -37,6 +37,7 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 
+import org.apache.commons.validator.routines.InetAddressValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,9 +79,6 @@ public abstract class AbstractSequencerReference implements SequencerReference {
   private SequencerReference upgradedSequencerReference;
 
   @Transient
-  private SequencerReference preUpgradeSequencerReference;
-
-  @Transient
   private Date lastServicedDate;
 
   @Override
@@ -115,11 +113,11 @@ public abstract class AbstractSequencerReference implements SequencerReference {
 
   @Override
   public void setIpAddress(String ip) {
-    this.ip = ip;
+    this.ip = (InetAddressValidator.getInstance().isValid(ip) ? ip : null);
   }
 
   @Override
-  public String getIpAddress() throws UnknownHostException {
+  public String getIpAddress() {
     return this.ip;
   }
 
@@ -161,16 +159,6 @@ public abstract class AbstractSequencerReference implements SequencerReference {
   @Override
   public SequencerReference getUpgradedSequencerReference() {
     return upgradedSequencerReference;
-  }
-
-  @Override
-  public void setPreUpgradeSequencerReference(SequencerReference sequencer) {
-    this.preUpgradeSequencerReference = sequencer;
-  }
-
-  @Override
-  public SequencerReference getPreUpgradeSequencerReference() {
-    return preUpgradeSequencerReference;
   }
 
   @Override

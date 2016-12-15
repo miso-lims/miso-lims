@@ -32,7 +32,7 @@ import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 /**
- * A SequencerReference is a {@link SequencerReference} specifically designated with a {@link Platform}
+ * A SequencerReference is a sequencing machine specifically designated with a {@link Platform}
  * 
  * @author Rob Davey
  * @since 0.0.2
@@ -96,9 +96,8 @@ public interface SequencerReference extends Nameable, Deletable {
    * Returns the String ipAddress of this SequencerReference object.
    * 
    * @return String ipAddress.
-   * @throws UnknownHostException
    */
-  String getIpAddress() throws UnknownHostException;
+  String getIpAddress();
 
   /**
    * Returns the fully qualified domain name (FQDN) of this SequencerReference object.

@@ -92,12 +92,7 @@ public class HibernateSequencerReferenceDao implements SequencerReferenceStore {
 
   @Override
   public SequencerReference get(long id) throws IOException {
-    SequencerReference sr = (SequencerReference) currentSession().get(SequencerReferenceImpl.class, id);
-    SequencerReference preUpgradeSR = getByUpgradedReference(id);
-    if (preUpgradeSR != null) {
-      sr.setPreUpgradeSequencerReference(preUpgradeSR);
-    }
-    return sr;
+    return (SequencerReference) currentSession().get(SequencerReferenceImpl.class, id);
   }
 
   @Override
@@ -133,7 +128,8 @@ public class HibernateSequencerReferenceDao implements SequencerReferenceStore {
     return criteria.list();
   }
 
-  private SequencerReference getByUpgradedReference(long id) {
+  @Override
+  public SequencerReference getByUpgradedReference(long id) {
     Criteria criteria = currentSession().createCriteria(SequencerReferenceImpl.class);
     criteria.add(Restrictions.eq("upgradedSequencerReference.id", id));
     return (SequencerReference) criteria.uniqueResult();

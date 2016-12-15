@@ -64,6 +64,10 @@
       <artifactId>commons-net</artifactId>
     </dependency>
     <dependency>
+      <groupId>commons-validator</groupId>
+      <artifactId>commons-validator</artifactId>
+    </dependency>
+    <dependency>
       <groupId>fr.opensagres</groupId>
       <artifactId>org.odftoolkit.odfdom.converter</artifactId>
     </dependency>

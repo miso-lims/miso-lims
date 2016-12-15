@@ -2247,6 +2247,15 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
+  public SequencerReference getSequencerReferenceByUpgradedReferenceId(long upgradedReferenceId) throws IOException {
+    if (sequencerReferenceStore != null) {
+      return sequencerReferenceStore.getByUpgradedReference(upgradedReferenceId);
+    } else {
+      throw new IOException("No sequencerReferenceStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
   public Kit getKitById(long kitId) throws IOException {
     if (kitStore != null) {
       return kitStore.get(kitId);

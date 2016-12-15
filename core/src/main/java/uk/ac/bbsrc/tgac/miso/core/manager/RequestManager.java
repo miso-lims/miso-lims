@@ -246,6 +246,8 @@ public interface RequestManager {
 
   public SequencerReference getSequencerReferenceByName(String referenceName) throws IOException;
 
+  public SequencerReference getSequencerReferenceByUpgradedReferenceId(long upgradedReferenceId) throws IOException;
+
   public SequencerServiceRecord getSequencerServiceRecordById(long id) throws IOException;
 
   public Kit getKitById(long kitId) throws IOException;
