@@ -98,8 +98,8 @@ public abstract class AbstractPool extends AbstractBoxable implements Pool {
       @JoinColumn(name = "pool_poolId") })
   @AnyMetaDef(idType = "long", metaType = "string", 
           metaValues = { 
-          @MetaValue(targetEntity = LibraryDilution.class, value = "L"),
-          @MetaValue(targetEntity = emPCRDilution.class, value = "E")
+          @MetaValue(targetEntity = LibraryDilution.class, value = "LDI"),
+          @MetaValue(targetEntity = emPCRDilution.class, value = "EDI")
      })
   private Set<Dilution> pooledElements = new HashSet<>();
   private Collection<Experiment> experiments = new HashSet<>();

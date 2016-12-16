@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -518,7 +518,17 @@ public class SQLPoolDAO implements PoolStore {
 
         eInsert.execute(esParams);
         // TODO Fixed in Hibernate
-
+        // if (this.cascadeType != null) {
+        // if (this.cascadeType.equals(CascadeType.PERSIST)) {
+        // Store<? super Dilution> dao = daoLookup.lookup(d.getClass());
+        // if (dao != null) {
+        // dao.save(d);
+        // }
+        // } else if (this.cascadeType.equals(CascadeType.REMOVE)) {
+        // if (dc != null) DbUtils.updateCaches(cacheManager, d, Dilution.class);
+        // if (ldc != null) DbUtils.updateCaches(cacheManager, d, Dilution.class);
+        // }
+        // }
       }
     }
 
@@ -869,8 +879,29 @@ public class SQLPoolDAO implements PoolStore {
       Long elementId = rs.getLong("elementId");
       String type = rs.getString("elementType");
 
-        // TODO Fixed in Hibernate
-        return null;
+      // TODO Fixed in Hibernate
+      // try {
+      // Class<? extends Dilution> clz = Class.forName(type).asSubclass(Dilution.class);
+      // Store<? extends Dilution> dao = daoLookup.lookup(clz);
+      // if (dao != null) {
+      // log.debug("Mapping poolable -> " + poolId + " : " + type + " : " + elementId);
+      // Dilution p = (isLazy() ? dao.lazyGet(elementId) : dao.get(elementId));
+      //
+      // if (p != null) {
+      // log.debug("\\_ got " + p.getId() + " : " + p.getName());
+      // } else {
+      // log.debug("\\_ got null");
+      // }
+      // return p;
+      // } else {
+      // throw new SQLException("No DAO found or more than one found.");
+      // }
+      // } catch (ClassNotFoundException e) {
+      // throw new SQLException("Cannot resolve element type to a valid class", e);
+      // } catch (IOException e) {
+      // throw new SQLException("Cannot retrieve poolable element: [" + type + " ] " + elementId);
+      // }
+      return null;
     }
   }
 

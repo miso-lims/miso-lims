@@ -418,6 +418,9 @@ public class SQLProjectDAO implements ProjectStore {
     }
 
     // TODO Hibernate ProjectOverview properly
+    // if (overview.getSampleGroup() != null && !overview.getSampleGroup().getEntities().isEmpty()) {
+    // entityGroupDAO.save(overview.getSampleGroup());
+    // }
 
     watcherDAO.removeWatchedEntityByUser(overview, user);
 

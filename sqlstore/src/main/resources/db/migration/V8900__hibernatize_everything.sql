@@ -22,4 +22,4 @@ INSERT INTO ProjectOverview_Sample(projectOverview_overviewId, sample_sampleId)
 DROP TABLE EntityGroup_Elements;
 DROP TABLE EntityGroup;
 
-UPDATE Pool_Elements SET elementType = CASE elementType WHEN 'uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution' THEN 'L' WHEN 'uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution' THEN 'E' END;
+UPDATE Pool_Elements SET elementType = CASE elementType WHEN 'uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution' THEN 'LDI' WHEN 'uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution' THEN 'EDI' END;
