@@ -81,7 +81,7 @@ public class UserImpl implements User, Serializable, Comparable {
   private boolean active = true;
 
   @ManyToMany(targetEntity = Group.class)
-  @JoinTable(name = "User_Group", joinColumns = { @JoinColumn(name = "groups_groupId") }, inverseJoinColumns = {
+  @JoinTable(name = "User_Group", inverseJoinColumns = { @JoinColumn(name = "groups_groupId") }, joinColumns = {
       @JoinColumn(name = "users_userId") })
   private Collection<Group> groups = new HashSet<>();
   @Transient
