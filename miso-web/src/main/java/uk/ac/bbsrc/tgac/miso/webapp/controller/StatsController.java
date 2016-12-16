@@ -144,7 +144,7 @@ public class StatsController {
       Collection<Run> runs = requestManager.listRunsBySequencerId(referenceId);
       Collection<SequencerServiceRecord> serviceRecords = requestManager.listSequencerServiceRecordsBySequencerId(referenceId);
       Collection<SequencerReference> otherSequencers = getOtherSequencers(sr.getId());
-      sr.setPreUpgradeSequencerReference(requestManager.getSequencerReferenceByUpgradedReferenceId(sr.getId()));
+      model.put("preUpgradeSeqRef", requestManager.getSequencerReferenceByUpgradedReferenceId(sr.getId()));
       
       model.put(ModelKeys.SEQUENCER.getKey(), sr);
       model.put(ModelKeys.RUNS.getKey(), runs);

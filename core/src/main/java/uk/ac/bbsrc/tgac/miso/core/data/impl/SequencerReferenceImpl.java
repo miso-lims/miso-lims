@@ -23,8 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
+import java.io.IOException;
 import java.io.Serializable;
-import java.net.UnknownHostException;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -51,7 +51,7 @@ public class SequencerReferenceImpl extends AbstractSequencerReference implement
    * @param platform
    *          of type Platform
    */
-  public SequencerReferenceImpl(String name, String ip, Platform platform) {
+  public SequencerReferenceImpl(String name, String ip, Platform platform) throws IOException {
     setName(name);
     setIpAddress(ip);
     setPlatform(platform);
@@ -60,9 +60,9 @@ public class SequencerReferenceImpl extends AbstractSequencerReference implement
   /**
    * Exists for Hibernate purposes
    * 
-   * @throws UnknownHostException
+   * @throws IOException
    */
-  public SequencerReferenceImpl() throws UnknownHostException {
+  public SequencerReferenceImpl() throws IOException {
     setPlatform(null);
     setName(null);
     setIpAddress(null);

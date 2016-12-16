@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.Date;
 
-import org.codehaus.jackson.annotate.JsonBackReference;
 import org.codehaus.jackson.annotate.JsonManagedReference;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
@@ -145,19 +144,6 @@ public interface SequencerReference extends Nameable, Deletable {
    */
   @JsonManagedReference
   public SequencerReference getUpgradedSequencerReference();
-  
-  /**
-   * Sets the pre-upgrade sequencer reference, which is a previous version of this same sequencer, likely before an upgrade caused a rename
-   * 
-   * @param sequencer
-   */
-  public void setPreUpgradeSequencerReference(SequencerReference sequencer);
-  
-  /**
-   * @return the pre-upgrade sequencer reference, which is a previous version of this same sequencer, likely before an upgrade caused a rename
-   */
-  @JsonBackReference
-  public SequencerReference getPreUpgradeSequencerReference();
   
   /**
    * @return true if the sequencer is currently being used in production; false if it is retired
