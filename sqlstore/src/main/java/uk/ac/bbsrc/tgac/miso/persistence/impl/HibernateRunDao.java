@@ -7,13 +7,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.CascadeType;
-
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -31,8 +27,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.AbstractRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.RunAlertManager;
-import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
 import uk.ac.bbsrc.tgac.miso.core.store.WatcherStore;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
@@ -47,9 +41,6 @@ public class HibernateRunDao implements RunStore {
   private SessionFactory sessionFactory;
   @Autowired
   private RunAlertManager runAlertManager;
-  @Autowired
-  private NamingScheme namingScheme;
-
 
   private JdbcTemplate template;
   private WatcherStore watcherDAO;
@@ -77,26 +68,10 @@ public class HibernateRunDao implements RunStore {
     long id;
     if (run.getId() == AbstractRun.UNSAVED_ID) {
       currentSession().save(run);
-      try {
-        String name = namingScheme.generateNameFor(run);
-        run.setName(name);
-
-        DbUtils.validateNameOrThrow(run, namingScheme);
-        Number newId = (long) currentSession().save(run);
-        if (newId.longValue() != run.getId()) {
-          log.error("Expected Run ID doesn't match returned value from database insert: rolling back...");
-          currentSession().delete(run);
-          throw new IOException("Something bad happened. Expected Run ID doesn't match returned value from DB insert");
-        } else {
-          id = run.getId();
-        }
-      } catch (MisoNamingException e) {
-        throw new IOException("Cannot save Run - issue with generating name");
-      }
     } else {
       currentSession().update(run);
-      id = run.getId();
     }
+    id = run.getId();
     return id;
   }
 
@@ -127,9 +102,10 @@ public class HibernateRunDao implements RunStore {
   @Override
   public boolean remove(Run run) throws IOException {
     if (run.isDeletable()) {
+      Long runId = run.getId();
       currentSession().delete(run);
 
-      Run testIfExists = get(run.getId());
+      Run testIfExists = get(runId);
       return testIfExists == null;
     } else {
       return false;
@@ -156,22 +132,10 @@ public class HibernateRunDao implements RunStore {
     return (Run) criteria.uniqueResult();
   }
 
-  private static final String[] searchProperties = new String[] { "name", "alias", "description" };
-
-  private Criterion searchRestrictions(String querystr) {
-    String str = DbUtils.convertStringToSearchQuery(querystr);
-
-    Criterion[] criteria = new Criterion[searchProperties.length];
-    for (int i = 0; i < searchProperties.length; i++) {
-      criteria[i] = Restrictions.ilike(searchProperties[i], str, MatchMode.ANYWHERE);
-    }
-    return Restrictions.or(criteria);
-  }
-
   @Override
   public List<Run> listBySearch(String query) throws IOException {
     Criteria criteria = currentSession().createCriteria(RunImpl.class);
-    criteria.add(searchRestrictions(query));
+    criteria.add(DbUtils.searchRestrictions(query, "name", "alias", "description"));
     @SuppressWarnings("unchecked")
     List<Run> records = criteria.list();
     return records;
@@ -181,13 +145,7 @@ public class HibernateRunDao implements RunStore {
   public Run getByAlias(String alias) throws IOException {
     Criteria criteria = currentSession().createCriteria(RunImpl.class);
     criteria.add(Restrictions.eq("alias", alias));
-    @SuppressWarnings("unchecked")
-    List<Run> records = criteria.list();
-    if (records.size() == 1) {
-      return records.iterator().next();
-    } else {
-      throw new IOException("Found more than one run by this name");
-    }
+    return (Run) criteria.uniqueResult();
   }
 
   @Override
@@ -196,7 +154,6 @@ public class HibernateRunDao implements RunStore {
     return Collections.emptyList();
   }
 
-  // TODO: confirm that this works as intended
   @Override
   public List<Run> listByPoolId(long poolId) throws IOException {
     Criteria criteria = currentSession().createCriteria(RunImpl.class);
@@ -218,12 +175,10 @@ public class HibernateRunDao implements RunStore {
     return records;
   }
 
-  // TODO: confirm that this works as intended
   @Override
   public List<Run> listByProjectId(long projectId) throws IOException {
     Criteria criteria = currentSession().createCriteria(RunImpl.class);
-    criteria.createAlias("containers", "spc");
-    criteria.createAlias("spc.partitions", "partition");
+    criteria.createAlias("containers.partitions", "partition");
     criteria.createAlias("partition.pool.libraries", "library");
     criteria.add(Restrictions.eq("library.sample.project.id", projectId));
     @SuppressWarnings("unchecked")
@@ -268,7 +223,6 @@ public class HibernateRunDao implements RunStore {
     return records;
   }
 
-  // TODO: confirm that this works as intended, and isn't horribly slow
   @Override
   public int[] saveAll(Collection<Run> runs) throws IOException {
     List<Long> rows = new ArrayList<>();
@@ -302,7 +256,7 @@ public class HibernateRunDao implements RunStore {
     if (offset < 0 || limit < 0) throw new IOException("Limit and Offset must not be less than zero");
     if ("lastModified".equals(sortCol)) sortCol = "derivedInfo.lastModified";
     Criteria criteria = currentSession().createCriteria(RunImpl.class);
-    criteria.add(searchRestrictions(querystr));
+    criteria.add(DbUtils.searchRestrictions(querystr, "name", "alias", "description"));
     criteria.createAlias("derivedInfo", "derivedInfo");
     criteria.setFirstResult(offset);
     criteria.setMaxResults(limit);
@@ -329,7 +283,7 @@ public class HibernateRunDao implements RunStore {
   @Override
   public long countBySearch(String querystr) throws IOException {
     Criteria criteria = currentSession().createCriteria(RunImpl.class);
-    criteria.add(searchRestrictions(querystr));
+    criteria.add(DbUtils.searchRestrictions(querystr, "name", "alias", "description"));
     long c = (long) criteria.setProjection(Projections.rowCount()).uniqueResult();
     return (int) c;
   }
@@ -348,11 +302,6 @@ public class HibernateRunDao implements RunStore {
 
   public void setSessionFactory(SessionFactory sessionFactory) {
     this.sessionFactory = sessionFactory;
-  }
-
-  @Override
-  public void setNamingScheme(NamingScheme namingScheme) {
-    this.namingScheme = namingScheme;
   }
 
   public RunAlertManager getRunAlertManager() {
@@ -377,10 +326,6 @@ public class HibernateRunDao implements RunStore {
 
   public void setSecurityManager(com.eaglegenomics.simlims.core.manager.SecurityManager securityManager) {
     this.securityManager = securityManager;
-  }
-
-  @Override
-  public void setCascadeType(CascadeType cascadeType) {
   }
 
 }

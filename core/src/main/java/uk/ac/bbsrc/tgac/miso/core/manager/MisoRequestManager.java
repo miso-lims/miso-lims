@@ -42,6 +42,7 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.google.common.collect.Lists;
 
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
@@ -55,6 +56,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
+import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
@@ -85,6 +87,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.event.Alert;
+import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.AlertStore;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
@@ -188,6 +193,8 @@ public class MisoRequestManager implements RequestManager {
   private LibraryDesignDao libraryDesignDao;
   @Autowired
   private LibraryDesignCodeDao libraryDesignCodeDao;
+  @Autowired
+  private NamingScheme namingScheme;
 
   public void setSecurityStore(SecurityStore securityStore) {
     this.securityStore = securityStore;
@@ -231,6 +238,10 @@ public class MisoRequestManager implements RequestManager {
 
   public void setLibraryQcStore(LibraryQcStore libraryQcStore) {
     this.libraryQcStore = libraryQcStore;
+  }
+
+  public void setNamingScheme(NamingScheme namingScheme) {
+    this.namingScheme = namingScheme;
   }
 
   public void setNoteStore(NoteStore noteStore) {
@@ -1500,7 +1511,31 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public long saveRun(Run run) throws IOException {
     if (runStore != null) {
-      return runStore.save(run);
+      long id;
+      if (run.getId() == AbstractRun.UNSAVED_ID) {
+        runStore.save(run);
+        try {
+          String name = namingScheme.generateNameFor(run);
+          run.setName(name);
+
+          validateNameOrThrow(run, namingScheme);
+          Number newId = (long) runStore.save(run);
+          if (newId.longValue() != run.getId()) {
+            log.error("Expected Run ID doesn't match returned value from database insert: rolling back...");
+            runStore.remove(run);
+            throw new IOException("Something bad happened. Expected Run ID doesn't match returned value from DB insert");
+          } else {
+            id = run.getId();
+          }
+        } catch (MisoNamingException e) {
+          throw new IOException("Cannot save Run - issue with generating name");
+        }
+      } else {
+        // applyChanges
+        runStore.save(run);
+        id = run.getId();
+      }
+      return id;
     } else {
       throw new IOException("No runStore available. Check that it has been declared in the Spring config.");
     }
@@ -2881,6 +2916,11 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public List<Library> getLibrariesByCreationDate(Date from, Date to) throws IOException {
     return libraryStore.searchByCreationDate(from, to);
+  }
+
+  public static void validateNameOrThrow(Nameable object, NamingScheme namingScheme) throws IOException {
+    ValidationResult val = namingScheme.validateName(object.getName());
+    if (!val.isValid()) throw new IOException("Save failed - invalid name:" + val.getMessage());
   }
 
 }

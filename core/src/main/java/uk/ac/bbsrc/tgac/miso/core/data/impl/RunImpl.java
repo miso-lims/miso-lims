@@ -29,6 +29,8 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
@@ -58,6 +60,9 @@ public class RunImpl extends AbstractRun implements Serializable {
   protected static final Logger log = LoggerFactory.getLogger(RunImpl.class);
 
   @ManyToMany(targetEntity = SequencerPartitionContainerImpl.class, cascade = CascadeType.ALL)
+  @JoinTable(name = "Run_SequencerPartitionContainer", joinColumns = {
+      @JoinColumn(name = "Run_runId", nullable = false, updatable = false) }, inverseJoinColumns = {
+          @JoinColumn(name = "containers_containerId", nullable = false, updatable = false) })
   private List<SequencerPartitionContainer<SequencerPoolPartition>> containers = new AutoPopulatingList<SequencerPartitionContainer<SequencerPoolPartition>>(
       SequencerPartitionContainerImpl.class);
 

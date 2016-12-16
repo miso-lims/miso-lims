@@ -51,8 +51,6 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.store.SecurityStore;
 
-import net.sf.ehcache.CacheManager;
-
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
@@ -63,8 +61,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
 import uk.ac.bbsrc.tgac.miso.core.store.RunQcStore;
@@ -87,8 +83,6 @@ public class SQLRunDAOTest extends AbstractDAOTest {
   @Autowired
   private SessionFactory sessionFactory;
 
-  @Mock
-  private NamingScheme namingScheme;
   @Mock
   private SecurityStore securityDAO;
   @Mock
@@ -326,8 +320,6 @@ public class SQLRunDAOTest extends AbstractDAOTest {
     run.setLastModifier(mockUser);
 
     mockAutoIncrement(nextAutoIncrementId);
-    when(namingScheme.generateNameFor(run)).thenReturn(runName);
-    when(namingScheme.validateName(Mockito.anyString())).thenReturn(ValidationResult.success());
 
     long runId = dao.save(run);
     Run insertedRun = dao.get(runId);
@@ -354,11 +346,9 @@ public class SQLRunDAOTest extends AbstractDAOTest {
     run.setLastModifier(user);
     run.setSequencingParameters(null);
 
-    Mockito.when(namingScheme.validateName(Matchers.anyString())).thenReturn(ValidationResult.success());
-
     assertEquals(1L, dao.save(run));
     Run savedRun = dao.get(1L);
-    assertNotSame(run, savedRun); // weird caching error?
+    assertNotSame(run, savedRun);
     assertEquals(run.getId(), savedRun.getId());
     assertEquals("/far/far/away", savedRun.getFilePath());
     assertEquals("AwesomeRun", savedRun.getName());
@@ -369,7 +359,6 @@ public class SQLRunDAOTest extends AbstractDAOTest {
     assertNull(dao.get(nextAutoIncrementId));
     Run newRun = makeRun("TestRun");
     mockAutoIncrement(nextAutoIncrementId);
-    Mockito.when(namingScheme.validateName(Matchers.anyString())).thenReturn(ValidationResult.success());
 
     assertEquals(nextAutoIncrementId, dao.save(newRun));
 
@@ -393,18 +382,12 @@ public class SQLRunDAOTest extends AbstractDAOTest {
     runs.add(run1);
     runs.add(run2);
     mockAutoIncrement(autoIncrementId);
-    Mockito.when(namingScheme.validateName(Matchers.anyString())).thenReturn(ValidationResult.success());
 
     assertNull(dao.get(autoIncrementId));
     assertNull(dao.get(autoIncrementId + 1L));
 
-    CacheManager cacheManager = Mockito.mock(CacheManager.class);
-    Mockito.when(cacheManager.getCache(Matchers.anyString())).thenReturn(null);
-    // dao.setCacheManager(cacheManager);
-
     dao.saveAll(runs);
 
-    // dao.setCacheManager(null);
     Run savedRun1 = dao.get(autoIncrementId);
     assertNotNull(savedRun1);
     assertEquals(run1.getAlias(), savedRun1.getAlias());

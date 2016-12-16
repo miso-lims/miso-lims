@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.persistence.CascadeType;
-
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -38,7 +36,6 @@ public class HibernateRunQcDao implements RunQcStore {
 
   private RunStore runDao;
   private SequencerPartitionContainerStore sequencerPartitionContainerDao;
-  private CascadeType cascadeType;
 
   private Session currentSession() {
     return getSessionFactory().getCurrentSession();
@@ -128,7 +125,7 @@ public class HibernateRunQcDao implements RunQcStore {
 
   public List<Partition> listPartitionSelectionsByRunQcId(long runQcId) {
     Criteria criteria = currentSession().createCriteria(RunQCImpl.class);
-    criteria.add(Restrictions.eqOrIsNull("id", runQcId));
+    criteria.add(Restrictions.eq("id", runQcId));
     @SuppressWarnings("unchecked")
     List<RunQC> runQcs = criteria.list();
     List<Partition> partitions = new ArrayList<>();
@@ -160,13 +157,5 @@ public class HibernateRunQcDao implements RunQcStore {
 
   public void setSequencerPartitionContainerDao(SequencerPartitionContainerStore sequencerPartitionContainerDao) {
     this.sequencerPartitionContainerDao = sequencerPartitionContainerDao;
-  }
-
-  public CascadeType getCascadeType() {
-    return cascadeType;
-  }
-
-  public void setCascadeType(CascadeType cascadeType) {
-    this.cascadeType = cascadeType;
   }
 }

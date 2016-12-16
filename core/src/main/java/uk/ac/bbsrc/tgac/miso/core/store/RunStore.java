@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
 
 /**
  * Defines a DAO interface for storing Runs
@@ -37,7 +36,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface RunStore extends Store<Run>, Cascadable, Remover<Run>, NamingSchemeAware {
+public interface RunStore extends Store<Run>, Remover<Run> {
   /**
    * Gets the latest Run, by start date, that is associated with the given container
    *

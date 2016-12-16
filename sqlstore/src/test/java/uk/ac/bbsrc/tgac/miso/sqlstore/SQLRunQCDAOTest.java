@@ -11,8 +11,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import javax.persistence.CascadeType;
-
 import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Rule;
@@ -144,7 +142,6 @@ public class SQLRunQCDAOTest extends AbstractDAOTest {
 
   @Test
   public void testRemove() throws Exception {
-    dao.setCascadeType(CascadeType.ALL);
     RunQC runQC = dao.get(3);
     boolean remove = dao.remove(runQC);
     assertTrue(remove);
