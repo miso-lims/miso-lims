@@ -46,22 +46,22 @@ public class SecurityProfile implements Serializable {
   private User owner = null;
 
   @ManyToMany(targetEntity = UserImpl.class)
-  @JoinTable(name = "SecurityProfile_ReadUser", joinColumns = { @JoinColumn(name = "readUser_userId") }, inverseJoinColumns = {
+  @JoinTable(name = "SecurityProfile_ReadUser", inverseJoinColumns = { @JoinColumn(name = "readUser_userId") }, joinColumns = {
       @JoinColumn(name = "SecurityProfile_profileId") })
   private Collection<User> readUsers = new HashSet<>();
 
   @ManyToMany(targetEntity = UserImpl.class)
-  @JoinTable(name = "SecurityProfile_WriteUser", joinColumns = { @JoinColumn(name = "writeUser_userId") }, inverseJoinColumns = {
+  @JoinTable(name = "SecurityProfile_WriteUser", inverseJoinColumns = { @JoinColumn(name = "writeUser_userId") }, joinColumns = {
       @JoinColumn(name = "SecurityProfile_profileId") })
   private Collection<User> writeUsers = new HashSet<>();
 
   @ManyToMany(targetEntity = Group.class)
-  @JoinTable(name = "SecurityProfile_ReadGroup", joinColumns = { @JoinColumn(name = "readGroup_groupId") }, inverseJoinColumns = {
+  @JoinTable(name = "SecurityProfile_ReadGroup", inverseJoinColumns = { @JoinColumn(name = "readGroup_groupId") }, joinColumns = {
       @JoinColumn(name = "SecurityProfile_profileId") })
   private Collection<Group> readGroups = new HashSet<>();
 
   @ManyToMany(targetEntity = Group.class)
-  @JoinTable(name = "SecurityProfile_WriteGroup", joinColumns = { @JoinColumn(name = "writeGroup_groupId") }, inverseJoinColumns = {
+  @JoinTable(name = "SecurityProfile_WriteGroup", inverseJoinColumns = { @JoinColumn(name = "writeGroup_groupId") }, joinColumns = {
       @JoinColumn(name = "SecurityProfile_profileId") })
   private Collection<Group> writeGroups = new HashSet<>();
 

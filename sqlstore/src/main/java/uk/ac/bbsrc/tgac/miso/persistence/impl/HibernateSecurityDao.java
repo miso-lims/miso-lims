@@ -24,13 +24,9 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -149,11 +145,11 @@ public class HibernateSecurityDao implements SecurityStore {
 
   @Override
   public Collection<Group> listGroupsByIds(Collection<Long> groupIds) throws IOException {
-    List<Group> groups = new ArrayList<>(groupIds.size());
-    for (Long id : groupIds) {
-      groups.add(getGroupById(id));
-    }
-    return groups;
+    Criteria criteria = currentSession().createCriteria(UserImpl.class);
+    criteria.add(Restrictions.in("id", groupIds));
+    @SuppressWarnings("unchecked")
+    List<Group> results = criteria.list();
+    return results;
   }
 
   public Collection<Group> listGroupsByUserId(Long userId) throws IOException {
@@ -178,15 +174,11 @@ public class HibernateSecurityDao implements SecurityStore {
 
   @Override
   public Collection<User> listUsersByIds(Collection<Long> userIds) throws IOException {
-    if (userIds.size() > 0) {
-      Set<User> results = new HashSet<>();
-      for (long userId : userIds) {
-        User u = getUserById(userId);
-        if (u != null) results.add(u);
-      }
-      return results;
-    }
-    return Collections.emptySet();
+    Criteria criteria = currentSession().createCriteria(UserImpl.class);
+    criteria.add(Restrictions.in("id", userIds));
+    @SuppressWarnings("unchecked")
+    List<User> results = criteria.list();
+    return results;
   }
 
   @Override
