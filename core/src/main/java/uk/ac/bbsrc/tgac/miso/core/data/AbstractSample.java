@@ -31,6 +31,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.TreeSet;
 
+import javax.persistence.CascadeType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -89,7 +90,7 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @JsonManagedReference
   private final Collection<Library> libraries = new HashSet<>();
 
-  @OneToMany(targetEntity = SampleQCImpl.class)
+  @OneToMany(targetEntity = SampleQCImpl.class, mappedBy = "sample", cascade = CascadeType.ALL)
   private Collection<SampleQC> sampleQCs = new TreeSet<>();
 
   @OneToMany(targetEntity = Note.class)

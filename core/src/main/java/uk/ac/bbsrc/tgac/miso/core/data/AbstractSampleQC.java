@@ -23,7 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import javax.persistence.Column;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 
@@ -43,7 +43,7 @@ public abstract class AbstractSampleQC extends AbstractQC implements SampleQC {
   private Double results;
 
   @ManyToOne(targetEntity = SampleImpl.class)
-  @Column(name = "sample_sampleId")
+  @JoinColumn(name = "sample_sampleId")
   private Sample sample;
 
   @Override
