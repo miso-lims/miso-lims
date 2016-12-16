@@ -23,7 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.Date;
 
@@ -89,9 +88,8 @@ public interface SequencerReference extends Nameable, Deletable {
    * Sets the ipAddress of this SequencerReference object.
    * 
    * @param ip of type String
-   * @throws IOException
    */
-  void setIpAddress(String ip) throws IOException;
+  void setIpAddress(String ip);
 
   /**
    * Returns the String ipAddress of this SequencerReference object.

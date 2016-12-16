@@ -112,10 +112,18 @@ public abstract class AbstractSequencerReference implements SequencerReference {
   }
 
   @Override
-  public void setIpAddress(String ip) throws IOException {
-    if (ip == null) throw new IOException("IP address cannot be null");
-    InetAddress inet = InetAddress.getByName(ip);
-    this.ip = (inet != null ? inet.getHostAddress() : null);
+  public void setIpAddress(String ip) {
+    if (ip == null) {
+      this.ip = null;
+    } else {
+      try {
+      InetAddress inet = InetAddress.getByName(ip);
+      this.ip = (inet != null ? inet.getHostAddress() : null);
+      } catch (IOException e) {
+        log.error("Error getting InetAddress from given ip " + ip, e);
+        this.ip = null;
+      }
+    }
   }
 
   @Override

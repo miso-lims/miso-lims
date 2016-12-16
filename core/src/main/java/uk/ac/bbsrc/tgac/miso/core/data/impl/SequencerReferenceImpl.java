@@ -51,7 +51,7 @@ public class SequencerReferenceImpl extends AbstractSequencerReference implement
    * @param platform
    *          of type Platform
    */
-  public SequencerReferenceImpl(String name, String ip, Platform platform) throws IOException {
+  public SequencerReferenceImpl(String name, String ip, Platform platform) {
     setName(name);
     setIpAddress(ip);
     setPlatform(platform);
@@ -62,7 +62,7 @@ public class SequencerReferenceImpl extends AbstractSequencerReference implement
    * 
    * @throws IOException
    */
-  public SequencerReferenceImpl() throws IOException {
+  public SequencerReferenceImpl() {
     setPlatform(null);
     setName(null);
     setIpAddress(null);
