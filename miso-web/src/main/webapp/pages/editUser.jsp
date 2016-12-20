@@ -136,14 +136,6 @@
                 </div>
               </td>
             </tr>
-            <tr>
-              <td>Supplemental Roles:</td>
-              <td>
-                <div id="roles" class="checklist">
-                  <form:checkboxes items="${roles}" path="roles"/>
-                </div>
-              </td>
-            </tr>
           </table>
         </form:form>
       </c:when>

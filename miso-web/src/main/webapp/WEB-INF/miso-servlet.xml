@@ -43,6 +43,4 @@
   <context:property-placeholder location="${miso.propertiesFile}" />
 
   <bean name="webBindingInitializer" class="uk.ac.bbsrc.tgac.miso.spring.LimsBindingInitializer" />
-
-  <bean name="inputDataXmlView" class="uk.ac.bbsrc.tgac.miso.webapp.controller.InputDataXmlView" />
 </beans>
