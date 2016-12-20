@@ -48,11 +48,8 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.eaglegenomics.simlims.core.Activity;
 import com.eaglegenomics.simlims.core.Group;
-import com.eaglegenomics.simlims.core.Protocol;
 import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.ProtocolManager;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
@@ -73,9 +70,6 @@ public class EditUserController {
   private PasswordCodecService passwordCodecService;
 
   @Autowired
-  private ProtocolManager protocolManager;
-
-  @Autowired
   private DataObjectFactory dataObjectFactory;
 
   @Autowired
@@ -87,10 +81,6 @@ public class EditUserController {
 
   public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
     this.dataObjectFactory = dataObjectFactory;
-  }
-
-  public void setProtocolManager(ProtocolManager protocolManager) {
-    this.protocolManager = protocolManager;
   }
 
   public void setSecurityManager(SecurityManager securityManager) {
@@ -115,25 +105,6 @@ public class EditUserController {
     } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to list groups", ex);
-      }
-      throw ex;
-    }
-  }
-
-  @ModelAttribute("roles")
-  public Collection<String> populateRoles() throws IOException {
-    try {
-      Collection<String> roles = new ArrayList<String>();
-      for (Protocol protocol : protocolManager.listAllProtocols()) {
-        roles.add(protocol.getRole());
-      }
-      for (Activity activity : protocolManager.listAllActivities()) {
-        roles.add(activity.getRole());
-      }
-      return roles;
-    } catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to list roles", ex);
       }
       throw ex;
     }
