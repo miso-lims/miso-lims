@@ -117,11 +117,11 @@ public abstract class AbstractSequencerReference implements SequencerReference {
       this.ip = null;
     } else {
       try {
-      InetAddress inet = InetAddress.getByName(ip);
-      this.ip = (inet != null ? inet.getHostAddress() : null);
+        InetAddress inet = InetAddress.getByName(ip);
+        this.ip = (inet != null ? inet.getHostAddress() : null);
       } catch (IOException e) {
         log.error("Error getting InetAddress from given ip " + ip, e);
-        this.ip = null;
+        throw new IllegalArgumentException("Error getting InetAddress from given ip " + ip, e);
       }
     }
   }

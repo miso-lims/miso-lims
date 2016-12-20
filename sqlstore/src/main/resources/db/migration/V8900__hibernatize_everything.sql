@@ -31,3 +31,4 @@ UPDATE SequencerReference SET ip = INET_NTOA(ipAddress);
 --EndNoTest
 ALTER TABLE SequencerReference DROP COLUMN available;
 ALTER TABLE SequencerReference DROP COLUMN ipAddress;
+ALTER TABLE SequencerReference ADD CONSTRAINT upgraded_SR_UK UNIQUE (upgradedSequencerReferenceId);

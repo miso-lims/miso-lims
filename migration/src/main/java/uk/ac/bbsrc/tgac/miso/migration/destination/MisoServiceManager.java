@@ -49,7 +49,6 @@ import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSampleClassService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSampleNumberPerProjectService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSampleService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSampleValidRelationshipService;
-import uk.ac.bbsrc.tgac.miso.sqlstore.HibernateStudyDao;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLBoxDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLChangeLogDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLExperimentDAO;
