@@ -143,9 +143,9 @@
   </modules>
   <!-- SVN connection -->
   <scm>
-    <connection>scm:git:https://www.github.com/TGAC/miso-lims</connection>
-    <developerConnection>scm:git:git@github.com/TGAC/miso-lims</developerConnection>
-    <url>http://www.github.com/TGAC/miso-lims</url>
+    <connection>scm:git:https://www.github.com/oicr-gsi/miso-lims</connection>
+    <developerConnection>scm:git:git@github.com:oicr-gsi/miso-lims</developerConnection>
+    <url>http://www.github.com/oicr-gsi/miso-lims</url>
   </scm>
   <!-- Bug Tracker -->
   <issueManagement>
