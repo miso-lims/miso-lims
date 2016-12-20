@@ -391,11 +391,11 @@ VALUES (16),
 (17);
 
 DELETE FROM `SampleQC`;
-INSERT INTO `SampleQC`(`qcId`, `sample_sampleId`, `qcUserName`, `qcDate`, `qcMethod`, `results`) 
-VALUES (1,1,'admin','2015-08-27',1,5),(2,2,'admin','2015-08-27',1,5),(3,3,'admin','2015-08-27',1,5),(4,4,'admin','2015-08-27',1,5),
-(5,5,'admin','2015-08-27',1,5),(6,6,'admin','2015-08-27',1,5),(7,7,'admin','2015-08-27',1,5),(8,8,'admin','2015-08-27',1,5),
-(9,9,'admin','2015-08-27',1,5),(10,10,'admin','2015-08-27',1,5),(11,11,'admin','2015-08-27',1,5),(12,12,'admin','2015-08-27',1,5),
-(13,13,'admin','2015-08-27',1,5),(14,14,'admin','2015-08-27',1,5), (15,14,'admin','2015-08-27',1,5);
+INSERT INTO `SampleQC`(`sample_sampleId`, `qcUserName`, `qcDate`, `qcMethod`, `results`) 
+VALUES (1,'admin','2015-08-27',1,5),(2,2,'admin','2015-08-27',1,5),(3,3,'admin','2015-08-27',1,5),(4,4,'admin','2015-08-27',1,5),
+(5,'admin','2015-08-27',1,5),(6,6,'admin','2015-08-27',1,5),(7,7,'admin','2015-08-27',1,5),(8,8,'admin','2015-08-27',1,5),
+(9,'admin','2015-08-27',1,5),(10,10,'admin','2015-08-27',1,5),(11,11,'admin','2015-08-27',1,5),(12,12,'admin','2015-08-27',1,5),
+(13,'admin','2015-08-27',1,5),(14,14,'admin','2015-08-27',1,5), (15,14,'admin','2015-08-27',1,5);
 
 DELETE FROM `SequencerPartitionContainer`;
 INSERT INTO `SequencerPartitionContainer`(`containerId`, `securityProfile_profileId`, `identificationBarcode`, `locationBarcode`, `platform`, `validationBarcode`, `lastModifier`) 

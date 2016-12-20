@@ -48,7 +48,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.SiblingNumberGenerator;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
-import uk.ac.bbsrc.tgac.miso.core.store.SampleQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleDao;
@@ -74,8 +73,6 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
   private LibraryStore libraryDao;
 
   private NoteStore noteDao;
-
-  private SampleQcStore sampleQcDao;
 
   private SecurityStore securityDao;
 
@@ -146,9 +143,6 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
 
     sample.getLibraries().clear();
     sample.getLibraries().addAll(libraryDao.listBySampleId(sample.getId()));
-
-    sample.getSampleQCs().clear();
-    sample.getSampleQCs().addAll(sampleQcDao.listBySampleId(sample.getId()));
 
     sample.getNotes().clear();
     sample.getNotes().addAll(noteDao.listBySample(sample.getId()));
@@ -254,10 +248,6 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
   public Long countAll() throws IOException {
     Query query = currentSession().createQuery("select count(*) from SampleImpl");
     return (Long) query.uniqueResult();
-  }
-
-  public SampleQcStore getSampleQcDao() {
-    return sampleQcDao;
   }
 
   public SecurityStore getSecurityDao() {
@@ -383,6 +373,7 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
   @Override
   public List<Sample> listBySearchOffsetAndNumResults(int offset, int resultsPerPage, String querystr, String sortCol, String sortDir)
       throws IOException {
+    if (offset < 0 || resultsPerPage < 0) throw new IOException("Limit and Offset must not be less than zero");
     if ("lastModified".equals(sortCol)) sortCol = "derivedInfo.lastModified";
     Criteria criteria = currentSession().createCriteria(SampleImpl.class);
     criteria.add(searchRestrictions(querystr));
@@ -391,7 +382,7 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
     criteria.createAlias("derivedInfo", "derivedInfo");
     criteria.setFirstResult(offset);
     criteria.setMaxResults(resultsPerPage);
-    criteria.addOrder("asc".equals(sortDir) ? Order.asc(sortCol) : Order.desc(sortCol));
+    criteria.addOrder("asc".equalsIgnoreCase(sortDir) ? Order.asc(sortCol) : Order.desc(sortCol));
     criteria.setProjection(Projections.property("id"));
     @SuppressWarnings("unchecked")
     List<Long> ids = criteria.list();
@@ -401,7 +392,7 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
     // We do this in two steps to make a smaller query that that the database can optimise
     Criteria query = currentSession().createCriteria(SampleImpl.class);
     query.add(Restrictions.in("id", ids));
-    query.addOrder("asc".equals(sortDir) ? Order.asc(sortCol) : Order.desc(sortCol));
+    query.addOrder("asc".equalsIgnoreCase(sortDir) ? Order.asc(sortCol) : Order.desc(sortCol));
     query.createAlias("derivedInfo", "derivedInfo");
     @SuppressWarnings("unchecked")
     List<Sample> requestedPage = fetchSqlStore(query.list());
@@ -410,14 +401,15 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
 
   @Override
   public List<Sample> listByOffsetAndNumResults(int offset, int resultsPerPage, String sortCol, String sortDir) throws IOException {
-    Criteria criteria = currentSession().createCriteria(SampleImpl.class);
+    if (offset < 0 || resultsPerPage < 0) throw new IOException("Limit and Offset must not be less than zero");
     if ("lastModified".equals(sortCol)) sortCol = "derivedInfo.lastModified";
+    Criteria criteria = currentSession().createCriteria(SampleImpl.class);
     // I don't know why this alias is required, but without it, you can't sort by 'derivedInfo.lastModifier', which is the field on which we
     // want to sort most List X pages
     criteria.createAlias("derivedInfo", "derivedInfo");
     criteria.setFirstResult(offset);
     criteria.setMaxResults(resultsPerPage);
-    criteria.addOrder("asc".equals(sortDir.toLowerCase()) ? Order.asc(sortCol) : Order.desc(sortCol));
+    criteria.addOrder("asc".equalsIgnoreCase(sortDir.toLowerCase()) ? Order.asc(sortCol) : Order.desc(sortCol));
     @SuppressWarnings("unchecked")
     List<Sample> requestedPage = criteria.list();
     return fetchSqlStore(requestedPage);
@@ -492,10 +484,6 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
 
   public void setNoteDao(NoteStore noteDao) {
     this.noteDao = noteDao;
-  }
-
-  public void setSampleQcDao(SampleQcStore sampleQcDao) {
-    this.sampleQcDao = sampleQcDao;
   }
 
   public void setSecurityDao(SecurityStore securityDao) {
