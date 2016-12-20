@@ -704,7 +704,8 @@ CREATE PROCEDURE deleteSample(
   DELETE FROM SampleCVSlide WHERE sampleId = iSampleId;
   DELETE FROM SampleLCMTube WHERE sampleId = iSampleId;
   DELETE FROM SampleTissue WHERE sampleId = iSampleId;
-  DELETE FROM Identity WHERE sampleId = iSampleId;
+  DELETE FROM `Identity` WHERE sampleId = iSampleId;
+  DELETE FROM SampleChangeLog WHERE sampleId = iSampleId;
   DELETE FROM DetailedSample WHERE sampleId = iSampleId;
 
   -- delete from Sample table
@@ -751,6 +752,7 @@ CREATE PROCEDURE deleteLibrary(
 
   -- delete from libraryAdditionalInfo
   DELETE FROM LibraryAdditionalInfo WHERE libraryId = iLibraryId;
+  DELETE FROM LibraryChangeLog WHERE libraryId = iLibraryId;
 
   -- delete from Library table
   DELETE FROM Library WHERE libraryId = iLibraryId;
