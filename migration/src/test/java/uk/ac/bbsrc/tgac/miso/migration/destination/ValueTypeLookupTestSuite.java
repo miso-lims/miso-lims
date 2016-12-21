@@ -53,6 +53,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLabDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDesignCodeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDesignDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSamplePurposeDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleQcDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSequencerReferenceDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSubprojectDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueMaterialDao;
@@ -61,7 +62,6 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueTypeDao;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultReferenceGenomeService;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryQCDAO;
-import uk.ac.bbsrc.tgac.miso.sqlstore.SQLSampleQCDAO;
 
 public class ValueTypeLookupTestSuite {
 
@@ -156,7 +156,7 @@ public class ValueTypeLookupTestSuite {
     Mockito.when(iDao.listAllIndices()).thenReturn(inds);
     Mockito.when(mgr.getIndexDao()).thenReturn(iDao);
 
-    SQLSampleQCDAO sqcDao = Mockito.mock(SQLSampleQCDAO.class);
+    HibernateSampleQcDao sqcDao = Mockito.mock(HibernateSampleQcDao.class);
     List<QcType> sqcs = new ArrayList<>();
     sqcs.add(makeQcType(VALID_LONG, VALID_STRING));
     Mockito.when(sqcDao.listAllSampleQcTypes()).thenReturn(sqcs);

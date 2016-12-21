@@ -40,6 +40,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSequencerReferenceDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSequencingParametersDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateStudyDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSubprojectDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTargetedSequencingDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueMaterialDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueOriginDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueTypeDao;
@@ -64,7 +65,6 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.SQLRunQCDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLSequencerPartitionContainerDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLSequencerPoolPartitionDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLStatusDAO;
-import uk.ac.bbsrc.tgac.miso.sqlstore.SQLTargetedSequencingDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLWatcherDAO;
 
 /**
@@ -93,7 +93,7 @@ public class MisoServiceManager {
   private SQLLibraryDAO libraryDao;
   private SQLLibraryQCDAO libraryQcDao;
   private SQLLibraryDilutionDAO dilutionDao;
-  private SQLTargetedSequencingDAO targetedSequencingDao;
+  private HibernateTargetedSequencingDao targetedSequencingDao;
   private SQLPoolDAO poolDao;
   private SQLPoolQCDAO poolQcDao;
   private SQLExperimentDAO experimentDao;
@@ -276,7 +276,6 @@ public class MisoServiceManager {
     if (sampleDao != null) sampleDao.setSecurityDao(securityStore);
     if (noteDao != null) noteDao.setSecurityDAO(securityStore);
     if (libraryDao != null) libraryDao.setSecurityDAO(securityStore);
-    if (targetedSequencingDao != null) targetedSequencingDao.setSecurityDAO(securityStore);
     if (poolDao != null) poolDao.setSecurityDAO(securityStore);
     if (experimentDao != null) experimentDao.setSecurityDAO(securityStore);
     if (runDao != null) runDao.setSecurityDAO(securityStore);
@@ -635,19 +634,17 @@ public class MisoServiceManager {
     if (libraryDao != null) libraryDao.setDilutionDAO(dilutionDao);
   }
 
-  public SQLTargetedSequencingDAO getTargetedSequencingDao() {
+  public HibernateTargetedSequencingDao getTargetedSequencingDao() {
     return targetedSequencingDao;
   }
 
-  public void setTargetedSequencingDao(SQLTargetedSequencingDAO targetedSequencingDao) {
+  public void setTargetedSequencingDao(HibernateTargetedSequencingDao targetedSequencingDao) {
     this.targetedSequencingDao = targetedSequencingDao;
     updateTargetedSequencingDaoDependencies();
   }
 
   public void setDefaultTargetedSequencingDao() {
-    SQLTargetedSequencingDAO dao = new SQLTargetedSequencingDAO();
-    dao.setJdbcTemplate(jdbcTemplate);
-    dao.setSecurityDAO(securityStore);
+    HibernateTargetedSequencingDao dao = new HibernateTargetedSequencingDao();
     setTargetedSequencingDao(dao);
   }
 

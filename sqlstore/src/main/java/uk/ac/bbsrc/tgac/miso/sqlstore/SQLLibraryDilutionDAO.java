@@ -341,7 +341,7 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
     params.addValue("dilutionUserName", dilution.getDilutionCreator());
     params.addValue("lastUpdated", dilution.getLastModified());
     if (dilution.getTargetedSequencing() != null) {
-      params.addValue("targetedSequencingId", dilution.getTargetedSequencing().getTargetedSequencingId());
+      params.addValue("targetedSequencingId", dilution.getTargetedSequencing().getId());
     } else {
       params.addValue("targetedSequencingId", null);
     }
@@ -377,7 +377,7 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
       params.addValue("dilutionId", dilution.getId());
       params.addValue("name", dilution.getName());
       if (dilution.getTargetedSequencing() != null) {
-        params.addValue("targetedSequencingId", dilution.getTargetedSequencing().getTargetedSequencingId());
+        params.addValue("targetedSequencingId", dilution.getTargetedSequencing().getId());
       } else {
         params.addValue("targetedSequencingId", null);
       }

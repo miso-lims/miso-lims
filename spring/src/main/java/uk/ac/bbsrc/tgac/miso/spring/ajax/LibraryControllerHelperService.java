@@ -638,7 +638,7 @@ public class LibraryControllerHelperService {
     JSONArray targetedSequencingByKit = new JSONArray();
     for (TargetedSequencing targetedSequencing : targetedSequencings) {
       Map<String, Object> targetedSequencingMap = Maps.newHashMap();
-      targetedSequencingMap.put("targetedSequencingId", targetedSequencing.getTargetedSequencingId());
+      targetedSequencingMap.put("targetedSequencingId", targetedSequencing.getId());
       targetedSequencingMap.put("alias", targetedSequencing.getAlias());
       targetedSequencingMap.put("kitDescriptorId", targetedSequencing.getKitDescriptor().getId());
       fullTargetedSequencingCollection.add(targetedSequencingMap);
