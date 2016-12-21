@@ -25,15 +25,12 @@ public class TargetedSequencing {
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long targetedSequencingId;
 
-  /** Name displayed in UI and associated with targeted sequencing bed file. */
   @Column(nullable = false)
   private String alias;
 
-  /** Description used to make purpose of targeted sequencing clearer to user. */
   @Column(nullable = false)
   private String description;
 
-  /** The kit chosen will restrict the targeted sequencing that is available. */
   @ManyToOne(targetEntity = KitDescriptor.class)
   @JoinColumn(name = "kitDescriptorId")
   private KitDescriptor kitDescriptor;
@@ -63,26 +60,56 @@ public class TargetedSequencing {
     this.targetedSequencingId = targetedSequencingId;
   }
 
+  /**
+   * Returns name displayed in UI and associated with targeted sequencing bed file.
+   * 
+   * @return alias of type String
+   */
   public String getAlias() {
     return alias;
   }
 
+  /**
+   * Sets name displayed in UI and associated with targeted sequencing bed file.
+   * 
+   * @param alias of type String
+   */
   public void setAlias(String alias) {
     this.alias = alias;
   }
 
+  /**
+   * Returns description used to make purpose of targeted sequencing clearer to user.
+   * 
+   * @return description of type String
+   */
   public String getDescription() {
     return description;
   }
 
+  /**
+   * Sets description used to make purpose of targeted sequencing clearer to user.
+   * 
+   * @param description of type String
+   */
   public void setDescription(String description) {
     this.description = description;
   }
 
+  /**
+   * Returns the kit descriptor chosen, which will restrict the targeted sequencing that is available.
+   * 
+   * @return kitDescriptor of type KitDescriptor
+   */
   public KitDescriptor getKitDescriptor() {
     return kitDescriptor;
   }
 
+  /**
+   * Sets the kit descriptor chosen, which will restrict the targeted sequencing that is available.
+   * 
+   * @param kitDescriptor of type KitDescriptor
+   */
   public void setKitDescriptor(KitDescriptor kitDescriptor) {
     this.kitDescriptor = kitDescriptor;
   }

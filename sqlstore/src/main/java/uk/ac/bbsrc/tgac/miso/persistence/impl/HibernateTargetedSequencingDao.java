@@ -31,18 +31,6 @@ public class HibernateTargetedSequencingDao implements TargetedSequencingStore {
   }
 
   @Override
-  public long save(TargetedSequencing ts) throws IOException {
-    long id;
-    if (ts.getId() == TargetedSequencing.UNSAVED_ID) {
-      id = (long) currentSession().save(ts);
-    } else {
-      currentSession().update(ts);
-      id = ts.getId();
-    }
-    return id;
-  }
-
-  @Override
   public TargetedSequencing get(long id) throws IOException {
     return (TargetedSequencing) currentSession().get(TargetedSequencing.class, id);
   }
@@ -72,6 +60,11 @@ public class HibernateTargetedSequencingDao implements TargetedSequencingStore {
 
   public void setSessionFactory(SessionFactory sessionFactory) {
     this.sessionFactory = sessionFactory;
+  }
+
+  @Override
+  public long save(TargetedSequencing t) throws IOException {
+    throw new UnsupportedOperationException("Method not implemented in DAO");
   }
 
 }
