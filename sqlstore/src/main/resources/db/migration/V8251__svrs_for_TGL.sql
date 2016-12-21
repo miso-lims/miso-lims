@@ -1,6 +1,6 @@
 --StartNoTest
 DELIMITER //
-DROP PROCEDURE IF EXISTS insert_svr_if_not_exists;
+DROP PROCEDURE IF EXISTS insert_svr_if_not_exists//
 CREATE PROCEDURE insert_svr_if_not_exists(svrParentId BIGINT(20), svrChildId BIGINT(20))
 BEGIN
   SET @time = NOW();
