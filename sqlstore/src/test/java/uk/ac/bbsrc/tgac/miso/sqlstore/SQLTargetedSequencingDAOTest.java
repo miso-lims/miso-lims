@@ -5,46 +5,29 @@ import static org.junit.Assert.assertThat;
 
 import java.util.Collection;
 
+import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.security.core.Authentication;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
-import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSecurityDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTargetedSequencingDao;
 
 public class SQLTargetedSequencingDAOTest extends AbstractDAOTest {
 
   @Autowired
-  private JdbcTemplate template;
-
-  @Autowired
-  private DataObjectFactory dataObjectFactory;
-
-  @Mock
-  private Authentication authenticationMock;
-
-  @Mock
-  private HibernateSecurityDao securityDAO;
-
-  @Mock
-  private KitStore kitDao;
+  private SessionFactory sessionFactory;
 
   @InjectMocks
-  private SQLTargetedSequencingDAO dao;
+  private HibernateTargetedSequencingDao dao;
 
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
-    dao.setJdbcTemplate(template);
-    dao.setDataObjectFactory(dataObjectFactory);
+    dao.setSessionFactory(sessionFactory);
   }
 
   @Test
