@@ -92,8 +92,8 @@ public class ImportExcel {
     List sheetData = new ArrayList();
     List sheetData1 = new ArrayList();
 
-    List<List<Cell>> ga2Data = new ArrayList<List<Cell>>();
-    List<List<Cell>> hiSeqData = new ArrayList<List<Cell>>();
+    List<List<Cell>> ga2Data = new ArrayList<>();
+    List<List<Cell>> hiSeqData = new ArrayList<>();
 
     sp.setAllowAllInternal(true);
     sp.setOwner(securityManager.getUserById(1L));
@@ -406,8 +406,7 @@ public class ImportExcel {
                 } else if (machine.equals("SN790")) {
                   machine = "N78428";
                 }
-                sr = new SequencerReferenceImpl(machine, InetAddress.getByName(machine), platform);
-                sr.setAvailable(true);
+                sr = new SequencerReferenceImpl(machine, InetAddress.getByName(machine).getHostAddress(), platform);
                 long srId = misoManager.saveSequencerReference(sr);
                 sr.setId(srId);
                 run.setSequencerReference(sr);

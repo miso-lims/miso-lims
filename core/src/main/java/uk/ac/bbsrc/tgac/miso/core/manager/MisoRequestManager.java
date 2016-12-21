@@ -2247,9 +2247,9 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public SequencerReference getSequencerReferenceByRunId(long runId) throws IOException {
+  public SequencerReference getSequencerReferenceByUpgradedReferenceId(long upgradedReferenceId) throws IOException {
     if (sequencerReferenceStore != null) {
-      return sequencerReferenceStore.getByRunId(runId);
+      return sequencerReferenceStore.getByUpgradedReference(upgradedReferenceId);
     } else {
       throw new IOException("No sequencerReferenceStore available. Check that it has been declared in the Spring config.");
     }

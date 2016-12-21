@@ -36,6 +36,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleQcDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleValidRelationshipDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSecurityDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSecurityProfileDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSequencerReferenceDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSequencingParametersDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateStudyDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSubprojectDao;
@@ -62,7 +63,6 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.SQLRunDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLRunQCDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLSequencerPartitionContainerDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLSequencerPoolPartitionDAO;
-import uk.ac.bbsrc.tgac.miso.sqlstore.SQLSequencerReferenceDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLStatusDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLTargetedSequencingDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLWatcherDAO;
@@ -105,7 +105,7 @@ public class MisoServiceManager {
   private SQLSequencerPartitionContainerDAO sequencerPartitionContainerDao;
   private SQLSequencerPoolPartitionDAO partitionDao;
   private SQLStatusDAO statusDao;
-  private SQLSequencerReferenceDAO sequencerReferenceDao;
+  private HibernateSequencerReferenceDao sequencerReferenceDao;
   private SQLBoxDAO boxDao;
 
   private DefaultSampleClassService sampleClassService;
@@ -755,7 +755,6 @@ public class MisoServiceManager {
   private void updatePlatformDaoDependencies() {
     if (experimentDao != null) experimentDao.setPlatformDAO(platformDao);
     if (sequencerPartitionContainerDao != null) sequencerPartitionContainerDao.setPlatformDAO(platformDao);
-    if (sequencerReferenceDao != null) sequencerReferenceDao.setPlatformDAO(platformDao);
   }
 
   public HibernateStudyDao getStudyDao() {
@@ -906,20 +905,18 @@ public class MisoServiceManager {
     if (runDao != null) runDao.setStatusDAO(statusDao);
   }
 
-  public SQLSequencerReferenceDAO getSequencerReferenceDao() {
+  public HibernateSequencerReferenceDao getSequencerReferenceDao() {
     return sequencerReferenceDao;
   }
 
-  public void setSequencerReferenceDao(SQLSequencerReferenceDAO sequencerReferenceDao) {
+  public void setSequencerReferenceDao(HibernateSequencerReferenceDao sequencerReferenceDao) {
     this.sequencerReferenceDao = sequencerReferenceDao;
     updateSequencerReferenceDaoDependencies();
   }
 
   public void setDefaultSequencerReferenceDao() {
-    SQLSequencerReferenceDAO dao = new SQLSequencerReferenceDAO();
-    dao.setDataObjectFactory(dataObjectFactory);
+    HibernateSequencerReferenceDao dao = new HibernateSequencerReferenceDao();
     dao.setJdbcTemplate(jdbcTemplate);
-    dao.setPlatformDAO(platformDao);
     setSequencerReferenceDao(dao);
   }
 

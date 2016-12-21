@@ -48,20 +48,20 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.persistence.HibernateSampleClassDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateDetailedQcStatusDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateIndexDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateKitDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLabDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDesignCodeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDesignDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSamplePurposeDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSequencerReferenceDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSubprojectDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueMaterialDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueOriginDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueTypeDao;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateKitDao;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultReferenceGenomeService;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryQCDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLSampleQCDAO;
-import uk.ac.bbsrc.tgac.miso.sqlstore.SQLSequencerReferenceDAO;
 
 public class ValueTypeLookupTestSuite {
 
@@ -168,7 +168,7 @@ public class ValueTypeLookupTestSuite {
     Mockito.when(lqcDao.listAllLibraryQcTypes()).thenReturn(lqcs);
     Mockito.when(mgr.getLibraryQcDao()).thenReturn(lqcDao);
 
-    SQLSequencerReferenceDAO seqRefDao = Mockito.mock(SQLSequencerReferenceDAO.class);
+    HibernateSequencerReferenceDao seqRefDao = Mockito.mock(HibernateSequencerReferenceDao.class);
     List<SequencerReference> seqRefs = new ArrayList<>();
     seqRefs.add(makeSequencer(VALID_LONG, VALID_STRING));
     Mockito.when(seqRefDao.listAll()).thenReturn(seqRefs);

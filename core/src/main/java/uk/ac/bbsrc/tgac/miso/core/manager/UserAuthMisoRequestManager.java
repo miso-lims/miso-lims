@@ -1909,8 +1909,8 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public SequencerReference getSequencerReferenceByRunId(long runId) throws IOException {
-    return backingManager.getSequencerReferenceByRunId(runId);
+  public SequencerReference getSequencerReferenceByUpgradedReferenceId(long upgradedReferenceId) throws IOException {
+    return backingManager.getSequencerReferenceByUpgradedReferenceId(upgradedReferenceId);
   }
 
   @Override
