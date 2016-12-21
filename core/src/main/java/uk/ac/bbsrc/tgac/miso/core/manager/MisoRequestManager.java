@@ -1513,20 +1513,13 @@ public class MisoRequestManager implements RequestManager {
     if (runStore != null) {
       long id;
       if (run.getId() == AbstractRun.UNSAVED_ID) {
-        runStore.save(run);
+        run.setId(runStore.save(run));
         try {
           String name = namingScheme.generateNameFor(run);
           run.setName(name);
 
           validateNameOrThrow(run, namingScheme);
-          Number newId = (long) runStore.save(run);
-          if (newId.longValue() != run.getId()) {
-            log.error("Expected Run ID doesn't match returned value from database insert: rolling back...");
-            runStore.remove(run);
-            throw new IOException("Something bad happened. Expected Run ID doesn't match returned value from DB insert");
-          } else {
-            id = run.getId();
-          }
+          id = runStore.save(run);
         } catch (MisoNamingException e) {
           throw new IOException("Cannot save Run - issue with generating name");
         }

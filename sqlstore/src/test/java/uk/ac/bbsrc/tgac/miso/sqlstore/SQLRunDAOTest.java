@@ -133,7 +133,11 @@ public class SQLRunDAOTest extends AbstractDAOTest {
     assertEquals(4, runs.size());
   }
 
-  // testListAllWithZeroLimit() deleted because our version of Hibernate (4.2.21.FINAL) treats limit 0 as "no limit" (not fixed until 4.3.2)
+  @Test
+  public void testListAllWithZeroLimit() throws IOException {
+    List<Run> runs = dao.listAllWithLimit(0L);
+    assertEquals(4, runs.size());
+  }
 
   @Test
   public void testListAllWithNegativeLimit() throws IOException {

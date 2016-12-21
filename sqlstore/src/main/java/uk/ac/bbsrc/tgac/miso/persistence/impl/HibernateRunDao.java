@@ -3,7 +3,6 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -146,12 +145,6 @@ public class HibernateRunDao implements RunStore {
     Criteria criteria = currentSession().createCriteria(RunImpl.class);
     criteria.add(Restrictions.eq("alias", alias));
     return (Run) criteria.uniqueResult();
-  }
-
-  @Override
-  @Deprecated
-  public List<Run> listByExperimentId(long experimentId) throws IOException {
-    return Collections.emptyList();
   }
 
   @Override

@@ -75,16 +75,6 @@ public interface RunStore extends Store<Run>, Remover<Run> {
   Run getByAlias(String alias) throws IOException;
 
   /**
-   * List all Runs related to an Experiment given an Experiment ID
-   *
-   * @param experimentId of type long
-   * @return List<Run>
-   * @throws IOException when
-   */
-  @Deprecated
-  List<Run> listByExperimentId(long experimentId) throws IOException;
-
-  /**
    * List all Runs using a Pool given a Pool ID
    *
    * @param poolId of type long

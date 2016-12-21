@@ -1,7 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -17,7 +16,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractRunQC;
-import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
@@ -121,18 +119,6 @@ public class HibernateRunQcDao implements RunQcStore {
     @SuppressWarnings("unchecked")
     Collection<QcType> records = criteria.list();
     return records;
-  }
-
-  public List<Partition> listPartitionSelectionsByRunQcId(long runQcId) {
-    Criteria criteria = currentSession().createCriteria(RunQCImpl.class);
-    criteria.add(Restrictions.eq("id", runQcId));
-    @SuppressWarnings("unchecked")
-    List<RunQC> runQcs = criteria.list();
-    List<Partition> partitions = new ArrayList<>();
-    for (RunQC runQc : runQcs) {
-      if (runQc.getPartitionSelections() != null) partitions.addAll(runQc.getPartitionSelections());
-    }
-    return partitions;
   }
 
   public SessionFactory getSessionFactory() {
