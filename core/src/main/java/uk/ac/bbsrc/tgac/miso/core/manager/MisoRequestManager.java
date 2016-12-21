@@ -49,14 +49,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
-import uk.ac.bbsrc.tgac.miso.core.data.EntityGroup;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
-import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
@@ -92,7 +90,6 @@ import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.EmPCRDilutionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.EmPCRStore;
-import uk.ac.bbsrc.tgac.miso.core.store.EntityGroupStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ExperimentStore;
 import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignCodeDao;
@@ -139,8 +136,6 @@ public class MisoRequestManager implements RequestManager {
   private EmPCRStore emPCRStore;
   @Autowired
   private ExperimentStore experimentStore;
-  @Autowired
-  private EntityGroupStore entityGroupStore;
   @Autowired
   private KitStore kitStore;
   @Autowired
@@ -220,10 +215,6 @@ public class MisoRequestManager implements RequestManager {
 
   public void setExperimentStore(ExperimentStore experimentStore) {
     this.experimentStore = experimentStore;
-  }
-
-  public void setEntityGroupStore(EntityGroupStore entityGroupStore) {
-    this.entityGroupStore = entityGroupStore;
   }
 
   public void setKitStore(KitStore kitStore) {
@@ -1445,17 +1436,6 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public void deleteEntityGroup(EntityGroup<? extends Nameable, ? extends Nameable> entityGroup) throws IOException {
-    if (entityGroupStore != null) {
-      if (!entityGroupStore.remove(entityGroup)) {
-        throw new IOException("Unable to delete EntityGroup.");
-      }
-    } else {
-      throw new IOException("No entityGroupStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
   public void deleteContainer(SequencerPartitionContainer container) throws IOException {
     if (sequencerPartitionContainerStore != null) {
       if (!sequencerPartitionContainerStore.remove(container)) {
@@ -1811,14 +1791,6 @@ public class MisoRequestManager implements RequestManager {
     }
   }
 
-  @Override
-  public long saveEntityGroup(EntityGroup<? extends Nameable, ? extends Nameable> entityGroup) throws IOException {
-    if (entityGroupStore != null) {
-      return entityGroupStore.save(entityGroup);
-    } else {
-      throw new IOException("No entityGroupStore available. Check that it has been declared in the Spring config.");
-    }
-  }
 
   // GETS
   @Override
@@ -2406,15 +2378,6 @@ public class MisoRequestManager implements RequestManager {
       return alertStore.get(alertId);
     } else {
       throw new IOException("No alertStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public EntityGroup<? extends Nameable, ? extends Nameable> getEntityGroupById(long entityGroupId) throws IOException {
-    if (entityGroupStore != null) {
-      return entityGroupStore.get(entityGroupId);
-    } else {
-      throw new IOException("No entityGroupStore available. Check that it has been declared in the Spring config.");
     }
   }
 

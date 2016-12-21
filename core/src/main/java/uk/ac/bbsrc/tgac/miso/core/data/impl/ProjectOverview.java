@@ -47,7 +47,6 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Alertable;
-import uk.ac.bbsrc.tgac.miso.core.data.EntityGroup;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -86,7 +85,7 @@ public class ProjectOverview implements Watchable, Alertable, Nameable, Serializ
 
   private String principalInvestigator;
 
-  private EntityGroup<ProjectOverview, Sample> sampleGroup;
+  private Set<Sample> sampleGroup;
 
   private Collection<Library> libraries = new HashSet<>();
   private Collection<Run> runs = new HashSet<>();
@@ -177,27 +176,26 @@ public class ProjectOverview implements Watchable, Alertable, Nameable, Serializ
     this.locked = locked;
   }
 
-  public EntityGroup<ProjectOverview, Sample> getSampleGroup() {
+  public Set<Sample> getSampleGroup() {
     return sampleGroup;
   }
 
-  public void setSampleGroup(EntityGroup<ProjectOverview, Sample> sampleGroup) {
-    this.sampleGroup = sampleGroup;
+  public void setSampleGroup(Set<Sample> sampleGroup) {
   }
 
   public Set<Sample> getSamples() {
-    return sampleGroup.getEntities();
+    return sampleGroup;
   }
 
   @Deprecated
   public void setSamples(Set<Sample> samples) {
-    getSampleGroup().setEntities(samples);
+    sampleGroup = samples;
   }
 
   public Collection<Sample> getQcPassedSamples() {
     List<Sample> qcSamples = new ArrayList<>();
     if (getSampleGroup() != null) {
-      for (Sample s : getSampleGroup().getEntities()) {
+      for (Sample s : getSampleGroup()) {
         if (s != null && s.getQcPassed() != null && s.getQcPassed()) {
           qcSamples.add(s);
         }
@@ -427,9 +425,9 @@ public class ProjectOverview implements Watchable, Alertable, Nameable, Serializ
     sb.append(" : ");
     sb.append(getName());
     sb.append(" : ");
-    if (getSampleGroup() != null && !getSampleGroup().getEntities().isEmpty()) {
+    if (getSampleGroup() != null && !getSampleGroup().isEmpty()) {
       sb.append(" [ ");
-      sb.append(LimsUtils.join(getSampleGroup().getEntities(), ","));
+      sb.append(LimsUtils.join(getSampleGroup(), ","));
       sb.append(" ] ");
     }
     return sb.toString();

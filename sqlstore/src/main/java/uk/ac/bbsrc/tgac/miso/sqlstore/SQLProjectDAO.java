@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -57,7 +57,6 @@ import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractProject;
-import uk.ac.bbsrc.tgac.miso.core.data.EntityGroup;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
@@ -68,7 +67,6 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
-import uk.ac.bbsrc.tgac.miso.core.store.EntityGroupStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
@@ -163,7 +161,6 @@ public class SQLProjectDAO implements ProjectStore {
   private Store<SecurityProfile> securityProfileDAO;
   private CascadeType cascadeType;
   private SampleStore sampleDAO;
-  private EntityGroupStore entityGroupDAO;
   private LibraryStore libraryDAO;
   private RunStore runDAO;
   private NoteStore noteDAO;
@@ -238,11 +235,6 @@ public class SQLProjectDAO implements ProjectStore {
   @CoverageIgnore
   public void setSampleDAO(SampleStore sampleDAO) {
     this.sampleDAO = sampleDAO;
-  }
-
-  @CoverageIgnore
-  public void setEntityGroupDAO(EntityGroupStore entityGroupDAO) {
-    this.entityGroupDAO = entityGroupDAO;
   }
 
   @CoverageIgnore
@@ -425,9 +417,10 @@ public class SQLProjectDAO implements ProjectStore {
       }
     }
 
-    if (overview.getSampleGroup() != null && !overview.getSampleGroup().getEntities().isEmpty()) {
-      entityGroupDAO.save(overview.getSampleGroup());
-    }
+    // TODO Hibernate ProjectOverview properly
+    // if (overview.getSampleGroup() != null && !overview.getSampleGroup().getEntities().isEmpty()) {
+    // entityGroupDAO.save(overview.getSampleGroup());
+    // }
 
     watcherDAO.removeWatchedEntityByUser(overview, user);
 
@@ -669,11 +662,7 @@ public class SQLProjectDAO implements ProjectStore {
         overview.setPrimaryAnalysisCompleted(rs.getBoolean("primaryAnalysisCompleted"));
         overview.setLastUpdated(rs.getTimestamp("lastUpdated"));
 
-        EntityGroup<ProjectOverview, Sample> osg = entityGroupDAO.getEntityGroupByParent(overview, overview.getClass());
-        if (osg != null) {
-          osg.setParent(overview);
-          overview.setSampleGroup(osg);
-        }
+        // TODO: Hibernate ProjectOverview properly
 
         overview.setLibraries(libraryDAO.listByProjectId(rs.getLong("project_projectId")));
         overview.setRuns(runDAO.listByProjectId(rs.getLong("project_projectId")));

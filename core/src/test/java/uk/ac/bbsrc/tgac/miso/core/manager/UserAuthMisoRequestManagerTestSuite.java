@@ -30,7 +30,6 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
-import uk.ac.bbsrc.tgac.miso.core.data.EntityGroup;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
@@ -114,8 +113,6 @@ public class UserAuthMisoRequestManagerTestSuite {
   private SequencerPartitionContainer sequencerPartitionContainer;
   @Mock
   private Submission submission;
-  @Mock
-  private EntityGroup entityGroup;
   @Mock
   private Dilution dilution;
   @Mock
@@ -869,20 +866,6 @@ public class UserAuthMisoRequestManagerTestSuite {
     userAuthMisoRequestManager.saveSubmission(submission);
 
     verify(backingManager, never()).saveSubmission(submission);
-  }
-
-  /**
-   * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveEntityGroup(uk.ac.bbsrc.tgac.miso.core.data.EntityGroup)} .
-   */
-  @Test
-  public void testSaveEntityGroup() throws IOException {
-    final long expectedReturn = 1L;
-
-    when(backingManager.saveEntityGroup(entityGroup)).thenReturn(expectedReturn);
-
-    assertEquals(expectedReturn, userAuthMisoRequestManager.saveEntityGroup(entityGroup));
-    verify(backingManager).saveEntityGroup(entityGroup);
   }
 
   /**
@@ -2084,20 +2067,6 @@ public class UserAuthMisoRequestManagerTestSuite {
     userAuthMisoRequestManager.getSubmissionById(id);
 
     verify(backingManager).getSubmissionById(id);
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getEntityGroupById(long)} .
-   */
-  @Test
-  public void testGetEntityGroupById() throws IOException {
-    long id = 1L;
-
-    when(backingManager.getEntityGroupById(id)).thenReturn(entityGroup);
-
-    assertEquals(entityGroup, userAuthMisoRequestManager.getEntityGroupById(id));
-
-    verify(backingManager).getEntityGroupById(id);
   }
 
   /**

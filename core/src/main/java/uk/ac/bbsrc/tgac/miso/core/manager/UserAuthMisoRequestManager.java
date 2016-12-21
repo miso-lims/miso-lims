@@ -49,14 +49,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
-import uk.ac.bbsrc.tgac.miso.core.data.EntityGroup;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
-import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
@@ -380,10 +378,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
     }
   }
 
-  @Override
-  public long saveEntityGroup(EntityGroup<? extends Nameable, ? extends Nameable> entityGroup) throws IOException {
-    return backingManager.saveEntityGroup(entityGroup);
-  }
 
   // gets
   @Override
@@ -709,10 +703,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
       throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Submission " + submissionId);
   }
 
-  @Override
-  public EntityGroup<? extends Nameable, ? extends Nameable> getEntityGroupById(long entityGroupId) throws IOException {
-    return backingManager.getEntityGroupById(entityGroupId);
-  }
 
   /* lists */
 
@@ -1731,11 +1721,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
     if (getCurrentUser().isAdmin()) {
       backingManager.deletePoolQC(poolQc);
     }
-  }
-
-  @Override
-  public void deleteEntityGroup(EntityGroup<? extends Nameable, ? extends Nameable> entityGroup) throws IOException {
-    backingManager.deleteEntityGroup(entityGroup);
   }
 
   @Override

@@ -40,7 +40,6 @@ import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
-import uk.ac.bbsrc.tgac.miso.core.store.EntityGroupStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
 import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
@@ -95,9 +94,6 @@ public class SQLProjectDAOTest extends AbstractDAOTest {
   /*
    * @Mock private CacheManager cacheManager;
    */
-
-  @Mock
-  private EntityGroupStore entityGroupDao;
 
   @Mock
   private LibraryStore libraryDAO;

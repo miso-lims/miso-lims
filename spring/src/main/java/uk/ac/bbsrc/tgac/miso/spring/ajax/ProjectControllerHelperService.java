@@ -56,14 +56,12 @@ import net.sourceforge.fluxion.ajax.util.JSONUtils;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
-import uk.ac.bbsrc.tgac.miso.core.data.EntityGroup;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PrintJob;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.EntityGroupImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
@@ -979,10 +977,7 @@ public class ProjectControllerHelperService {
         }
       }
 
-      final EntityGroup<ProjectOverview, Sample> osg = new EntityGroupImpl<>();
-      osg.setEntities(samples);
-      osg.setParent(overview);
-      overview.setSampleGroup(osg);
+      overview.setSamples(samples);
 
       requestManager.saveProjectOverview(overview);
       requestManager.saveProject(overview.getProject());
@@ -996,25 +991,20 @@ public class ProjectControllerHelperService {
 
   public JSONObject addSamplesToGroup(HttpSession session, JSONObject json) {
     final Long overviewId = json.getLong("overviewId");
-    final Long groupId = json.getLong("groupId");
     try {
       final ProjectOverview overview = requestManager.getProjectOverviewById(overviewId);
-      final EntityGroup<ProjectOverview, Sample> osg = overview.getSampleGroup();
-
-      if (osg != null && groupId != null && osg.getId() == groupId.longValue()) {
-        if (json.has("samples")) {
-          final JSONArray a = JSONArray.fromObject(json.get("samples"));
-          for (final JSONObject j : (Iterable<JSONObject>) a) {
-            if (j.has("sampleId")) {
-              final Sample s = requestManager.getSampleById(j.getLong("sampleId"));
-              if (osg.getEntities().contains(s)) {
-                log.error("Sample group already contains " + s.getName());
-              } else {
-                osg.addEntity(s);
-              }
+      if (json.has("samples")) {
+        final JSONArray a = JSONArray.fromObject(json.get("samples"));
+        for (final JSONObject j : (Iterable<JSONObject>) a) {
+          if (j.has("sampleId")) {
+            final Sample s = requestManager.getSampleById(j.getLong("sampleId"));
+            if (overview.getSamples().contains(s)) {
+              log.error("Sample group already contains " + s.getName());
             } else {
-              return JSONUtils.SimpleJSONError("Unable to add Sample Group: invalid sample set JSON has missing sampleId");
+              overview.getSamples().add(s);
             }
+          } else {
+            return JSONUtils.SimpleJSONError("Unable to add Sample Group: invalid sample set JSON has missing sampleId");
           }
         }
       }

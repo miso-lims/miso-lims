@@ -34,9 +34,12 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 
@@ -45,6 +48,9 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.map.annotate.JsonDeserialize;
+import org.hibernate.annotations.AnyMetaDef;
+import org.hibernate.annotations.ManyToAny;
+import org.hibernate.annotations.MetaValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,6 +58,8 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution;
 import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
 import uk.ac.bbsrc.tgac.miso.core.event.model.PoolEvent;
 import uk.ac.bbsrc.tgac.miso.core.event.type.MisoEventType;
@@ -85,6 +93,14 @@ public abstract class AbstractPool extends AbstractBoxable implements Pool {
   private String name;
   private String description;
 
+  @ManyToAny(metaColumn=@Column(name="elementType"))
+  @JoinTable(name = "Pool_Elements", joinColumns = { @JoinColumn(name = "elementId") }, inverseJoinColumns = {
+      @JoinColumn(name = "pool_poolId") })
+  @AnyMetaDef(idType = "long", metaType = "string", 
+          metaValues = { 
+          @MetaValue(targetEntity = LibraryDilution.class, value = "LDI"),
+          @MetaValue(targetEntity = emPCRDilution.class, value = "EDI")
+     })
   private Set<Dilution> pooledElements = new HashSet<>();
   private Collection<Experiment> experiments = new HashSet<>();
   private Date creationDate;
