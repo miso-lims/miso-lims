@@ -33,6 +33,7 @@ import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSecurityDao;
 
 public class SQLSecurityDAOTest extends AbstractDAOTest {
   
@@ -47,7 +48,7 @@ public class SQLSecurityDAOTest extends AbstractDAOTest {
   private Store<SecurityProfile> securityProfileDAO;
   
   @InjectMocks
-  private SQLSecurityDAO dao;
+  private HibernateSecurityDao dao;
   
   private static long nextUserId = 4L;
   private static long nextGroupId = 4L;

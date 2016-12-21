@@ -18,6 +18,7 @@ import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSecurityDao;
 
 public class SQLTargetedSequencingDAOTest extends AbstractDAOTest {
 
@@ -31,7 +32,7 @@ public class SQLTargetedSequencingDAOTest extends AbstractDAOTest {
   private Authentication authenticationMock;
 
   @Mock
-  private SQLSecurityDAO securityDAO;
+  private HibernateSecurityDao securityDAO;
 
   @Mock
   private KitStore kitDao;

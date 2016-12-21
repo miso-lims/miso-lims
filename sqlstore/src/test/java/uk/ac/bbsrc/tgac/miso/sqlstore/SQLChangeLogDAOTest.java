@@ -20,13 +20,14 @@ import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSecurityDao;
 
 public class SQLChangeLogDAOTest extends AbstractDAOTest {
 
   @Autowired
   private JdbcTemplate jdbcTemplate;
   @Mock
-  private SQLSecurityDAO securityDAO;
+  private HibernateSecurityDao securityDAO;
 
   private SQLChangeLogDAO sut;
 

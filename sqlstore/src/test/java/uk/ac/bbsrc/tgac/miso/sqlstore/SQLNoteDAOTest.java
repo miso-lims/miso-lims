@@ -37,6 +37,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSecurityDao;
 
 public class SQLNoteDAOTest extends AbstractDAOTest {
 
@@ -47,7 +48,7 @@ public class SQLNoteDAOTest extends AbstractDAOTest {
   private SQLNoteDAO dao;
 
   @Mock
-  private SQLSecurityDAO securityDAO;
+  private HibernateSecurityDao securityDAO;
 
   @Autowired
   @Spy

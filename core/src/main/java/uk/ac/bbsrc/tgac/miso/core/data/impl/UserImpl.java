@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -33,6 +33,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -54,7 +57,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
  * @since 0.0.2
  */
 @Entity
-@Table(name = "User")
+@Table(name = "`User`")
 public class UserImpl implements User, Serializable, Comparable {
   protected static final Logger log = LoggerFactory.getLogger(UserImpl.class);
 
@@ -77,8 +80,10 @@ public class UserImpl implements User, Serializable, Comparable {
   private boolean admin = false;
   private boolean active = true;
 
-  @Transient
-  private Collection<Group> groups = new HashSet<Group>();
+  @ManyToMany(targetEntity = Group.class)
+  @JoinTable(name = "User_Group", inverseJoinColumns = { @JoinColumn(name = "groups_groupId") }, joinColumns = {
+      @JoinColumn(name = "users_userId") })
+  private Collection<Group> groups = new HashSet<>();
   @Transient
   private String[] roles = new String[0];
 
@@ -147,7 +152,7 @@ public class UserImpl implements User, Serializable, Comparable {
 
   @Override
   public Collection<GrantedAuthority> getRolesAsAuthorities() {
-    List<GrantedAuthority> auths = new ArrayList<GrantedAuthority>();
+    List<GrantedAuthority> auths = new ArrayList<>();
     for (String s : roles) {
       auths.add(new GrantedAuthorityImpl(s));
     }
@@ -156,7 +161,7 @@ public class UserImpl implements User, Serializable, Comparable {
 
   @Override
   public Collection<GrantedAuthority> getPermissionsAsAuthorities() {
-    List<GrantedAuthority> auths = new ArrayList<GrantedAuthority>();
+    List<GrantedAuthority> auths = new ArrayList<>();
     if (isAdmin()) {
       auths.add(MisoAuthority.ROLE_ADMIN);
     }
