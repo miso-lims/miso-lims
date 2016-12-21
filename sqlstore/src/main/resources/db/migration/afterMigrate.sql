@@ -655,6 +655,111 @@ FOR EACH ROW
     '',
     NEW.lastModifier,
     'Kit descriptor created.')//
+    
+DROP PROCEDURE IF EXISTS deleteSample//
+CREATE PROCEDURE deleteSample(
+  iSampleId BIGINT(20),
+  iSampleAlias VARCHAR(255)
+) BEGIN
+  DECLARE errorMessage varchar(300);
+  -- rollback if any errors are thrown
+  DECLARE EXIT HANDLER FOR SQLEXCEPTION
+  BEGIN
+    ROLLBACK;
+    RESIGNAL;
+  END;
+
+  START TRANSACTION;
+
+  -- check that the sample exists
+  IF NOT EXISTS (SELECT 1 FROM Sample WHERE sampleId = iSampleId AND alias = iSampleAlias)
+  THEN
+    SET errorMessage = CONCAT('Sample with ID ', iSampleId, ' and alias ', iSampleAlias, ' not found.');
+    SIGNAL SQLSTATE '45000' SET message_text = errorMessage;
+  END IF;
+
+  -- confirm that the sample has no sample children
+  IF EXISTS (SELECT * FROM DetailedSample WHERE parentId = iSampleId)
+  THEN
+    SET errorMessage = CONCAT('Cannot delete sample with ID ', iSampleId, ' due to child samples.');
+    SIGNAL SQLSTATE '45000' SET message_text = errorMessage;
+  END IF;
+
+  -- confirm that the sample has no library children
+  IF EXISTS (SELECT * FROM Library WHERE sample_sampleId = iSampleId)
+  THEN
+    SET errorMessage = CONCAT('Cannot delete sample with ID ', iSampleId, ' due to related libraries.');
+    SIGNAL SQLSTATE '45000' SET message_text = errorMessage;
+  END IF;
+
+  -- delete related SampleQCs and notes
+  DELETE FROM SampleQC WHERE sample_sampleId = iSampleId;
+  DELETE FROM Note WHERE noteId IN (SELECT notes_noteId FROM Sample_Note WHERE sample_sampleId = iSampleId);
+  DELETE FROM Sample_Note WHERE sample_sampleId = iSampleId;
+
+  -- delete from sample class/category tables
+  DELETE FROM SampleAliquot WHERE sampleId = iSampleId;
+  DELETE FROM SampleStock WHERE sampleId = iSampleId;
+  DELETE FROM SampleTissueProcessing WHERE sampleId = iSampleId;
+  DELETE FROM SampleCVSlide WHERE sampleId = iSampleId;
+  DELETE FROM SampleLCMTube WHERE sampleId = iSampleId;
+  DELETE FROM SampleTissue WHERE sampleId = iSampleId;
+  DELETE FROM `Identity` WHERE sampleId = iSampleId;
+  DELETE FROM SampleChangeLog WHERE sampleId = iSampleId;
+  DELETE FROM DetailedSample WHERE sampleId = iSampleId;
+
+  -- delete from Sample table
+  DELETE FROM Sample WHERE sampleId = iSampleId;
+  SELECT ROW_COUNT() AS number_deleted;
+
+  COMMIT;
+END//
+
+DROP PROCEDURE IF EXISTS deleteLibrary//
+CREATE PROCEDURE deleteLibrary(
+  iLibraryId BIGINT(20),
+  iLibraryAlias VARCHAR(255)
+) BEGIN
+  DECLARE errorMessage varchar(300);
+  -- rollback if any errors are thrown
+  DECLARE EXIT HANDLER FOR SQLEXCEPTION
+  BEGIN
+    ROLLBACK;
+    RESIGNAL;
+  END;
+
+  START TRANSACTION;
+
+  -- check that the library exists
+  IF NOT EXISTS (SELECT 1 FROM Library WHERE libraryId = iLibraryId AND alias = iLibraryAlias)
+  THEN
+    SET errorMessage = CONCAT('Library with ID ', iLibraryId, ' and alias ', iLibraryAlias, ' not found.');
+    SIGNAL SQLSTATE '45000' SET message_text = errorMessage;
+  END IF;
+
+  -- confirm that the library has no dilution children
+  IF EXISTS (SELECT * FROM LibraryDilution WHERE library_libraryId = iLibraryId)
+  THEN
+    SET errorMessage = CONCAT('Cannot delete library with ID ', iLibraryId, ' due to child dilutions.');
+    SIGNAL SQLSTATE '45000' SET message_text = errorMessage;
+  END IF;
+
+  -- delete related LibraryQCs, notes, and indices
+  DELETE FROM LibraryQC WHERE library_libraryId = iLibraryId;
+  DELETE FROM Note WHERE noteId IN (SELECT notes_noteId FROM Library_Note WHERE library_libraryId = iLibraryId);
+  DELETE FROM Library_Note WHERE library_libraryId = iLibraryId;
+  DELETE FROM Library_Index WHERE library_libraryId = iLibraryId;
+
+  -- delete from libraryAdditionalInfo
+  DELETE FROM LibraryAdditionalInfo WHERE libraryId = iLibraryId;
+  DELETE FROM LibraryChangeLog WHERE libraryId = iLibraryId;
+
+  -- delete from Library table
+  DELETE FROM Library WHERE libraryId = iLibraryId;
+  SELECT ROW_COUNT() AS number_deleted;
+
+  COMMIT;
+END//
 
 
 -- 
