@@ -157,6 +157,7 @@ public class SQLNoteDAOTest extends AbstractDAOTest {
     note.setOwner(new UserImpl());
     note.setInternalOnly(true);
     Run run = new RunImpl();
+    run.setId(1L);
     long saveId = dao.saveRunNote(run, note);
 
     assertTrue(saveId > 0);
@@ -259,7 +260,7 @@ public class SQLNoteDAOTest extends AbstractDAOTest {
 
   @Test
   public void testListByRun() throws Exception {
-    List<Note> notes = dao.listByRun(33l);
+    List<Note> notes = dao.listByRun(3l);
     assertEquals(1, notes.size());
     assertEquals(new Long(1), notes.iterator().next().getNoteId());
   }

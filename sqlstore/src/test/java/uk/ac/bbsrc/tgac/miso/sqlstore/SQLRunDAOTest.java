@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -50,8 +51,6 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.store.SecurityStore;
 
-import net.sf.ehcache.CacheManager;
-
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
@@ -62,9 +61,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
-import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
 import uk.ac.bbsrc.tgac.miso.core.store.RunQcStore;
@@ -73,6 +69,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.SequencerReferenceStore;
 import uk.ac.bbsrc.tgac.miso.core.store.StatusStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.core.store.WatcherStore;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateRunDao;
 
 public class SQLRunDAOTest extends AbstractDAOTest {
 
@@ -83,8 +80,9 @@ public class SQLRunDAOTest extends AbstractDAOTest {
   @Spy
   private JdbcTemplate jdbcTemplate;
 
-  @Mock
-  private NamingScheme namingScheme;
+  @Autowired
+  private SessionFactory sessionFactory;
+
   @Mock
   private SecurityStore securityDAO;
   @Mock
@@ -105,7 +103,7 @@ public class SQLRunDAOTest extends AbstractDAOTest {
   private ChangeLogStore changeLogDAO;
 
   @InjectMocks
-  private SQLRunDAO dao;
+  private HibernateRunDao dao;
 
   // Auto-increment sequence doesn't roll back with transactions, so must be tracked
   private static long nextAutoIncrementId = 5L;
@@ -114,11 +112,11 @@ public class SQLRunDAOTest extends AbstractDAOTest {
   public void setup() {
     MockitoAnnotations.initMocks(this);
     dao.setJdbcTemplate(jdbcTemplate);
-    dao.setDataObjectFactory(new TgacDataObjectFactory());
+    dao.setSessionFactory(sessionFactory);
   }
 
   @Test
-  public void testListAll() {
+  public void testListAll() throws IOException {
     List<Run> runs = dao.listAll();
     assertEquals(4, runs.size());
   }
@@ -138,7 +136,7 @@ public class SQLRunDAOTest extends AbstractDAOTest {
   @Test
   public void testListAllWithZeroLimit() throws IOException {
     List<Run> runs = dao.listAllWithLimit(0L);
-    assertEquals(0, runs.size());
+    assertEquals(4, runs.size());
   }
 
   @Test
@@ -153,25 +151,25 @@ public class SQLRunDAOTest extends AbstractDAOTest {
   }
 
   @Test
-  public void testListBySearch1204() {
+  public void testListBySearch1204() throws IOException {
     List<Run> runs = dao.listBySearch("1204");
     assertEquals(2, runs.size());
   }
 
   @Test
-  public void testListBySearchH1179() {
+  public void testListBySearchH1179() throws IOException {
     List<Run> runs = dao.listBySearch("h1179");
     assertEquals(4, runs.size());
   }
 
   @Test
-  public void testListBySearchNone() {
+  public void testListBySearchNone() throws IOException {
     List<Run> runs = dao.listBySearch("pizza");
     assertEquals(0, runs.size());
   }
 
   @Test
-  public void testListBySearchEmpty() {
+  public void testListBySearchEmpty() throws IOException {
     List<Run> runs = dao.listBySearch("");
     assertEquals(4, runs.size());
   }
@@ -326,8 +324,6 @@ public class SQLRunDAOTest extends AbstractDAOTest {
     run.setLastModifier(mockUser);
 
     mockAutoIncrement(nextAutoIncrementId);
-    when(namingScheme.generateNameFor(run)).thenReturn(runName);
-    when(namingScheme.validateName(Mockito.anyString())).thenReturn(ValidationResult.success());
 
     long runId = dao.save(run);
     Run insertedRun = dao.get(runId);
@@ -354,8 +350,6 @@ public class SQLRunDAOTest extends AbstractDAOTest {
     run.setLastModifier(user);
     run.setSequencingParameters(null);
 
-    Mockito.when(namingScheme.validateName(Matchers.anyString())).thenReturn(ValidationResult.success());
-
     assertEquals(1L, dao.save(run));
     Run savedRun = dao.get(1L);
     assertNotSame(run, savedRun);
@@ -369,7 +363,6 @@ public class SQLRunDAOTest extends AbstractDAOTest {
     assertNull(dao.get(nextAutoIncrementId));
     Run newRun = makeRun("TestRun");
     mockAutoIncrement(nextAutoIncrementId);
-    Mockito.when(namingScheme.validateName(Matchers.anyString())).thenReturn(ValidationResult.success());
 
     assertEquals(nextAutoIncrementId, dao.save(newRun));
 
@@ -393,18 +386,12 @@ public class SQLRunDAOTest extends AbstractDAOTest {
     runs.add(run1);
     runs.add(run2);
     mockAutoIncrement(autoIncrementId);
-    Mockito.when(namingScheme.validateName(Matchers.anyString())).thenReturn(ValidationResult.success());
 
     assertNull(dao.get(autoIncrementId));
     assertNull(dao.get(autoIncrementId + 1L));
 
-    CacheManager cacheManager = Mockito.mock(CacheManager.class);
-    Mockito.when(cacheManager.getCache(Matchers.anyString())).thenReturn(null);
-    dao.setCacheManager(cacheManager);
-
     dao.saveAll(runs);
 
-    dao.setCacheManager(null);
     Run savedRun1 = dao.get(autoIncrementId);
     assertNotNull(savedRun1);
     assertEquals(run1.getAlias(), savedRun1.getAlias());

@@ -43,6 +43,8 @@
         <value>com.eaglegenomics.simlims.core.SecurityProfile</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractPlatform</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractProject</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractRun</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractRunQC</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractSample</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractSampleQC</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerReference</value>
@@ -61,6 +63,9 @@
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrderImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.RunDerivedInfo</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.RunQCImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleCVSlideImpl</value>
@@ -78,6 +83,7 @@
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleValidRelationshipImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingParametersImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl</value>

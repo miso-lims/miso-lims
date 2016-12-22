@@ -36,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.store.SecurityStore;
@@ -51,9 +52,8 @@ import uk.ac.bbsrc.tgac.miso.core.store.AlertStore;
  * uk.ac.bbsrc.tgac.miso.hibernate.persistence.impl
  *
  * @author Heather Armstrong
- * @since 0.2.43
  */
-
+@Repository
 @Transactional(rollbackFor = Exception.class)
 public class HibernateAlertDao implements AlertStore {
 

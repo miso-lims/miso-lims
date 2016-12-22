@@ -32,14 +32,19 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
-import javax.persistence.Entity;
+import javax.persistence.Column;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToOne;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Transient;
 
 import org.slf4j.Logger;
@@ -50,7 +55,12 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunDerivedInfo;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunQCImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingParametersImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.visitor.SubmittableVisitor;
@@ -67,8 +77,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  * @author Rob Davey
  * @since 0.0.2
  */
-@Entity
-@Table(name = "`Run`")
+@MappedSuperclass
 public abstract class AbstractRun implements Run {
   protected static final Logger log = LoggerFactory.getLogger(AbstractRun.class);
 
@@ -81,38 +90,58 @@ public abstract class AbstractRun implements Run {
   @Transient
   public Document submissionDocument;
 
-  @OneToOne(cascade = CascadeType.ALL)
+  @OneToOne(targetEntity = SecurityProfile.class, cascade = CascadeType.ALL)
   private SecurityProfile securityProfile;
 
   private String name;
+  @Column(nullable = false)
   private String alias;
   private String description;
   private String accession;
   private Integer platformRunId;
+
+  @Column(nullable = false)
   private Boolean pairedEnd;
   private Integer cycles;
   private String filePath;
 
-  private Date lastUpdated;
-
   @OneToOne(targetEntity = StatusImpl.class, cascade = CascadeType.ALL)
   private Status status;
 
+  @OneToMany(targetEntity = RunQCImpl.class)
   private Collection<RunQC> runQCs = new TreeSet<>();
 
+  @OneToMany(targetEntity = Note.class)
+  @JoinTable(name = "Run_Note", joinColumns = {
+      @JoinColumn(name = "run_runId", nullable = false, updatable = false) }, inverseJoinColumns = {
+          @JoinColumn(name = "notes_noteId", nullable = false, updatable = false) })
   private Collection<Note> notes = new HashSet<>();
 
-  @Transient
   @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
   private PlatformType platformType;
+
+  @ManyToOne(targetEntity = SequencerReferenceImpl.class)
+  @JoinColumn(name = "sequencerReference_sequencerReferenceId", nullable = false)
   private SequencerReference sequencerReference;
 
   // listeners
+  @Transient
   private final Set<MisoListener> listeners = new HashSet<>();
+  @Transient
   private Set<User> watchers = new HashSet<>();
+
+  @ManyToOne(targetEntity = UserImpl.class)
+  @JoinColumn(name = "lastModifier", nullable = false)
   private User lastModifier;
 
+  @ManyToOne(targetEntity = SequencingParametersImpl.class)
+  @JoinColumn(name = "sequencingParameters_parametersId")
   private SequencingParameters sequencingParameters;
+
+  @OneToOne(targetEntity = RunDerivedInfo.class)
+  @PrimaryKeyJoinColumn
+  private RunDerivedInfo derivedInfo;
 
   @Override
   public User getLastModifier() {
@@ -124,6 +153,12 @@ public abstract class AbstractRun implements Run {
     this.lastModifier = lastModifier;
   }
 
+  @Override
+  public Date getLastUpdated() {
+    return (derivedInfo == null ? null : derivedInfo.getLastModified());
+  }
+
+  @OneToMany(targetEntity = ChangeLog.class)
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
   @Override
@@ -303,16 +338,6 @@ public abstract class AbstractRun implements Run {
   @Override
   public void setNotes(Collection<Note> notes) {
     this.notes = notes;
-  }
-
-  @Override
-  public Date getLastUpdated() {
-    return lastUpdated;
-  }
-
-  @Override
-  public void setLastUpdated(Date lastUpdated) {
-    this.lastUpdated = lastUpdated;
   }
 
   @Override

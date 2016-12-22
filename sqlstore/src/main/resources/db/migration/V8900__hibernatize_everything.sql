@@ -6,7 +6,7 @@ ALTER TABLE Study ADD COLUMN studyTypeId bigint(20);
 UPDATE Study SET studyTypeId = (SELECT typeId FROM StudyType WHERE name = studyType);
 ALTER TABLE Study ADD CONSTRAINT study_studyTypeId FOREIGN KEY (studyTypeId) REFERENCES StudyType(typeId);
 ALTER TABLE Study DROP COLUMN studyType;
-ALTER TABLE Study ALTER COLUMN studyTypeId bigint(20) NOT NULL;
+ALTER TABLE Study CHANGE COLUMN studyTypeId studyTypeId bigint(20) NOT NULL;
 
 CREATE TABLE ProjectOverview_Sample (
   projectOverview_overviewId bigint(20) NOT NULL,
@@ -35,3 +35,27 @@ ALTER TABLE SequencerReference ADD CONSTRAINT upgraded_SR_UK UNIQUE (upgradedSeq
 
 DROP TABLE Request;
 DROP TABLE Request_Note;
+
+ALTER TABLE Status ADD FOREIGN KEY (instrumentName) REFERENCES SequencerReference (name);
+ALTER TABLE Status ADD FOREIGN KEY (runName) REFERENCES Run (alias);
+
+ALTER TABLE Run_Note ADD CONSTRAINT RunNote_Run_FK FOREIGN KEY (run_runId) REFERENCES Run (runId);
+ALTER TABLE Run_Note ADD CONSTRAINT RunNote_Note_FK FOREIGN KEY (notes_noteId) REFERENCES Note (noteId);
+
+UPDATE Run SET platformType = UPPER(platformType);
+
+ALTER TABLE RunQC_Partition ADD COLUMN partition_partitionId BIGINT(20);
+
+UPDATE RunQC_Partition rqp SET partition_partitionId = (
+  SELECT p.partitionId FROM `_Partition` p 
+  JOIN SequencerPartitionContainer_Partition spcp ON spcp.partitions_partitionId = p.partitionId
+  WHERE spcp.container_containerId = rqp.containers_containerId
+  AND p.partitionNumber = rqp.partitionNumber
+);
+ALTER TABLE RunQC_Partition CHANGE COLUMN partition_partitionId partition_partitionId BIGINT(20) NOT NULL;
+ALTER TABLE RunQC_Partition ADD CONSTRAINT RunQCPartition_Partition_FK FOREIGN KEY (partition_partitionId) REFERENCES `_Partition` (partitionId);
+ALTER TABLE RunQC_Partition ADD CONSTRAINT RunQCPartition_RunQC_FK FOREIGN KEY (runQc_runQcId) REFERENCES `RunQC` (qcId);
+ALTER TABLE RunQC_Partition DROP PRIMARY KEY;
+ALTER TABLE RunQC_Partition ADD PRIMARY KEY(`runQc_runQcId`, `partitionId`);
+ALTER TABLE RunQC_Partition DROP COLUMN partitionNumber;
+ALTER TABLE RunQC_Partition DROP COLUMN containers_containerId;

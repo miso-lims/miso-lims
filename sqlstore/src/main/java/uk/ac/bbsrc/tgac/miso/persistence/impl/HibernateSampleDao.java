@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.Note;
@@ -61,6 +62,7 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
  * that Hibernate cannot access. Similarly, it then follows any necessary links on save. All the SqlStore-populated fields are marked
  * “transient” in the Sample class.
  */
+@Repository
 @Transactional(rollbackFor = Exception.class)
 public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
 

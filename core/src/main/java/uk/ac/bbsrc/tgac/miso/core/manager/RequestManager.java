@@ -502,8 +502,6 @@ public interface RequestManager {
 
   public Collection<Submission> listAllSubmissions() throws IOException;
 
-  public Collection<Run> listRunsByExperimentId(Long experimentId) throws IOException;
-
   public Collection<Run> listRunsBySequencerId(Long sequencerReferenceId) throws IOException;
 
   /**

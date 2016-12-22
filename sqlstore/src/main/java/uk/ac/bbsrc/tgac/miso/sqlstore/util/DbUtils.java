@@ -35,6 +35,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.regex.Matcher;
 
 import org.hibernate.criterion.Criterion;
@@ -377,6 +378,20 @@ public class DbUtils {
       criteria[i] = Restrictions.ilike(searchProperties[i], str, MatchMode.ANYWHERE);
     }
     return Restrictions.or(criteria);
+  }
+
+  /**
+   * Prefix for a temporary name for any entity
+   */
+  static final public String TEMPORARY_NAME_PREFIX = "TEMPORARY_";
+
+  /**
+   * Generate a temporary name using a UUID.
+   * 
+   * @return Temporary name
+   */
+  static public String generateTemporaryName() {
+    return TEMPORARY_NAME_PREFIX + UUID.randomUUID();
   }
 
 }

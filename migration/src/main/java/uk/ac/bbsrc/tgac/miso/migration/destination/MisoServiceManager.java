@@ -2,8 +2,6 @@ package uk.ac.bbsrc.tgac.miso.migration.destination;
 
 import java.io.IOException;
 
-import javax.persistence.CascadeType;
-
 import org.hibernate.SessionFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.Authentication;
@@ -29,6 +27,8 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDesignCodeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDesignDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernatePlatformDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateReferenceGenomeDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateRunDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateRunQcDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleNumberPerProjectDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSamplePurposeDao;
@@ -38,6 +38,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSecurityDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSecurityProfileDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSequencerReferenceDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSequencingParametersDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateStatusDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateStudyDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSubprojectDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTargetedSequencingDao;
@@ -60,11 +61,8 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.SQLNoteDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLPoolDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLPoolQCDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLProjectDAO;
-import uk.ac.bbsrc.tgac.miso.sqlstore.SQLRunDAO;
-import uk.ac.bbsrc.tgac.miso.sqlstore.SQLRunQCDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLSequencerPartitionContainerDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLSequencerPoolPartitionDAO;
-import uk.ac.bbsrc.tgac.miso.sqlstore.SQLStatusDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLWatcherDAO;
 
 /**
@@ -100,11 +98,11 @@ public class MisoServiceManager {
   private HibernateKitDao kitDao;
   private HibernatePlatformDao platformDao;
   private HibernateStudyDao studyDao;
-  private SQLRunDAO runDao;
-  private SQLRunQCDAO runQcDao;
+  private HibernateRunDao runDao;
+  private HibernateRunQcDao runQcDao;
   private SQLSequencerPartitionContainerDAO sequencerPartitionContainerDao;
   private SQLSequencerPoolPartitionDAO partitionDao;
-  private SQLStatusDAO statusDao;
+  private HibernateStatusDao statusDao;
   private HibernateSequencerReferenceDao sequencerReferenceDao;
   private SQLBoxDAO boxDao;
 
@@ -278,7 +276,6 @@ public class MisoServiceManager {
     if (libraryDao != null) libraryDao.setSecurityDAO(securityStore);
     if (poolDao != null) poolDao.setSecurityDAO(securityStore);
     if (experimentDao != null) experimentDao.setSecurityDAO(securityStore);
-    if (runDao != null) runDao.setSecurityDAO(securityStore);
     if (sequencerPartitionContainerDao != null) sequencerPartitionContainerDao.setSecurityDAO(securityStore);
     if (boxDao != null) boxDao.setSecurityDAO(securityStore);
     if (changeLogDao != null) changeLogDao.setSecurityDAO(securityStore);
@@ -306,7 +303,6 @@ public class MisoServiceManager {
     if (dilutionDao != null) dilutionDao.setSecurityProfileDAO(securityProfileDao);
     if (poolDao != null) poolDao.setSecurityProfileDAO(securityProfileDao);
     if (experimentDao != null) experimentDao.setSecurityProfileDAO(securityProfileDao);
-    if (runDao != null) runDao.setSecurityProfileDAO(securityProfileDao);
     if (sequencerPartitionContainerDao != null) sequencerPartitionContainerDao.setSecurityProfileDAO(securityProfileDao);
     if (partitionDao != null) partitionDao.setSecurityProfileDAO(securityProfileDao);
     if (boxDao != null) boxDao.setSecurityProfileDAO(securityProfileDao);
@@ -531,7 +527,6 @@ public class MisoServiceManager {
     if (sampleDao != null) sampleDao.setNoteDao(noteDao);
     if (libraryDao != null) libraryDao.setNoteDAO(noteDao);
     if (poolDao != null) poolDao.setNoteDAO(noteDao);
-    if (runDao != null) runDao.setNoteDAO(noteDao);
   }
 
   public HibernateSampleQcDao getSampleQcDao() {
@@ -775,60 +770,45 @@ public class MisoServiceManager {
     if (projectDao != null) projectDao.setStudyDAO(studyDao);
   }
 
-  public SQLRunDAO getRunDao() {
+  public HibernateRunDao getRunDao() {
     return runDao;
   }
 
-  public void setRunDao(SQLRunDAO runDao) {
+  public void setRunDao(HibernateRunDao runDao) {
     this.runDao = runDao;
     updateRunDaoDependencies();
   }
 
   public void setDefaultRunDao() {
-    SQLRunDAO dao = new SQLRunDAO();
-    dao.setChangeLogDAO(changeLogDao);
-    dao.setDataObjectFactory(dataObjectFactory);
+    HibernateRunDao dao = new HibernateRunDao();
     dao.setJdbcTemplate(jdbcTemplate);
-    dao.setNamingScheme(getNamingScheme());
-    dao.setNoteDAO(noteDao);
-    dao.setRunQcDAO(runQcDao);
-    dao.setSecurityDAO(securityStore);
     dao.setSecurityManager(securityManager);
-    dao.setSecurityProfileDAO(securityProfileDao);
-    dao.setSequencerPartitionContainerDAO(sequencerPartitionContainerDao);
-    dao.setSequencerReferenceDAO(sequencerReferenceDao);
-    dao.setStatusDAO(statusDao);
     dao.setWatcherDAO(watcherDao);
-    dao.setSequencingParametersDao(sequencingParametersDao);
-    dao.setCascadeType(CascadeType.PERSIST);
     setRunDao(dao);
   }
 
   private void updateRunDaoDependencies() {
-    if (runQcDao != null) runQcDao.setRunDAO(runDao);
+    if (runQcDao != null) runQcDao.setRunDao(runDao);
     if (sequencerPartitionContainerDao != null) sequencerPartitionContainerDao.setRunDAO(runDao);
   }
 
-  public SQLRunQCDAO getRunQcDao() {
+  public HibernateRunQcDao getRunQcDao() {
     return runQcDao;
   }
 
-  public void setRunQcDao(SQLRunQCDAO runQcDao) {
+  public void setRunQcDao(HibernateRunQcDao runQcDao) {
     this.runQcDao = runQcDao;
     updateRunQcDependencies();
   }
 
   public void setDefaultRunQcDao() {
-    SQLRunQCDAO dao = new SQLRunQCDAO();
-    dao.setDataObjectFactory(dataObjectFactory);
-    dao.setJdbcTemplate(jdbcTemplate);
-    dao.setRunDAO(runDao);
-    dao.setSequencerPartitionContainerDAO(sequencerPartitionContainerDao);
+    HibernateRunQcDao dao = new HibernateRunQcDao();
+    dao.setRunDao(runDao);
+    dao.setSequencerPartitionContainerDao(sequencerPartitionContainerDao);
     setRunQcDao(dao);
   }
 
   private void updateRunQcDependencies() {
-    if (runDao != null) runDao.setRunQcDAO(runQcDao);
   }
 
   public SQLSequencerPartitionContainerDAO getSequencerPartitionContainerDao() {
@@ -854,8 +834,7 @@ public class MisoServiceManager {
   }
 
   private void updateSequencerPartitionContainerDaoDependencies() {
-    if (runQcDao != null) runQcDao.setSequencerPartitionContainerDAO(sequencerPartitionContainerDao);
-    if (runDao != null) runDao.setSequencerPartitionContainerDAO(sequencerPartitionContainerDao);
+    if (runQcDao != null) runQcDao.setSequencerPartitionContainerDao(sequencerPartitionContainerDao);
     if (partitionDao != null) partitionDao.setSequencerPartitionContainerDAO(sequencerPartitionContainerDao);
   }
 
@@ -882,24 +861,22 @@ public class MisoServiceManager {
     if (sequencerPartitionContainerDao != null) sequencerPartitionContainerDao.setPartitionDAO(partitionDao);
   }
 
-  public SQLStatusDAO getStatusDao() {
+  public HibernateStatusDao getStatusDao() {
     return statusDao;
   }
 
-  public void setStatusDao(SQLStatusDAO statusDao) {
+  public void setStatusDao(HibernateStatusDao statusDao) {
     this.statusDao = statusDao;
     updateStatusDaoDependencies();
   }
 
   public void setDefaultStatusDao() {
-    SQLStatusDAO dao = new SQLStatusDAO();
-    dao.setDataObjectFactory(dataObjectFactory);
+    HibernateStatusDao dao = new HibernateStatusDao();
     dao.setJdbcTemplate(jdbcTemplate);
     setStatusDao(dao);
   }
 
   private void updateStatusDaoDependencies() {
-    if (runDao != null) runDao.setStatusDAO(statusDao);
   }
 
   public HibernateSequencerReferenceDao getSequencerReferenceDao() {
@@ -918,7 +895,6 @@ public class MisoServiceManager {
   }
 
   private void updateSequencerReferenceDaoDependencies() {
-    if (runDao != null) runDao.setSequencerReferenceDAO(sequencerReferenceDao);
   }
 
   public SQLBoxDAO getBoxDao() {
@@ -1353,7 +1329,6 @@ public class MisoServiceManager {
   }
 
   private void updateSequencingParametersDaoDependencies() {
-    if (runDao != null) runDao.setSequencingParametersDao(sequencingParametersDao);
   }
 
 }

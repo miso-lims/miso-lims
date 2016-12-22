@@ -681,3 +681,6 @@ CREATE OR REPLACE VIEW OrderCompletion AS
 
 CREATE OR REPLACE VIEW SampleDerivedInfo AS
   SELECT sampleId, MAX(changeTime) as lastModified FROM SampleChangeLog GROUP BY sampleId;
+  
+CREATE OR REPLACE VIEW RunDerivedInfo AS
+  SELECT runId, MAX(changeTime) as lastModified FROM RunChangeLog GROUP BY runId;
