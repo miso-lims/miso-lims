@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import static org.junit.Assert.*;
+import static uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils.generateTemporaryName;
 
 import java.io.IOException;
 import java.util.Date;
@@ -133,7 +134,7 @@ public class DefaultSampleServiceTestSuite {
   @Test
   public void temporarySampleNameTest() throws Exception {
     Sample sample = new SampleImpl();
-    sample.setName(DefaultSampleService.generateTemporaryName());
+    sample.setName(generateTemporaryName());
     assertTrue("Temporary sample names must return true.", DefaultSampleService.hasTemporaryName(sample));
   }
 

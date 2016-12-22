@@ -33,6 +33,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1503,6 +1504,8 @@ public class MisoRequestManager implements RequestManager {
     if (runStore != null) {
       long id;
       if (run.getId() == AbstractRun.UNSAVED_ID) {
+        run.setName(generateTemporaryName());
+        run.setId(runStore.save(run));
         try {
           String name = namingScheme.generateNameFor(run);
           run.setName(name);
@@ -2903,6 +2906,21 @@ public class MisoRequestManager implements RequestManager {
   public static void validateNameOrThrow(Nameable object, NamingScheme namingScheme) throws IOException {
     ValidationResult val = namingScheme.validateName(object.getName());
     if (!val.isValid()) throw new IOException("Save failed - invalid name:" + val.getMessage());
+  }
+
+  /**
+   * universal temporary name prefix. TODO: these same methods are in sqlstore DbUtils;
+   * use those when refactoring away the RequestManager.
+   */
+  static final public String TEMPORARY_NAME_PREFIX = "TEMPORARY_";
+
+  /**
+   * Generate a temporary name using a UUID.
+   * 
+   * @return Temporary name
+   */
+  static public String generateTemporaryName() {
+    return TEMPORARY_NAME_PREFIX + UUID.randomUUID();
   }
 
 }

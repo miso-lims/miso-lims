@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
+import static uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils.*;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -9,7 +10,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.hibernate.exception.ConstraintViolationException;
@@ -641,17 +641,6 @@ public class DefaultSampleService implements SampleService {
     authorizationManager.throwIfNonAdmin();
     Sample sample = get(sampleId);
     sampleDao.deleteSample(sample);
-  }
-
-  static final private String TEMPORARY_NAME_PREFIX = "TEMPORARY_S";
-
-  /**
-   * Generate a temporary name using a UUID.
-   * 
-   * @return Temporary name
-   */
-  static public String generateTemporaryName() {
-    return TEMPORARY_NAME_PREFIX + UUID.randomUUID();
   }
 
   static public boolean hasTemporaryName(Sample sample) {
