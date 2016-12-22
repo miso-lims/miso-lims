@@ -1,7 +1,7 @@
 MISO: An open source LIMS for small-to-large scale sequencing centres
 ---------------------------------------------------------------------
 Copyright (c) 2010-2012. The Genome Analysis Centre, Norwich, UK
-MISO project contacts: Robert Davey (robert.davey@bbsrc.ac.uk) (mario.caccamo@bbsrc.ac.uk)
+MISO project contacts: Robert Davey (robert.davey@bbsrc.ac.uk)
 
 ~ **********************************************************************
 ~
@@ -109,7 +109,7 @@ and populate it with the following information:
       -->
 </Context>
 
-If the <tomcat-install>/conf/Catalina/localhost directory doesn't exist (usually due to a fresh Tomcat install), either create 
+If the <tomcat-install>/conf/Catalina/localhost directory doesn't exist (usually due to a fresh Tomcat install), either create
 it yourself, or cycle a Tomcat startup/shutdown and it should appear.
 
 If your Tomcat install has the autoDeploy="true" flag set in server.xml, if you delete the webapps/ROOT directory and the ROOT.war
@@ -142,7 +142,7 @@ Please set this to the absolute path of where you would like MISO to store files
 The default path is '/storage/miso'. It is recommended that you do not change this location as some things will break.
 
 ~ ***********************************************
-~ 
+~
 ~ NB: You shouldn't need to change the miso.properties file as long as the /storage/miso directory exists on your filesystem and is writeable!
 ~
 ~ ***********************************************
@@ -166,7 +166,7 @@ submission.properties - properties to set the submission environment (see 2.5 be
 MISO can use either LDAP or SQL as an authentication mechanism, and will need to know where your chosen method resides. These
 properties need to be set before the container is started, and relate to properties files stored on disk.
 
-Firstly, the security options for both auth systems are specified in the security.properties file. If you are using JDBC, 
+Firstly, the security options for both auth systems are specified in the security.properties file. If you are using JDBC,
 then it is unlikely that you will need to change any options, but the LDAP setup is far more complex.
 Please ask your sysadmin to match up the MISO LDAP options with your local LDAP server options.
 
@@ -184,7 +184,7 @@ To set the 'security.method' property, use local environment variables on Tomcat
 ~ SEVERE: Error listenerStart
 ~ 20-Oct-2010 11:08:28 org.apache.catalina.core.StandardContext start
 ~ SEVERE: Context [/tgac] startup failed due to previous errors
-~ 
+~
 ~ **********************************************************************
 
 2.5 ) Submission properties

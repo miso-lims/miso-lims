@@ -25,7 +25,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAdditionalInfoImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
-import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
+import uk.ac.bbsrc.tgac.miso.core.store.KitDescriptorStore;
 
 public class HibernateLibraryAdditionalInfoDaoTest extends AbstractDAOTest {
 
@@ -33,7 +33,7 @@ public class HibernateLibraryAdditionalInfoDaoTest extends AbstractDAOTest {
   private SessionFactory sessionFactory;
 
   @Mock
-  private KitStore kitStore;
+  private KitDescriptorStore kitDescriptorStore;
 
   @InjectMocks
   HibernateLibraryAdditionalInfoDao dao;
@@ -115,7 +115,7 @@ public class HibernateLibraryAdditionalInfoDaoTest extends AbstractDAOTest {
 
     LibraryAdditionalInfo info = dao.getLibraryAdditionalInfo(1L);
     assertNotNull(info);
-    assertEquals(Long.valueOf(1L), info.getPrepKit().getId());
+    assertEquals(1L, info.getPrepKit().getId());
     KitDescriptor newKit = mockKitDescriptorInStore(2L);
     info.setPrepKit(newKit);
     Date oldDate = info.getLastUpdated();
@@ -128,7 +128,7 @@ public class HibernateLibraryAdditionalInfoDaoTest extends AbstractDAOTest {
 
   /**
    * Creates a mock KitDescriptor with only getKitDescriptorId() set up, and adds it to be returned from kitStore.getKitDescriptorById()
-   * 
+   *
    * @param id
    *          the ID to use for the mock, and retrieval via kitStore
    * @return the mock KitDescriptor
@@ -137,7 +137,7 @@ public class HibernateLibraryAdditionalInfoDaoTest extends AbstractDAOTest {
   private KitDescriptor mockKitDescriptorInStore(Long id) throws IOException {
     KitDescriptor kd = Mockito.mock(KitDescriptor.class);
     Mockito.when(kd.getId()).thenReturn(id);
-    Mockito.when(kitStore.getKitDescriptorById(id)).thenReturn(kd);
+    Mockito.when(kitDescriptorStore.getKitDescriptorById(id)).thenReturn(kd);
     return kd;
   }
 

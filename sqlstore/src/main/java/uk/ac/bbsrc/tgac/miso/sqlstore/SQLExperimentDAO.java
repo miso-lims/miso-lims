@@ -54,7 +54,7 @@ import net.sf.ehcache.Element;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractExperiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
-import uk.ac.bbsrc.tgac.miso.core.data.Kit;
+import uk.ac.bbsrc.tgac.miso.core.data.KitComponent;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
@@ -64,7 +64,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ExperimentStore;
-import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
+import uk.ac.bbsrc.tgac.miso.core.store.KitComponentStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PlatformStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
@@ -121,11 +121,11 @@ public class SQLExperimentDAO implements ExperimentStore {
       + "WHERE experiments_experimentId=:experiments_experimentId";
 
   protected static final Logger log = LoggerFactory.getLogger(SQLExperimentDAO.class);
-  private static final BridgeCollectionUpdater<Kit> KIT_WRITER = new BridgeCollectionUpdater<Kit>("Experiment_Kit", "experiments_experimentId",
+  private static final BridgeCollectionUpdater<KitComponent> KIT_WRITER = new BridgeCollectionUpdater<KitComponent>("Experiment_Kit", "experiments_experimentId",
       "kits_kidId") {
 
     @Override
-    protected Object getId(Kit item) {
+    protected Object getId(KitComponent item) {
       return item.getId();
     }
 
@@ -143,7 +143,7 @@ public class SQLExperimentDAO implements ExperimentStore {
   private StudyStore studyDAO;
   private PoolStore poolDAO;
   private PlatformStore platformDAO;
-  private KitStore kitDAO;
+  private KitComponentStore kitComponentDAO;
   private Store<SecurityProfile> securityProfileDAO;
   private CascadeType cascadeType;
   private ChangeLogStore changeLogDAO;
@@ -193,8 +193,8 @@ public class SQLExperimentDAO implements ExperimentStore {
   }
 
   @CoverageIgnore
-  public void setKitDAO(KitStore kitDAO) {
-    this.kitDAO = kitDAO;
+  public void setKitComponentDAO(KitComponentStore kitComponentDAO) {
+    this.kitComponentDAO = kitComponentDAO;
   }
 
   @CoverageIgnore
@@ -347,7 +347,7 @@ public class SQLExperimentDAO implements ExperimentStore {
         }
       }
 
-      KIT_WRITER.saveAll(template, experiment.getId(), experiment.getKits());
+      KIT_WRITER.saveAll(template, experiment.getId(), experiment.getKitComponents());
       purgeListCache(experiment);
     }
 
@@ -501,7 +501,7 @@ public class SQLExperimentDAO implements ExperimentStore {
 
         if (!isLazy()) {
           e.setPool(poolDAO.getPoolByExperiment(e));
-          e.setKits(kitDAO.listByExperiment(rs.getLong("experimentId")));
+          e.setKitComponents(kitComponentDAO.listByExperiment(rs.getLong("experimentId")));
         }
         e.getChangeLog().addAll(getChangeLogDAO().listAllById(TABLE_NAME, id));
       } catch (IOException e1) {

@@ -57,7 +57,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueMaterialDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueOriginDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueTypeDao;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultReferenceGenomeService;
-import uk.ac.bbsrc.tgac.miso.sqlstore.SQLKitDAO;
+import uk.ac.bbsrc.tgac.miso.sqlstore.SQLKitDescriptorDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryQCDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLSampleQCDAO;
@@ -98,11 +98,11 @@ public class ValueTypeLookupTestSuite {
     Mockito.when(tmDao.getTissueMaterial()).thenReturn(tms);
     Mockito.when(mgr.getTissueMaterialDao()).thenReturn(tmDao);
 
-    SQLKitDAO kitDao = Mockito.mock(SQLKitDAO.class);
+    SQLKitDescriptorDAO kitDao = Mockito.mock(SQLKitDescriptorDAO.class);
     List<KitDescriptor> kits = new ArrayList<>();
     kits.add(makeKit(VALID_LONG, VALID_STRING));
-    Mockito.when(kitDao.listAllKitDescriptors()).thenReturn(kits);
-    Mockito.when(mgr.getKitDao()).thenReturn(kitDao);
+    Mockito.when(kitDao.listAll()).thenReturn(kits);
+    Mockito.when(mgr.getKitDescriptorDao()).thenReturn(kitDao);
 
     HibernateSamplePurposeDao spDao = Mockito.mock(HibernateSamplePurposeDao.class);
     List<SamplePurpose> sps = new ArrayList<>();

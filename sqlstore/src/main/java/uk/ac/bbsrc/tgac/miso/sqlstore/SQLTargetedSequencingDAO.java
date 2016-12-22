@@ -26,7 +26,8 @@ import net.sf.ehcache.Element;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
-import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
+import uk.ac.bbsrc.tgac.miso.core.store.KitComponentStore;
+import uk.ac.bbsrc.tgac.miso.core.store.KitDescriptorStore;
 import uk.ac.bbsrc.tgac.miso.core.store.TargetedSequencingStore;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
@@ -50,7 +51,10 @@ public class SQLTargetedSequencingDAO implements TargetedSequencingStore {
   private SecurityStore securityDAO;
 
   @Autowired
-  private KitStore kitStore;
+  private KitComponentStore kitComponentStore;
+
+  @Autowired
+  private KitDescriptorStore kitDescriptorStore;
 
   @Autowired
   private CacheManager cacheManager;
@@ -168,7 +172,7 @@ public class SQLTargetedSequencingDAO implements TargetedSequencingStore {
       try {
         targetedSequencing.setCreatedBy(securityDAO.getUserById(rs.getLong("createdBy")));
         targetedSequencing.setUpdatedBy(securityDAO.getUserById(rs.getLong("updatedBy")));
-        targetedSequencing.setKitDescriptor(kitStore.getKitDescriptorById(rs.getLong("kitDescriptorId")));
+        targetedSequencing.setKitDescriptor(kitDescriptorStore.getKitDescriptorById(rs.getLong("kitDescriptorId")));
       } catch (IOException e1) {
         log.error("library dilution row mapper", e1);
       }

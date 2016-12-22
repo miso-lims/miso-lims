@@ -139,6 +139,13 @@ public class MenuController implements ServletContextAware {
     return "/pages/projectMenu.jsp";
   }
 
+  @RequestMapping("/kitComponentManagement")
+  public String exhaustComponent() { return "/pages/kitComponentManagement.jsp";}
+
+  @RequestMapping("/listKitChangeLog")
+  public String listKitChangeLog() { return "/pages/listKitChangeLog.jsp";
+  }
+
   @RequestMapping("/activity/menu")
   public String activityMenu() {
     return "/pages/activityMenu.jsp";
@@ -149,6 +156,12 @@ public class MenuController implements ServletContextAware {
     model.put("title", "Institute Defaults");
     return new ModelAndView("/pages/instituteDefaults.jsp", model);
   }
+
+  @RequestMapping("/kitDescriptorManagement")
+  public String kitManagement(){ return "/pages/KitDescriptorManagement.jsp";}
+
+  @RequestMapping("/listkitcomponents")
+  public String listKitComponents(){ return "/pages/listKitComponents.jsp";}
 
   @Override
   public void setServletContext(ServletContext servletContext) {

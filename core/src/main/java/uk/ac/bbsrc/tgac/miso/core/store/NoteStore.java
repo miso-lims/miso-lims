@@ -28,7 +28,7 @@ import java.util.List;
 
 import com.eaglegenomics.simlims.core.Note;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Kit;
+import uk.ac.bbsrc.tgac.miso.core.data.KitComponent;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
@@ -37,14 +37,14 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 
 /**
  * Defines a DAO interface for storing Notes
- * 
+ *
  * @author Rob Davey
  * @since 0.0.2
  */
 public interface NoteStore extends Store<Note> {
   /**
    * List all Notes related to a ProjectOverview given a ProjectOverview ID
-   * 
+   *
    * @param overviewId
    *          of type Long
    * @return List<Note>
@@ -55,7 +55,7 @@ public interface NoteStore extends Store<Note> {
 
   /**
    * List all Notes related to a Kit given a Kit ID
-   * 
+   *
    * @param kitId
    *          of type Long
    * @return List<Note>
@@ -66,7 +66,7 @@ public interface NoteStore extends Store<Note> {
 
   /**
    * List all Notes related to a Sample given a Sample ID
-   * 
+   *
    * @param sampleId
    *          of type Long
    * @return List<Note>
@@ -77,7 +77,7 @@ public interface NoteStore extends Store<Note> {
 
   /**
    * List all Notes related to a Library given a Library ID
-   * 
+   *
    * @param libraryId
    *          of type Long
    * @return List<Note>
@@ -88,7 +88,7 @@ public interface NoteStore extends Store<Note> {
 
   /**
    * List all Notes related to a Run given a Run ID
-   * 
+   *
    * @param runId
    *          of type Long
    * @return List<Note>
@@ -99,7 +99,7 @@ public interface NoteStore extends Store<Note> {
 
   /**
    * Save a ProjectOverview Note
-   * 
+   *
    * @param overview
    *          of type ProjectOverview
    * @param note
@@ -111,21 +111,21 @@ public interface NoteStore extends Store<Note> {
   long saveProjectOverviewNote(ProjectOverview overview, Note note) throws IOException;
 
   /**
-   * Save a Kit Note
-   * 
-   * @param kit
-   *          of type Kit
+   * Save a KitComponent Note
+   *
+   * @param kitComponent
+   *          of type KitComponent
    * @param note
    *          of type Note
    * @return long
    * @throws IOException
    *           when
    */
-  long saveKitNote(Kit kit, Note note) throws IOException;
+  long saveKitNote(KitComponent kitComponent, Note note) throws IOException;
 
   /**
    * Save a Sample Note
-   * 
+   *
    * @param sample
    *          of type Sample
    * @param note
@@ -138,7 +138,7 @@ public interface NoteStore extends Store<Note> {
 
   /**
    * Save a Library Note
-   * 
+   *
    * @param library
    *          of type Library
    * @param note
@@ -151,7 +151,7 @@ public interface NoteStore extends Store<Note> {
 
   /**
    * Save a Run Note
-   * 
+   *
    * @param run
    *          of type Run
    * @param note
@@ -164,7 +164,7 @@ public interface NoteStore extends Store<Note> {
 
   /**
    * Remove note
-   * 
+   *
    * @param note
    *          Note
    * @return boolean true if removed successfully

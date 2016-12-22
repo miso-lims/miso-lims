@@ -212,7 +212,7 @@ public interface Experiment extends SecurableByProfile, Submittable<Document>, C
    * @param kits
    *          kits.
    */
-  public void setKits(Collection<Kit> kits);
+  public void setKitComponents(Collection<KitComponent> kits);
 
   /**
    * Add a Kit to this Experiment object
@@ -220,14 +220,14 @@ public interface Experiment extends SecurableByProfile, Submittable<Document>, C
    * @param kit
    *          of type Kit
    */
-  public void addKit(Kit kit);
+  public void addKitComponent(KitComponent kit);
 
   /**
    * Returns the kits used to construct this Experiment object.
    * 
    * @return Collection<Kit> kits.
    */
-  public Collection<Kit> getKits();
+  public Collection<KitComponent> getKitComponents();
 
   /**
    * Return kits used within this experiment of a given KitType
@@ -237,7 +237,7 @@ public interface Experiment extends SecurableByProfile, Submittable<Document>, C
    * @return Collection<Kit>
    */
   @JsonIgnore
-  public Collection<Kit> getKitsByKitType(KitType kitType);
+  public Collection<KitComponent> getKitsByKitType(KitType kitType);
 
   public Collection<ChangeLog> getChangeLog();
 

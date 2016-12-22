@@ -169,10 +169,15 @@ VALUES (1, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:49'),
 (13, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:13'),
 (14, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:15');
 
-DELETE FROM `Kit`;
-INSERT INTO `Kit`(`kitId`,`identificationBarcode`,`locationBarcode`,`lotNumber`,`kitDate`,`kitDescriptorId`) VALUES
-(1,'1234','Freezer2','LOT34',NOW(),1),
-(2,'5678','Freezer3','LOT35',NOW(),2);
+DELETE FROM `KitComponent`;
+INSERT INTO `KitComponent`(`kitComponentId`,`identificationBarcode`,`locationBarcode`,`lotNumber`,`kitReceivedDate`, `kitExpiryDate`, `exhausted`, `kitComponentDescriptorId`) VALUES
+(1,'1234','Freezer2','LOT34',NOW(), NOW(), false, 1),
+(2,'5678','Freezer3','LOT35',NOW(), NOW(), false, 2);
+
+DELETE FROM `KitComponentDescriptor`;
+INSERT INTO `KitComponentDescriptor`(`kitComponentDescriptorId`,`name`,`referenceNumber`,`kitDescriptorId`) VALUES
+(1,'KitComponentDescriptor1','1234',1),
+(2,'KitComponentDescriptor2','5678', 2);
 
 DELETE FROM `TargetedSequencing`;
 INSERT INTO `TargetedSequencing`(`targetedSequencingId`,`alias`,`description`,`kitDescriptorId`, `archived`, `createdBy`,`creationDate`,`updatedBy`,`lastUpdated`) VALUES

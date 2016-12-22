@@ -32,6 +32,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +44,9 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
@@ -51,7 +55,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.EntityGroup;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
-import uk.ac.bbsrc.tgac.miso.core.data.Kit;
+import uk.ac.bbsrc.tgac.miso.core.data.KitComponent;
+import uk.ac.bbsrc.tgac.miso.core.data.KitComponentDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
@@ -1844,15 +1849,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public long saveKit(Kit kit) throws IOException {
-    if (getCurrentUser().isInternal()) {
-      return backingManager.saveKit(kit);
-    } else {
-      throw new IOException("User " + getCurrentUser().getFullName() + " cannot write to this Kit");
-    }
-  }
-
-  @Override
   public long saveKitDescriptor(KitDescriptor kitDescriptor) throws IOException {
     if (getCurrentUser().isInternal()) {
       return backingManager.saveKitDescriptor(kitDescriptor);
@@ -1939,27 +1935,10 @@ public class UserAuthMisoRequestManager implements RequestManager {
     return backingManager.getSequencerReferenceByRunId(runId);
   }
 
-  @Override
-  public Kit getKitById(long kitId) throws IOException {
-    Kit o = backingManager.getKitById(kitId);
-    if (getCurrentUser().isInternal())
-      return o;
-    else
-      throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Kit " + kitId);
-  }
 
   @Override
-  public Kit getKitByIdentificationBarcode(String barcode) throws IOException {
-    Kit o = backingManager.getKitByIdentificationBarcode(barcode);
-    if (getCurrentUser().isInternal())
-      return o;
-    else
-      throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Kit " + barcode);
-  }
-
-  @Override
-  public Kit getKitByLotNumber(String lotNumber) throws IOException {
-    Kit o = backingManager.getKitByLotNumber(lotNumber);
+  public KitComponent getKitByLotNumber(String lotNumber) throws IOException {
+    KitComponent o = backingManager.getKitByLotNumber(lotNumber);
     if (getCurrentUser().isInternal())
       return o;
     else
@@ -2174,22 +2153,17 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Kit> listAllKits() throws IOException {
-    return backingManager.listAllKits();
-  }
-
-  @Override
-  public Collection<Kit> listKitsByExperimentId(long experimentId) throws IOException {
+  public Collection<KitComponent> listKitsByExperimentId(long experimentId) throws IOException {
     return backingManager.listKitsByExperimentId(experimentId);
   }
 
   @Override
-  public Collection<Kit> listKitsByManufacturer(String manufacturer) throws IOException {
+  public Collection<KitComponent> listKitsByManufacturer(String manufacturer) throws IOException {
     return backingManager.listKitsByManufacturer(manufacturer);
   }
 
   @Override
-  public Collection<Kit> listKitsByType(KitType kitType) throws IOException {
+  public Collection<KitComponent> listKitsByType(KitType kitType) throws IOException {
     return backingManager.listKitsByType(kitType);
   }
 
@@ -2632,5 +2606,130 @@ public class UserAuthMisoRequestManager implements RequestManager {
         authorizedLibs.add(lib);
     }
     return authorizedLibs;
+  }
+
+  @Override
+  public boolean isKitComponentAlreadyLogged(String identificationBarcode) throws IOException {
+    return backingManager.isKitComponentAlreadyLogged(identificationBarcode);
+  }
+
+  @Override
+  public long saveKitComponent(KitComponent kitComponent) throws IOException {
+    return backingManager.saveKitComponent(kitComponent);
+  }
+
+  @Override
+  public long saveKitComponentDescriptor(KitComponentDescriptor kitComponentDescriptor) throws IOException {
+    return backingManager.saveKitComponentDescriptor(kitComponentDescriptor);
+  }
+
+  @Override
+  public long saveKitChangeLog(JSONObject changeLog) throws IOException {
+    return backingManager.saveKitChangeLog(changeLog);
+  }
+
+  @Override
+  public JSONArray getKitChangeLog() throws IOException {
+    return backingManager.getKitChangeLog();
+  }
+
+  @Override
+  public JSONArray getKitChangeLogByKitComponentId(long kitComponentId) throws IOException {
+    return backingManager.getKitChangeLogByKitComponentId(kitComponentId);
+  }
+
+  @Override
+  public KitComponent getKitComponentById(long kitId) throws IOException {
+    return backingManager.getKitComponentById(kitId);
+  }
+
+  @Override
+  public KitComponent getKitComponentByIdentificationBarcode(String barcode) throws IOException {
+    return backingManager.getKitComponentByIdentificationBarcode(barcode);
+  }
+
+  @Override
+  public KitComponentDescriptor getKitComponentDescriptorById(long kitComponentDescriptorId) throws IOException {
+    return backingManager.getKitComponentDescriptorById(kitComponentDescriptorId);
+  }
+
+  @Override
+  public KitComponentDescriptor getKitComponentDescriptorByReferenceNumber(String referenceNumber) throws IOException {
+    return backingManager.getKitComponentDescriptorByReferenceNumber(referenceNumber);
+  }
+
+  @Override
+  public Collection<KitComponent> listAllKitComponents() throws IOException {
+    return backingManager.listAllKitComponents();
+  }
+
+  @Override
+  public Collection<KitComponent> listKitComponentsByExperimentId(long experimentId) throws IOException {
+    return backingManager.listKitComponentsByExperimentId(experimentId);
+  }
+
+  @Override
+  public Collection<KitComponent> listKitComponentsByManufacturer(String manufacturer) throws IOException {
+    return backingManager.listKitComponentsByManufacturer(manufacturer);
+  }
+
+  @Override
+  public Collection<KitComponent> listKitComponentsByType(KitType kitType) throws IOException {
+    return backingManager.listKitComponentsByType(kitType);
+  }
+
+  @Override
+  public Collection<KitComponent> listKitComponentsByLocationBarcode(String locationBarcode) throws IOException {
+    return backingManager.listKitComponentsByLocationBarcode(locationBarcode);
+  }
+
+  @Override
+  public Collection<KitComponent> listKitComponentsByLotNumber(String lotNumber) throws IOException {
+    return backingManager.listKitComponentsByLotNumber(lotNumber);
+  }
+
+  @Override
+  public Collection<KitComponent> listKitComponentsByReceivedDate(LocalDate receivedDate) throws IOException {
+    return backingManager.listKitComponentsByReceivedDate(receivedDate);
+  }
+
+  @Override
+  public Collection<KitComponent> listKitComponentsByExpiryDate(LocalDate expiryDate) throws IOException {
+    return backingManager.listKitComponentsByExpiryDate(expiryDate);
+  }
+
+  @Override
+  public Collection<KitComponent> listKitComponentsByExhausted(boolean exhausted) throws IOException {
+    return backingManager.listKitComponentsByExhausted(exhausted);
+  }
+
+  @Override
+  public Collection<KitComponent> listKitComponentsByKitComponentDescriptorId(long kitComponentDescriptorId) throws IOException {
+    return backingManager.listKitComponentsByKitComponentDescriptorId(kitComponentDescriptorId);
+  }
+
+  @Override
+  public Collection<KitComponent> listKitComponentsByKitDescriptorId(long kitDescriptorID) throws IOException {
+    return backingManager.listKitComponentsByKitDescriptorId(kitDescriptorID);
+  }
+
+  @Override
+  public Collection<KitComponentDescriptor> listKitComponentDescriptorsByKitDescriptorId(long kitDescriptorId) throws IOException {
+    return backingManager.listKitComponentDescriptorsByKitDescriptorId(kitDescriptorId);
+  }
+
+  @Override
+  public Collection<KitDescriptor> listKitDescriptorsByManufacturer(String manufacturer) throws IOException {
+    return backingManager.listKitDescriptorsByManufacturer(manufacturer);
+  }
+
+  @Override
+  public Collection<KitDescriptor> listKitDescriptorsByPlatform(PlatformType platformType) throws IOException {
+    return backingManager.listKitDescriptorsByPlatform(platformType);
+  }
+
+  @Override
+  public Collection<KitDescriptor> listKitDescriptorsByUnits(String units) throws IOException {
+    return backingManager.listKitDescriptorsByUnits(units);
   }
 }
