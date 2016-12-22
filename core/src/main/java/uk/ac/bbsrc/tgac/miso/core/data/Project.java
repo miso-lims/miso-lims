@@ -49,7 +49,8 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 // @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 @JsonIgnoreProperties({ "securityProfile" })
-public interface Project extends com.eaglegenomics.simlims.core.Project, Comparable, SecurableByProfile, Submittable<Document>, Reportable,
+public interface Project extends com.eaglegenomics.simlims.core.Project, Comparable<Project>, SecurableByProfile, Submittable<Document>,
+    Reportable<Project>,
     Deletable, Watchable, Nameable, Alertable {
   /** Field PREFIX */
   public static final String PREFIX = "PRO";

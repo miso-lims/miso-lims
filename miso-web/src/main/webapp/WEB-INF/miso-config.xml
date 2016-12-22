@@ -32,8 +32,6 @@
 
   <bean id="dataObjectFactory" name="dataObjectFactory" class="uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory" />
 
-  <bean id="protocolManager" class="com.eaglegenomics.simlims.core.manager.LocalProtocolManager" />
-
   <bean id="requestManager" class="uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager">
     <constructor-arg index="0">
       <bean class="org.springframework.security.core.context.SecurityContextHolder" factory-method="getContextHolderStrategy" />
