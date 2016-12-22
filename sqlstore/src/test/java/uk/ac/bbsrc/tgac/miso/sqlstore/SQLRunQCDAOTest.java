@@ -134,13 +134,6 @@ public class SQLRunQCDAOTest extends AbstractDAOTest {
   }
 
   @Test
-  public void testListPartitionSelectionsByRunQcId() throws Exception {
-    Collection<Partition> partitions = dao.listPartitionSelectionsByRunQcId(1);
-    assertEquals(1, partitions.size());
-    assertEquals(new Integer(3), partitions.iterator().next().getPartitionNumber());
-  }
-
-  @Test
   public void testRemove() throws Exception {
     RunQC runQC = dao.get(3);
     boolean remove = dao.remove(runQC);

@@ -1586,19 +1586,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  @Deprecated
-  public Collection<Run> listRunsByExperimentId(Long experimentId) throws IOException {
-    User user = getCurrentUser();
-    Collection<Run> accessibles = new HashSet<>();
-    for (Run run : backingManager.listRunsByExperimentId(experimentId)) {
-      if (run.userCanRead(user)) {
-        accessibles.add(run);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
   public Collection<Run> listRunsBySequencerId(Long sequencerReferenceId) throws IOException {
     User user = getCurrentUser();
     Collection<Run> accessibles = new HashSet<>();

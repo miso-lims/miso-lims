@@ -1125,16 +1125,6 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  @Deprecated
-  public Collection<Run> listRunsByExperimentId(Long experimentId) throws IOException {
-    if (runStore != null) {
-      return runStore.listByExperimentId(experimentId);
-    } else {
-      throw new IOException("No runStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
   public Collection<Run> listRunsBySequencerId(Long sequencerReferenceId) throws IOException {
     if (runStore != null) {
       return runStore.listBySequencerId(sequencerReferenceId);
@@ -1513,7 +1503,6 @@ public class MisoRequestManager implements RequestManager {
     if (runStore != null) {
       long id;
       if (run.getId() == AbstractRun.UNSAVED_ID) {
-        run.setId(runStore.save(run));
         try {
           String name = namingScheme.generateNameFor(run);
           run.setName(name);
