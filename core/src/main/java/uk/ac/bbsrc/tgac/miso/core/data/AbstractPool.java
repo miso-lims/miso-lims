@@ -40,6 +40,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 
@@ -54,11 +55,13 @@ import org.hibernate.annotations.MetaValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution;
 import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
 import uk.ac.bbsrc.tgac.miso.core.event.model.PoolEvent;
@@ -115,7 +118,16 @@ public abstract class AbstractPool extends AbstractBoxable implements Pool {
 
   // listeners
   private final Set<MisoListener> listeners = new HashSet<>();
-  private Set<User> watchers = new HashSet<>();
+
+  // Cascade all operations except delete
+  @ManyToMany(targetEntity = UserImpl.class, cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH })
+  @JoinTable(name = "Pool_Watcher", joinColumns = { @JoinColumn(name = "poolId") }, inverseJoinColumns = { @JoinColumn(name = "userId") })
+  private Set<User> watchUsers = new HashSet<>();
+
+  @Transient
+  // not Hibernate-managed
+  private Group watchGroup;
+
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
   private User lastModifier;
   private Date lastModified;
@@ -363,24 +375,38 @@ public abstract class AbstractPool extends AbstractBoxable implements Pool {
     }
   }
 
-  @Override
-  public Set<User> getWatchers() {
-    return watchers;
+  public void setWatchUsers(Set<User> watchUsers) {
+    this.watchUsers = watchUsers;
+  }
+
+  public Set<User> getWatchUsers() {
+    return watchUsers;
+  }
+
+  public void setWatchGroup(Group watchGroup) {
+    this.watchGroup = watchGroup;
+  }
+
+  public Group getWatchGroup() {
+    return watchGroup;
   }
 
   @Override
-  public void setWatchers(Set<User> watchers) {
-    this.watchers = watchers;
+  public Set<User> getWatchers() {
+    Set<User> allWatchers = new HashSet<>();
+    if (watchGroup != null) allWatchers.addAll(watchGroup.getUsers());
+    if (watchUsers != null) allWatchers.addAll(watchUsers);
+    return allWatchers;
   }
 
   @Override
   public void addWatcher(User user) {
-    watchers.add(user);
+    watchUsers.add(user);
   }
 
   @Override
   public void removeWatcher(User user) {
-    watchers.remove(user);
+    watchUsers.remove(user);
   }
 
   @Override

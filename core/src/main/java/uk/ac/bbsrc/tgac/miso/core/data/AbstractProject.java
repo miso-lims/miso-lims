@@ -30,11 +30,14 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToOne;
 import javax.persistence.Transient;
@@ -48,11 +51,13 @@ import org.hibernate.annotations.TypeDefs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressTypeUserType;
 import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
@@ -110,8 +115,16 @@ public abstract class AbstractProject implements Project {
   @Transient
   private final Set<MisoListener> listeners = new HashSet<>();
   private Date lastUpdated;
+
+  // Cascade all operations except delete
+  @ManyToMany(targetEntity = UserImpl.class, cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH })
+  @JoinTable(name = "Project_Watcher", joinColumns = { @JoinColumn(name = "projectId") },
+      inverseJoinColumns = { @JoinColumn(name = "userId") })
+  private Set<User> watchUsers = new HashSet<>();
+
   @Transient
-  private Set<User> watchers = new HashSet<>();
+  // not Hibernate-managed
+  private Group watchGroup;
 
   @Override
   public Date getCreationDate() {
@@ -369,24 +382,38 @@ public abstract class AbstractProject implements Project {
     return listeners.remove(listener);
   }
 
-  @Override
-  public Set<User> getWatchers() {
-    return watchers;
+  public void setWatchUsers(Set<User> watchUsers) {
+    this.watchUsers = watchUsers;
+  }
+
+  public Set<User> getWatchUsers() {
+    return watchUsers;
+  }
+
+  public void setWatchGroup(Group watchGroup) {
+    this.watchGroup = watchGroup;
+  }
+
+  public Group getWatchGroup() {
+    return watchGroup;
   }
 
   @Override
-  public void setWatchers(Set<User> watchers) {
-    this.watchers = watchers;
+  public Set<User> getWatchers() {
+    Set<User> allWatchers = new HashSet<>();
+    if (watchGroup != null) allWatchers.addAll(watchGroup.getUsers());
+    if (watchUsers != null) allWatchers.addAll(watchUsers);
+    return allWatchers;
   }
 
   @Override
   public void addWatcher(User user) {
-    watchers.add(user);
+    watchUsers.add(user);
   }
 
   @Override
   public void removeWatcher(User user) {
-    watchers.remove(user);
+    watchUsers.remove(user);
   }
 
   @Override

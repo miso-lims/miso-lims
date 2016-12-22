@@ -31,6 +31,7 @@ import java.util.Map;
 
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
+import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
@@ -664,5 +665,9 @@ public interface RequestManager {
   public Integer countLibraryDilutionsBySearchAndPlatform(String search, PlatformType platform) throws IOException;
 
   public List<Run> getRunsByPool(Pool pool) throws IOException;
+
+  public void addRunWatcher(Run run, User watcher) throws IOException;
+
+  public void removeRunWatcher(Run run, User watcher) throws IOException;
 
 }

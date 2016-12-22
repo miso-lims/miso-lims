@@ -40,6 +40,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToMany;
@@ -51,6 +52,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
+import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
@@ -125,11 +127,17 @@ public abstract class AbstractRun implements Run {
   @JoinColumn(name = "sequencerReference_sequencerReferenceId", nullable = false)
   private SequencerReference sequencerReference;
 
-  // listeners
   @Transient
   private final Set<MisoListener> listeners = new HashSet<>();
+
+  // Cascade all operations except delete
+  @ManyToMany(targetEntity = UserImpl.class, cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH })
+  @JoinTable(name = "Run_Watcher", joinColumns = { @JoinColumn(name = "runId") }, inverseJoinColumns = { @JoinColumn(name = "userId") })
+  private Set<User> watchUsers = new HashSet<>();
+
   @Transient
-  private Set<User> watchers = new HashSet<>();
+  // not Hibernate-managed
+  private Group watchGroup;
 
   @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "lastModifier", nullable = false)
@@ -458,24 +466,39 @@ public abstract class AbstractRun implements Run {
     }
   }
 
-  @Override
-  public Set<User> getWatchers() {
-    return watchers;
+  public void setWatchUsers(Set<User> watchUsers) {
+    this.watchUsers = watchUsers;
+  }
+
+  public Set<User> getWatchUsers() {
+    return watchUsers;
   }
 
   @Override
-  public void setWatchers(Set<User> watchers) {
-    this.watchers = watchers;
+  public void setWatchGroup(Group watchGroup) {
+    this.watchGroup = watchGroup;
+  }
+
+  public Group getWatchGroup() {
+    return watchGroup;
+  }
+
+  @Override
+  public Set<User> getWatchers() {
+    Set<User> allWatchers = new HashSet<>();
+    if (watchGroup != null) allWatchers.addAll(watchGroup.getUsers());
+    if (watchUsers != null) allWatchers.addAll(watchUsers);
+    return allWatchers;
   }
 
   @Override
   public void addWatcher(User user) {
-    watchers.add(user);
+    watchUsers.add(user);
   }
 
   @Override
   public void removeWatcher(User user) {
-    watchers.remove(user);
+    watchUsers.remove(user);
   }
 
   @Override

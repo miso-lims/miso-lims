@@ -28,6 +28,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import com.eaglegenomics.simlims.core.User;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 
 /**
@@ -152,4 +154,8 @@ public interface RunStore extends Store<Run>, Remover<Run> {
   public List<Run> listByOffsetAndNumResults(int offset, int limit, String sortDir, String sortCol) throws IOException;
 
   public long countBySearch(String querystr) throws IOException;
+
+  public void addWatcher(Run run, User watcher);
+
+  public void removeWatcher(Run run, User watcher);
 }

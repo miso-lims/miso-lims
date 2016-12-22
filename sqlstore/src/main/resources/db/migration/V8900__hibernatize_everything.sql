@@ -59,3 +59,63 @@ ALTER TABLE RunQC_Partition DROP PRIMARY KEY;
 ALTER TABLE RunQC_Partition ADD PRIMARY KEY(`runQc_runQcId`, `partitionId`);
 ALTER TABLE RunQC_Partition DROP COLUMN partitionNumber;
 ALTER TABLE RunQC_Partition DROP COLUMN containers_containerId;
+
+CREATE TABLE Project_Watcher (
+  projectId bigint(20) NOT NULL,
+  userId bigint(20) NOT NULL,
+  PRIMARY KEY (projectId, userId),
+  CONSTRAINT fk_projectWatcher_project FOREIGN KEY (projectId) REFERENCES Project (projectId) ON DELETE CASCADE,
+  CONSTRAINT fk_projectWatcher_user FOREIGN KEY (userId) REFERENCES User (userId) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE ProjectOverview_Watcher (
+  overviewId bigint(20) NOT NULL,
+  userId bigint(20) NOT NULL,
+  PRIMARY KEY (overviewId, userId),
+  CONSTRAINT fk_projectOverviewWatcher_project FOREIGN KEY (overviewId) REFERENCES ProjectOverview (overviewId) ON DELETE CASCADE,
+  CONSTRAINT fk_projectOverviewWatcher_user FOREIGN KEY (userId) REFERENCES User (userId) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE Pool_Watcher (
+  poolId bigint(20) NOT NULL,
+  userId bigint(20) NOT NULL,
+  PRIMARY KEY (poolId, userId),
+  CONSTRAINT fk_poolWatcher_pool FOREIGN KEY (poolId) REFERENCES Pool (poolId) ON DELETE CASCADE,
+  CONSTRAINT fk_poolWatcher_user FOREIGN KEY (userId) REFERENCES User (userId) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE Run_Watcher (
+  runId bigint(20) NOT NULL,
+  userId bigint(20) NOT NULL,
+  PRIMARY KEY (runId, userId),
+  CONSTRAINT fk_runWatcher_run FOREIGN KEY (runId) REFERENCES Run (runId) ON DELETE CASCADE,
+  CONSTRAINT fk_runWatcher_user FOREIGN KEY (userId) REFERENCES User (userId) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- StartNoTest
+INSERT INTO Project_Watcher(projectId, userId)
+SELECT p.projectId, u.userId
+FROM Watcher w
+JOIN Project p ON p.name = w.entityName
+JOIN User u ON u.userId = w.userId;
+
+INSERT INTO ProjectOverview_Watcher(overviewId, userId)
+SELECT o.overviewId, u.userId
+FROM Watcher w
+JOIN ProjectOverview o ON CONCAT('POV', o.overviewId) = w.entityName
+JOIN User u ON u.userId = w.userId;
+
+INSERT INTO Pool_Watcher(runId, userId)
+SELECT p.poolId, u.userId
+FROM Watcher w
+JOIN Pool p ON p.name = w.entityName
+JOIN User u ON u.userId = w.userId;
+
+INSERT INTO Run_Watcher(runId, userId)
+SELECT r.runId, u.userId
+FROM Watcher w
+JOIN Run r ON r.name = w.entityName
+JOIN User u ON u.userId = w.userId;
+-- EndNoTest
+
+DROP TABLE Watcher;

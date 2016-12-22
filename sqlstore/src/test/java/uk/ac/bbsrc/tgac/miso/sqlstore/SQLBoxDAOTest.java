@@ -73,7 +73,6 @@ import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerReferenceStore;
 import uk.ac.bbsrc.tgac.miso.core.store.StatusStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
-import uk.ac.bbsrc.tgac.miso.core.store.WatcherStore;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleDao;
 
 public class SQLBoxDAOTest extends AbstractDAOTest {
@@ -101,8 +100,6 @@ public class SQLBoxDAOTest extends AbstractDAOTest {
   private StatusStore statusDAO;
   @Mock
   private NoteStore noteDAO;
-  @Mock
-  private WatcherStore watcherDAO;
   @Mock
   private ChangeLogStore changeLogDAO;
   @Mock

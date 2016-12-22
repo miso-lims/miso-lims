@@ -46,7 +46,6 @@ import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.core.store.StudyStore;
-import uk.ac.bbsrc.tgac.miso.core.store.WatcherStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.persistence.ReferenceGenomeDao;
 
@@ -67,9 +66,6 @@ public class SQLProjectDAOTest extends AbstractDAOTest {
   @Autowired
   @Spy
   private TgacDataObjectFactory dataObjectFactory;
-
-  @Mock
-  private WatcherStore watcherDAO;
 
   @Mock
   private SampleStore sampleDAO;

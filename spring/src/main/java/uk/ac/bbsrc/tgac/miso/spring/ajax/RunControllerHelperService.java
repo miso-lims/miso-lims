@@ -74,7 +74,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.pacbio.PacBioRun;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.solid.SolidRun;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
-import uk.ac.bbsrc.tgac.miso.core.event.manager.WatchManager;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
@@ -97,15 +96,9 @@ public class RunControllerHelperService {
   @Autowired
   private RequestManager requestManager;
   @Autowired
-  private WatchManager watchManager;
-  @Autowired
   private DataObjectFactory dataObjectFactory;
   @Autowired
   private MisoFilesManager misoFileManager;
-
-  public void setWatchManager(WatchManager watchManager) {
-    this.watchManager = watchManager;
-  }
 
   public void setMisoFileManager(MisoFilesManager misoFileManager) {
     this.misoFileManager = misoFileManager;
@@ -941,9 +934,7 @@ public class RunControllerHelperService {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Run run = requestManager.getRunById(runId);
       if (!run.getWatchers().contains(user)) {
-        watchManager.watch(run, user);
-        run.setLastModifier(user);
-        requestManager.saveRun(run);
+        requestManager.addRunWatcher(run, user);
       }
       return JSONUtils.SimpleJSONResponse("OK");
     } catch (IOException e) {
@@ -958,9 +949,7 @@ public class RunControllerHelperService {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Run run = requestManager.getRunById(runId);
       if (run.getWatchers().contains(user)) {
-        watchManager.unwatch(run, user);
-        run.setLastModifier(user);
-        requestManager.saveRun(run);
+        requestManager.removeRunWatcher(run, user);
       }
       return JSONUtils.SimpleJSONResponse("OK");
     } catch (IOException e) {

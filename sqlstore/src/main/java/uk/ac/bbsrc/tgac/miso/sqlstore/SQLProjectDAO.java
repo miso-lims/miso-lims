@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -74,7 +73,6 @@ import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.core.store.StudyStore;
-import uk.ac.bbsrc.tgac.miso.core.store.WatcherStore;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.persistence.ReferenceGenomeDao;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
@@ -164,7 +162,6 @@ public class SQLProjectDAO implements ProjectStore {
   private LibraryStore libraryDAO;
   private RunStore runDAO;
   private NoteStore noteDAO;
-  private WatcherStore watcherDAO;
 
   @Autowired
   private ProjectAlertManager projectAlertManager;
@@ -250,11 +247,6 @@ public class SQLProjectDAO implements ProjectStore {
   @CoverageIgnore
   public void setNoteDAO(NoteStore noteDAO) {
     this.noteDAO = noteDAO;
-  }
-
-  @CoverageIgnore
-  public void setWatcherDAO(WatcherStore watcherDAO) {
-    this.watcherDAO = watcherDAO;
   }
 
   @CoverageIgnore
@@ -349,11 +341,11 @@ public class SQLProjectDAO implements ProjectStore {
         }
       }
 
-      watcherDAO.removeWatchedEntityByUser(project, user);
-
-      for (User u : project.getWatchers()) {
-        watcherDAO.saveWatchedEntityUser(project, u);
-      }
+      // Hibernatization Note: saving watchers will happen automatically
+      //
+      // for (User u : project.getWatchers()) {
+      // watcherDAO.saveWatchedEntityUser(project, u);
+      // }
 
       purgeListCache(project);
     }
@@ -422,11 +414,14 @@ public class SQLProjectDAO implements ProjectStore {
     // entityGroupDAO.save(overview.getSampleGroup());
     // }
 
-    watcherDAO.removeWatchedEntityByUser(overview, user);
+    // TODO: (Hibernatization) Regular save shouldn't modify watchers. Create addWatcher & removeWatcher methods
+    // (See HibernateRunDao for example)
 
-    for (User u : overview.getWatchers()) {
-      watcherDAO.saveWatchedEntityUser(overview, u);
-    }
+    // watcherDAO.removeWatchedEntityByUser(overview, user);
+    //
+    // for (User u : overview.getWatchers()) {
+    // watcherDAO.saveWatchedEntityUser(overview, u);
+    // }
 
     DbUtils.updateCaches(cacheManager, overview.getProject(), Project.class);
     DbUtils.updateCaches(cacheManager, overview, ProjectOverview.class);
@@ -586,12 +581,15 @@ public class SQLProjectDAO implements ProjectStore {
         try {
           project.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
           project.setIssueKeys(listIssueKeysByProjectId(id));
-          project.setWatchers(new HashSet<>(watcherDAO.getWatchersByEntityName(project.getWatchableIdentifier())));
+          // project.setWatchers(new HashSet<>(watcherDAO.getWatchersByEntityName(project.getWatchableIdentifier())));
           if (project.getSecurityProfile() != null && project.getSecurityProfile().getOwner() != null)
             project.addWatcher(project.getSecurityProfile().getOwner());
-          for (User u : watcherDAO.getWatchersByWatcherGroup("ProjectWatchers")) {
-            project.addWatcher(u);
-          }
+
+          // TODO: Hibernate will load watchUsers automatically, but watchGroup must be loaded explicitly
+
+          // for (User u : watcherDAO.getWatchersByWatcherGroup("ProjectWatchers")) {
+          // project.addWatcher(u);
+          // }
 
           if (!isLazy()) {
             Collection<ProjectOverview> overviews = listOverviewsByProjectId(id);
@@ -668,12 +666,13 @@ public class SQLProjectDAO implements ProjectStore {
         overview.setRuns(runDAO.listByProjectId(rs.getLong("project_projectId")));
         overview.setNotes(noteDAO.listByProjectOverview(id));
 
-        overview.setWatchers(new HashSet<>(watcherDAO.getWatchersByEntityName(overview.getWatchableIdentifier())));
+        // TODO: Hibernate will load watchUsers automatically, but watchGroup must be loaded explicitly
+        // overview.setWatchers(new HashSet<>(watcherDAO.getWatchersByEntityName(overview.getWatchableIdentifier())));
         if (overview.getProject().getSecurityProfile() != null && overview.getProject().getSecurityProfile().getOwner() != null)
           overview.addWatcher(overview.getProject().getSecurityProfile().getOwner());
-        for (User u : watcherDAO.getWatchersByWatcherGroup("ProjectWatchers")) {
-          overview.addWatcher(u);
-        }
+        // for (User u : watcherDAO.getWatchersByWatcherGroup("ProjectWatchers")) {
+        // overview.addWatcher(u);
+        // }
       } catch (IOException e) {
         log.error("project overview row mapper", e);
       }

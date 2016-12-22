@@ -2579,4 +2579,24 @@ public class UserAuthMisoRequestManager implements RequestManager {
     }
     return authorizedLibs;
   }
+
+  @Override
+  public void addRunWatcher(Run run, User watcher) throws IOException {
+    if (!readCheck(run)) {
+      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Run " + run.getId());
+    } else if (!run.userCanRead(watcher)) {
+      throw new AuthorizationIOException("User " + watcher.getLoginName() + " cannot read Run " + run.getId());
+    } else {
+      backingManager.addRunWatcher(run, watcher);
+    }
+  }
+
+  @Override
+  public void removeRunWatcher(Run run, User watcher) throws IOException {
+    if (!writeCheck(run)) {
+      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read write to Run " + run.getId());
+    } else {
+      backingManager.removeRunWatcher(run, watcher);
+    }
+  }
 }

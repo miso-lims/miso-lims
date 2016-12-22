@@ -41,6 +41,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
+import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Lists;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractRun;
@@ -2921,6 +2922,16 @@ public class MisoRequestManager implements RequestManager {
    */
   static public String generateTemporaryName() {
     return TEMPORARY_NAME_PREFIX + UUID.randomUUID();
+  }
+
+  @Override
+  public void addRunWatcher(Run run, User watcher) throws IOException {
+    runStore.addWatcher(run, watcher);
+  }
+
+  @Override
+  public void removeRunWatcher(Run run, User watcher) throws IOException {
+    runStore.removeWatcher(run, watcher);
   }
 
 }
