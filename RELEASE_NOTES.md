@@ -1,3 +1,10 @@
+# 0.2.46
+
+Changes:
+
+ * GLT-1380 allow users to delete barcodes (#610)
+ * GLT-1363 hide Experiments section when creating a new pool (#594)
+
 # 0.2.45
 
 Changes:
