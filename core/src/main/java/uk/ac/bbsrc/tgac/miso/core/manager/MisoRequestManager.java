@@ -1407,22 +1407,20 @@ public class MisoRequestManager implements RequestManager {
 
   @Override
   public void deleteRunNote(Run run, Note note) throws IOException {
-    if (runStore != null) {
-      Run managed = runStore.get(run.getId());
-      runStore.deleteNote(managed, note);
-    } else {
-      throw new IOException("No noteStore available. Check that it has been declared in the Spring config.");
-    }
+    Run managed = runStore.get(run.getId());
+    runStore.deleteNote(managed, note);
   }
 
   @Override
   public void deleteKitNote(Kit kit, Note note) throws IOException {
-    if (kitStore != null) {
-      Kit managed = kitStore.get(kit.getId());
-      kitStore.deleteNote(managed, note);
-    } else {
-      throw new IOException("No noteStore available. Check that it has been declared in the Spring config.");
-    }
+    Kit managed = kitStore.get(kit.getId());
+    kitStore.deleteNote(managed, note);
+  }
+
+  @Override
+  public void deleteLibraryNote(Library library, Note note) throws IOException {
+    Library managed = libraryStore.get(library.getId());
+    libraryStore.deleteNote(managed, note);
   }
 
   @Override
@@ -1512,22 +1510,14 @@ public class MisoRequestManager implements RequestManager {
 
   @Override
   public void saveRunNote(Run run, Note note) throws IOException {
-    if (runStore != null) {
-      Run managed = runStore.get(run.getId());
-      runStore.addNote(managed, note);
-    } else {
-      throw new IOException("No noteStore available. Check that it has been declared in the Spring config.");
-    }
+    Run managed = runStore.get(run.getId());
+    runStore.addNote(managed, note);
   }
 
   @Override
   public void saveKitNote(Kit kit, Note note) throws IOException {
-    if (kitStore != null) {
-      Kit managed = kitStore.get(kit.getId());
-      kitStore.addNote(managed, note);
-    } else {
-      throw new IOException("No noteStore available. Check that it has been declared in the Spring config.");
-    }
+    Kit managed = kitStore.get(kit.getId());
+    kitStore.addNote(managed, note);
   }
 
   @Override
@@ -1615,12 +1605,9 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public long saveLibraryNote(Library library, Note note) throws IOException {
-    if (noteStore != null) {
-      return noteStore.saveLibraryNote(library, note);
-    } else {
-      throw new IOException("No noteStore available. Check that it has been declared in the Spring config.");
-    }
+  public void saveLibraryNote(Library library, Note note) throws IOException {
+    Library managed = libraryStore.get(library.getId());
+    libraryStore.addNote(managed, note);
   }
 
   @Override

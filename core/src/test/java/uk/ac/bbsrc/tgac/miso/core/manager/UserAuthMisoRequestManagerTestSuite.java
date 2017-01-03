@@ -524,12 +524,8 @@ public class UserAuthMisoRequestManagerTestSuite {
    */
   @Test
   public void testSaveLibraryNote() throws IOException {
-    final long expectedReturn = 1L;
     when(library.userCanWrite(any(User.class))).thenReturn(true);
-    when(backingManager.saveLibraryNote(library, note)).thenReturn(expectedReturn);
-
-    assertEquals(expectedReturn, userAuthMisoRequestManager.saveLibraryNote(library, note));
-
+    userAuthMisoRequestManager.saveLibraryNote(library, note);
     verify(backingManager).saveLibraryNote(library, note);
   }
 

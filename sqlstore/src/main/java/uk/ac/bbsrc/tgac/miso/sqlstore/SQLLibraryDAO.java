@@ -973,4 +973,16 @@ public class SQLLibraryDAO implements LibraryStore {
     return DbUtils.getColumnSizes(template, TABLE_NAME);
   }
 
+  @Override
+  public void addNote(Library library, Note note) throws IOException {
+    // TODO implement during Hibernatization
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void deleteNote(Library library, Note note) throws IOException {
+    // TODO implement during Hibernatization
+    throw new UnsupportedOperationException();
+  }
+
 }

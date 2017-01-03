@@ -106,7 +106,7 @@ public interface RequestManager {
 
   public long saveLibraryDilution(LibraryDilution libraryDilution) throws IOException;
 
-  public long saveLibraryNote(Library library, Note note) throws IOException;
+  public void saveLibraryNote(Library library, Note note) throws IOException;
 
   public long saveLibraryQC(LibraryQC libraryQC) throws IOException;
 
@@ -572,6 +572,8 @@ public interface RequestManager {
   public void deleteRunNote(Run run, Note note) throws IOException;
 
   public void deleteKitNote(Kit kit, Note note) throws IOException;
+
+  public void deleteLibraryNote(Library library, Note note) throws IOException;
 
   public void deleteBox(Box box) throws IOException;
 

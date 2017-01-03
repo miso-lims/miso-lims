@@ -29,6 +29,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.eaglegenomics.simlims.core.Note;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
@@ -267,4 +269,9 @@ public interface LibraryStore extends Store<Library>, Remover<Library>, NamingSc
   Library getAdjacentLibrary(long libraryId, boolean before) throws IOException;
 
   List<Library> searchByCreationDate(Date from, Date to) throws IOException;
+
+  public void addNote(Library library, Note note) throws IOException;
+
+  public void deleteNote(Library library, Note note) throws IOException;
+
 }

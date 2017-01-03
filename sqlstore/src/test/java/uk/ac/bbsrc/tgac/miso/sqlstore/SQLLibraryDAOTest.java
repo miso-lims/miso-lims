@@ -24,6 +24,7 @@ import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.store.SecurityStore;
@@ -430,6 +431,34 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
   public void testListAllLibraryStrategyTypes() throws Exception {
     List<LibraryStrategyType> libraryStrategyTypes = dao.listAllLibraryStrategyTypes();
     assertEquals(20, libraryStrategyTypes.size());
+  }
+
+  @Test
+  public void testNotes() throws Exception {
+    String message = "test message";
+    Note note = new Note();
+    note.setText(message);
+
+    Library lib = dao.get(1L);
+    assertNotNull(lib);
+    assertEquals(0, lib.getNotes().size());
+
+    dao.addNote(lib, note);
+    Library libWithNote = dao.get(1L);
+    assertNotNull(libWithNote);
+    assertEquals(1, libWithNote.getNotes().size());
+    Note savedNote = libWithNote.getNotes().iterator().next();
+    assertEquals(message, savedNote.getText());
+    // TODO: uncomment after Hibernatized
+    // Long noteId = savedNote.getNoteId();
+    // assertNotNull(sessionFactory.getCurrentSession().get(Note.class, noteId));
+
+    dao.deleteNote(libWithNote, savedNote);
+    Library libNoteDeleted = dao.get(1L);
+    assertNotNull(libNoteDeleted);
+    assertEquals(0, libNoteDeleted.getNotes().size());
+    Long noteId = savedNote.getNoteId();
+    // assertNull(sessionFactory.getCurrentSession().get(Note.class, noteId));
   }
 
 }
