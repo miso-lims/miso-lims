@@ -26,8 +26,10 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,48 +86,41 @@ public class MessageConsumerController {
   }
 
   @RequestMapping(value = "/illumina/run/status", method = RequestMethod.POST)
-  public String consumeGatewayIlluminaStatus(HttpServletRequest request) throws IOException {
-    for (NotificationGateway s : notificationGatewayService.getGatewaysFor(PlatformType.ILLUMINA)) {
-      log.debug("Using " + s.toString());
-      s.consume(buildMessage(exposeRequest(request)));
-    }
-    return "redirect:/miso";
+  public void consumeGatewayIlluminaStatus(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    consumeGatewayStatus(request, response, PlatformType.ILLUMINA);
   }
 
   @RequestMapping(value = "/ls454/run/status", method = RequestMethod.POST)
-  public String consumeGateway454Status(HttpServletRequest request) throws IOException {
-    for (NotificationGateway s : notificationGatewayService.getGatewaysFor(PlatformType.LS454)) {
-      log.debug("Using " + s.toString());
-      s.consume(buildMessage(exposeRequest(request)));
-    }
-    return "redirect:/miso";
+  public void consumeGateway454Status(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    consumeGatewayStatus(request, response, PlatformType.LS454);
   }
 
   @RequestMapping(value = "/solid/run/status", method = RequestMethod.POST)
-  public String consumeGatewaySolidStatus(HttpServletRequest request) throws IOException {
-    for (NotificationGateway s : notificationGatewayService.getGatewaysFor(PlatformType.SOLID)) {
-      log.debug("Using " + s.toString());
-      s.consume(buildMessage(exposeRequest(request)));
-    }
-    return "redirect:/miso";
+  public void consumeGatewaySolidStatus(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    consumeGatewayStatus(request, response, PlatformType.SOLID);
   }
 
   @RequestMapping(value = "/pacbio/run/status", method = RequestMethod.POST)
-  public String consumeGatewayPacbioStatus(HttpServletRequest request) throws IOException {
-    for (NotificationGateway s : notificationGatewayService.getGatewaysFor(PlatformType.PACBIO)) {
-      log.debug("Using " + s.toString());
-      s.consume(buildMessage(exposeRequest(request)));
-    }
-    return "redirect:/miso";
+  public void consumeGatewayPacbioStatus(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    consumeGatewayStatus(request, response, PlatformType.PACBIO);
   }
 
   @RequestMapping(value = "/iontorrent/run/status", method = RequestMethod.POST)
-  public String consumeGatewayIonTorrentStatus(HttpServletRequest request) throws IOException {
-    for (NotificationGateway s : notificationGatewayService.getGatewaysFor(PlatformType.IONTORRENT)) {
+  public void consumeGatewayIonTorrentStatus(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    consumeGatewayStatus(request, response, PlatformType.IONTORRENT);
+  }
+
+  private void consumeGatewayStatus(HttpServletRequest request, HttpServletResponse response, PlatformType platform) throws IOException {
+    Set<NotificationGateway> gateways = (Set<NotificationGateway>) notificationGatewayService.getGatewaysFor(platform);
+    if (gateways == null || gateways.isEmpty()) {
+      log.error("No notification gateways found for platform: " + platform.getKey());
+      response.sendError(HttpServletResponse.SC_NOT_FOUND);
+    }
+    for (NotificationGateway s : gateways) {
       log.debug("Using " + s.toString());
       s.consume(buildMessage(exposeRequest(request)));
     }
-    return "redirect:/miso";
+    response.sendRedirect("/miso");
   }
 
   private MultiValueMap<String, String> exposeRequest(HttpServletRequest request) {

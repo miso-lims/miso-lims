@@ -64,7 +64,7 @@
         <role>Developer</role>
       </roles>
       <timezone>0</timezone>
-      <properties></properties>
+      <properties />
     </developer>
     <developer>
       <id>mtaschuk</id>
@@ -76,7 +76,7 @@
         <role>project contact</role>
       </roles>
       <timezone>-5</timezone>
-      <properties></properties>
+      <properties />
     </developer>
     <developer>
       <id>tdebat</id>
@@ -88,7 +88,7 @@
         <role>Developer</role>
       </roles>
       <timezone>-5</timezone>
-      <properties></properties>
+      <properties />
     </developer>
     <developer>
       <id>amasella</id>
@@ -100,7 +100,7 @@
         <role>Developer</role>
       </roles>
       <timezone>-5</timezone>
-      <properties></properties>
+      <properties />
     </developer>
     <developer>
       <id>dcooke</id>
@@ -112,7 +112,7 @@
         <role>Developer</role>
       </roles>
       <timezone>-5</timezone>
-      <properties></properties>
+      <properties />
     </developer>
     <developer>
       <id>harmstrong</id>
@@ -124,7 +124,7 @@
         <role>Developer</role>
       </roles>
       <timezone>-5</timezone>
-      <properties></properties>
+      <properties />
     </developer>
   </developers>
   <modules>
@@ -139,6 +139,8 @@
     <module>notification-server</module>
     <module>runstats-client</module>
     <module>notification-consumer-services</module>
+    <module>miso-external-web</module>
+    <module>runstats-server</module>
     <module>demo-notification-client</module>
   </modules>
   <!-- SVN connection -->
@@ -674,6 +676,11 @@
       <dependency>
         <groupId>uk.ac.bbsrc.tgac.miso</groupId>
         <artifactId>miso-service</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>uk.ac.bbsrc.tgac.miso</groupId>
+        <artifactId>notification-consumer-services</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

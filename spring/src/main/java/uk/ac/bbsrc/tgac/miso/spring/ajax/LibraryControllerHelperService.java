@@ -375,8 +375,10 @@ public class LibraryControllerHelperService {
     String idBarcode = json.getString("identificationBarcode");
 
     try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      if (!isStringEmptyOrNull(idBarcode)) {
+      if (isStringEmptyOrNull(idBarcode)) {
+        // if the user accidentally deletes a barcode, the changelogs will have a record of the original barcode
+        idBarcode = null;
+      } else {
         List<Boxable> previouslyBarcodedItems = new ArrayList<>(requestManager.getBoxablesFromBarcodeList(Arrays.asList(idBarcode)));
         if (!previouslyBarcodedItems.isEmpty()
             && !(previouslyBarcodedItems.size() == 1 && previouslyBarcodedItems.get(0).getId() == libraryId)) {
@@ -387,13 +389,12 @@ public class LibraryControllerHelperService {
           log.debug(error);
           return JSONUtils.SimpleJSONError(error);
         }
-        Library library = requestManager.getLibraryById(libraryId);
-        library.setIdentificationBarcode(idBarcode);
-        library.setLastModifier(user);
-        requestManager.saveLibrary(library);
-      } else {
-        return JSONUtils.SimpleJSONError("New identification barcode not recognized");
       }
+      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+      Library library = requestManager.getLibraryById(libraryId);
+      library.setIdentificationBarcode(idBarcode);
+      library.setLastModifier(user);
+      requestManager.saveLibrary(library);
     } catch (IOException e) {
       log.debug("Could not change Library identificationBarcode: " + e.getMessage());
       return JSONUtils.SimpleJSONError(e.getMessage());
