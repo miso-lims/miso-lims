@@ -703,37 +703,6 @@ public class UserAuthMisoRequestManagerTestSuite {
 
   /**
    * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveSequencerPoolPartition(uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition)}
-   * .
-   */
-  @Test
-  public void testSaveSequencerPoolPartition() throws IOException {
-    final long expectedReturn = 1L;
-    when(sequencerPoolParition.userCanWrite(any(User.class))).thenReturn(true);
-    when(backingManager.saveSequencerPoolPartition(sequencerPoolParition)).thenReturn(expectedReturn);
-
-    assertEquals(expectedReturn, userAuthMisoRequestManager.saveSequencerPoolPartition(sequencerPoolParition));
-    verify(backingManager).saveSequencerPoolPartition(sequencerPoolParition);
-  }
-
-  /**
-   * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveSequencerPoolPartition(uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition)}
-   * .
-   */
-  @Test
-  public void testSaveSequencerPoolPartitionThrows() throws IOException {
-    when(sequencerPoolParition.userCanWrite(any(User.class))).thenReturn(false);
-
-    thrown.expect(IOException.class);
-    thrown.expectMessage("User null cannot write to this Partition");
-    userAuthMisoRequestManager.saveSequencerPoolPartition(sequencerPoolParition);
-
-    verify(backingManager, never()).saveSequencerPoolPartition(sequencerPoolParition);
-  }
-
-  /**
-   * Test method for
    * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveSequencerPartitionContainer(uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer)}
    * .
    */

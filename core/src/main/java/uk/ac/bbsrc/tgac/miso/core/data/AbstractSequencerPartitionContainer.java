@@ -32,11 +32,21 @@ import javax.persistence.CascadeType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToOne;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ContainerDerivedInfo;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PlatformImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
@@ -45,6 +55,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  * @author Rob Davey
  * @since 0.1.6
  */
+@MappedSuperclass
 public abstract class AbstractSequencerPartitionContainer<T extends Partition> implements SequencerPartitionContainer<T> {
   public static final Long UNSAVED_ID = 0L;
 
@@ -57,16 +68,31 @@ public abstract class AbstractSequencerPartitionContainer<T extends Partition> i
   private String locationBarcode;
   private Boolean paired = false;
   private String name;
+
+  @OneToOne(targetEntity = RunImpl.class)
+  @JoinTable(name = "Run_SequencerPartitionContainer", joinColumns = {
+      @JoinColumn(name = "containers_containerId") }, inverseJoinColumns = {
+          @JoinColumn(name = "Run_runId") })
   private Run run = null;
 
-  @OneToOne(cascade = CascadeType.ALL)
+  @OneToOne(targetEntity = SecurityProfile.class, cascade = CascadeType.ALL)
   private SecurityProfile securityProfile;
+  @ManyToOne(targetEntity = PlatformImpl.class)
+  @JoinColumn(name = "platform")
   private Platform platform;
+
   private String validationBarcode;
 
-  private final Collection<ChangeLog> changeLog = new ArrayList<ChangeLog>();
+  @OneToMany(targetEntity = ChangeLog.class)
+  private final Collection<ChangeLog> changeLog = new ArrayList<>();
+  
+  @ManyToOne(targetEntity = UserImpl.class)
+  @JoinColumn(name = "lastModifier")
   private User lastModifier;
-  private Date lastModified;
+
+  @OneToOne(targetEntity = ContainerDerivedInfo.class)
+  @PrimaryKeyJoinColumn
+  private ContainerDerivedInfo derivedInfo;
 
   @Override
   public User getLastModifier() {
@@ -80,12 +106,7 @@ public abstract class AbstractSequencerPartitionContainer<T extends Partition> i
 
   @Override
   public Date getLastModified() {
-    return lastModified;
-  }
-
-  @Override
-  public void setLastModified(Date lastModified) {
-    this.lastModified = lastModified;
+    return (derivedInfo == null ? null : derivedInfo.getLastModified());
   }
 
   @Override

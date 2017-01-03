@@ -580,6 +580,27 @@ FOR EACH ROW
     NEW.lastModifier,
     'Container created.')//
 
+DROP TRIGGER IF EXISTS PartitionChange//
+CREATE TRIGGER PartitionChange BEFORE UPDATE ON _Partition
+FOR EACH ROW
+  BEGIN
+    DECLARE log_message varchar(500) CHARACTER SET utf8;
+    SET log_message = CONCAT_WS(', ',
+    CASE WHEN (NEW.pool_poolId IS NULL) <> (OLD.pool_poolId IS NULL) OR NEW.pool_poolId <> OLD.pool_poolId THEN CONCAT('pool changed in partition ', OLD.partitionNumber, ': ', COALESCE((SELECT name FROM Pool WHERE poolId = OLD.pool_poolId), 'n/a'), ' → ', COALESCE((SELECT name FROM Pool WHERE poolId = NEW.pool_poolId), 'n/a')) END);
+    IF log_message IS NOT NULL AND log_message <> '' THEN
+      INSERT INTO SequencerPartitionContainerChangeLog(containerId, columnsChanged, userId, message) VALUES (
+        (SELECT spcp.container_containerId FROM SequencerPartitionContainer_Partition spcp
+         WHERE spcp.partitions_partitionId = OLD.partitionId),
+         COALESCE(CONCAT_WS(', ',
+           CASE WHEN (NEW.pool_poolId IS NULL) <> (OLD.pool_poolId IS NULL) OR NEW.pool_poolId <> OLD.pool_poolId THEN 'pool' END), ''),
+         (SELECT spc.lastModifier FROM SequencerPartitionContainer spc
+           JOIN SequencerPartitionContainer_Partition spcp ON spcp.container_containerId = spc.containerId
+         WHERE spcp.partitions_partitionId = OLD.partitionId),
+         log_message
+      );
+    END IF;
+  END //
+
 DROP TRIGGER IF EXISTS BoxChange//
 CREATE TRIGGER BoxChange BEFORE UPDATE ON Box
 FOR EACH ROW
@@ -684,3 +705,6 @@ CREATE OR REPLACE VIEW SampleDerivedInfo AS
   
 CREATE OR REPLACE VIEW RunDerivedInfo AS
   SELECT runId, MAX(changeTime) as lastModified FROM RunChangeLog GROUP BY runId;
+
+CREATE OR REPLACE VIEW ContainerDerivedInfo AS
+  SELECT containerId, MAX(changeTime) as lastModified FROM SequencerPartitionContainerChangeLog GROUP BY containerId;

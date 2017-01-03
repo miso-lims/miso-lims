@@ -59,6 +59,7 @@
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.InstituteImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAdditionalInfoImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.PlatformImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrderImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl</value>
@@ -81,6 +82,7 @@
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueProcessingImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleValidRelationshipImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingParametersImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl</value>

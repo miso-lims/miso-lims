@@ -120,8 +120,6 @@ public interface RequestManager {
 
   public long saveStudy(Study study) throws IOException;
 
-  public long saveSequencerPoolPartition(SequencerPoolPartition partition) throws IOException;
-
   public long saveSequencerPartitionContainer(SequencerPartitionContainer container) throws IOException;
 
   public long savePlatform(Platform platform) throws IOException;
@@ -327,10 +325,6 @@ public interface RequestManager {
 
   public Collection<SequencerPartitionContainer<SequencerPoolPartition>> listSequencerPartitionContainersByBarcode(String barcode)
       throws IOException;
-
-  public Collection<SequencerPoolPartition> listAllSequencerPoolPartitions() throws IOException;
-
-  public Collection<? extends SequencerPoolPartition> listPartitionsBySequencerPartitionContainerId(long containerId) throws IOException;
 
   public Collection<SequencerPartitionContainer<SequencerPoolPartition>> listAllSequencerPartitionContainers() throws IOException;
 
@@ -558,8 +552,6 @@ public interface RequestManager {
   public void deleteSequencerServiceRecord(SequencerServiceRecord serviceRecord) throws IOException;
 
   public void deletePool(Pool pool) throws IOException;
-
-  public void deletePartition(SequencerPoolPartition partition) throws IOException;
 
   public void deleteContainer(SequencerPartitionContainer container) throws IOException;
 

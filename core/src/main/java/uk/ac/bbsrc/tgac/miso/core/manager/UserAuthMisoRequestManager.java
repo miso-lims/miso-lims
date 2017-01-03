@@ -2,22 +2,22 @@
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
  * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
- * 
+ *
  * This file is part of MISO.
- * 
+ *
  * MISO is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
- * along with MISO. If not, see <http://www.gnu.org/licenses/>.
- * 
+ * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ *
  * *********************************************************************
  */
 
@@ -335,15 +335,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public long saveSequencerPoolPartition(SequencerPoolPartition partition) throws IOException {
-    if (writeCheck(partition)) {
-      return backingManager.saveSequencerPoolPartition(partition);
-    } else {
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot write to this Partition");
-    }
-  }
-
-  @Override
   public long saveSequencerPartitionContainer(SequencerPartitionContainer container) throws IOException {
     if (writeCheck(container)) {
       container.setLastModifier(getCurrentUser());
@@ -512,8 +503,20 @@ public class UserAuthMisoRequestManager implements RequestManager {
   @Override
   public SequencerPartitionContainer<SequencerPoolPartition> getSequencerPartitionContainerById(long containerId) throws IOException {
     SequencerPartitionContainer o = backingManager.getSequencerPartitionContainerById(containerId);
-    if (readCheck(o)) return o;
-    else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read SequencerPartitionContainer " + containerId);
+    if (readCheck(o))
+      return o;
+    else
+      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read SequencerPartitionContainer " + containerId);
+  }
+
+  @Override
+  public Note getNoteById(long noteId) throws IOException {
+    Note o = backingManager.getNoteById(noteId);
+    User user = getCurrentUser();
+    if (o.getOwner().equals(user) || user.isAdmin() || (o.isInternalOnly() && user.isInternal()))
+      return o;
+    else
+      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Note " + o.getNoteId());
   }
 
   @Override
@@ -1382,30 +1385,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
     for (Study study : backingManager.listAllStudiesByProjectId(projectId)) {
       if (study.userCanRead(user)) {
         accessibles.add(study);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Collection<SequencerPoolPartition> listAllSequencerPoolPartitions() throws IOException {
-    User user = getCurrentUser();
-    Collection<SequencerPoolPartition> accessibles = new HashSet<>();
-    for (SequencerPoolPartition partition : backingManager.listAllSequencerPoolPartitions()) {
-      if (partition.userCanRead(user)) {
-        accessibles.add(partition);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Collection<? extends SequencerPoolPartition> listPartitionsBySequencerPartitionContainerId(long containerId) throws IOException {
-    User user = getCurrentUser();
-    Collection<SequencerPoolPartition> accessibles = new HashSet<>();
-    for (SequencerPoolPartition p : backingManager.listPartitionsBySequencerPartitionContainerId(containerId)) {
-      if (p.userCanRead(user)) {
-        accessibles.add(p);
       }
     }
     return accessibles;

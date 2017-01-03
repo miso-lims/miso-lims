@@ -148,6 +148,4 @@ public interface SequencerPartitionContainer<T extends Partition> extends Secura
 
   public Date getLastModified();
 
-  public void setLastModified(Date lastModified);
-
 }

@@ -986,24 +986,6 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<SequencerPoolPartition> listAllSequencerPoolPartitions() throws IOException {
-    if (partitionStore != null) {
-      return partitionStore.listAll();
-    } else {
-      throw new IOException("No partitionStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<? extends SequencerPoolPartition> listPartitionsBySequencerPartitionContainerId(long containerId) throws IOException {
-    if (sequencerPartitionContainerStore != null) {
-      return sequencerPartitionContainerStore.listPartitionsByContainerId(containerId);
-    } else {
-      throw new IOException("No sequencerPartitionContainerStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
   public Collection<SequencerPartitionContainer<SequencerPoolPartition>> listAllSequencerPartitionContainers() throws IOException {
     if (sequencerPartitionContainerStore != null) {
       return sequencerPartitionContainerStore.listAll();
@@ -1487,17 +1469,6 @@ public class MisoRequestManager implements RequestManager {
     projectStore.saveOverview(managed);
   }
 
-  @Override
-  public void deletePartition(SequencerPoolPartition partition) throws IOException {
-    if (partitionStore != null) {
-      if (!partitionStore.remove(partition)) {
-        throw new IOException("Unable to delete partition.");
-      }
-    } else {
-      throw new IOException("No plateStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
   // SAVES
 
   @Override
@@ -1737,15 +1708,6 @@ public class MisoRequestManager implements RequestManager {
       return studyStore.save(study);
     } else {
       throw new IOException("No studyStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public long saveSequencerPoolPartition(SequencerPoolPartition partition) throws IOException {
-    if (partitionStore != null) {
-      return partitionStore.save(partition);
-    } else {
-      throw new IOException("No partitionStore available. Check that it has been declared in the Spring config.");
     }
   }
 
@@ -2197,10 +2159,10 @@ public class MisoRequestManager implements RequestManager {
 
   @Override
   public SequencerPoolPartition getSequencerPoolPartitionById(long partitionId) throws IOException {
-    if (partitionStore != null) {
-      return partitionStore.get(partitionId);
+    if (sequencerPartitionContainerStore != null) {
+      return sequencerPartitionContainerStore.getPartitionById(partitionId);
     } else {
-      throw new IOException("No partitionStore available. Check that it has been declared in the Spring config.");
+      throw new IOException("No sequencerPartitionContainerStore available. Check that it has been declared in the Spring config.");
     }
   }
 
@@ -2820,7 +2782,7 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public Long countContainers() throws IOException {
     if (sequencerPartitionContainerStore != null) {
-      return sequencerPartitionContainerStore.countContainers();
+      return Long.valueOf(sequencerPartitionContainerStore.count());
     } else {
       throw new IOException("No sequencerPartitionContainerStore available. Check that it has been declared in the Spring config.");
     }

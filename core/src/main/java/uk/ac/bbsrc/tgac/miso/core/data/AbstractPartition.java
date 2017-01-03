@@ -24,14 +24,20 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToOne;
+import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToOne;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
@@ -40,6 +46,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  * @author Rob Davey
  * @since 0.0.2
  */
+@MappedSuperclass
 public abstract class AbstractPartition implements Partition {
   public static final Long UNSAVED_ID = 0L;
 
@@ -47,10 +54,17 @@ public abstract class AbstractPartition implements Partition {
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long id = AbstractPartition.UNSAVED_ID;
 
-  @OneToOne(cascade = CascadeType.ALL)
+  @OneToOne(targetEntity = SecurityProfile.class, cascade = CascadeType.ALL)
+  @JoinColumn(name = "securityProfile_profileId")
   private SecurityProfile securityProfile = null;
 
+  @Column(nullable = false)
   private Integer partitionNumber;
+
+  @ManyToOne(targetEntity = SequencerPartitionContainerImpl.class, cascade = CascadeType.ALL)
+  @JoinTable(name = "SequencerPartitionContainer_Partition", joinColumns = {
+      @JoinColumn(name = "partitions_partitionId") }, inverseJoinColumns = {
+          @JoinColumn(name = "container_containerId") })
   private SequencerPartitionContainer sequencerPartitionContainer = null;
 
   @Override

@@ -25,6 +25,11 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.io.Serializable;
 
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
@@ -45,10 +50,14 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 @JsonIgnoreProperties({ "securityProfile", "container" })
+@Entity
+@Table(name = "`_Partition`")
 public class PartitionImpl extends AbstractPartition implements SequencerPoolPartition, Serializable {
 
   private static final long serialVersionUID = 1L;
 
+  @ManyToOne(targetEntity = PoolImpl.class)
+  @JoinColumn(name = "pool_poolId")
   Pool pool = null;
 
   public PartitionImpl() {

@@ -148,7 +148,7 @@ public class ContainerRestController extends RestController {
   public DataTablesResponseDto<ContainerDto> getContainers(HttpServletRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
     if (request.getParameterMap().size() > 0) {
-      Long numContainers = Long.valueOf(requestManager.countContainers());
+      Long numContainers = requestManager.countContainers();
       // get request params from DataTables
       Integer iDisplayStart = Integer.parseInt(request.getParameter("iDisplayStart"));
       Integer iDisplayLength = Integer.parseInt(request.getParameter("iDisplayLength"));
