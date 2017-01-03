@@ -541,10 +541,6 @@ Library.barcode = {
       modal: true,
       resizable: false,
       buttons: {
-        "Delete Barcode": function () {
-          self.changeSampleIdBarcode(sampleId, '');
-          jQuery(this).dialog('close');
-        },
         "Save": function () {
           self.changeLibraryIdBarcode(libraryId, jQuery('#idBarcodeInput').val());
           jQuery(this).dialog('close');
