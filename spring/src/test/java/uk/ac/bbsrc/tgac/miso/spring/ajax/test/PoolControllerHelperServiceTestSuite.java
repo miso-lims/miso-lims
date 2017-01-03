@@ -1,11 +1,8 @@
 package uk.ac.bbsrc.tgac.miso.spring.ajax.test;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 
@@ -22,6 +19,7 @@ import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import net.sf.json.JSONObject;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
@@ -94,10 +92,10 @@ public class PoolControllerHelperServiceTestSuite {
 
     final JSONObject response = poolControllerHelperService.changePoolIdBarcode(null, json);
 
-    verify(pool, never()).setIdentificationBarcode(idBarcode);
-    verify(requestManager, never()).savePool(pool);
+    verify(pool).setIdentificationBarcode(null);
+    verify(requestManager).savePool(pool);
 
-    assertEquals("New+identification+barcode+not+recognized", response.get("error"));
+    assertEquals("New+identification+barcode+successfully+assigned.", response.get("response"));
   }
 
   @SuppressWarnings("unchecked")

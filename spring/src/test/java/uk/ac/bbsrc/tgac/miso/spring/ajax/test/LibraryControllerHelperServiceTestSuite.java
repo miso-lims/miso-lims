@@ -93,7 +93,7 @@ public class LibraryControllerHelperServiceTestSuite {
     final JSONObject response = libraryControllerHelperService.changeLibraryIdBarcode(null, json);
 
     verify(library, never()).setIdentificationBarcode(idBarcode);
-    verify(libraryService, never()).update(library);
+    verify(requestManager, never()).saveLibrary(library);
 
     assertEquals("New+identification+barcode+not+recognized", response.get("error"));
   }

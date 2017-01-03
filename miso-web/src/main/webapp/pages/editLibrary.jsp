@@ -129,7 +129,7 @@
                onclick="Library.barcode.printLibraryBarcodes(${library.id});">Print</a>
             <c:if test="${not autoGenerateIdBarcodes}">
               <a href="javascript:void(0);"
-               onclick="Library.barcode.showLibraryIdBarcodeChangeDialog(${library.id}, '${library.identificationBarcode}');">Assign New Barcode</a>
+               onclick="Library.barcode.showLibraryIdBarcodeChangeDialog(${library.id}, '${library.identificationBarcode}');">Update Barcode</a>
             </c:if>
           </div>
         </li>

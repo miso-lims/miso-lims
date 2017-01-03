@@ -138,7 +138,7 @@
                onclick="Sample.barcode.printSampleBarcodes(${sample.id});">Print</a>
             <c:if test="${not autoGenerateIdBarcodes}">
               <a href="javascript:void(0);"
-               onclick="Sample.ui.showSampleIdBarcodeChangeDialog(${sample.id}, '${sample.identificationBarcode}');">Assign New Barcode</a>
+               onclick="Sample.ui.showSampleIdBarcodeChangeDialog(${sample.id}, '${sample.identificationBarcode}');">Update Barcode</a>
             </c:if>
           </div>
         </li>

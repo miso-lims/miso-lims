@@ -617,7 +617,10 @@ public class SampleControllerHelperService {
     String idBarcode = json.getString("identificationBarcode");
 
     try {
-      if (!isStringEmptyOrNull(idBarcode)) {
+      if (isStringEmptyOrNull(idBarcode)) {
+        // if the user accidentally deletes a barcode, the changelogs will have a record of the original barcode
+        idBarcode = null;
+      } else {
         List<Boxable> previouslyBarcodedItems = new ArrayList<>(requestManager.getBoxablesFromBarcodeList(Arrays.asList(idBarcode)));
         if (!previouslyBarcodedItems.isEmpty()
             && !(previouslyBarcodedItems.size() == 1 && previouslyBarcodedItems.get(0).getId() == sampleId)) {
@@ -628,14 +631,13 @@ public class SampleControllerHelperService {
           log.debug(error);
           return JSONUtils.SimpleJSONError(error);
         }
-        User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-        Sample sample = sampleService.get(sampleId);
-        sample.setIdentificationBarcode(idBarcode);
-        sample.setLastModifier(user);
-        sampleService.update(sample);
-      } else {
-        return JSONUtils.SimpleJSONError("New identification barcode not recognized");
       }
+      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+      Sample sample = sampleService.get(sampleId);
+      sample.setIdentificationBarcode(idBarcode);
+      sample.setLastModifier(user);
+      sampleService.update(sample);
+
     } catch (IOException e) {
       log.debug("Could not change Sample identificationBarcode: " + e.getMessage());
       return JSONUtils.SimpleJSONError(e.getMessage());
