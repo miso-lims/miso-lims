@@ -92,6 +92,8 @@ public interface RequestManager {
 
   public void saveRunNote(Run run, Note note) throws IOException;
 
+  public void saveKitNote(Kit kit, Note note) throws IOException;
+
   public long saveSample(Sample sample) throws IOException;
 
   public long saveSampleQC(SampleQC sampleQC) throws IOException;
@@ -568,6 +570,8 @@ public interface RequestManager {
   public void deleteNote(Note note) throws IOException;
 
   public void deleteRunNote(Run run, Note note) throws IOException;
+
+  public void deleteKitNote(Kit kit, Note note) throws IOException;
 
   public void deleteBox(Box box) throws IOException;
 

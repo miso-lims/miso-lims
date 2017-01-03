@@ -40,6 +40,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.eaglegenomics.simlims.core.Note;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.KitImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
@@ -51,7 +53,6 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 @Repository
 @Transactional(rollbackFor = Exception.class)
 public class HibernateKitDao implements KitStore {
-  private static final String KIT_TABLE_NAME = "Kit";
   private static final String DESCRIPTOR_TABLE_NAME = "KitDescriptor";
 
   protected static final Logger log = LoggerFactory.getLogger(HibernateKitDao.class);
@@ -186,5 +187,20 @@ public class HibernateKitDao implements KitStore {
   @Override
   public Map<String, Integer> getKitDescriptorColumnSizes() throws IOException {
     return DbUtils.getColumnSizes(jdbcTemplate, DESCRIPTOR_TABLE_NAME);
+  }
+
+  @Override
+  public void addNote(Kit kit, Note note) throws IOException {
+    kit.addNote(note);
+    save(kit);
+  }
+
+  @Override
+  public void deleteNote(Kit kit, Note note) throws IOException {
+    if (!kit.getNotes().remove(note)) {
+      throw new IllegalArgumentException("Note does not belong to this Kit");
+    } else {
+      save(kit);
+    }
   }
 }
