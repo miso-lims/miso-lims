@@ -3,11 +3,14 @@ package com.eaglegenomics.simlims.core;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 /**
  * Copyright (C) 2009 The Genome Analysis Center, Norwich, UK.
@@ -18,6 +21,7 @@ import javax.persistence.ManyToOne;
  * @since 0.0.1
  */
 @Entity
+@Table(name = "Note")
 public class Note implements Serializable, Comparable<Note> {
 
   private static final long serialVersionUID = 1L;
@@ -31,10 +35,19 @@ public class Note implements Serializable, Comparable<Note> {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long noteId = Note.UNSAVED_ID;
+
+  @Column(nullable = false, updatable = false)
   private Date creationDate = new Date();
+
+  @Column(nullable = false, updatable = false)
   private String text = "";
+
+  @Column(nullable = false, updatable = false)
   @ManyToOne
+  @JoinColumn(name = "owner_userId")
   private User owner = null;
+
+  @Column(nullable = false, updatable = false)
   private boolean internalOnly = false;
 
   public Note() {
