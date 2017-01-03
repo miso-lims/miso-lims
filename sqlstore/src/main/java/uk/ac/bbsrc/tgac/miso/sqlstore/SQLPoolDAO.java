@@ -53,7 +53,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
-import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.store.SecurityStore;
 import com.googlecode.ehcache.annotations.Cacheable;
 import com.googlecode.ehcache.annotations.KeyGenerator;
@@ -83,7 +82,6 @@ import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
-import uk.ac.bbsrc.tgac.miso.core.store.WatcherStore;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
@@ -234,7 +232,6 @@ public class SQLPoolDAO implements PoolStore {
   private ExperimentStore experimentDAO;
   private PoolQcStore poolQcDAO;
   private Store<SecurityProfile> securityProfileDAO;
-  private WatcherStore watcherDAO;
   private CascadeType cascadeType;
   private boolean autoGenerateIdentificationBarcodes;
   private ChangeLogStore changeLogDAO;
@@ -334,11 +331,6 @@ public class SQLPoolDAO implements PoolStore {
   @CoverageIgnore
   public void setPoolQcDAO(PoolQcStore poolQcDAO) {
     this.poolQcDAO = poolQcDAO;
-  }
-
-  @CoverageIgnore
-  public void setWatcherDAO(WatcherStore watcherDAO) {
-    this.watcherDAO = watcherDAO;
   }
 
   @CoverageIgnore
@@ -567,11 +559,14 @@ public class SQLPoolDAO implements PoolStore {
       }
     }
 
-    watcherDAO.removeWatchedEntityByUser(pool, pool.getLastModifier());
+    // TODO: (Hibernatization) Regular save shouldn't modify watchers. Create addWatcher & removeWatcher methods
+    // (See HibernateRunDao for example)
 
-    for (User u : pool.getWatchers()) {
-      watcherDAO.saveWatchedEntityUser(pool, u);
-    }
+    // watcherDAO.removeWatchedEntityByUser(pool, pool.getLastModifier());
+    //
+    // for (User u : pool.getWatchers()) {
+    // watcherDAO.saveWatchedEntityUser(pool, u);
+    // }
 
     if (!pool.getNotes().isEmpty()) {
       for (Note n : pool.getNotes()) {
@@ -828,13 +823,15 @@ public class SQLPoolDAO implements PoolStore {
         }
 
         p.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
-        p.setWatchers(new HashSet<>(watcherDAO.getWatchersByEntityName(p.getWatchableIdentifier())));
+        // p.setWatchers(new HashSet<>(watcherDAO.getWatchersByEntityName(p.getWatchableIdentifier())));
         if (p.getSecurityProfile() != null && p.getSecurityProfile().getOwner() != null) {
           p.addWatcher(p.getSecurityProfile().getOwner());
         }
-        for (User u : watcherDAO.getWatchersByWatcherGroup("PoolWatchers")) {
-          p.addWatcher(u);
-        }
+        // TODO: Hibernate will load watchUsers automatically, but watchGroup must be loaded explicitly
+
+        // for (User u : watcherDAO.getWatchersByWatcherGroup("PoolWatchers")) {
+        // p.addWatcher(u);
+        // }
 
         if (!isLazy()) {
           p.setExperiments(experimentDAO.listByPoolId(id));

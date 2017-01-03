@@ -16,18 +16,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.RunAlertManager;
+import uk.ac.bbsrc.tgac.miso.core.event.manager.WatchManager;
 import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
-import uk.ac.bbsrc.tgac.miso.core.store.WatcherStore;
+import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 @Repository
@@ -40,9 +41,12 @@ public class HibernateRunDao implements RunStore {
   private SessionFactory sessionFactory;
   @Autowired
   private RunAlertManager runAlertManager;
+  @Autowired
+  private WatchManager watchManager;
+  @Autowired
+  private SecurityStore securityStore;
 
   private JdbcTemplate template;
-  private WatcherStore watcherDAO;
   private com.eaglegenomics.simlims.core.manager.SecurityManager securityManager;
 
   private Session currentSession() {
@@ -51,19 +55,8 @@ public class HibernateRunDao implements RunStore {
 
   public static final String TABLE_NAME = "Run";
 
-  private void updateWatchers(Run run) throws IOException {
-    // if this is saved by a user, and not automatically saved by the notification system
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    watcherDAO.removeWatchedEntityByUser(run, user);
-
-    for (User u : run.getWatchers()) {
-      watcherDAO.saveWatchedEntityUser(run, u);
-    }
-  }
-
   @Override
   public long save(Run run) throws IOException {
-    updateWatchers(run);
     long id;
     if (run.getId() == AbstractRun.UNSAVED_ID) {
       currentSession().save(run);
@@ -76,7 +69,25 @@ public class HibernateRunDao implements RunStore {
 
   @Override
   public Run get(long id) throws IOException {
-    return (Run) currentSession().get(RunImpl.class, id);
+    Run run = (Run) currentSession().get(RunImpl.class, id);
+    return withWatcherGroup(run);
+  }
+
+  private Group getRunWatcherGroup() throws IOException {
+    return securityStore.getGroupByName("RunWatchers");
+  }
+
+  private Run withWatcherGroup(Run run) throws IOException {
+    run.setWatchGroup(getRunWatcherGroup());
+    return run;
+  }
+
+  private List<Run> withWatcherGroup(List<Run> runs) throws IOException {
+    Group group = getRunWatcherGroup();
+    for (Run run : runs) {
+      run.setWatchGroup(group);
+    }
+    return runs;
   }
 
   @Override
@@ -89,7 +100,8 @@ public class HibernateRunDao implements RunStore {
     Criteria criteria = currentSession().createCriteria(RunImpl.class);
     @SuppressWarnings("unchecked")
     List<Run> records = criteria.list();
-    return records;
+
+    return withWatcherGroup(records);
   }
 
   @Override
@@ -118,7 +130,7 @@ public class HibernateRunDao implements RunStore {
     criteria.add(Restrictions.eq("spc.id", containerId));
     criteria.addOrder(Order.desc("status.startDate"));
     criteria.setMaxResults(1);
-    return (Run) criteria.uniqueResult();
+    return withWatcherGroup((Run) criteria.uniqueResult());
   }
 
   @Override
@@ -128,7 +140,7 @@ public class HibernateRunDao implements RunStore {
     criteria.add(Restrictions.eq("spc.id", containerId));
     criteria.addOrder(Order.desc("run.id"));
     criteria.setMaxResults(1);
-    return (Run) criteria.uniqueResult();
+    return withWatcherGroup((Run) criteria.uniqueResult());
   }
 
   @Override
@@ -137,14 +149,14 @@ public class HibernateRunDao implements RunStore {
     criteria.add(DbUtils.searchRestrictions(query, "name", "alias", "description"));
     @SuppressWarnings("unchecked")
     List<Run> records = criteria.list();
-    return records;
+    return withWatcherGroup(records);
   }
 
   @Override
   public Run getByAlias(String alias) throws IOException {
     Criteria criteria = currentSession().createCriteria(RunImpl.class);
     criteria.add(Restrictions.eq("alias", alias));
-    return (Run) criteria.uniqueResult();
+    return withWatcherGroup((Run) criteria.uniqueResult());
   }
 
   @Override
@@ -155,7 +167,7 @@ public class HibernateRunDao implements RunStore {
     criteria.add(Restrictions.eq("partition.pool.id", poolId));
     @SuppressWarnings("unchecked")
     List<Run> records = criteria.list();
-    return records;
+    return withWatcherGroup(records);
   }
 
   @Override
@@ -165,7 +177,7 @@ public class HibernateRunDao implements RunStore {
     criteria.add(Restrictions.eq("spc.id", containerId));
     @SuppressWarnings("unchecked")
     List<Run> records = criteria.list();
-    return records;
+    return withWatcherGroup(records);
   }
 
   @Override
@@ -176,7 +188,7 @@ public class HibernateRunDao implements RunStore {
     criteria.add(Restrictions.eq("library.sample.project.id", projectId));
     @SuppressWarnings("unchecked")
     List<Run> records = criteria.list();
-    return records;
+    return withWatcherGroup(records);
   }
 
   @Override
@@ -185,7 +197,7 @@ public class HibernateRunDao implements RunStore {
     criteria.add(Restrictions.eq("sequencerReference.platform.id", platformId));
     @SuppressWarnings("unchecked")
     List<Run> records = criteria.list();
-    return records;
+    return withWatcherGroup(records);
   }
 
   @Override
@@ -194,7 +206,7 @@ public class HibernateRunDao implements RunStore {
     criteria.add(Restrictions.eq("status.health", health));
     @SuppressWarnings("unchecked")
     List<Run> records = criteria.list();
-    return records;
+    return withWatcherGroup(records);
   }
 
   @Override
@@ -203,7 +215,7 @@ public class HibernateRunDao implements RunStore {
     criteria.add(Restrictions.eq("sequencerReference.id", sequencerReferenceId));
     @SuppressWarnings("unchecked")
     List<Run> records = criteria.list();
-    return records;
+    return withWatcherGroup(records);
   }
 
   @Override
@@ -213,7 +225,7 @@ public class HibernateRunDao implements RunStore {
     criteria.setMaxResults((int) limit);
     @SuppressWarnings("unchecked")
     List<Run> records = criteria.list();
-    return records;
+    return withWatcherGroup(records);
   }
 
   @Override
@@ -256,7 +268,7 @@ public class HibernateRunDao implements RunStore {
     criteria.addOrder("asc".equalsIgnoreCase(sortDir) ? Order.asc(sortCol) : Order.desc(sortCol));
     @SuppressWarnings("unchecked")
     List<Run> runs = criteria.list();
-    return runs;
+    return withWatcherGroup(runs);
   }
 
   @Override
@@ -270,7 +282,7 @@ public class HibernateRunDao implements RunStore {
     criteria.addOrder("asc".equalsIgnoreCase(sortDir) ? Order.asc(sortCol) : Order.desc(sortCol));
     @SuppressWarnings("unchecked")
     List<Run> runs = criteria.list();
-    return runs;
+    return withWatcherGroup(runs);
   }
 
   @Override
@@ -305,20 +317,32 @@ public class HibernateRunDao implements RunStore {
     this.runAlertManager = runAlertManager;
   }
 
-  public WatcherStore getWatcherDAO() {
-    return watcherDAO;
-  }
-
-  public void setWatcherDAO(WatcherStore watcherDAO) {
-    this.watcherDAO = watcherDAO;
-  }
-
   public com.eaglegenomics.simlims.core.manager.SecurityManager getSecurityManager() {
     return securityManager;
   }
 
   public void setSecurityManager(com.eaglegenomics.simlims.core.manager.SecurityManager securityManager) {
     this.securityManager = securityManager;
+  }
+
+  public WatchManager getWatchManager() {
+    return watchManager;
+  }
+
+  public void setWatchManager(WatchManager watchManager) {
+    this.watchManager = watchManager;
+  }
+
+  @Override
+  public void addWatcher(Run run, User watcher) {
+    watchManager.watch(run, watcher);
+    currentSession().update(run);
+  }
+
+  @Override
+  public void removeWatcher(Run run, User watcher) {
+    watchManager.unwatch(run, watcher);
+    currentSession().update(run);
   }
 
 }

@@ -32,6 +32,7 @@ import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.w3c.dom.Document;
 
+import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 
@@ -280,4 +281,6 @@ public interface Run extends SecurableByProfile, Submittable<Document>, Comparab
   public SequencingParameters getSequencingParameters();
 
   public void setSequencingParameters(SequencingParameters parameters);
+
+  public void setWatchGroup(Group watchGroup);
 }

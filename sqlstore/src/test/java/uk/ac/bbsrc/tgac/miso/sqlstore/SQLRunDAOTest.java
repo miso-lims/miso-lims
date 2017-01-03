@@ -68,8 +68,8 @@ import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerReferenceStore;
 import uk.ac.bbsrc.tgac.miso.core.store.StatusStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
-import uk.ac.bbsrc.tgac.miso.core.store.WatcherStore;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateRunDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSecurityDao;
 
 public class SQLRunDAOTest extends AbstractDAOTest {
 
@@ -97,8 +97,6 @@ public class SQLRunDAOTest extends AbstractDAOTest {
   private StatusStore statusDAO;
   @Mock
   private NoteStore noteDAO;
-  @Mock
-  private WatcherStore watcherDAO;
   @Mock
   private ChangeLogStore changeLogDAO;
 
@@ -527,5 +525,28 @@ public class SQLRunDAOTest extends AbstractDAOTest {
     List<Run> runs = dao.listByOffsetAndNumResults(2, 2, "desc", "lastModified");
     assertEquals(2, runs.size());
     assertEquals(2, runs.get(0).getId());
+  }
+
+  @Test
+  public void testWatchers() throws Exception {
+    Run run = dao.get(1L);
+    assertNotNull(run);
+    assertEquals(0, run.getWatchers().size());
+
+    // Need to use SecurityDao to get a valid Hibernate-managed User
+    HibernateSecurityDao userDao = new HibernateSecurityDao();
+    userDao.setSessionFactory(sessionFactory);
+    User user = securityDAO.getUserById(1L);
+    assertNotNull(user);
+
+    dao.addWatcher(run, user);
+    assertEquals(1, run.getWatchers().size());
+    run = dao.get(1L);
+    assertEquals(1, run.getWatchers().size());
+
+    dao.removeWatcher(run, user);
+    assertEquals(0, run.getWatchers().size());
+    run = dao.get(1L);
+    assertEquals(0, run.getWatchers().size());
   }
 }

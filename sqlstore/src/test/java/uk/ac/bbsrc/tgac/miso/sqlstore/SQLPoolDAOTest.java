@@ -46,7 +46,6 @@ import uk.ac.bbsrc.tgac.miso.core.store.ExperimentStore;
 import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
-import uk.ac.bbsrc.tgac.miso.core.store.WatcherStore;
 
 public class SQLPoolDAOTest extends AbstractDAOTest {
 
@@ -63,8 +62,6 @@ public class SQLPoolDAOTest extends AbstractDAOTest {
   private PoolQcStore poolQcDAO;
   @Mock
   private Store<SecurityProfile> securityProfileDAO;
-  @Mock
-  private WatcherStore watcherDAO;
   @Mock
   private ChangeLogStore changeLogDAO;
   @Mock

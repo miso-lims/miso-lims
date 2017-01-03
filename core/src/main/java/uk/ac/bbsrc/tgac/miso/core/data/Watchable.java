@@ -46,13 +46,6 @@ public interface Watchable {
   Set<User> getWatchers();
 
   /**
-   * Sets the Set of {@link User}s watching this Watchable object
-   * 
-   * @param watchers
-   */
-  void setWatchers(Set<User> watchers);
-
-  /**
    * Adds a {@link User} to this Watchable object's watcher list
    * 
    * @param user

@@ -447,10 +447,6 @@ VALUES (1,'STU1','Test study1',NULL,1,1,'Other','Test Study1',1),
 (3,'STU3','OICR',NULL,1,1,'Other','Test Study3',1),
 (4,'STU4','OICR',NULL,1,1,'Other','Test Study4',1);
 
-DELETE FROM `Watcher`;
-INSERT INTO `Watcher`(`entityName`, `userId`) 
-VALUES ('IPO1',1),('IPO10',1),('IPO2',1),('IPO3',1),('IPO4',1),('IPO5',1),('IPO6',1),('IPO7',1),('IPO8',1),('IPO9',1);
-
 DELETE FROM `SecurityProfile`;
 DELETE FROM `SecurityProfile_ReadGroup`;
 DELETE FROM `SecurityProfile_WriteGroup`;

@@ -63,7 +63,6 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.SQLPoolQCDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLProjectDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLSequencerPartitionContainerDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLSequencerPoolPartitionDAO;
-import uk.ac.bbsrc.tgac.miso.sqlstore.SQLWatcherDAO;
 
 /**
  * This class is used to simplify creation and wiring of MISO services. Some of the config is currently hardcoded - mainly naming schemes
@@ -83,7 +82,6 @@ public class MisoServiceManager {
 
   private HibernateSecurityDao securityStore;
   private HibernateSecurityProfileDao securityProfileDao;
-  private SQLWatcherDAO watcherDao;
   private SQLProjectDAO projectDao;
   private SQLChangeLogDAO changeLogDao;
   private SQLNoteDAO noteDao;
@@ -198,7 +196,6 @@ public class MisoServiceManager {
     m.setDefaultTissueMaterialDao();
     m.setDefaultTissueOriginDao();
     m.setDefaultTissueTypeDao();
-    m.setDefaultWatcherDao();
     m.setDefaultLibraryDesignDao();
     m.setDefaultLibraryDesignCodeDao();
     m.setDefaultIndexDao();
@@ -324,32 +321,9 @@ public class MisoServiceManager {
   }
 
   private void updateSecurityManagerDependencies() {
-    if (watcherDao != null) watcherDao.setSecurityManager(securityManager);
     if (projectDao != null) projectDao.setSecurityManager(securityManager);
     if (poolDao != null) poolDao.setSecurityManager(securityManager);
     if (runDao != null) runDao.setSecurityManager(securityManager);
-  }
-
-  public SQLWatcherDAO getWatcherDao() {
-    return watcherDao;
-  }
-
-  public void setWatcherDao(SQLWatcherDAO watcherDao) {
-    this.watcherDao = watcherDao;
-    updateWatcherDaoDependencies();
-  }
-
-  public void setDefaultWatcherDao() {
-    SQLWatcherDAO dao = new SQLWatcherDAO();
-    dao.setJdbcTemplate(jdbcTemplate);
-    dao.setSecurityManager(securityManager);
-    setWatcherDao(dao);
-  }
-
-  private void updateWatcherDaoDependencies() {
-    if (projectDao != null) projectDao.setWatcherDAO(watcherDao);
-    if (poolDao != null) poolDao.setWatcherDAO(watcherDao);
-    if (runDao != null) runDao.setWatcherDAO(watcherDao);
   }
 
   public SQLProjectDAO getProjectDao() {
@@ -367,7 +341,6 @@ public class MisoServiceManager {
     dao.setSecurityManager(securityManager);
     dao.setSecurityProfileDAO(securityProfileDao);
     dao.setNamingScheme(getNamingScheme());
-    dao.setWatcherDAO(watcherDao);
     dao.setDataObjectFactory(dataObjectFactory);
     dao.setReferenceGenomeDao(referenceGenomeDao);
     setProjectDao(dao);
@@ -669,7 +642,6 @@ public class MisoServiceManager {
     dao.setSecurityDAO(securityStore);
     dao.setSecurityManager(securityManager);
     dao.setSecurityProfileDAO(securityProfileDao);
-    dao.setWatcherDAO(watcherDao);
     dao.setPoolQcDAO(poolQcDao);
     setPoolDao(dao);
   }
@@ -783,7 +755,6 @@ public class MisoServiceManager {
     HibernateRunDao dao = new HibernateRunDao();
     dao.setJdbcTemplate(jdbcTemplate);
     dao.setSecurityManager(securityManager);
-    dao.setWatcherDAO(watcherDao);
     setRunDao(dao);
   }
 

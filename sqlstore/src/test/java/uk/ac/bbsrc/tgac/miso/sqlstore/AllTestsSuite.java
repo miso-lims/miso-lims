@@ -68,8 +68,7 @@ import org.junit.runners.Suite;
     SQLSequencerServiceRecordDAOTest.class, //
     SQLStatusDAOTest.class, //
     SQLStudyDAOTest.class, //
-    SQLTargetedSequencingDAOTest.class, //
-    SQLWatcherDAOTest.class //
+    SQLTargetedSequencingDAOTest.class //
 })
 
 public class AllTestsSuite {
