@@ -59,6 +59,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
@@ -69,7 +70,6 @@ import uk.ac.bbsrc.tgac.miso.core.store.SequencerReferenceStore;
 import uk.ac.bbsrc.tgac.miso.core.store.StatusStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateRunDao;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSecurityDao;
 
 public class SQLRunDAOTest extends AbstractDAOTest {
 
@@ -533,10 +533,7 @@ public class SQLRunDAOTest extends AbstractDAOTest {
     assertNotNull(run);
     assertEquals(0, run.getWatchers().size());
 
-    // Need to use SecurityDao to get a valid Hibernate-managed User
-    HibernateSecurityDao userDao = new HibernateSecurityDao();
-    userDao.setSessionFactory(sessionFactory);
-    User user = securityDAO.getUserById(1L);
+    User user = (User) sessionFactory.getCurrentSession().get(UserImpl.class, 1L);
     assertNotNull(user);
 
     dao.addWatcher(run, user);
@@ -548,5 +545,30 @@ public class SQLRunDAOTest extends AbstractDAOTest {
     assertEquals(0, run.getWatchers().size());
     run = dao.get(1L);
     assertEquals(0, run.getWatchers().size());
+  }
+
+  @Test
+  public void testNotes() throws Exception {
+    long runId = 1L;
+    String message = "test message";
+    Note note = new Note();
+    note.setText(message);
+
+    Run run = dao.get(runId);
+    assertNotNull(run);
+    assertEquals(0, run.getNotes().size());
+
+    dao.addNote(run, note);
+    Run runWithNote = dao.get(runId);
+    assertEquals(1, runWithNote.getNotes().size());
+    Note savedNote = runWithNote.getNotes().iterator().next();
+    assertEquals(message, savedNote.getText());
+    Long noteId = savedNote.getNoteId();
+    assertNotNull(sessionFactory.getCurrentSession().get(Note.class, noteId));
+
+    dao.deleteNote(runWithNote, savedNote);
+    Run runNoteDeleted = dao.get(runId);
+    assertEquals(0, runNoteDeleted.getNotes().size());
+    assertNull(sessionFactory.getCurrentSession().get(Note.class, noteId));
   }
 }

@@ -1406,6 +1406,16 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
+  public void deleteRunNote(Run run, Note note) throws IOException {
+    if (runStore != null) {
+      Run managed = runStore.get(run.getId());
+      runStore.deleteNote(managed, note);
+    } else {
+      throw new IOException("No noteStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
   public void deletePartition(SequencerPoolPartition partition) throws IOException {
     if (partitionStore != null) {
       if (!partitionStore.remove(partition)) {
@@ -1491,9 +1501,10 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public long saveRunNote(Run run, Note note) throws IOException {
-    if (noteStore != null) {
-      return noteStore.saveRunNote(run, note);
+  public void saveRunNote(Run run, Note note) throws IOException {
+    if (runStore != null) {
+      Run managed = runStore.get(run.getId());
+      runStore.addNote(managed, note);
     } else {
       throw new IOException("No noteStore available. Check that it has been declared in the Spring config.");
     }

@@ -90,7 +90,7 @@ public interface RequestManager {
 
   public long saveRunQC(RunQC runQC) throws IOException;
 
-  public long saveRunNote(Run run, Note note) throws IOException;
+  public void saveRunNote(Run run, Note note) throws IOException;
 
   public long saveSample(Sample sample) throws IOException;
 
@@ -566,6 +566,8 @@ public interface RequestManager {
   public void deleteContainer(SequencerPartitionContainer container) throws IOException;
 
   public void deleteNote(Note note) throws IOException;
+
+  public void deleteRunNote(Run run, Note note) throws IOException;
 
   public void deleteBox(Box box) throws IOException;
 

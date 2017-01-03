@@ -20,6 +20,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.Group;
+import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractRun;
@@ -343,6 +344,21 @@ public class HibernateRunDao implements RunStore {
   public void removeWatcher(Run run, User watcher) {
     watchManager.unwatch(run, watcher);
     currentSession().update(run);
+  }
+
+  @Override
+  public void addNote(Run run, Note note) throws IOException {
+    run.addNote(note);
+    save(run);
+  }
+
+  @Override
+  public void deleteNote(Run run, Note note) throws IOException {
+    if (!run.getNotes().remove(note)) {
+      throw new IllegalArgumentException("Note does not belong to this Run");
+    } else {
+      save(run);
+    }
   }
 
 }

@@ -1658,6 +1658,15 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
+  public void deleteRunNote(Run run, Note note) throws IOException {
+    if (writeCheck(run) && (getCurrentUser().isAdmin() || getCurrentUser().equals(note.getOwner()))) {
+      backingManager.deleteRunNote(run, note);
+    } else {
+      throw new IOException("User " + getCurrentUser().getFullName() + " cannot write to this Run");
+    }
+  }
+
+  @Override
   public int[] saveRuns(Collection<Run> runs) throws IOException {
     User user = getCurrentUser();
     for (Run run : runs) {
@@ -1677,9 +1686,9 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public long saveRunNote(Run run, Note note) throws IOException {
+  public void saveRunNote(Run run, Note note) throws IOException {
     if (writeCheck(run)) {
-      return backingManager.saveRunNote(run, note);
+      backingManager.saveRunNote(run, note);
     } else {
       throw new IOException("User " + getCurrentUser().getFullName() + " cannot write to this Run");
     }
