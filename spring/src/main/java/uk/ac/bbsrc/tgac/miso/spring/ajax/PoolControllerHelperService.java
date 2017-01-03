@@ -66,14 +66,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
-import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
 import uk.ac.bbsrc.tgac.miso.core.data.PrintJob;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
@@ -411,7 +409,10 @@ public class PoolControllerHelperService {
     String idBarcode = json.getString("identificationBarcode");
 
     try {
-      if (!isStringEmptyOrNull(idBarcode)) {
+      if (isStringEmptyOrNull(idBarcode)) {
+        // if the user accidentally deletes a barcode, the changelogs will have a record of the original barcode
+        idBarcode = null;
+      } else {
         List<Boxable> previouslyBarcodedItems = new ArrayList<>(requestManager.getBoxablesFromBarcodeList(Arrays.asList(idBarcode)));
         if (!previouslyBarcodedItems.isEmpty()
             && !(previouslyBarcodedItems.size() == 1 && previouslyBarcodedItems.get(0).getId() == poolId)) {
@@ -422,15 +423,12 @@ public class PoolControllerHelperService {
           log.debug(error);
           return JSONUtils.SimpleJSONError(error);
         }
-        Pool pool = requestManager.getPoolById(poolId);
-        User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-
-        pool.setIdentificationBarcode(idBarcode);
-        pool.setLastModifier(user);
-        requestManager.savePool(pool);
-      } else {
-        return JSONUtils.SimpleJSONError("New identification barcode not recognized");
       }
+      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+      Pool pool = requestManager.getPoolById(poolId);
+      pool.setIdentificationBarcode(idBarcode);
+      pool.setLastModifier(user);
+      requestManager.savePool(pool);
     } catch (IOException e) {
       log.debug("Could not change Pool identificationBarcode: " + e.getMessage());
       return JSONUtils.SimpleJSONError(e.getMessage());
