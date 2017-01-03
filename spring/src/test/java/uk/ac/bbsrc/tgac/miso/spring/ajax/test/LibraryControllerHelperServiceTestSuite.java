@@ -1,11 +1,8 @@
 package uk.ac.bbsrc.tgac.miso.spring.ajax.test;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 
@@ -22,6 +19,7 @@ import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import net.sf.json.JSONObject;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
@@ -90,10 +88,10 @@ public class LibraryControllerHelperServiceTestSuite {
 
     final JSONObject response = libraryControllerHelperService.changeLibraryIdBarcode(null, json);
 
-    verify(library, never()).setIdentificationBarcode(idBarcode);
-    verify(requestManager, never()).saveLibrary(library);
+    verify(library).setIdentificationBarcode(null);
+    verify(requestManager).saveLibrary(library);
 
-    assertEquals("New+identification+barcode+not+recognized", response.get("error"));
+    assertEquals("New+identification+barcode+successfully+assigned.", response.get("response"));
   }
 
   @Test

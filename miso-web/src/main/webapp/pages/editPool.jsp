@@ -77,7 +77,7 @@
                onclick="Pool.barcode.printPoolBarcodes(${pool.id});">Print</a>
             <c:if test="${not autoGenerateIdBarcodes}">
               <a href="javascript:void(0);"
-               onclick="Pool.barcode.showPoolIdBarcodeChangeDialog(${pool.id}, '${pool.identificationBarcode}');">Assign New Barcode</a>
+               onclick="Pool.barcode.showPoolIdBarcodeChangeDialog(${pool.id}, '${pool.identificationBarcode}');">Update Barcode</a>
             </c:if>
           </div>
         </li>
