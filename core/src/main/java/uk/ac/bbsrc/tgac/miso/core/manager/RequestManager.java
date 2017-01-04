@@ -82,7 +82,7 @@ public interface RequestManager {
 
   public long saveProjectOverview(ProjectOverview overview) throws IOException;
 
-  public long saveProjectOverviewNote(ProjectOverview overview, Note note) throws IOException;
+  public void saveProjectOverviewNote(ProjectOverview overview, Note note) throws IOException;
 
   public long saveRun(Run run) throws IOException;
 
@@ -578,6 +578,8 @@ public interface RequestManager {
   public void deleteSampleNote(Sample sample, Note note) throws IOException;
 
   public void deletePoolNote(Pool pool, Note note) throws IOException;
+
+  public void deleteProjectOverviewNote(ProjectOverview projectOverview, Note note) throws IOException;
 
   public void deleteBox(Box box) throws IOException;
 

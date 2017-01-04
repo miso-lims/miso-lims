@@ -1436,6 +1436,12 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
+  public void deleteProjectOverviewNote(ProjectOverview projectOverview, Note note) throws IOException {
+    ProjectOverview managed = projectStore.getProjectOverviewById(projectOverview.getId());
+    projectStore.deleteNote(managed, note);
+  }
+
+  @Override
   public void deletePartition(SequencerPoolPartition partition) throws IOException {
     if (partitionStore != null) {
       if (!partitionStore.remove(partition)) {
@@ -1467,12 +1473,9 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public long saveProjectOverviewNote(ProjectOverview overview, Note note) throws IOException {
-    if (noteStore != null) {
-      return noteStore.saveProjectOverviewNote(overview, note);
-    } else {
-      throw new IOException("No noteStore available. Check that it has been declared in the Spring config.");
-    }
+  public void saveProjectOverviewNote(ProjectOverview overview, Note note) throws IOException {
+    ProjectOverview managed = projectStore.getProjectOverviewById(overview.getId());
+    noteStore.saveProjectOverviewNote(managed, note);
   }
 
   @Override

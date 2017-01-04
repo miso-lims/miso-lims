@@ -239,14 +239,9 @@ public class UserAuthMisoRequestManagerTestSuite {
    */
   @Test
   public void testSaveProjectOverviewNote() throws IOException {
-    final long expectedReturn = 1L;
-
     when(overview.getProject()).thenReturn(project);
     when(project.userCanWrite(any(User.class))).thenReturn(true);
-    when(backingManager.saveProjectOverviewNote(overview, note)).thenReturn(expectedReturn);
-
-    assertEquals(expectedReturn, userAuthMisoRequestManager.saveProjectOverviewNote(overview, note));
-
+    userAuthMisoRequestManager.saveProjectOverviewNote(overview, note);
     verify(backingManager).saveProjectOverviewNote(overview, note);
   }
 
