@@ -75,8 +75,10 @@ public abstract class AbstractSequencerPartitionContainer<T extends Partition> i
           @JoinColumn(name = "Run_runId") })
   private Run run = null;
 
-  @OneToOne(targetEntity = SecurityProfile.class, cascade = CascadeType.ALL)
+  @ManyToOne(targetEntity = SecurityProfile.class, cascade = CascadeType.ALL)
+  @JoinColumn(name = "securityProfile_profileId")
   private SecurityProfile securityProfile;
+
   @ManyToOne(targetEntity = PlatformImpl.class)
   @JoinColumn(name = "platform")
   private Platform platform;
