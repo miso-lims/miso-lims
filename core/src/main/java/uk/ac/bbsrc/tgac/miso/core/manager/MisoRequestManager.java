@@ -1714,7 +1714,25 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public long saveSequencerPartitionContainer(SequencerPartitionContainer container) throws IOException {
     if (sequencerPartitionContainerStore != null) {
-      return sequencerPartitionContainerStore.save(container);
+      long id;
+      if (container.getId() == AbstractRun.UNSAVED_ID) {
+        container.setName(generateTemporaryName());
+        container.setId(sequencerPartitionContainerStore.save(container));
+        try {
+          String name = namingScheme.generateNameFor(container);
+          container.setName(name);
+
+          validateNameOrThrow(container, namingScheme);
+          id = sequencerPartitionContainerStore.save(container);
+        } catch (MisoNamingException e) {
+          throw new IOException("Cannot save SequencerPartitionContainer - issue with generating name");
+        }
+      } else {
+        // applyChanges
+        sequencerPartitionContainerStore.save(container);
+        id = container.getId();
+      }
+      return id;
     } else {
       throw new IOException("No sequencerPartitionContainerStore available. Check that it has been declared in the Spring config.");
     }
