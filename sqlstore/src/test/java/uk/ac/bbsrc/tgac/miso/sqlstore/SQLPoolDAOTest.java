@@ -44,7 +44,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ExperimentStore;
-import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 
@@ -67,8 +66,6 @@ public class SQLPoolDAOTest extends AbstractDAOTest {
   private ChangeLogStore changeLogDAO;
   @Mock
   private SecurityStore securityDAO;
-  @Mock
-  private NoteStore noteDAO;
   @Mock
   private BoxStore boxDAO;
   @Mock

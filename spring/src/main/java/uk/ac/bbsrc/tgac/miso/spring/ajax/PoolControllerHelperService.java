@@ -642,15 +642,13 @@ public class PoolControllerHelperService {
 
     try {
       Pool pool = requestManager.getPoolById(poolId);
-      Note note = requestManager.getNoteById(noteId);
-      if (pool.getNotes().contains(note)) {
-        pool.getNotes().remove(note);
-        requestManager.deleteNote(note);
-        requestManager.savePool(pool);
-        return JSONUtils.SimpleJSONResponse("OK");
-      } else {
-        return JSONUtils.SimpleJSONError("Pool does not have note " + noteId + ". Cannot remove");
+      for (Note note : pool.getNotes()) {
+        if (note.getNoteId().equals(noteId)) {
+          requestManager.deletePoolNote(pool, note);
+          return JSONUtils.SimpleJSONResponse("OK");
+        }
       }
+      return JSONUtils.SimpleJSONError("Pool does not have note " + noteId + ". Cannot remove");
     } catch (IOException e) {
       log.error("cannot remove note", e);
       return JSONUtils.SimpleJSONError("Cannot remove note: " + e.getMessage());

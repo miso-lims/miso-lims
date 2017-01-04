@@ -210,8 +210,6 @@ public interface RequestManager {
 
   public emPCRDilution getEmPCRDilutionByBarcode(String barcode) throws IOException;
 
-  public Note getNoteById(long noteId) throws IOException;
-
   public Platform getPlatformById(long platformId) throws IOException;
 
   public Project getProjectById(long projectId) throws IOException;
@@ -566,8 +564,6 @@ public interface RequestManager {
   public void deletePartition(SequencerPoolPartition partition) throws IOException;
 
   public void deleteContainer(SequencerPartitionContainer container) throws IOException;
-
-  public void deleteNote(Note note) throws IOException;
 
   public void deleteRunNote(Run run, Note note) throws IOException;
 

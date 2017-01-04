@@ -47,7 +47,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
-import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
@@ -74,8 +73,6 @@ public class SQLSampleDAOTest extends AbstractDAOTest {
   private LibraryStore libraryStore;
   @Mock
   private SampleQcStore sampleQCStore;
-  @Mock
-  private NoteStore noteStore;
   @Mock
   private NamingScheme namingScheme;
 

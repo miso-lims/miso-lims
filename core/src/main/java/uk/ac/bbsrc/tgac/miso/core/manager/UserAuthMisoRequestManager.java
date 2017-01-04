@@ -523,14 +523,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Note getNoteById(long noteId) throws IOException {
-    Note o = backingManager.getNoteById(noteId);
-    User user = getCurrentUser();
-    if (o.getOwner().equals(user) || user.isAdmin() || (o.isInternalOnly() && user.isInternal())) return o;
-    else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Note " + o.getNoteId());
-  }
-
-  @Override
   public Project getProjectById(long projectId) throws IOException {
     Project o = backingManager.getProjectById(projectId);
     if (readCheck(o)) return o;
@@ -1578,13 +1570,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   public void deletePartition(SequencerPoolPartition partition) throws IOException {
     if (getCurrentUser().isAdmin()) {
       backingManager.deletePartition(partition);
-    }
-  }
-
-  @Override
-  public void deleteNote(Note note) throws IOException {
-    if (getCurrentUser().isAdmin() || getCurrentUser().equals(note.getOwner())) {
-      backingManager.deleteNote(note);
     }
   }
 

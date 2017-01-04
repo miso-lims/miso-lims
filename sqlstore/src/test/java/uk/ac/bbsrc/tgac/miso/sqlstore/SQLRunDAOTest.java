@@ -63,7 +63,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
-import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
 import uk.ac.bbsrc.tgac.miso.core.store.RunQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerReferenceStore;
@@ -95,8 +94,6 @@ public class SQLRunDAOTest extends AbstractDAOTest {
   private SequencerPartitionContainerStore sequencerPartitionContainerDAO;
   @Mock
   private StatusStore statusDAO;
-  @Mock
-  private NoteStore noteDAO;
   @Mock
   private ChangeLogStore changeLogDAO;
 
@@ -454,10 +451,6 @@ public class SQLRunDAOTest extends AbstractDAOTest {
     List<RunQC> mockQcs = new ArrayList<>();
     mockQcs.add(Mockito.mock(RunQC.class));
     Mockito.when(runQcDAO.listByRunId(Matchers.anyLong())).thenReturn(mockQcs);
-
-    List<Note> mockNotes = new ArrayList<>();
-    mockNotes.add(Mockito.mock(Note.class));
-    Mockito.when(noteDAO.listByRun(Matchers.anyLong())).thenReturn(mockNotes);
   }
 
   private void assertNonLazyThings(Run run) {

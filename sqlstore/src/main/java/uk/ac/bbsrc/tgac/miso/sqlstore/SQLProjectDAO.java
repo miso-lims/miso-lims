@@ -67,7 +67,6 @@ import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
-import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
 import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
@@ -161,7 +160,6 @@ public class SQLProjectDAO implements ProjectStore {
   private SampleStore sampleDAO;
   private LibraryStore libraryDAO;
   private RunStore runDAO;
-  private NoteStore noteDAO;
 
   @Autowired
   private ProjectAlertManager projectAlertManager;
@@ -242,11 +240,6 @@ public class SQLProjectDAO implements ProjectStore {
   @CoverageIgnore
   public void setRunDAO(RunStore runDAO) {
     this.runDAO = runDAO;
-  }
-
-  @CoverageIgnore
-  public void setNoteDAO(NoteStore noteDAO) {
-    this.noteDAO = noteDAO;
   }
 
   @CoverageIgnore
@@ -404,7 +397,8 @@ public class SQLProjectDAO implements ProjectStore {
     if (this.cascadeType != null && this.cascadeType.equals(CascadeType.PERSIST)) {
       if (!overview.getNotes().isEmpty()) {
         for (Note n : overview.getNotes()) {
-          noteDAO.saveProjectOverviewNote(overview, n);
+          // will be Hibernate-managed
+          // noteDAO.saveProjectOverviewNote(overview, n);
         }
       }
     }
@@ -664,7 +658,8 @@ public class SQLProjectDAO implements ProjectStore {
 
         overview.setLibraries(libraryDAO.listByProjectId(rs.getLong("project_projectId")));
         overview.setRuns(runDAO.listByProjectId(rs.getLong("project_projectId")));
-        overview.setNotes(noteDAO.listByProjectOverview(id));
+        // will be Hibernate-managed
+        // overview.setNotes(noteDAO.listByProjectOverview(id));
 
         // TODO: Hibernate will load watchUsers automatically, but watchGroup must be loaded explicitly
         // overview.setWatchers(new HashSet<>(watcherDAO.getWatchersByEntityName(overview.getWatchableIdentifier())));

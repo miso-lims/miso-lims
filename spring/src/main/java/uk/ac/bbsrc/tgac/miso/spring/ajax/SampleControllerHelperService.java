@@ -466,15 +466,13 @@ public class SampleControllerHelperService {
 
     try {
       Sample sample = requestManager.getSampleById(sampleId);
-      Note note = requestManager.getNoteById(noteId);
-      if (sample.getNotes().contains(note)) {
-        sample.getNotes().remove(note);
-        requestManager.deleteNote(note);
-        requestManager.saveSample(sample);
-        return JSONUtils.SimpleJSONResponse("OK");
-      } else {
-        return JSONUtils.SimpleJSONError("Sample does not have note " + noteId + ". Cannot remove");
+      for (Note note : sample.getNotes()) {
+        if (note.getNoteId().equals(noteId)) {
+          requestManager.deleteSampleNote(sample, note);
+          return JSONUtils.SimpleJSONResponse("OK");
+        }
       }
+      return JSONUtils.SimpleJSONError("Sample does not have note " + noteId + ". Cannot remove");
     } catch (IOException e) {
       log.error("cannot remove note", e);
       return JSONUtils.SimpleJSONError("Cannot remove note: " + e.getMessage());

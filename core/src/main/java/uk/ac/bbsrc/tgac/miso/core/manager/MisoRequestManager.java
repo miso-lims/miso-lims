@@ -102,7 +102,6 @@ import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignDao;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
-import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PartitionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PlatformStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolQcStore;
@@ -145,8 +144,6 @@ public class MisoRequestManager implements RequestManager {
   private LibraryStore libraryStore;
   @Autowired
   private LibraryQcStore libraryQcStore;
-  @Autowired
-  private NoteStore noteStore;
   @Autowired
   private PartitionStore partitionStore;
   @Autowired
@@ -236,10 +233,6 @@ public class MisoRequestManager implements RequestManager {
 
   public void setNamingScheme(NamingScheme namingScheme) {
     this.namingScheme = namingScheme;
-  }
-
-  public void setNoteStore(NoteStore noteStore) {
-    this.noteStore = noteStore;
   }
 
   public void setPartitionStore(PartitionStore partitionStore) {
@@ -1395,17 +1388,6 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public void deleteNote(Note note) throws IOException {
-    if (noteStore != null) {
-      if (!noteStore.remove(note)) {
-        throw new IOException("Unable to delete note.");
-      }
-    } else {
-      throw new IOException("No noteStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
   public void deleteRunNote(Run run, Note note) throws IOException {
     Run managed = runStore.get(run.getId());
     runStore.deleteNote(managed, note);
@@ -1475,7 +1457,7 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public void saveProjectOverviewNote(ProjectOverview overview, Note note) throws IOException {
     ProjectOverview managed = projectStore.getProjectOverviewById(overview.getId());
-    noteStore.saveProjectOverviewNote(managed, note);
+    projectStore.addNote(managed, note);
   }
 
   @Override
@@ -1556,7 +1538,7 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public void saveSampleNote(Sample sample, Note note) throws IOException {
     Sample managed = sampleStore.get(sample.getId());
-    noteStore.saveSampleNote(managed, note);
+    sampleStore.addNote(managed, note);
   }
 
   @Override
@@ -2182,15 +2164,6 @@ public class MisoRequestManager implements RequestManager {
       return statusStore.getByRunName(runName);
     } else {
       throw new IOException("No statusStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Note getNoteById(long noteId) throws IOException {
-    if (noteStore != null) {
-      return noteStore.get(noteId);
-    } else {
-      throw new IOException("No noteStore available. Check that it has been declared in the Spring config.");
     }
   }
 
