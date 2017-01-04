@@ -520,7 +520,7 @@ FOR EACH ROW
         CASE WHEN NEW.description <> OLD.description THEN CONCAT('description: ', OLD.description, ' → ', NEW.description) END,
         CASE WHEN NEW.name <> OLD.name THEN CONCAT('name: ', OLD.name, ' → ', NEW.name) END,
         CASE WHEN NEW.project_projectId <> OLD.project_projectId THEN CONCAT('project: ', COALESCE((SELECT name FROM Project WHERE projectId = OLD.project_projectId), 'n/a'), ' → ', COALESCE((SELECT name FROM Project WHERE projectId = NEW.project_projectId), 'n/a')) END,
-        CASE WHEN NEW.studyType <> OLD.studyType THEN CONCAT('type: ', COALESCE((SELECT name FROM StudyType WHERE typeId = OLD.studyType), 'n/a'), ' → ', COALESCE((SELECT name FROM StudyType WHERE typeId = NEW.studyType), 'n/a')) END);
+        CASE WHEN NEW.studyTypeId <> OLD.studyTypeId THEN CONCAT('type: ', COALESCE((SELECT name FROM StudyType WHERE typeId = OLD.studyTypeId), 'n/a'), ' → ', COALESCE((SELECT name FROM StudyType WHERE typeId = NEW.studyTypeId), 'n/a')) END);
   IF log_message IS NOT NULL AND log_message <> '' THEN
     INSERT INTO StudyChangeLog(studyId, columnsChanged, userId, message) VALUES (
       NEW.studyId,
@@ -530,7 +530,7 @@ FOR EACH ROW
         CASE WHEN NEW.description <> OLD.description THEN 'description' END,
         CASE WHEN NEW.name <> OLD.name THEN 'name' END,
         CASE WHEN NEW.project_projectId <> OLD.project_projectId THEN 'project_projectId' END,
-        CASE WHEN NEW.studyType <> OLD.studyType THEN 'studyType' END), ''),
+        CASE WHEN NEW.studyTypeId <> OLD.studyTypeId THEN 'studyTypeId' END), ''),
       NEW.lastModifier,
       log_message
       );
