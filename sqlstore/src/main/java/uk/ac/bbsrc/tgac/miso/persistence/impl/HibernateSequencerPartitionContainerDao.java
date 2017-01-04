@@ -13,6 +13,9 @@ import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +31,9 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 @Transactional(rollbackFor = Exception.class)
 public class HibernateSequencerPartitionContainerDao implements SequencerPartitionContainerStore {
 
+  protected static final Logger log = LoggerFactory.getLogger(HibernateSequencerPartitionContainerDao.class);
+
+  @Autowired
   private SessionFactory sessionFactory;
 
   private Session currentSession() {
