@@ -23,16 +23,13 @@
 
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -48,9 +45,8 @@ import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerServiceRecordImpl;
-import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
-import uk.ac.bbsrc.tgac.miso.core.store.SequencerReferenceStore;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSequencerServiceRecordDao;
 
 public class SQLSequencerServiceRecordDAOTest extends AbstractDAOTest {
 
@@ -58,15 +54,16 @@ public class SQLSequencerServiceRecordDAOTest extends AbstractDAOTest {
   public final ExpectedException exception = ExpectedException.none();
   
   @Autowired
+  private SessionFactory sessionFactory;
+
+  @Autowired
   private JdbcTemplate jdbcTemplate;
   
-  @Mock
-  private SequencerReferenceStore sequencerReferenceDAO;
   @Mock
   private MisoFilesManager misoFilesManager;
   
   @InjectMocks
-  private SQLSequencerServiceRecordDAO dao;
+  private HibernateSequencerServiceRecordDao dao;
   
   //Auto-increment sequence doesn't roll back with transactions, so must be tracked
   private static long nextAutoIncrementId = 4L;
@@ -74,8 +71,8 @@ public class SQLSequencerServiceRecordDAOTest extends AbstractDAOTest {
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    dao.setJdbcTemplate(jdbcTemplate);
-    dao.setDataObjectFactory(new TgacDataObjectFactory());
+    dao.setTemplate(jdbcTemplate);
+    dao.setSessionFactory(sessionFactory);
   }
   
   @Test
