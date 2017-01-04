@@ -114,7 +114,7 @@ public class HibernateSequencerServiceRecordDao implements SequencerServiceRecor
   @Override
   public List<SequencerServiceRecord> listBySequencerId(long referenceId) {
     Criteria criteria = currentSession().createCriteria(SequencerServiceRecordImpl.class);
-    criteria.add(Restrictions.eq("run.id", referenceId));
+    criteria.add(Restrictions.eq("sequencerReference.id", referenceId));
     @SuppressWarnings("unchecked")
     List<SequencerServiceRecord> records = criteria.list();
     return records;
