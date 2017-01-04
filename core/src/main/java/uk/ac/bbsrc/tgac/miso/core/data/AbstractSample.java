@@ -93,7 +93,7 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @OneToMany(targetEntity = SampleQCImpl.class, mappedBy = "sample", cascade = CascadeType.ALL)
   private Collection<SampleQC> sampleQCs = new TreeSet<>();
 
-  @OneToMany(targetEntity = Note.class)
+  @OneToMany(targetEntity = Note.class, cascade = CascadeType.ALL)
   @JoinTable(name = "Sample_Note", joinColumns = {
       @JoinColumn(name = "sample_sampleId", nullable = false, updatable = false) }, inverseJoinColumns = {
           @JoinColumn(name = "notes_noteId", nullable = false, updatable = false) })

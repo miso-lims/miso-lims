@@ -547,4 +547,19 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
     query.setParameter("id", id);
     return fetchSqlStore((Sample) query.uniqueResult());
   }
+
+  @Override
+  public void addNote(Sample sample, Note note) throws IOException {
+    sample.addNote(note);
+    save(sample);
+  }
+
+  @Override
+  public void deleteNote(Sample sample, Note note) throws IOException {
+    if (!sample.getNotes().remove(note)) {
+      throw new IllegalArgumentException("Note does not belong to this Sample");
+    } else {
+      save(sample);
+    }
+  }
 }

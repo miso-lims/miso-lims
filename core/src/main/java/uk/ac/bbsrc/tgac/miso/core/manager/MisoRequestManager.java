@@ -1424,6 +1424,12 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
+  public void deleteSampleNote(Sample sample, Note note) throws IOException {
+    Sample managed = sampleStore.get(sample.getId());
+    sampleStore.deleteNote(managed, note);
+  }
+
+  @Override
   public void deletePartition(SequencerPoolPartition partition) throws IOException {
     if (partitionStore != null) {
       if (!partitionStore.remove(partition)) {
@@ -1539,12 +1545,9 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public long saveSampleNote(Sample sample, Note note) throws IOException {
-    if (noteStore != null) {
-      return noteStore.saveSampleNote(sample, note);
-    } else {
-      throw new IOException("No noteStore available. Check that it has been declared in the Spring config.");
-    }
+  public void saveSampleNote(Sample sample, Note note) throws IOException {
+    Sample managed = sampleStore.get(sample.getId());
+    noteStore.saveSampleNote(managed, note);
   }
 
   @Override

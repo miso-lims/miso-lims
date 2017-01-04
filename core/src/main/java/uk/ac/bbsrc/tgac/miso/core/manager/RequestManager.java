@@ -98,7 +98,7 @@ public interface RequestManager {
 
   public long saveSampleQC(SampleQC sampleQC) throws IOException;
 
-  public long saveSampleNote(Sample sample, Note note) throws IOException;
+  public void saveSampleNote(Sample sample, Note note) throws IOException;
 
   public long saveEmPcrDilution(emPCRDilution dilution) throws IOException;
 
@@ -574,6 +574,8 @@ public interface RequestManager {
   public void deleteKitNote(Kit kit, Note note) throws IOException;
 
   public void deleteLibraryNote(Library library, Note note) throws IOException;
+
+  public void deleteSampleNote(Sample sample, Note note) throws IOException;
 
   public void deleteBox(Box box) throws IOException;
 
