@@ -114,7 +114,7 @@ public interface RequestManager {
 
   public long savePoolQC(PoolQC poolQC) throws IOException;
 
-  public long savePoolNote(Pool pool, Note note) throws IOException;
+  public void savePoolNote(Pool pool, Note note) throws IOException;
 
   public long saveEmPCR(emPCR pcr) throws IOException;
 
@@ -576,6 +576,8 @@ public interface RequestManager {
   public void deleteLibraryNote(Library library, Note note) throws IOException;
 
   public void deleteSampleNote(Sample sample, Note note) throws IOException;
+
+  public void deletePoolNote(Pool pool, Note note) throws IOException;
 
   public void deleteBox(Box box) throws IOException;
 

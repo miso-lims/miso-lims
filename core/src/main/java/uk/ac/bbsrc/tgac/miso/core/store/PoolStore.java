@@ -28,6 +28,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import com.eaglegenomics.simlims.core.Note;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
@@ -243,4 +245,9 @@ public interface PoolStore extends Store<Pool>, Remover<Pool>, NamingSchemeAware
    * @throws IOException
    */
   long countPoolsByPlatform(PlatformType platform) throws IOException;
+
+  public void addNote(Pool pool, Note note) throws IOException;
+
+  public void deleteNote(Pool pool, Note note) throws IOException;
+
 }

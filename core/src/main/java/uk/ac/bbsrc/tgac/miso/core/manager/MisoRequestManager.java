@@ -1430,6 +1430,12 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
+  public void deletePoolNote(Pool pool, Note note) throws IOException {
+    Pool managed = poolStore.get(pool.getId());
+    poolStore.deleteNote(managed, note);
+  }
+
+  @Override
   public void deletePartition(SequencerPoolPartition partition) throws IOException {
     if (partitionStore != null) {
       if (!partitionStore.remove(partition)) {
@@ -1662,12 +1668,9 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public long savePoolNote(Pool pool, Note note) throws IOException {
-    if (noteStore != null) {
-      return noteStore.savePoolNote(pool, note);
-    } else {
-      throw new IOException("No noteStore available. Check that it has been declared in the Spring config.");
-    }
+  public void savePoolNote(Pool pool, Note note) throws IOException {
+    Pool managed = poolStore.get(pool.getId());
+    poolStore.addNote(managed, note);
   }
 
   @Override

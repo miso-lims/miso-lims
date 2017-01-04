@@ -986,4 +986,16 @@ public class SQLPoolDAO implements PoolStore {
     return template.query(query, new Object[] { platform.getKey() }, new PoolMapper(true));
   }
 
+  @Override
+  public void addNote(Pool pool, Note note) throws IOException {
+    // TODO implement during Hibernatization
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void deleteNote(Pool pool, Note note) throws IOException {
+    // TODO implement during Hibernatization
+    throw new UnsupportedOperationException();
+  }
+
 }

@@ -305,9 +305,9 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public long savePoolNote(Pool pool, Note note) throws IOException {
+  public void savePoolNote(Pool pool, Note note) throws IOException {
     if (writeCheck(pool)) {
-      return backingManager.savePoolNote(pool, note);
+      backingManager.savePoolNote(pool, note);
     } else {
       throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot write to this Pool");
     }
@@ -1690,6 +1690,15 @@ public class UserAuthMisoRequestManager implements RequestManager {
       backingManager.deleteSampleNote(sample, note);
     } else {
       throw new IOException("User " + getCurrentUser().getFullName() + " cannot write to this Sample");
+    }
+  }
+
+  @Override
+  public void deletePoolNote(Pool pool, Note note) throws IOException {
+    if (writeCheck(pool) && (getCurrentUser().isAdmin() || getCurrentUser().equals(note.getOwner()))) {
+      backingManager.deletePoolNote(pool, note);
+    } else {
+      throw new IOException("User " + getCurrentUser().getFullName() + " cannot write to this Pool");
     }
   }
 
