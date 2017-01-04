@@ -704,7 +704,6 @@ public class MisoServiceManager {
   }
 
   private void updateRunDaoDependencies() {
-    if (runQcDao != null) runQcDao.setRunDao(runDao);
   }
 
   public HibernateRunQcDao getRunQcDao() {
@@ -718,8 +717,6 @@ public class MisoServiceManager {
 
   public void setDefaultRunQcDao() {
     HibernateRunQcDao dao = new HibernateRunQcDao();
-    dao.setRunDao(runDao);
-    dao.setSequencerPartitionContainerDao(sequencerPartitionContainerDao);
     setRunQcDao(dao);
   }
 
@@ -741,7 +738,7 @@ public class MisoServiceManager {
   }
 
   private void updateSequencerPartitionContainerDaoDependencies() {
-    if (runQcDao != null) runQcDao.setSequencerPartitionContainerDao(sequencerPartitionContainerDao);
+ 
   }
 
   public HibernateStatusDao getStatusDao() {
