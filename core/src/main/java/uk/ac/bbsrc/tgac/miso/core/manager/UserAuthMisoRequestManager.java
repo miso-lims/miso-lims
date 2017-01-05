@@ -48,6 +48,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
+import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
@@ -1150,31 +1151,7 @@ public class UserAuthMisoRequestManager implements RequestManager {
     return accessibles;
   }
 
-  @Override
-  public List<Pool> listPoolsBySampleId(long sampleId) throws IOException {
-    User user = getCurrentUser();
-    ArrayList<Pool> accessibles = new ArrayList<>();
-    for (Pool pool : backingManager.listPoolsBySampleId(sampleId)) {
-      if (pool.userCanRead(user)) {
-        accessibles.add(pool);
-      }
-    }
-    Collections.sort(accessibles);
-    return accessibles;
-  }
 
-  @Override
-  public List<PoolQC> listAllPoolQCsByPoolId(long poolId) throws IOException {
-    User user = getCurrentUser();
-    ArrayList<PoolQC> accessibles = new ArrayList<>();
-    for (PoolQC qc : backingManager.listAllPoolQCsByPoolId(poolId)) {
-      if (qc.userCanRead(user)) {
-        accessibles.add(qc);
-      }
-    }
-    Collections.sort(accessibles);
-    return accessibles;
-  }
   @Override
   public Collection<Study> listAllStudies() throws IOException {
     User user = getCurrentUser();
@@ -1341,13 +1318,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   public void deletePool(Pool pool) throws IOException {
     if (getCurrentUser().isAdmin()) {
       backingManager.deletePool(pool);
-    }
-  }
-
-  @Override
-  public void deletePoolQC(PoolQC poolQc) throws IOException {
-    if (getCurrentUser().isAdmin()) {
-      backingManager.deletePoolQC(poolQc);
     }
   }
 
@@ -2224,6 +2194,26 @@ public class UserAuthMisoRequestManager implements RequestManager {
       throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read write to Run " + run.getId());
     } else {
       backingManager.removeRunWatcher(run, watcher);
+    }
+  }
+
+  @Override
+  public void addPoolWatcher(Pool pool, User watcher) throws IOException {
+    if (!readCheck(pool)) {
+      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Pool " + pool.getId());
+    } else if (!pool.userCanRead(watcher)) {
+      throw new AuthorizationIOException("User " + watcher.getLoginName() + " cannot read Pool " + pool.getId());
+    } else {
+      backingManager.addPoolWatcher(pool, watcher);
+    }
+  }
+
+  @Override
+  public void removePoolWatcher(Pool pool, User watcher) throws IOException {
+    if (!writeCheck(pool)) {
+      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read write to Pool " + pool.getId());
+    } else {
+      backingManager.removePoolWatcher(pool, watcher);
     }
   }
 }

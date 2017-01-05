@@ -49,11 +49,11 @@ import org.springframework.web.servlet.ModelAndView;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractPool;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.illumina.IlluminaPool;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedDilutionException;
@@ -143,12 +143,12 @@ public class EditIlluminaPoolController {
 
   @RequestMapping(value = "/new", method = RequestMethod.GET)
   public ModelAndView newUnassignedIlluminaPool(ModelMap model) throws IOException {
-    return setupForm(AbstractPool.UNSAVED_ID, model);
+    return setupForm(PoolImpl.UNSAVED_ID, model);
   }
 
   @RequestMapping(value = "/new/{experimentId}", method = RequestMethod.GET)
   public ModelAndView newAssignedIlluminaPool(@PathVariable Long experimentId, ModelMap model) throws IOException {
-    return setupFormWithExperiment(AbstractPool.UNSAVED_ID, experimentId, model);
+    return setupFormWithExperiment(PoolImpl.UNSAVED_ID, experimentId, model);
   }
 
   @RequestMapping(value = "/{poolId}", method = RequestMethod.GET)
@@ -156,7 +156,7 @@ public class EditIlluminaPoolController {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Pool pool = null;
-      if (poolId == AbstractPool.UNSAVED_ID) {
+      if (poolId == PoolImpl.UNSAVED_ID) {
         pool = dataObjectFactory.getIlluminaPool(user);
         model.put("title", "New Illumina Pool");
       } else {
@@ -193,7 +193,7 @@ public class EditIlluminaPoolController {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Pool pool = null;
-      if (poolId == AbstractPool.UNSAVED_ID) {
+      if (poolId == PoolImpl.UNSAVED_ID) {
         pool = dataObjectFactory.getPool(user);
         pool.setPlatformType(PlatformType.ILLUMINA);
         model.put("title", "New Illumina Pool");

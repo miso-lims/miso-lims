@@ -31,6 +31,7 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
+import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 
@@ -216,10 +217,6 @@ public interface Pool extends SecurableByProfile, Comparable, Barcodable, Watcha
    */
   public void setQcPassed(Boolean qcPassed);
 
-  Date getLastUpdated();
-
-  void setLastUpdated(Date lastUpdated);
-
   public Collection<ChangeLog> getChangeLog();
 
   /**
@@ -277,5 +274,7 @@ public interface Pool extends SecurableByProfile, Comparable, Barcodable, Watcha
   void setDescription(String description);
 
   boolean hasDuplicateIndices();
+
+  void setWatchGroup(Group group);
 
 }
