@@ -208,11 +208,6 @@
                   </c:otherwise>
                 </c:choose>
               </tr>
-                <%--
-                <tr>
-                  <td>Paired: ${container.paired}</td>
-                </tr>
-                --%>
             </table>
             <div id='partitionErrorDiv'></div>
             <div id="partitionDiv">

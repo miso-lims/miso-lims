@@ -66,8 +66,6 @@ public abstract class AbstractSequencerPartitionContainer<T extends Partition> i
   // identificationBarcode is displayed as "serial number" to the user
   private String identificationBarcode;
   private String locationBarcode;
-  private Boolean paired = false;
-  private String name;
 
   @OneToOne(targetEntity = RunImpl.class)
   @JoinTable(name = "Run_SequencerPartitionContainer", joinColumns = {
@@ -147,16 +145,6 @@ public abstract class AbstractSequencerPartitionContainer<T extends Partition> i
   }
 
   @Override
-  public String getName() {
-    return name;
-  }
-
-  @Override
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  @Override
   public String getLabelText() {
     return getPlatform().getPlatformType().name() + " " + getValidationBarcode();
   }
@@ -176,12 +164,12 @@ public abstract class AbstractSequencerPartitionContainer<T extends Partition> i
     this.validationBarcode = validationBarcode;
   }
 
-  public Boolean getPaired() {
-    return paired;
-  }
-
-  public void setPaired(Boolean paired) {
-    this.paired = paired;
+  /**
+   * Containers don't have names, but they implement an interface which requires this method.
+   */
+  @Override
+  public String getName() {
+    throw new UnsupportedOperationException();
   }
 
   @Override
