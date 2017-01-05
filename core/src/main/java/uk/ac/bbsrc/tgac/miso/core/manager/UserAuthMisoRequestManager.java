@@ -242,15 +242,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public void saveSampleNote(Sample sample, Note note) throws IOException {
-    if (writeCheck(sample)) {
-      backingManager.saveSampleNote(sample, note);
-    } else {
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot write to this Sample");
-    }
-  }
-
-  @Override
   public long saveLibrary(Library library) throws IOException {
     if (writeCheck(library)) {
       return backingManager.saveLibrary(library);
@@ -1597,15 +1588,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
       backingManager.deleteLibraryNote(library, note);
     } else {
       throw new IOException("User " + getCurrentUser().getFullName() + " cannot write to this Library");
-    }
-  }
-
-  @Override
-  public void deleteSampleNote(Sample sample, Note note) throws IOException {
-    if (writeCheck(sample) && (getCurrentUser().isAdmin() || getCurrentUser().equals(note.getOwner()))) {
-      backingManager.deleteSampleNote(sample, note);
-    } else {
-      throw new IOException("User " + getCurrentUser().getFullName() + " cannot write to this Sample");
     }
   }
 

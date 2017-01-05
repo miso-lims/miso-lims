@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
@@ -703,6 +705,32 @@ public class DefaultSampleService implements SampleService {
   @Override
   public List<Sample> getByAlias(String alias) throws IOException {
     return new ArrayList<>(sampleDao.listByAlias(alias));
+  }
+
+  @Override
+  public void addNote(Sample sample, Note note) throws IOException {
+    Sample managed = sampleDao.get(sample.getId());
+    authorizationManager.throwIfNotWritable(managed);
+    note.setCreationDate(new Date());
+    note.setOwner(authorizationManager.getCurrentUser());
+    sampleDao.addNote(managed, note);
+  }
+
+  @Override
+  public void deleteNote(Sample sample, Long noteId) throws IOException {
+    if (noteId == null || noteId.equals(Note.UNSAVED_ID)) {
+      throw new IllegalArgumentException("Cannot delete an unsaved Note");
+    }
+    Sample managed = sampleDao.get(sample.getId());
+    authorizationManager.throwIfNotWritable(managed);
+    for (Note note : managed.getNotes()) {
+      if (note.getNoteId().equals(noteId)) {
+        authorizationManager.throwIfNonAdminOrMatchingOwner(note.getOwner());
+        sampleDao.deleteNote(managed, note);
+        return;
+      }
+    }
+    throw new IOException("Note " + noteId + " not found for Sample " + sample.getId());
   }
 
 }

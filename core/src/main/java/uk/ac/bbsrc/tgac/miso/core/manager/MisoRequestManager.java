@@ -1406,12 +1406,6 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public void deleteSampleNote(Sample sample, Note note) throws IOException {
-    Sample managed = sampleStore.get(sample.getId());
-    sampleStore.deleteNote(managed, note);
-  }
-
-  @Override
   public void deletePoolNote(Pool pool, Note note) throws IOException {
     Pool managed = poolStore.get(pool.getId());
     poolStore.deleteNote(managed, note);
@@ -1533,12 +1527,6 @@ public class MisoRequestManager implements RequestManager {
     } else {
       throw new IOException("No sampleQcStore available. Check that it has been declared in the Spring config.");
     }
-  }
-
-  @Override
-  public void saveSampleNote(Sample sample, Note note) throws IOException {
-    Sample managed = sampleStore.get(sample.getId());
-    sampleStore.addNote(managed, note);
   }
 
   @Override

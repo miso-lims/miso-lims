@@ -406,38 +406,6 @@ public class UserAuthMisoRequestManagerTestSuite {
 
   /**
    * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveSampleNote(uk.ac.bbsrc.tgac.miso.core.data.Sample, com.eaglegenomics.simlims.core.Note)}
-   * .
-   * 
-   * @throws IOException
-   */
-  @Test
-  public void testSaveSampleNote() throws IOException {
-    when(sample.userCanWrite(any(User.class))).thenReturn(true);
-    userAuthMisoRequestManager.saveSampleNote(sample, note);
-    verify(backingManager).saveSampleNote(sample, note);
-  }
-
-  /**
-   * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveSampleNote(uk.ac.bbsrc.tgac.miso.core.data.Sample, com.eaglegenomics.simlims.core.Note)}
-   * .
-   * 
-   * @throws IOException
-   */
-  @Test
-  public void testSaveSampleNoteThrows() throws IOException {
-    when(sample.userCanWrite(any(User.class))).thenReturn(false);
-
-    thrown.expect(IOException.class);
-    thrown.expectMessage("User null cannot write to this Sample");
-    userAuthMisoRequestManager.saveSampleNote(sample, note);
-
-    verify(backingManager, never()).saveSampleNote(sample, note);
-  }
-
-  /**
-   * Test method for
    * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveLibrary(uk.ac.bbsrc.tgac.miso.core.data.Library)} .
    * 
    * @throws IOException

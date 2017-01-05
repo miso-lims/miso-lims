@@ -83,4 +83,9 @@ public class MigrationAuthorizationManager implements AuthorizationManager {
     return new ArrayList<>(unfiltered);
   }
 
+  @Override
+  public void throwIfNonAdminOrMatchingOwner(User owner) throws IOException, AuthorizationException {
+
+  }
+
 }

@@ -89,6 +89,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.TaxonomyUtils;
+import uk.ac.bbsrc.tgac.miso.service.SampleService;
 
 /**
  * uk.ac.bbsrc.tgac.miso.spring.ajax
@@ -105,6 +106,8 @@ public class SampleControllerHelperService {
   private SecurityManager securityManager;
   @Autowired
   private RequestManager requestManager;
+  @Autowired
+  private SampleService sampleService;
   @Autowired
   private MisoFilesManager misoFileManager;
   @Autowired
@@ -438,20 +441,12 @@ public class SampleControllerHelperService {
     String text = json.getString("text");
 
     try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Sample sample = requestManager.getSampleById(sampleId);
+      Sample sample = sampleService.get(sampleId);
       Note note = new Note();
-
       internalOnly = internalOnly.equals("on") ? "true" : "false";
-
       note.setInternalOnly(Boolean.parseBoolean(internalOnly));
       note.setText(text);
-      note.setOwner(user);
-      note.setCreationDate(new Date());
-      sample.getNotes().add(note);
-      requestManager.saveSampleNote(sample, note);
-      sample.setLastModifier(user);
-      requestManager.saveSample(sample);
+      sampleService.addNote(sample, note);
     } catch (IOException e) {
       log.error("add sample note", e);
       return JSONUtils.SimpleJSONError(e.getMessage());
@@ -466,13 +461,8 @@ public class SampleControllerHelperService {
 
     try {
       Sample sample = requestManager.getSampleById(sampleId);
-      for (Note note : sample.getNotes()) {
-        if (note.getNoteId().equals(noteId)) {
-          requestManager.deleteSampleNote(sample, note);
-          return JSONUtils.SimpleJSONResponse("OK");
-        }
-      }
-      return JSONUtils.SimpleJSONError("Sample does not have note " + noteId + ". Cannot remove");
+      sampleService.deleteNote(sample, noteId);
+      return JSONUtils.SimpleJSONResponse("OK");
     } catch (IOException e) {
       log.error("cannot remove note", e);
       return JSONUtils.SimpleJSONError("Cannot remove note: " + e.getMessage());
@@ -639,12 +629,8 @@ public class SampleControllerHelperService {
         Note note = new Note();
         note.setInternalOnly(true);
         note.setText("Location changed from " + oldLocation + " to " + newLocation + " by " + user.getLoginName() + " on " + new Date());
-        note.setOwner(user);
-        note.setCreationDate(new Date());
-        sample.getNotes().add(note);
-        requestManager.saveSampleNote(sample, note);
-        sample.setLastModifier(user);
-        requestManager.saveSample(sample);
+        sampleService.addNote(sample, note);
+        sampleService.update(sample);
       } else {
         return JSONUtils.SimpleJSONError("New location barcode not recognised");
       }

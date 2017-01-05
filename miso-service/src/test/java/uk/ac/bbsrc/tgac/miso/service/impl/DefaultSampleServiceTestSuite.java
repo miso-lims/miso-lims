@@ -20,6 +20,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Lists;
@@ -490,6 +491,48 @@ public class DefaultSampleServiceTestSuite {
     Sample newSample = new SampleImpl();
     newSample.setProject(project);
     sut.confirmExternalNameUniqueForProjectIfRequired("String1", newSample);
+  }
+  
+  @Test
+  public void testAddNote() throws Exception {
+    Sample paramSample = new SampleImpl();
+    paramSample.setId(1L);
+    paramSample.setAlias("paramSample");
+    
+    Note note = new Note();
+    
+    Sample dbSample = new SampleImpl();
+    dbSample.setId(paramSample.getId());
+    dbSample.setAlias("persistedSample");
+    Mockito.when(sampleDao.get(paramSample.getId())).thenReturn(dbSample);
+    
+    sut.addNote(paramSample, note);
+    
+    Mockito.verify(authorizationManager).throwIfNotWritable(dbSample);
+    Mockito.verify(sampleDao).addNote(dbSample, note);
+  }
+
+  @Test
+  public void testDeleteNote() throws Exception {
+    Sample paramSample = new SampleImpl();
+    paramSample.setId(1L);
+    paramSample.setAlias("paramSample");
+
+    Sample dbSample = new SampleImpl();
+    dbSample.setId(paramSample.getId());
+    dbSample.setAlias("persistedSample");
+    Note note = new Note();
+    note.setNoteId(3L);
+    User owner = new UserImpl();
+    owner.setUserId(5L);
+    note.setOwner(owner);
+    dbSample.addNote(note);
+    Mockito.when(sampleDao.get(paramSample.getId())).thenReturn(dbSample);
+
+    sut.deleteNote(paramSample, note.getNoteId());
+
+    Mockito.verify(authorizationManager).throwIfNonAdminOrMatchingOwner(owner);
+    Mockito.verify(sampleDao).deleteNote(dbSample, note);
   }
 
   private Sample makePlainSample() {

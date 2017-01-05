@@ -6,6 +6,8 @@ import java.util.List;
 
 import org.hibernate.exception.ConstraintViolationException;
 
+import com.eaglegenomics.simlims.core.Note;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 
@@ -38,4 +40,8 @@ public interface SampleService {
   void confirmExternalNameUniqueForProjectIfRequired(String externalNames, Sample sample) throws IOException, ConstraintViolationException;
 
   Collection<Identity> getIdentitiesByExternalNameAndProject(String externalName, Long projectId) throws IOException;
+
+  public void addNote(Sample sample, Note note) throws IOException;
+
+  public void deleteNote(Sample sample, Long noteId) throws IOException;
 }

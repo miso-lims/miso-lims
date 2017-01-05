@@ -98,8 +98,6 @@ public interface RequestManager {
 
   public long saveSampleQC(SampleQC sampleQC) throws IOException;
 
-  public void saveSampleNote(Sample sample, Note note) throws IOException;
-
   public long saveEmPcrDilution(emPCRDilution dilution) throws IOException;
 
   public long saveLibrary(Library library) throws IOException;
@@ -570,8 +568,6 @@ public interface RequestManager {
   public void deleteKitNote(Kit kit, Note note) throws IOException;
 
   public void deleteLibraryNote(Library library, Note note) throws IOException;
-
-  public void deleteSampleNote(Sample sample, Note note) throws IOException;
 
   public void deletePoolNote(Pool pool, Note note) throws IOException;
 

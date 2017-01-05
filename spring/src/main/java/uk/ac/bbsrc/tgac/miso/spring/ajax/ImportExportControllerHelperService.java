@@ -41,11 +41,6 @@ import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpSession;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-import net.sourceforge.fluxion.ajax.Ajaxified;
-import net.sourceforge.fluxion.ajax.util.JSONUtils;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +49,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import net.sourceforge.fluxion.ajax.Ajaxified;
+import net.sourceforge.fluxion.ajax.util.JSONUtils;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
@@ -77,6 +77,7 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
 import uk.ac.bbsrc.tgac.miso.core.util.FormUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.service.SampleService;
 
 /**
  * uk.ac.bbsrc.tgac.miso.spring.ajax
@@ -91,6 +92,8 @@ public class ImportExportControllerHelperService {
   protected static final Logger log = LoggerFactory.getLogger(ImportExportControllerHelperService.class);
   @Autowired
   private RequestManager requestManager;
+  @Autowired
+  private SampleService sampleService;
   @Autowired
   private IndexService indexService;
   @Autowired
@@ -228,13 +231,10 @@ public class ImportExportControllerHelperService {
               List<String> notesList = Arrays.asList((jsonArrayElement.getString(8)).split(";"));
               for (String notetext : notesList) {
                 Note note = new Note();
-                note.setCreationDate(date);
-                note.setOwner(user);
                 note.setText(notetext);
                 if (!s.getNotes().contains(note)) {
-                  s.addNote(note);
-                  requestManager.saveSampleNote(s, note);
-                  requestManager.saveSample(s);
+                  sampleService.addNote(s, note);
+                  sampleService.update(s);
                   log.info("Added sample Note for Well: " + note.toString());
                 }
               }
@@ -249,7 +249,6 @@ public class ImportExportControllerHelperService {
   }
 
   public JSONObject confirmLibrariesPoolsUpload(HttpSession session, JSONObject json) throws Exception {
-    Date date = new Date();
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     JSONObject jsonObject = JSONObject.fromObject(json.get("sheet"));
     Map<String, Pool> pools = new HashMap<String, Pool>();
