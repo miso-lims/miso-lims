@@ -32,7 +32,6 @@
     <version>0.2.47-SNAPSHOT</version>
   </parent>
   <artifactId>runstats-server</artifactId>
-  <version>0.2.46</version>
   <packaging>jar</packaging>
   <name>runstats-server</name>
   <url>http://maven.apache.org</url>
