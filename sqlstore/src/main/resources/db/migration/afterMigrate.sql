@@ -494,6 +494,37 @@ FOR EACH ROW
   END IF;
   END//
 
+DROP TRIGGER IF EXISTS LibraryDilutionChange//
+CREATE TRIGGER LibraryDilutionChange BEFORE UPDATE ON LibraryDilution
+FOR EACH ROW
+  BEGIN
+    DECLARE log_message varchar(500) CHARACTER SET utf8;
+    SET log_message = CONCAT_WS(', ',
+      CASE WHEN NEW.concentration <> OLD.concentration THEN CONCAT('concentration: ', OLD.concentration, ' → ', NEW.concentration) END,
+      CASE WHEN (NEW.identificationBarcode IS NULL) <> (OLD.identificationBarcode IS NULL) OR NEW.identificationBarcode <> OLD.identificationBarcode THEN CONCAT('barcode: ', COALESCE(OLD.identificationBarcode, 'n/a'), ' → ', COALESCE(NEW.identificationBarcode, 'n/a')) END,
+      CASE WHEN (NEW.targetedSequencingId IS NULL) <> (OLD.targetedSequencingId IS NULL) OR NEW.targetedSequencingId <> OLD.targetedSequencingId THEN CONCAT('targeted sequencing: ', COALESCE((SELECT alias FROM TargetedSequencing WHERE targetedSequencingId = OLD.targetedSequencingId), 'n/a'), ' → ', COALESCE((SELECT alias FROM TargetedSequencing WHERE targetedSequencingId = NEW.targetedSequencingId), 'n/a')) END);
+    IF log_message IS NOT NULL AND log_message <> '' THEN
+      INSERT INTO LibraryChangeLog(libraryId, columnsChanged, userId, message) VALUES (
+      NEW.library_libraryId,
+        COALESCE(CONCAT_WS(',',
+          CASE WHEN NEW.concentration <> OLD.concentration THEN 'concentration' END,
+          CASE WHEN (NEW.identificationBarcode IS NULL) <> (OLD.identificationBarcode IS NULL) OR NEW.identificationBarcode <> OLD.identificationBarcode THEN 'identificationBarcode' END,
+          CASE WHEN (NEW.targetedSequencingId IS NULL) <> (OLD.targetedSequencingId IS NULL) OR NEW.targetedSequencingId <> OLD.targetedSequencingId THEN 'targetedSequencingId' END
+        ), ''),
+        (SELECT lastModifier FROM Library WHERE libraryId = NEW.library_libraryId),
+        log_message
+      );
+    END IF;
+  END//
+
+DROP TRIGGER IF EXISTS LibraryDilutionInsert//
+CREATE TRIGGER LibraryDilutionInsert AFTER INSERT ON LibraryDilution
+FOR EACH ROW
+  INSERT INTO LibraryChangeLog(libraryId, columnsChanged, userId, message) VALUES (
+    NEW.library_libraryId,
+    '',
+    (SELECT lastModifier FROM Library WHERE libraryId = NEW.library_libraryId),
+    COALESCE('Library dilution ', NEW.name,' created.'))//
 
 DROP TRIGGER IF EXISTS BeforeInsertLibrary//
 CREATE TRIGGER BeforeInsertLibrary BEFORE INSERT ON Library
