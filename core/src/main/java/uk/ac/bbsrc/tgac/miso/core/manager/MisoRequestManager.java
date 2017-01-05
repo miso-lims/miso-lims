@@ -102,7 +102,6 @@ import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignDao;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
-import uk.ac.bbsrc.tgac.miso.core.store.PartitionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PlatformStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
@@ -145,7 +144,6 @@ public class MisoRequestManager implements RequestManager {
   @Autowired
   private LibraryQcStore libraryQcStore;
   @Autowired
-  private PartitionStore partitionStore;
   @Autowired
   private PlatformStore platformStore;
   @Autowired
@@ -235,8 +233,6 @@ public class MisoRequestManager implements RequestManager {
     this.namingScheme = namingScheme;
   }
 
-  public void setPartitionStore(PartitionStore partitionStore) {
-    this.partitionStore = partitionStore;
   }
 
   public void setPlatformStore(PlatformStore platformStore) {
@@ -326,7 +322,6 @@ public class MisoRequestManager implements RequestManager {
     }
   }
 
-  @SuppressWarnings("rawtypes")
   @Override
   public Collection<Pool> listAllPoolsBySearch(String query) throws IOException {
     if (poolStore != null) {
@@ -336,7 +331,6 @@ public class MisoRequestManager implements RequestManager {
     }
   }
 
-  @SuppressWarnings("rawtypes")
   @Override
   public Collection<Pool> listAllPoolsWithLimit(int limit) throws IOException {
     if (poolStore != null) {
@@ -1359,7 +1353,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public void deleteContainer(SequencerPartitionContainer container) throws IOException {
+  public void deleteContainer(SequencerPartitionContainer<SequencerPoolPartition> container) throws IOException {
     if (sequencerPartitionContainerStore != null) {
       if (!sequencerPartitionContainerStore.remove(container)) {
         throw new IOException("Unable to delete container.");
@@ -1712,7 +1706,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public long saveSequencerPartitionContainer(SequencerPartitionContainer container) throws IOException {
+  public long saveSequencerPartitionContainer(SequencerPartitionContainer<SequencerPoolPartition>sourceContainer) throws IOException {
     if (sequencerPartitionContainerStore != null) {
       long id;
       if (container.getId() == AbstractRun.UNSAVED_ID) {

@@ -36,7 +36,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
  */
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public interface Platform extends Comparable {
+public interface Platform extends Comparable<Platform> {
   /**
    * Returns the platformId of this Platform object.
    * 

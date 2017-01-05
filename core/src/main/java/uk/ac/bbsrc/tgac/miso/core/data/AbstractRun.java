@@ -318,7 +318,7 @@ public abstract class AbstractRun implements Run {
     try {
       runQC.setRun(this);
     } catch (MalformedRunException e) {
-      log.error("set run", e);
+      log.error("set run QC", e);
     }
     fireRunQcAddedEvent();
   }
@@ -541,8 +541,7 @@ public abstract class AbstractRun implements Run {
   }
 
   @Override
-  public int compareTo(Object o) {
-    Run t = (Run) o;
+  public int compareTo(Run t) {
     if (getId() < t.getId()) return -1;
     if (getId() > t.getId()) return 1;
     return 0;

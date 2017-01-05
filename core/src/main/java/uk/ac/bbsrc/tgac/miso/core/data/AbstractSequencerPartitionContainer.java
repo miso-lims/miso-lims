@@ -235,7 +235,7 @@ public abstract class AbstractSequencerPartitionContainer<T extends Partition> i
     if (obj == null) return false;
     if (obj == this) return true;
     if (!(obj instanceof SequencerPartitionContainer)) return false;
-    SequencerPartitionContainer them = (SequencerPartitionContainer) obj;
+    SequencerPartitionContainer<?> them = (SequencerPartitionContainer<?>) obj;
     // If not saved, then compare resolved actual objects. Otherwise just compare IDs.
     if (getId() == AbstractSequencerPartitionContainer.UNSAVED_ID || them.getId() == AbstractSequencerPartitionContainer.UNSAVED_ID) {
       return getIdentificationBarcode().equals(them.getIdentificationBarcode());
@@ -267,8 +267,7 @@ public abstract class AbstractSequencerPartitionContainer<T extends Partition> i
   }
 
   @Override
-  public int compareTo(Object o) {
-    SequencerPartitionContainer t = (SequencerPartitionContainer) o;
+  public int compareTo(SequencerPartitionContainer<?> t) {
     if (getId() < t.getId()) return -1;
     if (getId() > t.getId()) return 1;
     return 0;

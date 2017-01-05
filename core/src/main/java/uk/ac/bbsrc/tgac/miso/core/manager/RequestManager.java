@@ -120,7 +120,7 @@ public interface RequestManager {
 
   public long saveStudy(Study study) throws IOException;
 
-  public long saveSequencerPartitionContainer(SequencerPartitionContainer container) throws IOException;
+  public long saveSequencerPartitionContainer(SequencerPartitionContainer<SequencerPoolPartition> container) throws IOException;
 
   public long savePlatform(Platform platform) throws IOException;
 
@@ -553,7 +553,7 @@ public interface RequestManager {
 
   public void deletePool(Pool pool) throws IOException;
 
-  public void deleteContainer(SequencerPartitionContainer container) throws IOException;
+  public void deleteContainer(SequencerPartitionContainer<SequencerPoolPartition> container) throws IOException;
 
   public void deleteRunNote(Run run, Long noteId) throws IOException;
 
