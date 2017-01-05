@@ -38,7 +38,10 @@ import javax.persistence.Id;
  * @author Rob Davey
  * @since 0.0.2
  */
-public class LibraryStrategyType implements Comparable, Serializable {
+public class LibraryStrategyType implements Comparable<LibraryStrategyType>, Serializable {
+
+  private static final long serialVersionUID = 1L;
+
   /** Field UNSAVED_ID */
   public static final Long UNSAVED_ID = 0L;
 
@@ -132,9 +135,7 @@ public class LibraryStrategyType implements Comparable, Serializable {
   }
 
   @Override
-  public int compareTo(Object o) {
-    LibraryStrategyType t = (LibraryStrategyType) o;
-
+  public int compareTo(LibraryStrategyType t) {
     int name = getName().compareTo(t.getName());
     if (name != 0) return name;
 

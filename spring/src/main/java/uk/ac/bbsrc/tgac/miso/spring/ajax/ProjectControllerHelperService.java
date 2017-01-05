@@ -96,7 +96,7 @@ public class ProjectControllerHelperService {
   @Autowired
   private IssueTrackerManager issueTrackerManager;
   @Autowired
-  private PrintManager<MisoPrintService, Queue<?>> printManager;
+  private PrintManager<MisoPrintService<?, ?, ?>, Queue<?>> printManager;
   @Autowired
   private MisoFilesManager misoFileManager;
   @Autowired
@@ -124,7 +124,7 @@ public class ProjectControllerHelperService {
     this.misoFileManager = misoFileManager;
   }
 
-  public void setPrintManager(PrintManager<MisoPrintService, Queue<?>> printManager) {
+  public void setPrintManager(PrintManager<MisoPrintService<?, ?, ?>, Queue<?>> printManager) {
     this.printManager = printManager;
   }
 
@@ -923,7 +923,6 @@ public class ProjectControllerHelperService {
     final StringBuilder sb = new StringBuilder();
     final JSONObject j = new JSONObject();
     try {
-      final User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       final ProjectOverview overview = requestManager.getProjectOverviewById(overviewId);
       sb.append("<ul class='bullets' style='margin-left: -30px;'>");
       for (final User theUser : overview.getWatchers()) {

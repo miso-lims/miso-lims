@@ -107,7 +107,7 @@ public class PoolControllerHelperService {
   @Autowired
   private BarcodeFactory barcodeFactory;
   @Autowired
-  private PrintManager<MisoPrintService, Queue<?>> printManager;
+  private PrintManager<MisoPrintService<?, ?, ?>, Queue<?>> printManager;
   @Autowired
   private ExperimentService experimentService;
 
@@ -757,7 +757,7 @@ public class PoolControllerHelperService {
     this.misoFileManager = misoFileManager;
   }
 
-  public void setPrintManager(PrintManager<MisoPrintService, Queue<?>> printManager) {
+  public void setPrintManager(PrintManager<MisoPrintService<?, ?, ?>, Queue<?>> printManager) {
     this.printManager = printManager;
   }
 }
