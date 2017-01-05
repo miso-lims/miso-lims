@@ -27,8 +27,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 
-import com.eaglegenomics.simlims.core.Note;
-
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
@@ -120,9 +118,5 @@ public interface ProjectStore extends Store<Project>, Cascadable, Remover<Projec
    * @throws IOException
    */
   public Map<String, Integer> getProjectColumnSizes() throws IOException;
-
-  public void addNote(ProjectOverview projectOverview, Note note) throws IOException;
-
-  public void deleteNote(ProjectOverview projectOverview, Note note) throws IOException;
 
 }

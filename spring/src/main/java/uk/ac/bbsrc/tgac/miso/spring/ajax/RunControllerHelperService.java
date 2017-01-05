@@ -897,13 +897,8 @@ public class RunControllerHelperService {
 
     try {
       Run run = requestManager.getRunById(runId);
-      for (Note note : run.getNotes()) {
-        if (note.getNoteId().equals(noteId)) {
-          requestManager.deleteRunNote(run, note);
-          return JSONUtils.SimpleJSONResponse("OK");
-        }
-      }
-      return JSONUtils.SimpleJSONError("Sample does not have note " + noteId + ". Cannot remove");
+      requestManager.deleteRunNote(run, noteId);
+      return JSONUtils.SimpleJSONResponse("OK");
     } catch (IOException e) {
       log.error("delete run note", e);
       return JSONUtils.SimpleJSONError("Cannot remove note: " + e.getMessage());

@@ -31,7 +31,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.store.SecurityStore;
 
@@ -529,18 +528,4 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
     return fetchSqlStore((Sample) query.uniqueResult());
   }
 
-  @Override
-  public void addNote(Sample sample, Note note) throws IOException {
-    sample.addNote(note);
-    save(sample);
-  }
-
-  @Override
-  public void deleteNote(Sample sample, Note note) throws IOException {
-    if (!sample.getNotes().remove(note)) {
-      throw new IllegalArgumentException("Note does not belong to this Sample");
-    } else {
-      save(sample);
-    }
-  }
 }

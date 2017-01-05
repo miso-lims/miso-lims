@@ -46,7 +46,6 @@ import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.store.SecurityStore;
@@ -538,30 +537,5 @@ public class SQLRunDAOTest extends AbstractDAOTest {
     assertEquals(0, run.getWatchers().size());
     run = dao.get(1L);
     assertEquals(0, run.getWatchers().size());
-  }
-
-  @Test
-  public void testNotes() throws Exception {
-    long runId = 1L;
-    String message = "test message";
-    Note note = new Note();
-    note.setText(message);
-
-    Run run = dao.get(runId);
-    assertNotNull(run);
-    assertEquals(0, run.getNotes().size());
-
-    dao.addNote(run, note);
-    Run runWithNote = dao.get(runId);
-    assertEquals(1, runWithNote.getNotes().size());
-    Note savedNote = runWithNote.getNotes().iterator().next();
-    assertEquals(message, savedNote.getText());
-    Long noteId = savedNote.getNoteId();
-    assertNotNull(sessionFactory.getCurrentSession().get(Note.class, noteId));
-
-    dao.deleteNote(runWithNote, savedNote);
-    Run runNoteDeleted = dao.get(runId);
-    assertEquals(0, runNoteDeleted.getNotes().size());
-    assertNull(sessionFactory.getCurrentSession().get(Note.class, noteId));
   }
 }

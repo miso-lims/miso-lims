@@ -509,7 +509,10 @@ public class DefaultSampleServiceTestSuite {
     sut.addNote(paramSample, note);
     
     Mockito.verify(authorizationManager).throwIfNotWritable(dbSample);
-    Mockito.verify(sampleDao).addNote(dbSample, note);
+    ArgumentCaptor<Sample> capture = ArgumentCaptor.forClass(Sample.class);
+    Mockito.verify(sampleDao).save(capture.capture());
+    Sample savedSample = capture.getValue();
+    assertEquals(1, savedSample.getNotes().size());
   }
 
   @Test
@@ -532,7 +535,10 @@ public class DefaultSampleServiceTestSuite {
     sut.deleteNote(paramSample, note.getNoteId());
 
     Mockito.verify(authorizationManager).throwIfNonAdminOrMatchingOwner(owner);
-    Mockito.verify(sampleDao).deleteNote(dbSample, note);
+    ArgumentCaptor<Sample> capture = ArgumentCaptor.forClass(Sample.class);
+    Mockito.verify(sampleDao).save(capture.capture());
+    Sample savedSample = capture.getValue();
+    assertTrue(savedSample.getNotes().isEmpty());
   }
 
   private Sample makePlainSample() {

@@ -22,7 +22,6 @@ import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.store.SecurityStore;
@@ -586,32 +585,6 @@ public class SQLPoolDAOTest extends AbstractDAOTest {
     assertNotNull(newPool);
     assertEquals(oldPool.getAlias(), newPool.getAlias());
     assertEquals(oldPool.getVolume(), newPool.getVolume());
-  }
-
-  @Test
-  public void testNotes() throws Exception {
-    long runId = 1L;
-    String message = "test message";
-    Note note = new Note();
-    note.setText(message);
-
-    Pool pool = dao.get(runId);
-    assertNotNull(pool);
-    assertEquals(0, pool.getNotes().size());
-
-    dao.addNote(pool, note);
-    Pool poolWithNote = dao.get(runId);
-    assertEquals(1, poolWithNote.getNotes().size());
-    Note savedNote = poolWithNote.getNotes().iterator().next();
-    assertEquals(message, savedNote.getText());
-    // TODO: uncomment after Hibernatized
-    // Long noteId = savedNote.getNoteId();
-    // assertNotNull(sessionFactory.getCurrentSession().get(Note.class, noteId));
-
-    dao.deleteNote(poolWithNote, savedNote);
-    Pool poolNoteDeleted = dao.get(runId);
-    assertEquals(0, poolNoteDeleted.getNotes().size());
-    // assertNull(sessionFactory.getCurrentSession().get(Note.class, noteId));
   }
 
 }

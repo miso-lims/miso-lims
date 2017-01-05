@@ -1388,33 +1388,103 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public void deleteRunNote(Run run, Note note) throws IOException {
+  public void deleteRunNote(Run run, Long noteId) throws IOException {
+    if (noteId == null || noteId.equals(Note.UNSAVED_ID)) {
+      throw new IllegalArgumentException("Cannot delete an unsaved Note");
+    }
     Run managed = runStore.get(run.getId());
-    runStore.deleteNote(managed, note);
+    Note deleteNote = null;
+    for (Note note : managed.getNotes()) {
+      if (note.getNoteId().equals(noteId)) {
+        deleteNote = note;
+        break;
+      }
+    }
+    if (deleteNote == null) {
+      throw new IOException("Note " + noteId + " not found for Run " + run.getId());
+    }
+    managed.getNotes().remove(deleteNote);
+    runStore.save(managed);
   }
 
   @Override
-  public void deleteKitNote(Kit kit, Note note) throws IOException {
+  public void deleteKitNote(Kit kit, Long noteId) throws IOException {
+    if (noteId == null || noteId.equals(Note.UNSAVED_ID)) {
+      throw new IllegalArgumentException("Cannot delete an unsaved Note");
+    }
     Kit managed = kitStore.get(kit.getId());
-    kitStore.deleteNote(managed, note);
+    Note deleteNote = null;
+    for (Note note : managed.getNotes()) {
+      if (note.getNoteId().equals(noteId)) {
+        deleteNote = note;
+        break;
+      }
+    }
+    if (deleteNote == null) {
+      throw new IOException("Note " + noteId + " not found for Kit " + kit.getId());
+    }
+    managed.getNotes().remove(deleteNote);
+    kitStore.save(managed);
   }
 
   @Override
-  public void deleteLibraryNote(Library library, Note note) throws IOException {
+  public void deleteLibraryNote(Library library, Long noteId) throws IOException {
+    if (noteId == null || noteId.equals(Note.UNSAVED_ID)) {
+      throw new IllegalArgumentException("Cannot delete an unsaved Note");
+    }
     Library managed = libraryStore.get(library.getId());
-    libraryStore.deleteNote(managed, note);
+    Note deleteNote = null;
+    for (Note note : managed.getNotes()) {
+      if (note.getNoteId().equals(noteId)) {
+        deleteNote = note;
+        break;
+      }
+    }
+    if (deleteNote == null) {
+      throw new IOException("Note " + noteId + " not found for Library " + library.getId());
+    }
+    managed.getNotes().remove(deleteNote);
+    libraryStore.save(managed);
   }
 
   @Override
-  public void deletePoolNote(Pool pool, Note note) throws IOException {
+  public void deletePoolNote(Pool pool, Long noteId) throws IOException {
+    if (noteId == null || noteId.equals(Note.UNSAVED_ID)) {
+      throw new IllegalArgumentException("Cannot delete an unsaved Note");
+    }
     Pool managed = poolStore.get(pool.getId());
-    poolStore.deleteNote(managed, note);
+    Note deleteNote = null;
+    for (Note note : managed.getNotes()) {
+      if (note.getNoteId().equals(noteId)) {
+        deleteNote = note;
+        break;
+      }
+    }
+    if (deleteNote == null) {
+      throw new IOException("Note " + noteId + " not found for Pool " + pool.getId());
+    }
+    managed.getNotes().remove(deleteNote);
+    poolStore.save(managed);
   }
 
   @Override
-  public void deleteProjectOverviewNote(ProjectOverview projectOverview, Note note) throws IOException {
+  public void deleteProjectOverviewNote(ProjectOverview projectOverview, Long noteId) throws IOException {
+    if (noteId == null || noteId.equals(Note.UNSAVED_ID)) {
+      throw new IllegalArgumentException("Cannot delete an unsaved Note");
+    }
     ProjectOverview managed = projectStore.getProjectOverviewById(projectOverview.getId());
-    projectStore.deleteNote(managed, note);
+    Note deleteNote = null;
+    for (Note note : managed.getNotes()) {
+      if (note.getNoteId().equals(noteId)) {
+        deleteNote = note;
+        break;
+      }
+    }
+    if (deleteNote == null) {
+      throw new IOException("Note " + noteId + " not found for ProjectOverview " + projectOverview.getId());
+    }
+    managed.getNotes().remove(deleteNote);
+    projectStore.saveOverview(managed);
   }
 
   @Override
@@ -1451,7 +1521,10 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public void saveProjectOverviewNote(ProjectOverview overview, Note note) throws IOException {
     ProjectOverview managed = projectStore.getProjectOverviewById(overview.getId());
-    projectStore.addNote(managed, note);
+    note.setCreationDate(new Date());
+    // TODO: when moved to Service: note.setOwner(authorizationManager.getCurrentUser());
+    managed.getNotes().add(note);
+    projectStore.saveOverview(managed);
   }
 
   @Override
@@ -1502,13 +1575,19 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public void saveRunNote(Run run, Note note) throws IOException {
     Run managed = runStore.get(run.getId());
-    runStore.addNote(managed, note);
+    note.setCreationDate(new Date());
+    // TODO: when moved to Service: note.setOwner(authorizationManager.getCurrentUser());
+    managed.addNote(note);
+    runStore.save(managed);
   }
 
   @Override
   public void saveKitNote(Kit kit, Note note) throws IOException {
     Kit managed = kitStore.get(kit.getId());
-    kitStore.addNote(managed, note);
+    note.setCreationDate(new Date());
+    // TODO: when moved to Service: note.setOwner(authorizationManager.getCurrentUser());
+    managed.addNote(note);
+    kitStore.save(managed);
   }
 
   @Override
@@ -1589,7 +1668,10 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public void saveLibraryNote(Library library, Note note) throws IOException {
     Library managed = libraryStore.get(library.getId());
-    libraryStore.addNote(managed, note);
+    note.setCreationDate(new Date());
+    // TODO: when moved to Service: note.setOwner(authorizationManager.getCurrentUser());
+    managed.getNotes().add(note);
+    libraryStore.save(managed);
   }
 
   @Override
@@ -1643,7 +1725,10 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public void savePoolNote(Pool pool, Note note) throws IOException {
     Pool managed = poolStore.get(pool.getId());
-    poolStore.addNote(managed, note);
+    note.setCreationDate(new Date());
+    // TODO: when moved to Service: note.setOwner(authorizationManager.getCurrentUser());
+    managed.addNote(note);
+    poolStore.save(managed);
   }
 
   @Override

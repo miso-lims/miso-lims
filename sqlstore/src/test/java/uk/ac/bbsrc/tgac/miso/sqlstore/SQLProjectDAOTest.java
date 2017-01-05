@@ -27,7 +27,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
@@ -345,32 +344,6 @@ public class SQLProjectDAOTest extends AbstractDAOTest {
   @Test
   public void testGetProjectColumnSizes() {
     // TODO : Implement
-  }
-
-  @Test
-  public void testNotes() throws Exception {
-    long overviewId = 1L;
-    String message = "test message";
-    Note note = new Note();
-    note.setText(message);
-
-    ProjectOverview overview = projectDAO.getProjectOverviewById(overviewId);
-    assertNotNull(overview);
-    assertEquals(0, overview.getNotes().size());
-
-    projectDAO.addNote(overview, note);
-    ProjectOverview overviewWithNote = projectDAO.getProjectOverviewById(overviewId);
-    assertEquals(1, overviewWithNote.getNotes().size());
-    Note savedNote = overviewWithNote.getNotes().iterator().next();
-    assertEquals(message, savedNote.getText());
-    // TODO: uncomment after Hibernatized
-    // Long noteId = savedNote.getNoteId();
-    // assertNotNull(sessionFactory.getCurrentSession().get(Note.class, noteId));
-
-    projectDAO.deleteNote(overviewWithNote, savedNote);
-    ProjectOverview overviewNoteDeleted = projectDAO.getProjectOverviewById(overviewId);
-    assertEquals(0, overviewNoteDeleted.getNotes().size());
-    // assertNull(sessionFactory.getCurrentSession().get(Note.class, noteId));
   }
 
 }

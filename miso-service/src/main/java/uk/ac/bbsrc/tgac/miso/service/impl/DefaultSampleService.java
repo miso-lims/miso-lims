@@ -713,7 +713,8 @@ public class DefaultSampleService implements SampleService {
     authorizationManager.throwIfNotWritable(managed);
     note.setCreationDate(new Date());
     note.setOwner(authorizationManager.getCurrentUser());
-    sampleDao.addNote(managed, note);
+    managed.addNote(note);
+    sampleDao.save(managed);
   }
 
   @Override
@@ -723,14 +724,19 @@ public class DefaultSampleService implements SampleService {
     }
     Sample managed = sampleDao.get(sample.getId());
     authorizationManager.throwIfNotWritable(managed);
+    Note deleteNote = null;
     for (Note note : managed.getNotes()) {
       if (note.getNoteId().equals(noteId)) {
-        authorizationManager.throwIfNonAdminOrMatchingOwner(note.getOwner());
-        sampleDao.deleteNote(managed, note);
-        return;
+        deleteNote = note;
+        break;
       }
     }
-    throw new IOException("Note " + noteId + " not found for Sample " + sample.getId());
+    if (deleteNote == null) {
+      throw new IOException("Note " + noteId + " not found for Sample " + sample.getId());
+    }
+    authorizationManager.throwIfNonAdminOrMatchingOwner(deleteNote.getOwner());
+    managed.getNotes().remove(deleteNote);
+    sampleDao.save(managed);
   }
 
 }

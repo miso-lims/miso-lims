@@ -563,15 +563,15 @@ public interface RequestManager {
 
   public void deleteContainer(SequencerPartitionContainer container) throws IOException;
 
-  public void deleteRunNote(Run run, Note note) throws IOException;
+  public void deleteRunNote(Run run, Long noteId) throws IOException;
 
-  public void deleteKitNote(Kit kit, Note note) throws IOException;
+  public void deleteKitNote(Kit kit, Long noteId) throws IOException;
 
-  public void deleteLibraryNote(Library library, Note note) throws IOException;
+  public void deleteLibraryNote(Library library, Long noteId) throws IOException;
 
-  public void deletePoolNote(Pool pool, Note note) throws IOException;
+  public void deletePoolNote(Pool pool, Long noteId) throws IOException;
 
-  public void deleteProjectOverviewNote(ProjectOverview projectOverview, Note note) throws IOException;
+  public void deleteProjectOverviewNote(ProjectOverview projectOverview, Long noteId) throws IOException;
 
   public void deleteBox(Box box) throws IOException;
 

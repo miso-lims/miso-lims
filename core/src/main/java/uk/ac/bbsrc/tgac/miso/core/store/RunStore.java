@@ -28,7 +28,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
@@ -159,9 +158,5 @@ public interface RunStore extends Store<Run>, Remover<Run> {
   public void addWatcher(Run run, User watcher);
 
   public void removeWatcher(Run run, User watcher);
-
-  public void addNote(Run run, Note note) throws IOException;
-
-  public void deleteNote(Run run, Note note) throws IOException;
 
 }

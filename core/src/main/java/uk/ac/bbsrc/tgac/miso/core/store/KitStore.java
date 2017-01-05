@@ -27,8 +27,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import com.eaglegenomics.simlims.core.Note;
-
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
@@ -61,9 +59,5 @@ public interface KitStore extends Store<Kit> {
    * @throws IOException
    */
   public Map<String, Integer> getKitDescriptorColumnSizes() throws IOException;
-
-  public void addNote(Kit kit, Note note) throws IOException;
-
-  public void deleteNote(Kit kit, Note note) throws IOException;
 
 }

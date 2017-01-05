@@ -206,13 +206,8 @@ public class ProjectControllerHelperService {
 
     try {
       final ProjectOverview po = requestManager.getProjectOverviewById(overviewId);
-      for (Note note : po.getNotes()) {
-        if (note.getNoteId().equals(noteId)) {
-          requestManager.deleteProjectOverviewNote(po, note);
-          return JSONUtils.SimpleJSONResponse("OK");
-        }
-      }
-      return JSONUtils.SimpleJSONError("Project Overview does not have note " + noteId + ". Cannot remove");
+      requestManager.deleteProjectOverviewNote(po, noteId);
+      return JSONUtils.SimpleJSONResponse("OK");
     } catch (final IOException e) {
       log.error("delete project overview", e);
       return JSONUtils.SimpleJSONError("Cannot remove note: " + e.getMessage());

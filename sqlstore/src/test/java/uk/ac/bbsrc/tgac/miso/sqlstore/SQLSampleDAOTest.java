@@ -29,7 +29,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.store.SecurityStore;
@@ -398,31 +397,6 @@ public class SQLSampleDAOTest extends AbstractDAOTest {
     sessionFactory.getCurrentSession().refresh(s2);
     assertEquals(new Integer(1), s1.getSiblingNumber());
     assertEquals(new Integer(2), s2.getSiblingNumber());
-  }
-
-  @Test
-  public void testNotes() throws Exception {
-    long runId = 1L;
-    String message = "test message";
-    Note note = new Note();
-    note.setText(message);
-
-    Sample sample = dao.get(runId);
-    assertNotNull(sample);
-    assertEquals(0, sample.getNotes().size());
-
-    dao.addNote(sample, note);
-    Sample sampleWithNote = dao.get(runId);
-    assertEquals(1, sampleWithNote.getNotes().size());
-    Note savedNote = sampleWithNote.getNotes().iterator().next();
-    assertEquals(message, savedNote.getText());
-    Long noteId = savedNote.getNoteId();
-    assertNotNull(sessionFactory.getCurrentSession().get(Note.class, noteId));
-
-    dao.deleteNote(sampleWithNote, savedNote);
-    Sample sampleNoteDeleted = dao.get(runId);
-    assertEquals(0, sampleNoteDeleted.getNotes().size());
-    assertNull(sessionFactory.getCurrentSession().get(Note.class, noteId));
   }
 
 }

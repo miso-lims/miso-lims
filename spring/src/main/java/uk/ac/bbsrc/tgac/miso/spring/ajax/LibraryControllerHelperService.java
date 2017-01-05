@@ -177,13 +177,8 @@ public class LibraryControllerHelperService {
 
     try {
       Library library = requestManager.getLibraryById(libraryId);
-      for (Note note : library.getNotes()) {
-        if (note.getNoteId().equals(noteId)) {
-          requestManager.deleteLibraryNote(library, note);
-          return JSONUtils.SimpleJSONResponse("OK");
-        }
-      }
-      return JSONUtils.SimpleJSONError("Library does not have note " + noteId + ". Cannot remove");
+      requestManager.deleteLibraryNote(library, noteId);
+      return JSONUtils.SimpleJSONResponse("OK");
     } catch (IOException e) {
       log.error("delete library note", e);
       return JSONUtils.SimpleJSONError("Cannot remove note: " + e.getMessage());

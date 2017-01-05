@@ -28,8 +28,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import com.eaglegenomics.simlims.core.Note;
-
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 
@@ -170,9 +168,5 @@ public interface SampleStore extends Store<Sample>, Cascadable, Remover<Sample> 
    *           when the objects cannot be retrieved
    */
   Collection<Sample> getByIdList(List<Long> idList) throws IOException;
-
-  public void addNote(Sample sample, Note note) throws IOException;
-
-  public void deleteNote(Sample sample, Note note) throws IOException;
 
 }

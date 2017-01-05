@@ -199,6 +199,7 @@ public class UserAuthMisoRequestManager implements RequestManager {
   @Override
   public void saveProjectOverviewNote(ProjectOverview overview, Note note) throws IOException {
     if (writeCheck(overview.getProject())) {
+      note.setOwner(getCurrentUser());
       backingManager.saveProjectOverviewNote(overview, note);
     } else {
       throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot write to the parent Project");
@@ -262,6 +263,7 @@ public class UserAuthMisoRequestManager implements RequestManager {
   @Override
   public void saveLibraryNote(Library library, Note note) throws IOException {
     if (writeCheck(library)) {
+      note.setOwner(getCurrentUser());
       backingManager.saveLibraryNote(library, note);
     } else {
       throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot write to this Library");
@@ -298,6 +300,7 @@ public class UserAuthMisoRequestManager implements RequestManager {
   @Override
   public void savePoolNote(Pool pool, Note note) throws IOException {
     if (writeCheck(pool)) {
+      note.setOwner(getCurrentUser());
       backingManager.savePoolNote(pool, note);
     } else {
       throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot write to this Pool");
@@ -1565,45 +1568,46 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public void deleteRunNote(Run run, Note note) throws IOException {
-    if (writeCheck(run) && (getCurrentUser().isAdmin() || getCurrentUser().equals(note.getOwner()))) {
-      backingManager.deleteRunNote(run, note);
+  public void deleteRunNote(Run run, Long noteId) throws IOException {
+    if (writeCheck(run)) {
+      // TODO: when Hibernatized, should call authorizationManager.throwIfNonAdminOrMatchingOwner(note.getOwner()) too
+      backingManager.deleteRunNote(run, noteId);
     } else {
       throw new IOException("User " + getCurrentUser().getFullName() + " cannot write to this Run");
     }
   }
 
   @Override
-  public void deleteKitNote(Kit kit, Note note) throws IOException {
-    if (getCurrentUser().isAdmin() || getCurrentUser().equals(note.getOwner())) {
-      backingManager.deleteKitNote(kit, note);
-    } else {
-      throw new IOException("User " + getCurrentUser().getFullName() + " cannot write to this Kit");
-    }
+  public void deleteKitNote(Kit kit, Long noteId) throws IOException {
+    // TODO: when Hibernatized, should call authorizationManager.throwIfNonAdminOrMatchingOwner(note.getOwner())
+    backingManager.deleteKitNote(kit, noteId);
   }
 
   @Override
-  public void deleteLibraryNote(Library library, Note note) throws IOException {
-    if (writeCheck(library) && (getCurrentUser().isAdmin() || getCurrentUser().equals(note.getOwner()))) {
-      backingManager.deleteLibraryNote(library, note);
+  public void deleteLibraryNote(Library library, Long noteId) throws IOException {
+    if (writeCheck(library)) {
+      // TODO: when Hibernatized, should call authorizationManager.throwIfNonAdminOrMatchingOwner(note.getOwner()) too
+      backingManager.deleteLibraryNote(library, noteId);
     } else {
       throw new IOException("User " + getCurrentUser().getFullName() + " cannot write to this Library");
     }
   }
 
   @Override
-  public void deletePoolNote(Pool pool, Note note) throws IOException {
-    if (writeCheck(pool) && (getCurrentUser().isAdmin() || getCurrentUser().equals(note.getOwner()))) {
-      backingManager.deletePoolNote(pool, note);
+  public void deletePoolNote(Pool pool, Long noteId) throws IOException {
+    if (writeCheck(pool)) {
+      // TODO: when Hibernatized, should call authorizationManager.throwIfNonAdminOrMatchingOwner(note.getOwner()) too
+      backingManager.deletePoolNote(pool, noteId);
     } else {
       throw new IOException("User " + getCurrentUser().getFullName() + " cannot write to this Pool");
     }
   }
 
   @Override
-  public void deleteProjectOverviewNote(ProjectOverview projectOverview, Note note) throws IOException {
-    if (writeCheck(projectOverview.getProject()) && (getCurrentUser().isAdmin() || getCurrentUser().equals(note.getOwner()))) {
-      backingManager.deleteProjectOverviewNote(projectOverview, note);
+  public void deleteProjectOverviewNote(ProjectOverview projectOverview, Long noteId) throws IOException {
+    if (writeCheck(projectOverview.getProject())) {
+      // TODO: when Hibernatized, should call authorizationManager.throwIfNonAdminOrMatchingOwner(note.getOwner()) too
+      backingManager.deleteProjectOverviewNote(projectOverview, noteId);
     } else {
       throw new IOException("User " + getCurrentUser().getFullName() + " cannot write to the parent Project");
     }

@@ -18,7 +18,6 @@ import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
@@ -185,31 +184,6 @@ public class SQLKitDAOTest extends AbstractDAOTest {
   public void testGetKitDescriptorColumnSizes() throws IOException {
     Map<String, Integer> columnSizes = dao.getKitDescriptorColumnSizes();
     assertThat(columnSizes, hasEntry("name", 255));
-  }
-
-  @Test
-  public void testNotes() throws Exception {
-    long kitId = 1L;
-    String message = "test message";
-    Note note = new Note();
-    note.setText(message);
-
-    Kit kit = dao.get(kitId);
-    assertNotNull(kit);
-    assertEquals(0, kit.getNotes().size());
-
-    dao.addNote(kit, note);
-    Kit kitWithNote = dao.get(kitId);
-    assertEquals(1, kitWithNote.getNotes().size());
-    Note savedNote = kitWithNote.getNotes().iterator().next();
-    assertEquals(message, savedNote.getText());
-    Long noteId = savedNote.getNoteId();
-    assertNotNull(sessionFactory.getCurrentSession().get(Note.class, noteId));
-
-    dao.deleteNote(kitWithNote, savedNote);
-    Kit kitNoteDeleted = dao.get(kitId);
-    assertEquals(0, kitNoteDeleted.getNotes().size());
-    assertNull(sessionFactory.getCurrentSession().get(Note.class, noteId));
   }
 
 }
