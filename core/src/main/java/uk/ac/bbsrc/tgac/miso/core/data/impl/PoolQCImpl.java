@@ -25,13 +25,17 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.io.Serializable;
 
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.eaglegenomics.simlims.core.User;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractPoolQC;
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolException;
 
 
@@ -41,8 +45,16 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolException;
  * @author Rob Davey
  * @since 0.1.9
  */
-public class PoolQCImpl extends AbstractPoolQC implements Serializable {
+public class PoolQCImpl extends AbstractQC implements PoolQC, Serializable {
   protected static final Logger log = LoggerFactory.getLogger(PoolQCImpl.class);
+  public static final String UNITS = "nM";
+
+  @ManyToOne(targetEntity = PoolImpl.class)
+  @JoinColumn(name = "pool_poolId")
+  private Pool pool;
+
+  private Double results;
+
   /**
    * Construct a new PoolQC
    */
@@ -65,6 +77,57 @@ public class PoolQCImpl extends AbstractPoolQC implements Serializable {
         log.error("constructor", e);
       }
     }
+  }
+
+  /**
+   * Equivalency is based on getQcId() if set, otherwise on name
+   */
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == null) return false;
+    if (obj == this) return true;
+    if (!(obj instanceof PoolQCImpl)) return false;
+    PoolQC them = (PoolQC) obj;
+    // If not saved, then compare resolved actual objects. Otherwise
+    // just compare IDs.
+    if (this.getId() == AbstractQC.UNSAVED_ID || them.getId() == AbstractQC.UNSAVED_ID) {
+      return this.getQcCreator().equals(them.getQcCreator()) && this.getQcDate().equals(them.getQcDate())
+          && this.getQcType().equals(them.getQcType()) && this.getResults().equals(them.getResults());
+    } else {
+      return this.getId() == them.getId();
+    }
+  }
+
+  @Override
+  public Pool getPool() {
+    return pool;
+  }
+
+  @Override
+  public Double getResults() {
+    return results;
+  }
+
+  @Override
+  public int hashCode() {
+    if (getId() != AbstractQC.UNSAVED_ID) {
+      return (int) getId();
+    } else {
+      int hashcode = getQcCreator().hashCode();
+      hashcode = 37 * hashcode + getQcDate().hashCode();
+      hashcode = 37 * hashcode + getQcType().hashCode();
+      hashcode = 37 * hashcode + getResults().hashCode();
+      return hashcode;
+    }
+  }
+
+  @Override
+  public void setPool(Pool pool) throws MalformedPoolException {
+    this.pool = pool;
+  }
+  @Override
+  public void setResults(Double results) {
+    this.results = results;
   }
 
   @Override

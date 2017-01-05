@@ -731,3 +731,6 @@ CREATE OR REPLACE VIEW RunDerivedInfo AS
 
 CREATE OR REPLACE VIEW ContainerDerivedInfo AS
   SELECT containerId, MAX(changeTime) as lastModified FROM SequencerPartitionContainerChangeLog GROUP BY containerId;
+
+CREATE OR REPLACE VIEW PoolDerivedInfo AS
+  SELECT poolId, MAX(changeTime) as lastModified FROM PoolChangeLog GROUP BY poolId;

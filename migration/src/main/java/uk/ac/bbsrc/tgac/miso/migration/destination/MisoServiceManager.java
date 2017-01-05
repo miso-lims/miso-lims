@@ -12,6 +12,7 @@ import org.springframework.security.core.context.SecurityContextImpl;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.LocalSecurityManager;
 
+import uk.ac.bbsrc.tgac.miso.core.event.manager.WatchManager;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
@@ -28,6 +29,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryAdditionalInfoDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDesignCodeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDesignDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernatePlatformDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernatePoolDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateProjectDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateReferenceGenomeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateRunDao;
@@ -59,8 +61,6 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.SQLBoxDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryDilutionDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryQCDAO;
-import uk.ac.bbsrc.tgac.miso.sqlstore.SQLPoolDAO;
-import uk.ac.bbsrc.tgac.miso.sqlstore.SQLPoolQCDAO;
 
 /**
  * This class is used to simplify creation and wiring of MISO services. Some of the config is currently hardcoded - mainly naming schemes
@@ -87,8 +87,7 @@ public class MisoServiceManager {
   private SQLLibraryQCDAO libraryQcDao;
   private SQLLibraryDilutionDAO dilutionDao;
   private HibernateTargetedSequencingDao targetedSequencingDao;
-  private SQLPoolDAO poolDao;
-  private SQLPoolQCDAO poolQcDao;
+  private HibernatePoolDao poolDao;
   private HibernateExperimentDao experimentDao;
   private HibernateKitDao kitDao;
   private HibernatePlatformDao platformDao;
@@ -125,6 +124,7 @@ public class MisoServiceManager {
   private HibernateIndexDao indexDao;
   private HibernateSequencingParametersDao sequencingParametersDao;
   private HibernateReferenceGenomeDao referenceGenomeDao;
+  private final WatchManager watchManager;
 
   /**
    * Constructs a new MisoServiceManager with no services initialized
@@ -135,6 +135,7 @@ public class MisoServiceManager {
   public MisoServiceManager(JdbcTemplate jdbcTemplate, SessionFactory sessionFactory) {
     this.jdbcTemplate = jdbcTemplate;
     this.sessionFactory = sessionFactory;
+    watchManager = new WatchManager();
   }
 
   /**
@@ -193,7 +194,6 @@ public class MisoServiceManager {
     m.setDefaultLibraryDesignDao();
     m.setDefaultLibraryDesignCodeDao();
     m.setDefaultIndexDao();
-    m.setDefaultPoolQcDao();
     m.setDefaultSequencingParametersDao();
 
     User migrationUser = m.getsecurityStore().getUserByLoginName(username);
@@ -264,7 +264,7 @@ public class MisoServiceManager {
     if (securityManager != null) securityManager.setSecurityStore(securityStore);
     if (sampleDao != null) sampleDao.setSecurityDao(securityStore);
     if (libraryDao != null) libraryDao.setSecurityDAO(securityStore);
-    if (poolDao != null) poolDao.setSecurityDAO(securityStore);
+    if (poolDao != null) poolDao.setSecurityStore(securityStore);
     if (boxDao != null) boxDao.setSecurityDAO(securityStore);
   }
 
@@ -287,7 +287,6 @@ public class MisoServiceManager {
     if (sampleDao != null) sampleDao.setSecurityProfileDao(securityProfileDao);
     if (libraryDao != null) libraryDao.setSecurityProfileDAO(securityProfileDao);
     if (dilutionDao != null) dilutionDao.setSecurityProfileDAO(securityProfileDao);
-    if (poolDao != null) poolDao.setSecurityProfileDAO(securityProfileDao);
     if (boxDao != null) boxDao.setSecurityProfileDAO(securityProfileDao);
   }
 
@@ -307,7 +306,6 @@ public class MisoServiceManager {
   }
 
   private void updateSecurityManagerDependencies() {
-    if (poolDao != null) poolDao.setSecurityManager(securityManager);
     if (runDao != null) runDao.setSecurityManager(securityManager);
   }
 
@@ -450,7 +448,6 @@ public class MisoServiceManager {
   private void updateChangeLogDaoDependencies() {
     if (sampleDao != null) sampleDao.setChangeLogDao(changeLogDao);
     if (libraryDao != null) libraryDao.setChangeLogDAO(changeLogDao);
-    if (poolDao != null) poolDao.setChangeLogDAO(changeLogDao);
     if (boxDao != null) boxDao.setChangeLogDAO(changeLogDao);
   }
 
@@ -571,28 +568,21 @@ public class MisoServiceManager {
     if (dilutionDao != null) dilutionDao.setTargetedSequencingDAO(targetedSequencingDao);
   }
 
-  public SQLPoolDAO getPoolDao() {
+  public HibernatePoolDao getPoolDao() {
     return poolDao;
   }
 
-  public void setPoolDao(SQLPoolDAO poolDao) {
+  public void setPoolDao(HibernatePoolDao poolDao) {
     this.poolDao = poolDao;
     updatePoolDaoDependencies();
   }
 
   public void setDefaultPoolDao() {
-    SQLPoolDAO dao = new SQLPoolDAO();
-    dao.setAutoGenerateIdentificationBarcodes(autoGenerateIdBarcodes);
+    HibernatePoolDao dao = new HibernatePoolDao();
     dao.setBoxDAO(boxDao);
-    dao.setChangeLogDAO(changeLogDao);
-    dao.setDataObjectFactory(dataObjectFactory);
-    dao.setExperimentDAO(experimentDao);
-    dao.setJdbcTemplate(jdbcTemplate);
-    dao.setNamingScheme(getNamingScheme());
-    dao.setSecurityDAO(securityStore);
-    dao.setSecurityManager(securityManager);
-    dao.setSecurityProfileDAO(securityProfileDao);
-    dao.setPoolQcDAO(poolQcDao);
+    dao.setSecurityStore(securityStore);
+    dao.setSessionFactory(sessionFactory);
+    dao.setWatchManager(watchManager);
     setPoolDao(dao);
   }
 
@@ -617,7 +607,6 @@ public class MisoServiceManager {
   }
 
   private void updateExperimentDaoDependencies() {
-    if (poolDao != null) poolDao.setExperimentDAO(experimentDao);
   }
 
   public HibernateKitDao getKitDao() {
@@ -1159,31 +1148,9 @@ public class MisoServiceManager {
     if (libraryDao != null) libraryDao.setIndexStore(indexDao);
   }
 
-  public SQLPoolQCDAO getPoolQcDao() {
-    return poolQcDao;
-  }
-
-  public void setPoolQcDao(SQLPoolQCDAO poolQcDao) {
-    this.poolQcDao = poolQcDao;
-    updatePoolQcDaoDependencies();
-  }
-
-  public void setDefaultPoolQcDao() {
-    SQLPoolQCDAO dao = new SQLPoolQCDAO();
-    dao.setJdbcTemplate(jdbcTemplate);
-    dao.setDataObjectFactory(dataObjectFactory);
-    dao.setPoolDAO(poolDao);
-    setPoolQcDao(dao);
-  }
-
-  private void updatePoolQcDaoDependencies() {
-    if (poolDao != null) poolDao.setPoolQcDAO(poolQcDao);
-  }
-
   public void setDefaultSequencingParametersDao() {
     HibernateSequencingParametersDao dao = new HibernateSequencingParametersDao();
     dao.setSessionFactory(sessionFactory);
-    dao.setPlatformStore(platformDao);
     setSequencingParametersDao(dao);
   }
 

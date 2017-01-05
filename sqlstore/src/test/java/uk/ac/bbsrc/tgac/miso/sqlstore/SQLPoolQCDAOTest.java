@@ -6,8 +6,7 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 
-import javax.persistence.CascadeType;
-
+import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -26,8 +25,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolException;
-import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
-import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernatePoolQCDao;
 
 public class SQLPoolQCDAOTest extends AbstractDAOTest {
   
@@ -39,10 +37,10 @@ public class SQLPoolQCDAOTest extends AbstractDAOTest {
   private JdbcTemplate jdbcTemplate;
   
   @Mock
-  private PoolStore poolDAO;
+  private SessionFactory sessionFactory;
   
   @InjectMocks
-  private SQLPoolQCDAO dao;
+  private HibernatePoolQCDao dao;
   
   //Auto-increment sequence doesn't roll back with transactions, so must be tracked
    private static long nextAutoIncrementId = 4L;
@@ -50,8 +48,7 @@ public class SQLPoolQCDAOTest extends AbstractDAOTest {
   @Before
   public void setUp() {
     MockitoAnnotations.initMocks(this);
-    dao.setJdbcTemplate(jdbcTemplate);
-    dao.setDataObjectFactory(new TgacDataObjectFactory());
+    dao.setSessionFactory(sessionFactory);
   }
   
   @Test
@@ -143,7 +140,6 @@ public class SQLPoolQCDAOTest extends AbstractDAOTest {
   
   @Test
   public void testRemove() throws IOException {
-    dao.setCascadeType(CascadeType.REFRESH);
     PoolQC qc = dao.get(1L);
     assertNotNull(qc);
     assertTrue(dao.remove(qc));

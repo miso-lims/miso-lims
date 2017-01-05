@@ -70,7 +70,7 @@ public class DefaultSequencingParametersService implements SequencingParametersS
     }
     Collection<SequencingParameters> results = new ArrayList<>();
     for (SequencingParameters sp : sequencingParametersDao.getSequencingParameters()) {
-      if (sp.getPlatformId() == platformId) {
+      if (sp.getPlatform().getId() == platformId) {
         results.add(sp);
       }
     }

@@ -2,6 +2,8 @@ package uk.ac.bbsrc.tgac.miso.core.store;
 
 import java.util.Collection;
 
+import com.eaglegenomics.simlims.core.User;
+
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 
 /**
@@ -48,5 +50,7 @@ public interface ChangeLogStore {
    * @return The id of newly created change log.
    */
   public Long create(String type, long entityId, ChangeLog changeLog);
+
+  public Long create(String type, long entityId, String columnsChanged, String summary, User user);
   
 }

@@ -99,7 +99,7 @@ public class SQLBoxDAO implements BoxStore {
                 }
               }
               if (item == null) {
-                item = poolDAO.getByPositionId(positionId);
+                // BATS item = poolDAO.getByPositionId(positionId);
               }
             }
             box.getBoxables().put(BoxUtils.getPositionString(row, column), item);

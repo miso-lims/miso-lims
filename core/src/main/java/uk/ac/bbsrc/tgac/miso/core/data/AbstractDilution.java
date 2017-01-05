@@ -24,16 +24,21 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.util.Date;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 
@@ -58,6 +63,21 @@ public abstract class AbstractDilution implements Dilution, Comparable {
   private String identificationBarcode;
   private String dilutionUserName;
   private Long preMigrationId;
+
+  @ManyToMany(targetEntity=PoolImpl.class)
+  @JoinTable(name = "Pool_Dilution", joinColumns = { @JoinColumn(name = "dilution_dilutionId") }, inverseJoinColumns = {
+      @JoinColumn(name = "pool_poolId") })
+  private Set<Pool> pools;
+
+  @Override
+  public Set<Pool> getPools() {
+    return pools;
+  }
+
+  @Override
+  public void setPools(Set<Pool> pools) {
+    this.pools = pools;
+  }
 
   @Override
   public long getId() {

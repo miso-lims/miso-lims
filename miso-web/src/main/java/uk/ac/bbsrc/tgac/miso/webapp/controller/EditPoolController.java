@@ -59,7 +59,6 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractPool;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
@@ -143,7 +142,7 @@ public class EditPoolController {
 
   @ModelAttribute("poolConcentrationUnits")
   public String poolConcentrationUnits() {
-    return AbstractPool.CONCENTRATION_UNITS;
+    return PoolImpl.CONCENTRATION_UNITS;
   }
 
   @Value("${miso.autoGenerateIdentificationBarcodes}")
@@ -161,7 +160,7 @@ public class EditPoolController {
 
   @RequestMapping(value = "/new", method = RequestMethod.GET)
   public ModelAndView newUnassignedPool(ModelMap model) throws IOException {
-    return setupForm(AbstractPool.UNSAVED_ID, model);
+    return setupForm(PoolImpl.UNSAVED_ID, model);
   }
 
   @RequestMapping(value = "/{poolId}", method = RequestMethod.GET)
@@ -169,7 +168,7 @@ public class EditPoolController {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Pool pool = null;
-      if (poolId == AbstractPool.UNSAVED_ID) {
+      if (poolId == PoolImpl.UNSAVED_ID) {
         pool = dataObjectFactory.getPool(user);
         model.put("title", "New Pool");
       } else {
@@ -193,7 +192,7 @@ public class EditPoolController {
 
       ObjectMapper mapper = new ObjectMapper();
       model.put("runsJSON", mapper.writeValueAsString(
-          poolId == AbstractPool.UNSAVED_ID ? Collections.emptyList() : Dtos.asRunDtos(requestManager.getRunsByPool(pool))));
+          poolId == PoolImpl.UNSAVED_ID ? Collections.emptyList() : Dtos.asRunDtos(requestManager.getRunsByPool(pool))));
 
       return new ModelAndView("/pages/editPool.jsp", model);
     } catch (IOException ex) {
@@ -319,7 +318,7 @@ public class EditPoolController {
       }
       // The pooled elements may have been modified asynchronously while the form was being edited. Since they can't be edited by form,
       // update them to avoid reverting the state.
-      if (pool.getId() != AbstractPool.UNSAVED_ID) {
+      if (pool.getId() != PoolImpl.UNSAVED_ID) {
         @SuppressWarnings("unchecked")
         Pool original = requestManager.getPoolById(pool.getId());
         pool.setPoolableElements(original.getPoolableElements());

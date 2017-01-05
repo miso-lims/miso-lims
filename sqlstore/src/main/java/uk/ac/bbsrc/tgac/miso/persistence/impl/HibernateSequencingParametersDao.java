@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingParametersImpl;
-import uk.ac.bbsrc.tgac.miso.core.store.PlatformStore;
 import uk.ac.bbsrc.tgac.miso.persistence.SequencingParametersDao;
 
 @Repository
@@ -29,21 +28,6 @@ public class HibernateSequencingParametersDao implements SequencingParametersDao
   @Autowired
   private SessionFactory sessionFactory;
 
-  @Autowired
-  private PlatformStore platformStore;
-
-  private SequencingParameters fetchSqlStore(SequencingParameters sp) throws IOException {
-    sp.setPlatform(getPlatformStore().get(sp.getPlatformId()));
-    return sp;
-  }
-
-  private <T extends Iterable<SequencingParameters>> T fetchSqlStore(T items) throws IOException {
-    for (SequencingParameters item : items) {
-      fetchSqlStore(item);
-    }
-    return items;
-  }
-
   private Session currentSession() {
     return sessionFactory.getCurrentSession();
   }
@@ -53,7 +37,7 @@ public class HibernateSequencingParametersDao implements SequencingParametersDao
     Query query = currentSession().createQuery("from SequencingParametersImpl sp");
     @SuppressWarnings("unchecked")
     List<SequencingParameters> records = query.list();
-    return fetchSqlStore(records);
+    return records;
 
   }
 
@@ -62,7 +46,7 @@ public class HibernateSequencingParametersDao implements SequencingParametersDao
     if (id == null) {
       return null;
     }
-    return fetchSqlStore((SequencingParameters) currentSession().get(SequencingParametersImpl.class, id));
+    return (SequencingParameters) currentSession().get(SequencingParametersImpl.class, id);
   }
 
   @Override
@@ -102,13 +86,4 @@ public class HibernateSequencingParametersDao implements SequencingParametersDao
   public void setSessionFactory(SessionFactory sessionFactory) {
     this.sessionFactory = sessionFactory;
   }
-
-  public PlatformStore getPlatformStore() {
-    return platformStore;
-  }
-
-  public void setPlatformStore(PlatformStore platformStore) {
-    this.platformStore = platformStore;
-  }
-
 }

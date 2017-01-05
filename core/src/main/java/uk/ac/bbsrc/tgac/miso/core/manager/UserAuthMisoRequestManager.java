@@ -1151,31 +1151,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public List<Pool> listPoolsBySampleId(long sampleId) throws IOException {
-    User user = getCurrentUser();
-    ArrayList<Pool> accessibles = new ArrayList<>();
-    for (Pool pool : backingManager.listPoolsBySampleId(sampleId)) {
-      if (pool.userCanRead(user)) {
-        accessibles.add(pool);
-      }
-    }
-    Collections.sort(accessibles);
-    return accessibles;
-  }
-
-  @Override
-  public List<PoolQC> listAllPoolQCsByPoolId(long poolId) throws IOException {
-    User user = getCurrentUser();
-    ArrayList<PoolQC> accessibles = new ArrayList<>();
-    for (PoolQC qc : backingManager.listAllPoolQCsByPoolId(poolId)) {
-      if (qc.userCanRead(user)) {
-        accessibles.add(qc);
-      }
-    }
-    Collections.sort(accessibles);
-    return accessibles;
-  }
-  @Override
   public Collection<Study> listAllStudies() throws IOException {
     User user = getCurrentUser();
     Collection<Study> accessibles = new HashSet<>();
@@ -1259,6 +1234,8 @@ public class UserAuthMisoRequestManager implements RequestManager {
     return accessibles;
   }
 
+  /* deletes */
+
   @Override
   public void deleteStudy(Study study) throws IOException {
     if (getCurrentUser().isAdmin()) {
@@ -1333,13 +1310,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   public void deletePool(Pool pool) throws IOException {
     if (getCurrentUser().isAdmin()) {
       backingManager.deletePool(pool);
-    }
-  }
-
-  @Override
-  public void deletePoolQC(PoolQC poolQc) throws IOException {
-    if (getCurrentUser().isAdmin()) {
-      backingManager.deletePoolQC(poolQc);
     }
   }
 
@@ -2236,6 +2206,26 @@ public class UserAuthMisoRequestManager implements RequestManager {
       throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read write to Project " + project.getId());
     } else {
       backingManager.removeProjectWatcher(project, watcher);
+    }
+  }
+
+  @Override
+  public void addPoolWatcher(Pool pool, User watcher) throws IOException {
+    if (!readCheck(pool)) {
+      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Pool " + pool.getId());
+    } else if (!pool.userCanRead(watcher)) {
+      throw new AuthorizationIOException("User " + watcher.getLoginName() + " cannot read Pool " + pool.getId());
+    } else {
+      backingManager.addPoolWatcher(pool, watcher);
+    }
+  }
+
+  @Override
+  public void removePoolWatcher(Pool pool, User watcher) throws IOException {
+    if (!writeCheck(pool)) {
+      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read write to Pool " + pool.getId());
+    } else {
+      backingManager.removePoolWatcher(pool, watcher);
     }
   }
 }
