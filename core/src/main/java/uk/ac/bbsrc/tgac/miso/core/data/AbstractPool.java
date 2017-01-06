@@ -119,8 +119,7 @@ public abstract class AbstractPool extends AbstractBoxable implements Pool {
   // listeners
   private final Set<MisoListener> listeners = new HashSet<>();
 
-  // Cascade all operations except delete
-  @ManyToMany(targetEntity = UserImpl.class, cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH })
+  @ManyToMany(targetEntity = UserImpl.class)
   @JoinTable(name = "Pool_Watcher", joinColumns = { @JoinColumn(name = "poolId") }, inverseJoinColumns = { @JoinColumn(name = "userId") })
   private Set<User> watchUsers = new HashSet<>();
 
