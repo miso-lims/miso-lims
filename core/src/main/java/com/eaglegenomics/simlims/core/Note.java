@@ -42,9 +42,8 @@ public class Note implements Serializable, Comparable<Note> {
   @Column(nullable = false, updatable = false)
   private String text = "";
 
-  @Column(nullable = false, updatable = false)
   @ManyToOne
-  @JoinColumn(name = "owner_userId")
+  @JoinColumn(name = "owner_userId", nullable = false, updatable = false)
   private User owner = null;
 
   @Column(nullable = false, updatable = false)
