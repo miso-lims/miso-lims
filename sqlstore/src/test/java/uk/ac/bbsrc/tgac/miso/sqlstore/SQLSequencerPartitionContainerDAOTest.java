@@ -159,7 +159,7 @@ public class SQLSequencerPartitionContainerDAOTest extends AbstractDAOTest {
     Run run = Mockito.mock(Run.class);
     Mockito.when(run.getId()).thenReturn(1L);
     spc.setIdentificationBarcode("ABCDEFXX");
-    spc.addRun(run);
+    spc.setRun(run);
 
     assertEquals(4L, dao.save(spc));
     SequencerPartitionContainer<SequencerPoolPartition> savedSPC = dao.get(4L);

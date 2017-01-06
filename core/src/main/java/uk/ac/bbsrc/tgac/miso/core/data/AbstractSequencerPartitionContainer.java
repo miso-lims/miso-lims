@@ -196,7 +196,6 @@ public abstract class AbstractSequencerPartitionContainer<T extends Partition> i
   public Run getLastRun() {
     Run lastRun = null;
     for (Run thisRun : getRuns()) {
-      if (thisRun == null) continue;
       if (lastRun == null) {
         lastRun = thisRun;
       } else if (thisRun.getStatus() != null && thisRun.getStatus().getStartDate().after(lastRun.getStatus().getStartDate())) {
@@ -207,8 +206,13 @@ public abstract class AbstractSequencerPartitionContainer<T extends Partition> i
   }
 
   @Override
-  public void addRun(Run run) {
-    runs.add(run);
+  public void setRun(Run run) {
+    if (runs.size() < 2) {
+      runs.add(run);
+    } else {
+      // this should only be called in cases where the container should have only a single run
+      throw new IllegalArgumentException("Cannot add more than one run to a container!");
+    }
   }
 
   @Override

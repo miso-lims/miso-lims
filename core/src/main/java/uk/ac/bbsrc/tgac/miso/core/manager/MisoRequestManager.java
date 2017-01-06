@@ -1517,12 +1517,7 @@ public class MisoRequestManager implements RequestManager {
         managed.setPairedEnd(run.getPairedEnd());
         managed.setCycles(run.getCycles());
         managed.setFilePath(run.getFilePath());
-        Status targetStatus = getStatusById(run.getStatus().getId());
-        targetStatus.setHealth(run.getStatus().getHealth());
-        targetStatus.setStartDate(run.getStatus().getStartDate());
-        targetStatus.setCompletionDate(run.getStatus().getCompletionDate());
-        targetStatus.setRunName(run.getAlias());
-        managed.setStatus(targetStatus);
+        managed.setStatus(run.getStatus());
         for (RunQC runQc : run.getRunQCs()) {
           if (!managed.getRunQCs().contains(runQc)) {
             try {
@@ -1739,12 +1734,6 @@ public class MisoRequestManager implements RequestManager {
         managed.setIdentificationBarcode(container.getIdentificationBarcode());
         managed.setLocationBarcode(container.getLocationBarcode());
         managed.setValidationBarcode(container.getValidationBarcode());
-        Collection<Run> runs = new HashSet<>();
-        for (Run run : container.getRuns()) {
-          if (run != null) runs.add(getRunById(run.getId()));
-        }
-        managed.setRuns(runs);
-        managed.setPlatform(container.getPlatform());
         updatePartitionPools(container, managed);
         return sequencerPartitionContainerStore.save(managed);
       }
@@ -1765,7 +1754,7 @@ public class MisoRequestManager implements RequestManager {
             managedPartition.setPool(null);
           } else if (sourcePool != null && managedPool == null) {
             managedPartition.setPool(getPoolById(sourcePool.getId()));
-          } else if (sourcePool.getId() == managedPool.getId()) {
+          } else if (sourcePool.getId() != managedPool.getId()) {
             managedPartition.setPool(getPoolById(sourcePool.getId()));
           }
         }

@@ -292,7 +292,7 @@ public class PacBioNotificationMessageConsumerMechanism
                         if (f.getPlatform() == null && r.getSequencerReference().getPlatform() != null) {
                           f.setPlatform(r.getSequencerReference().getPlatform());
                         }
-                        f.addRun(r);
+                        f.setRun(r);
                         log.info("\\_ Created new container with " + f.getPartitions().size() + " partitions");
                         long flowId = requestManager.saveSequencerPartitionContainer(f);
                         f.setId(flowId);
