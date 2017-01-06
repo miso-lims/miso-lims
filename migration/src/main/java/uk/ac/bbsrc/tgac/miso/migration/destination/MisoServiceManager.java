@@ -623,7 +623,6 @@ public class MisoServiceManager {
   public void setDefaultExperimentDao() {
     HibernateExperimentDao dao = new HibernateExperimentDao();
     dao.setJdbcTemplate(jdbcTemplate);
-    dao.setNamingScheme(getNamingScheme());
     setExperimentDao(dao);
   }
 

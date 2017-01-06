@@ -146,7 +146,6 @@ public class MisoRequestManager implements RequestManager {
   @Autowired
   private LibraryQcStore libraryQcStore;
   @Autowired
-  @Autowired
   private PlatformStore platformStore;
   @Autowired
   private ProjectStore projectStore;
@@ -233,8 +232,6 @@ public class MisoRequestManager implements RequestManager {
 
   public void setNamingScheme(NamingScheme namingScheme) {
     this.namingScheme = namingScheme;
-  }
-
   }
 
   public void setPlatformStore(PlatformStore platformStore) {
