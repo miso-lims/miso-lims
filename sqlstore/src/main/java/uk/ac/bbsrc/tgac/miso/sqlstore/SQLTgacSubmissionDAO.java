@@ -399,15 +399,7 @@ public class SQLTgacSubmissionDAO implements SubmissionStore, NamingSchemeAware 
           // adds the new pool to the partition
           newPartition.setPool(newPool);
 
-          // replace any existing experiment-linked pools with the new pool
-          for (Experiment experiment : experimentDAO.listBySubmissionId(rs.getLong("submissionId"))) {
-            if (experiment.getPool().getId() == newPool.getId()) {
-              experiment.setPool(newPool);
-              t.addSubmissionElement(experiment);
-              log.debug(t.getName() + ": added " + experiment.getName());
-              break;
-            }
-          }
+          // BATS Will be done by Hibernate
 
           // adds the partition to the submission
           log.debug("submission " + t.getId() + " new partition " + newPartition.getId() + " contains dilutions "

@@ -54,6 +54,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.ExperimentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 
 /**
  * Created by IntelliJ IDEA. User: bianx Date: 19-Apr-2011 Time: 12:04:04 To change this template use File | Settings | File Templates.
@@ -65,6 +66,8 @@ public class ExperimentWizardControllerHelperService {
   private SecurityManager securityManager;
   @Autowired
   private RequestManager requestManager;
+  @Autowired
+  private ExperimentService experimentService;
 
   public JSONObject loadExperimentPlatform(HttpSession session, JSONObject json) {
 
@@ -158,7 +161,7 @@ public class ExperimentWizardControllerHelperService {
           e.setPool(requestManager.getPoolByBarcode(poolBarcode));
         }
         e.setLastModifier(securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName()));
-        requestManager.saveExperiment(e);
+        experimentService.save(e);
 
       }
     } catch (IOException e) {

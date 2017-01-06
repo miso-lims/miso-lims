@@ -86,6 +86,7 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.ReferenceGenomeService;
 
 @Controller
@@ -108,6 +109,9 @@ public class EditProjectController {
 
   @Autowired
   private ReferenceGenomeService referenceGenomeService;
+
+  @Autowired
+  private ExperimentService experimentService;
 
   public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
     this.dataObjectFactory = dataObjectFactory;
@@ -317,7 +321,7 @@ public class EditProjectController {
       }
 
       for (Study study : studies) {
-        Collection<Experiment> experiments = requestManager.listAllExperimentsByStudyId(study.getId());
+        Collection<Experiment> experiments = experimentService.listAllByStudyId(study.getId());
         if (experiments.size() == 0) {
           studiesJSON.put(study.getName(), "2");
         } else {

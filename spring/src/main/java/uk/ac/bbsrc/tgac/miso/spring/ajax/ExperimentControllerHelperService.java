@@ -53,6 +53,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.KitImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 
 /**
  * uk.ac.bbsrc.tgac.miso.spring.ajax
@@ -69,6 +70,8 @@ public class ExperimentControllerHelperService {
   private SecurityManager securityManager;
   @Autowired
   private RequestManager requestManager;
+  @Autowired
+  private ExperimentService experimentService;
 
   public JSONObject lookupKitByIdentificationBarcode(HttpSession session, JSONObject json) {
     try {
@@ -192,7 +195,7 @@ public class ExperimentControllerHelperService {
       if (json.has("experimentId")) {
         String experimentId = json.getString("experimentId");
         String multiplexed = json.getString("multiplexed");
-        Experiment e = requestManager.getExperimentById(new Long(experimentId));
+        Experiment e = experimentService.get(new Long(experimentId));
 
         Collection<KitDescriptor> kits = requestManager.listKitDescriptorsByType(KitType.LIBRARY);
         StringBuilder lkits = new StringBuilder();
@@ -249,7 +252,7 @@ public class ExperimentControllerHelperService {
     try {
       if (json.has("experimentId")) {
         String experimentId = json.getString("experimentId");
-        Experiment e = requestManager.getExperimentById(new Long(experimentId));
+        Experiment e = experimentService.get(new Long(experimentId));
 
         Collection<KitDescriptor> kits = requestManager.listKitDescriptorsByType(KitType.EMPCR);
         StringBuilder sb = new StringBuilder();
@@ -285,7 +288,7 @@ public class ExperimentControllerHelperService {
     try {
       if (json.has("experimentId")) {
         String experimentId = json.getString("experimentId");
-        Experiment e = requestManager.getExperimentById(new Long(experimentId));
+        Experiment e = experimentService.get(new Long(experimentId));
 
         Collection<KitDescriptor> kits = requestManager.listKitDescriptorsByType(KitType.CLUSTERING);
         StringBuilder sb = new StringBuilder();
@@ -335,10 +338,10 @@ public class ExperimentControllerHelperService {
           lk.setKitDate(new Date());
         }
 
-        Experiment e = requestManager.getExperimentById(new Long(experimentId));
+        Experiment e = experimentService.get(new Long(experimentId));
         e.addKit(lk);
         e.setLastModifier(securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName()));
-        requestManager.saveExperiment(e);
+        experimentService.save(e);
         Integer newStock = kd.getStockLevel() - 1;
         kd.setStockLevel(newStock);
         requestManager.saveKitDescriptor(kd);
@@ -356,7 +359,7 @@ public class ExperimentControllerHelperService {
     try {
       if (json.has("experimentId")) {
         String experimentId = json.getString("experimentId");
-        Experiment e = requestManager.getExperimentById(new Long(experimentId));
+        Experiment e = experimentService.get(new Long(experimentId));
 
         Collection<KitDescriptor> kits = requestManager.listKitDescriptorsByType(KitType.SEQUENCING);
         StringBuilder sb = new StringBuilder();
@@ -391,7 +394,7 @@ public class ExperimentControllerHelperService {
     try {
       JSONObject j = new JSONObject();
       JSONArray jsonArray = new JSONArray();
-      for (Experiment experiment : requestManager.listAllExperiments()) {
+      for (Experiment experiment : experimentService.listAll()) {
         JSONArray inner = new JSONArray();
         inner.add(TableHelper.hyperLinkify("/miso/experiment/" + experiment.getId(), experiment.getName()));
         inner.add(TableHelper.hyperLinkify("/miso/experiment/" + experiment.getId(), experiment.getAlias()));

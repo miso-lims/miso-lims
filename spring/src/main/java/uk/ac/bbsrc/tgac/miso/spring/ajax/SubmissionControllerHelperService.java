@@ -79,6 +79,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.submission.FilePathGeneratorResolverSe
 import uk.ac.bbsrc.tgac.miso.core.service.submission.UploadJob;
 import uk.ac.bbsrc.tgac.miso.core.service.submission.UploadReport;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 
 /**
  * uk.ac.bbsrc.tgac.miso.spring.ajax
@@ -101,6 +102,8 @@ public class SubmissionControllerHelperService {
   private MisoFilesManager misoFileManager;
   @Autowired
   private FilePathGeneratorResolverService filePathGeneratorResolverService;
+  @Autowired
+  private ExperimentService experimentService;
 
   private final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
@@ -425,7 +428,7 @@ public class SubmissionControllerHelperService {
 
         Project p = requestManager.getProjectById(projectId);
         for (Study s : p.getStudies()) {
-          Collection<Experiment> experiments = requestManager.listAllExperimentsByStudyId(s.getId());
+          Collection<Experiment> experiments = experimentService.listAllByStudyId(s.getId());
           s.setExperiments(experiments);
         }
         // gets the runs for the project

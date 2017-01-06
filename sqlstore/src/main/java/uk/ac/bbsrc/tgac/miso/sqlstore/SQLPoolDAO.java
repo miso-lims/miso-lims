@@ -834,7 +834,7 @@ public class SQLPoolDAO implements PoolStore {
         // }
 
         if (!isLazy()) {
-          p.setExperiments(experimentDAO.listByPoolId(id));
+          // BATS Hibernate will load this
 
           for (PoolQC qc : poolQcDAO.listByPoolId(id)) {
             p.addQc(qc);

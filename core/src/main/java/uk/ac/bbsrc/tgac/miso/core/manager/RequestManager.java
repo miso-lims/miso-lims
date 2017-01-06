@@ -39,7 +39,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
-import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
@@ -119,8 +118,6 @@ public interface RequestManager {
 
   public long saveEmPCRDilution(emPCRDilution dilution) throws IOException;
 
-  public long saveExperiment(Experiment experiment) throws IOException;
-
   public long saveStudy(Study study) throws IOException;
 
   public long saveSequencerPoolPartition(SequencerPoolPartition partition) throws IOException;
@@ -151,8 +148,6 @@ public interface RequestManager {
   public SequencerPoolPartition getSequencerPoolPartitionById(long partitionId) throws IOException;
 
   public SequencerPartitionContainer<SequencerPoolPartition> getSequencerPartitionContainerById(long containerId) throws IOException;
-
-  public Experiment getExperimentById(long experimentId) throws IOException;
 
   public Pool getPoolById(long poolId) throws IOException;
 
@@ -304,12 +299,6 @@ public interface RequestManager {
   public Collection<Study> listAllStudiesWithLimit(long limit) throws IOException;
 
   public Collection<Study> listAllStudiesBySearch(String query) throws IOException;
-
-  public Collection<Experiment> listAllExperiments() throws IOException;
-
-  public Collection<Experiment> listAllExperimentsWithLimit(long limit) throws IOException;
-
-  public Collection<Experiment> listAllExperimentsBySearch(String query) throws IOException;
 
   public Collection<Box> listAllBoxes() throws IOException;
 
@@ -464,11 +453,6 @@ public interface RequestManager {
   public Collection<PoolQC> listAllPoolQCsByPoolId(long poolId) throws IOException;
 
   /**
-   * Obtain a list of all the Experiments the user has access to. Access is defined as either read or write access.
-   */
-  public Collection<Experiment> listAllExperimentsByStudyId(long studyId) throws IOException;
-
-  /**
    * Obtain a list of all the Studys the user has access to. Access is defined as either read or write access.
    */
   public Collection<Study> listAllStudiesByProjectId(long projectId) throws IOException;
@@ -551,8 +535,6 @@ public interface RequestManager {
 
   public void deleteStudy(Study study) throws IOException;
 
-  public void deleteExperiment(Experiment experiment) throws IOException;
-
   public void deleteSample(Sample sample) throws IOException;
 
   public void deleteLibrary(Library library) throws IOException;
@@ -590,8 +572,6 @@ public interface RequestManager {
   public Map<String, Integer> getServiceRecordColumnSizes() throws IOException;
 
   public Map<String, Integer> getBoxColumnSizes() throws IOException;
-
-  public Map<String, Integer> getExperimentColumnSizes() throws IOException;
 
   public Map<String, Integer> getPoolColumnSizes() throws IOException;
 

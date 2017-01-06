@@ -49,6 +49,7 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
@@ -63,6 +64,7 @@ import uk.ac.bbsrc.tgac.miso.core.event.type.AlertLevel;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.MisoAuthority;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 
 /**
  * uk.ac.bbsrc.tgac.miso.miso.spring.ajax
@@ -80,6 +82,8 @@ public class DashboardHelperService {
   private SecurityManager securityManager;
   @Autowired
   private RequestManager requestManager;
+  @Autowired
+  private ExperimentService experimentService;
 
   public JSONObject checkUser(HttpSession session, JSONObject json) {
     String username = json.getString("username");
@@ -184,9 +188,9 @@ public class DashboardHelperService {
       StringBuilder b = new StringBuilder();
       if (!isStringEmptyOrNull(searchStr)) {
 
-        pools = new ArrayList<Pool>(requestManager.listAllPoolsBySearch(searchStr));
+        pools = new ArrayList<>(requestManager.listAllPoolsBySearch(searchStr));
       } else {
-        pools = new ArrayList<Pool>(requestManager.listAllPoolsWithLimit(50));
+        pools = new ArrayList<>(requestManager.listAllPoolsWithLimit(50));
       }
 
       if (pools.size() > 0) {
@@ -217,9 +221,9 @@ public class DashboardHelperService {
       List<Study> studies;
       StringBuilder b = new StringBuilder();
       if (!isStringEmptyOrNull(searchStr)) {
-        studies = new ArrayList<Study>(requestManager.listAllStudiesBySearch(searchStr));
+        studies = new ArrayList<>(requestManager.listAllStudiesBySearch(searchStr));
       } else {
-        studies = new ArrayList<Study>(requestManager.listAllStudiesWithLimit(50));
+        studies = new ArrayList<>(requestManager.listAllStudiesWithLimit(50));
       }
 
       if (studies.size() > 0) {
@@ -248,9 +252,9 @@ public class DashboardHelperService {
       List<Experiment> experiments;
       StringBuilder b = new StringBuilder();
       if (!isStringEmptyOrNull(searchStr)) {
-        experiments = new ArrayList<Experiment>(requestManager.listAllExperimentsBySearch(searchStr));
+        experiments = new ArrayList<>(experimentService.listAllBySearch(searchStr));
       } else {
-        experiments = new ArrayList<Experiment>(requestManager.listAllExperimentsWithLimit(50));
+        experiments = new ArrayList<>(experimentService.listAllWithLimit(50));
       }
 
       if (experiments.size() > 0) {
@@ -279,9 +283,9 @@ public class DashboardHelperService {
       List<Run> runs;
       StringBuilder b = new StringBuilder();
       if (!isStringEmptyOrNull(searchStr)) {
-        runs = new ArrayList<Run>(requestManager.listAllRunsBySearch(searchStr));
+        runs = new ArrayList<>(requestManager.listAllRunsBySearch(searchStr));
       } else {
-        runs = new ArrayList<Run>(requestManager.listAllRunsWithLimit(50));
+        runs = new ArrayList<>(requestManager.listAllRunsWithLimit(50));
       }
 
       if (runs.size() > 0) {
@@ -310,9 +314,9 @@ public class DashboardHelperService {
       List<LibraryDilution> libraryDilutions;
       StringBuilder b = new StringBuilder();
       if (!isStringEmptyOrNull(searchStr)) {
-        libraryDilutions = new ArrayList<LibraryDilution>(requestManager.listAllLibraryDilutionsBySearchOnly(searchStr));
+        libraryDilutions = new ArrayList<>(requestManager.listAllLibraryDilutionsBySearchOnly(searchStr));
       } else {
-        libraryDilutions = new ArrayList<LibraryDilution>(requestManager.listAllLibraryDilutionsWithLimit(50));
+        libraryDilutions = new ArrayList<>(requestManager.listAllLibraryDilutionsWithLimit(50));
       }
 
       if (libraryDilutions.size() > 0) {
@@ -345,13 +349,13 @@ public class DashboardHelperService {
       List<Library> libraries;
       StringBuilder b = new StringBuilder();
       if (!isStringEmptyOrNull(searchStr)) {
-        libraries = new ArrayList<Library>(requestManager.listAllLibrariesBySearch(searchStr));
+        libraries = new ArrayList<>(requestManager.listAllLibrariesBySearch(searchStr));
         if (libraries.isEmpty()) {
           // Base64-encoded string, most likely a barcode image beeped in. decode and search
-          libraries = new ArrayList<Library>(requestManager.listAllLibrariesBySearch(new String(Base64.decodeBase64(searchStr))));
+          libraries = new ArrayList<>(requestManager.listAllLibrariesBySearch(new String(Base64.decodeBase64(searchStr))));
         }
       } else {
-        libraries = new ArrayList<Library>(requestManager.listAllLibrariesWithLimit(50));
+        libraries = new ArrayList<>(requestManager.listAllLibrariesWithLimit(50));
       }
 
       if (libraries.size() > 0) {
@@ -465,7 +469,7 @@ public class DashboardHelperService {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       if (user.isAdmin()) {
-        List<Alert> alerts = new ArrayList<Alert>(requestManager.listAlertsByUserId(0L, limit));
+        List<Alert> alerts = new ArrayList<>(requestManager.listAlertsByUserId(0L, limit));
         Collections.sort(alerts);
         Collections.reverse(alerts);
         for (Alert a : alerts) {
@@ -513,7 +517,7 @@ public class DashboardHelperService {
 
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      List<Alert> alerts = new ArrayList<Alert>(requestManager.listUnreadAlertsByUserId(user.getUserId()));
+      List<Alert> alerts = new ArrayList<>(requestManager.listUnreadAlertsByUserId(user.getUserId()));
       for (Alert a : alerts) {
         if (a.getAlertUser().equals(user)) {
           a.setAlertRead(true);

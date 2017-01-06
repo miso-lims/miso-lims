@@ -90,6 +90,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignCodeDao;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SequencingParametersDao;
+import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.ReferenceGenomeService;
 
 /**
@@ -122,6 +123,9 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
   @Autowired
   private SequencingParametersDao sequencingParametersDao;
+
+  @Autowired
+  private ExperimentService experimentService;
 
   /**
    * Simplified interface to convert form data to fields.
@@ -418,7 +422,7 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
     new BindingConverterById<Experiment>(Experiment.class) {
       @Override
       public Experiment resolveById(long id) throws Exception {
-        return requestManager.getExperimentById(id);
+        return experimentService.get(id);
       }
     }.register(binder).register(binder, Set.class, "experiments");
 
@@ -616,7 +620,7 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
       @Override
       public Experiment resolve(long id) throws Exception {
-        return requestManager.getExperimentById(id);
+        return experimentService.get(id);
       }
 
     }).add(new Resolver<SequencerPoolPartition>() {

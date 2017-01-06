@@ -39,6 +39,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -46,6 +47,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.EditProjectController;
 
 /**
@@ -60,6 +62,8 @@ public class ProjectD3GraphController {
 
   @Autowired
   private RequestManager requestManager;
+  @Autowired
+  private ExperimentService experimentService;
 
   @RequestMapping(value = "{projectId}", method = RequestMethod.GET)
   public @ResponseBody JSONObject d3graphRest(@PathVariable Long projectId) throws IOException {
@@ -103,7 +107,7 @@ public class ProjectD3GraphController {
         JSONArray substudiesArray = new JSONArray();
         substudyJSON.put("name", study.getName());
         substudyJSON.put("description", study.getAlias());
-        Collection<Experiment> experiments = requestManager.listAllExperimentsByStudyId(study.getId());
+        Collection<Experiment> experiments = experimentService.listAllByStudyId(study.getId());
         if (experiments.size() > 0) {
           JSONObject experimentJSON = new JSONObject();
           JSONArray experimentsArray = new JSONArray();
