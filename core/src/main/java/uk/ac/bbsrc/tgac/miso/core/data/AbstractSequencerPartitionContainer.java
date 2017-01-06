@@ -34,6 +34,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToMany;
@@ -67,11 +68,11 @@ public abstract class AbstractSequencerPartitionContainer<T extends Partition> i
   private String identificationBarcode;
   private String locationBarcode;
 
-  @OneToOne(targetEntity = RunImpl.class)
+  @ManyToMany(targetEntity = RunImpl.class)
   @JoinTable(name = "Run_SequencerPartitionContainer", joinColumns = {
-      @JoinColumn(name = "containers_containerId") }, inverseJoinColumns = {
-          @JoinColumn(name = "Run_runId") })
-  private Run run = null;
+      @JoinColumn(name = "containers_containerId", nullable = false, updatable = false) }, inverseJoinColumns = {
+          @JoinColumn(name = "Run_runId", nullable = false, updatable = false) })
+  private Collection<Run> runs = null;
 
   @ManyToOne(targetEntity = SecurityProfile.class, cascade = CascadeType.ALL)
   @JoinColumn(name = "securityProfile_profileId")
@@ -182,13 +183,32 @@ public abstract class AbstractSequencerPartitionContainer<T extends Partition> i
   public abstract T getPartitionAt(int partitionNumber);
 
   @Override
-  public Run getRun() {
-    return run;
+  public Collection<Run> getRuns() {
+    return runs;
   }
 
   @Override
-  public void setRun(Run run) {
-    this.run = run;
+  public void setRuns(Collection<Run> runs) {
+    this.runs = runs;
+  }
+
+  @Override
+  public Run getLastRun() {
+    Run lastRun = null;
+    for (Run thisRun : getRuns()) {
+      if (thisRun == null) continue;
+      if (lastRun == null) {
+        lastRun = thisRun;
+      } else if (thisRun.getStatus() != null && thisRun.getStatus().getStartDate().after(lastRun.getStatus().getStartDate())) {
+        lastRun = thisRun;
+      }
+    }
+    return lastRun;
+  }
+
+  @Override
+  public void addRun(Run run) {
+    runs.add(run);
   }
 
   @Override

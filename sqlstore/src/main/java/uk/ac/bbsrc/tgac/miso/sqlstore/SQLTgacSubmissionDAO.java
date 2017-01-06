@@ -381,7 +381,7 @@ public class SQLTgacSubmissionDAO implements SubmissionStore, NamingSchemeAware 
               runDAO.listBySequencerPartitionContainerId(partition.getSequencerPartitionContainer().getId()));
           // if there is 1 run for the flowcell/container, sets the run for that container to the first on on the list
           if (runs.size() == 1) {
-            partition.getSequencerPartitionContainer().setRun(runs.get(0));
+            partition.getSequencerPartitionContainer().addRun(runs.get(0));
           }
 
           List<Long> dilutionIdList = template.queryForList(SUBMISSION_DILUTION_SELECT, Long.class,

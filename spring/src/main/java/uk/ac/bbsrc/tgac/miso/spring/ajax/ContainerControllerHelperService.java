@@ -747,11 +747,11 @@ public class ContainerControllerHelperService {
       for (SequencerPartitionContainer<SequencerPoolPartition> spc : requestManager.listAllSequencerPartitionContainers()) {
         String run = "";
         String sequencer = "";
-        if (spc.getRun() != null) {
-          run = TableHelper.hyperLinkify("/miso/run/" + spc.getRun().getId(), spc.getRun().getAlias());
-          if (spc.getRun().getSequencerReference() != null) {
-            sequencer = TableHelper.hyperLinkify("/miso/sequencer/" + spc.getRun().getSequencerReference().getId(),
-                spc.getRun().getSequencerReference().getPlatform().getNameAndModel());
+        if (spc.getLastRun() != null) {
+          run = TableHelper.hyperLinkify("/miso/run/" + spc.getLastRun().getId(), spc.getLastRun().getAlias());
+          if (spc.getLastRun().getSequencerReference() != null) {
+            sequencer = TableHelper.hyperLinkify("/miso/sequencer/" + spc.getLastRun().getSequencerReference().getId(),
+                spc.getLastRun().getSequencerReference().getPlatform().getNameAndModel());
           }
         }
         String identificationBarcode = (isStringEmptyOrNull(spc.getIdentificationBarcode()) ? "Unknown Barcode"
@@ -808,13 +808,14 @@ public class ContainerControllerHelperService {
     try {
       if (json.has("containerId")) {
         Long containerId = json.getLong("containerId");
-        SequencerPartitionContainer container = requestManager.getSequencerPartitionContainerById(containerId);
+        SequencerPartitionContainer<?> container = requestManager.getSequencerPartitionContainerById(containerId);
 
-        if (container.getRun() != null && "Completed".equals(container.getRun().getStatus().getHealth().getKey())) {
-          return JSONUtils.SimpleJSONResponse("yes");
-        } else {
-          return JSONUtils.SimpleJSONResponse("no");
+        for (Run run : container.getRuns()) {
+          if (run != null && "Completed".equals(run.getStatus().getHealth().getKey())) {
+            return JSONUtils.SimpleJSONResponse("yes");
+          }
         }
+        return JSONUtils.SimpleJSONResponse("no");
 
       } else {
         return JSONUtils.SimpleJSONError("No Sequencing Container specified");

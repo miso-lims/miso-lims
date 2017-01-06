@@ -53,19 +53,26 @@ public interface SequencerPartitionContainer<T extends Partition>
   public void setId(long id);
 
   /**
-   * Returns the run of this Container object.
+   * Returns the runs of this Container object.
    * 
-   * @return Run run.
+   * @return Collection<Run> run.
    */
-  Run getRun();
+  Collection<Run> getRuns();
 
   /**
-   * Sets the run of this Container object.
+   * Sets the runs of this Container object.
    * 
-   * @param run The run of which this Container is a part.
+   * @param runs The runs of which this Container is a part.
    * 
    */
-  void setRun(Run run);
+  void setRuns(Collection<Run> runs);
+
+  /**
+   * Returns the last run of this Container object.
+   * 
+   * @return Run run
+   */
+  Run getLastRun();
 
   /**
    * Get the list of {@link Partition} objects comprising this container
@@ -141,5 +148,7 @@ public interface SequencerPartitionContainer<T extends Partition>
   public Collection<ChangeLog> getChangeLog();
 
   public Date getLastModified();
+
+  void addRun(Run run);
 
 }

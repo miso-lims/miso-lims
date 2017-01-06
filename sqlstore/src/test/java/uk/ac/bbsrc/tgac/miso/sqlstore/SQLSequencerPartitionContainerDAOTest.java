@@ -27,9 +27,7 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.hibernate.SessionFactory;
 import org.junit.Before;
@@ -161,7 +159,7 @@ public class SQLSequencerPartitionContainerDAOTest extends AbstractDAOTest {
     Run run = Mockito.mock(Run.class);
     Mockito.when(run.getId()).thenReturn(1L);
     spc.setIdentificationBarcode("ABCDEFXX");
-    spc.setRun(run);
+    spc.addRun(run);
 
     assertEquals(4L, dao.save(spc));
     SequencerPartitionContainer<SequencerPoolPartition> savedSPC = dao.get(4L);
@@ -180,7 +178,6 @@ public class SQLSequencerPartitionContainerDAOTest extends AbstractDAOTest {
   public void testSaveNew() throws IOException {
     long autoIncrementId = nextAutoIncrementId;
     SequencerPartitionContainer<SequencerPoolPartition> newSPC = makeSPC("ABCDEFXX");
-    mockAutoIncrement(autoIncrementId);
 
     assertEquals(autoIncrementId, dao.save(newSPC));
 
@@ -198,8 +195,6 @@ public class SQLSequencerPartitionContainerDAOTest extends AbstractDAOTest {
     User mockUser = Mockito.mock(User.class);
     when(mockUser.getUserId()).thenReturn(1L);
     spc.setLastModifier(mockUser);
-
-    mockAutoIncrement(nextAutoIncrementId);
 
     long spcId = dao.save(spc);
     SequencerPartitionContainer<SequencerPoolPartition> insertedSpc = dao.get(spcId);
@@ -239,12 +234,6 @@ public class SQLSequencerPartitionContainerDAOTest extends AbstractDAOTest {
     pc.setLastModifier(user);
     return pc;
   }
-
-  private void mockAutoIncrement(long value) {
-    Map<String, Object> rs = new HashMap<>();
-    rs.put("Auto_increment", value);
-  }
-
 
   private void assertNonLazyThings(SequencerPartitionContainer<SequencerPoolPartition> spc) {
     assertNotNull(spc);
