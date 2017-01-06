@@ -243,4 +243,5 @@ public interface PoolStore extends Store<Pool>, Remover<Pool>, NamingSchemeAware
    * @throws IOException
    */
   long countPoolsByPlatform(PlatformType platform) throws IOException;
+
 }

@@ -78,7 +78,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ExperimentStore;
-import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
@@ -236,7 +235,6 @@ public class SQLPoolDAO implements PoolStore {
   private boolean autoGenerateIdentificationBarcodes;
   private ChangeLogStore changeLogDAO;
   private SecurityStore securityDAO;
-  private NoteStore noteDAO;
   private BoxStore boxDAO;
 
   @CoverageIgnore
@@ -351,11 +349,6 @@ public class SQLPoolDAO implements PoolStore {
   @CoverageIgnore
   public void setAutoGenerateIdentificationBarcodes(boolean autoGenerateIdentificationBarcodes) {
     this.autoGenerateIdentificationBarcodes = autoGenerateIdentificationBarcodes;
-  }
-
-  @CoverageIgnore
-  public void setNoteDAO(NoteStore noteDAO) {
-    this.noteDAO = noteDAO;
   }
 
   @CoverageIgnore
@@ -570,7 +563,8 @@ public class SQLPoolDAO implements PoolStore {
 
     if (!pool.getNotes().isEmpty()) {
       for (Note n : pool.getNotes()) {
-        noteDAO.savePoolNote(pool, n);
+        // Will be Hibernate-managed
+        // noteDAO.savePoolNote(pool, n);
       }
     }
 
@@ -839,7 +833,8 @@ public class SQLPoolDAO implements PoolStore {
           for (PoolQC qc : poolQcDAO.listByPoolId(id)) {
             p.addQc(qc);
           }
-          p.setNotes(noteDAO.listByPool(id));
+          // Will be Hibernate-managed
+          // p.setNotes(noteDAO.listByPool(id));
         }
         p.getChangeLog().addAll(changeLogDAO.listAllById(TABLE_NAME, id));
       } catch (IOException e1) {

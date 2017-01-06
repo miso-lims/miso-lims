@@ -267,4 +267,5 @@ public interface LibraryStore extends Store<Library>, Remover<Library>, NamingSc
   Library getAdjacentLibrary(long libraryId, boolean before) throws IOException;
 
   List<Library> searchByCreationDate(Date from, Date to) throws IOException;
+
 }

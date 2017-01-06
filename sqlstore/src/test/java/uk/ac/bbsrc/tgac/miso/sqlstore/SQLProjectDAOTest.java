@@ -41,7 +41,6 @@ import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
-import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
 import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
@@ -81,8 +80,6 @@ public class SQLProjectDAOTest extends AbstractDAOTest {
   private Store<SecurityProfile> securityProfileDAO;
   @Mock
   private RunStore runDAO;
-  @Mock
-  private NoteStore noteDAO;
 
   @Mock
   private NamingScheme namingScheme;
@@ -348,8 +345,5 @@ public class SQLProjectDAOTest extends AbstractDAOTest {
   public void testGetProjectColumnSizes() {
     // TODO : Implement
   }
-
-  // TODO : Project mapper should be tested but if we move to
-  // hibernate this may not be necessary.
 
 }

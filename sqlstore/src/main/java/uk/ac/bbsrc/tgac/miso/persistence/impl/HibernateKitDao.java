@@ -51,7 +51,6 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 @Repository
 @Transactional(rollbackFor = Exception.class)
 public class HibernateKitDao implements KitStore {
-  private static final String KIT_TABLE_NAME = "Kit";
   private static final String DESCRIPTOR_TABLE_NAME = "KitDescriptor";
 
   protected static final Logger log = LoggerFactory.getLogger(HibernateKitDao.class);

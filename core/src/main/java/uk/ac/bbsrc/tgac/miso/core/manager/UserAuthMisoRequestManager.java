@@ -2,22 +2,22 @@
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
  * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
- *
+ * 
  * This file is part of MISO.
- *
+ * 
  * MISO is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
- *
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
+ * 
  * *********************************************************************
  */
 
@@ -197,9 +197,10 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public long saveProjectOverviewNote(ProjectOverview overview, Note note) throws IOException {
+  public void saveProjectOverviewNote(ProjectOverview overview, Note note) throws IOException {
     if (writeCheck(overview.getProject())) {
-      return backingManager.saveProjectOverviewNote(overview, note);
+      note.setOwner(getCurrentUser());
+      backingManager.saveProjectOverviewNote(overview, note);
     } else {
       throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot write to the parent Project");
     }
@@ -242,15 +243,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public long saveSampleNote(Sample sample, Note note) throws IOException {
-    if (writeCheck(sample)) {
-      return backingManager.saveSampleNote(sample, note);
-    } else {
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot write to this Sample");
-    }
-  }
-
-  @Override
   public long saveLibrary(Library library) throws IOException {
     if (writeCheck(library)) {
       return backingManager.saveLibrary(library);
@@ -269,9 +261,10 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public long saveLibraryNote(Library library, Note note) throws IOException {
+  public void saveLibraryNote(Library library, Note note) throws IOException {
     if (writeCheck(library)) {
-      return backingManager.saveLibraryNote(library, note);
+      note.setOwner(getCurrentUser());
+      backingManager.saveLibraryNote(library, note);
     } else {
       throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot write to this Library");
     }
@@ -305,9 +298,10 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public long savePoolNote(Pool pool, Note note) throws IOException {
+  public void savePoolNote(Pool pool, Note note) throws IOException {
     if (writeCheck(pool)) {
-      return backingManager.savePoolNote(pool, note);
+      note.setOwner(getCurrentUser());
+      backingManager.savePoolNote(pool, note);
     } else {
       throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot write to this Pool");
     }
@@ -368,80 +362,62 @@ public class UserAuthMisoRequestManager implements RequestManager {
     }
   }
 
-
   // gets
   @Override
   public SequencerPoolPartition getSequencerPoolPartitionById(long partitionId) throws IOException {
     SequencerPoolPartition o = backingManager.getSequencerPoolPartitionById(partitionId);
-    if (readCheck(o))
-      return o;
-    else
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Partition " + partitionId);
+    if (readCheck(o)) return o;
+    else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Partition " + partitionId);
   }
-
 
   @Override
   public Pool getPoolById(long poolId) throws IOException {
     Pool o = backingManager.getPoolById(poolId);
-    if (readCheck(o))
-      return o;
-    else
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Pool " + poolId);
+    if (readCheck(o)) return o;
+    else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Pool " + poolId);
   }
 
   @Override
   public Pool getPoolByBarcode(String barcode, PlatformType platformType) throws IOException {
     Pool o = backingManager.getPoolByBarcode(barcode, platformType);
-    if (readCheck(o))
-      return o;
-    else
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Pool " + o.getId());
+    if (readCheck(o)) return o;
+    else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Pool " + o.getId());
   }
 
   @Override
   public Pool getPoolByIdBarcode(String barcode) throws IOException {
     Pool o = backingManager.getPoolByIdBarcode(barcode);
-    if (readCheck(o))
-      return o;
-    else
-      throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Pool " + o.getId());
+    if (readCheck(o)) return o;
+    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Pool " + o.getId());
   }
 
   @Override
   public Pool getPoolByBarcode(String barcode) throws IOException {
     Pool o = backingManager.getPoolByBarcode(barcode);
-    if (readCheck(o))
-      return o;
-    else
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Pool " + o.getId());
+    if (readCheck(o)) return o;
+    else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Pool " + o.getId());
   }
 
   @Override
   public PoolQC getPoolQCById(long qcId) throws IOException {
     PoolQC o = backingManager.getPoolQCById(qcId);
-    if (readCheck(o.getPool()))
-      return o;
-    else
-      throw new AuthorizationIOException(
-          "User " + getCurrentUsername() + " cannot read parent Pool " + o.getPool().getId() + " for PoolQC " + qcId);
+    if (readCheck(o.getPool())) return o;
+    else throw new AuthorizationIOException(
+        "User " + getCurrentUsername() + " cannot read parent Pool " + o.getPool().getId() + " for PoolQC " + qcId);
   }
 
   @Override
   public Library getLibraryById(long libraryId) throws IOException {
     Library o = backingManager.getLibraryById(libraryId);
-    if (readCheck(o))
-      return o;
-    else
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Library " + libraryId);
+    if (readCheck(o)) return o;
+    else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Library " + libraryId);
   }
 
   @Override
   public Library getLibraryByBarcode(String barcode) throws IOException {
     Library o = backingManager.getLibraryByBarcode(barcode);
-    if (readCheck(o))
-      return o;
-    else
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Library " + o.getId());
+    if (readCheck(o)) return o;
+    else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Library " + o.getId());
   }
 
   @Override
@@ -458,233 +434,174 @@ public class UserAuthMisoRequestManager implements RequestManager {
   @Override
   public Dilution getDilutionByBarcode(String barcode) throws IOException {
     Dilution o = backingManager.getDilutionByBarcode(barcode);
-    if (readCheck(o))
-      return o;
-    else
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Dilution " + o.getId());
+    if (readCheck(o)) return o;
+    else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Dilution " + o.getId());
   }
 
   @Override
   public Dilution getDilutionByIdAndPlatform(long dilutionid, PlatformType platformType) throws IOException {
     Dilution o = backingManager.getDilutionByIdAndPlatform(dilutionid, platformType);
-    if (readCheck(o))
-      return o;
-    else
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Dilution " + o.getId());
+    if (readCheck(o)) return o;
+    else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Dilution " + o.getId());
   }
 
   @Override
   public Dilution getDilutionByBarcodeAndPlatform(String barcode, PlatformType platformType) throws IOException {
     Dilution o = backingManager.getDilutionByBarcodeAndPlatform(barcode, platformType);
-    if (readCheck(o))
-      return o;
-    else
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Dilution " + o.getId());
+    if (readCheck(o)) return o;
+    else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Dilution " + o.getId());
   }
 
   @Override
   public LibraryDilution getLibraryDilutionById(long dilutionId) throws IOException {
     LibraryDilution o = backingManager.getLibraryDilutionById(dilutionId);
-    if (readCheck(o))
-      return o;
-    else
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read LibraryDilution " + dilutionId);
+    if (readCheck(o)) return o;
+    else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read LibraryDilution " + dilutionId);
   }
 
   @Override
   public LibraryDilution getLibraryDilutionByBarcode(String barcode) throws IOException {
     LibraryDilution o = backingManager.getLibraryDilutionByBarcode(barcode);
-    if (readCheck(o))
-      return o;
-    else
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read LibraryDilution " + o.getId());
+    if (readCheck(o)) return o;
+    else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read LibraryDilution " + o.getId());
   }
 
   @Override
   public LibraryDilution getLibraryDilutionByBarcodeAndPlatform(String barcode, PlatformType platformType) throws IOException {
     LibraryDilution o = backingManager.getLibraryDilutionByBarcodeAndPlatform(barcode, platformType);
-    if (readCheck(o))
-      return o;
-    else
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read LibraryDilution " + o.getId());
+    if (readCheck(o)) return o;
+    else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read LibraryDilution " + o.getId());
   }
 
   @Override
   public LibraryQC getLibraryQCById(long qcId) throws IOException {
     LibraryQC o = backingManager.getLibraryQCById(qcId);
-    if (readCheck(o.getLibrary()))
-      return o;
-    else
-      throw new AuthorizationIOException(
-          "User " + getCurrentUsername() + " cannot read parent Library " + o.getLibrary().getId() + " for LibraryQC " + qcId);
+    if (readCheck(o.getLibrary())) return o;
+    else throw new AuthorizationIOException(
+        "User " + getCurrentUsername() + " cannot read parent Library " + o.getLibrary().getId() + " for LibraryQC " + qcId);
   }
 
   @Override
   public emPCR getEmPCRById(long pcrId) throws IOException {
     emPCR o = backingManager.getEmPCRById(pcrId);
-    if (readCheck(o))
-      return o;
-    else
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read emPCR " + pcrId);
+    if (readCheck(o)) return o;
+    else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read emPCR " + pcrId);
   }
 
   @Override
   public emPCRDilution getEmPCRDilutionById(long dilutionId) throws IOException {
     emPCRDilution o = backingManager.getEmPCRDilutionById(dilutionId);
-    if (readCheck(o))
-      return o;
-    else
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read emPCRDilution " + dilutionId);
+    if (readCheck(o)) return o;
+    else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read emPCRDilution " + dilutionId);
   }
 
   @Override
   public emPCRDilution getEmPCRDilutionByBarcode(String barcode) throws IOException {
     emPCRDilution o = backingManager.getEmPCRDilutionByBarcode(barcode);
-    if (readCheck(o))
-      return o;
-    else
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read emPCRDilution " + o.getId());
+    if (readCheck(o)) return o;
+    else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read emPCRDilution " + o.getId());
   }
 
   @Override
   public emPCRDilution getEmPCRDilutionByBarcodeAndPlatform(String barcode, PlatformType platformType) throws IOException {
     emPCRDilution o = backingManager.getEmPCRDilutionByBarcodeAndPlatform(barcode, platformType);
-    if (readCheck(o))
-      return o;
-    else
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read emPCRDilution " + o.getId());
+    if (readCheck(o)) return o;
+    else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read emPCRDilution " + o.getId());
   }
 
   @Override
   public SequencerPartitionContainer<SequencerPoolPartition> getSequencerPartitionContainerById(long containerId) throws IOException {
     SequencerPartitionContainer o = backingManager.getSequencerPartitionContainerById(containerId);
-    if (readCheck(o))
-      return o;
-    else
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read SequencerPartitionContainer " + containerId);
-  }
-
-  @Override
-  public Note getNoteById(long noteId) throws IOException {
-    Note o = backingManager.getNoteById(noteId);
-    User user = getCurrentUser();
-    if (o.getOwner().equals(user) || user.isAdmin() || (o.isInternalOnly() && user.isInternal()))
-      return o;
-    else
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Note " + o.getNoteId());
+    if (readCheck(o)) return o;
+    else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read SequencerPartitionContainer " + containerId);
   }
 
   @Override
   public Project getProjectById(long projectId) throws IOException {
     Project o = backingManager.getProjectById(projectId);
-    if (readCheck(o))
-      return o;
-    else
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Project " + projectId);
+    if (readCheck(o)) return o;
+    else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Project " + projectId);
   }
 
   @Override
   public Project getProjectByAlias(String projectAlias) throws IOException {
     Project o = backingManager.getProjectByAlias(projectAlias);
-    if (readCheck(o))
-      return o;
-    else
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Project " + projectAlias);
+    if (readCheck(o)) return o;
+    else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Project " + projectAlias);
   }
 
   @Override
   public ProjectOverview getProjectOverviewById(long overviewId) throws IOException {
     ProjectOverview o = backingManager.getProjectOverviewById(overviewId);
-    if (readCheck(o.getProject()))
-      return o;
-    else
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read parent Project " + o.getProject().getProjectId()
-          + " for ProjectOverview " + overviewId);
+    if (readCheck(o.getProject())) return o;
+    else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read parent Project " + o.getProject().getProjectId()
+        + " for ProjectOverview " + overviewId);
   }
 
   @Override
   public Run getRunById(long runId) throws IOException {
     Run o = backingManager.getRunById(runId);
-    if (readCheck(o))
-      return o;
-    else
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Run " + runId);
+    if (readCheck(o)) return o;
+    else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Run " + runId);
   }
 
   @Override
   public Run getRunByAlias(String alias) throws IOException {
     Run o = backingManager.getRunByAlias(alias);
-    if (readCheck(o))
-      return o;
-    else
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Run " + o.getId());
+    if (readCheck(o)) return o;
+    else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Run " + o.getId());
   }
 
   @Override
   public RunQC getRunQCById(long runQcId) throws IOException {
     RunQC o = backingManager.getRunQCById(runQcId);
-    if (readCheck(o.getRun()))
-      return o;
-    else
-      throw new AuthorizationIOException(
-          "User " + getCurrentUsername() + " cannot read parent Run " + o.getRun().getId() + " for RunQC " + runQcId);
+    if (readCheck(o.getRun())) return o;
+    else throw new AuthorizationIOException(
+        "User " + getCurrentUsername() + " cannot read parent Run " + o.getRun().getId() + " for RunQC " + runQcId);
   }
 
   @Override
   public Sample getSampleById(long sampleId) throws IOException {
     Sample o = backingManager.getSampleById(sampleId);
-    if (readCheck(o))
-      return o;
-    else
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Sample " + sampleId);
+    if (readCheck(o)) return o;
+    else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Sample " + sampleId);
   }
 
   @Override
   public Sample getSampleByBarcode(String barcode) throws IOException {
     Sample o = backingManager.getSampleByBarcode(barcode);
-    if (readCheck(o))
-      return o;
-    else
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Sample " + o.getId());
+    if (readCheck(o)) return o;
+    else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Sample " + o.getId());
   }
 
   @Override
   public SampleQC getSampleQCById(long sampleQcId) throws IOException {
     SampleQC o = backingManager.getSampleQCById(sampleQcId);
-    if (readCheck(o.getSample()))
-      return o;
-    else
-      throw new AuthorizationIOException(
-          "User " + getCurrentUsername() + " cannot read parent Sample " + o.getSample().getId() + " for SampleQC " + sampleQcId);
+    if (readCheck(o.getSample())) return o;
+    else throw new AuthorizationIOException(
+        "User " + getCurrentUsername() + " cannot read parent Sample " + o.getSample().getId() + " for SampleQC " + sampleQcId);
   }
 
   @Override
   public Status getStatusByRunName(String runName) throws IOException {
     Run o = backingManager.getRunByAlias(runName);
-    if (readCheck(o))
-      return backingManager.getStatusByRunName(runName);
-    else
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read parent Run " + o.getId() + " for Status");
+    if (readCheck(o)) return backingManager.getStatusByRunName(runName);
+    else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read parent Run " + o.getId() + " for Status");
   }
 
   @Override
   public Study getStudyById(long studyId) throws IOException {
     Study o = backingManager.getStudyById(studyId);
-    if (readCheck(o))
-      return o;
-    else
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Study " + studyId);
+    if (readCheck(o)) return o;
+    else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Study " + studyId);
   }
 
   @Override
   public Submission getSubmissionById(long submissionId) throws IOException {
     Submission o = backingManager.getSubmissionById(submissionId);
-    if (readCheck(o))
-      return o;
-    else
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Submission " + submissionId);
+    if (readCheck(o)) return o;
+    else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Submission " + submissionId);
   }
-
 
   /* lists */
 
@@ -1651,9 +1568,48 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public void deleteNote(Note note) throws IOException {
-    if (getCurrentUser().isAdmin() || getCurrentUser().equals(note.getOwner())) {
-      backingManager.deleteNote(note);
+  public void deleteRunNote(Run run, Long noteId) throws IOException {
+    if (writeCheck(run)) {
+      // TODO: when Hibernatized, should call authorizationManager.throwIfNonAdminOrMatchingOwner(note.getOwner()) too
+      backingManager.deleteRunNote(run, noteId);
+    } else {
+      throw new IOException("User " + getCurrentUser().getFullName() + " cannot write to this Run");
+    }
+  }
+
+  @Override
+  public void deleteKitNote(Kit kit, Long noteId) throws IOException {
+    // TODO: when Hibernatized, should call authorizationManager.throwIfNonAdminOrMatchingOwner(note.getOwner())
+    backingManager.deleteKitNote(kit, noteId);
+  }
+
+  @Override
+  public void deleteLibraryNote(Library library, Long noteId) throws IOException {
+    if (writeCheck(library)) {
+      // TODO: when Hibernatized, should call authorizationManager.throwIfNonAdminOrMatchingOwner(note.getOwner()) too
+      backingManager.deleteLibraryNote(library, noteId);
+    } else {
+      throw new IOException("User " + getCurrentUser().getFullName() + " cannot write to this Library");
+    }
+  }
+
+  @Override
+  public void deletePoolNote(Pool pool, Long noteId) throws IOException {
+    if (writeCheck(pool)) {
+      // TODO: when Hibernatized, should call authorizationManager.throwIfNonAdminOrMatchingOwner(note.getOwner()) too
+      backingManager.deletePoolNote(pool, noteId);
+    } else {
+      throw new IOException("User " + getCurrentUser().getFullName() + " cannot write to this Pool");
+    }
+  }
+
+  @Override
+  public void deleteProjectOverviewNote(ProjectOverview projectOverview, Long noteId) throws IOException {
+    if (writeCheck(projectOverview.getProject())) {
+      // TODO: when Hibernatized, should call authorizationManager.throwIfNonAdminOrMatchingOwner(note.getOwner()) too
+      backingManager.deleteProjectOverviewNote(projectOverview, noteId);
+    } else {
+      throw new IOException("User " + getCurrentUser().getFullName() + " cannot write to the parent Project");
     }
   }
 
@@ -1677,12 +1633,17 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public long saveRunNote(Run run, Note note) throws IOException {
+  public void saveRunNote(Run run, Note note) throws IOException {
     if (writeCheck(run)) {
-      return backingManager.saveRunNote(run, note);
+      backingManager.saveRunNote(run, note);
     } else {
       throw new IOException("User " + getCurrentUser().getFullName() + " cannot write to this Run");
     }
+  }
+
+  @Override
+  public void saveKitNote(Kit kit, Note note) throws IOException {
+    backingManager.saveKitNote(kit, note);
   }
 
   @Override
@@ -1829,28 +1790,22 @@ public class UserAuthMisoRequestManager implements RequestManager {
   @Override
   public Kit getKitById(long kitId) throws IOException {
     Kit o = backingManager.getKitById(kitId);
-    if (getCurrentUser().isInternal())
-      return o;
-    else
-      throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Kit " + kitId);
+    if (getCurrentUser().isInternal()) return o;
+    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Kit " + kitId);
   }
 
   @Override
   public Kit getKitByIdentificationBarcode(String barcode) throws IOException {
     Kit o = backingManager.getKitByIdentificationBarcode(barcode);
-    if (getCurrentUser().isInternal())
-      return o;
-    else
-      throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Kit " + barcode);
+    if (getCurrentUser().isInternal()) return o;
+    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Kit " + barcode);
   }
 
   @Override
   public Kit getKitByLotNumber(String lotNumber) throws IOException {
     Kit o = backingManager.getKitByLotNumber(lotNumber);
-    if (getCurrentUser().isInternal())
-      return o;
-    else
-      throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Kit " + lotNumber);
+    if (getCurrentUser().isInternal()) return o;
+    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Kit " + lotNumber);
   }
 
   @Override
@@ -1911,28 +1866,22 @@ public class UserAuthMisoRequestManager implements RequestManager {
   @Override
   public Box getBoxById(long boxId) throws IOException {
     Box o = backingManager.getBoxById(boxId);
-    if (readCheck(o))
-      return o;
-    else
-      throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Box " + boxId);
+    if (readCheck(o)) return o;
+    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Box " + boxId);
   }
 
   @Override
   public Box getBoxByBarcode(String barcode) throws IOException {
     Box o = backingManager.getBoxByBarcode(barcode);
-    if (readCheck(o))
-      return o;
-    else
-      throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Box " + barcode);
+    if (readCheck(o)) return o;
+    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Box " + barcode);
   }
 
   @Override
   public Box getBoxByAlias(String alias) throws IOException {
     Box o = backingManager.getBoxByAlias(alias);
-    if (readCheck(o))
-      return o;
-    else
-      throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Box " + alias);
+    if (readCheck(o)) return o;
+    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Box " + alias);
   }
 
   @Override
@@ -2107,26 +2056,20 @@ public class UserAuthMisoRequestManager implements RequestManager {
 
   @Override
   public Collection<Alert> listUnreadAlertsByUserId(long userId) throws IOException {
-    if (getCurrentUser().getUserId() == userId || getCurrentUser().isInternal())
-      return backingManager.listUnreadAlertsByUserId(userId);
-    else
-      return null;
+    if (getCurrentUser().getUserId() == userId || getCurrentUser().isInternal()) return backingManager.listUnreadAlertsByUserId(userId);
+    else return null;
   }
 
   @Override
   public Collection<Alert> listAlertsByUserId(long userId) throws IOException {
-    if (getCurrentUser().getUserId() == userId || getCurrentUser().isInternal())
-      return backingManager.listAlertsByUserId(userId);
-    else
-      return null;
+    if (getCurrentUser().getUserId() == userId || getCurrentUser().isInternal()) return backingManager.listAlertsByUserId(userId);
+    else return null;
   }
 
   @Override
   public Collection<Alert> listAlertsByUserId(long userId, long limit) throws IOException {
-    if (getCurrentUser().getUserId() == userId || getCurrentUser().isInternal())
-      return backingManager.listAlertsByUserId(userId, limit);
-    else
-      return null;
+    if (getCurrentUser().getUserId() == userId || getCurrentUser().isInternal()) return backingManager.listAlertsByUserId(userId, limit);
+    else return null;
   }
 
   @Override
@@ -2396,10 +2339,8 @@ public class UserAuthMisoRequestManager implements RequestManager {
   @Override
   public Run getLatestRunBySequencerPartitionContainerId(Long containerId) throws IOException {
     Run o = backingManager.getLatestRunBySequencerPartitionContainerId(containerId);
-    if (readCheck(o))
-      return o;
-    else
-      throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Run " + o.getId());
+    if (readCheck(o)) return o;
+    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Run " + o.getId());
   }
 
   @Override
@@ -2450,10 +2391,8 @@ public class UserAuthMisoRequestManager implements RequestManager {
   @Override
   public Project lazyGetProjectById(long projectId) throws IOException {
     Project o = backingManager.lazyGetProjectById(projectId);
-    if (readCheck(o))
-      return o;
-    else
-      throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Project " + projectId);
+    if (readCheck(o)) return o;
+    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Project " + projectId);
   }
 
   @Override
@@ -2462,7 +2401,7 @@ public class UserAuthMisoRequestManager implements RequestManager {
     List<LibraryDilution> rtn = new ArrayList<>();
     List<LibraryDilution> results = backingManager.getLibraryDilutionsForPoolDataTable(offset, limit, search, sortDir, sortCol, platform);
     User currentUser = getCurrentUser();
-    for (LibraryDilution ld : results){
+    for (LibraryDilution ld : results) {
       if (ld.userCanRead(currentUser)) {
         rtn.add(ld);
       }

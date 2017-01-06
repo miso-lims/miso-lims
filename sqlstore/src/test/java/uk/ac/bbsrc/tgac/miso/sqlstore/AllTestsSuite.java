@@ -48,7 +48,6 @@ import org.junit.runners.Suite;
     SQLLibraryDAOTest.class, //
     SQLLibraryDilutionDAOTest.class, //
     SQLLibraryQCDAOTest.class, //
-    SQLNoteDAOTest.class, //
     SQLPlatformDAOTest.class, //
     SQLPoolDAOTest.class, //
     SQLPoolQCDAOTest.class, //

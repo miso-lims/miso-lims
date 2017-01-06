@@ -82,7 +82,7 @@ public interface RequestManager {
 
   public long saveProjectOverview(ProjectOverview overview) throws IOException;
 
-  public long saveProjectOverviewNote(ProjectOverview overview, Note note) throws IOException;
+  public void saveProjectOverviewNote(ProjectOverview overview, Note note) throws IOException;
 
   public long saveRun(Run run) throws IOException;
 
@@ -90,13 +90,13 @@ public interface RequestManager {
 
   public long saveRunQC(RunQC runQC) throws IOException;
 
-  public long saveRunNote(Run run, Note note) throws IOException;
+  public void saveRunNote(Run run, Note note) throws IOException;
+
+  public void saveKitNote(Kit kit, Note note) throws IOException;
 
   public long saveSample(Sample sample) throws IOException;
 
   public long saveSampleQC(SampleQC sampleQC) throws IOException;
-
-  public long saveSampleNote(Sample sample, Note note) throws IOException;
 
   public long saveEmPcrDilution(emPCRDilution dilution) throws IOException;
 
@@ -104,7 +104,7 @@ public interface RequestManager {
 
   public long saveLibraryDilution(LibraryDilution libraryDilution) throws IOException;
 
-  public long saveLibraryNote(Library library, Note note) throws IOException;
+  public void saveLibraryNote(Library library, Note note) throws IOException;
 
   public long saveLibraryQC(LibraryQC libraryQC) throws IOException;
 
@@ -112,7 +112,7 @@ public interface RequestManager {
 
   public long savePoolQC(PoolQC poolQC) throws IOException;
 
-  public long savePoolNote(Pool pool, Note note) throws IOException;
+  public void savePoolNote(Pool pool, Note note) throws IOException;
 
   public long saveEmPCR(emPCR pcr) throws IOException;
 
@@ -207,8 +207,6 @@ public interface RequestManager {
   public emPCRDilution getEmPCRDilutionById(long dilutionId) throws IOException;
 
   public emPCRDilution getEmPCRDilutionByBarcode(String barcode) throws IOException;
-
-  public Note getNoteById(long noteId) throws IOException;
 
   public Platform getPlatformById(long platformId) throws IOException;
 
@@ -565,7 +563,15 @@ public interface RequestManager {
 
   public void deleteContainer(SequencerPartitionContainer container) throws IOException;
 
-  public void deleteNote(Note note) throws IOException;
+  public void deleteRunNote(Run run, Long noteId) throws IOException;
+
+  public void deleteKitNote(Kit kit, Long noteId) throws IOException;
+
+  public void deleteLibraryNote(Library library, Long noteId) throws IOException;
+
+  public void deletePoolNote(Pool pool, Long noteId) throws IOException;
+
+  public void deleteProjectOverviewNote(ProjectOverview projectOverview, Long noteId) throws IOException;
 
   public void deleteBox(Box box) throws IOException;
 

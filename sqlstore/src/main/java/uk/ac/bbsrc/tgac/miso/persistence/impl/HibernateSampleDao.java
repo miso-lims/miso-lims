@@ -31,7 +31,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.store.SecurityStore;
 
@@ -48,7 +47,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.SiblingNumberGenerator;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
-import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleDao;
@@ -73,8 +71,6 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
   private ChangeLogStore changeLogDao;
 
   private LibraryStore libraryDao;
-
-  private NoteStore noteDao;
 
   private SecurityStore securityDao;
 
@@ -144,9 +140,6 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
 
     sample.getLibraries().clear();
     sample.getLibraries().addAll(libraryDao.listBySampleId(sample.getId()));
-
-    sample.getNotes().clear();
-    sample.getNotes().addAll(noteDao.listBySample(sample.getId()));
 
     sample.getChangeLog().clear();
     sample.getChangeLog().addAll(changeLogDao.listAllById("Sample", sample.getId()));
@@ -226,10 +219,6 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
 
   public LibraryStore getLibraryDao() {
     return libraryDao;
-  }
-
-  public NoteStore getNoteDao() {
-    return noteDao;
   }
 
   @Override
@@ -437,14 +426,9 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
    * Write all the non-Hibernate data from a Sample that aren't persisted manually in the controllers.
    */
   private void persistSqlStore(Sample sample) throws IOException {
+    // TODO: method no longer needed except for cache invalidation
     Cache cache = cacheManager == null ? null : cacheManager.getCache(LimsUtils.noddyCamelCaseify(Project.class.getSimpleName()) + "Cache");
     if (cache != null) cache.remove(DbUtils.hashCodeCacheKeyFor(sample.getProject().getId()));
-
-    // Now we have to persist all the things that aren't covered by Hibernate. Turns out, just notes.
-
-    for (Note n : sample.getNotes()) {
-      noteDao.saveSampleNote(sample, n);
-    }
   }
 
   @Override
@@ -481,10 +465,6 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
 
   public void setLibraryDao(LibraryStore libraryDao) {
     this.libraryDao = libraryDao;
-  }
-
-  public void setNoteDao(NoteStore noteDao) {
-    this.noteDao = noteDao;
   }
 
   public void setSecurityDao(SecurityStore securityDao) {
@@ -547,4 +527,5 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
     query.setParameter("id", id);
     return fetchSqlStore((Sample) query.uniqueResult());
   }
+
 }

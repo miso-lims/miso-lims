@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -58,7 +59,7 @@ public class KitImpl implements Kit {
   private String identificationBarcode;
   private String locationBarcode;
 
-  @OneToMany(targetEntity = Note.class)
+  @OneToMany(targetEntity = Note.class, cascade = CascadeType.ALL)
   @JoinTable(name = "Kit_Note", joinColumns = {
       @JoinColumn(name = "kit_kitId", nullable = false, updatable = false) }, inverseJoinColumns = {
           @JoinColumn(name = "notes_noteId", nullable = false, updatable = false) })

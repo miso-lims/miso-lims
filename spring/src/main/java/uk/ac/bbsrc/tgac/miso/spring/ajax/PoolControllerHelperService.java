@@ -107,7 +107,7 @@ public class PoolControllerHelperService {
   @Autowired
   private BarcodeFactory barcodeFactory;
   @Autowired
-  private PrintManager<MisoPrintService, Queue<?>> printManager;
+  private PrintManager<MisoPrintService<?, ?, ?>, Queue<?>> printManager;
   @Autowired
   private ExperimentService experimentService;
 
@@ -642,15 +642,8 @@ public class PoolControllerHelperService {
 
     try {
       Pool pool = requestManager.getPoolById(poolId);
-      Note note = requestManager.getNoteById(noteId);
-      if (pool.getNotes().contains(note)) {
-        pool.getNotes().remove(note);
-        requestManager.deleteNote(note);
-        requestManager.savePool(pool);
-        return JSONUtils.SimpleJSONResponse("OK");
-      } else {
-        return JSONUtils.SimpleJSONError("Pool does not have note " + noteId + ". Cannot remove");
-      }
+      requestManager.deletePoolNote(pool, noteId);
+      return JSONUtils.SimpleJSONResponse("OK");
     } catch (IOException e) {
       log.error("cannot remove note", e);
       return JSONUtils.SimpleJSONError("Cannot remove note: " + e.getMessage());
@@ -759,7 +752,7 @@ public class PoolControllerHelperService {
     this.misoFileManager = misoFileManager;
   }
 
-  public void setPrintManager(PrintManager<MisoPrintService, Queue<?>> printManager) {
+  public void setPrintManager(PrintManager<MisoPrintService<?, ?, ?>, Queue<?>> printManager) {
     this.printManager = printManager;
   }
 }

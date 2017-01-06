@@ -118,4 +118,5 @@ public interface ProjectStore extends Store<Project>, Cascadable, Remover<Projec
    * @throws IOException
    */
   public Map<String, Integer> getProjectColumnSizes() throws IOException;
+
 }

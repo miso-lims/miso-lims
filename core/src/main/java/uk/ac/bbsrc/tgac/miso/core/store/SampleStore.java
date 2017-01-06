@@ -168,4 +168,5 @@ public interface SampleStore extends Store<Sample>, Cascadable, Remover<Sample> 
    *           when the objects cannot be retrieved
    */
   Collection<Sample> getByIdList(List<Long> idList) throws IOException;
+
 }

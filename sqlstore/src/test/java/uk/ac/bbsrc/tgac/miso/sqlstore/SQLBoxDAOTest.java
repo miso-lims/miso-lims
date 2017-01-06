@@ -67,7 +67,6 @@ import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
-import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
 import uk.ac.bbsrc.tgac.miso.core.store.RunQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerReferenceStore;
@@ -98,8 +97,6 @@ public class SQLBoxDAOTest extends AbstractDAOTest {
   private SequencerPartitionContainerStore sequencerPartitionContainerDAO;
   @Mock
   private StatusStore statusDAO;
-  @Mock
-  private NoteStore noteDAO;
   @Mock
   private ChangeLogStore changeLogDAO;
   @Mock

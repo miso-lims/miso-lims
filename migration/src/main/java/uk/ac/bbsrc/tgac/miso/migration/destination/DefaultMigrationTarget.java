@@ -217,7 +217,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
     valueTypeLookup.resolveAll(sample);
 
     Collection<SampleQC> qcs = new TreeSet<>(sample.getSampleQCs());
-    Collection<Note> notes = new HashSet<>(sample.getNotes());
+    addSampleNoteDetails(sample);
 
     if (isDetailedSample(sample)) {
       DetailedSample detailed = (DetailedSample) sample;
@@ -247,7 +247,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
       sample.setId(serviceManager.getSampleService().create(sample));
     }
     saveSampleQcs(sample, qcs);
-    saveSampleNotes(sample, notes);
+
     log.debug("Saved sample " + sample.getAlias());
   }
 
@@ -316,12 +316,11 @@ public class DefaultMigrationTarget implements MigrationTarget {
     }
   }
 
-  private void saveSampleNotes(Sample sample, Collection<Note> notes) throws IOException {
+  private void addSampleNoteDetails(Sample sample) throws IOException {
     Date date = (replaceChangeLogs && sample.getChangeLog() != null) ? getLatestChangeDate(sample) : timeStamp;
-    for (Note note : notes) {
+    for (Note note : sample.getNotes()) {
       note.setCreationDate(date);
       note.setOwner(migrationUser);
-      note.setNoteId(serviceManager.getNoteDao().saveSampleNote(sample, note));
     }
   }
 
@@ -490,10 +489,9 @@ public class DefaultMigrationTarget implements MigrationTarget {
   public void savePools(final Collection<Pool> pools) throws IOException {
     log.info("Migrating pools...");
     for (Pool pool : pools) {
-      Collection<Note> notes = pool.getNotes();
       setPoolModifiedDetails(pool);
+      addPoolNoteDetails(pool);
       pool.setId(serviceManager.getPoolDao().save(pool));
-      savePoolNotes(pool, notes);
       log.debug("Saved pool " + pool.getAlias());
     }
     log.info(pools.size() + " pools migrated.");
@@ -505,11 +503,10 @@ public class DefaultMigrationTarget implements MigrationTarget {
     pool.setLastUpdated(timeStamp);
   }
   
-  private void savePoolNotes(Pool pool, Collection<Note> notes) throws IOException {
-    for (Note note : notes) {
+  private void addPoolNoteDetails(Pool pool) throws IOException {
+    for (Note note : pool.getNotes()) {
       note.setCreationDate(timeStamp);
       note.setOwner(migrationUser);
-      note.setNoteId(serviceManager.getNoteDao().savePoolNote(pool, note));
     }
   }
 
@@ -560,7 +557,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
               toPoolables.addAll(fromPoolables);
               setPoolModifiedDetails(toPool);
               serviceManager.getPoolDao().save(toPool);
-              savePoolNotes(toPool, fromPartition.getPool().getNotes());
+              addPoolNoteDetails(fromPartition.getPool());
               log.debug(String.format("Merged new pool %s with existing pool '%s' in run %d lane %d",
                   fromPartition.getPool().getAlias(), toPool.getAlias(), to.getId(), toPartition.getPartitionNumber()));
             } else {

@@ -58,7 +58,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.AbstractRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
-import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
@@ -603,20 +602,6 @@ public class RunControllerHelperService {
     return JSONUtils.SimpleJSONResponse(b.toString());
   }
 
-  private String getPlatformSelect(Run run) throws IOException {
-    StringBuilder b = new StringBuilder();
-    Collection<Platform> platforms = requestManager.listAllPlatforms();
-    b.append("<select name='platform' id='platform' onchange='setContainerCount(this);'>");
-    for (Platform p : platforms) {
-      if (p.getPlatformType().equals(run.getPlatformType())) {
-        b.append("<option value='" + p.getId() + "' platform='" + p.getPlatformType().getKey() + "'");
-        b.append(">" + p.getPlatformType().getKey() + " - " + p.getInstrumentModel() + "</option>");
-      }
-    }
-    b.append("</select>");
-    return b.toString();
-  }
-
   public JSONObject getRunQCUsers(HttpSession session, JSONObject json) {
     try {
       Collection<String> users = new HashSet<>();
@@ -912,16 +897,8 @@ public class RunControllerHelperService {
 
     try {
       Run run = requestManager.getRunById(runId);
-      Note note = requestManager.getNoteById(noteId);
-      if (run.getNotes().contains(note)) {
-        run.getNotes().remove(note);
-        requestManager.deleteNote(note);
-        run.setLastModifier(securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName()));
-        requestManager.saveRun(run);
-        return JSONUtils.SimpleJSONResponse("OK");
-      } else {
-        return JSONUtils.SimpleJSONError("Sample does not have note " + noteId + ". Cannot remove");
-      }
+      requestManager.deleteRunNote(run, noteId);
+      return JSONUtils.SimpleJSONResponse("OK");
     } catch (IOException e) {
       log.error("delete run note", e);
       return JSONUtils.SimpleJSONError("Cannot remove note: " + e.getMessage());

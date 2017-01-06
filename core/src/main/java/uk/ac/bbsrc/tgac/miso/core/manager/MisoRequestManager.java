@@ -102,7 +102,6 @@ import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignDao;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
-import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PartitionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PlatformStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolQcStore;
@@ -145,8 +144,6 @@ public class MisoRequestManager implements RequestManager {
   private LibraryStore libraryStore;
   @Autowired
   private LibraryQcStore libraryQcStore;
-  @Autowired
-  private NoteStore noteStore;
   @Autowired
   private PartitionStore partitionStore;
   @Autowired
@@ -236,10 +233,6 @@ public class MisoRequestManager implements RequestManager {
 
   public void setNamingScheme(NamingScheme namingScheme) {
     this.namingScheme = namingScheme;
-  }
-
-  public void setNoteStore(NoteStore noteStore) {
-    this.noteStore = noteStore;
   }
 
   public void setPartitionStore(PartitionStore partitionStore) {
@@ -1395,14 +1388,103 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public void deleteNote(Note note) throws IOException {
-    if (noteStore != null) {
-      if (!noteStore.remove(note)) {
-        throw new IOException("Unable to delete note.");
-      }
-    } else {
-      throw new IOException("No noteStore available. Check that it has been declared in the Spring config.");
+  public void deleteRunNote(Run run, Long noteId) throws IOException {
+    if (noteId == null || noteId.equals(Note.UNSAVED_ID)) {
+      throw new IllegalArgumentException("Cannot delete an unsaved Note");
     }
+    Run managed = runStore.get(run.getId());
+    Note deleteNote = null;
+    for (Note note : managed.getNotes()) {
+      if (note.getNoteId().equals(noteId)) {
+        deleteNote = note;
+        break;
+      }
+    }
+    if (deleteNote == null) {
+      throw new IOException("Note " + noteId + " not found for Run " + run.getId());
+    }
+    managed.getNotes().remove(deleteNote);
+    runStore.save(managed);
+  }
+
+  @Override
+  public void deleteKitNote(Kit kit, Long noteId) throws IOException {
+    if (noteId == null || noteId.equals(Note.UNSAVED_ID)) {
+      throw new IllegalArgumentException("Cannot delete an unsaved Note");
+    }
+    Kit managed = kitStore.get(kit.getId());
+    Note deleteNote = null;
+    for (Note note : managed.getNotes()) {
+      if (note.getNoteId().equals(noteId)) {
+        deleteNote = note;
+        break;
+      }
+    }
+    if (deleteNote == null) {
+      throw new IOException("Note " + noteId + " not found for Kit " + kit.getId());
+    }
+    managed.getNotes().remove(deleteNote);
+    kitStore.save(managed);
+  }
+
+  @Override
+  public void deleteLibraryNote(Library library, Long noteId) throws IOException {
+    if (noteId == null || noteId.equals(Note.UNSAVED_ID)) {
+      throw new IllegalArgumentException("Cannot delete an unsaved Note");
+    }
+    Library managed = libraryStore.get(library.getId());
+    Note deleteNote = null;
+    for (Note note : managed.getNotes()) {
+      if (note.getNoteId().equals(noteId)) {
+        deleteNote = note;
+        break;
+      }
+    }
+    if (deleteNote == null) {
+      throw new IOException("Note " + noteId + " not found for Library " + library.getId());
+    }
+    managed.getNotes().remove(deleteNote);
+    libraryStore.save(managed);
+  }
+
+  @Override
+  public void deletePoolNote(Pool pool, Long noteId) throws IOException {
+    if (noteId == null || noteId.equals(Note.UNSAVED_ID)) {
+      throw new IllegalArgumentException("Cannot delete an unsaved Note");
+    }
+    Pool managed = poolStore.get(pool.getId());
+    Note deleteNote = null;
+    for (Note note : managed.getNotes()) {
+      if (note.getNoteId().equals(noteId)) {
+        deleteNote = note;
+        break;
+      }
+    }
+    if (deleteNote == null) {
+      throw new IOException("Note " + noteId + " not found for Pool " + pool.getId());
+    }
+    managed.getNotes().remove(deleteNote);
+    poolStore.save(managed);
+  }
+
+  @Override
+  public void deleteProjectOverviewNote(ProjectOverview projectOverview, Long noteId) throws IOException {
+    if (noteId == null || noteId.equals(Note.UNSAVED_ID)) {
+      throw new IllegalArgumentException("Cannot delete an unsaved Note");
+    }
+    ProjectOverview managed = projectStore.getProjectOverviewById(projectOverview.getId());
+    Note deleteNote = null;
+    for (Note note : managed.getNotes()) {
+      if (note.getNoteId().equals(noteId)) {
+        deleteNote = note;
+        break;
+      }
+    }
+    if (deleteNote == null) {
+      throw new IOException("Note " + noteId + " not found for ProjectOverview " + projectOverview.getId());
+    }
+    managed.getNotes().remove(deleteNote);
+    projectStore.saveOverview(managed);
   }
 
   @Override
@@ -1437,12 +1519,12 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public long saveProjectOverviewNote(ProjectOverview overview, Note note) throws IOException {
-    if (noteStore != null) {
-      return noteStore.saveProjectOverviewNote(overview, note);
-    } else {
-      throw new IOException("No noteStore available. Check that it has been declared in the Spring config.");
-    }
+  public void saveProjectOverviewNote(ProjectOverview overview, Note note) throws IOException {
+    ProjectOverview managed = projectStore.getProjectOverviewById(overview.getId());
+    note.setCreationDate(new Date());
+    // TODO: when moved to Service: note.setOwner(authorizationManager.getCurrentUser());
+    managed.getNotes().add(note);
+    projectStore.saveOverview(managed);
   }
 
   @Override
@@ -1491,12 +1573,21 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public long saveRunNote(Run run, Note note) throws IOException {
-    if (noteStore != null) {
-      return noteStore.saveRunNote(run, note);
-    } else {
-      throw new IOException("No noteStore available. Check that it has been declared in the Spring config.");
-    }
+  public void saveRunNote(Run run, Note note) throws IOException {
+    Run managed = runStore.get(run.getId());
+    note.setCreationDate(new Date());
+    // TODO: when moved to Service: note.setOwner(authorizationManager.getCurrentUser());
+    managed.addNote(note);
+    runStore.save(managed);
+  }
+
+  @Override
+  public void saveKitNote(Kit kit, Note note) throws IOException {
+    Kit managed = kitStore.get(kit.getId());
+    note.setCreationDate(new Date());
+    // TODO: when moved to Service: note.setOwner(authorizationManager.getCurrentUser());
+    managed.addNote(note);
+    kitStore.save(managed);
   }
 
   @Override
@@ -1514,15 +1605,6 @@ public class MisoRequestManager implements RequestManager {
       return sampleQcStore.save(sampleQc);
     } else {
       throw new IOException("No sampleQcStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public long saveSampleNote(Sample sample, Note note) throws IOException {
-    if (noteStore != null) {
-      return noteStore.saveSampleNote(sample, note);
-    } else {
-      throw new IOException("No noteStore available. Check that it has been declared in the Spring config.");
     }
   }
 
@@ -1584,12 +1666,12 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public long saveLibraryNote(Library library, Note note) throws IOException {
-    if (noteStore != null) {
-      return noteStore.saveLibraryNote(library, note);
-    } else {
-      throw new IOException("No noteStore available. Check that it has been declared in the Spring config.");
-    }
+  public void saveLibraryNote(Library library, Note note) throws IOException {
+    Library managed = libraryStore.get(library.getId());
+    note.setCreationDate(new Date());
+    // TODO: when moved to Service: note.setOwner(authorizationManager.getCurrentUser());
+    managed.getNotes().add(note);
+    libraryStore.save(managed);
   }
 
   @Override
@@ -1641,12 +1723,12 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public long savePoolNote(Pool pool, Note note) throws IOException {
-    if (noteStore != null) {
-      return noteStore.savePoolNote(pool, note);
-    } else {
-      throw new IOException("No noteStore available. Check that it has been declared in the Spring config.");
-    }
+  public void savePoolNote(Pool pool, Note note) throws IOException {
+    Pool managed = poolStore.get(pool.getId());
+    note.setCreationDate(new Date());
+    // TODO: when moved to Service: note.setOwner(authorizationManager.getCurrentUser());
+    managed.addNote(note);
+    poolStore.save(managed);
   }
 
   @Override
@@ -2155,15 +2237,6 @@ public class MisoRequestManager implements RequestManager {
       return statusStore.getByRunName(runName);
     } else {
       throw new IOException("No statusStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Note getNoteById(long noteId) throws IOException {
-    if (noteStore != null) {
-      return noteStore.get(noteId);
-    } else {
-      throw new IOException("No noteStore available. Check that it has been declared in the Spring config.");
     }
   }
 

@@ -41,6 +41,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 
@@ -131,7 +132,10 @@ public abstract class AbstractPool extends AbstractBoxable implements Pool {
   private User lastModifier;
   private Date lastModified;
 
-  @Transient
+  @OneToMany(targetEntity = Note.class, cascade = CascadeType.ALL)
+  @JoinTable(name = "Pool_Note", joinColumns = {
+      @JoinColumn(name = "pool_poolId", nullable = false, updatable = false) }, inverseJoinColumns = {
+      @JoinColumn(name = "notes_noteId", nullable = false, updatable = false) })
   private Collection<Note> notes = new HashSet<>();
 
   @Override

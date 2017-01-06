@@ -46,7 +46,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.IndexStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
-import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.persistence.LibraryAdditionalInfoDao;
@@ -65,8 +64,6 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
   private LibraryDilutionStore libraryDilutionStore;
   @Mock
   private SQLLibraryQCDAO libraryQCDAO;
-  @Mock
-  private NoteStore noteStore;
   @Mock
   private NamingScheme namingScheme;
   @Mock

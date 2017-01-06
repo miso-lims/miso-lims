@@ -59,4 +59,5 @@ public interface KitStore extends Store<Kit> {
    * @throws IOException
    */
   public Map<String, Integer> getKitDescriptorColumnSizes() throws IOException;
+
 }

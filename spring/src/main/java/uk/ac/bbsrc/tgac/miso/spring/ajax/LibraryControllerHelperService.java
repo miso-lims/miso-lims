@@ -176,18 +176,9 @@ public class LibraryControllerHelperService {
     Long noteId = json.getLong("noteId");
 
     try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Library library = requestManager.getLibraryById(libraryId);
-      Note note = requestManager.getNoteById(noteId);
-      if (library.getNotes().contains(note)) {
-        library.getNotes().remove(note);
-        requestManager.deleteNote(note);
-        library.setLastModifier(user);
-        requestManager.saveLibrary(library);
-        return JSONUtils.SimpleJSONResponse("OK");
-      } else {
-        return JSONUtils.SimpleJSONError("Library does not have note " + noteId + ". Cannot remove");
-      }
+      requestManager.deleteLibraryNote(library, noteId);
+      return JSONUtils.SimpleJSONResponse("OK");
     } catch (IOException e) {
       log.error("delete library note", e);
       return JSONUtils.SimpleJSONError("Cannot remove note: " + e.getMessage());

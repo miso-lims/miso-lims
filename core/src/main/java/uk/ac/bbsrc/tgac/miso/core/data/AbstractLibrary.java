@@ -32,12 +32,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.TreeSet;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 
@@ -45,8 +48,6 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.codehaus.jackson.annotate.JsonBackReference;
 import org.codehaus.jackson.annotate.JsonManagedReference;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -133,7 +134,10 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
 
   private Date lastModified;
 
-  @Transient
+  @OneToMany(targetEntity = Note.class, cascade = CascadeType.ALL)
+  @JoinTable(name = "Kit_Note", joinColumns = {
+      @JoinColumn(name = "kit_kitId", nullable = false, updatable = false) }, inverseJoinColumns = {
+      @JoinColumn(name = "notes_noteId", nullable = false, updatable = false) })
   private Collection<Note> notes = new HashSet<Note>();
 
   @Transient
@@ -142,8 +146,7 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @Transient
   private Date lastUpdated;
 
-  @OneToOne(targetEntity = LibraryAdditionalInfoImpl.class, mappedBy = "library")
-  @Cascade({ CascadeType.ALL })
+  @OneToOne(targetEntity = LibraryAdditionalInfoImpl.class, mappedBy = "library", cascade = CascadeType.ALL)
   @JsonManagedReference
   private LibraryAdditionalInfo libraryAdditionalInfo;
 

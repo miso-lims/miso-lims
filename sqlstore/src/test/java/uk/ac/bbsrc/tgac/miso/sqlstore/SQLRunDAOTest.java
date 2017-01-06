@@ -46,7 +46,6 @@ import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.store.SecurityStore;
@@ -59,17 +58,16 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
-import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
 import uk.ac.bbsrc.tgac.miso.core.store.RunQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerReferenceStore;
 import uk.ac.bbsrc.tgac.miso.core.store.StatusStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateRunDao;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSecurityDao;
 
 public class SQLRunDAOTest extends AbstractDAOTest {
 
@@ -95,8 +93,6 @@ public class SQLRunDAOTest extends AbstractDAOTest {
   private SequencerPartitionContainerStore sequencerPartitionContainerDAO;
   @Mock
   private StatusStore statusDAO;
-  @Mock
-  private NoteStore noteDAO;
   @Mock
   private ChangeLogStore changeLogDAO;
 
@@ -454,10 +450,6 @@ public class SQLRunDAOTest extends AbstractDAOTest {
     List<RunQC> mockQcs = new ArrayList<>();
     mockQcs.add(Mockito.mock(RunQC.class));
     Mockito.when(runQcDAO.listByRunId(Matchers.anyLong())).thenReturn(mockQcs);
-
-    List<Note> mockNotes = new ArrayList<>();
-    mockNotes.add(Mockito.mock(Note.class));
-    Mockito.when(noteDAO.listByRun(Matchers.anyLong())).thenReturn(mockNotes);
   }
 
   private void assertNonLazyThings(Run run) {
@@ -533,10 +525,7 @@ public class SQLRunDAOTest extends AbstractDAOTest {
     assertNotNull(run);
     assertEquals(0, run.getWatchers().size());
 
-    // Need to use SecurityDao to get a valid Hibernate-managed User
-    HibernateSecurityDao userDao = new HibernateSecurityDao();
-    userDao.setSessionFactory(sessionFactory);
-    User user = securityDAO.getUserById(1L);
+    User user = (User) sessionFactory.getCurrentSession().get(UserImpl.class, 1L);
     assertNotNull(user);
 
     dao.addWatcher(run, user);

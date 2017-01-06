@@ -96,7 +96,7 @@ public class ProjectControllerHelperService {
   @Autowired
   private IssueTrackerManager issueTrackerManager;
   @Autowired
-  private PrintManager<MisoPrintService, Queue<?>> printManager;
+  private PrintManager<MisoPrintService<?, ?, ?>, Queue<?>> printManager;
   @Autowired
   private MisoFilesManager misoFileManager;
   @Autowired
@@ -124,7 +124,7 @@ public class ProjectControllerHelperService {
     this.misoFileManager = misoFileManager;
   }
 
-  public void setPrintManager(PrintManager<MisoPrintService, Queue<?>> printManager) {
+  public void setPrintManager(PrintManager<MisoPrintService<?, ?, ?>, Queue<?>> printManager) {
     this.printManager = printManager;
   }
 
@@ -206,15 +206,8 @@ public class ProjectControllerHelperService {
 
     try {
       final ProjectOverview po = requestManager.getProjectOverviewById(overviewId);
-      final Note note = requestManager.getNoteById(noteId);
-      if (po.getNotes().contains(note)) {
-        po.getNotes().remove(note);
-        requestManager.deleteNote(note);
-        requestManager.saveProjectOverview(po);
-        return JSONUtils.SimpleJSONResponse("OK");
-      } else {
-        return JSONUtils.SimpleJSONError("Project Overview does not have note " + noteId + ". Cannot remove");
-      }
+      requestManager.deleteProjectOverviewNote(po, noteId);
+      return JSONUtils.SimpleJSONResponse("OK");
     } catch (final IOException e) {
       log.error("delete project overview", e);
       return JSONUtils.SimpleJSONError("Cannot remove note: " + e.getMessage());
@@ -925,7 +918,6 @@ public class ProjectControllerHelperService {
     final StringBuilder sb = new StringBuilder();
     final JSONObject j = new JSONObject();
     try {
-      final User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       final ProjectOverview overview = requestManager.getProjectOverviewById(overviewId);
       sb.append("<ul class='bullets' style='margin-left: -30px;'>");
       for (final User theUser : overview.getWatchers()) {

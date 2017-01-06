@@ -37,6 +37,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
@@ -82,6 +83,8 @@ public class ProjectOverview implements Watchable, Alertable, Nameable, Serializ
 
   public static final Long UNSAVED_ID = 0L;
 
+  private static final String NAME_PREFIX = "POV";
+
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long overviewId = ProjectOverview.UNSAVED_ID;
@@ -94,7 +97,13 @@ public class ProjectOverview implements Watchable, Alertable, Nameable, Serializ
 
   private Collection<Library> libraries = new HashSet<>();
   private Collection<Run> runs = new HashSet<>();
+
+  @OneToMany(targetEntity = Note.class, cascade = CascadeType.ALL)
+  @JoinTable(name = "ProjectOverview_Note", joinColumns = {
+      @JoinColumn(name = "overview_overviewId", nullable = false, updatable = false) }, inverseJoinColumns = {
+      @JoinColumn(name = "notes_noteId", nullable = false, updatable = false) })
   private Collection<Note> notes = new HashSet<>();
+
   private Date startDate;
   private Date endDate;
   private Integer numProposedSamples;
@@ -120,7 +129,7 @@ public class ProjectOverview implements Watchable, Alertable, Nameable, Serializ
 
   @Override
   public String getName() {
-    return "POV" + getId();
+    return NAME_PREFIX + getId();
   }
 
   @Override

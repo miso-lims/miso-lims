@@ -42,7 +42,10 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "LibraryType")
-public class LibraryType implements Comparable, Serializable {
+public class LibraryType implements Comparable<LibraryType>, Serializable {
+
+  private static final long serialVersionUID = 1L;
+
   public static final Long UNSAVED_ID = 0L;
 
   /** Field libraryTypeId */
@@ -144,8 +147,7 @@ public class LibraryType implements Comparable, Serializable {
   }
 
   @Override
-  public int compareTo(Object o) {
-    LibraryType t = (LibraryType) o;
+  public int compareTo(LibraryType t) {
     return getDescription().compareTo(t.getDescription());
   }
 }

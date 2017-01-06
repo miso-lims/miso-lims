@@ -239,14 +239,9 @@ public class UserAuthMisoRequestManagerTestSuite {
    */
   @Test
   public void testSaveProjectOverviewNote() throws IOException {
-    final long expectedReturn = 1L;
-
     when(overview.getProject()).thenReturn(project);
     when(project.userCanWrite(any(User.class))).thenReturn(true);
-    when(backingManager.saveProjectOverviewNote(overview, note)).thenReturn(expectedReturn);
-
-    assertEquals(expectedReturn, userAuthMisoRequestManager.saveProjectOverviewNote(overview, note));
-
+    userAuthMisoRequestManager.saveProjectOverviewNote(overview, note);
     verify(backingManager).saveProjectOverviewNote(overview, note);
   }
 
@@ -411,42 +406,6 @@ public class UserAuthMisoRequestManagerTestSuite {
 
   /**
    * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveSampleNote(uk.ac.bbsrc.tgac.miso.core.data.Sample, com.eaglegenomics.simlims.core.Note)}
-   * .
-   * 
-   * @throws IOException
-   */
-  @Test
-  public void testSaveSampleNote() throws IOException {
-    final long expectedReturn = 1L;
-    when(sample.userCanWrite(any(User.class))).thenReturn(true);
-    when(backingManager.saveSampleNote(sample, note)).thenReturn(expectedReturn);
-
-    assertEquals(expectedReturn, userAuthMisoRequestManager.saveSampleNote(sample, note));
-
-    verify(backingManager).saveSampleNote(sample, note);
-  }
-
-  /**
-   * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveSampleNote(uk.ac.bbsrc.tgac.miso.core.data.Sample, com.eaglegenomics.simlims.core.Note)}
-   * .
-   * 
-   * @throws IOException
-   */
-  @Test
-  public void testSaveSampleNoteThrows() throws IOException {
-    when(sample.userCanWrite(any(User.class))).thenReturn(false);
-
-    thrown.expect(IOException.class);
-    thrown.expectMessage("User null cannot write to this Sample");
-    userAuthMisoRequestManager.saveSampleNote(sample, note);
-
-    verify(backingManager, never()).saveSampleNote(sample, note);
-  }
-
-  /**
-   * Test method for
    * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveLibrary(uk.ac.bbsrc.tgac.miso.core.data.Library)} .
    * 
    * @throws IOException
@@ -524,12 +483,8 @@ public class UserAuthMisoRequestManagerTestSuite {
    */
   @Test
   public void testSaveLibraryNote() throws IOException {
-    final long expectedReturn = 1L;
     when(library.userCanWrite(any(User.class))).thenReturn(true);
-    when(backingManager.saveLibraryNote(library, note)).thenReturn(expectedReturn);
-
-    assertEquals(expectedReturn, userAuthMisoRequestManager.saveLibraryNote(library, note));
-
+    userAuthMisoRequestManager.saveLibraryNote(library, note);
     verify(backingManager).saveLibraryNote(library, note);
   }
 
@@ -1552,74 +1507,6 @@ public class UserAuthMisoRequestManagerTestSuite {
     userAuthMisoRequestManager.getSequencerPartitionContainerById(id);
 
     verify(backingManager).getSequencerPartitionContainerById(id);
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getNoteById(long)} .
-   */
-  @Test
-  public void testGetNoteById() throws IOException {
-    long id = 1L;
-    when(backingManager.getNoteById(id)).thenReturn(note);
-    when(note.getOwner()).thenReturn(user);
-
-    assertEquals(note, userAuthMisoRequestManager.getNoteById(id));
-
-    verify(backingManager).getNoteById(id);
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getNoteById(long)} .
-   */
-  @Test
-  public void testGetNoteById_AdminUser() throws IOException {
-    long id = 1L;
-    User anotherUser = mock(User.class);
-    when(note.getOwner()).thenReturn(anotherUser);
-    when(user.isAdmin()).thenReturn(true);
-    when(backingManager.getNoteById(id)).thenReturn(note);
-
-    assertEquals(note, userAuthMisoRequestManager.getNoteById(id));
-
-    verify(backingManager).getNoteById(id);
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getNoteById(long)} .
-   */
-  @Test
-  public void testGetNoteById_InternalUser() throws IOException {
-    long id = 1L;
-    User anotherUser = mock(User.class);
-    when(note.getOwner()).thenReturn(anotherUser);
-    when(note.isInternalOnly()).thenReturn(true);
-    when(user.isInternal()).thenReturn(true);
-    when(backingManager.getNoteById(id)).thenReturn(note);
-
-    assertEquals(note, userAuthMisoRequestManager.getNoteById(id));
-
-    verify(backingManager).getNoteById(id);
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getNoteById(long)} .
-   */
-  @Test
-  public void testGetNoteById_DifferentUser() throws IOException {
-    long id = 1L;
-    User anotherUser = mock(User.class);
-    when(note.getOwner()).thenReturn(anotherUser);
-    when(note.isInternalOnly()).thenReturn(false);
-    when(note.getNoteId()).thenReturn(id);
-    when(user.isInternal()).thenReturn(true);
-    when(backingManager.getNoteById(id)).thenReturn(note);
-
-    thrown.expect(IOException.class);
-    thrown.expectMessage("User null cannot read Note " + id);
-
-    userAuthMisoRequestManager.getNoteById(id);
-
-    verify(backingManager).getNoteById(id);
   }
 
   /**

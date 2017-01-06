@@ -88,7 +88,6 @@ import uk.ac.bbsrc.tgac.miso.core.store.IndexStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
-import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
@@ -220,7 +219,6 @@ public class SQLLibraryDAO implements LibraryStore {
   private PoolStore poolDAO;
   private LibraryQcStore libraryQcDAO;
   private LibraryDilutionStore dilutionDAO;
-  private NoteStore noteDAO;
   private CascadeType cascadeType;
   private boolean autoGenerateIdentificationBarcodes;
   private ChangeLogStore changeLogDAO;
@@ -288,10 +286,6 @@ public class SQLLibraryDAO implements LibraryStore {
 
   public void setDilutionDAO(LibraryDilutionStore dilutionDAO) {
     this.dilutionDAO = dilutionDAO;
-  }
-
-  public void setNoteDAO(NoteStore noteDAO) {
-    this.noteDAO = noteDAO;
   }
 
   public Store<SecurityProfile> getSecurityProfileDAO() {
@@ -494,7 +488,8 @@ public class SQLLibraryDAO implements LibraryStore {
 
       if (!library.getNotes().isEmpty()) {
         for (Note n : library.getNotes()) {
-          noteDAO.saveLibraryNote(library, n);
+          // will be Hibernate-managed
+          // noteDAO.saveLibraryNote(library, n);
         }
       }
 
@@ -912,7 +907,8 @@ public class SQLLibraryDAO implements LibraryStore {
             library.addQc(qc);
           }
 
-          library.setNotes(noteDAO.listByLibrary(id));
+          // will be Hibernate-managed
+          // library.setNotes(noteDAO.listByLibrary(id));
         } else {
           library.setSample(sampleDAO.lazyGet(rs.getLong("sample_sampleId")));
         }

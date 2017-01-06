@@ -158,4 +158,5 @@ public interface RunStore extends Store<Run>, Remover<Run> {
   public void addWatcher(Run run, User watcher);
 
   public void removeWatcher(Run run, User watcher);
+
 }
