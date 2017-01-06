@@ -30,7 +30,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -116,8 +115,7 @@ public abstract class AbstractProject implements Project {
   private final Set<MisoListener> listeners = new HashSet<>();
   private Date lastUpdated;
 
-  // Cascade all operations except delete
-  @ManyToMany(targetEntity = UserImpl.class, cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH })
+  @ManyToMany(targetEntity = UserImpl.class)
   @JoinTable(name = "Project_Watcher", joinColumns = { @JoinColumn(name = "projectId") },
       inverseJoinColumns = { @JoinColumn(name = "userId") })
   private Set<User> watchUsers = new HashSet<>();

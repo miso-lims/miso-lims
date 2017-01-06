@@ -130,8 +130,7 @@ public abstract class AbstractRun implements Run {
   @Transient
   private final Set<MisoListener> listeners = new HashSet<>();
 
-  // Cascade all operations except delete
-  @ManyToMany(targetEntity = UserImpl.class, cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH })
+  @ManyToMany(targetEntity = UserImpl.class)
   @JoinTable(name = "Run_Watcher", joinColumns = { @JoinColumn(name = "runId") }, inverseJoinColumns = { @JoinColumn(name = "userId") })
   private Set<User> watchUsers = new HashSet<>();
 

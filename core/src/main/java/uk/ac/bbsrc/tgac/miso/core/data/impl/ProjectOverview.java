@@ -31,7 +31,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -108,8 +107,7 @@ public class ProjectOverview implements Watchable, Alertable, Nameable, Serializ
   private boolean primaryAnalysisCompleted;
   private final Set<MisoListener> listeners = new HashSet<>();
 
-  // Cascade all operations except delete
-  @ManyToMany(targetEntity = UserImpl.class, cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH })
+  @ManyToMany(targetEntity = UserImpl.class)
   @JoinTable(name = "ProjectOverview_Watcher", joinColumns = { @JoinColumn(name = "overviewId") },
       inverseJoinColumns = { @JoinColumn(name = "userId") })
   private Set<User> watchUsers = new HashSet<>();
