@@ -45,6 +45,7 @@ import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Lists;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractRun;
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
@@ -88,6 +89,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.event.Alert;
+import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunQcException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
@@ -1495,7 +1497,6 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public long saveRun(Run run) throws IOException {
     if (runStore != null) {
-      long id;
       if (run.getId() == AbstractRun.UNSAVED_ID) {
         run.setName(generateTemporaryName());
         run.setId(runStore.save(run));
@@ -1504,16 +1505,38 @@ public class MisoRequestManager implements RequestManager {
           run.setName(name);
 
           validateNameOrThrow(run, namingScheme);
-          id = runStore.save(run);
+          return runStore.save(run);
         } catch (MisoNamingException e) {
           throw new IOException("Cannot save Run - issue with generating name");
         }
       } else {
-        // applyChanges
-        runStore.save(run);
-        id = run.getId();
+        Run managed = getRunById(run.getId());
+        log.info("update run: " + managed);
+        managed.setAlias(run.getAlias());
+        managed.setDescription(run.getDescription());
+        managed.setPairedEnd(run.getPairedEnd());
+        managed.setCycles(run.getCycles());
+        managed.setFilePath(run.getFilePath());
+        Status targetStatus = getStatusById(run.getStatus().getId());
+        targetStatus.setHealth(run.getStatus().getHealth());
+        targetStatus.setStartDate(run.getStatus().getStartDate());
+        targetStatus.setCompletionDate(run.getStatus().getCompletionDate());
+        targetStatus.setRunName(run.getAlias());
+        managed.setStatus(targetStatus);
+        for (RunQC runQc : run.getRunQCs()) {
+          if (!managed.getRunQCs().contains(runQc)) {
+            try {
+              managed.addQc(runQc);
+            } catch (MalformedRunQcException e) {
+              log.error("malformed runQC: ", e);
+            }
+          }
+        }
+        managed.setNotes(run.getNotes());
+        managed.setSequencingParameters(run.getSequencingParameters());
+        runStore.save(managed);
+        return run.getId();
       }
-      return id;
     } else {
       throw new IOException("No runStore available. Check that it has been declared in the Spring config.");
     }
@@ -1705,30 +1728,48 @@ public class MisoRequestManager implements RequestManager {
     }
   }
 
-  @Override
-  public long saveSequencerPartitionContainer(SequencerPartitionContainer<SequencerPoolPartition>sourceContainer) throws IOException {
-    if (sequencerPartitionContainerStore != null) {
-      long id;
-      if (container.getId() == AbstractRun.UNSAVED_ID) {
-        container.setName(generateTemporaryName());
-        container.setId(sequencerPartitionContainerStore.save(container));
-        try {
-          String name = namingScheme.generateNameFor(container);
-          container.setName(name);
 
-          validateNameOrThrow(container, namingScheme);
-          id = sequencerPartitionContainerStore.save(container);
-        } catch (MisoNamingException e) {
-          throw new IOException("Cannot save SequencerPartitionContainer - issue with generating name");
-        }
+  @Override
+  public long saveSequencerPartitionContainer(SequencerPartitionContainer<SequencerPoolPartition>container) throws IOException {
+    if (sequencerPartitionContainerStore != null) {
+      if (container.getId() == AbstractSequencerPartitionContainer.UNSAVED_ID) {
+        return sequencerPartitionContainerStore.save(container);
       } else {
-        // applyChanges
-        sequencerPartitionContainerStore.save(container);
-        id = container.getId();
+        SequencerPartitionContainer<SequencerPoolPartition> managed = getSequencerPartitionContainerById(container.getId());
+        managed.setIdentificationBarcode(container.getIdentificationBarcode());
+        managed.setLocationBarcode(container.getLocationBarcode());
+        managed.setValidationBarcode(container.getValidationBarcode());
+        Collection<Run> runs = new HashSet<>();
+        for (Run run : container.getRuns()) {
+          if (run != null) runs.add(getRunById(run.getId()));
+        }
+        managed.setRuns(runs);
+        managed.setPlatform(container.getPlatform());
+        updatePartitionPools(container, managed);
+        return sequencerPartitionContainerStore.save(managed);
       }
-      return id;
     } else {
       throw new IOException("No sequencerPartitionContainerStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  private void updatePartitionPools(SequencerPartitionContainer<SequencerPoolPartition> source,
+      SequencerPartitionContainer<SequencerPoolPartition> managed) throws IOException {
+    for (SequencerPoolPartition sourcePartition : source.getPartitions()) {
+      for (SequencerPoolPartition managedPartition : source.getPartitions()) {
+        if (sourcePartition.getId() == managedPartition.getId()) {
+          Pool sourcePool = sourcePartition.getPool();
+          Pool managedPool = managedPartition.getPool();
+          if (sourcePool == null && managedPool == null) continue;
+          if (sourcePool == null && managedPool != null) {
+            managedPartition.setPool(null);
+          } else if (sourcePool != null && managedPool == null) {
+            managedPartition.setPool(getPoolById(sourcePool.getId()));
+          } else if (sourcePool.getId() == managedPool.getId()) {
+            managedPartition.setPool(getPoolById(sourcePool.getId()));
+          }
+        }
+      }
     }
   }
 

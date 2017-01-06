@@ -60,8 +60,8 @@ public class SequencerPartitionContainerImpl extends AbstractSequencerPartitionC
 
   @OneToMany(targetEntity = PartitionImpl.class, cascade = CascadeType.ALL)
   @JoinTable(name = "SequencerPartitionContainer_Partition", joinColumns = {
-      @JoinColumn(name = "container_containerId") }, inverseJoinColumns = {
-          @JoinColumn(name = "partitions_partitionId") })
+      @JoinColumn(name = "container_containerId", updatable = false) }, inverseJoinColumns = {
+          @JoinColumn(name = "partitions_partitionId", updatable = false) })
   private List<SequencerPoolPartition> partitions = new AutoPopulatingList<SequencerPoolPartition>(PartitionImpl.class);
 
   private int partitionLimit = 8;
