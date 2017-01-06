@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -44,6 +44,7 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Lists;
 
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractProject;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractRun;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
@@ -103,6 +104,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.PlatformStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
+import uk.ac.bbsrc.tgac.miso.core.store.ReferenceGenomeDao;
 import uk.ac.bbsrc.tgac.miso.core.store.RunQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleQcStore;
@@ -116,6 +118,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.core.store.StudyStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SubmissionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.TargetedSequencingStore;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 /**
  * Implementation of a RequestManager to facilitate persistence operations on MISO model objects
@@ -144,6 +147,8 @@ public class MisoRequestManager implements RequestManager {
   private PoolStore poolStore;
   @Autowired
   private PoolQcStore poolQcStore;
+  @Autowired
+  private ReferenceGenomeDao referenceGenomeDao;
   @Autowired
   private RunStore runStore;
   @Autowired
@@ -1071,16 +1076,6 @@ public class MisoRequestManager implements RequestManager {
   }
 
   // DELETES
-  @Override
-  public void deleteProject(Project project) throws IOException {
-    if (projectStore != null) {
-      if (!projectStore.remove(project)) {
-        throw new IOException("Unable to delete Project. Make sure the project has no child entitites.");
-      }
-    } else {
-      throw new IOException("No projectStore available. Check that it has been declared in the Spring config.");
-    }
-  }
 
   @Override
   public void deleteStudy(Study study) throws IOException {
@@ -1330,6 +1325,35 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public long saveProject(Project project) throws IOException {
     if (projectStore != null) {
+      ValidationResult shortNameValidation = namingScheme.validateProjectShortName(project.getShortName());
+      if (!shortNameValidation.isValid()) {
+        throw new IOException("Cannot save project - invalid shortName: " + shortNameValidation.getMessage());
+      }
+      if (project.getId() == AbstractProject.UNSAVED_ID) {
+        project.setName(generateTemporaryName());
+        projectStore.save(project);
+        try {
+          project.setName(namingScheme.generateNameFor(project));
+        } catch (MisoNamingException e) {
+          throw new IOException("Cannot save Project - issue with naming scheme", e);
+        }
+        LimsUtils.validateNameOrThrow(project, namingScheme);
+      } else {
+        Project original = projectStore.get(project.getId());
+        original.setAlias(project.getAlias());
+        original.setDescription(project.getDescription());
+        original.setIssueKeys(project.getIssueKeys());
+        original.setLastUpdated(project.getLastUpdated());
+        original.setProgress(project.getProgress());
+        original.setReferenceGenome(referenceGenomeDao.getReferenceGenome(project.getReferenceGenome().getId()));
+        original.setShortName(project.getShortName());
+        for (ProjectOverview po : project.getOverviews()) {
+          if (po.getId() == ProjectOverview.UNSAVED_ID) {
+            original.getOverviews().add(po);
+          }
+        }
+        project = original;
+      }
       return projectStore.save(project);
     } else {
       throw new IOException("No projectStore available. Check that it has been declared in the Spring config.");
@@ -1671,7 +1695,6 @@ public class MisoRequestManager implements RequestManager {
       throw new IOException("No alertStore available. Check that it has been declared in the Spring config.");
     }
   }
-
 
   // GETS
   @Override
@@ -2701,6 +2724,16 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public void removeRunWatcher(Run run, User watcher) throws IOException {
     runStore.removeWatcher(run, watcher);
+  }
+
+  @Override
+  public void addProjectWatcher(Project project, User watcher) throws IOException {
+    projectStore.addWatcher(project, watcher);
+  }
+
+  @Override
+  public void removeProjectWatcher(Project project, User watcher) throws IOException {
+    projectStore.removeWatcher(project, watcher);
   }
 
 }

@@ -484,8 +484,6 @@ public interface RequestManager {
   public void discardAllTubes(Box box) throws IOException;
 
   // DELETES
-  public void deleteProject(Project project) throws IOException;
-
   public void deleteStudy(Study study) throws IOException;
 
   public void deleteSample(Sample sample) throws IOException;
@@ -604,5 +602,9 @@ public interface RequestManager {
   public void addRunWatcher(Run run, User watcher) throws IOException;
 
   public void removeRunWatcher(Run run, User watcher) throws IOException;
+
+  void addProjectWatcher(Project project, User watcher) throws IOException;
+
+  void removeProjectWatcher(Project project, User watcher) throws IOException;
 
 }

@@ -36,17 +36,17 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
+import uk.ac.bbsrc.tgac.miso.core.store.ReferenceGenomeDao;
 import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.core.store.StudyStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-import uk.ac.bbsrc.tgac.miso.persistence.ReferenceGenomeDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateProjectDao;
 
 /**
  * @author Chris Salt
@@ -95,7 +95,7 @@ public class SQLProjectDAOTest extends AbstractDAOTest {
   private ReferenceGenomeDao referenceGenomeDao;
 
   @InjectMocks
-  private SQLProjectDAO projectDAO;
+  private HibernateProjectDao projectDAO;
 
   // shared rules
   private final Authentication mockAuthentication = mock(Authentication.class);
@@ -110,15 +110,11 @@ public class SQLProjectDAOTest extends AbstractDAOTest {
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
-    DataObjectFactory dataObjectFactory = new TgacDataObjectFactory();
-    projectDAO.setDataObjectFactory(dataObjectFactory);
 
     when(mockContext.getAuthentication()).thenReturn(mockAuthentication);
     when(mockAuthentication.getName()).thenReturn("some name");
     SecurityContextHolder.setContext(mockContext);
     when(securityProfileDAO.save(any(SecurityProfile.class))).thenReturn(1L);
-    
-    projectDAO.setReferenceGenomeDao(referenceGenomeDao);
 
     when(namingScheme.generateNameFor(Matchers.any(Project.class))).thenReturn("EDI123");
     when(namingScheme.validateName(Matchers.anyString())).thenReturn(ValidationResult.success());
@@ -133,7 +129,7 @@ public class SQLProjectDAOTest extends AbstractDAOTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLProjectDAO#save(uk.ac.bbsrc.tgac.miso.core.data.Project)} .
+   * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateProjectDao#save(uk.ac.bbsrc.tgac.miso.core.data.Project)} .
    */
   @Test
   public void testSave() throws Exception {
@@ -150,7 +146,7 @@ public class SQLProjectDAOTest extends AbstractDAOTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLProjectDAO#save(uk.ac.bbsrc.tgac.miso.core.data.Project)} .
+   * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateProjectDao#save(uk.ac.bbsrc.tgac.miso.core.data.Project)} .
    */
 
   @Test
@@ -175,7 +171,7 @@ public class SQLProjectDAOTest extends AbstractDAOTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLProjectDAO#saveOverview(uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview)}
+   * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateProjectDao#saveOverview(uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview)}
    * .
    * 
    * @throws IOException
@@ -187,7 +183,7 @@ public class SQLProjectDAOTest extends AbstractDAOTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLProjectDAO#listAll()}.
+   * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateProjectDao#listAll()}.
    */
   @Test
   public void testListAll() throws Exception {
@@ -196,7 +192,7 @@ public class SQLProjectDAOTest extends AbstractDAOTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLProjectDAO#listAllWithLimit(long)} .
+   * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateProjectDao#listAllWithLimit(long)} .
    * 
    * @throws IOException
    */
@@ -208,7 +204,7 @@ public class SQLProjectDAOTest extends AbstractDAOTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLProjectDAO#count()}.
+   * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateProjectDao#count()}.
    * 
    * @throws IOException
    */
@@ -219,24 +215,8 @@ public class SQLProjectDAOTest extends AbstractDAOTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLProjectDAO#remove(uk.ac.bbsrc.tgac.miso.core.data.Project)} .
-   * 
-   * @throws IOException
-   */
-  @Ignore
-  @Test
-  public void testRemove() throws IOException {
-    // TODO: Uses cache so ignoring test for now.
-    List<Project> projects = projectDAO.listAll();
-    assertEquals(3, projects.size());
-    projectDAO.remove(projects.get(1));
-    projects = projectDAO.listAll();
-    assertEquals(2, projects.size());
-  }
-
-  /**
    * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLProjectDAO#removeOverview(uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview)} .
+   * {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateProjectDao#removeOverview(uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview)} .
    */
   @Ignore
   @Test
@@ -246,7 +226,7 @@ public class SQLProjectDAOTest extends AbstractDAOTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLProjectDAO#get(long)}.
+   * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateProjectDao#get(long)}.
    * 
    * @throws IOException
    */
@@ -257,7 +237,7 @@ public class SQLProjectDAOTest extends AbstractDAOTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLProjectDAO#lazyGet(long)}.
+   * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateProjectDao#lazyGet(long)}.
    * 
    * @throws IOException
    */
@@ -268,7 +248,7 @@ public class SQLProjectDAOTest extends AbstractDAOTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLProjectDAO#listBySearch(java.lang.String)} .
+   * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateProjectDao#listBySearch(java.lang.String)} .
    */
   @Ignore
   @Test
@@ -279,7 +259,7 @@ public class SQLProjectDAOTest extends AbstractDAOTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLProjectDAO#getByAlias(java.lang.String)} .
+   * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateProjectDao#getByAlias(java.lang.String)} .
    * 
    * @throws IOException
    */
@@ -293,7 +273,7 @@ public class SQLProjectDAOTest extends AbstractDAOTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLProjectDAO#getByStudyId(long)}.
+   * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateProjectDao#getByStudyId(long)}.
    * 
    * @throws IOException
    */
@@ -304,7 +284,7 @@ public class SQLProjectDAOTest extends AbstractDAOTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLProjectDAO#getProjectOverviewById(long)} .
+   * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateProjectDao#getProjectOverviewById(long)} .
    * 
    * @throws IOException
    */
@@ -315,7 +295,7 @@ public class SQLProjectDAOTest extends AbstractDAOTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLProjectDAO#lazyGetProjectOverviewById(long)} .
+   * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateProjectDao#lazyGetProjectOverviewById(long)} .
    */
   @Test
   public void testLazyGetProjectOverviewById() {
@@ -323,7 +303,7 @@ public class SQLProjectDAOTest extends AbstractDAOTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLProjectDAO#listOverviewsByProjectId(long)} .
+   * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateProjectDao#listOverviewsByProjectId(long)} .
    */
   @Test
   public void testListOverviewsByProjectId() {
@@ -331,7 +311,7 @@ public class SQLProjectDAOTest extends AbstractDAOTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLProjectDAO#listIssueKeysByProjectId(long)} .
+   * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateProjectDao#listIssueKeysByProjectId(long)} .
    */
   @Test
   public void testListIssueKeysByProjectId() {
@@ -339,7 +319,7 @@ public class SQLProjectDAOTest extends AbstractDAOTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLProjectDAO#getProjectColumnSizes()} .
+   * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateProjectDao#getProjectColumnSizes()} .
    */
   @Test
   public void testGetProjectColumnSizes() {

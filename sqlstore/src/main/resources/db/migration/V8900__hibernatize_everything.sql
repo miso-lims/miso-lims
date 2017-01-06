@@ -1,3 +1,5 @@
+DROP TABLE Project_Study;
+UPDATE Project SET progress = UPPER(progress);
 UPDATE KitDescriptor SET kitType = UPPER(kitType), platformType = UPPER(platformType);
 
 UPDATE Platform SET name = UPPER(name);
@@ -7,6 +9,11 @@ UPDATE Study SET studyTypeId = (SELECT typeId FROM StudyType WHERE name = studyT
 ALTER TABLE Study ADD CONSTRAINT study_studyTypeId FOREIGN KEY (studyTypeId) REFERENCES StudyType(typeId);
 ALTER TABLE Study DROP COLUMN studyType;
 ALTER TABLE Study CHANGE COLUMN studyTypeId studyTypeId bigint(20) NOT NULL;
+
+ALTER TABLE ProjectOverview ADD COLUMN project_projectId bigint(20);
+UPDATE ProjectOverview SET project_projectId = (SELECT project_projectId FROM Project_ProjectOverview WHERE overviews_overviewId = overviewId);
+ALTER TABLE ProjectOverview ADD CONSTRAINT projectOverview_project_project_projectId FOREIGN KEY (project_projectId) REFERENCES Project(projectId);
+DROP TABLE Project_ProjectOverview;
 
 CREATE TABLE ProjectOverview_Sample (
   projectOverview_overviewId bigint(20) NOT NULL,

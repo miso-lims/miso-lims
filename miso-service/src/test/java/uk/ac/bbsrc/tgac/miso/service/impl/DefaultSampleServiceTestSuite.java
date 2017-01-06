@@ -58,10 +58,10 @@ import uk.ac.bbsrc.tgac.miso.persistence.SubprojectDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueMaterialDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueOriginDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueTypeDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateProjectDao;
 import uk.ac.bbsrc.tgac.miso.service.SampleNumberPerProjectService;
 import uk.ac.bbsrc.tgac.miso.service.SampleValidRelationshipService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
-import uk.ac.bbsrc.tgac.miso.sqlstore.SQLProjectDAO;
 
 public class DefaultSampleServiceTestSuite {
 
@@ -75,7 +75,7 @@ public class DefaultSampleServiceTestSuite {
   private AuthorizationManager authorizationManager;
 
   @Mock
-  private SQLProjectDAO sqlProjectDAO;
+  private HibernateProjectDao projectDAO;
 
   @Mock
   private SampleClassDao sampleClassDao;
