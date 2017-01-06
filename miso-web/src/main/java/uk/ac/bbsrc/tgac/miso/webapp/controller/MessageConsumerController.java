@@ -115,6 +115,7 @@ public class MessageConsumerController {
     if (gateways == null || gateways.isEmpty()) {
       log.error("No notification gateways found for platform: " + platform.getKey());
       response.sendError(HttpServletResponse.SC_NOT_FOUND);
+      return;
     }
     for (NotificationGateway s : gateways) {
       log.debug("Using " + s.toString());
