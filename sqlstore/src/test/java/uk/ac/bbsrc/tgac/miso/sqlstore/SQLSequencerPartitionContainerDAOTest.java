@@ -35,6 +35,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +50,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PlatformImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateChangeLogDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSequencerPartitionContainerDao;
 
 public class SQLSequencerPartitionContainerDAOTest extends AbstractDAOTest {
@@ -58,6 +60,9 @@ public class SQLSequencerPartitionContainerDAOTest extends AbstractDAOTest {
 
   @Autowired
   private SessionFactory sessionFactory;
+
+  @Mock
+  private HibernateChangeLogDao changeLogDAO;
 
   @InjectMocks
   private HibernateSequencerPartitionContainerDao dao;
@@ -200,6 +205,7 @@ public class SQLSequencerPartitionContainerDAOTest extends AbstractDAOTest {
     SequencerPartitionContainer<SequencerPoolPartition> insertedSpc = dao.get(spcId);
     assertNotNull(insertedSpc);
     assertTrue(dao.remove(spc));
+    Mockito.verify(changeLogDAO, Mockito.times(1)).deleteAllById("SequencerPartitionContainer", spc.getId());
     assertNull(dao.get(insertedSpc.getId()));
     nextAutoIncrementId++;
   }

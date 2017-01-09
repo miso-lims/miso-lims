@@ -76,13 +76,13 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
-import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ExperimentStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateChangeLogDao;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
@@ -233,19 +233,11 @@ public class SQLPoolDAO implements PoolStore {
   private Store<SecurityProfile> securityProfileDAO;
   private CascadeType cascadeType;
   private boolean autoGenerateIdentificationBarcodes;
-  private ChangeLogStore changeLogDAO;
   private SecurityStore securityDAO;
   private BoxStore boxDAO;
 
-  @CoverageIgnore
-  public ChangeLogStore getChangeLogDAO() {
-    return changeLogDAO;
-  }
-
-  @CoverageIgnore
-  public void setChangeLogDAO(ChangeLogStore changeLogDAO) {
-    this.changeLogDAO = changeLogDAO;
-  }
+  @Autowired
+  private HibernateChangeLogDao changeLogDao;
 
   @Autowired
   private PoolAlertManager poolAlertManager;
@@ -720,7 +712,7 @@ public class SQLPoolDAO implements PoolStore {
 
     boolean ok = true;
     if (pool.isDeletable()) {
-      changeLogDAO.deleteAllById(TABLE_NAME, pool.getId());
+      changeLogDao.deleteAllById(TABLE_NAME, pool.getId());
     }
     if (pool.isDeletable() && poolNamedTemplate.update(POOL_DELETE, poolparams) == 1) {
       if (!pool.getPoolableElements().isEmpty()) {
@@ -836,7 +828,7 @@ public class SQLPoolDAO implements PoolStore {
           // Will be Hibernate-managed
           // p.setNotes(noteDAO.listByPool(id));
         }
-        p.getChangeLog().addAll(changeLogDAO.listAllById(TABLE_NAME, id));
+        p.getChangeLog().addAll(changeLogDao.listAllById(TABLE_NAME, id));
       } catch (IOException e1) {
         log.error("Cannot map from database to Pool: ", e1);
       } catch (MalformedPoolQcException e) {
@@ -979,6 +971,10 @@ public class SQLPoolDAO implements PoolStore {
     if (!"asc".equals(sortDir.toLowerCase()) && !"desc".equals(sortDir.toLowerCase())) sortDir = "DESC";
     String query = POOL_SELECT_BY_PLATFORM + " ORDER BY " + sortCol + " " + sortDir + " LIMIT " + limit + " OFFSET " + offset;
     return template.query(query, new Object[] { platform.getKey() }, new PoolMapper(true));
+  }
+
+  public void setChangeLogDAO(HibernateChangeLogDao changeLogDao) {
+    this.changeLogDao = changeLogDao;
   }
 
 }

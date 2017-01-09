@@ -47,7 +47,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
-import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -1689,12 +1688,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
       }
     }
     return accessibles;
-  }
-
-  @Override
-  public Collection<ChangeLog> listAllChanges(String type) throws IOException {
-    if (getCurrentUser().isInternal()) return backingManager.listAllChanges(type);
-    return null;
   }
 
   @Override

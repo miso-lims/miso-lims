@@ -83,7 +83,6 @@ import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
-import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.IndexStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryQcStore;
@@ -94,6 +93,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.persistence.LibraryAdditionalInfoDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateChangeLogDao;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
@@ -221,7 +221,6 @@ public class SQLLibraryDAO implements LibraryStore {
   private LibraryDilutionStore dilutionDAO;
   private CascadeType cascadeType;
   private boolean autoGenerateIdentificationBarcodes;
-  private ChangeLogStore changeLogDAO;
   private SecurityStore securityDAO;
   private BoxStore boxDAO;
 
@@ -263,6 +262,9 @@ public class SQLLibraryDAO implements LibraryStore {
 
   @Autowired
   private DataObjectFactory dataObjectFactory;
+
+  @Autowired
+  private HibernateChangeLogDao changeLogDao;
 
   public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
     this.dataObjectFactory = dataObjectFactory;
@@ -639,7 +641,7 @@ public class SQLLibraryDAO implements LibraryStore {
   public boolean remove(Library library) throws IOException {
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
     if (library.isDeletable()) {
-      changeLogDAO.deleteAllById(TABLE_NAME, library.getId());
+      changeLogDao.deleteAllById(TABLE_NAME, library.getId());
     }
     if (library.isDeletable()
         && (namedTemplate.update(LIBRARY_DELETE, new MapSqlParameterSource().addValue("libraryId", library.getId())) == 1)) {
@@ -802,14 +804,6 @@ public class SQLLibraryDAO implements LibraryStore {
     }
   }
 
-  public ChangeLogStore getChangeLogDAO() {
-    return changeLogDAO;
-  }
-
-  public void setChangeLogDAO(ChangeLogStore changeLogDAO) {
-    this.changeLogDAO = changeLogDAO;
-  }
-
   public SecurityStore getSecurityDAO() {
     return securityDAO;
   }
@@ -912,7 +906,7 @@ public class SQLLibraryDAO implements LibraryStore {
         } else {
           library.setSample(sampleDAO.lazyGet(rs.getLong("sample_sampleId")));
         }
-        library.getChangeLog().addAll(getChangeLogDAO().listAllById(TABLE_NAME, id));
+        library.getChangeLog().addAll(changeLogDao.listAllById(TABLE_NAME, id));
         library.setLibraryAdditionalInfo(libraryAdditionalInfoDAO.getLibraryAdditionalInfoByLibraryId(library.getId()));
       } catch (IOException e1) {
         log.error("library row mapper", e1);
@@ -967,6 +961,10 @@ public class SQLLibraryDAO implements LibraryStore {
   @Override
   public Map<String, Integer> getLibraryColumnSizes() throws IOException {
     return DbUtils.getColumnSizes(template, TABLE_NAME);
+  }
+
+  public void setChangeLogDAO(HibernateChangeLogDao changeLogDao) {
+    this.changeLogDao = changeLogDao;
   }
 
 }

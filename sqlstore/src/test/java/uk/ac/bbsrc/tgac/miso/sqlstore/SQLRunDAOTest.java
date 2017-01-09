@@ -61,13 +61,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
-import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.RunQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerReferenceStore;
 import uk.ac.bbsrc.tgac.miso.core.store.StatusStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateRunDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateChangeLogDao;
 
 public class SQLRunDAOTest extends AbstractDAOTest {
 
@@ -94,7 +94,7 @@ public class SQLRunDAOTest extends AbstractDAOTest {
   @Mock
   private StatusStore statusDAO;
   @Mock
-  private ChangeLogStore changeLogDAO;
+  private HibernateChangeLogDao changeLogDAO;
 
   @InjectMocks
   private HibernateRunDao dao;

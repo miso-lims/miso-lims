@@ -54,6 +54,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 
 @Controller
 @RequestMapping("/container")
@@ -70,6 +71,9 @@ public class EditSequencerPartitionContainerController {
   @Autowired
   private DataObjectFactory dataObjectFactory;
 
+  @Autowired
+  private ChangeLogService changeLogService;
+
   public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
     this.dataObjectFactory = dataObjectFactory;
   }
@@ -84,7 +88,7 @@ public class EditSequencerPartitionContainerController {
 
   @RequestMapping(value = "/rest/changes", method = RequestMethod.GET)
   public @ResponseBody Collection<ChangeLog> jsonRestChanges() throws IOException {
-    return requestManager.listAllChanges("SequencerPartitionContainer");
+    return changeLogService.listAll("SequencerPartitionContainer");
   }
 
   @ModelAttribute("platformTypes")

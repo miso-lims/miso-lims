@@ -58,6 +58,7 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractPool;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
@@ -74,6 +75,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SequencingParametersDto;
+import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
 
 /**
@@ -103,6 +105,9 @@ public class EditPoolController {
   private DataObjectFactory dataObjectFactory;
 
   @Autowired
+  private ChangeLogService changeLogService;
+
+  @Autowired
   private JdbcTemplate interfaceTemplate;
 
   public void setInterfaceTemplate(JdbcTemplate interfaceTemplate) {
@@ -123,7 +128,7 @@ public class EditPoolController {
 
   @RequestMapping(value = "/rest/changes", method = RequestMethod.GET)
   public @ResponseBody Collection<ChangeLog> jsonRestChanges() throws IOException {
-    return requestManager.listAllChanges("Pool");
+    return changeLogService.listAll("Pool");
   }
 
   @ModelAttribute("platformTypes")

@@ -42,12 +42,12 @@ import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
-import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateChangeLogDao;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
@@ -105,7 +105,7 @@ public class SQLBoxDAO implements BoxStore {
             box.getBoxables().put(BoxUtils.getPositionString(row, column), item);
           }
         }, box.getId());
-        box.getChangeLog().addAll(changeLogDAO.listAllById(TABLE_NAME, rs.getLong("boxId")));
+        box.getChangeLog().addAll(changeLogDao.listAllById(TABLE_NAME, rs.getLong("boxId")));
       } catch (IOException e) {
         e.printStackTrace();
       }
@@ -201,7 +201,9 @@ public class SQLBoxDAO implements BoxStore {
   private PoolStore poolDAO;
   private JdbcTemplate template;
   private boolean autoGenerateIdentificationBarcodes;
-  private ChangeLogStore changeLogDAO;
+
+  @Autowired
+  private HibernateChangeLogDao changeLogDao;
 
   @Autowired
   private CacheManager cacheManager;
@@ -242,10 +244,6 @@ public class SQLBoxDAO implements BoxStore {
     box.setIdentificationBarcode(barcode);
   } // if !autoGenerateIdentificationBarcodes then the identificationBarcode is set by the user
 
-  public ChangeLogStore getChangeLogDAO() {
-    return changeLogDAO;
-  }
-
   public DataObjectFactory getDataObjectFactory() {
     return dataObjectFactory;
   }
@@ -272,10 +270,6 @@ public class SQLBoxDAO implements BoxStore {
 
   public Store<SecurityProfile> getSecurityProfileDAO() {
     return securityProfileDAO;
-  }
-
-  public void setChangeLogDAO(ChangeLogStore changeLogDAO) {
-    this.changeLogDAO = changeLogDAO;
   }
 
   public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
@@ -604,5 +598,9 @@ public class SQLBoxDAO implements BoxStore {
   @Override
   public Map<String, Integer> getBoxColumnSizes() throws IOException {
     return DbUtils.getColumnSizes(template, TABLE_NAME);
+  }
+
+  public void setChangeLogDAO(HibernateChangeLogDao changeLogDao) {
+    this.changeLogDao = changeLogDao;
   }
 }

@@ -68,13 +68,14 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
 
   private boolean autoGenerateIdentificationBarcodes;
 
-  private ChangeLogStore changeLogDao;
-
   private LibraryStore libraryDao;
 
   private SecurityStore securityDao;
 
   private Store<SecurityProfile> securityProfileDao;
+
+  @Autowired
+  private ChangeLogStore changeLogDao;
 
   @Autowired
   private SessionFactory sessionFactory;
@@ -455,10 +456,6 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
   public void setCascadeType(CascadeType cascadeType) {
   }
 
-  public void setChangeLogDao(ChangeLogStore changeLogDao) {
-    this.changeLogDao = changeLogDao;
-  }
-
   public void setJdbcTemplate(JdbcTemplate template) {
     this.template = template;
   }
@@ -526,6 +523,10 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
     Query query = currentSession().createQuery("FROM DetailedSampleImpl ds WHERE ds.preMigrationId = :id");
     query.setParameter("id", id);
     return fetchSqlStore((Sample) query.uniqueResult());
+  }
+
+  public void setChangeLogDao(ChangeLogStore changeLogDao) {
+    this.changeLogDao = changeLogDao;
   }
 
 }
