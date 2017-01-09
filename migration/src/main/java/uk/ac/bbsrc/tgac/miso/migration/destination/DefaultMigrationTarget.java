@@ -361,46 +361,54 @@ public class DefaultMigrationTarget implements MigrationTarget {
   public void saveLibraries(final Collection<Library> libraries) throws IOException {
     log.info("Migrating libraries...");
     for (Library library : libraries) {
-      log.debug("Saving library " + library.getAlias());
-      if (isDetailedSample(library.getSample())) {
-        DetailedSample sample = (DetailedSample) library.getSample();
-        if (sample.getId() == AbstractSample.UNSAVED_ID && sample.getPreMigrationId() != null) {
-          library.setSample(serviceManager.getSampleDao().getByPreMigrationId(sample.getPreMigrationId()));
-          if (library.getSample() == null) {
-            throw new IOException("No Sample found with pre-migration ID " + sample.getPreMigrationId());
-          }
-        }
+      try {
+        saveLibrary(library);
+      } catch (Exception e) {
+        handleException(e);
       }
-      if (library.getSample() == null || library.getSample().getId() == AbstractSample.UNSAVED_ID) {
-        throw new IOException("Library does not have a parent sample set");
-      }
-      library.inheritPermissions(library.getSample().getProject());
-      valueTypeLookup.resolveAll(library);
-      library.setLastModifier(migrationUser);
-      if (isDetailedLibrary(library)) {
-
-        library.setCreationDate(timeStamp);
-        // Check for duplicate alias
-        Collection<Library> dupes = serviceManager.getLibraryDao().listByAlias(library.getAlias());
-        if (!dupes.isEmpty()) {
-          for (Library dupe : dupes) {
-            ((DetailedLibrary) dupe).setNonStandardAlias(true);
-            serviceManager.getLibraryDao().save(dupe);
-          }
-          ((DetailedLibrary) library).setNonStandardAlias(true);
-        }
-      }
-      if (replaceChangeLogs) {
-        Collection<ChangeLog> changes = library.getChangeLog();
-        copyTimestampsFromChangelog(library);
-        library.setId(serviceManager.getLibraryDao().save(library));
-        saveLibraryChangeLog(library, changes);
-      } else {
-        library.setId(serviceManager.getLibraryDao().save(library));
-      }
-      log.debug("Saved library " + library.getAlias());
     }
     log.info(libraries.size() + " libraries migrated.");
+  }
+
+  private void saveLibrary(Library library) throws IOException {
+    log.debug("Saving library " + library.getAlias());
+    if (isDetailedSample(library.getSample())) {
+      DetailedSample sample = (DetailedSample) library.getSample();
+      if (sample.getId() == AbstractSample.UNSAVED_ID && sample.getPreMigrationId() != null) {
+        library.setSample(serviceManager.getSampleDao().getByPreMigrationId(sample.getPreMigrationId()));
+        if (library.getSample() == null) {
+          throw new IOException("No Sample found with pre-migration ID " + sample.getPreMigrationId());
+        }
+      }
+    }
+    if (library.getSample() == null || library.getSample().getId() == AbstractSample.UNSAVED_ID) {
+      throw new IOException("Library does not have a parent sample set");
+    }
+    library.inheritPermissions(library.getSample().getProject());
+    valueTypeLookup.resolveAll(library);
+    library.setLastModifier(migrationUser);
+    if (isDetailedLibrary(library)) {
+
+      library.setCreationDate(timeStamp);
+      // Check for duplicate alias
+      Collection<Library> dupes = serviceManager.getLibraryDao().listByAlias(library.getAlias());
+      if (!dupes.isEmpty()) {
+        for (Library dupe : dupes) {
+          ((DetailedLibrary) dupe).setNonStandardAlias(true);
+          serviceManager.getLibraryDao().save(dupe);
+        }
+        ((DetailedLibrary) library).setNonStandardAlias(true);
+      }
+    }
+    if (replaceChangeLogs) {
+      Collection<ChangeLog> changes = library.getChangeLog();
+      copyTimestampsFromChangelog(library);
+      library.setId(serviceManager.getLibraryDao().save(library));
+      saveLibraryChangeLog(library, changes);
+    } else {
+      library.setId(serviceManager.getLibraryDao().save(library));
+    }
+    log.debug("Saved library " + library.getAlias());
   }
 
   private void copyTimestampsFromChangelog(Library library) {
@@ -420,32 +428,41 @@ public class DefaultMigrationTarget implements MigrationTarget {
   public void saveLibraryDilutions(final Collection<LibraryDilution> libraryDilutions) throws IOException {
     log.info("Migrating library dilutions...");
     for (LibraryDilution ldi : libraryDilutions) {
-      String friendlyName = " of " + ldi.getLibrary().getAlias();
-      if (ldi.getPreMigrationId() != null) {
-        friendlyName += " with pre-migration id " + ldi.getPreMigrationId();
+      try {
+        saveLibraryDilutions(ldi);
+      } catch (Exception e) {
+        handleException(e);
       }
-      log.debug("Saving library dilution " + friendlyName);
-      if (replaceChangeLogs) {
-        if (ldi.getCreationDate() == null || ldi.getLastModified() == null) {
-          throw new IOException("Cannot save dilution due to missing timestamps");
-        }
-      } else {
-        ldi.setCreationDate(timeStamp);
-        ldi.setLastModified(timeStamp);
-      }
-
-      if (ldi.getLibrary().getId() == LibraryDilution.UNSAVED_ID && ((DetailedLibrary) ldi.getLibrary()).getPreMigrationId() != null) {
-        Long preMigrationId = ((DetailedLibrary) ldi.getLibrary()).getPreMigrationId();
-        ldi.setLibrary(serviceManager.getLibraryDao().getByPreMigrationId(preMigrationId));
-        if (ldi.getLibrary() == null) {
-          throw new IOException("No Library found with pre-migration ID " + preMigrationId);
-        }
-      }
-      
-      ldi.setId(serviceManager.getDilutionDao().save(ldi));
-      log.debug("Saved library dilution " + friendlyName);
     }
     log.info(libraryDilutions.size() + " library dilutions migrated.");
+  }
+
+  public void saveLibraryDilutions(LibraryDilution ldi) throws IOException {
+    String friendlyName = " of " + ldi.getLibrary().getAlias();
+    if (ldi.getPreMigrationId() != null) {
+      friendlyName += " with pre-migration id " + ldi.getPreMigrationId();
+    }
+    log.debug("Saving library dilution " + friendlyName);
+    if (replaceChangeLogs) {
+      if (ldi.getCreationDate() == null || ldi.getLastModified() == null) {
+        throw new IOException("Cannot save dilution due to missing timestamps");
+      }
+    } else {
+      ldi.setCreationDate(timeStamp);
+      ldi.setLastModified(timeStamp);
+    }
+
+    if (ldi.getLibrary().getId() == LibraryDilution.UNSAVED_ID && ldi.getLibrary() instanceof DetailedLibrary
+        && ((DetailedLibrary) ldi.getLibrary()).getPreMigrationId() != null) {
+      Long preMigrationId = ((DetailedLibrary) ldi.getLibrary()).getPreMigrationId();
+      ldi.setLibrary(serviceManager.getLibraryDao().getByPreMigrationId(preMigrationId));
+      if (ldi.getLibrary() == null) {
+        throw new IOException("No Library found with pre-migration ID " + preMigrationId);
+      }
+    }
+
+    ldi.setId(serviceManager.getDilutionDao().save(ldi));
+    log.debug("Saved library dilution " + friendlyName);
   }
 
   /**
@@ -488,7 +505,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
       }
     }
   }
-  
+
   public void savePools(final Collection<Pool> pools) throws IOException {
     log.info("Migrating pools...");
     for (Pool pool : pools) {
@@ -499,12 +516,12 @@ public class DefaultMigrationTarget implements MigrationTarget {
     }
     log.info(pools.size() + " pools migrated.");
   }
-  
+
   private void setPoolModifiedDetails(Pool pool) throws IOException {
     if (pool.getId() == PoolImpl.UNSAVED_ID) pool.setCreationDate(timeStamp);
     pool.setLastModifier(migrationUser);
   }
-  
+
   private void addPoolNoteDetails(Pool pool) throws IOException {
     for (Note note : pool.getNotes()) {
       note.setCreationDate(timeStamp);
@@ -566,7 +583,8 @@ public class DefaultMigrationTarget implements MigrationTarget {
               // Add new pool
               toPartition.setPool(fromPartition.getPool());
               setPoolModifiedDetails(fromPartition.getPool());
-              log.debug("added " + toPartition.getPool().getAlias() + " to run " + to.getId() + " lane " + toPartition.getPartitionNumber());
+              log.debug(
+                  "added " + toPartition.getPool().getAlias() + " to run " + to.getId() + " lane " + toPartition.getPartitionNumber());
             }
             break;
           }
@@ -607,8 +625,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
     if (tolerateErrors) {
       log.error("Error during save", e);
       sessionFactory.getCurrentSession().clear();
-    }
-    else throw new IOException(e);
+    } else throw new IOException(e);
   }
 
 }
