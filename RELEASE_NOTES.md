@@ -1,3 +1,9 @@
+# 0.2.47
+
+Changes:
+
+ * Add changes to Library changelog when a Library Dilution is created/updated
+
 # 0.2.46
 
 Changes:
