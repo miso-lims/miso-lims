@@ -29,7 +29,7 @@
   <parent>
     <artifactId>miso</artifactId>
     <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-    <version>0.2.47-oicr-SNAPSHOT</version>
+    <version>0.2.47-oicr</version>
   </parent>
   <artifactId>runstats-server</artifactId>
   <packaging>jar</packaging>
