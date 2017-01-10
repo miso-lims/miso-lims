@@ -36,8 +36,7 @@ ALTER TABLE SequencerReference ADD CONSTRAINT upgraded_SR_UK UNIQUE (upgradedSeq
 DROP TABLE Request;
 DROP TABLE Request_Note;
 
-ALTER TABLE Status ADD FOREIGN KEY (instrumentName) REFERENCES SequencerReference (name);
-ALTER TABLE Status ADD FOREIGN KEY (runName) REFERENCES Run (alias);
+ALTER TABLE Status ADD CONSTRAINT Status_SequencerReference_FK FOREIGN KEY (instrumentName) REFERENCES SequencerReference (name);
 
 ALTER TABLE Run_Note ADD CONSTRAINT RunNote_Run_FK FOREIGN KEY (run_runId) REFERENCES Run (runId);
 ALTER TABLE Run_Note ADD CONSTRAINT RunNote_Note_FK FOREIGN KEY (notes_noteId) REFERENCES Note (noteId);
@@ -53,10 +52,10 @@ UPDATE RunQC_Partition rqp SET partition_partitionId = (
   AND p.partitionNumber = rqp.partitionNumber
 );
 ALTER TABLE RunQC_Partition CHANGE COLUMN partition_partitionId partition_partitionId BIGINT(20) NOT NULL;
+ALTER TABLE RunQC_Partition DROP PRIMARY KEY;
+ALTER TABLE RunQC_Partition ADD PRIMARY KEY(`runQc_runQcId`, `partition_partitionId`);
 ALTER TABLE RunQC_Partition ADD CONSTRAINT RunQCPartition_Partition_FK FOREIGN KEY (partition_partitionId) REFERENCES `_Partition` (partitionId);
 ALTER TABLE RunQC_Partition ADD CONSTRAINT RunQCPartition_RunQC_FK FOREIGN KEY (runQc_runQcId) REFERENCES `RunQC` (qcId);
-ALTER TABLE RunQC_Partition DROP PRIMARY KEY;
-ALTER TABLE RunQC_Partition ADD PRIMARY KEY(`runQc_runQcId`, `partitionId`);
 ALTER TABLE RunQC_Partition DROP COLUMN partitionNumber;
 ALTER TABLE RunQC_Partition DROP COLUMN containers_containerId;
 
@@ -105,7 +104,7 @@ FROM Watcher w
 JOIN ProjectOverview o ON CONCAT('POV', o.overviewId) = w.entityName
 JOIN User u ON u.userId = w.userId;
 
-INSERT INTO Pool_Watcher(runId, userId)
+INSERT INTO Pool_Watcher(poolId, userId)
 SELECT p.poolId, u.userId
 FROM Watcher w
 JOIN Pool p ON p.name = w.entityName

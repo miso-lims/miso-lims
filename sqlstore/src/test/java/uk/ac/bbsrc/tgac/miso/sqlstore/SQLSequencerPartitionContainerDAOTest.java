@@ -22,37 +22,25 @@
 
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.InjectMocks;
-import org.mockito.Matchers;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.store.SecurityStore;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
@@ -61,12 +49,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PlatformImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
-import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
-import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
-import uk.ac.bbsrc.tgac.miso.core.store.PartitionStore;
-import uk.ac.bbsrc.tgac.miso.core.store.PlatformStore;
-import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
-import uk.ac.bbsrc.tgac.miso.core.store.Store;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSequencerPartitionContainerDao;
 
 public class SQLSequencerPartitionContainerDAOTest extends AbstractDAOTest {
 
@@ -74,23 +57,10 @@ public class SQLSequencerPartitionContainerDAOTest extends AbstractDAOTest {
   public final ExpectedException exception = ExpectedException.none();
 
   @Autowired
-  @Spy
-  private JdbcTemplate jdbcTemplate;
+  private SessionFactory sessionFactory;
 
-  @Mock
-  private RunStore runDAO;
-  @Mock
-  private PartitionStore partitionDAO;
-  @Mock
-  private PlatformStore platformDAO;
-  @Mock
-  private SecurityStore securityDAO;
-  @Mock
-  private Store<SecurityProfile> securityProfileDAO;
-  @Mock
-  private ChangeLogStore changeLogDAO;
   @InjectMocks
-  private SQLSequencerPartitionContainerDAO dao;
+  private HibernateSequencerPartitionContainerDao dao;
 
   // Auto-increment sequence doesn't roll back with transactions, so must be tracked
   private static long nextAutoIncrementId = 5L;
@@ -98,10 +68,7 @@ public class SQLSequencerPartitionContainerDAOTest extends AbstractDAOTest {
   @Before
   public void setup() throws IOException {
     MockitoAnnotations.initMocks(this);
-    dao.setJdbcTemplate(jdbcTemplate);
-    dao.setDataObjectFactory(new TgacDataObjectFactory());
-    Mockito.when(platformDAO.get(Mockito.anyLong())).thenReturn(new PlatformImpl());
-    dao.setPlatformDAO(platformDAO);
+    dao.setSessionFactory(sessionFactory);
   }
 
   @Test
@@ -159,14 +126,12 @@ public class SQLSequencerPartitionContainerDAOTest extends AbstractDAOTest {
 
   @Test
   public void testGet() throws IOException {
-    mockNonLazyThings();
     SequencerPartitionContainer<SequencerPoolPartition> spc = dao.get(1L);
     assertNonLazyThings(spc);
   }
 
   @Test
   public void testLazyGet() throws IOException {
-    mockNonLazyThings();
     SequencerPartitionContainer<SequencerPoolPartition> spc = dao.lazyGet(1L);
     assertNotNull(spc);
     assertEquals(1, spc.getPartitions().size());
@@ -174,7 +139,6 @@ public class SQLSequencerPartitionContainerDAOTest extends AbstractDAOTest {
 
   @Test
   public void testLazyGetNone() throws IOException {
-    mockNonLazyThings();
     SequencerPartitionContainer<SequencerPoolPartition> spc = dao.lazyGet(-9999L);
     assertNull(spc);
   }
@@ -214,7 +178,6 @@ public class SQLSequencerPartitionContainerDAOTest extends AbstractDAOTest {
   public void testSaveNew() throws IOException {
     long autoIncrementId = nextAutoIncrementId;
     SequencerPartitionContainer<SequencerPoolPartition> newSPC = makeSPC("ABCDEFXX");
-    mockAutoIncrement(autoIncrementId);
 
     assertEquals(autoIncrementId, dao.save(newSPC));
 
@@ -233,13 +196,10 @@ public class SQLSequencerPartitionContainerDAOTest extends AbstractDAOTest {
     when(mockUser.getUserId()).thenReturn(1L);
     spc.setLastModifier(mockUser);
 
-    mockAutoIncrement(nextAutoIncrementId);
-
     long spcId = dao.save(spc);
     SequencerPartitionContainer<SequencerPoolPartition> insertedSpc = dao.get(spcId);
     assertNotNull(insertedSpc);
     assertTrue(dao.remove(spc));
-    Mockito.verify(changeLogDAO, Mockito.times(1)).deleteAllById("SequencerPartitionContainer", spc.getId());
     assertNull(dao.get(insertedSpc.getId()));
     nextAutoIncrementId++;
   }
@@ -249,7 +209,6 @@ public class SQLSequencerPartitionContainerDAOTest extends AbstractDAOTest {
     assertEquals(1, dao.listAllSequencerPartitionContainersByRunId(1L).size());
 
     SequencerPartitionContainer<SequencerPoolPartition> spc = dao.get(1L);
-    dao.removeContainerFromRun(spc);
     assertEquals(0, dao.listAllSequencerPartitionContainersByRunId(1L).size());
   }
 
@@ -258,7 +217,6 @@ public class SQLSequencerPartitionContainerDAOTest extends AbstractDAOTest {
     assertEquals(1, dao.listAllSequencerPartitionContainersByRunId(1L).size());
 
     SequencerPartitionContainer<SequencerPoolPartition> spc = dao.get(2L);
-    dao.removeContainerFromRun(spc);
     assertEquals(1, dao.listAllSequencerPartitionContainersByRunId(1L).size());
   }
 
@@ -270,25 +228,11 @@ public class SQLSequencerPartitionContainerDAOTest extends AbstractDAOTest {
     pc.setSecurityProfile(profile);
     pc.setIdentificationBarcode(identificationBarcode);
     pc.setLocationBarcode("location");
-    pc.setPlatform(platformDAO.get(1L));
+    Platform platform = new PlatformImpl();
+    platform.setId(1L);
+    pc.setPlatform(platform);
     pc.setLastModifier(user);
     return pc;
-  }
-
-  private void mockAutoIncrement(long value) {
-    Map<String, Object> rs = new HashMap<>();
-    rs.put("Auto_increment", value);
-    Mockito.doReturn(rs).when(jdbcTemplate).queryForMap(Matchers.anyString());
-  }
-
-  @SuppressWarnings("unchecked") // Safe (for mocks in a unit test)
-  private void mockNonLazyThings() throws IOException {
-    User mockUser = Mockito.mock(User.class);
-    Mockito.when(securityDAO.getUserById(Matchers.anyLong())).thenReturn(mockUser);
-
-    List<SequencerPoolPartition> mockPartitions = new ArrayList<>();
-    mockPartitions.add(Mockito.mock(SequencerPoolPartition.class));
-    Mockito.when(partitionDAO.listBySequencerPartitionContainerId(Matchers.anyLong())).thenReturn(mockPartitions);
   }
 
   private void assertNonLazyThings(SequencerPartitionContainer<SequencerPoolPartition> spc) {

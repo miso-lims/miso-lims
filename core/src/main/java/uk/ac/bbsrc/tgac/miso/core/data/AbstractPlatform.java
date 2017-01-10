@@ -147,8 +147,7 @@ public abstract class AbstractPlatform implements Platform {
   }
 
   @Override
-  public int compareTo(Object o) {
-    Platform t = (Platform) o;
+  public int compareTo(Platform t) {
     if (getId() < t.getId()) return -1;
     if (getId() > t.getId()) return 1;
     return 0;

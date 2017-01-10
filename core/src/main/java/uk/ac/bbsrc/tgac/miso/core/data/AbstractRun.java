@@ -93,6 +93,7 @@ public abstract class AbstractRun implements Run {
   public Document submissionDocument;
 
   @OneToOne(targetEntity = SecurityProfile.class, cascade = CascadeType.ALL)
+  @JoinColumn(name = "securityProfile_profileId")
   private SecurityProfile securityProfile;
 
   private String name;
@@ -108,9 +109,10 @@ public abstract class AbstractRun implements Run {
   private String filePath;
 
   @OneToOne(targetEntity = StatusImpl.class, cascade = CascadeType.ALL)
+  @JoinColumn(name = "status_statusId")
   private Status status;
 
-  @OneToMany(targetEntity = RunQCImpl.class)
+  @OneToMany(targetEntity = RunQCImpl.class, mappedBy = "run", cascade = CascadeType.ALL)
   private Collection<RunQC> runQCs = new TreeSet<>();
 
   @OneToMany(targetEntity = Note.class, cascade = CascadeType.ALL)
@@ -318,7 +320,7 @@ public abstract class AbstractRun implements Run {
     try {
       runQC.setRun(this);
     } catch (MalformedRunException e) {
-      log.error("set run", e);
+      log.error("set run QC", e);
     }
     fireRunQcAddedEvent();
   }
@@ -541,8 +543,7 @@ public abstract class AbstractRun implements Run {
   }
 
   @Override
-  public int compareTo(Object o) {
-    Run t = (Run) o;
+  public int compareTo(Run t) {
     if (getId() < t.getId()) return -1;
     if (getId() > t.getId()) return 1;
     return 0;

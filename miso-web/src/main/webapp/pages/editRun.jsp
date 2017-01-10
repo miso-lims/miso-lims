@@ -541,11 +541,6 @@
             </c:otherwise>
           </c:choose>
         </tr>
-          <%--
-          <tr>
-              <td>Paired: ${container.paired}</td>
-          </tr>
-          --%>
       </table>
       <div id='partitionErrorDiv' class="parsley-custom-error-message"></div>
       <div id="partitionDiv">

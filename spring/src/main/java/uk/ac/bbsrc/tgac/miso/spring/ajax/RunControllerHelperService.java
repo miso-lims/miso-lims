@@ -250,8 +250,6 @@ public class RunControllerHelperService {
         "<tr><td>Location:</td><td><input type='text' id='locationBarcode' name='locationBarcode'/><input type='hidden' value='on' name='_locationBarcode'></td></tr>");
     sb.append(
         "<tr><td>Validation:</td><td><input type='text' id='validationBarcode' name='validationBarcode'/><input type='hidden' value='on' name='_validationBarcode'></td></tr>");
-    sb.append(
-        "<tr><td>Paired End:</td><td><input type='checkbox' id='paired' name='paired' value='false'/><input type='hidden' value='on' name='_paired'></td></tr>");
     sb.append("</table>");
     sb.append("<div id='partitionErrorDiv'> </div>");
     sb.append("<div id='partitionDiv'>");
@@ -302,8 +300,6 @@ public class RunControllerHelperService {
             + i + "].identificationBarcode' name='sequencerPartitionContainers[" + i + "].identificationBarcode'/></div></td></tr>");
         b.append("<tr><td>Location:</td><td><input type='text' id='sequencerPartitionContainers[" + i
             + "].locationBarcode' name='sequencerPartitionContainers[" + i + "].locationBarcode'/></td></tr>");
-        b.append("<tr><td>Paired End:</td><td><input type='checkbox' id='sequencerPartitionContainers[" + i
-            + "].paired' name='sequencerPartitionContainers[" + i + "].paired' value='false'/></td></tr>");
         b.append("</table>");
         b.append("<div id='partitionErrorDiv'> </div>");
         b.append("<div id='partitionDiv'>");
@@ -387,8 +383,6 @@ public class RunControllerHelperService {
           + i + "].identificationBarcode' name='sequencerPartitionContainers[" + i + "].identificationBarcode'/></div></td></tr>");
       b.append("<tr><td>Location:</td><td><input type='text' id='sequencerPartitionContainers[" + i
           + "].locationBarcode' name='sequencerPartitionContainers[" + i + "].locationBarcode'/></td></tr>");
-      b.append("<tr><td>Paired End:</td><td><input type='checkbox' id='sequencerPartitionContainers[" + i
-          + "].paired' name='sequencerPartitionContainers[" + i + "].paired'/></td></tr>");
       b.append("</table>");
       b.append("<div id='partitionErrorDiv'> </div>");
       b.append("<div id='partitionDiv'>");
@@ -454,8 +448,6 @@ public class RunControllerHelperService {
           + i + "].identificationBarcode' name='sequencerPartitionContainers[" + i + "].identificationBarcode'/></div></td></tr>");
       b.append("<tr><td>Location:</td><td><input type='text' id='sequencerPartitionContainers[" + i
           + "].locationBarcode' name='sequencerPartitionContainers[" + i + "].locationBarcode'/></td></tr>");
-      b.append("<tr><td>Paired End:</td><td><input type='checkbox' id='sequencerPartitionContainers[" + i
-          + "].paired' name='sequencerPartitionContainers[" + i + "].paired'/></td></tr>");
       b.append("</table>");
       b.append("<div id='partitionErrorDiv'> </div>");
       b.append("<div id='partitionDiv'>");
@@ -543,8 +535,6 @@ public class RunControllerHelperService {
           + i + "].identificationBarcode' name='sequencerPartitionContainers[" + i + "].identificationBarcode'/></div></td></tr>");
       b.append("<tr><td>Location:</td><td><input type='text' id='sequencerPartitionContainers[" + i
           + "].locationBarcode' name='sequencerPartitionContainers[" + i + "].locationBarcode'/></td></tr>");
-      b.append("<tr><td>Paired End:</td><td><input type='checkbox' id='sequencerPartitionContainers[" + i
-          + "].paired' name='sequencerPartitionContainers[" + i + "].paired'/></td></tr>");
       b.append("</table>");
       b.append("<div id='partitionErrorDiv'> </div>");
       b.append("<div id='partitionDiv'>");

@@ -41,13 +41,13 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.integration.Message;
 import org.springframework.util.Assert;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
@@ -93,7 +93,7 @@ public class PacBioNotificationMessageConsumerMechanism
     RequestManager requestManager = message.getHeaders().get("handler", RequestManager.class);
     Assert.notNull(requestManager, "Cannot consume MISO notification messages without a RequestManager.");
     Map<String, List<String>> statuses = message.getPayload();
-    Set<Run> output = new HashSet<Run>();
+    Set<Run> output = new HashSet<>();
     for (String key : statuses.keySet()) {
       HealthType ht = HealthType.valueOf(key);
       JSONArray runs = (JSONArray) JSONArray.fromObject(statuses.get(key)).get(0);
@@ -106,8 +106,8 @@ public class PacBioNotificationMessageConsumerMechanism
   }
 
   private Map<String, Run> processRunJSON(HealthType ht, JSONArray runs, RequestManager requestManager) {
-    Map<String, Run> updatedRuns = new HashMap<String, Run>();
-    List<Run> runsToSave = new ArrayList<Run>();
+    Map<String, Run> updatedRuns = new HashMap<>();
+    List<Run> runsToSave = new ArrayList<>();
 
     DateFormat gsLogDateFormat = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy");
     DateFormat startDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
@@ -257,7 +257,7 @@ public class PacBioNotificationMessageConsumerMechanism
                         .listSequencerPartitionContainersByBarcode(run.getString("plateId"));
                     if (!pfs.isEmpty()) {
                       if (pfs.size() == 1) {
-                        SequencerPartitionContainer<SequencerPoolPartition> lf = new ArrayList<SequencerPartitionContainer<SequencerPoolPartition>>(
+                        SequencerPartitionContainer<SequencerPoolPartition> lf = new ArrayList<>(
                             pfs).get(0);
                         if (lf.getSecurityProfile() != null && r.getSecurityProfile() == null) {
                           r.setSecurityProfile(lf.getSecurityProfile());
@@ -297,10 +297,9 @@ public class PacBioNotificationMessageConsumerMechanism
                         long flowId = requestManager.saveSequencerPartitionContainer(f);
                         f.setId(flowId);
                         ((RunImpl) r).addSequencerPartitionContainer(f);
-
-                          }
-                        }
                       }
+                    }
+                  }
                 } else {
                   SequencerPartitionContainer f = fs.iterator().next();
                   f.setSecurityProfile(r.getSecurityProfile());

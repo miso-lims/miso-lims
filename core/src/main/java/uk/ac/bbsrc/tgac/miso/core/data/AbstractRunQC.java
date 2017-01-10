@@ -25,13 +25,13 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.util.List;
 
-import javax.persistence.Column;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToMany;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunException;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -46,11 +46,11 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 public abstract class AbstractRunQC extends AbstractQC implements RunQC {
 
   @ManyToOne(targetEntity = RunImpl.class)
-  @Column(name = "run_runId")
+  @JoinColumn(name = "run_runId")
   private Run run;
   private String information;
 
-  @OneToMany(targetEntity = Partition.class)
+  @OneToMany(targetEntity = PartitionImpl.class)
   @JoinTable(name = "RunQC_Partition", joinColumns = {
       @JoinColumn(name = "runQc_runQcId", nullable = false, updatable = false) }, inverseJoinColumns = {
           @JoinColumn(name = "partition_partitionId", nullable = false)

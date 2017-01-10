@@ -198,8 +198,6 @@ public class ContainerControllerHelperService {
         "<tr><td>Location:</td><td><input type='text' id='locationBarcode' name='locationBarcode'/><input type='hidden' value='on' name='_locationBarcode'></td></tr>");
     sb.append(
         "<tr><td>Validation:</td><td><input type='text' id='validationBarcode' name='validationBarcode'/><input type='hidden' value='on' name='_validationBarcode'></td></tr>");
-    sb.append(
-        "<tr><td>Paired End:</td><td><input type='checkbox' id='paired' name='paired' value='false'/><input type='hidden' value='on' name='_paired'></td></tr>");
     sb.append("</table>");
     sb.append("<div id='partitionErrorDiv'> </div>");
     sb.append("<div id='partitionDiv'>");
@@ -749,11 +747,11 @@ public class ContainerControllerHelperService {
       for (SequencerPartitionContainer<SequencerPoolPartition> spc : requestManager.listAllSequencerPartitionContainers()) {
         String run = "";
         String sequencer = "";
-        if (spc.getRun() != null) {
-          run = TableHelper.hyperLinkify("/miso/run/" + spc.getRun().getId(), spc.getRun().getAlias());
-          if (spc.getRun().getSequencerReference() != null) {
-            sequencer = TableHelper.hyperLinkify("/miso/sequencer/" + spc.getRun().getSequencerReference().getId(),
-                spc.getRun().getSequencerReference().getPlatform().getNameAndModel());
+        if (spc.getLastRun() != null) {
+          run = TableHelper.hyperLinkify("/miso/run/" + spc.getLastRun().getId(), spc.getLastRun().getAlias());
+          if (spc.getLastRun().getSequencerReference() != null) {
+            sequencer = TableHelper.hyperLinkify("/miso/sequencer/" + spc.getLastRun().getSequencerReference().getId(),
+                spc.getLastRun().getSequencerReference().getPlatform().getNameAndModel());
           }
         }
         String identificationBarcode = (isStringEmptyOrNull(spc.getIdentificationBarcode()) ? "Unknown Barcode"
@@ -810,13 +808,14 @@ public class ContainerControllerHelperService {
     try {
       if (json.has("containerId")) {
         Long containerId = json.getLong("containerId");
-        SequencerPartitionContainer container = requestManager.getSequencerPartitionContainerById(containerId);
+        SequencerPartitionContainer<?> container = requestManager.getSequencerPartitionContainerById(containerId);
 
-        if (container.getRun() != null && "Completed".equals(container.getRun().getStatus().getHealth().getKey())) {
-          return JSONUtils.SimpleJSONResponse("yes");
-        } else {
-          return JSONUtils.SimpleJSONResponse("no");
+        for (Run run : container.getRuns()) {
+          if (run != null && "Completed".equals(run.getStatus().getHealth().getKey())) {
+            return JSONUtils.SimpleJSONResponse("yes");
+          }
         }
+        return JSONUtils.SimpleJSONResponse("no");
 
       } else {
         return JSONUtils.SimpleJSONError("No Sequencing Container specified");

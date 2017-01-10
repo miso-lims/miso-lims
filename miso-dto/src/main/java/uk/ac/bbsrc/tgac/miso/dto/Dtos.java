@@ -1233,9 +1233,10 @@ public class Dtos {
     dto.setId(from.getId());
     dto.setIdentificationBarcode(from.getIdentificationBarcode());
     dto.setPlatform(from.getPlatform().getPlatformType().getKey());
-    if (from.getRun() != null) {
-      dto.setLastRunAlias(from.getRun().getAlias());
-      dto.setLastRunId(from.getRun().getId());
+    Run lastRun = from.getLastRun();
+    if (lastRun != null) {
+      dto.setLastRunAlias(lastRun.getAlias());
+      dto.setLastRunId(lastRun.getId());
     }
     if (from.getLastModified() != null) {
       dto.setLastModified(getDateAsString(from.getLastModified()));

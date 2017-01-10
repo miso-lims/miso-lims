@@ -45,6 +45,7 @@ import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Lists;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractRun;
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
@@ -88,6 +89,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.event.Alert;
+import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunQcException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
@@ -102,7 +104,6 @@ import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignDao;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
-import uk.ac.bbsrc.tgac.miso.core.store.PartitionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PlatformStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
@@ -144,8 +145,6 @@ public class MisoRequestManager implements RequestManager {
   private LibraryStore libraryStore;
   @Autowired
   private LibraryQcStore libraryQcStore;
-  @Autowired
-  private PartitionStore partitionStore;
   @Autowired
   private PlatformStore platformStore;
   @Autowired
@@ -235,10 +234,6 @@ public class MisoRequestManager implements RequestManager {
     this.namingScheme = namingScheme;
   }
 
-  public void setPartitionStore(PartitionStore partitionStore) {
-    this.partitionStore = partitionStore;
-  }
-
   public void setPlatformStore(PlatformStore platformStore) {
     this.platformStore = platformStore;
   }
@@ -326,7 +321,6 @@ public class MisoRequestManager implements RequestManager {
     }
   }
 
-  @SuppressWarnings("rawtypes")
   @Override
   public Collection<Pool> listAllPoolsBySearch(String query) throws IOException {
     if (poolStore != null) {
@@ -336,7 +330,6 @@ public class MisoRequestManager implements RequestManager {
     }
   }
 
-  @SuppressWarnings("rawtypes")
   @Override
   public Collection<Pool> listAllPoolsWithLimit(int limit) throws IOException {
     if (poolStore != null) {
@@ -986,24 +979,6 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<SequencerPoolPartition> listAllSequencerPoolPartitions() throws IOException {
-    if (partitionStore != null) {
-      return partitionStore.listAll();
-    } else {
-      throw new IOException("No partitionStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<? extends SequencerPoolPartition> listPartitionsBySequencerPartitionContainerId(long containerId) throws IOException {
-    if (sequencerPartitionContainerStore != null) {
-      return sequencerPartitionContainerStore.listPartitionsByContainerId(containerId);
-    } else {
-      throw new IOException("No sequencerPartitionContainerStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
   public Collection<SequencerPartitionContainer<SequencerPoolPartition>> listAllSequencerPartitionContainers() throws IOException {
     if (sequencerPartitionContainerStore != null) {
       return sequencerPartitionContainerStore.listAll();
@@ -1377,7 +1352,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public void deleteContainer(SequencerPartitionContainer container) throws IOException {
+  public void deleteContainer(SequencerPartitionContainer<SequencerPoolPartition> container) throws IOException {
     if (sequencerPartitionContainerStore != null) {
       if (!sequencerPartitionContainerStore.remove(container)) {
         throw new IOException("Unable to delete container.");
@@ -1487,17 +1462,6 @@ public class MisoRequestManager implements RequestManager {
     projectStore.saveOverview(managed);
   }
 
-  @Override
-  public void deletePartition(SequencerPoolPartition partition) throws IOException {
-    if (partitionStore != null) {
-      if (!partitionStore.remove(partition)) {
-        throw new IOException("Unable to delete partition.");
-      }
-    } else {
-      throw new IOException("No plateStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
   // SAVES
 
   @Override
@@ -1530,7 +1494,6 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public long saveRun(Run run) throws IOException {
     if (runStore != null) {
-      long id;
       if (run.getId() == AbstractRun.UNSAVED_ID) {
         run.setName(generateTemporaryName());
         run.setId(runStore.save(run));
@@ -1539,16 +1502,38 @@ public class MisoRequestManager implements RequestManager {
           run.setName(name);
 
           validateNameOrThrow(run, namingScheme);
-          id = runStore.save(run);
+          return runStore.save(run);
         } catch (MisoNamingException e) {
           throw new IOException("Cannot save Run - issue with generating name");
         }
       } else {
-        // applyChanges
-        runStore.save(run);
-        id = run.getId();
+        Run managed = getRunById(run.getId());
+        log.info("update run: " + managed);
+        managed.setAlias(run.getAlias());
+        managed.setDescription(run.getDescription());
+        managed.setPairedEnd(run.getPairedEnd());
+        managed.setCycles(run.getCycles());
+        managed.setFilePath(run.getFilePath());
+        managed.getStatus().setHealth(run.getStatus().getHealth());
+        managed.getStatus().setStartDate(run.getStatus().getStartDate());
+        managed.getStatus().setCompletionDate(run.getStatus().getCompletionDate());
+        managed.getStatus().setInstrumentName(run.getStatus().getInstrumentName());
+        managed.getStatus().setRunName(run.getStatus().getRunName());
+        managed.getStatus().setXml(run.getStatus().getXml());
+        for (RunQC runQc : run.getRunQCs()) {
+          if (!managed.getRunQCs().contains(runQc)) {
+            try {
+              managed.addQc(runQc);
+            } catch (MalformedRunQcException e) {
+              log.error("malformed runQC: ", e);
+            }
+          }
+        }
+        managed.setNotes(run.getNotes());
+        managed.setSequencingParameters(run.getSequencingParameters());
+        runStore.save(managed);
+        return run.getId();
       }
-      return id;
     } else {
       throw new IOException("No runStore available. Check that it has been declared in the Spring config.");
     }
@@ -1740,21 +1725,42 @@ public class MisoRequestManager implements RequestManager {
     }
   }
 
+
   @Override
-  public long saveSequencerPoolPartition(SequencerPoolPartition partition) throws IOException {
-    if (partitionStore != null) {
-      return partitionStore.save(partition);
+  public long saveSequencerPartitionContainer(SequencerPartitionContainer<SequencerPoolPartition>container) throws IOException {
+    if (sequencerPartitionContainerStore != null) {
+      if (container.getId() == AbstractSequencerPartitionContainer.UNSAVED_ID) {
+        return sequencerPartitionContainerStore.save(container);
+      } else {
+        SequencerPartitionContainer<SequencerPoolPartition> managed = getSequencerPartitionContainerById(container.getId());
+        managed.setIdentificationBarcode(container.getIdentificationBarcode());
+        managed.setLocationBarcode(container.getLocationBarcode());
+        managed.setValidationBarcode(container.getValidationBarcode());
+        updatePartitionPools(container, managed);
+        return sequencerPartitionContainerStore.save(managed);
+      }
     } else {
-      throw new IOException("No partitionStore available. Check that it has been declared in the Spring config.");
+      throw new IOException("No sequencerPartitionContainerStore available. Check that it has been declared in the Spring config.");
     }
   }
 
-  @Override
-  public long saveSequencerPartitionContainer(SequencerPartitionContainer container) throws IOException {
-    if (sequencerPartitionContainerStore != null) {
-      return sequencerPartitionContainerStore.save(container);
-    } else {
-      throw new IOException("No sequencerPartitionContainerStore available. Check that it has been declared in the Spring config.");
+  private void updatePartitionPools(SequencerPartitionContainer<SequencerPoolPartition> source,
+      SequencerPartitionContainer<SequencerPoolPartition> managed) throws IOException {
+    for (SequencerPoolPartition sourcePartition : source.getPartitions()) {
+      for (SequencerPoolPartition managedPartition : source.getPartitions()) {
+        if (sourcePartition.getId() == managedPartition.getId()) {
+          Pool sourcePool = sourcePartition.getPool();
+          Pool managedPool = managedPartition.getPool();
+          if (sourcePool == null && managedPool == null) continue;
+          if (sourcePool == null && managedPool != null) {
+            managedPartition.setPool(null);
+          } else if (sourcePool != null && managedPool == null) {
+            managedPartition.setPool(getPoolById(sourcePool.getId()));
+          } else if (sourcePool.getId() != managedPool.getId()) {
+            managedPartition.setPool(getPoolById(sourcePool.getId()));
+          }
+        }
+      }
     }
   }
 
@@ -2197,10 +2203,10 @@ public class MisoRequestManager implements RequestManager {
 
   @Override
   public SequencerPoolPartition getSequencerPoolPartitionById(long partitionId) throws IOException {
-    if (partitionStore != null) {
-      return partitionStore.get(partitionId);
+    if (sequencerPartitionContainerStore != null) {
+      return sequencerPartitionContainerStore.getPartitionById(partitionId);
     } else {
-      throw new IOException("No partitionStore available. Check that it has been declared in the Spring config.");
+      throw new IOException("No sequencerPartitionContainerStore available. Check that it has been declared in the Spring config.");
     }
   }
 
@@ -2820,7 +2826,7 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public Long countContainers() throws IOException {
     if (sequencerPartitionContainerStore != null) {
-      return sequencerPartitionContainerStore.countContainers();
+      return Long.valueOf(sequencerPartitionContainerStore.count());
     } else {
       throw new IOException("No sequencerPartitionContainerStore available. Check that it has been declared in the Spring config.");
     }

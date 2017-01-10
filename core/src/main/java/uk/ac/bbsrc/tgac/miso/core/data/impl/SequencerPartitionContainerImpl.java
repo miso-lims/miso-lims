@@ -26,6 +26,13 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.AutoPopulatingList;
@@ -46,9 +53,15 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
  * @date 14-May-2012
  * @since 0.1.6
  */
+@Entity
+@Table(name = "SequencerPartitionContainer")
 public class SequencerPartitionContainerImpl extends AbstractSequencerPartitionContainer<SequencerPoolPartition> implements Serializable {
   protected static final Logger log = LoggerFactory.getLogger(SequencerPartitionContainerImpl.class);
 
+  @OneToMany(targetEntity = PartitionImpl.class, cascade = CascadeType.ALL)
+  @JoinTable(name = "SequencerPartitionContainer_Partition", joinColumns = {
+      @JoinColumn(name = "container_containerId", updatable = false) }, inverseJoinColumns = {
+          @JoinColumn(name = "partitions_partitionId", updatable = false) })
   private List<SequencerPoolPartition> partitions = new AutoPopulatingList<SequencerPoolPartition>(PartitionImpl.class);
 
   private int partitionLimit = 8;

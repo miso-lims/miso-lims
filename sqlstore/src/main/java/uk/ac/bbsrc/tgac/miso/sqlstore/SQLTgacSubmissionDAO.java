@@ -327,7 +327,7 @@ public class SQLTgacSubmissionDAO implements SubmissionStore, NamingSchemeAware 
   }
 
   @Override
-  public Submission lazyGet(long id) throws IOException {
+  public Submission<Submittable, Document, Document> lazyGet(long id) throws IOException {
     return get(id);
   }
 

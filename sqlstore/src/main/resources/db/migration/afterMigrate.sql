@@ -292,6 +292,29 @@ FOR EACH ROW
     '',
     NEW.lastModifier,
     'Run created.')//
+    
+DROP TRIGGER IF EXISTS StatusChange//
+CREATE TRIGGER StatusChange BEFORE UPDATE ON Status
+FOR EACH ROW
+  BEGIN
+	  DECLARE log_message varchar(500) CHARACTER SET utf8;
+	  SET log_message = CONCAT_WS(', ',
+      CASE WHEN NEW.health <> OLD.health THEN CONCAT('health: ', COALESCE(OLD.health, 'n/a'), ' → ', COALESCE(NEW.health, 'n/a')) END,
+      CASE WHEN (NEW.completionDate IS NULL) <> (OLD.completionDate IS NULL) OR NEW.completionDate <> OLD.completionDate THEN CONCAT('completion date: ', COALESCE(OLD.completionDate, 'n/a'), ' → ', COALESCE(NEW.completionDate, 'n/a')) END,
+      CASE WHEN (NEW.startDate IS NULL) <> (OLD.startDate IS NULL) OR NEW.startDate <> OLD.startDate THEN CONCAT('start date: ', COALESCE(OLD.startDate, 'n/a'), ' → ', COALESCE(NEW.startDate, 'n/a')) END,
+      CASE WHEN NEW.runName <> OLD.runName THEN CONCAT('run name: ', COALESCE(OLD.runName, 'n/a'), ' → ', COALESCE(NEW.runName, 'n/a'), ' (this could be a problem -- inform your MISO administrators if you see this)') END);
+    IF log_message IS NOT NULL AND log_message <> '' THEN
+      INSERT INTO RunChangeLog(runId, columnsChanged, userId, message) VALUES (
+        (SELECT runId FROM Run WHERE alias = NEW.runName),
+        COALESCE(CONCAT_WS(',',
+          CASE WHEN NEW.health <> OLD.health THEN 'health' END,
+          CASE WHEN (NEW.completionDate IS NULL) <> (OLD.completionDate IS NULL) OR NEW.completionDate <> OLD.completionDate THEN 'completionDate' END,
+          CASE WHEN (NEW.startDate IS NULL) <> (OLD.startDate IS NULL) OR NEW.startDate <> OLD.startDate THEN 'startDate' END,
+          CASE WHEN NEW.runName <> OLD.runName THEN 'runName' END), ''),
+        (SELECT lastModifier FROM Run WHERE alias = NEW.runName),
+        log_message);
+    END IF;
+  END//
 
 DROP TRIGGER IF EXISTS BeforeInsertPool//
 CREATE TRIGGER BeforeInsertPool BEFORE INSERT ON Pool
@@ -520,7 +543,7 @@ FOR EACH ROW
         CASE WHEN NEW.description <> OLD.description THEN CONCAT('description: ', OLD.description, ' → ', NEW.description) END,
         CASE WHEN NEW.name <> OLD.name THEN CONCAT('name: ', OLD.name, ' → ', NEW.name) END,
         CASE WHEN NEW.project_projectId <> OLD.project_projectId THEN CONCAT('project: ', COALESCE((SELECT name FROM Project WHERE projectId = OLD.project_projectId), 'n/a'), ' → ', COALESCE((SELECT name FROM Project WHERE projectId = NEW.project_projectId), 'n/a')) END,
-        CASE WHEN NEW.studyType <> OLD.studyType THEN CONCAT('type: ', COALESCE((SELECT name FROM StudyType WHERE typeId = OLD.studyType), 'n/a'), ' → ', COALESCE((SELECT name FROM StudyType WHERE typeId = NEW.studyType), 'n/a')) END);
+        CASE WHEN NEW.studyTypeId <> OLD.studyTypeId THEN CONCAT('type: ', COALESCE((SELECT name FROM StudyType WHERE typeId = OLD.studyTypeId), 'n/a'), ' → ', COALESCE((SELECT name FROM StudyType WHERE typeId = NEW.studyTypeId), 'n/a')) END);
   IF log_message IS NOT NULL AND log_message <> '' THEN
     INSERT INTO StudyChangeLog(studyId, columnsChanged, userId, message) VALUES (
       NEW.studyId,
@@ -530,7 +553,7 @@ FOR EACH ROW
         CASE WHEN NEW.description <> OLD.description THEN 'description' END,
         CASE WHEN NEW.name <> OLD.name THEN 'name' END,
         CASE WHEN NEW.project_projectId <> OLD.project_projectId THEN 'project_projectId' END,
-        CASE WHEN NEW.studyType <> OLD.studyType THEN 'studyType' END), ''),
+        CASE WHEN NEW.studyTypeId <> OLD.studyTypeId THEN 'studyTypeId' END), ''),
       NEW.lastModifier,
       log_message
       );
@@ -579,6 +602,27 @@ FOR EACH ROW
     '',
     NEW.lastModifier,
     'Container created.')//
+
+DROP TRIGGER IF EXISTS PartitionChange//
+CREATE TRIGGER PartitionChange BEFORE UPDATE ON _Partition
+FOR EACH ROW
+  BEGIN
+    DECLARE log_message varchar(500) CHARACTER SET utf8;
+    SET log_message = CONCAT_WS(', ',
+    CASE WHEN (NEW.pool_poolId IS NULL) <> (OLD.pool_poolId IS NULL) OR NEW.pool_poolId <> OLD.pool_poolId THEN CONCAT('pool changed in partition ', OLD.partitionNumber, ': ', COALESCE((SELECT name FROM Pool WHERE poolId = OLD.pool_poolId), 'n/a'), ' → ', COALESCE((SELECT name FROM Pool WHERE poolId = NEW.pool_poolId), 'n/a')) END);
+    IF log_message IS NOT NULL AND log_message <> '' THEN
+      INSERT INTO SequencerPartitionContainerChangeLog(containerId, columnsChanged, userId, message) VALUES (
+        (SELECT spcp.container_containerId FROM SequencerPartitionContainer_Partition spcp
+         WHERE spcp.partitions_partitionId = OLD.partitionId),
+         COALESCE(CONCAT_WS(', ',
+           CASE WHEN (NEW.pool_poolId IS NULL) <> (OLD.pool_poolId IS NULL) OR NEW.pool_poolId <> OLD.pool_poolId THEN 'pool' END), ''),
+         (SELECT spc.lastModifier FROM SequencerPartitionContainer spc
+           JOIN SequencerPartitionContainer_Partition spcp ON spcp.container_containerId = spc.containerId
+         WHERE spcp.partitions_partitionId = OLD.partitionId),
+         log_message
+      );
+    END IF;
+  END //
 
 DROP TRIGGER IF EXISTS BoxChange//
 CREATE TRIGGER BoxChange BEFORE UPDATE ON Box
@@ -684,3 +728,6 @@ CREATE OR REPLACE VIEW SampleDerivedInfo AS
   
 CREATE OR REPLACE VIEW RunDerivedInfo AS
   SELECT runId, MAX(changeTime) as lastModified FROM RunChangeLog GROUP BY runId;
+
+CREATE OR REPLACE VIEW ContainerDerivedInfo AS
+  SELECT containerId, MAX(changeTime) as lastModified FROM SequencerPartitionContainerChangeLog GROUP BY containerId;

@@ -76,7 +76,7 @@ public class TGACIlluminaFilepathGenerator implements FilePathGenerator {
         StringBuilder filePath = new StringBuilder();
         if (!isStringEmptyOrNull(basePath)) {
           filePath.append(
-              partition.getSequencerPartitionContainer().getRun().getFilePath() + "/Data/Intensities/BaseCalls/PAP/Project_"
+              partition.getSequencerPartitionContainer().getLastRun().getFilePath() + "/Data/Intensities/BaseCalls/PAP/Project_"
                   + experiment.getStudy().getProject().getAlias() + "/Sample_" + l.getLibrary().getName() + "/" + l.getLibrary().getName());
         } else {
           filePath.append(
@@ -104,7 +104,7 @@ public class TGACIlluminaFilepathGenerator implements FilePathGenerator {
   @Override
   public Set<File> generateFilePaths(SequencerPoolPartition partition) throws SubmissionException {
     Set<File> filePaths = new HashSet<>();
-    if ((partition.getSequencerPartitionContainer().getRun().getFilePath()) == null) {
+    if ((partition.getSequencerPartitionContainer().getLastRun().getFilePath()) == null) {
       throw new SubmissionException("No valid run filepath!");
     }
 

@@ -73,7 +73,7 @@ public class EraRunDecorator extends AbstractSubmittableDecorator<Document> {
       Pool pool = p.getPool();
 
       // TODO - fix this. not great.
-      Run r = p.getSequencerPartitionContainer().getRun();
+      Run r = p.getSequencerPartitionContainer().getLastRun();
 
       if (r == null) r = this.r;
 

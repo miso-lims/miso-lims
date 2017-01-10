@@ -46,30 +46,35 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 @JsonIgnoreProperties({ "securityProfile", "run" })
-public interface SequencerPartitionContainer<T extends Partition> extends SecurableByProfile, Deletable, Comparable, Barcodable, Locatable {
+public interface SequencerPartitionContainer<T extends Partition>
+    extends SecurableByProfile, Deletable, Comparable<SequencerPartitionContainer<?>>, Barcodable, Locatable
+{
+
   public void setId(long id);
 
   /**
-   * Sets the name of this Container object.
+   * Returns the runs of this Container object.
    * 
-   * @param name name.
+   * @return Collection<Run> run.
    */
-  public void setName(String name);
+  Collection<Run> getRuns();
 
   /**
-   * Returns the run of this Container object.
+   * Sets the runs of this Container object.
    * 
-   * @return Run run.
+   * @param runs The runs of which this Container is a part.
+   * 
    */
-  Run getRun();
+  void setRuns(Collection<Run> runs);
 
   /**
-   * Sets the run of this Container object.
+   * Returns the run with
+   * a) the latest start date (of the runs which have a known status), or
+   * b) the last modified date
    * 
-   * @param run The run of which this Container is a part.
-   * 
+   * @return Run run
    */
-  void setRun(Run run);
+  Run getLastRun();
 
   /**
    * Get the list of {@link Partition} objects comprising this container
@@ -135,8 +140,6 @@ public interface SequencerPartitionContainer<T extends Partition> extends Secura
 
   /**
    * Add new partition
-   * 
-   * 
    */
   public void addNewPartition();
 
@@ -148,6 +151,6 @@ public interface SequencerPartitionContainer<T extends Partition> extends Secura
 
   public Date getLastModified();
 
-  public void setLastModified(Date lastModified);
+  void setRun(Run run);
 
 }

@@ -82,8 +82,6 @@ public interface SequencerPartitionContainerStore extends Store<SequencerPartiti
    */
   Collection<? extends SequencerPoolPartition> listPartitionsByContainerId(long sequencerPartitionContainerId) throws IOException;
 
-  long countContainers() throws IOException;
-
   long countBySearch(String querystr) throws IOException;
 
   List<SequencerPartitionContainer<SequencerPoolPartition>> listBySearchOffsetAndNumResults(int offset, int limit, String querystr,
@@ -91,4 +89,6 @@ public interface SequencerPartitionContainerStore extends Store<SequencerPartiti
 
   List<SequencerPartitionContainer<SequencerPoolPartition>> listByOffsetAndNumResults(int offset, int limit, String sortDir, String sortCol)
       throws IOException;
+
+  SequencerPoolPartition getPartitionById(long partitionId);
 }
