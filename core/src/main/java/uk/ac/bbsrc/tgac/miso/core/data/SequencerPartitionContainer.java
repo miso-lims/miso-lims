@@ -68,7 +68,9 @@ public interface SequencerPartitionContainer<T extends Partition>
   void setRuns(Collection<Run> runs);
 
   /**
-   * Returns the run with the latest start date (of the runs which have a known status) of this Container object.
+   * Returns the run with
+   * a) the latest start date (of the runs which have a known status), or
+   * b) the last modified date
    * 
    * @return Run run
    */

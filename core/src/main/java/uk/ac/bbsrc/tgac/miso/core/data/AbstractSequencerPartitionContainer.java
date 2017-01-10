@@ -198,6 +198,8 @@ public abstract class AbstractSequencerPartitionContainer<T extends Partition> i
     for (Run thisRun : getRuns()) {
       if (lastRun == null) {
         lastRun = thisRun;
+      } else if (lastRun.getStatus().getStartDate() == null && thisRun.getStatus().getStartDate() == null) {
+        if (thisRun.getLastUpdated().after(lastRun.getLastUpdated())) lastRun = thisRun;
       } else if (lastRun.getStatus().getStartDate() == null && thisRun.getStatus().getStartDate() != null) {
         lastRun = thisRun;
       } else if (lastRun.getStatus().getStartDate() != null && thisRun.getStatus().getStartDate() == null) {
