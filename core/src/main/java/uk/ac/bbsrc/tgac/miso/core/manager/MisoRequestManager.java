@@ -1514,7 +1514,12 @@ public class MisoRequestManager implements RequestManager {
         managed.setPairedEnd(run.getPairedEnd());
         managed.setCycles(run.getCycles());
         managed.setFilePath(run.getFilePath());
-        managed.setStatus(run.getStatus());
+        managed.getStatus().setHealth(run.getStatus().getHealth());
+        managed.getStatus().setStartDate(run.getStatus().getStartDate());
+        managed.getStatus().setCompletionDate(run.getStatus().getCompletionDate());
+        managed.getStatus().setInstrumentName(run.getStatus().getInstrumentName());
+        managed.getStatus().setRunName(run.getStatus().getRunName());
+        managed.getStatus().setXml(run.getStatus().getXml());
         for (RunQC runQc : run.getRunQCs()) {
           if (!managed.getRunQCs().contains(runQc)) {
             try {

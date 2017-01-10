@@ -198,7 +198,11 @@ public abstract class AbstractSequencerPartitionContainer<T extends Partition> i
     for (Run thisRun : getRuns()) {
       if (lastRun == null) {
         lastRun = thisRun;
-      } else if (thisRun.getStatus() != null && thisRun.getStatus().getStartDate().after(lastRun.getStatus().getStartDate())) {
+      } else if (lastRun.getStatus().getStartDate() == null && thisRun.getStatus().getStartDate() != null) {
+        lastRun = thisRun;
+      } else if (lastRun.getStatus().getStartDate() != null && thisRun.getStatus().getStartDate() == null) {
+        continue;
+      } else if (thisRun.getStatus().getStartDate().after(lastRun.getStatus().getStartDate())) {
         lastRun = thisRun;
       }
     }
@@ -207,11 +211,11 @@ public abstract class AbstractSequencerPartitionContainer<T extends Partition> i
 
   @Override
   public void setRun(Run run) {
-    if (runs.size() < 2) {
-      runs.add(run);
+    if (run != null && runs.size() > 1) {
+      throw new IllegalArgumentException("Cannot set single run on a container with multiple runs already linked!");
     } else {
-      // this should only be called in cases where the container should have only a single run
-      throw new IllegalArgumentException("Cannot add more than one run to a container!");
+      runs = new ArrayList<>();
+      if (run != null) runs.add(run);
     }
   }
 
