@@ -2,17 +2,6 @@
 DELIMITER //
 
 DROP FUNCTION IF EXISTS `nextval`//
-CREATE FUNCTION `nextval` (`seq_name` varchar(100))
-RETURNS bigint(20) NOT DETERMINISTIC
-BEGIN
-    DECLARE cur_val bigint(20);
-    SELECT sequence_cur_value INTO cur_val FROM sequence_data WHERE sequence_name = seq_name;
- 
-    IF cur_val IS NOT NULL THEN
-        UPDATE sequence_data SET sequence_cur_value = sequence_cur_value + 1 WHERE sequence_name = seq_name;
-    END IF;
-    RETURN cur_val;
-END//
 
 DROP TRIGGER IF EXISTS SampleChange//
 CREATE TRIGGER SampleChange BEFORE UPDATE ON Sample
@@ -232,9 +221,6 @@ FOR EACH ROW
   END//
 
 DROP TRIGGER IF EXISTS BeforeInsertSample//
-CREATE TRIGGER BeforeInsertSample BEFORE INSERT ON Sample
-  FOR EACH ROW
-  SET NEW.boxPositionId = nextval('box_position_seq')//
 
 DROP TRIGGER IF EXISTS SampleInsert//
 CREATE TRIGGER SampleInsert AFTER INSERT ON Sample
@@ -317,9 +303,6 @@ FOR EACH ROW
   END//
 
 DROP TRIGGER IF EXISTS BeforeInsertPool//
-CREATE TRIGGER BeforeInsertPool BEFORE INSERT ON Pool
-  FOR EACH ROW
-  SET NEW.boxPositionId = nextval('box_position_seq')//
 
 DROP TRIGGER IF EXISTS PoolChange//
 CREATE TRIGGER PoolChange BEFORE UPDATE ON Pool
@@ -519,9 +502,6 @@ FOR EACH ROW
 
 
 DROP TRIGGER IF EXISTS BeforeInsertLibrary//
-CREATE TRIGGER BeforeInsertLibrary BEFORE INSERT ON Library
-  FOR EACH ROW
-  SET NEW.boxPositionId = nextval('box_position_seq')//
 
 DROP TRIGGER IF EXISTS LibraryInsert//
 CREATE TRIGGER LibraryInsert AFTER INSERT ON Library

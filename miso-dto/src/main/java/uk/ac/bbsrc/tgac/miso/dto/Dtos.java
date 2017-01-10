@@ -1081,7 +1081,7 @@ public class Dtos {
     BoxableDto dto = new BoxableDto();
     dto.setId(from.getId());
     dto.setAlias(from.getAlias());
-    dto.setBoxAlias(from.getBoxAlias());
+    dto.setBoxAlias(from.getBox().getAlias());
     dto.setBoxPosition(BoxUtils.makeLocationLabel(from));
     dto.setDiscarded(from.isDiscarded());
     dto.setIdentificationBarcode(from.getIdentificationBarcode());

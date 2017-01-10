@@ -47,6 +47,8 @@ import javax.persistence.Transient;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.codehaus.jackson.annotate.JsonManagedReference;
+import org.hibernate.annotations.Formula;
+import org.hibernate.annotations.JoinFormula;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -55,6 +57,7 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleDerivedInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleQCImpl;
@@ -128,6 +131,18 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @PrimaryKeyJoinColumn
   private SampleDerivedInfo derivedInfo;
 
+  @ManyToOne(targetEntity = BoxImpl.class)
+  @JoinFormula("(SELECT boxId FROM BoxPosition WHERE targetId = id AND targetType = 'S')")
+  private Box box;
+
+  @Formula("(SELECT position FROM BoxPosition WHERE targetId = id AND targetType = 'S')")
+  private String position;
+
+  @Override
+  public String getBoxPosition() {
+    return position;
+  }
+
   @Override
   public User getLastModifier() {
     return lastModifier;
@@ -166,6 +181,11 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @Override
   public void setAccession(String accession) {
     this.accession = accession;
+  }
+
+  @Override
+  public Box getBox() {
+    return box;
   }
 
   @Override

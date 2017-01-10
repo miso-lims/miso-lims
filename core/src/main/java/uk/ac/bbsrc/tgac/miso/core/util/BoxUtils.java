@@ -2,12 +2,6 @@ package uk.ac.bbsrc.tgac.miso.core.util;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowCallbackHandler;
-
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 
 /**
@@ -163,29 +157,14 @@ public class BoxUtils {
     return letter;
   }
 
-  public static void extractBoxableInformation(JdbcTemplate template, final Boxable boxable) {
-    template.query(
-        "SELECT Box.alias AS alias, Box.boxId AS id, Box.locationBarcode AS location, BoxPosition.`column` AS `column`, BoxPosition.`row` AS `row` FROM BoxPosition JOIN Box ON BoxPosition.boxId = Box.boxId WHERE boxPositionId = ?",
-        new Object[] { boxable.getBoxPositionId() }, new RowCallbackHandler() {
-
-          @Override
-          public void processRow(ResultSet rs) throws SQLException {
-            boxable.setBoxAlias(rs.getString("alias"));
-            boxable.setBoxId(rs.getLong("id"));
-            boxable.setBoxLocation(rs.getString("location"));
-            boxable.setBoxPosition(getPositionString(rs.getInt("row"), rs.getInt("column")));
-          }
-        });
-  }
-
   public static String makeLocationLabel(Boxable b) {
     if (b.isDiscarded()) {
       return "EMPTY";
-    } else if (!isStringEmptyOrNull(b.getBoxAlias()) && !isStringEmptyOrNull(b.getBoxPosition())
-        && !isStringEmptyOrNull(b.getBoxLocation())) {
-      return b.getBoxAlias() + " - " + b.getBoxPosition() + " (" + b.getBoxLocation() + ")";
-    } else if (!isStringEmptyOrNull(b.getBoxAlias()) && !isStringEmptyOrNull(b.getBoxPosition())) {
-      return b.getBoxAlias() + " - " + b.getBoxPosition();
+    } else if (!isStringEmptyOrNull(b.getBox().getAlias()) && !isStringEmptyOrNull(b.getBoxPosition())
+        && !isStringEmptyOrNull(b.getBox().getLocationBarcode())) {
+      return b.getBox().getAlias() + " - " + b.getBoxPosition() + " (" + b.getBox().getLocationBarcode() + ")";
+    } else if (!isStringEmptyOrNull(b.getBox().getAlias()) && !isStringEmptyOrNull(b.getBoxPosition())) {
+      return b.getBox().getAlias() + " - " + b.getBoxPosition();
     } else if (!isStringEmptyOrNull(b.getLocationBarcode())) {
       return b.getLocationBarcode();
     } else {

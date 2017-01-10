@@ -17,6 +17,7 @@ import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Lists;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
+import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
@@ -677,24 +678,10 @@ public class DetailedSampleBuilder
     return false;
   }
 
-  @Override
-  public void setBoxId(Long boxId) {
-    throw new UnsupportedOperationException("Method not implemented on builder");
-  }
 
   @Override
-  public Long getBoxId() {
-    throw new UnsupportedOperationException("Method not implemented on builder");
-  }
-
-  @Override
-  public void setBoxAlias(String alias) {
-    throw new UnsupportedOperationException("Method not implemented on builder");
-  }
-
-  @Override
-  public String getBoxAlias() {
-    throw new UnsupportedOperationException("Method not implemented on builder");
+  public Box getBox() {
+    return null;
   }
 
   @Override
@@ -718,33 +705,8 @@ public class DetailedSampleBuilder
   }
 
   @Override
-  public Long getBoxPositionId() {
-    return null;
-  }
-
-  @Override
-  public void setBoxPositionId(Long id) {
-    throw new UnsupportedOperationException("Method not implemented on builder");
-  }
-
-  @Override
   public String getBoxPosition() {
     return null;
-  }
-
-  @Override
-  public void setBoxPosition(String id) {
-    throw new UnsupportedOperationException("Method not implemented on builder");
-  }
-
-  @Override
-  public String getBoxLocation() {
-    return null;
-  }
-
-  @Override
-  public void setBoxLocation(String boxLocation) {
-    throw new UnsupportedOperationException("Method not implemented on builder");
   }
 
   @Override

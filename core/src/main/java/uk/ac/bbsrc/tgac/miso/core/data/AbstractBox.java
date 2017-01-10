@@ -4,19 +4,27 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.MappedSuperclass;
+
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 
+@MappedSuperclass
 public abstract class AbstractBox implements Box {
 
   public static final Long UNSAVED_ID = 0L;
 
   private SecurityProfile securityProfile;
 
-  private long boxId;
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private long boxId = UNSAVED_ID;
   private String name;
   private String alias;
   private String description;
@@ -34,7 +42,7 @@ public abstract class AbstractBox implements Box {
   public AbstractBox() {
 	  securityProfile = null;
 	  boxId = AbstractBox.UNSAVED_ID;
-	  changeLog = new ArrayList<ChangeLog>();
+	  changeLog = new ArrayList<>();
   }
   
   @Override

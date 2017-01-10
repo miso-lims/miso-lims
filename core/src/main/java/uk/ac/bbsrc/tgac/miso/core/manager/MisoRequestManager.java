@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +46,7 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Lists;
 
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractBox;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractRun;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
@@ -1564,9 +1566,8 @@ public class MisoRequestManager implements RequestManager {
     }
   }
 
-
   @Override
-  public long saveSequencerPartitionContainer(SequencerPartitionContainer<SequencerPoolPartition>container) throws IOException {
+  public long saveSequencerPartitionContainer(SequencerPartitionContainer<SequencerPoolPartition> container) throws IOException {
     if (sequencerPartitionContainerStore != null) {
       if (container.getId() == AbstractSequencerPartitionContainer.UNSAVED_ID) {
         return sequencerPartitionContainerStore.save(container);
@@ -2186,7 +2187,6 @@ public class MisoRequestManager implements RequestManager {
     }
   }
 
-
   public ChangeLogStore getChangeLogStore() {
     return changeLogStore;
   }
@@ -2198,7 +2198,43 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public long saveBox(Box box) throws IOException {
     if (boxStore != null) {
-      return boxStore.save(box);
+      if (box.getId() == AbstractBox.UNSAVED_ID) {
+        try {
+          boxStore.save(box);
+
+          if (autoGenerateIdBarcodes) {
+            box.setIdentificationBarcode(box.getName() + "::" + box.getAlias());
+          }
+          namingScheme.generateNameFor(box);
+          validateNameOrThrow(box, namingScheme);
+          return boxStore.save(box);
+        } catch (MisoNamingException e) {
+          throw new IOException("Invalid name for box", e);
+        }
+      } else {
+        Box original = boxStore.get(box.getId());
+        original.setAlias(box.getAlias());
+        original.setDescription(box.getDescription());
+        original.setIdentificationBarcode(box.getIdentificationBarcode());
+        original.setSize(boxStore.getSizeById(box.getSize().getId()));
+        original.setUse(boxStore.getUseById(box.getUse().getId()));
+        Map<String, Boxable> contents = new HashMap<>();
+        for (Map.Entry<String, Boxable> entry : box.getBoxables().entrySet()) {
+          Boxable item;
+          if (entry.getValue() instanceof Pool) {
+            item = poolStore.get(entry.getValue().getId());
+          } else if (entry.getValue() instanceof Sample) {
+            item = sampleStore.get(entry.getValue().getId());
+          } else if (entry.getValue() instanceof Library) {
+            item = libraryStore.get(entry.getValue().getId());
+          } else {
+            throw new IllegalArgumentException("Unknown boxable: " + entry.getValue().getClass().getName());
+          }
+          contents.put(entry.getKey(), item);
+        }
+        original.setBoxables(contents);
+        return boxStore.save(box);
+      }
     } else {
       throw new IOException("No boxStore available. Check that it has been declared in the Spring config.");
     }

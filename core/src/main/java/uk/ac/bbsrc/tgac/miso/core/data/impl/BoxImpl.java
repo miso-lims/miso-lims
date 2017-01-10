@@ -6,7 +6,18 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.MapKeyClass;
+import javax.persistence.MapKeyColumn;
+import javax.persistence.Table;
+
 import org.codehaus.jackson.map.ObjectMapper;
+import org.hibernate.annotations.AnyMetaDef;
+import org.hibernate.annotations.ManyToAny;
+import org.hibernate.annotations.MetaValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,12 +28,24 @@ import uk.ac.bbsrc.tgac.miso.core.data.AbstractBox;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 
+@Entity
+@Table(name = "Box")
 public class BoxImpl extends AbstractBox implements Serializable {
 
   protected static final Logger log = LoggerFactory.getLogger(BoxImpl.class);
 
   // The contents of the Box
-  private Map<String, Boxable> boxableItems = new HashMap<String, Boxable>();
+  @ManyToAny(metaColumn = @Column(name = "targetType"))
+  @MapKeyColumn(name = "position", unique = true)
+  @MapKeyClass(String.class)
+  @JoinTable(name = "BoxPosition", joinColumns = { @JoinColumn(name = "targetId") }, inverseJoinColumns = {
+      @JoinColumn(name = "boxId") })
+  @AnyMetaDef(idType = "long", metaType = "string", metaValues = {
+      @MetaValue(targetEntity = LibraryImpl.class, value = "L"),
+      @MetaValue(targetEntity = PoolImpl.class, value = "P"),
+      @MetaValue(targetEntity = SampleImpl.class, value = "S")
+  })
+  private Map<String, Boxable> boxableItems = new HashMap<>();
 
   /*
    * Construct new Box with defaults, and an empty SecurityProfile
