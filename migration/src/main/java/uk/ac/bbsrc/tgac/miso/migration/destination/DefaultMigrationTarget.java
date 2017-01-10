@@ -352,6 +352,16 @@ public class DefaultMigrationTarget implements MigrationTarget {
   public void saveLibraries(final Collection<Library> libraries) throws IOException {
     log.info("Migrating libraries...");
     for (Library library : libraries) {
+      try {
+        saveLibrary(library);
+      } catch (Exception e) {
+        handleException(e);
+      }
+    }
+    log.info(libraries.size() + " libraries migrated.");
+  }
+
+  private void saveLibrary(Library library) throws IOException {
       log.debug("Saving library " + library.getAlias());
       if (isDetailedSample(library.getSample())) {
         DetailedSample sample = (DetailedSample) library.getSample();
@@ -393,8 +403,6 @@ public class DefaultMigrationTarget implements MigrationTarget {
         library.setId(serviceManager.getLibraryDao().save(library));
       }
       log.debug("Saved library " + library.getAlias());
-    }
-    log.info(libraries.size() + " libraries migrated.");
   }
 
   private void copyTimestampsFromChangelog(Library library) {
@@ -417,33 +425,41 @@ public class DefaultMigrationTarget implements MigrationTarget {
   public void saveLibraryDilutions(final Collection<LibraryDilution> libraryDilutions) throws IOException {
     log.info("Migrating library dilutions...");
     for (LibraryDilution ldi : libraryDilutions) {
-      String friendlyName = " of " + ldi.getLibrary().getAlias();
-      if (ldi.getPreMigrationId() != null) {
-        friendlyName += " with pre-migration id " + ldi.getPreMigrationId();
+      try {
+        saveLibraryDilutions(ldi);
+      } catch (Exception e) {
+        handleException(e);
       }
-      log.debug("Saving library dilution " + friendlyName);
-      if (replaceChangeLogs) {
-        if (ldi.getCreationDate() == null || ldi.getLastModified() == null) {
-          throw new IOException("Cannot save dilution due to missing timestamps");
-        }
-      } else {
-        ldi.setCreationDate(timeStamp);
-        ldi.setLastModified(timeStamp);
-      }
-      
-      if (ldi.getLibrary().getId() == AbstractDilution.UNSAVED_ID && ldi.getLibrary().getLibraryAdditionalInfo() != null
-          && ldi.getLibrary().getLibraryAdditionalInfo().getPreMigrationId() != null) {
-        Long preMigrationId = ldi.getLibrary().getLibraryAdditionalInfo().getPreMigrationId();
-        ldi.setLibrary(serviceManager.getLibraryDao().getByPreMigrationId(preMigrationId));
-        if (ldi.getLibrary() == null) {
-          throw new IOException("No Library found with pre-migration ID " + preMigrationId);
-        }
-      }
-      
-      ldi.setId(serviceManager.getDilutionDao().save(ldi));
-      log.debug("Saved library dilution " + friendlyName);
     }
     log.info(libraryDilutions.size() + " library dilutions migrated.");
+  }
+
+  public void saveLibraryDilutions(LibraryDilution ldi) throws IOException {
+    String friendlyName = " of " + ldi.getLibrary().getAlias();
+    if (ldi.getPreMigrationId() != null) {
+      friendlyName += " with pre-migration id " + ldi.getPreMigrationId();
+    }
+    log.debug("Saving library dilution " + friendlyName);
+    if (replaceChangeLogs) {
+      if (ldi.getCreationDate() == null || ldi.getLastModified() == null) {
+        throw new IOException("Cannot save dilution due to missing timestamps");
+      }
+    } else {
+      ldi.setCreationDate(timeStamp);
+      ldi.setLastModified(timeStamp);
+    }
+
+    if (ldi.getLibrary().getId() == AbstractDilution.UNSAVED_ID && ldi.getLibrary().getLibraryAdditionalInfo() != null
+        && ldi.getLibrary().getLibraryAdditionalInfo().getPreMigrationId() != null) {
+      Long preMigrationId = ldi.getLibrary().getLibraryAdditionalInfo().getPreMigrationId();
+      ldi.setLibrary(serviceManager.getLibraryDao().getByPreMigrationId(preMigrationId));
+      if (ldi.getLibrary() == null) {
+        throw new IOException("No Library found with pre-migration ID " + preMigrationId);
+      }
+    }
+
+    ldi.setId(serviceManager.getDilutionDao().save(ldi));
+    log.debug("Saved library dilution " + friendlyName);
   }
 
   /**
