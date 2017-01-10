@@ -508,18 +508,18 @@ FOR EACH ROW
   BEGIN
     DECLARE log_message varchar(500) CHARACTER SET utf8;
     SET log_message = CONCAT_WS(', ',
-      CASE WHEN NEW.concentration <> OLD.concentration THEN CONCAT(NEW.name, ' concentration: ', OLD.concentration, ' → ', NEW.concentration) END,
-      CASE WHEN (NEW.identificationBarcode IS NULL) <> (OLD.identificationBarcode IS NULL) OR NEW.identificationBarcode <> OLD.identificationBarcode THEN CONCAT(NEW.name, ' barcode: ', COALESCE(OLD.identificationBarcode, 'n/a'), ' → ', COALESCE(NEW.identificationBarcode, 'n/a')) END,
-      CASE WHEN (NEW.targetedSequencingId IS NULL) <> (OLD.targetedSequencingId IS NULL) OR NEW.targetedSequencingId <> OLD.targetedSequencingId THEN CONCAT(NEW.name, ' targeted sequencing: ', COALESCE((SELECT alias FROM TargetedSequencing WHERE targetedSequencingId = OLD.targetedSequencingId), 'n/a'), ' → ', COALESCE((SELECT alias FROM TargetedSequencing WHERE targetedSequencingId = NEW.targetedSequencingId), 'n/a')) END);
+      CASE WHEN NEW.concentration <> OLD.concentration THEN CONCAT('concentration: ', OLD.concentration, ' → ', NEW.concentration) END,
+      CASE WHEN (NEW.identificationBarcode IS NULL) <> (OLD.identificationBarcode IS NULL) OR NEW.identificationBarcode <> OLD.identificationBarcode THEN CONCAT('barcode: ', COALESCE(OLD.identificationBarcode, 'n/a'), ' → ', COALESCE(NEW.identificationBarcode, 'n/a')) END,
+      CASE WHEN (NEW.targetedSequencingId IS NULL) <> (OLD.targetedSequencingId IS NULL) OR NEW.targetedSequencingId <> OLD.targetedSequencingId THEN CONCAT('targeted sequencing: ', COALESCE((SELECT alias FROM TargetedSequencing WHERE targetedSequencingId = OLD.targetedSequencingId), 'n/a'), ' → ', COALESCE((SELECT alias FROM TargetedSequencing WHERE targetedSequencingId = NEW.targetedSequencingId), 'n/a')) END);
     IF log_message IS NOT NULL AND log_message <> '' THEN
       INSERT INTO LibraryChangeLog(libraryId, columnsChanged, userId, message) VALUES (
       NEW.library_libraryId,
         COALESCE(CONCAT_WS(',',
-          CASE WHEN NEW.concentration <> OLD.concentration THEN CONCAT(NEW.name, ' concentration') END,
-          CASE WHEN (NEW.identificationBarcode IS NULL) <> (OLD.identificationBarcode IS NULL) OR NEW.identificationBarcode <> OLD.identificationBarcode THEN CONCAT(NEW.name, ' identificationBarcode') END,
-          CASE WHEN (NEW.targetedSequencingId IS NULL) <> (OLD.targetedSequencingId IS NULL) OR NEW.targetedSequencingId <> OLD.targetedSequencingId THEN CONCAT(NEW.name, ' targetedSequencingId') END
+          CASE WHEN NEW.concentration <> OLD.concentration THEN 'concentration' END,
+          CASE WHEN (NEW.identificationBarcode IS NULL) <> (OLD.identificationBarcode IS NULL) OR NEW.identificationBarcode <> OLD.identificationBarcode THEN 'identificationBarcode' END,
+          CASE WHEN (NEW.targetedSequencingId IS NULL) <> (OLD.targetedSequencingId IS NULL) OR NEW.targetedSequencingId <> OLD.targetedSequencingId THEN 'targetedSequencingId' END
         ), ''),
-        NEW.lastModifier,
+        (SELECT lastModifier FROM Library WHERE libraryId = NEW.library_libraryId),
         log_message
       );
     END IF;
@@ -531,8 +531,8 @@ FOR EACH ROW
   INSERT INTO LibraryChangeLog(libraryId, columnsChanged, userId, message) VALUES (
     NEW.library_libraryId,
     '',
-    NEW.lastModifier,
-CONCAT('Library dilution ', NEW.name, ' created.'))//
+    (SELECT lastModifier FROM Library WHERE libraryId = NEW.library_libraryId),
+    COALESCE('Library dilution ', NEW.name,' created.'))//
 
 DROP TRIGGER IF EXISTS BeforeInsertLibrary//
 
@@ -556,7 +556,7 @@ FOR EACH ROW
         CASE WHEN NEW.description <> OLD.description THEN CONCAT('description: ', OLD.description, ' → ', NEW.description) END,
         CASE WHEN NEW.name <> OLD.name THEN CONCAT('name: ', OLD.name, ' → ', NEW.name) END,
         CASE WHEN NEW.project_projectId <> OLD.project_projectId THEN CONCAT('project: ', COALESCE((SELECT name FROM Project WHERE projectId = OLD.project_projectId), 'n/a'), ' → ', COALESCE((SELECT name FROM Project WHERE projectId = NEW.project_projectId), 'n/a')) END,
-        CASE WHEN NEW.studyTypeId <> OLD.studyTypeId THEN CONCAT('type: ', COALESCE((SELECT name FROM StudyType WHERE typeId = OLD.studyTypeId), 'n/a'), ' → ', COALESCE((SELECT name FROM StudyType WHERE typeId = NEW.studyTypeId), 'n/a')) END);
+        CASE WHEN NEW.studyType <> OLD.studyType THEN CONCAT('type: ', COALESCE((SELECT name FROM StudyType WHERE typeId = OLD.studyType), 'n/a'), ' → ', COALESCE((SELECT name FROM StudyType WHERE typeId = NEW.studyType), 'n/a')) END);
   IF log_message IS NOT NULL AND log_message <> '' THEN
     INSERT INTO StudyChangeLog(studyId, columnsChanged, userId, message) VALUES (
       NEW.studyId,
@@ -566,7 +566,7 @@ FOR EACH ROW
         CASE WHEN NEW.description <> OLD.description THEN 'description' END,
         CASE WHEN NEW.name <> OLD.name THEN 'name' END,
         CASE WHEN NEW.project_projectId <> OLD.project_projectId THEN 'project_projectId' END,
-        CASE WHEN NEW.studyTypeId <> OLD.studyTypeId THEN 'studyTypeId' END), ''),
+        CASE WHEN NEW.studyType <> OLD.studyType THEN 'studyType' END), ''),
       NEW.lastModifier,
       log_message
       );
@@ -1251,15 +1251,3 @@ CREATE OR REPLACE VIEW SampleDerivedInfo AS
   
 CREATE OR REPLACE VIEW RunDerivedInfo AS
   SELECT runId, MAX(changeTime) as lastModified FROM RunChangeLog GROUP BY runId;
-
-CREATE OR REPLACE VIEW ContainerDerivedInfo AS
-  SELECT containerId, MAX(changeTime) as lastModified FROM SequencerPartitionContainerChangeLog GROUP BY containerId;
-
-CREATE OR REPLACE VIEW PoolDerivedInfo AS
-  SELECT poolId, MAX(changeTime) as lastModified FROM PoolChangeLog GROUP BY poolId;
-
-CREATE OR REPLACE VIEW LibraryDerivedInfo AS
-  SELECT libraryId, MAX(changeTime) AS lastModified FROM LibraryChangeLog GROUP BY libraryId;
-  
-CREATE OR REPLACE VIEW BoxDerivedInfo AS
-  SELECT boxId, MAX(changeTime) AS lastModified FROM BoxChangeLog GROUP BY boxId;
