@@ -318,31 +318,7 @@ public class RunControllerHelperService {
         b.append("<table class='in'>");
         b.append("<th>" + PlatformType.ILLUMINA.getPartitionName() + " No.</th>");
         b.append("<th>Pool</th>");
-
-        b.append("<tr><td>1 </td><td width='90%'><div id='p_div_" + i
-            + "-0' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + i
-            + "].partitions[0].pool' partition='" + i + "_0'></ul></div></td></tr>");
-        b.append("<tr><td>2 </td><td width='90%'><div id='p_div_" + i
-            + "-1' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + i
-            + "].partitions[1].pool' partition='" + i + "_1'></ul></div></td></tr>");
-        b.append("<tr><td>3 </td><td width='90%'><div id='p_div_" + i
-            + "-2' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + i
-            + "].partitions[2].pool' partition='" + i + "_2'></ul></div></td></tr>");
-        b.append("<tr><td>4 </td><td width='90%'><div id='p_div_" + i
-            + "-3' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + i
-            + "].partitions[3].pool' partition='" + i + "_3'></ul></div></td></tr>");
-        b.append("<tr><td>5 </td><td width='90%'><div id='p_div_" + i
-            + "-4' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + i
-            + "].partitions[4].pool' partition='" + i + "_4'></ul></div></td></tr>");
-        b.append("<tr><td>6 </td><td width='90%'><div id='p_div_" + i
-            + "-5' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + i
-            + "].partitions[5].pool' partition='" + i + "_5'></ul></div></td></tr>");
-        b.append("<tr><td>7 </td><td width='90%'><div id='p_div_" + i
-            + "-6' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + i
-            + "].partitions[6].pool' partition='" + i + "_6'></ul></div></td></tr>");
-        b.append("<tr><td>8 </td><td width='90%'><div id='p_div_" + i
-            + "-7' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + i
-            + "].partitions[7].pool' partition='" + i + "_7'></ul></div></td></tr>");
+        b.append(generateRows(i, 0, 7));
         b.append("</table>");
         b.append("</div>");
 
@@ -353,6 +329,19 @@ public class RunControllerHelperService {
       }
     }
     return JSONUtils.SimpleJSONResponse(b.toString());
+  }
+
+  public String generateRows(int containerNum, int startRowNum, int endRowNum) {
+    StringBuilder b = new StringBuilder();
+    for (int j = startRowNum; j <= endRowNum; j++) {
+      b.append("<tr><td>" + (j + 1) + " </td>"
+          + "<td width='90%'><div id='p_div_" + containerNum + "-" + j + "' class='elementListDroppableDiv'>"
+          + "<ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + containerNum
+          + "].partitions[" + j + "].pool' partition='" + containerNum + "_" + j + "'>"
+          + "</ul></div>"
+          + "</td></tr>");
+    }
+    return b.toString();
   }
 
   public JSONObject changeIlluminaLane(HttpSession session, JSONObject json) {
@@ -369,13 +358,7 @@ public class RunControllerHelperService {
     f.setPartitionLimit(numLanes);
     f.initEmptyPartitions();
 
-    for (int i = 0; i < numLanes; i++) {
-      b.append("<tr><td>" + (i + 1) + "</td>");
-      b.append("<td width='90%'><div id='p_div_" + container + "-" + i
-          + "' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + container
-          + "].partitions[" + i + "].pool' partition='" + container + "_" + i + "'></ul></div></td>");
-      b.append("</tr>");
-    }
+    b.append(generateRows(container, 0, (numLanes - 1)));
     b.append("</table>");
 
     return JSONUtils.SimpleJSONResponse(b.toString());
@@ -402,24 +385,24 @@ public class RunControllerHelperService {
       b.append("<div id='partitionDiv'>");
 
       b.append("Number of " + PlatformType.LS454.getPartitionName() + "s:");
-      b.append("<input id='chamber1' name='container" + i + "Select' onchange='Run.ui.changeLS454Chamber(this, " + i
-          + ");' type='radio' value='1'/>1 ");
-      b.append("<input id='chamber2' name='container" + i + "Select' onchange='Run.ui.changeLS454Chamber(this, " + i
-          + ");' type='radio' value='2'/>2 ");
-      b.append("<input id='chamber4' name='container" + i + "Select' onchange='Run.ui.changeLS454Chamber(this, " + i
-          + ");' type='radio' value='4'/>4 ");
-      b.append("<input id='chamber8' name='container" + i + "Select' onchange='Run.ui.changeLS454Chamber(this, " + i
-          + ");' type='radio' value='8'/>8 ");
-      b.append("<input id='chamber16' name='container" + i + "Select' onchange='Run.ui.changeLS454Chamber(this, " + i
-          + ");' type='radio' value='16'/>16<br/>");
-      b.append("<div id='containerdiv" + i + "'> </div>");
-      b.append("</div>");
+      b.append(generateChamberButtons("LS454", i, 1, 16));
+      b.append("<br/></div>");
 
       SequencerPartitionContainer<SequencerPoolPartition> f = dataObjectFactory.getSequencerPartitionContainer();
       f.setPlatform(run.getSequencerReference().getPlatform());
       run.addSequencerPartitionContainer(f);
     }
     return JSONUtils.SimpleJSONResponse(b.toString());
+  }
+
+  public String generateChamberButtons(String platformName, int containerNum, int startChamberNum, int endChamberNum) {
+    StringBuilder b = new StringBuilder();
+    for (int i = startChamberNum; i <= endChamberNum; i *= 2) {
+      b.append("<input id='chamber" + i + "' name='container" + containerNum + "Select'"
+          + " onchange='Run.ui.change" + platformName + "Chamber(this, " + containerNum + ");'"
+          + " type='radio' value='" + i + "'/>" + i + " ");
+    }
+    return b.toString();
   }
 
   public JSONObject changeLS454Chamber(HttpSession session, JSONObject json) {
@@ -436,13 +419,7 @@ public class RunControllerHelperService {
     f.setPartitionLimit(numChambers);
     f.initEmptyPartitions();
 
-    for (int i = 0; i < numChambers; i++) {
-      b.append("<tr><td>" + (i + 1) + "</td>");
-      b.append("<td width='90%'><div id='p_div_" + container + "-" + i
-          + "' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + container
-          + "].partitions[" + i + "].pool' partition='" + container + "_" + i + "'></ul></div></td>");
-      b.append("</tr>");
-    }
+    b.append(generateRows(container, 0, (numChambers - 1)));
     b.append("</table>");
 
     return JSONUtils.SimpleJSONResponse(b.toString());
@@ -472,36 +449,12 @@ public class RunControllerHelperService {
         b.append("<th>" + PlatformType.SOLID.getPartitionName() + " No.</th>");
         b.append("<th>Pool</th>");
 
-        b.append("<tr><td>1 </td><td width='90%'><div id='p_div_" + i
-            + "-0' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + i
-            + "].partitions[0].pool' partition='" + i + "_0'></ul></div></td></tr>");
-        b.append("<tr><td>2 </td><td width='90%'><div id='p_div_" + i
-            + "-1' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + i
-            + "].partitions[1].pool' partition='" + i + "_1'></ul></div></td></tr>");
-        b.append("<tr><td>3 </td><td width='90%'><div id='p_div_" + i
-            + "-2' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + i
-            + "].partitions[2].pool' partition='" + i + "_2'></ul></div></td></tr>");
-        b.append("<tr><td>4 </td><td width='90%'><div id='p_div_" + i
-            + "-3' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + i
-            + "].partitions[3].pool' partition='" + i + "_3'></ul></div></td></tr>");
-        b.append("<tr><td>5 </td><td width='90%'><div id='p_div_" + i
-            + "-4' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + i
-            + "].partitions[4].pool' partition='" + i + "_4'></ul></div></td></tr>");
-        b.append("<tr><td>6 </td><td width='90%'><div id='p_div_" + i
-            + "-5' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + i
-            + "].partitions[5].pool' partition='" + i + "_5'></ul></div></td></tr>");
+        b.append(generateRows(i, 0, 5));
         b.append("</table>");
       } else {
 
         b.append("Number of " + PlatformType.SOLID.getPartitionName() + "s:");
-        b.append("<input id='chamber1' name='container" + i + "Select' onchange='Run.ui.changeSolidChamber(this, " + i
-            + ");' type='radio' value='1'/>1 ");
-        b.append("<input id='chamber4' name='container" + i + "Select' onchange='Run.ui.changeSolidChamber(this, " + i
-            + ");' type='radio' value='4'/>4 ");
-        b.append("<input id='chamber8' name='container" + i + "Select' onchange='Run.ui.changeSolidChamber(this, " + i
-            + ");' type='radio' value='8'/>8 ");
-        b.append("<input id='chamber16' name='container" + i + "Select' onchange='Run.ui.changeSolidChamber(this, " + i
-            + ");' type='radio' value='16'/>16<br/>");
+        b.append(generateChamberButtons("Solid", i, 1, 16));
       }
       b.append("<div id='containerdiv" + i + "'> </div>");
       b.append("</div>");
@@ -526,13 +479,8 @@ public class RunControllerHelperService {
     b.append("<table class='in'>");
     b.append("<th>" + PlatformType.SOLID.getPartitionName() + " No.</th>");
     b.append("<th>Pool</th>");
-    for (int i = 0; i < numChambers; i++) {
-      b.append("<tr><td>" + (i + 1) + "</td>");
-      b.append("<td width='90%'><div id='p_div_" + container + "-" + i
-          + "' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + container
-          + "].partitions[" + i + "].pool'  partition='" + container + "_" + i + "'></ul></div></td>");
-      b.append("</tr>");
-    }
+
+    b.append(generateRows(container, 0, (numChambers - 1)));
     b.append("</table>");
     return JSONUtils.SimpleJSONResponse(b.toString());
   }
@@ -551,31 +499,18 @@ public class RunControllerHelperService {
           + i + "].identificationBarcode' name='sequencerPartitionContainers[" + i + "].identificationBarcode'/></div></td></tr>");
       b.append("<tr><td>Location:</td><td><input type='text' id='sequencerPartitionContainers[" + i
           + "].locationBarcode' name='sequencerPartitionContainers[" + i + "].locationBarcode'/></td></tr>");
-      b.append("<tr><td>Paired End:</td><td><input type='checkbox' id='sequencerPartitionContainers[" + i
-          + "].paired' name='sequencerPartitionContainers[" + i + "].paired'/></td></tr>");
       b.append("</table>");
       b.append("<div id='partitionErrorDiv'> </div>");
       b.append("<div id='partitionDiv'>");
 
       b.append("Number of " + PlatformType.PACBIO.getPartitionName() + "s:");
-      b.append("<input id='chamber1' name='container" + i + "Select' onchange='Run.ui.changePacBioChamber(this, " + i
-          + ");' type='radio' value='1'/>1 ");
-      b.append("<input id='chamber2' name='container" + i + "Select' onchange='Run.ui.changePacBioChamber(this, " + i
-          + ");' type='radio' value='2'/>2 ");
-      b.append("<input id='chamber3' name='container" + i + "Select' onchange='Run.ui.changePacBioChamber(this, " + i
-          + ");' type='radio' value='3'/>3 ");
-      b.append("<input id='chamber4' name='container" + i + "Select' onchange='Run.ui.changePacBioChamber(this, " + i
-          + ");' type='radio' value='4'/>4 ");
-      b.append("<input id='chamber5' name='container" + i + "Select' onchange='Run.ui.changePacBioChamber(this, " + i
-          + ");' type='radio' value='5'/>5 ");
-      b.append("<input id='chamber6' name='container" + i + "Select' onchange='Run.ui.changePacBioChamber(this, " + i
-          + ");' type='radio' value='6'/>6 ");
-      b.append("<input id='chamber7' name='container" + i + "Select' onchange='Run.ui.changePacBioChamber(this, " + i
-          + ");' type='radio' value='7'/>7 ");
-      b.append("<input id='chamber8' name='container" + i + "Select' onchange='Run.ui.changePacBioChamber(this, " + i
-          + ");' type='radio' value='8'/>8<br/>");
+      for (int j = 1; j <= 8; j++) {
+        b.append("<input id='chamber" + j + "' name='container" + i + "Select'"
+            + " onchange='Container.ui.changeContainerPacBioChamber(this, " + i + ");'"
+            + " type='radio' value='" + j + "'/>" + j + " ");
+      }
 
-      b.append("<div id='containerdiv" + i + "'> </div>");
+      b.append("<br/><div id='containerdiv" + i + "'> </div>");
       b.append("</div>");
       SequencerPartitionContainer<SequencerPoolPartition> f = dataObjectFactory.getSequencerPartitionContainer();
       f.setPlatform(run.getSequencerReference().getPlatform());
@@ -598,13 +533,7 @@ public class RunControllerHelperService {
     b.append("<table class='in'>");
     b.append("<th>" + PlatformType.PACBIO.getPartitionName() + " No.</th>");
     b.append("<th>Pool</th>");
-    for (int i = 0; i < numChambers; i++) {
-      b.append("<tr><td>" + (i + 1) + "</td>");
-      b.append("<td width='90%'><div id='p_div_" + container + "-" + i
-          + "' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + container
-          + "].partitions[" + i + "].pool'  partition='" + container + "_" + i + "'></ul></div></td>");
-      b.append("</tr>");
-    }
+    b.append(generateRows(container, 0, numChambers));
     b.append("</table>");
 
     return JSONUtils.SimpleJSONResponse(b.toString());
