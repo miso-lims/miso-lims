@@ -1,3 +1,5 @@
+-- harmonize_TGL_kd_ts
+-- StartNoTest
 --StartNoTest
 CALL addTargetedSequencing('Agilent SureSelectXT MethylSeq', 'TGL', 'Agilent SureSelectXT MethylSeq', 0);
 CALL addTargetedSequencing('IDT xGEN Exome Research Panel v1', 'TGL', 'IDT xGEN Exome Research Panel v1', 0);
@@ -21,3 +23,12 @@ UPDATE LibraryAdditionalInfo SET kitDescriptorId = (
 WHERE libraryId IN (SELECT library_libraryId FROM LibraryDilution WHERE targetedSequencingId IN (SELECT targetedSequencingId FROM TargetedSequencing 
 WHERE alias = 'Agilent SureSelect Human All Exon V5 + UTRs'));
 --EndNoTest
+-- EndNoTest
+
+-- tarseq_mouse_all_exon
+-- StartNoTest
+--StartNoTest
+CALL addTargetedSequencing('SureSelect Mouse All Exon', '', 'Agilent SureSelect XT', 0);
+--EndNoTest
+-- EndNoTest
+
