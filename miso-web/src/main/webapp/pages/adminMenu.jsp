@@ -34,7 +34,7 @@
           <a href="<c:url value='/miso/admin/configuration/general'/>">General</a><br/>
           <a href="<c:url value='/miso/admin/configuration/database'/>">Database</a><br/>
           <a href="<c:url value='/miso/admin/configuration/security'/>">Security</a><br/>
-          <a href="<c:url value='/miso/admin/configuration/printers'/>">Barcode Printers</a>
+          <a href="<c:url value='/miso/printers'/>">Barcode Printers</a>
         </div>
       </div>
 

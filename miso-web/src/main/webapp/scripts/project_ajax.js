@@ -1283,7 +1283,6 @@ Project.barcode = {
       'printerControllerHelperService',
       'listAvailableServices',
       {
-        'serviceClass': 'uk.ac.bbsrc.tgac.miso.core.data.Sample',
         'url': ajaxurl
       },
       {
@@ -1305,7 +1304,7 @@ Project.barcode = {
                   'projectControllerHelperService',
                   'printSelectedSampleBarcodes',
                   {
-                    'serviceName': jQuery('#serviceSelect').val(),
+                    'printerId': jQuery('#serviceSelect').val(),
                     'samples': samples,
                     'url': ajaxurl
                   },
@@ -1414,7 +1413,6 @@ Project.barcode = {
       'printerControllerHelperService',
       'listAvailableServices',
       {
-        'serviceClass': 'uk.ac.bbsrc.tgac.miso.core.data.Library',
         'url': ajaxurl
       },
       {
@@ -1436,7 +1434,7 @@ Project.barcode = {
                   'projectControllerHelperService',
                   'printSelectedLibraryBarcodes',
                   {
-                    'serviceName': jQuery('#serviceSelect').val(),
+                    'printerId': jQuery('#serviceSelect').val(),
                     'libraries': libraries,
                     'url': ajaxurl
                   },
@@ -1561,7 +1559,7 @@ Project.barcode = {
                   'projectControllerHelperService',
                   'printSelectedLibraryDilutionBarcodes',
                   {
-                    'serviceName': jQuery('#serviceSelect').val(),
+                    'printerId': jQuery('#serviceSelect').val(),
                     'dilutions': dilutions,
                     'url': ajaxurl
                   },

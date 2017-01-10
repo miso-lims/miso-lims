@@ -571,7 +571,6 @@ Box.barcode = {
       'printerControllerHelperService',
       'listAvailableServices',
       {
-        'serviceClass': 'uk.ac.bbsrc.tgac.miso.core.data.Box',
         'url': ajaxurl
       },
       {
@@ -593,7 +592,7 @@ Box.barcode = {
                   'boxControllerHelperService',
                   'printBoxBarcodes',
                   {
-                    'serviceName': jQuery('#serviceSelect').val(),
+                    'printerId': jQuery('#serviceSelect').val(),
                     'boxes': boxes,
                     'url': ajaxurl
                   },

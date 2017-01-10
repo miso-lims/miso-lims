@@ -33,12 +33,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -62,29 +61,24 @@ import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
-import uk.ac.bbsrc.tgac.miso.core.data.PrintJob;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ExperimentImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
-import uk.ac.bbsrc.tgac.miso.core.exception.MisoPrintException;
 import uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
-import uk.ac.bbsrc.tgac.miso.core.manager.PrintManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
-import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService;
-import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.service.PrinterService;
+import uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils;
+import uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils.BarcodePrintAssister;
 
 /**
  * uk.ac.bbsrc.tgac.miso.spring.ajax
@@ -106,7 +100,7 @@ public class PoolControllerHelperService {
   @Autowired
   private BarcodeFactory barcodeFactory;
   @Autowired
-  private PrintManager<MisoPrintService<?, ?, ?>, Queue<?>> printManager;
+  private PrinterService printerService;
   @Autowired
   private ExperimentService experimentService;
 
@@ -359,51 +353,33 @@ public class PoolControllerHelperService {
   }
 
   public JSONObject printPoolBarcodes(HttpSession session, JSONObject json) {
-    try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      JSONArray ss = JSONArray.fromObject(json.getString("pools"));
+    return ControllerHelperServiceUtils.printBarcodes(printerService, json, new BarcodePrintAssister<Pool>() {
 
-      String serviceName = null;
-      if (json.has("serviceName")) {
-        serviceName = json.getString("serviceName");
+      @Override
+      public Pool fetch(long id) throws IOException {
+        return requestManager.getPoolById(id);
       }
 
-      MisoPrintService<File, Barcodable, PrintContext<File>> mps = null;
-      if (serviceName == null) {
-        Collection<MisoPrintService> services = printManager.listPrintServicesByBarcodeableClass(Pool.class);
-        if (services.size() == 1) {
-          mps = services.iterator().next();
-        } else {
-          return JSONUtils
-              .SimpleJSONError("No serviceName specified, but more than one available service able to print this barcode type.");
-        }
-      } else {
-        mps = printManager.getPrintService(serviceName);
+      @Override
+      public void store(Pool item) throws IOException {
+        requestManager.savePool(item);
       }
 
-      Queue<File> thingsToPrint = new LinkedList<>();
-      for (JSONObject p : (Iterable<JSONObject>) ss) {
-        try {
-          Long poolId = p.getLong("poolId");
-          Pool pool = requestManager.getPoolById(poolId);
-
-          File f = mps.getLabelFor(pool);
-          if (f != null) thingsToPrint.add(f);
-        } catch (IOException e) {
-          log.error("error printing pool barcode", e);
-          return JSONUtils.SimpleJSONError("Error printing pool barcode: " + e.getMessage());
-        }
+      @Override
+      public String getGroupName() {
+        return "pools";
       }
 
-      PrintJob pj = printManager.print(thingsToPrint, mps.getName(), user);
-      return JSONUtils.SimpleJSONResponse("Job " + pj.getId() + " : Barcodes printed.");
-    } catch (MisoPrintException e) {
-      log.error("no printer of that name available", e);
-      return JSONUtils.SimpleJSONError("No printer of that name available: " + e.getMessage());
-    } catch (IOException e) {
-      log.error("cannot print barcodes", e);
-      return JSONUtils.SimpleJSONError("Cannot print barcodes: " + e.getMessage());
-    }
+      @Override
+      public String getIdName() {
+        return "poolId";
+      }
+
+      @Override
+      public Iterable<Pool> fetchAll(long projectId) throws IOException {
+        return Collections.emptyList();
+      }
+    });
   }
 
   public JSONObject changePoolIdBarcode(HttpSession session, JSONObject json) {
@@ -745,7 +721,7 @@ public class PoolControllerHelperService {
     this.misoFileManager = misoFileManager;
   }
 
-  public void setPrintManager(PrintManager<MisoPrintService<?, ?, ?>, Queue<?>> printManager) {
-    this.printManager = printManager;
+  public void setPrinterService(PrinterService printerService) {
+    this.printerService = printerService;
   }
 }

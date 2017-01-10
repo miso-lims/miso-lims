@@ -56,7 +56,6 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL) // , using = LibrarySerializer.class)
 @JsonTypeName("library")
 @JsonIgnoreProperties({ "securityProfile" })
-@PrintableBarcode
 public interface Library extends SecurableByProfile, Comparable, Barcodable, Locatable, Deletable, Boxable {
 
   /** Field PREFIX */

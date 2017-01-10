@@ -25,15 +25,12 @@ package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Queue;
 
 import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -46,12 +43,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
-import uk.ac.bbsrc.tgac.miso.core.event.manager.WatchManager;
-import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
-import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
-import uk.ac.bbsrc.tgac.miso.core.manager.PrintManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
-import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 
 /**
@@ -66,42 +58,12 @@ import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 public class ProjectTreeControllerHelperService {
   protected static final Logger log = LoggerFactory.getLogger(ProjectTreeControllerHelperService.class);
   @Autowired
-  private SecurityManager securityManager;
-  @Autowired
   private RequestManager requestManager;
-  @Autowired
-  private IssueTrackerManager issueTrackerManager;
-  @Autowired
-  private PrintManager<MisoPrintService, Queue<?>> printManager;
-  @Autowired
-  private MisoFilesManager misoFileManager;
-  @Autowired
-  private WatchManager watchManager;
   @Autowired
   private ExperimentService experimentService;
 
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
-
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
-  }
-
-  public void setIssueTrackerManager(IssueTrackerManager issueTrackerManager) {
-    this.issueTrackerManager = issueTrackerManager;
-  }
-
-  public void setMisoFileManager(MisoFilesManager misoFileManager) {
-    this.misoFileManager = misoFileManager;
-  }
-
-  public void setPrintManager(PrintManager<MisoPrintService, Queue<?>> printManager) {
-    this.printManager = printManager;
-  }
-
-  public void setWatchManager(WatchManager watchManager) {
-    this.watchManager = watchManager;
   }
 
   /*

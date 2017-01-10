@@ -49,7 +49,6 @@ import org.junit.runners.Suite;
     SQLLibraryQCDAOTest.class, //
     SQLPlatformDAOTest.class, //
     SQLPoolQCDAOTest.class, //
-    SQLPrintJobDAOTest.class, //
     SQLPrintServiceDAOTest.class, //
     SQLProjectDAOTest.class, //
     SQLReferenceGenomeDAOTest.class, //

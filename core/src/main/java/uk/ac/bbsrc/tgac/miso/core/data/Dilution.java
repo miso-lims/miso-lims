@@ -43,7 +43,6 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 @JsonIgnoreProperties({ "securityProfile", "internalPoolableElements" })
-@PrintableBarcode
 public interface Dilution extends SecurableByProfile, Barcodable, Comparable, Deletable, Nameable {
 
   /**
