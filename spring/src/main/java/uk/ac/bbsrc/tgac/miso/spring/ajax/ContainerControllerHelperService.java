@@ -251,22 +251,7 @@ public class ContainerControllerHelperService {
         b.append("<th>" + PlatformType.get("Illumina").getPartitionName() + " No.</th>");
         b.append("<th>Pool</th>");
 
-        b.append(
-            "<tr><td>1 </td><td width='90%'><div id='p_div-0'><ul class='runPartitionDroppable' bind='partitions[0].pool' partition='0' ondblclick='Container.partition.populatePartition(this);'></ul></div></td></tr>");
-        b.append(
-            "<tr><td>2 </td><td width='90%'><div id='p_div-1'><ul class='runPartitionDroppable' bind='partitions[1].pool' partition='1' ondblclick='Container.partition.populatePartition(this);'></ul></div></td></tr>");
-        b.append(
-            "<tr><td>3 </td><td width='90%'><div id='p_div-2'><ul class='runPartitionDroppable' bind='partitions[2].pool' partition='2' ondblclick='Container.partition.populatePartition(this);'></ul></div></td></tr>");
-        b.append(
-            "<tr><td>4 </td><td width='90%'><div id='p_div-3'><ul class='runPartitionDroppable' bind='partitions[3].pool' partition='3' ondblclick='Container.partition.populatePartition(this);'></ul></div></td></tr>");
-        b.append(
-            "<tr><td>5 </td><td width='90%'><div id='p_div-4'><ul class='runPartitionDroppable' bind='partitions[4].pool' partition='4' ondblclick='Container.partition.populatePartition(this);'></ul></div></td></tr>");
-        b.append(
-            "<tr><td>6 </td><td width='90%'><div id='p_div-5'><ul class='runPartitionDroppable' bind='partitions[5].pool' partition='5' ondblclick='Container.partition.populatePartition(this);'></ul></div></td></tr>");
-        b.append(
-            "<tr><td>7 </td><td width='90%'><div id='p_div-6'><ul class='runPartitionDroppable' bind='partitions[6].pool' partition='6' ondblclick='Container.partition.populatePartition(this);'></ul></div></td></tr>");
-        b.append(
-            "<tr><td>8 </td><td width='90%'><div id='p_div-7'><ul class='runPartitionDroppable' bind='partitions[7].pool' partition='7' ondblclick='Container.partition.populatePartition(this);'></ul></div></td></tr>");
+        b.append(generateRows(0, 7));
         b.append("</table>");
         b.append("</div>");
 
@@ -285,22 +270,36 @@ public class ContainerControllerHelperService {
     }
   }
 
+  private String generateChamberButtons(String platformName, int containerNum, int startChamberNum, int endChamberNum) {
+    StringBuilder b = new StringBuilder();
+    for (int i = startChamberNum; i <= endChamberNum; i *= 2) {
+      b.append("<input id='chamber" + i + "' name='container0Select'"
+          + " onchange='Container.ui.changeContainer" + platformName + "Chamber(this, 0);'"
+          + " type='radio' value='" + i + "'/>" + i + " ");
+    }
+    return b.toString();
+  }
+
+  private String generateRows(int startRowNum, int endRowNum) {
+    StringBuilder b = new StringBuilder();
+    for (int i = startRowNum; i <= endRowNum; i++) {
+      b.append("<tr><td>" + (i + 1) + " </td>"
+          + "<td width='90%'><div id='p_div_0-" + i + "' class='barcodeEntryDiv'>"
+          + "<ul class='runPartitionDroppable' bind='partitions[" + i + "].pool'"
+          + " partition='" + i + "' ondblclick='Container.partition.populatePartition(this);'>"
+          + "</ul></div>"
+          + "</td></tr>");
+    }
+    return b.toString();
+  }
+
   public JSONObject changeLS454Container(HttpSession session, JSONObject json) {
     StringBuilder b = new StringBuilder();
     b.append(containerInfoHtml(PlatformType.LS454));
 
     b.append("Number of " + PlatformType.LS454.getPartitionName() + "s:");
-    b.append(
-        "<input id='chamber1' name='container0Select' onchange='Container.ui.changeContainerLS454Chamber(this, 0);' type='radio' value='1'/>1 ");
-    b.append(
-        "<input id='chamber2' name='container0Select' onchange='Container.ui.changeContainerLS454Chamber(this, 0);' type='radio' value='2'/>2 ");
-    b.append(
-        "<input id='chamber4' name='container0Select' onchange='Container.ui.changeContainerLS454Chamber(this, 0);' type='radio' value='4'/>4 ");
-    b.append(
-        "<input id='chamber8' name='container0Select' onchange='Container.ui.changeContainerLS454Chamber(this, 0);' type='radio' value='8'/>8 ");
-    b.append(
-        "<input id='chamber16' name='container0Select' onchange='Container.ui.changeContainerLS454Chamber(this, 0);' type='radio' value='16'/>16<br/>");
-    b.append("<div id='containerdiv0'> </div>");
+    b.append(generateChamberButtons("LS454", 0, 1, 16));
+    b.append("<br/><div id='containerdiv0'> </div>");
     b.append("</div>");
     return JSONUtils.SimpleJSONResponse(b.toString());
   }
@@ -316,18 +315,7 @@ public class ContainerControllerHelperService {
         b.append("<th>" + PlatformType.SOLID.getPartitionName() + " No.</th>");
         b.append("<th>Pool</th>");
 
-        b.append(
-            "<tr><td>1 </td><td width='90%'><div id='p_div_0-0' class='barcodeEntryDiv'><ul class='runPartitionDroppable' bind='partitions[0].pool' partition='0' ondblclick='Container.partition.populatePartition(this);'></ul></div></td></tr>");
-        b.append(
-            "<tr><td>2 </td><td width='90%'><div id='p_div_0-1' class='barcodeEntryDiv'><ul class='runPartitionDroppable' bind='partitions[1].pool' partition='1' ondblclick='Container.partition.populatePartition(this);'></ul></div></td></tr>");
-        b.append(
-            "<tr><td>3 </td><td width='90%'><div id='p_div_0-2' class='barcodeEntryDiv'><ul class='runPartitionDroppable' bind='partitions[2].pool' partition='2' ondblclick='Container.partition.populatePartition(this);'></ul></div></td></tr>");
-        b.append(
-            "<tr><td>4 </td><td width='90%'><div id='p_div_0-3' class='barcodeEntryDiv'><ul class='runPartitionDroppable' bind='partitions[3].pool' partition='3' ondblclick='Container.partition.populatePartition(this);'></ul></div></td></tr>");
-        b.append(
-            "<tr><td>5 </td><td width='90%'><div id='p_div_0-4' class='barcodeEntryDiv'><ul class='runPartitionDroppable' bind='partitions[4].pool' partition='4' ondblclick='Container.partition.populatePartition(this);'></ul></div></td></tr>");
-        b.append(
-            "<tr><td>6 </td><td width='90%'><div id='p_div_0-5' class='barcodeEntryDiv'><ul class='runPartitionDroppable' bind='partitions[5].pool' partition='5' ondblclick='Container.partition.populatePartition(this);'></ul></div></td></tr>");
+        b.append(generateRows(0, 5));
         b.append("</table>");
 
         SequencerPartitionContainer<SequencerPoolPartition> lf = (SequencerPartitionContainer<SequencerPoolPartition>) session
@@ -336,18 +324,10 @@ public class ContainerControllerHelperService {
         lf.initEmptyPartitions();
         session.setAttribute("container_" + json.getString("container_cId"), lf);
       } else {
-
         b.append("Number of " + PlatformType.SOLID.getPartitionName() + "s:");
-        b.append(
-            "<input id='chamber1' name='container0Select' onchange='Container.ui.changeContainerSolidChamber(this, 0);' type='radio' value='1'/>1 ");
-        b.append(
-            "<input id='chamber4' name='container0Select' onchange='Container.ui.changeContainerSolidChamber(this, 0);' type='radio' value='4'/>4 ");
-        b.append(
-            "<input id='chamber8' name='container0Select' onchange='Container.ui.changeContainerSolidChamber(this, 0);' type='radio' value='8'/>8 ");
-        b.append(
-            "<input id='chamber16' name='container0Select' onchange='Container.ui.changeContainerSolidChamber(this, 0);' type='radio' value='16'/>16<br/>");
+        b.append(generateChamberButtons("Solid", 0, 1, 16));
       }
-      b.append("<div id='containerdiv0'> </div>");
+      b.append("<br/><div id='containerdiv0'> </div>");
       b.append("</div>");
       return JSONUtils.SimpleJSONResponse(b.toString());
     } catch (IOException e) {
@@ -360,24 +340,13 @@ public class ContainerControllerHelperService {
     StringBuilder b = new StringBuilder();
     b.append(containerInfoHtml(PlatformType.PACBIO));
     b.append("Number of " + PlatformType.PACBIO.getPartitionName() + "s:");
-    b.append(
-        "<input id='chamber1' name='container0Select' onchange='Container.ui.changeContainerPacBioChamber(this, 0);' type='radio' value='1'/>1 ");
-    b.append(
-        "<input id='chamber2' name='container0Select' onchange='Container.ui.changeContainerPacBioChamber(this, 0);' type='radio' value='2'/>2 ");
-    b.append(
-        "<input id='chamber3' name='container0Select' onchange='Container.ui.changeContainerPacBioChamber(this, 0);' type='radio' value='3'/>3 ");
-    b.append(
-        "<input id='chamber4' name='container0Select' onchange='Container.ui.changeContainerPacBioChamber(this, 0);' type='radio' value='4'/>4 ");
-    b.append(
-        "<input id='chamber5' name='container0Select' onchange='Container.ui.changeContainerPacBioChamber(this, 0);' type='radio' value='5'/>5 ");
-    b.append(
-        "<input id='chamber6' name='container0Select' onchange='Container.ui.changeContainerPacBioChamber(this, 0);' type='radio' value='6'/>6 ");
-    b.append(
-        "<input id='chamber7' name='container0Select' onchange='Container.ui.changeContainerPacBioChamber(this, 0);' type='radio' value='7'/>7 ");
-    b.append(
-        "<input id='chamber8' name='container0Select' onchange='Container.ui.changeContainerPacBioChamber(this, 0);' type='radio' value='8'/>8<br/>");
+    for (int i = 1; i <= 8; i++) {
+      b.append("<input id='chamber" + i + "' name='container0Select'"
+          + " onchange='Container.ui.changeContainerPacBioChamber(this, 0);'"
+          + " type='radio' value='" + i + "'/>" + i + " ");
+    }
 
-    b.append("<div id='containerdiv0'> </div>");
+    b.append("<br/><div id='containerdiv0'> </div>");
     b.append("</div>");
     return JSONUtils.SimpleJSONResponse(b.toString());
   }
