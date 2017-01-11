@@ -1,8 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -17,7 +15,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.datetime.DateFormatter;
@@ -33,8 +30,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.RunQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
-import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
-import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateRunQcDao;
 
 public class SQLRunQCDAOTest extends AbstractDAOTest {
@@ -45,11 +40,6 @@ public class SQLRunQCDAOTest extends AbstractDAOTest {
   @InjectMocks
   private HibernateRunQcDao dao;
 
-  @Mock
-  private RunStore runDAO;
-  @Mock
-  private SequencerPartitionContainerStore sequencerPartitionContainerDAO;
-
   @Autowired
   SessionFactory sessionFactory;
 
@@ -57,14 +47,12 @@ public class SQLRunQCDAOTest extends AbstractDAOTest {
   public void setup() throws IOException, MisoNamingException {
     MockitoAnnotations.initMocks(this);
     dao.setSessionFactory(sessionFactory);
-    dao.setRunDao(runDAO);
     SequencerPartitionContainer spp = new SequencerPartitionContainerImpl();
     List<Partition> partitionList = new ArrayList();
     Partition partition = new PartitionImpl();
     partition.setPartitionNumber(new Integer(3));
     partitionList.add(partition);
     spp.setPartitions(partitionList);
-    when(sequencerPartitionContainerDAO.lazyGet(anyLong())).thenReturn( spp);
   }
 
   @Test

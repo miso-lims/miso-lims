@@ -236,8 +236,8 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
 
   @Override
   public Long countAll() throws IOException {
-    Query query = currentSession().createQuery("select count(*) from SampleImpl");
-    return (Long) query.uniqueResult();
+    Criteria criteria = currentSession().createCriteria(SampleImpl.class);
+    return (Long) criteria.setProjection(Projections.rowCount()).uniqueResult();
   }
 
   public SecurityStore getSecurityDao() {

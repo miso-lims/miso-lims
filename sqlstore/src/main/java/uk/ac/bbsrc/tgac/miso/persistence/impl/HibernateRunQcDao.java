@@ -20,8 +20,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.store.RunQcStore;
-import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
-import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)
@@ -31,9 +29,6 @@ public class HibernateRunQcDao implements RunQcStore {
 
   @Autowired
   private SessionFactory sessionFactory;
-
-  private RunStore runDao;
-  private SequencerPartitionContainerStore sequencerPartitionContainerDao;
 
   private Session currentSession() {
     return getSessionFactory().getCurrentSession();
@@ -127,21 +122,5 @@ public class HibernateRunQcDao implements RunQcStore {
 
   public void setSessionFactory(SessionFactory sessionFactory) {
     this.sessionFactory = sessionFactory;
-  }
-
-  public RunStore getRunDao() {
-    return runDao;
-  }
-
-  public void setRunDao(RunStore runDao) {
-    this.runDao = runDao;
-  }
-
-  public SequencerPartitionContainerStore getSequencerPartitionContainerDao() {
-    return sequencerPartitionContainerDao;
-  }
-
-  public void setSequencerPartitionContainerDao(SequencerPartitionContainerStore sequencerPartitionContainerDao) {
-    this.sequencerPartitionContainerDao = sequencerPartitionContainerDao;
   }
 }
