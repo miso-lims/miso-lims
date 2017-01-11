@@ -19,7 +19,7 @@ public abstract class AbstractSequencerServiceRecord implements SequencerService
   
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private long id = AbstractSequencerServiceRecord.UNSAVED_ID;
+  private long recordId = AbstractSequencerServiceRecord.UNSAVED_ID;
 
   @ManyToOne(targetEntity = SequencerReferenceImpl.class)
   @JoinColumn(name = "sequencerReferenceId")
@@ -28,7 +28,7 @@ public abstract class AbstractSequencerServiceRecord implements SequencerService
   private String title;
   private String details;
 
-  @Column(nullable = false)
+  @Column(name = "servicedBy", nullable = false)
   private String servicedByName;
   private String referenceNumber;
 
@@ -39,12 +39,12 @@ public abstract class AbstractSequencerServiceRecord implements SequencerService
 
   @Override
   public void setId(long id) {
-    this.id = id;
+    this.recordId = id;
   }
 
   @Override
   public long getId() {
-    return id;
+    return recordId;
   }
 
   @Override
