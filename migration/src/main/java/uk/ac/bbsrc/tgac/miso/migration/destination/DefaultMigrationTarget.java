@@ -367,7 +367,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
       library.inheritPermissions(library.getSample().getProject());
       valueTypeLookup.resolveAll(library);
       library.setLastModifier(migrationUser);
-      library.setLastUpdated(timeStamp);
+      library.getLibraryAdditionalInfo().setLastUpdated(timeStamp);
       if (library.getLibraryAdditionalInfo() != null) {
         library.getLibraryAdditionalInfo().setCreatedBy(migrationUser);
         library.getLibraryAdditionalInfo().setCreationDate(timeStamp);
@@ -401,7 +401,6 @@ public class DefaultMigrationTarget implements MigrationTarget {
     Date latest = getLatestChangeDate(library);
     library.getLibraryAdditionalInfo().setCreationDate(earliest);
     library.getLibraryAdditionalInfo().setLastUpdated(latest);
-    library.setLastUpdated(latest);
   }
 
   private void saveLibraryChangeLog(Library library, Collection<ChangeLog> changes) throws IOException {

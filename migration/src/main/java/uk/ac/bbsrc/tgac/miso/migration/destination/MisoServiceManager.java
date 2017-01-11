@@ -27,6 +27,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLabDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryAdditionalInfoDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDesignCodeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDesignDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryQcDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernatePlatformDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernatePoolDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateProjectDao;
@@ -58,7 +59,6 @@ import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSampleService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSampleValidRelationshipService;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryDilutionDAO;
-import uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryQCDAO;
 
 /**
  * This class is used to simplify creation and wiring of MISO services. Some of the config is currently hardcoded - mainly naming schemes
@@ -81,7 +81,7 @@ public class MisoServiceManager {
   private HibernateChangeLogDao changeLogDao;
   private HibernateSampleQcDao sampleQcDao;
   private SQLLibraryDAO libraryDao;
-  private SQLLibraryQCDAO libraryQcDao;
+  private HibernateLibraryQcDao libraryQcDao;
   private SQLLibraryDilutionDAO dilutionDao;
   private HibernateTargetedSequencingDao targetedSequencingDao;
   private HibernatePoolDao poolDao;
@@ -479,7 +479,6 @@ public class MisoServiceManager {
     dao.setDilutionDAO(dilutionDao);
     dao.setJdbcTemplate(jdbcTemplate);
     dao.setLibraryQcDAO(libraryQcDao);
-    dao.setNamingScheme(getNamingScheme());
     dao.setPoolDAO(poolDao);
     dao.setSampleDAO(sampleDao);
     dao.setSecurityDAO(securityStore);
@@ -491,24 +490,21 @@ public class MisoServiceManager {
 
   private void updateLibraryDaoDependencies() {
     if (sampleDao != null) sampleDao.setLibraryDao(libraryDao);
-    if (libraryQcDao != null) libraryQcDao.setLibraryDAO(libraryDao);
     if (dilutionDao != null) dilutionDao.setLibraryDAO(libraryDao);
     if (libraryDesignDao != null) libraryDesignDao.setLibraryDao(libraryDao);
   }
 
-  public SQLLibraryQCDAO getLibraryQcDao() {
+  public HibernateLibraryQcDao getLibraryQcDao() {
     return libraryQcDao;
   }
 
-  public void setLibraryQcDao(SQLLibraryQCDAO libraryQcDao) {
+  public void setLibraryQcDao(HibernateLibraryQcDao libraryQcDao) {
     this.libraryQcDao = libraryQcDao;
     updateLibraryQcDaoDependencies();
   }
 
   public void setDefaultLibraryQcDao() {
-    SQLLibraryQCDAO dao = new SQLLibraryQCDAO();
-    dao.setJdbcTemplate(jdbcTemplate);
-    dao.setLibraryDAO(libraryDao);
+    HibernateLibraryQcDao dao = new HibernateLibraryQcDao();
     setLibraryQcDao(dao);
   }
 

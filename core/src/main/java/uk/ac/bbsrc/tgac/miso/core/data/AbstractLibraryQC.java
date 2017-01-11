@@ -23,6 +23,12 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import javax.persistence.Column;
+import javax.persistence.ManyToOne;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.Transient;
+
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
 
 /**
@@ -31,11 +37,18 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
  * @author Rob Davey
  * @since 0.0.2
  */
+@MappedSuperclass
 public abstract class AbstractLibraryQC extends AbstractQC implements LibraryQC {
+  @Transient
   public static final String UNITS = "nM";
 
   private Double results;
+
+  @Column(nullable = false)
   private Integer insertSize;
+
+  @ManyToOne(targetEntity = LibraryImpl.class)
+  @Column(name = "library_libraryId")
   private Library library;
 
   @Override

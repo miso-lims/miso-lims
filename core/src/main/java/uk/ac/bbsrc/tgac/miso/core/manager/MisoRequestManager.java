@@ -26,6 +26,7 @@ package uk.ac.bbsrc.tgac.miso.core.manager;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -36,6 +37,8 @@ import java.util.Map;
 import java.util.TreeSet;
 import java.util.UUID;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +50,8 @@ import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Lists;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBox;
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractRun;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
@@ -55,8 +60,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
+import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
@@ -98,6 +105,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.AlertStore;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
+import uk.ac.bbsrc.tgac.miso.core.store.IndexStore;
 import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignCodeDao;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignDao;
@@ -190,6 +198,10 @@ public class MisoRequestManager implements RequestManager {
   private LibraryDesignDao libraryDesignDao;
   @Autowired
   private LibraryDesignCodeDao libraryDesignCodeDao;
+  @Autowired
+  private IndexStore indexDao;
+  @Autowired
+  private TargetedSequencingStore targetedSequencingDao;
   @Autowired
   private NamingScheme namingScheme;
 
@@ -287,6 +299,10 @@ public class MisoRequestManager implements RequestManager {
 
   public void setSubmissionStore(SubmissionStore submissionStore) {
     this.submissionStore = submissionStore;
+  }
+
+  public void setAutoGenerateIdBarcodes(boolean autoGenerateIdBarcodes) {
+    this.autoGenerateIdBarcodes = autoGenerateIdBarcodes;
   }
 
   @Override
@@ -1461,48 +1477,230 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public long saveLibrary(Library library) throws IOException {
     if (libraryStore != null) {
-      if (library.isDiscarded()) {
-        library.setVolume(0.0);
+      Library savedLibrary = null;
+      if (library.getId() == AbstractLibrary.UNSAVED_ID) {
+        loadChildEntities(library);
+
+        // pre-save field generation
+        library.setName(generateTemporaryName());
+        try {
+          if (library.getLibraryAdditionalInfo() != null && library.getLibraryAdditionalInfo().hasNonStandardAlias()) {
+            // do not validate alias
+          } else if (isStringEmptyOrNull(library.getAlias()) && namingScheme.hasLibraryAliasGenerator()) {
+            library.setAlias(namingScheme.generateLibraryAlias(library));
+          } else if (!namingScheme.duplicateLibraryAliasAllowed()) {
+            namingScheme.validateLibraryAlias(library.getAlias());
+          }
+        } catch (MisoNamingException e) {
+          throw new IOException("Error generating library alias", e);
+        }
+        savedLibrary = getLibraryById(libraryStore.save(library));
+      } else {
+        Library managed = getLibraryById(library.getId());
+        applyChanges(managed, library);
+        loadChildEntities(managed);
+        savedLibrary = getLibraryById(libraryStore.save(managed));
       }
-      if (library.getLibraryAdditionalInfo() != null && library.getLibraryAdditionalInfo().getLibraryDesign() != null) {
-        if (!isDetailedSample(library.getSample())) {
-          throw new IOException("A library design can only be applied to a detailed sample.");
+
+      // post-save field generation
+      boolean needsUpdate = false;
+      try {
+        if (LimsUtils.hasTemporaryName(library)) {
+          savedLibrary.setName(namingScheme.generateNameFor(savedLibrary));
+          validateNameOrThrow(library, namingScheme);
+          if (autoGenerateIdBarcodes) autoGenerateIdBarcode(library);
+          needsUpdate = true;
         }
-        LibraryDesign design = libraryDesignDao.getLibraryDesign(library.getLibraryAdditionalInfo().getLibraryDesign().getId());
-        if (((DetailedSample) library.getSample()).getSampleClass().getId() != design.getSampleClass().getId()) {
-          throw new IOException(
-              "This library design is not valid for sample " + library.getSample().getName() + " because the class is not compatible.");
+        if (needsUpdate) {
+          libraryStore.save(savedLibrary);
         }
-        library.getLibraryAdditionalInfo().setLibraryDesign(design);
-        LibrarySelectionType selection = libraryStore.getLibrarySelectionTypeById(design.getLibrarySelectionType().getId());
-        LibraryStrategyType strategy = libraryStore.getLibraryStrategyTypeById(design.getLibraryStrategyType().getId());
-        if (library.getLibrarySelectionType() != null && library.getLibrarySelectionType().getId() != selection.getId()) {
-          throw new IOException("Library selection doesn't match library design.");
-        }
-        if (library.getLibraryStrategyType() != null && library.getLibraryStrategyType().getId() != strategy.getId()) {
-          throw new IOException("Library strategy doesn't match library design.");
-        }
-        if (library.getLibraryAdditionalInfo().getLibraryDesignCode().getId() != null
-            && library.getLibraryAdditionalInfo().getLibraryDesign().getId() != null
-            && library.getLibraryAdditionalInfo().getLibraryDesignCode().getId() != library.getLibraryAdditionalInfo().getLibraryDesign()
-                .getLibraryDesignCode().getId()) {
-          throw new IOException("Selected library design code does not match library design code for selected library design.");
-        }
-        library.setLibrarySelectionType(selection);
-        library.setLibraryStrategyType(strategy);
+      } catch (MisoNamingException e) {
+        throw new IllegalArgumentException("Name generator failed to generate valid name for library");
+      } catch (ConstraintViolationException e) {
+        // Send the nested root cause message to the user, since it contains the actual error.
+        throw new ConstraintViolationException(e.getMessage() + " " + ExceptionUtils.getRootCauseMessage(e), e.getSQLException(),
+            e.getConstraintName());
+      } catch (SQLException e) {
+        throw new IOException(e);
       }
-      return libraryStore.save(library);
+      return savedLibrary.getId();
     } else {
       throw new IOException("No libraryStore available. Check that it has been declared in the Spring config.");
     }
   }
 
+  private void loadChildEntities(Library library) throws IOException {
+    if (library.getSample() != null) {
+      library.setSample(getSampleById(library.getSample().getId()));
+    }
+    if (library.getLibraryType() != null) {
+      library.setLibraryType(getLibraryTypeById(library.getLibraryType().getId()));
+    }
+
+    if (library.getLibrarySelectionType() != null) {
+      library.setLibrarySelectionType(getLibrarySelectionTypeById(library.getLibrarySelectionType().getId()));
+    }
+    if (library.getLibraryStrategyType() != null) {
+      library.setLibraryStrategyType(getLibraryStrategyTypeById(library.getLibraryStrategyType().getId()));
+    }
+    List<Index> managedIndices = new ArrayList<>();
+    for (Index index : library.getIndices()) {
+      Index managedIndex = indexDao.getIndexById(index.getId());
+      if (managedIndex != null) managedIndices.add(managedIndex);
+    }
+    library.setIndices(managedIndices);
+    if (library.getLibraryAdditionalInfo() != null) {
+      LibraryAdditionalInfo lai = library.getLibraryAdditionalInfo();
+      if (lai.getPrepKit() != null) {
+        lai.setPrepKit(getKitDescriptorById(lai.getPrepKit().getId()));
+      }
+      if (lai.getLibraryDesign() != null) {
+        lai.setLibraryDesign(libraryDesignDao.getLibraryDesign(lai.getLibraryDesign().getId()));
+      }
+      if (library.getLibraryAdditionalInfo().getLibraryDesignCode() != null) {
+        lai.setLibraryDesignCode(libraryDesignCodeDao.getLibraryDesignCode(lai.getLibraryDesignCode().getId()));
+      }
+      library.setLibraryAdditionalInfo(lai);
+      validateLibraryDesignValues(library);
+    }
+  }
+
+  /**
+   * Loads persisted objects into LibraryDilution fields. Should be called before saving LibraryDilutions. Loads all member objects
+   * <b>except</b>
+   * <ul>
+   * <li>creator/lastModifier User objects</li>
+   * </ul>
+   * 
+   * @param libraryDilution the LibraryDilution to load entities into. Must contain at least the IDs of objects to load (e.g. to load the
+   *          persisted Library
+   *          into dilution.library, dilution.library.id must be set)
+   * @throws IOException
+   */
+  private void loadChildEntities(LibraryDilution dilution) throws IOException {
+    if (dilution.getLibrary() != null) {
+      dilution.setLibrary(getLibraryById(dilution.getLibrary().getId()));
+    }
+    if (dilution.getTargetedSequencing() != null) {
+      dilution.setTargetedSequencing(targetedSequencingDao.get(dilution.getTargetedSequencing().getId()));
+    }
+  }
+
+  /**
+   * Copies modifiable fields from the source LibraryDilution into the target LibraryDilution to be persisted
+   * 
+   * @param target the persisted LibraryDilution to modify
+   * @param source the modified LibraryDilution to copy modifiable fields from
+   * @throws IOException
+   */
+  private void applyChanges(LibraryDilution target, LibraryDilution source) {
+    target.setConcentration(source.getConcentration());
+    if (!autoGenerateIdBarcodes) target.setIdentificationBarcode(source.getIdentificationBarcode());
+  }
+
+  private void applyChanges(Library target, Library source) throws IOException {
+    target.setDescription(source.getDescription());
+    target.setIdentificationBarcode(source.getIdentificationBarcode());
+    target.setLocationBarcode(source.getLocationBarcode());
+    target.setInitialConcentration(source.getInitialConcentration());
+    target.setPlatformName(source.getPlatformName());
+    target.setAlias(source.getAlias());
+    target.setPaired(source.getPaired());
+    target.setLowQuality(source.isLowQuality());
+    target.setDiscarded(source.isDiscarded());
+    if (target.isDiscarded()) {
+      target.setVolume(0.0);
+    } else {
+      target.setVolume(source.getVolume());
+    }
+    target.setQcPassed(source.getQcPassed());
+  }
+
+  /**
+   * Confirms that when a Library Design is selected (detailed library only), the corresponding
+   * LibraryDesignCode, LibrarySelection and LibraryStrategy all match the values for the selected LibraryDesign.
+   *
+   * @param library the Library with desired selection, strategy, and libraryDesignCode set.
+   * @throws IOException when the library's values don't match the values of the LibraryDesign
+   */
+  private void validateLibraryDesignValues(Library library) throws IOException {
+    if (!isDetailedSample(library.getSample())) {
+      throw new IOException("A library design can only be applied to a detailed sample.");
+    }
+    LibraryDesign design = libraryDesignDao.getLibraryDesign(library.getLibraryAdditionalInfo().getLibraryDesign().getId());
+    if (((DetailedSample) library.getSample()).getSampleClass().getId() != design.getSampleClass().getId()) {
+      throw new IOException(
+          "This library design is not valid for sample " + library.getSample().getName() + " because the class is not compatible.");
+    }
+    library.getLibraryAdditionalInfo().setLibraryDesign(design);
+    LibrarySelectionType selection = libraryStore.getLibrarySelectionTypeById(design.getLibrarySelectionType().getId());
+    LibraryStrategyType strategy = libraryStore.getLibraryStrategyTypeById(design.getLibraryStrategyType().getId());
+    if (library.getLibrarySelectionType() != null && library.getLibrarySelectionType().getId() != selection.getId()) {
+      throw new IOException("Library selection doesn't match library design.");
+    }
+    if (library.getLibraryStrategyType() != null && library.getLibraryStrategyType().getId() != strategy.getId()) {
+      throw new IOException("Library strategy doesn't match library design.");
+    }
+    if (library.getLibraryAdditionalInfo().getLibraryDesignCode().getId() != null
+        && library.getLibraryAdditionalInfo().getLibraryDesign().getId() != null
+        && library.getLibraryAdditionalInfo().getLibraryDesignCode().getId() != library.getLibraryAdditionalInfo().getLibraryDesign()
+            .getLibraryDesignCode().getId()) {
+      throw new IOException("Selected library design code does not match library design code for selected library design.");
+    }
+    library.setLibrarySelectionType(selection);
+    library.setLibraryStrategyType(strategy);
+  }
+
+  /**
+   * Generates a unique barcode for a Library
+   * 
+   * @param library
+   */
+  public void autoGenerateIdBarcode(Library library) {
+    String barcode = library.getName() + "::" + library.getAlias();
+    library.setIdentificationBarcode(barcode);
+  }
+
   @Override
   public long saveLibraryDilution(LibraryDilution libraryDilution) throws IOException {
     if (libraryDilutionStore != null) {
-      return libraryDilutionStore.save(libraryDilution);
-    } else {
-      throw new IOException("No libraryDilutionStore available. Check that it has been declared in the Spring config.");
+      LibraryDilution savedDilution = null;
+      // TODO when moved to service
+      // Library managedLibrary = getLibraryById(savedDilution.getLibrary().getId());
+      // managedLibrary.setLastModifier(user);
+      // libraryStore.save(managedLibrary);
+      if (libraryDilution.getId() == AbstractDilution.UNSAVED_ID) {
+
+        // pre-save field generation
+        libraryDilution.setName(generateTemporaryName());
+        savedDilution = getLibraryDilutionById(libraryDilutionStore.save(libraryDilution));
+      } else {
+        LibraryDilution managed = getLibraryDilutionById(libraryDilution.getId());
+        applyChanges(managed, libraryDilution);
+        loadChildEntities(managed);
+        savedDilution = getLibraryDilutionById(libraryDilutionStore.save(managed));
+      }
+
+      // post-save field generation
+      boolean needsUpdate = false;
+      try {
+        if (LimsUtils.hasTemporaryName(savedDilution)) {
+          savedDilution.setName(namingScheme.generateNameFor(savedDilution));
+          validateNameOrThrow(savedDilution, namingScheme);
+          if (autoGenerateIdBarcodes) LimsUtils.generateAndSetIdBarcode(savedDilution);
+          needsUpdate = true;
+        }
+        if (needsUpdate) {
+          libraryDilutionStore.save(savedDilution);
+        }
+      } catch (MisoNamingException e) {
+        throw new IllegalArgumentException("Name generator failed to generate valid name for libraryDilution");
+      } catch (ConstraintViolationException e) {
+        // Send the nested root cause message to the user, since it contains the actual error.
+        throw new ConstraintViolationException(e.getMessage() + " " + ExceptionUtils.getRootCauseMessage(e), e.getSQLException(),
+            e.getConstraintName());
+      }
+      return savedDilution.getId();
     }
   }
 
@@ -1520,7 +1718,7 @@ public class MisoRequestManager implements RequestManager {
     if (libraryQcStore != null) {
       return libraryQcStore.save(libraryQc);
     } else {
-      throw new IOException("No libraryQcStore available. Check that it has been declared in the Spring config.");
+      throw new IOException("No libraryDilutionStore available. Check that it has been declared in the Spring config.");
     }
   }
 
@@ -1861,15 +2059,6 @@ public class MisoRequestManager implements RequestManager {
   public LibraryType getLibraryTypeById(long typeId) throws IOException {
     if (libraryStore != null) {
       return libraryStore.getLibraryTypeById(typeId);
-    } else {
-      throw new IOException("No libraryStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public LibraryType getLibraryTypeByDescription(String description) throws IOException {
-    if (libraryStore != null) {
-      return libraryStore.getLibraryTypeByDescription(description);
     } else {
       throw new IOException("No libraryStore available. Check that it has been declared in the Spring config.");
     }

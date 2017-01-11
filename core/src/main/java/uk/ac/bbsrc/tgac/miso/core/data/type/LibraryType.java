@@ -25,7 +25,10 @@ package uk.ac.bbsrc.tgac.miso.core.data.type;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -48,14 +51,18 @@ public class LibraryType implements Comparable<LibraryType>, Serializable {
 
   public static final Long UNSAVED_ID = 0L;
 
-  /** Field libraryTypeId */
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long libraryTypeId = LibraryType.UNSAVED_ID;
-  /** Field description */
+
+  @Column(nullable = false)
   private String description;
-  /** Field platformType */
-  private String platformType;
+
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private PlatformType platformType;
+
+  @Column(nullable = false)
   private Boolean archived;
 
   /**
@@ -99,9 +106,9 @@ public class LibraryType implements Comparable<LibraryType>, Serializable {
   /**
    * Returns the platformType of this LibraryType object.
    * 
-   * @return String platformType.
+   * @return PlatformType platformType.
    */
-  public String getPlatformType() {
+  public PlatformType getPlatformType() {
     return platformType;
   }
 
@@ -111,7 +118,7 @@ public class LibraryType implements Comparable<LibraryType>, Serializable {
    * @param platformType
    *          platformType.
    */
-  public void setPlatformType(String platformType) {
+  public void setPlatformType(PlatformType platformType) {
     this.platformType = platformType;
   }
 

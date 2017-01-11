@@ -396,7 +396,7 @@ public class LoadGeneratorSource implements MigrationSource {
     LibraryDilution ldi = new LibraryDilution();
     ldi.setLibrary(library);
     ldi.setConcentration(1D);
-    ldi.setDilutionCreator("load-test");
+    ldi.setDilutionUserName("load-test");
     return ldi;
   }
 

@@ -11,16 +11,16 @@ import org.hibernate.annotations.Synchronize;
 
 @Entity
 @Immutable
-@Table(name = "RunDerivedInfo")
-@Synchronize("Run")
-public class RunDerivedInfo {
+@Table(name = "LibraryDerivedInfo")
+@Synchronize("Library")
+public class LibraryDerivedInfo {
 
   @Id
-  private Long runId;
+  private Long libraryId;
   private Date lastModified;
 
   public Long getId() {
-    return runId;
+    return libraryId;
   }
 
   public Date getLastModified() {

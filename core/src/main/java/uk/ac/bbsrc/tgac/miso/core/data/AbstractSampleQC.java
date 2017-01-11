@@ -26,6 +26,7 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.Transient;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
@@ -38,6 +39,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
  */
 @MappedSuperclass
 public abstract class AbstractSampleQC extends AbstractQC implements SampleQC {
+  @Transient
   public static final String UNITS = "ng/&#181;l";
 
   private Double results;

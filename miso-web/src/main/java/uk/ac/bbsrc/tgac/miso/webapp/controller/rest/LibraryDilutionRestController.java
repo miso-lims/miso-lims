@@ -81,7 +81,7 @@ public class LibraryDilutionRestController extends RestController {
 
   private Long populateAndSaveDilutionFromDto(DilutionDto dilutionDto, LibraryDilution dilution, boolean create) throws IOException {
     User user = authorizationManager.getCurrentUser();
-    dilution.setDilutionCreator(user.getFullName());
+    dilution.setDilutionUserName(user.getFullName());
     if (dilutionDto.getTargetedSequencingId() != null) {
       dilution.setTargetedSequencing(requestManager.getTargetedSequencingById(dilutionDto.getTargetedSequencingId()));
     }

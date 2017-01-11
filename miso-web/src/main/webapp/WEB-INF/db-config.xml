@@ -39,6 +39,8 @@
       <list>
         <value>com.eaglegenomics.simlims.core.Group</value>
         <value>com.eaglegenomics.simlims.core.SecurityProfile</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractLibraryQC</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractPlatform</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractProject</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractRun</value>
@@ -60,7 +62,10 @@
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.InstituteImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.Library</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAdditionalInfoImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDerivedInfo</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryQCImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.PlatformImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl</value>
@@ -100,6 +105,8 @@
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.type.QcType</value>
         <value>uk.ac.bbsrc.tgac.miso.core.event.impl.DefaultAlert</value>
       </list>

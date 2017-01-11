@@ -91,7 +91,7 @@ public abstract class AbstractRun implements Run {
   @Transient
   public Document submissionDocument;
 
-  @OneToOne(targetEntity = SecurityProfile.class, cascade = CascadeType.ALL)
+  @ManyToOne(targetEntity = SecurityProfile.class, cascade = CascadeType.ALL)
   @JoinColumn(name = "securityProfile_profileId")
   private SecurityProfile securityProfile = new SecurityProfile();
 

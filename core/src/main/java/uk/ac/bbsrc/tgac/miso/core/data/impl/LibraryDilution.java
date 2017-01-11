@@ -26,6 +26,12 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
@@ -40,12 +46,27 @@ import uk.ac.bbsrc.tgac.miso.core.data.Library;
  * @author Rob Davey
  * @since 0.0.2
  */
+@Entity
+@Table(name = "LibraryDilution")
 public class LibraryDilution extends AbstractDilution implements Serializable {
 
   private static final long serialVersionUID = 1L;
+
+  @ManyToOne(targetEntity = LibraryImpl.class)
+  @JoinColumn(name = "library_libraryId")
   private Library library;
+
+  @ManyToOne
+  @JoinColumn(name = "targetedSequencingId")
   private TargetedSequencing targetedSequencing;
+
+  @ManyToOne(targetEntity = UserImpl.class)
+  @JoinColumn
+  private User lastModifier;
+
   private Date lastModified;
+
+  @Transient
   public static final String UNITS = "nM";
 
   /**
@@ -85,6 +106,14 @@ public class LibraryDilution extends AbstractDilution implements Serializable {
 
   public void setTargetedSequencing(TargetedSequencing targetedSequencing) {
     this.targetedSequencing = targetedSequencing;
+  }
+
+  public User getLastModifier() {
+    return lastModifier;
+  }
+
+  public void setLastModifier(User lastModifier) {
+    this.lastModifier = lastModifier;
   }
 
   public Date getLastModified() {

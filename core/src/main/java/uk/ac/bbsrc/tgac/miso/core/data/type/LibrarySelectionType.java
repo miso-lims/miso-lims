@@ -25,9 +25,12 @@ package uk.ac.bbsrc.tgac.miso.core.data.type;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 /**
  * Provides model access to the underlying MISO LibrarySelectionType lookup table. These types should match the SRA submission schema for
@@ -38,6 +41,8 @@ import javax.persistence.Id;
  * @author Rob Davey
  * @since 0.0.2
  */
+@Entity
+@Table(name = "LibrarySelectionType")
 public class LibrarySelectionType implements Comparable<LibrarySelectionType>, Serializable {
 
   private static final long serialVersionUID = 1L;
@@ -45,13 +50,14 @@ public class LibrarySelectionType implements Comparable<LibrarySelectionType>, S
   /** Field UNSAVED_ID */
   public static final Long UNSAVED_ID = 0L;
 
-  /** Field librarySelectionTypeId */
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long librarySelectionTypeId = LibrarySelectionType.UNSAVED_ID;
-  /** Field name */
+
+  @Column(nullable = false, unique = true)
   private String name;
-  /** Field description */
+
+  @Column(nullable = false)
   private String description;
 
   /**

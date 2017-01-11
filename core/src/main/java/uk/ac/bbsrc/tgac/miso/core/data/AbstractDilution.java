@@ -27,13 +27,15 @@ import java.util.Date;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
+import javax.persistence.MappedSuperclass;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
@@ -48,20 +50,27 @@ import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
  * @author Rob Davey
  * @since 0.0.2
  */
+@MappedSuperclass
 public abstract class AbstractDilution implements Dilution, Comparable {
   public static final Long UNSAVED_ID = 0L;
 
-  @OneToOne(cascade = CascadeType.ALL)
+  @ManyToOne(cascade = CascadeType.ALL)
   private SecurityProfile securityProfile;
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long dilutionId = AbstractDilution.UNSAVED_ID;
+
+  @Column(nullable = false)
   private String name;
+  @Column(nullable = false)
   private Date creationDate;
+  @Column(nullable = false)
   private Double concentration;
-  private String identificationBarcode;
+  @Column(nullable = false)
   private String dilutionUserName;
+
+  private String identificationBarcode;
   private Long preMigrationId;
 
   @ManyToMany(targetEntity=PoolImpl.class)
@@ -99,12 +108,12 @@ public abstract class AbstractDilution implements Dilution, Comparable {
   }
 
   @Override
-  public String getDilutionCreator() {
+  public String getDilutionUserName() {
     return dilutionUserName;
   }
 
   @Override
-  public void setDilutionCreator(String dilutionUserName) {
+  public void setDilutionUserName(String dilutionUserName) {
     this.dilutionUserName = dilutionUserName;
   }
 
@@ -206,7 +215,7 @@ public abstract class AbstractDilution implements Dilution, Comparable {
   }
 
   /**
-   * Equivalency is based on getProjectId() if set, otherwise on name, description and creation date.
+   * Equivalency is based on getId() if set, otherwise on name, barcode, concentration, creation date, and creator userName.
    */
   @CoverageIgnore
   @Override
@@ -243,10 +252,10 @@ public abstract class AbstractDilution implements Dilution, Comparable {
       else if (!creationDate.equals(them.getCreationDate()))
         return false;
       if (dilutionUserName == null) {
-        if (them.getDilutionCreator() != null)
+        if (them.getDilutionUserName() != null)
           return false;
       }
-      else if (!dilutionUserName.equals(them.getDilutionCreator()))
+      else if (!dilutionUserName.equals(them.getDilutionUserName()))
         return false;
       return true;
     } else {
@@ -263,7 +272,7 @@ public abstract class AbstractDilution implements Dilution, Comparable {
       final int PRIME = 37;
       int hashcode = 1;
       if (getCreationDate() != null) hashcode = PRIME * hashcode + getCreationDate().hashCode();
-      if (getDilutionCreator() != null) hashcode = PRIME * hashcode + getDilutionCreator().hashCode();
+      if (getDilutionUserName() != null) hashcode = PRIME * hashcode + getDilutionUserName().hashCode();
       if (getConcentration() != null) hashcode = PRIME * hashcode + getConcentration().hashCode();
       return hashcode;
     }

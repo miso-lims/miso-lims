@@ -420,7 +420,8 @@ public class LibraryControllerHelperService {
               library.setCreationDate(new Date());
               library.setLocationBarcode(locationBarcode);
               library.setQcPassed(false);
-              library.setLibraryType(requestManager.getLibraryTypeByDescription(type));
+              library
+                  .setLibraryType(requestManager.getLibraryTypeByDescriptionAndPlatform(type, PlatformType.get(library.getPlatformName())));
               library.setLibrarySelectionType(requestManager.getLibrarySelectionTypeByName(selectionType));
               library.setLibraryStrategyType(requestManager.getLibraryStrategyTypeByName(strategyType));
               library.setLastModifier(user);

@@ -31,7 +31,7 @@ public class MockFormTestRequestManager extends MisoRequestManager {
     LibraryType lt = new LibraryType();
     lt.setId(1L);
     lt.setDescription("Paired End");
-    lt.setPlatformType("Illumina");
+    lt.setPlatformType(PlatformType.get("Illumina"));
     return lt;
   }
 

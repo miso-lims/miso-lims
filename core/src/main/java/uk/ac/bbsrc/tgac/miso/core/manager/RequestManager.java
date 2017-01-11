@@ -177,8 +177,6 @@ public interface RequestManager {
 
   public LibraryType getLibraryTypeById(long libraryId) throws IOException;
 
-  public LibraryType getLibraryTypeByDescription(String description) throws IOException;
-
   public LibraryType getLibraryTypeByDescriptionAndPlatform(String description, PlatformType platformType) throws IOException;
 
   public LibrarySelectionType getLibrarySelectionTypeById(long librarySelectionTypeId) throws IOException;

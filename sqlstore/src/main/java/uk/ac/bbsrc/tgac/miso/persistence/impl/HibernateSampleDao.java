@@ -174,9 +174,9 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
 
   @Override
   public Sample getByBarcode(String barcode) throws IOException {
-    Query query = currentSession().createQuery("from SampleImpl where identificationBarcode = :barcode");
-    query.setString("barcode", barcode);
-    return fetchSqlStore((Sample) query.uniqueResult());
+    Criteria criteria = currentSession().createCriteria(SampleImpl.class);
+    criteria.add(Restrictions.eq("identificationBarcode", barcode));
+    return fetchSqlStore((Sample) criteria.uniqueResult());
   }
 
   @Override
@@ -365,7 +365,7 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
     if ("lastModified".equals(sortCol)) sortCol = "derivedInfo.lastModified";
     Criteria criteria = currentSession().createCriteria(SampleImpl.class);
     criteria.add(searchRestrictions(querystr));
-    // I don't know why this alias is required, but without it, you can't sort by 'derivedInfo.lastModifier', which is the field on which we
+    // required to sort by 'derivedInfo.lastModified', which is the field on which we
     // want to sort most List X pages
     criteria.createAlias("derivedInfo", "derivedInfo");
     criteria.setFirstResult(offset);
@@ -392,7 +392,7 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
     if (offset < 0 || resultsPerPage < 0) throw new IOException("Limit and Offset must not be less than zero");
     if ("lastModified".equals(sortCol)) sortCol = "derivedInfo.lastModified";
     Criteria criteria = currentSession().createCriteria(SampleImpl.class);
-    // I don't know why this alias is required, but without it, you can't sort by 'derivedInfo.lastModifier', which is the field on which we
+    // required to sort by 'derivedInfo.lastModified', which is the field on which we
     // want to sort most List X pages
     criteria.createAlias("derivedInfo", "derivedInfo");
     criteria.setFirstResult(offset);

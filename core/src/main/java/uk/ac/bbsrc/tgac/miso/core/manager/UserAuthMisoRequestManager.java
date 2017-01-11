@@ -1468,11 +1468,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public LibraryType getLibraryTypeByDescription(String description) throws IOException {
-    return backingManager.getLibraryTypeByDescription(description);
-  }
-
-  @Override
   public LibraryType getLibraryTypeByDescriptionAndPlatform(String description, PlatformType platformType) throws IOException {
     return backingManager.getLibraryTypeByDescriptionAndPlatform(description, platformType);
   }

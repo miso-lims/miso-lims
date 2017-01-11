@@ -44,6 +44,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.persistence.HibernateSampleClassDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateDetailedQcStatusDao;
@@ -52,6 +53,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateKitDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLabDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDesignCodeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDesignDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryQcDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSamplePurposeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleQcDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSequencerReferenceDao;
@@ -61,7 +63,6 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueOriginDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueTypeDao;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultReferenceGenomeService;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryDAO;
-import uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryQCDAO;
 
 public class ValueTypeLookupTestSuite {
 
@@ -162,7 +163,7 @@ public class ValueTypeLookupTestSuite {
     Mockito.when(sqcDao.listAllSampleQcTypes()).thenReturn(sqcs);
     Mockito.when(mgr.getSampleQcDao()).thenReturn(sqcDao);
 
-    SQLLibraryQCDAO lqcDao = Mockito.mock(SQLLibraryQCDAO.class);
+    HibernateLibraryQcDao lqcDao = Mockito.mock(HibernateLibraryQcDao.class);
     List<QcType> lqcs = new ArrayList<>();
     lqcs.add(makeQcType(VALID_LONG, VALID_STRING));
     Mockito.when(lqcDao.listAllLibraryQcTypes()).thenReturn(lqcs);
@@ -386,7 +387,7 @@ public class ValueTypeLookupTestSuite {
   private LibraryType makeLibraryType(Long id, String platform, String desc) {
     LibraryType lt = new LibraryType();
     lt.setId(id == null ? LibraryType.UNSAVED_ID : id);
-    lt.setPlatformType(platform);
+    lt.setPlatformType(PlatformType.get(platform));
     lt.setDescription(desc);
     return lt;
   }

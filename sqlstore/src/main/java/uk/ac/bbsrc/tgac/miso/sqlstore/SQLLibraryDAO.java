@@ -251,11 +251,6 @@ public class SQLLibraryDAO implements LibraryStore {
     return namingScheme;
   }
 
-  @Override
-  public void setNamingScheme(NamingScheme namingScheme) {
-    this.namingScheme = namingScheme;
-  }
-
   @Autowired
   private CacheManager cacheManager;
 
@@ -559,11 +554,6 @@ public class SQLLibraryDAO implements LibraryStore {
   }
 
   @Override
-  public List<Library> listByLibraryDilutionId(long dilutionId) throws IOException {
-    return template.query(LIBRARIES_BY_RELATED_DILUTION_ID, new Object[] { dilutionId }, new LibraryMapper(true));
-  }
-
-  @Override
   public List<Library> listBySampleId(long sampleId) throws IOException {
     return template.query(LIBRARIES_SELECT_BY_SAMPLE_ID, new Object[] { sampleId }, new LibraryMapper(true));
   }
@@ -678,7 +668,6 @@ public class SQLLibraryDAO implements LibraryStore {
     return e;
   }
 
-  @Override
   public LibraryType getLibraryTypeByDescription(String description) throws IOException {
     List<LibraryType> eResults = template.query(LIBRARY_TYPE_SELECT_BY_DESCRIPTION, new Object[] { description }, new LibraryTypeMapper());
     LibraryType e = eResults.size() > 0 ? eResults.get(0) : null;
@@ -857,7 +846,6 @@ public class SQLLibraryDAO implements LibraryStore {
         library.setVolume(null);
       }
       library.setDiscarded(rs.getBoolean("discarded"));
-      library.setLastModified(rs.getDate("lastModified"));
       library.setQcPassed(rs.getBoolean("qcPassed"));
       // rs.wasNull() needs to be directly after rs.getBoolean("qcPassed") as that's the value which gets checked for null
       if (rs.wasNull()) {
@@ -923,7 +911,7 @@ public class SQLLibraryDAO implements LibraryStore {
       LibraryType lt = new LibraryType();
       lt.setId(rs.getLong("libraryTypeId"));
       lt.setDescription(rs.getString("description"));
-      lt.setPlatformType(rs.getString("platformType"));
+      lt.setPlatformType(PlatformType.get(rs.getString("platformType")));
       lt.setArchived(rs.getBoolean("archived"));
       return lt;
     }

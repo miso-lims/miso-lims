@@ -287,22 +287,6 @@ public interface Library extends SecurableByProfile, Comparable, Barcodable, Loc
   public void setCreationDate(Date date);
 
   /**
-   * Returns the libraryQuant of this Library object.
-   * 
-   * @return Integer libraryQuant.
-   */
-  public Integer getLibraryQuant();
-
-  /**
-   * Sets the libraryQuant of this Library object.
-   * 
-   * @param libraryQuant
-   *          libraryQuant.
-   * 
-   */
-  public void setLibraryQuant(Integer libraryQuant);
-
-  /**
    * Returns the qcPassed of this Library object.
    * 
    * @return Boolean qcPassed.
@@ -317,10 +301,6 @@ public interface Library extends SecurableByProfile, Comparable, Barcodable, Loc
    *          qcPassed.
    */
   public void setQcPassed(Boolean qcPassed);
-
-  Date getLastUpdated();
-
-  void setLastUpdated(Date lastUpdated);
 
   public Collection<ChangeLog> getChangeLog();
 
@@ -346,7 +326,5 @@ public interface Library extends SecurableByProfile, Comparable, Barcodable, Loc
   public void setLibraryAdditionalInfo(LibraryAdditionalInfo libraryAdditionalInfo);
 
   public IndexFamily getCurrentFamily();
-
-  void setLastModified(Date lastModified);
 
 }

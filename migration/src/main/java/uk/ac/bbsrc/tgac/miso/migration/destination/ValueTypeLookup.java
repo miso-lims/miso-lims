@@ -231,7 +231,7 @@ public class ValueTypeLookup {
     Map<String, Map<String, LibraryType>> mapByPlatformAndDesc = new UniqueKeyHashMap<>();
     for (LibraryType lt : libraryTypes) {
       if (!mapByPlatformAndDesc.containsKey(lt.getPlatformType())) {
-        mapByPlatformAndDesc.put(lt.getPlatformType(), new UniqueKeyHashMap<String, LibraryType>());
+        mapByPlatformAndDesc.put(lt.getPlatformType().getKey(), new UniqueKeyHashMap<String, LibraryType>());
       }
       mapByPlatformAndDesc.get(lt.getPlatformType()).put(lt.getDescription(), lt);
       mapById.put(lt.getId(), lt);

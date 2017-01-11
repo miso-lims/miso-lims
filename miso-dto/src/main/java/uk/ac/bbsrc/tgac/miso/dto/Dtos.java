@@ -1143,7 +1143,7 @@ public class Dtos {
     to.setConcentration(from.getConcentration());
     to.setLibrary(to(from.getLibrary()));
     if (!isStringEmptyOrNull(from.getDilutionUserName())) {
-      to.setDilutionCreator(from.getDilutionUserName());
+      to.setDilutionUserName(from.getDilutionUserName());
     }
     DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
     try {
