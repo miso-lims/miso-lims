@@ -524,7 +524,7 @@ FOR EACH ROW
     NEW.library_libraryId,
     '',
     (SELECT lastModifier FROM Library WHERE libraryId = NEW.library_libraryId),
-    COALESCE('Library dilution ', NEW.name,' created.'))//
+    CONCAT('Library dilution ', NEW.name, ' created.'))//
 
 DROP TRIGGER IF EXISTS BeforeInsertLibrary//
 CREATE TRIGGER BeforeInsertLibrary BEFORE INSERT ON Library
