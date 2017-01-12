@@ -5,9 +5,11 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,10 +92,8 @@ public class HibernateLibraryAdditionalInfoDao implements LibraryAdditionalInfoD
   }
   
   @Override
-  public void deleteLibraryAdditionalInfo(
-      LibraryAdditionalInfo libraryAdditionalInfo) {
+  public void deleteLibraryAdditionalInfo(LibraryAdditionalInfo libraryAdditionalInfo) {
     currentSession().delete(libraryAdditionalInfo);
-    
   }
 
   @Override
@@ -101,6 +101,13 @@ public class HibernateLibraryAdditionalInfoDao implements LibraryAdditionalInfoD
     Date now = new Date();
     libraryAdditionalInfo.setLastUpdated(now);
     currentSession().update(libraryAdditionalInfo);
+  }
+
+  @Override
+  public LibraryAdditionalInfo getByPreMigrationId(Long preMigrationId) throws IOException {
+    Criteria criteria = currentSession().createCriteria(LibraryAdditionalInfo.class);
+    criteria.add(Restrictions.eq("preMigrationId", preMigrationId));
+    return (LibraryAdditionalInfo) criteria.uniqueResult();
   }
   
 }

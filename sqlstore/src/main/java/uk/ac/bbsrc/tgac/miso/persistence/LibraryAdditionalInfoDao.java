@@ -30,6 +30,14 @@ public interface LibraryAdditionalInfoDao {
   LibraryAdditionalInfo getLibraryAdditionalInfoByLibraryId(Long id) throws IOException;
 
   /**
+   * Retrieves a single LibraryAdditionalInfo by preMigrationId
+   * 
+   * @param preMigrationId preMigration ID of Library to find LibraryAdditionalInfo for
+   * @throws IOException
+   */
+  LibraryAdditionalInfo getByPreMigrationId(Long preMigrationId) throws IOException;
+
+  /**
    * Saves a new LibraryAdditionalInfo
    * 
    * @param libraryAdditionalInfo the new LibraryAdditionalInfo to save

@@ -1,10 +1,8 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
-import static uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils.searchRestrictions;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -14,6 +12,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -22,7 +21,6 @@ import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary;
@@ -40,7 +38,7 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 public class HibernateLibraryDao implements LibraryStore {
 
-  protected static final Logger log = LoggerFactory.getLogger(HibernateSampleQcDao.class);
+  protected static final Logger log = LoggerFactory.getLogger(HibernateLibraryDao.class);
 
   @Autowired
   private SessionFactory sessionFactory;
@@ -48,28 +46,19 @@ public class HibernateLibraryDao implements LibraryStore {
   private JdbcTemplate template;
   @Autowired
   private NamingScheme namingScheme;
-  @Value("${miso.autoGenerateIdentificationBarcodes:true}")
-  private boolean autoGenerateIdentificationBarcodes;
-  @Value("${miso.detailed.sample.enabled:false}")
-  private Boolean detailedSampleEnabled;
 
   private Session currentSession() {
     return getSessionFactory().getCurrentSession();
   }
 
-  /**
-   * Generates a unique barcode based on the library's name and alias.
-   * Note that the barcode will change when the alias is changed.
-   *
-   * @param library
-   */
-  public void autoGenerateIdBarcode(Library library) {
-    String barcode = library.getName() + "::" + library.getAlias();
-    library.setIdentificationBarcode(barcode);
+  private Criterion searchRestrictions(String querystr) {
+    return DbUtils.searchRestrictions(querystr, "name", "alias", "description", "identificationBarcode");
   }
 
   @Override
   public long save(Library library) throws IOException {
+    Date now = new Date();
+    if (library.getCreationDate() == null) library.setCreationDate(now);
     long id;
     if (library.getId() == AbstractLibrary.UNSAVED_ID) {
       if (!namingScheme.duplicateLibraryAliasAllowed() && !listByAlias(library.getAlias()).isEmpty()
@@ -96,7 +85,7 @@ public class HibernateLibraryDao implements LibraryStore {
   }
 
   @Override
-  public Collection<Library> listAll() throws IOException {
+  public List<Library> listAll() throws IOException {
     Criteria criteria = currentSession().createCriteria(LibraryImpl.class);
     @SuppressWarnings("unchecked")
     List<Library> records = criteria.list();
@@ -129,16 +118,16 @@ public class HibernateLibraryDao implements LibraryStore {
   }
 
   @Override
-  public Collection<Library> listBySearch(String query) throws IOException {
+  public List<Library> listBySearch(String query) throws IOException {
     Criteria criteria = currentSession().createCriteria(LibraryImpl.class);
-    criteria.add(searchRestrictions(query, "name", "alias", "description", "identificationBarcode"));
+    criteria.add(searchRestrictions(query));
     @SuppressWarnings("unchecked")
     List<Library> records = criteria.list();
     return records;
   }
 
   @Override
-  public Collection<Library> listByAlias(String alias) throws IOException {
+  public List<Library> listByAlias(String alias) throws IOException {
     Criteria criteria = currentSession().createCriteria(LibraryImpl.class);
     criteria.add(Restrictions.eq("alias", alias));
     @SuppressWarnings("unchecked")
@@ -147,7 +136,7 @@ public class HibernateLibraryDao implements LibraryStore {
   }
 
   @Override
-  public Collection<Library> listBySampleId(long sampleId) throws IOException {
+  public List<Library> listBySampleId(long sampleId) throws IOException {
     Criteria criteria = currentSession().createCriteria(LibraryImpl.class);
     criteria.add(Restrictions.eq("sample.id", sampleId));
     @SuppressWarnings("unchecked")
@@ -156,7 +145,7 @@ public class HibernateLibraryDao implements LibraryStore {
   }
 
   @Override
-  public Collection<Library> listByProjectId(long projectId) throws IOException {
+  public List<Library> listByProjectId(long projectId) throws IOException {
     Criteria criteria = currentSession().createCriteria(LibraryImpl.class);
     criteria.add(Restrictions.eq("sample.project.id", projectId));
     @SuppressWarnings("unchecked")
@@ -165,12 +154,37 @@ public class HibernateLibraryDao implements LibraryStore {
   }
 
   @Override
-  public Collection<Library> getByIdList(List<Long> idList) throws IOException {
+  public List<Library> getByIdList(List<Long> idList) throws IOException {
     if (idList.isEmpty()) {
       return Collections.emptyList();
     }
     Query query = currentSession().createQuery("from LibraryImpl where libraryId in (:ids)");
     query.setParameterList("ids", idList, LongType.INSTANCE);
+    @SuppressWarnings("unchecked")
+    List<Library> records = query.list();
+    return records;
+  }
+
+  @Override
+  public List<Library> listAllWithLimit(long limit) throws IOException {
+    Criteria criteria = currentSession().createCriteria(LibraryImpl.class);
+    criteria.setMaxResults(((Long) limit).intValue());
+    @SuppressWarnings("unchecked")
+    List<Library> records = criteria.list();
+    return records;
+  }
+
+  @Override
+  public Boxable getByPositionId(long positionId) {
+    Criteria criteria = currentSession().createCriteria(LibraryImpl.class);
+    criteria.add(Restrictions.eq("boxPositionId", positionId));
+    return (Library) criteria.uniqueResult();
+  }
+
+  @Override
+  public List<Library> getByBarcodeList(List<String> barcodeList) throws IOException {
+    Query query = currentSession().createQuery("from LibraryImpl where identificationBarcode in (:barcodes)");
+    query.setParameterList("barcodes", barcodeList, StringType.INSTANCE);
     @SuppressWarnings("unchecked")
     List<Library> records = query.list();
     return records;
@@ -187,7 +201,7 @@ public class HibernateLibraryDao implements LibraryStore {
   public LibraryType getLibraryTypeByDescriptionAndPlatform(String description, PlatformType platformType) throws IOException {
     Criteria criteria = currentSession().createCriteria(LibraryType.class);
     criteria.add(Restrictions.eq("description", description));
-    criteria.add(Restrictions.eq("platformType", platformType));
+    criteria.add(Restrictions.ilike("platformType", platformType));
     return (LibraryType) criteria.uniqueResult();
   }
 
@@ -220,7 +234,7 @@ public class HibernateLibraryDao implements LibraryStore {
   }
 
   @Override
-  public Collection<LibraryType> listAllLibraryTypes() throws IOException {
+  public List<LibraryType> listAllLibraryTypes() throws IOException {
     Criteria criteria = currentSession().createCriteria(LibraryType.class);
     @SuppressWarnings("unchecked")
     List<LibraryType> records = criteria.list();
@@ -228,16 +242,16 @@ public class HibernateLibraryDao implements LibraryStore {
   }
 
   @Override
-  public Collection<LibraryType> listLibraryTypesByPlatform(String platformName) throws IOException {
+  public List<LibraryType> listLibraryTypesByPlatform(PlatformType platformName) throws IOException {
     Criteria criteria = currentSession().createCriteria(LibraryType.class);
-    criteria.add(Restrictions.eq("platformType", PlatformType.get(platformName)));
+    criteria.add(Restrictions.eq("platformType", platformName));
     @SuppressWarnings("unchecked")
     List<LibraryType> records = criteria.list();
     return records;
   }
 
   @Override
-  public Collection<LibrarySelectionType> listAllLibrarySelectionTypes() throws IOException {
+  public List<LibrarySelectionType> listAllLibrarySelectionTypes() throws IOException {
     Criteria criteria = currentSession().createCriteria(LibrarySelectionType.class);
     @SuppressWarnings("unchecked")
     List<LibrarySelectionType> records = criteria.list();
@@ -245,35 +259,10 @@ public class HibernateLibraryDao implements LibraryStore {
   }
 
   @Override
-  public Collection<LibraryStrategyType> listAllLibraryStrategyTypes() throws IOException {
+  public List<LibraryStrategyType> listAllLibraryStrategyTypes() throws IOException {
     Criteria criteria = currentSession().createCriteria(LibraryStrategyType.class);
     @SuppressWarnings("unchecked")
     List<LibraryStrategyType> records = criteria.list();
-    return records;
-  }
-
-  @Override
-  public Collection<Library> listAllWithLimit(long limit) throws IOException {
-    Criteria criteria = currentSession().createCriteria(LibraryImpl.class);
-    criteria.setMaxResults(((Long) limit).intValue());
-    @SuppressWarnings("unchecked")
-    List<Library> records = criteria.list();
-    return records;
-  }
-
-  @Override
-  public Boxable getByPositionId(long positionId) {
-    Criteria criteria = currentSession().createCriteria(LibraryImpl.class);
-    criteria.add(Restrictions.eq("boxPositionId", positionId));
-    return (Library) criteria.uniqueResult();
-  }
-
-  @Override
-  public Collection<Library> getByBarcodeList(List<String> barcodeList) throws IOException {
-    Query query = currentSession().createQuery("from LibraryImpl where identificationBarcode in (:barcodes)");
-    query.setParameterList("barcodes", barcodeList, StringType.INSTANCE);
-    @SuppressWarnings("unchecked")
-    List<Library> records = query.list();
     return records;
   }
 
@@ -288,7 +277,7 @@ public class HibernateLibraryDao implements LibraryStore {
     if (offset < 0 || limit < 0) throw new IOException("Limit and Offset must not be less than zero");
     if ("lastModified".equals(sortCol)) sortCol = "derivedInfo.lastModified";
     Criteria criteria = currentSession().createCriteria(LibraryImpl.class);
-    criteria.add(searchRestrictions(querystr, "name", "alias", "description", "identificationBarcode"));
+    criteria.add(searchRestrictions(querystr));
     // required to sort by 'derivedInfo.lastModified', which is the field on which we
     // want to sort most List X pages
     criteria.createAlias("derivedInfo", "derivedInfo");
@@ -363,29 +352,11 @@ public class HibernateLibraryDao implements LibraryStore {
   }
 
   @CoverageIgnore
-  public JdbcTemplate getTemplate() {
-    return template;
-  }
-
-  @CoverageIgnore
   public void setTemplate(JdbcTemplate template) {
     this.template = template;
   }
 
-  public boolean isAutoGenerateIdentificationBarcodes() {
-    return autoGenerateIdentificationBarcodes;
+  public void setNamingScheme(NamingScheme namingScheme) {
+    this.namingScheme = namingScheme;
   }
-
-  public void setAutoGenerateIdentificationBarcodes(boolean autoGenerateIdentificationBarcodes) {
-    this.autoGenerateIdentificationBarcodes = autoGenerateIdentificationBarcodes;
-  }
-
-  public Boolean getDetailedSampleEnabled() {
-    return detailedSampleEnabled;
-  }
-
-  public void setDetailedSampleEnabled(Boolean detailedSampleEnabled) {
-    this.detailedSampleEnabled = detailedSampleEnabled;
-  }
-
 }

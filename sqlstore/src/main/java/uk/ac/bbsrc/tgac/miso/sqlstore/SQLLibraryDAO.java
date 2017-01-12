@@ -713,7 +713,7 @@ public class SQLLibraryDAO implements LibraryStore {
   }
 
   @Override
-  public List<LibraryType> listLibraryTypesByPlatform(String platformType) throws IOException {
+  public List<LibraryType> listLibraryTypesByPlatform(PlatformType platformType) throws IOException {
     return template.query(LIBRARY_TYPES_SELECT_BY_PLATFORM, new Object[] { platformType }, new LibraryTypeMapper());
   }
 

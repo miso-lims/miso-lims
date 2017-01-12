@@ -27,6 +27,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.dto.DilutionDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 @Controller
@@ -39,9 +40,15 @@ public class LibraryDilutionRestController extends RestController {
 
   @Autowired
   private AuthorizationManager authorizationManager;
+  @Autowired
+  private LibraryService libraryService;
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
+  }
+
+  public void setLibraryService(LibraryService libraryService) {
+    this.libraryService = libraryService;
   }
 
   @RequestMapping(value = "{dilutionId}", method = RequestMethod.GET, produces = "application/json")
@@ -64,7 +71,7 @@ public class LibraryDilutionRestController extends RestController {
     LibraryDilution dilution;
     try {
       dilution = Dtos.to(dilutionDto);
-      dilution.setLibrary(requestManager.getLibraryById(dilutionDto.getLibrary().getId()));
+      dilution.setLibrary(libraryService.get(dilutionDto.getLibrary().getId()));
       id = populateAndSaveDilutionFromDto(dilutionDto, dilution, true);
     } catch (ConstraintViolationException e) {
       log.error("Error while creating dilution", e);

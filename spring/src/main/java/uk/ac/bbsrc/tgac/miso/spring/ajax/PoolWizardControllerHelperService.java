@@ -111,7 +111,7 @@ public class PoolWizardControllerHelperService {
 
         List<Dilution> dils = new ArrayList<>();
         for (Integer id : ids) {
-          dils.add(requestManager.getDilutionByIdAndPlatform(id.longValue(), platformType));
+          dils.add(requestManager.getLibraryDilutionById(id.longValue()));
         }
 
         boolean indexCollision = false;

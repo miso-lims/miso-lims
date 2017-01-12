@@ -63,6 +63,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.util.FormUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.webapp.service.forms.MisoFormsService;
 
 @Controller
@@ -83,6 +84,8 @@ public class UploadController {
   private NamingScheme namingScheme;
   @Autowired
   private IndexService tagBarcodeService;
+  @Autowired
+  private LibraryService libraryService;
 
   public void setTagBarcodeService(IndexService tagBarcodeService) {
     this.tagBarcodeService = tagBarcodeService;
@@ -110,6 +113,10 @@ public class UploadController {
 
   public void setLibraryNamingScheme(NamingScheme namingScheme) {
     this.namingScheme = namingScheme;
+  }
+
+  public void setLibraryService(LibraryService libraryService) {
+    this.libraryService = libraryService;
   }
 
   public void uploadFile(Class<?> type, String qualifier, MultipartFile fileItem) throws IOException {
@@ -244,7 +251,7 @@ public class UploadController {
     String libraryId = request.getParameter("libraryId");
     if (libraryId == null) {
       throw new IOException("Cannot upload file - libraryId parameter missing or null");
-    } else if (requestManager.getLibraryById(Long.valueOf(libraryId)) == null) {
+    } else if (libraryService.get(Long.valueOf(libraryId)) == null) {
       throw new IOException("Cannot upload file - library does not exist");
     }
 
@@ -270,7 +277,7 @@ public class UploadController {
   @RequestMapping(value = "/dilution-to-pool", method = RequestMethod.POST)
   public void uploadLibraryList(MultipartHttpServletRequest request) throws IOException {
     try {
-      HashSet<String> librarySet = new HashSet<String>();
+      HashSet<String> librarySet = new HashSet<>();
       for (MultipartFile fileItem : getMultipartFiles(request)) {
         for (String s : new String(fileItem.getBytes()).split("\n")) {
           librarySet.add(s);
@@ -303,7 +310,7 @@ public class UploadController {
   }
 
   private List<MultipartFile> getMultipartFiles(MultipartHttpServletRequest request) {
-    List<MultipartFile> files = new ArrayList<MultipartFile>();
+    List<MultipartFile> files = new ArrayList<>();
     Map<String, MultipartFile> fMap = request.getFileMap();
     for (String fileName : fMap.keySet()) {
       MultipartFile fileItem = fMap.get(fileName);

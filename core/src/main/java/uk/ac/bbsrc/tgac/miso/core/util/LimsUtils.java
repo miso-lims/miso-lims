@@ -71,6 +71,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
@@ -82,6 +83,8 @@ import org.slf4j.LoggerFactory;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
@@ -96,6 +99,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
@@ -906,5 +910,66 @@ public class LimsUtils {
   public static void validateNameOrThrow(Nameable object, NamingScheme namingScheme) throws IOException {
     ValidationResult val = namingScheme.validateName(object.getName());
     if (!val.isValid()) throw new IOException("Save failed - invalid name:" + val.getMessage());
+  }
+
+  /**
+   * universal temporary name prefix. TODO: these same methods are in sqlstore DbUtils;
+   * use those when refactoring away the RequestManager.
+   */
+  static final public String TEMPORARY_NAME_PREFIX = "TEMPORARY_";
+
+  /**
+   * Generate a temporary name using a UUID.
+   * 
+   * @return Temporary name
+   */
+  static public String generateTemporaryName() {
+    return TEMPORARY_NAME_PREFIX + UUID.randomUUID();
+  }
+
+  /**
+   * Check if the nameable object has a temporary name.
+   * 
+   * @param nameable Nameable object
+   * @return
+   */
+  static public boolean hasTemporaryName(Nameable nameable) {
+    return nameable != null && nameable.getName() != null && nameable.getName().startsWith(TEMPORARY_NAME_PREFIX);
+  }
+
+  /**
+   * Check if the Boxable item has a temporary name
+   * 
+   * @param boxable Boxable item
+   * @return
+   */
+  static public boolean hasTemporaryAlias(Boxable boxable) {
+    return boxable != null && boxable.getAlias() != null && boxable.getAlias().startsWith(TEMPORARY_NAME_PREFIX);
+  }
+
+  /**
+   * Generates a unique barcode for a Nameable entity, and sets the identificationBarcode property for Boxables and LibraryDilutions.
+   * 
+   * @param nameable Nameable object
+   * @throws IOException
+   */
+  public static void generateAndSetIdBarcode(Nameable nameable) throws IOException {
+    String barcode = null;
+    if (nameable instanceof AbstractDilution && nameable.getName() != null) {
+      barcode = nameable.getName();
+      if (((LibraryDilution) nameable).getLibrary() != null
+          && ((LibraryDilution) nameable).getLibrary().getAlias() != null) {
+        barcode += "::" + ((LibraryDilution) nameable).getLibrary().getAlias();
+      }
+      ((LibraryDilution) nameable).setIdentificationBarcode(barcode);
+    } else if (nameable instanceof Boxable && nameable.getName() != null) {
+      barcode = nameable.getName();
+      if (((Boxable) nameable).getAlias() != null) {
+        barcode += "::" + ((Boxable) nameable).getAlias();
+      }
+      ((Boxable) nameable).setIdentificationBarcode(barcode);
+    } else {
+      throw new IOException("Error generating barcode");
+    }
   }
 }

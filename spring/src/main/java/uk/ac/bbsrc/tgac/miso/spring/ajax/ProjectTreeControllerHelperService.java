@@ -45,6 +45,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 
 /**
  * uk.ac.bbsrc.tgac.miso.spring.ajax
@@ -61,15 +62,20 @@ public class ProjectTreeControllerHelperService {
   private RequestManager requestManager;
   @Autowired
   private ExperimentService experimentService;
+  @Autowired
+  private LibraryService libraryService;
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
   }
 
-  /*
+  public void setLibraryService(LibraryService libraryService) {
+    this.libraryService = libraryService;
+  }
+
+  /**
    * starts with project listing list all the projects and subs define the number of Runs, Samples and Studies return as a JSONarray
    */
-
   public JSONObject listProjectTree(HttpSession session, JSONObject json) {
     try {
       Collection<Project> projects = requestManager.listAllProjects();
@@ -198,7 +204,7 @@ public class ProjectTreeControllerHelperService {
       Collection<Sample> samples = requestManager.listAllSamplesByProjectId(projectId);
 
       for (Sample sample : samples) {
-        Collection<Library> libraries = requestManager.listAllLibrariesBySampleId(sample.getId());
+        Collection<Library> libraries = libraryService.getAllBySampleId(sample.getId());
         if (libraries.size() == 0) {
 
           String sampleQC = "0";
@@ -239,7 +245,7 @@ public class ProjectTreeControllerHelperService {
 
       JSONObject miso = new JSONObject();
 
-      Collection<Library> libraries = requestManager.listAllLibrariesBySampleId(sampleId);
+      Collection<Library> libraries = libraryService.getAllBySampleId(sampleId);
       JSONArray librariesArray = new JSONArray();
 
       for (Library library : libraries) {

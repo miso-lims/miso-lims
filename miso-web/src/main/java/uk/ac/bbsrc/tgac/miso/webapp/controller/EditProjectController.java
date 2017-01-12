@@ -85,6 +85,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.ReferenceGenomeService;
 
 @Controller
@@ -107,6 +108,8 @@ public class EditProjectController {
 
   @Autowired
   private ExperimentService experimentService;
+  @Autowired
+  private LibraryService libraryService;
 
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
@@ -118,6 +121,10 @@ public class EditProjectController {
 
   public void setFilesManager(FilesManager filesManager) {
     this.filesManager = filesManager;
+  }
+
+  public void setLibraryService(LibraryService libraryService) {
+    this.libraryService = libraryService;
   }
 
   @InitBinder
@@ -197,7 +204,7 @@ public class EditProjectController {
   }
 
   public Collection<Library> populateProjectLibraries(long projectId) throws IOException {
-    List<Library> libraries = new ArrayList<>(requestManager.listAllLibrariesByProjectId(projectId));
+    List<Library> libraries = new ArrayList<>(libraryService.getAllByProjectId(projectId));
     try {
       Collections.sort(libraries, new AliasComparator(Library.class));
       for (Library l : libraries) {
@@ -304,7 +311,7 @@ public class EditProjectController {
       }
 
       for (Sample sample : samples) {
-        Collection<Library> libraries = requestManager.listAllLibrariesBySampleId(sample.getId());
+        Collection<Library> libraries = libraryService.getAllBySampleId(sample.getId());
         if (libraries.size() == 0) {
           if (sample.getQcPassed()) {
             samplesJSON.put(sample.getName(), "1");

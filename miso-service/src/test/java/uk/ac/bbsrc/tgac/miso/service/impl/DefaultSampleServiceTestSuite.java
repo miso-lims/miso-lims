@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import static org.junit.Assert.*;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.hasTemporaryName;
 import static uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils.generateTemporaryName;
 
 import java.io.IOException;
@@ -136,21 +137,21 @@ public class DefaultSampleServiceTestSuite {
   public void temporarySampleNameTest() throws Exception {
     Sample sample = new SampleImpl();
     sample.setName(generateTemporaryName());
-    assertTrue("Temporary sample names must return true.", DefaultSampleService.hasTemporaryName(sample));
+    assertTrue("Temporary sample names must return true.", hasTemporaryName(sample));
   }
 
   @Test
   public void notTemporarySampleNameTest() throws Exception {
     Sample sample = new SampleImpl();
     sample.setName("RealSampleName");
-    assertFalse("Real sample names must return false.", DefaultSampleService.hasTemporaryName(sample));
+    assertFalse("Real sample names must return false.", hasTemporaryName(sample));
   }
 
   @Test
   public void nullSampleNameTest() throws Exception {
     Sample sample = new SampleImpl();
     sample.setName(null);
-    assertFalse("Non-temporary sample names must return false.", DefaultSampleService.hasTemporaryName(sample));
+    assertFalse("Non-temporary sample names must return false.", hasTemporaryName(sample));
   }
 
   @Test
@@ -158,7 +159,7 @@ public class DefaultSampleServiceTestSuite {
     Sample sample = null;
     assertFalse(
         "A null sample object does not contain a temporary name so must return false.",
-        DefaultSampleService.hasTemporaryName(sample));
+        hasTemporaryName(sample));
   }
 
   @Test

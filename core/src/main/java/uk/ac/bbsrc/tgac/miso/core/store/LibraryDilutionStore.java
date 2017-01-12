@@ -99,32 +99,6 @@ public interface LibraryDilutionStore extends Store<LibraryDilution>, Remover<Li
   Collection<LibraryDilution> listAllLibraryDilutionsByProjectAndPlatform(long projectId, PlatformType platformType) throws IOException;
 
   /**
-   * Get a Dilution by ID barcode, given a PlatformType
-   *
-   * @param barcode
-   *          of type String
-   * @param platformType
-   *          of type PlatformType
-   * @return Dilution
-   * @throws IOException
-   *           when
-   */
-  LibraryDilution getLibraryDilutionByBarcodeAndPlatform(String barcode, PlatformType platformType) throws IOException;
-
-  /**
-   * Get a Dilution by ID, given a PlatformType
-   *
-   * @param dilutionId
-   *          of type long
-   * @param platformType
-   *          of type PlatformType
-   * @return Dilution
-   * @throws IOException
-   *           when
-   */
-  LibraryDilution getLibraryDilutionByIdAndPlatform(long dilutionId, PlatformType platformType) throws IOException;
-
-  /**
    * Get a LibraryDilution by ID barcode
    *
    * @param barcode

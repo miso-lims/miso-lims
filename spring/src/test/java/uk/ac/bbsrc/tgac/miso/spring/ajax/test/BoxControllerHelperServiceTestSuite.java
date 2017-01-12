@@ -42,6 +42,8 @@ import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.integration.BoxScanner;
 import uk.ac.bbsrc.tgac.miso.integration.visionmate.VisionMateScan;
+import uk.ac.bbsrc.tgac.miso.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.spring.ajax.BoxControllerHelperService;
 
@@ -61,6 +63,10 @@ public class BoxControllerHelperServiceTestSuite {
   private RequestManager requestManager;
   @Mock
   private MisoFilesManager misoFileManager;
+  @Mock
+  private LibraryService libraryService;
+  @Mock
+  private SampleService sampleService;
   @Mock
   private User mockUser;
   @Mock
@@ -168,10 +174,10 @@ public class BoxControllerHelperServiceTestSuite {
   public void testSaveBoxContents() throws Exception {
     // mock lookups
     Sample sample = makeSample();
-    when(requestManager.getSampleByBarcode(sample.getIdentificationBarcode())).thenReturn(sample);
+    when(sampleService.getByBarcode(sample.getIdentificationBarcode())).thenReturn(sample);
     
     Library library = makeLibrary();
-    when(requestManager.getLibraryByBarcode(library.getIdentificationBarcode())).thenReturn(library);
+    when(libraryService.getByBarcode(library.getIdentificationBarcode())).thenReturn(library);
     
     // do not add sample/library to box. Testing verifies that this gets done by saveBoxContents by parsing the JSON
     Box box = makeEmptyBox();
@@ -213,7 +219,7 @@ public class BoxControllerHelperServiceTestSuite {
     when(requestManager.getBoxById(box.getId())).thenReturn(box);
     
     Sample sample = makeSample();
-    when(requestManager.getSampleByBarcode(sample.getIdentificationBarcode())).thenReturn(sample);
+    when(sampleService.getByBarcode(sample.getIdentificationBarcode())).thenReturn(sample);
     
     JSONObject json = new JSONObject();
     json.put("boxId", box.getId());
@@ -291,9 +297,9 @@ public class BoxControllerHelperServiceTestSuite {
   @Test
   public void testGetBoxableByBarcode() throws Exception {
     Sample sample = makeSample();
-    when(requestManager.getSampleByBarcode(sample.getIdentificationBarcode())).thenReturn(sample);
+    when(sampleService.getByBarcode(sample.getIdentificationBarcode())).thenReturn(sample);
     Library library = makeLibrary();
-    when(requestManager.getLibraryByBarcode(library.getIdentificationBarcode())).thenReturn(library);
+    when(libraryService.getByBarcode(library.getIdentificationBarcode())).thenReturn(library);
     
     // valid lookups
     assertEquals(sample, boxControllerHelperService.getBoxableByBarcode(sample.getIdentificationBarcode()));
@@ -301,7 +307,7 @@ public class BoxControllerHelperServiceTestSuite {
     
     // invalid - barcode is not unique
     library.setIdentificationBarcode(sample.getIdentificationBarcode());
-    when(requestManager.getLibraryByBarcode(library.getIdentificationBarcode())).thenReturn(library);
+    when(libraryService.getByBarcode(library.getIdentificationBarcode())).thenReturn(library);
     
     exception.expect(DuplicateKeyException.class);
     boxControllerHelperService.getBoxableByBarcode(sample.getIdentificationBarcode());
@@ -310,7 +316,7 @@ public class BoxControllerHelperServiceTestSuite {
   @Test
   public void testLookupBoxableByBarcode() throws Exception {
     Sample sample = makeSample();
-    when(requestManager.getSampleByBarcode(sample.getIdentificationBarcode())).thenReturn(sample);
+    when(sampleService.getByBarcode(sample.getIdentificationBarcode())).thenReturn(sample);
     
     JSONObject json = new JSONObject();
     json.put("barcode", sample.getIdentificationBarcode());
@@ -326,7 +332,7 @@ public class BoxControllerHelperServiceTestSuite {
   public void testLookupBoxableByBarcodeTrashed() throws Exception {
     Sample sample = makeSample();
     sample.setDiscarded(true);
-    when(requestManager.getSampleByBarcode(sample.getIdentificationBarcode())).thenReturn(sample);
+    when(sampleService.getByBarcode(sample.getIdentificationBarcode())).thenReturn(sample);
     
     JSONObject json = new JSONObject();
     json.put("barcode", sample.getIdentificationBarcode());
@@ -340,10 +346,10 @@ public class BoxControllerHelperServiceTestSuite {
   @Test
   public void testLookupBoxableByBarcodeDuplicate() throws Exception {
     Sample sample = makeSample();
-    when(requestManager.getSampleByBarcode(sample.getIdentificationBarcode())).thenReturn(sample);
+    when(sampleService.getByBarcode(sample.getIdentificationBarcode())).thenReturn(sample);
     Library library = makeLibrary();
     library.setIdentificationBarcode(sample.getIdentificationBarcode());
-    when(requestManager.getLibraryByBarcode(library.getIdentificationBarcode())).thenReturn(library);
+    when(libraryService.getByBarcode(library.getIdentificationBarcode())).thenReturn(library);
     
     JSONObject json = new JSONObject();
     json.put("barcode", sample.getIdentificationBarcode());

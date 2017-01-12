@@ -48,4 +48,11 @@ public interface LibraryAdditionalInfoService {
    */
   void delete(Long libraryAdditionalInfoId) throws IOException;
   
+  /**
+   * Get a LibraryAdditionalInfo by its Library ID
+   * 
+   * @param libraryId ID of the LibraryAdditionalInfo's Library
+   * @throws IOException
+   */
+  LibraryAdditionalInfo getByLibraryId(long libraryId) throws IOException;
 }

@@ -60,6 +60,7 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.jackson.LibraryRecursionAvoidanceMixin;
 import uk.ac.bbsrc.tgac.miso.core.util.jackson.SampleProjectAvoidanceMixin;
 import uk.ac.bbsrc.tgac.miso.core.util.jackson.UserInfoMixin;
+import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.SampleGroupService;
 
 /**
@@ -77,12 +78,17 @@ public class ProjectRestController extends RestController {
 
   @Autowired
   private RequestManager requestManager;
-
+  @Autowired
+  private LibraryService libraryService;
   @Autowired
   private SampleGroupService sampleGroupService;
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
+  }
+
+  public void setLibraryService(LibraryService libraryService) {
+    this.libraryService = libraryService;
   }
 
   @RequestMapping(value = "/alias/{projectAlias}", method = RequestMethod.GET, produces = "application/json")
@@ -103,7 +109,7 @@ public class ProjectRestController extends RestController {
     }
     for (Sample s : project.getSamples()) {
       if (s.getLibraries().isEmpty()) {
-        for (Library l : requestManager.listAllLibrariesBySampleId(s.getId())) {
+        for (Library l : libraryService.getAllBySampleId(s.getId())) {
           try {
             s.addLibrary(l);
           } catch (MalformedLibraryException e) {
@@ -130,7 +136,7 @@ public class ProjectRestController extends RestController {
 
   @RequestMapping(value = "{projectId}/libraries", method = RequestMethod.GET, produces = "application/json")
   public @ResponseBody String getProjectLibraries(@PathVariable Long projectId) throws IOException {
-    Collection<Library> lp = requestManager.listAllLibrariesByProjectId(projectId);
+    Collection<Library> lp = libraryService.getAllByProjectId(projectId);
     for (Library l : lp) {
       for (LibraryDilution dil : requestManager.listAllLibraryDilutionsByLibraryId(l.getId())) {
         try {

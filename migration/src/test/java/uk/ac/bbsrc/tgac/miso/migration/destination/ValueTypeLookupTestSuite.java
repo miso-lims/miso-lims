@@ -51,6 +51,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateDetailedQcStatusDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateIndexDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateKitDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLabDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDesignCodeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDesignDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryQcDao;
@@ -62,7 +63,6 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueMaterialDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueOriginDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueTypeDao;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultReferenceGenomeService;
-import uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryDAO;
 
 public class ValueTypeLookupTestSuite {
 
@@ -124,7 +124,7 @@ public class ValueTypeLookupTestSuite {
     Mockito.when(toDao.getTissueOrigin()).thenReturn(tos);
     Mockito.when(mgr.getTissueOriginDao()).thenReturn(toDao);
 
-    SQLLibraryDAO libDao = Mockito.mock(SQLLibraryDAO.class);
+    HibernateLibraryDao libDao = Mockito.mock(HibernateLibraryDao.class);
     List<LibrarySelectionType> lsts = new ArrayList<>();
     lsts.add(makeLibrarySelection(VALID_LONG, VALID_STRING));
     Mockito.when(libDao.listAllLibrarySelectionTypes()).thenReturn(lsts);

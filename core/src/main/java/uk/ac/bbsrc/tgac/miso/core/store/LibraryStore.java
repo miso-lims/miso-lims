@@ -163,11 +163,11 @@ public interface LibraryStore extends Store<Library>, Remover<Library> {
   /**
    * List all LibraryTypes available to a given platform
    *
-   * @param platformName of type String
+   * @param platform PlatformType
    * @return Collection<LibraryType>
    * @throws IOException when
    */
-  Collection<LibraryType> listLibraryTypesByPlatform(String platformName) throws IOException;
+  Collection<LibraryType> listLibraryTypesByPlatform(PlatformType platform) throws IOException;
 
   /**
    * List all LibrarySelectionTypes

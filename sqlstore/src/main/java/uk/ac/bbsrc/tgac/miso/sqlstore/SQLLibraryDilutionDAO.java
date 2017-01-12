@@ -273,26 +273,6 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
   }
 
   @Override
-  public LibraryDilution getLibraryDilutionByBarcodeAndPlatform(String barcode, PlatformType platformType) throws IOException {
-    LibraryDilution b = getLibraryDilutionByBarcode(barcode);
-
-    if (b != null && b.getLibrary().getPlatformName().equals(platformType.getKey())) {
-      return b;
-    }
-    return null;
-  }
-
-  @Override
-  public LibraryDilution getLibraryDilutionByIdAndPlatform(long dilutionId, PlatformType platformType) throws IOException {
-    LibraryDilution b = get(dilutionId);
-
-    if (b != null && b.getLibrary().getPlatformName().equals(platformType.getKey())) {
-      return b;
-    }
-    return null;
-  }
-
-  @Override
   @Cacheable(cacheName = "libraryDilutionCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
       @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public LibraryDilution get(long dilutionId) throws IOException {

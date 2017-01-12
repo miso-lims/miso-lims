@@ -65,6 +65,7 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.MisoAuthority;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 
 /**
  * uk.ac.bbsrc.tgac.miso.miso.spring.ajax
@@ -84,6 +85,8 @@ public class DashboardHelperService {
   private RequestManager requestManager;
   @Autowired
   private ExperimentService experimentService;
+  @Autowired
+  private LibraryService libraryService;
 
   public JSONObject checkUser(HttpSession session, JSONObject json) {
     String username = json.getString("username");
@@ -349,13 +352,13 @@ public class DashboardHelperService {
       List<Library> libraries;
       StringBuilder b = new StringBuilder();
       if (!isStringEmptyOrNull(searchStr)) {
-        libraries = new ArrayList<>(requestManager.listAllLibrariesBySearch(searchStr));
+        libraries = new ArrayList<>(libraryService.getAllBySearch(searchStr));
         if (libraries.isEmpty()) {
           // Base64-encoded string, most likely a barcode image beeped in. decode and search
-          libraries = new ArrayList<>(requestManager.listAllLibrariesBySearch(new String(Base64.decodeBase64(searchStr))));
+          libraries = new ArrayList<>(libraryService.getAllBySearch(new String(Base64.decodeBase64(searchStr))));
         }
       } else {
-        libraries = new ArrayList<>(requestManager.listAllLibrariesWithLimit(50));
+        libraries = new ArrayList<>(libraryService.getAllWithLimit(50));
       }
 
       if (libraries.size() > 0) {
@@ -569,5 +572,9 @@ public class DashboardHelperService {
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
+  }
+
+  public void setLibraryService(LibraryService libraryService) {
+    this.libraryService = libraryService;
   }
 }

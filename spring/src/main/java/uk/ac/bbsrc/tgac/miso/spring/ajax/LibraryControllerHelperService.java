@@ -76,6 +76,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
@@ -89,6 +90,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.IndexStore;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.integration.context.ApplicationContextProvider;
+import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.PrinterService;
 import uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils;
 import uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils.BarcodePrintAssister;
@@ -138,21 +140,21 @@ public class LibraryControllerHelperService {
   }
 
   public static final class LibraryBarcodeAssister implements BarcodePrintAssister<Library> {
-    private final RequestManager requestManager;
+    private final LibraryService libraryService;
 
-    public LibraryBarcodeAssister(RequestManager requestManager) {
+    public LibraryBarcodeAssister(LibraryService libraryService) {
       super();
-      this.requestManager = requestManager;
+      this.libraryService = libraryService;
     }
 
     @Override
     public Library fetch(long id) throws IOException {
-      return requestManager.getLibraryById(id);
+      return libraryService.get(id);
     }
 
     @Override
     public void store(Library library) throws IOException {
-      requestManager.saveLibrary(library);
+      libraryService.save(library);
     }
 
     @Override
@@ -167,7 +169,7 @@ public class LibraryControllerHelperService {
 
     @Override
     public Iterable<Library> fetchAll(long projectId) throws IOException {
-      return requestManager.listAllLibrariesByProjectId(projectId);
+      return libraryService.getAllByProjectId(projectId);
     }
   }
 
@@ -186,6 +188,8 @@ public class LibraryControllerHelperService {
   private IndexStore indexStore;
   @Autowired
   private NamingScheme namingScheme;
+  @Autowired
+  private LibraryService libraryService;
 
   public JSONObject validateLibraryAlias(HttpSession session, JSONObject json) {
     if (json.has("alias")) {
@@ -210,7 +214,7 @@ public class LibraryControllerHelperService {
 
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Library library = requestManager.getLibraryById(libraryId);
+      Library library = libraryService.get(libraryId);
       Note note = new Note();
       internalOnly = internalOnly.equals("on") ? "true" : "false";
       note.setInternalOnly(Boolean.parseBoolean(internalOnly));
@@ -218,9 +222,9 @@ public class LibraryControllerHelperService {
       note.setOwner(user);
       note.setCreationDate(new Date());
       library.getNotes().add(note);
-      requestManager.saveLibraryNote(library, note);
+      libraryService.addNote(library, note);
       library.setLastModifier(user);
-      requestManager.saveLibrary(library);
+      libraryService.save(library);
     } catch (IOException e) {
       log.error("add library note", e);
       return JSONUtils.SimpleJSONError(e.getMessage());
@@ -234,8 +238,8 @@ public class LibraryControllerHelperService {
     Long noteId = json.getLong("noteId");
 
     try {
-      Library library = requestManager.getLibraryById(libraryId);
-      requestManager.deleteLibraryNote(library, noteId);
+      Library library = libraryService.get(libraryId);
+      libraryService.deleteNote(library, noteId);
       return JSONUtils.SimpleJSONResponse("OK");
     } catch (IOException e) {
       log.error("delete library note", e);
@@ -247,7 +251,7 @@ public class LibraryControllerHelperService {
     Long libraryId = json.getLong("libraryId");
     File temploc = getBarcodeFileLocation(session);
     try {
-      Library library = requestManager.getLibraryById(libraryId);
+      Library library = libraryService.get(libraryId);
       barcodeFactory.setPointPixels(1.5f);
       barcodeFactory.setBitmapResolution(600);
       RenderedImage bi = null;
@@ -283,7 +287,7 @@ public class LibraryControllerHelperService {
   }
 
   public JSONObject printLibraryBarcodes(HttpSession session, JSONObject json) {
-    return ControllerHelperServiceUtils.printBarcodes(printerService, json, new LibraryBarcodeAssister(requestManager));
+    return ControllerHelperServiceUtils.printBarcodes(printerService, json, new LibraryBarcodeAssister(libraryService));
   }
 
   public JSONObject printLibraryDilutionBarcodes(HttpSession session, JSONObject json) {
@@ -299,7 +303,7 @@ public class LibraryControllerHelperService {
       String newLocation = LimsUtils.lookupLocation(locationBarcode);
       if (newLocation != null) {
         User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-        Library library = requestManager.getLibraryById(libraryId);
+        Library library = libraryService.get(libraryId);
         String oldLocation = library.getLocationBarcode();
         library.setLocationBarcode(newLocation);
 
@@ -308,10 +312,8 @@ public class LibraryControllerHelperService {
         note.setText("Location changed from " + oldLocation + " to " + newLocation + " by " + user.getLoginName() + " on " + new Date());
         note.setOwner(user);
         note.setCreationDate(new Date());
-        library.getNotes().add(note);
-        requestManager.saveLibraryNote(library, note);
-        library.setLastModifier(user);
-        requestManager.saveLibrary(library);
+        libraryService.addNote(library, note);
+        libraryService.save(library);
       } else {
         return JSONUtils.SimpleJSONError("New location barcode not recognised");
       }
@@ -328,8 +330,10 @@ public class LibraryControllerHelperService {
     String idBarcode = json.getString("identificationBarcode");
 
     try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      if (!isStringEmptyOrNull(idBarcode)) {
+      if (isStringEmptyOrNull(idBarcode)) {
+        // if the user accidentally deletes a barcode, the changelogs will have a record of the original barcode
+        idBarcode = null;
+      } else {
         List<Boxable> previouslyBarcodedItems = new ArrayList<>(requestManager.getBoxablesFromBarcodeList(Arrays.asList(idBarcode)));
         if (!previouslyBarcodedItems.isEmpty()
             && !(previouslyBarcodedItems.size() == 1 && previouslyBarcodedItems.get(0).getId() == libraryId)) {
@@ -340,13 +344,10 @@ public class LibraryControllerHelperService {
           log.debug(error);
           return JSONUtils.SimpleJSONError(error);
         }
-        Library library = requestManager.getLibraryById(libraryId);
-        library.setIdentificationBarcode(idBarcode);
-        library.setLastModifier(user);
-        requestManager.saveLibrary(library);
-      } else {
-        return JSONUtils.SimpleJSONError("New identification barcode not recognized");
-      }
+    }
+    Library library = libraryService.get(libraryId);
+    library.setIdentificationBarcode(idBarcode);
+    libraryService.save(library);
     } catch (IOException e) {
       log.debug("Could not change Library identificationBarcode: " + e.getMessage());
       return JSONUtils.SimpleJSONError(e.getMessage());
@@ -421,9 +422,9 @@ public class LibraryControllerHelperService {
               library.setLocationBarcode(locationBarcode);
               library.setQcPassed(false);
               library
-                  .setLibraryType(requestManager.getLibraryTypeByDescriptionAndPlatform(type, PlatformType.get(library.getPlatformName())));
-              library.setLibrarySelectionType(requestManager.getLibrarySelectionTypeByName(selectionType));
-              library.setLibraryStrategyType(requestManager.getLibraryStrategyTypeByName(strategyType));
+                  .setLibraryType(libraryService.getLibraryTypeByDescriptionAndPlatform(type, PlatformType.get(library.getPlatformName())));
+              library.setLibrarySelectionType(libraryService.getLibrarySelectionTypeByName(selectionType));
+              library.setLibraryStrategyType(libraryService.getLibraryStrategyTypeByName(strategyType));
               library.setLastModifier(user);
 
               boolean paired = false;
@@ -467,7 +468,7 @@ public class LibraryControllerHelperService {
           List<Library> sortedList = new ArrayList<>(saveSet);
           Collections.sort(sortedList, new AliasComparator(Library.class));
           for (Library library : sortedList) {
-            requestManager.saveLibrary(library);
+            libraryService.save(library);
           }
         } catch (Exception e) {
           log.error("Error saving bulk libraries", e);
@@ -499,7 +500,7 @@ public class LibraryControllerHelperService {
 
         StringBuilder libsb = new StringBuilder();
         List<LibraryType> types = new ArrayList<>();
-        for (LibraryType type : requestManager.listLibraryTypesByPlatform(platform)) {
+        for (LibraryType type : libraryService.getAllLibraryTypesByPlatform(PlatformType.get(platform))) {
           if (!type.getArchived() || type.getId() == originalLibraryTypeId) {
             types.add(type);
           }
@@ -556,7 +557,7 @@ public class LibraryControllerHelperService {
   public JSONObject getLibraryQcTypes(HttpSession session, JSONObject json) {
     try {
       StringBuilder sb = new StringBuilder();
-      Collection<QcType> types = requestManager.listAllLibraryQcTypes();
+      Collection<QcType> types = libraryService.getAllLibraryQcTypes();
       for (QcType s : types) {
         sb.append("<option units='" + s.getUnits() + "' value='" + s.getQcTypeId() + "'>" + s.getName() + "</option>");
       }
@@ -627,7 +628,7 @@ public class LibraryControllerHelperService {
       }
       if (json.has("libraryId") && !isStringEmptyOrNull(json.getString("libraryId"))) {
         Long libraryId = Long.parseLong(json.getString("libraryId"));
-        Library library = requestManager.getLibraryById(libraryId);
+        Library library = libraryService.get(libraryId);
         LibraryQC newQc = new LibraryQCImpl();
         if (json.has("qcPassed") && json.getString("qcPassed").equals("true")) {
           library.setQcPassed(true);
@@ -637,8 +638,7 @@ public class LibraryControllerHelperService {
         newQc.setQcType(requestManager.getLibraryQcTypeById(json.getLong("qcType")));
         newQc.setResults(Double.parseDouble(json.getString("results")));
         newQc.setInsertSize(Integer.parseInt(json.getString("insertSize")));
-        library.addQc(newQc);
-        requestManager.saveLibraryQC(newQc);
+        libraryService.addQc(library, newQc);
 
         StringBuilder sb = new StringBuilder();
         sb.append("<tr><th>QCed By</th><th>QC Date</th><th>Method</th><th>Results</th><th>Insert Size</th></tr>");
@@ -713,16 +713,16 @@ public class LibraryControllerHelperService {
     try {
       for (Object k : json.keySet()) {
         String key = (String) k;
-        if (isStringEmptyOrNull(json.getString(key))) {
+        if (isStringEmptyOrNull(json.getString(key)) && !key.equals("idBarcode")) {
           return JSONUtils.SimpleJSONError("Please enter a value for '" + key + "'");
         }
       }
       if (json.has("libraryId") && !isStringEmptyOrNull(json.getString("libraryId"))) {
         Long libraryId = Long.parseLong(json.getString("libraryId"));
-        Library library = requestManager.getLibraryById(libraryId);
+        Library library = libraryService.get(libraryId);
         LibraryDilution newDilution = new LibraryDilution();
         newDilution.setSecurityProfile(library.getSecurityProfile());
-        newDilution.setDilutionCreator(json.getString("dilutionCreator"));
+        newDilution.setDilutionUserName(json.getString("dilutionCreator"));
         newDilution.setCreationDate(new SimpleDateFormat("dd/MM/yyyy").parse(json.getString("dilutionDate")));
         newDilution.setLastModified(newDilution.getCreationDate());
         newDilution.setConcentration(Double.parseDouble(json.getString("results")));
@@ -756,7 +756,7 @@ public class LibraryControllerHelperService {
           SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
           sb.append("<tr>");
           sb.append("<td>" + dil.getName() + "</td>");
-          sb.append("<td>" + dil.getDilutionCreator() + "</td>");
+          sb.append("<td>" + dil.getDilutionUserName() + "</td>");
           sb.append("<td>" + date.format(dil.getCreationDate()) + "</td>");
           sb.append("<td>" + LimsUtils.round(dil.getConcentration(), 2) + " " + dil.getUnits() + "</td>");
           if (json.has("targetedSequencing")) {
@@ -926,7 +926,7 @@ public class LibraryControllerHelperService {
 
         libraryQc.setResults(Double.parseDouble(json.getString("result")));
         libraryQc.setInsertSize(Integer.parseInt(json.getString("insertSize")));
-        requestManager.saveLibraryQC(libraryQc);
+        libraryService.addQc(libraryService.get(libraryQc.getLibrary().getId()), libraryQc);
 
       }
       return JSONUtils.SimpleJSONResponse("done");
@@ -949,7 +949,7 @@ public class LibraryControllerHelperService {
       if (json.has("libraryId")) {
         Long libraryId = json.getLong("libraryId");
         try {
-          requestManager.deleteLibrary(requestManager.getLibraryById(libraryId));
+          libraryService.delete(libraryService.get(libraryId));
           return JSONUtils.SimpleJSONResponse("Library deleted");
         } catch (IOException e) {
           log.error("cannot delete library", e);
@@ -1016,5 +1016,9 @@ public class LibraryControllerHelperService {
 
   public void setIndexStore(IndexStore indexStore) {
     this.indexStore = indexStore;
+  }
+
+  public void setLibraryService(LibraryService libraryService) {
+    this.libraryService = libraryService;
   }
 }

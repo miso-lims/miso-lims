@@ -89,7 +89,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 public abstract class AbstractLibrary extends AbstractBoxable implements Library {
 
   protected static final Logger log = LoggerFactory.getLogger(AbstractLibrary.class);
-  public static final Long UNSAVED_ID = 0L;
+
   public static final String UNITS = "nM";
 
   @Id
@@ -417,6 +417,11 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   }
 
   @Override
+  public void addNote(Note note) {
+    this.notes.add(note);
+  }
+
+  @Override
   public void setNotes(Collection<Note> notes) {
     this.notes = notes;
   }
@@ -485,8 +490,7 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
 
   @CoverageIgnore
   @Override
-  public int compareTo(Object o) {
-    final Library l = (Library) o;
+  public int compareTo(Library l) {
     if (getId() != 0L && l.getId() != 0L) {
       if (getId() < l.getId()) return -1;
       if (getId() > l.getId()) return 1;

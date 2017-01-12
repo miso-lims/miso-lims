@@ -82,4 +82,12 @@ public class DefaultLibraryAdditionalInfoService implements LibraryAdditionalInf
     libraryAdditionalInfoDao.deleteLibraryAdditionalInfo(libraryAdditionalInfo);
   }
 
+  @Override
+  public LibraryAdditionalInfo getByLibraryId(long libraryId) throws IOException {
+    authorizationManager.throwIfUnauthenticated();
+    LibraryAdditionalInfo selected = libraryAdditionalInfoDao.getLibraryAdditionalInfoByLibraryId(libraryId);
+    authorizationManager.throwIfNotReadable(selected.getLibrary());
+    return selected;
+  }
+
 }

@@ -60,7 +60,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
 import uk.ac.bbsrc.tgac.miso.core.util.jackson.ProjectSampleRecursionAvoidanceMixin;
 import uk.ac.bbsrc.tgac.miso.core.util.jackson.SampleRecursionAvoidanceMixin;
@@ -68,6 +67,8 @@ import uk.ac.bbsrc.tgac.miso.core.util.jackson.UserInfoMixin;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
+import uk.ac.bbsrc.tgac.miso.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 /**
@@ -84,22 +85,26 @@ public class LibraryRestController extends RestController {
   protected static final Logger log = LoggerFactory.getLogger(LibraryRestController.class);
 
   @Autowired
-  private RequestManager requestManager;
-
-  @Autowired
   private AuthorizationManager authorizationManager;
-
   @Autowired
   private IndexService indexService;
+  @Autowired
+  private LibraryService libraryService;
+  @Autowired
+  private SampleService sampleService;
 
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
+  public void setLibraryService(LibraryService libraryService) {
+    this.libraryService = libraryService;
+  }
+
+  public void setSampleService(SampleService sampleService) {
+    this.sampleService = sampleService;
   }
 
   @RequestMapping(value = "{libraryId}", method = RequestMethod.GET, produces = "application/json")
   public @ResponseBody String getLibraryById(@PathVariable Long libraryId) throws IOException {
     ObjectMapper mapper = new ObjectMapper();
-    Library l = requestManager.getLibraryById(libraryId);
+    Library l = libraryService.get(libraryId);
     if (l == null) {
       throw new RestException("No library found with ID: " + libraryId, Status.NOT_FOUND);
     }
@@ -111,7 +116,7 @@ public class LibraryRestController extends RestController {
 
   @RequestMapping(method = RequestMethod.GET, produces = "application/json")
   public @ResponseBody String listAllLibraries() throws IOException {
-    Collection<Library> libraries = requestManager.listAllLibraries();
+    Collection<Library> libraries = libraryService.getAll();
     ObjectMapper mapper = new ObjectMapper();
     mapper.getSerializationConfig().addMixInAnnotations(Project.class, ProjectSampleRecursionAvoidanceMixin.class);
     mapper.getSerializationConfig().addMixInAnnotations(Sample.class, SampleRecursionAvoidanceMixin.class);
@@ -123,12 +128,12 @@ public class LibraryRestController extends RestController {
     User user = authorizationManager.getCurrentUser();
     library.setLastModifier(user);
     if (libraryDto.getLibrarySelectionTypeId() != null) {
-      library.setLibrarySelectionType(requestManager.getLibrarySelectionTypeById(libraryDto.getLibrarySelectionTypeId()));
+      library.setLibrarySelectionType(libraryService.getLibrarySelectionTypeById(libraryDto.getLibrarySelectionTypeId()));
     }
     if (libraryDto.getLibraryStrategyTypeId() != null) {
-      library.setLibraryStrategyType(requestManager.getLibraryStrategyTypeById(libraryDto.getLibraryStrategyTypeId()));
+      library.setLibraryStrategyType(libraryService.getLibraryStrategyTypeById(libraryDto.getLibraryStrategyTypeId()));
     }
-    library.setLibraryType(requestManager.getLibraryTypeById(libraryDto.getLibraryTypeId()));
+    library.setLibraryType(libraryService.getLibraryTypeById(libraryDto.getLibraryTypeId()));
     List<Index> indices = new ArrayList<>();
     if (libraryDto.getIndex1Id() != null) {
       indices.add(indexService.getIndexById(libraryDto.getIndex1Id()));
@@ -143,7 +148,7 @@ public class LibraryRestController extends RestController {
       library.getLibraryAdditionalInfo().setCreatedBy(user);
       library.getLibraryAdditionalInfo().setUpdatedBy(user);
     }
-    return requestManager.saveLibrary(library);
+    return libraryService.save(library).getId();
   }
 
   @RequestMapping(method = RequestMethod.POST, headers = { "Content-type=application/json" })
@@ -158,7 +163,7 @@ public class LibraryRestController extends RestController {
     try {
       Library library = Dtos.to(libraryDto);
       library.setCreationDate(new Date());
-      library.setSample(requestManager.getSampleById(libraryDto.getParentSampleId()));
+      library.setSample(sampleService.get(libraryDto.getParentSampleId()));
       library.inheritPermissions(library.getSample());
       id = populateAndSaveLibraryFromDto(libraryDto, library, true);
     } catch (ConstraintViolationException | IllegalArgumentException e) {
@@ -183,7 +188,7 @@ public class LibraryRestController extends RestController {
           "Received null libraryDto from front end; cannot convert to Library. Something likely went wrong in the JS DTO conversion.");
       throw new RestException("Cannot convert null to Library", Status.BAD_REQUEST);
     }
-    Library library = requestManager.getLibraryById(id);
+    Library library = libraryService.get(id);
     if (library == null) {
       throw new RestException("No such library.", Status.NOT_FOUND);
     }
@@ -197,7 +202,7 @@ public class LibraryRestController extends RestController {
   public DataTablesResponseDto<LibraryDto> getLibraries(HttpServletRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
     if (request.getParameterMap().size() > 0) {
-      Long numLibraries = Long.valueOf(requestManager.countLibraries());
+      Long numLibraries = Long.valueOf(libraryService.count());
       // get request params from DataTables
       Integer iDisplayStart = Integer.parseInt(request.getParameter("iDisplayStart"));
       Integer iDisplayLength = Integer.parseInt(request.getParameter("iDisplayLength"));
@@ -211,10 +216,10 @@ public class LibraryRestController extends RestController {
       Long numMatches;
 
       if (!isStringEmptyOrNull(sSearch)) {
-        librarySubset = requestManager.getLibrariesByPageSizeSearch(iDisplayStart, iDisplayLength, sSearch, sSortDir, sortCol);
-        numMatches = Long.valueOf(requestManager.countLibrariesBySearch(sSearch));
+        librarySubset = libraryService.getAllByPageSizeAndSearch(iDisplayStart, iDisplayLength, sSearch, sSortDir, sortCol);
+        numMatches = Long.valueOf(libraryService.countBySearch(sSearch));
       } else {
-        librarySubset = requestManager.getLibrariesByPageAndSize(iDisplayStart, iDisplayLength, sSortDir, sortCol);
+        librarySubset = libraryService.getAllByPageAndSize(iDisplayStart, iDisplayLength, sSortDir, sortCol);
         numMatches = numLibraries;
       }
       List<LibraryDto> libraryDtos = Dtos.asLibraryDtos(librarySubset);

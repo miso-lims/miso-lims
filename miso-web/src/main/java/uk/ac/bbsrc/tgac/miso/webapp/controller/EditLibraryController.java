@@ -104,9 +104,10 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryAdditionalInfoDto;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
-import uk.ac.bbsrc.tgac.miso.persistence.LibraryAdditionalInfoDao;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryAdditionalInfoService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 /**
@@ -137,12 +138,13 @@ public class EditLibraryController {
 
   @Autowired
   private IndexService indexService;
-
+  @Autowired
+  private LibraryService libraryService;
   @Autowired
   private LibraryAdditionalInfoService libraryAdditionalInfoService;
 
   @Autowired
-  private LibraryAdditionalInfoDao libraryAdditionalInfoDao;
+  private SampleService sampleService;
 
   @Autowired
   private LibraryDesignDao libraryDesignDao;
@@ -167,6 +169,14 @@ public class EditLibraryController {
 
   public void setLibraryAdditionalInfoService(LibraryAdditionalInfoService libraryAdditionalInfoService) {
     this.libraryAdditionalInfoService = libraryAdditionalInfoService;
+  }
+
+  public void setLibraryService(LibraryService libraryService) {
+    this.libraryService = libraryService;
+  }
+
+  public void setSampleService(SampleService sampleService) {
+    this.sampleService = sampleService;
   }
 
   @Value("${miso.notification.interop.enabled}")
@@ -195,8 +205,8 @@ public class EditLibraryController {
     if (l.getId() == AbstractLibrary.UNSAVED_ID) {
       return;
     }
-    model.put("previousLibrary", requestManager.getAdjacentLibraryById(l.getId(), true));
-    model.put("nextLibrary", requestManager.getAdjacentLibraryById(l.getId(), false));
+    model.put("previousLibrary", libraryService.getAdjacentLibrary(l.getId(), true));
+    model.put("nextLibrary", libraryService.getAdjacentLibrary(l.getId(), false));
 
   }
 
@@ -220,7 +230,7 @@ public class EditLibraryController {
 
   public Collection<LibraryType> populateLibraryTypesByPlatform(String platform) throws IOException {
     List<LibraryType> types = new ArrayList<>();
-    for (LibraryType type : requestManager.listLibraryTypesByPlatform(platform)) {
+    for (LibraryType type : libraryService.getAllLibraryTypesByPlatform(PlatformType.get(platform))) {
       if (!type.getArchived()) {
         types.add(type);
       }
@@ -230,14 +240,14 @@ public class EditLibraryController {
   }
 
   public Collection<LibraryType> populateLibraryTypes() throws IOException {
-    List<LibraryType> types = new ArrayList<>(requestManager.listAllLibraryTypes());
+    List<LibraryType> types = new ArrayList<>(libraryService.getAllLibraryTypes());
     Collections.sort(types);
     return types;
   }
 
   @ModelAttribute("maxLengths")
   public Map<String, Integer> maxLengths() throws IOException {
-    return requestManager.getLibraryColumnSizes();
+    return libraryService.getLibraryColumnSizes();
   }
 
   private Collection<String> populatePlatformNames(List<String> current) throws IOException {
@@ -279,7 +289,7 @@ public class EditLibraryController {
 
   @ModelAttribute("librarySelectionTypes")
   public Collection<LibrarySelectionType> populateLibrarySelectionTypes() throws IOException {
-    List<LibrarySelectionType> types = new ArrayList<>(requestManager.listAllLibrarySelectionTypes());
+    List<LibrarySelectionType> types = new ArrayList<>(libraryService.getAllLibrarySelectionTypes());
     Collections.sort(types);
     return types;
   }
@@ -295,7 +305,7 @@ public class EditLibraryController {
 
   @ModelAttribute("libraryStrategyTypes")
   public Collection<LibraryStrategyType> populateLibraryStrategyTypes() throws IOException {
-    List<LibraryStrategyType> types = new ArrayList<>(requestManager.listAllLibraryStrategyTypes());
+    List<LibraryStrategyType> types = new ArrayList<>(libraryService.getAllLibraryStrategyTypes());
     Collections.sort(types);
     return types;
   }
@@ -528,7 +538,7 @@ public class EditLibraryController {
     final JSONObject rtn = new JSONObject();
     final List<String> rtnLibTypes = new ArrayList<>();
     if (!isStringEmptyOrNull(platform)) {
-      final Collection<LibraryType> libTypes = requestManager.listLibraryTypesByPlatform(platform);
+      final Collection<LibraryType> libTypes = libraryService.getAllLibraryTypesByPlatform(PlatformType.get(platform));
       for (final LibraryType type : libTypes) {
         rtnLibTypes.add(type.getDescription());
       }
@@ -630,7 +640,7 @@ public class EditLibraryController {
   public ModelAndView setupForm(@PathVariable Long libraryId, ModelMap model) throws IOException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Library library = requestManager.getLibraryById(libraryId);
+      Library library = libraryService.get(libraryId);
 
       if (library == null) {
         throw new SecurityException("No such Library.");
@@ -640,7 +650,7 @@ public class EditLibraryController {
       }
 
       Long libraryPrepKitId = null;
-      LibraryAdditionalInfo libraryAdditionalInfo = libraryAdditionalInfoDao.getLibraryAdditionalInfoByLibraryId(libraryId);
+      LibraryAdditionalInfo libraryAdditionalInfo = libraryAdditionalInfoService.getByLibraryId(libraryId);
       library.setLibraryAdditionalInfo(libraryAdditionalInfo);
       if (libraryAdditionalInfo != null && libraryAdditionalInfo.getPrepKit() != null) {
         libraryPrepKitId = libraryAdditionalInfo.getPrepKit().getId();
@@ -694,7 +704,7 @@ public class EditLibraryController {
         }
         model.put("title", "New Library");
       } else {
-        library = requestManager.getLibraryById(libraryId);
+        library = libraryService.get(libraryId);
         model.put("title", "Library " + libraryId);
         if (library.getIndices() != null && !library.getIndices().isEmpty() && library.getIndices().get(1) != null) {
           model.put("selectedIndexFamily", library.getIndices().get(1).getFamily().getName());
@@ -708,7 +718,7 @@ public class EditLibraryController {
 
       SampleClass sampleClass = null;
       if (sampleId != null) {
-        Sample sample = requestManager.getSampleById(sampleId);
+        Sample sample = sampleService.get(sampleId);
         library.setSample(sample);
         model.put("sample", sample);
         if (LimsUtils.isDetailedSample(sample)) {
@@ -725,7 +735,7 @@ public class EditLibraryController {
         Matcher mat = pat.matcher(sample.getAlias());
         if (mat.matches()) {
           // convert the sample alias automatically to a library alias
-          int numLibs = requestManager.listAllLibrariesBySampleId(sample.getId()).size();
+          int numLibs = libraryService.getAllBySampleId(sample.getId()).size();
           String autogenLibAlias = mat.group(1) + "_" + "L" + mat.group(2) + "-" + (numLibs + 1) + "_" + mat.group(3);
           model.put("autogeneratedLibraryAlias", autogenLibAlias);
         }
@@ -841,7 +851,7 @@ public class EditLibraryController {
       ObjectMapper mapper = new ObjectMapper();
       List<LibraryDto> libraryDtos = new ArrayList<>();
       List<String> currentPlatforms = new ArrayList<>();
-      for (Library library : requestManager.getLibrariesByIdList(idList)) {
+      for (Library library : libraryService.getAllByIdList(idList)) {
         LibraryAdditionalInfo lai = null;
         if (isDetailedSampleEnabled()) {
           lai = libraryAdditionalInfoService.get(library.getId());
@@ -885,7 +895,7 @@ public class EditLibraryController {
       List<Long> idList = getIdsFromString(libraryIds);
       ObjectMapper mapper = new ObjectMapper();
       List<LibraryDto> libraryDtos = new ArrayList<>();
-      for (Library library : requestManager.getLibrariesByIdList(idList)) {
+      for (Library library : libraryService.getAllByIdList(idList)) {
         LibraryAdditionalInfo lai = null;
         if (isDetailedSampleEnabled()) {
           lai = libraryAdditionalInfoService.get(library.getId());
@@ -937,8 +947,8 @@ public class EditLibraryController {
             // If a design is selected, these form elements are disabled and therefore not submitted.
             LibraryDesign design = libraryDesignDao.getLibraryDesign(library.getLibraryAdditionalInfo().getLibraryDesign().getId());
             library.getLibraryAdditionalInfo().setLibraryDesign(design);
-            library.setLibrarySelectionType(requestManager.getLibrarySelectionTypeById(design.getLibrarySelectionType().getId()));
-            library.setLibraryStrategyType(requestManager.getLibraryStrategyTypeById(design.getLibraryStrategyType().getId()));
+            library.setLibrarySelectionType(libraryService.getLibrarySelectionTypeById(design.getLibrarySelectionType().getId()));
+            library.setLibraryStrategyType(libraryService.getLibraryStrategyTypeById(design.getLibraryStrategyType().getId()));
             library.getLibraryAdditionalInfo().setLibraryDesignCode(libraryDesignCodeDao
                 .getLibraryDesignCode(library.getLibraryAdditionalInfo().getLibraryDesign().getLibraryDesignCode().getId()));
           }
@@ -949,7 +959,7 @@ public class EditLibraryController {
         library.getLibraryAdditionalInfo().setUpdatedBy(user);
       }
 
-      requestManager.saveLibrary(library);
+      libraryService.save(library);
 
       session.setComplete();
       model.clear();
@@ -974,10 +984,10 @@ public class EditLibraryController {
           ObjectMapper mapper = new ObjectMapper();
           LibraryDto libDto = mapper.readValue(lDto.toString(), LibraryDto.class);
           Library library = Dtos.to(libDto);
-          library.setSample(requestManager.getSampleById(libDto.getParentSampleId()));
-          library.setLibrarySelectionType(requestManager.getLibrarySelectionTypeById(libDto.getLibrarySelectionTypeId()));
-          library.setLibraryStrategyType(requestManager.getLibraryStrategyTypeById(libDto.getLibraryStrategyTypeId()));
-          library.setLibraryType(requestManager.getLibraryTypeById(libDto.getLibraryTypeId()));
+          library.setSample(sampleService.get(libDto.getParentSampleId()));
+          library.setLibrarySelectionType(libraryService.getLibrarySelectionTypeById(libDto.getLibrarySelectionTypeId()));
+          library.setLibraryStrategyType(libraryService.getLibraryStrategyTypeById(libDto.getLibraryStrategyTypeId()));
+          library.setLibraryType(libraryService.getLibraryTypeById(libDto.getLibraryTypeId()));
 
           if (!library.userCanWrite(user)) {
             throw new SecurityException("Permission denied.");
@@ -992,7 +1002,7 @@ public class EditLibraryController {
             library.getLibraryAdditionalInfo().setUpdatedBy(user);
           }
 
-          Long savedId = requestManager.saveLibrary(library);
+          Long savedId = libraryService.save(library).getId();
           savedLibraryIds.add(savedId);
         }
         return "redirect:/miso/library/bulk/edit/" + savedLibraryIds.toString();

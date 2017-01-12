@@ -89,6 +89,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignCodeDao;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SequencingParametersDao;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.ReferenceGenomeService;
 
 /**
@@ -112,18 +113,19 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
   @Autowired
   private BoxStore sqlBoxDAO;
-
+  @Autowired
+  private ExperimentService experimentService;
+  @Autowired
+  private IndexService indexService;
+  @Autowired
+  private LibraryService libraryService;
   @Autowired
   private ReferenceGenomeService referenceGenomeService;
 
   @Autowired
-  private IndexService indexService;
-
-  @Autowired
   private SequencingParametersDao sequencingParametersDao;
 
-  @Autowired
-  private ExperimentService experimentService;
+
 
   /**
    * Simplified interface to convert form data to fields.
@@ -473,7 +475,7 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
     new BindingConverterById<Library>(Library.class) {
       @Override
       public Library resolveById(long id) throws Exception {
-        return requestManager.getLibraryById(id);
+        return libraryService.get(id);
       }
 
     }.register(binder).register(binder, Set.class, "libraries");
@@ -505,7 +507,7 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
     new BindingConverterById<LibraryType>(LibraryType.class) {
       @Override
       public LibraryType resolveById(long id) throws Exception {
-        return requestManager.getLibraryTypeById(id);
+        return libraryService.getLibraryTypeById(id);
       }
 
     }.register(binder).register(binder, Set.class, "libraryTypes");
@@ -513,14 +515,14 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
     new BindingConverterById<LibrarySelectionType>(LibrarySelectionType.class) {
       @Override
       public LibrarySelectionType resolveById(long id) throws Exception {
-        return requestManager.getLibrarySelectionTypeById(id);
+        return libraryService.getLibrarySelectionTypeById(id);
       }
     }.register(binder).register(binder, Set.class, "librarySelectionTypes");
 
     new BindingConverterById<LibraryStrategyType>(LibraryStrategyType.class) {
       @Override
       public LibraryStrategyType resolveById(long id) throws Exception {
-        return requestManager.getLibraryStrategyTypeById(id);
+        return libraryService.getLibraryStrategyTypeById(id);
       }
     }.register(binder).register(binder, Set.class, "libraryStrategyTypes");
 
@@ -656,5 +658,9 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
       }
 
     });
+  }
+
+  public void setLibraryService(LibraryService libraryService) {
+    this.libraryService = libraryService;
   }
 }

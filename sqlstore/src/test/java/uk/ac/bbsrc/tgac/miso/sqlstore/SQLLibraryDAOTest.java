@@ -11,8 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.CascadeType;
-
+import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -20,7 +19,6 @@ import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -31,17 +29,14 @@ import com.eaglegenomics.simlims.core.store.SecurityStore;
 import net.sf.ehcache.CacheManager;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
-import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAdditionalInfoImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.IndexStore;
@@ -50,14 +45,15 @@ import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.persistence.LibraryAdditionalInfoDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateChangeLogDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryQcDao;
 
 public class SQLLibraryDAOTest extends AbstractDAOTest {
 
   @Autowired
-  @Spy
   private JdbcTemplate jdbcTemplate;
-
+  @Autowired
+  private SessionFactory sessionFactory;
   @Mock
   private SecurityStore securityDAO;
   @Mock
@@ -78,7 +74,7 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
   private HibernateChangeLogDao changeLogDAO;
 
   @InjectMocks
-  private SQLLibraryDAO dao;
+  private HibernateLibraryDao dao;
 
   // Auto-increment sequence doesn't roll back with transactions, so must be tracked
   private static long nextAutoIncrementId = 15L;
@@ -86,12 +82,8 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
   @Before
   public void setup() throws IOException {
     MockitoAnnotations.initMocks(this);
-    dao.setJdbcTemplate(jdbcTemplate);
-    dao.setDataObjectFactory(new TgacDataObjectFactory());
-    dao.setDetailedSampleEnabled(false);
-    when(indexStore.getIndexById(Matchers.anyLong())).thenReturn(new Index());
-    when(sampleStore.get(Matchers.anyLong())).thenReturn(new SampleImpl());
-    when(libraryAdditionalInfoDao.getLibraryAdditionalInfoByLibraryId(Matchers.anyLong())).thenReturn(new LibraryAdditionalInfoImpl());
+    dao.setTemplate(jdbcTemplate);
+    dao.setSessionFactory(sessionFactory);
   }
 
   @Test
@@ -191,16 +183,8 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
   @Test
   public void testGetByIdentificationBarcode() throws Exception {
     String barcode = "LIB7::TEST_0004_Bn_P_PE_300_WG";
-    Library byIdentificationBarcode = dao.getByIdentificationBarcode("LIB7::TEST_0004_Bn_P_PE_300_WG");
+    Library byIdentificationBarcode = dao.getByBarcode("LIB7::TEST_0004_Bn_P_PE_300_WG");
     assertEquals("identiification barcode does not match", barcode, byIdentificationBarcode.getIdentificationBarcode());
-  }
-
-  @Test
-  public void testListByLibraryDilutionId() throws Exception {
-
-    List<Library> libraries = dao.listByLibraryDilutionId(9);
-    assertEquals(1, libraries.size());
-    assertEquals(9, libraries.get(0).getId());
   }
 
   @Test
@@ -312,9 +296,7 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
 
   @Test
   public void testRemove() throws Exception {
-    dao.setCascadeType(CascadeType.ALL);
     CacheManager cacheManager = null;
-    dao.setCacheManager(cacheManager);
 
     Library library = new LibraryImpl();
     String libraryName = "LIB111";
@@ -356,7 +338,7 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
 
   @Test
   public void testGetLibraryTypeByDescription() throws Exception {
-    LibraryType libraryTypeByDescription = dao.getLibraryTypeByDescription("Mate Pair");
+    LibraryType libraryTypeByDescription = dao.getLibraryTypeByDescriptionAndPlatform("Mate Pair", PlatformType.ILLUMINA);
     assertEquals("Illumina", libraryTypeByDescription.getPlatformType());
     assertEquals(Long.valueOf(2), libraryTypeByDescription.getId());
     assertEquals("Illumina", libraryTypeByDescription.getPlatformType());
@@ -404,7 +386,7 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
 
   @Test
   public void testListLibraryTypesByPlatform() throws Exception {
-    List<LibraryType> libraryTypes = dao.listLibraryTypesByPlatform("Solid");
+    List<LibraryType> libraryTypes = dao.listLibraryTypesByPlatform(PlatformType.SOLID);
     assertEquals(5, libraryTypes.size());
     List<String> platforms = Arrays.asList("Small RNA", "Whole Transcriptome", "SAGE", "Long Mate Pair", "Fragment");
     for (LibraryType libraryType : libraryTypes) {
