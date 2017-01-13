@@ -760,7 +760,7 @@ public class LibraryControllerHelperService {
     try {
       for (Object k : json.keySet()) {
         String key = (String) k;
-        if (isStringEmptyOrNull(json.getString(key))) {
+        if (isStringEmptyOrNull(json.getString(key)) && !key.equals("idBarcode")) {
           return JSONUtils.SimpleJSONError("Please enter a value for '" + key + "'");
         }
       }
