@@ -1161,9 +1161,6 @@
 
       <div id="librarydilsmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
         <c:if test="${not empty projectLibraryDilutions}">
-          <c:if test="${existsAnyEmPcrLibrary}">
-            <a href='javascript:void(0);' onclick='bulkEmPcrTable();' class="add">Add EmPCRs</a>
-          </c:if>
           <a href="javascript:void(0);" onclick="Project.barcode.selectLibraryDilutionBarcodesToPrint('#librarydils_table');">Print Barcodes ...</a>
           <a href='<c:url value="/miso/poolwizard/new/${project.id}"/>'>Create Pools</a>
         </c:if>
@@ -1250,9 +1247,6 @@
 
       <div id="poolsmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
         <c:if test="${not empty projectPools}">
-          <c:if test="${existsAnyEmPcrLibrary}">
-            <a href='javascript:void(0);' onclick="Project.ui.addPoolEmPCR('#pools_table');" class="add">Add Pool EmPCR</a>
-          </c:if>
           <a href="javascript:void(0);" onclick="Pool.barcode.selectPoolBarcodesToPrint('#pools_table');">Print Barcodes ...</a>
         </c:if>
       </div>
@@ -1310,168 +1304,6 @@
           "sPaginationType": "full_numbers",
           "fnDrawCallback": function (oSettings) {
             jQuery('#pools_table_paginate').find('.fg-button').addClass('dataTables_paginate_numbers').removeClass('fg-button ui-button');
-          }
-        });
-      });
-    </script>
-  </span>
-</div>
-
-<%--
-  TODO - only show these options if some of the libraries have the right platform!
-   At the moment you can create emPCRs and EmPcrDilutions for Illumina libraries!
---%>
-<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#empcrs_arrowclick'), 'empcrsdiv');">
-  ${fn:length(projectEmPcrs)} EmPCRs
-  <div id="empcrs_arrowclick" class="toggleLeft"></div>
-</div>
-<div id="empcrsdiv" style="display:none;">
-  <a name="empcr"></a>
-
-  <h1>${fn:length(projectEmPcrs)} EmPCRs</h1>
-  <ul class="sddm">
-    <li>
-      <a onmouseover="mopen('empcrsmenu')" onmouseout="mclosetime()">Options
-        <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
-      </a>
-
-      <div id="empcrsmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
-        <c:if test="${not empty projectEmPcrs}">
-          <a href='javascript:void(0);' onclick='bulkEmPcrDilutionTable();' class="add">Add EmPCR Dilutions</a>
-        </c:if>
-      </div>
-    </li>
-  </ul>
-  <span style="clear:both">
-    <table class="list" id="empcrs_table">
-      <thead>
-      <tr>
-        <th>EmPCR Name</th>
-        <th>Library Dilution</th>
-        <th>EmPCR Creator</th>
-        <th>EmPCR Creation Date</th>
-        <th>EmPCR Concentration</th>
-        <sec:authorize access="hasRole('ROLE_ADMIN')">
-          <th class="fit">DELETE</th>
-        </sec:authorize>
-      </tr>
-      </thead>
-      <tbody>
-      <c:forEach items="${projectEmPcrs}" var="pcr">
-        <tr pcrId="${pcr.id}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-          <td><b><a href="<c:url value='/miso/library/${pcr.libraryDilution.library.id}'/>">${pcr.name}</a></b></td>
-          <td><a href="<c:url value='/miso/library/${pcr.libraryDilution.library.id}'/>">${pcr.libraryDilution.name}</a></td>
-          <td>${pcr.pcrCreator}</td>
-          <td>${pcr.creationDate}</td>
-          <td>${pcr.concentration}</td>
-
-          <sec:authorize access="hasRole('ROLE_ADMIN')">
-            <td class="misoicon" onclick="Library.empcr.deleteEmPCR(${pcr.id}, Utils.page.pageReload);">
-              <span class="ui-icon ui-icon-trash"/>
-            </td>
-          </sec:authorize>
-        </tr>
-      </c:forEach>
-      </tbody>
-    </table>
-    <script type="text/javascript">
-      jQuery(document).ready(function () {
-        jQuery('#empcrs_table').dataTable({
-          "aaSorting": [
-            [1, 'asc'],
-            [3, 'asc']
-          ],
-          "aoColumns": [
-            { "sType": 'natural' },
-            { "sType": 'natural' },
-            null,
-            null,
-            null
-            <sec:authorize access="hasRole('ROLE_ADMIN')">, null</sec:authorize>
-          ],
-          "iDisplayLength": 50,
-          "bJQueryUI": true,
-          "bRetrieve": true,
-          "sPaginationType": "full_numbers",
-          "fnDrawCallback": function (oSettings) {
-            jQuery('#empcrs_table_paginate').find('.fg-button').addClass('dataTables_paginate_numbers').removeClass('fg-button ui-button');
-          }
-        });
-      });
-    </script>
-  </span>
-</div>
-
-<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#empcrdils_arrowclick'), 'empcrdilsdiv');">
-  ${fn:length(projectEmPcrDilutions)} EmPCR Dilutions
-  <div id="empcrdils_arrowclick" class="toggleLeft"></div>
-</div>
-<div id="empcrdilsdiv" style="display:none;">
-  <a name="empcrdil"></a>
-
-  <h1>${fn:length(projectEmPcrDilutions)} EmPCR Dilutions</h1>
-  <ul class="sddm">
-    <li>
-      <a onmouseover="mopen('empcrdilsmenu')" onmouseout="mclosetime()">Options
-        <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
-      </a>
-
-      <div id="empcrdilsmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
-        <c:if test="${not empty projectEmPcrDilutions}">
-          <a href='<c:url value="/miso/poolwizard/new/${project.id}"/>'>Create Pools</a>
-        </c:if>
-      </div>
-    </li>
-  </ul>
-  <span style="clear:both">
-    <table class="list" id="empcrdils_table">
-      <thead>
-      <tr>
-        <th>Dilution Name</th>
-        <th>Dilution Creator</th>
-        <th>Dilution Creation Date</th>
-        <th>Dilution Concentration</th>
-        <sec:authorize access="hasRole('ROLE_ADMIN')">
-          <th class="fit">DELETE</th>
-        </sec:authorize>
-      </tr>
-      </thead>
-      <tbody>
-      <c:forEach items="${projectEmPcrDilutions}" var="dil">
-        <tr dilutionId="${dil.id}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-          <td><b><a href="<c:url value='/miso/library/${dil.library.id}'/>">${dil.name}</a></b></td>
-          <td>${dil.dilutionCreator}</td>
-          <td>${dil.creationDate}</td>
-          <td>${dil.concentration}</td>
-
-          <sec:authorize access="hasRole('ROLE_ADMIN')">
-            <td class="misoicon" onclick="Library.empcr.deleteEmPCRDilution(${dil.id}, Utils.page.pageReload);">
-              <span class="ui-icon ui-icon-trash"/>
-            </td>
-          </sec:authorize>
-        </tr>
-      </c:forEach>
-      </tbody>
-    </table>
-    <script type="text/javascript">
-      jQuery(document).ready(function () {
-        jQuery('#empcrdils_table').dataTable({
-          "aaSorting": [
-            [2, 'asc']
-          ],
-          "aoColumns": [
-            null,
-            null,
-            null,
-            null
-            <sec:authorize access="hasRole('ROLE_ADMIN')">, null</sec:authorize>
-          ],
-          "iDisplayLength": 50,
-          "bJQueryUI": true,
-          "bRetrieve": true,
-          "sPaginationType": "full_numbers",
-          "fnDrawCallback": function (oSettings) {
-            jQuery('#empcrdils_table_paginate').find('.fg-button').addClass('dataTables_paginate_numbers').removeClass('fg-button ui-button');
           }
         });
       });

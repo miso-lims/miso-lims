@@ -47,9 +47,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCR;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRPool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.illumina.IlluminaPool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ls454.LS454Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.pacbio.PacBioPool;
@@ -120,14 +117,6 @@ public abstract class DataObjectFactory {
 
   public abstract TargetedSequencing getTargetedSequencing();
 
-  public abstract emPCRDilution getEmPCRDilution();
-
-  public abstract emPCRDilution getEmPCRDilution(User user);
-
-  public abstract emPCR getEmPCR();
-
-  public abstract emPCR getEmPCR(User user);
-
   public abstract Pool getPool();
 
   public abstract Pool getPool(User user);
@@ -159,12 +148,6 @@ public abstract class DataObjectFactory {
 
   @Deprecated
   public abstract PacBioPool getPacBioPool(User user);
-
-  @Deprecated
-  public abstract emPCRPool getEmPCRPool(PlatformType platformType);
-
-  @Deprecated
-  public abstract emPCRPool getEmPCRPool(PlatformType platformType, User user);
 
   public abstract Status getStatus();
 

@@ -79,8 +79,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCR;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
@@ -96,8 +94,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.AlertStore;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
-import uk.ac.bbsrc.tgac.miso.core.store.EmPCRDilutionStore;
-import uk.ac.bbsrc.tgac.miso.core.store.EmPCRStore;
 import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignCodeDao;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignDao;
@@ -134,11 +130,7 @@ public class MisoRequestManager implements RequestManager {
   @Autowired
   private AlertStore alertStore;
   @Autowired
-  private EmPCRDilutionStore emPCRDilutionStore;
-  @Autowired
   private LibraryDilutionStore libraryDilutionStore;
-  @Autowired
-  private EmPCRStore emPCRStore;
   @Autowired
   private KitStore kitStore;
   @Autowired
@@ -202,16 +194,8 @@ public class MisoRequestManager implements RequestManager {
     this.alertStore = alertStore;
   }
 
-  public void setEmPCRDilutionStore(EmPCRDilutionStore emPCRDilutionStore) {
-    this.emPCRDilutionStore = emPCRDilutionStore;
-  }
-
   public void setLibraryDilutionStore(LibraryDilutionStore libraryDilutionStore) {
     this.libraryDilutionStore = libraryDilutionStore;
-  }
-
-  public void setEmPCRStore(EmPCRStore emPCRStore) {
-    this.emPCRStore = emPCRStore;
   }
 
   public void setKitStore(KitStore kitStore) {
@@ -748,10 +732,6 @@ public class MisoRequestManager implements RequestManager {
     for (Dilution d : libraryDilutionStore.listAllLibraryDilutionsBySearchAndPlatform(query, platformType)) {
       dilutions.add(d);
     }
-
-    for (Dilution d : emPCRDilutionStore.listAllEmPcrDilutionsBySearch(query, platformType)) {
-      dilutions.add(d);
-    }
     return dilutions;
   }
 
@@ -759,10 +739,6 @@ public class MisoRequestManager implements RequestManager {
   public Collection<Dilution> listAllDilutionsByProjectAndPlatform(long projectId, PlatformType platformType) throws IOException {
     List<Dilution> dilutions = new ArrayList<>();
     for (Dilution d : libraryDilutionStore.listAllLibraryDilutionsByProjectAndPlatform(projectId, platformType)) {
-      dilutions.add(d);
-    }
-
-    for (Dilution d : emPCRDilutionStore.listAllEmPcrDilutionsByProjectAndPlatform(projectId, platformType)) {
       dilutions.add(d);
     }
     return dilutions;
@@ -829,96 +805,6 @@ public class MisoRequestManager implements RequestManager {
       return libraryDilutionStore.listAllLibraryDilutionsByProjectAndPlatform(projectId, platformType);
     } else {
       throw new IOException("No libraryDilutionStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<emPCRDilution> listAllEmPCRDilutions() throws IOException {
-    if (emPCRDilutionStore != null) {
-      return emPCRDilutionStore.listAll();
-    } else {
-      throw new IOException("No dilutionStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<emPCRDilution> listAllEmPCRDilutionsByPlatform(PlatformType platformType) throws IOException {
-    if (emPCRDilutionStore != null) {
-      return emPCRDilutionStore.listAllEmPcrDilutionsByPlatform(platformType);
-    } else {
-      throw new IOException("No emPcrDilutionStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<emPCRDilution> listAllEmPCRDilutionsByPoolAndPlatform(long poolId, PlatformType platformType) throws IOException {
-    if (emPCRDilutionStore != null) {
-      return emPCRDilutionStore.listAllEmPcrDilutionsByPoolAndPlatform(poolId, platformType);
-    } else {
-      throw new IOException("No dilutionStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<emPCR> listAllEmPCRs() throws IOException {
-    if (emPCRStore != null) {
-      return emPCRStore.listAll();
-    } else {
-      throw new IOException("No emPCRStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<emPCR> listAllEmPCRsByDilutionId(long dilutionId) throws IOException {
-    if (emPCRStore != null) {
-      return emPCRStore.listAllByDilutionId(dilutionId);
-    } else {
-      throw new IOException("No emPCRStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<emPCR> listAllEmPCRsByProjectId(long projectId) throws IOException {
-    if (emPCRStore != null) {
-      return emPCRStore.listAllByProjectId(projectId);
-    } else {
-      throw new IOException("No emPCRStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<emPCRDilution> listAllEmPCRDilutionsByEmPcrId(long pcrId) throws IOException {
-    if (emPCRDilutionStore != null) {
-      return emPCRDilutionStore.listAllByEmPCRId(pcrId);
-    } else {
-      throw new IOException("No emPcrDilutionStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<emPCRDilution> listAllEmPCRDilutionsByProjectId(long projectId) throws IOException {
-    if (emPCRDilutionStore != null) {
-      return emPCRDilutionStore.listAllEmPcrDilutionsByProjectId(projectId);
-    } else {
-      throw new IOException("No emPcrDilutionStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<emPCRDilution> listAllEmPCRDilutionsBySearch(String query, PlatformType platformType) throws IOException {
-    if (emPCRDilutionStore != null) {
-      return emPCRDilutionStore.listAllEmPcrDilutionsBySearch(query, platformType);
-    } else {
-      throw new IOException("No dilutionStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<emPCRDilution> listAllEmPCRDilutionsByProjectAndPlatform(long projectId, PlatformType platformType) throws IOException {
-    if (emPCRDilutionStore != null) {
-      return emPCRDilutionStore.listAllEmPcrDilutionsByProjectAndPlatform(projectId, platformType);
-    } else {
-      throw new IOException("No emPcrDilutionStore available. Check that it has been declared in the Spring config.");
     }
   }
 
@@ -1231,17 +1117,6 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public void deleteEmPCR(emPCR empcr) throws IOException {
-    if (emPCRStore != null) {
-      if (!emPCRStore.remove(empcr)) {
-        throw new IOException("Unable to delete EmPCR. Make sure the EmPCR has no child entitites.");
-      }
-    } else {
-      throw new IOException("No emPCRStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
   public void deleteRun(Run run) throws IOException {
     if (runStore != null) {
       if (!runStore.remove(run)) {
@@ -1304,17 +1179,6 @@ public class MisoRequestManager implements RequestManager {
       }
     } else {
       throw new IOException("No libraryDilutionStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public void deleteEmPCRDilution(emPCRDilution dilution) throws IOException {
-    if (emPCRDilutionStore != null) {
-      if (!emPCRDilutionStore.remove(dilution)) {
-        throw new IOException("Unable to delete emPCRDilution.");
-      }
-    } else {
-      throw new IOException("No emPcrDilutionStore available. Check that it has been declared in the Spring config.");
     }
   }
 
@@ -1594,15 +1458,6 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public long saveEmPcrDilution(emPCRDilution dilution) throws IOException {
-    if (emPCRDilutionStore != null) {
-      return emPCRDilutionStore.save(dilution);
-    } else {
-      throw new IOException("No emPcrDilutionStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
   public long saveLibrary(Library library) throws IOException {
     if (libraryStore != null) {
       if (library.isDiscarded()) {
@@ -1665,24 +1520,6 @@ public class MisoRequestManager implements RequestManager {
       return libraryQcStore.save(libraryQc);
     } else {
       throw new IOException("No libraryQcStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public long saveEmPCR(emPCR pcr) throws IOException {
-    if (emPCRStore != null) {
-      return emPCRStore.save(pcr);
-    } else {
-      throw new IOException("No emPCRStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public long saveEmPCRDilution(emPCRDilution dilution) throws IOException {
-    if (emPCRDilutionStore != null) {
-      return emPCRDilutionStore.save(dilution);
-    } else {
-      throw new IOException("No dilutionStore available. Check that it has been declared in the Spring config.");
     }
   }
 
@@ -1955,14 +1792,6 @@ public class MisoRequestManager implements RequestManager {
       throw new IOException("No libraryDilutionStore available. Check that it has been declared in the Spring config.");
     }
 
-    if (emPCRDilutionStore != null) {
-      if (d == null) {
-        d = emPCRDilutionStore.getEmPcrDilutionByBarcode(barcode);
-      }
-    } else {
-      throw new IOException("No emPcrDilutionStore available. Check that it has been declared in the Spring config.");
-    }
-
     return d;
   }
 
@@ -1973,14 +1802,6 @@ public class MisoRequestManager implements RequestManager {
       d = libraryDilutionStore.getLibraryDilutionByIdAndPlatform(dilutionid, platformType);
     } else {
       throw new IOException("No libraryDilutionStore available. Check that it has been declared in the Spring config.");
-    }
-
-    if (emPCRDilutionStore != null) {
-      if (d == null) {
-        d = emPCRDilutionStore.getEmPcrDilutionByIdAndPlatform(dilutionid, platformType);
-      }
-    } else {
-      throw new IOException("No emPcrDilutionStore available. Check that it has been declared in the Spring config.");
     }
 
     return d;
@@ -1995,14 +1816,6 @@ public class MisoRequestManager implements RequestManager {
       throw new IOException("No libraryDilutionStore available. Check that it has been declared in the Spring config.");
     }
 
-    if (emPCRDilutionStore != null) {
-      if (d == null) {
-        d = emPCRDilutionStore.getEmPcrDilutionByBarcodeAndPlatform(barcode, platformType);
-      }
-    } else {
-      throw new IOException("No emPcrDilutionStore available. Check that it has been declared in the Spring config.");
-    }
-
     return d;
   }
 
@@ -2010,15 +1823,6 @@ public class MisoRequestManager implements RequestManager {
   public LibraryDilution getLibraryDilutionByBarcodeAndPlatform(String barcode, PlatformType platformType) throws IOException {
     if (libraryDilutionStore != null) {
       return libraryDilutionStore.getLibraryDilutionByBarcodeAndPlatform(barcode, platformType);
-    } else {
-      throw new IOException("No dilutionStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public emPCRDilution getEmPCRDilutionByBarcodeAndPlatform(String barcode, PlatformType platformType) throws IOException {
-    if (emPCRDilutionStore != null) {
-      return emPCRDilutionStore.getEmPcrDilutionByBarcodeAndPlatform(barcode, platformType);
     } else {
       throw new IOException("No dilutionStore available. Check that it has been declared in the Spring config.");
     }
@@ -2111,33 +1915,6 @@ public class MisoRequestManager implements RequestManager {
       return libraryStore.getLibraryStrategyTypeByName(name);
     } else {
       throw new IOException("No libraryStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public emPCR getEmPCRById(long pcrId) throws IOException {
-    if (emPCRStore != null) {
-      return emPCRStore.get(pcrId);
-    } else {
-      throw new IOException("No emPCRStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public emPCRDilution getEmPCRDilutionById(long dilutionId) throws IOException {
-    if (emPCRDilutionStore != null) {
-      return emPCRDilutionStore.get(dilutionId);
-    } else {
-      throw new IOException("No dilutionStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public emPCRDilution getEmPCRDilutionByBarcode(String barcode) throws IOException {
-    if (emPCRDilutionStore != null) {
-      return emPCRDilutionStore.getEmPcrDilutionByBarcode(barcode);
-    } else {
-      throw new IOException("No dilutionStore available. Check that it has been declared in the Spring config.");
     }
   }
 

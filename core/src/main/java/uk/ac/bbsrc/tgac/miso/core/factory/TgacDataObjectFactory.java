@@ -65,9 +65,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubmissionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCR;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRPool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.illumina.IlluminaPool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.illumina.IlluminaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ls454.LS454Pool;
@@ -163,26 +160,6 @@ public class TgacDataObjectFactory extends DataObjectFactory {
   }
 
   @Override
-  public emPCRDilution getEmPCRDilution() {
-    return new emPCRDilution();
-  }
-
-  @Override
-  public emPCRDilution getEmPCRDilution(User user) {
-    return new emPCRDilution(user);
-  }
-
-  @Override
-  public emPCR getEmPCR() {
-    return new emPCR();
-  }
-
-  @Override
-  public emPCR getEmPCR(User user) {
-    return new emPCR(user);
-  }
-
-  @Override
   public Pool getPool() {
     return new PoolImpl();
   }
@@ -238,18 +215,6 @@ public class TgacDataObjectFactory extends DataObjectFactory {
   @Deprecated
   public PacBioPool getPacBioPool(User user) {
     return new PacBioPool(user);
-  }
-
-  @Override
-  @Deprecated
-  public emPCRPool getEmPCRPool(PlatformType platformType) {
-    return new emPCRPool(platformType);
-  }
-
-  @Override
-  @Deprecated
-  public emPCRPool getEmPCRPool(PlatformType platformType, User user) {
-    return new emPCRPool(user, platformType);
   }
 
   @Override

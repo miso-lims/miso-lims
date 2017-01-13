@@ -78,7 +78,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.Submittable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
@@ -493,20 +492,8 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
       }
 
     };
-    Resolver<emPCRDilution> ediResolver = new Resolver<emPCRDilution>() {
 
-      @Override
-      public String getPrefix() {
-        return "EDI";
-      }
-
-      @Override
-      public emPCRDilution resolve(long id) throws Exception {
-        return requestManager.getEmPCRDilutionById(id);
-      }
-
-    };
-    new BindingConverterByPrefixDispatch<>(Dilution.class).add(ldiResolver).add(ediResolver).register(binder).register(binder,
+    new BindingConverterByPrefixDispatch<>(Dilution.class).add(ldiResolver).register(binder).register(binder,
         Set.class, "dilutions");
 
     new BindingConverterById<LibraryDilution>(LibraryDilution.class) {
@@ -553,13 +540,6 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
       }
 
     }.register(binder);
-
-    new BindingConverterById<emPCRDilution>(emPCRDilution.class) {
-      @Override
-      public emPCRDilution resolveById(long id) throws Exception {
-        return requestManager.getEmPCRDilutionById(id);
-      }
-    }.register(binder).register(binder, Set.class, "pcrDilutions");
 
     new BindingConverterById<Platform>(Platform.class) {
       @Override
@@ -659,7 +639,7 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
       }
     }.register(binder).register(binder, Set.class, "referenceGenomes");
 
-    new BindingConverterByPrefixDispatch<>(Dilution.class).add(ldiResolver).add(ediResolver).register(binder, Set.class,
+    new BindingConverterByPrefixDispatch<>(Dilution.class).add(ldiResolver).register(binder, Set.class,
         "poolableElements");
 
 

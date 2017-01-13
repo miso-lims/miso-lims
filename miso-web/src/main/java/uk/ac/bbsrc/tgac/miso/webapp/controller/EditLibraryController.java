@@ -33,7 +33,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -87,8 +86,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAdditionalInfoImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCR;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
@@ -345,16 +342,6 @@ public class EditLibraryController {
   @ModelAttribute("poolConcentrationUnits")
   public String poolConcentrationUnits() {
     return AbstractPool.CONCENTRATION_UNITS;
-  }
-
-  @ModelAttribute("emPCRUnits")
-  public String emPCRUnits() {
-    return emPCR.UNITS;
-  }
-
-  @ModelAttribute("emPCRDilutionUnits")
-  public String emPCRDilutionUnits() {
-    return emPCRDilution.UNITS;
   }
 
   @ModelAttribute("prepKits")
@@ -637,29 +624,6 @@ public class EditLibraryController {
     return requestManager.listAllChanges("Library");
   }
 
-  public Collection<emPCR> populateEmPcrs(User user, Library library) throws IOException {
-    Collection<emPCR> pcrs = new HashSet<>();
-    for (emPCR pcr : requestManager.listAllEmPCRs()) {
-      for (LibraryDilution ldil : library.getLibraryDilutions()) {
-        if (pcr.getLibraryDilution().getId() == ldil.getId()) {
-          pcrs.add(pcr);
-        }
-      }
-    }
-    return pcrs;
-  }
-
-  public Collection<emPCRDilution> populateEmPcrDilutions(User user, Collection<emPCR> pcrs) throws IOException {
-    Collection<emPCRDilution> dilutions = new HashSet<>();
-    for (emPCR pcr : pcrs) {
-      for (emPCRDilution dilution : requestManager.listAllEmPCRDilutionsByEmPcrId(pcr.getId())) {
-        dilution.setEmPCR(pcr);
-        dilutions.add(dilution);
-      }
-    }
-    return dilutions;
-  }
-
   @RequestMapping(value = "/new/{sampleId}", method = RequestMethod.GET)
   public ModelAndView newAssignedLibrary(@PathVariable Long sampleId, ModelMap model) throws IOException {
     return setupForm(AbstractLibrary.UNSAVED_ID, sampleId, model);
@@ -691,9 +655,6 @@ public class EditLibraryController {
       model.put("formObj", library);
       model.put("library", library);
 
-      Collection<emPCR> pcrs = populateEmPcrs(user, library);
-      model.put("emPCRs", pcrs);
-      model.put("emPcrDilutions", populateEmPcrDilutions(user, pcrs));
       model.put("platformNames", populatePlatformNames(Arrays.asList(library.getPlatformName())));
       populateAvailableIndexFamilies(library, model);
       addAdjacentLibraries(library, model);
@@ -788,9 +749,6 @@ public class EditLibraryController {
 
       model.put("formObj", library);
       model.put("library", library);
-      Collection<emPCR> pcrs = populateEmPcrs(user, library);
-      model.put("emPCRs", pcrs);
-      model.put("emPcrDilutions", populateEmPcrDilutions(user, pcrs));
       model.put("platformNames", populatePlatformNames(Arrays.asList(library.getPlatformName())));
       populateAvailableIndexFamilies(library, model);
 

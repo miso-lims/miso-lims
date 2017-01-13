@@ -75,8 +75,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCR;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
@@ -308,24 +306,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public long saveEmPCR(emPCR pcr) throws IOException {
-    if (writeCheck(pcr)) {
-      return backingManager.saveEmPCR(pcr);
-    } else {
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot write to this EmPCR");
-    }
-  }
-
-  @Override
-  public long saveEmPCRDilution(emPCRDilution dilution) throws IOException {
-    if (writeCheck(dilution)) {
-      return backingManager.saveEmPCRDilution(dilution);
-    } else {
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot write to this EmPCRDilution");
-    }
-  }
-
-  @Override
   public long saveStudy(Study study) throws IOException {
     if (writeCheck(study)) {
       return backingManager.saveStudy(study);
@@ -470,34 +450,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
     if (readCheck(o.getLibrary())) return o;
     else throw new AuthorizationIOException(
         "User " + getCurrentUsername() + " cannot read parent Library " + o.getLibrary().getId() + " for LibraryQC " + qcId);
-  }
-
-  @Override
-  public emPCR getEmPCRById(long pcrId) throws IOException {
-    emPCR o = backingManager.getEmPCRById(pcrId);
-    if (readCheck(o)) return o;
-    else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read emPCR " + pcrId);
-  }
-
-  @Override
-  public emPCRDilution getEmPCRDilutionById(long dilutionId) throws IOException {
-    emPCRDilution o = backingManager.getEmPCRDilutionById(dilutionId);
-    if (readCheck(o)) return o;
-    else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read emPCRDilution " + dilutionId);
-  }
-
-  @Override
-  public emPCRDilution getEmPCRDilutionByBarcode(String barcode) throws IOException {
-    emPCRDilution o = backingManager.getEmPCRDilutionByBarcode(barcode);
-    if (readCheck(o)) return o;
-    else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read emPCRDilution " + o.getId());
-  }
-
-  @Override
-  public emPCRDilution getEmPCRDilutionByBarcodeAndPlatform(String barcode, PlatformType platformType) throws IOException {
-    emPCRDilution o = backingManager.getEmPCRDilutionByBarcodeAndPlatform(barcode, platformType);
-    if (readCheck(o)) return o;
-    else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read emPCRDilution " + o.getId());
   }
 
   @Override
@@ -1120,114 +1072,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<emPCRDilution> listAllEmPCRDilutions() throws IOException {
-    User user = getCurrentUser();
-    Collection<emPCRDilution> accessibles = new HashSet<>();
-    for (emPCRDilution dilution : backingManager.listAllEmPCRDilutions()) {
-      if (dilution.userCanRead(user)) {
-        accessibles.add(dilution);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Collection<emPCRDilution> listAllEmPCRDilutionsByEmPcrId(long pcrId) throws IOException {
-    User user = getCurrentUser();
-    Collection<emPCRDilution> accessibles = new HashSet<>();
-    for (emPCRDilution dilution : backingManager.listAllEmPCRDilutionsByEmPcrId(pcrId)) {
-      if (dilution.userCanRead(user)) {
-        accessibles.add(dilution);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Collection<emPCRDilution> listAllEmPCRDilutionsByPlatform(PlatformType platformType) throws IOException {
-    User user = getCurrentUser();
-    Collection<emPCRDilution> accessibles = new HashSet<>();
-    for (emPCRDilution dilution : backingManager.listAllEmPCRDilutionsByPlatform(platformType)) {
-      if (dilution.userCanRead(user)) {
-        accessibles.add(dilution);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Collection<emPCRDilution> listAllEmPCRDilutionsByProjectId(long projectId) throws IOException {
-    User user = getCurrentUser();
-    Collection<emPCRDilution> accessibles = new HashSet<>();
-    for (emPCRDilution dilution : backingManager.listAllEmPCRDilutionsByProjectId(projectId)) {
-      if (dilution.userCanRead(user)) {
-        accessibles.add(dilution);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Collection<emPCRDilution> listAllEmPCRDilutionsBySearch(String query, PlatformType platformType) throws IOException {
-    User user = getCurrentUser();
-    Collection<emPCRDilution> accessibles = new HashSet<>();
-    for (emPCRDilution dilution : backingManager.listAllEmPCRDilutionsBySearch(query, platformType)) {
-      if (dilution.userCanRead(user)) {
-        accessibles.add(dilution);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Collection<emPCRDilution> listAllEmPCRDilutionsByProjectAndPlatform(long projectId, PlatformType platformType) throws IOException {
-    User user = getCurrentUser();
-    Collection<emPCRDilution> accessibles = new HashSet<>();
-    for (emPCRDilution dilution : backingManager.listAllEmPCRDilutionsByProjectAndPlatform(projectId, platformType)) {
-      if (dilution.userCanRead(user)) {
-        accessibles.add(dilution);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Collection<emPCRDilution> listAllEmPCRDilutionsByPoolAndPlatform(long poolId, PlatformType platformType) throws IOException {
-    User user = getCurrentUser();
-    Collection<emPCRDilution> accessibles = new HashSet<>();
-    for (emPCRDilution dilution : backingManager.listAllEmPCRDilutionsByPoolAndPlatform(poolId, platformType)) {
-      if (dilution.userCanRead(user)) {
-        accessibles.add(dilution);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Collection<emPCR> listAllEmPCRs() throws IOException {
-    User user = getCurrentUser();
-    Collection<emPCR> accessibles = new HashSet<>();
-    for (emPCR pcr : backingManager.listAllEmPCRs()) {
-      if (pcr.userCanRead(user)) {
-        accessibles.add(pcr);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Collection<emPCR> listAllEmPCRsByDilutionId(long dilutionId) throws IOException {
-    User user = getCurrentUser();
-    Collection<emPCR> accessibles = new HashSet<>();
-    for (emPCR pcr : backingManager.listAllEmPCRsByDilutionId(dilutionId)) {
-      if (pcr.userCanRead(user)) {
-        accessibles.add(pcr);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
   public Collection<Pool> listAllPools() throws IOException {
     User user = getCurrentUser();
     ArrayList<Pool> accessibles = new ArrayList<>();
@@ -1446,13 +1290,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public void deleteEmPCR(emPCR empcr) throws IOException {
-    if (getCurrentUser().isAdmin()) {
-      backingManager.deleteEmPCR(empcr);
-    }
-  }
-
-  @Override
   public void deleteRun(Run run) throws IOException {
     if (getCurrentUser().isAdmin()) {
       backingManager.deleteRun(run);
@@ -1484,13 +1321,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   public void deleteLibraryDilution(LibraryDilution dilution) throws IOException {
     if (getCurrentUser().isAdmin()) {
       backingManager.deleteLibraryDilution(dilution);
-    }
-  }
-
-  @Override
-  public void deleteEmPCRDilution(emPCRDilution dilution) throws IOException {
-    if (getCurrentUser().isAdmin()) {
-      backingManager.deleteEmPCRDilution(dilution);
     }
   }
 
@@ -1606,15 +1436,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   @Override
   public void saveKitNote(Kit kit, Note note) throws IOException {
     backingManager.saveKitNote(kit, note);
-  }
-
-  @Override
-  public long saveEmPcrDilution(emPCRDilution dilution) throws IOException {
-    if (writeCheck(dilution)) {
-      return backingManager.saveEmPcrDilution(dilution);
-    } else {
-      throw new IOException("User " + getCurrentUser().getFullName() + " cannot write to this Dilution");
-    }
   }
 
   @Override
@@ -1899,16 +1720,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   @Override
   public Collection<LibraryStrategyType> listAllLibraryStrategyTypes() throws IOException {
     return backingManager.listAllLibraryStrategyTypes();
-  }
-
-  @Override
-  public Collection<emPCR> listAllEmPCRsByProjectId(long projectId) throws IOException {
-    Collection<emPCR> empcrs = backingManager.listAllEmPCRsByProjectId(projectId);
-    Collection<emPCR> accessible = new ArrayList<>();
-    for (emPCR empcr : empcrs) {
-      if (empcr.userCanRead(getCurrentUser())) accessible.add(empcr);
-    }
-    return accessible;
   }
 
   @Override

@@ -677,10 +677,6 @@
               </td>
             </c:if>
             <td>
-              <c:if test="${library.platformName eq 'LS454' or library.platformName eq 'Solid'}">
-                <a href="javascript:void(0);" onclick="Library.empcr.insertEmPcrRow(${dil.id});">Add emPCR</a> 
-                <br />           
-              </c:if>
               <a href="<c:url value="/miso/poolwizard/new/${library.sample.project.id}"/>">Construct New Pool</a>
             </td>
           </tr>
@@ -691,80 +687,6 @@
     <input type='hidden' id='dilLibraryId' name='id' value='${library.id}'/>
   </form>
 </span>
-
-<c:if test="${library.platformName ne 'Illumina'}">
-  <br/>
-  <h1>emPCR</h1>
-
-  <div id="addEmPcr"></div>
-  <form id='addEmPcrForm'>
-    <table class="list" id="emPcrTable">
-      <thead>
-      <tr>
-        <th>Library Dilution ID</th>
-        <th>PCRed By</th>
-        <th>PCR Date</th>
-        <th>Results (${emPCRUnits})</th>
-      </tr>
-      </thead>
-      <tbody>
-      <c:if test="${not empty emPCRs}">
-        <c:forEach items="${emPCRs}" var="empcr">
-          <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-            <td>${empcr.libraryDilution.id}</td>
-            <td>${empcr.pcrCreator}</td>
-            <td><fmt:formatDate value="${empcr.creationDate}"/></td>
-            <td>${empcr.concentration} ${emPCRUnits}</td>
-            <td>
-              <a href="javascript:void(0);" onclick="Library.empcr.insertEmPcrDilutionRow(${empcr.id});">Add emPCR Dilution</a>
-            </td>
-          </tr>
-        </c:forEach>
-      </c:if>
-      </tbody>
-    </table>
-  </form>
-
-  <h1>emPCR Dilutions</h1>
-
-  <div id="addEmPcrDilution"></div>
-  <form id='addEmPcrDilutionForm'>
-    <table class="list" id="emPcrDilutionTable">
-      <thead>
-      <tr>
-        <th>emPCR ID</th>
-        <th>Done By</th>
-        <th>Date</th>
-        <th>Results (${emPCRDilutionUnits})</th>
-        <th>Construct Pool</th>
-      </tr>
-      </thead>
-      <tbody>
-      <c:if test="${not empty emPcrDilutions}">
-        <c:forEach items="${emPcrDilutions}" var="dil">
-          <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-            <td>${dil.emPCR.id}</td>
-            <td>${dil.dilutionCreator}</td>
-            <td><fmt:formatDate value="${dil.creationDate}"/></td>
-            <td>${dil.concentration} ${emPCRDilutionUnits}</td>
-            <td>
-              <a href="<c:url value="/miso/poolwizard/new/${library.sample.project.id}"/>">Construct New Pool</a>
-            </td>
-          </tr>
-        </c:forEach>
-      </c:if>
-      </tbody>
-    </table>
-  </form>
-  <script type="text/javascript">
-    jQuery(document).ready(function () {
-      jQuery("#emPcrDilutionTable").tablesorter({
-        headers: {
-        }
-      });
-    });
-  </script>
-</c:if>
 
   <c:if test="${not empty libraryPools}">
     <br/>
