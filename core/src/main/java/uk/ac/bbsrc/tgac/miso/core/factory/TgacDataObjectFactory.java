@@ -62,7 +62,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerServiceRecordImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SubmissionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.illumina.IlluminaPool;
@@ -465,16 +464,6 @@ public class TgacDataObjectFactory extends DataObjectFactory {
     } else {
       throw new IllegalArgumentException("Unrecognised PlatformType");
     }
-  }
-
-  @Override
-  public SubmissionImpl getSubmission() {
-    return new SubmissionImpl();
-  }
-
-  @Override
-  public SubmissionImpl getSubmission(User user) {
-    return new SubmissionImpl(user);
   }
 
   @Override

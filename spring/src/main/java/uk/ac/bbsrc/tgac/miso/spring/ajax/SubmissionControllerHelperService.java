@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -56,7 +56,6 @@ import net.sourceforge.fluxion.ajax.util.JSONUtils;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
-import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -64,9 +63,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
-import uk.ac.bbsrc.tgac.miso.core.data.Submittable;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubmissionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.SubmissionActionType;
 import uk.ac.bbsrc.tgac.miso.core.exception.SubmissionException;
@@ -146,33 +142,10 @@ public class SubmissionControllerHelperService {
           if (j.getString("name").contains("DIL")) {
             Long dilutionId = Long.parseLong(j.getString("name").replaceAll("\\D+", ""));
             Long partitionId = Long.parseLong(j.getString("value").replaceAll("\\D+", ""));
-            // and a new Partition created from the ID
-            PartitionImpl newPartition = new PartitionImpl();
-            newPartition.setId(partitionId);
-            // if the partition is not already in the set of newPartitions:
-            if (newPartitions.add(newPartition)) {
-              // a new pool is created
-              Pool newPool = new PoolImpl();
-              // details of the original partition's pool are copied to the new one
-              Pool oldPool = requestManager.getSequencerPoolPartitionById(partitionId).getPool();
-              newPool.setExperiments(oldPool.getExperiments());
-              newPool.setPlatformType(oldPool.getPlatformType());
-              // the new pool is added to the partition
-              newPartition.setPool(newPool);
-            }
-
-            for (SequencerPoolPartition nextPartition : newPartitions) {
-              if (nextPartition.getId() == partitionId) {
-                Dilution dilution = requestManager.getLibraryDilutionById(dilutionId);
-                Pool pool = nextPartition.getPool();
-                pool.addPoolableElement(dilution);
-              }
-            }
+            Dilution dilution = requestManager.getLibraryDilutionById(dilutionId);
+            SequencerPoolPartition partition = requestManager.getSequencerPoolPartitionById(partitionId);
+            newSubmission.getDilutions().put(dilution, partition);
           }
-        }
-        // the set of partitions is added to the new Submission
-        for (SequencerPoolPartition sequencerPoolPartition : newPartitions) {
-          newSubmission.addSubmissionElement(sequencerPoolPartition);
         }
         // the submission is saved
         requestManager.saveSubmission(newSubmission);
@@ -189,7 +162,7 @@ public class SubmissionControllerHelperService {
     try {
       if (json.has("submissionId") && !isStringEmptyOrNull(json.getString("submissionId"))) {
         Long submissionId = ((Integer) json.get("submissionId")).longValue();
-        Submission<Submittable, Document, Document> submission = requestManager.getSubmissionById(submissionId);
+        Submission submission = requestManager.getSubmissionById(submissionId);
 
         SubmissionActionType action = SubmissionActionType.VALIDATE;
         if (json.has("operation")) {
@@ -198,7 +171,7 @@ public class SubmissionControllerHelperService {
         submission.setSubmissionActionType(action);
 
         try {
-          String s = submissionManager.generateSubmissionMetadata(submission);
+          String s = submissionManager.prepareSubmission(submission).toString();
           return JSONUtils.JSONObjectResponse("metadata", s);
         } catch (SubmissionException se) {
           log.error("cannot preview submission metadata", se);
@@ -267,21 +240,21 @@ public class SubmissionControllerHelperService {
     try {
       if (json.has("submissionId") && !isStringEmptyOrNull(json.getString("submissionId"))) {
         Long submissionId = ((Integer) json.get("submissionId")).longValue();
-        Submission<Submittable, Document, Document> submission = requestManager.getSubmissionById(submissionId);
+        Submission submission = requestManager.getSubmissionById(submissionId);
         SubmissionActionType action = SubmissionActionType.VALIDATE;
         if (json.has("operation")) {
           action = SubmissionActionType.valueOf(json.getString("operation"));
         }
         submission.setSubmissionActionType(action);
         try {
-          String s = submissionManager.generateSubmissionMetadata(submission);
+          submissionManager.prepareSubmission(submission);
         } catch (SubmissionException se) {
           log.error("validate submission metadata", se);
           return JSONUtils.SimpleJSONError(se.getMessage());
         }
-        Document report = submission.submit(submissionManager);
+        Document report = submissionManager.submit(submission);
         if (report != null) {
-          Map<String, Object> responseMap = (Map<String, Object>) submissionManager.parseResponse(report);
+          Map<String, Object> responseMap = submissionManager.parseResponse(report);
           return JSONUtils.JSONObjectResponse(responseMap);
         } else {
           return JSONUtils.SimpleJSONError("Failed to get submission report. Something went wrong in the submission process");
@@ -307,10 +280,10 @@ public class SubmissionControllerHelperService {
         }
 
         submission.setSubmissionActionType(action);
-        Document report = (Document) submission.submit(submissionManager);
+        Document report = submissionManager.submit(submission);
 
         if (report != null) {
-          Map<String, Object> responseMap = (Map<String, Object>) submissionManager.parseResponse(report);
+          Map<String, Object> responseMap = submissionManager.parseResponse(report);
           return JSONUtils.JSONObjectResponse(responseMap);
         } else {
           return JSONUtils.SimpleJSONError("Failed to get submission report. Something went wrong in the submission process");
@@ -327,7 +300,7 @@ public class SubmissionControllerHelperService {
     try {
       if (json.has("submissionId") && !isStringEmptyOrNull(json.getString("submissionId"))) {
         Long submissionId = ((Integer) json.get("submissionId")).longValue();
-        Submission<Submittable, Document, Document> submission = requestManager.getSubmissionById(submissionId);
+        Submission submission = requestManager.getSubmissionById(submissionId);
         String response = submissionManager.submitSequenceData(submission);
         return (JSONUtils.SimpleJSONResponse(response));
       } else {
@@ -384,23 +357,19 @@ public class SubmissionControllerHelperService {
         // TODO - get projects from submission
         Submission sub = requestManager.getSubmissionById(submissionId);
         Set<Long> projectIds = new HashSet<>();
-        for (Object o : sub.getSubmissionElements()) {
-          if (o instanceof Project) {
-            projectIds.add(((Project) o).getProjectId());
-          }
 
-          if (o instanceof Study) {
-            projectIds.add(((Study) o).getProject().getProjectId());
-          }
-
-          if (o instanceof Experiment) {
-            projectIds.add(((Experiment) o).getStudy().getProject().getProjectId());
-          }
-
-          if (o instanceof Sample) {
-            projectIds.add(((Sample) o).getProject().getProjectId());
-          }
+        for (Study s : sub.getStudies()) {
+          projectIds.add(s.getProject().getProjectId());
         }
+
+        for (Experiment e : sub.getExperiments()) {
+          projectIds.add(e.getStudy().getProject().getProjectId());
+        }
+
+        for (Sample s : sub.getSamples()) {
+          projectIds.add(s.getProject().getProjectId());
+        }
+
         responseMap.put("projects", JSONArray.fromObject(projectIds));
         return JSONUtils.JSONObjectResponse(responseMap);
       }
@@ -476,7 +445,7 @@ public class SubmissionControllerHelperService {
 
                     if (sub != null) {
                       // checks checkboxes if the partition is in the submission
-                      if (sub != null && !sub.getSubmissionElements().isEmpty() && sub.getSubmissionElements().contains(part)) {
+                      if (sub != null && sub.getDilutions().containsValue(part)) {
                         sb.append(" checked='checked' ");
                       }
                     }
@@ -504,16 +473,12 @@ public class SubmissionControllerHelperService {
                       sb.append("<li><input type='checkbox'  name='DIL_" + d.getId() + "' id='DIL" + d.getId() + "_PAR" + part.getId()
                           + "' value='PAR_" + part.getId() + "' ");
 
-                      if (sub != null && sub.getSubmissionElements().contains(part)) {
+                      if (sub != null && sub.getDilutions().containsValue(part)) {
                         // checks dilution checkboxes if dilution is in the submission
-                        for (Object o : sub.getSubmissionElements()) {
-                          if (o.equals(part)) {
-                            SequencerPoolPartition subPart = (SequencerPoolPartition) o;
-                            for (Dilution bla : subPart.getPool().getPoolableElements()) {
-                              if (bla.getClass().equals(d.getClass()) && bla.getId() == d.getId()) {
-                                sb.append(" checked='checked' ");
-                              }
-                            }
+                        for (Dilution bla : part.getPool().getPoolableElements()) {
+                          if (sub.getDilutions().containsKey(bla)) {
+                            sb.append(" checked='checked' ");
+                            break;
                           }
                         }
                       }

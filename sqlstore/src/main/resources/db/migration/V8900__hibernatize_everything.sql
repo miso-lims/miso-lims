@@ -411,3 +411,12 @@ ALTER TABLE Sample DROP COLUMN `boxPositionId`;
 ALTER TABLE Library DROP COLUMN `boxPositionId`;
 ALTER TABLE Pool DROP COLUMN `boxPositionId`;
 DROP TABLE sequence_data;
+
+DROP TABLE Submission_Partition;
+DROP TABLE Submission_Chamber;
+DROP TABLE Submission_Lane;
+DROP TABLE Flowcell_Lane;
+DROP TABLE Flowcell_Chamber;
+DROP TABLE Chamber;
+DROP TABLE Lane;
+DROP TABLE Flowcell;

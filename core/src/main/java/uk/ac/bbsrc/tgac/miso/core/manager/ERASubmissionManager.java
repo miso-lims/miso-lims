@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -42,13 +42,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -62,25 +62,30 @@ import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.entity.mime.MultipartEntity;
-import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import net.sf.json.JSONArray;
+
+import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
+import uk.ac.bbsrc.tgac.miso.core.data.Index;
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
-import uk.ac.bbsrc.tgac.miso.core.data.Submittable;
+import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.SubmissionActionType;
 import uk.ac.bbsrc.tgac.miso.core.exception.SubmissionException;
-import uk.ac.bbsrc.tgac.miso.core.factory.submission.ERASubmissionFactory;
-import uk.ac.bbsrc.tgac.miso.core.service.submission.ERAEndpoint;
-import uk.ac.bbsrc.tgac.miso.core.service.submission.EndPoint;
 import uk.ac.bbsrc.tgac.miso.core.service.submission.FTPTransferMethod;
 import uk.ac.bbsrc.tgac.miso.core.service.submission.FilePathGenerator;
 import uk.ac.bbsrc.tgac.miso.core.service.submission.TGACIlluminaFilepathGenerator;
@@ -95,19 +100,12 @@ import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
  * @author Rob Davey
  * @since 0.0.2
  */
-public class ERASubmissionManager implements SubmissionManager<Set<Submittable<Document>>, URL, Document> {
+public class ERASubmissionManager implements SubmissionManager {
   @Autowired
   private Properties submissionProperties;
 
   public void setSubmissionProperties(Properties submissionProperties) {
     this.submissionProperties = submissionProperties;
-  }
-
-  @Autowired
-  private RequestManager requestManager;
-
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
   }
 
   @Autowired
@@ -126,9 +124,7 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
   private String authKey;
   private URL submissionEndPoint;
   private String submissionStoragePath;
-  private Map<Long, UploadReport> uploadReports = new HashMap<Long, UploadReport>();
-
-  private DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+  private final Map<Long, UploadReport> uploadReports = new HashMap<>();
 
   /**
    * Sets the centreName of this ERASubmissionManager object.
@@ -176,7 +172,6 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
    * @param submissionEndPoint
    *          submissionEndPoint.
    */
-  @Override
   public void setSubmissionEndPoint(URL submissionEndPoint) {
     this.submissionEndPoint = submissionEndPoint;
   }
@@ -186,7 +181,6 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
    * 
    * @return URL submissionEndPoint.
    */
-  @Override
   public URL getSubmissionEndPoint() {
     return this.submissionEndPoint;
   }
@@ -197,7 +191,6 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
    * @param submissionStoragePath
    *          submissionStoragePath.
    */
-  @Override
   public void setSubmissionStoragePath(String submissionStoragePath) {
     this.submissionStoragePath = submissionStoragePath;
   }
@@ -207,67 +200,482 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
    * 
    * @return String submissionStoragePath.
    */
-  @Override
   public String getSubmissionStoragePath() {
     return submissionStoragePath;
   }
 
-  @Override
-  public String generateSubmissionMetadata(Submission submission) throws SubmissionException {
-    File subPath = new File(misoFileManager.getFileStorageDirectory() + "/submission/" + submission.getName());
-    StringBuilder sb = new StringBuilder();
-    try {
-      DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+  private final class ExperimentXmlSubfile extends XmlSubmissionFromSet<Experiment> {
+    @Override
+    protected Set<Experiment> items(Submission submission) {
+      return submission.getExperiments();
+    }
 
-      String d = df.format(new Date());
-      submissionProperties.put("submissionDate", d);
+    @Override
+    protected String xmlName() {
+      return "EXPERIMENT";
+    }
 
-      if (LimsUtils.checkDirectory(subPath, true)) {
-        Map<String, List<Submittable<Document>>> map = new HashMap<String, List<Submittable<Document>>>();
-        map.put("study", new ArrayList<Submittable<Document>>());
-        map.put("sample", new ArrayList<Submittable<Document>>());
-        map.put("experiment", new ArrayList<Submittable<Document>>());
-        map.put("run", new ArrayList<Submittable<Document>>());
+    @Override
+    protected String xmlCollectionName() {
+      return "EXPERIMENT_SET";
+    }
 
-        Set<Submittable<Document>> subs = submission.getSubmissionElements();
-        for (Submittable<Document> sub : subs) {
+    @Override
+    protected void populate(Element xml, Experiment experiment) {
+      xml.setAttribute("alias", experiment.getAlias());
+      xml.setAttribute("center_name", submissionProperties.getProperty("submission.centreName"));
 
-          if (sub instanceof Study) {
-            map.get("study").add(sub);
-          } else if (sub instanceof Sample) {
-            map.get("sample").add(sub);
-          } else if (sub instanceof Experiment) {
-            map.get("experiment").add(sub);
-          } else if (sub instanceof SequencerPoolPartition) {
-            map.get("run").add(sub);
-          }
-        }
+      Element xmlTitle = xml.getOwnerDocument().createElementNS(null, "TITLE");
+      xmlTitle.setTextContent(experiment.getTitle());
+      xml.appendChild(xmlTitle);
 
-        for (String key : map.keySet()) {
-          List<Submittable<Document>> submittables = map.get(key);
-          Document submissionDocument = docBuilder.newDocument();
-          ERASubmissionFactory.generateSubmissionXML(submissionDocument, submittables, key, submissionProperties);
-
-          // generate xml files on disk
-          File f = new File(subPath, File.separator + submission.getName() + "_" + key + "_" + d + ".xml");
-          if (f.exists()) {
-            f.delete();
-          }
-          SubmissionUtils.transform(submissionDocument, f);
-
-          sb.append(SubmissionUtils.transform(submissionDocument, true));
-        }
-
-        Document submissionDocument = docBuilder.newDocument();
-        ERASubmissionFactory.generateParentSubmissionXML(submissionDocument, submission, submissionProperties);
-        File f = new File(subPath, File.separator + submission.getName() + "_submission_" + d + ".xml");
-        if (f.exists()) {
-          f.delete();
-        }
-        SubmissionUtils.transform(submissionDocument, f, true);
-
-        sb.append(SubmissionUtils.transform(submissionDocument, true));
+      Element xmlStudyRef = xml.getOwnerDocument().createElementNS(null, "STUDY_REF");
+      xmlStudyRef.setAttribute("refname", experiment.getStudy().getAlias());
+      xmlStudyRef.setAttribute("refcenter", submissionProperties.getProperty("submission.centreName"));
+      if (!isStringEmptyOrNull(experiment.getStudy().getAccession())) {
+        xmlStudyRef.setAttribute("accession", experiment.getStudy().getAccession());
       }
+      xml.appendChild(xmlStudyRef);
+
+      Element xmlDesign = xml.getOwnerDocument().createElementNS(null, "DESIGN");
+      xml.appendChild(xmlDesign);
+
+      Element designDescription = xml.getOwnerDocument().createElementNS(null, "DESIGN_DESCRIPTION");
+      designDescription.setTextContent(experiment.getDescription());
+      xmlDesign.appendChild(designDescription);
+
+      Element sampleDescriptor = xml.getOwnerDocument().createElementNS(null, "SAMPLE_DESCRIPTOR");
+      sampleDescriptor.setAttribute("refcenter", submissionProperties.getProperty("submission.centreName"));
+
+      Library relevantLibrary = null;
+
+      if (experiment.getPool() != null) {
+        if (experiment.getPool().getPoolableElements().size() > 1) {
+          // multiplexed pool
+          Element xmlPool = xml.getOwnerDocument().createElementNS(null, "POOL");
+          sampleDescriptor.appendChild(xmlPool);
+
+          for (Dilution dilution : experiment.getPool().getPoolableElements()) {
+            relevantLibrary = dilution.getLibrary();
+            Element xmlMember = xml.getOwnerDocument().createElementNS(null, "MEMBER");
+            xmlMember.setAttribute("member_name", dilution.getName());
+            xmlMember.setAttribute("refcenter", submissionProperties.getProperty("submission.centreName"));
+            xmlMember.setAttribute("refname", relevantLibrary.getSample().getAlias());
+            if (!isStringEmptyOrNull(relevantLibrary.getSample().getAccession())) {
+              sampleDescriptor.setAttribute("accession", relevantLibrary.getSample().getAccession());
+            }
+            xmlPool.appendChild(xmlMember);
+
+            Element xmlReadLabel = xml.getOwnerDocument().createElementNS(null, "READ_LABEL");
+            if (!relevantLibrary.getIndices().isEmpty()) {
+              StringBuilder tsb = new StringBuilder();
+              StringBuilder vsb = new StringBuilder();
+              for (Index index : relevantLibrary.getIndices()) {
+                tsb.append(index.getSequence());
+                vsb.append(index.getName());
+              }
+              xmlReadLabel.setAttribute("read_group_tag", tsb.toString());
+              xmlReadLabel.setTextContent(vsb.toString());
+            }
+            xmlMember.appendChild(xmlReadLabel);
+          }
+        } else {
+          for (Dilution dilution : experiment.getPool().getPoolableElements()) {
+            relevantLibrary = dilution.getLibrary();
+            sampleDescriptor.setAttribute("refname", relevantLibrary.getSample().getAlias());
+            sampleDescriptor.setAttribute("refcenter", submissionProperties.getProperty("submission.centreName"));
+            if (!isStringEmptyOrNull(relevantLibrary.getSample().getAccession())) {
+              sampleDescriptor.setAttribute("accession", relevantLibrary.getSample().getAccession());
+            }
+          }
+        }
+      }
+
+      xmlDesign.appendChild(sampleDescriptor);
+
+      Element libraryDescriptor = xml.getOwnerDocument().createElementNS(null, "LIBRARY_DESCRIPTOR");
+      Element libraryName = xml.getOwnerDocument().createElementNS(null, "LIBRARY_NAME");
+      if (relevantLibrary != null) {
+        if (!isStringEmptyOrNull(experiment.getPool().getAlias())) {
+          libraryName.setTextContent(experiment.getPool().getAlias());
+        } else {
+          libraryName.setTextContent(experiment.getPool().getName());
+        }
+      }
+      libraryDescriptor.appendChild(libraryName);
+
+      Element libraryStrategy = xml.getOwnerDocument().createElementNS(null, "LIBRARY_STRATEGY");
+      if (relevantLibrary != null) {
+        libraryStrategy.setTextContent(relevantLibrary.getLibraryStrategyType().getName());
+      }
+      libraryDescriptor.appendChild(libraryStrategy);
+
+      Element librarySource = xml.getOwnerDocument().createElementNS(null, "LIBRARY_SOURCE");
+      if (relevantLibrary != null) {
+        librarySource.setTextContent(relevantLibrary.getSample().getSampleType());
+      }
+      libraryDescriptor.appendChild(librarySource);
+
+      Element librarySelection = xml.getOwnerDocument().createElementNS(null, "LIBRARY_SELECTION");
+      if (relevantLibrary != null) {
+        librarySelection.setTextContent(relevantLibrary.getLibrarySelectionType().getName());
+      }
+      libraryDescriptor.appendChild(librarySelection);
+
+      Element libraryLayout = xml.getOwnerDocument().createElementNS(null, "LIBRARY_LAYOUT");
+      Element layout;
+      if (relevantLibrary != null) {
+        if (relevantLibrary.getPaired()) {
+          layout = xml.getOwnerDocument().createElementNS(null, "PAIRED");
+          if (!relevantLibrary.getLibraryQCs().isEmpty()) {
+            List<LibraryQC> qcs = new ArrayList<>(relevantLibrary.getLibraryQCs());
+            int insert = 0;
+            for (LibraryQC qc : qcs) {
+              insert += qc.getInsertSize();
+            }
+            layout.setAttribute("NOMINAL_LENGTH", String.valueOf(insert / qcs.size()));
+          } else {
+            layout.setAttribute("NOMINAL_LENGTH", "0");
+          }
+        } else {
+          layout = xml.getOwnerDocument().createElementNS(null, "SINGLE");
+        }
+        libraryLayout.appendChild(layout);
+      }
+      libraryDescriptor.appendChild(libraryLayout);
+
+      Element poolingStrategy = xml.getOwnerDocument().createElementNS(null, "POOLING_STRATEGY");
+      if (experiment.getPool() != null) {
+        if (experiment.getPool().getPoolableElements().size() > 1) {
+          poolingStrategy.setTextContent("multiplexed libraries");
+        } else {
+          poolingStrategy.setTextContent("none");
+        }
+      }
+      libraryDescriptor.appendChild(poolingStrategy);
+
+      xmlDesign.appendChild(libraryDescriptor);
+      if (experiment.getPlatform() != null && experiment.getPlatform().getPlatformType().getSraName() != null) {
+        Element platform = xml.getOwnerDocument().createElementNS(null, "PLATFORM");
+        Element type = xml.getOwnerDocument().createElementNS(null, experiment.getPlatform().getPlatformType().getSraName());
+        platform.appendChild(type);
+
+        Element model = xml.getOwnerDocument().createElementNS(null, "INSTRUMENT_MODEL");
+        model.setTextContent(experiment.getPlatform().getInstrumentModel());
+        type.appendChild(model);
+        xml.appendChild(platform);
+      }
+      Element processing = xml.getOwnerDocument().createElementNS(null, "PROCESSING");
+      xml.appendChild(processing);
+    }
+
+    @Override
+    public String name() {
+      return "experiment";
+    }
+  }
+
+  private final class StudyXmlSubfile extends XmlSubmissionFromSet<Study> {
+    @Override
+    public String name() {
+      return "study";
+    }
+
+    @Override
+    public Set<Study> items(Submission submission) {
+      return submission.getStudies();
+    }
+
+    @Override
+    protected String xmlName() {
+      return "STUDY";
+    }
+
+    @Override
+    protected String xmlCollectionName() {
+      return "STUDY_SET";
+    }
+
+    @Override
+    protected void populate(Element xml, Study s) {
+      xml.setAttribute("alias", s.getAlias());
+
+      Element studyDescriptor = xml.getOwnerDocument().createElementNS(null, "DESCRIPTOR");
+      xml.appendChild(studyDescriptor);
+
+      Element studyTitle = xml.getOwnerDocument().createElementNS(null, "STUDY_TITLE");
+      studyTitle.setTextContent(s.getAlias());
+      studyDescriptor.appendChild(studyTitle);
+
+      Element studyType = xml.getOwnerDocument().createElementNS(null, "STUDY_TYPE");
+      studyType.setAttribute("existing_study_type", s.getStudyType());
+      studyDescriptor.appendChild(studyType);
+
+      Element centerProjectName = xml.getOwnerDocument().createElementNS(null, "CENTER_PROJECT_NAME");
+      centerProjectName.setTextContent(s.getProject().getAlias());
+      studyDescriptor.appendChild(centerProjectName);
+
+      Element studyAbstract = xml.getOwnerDocument().createElementNS(null, "STUDY_ABSTRACT");
+      studyAbstract.setTextContent(s.getAbstract());
+      studyDescriptor.appendChild(studyAbstract);
+
+      Element studyDescription = xml.getOwnerDocument().createElementNS(null, "STUDY_DESCRIPTION");
+      studyDescription.setTextContent(s.getDescription());
+      studyDescriptor.appendChild(studyDescription);
+    }
+  }
+
+  private final class SampleXmlSubfile extends XmlSubmissionFromSet<Sample> {
+    @Override
+    protected Set<Sample> items(Submission submission) {
+      return submission.getSamples();
+    }
+
+    @Override
+    protected String xmlName() {
+      return "SAMPLE";
+    }
+
+    @Override
+    protected String xmlCollectionName() {
+      return "SAMPLE_SET";
+    }
+
+    @Override
+    protected void populate(Element xml, Sample sample) {
+      xml.setAttribute("alias", sample.getAlias());
+
+      xml.setAttribute("center_name", submissionProperties.getProperty("submission.centreName"));
+
+      Element sampleTitle = xml.getOwnerDocument().createElementNS(null, "TITLE");
+      sampleTitle.setTextContent(sample.getAlias());
+      xml.appendChild(sampleTitle);
+
+      Element sampleName = xml.getOwnerDocument().createElementNS(null, "SAMPLE_NAME");
+      Element sampleScientificName = xml.getOwnerDocument().createElementNS(null, "SCIENTIFIC_NAME");
+      sampleScientificName.setTextContent(sample.getScientificName());
+      sampleName.appendChild(sampleScientificName);
+
+      // 2/11/2011 Antony Colles moved IF !=null statement, to help produce valid submission XML.
+      Element sampleTaxonIdentifier = xml.getOwnerDocument().createElementNS(null, "TAXON_ID");
+      if (!isStringEmptyOrNull(sample.getTaxonIdentifier())) {
+        sampleTaxonIdentifier.setTextContent(sample.getTaxonIdentifier());
+      } else {
+        sampleTaxonIdentifier.setTextContent("000001");
+      }
+      sampleName.appendChild(sampleTaxonIdentifier);
+
+      xml.appendChild(sampleName);
+
+      Element sampleDescription = xml.getOwnerDocument().createElementNS(null, "DESCRIPTION");
+      sampleDescription.setTextContent(sample.getDescription());
+      xml.appendChild(sampleDescription);
+
+    }
+
+    @Override
+    public String name() {
+      return "sample";
+    }
+  }
+
+  private static final DateFormat DF_TIMESTAMP = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+
+  private final class DilutionXmlSubfile extends XmlSubmissionFromSet<Entry<Dilution, SequencerPoolPartition>> {
+
+    @Override
+    protected Set<Entry<Dilution, SequencerPoolPartition>> items(Submission submission) {
+      return submission.getDilutions().entrySet();
+    }
+
+    @Override
+    protected String xmlName() {
+      return "RUN";
+    }
+
+    @Override
+    protected String xmlCollectionName() {
+      return "RUN_SET";
+    }
+
+    @Override
+    protected void populate(Element xml, Entry<Dilution, SequencerPoolPartition> entry) {
+      Run r = entry.getValue().getSequencerPartitionContainer().getLastRun();
+
+      xml.setAttribute("alias", "L00" + entry.getValue().getPartitionNumber() + ":" + entry.getKey().getName() + ":" + r.getAlias());
+      xml.setAttribute("run_center", submissionProperties.getProperty("submission.centreName"));
+      if (r.getStatus() != null && r.getStatus().getHealth().equals(HealthType.Completed)) {
+
+        xml.setAttribute("run_date", DF_TIMESTAMP.format(r.getStatus().getCompletionDate()));
+      }
+      xml.setAttribute("center_name", submissionProperties.getProperty("submission.centreName"));
+
+      Collection<Experiment> es = entry.getValue().getPool().getExperiments();
+      for (Experiment e : es) {
+        Element experimentRef = xml.getOwnerDocument().createElementNS(null, "EXPERIMENT_REF");
+        experimentRef.setAttribute("refname", e.getAlias());
+        experimentRef.setAttribute("refcenter", submissionProperties.getProperty("submission.centreName"));
+        xml.appendChild(experimentRef);
+      }
+
+      Element dataBlock = xml.getOwnerDocument().createElementNS(null, "DATA_BLOCK");
+      dataBlock.setAttribute("sector", Integer.toString(entry.getValue().getPartitionNumber()));
+      if (entry.getValue().getPool().getPoolableElements().size() > 1) {
+        // multiplexed
+        dataBlock.setAttribute("member_name", entry.getKey().getName());
+      }
+
+      Element files = xml.getOwnerDocument().createElementNS(null, "FILES");
+
+      try {
+        Element file = xml.getOwnerDocument().createElementNS(null, "FILE");
+        file.setAttribute("filename",
+            r.getAlias() + "/" + "00" + entry.getValue().getPartitionNumber() + "/" + entry.getKey().getName() + "_R1.fastq.gz");
+        file.setAttribute("filetype", "fastq");
+        file.setAttribute("quality_scoring_system", "phred");
+        file.setAttribute("quality_encoding", "ascii");
+        file.setAttribute("ascii_offset", "!");
+        file.setAttribute("checksum_method", "MD5");
+        file.setAttribute("checksum", "");
+        Element readLabel = xml.getOwnerDocument().createElementNS(null, "READ_LABEL");
+        readLabel.setTextContent("1");
+        file.appendChild(readLabel);
+        files.appendChild(file);
+
+        if (r.getPairedEnd()) {
+          Element file2 = xml.getOwnerDocument().createElementNS(null, "FILE");
+          file2.setAttribute("filename",
+              r.getAlias() + "/" + "00" + entry.getValue().getPartitionNumber() + "/" + entry.getKey().getName() + "_R2.fastq.gz");
+          file2.setAttribute("filetype", "fastq");
+          file2.setAttribute("quality_scoring_system", "phred");
+          file2.setAttribute("quality_encoding", "ascii");
+          file2.setAttribute("ascii_offset", "!");
+          file2.setAttribute("checksum_method", "MD5");
+          file2.setAttribute("checksum", "");
+          Element readLabel2 = xml.getOwnerDocument().createElementNS(null, "READ_LABEL");
+          readLabel2.setTextContent("2");
+          file2.appendChild(readLabel2);
+          files.appendChild(file2);
+        }
+      } catch (Exception e) {
+        log.error("build submission", e);
+      }
+
+    }
+
+    @Override
+    public String name() {
+      return "run";
+    }
+  }
+
+  private abstract class ChildSubmissionFile {
+    public abstract void generateDocument(MultipartEntity entity, Submission submission, Properties submissionProperties)
+        throws ParserConfigurationException;
+
+    public abstract String name();
+
+    public abstract boolean isEmpty(Submission submission);
+
+    public String fileName(Submission submission) {
+      return String.format("%s_%s_%s.xml", submission.getName(), name(), DF_TIMESTAMP.format(submission.getSubmissionDate()));
+    }
+  }
+
+  private abstract class XmlSubmissionFromSet<T> extends ChildSubmissionFile {
+    protected abstract Set<T> items(Submission submission);
+
+    protected abstract String xmlName();
+
+    protected abstract String xmlCollectionName();
+
+    @Override
+    public boolean isEmpty(Submission submission) {
+      return items(submission).isEmpty();
+    }
+
+    @Override
+    public void generateDocument(MultipartEntity entity, Submission submission, Properties submissionProperties)
+        throws ParserConfigurationException {
+      Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+
+      Element set = document.createElementNS(null, xmlCollectionName());
+      document.appendChild(set);
+      for (T item : items(submission)) {
+        Element itemElement = document.createElement(xmlName());
+        populate(itemElement, item);
+        set.appendChild(itemElement);
+      }
+
+    }
+
+    protected abstract void populate(Element itemElement, T item);
+
+  }
+
+  private final ChildSubmissionFile[] FILES = new ChildSubmissionFile[] { new StudyXmlSubfile(), new SampleXmlSubfile(),
+      new DilutionXmlSubfile(),
+      new ExperimentXmlSubfile() };
+
+  @Override
+  public MultipartEntity prepareSubmission(Submission submission) throws SubmissionException {
+    try {
+      MultipartEntity entity = new MultipartEntity();
+      submission.setSubmissionDate(new Date());
+
+      Document submissionDocument = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+
+      Element s = submissionDocument.createElementNS(null, "SUBMISSION");
+      s.setAttribute("alias", submission.getAlias());
+      s.setAttribute("submission_date", DF_TIMESTAMP.format(submission.getSubmissionDate()));
+      s.setAttribute("submission_comment", submission.getDescription());
+      s.setAttribute("center_name", submissionProperties.getProperty("submission.centreName"));
+
+      Element title = submissionDocument.createElementNS(null, "TITLE");
+      title.setTextContent(submission.getTitle());
+      s.appendChild(title);
+
+      Element contacts = submissionDocument.createElementNS(null, "CONTACTS");
+      for (String contactName : submissionProperties.getProperty("submission.contacts").split(",")) {
+        Element contact = submissionDocument.createElementNS(null, "CONTACT");
+        contact.setAttribute("name", contactName);
+        contacts.appendChild(contact);
+      }
+      s.appendChild(contacts);
+
+      SubmissionActionType sat = submission.getSubmissionActionType();
+
+      Element actions = submissionDocument.createElementNS(null, "ACTIONS");
+
+      for (ChildSubmissionFile subFile : FILES) {
+
+        subFile.generateDocument(entity, submission, submissionProperties);
+        if (!subFile.isEmpty(submission)) {
+          if (sat == SubmissionActionType.ADD || sat == SubmissionActionType.VALIDATE) {
+            Element action = submissionDocument.createElementNS(null, "ACTION");
+            Element validate = submissionDocument.createElementNS(null, sat.name());
+            validate.setAttribute("schema", subFile.name());
+            validate.setAttribute("source", subFile.fileName(submission));
+            action.appendChild(validate);
+            actions.appendChild(action);
+          }
+        }
+      }
+      s.appendChild(actions);
+
+      if (submissionDocument.getElementsByTagName("SUBMISSION_SET").item(0) != null) {
+        submissionDocument.getElementsByTagName("SUBMISSION_SET").item(0).appendChild(s);
+      } else {
+        Element submissionSet = submissionDocument.createElementNS(null, "SUBMISSION_SET");
+        submissionDocument.appendChild(submissionSet);
+        submissionSet.appendChild(s);
+      }
+
+      entity.addPart("SUBMISSION",
+          new StringBody(SubmissionUtils.transform(submissionDocument)));
+
+      return entity;
+
     } catch (ParserConfigurationException e) {
       log.error("generate submission metadata", e);
       throw new SubmissionException(e.getMessage());
@@ -277,150 +685,43 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
     } catch (IOException e) {
       log.error("generate submission metadata", e);
       throw new SubmissionException(
-          "Cannot write to submission storage directory: " + subPath + ". Please check this directory exists and is writable.");
-    } finally {
-      submissionProperties.remove("submissionDate");
+          "Cannot generate data.");
     }
-
-    return sb.toString();
   }
 
   /**
    * Submits the given set of Submittables to the ERA submission service endpoint
    * 
    * @param submissionData
-   *          of type Set<Submittable<Document>>
+   *          of type Set<Submittable>
    * @return Document
    * @throws SubmissionException
    *           when an error occurred with the submission process
    */
   @Override
-  public Document submit(Set<Submittable<Document>> submissionData) throws SubmissionException {
+  public Document submit(Submission submission) throws SubmissionException {
     try {
+      MultipartEntity request = prepareSubmission(submission);
 
-      DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+      String url = getSubmissionEndPoint() + "?auth=ERA%20" + dropBox + "%20" + authKey;
+      HttpClient httpclient = getEvilTrustingTrustManager(new DefaultHttpClient());
+      HttpPost httppost = new HttpPost(url);
 
-      if (submissionEndPoint == null) {
-        throw new SubmissionException("No submission endpoint configured. Please check your submission.properties file.");
-      }
+      httppost.setEntity(request);
+      HttpResponse response = httpclient.execute(httppost);
 
-      if (submissionData == null || submissionData.size() == 0) {
-        throw new SubmissionException("No submission data set.");
-      }
-
-      if (accountName == null || dropBox == null || authKey == null) {
-        throw new SubmissionException("An accountName, dropBox and authKey must be supplied!");
-      }
-
-      if (centreName == null) {
+      if (response.getStatusLine().getStatusCode() != 200) {
         throw new SubmissionException(
-            "No centreName configured. Please check your submission.properties file and specify your Center Name as given by the SRA.");
+            "Response from submission endpoint (" + url + ") was not OK (200). Was: " + response.getStatusLine().getStatusCode());
       }
-
-      String curl = "curl -k ";
-
-      StringBuilder sb = new StringBuilder();
-      sb.append(curl);
-      String proxyHost = submissionProperties.getProperty("submission.proxyHost");
-      String proxyUser = submissionProperties.getProperty("submission.proxyUser");
-      String proxyPass = submissionProperties.getProperty("submission.proxyPass");
-
-      if (!isStringEmptyOrNull(proxyHost)) {
-        sb.append("-x ").append(proxyHost);
-
-        if (!isStringEmptyOrNull(proxyUser)) {
-          sb.append("-U ").append(proxyUser);
-
-          if (!isStringEmptyOrNull(proxyPass)) {
-            sb.append(":").append(proxyPass);
-          }
-        }
-      }
-
-      // submit via REST to endpoint
-      try {
-        Map<String, List<Submittable<Document>>> map = new HashMap<String, List<Submittable<Document>>>();
-        map.put("study", new ArrayList<Submittable<Document>>());
-        map.put("sample", new ArrayList<Submittable<Document>>());
-        map.put("experiment", new ArrayList<Submittable<Document>>());
-        map.put("run", new ArrayList<Submittable<Document>>());
-
-        Document submissionXml = docBuilder.newDocument();
-        String subName = null;
-
-        String d = df.format(new Date());
-        submissionProperties.put("submissionDate", d);
-
-        for (Submittable<Document> s : submissionData) {
-          if (s instanceof Submission) {
-            ERASubmissionFactory.generateParentSubmissionXML(submissionXml, (Submission) s, submissionProperties);
-            subName = ((Submission) s).getName();
-          } else if (s instanceof Study) {
-            map.get("study").add(s);
-          } else if (s instanceof Sample) {
-            map.get("sample").add(s);
-          } else if (s instanceof Experiment) {
-            map.get("experiment").add(s);
-          } else if (s instanceof SequencerPoolPartition) {
-            map.get("run").add(s);
-          }
-        }
-
-        if (submissionXml != null && subName != null) {
-          String url = getSubmissionEndPoint() + "?auth=ERA%20" + dropBox + "%20" + authKey;
-          HttpClient httpclient = getEvilTrustingTrustManager(new DefaultHttpClient());
-          HttpPost httppost = new HttpPost(url);
-          MultipartEntity reqEntity = new MultipartEntity();
-
-          String submissionXmlFileName = subName + File.separator + subName + "_submission_" + d + ".xml";
-
-          File subtmp = new File(submissionStoragePath + submissionXmlFileName);
-          SubmissionUtils.transform(submissionXml, subtmp, true);
-
-          reqEntity.addPart("SUBMISSION", new FileBody(subtmp));
-          for (String key : map.keySet()) {
-            List<Submittable<Document>> submittables = map.get(key);
-            String submittableXmlFileName = subName + File.separator + subName + "_" + key.toLowerCase() + "_" + d + ".xml";
-            File elementTmp = new File(submissionStoragePath + submittableXmlFileName);
-            Document submissionDocument = docBuilder.newDocument();
-            ERASubmissionFactory.generateSubmissionXML(submissionDocument, submittables, key, submissionProperties);
-            SubmissionUtils.transform(submissionDocument, elementTmp, true);
-            reqEntity.addPart(key.toUpperCase(), new FileBody(elementTmp));
-          }
-
-          httppost.setEntity(reqEntity);
-          HttpResponse response = httpclient.execute(httppost);
-
-          if (response.getStatusLine().getStatusCode() == 200) {
-            HttpEntity resEntity = response.getEntity();
-            try {
-              Document submissionReport = docBuilder.newDocument();
-              SubmissionUtils.transform(resEntity.getContent(), submissionReport);
-              File savedReport = new File(submissionStoragePath + subName + File.separator + "report_" + d + ".xml");
-              SubmissionUtils.transform(submissionReport, savedReport);
-              return submissionReport;
-            } catch (IOException e) {
-              log.error("submission report", e);
-            } catch (TransformerException e) {
-              log.error("submission report", e);
-            } finally {
-              submissionProperties.remove("submissionDate");
-            }
-          } else {
-            throw new SubmissionException(
-                "Response from submission endpoint (" + url + ") was not OK (200). Was: " + response.getStatusLine().getStatusCode());
-          }
-        } else {
-          throw new SubmissionException("Could not find a Submission in the supplied set of Submittables");
-        }
-      } catch (IOException e) {
-        log.error("submission report", e);
-      } catch (TransformerException e) {
-        log.error("submission report", e);
-      } finally {
-        submissionProperties.remove("submissionDate");
-      }
-    } catch (ParserConfigurationException e) {
+      HttpEntity resEntity = response.getEntity();
+      Document submissionReport = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+      SubmissionUtils.transform(resEntity.getContent(), submissionReport);
+      File savedReport = new File(
+          submissionStoragePath + submission.getName() + File.separator + "report_" + DF_TIMESTAMP.format(new Date()) + ".xml");
+      SubmissionUtils.transform(submissionReport, savedReport);
+      return submissionReport;
+    } catch (IOException | TransformerException | ParserConfigurationException e) {
       log.error("submission report", e);
     }
     return null;
@@ -428,11 +729,11 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
 
   @Override
   public Map<String, Object> parseResponse(Document report) {
-    Map<String, Object> responseMap = new HashMap<String, Object>();
+    Map<String, Object> responseMap = new HashMap<>();
     NodeList errors = report.getElementsByTagName("ERROR");
     NodeList infos = report.getElementsByTagName("INFO");
 
-    ArrayList<String> errorList = new ArrayList<String>();
+    ArrayList<String> errorList = new ArrayList<>();
     if (errors.getLength() > 0) {
       for (int i = 0; i < errors.getLength(); i++) {
         errorList.add(errors.item(i).getTextContent());
@@ -440,7 +741,7 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
       responseMap.put("errors", JSONArray.fromObject(errorList));
     }
 
-    ArrayList<String> infoList = new ArrayList<String>();
+    ArrayList<String> infoList = new ArrayList<>();
     if (infos.getLength() > 0) {
       for (int i = 0; i < infos.getLength(); i++) {
         infoList.add(infos.item(i).getTextContent());
@@ -452,27 +753,23 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
 
   @Override
   public String submitSequenceData(Submission s) {
-    Set<File> dataFiles = new HashSet<File>();
+    Set<File> dataFiles = new HashSet<>();
     FilePathGenerator FPG = new TGACIlluminaFilepathGenerator();
 
-    for (Object o : s.getSubmissionElements()) {
-      if (o instanceof SequencerPoolPartition) {
-        SequencerPoolPartition l = (SequencerPoolPartition) o;
-        try {
-          dataFiles = FPG.generateFilePaths(l);
-        } catch (SubmissionException submissionException) {
-          log.error("submit sequence data", submissionException);
-        }
+    for (Object o : s.getDilutions().values()) {
+      SequencerPoolPartition l = (SequencerPoolPartition) o;
+      try {
+        dataFiles = FPG.generateFilePaths(l);
+      } catch (SubmissionException submissionException) {
+        log.error("submit sequence data", submissionException);
       }
     }
 
     if (dataFiles.size() > 0) {
       TransferMethod t = new FTPTransferMethod();
-      EndPoint end = new ERAEndpoint();
-      end.setDestination(URI.create("ftp://localhost"));
 
       try {
-        UploadReport report = t.uploadSequenceData(dataFiles, end);
+        UploadReport report = t.uploadSequenceData(dataFiles, URI.create("ftp://localhost"));
         uploadReports.put(s.getId(), report);
 
         return ("Attempting to upload files...");
@@ -494,15 +791,7 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
     return null;
   }
 
-  @Override
-  public void setTransferMethod(TransferMethod transferMethod) {
-
-  }
-
-  /*
-   * public FTPUploadReport getUploadReport(Submission submission){ return uploadReports.get(submission); }
-   */
-
+  // TODO(apmasell): These files no longer get written to disk, so this method doesn't work.
   @Override
   public String prettifySubmissionMetadata(Submission submission) throws SubmissionException {
     StringBuilder sb = new StringBuilder();
@@ -516,7 +805,7 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
         for (File f : files) {
           if (f.getName().contains("submission_")) {
             String d = f.getName().substring(f.getName().lastIndexOf("_") + 1, f.getName().lastIndexOf("."));
-            Date test = df.parse(d);
+            Date test = DF_TIMESTAMP.parse(d);
             if (latestDate == null || test.after(latestDate)) {
               latestDate = test;
             }
@@ -528,7 +817,7 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
 
       String dateStr = "";
       if (latestDate != null) {
-        dateStr = "_" + df.format(latestDate);
+        dateStr = "_" + DF_TIMESTAMP.format(latestDate);
       }
 
       InputStream in = null;
@@ -636,7 +925,7 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
       // Finally, apply the ClientConnectionManager to the Http Client
       // or, as in this example, create a new one.
       return new DefaultHttpClient(ccm, httpClient.getParams());
-    } catch (Throwable t) {
+    } catch (Exception t) {
       log.error("Something nasty happened with the EvilTrustingTrustManager. Warranty is null and void!", t);
       return null;
     }

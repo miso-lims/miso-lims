@@ -659,11 +659,6 @@ public class DetailedSampleBuilder
   }
 
   @Override
-  public void buildSubmission() {
-    throw new UnsupportedOperationException("Method not implemented on builder");
-  }
-
-  @Override
   public void buildReport() throws ReportingException {
     throw new UnsupportedOperationException("Method not implemented on builder");
   }

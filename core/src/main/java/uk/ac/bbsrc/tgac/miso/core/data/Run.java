@@ -30,7 +30,6 @@ import java.util.List;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
-import org.w3c.dom.Document;
 
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.Note;
@@ -53,7 +52,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 @JsonIgnoreProperties({ "securityProfile", "submissionDocument" })
 public interface Run
-    extends SecurableByProfile, Submittable<Document>, Comparable<Run>, Reportable, Watchable, Deletable, Nameable, Alertable {
+    extends SecurableByProfile, Comparable<Run>, Reportable, Watchable, Deletable, Nameable, Alertable {
   /** Field PREFIX */
   public static final String PREFIX = "RUN";
 

@@ -45,7 +45,6 @@ import org.w3c.dom.Document;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ExperimentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -139,10 +138,6 @@ public class StudyImpl implements Study, Serializable {
 
     // add
     this.experiments.add(e);
-  }
-
-  @Override
-  public void buildSubmission() {
   }
 
   @Override

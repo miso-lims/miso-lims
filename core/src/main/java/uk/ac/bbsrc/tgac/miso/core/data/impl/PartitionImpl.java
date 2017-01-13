@@ -64,10 +64,6 @@ public class PartitionImpl extends AbstractPartition implements SequencerPoolPar
   }
 
   @Override
-  public void buildSubmission() {
-  }
-
-  @Override
   public Pool getPool() {
     return pool;
   }

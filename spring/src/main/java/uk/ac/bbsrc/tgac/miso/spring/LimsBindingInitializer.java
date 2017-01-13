@@ -76,7 +76,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
-import uk.ac.bbsrc.tgac.miso.core.data.Submittable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
@@ -569,53 +568,6 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
       }
 
     }.register(binder);
-
-    new BindingConverterByPrefixDispatch<>(Submittable.class).add(new Resolver<Study>() {
-      @Override
-      public String getPrefix() {
-        return Study.PREFIX;
-      }
-
-      @Override
-      public Study resolve(long id) throws Exception {
-        return requestManager.getStudyById(id);
-      }
-
-    }).add(new Resolver<Sample>() {
-      @Override
-      public String getPrefix() {
-        return Sample.PREFIX;
-      }
-
-      @Override
-      public Sample resolve(long id) throws Exception {
-        return requestManager.getSampleById(id);
-      }
-    }).add(new Resolver<Experiment>() {
-
-      @Override
-      public String getPrefix() {
-        return Experiment.PREFIX;
-      }
-
-      @Override
-      public Experiment resolve(long id) throws Exception {
-        return experimentService.get(id);
-      }
-
-    }).add(new Resolver<SequencerPoolPartition>() {
-
-      @Override
-      public String getPrefix() {
-        return "PAR";
-      }
-
-      @Override
-      public SequencerPoolPartition resolve(long id) throws Exception {
-        return requestManager.getSequencerPoolPartitionById(id);
-      }
-
-    }).register(binder, "submissionElement").register(binder, Set.class, "submissionElements");
 
     new BindingConverterById<Kit>(Kit.class) {
       @Override

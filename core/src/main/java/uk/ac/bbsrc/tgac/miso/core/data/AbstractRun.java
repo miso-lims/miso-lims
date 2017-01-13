@@ -65,7 +65,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.data.visitor.SubmittableVisitor;
 import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
 import uk.ac.bbsrc.tgac.miso.core.event.model.RunEvent;
 import uk.ac.bbsrc.tgac.miso.core.event.type.MisoEventType;
@@ -361,10 +360,6 @@ public abstract class AbstractRun implements Run {
 
   public Document getSubmissionData() {
     return submissionDocument;
-  }
-
-  public void accept(SubmittableVisitor v) {
-    v.visit(this);
   }
 
   @Override

@@ -37,6 +37,6 @@ import org.junit.runners.Suite;
  */
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses({ EraSubmissionTests.class, FormUtilsTests.class, RunTests.class })
+@Suite.SuiteClasses({ FormUtilsTests.class, RunTests.class })
 public class AllTestsSuite {
 }

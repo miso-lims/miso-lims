@@ -115,10 +115,6 @@ public class RunImpl extends AbstractRun implements Serializable {
     }
   }
 
-  @Override
-  public void buildSubmission() {
-  }
-
   /**
    * Method buildReport ...
    */

@@ -129,8 +129,6 @@ public abstract class AbstractPartition implements Partition {
     }
   }
 
-  public abstract void buildSubmission();
-
   /**
    * Equivalency is based on getProjectId() if set, otherwise on name, description and creation date.
    */

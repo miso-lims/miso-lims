@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.core.service.submission;
 
 import java.io.File;
+import java.net.URI;
 import java.util.Set;
 
 import uk.ac.bbsrc.tgac.miso.core.exception.SubmissionException;
@@ -42,5 +43,5 @@ public interface TransferMethod {
    *          set of datafiles
    * @return UploadReport response
    */
-  public UploadReport uploadSequenceData(Set<File> dataFiles, EndPoint endpoint) throws SubmissionException;
+  public UploadReport uploadSequenceData(Set<File> dataFiles, URI endpoint) throws SubmissionException;
 }

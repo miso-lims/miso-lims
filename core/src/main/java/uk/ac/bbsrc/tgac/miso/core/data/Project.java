@@ -29,7 +29,6 @@ import java.util.Date;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
-import org.w3c.dom.Document;
 
 import com.eaglegenomics.simlims.core.Group;
 
@@ -51,8 +50,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 // @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 @JsonIgnoreProperties({ "securityProfile" })
-public interface Project extends com.eaglegenomics.simlims.core.Project, Comparable<Project>, SecurableByProfile, Submittable<Document>,
-    Reportable<Project>,
+public interface Project extends com.eaglegenomics.simlims.core.Project, Comparable<Project>, SecurableByProfile, Reportable<Project>,
     Deletable, Watchable, Nameable, Alertable {
   /** Field PREFIX */
   public static final String PREFIX = "PRO";

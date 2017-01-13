@@ -156,10 +156,6 @@ public class ExperimentImpl implements Experiment, Serializable {
     this.kits.add(kit);
   }
 
-  @Override
-  public void buildSubmission() {
-  }
-
   @CoverageIgnore
   @Override
   public int compareTo(Object o) {

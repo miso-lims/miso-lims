@@ -674,7 +674,6 @@ public class UserAuthMisoRequestManagerTestSuite {
   public void testSaveSubmission() throws IOException {
     final long expectedReturn = 1L;
 
-    when(submission.userCanWrite(any(User.class))).thenReturn(true);
     when(backingManager.saveSubmission(submission)).thenReturn(expectedReturn);
 
     assertEquals(expectedReturn, userAuthMisoRequestManager.saveSubmission(submission));
@@ -687,7 +686,6 @@ public class UserAuthMisoRequestManagerTestSuite {
    */
   @Test
   public void testSaveSubmissionThrows() throws IOException {
-    when(submission.userCanWrite(any(User.class))).thenReturn(false);
 
     thrown.expect(IOException.class);
     thrown.expectMessage("User null cannot write to this Submission");
@@ -1639,7 +1637,6 @@ public class UserAuthMisoRequestManagerTestSuite {
   public void testGetSubmissionById() throws IOException {
     long id = 1L;
     when(backingManager.getSubmissionById(id)).thenReturn(submission);
-    when(submission.userCanRead(any(User.class))).thenReturn(true);
 
     assertEquals(submission, userAuthMisoRequestManager.getSubmissionById(id));
 

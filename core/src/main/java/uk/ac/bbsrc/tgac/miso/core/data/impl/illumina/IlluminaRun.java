@@ -119,15 +119,6 @@ public class IlluminaRun extends RunImpl {
   }
 
   @Override
-  public void buildSubmission() {
-    /*
-     * try { DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder(); submissionDocument =
-     * docBuilder.newDocument(); } catch (ParserConfigurationException e) { e.printStackTrace(); }
-     * ERASubmissionFactory.generateFullRunSubmissionXML(submissionDocument, this);
-     */
-  }
-
-  @Override
   public String toString() {
     StringBuffer sb = new StringBuffer();
     sb.append(super.toString());

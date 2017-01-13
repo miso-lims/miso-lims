@@ -30,7 +30,6 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
-import org.w3c.dom.Document;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -49,7 +48,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 @JsonIgnoreProperties({ "securityProfile" })
-public interface Experiment extends SecurableByProfile, Submittable<Document>, Comparable, Deletable, Nameable {
+public interface Experiment extends SecurableByProfile, Comparable, Deletable, Nameable {
 
   /** Field UNSAVED_ID */
   public static final Long UNSAVED_ID = 0L;

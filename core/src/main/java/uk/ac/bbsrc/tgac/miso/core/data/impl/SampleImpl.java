@@ -92,15 +92,6 @@ public class SampleImpl extends AbstractSample implements Serializable {
     }
   }
 
-  @Override
-  public void buildSubmission() {
-    /*
-     * try { DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder(); submissionDocument =
-     * docBuilder.newDocument(); } catch (ParserConfigurationException e) { e.printStackTrace(); }
-     * ERASubmissionFactory.generateSampleSubmissionXML(submissionDocument, this);
-     */
-  }
-
   /**
    * Method buildReport ...
    */

@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.core.service.submission;
 
 import java.io.File;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -61,11 +62,11 @@ public class FTPTransferMethod implements TransferMethod {
   }
 
   @Override
-  public FTPUploadReport uploadSequenceData(Set<File> dataFiles, EndPoint endpoint) throws SubmissionException {
-    List<FTPUploadJob> FTPUploadList = new ArrayList<FTPUploadJob>();
+  public FTPUploadReport uploadSequenceData(Set<File> dataFiles, URI endpoint) throws SubmissionException {
+    List<FTPUploadJob> FTPUploadList = new ArrayList<>();
     try {
       for (File f : dataFiles) {
-        FTPClient ftpClient = TransmissionUtils.ftpConnect(endpoint.getDestination().getHost(), username, password);
+        FTPClient ftpClient = TransmissionUtils.ftpConnect(endpoint.getHost(), username, password);
 
         FTPUploadJob FTPUploadJob = new FTPUploadJob(f);
 
