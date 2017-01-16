@@ -40,6 +40,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
@@ -53,6 +54,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.ExperimentChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
@@ -72,6 +74,7 @@ public class ExperimentImpl implements Experiment, Serializable {
 
   private String alias;
 
+  @OneToMany(targetEntity = ExperimentChangeLog.class, mappedBy = "experiment")
   private final List<ChangeLog> changeLog = new ArrayList<>();
 
   private String description;

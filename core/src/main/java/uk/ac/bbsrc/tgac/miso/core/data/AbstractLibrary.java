@@ -68,6 +68,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
@@ -166,7 +167,7 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
       @JoinColumn(name = "notes_noteId", nullable = false, updatable = false) })
   private Collection<Note> notes = new HashSet<>();
 
-  @OneToMany(targetEntity = ChangeLog.class)
+  @OneToMany(targetEntity = LibraryChangeLog.class, mappedBy = "library")
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
   @OneToOne(targetEntity = LibraryDerivedInfo.class)

@@ -9,6 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -35,8 +36,6 @@ public class SequencingParametersImpl implements SequencingParameters, Serializa
   private Long parametersId;
   @Column(nullable = false)
   private String name;
-  @Column(nullable = false, name = "platformId")
-  private Platform platform;
   private String xpath;
   @OneToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "createdBy", nullable = false)
@@ -50,6 +49,10 @@ public class SequencingParametersImpl implements SequencingParameters, Serializa
   private Date lastUpdated;
   @Transient
   private XPathExpression expression;
+
+  @ManyToOne(targetEntity = PlatformImpl.class)
+  @JoinColumn(name = "platformId")
+  private Platform platform;
 
   @Override
   public int compareTo(SequencingParameters o) {

@@ -64,6 +64,7 @@ public class LibraryDilution extends AbstractDilution implements Serializable {
   @JoinColumn
   private User lastModifier;
 
+  @Transient
   private Date lastModified;
 
   @Transient

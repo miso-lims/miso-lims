@@ -1,15 +1,8 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import org.codehaus.jackson.annotate.JsonBackReference;
-
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 
 public interface DetailedLibrary extends Library {
-
-  @JsonBackReference
-  Library getLibrary();
-
-  void setLibrary(Library library);
 
   KitDescriptor getKitDescriptor();
 

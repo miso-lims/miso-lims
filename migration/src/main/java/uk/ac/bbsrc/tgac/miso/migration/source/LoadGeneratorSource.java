@@ -32,7 +32,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
@@ -358,10 +357,7 @@ public class LoadGeneratorSource implements MigrationSource {
     LibraryStrategyType strat = new LibraryStrategyType();
     strat.setId(libraryStrategyTypeId);
     lib.setLibraryStrategyType(strat);
-
-    DetailedLibrary lai = new DetailedLibraryImpl();
-    lai.setArchived(false);
-    lai.setLibrary(lib);
+    ((DetailedLibrary) lib).setArchived(false);
 
     // faked alias generation to avoid necessity of target database data
     // Note: this will fail (OICR) validation if libraryCount > 999999

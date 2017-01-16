@@ -6,16 +6,12 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.MapsId;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
-import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
@@ -26,13 +22,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 public class DetailedLibraryImpl extends LibraryImpl implements DetailedLibrary {
 
   private static final long serialVersionUID = 1L;
-
-  // TODO: enable once Library is migrated to Hibernate.
-  @OneToOne(targetEntity = LibraryImpl.class)
-  @JoinColumn(name = "libraryId", nullable = false)
-  @MapsId
-  @Transient
-  private Library library;
 
   @ManyToOne
   @JoinColumn(name = "kitDescriptorId")
@@ -53,16 +42,6 @@ public class DetailedLibraryImpl extends LibraryImpl implements DetailedLibrary 
   private LibraryDesignCode libraryDesignCode;
 
   private Long preMigrationId;
-
-  @Override
-  public Library getLibrary() {
-    return library;
-  }
-
-  @Override
-  public void setLibrary(Library library) {
-    this.library = library;
-  }
 
   @Override
   public KitDescriptor getKitDescriptor() {

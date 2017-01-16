@@ -58,10 +58,12 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleDerivedInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SampleChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleQcException;
@@ -84,12 +86,13 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   private long sampleId = AbstractSample.UNSAVED_ID;
 
   @ManyToOne(targetEntity = ProjectImpl.class)
+  @JoinColumn(name = "project_projectId")
   private Project project;
 
   @Transient
   private final Collection<Experiment> experiments = new HashSet<>();
 
-  @Transient
+  @OneToMany(targetEntity = LibraryImpl.class, mappedBy = "sampleId")
   @JsonManagedReference
   private final Collection<Library> libraries = new HashSet<>();
 
@@ -102,7 +105,7 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
           @JoinColumn(name = "notes_noteId", nullable = false, updatable = false) })
   private Collection<Note> notes = new HashSet<>();
 
-  @Transient
+  @OneToMany(targetEntity = SampleChangeLog.class, mappedBy = "sample")
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
   @Transient
