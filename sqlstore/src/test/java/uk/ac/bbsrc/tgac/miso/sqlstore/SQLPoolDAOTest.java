@@ -41,10 +41,10 @@ import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
-import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ExperimentStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateChangeLogDao;
 
 public class SQLPoolDAOTest extends AbstractDAOTest {
 
@@ -62,7 +62,7 @@ public class SQLPoolDAOTest extends AbstractDAOTest {
   @Mock
   private Store<SecurityProfile> securityProfileDAO;
   @Mock
-  private ChangeLogStore changeLogDAO;
+  private HibernateChangeLogDao changeLogDAO;
   @Mock
   private SecurityStore securityDAO;
   @Mock

@@ -17,6 +17,7 @@ import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.migration.util.OicrMigrationNamingScheme;
 import uk.ac.bbsrc.tgac.miso.persistence.HibernateSampleClassDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateChangeLogDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateDetailedQcStatusDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateExperimentDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateIndexDao;
@@ -54,7 +55,6 @@ import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSampleNumberPerProjectService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSampleService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSampleValidRelationshipService;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLBoxDAO;
-import uk.ac.bbsrc.tgac.miso.sqlstore.SQLChangeLogDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryDilutionDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryQCDAO;
@@ -81,7 +81,7 @@ public class MisoServiceManager {
   private HibernateSecurityDao securityStore;
   private HibernateSecurityProfileDao securityProfileDao;
   private SQLProjectDAO projectDao;
-  private SQLChangeLogDAO changeLogDao;
+  private HibernateChangeLogDao changeLogDao;
   private HibernateSampleQcDao sampleQcDao;
   private SQLLibraryDAO libraryDao;
   private SQLLibraryQCDAO libraryQcDao;
@@ -266,7 +266,6 @@ public class MisoServiceManager {
     if (libraryDao != null) libraryDao.setSecurityDAO(securityStore);
     if (poolDao != null) poolDao.setSecurityDAO(securityStore);
     if (boxDao != null) boxDao.setSecurityDAO(securityStore);
-    if (changeLogDao != null) changeLogDao.setSecurityDAO(securityStore);
   }
 
   public HibernateSecurityProfileDao getSecurityProfileDao() {
@@ -441,19 +440,18 @@ public class MisoServiceManager {
     if (projectDao != null) projectDao.setSampleDAO(sampleDao);
   }
 
-  public SQLChangeLogDAO getChangeLogDao() {
+  public HibernateChangeLogDao getChangeLogDao() {
     return changeLogDao;
   }
 
-  public void setChangeLogDao(SQLChangeLogDAO changeLogDao) {
+  public void setChangeLogDao(HibernateChangeLogDao changeLogDao) {
     this.changeLogDao = changeLogDao;
     updateChangeLogDaoDependencies();
   }
 
   public void setDefaultChangeLogDao() {
-    SQLChangeLogDAO dao = new SQLChangeLogDAO();
-    dao.setJdbcTemplate(jdbcTemplate);
-    dao.setSecurityDAO(securityStore);
+    HibernateChangeLogDao dao = new HibernateChangeLogDao();
+    dao.setSessionFactory(sessionFactory);
     setChangeLogDao(dao);
   }
 

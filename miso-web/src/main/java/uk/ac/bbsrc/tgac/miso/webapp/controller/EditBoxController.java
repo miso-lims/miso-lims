@@ -33,6 +33,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.integration.BoxScanner;
+import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 
 @Controller
 @RequestMapping("/box")
@@ -48,6 +49,9 @@ public class EditBoxController {
 
   @Autowired
   private DataObjectFactory dataObjectFactory;
+
+  @Autowired
+  private ChangeLogService changeLogService;
 
   @Autowired
   private BoxScanner boxScanner;
@@ -78,7 +82,7 @@ public class EditBoxController {
   }
 
   public List<String> boxSizesAsRowsByColumns() throws IOException {
-    List<String> sizes = new ArrayList<String>();
+    List<String> sizes = new ArrayList<>();
     for (BoxSize boxSize : requestManager.listAllBoxSizes()) {
       sizes.add("\"" + boxSize.getRowsByColumns() + "\"" + ":" + "\"" + boxSize.getRowsByColumns() + "\"");
     }
@@ -97,7 +101,7 @@ public class EditBoxController {
 
   @RequestMapping(value = "/rest/changes", method = RequestMethod.GET)
   public @ResponseBody Collection<ChangeLog> jsonRestChanges() throws IOException {
-    return requestManager.listAllChanges("Box");
+    return changeLogService.listAll("Box");
   }
 
   @RequestMapping(value = "/{boxId}", method = RequestMethod.GET)

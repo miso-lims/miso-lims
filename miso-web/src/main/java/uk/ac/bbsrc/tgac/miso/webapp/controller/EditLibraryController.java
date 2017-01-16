@@ -105,6 +105,7 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryAdditionalInfoDto;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
 import uk.ac.bbsrc.tgac.miso.persistence.LibraryAdditionalInfoDao;
+import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryAdditionalInfoService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
@@ -151,6 +152,9 @@ public class EditLibraryController {
 
   @Autowired
   private LibraryDesignCodeDao libraryDesignCodeDao;
+
+  @Autowired
+  private ChangeLogService changeLogService;
 
   public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
     this.dataObjectFactory = dataObjectFactory;
@@ -621,7 +625,7 @@ public class EditLibraryController {
 
   @RequestMapping(value = "/rest/changes", method = RequestMethod.GET)
   public @ResponseBody Collection<ChangeLog> jsonRestChanges() throws IOException {
-    return requestManager.listAllChanges("Library");
+    return changeLogService.listAll("Library");
   }
 
   @RequestMapping(value = "/new/{sampleId}", method = RequestMethod.GET)

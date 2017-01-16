@@ -50,6 +50,10 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
+import com.eaglegenomics.simlims.core.SecurityProfile;
+import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
+
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
@@ -62,6 +66,7 @@ import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 
 @Controller
@@ -81,6 +86,9 @@ public class EditExperimentController {
 
   @Autowired
   private DataObjectFactory dataObjectFactory;
+
+  @Autowired
+  private ChangeLogService changeLogService;
 
   public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
     this.dataObjectFactory = dataObjectFactory;
@@ -130,7 +138,7 @@ public class EditExperimentController {
 
   @RequestMapping(value = "/rest/changes", method = RequestMethod.GET)
   public @ResponseBody Collection<ChangeLog> jsonRestChanges() throws IOException {
-    return requestManager.listAllChanges("Experiment");
+    return changeLogService.listAll("Experiment");
   }
 
   @RequestMapping(value = "/{experimentId}", method = RequestMethod.GET)

@@ -76,6 +76,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
 import uk.ac.bbsrc.tgac.miso.runstats.client.RunStatsException;
 import uk.ac.bbsrc.tgac.miso.runstats.client.manager.RunStatsManager;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
@@ -96,6 +97,9 @@ public class EditRunController {
 
   @Autowired
   private RunAlertManager runAlertManager;
+
+  @Autowired
+  private ChangeLogService changeLogService;
 
   private RunStatsManager runStatsManager;
 
@@ -243,7 +247,7 @@ public class EditRunController {
 
   @RequestMapping(value = "/rest/changes", method = RequestMethod.GET)
   public @ResponseBody Collection<ChangeLog> jsonRestChanges() throws IOException {
-    return requestManager.listAllChanges("Run");
+    return changeLogService.listAll("Run");
   }
 
   @RequestMapping(value = "/{runId}", method = RequestMethod.GET)

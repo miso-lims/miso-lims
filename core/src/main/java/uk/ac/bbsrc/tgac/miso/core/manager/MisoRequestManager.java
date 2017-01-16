@@ -50,7 +50,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
-import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
@@ -2185,10 +2184,6 @@ public class MisoRequestManager implements RequestManager {
     }
   }
 
-  @Override
-  public Collection<ChangeLog> listAllChanges(String type) throws IOException {
-    return changeLogStore.listAll(type);
-  }
 
   public ChangeLogStore getChangeLogStore() {
     return changeLogStore;

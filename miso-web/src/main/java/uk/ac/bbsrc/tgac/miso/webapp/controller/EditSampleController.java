@@ -115,6 +115,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
+import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.DetailedQcStatusService;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.LabService;
@@ -158,6 +159,9 @@ public class EditSampleController {
 
   @Autowired
   private ExperimentService experimentService;
+
+  @Autowired
+  private ChangeLogService changeLogService;
 
   public void setSampleOptionsController(SampleOptionsController sampleOptionsController) {
     this.sampleOptionsController = sampleOptionsController;
@@ -747,7 +751,7 @@ public class EditSampleController {
 
   @RequestMapping(value = "/rest/changes", method = RequestMethod.GET)
   public @ResponseBody Collection<ChangeLog> jsonRestChanges() throws IOException {
-    return requestManager.listAllChanges("Sample");
+    return changeLogService.listAll("Sample");
   }
 
   /**
