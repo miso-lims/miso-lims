@@ -24,7 +24,6 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateIndexDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateInstituteDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateKitDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLabDao;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryAdditionalInfoDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDesignCodeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDesignDao;
@@ -117,7 +116,6 @@ public class MisoServiceManager {
   private HibernateTissueMaterialDao tissueMaterialDao;
   private HibernateSampleNumberPerProjectDao sampleNumberPerProjectDao;
   private HibernateSampleValidRelationshipDao sampleValidRelationshipDao;
-  private HibernateLibraryAdditionalInfoDao libraryAdditionalInfoDao;
   private HibernateLibraryDesignDao libraryDesignDao;
   private HibernateLibraryDesignCodeDao libraryDesignCodeDao;
   private HibernateIndexDao indexDao;
@@ -159,7 +157,6 @@ public class MisoServiceManager {
     m.setDefaultLabService();
     m.setDefaultLibraryDao();
     m.setDefaultLibraryService();
-    m.setDefaultLibraryAdditionalInfoDao();
     m.setDefaultLibraryQcDao();
     m.setDefaultPlatformDao();
     m.setDefaultPoolDao();
@@ -496,7 +493,6 @@ public class MisoServiceManager {
     svc.setAutoGenerateIdBarcodes(autoGenerateIdBarcodes);
     svc.setNamingScheme(getNamingScheme());
     svc.setLibraryDao(libraryDao);
-    svc.setLibraryAdditionalInfoDao(libraryAdditionalInfoDao);
     svc.setLibraryDesignDao(libraryDesignDao);
     svc.setLibraryDesignCodeDao(libraryDesignCodeDao);
     svc.setLibraryQcDao(libraryQcDao);
@@ -623,7 +619,6 @@ public class MisoServiceManager {
 
   private void updateKitDaoDependencies() {
     if (libraryService != null) libraryService.setKitDao(kitDao);
-    if (libraryAdditionalInfoDao != null) libraryAdditionalInfoDao.setKitStore(kitDao);
   }
 
   public HibernatePlatformDao getPlatformDao() {
@@ -1065,26 +1060,6 @@ public class MisoServiceManager {
 
   private void updateSampleValidRelationshipDaoDependencies() {
     if (sampleValidRelationshipService != null) sampleValidRelationshipService.setSampleValidRelationshipDao(sampleValidRelationshipDao);
-  }
-
-  public HibernateLibraryAdditionalInfoDao getLibraryAdditionalInfoDao() {
-    return libraryAdditionalInfoDao;
-  }
-
-  public void setLibraryAdditionalInfoDao(HibernateLibraryAdditionalInfoDao libraryAdditionalInfoDao) {
-    this.libraryAdditionalInfoDao = libraryAdditionalInfoDao;
-    updateLibraryAdditionalInfoDaoDependencies();
-  }
-
-  public void setDefaultLibraryAdditionalInfoDao() {
-    HibernateLibraryAdditionalInfoDao dao = new HibernateLibraryAdditionalInfoDao();
-    dao.setKitStore(kitDao);
-    dao.setSessionFactory(sessionFactory);
-    setLibraryAdditionalInfoDao(dao);
-  }
-
-  private void updateLibraryAdditionalInfoDaoDependencies() {
-    if (libraryService != null) libraryService.setLibraryAdditionalInfoDao(libraryAdditionalInfoDao);
   }
 
   public HibernateLibraryDesignDao getLibraryDesignDao() {

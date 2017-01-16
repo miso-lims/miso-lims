@@ -23,7 +23,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstituteImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAdditionalInfoImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrderImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl;
@@ -107,7 +107,7 @@ public class MisoTargetUtils {
             LabImpl.class,
             ReferenceGenomeImpl.class,
             AbstractLibrary.class,
-            LibraryAdditionalInfoImpl.class,
+            DetailedLibraryImpl.class,
             LibraryDesign.class,
             LibraryDesignCode.class,
             LibraryType.class,

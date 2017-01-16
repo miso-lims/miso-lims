@@ -59,7 +59,7 @@ public interface Dilution extends SecurableByProfile, Barcodable, Comparable, De
    * 
    * @return String dilutionCreator.
    */
-  public String getDilutionUserName();
+  public String getDilutionCreator();
 
   /**
    * Sets the dilutionCreator of this Dilution object.
@@ -68,7 +68,7 @@ public interface Dilution extends SecurableByProfile, Barcodable, Comparable, De
    *          dilutionCreator.
    * 
    */
-  public void setDilutionUserName(String creator);
+  public void setDilutionCreator(String creator);
 
   /**
    * Returns the creationDate of this Dilution object.

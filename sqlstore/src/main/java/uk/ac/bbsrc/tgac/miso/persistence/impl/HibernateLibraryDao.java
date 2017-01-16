@@ -21,10 +21,12 @@ import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
@@ -34,6 +36,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 public class HibernateLibraryDao implements LibraryStore {
@@ -46,6 +49,8 @@ public class HibernateLibraryDao implements LibraryStore {
   private JdbcTemplate template;
   @Autowired
   private NamingScheme namingScheme;
+  @Value("${miso.detailed.sample.enabled:false}")
+  private boolean detailedSampleEnabled;
 
   private Session currentSession() {
     return getSessionFactory().getCurrentSession();
@@ -62,7 +67,7 @@ public class HibernateLibraryDao implements LibraryStore {
     long id;
     if (library.getId() == AbstractLibrary.UNSAVED_ID) {
       if (!namingScheme.duplicateLibraryAliasAllowed() && !listByAlias(library.getAlias()).isEmpty()
-          && (library.getLibraryAdditionalInfo() != null ? !library.getLibraryAdditionalInfo().hasNonStandardAlias() : true)) {
+          && (LimsUtils.isDetailedLibrary(library) && !((DetailedLibrary) library).hasNonStandardAlias())) {
         // throw if duplicate aliases are not allowed and the library has a standard alias (detailed sample only)
         throw new IOException("NEW: A library with this alias already exists in the database");
       }
@@ -343,6 +348,14 @@ public class HibernateLibraryDao implements LibraryStore {
     return records;
   }
 
+  @Override
+  public Library getByPreMigrationId(Long preMigrationId) throws IOException {
+    if (!detailedSampleEnabled) return null;
+    Criteria criteria = currentSession().createCriteria(LibraryImpl.class);
+    criteria.add(Restrictions.eq("preMigrationId", preMigrationId));
+    return (Library) criteria.uniqueResult();
+  }
+
   public SessionFactory getSessionFactory() {
     return sessionFactory;
   }
@@ -359,4 +372,5 @@ public class HibernateLibraryDao implements LibraryStore {
   public void setNamingScheme(NamingScheme namingScheme) {
     this.namingScheme = namingScheme;
   }
+
 }

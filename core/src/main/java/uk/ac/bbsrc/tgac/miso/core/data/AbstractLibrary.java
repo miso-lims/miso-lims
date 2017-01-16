@@ -63,7 +63,6 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAdditionalInfoImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDerivedInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryQCImpl;
@@ -173,11 +172,6 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @OneToOne(targetEntity = LibraryDerivedInfo.class)
   @PrimaryKeyJoinColumn
   private LibraryDerivedInfo derivedInfo;
-
-  @OneToOne(targetEntity = LibraryAdditionalInfoImpl.class, mappedBy = "library", cascade = CascadeType.ALL)
-  @JsonManagedReference
-  private LibraryAdditionalInfo libraryAdditionalInfo;
-
 
   @ManyToOne(targetEntity = BoxImpl.class)
   @JoinFormula("(SELECT boxId FROM BoxPosition WHERE targetId = id AND targetType = 'L')")
@@ -441,16 +435,6 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
     return lowQuality;
   }
 
-  @Override
-  public LibraryAdditionalInfo getLibraryAdditionalInfo() {
-    return libraryAdditionalInfo;
-  }
-
-  @Override
-  public void setLibraryAdditionalInfo(LibraryAdditionalInfo libraryAdditionalInfo) {
-    this.libraryAdditionalInfo = libraryAdditionalInfo;
-  }
-
   @CoverageIgnore
   @Override
   public boolean isDeletable() {
@@ -563,7 +547,6 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
         .append(identificationBarcode)
         .append(indices)
         .append(initialConcentration)
-        .append(libraryAdditionalInfo)
         .append(librarySelectionType)
         .append(libraryStrategyType)
         .append(libraryType)
@@ -589,7 +572,6 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
         .append(identificationBarcode, other.identificationBarcode)
         .append(indices, other.indices)
         .append(initialConcentration, other.initialConcentration)
-        .append(libraryAdditionalInfo, other.libraryAdditionalInfo)
         .append(librarySelectionType, other.librarySelectionType)
         .append(libraryStrategyType, other.libraryStrategyType)
         .append(libraryType, other.libraryType)

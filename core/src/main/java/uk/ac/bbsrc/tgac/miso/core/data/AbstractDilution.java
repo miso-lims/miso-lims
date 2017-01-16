@@ -67,8 +67,8 @@ public abstract class AbstractDilution implements Dilution, Comparable {
   private Date creationDate;
   @Column(nullable = false)
   private Double concentration;
-  @Column(nullable = false)
-  private String dilutionUserName;
+  @Column(name = "dilutionUserName", nullable = false)
+  private String dilutionCreator;
 
   private String identificationBarcode;
   private Long preMigrationId;
@@ -108,13 +108,13 @@ public abstract class AbstractDilution implements Dilution, Comparable {
   }
 
   @Override
-  public String getDilutionUserName() {
-    return dilutionUserName;
+  public String getDilutionCreator() {
+    return dilutionCreator;
   }
 
   @Override
-  public void setDilutionUserName(String dilutionUserName) {
-    this.dilutionUserName = dilutionUserName;
+  public void setDilutionCreator(String dilutionUserName) {
+    this.dilutionCreator = dilutionUserName;
   }
 
   @Override
@@ -251,11 +251,11 @@ public abstract class AbstractDilution implements Dilution, Comparable {
       }
       else if (!creationDate.equals(them.getCreationDate()))
         return false;
-      if (dilutionUserName == null) {
-        if (them.getDilutionUserName() != null)
+      if (dilutionCreator == null) {
+        if (them.getDilutionCreator() != null)
           return false;
       }
-      else if (!dilutionUserName.equals(them.getDilutionUserName()))
+      else if (!dilutionCreator.equals(them.getDilutionCreator()))
         return false;
       return true;
     } else {
@@ -272,7 +272,7 @@ public abstract class AbstractDilution implements Dilution, Comparable {
       final int PRIME = 37;
       int hashcode = 1;
       if (getCreationDate() != null) hashcode = PRIME * hashcode + getCreationDate().hashCode();
-      if (getDilutionUserName() != null) hashcode = PRIME * hashcode + getDilutionUserName().hashCode();
+      if (getDilutionCreator() != null) hashcode = PRIME * hashcode + getDilutionCreator().hashCode();
       if (getConcentration() != null) hashcode = PRIME * hashcode + getConcentration().hashCode();
       return hashcode;
     }

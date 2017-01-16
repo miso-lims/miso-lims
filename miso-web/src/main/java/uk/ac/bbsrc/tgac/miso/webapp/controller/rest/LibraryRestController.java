@@ -26,7 +26,6 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -55,9 +54,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.eaglegenomics.simlims.core.User;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.LibraryAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
@@ -124,33 +121,6 @@ public class LibraryRestController extends RestController {
     return mapper.writeValueAsString(libraries);
   }
 
-  private Long populateAndSaveLibraryFromDto(LibraryDto libraryDto, Library library, boolean create) throws IOException {
-    User user = authorizationManager.getCurrentUser();
-    library.setLastModifier(user);
-    if (libraryDto.getLibrarySelectionTypeId() != null) {
-      library.setLibrarySelectionType(libraryService.getLibrarySelectionTypeById(libraryDto.getLibrarySelectionTypeId()));
-    }
-    if (libraryDto.getLibraryStrategyTypeId() != null) {
-      library.setLibraryStrategyType(libraryService.getLibraryStrategyTypeById(libraryDto.getLibraryStrategyTypeId()));
-    }
-    library.setLibraryType(libraryService.getLibraryTypeById(libraryDto.getLibraryTypeId()));
-    List<Index> indices = new ArrayList<>();
-    if (libraryDto.getIndex1Id() != null) {
-      indices.add(indexService.getIndexById(libraryDto.getIndex1Id()));
-    }
-    if (libraryDto.getIndex2Id() != null) {
-      indices.add(indexService.getIndexById(libraryDto.getIndex2Id()));
-    }
-    library.setIndices(indices);
-    LibraryAdditionalInfo lai = Dtos.to(libraryDto.getLibraryAdditionalInfo());
-    if (lai != null) {
-      library.setLibraryAdditionalInfo(lai);
-      library.getLibraryAdditionalInfo().setCreatedBy(user);
-      library.getLibraryAdditionalInfo().setUpdatedBy(user);
-    }
-    return libraryService.save(library).getId();
-  }
-
   @RequestMapping(method = RequestMethod.POST, headers = { "Content-type=application/json" })
   @ResponseBody
   public ResponseEntity<?> createLibrary(@RequestBody LibraryDto libraryDto, UriComponentsBuilder b) throws IOException {
@@ -165,7 +135,7 @@ public class LibraryRestController extends RestController {
       library.setCreationDate(new Date());
       library.setSample(sampleService.get(libraryDto.getParentSampleId()));
       library.inheritPermissions(library.getSample());
-      id = populateAndSaveLibraryFromDto(libraryDto, library, true);
+      libraryService.save(library);
     } catch (ConstraintViolationException | IllegalArgumentException e) {
       log.error("Error while creating library. ", e);
       RestException restException = new RestException(e.getMessage(), Status.BAD_REQUEST);
@@ -192,8 +162,8 @@ public class LibraryRestController extends RestController {
     if (library == null) {
       throw new RestException("No such library.", Status.NOT_FOUND);
     }
-    library = Dtos.to(libraryDto, library);
-    populateAndSaveLibraryFromDto(libraryDto, library, false);
+    library = Dtos.to(libraryDto);
+    libraryService.save(library);
     return new ResponseEntity<>(HttpStatus.OK);
   }
 

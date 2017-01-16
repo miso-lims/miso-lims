@@ -43,7 +43,6 @@ import uk.ac.bbsrc.tgac.miso.core.store.IndexStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
-import uk.ac.bbsrc.tgac.miso.persistence.LibraryAdditionalInfoDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateChangeLogDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryQcDao;
@@ -68,8 +67,6 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
   private IndexStore indexStore;
   @Mock
   private SampleStore sampleStore;
-  @Mock
-  private LibraryAdditionalInfoDao libraryAdditionalInfoDao;
   @Mock
   private HibernateChangeLogDao changeLogDAO;
 

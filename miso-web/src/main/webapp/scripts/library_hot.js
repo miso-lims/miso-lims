@@ -26,10 +26,11 @@ Library.hot = {
    */
   prepLibrariesForPropagate: function (libraries) {
     return libraries.map(function (lib) {
-      if (lib.libraryAdditionalInfo) {
+      if (Hot.detailedSample) {
         // if any members are null, fill them with empty objects otherwise things go poorly
-        if (!lib.libraryAdditionalInfo.prepKit) {
-          lib.libraryAdditionalInfo.prepKit = { id: '', name: '' };
+        if (!lib.kitDescriptorId) {
+          lib.kitDescriptorId = '';
+          lib.kitDescriptorName = '';
         }
       }
       return lib;
@@ -43,15 +44,16 @@ Library.hot = {
     return libraries.map(function (lib) {
       lib.librarySelectionTypeAlias = Hot.getAliasFromId(lib.librarySelectionTypeId, Hot.dropdownRef.selectionTypes) || '(None)';
       lib.libraryStrategyTypeAlias = Hot.getAliasFromId(lib.libraryStrategyTypeId, Hot.dropdownRef.strategyTypes) || '(None)';
-      if (lib.libraryAdditionalInfo) {
+      if (Hot.detailedSample) {
         // if any members are null, fill them with empty objects otherwise things go poorly
-        if (!lib.libraryAdditionalInfo.prepKit) {
-          lib.libraryAdditionalInfo.prepKit = { id: '', name: '' };
+        if (!lib.kitDescriptorId) {
+          lib.kitDescriptorId = '';
+          lib.kitDescriptorName = '';
         }
-        if (lib.libraryAdditionalInfo.libraryDesignId) {
-          lib.libraryDesignAlias = Hot.maybeGetProperty(Hot.findFirstOrNull(Hot.idPredicate(lib.libraryAdditionalInfo.libraryDesignId), Library.designs), 'name') || '(None)';
+        if (lib.libraryDesignId) {
+          lib.libraryDesignAlias = Hot.maybeGetProperty(Hot.findFirstOrNull(Hot.idPredicate(lib.libraryDesignId), Library.designs), 'name') || '(None)';
         }
-        lib.libraryDesignCode = Hot.maybeGetProperty(Hot.findFirstOrNull(Hot.idPredicate(lib.libraryAdditionalInfo.libraryDesignCode), Hot.dropdownRef.libraryDesignCodes), 'code');
+        lib.libraryDesignCode = Hot.maybeGetProperty(Hot.findFirstOrNull(Hot.idPredicate(lib.libraryDesignCodeId), Hot.dropdownRef.libraryDesignCodes), 'code');
       }
       if (!lib.indexFamilyName) {
         lib.indexFamilyName = 'No index';
@@ -109,7 +111,7 @@ Library.hot = {
     
     var aliasColIndex = Hot.getColIndex('alias');
     Hot.startData.forEach(function (library, index) {
-      if (!Hot.detailedSample || !library.libraryAdditionalInfo.nonStandardAlias) {
+      if (!Hot.detailedSample || !library.nonStandardAlias) {
         Hot.hotTable.setCellMeta(index, aliasColIndex, 'validator', Library.hot.validateAlias);
       } else {
         Hot.hotTable.setCellMeta(index, aliasColIndex, 'renderer', Hot.nsAliasRenderer);
@@ -188,13 +190,9 @@ Library.hot = {
     index1Label: '',
     index2Label: '',
     volume: null,
-    libraryAdditionalInfo: Hot.detailedSample ? {
-      prepKit: {
-        id: '',
-        name: ''
-      },
-      archived: false
-    } : null,
+    kitDescriptorId: null,
+    kitDescriptorName: null,
+    archived: false
   },
   
   /**
@@ -387,7 +385,7 @@ Library.hot = {
       },
       {
         header: 'Kit',
-        data: 'libraryAdditionalInfo.prepKit.name',
+        data: 'kitDescriptorName',
         type: 'dropdown',
         trimDropdown: false,
         source: Library.hot.getKitDescriptors(),
@@ -638,24 +636,22 @@ Library.hot = {
 
       lib.volume = obj.volume;
 
-      if (obj.libraryAdditionalInfo) {
-        lib.libraryAdditionalInfo = {};
-        if (obj.libraryAdditionalInfo.prepKit.name) {
-          var prepKitName = obj.libraryAdditionalInfo.prepKit.name;
-          lib.libraryAdditionalInfo.prepKit = Hot.sampleOptions.kitDescriptorsDtos.filter(function (kd) { return (kd.name == prepKitName); })[0];
+      if (Hot.detailedSample) {
+        if (obj.kitDescriptorName) {
+          lib.kitDescriptorId = Hot.maybeGetProperty(Hot.findFirstOrNull(Hot.namePredicate(obj.kitDescriptorName), Hot.sampleOptions.kitDescriptorsDtos), 'id');
         }
-        if (obj.libraryAdditionalInfo.archived) {
-          lib.libraryAdditionalInfo.archived = obj.libraryAdditionalInfo.archived;
+        if (obj.archived) {
+          lib.archived = obj.archived;
         } else {
-          lib.libraryAdditionalInfo.archived = false;
+          lib.archived = undefined;
         }
-        lib.libraryAdditionalInfo.nonStandardAlias = obj.libraryAdditionalInfo.nonStandardAlias;
+        lib.nonStandardAlias = obj.nonStandardAlias;
         if (obj.libraryDesignAlias == '(None)') {
-          lib.libraryAdditionalInfo.libraryDesignId = undefined;
+          lib.libraryDesignId = undefined;
         } else {
-          lib.libraryAdditionalInfo.libraryDesignId = Hot.maybeGetProperty(Hot.findFirstOrNull(Hot.namePredicate(obj.libraryDesignAlias), Library.designs), 'id');
+          lib.libraryDesignId = Hot.maybeGetProperty(Hot.findFirstOrNull(Hot.namePredicate(obj.libraryDesignAlias), Library.designs), 'id');
         }
-        lib.libraryAdditionalInfo.libraryDesignCodeId = Hot.maybeGetProperty(Hot.findFirstOrNull(function (ldCode) { return ldCode.code == obj.libraryDesignCode; }, Hot.dropdownRef.libraryDesignCodes), 'id');
+        lib.libraryDesignCodeId = Hot.maybeGetProperty(Hot.findFirstOrNull(function (ldCode) { return ldCode.code == obj.libraryDesignCode; }, Hot.dropdownRef.libraryDesignCodes), 'id');
       }
 
       lib.qcPassed = (obj.qcPassed && obj.qcPassed != 'unknown' ? obj.qcPassed : '') || '';

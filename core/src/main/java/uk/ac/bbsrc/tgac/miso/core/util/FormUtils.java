@@ -3456,7 +3456,7 @@ public class FormUtils {
                   ldi.setConcentration(Double.valueOf(getCellValueAsString(dilutionMolarityCell)));
                   ldi.setCreationDate(new Date());
                   ldi.setLastModified(ldi.getCreationDate());
-                  ldi.setDilutionUserName(u.getLoginName());
+                  ldi.setDilutionCreator(u.getLoginName());
                   if (!library.getLibraryDilutions().contains(ldi)) {
                     library.addDilution(ldi);
                     log.info("Added library dilution: " + ldi.toString());
@@ -3933,7 +3933,7 @@ public class FormUtils {
         ldi.setSecurityProfile(library.getSecurityProfile());
         ldi.setConcentration(Double.valueOf(dilutionMolarity));
         ldi.setCreationDate(new Date());
-        ldi.setDilutionUserName(u.getLoginName());
+        ldi.setDilutionCreator(u.getLoginName());
         if (!library.getLibraryDilutions().contains(ldi)) {
           library.addDilution(ldi);
           log.info("Added library dilution: " + ldi.toString());

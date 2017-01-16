@@ -11,11 +11,11 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.springframework.format.datetime.DateFormatter;
 
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.LibraryAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -32,8 +32,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAdditionalInfoImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
@@ -359,10 +359,9 @@ public class LoadGeneratorSource implements MigrationSource {
     strat.setId(libraryStrategyTypeId);
     lib.setLibraryStrategyType(strat);
 
-    LibraryAdditionalInfo lai = new LibraryAdditionalInfoImpl();
+    DetailedLibrary lai = new DetailedLibraryImpl();
     lai.setArchived(false);
     lai.setLibrary(lib);
-    lib.setLibraryAdditionalInfo(lai);
 
     // faked alias generation to avoid necessity of target database data
     // Note: this will fail (OICR) validation if libraryCount > 999999
@@ -396,7 +395,7 @@ public class LoadGeneratorSource implements MigrationSource {
     LibraryDilution ldi = new LibraryDilution();
     ldi.setLibrary(library);
     ldi.setConcentration(1D);
-    ldi.setDilutionUserName("load-test");
+    ldi.setDilutionCreator("load-test");
     return ldi;
   }
 

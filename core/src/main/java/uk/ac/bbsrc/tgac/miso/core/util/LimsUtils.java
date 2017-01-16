@@ -85,8 +85,10 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletion;
@@ -895,6 +897,10 @@ public class LimsUtils {
 
   public static boolean isAliquotSample(Sample sample) {
     return sample instanceof SampleAliquot;
+  }
+
+  public static boolean isDetailedLibrary(Library library) {
+    return library instanceof DetailedLibrary;
   }
 
   public static boolean hasStockParent(Long id, Iterable<SampleValidRelationship> relationships) throws IOException {

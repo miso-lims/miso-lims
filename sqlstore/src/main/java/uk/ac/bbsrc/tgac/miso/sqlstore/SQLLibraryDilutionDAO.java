@@ -318,7 +318,7 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
     params.addValue("library_libraryId", dilution.getLibrary().getId());
     params.addValue("creationDate", dilution.getCreationDate());
     params.addValue("securityProfile_profileId", securityProfileId);
-    params.addValue("dilutionUserName", dilution.getDilutionUserName());
+    params.addValue("dilutionUserName", dilution.getDilutionCreator());
     params.addValue("lastUpdated", dilution.getLastModified());
     if (dilution.getTargetedSequencing() != null) {
       params.addValue("targetedSequencingId", dilution.getTargetedSequencing().getId());
@@ -499,7 +499,7 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
       if (rs.wasNull()) libraryDilution.setPreMigrationId(null);
       libraryDilution.setIdentificationBarcode(rs.getString("identificationBarcode"));
       libraryDilution.setCreationDate(rs.getDate("creationDate"));
-      libraryDilution.setDilutionUserName(rs.getString("dilutionUserName"));
+      libraryDilution.setDilutionCreator(rs.getString("dilutionUserName"));
       libraryDilution.setLastModified(rs.getTimestamp("lastUpdated"));
 
       try {

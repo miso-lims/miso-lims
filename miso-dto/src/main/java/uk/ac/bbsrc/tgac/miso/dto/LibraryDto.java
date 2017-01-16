@@ -15,7 +15,6 @@ public class LibraryDto {
   private String identificationBarcode;
   private String lastModified;
   private Long libraryId;
-  private LibraryAdditionalInfoDto libraryAdditionalInfo;
   private Long librarySelectionTypeId;
   private Long libraryStrategyTypeId;
   private Long libraryTypeId;
@@ -63,10 +62,6 @@ public class LibraryDto {
 
   public String getLastModified() {
     return lastModified;
-  }
-
-  public LibraryAdditionalInfoDto getLibraryAdditionalInfo() {
-    return libraryAdditionalInfo;
   }
 
   public Long getLibrarySelectionTypeId() {
@@ -173,10 +168,6 @@ public class LibraryDto {
   @JsonSerialize(include = JsonSerialize.Inclusion.ALWAYS)
   public void setLastModified(String lastModified) {
     this.lastModified = lastModified;
-  }
-
-  public void setLibraryAdditionalInfo(LibraryAdditionalInfoDto libraryAdditionalInfo) {
-    this.libraryAdditionalInfo = libraryAdditionalInfo;
   }
 
   public void setLibrarySelectionTypeId(Long librarySelectionTypeId) {

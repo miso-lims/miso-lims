@@ -66,6 +66,7 @@ import net.sf.ehcache.Element;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
@@ -91,7 +92,6 @@ import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-import uk.ac.bbsrc.tgac.miso.persistence.LibraryAdditionalInfoDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateChangeLogDao;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
@@ -230,12 +230,12 @@ public class SQLLibraryDAO implements LibraryStore {
     this.detailedSampleEnabled = detailedSampleEnabled;
   }
 
-  @Autowired
-  private LibraryAdditionalInfoDao libraryAdditionalInfoDAO;
-
-  public void setLibraryAdditionalInfoDao(LibraryAdditionalInfoDao libraryAdditionalInfoDao) {
-    this.libraryAdditionalInfoDAO = libraryAdditionalInfoDao;
-  }
+  // @Autowired
+  // private LibraryAdditionalInfoDao libraryAdditionalInfoDAO;
+  //
+  // public void setLibraryAdditionalInfoDao(LibraryAdditionalInfoDao libraryAdditionalInfoDao) {
+  // this.libraryAdditionalInfoDAO = libraryAdditionalInfoDao;
+  // }
 
   @Autowired
   private IndexStore indexStore;
@@ -384,7 +384,7 @@ public class SQLLibraryDAO implements LibraryStore {
 
     if (library.getId() == AbstractLibrary.UNSAVED_ID) {
       if (!namingScheme.duplicateLibraryAliasAllowed() && !listByAlias(library.getAlias()).isEmpty()
-          && (library.getLibraryAdditionalInfo() != null ? !library.getLibraryAdditionalInfo().hasNonStandardAlias() : true)) {
+          && (library instanceof DetailedLibrary && !((DetailedLibrary) library).hasNonStandardAlias())) {
         // throw if duplicate aliases are not allowed and the library has a standard alias (detailed sample only)
         throw new IOException("NEW: A library with this alias already exists in the database");
       } else {
@@ -410,11 +410,11 @@ public class SQLLibraryDAO implements LibraryStore {
                 new MapSqlParameterSource().addValue("libraryId", newId.longValue()));
             throw new IOException("Something bad happened. Expected library ID doesn't match returned value from DB insert");
           }
-          if (library.getLibraryAdditionalInfo() != null) {
-            library.getLibraryAdditionalInfo().setLibrary(library);
-            library.getLibraryAdditionalInfo().setLibraryId(newId.longValue());
-            libraryAdditionalInfoDAO.addLibraryAdditionalInfo(library.getLibraryAdditionalInfo());
-          }
+          // if (library.getLibraryAdditionalInfo() != null) {
+          // library.getLibraryAdditionalInfo().setLibrary(library);
+          // library.getLibraryAdditionalInfo().setLibraryId(newId.longValue());
+          // libraryAdditionalInfoDAO.addLibraryAdditionalInfo(library.getLibraryAdditionalInfo());
+          // }
         } catch (MisoNamingException e) {
           throw new IOException("Cannot save library - issue with naming scheme", e);
         }
@@ -433,18 +433,18 @@ public class SQLLibraryDAO implements LibraryStore {
           library.getLocationBarcode());
       NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
       namedTemplate.update(LIBRARY_UPDATE, params);
-      if (library.getLibraryAdditionalInfo() != null) {
-        library.getLibraryAdditionalInfo().setLibrary(library);
-        library.getLibraryAdditionalInfo().setLibraryId(library.getId());
-        libraryAdditionalInfoDAO.update(library.getLibraryAdditionalInfo());
-      }
+      // if (library.getLibraryAdditionalInfo() != null) {
+      // library.getLibraryAdditionalInfo().setLibrary(library);
+      // // library.getLibraryAdditionalInfo().setLibraryId(library.getId());
+      // // libraryAdditionalInfoDAO.update(library.getLibraryAdditionalInfo());
+      // }
     }
 
-    if (library.getLibraryAdditionalInfo() != null) {
-      library.getLibraryAdditionalInfo().setLibrary(library);
-      library.getLibraryAdditionalInfo().setLibraryId(library.getId());
-      libraryAdditionalInfoDAO.addLibraryAdditionalInfo(library.getLibraryAdditionalInfo());
-    }
+    // if (library.getLibraryAdditionalInfo() != null) {
+    // // library.getLibraryAdditionalInfo().setLibrary(library);
+    // // library.getLibraryAdditionalInfo().setLibraryId(library.getId());
+    // //libraryAdditionalInfoDAO.addLibraryAdditionalInfo(library.getLibraryAdditionalInfo());
+    // }
 
     MapSqlParameterSource libparams = new MapSqlParameterSource();
     libparams.addValue("library_libraryId", library.getId());
@@ -497,7 +497,7 @@ public class SQLLibraryDAO implements LibraryStore {
 
   private void validateAliasOrThrow(Library library) throws IOException {
     ValidationResult val = namingScheme.validateLibraryAlias(library.getAlias());
-    if (!val.isValid() && (library.getLibraryAdditionalInfo() == null || !library.getLibraryAdditionalInfo().hasNonStandardAlias())) {
+    if (!val.isValid() && (library instanceof DetailedLibrary && !((DetailedLibrary) library).hasNonStandardAlias())) {
       throw new IOException("Cannot save library - invalid alias:" + val.getMessage());
     }
   }
@@ -888,7 +888,7 @@ public class SQLLibraryDAO implements LibraryStore {
           library.setSample(sampleDAO.lazyGet(rs.getLong("sample_sampleId")));
         }
         library.getChangeLog().addAll(changeLogDao.listAllById(TABLE_NAME, id));
-        library.setLibraryAdditionalInfo(libraryAdditionalInfoDAO.getLibraryAdditionalInfoByLibraryId(library.getId()));
+        // library.setLibraryAdditionalInfo(libraryAdditionalInfoDAO.getLibraryAdditionalInfoByLibraryId(library.getId()));
       } catch (IOException e1) {
         log.error("library row mapper", e1);
       } catch (MalformedLibraryQcException e) {
@@ -942,6 +942,12 @@ public class SQLLibraryDAO implements LibraryStore {
   @Override
   public Map<String, Integer> getLibraryColumnSizes() throws IOException {
     return DbUtils.getColumnSizes(template, TABLE_NAME);
+  }
+
+  @Override
+  public Library getByPreMigrationId(Long preMigrationId) throws IOException {
+    // TODO Auto-generated method stub
+    return null;
   }
 
   public void setChangeLogDAO(HibernateChangeLogDao changeLogDao) {

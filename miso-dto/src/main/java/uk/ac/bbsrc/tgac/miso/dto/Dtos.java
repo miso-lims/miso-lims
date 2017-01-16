@@ -22,6 +22,7 @@ import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
@@ -30,7 +31,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Institute;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.LibraryAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
@@ -56,12 +56,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstituteImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAdditionalInfoImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrderImpl;
@@ -84,6 +84,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 
@@ -860,39 +863,28 @@ public class Dtos {
     return to;
   }
 
-  public static LibraryAdditionalInfoDto asDto(LibraryAdditionalInfo from) {
-    LibraryAdditionalInfoDto dto = new LibraryAdditionalInfoDto();
-    dto.setLibraryId(from.getLibraryId());
-    if (from.getPrepKit() != null) {
-      dto.setPrepKit(asDto(from.getPrepKit()));
+  private static DetailedLibraryDto asDetailedLibraryDto(DetailedLibrary from) {
+    DetailedLibraryDto dto = new DetailedLibraryDto();
+    if (from.getKitDescriptor() != null) {
+      dto.setKitDescriptorId(from.getKitDescriptor().getId());
     }
-    dto.setCreatedById(from.getCreatedBy().getUserId());
-    dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
-    dto.setUpdatedById(from.getUpdatedBy().getUserId());
-    dto.setLastUpdated(dateTimeFormatter.print(from.getLastUpdated().getTime()));
-    dto.setArchived(from.getArchived());
     if (from.getLibraryDesign() != null) {
       dto.setLibraryDesignId(from.getLibraryDesign().getId());
     }
     dto.setLibraryDesignCodeId(from.getLibraryDesignCode().getId());
+    dto.setPreMigrationId(from.getPreMigrationId());
+    dto.setArchived(from.getArchived());
     dto.setNonStandardAlias(from.hasNonStandardAlias());
     return dto;
   }
 
-  public static Set<LibraryAdditionalInfoDto> asLibraryAdditionalInfoDtos(Collection<LibraryAdditionalInfo> from) {
-    Set<LibraryAdditionalInfoDto> dtoSet = Sets.newHashSet();
-    for (LibraryAdditionalInfo l : from) {
-      dtoSet.add(asDto(l));
-    }
-    return dtoSet;
-  }
-
-  public static LibraryAdditionalInfo to(LibraryAdditionalInfoDto from) {
+  public static DetailedLibrary toDetailedLibrary(DetailedLibraryDto from) {
     if (from == null) return null;
-    LibraryAdditionalInfo to = new LibraryAdditionalInfoImpl();
-    to.setLibraryId(from.getLibraryId());
-    if (from.getPrepKit() != null) {
-      to.setPrepKit(to(from.getPrepKit()));
+    DetailedLibrary to = new DetailedLibraryImpl();
+    if (from.getKitDescriptorId() != null) {
+      KitDescriptor kitDescriptor = new KitDescriptor();
+      kitDescriptor.setId(from.getKitDescriptorId());
+      to.setKitDescriptor(kitDescriptor);
     }
     if (from.getLibraryDesignId() != null) {
       LibraryDesign design = new LibraryDesign();
@@ -902,6 +894,7 @@ public class Dtos {
     LibraryDesignCode ldCode = new LibraryDesignCode();
     ldCode.setId(from.getLibraryDesignCodeId());
     to.setLibraryDesignCode(ldCode);
+
     to.setArchived(from.getArchived());
     to.setNonStandardAlias(from.getNonStandardAlias());
     return to;
@@ -957,8 +950,13 @@ public class Dtos {
     return dtoList;
   }
 
-  public static LibraryDto asDto(Library from, LibraryAdditionalInfo infoFrom) {
-    LibraryDto dto = new LibraryDto();
+  public static LibraryDto asDto(Library from) {
+    LibraryDto dto = null;
+    if (isDetailedLibrary(from)) {
+      dto = asDetailedLibraryDto((DetailedLibrary) from);
+    } else {
+      dto = new LibraryDto();
+    }
     dto.setAlias(from.getAlias());
     dto.setName(from.getName());
     dto.setParentSampleId(from.getSample().getId());
@@ -999,9 +997,6 @@ public class Dtos {
       }
     }
     dto.setVolume(from.getVolume());
-    if (infoFrom != null) {
-      dto.setLibraryAdditionalInfo(asDto(infoFrom));
-    }
     if (!isStringEmptyOrNull(from.getIdentificationBarcode())) {
       dto.setIdentificationBarcode(from.getIdentificationBarcode());
     }
@@ -1012,21 +1007,22 @@ public class Dtos {
   public static List<LibraryDto> asLibraryDtos(Collection<Library> from) {
     List<LibraryDto> dtoSet = new ArrayList<>();
     for (Library lib : from) {
-      dtoSet.add(asDto(lib, lib.getLibraryAdditionalInfo()));
+      dtoSet.add(asDto(lib));
     }
     return dtoSet;
-  }
-
-  public static Library to(LibraryDto from) {
-    Library target = new LibraryImpl();
-    return to(from, target);
   }
 
   /**
    * Overwrites all modifiable fields. Intended to be used with a freshly-loaded database object or newly-created impl so save and update
    * are similar.
    */
-  public static Library to(LibraryDto from, Library to) {
+  public static Library to(LibraryDto from) {
+    Library to = null;
+    if (from instanceof DetailedLibraryDto) {
+      to = toDetailedLibrary((DetailedLibraryDto) from);
+    } else {
+      to = new LibraryImpl();
+    }
     to.setAlias(from.getAlias());
     to.setName(from.getName());
     to.setDescription(from.getDescription());
@@ -1035,6 +1031,22 @@ public class Dtos {
     to.setLowQuality(from.getLowQuality());
     to.setPaired(from.getPaired());
     to.setPlatformName(from.getPlatformName());
+    if (from.getLibrarySelectionTypeId() != null) {
+      LibrarySelectionType sel = new LibrarySelectionType();
+      sel.setId(from.getLibrarySelectionTypeId());
+      to.setLibrarySelectionType(sel);
+    }
+    if (from.getLibraryStrategyTypeId() != null) {
+      LibraryStrategyType strat = new LibraryStrategyType();
+      strat.setId(from.getLibraryStrategyTypeId());
+      to.setLibraryStrategyType(strat);
+    }
+    if (from.getLibraryTypeId() != null) {
+      LibraryType type = new LibraryType();
+      type.setId(from.getLibraryTypeId());
+      if (from.getLibraryTypeAlias() != null) type.setDescription(from.getLibraryTypeAlias());
+      to.setLibraryType(type);
+    }
     to.setQcPassed(from.getQcPassed());
     if (from.getIndex1Id() != null) {
       List<Index> indices = new ArrayList<>();
@@ -1143,7 +1155,7 @@ public class Dtos {
     to.setConcentration(from.getConcentration());
     to.setLibrary(to(from.getLibrary()));
     if (!isStringEmptyOrNull(from.getDilutionUserName())) {
-      to.setDilutionUserName(from.getDilutionUserName());
+      to.setDilutionCreator(from.getDilutionUserName());
     }
     DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
     try {

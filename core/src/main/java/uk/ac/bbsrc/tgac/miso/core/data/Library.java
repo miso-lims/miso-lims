@@ -331,10 +331,6 @@ public interface Library extends SecurableByProfile, Comparable<Library>, Barcod
 
   public boolean isLowQuality();
 
-  public LibraryAdditionalInfo getLibraryAdditionalInfo();
-
-  public void setLibraryAdditionalInfo(LibraryAdditionalInfo libraryAdditionalInfo);
-
   public IndexFamily getCurrentFamily();
 
 }

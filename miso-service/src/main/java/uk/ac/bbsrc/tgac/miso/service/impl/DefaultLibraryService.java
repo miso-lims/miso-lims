@@ -23,10 +23,10 @@ import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibraryQC;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.LibraryAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
@@ -44,7 +44,6 @@ import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignCodeDao;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignDao;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
-import uk.ac.bbsrc.tgac.miso.persistence.LibraryAdditionalInfoDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleDao;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
@@ -67,8 +66,6 @@ public class DefaultLibraryService implements LibraryService {
   private LibraryDesignDao libraryDesignDao;
   @Autowired
   private LibraryDesignCodeDao libraryDesignCodeDao;
-  @Autowired
-  private LibraryAdditionalInfoDao libraryAdditionalInfoDao;
   @Autowired
   private LibraryQcStore libraryQcDao;
   @Autowired
@@ -126,7 +123,7 @@ public class DefaultLibraryService implements LibraryService {
     
     // pre-save field generation
     library.setName(generateTemporaryName());
-    if (library.getLibraryAdditionalInfo() != null && library.getLibraryAdditionalInfo().hasNonStandardAlias()) {
+    if (isDetailedLibrary(library) && ((DetailedLibrary) library).hasNonStandardAlias()) {
       // do not validate alias
     } else if (isStringEmptyOrNull(library.getAlias()) && namingScheme.hasLibraryAliasGenerator()) {
       try {
@@ -412,18 +409,17 @@ public class DefaultLibraryService implements LibraryService {
       if (managedIndex != null) managedIndices.add(managedIndex);
     }
     library.setIndices(managedIndices);
-    if (library.getLibraryAdditionalInfo() != null) {
-      LibraryAdditionalInfo lai = library.getLibraryAdditionalInfo();
-      if (lai.getPrepKit() != null) {
-        lai.setPrepKit(kitDescriptorDao.getKitDescriptorById(lai.getPrepKit().getId()));
+    if (isDetailedLibrary(library)) {
+      DetailedLibrary lai = (DetailedLibrary) library;
+      if (lai.getKitDescriptor() != null) {
+        lai.setKitDescriptor(kitDescriptorDao.getKitDescriptorById(lai.getKitDescriptor().getId()));
       }
       if (lai.getLibraryDesign() != null) {
         lai.setLibraryDesign(libraryDesignDao.getLibraryDesign(lai.getLibraryDesign().getId()));
       }
-      if (library.getLibraryAdditionalInfo().getLibraryDesignCode() != null) {
+      if (lai.getLibraryDesignCode() != null) {
         lai.setLibraryDesignCode(libraryDesignCodeDao.getLibraryDesignCode(lai.getLibraryDesignCode().getId()));
       }
-      library.setLibraryAdditionalInfo(lai);
       validateLibraryDesignValues(library);
     }
   }
@@ -462,6 +458,13 @@ public class DefaultLibraryService implements LibraryService {
       target.setVolume(source.getVolume());
     }
     target.setQcPassed(source.getQcPassed());
+    if (isDetailedLibrary(target)) {
+      DetailedLibrary dSource = (DetailedLibrary) source;
+      DetailedLibrary dTarget = (DetailedLibrary) target;
+      dTarget.setPreMigrationId(dSource.getPreMigrationId());
+      dTarget.setNonStandardAlias(dSource.hasNonStandardAlias());
+      dTarget.setArchived(dSource.getArchived());
+    }
   }
 
   /**
@@ -472,15 +475,15 @@ public class DefaultLibraryService implements LibraryService {
    * @throws IOException when the library's values don't match the values of the LibraryDesign
    */
   private void validateLibraryDesignValues(Library library) throws IOException {
-    if (!isDetailedSample(library.getSample())) {
+    if (!isDetailedLibrary(library)) {
       throw new IOException("A library design can only be applied to a detailed sample.");
     }
-    LibraryDesign design = libraryDesignDao.getLibraryDesign(library.getLibraryAdditionalInfo().getLibraryDesign().getId());
+    LibraryDesign design = libraryDesignDao.getLibraryDesign(((DetailedLibrary) library).getLibraryDesign().getId());
     if (((DetailedSample) library.getSample()).getSampleClass().getId() != design.getSampleClass().getId()) {
       throw new IOException(
           "This library design is not valid for sample " + library.getSample().getName() + " because the class is not compatible.");
     }
-    library.getLibraryAdditionalInfo().setLibraryDesign(design);
+    ((DetailedLibrary) library).setLibraryDesign(design);
     LibrarySelectionType selection = libraryDao.getLibrarySelectionTypeById(design.getLibrarySelectionType().getId());
     LibraryStrategyType strategy = libraryDao.getLibraryStrategyTypeById(design.getLibraryStrategyType().getId());
     if (library.getLibrarySelectionType() != null && library.getLibrarySelectionType().getId() != selection.getId()) {
@@ -489,10 +492,10 @@ public class DefaultLibraryService implements LibraryService {
     if (library.getLibraryStrategyType() != null && library.getLibraryStrategyType().getId() != strategy.getId()) {
       throw new IOException("Library strategy doesn't match library design.");
     }
-    if (library.getLibraryAdditionalInfo().getLibraryDesignCode().getId() != null
-        && library.getLibraryAdditionalInfo().getLibraryDesign().getId() != null
-        && library.getLibraryAdditionalInfo().getLibraryDesignCode().getId() != library.getLibraryAdditionalInfo().getLibraryDesign()
-            .getLibraryDesignCode().getId()) {
+    if (((DetailedLibrary) library).getLibraryDesignCode().getId() != null
+        && ((DetailedLibrary) library).getLibraryDesign().getId() != null
+        && ((DetailedLibrary) library).getLibraryDesignCode().getId() != null
+        && ((DetailedLibrary) library).getLibraryDesign().getLibraryDesignCode().getId() != null) {
       throw new IOException("Selected library design code does not match library design code for selected library design.");
     }
     library.setLibrarySelectionType(selection);
@@ -521,10 +524,6 @@ public class DefaultLibraryService implements LibraryService {
 
   public void setLibraryDesignCodeDao(LibraryDesignCodeDao libraryDesignCodeDao) {
     this.libraryDesignCodeDao = libraryDesignCodeDao;
-  }
-
-  public void setLibraryAdditionalInfoDao(LibraryAdditionalInfoDao libraryAdditionalInfoDao) {
-    this.libraryAdditionalInfoDao = libraryAdditionalInfoDao;
   }
 
   public void setLibraryQcDao(LibraryQcStore libraryQcStore) {

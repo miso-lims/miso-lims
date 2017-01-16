@@ -249,4 +249,12 @@ public interface LibraryStore extends Store<Library>, Remover<Library> {
 
   List<Library> searchByCreationDate(Date from, Date to) throws IOException;
 
+  /**
+   * Retrieves a single Library by preMigrationId (DetailedLibrary only)
+   * 
+   * @param preMigrationId preMigration ID of Library
+   * @throws IOException
+   */
+  Library getByPreMigrationId(Long preMigrationId) throws IOException;
+
 }

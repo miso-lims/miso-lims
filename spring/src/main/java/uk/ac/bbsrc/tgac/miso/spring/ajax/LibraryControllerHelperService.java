@@ -68,6 +68,7 @@ import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -722,7 +723,7 @@ public class LibraryControllerHelperService {
         Library library = libraryService.get(libraryId);
         LibraryDilution newDilution = new LibraryDilution();
         newDilution.setSecurityProfile(library.getSecurityProfile());
-        newDilution.setDilutionUserName(json.getString("dilutionCreator"));
+        newDilution.setDilutionCreator(json.getString("dilutionCreator"));
         newDilution.setCreationDate(new SimpleDateFormat("dd/MM/yyyy").parse(json.getString("dilutionDate")));
         newDilution.setLastModified(newDilution.getCreationDate());
         newDilution.setConcentration(Double.parseDouble(json.getString("results")));
@@ -756,7 +757,7 @@ public class LibraryControllerHelperService {
           SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
           sb.append("<tr>");
           sb.append("<td>" + dil.getName() + "</td>");
-          sb.append("<td>" + dil.getDilutionUserName() + "</td>");
+          sb.append("<td>" + dil.getDilutionCreator() + "</td>");
           sb.append("<td>" + date.format(dil.getCreationDate()) + "</td>");
           sb.append("<td>" + LimsUtils.round(dil.getConcentration(), 2) + " " + dil.getUnits() + "</td>");
           if (json.has("targetedSequencing")) {
@@ -860,10 +861,10 @@ public class LibraryControllerHelperService {
             "<input type='text' id='idBarcodeValue" + dilutionId + "' value='"
                 + (isStringEmptyOrNull(dilution.getIdentificationBarcode()) ? "" : dilution.getIdentificationBarcode()) + "'/>");
       }
-      if (dilution.getLibrary().getLibraryAdditionalInfo() != null && dilution.getLibrary().getLibraryAdditionalInfo().getPrepKit() != null
-          && dilution.getLibrary().getLibraryAdditionalInfo().getPrepKit().getId() != null && json.getBoolean("detailedSample")) {
+      if (LimsUtils.isDetailedLibrary(dilution.getLibrary()) && ((DetailedLibrary) dilution.getLibrary()).getKitDescriptor() != null
+          && ((DetailedLibrary) dilution.getLibrary()).getKitDescriptor().getId() != null && json.getBoolean("detailedSample")) {
         response.put("targetedSequencings",
-            getTargetedSequencingTypes(dilution.getLibrary().getLibraryAdditionalInfo().getPrepKit().getId()));
+            getTargetedSequencingTypes(((DetailedLibrary) dilution.getLibrary()).getKitDescriptor().getId()));
       }
       response.put("edit",
           "<a href='javascript:void(0);' onclick='Library.dilution.editLibraryDilution(\"" + dilutionId + "\", "
