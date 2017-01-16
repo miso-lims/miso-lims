@@ -50,12 +50,9 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.support.WebBindingInitializer;
 import org.springframework.web.context.request.WebRequest;
 
-import com.eaglegenomics.simlims.core.Activity;
 import com.eaglegenomics.simlims.core.Group;
-import com.eaglegenomics.simlims.core.Protocol;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.ProtocolManager;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
@@ -101,9 +98,6 @@ import uk.ac.bbsrc.tgac.miso.service.ReferenceGenomeService;
 public class LimsBindingInitializer extends org.springframework.web.bind.support.ConfigurableWebBindingInitializer
     implements WebBindingInitializer {
   protected static final Logger log = LoggerFactory.getLogger(LimsBindingInitializer.class);
-
-  @Autowired
-  private ProtocolManager protocolManager;
 
   @Autowired
   private RequestManager requestManager;
@@ -357,17 +351,6 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
   }
 
   /**
-   * Sets the protocolManager of this LimsBindingInitializer object.
-   * 
-   * @param protocolManager
-   *          protocolManager.
-   */
-  public void setProtocolManager(ProtocolManager protocolManager) {
-    assert (protocolManager != null);
-    this.protocolManager = protocolManager;
-  }
-
-  /**
    * Sets the securityManager of this LimsBindingInitializer object.
    * 
    * @param securityManager
@@ -401,20 +384,6 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
       @Override
       public InetAddress resolve(String element) throws Exception {
         return InetAddress.getByName(element);
-      }
-    }.register(binder);
-
-    new BindingConverter<Activity>(Activity.class) {
-      @Override
-      public Activity resolve(String id) throws Exception {
-        return protocolManager.getActivity(id);
-      }
-    }.register(binder);
-
-    new BindingConverter<Protocol>(Protocol.class) {
-      @Override
-      public Protocol resolve(String id) throws Exception {
-        return protocolManager.getProtocol(id);
       }
     }.register(binder);
 

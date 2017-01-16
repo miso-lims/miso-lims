@@ -48,7 +48,6 @@ import org.hibernate.annotations.TypeDefs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.eaglegenomics.simlims.core.Request;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
@@ -86,9 +85,6 @@ public abstract class AbstractProject implements Project {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long projectId = AbstractProject.UNSAVED_ID;
-
-  @Transient
-  private Collection<Request> requests = new HashSet<>();
 
   @Transient
   private Collection<Sample> samples = new HashSet<>();
@@ -164,11 +160,6 @@ public abstract class AbstractProject implements Project {
   }
 
   @Override
-  public Collection<Request> getRequests() {
-    return requests;
-  }
-
-  @Override
   public Collection<Sample> getSamples() {
     return samples;
   }
@@ -222,11 +213,6 @@ public abstract class AbstractProject implements Project {
   @Deprecated
   public void setProjectId(Long projectId) {
     this.projectId = projectId;
-  }
-
-  @Override
-  public void setRequests(Collection<Request> requests) {
-    this.requests = requests;
   }
 
   @Override
@@ -339,18 +325,6 @@ public abstract class AbstractProject implements Project {
     return securityProfile.userCanWrite(user);
   }
 
-  /**
-   * Only those users who can write to the project can create requests on it.
-   */
-  public Request createRequest(User owner) throws SecurityException {
-    if (!userCanWrite(owner)) {
-      throw new SecurityException();
-    }
-    Request request = new Request(this, owner);
-    getRequests().add(request);
-    return request;
-  }
-
   public void addStudy(Study s) {
     // do study validation
     s.setProject(this);
@@ -421,13 +395,12 @@ public abstract class AbstractProject implements Project {
   }
 
   @Override
-  public int compareTo(Object o) {
-    Project s = (Project) o;
-    if (getId() != 0L && s.getId() != 0L) {
-      if (getId() < s.getId()) return -1;
-      if (getId() > s.getId()) return 1;
-    } else if (getAlias() != null && s.getAlias() != null) {
-      return getAlias().compareTo(s.getAlias());
+  public int compareTo(Project o) {
+    if (getId() != 0L && o.getId() != 0L) {
+      if (getId() < o.getId()) return -1;
+      if (getId() > o.getId()) return 1;
+    } else if (getAlias() != null && o.getAlias() != null) {
+      return getAlias().compareTo(o.getAlias());
     }
     return 0;
   }
