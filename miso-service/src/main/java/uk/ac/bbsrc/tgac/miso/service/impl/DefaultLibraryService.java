@@ -150,8 +150,9 @@ public class DefaultLibraryService implements LibraryService {
   @Override
   public boolean delete(Library library) throws IOException {
     authorizationManager.throwIfNonAdmin();
-    library.getSample().getLibraries().remove(library);
-    return libraryDao.remove(get(library.getId()));
+    Library managed = get(library.getId());
+    managed.getSample().getLibraries().remove(managed);
+    return libraryDao.remove(managed);
   }
 
   @Override
@@ -317,7 +318,7 @@ public class DefaultLibraryService implements LibraryService {
     note.setCreationDate(new Date());
     note.setOwner(authorizationManager.getCurrentUser());
     managed.addNote(note);
-    libraryDao.save(managed);
+    save(managed);
   }
 
   @Override
@@ -356,7 +357,7 @@ public class DefaultLibraryService implements LibraryService {
       throw new IOException("Malformed Library QC");
     }
     libraryQcDao.save(qc);
-    // libraryDao.save(library); ??
+    libraryDao.save(library);
   }
 
   @Override

@@ -77,6 +77,7 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
 import uk.ac.bbsrc.tgac.miso.core.util.FormUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 
@@ -95,6 +96,8 @@ public class ImportExportControllerHelperService {
   private RequestManager requestManager;
   @Autowired
   private SampleService sampleService;
+  @Autowired
+  private LibraryDilutionService dilutionService;
   @Autowired
   private IndexService indexService;
   @Autowired
@@ -186,7 +189,7 @@ public class ImportExportControllerHelperService {
       Sample s = null;
       if (jsonArrayElement.get(3) != null && !isStringEmptyOrNull(jsonArrayElement.getString(3))) {
         String salias = jsonArrayElement.getString(3);
-        Collection<Sample> ss = requestManager.listSamplesByAlias(salias);
+        Collection<Sample> ss = sampleService.getByAlias(salias);
         if (!ss.isEmpty()) {
           if (ss.size() == 1) {
             s = ss.iterator().next();
@@ -444,7 +447,7 @@ public class ImportExportControllerHelperService {
                     library.addDilution(ldi);
                     log.info("Added library dilution: " + ldi.toString());
                   }
-                  requestManager.saveLibraryDilution(ldi);
+                  dilutionService.save(ldi);
                 } catch (NumberFormatException nfe) {
                   throw new InputFormException("Supplied LibraryDilution concentration for library '" + jsonArrayElement.getString(3)
                       + "' (" + s.getAlias() + ") is invalid", nfe);
@@ -604,6 +607,18 @@ public class ImportExportControllerHelperService {
 
   public void setIndexService(IndexService indexService) {
     this.indexService = indexService;
+  }
+
+  public void setSampleService(SampleService sampleService) {
+    this.sampleService = sampleService;
+  }
+
+  public void setDilutionService(LibraryDilutionService dilutionService) {
+    this.dilutionService = dilutionService;
+  }
+
+  public void setLibraryService(LibraryService libraryService) {
+    this.libraryService = libraryService;
   }
 
 }

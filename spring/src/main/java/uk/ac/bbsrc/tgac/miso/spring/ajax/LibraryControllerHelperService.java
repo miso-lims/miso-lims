@@ -91,6 +91,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.IndexStore;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.integration.context.ApplicationContextProvider;
+import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.PrinterService;
 import uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils;
@@ -107,21 +108,21 @@ import uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils.BarcodePrintAss
 @Ajaxified
 public class LibraryControllerHelperService {
   public static final class LibraryDilutionBarcodeAssister implements BarcodePrintAssister<LibraryDilution> {
-    private final RequestManager requestManager;
+    private final LibraryDilutionService dilutionService;
 
-    public LibraryDilutionBarcodeAssister(RequestManager requestManager) {
+    public LibraryDilutionBarcodeAssister(LibraryDilutionService dilutionService) {
       super();
-      this.requestManager = requestManager;
+      this.dilutionService = dilutionService;
     }
 
     @Override
     public LibraryDilution fetch(long id) throws IOException {
-      return requestManager.getLibraryDilutionById(id);
+      return dilutionService.get(id);
     }
 
     @Override
     public void store(LibraryDilution item) throws IOException {
-      requestManager.saveLibraryDilution(item);
+      dilutionService.save(item);
     }
 
     @Override
@@ -136,7 +137,7 @@ public class LibraryControllerHelperService {
 
     @Override
     public Iterable<LibraryDilution> fetchAll(long projectId) throws IOException {
-      return requestManager.listAllLibraryDilutionsByProjectId(projectId);
+      return dilutionService.getAllByProjectId(projectId);
     }
   }
 
@@ -191,6 +192,8 @@ public class LibraryControllerHelperService {
   private NamingScheme namingScheme;
   @Autowired
   private LibraryService libraryService;
+  @Autowired
+  private LibraryDilutionService dilutionService;
 
   public JSONObject validateLibraryAlias(HttpSession session, JSONObject json) {
     if (json.has("alias")) {
@@ -222,10 +225,7 @@ public class LibraryControllerHelperService {
       note.setText(text);
       note.setOwner(user);
       note.setCreationDate(new Date());
-      library.getNotes().add(note);
       libraryService.addNote(library, note);
-      library.setLastModifier(user);
-      libraryService.save(library);
     } catch (IOException e) {
       log.error("add library note", e);
       return JSONUtils.SimpleJSONError(e.getMessage());
@@ -293,7 +293,7 @@ public class LibraryControllerHelperService {
 
   public JSONObject printLibraryDilutionBarcodes(HttpSession session, JSONObject json) {
     return ControllerHelperServiceUtils.printBarcodes(printerService, json,
-        new LibraryDilutionBarcodeAssister(requestManager));
+        new LibraryDilutionBarcodeAssister(dilutionService));
   }
 
   public JSONObject changeLibraryLocation(HttpSession session, JSONObject json) {
@@ -303,17 +303,8 @@ public class LibraryControllerHelperService {
     try {
       String newLocation = LimsUtils.lookupLocation(locationBarcode);
       if (newLocation != null) {
-        User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
         Library library = libraryService.get(libraryId);
-        String oldLocation = library.getLocationBarcode();
         library.setLocationBarcode(newLocation);
-
-        Note note = new Note();
-        note.setInternalOnly(true);
-        note.setText("Location changed from " + oldLocation + " to " + newLocation + " by " + user.getLoginName() + " on " + new Date());
-        note.setOwner(user);
-        note.setCreationDate(new Date());
-        libraryService.addNote(library, note);
         libraryService.save(library);
       } else {
         return JSONUtils.SimpleJSONError("New location barcode not recognised");
@@ -361,7 +352,7 @@ public class LibraryControllerHelperService {
     Long dilutionId = json.getLong("dilutionId");
     File temploc = getBarcodeFileLocation(session);
     try {
-      LibraryDilution dil = requestManager.getLibraryDilutionById(dilutionId);
+      LibraryDilution dil = dilutionService.get(dilutionId);
       barcodeFactory.setPointPixels(1.5f);
       barcodeFactory.setBitmapResolution(600);
       RenderedImage bi = barcodeFactory.generateSquareDataMatrix(dil, 400);
@@ -634,7 +625,6 @@ public class LibraryControllerHelperService {
         if (json.has("qcPassed") && json.getString("qcPassed").equals("true")) {
           library.setQcPassed(true);
         }
-        newQc.setQcCreator(json.getString("qcCreator"));
         newQc.setQcDate(new SimpleDateFormat("dd/MM/yyyy").parse(json.getString("qcDate")));
         newQc.setQcType(requestManager.getLibraryQcTypeById(json.getLong("qcType")));
         newQc.setResults(Double.parseDouble(json.getString("results")));
@@ -722,8 +712,6 @@ public class LibraryControllerHelperService {
         Long libraryId = Long.parseLong(json.getString("libraryId"));
         Library library = libraryService.get(libraryId);
         LibraryDilution newDilution = new LibraryDilution();
-        newDilution.setSecurityProfile(library.getSecurityProfile());
-        newDilution.setDilutionCreator(json.getString("dilutionCreator"));
         newDilution.setCreationDate(new SimpleDateFormat("dd/MM/yyyy").parse(json.getString("dilutionDate")));
         newDilution.setLastModified(newDilution.getCreationDate());
         newDilution.setConcentration(Double.parseDouble(json.getString("results")));
@@ -738,7 +726,7 @@ public class LibraryControllerHelperService {
           newDilution.setIdentificationBarcode(json.getString("idBarcode"));
         }
         library.addDilution(newDilution);
-        requestManager.saveLibraryDilution(newDilution);
+        dilutionService.create(newDilution);
 
         StringBuilder sb = new StringBuilder();
         sb.append("<tr>");
@@ -854,7 +842,7 @@ public class LibraryControllerHelperService {
     try {
       JSONObject response = new JSONObject();
       Long dilutionId = Long.parseLong(json.getString("dilutionId"));
-      LibraryDilution dilution = requestManager.getLibraryDilutionById(dilutionId);
+      LibraryDilution dilution = dilutionService.get(dilutionId);
       response.put("results", "<input type='text' id='" + dilutionId + "' value='" + dilution.getConcentration() + "'/>");
       if (!json.getBoolean("autoGenerateIdBarcodes")) {
         response.put("idBarcode",
@@ -880,7 +868,7 @@ public class LibraryControllerHelperService {
     try {
       if (json.has("dilutionId") && !isStringEmptyOrNull(json.getString("dilutionId"))) {
         Long dilutionId = Long.parseLong(json.getString("dilutionId"));
-        LibraryDilution dilution = requestManager.getLibraryDilutionById(dilutionId);
+        LibraryDilution dilution = dilutionService.get(dilutionId);
         dilution.setConcentration(Double.parseDouble(json.getString("result")));
         if (json.has("targetedSequencing")) {
           if (isStringEmptyOrNull(json.getString("targetedSequencing"))) {
@@ -890,8 +878,7 @@ public class LibraryControllerHelperService {
           }
         }
         if (json.has("idBarcode")) dilution.setIdentificationBarcode(json.getString("idBarcode"));
-        dilution.setLastModified(new Date());
-        requestManager.saveLibraryDilution(dilution);
+        dilutionService.save(dilution);
         return JSONUtils.SimpleJSONResponse("OK");
       }
     } catch (Exception e) {
@@ -938,56 +925,32 @@ public class LibraryControllerHelperService {
   }
 
   public JSONObject deleteLibrary(HttpSession session, JSONObject json) {
-    User user;
-    try {
-      user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    } catch (IOException e) {
-      log.error("error getting current logged in user", e);
-      return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
-    }
-
-    if (user != null && user.isAdmin()) {
-      if (json.has("libraryId")) {
-        Long libraryId = json.getLong("libraryId");
-        try {
-          libraryService.delete(libraryService.get(libraryId));
-          return JSONUtils.SimpleJSONResponse("Library deleted");
-        } catch (IOException e) {
-          log.error("cannot delete library", e);
-          return JSONUtils.SimpleJSONError("Cannot delete library: " + e.getMessage());
-        }
-      } else {
-        return JSONUtils.SimpleJSONError("No library specified to delete.");
+    if (json.has("libraryId")) {
+      Long libraryId = json.getLong("libraryId");
+      try {
+        libraryService.delete(libraryService.get(libraryId));
+        return JSONUtils.SimpleJSONResponse("Library deleted");
+      } catch (IOException e) {
+        log.error("cannot delete library", e);
+        return JSONUtils.SimpleJSONError("Cannot delete library: " + e.getMessage());
       }
     } else {
-      return JSONUtils.SimpleJSONError("Only logged-in admins can delete objects.");
+      return JSONUtils.SimpleJSONError("No library specified to delete.");
     }
   }
 
   public JSONObject deleteLibraryDilution(HttpSession session, JSONObject json) {
-    User user;
-    try {
-      user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    } catch (IOException e) {
-      log.error("error getting currently logged in user", e);
-      return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
-    }
-
-    if (user != null && user.isAdmin()) {
-      if (json.has("libraryDilutionId")) {
-        Long libraryDilutionId = json.getLong("libraryDilutionId");
-        try {
-          requestManager.deleteLibraryDilution(requestManager.getLibraryDilutionById(libraryDilutionId));
-          return JSONUtils.SimpleJSONResponse("LibraryDilution deleted");
-        } catch (IOException e) {
-          log.error("delete library dilution", e);
-          return JSONUtils.SimpleJSONError("Cannot delete library dilution: " + e.getMessage());
-        }
-      } else {
-        return JSONUtils.SimpleJSONError("No library dilution specified to delete.");
+    if (json.has("libraryDilutionId")) {
+      Long libraryDilutionId = json.getLong("libraryDilutionId");
+      try {
+        dilutionService.delete(dilutionService.get(libraryDilutionId));
+        return JSONUtils.SimpleJSONResponse("LibraryDilution deleted");
+      } catch (IOException e) {
+        log.error("delete library dilution", e);
+        return JSONUtils.SimpleJSONError("Cannot delete library dilution: " + e.getMessage());
       }
     } else {
-      return JSONUtils.SimpleJSONError("Only logged-in admins can delete objects.");
+      return JSONUtils.SimpleJSONError("No library dilution specified to delete.");
     }
   }
 
@@ -1021,5 +984,9 @@ public class LibraryControllerHelperService {
 
   public void setLibraryService(LibraryService libraryService) {
     this.libraryService = libraryService;
+  }
+
+  public void setDilutionService(LibraryDilutionService dilutionService) {
+    this.dilutionService = dilutionService;
   }
 }

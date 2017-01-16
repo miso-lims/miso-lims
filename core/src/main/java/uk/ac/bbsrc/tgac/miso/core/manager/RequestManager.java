@@ -25,7 +25,6 @@ package uk.ac.bbsrc.tgac.miso.core.manager;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -37,7 +36,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
-import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
@@ -95,9 +93,6 @@ public interface RequestManager {
 
   public long saveSampleQC(SampleQC sampleQC) throws IOException;
 
-
-  public long saveLibraryDilution(LibraryDilution libraryDilution) throws IOException;
-
   public long savePool(Pool pool) throws IOException;
 
   public long savePoolQC(PoolQC poolQC) throws IOException;
@@ -142,15 +137,6 @@ public interface RequestManager {
   public Pool getPoolByIdBarcode(String barcode) throws IOException;
 
   public PoolQC getPoolQCById(long poolQcId) throws IOException;
-
-  public LibraryDilution getLibraryDilutionById(long dilutionId) throws IOException;
-
-  public LibraryDilution getLibraryDilutionByBarcode(String barcode) throws IOException;
-
-  public Integer countLibraryDilutionsByPlatform(PlatformType platform) throws IOException;
-
-  public List<LibraryDilution> getLibraryDilutionsForPoolDataTable(int offset, int limit, String search, String sortDir, String sortCol,
-      PlatformType platform) throws IOException;
 
   public LibraryQC getLibraryQCById(long qcId) throws IOException;
 
@@ -304,25 +290,6 @@ public interface RequestManager {
 
   public Collection<LibraryQC> listAllLibraryQCsByLibraryId(long libraryId) throws IOException;
 
-  public Collection<Dilution> listAllLibraryDilutionsBySearchAndPlatform(String query, PlatformType platformType) throws IOException;
-
-  public Collection<Dilution> listAllDilutionsByProjectAndPlatform(long projectId, PlatformType platformType) throws IOException;
-
-  public Collection<LibraryDilution> listAllLibraryDilutions() throws IOException;
-
-  public Collection<LibraryDilution> listAllLibraryDilutionsWithLimit(long limit) throws IOException;
-
-  public Collection<LibraryDilution> listAllLibraryDilutionsByLibraryId(long libraryId) throws IOException;
-
-  public Collection<LibraryDilution> listAllLibraryDilutionsByPlatform(PlatformType platformType) throws IOException;
-
-  public Collection<LibraryDilution> listAllLibraryDilutionsByProjectId(long projectId) throws IOException;
-
-  public Collection<LibraryDilution> listAllLibraryDilutionsBySearchOnly(String query) throws IOException;
-
-  public Collection<LibraryDilution> listAllLibraryDilutionsByProjectAndPlatform(long projectId, PlatformType platformType)
-      throws IOException;
-
   public Collection<TargetedSequencing> listAllTargetedSequencing() throws IOException;
 
   public Collection<Pool> listAllPools() throws IOException;
@@ -437,8 +404,6 @@ public interface RequestManager {
 
   public void deleteLibraryQC(LibraryQC libraryQc) throws IOException;
 
-  public void deleteLibraryDilution(LibraryDilution dilution) throws IOException;
-
   public void deleteSequencerReference(SequencerReference sequencerReference) throws IOException;
 
   public void deleteSequencerServiceRecord(SequencerServiceRecord serviceRecord) throws IOException;
@@ -517,8 +482,6 @@ public interface RequestManager {
 
   public Project lazyGetProjectById(long projectId) throws IOException;
 
-  public Integer countLibraryDilutionsBySearchAndPlatform(String search, PlatformType platform) throws IOException;
-
   public List<Run> getRunsByPool(Pool pool) throws IOException;
 
   public void addRunWatcher(Run run, User watcher) throws IOException;
@@ -534,7 +497,6 @@ public interface RequestManager {
   public void removePoolWatcher(Pool pool, User watcher) throws IOException;
 
   /** Delete these once FormUtils are refactored */
-  public Library getLibraryById(long libraryId) throws IOException;
 
   long saveLibrary(Library library) throws IOException;
 
@@ -546,9 +508,13 @@ public interface RequestManager {
 
   public LibraryStrategyType getLibraryStrategyTypeByName(String name) throws IOException;
 
+  public long saveLibraryDilution(LibraryDilution libraryDilution) throws IOException;
+
   /** end delete once FormUtils are refactored */
 
   /** Delete once LibraryAliasGenerator is refactored */
   public Collection<Library> listAllLibrariesBySampleId(long sampleId) throws IOException;
 
+  /** Delete once MisoAppListener is refactored */
+  public Collection<LibraryDilution> listAllLibraryDilutions() throws IOException;
 }

@@ -65,8 +65,10 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.util.FormUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.PrinterService;
+import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils;
 
 /**
@@ -96,6 +98,10 @@ public class ProjectControllerHelperService {
   private NamingScheme namingScheme;
   @Autowired
   private LibraryService libraryService;
+  @Autowired
+  private LibraryDilutionService dilutionService;
+  @Autowired
+  private SampleService sampleService;
 
   public void setNamingScheme(NamingScheme namingScheme) {
     this.namingScheme = namingScheme;
@@ -127,6 +133,14 @@ public class ProjectControllerHelperService {
 
   public void setLibraryService(LibraryService libraryService) {
     this.libraryService = libraryService;
+  }
+
+  public void setDilutionService(LibraryDilutionService dilutionService) {
+    this.dilutionService = dilutionService;
+  }
+
+  public void setSampleService(SampleService sampleService) {
+    this.sampleService = sampleService;
   }
 
   public JSONObject validateProjectShortName(HttpSession session, JSONObject json) {
@@ -508,12 +522,12 @@ public class ProjectControllerHelperService {
 
   public JSONObject printAllLibraryDilutionBarcodes(HttpSession session, JSONObject json) {
     return ControllerHelperServiceUtils.printAllBarcodes(printerService, json,
-        new LibraryControllerHelperService.LibraryDilutionBarcodeAssister(requestManager));
+        new LibraryControllerHelperService.LibraryDilutionBarcodeAssister(dilutionService));
   }
 
   public JSONObject printSelectedLibraryDilutionBarcodes(HttpSession session, JSONObject json) {
     return ControllerHelperServiceUtils.printBarcodes(printerService, json,
-        new LibraryControllerHelperService.LibraryDilutionBarcodeAssister(requestManager));
+        new LibraryControllerHelperService.LibraryDilutionBarcodeAssister(dilutionService));
   }
 
   public JSONObject generateSampleDeliveryForm(HttpSession session, JSONObject json) {
@@ -527,7 +541,7 @@ public class ProjectControllerHelperService {
       try {
         final JSONArray a = JSONArray.fromObject(json.get("samples"));
         for (final JSONObject j : (Iterable<JSONObject>) a) {
-          samples.add(requestManager.getSampleById(j.getLong("sampleId")));
+          samples.add(sampleService.get(j.getLong("sampleId")));
         }
         final File f = misoFileManager.getNewFile(Project.class, projectId.toString(),
             "SampleInformationForm-" + LimsUtils.getCurrentDateAsString() + ".odt");
@@ -709,7 +723,7 @@ public class ProjectControllerHelperService {
         final JSONArray a = JSONArray.fromObject(json.get("samples"));
         for (final JSONObject j : (Iterable<JSONObject>) a) {
           if (j.has("sampleId")) {
-            samples.add(requestManager.getSampleById(j.getLong("sampleId")));
+            samples.add(sampleService.get(j.getLong("sampleId")));
           } else {
             return JSONUtils.SimpleJSONError("Unable to add Sample Group: invalid sample set JSON has missing sampleId");
           }

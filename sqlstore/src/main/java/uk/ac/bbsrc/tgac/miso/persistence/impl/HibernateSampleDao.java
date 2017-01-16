@@ -138,9 +138,6 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
     // Now we have to reconstitute all the things that aren't covered by Hibernate.
     sample.setSecurityProfile(securityDao.getSecurityProfileById(sample.getSecurityProfileId()));
 
-    sample.getLibraries().clear();
-    sample.getLibraries().addAll(libraryDao.listBySampleId(sample.getId()));
-
     sample.getChangeLog().clear();
     sample.getChangeLog().addAll(changeLogDao.listAllById("Sample", sample.getId()));
 

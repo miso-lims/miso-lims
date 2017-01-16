@@ -4,6 +4,7 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -57,6 +58,7 @@ public class DefaultLibraryDilutionService implements LibraryDilutionService {
     Library managedLibrary = libraryDao.get(dilution.getLibrary().getId());
     managedLibrary.setLastModifier(authorizationManager.getCurrentUser());
     libraryDao.save(managedLibrary);
+    dilution.setLastModified(new Date());
     try {
       Long newId = dilutionDao.save(dilution);
       LibraryDilution managed = dilutionDao.get(newId);
@@ -102,6 +104,14 @@ public class DefaultLibraryDilutionService implements LibraryDilutionService {
     loadChildEntities(updatedDilution);
     save(updatedDilution);
   }
+  
+  @Override
+  public boolean delete(LibraryDilution dilution) throws IOException {
+    authorizationManager.throwIfNonAdmin();
+    LibraryDilution managed = get(dilution.getId());
+    managed.getLibrary().getLibraryDilutions().remove(managed);
+    return dilutionDao.remove(managed);
+  }
 
   @Override
   public int count() throws IOException {
@@ -120,8 +130,8 @@ public class DefaultLibraryDilutionService implements LibraryDilutionService {
 
   @Override
   public List<LibraryDilution> getAll() throws IOException {
-    // TODO Auto-generated method stub
-    return null;
+    Collection<LibraryDilution> allDilutions = dilutionDao.listAll();
+    return authorizationManager.filterUnreadable(allDilutions);
   }
 
   @Override
@@ -199,6 +209,7 @@ public class DefaultLibraryDilutionService implements LibraryDilutionService {
     if (dilution.getTargetedSequencing() != null) {
       dilution.setTargetedSequencing(targetedSequencingDao.get(dilution.getTargetedSequencing().getId()));
     }
+    dilution.setDilutionCreator(authorizationManager.getCurrentUsername());
   }
 
   /**

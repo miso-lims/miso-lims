@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Value;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
@@ -26,8 +25,6 @@ public class HibernateLibraryDilutionDao implements LibraryDilutionStore {
 
   @Autowired
   private SessionFactory sessionFactory;
-  @Autowired
-  private NamingScheme namingScheme;
 
   private Session currentSession() {
     return getSessionFactory().getCurrentSession();
@@ -207,8 +204,4 @@ public class HibernateLibraryDilutionDao implements LibraryDilutionStore {
     this.sessionFactory = sessionFactory;
   }
 
-  @Override
-  public void setNamingScheme(NamingScheme namingScheme) {
-    this.namingScheme = namingScheme;
-  }
 }

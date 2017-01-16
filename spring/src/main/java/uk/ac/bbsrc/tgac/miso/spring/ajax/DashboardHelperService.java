@@ -65,6 +65,7 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.MisoAuthority;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 
 /**
@@ -87,6 +88,8 @@ public class DashboardHelperService {
   private ExperimentService experimentService;
   @Autowired
   private LibraryService libraryService;
+  @Autowired
+  private LibraryDilutionService dilutionService;
 
   public JSONObject checkUser(HttpSession session, JSONObject json) {
     String username = json.getString("username");
@@ -317,9 +320,9 @@ public class DashboardHelperService {
       List<LibraryDilution> libraryDilutions;
       StringBuilder b = new StringBuilder();
       if (!isStringEmptyOrNull(searchStr)) {
-        libraryDilutions = new ArrayList<>(requestManager.listAllLibraryDilutionsBySearchOnly(searchStr));
+        libraryDilutions = new ArrayList<>(dilutionService.getAllBySearch(searchStr));
       } else {
-        libraryDilutions = new ArrayList<>(requestManager.listAllLibraryDilutionsWithLimit(50));
+        libraryDilutions = new ArrayList<>(dilutionService.getAllWithLimit(50));
       }
 
       if (libraryDilutions.size() > 0) {
@@ -576,5 +579,13 @@ public class DashboardHelperService {
 
   public void setLibraryService(LibraryService libraryService) {
     this.libraryService = libraryService;
+  }
+
+  public void setExperimentService(ExperimentService experimentService) {
+    this.experimentService = experimentService;
+  }
+
+  public void setDilutionService(LibraryDilutionService dilutionService) {
+    this.dilutionService = dilutionService;
   }
 }

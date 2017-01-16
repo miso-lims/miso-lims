@@ -146,11 +146,6 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
     return namingScheme;
   }
 
-  @Override
-  public void setNamingScheme(NamingScheme namingScheme) {
-    this.namingScheme = namingScheme;
-  }
-
   @Autowired
   private CacheManager cacheManager;
 

@@ -61,6 +61,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.jackson.UserInfoMixin;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
+import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 
 /**
  * A controller to handle all REST requests for Pools
@@ -76,8 +77,15 @@ public class PoolRestController extends RestController {
   @Autowired
   private RequestManager requestManager;
 
+  @Autowired
+  private LibraryDilutionService dilutionService;
+
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
+  }
+
+  public void setDilutionService(LibraryDilutionService dilutionService) {
+    this.dilutionService = dilutionService;
   }
 
   @RequestMapping(value = "{poolId}", method = RequestMethod.GET, produces = "application/json")
@@ -156,7 +164,7 @@ public class PoolRestController extends RestController {
 
   @RequestMapping(value = "/wizard/librarydilutions", method = RequestMethod.GET, produces = "application/json")
   public @ResponseBody JSONObject ldRest() throws IOException {
-    Collection<LibraryDilution> lds = requestManager.listAllLibraryDilutions();
+    Collection<LibraryDilution> lds = dilutionService.getAll();
 
     List<String> types = new ArrayList<>(requestManager.listDistinctPlatformNames());
     Collections.sort(types);

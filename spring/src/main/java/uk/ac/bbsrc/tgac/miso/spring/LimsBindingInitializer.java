@@ -89,6 +89,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignCodeDao;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SequencingParametersDao;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.ReferenceGenomeService;
 
@@ -113,6 +114,9 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
   @Autowired
   private BoxStore sqlBoxDAO;
+
+  @Autowired
+  private LibraryDilutionService dilutionService;
   @Autowired
   private ExperimentService experimentService;
   @Autowired
@@ -489,7 +493,7 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
       @Override
       public LibraryDilution resolve(long id) throws Exception {
-        return requestManager.getLibraryDilutionById(id);
+        return dilutionService.get(id);
       }
 
     };
@@ -500,7 +504,7 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
     new BindingConverterById<LibraryDilution>(LibraryDilution.class) {
       @Override
       public LibraryDilution resolveById(long id) throws Exception {
-        return requestManager.getLibraryDilutionById(id);
+        return dilutionService.get(id);
       }
     }.register(binder).register(binder, Set.class, "libraryDilutions");
 
@@ -662,5 +666,9 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
   public void setLibraryService(LibraryService libraryService) {
     this.libraryService = libraryService;
+  }
+
+  public void setDilutionService(LibraryDilutionService dilutionService) {
+    this.dilutionService = dilutionService;
   }
 }

@@ -80,6 +80,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
@@ -661,7 +662,7 @@ public class EditLibraryController {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Library library = null;
       if (libraryId == AbstractLibrary.UNSAVED_ID) {
-        library = (isDetailedSampleEnabled() ? new DetailedLibraryImpl(user) : new LibraryImpl(user));
+        library = (isDetailedSampleEnabled() ? new DetailedLibraryImpl() : new LibraryImpl(user));
         model.put("title", "New Library");
       } else {
         library = libraryService.get(libraryId);

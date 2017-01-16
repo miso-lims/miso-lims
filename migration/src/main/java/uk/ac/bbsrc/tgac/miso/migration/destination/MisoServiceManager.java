@@ -535,7 +535,6 @@ public class MisoServiceManager {
 
   public void setDefaultDilutionDao() {
     HibernateLibraryDilutionDao dao = new HibernateLibraryDilutionDao();
-    dao.setNamingScheme(getNamingScheme());
     dao.setSessionFactory(sessionFactory);
     setDilutionDao(dao);
   }
@@ -1123,7 +1122,6 @@ public class MisoServiceManager {
   public void setDefaultSequencingParametersDao() {
     HibernateSequencingParametersDao dao = new HibernateSequencingParametersDao();
     dao.setSessionFactory(sessionFactory);
-    dao.setPlatformStore(platformDao);
     setSequencingParametersDao(dao);
   }
 

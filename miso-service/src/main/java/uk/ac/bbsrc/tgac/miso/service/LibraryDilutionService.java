@@ -43,4 +43,6 @@ public interface LibraryDilutionService {
   List<LibraryDilution> getAllByPageSizeSearchAndPlatform(int offset, int size, String querystr, PlatformType platform, String sortDir,
       String sortCol) throws IOException;
 
+  boolean delete(LibraryDilution dilution) throws IOException;
+
 }

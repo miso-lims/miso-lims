@@ -60,6 +60,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedDilutionException;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 
 /**
  * com.eaglegenomics.miso.web
@@ -85,6 +86,9 @@ public class EditIlluminaPoolController {
   @Autowired
   private ExperimentService experimentService;
 
+  @Autowired
+  private LibraryDilutionService dilutionService;
+
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
   }
@@ -100,7 +104,7 @@ public class EditIlluminaPoolController {
 
   private List<? extends Dilution> populateAvailableDilutions(Pool pool) throws IOException {
     ArrayList<LibraryDilution> libs = new ArrayList<>();
-    for (Dilution l : requestManager.listAllLibraryDilutionsByPlatform(PlatformType.ILLUMINA)) {
+    for (Dilution l : dilutionService.getAllByPlatform(PlatformType.ILLUMINA)) {
       if (!pool.getPoolableElements().contains(l)) {
         libs.add((LibraryDilution) l);
       }
@@ -235,7 +239,7 @@ public class EditIlluminaPoolController {
       }
 
       if (dilutionId != null) {
-        LibraryDilution ld = requestManager.getLibraryDilutionById(dilutionId);
+        LibraryDilution ld = dilutionService.get(dilutionId);
         if (ld != null) {
           pool.addPoolableElement(ld);
         }
@@ -265,7 +269,7 @@ public class EditIlluminaPoolController {
     IlluminaPool p = (IlluminaPool) model.get("pool");
     String[] dils = request.getParameterValues("importdilslist");
     for (String s : dils) {
-      LibraryDilution ld = requestManager.getLibraryDilutionByBarcode(s);
+      LibraryDilution ld = dilutionService.getByBarcode(s);
       if (ld != null) {
         try {
           p.addPoolableElement(ld);
