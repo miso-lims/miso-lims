@@ -64,8 +64,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCR;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
@@ -98,8 +96,6 @@ public interface RequestManager {
 
   public long saveSampleQC(SampleQC sampleQC) throws IOException;
 
-  public long saveEmPcrDilution(emPCRDilution dilution) throws IOException;
-
   public long saveLibrary(Library library) throws IOException;
 
   public long saveLibraryDilution(LibraryDilution libraryDilution) throws IOException;
@@ -113,10 +109,6 @@ public interface RequestManager {
   public long savePoolQC(PoolQC poolQC) throws IOException;
 
   public void savePoolNote(Pool pool, Note note) throws IOException;
-
-  public long saveEmPCR(emPCR pcr) throws IOException;
-
-  public long saveEmPCRDilution(emPCRDilution dilution) throws IOException;
 
   public long saveStudy(Study study) throws IOException;
 
@@ -197,14 +189,6 @@ public interface RequestManager {
   public LibraryStrategyType getLibraryStrategyTypeById(long libraryStrategyTypeId) throws IOException;
 
   public LibraryStrategyType getLibraryStrategyTypeByName(String name) throws IOException;
-
-  public emPCR getEmPCRById(long pcrId) throws IOException;
-
-  public emPCRDilution getEmPCRDilutionByBarcodeAndPlatform(String barcode, PlatformType platformType) throws IOException;
-
-  public emPCRDilution getEmPCRDilutionById(long dilutionId) throws IOException;
-
-  public emPCRDilution getEmPCRDilutionByBarcode(String barcode) throws IOException;
 
   public Platform getPlatformById(long platformId) throws IOException;
 
@@ -400,26 +384,6 @@ public interface RequestManager {
 
   public Collection<TargetedSequencing> listAllTargetedSequencing() throws IOException;
 
-  public Collection<emPCRDilution> listAllEmPCRDilutions() throws IOException;
-
-  public Collection<emPCRDilution> listAllEmPCRDilutionsByEmPcrId(long pcrId) throws IOException;
-
-  public Collection<emPCRDilution> listAllEmPCRDilutionsByPlatform(PlatformType platformType) throws IOException;
-
-  public Collection<emPCRDilution> listAllEmPCRDilutionsByProjectId(long projectId) throws IOException;
-
-  public Collection<emPCRDilution> listAllEmPCRDilutionsBySearch(String query, PlatformType platformType) throws IOException;
-
-  public Collection<emPCRDilution> listAllEmPCRDilutionsByProjectAndPlatform(long projectId, PlatformType platformType) throws IOException;
-
-  public Collection<emPCRDilution> listAllEmPCRDilutionsByPoolAndPlatform(long poolId, PlatformType platformType) throws IOException;
-
-  public Collection<emPCR> listAllEmPCRs() throws IOException;
-
-  public Collection<emPCR> listAllEmPCRsByDilutionId(long dilutionId) throws IOException;
-
-  public Collection<emPCR> listAllEmPCRsByProjectId(long projectId) throws IOException;
-
   public Collection<Pool> listAllPools() throws IOException;
 
   public Collection<Pool> listAllPoolsBySearch(String query) throws IOException;
@@ -531,8 +495,6 @@ public interface RequestManager {
 
   public void deleteLibrary(Library library) throws IOException;
 
-  public void deleteEmPCR(emPCR empcr) throws IOException;
-
   public void deleteRun(Run run) throws IOException;
 
   public void deleteRunQC(RunQC runQc) throws IOException;
@@ -544,8 +506,6 @@ public interface RequestManager {
   public void deletePoolQC(PoolQC poolQc) throws IOException;
 
   public void deleteLibraryDilution(LibraryDilution dilution) throws IOException;
-
-  public void deleteEmPCRDilution(emPCRDilution dilution) throws IOException;
 
   public void deleteSequencerReference(SequencerReference sequencerReference) throws IOException;
 

@@ -47,7 +47,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCR;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.AuthorizationIOException;
 
@@ -99,10 +98,6 @@ public class UserAuthMisoRequestManagerTestSuite {
   private Pool pool;
   @Mock
   private PoolQC poolQC;
-  @Mock
-  private emPCR emPCR;
-  @Mock
-  private uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution emPCRDilution;
   @Mock
   private Experiment experiment;
   @Mock
@@ -608,68 +603,6 @@ public class UserAuthMisoRequestManagerTestSuite {
     userAuthMisoRequestManager.savePoolQC(poolQC);
 
     verify(backingManager, never()).savePoolQC(poolQC);
-  }
-
-  /**
-   * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveEmPCR(uk.ac.bbsrc.tgac.miso.core.data.impl.emPCR)} .
-   */
-  @Test
-  public void testSaveEmPCR() throws IOException {
-    final long expectedReturn = 1L;
-    when(emPCR.userCanWrite(any(User.class))).thenReturn(true);
-    when(backingManager.saveEmPCR(emPCR)).thenReturn(expectedReturn);
-
-    assertEquals(expectedReturn, userAuthMisoRequestManager.saveEmPCR(emPCR));
-    verify(backingManager).saveEmPCR(emPCR);
-  }
-
-  /**
-   * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveEmPCR(uk.ac.bbsrc.tgac.miso.core.data.impl.emPCR)} .
-   * 
-   * @throws IOException
-   */
-  @Test
-  public void testSaveEmPCRThrows() throws IOException {
-    when(emPCR.userCanWrite(any(User.class))).thenReturn(false);
-
-    thrown.expect(IOException.class);
-    thrown.expectMessage("User null cannot write to this EmPCR");
-    userAuthMisoRequestManager.saveEmPCR(emPCR);
-
-    verify(backingManager, never()).saveEmPCR(emPCR);
-  }
-
-  /**
-   * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveEmPCRDilution(uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution)}
-   * .
-   */
-  @Test
-  public void testSaveEmPCRDilution() throws IOException {
-    final long expectedReturn = 1L;
-    when(emPCRDilution.userCanWrite(any(User.class))).thenReturn(true);
-    when(backingManager.saveEmPCRDilution(emPCRDilution)).thenReturn(expectedReturn);
-
-    assertEquals(expectedReturn, userAuthMisoRequestManager.saveEmPCRDilution(emPCRDilution));
-    verify(backingManager).saveEmPCRDilution(emPCRDilution);
-  }
-
-  /**
-   * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveEmPCRDilution(uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution)}
-   * .
-   */
-  @Test
-  public void testSaveEmPCRDilutionThrows() throws IOException {
-    when(emPCRDilution.userCanWrite(any(User.class))).thenReturn(false);
-
-    thrown.expect(IOException.class);
-    thrown.expectMessage("User null cannot write to this EmPCRDilution");
-    userAuthMisoRequestManager.saveEmPCRDilution(emPCRDilution);
-
-    verify(backingManager, never()).saveEmPCRDilution(emPCRDilution);
   }
 
   /**
@@ -1311,140 +1244,6 @@ public class UserAuthMisoRequestManagerTestSuite {
     userAuthMisoRequestManager.getLibraryQCById(qcId);
 
     verify(backingManager).getLibraryQCById(qcId);
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getEmPCRById(long)} .
-   */
-  @Test
-  public void testGetEmPCRById() throws IOException {
-    long id = 1L;
-    when(backingManager.getEmPCRById(id)).thenReturn(emPCR);
-    when(emPCR.userCanRead(any(User.class))).thenReturn(true);
-
-    assertEquals(emPCR, userAuthMisoRequestManager.getEmPCRById(id));
-
-    verify(backingManager).getEmPCRById(id);
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getEmPCRById(long)} .
-   */
-  @Test
-  public void testGetEmPCRByIdThrows() throws IOException {
-    long qcId = 1L;
-    when(backingManager.getEmPCRById(qcId)).thenReturn(emPCR);
-    when(emPCR.userCanRead(any(User.class))).thenReturn(false);
-
-    thrown.expect(IOException.class);
-    thrown.expectMessage("User null cannot read emPCR " + qcId);
-
-    userAuthMisoRequestManager.getEmPCRById(qcId);
-
-    verify(backingManager).getEmPCRById(qcId);
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getEmPCRDilutionById(long)} .
-   */
-  @Test
-  public void testGetEmPCRDilutionById() throws IOException {
-    long id = 1L;
-    when(backingManager.getEmPCRDilutionById(id)).thenReturn(emPCRDilution);
-    when(emPCRDilution.userCanRead(any(User.class))).thenReturn(true);
-
-    assertEquals(emPCRDilution, userAuthMisoRequestManager.getEmPCRDilutionById(id));
-
-    verify(backingManager).getEmPCRDilutionById(id);
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getEmPCRDilutionById(long)} .
-   */
-  @Test
-  public void testGetEmPCRDilutionByIdThrows() throws IOException {
-    long qcId = 1L;
-    when(backingManager.getEmPCRDilutionById(qcId)).thenReturn(emPCRDilution);
-    when(emPCRDilution.userCanRead(any(User.class))).thenReturn(false);
-
-    thrown.expect(IOException.class);
-    thrown.expectMessage("User null cannot read emPCRDilution " + qcId);
-
-    userAuthMisoRequestManager.getEmPCRDilutionById(qcId);
-
-    verify(backingManager).getEmPCRDilutionById(qcId);
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getEmPCRDilutionByBarcode(java.lang.String)} .
-   */
-  @Test
-  public void testGetEmPCRDilutionByBarcode() throws IOException {
-    String barcode = "barcode";
-    when(backingManager.getEmPCRDilutionByBarcode(barcode)).thenReturn(emPCRDilution);
-    when(emPCRDilution.userCanRead(any(User.class))).thenReturn(true);
-
-    assertEquals(emPCRDilution, userAuthMisoRequestManager.getEmPCRDilutionByBarcode(barcode));
-
-    verify(backingManager).getEmPCRDilutionByBarcode(barcode);
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getEmPCRDilutionByBarcode(java.lang.String)} .
-   */
-  @Test
-  public void testGetEmPCRDilutionByBarcodeThrows() throws IOException {
-    String barcode = "barcode";
-    when(backingManager.getEmPCRDilutionByBarcode(barcode)).thenReturn(emPCRDilution);
-    when(emPCRDilution.userCanRead(any(User.class))).thenReturn(false);
-    long id = 1L;
-    when(emPCRDilution.getId()).thenReturn(id);
-
-    thrown.expect(IOException.class);
-    thrown.expectMessage("User null cannot read emPCRDilution " + id);
-
-    userAuthMisoRequestManager.getEmPCRDilutionByBarcode(barcode);
-
-    verify(backingManager).getEmPCRDilutionByBarcode(barcode);
-  }
-
-  /**
-   * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getEmPCRDilutionByBarcodeAndPlatform(java.lang.String, uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType)}
-   * .
-   */
-  @Test
-  public void testGetEmPCRDilutionByBarcodeAndPlatform() throws IOException {
-    String barcode = "barcode";
-    PlatformType platformType = PlatformType.ILLUMINA;
-    when(backingManager.getEmPCRDilutionByBarcodeAndPlatform(barcode, platformType)).thenReturn(emPCRDilution);
-    when(emPCRDilution.userCanRead(any(User.class))).thenReturn(true);
-
-    assertEquals(emPCRDilution, userAuthMisoRequestManager.getEmPCRDilutionByBarcodeAndPlatform(barcode, platformType));
-
-    verify(backingManager).getEmPCRDilutionByBarcodeAndPlatform(barcode, platformType);
-  }
-
-  /**
-   * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getEmPCRDilutionByBarcodeAndPlatform(java.lang.String, uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType)}
-   * .
-   */
-  @Test
-  public void testGetEmPCRDilutionByBarcodeAndPlatformThrows() throws IOException {
-    String barcode = "barcode";
-    long id = 1L;
-    PlatformType platformType = PlatformType.ILLUMINA;
-    when(backingManager.getEmPCRDilutionByBarcodeAndPlatform(barcode, platformType)).thenReturn(emPCRDilution);
-    when(emPCRDilution.userCanRead(any(User.class))).thenReturn(false);
-    when(emPCRDilution.getId()).thenReturn(id);
-
-    thrown.expect(IOException.class);
-    thrown.expectMessage("User null cannot read emPCRDilution " + id);
-
-    userAuthMisoRequestManager.getEmPCRDilutionByBarcodeAndPlatform(barcode, platformType);
-
-    verify(backingManager).getEmPCRDilutionByBarcodeAndPlatform(barcode, platformType);
   }
 
   /**

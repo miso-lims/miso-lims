@@ -37,7 +37,6 @@
 <div id="tabs">
 <ul>
   <li><a href="#tab-1"><span>Sequencing Kits</span></a></li>
-  <li><a href="#tab-2"><span>EMPCR Kits</span></a></li>
   <li><a href="#tab-3"><span>Library Kits</span></a></li>
   <li><a href="#tab-4"><span>Clustering Kits</span></a></li>
   <li><a href="#tab-5"><span>Multiplexing Kits</span></a></li>
@@ -100,70 +99,6 @@
       });
 
       jQuery('#filter-form1').submit(function () {
-        theTable.find("tbody > tr:visible > td:eq(1)").mousedown();
-        return false;
-      }).focus(); //Give focus to input field
-    });
-  </script>
-</div>
-
-<div id="tab-2">
-  <h1>
-    <div id="EMPCRtotalCount">
-    </div>
-  </h1>
-  <a href="<c:url value="/miso/kitdescriptor/new"/>" class="add">Create Kit Descriptor</a>
-
-  <form id="filter-form2">Filter: <input name="filter" id="filter2" value="" maxlength="30" size="30" type="text">
-  </form>
-  <br/>
-  <table class="list" id="table2">
-    <thead>
-    <tr>
-      <th>Name</th>
-      <th>Version</th>
-      <th>Manufacturer</th>
-      <th>Part Number</th>
-      <th>Stock Level</th>
-      <th>Type</th>
-      <th>Platform</th>
-    </tr>
-    </thead>
-    <tbody>
-    <c:forEach items="${empcr}" var="empcr">
-      <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-        <td><b><a href='<c:url value="/miso/kitdescriptor/${empcr.id}"/>'>${empcr.name}</a></b></td> 
-        <td>${empcr.version}</td>
-        <td>${empcr.manufacturer}</td>
-        <td>${empcr.partNumber}</td>
-        <td>${empcr.stockLevel}</td>
-        <td>${empcr.kitType.key}</td>
-        <td>${empcr.platformType.key}</td>
-      </tr>
-    </c:forEach>
-    </tbody>
-  </table>
-  <script type="text/javascript">
-
-    jQuery(document).ready(function () {
-      jQuery("#table2").tablesorter({
-        headers: {
-          7: {
-            sorter: false
-          }
-        }
-      });
-    });
-
-    jQuery(function () {
-      var theTable = jQuery("#table2");
-
-      jQuery("#filter2").keyup(function () {
-        jQuery.uiTableFilter(theTable, this.value);
-        writeTotalNo();
-      });
-
-      jQuery('#filter-form2').submit(function () {
         theTable.find("tbody > tr:visible > td:eq(1)").mousedown();
         return false;
       }).focus(); //Give focus to input field
@@ -361,7 +296,7 @@
     });
 
     function writeTotalNo() {
-      var kits = ['Sequencing', 'EMPCR', 'Library', 'Clustering', 'Multiplexing'];
+      var kits = ['Sequencing', 'Library', 'Clustering', 'Multiplexing'];
       for (var i = 0; i < kits.length; i++) {
         var num = jQuery('#table' + (i + 1) + '>tbody>tr').length;
         jQuery('#' + kits[i] + 'totalCount').html(num + " " + kits[i] + " Kit" + (num == 1 ? "" : "s"));

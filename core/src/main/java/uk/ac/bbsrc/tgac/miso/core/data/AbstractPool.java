@@ -63,7 +63,6 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution;
 import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
 import uk.ac.bbsrc.tgac.miso.core.event.model.PoolEvent;
 import uk.ac.bbsrc.tgac.miso.core.event.type.MisoEventType;
@@ -102,8 +101,7 @@ public abstract class AbstractPool extends AbstractBoxable implements Pool {
       @JoinColumn(name = "pool_poolId") })
   @AnyMetaDef(idType = "long", metaType = "string", 
           metaValues = { 
-          @MetaValue(targetEntity = LibraryDilution.class, value = "LDI"),
-          @MetaValue(targetEntity = emPCRDilution.class, value = "EDI")
+          @MetaValue(targetEntity = LibraryDilution.class, value = "LDI")
      })
   private Set<Dilution> pooledElements = new HashSet<>();
   private Collection<Experiment> experiments = new HashSet<>();

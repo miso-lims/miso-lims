@@ -44,12 +44,12 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.PoolAlertManager;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.ProjectAlertManager;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.RunAlertManager;
@@ -137,7 +137,7 @@ public class CacheHelperService {
   }
 
   public JSONObject viewCacheStats(HttpSession session, JSONObject json) {
-    Map<String, Object> response = new HashMap<String, Object>();
+    Map<String, Object> response = new HashMap<>();
     List<String> cacheNames = Arrays.asList(cacheManager.getCacheNames());
     Collections.sort(cacheNames);
     JSONArray caches = new JSONArray();
@@ -166,12 +166,6 @@ public class CacheHelperService {
       for (LibraryDilution ld : requestManager.listAllLibraryDilutions()) {
         if (isStringEmptyOrNull(ld.getIdentificationBarcode())) {
           requestManager.saveLibraryDilution(ld);
-        }
-      }
-
-      for (emPCRDilution ed : requestManager.listAllEmPCRDilutions()) {
-        if (isStringEmptyOrNull(ed.getIdentificationBarcode())) {
-          requestManager.saveEmPCRDilution(ed);
         }
       }
 

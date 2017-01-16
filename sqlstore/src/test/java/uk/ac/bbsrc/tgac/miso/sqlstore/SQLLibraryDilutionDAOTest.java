@@ -32,7 +32,6 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
-import uk.ac.bbsrc.tgac.miso.core.store.EmPCRStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.core.store.TargetedSequencingStore;
@@ -45,8 +44,6 @@ public class SQLLibraryDilutionDAOTest extends AbstractDAOTest {
   @Autowired
   @Spy
   private JdbcTemplate jdbcTemplate;
-  @Mock
-  private EmPCRStore emPcrDAO;
   @Mock
   private LibraryStore libraryDAO;
   @Mock

@@ -75,8 +75,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCR;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryQcException;
@@ -259,27 +257,6 @@ public class EditProjectController {
     return existsAnyEmPcrLibrary(populateProjectLibraryDilutions(projectId));
   }
 
-  public Collection<emPCR> populateProjectEmPCRs(long projectId) throws IOException {
-    List<emPCR> pcrs = new ArrayList<>(requestManager.listAllEmPCRsByProjectId(projectId));
-    Collections.sort(pcrs);
-    return pcrs;
-  }
-
-  public Collection<emPCRDilution> populateProjectEmPcrDilutions(Collection<emPCR> projectEmPCRs) throws IOException {
-    List<emPCRDilution> dilutions = new ArrayList<>();
-    for (emPCR e : projectEmPCRs) {
-      dilutions.addAll(requestManager.listAllEmPCRDilutionsByEmPcrId(e.getId()));
-    }
-    Collections.sort(dilutions);
-    return dilutions;
-  }
-
-  public Collection<emPCRDilution> populateProjectEmPcrDilutions(long projectId) throws IOException {
-    List<emPCRDilution> dilutions = new ArrayList<>(requestManager.listAllEmPCRDilutionsByProjectId(projectId));
-    Collections.sort(dilutions);
-    return dilutions;
-  }
-
   public Map<Long, Collection<Library>> populateLibraryGroupMap(Project project, Collection<Library> projectLibraries) throws IOException {
     Map<Long, Collection<Library>> libraryGroupMap = new HashMap<>();
 
@@ -398,10 +375,6 @@ public class EditProjectController {
         Collection<LibraryDilution> libraryDilutions = populateProjectLibraryDilutions(libraries);
         model.put("projectLibraryDilutions", libraryDilutions);
         model.put("existsAnyEmPcrLibrary", existsAnyEmPcrLibrary(libraryDilutions));
-
-        Collection<emPCR> emPcrs = populateProjectEmPCRs(projectId);
-        model.put("projectEmPcrs", emPcrs);
-        model.put("projectEmPcrDilutions", populateProjectEmPcrDilutions(emPcrs));
 
         model.put("projectPools", populateProjectPools(projectId));
 

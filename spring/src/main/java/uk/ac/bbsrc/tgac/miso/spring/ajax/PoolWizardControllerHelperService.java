@@ -53,7 +53,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedDilutionException;
@@ -134,14 +133,7 @@ public class PoolWizardControllerHelperService {
         }
 
         if (!indexCollision) {
-          Pool pool;
-          // TODO special type of pool for LibraryDilutions that will go on to be emPCRed as a whole
-          if (dils.get(0) instanceof LibraryDilution
-              && (platformType.equals(PlatformType.SOLID) || platformType.equals(PlatformType.LS454))) {
-            pool = dataObjectFactory.getEmPCRPool(platformType, user);
-          } else {
-            pool = dataObjectFactory.getPoolOfType(platformType, user);
-          }
+          Pool pool = dataObjectFactory.getPoolOfType(platformType, user);
 
           if (alias != null) {
             pool.setAlias(alias);
