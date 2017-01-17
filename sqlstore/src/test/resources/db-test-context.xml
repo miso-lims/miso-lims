@@ -40,6 +40,7 @@
     <property name="annotatedClasses">
       <list>
         <value>com.eaglegenomics.simlims.core.Group</value>
+        <value>com.eaglegenomics.simlims.core.Note</value>
         <value>com.eaglegenomics.simlims.core.SecurityProfile</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractLibraryQC</value>
@@ -60,6 +61,7 @@
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.ExperimentImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.InstituteImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl</value>
@@ -98,12 +100,22 @@
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerServiceRecordImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingParametersImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.BoxChangeLog</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.ExperimentChangeLog</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.KitDescriptorChangeLog</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryChangeLog</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.PoolChangeLog</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.RunChangeLog</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SampleChangeLog</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SequencerPartitionContainerChangeLog</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.StudyChangeLog</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType</value>

@@ -120,7 +120,6 @@ public class SQLSampleDAOTest extends AbstractDAOTest {
     Sample retrieved = dao.get(id);
     assertEquals("did not insert sample", sizeBefore + 1, dao.listAll().size());
     assertEquals("sample name does not match", sampleName, retrieved.getName());
-    assertEquals("Security profile does not match", 3L, (long) retrieved.getSecurityProfileId());
   }
 
   @Test

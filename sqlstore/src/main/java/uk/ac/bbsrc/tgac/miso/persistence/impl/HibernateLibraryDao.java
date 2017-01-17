@@ -16,6 +16,7 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
 import org.hibernate.type.LongType;
 import org.hibernate.type.StringType;
 import org.slf4j.Logger;
@@ -40,6 +41,52 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 public class HibernateLibraryDao implements LibraryStore {
+
+  private interface AdjacencySelector {
+    Criterion generateCriterion(String associationPath, Long libraryId);
+
+    Criterion generateCriterion(String associationPathOne, String associationPathTwo);
+
+    Order getOrder(String associationPath);
+  }
+
+  private static final AdjacencySelector BEFORE = new AdjacencySelector() {
+
+    @Override
+    public Criterion generateCriterion(String associationPath, Long libraryId) {
+      return Restrictions.lt(associationPath, libraryId);
+    }
+
+    @Override
+    public Order getOrder(String associationPath) {
+      return Order.desc(associationPath);
+    }
+
+    @Override
+    public Criterion generateCriterion(String associationPathOne, String associationPathTwo) {
+      return Restrictions.ltProperty(associationPathOne, associationPathTwo);
+    }
+
+  };
+
+  private static final AdjacencySelector AFTER = new AdjacencySelector() {
+
+    @Override
+    public Criterion generateCriterion(String associationPath, Long libraryId) {
+      return Restrictions.gt(associationPath, libraryId);
+    }
+
+    @Override
+    public Order getOrder(String associationPath) {
+      return Order.asc(associationPath);
+    }
+
+    @Override
+    public Criterion generateCriterion(String associationPathOne, String associationPathTwo) {
+      return Restrictions.gtProperty(associationPathOne, associationPathTwo);
+    }
+
+  };
 
   protected static final Logger log = LoggerFactory.getLogger(HibernateLibraryDao.class);
 
@@ -334,9 +381,31 @@ public class HibernateLibraryDao implements LibraryStore {
 
   @Override
   public Library getAdjacentLibrary(long libraryId, boolean before) throws IOException {
-    // TODO Auto-generated method stub
-    return null;
+    AdjacencySelector selector = before ? BEFORE : AFTER;
+
+    // get library siblings
+    Criteria criteria = currentSession().createCriteria(LibraryImpl.class);
+    criteria.createAlias("sample.libraries", "targetLibrary", JoinType.INNER_JOIN);
+    criteria.add(selector.generateCriterion("targetLibrary.id", libraryId));
+    criteria.addOrder(selector.getOrder("id"));
+    criteria.setMaxResults(1);
+    Library library = (Library) criteria.uniqueResult();
+    if (library != null) return library;
+
+    // get library cousins
+    criteria = currentSession().createCriteria(LibraryImpl.class);
+    criteria.createAlias("sample.project.samples", "targetSample", JoinType.INNER_JOIN);
+    criteria.add(Restrictions.eq("targetSample.libraries.id", libraryId));
+    criteria.add(selector.generateCriterion("targetSample.id", "sample.id"));
+    criteria.addOrder(selector.getOrder("sample.id"));
+    criteria.addOrder(selector.getOrder("id"));
+    criteria.setMaxResults(1);
+
+    library = (Library) criteria.uniqueResult();
+    return library;
   }
+
+  
 
   @Override
   public List<Library> searchByCreationDate(Date from, Date to) throws IOException {

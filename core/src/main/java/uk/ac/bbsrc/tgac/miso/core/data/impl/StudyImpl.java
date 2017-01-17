@@ -34,6 +34,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -65,10 +67,14 @@ public class StudyImpl implements Study, Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  @ManyToOne(cascade = CascadeType.ALL)
+  @ManyToOne(targetEntity = ProjectImpl.class, cascade = CascadeType.ALL)
+  @JoinColumn(name = "project_projectId")
   private Project project = null;
 
   @OneToMany(targetEntity = ExperimentImpl.class, cascade = CascadeType.ALL)
+  @JoinTable(name = "Study_Experiment", joinColumns = {
+      @JoinColumn(name = "Study_studyId", nullable = false, updatable = false) }, inverseJoinColumns = {
+          @JoinColumn(name = "experiments_experimentId", nullable = false, updatable = false) })
   private Collection<Experiment> experiments = new HashSet<>();
 
   @Id
@@ -79,6 +85,7 @@ public class StudyImpl implements Study, Serializable {
   public Document submissionDocument;
 
   @OneToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "securityProfile_profileId")
   private SecurityProfile securityProfile = null;
 
   @Column(name = "name", nullable = false)

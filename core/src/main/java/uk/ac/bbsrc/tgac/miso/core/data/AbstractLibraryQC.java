@@ -28,7 +28,6 @@ import javax.persistence.Column;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
-import javax.persistence.Transient;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
@@ -41,7 +40,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
  */
 @MappedSuperclass
 public abstract class AbstractLibraryQC extends AbstractQC implements LibraryQC {
-  @Transient
+
   public static final String UNITS = "nM";
 
   private Double results;

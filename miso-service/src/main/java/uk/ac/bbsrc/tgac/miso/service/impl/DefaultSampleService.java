@@ -258,7 +258,7 @@ public class DefaultSampleService implements SampleService {
       if (hasTemporaryName(sample)) {
         created.setName(namingScheme.generateNameFor(created));
         // if !autoGenerateIdBarcodes then the identificationBarcode is set by the user
-        if (autoGenerateIdBarcodes) generateAndSetIdBarcode(created);
+        if (autoGenerateIdBarcodes && isStringEmptyOrNull(created.getIdentificationBarcode())) generateAndSetIdBarcode(created);
         needsUpdate = true;
       }
       if (hasTemporaryAlias(sample)) {

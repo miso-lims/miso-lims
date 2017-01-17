@@ -87,9 +87,6 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
 
   @Override
   public Long addSample(final Sample sample) throws IOException {
-    if (sample.getSecurityProfile() != null) {
-      sample.setSecurityProfileId(getSecurityProfileDao().save(sample.getSecurityProfile()));
-    }
     return (Long) currentSession().save(sample);
   }
 
@@ -136,7 +133,7 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
   private <T extends Sample> T fetchSqlStore(T sample) throws IOException {
     if (sample == null) return null;
     // Now we have to reconstitute all the things that aren't covered by Hibernate.
-    sample.setSecurityProfile(securityDao.getSecurityProfileById(sample.getSecurityProfileId()));
+    sample.setSecurityProfile(securityDao.getSecurityProfileById(sample.getSecurityProfile().getProfileId()));
 
     sample.getChangeLog().clear();
     sample.getChangeLog().addAll(changeLogDao.listAllById("Sample", sample.getId()));
@@ -468,9 +465,6 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
 
   @Override
   public void update(Sample sample) throws IOException {
-    if (sample.getSecurityProfile() != null) {
-      sample.setSecurityProfileId(sample.getSecurityProfile().getProfileId());
-    }
     currentSession().update(sample);
     persistSqlStore(sample);
   }

@@ -89,13 +89,14 @@ public class ExperimentImpl implements Experiment, Serializable {
   private Collection<Kit> kits = new HashSet<>();
 
   @ManyToOne(targetEntity = UserImpl.class)
+  @JoinColumn
   private User lastModifier;
 
   @Column(nullable = false)
   private String name;
 
   @ManyToOne(targetEntity = PlatformImpl.class)
-  @Column(name = "platform_platformId")
+  @JoinColumn(name = "platform_platformId")
   private Platform platform;
 
   // defines a pool on which this experiment will operate. This contains one or more dilutions of a sample
@@ -114,7 +115,7 @@ public class ExperimentImpl implements Experiment, Serializable {
   private SecurityProfile securityProfile = new SecurityProfile();
 
   @ManyToOne(targetEntity = StudyImpl.class)
-  @Column(name = "study_studyId")
+  @JoinColumn(name = "study_studyId")
   private Study study = null;
   @Column(nullable = false)
   private String title;

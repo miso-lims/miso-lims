@@ -132,7 +132,7 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @OneToMany(targetEntity = LibraryQCImpl.class, mappedBy = "library", cascade = CascadeType.ALL)
   private final Collection<LibraryQC> libraryQCs = new TreeSet<>();
 
-  @OneToMany(targetEntity = LibraryDilution.class, mappedBy = "library", cascade = CascadeType.REMOVE)
+  @OneToMany(targetEntity = LibraryDilution.class, mappedBy = "library", cascade = CascadeType.ALL)
   private final Collection<LibraryDilution> libraryDilutions = new HashSet<>();
 
   @ManyToOne(cascade = CascadeType.ALL)
@@ -161,8 +161,8 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   private User lastModifier;
 
   @OneToMany(targetEntity = Note.class, cascade = CascadeType.ALL)
-  @JoinTable(name = "Kit_Note", joinColumns = {
-      @JoinColumn(name = "kit_kitId", nullable = false, updatable = false) }, inverseJoinColumns = {
+  @JoinTable(name = "Library_Note", joinColumns = {
+      @JoinColumn(name = "library_libraryId", nullable = false, updatable = false) }, inverseJoinColumns = {
       @JoinColumn(name = "notes_noteId", nullable = false, updatable = false) })
   private Collection<Note> notes = new HashSet<>();
 

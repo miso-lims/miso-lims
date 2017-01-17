@@ -19,6 +19,8 @@ import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -39,15 +41,17 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
+import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.IndexStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
+import uk.ac.bbsrc.tgac.miso.core.store.LibraryQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateChangeLogDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDao;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryQcDao;
 
 public class SQLLibraryDAOTest extends AbstractDAOTest {
+
+  private static final Logger log = LoggerFactory.getLogger(SQLLibraryDAOTest.class);
 
   @Autowired
   private JdbcTemplate jdbcTemplate;
@@ -60,7 +64,7 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
   @Mock
   private LibraryDilutionStore libraryDilutionStore;
   @Mock
-  private HibernateLibraryQcDao libraryQCDAO;
+  private LibraryQcStore libraryQCDAO;
   @Mock
   private NamingScheme namingScheme;
   @Mock
@@ -68,7 +72,7 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
   @Mock
   private SampleStore sampleStore;
   @Mock
-  private HibernateChangeLogDao changeLogDAO;
+  private ChangeLogStore changeLogDAO;
 
   @InjectMocks
   private HibernateLibraryDao dao;

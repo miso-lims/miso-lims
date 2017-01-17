@@ -27,7 +27,7 @@ public class SequencerPartitionContainerChangeLog extends AbstractChangeLog {
   private Long sequencerPartitionContainerChangeLogId;
 
   @ManyToOne(fetch = FetchType.LAZY, targetEntity = SequencerPartitionContainerImpl.class)
-  @JoinColumn(name = "containerId", nullable = false, updatable = false)
+  @JoinColumn(name = "containerId", referencedColumnName = "containerId", nullable = false, updatable = false)
   private SequencerPartitionContainer<Partition> sequencerPartitionContainer;
 
   @Override

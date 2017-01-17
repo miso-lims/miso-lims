@@ -25,8 +25,10 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.io.Serializable;
 
+import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +47,8 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolException;
  * @author Rob Davey
  * @since 0.1.9
  */
+@Entity
+@Table(name = "PoolQC")
 public class PoolQCImpl extends AbstractQC implements PoolQC, Serializable {
   protected static final Logger log = LoggerFactory.getLogger(PoolQCImpl.class);
   public static final String UNITS = "nM";

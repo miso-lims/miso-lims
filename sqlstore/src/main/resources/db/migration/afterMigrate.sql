@@ -478,13 +478,15 @@ FOR EACH ROW
   END//
 
 DROP TRIGGER IF EXISTS LibraryAdditionalInfoChange//
-CREATE TRIGGER LibraryAdditionalInfoChange BEFORE UPDATE ON LibraryAdditionalInfo
+DROP TRIGGER IF EXISTS DetailedLibraryChange//
+CREATE TRIGGER DetailedLibraryChange BEFORE UPDATE ON DetailedLibrary
 FOR EACH ROW
   BEGIN
   DECLARE log_message varchar(500) CHARACTER SET utf8;
   SET log_message = CONCAT_WS(', ',
      CASE WHEN NEW.archived <> OLD.archived THEN CONCAT('archived: ', OLD.archived, ' → ', NEW.archived) END,
      CASE WHEN (NEW.kitDescriptorId IS NULL) <> (OLD.kitDescriptorId IS NULL) OR NEW.kitDescriptorId <> OLD.kitDescriptorId THEN CONCAT('kit: ', COALESCE((SELECT name FROM KitDescriptor WHERE kitDescriptorId = OLD.kitDescriptorId), 'n/a'), ' → ', COALESCE((SELECT name FROM KitDescriptor WHERE kitDescriptorId = NEW.kitDescriptorId), 'n/a')) END,
+     CASE WHEN NEW.libraryDesignCodeId <> OLD.libraryDesignCodeId THEN CONCAT('designCode: ', (SELECT code FROM LibraryDesignCode WHERE libraryDesignCodeId = OLD.libraryDesignCodeId), ' → ', (SELECT code FROM LibraryDesignCode WHERE libraryDesignCodeId = NEW.libraryDesignCodeId)) END,
      CASE WHEN (NEW.libraryDesign IS NULL) <> (OLD.libraryDesign IS NULL) OR NEW.libraryDesign <> OLD.libraryDesign THEN CONCAT('library design: ', COALESCE((SELECT name FROM LibraryDesign WHERE libraryDesignId = OLD.libraryDesign), 'n/a'), ' → ', COALESCE((SELECT name FROM LibraryDesign WHERE libraryDesignId = NEW.libraryDesign), 'n/a')) END);
   IF log_message IS NOT NULL AND log_message <> '' THEN
     INSERT INTO LibraryChangeLog(libraryId, columnsChanged, userId, message) VALUES (
@@ -500,6 +502,37 @@ FOR EACH ROW
   END IF;
   END//
 
+DROP TRIGGER IF EXISTS LibraryDilutionChange//
+CREATE TRIGGER LibraryDilutionChange BEFORE UPDATE ON LibraryDilution
+FOR EACH ROW
+  BEGIN
+    DECLARE log_message varchar(500) CHARACTER SET utf8;
+    SET log_message = CONCAT_WS(', ',
+      CASE WHEN NEW.concentration <> OLD.concentration THEN CONCAT(NEW.name, ' concentration: ', OLD.concentration, ' → ', NEW.concentration) END,
+      CASE WHEN (NEW.identificationBarcode IS NULL) <> (OLD.identificationBarcode IS NULL) OR NEW.identificationBarcode <> OLD.identificationBarcode THEN CONCAT(NEW.name, ' barcode: ', COALESCE(OLD.identificationBarcode, 'n/a'), ' → ', COALESCE(NEW.identificationBarcode, 'n/a')) END,
+      CASE WHEN (NEW.targetedSequencingId IS NULL) <> (OLD.targetedSequencingId IS NULL) OR NEW.targetedSequencingId <> OLD.targetedSequencingId THEN CONCAT(NEW.name, ' targeted sequencing: ', COALESCE((SELECT alias FROM TargetedSequencing WHERE targetedSequencingId = OLD.targetedSequencingId), 'n/a'), ' → ', COALESCE((SELECT alias FROM TargetedSequencing WHERE targetedSequencingId = NEW.targetedSequencingId), 'n/a')) END);
+    IF log_message IS NOT NULL AND log_message <> '' THEN
+      INSERT INTO LibraryChangeLog(libraryId, columnsChanged, userId, message) VALUES (
+      NEW.library_libraryId,
+        COALESCE(CONCAT_WS(',',
+          CASE WHEN NEW.concentration <> OLD.concentration THEN CONCAT(NEW.name, ' concentration') END,
+          CASE WHEN (NEW.identificationBarcode IS NULL) <> (OLD.identificationBarcode IS NULL) OR NEW.identificationBarcode <> OLD.identificationBarcode THEN CONCAT(NEW.name, ' identificationBarcode') END,
+          CASE WHEN (NEW.targetedSequencingId IS NULL) <> (OLD.targetedSequencingId IS NULL) OR NEW.targetedSequencingId <> OLD.targetedSequencingId THEN CONCAT(NEW.name, ' targetedSequencingId') END
+        ), ''),
+        NEW.lastModifier,
+        log_message
+      );
+    END IF;
+  END//
+
+DROP TRIGGER IF EXISTS LibraryDilutionInsert//
+CREATE TRIGGER LibraryDilutionInsert AFTER INSERT ON LibraryDilution
+FOR EACH ROW
+  INSERT INTO LibraryChangeLog(libraryId, columnsChanged, userId, message) VALUES (
+    NEW.library_libraryId,
+    '',
+    NEW.lastModifier,
+CONCAT('Library dilution ', NEW.name, ' created.'))//
 
 DROP TRIGGER IF EXISTS BeforeInsertLibrary//
 

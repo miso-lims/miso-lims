@@ -4,7 +4,6 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -16,7 +15,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
@@ -55,10 +53,7 @@ public class DefaultLibraryDilutionService implements LibraryDilutionService {
 
   @Override
   public LibraryDilution save(LibraryDilution dilution) throws IOException {
-    Library managedLibrary = libraryDao.get(dilution.getLibrary().getId());
-    managedLibrary.setLastModifier(authorizationManager.getCurrentUser());
-    libraryDao.save(managedLibrary);
-    dilution.setLastModified(new Date());
+    dilution.setLastModifier(authorizationManager.getCurrentUser());
     try {
       Long newId = dilutionDao.save(dilution);
       LibraryDilution managed = dilutionDao.get(newId);
@@ -69,7 +64,7 @@ public class DefaultLibraryDilutionService implements LibraryDilutionService {
         managed.setName(namingScheme.generateNameFor(managed));
         validateNameOrThrow(managed, namingScheme);
         // if !autoGenerateIdBarcodes then the identificationBarcode is set by the user
-        if (autoGenerateIdBarcodes) generateAndSetIdBarcode(managed);
+        if (autoGenerateIdBarcodes && isStringEmptyOrNull(managed.getIdentificationBarcode())) generateAndSetIdBarcode(managed);
         needsUpdate = true;
       }
       if (needsUpdate) dilutionDao.save(managed);

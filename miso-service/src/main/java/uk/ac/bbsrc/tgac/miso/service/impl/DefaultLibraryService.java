@@ -98,7 +98,7 @@ public class DefaultLibraryService implements LibraryService {
         managed.setName(namingScheme.generateNameFor(managed));
         validateNameOrThrow(managed, namingScheme);
         // if !autoGenerateIdBarcodes then the identificationBarcode is set by the user
-        if (autoGenerateIdBarcodes) generateAndSetIdBarcode(managed);
+        if (autoGenerateIdBarcodes && isStringEmptyOrNull(managed.getIdentificationBarcode())) generateAndSetIdBarcode(managed);
         needsUpdate = true;
       }
       if (needsUpdate) libraryDao.save(managed);

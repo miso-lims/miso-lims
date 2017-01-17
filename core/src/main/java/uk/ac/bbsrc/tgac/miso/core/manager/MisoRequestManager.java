@@ -95,7 +95,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.AlertStore;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
-import uk.ac.bbsrc.tgac.miso.core.store.IndexStore;
 import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignCodeDao;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignDao;
@@ -188,10 +187,6 @@ public class MisoRequestManager implements RequestManager {
   private LibraryDesignDao libraryDesignDao;
   @Autowired
   private LibraryDesignCodeDao libraryDesignCodeDao;
-  @Autowired
-  private IndexStore indexDao;
-  @Autowired
-  private TargetedSequencingStore targetedSequencingDao;
   @Autowired
   private NamingScheme namingScheme;
 
@@ -289,10 +284,6 @@ public class MisoRequestManager implements RequestManager {
 
   public void setSubmissionStore(SubmissionStore submissionStore) {
     this.submissionStore = submissionStore;
-  }
-
-  public void setAutoGenerateIdBarcodes(boolean autoGenerateIdBarcodes) {
-    this.autoGenerateIdBarcodes = autoGenerateIdBarcodes;
   }
 
   @Override

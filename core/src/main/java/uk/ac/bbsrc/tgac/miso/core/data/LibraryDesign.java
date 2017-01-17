@@ -5,7 +5,6 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
@@ -40,7 +39,7 @@ public class LibraryDesign {
   private LibraryStrategyType libraryStrategyType;
   @Column(nullable = false)
   private String name;
-  @OneToOne(targetEntity = SampleClassImpl.class)
+  @ManyToOne(targetEntity = SampleClassImpl.class)
   @JoinColumn(name = "sampleClassId", nullable = false)
   private SampleClass sampleClass;
 

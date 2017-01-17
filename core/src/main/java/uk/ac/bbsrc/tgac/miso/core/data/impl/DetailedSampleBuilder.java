@@ -322,16 +322,6 @@ public class DetailedSampleBuilder
   }
 
   @Override
-  public Long getSecurityProfileId() {
-    return securityProfile_profileId;
-  }
-
-  @Override
-  public void setSecurityProfileId(Long securityProfileId) {
-    this.securityProfile_profileId = securityProfileId;
-  }
-
-  @Override
   public User getLastModifier() {
     return lastModifier;
   }
@@ -867,7 +857,6 @@ public class DetailedSampleBuilder
 
     sample.setId(sampleId);
     sample.setProject(project);
-    sample.setSecurityProfileId(securityProfile_profileId);
     sample.setSecurityProfile(securityProfile);
     sample.setAccession(accession);
     sample.setName(name);
