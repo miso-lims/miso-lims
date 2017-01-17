@@ -33,8 +33,19 @@ CREATE TABLE `Pool_Dilution` (
 INSERT INTO Pool_Dilution(pool_poolId, dilution_dilutionId) SELECT
   pool_poolId, elementId FROM Pool_Elements
   WHERE elementType = 'uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution';
-INSERT INTO Pool_Dilution(pool_poolId, dilution_dilutionId) SELECT
+INSERT INTO Pool_Dilution(pool_poolId, dilution_dilutionId) SELECT DISTINCT
   pool_poolId, dilution_dilutionId
+  FROM Pool_Elements JOIN emPCRDilution ON Pool_Elements.elementId = emPCRDilution.dilutionId
+  JOIN emPCR ON emPCR.pcrId = emPCRDilution.emPCR_pcrId
+  WHERE elementType = 'uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution'
+  AND NOT EXISTS (SELECT * FROM Pool_Dilution WHERE Pool_Dilution.pool_poolId = Pool_Elements.pool_poolId AND Pool_Dilution.dilution_dilutionId = emPCR.dilution_dilutionId);
+
+INSERT INTO PoolChangeLog(poolId, userId, message) SELECT
+  pool_poolId, (SELECT userId FROM `User` WHERE loginName = 'admin'),
+  CONCAT(
+    'Replaced emPCR dilution ', emPCRDilution.name, ' (concentration = ', emPCRDilution.concentration, ') created on ', emPCRDilution.creationDate, ' by ', emPCRDilution.dilutionUserName,
+    'created from emPCR ', emPCR.name, ' (concentration = ', emPCR.concentration, ') created on ', emPCR.creationDate, ' by ', emPCR.pcrUserName,
+    ' with library dilution ',  (SELECT name FROM LibraryDilution WHERE LibraryDilution.dilutionId = emPCR.dilution_dilutionId))
   FROM Pool_Elements JOIN emPCRDilution ON Pool_Elements.elementId = emPCRDilution.dilutionId
   JOIN emPCR ON emPCR.pcrId = emPCRDilution.emPCR_pcrId
   WHERE elementType = 'uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution'
