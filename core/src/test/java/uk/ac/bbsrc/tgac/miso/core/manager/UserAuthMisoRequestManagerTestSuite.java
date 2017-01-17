@@ -2370,16 +2370,6 @@ public class UserAuthMisoRequestManagerTestSuite {
 
   /**
    * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#deleteProject(uk.ac.bbsrc.tgac.miso.core.data.Project)} .
-   */
-
-  @Test
-  public void testDeleteProject() throws IOException {
-    // TODO: Implement.
-  }
-
-  /**
-   * Test method for
    * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#deleteStudy(uk.ac.bbsrc.tgac.miso.core.data.Study)} .
    */
 

@@ -14,10 +14,10 @@ import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
+import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
 import uk.ac.bbsrc.tgac.miso.persistence.SubprojectDao;
 import uk.ac.bbsrc.tgac.miso.service.SubprojectService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
-import uk.ac.bbsrc.tgac.miso.sqlstore.SQLProjectDAO;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
@@ -26,7 +26,7 @@ public class DefaultSubprojectService implements SubprojectService {
   protected static final Logger log = LoggerFactory.getLogger(DefaultSubprojectService.class);
 
   @Autowired
-  private SQLProjectDAO sqlProjectDAO;
+  private ProjectStore projectStore;
   @Autowired
   private SubprojectDao subprojectDao;
 
@@ -43,7 +43,7 @@ public class DefaultSubprojectService implements SubprojectService {
   public Long create(Subproject subproject, Long parentProjectId) throws IOException {
     authorizationManager.throwIfNonAdmin();
     User user = authorizationManager.getCurrentUser();
-    Project parentProject = sqlProjectDAO.lazyGet(parentProjectId);
+    Project parentProject = projectStore.lazyGet(parentProjectId);
     subproject.setCreatedBy(user);
     subproject.setUpdatedBy(user);
     subproject.setParentProject(parentProject);

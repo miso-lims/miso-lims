@@ -400,7 +400,7 @@ public class SQLLibraryDAO implements LibraryStore {
 
           String name = namingScheme.generateNameFor(library);
           library.setName(name);
-          DbUtils.validateNameOrThrow(library, namingScheme);
+          LimsUtils.validateNameOrThrow(library, namingScheme);
           validateAliasOrThrow(library);
           if (autoGenerateIdentificationBarcodes) {
             autoGenerateIdBarcode(library);
@@ -426,7 +426,7 @@ public class SQLLibraryDAO implements LibraryStore {
         }
       }
     } else {
-      DbUtils.validateNameOrThrow(library, namingScheme);
+      LimsUtils.validateNameOrThrow(library, namingScheme);
       validateAliasOrThrow(library);
       params.addValue("libraryId", library.getId());
       params.addValue("name", library.getName());

@@ -878,12 +878,7 @@ public class ProjectControllerHelperService {
     try {
       final User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       final ProjectOverview overview = requestManager.getProjectOverviewById(overviewId);
-      if (!overview.getWatchers().contains(user)) {
-        watchManager.watch(overview, user);
-        watchManager.watch(overview.getProject(), user);
-        requestManager.saveProjectOverview(overview);
-        requestManager.saveProject(overview.getProject());
-      }
+      requestManager.addProjectWatcher(overview.getProject(), user);
       return JSONUtils.SimpleJSONResponse("OK");
     } catch (final IOException e) {
       log.error("watch overview", e);
@@ -896,13 +891,8 @@ public class ProjectControllerHelperService {
     try {
       final User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       final ProjectOverview overview = requestManager.getProjectOverviewById(overviewId);
+      requestManager.removeProjectWatcher(overview.getProject(), user);
       if (!overview.getProject().getSecurityProfile().getOwner().equals(user)) {
-        if (overview.getWatchers().contains(user)) {
-          watchManager.unwatch(overview, user);
-          watchManager.unwatch(overview.getProject(), user);
-          requestManager.saveProjectOverview(overview);
-          requestManager.saveProject(overview.getProject());
-        }
         return JSONUtils.SimpleJSONResponse("OK");
       } else {
         return JSONUtils.SimpleJSONError("Cannot unwatch an entity of which you are the owner.");

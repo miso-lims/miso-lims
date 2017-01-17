@@ -165,7 +165,7 @@
 <div style="float:right;margin:5px;">
   <div class="breadcrumbsbubbleInfo">
     <div class="trigger"><c:choose>
-      <c:when test="${not empty overviewMap[overview.overviewId]}">
+      <c:when test="${not empty overviewMap[overview.id]}">
         <a href='javascript:void(0);' onclick="Project.alert.unwatchOverview(${overview.id});">Stop
           watching</a>
       </c:when>

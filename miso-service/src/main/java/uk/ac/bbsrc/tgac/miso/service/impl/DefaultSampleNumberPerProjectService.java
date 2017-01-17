@@ -14,10 +14,10 @@ import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleNumberPerProject;
+import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleNumberPerProjectDao;
 import uk.ac.bbsrc.tgac.miso.service.SampleNumberPerProjectService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
-import uk.ac.bbsrc.tgac.miso.sqlstore.SQLProjectDAO;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
@@ -29,7 +29,7 @@ public class DefaultSampleNumberPerProjectService implements SampleNumberPerProj
   private SampleNumberPerProjectDao sampleNumberPerProjectDao;
 
   @Autowired
-  private SQLProjectDAO sqlProjectDAO;
+  private ProjectStore projectStore;
 
   @Autowired
   private AuthorizationManager authorizationManager;
@@ -38,8 +38,8 @@ public class DefaultSampleNumberPerProjectService implements SampleNumberPerProj
     this.sampleNumberPerProjectDao = sampleNumberPerProjectDao;
   }
 
-  public void setSqlProjectDAO(SQLProjectDAO sqlProjectDAO) {
-    this.sqlProjectDAO = sqlProjectDAO;
+  public void setProjectStore(ProjectStore projectStore) {
+    this.projectStore = projectStore;
   }
 
   public void setAuthorizationManager(AuthorizationManager authorizationManager) {
@@ -56,7 +56,7 @@ public class DefaultSampleNumberPerProjectService implements SampleNumberPerProj
   public Long create(SampleNumberPerProject sampleNumberPerProject, Long projectId) throws IOException {
     authorizationManager.throwIfNonAdmin();
     User user = authorizationManager.getCurrentUser();
-    Project project = sqlProjectDAO.get(projectId);
+    Project project = projectStore.get(projectId);
     sampleNumberPerProject.setCreatedBy(user);
     sampleNumberPerProject.setUpdatedBy(user);
     sampleNumberPerProject.setProject(project);

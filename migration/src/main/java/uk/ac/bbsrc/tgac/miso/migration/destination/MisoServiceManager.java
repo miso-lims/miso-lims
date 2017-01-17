@@ -28,6 +28,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryAdditionalInfoDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDesignCodeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDesignDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernatePlatformDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateProjectDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateReferenceGenomeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateRunDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateRunQcDao;
@@ -60,7 +61,6 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryDilutionDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryQCDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLPoolDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLPoolQCDAO;
-import uk.ac.bbsrc.tgac.miso.sqlstore.SQLProjectDAO;
 
 /**
  * This class is used to simplify creation and wiring of MISO services. Some of the config is currently hardcoded - mainly naming schemes
@@ -80,7 +80,7 @@ public class MisoServiceManager {
 
   private HibernateSecurityDao securityStore;
   private HibernateSecurityProfileDao securityProfileDao;
-  private SQLProjectDAO projectDao;
+  private HibernateProjectDao projectDao;
   private HibernateChangeLogDao changeLogDao;
   private HibernateSampleQcDao sampleQcDao;
   private SQLLibraryDAO libraryDao;
@@ -284,7 +284,6 @@ public class MisoServiceManager {
   }
 
   private void updateSecurityProfileDaoDependencies() {
-    if (projectDao != null) projectDao.setSecurityProfileDAO(securityProfileDao);
     if (sampleDao != null) sampleDao.setSecurityProfileDao(securityProfileDao);
     if (libraryDao != null) libraryDao.setSecurityProfileDAO(securityProfileDao);
     if (dilutionDao != null) dilutionDao.setSecurityProfileDAO(securityProfileDao);
@@ -308,33 +307,27 @@ public class MisoServiceManager {
   }
 
   private void updateSecurityManagerDependencies() {
-    if (projectDao != null) projectDao.setSecurityManager(securityManager);
     if (poolDao != null) poolDao.setSecurityManager(securityManager);
     if (runDao != null) runDao.setSecurityManager(securityManager);
   }
 
-  public SQLProjectDAO getProjectDao() {
+  public HibernateProjectDao getProjectDao() {
     return projectDao;
   }
 
-  public void setProjectDao(SQLProjectDAO projectDao) {
+  public void setProjectDao(HibernateProjectDao projectDao) {
     this.projectDao = projectDao;
     updateProjectDaoDependencies();
   }
 
   public void setDefaultProjectDao() {
-    SQLProjectDAO dao = new SQLProjectDAO();
+    HibernateProjectDao dao = new HibernateProjectDao();
     dao.setJdbcTemplate(jdbcTemplate);
-    dao.setSecurityManager(securityManager);
-    dao.setSecurityProfileDAO(securityProfileDao);
-    dao.setNamingScheme(getNamingScheme());
-    dao.setDataObjectFactory(dataObjectFactory);
-    dao.setReferenceGenomeDao(referenceGenomeDao);
     setProjectDao(dao);
   }
 
   private void updateProjectDaoDependencies() {
-    if (sampleNumberPerProjectService != null) sampleNumberPerProjectService.setSqlProjectDAO(projectDao);
+    if (sampleNumberPerProjectService != null) sampleNumberPerProjectService.setProjectStore(projectDao);
   }
 
   public HibernateSampleClassDao getSampleClassDao() {
@@ -437,7 +430,6 @@ public class MisoServiceManager {
     if (sampleService != null) sampleService.setSampleDao(sampleDao);
     if (libraryDao != null) libraryDao.setSampleDAO(sampleDao);
     if (boxDao != null) boxDao.setSampleDAO(sampleDao);
-    if (projectDao != null) projectDao.setSampleDAO(sampleDao);
   }
 
   public HibernateChangeLogDao getChangeLogDao() {
@@ -682,7 +674,6 @@ public class MisoServiceManager {
   }
 
   private void updateStudyDaoDependencies() {
-    if (projectDao != null) projectDao.setStudyDAO(studyDao);
   }
 
   public HibernateRunDao getRunDao() {
@@ -989,7 +980,7 @@ public class MisoServiceManager {
     DefaultSampleNumberPerProjectService svc = new DefaultSampleNumberPerProjectService();
     svc.setAuthorizationManager(authorizationManager);
     svc.setSampleNumberPerProjectDao(sampleNumberPerProjectDao);
-    svc.setSqlProjectDAO(projectDao);
+    svc.setProjectStore(projectDao);
     setSampleNumberPerProjectService(svc);
   }
 
@@ -1068,7 +1059,6 @@ public class MisoServiceManager {
   }
 
   private void updateReferenceGenomeDaoDependencies() {
-    if (projectDao != null) projectDao.setReferenceGenomeDao(referenceGenomeDao);
     if (referenceGenomeService != null) referenceGenomeService.setReferenceGenomeDao(referenceGenomeDao);
   }
 

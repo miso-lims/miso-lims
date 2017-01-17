@@ -67,6 +67,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
 import uk.ac.bbsrc.tgac.miso.core.store.StudyStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SubmissionStore;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 /**
@@ -180,7 +181,7 @@ public class SQLTgacSubmissionDAO implements SubmissionStore, NamingSchemeAware 
     // if a submission already exists then delete all the old rows first, and repopulate.
     // easier than trying to work out which rows need to be updated and which don't
     if (submission.getId() != Submission.UNSAVED_ID) {
-      DbUtils.validateNameOrThrow(submission, namingScheme);
+      LimsUtils.validateNameOrThrow(submission, namingScheme);
       MapSqlParameterSource delparams = new MapSqlParameterSource();
       delparams.addValue("submissionId", submission.getId());
       NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
@@ -198,7 +199,7 @@ public class SQLTgacSubmissionDAO implements SubmissionStore, NamingSchemeAware 
         String name = namingScheme.generateNameFor(submission);
         submission.setName(name);
 
-        DbUtils.validateNameOrThrow(submission, namingScheme);
+        LimsUtils.validateNameOrThrow(submission, namingScheme);
         params.addValue("name", name);
         params.addValue("creationDate", new Date());
 
@@ -327,7 +328,7 @@ public class SQLTgacSubmissionDAO implements SubmissionStore, NamingSchemeAware 
   }
 
   @Override
-  public Submission<Submittable, Document, Document> lazyGet(long id) throws IOException {
+  public Submission lazyGet(long id) throws IOException {
     return get(id);
   }
 

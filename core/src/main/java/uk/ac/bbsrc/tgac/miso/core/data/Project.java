@@ -31,6 +31,8 @@ import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.w3c.dom.Document;
 
+import com.eaglegenomics.simlims.core.Group;
+
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
@@ -105,13 +107,6 @@ public interface Project extends com.eaglegenomics.simlims.core.Project, Compara
   Collection<Sample> getSamples();
 
   /**
-   * Returns the registered samples of this Project object.
-   * 
-   * @return Collection<Run> runs.
-   */
-  Collection<Run> getRuns();
-
-  /**
    * Returns the registered studies of this Project object.
    * 
    * @return Collection<Study> studies.
@@ -141,14 +136,6 @@ public interface Project extends com.eaglegenomics.simlims.core.Project, Compara
    *          samples.
    */
   void setSamples(Collection<Sample> samples);
-
-  /**
-   * Registers a collection of samples to this Project object.
-   * 
-   * @param runs
-   *          runs.
-   */
-  void setRuns(Collection<Run> runs);
 
   /**
    * Register that a Sample has been recieved in relation to this Project
@@ -204,4 +191,6 @@ public interface Project extends com.eaglegenomics.simlims.core.Project, Compara
   public ReferenceGenome getReferenceGenome();
 
   public void setReferenceGenome(ReferenceGenome referenceGenome);
+
+  public void setWatchGroup(Group group);
 }

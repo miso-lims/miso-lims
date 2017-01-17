@@ -354,7 +354,7 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
         String name = namingScheme.generateNameFor(dilution);
         dilution.setName(name);
 
-        DbUtils.validateNameOrThrow(dilution, namingScheme);
+        LimsUtils.validateNameOrThrow(dilution, namingScheme);
         if (autoGenerateIdentificationBarcodes) {
           autoGenerateIdBarcode(dilution);
         } // if !autoGenerateIdentificationBarcodes then the identificationBarcode is set by the user
@@ -373,7 +373,7 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
         throw new IOException("Cannot save LibraryDilution - issue with naming scheme", e);
       }
     } else {
-      DbUtils.validateNameOrThrow(dilution, namingScheme);
+      LimsUtils.validateNameOrThrow(dilution, namingScheme);
       params.addValue("dilutionId", dilution.getId());
       params.addValue("name", dilution.getName());
       if (dilution.getTargetedSequencing() != null) {

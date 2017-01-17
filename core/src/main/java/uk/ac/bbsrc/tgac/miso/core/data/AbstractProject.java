@@ -30,23 +30,27 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
-import javax.persistence.OneToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
-import org.hibernate.annotations.TypeDefs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,9 +60,10 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
-import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressTypeUserType;
 import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
@@ -70,7 +75,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
  * @since 0.0.2
  */
 @MappedSuperclass
-@TypeDefs({ @TypeDef(name = "progressTypeUserType", typeClass = ProgressTypeUserType.class) })
 public abstract class AbstractProject implements Project {
   protected static final Logger log = LoggerFactory.getLogger(AbstractProject.class);
   private static final long serialVersionUID = 1L;
@@ -80,6 +84,7 @@ public abstract class AbstractProject implements Project {
    */
   public static final Long UNSAVED_ID = 0L;
 
+  @Column(updatable = false)
   private Date creationDate = new Date();
   private String description = "";
   private String name = "";
@@ -90,29 +95,32 @@ public abstract class AbstractProject implements Project {
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long projectId = AbstractProject.UNSAVED_ID;
 
-  @Transient
+  @OneToMany(targetEntity = SampleImpl.class, fetch = FetchType.LAZY, mappedBy = "project")
   private Collection<Sample> samples = new HashSet<>();
-  @Transient
-  private Collection<Run> runs = new HashSet<>();
-  @Transient
+  @OneToMany(targetEntity = StudyImpl.class, fetch = FetchType.LAZY, mappedBy = "project")
   private Collection<Study> studies = new HashSet<>();
-  @Transient
+  @OneToMany(targetEntity = ProjectOverview.class, mappedBy = "project", cascade = CascadeType.ALL)
   private Collection<ProjectOverview> overviews = new HashSet<>();
-  @Transient
+  @ElementCollection
+  @CollectionTable(name = "Project_Issues", joinColumns = { @JoinColumn(name = "project_projectId") })
+  @Column(name = "issueKey")
   private Collection<String> issueKeys = new HashSet<>();
 
-  @Column
-  @Type(type = "progressTypeUserType")
+  @Enumerated(EnumType.STRING)
   private ProgressType progress;
 
-  @OneToOne(targetEntity = ReferenceGenomeImpl.class)
+  @ManyToOne(targetEntity = ReferenceGenomeImpl.class)
   @JoinColumn(name = "referenceGenomeId", referencedColumnName = "referenceGenomeId", nullable = false)
   private ReferenceGenome referenceGenome;
 
-  @Transient
+  @ManyToOne
+  @JoinColumn(name = "securityProfile_profileId")
   private SecurityProfile securityProfile = null;
+
   @Transient
   private final Set<MisoListener> listeners = new HashSet<>();
+
+  @Column(nullable = false)
   private Date lastUpdated;
 
   @ManyToMany(targetEntity = UserImpl.class)
@@ -176,11 +184,6 @@ public abstract class AbstractProject implements Project {
   }
 
   @Override
-  public Collection<Run> getRuns() {
-    return runs;
-  }
-
-  @Override
   public Collection<Study> getStudies() {
     return studies;
   }
@@ -233,16 +236,6 @@ public abstract class AbstractProject implements Project {
       Collections.sort(Arrays.asList(this.samples), new AliasComparator(Sample.class));
     } catch (NoSuchMethodException e) {
       log.error("set samples", e);
-    }
-  }
-
-  @Override
-  public void setRuns(Collection<Run> runs) {
-    this.runs = runs;
-    try {
-      Collections.sort(Arrays.asList(this.runs), new AliasComparator(Run.class));
-    } catch (NoSuchMethodException e) {
-      log.error("set runs", e);
     }
   }
 
@@ -388,6 +381,7 @@ public abstract class AbstractProject implements Project {
     return watchUsers;
   }
 
+  @Override
   public void setWatchGroup(Group watchGroup) {
     this.watchGroup = watchGroup;
   }

@@ -1259,14 +1259,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
     return accessibles;
   }
 
-  /* deletes */
-  @Override
-  public void deleteProject(Project project) throws IOException {
-    if (getCurrentUser().isAdmin()) {
-      backingManager.deleteProject(project);
-    }
-  }
-
   @Override
   public void deleteStudy(Study study) throws IOException {
     if (getCurrentUser().isAdmin()) {
@@ -2224,6 +2216,26 @@ public class UserAuthMisoRequestManager implements RequestManager {
       throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read write to Run " + run.getId());
     } else {
       backingManager.removeRunWatcher(run, watcher);
+    }
+  }
+
+  @Override
+  public void addProjectWatcher(Project project, User watcher) throws IOException {
+    if (!readCheck(project)) {
+      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Project " + project.getId());
+    } else if (!project.userCanRead(watcher)) {
+      throw new AuthorizationIOException("User " + watcher.getLoginName() + " cannot read Project " + project.getId());
+    } else {
+      backingManager.addProjectWatcher(project, watcher);
+    }
+  }
+
+  @Override
+  public void removeProjectWatcher(Project project, User watcher) throws IOException {
+    if (!writeCheck(project)) {
+      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read write to Project " + project.getId());
+    } else {
+      backingManager.removeProjectWatcher(project, watcher);
     }
   }
 }

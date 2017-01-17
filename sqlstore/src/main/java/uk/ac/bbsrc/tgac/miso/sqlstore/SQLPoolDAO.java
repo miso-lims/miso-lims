@@ -82,6 +82,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateChangeLogDao;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
@@ -424,7 +425,7 @@ public class SQLPoolDAO implements PoolStore {
         String name = namingScheme.generateNameFor(pool);
         pool.setName(name);
 
-        DbUtils.validateNameOrThrow(pool, namingScheme);
+        LimsUtils.validateNameOrThrow(pool, namingScheme);
         if (autoGenerateIdentificationBarcodes) {
           autoGenerateIdBarcode(pool);
         } // if !autoGenerateIdentificationBarcodes then the identificationBarcode is set by the user
@@ -442,7 +443,7 @@ public class SQLPoolDAO implements PoolStore {
         throw new IOException("Cannot save Pool - issue with naming scheme", e);
       }
     } else {
-      DbUtils.validateNameOrThrow(pool, namingScheme);
+      LimsUtils.validateNameOrThrow(pool, namingScheme);
       params.addValue("poolId", pool.getId()).addValue("name", pool.getName());
 
       if (autoGenerateIdentificationBarcodes) {
