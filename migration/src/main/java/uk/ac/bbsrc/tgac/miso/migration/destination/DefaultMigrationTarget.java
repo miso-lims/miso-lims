@@ -26,7 +26,6 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
@@ -426,7 +425,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
         ldi.setLastModified(timeStamp);
       }
 
-      if (ldi.getLibrary().getId() == AbstractDilution.UNSAVED_ID && ((DetailedLibrary) ldi.getLibrary()).getPreMigrationId() != null) {
+      if (ldi.getLibrary().getId() == LibraryDilution.UNSAVED_ID && ((DetailedLibrary) ldi.getLibrary()).getPreMigrationId() != null) {
         Long preMigrationId = ((DetailedLibrary) ldi.getLibrary()).getPreMigrationId();
         ldi.setLibrary(serviceManager.getLibraryDao()
             .get(serviceManager.getLibraryDao().getByPreMigrationId(preMigrationId).getId()));

@@ -50,7 +50,6 @@ import com.googlecode.ehcache.annotations.TriggersRemove;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
@@ -321,7 +320,7 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
       params.addValue("targetedSequencingId", null);
     }
 
-    if (dilution.getId() == AbstractDilution.UNSAVED_ID) {
+    if (dilution.getId() == LibraryDilution.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName("LibraryDilution").usingGeneratedKeyColumns("dilutionId");
       try {
         dilution.setId(DbUtils.getAutoIncrement(template, "LibraryDilution"));

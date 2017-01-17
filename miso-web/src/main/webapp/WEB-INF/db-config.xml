@@ -64,6 +64,7 @@
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.InstituteImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDerivedInfo</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryQCImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl</value>

@@ -83,7 +83,6 @@ import org.slf4j.LoggerFactory;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
@@ -961,7 +960,7 @@ public class LimsUtils {
    */
   public static void generateAndSetIdBarcode(Nameable nameable) throws IOException {
     String barcode = null;
-    if (nameable instanceof AbstractDilution && nameable.getName() != null) {
+    if (nameable instanceof LibraryDilution && nameable.getName() != null) {
       barcode = nameable.getName();
       if (((LibraryDilution) nameable).getLibrary() != null
           && ((LibraryDilution) nameable).getLibrary().getAlias() != null) {
