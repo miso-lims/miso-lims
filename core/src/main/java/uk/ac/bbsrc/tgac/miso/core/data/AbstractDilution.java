@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.util.Date;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.GeneratedValue;
@@ -58,6 +59,8 @@ public abstract class AbstractDilution implements Dilution, Comparable {
   private String identificationBarcode;
   private String dilutionUserName;
   private Long preMigrationId;
+  // TODO: Create an interface for this when Hibernating
+  private Set<Pool> pools;
 
   @Override
   public long getId() {

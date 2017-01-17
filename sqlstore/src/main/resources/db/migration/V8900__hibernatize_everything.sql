@@ -22,7 +22,36 @@ INSERT INTO ProjectOverview_Sample(projectOverview_overviewId, sample_sampleId)
 DROP TABLE EntityGroup_Elements;
 DROP TABLE EntityGroup;
 
-UPDATE Pool_Elements SET elementType = CASE elementType WHEN 'uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution' THEN 'LDI' WHEN 'uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution' THEN 'EDI' END;
+CREATE TABLE `Pool_Dilution` (
+  `pool_poolId` bigint(20) NOT NULL,
+  `dilution_dilutionId` bigint(20) NOT NULL,
+  PRIMARY KEY (`pool_poolId`,`dilution_dilutionId`),
+  CONSTRAINT `Pool_Dilution_pool_poolId` FOREIGN KEY (`pool_poolId`) REFERENCES `Pool` (`poolId`),
+  CONSTRAINT `Pool_Dilution_dilution_dilutionId` FOREIGN KEY (`dilution_dilutionId`) REFERENCES `LibraryDilution` (`dilutionId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO Pool_Dilution(pool_poolId, dilution_dilutionId) SELECT
+  pool_poolId, elementId FROM Pool_Elements
+  WHERE elementType = 'uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution';
+INSERT INTO Pool_Dilution(pool_poolId, dilution_dilutionId) SELECT DISTINCT
+  pool_poolId, dilution_dilutionId
+  FROM Pool_Elements JOIN emPCRDilution ON Pool_Elements.elementId = emPCRDilution.dilutionId
+  JOIN emPCR ON emPCR.pcrId = emPCRDilution.emPCR_pcrId
+  WHERE elementType = 'uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution'
+  AND NOT EXISTS (SELECT * FROM Pool_Dilution WHERE Pool_Dilution.pool_poolId = Pool_Elements.pool_poolId AND Pool_Dilution.dilution_dilutionId = emPCR.dilution_dilutionId);
+
+INSERT INTO PoolChangeLog(poolId, userId, message) SELECT
+  pool_poolId, (SELECT userId FROM `User` WHERE loginName = 'admin'),
+  CONCAT(
+    'Replaced emPCR dilution ', emPCRDilution.name, ' (concentration = ', emPCRDilution.concentration, ') created on ', emPCRDilution.creationDate, ' by ', emPCRDilution.dilutionUserName,
+    'created from emPCR ', emPCR.name, ' (concentration = ', emPCR.concentration, ') created on ', emPCR.creationDate, ' by ', emPCR.pcrUserName,
+    ' with library dilution ',  (SELECT name FROM LibraryDilution WHERE LibraryDilution.dilutionId = emPCR.dilution_dilutionId))
+  FROM Pool_Elements JOIN emPCRDilution ON Pool_Elements.elementId = emPCRDilution.dilutionId
+  JOIN emPCR ON emPCR.pcrId = emPCRDilution.emPCR_pcrId
+  WHERE elementType = 'uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution'
+  AND NOT EXISTS (SELECT * FROM Pool_Dilution WHERE Pool_Dilution.pool_poolId = Pool_Elements.pool_poolId AND Pool_Dilution.dilution_dilutionId = emPCR.dilution_dilutionId);
+
+DROP TABLE Pool_Elements;
 
 ALTER TABLE SequencerReference ADD COLUMN ip VARCHAR(50) NOT NULL DEFAULT 'localhost';
 -- H2 doesn't have INET_NTOA function

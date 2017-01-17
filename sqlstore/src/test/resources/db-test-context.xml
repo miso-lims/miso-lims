@@ -61,7 +61,9 @@
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAdditionalInfoImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.PlatformImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrderImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.PoolQCImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.RunDerivedInfo</value>

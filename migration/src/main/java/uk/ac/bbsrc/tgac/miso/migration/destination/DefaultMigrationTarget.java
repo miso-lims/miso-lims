@@ -27,7 +27,6 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractDilution;
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractPool;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
@@ -44,6 +43,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleNumberPerProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
@@ -498,9 +498,8 @@ public class DefaultMigrationTarget implements MigrationTarget {
   }
   
   private void setPoolModifiedDetails(Pool pool) throws IOException {
-    if (pool.getId() == AbstractPool.UNSAVED_ID) pool.setCreationDate(timeStamp);
+    if (pool.getId() == PoolImpl.UNSAVED_ID) pool.setCreationDate(timeStamp);
     pool.setLastModifier(migrationUser);
-    pool.setLastUpdated(timeStamp);
   }
   
   private void addPoolNoteDetails(Pool pool) throws IOException {
