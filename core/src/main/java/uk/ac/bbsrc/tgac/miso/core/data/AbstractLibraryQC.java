@@ -46,7 +46,7 @@ public abstract class AbstractLibraryQC extends AbstractQC implements LibraryQC 
   private Double results;
 
   @Column(nullable = false)
-  private Integer insertSize;
+  private int insertSize;
 
   @ManyToOne(targetEntity = LibraryImpl.class, cascade = CascadeType.PERSIST)
   @JoinColumn(name = "library_libraryId")
@@ -73,12 +73,12 @@ public abstract class AbstractLibraryQC extends AbstractQC implements LibraryQC 
   }
 
   @Override
-  public Integer getInsertSize() {
+  public int getInsertSize() {
     return insertSize;
   }
 
   @Override
-  public void setInsertSize(Integer insertSize) {
+  public void setInsertSize(int insertSize) {
     this.insertSize = insertSize;
   }
 

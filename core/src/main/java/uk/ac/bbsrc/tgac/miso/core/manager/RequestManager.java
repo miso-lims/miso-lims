@@ -496,25 +496,27 @@ public interface RequestManager {
 
   public void removePoolWatcher(Pool pool, User watcher) throws IOException;
 
-  /** Delete these once FormUtils are refactored */
-
+  @Deprecated
   long saveLibrary(Library library) throws IOException;
 
+  @Deprecated
   long saveLibraryQC(LibraryQC libraryQc) throws IOException;
 
+  @Deprecated
   public LibraryType getLibraryTypeByDescriptionAndPlatform(String description, PlatformType platformType) throws IOException;
 
+  @Deprecated
   public LibrarySelectionType getLibrarySelectionTypeByName(String name) throws IOException;
 
+  @Deprecated
   public LibraryStrategyType getLibraryStrategyTypeByName(String name) throws IOException;
 
+  @Deprecated
   public long saveLibraryDilution(LibraryDilution libraryDilution) throws IOException;
 
-  /** end delete once FormUtils are refactored */
-
-  /** Delete once LibraryAliasGenerator is refactored */
+  @Deprecated
   public Collection<Library> listAllLibrariesBySampleId(long sampleId) throws IOException;
 
-  /** Delete once MisoAppListener is refactored */
+  @Deprecated
   public Collection<LibraryDilution> listAllLibraryDilutions() throws IOException;
 }

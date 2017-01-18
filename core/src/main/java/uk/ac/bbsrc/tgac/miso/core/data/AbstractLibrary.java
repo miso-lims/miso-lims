@@ -115,15 +115,15 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   private Boolean qcPassed;
 
   @Column(nullable = false)
-  private boolean lowQuality;
+  private boolean lowQuality = false;
 
   @Column(nullable = false)
-  private Boolean paired;
+  private boolean paired;
 
   @Column(name = "concentration")
   private Double initialConcentration;
 
-  @ManyToMany
+  @ManyToMany(targetEntity = Index.class)
   @JoinTable(name = "Library_Index", joinColumns = {
       @JoinColumn(name = "library_libraryId", nullable = false) }, inverseJoinColumns = {
           @JoinColumn(name = "index_indexId", nullable = false) })

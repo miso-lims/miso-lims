@@ -478,7 +478,7 @@ public class FlexReportingControllerHelperService {
                               JsonSanitizer.sanitize(
                                   "[\"" + sample.getAlias() + "\",\"" + sample.getDescription() + "\",\"" + sample.getSampleType() + "\",\""
                                       + libraryInRun.getName() + "\",\"" + dilution.getName() + "\",\"" + indexInfo.toString() + "\",\""
-                                      + libraryQc.getInsertSize().toString() + "\",\"" + run.getAlias() + "\",\""
+                                      + Integer.toString(libraryQc.getInsertSize()) + "\",\"" + run.getAlias() + "\",\""
                                       + spp.getPartitionNumber().toString() + "\"]"));
                         }
                       }

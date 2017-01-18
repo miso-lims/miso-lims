@@ -189,6 +189,8 @@ public class MisoRequestManager implements RequestManager {
   private LibraryDesignCodeDao libraryDesignCodeDao;
   @Autowired
   private NamingScheme namingScheme;
+  @Value("${miso.autoGenerateIdentificationBarcodes:true}")
+  private boolean autoGenerateIdBarcodes;
 
   public void setSecurityStore(SecurityStore securityStore) {
     this.securityStore = securityStore;
@@ -284,6 +286,10 @@ public class MisoRequestManager implements RequestManager {
 
   public void setSubmissionStore(SubmissionStore submissionStore) {
     this.submissionStore = submissionStore;
+  }
+
+  public void setAutoGenerateIdBarcodes(boolean autoGenerateIdBarcodes) {
+    this.autoGenerateIdBarcodes = autoGenerateIdBarcodes;
   }
 
   @Override
@@ -1269,9 +1275,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  // TODO: REMOVE THIS once FormUtils is fixed
   public long saveLibrary(Library library) throws IOException {
-    // DO NOT USE THIS, use libraryService instead
     if (libraryStore != null) {
       return libraryStore.save(library);
     } else {
@@ -1280,9 +1284,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  // TODO: REMOVE THIS once FormUtils is fixed
   public long saveLibraryDilution(LibraryDilution libraryDilution) throws IOException {
-    // DO NOT USE THIS, use dilutionService instead
     if (libraryDilutionStore != null) {
       return libraryDilutionStore.save(libraryDilution);
     } else {
@@ -1291,9 +1293,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  // TODO: REMOVE THIS once FormUtils is fixed
   public long saveLibraryQC(LibraryQC libraryQc) throws IOException {
-    // DO NOT USE THIS, use libraryService instead
     if (libraryQcStore != null) {
       return libraryQcStore.save(libraryQc);
     } else {
@@ -1545,7 +1545,6 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  // TODO: delete this once FormUtils is fixed
   public LibraryType getLibraryTypeByDescriptionAndPlatform(String description, PlatformType platformType) throws IOException {
     if (libraryStore != null) {
       return libraryStore.getLibraryTypeByDescriptionAndPlatform(description, platformType);
