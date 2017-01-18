@@ -829,12 +829,14 @@ public class FlexReportingControllerHelperService {
       if (library.getQcPassed() != null) {
         qc = library.getQcPassed().toString();
       }
-      jsonArray.add(
-          JsonSanitizer.sanitize(
-              "[\"" + (library.getName().replace("+", "-")).replace("'", "\\'") + "\",\""
-                  + (library.getAlias().replace("+", "-")).replace("'", "\\'") + "\",\""
-                  + (library.getDescription().replace("+", "-")).replace("'", "\\'") + "\",\"" + library.getPlatformType() + "\",\""
-                  + library.getLibraryType().getDescription() + "\",\"" + qc + "\"]"));
+      JSONArray row = new JSONArray();
+      row.add(library.getName());
+      row.add(library.getAlias());
+      row.add(library.getDescription() == null ? "" : library.getDescription());
+      row.add(library.getPlatformName());
+      row.add(library.getLibraryType().getDescription());
+      row.add(qc);
+      jsonArray.add(row);
     }
     return jsonArray;
   }
