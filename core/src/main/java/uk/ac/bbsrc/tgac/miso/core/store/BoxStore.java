@@ -8,13 +8,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
 
 /**
  * This interface defines a DAO for storing Boxes
  * 
  */
-public interface BoxStore extends Store<Box>, Remover<Box>, NamingSchemeAware {
+public interface BoxStore extends Store<Box>, Remover<Box> {
   /**
    * Retrieve a Box from data store given a Box alias.
    * 

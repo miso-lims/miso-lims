@@ -74,8 +74,6 @@ ALTER TABLE SequencerReference ADD CONSTRAINT upgraded_SR_UK UNIQUE (upgradedSeq
 DROP TABLE Request;
 DROP TABLE Request_Note;
 
-ALTER TABLE Status ADD CONSTRAINT Status_SequencerReference_FK FOREIGN KEY (instrumentName) REFERENCES SequencerReference (name);
-
 ALTER TABLE Run_Note ADD CONSTRAINT RunNote_Run_FK FOREIGN KEY (run_runId) REFERENCES Run (runId);
 ALTER TABLE Run_Note ADD CONSTRAINT RunNote_Note_FK FOREIGN KEY (notes_noteId) REFERENCES Note (noteId);
 
@@ -345,3 +343,33 @@ WHERE studyChangeLogId IN (
             ) AS t
         );
 ALTER TABLE StudyChangeLog ADD FOREIGN KEY (studyId) REFERENCES Study(studyId);
+
+ALTER TABLE BoxPosition ADD COLUMN targetId bigint(20);
+ALTER TABLE BoxPosition ADD COLUMN targetType varchar(1);
+ALTER TABLE BoxPosition ADD COLUMN position varchar(3);
+UPDATE BoxPosition SET
+  position = CONCAT(CHAR(65 + `column`), LPAD(row, 2, '0')),
+  targetType = (
+    SELECT 'S' FROM Sample WHERE Sample.boxPositionId = BoxPosition.boxPositionId UNION
+    SELECT 'L' FROM Library WHERE Library.boxPositionId = BoxPosition.boxPositionId UNION
+    SELECT 'P' FROM Pool WHERE Pool.boxPositionId = BoxPosition.boxPositionId),
+  targetId = (
+    SELECT sampleId FROM Sample WHERE Sample.boxPositionId = BoxPosition.boxPositionId UNION
+    SELECT libraryId FROM Library WHERE Library.boxPositionId = BoxPosition.boxPositionId UNION
+    SELECT poolId FROM Pool WHERE Pool.boxPositionId = BoxPosition.boxPositionId);
+
+ALTER TABLE BoxPosition CHANGE COLUMN targetId targetId bigint(20) NOT NULL;
+ALTER TABLE BoxPosition CHANGE COLUMN targetType targetType varchar(1) NOT NULL;
+ALTER TABLE BoxPosition CHANGE COLUMN position position varchar(3) NOT NULL;
+ALTER TABLE BoxPosition DROP PRIMARY KEY;
+ALTER TABLE BoxPosition ADD CONSTRAINT PRIMARY KEY(boxId, targetId, targetType);
+ALTER TABLE BoxPosition ADD CONSTRAINT box_unique_item UNIQUE (targetId, targetType);
+ALTER TABLE BoxPosition ADD CONSTRAINT box_single_occupancy UNIQUE (boxId, position);
+ALTER TABLE BoxPosition DROP INDEX boxId;
+ALTER TABLE BoxPosition DROP COLUMN `row`;
+ALTER TABLE BoxPosition DROP COLUMN `column`;
+ALTER TABLE BoxPosition DROP COLUMN `boxPositionId`;
+ALTER TABLE Sample DROP COLUMN `boxPositionId`;
+ALTER TABLE Library DROP COLUMN `boxPositionId`;
+ALTER TABLE Pool DROP COLUMN `boxPositionId`;
+DROP TABLE sequence_data;

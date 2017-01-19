@@ -1,6 +1,18 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "BoxSize")
 public class BoxSize {
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  @Column(name = "boxSizeId")
   private long id;
   private int rows;
   private int columns;

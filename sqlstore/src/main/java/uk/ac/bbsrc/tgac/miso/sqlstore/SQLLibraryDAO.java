@@ -90,7 +90,6 @@ import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
-import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.persistence.LibraryAdditionalInfoDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateChangeLogDao;
@@ -858,13 +857,7 @@ public class SQLLibraryDAO implements LibraryStore {
         library.setVolume(null);
       }
       library.setDiscarded(rs.getBoolean("discarded"));
-      library.setBoxPositionId(rs.getLong("boxPositionId"));
-      library.setBoxAlias(rs.getString("boxAlias"));
-      library.setBoxId(rs.getLong("boxId"));
       library.setLastModified(rs.getDate("lastModified"));
-      int row = rs.getInt("boxRow");
-      if (!rs.wasNull()) library.setBoxPosition(BoxUtils.getPositionString(row, rs.getInt("boxColumn")));
-      library.setBoxLocation(rs.getString("boxLocation"));
       library.setQcPassed(rs.getBoolean("qcPassed"));
       // rs.wasNull() needs to be directly after rs.getBoolean("qcPassed") as that's the value which gets checked for null
       if (rs.wasNull()) {

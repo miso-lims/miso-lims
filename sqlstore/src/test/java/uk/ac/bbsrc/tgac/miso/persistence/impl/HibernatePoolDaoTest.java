@@ -56,7 +56,6 @@ public class HibernatePoolDaoTest extends AbstractDAOTest {
     assertEquals(expected.getReadyToRun(), actual.getReadyToRun());
     assertEquals(expected.getAlias(), actual.getAlias());
     assertEquals(expected.getLastModifier().getUserId(), actual.getLastModifier().getUserId());
-    assertEquals(expected.getBoxPositionId(), actual.getBoxPositionId());
     assertEquals(expected.isDiscarded(), actual.isDiscarded());
     if (!expected.isDiscarded()) {
       assertEquals(expected.getVolume(), actual.getVolume());
@@ -89,7 +88,6 @@ public class HibernatePoolDaoTest extends AbstractDAOTest {
     rtn.setReadyToRun(true);
     rtn.setAlias("Alias " + counter);
     rtn.setLastModifier(mockUser);
-    rtn.setBoxPositionId(1L);
     rtn.setDiscarded(empty);
     rtn.setVolume(new Double(counter));
     rtn.setQcPassed(false);
@@ -147,7 +145,6 @@ public class HibernatePoolDaoTest extends AbstractDAOTest {
     testPool.setReadyToRun(false);
     testPool.setAlias("Alias changed");
     testPool.setLastModifier(newModifier);
-    testPool.setBoxPositionId(2L);
     testPool.setDiscarded(true);
     testPool.setVolume(10D);
     testPool.setQcPassed(true);

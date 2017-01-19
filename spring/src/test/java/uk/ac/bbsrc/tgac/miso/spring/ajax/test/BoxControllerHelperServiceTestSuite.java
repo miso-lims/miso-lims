@@ -1,25 +1,14 @@
 package uk.ac.bbsrc.tgac.miso.spring.ajax.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-
-import net.sf.json.JSONArray;
-import net.sf.json.JSONException;
-import net.sf.json.JSONObject;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -34,6 +23,10 @@ import org.springframework.security.core.Authentication;
 
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONException;
+import net.sf.json.JSONObject;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
@@ -158,7 +151,7 @@ public class BoxControllerHelperServiceTestSuite {
   public final void testExportBoxContentsFormError() throws Exception {
     final long id = 1L;
     final Exception error = new IOException("thrown by mock");
-    ArrayList<String> array = new ArrayList<String>();
+    ArrayList<String> array = new ArrayList<>();
     array.add("a:a:a");
     array.add("b:b:b");
     array.add("c:c:c");
@@ -402,7 +395,6 @@ public class BoxControllerHelperServiceTestSuite {
     sample.setId(1L);
     sample.setAlias("sample");
     sample.setIdentificationBarcode("1111");
-    sample.setBoxPositionId(1L);
     sample.setDiscarded(false);
     return sample;
   }
@@ -412,7 +404,6 @@ public class BoxControllerHelperServiceTestSuite {
     library.setId(1L);
     library.setAlias("library");
     library.setIdentificationBarcode("2222");
-    library.setBoxPositionId(2L);
     library.setDiscarded(false);
     return library;
   }

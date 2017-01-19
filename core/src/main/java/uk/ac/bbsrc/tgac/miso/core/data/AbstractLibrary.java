@@ -39,6 +39,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
+import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -48,6 +49,8 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.codehaus.jackson.annotate.JsonBackReference;
 import org.codehaus.jackson.annotate.JsonManagedReference;
+import org.hibernate.annotations.Formula;
+import org.hibernate.annotations.JoinFormula;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,6 +58,7 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAdditionalInfoImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
@@ -101,10 +105,10 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   private Boolean paired;
 
   @Transient
-  private final Collection<LibraryQC> libraryQCs = new TreeSet<LibraryQC>();
+  private final Collection<LibraryQC> libraryQCs = new TreeSet<>();
 
   @Transient
-  private final Collection<LibraryDilution> libraryDilutions = new HashSet<LibraryDilution>();
+  private final Collection<LibraryDilution> libraryDilutions = new HashSet<>();
 
   @Transient
   private SecurityProfile securityProfile;
@@ -138,10 +142,10 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @JoinTable(name = "Kit_Note", joinColumns = {
       @JoinColumn(name = "kit_kitId", nullable = false, updatable = false) }, inverseJoinColumns = {
       @JoinColumn(name = "notes_noteId", nullable = false, updatable = false) })
-  private Collection<Note> notes = new HashSet<Note>();
+  private Collection<Note> notes = new HashSet<>();
 
   @Transient
-  private final Collection<ChangeLog> changeLog = new ArrayList<ChangeLog>();
+  private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
   @Transient
   private Date lastUpdated;
@@ -149,6 +153,18 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @OneToOne(targetEntity = LibraryAdditionalInfoImpl.class, mappedBy = "library", cascade = CascadeType.ALL)
   @JsonManagedReference
   private LibraryAdditionalInfo libraryAdditionalInfo;
+
+
+  @ManyToOne(targetEntity = BoxImpl.class)
+  @JoinFormula("(SELECT boxId FROM BoxPosition WHERE targetId = id AND targetType = 'L')")
+  private Box box;
+  @Formula("(SELECT position FROM BoxPosition WHERE targetId = id AND targetType = 'L')")
+  private String position;
+
+  @Override
+  public String getBoxPosition() {
+    return position;
+  }
 
   @Override
   public long getId() {
@@ -188,6 +204,11 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @Override
   public void setAccession(String accession) {
     this.accession = accession;
+  }
+
+  @Override
+  public Box getBox() {
+    return box;
   }
 
   @Override

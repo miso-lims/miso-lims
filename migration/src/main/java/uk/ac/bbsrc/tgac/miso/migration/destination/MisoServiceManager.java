@@ -16,6 +16,7 @@ import uk.ac.bbsrc.tgac.miso.core.event.manager.WatchManager;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.migration.util.OicrMigrationNamingScheme;
 import uk.ac.bbsrc.tgac.miso.persistence.HibernateSampleClassDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateBoxDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateChangeLogDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateDetailedQcStatusDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateExperimentDao;
@@ -55,7 +56,6 @@ import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSampleClassService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSampleNumberPerProjectService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSampleService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSampleValidRelationshipService;
-import uk.ac.bbsrc.tgac.miso.sqlstore.SQLBoxDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryDilutionDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryQCDAO;
@@ -94,7 +94,7 @@ public class MisoServiceManager {
   private HibernateSequencerPartitionContainerDao sequencerPartitionContainerDao;
   private HibernateStatusDao statusDao;
   private HibernateSequencerReferenceDao sequencerReferenceDao;
-  private SQLBoxDAO boxDao;
+  private HibernateBoxDao boxDao;
 
   private DefaultSampleClassService sampleClassService;
   private DefaultSampleService sampleService;
@@ -262,7 +262,6 @@ public class MisoServiceManager {
     if (sampleDao != null) sampleDao.setSecurityDao(securityStore);
     if (libraryDao != null) libraryDao.setSecurityDAO(securityStore);
     if (poolDao != null) poolDao.setSecurityStore(securityStore);
-    if (boxDao != null) boxDao.setSecurityDAO(securityStore);
   }
 
   public HibernateSecurityProfileDao getSecurityProfileDao() {
@@ -284,7 +283,6 @@ public class MisoServiceManager {
     if (sampleDao != null) sampleDao.setSecurityProfileDao(securityProfileDao);
     if (libraryDao != null) libraryDao.setSecurityProfileDAO(securityProfileDao);
     if (dilutionDao != null) dilutionDao.setSecurityProfileDAO(securityProfileDao);
-    if (boxDao != null) boxDao.setSecurityProfileDAO(securityProfileDao);
   }
 
   public LocalSecurityManager getSecurityManager() {
@@ -424,7 +422,6 @@ public class MisoServiceManager {
   private void updateSampleDaoDependencies() {
     if (sampleService != null) sampleService.setSampleDao(sampleDao);
     if (libraryDao != null) libraryDao.setSampleDAO(sampleDao);
-    if (boxDao != null) boxDao.setSampleDAO(sampleDao);
   }
 
   public HibernateChangeLogDao getChangeLogDao() {
@@ -445,7 +442,6 @@ public class MisoServiceManager {
   private void updateChangeLogDaoDependencies() {
     if (sampleDao != null) sampleDao.setChangeLogDao(changeLogDao);
     if (libraryDao != null) libraryDao.setChangeLogDAO(changeLogDao);
-    if (boxDao != null) boxDao.setChangeLogDAO(changeLogDao);
   }
 
   public HibernateSampleQcDao getSampleQcDao() {
@@ -497,7 +493,6 @@ public class MisoServiceManager {
     if (sampleDao != null) sampleDao.setLibraryDao(libraryDao);
     if (libraryQcDao != null) libraryQcDao.setLibraryDAO(libraryDao);
     if (dilutionDao != null) dilutionDao.setLibraryDAO(libraryDao);
-    if (boxDao != null) boxDao.setLibraryDAO(libraryDao);
     if (libraryDesignDao != null) libraryDesignDao.setLibraryDao(libraryDao);
   }
 
@@ -582,7 +577,6 @@ public class MisoServiceManager {
 
   private void updatePoolDaoDependencies() {
     if (libraryDao != null) libraryDao.setPoolDAO(poolDao);
-    if (boxDao != null) boxDao.setPoolDAO(poolDao);
   }
 
   public HibernateExperimentDao getExperimentDao() {
@@ -749,26 +743,19 @@ public class MisoServiceManager {
   private void updateSequencerReferenceDaoDependencies() {
   }
 
-  public SQLBoxDAO getBoxDao() {
+  public HibernateBoxDao getBoxDao() {
     return boxDao;
   }
 
-  public void setBoxDao(SQLBoxDAO boxDao) {
+  public void setBoxDao(HibernateBoxDao boxDao) {
     this.boxDao = boxDao;
     updateBoxDaoDependencies();
   }
 
   public void setDefaultBoxDao() {
-    SQLBoxDAO dao = new SQLBoxDAO();
-    dao.setAutoGenerateIdentificationBarcodes(autoGenerateIdBarcodes);
-    dao.setChangeLogDAO(changeLogDao);
+    HibernateBoxDao dao = new HibernateBoxDao();
+    dao.setSessionFactory(sessionFactory);
     dao.setJdbcTemplate(jdbcTemplate);
-    dao.setLibraryDAO(libraryDao);
-    dao.setNamingScheme(getNamingScheme());
-    dao.setPoolDAO(poolDao);
-    dao.setSampleDAO(sampleDao);
-    dao.setSecurityDAO(securityStore);
-    dao.setSecurityProfileDAO(securityProfileDao);
     setBoxDao(dao);
   }
 

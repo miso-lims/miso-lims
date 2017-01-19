@@ -1,6 +1,5 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.BoxUtils.extractBoxableInformation;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import java.io.IOException;
@@ -148,8 +147,6 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
     if (LimsUtils.isDetailedSample(sample)) {
       ((DetailedSample) sample).setChildren(listByParentId(sample.getId()));
     }
-
-    extractBoxableInformation(template, sample);
 
     return sample;
   }

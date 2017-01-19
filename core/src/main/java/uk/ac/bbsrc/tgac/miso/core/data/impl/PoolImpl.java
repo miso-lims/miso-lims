@@ -57,6 +57,8 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.map.annotate.JsonDeserialize;
+import org.hibernate.annotations.Formula;
+import org.hibernate.annotations.JoinFormula;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,6 +68,7 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxable;
+import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
@@ -104,27 +107,31 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
   private static final long serialVersionUID = 1L;
   public static final Long UNSAVED_ID = 0L;
 
+  @ManyToOne(targetEntity = BoxImpl.class)
+  @JoinFormula("(SELECT boxId FROM BoxPosition WHERE targetId = id AND targetType = 'P')")
+  private Box box;
   @OneToMany(targetEntity = PoolChangeLog.class, mappedBy = "pool")
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
+
   @Column(length = CONCENTRATION_LENGTH)
   private Double concentration;
-
   private Date creationDate;
+  @OneToOne(targetEntity = PoolDerivedInfo.class)
+  @PrimaryKeyJoinColumn
+  private PoolDerivedInfo derivedInfo;
   @Column(length = DESCRIPTION_LENGTH)
   private String description;
+
   @ManyToMany(targetEntity = ExperimentImpl.class)
   @JoinTable(name = "Pool_Experiment", joinColumns = { @JoinColumn(name = "pool_poolId") }, inverseJoinColumns = {
       @JoinColumn(name = "experiments_experimentId") })
   private Collection<Experiment> experiments = new HashSet<>();
+
   @Column(length = ID_BARCODE_LENGTH)
   private String identificationBarcode;
 
   @ManyToOne(targetEntity = UserImpl.class)
   private User lastModifier;
-
-  @OneToOne(targetEntity = PoolDerivedInfo.class)
-  @PrimaryKeyJoinColumn
-  private PoolDerivedInfo derivedInfo;
 
   // listeners
   @Transient
@@ -150,8 +157,13 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long poolId = PoolImpl.UNSAVED_ID;
+
   @OneToMany(targetEntity = PoolQCImpl.class, mappedBy = "pool")
   private final Collection<PoolQC> poolQCs = new TreeSet<>();
+
+  @Formula("(SELECT position FROM BoxPosition WHERE targetId = id AND targetType = 'P')")
+  private String position;
+
   private Boolean qcPassed;
 
   @Column(name = "ready")
@@ -175,7 +187,6 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
   public PoolImpl() {
     setSecurityProfile(new SecurityProfile());
   }
-
   public PoolImpl(User user) {
     setSecurityProfile(new SecurityProfile(user));
   }
@@ -245,6 +256,16 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
         listener.stateChanged(pe);
       }
     }
+  }
+
+  @Override
+  public Box getBox() {
+    return box;
+  }
+
+  @Override
+  public String getBoxPosition() {
+    return position;
   }
 
   @Override
@@ -433,11 +454,6 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
   }
 
   @Override
-  public void setWatchGroup(Group group) {
-    this.watchGroup = group;
-  }
-
-  @Override
   public void setConcentration(Double concentration) {
     this.concentration = concentration;
   }
@@ -528,6 +544,11 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
 
   public void setUnits(String units) {
     this.units = units;
+  }
+
+  @Override
+  public void setWatchGroup(Group group) {
+    this.watchGroup = group;
   }
 
   public void setWatchUsers(Set<User> watchUsers) {
