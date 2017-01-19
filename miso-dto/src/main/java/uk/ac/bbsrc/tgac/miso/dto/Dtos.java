@@ -1023,7 +1023,10 @@ public class Dtos {
     } else {
       to = new LibraryImpl();
     }
-    to.setId(from.getId());
+    if (from.getId() != null) {
+      to.setId(from.getId());
+    }
+
     to.setAlias(from.getAlias());
     to.setName(from.getName());
     to.setDescription(from.getDescription());
