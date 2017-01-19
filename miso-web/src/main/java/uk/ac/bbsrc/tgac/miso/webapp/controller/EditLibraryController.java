@@ -94,7 +94,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
@@ -137,9 +136,6 @@ public class EditLibraryController {
   private RequestManager requestManager;
 
   @Autowired
-  private DataObjectFactory dataObjectFactory;
-
-  @Autowired
   private IndexService indexService;
 
   @Autowired
@@ -156,10 +152,6 @@ public class EditLibraryController {
 
   @Autowired
   private ChangeLogService changeLogService;
-
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
-  }
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
@@ -696,7 +688,7 @@ public class EditLibraryController {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Library library = null;
       if (libraryId == AbstractLibrary.UNSAVED_ID) {
-        library = dataObjectFactory.getLibrary(user);
+        library = new LibraryImpl(user);
         if (isDetailedSampleEnabled()) {
           addNewDetailedLibraryEntities(library);
         }

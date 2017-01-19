@@ -31,7 +31,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 
 /**
@@ -43,12 +42,6 @@ public class ExternalSectionController {
   private com.eaglegenomics.simlims.core.manager.SecurityManager securityManager;
   @Autowired
   private uk.ac.bbsrc.tgac.miso.core.manager.RequestManager requestManager;
-  @Autowired
-  private DataObjectFactory dataObjectFactory;
-
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
-  }
 
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;

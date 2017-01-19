@@ -49,7 +49,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 
 @Controller
@@ -65,17 +64,10 @@ public class PoolWizardController {
   private RequestManager requestManager;
 
   @Autowired
-  private DataObjectFactory dataObjectFactory;
-
-  @Autowired
   private JdbcTemplate interfaceTemplate;
 
   public void setInterfaceTemplate(JdbcTemplate interfaceTemplate) {
     this.interfaceTemplate = interfaceTemplate;
-  }
-
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
   }
 
   public void setRequestManager(RequestManager requestManager) {

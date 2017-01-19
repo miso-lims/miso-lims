@@ -61,10 +61,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ExperimentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 
@@ -78,8 +78,6 @@ public class ContainerControllerHelperService {
   private SecurityManager securityManager;
   @Autowired
   private RequestManager requestManager;
-  @Autowired
-  private DataObjectFactory dataObjectFactory;
   @Autowired
   private ExperimentService experimentService;
 
@@ -613,7 +611,7 @@ public class ContainerControllerHelperService {
 
       StringBuilder sb = new StringBuilder();
 
-      Experiment e = dataObjectFactory.getExperiment();
+      Experiment e = new ExperimentImpl();
       e.setAlias("EXP_AUTOGEN_" + s.getName() + "_" + s.getStudyType() + "_" + (s.getExperiments().size() + 1));
       e.setTitle(s.getProject().getName() + " " + platform.getPlatformType().getKey() + " " + s.getStudyType() + " experiment (Auto-gen)");
       e.setDescription(s.getProject().getAlias());
@@ -860,10 +858,6 @@ public class ContainerControllerHelperService {
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
-  }
-
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
   }
 
   public JSONObject isSerialNumberUnique(HttpSession session, JSONObject json) {

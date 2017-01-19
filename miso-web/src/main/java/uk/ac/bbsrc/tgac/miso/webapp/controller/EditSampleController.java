@@ -95,11 +95,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleBuilder;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ExperimentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SamplePurposeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl;
@@ -108,7 +110,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.StrStatus;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
@@ -143,9 +144,6 @@ public class EditSampleController {
   private RequestManager requestManager;
 
   @Autowired
-  private DataObjectFactory dataObjectFactory;
-
-  @Autowired
   private NamingScheme namingScheme;
 
   @Autowired
@@ -165,10 +163,6 @@ public class EditSampleController {
 
   public void setSampleOptionsController(SampleOptionsController sampleOptionsController) {
     this.sampleOptionsController = sampleOptionsController;
-  }
-
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
   }
 
   public void setRequestManager(RequestManager requestManager) {
@@ -271,7 +265,7 @@ public class EditSampleController {
       if (experimentId != null) {
         return experimentService.get(experimentId);
       } else {
-        return dataObjectFactory.getExperiment();
+        return new ExperimentImpl();
       }
     } catch (IOException ex) {
       if (log.isDebugEnabled()) {
@@ -671,7 +665,7 @@ public class EditSampleController {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Sample sample = null;
       if (sampleId == AbstractSample.UNSAVED_ID) {
-        sample = detailedSample ? new DetailedSampleBuilder(user) : dataObjectFactory.getSample(user);
+        sample = detailedSample ? new DetailedSampleBuilder(user) : new SampleImpl(user);
         model.put("sampleCategory", "new");
         model.put("title", "New Sample");
 

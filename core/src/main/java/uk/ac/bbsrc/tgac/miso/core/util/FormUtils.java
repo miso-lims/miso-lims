@@ -78,6 +78,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
@@ -86,8 +87,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.exception.DeliveryFormException;
 import uk.ac.bbsrc.tgac.miso.core.exception.InputFormException;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
-import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
@@ -4088,12 +4087,11 @@ public class FormUtils {
     OdfTable sampleTable = oDoc.getTableList().get(1);
 
     if (sampleTable != null) {
-      DataObjectFactory df = new TgacDataObjectFactory();
       for (OdfTableRow row : sampleTable.getRowList()) {
         if (row.getRowIndex() != 0) {
           TableTableRowElement ttre = row.getOdfElement();
 
-          Sample s = df.getSample();
+          Sample s = new SampleImpl();
 
           Node n1 = ttre.getChildNodes().item(0);
           if (n1.getFirstChild() != null) {

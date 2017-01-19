@@ -47,16 +47,11 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
-import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
-
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -75,14 +70,7 @@ public class EditStudyController {
   private RequestManager requestManager;
 
   @Autowired
-  private DataObjectFactory dataObjectFactory;
-
-  @Autowired
   private ChangeLogService changeLogService;
-
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
-  }
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
@@ -164,7 +152,7 @@ public class EditStudyController {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Study study = null;
       if (studyId == StudyImpl.UNSAVED_ID) {
-        study = dataObjectFactory.getStudy(user);
+        study = new StudyImpl(user);
         model.put("title", "New Study");
       } else {
         study = requestManager.getStudyById(studyId);

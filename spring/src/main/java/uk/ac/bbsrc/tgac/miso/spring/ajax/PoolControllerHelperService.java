@@ -72,11 +72,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
 import uk.ac.bbsrc.tgac.miso.core.data.PrintJob;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ExperimentImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoPrintException;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.PrintManager;
@@ -100,8 +101,6 @@ public class PoolControllerHelperService {
   private SecurityManager securityManager;
   @Autowired
   private RequestManager requestManager;
-  @Autowired
-  private DataObjectFactory dataObjectFactory;
   @Autowired
   private MisoFilesManager misoFileManager;
   @Autowired
@@ -138,7 +137,7 @@ public class PoolControllerHelperService {
       if (json.has("poolId") && !isStringEmptyOrNull(json.getString("poolId"))) {
         Long poolId = Long.parseLong(json.getString("poolId"));
         Pool pool = requestManager.getPoolById(poolId);
-        PoolQC newQc = dataObjectFactory.getPoolQC();
+        PoolQC newQc = new PoolQCImpl();
         if (json.has("qcPassed") && json.getString("qcPassed").equals("true")) {
           pool.setQcPassed(true);
         }
@@ -494,7 +493,7 @@ public class PoolControllerHelperService {
         if (r != null) {
           StringBuilder sb = new StringBuilder();
 
-          Experiment e = dataObjectFactory.getExperiment();
+          Experiment e = new ExperimentImpl();
           e.setAlias("EXP_AUTOGEN_" + s.getName() + "_" + s.getStudyType() + "_" + (s.getExperiments().size() + 1));
           e.setTitle(s.getProject().getName() + " " + r.getPlatformType().getKey() + " " + s.getStudyType() + " experiment (Auto-gen)");
           e.setDescription(s.getProject().getAlias());
@@ -736,10 +735,6 @@ public class PoolControllerHelperService {
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
-  }
-
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
   }
 
   public void setBarcodeFactory(BarcodeFactory barcodeFactory) {

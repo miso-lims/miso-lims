@@ -68,7 +68,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedDilutionException;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -101,9 +100,6 @@ public class EditPoolController {
   private RequestManager requestManager;
 
   @Autowired
-  private DataObjectFactory dataObjectFactory;
-
-  @Autowired
   private ChangeLogService changeLogService;
 
   @Autowired
@@ -111,10 +107,6 @@ public class EditPoolController {
 
   public void setInterfaceTemplate(JdbcTemplate interfaceTemplate) {
     this.interfaceTemplate = interfaceTemplate;
-  }
-
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
   }
 
   public void setRequestManager(RequestManager requestManager) {
@@ -169,7 +161,7 @@ public class EditPoolController {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Pool pool = null;
       if (poolId == PoolImpl.UNSAVED_ID) {
-        pool = dataObjectFactory.getPool(user);
+        pool = new PoolImpl(user);
         model.put("title", "New Pool");
       } else {
         pool = requestManager.getPoolById(poolId);
