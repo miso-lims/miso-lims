@@ -13,9 +13,11 @@ import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryAdditionalInfo;
-import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
+import uk.ac.bbsrc.tgac.miso.core.store.KitComponentStore;
+import uk.ac.bbsrc.tgac.miso.core.store.KitDescriptorStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.persistence.LibraryAdditionalInfoDao;
+
 import uk.ac.bbsrc.tgac.miso.service.LibraryAdditionalInfoService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
@@ -32,7 +34,10 @@ public class DefaultLibraryAdditionalInfoService implements LibraryAdditionalInf
   private LibraryStore libraryStore;
 
   @Autowired
-  private KitStore kitStore;
+  private KitComponentStore kitStore;
+
+  @Autowired
+  private KitDescriptorStore kitDescriptorStore;
 
   @Autowired
   private AuthorizationManager authorizationManager;
@@ -48,7 +53,7 @@ public class DefaultLibraryAdditionalInfoService implements LibraryAdditionalInf
     authorizationManager.throwIfNotWritable(libraryStore.get(libraryId));
     libraryAdditionalInfo.setLibrary(libraryStore.get(libraryId));
     if (libraryAdditionalInfo.getPrepKit() != null) {
-      libraryAdditionalInfo.setPrepKit(kitStore.getKitDescriptorById(libraryAdditionalInfo.getPrepKit().getId()));
+      libraryAdditionalInfo.setPrepKit(kitDescriptorStore.getKitDescriptorById(libraryAdditionalInfo.getPrepKit().getId()));
     }
     User user = authorizationManager.getCurrentUser();
     libraryAdditionalInfo.setCreatedBy(user);
@@ -61,7 +66,7 @@ public class DefaultLibraryAdditionalInfoService implements LibraryAdditionalInf
     authorizationManager.throwIfNotWritable(libraryAdditionalInfo.getLibrary());
     LibraryAdditionalInfo updated = get(libraryAdditionalInfo.getLibraryId());
     if (libraryAdditionalInfo.getPrepKit() != null) {
-      updated.setPrepKit(kitStore.getKitDescriptorById(libraryAdditionalInfo.getPrepKit().getId()));
+      updated.setPrepKit(kitDescriptorStore.getKitDescriptorById(libraryAdditionalInfo.getPrepKit().getId()));
     }
     updated.setArchived(libraryAdditionalInfo.getArchived());
     User user = authorizationManager.getCurrentUser();

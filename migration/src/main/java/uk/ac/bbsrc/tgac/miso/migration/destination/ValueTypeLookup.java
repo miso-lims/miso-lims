@@ -100,7 +100,7 @@ public class ValueTypeLookup {
     setSampleClasses(misoServiceManager.getSampleClassDao().getSampleClass());
     setTissueTypes(misoServiceManager.getTissueTypeDao().getTissueType());
     setTissueMaterials(misoServiceManager.getTissueMaterialDao().getTissueMaterial());
-    setKits(misoServiceManager.getKitDao().listAllKitDescriptors());
+    setKits(misoServiceManager.getKitDescriptorDao().listAll());
     setSamplePurposes(misoServiceManager.getSamplePurposeDao().getSamplePurpose());
     setLabs(misoServiceManager.getLabDao().getLabs());
     setTissueOrigins(misoServiceManager.getTissueOriginDao().getTissueOrigin());

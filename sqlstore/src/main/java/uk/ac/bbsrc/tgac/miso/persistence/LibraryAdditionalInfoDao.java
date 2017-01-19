@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryAdditionalInfo;
+import uk.ac.bbsrc.tgac.miso.core.store.KitDescriptorStore;
 
 public interface LibraryAdditionalInfoDao {
 
@@ -15,7 +16,7 @@ public interface LibraryAdditionalInfoDao {
 
   /**
    * Retrieves a single LibraryAdditionalInfo by ID
-   * 
+   *
    * @param id ID of the LibraryAdditionalInfo to retrieve
    * @throws IOException
    */
@@ -23,7 +24,7 @@ public interface LibraryAdditionalInfoDao {
 
   /**
    * Retrieves a single LibraryAdditionalInfo by Library
-   * 
+   *
    * @param id ID of Library to find LibraryAdditionalInfo for
    * @throws IOException
    */
@@ -31,7 +32,7 @@ public interface LibraryAdditionalInfoDao {
 
   /**
    * Saves a new LibraryAdditionalInfo
-   * 
+   *
    * @param libraryAdditionalInfo the new LibraryAdditionalInfo to save
    * @return the ID of the newly-created LibraryAdditionalInfo
    */
@@ -39,16 +40,19 @@ public interface LibraryAdditionalInfoDao {
 
   /**
    * Deletes an existing LibraryAdditionalInfo
-   * 
+   *
    * @param LibraryAdditionalInfo the LibraryAdditionalInfo to delete
    */
   void deleteLibraryAdditionalInfo(LibraryAdditionalInfo LibraryAdditionalInfo);
 
   /**
    * Saves a modified LibraryAdditionalInfo
-   * 
+   *
    * @param libraryAdditionalInfo the modified LibraryAdditionalInfo to save
    */
   void update(LibraryAdditionalInfo libraryAdditionalInfo);
-  
+
+  void setKitDescriptorStore(KitDescriptorStore kitDescriptorStore);
+
+  KitDescriptorStore getKitDescriptorStore();
 }

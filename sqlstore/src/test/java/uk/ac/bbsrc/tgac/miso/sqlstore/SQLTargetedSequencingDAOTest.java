@@ -17,7 +17,7 @@ import org.springframework.security.core.Authentication;
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
-import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
+import uk.ac.bbsrc.tgac.miso.core.store.KitDescriptorStore;
 
 public class SQLTargetedSequencingDAOTest extends AbstractDAOTest {
 
@@ -34,7 +34,7 @@ public class SQLTargetedSequencingDAOTest extends AbstractDAOTest {
   private SQLSecurityDAO securityDAO;
 
   @Mock
-  private KitStore kitDao;
+  private KitDescriptorStore kitDao;
 
   @InjectMocks
   private SQLTargetedSequencingDAO dao;

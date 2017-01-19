@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~ Copyright (c) 2017. Earlham Institute, Norwich, UK, and
-  ~ the Ontario Institute for Cancer Research, Ontario, Canada. 
-  ~ MISO project contacts: Robert Davey @ EI (formerly TGAC), 
-  ~ Morgan Taschuk @ OICR 
+  ~ the Ontario Institute for Cancer Research, Ontario, Canada.
+  ~ MISO project contacts: Robert Davey @ EI (formerly TGAC),
+  ~ Morgan Taschuk @ OICR
   ~
   ~ **********************************************************************
   ~
@@ -32,6 +32,8 @@
     <version>0.2.48-SNAPSHOT</version>
   </parent>
   <artifactId>miso-dto</artifactId>
+  <packaging>jar</packaging>
+
   <name>miso-dto</name>
   <url>http://maven.apache.org</url>
   <properties>

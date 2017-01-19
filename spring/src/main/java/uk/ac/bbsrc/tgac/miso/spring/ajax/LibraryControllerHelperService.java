@@ -908,7 +908,7 @@ public class LibraryControllerHelperService {
                 + (isStringEmptyOrNull(dilution.getIdentificationBarcode()) ? "" : dilution.getIdentificationBarcode()) + "'/>");
       }
       if (dilution.getLibrary().getLibraryAdditionalInfo() != null && dilution.getLibrary().getLibraryAdditionalInfo().getPrepKit() != null
-          && dilution.getLibrary().getLibraryAdditionalInfo().getPrepKit().getId() != null && json.getBoolean("detailedSample")) {
+          && json.getBoolean("detailedSample")) {
         response.put("targetedSequencings",
             getTargetedSequencingTypes(dilution.getLibrary().getLibraryAdditionalInfo().getPrepKit().getId()));
       }

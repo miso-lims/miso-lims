@@ -1,8 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -36,17 +34,17 @@ public class AbstractExperimentTestSuite {
 
   @Test
   public final void testGetKitsByKitType() {
-    final Collection<Kit> expectedLibraryKits = getNMockKits(3, KitType.LIBRARY);
-    final Collection<Kit> expectedSequencingKits = getNMockKits(2, KitType.SEQUENCING);
-    final Collection<Kit> expectedEmpcrKits = getNMockKits(4, KitType.EMPCR);
-    final Collection<Kit> expectedClusteringKits = getNMockKits(5, KitType.CLUSTERING);
-    final Collection<Kit> expectedMultiplexingKits = getNMockKits(6, KitType.MULTIPLEXING);
+    final Collection<KitComponent> expectedLibraryKits = getNMockKits(3, KitType.LIBRARY);
+    final Collection<KitComponent> expectedSequencingKits = getNMockKits(2, KitType.SEQUENCING);
+    final Collection<KitComponent> expectedEmpcrKits = getNMockKits(4, KitType.EMPCR);
+    final Collection<KitComponent> expectedClusteringKits = getNMockKits(5, KitType.CLUSTERING);
+    final Collection<KitComponent> expectedMultiplexingKits = getNMockKits(6, KitType.MULTIPLEXING);
 
-    final Collection<Kit> libraryKits = ae.getKitsByKitType(KitType.LIBRARY);
-    final Collection<Kit> sequencingKits = ae.getKitsByKitType(KitType.SEQUENCING);
-    final Collection<Kit> empcrKits = ae.getKitsByKitType(KitType.EMPCR);
-    final Collection<Kit> clusteringKits = ae.getKitsByKitType(KitType.CLUSTERING);
-    final Collection<Kit> multiplexingKits = ae.getKitsByKitType(KitType.MULTIPLEXING);
+    final Collection<KitComponent> libraryKits = ae.getKitsByKitType(KitType.LIBRARY);
+    final Collection<KitComponent> sequencingKits = ae.getKitsByKitType(KitType.SEQUENCING);
+    final Collection<KitComponent> empcrKits = ae.getKitsByKitType(KitType.EMPCR);
+    final Collection<KitComponent> clusteringKits = ae.getKitsByKitType(KitType.CLUSTERING);
+    final Collection<KitComponent> multiplexingKits = ae.getKitsByKitType(KitType.MULTIPLEXING);
 
     assertKitListEqual(expectedLibraryKits, libraryKits);
     assertKitListEqual(expectedSequencingKits, sequencingKits);
@@ -77,11 +75,11 @@ public class AbstractExperimentTestSuite {
   }
 
   // Utility methods.
-  private static final void assertKitListEqual(Collection<Kit> expected, Collection<Kit> actual) {
+  private static final void assertKitListEqual(Collection<KitComponent> expected, Collection<KitComponent> actual) {
     assertEquals(expected.size(), actual.size());
     int found = 0;
-    for (final Kit eKit : expected) {
-      for (final Kit aKit : actual) {
+    for (final KitComponent eKit : expected) {
+      for (final KitComponent aKit : actual) {
         if (eKit.getName().equals(aKit.getName())) {
           found++;
           break;
@@ -91,22 +89,25 @@ public class AbstractExperimentTestSuite {
     assertEquals(found, actual.size());
   }
 
-  private final List<Kit> getNMockKits(int n, KitType kitType) {
-    final List<Kit> rtn = new ArrayList<Kit>();
+  private final List<KitComponent> getNMockKits(int n, KitType kitType) {
+    final List<KitComponent> rtn = new ArrayList<>();
     for (int i = 0; i < n; i++) {
-      final Kit k = Mockito.mock(Kit.class);
+      final KitComponent k = Mockito.mock(KitComponent.class);
       setUpKit(k, kitType, "" + kitType + i);
       rtn.add(k);
     }
     return rtn;
   }
 
-  private final void setUpKit(Kit kit, KitType type, String identifier) {
+  private final void setUpKit(KitComponent kit, KitType type, String identifier) {
     final KitDescriptor kitDescriptor = new KitDescriptor();
+    final KitComponentDescriptor kitComponentDescriptor = Mockito.mock(KitComponentDescriptor.class);
     kitDescriptor.setKitType(type);
-    when(kit.getKitDescriptor()).thenReturn(kitDescriptor);
+
+    when(kit.getKitComponentDescriptor()).thenReturn(kitComponentDescriptor);
+    when(kitComponentDescriptor.getKitDescriptor()).thenReturn(kitDescriptor);
     when(kit.getName()).thenReturn(identifier);
-    ae.addKit(kit);
+    ae.addKitComponent(kit);
   }
 
 }

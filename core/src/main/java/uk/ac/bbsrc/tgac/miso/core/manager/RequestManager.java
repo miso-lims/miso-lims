@@ -29,8 +29,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.joda.time.LocalDate;
+
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
@@ -40,7 +45,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.EntityGroup;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
-import uk.ac.bbsrc.tgac.miso.core.data.Kit;
+import uk.ac.bbsrc.tgac.miso.core.data.KitComponent;
+import uk.ac.bbsrc.tgac.miso.core.data.KitComponentDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
@@ -77,6 +83,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.event.Alert;
 
 public interface RequestManager {
+
+  public boolean isKitComponentAlreadyLogged(String identificationBarcode) throws IOException;
 
   // SAVES
   public long saveProject(Project project) throws IOException;
@@ -137,11 +145,13 @@ public interface RequestManager {
 
   public long saveSequencerReference(SequencerReference sequencerReference) throws IOException;
 
-  public long saveSequencerServiceRecord(SequencerServiceRecord record) throws IOException;
+  public long saveKitComponent(KitComponent kitComponent) throws IOException;
 
-  public long saveKit(Kit kit) throws IOException;
+  public long saveKitComponentDescriptor(KitComponentDescriptor kitComponentDescriptor) throws IOException;
 
   public long saveKitDescriptor(KitDescriptor kitDescriptor) throws IOException;
+
+  public long saveKitChangeLog(JSONObject changeLog) throws IOException;
 
   public long saveAlert(Alert alert) throws IOException;
 
@@ -253,11 +263,17 @@ public interface RequestManager {
 
   public SequencerServiceRecord getSequencerServiceRecordById(long id) throws IOException;
 
-  public Kit getKitById(long kitId) throws IOException;
+  public JSONArray getKitChangeLog() throws IOException;
 
-  public Kit getKitByIdentificationBarcode(String barcode) throws IOException;
+  public JSONArray getKitChangeLogByKitComponentId(long kitComponentId) throws IOException;
 
-  public Kit getKitByLotNumber(String lotNumber) throws IOException;
+  public KitComponent getKitComponentById(long kitId) throws IOException;
+
+  public KitComponent getKitComponentByIdentificationBarcode(String barcode) throws IOException;
+
+  public KitComponentDescriptor getKitComponentDescriptorById(long kitComponentDescriptorId) throws IOException;
+
+  public KitComponentDescriptor getKitComponentDescriptorByReferenceNumber(String referenceNumber) throws IOException;
 
   public KitDescriptor getKitDescriptorById(long kitDescriptorId) throws IOException;
 
@@ -526,13 +542,35 @@ public interface RequestManager {
 
   public Collection<SequencerServiceRecord> listSequencerServiceRecordsBySequencerId(long referenceId) throws IOException;
 
-  public Collection<Kit> listAllKits() throws IOException;
+  public Collection<KitComponent> listAllKitComponents() throws IOException;
 
-  public Collection<Kit> listKitsByExperimentId(long experimentId) throws IOException;
+  public Collection<KitComponent> listKitComponentsByExperimentId(long experimentId) throws IOException;
 
-  public Collection<Kit> listKitsByManufacturer(String manufacturer) throws IOException;
+  public Collection<KitComponent> listKitComponentsByManufacturer(String manufacturer) throws IOException;
 
-  public Collection<Kit> listKitsByType(KitType kitType) throws IOException;
+  public Collection<KitComponent> listKitComponentsByType(KitType kitType) throws IOException;
+
+  public Collection<KitComponent> listKitComponentsByLocationBarcode(String locationBarcode) throws IOException;
+
+  public Collection<KitComponent> listKitComponentsByLotNumber(String lotNumber) throws IOException;
+
+  public Collection<KitComponent> listKitComponentsByReceivedDate(LocalDate receivedDate) throws IOException;
+
+  public Collection<KitComponent> listKitComponentsByExpiryDate(LocalDate expiryDate) throws IOException;
+
+  public Collection<KitComponent> listKitComponentsByExhausted(boolean exhausted) throws IOException;
+
+  public Collection<KitComponent> listKitComponentsByKitComponentDescriptorId(long kitComponentDescriptorId) throws IOException;
+
+  public Collection<KitComponent> listKitComponentsByKitDescriptorId(long kitDescriptorID) throws IOException;
+
+  public Collection<KitComponentDescriptor> listKitComponentDescriptorsByKitDescriptorId(long kitDescriptorId) throws IOException;
+
+  public Collection<KitDescriptor> listKitDescriptorsByManufacturer(String manufacturer) throws IOException;
+
+  public Collection<KitDescriptor> listKitDescriptorsByPlatform(PlatformType platformType) throws IOException;
+
+  public Collection<KitDescriptor> listKitDescriptorsByUnits(String units) throws IOException;
 
   public Collection<KitDescriptor> listKitDescriptorsByType(KitType kitType) throws IOException;
 
@@ -681,5 +719,15 @@ public interface RequestManager {
   public Integer countLibraryDilutionsBySearchAndPlatform(String search, PlatformType platform) throws IOException;
 
   public List<Run> getRunsByPool(Pool pool) throws IOException;
+
+  public Collection<KitComponent> listKitsByType(KitType kitType) throws IOException;
+
+  public KitComponent getKitByLotNumber(String lotNumber) throws IOException;
+
+  public long saveSequencerServiceRecord(SequencerServiceRecord record) throws IOException;
+
+  public Collection<KitComponent> listKitsByManufacturer(String manufacturer) throws IOException;
+
+  public Collection<KitComponent> listKitsByExperimentId(long experimentId) throws IOException;
 
 }

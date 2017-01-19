@@ -21,7 +21,6 @@ import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
-import uk.ac.bbsrc.tgac.miso.migration.util.OicrMigrationNamingScheme;
 import uk.ac.bbsrc.tgac.miso.persistence.HibernateSampleClassDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateDetailedQcStatusDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateIndexDao;
@@ -49,7 +48,8 @@ import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSampleValidRelationshipService;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLBoxDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLChangeLogDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLExperimentDAO;
-import uk.ac.bbsrc.tgac.miso.sqlstore.SQLKitDAO;
+import uk.ac.bbsrc.tgac.miso.sqlstore.SQLKitComponentDAO;
+import uk.ac.bbsrc.tgac.miso.sqlstore.SQLKitDescriptorDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryDilutionDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryQCDAO;
@@ -71,6 +71,8 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.SQLStudyDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLTargetedSequencingDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLWatcherDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DaoLookup;
+
+import uk.ac.bbsrc.tgac.miso.migration.util.OicrMigrationNamingScheme;
 
 /**
  * This class is used to simplify creation and wiring of MISO services. Some of the config is currently hardcoded - mainly naming schemes
@@ -103,7 +105,8 @@ public class MisoServiceManager {
   private SQLPoolDAO poolDao;
   private SQLPoolQCDAO poolQcDao;
   private SQLExperimentDAO experimentDao;
-  private SQLKitDAO kitDao;
+  private SQLKitComponentDAO kitDao;
+  private SQLKitDescriptorDAO kitDescriptorDao;
   private SQLPlatformDAO platformDao;
   private SQLStudyDAO studyDao;
   private SQLRunDAO runDao;
@@ -142,7 +145,7 @@ public class MisoServiceManager {
 
   /**
    * Constructs a new MisoServiceManager with no services initialized
-   * 
+   *
    * @param jdbcTemplate for JDBC access to the database
    * @param sessionFactory for Hibernate access to the database
    */
@@ -153,7 +156,7 @@ public class MisoServiceManager {
 
   /**
    * Factory method to create a MisoServiceManager with all services already created and wired
-   * 
+   *
    * @param jdbcTemplate for JDBC access to the database
    * @param sessionFactory for Hibernate access to the database
    * @param username user to attribute migration to
@@ -224,7 +227,7 @@ public class MisoServiceManager {
 
   /**
    * Sets up the SecurityContext to authenticate as migrationUser
-   * 
+   *
    * @param migrationUser
    */
   public void setUpSecurityContext(User migrationUser) {
@@ -288,7 +291,7 @@ public class MisoServiceManager {
     if (targetedSequencingDao != null) targetedSequencingDao.setSecurityDAO(securityStore);
     if (poolDao != null) poolDao.setSecurityDAO(securityStore);
     if (experimentDao != null) experimentDao.setSecurityDAO(securityStore);
-    if (kitDao != null) kitDao.setSecurityDAO(securityStore);
+    //if (kitDao != null) kitDao.setSecurityDAO(securityStore);
     if (studyDao != null) studyDao.setSecurityDAO(securityStore);
     if (runDao != null) runDao.setSecurityDAO(securityStore);
     if (sequencerPartitionContainerDao != null) sequencerPartitionContainerDao.setSecurityDAO(securityStore);
@@ -525,7 +528,7 @@ public class MisoServiceManager {
     if (libraryDao != null) libraryDao.setChangeLogDAO(changeLogDao);
     if (poolDao != null) poolDao.setChangeLogDAO(changeLogDao);
     if (experimentDao != null) experimentDao.setChangeLogDAO(changeLogDao);
-    if (kitDao != null) kitDao.setChangeLogDAO(changeLogDao);
+    //if (kitDao != null) kitDao.setChangeLogDAO(changeLogDao);
     if (studyDao != null) studyDao.setChangeLogDAO(changeLogDao);
     if (sequencerPartitionContainerDao != null) sequencerPartitionContainerDao.setChangeLogDAO(changeLogDao);
     if (boxDao != null) boxDao.setChangeLogDAO(changeLogDao);
@@ -730,7 +733,7 @@ public class MisoServiceManager {
     dao.setChangeLogDAO(changeLogDao);
     dao.setDataObjectFactory(dataObjectFactory);
     dao.setJdbcTemplate(jdbcTemplate);
-    dao.setKitDAO(kitDao);
+    dao.setKitComponentDAO(kitDao);
     dao.setNamingScheme(getNamingScheme());
     dao.setPlatformDAO(platformDao);
     dao.setPoolDAO(poolDao);
@@ -745,27 +748,36 @@ public class MisoServiceManager {
     if (studyDao != null) studyDao.setExperimentDAO(experimentDao);
   }
 
-  public SQLKitDAO getKitDao() {
+  public SQLKitComponentDAO getKitDao() {
     return kitDao;
   }
 
-  public void setKitDao(SQLKitDAO kitDao) {
+  public void setKitDao(SQLKitComponentDAO kitDao) {
+    this.kitDao = kitDao;
+    updateKitDaoDependencies();
+  }
+  
+    public SQLKitDescriptorDAO getKitDescriptorDao() {
+    return kitDescriptorDao;
+  }
+
+  public void setKitDescriptorDao(SQLKitDescriptorDAO kitDescriptorDao) {
     this.kitDao = kitDao;
     updateKitDaoDependencies();
   }
 
   public void setDefaultKitDao() {
-    SQLKitDAO dao = new SQLKitDAO();
-    dao.setChangeLogDAO(changeLogDao);
+    SQLKitComponentDAO dao = new SQLKitComponentDAO();
+    //dao.setChangeLogDAO(changeLogDao);
     dao.setJdbcTemplate(jdbcTemplate);
     dao.setNoteDAO(noteDao);
-    dao.setSecurityDAO(securityStore);
+    //dao.setSecurityDAO(securityStore);
     setKitDao(dao);
   }
 
   private void updateKitDaoDependencies() {
-    if (experimentDao != null) experimentDao.setKitDAO(kitDao);
-    if (libraryAdditionalInfoDao != null) libraryAdditionalInfoDao.setKitStore(kitDao);
+    if (experimentDao != null) experimentDao.setKitComponentDAO(kitDao);
+    if (libraryAdditionalInfoDao != null) libraryAdditionalInfoDao.setKitDescriptorStore(kitDescriptorDao);
   }
 
   public SQLPlatformDAO getPlatformDao() {
@@ -1292,7 +1304,7 @@ public class MisoServiceManager {
 
   public void setDefaultLibraryAdditionalInfoDao() {
     HibernateLibraryAdditionalInfoDao dao = new HibernateLibraryAdditionalInfoDao();
-    dao.setKitStore(kitDao);
+    dao.setKitDescriptorStore(kitDescriptorDao);
     dao.setSessionFactory(sessionFactory);
     setLibraryAdditionalInfoDao(dao);
   }
@@ -1373,7 +1385,7 @@ public class MisoServiceManager {
     lookup.setDaos(makeDaoLookupMap());
     setDaoLookup(lookup);
   }
-  
+
   private Map<Class<?>, Store<?>> makeDaoLookupMap() {
     Map<Class<?>, Store<?>> daoMap = new HashMap<>();
     if (dilutionDao != null) daoMap.put(LibraryDilution.class, dilutionDao);

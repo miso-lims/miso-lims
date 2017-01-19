@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~ Copyright (c) 2017. Earlham Institute, Norwich, UK, and
-  ~ the Ontario Institute for Cancer Research, Ontario, Canada. 
-  ~ MISO project contacts: Robert Davey @ EI (formerly TGAC), 
-  ~ Morgan Taschuk @ OICR 
+  ~ the Ontario Institute for Cancer Research, Ontario, Canada.
+  ~ MISO project contacts: Robert Davey @ EI (formerly TGAC),
+  ~ Morgan Taschuk @ OICR
   ~
   ~ **********************************************************************
   ~
@@ -66,7 +66,6 @@
     <dependency>
       <groupId>joda-time</groupId>
       <artifactId>joda-time</artifactId>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>mysql</groupId>

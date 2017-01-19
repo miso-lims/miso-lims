@@ -43,7 +43,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleValidRelationshipImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
-import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
+import uk.ac.bbsrc.tgac.miso.core.store.KitComponentStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -100,7 +100,7 @@ public class DefaultSampleServiceTestSuite {
   private SubprojectDao subProjectDao;
 
   @Mock
-  private KitStore kitStore;
+  private KitComponentStore kitStore;
 
   @Mock
   private SecurityStore securityStore;
@@ -561,7 +561,7 @@ public class DefaultSampleServiceTestSuite {
   /**
    * Adds a shell project to the provided Sample, and adds the real project to the mocked projectStore. The projectStore should be queried
    * to swap in the persisted object in place of the shell
-   * 
+   *
    * @param sample the Sample to add shell project to
    * @return the "real" project that will be returned by the mock projectStore
    * @throws IOException

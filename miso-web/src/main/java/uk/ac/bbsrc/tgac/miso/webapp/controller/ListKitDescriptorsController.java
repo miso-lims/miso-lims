@@ -74,7 +74,7 @@ public class ListKitDescriptorsController {
       return new ModelAndView("/pages/listKitDescriptors.jsp", model);
     } catch (IOException ex) {
       if (log.isDebugEnabled()) {
-        log.debug("Failed to list Kit Descriptors", ex);
+        log.debug("Failed to list KitComponent Descriptors", ex);
       }
       throw ex;
     }

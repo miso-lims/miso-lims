@@ -63,7 +63,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
-import uk.ac.bbsrc.tgac.miso.core.data.Kit;
+import uk.ac.bbsrc.tgac.miso.core.data.KitComponent;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
@@ -131,7 +131,7 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
   /**
    * Simplified interface to convert form data to fields.
-   * 
+   *
    * @param <T>
    *          The target type of the conversion.
    */
@@ -160,7 +160,7 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
     /**
      * Register this conversion with a Spring binder.
-     * 
+     *
      * @param binder
      *          The binder to receive the registration
      * @param fields
@@ -177,7 +177,7 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
     /**
      * Register this conversion for a collection with a Spring binder.
-     * 
+     *
      * @param binder
      *          The binder to receive the registration
      * @param collection
@@ -206,7 +206,7 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
     /**
      * Register this conversion for a map with a Spring binder.
-     * 
+     *
      * @param binder
      *          The binder to receive the registration
      * @param collection
@@ -347,7 +347,7 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
   /**
    * Sets the requestManager of this LimsBindingInitializer object.
-   * 
+   *
    * @param requestManager
    *          requestManager.
    */
@@ -358,7 +358,7 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
   /**
    * Sets the protocolManager of this LimsBindingInitializer object.
-   * 
+   *
    * @param protocolManager
    *          protocolManager.
    */
@@ -369,7 +369,7 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
   /**
    * Sets the securityManager of this LimsBindingInitializer object.
-   * 
+   *
    * @param securityManager
    *          securityManager.
    */
@@ -380,7 +380,7 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
   /**
    * Init this binder, registering all the custom editors to class types
-   * 
+   *
    * @param binder
    *          of type WebDataBinder
    * @param req
@@ -664,10 +664,10 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
     }).register(binder, "submissionElement").register(binder, Set.class, "submissionElements");
 
-    new BindingConverterById<Kit>(Kit.class) {
+    new BindingConverterById<KitComponent>(KitComponent.class) {
       @Override
-      public Kit resolveById(long id) throws Exception {
-        return requestManager.getKitById(id);
+      public KitComponent resolveById(long id) throws Exception {
+        return requestManager.getKitComponentById(id);
       }
     }.register(binder).register(binder, Set.class, "kits");
 

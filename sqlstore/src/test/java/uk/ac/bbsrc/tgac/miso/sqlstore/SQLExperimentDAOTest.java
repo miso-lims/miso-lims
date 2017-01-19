@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
@@ -7,6 +7,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,7 @@ import com.eaglegenomics.simlims.core.store.SecurityStore;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
+import uk.ac.bbsrc.tgac.miso.core.data.KitComponent;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ExperimentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PlatformImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
@@ -38,7 +40,8 @@ import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
-import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
+import uk.ac.bbsrc.tgac.miso.core.store.KitComponentStore;
+import uk.ac.bbsrc.tgac.miso.core.store.KitDescriptorStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PlatformStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
@@ -69,7 +72,10 @@ public class SQLExperimentDAOTest extends AbstractDAOTest {
   @Mock
   private PoolStore poolDAO;
   @Mock
-  private KitStore kitDAO;
+  private KitDescriptorStore kitDAO;
+  @Mock
+  private KitComponentStore kitComponentDao;
+
   @Mock
   private NamingScheme namingScheme;
 
@@ -83,11 +89,12 @@ public class SQLExperimentDAOTest extends AbstractDAOTest {
     dao.setDataObjectFactory(new TgacDataObjectFactory());
     when(namingScheme.generateNameFor(Matchers.any(Experiment.class))).thenReturn("EDI123");
     when(namingScheme.validateName(Matchers.anyString())).thenReturn(ValidationResult.success());
+    when(kitComponentDao.listByExperiment(Matchers.anyLong())).thenReturn(new ArrayList<KitComponent>());
   }
 
   /**
    * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLExperimentDAO#save(uk.ac.bbsrc.tgac.miso.core.data.Experiment)} .
-   * 
+   *
    * @throws IOException
    */
   @Test
@@ -123,7 +130,7 @@ public class SQLExperimentDAOTest extends AbstractDAOTest {
 
   /**
    * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLExperimentDAO#listAllWithLimit(long)} .
-   * 
+   *
    * @throws IOException
    */
   @Test
@@ -134,7 +141,7 @@ public class SQLExperimentDAOTest extends AbstractDAOTest {
 
   /**
    * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLExperimentDAO#count()}.
-   * 
+   *
    * @throws IOException
    */
   @Test
@@ -163,7 +170,7 @@ public class SQLExperimentDAOTest extends AbstractDAOTest {
 
   /**
    * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLExperimentDAO#listBySubmissionId(long)} .
-   * 
+   *
    * @throws IOException
    */
   @Test
@@ -183,7 +190,7 @@ public class SQLExperimentDAOTest extends AbstractDAOTest {
 
   /**
    * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLExperimentDAO#get(long)}.
-   * 
+   *
    * @throws IOException
    */
   @Test
@@ -197,7 +204,7 @@ public class SQLExperimentDAOTest extends AbstractDAOTest {
 
   /**
    * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLExperimentDAO#lazyGet(long)}.
-   * 
+   *
    * @throws IOException
    */
   @Test
@@ -211,7 +218,7 @@ public class SQLExperimentDAOTest extends AbstractDAOTest {
 
   /**
    * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLExperimentDAO#remove(uk.ac.bbsrc.tgac.miso.core.data.Experiment)} .
-   * 
+   *
    * @throws IOException
    */
   @Test

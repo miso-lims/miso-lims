@@ -28,10 +28,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
-import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +41,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
+
+import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
@@ -63,7 +62,7 @@ public class EditKitDescriptorController {
 
   @Autowired
   private DataObjectFactory dataObjectFactory;
-  
+
   @Autowired
   private SecurityManager securityManager;
 
@@ -78,10 +77,9 @@ public class EditKitDescriptorController {
   }
 
   @ModelAttribute("platformTypes")
-  public Collection<PlatformType> populatePlatformTypes() {
-    return Arrays.asList(PlatformType.values());
+  public Collection<String> populatePlatformTypes() {
+    return PlatformType.getKeys();
   }
-
   public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
     this.dataObjectFactory = dataObjectFactory;
   }
@@ -92,12 +90,13 @@ public class EditKitDescriptorController {
 
   @RequestMapping(value = "/new", method = RequestMethod.GET)
   public ModelAndView setupForm(ModelMap model) throws IOException {
-    model.addAttribute("kitDescriptor", null);
+      model.addAttribute("kitDescriptor", null);
     return setupForm(KitDescriptor.UNSAVED_ID, model);
   }
 
   @RequestMapping(value = "/{kitDescriptorId}", method = RequestMethod.GET)
-  public ModelAndView setupForm(@PathVariable Long kitDescriptorId, ModelMap model) throws IOException {
+  public ModelAndView setupForm(@PathVariable Long kitDescriptorId,
+                                ModelMap model) throws IOException {
     try {
       KitDescriptor kitDescriptor = null;
       if (kitDescriptorId == KitDescriptor.UNSAVED_ID) {
@@ -105,7 +104,7 @@ public class EditKitDescriptorController {
         model.put("title", "New Kit Descriptor");
       } else {
         kitDescriptor = requestManager.getKitDescriptorById(kitDescriptorId);
-        model.put("title", kitDescriptor.getName());
+        model.put("title", "Kit Descriptor " + kitDescriptorId);
       }
 
       if (kitDescriptor == null) {
@@ -114,8 +113,10 @@ public class EditKitDescriptorController {
 
       model.put("formObj", kitDescriptor);
       model.put("kitDescriptor", kitDescriptor);
+
       return new ModelAndView("/pages/editKitDescriptor.jsp", model);
-    } catch (IOException ex) {
+    }
+    catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to show Kit Descriptor", ex);
       }
@@ -124,18 +125,21 @@ public class EditKitDescriptorController {
   }
 
   @RequestMapping(method = RequestMethod.POST)
-  public String processSubmit(@ModelAttribute("kitDescriptor") KitDescriptor kitDescriptor, ModelMap model, SessionStatus session)
-      throws IOException {
+  public String processSubmit(@ModelAttribute("kitDescriptor") KitDescriptor kitDescriptor,
+                              ModelMap model, SessionStatus session) throws IOException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       kitDescriptor.setLastModifier(user);
       requestManager.saveKitDescriptor(kitDescriptor);
       session.setComplete();
       model.clear();
-      return "redirect:/miso/kitdescriptor/" + kitDescriptor.getId();
-    } catch (IOException ex) {
+
+      //SEND TO THE PAGE WITH COMPONENTS
+      return "redirect:/miso/kitcomponentdescriptor/kit" + kitDescriptor.getId() + "/new";
+    }
+    catch (IOException ex) {
       if (log.isDebugEnabled()) {
-        log.debug("Failed to save Kit Descriptor", ex);
+          log.debug("Failed to save KitComponent Descriptor", ex);
       }
       throw ex;
     }
