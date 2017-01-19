@@ -116,8 +116,6 @@ public class SampleControllerHelperService {
   private PrintManager<MisoPrintService<?, ?, ?>, Queue<?>> printManager;
   @Autowired
   private NamingScheme namingScheme;
-  @Autowired
-  private CacheHelperService cacheHelperService;
 
   public JSONObject validateSampleAlias(HttpSession session, JSONObject json) {
     try {
@@ -729,7 +727,6 @@ public class SampleControllerHelperService {
             if (overview.getSamples().remove(s)) {
               requestManager.saveProjectOverview(overview);
 
-              cacheHelperService.evictObjectFromCache(s.getProject(), Project.class);
               return JSONUtils.SimpleJSONResponse("Sample removed from group");
             } else {
               return JSONUtils.SimpleJSONError("Error removing sample from sample group.");
@@ -798,9 +795,5 @@ public class SampleControllerHelperService {
 
   public void setSampleNamingScheme(NamingScheme namingScheme) {
     this.namingScheme = namingScheme;
-  }
-
-  public void setCacheHelperService(CacheHelperService cacheHelperService) {
-    this.cacheHelperService = cacheHelperService;
   }
 }

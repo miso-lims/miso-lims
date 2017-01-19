@@ -25,7 +25,6 @@ package uk.ac.bbsrc.tgac.miso.webapp.context;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
@@ -46,12 +45,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.support.nativejdbc.CommonsDbcpNativeJdbcExtractor;
 import org.springframework.jndi.JndiObjectFactoryBean;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.context.support.XmlWebApplicationContext;
@@ -68,7 +61,6 @@ import uk.ac.bbsrc.tgac.miso.core.factory.issuetracker.IssueTrackerFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoRequestManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.PrintManager;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.generation.NameGenerator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.resolvers.NamingSchemeResolverService;
@@ -177,47 +169,6 @@ public class MisoAppListener implements ServletContextListener {
       PoolAlertManager poam = (PoolAlertManager) context.getBean("poolAlertManager");
       poam.setRequestManager(rm);
       poam.setSecurityManager(sm);
-    }
-
-    if ("true".equals(misoProperties.get("miso.db.caching.precache.enabled"))) {
-      log.info("Precaching. This may take a while.");
-      try {
-        RequestManager rm = (RequestManager) context.getBean("requestManager");
-
-        User userdetails = new User("precacher", "none", true, true, true, true,
-            AuthorityUtils.createAuthorityList("ROLE_ADMIN,ROLE_INTERNAL"));
-        PreAuthenticatedAuthenticationToken newAuthentication = new PreAuthenticatedAuthenticationToken(userdetails,
-            userdetails.getPassword(), userdetails.getAuthorities());
-        newAuthentication.setAuthenticated(true);
-        newAuthentication.setDetails(userdetails);
-
-        try {
-          SecurityContext sc = SecurityContextHolder.getContextHolderStrategy().getContext();
-          sc.setAuthentication(newAuthentication);
-          SecurityContextHolder.getContextHolderStrategy().setContext(sc);
-        } catch (AuthenticationException a) {
-          log.error("security context init", a);
-        }
-
-        log.info("\\_ projects...");
-        log.info("" + rm.listAllProjects().size());
-        log.info("\\_ studies...");
-        log.info("" + rm.listAllStudies().size());
-        log.info("\\_ samples...");
-        log.info("" + rm.listAllSamples().size());
-        log.info("\\_ libraries...");
-        log.info("" + rm.listAllLibraries().size());
-        log.info("\\_ dilutions...");
-        log.info("" + rm.listAllLibraryDilutions().size());
-        log.info("\\_ pools...");
-        log.info("" + rm.listAllPools().size());
-        log.info("\\_ sequencing containers...");
-        log.info("" + rm.listAllSequencerPartitionContainers().size());
-        log.info("\\_ runs...");
-        log.info("" + rm.listAllRuns().size());
-      } catch (IOException e) {
-        log.info("precache", e);
-      }
     }
 
     if ("true".equals(misoProperties.get("miso.issuetracker.enabled"))) {
