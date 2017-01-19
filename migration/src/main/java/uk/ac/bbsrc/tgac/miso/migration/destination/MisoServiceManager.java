@@ -470,6 +470,7 @@ public class MisoServiceManager {
     HibernateLibraryDao dao = new HibernateLibraryDao();
     dao.setNamingScheme(namingScheme);
     dao.setSessionFactory(sessionFactory);
+    dao.setBoxDao(boxDao);
     setLibraryDao(dao);
   }
 

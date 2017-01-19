@@ -35,6 +35,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -96,6 +97,8 @@ public class HibernateLibraryDao implements LibraryStore {
   private JdbcTemplate template;
   @Autowired
   private NamingScheme namingScheme;
+  @Autowired
+  private BoxStore boxDao;
   @Value("${miso.detailed.sample.enabled:false}")
   private boolean detailedSampleEnabled;
 
@@ -120,6 +123,9 @@ public class HibernateLibraryDao implements LibraryStore {
       }
       id = (long) currentSession().save(library);
     } else {
+      if (library.isDiscarded()) {
+        getBoxDao().removeBoxableFromBox(library);
+      }
       currentSession().update(library);
       id = library.getId();
     }
@@ -440,6 +446,14 @@ public class HibernateLibraryDao implements LibraryStore {
 
   public void setNamingScheme(NamingScheme namingScheme) {
     this.namingScheme = namingScheme;
+  }
+
+  public BoxStore getBoxDao() {
+    return boxDao;
+  }
+
+  public void setBoxDao(BoxStore boxDao) {
+    this.boxDao = boxDao;
   }
 
 }
