@@ -54,9 +54,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.data.Submittable;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SubmissionImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunException;
 import uk.ac.bbsrc.tgac.miso.core.exception.SubmissionException;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.SubmissionManager;
@@ -75,9 +75,6 @@ public class EditSubmissionController {
   private RequestManager requestManager;
 
   @Autowired
-  private DataObjectFactory dataObjectFactory;
-
-  @Autowired
   private FilesManager misoFileManager;
 
   @Autowired
@@ -85,10 +82,6 @@ public class EditSubmissionController {
 
   @Autowired
   private ExperimentService experimentService;
-
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
-  }
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
@@ -158,7 +151,7 @@ public class EditSubmissionController {
       Submission submission = null;
       if (submissionId == Submission.UNSAVED_ID) {
         User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-        submission = dataObjectFactory.getSubmission(user);
+        submission = new SubmissionImpl(user);
         model.put("title", "New Submission");
       } else {
         submission = requestManager.getSubmissionById(submissionId);

@@ -80,12 +80,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoPrintException;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.PrintManager;
@@ -114,8 +114,6 @@ public class LibraryControllerHelperService {
   private SecurityManager securityManager;
   @Autowired
   private RequestManager requestManager;
-  @Autowired
-  private DataObjectFactory dataObjectFactory;
   @Autowired
   private BarcodeFactory barcodeFactory;
   @Autowired
@@ -663,7 +661,7 @@ public class LibraryControllerHelperService {
       if (json.has("libraryId") && !isStringEmptyOrNull(json.getString("libraryId"))) {
         Long libraryId = Long.parseLong(json.getString("libraryId"));
         Library library = requestManager.getLibraryById(libraryId);
-        LibraryQC newQc = dataObjectFactory.getLibraryQC();
+        LibraryQC newQc = new LibraryQCImpl();
         if (json.has("qcPassed") && json.getString("qcPassed").equals("true")) {
           library.setQcPassed(true);
         }
@@ -755,7 +753,7 @@ public class LibraryControllerHelperService {
       if (json.has("libraryId") && !isStringEmptyOrNull(json.getString("libraryId"))) {
         Long libraryId = Long.parseLong(json.getString("libraryId"));
         Library library = requestManager.getLibraryById(libraryId);
-        LibraryDilution newDilution = dataObjectFactory.getLibraryDilution();
+        LibraryDilution newDilution = new LibraryDilution();
         newDilution.setSecurityProfile(library.getSecurityProfile());
         newDilution.setDilutionCreator(json.getString("dilutionCreator"));
         newDilution.setCreationDate(new SimpleDateFormat("dd/MM/yyyy").parse(json.getString("dilutionDate")));
@@ -1031,10 +1029,6 @@ public class LibraryControllerHelperService {
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
-  }
-
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
   }
 
   public void setBarcodeFactory(BarcodeFactory barcodeFactory) {

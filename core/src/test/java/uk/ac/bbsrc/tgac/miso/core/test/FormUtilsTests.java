@@ -30,8 +30,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.junit.Ignore;
 import org.junit.Test;
 import org.odftoolkit.odfdom.doc.OdfTextDocument;
@@ -41,12 +39,13 @@ import org.slf4j.LoggerFactory;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
-import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.DefaultNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.util.FormUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+
+import junit.framework.Assert;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.test
@@ -154,11 +153,10 @@ public class FormUtilsTests {
   }
 
   private List<Sample> generateSamples() {
-    List<Sample> samples = new ArrayList<Sample>();
-    DataObjectFactory dataObjectFactory = new TgacDataObjectFactory();
+    List<Sample> samples = new ArrayList<>();
 
     for (int i = 1; i < 6; i++) {
-      Sample s = dataObjectFactory.getSample();
+      Sample s = new SampleImpl();
       s.setId(i);
       s.setName("SAM" + i);
       s.setAlias("MI_S" + i + "_TestSample");

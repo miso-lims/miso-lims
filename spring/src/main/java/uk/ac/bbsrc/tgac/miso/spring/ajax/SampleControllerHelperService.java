@@ -75,9 +75,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoPrintException;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.PrintManager;
@@ -110,8 +110,6 @@ public class SampleControllerHelperService {
   private SampleService sampleService;
   @Autowired
   private MisoFilesManager misoFileManager;
-  @Autowired
-  private DataObjectFactory dataObjectFactory;
   @Autowired
   private BarcodeFactory barcodeFactory;
   @Autowired
@@ -332,7 +330,7 @@ public class SampleControllerHelperService {
           }
         }
 
-        SampleQC newQc = dataObjectFactory.getSampleQC();
+        SampleQC newQc = new SampleQCImpl();
         newQc.setQcCreator(json.getString("qcCreator"));
         newQc.setQcDate(new SimpleDateFormat("dd/MM/yyyy").parse(json.getString("qcDate")));
         newQc.setQcType(requestManager.getSampleQcTypeById(json.getLong("qcType")));
@@ -784,10 +782,6 @@ public class SampleControllerHelperService {
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
-  }
-
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
   }
 
   public void setBarcodeFactory(BarcodeFactory barcodeFactory) {

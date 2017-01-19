@@ -13,8 +13,6 @@ import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.LocalSecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.event.manager.WatchManager;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
-import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.migration.util.OicrMigrationNamingScheme;
 import uk.ac.bbsrc.tgac.miso.persistence.HibernateSampleClassDao;
@@ -71,7 +69,6 @@ public class MisoServiceManager {
   private final JdbcTemplate jdbcTemplate;
   private final SessionFactory sessionFactory;
 
-  private final DataObjectFactory dataObjectFactory = new TgacDataObjectFactory();
   private final boolean autoGenerateIdBarcodes = false; // TODO: config option
   private NamingScheme namingScheme;
 
@@ -483,7 +480,6 @@ public class MisoServiceManager {
     dao.setAutoGenerateIdentificationBarcodes(autoGenerateIdBarcodes);
     dao.setBoxDAO(boxDao);
     dao.setChangeLogDAO(changeLogDao);
-    dao.setDataObjectFactory(dataObjectFactory);
     dao.setDilutionDAO(dilutionDao);
     dao.setJdbcTemplate(jdbcTemplate);
     dao.setLibraryQcDAO(libraryQcDao);
@@ -516,7 +512,6 @@ public class MisoServiceManager {
 
   public void setDefaultLibraryQcDao() {
     SQLLibraryQCDAO dao = new SQLLibraryQCDAO();
-    dao.setDataObjectFactory(dataObjectFactory);
     dao.setJdbcTemplate(jdbcTemplate);
     dao.setLibraryDAO(libraryDao);
     setLibraryQcDao(dao);
@@ -537,7 +532,6 @@ public class MisoServiceManager {
 
   public void setDefaultDilutionDao() {
     SQLLibraryDilutionDAO dao = new SQLLibraryDilutionDAO();
-    dao.setDataObjectFactory(dataObjectFactory);
     dao.setJdbcTemplate(jdbcTemplate);
     dao.setLibraryDAO(libraryDao);
     dao.setNamingScheme(getNamingScheme());
@@ -768,7 +762,6 @@ public class MisoServiceManager {
     SQLBoxDAO dao = new SQLBoxDAO();
     dao.setAutoGenerateIdentificationBarcodes(autoGenerateIdBarcodes);
     dao.setChangeLogDAO(changeLogDao);
-    dao.setDataObjectFactory(dataObjectFactory);
     dao.setJdbcTemplate(jdbcTemplate);
     dao.setLibraryDAO(libraryDao);
     dao.setNamingScheme(getNamingScheme());

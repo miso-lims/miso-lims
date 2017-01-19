@@ -94,7 +94,7 @@ public abstract class AbstractRun implements Run {
 
   @OneToOne(targetEntity = SecurityProfile.class, cascade = CascadeType.ALL)
   @JoinColumn(name = "securityProfile_profileId")
-  private SecurityProfile securityProfile;
+  private SecurityProfile securityProfile = new SecurityProfile();
 
   private String name;
   @Column(nullable = false)
@@ -110,7 +110,7 @@ public abstract class AbstractRun implements Run {
 
   @OneToOne(targetEntity = StatusImpl.class, cascade = CascadeType.ALL)
   @JoinColumn(name = "status_statusId")
-  private Status status;
+  private Status status = new StatusImpl();
 
   @OneToMany(targetEntity = RunQCImpl.class, mappedBy = "run", cascade = CascadeType.ALL)
   private Collection<RunQC> runQCs = new TreeSet<>();

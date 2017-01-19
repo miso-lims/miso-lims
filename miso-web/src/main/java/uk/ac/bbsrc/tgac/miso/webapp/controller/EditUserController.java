@@ -53,7 +53,6 @@ import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.MisoAuthority;
 import uk.ac.bbsrc.tgac.miso.core.security.PasswordCodecService;
@@ -70,17 +69,10 @@ public class EditUserController {
   private PasswordCodecService passwordCodecService;
 
   @Autowired
-  private DataObjectFactory dataObjectFactory;
-
-  @Autowired
   private RequestManager requestManager;
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
-  }
-
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
   }
 
   public void setSecurityManager(SecurityManager securityManager) {
@@ -99,7 +91,7 @@ public class EditUserController {
   @ModelAttribute("groups")
   public Collection<Group> populateGroups() throws IOException {
     try {
-      List<Group> groups = new ArrayList<Group>(securityManager.listAllGroups());
+      List<Group> groups = new ArrayList<>(securityManager.listAllGroups());
       Collections.sort(groups);
       return groups;
     } catch (IOException ex) {
@@ -150,7 +142,7 @@ public class EditUserController {
   @RequestMapping(value = "/admin/user/{userId}", method = RequestMethod.GET)
   public ModelAndView adminSetupForm(@PathVariable Long userId, ModelMap model, HttpServletRequest request) throws IOException {
     try {
-      model.put("user", userId == UserImpl.UNSAVED_ID ? dataObjectFactory.getUser() : securityManager.getUserById(userId));
+      model.put("user", userId == UserImpl.UNSAVED_ID ? new UserImpl() : securityManager.getUserById(userId));
 
       String securityMethod = (String) request.getSession().getServletContext().getAttribute("security.method");
       model.put("securityMethod", securityMethod);

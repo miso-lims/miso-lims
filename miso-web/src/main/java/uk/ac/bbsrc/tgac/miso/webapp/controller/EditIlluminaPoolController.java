@@ -57,7 +57,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.illumina.IlluminaPool;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedDilutionException;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
@@ -84,14 +83,7 @@ public class EditIlluminaPoolController {
   private RequestManager requestManager;
 
   @Autowired
-  private DataObjectFactory dataObjectFactory;
-
-  @Autowired
   private ExperimentService experimentService;
-
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
-  }
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
@@ -157,7 +149,7 @@ public class EditIlluminaPoolController {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Pool pool = null;
       if (poolId == PoolImpl.UNSAVED_ID) {
-        pool = dataObjectFactory.getIlluminaPool(user);
+        pool = new PoolImpl(user);
         model.put("title", "New Illumina Pool");
       } else {
         pool = requestManager.getPoolById(poolId);
@@ -194,7 +186,7 @@ public class EditIlluminaPoolController {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Pool pool = null;
       if (poolId == PoolImpl.UNSAVED_ID) {
-        pool = dataObjectFactory.getPool(user);
+        pool = new PoolImpl(user);
         pool.setPlatformType(PlatformType.ILLUMINA);
         model.put("title", "New Illumina Pool");
       } else {
@@ -235,12 +227,8 @@ public class EditIlluminaPoolController {
   public ModelAndView setupFormWithDilution(@PathVariable Long dilutionId, ModelMap model) throws IOException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      IlluminaPool pool = dataObjectFactory.getIlluminaPool(user);
+      Pool pool = new PoolImpl(user);
       model.put("title", "New Illumina Pool");
-
-      if (pool == null) {
-        throw new SecurityException("No such Illumina Pool");
-      }
 
       if (!pool.userCanRead(user)) {
         throw new SecurityException("Permission denied.");

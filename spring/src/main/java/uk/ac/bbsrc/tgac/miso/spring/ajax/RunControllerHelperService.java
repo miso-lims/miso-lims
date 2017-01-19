@@ -67,13 +67,14 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunQCImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.illumina.IlluminaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ls454.LS454Run;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.pacbio.PacBioRun;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.solid.SolidRun;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -94,8 +95,6 @@ public class RunControllerHelperService {
   private SecurityManager securityManager;
   @Autowired
   private RequestManager requestManager;
-  @Autowired
-  private DataObjectFactory dataObjectFactory;
   @Autowired
   private MisoFilesManager misoFileManager;
 
@@ -124,7 +123,8 @@ public class RunControllerHelperService {
         if (newPt != null) {
           log.info("STORED: " + newRuntype + " :: " + storedPlatformType);
           if (!newRuntype.equals(storedPlatformType)) {
-            run = dataObjectFactory.getRunOfType(newPt, user);
+            run = new RunImpl(user);
+            run.setPlatformType(newPt);
             run.setId(storedRun.getId());
           } else {
             run = storedRun;
@@ -185,7 +185,8 @@ public class RunControllerHelperService {
       Map<String, Object> responseMap = new HashMap<>();
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
 
-      Run run = dataObjectFactory.getRunOfType(pt, user);
+      Run run = new RunImpl(user);
+      run.setPlatformType(pt);
       run.setSequencerReference(sr);
 
       session.setAttribute("run_" + cId, run);
@@ -273,7 +274,7 @@ public class RunControllerHelperService {
       b.append("</table>");
       b.append("</div>");
 
-      SequencerPartitionContainer<SequencerPoolPartition> f = dataObjectFactory.getSequencerPartitionContainer();
+      SequencerPartitionContainer<SequencerPoolPartition> f = new SequencerPartitionContainerImpl();
       f.setPlatform(run.getSequencerReference().getPlatform());
       f.setPartitionLimit(1);
       f.initEmptyPartitions();
@@ -286,7 +287,7 @@ public class RunControllerHelperService {
       b.append("<input id='lane8' name='container0Select' onchange='Run.ui.changeIlluminaLane(this, 0);' type='radio' value='8'/>8 ");
       b.append("<div id='containerdiv0'> </div>");
 
-      SequencerPartitionContainer<SequencerPoolPartition> f = dataObjectFactory.getSequencerPartitionContainer();
+      SequencerPartitionContainer<SequencerPoolPartition> f = new SequencerPartitionContainerImpl();
       f.setPlatform(run.getSequencerReference().getPlatform());
       run.addSequencerPartitionContainer(f);
     } else {
@@ -334,7 +335,7 @@ public class RunControllerHelperService {
         b.append("</table>");
         b.append("</div>");
 
-        SequencerPartitionContainer<SequencerPoolPartition> f = dataObjectFactory.getSequencerPartitionContainer();
+        SequencerPartitionContainer<SequencerPoolPartition> f = new SequencerPartitionContainerImpl();
         f.setPlatform(run.getSequencerReference().getPlatform());
         f.initEmptyPartitions();
         run.addSequencerPartitionContainer(f);
@@ -401,7 +402,7 @@ public class RunControllerHelperService {
       b.append("<div id='containerdiv" + i + "'> </div>");
       b.append("</div>");
 
-      SequencerPartitionContainer<SequencerPoolPartition> f = dataObjectFactory.getSequencerPartitionContainer();
+      SequencerPartitionContainer<SequencerPoolPartition> f = new SequencerPartitionContainerImpl();
       f.setPlatform(run.getSequencerReference().getPlatform());
       run.addSequencerPartitionContainer(f);
     }
@@ -489,7 +490,7 @@ public class RunControllerHelperService {
       }
       b.append("<div id='containerdiv" + i + "'> </div>");
       b.append("</div>");
-      SequencerPartitionContainer<SequencerPoolPartition> f = dataObjectFactory.getSequencerPartitionContainer();
+      SequencerPartitionContainer<SequencerPoolPartition> f = new SequencerPartitionContainerImpl();
       f.setPlatform(run.getSequencerReference().getPlatform());
       run.addSequencerPartitionContainer(f);
     }
@@ -559,7 +560,7 @@ public class RunControllerHelperService {
 
       b.append("<div id='containerdiv" + i + "'> </div>");
       b.append("</div>");
-      SequencerPartitionContainer<SequencerPoolPartition> f = dataObjectFactory.getSequencerPartitionContainer();
+      SequencerPartitionContainer<SequencerPoolPartition> f = new SequencerPartitionContainerImpl();
       f.setPlatform(run.getSequencerReference().getPlatform());
       run.addSequencerPartitionContainer(f);
     }
@@ -685,7 +686,7 @@ public class RunControllerHelperService {
           }
         }
 
-        RunQC newQc = dataObjectFactory.getRunQC();
+        RunQC newQc = new RunQCImpl();
         newQc.setQcCreator(json.getString("qcCreator"));
         newQc.setQcDate(new SimpleDateFormat("dd/MM/yyyy").parse(json.getString("qcDate")));
         newQc.setQcType(requestManager.getRunQcTypeById(json.getLong("qcType")));
@@ -1137,9 +1138,5 @@ public class RunControllerHelperService {
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
-  }
-
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
   }
 }

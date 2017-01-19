@@ -53,12 +53,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedDilutionException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolQcException;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 
 /**
@@ -71,8 +72,6 @@ public class PoolWizardControllerHelperService {
   private SecurityManager securityManager;
   @Autowired
   private RequestManager requestManager;
-  @Autowired
-  private DataObjectFactory dataObjectFactory;
 
   public JSONObject addPool(HttpSession session, JSONObject json) {
     JSONObject response = new JSONObject();
@@ -89,7 +88,7 @@ public class PoolWizardControllerHelperService {
     List<PoolQC> pqcs = new ArrayList<>();
     JSONArray qcs = JSONArray.fromObject(json.get("qcs"));
     for (JSONObject q : (Iterable<JSONObject>) qcs) {
-      PoolQC s = dataObjectFactory.getPoolQC();
+      PoolQC s = new PoolQCImpl();
 
       try {
         s.setResults(Double.valueOf(q.getString("poolQcResults")));
@@ -133,7 +132,7 @@ public class PoolWizardControllerHelperService {
         }
 
         if (!indexCollision) {
-          Pool pool = dataObjectFactory.getPoolOfType(platformType, user);
+          Pool pool = new PoolImpl(user);
 
           if (alias != null) {
             pool.setAlias(alias);
@@ -308,9 +307,5 @@ public class PoolWizardControllerHelperService {
 
   public void setRequestManager(uk.ac.bbsrc.tgac.miso.core.manager.RequestManager requestManager) {
     this.requestManager = requestManager;
-  }
-
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
   }
 }

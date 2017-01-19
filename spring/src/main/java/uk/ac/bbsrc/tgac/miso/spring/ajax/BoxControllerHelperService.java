@@ -38,7 +38,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.PrintJob;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoPrintException;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.PrintManager;
@@ -63,9 +62,6 @@ public class BoxControllerHelperService {
 
   @Autowired
   private RequestManager requestManager;
-
-  @Autowired
-  private DataObjectFactory dataObjectFactory;
 
   @Autowired
   private BarcodeFactory barcodeFactory;
@@ -935,11 +931,6 @@ public class BoxControllerHelperService {
   @CoverageIgnore
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
-  }
-
-  @CoverageIgnore
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
   }
 
   @CoverageIgnore

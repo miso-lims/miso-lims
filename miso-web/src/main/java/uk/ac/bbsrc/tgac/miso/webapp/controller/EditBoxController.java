@@ -30,7 +30,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.AbstractBox;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.integration.BoxScanner;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
@@ -48,17 +48,10 @@ public class EditBoxController {
   private RequestManager requestManager;
 
   @Autowired
-  private DataObjectFactory dataObjectFactory;
-
-  @Autowired
   private ChangeLogService changeLogService;
 
   @Autowired
   private BoxScanner boxScanner;
-
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
-  }
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
@@ -111,15 +104,14 @@ public class EditBoxController {
       Box box = null;
 
       if (boxId == AbstractBox.UNSAVED_ID) {
-        box = dataObjectFactory.getBox(user);
+        box = new BoxImpl(user);
         model.put("title", "New Box");
       } else {
         box = requestManager.getBoxById(boxId);
+        if (box == null) {
+          throw new SecurityException("No such Box");
+        }
         model.put("title", box.getAlias());
-      }
-
-      if (box == null) {
-        throw new SecurityException("No such Box");
       }
       if (!box.userCanRead(user)) {
         throw new SecurityException("Permission denied.");

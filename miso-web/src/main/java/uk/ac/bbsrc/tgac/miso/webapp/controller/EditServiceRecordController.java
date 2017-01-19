@@ -49,7 +49,7 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerServiceRecordImpl;
 import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 
@@ -81,9 +81,6 @@ public class EditServiceRecordController {
   @Autowired
   private FilesManager filesManager;
 
-  @Autowired
-  private DataObjectFactory dataObjectFactory;
-
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
   }
@@ -91,14 +88,10 @@ public class EditServiceRecordController {
   public void setFilesManager(FilesManager filesManager) {
     this.filesManager = filesManager;
   }
-
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
-  }
   
   public Map<Integer, String> populateServiceRecordFiles(SequencerServiceRecord record) throws IOException {
     if (record.getId() != AbstractSequencerServiceRecord.UNSAVED_ID) {
-      Map<Integer, String> fileMap = new HashMap<Integer, String>();
+      Map<Integer, String> fileMap = new HashMap<>();
       for (String s : filesManager.getFileNames(SequencerServiceRecord.class, String.valueOf(record.getId()))) {
         fileMap.put(s.hashCode(), s);
       }
@@ -130,7 +123,7 @@ public class EditServiceRecordController {
     if (sequencer == null) {
       throw new IOException("No such Sequencer.");
     }
-    SequencerServiceRecord record = dataObjectFactory.getSequencerServiceRecord();
+    SequencerServiceRecord record = new SequencerServiceRecordImpl();
     record.setSequencerReference(sequencer);
     model.put(ModelKeys.RECORD.getKey(), record);
     return new ModelAndView("/pages/editServiceRecord.jsp", model);

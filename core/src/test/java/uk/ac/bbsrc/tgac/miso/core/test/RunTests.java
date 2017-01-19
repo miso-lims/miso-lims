@@ -23,23 +23,20 @@
 
 package uk.ac.bbsrc.tgac.miso.core.test;
 
-import org.junit.After;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.illumina.IlluminaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.event.AlerterService;
 import uk.ac.bbsrc.tgac.miso.core.event.ResponderService;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
-import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.test
@@ -52,26 +49,24 @@ import java.util.Set;
  */
 public class RunTests {
   protected static final Logger log = LoggerFactory.getLogger(RunTests.class);
-  private DataObjectFactory dataObjectFactory;
 
   @Before
   public void setUp() {
-    dataObjectFactory = new TgacDataObjectFactory();
   }
 
   @Test
   public void testIlluminaRun() {
-    IlluminaRun r = (IlluminaRun) dataObjectFactory.getRunOfType(PlatformType.ILLUMINA);
+    IlluminaRun r = new IlluminaRun();
     r.setId(-1L);
 
     log.info("Registering listeners");
 
     MockRunListener foo = new MockRunListener();
 
-    Set<ResponderService> responders = new HashSet<ResponderService>();
+    Set<ResponderService> responders = new HashSet<>();
     MockRunResponderService runResponder = new MockRunResponderService();
 
-    Set<AlerterService> alerters = new HashSet<AlerterService>();
+    Set<AlerterService> alerters = new HashSet<>();
     MockLogAlerterService logAlerter = new MockLogAlerterService();
     alerters.add(logAlerter);
 
@@ -109,10 +104,5 @@ public class RunTests {
 
     log.info("Unregistering listeners");
     r.removeListener(foo);
-  }
-
-  @After
-  public void tearDown() {
-    dataObjectFactory = null;
   }
 }
