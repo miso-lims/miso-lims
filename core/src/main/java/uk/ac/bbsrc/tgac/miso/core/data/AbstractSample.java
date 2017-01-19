@@ -66,7 +66,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
  * Skeleton implementation of a Sample
- * 
+ *
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -118,7 +118,6 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   private Boolean qcPassed;
   private String identificationBarcode;
   private String locationBarcode;
-  private String alias;
   private Long securityProfile_profileId;
 
   @OneToOne(targetEntity = UserImpl.class)
@@ -210,16 +209,6 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   }
 
   @Override
-  public String getAlias() {
-    return alias;
-  }
-
-  @Override
-  public void setAlias(String alias) {
-    this.alias = alias;
-  }
-
-  @Override
   public String getIdentificationBarcode() {
     return identificationBarcode;
   }
@@ -306,7 +295,7 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
 
   /*
    * public Document getSubmissionData() { return submissionDocument; }
-   * 
+   *
    * public void accept(SubmittableVisitor v) { v.visit(this); }
    */
 
@@ -421,20 +410,9 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
 
   @Override
   public int hashCode() {
-    return new HashCodeBuilder(7, 37)
-        .appendSuper(super.hashCode())
-        .append(accession)
-        .append(alias)
-        .append(description)
-        .append(identificationBarcode)
-        .append(locationBarcode)
-        .append(project)
-        .append(qcPassed)
-        .append(receivedDate)
-        .append(sampleType)
-        .append(scientificName)
-        .append(taxonIdentifier)
-        .toHashCode();
+    return new HashCodeBuilder(7, 37).appendSuper(super.hashCode()).append(accession).append(getAlias()).append(description)
+        .append(identificationBarcode).append(locationBarcode).append(project).append(qcPassed).append(receivedDate).append(sampleType)
+        .append(scientificName).append(taxonIdentifier).toHashCode();
   }
 
   @Override
@@ -443,20 +421,11 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
     if (obj == null) return false;
     if (getClass() != obj.getClass()) return false;
     AbstractSample other = (AbstractSample) obj;
-    return new EqualsBuilder()
-        .appendSuper(super.equals(obj))
-        .append(accession, other.accession)
-        .append(alias, other.alias)
-        .append(description, other.description)
-        .append(identificationBarcode, other.identificationBarcode)
-        .append(locationBarcode, other.locationBarcode)
-        .append(project, other.project)
-        .append(qcPassed, other.qcPassed)
-        .append(receivedDate, other.receivedDate)
-        .append(sampleType, other.sampleType)
-        .append(scientificName, other.scientificName)
-        .append(taxonIdentifier, other.taxonIdentifier)
-        .isEquals();
+    return new EqualsBuilder().appendSuper(super.equals(obj)).append(accession, other.accession).append(getAlias(), other.getAlias())
+        .append(description, other.description).append(identificationBarcode, other.identificationBarcode)
+        .append(locationBarcode, other.locationBarcode).append(project, other.project).append(qcPassed, other.qcPassed)
+        .append(receivedDate, other.receivedDate).append(sampleType, other.sampleType).append(scientificName, other.scientificName)
+        .append(taxonIdentifier, other.taxonIdentifier).isEquals();
   }
 
 }

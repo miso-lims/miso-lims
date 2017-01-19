@@ -212,16 +212,16 @@ VALUES (1,12),(2,11),(3,10),(4,9),(5,8),(6,7),(7,6),(8,5),(9,4),(10,3),(11,2),(1
 
 DELETE FROM `Pool`;
 INSERT INTO `Pool`(`poolId`, `concentration`, `identificationBarcode`, `name`, `description`, `creationDate`, `securityProfile_profileId`, `experiment_experimentId`, `platformType`, `ready`, `alias`, `qcPassed`, `boxPositionId`) 
-VALUES (1,2,'IPO1::Illumina','IPO1','TEST','2015-08-27',2,1,'Illumina',1,'Pool 1',NULL,201),
-(2,2,'IPO2::Illumina','IPO2','TEST','2015-08-27',3,NULL,'Illumina',1,'Pool 2',NULL,202),
-(3,2,'IPO3::Illumina','IPO3','TEST','2015-08-27',4,NULL,'Illumina',1,'Pool 3',NULL,203),
-(4,2,'IPO4::Illumina','IPO4','TEST','2015-08-27',5,NULL,'Illumina',1,'Pool 4',NULL,204),
-(5,2,'IPO5::Illumina','IPO5','TEST','2015-08-27',6,NULL,'Illumina',1,'Pool 5',NULL,205),
-(6,2,'IPO6::Illumina','IPO6','TEST','2015-08-27',7,NULL,'Illumina',0,'Pool 6',NULL,206),
-(7,2,'IPO7::Illumina','IPO7','TEST','2015-08-27',8,NULL,'Illumina',0,'Pool 7',NULL,207),
-(8,2,'IPO8::Illumina','IPO8','TEST','2015-08-27',9,NULL,'Illumina',0,'Pool 8',NULL,208),
-(9,2,'IPO9::Illumina','IPO9','TEST','2015-08-27',10,NULL,'Illumina',0,'Pool 9',NULL,209),
-(10,2,'IPO10::Illumina','IPO10','TEST','2015-08-27',11,NULL,'Illumina',0,'Pool 10',NULL,210);
+VALUES (1,2,'IPO1::Illumina','IPO1','TEST','2015-08-27',2,1,'ILLUMINA',1,'Pool 1',NULL,201),
+(2,2,'IPO2::Illumina','IPO2','TEST','2015-08-27',3,NULL,'ILLUMINA',1,'Pool 2',NULL,202),
+(3,2,'IPO3::Illumina','IPO3','TEST','2015-08-27',4,NULL,'ILLUMINA',1,'Pool 3',NULL,203),
+(4,2,'IPO4::Illumina','IPO4','TEST','2015-08-27',5,NULL,'ILLUMINA',1,'Pool 4',NULL,204),
+(5,2,'IPO5::Illumina','IPO5','TEST','2015-08-27',6,NULL,'ILLUMINA',1,'Pool 5',NULL,205),
+(6,2,'IPO6::Illumina','IPO6','TEST','2015-08-27',7,NULL,'ILLUMINA',0,'Pool 6',NULL,206),
+(7,2,'IPO7::Illumina','IPO7','TEST','2015-08-27',8,NULL,'ILLUMINA',0,'Pool 7',NULL,207),
+(8,2,'IPO8::Illumina','IPO8','TEST','2015-08-27',9,NULL,'ILLUMINA',0,'Pool 8',NULL,208),
+(9,2,'IPO9::Illumina','IPO9','TEST','2015-08-27',10,NULL,'ILLUMINA',0,'Pool 9',NULL,209),
+(10,2,'IPO10::Illumina','IPO10','TEST','2015-08-27',11,NULL,'ILLUMINA',0,'Pool 10',NULL,210);
 
 DELETE FROM `Pool_Elements`;
 INSERT INTO `Pool_Elements`(`pool_poolId`, `elementType`, `elementId`) 

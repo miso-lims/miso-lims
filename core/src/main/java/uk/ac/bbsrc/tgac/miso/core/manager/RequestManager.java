@@ -401,10 +401,6 @@ public interface RequestManager {
 
   public Collection<Pool> listPoolsByLibraryId(long libraryId) throws IOException;
 
-  public Collection<Pool> listPoolsBySampleId(long sampleId) throws IOException;
-
-  public Collection<PoolQC> listAllPoolQCsByPoolId(long poolId) throws IOException;
-
   /**
    * Obtain a list of all the Studys the user has access to. Access is defined as either read or write access.
    */
@@ -497,8 +493,6 @@ public interface RequestManager {
   public void deleteSampleQC(SampleQC sampleQc) throws IOException;
 
   public void deleteLibraryQC(LibraryQC libraryQc) throws IOException;
-
-  public void deletePoolQC(PoolQC poolQc) throws IOException;
 
   public void deleteLibraryDilution(LibraryDilution dilution) throws IOException;
 
@@ -607,4 +601,7 @@ public interface RequestManager {
 
   void removeProjectWatcher(Project project, User watcher) throws IOException;
 
+  public void addPoolWatcher(Pool pool, User watcher) throws IOException;
+
+  public void removePoolWatcher(Pool pool, User watcher) throws IOException;
 }

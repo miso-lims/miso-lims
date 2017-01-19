@@ -67,6 +67,7 @@ import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
+import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
 import uk.ac.bbsrc.tgac.miso.core.store.RunQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerReferenceStore;
@@ -104,7 +105,7 @@ public class SQLBoxDAOTest extends AbstractDAOTest {
   @Mock
   private HibernateSampleDao sampleDao;
   @Mock
-  private SQLPoolDAO poolDao;
+  private PoolStore poolDao;
 
   @InjectMocks
   private SQLBoxDAO dao;
@@ -220,7 +221,6 @@ public class SQLBoxDAOTest extends AbstractDAOTest {
 
   @Test
   public void testEmptyAllTubes() throws Exception {
-    when(poolDao.getByPositionId(1)).thenReturn(new PoolImpl(new UserImpl()));
     when(poolDao.getByBarcode(null)).thenReturn(new PoolImpl(new UserImpl()));
     Box box = dao.get(1);
 
@@ -232,7 +232,6 @@ public class SQLBoxDAOTest extends AbstractDAOTest {
 
   @Test
   public void testEmptySingleTube() throws Exception {
-    when(poolDao.getByPositionId(1)).thenReturn(new PoolImpl(new UserImpl()));
     when(poolDao.getByBarcode(null)).thenReturn(new PoolImpl(new UserImpl()));
 
     Box box = dao.get(1);

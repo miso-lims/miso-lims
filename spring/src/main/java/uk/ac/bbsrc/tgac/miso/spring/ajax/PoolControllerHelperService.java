@@ -693,7 +693,6 @@ public class PoolControllerHelperService {
         return JSONUtils.SimpleJSONError("No such element.");
       }
       pool.getPoolableElements().add(target);
-      pool.setLastModified(new Date());
       pool.setLastModifier(user);
       requestManager.savePool(pool);
       return JSONUtils.SimpleJSONResponse("Pool modified.");
@@ -721,7 +720,6 @@ public class PoolControllerHelperService {
       }
       if (target != null) {
         pool.getPoolableElements().remove(target);
-        pool.setLastModified(new Date());
         pool.setLastModifier(user);
         requestManager.savePool(pool);
       }

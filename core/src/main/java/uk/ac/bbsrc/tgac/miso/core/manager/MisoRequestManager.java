@@ -38,13 +38,13 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Lists;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractProject;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractRun;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
@@ -77,6 +77,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
@@ -128,6 +130,9 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
  */
 public class MisoRequestManager implements RequestManager {
   protected static final Logger log = LoggerFactory.getLogger(MisoRequestManager.class);
+
+  @Value("${miso.autoGenerateIdentificationBarcodes}")
+  private Boolean autoGenerateIdBarcodes;
 
   @Autowired
   private AlertStore alertStore;
@@ -312,7 +317,7 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public Collection<Pool> listAllPoolsBySearch(String query) throws IOException {
     if (poolStore != null) {
-      return poolStore.listBySearch(query);
+      return poolStore.listAllByCriteria(null, query, null, false);
     } else {
       throw new IOException("No poolStore available. Check that it has been declared in the Spring config.");
     }
@@ -321,7 +326,7 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public Collection<Pool> listAllPoolsWithLimit(int limit) throws IOException {
     if (poolStore != null) {
-      return poolStore.listAllPoolsWithLimit(limit);
+      return poolStore.listAllByCriteria(null, null, limit, false);
     } else {
       throw new IOException("No poolStore available. Check that it has been declared in the Spring config.");
     }
@@ -623,7 +628,7 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public Collection<Pool> listAllPoolsByPlatform(PlatformType platformType) throws IOException {
     if (poolStore != null) {
-      return poolStore.listAllByPlatform(platformType);
+      return poolStore.listAllByCriteria(platformType, null, null, false);
     } else {
       throw new IOException("No poolStore available. Check that it has been declared in the Spring config.");
     }
@@ -633,7 +638,7 @@ public class MisoRequestManager implements RequestManager {
   public Collection<Pool> listAllPoolsByPlatformAndSearch(PlatformType platformType, String query)
       throws IOException {
     if (poolStore != null) {
-      return poolStore.listAllByPlatformAndSearch(platformType, query);
+      return poolStore.listAllByCriteria(platformType, query, null, false);
     } else {
       throw new IOException("No poolStore available. Check that it has been declared in the Spring config.");
     }
@@ -642,7 +647,7 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public Collection<Pool> listReadyPoolsByPlatform(PlatformType platformType) throws IOException {
     if (poolStore != null) {
-      return poolStore.listReadyByPlatform(platformType);
+      return poolStore.listAllByCriteria(platformType, null, null, true);
     } else {
       throw new IOException("No poolStore available. Check that it has been declared in the Spring config.");
     }
@@ -652,7 +657,7 @@ public class MisoRequestManager implements RequestManager {
   public Collection<Pool> listReadyPoolsByPlatformAndSearch(PlatformType platformType, String query)
       throws IOException {
     if (poolStore != null) {
-      return poolStore.listReadyByPlatformAndSearch(platformType, query);
+      return poolStore.listAllByCriteria(platformType, query, null, true);
     } else {
       throw new IOException("No poolStore available. Check that it has been declared in the Spring config.");
     }
@@ -673,24 +678,6 @@ public class MisoRequestManager implements RequestManager {
       return poolStore.listByLibraryId(libraryId);
     } else {
       throw new IOException("No poolStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<Pool> listPoolsBySampleId(long sampleId) throws IOException {
-    if (poolStore != null) {
-      return poolStore.listBySampleId(sampleId);
-    } else {
-      throw new IOException("No poolStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<PoolQC> listAllPoolQCsByPoolId(long poolId) throws IOException {
-    if (poolQcStore != null) {
-      return poolQcStore.listByPoolId(poolId);
-    } else {
-      throw new IOException("No poolQcStore available. Check that it has been declared in the Spring config.");
     }
   }
 
@@ -1155,17 +1142,6 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public void deletePoolQC(PoolQC poolQc) throws IOException {
-    if (poolQcStore != null) {
-      if (!poolQcStore.remove(poolQc)) {
-        throw new IOException("Unable to delete PoolQC.");
-      }
-    } else {
-      throw new IOException("No poolQcStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
   public void deleteLibraryDilution(LibraryDilution dilution) throws IOException {
     if (libraryDilutionStore != null) {
       if (!libraryDilutionStore.remove(dilution)) {
@@ -1329,7 +1305,7 @@ public class MisoRequestManager implements RequestManager {
       if (!shortNameValidation.isValid()) {
         throw new IOException("Cannot save project - invalid shortName: " + shortNameValidation.getMessage());
       }
-      if (project.getId() == AbstractProject.UNSAVED_ID) {
+      if (project.getId() == ProjectImpl.UNSAVED_ID) {
         project.setName(generateTemporaryName());
         projectStore.save(project);
         try {
@@ -1551,6 +1527,9 @@ public class MisoRequestManager implements RequestManager {
     if (poolStore != null) {
       if (pool.isDiscarded()) {
         pool.setVolume(0.0);
+      }
+      if (autoGenerateIdBarcodes && pool.getId() == PoolImpl.UNSAVED_ID) {
+        autoGenerateIdBarcode(pool);
       }
       return poolStore.save(pool);
     } else {
@@ -2501,7 +2480,7 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public Long countPoolsByPlatform(PlatformType platform) throws IOException {
     if (poolStore != null) {
-      return poolStore.countPoolsByPlatform(platform);
+      return poolStore.countPoolsBySearch(platform, null);
     } else {
       throw new IOException("No poolStore available. Check that it has been declared in the Spring config.");
     }
@@ -2530,7 +2509,7 @@ public class MisoRequestManager implements RequestManager {
   public List<Pool> getPoolsByPageAndSize(int offset, int limit, String sortDir, String sortCol,
       PlatformType platform) throws IOException {
     if (poolStore != null) {
-      return poolStore.listByOffsetAndNumResults(offset, limit, sortDir, sortCol, platform);
+      return poolStore.listBySearchOffsetAndNumResultsAndPlatform(offset, limit, null, sortDir, sortCol, platform);
     } else {
       throw new IOException("No poolStore available. Check that it has been declared in the Spring config.");
     }
@@ -2736,4 +2715,19 @@ public class MisoRequestManager implements RequestManager {
     projectStore.removeWatcher(project, watcher);
   }
 
+  @Override
+  public void addPoolWatcher(Pool pool, User watcher) throws IOException {
+    poolStore.addWatcher(pool, watcher);
+
+  }
+
+  @Override
+  public void removePoolWatcher(Pool pool, User watcher) throws IOException {
+    poolStore.removeWatcher(pool, watcher);
+  }
+
+  public void autoGenerateIdBarcode(Pool pool) {
+    String barcode = pool.getName() + "::" + pool.getAlias();
+    pool.setIdentificationBarcode(barcode);
+  }
 }

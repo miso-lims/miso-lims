@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.eaglegenomics.simlims.core.User;
+
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.BoxChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.ExperimentChangeLog;
@@ -76,6 +78,18 @@ public class HibernateChangeLogDao implements ChangeLogStore {
     result.setSummary(changeLog.getSummary());
     result.setTime(new Date());
     result.setUser(changeLog.getUser());
+    return (Long) currentSession().save(result);
+  }
+
+  @Override
+  public Long create(String type, long entityId, String columnsChanged, String summary, User user) {
+    ChangeLogType changeLogType = ChangeLogType.get(type);
+    ChangeLog result = changeLogType.create();
+    result.setColumnsChanged(columnsChanged);
+    result.setId(entityId);
+    result.setSummary(summary);
+    result.setTime(new Date());
+    result.setUser(user);
     return (Long) currentSession().save(result);
   }
 

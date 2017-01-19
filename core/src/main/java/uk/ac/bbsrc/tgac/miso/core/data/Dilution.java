@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.util.Date;
+import java.util.Set;
 
 import org.codehaus.jackson.annotate.JsonBackReference;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
@@ -117,5 +118,9 @@ public interface Dilution extends SecurableByProfile, Barcodable, Comparable, De
   Long getPreMigrationId();
 
   void setPreMigrationId(Long preMigrationId);
+
+  Set<Pool> getPools();
+
+  void setPools(Set<Pool> pools);
 
 }

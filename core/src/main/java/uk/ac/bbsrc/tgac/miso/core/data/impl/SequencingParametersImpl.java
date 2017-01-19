@@ -35,8 +35,8 @@ public class SequencingParametersImpl implements SequencingParameters, Serializa
   private Long parametersId;
   @Column(nullable = false)
   private String name;
-  @Column(nullable = false)
-  private Long platformId;
+  @Column(nullable = false, name = "platformId")
+  private Platform platform;
   private String xpath;
   @OneToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "createdBy", nullable = false)
@@ -50,9 +50,6 @@ public class SequencingParametersImpl implements SequencingParameters, Serializa
   private Date lastUpdated;
   @Transient
   private XPathExpression expression;
-
-  @Transient
-  private Platform platform;
 
   @Override
   public int compareTo(SequencingParameters o) {
@@ -87,11 +84,6 @@ public class SequencingParametersImpl implements SequencingParameters, Serializa
   @Override
   public Platform getPlatform() {
     return platform;
-  }
-
-  @Override
-  public Long getPlatformId() {
-    return platformId;
   }
 
   @Override
@@ -143,9 +135,6 @@ public class SequencingParametersImpl implements SequencingParameters, Serializa
   @Override
   public void setPlatform(Platform platform) {
     this.platform = platform;
-    if (platform != null) {
-      platformId = platform.getId();
-    }
   }
 
   @Override

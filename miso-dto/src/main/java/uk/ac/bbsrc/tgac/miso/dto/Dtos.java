@@ -938,7 +938,7 @@ public class Dtos {
     SequencingParametersDto dto = new SequencingParametersDto();
     dto.setId(from.getId());
     dto.setName(from.getName());
-    dto.setPlatformId(from.getPlatformId());
+    dto.setPlatformId(from.getPlatform().getId());
     return dto;
   }
 
