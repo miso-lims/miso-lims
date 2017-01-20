@@ -33,13 +33,9 @@ import org.springframework.transaction.annotation.Transactional;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.store.SecurityStore;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
-import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
@@ -81,9 +77,6 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
 
   @Autowired
   private JdbcTemplate template;
-
-  @Autowired
-  private CacheManager cacheManager;
 
   @Override
   public Long addSample(final Sample sample) throws IOException {
@@ -414,15 +407,6 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
     return new HashSet<>(samples);
   }
 
-  /**
-   * Write all the non-Hibernate data from a Sample that aren't persisted manually in the controllers.
-   */
-  private void persistSqlStore(Sample sample) throws IOException {
-    // TODO: method no longer needed except for cache invalidation
-    Cache cache = cacheManager == null ? null : cacheManager.getCache(LimsUtils.noddyCamelCaseify(Project.class.getSimpleName()) + "Cache");
-    if (cache != null) cache.remove(DbUtils.hashCodeCacheKeyFor(sample.getProject().getId()));
-  }
-
   @Override
   public boolean remove(Sample t) throws IOException {
     deleteSample(t);
@@ -466,7 +450,6 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
   @Override
   public void update(Sample sample) throws IOException {
     currentSession().update(sample);
-    persistSqlStore(sample);
   }
 
   public SessionFactory getSessionFactory() {

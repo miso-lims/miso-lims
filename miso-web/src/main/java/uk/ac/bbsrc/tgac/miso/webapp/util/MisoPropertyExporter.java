@@ -74,7 +74,6 @@ public class MisoPropertyExporter extends PropertyPlaceholderConfigurer {
       }
 
       // set a system property to the base directory so that other systems can be configured based on this path
-      // e.g. ehcache DiskStores
       System.setProperty("miso.baseDirectory", baseStoragePath);
 
       Map<String, String> propchecks = MisoWebUtils.checkCorePropertiesFiles(baseStoragePath);

@@ -41,8 +41,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.store.SecurityStore;
 
-import net.sf.ehcache.CacheManager;
-
 import uk.ac.bbsrc.tgac.miso.core.event.Alert;
 import uk.ac.bbsrc.tgac.miso.core.event.impl.DefaultAlert;
 import uk.ac.bbsrc.tgac.miso.core.event.type.AlertLevel;
@@ -66,9 +64,6 @@ public class HibernateAlertDao implements AlertStore {
 
   @Autowired
   private JdbcTemplate template;
-
-  @Autowired
-  private CacheManager cacheManager;
 
   public SecurityStore getSecurityDao() {
     return securityDao;
@@ -96,14 +91,6 @@ public class HibernateAlertDao implements AlertStore {
 
   public void setJdbcTemplate(JdbcTemplate template) {
     this.template = template;
-  }
-
-  public CacheManager getCacheManager() {
-    return cacheManager;
-  }
-
-  public void setCacheManager(CacheManager cacheManager) {
-    this.cacheManager = cacheManager;
   }
 
   @Override
