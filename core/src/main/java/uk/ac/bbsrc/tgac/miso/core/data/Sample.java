@@ -29,7 +29,6 @@ import java.util.Date;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonTypeName;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
-import org.w3c.dom.Document;
 
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
@@ -53,7 +52,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
 @JsonTypeName("sample")
 @JsonIgnoreProperties({ "securityProfile", "submissionDocument", "children", "parent" })
-public interface Sample extends SecurableByProfile, Submittable<Document>, Locatable, Reportable, Comparable<Sample>, Deletable, Boxable {
+public interface Sample extends SecurableByProfile, Locatable, Reportable, Comparable<Sample>, Deletable, Boxable {
 
   /** Field UNSAVED_ID */
   public static final Long UNSAVED_ID = 0L;

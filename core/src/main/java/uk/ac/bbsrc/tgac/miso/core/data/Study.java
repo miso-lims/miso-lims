@@ -29,7 +29,6 @@ import org.codehaus.jackson.annotate.JsonBackReference;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
-import org.w3c.dom.Document;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -45,7 +44,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 @JsonIgnoreProperties({ "securityProfile" })
-public interface Study extends SecurableByProfile, Submittable<Document>, Comparable, Deletable, Nameable {
+public interface Study extends SecurableByProfile, Comparable, Deletable, Nameable {
 
   /** Field PREFIX */
   public static final String PREFIX = "STU";

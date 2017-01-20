@@ -377,9 +377,6 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   }
 
   @Override
-  public abstract void buildSubmission();
-
-  @Override
   public abstract void buildReport();
 
   @Override

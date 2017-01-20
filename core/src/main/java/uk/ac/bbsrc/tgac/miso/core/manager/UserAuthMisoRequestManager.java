@@ -325,11 +325,7 @@ public class UserAuthMisoRequestManager implements RequestManager {
 
   @Override
   public long saveSubmission(Submission submission) throws IOException {
-    if (writeCheck(submission)) {
-      return backingManager.saveSubmission(submission);
-    } else {
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot write to this Submission");
-    }
+    return backingManager.saveSubmission(submission);
   }
 
   // gets
@@ -542,9 +538,7 @@ public class UserAuthMisoRequestManager implements RequestManager {
 
   @Override
   public Submission getSubmissionById(long submissionId) throws IOException {
-    Submission o = backingManager.getSubmissionById(submissionId);
-    if (readCheck(o)) return o;
-    else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Submission " + submissionId);
+    return backingManager.getSubmissionById(submissionId);
   }
 
   /* lists */
@@ -1212,12 +1206,9 @@ public class UserAuthMisoRequestManager implements RequestManager {
 
   @Override
   public Collection<Submission> listAllSubmissions() throws IOException {
-    User user = getCurrentUser();
     Collection<Submission> accessibles = new HashSet<>();
     for (Submission submission : backingManager.listAllSubmissions()) {
-      if (submission.userCanRead(user)) {
-        accessibles.add(submission);
-      }
+      accessibles.add(submission);
     }
     return accessibles;
   }

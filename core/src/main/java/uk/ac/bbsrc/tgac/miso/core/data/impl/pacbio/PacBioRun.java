@@ -65,15 +65,6 @@ public class PacBioRun extends RunImpl {
     setSecurityProfile(new SecurityProfile(user));
   }
 
-  @Override
-  public void buildSubmission() {
-    /*
-     * try { DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder(); submissionDocument =
-     * docBuilder.newDocument(); } catch (ParserConfigurationException e) { e.printStackTrace(); }
-     * ERASubmissionFactory.generateFullRunSubmissionXML(submissionDocument, this);
-     */
-  }
-
   /**
    * Method buildReport ...
    */

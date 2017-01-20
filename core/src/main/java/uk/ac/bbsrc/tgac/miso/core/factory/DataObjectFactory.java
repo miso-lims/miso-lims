@@ -44,7 +44,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
-import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.illumina.IlluminaPool;
@@ -154,10 +153,6 @@ public abstract class DataObjectFactory {
   public abstract SequencerReference getSequencerReference();
 
   public abstract SequencerServiceRecord getSequencerServiceRecord();
-
-  public abstract Submission getSubmission();
-
-  public abstract Submission getSubmission(User user);
 
   public abstract Box getBox();
 

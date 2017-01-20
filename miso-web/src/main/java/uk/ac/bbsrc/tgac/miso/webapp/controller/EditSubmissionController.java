@@ -33,7 +33,6 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -44,7 +43,6 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
@@ -53,7 +51,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
-import uk.ac.bbsrc.tgac.miso.core.data.Submittable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubmissionImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunException;
 import uk.ac.bbsrc.tgac.miso.core.exception.SubmissionException;
@@ -131,15 +128,6 @@ public class EditSubmissionController {
     return experimentService.listAll();
   }
 
-  @ModelAttribute("availableElements")
-  public Collection<Submittable> populateElements() throws IOException {
-    ArrayList<Submittable> list = new ArrayList<>();
-    list.addAll(populateSamples());
-    list.addAll(populateStudies());
-    list.addAll(populateExperiments());
-    return list;
-  }
-
   @RequestMapping(value = "/new", method = RequestMethod.GET)
   public ModelAndView newSubmission(ModelMap model) throws IOException {
     return setupForm(Submission.UNSAVED_ID, model);
@@ -150,8 +138,7 @@ public class EditSubmissionController {
     try {
       Submission submission = null;
       if (submissionId == Submission.UNSAVED_ID) {
-        User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-        submission = new SubmissionImpl(user);
+        submission = new SubmissionImpl();
         model.put("title", "New Submission");
       } else {
         submission = requestManager.getSubmissionById(submissionId);

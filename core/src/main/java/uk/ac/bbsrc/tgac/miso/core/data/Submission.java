@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.util.Date;
+import java.util.Map;
 import java.util.Set;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
@@ -31,9 +32,6 @@ import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 import uk.ac.bbsrc.tgac.miso.core.data.type.SubmissionActionType;
-import uk.ac.bbsrc.tgac.miso.core.exception.SubmissionException;
-import uk.ac.bbsrc.tgac.miso.core.manager.SubmissionManager;
-import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
  * Created by IntelliJ IDEA. User: davey Date: 10-Feb-2010 Time: 09:43:30
@@ -41,7 +39,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 @JsonIgnoreProperties({ "securityProfile" })
-public interface Submission<I, O, R> extends Submittable<O>, SecurableByProfile, Nameable, Comparable {
+public interface Submission extends Nameable, Comparable {
 
   public static final Long UNSAVED_ID = 0L;
 
@@ -81,17 +79,23 @@ public interface Submission<I, O, R> extends Submittable<O>, SecurableByProfile,
 
   public void setCompleted(boolean completed);
 
-  public void addSubmissionElement(I i);
-
-  public Set<Submittable<O>> getSubmissionElements();
-
   public SubmissionActionType getSubmissionActionType();
 
   public void setSubmissionActionType(SubmissionActionType submissionActionType);
 
-  public R submit(SubmissionManager<I, O, R> manager) throws SubmissionException;
+  Set<Sample> getSamples();
 
-  Date getLastUpdated();
+  void setSamples(Set<Sample> samples);
 
-  void setLastUpdated(Date lastUpdated);
+  Set<Study> getStudies();
+
+  void setStudies(Set<Study> studies);
+
+  Set<Experiment> getExperiments();
+
+  void setExperiments(Set<Experiment> experiments);
+
+  Map<Dilution, SequencerPoolPartition> getDilutions();
+
+  void setDilutions(Map<Dilution, SequencerPoolPartition> dilutions);
 }
