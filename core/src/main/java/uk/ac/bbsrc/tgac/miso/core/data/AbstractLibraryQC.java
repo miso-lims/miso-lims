@@ -72,12 +72,12 @@ public abstract class AbstractLibraryQC extends AbstractQC implements LibraryQC 
   }
 
   @Override
-  public int getInsertSize() {
+  public Integer getInsertSize() {
     return insertSize;
   }
 
   @Override
-  public void setInsertSize(int insertSize) {
+  public void setInsertSize(Integer insertSize) {
     this.insertSize = insertSize;
   }
 
