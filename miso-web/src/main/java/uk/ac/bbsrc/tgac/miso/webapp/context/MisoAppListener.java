@@ -27,7 +27,6 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 
@@ -60,13 +59,10 @@ import uk.ac.bbsrc.tgac.miso.core.event.manager.RunAlertManager;
 import uk.ac.bbsrc.tgac.miso.core.factory.issuetracker.IssueTrackerFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoRequestManager;
-import uk.ac.bbsrc.tgac.miso.core.manager.PrintManager;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.generation.NameGenerator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.resolvers.NamingSchemeResolverService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.NameValidator;
-import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService;
-import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
 import uk.ac.bbsrc.tgac.miso.core.store.RunQcStore;
@@ -130,22 +126,6 @@ public class MisoAppListener implements ServletContextListener {
     System.setProperty("java.awt.headless", "true");
 
     initializeNamingSchemes(context, misoProperties);
-
-    // set up printers
-    PrintManager<?, ?> printManager = (PrintManager<?, ?>) context.getBean("printManager");
-    Collection<PrintContext> pcs = printManager.getPrintContexts();
-    for (PrintContext<?> pc : pcs) {
-      log.info(pc.getName() + " : " + pc.getDescription());
-    }
-
-    try {
-      Collection<MisoPrintService> mpss = printManager.listAllPrintServices();
-      for (MisoPrintService<?, ?, ?> mps : mpss) {
-        log.info("Got print service: " + mps.toString());
-      }
-    } catch (Exception e) {
-      log.error("Could not list print services. This does not bode well for printing.", e);
-    }
 
     // set up alerting
     if ("true".equals(misoProperties.get("miso.alerting.enabled"))) {

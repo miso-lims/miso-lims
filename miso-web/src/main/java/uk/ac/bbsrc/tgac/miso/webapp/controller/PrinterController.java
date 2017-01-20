@@ -24,28 +24,23 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Queue;
 
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.node.ArrayNode;
+import org.codehaus.jackson.node.ObjectNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
-
-import uk.ac.bbsrc.tgac.miso.core.data.PrintJob;
-import uk.ac.bbsrc.tgac.miso.core.manager.PrintManager;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
-import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService;
+import uk.ac.bbsrc.tgac.miso.core.service.printing.Backend;
+import uk.ac.bbsrc.tgac.miso.core.service.printing.Driver;
+import uk.ac.bbsrc.tgac.miso.service.PrinterService;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.controller
@@ -61,57 +56,32 @@ public class PrinterController {
   protected static final Logger log = LoggerFactory.getLogger(PrinterController.class);
 
   @Autowired
-  private SecurityManager securityManager;
+  private PrinterService printerService;
 
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
+  public void setPrinterService(PrinterService printerService) {
+    this.printerService = printerService;
   }
 
-  @Autowired
-  private RequestManager requestManager;
-
-  public void setRequestManager(uk.ac.bbsrc.tgac.miso.core.manager.RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
-
-  @Autowired
-  private PrintManager<MisoPrintService, Queue<?>> printManager;
-
-  public void setPrintManager(PrintManager<MisoPrintService, Queue<?>> printManager) {
-    this.printManager = printManager;
-  }
-
-  @RequestMapping(value = "/admin/configuration/printers", method = RequestMethod.GET)
+  @RequestMapping(value = "/printers", method = RequestMethod.GET)
   public ModelAndView view(ModelMap model) throws IOException {
-    model.put("barcodePrinters", printManager.listAllPrintServices());
+    model.put("printers", printerService.getAll());
+    ObjectMapper mapper = new ObjectMapper();
+    ArrayNode backends = mapper.createArrayNode();
+    for (Backend backend : Backend.values()) {
+      ObjectNode node = mapper.createObjectNode();
+      node.put("name", backend.name());
+      node.put("id", backend.ordinal());
+      ArrayNode configurationKeys = mapper.createArrayNode();
+      for (String key : backend.getConfigurationKeys()) {
+        configurationKeys.add(key);
+      }
+      node.put("configurationKeys", configurationKeys);
+      backends.add(node);
+    }
+    model.put("backendsJSON", mapper.writeValueAsString(backends));
+    model.put("backends", Backend.values());
+    model.put("drivers", Driver.values());
     model.put("title", "Configure Printers");
-    return new ModelAndView("/pages/viewPrinters.jsp", model);
-  }
-
-  @RequestMapping(value = "/admin/configuration/printers/barcode/{printerId}", method = RequestMethod.GET)
-  public ModelAndView viewBarcodePrinter(@PathVariable(value = "printerId") String printerId, ModelMap model) throws IOException {
-    try {
-      MisoPrintService ps = printManager.getPrintService(printerId);
-      model.put("barcodePrinter", ps);
-
-      Collection<? extends PrintJob> jobs = printManager.listPrintJobsByPrintService(ps);
-      model.put("printJobs", jobs);
-    } catch (IOException e) {
-      log.error("view barcode printer", e);
-    }
-    return new ModelAndView("/pages/viewPrinters.jsp", model);
-  }
-
-  @RequestMapping(value = "/printjobs", method = RequestMethod.GET)
-  public ModelAndView myPrintJobs(ModelMap model) throws IOException {
-    try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Collection<? extends PrintJob> jobs = printManager.listPrintJobsByUser(user);
-      model.put("userPrintJobs", jobs);
-      model.put("title", "Print Jobs");
-    } catch (Exception e) {
-      log.error("my print jobs", e);
-    }
     return new ModelAndView("/pages/viewPrinters.jsp", model);
   }
 }

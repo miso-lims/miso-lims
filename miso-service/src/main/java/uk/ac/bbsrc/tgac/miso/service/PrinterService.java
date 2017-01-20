@@ -21,27 +21,26 @@
  * *********************************************************************
  */
 
-package uk.ac.bbsrc.tgac.miso.core.data;
+package uk.ac.bbsrc.tgac.miso.service;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
 
-/**
- * An annotation to describe and collate, at runtime, those model elements that can be printed via a barcode printer.
- * <p/>
- * This annotation is different from the {@link Barcodable} interface in that elements annotated with PrintableBarcode are scanned for and
- * loaded at runtime by the google-code {@link org.reflections.Reflections} system.
- * 
- * 
- * @author Rob Davey
- * @date 16/04/12
- * @since 0.1.6
- */
-@Documented
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.TYPE })
-public @interface PrintableBarcode {
+import uk.ac.bbsrc.tgac.miso.core.data.Printer;
+
+public interface PrinterService {
+
+  public long create(Printer printer) throws IOException;
+
+  public Printer get(long printerId) throws IOException;
+
+  public Collection<Printer> getAll() throws IOException;
+
+  public List<Printer> getEnabled() throws IOException;
+
+  public void remove(Printer printer) throws IOException;
+
+  public long update(Printer printer) throws IOException;
+
 }

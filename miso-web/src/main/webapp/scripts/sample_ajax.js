@@ -590,7 +590,6 @@ Sample.barcode = {
       'printerControllerHelperService',
       'listAvailableServices',
       {
-        'serviceClass': 'uk.ac.bbsrc.tgac.miso.core.data.Sample',
         'url': ajaxurl
       },
       {
@@ -612,7 +611,7 @@ Sample.barcode = {
                   'sampleControllerHelperService',
                   'printSampleBarcodes',
                   {
-                    'serviceName': jQuery('#serviceSelect').val(),
+                    'printerId': jQuery('#serviceSelect').val(),
                     'samples': samples,
                     'url': ajaxurl
                   },

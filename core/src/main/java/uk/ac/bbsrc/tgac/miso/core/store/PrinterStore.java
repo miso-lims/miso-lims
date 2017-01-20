@@ -21,23 +21,9 @@
  * *********************************************************************
  */
 
-package uk.ac.bbsrc.tgac.miso.core.service.printing;
+package uk.ac.bbsrc.tgac.miso.core.store;
 
-import java.util.Collection;
+import uk.ac.bbsrc.tgac.miso.core.data.Printer;
 
-import uk.ac.bbsrc.tgac.miso.core.service.printing.schema.BarcodableSchema;
-
-/**
- * uk.ac.bbsrc.tgac.miso.core.service.integration
- * <p/>
- * Info
- * 
- * @author Rob Davey
- * @date 13/04/12
- * @since 0.1.6
- */
-public interface BarcodableSchemaResolverService {
-  BarcodableSchema getBarcodableSchema(String name);
-
-  Collection<BarcodableSchema> getBarcodableSchemas();
+public interface PrinterStore extends Store<Printer>, Remover<Printer> {
 }

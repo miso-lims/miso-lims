@@ -577,7 +577,6 @@ Library.barcode = {
       'printerControllerHelperService',
       'listAvailableServices',
       {
-        'serviceClass': 'uk.ac.bbsrc.tgac.miso.core.data.Library',
         'url': ajaxurl
       },
       {
@@ -599,7 +598,7 @@ Library.barcode = {
                   'libraryControllerHelperService',
                   'printLibraryBarcodes',
                   {
-                    'serviceName': jQuery('#serviceSelect').val(),
+                    'printerId': jQuery('#serviceSelect').val(),
                     'libraries': libraries,
                     'url': ajaxurl
                   },
@@ -654,7 +653,7 @@ Library.barcode = {
                   'libraryControllerHelperService',
                   'printLibraryDilutionBarcodes',
                   {
-                    'serviceName': jQuery('#serviceSelect').val(),
+                    'printerId': jQuery('#serviceSelect').val(),
                     'dilutions': dilutions,
                     'platform': platform,
                     'url': ajaxurl

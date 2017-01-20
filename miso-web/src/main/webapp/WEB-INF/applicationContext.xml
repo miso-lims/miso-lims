@@ -42,8 +42,6 @@
 
   <import resource="miso-config.xml" />
 
-  <import resource="print-config.xml" />
-
   <import resource="${security.method}-security-config.xml" />
 
 </beans>

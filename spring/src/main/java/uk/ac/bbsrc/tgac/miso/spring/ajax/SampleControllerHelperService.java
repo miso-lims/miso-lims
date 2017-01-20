@@ -40,10 +40,8 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
 
 import javax.imageio.ImageIO;
@@ -67,29 +65,25 @@ import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
-import uk.ac.bbsrc.tgac.miso.core.data.PrintJob;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
-import uk.ac.bbsrc.tgac.miso.core.exception.MisoPrintException;
 import uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
-import uk.ac.bbsrc.tgac.miso.core.manager.PrintManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
-import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService;
-import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.TaxonomyUtils;
+import uk.ac.bbsrc.tgac.miso.service.PrinterService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
+import uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils;
+import uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils.BarcodePrintAssister;
 
 /**
  * uk.ac.bbsrc.tgac.miso.spring.ajax
@@ -101,6 +95,38 @@ import uk.ac.bbsrc.tgac.miso.service.SampleService;
  */
 @Ajaxified
 public class SampleControllerHelperService {
+  public static final class SampleBarcodeAssister implements BarcodePrintAssister<Sample> {
+    private final RequestManager requestManager;
+
+    public SampleBarcodeAssister(RequestManager requestManager) {
+      this.requestManager = requestManager;
+    }
+    @Override
+    public Iterable<Sample> fetchAll(long projectId) throws IOException {
+      return requestManager.listAllSamplesByProjectId(projectId);
+    }
+
+    @Override
+    public Sample fetch(long id) throws IOException {
+      return requestManager.getSampleById(id);
+    }
+
+    @Override
+    public void store(Sample item) throws IOException {
+      requestManager.saveSample(item);
+    }
+
+    @Override
+    public String getGroupName() {
+      return "samples";
+    }
+
+    @Override
+    public String getIdName() {
+      return "sampleId";
+    }
+  }
+
   protected static final Logger log = LoggerFactory.getLogger(SampleControllerHelperService.class);
   @Autowired
   private SecurityManager securityManager;
@@ -113,7 +139,7 @@ public class SampleControllerHelperService {
   @Autowired
   private BarcodeFactory barcodeFactory;
   @Autowired
-  private PrintManager<MisoPrintService<?, ?, ?>, Queue<?>> printManager;
+  private PrinterService printerService;
   @Autowired
   private NamingScheme namingScheme;
 
@@ -552,62 +578,7 @@ public class SampleControllerHelperService {
   }
 
   public JSONObject printSampleBarcodes(HttpSession session, JSONObject json) {
-    try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-
-      String serviceName = null;
-      if (json.has("serviceName")) {
-        serviceName = json.getString("serviceName");
-      }
-
-      MisoPrintService<File, Barcodable, PrintContext<File>> mps = null;
-      if (serviceName == null) {
-        Collection<MisoPrintService> services = printManager.listPrintServicesByBarcodeableClass(Sample.class);
-        if (services.size() == 1) {
-          mps = services.iterator().next();
-          if (mps == null) {
-            return JSONUtils
-                .SimpleJSONError("Unable to resolve a print service for Samples. A service seems to be recognised but cannot be resolved.");
-          }
-        } else {
-          return JSONUtils
-              .SimpleJSONError("No serviceName specified, but more than one available service able to print this barcode type.");
-        }
-      } else {
-        mps = printManager.getPrintService(serviceName);
-        if (mps == null) {
-          return JSONUtils.SimpleJSONError("Unable to resolve a print service for Samples with the name '" + serviceName + "'.");
-        }
-      }
-
-      Queue<File> thingsToPrint = new LinkedList<>();
-      JSONArray ss = JSONArray.fromObject(json.getString("samples"));
-      for (JSONObject s : (Iterable<JSONObject>) ss) {
-        try {
-          Long sampleId = s.getLong("sampleId");
-          Sample sample = requestManager.getSampleById(sampleId);
-          // autosave the barcode if none has been previously generated
-          if (isStringEmptyOrNull(sample.getIdentificationBarcode())) {
-            sample.setLastModifier(user);
-            requestManager.saveSample(sample);
-          }
-          File f = mps.getLabelFor(sample);
-          if (f != null) thingsToPrint.add(f);
-        } catch (IOException e) {
-          log.error("printing barcodes", e);
-          return JSONUtils.SimpleJSONError("Error printing barcodes: " + e.getMessage());
-        }
-      }
-
-      PrintJob pj = printManager.print(thingsToPrint, mps.getName(), user);
-      return JSONUtils.SimpleJSONResponse("Job " + pj.getId() + " : Barcodes printed.");
-    } catch (MisoPrintException e) {
-      log.error("printing barcodes", e);
-      return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
-    } catch (IOException e) {
-      log.error("printing barcodes", e);
-      return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
-    }
+    return ControllerHelperServiceUtils.printBarcodes(printerService, json, new SampleBarcodeAssister(requestManager));
   }
 
   public JSONObject changeSampleLocation(HttpSession session, JSONObject json) {
@@ -789,8 +760,8 @@ public class SampleControllerHelperService {
     this.misoFileManager = misoFileManager;
   }
 
-  public void setPrintManager(PrintManager<MisoPrintService<?, ?, ?>, Queue<?>> printManager) {
-    this.printManager = printManager;
+  public void setPrinterService(PrinterService printerService) {
+    this.printerService = printerService;
   }
 
   public void setSampleNamingScheme(NamingScheme namingScheme) {

@@ -155,6 +155,44 @@ JOIN User u ON u.userId = w.userId;
 
 DROP TABLE Watcher;
 
+CREATE TABLE `Printer` (
+  `printerId` bigint(20) NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  `driver` varchar(20) NOT NULL,
+  `backend` varchar(20) NOT NULL,
+  `configuration` varchar(1024),
+  `enabled` boolean NOT NULL DEFAULT '1',
+  PRIMARY KEY (`printerId`),
+  CONSTRAINT printer_name UNIQUE(name)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO Printer (name, driver, backend, configuration, enabled)
+  SELECT DISTINCT
+    MIN(serviceName),
+    CASE contextName
+      WHEN 'brady1DBarcodeLabelSchema' THEN 'BRADY_1D'
+      WHEN 'bradyStandardTubeBarcodeLabelSchema' THEN 'BRADY_STANDARD'
+      WHEN 'bradyCustomStandardTubeBarcodeLabelSchema' THEN 'BRADY_STANDARD'
+      WHEN 'bradyMinus80TubeBarcodeLabelSchema' THEN 'BRADY_M80'
+      WHEN 'bradyCustomMinus80TubeBarcodeLabelSchema' THEN 'BRADY_M80'
+    END,
+    CASE printSchema
+      WHEN 'mach4-type-spool-printer' THEN 'CUPS'
+      WHEN 'mach4-type-ftp-printer' THEN 'FTP'
+    END,
+    contextFields,
+    MAX(enabled)
+  FROM PrintService
+  WHERE
+    contextName IN ('brady1DBarcodeLabelSchema', 'bradyStandardTubeBarcodeLabelSchema', 'bradyCustomStandardTubeBarcodeLabelSchema', 'bradyMinus80TubeBarcodeLabelSchema', 'bradyCustomMinus80TubeBarcodeLabelSchema')
+    AND
+    printSchema IN ('mach4-type-spool-printer', 'mach4-type-ftp-printer')
+  GROUP BY printSchema, contextName, contextFields;
+
+DROP TABLE PrintService;
+DROP TABLE PrintJob;
+
+
 ALTER TABLE BoxChangeLog ADD boxChangeLogId bigint(20) PRIMARY KEY AUTO_INCREMENT FIRST;
 ALTER TABLE BoxChangeLog MODIFY columnsChanged VARCHAR(500);
 ALTER TABLE BoxChangeLog MODIFY message LONGTEXT;

@@ -37,10 +37,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -69,35 +67,31 @@ import net.sf.json.JsonConfig;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
-import uk.ac.bbsrc.tgac.miso.core.data.PrintJob;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
-import uk.ac.bbsrc.tgac.miso.core.exception.MisoPrintException;
 import uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
-import uk.ac.bbsrc.tgac.miso.core.manager.PrintManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
-import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService;
-import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
 import uk.ac.bbsrc.tgac.miso.core.store.IndexStore;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.integration.context.ApplicationContextProvider;
+import uk.ac.bbsrc.tgac.miso.service.PrinterService;
+import uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils;
+import uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils.BarcodePrintAssister;
 
 /**
  * uk.ac.bbsrc.tgac.miso.spring.ajax
@@ -109,6 +103,74 @@ import uk.ac.bbsrc.tgac.miso.integration.context.ApplicationContextProvider;
  */
 @Ajaxified
 public class LibraryControllerHelperService {
+  public static final class LibraryDilutionBarcodeAssister implements BarcodePrintAssister<LibraryDilution> {
+    private final RequestManager requestManager;
+
+    public LibraryDilutionBarcodeAssister(RequestManager requestManager) {
+      super();
+      this.requestManager = requestManager;
+    }
+
+    @Override
+    public LibraryDilution fetch(long id) throws IOException {
+      return requestManager.getLibraryDilutionById(id);
+    }
+
+    @Override
+    public void store(LibraryDilution item) throws IOException {
+      requestManager.saveLibraryDilution(item);
+    }
+
+    @Override
+    public String getGroupName() {
+      return "dilutions";
+    }
+
+    @Override
+    public String getIdName() {
+      return "dilutionId";
+    }
+
+    @Override
+    public Iterable<LibraryDilution> fetchAll(long projectId) throws IOException {
+      return requestManager.listAllLibraryDilutionsByProjectId(projectId);
+    }
+  }
+
+  public static final class LibraryBarcodeAssister implements BarcodePrintAssister<Library> {
+    private final RequestManager requestManager;
+
+    public LibraryBarcodeAssister(RequestManager requestManager) {
+      super();
+      this.requestManager = requestManager;
+    }
+
+    @Override
+    public Library fetch(long id) throws IOException {
+      return requestManager.getLibraryById(id);
+    }
+
+    @Override
+    public void store(Library library) throws IOException {
+      requestManager.saveLibrary(library);
+    }
+
+    @Override
+    public String getGroupName() {
+      return "libraries";
+    }
+
+    @Override
+    public String getIdName() {
+      return "libraryId";
+    }
+
+    @Override
+    public Iterable<Library> fetchAll(long projectId) throws IOException {
+      return requestManager.listAllLibrariesByProjectId(projectId);
+    }
+  }
+
   protected static final Logger log = LoggerFactory.getLogger(LibraryControllerHelperService.class);
   @Autowired
   private SecurityManager securityManager;
@@ -119,7 +181,7 @@ public class LibraryControllerHelperService {
   @Autowired
   private MisoFilesManager misoFileManager;
   @Autowired
-  private PrintManager<MisoPrintService<?, ?, ?>, Queue<?>> printManager;
+  private PrinterService printerService;
   @Autowired
   private IndexStore indexStore;
   @Autowired
@@ -221,108 +283,12 @@ public class LibraryControllerHelperService {
   }
 
   public JSONObject printLibraryBarcodes(HttpSession session, JSONObject json) {
-    try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-
-      String serviceName = null;
-      if (json.has("serviceName")) {
-        serviceName = json.getString("serviceName");
-      }
-
-      MisoPrintService<File, Barcodable, PrintContext<File>> mps = null;
-      if (serviceName == null) {
-        Collection<MisoPrintService> services = printManager.listPrintServicesByBarcodeableClass(Library.class);
-        if (services.size() == 1) {
-          mps = services.iterator().next();
-        } else {
-          return JSONUtils
-              .SimpleJSONError("No serviceName specified, but more than one available service able to print this barcode type.");
-        }
-      } else {
-        mps = printManager.getPrintService(serviceName);
-      }
-
-      Queue<File> thingsToPrint = new LinkedList<>();
-
-      JSONArray ls = JSONArray.fromObject(json.getString("libraries"));
-      for (JSONObject l : (Iterable<JSONObject>) ls) {
-        try {
-          Long libraryId = l.getLong("libraryId");
-          Library library = requestManager.getLibraryById(libraryId);
-          // autosave the barcode if none has been previously generated
-          if (isStringEmptyOrNull(library.getIdentificationBarcode())) {
-            library.setLastModifier(user);
-            requestManager.saveLibrary(library);
-          }
-
-          File f = mps.getLabelFor(library);
-          if (f != null) thingsToPrint.add(f);
-        } catch (IOException e) {
-          log.error("printing barcodes", e);
-          return JSONUtils.SimpleJSONError("Error printing barcodes: " + e.getMessage());
-        }
-      }
-      PrintJob pj = printManager.print(thingsToPrint, mps.getName(), user);
-      return JSONUtils.SimpleJSONResponse("Job " + pj.getId() + " : Barcodes printed.");
-    } catch (MisoPrintException e) {
-      log.error("print barcodes", e);
-      return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
-    } catch (IOException e) {
-      log.error("print barcodes", e);
-      return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
-    }
+    return ControllerHelperServiceUtils.printBarcodes(printerService, json, new LibraryBarcodeAssister(requestManager));
   }
 
   public JSONObject printLibraryDilutionBarcodes(HttpSession session, JSONObject json) {
-    try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-
-      String serviceName = null;
-      if (json.has("serviceName")) {
-        serviceName = json.getString("serviceName");
-      }
-
-      MisoPrintService<File, Barcodable, PrintContext<File>> mps = null;
-      if (serviceName == null) {
-        Collection<MisoPrintService> services = printManager.listPrintServicesByBarcodeableClass(LibraryDilution.class);
-        if (services.size() == 1) {
-          mps = services.iterator().next();
-        } else {
-          return JSONUtils
-              .SimpleJSONError("No serviceName specified, but more than one available service able to print this barcode type.");
-        }
-      } else {
-        mps = printManager.getPrintService(serviceName);
-      }
-
-      Queue<File> thingsToPrint = new LinkedList<>();
-
-      JSONArray ls = JSONArray.fromObject(json.getString("dilutions"));
-      for (JSONObject l : (Iterable<JSONObject>) ls) {
-        try {
-          Long dilutionId = l.getLong("dilutionId");
-          LibraryDilution dilution = requestManager.getLibraryDilutionById(dilutionId);
-          // autosave the barcode if none has been previously generated
-          if (isStringEmptyOrNull(dilution.getIdentificationBarcode())) {
-            requestManager.saveLibraryDilution(dilution);
-          }
-          File f = mps.getLabelFor(dilution);
-          if (f != null) thingsToPrint.add(f);
-          thingsToPrint.add(f);
-        } catch (IOException e) {
-          log.error("print barcodes", e);
-          return JSONUtils.SimpleJSONError("Error printing barcodes: " + e.getMessage());
-        }
-      }
-      PrintJob pj = printManager.print(thingsToPrint, mps.getName(), user);
-      return JSONUtils.SimpleJSONResponse("Job " + pj.getId() + " : Barcodes printed.");
-    } catch (MisoPrintException e) {
-      log.error("print barcodes", e);
-      return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
-    } catch (IOException e) {
-      log.error("print barcodes", e);
-      return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
-    }
+    return ControllerHelperServiceUtils.printBarcodes(printerService, json,
+        new LibraryDilutionBarcodeAssister(requestManager));
   }
 
   public JSONObject changeLibraryLocation(HttpSession session, JSONObject json) {
@@ -1039,8 +1005,8 @@ public class LibraryControllerHelperService {
     this.misoFileManager = misoFileManager;
   }
 
-  public void setPrintManager(PrintManager<MisoPrintService<?, ?, ?>, Queue<?>> printManager) {
-    this.printManager = printManager;
+  public void setPrinterService(PrinterService printerService) {
+    this.printerService = printerService;
   }
 
   public void setLibraryNamingScheme(NamingScheme namingScheme) {
