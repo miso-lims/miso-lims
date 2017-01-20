@@ -49,10 +49,6 @@
       <artifactId>cglib-nodep</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.googlecode.ehcache-spring-annotations</groupId>
-      <artifactId>ehcache-spring-annotations</artifactId>
-    </dependency>
-    <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
       <scope>test</scope>
@@ -71,15 +67,6 @@
     <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>net.sf.ehcache</groupId>
-      <artifactId>ehcache</artifactId>
-      <type>pom</type>
-    </dependency>
-    <dependency>
-      <groupId>net.sf.ehcache</groupId>
-      <artifactId>ehcache-core</artifactId>
     </dependency>
     <dependency>
       <groupId>net.sf.json-lib</groupId>
@@ -210,7 +197,6 @@
           <usedDependencies>
             <usedDependency>mysql:mysql-connector-java</usedDependency>
             <usedDependency>org.flywaydb:flyway-core</usedDependency>
-            <usedDependency>net.sf.ehcache:ehcache</usedDependency>
             <usedDependency>com.h2database:h2</usedDependency>
             <usedDependency>cglib:cglib-nodep</usedDependency>
           </usedDependencies>

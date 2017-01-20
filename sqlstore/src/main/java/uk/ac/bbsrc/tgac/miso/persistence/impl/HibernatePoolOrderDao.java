@@ -12,11 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import net.sf.ehcache.CacheManager;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrderImpl;
 import uk.ac.bbsrc.tgac.miso.persistence.PoolOrderDao;
-import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)
@@ -26,13 +24,6 @@ public class HibernatePoolOrderDao implements PoolOrderDao {
 
   @Autowired
   private SessionFactory sessionFactory;
-
-  @Autowired
-  private CacheManager cacheManager;
-
-  private void invalidatePoolCache(long poolId) {
-    cacheManager.getCache("poolCache").remove(DbUtils.hashCodeCacheKeyFor(poolId));
-  }
 
   private Session currentSession() {
     return sessionFactory.getCurrentSession();
@@ -57,15 +48,12 @@ public class HibernatePoolOrderDao implements PoolOrderDao {
     poolOrder.setCreationDate(now);
     poolOrder.setLastUpdated(now);
     Long id = (Long) currentSession().save(poolOrder);
-    invalidatePoolCache(poolOrder.getPoolId());
     return id;
   }
 
   @Override
   public void deletePoolOrder(PoolOrder poolOrder) {
-    Long poolId = poolOrder.getPoolId();
     currentSession().delete(poolOrder);
-    invalidatePoolCache(poolId);
   }
 
   @Override
@@ -73,7 +61,6 @@ public class HibernatePoolOrderDao implements PoolOrderDao {
     Date now = new Date();
     poolOrder.setLastUpdated(now);
     currentSession().update(poolOrder);
-    invalidatePoolCache(poolOrder.getPoolId());
   }
 
   @Override

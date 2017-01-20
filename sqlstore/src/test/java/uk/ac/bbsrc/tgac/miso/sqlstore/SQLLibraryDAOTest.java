@@ -28,8 +28,6 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.store.SecurityStore;
 
-import net.sf.ehcache.CacheManager;
-
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -297,8 +295,6 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
 
   @Test
   public void testRemove() throws Exception {
-    CacheManager cacheManager = null;
-
     Library library = new LibraryImpl();
     String libraryName = "LIB111";
     library.setName(libraryName);
