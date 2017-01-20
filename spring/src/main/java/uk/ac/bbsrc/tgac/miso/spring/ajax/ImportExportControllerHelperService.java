@@ -354,7 +354,7 @@ public class ImportExportControllerHelperService {
               }
 
               log.info("Added library: " + library.toString());
-              libraryService.save(library);
+              libraryService.create(library);
               if (jsonArrayElement.get(5) != null && !isStringEmptyOrNull(jsonArrayElement.getString(5))) {
                 try {
                   LibraryQC lqc = new LibraryQCImpl();
@@ -428,7 +428,7 @@ public class ImportExportControllerHelperService {
               }
 
               log.info("Added library: " + library.toString());
-              libraryService.save(library);
+              libraryService.create(library);
             }
 
             if ((library.getQcPassed() || library.getQcPassed() == null) && ("A".equals(proceedKey) || "P".equals(proceedKey))) {
@@ -447,7 +447,7 @@ public class ImportExportControllerHelperService {
                     library.addDilution(ldi);
                     log.info("Added library dilution: " + ldi.toString());
                   }
-                  dilutionService.save(ldi);
+                  dilutionService.create(ldi);
                 } catch (NumberFormatException nfe) {
                   throw new InputFormException("Supplied LibraryDilution concentration for library '" + jsonArrayElement.getString(3)
                       + "' (" + s.getAlias() + ") is invalid", nfe);
@@ -455,7 +455,7 @@ public class ImportExportControllerHelperService {
               }
 
               log.info("Added library: " + library.toString());
-              libraryService.save(library);
+              libraryService.create(library);
 
               Pattern poolPattern = Pattern.compile("^[IiUu][Pp][Oo]([0-9]*)");
               if (jsonArrayElement.get(12) != null && !isStringEmptyOrNull(jsonArrayElement.getString(12))) {
@@ -501,7 +501,7 @@ public class ImportExportControllerHelperService {
               }
 
               log.info("Added library: " + library.toString());
-              libraryService.save(library);
+              libraryService.create(library);
             }
           }
 

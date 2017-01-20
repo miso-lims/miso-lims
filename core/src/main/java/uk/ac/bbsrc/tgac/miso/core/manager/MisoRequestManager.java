@@ -132,7 +132,6 @@ public class MisoRequestManager implements RequestManager {
 
   @Value("${miso.autoGenerateIdentificationBarcodes}")
   private Boolean autoGenerateIdBarcodes;
-
   @Autowired
   private AlertStore alertStore;
   @Autowired
@@ -189,8 +188,6 @@ public class MisoRequestManager implements RequestManager {
   private LibraryDesignCodeDao libraryDesignCodeDao;
   @Autowired
   private NamingScheme namingScheme;
-  @Value("${miso.autoGenerateIdentificationBarcodes:true}")
-  private boolean autoGenerateIdBarcodes;
 
   public void setSecurityStore(SecurityStore securityStore) {
     this.securityStore = securityStore;

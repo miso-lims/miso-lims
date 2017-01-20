@@ -79,6 +79,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueProcessingImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleValidRelationshipImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
@@ -1012,10 +1013,6 @@ public class Dtos {
     return dtoSet;
   }
 
-  /**
-   * Overwrites all modifiable fields. Intended to be used with a freshly-loaded database object or newly-created impl so save and update
-   * are similar.
-   */
   public static Library to(LibraryDto from) {
     Library to = null;
     if (from instanceof DetailedLibraryDto) {
@@ -1163,6 +1160,9 @@ public class Dtos {
     } catch (ParseException e) {
       // do nothing because this shouldn't cause it to fail, and the Dtos class does not have a logger
     }
+    TargetedSequencing ts = new TargetedSequencing();
+    if (from.getTargetedSequencingId() != null) ts.setId(from.getTargetedSequencingId());
+    to.setTargetedSequencing(ts);
     return to;
   }
 

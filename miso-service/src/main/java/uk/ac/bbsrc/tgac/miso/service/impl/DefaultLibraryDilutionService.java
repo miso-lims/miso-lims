@@ -51,8 +51,7 @@ public class DefaultLibraryDilutionService implements LibraryDilutionService {
     return dilution;
   }
 
-  @Override
-  public LibraryDilution save(LibraryDilution dilution) throws IOException {
+  private LibraryDilution save(LibraryDilution dilution) throws IOException {
     dilution.setLastModifier(authorizationManager.getCurrentUser());
     try {
       Long newId = dilutionDao.save(dilution);
@@ -63,8 +62,11 @@ public class DefaultLibraryDilutionService implements LibraryDilutionService {
       if (hasTemporaryName(dilution)) {
         managed.setName(namingScheme.generateNameFor(managed));
         validateNameOrThrow(managed, namingScheme);
+        needsUpdate = true;
+      }
+      if (autoGenerateIdBarcodes && isStringEmptyOrNull(managed.getIdentificationBarcode())) {
         // if !autoGenerateIdBarcodes then the identificationBarcode is set by the user
-        if (autoGenerateIdBarcodes && isStringEmptyOrNull(managed.getIdentificationBarcode())) generateAndSetIdBarcode(managed);
+        generateAndSetIdBarcode(managed);
         needsUpdate = true;
       }
       if (needsUpdate) dilutionDao.save(managed);
@@ -81,6 +83,7 @@ public class DefaultLibraryDilutionService implements LibraryDilutionService {
   @Override
   public Long create(LibraryDilution dilution) throws IOException {
     loadChildEntities(dilution);
+    dilution.setDilutionCreator(authorizationManager.getCurrentUsername());
     if (dilution.getSecurityProfile() == null) {
       dilution.inheritPermissions(libraryDao.get(dilution.getLibrary().getId()));
     }
@@ -204,7 +207,6 @@ public class DefaultLibraryDilutionService implements LibraryDilutionService {
     if (dilution.getTargetedSequencing() != null) {
       dilution.setTargetedSequencing(targetedSequencingDao.get(dilution.getTargetedSequencing().getId()));
     }
-    dilution.setDilutionCreator(authorizationManager.getCurrentUsername());
   }
 
   /**
@@ -216,7 +218,8 @@ public class DefaultLibraryDilutionService implements LibraryDilutionService {
    */
   private void applyChanges(LibraryDilution target, LibraryDilution source) {
     target.setConcentration(source.getConcentration());
-    if (!autoGenerateIdBarcodes) target.setIdentificationBarcode(source.getIdentificationBarcode());
+    target.setTargetedSequencing(source.getTargetedSequencing());
+    target.setIdentificationBarcode(source.getIdentificationBarcode());
   }
 
   public void setDilutionDao(LibraryDilutionStore dilutionDao) {

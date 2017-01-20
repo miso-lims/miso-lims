@@ -395,7 +395,6 @@ public class DefaultMigrationTarget implements MigrationTarget {
 
   private void copyTimestampsFromChangelog(Library library) {
     Date earliest = getEarliestChangeDate(library);
-    Date latest = getLatestChangeDate(library);
     library.setCreationDate(earliest);
   }
 
@@ -427,8 +426,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
 
       if (ldi.getLibrary().getId() == LibraryDilution.UNSAVED_ID && ((DetailedLibrary) ldi.getLibrary()).getPreMigrationId() != null) {
         Long preMigrationId = ((DetailedLibrary) ldi.getLibrary()).getPreMigrationId();
-        ldi.setLibrary(serviceManager.getLibraryDao()
-            .get(serviceManager.getLibraryDao().getByPreMigrationId(preMigrationId).getId()));
+        ldi.setLibrary(serviceManager.getLibraryDao().getByPreMigrationId(preMigrationId));
         if (ldi.getLibrary() == null) {
           throw new IOException("No Library found with pre-migration ID " + preMigrationId);
         }

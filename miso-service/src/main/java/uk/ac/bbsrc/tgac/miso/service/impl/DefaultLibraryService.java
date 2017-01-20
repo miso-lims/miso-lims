@@ -38,12 +38,14 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryQcException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.IndexStore;
 import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignCodeDao;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignDao;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleDao;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
@@ -84,9 +86,7 @@ public class DefaultLibraryService implements LibraryService {
     return library;
   }
 
-  @Override
-  public Library save(Library library) throws IOException {
-    library.setLastModifier(authorizationManager.getCurrentUser());
+  private Library save(Library library) throws IOException {
     try {
       Long newId = libraryDao.save(library);
       
@@ -97,8 +97,11 @@ public class DefaultLibraryService implements LibraryService {
       if (hasTemporaryName(library)) {
         managed.setName(namingScheme.generateNameFor(managed));
         validateNameOrThrow(managed, namingScheme);
+        needsUpdate = true;
+      }
+      if (autoGenerateIdBarcodes && isStringEmptyOrNull(managed.getIdentificationBarcode())) {
         // if !autoGenerateIdBarcodes then the identificationBarcode is set by the user
-        if (autoGenerateIdBarcodes && isStringEmptyOrNull(managed.getIdentificationBarcode())) generateAndSetIdBarcode(managed);
+        generateAndSetIdBarcode(managed);
         needsUpdate = true;
       }
       if (needsUpdate) libraryDao.save(managed);
@@ -132,7 +135,7 @@ public class DefaultLibraryService implements LibraryService {
         throw new IOException("Error generating alias for library", e);
       }
     } else {
-      namingScheme.validateLibraryAlias(library.getAlias());
+      validateAliasOrThrow(library);
     }
     return save(library).getId();
   }
@@ -142,6 +145,7 @@ public class DefaultLibraryService implements LibraryService {
     Library updatedLibrary = get(library.getId());
     authorizationManager.throwIfNotWritable(updatedLibrary);
     applyChanges(updatedLibrary, library);
+    validateAliasOrThrow(updatedLibrary);
     setChangeDetails(updatedLibrary);
     loadChildEntities(updatedLibrary);
     save(updatedLibrary);
@@ -458,6 +462,9 @@ public class DefaultLibraryService implements LibraryService {
     } else {
       target.setVolume(source.getVolume());
     }
+    target.getLibraryType().setId(source.getLibraryType().getId());
+    target.getLibrarySelectionType().setId(source.getLibrarySelectionType().getId());
+    target.getLibraryStrategyType().setId(source.getLibraryStrategyType().getId());
     target.setQcPassed(source.getQcPassed());
     if (isDetailedLibrary(target)) {
       DetailedLibrary dSource = (DetailedLibrary) source;
@@ -465,6 +472,17 @@ public class DefaultLibraryService implements LibraryService {
       dTarget.setPreMigrationId(dSource.getPreMigrationId());
       dTarget.setNonStandardAlias(dSource.hasNonStandardAlias());
       dTarget.setArchived(dSource.getArchived());
+      dTarget.getLibraryDesignCode().setId(dSource.getLibraryDesignCode().getId());
+      if (dSource.getLibraryDesign() != null) {
+        dTarget.getLibraryDesign().setId(dSource.getLibraryDesign().getId());
+      } else {
+        dTarget.getLibraryDesign().setId(null);
+      }
+      if (dSource.getKitDescriptor() != null) {
+      dTarget.getKitDescriptor().setId(dSource.getKitDescriptor().getId());
+      } else {
+        dTarget.getKitDescriptor().setId(null);
+      }
     }
   }
 
@@ -479,14 +497,13 @@ public class DefaultLibraryService implements LibraryService {
     if (!isDetailedLibrary(library)) {
       throw new IOException("A library design can only be applied to a detailed sample.");
     }
-    LibraryDesign design = libraryDesignDao.getLibraryDesign(((DetailedLibrary) library).getLibraryDesign().getId());
+    LibraryDesign design = ((DetailedLibrary) library).getLibraryDesign();
     if (((DetailedSample) library.getSample()).getSampleClass().getId() != design.getSampleClass().getId()) {
       throw new IOException(
           "This library design is not valid for sample " + library.getSample().getName() + " because the class is not compatible.");
     }
-    ((DetailedLibrary) library).setLibraryDesign(design);
-    LibrarySelectionType selection = libraryDao.getLibrarySelectionTypeById(design.getLibrarySelectionType().getId());
-    LibraryStrategyType strategy = libraryDao.getLibraryStrategyTypeById(design.getLibraryStrategyType().getId());
+    LibrarySelectionType selection = design.getLibrarySelectionType();
+    LibraryStrategyType strategy = design.getLibraryStrategyType();
     if (library.getLibrarySelectionType() != null && library.getLibrarySelectionType().getId() != selection.getId()) {
       throw new IOException("Library selection doesn't match library design.");
     }
@@ -499,8 +516,35 @@ public class DefaultLibraryService implements LibraryService {
         && ((DetailedLibrary) library).getLibraryDesign().getLibraryDesignCode().getId() != null) {
       throw new IOException("Selected library design code does not match library design code for selected library design.");
     }
-    library.setLibrarySelectionType(selection);
-    library.setLibraryStrategyType(strategy);
+  }
+
+  /**
+   * Checks whether library's alias conforms to the naming scheme. Validation is skipped for DetailedLibraries
+   * {@code if (library.hasNonStandardAlias())}
+   * 
+   * @param library
+   * @throws IOException
+   * @throws IllegalArgumentException
+   */
+  private void validateAliasOrThrow(Library library) throws IOException {
+    validateAliasUniqueness(library);
+    if (!isDetailedLibrary(library) || !((DetailedLibrary) library).hasNonStandardAlias()) {
+      ValidationResult aliasValidation = namingScheme.validateLibraryAlias(library.getAlias());
+      if (!aliasValidation.isValid()) {
+        throw new IllegalArgumentException("Invalid library alias: '" + library.getAlias() + "' - " + aliasValidation.getMessage());
+      }
+    }
+  }
+
+  private void validateAliasUniqueness(Library library) throws IOException {
+    if (!namingScheme.duplicateLibraryAliasAllowed() && !getAllByAlias(library.getAlias()).isEmpty()) {
+      if (LimsUtils.isDetailedLibrary(library) && ((DetailedLibrary) library).hasNonStandardAlias()) {
+        // do nothing; nonstandard alias means duplicates are acceptable
+      } else {
+        // throw if duplicate aliases are not allowed (and in the case of a DetailedLibrary, if it has a standard alias
+        throw new IllegalArgumentException("NEW: A library with this alias already exists in the database");
+      }
+    }
   }
 
   public void setLibraryDao(LibraryStore libraryDao) {

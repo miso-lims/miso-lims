@@ -122,7 +122,7 @@ public class LibraryControllerHelperService {
 
     @Override
     public void store(LibraryDilution item) throws IOException {
-      dilutionService.save(item);
+      dilutionService.update(item);
     }
 
     @Override
@@ -156,7 +156,7 @@ public class LibraryControllerHelperService {
 
     @Override
     public void store(Library library) throws IOException {
-      libraryService.save(library);
+      libraryService.update(library);
     }
 
     @Override
@@ -305,7 +305,7 @@ public class LibraryControllerHelperService {
       if (newLocation != null) {
         Library library = libraryService.get(libraryId);
         library.setLocationBarcode(newLocation);
-        libraryService.save(library);
+        libraryService.update(library);
       } else {
         return JSONUtils.SimpleJSONError("New location barcode not recognised");
       }
@@ -336,10 +336,10 @@ public class LibraryControllerHelperService {
           log.debug(error);
           return JSONUtils.SimpleJSONError(error);
         }
-    }
-    Library library = libraryService.get(libraryId);
-    library.setIdentificationBarcode(idBarcode);
-    libraryService.save(library);
+      }
+      Library library = libraryService.get(libraryId);
+      library.setIdentificationBarcode(idBarcode);
+      libraryService.update(library);
     } catch (IOException e) {
       log.debug("Could not change Library identificationBarcode: " + e.getMessage());
       return JSONUtils.SimpleJSONError(e.getMessage());
@@ -460,7 +460,7 @@ public class LibraryControllerHelperService {
           List<Library> sortedList = new ArrayList<>(saveSet);
           Collections.sort(sortedList, new AliasComparator(Library.class));
           for (Library library : sortedList) {
-            libraryService.save(library);
+            libraryService.create(library);
           }
         } catch (Exception e) {
           log.error("Error saving bulk libraries", e);
@@ -878,7 +878,7 @@ public class LibraryControllerHelperService {
           }
         }
         if (json.has("idBarcode")) dilution.setIdentificationBarcode(json.getString("idBarcode"));
-        dilutionService.save(dilution);
+        dilutionService.update(dilution);
         return JSONUtils.SimpleJSONResponse("OK");
       }
     } catch (Exception e) {

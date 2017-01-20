@@ -878,7 +878,11 @@ public class EditLibraryController {
   public String processSubmit(@ModelAttribute("library") Library library, ModelMap model, SessionStatus session)
       throws IOException, MalformedLibraryException {
     try {
-      libraryService.save(library);
+      if (library.getId() == AbstractLibrary.UNSAVED_ID) {
+        libraryService.create(library);
+      } else {
+        libraryService.update(library);
+      }
 
       session.setComplete();
       model.clear();
@@ -901,12 +905,8 @@ public class EditLibraryController {
           ObjectMapper mapper = new ObjectMapper();
           LibraryDto libDto = mapper.readValue(lDto.toString(), LibraryDto.class);
           Library library = Dtos.to(libDto);
-          library.setSample(sampleService.get(libDto.getParentSampleId()));
-          library.setLibrarySelectionType(libraryService.getLibrarySelectionTypeById(libDto.getLibrarySelectionTypeId()));
-          library.setLibraryStrategyType(libraryService.getLibraryStrategyTypeById(libDto.getLibraryStrategyTypeId()));
-          library.setLibraryType(libraryService.getLibraryTypeById(libDto.getLibraryTypeId()));
 
-          Long savedId = libraryService.save(library).getId();
+          Long savedId = libraryService.create(library);
           savedLibraryIds.add(savedId);
         }
         return "redirect:/miso/library/bulk/edit/" + savedLibraryIds.toString();

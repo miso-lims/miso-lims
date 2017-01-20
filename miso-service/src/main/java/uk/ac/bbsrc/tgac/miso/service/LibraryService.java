@@ -20,8 +20,6 @@ public interface LibraryService {
 
   Library get(long libraryId) throws IOException;
 
-  Library save(Library library) throws IOException;
-
   Long create(Library library) throws IOException;
 
   void update(Library library) throws IOException;

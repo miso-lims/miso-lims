@@ -1,7 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
-import java.util.Date;
 
 import javax.ws.rs.core.Response.Status;
 
@@ -22,7 +21,6 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.dto.DilutionDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
@@ -66,8 +64,7 @@ public class LibraryDilutionRestController extends RestController {
     LibraryDilution dilution;
     try {
       dilution = Dtos.to(dilutionDto);
-      dilution.setLibrary(libraryService.get(dilutionDto.getLibrary().getId()));
-      id = populateAndSaveDilutionFromDto(dilutionDto, dilution, true);
+      id = dilutionService.create(dilution);
     } catch (ConstraintViolationException e) {
       log.error("Error while creating dilution", e);
       RestException restException = new RestException(e.getMessage(), Status.BAD_REQUEST);
@@ -79,18 +76,6 @@ public class LibraryDilutionRestController extends RestController {
     headers.setLocation(uriComponents.toUri());
     headers.set("Id", id.toString());
     return new ResponseEntity<>(headers, HttpStatus.CREATED);
-  }
-
-  private Long populateAndSaveDilutionFromDto(DilutionDto dilutionDto, LibraryDilution dilution, boolean create) throws IOException {
-    if (dilutionDto.getTargetedSequencingId() != null) {
-      dilution.setTargetedSequencing(new TargetedSequencing());
-      dilution.getTargetedSequencing().setId(dilutionDto.getTargetedSequencingId());
-    }
-    if (create) {
-      dilution.setCreationDate(new Date());
-    }
-    Long id = dilutionService.save(dilution).getId();
-    return id;
   }
 
 }

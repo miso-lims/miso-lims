@@ -67,11 +67,11 @@ public class StudyImpl implements Study, Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  @ManyToOne(targetEntity = ProjectImpl.class, cascade = CascadeType.ALL)
+  @ManyToOne(targetEntity = ProjectImpl.class)
   @JoinColumn(name = "project_projectId")
   private Project project = null;
 
-  @OneToMany(targetEntity = ExperimentImpl.class, cascade = CascadeType.ALL)
+  @OneToMany(targetEntity = ExperimentImpl.class)
   @JoinTable(name = "Study_Experiment", joinColumns = {
       @JoinColumn(name = "Study_studyId", nullable = false, updatable = false) }, inverseJoinColumns = {
           @JoinColumn(name = "experiments_experimentId", nullable = false, updatable = false) })

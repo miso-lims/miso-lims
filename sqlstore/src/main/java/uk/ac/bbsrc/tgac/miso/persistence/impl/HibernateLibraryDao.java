@@ -27,7 +27,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
-import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
@@ -38,7 +37,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 public class HibernateLibraryDao implements LibraryStore {
@@ -116,11 +114,6 @@ public class HibernateLibraryDao implements LibraryStore {
     if (library.getCreationDate() == null) library.setCreationDate(now);
     long id;
     if (library.getId() == AbstractLibrary.UNSAVED_ID) {
-      if (!namingScheme.duplicateLibraryAliasAllowed() && !listByAlias(library.getAlias()).isEmpty()
-          && (LimsUtils.isDetailedLibrary(library) && !((DetailedLibrary) library).hasNonStandardAlias())) {
-        // throw if duplicate aliases are not allowed and the library has a standard alias (detailed sample only)
-        throw new IOException("NEW: A library with this alias already exists in the database");
-      }
       id = (long) currentSession().save(library);
     } else {
       if (library.isDiscarded()) {

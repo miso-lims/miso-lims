@@ -23,7 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -46,9 +45,9 @@ public abstract class AbstractLibraryQC extends AbstractQC implements LibraryQC 
   private Double results;
 
   @Column(nullable = false)
-  private int insertSize;
+  private Integer insertSize;
 
-  @ManyToOne(targetEntity = LibraryImpl.class, cascade = CascadeType.PERSIST)
+  @ManyToOne(targetEntity = LibraryImpl.class)
   @JoinColumn(name = "library_libraryId")
   private Library library;
 

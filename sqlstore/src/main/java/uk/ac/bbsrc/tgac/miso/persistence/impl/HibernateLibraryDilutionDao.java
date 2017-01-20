@@ -13,9 +13,7 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
@@ -37,7 +35,7 @@ public class HibernateLibraryDilutionDao implements LibraryDilutionStore {
   @Override
   public long save(LibraryDilution dilution) throws IOException {
     long id;
-    if (dilution.getId() == AbstractLibrary.UNSAVED_ID) {
+    if (dilution.getId() == LibraryDilution.UNSAVED_ID) {
       id = (long) currentSession().save(dilution);
     } else {
       currentSession().update(dilution);

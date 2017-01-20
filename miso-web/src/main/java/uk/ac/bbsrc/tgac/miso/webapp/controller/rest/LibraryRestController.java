@@ -27,7 +27,6 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -132,10 +131,7 @@ public class LibraryRestController extends RestController {
     Long id = null;
     try {
       Library library = Dtos.to(libraryDto);
-      library.setCreationDate(new Date());
-      library.setSample(sampleService.get(libraryDto.getParentSampleId()));
-      library.inheritPermissions(library.getSample());
-      libraryService.save(library);
+      libraryService.create(library);
     } catch (ConstraintViolationException | IllegalArgumentException e) {
       log.error("Error while creating library. ", e);
       RestException restException = new RestException(e.getMessage(), Status.BAD_REQUEST);
@@ -163,7 +159,7 @@ public class LibraryRestController extends RestController {
       throw new RestException("No such library.", Status.NOT_FOUND);
     }
     library = Dtos.to(libraryDto);
-    libraryService.save(library);
+    libraryService.update(library);
     return new ResponseEntity<>(HttpStatus.OK);
   }
 

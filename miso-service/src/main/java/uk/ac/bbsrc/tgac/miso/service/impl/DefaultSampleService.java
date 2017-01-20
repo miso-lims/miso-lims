@@ -243,13 +243,13 @@ public class DefaultSampleService implements SampleService {
     }
     try {
       Long newId = sample.getId();
+      if (!hasTemporaryAlias(sample)) {
+        validateAlias(sample);
+      }
       if (newId == Sample.UNSAVED_ID) {
         newId = sampleDao.addSample(sample);
       } else {
         sampleDao.update(sample);
-      }
-      if (!hasTemporaryAlias(sample)) {
-        validateAlias(sample);
       }
       Sample created = sampleDao.getSample(newId);
 
@@ -257,22 +257,22 @@ public class DefaultSampleService implements SampleService {
       boolean needsUpdate = false;
       if (hasTemporaryName(sample)) {
         created.setName(namingScheme.generateNameFor(created));
-        // if !autoGenerateIdBarcodes then the identificationBarcode is set by the user
-        if (autoGenerateIdBarcodes && isStringEmptyOrNull(created.getIdentificationBarcode())) generateAndSetIdBarcode(created);
+        validateNameOrThrow(created, namingScheme);
         needsUpdate = true;
       }
       if (hasTemporaryAlias(sample)) {
         String generatedAlias = namingScheme.generateSampleAlias(created);
         validateAliasUniqueness(generatedAlias);
         created.setAlias(generatedAlias);
+        validateAlias(created);
         needsUpdate = true;
       }
-      if (isStringBlankOrNull(created.getAlias())) {
-        created.setAlias(created.getName());
+      if (autoGenerateIdBarcodes && isStringEmptyOrNull(created.getIdentificationBarcode())) {
+        // if !autoGenerateIdBarcodes then the identificationBarcode is set by the user
+        generateAndSetIdBarcode(created);
         needsUpdate = true;
       }
       if (needsUpdate) {
-        validateAlias(created);
         sampleDao.update(created);
       }
 

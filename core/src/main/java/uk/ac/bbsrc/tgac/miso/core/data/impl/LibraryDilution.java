@@ -282,7 +282,6 @@ public class LibraryDilution implements Dilution, Serializable {
     return getId() != LibraryDilution.UNSAVED_ID;
   }
 
-  @CoverageIgnore
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
@@ -299,7 +298,6 @@ public class LibraryDilution implements Dilution, Serializable {
   /**
    * Equivalency is based on getId() if set, otherwise on name, barcode, concentration, creation date, and creator userName.
    */
-  @CoverageIgnore
   @Override
   public boolean equals(Object obj) {
     if (obj == null) return false;

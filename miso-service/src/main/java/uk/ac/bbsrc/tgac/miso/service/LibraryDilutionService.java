@@ -10,8 +10,6 @@ public interface LibraryDilutionService {
 
   LibraryDilution get(long dilutionId) throws IOException;
 
-  LibraryDilution save(LibraryDilution dilution) throws IOException;
-
   Long create(LibraryDilution dilution) throws IOException;
 
   void update(LibraryDilution dilution) throws IOException;
