@@ -739,18 +739,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Sample> listAllSamplesByExperimentId(long experimentId) throws IOException {
-    User user = getCurrentUser();
-    Collection<Sample> accessibles = new HashSet<>();
-    for (Sample sample : backingManager.listAllSamplesByExperimentId(experimentId)) {
-      if (sample.userCanRead(user)) {
-        accessibles.add(sample);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
   public Collection<Sample> listSamplesByAlias(String alias) throws IOException {
     User user = getCurrentUser();
     Collection<Sample> accessibles = new HashSet<>();

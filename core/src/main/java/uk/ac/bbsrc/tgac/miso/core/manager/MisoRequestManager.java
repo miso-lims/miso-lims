@@ -496,14 +496,6 @@ public class MisoRequestManager implements RequestManager {
     }
   }
 
-  @Override
-  public Collection<Sample> listAllSamplesByExperimentId(long experimentId) throws IOException {
-    if (sampleStore != null) {
-      return sampleStore.listByExperimentId(experimentId);
-    } else {
-      throw new IOException("No sampleStore available. Check that it has been declared in the Spring config.");
-    }
-  }
 
   @Override
   public Collection<Sample> listSamplesByAlias(String alias) throws IOException {

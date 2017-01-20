@@ -37,6 +37,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToMany;
@@ -51,7 +52,6 @@ import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.JoinFormula;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
 
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
@@ -89,9 +89,6 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @JoinColumn(name = "project_projectId")
   private Project project;
 
-  @Transient
-  private final Collection<Experiment> experiments = new HashSet<>();
-
   @OneToMany(targetEntity = LibraryImpl.class, mappedBy = "sample")
   @JsonManagedReference
   private final Collection<Library> libraries = new HashSet<>();
@@ -108,10 +105,7 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @OneToMany(targetEntity = SampleChangeLog.class, mappedBy = "sample")
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
-  @Transient
-  public Document submissionDocument;
-
-  @ManyToOne(cascade = CascadeType.ALL)
+  @ManyToMany
   @JoinColumn(name = "securityProfile_profileId")
   private SecurityProfile securityProfile = null;
 
@@ -315,12 +309,6 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   public void setQcPassed(Boolean qcPassed) {
     this.qcPassed = qcPassed;
   }
-
-  /*
-   * public Document getSubmissionData() { return submissionDocument; }
-   *
-   * public void accept(SubmittableVisitor v) { v.visit(this); }
-   */
 
   @Override
   public Collection<Note> getNotes() {

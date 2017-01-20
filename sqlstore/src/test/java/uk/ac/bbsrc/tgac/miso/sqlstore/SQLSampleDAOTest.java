@@ -13,8 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.CascadeType;
-
 import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Rule;
@@ -31,7 +29,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.store.SecurityStore;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
@@ -44,11 +41,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
-import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
-import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
-import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
-import uk.ac.bbsrc.tgac.miso.core.store.SampleQcStore;
-import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleDao;
 
@@ -60,18 +52,6 @@ public class SQLSampleDAOTest extends AbstractDAOTest {
 
   @Autowired
   private JdbcTemplate template;
-  @Mock
-  private SecurityStore securityDAO;
-  @Mock
-  private Store<SecurityProfile> securityProfileDAO;
-  @Mock
-  private ChangeLogStore changeLogDAO;
-  @Mock
-  private ProjectStore projectStore;
-  @Mock
-  private LibraryStore libraryStore;
-  @Mock
-  private SampleQcStore sampleQCStore;
   @Mock
   private NamingScheme namingScheme;
 
@@ -86,7 +66,6 @@ public class SQLSampleDAOTest extends AbstractDAOTest {
     MockitoAnnotations.initMocks(this);
     dao.setSessionFactory(sessionFactory);
     dao.setJdbcTemplate(template);
-    dao.setSecurityProfileDao(securityProfileDAO);
   }
 
   @Test
@@ -113,7 +92,6 @@ public class SQLSampleDAOTest extends AbstractDAOTest {
     when(namingScheme.generateNameFor(any(Sample.class))).thenReturn(sampleName);
     when(namingScheme.validateName(anyString())).thenReturn(ValidationResult.success());
     when(namingScheme.validateSampleAlias(anyString())).thenReturn(ValidationResult.success());
-    when(securityProfileDAO.save(any(SecurityProfile.class))).thenReturn(3L);
 
     int sizeBefore = dao.listAll().size();
     long id = dao.save(sample);
@@ -183,7 +161,6 @@ public class SQLSampleDAOTest extends AbstractDAOTest {
 
   @Test
   public void testRemove() throws Exception {
-    dao.setCascadeType(CascadeType.ALL);
 
     Sample sample = dao.get(7);
 
