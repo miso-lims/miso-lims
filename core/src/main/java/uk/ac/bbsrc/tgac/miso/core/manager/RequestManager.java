@@ -272,8 +272,6 @@ public interface RequestManager {
 
   public Collection<Sample> listAllSamplesByProjectId(long projectId) throws IOException;
 
-  public Collection<Sample> listAllSamplesByExperimentId(long experimentId) throws IOException;
-
   public Collection<Sample> listSamplesByAlias(String alias) throws IOException;
 
   /**

@@ -12,7 +12,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
 
 public interface SampleDao extends SampleStore {
 
-  List<Sample> getSample() throws IOException;
+  List<Sample> getSamples() throws IOException;
 
   Sample getSample(Long id) throws IOException;
   

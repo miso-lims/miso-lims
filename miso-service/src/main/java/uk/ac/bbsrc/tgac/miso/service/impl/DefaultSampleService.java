@@ -625,7 +625,7 @@ public class DefaultSampleService implements SampleService {
 
   @Override
   public List<Sample> getAll() throws IOException {
-    Collection<Sample> allSamples = sampleDao.getSample();
+    Collection<Sample> allSamples = sampleDao.getSamples();
     return authorizationManager.filterUnreadable(allSamples);
   }
 

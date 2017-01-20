@@ -5,12 +5,8 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
-import javax.persistence.CascadeType;
 
 import org.hibernate.Criteria;
 import org.hibernate.Query;
@@ -21,8 +17,6 @@ import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.type.LongType;
-import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,20 +24,12 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
-import com.eaglegenomics.simlims.core.store.SecurityStore;
-
-import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
-import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.SiblingNumberGenerator;
-import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
-import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
-import uk.ac.bbsrc.tgac.miso.core.store.Store;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleDao;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
@@ -60,17 +46,6 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
 
   protected static final Logger log = LoggerFactory.getLogger(HibernateSampleDao.class);
-
-  private boolean autoGenerateIdentificationBarcodes;
-
-  private LibraryStore libraryDao;
-
-  private SecurityStore securityDao;
-
-  private Store<SecurityProfile> securityProfileDao;
-
-  @Autowired
-  private ChangeLogStore changeLogDao;
 
   @Autowired
   private SessionFactory sessionFactory;
@@ -106,7 +81,7 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
 
   @Override
   public int count() throws IOException {
-    return getSample().size();
+    return getSamples().size();
   }
 
   private Session currentSession() {
@@ -118,61 +93,25 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
     currentSession().delete(sample);
   }
 
-  /**
-   * Fix up a Sample loaded by Hibernate by gathering the SqlStore-persisted information and mutating the object.
-   *
-   * @returns the original object after mutation.
-   */
-  private <T extends Sample> T fetchSqlStore(T sample) throws IOException {
-    if (sample == null) return null;
-    // Now we have to reconstitute all the things that aren't covered by Hibernate.
-    sample.setSecurityProfile(securityDao.getSecurityProfileById(sample.getSecurityProfile().getProfileId()));
-
-    sample.getChangeLog().clear();
-    sample.getChangeLog().addAll(changeLogDao.listAllById("Sample", sample.getId()));
-
-    if (LimsUtils.isDetailedSample(sample)) {
-      ((DetailedSample) sample).setChildren(listByParentId(sample.getId()));
-    }
-
-    return sample;
-  }
-
-  /**
-   * Fixup a collection of Samples loaded by Hibernate. This mutates the collection's contents.
-   *
-   * @return the original collection, having had it's contents mutated
-   */
-  private <T extends Iterable<U>, U extends Sample> T fetchSqlStore(T iterable) throws IOException {
-    for (Sample s : iterable) {
-      fetchSqlStore(s);
-    }
-    return iterable;
-  }
-
   @Override
   public Sample get(long id) throws IOException {
     return getSample(id);
-  }
-
-  public boolean getAutoGenerateIdentificationBarcodes() {
-    return autoGenerateIdentificationBarcodes;
   }
 
   @Override
   public Sample getByBarcode(String barcode) throws IOException {
     Criteria criteria = currentSession().createCriteria(SampleImpl.class);
     criteria.add(Restrictions.eq("identificationBarcode", barcode));
-    return fetchSqlStore((Sample) criteria.uniqueResult());
+    return (Sample) criteria.uniqueResult();
   }
 
   @Override
   public Collection<Sample> getByBarcodeList(List<String> barcodeList) throws IOException {
-    Query query = currentSession().createQuery("from SampleImpl where identificationBarcode in (:barcodes)");
-    query.setParameterList("barcodes", barcodeList, StringType.INSTANCE);
+    Criteria criteria = currentSession().createCriteria(SampleImpl.class);
+    criteria.add(Restrictions.in("identificationBarcode", barcodeList));
     @SuppressWarnings("unchecked")
-    List<Sample> records = query.list();
-    return fetchSqlStore(records);
+    List<Sample> records = criteria.list();
+    return records;
   }
 
   @Override
@@ -180,57 +119,34 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
     if (idList.isEmpty()) {
       return Collections.emptyList();
     }
-    Query query = currentSession().createQuery("from SampleImpl where sampleId in (:ids)");
-    query.setParameterList("ids", idList, LongType.INSTANCE);
+    Criteria criteria = currentSession().createCriteria(SampleImpl.class);
+    criteria.add(Restrictions.in("sampleId", idList));
     @SuppressWarnings("unchecked")
-    List<Sample> records = query.list();
-    return fetchSqlStore(records);
-  }
-
-  @Override
-  public Boxable getByPositionId(long positionId) throws IOException {
-    Query query = currentSession().createQuery("from SampleImpl where boxPositionId = :posn");
-    query.setLong("posn", positionId);
-    return fetchSqlStore((Sample) query.uniqueResult());
-  }
-
-  public ChangeLogStore getChangeLogDao() {
-    return changeLogDao;
+    List<Sample> records = criteria.list();
+    return records;
   }
 
   public JdbcTemplate getJdbcTemplate() {
     return template;
   }
 
-  public LibraryStore getLibraryDao() {
-    return libraryDao;
-  }
-
   @Override
-  public List<Sample> getSample() throws IOException {
-    Query query = currentSession().createQuery("from SampleImpl");
+  public List<Sample> getSamples() throws IOException {
+    Criteria criteria = currentSession().createCriteria(SampleImpl.class);
     @SuppressWarnings("unchecked")
-    List<Sample> records = query.list();
-    return fetchSqlStore(records);
+    List<Sample> records = criteria.list();
+    return records;
   }
 
   @Override
   public Sample getSample(Long id) throws IOException {
-    return fetchSqlStore((Sample) currentSession().get(SampleImpl.class, id));
+    return (Sample) currentSession().get(SampleImpl.class, id);
   }
 
   @Override
   public Long countAll() throws IOException {
     Criteria criteria = currentSession().createCriteria(SampleImpl.class);
     return (Long) criteria.setProjection(Projections.rowCount()).uniqueResult();
-  }
-
-  public SecurityStore getSecurityDao() {
-    return securityDao;
-  }
-
-  public Store<SecurityProfile> getSecurityProfileDao() {
-    return securityProfileDao;
   }
 
   /**
@@ -243,16 +159,17 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
 
   @Override
   public Collection<Sample> listAll() throws IOException {
-    return getSample();
+    return getSamples();
   }
 
   @Override
   public Collection<Sample> listAllByReceivedDate(long limit) throws IOException {
-    Query query = currentSession().createQuery("from SampleImpl order by receivedDate desc");
-    query.setMaxResults((int) limit);
+    Criteria criteria = currentSession().createCriteria(SampleImpl.class);
+    criteria.addOrder(Order.desc("receivedDate"));
+    criteria.setMaxResults((int) limit);
     @SuppressWarnings("unchecked")
-    List<Sample> records = query.list();
-    return fetchSqlStore(records);
+    List<Sample> records = criteria.list();
+    return records;
   }
 
   @Override
@@ -262,38 +179,27 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
 
   @Override
   public Collection<Sample> listAllWithLimit(long limit) throws IOException {
-    Query query = currentSession().createQuery("from SampleImpl");
-    query.setMaxResults((int) limit);
+    Criteria criteria = currentSession().createCriteria(SampleImpl.class);
+    criteria.setMaxResults((int) limit);
     @SuppressWarnings("unchecked")
-    List<Sample> records = query.list();
-    return fetchSqlStore(records);
+    List<Sample> records = criteria.list();
+    return records;
   }
 
   @Override
   public boolean aliasExists(String alias) throws IOException {
-    Query query = currentSession().createQuery("from SampleImpl where alias = :alias");
-    query.setString("alias", alias);
-    @SuppressWarnings("unchecked")
-    List<Sample> records = query.list();
-    return records.size() > 0;
+    Criteria criteria = currentSession().createCriteria(SampleImpl.class);
+    criteria.add(Restrictions.eq("alias", alias));
+    return (Long) criteria.setProjection(Projections.rowCount()).uniqueResult() > 0;
   }
 
   @Override
   public Collection<Sample> listByAlias(String alias) throws IOException {
-    Query query = currentSession().createQuery("from SampleImpl where alias = :alias");
-    query.setString("alias", alias);
+    Criteria criteria = currentSession().createCriteria(SampleImpl.class);
+    criteria.add(Restrictions.eq("alias", alias));
     @SuppressWarnings("unchecked")
-    List<Sample> records = query.list();
-    return fetchSqlStore(records);
-  }
-
-  @Override
-  public Collection<Sample> listByExperimentId(long experimentId) throws IOException {
-    Query query = currentSession().createQuery("from SampleImpl where experiment.id like :id");
-    query.setLong("id", experimentId);
-    @SuppressWarnings("unchecked")
-    List<Sample> records = query.list();
-    return fetchSqlStore(records);
+    List<Sample> records = criteria.list();
+    return records;
   }
 
   /**
@@ -331,7 +237,7 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
     criteria.add(searchRestrictions(querystr));
     @SuppressWarnings("unchecked")
     List<Sample> records = criteria.list();
-    return fetchSqlStore(records);
+    return records;
   }
 
   @Override
@@ -365,12 +271,12 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
       return Collections.emptyList();
     }
     // We do this in two steps to make a smaller query that that the database can optimise
-    Criteria query = currentSession().createCriteria(SampleImpl.class);
-    query.add(Restrictions.in("id", ids));
-    query.addOrder("asc".equalsIgnoreCase(sortDir) ? Order.asc(sortCol) : Order.desc(sortCol));
-    query.createAlias("derivedInfo", "derivedInfo");
+    Criteria sampleCriteria = currentSession().createCriteria(SampleImpl.class);
+    sampleCriteria.add(Restrictions.in("id", ids));
+    sampleCriteria.addOrder("asc".equalsIgnoreCase(sortDir) ? Order.asc(sortCol) : Order.desc(sortCol));
+    sampleCriteria.createAlias("derivedInfo", "derivedInfo");
     @SuppressWarnings("unchecked")
-    List<Sample> requestedPage = fetchSqlStore(query.list());
+    List<Sample> requestedPage = sampleCriteria.list();
     return requestedPage;
   }
 
@@ -387,24 +293,7 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
     criteria.addOrder("asc".equalsIgnoreCase(sortDir.toLowerCase()) ? Order.asc(sortCol) : Order.desc(sortCol));
     @SuppressWarnings("unchecked")
     List<Sample> requestedPage = criteria.list();
-    return fetchSqlStore(requestedPage);
-  }
-
-  @Override
-  public Collection<Sample> listBySubmissionId(long submissionId) throws IOException {
-    Query query = currentSession().createQuery("from SampleImpl where submissionId like :id");
-    query.setLong("id", submissionId);
-    @SuppressWarnings("unchecked")
-    List<Sample> records = query.list();
-    return fetchSqlStore(records);
-  }
-
-  private Set<DetailedSample> listByParentId(long parentId) {
-    Query query = currentSession().createQuery("select s from SampleImpl s " + "join s.parent p " + "where p.sampleId = :id");
-    query.setLong("id", parentId);
-    @SuppressWarnings("unchecked")
-    List<DetailedSample> samples = query.list();
-    return new HashSet<>(samples);
+    return requestedPage;
   }
 
   @Override
@@ -423,28 +312,8 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
     }
   }
 
-  public void setAutoGenerateIdentificationBarcodes(boolean autoGenerateIdentificationBarcodes) {
-    this.autoGenerateIdentificationBarcodes = autoGenerateIdentificationBarcodes;
-  }
-
-  @Override
-  public void setCascadeType(CascadeType cascadeType) {
-  }
-
   public void setJdbcTemplate(JdbcTemplate template) {
     this.template = template;
-  }
-
-  public void setLibraryDao(LibraryStore libraryDao) {
-    this.libraryDao = libraryDao;
-  }
-
-  public void setSecurityDao(SecurityStore securityDao) {
-    this.securityDao = securityDao;
-  }
-
-  public void setSecurityProfileDao(Store<SecurityProfile> securityProfileDao) {
-    this.securityProfileDao = securityProfileDao;
   }
 
   @Override
@@ -473,7 +342,7 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
     criteria.add(Restrictions.or(Restrictions.ilike("externalName", str), Restrictions.ilike("alias", str)));
     @SuppressWarnings("unchecked")
     Collection<Identity> records = criteria.list();
-    return fetchSqlStore(records);
+    return records;
   }
 
   @Override
@@ -486,18 +355,13 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
     criteria.add(Restrictions.or(Restrictions.ilike("externalName", str), Restrictions.ilike("alias", str)));
     @SuppressWarnings("unchecked")
     Collection<Identity> records = criteria.list();
-    return fetchSqlStore(records);
+    return records;
   }
 
   @Override
   public Sample getByPreMigrationId(Long id) throws IOException {
-    Query query = currentSession().createQuery("FROM DetailedSampleImpl ds WHERE ds.preMigrationId = :id");
-    query.setParameter("id", id);
-    return fetchSqlStore((Sample) query.uniqueResult());
+    Criteria criteria = currentSession().createCriteria(DetailedSampleImpl.class);
+    criteria.add(Restrictions.eq("preMigrationId", id));
+    return (Sample) criteria.uniqueResult();
   }
-
-  public void setChangeLogDao(ChangeLogStore changeLogDao) {
-    this.changeLogDao = changeLogDao;
-  }
-
 }

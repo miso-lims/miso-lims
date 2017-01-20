@@ -11,6 +11,7 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -31,7 +32,7 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
   @JoinColumn(name = "parentId", nullable = true)
   private DetailedSample parent;
 
-  @Transient
+  @OneToMany(targetEntity = DetailedSampleImpl.class, mappedBy = "parent")
   private Set<DetailedSample> children = new HashSet<>();
 
   @OneToOne(targetEntity = SampleClassImpl.class)

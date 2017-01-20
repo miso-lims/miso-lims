@@ -70,7 +70,6 @@ public class DetailedSampleBuilder
   private String identificationBarcode;
   private String locationBarcode;
   private String alias;
-  private Long securityProfile_profileId;
   private User lastModifier;
   private Double volume;
   private boolean discarded = false;
@@ -133,7 +132,6 @@ public class DetailedSampleBuilder
   public DetailedSampleBuilder(User user) {
     if (user != null) {
       securityProfile = new SecurityProfile(user);
-      securityProfile_profileId = getSecurityProfile().getProfileId();
     }
   }
 

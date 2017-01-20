@@ -260,7 +260,6 @@ public class MisoServiceManager {
 
   private void updateSecurityStoreDependencies() {
     if (securityManager != null) securityManager.setSecurityStore(securityStore);
-    if (sampleDao != null) sampleDao.setSecurityDao(securityStore);
     if (poolDao != null) poolDao.setSecurityStore(securityStore);
   }
 
@@ -280,7 +279,6 @@ public class MisoServiceManager {
   }
 
   private void updateSecurityProfileDaoDependencies() {
-    if (sampleDao != null) sampleDao.setSecurityProfileDao(securityProfileDao);
   }
 
   public LocalSecurityManager getSecurityManager() {
@@ -405,13 +403,6 @@ public class MisoServiceManager {
 
   public void setDefaultSampleDao() {
     HibernateSampleDao dao = new HibernateSampleDao();
-    dao.setAutoGenerateIdentificationBarcodes(autoGenerateIdBarcodes);
-    dao.setCascadeType(null);
-    dao.setChangeLogDao(changeLogDao);
-    dao.setJdbcTemplate(jdbcTemplate);
-    dao.setLibraryDao(libraryDao);
-    dao.setSecurityDao(securityStore);
-    dao.setSecurityProfileDao(securityProfileDao);
     dao.setSessionFactory(sessionFactory);
     setSampleDao(dao);
   }
@@ -436,7 +427,6 @@ public class MisoServiceManager {
   }
 
   private void updateChangeLogDaoDependencies() {
-    if (sampleDao != null) sampleDao.setChangeLogDao(changeLogDao);
   }
 
   public HibernateSampleQcDao getSampleQcDao() {
@@ -450,7 +440,6 @@ public class MisoServiceManager {
 
   public void setDefaultSampleQcDao() {
     HibernateSampleQcDao dao = new HibernateSampleQcDao();
-    dao.setSessionFactory(sessionFactory);
     setSampleQcDao(dao);
   }
 
@@ -475,7 +464,6 @@ public class MisoServiceManager {
   }
 
   private void updateLibraryDaoDependencies() {
-    if (sampleDao != null) sampleDao.setLibraryDao(libraryDao);
     if (libraryDesignDao != null) libraryDesignDao.setLibraryDao(libraryDao);
   }
 
