@@ -130,11 +130,18 @@ public class DefaultAuthorizationManager implements AuthorizationManager {
     return filtered;
   }
 
+  /**
+   * Does not throw if owner is null (editable by anyone).
+   */
   @Override
   public void throwIfNonAdminOrMatchingOwner(User owner) throws IOException, AuthorizationException {
-    User currentUser = getCurrentUser();
-    if (!(currentUser.isAdmin() || currentUser.getUserId().equals(owner.getUserId()))) {
-      throw new AuthorizationException("Current user is not admin or owner");
+    if (owner == null) {
+      throwIfNonAdmin();
+    } else {
+      User currentUser = getCurrentUser();
+      if (!(currentUser.isAdmin() || currentUser.getUserId().equals(owner.getUserId()))) {
+        throw new AuthorizationException("Current user is not admin or owner");
+      }
     }
   }
 

@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO. If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -34,7 +34,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
-import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,8 +52,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
-import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
-import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
@@ -135,7 +132,6 @@ public class MisoRequestManager implements RequestManager {
 
   @Value("${miso.autoGenerateIdentificationBarcodes}")
   private Boolean autoGenerateIdBarcodes;
-
   @Autowired
   private AlertStore alertStore;
   @Autowired
@@ -287,6 +283,10 @@ public class MisoRequestManager implements RequestManager {
 
   public void setSubmissionStore(SubmissionStore submissionStore) {
     this.submissionStore = submissionStore;
+  }
+
+  public void setAutoGenerateIdBarcodes(boolean autoGenerateIdBarcodes) {
+    this.autoGenerateIdBarcodes = autoGenerateIdBarcodes;
   }
 
   @Override
@@ -551,33 +551,6 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Library> listAllLibrariesWithLimit(long limit) throws IOException {
-    if (libraryStore != null) {
-      return libraryStore.listAllWithLimit(limit);
-    } else {
-      throw new IOException("No libraryStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<Library> listAllLibrariesBySearch(String query) throws IOException {
-    if (libraryStore != null) {
-      return libraryStore.listBySearch(query);
-    } else {
-      throw new IOException("No libraryStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<Library> listAllLibrariesByProjectId(long projectId) throws IOException {
-    if (libraryStore != null) {
-      return libraryStore.listByProjectId(projectId);
-    } else {
-      throw new IOException("No libraryStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
   public Collection<Library> listAllLibrariesBySampleId(long sampleId) throws IOException {
     if (libraryStore != null) {
       return libraryStore.listBySampleId(sampleId);
@@ -592,15 +565,6 @@ public class MisoRequestManager implements RequestManager {
       return libraryQcStore.listByLibraryId(libraryId);
     } else {
       throw new IOException("No libraryQcStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<Library> getLibrariesByIdList(List<Long> idList) throws IOException {
-    if (libraryStore != null) {
-      return libraryStore.getByIdList(idList);
-    } else {
-      throw new IOException("No libraryStore available. Check that it has been declared in the Spring config.");
     }
   }
 
@@ -684,118 +648,9 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<LibraryType> listAllLibraryTypes() throws IOException {
-    if (libraryStore != null) {
-      return libraryStore.listAllLibraryTypes();
-    } else {
-      throw new IOException("No libraryStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<LibraryType> listLibraryTypesByPlatform(String platformName) throws IOException {
-    if (libraryStore != null) {
-      return libraryStore.listLibraryTypesByPlatform(platformName);
-    } else {
-      throw new IOException("No libraryStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<LibrarySelectionType> listAllLibrarySelectionTypes() throws IOException {
-    if (libraryStore != null) {
-      return libraryStore.listAllLibrarySelectionTypes();
-    } else {
-      throw new IOException("No libraryStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<LibraryStrategyType> listAllLibraryStrategyTypes() throws IOException {
-    if (libraryStore != null) {
-      return libraryStore.listAllLibraryStrategyTypes();
-    } else {
-      throw new IOException("No libraryStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<Dilution> listAllLibraryDilutionsBySearchAndPlatform(String query, PlatformType platformType) throws IOException {
-    List<Dilution> dilutions = new ArrayList<>();
-    for (Dilution d : libraryDilutionStore.listAllLibraryDilutionsBySearchAndPlatform(query, platformType)) {
-      dilutions.add(d);
-    }
-    return dilutions;
-  }
-
-  @Override
-  public Collection<Dilution> listAllDilutionsByProjectAndPlatform(long projectId, PlatformType platformType) throws IOException {
-    List<Dilution> dilutions = new ArrayList<>();
-    for (Dilution d : libraryDilutionStore.listAllLibraryDilutionsByProjectAndPlatform(projectId, platformType)) {
-      dilutions.add(d);
-    }
-    return dilutions;
-  }
-
-  @Override
   public Collection<LibraryDilution> listAllLibraryDilutions() throws IOException {
     if (libraryDilutionStore != null) {
       return libraryDilutionStore.listAll();
-    } else {
-      throw new IOException("No libraryDilutionStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<LibraryDilution> listAllLibraryDilutionsWithLimit(long limit) throws IOException {
-    if (libraryDilutionStore != null) {
-      return libraryDilutionStore.listAllWithLimit(limit);
-    } else {
-      throw new IOException("No libraryDilutionStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<LibraryDilution> listAllLibraryDilutionsByLibraryId(long libraryId) throws IOException {
-    if (libraryDilutionStore != null) {
-      return libraryDilutionStore.listByLibraryId(libraryId);
-    } else {
-      throw new IOException("No libraryDilutionStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<LibraryDilution> listAllLibraryDilutionsByPlatform(PlatformType platformType) throws IOException {
-    if (libraryDilutionStore != null) {
-      return libraryDilutionStore.listAllLibraryDilutionsByPlatform(platformType);
-    } else {
-      throw new IOException("No dilutionStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<LibraryDilution> listAllLibraryDilutionsByProjectId(long projectId) throws IOException {
-    if (libraryDilutionStore != null) {
-      return libraryDilutionStore.listAllLibraryDilutionsByProjectId(projectId);
-    } else {
-      throw new IOException("No dilutionStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<LibraryDilution> listAllLibraryDilutionsBySearchOnly(String query) throws IOException {
-    if (libraryDilutionStore != null) {
-      return libraryDilutionStore.listAllLibraryDilutionsBySearchOnly(query);
-    } else {
-      throw new IOException("No libraryDilutionStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<LibraryDilution> listAllLibraryDilutionsByProjectAndPlatform(long projectId, PlatformType platformType)
-      throws IOException {
-    if (libraryDilutionStore != null) {
-      return libraryDilutionStore.listAllLibraryDilutionsByProjectAndPlatform(projectId, platformType);
     } else {
       throw new IOException("No libraryDilutionStore available. Check that it has been declared in the Spring config.");
     }
@@ -1089,17 +944,6 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public void deleteLibrary(Library library) throws IOException {
-    if (libraryStore != null) {
-      if (!libraryStore.remove(library)) {
-        throw new IOException("Unable to delete Library. Make sure the library has no child entitites.");
-      }
-    } else {
-      throw new IOException("No libraryStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
   public void deleteRun(Run run) throws IOException {
     if (runStore != null) {
       if (!runStore.remove(run)) {
@@ -1140,17 +984,6 @@ public class MisoRequestManager implements RequestManager {
       }
     } else {
       throw new IOException("No libraryQcStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public void deleteLibraryDilution(LibraryDilution dilution) throws IOException {
-    if (libraryDilutionStore != null) {
-      if (!libraryDilutionStore.remove(dilution)) {
-        throw new IOException("Unable to delete LibraryDilution.");
-      }
-    } else {
-      throw new IOException("No libraryDilutionStore available. Check that it has been declared in the Spring config.");
     }
   }
 
@@ -1236,26 +1069,6 @@ public class MisoRequestManager implements RequestManager {
     }
     managed.getNotes().remove(deleteNote);
     kitStore.save(managed);
-  }
-
-  @Override
-  public void deleteLibraryNote(Library library, Long noteId) throws IOException {
-    if (noteId == null || noteId.equals(Note.UNSAVED_ID)) {
-      throw new IllegalArgumentException("Cannot delete an unsaved Note");
-    }
-    Library managed = libraryStore.get(library.getId());
-    Note deleteNote = null;
-    for (Note note : managed.getNotes()) {
-      if (note.getNoteId().equals(noteId)) {
-        deleteNote = note;
-        break;
-      }
-    }
-    if (deleteNote == null) {
-      throw new IOException("Note " + noteId + " not found for Library " + library.getId());
-    }
-    managed.getNotes().remove(deleteNote);
-    libraryStore.save(managed);
   }
 
   @Override
@@ -1461,36 +1274,6 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public long saveLibrary(Library library) throws IOException {
     if (libraryStore != null) {
-      if (library.isDiscarded()) {
-        library.setVolume(0.0);
-      }
-      if (library.getLibraryAdditionalInfo() != null && library.getLibraryAdditionalInfo().getLibraryDesign() != null) {
-        if (!isDetailedSample(library.getSample())) {
-          throw new IOException("A library design can only be applied to a detailed sample.");
-        }
-        LibraryDesign design = libraryDesignDao.getLibraryDesign(library.getLibraryAdditionalInfo().getLibraryDesign().getId());
-        if (((DetailedSample) library.getSample()).getSampleClass().getId() != design.getSampleClass().getId()) {
-          throw new IOException(
-              "This library design is not valid for sample " + library.getSample().getName() + " because the class is not compatible.");
-        }
-        library.getLibraryAdditionalInfo().setLibraryDesign(design);
-        LibrarySelectionType selection = libraryStore.getLibrarySelectionTypeById(design.getLibrarySelectionType().getId());
-        LibraryStrategyType strategy = libraryStore.getLibraryStrategyTypeById(design.getLibraryStrategyType().getId());
-        if (library.getLibrarySelectionType() != null && library.getLibrarySelectionType().getId() != selection.getId()) {
-          throw new IOException("Library selection doesn't match library design.");
-        }
-        if (library.getLibraryStrategyType() != null && library.getLibraryStrategyType().getId() != strategy.getId()) {
-          throw new IOException("Library strategy doesn't match library design.");
-        }
-        if (library.getLibraryAdditionalInfo().getLibraryDesignCode().getId() != null
-            && library.getLibraryAdditionalInfo().getLibraryDesign().getId() != null
-            && library.getLibraryAdditionalInfo().getLibraryDesignCode().getId() != library.getLibraryAdditionalInfo().getLibraryDesign()
-                .getLibraryDesignCode().getId()) {
-          throw new IOException("Selected library design code does not match library design code for selected library design.");
-        }
-        library.setLibrarySelectionType(selection);
-        library.setLibraryStrategyType(strategy);
-      }
       return libraryStore.save(library);
     } else {
       throw new IOException("No libraryStore available. Check that it has been declared in the Spring config.");
@@ -1504,15 +1287,6 @@ public class MisoRequestManager implements RequestManager {
     } else {
       throw new IOException("No libraryDilutionStore available. Check that it has been declared in the Spring config.");
     }
-  }
-
-  @Override
-  public void saveLibraryNote(Library library, Note note) throws IOException {
-    Library managed = libraryStore.get(library.getId());
-    note.setCreationDate(new Date());
-    // TODO: when moved to Service: note.setOwner(authorizationManager.getCurrentUser());
-    managed.getNotes().add(note);
-    libraryStore.save(managed);
   }
 
   @Override
@@ -1531,7 +1305,7 @@ public class MisoRequestManager implements RequestManager {
         pool.setVolume(0.0);
       }
       if (autoGenerateIdBarcodes && pool.getId() == PoolImpl.UNSAVED_ID) {
-        autoGenerateIdBarcode(pool);
+        LimsUtils.generateAndSetIdBarcode(pool);
       }
       return poolStore.save(pool);
     } else {
@@ -1759,119 +1533,11 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Library getLibraryById(long libraryId) throws IOException {
-    if (libraryStore != null) {
-      return libraryStore.get(libraryId);
-    } else {
-      throw new IOException("No libraryStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Library getLibraryByBarcode(String barcode) throws IOException {
-    if (libraryStore != null) {
-      return libraryStore.getByBarcode(barcode);
-    } else {
-      throw new IOException("No libraryStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<Library> listLibrariesByAlias(String alias) throws IOException {
-    if (libraryStore != null) {
-      return libraryStore.listByAlias(alias);
-    } else {
-      throw new IOException("No libraryStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Dilution getDilutionByBarcode(String barcode) throws IOException {
-    Dilution d = null;
-    if (libraryDilutionStore != null) {
-      d = libraryDilutionStore.getLibraryDilutionByBarcode(barcode);
-    } else {
-      throw new IOException("No libraryDilutionStore available. Check that it has been declared in the Spring config.");
-    }
-
-    return d;
-  }
-
-  @Override
-  public Dilution getDilutionByIdAndPlatform(long dilutionid, PlatformType platformType) throws IOException {
-    Dilution d = null;
-    if (libraryDilutionStore != null) {
-      d = libraryDilutionStore.getLibraryDilutionByIdAndPlatform(dilutionid, platformType);
-    } else {
-      throw new IOException("No libraryDilutionStore available. Check that it has been declared in the Spring config.");
-    }
-
-    return d;
-  }
-
-  @Override
-  public Dilution getDilutionByBarcodeAndPlatform(String barcode, PlatformType platformType) throws IOException {
-    Dilution d = null;
-    if (libraryDilutionStore != null) {
-      d = libraryDilutionStore.getLibraryDilutionByBarcodeAndPlatform(barcode, platformType);
-    } else {
-      throw new IOException("No libraryDilutionStore available. Check that it has been declared in the Spring config.");
-    }
-
-    return d;
-  }
-
-  @Override
-  public LibraryDilution getLibraryDilutionByBarcodeAndPlatform(String barcode, PlatformType platformType) throws IOException {
-    if (libraryDilutionStore != null) {
-      return libraryDilutionStore.getLibraryDilutionByBarcodeAndPlatform(barcode, platformType);
-    } else {
-      throw new IOException("No dilutionStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public LibraryDilution getLibraryDilutionById(long dilutionId) throws IOException {
-    if (libraryDilutionStore != null) {
-      return libraryDilutionStore.get(dilutionId);
-    } else {
-      throw new IOException("No libraryDilutionStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public LibraryDilution getLibraryDilutionByBarcode(String barcode) throws IOException {
-    if (libraryDilutionStore != null) {
-      return libraryDilutionStore.getLibraryDilutionByBarcode(barcode);
-    } else {
-      throw new IOException("No dilutionStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
   public LibraryQC getLibraryQCById(long libraryQcId) throws IOException {
     if (libraryQcStore != null) {
       return libraryQcStore.get(libraryQcId);
     } else {
       throw new IOException("No libraryQcStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public LibraryType getLibraryTypeById(long typeId) throws IOException {
-    if (libraryStore != null) {
-      return libraryStore.getLibraryTypeById(typeId);
-    } else {
-      throw new IOException("No libraryStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public LibraryType getLibraryTypeByDescription(String description) throws IOException {
-    if (libraryStore != null) {
-      return libraryStore.getLibraryTypeByDescription(description);
-    } else {
-      throw new IOException("No libraryStore available. Check that it has been declared in the Spring config.");
     }
   }
 
@@ -1885,27 +1551,9 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public LibrarySelectionType getLibrarySelectionTypeById(long typeId) throws IOException {
-    if (libraryStore != null) {
-      return libraryStore.getLibrarySelectionTypeById(typeId);
-    } else {
-      throw new IOException("No libraryStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
   public LibrarySelectionType getLibrarySelectionTypeByName(String name) throws IOException {
     if (libraryStore != null) {
       return libraryStore.getLibrarySelectionTypeByName(name);
-    } else {
-      throw new IOException("No libraryStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public LibraryStrategyType getLibraryStrategyTypeById(long typeId) throws IOException {
-    if (libraryStore != null) {
-      return libraryStore.getLibraryStrategyTypeById(typeId);
     } else {
       throw new IOException("No libraryStore available. Check that it has been declared in the Spring config.");
     }
@@ -2405,15 +2053,6 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Map<String, Integer> getLibraryColumnSizes() throws IOException {
-    if (libraryStore != null) {
-      return libraryStore.getLibraryColumnSizes();
-    } else {
-      throw new IOException("No libraryStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
   public Map<String, Integer> getProjectColumnSizes() throws IOException {
     if (projectStore != null) {
       return projectStore.getProjectColumnSizes();
@@ -2552,43 +2191,6 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public int countLibraries() throws IOException {
-    if (libraryStore != null) {
-      return libraryStore.count();
-    } else {
-      throw new IOException("No libraryStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public List<Library> getLibrariesByPageSizeSearch(int offset, int limit, String querystr, String sortDir, String sortCol)
-      throws IOException {
-    if (libraryStore != null) {
-      return libraryStore.listBySearchOffsetAndNumResults(offset, limit, querystr, sortDir, sortCol);
-    } else {
-      throw new IOException("No libraryStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public List<Library> getLibrariesByPageAndSize(int offset, int limit, String sortDir, String sortCol) throws IOException {
-    if (libraryStore != null) {
-      return libraryStore.listByOffsetAndNumResults(offset, limit, sortDir, sortCol);
-    } else {
-      throw new IOException("No libraryStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Long countLibrariesBySearch(String querystr) throws IOException {
-    if (libraryStore != null) {
-      return libraryStore.countLibrariesBySearch(querystr);
-    } else {
-      throw new IOException("No libraryStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
   public Long countRuns() throws IOException {
     if (runStore != null) {
       return runStore.countRuns();
@@ -2672,11 +2274,6 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Library getAdjacentLibraryById(long libraryId, boolean before) throws IOException {
-    return libraryStore.getAdjacentLibrary(libraryId, before);
-  }
-
-  @Override
   public Project lazyGetProjectById(long projectId) throws IOException {
     if (projectStore != null) {
       return projectStore.lazyGet(projectId);
@@ -2686,49 +2283,13 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public List<LibraryDilution> getLibraryDilutionsForPoolDataTable(int offset, int limit, String search, String sortDir, String sortCol,
-      PlatformType platform) throws IOException {
-    return libraryDilutionStore.listBySearchOffsetAndNumResultsAndPlatform(offset, limit, search, sortDir, sortCol, platform);
-  }
-
-  @Override
-  public Integer countLibraryDilutionsByPlatform(PlatformType platform) throws IOException {
-    return libraryDilutionStore.countByPlatform(platform);
-  }
-
-  @Override
-  public Integer countLibraryDilutionsBySearchAndPlatform(String search, PlatformType platform) throws IOException {
-    return libraryDilutionStore.countAllBySearchAndPlatform(search, platform);
-  }
-
-  @Override
   public List<Run> getRunsByPool(Pool pool) throws IOException {
     return runStore.listByPoolId(pool.getId());
-  }
-
-  @Override
-  public List<Library> getLibrariesByCreationDate(Date from, Date to) throws IOException {
-    return libraryStore.searchByCreationDate(from, to);
   }
 
   public static void validateNameOrThrow(Nameable object, NamingScheme namingScheme) throws IOException {
     ValidationResult val = namingScheme.validateName(object.getName());
     if (!val.isValid()) throw new IOException("Save failed - invalid name:" + val.getMessage());
-  }
-
-  /**
-   * universal temporary name prefix. TODO: these same methods are in sqlstore DbUtils;
-   * use those when refactoring away the RequestManager.
-   */
-  static final public String TEMPORARY_NAME_PREFIX = "TEMPORARY_";
-
-  /**
-   * Generate a temporary name using a UUID.
-   * 
-   * @return Temporary name
-   */
-  static public String generateTemporaryName() {
-    return TEMPORARY_NAME_PREFIX + UUID.randomUUID();
   }
 
   @Override

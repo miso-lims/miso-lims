@@ -8,18 +8,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.InjectMocks;
-import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 
@@ -29,12 +27,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
-import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
-import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
-import uk.ac.bbsrc.tgac.miso.core.store.Store;
-import uk.ac.bbsrc.tgac.miso.core.store.TargetedSequencingStore;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDilutionDao;
 
 public class SQLLibraryDilutionDAOTest extends AbstractDAOTest {
 
@@ -42,19 +37,12 @@ public class SQLLibraryDilutionDAOTest extends AbstractDAOTest {
   public final ExpectedException expectedException = ExpectedException.none();
 
   @Autowired
-  @Spy
-  private JdbcTemplate jdbcTemplate;
-  @Mock
-  private LibraryStore libraryDAO;
-  @Mock
-  private TargetedSequencingStore targetedSequencingDAO;
-  @Mock
-  private Store<SecurityProfile> securityProfileDAO;
+  private SessionFactory sessionFactory;
   @Mock
   private NamingScheme namingScheme;
 
   @InjectMocks
-  private SQLLibraryDilutionDAO dao;
+  private HibernateLibraryDilutionDao dao;
 
   // Auto-increment sequence doesn't roll back with transactions, so must be tracked
   private static long nextAutoIncrementId = 15L;
@@ -62,16 +50,13 @@ public class SQLLibraryDilutionDAOTest extends AbstractDAOTest {
   @Before
   public void setUp() throws MisoNamingException {
     MockitoAnnotations.initMocks(this);
-    dao.setJdbcTemplate(jdbcTemplate);
-    dao.setDataObjectFactory(new TgacDataObjectFactory());
-    dao.setTargetedSequencingDAO(targetedSequencingDAO);
+    dao.setSessionFactory(sessionFactory);
     Mockito.when(namingScheme.validateName(Mockito.anyString())).thenReturn(ValidationResult.success());
   }
 
   private void mockAutoIncrement(long value) {
     final Map<String, Object> rs = new HashMap<>();
     rs.put("Auto_increment", value);
-    Mockito.doReturn(rs).when(jdbcTemplate).queryForMap(Matchers.anyString());
   }
 
   @Test
@@ -119,47 +104,6 @@ public class SQLLibraryDilutionDAOTest extends AbstractDAOTest {
   public void testGetLibraryDilutionByBarcodeNull() throws IOException {
     expectedException.expect(NullPointerException.class);
     dao.getLibraryDilutionByBarcode(null);
-  }
-
-  @Test
-  public void testGetLibraryDilutionByBarcodeAndPlatform() throws IOException {
-    mockIlluminaLibraryDao();
-    assertNotNull(dao.getLibraryDilutionByBarcodeAndPlatform("LDI2::TEST_0001_Bn_R_PE_300_WG", PlatformType.ILLUMINA));
-  }
-
-  @Test
-  public void testGetLibraryDilutionByBarcodeAndPlatformNone() throws IOException {
-    assertNull(dao.getLibraryDilutionByBarcodeAndPlatform("nonexistant barcode", PlatformType.ILLUMINA));
-  }
-
-  @Test
-  public void testGetLibraryDilutionByBarcodeAndPlatformNullBarcode() throws IOException {
-    expectedException.expect(NullPointerException.class);
-    dao.getLibraryDilutionByBarcodeAndPlatform(null, PlatformType.ILLUMINA);
-  }
-
-  @Test
-  public void testGetLibraryDilutionByBarcodeAndPlatformNullPlatform() throws IOException {
-    mockIlluminaLibraryDao();
-    expectedException.expect(NullPointerException.class);
-    dao.getLibraryDilutionByBarcodeAndPlatform("LDI2::TEST_0001_Bn_R_PE_300_WG", null);
-  }
-
-  @Test
-  public void testGetLibraryDilutionByIdAndPlatform() throws IOException {
-    mockIlluminaLibraryDao();
-    assertNotNull(dao.getLibraryDilutionByIdAndPlatform(1L, PlatformType.ILLUMINA));
-  }
-
-  @Test
-  public void testGetLibraryDilutionByIdAndPlatformNone() throws IOException {
-    assertNull(dao.getLibraryDilutionByIdAndPlatform(100L, PlatformType.ILLUMINA));
-  }
-
-  @Test
-  public void testGetLibraryDilutionByIdAndPlatformNull() throws IOException {
-    expectedException.expect(NullPointerException.class);
-    dao.getLibraryDilutionByIdAndPlatform(1L, null);
   }
 
   @Test
@@ -291,7 +235,6 @@ public class SQLLibraryDilutionDAOTest extends AbstractDAOTest {
 
   @Test
   public void testRemove() throws IOException {
-    dao.setCascadeType(javax.persistence.CascadeType.REFRESH);
     final LibraryDilution ld = dao.get(1L);
     assertNotNull(ld);
     assertTrue(dao.remove(ld));
@@ -360,12 +303,4 @@ public class SQLLibraryDilutionDAOTest extends AbstractDAOTest {
     assertNotNull(results);
     assertEquals(1, results.size());
   }
-
-  private void mockIlluminaLibraryDao() throws IOException {
-    final Library lib = new LibraryImpl();
-    lib.setPlatformName("Illumina");
-    Mockito.when(libraryDAO.get(Mockito.anyLong())).thenReturn(lib);
-  }
-
-
 }

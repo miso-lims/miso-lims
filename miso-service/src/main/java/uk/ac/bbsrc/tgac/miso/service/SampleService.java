@@ -44,4 +44,6 @@ public interface SampleService {
   public void addNote(Sample sample, Note note) throws IOException;
 
   public void deleteNote(Sample sample, Long noteId) throws IOException;
+
+  Sample getByBarcode(String barcode) throws IOException;
 }

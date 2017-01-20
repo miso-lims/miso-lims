@@ -58,10 +58,12 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleDerivedInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SampleChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleQcException;
@@ -84,12 +86,13 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   private long sampleId = AbstractSample.UNSAVED_ID;
 
   @ManyToOne(targetEntity = ProjectImpl.class)
+  @JoinColumn(name = "project_projectId")
   private Project project;
 
   @Transient
   private final Collection<Experiment> experiments = new HashSet<>();
 
-  @Transient
+  @OneToMany(targetEntity = LibraryImpl.class, mappedBy = "sample")
   @JsonManagedReference
   private final Collection<Library> libraries = new HashSet<>();
 
@@ -102,13 +105,14 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
           @JoinColumn(name = "notes_noteId", nullable = false, updatable = false) })
   private Collection<Note> notes = new HashSet<>();
 
-  @Transient
+  @OneToMany(targetEntity = SampleChangeLog.class, mappedBy = "sample")
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
   @Transient
   public Document submissionDocument;
 
-  @Transient
+  @ManyToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "securityProfile_profileId")
   private SecurityProfile securityProfile = null;
 
   private String accession;
@@ -121,7 +125,6 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   private Boolean qcPassed;
   private String identificationBarcode;
   private String locationBarcode;
-  private Long securityProfile_profileId;
 
   @OneToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "lastModifier", nullable = false)
@@ -352,9 +355,6 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @Override
   public void setSecurityProfile(SecurityProfile securityProfile) {
     this.securityProfile = securityProfile;
-    if (securityProfile != null) {
-      this.securityProfile_profileId = securityProfile.getProfileId();
-    }
   }
 
   @Override
@@ -416,20 +416,20 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   }
 
   @Override
-  public Long getSecurityProfileId() {
-    return securityProfile_profileId;
-  }
-
-  @Override
-  public void setSecurityProfileId(Long securityProfileId) {
-    securityProfile_profileId = securityProfileId;
-  }
-
-  @Override
   public int hashCode() {
-    return new HashCodeBuilder(7, 37).appendSuper(super.hashCode()).append(accession).append(getAlias()).append(description)
-        .append(identificationBarcode).append(locationBarcode).append(project).append(qcPassed).append(receivedDate).append(sampleType)
-        .append(scientificName).append(taxonIdentifier).toHashCode();
+    return new HashCodeBuilder(7, 37)
+        .appendSuper(super.hashCode())
+        .append(accession)
+        .append(description)
+        .append(identificationBarcode)
+        .append(locationBarcode)
+        .append(project)
+        .append(qcPassed)
+        .append(receivedDate)
+        .append(sampleType)
+        .append(scientificName)
+        .append(taxonIdentifier)
+        .toHashCode();
   }
 
   @Override
@@ -438,11 +438,19 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
     if (obj == null) return false;
     if (getClass() != obj.getClass()) return false;
     AbstractSample other = (AbstractSample) obj;
-    return new EqualsBuilder().appendSuper(super.equals(obj)).append(accession, other.accession).append(getAlias(), other.getAlias())
-        .append(description, other.description).append(identificationBarcode, other.identificationBarcode)
-        .append(locationBarcode, other.locationBarcode).append(project, other.project).append(qcPassed, other.qcPassed)
-        .append(receivedDate, other.receivedDate).append(sampleType, other.sampleType).append(scientificName, other.scientificName)
-        .append(taxonIdentifier, other.taxonIdentifier).isEquals();
+    return new EqualsBuilder()
+        .appendSuper(super.equals(obj))
+        .append(accession, other.accession)
+        .append(description, other.description)
+        .append(identificationBarcode, other.identificationBarcode)
+        .append(locationBarcode, other.locationBarcode)
+        .append(project, other.project)
+        .append(qcPassed, other.qcPassed)
+        .append(receivedDate, other.receivedDate)
+        .append(sampleType, other.sampleType)
+        .append(scientificName, other.scientificName)
+        .append(taxonIdentifier, other.taxonIdentifier)
+        .isEquals();
   }
 
 }

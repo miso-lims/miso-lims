@@ -63,6 +63,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingParametersImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.RunChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
@@ -91,7 +92,7 @@ public abstract class AbstractRun implements Run {
   @Transient
   public Document submissionDocument;
 
-  @OneToOne(targetEntity = SecurityProfile.class, cascade = CascadeType.ALL)
+  @ManyToOne(targetEntity = SecurityProfile.class, cascade = CascadeType.ALL)
   @JoinColumn(name = "securityProfile_profileId")
   private SecurityProfile securityProfile = new SecurityProfile();
 
@@ -166,7 +167,7 @@ public abstract class AbstractRun implements Run {
     return (derivedInfo == null ? null : derivedInfo.getLastModified());
   }
 
-  @OneToMany(targetEntity = ChangeLog.class)
+  @OneToMany(targetEntity = RunChangeLog.class, mappedBy = "run")
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
   @Override

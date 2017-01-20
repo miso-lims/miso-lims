@@ -52,6 +52,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.controller
@@ -75,6 +76,9 @@ public class DownloadController {
   @Autowired
   private FilesManager filesManager;
 
+  @Autowired
+  private LibraryService libraryService;
+
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
   }
@@ -85,6 +89,10 @@ public class DownloadController {
 
   public void setFilesManager(FilesManager filesManager) {
     this.filesManager = filesManager;
+  }
+
+  public void setLibraryService(LibraryService libraryService) {
+    this.libraryService = libraryService;
   }
 
   @RequestMapping(value = "/project/{id}/{hashcode}", method = RequestMethod.GET)
@@ -124,7 +132,7 @@ public class DownloadController {
   protected void downloadLibraryQcFile(@PathVariable Long id, @PathVariable Integer hashcode, HttpServletResponse response)
       throws Exception {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    Library library = requestManager.getLibraryById(id);
+    Library library = libraryService.get(id);
     if (library.userCanRead(user)) {
       lookupAndRetrieveFile(LibraryQC.class, id.toString(), hashcode, response);
     } else {

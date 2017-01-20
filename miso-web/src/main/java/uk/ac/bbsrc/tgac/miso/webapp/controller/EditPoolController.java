@@ -74,6 +74,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SequencingParametersDto;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
 
 /**
@@ -103,6 +104,9 @@ public class EditPoolController {
   private ChangeLogService changeLogService;
 
   @Autowired
+  private LibraryDilutionService dilutionService;
+
+  @Autowired
   private JdbcTemplate interfaceTemplate;
 
   public void setInterfaceTemplate(JdbcTemplate interfaceTemplate) {
@@ -115,6 +119,10 @@ public class EditPoolController {
 
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
+  }
+
+  public void setDilutionService(LibraryDilutionService dilutionService) {
+    this.dilutionService = dilutionService;
   }
 
   @RequestMapping(value = "/rest/changes", method = RequestMethod.GET)
@@ -235,9 +243,9 @@ public class EditPoolController {
     JSONObject rtn = new JSONObject();
     JSONArray data = new JSONArray();
 
-    List<LibraryDilution> dils = requestManager.getLibraryDilutionsForPoolDataTable(start, length, search, sSortDir_0, sortCol,
-        platformType);
-    int allDilutionsCount = requestManager.countLibraryDilutionsByPlatform(PlatformType.ILLUMINA);
+    List<LibraryDilution> dils = dilutionService.getAllByPageSizeSearchAndPlatform(start, length, search, platformType, sSortDir_0,
+        sortCol);
+    int allDilutionsCount = dilutionService.countByPlatform(PlatformType.ILLUMINA);
 
     for (LibraryDilution dil : dils) {
       JSONArray inner = new JSONArray();
@@ -256,7 +264,7 @@ public class EditPoolController {
       data.add(inner);
     }
     rtn.put("iTotalRecords", allDilutionsCount);
-    rtn.put("iTotalDisplayRecords", requestManager.countLibraryDilutionsBySearchAndPlatform(search, platformType));
+    rtn.put("iTotalDisplayRecords", dilutionService.countBySearchAndPlatform(search, platformType));
     rtn.put("sEcho", "" + draw);
     rtn.put("aaData", data);
     return rtn.toString();
@@ -285,7 +293,7 @@ public class EditPoolController {
     Pool p = (PoolImpl) model.get("pool");
     String[] dils = request.getParameterValues("importdilslist");
     for (String s : dils) {
-      Dilution ld = requestManager.getDilutionByBarcodeAndPlatform(s, p.getPlatformType());
+      LibraryDilution ld = dilutionService.getByBarcode(s);
       if (ld != null) {
         try {
           p.addPoolableElement(ld);
@@ -311,7 +319,6 @@ public class EditPoolController {
       // The pooled elements may have been modified asynchronously while the form was being edited. Since they can't be edited by form,
       // update them to avoid reverting the state.
       if (pool.getId() != PoolImpl.UNSAVED_ID) {
-        @SuppressWarnings("unchecked")
         Pool original = requestManager.getPoolById(pool.getId());
         pool.setPoolableElements(original.getPoolableElements());
       }

@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO. If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -76,6 +76,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.submission.UploadJob;
 import uk.ac.bbsrc.tgac.miso.core.service.submission.UploadReport;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 
 /**
  * uk.ac.bbsrc.tgac.miso.spring.ajax
@@ -100,6 +101,8 @@ public class SubmissionControllerHelperService {
   private FilePathGeneratorResolverService filePathGeneratorResolverService;
   @Autowired
   private ExperimentService experimentService;
+  @Autowired
+  private LibraryDilutionService dilutionService;
 
   private final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
@@ -142,7 +145,7 @@ public class SubmissionControllerHelperService {
           if (j.getString("name").contains("DIL")) {
             Long dilutionId = Long.parseLong(j.getString("name").replaceAll("\\D+", ""));
             Long partitionId = Long.parseLong(j.getString("value").replaceAll("\\D+", ""));
-            Dilution dilution = requestManager.getLibraryDilutionById(dilutionId);
+            Dilution dilution = dilutionService.get(dilutionId);
             SequencerPoolPartition partition = requestManager.getSequencerPoolPartitionById(partitionId);
             newSubmission.getDilutions().put(dilution, partition);
           }
@@ -545,5 +548,13 @@ public class SubmissionControllerHelperService {
 
   public void setFilePathGeneratorResolverService(FilePathGeneratorResolverService filePathGeneratorResolverService) {
     this.filePathGeneratorResolverService = filePathGeneratorResolverService;
+  }
+
+  public void setExperimentService(ExperimentService experimentService) {
+    this.experimentService = experimentService;
+  }
+
+  public void setDilutionService(LibraryDilutionService dilutionService) {
+    this.dilutionService = dilutionService;
   }
 }

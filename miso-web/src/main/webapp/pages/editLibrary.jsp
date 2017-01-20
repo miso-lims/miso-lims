@@ -201,7 +201,7 @@
     </c:choose>
 
     <span id="aliasCounter" class="counter"></span>
-    <c:if test="${detailedSample && library.libraryAdditionalInfo.hasNonStandardAlias()}">
+    <c:if test="${detailedSample && library.hasNonStandardAlias()}">
       <ul class="parsley-errors-list filled" id="nonStandardAlias">
         <li class="parsley-custom-error-message">
         Double-check this alias -- it will be saved even if it is duplicated or does not follow the naming standard!
@@ -238,7 +238,7 @@
   </tr>
 </c:if>
 <c:choose>
-  <c:when test="${!empty library.sample && !empty library.libraryAdditionalInfo}">
+  <c:when test="${!empty library.sample && detailedSample}">
     <input type="hidden" value="true" name="paired" id="paired"/>
   </c:when>
   <c:otherwise>
@@ -284,12 +284,12 @@
   </c:choose>
 </tr>
 <tr>
-<c:if test="${!empty library.sample && !empty library.libraryAdditionalInfo}">
+<c:if test="${!empty library.sample && detailedSample}">
   <tr>
     <td>Library Design:</td>
     <td>
-      <miso:select id="libraryDesignTypes" path="libraryAdditionalInfo.libraryDesign" items="${libraryDesigns}" itemLabel="name" itemValue="id" defaultLabel="(None)" defaultValue="-1" onchange="Library.ui.changeDesign()"/>
-      &nbsp;&nbsp;&nbsp;Design Code: <miso:select id="libraryDesignCodes" path="libraryAdditionalInfo.libraryDesignCode" items="${libraryDesignCodes}" itemLabel="code" itemValue="id" defaultLabel="(None)" defaultValue="-1"/>
+      <miso:select id="libraryDesignTypes" path="libraryDesign" items="${libraryDesigns}" itemLabel="name" itemValue="id" defaultLabel="(None)" defaultValue="-1" onchange="Library.ui.changeDesign()"/>
+      &nbsp;&nbsp;&nbsp;Design Code: <miso:select id="libraryDesignCodes" path="libraryDesignCode" items="${libraryDesignCodes}" itemLabel="code" itemValue="id" defaultLabel="(None)" defaultValue="-1"/>
     </td>
   </tr>
 </c:if>
@@ -400,7 +400,7 @@
   <tr>
     <td>Library Kit:*</td>
     <td>
-      <miso:select id="libraryKit" path="libraryAdditionalInfo.prepKit" items="${prepKits}" itemLabel="name"
+      <miso:select id="libraryKit" path="kitDescriptor" items="${prepKits}" itemLabel="name"
           itemValue="id" defaultLabel="SELECT" defaultValue=""/>
     </td>
   </tr>
@@ -416,7 +416,7 @@
   </c:if>
   <tr>
     <td class="h">Archived:</td>
-    <td><form:checkbox id="archived" path="libraryAdditionalInfo.archived"/></td>
+    <td><form:checkbox id="archived" path="archived"/></td>
   </tr>
 </table>
 <script type="text/javascript">

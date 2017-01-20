@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +46,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
-import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
@@ -258,16 +256,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public void saveLibraryNote(Library library, Note note) throws IOException {
-    if (writeCheck(library)) {
-      note.setOwner(getCurrentUser());
-      backingManager.saveLibraryNote(library, note);
-    } else {
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot write to this Library");
-    }
-  }
-
-  @Override
   public long saveLibraryQC(LibraryQC libraryQC) throws IOException {
     if (writeCheck(libraryQC.getLibrary())) {
       return backingManager.saveLibraryQC(libraryQC);
@@ -373,73 +361,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Library getLibraryById(long libraryId) throws IOException {
-    Library o = backingManager.getLibraryById(libraryId);
-    if (readCheck(o)) return o;
-    else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Library " + libraryId);
-  }
-
-  @Override
-  public Library getLibraryByBarcode(String barcode) throws IOException {
-    Library o = backingManager.getLibraryByBarcode(barcode);
-    if (readCheck(o)) return o;
-    else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Library " + o.getId());
-  }
-
-  @Override
-  public Collection<Library> listLibrariesByAlias(String alias) throws IOException {
-    Collection<Library> libraries = backingManager.listLibrariesByAlias(alias);
-    for (Library library : libraries) {
-      if (!readCheck(library)) {
-        throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Library " + library.getId());
-      }
-    }
-    return libraries;
-  }
-
-  @Override
-  public Dilution getDilutionByBarcode(String barcode) throws IOException {
-    Dilution o = backingManager.getDilutionByBarcode(barcode);
-    if (readCheck(o)) return o;
-    else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Dilution " + o.getId());
-  }
-
-  @Override
-  public Dilution getDilutionByIdAndPlatform(long dilutionid, PlatformType platformType) throws IOException {
-    Dilution o = backingManager.getDilutionByIdAndPlatform(dilutionid, platformType);
-    if (readCheck(o)) return o;
-    else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Dilution " + o.getId());
-  }
-
-  @Override
-  public Dilution getDilutionByBarcodeAndPlatform(String barcode, PlatformType platformType) throws IOException {
-    Dilution o = backingManager.getDilutionByBarcodeAndPlatform(barcode, platformType);
-    if (readCheck(o)) return o;
-    else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Dilution " + o.getId());
-  }
-
-  @Override
-  public LibraryDilution getLibraryDilutionById(long dilutionId) throws IOException {
-    LibraryDilution o = backingManager.getLibraryDilutionById(dilutionId);
-    if (readCheck(o)) return o;
-    else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read LibraryDilution " + dilutionId);
-  }
-
-  @Override
-  public LibraryDilution getLibraryDilutionByBarcode(String barcode) throws IOException {
-    LibraryDilution o = backingManager.getLibraryDilutionByBarcode(barcode);
-    if (readCheck(o)) return o;
-    else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read LibraryDilution " + o.getId());
-  }
-
-  @Override
-  public LibraryDilution getLibraryDilutionByBarcodeAndPlatform(String barcode, PlatformType platformType) throws IOException {
-    LibraryDilution o = backingManager.getLibraryDilutionByBarcodeAndPlatform(barcode, platformType);
-    if (readCheck(o)) return o;
-    else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read LibraryDilution " + o.getId());
-  }
-
-  @Override
   public LibraryQC getLibraryQCById(long qcId) throws IOException {
     LibraryQC o = backingManager.getLibraryQCById(qcId);
     if (readCheck(o.getLibrary())) return o;
@@ -474,7 +395,7 @@ public class UserAuthMisoRequestManager implements RequestManager {
   public ProjectOverview getProjectOverviewById(long overviewId) throws IOException {
     ProjectOverview o = backingManager.getProjectOverviewById(overviewId);
     if (readCheck(o.getProject())) return o;
-    else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read parent Project " + o.getProject().getProjectId()
+    else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read parent Project " + o.getProject().getId()
         + " for ProjectOverview " + overviewId);
   }
 
@@ -881,63 +802,12 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Library> listAllLibrariesWithLimit(long limit) throws IOException {
-    User user = getCurrentUser();
-    Collection<Library> accessibles = new HashSet<>();
-    for (Library library : backingManager.listAllLibrariesWithLimit(limit)) {
-      if (library.userCanRead(user)) {
-        accessibles.add(library);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Collection<Library> listAllLibrariesBySearch(String query) throws IOException {
-    User user = getCurrentUser();
-    Collection<Library> accessibles = new HashSet<>();
-    for (Library library : backingManager.listAllLibrariesBySearch(query)) {
-      if (library.userCanRead(user)) {
-        accessibles.add(library);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Collection<Library> listAllLibrariesByProjectId(long projectId) throws IOException {
-    User user = getCurrentUser();
-    Collection<Library> accessibles = new HashSet<>();
-    for (Library library : backingManager.listAllLibrariesByProjectId(projectId)) {
-      if (library.userCanRead(user)) {
-        accessibles.add(library);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
   public Collection<Library> listAllLibrariesBySampleId(long sampleId) throws IOException {
     User user = getCurrentUser();
     Collection<Library> accessibles = new HashSet<>();
     for (Library library : backingManager.listAllLibrariesBySampleId(sampleId)) {
       if (library.userCanRead(user)) {
         accessibles.add(library);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Collection<Library> getLibrariesByIdList(List<Long> idList) throws IOException {
-    User user = getCurrentUser();
-    Collection<Library> accessibles = new HashSet<>();
-    for (Library library : backingManager.getLibrariesByIdList(idList)) {
-      if (library.userCanRead(user)) {
-        accessibles.add(library);
-      } else {
-        throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Library " + library.getId() + " "
-            + library.getAlias() + "(" + library.getName() + ")");
       }
     }
     return accessibles;
@@ -956,107 +826,10 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Dilution> listAllLibraryDilutionsBySearchAndPlatform(String query, PlatformType platformType) throws IOException {
-    User user = getCurrentUser();
-    Collection<Dilution> accessibles = new HashSet<>();
-    for (Dilution dilution : backingManager.listAllLibraryDilutionsBySearchAndPlatform(query, platformType)) {
-      if (dilution.userCanRead(user)) {
-        accessibles.add(dilution);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Collection<Dilution> listAllDilutionsByProjectAndPlatform(long projectId, PlatformType platformType) throws IOException {
-    User user = getCurrentUser();
-    Collection<Dilution> accessibles = new HashSet<>();
-    for (Dilution dilution : backingManager.listAllDilutionsByProjectAndPlatform(projectId, platformType)) {
-      if (dilution.userCanRead(user)) {
-        accessibles.add(dilution);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
   public Collection<LibraryDilution> listAllLibraryDilutions() throws IOException {
     User user = getCurrentUser();
     Collection<LibraryDilution> accessibles = new HashSet<>();
     for (LibraryDilution dilution : backingManager.listAllLibraryDilutions()) {
-      if (dilution.userCanRead(user)) {
-        accessibles.add(dilution);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Collection<LibraryDilution> listAllLibraryDilutionsWithLimit(long limit) throws IOException {
-    User user = getCurrentUser();
-    Collection<LibraryDilution> accessibles = new HashSet<>();
-    for (LibraryDilution dilution : backingManager.listAllLibraryDilutionsWithLimit(limit)) {
-      if (dilution.userCanRead(user)) {
-        accessibles.add(dilution);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Collection<LibraryDilution> listAllLibraryDilutionsByLibraryId(long libraryId) throws IOException {
-    User user = getCurrentUser();
-    Collection<LibraryDilution> accessibles = new HashSet<>();
-    for (LibraryDilution dilution : backingManager.listAllLibraryDilutionsByLibraryId(libraryId)) {
-      if (dilution.userCanRead(user)) {
-        accessibles.add(dilution);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Collection<LibraryDilution> listAllLibraryDilutionsByPlatform(PlatformType platformType) throws IOException {
-    User user = getCurrentUser();
-    Collection<LibraryDilution> accessibles = new HashSet<>();
-    for (LibraryDilution dilution : backingManager.listAllLibraryDilutionsByPlatform(platformType)) {
-      if (dilution.userCanRead(user)) {
-        accessibles.add(dilution);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Collection<LibraryDilution> listAllLibraryDilutionsByProjectId(long projectId) throws IOException {
-    User user = getCurrentUser();
-    Collection<LibraryDilution> accessibles = new HashSet<>();
-    for (LibraryDilution dilution : backingManager.listAllLibraryDilutionsByProjectId(projectId)) {
-      if (dilution.userCanRead(user)) {
-        accessibles.add(dilution);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Collection<LibraryDilution> listAllLibraryDilutionsBySearchOnly(String query) throws IOException {
-    User user = getCurrentUser();
-    Collection<LibraryDilution> accessibles = new HashSet<>();
-    for (LibraryDilution dilution : backingManager.listAllLibraryDilutionsBySearchOnly(query)) {
-      if (dilution.userCanRead(user)) {
-        accessibles.add(dilution);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Collection<LibraryDilution> listAllLibraryDilutionsByProjectAndPlatform(long projectId, PlatformType platformType)
-      throws IOException {
-    User user = getCurrentUser();
-    Collection<LibraryDilution> accessibles = new HashSet<>();
-    for (LibraryDilution dilution : backingManager.listAllLibraryDilutionsByProjectAndPlatform(projectId, platformType)) {
       if (dilution.userCanRead(user)) {
         accessibles.add(dilution);
       }
@@ -1242,13 +1015,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public void deleteLibrary(Library library) throws IOException {
-    if (getCurrentUser().isAdmin()) {
-      backingManager.deleteLibrary(library);
-    }
-  }
-
-  @Override
   public void deleteRun(Run run) throws IOException {
     if (getCurrentUser().isAdmin()) {
       backingManager.deleteRun(run);
@@ -1273,13 +1039,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   public void deleteLibraryQC(LibraryQC libraryQc) throws IOException {
     if (getCurrentUser().isAdmin()) {
       backingManager.deleteLibraryQC(libraryQc);
-    }
-  }
-
-  @Override
-  public void deleteLibraryDilution(LibraryDilution dilution) throws IOException {
-    if (getCurrentUser().isAdmin()) {
-      backingManager.deleteLibraryDilution(dilution);
     }
   }
 
@@ -1325,16 +1084,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   public void deleteKitNote(Kit kit, Long noteId) throws IOException {
     // TODO: when Hibernatized, should call authorizationManager.throwIfNonAdminOrMatchingOwner(note.getOwner())
     backingManager.deleteKitNote(kit, noteId);
-  }
-
-  @Override
-  public void deleteLibraryNote(Library library, Long noteId) throws IOException {
-    if (writeCheck(library)) {
-      // TODO: when Hibernatized, should call authorizationManager.throwIfNonAdminOrMatchingOwner(note.getOwner()) too
-      backingManager.deleteLibraryNote(library, noteId);
-    } else {
-      throw new IOException("User " + getCurrentUser().getFullName() + " cannot write to this Library");
-    }
   }
 
   @Override
@@ -1463,33 +1212,13 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public LibraryType getLibraryTypeById(long libraryId) throws IOException {
-    return backingManager.getLibraryTypeById(libraryId);
-  }
-
-  @Override
-  public LibraryType getLibraryTypeByDescription(String description) throws IOException {
-    return backingManager.getLibraryTypeByDescription(description);
-  }
-
-  @Override
   public LibraryType getLibraryTypeByDescriptionAndPlatform(String description, PlatformType platformType) throws IOException {
     return backingManager.getLibraryTypeByDescriptionAndPlatform(description, platformType);
   }
 
   @Override
-  public LibrarySelectionType getLibrarySelectionTypeById(long librarySelectionTypeId) throws IOException {
-    return backingManager.getLibrarySelectionTypeById(librarySelectionTypeId);
-  }
-
-  @Override
   public LibrarySelectionType getLibrarySelectionTypeByName(String name) throws IOException {
     return backingManager.getLibrarySelectionTypeByName(name);
-  }
-
-  @Override
-  public LibraryStrategyType getLibraryStrategyTypeById(long libraryStrategyTypeId) throws IOException {
-    return backingManager.getLibraryStrategyTypeById(libraryStrategyTypeId);
   }
 
   @Override
@@ -1648,25 +1377,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
     return backingManager.listAllSampleTypes();
   }
 
-  @Override
-  public Collection<LibraryType> listAllLibraryTypes() throws IOException {
-    return backingManager.listAllLibraryTypes();
-  }
-
-  @Override
-  public Collection<LibraryType> listLibraryTypesByPlatform(String platformType) throws IOException {
-    return backingManager.listLibraryTypesByPlatform(platformType);
-  }
-
-  @Override
-  public Collection<LibrarySelectionType> listAllLibrarySelectionTypes() throws IOException {
-    return backingManager.listAllLibrarySelectionTypes();
-  }
-
-  @Override
-  public Collection<LibraryStrategyType> listAllLibraryStrategyTypes() throws IOException {
-    return backingManager.listAllLibraryStrategyTypes();
-  }
 
   @Override
   public Collection<Pool> listPoolsByProjectId(long projectId) throws IOException {
@@ -1861,11 +1571,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Map<String, Integer> getLibraryColumnSizes() throws IOException {
-    return backingManager.getLibraryColumnSizes();
-  }
-
-  @Override
   public Map<String, Integer> getProjectColumnSizes() throws IOException {
     return backingManager.getProjectColumnSizes();
   }
@@ -1987,41 +1692,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public int countLibraries() throws IOException {
-    return backingManager.countLibraries();
-  }
-
-  @Override
-  public List<Library> getLibrariesByPageSizeSearch(int offset, int limit, String querystr, String sortDir, String sortCol)
-      throws IOException {
-    User user = getCurrentUser();
-    List<Library> accessibles = new ArrayList<>();
-    for (Library library : backingManager.getLibrariesByPageSizeSearch(offset, limit, querystr, sortDir, sortCol)) {
-      if (library.userCanRead(user)) {
-        accessibles.add(library);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public List<Library> getLibrariesByPageAndSize(int offset, int limit, String sortDir, String sortCol) throws IOException {
-    User user = getCurrentUser();
-    List<Library> accessibles = new ArrayList<>();
-    for (Library library : backingManager.getLibrariesByPageAndSize(offset, limit, sortDir, sortCol)) {
-      if (library.userCanRead(user)) {
-        accessibles.add(library);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Long countLibrariesBySearch(String querystr) throws IOException {
-    return backingManager.countLibrariesBySearch(querystr);
-  }
-
-  @Override
   public Long countRuns() throws IOException {
     return backingManager.countRuns();
   }
@@ -2101,41 +1771,10 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Library getAdjacentLibraryById(long libraryId, boolean before) throws IOException {
-    Library o = backingManager.getAdjacentLibraryById(libraryId, before);
-    // We don't throw because the user has no real control over this.
-    return readCheck(o) ? o : null;
-  }
-
-  @Override
   public Project lazyGetProjectById(long projectId) throws IOException {
     Project o = backingManager.lazyGetProjectById(projectId);
     if (readCheck(o)) return o;
     else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Project " + projectId);
-  }
-
-  @Override
-  public List<LibraryDilution> getLibraryDilutionsForPoolDataTable(int offset, int limit, String search, String sortDir, String sortCol,
-      PlatformType platform) throws IOException {
-    List<LibraryDilution> rtn = new ArrayList<>();
-    List<LibraryDilution> results = backingManager.getLibraryDilutionsForPoolDataTable(offset, limit, search, sortDir, sortCol, platform);
-    User currentUser = getCurrentUser();
-    for (LibraryDilution ld : results) {
-      if (ld.userCanRead(currentUser)) {
-        rtn.add(ld);
-      }
-    }
-    return rtn;
-  }
-
-  @Override
-  public Integer countLibraryDilutionsByPlatform(PlatformType platform) throws IOException {
-    return backingManager.countLibraryDilutionsByPlatform(platform);
-  }
-
-  @Override
-  public Integer countLibraryDilutionsBySearchAndPlatform(String search, PlatformType platform) throws IOException {
-    return backingManager.countLibraryDilutionsBySearchAndPlatform(search, platform);
   }
 
   @Override
@@ -2147,17 +1786,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
         authorizedRuns.add(run);
     }
     return authorizedRuns;
-  }
-
-  @Override
-  public List<Library> getLibrariesByCreationDate(Date from, Date to) throws IOException {
-    List<Library> libraries = backingManager.getLibrariesByCreationDate(from, to);
-    List<Library> authorizedLibs = new ArrayList<>();
-    for (Library lib : libraries) {
-      if (readCheck(lib))
-        authorizedLibs.add(lib);
-    }
-    return authorizedLibs;
   }
 
   @Override

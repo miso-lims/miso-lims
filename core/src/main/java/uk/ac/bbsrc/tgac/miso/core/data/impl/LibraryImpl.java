@@ -26,6 +26,8 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 import java.io.Serializable;
 
 import javax.persistence.Entity;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.Table;
 
 import org.slf4j.Logger;
@@ -47,6 +49,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
  */
 @Entity
 @Table(name = "Library")
+@Inheritance(strategy = InheritanceType.JOINED)
 public class LibraryImpl extends AbstractLibrary implements Serializable {
   protected static final Logger log = LoggerFactory.getLogger(LibraryImpl.class);
 

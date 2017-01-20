@@ -12,8 +12,8 @@ import org.hibernate.annotations.Index;
 import org.hibernate.annotations.Table;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 
 @Entity
 @Table(appliesTo = "RunChangeLog", indexes = { @Index(name = "RunChangeLog_runId_changeTime", columnNames = { "runId", "changeTime" }) })
@@ -23,7 +23,7 @@ public class RunChangeLog extends AbstractChangeLog {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long runChangeLogId;
 
-  @ManyToOne(fetch = FetchType.LAZY, targetEntity = AbstractRun.class)
+  @ManyToOne(fetch = FetchType.LAZY, targetEntity = RunImpl.class)
   @JoinColumn(name = "runId", nullable = false, updatable = false)
   private Run run;
 

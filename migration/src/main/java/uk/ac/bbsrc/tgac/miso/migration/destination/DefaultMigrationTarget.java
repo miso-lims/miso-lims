@@ -26,9 +26,9 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -367,20 +367,17 @@ public class DefaultMigrationTarget implements MigrationTarget {
       library.inheritPermissions(library.getSample().getProject());
       valueTypeLookup.resolveAll(library);
       library.setLastModifier(migrationUser);
-      library.setLastUpdated(timeStamp);
-      if (library.getLibraryAdditionalInfo() != null) {
-        library.getLibraryAdditionalInfo().setCreatedBy(migrationUser);
-        library.getLibraryAdditionalInfo().setCreationDate(timeStamp);
-        library.getLibraryAdditionalInfo().setUpdatedBy(migrationUser);
-        library.getLibraryAdditionalInfo().setLastUpdated(timeStamp);
+      if (isDetailedLibrary(library)) {
+
+        library.setCreationDate(timeStamp);
         // Check for duplicate alias
         Collection<Library> dupes = serviceManager.getLibraryDao().listByAlias(library.getAlias());
         if (!dupes.isEmpty()) {
           for (Library dupe : dupes) {
-            dupe.getLibraryAdditionalInfo().setNonStandardAlias(true);
+            ((DetailedLibrary) dupe).setNonStandardAlias(true);
             serviceManager.getLibraryDao().save(dupe);
           }
-          library.getLibraryAdditionalInfo().setNonStandardAlias(true);
+          ((DetailedLibrary) library).setNonStandardAlias(true);
         }
       }
       if (replaceChangeLogs) {
@@ -398,10 +395,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
 
   private void copyTimestampsFromChangelog(Library library) {
     Date earliest = getEarliestChangeDate(library);
-    Date latest = getLatestChangeDate(library);
-    library.getLibraryAdditionalInfo().setCreationDate(earliest);
-    library.getLibraryAdditionalInfo().setLastUpdated(latest);
-    library.setLastUpdated(latest);
+    library.setCreationDate(earliest);
   }
 
   private void saveLibraryChangeLog(Library library, Collection<ChangeLog> changes) throws IOException {
@@ -429,10 +423,9 @@ public class DefaultMigrationTarget implements MigrationTarget {
         ldi.setCreationDate(timeStamp);
         ldi.setLastModified(timeStamp);
       }
-      
-      if (ldi.getLibrary().getId() == AbstractDilution.UNSAVED_ID && ldi.getLibrary().getLibraryAdditionalInfo() != null
-          && ldi.getLibrary().getLibraryAdditionalInfo().getPreMigrationId() != null) {
-        Long preMigrationId = ldi.getLibrary().getLibraryAdditionalInfo().getPreMigrationId();
+
+      if (ldi.getLibrary().getId() == LibraryDilution.UNSAVED_ID && ((DetailedLibrary) ldi.getLibrary()).getPreMigrationId() != null) {
+        Long preMigrationId = ((DetailedLibrary) ldi.getLibrary()).getPreMigrationId();
         ldi.setLibrary(serviceManager.getLibraryDao().getByPreMigrationId(preMigrationId));
         if (ldi.getLibrary() == null) {
           throw new IOException("No Library found with pre-migration ID " + preMigrationId);

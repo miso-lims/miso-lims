@@ -25,7 +25,6 @@ package uk.ac.bbsrc.tgac.miso.core.manager;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -37,7 +36,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
-import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
@@ -95,14 +93,6 @@ public interface RequestManager {
 
   public long saveSampleQC(SampleQC sampleQC) throws IOException;
 
-  public long saveLibrary(Library library) throws IOException;
-
-  public long saveLibraryDilution(LibraryDilution libraryDilution) throws IOException;
-
-  public void saveLibraryNote(Library library, Note note) throws IOException;
-
-  public long saveLibraryQC(LibraryQC libraryQC) throws IOException;
-
   public long savePool(Pool pool) throws IOException;
 
   public long savePoolQC(PoolQC poolQC) throws IOException;
@@ -148,46 +138,7 @@ public interface RequestManager {
 
   public PoolQC getPoolQCById(long poolQcId) throws IOException;
 
-  public Library getLibraryById(long libraryId) throws IOException;
-
-  public Library getLibraryByBarcode(String barcode) throws IOException;
-
-  public Collection<Library> listLibrariesByAlias(String alias) throws IOException;
-
-  public Library getAdjacentLibraryById(long libraryId, boolean before) throws IOException;
-
-  public Dilution getDilutionByBarcode(String barcode) throws IOException;
-
-  public Dilution getDilutionByIdAndPlatform(long dilutionid, PlatformType platformType) throws IOException;
-
-  public Dilution getDilutionByBarcodeAndPlatform(String barcode, PlatformType platformType) throws IOException;
-
-  public LibraryDilution getLibraryDilutionByBarcodeAndPlatform(String barcode, PlatformType platformType) throws IOException;
-
-  public LibraryDilution getLibraryDilutionById(long dilutionId) throws IOException;
-
-  public LibraryDilution getLibraryDilutionByBarcode(String barcode) throws IOException;
-
-  public Integer countLibraryDilutionsByPlatform(PlatformType platform) throws IOException;
-
-  public List<LibraryDilution> getLibraryDilutionsForPoolDataTable(int offset, int limit, String search, String sortDir, String sortCol,
-      PlatformType platform) throws IOException;
-
   public LibraryQC getLibraryQCById(long qcId) throws IOException;
-
-  public LibraryType getLibraryTypeById(long libraryId) throws IOException;
-
-  public LibraryType getLibraryTypeByDescription(String description) throws IOException;
-
-  public LibraryType getLibraryTypeByDescriptionAndPlatform(String description, PlatformType platformType) throws IOException;
-
-  public LibrarySelectionType getLibrarySelectionTypeById(long librarySelectionTypeId) throws IOException;
-
-  public LibrarySelectionType getLibrarySelectionTypeByName(String name) throws IOException;
-
-  public LibraryStrategyType getLibraryStrategyTypeById(long libraryStrategyTypeId) throws IOException;
-
-  public LibraryStrategyType getLibraryStrategyTypeByName(String name) throws IOException;
 
   public Platform getPlatformById(long platformId) throws IOException;
 
@@ -337,47 +288,7 @@ public interface RequestManager {
   @Deprecated // massively detremental to performance.
   public Collection<Library> listAllLibraries() throws IOException;
 
-  public Collection<Library> listAllLibrariesWithLimit(long limit) throws IOException;
-
-  public Collection<Library> listAllLibrariesBySearch(String query) throws IOException;
-
-  public Collection<Library> listAllLibrariesByProjectId(long projectId) throws IOException;
-
-  public Collection<Library> listAllLibrariesBySampleId(long sampleId) throws IOException;
-
-  /**
-   * throws AuthorizationIOException if user cannot read one of the requested libraries
-   */
-  public Collection<Library> getLibrariesByIdList(List<Long> idList) throws IOException;
-
   public Collection<LibraryQC> listAllLibraryQCsByLibraryId(long libraryId) throws IOException;
-
-  public Collection<LibraryType> listAllLibraryTypes() throws IOException;
-
-  public Collection<LibraryType> listLibraryTypesByPlatform(String platformType) throws IOException;
-
-  public Collection<LibrarySelectionType> listAllLibrarySelectionTypes() throws IOException;
-
-  public Collection<LibraryStrategyType> listAllLibraryStrategyTypes() throws IOException;
-
-  public Collection<Dilution> listAllLibraryDilutionsBySearchAndPlatform(String query, PlatformType platformType) throws IOException;
-
-  public Collection<Dilution> listAllDilutionsByProjectAndPlatform(long projectId, PlatformType platformType) throws IOException;
-
-  public Collection<LibraryDilution> listAllLibraryDilutions() throws IOException;
-
-  public Collection<LibraryDilution> listAllLibraryDilutionsWithLimit(long limit) throws IOException;
-
-  public Collection<LibraryDilution> listAllLibraryDilutionsByLibraryId(long libraryId) throws IOException;
-
-  public Collection<LibraryDilution> listAllLibraryDilutionsByPlatform(PlatformType platformType) throws IOException;
-
-  public Collection<LibraryDilution> listAllLibraryDilutionsByProjectId(long projectId) throws IOException;
-
-  public Collection<LibraryDilution> listAllLibraryDilutionsBySearchOnly(String query) throws IOException;
-
-  public Collection<LibraryDilution> listAllLibraryDilutionsByProjectAndPlatform(long projectId, PlatformType platformType)
-      throws IOException;
 
   public Collection<TargetedSequencing> listAllTargetedSequencing() throws IOException;
 
@@ -484,7 +395,6 @@ public interface RequestManager {
 
   public void deleteSample(Sample sample) throws IOException;
 
-  public void deleteLibrary(Library library) throws IOException;
 
   public void deleteRun(Run run) throws IOException;
 
@@ -493,8 +403,6 @@ public interface RequestManager {
   public void deleteSampleQC(SampleQC sampleQc) throws IOException;
 
   public void deleteLibraryQC(LibraryQC libraryQc) throws IOException;
-
-  public void deleteLibraryDilution(LibraryDilution dilution) throws IOException;
 
   public void deleteSequencerReference(SequencerReference sequencerReference) throws IOException;
 
@@ -507,8 +415,6 @@ public interface RequestManager {
   public void deleteRunNote(Run run, Long noteId) throws IOException;
 
   public void deleteKitNote(Kit kit, Long noteId) throws IOException;
-
-  public void deleteLibraryNote(Library library, Long noteId) throws IOException;
 
   public void deletePoolNote(Pool pool, Long noteId) throws IOException;
 
@@ -523,8 +429,6 @@ public interface RequestManager {
   public Map<String, Integer> getPoolColumnSizes() throws IOException;
 
   public Map<String, Integer> getKitDescriptorColumnSizes() throws IOException;
-
-  public Map<String, Integer> getLibraryColumnSizes() throws IOException;
 
   public Map<String, Integer> getProjectColumnSizes() throws IOException;
 
@@ -556,17 +460,6 @@ public interface RequestManager {
 
   public Long getNumPoolsBySearch(PlatformType platform, String querystr) throws IOException;
 
-  public int countLibraries() throws IOException;
-
-  public List<Library> getLibrariesByCreationDate(Date from, Date to) throws IOException;
-
-  public List<Library> getLibrariesByPageSizeSearch(int offset, int limit, String querystr, String sortDir, String sortCol)
-      throws IOException;
-
-  public List<Library> getLibrariesByPageAndSize(int offset, int limit, String sortDir, String sortCol) throws IOException;
-
-  public Long countLibrariesBySearch(String querystr) throws IOException;
-
   public Long countRuns() throws IOException;
 
   public List<Run> getRunsByPageSizeSearch(int offset, int limit, String querystr, String sortDir, String sortCol) throws IOException;
@@ -589,8 +482,6 @@ public interface RequestManager {
 
   public Project lazyGetProjectById(long projectId) throws IOException;
 
-  public Integer countLibraryDilutionsBySearchAndPlatform(String search, PlatformType platform) throws IOException;
-
   public List<Run> getRunsByPool(Pool pool) throws IOException;
 
   public void addRunWatcher(Run run, User watcher) throws IOException;
@@ -604,4 +495,28 @@ public interface RequestManager {
   public void addPoolWatcher(Pool pool, User watcher) throws IOException;
 
   public void removePoolWatcher(Pool pool, User watcher) throws IOException;
+
+  @Deprecated
+  long saveLibrary(Library library) throws IOException;
+
+  @Deprecated
+  long saveLibraryQC(LibraryQC libraryQc) throws IOException;
+
+  @Deprecated
+  public LibraryType getLibraryTypeByDescriptionAndPlatform(String description, PlatformType platformType) throws IOException;
+
+  @Deprecated
+  public LibrarySelectionType getLibrarySelectionTypeByName(String name) throws IOException;
+
+  @Deprecated
+  public LibraryStrategyType getLibraryStrategyTypeByName(String name) throws IOException;
+
+  @Deprecated
+  public long saveLibraryDilution(LibraryDilution libraryDilution) throws IOException;
+
+  @Deprecated
+  public Collection<Library> listAllLibrariesBySampleId(long sampleId) throws IOException;
+
+  @Deprecated
+  public Collection<LibraryDilution> listAllLibraryDilutions() throws IOException;
 }

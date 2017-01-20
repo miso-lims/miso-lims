@@ -50,6 +50,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 
 /**
  * uk.ac.bbsrc.tgac.miso.miso.spring.ajax
@@ -68,6 +69,8 @@ public class PoolSearchService {
   private SecurityManager securityManager;
   @Autowired
   private RequestManager requestManager;
+  @Autowired
+  private LibraryDilutionService dilutionService;
 
   private abstract class PoolSearch {
     public abstract Collection<Pool> all(PlatformType type) throws IOException;
@@ -145,11 +148,11 @@ public class PoolSearchService {
       if (searchStr.length() > 1) {
         StringBuilder b = new StringBuilder();
         List<? extends Dilution> dilutions = new ArrayList<>(
-            requestManager.listAllLibraryDilutionsBySearchAndPlatform(searchStr, PlatformType.valueOf(platformType)));
+            dilutionService.getAllBySearchAndPlatform(searchStr, PlatformType.valueOf(platformType)));
         if (dilutions.isEmpty()) {
           // Base64-encoded string, most likely a barcode image beeped in. decode and search
-          dilutions = new ArrayList<>(requestManager
-              .listAllLibraryDilutionsBySearchAndPlatform(new String(Base64.decodeBase64(searchStr)), PlatformType.valueOf(platformType)));
+          dilutions = new ArrayList<>(dilutionService
+              .getAllBySearchAndPlatform(new String(Base64.decodeBase64(searchStr)), PlatformType.valueOf(platformType)));
 
         }
         int numMatches = 0;
@@ -219,5 +222,9 @@ public class PoolSearchService {
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
+  }
+
+  public void setDilutionService(LibraryDilutionService dilutionService) {
+    this.dilutionService = dilutionService;
   }
 }

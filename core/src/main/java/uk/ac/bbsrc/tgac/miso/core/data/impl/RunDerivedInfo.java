@@ -12,7 +12,7 @@ import org.hibernate.annotations.Synchronize;
 @Entity
 @Immutable
 @Table(name = "RunDerivedInfo")
-@Synchronize("Sample")
+@Synchronize("Run")
 public class RunDerivedInfo {
 
   @Id

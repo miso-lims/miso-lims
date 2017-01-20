@@ -35,7 +35,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
 
 /**
  * Defines a DAO interface for storing Libraries
@@ -43,7 +42,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface LibraryStore extends Store<Library>, Remover<Library>, NamingSchemeAware {
+public interface LibraryStore extends Store<Library>, Remover<Library> {
 
   /**
    * Get a Library given a ID barcode
@@ -108,15 +107,6 @@ public interface LibraryStore extends Store<Library>, Remover<Library>, NamingSc
   LibraryType getLibraryTypeById(long libraryTypeId) throws IOException;
 
   /**
-   * Get a LibraryType given a LibraryType description
-   *
-   * @param description of type String
-   * @return LibraryType
-   * @throws IOException when
-   */
-  LibraryType getLibraryTypeByDescription(String description) throws IOException;
-
-  /**
    * Get a LibraryType given a LibraryType description and platform
    *
    * @param description of type String
@@ -173,11 +163,11 @@ public interface LibraryStore extends Store<Library>, Remover<Library>, NamingSc
   /**
    * List all LibraryTypes available to a given platform
    *
-   * @param platformName of type String
+   * @param platform PlatformType
    * @return Collection<LibraryType>
    * @throws IOException when
    */
-  Collection<LibraryType> listLibraryTypesByPlatform(String platformName) throws IOException;
+  Collection<LibraryType> listLibraryTypesByPlatform(PlatformType platform) throws IOException;
 
   /**
    * List all LibrarySelectionTypes
@@ -194,15 +184,6 @@ public interface LibraryStore extends Store<Library>, Remover<Library>, NamingSc
    * @throws IOException when
    */
   Collection<LibraryStrategyType> listAllLibraryStrategyTypes() throws IOException;
-
-  /**
-   * List all libraries related to a given LibraryDilution given a LibraryDilution ID
-   *
-   * @param dilutionId of type long
-   * @return Collection<Library>
-   * @throws IOException when
-   */
-  Collection<Library> listByLibraryDilutionId(long dilutionId) throws IOException;
 
   /**
    * List all persisted objects
@@ -267,5 +248,13 @@ public interface LibraryStore extends Store<Library>, Remover<Library>, NamingSc
   Library getAdjacentLibrary(long libraryId, boolean before) throws IOException;
 
   List<Library> searchByCreationDate(Date from, Date to) throws IOException;
+
+  /**
+   * Retrieves a single Library by preMigrationId (DetailedLibrary only)
+   * 
+   * @param preMigrationId preMigration ID of Library
+   * @throws IOException
+   */
+  Library getByPreMigrationId(Long preMigrationId) throws IOException;
 
 }

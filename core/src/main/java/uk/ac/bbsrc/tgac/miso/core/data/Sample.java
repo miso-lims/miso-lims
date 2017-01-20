@@ -254,7 +254,6 @@ public interface Sample extends SecurableByProfile, Locatable, Reportable, Compa
    * 
    * @return Collection<SampleQC> sampleQCs.
    */
-  // @JsonManagedReference(value="sampleqcs")
   public Collection<SampleQC> getSampleQCs();
 
   /**
@@ -269,13 +268,4 @@ public interface Sample extends SecurableByProfile, Locatable, Reportable, Compa
 
   public void setLastModifier(User user);
 
-  /**
-   * Get the security profile id independently of the security profile. This is due to Hibernate. Don't use it.
-   */
-  public Long getSecurityProfileId();
-
-  /**
-   * Sets the security profile id independently of the security profile. This is due to Hibernate. Don't use it.
-   */
-  public void setSecurityProfileId(Long securityProfileId);
 }

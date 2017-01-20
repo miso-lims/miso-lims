@@ -11,11 +11,11 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.springframework.format.datetime.DateFormatter;
 
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.LibraryAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -32,10 +32,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAdditionalInfoImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PlatformImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
@@ -339,8 +338,8 @@ public class LoadGeneratorSource implements MigrationSource {
     return this.libraries;
   }
 
-  private Library createLibrary(DetailedSample sample, int libraryNum) {
-    Library lib = new LibraryImpl();
+  private DetailedLibrary createLibrary(DetailedSample sample, int libraryNum) {
+    DetailedLibrary lib = new DetailedLibraryImpl();
 
     lib.setDescription("library");
     lib.setSample(sample);
@@ -358,11 +357,6 @@ public class LoadGeneratorSource implements MigrationSource {
     LibraryStrategyType strat = new LibraryStrategyType();
     strat.setId(libraryStrategyTypeId);
     lib.setLibraryStrategyType(strat);
-
-    LibraryAdditionalInfo lai = new LibraryAdditionalInfoImpl();
-    lai.setArchived(false);
-    lai.setLibrary(lib);
-    lib.setLibraryAdditionalInfo(lai);
 
     // faked alias generation to avoid necessity of target database data
     // Note: this will fail (OICR) validation if libraryCount > 999999

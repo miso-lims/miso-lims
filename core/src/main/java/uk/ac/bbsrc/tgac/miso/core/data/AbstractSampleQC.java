@@ -38,6 +38,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
  */
 @MappedSuperclass
 public abstract class AbstractSampleQC extends AbstractQC implements SampleQC {
+
   public static final String UNITS = "ng/&#181;l";
 
   private Double results;

@@ -25,6 +25,9 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.io.Serializable;
 
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,6 +44,8 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
  * @author Rob Davey
  * @since 0.0.2
  */
+@Entity
+@Table(name = "LibraryQC")
 public class LibraryQCImpl extends AbstractLibraryQC implements Serializable {
   protected static final Logger log = LoggerFactory.getLogger(LibraryQCImpl.class);
   /**

@@ -80,11 +80,11 @@ public class HibernateLibraryDesignDao implements LibraryDesignDao {
   }
 
   private LibraryDesign fetchSqlStore(LibraryDesign libraryDesign) throws IOException {
-    if (libraryDesign != null && libraryDesign.getHibernateLibrarySelectionTypeId() != null) {
-      libraryDesign.setLibrarySelectionType(libraryDao.getLibrarySelectionTypeById(libraryDesign.getHibernateLibrarySelectionTypeId()));
+    if (libraryDesign != null && libraryDesign.getLibrarySelectionType().getId() != null) {
+      libraryDesign.setLibrarySelectionType(libraryDao.getLibrarySelectionTypeById(libraryDesign.getLibrarySelectionType().getId()));
     }
-    if (libraryDesign != null && libraryDesign.getHibernateLibraryStrategyTypeId() != null) {
-      libraryDesign.setLibraryStrategyType(libraryDao.getLibraryStrategyTypeById(libraryDesign.getHibernateLibraryStrategyTypeId()));
+    if (libraryDesign != null && libraryDesign.getLibraryStrategyType().getId() != null) {
+      libraryDesign.setLibraryStrategyType(libraryDao.getLibraryStrategyTypeById(libraryDesign.getLibraryStrategyType().getId()));
     }
     return libraryDesign;
   }

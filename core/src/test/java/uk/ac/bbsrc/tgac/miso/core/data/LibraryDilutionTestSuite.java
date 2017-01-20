@@ -13,22 +13,25 @@ import org.mockito.Mockito;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
  * @author saltc
  * 
  */
-public class AbstractDilutionTestSuite {
+public class LibraryDilutionTestSuite {
 
   /**
    * @throws java.lang.Exception
    */
-  AbstractDilution ad;
+  LibraryDilution ld;
 
   @Before
   public void setUp() throws Exception {
-    ad = new AbstractDilution() {
+    ld = new LibraryDilution() {
+      private static final long serialVersionUID = 1L;
+
       @Override
       public String getUnits() {
         return null;
@@ -39,7 +42,7 @@ public class AbstractDilutionTestSuite {
         return null;
       }
     };
-    ad.setName("MyAbstractDilution");
+    ld.setName("MyLibraryDilution");
   }
 
   @Test
@@ -50,9 +53,9 @@ public class AbstractDilutionTestSuite {
     when(parent.getSecurityProfile()).thenReturn(mockSecurityProfile);
     when(mockSecurityProfile.getOwner()).thenReturn(mockUser);
 
-    assertNull(ad.getSecurityProfile());
-    ad.inheritPermissions(parent);
-    assertNotNull(ad.getSecurityProfile());
+    assertNull(ld.getSecurityProfile());
+    ld.inheritPermissions(parent);
+    assertNotNull(ld.getSecurityProfile());
   }
 
   @Test(expected = SecurityException.class)
@@ -60,7 +63,7 @@ public class AbstractDilutionTestSuite {
     final SecurableByProfile parent = Mockito.mock(SecurableByProfile.class);
     final SecurityProfile mockSecurityProfile = Mockito.mock(SecurityProfile.class);
     when(parent.getSecurityProfile()).thenReturn(mockSecurityProfile);
-    ad.inheritPermissions(parent);
+    ld.inheritPermissions(parent);
   }
 
 }

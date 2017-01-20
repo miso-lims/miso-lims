@@ -70,6 +70,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 
 /**
  * uk.ac.bbsrc.tgac.miso.spring.ajax
@@ -91,9 +92,15 @@ public class FlexReportingControllerHelperService {
   private JdbcTemplate interfaceTemplate;
   @Autowired
   private ExperimentService experimentService;
+  @Autowired
+  private LibraryService libraryService;
 
   public void setInterfaceTemplate(JdbcTemplate interfaceTemplate) {
     this.interfaceTemplate = interfaceTemplate;
+  }
+
+  public void setLibraryService(LibraryService libraryService) {
+    this.libraryService = libraryService;
   }
 
   public String flexHTMLTemplate(String content) {
@@ -286,7 +293,7 @@ public class FlexReportingControllerHelperService {
           }
 
         }
-        for (Library library : requestManager.listAllLibrariesByProjectId(project.getProjectId())) {
+        for (Library library : libraryService.getAllByProjectId(project.getProjectId())) {
           if (!librariesInRun.contains(library)) {
             Sample sample = library.getSample();
             jsonArray.add("['" + project.getName() + "','" + sample.getName() + "','" + library.getName() + "','NA','NA','NA']");
@@ -471,7 +478,7 @@ public class FlexReportingControllerHelperService {
                               JsonSanitizer.sanitize(
                                   "[\"" + sample.getAlias() + "\",\"" + sample.getDescription() + "\",\"" + sample.getSampleType() + "\",\""
                                       + libraryInRun.getName() + "\",\"" + dilution.getName() + "\",\"" + indexInfo.toString() + "\",\""
-                                      + libraryQc.getInsertSize().toString() + "\",\"" + run.getAlias() + "\",\""
+                                      + Integer.toString(libraryQc.getInsertSize()) + "\",\"" + run.getAlias() + "\",\""
                                       + spp.getPartitionNumber().toString() + "\"]"));
                         }
                       }
@@ -696,9 +703,9 @@ public class FlexReportingControllerHelperService {
       Date startDate = df.parse(from);
       Date endDate = df.parse(to);
       if (!isStringEmptyOrNull(searchStr)) {
-        libraries = requestManager.listAllLibrariesBySearch(searchStr);
+        libraries = libraryService.getAllBySearch(searchStr);
       } else {
-        libraries = requestManager.getLibrariesByCreationDate(startDate, endDate);
+        libraries = libraryService.searchByCreationDate(startDate, endDate);
       }
 
       for (Library library : libraries) {
@@ -743,7 +750,7 @@ public class FlexReportingControllerHelperService {
 
       for (JSONObject j : (Iterable<JSONObject>) a) {
         if (j.getString("name").equals("libraryIds")) {
-          Library l = requestManager.getLibraryById(j.getLong("value"));
+          Library l = libraryService.get(j.getLong("value"));
           if (l != null) {
             libraries.add(l);
 
@@ -1131,7 +1138,7 @@ public class FlexReportingControllerHelperService {
       sampleJSON.put("name", "Samples");
       sampleJSON.put("description", "");
       for (Sample sample : samples) {
-        Collection<Library> libraries = requestManager.listAllLibrariesBySampleId(sample.getId());
+        Collection<Library> libraries = libraryService.getAllBySampleId(sample.getId());
         if (libraries.size() == 0) {
           if (sample.getQcPassed()) {
             samplesArray

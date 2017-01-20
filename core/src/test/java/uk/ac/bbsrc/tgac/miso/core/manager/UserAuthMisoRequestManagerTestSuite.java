@@ -27,7 +27,6 @@ import org.springframework.security.core.context.SecurityContextImpl;
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
-import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
@@ -401,40 +400,6 @@ public class UserAuthMisoRequestManagerTestSuite {
 
   /**
    * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveLibrary(uk.ac.bbsrc.tgac.miso.core.data.Library)} .
-   * 
-   * @throws IOException
-   */
-  @Test
-  public void testSaveLibrary() throws IOException {
-    final long expectedReturn = 1L;
-    when(library.userCanWrite(any(User.class))).thenReturn(true);
-    when(backingManager.saveLibrary(library)).thenReturn(expectedReturn);
-
-    assertEquals(expectedReturn, userAuthMisoRequestManager.saveLibrary(library));
-
-    verify(backingManager).saveLibrary(library);
-  }
-
-  /**
-   * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveLibrary(uk.ac.bbsrc.tgac.miso.core.data.Library)} .
-   * 
-   * @throws IOException
-   */
-  @Test
-  public void testSaveLibraryThrows() throws IOException {
-    when(library.userCanWrite(any(User.class))).thenReturn(false);
-
-    thrown.expect(IOException.class);
-    thrown.expectMessage("User null cannot write to this Library");
-    userAuthMisoRequestManager.saveLibrary(library);
-
-    verify(backingManager, never()).saveLibrary(library);
-  }
-
-  /**
-   * Test method for
    * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveLibraryDilution(uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution)}
    * .
    * 
@@ -467,74 +432,6 @@ public class UserAuthMisoRequestManagerTestSuite {
     userAuthMisoRequestManager.saveLibraryDilution(libraryDilution);
 
     verify(backingManager, never()).saveLibraryDilution(libraryDilution);
-  }
-
-  /**
-   * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveLibraryNote(uk.ac.bbsrc.tgac.miso.core.data.Library, com.eaglegenomics.simlims.core.Note)}
-   * .
-   * 
-   * @throws IOException
-   */
-  @Test
-  public void testSaveLibraryNote() throws IOException {
-    when(library.userCanWrite(any(User.class))).thenReturn(true);
-    userAuthMisoRequestManager.saveLibraryNote(library, note);
-    verify(backingManager).saveLibraryNote(library, note);
-  }
-
-  /**
-   * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveLibraryNote(uk.ac.bbsrc.tgac.miso.core.data.Library, com.eaglegenomics.simlims.core.Note)}
-   * .
-   * 
-   * @throws IOException
-   */
-  @Test
-  public void testSaveLibraryNoteThrows() throws IOException {
-    when(library.userCanWrite(any(User.class))).thenReturn(false);
-
-    thrown.expect(IOException.class);
-    thrown.expectMessage("User null cannot write to this Library");
-    userAuthMisoRequestManager.saveLibraryNote(library, note);
-
-    verify(backingManager, never()).saveLibraryNote(library, note);
-  }
-
-  /**
-   * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveLibraryQC(uk.ac.bbsrc.tgac.miso.core.data.LibraryQC)} .
-   * 
-   * @throws IOException
-   */
-  @Test
-  public void testSaveLibraryQC() throws IOException {
-    final long expectedReturn = 1L;
-    when(libraryQC.getLibrary()).thenReturn(library);
-    when(library.userCanWrite(any(User.class))).thenReturn(true);
-    when(backingManager.saveLibraryQC(libraryQC)).thenReturn(expectedReturn);
-
-    assertEquals(expectedReturn, userAuthMisoRequestManager.saveLibraryQC(libraryQC));
-
-    verify(backingManager).saveLibraryQC(libraryQC);
-  }
-
-  /**
-   * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveLibraryQC(uk.ac.bbsrc.tgac.miso.core.data.LibraryQC)} .
-   * 
-   * @throws IOException
-   */
-  @Test
-  public void testSaveLibraryQCThrows() throws IOException {
-    when(libraryQC.getLibrary()).thenReturn(library);
-    when(library.userCanWrite(any(User.class))).thenReturn(false);
-
-    thrown.expect(IOException.class);
-    thrown.expectMessage("User null cannot write to this Library");
-    userAuthMisoRequestManager.saveLibraryQC(libraryQC);
-
-    verify(backingManager, never()).saveLibraryQC(libraryQC);
   }
 
   /**
@@ -900,316 +797,6 @@ public class UserAuthMisoRequestManagerTestSuite {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getLibraryById(long)} .
-   */
-  @Test
-  public void testGetLibraryById() throws IOException {
-    long inputId = 1L;
-    when(backingManager.getLibraryById(inputId)).thenReturn(library);
-    when(library.userCanRead(any(User.class))).thenReturn(true);
-
-    assertEquals(library, userAuthMisoRequestManager.getLibraryById(inputId));
-
-    verify(backingManager).getLibraryById(inputId);
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getLibraryById(long)} .
-   */
-  @Test
-  public void testGetLibraryByIdThrows() throws IOException {
-    long inputId = 1L;
-    when(backingManager.getLibraryById(inputId)).thenReturn(library);
-    when(pool.userCanRead(any(User.class))).thenReturn(false);
-
-    thrown.expect(IOException.class);
-    thrown.expectMessage("User null cannot read Library " + inputId);
-
-    userAuthMisoRequestManager.getLibraryById(inputId);
-
-    verify(backingManager).getLibraryById(inputId);
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getLibraryByBarcode(java.lang.String)} .
-   */
-  @Test
-  public void testGetLibraryByBarcode() throws IOException {
-    String barcode = "barcode";
-    when(backingManager.getLibraryByBarcode(barcode)).thenReturn(library);
-    when(library.userCanRead(any(User.class))).thenReturn(true);
-
-    assertEquals(library, userAuthMisoRequestManager.getLibraryByBarcode(barcode));
-
-    verify(backingManager).getLibraryByBarcode(barcode);
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getLibraryByBarcode(java.lang.String)} .
-   */
-  @Test
-  public void testGetLibraryByBarcodeThrows() throws IOException {
-    String barcode = "barcode";
-    when(backingManager.getLibraryByBarcode(barcode)).thenReturn(library);
-    when(library.userCanRead(any(User.class))).thenReturn(false);
-    long libraryId = 1L;
-    when(library.getId()).thenReturn(libraryId);
-    thrown.expect(IOException.class);
-    thrown.expectMessage("User null cannot read Library " + libraryId);
-
-    userAuthMisoRequestManager.getLibraryByBarcode(barcode);
-
-    verify(backingManager).getLibraryByBarcode(barcode);
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getLibraryByAlias(java.lang.String)} .
-   */
-  @Test
-  public void testListLibraryByAlias() throws IOException {
-    String alias = "alias";
-    when(backingManager.listLibrariesByAlias(alias)).thenReturn(Sets.newHashSet(library));
-    when(library.userCanRead(any(User.class))).thenReturn(true);
-
-    assertEquals(library, userAuthMisoRequestManager.listLibrariesByAlias(alias).iterator().next());
-
-    verify(backingManager).listLibrariesByAlias(alias);
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getLibraryByAlias(java.lang.String)} .
-   */
-  @Test
-  public void testListLibraryByAliasThrows() throws IOException {
-    String alias = "alias";
-    when(backingManager.listLibrariesByAlias(alias)).thenReturn(Sets.newHashSet(library));
-    when(library.userCanRead(any(User.class))).thenReturn(false);
-    long libraryId = 1L;
-    when(library.getId()).thenReturn(libraryId);
-    thrown.expect(IOException.class);
-    thrown.expectMessage("User null cannot read Library " + libraryId);
-
-    userAuthMisoRequestManager.listLibrariesByAlias(alias);
-
-    verify(backingManager).listLibrariesByAlias(alias);
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getDilutionByBarcode(java.lang.String)} .
-   */
-  @Test
-  public void testGetDilutionByBarcode() throws IOException {
-    String barcode = "barcode";
-    when(backingManager.getDilutionByBarcode(barcode)).thenReturn(dilution);
-    when(dilution.userCanRead(any(User.class))).thenReturn(true);
-
-    assertEquals(dilution, userAuthMisoRequestManager.getDilutionByBarcode(barcode));
-
-    verify(backingManager).getDilutionByBarcode(barcode);
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getDilutionByBarcode(java.lang.String)} .
-   */
-  @Test
-  public void testGetDilutionByBarcodeThrows() throws IOException {
-    String barcode = "barcode";
-    when(backingManager.getDilutionByBarcode(barcode)).thenReturn(dilution);
-    when(dilution.userCanRead(any(User.class))).thenReturn(false);
-    long dilutionId = 1L;
-    when(dilution.getId()).thenReturn(dilutionId);
-    thrown.expect(IOException.class);
-    thrown.expectMessage("User null cannot read Dilution " + dilutionId);
-
-    userAuthMisoRequestManager.getDilutionByBarcode(barcode);
-
-    verify(backingManager).getDilutionByBarcode(barcode);
-  }
-
-  /**
-   * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getDilutionByIdAndPlatform(long, uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType)}
-   * .
-   */
-
-  @Test
-  public void testGetDilutionByIdAndPlatform() throws IOException {
-    long id = 1L;
-    PlatformType platformType = PlatformType.ILLUMINA;
-    when(backingManager.getDilutionByIdAndPlatform(id, platformType)).thenReturn(dilution);
-    when(dilution.userCanRead(any(User.class))).thenReturn(true);
-
-    assertEquals(dilution, userAuthMisoRequestManager.getDilutionByIdAndPlatform(id, platformType));
-
-    verify(backingManager).getDilutionByIdAndPlatform(id, platformType);
-  }
-
-  /**
-   * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getDilutionByIdAndPlatform(long, uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType)}
-   * .
-   */
-
-  @Test
-  public void testGetDilutionByIdAndPlatformThrows() throws IOException {
-    long dilutionId = 1L;
-    PlatformType platformType = PlatformType.ILLUMINA;
-    when(backingManager.getDilutionByIdAndPlatform(dilutionId, platformType)).thenReturn(dilution);
-    when(dilution.userCanRead(any(User.class))).thenReturn(false);
-    when(dilution.getId()).thenReturn(dilutionId);
-
-    thrown.expect(IOException.class);
-    thrown.expectMessage("User null cannot read Dilution " + dilutionId);
-
-    userAuthMisoRequestManager.getDilutionByIdAndPlatform(dilutionId, platformType);
-
-    verify(backingManager).getDilutionByIdAndPlatform(dilutionId, platformType);
-  }
-
-  /**
-   * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getDilutionByBarcodeAndPlatform(java.lang.String, uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType)}
-   * .
-   */
-  @Test
-  public void testGetDilutionByBarcodeAndPlatform() throws IOException {
-    String barcode = "barcode";
-    PlatformType platformType = PlatformType.ILLUMINA;
-    when(backingManager.getDilutionByBarcodeAndPlatform(barcode, platformType)).thenReturn(dilution);
-    when(dilution.userCanRead(any(User.class))).thenReturn(true);
-
-    assertEquals(dilution, userAuthMisoRequestManager.getDilutionByBarcodeAndPlatform(barcode, platformType));
-
-    verify(backingManager).getDilutionByBarcodeAndPlatform(barcode, platformType);
-  }
-
-  /**
-   * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getDilutionByBarcodeAndPlatform(java.lang.String, uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType)}
-   * .
-   */
-  @Test
-  public void testGetDilutionByBarcodeAndPlatformThrows() throws IOException {
-    String barcode = "barcode";
-    long id = 1L;
-    PlatformType platformType = PlatformType.ILLUMINA;
-    when(backingManager.getDilutionByBarcodeAndPlatform(barcode, platformType)).thenReturn(dilution);
-    when(dilution.userCanRead(any(User.class))).thenReturn(false);
-    when(dilution.getId()).thenReturn(id);
-
-    thrown.expect(IOException.class);
-    thrown.expectMessage("User null cannot read Dilution " + id);
-
-    userAuthMisoRequestManager.getDilutionByBarcodeAndPlatform(barcode, platformType);
-
-    verify(backingManager).getDilutionByBarcodeAndPlatform(barcode, platformType);
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getLibraryDilutionById(long)} .
-   */
-  @Test
-  public void testGetLibraryDilutionById() throws IOException {
-    long dilutionId = 1L;
-    when(backingManager.getLibraryDilutionById(dilutionId)).thenReturn(libraryDilution);
-    when(libraryDilution.userCanRead(any(User.class))).thenReturn(true);
-
-    assertEquals(libraryDilution, userAuthMisoRequestManager.getLibraryDilutionById(dilutionId));
-
-    verify(backingManager).getLibraryDilutionById(dilutionId);
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getLibraryDilutionById(long)} .
-   */
-  @Test
-  public void testGetLibraryDilutionByIdThrows() throws IOException {
-    long dilutionId = 1L;
-    PlatformType platformType = PlatformType.ILLUMINA;
-    when(backingManager.getLibraryDilutionById(dilutionId)).thenReturn(libraryDilution);
-    when(libraryDilution.userCanRead(any(User.class))).thenReturn(false);
-
-    thrown.expect(IOException.class);
-    thrown.expectMessage("User null cannot read LibraryDilution " + dilutionId);
-
-    userAuthMisoRequestManager.getLibraryDilutionById(dilutionId);
-
-    verify(backingManager).getLibraryDilutionById(dilutionId);
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getLibraryDilutionByBarcode(java.lang.String)} .
-   */
-  @Test
-  public void testGetLibraryDilutionByBarcode() throws IOException {
-    String barcode = "barcode";
-    when(backingManager.getLibraryDilutionByBarcode(barcode)).thenReturn(libraryDilution);
-    when(libraryDilution.userCanRead(any(User.class))).thenReturn(true);
-
-    assertEquals(libraryDilution, userAuthMisoRequestManager.getLibraryDilutionByBarcode(barcode));
-
-    verify(backingManager).getLibraryDilutionByBarcode(barcode);
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getLibraryDilutionByBarcode(java.lang.String)} .
-   */
-  @Test
-  public void testGetLibraryDilutionByBarcodeThrows() throws IOException {
-    String barcode = "barcode";
-    when(backingManager.getLibraryDilutionByBarcode(barcode)).thenReturn(libraryDilution);
-    when(libraryDilution.userCanRead(any(User.class))).thenReturn(false);
-    long id = 1L;
-    when(libraryDilution.getId()).thenReturn(id);
-
-    thrown.expect(IOException.class);
-    thrown.expectMessage("User null cannot read LibraryDilution " + id);
-
-    userAuthMisoRequestManager.getLibraryDilutionByBarcode(barcode);
-
-    verify(backingManager).getLibraryDilutionByBarcode(barcode);
-  }
-
-  /**
-   * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getLibraryDilutionByBarcodeAndPlatform(java.lang.String, uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType)}
-   * .
-   */
-  @Test
-  public void testGetLibraryDilutionByBarcodeAndPlatform() throws IOException {
-    String barcode = "barcode";
-    PlatformType platformType = PlatformType.ILLUMINA;
-    when(backingManager.getLibraryDilutionByBarcodeAndPlatform(barcode, platformType)).thenReturn(libraryDilution);
-    when(libraryDilution.userCanRead(any(User.class))).thenReturn(true);
-
-    assertEquals(libraryDilution, userAuthMisoRequestManager.getLibraryDilutionByBarcodeAndPlatform(barcode, platformType));
-
-    verify(backingManager).getLibraryDilutionByBarcodeAndPlatform(barcode, platformType);
-  }
-
-  /**
-   * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getLibraryDilutionByBarcodeAndPlatform(java.lang.String, uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType)}
-   * .
-   */
-  @Test
-  public void testGetLibraryDilutionByBarcodeAndPlatformThrows() throws IOException {
-    String barcode = "barcode";
-    long id = 1L;
-    PlatformType platformType = PlatformType.ILLUMINA;
-    when(backingManager.getLibraryDilutionByBarcodeAndPlatform(barcode, platformType)).thenReturn(libraryDilution);
-    when(libraryDilution.userCanRead(any(User.class))).thenReturn(false);
-    when(libraryDilution.getId()).thenReturn(id);
-
-    thrown.expect(IOException.class);
-    thrown.expectMessage("User null cannot read LibraryDilution " + id);
-
-    userAuthMisoRequestManager.getLibraryDilutionByBarcodeAndPlatform(barcode, platformType);
-
-    verify(backingManager).getLibraryDilutionByBarcodeAndPlatform(barcode, platformType);
-  }
-
-  /**
    * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getLibraryQCById(long)} .
    */
   @Test
@@ -1362,7 +949,7 @@ public class UserAuthMisoRequestManagerTestSuite {
     when(backingManager.getProjectOverviewById(projectOverviewId)).thenReturn(projectOverview);
     when(projectOverview.getProject()).thenReturn(project);
     when(project.userCanRead(any(User.class))).thenReturn(false);
-    when(project.getProjectId()).thenReturn(projectId);
+    when(project.getId()).thenReturn(projectId);
 
     thrown.expect(IOException.class);
     thrown.expectMessage("User null cannot read parent Project " + projectId + " for ProjectOverview " + projectOverviewId);
@@ -2362,6 +1949,16 @@ public class UserAuthMisoRequestManagerTestSuite {
 
   @Test
   public void testListAllPlatesBySearch() throws IOException {
+    // TODO: Implement.
+  }
+
+  /**
+   * Test method for
+   * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#deleteProject(uk.ac.bbsrc.tgac.miso.core.data.Project)} .
+   */
+
+  @Test
+  public void testDeleteProject() throws IOException {
     // TODO: Implement.
   }
 

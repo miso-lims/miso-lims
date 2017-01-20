@@ -1,7 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
-import static uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils.*;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -244,13 +243,13 @@ public class DefaultSampleService implements SampleService {
     }
     try {
       Long newId = sample.getId();
+      if (!hasTemporaryAlias(sample)) {
+        validateAlias(sample);
+      }
       if (newId == Sample.UNSAVED_ID) {
         newId = sampleDao.addSample(sample);
       } else {
         sampleDao.update(sample);
-      }
-      if (!hasTemporaryAlias(sample)) {
-        validateAlias(sample);
       }
       Sample created = sampleDao.getSample(newId);
 
@@ -258,24 +257,22 @@ public class DefaultSampleService implements SampleService {
       boolean needsUpdate = false;
       if (hasTemporaryName(sample)) {
         created.setName(namingScheme.generateNameFor(created));
+        validateNameOrThrow(created, namingScheme);
         needsUpdate = true;
       }
       if (hasTemporaryAlias(sample)) {
         String generatedAlias = namingScheme.generateSampleAlias(created);
         validateAliasUniqueness(generatedAlias);
         created.setAlias(generatedAlias);
+        validateAlias(created);
         needsUpdate = true;
       }
-      if (isStringBlankOrNull(sample.getAlias())) {
-        sample.setAlias(sample.getName());
+      if (autoGenerateIdBarcodes && isStringEmptyOrNull(created.getIdentificationBarcode())) {
+        // if !autoGenerateIdBarcodes then the identificationBarcode is set by the user
+        generateAndSetIdBarcode(created);
         needsUpdate = true;
       }
-      if (autoGenerateIdBarcodes) {
-        autoGenerateIdBarcode(sample);
-        needsUpdate = true;
-      } // if !autoGenerateIdentificationBarcodes then the identificationBarcode is set by the user
       if (needsUpdate) {
-        validateAlias(sample);
         sampleDao.update(created);
       }
 
@@ -521,7 +518,6 @@ public class DefaultSampleService implements SampleService {
    * Updates all timestamps and user data associated with the change
    * 
    * @param sample the Sample to update
-   * @param setCreated specifies whether this is a newly created Sample requiring creation timestamps and user data
    * @throws IOException
    */
   private void setChangeDetails(Sample sample) throws IOException {
@@ -645,24 +641,6 @@ public class DefaultSampleService implements SampleService {
     sampleDao.deleteSample(sample);
   }
 
-  static public boolean hasTemporaryName(Sample sample) {
-    return sample != null && sample.getName() != null && sample.getName().startsWith(TEMPORARY_NAME_PREFIX);
-  }
-
-  static public boolean hasTemporaryAlias(Sample sample) {
-    return sample != null && sample.getAlias() != null && sample.getAlias().startsWith(TEMPORARY_NAME_PREFIX);
-  }
-
-  /**
-   * Generates a unique barcode. Note that the barcode will change when the alias is changed.
-   * 
-   * @param sample
-   */
-  public void autoGenerateIdBarcode(Sample sample) {
-    String barcode = sample.getName() + "::" + sample.getAlias();
-    sample.setIdentificationBarcode(barcode);
-  }
-
   @CoverageIgnore
   @Override
   public List<Sample> getByPageAndSize(int offset, int size, String sortCol, String sortDir) throws IOException {
@@ -705,6 +683,12 @@ public class DefaultSampleService implements SampleService {
   @Override
   public List<Sample> getByAlias(String alias) throws IOException {
     return new ArrayList<>(sampleDao.listByAlias(alias));
+  }
+
+  @Override
+  public Sample getByBarcode(String barcode) throws IOException {
+    Sample sample = sampleDao.getByBarcode(barcode);
+    return (authorizationManager.readCheck(sample) ? sample : null);
   }
 
   @Override

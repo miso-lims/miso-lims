@@ -44,7 +44,9 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.integration.BoxScan;
 import uk.ac.bbsrc.tgac.miso.integration.BoxScanner;
 import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationException;
+import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.PrinterService;
+import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils;
 import uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils.BarcodePrintAssister;
@@ -55,6 +57,10 @@ public class BoxControllerHelperService {
 
   @Autowired
   private AuthorizationManager authorizationManager;
+  @Autowired
+  private LibraryService libraryService;
+  @Autowired
+  private SampleService sampleService;
 
   @Autowired
   private RequestManager requestManager;
@@ -120,8 +126,8 @@ public class BoxControllerHelperService {
     Boxable sample;
     Boxable library;
     Boxable pool;
-    sample = requestManager.getSampleByBarcode(barcode);
-    library = requestManager.getLibraryByBarcode(barcode);
+    sample = sampleService.getByBarcode(barcode);
+    library = libraryService.getByBarcode(barcode);
     pool = requestManager.getPoolByIdBarcode(barcode);
     if ((sample == null ? 0 : 1) + (library == null ? 0 : 1) + (pool == null ? 0 : 1) > 1) {
       String errorMessage = "";
@@ -925,5 +931,13 @@ public class BoxControllerHelperService {
   @CoverageIgnore
   public void setAuthorizationManager(AuthorizationManager authorizationManager) {
     this.authorizationManager = authorizationManager;
+  }
+
+  public void setLibraryService(LibraryService libraryService) {
+    this.libraryService = libraryService;
+  }
+
+  public void setSampleService(SampleService sampleService) {
+    this.sampleService = sampleService;
   }
 }

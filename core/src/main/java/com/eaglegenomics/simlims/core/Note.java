@@ -12,6 +12,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+
 /**
  * Copyright (C) 2009 The Genome Analysis Center, Norwich, UK.
  * <p>
@@ -42,7 +44,7 @@ public class Note implements Serializable, Comparable<Note> {
   @Column(nullable = false, updatable = false)
   private String text = "";
 
-  @ManyToOne
+  @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "owner_userId", nullable = false, updatable = false)
   private User owner = null;
 

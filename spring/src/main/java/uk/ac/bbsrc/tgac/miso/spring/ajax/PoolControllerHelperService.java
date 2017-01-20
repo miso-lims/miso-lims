@@ -69,6 +69,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ExperimentImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
@@ -76,6 +78,7 @@ import uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.PrinterService;
 import uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils;
 import uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils.BarcodePrintAssister;
@@ -103,6 +106,8 @@ public class PoolControllerHelperService {
   private PrinterService printerService;
   @Autowired
   private ExperimentService experimentService;
+  @Autowired
+  private LibraryDilutionService dilutionService;
 
   public JSONObject getPoolQcTypes(HttpSession session, JSONObject json) {
     try {
@@ -236,10 +241,10 @@ public class PoolControllerHelperService {
     StringBuilder sb = new StringBuilder();
     sb.append("<div id='dilslist' class='checklist' style='width: 100%;'>");
     for (String s : codes) {
-      Dilution ed = requestManager.getDilutionByBarcode(s);
+      Dilution ed = dilutionService.getByBarcode(s);
       // Base64-encoded string, most likely a barcode image beeped in. decode and search
       if (ed == null) {
-        ed = requestManager.getDilutionByBarcode(new String(Base64.decodeBase64(s)));
+        ed = dilutionService.getByBarcode(new String(Base64.decodeBase64(s)));
       }
       if (ed != null) {
         sb.append("<span>");
@@ -387,7 +392,10 @@ public class PoolControllerHelperService {
     String idBarcode = json.getString("identificationBarcode");
 
     try {
-      if (!isStringEmptyOrNull(idBarcode)) {
+      if (isStringEmptyOrNull(idBarcode)) {
+        // if the user accidentally deletes a barcode, the changelogs will have a record of the original barcode
+        idBarcode = null;
+      } else {
         List<Boxable> previouslyBarcodedItems = new ArrayList<>(requestManager.getBoxablesFromBarcodeList(Arrays.asList(idBarcode)));
         if (!previouslyBarcodedItems.isEmpty()
             && !(previouslyBarcodedItems.size() == 1 && previouslyBarcodedItems.get(0).getId() == poolId)) {
@@ -398,15 +406,12 @@ public class PoolControllerHelperService {
           log.debug(error);
           return JSONUtils.SimpleJSONError(error);
         }
-        Pool pool = requestManager.getPoolById(poolId);
-        User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-
-        pool.setIdentificationBarcode(idBarcode);
-        pool.setLastModifier(user);
-        requestManager.savePool(pool);
-      } else {
-        return JSONUtils.SimpleJSONError("New identification barcode not recognized");
       }
+      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+      Pool pool = requestManager.getPoolById(poolId);
+      pool.setIdentificationBarcode(idBarcode);
+      pool.setLastModifier(user);
+      requestManager.savePool(pool);
     } catch (IOException e) {
       log.debug("Could not change Pool identificationBarcode: " + e.getMessage());
       return JSONUtils.SimpleJSONError(e.getMessage());
@@ -662,8 +667,7 @@ public class PoolControllerHelperService {
       if (!pool.userCanWrite(user)) {
         return JSONUtils.SimpleJSONError("Not authorized to modify pool.");
       }
-      @SuppressWarnings("unchecked")
-      Dilution target = requestManager.getLibraryDilutionById(dilutionId);
+      Dilution target = dilutionService.get(dilutionId);
       if (target == null) {
         return JSONUtils.SimpleJSONError("No such element.");
       }
@@ -723,5 +727,13 @@ public class PoolControllerHelperService {
 
   public void setPrinterService(PrinterService printerService) {
     this.printerService = printerService;
+  }
+
+  public void setExperimentService(ExperimentService experimentService) {
+    this.experimentService = experimentService;
+  }
+
+  public void setDilutionService(LibraryDilutionService dilutionService) {
+    this.dilutionService = dilutionService;
   }
 }

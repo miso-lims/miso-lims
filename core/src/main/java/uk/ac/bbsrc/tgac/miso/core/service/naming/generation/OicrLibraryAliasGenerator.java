@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.core.service.naming.generation;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 
@@ -26,7 +27,7 @@ public class OicrLibraryAliasGenerator implements NameGenerator<Library> {
         } else if (library.getLibraryType().getDescription().equals("Single End")) {
           libraryType = "SE";
         }
-        String libraryDesignCode = library.getLibraryAdditionalInfo().getLibraryDesignCode().getCode();
+        String libraryDesignCode = ((DetailedLibrary) library).getLibraryDesignCode().getCode();
         String estimateInsertSize = "300";
         StringBuilder sb = new StringBuilder();
         sb.append(m.group(1)); // PCSI_0123_Pa_R (project name, patient number, tissue origin, tissue type)

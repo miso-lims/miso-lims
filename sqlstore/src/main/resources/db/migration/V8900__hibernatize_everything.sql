@@ -420,3 +420,22 @@ DROP TABLE Flowcell_Chamber;
 DROP TABLE Chamber;
 DROP TABLE Lane;
 DROP TABLE Flowcell;
+
+UPDATE Library SET platformName = UPPER(platformName);
+UPDATE LibraryType SET platformType = UPPER(platformType);
+ALTER TABLE Library ADD CONSTRAINT fk_library_libraryType FOREIGN KEY (libraryType) REFERENCES LibraryType (libraryTypeId);
+ALTER TABLE Library ADD CONSTRAINT fk_library_librarySelectionType FOREIGN KEY (librarySelectionType) REFERENCES LibrarySelectionType (librarySelectionTypeId);
+ALTER TABLE Library ADD CONSTRAINT fk_library_libraryStrategyType FOREIGN KEY (libraryStrategyType) REFERENCES LibraryStrategyType (libraryStrategyTypeId);
+
+ALTER TABLE LibraryDilution ADD COLUMN lastModifier bigint(20);
+UPDATE LibraryDilution SET lastModifier = (SELECT lastModifier FROM Library l WHERE l.libraryId = library_libraryId);
+ALTER TABLE LibraryDilution CHANGE COLUMN lastModifier lastModifier bigint(20) NOT NULL;
+ALTER TABLE LibraryDilution ADD CONSTRAINT fk_libraryDilution_lastModifier_user FOREIGN KEY (lastModifier) REFERENCES User (userId);
+
+ALTER TABLE LibraryAdditionalInfo RENAME TO DetailedLibrary;
+ALTER TABLE DetailedLibrary DROP FOREIGN KEY `libraryAdditionalInfo_createUser_fkey`;
+ALTER TABLE DetailedLibrary DROP COLUMN createdBy;
+ALTER TABLE DetailedLibrary DROP COLUMN creationDate;
+ALTER TABLE DetailedLibrary DROP FOREIGN KEY `libraryAdditionalInfo_updateUser_fkey`;
+ALTER TABLE DetailedLibrary DROP COLUMN updatedBy;
+ALTER TABLE DetailedLibrary DROP COLUMN lastUpdated;

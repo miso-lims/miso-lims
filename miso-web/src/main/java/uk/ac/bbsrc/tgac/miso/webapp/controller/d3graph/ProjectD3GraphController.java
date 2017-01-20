@@ -48,6 +48,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.EditProjectController;
 
 /**
@@ -64,6 +65,8 @@ public class ProjectD3GraphController {
   private RequestManager requestManager;
   @Autowired
   private ExperimentService experimentService;
+  @Autowired
+  private LibraryService libraryService;
 
   @RequestMapping(value = "{projectId}", method = RequestMethod.GET)
   public @ResponseBody JSONObject d3graphRest(@PathVariable Long projectId) throws IOException {
@@ -137,7 +140,7 @@ public class ProjectD3GraphController {
       sampleJSON.put("name", "Samples");
       sampleJSON.put("description", "");
       for (Sample sample : samples) {
-        Collection<Library> libraries = requestManager.listAllLibrariesBySampleId(sample.getId());
+        Collection<Library> libraries = libraryService.getAllBySampleId(sample.getId());
         if (libraries.size() == 0) {
 
           String sampleQC = "0";
@@ -209,6 +212,10 @@ public class ProjectD3GraphController {
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
+  }
+
+  public void setLibraryService(LibraryService libraryService) {
+    this.libraryService = libraryService;
   }
 
 }

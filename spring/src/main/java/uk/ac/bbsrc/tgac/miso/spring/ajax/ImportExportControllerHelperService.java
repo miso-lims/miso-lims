@@ -77,6 +77,8 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
 import uk.ac.bbsrc.tgac.miso.core.util.FormUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 
 /**
@@ -95,7 +97,11 @@ public class ImportExportControllerHelperService {
   @Autowired
   private SampleService sampleService;
   @Autowired
+  private LibraryDilutionService dilutionService;
+  @Autowired
   private IndexService indexService;
+  @Autowired
+  private LibraryService libraryService;
   @Autowired
   private MisoFilesManager misoFileManager;
   @Autowired
@@ -109,9 +115,9 @@ public class ImportExportControllerHelperService {
       List<Sample> samples;
       StringBuilder b = new StringBuilder();
       if (!isStringEmptyOrNull(searchStr)) {
-        samples = new ArrayList<Sample>(requestManager.listAllSamplesBySearch(searchStr));
+        samples = new ArrayList<>(requestManager.listAllSamplesBySearch(searchStr));
       } else {
-        samples = new ArrayList<Sample>(requestManager.listAllSamplesWithLimit(250));
+        samples = new ArrayList<>(requestManager.listAllSamplesWithLimit(250));
       }
 
       if (samples.size() > 0) {
@@ -183,7 +189,7 @@ public class ImportExportControllerHelperService {
       Sample s = null;
       if (jsonArrayElement.get(3) != null && !isStringEmptyOrNull(jsonArrayElement.getString(3))) {
         String salias = jsonArrayElement.getString(3);
-        Collection<Sample> ss = requestManager.listSamplesByAlias(salias);
+        Collection<Sample> ss = sampleService.getByAlias(salias);
         if (!ss.isEmpty()) {
           if (ss.size() == 1) {
             s = ss.iterator().next();
@@ -251,7 +257,7 @@ public class ImportExportControllerHelperService {
   public JSONObject confirmLibrariesPoolsUpload(HttpSession session, JSONObject json) throws Exception {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     JSONObject jsonObject = JSONObject.fromObject(json.get("sheet"));
-    Map<String, Pool> pools = new HashMap<String, Pool>();
+    Map<String, Pool> pools = new HashMap<>();
 
     Boolean paired = Boolean.parseBoolean(jsonObject.getString("paired"));
 
@@ -262,17 +268,17 @@ public class ImportExportControllerHelperService {
 
     LibraryType lt = null;
     if (jsonObject.getString("type") != null) {
-      lt = requestManager.getLibraryTypeByDescriptionAndPlatform(jsonObject.getString("type"), pt);
+      lt = libraryService.getLibraryTypeByDescriptionAndPlatform(jsonObject.getString("type"), pt);
     }
 
     LibrarySelectionType ls = null;
     if (jsonObject.getString("selection") != null) {
-      ls = requestManager.getLibrarySelectionTypeByName(jsonObject.getString("selection"));
+      ls = libraryService.getLibrarySelectionTypeByName(jsonObject.getString("selection"));
     }
 
     LibraryStrategyType lst = null;
     if (jsonObject.getString("strategy") != null) {
-      lst = requestManager.getLibraryStrategyTypeByName(jsonObject.getString("strategy"));
+      lst = libraryService.getLibraryStrategyTypeByName(jsonObject.getString("strategy"));
     }
 
     if (jsonObject.get("rows") != null) {
@@ -311,7 +317,7 @@ public class ImportExportControllerHelperService {
             if ("A".equals(proceedKey) || "L".equals(proceedKey)) {
               library.setAlias(jsonArrayElement.getString(3));
             } else if ("U".equals(proceedKey) || "P".equals(proceedKey)) {
-              Collection<Library> byAlias = requestManager.listLibrariesByAlias(jsonArrayElement.getString(3));
+              Collection<Library> byAlias = libraryService.getAllByAlias(jsonArrayElement.getString(3));
               if (byAlias.size() == 1) {
                 library = byAlias.iterator().next();
               } else {
@@ -348,7 +354,7 @@ public class ImportExportControllerHelperService {
               }
 
               log.info("Added library: " + library.toString());
-              requestManager.saveLibrary(library);
+              libraryService.create(library);
               if (jsonArrayElement.get(5) != null && !isStringEmptyOrNull(jsonArrayElement.getString(5))) {
                 try {
                   LibraryQC lqc = new LibraryQCImpl();
@@ -361,7 +367,7 @@ public class ImportExportControllerHelperService {
 
                   if (!library.getLibraryQCs().contains(lqc)) {
                     library.addQc(lqc);
-                    requestManager.saveLibraryQC(lqc);
+                    libraryService.addQc(library, lqc);
                     log.info("Added library QC: " + lqc.toString());
                   }
 
@@ -384,12 +390,10 @@ public class ImportExportControllerHelperService {
                   lqc.setLibrary(library);
                   lqc.setInsertSize(insertSize);
                   lqc.setResults(Double.valueOf(jsonArrayElement.getString(7)));
-                  lqc.setQcCreator(user.getLoginName());
-                  lqc.setQcDate(new Date());
                   lqc.setQcType(requestManager.getLibraryQcTypeByName("Bioanalyzer"));
                   if (!library.getLibraryQCs().contains(lqc)) {
                     library.addQc(lqc);
-                    requestManager.saveLibraryQC(lqc);
+                    libraryService.addQc(library, lqc);
                     log.info("Added library QC: " + lqc.toString());
                   }
 
@@ -424,7 +428,7 @@ public class ImportExportControllerHelperService {
               }
 
               log.info("Added library: " + library.toString());
-              requestManager.saveLibrary(library);
+              libraryService.create(library);
             }
 
             if ((library.getQcPassed() || library.getQcPassed() == null) && ("A".equals(proceedKey) || "P".equals(proceedKey))) {
@@ -443,7 +447,7 @@ public class ImportExportControllerHelperService {
                     library.addDilution(ldi);
                     log.info("Added library dilution: " + ldi.toString());
                   }
-                  requestManager.saveLibraryDilution(ldi);
+                  dilutionService.create(ldi);
                 } catch (NumberFormatException nfe) {
                   throw new InputFormException("Supplied LibraryDilution concentration for library '" + jsonArrayElement.getString(3)
                       + "' (" + s.getAlias() + ") is invalid", nfe);
@@ -451,7 +455,7 @@ public class ImportExportControllerHelperService {
               }
 
               log.info("Added library: " + library.toString());
-              requestManager.saveLibrary(library);
+              libraryService.create(library);
 
               Pattern poolPattern = Pattern.compile("^[IiUu][Pp][Oo]([0-9]*)");
               if (jsonArrayElement.get(12) != null && !isStringEmptyOrNull(jsonArrayElement.getString(12))) {
@@ -497,7 +501,7 @@ public class ImportExportControllerHelperService {
               }
 
               log.info("Added library: " + library.toString());
-              requestManager.saveLibrary(library);
+              libraryService.create(library);
             }
           }
 
@@ -512,7 +516,7 @@ public class ImportExportControllerHelperService {
   public JSONObject platformsOptions(HttpSession session, JSONObject json) {
     try {
       StringBuilder b = new StringBuilder();
-      List<String> pn = new ArrayList<String>(populatePlatformNames());
+      List<String> pn = new ArrayList<>(populatePlatformNames());
       for (String name : pn) {
         b.append("<option>" + name + "</option>");
       }
@@ -525,13 +529,13 @@ public class ImportExportControllerHelperService {
   }
 
   public Collection<String> populatePlatformNames() throws IOException {
-    List<String> types = new ArrayList<String>(requestManager.listDistinctPlatformNames());
+    List<String> types = new ArrayList<>(requestManager.listDistinctPlatformNames());
     Collections.sort(types);
     return types;
   }
 
   public Collection<LibraryStrategyType> populateLibraryStrategyTypes() throws IOException {
-    List<LibraryStrategyType> types = new ArrayList<LibraryStrategyType>(requestManager.listAllLibraryStrategyTypes());
+    List<LibraryStrategyType> types = new ArrayList<>(libraryService.getAllLibraryStrategyTypes());
     Collections.sort(types);
     return types;
   }
@@ -545,7 +549,7 @@ public class ImportExportControllerHelperService {
   }
 
   public Collection<LibrarySelectionType> populateLibrarySelectionTypes() throws IOException {
-    List<LibrarySelectionType> types = new ArrayList<LibrarySelectionType>(requestManager.listAllLibrarySelectionTypes());
+    List<LibrarySelectionType> types = new ArrayList<>(libraryService.getAllLibrarySelectionTypes());
     Collections.sort(types);
     return types;
   }
@@ -562,10 +566,10 @@ public class ImportExportControllerHelperService {
     try {
       if (json.has("platform") && !isStringEmptyOrNull((String) json.get("platform"))) {
         String platform = json.getString("platform");
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
 
         StringBuilder libsb = new StringBuilder();
-        List<LibraryType> types = new ArrayList<LibraryType>(requestManager.listLibraryTypesByPlatform(platform));
+        List<LibraryType> types = new ArrayList<>(libraryService.getAllLibraryTypesByPlatform(PlatformType.get(platform)));
         Collections.sort(types);
         for (LibraryType s : types) {
           libsb.append("<option>" + platform + "-" + s.getDescription() + "</option>");
@@ -603,6 +607,18 @@ public class ImportExportControllerHelperService {
 
   public void setIndexService(IndexService indexService) {
     this.indexService = indexService;
+  }
+
+  public void setSampleService(SampleService sampleService) {
+    this.sampleService = sampleService;
+  }
+
+  public void setDilutionService(LibraryDilutionService dilutionService) {
+    this.dilutionService = dilutionService;
+  }
+
+  public void setLibraryService(LibraryService libraryService) {
+    this.libraryService = libraryService;
   }
 
 }

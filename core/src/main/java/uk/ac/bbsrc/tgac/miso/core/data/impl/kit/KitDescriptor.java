@@ -35,8 +35,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -45,6 +45,7 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.KitDescriptorChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
@@ -73,7 +74,8 @@ public class KitDescriptor implements Serializable {
   private String partNumber = "";
   private Integer stockLevel = 0;
   private String description = "";
-  @Transient
+
+  @OneToMany(targetEntity = KitDescriptorChangeLog.class, mappedBy = "kitDescriptor")
   private final Collection<ChangeLog> changelog = new ArrayList<>();
 
   @ManyToOne(targetEntity = UserImpl.class)

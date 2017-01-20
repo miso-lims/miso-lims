@@ -85,6 +85,8 @@ import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.ReferenceGenomeService;
 
 @Controller
@@ -107,6 +109,10 @@ public class EditProjectController {
 
   @Autowired
   private ExperimentService experimentService;
+  @Autowired
+  private LibraryService libraryService;
+  @Autowired
+  private LibraryDilutionService dilutionService;
 
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
@@ -118,6 +124,18 @@ public class EditProjectController {
 
   public void setFilesManager(FilesManager filesManager) {
     this.filesManager = filesManager;
+  }
+
+  public void setLibraryService(LibraryService libraryService) {
+    this.libraryService = libraryService;
+  }
+
+  public void setExperimentService(ExperimentService experimentService) {
+    this.experimentService = experimentService;
+  }
+
+  public void setDilutionService(LibraryDilutionService dilutionService) {
+    this.dilutionService = dilutionService;
   }
 
   @InitBinder
@@ -197,7 +215,7 @@ public class EditProjectController {
   }
 
   public Collection<Library> populateProjectLibraries(long projectId) throws IOException {
-    List<Library> libraries = new ArrayList<>(requestManager.listAllLibrariesByProjectId(projectId));
+    List<Library> libraries = new ArrayList<>(libraryService.getAllByProjectId(projectId));
     try {
       Collections.sort(libraries, new AliasComparator(Library.class));
       for (Library l : libraries) {
@@ -219,14 +237,14 @@ public class EditProjectController {
   public Collection<LibraryDilution> populateProjectLibraryDilutions(Collection<Library> projectLibraries) throws IOException {
     List<LibraryDilution> dilutions = new ArrayList<>();
     for (Library l : projectLibraries) {
-      dilutions.addAll(requestManager.listAllLibraryDilutionsByLibraryId(l.getId()));
+      dilutions.addAll(dilutionService.getAllByLibraryId(l.getId()));
     }
     Collections.sort(dilutions);
     return dilutions;
   }
 
   public Collection<LibraryDilution> populateProjectLibraryDilutions(long projectId) throws IOException {
-    List<LibraryDilution> dilutions = new ArrayList<>(requestManager.listAllLibraryDilutionsByProjectId(projectId));
+    List<LibraryDilution> dilutions = new ArrayList<>(dilutionService.getAllByProjectId(projectId));
     Collections.sort(dilutions);
     return dilutions;
   }
@@ -304,7 +322,7 @@ public class EditProjectController {
       }
 
       for (Sample sample : samples) {
-        Collection<Library> libraries = requestManager.listAllLibrariesBySampleId(sample.getId());
+        Collection<Library> libraries = libraryService.getAllBySampleId(sample.getId());
         if (libraries.size() == 0) {
           if (sample.getQcPassed()) {
             samplesJSON.put(sample.getName(), "1");
@@ -314,7 +332,7 @@ public class EditProjectController {
         } else {
           JSONObject librariesJSON = new JSONObject();
           for (Library library : libraries) {
-            Collection<LibraryDilution> lds = requestManager.listAllLibraryDilutionsByLibraryId(library.getId());
+            Collection<LibraryDilution> lds = dilutionService.getAllByLibraryId(library.getId());
             if (lds.size() > 0) {
               JSONObject dilutionsJSON = new JSONObject();
               for (LibraryDilution ld : lds) {

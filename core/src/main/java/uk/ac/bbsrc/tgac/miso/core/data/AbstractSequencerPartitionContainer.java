@@ -48,6 +48,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.ContainerDerivedInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PlatformImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SequencerPartitionContainerChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
@@ -84,7 +85,7 @@ public abstract class AbstractSequencerPartitionContainer<T extends Partition> i
 
   private String validationBarcode;
 
-  @OneToMany(targetEntity = ChangeLog.class)
+  @OneToMany(targetEntity = SequencerPartitionContainerChangeLog.class, mappedBy = "sequencerPartitionContainer")
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
   
   @ManyToOne(targetEntity = UserImpl.class)
