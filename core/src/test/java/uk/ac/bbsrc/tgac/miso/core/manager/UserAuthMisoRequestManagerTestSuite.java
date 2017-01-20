@@ -578,20 +578,6 @@ public class UserAuthMisoRequestManagerTestSuite {
   }
 
   /**
-   * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveSubmission(uk.ac.bbsrc.tgac.miso.core.data.Submission)} .
-   */
-  @Test
-  public void testSaveSubmissionThrows() throws IOException {
-
-    thrown.expect(IOException.class);
-    thrown.expectMessage("User null cannot write to this Submission");
-    userAuthMisoRequestManager.saveSubmission(submission);
-
-    verify(backingManager, never()).saveSubmission(submission);
-  }
-
-  /**
    * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getSequencerPoolPartitionById(long)} .
    */
   @Test
@@ -1226,24 +1212,6 @@ public class UserAuthMisoRequestManagerTestSuite {
     when(backingManager.getSubmissionById(id)).thenReturn(submission);
 
     assertEquals(submission, userAuthMisoRequestManager.getSubmissionById(id));
-
-    verify(backingManager).getSubmissionById(id);
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getSubmissionById(long)} .
-   */
-  @Test
-  public void testGetSubmissionByIdThrows() throws IOException {
-    long id = 1L;
-
-    when(backingManager.getSubmissionById(id)).thenReturn(submission);
-    when(sample.userCanRead(any(User.class))).thenReturn(false);
-
-    thrown.expect(IOException.class);
-    thrown.expectMessage("User null cannot read Submission " + id);
-
-    userAuthMisoRequestManager.getSubmissionById(id);
 
     verify(backingManager).getSubmissionById(id);
   }

@@ -7,11 +7,14 @@ import java.util.Date;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.OneToMany;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.BoxChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 
@@ -33,28 +36,31 @@ public abstract class AbstractBox implements Box {
   private User lastModifier;
   private Date lastUpdated;
 
+  @ManyToOne
   private BoxSize size;
+  @ManyToOne
   private BoxUse use;
-  
+
+  @OneToMany(targetEntity = BoxChangeLog.class, mappedBy = "box")
   private final Collection<ChangeLog> changeLog;
 
   @CoverageIgnore
   public AbstractBox() {
-	  securityProfile = null;
-	  boxId = AbstractBox.UNSAVED_ID;
-	  changeLog = new ArrayList<>();
+    securityProfile = null;
+    boxId = AbstractBox.UNSAVED_ID;
+    changeLog = new ArrayList<>();
   }
-  
+
   @Override
   public User getLastModifier() {
     return lastModifier;
   }
-  
+
   @Override
   public void setLastModifier(User lastModifier) {
     this.lastModifier = lastModifier;
   }
-  
+
   @Override
   public long getId() {
     return boxId;
@@ -84,12 +90,12 @@ public abstract class AbstractBox implements Box {
   public void setAlias(String alias) {
     this.alias = alias;
   }
-  
+
   @Override
   public String getDescription() {
     return description;
   }
-  
+
   @Override
   public void setDescription(String description) {
     this.description = description;
@@ -130,8 +136,7 @@ public abstract class AbstractBox implements Box {
   public void inheritPermissions(SecurableByProfile parent) throws SecurityException {
     if (parent.getSecurityProfile().getOwner() != null) {
       setSecurityProfile(parent.getSecurityProfile());
-    }
-    else {
+    } else {
       throw new SecurityException("Cannot inherit permissions when parent object owner is not set!");
     }
   }
@@ -167,17 +172,17 @@ public abstract class AbstractBox implements Box {
   public void setSize(BoxSize size) {
     this.size = size;
   }
-  
+
   @Override
   public Collection<ChangeLog> getChangeLog() {
     return changeLog;
   }
-  
+
   @Override
   public Date getLastUpdated() {
     return lastUpdated;
   }
-  
+
   @Override
   public void setLastUpdated(Date lastUpdated) {
     this.lastUpdated = lastUpdated;

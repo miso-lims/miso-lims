@@ -79,7 +79,9 @@ ALTER TABLE Run_Note ADD CONSTRAINT RunNote_Note_FK FOREIGN KEY (notes_noteId) R
 
 UPDATE Run SET platformType = UPPER(platformType);
 
-ALTER TABLE RunQC_Partition ADD COLUMN partition_partitionId BIGINT(20);
+ALTER TABLE RunQC_Partition ADD COLUMN partition_partitionId BIGINT(20) NOT NULL;
+-- StartNoTest
+ALTER TABLE RunQC_Partition CHANGE COLUMN partition_partitionId partition_partitionId BIGINT(20);
 
 UPDATE RunQC_Partition rqp SET partition_partitionId = (
   SELECT p.partitionId FROM `_Partition` p 
@@ -88,6 +90,7 @@ UPDATE RunQC_Partition rqp SET partition_partitionId = (
   AND p.partitionNumber = rqp.partitionNumber
 );
 ALTER TABLE RunQC_Partition CHANGE COLUMN partition_partitionId partition_partitionId BIGINT(20) NOT NULL;
+--EndNoTest
 ALTER TABLE RunQC_Partition DROP PRIMARY KEY;
 ALTER TABLE RunQC_Partition ADD PRIMARY KEY(`runQc_runQcId`, `partition_partitionId`);
 ALTER TABLE RunQC_Partition ADD CONSTRAINT RunQCPartition_Partition_FK FOREIGN KEY (partition_partitionId) REFERENCES `_Partition` (partitionId);
@@ -193,7 +196,11 @@ DROP TABLE PrintService;
 DROP TABLE PrintJob;
 
 
-ALTER TABLE BoxChangeLog ADD boxChangeLogId bigint(20) PRIMARY KEY AUTO_INCREMENT FIRST;
+ALTER TABLE BoxChangeLog ADD boxChangeLogId bigint(20) AUTO_INCREMENT
+-- StartNoTest
+ PRIMARY KEY FIRST
+-- EndNoTest
+;
 ALTER TABLE BoxChangeLog MODIFY columnsChanged VARCHAR(500);
 ALTER TABLE BoxChangeLog MODIFY message LONGTEXT;
 ALTER TABLE BoxChangeLog ADD FOREIGN KEY (userId) REFERENCES User(userId);
@@ -214,7 +221,11 @@ WHERE boxChangeLogId IN (
         );
 ALTER TABLE BoxChangeLog ADD FOREIGN KEY (boxId) REFERENCES Box(boxId);
 
-ALTER TABLE ExperimentChangeLog ADD experimentChangeLogId bigint(20) PRIMARY KEY AUTO_INCREMENT FIRST;
+ALTER TABLE ExperimentChangeLog ADD experimentChangeLogId bigint(20) AUTO_INCREMENT
+-- StartNoTest
+ PRIMARY KEY FIRST
+-- EndNoTest
+;
 ALTER TABLE ExperimentChangeLog MODIFY columnsChanged VARCHAR(500);
 ALTER TABLE ExperimentChangeLog MODIFY message LONGTEXT;
 ALTER TABLE ExperimentChangeLog ADD FOREIGN KEY (userId) REFERENCES User(userId);
@@ -235,7 +246,11 @@ WHERE experimentChangeLogId IN (
         );
 ALTER TABLE ExperimentChangeLog ADD FOREIGN KEY (experimentId) REFERENCES Experiment(experimentId);
 
-ALTER TABLE KitDescriptorChangeLog ADD kitDescriptorChangeLogId bigint(20) PRIMARY KEY AUTO_INCREMENT FIRST;
+ALTER TABLE KitDescriptorChangeLog ADD kitDescriptorChangeLogId bigint(20) AUTO_INCREMENT
+-- StartNoTest
+ PRIMARY KEY FIRST
+-- EndNoTest
+;
 ALTER TABLE KitDescriptorChangeLog MODIFY columnsChanged VARCHAR(500);
 ALTER TABLE KitDescriptorChangeLog MODIFY message LONGTEXT;
 ALTER TABLE KitDescriptorChangeLog ADD FOREIGN KEY (userId) REFERENCES User(userId);
@@ -256,7 +271,11 @@ WHERE kitDescriptorChangeLogId IN (
         );
 ALTER TABLE KitDescriptorChangeLog ADD FOREIGN KEY (kitDescriptorId) REFERENCES KitDescriptor(kitDescriptorId);
 
-ALTER TABLE LibraryChangeLog ADD libraryChangeLogId bigint(20) PRIMARY KEY AUTO_INCREMENT FIRST;
+ALTER TABLE LibraryChangeLog ADD libraryChangeLogId bigint(20) AUTO_INCREMENT
+-- StartNoTest
+ PRIMARY KEY FIRST
+-- EndNoTest
+;
 ALTER TABLE LibraryChangeLog MODIFY columnsChanged VARCHAR(500);
 ALTER TABLE LibraryChangeLog MODIFY message LONGTEXT;
 ALTER TABLE LibraryChangeLog ADD FOREIGN KEY (userId) REFERENCES User(userId);
@@ -277,7 +296,11 @@ WHERE libraryChangeLogId IN (
         );
 ALTER TABLE LibraryChangeLog ADD FOREIGN KEY (libraryId) REFERENCES Library(libraryId);
 
-ALTER TABLE PoolChangeLog ADD poolChangeLogId bigint(20) PRIMARY KEY AUTO_INCREMENT FIRST;
+ALTER TABLE PoolChangeLog ADD poolChangeLogId bigint(20) AUTO_INCREMENT
+-- StartNoTest
+ PRIMARY KEY FIRST
+-- EndNoTest
+;
 ALTER TABLE PoolChangeLog MODIFY columnsChanged VARCHAR(500);
 ALTER TABLE PoolChangeLog MODIFY message LONGTEXT;
 ALTER TABLE PoolChangeLog ADD FOREIGN KEY (userId) REFERENCES User(userId);
@@ -298,7 +321,11 @@ WHERE poolChangeLogId IN (
         );
 ALTER TABLE PoolChangeLog ADD FOREIGN KEY (poolId) REFERENCES Pool(poolId);
 
-ALTER TABLE RunChangeLog ADD runChangeLogId bigint(20) PRIMARY KEY AUTO_INCREMENT FIRST;
+ALTER TABLE RunChangeLog ADD runChangeLogId bigint(20) AUTO_INCREMENT
+-- StartNoTest
+ PRIMARY KEY FIRST
+-- EndNoTest
+;
 ALTER TABLE RunChangeLog MODIFY columnsChanged VARCHAR(500);
 ALTER TABLE RunChangeLog MODIFY message LONGTEXT;
 ALTER TABLE RunChangeLog ADD FOREIGN KEY (userId) REFERENCES User(userId);
@@ -319,7 +346,11 @@ WHERE runChangeLogId IN (
         );
 ALTER TABLE RunChangeLog ADD FOREIGN KEY (runId) REFERENCES Run(runId);
 
-ALTER TABLE SampleChangeLog ADD sampleChangeLogId bigint(20) PRIMARY KEY AUTO_INCREMENT FIRST;
+ALTER TABLE SampleChangeLog ADD sampleChangeLogId bigint(20) AUTO_INCREMENT
+-- StartNoTest
+ PRIMARY KEY FIRST
+-- EndNoTest
+;
 ALTER TABLE SampleChangeLog MODIFY columnsChanged VARCHAR(500);
 ALTER TABLE SampleChangeLog MODIFY message LONGTEXT;
 ALTER TABLE SampleChangeLog ADD FOREIGN KEY (userId) REFERENCES User(userId);
@@ -340,7 +371,11 @@ WHERE sampleChangeLogId IN (
         );
 ALTER TABLE SampleChangeLog ADD FOREIGN KEY (sampleId) REFERENCES Sample(sampleId);
 
-ALTER TABLE SequencerPartitionContainerChangeLog ADD sequencerPartitionContainerChangeLogId bigint(20) PRIMARY KEY AUTO_INCREMENT FIRST;
+ALTER TABLE SequencerPartitionContainerChangeLog ADD sequencerPartitionContainerChangeLogId bigint(20) AUTO_INCREMENT
+-- StartNoTest
+ PRIMARY KEY FIRST
+-- EndNoTest
+;
 ALTER TABLE SequencerPartitionContainerChangeLog MODIFY columnsChanged VARCHAR(500);
 ALTER TABLE SequencerPartitionContainerChangeLog MODIFY message LONGTEXT;
 ALTER TABLE SequencerPartitionContainerChangeLog ADD FOREIGN KEY (userId) REFERENCES User(userId);
@@ -361,7 +396,11 @@ WHERE sequencerPartitionContainerChangeLogId IN (
         );
 ALTER TABLE SequencerPartitionContainerChangeLog ADD FOREIGN KEY (containerId) REFERENCES SequencerPartitionContainer(containerId);
 
-ALTER TABLE StudyChangeLog ADD studyChangeLogId bigint(20) PRIMARY KEY AUTO_INCREMENT FIRST;
+ALTER TABLE StudyChangeLog ADD studyChangeLogId bigint(20) AUTO_INCREMENT
+-- StartNoTest
+ PRIMARY KEY FIRST
+-- EndNoTest
+;
 ALTER TABLE StudyChangeLog MODIFY columnsChanged VARCHAR(500);
 ALTER TABLE StudyChangeLog MODIFY message LONGTEXT;
 ALTER TABLE StudyChangeLog ADD FOREIGN KEY (userId) REFERENCES User(userId);
@@ -382,9 +421,13 @@ WHERE studyChangeLogId IN (
         );
 ALTER TABLE StudyChangeLog ADD FOREIGN KEY (studyId) REFERENCES Study(studyId);
 
-ALTER TABLE BoxPosition ADD COLUMN targetId bigint(20);
-ALTER TABLE BoxPosition ADD COLUMN targetType varchar(1);
-ALTER TABLE BoxPosition ADD COLUMN position varchar(3);
+ALTER TABLE BoxPosition ADD COLUMN targetId bigint(20) NOT NULL;
+ALTER TABLE BoxPosition ADD COLUMN targetType varchar(1) NOT NULL;
+ALTER TABLE BoxPosition ADD COLUMN position varchar(3) NOT NULL;
+-- StartNoTest
+ALTER TABLE BoxPosition CHANGE COLUMN targetId targetId bigint(20);
+ALTER TABLE BoxPosition CHANGE COLUMN targetType targetType varchar(1);
+ALTER TABLE BoxPosition CHANGE COLUMN position position varchar(3);
 UPDATE BoxPosition SET
   position = CONCAT(CHAR(65 + `column`), LPAD(row, 2, '0')),
   targetType = (
@@ -395,18 +438,21 @@ UPDATE BoxPosition SET
     SELECT sampleId FROM Sample WHERE Sample.boxPositionId = BoxPosition.boxPositionId UNION
     SELECT libraryId FROM Library WHERE Library.boxPositionId = BoxPosition.boxPositionId UNION
     SELECT poolId FROM Pool WHERE Pool.boxPositionId = BoxPosition.boxPositionId);
+-- EndNoTest
 
 ALTER TABLE BoxPosition CHANGE COLUMN targetId targetId bigint(20) NOT NULL;
 ALTER TABLE BoxPosition CHANGE COLUMN targetType targetType varchar(1) NOT NULL;
 ALTER TABLE BoxPosition CHANGE COLUMN position position varchar(3) NOT NULL;
 ALTER TABLE BoxPosition DROP PRIMARY KEY;
-ALTER TABLE BoxPosition ADD CONSTRAINT PRIMARY KEY(boxId, targetId, targetType);
+ALTER TABLE BoxPosition ADD CONSTRAINT box_postion_pk PRIMARY KEY(boxId, targetId, targetType);
 ALTER TABLE BoxPosition ADD CONSTRAINT box_unique_item UNIQUE (targetId, targetType);
 ALTER TABLE BoxPosition ADD CONSTRAINT box_single_occupancy UNIQUE (boxId, position);
+-- StartNoTest
 ALTER TABLE BoxPosition DROP INDEX boxId;
 ALTER TABLE BoxPosition DROP COLUMN `row`;
 ALTER TABLE BoxPosition DROP COLUMN `column`;
 ALTER TABLE BoxPosition DROP COLUMN `boxPositionId`;
+-- EndNoTest
 ALTER TABLE Sample DROP COLUMN `boxPositionId`;
 ALTER TABLE Library DROP COLUMN `boxPositionId`;
 ALTER TABLE Pool DROP COLUMN `boxPositionId`;
