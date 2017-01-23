@@ -48,25 +48,15 @@ import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.context.support.XmlWebApplicationContext;
 
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
-
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.event.manager.PoolAlertManager;
-import uk.ac.bbsrc.tgac.miso.core.event.manager.ProjectAlertManager;
-import uk.ac.bbsrc.tgac.miso.core.event.manager.RunAlertManager;
 import uk.ac.bbsrc.tgac.miso.core.factory.issuetracker.IssueTrackerFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
-import uk.ac.bbsrc.tgac.miso.core.manager.MisoRequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.generation.NameGenerator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.resolvers.NamingSchemeResolverService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.NameValidator;
-import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
-import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
-import uk.ac.bbsrc.tgac.miso.core.store.RunQcStore;
-import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.runstats.client.manager.RunStatsManager;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoPropertyExporter;
@@ -126,30 +116,6 @@ public class MisoAppListener implements ServletContextListener {
     System.setProperty("java.awt.headless", "true");
 
     initializeNamingSchemes(context, misoProperties);
-
-    // set up alerting
-    if ("true".equals(misoProperties.get("miso.alerting.enabled"))) {
-      // set up indexers and alerters
-      MisoRequestManager rm = new MisoRequestManager();
-      rm.setProjectStore((ProjectStore) context.getBean("projectStore"));
-      rm.setRunStore((RunStore) context.getBean("runStore"));
-      rm.setRunQcStore((RunQcStore) context.getBean("runQcStore"));
-      rm.setPoolStore((PoolStore) context.getBean("poolStore"));
-
-      SecurityManager sm = (com.eaglegenomics.simlims.core.manager.SecurityManager) context.getBean("securityManager");
-
-      RunAlertManager ram = (RunAlertManager) context.getBean("runAlertManager");
-      ram.setRequestManager(rm);
-      ram.setSecurityManager(sm);
-
-      ProjectAlertManager pam = (ProjectAlertManager) context.getBean("projectAlertManager");
-      pam.setRequestManager(rm);
-      pam.setSecurityManager(sm);
-
-      PoolAlertManager poam = (PoolAlertManager) context.getBean("poolAlertManager");
-      poam.setRequestManager(rm);
-      poam.setSecurityManager(sm);
-    }
 
     if ("true".equals(misoProperties.get("miso.issuetracker.enabled"))) {
       String trackerType = misoProperties.get("miso.issuetracker.tracker");

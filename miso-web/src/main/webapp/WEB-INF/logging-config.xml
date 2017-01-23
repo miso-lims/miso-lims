@@ -33,12 +33,6 @@
       <aop:after-returning pointcut-ref="savePointcut" method="logEvent" arg-names="join" />
       <aop:after-throwing pointcut-ref="savePointcut" method="logFailedEvent" throwing="e" arg-names="join, e" />
     </aop:aspect>
-    <!-- <aop:aspect id="limsAjaxLogAspect" ref="editFileLoggerAspectBean"> -->
-    <!-- <aop:pointcut id="reservedAjaxPointcut" type="aspectj" expression="execution(@uk.ac.bbsrc.tgac.miso.logging.LoggedAction * *(..)) and 
-      @within(net.sourceforge.fluxion.ajax.Ajaxified)"/> -->
-    <!-- <aop:pointcut id="reservedAjaxPointcut" type="aspectj" expression="execution(* uk.ac.bbsrc.tgac.miso.ajax.logging.*Service.*(..))"/>
-      <aop:after-returning pointcut-ref="reservedAjaxPointcut" method="logEvent" arg-names="join"/> -->
-    <!-- </aop:aspect> -->
     <aop:aspect id="notificationLogAspect" ref="notificationFileLoggerAspectBean">
       <aop:pointcut id="notificationPointcut"
         expression="within(uk.ac.bbsrc.tgac.miso.notification.consumer.service.mechanism.*.consume*) and @annotation(uk.ac.bbsrc.tgac.miso.core.logging.LoggedAction))" />

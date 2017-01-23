@@ -181,8 +181,6 @@ public class LibraryControllerHelperService {
   @Autowired
   private RequestManager requestManager;
   @Autowired
-  private BarcodeFactory barcodeFactory;
-  @Autowired
   private MisoFilesManager misoFileManager;
   @Autowired
   private PrinterService printerService;
@@ -253,6 +251,7 @@ public class LibraryControllerHelperService {
     File temploc = getBarcodeFileLocation(session);
     try {
       Library library = libraryService.get(libraryId);
+      BarcodeFactory barcodeFactory = new BarcodeFactory();
       barcodeFactory.setPointPixels(1.5f);
       barcodeFactory.setBitmapResolution(600);
       RenderedImage bi = null;
@@ -353,6 +352,7 @@ public class LibraryControllerHelperService {
     File temploc = getBarcodeFileLocation(session);
     try {
       LibraryDilution dil = dilutionService.get(dilutionId);
+      BarcodeFactory barcodeFactory = new BarcodeFactory();
       barcodeFactory.setPointPixels(1.5f);
       barcodeFactory.setBitmapResolution(600);
       RenderedImage bi = barcodeFactory.generateSquareDataMatrix(dil, 400);
@@ -760,6 +760,8 @@ public class LibraryControllerHelperService {
           sb.append("<td>");
 
           try {
+            BarcodeFactory barcodeFactory = new BarcodeFactory();
+
             barcodeFactory.setPointPixels(1.5f);
             barcodeFactory.setBitmapResolution(600);
             RenderedImage bi = barcodeFactory.generateSquareDataMatrix(dil, 400);
@@ -960,10 +962,6 @@ public class LibraryControllerHelperService {
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
-  }
-
-  public void setBarcodeFactory(BarcodeFactory barcodeFactory) {
-    this.barcodeFactory = barcodeFactory;
   }
 
   public void setMisoFileManager(MisoFilesManager misoFileManager) {

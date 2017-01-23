@@ -66,9 +66,6 @@ public class BoxControllerHelperService {
   private RequestManager requestManager;
 
   @Autowired
-  private BarcodeFactory barcodeFactory;
-
-  @Autowired
   private MisoFilesManager misoFileManager;
 
   @Autowired
@@ -579,6 +576,7 @@ public class BoxControllerHelperService {
     File temploc = getBarcodeFileLocation(session);
     try {
       Box box = requestManager.getBoxById(boxId);
+      BarcodeFactory barcodeFactory = new BarcodeFactory();
       barcodeFactory.setPointPixels(1.5f);
       barcodeFactory.setBitmapResolution(600);
       RenderedImage bi = null;
@@ -906,11 +904,6 @@ public class BoxControllerHelperService {
   @CoverageIgnore
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
-  }
-
-  @CoverageIgnore
-  public void setBarcodeFactory(BarcodeFactory barcodeFactory) {
-    this.barcodeFactory = barcodeFactory;
   }
 
   @CoverageIgnore

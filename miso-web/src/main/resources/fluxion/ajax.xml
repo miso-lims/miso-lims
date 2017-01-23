@@ -68,9 +68,6 @@
   <bean id="libraryControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.LibraryControllerHelperService">
   </bean>
 
-  <bean id="experimentPreview" class="uk.ac.bbsrc.tgac.miso.spring.ajax.ExperimentPreview">
-  </bean>
-
   <bean id="projectPreview" class="uk.ac.bbsrc.tgac.miso.spring.ajax.ProjectPreview">
   </bean>
 
@@ -83,7 +80,7 @@
   <bean id="experimentSearchService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.ExperimentSearchService">
     </bean>
 
-  <bean id="cacheHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.CacheHelperService">
+  <bean id="barcodeHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.BarcodeHelperService">
   </bean>
 
   <bean id="loggedActionService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.logging.LoggedActionService">

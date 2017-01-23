@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -102,6 +102,7 @@ public class SampleControllerHelperService {
     public SampleBarcodeAssister(RequestManager requestManager) {
       this.requestManager = requestManager;
     }
+
     @Override
     public Iterable<Sample> fetchAll(long projectId) throws IOException {
       return requestManager.listAllSamplesByProjectId(projectId);
@@ -138,8 +139,6 @@ public class SampleControllerHelperService {
   @Autowired
   private MisoFilesManager misoFileManager;
   @Autowired
-  private BarcodeFactory barcodeFactory;
-  @Autowired
   private PrinterService printerService;
   @Autowired
   private NamingScheme namingScheme;
@@ -175,7 +174,7 @@ public class SampleControllerHelperService {
         Project p = requestManager.getProjectById(json.getLong("projectId"));
         SecurityProfile sp = p.getSecurityProfile();
         JSONArray a = JSONArray.fromObject(json.get("samples"));
-        Set<Sample> saveSet = new HashSet<>();
+        HashSet<Sample> saveSet = new HashSet<>();
 
         for (JSONObject j : (Iterable<JSONObject>) a) {
           try {
@@ -544,6 +543,7 @@ public class SampleControllerHelperService {
     File temploc = getBarcodeFileLocation(session);
     try {
       Sample sample = requestManager.getSampleById(sampleId);
+      BarcodeFactory barcodeFactory = new BarcodeFactory();
       barcodeFactory.setPointPixels(1.5f);
       barcodeFactory.setBitmapResolution(600);
       RenderedImage bi = null;
@@ -728,7 +728,7 @@ public class SampleControllerHelperService {
       String sampleQCValue = "NA";
       Collection<SampleQC> sampleQCs = requestManager.listAllSampleQCsBySampleId(sampleId);
       if (sampleQCs.size() > 0) {
-        List<SampleQC> list = new ArrayList(sampleQCs);
+        List<SampleQC> list = new ArrayList<>(sampleQCs);
         Collections.sort(list, new Comparator<SampleQC>() {
           @Override
           public int compare(SampleQC sqc1, SampleQC sqc2) {
@@ -751,10 +751,6 @@ public class SampleControllerHelperService {
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
-  }
-
-  public void setBarcodeFactory(BarcodeFactory barcodeFactory) {
-    this.barcodeFactory = barcodeFactory;
   }
 
   public void setMisoFileManager(MisoFilesManager misoFileManager) {

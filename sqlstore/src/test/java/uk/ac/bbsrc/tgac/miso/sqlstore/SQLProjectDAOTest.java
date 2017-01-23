@@ -36,7 +36,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
-import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
@@ -61,10 +60,6 @@ public class SQLProjectDAOTest extends AbstractDAOTest {
   @Autowired
   @Spy
   private JdbcTemplate jdbcTemplate;
-
-  @Autowired
-  @Spy
-  private TgacDataObjectFactory dataObjectFactory;
 
   @Mock
   private SampleStore sampleDAO;

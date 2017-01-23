@@ -277,10 +277,11 @@ public class LimsUtils {
    * @param haystack of type Set
    * @return Set
    */
-  public static Set relativeComplementByProperty(Class c, String methodName, Set needles, Set haystack) {
+  public static <T> Set<T> relativeComplementByProperty(Class<T> c, String methodName, HashSet<T> needles, Set<T> haystack) {
     try {
       Method m = c.getMethod(methodName);
-      Set diff = (Set) ((HashSet) needles).clone();
+      @SuppressWarnings("unchecked")
+      Set<T> diff = (Set<T>) (needles).clone();
 
       if (diff.size() > haystack.size()) {
         for (Iterator<?> i = haystack.iterator(); i.hasNext();) {

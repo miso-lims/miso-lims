@@ -32,6 +32,8 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
@@ -39,7 +41,6 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.event.manager
@@ -50,12 +51,13 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
  * @date 11/11/11
  * @since 0.1.6
  */
+@Service
 public class PoolAlertManager {
   protected static final Logger log = LoggerFactory.getLogger(PoolAlertManager.class);
   final Map<Long, Pool> pools = new HashMap<>();
   final Set<User> poolWatchers = new HashSet<>();
 
-  private RequestManager misoRequestManager;
+  @Value("${miso.alerting.enabled}")
   private boolean enabled = true;
 
   @Autowired
@@ -70,10 +72,6 @@ public class PoolAlertManager {
 
   public void setPoolListener(MisoListener poolListener) {
     this.poolListener = poolListener;
-  }
-
-  public void setRequestManager(RequestManager misoRequestManager) {
-    this.misoRequestManager = misoRequestManager;
   }
 
   public void setSecurityManager(SecurityManager securityManager) {
@@ -132,11 +130,7 @@ public class PoolAlertManager {
     }
   }
 
-  public void update(Long poolId) throws IOException {
-    update(misoRequestManager.getPoolById(poolId));
-  }
-
-  private void update(Pool p) throws IOException {
+  public void update(Pool p) throws IOException {
     if (enabled) {
       Pool clone = pools.get(p.getId());
       if (clone == null) {
@@ -155,9 +149,7 @@ public class PoolAlertManager {
     }
   }
 
-  public void addWatcher(Pool pool, Long userId) throws IOException {
-    User user = securityManager.getUserById(userId);
-    if (user != null) {
+  public void addWatcher(Pool pool, User user) throws IOException {
       Pool clone = pools.get(pool.getId());
       if (clone == null) {
         pool.addWatcher(user);
@@ -165,12 +157,10 @@ public class PoolAlertManager {
       } else {
         clone.addWatcher(user);
       }
-    }
   }
 
-  public void removeWatcher(Pool pool, Long userId) throws IOException {
-    User user = securityManager.getUserById(userId);
-    if (user != null && pool.getWatchers().contains(user)) {
+  public void removeWatcher(Pool pool, User user) throws IOException {
+    if (pool.getWatchers().contains(user)) {
       Pool clone = pools.get(pool.getId());
       if (clone == null) {
         pool.removeWatcher(user);
@@ -181,19 +171,18 @@ public class PoolAlertManager {
     }
   }
 
-  public void updateGroupWatcher(Long userId) throws IOException {
-    User user = securityManager.getUserById(userId);
+  public void updateGroupWatcher(User user) throws IOException {
     if (user != null) {
       poolWatchers.clear();
       poolWatchers.addAll(securityManager.listUsersByGroupName("PoolWatchers"));
 
       for (Pool p : pools.values()) {
         if (user.getGroups() != null && user.getGroups().contains(securityManager.getGroupByName("PoolWatchers"))) {
-          addWatcher(p, userId);
+          addWatcher(p, user);
         } else {
           if (p.getSecurityProfile() != null && p.getSecurityProfile().getOwner() != null
               && !p.getSecurityProfile().getOwner().equals(user)) {
-            removeWatcher(p, userId);
+            removeWatcher(p, user);
           }
         }
       }

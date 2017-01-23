@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -31,6 +31,8 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
@@ -40,7 +42,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.event.manager
@@ -51,11 +52,12 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
  * @date 11/11/11
  * @since 0.1.3
  */
+@Service
 public class ProjectAlertManager {
   protected static final Logger log = LoggerFactory.getLogger(ProjectAlertManager.class);
-  final Map<Long, Project> projects = new HashMap<Long, Project>();
+  final Map<Long, Project> projects = new HashMap<>();
 
-  private RequestManager misoRequestManager;
+  @Value("${miso.alerting.enabled}")
   private boolean enabled = true;
 
   @Autowired
@@ -64,10 +66,6 @@ public class ProjectAlertManager {
   private MisoListener projectOverviewListener;
   @Autowired
   private SecurityManager securityManager;
-
-  public void setRequestManager(RequestManager misoRequestManager) {
-    this.misoRequestManager = misoRequestManager;
-  }
 
   public MisoListener getProjectListener() {
     return projectListener;
@@ -158,11 +156,7 @@ public class ProjectAlertManager {
     }
   }
 
-  public void update(Long projectId) throws IOException {
-    update(misoRequestManager.getProjectById(projectId));
-  }
-
-  private void update(Project p) throws IOException {
+  public void update(Project p) throws IOException {
     if (enabled) {
       // don't just replace the object - set required fields otherwise we have to reset all the object's listeners
       Project clone = projects.get(p.getId());
@@ -200,41 +194,34 @@ public class ProjectAlertManager {
     }
   }
 
-  public void addWatcher(ProjectOverview overview, Long userId) throws IOException {
-    User user = securityManager.getUserById(userId);
-    if (user != null) {
-      for (Project clone : projects.values()) {
-        ProjectOverview cloneOverview = clone.getOverviewById(overview.getOverviewId());
-        if (cloneOverview != null) {
-          log.debug("Added watcher " + userId + " to overview " + overview.getOverviewId());
-          cloneOverview.addWatcher(user);
-          clone.addWatcher(user);
-          break;
-        }
+  public void addWatcher(ProjectOverview overview, User user) throws IOException {
+    for (Project clone : projects.values()) {
+      ProjectOverview cloneOverview = clone.getOverviewById(overview.getOverviewId());
+      if (cloneOverview != null) {
+        log.debug("Added watcher " + user.getUserId() + " to overview " + overview.getOverviewId());
+        cloneOverview.addWatcher(user);
+        clone.addWatcher(user);
+        break;
       }
     }
   }
 
-  public void removeWatcher(ProjectOverview overview, Long userId) throws IOException {
-    User user = securityManager.getUserById(userId);
-    if (user != null) {
-      for (Project clone : projects.values()) {
-        ProjectOverview cloneOverview = clone.getOverviewById(overview.getOverviewId());
-        if (cloneOverview != null) {
-          log.debug("Removed watcher " + userId + " from overview " + overview.getOverviewId());
-          cloneOverview.removeWatcher(user);
-          clone.removeWatcher(user);
-          break;
-        }
+  public void removeWatcher(ProjectOverview overview, User user) throws IOException {
+    for (Project clone : projects.values()) {
+      ProjectOverview cloneOverview = clone.getOverviewById(overview.getOverviewId());
+      if (cloneOverview != null) {
+        log.debug("Removed watcher " + user.getUserId() + " from overview " + overview.getOverviewId());
+        cloneOverview.removeWatcher(user);
+        clone.removeWatcher(user);
+        break;
       }
     }
   }
 
-  public void addWatcher(Project project, Long userId) throws IOException {
-    User user = securityManager.getUserById(userId);
+  public void addWatcher(Project project, User user) throws IOException {
     if (user != null) {
       Project clone = projects.get(project.getId());
-      log.debug("Added watcher " + userId + " to project " + project.getId());
+      log.debug("Added watcher " + user.getUserId() + " to project " + project.getId());
       if (clone == null) {
         project.addWatcher(user);
         for (ProjectOverview po : project.getOverviews()) {
@@ -257,41 +244,37 @@ public class ProjectAlertManager {
     }
   }
 
-  public void removeWatcher(Project project, Long userId) throws IOException {
-    User user = securityManager.getUserById(userId);
-    if (user != null) {
-      Project clone = projects.get(project.getId());
-      if (clone == null) {
-        project.removeWatcher(user);
-        for (ProjectOverview po : project.getOverviews()) {
-          ProjectOverview pOverview = project.getOverviewById(po.getOverviewId());
-          if (pOverview != null) {
-            pOverview.removeWatcher(user);
-          }
+  public void removeWatcher(Project project, User user) throws IOException {
+    Project clone = projects.get(project.getId());
+    if (clone == null) {
+      project.removeWatcher(user);
+      for (ProjectOverview po : project.getOverviews()) {
+        ProjectOverview pOverview = project.getOverviewById(po.getOverviewId());
+        if (pOverview != null) {
+          pOverview.removeWatcher(user);
         }
+      }
 
-        push(project);
-      } else {
-        clone.removeWatcher(user);
-        for (ProjectOverview po : clone.getOverviews()) {
-          ProjectOverview cloneOverview = clone.getOverviewById(po.getOverviewId());
-          if (cloneOverview != null) {
-            cloneOverview.removeWatcher(user);
-          }
+      push(project);
+    } else {
+      clone.removeWatcher(user);
+      for (ProjectOverview po : clone.getOverviews()) {
+        ProjectOverview cloneOverview = clone.getOverviewById(po.getOverviewId());
+        if (cloneOverview != null) {
+          cloneOverview.removeWatcher(user);
         }
       }
     }
   }
 
-  public void updateGroupWatcher(Long userId) throws IOException {
-    User user = securityManager.getUserById(userId);
+  public void updateGroupWatcher(User user) throws IOException {
     for (Project p : projects.values()) {
       if (user.getGroups() != null && user.getGroups().contains(securityManager.getGroupByName("ProjectWatchers"))) {
-        addWatcher(p, userId);
+        addWatcher(p, user);
       } else {
         if (p.getSecurityProfile() != null && p.getSecurityProfile().getOwner() != null
             && !p.getSecurityProfile().getOwner().equals(user)) {
-          removeWatcher(p, userId);
+          removeWatcher(p, user);
         }
       }
     }
