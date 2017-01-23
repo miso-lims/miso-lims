@@ -51,7 +51,6 @@ import javax.persistence.PrimaryKeyJoinColumn;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.codehaus.jackson.annotate.JsonBackReference;
-import org.codehaus.jackson.annotate.JsonManagedReference;
 import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.JoinFormula;
 import org.slf4j.Logger;
@@ -111,7 +110,6 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @Column(nullable = false)
   private PlatformType platformName;
 
-  private String alias;
   private Boolean qcPassed;
 
   @Column(nullable = false)
@@ -377,7 +375,7 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
 
   @Override
   public String getPlatformName() {
-    return platformName.getKey();
+    return platformName == null ? null : platformName.getKey();
   }
 
   @Override
@@ -542,7 +540,7 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
     return new HashCodeBuilder(3, 33)
         .appendSuper(super.hashCode())
         .append(accession)
-        .append(alias)
+        .append(getAlias())
         .append(description)
         .append(identificationBarcode)
         .append(indices)
@@ -567,7 +565,7 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
     return new EqualsBuilder()
         .appendSuper(super.equals(obj))
         .append(accession, other.accession)
-        .append(alias, other.alias)
+        .append(getAlias(), other.getAlias())
         .append(description, other.description)
         .append(identificationBarcode, other.identificationBarcode)
         .append(indices, other.indices)

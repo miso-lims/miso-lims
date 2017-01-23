@@ -19,7 +19,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 @Entity
 @Table(appliesTo = "SequencerPartitionContainerChangeLog", indexes = {
     @Index(name = "SequencerPartitionContainerChangeLog_sequencerPartitionContainerId_changeTime", columnNames = {
-    "sequencerPartitionContainerId", "changeTime" }) })
+        "containerId", "changeTime" }) })
 public class SequencerPartitionContainerChangeLog extends AbstractChangeLog {
 
   @Id

@@ -211,48 +211,48 @@ INSERT INTO `Library_Index`
 VALUES (1,12),(2,11),(3,10),(4,9),(5,8),(6,7),(7,6),(8,5),(9,4),(10,3),(11,2),(12,1),(13,24),(14,23);
 
 DELETE FROM `Pool`;
-INSERT INTO `Pool`(`poolId`, `concentration`, `identificationBarcode`, `name`, `description`, `creationDate`, `securityProfile_profileId`, `experiment_experimentId`, `platformType`, `ready`, `alias`, `qcPassed`, `boxPositionId`) 
-VALUES (1,2,'IPO1::Illumina','IPO1','TEST','2015-08-27',2,1,'ILLUMINA',1,'Pool 1',NULL,201),
-(2,2,'IPO2::Illumina','IPO2','TEST','2015-08-27',3,NULL,'ILLUMINA',1,'Pool 2',NULL,202),
-(3,2,'IPO3::Illumina','IPO3','TEST','2015-08-27',4,NULL,'ILLUMINA',1,'Pool 3',NULL,203),
-(4,2,'IPO4::Illumina','IPO4','TEST','2015-08-27',5,NULL,'ILLUMINA',1,'Pool 4',NULL,204),
-(5,2,'IPO5::Illumina','IPO5','TEST','2015-08-27',6,NULL,'ILLUMINA',1,'Pool 5',NULL,205),
-(6,2,'IPO6::Illumina','IPO6','TEST','2015-08-27',7,NULL,'ILLUMINA',0,'Pool 6',NULL,206),
-(7,2,'IPO7::Illumina','IPO7','TEST','2015-08-27',8,NULL,'ILLUMINA',0,'Pool 7',NULL,207),
-(8,2,'IPO8::Illumina','IPO8','TEST','2015-08-27',9,NULL,'ILLUMINA',0,'Pool 8',NULL,208),
-(9,2,'IPO9::Illumina','IPO9','TEST','2015-08-27',10,NULL,'ILLUMINA',0,'Pool 9',NULL,209),
-(10,2,'IPO10::Illumina','IPO10','TEST','2015-08-27',11,NULL,'ILLUMINA',0,'Pool 10',NULL,210);
+INSERT INTO `Pool`(`poolId`, `concentration`, `identificationBarcode`, `name`, `description`, `creationDate`, `securityProfile_profileId`, `experiment_experimentId`, `platformType`, `ready`, `alias`, `qcPassed`) 
+VALUES (1,2,'IPO1::Illumina','IPO1','TEST','2015-08-27',2,1,'ILLUMINA',1,'Pool 1',NULL),
+(2,2,'IPO2::Illumina','IPO2','TEST','2015-08-27',3,NULL,'ILLUMINA',1,'Pool 2',NULL),
+(3,2,'IPO3::Illumina','IPO3','TEST','2015-08-27',4,NULL,'ILLUMINA',1,'Pool 3',NULL),
+(4,2,'IPO4::Illumina','IPO4','TEST','2015-08-27',5,NULL,'ILLUMINA',1,'Pool 4',NULL),
+(5,2,'IPO5::Illumina','IPO5','TEST','2015-08-27',6,NULL,'ILLUMINA',1,'Pool 5',NULL),
+(6,2,'IPO6::Illumina','IPO6','TEST','2015-08-27',7,NULL,'ILLUMINA',0,'Pool 6',NULL),
+(7,2,'IPO7::Illumina','IPO7','TEST','2015-08-27',8,NULL,'ILLUMINA',0,'Pool 7',NULL),
+(8,2,'IPO8::Illumina','IPO8','TEST','2015-08-27',9,NULL,'ILLUMINA',0,'Pool 8',NULL),
+(9,2,'IPO9::Illumina','IPO9','TEST','2015-08-27',10,NULL,'ILLUMINA',0,'Pool 9',NULL),
+(10,2,'IPO10::Illumina','IPO10','TEST','2015-08-27',11,NULL,'ILLUMINA',0,'Pool 10',NULL);
 
-DELETE FROM `Pool_Elements`;
-INSERT INTO `Pool_Elements`(`pool_poolId`, `elementType`, `elementId`) 
-VALUES (1,'uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution',2),
-(2,'uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution',6),
-(2,'uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution',5),
-(2,'uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution',4),
-(3,'uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution',7),
-(3,'uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution',8),
-(3,'uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution',9),
-(3,'uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution',10),
-(3,'uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution',11),
-(3,'uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution',12),
-(3,'uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution',13),
-(4,'uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution',1),
-(5,'uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution',2),
-(6,'uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution',3),
-(6,'uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution',4),
-(6,'uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution',5),
-(6,'uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution',6),
-(7,'uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution',7),
-(7,'uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution',8),
-(8,'uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution',8),
-(8,'uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution',9),
-(9,'uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution',11),
-(9,'uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution',12),
-(10,'uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution',13),
-(10,'uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution',14),
-(3,'uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution',14),
-(1,'uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution',1),
-(2,'uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution',3);
+DELETE FROM `Pool_Dilution`;
+INSERT INTO `Pool_Dilution`(`pool_poolId`, `dilution_dilutionId`) 
+VALUES (1,2),
+(2,6),
+(2,5),
+(2,4),
+(3,7),
+(3,8),
+(3,9),
+(3,10),
+(3,11),
+(3,12),
+(3,13),
+(4,1),
+(5,2),
+(6,3),
+(6,4),
+(6,5),
+(6,6),
+(7,7),
+(7,8),
+(8,8),
+(8,9),
+(9,11),
+(9,12),
+(10,13),
+(10,14),
+(3,14),
+(1,1),
+(2,3);
 
 DELETE FROM `Pool_Experiment`;
 INSERT INTO `Pool_Experiment`(`pool_poolId`, `experiments_experimentId`) 
@@ -291,10 +291,6 @@ VALUES (2,'2013-11-27 12:20:15','Test project2','PRO2',1,'Active','TEST','2015-1
 INSERT INTO `Project`(`projectId`, `creationDate`, `description`, `name`, `securityProfile_profileId`, `progress`, `alias`, `lastUpdated`, `referenceGenomeId`)
 VALUES (3,'2016-01-27 11:11:15','Test project3','PRO3',1,'Active','TEST','2016-02-22 10:43:18', 2);
 
-DELETE FROM `Project_Study`;
-INSERT INTO `Project_Study` 
-VALUES (1,1);
-
 DELETE FROM `SequencerReference`;
 INSERT INTO `SequencerReference`(`referenceId`, `name`, `ip`, `platformId`)
 VALUES (1,'SN7001179','localhost',16),
@@ -320,8 +316,8 @@ VALUES ( 1, 'username1', '2016-01-26', 1, 'information1', 1),
 ( 3, 'username3', '2015-03-26', 3, 'information3', 1);
 
 DELETE FROM RunQC_Partition;
-INSERT INTO `RunQC_Partition`(`runQc_runQcId`, `containers_containerId`, `partitionNumber`)
-VALUES (1, 2, 3), (2, 4, 5), (3,6,7);
+INSERT INTO `RunQC_Partition`(`runQc_runQcId`, `partition_partitionId`)
+VALUES (1, 1);
 
 DELETE FROM `Run_SequencerPartitionContainer`;
 INSERT INTO `Run_SequencerPartitionContainer`(`Run_runId`, `containers_containerId`) 
@@ -397,10 +393,21 @@ VALUES (16),
 
 DELETE FROM `SampleQC`;
 INSERT INTO `SampleQC`(`sample_sampleId`, `qcUserName`, `qcDate`, `qcMethod`, `results`) 
-VALUES (1,'admin','2015-08-27',1,5),(2,2,'admin','2015-08-27',1,5),(3,3,'admin','2015-08-27',1,5),(4,4,'admin','2015-08-27',1,5),
-(5,'admin','2015-08-27',1,5),(6,6,'admin','2015-08-27',1,5),(7,7,'admin','2015-08-27',1,5),(8,8,'admin','2015-08-27',1,5),
-(9,'admin','2015-08-27',1,5),(10,10,'admin','2015-08-27',1,5),(11,11,'admin','2015-08-27',1,5),(12,12,'admin','2015-08-27',1,5),
-(13,'admin','2015-08-27',1,5),(14,14,'admin','2015-08-27',1,5), (15,14,'admin','2015-08-27',1,5);
+VALUES (1,'admin','2015-08-27',1,5),
+(2,'admin','2015-08-27',1,5),
+(3,'admin','2015-08-27',1,5),
+(4,'admin','2015-08-27',1,5),
+(5,'admin','2015-08-27',1,5),
+(6,'admin','2015-08-27',1,5),
+(7,'admin','2015-08-27',1,5),
+(8,'admin','2015-08-27',1,5),
+(9,'admin','2015-08-27',1,5),
+(10,'admin','2015-08-27',1,5),
+(11,'admin','2015-08-27',1,5),
+(12,'admin','2015-08-27',1,5),
+(13,'admin','2015-08-27',1,5),
+(14,'admin','2015-08-27',1,5),
+(15,'admin','2015-08-27',1,5);
 
 DELETE FROM `SequencerPartitionContainer`;
 INSERT INTO `SequencerPartitionContainer`(`containerId`, `securityProfile_profileId`, `identificationBarcode`, `locationBarcode`, `platform`, `validationBarcode`, `lastModifier`) 
@@ -441,11 +448,11 @@ VALUES (1,'Completed','2012-03-31','2012-03-23','SN7001179','2015-08-28 18:32:29
 (4,'Completed','2012-03-23','2012-03-14','SN7001179','2015-08-28 18:32:35','120314_h1179_0068_AC0KY7ACXX',RAWTOHEX('<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!--Illumina RTA Status Report-->\n<Status>\n  <Software>Illumina RTA 1.12.4.2</Software>\n  <RunName>120314_h1179_0068_AC0KY7ACXX</RunName>\n  <InstrumentName>H1179</InstrumentName>\n  <RunStarted>Sunday, March 18, 2012 3:37 PM</RunStarted>\n  <NumCycles>209</NumCycles>\n  <ImgCycle>209</ImgCycle>\n  <ScoreCycle>209</ScoreCycle>\n  <CallCycle>209</CallCycle>\n  <InputDir>D:\\Illumina\\HiSeqTemp\\120314_h1179_0068_AC0KY7ACXX</InputDir>\n  <OutputDir>\\\\storage4.stg.oicr.on.ca\\bas005\\archive\\h1179\\120314_h1179_0068_AC0KY7ACXX</OutputDir>\n  <Configuration>\n    <CopyAllFiles>true</CopyAllFiles>\n    <CopyImages>False</CopyImages>\n    <DeleteImages>True</DeleteImages>\n    <RunInfoExists>True</RunInfoExists>\n    <IsPairedEndRun>True</IsPairedEndRun>\n    <NumberOfReads>3</NumberOfReads>\n    <NumberOfLanes>8</NumberOfLanes>\n    <TilesPerLane>48</TilesPerLane>\n    <ControlLane>0</ControlLane>\n  </Configuration>\n</Status>\n'));
 
 DELETE FROM `Study`;
-INSERT INTO `Study`(`studyId`, `name`, `description`, `accession`, `securityProfile_profileId`, `project_projectId`, `studyType`, `alias`, `lastModifier`)
-VALUES (1,'STU1','Test study1',NULL,1,1,'Other','Test Study1',1),
-(2,'STU2','Test study2',NULL,1,1,'Other','Test Study2',1),
-(3,'STU3','OICR',NULL,1,1,'Other','Test Study3',1),
-(4,'STU4','OICR',NULL,1,1,'Other','Test Study4',1);
+INSERT INTO `Study`(`studyId`, `name`, `description`, `accession`, `securityProfile_profileId`, `project_projectId`, `studyTypeId`, `alias`, `lastModifier`)
+VALUES (1,'STU1','Test study1',NULL,1,1,(SELECT typeId FROM StudyType WHERE name = 'Other'),'Test Study1',1),
+(2,'STU2','Test study2',NULL,1,1,(SELECT typeId FROM StudyType WHERE name = 'Other'),'Test Study2',1),
+(3,'STU3','OICR',NULL,1,1,(SELECT typeId FROM StudyType WHERE name = 'Other'),'Test Study3',1),
+(4,'STU4','OICR',NULL,1,1,(SELECT typeId FROM StudyType WHERE name = 'Other'),'Test Study4',1);
 
 DELETE FROM `SecurityProfile`;
 DELETE FROM `SecurityProfile_ReadGroup`;
@@ -494,10 +501,10 @@ VALUES
 ('2','1', '2', 'box2', 'box2alias', 'box2', 'barcode2','identifcationbarcode2', '1', '1');
 
 DELETE FROM BoxPosition;
-INSERT INTO `BoxPosition` (`BoxPositionId`, `boxId`, `column`, `row`, `lastModifier`)
+INSERT INTO `BoxPosition` (`boxId`, `position`, `targetType`, `targetId`)
 VALUES
-('1', '1', '1', '1', '1'),
-('2', '2', '1', '2', '1');
+('1', 'A01', 'S', 1),
+('2', 'A02', 'S', 2);
 
 DELETE FROM Submission;
 INSERT INTO `Submission` (`submissionId`, `creationDate`, `submittedDate`, `verified`, `description`, `name`, `title`, `accession`, `alias`, `completed`)
@@ -603,4 +610,4 @@ INSERT INTO `DetailedLibrary`(`libraryId`, `kitDescriptorId`, `libraryDesignCode
 VALUES (1,1,1);
 
 DELETE FROM `Printer`;
-INSERT INTO Printer(printerId, name, backend, configuration, driver, enabled) VALUES (1, 'foo', 'CUPS', '{}', 'BRADY_1D');
+INSERT INTO Printer(printerId, name, backend, configuration, driver, enabled) VALUES (1, 'foo', 'CUPS', '{}', 'BRADY_1D', 1);

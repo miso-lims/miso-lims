@@ -37,13 +37,11 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
-import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -105,7 +103,7 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @OneToMany(targetEntity = SampleChangeLog.class, mappedBy = "sample")
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
-  @ManyToMany
+  @ManyToOne
   @JoinColumn(name = "securityProfile_profileId")
   private SecurityProfile securityProfile = null;
 

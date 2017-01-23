@@ -48,6 +48,8 @@
         <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractSample</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractSampleQC</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerReference</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.BoxSize</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.BoxUse</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.Index</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.IndexFamily</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.KitImpl</value>
@@ -55,6 +57,7 @@
         <value>uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.Printer</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.ContainerDerivedInfo</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl</value>
@@ -68,6 +71,7 @@
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryQCImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.PlatformImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.PoolDerivedInfo</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrderImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.PoolQCImpl</value>

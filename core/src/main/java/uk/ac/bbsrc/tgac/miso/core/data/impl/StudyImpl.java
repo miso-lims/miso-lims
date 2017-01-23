@@ -51,6 +51,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.StudyChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
@@ -100,6 +101,7 @@ public class StudyImpl implements Study, Serializable {
   private String studyType;
   @Column(name = "alias")
   private String alias;
+  @OneToMany(targetEntity = StudyChangeLog.class, mappedBy = "study")
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
   private User lastModifier;
 

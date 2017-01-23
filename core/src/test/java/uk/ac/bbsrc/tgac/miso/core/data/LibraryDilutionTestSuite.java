@@ -53,9 +53,9 @@ public class LibraryDilutionTestSuite {
     when(parent.getSecurityProfile()).thenReturn(mockSecurityProfile);
     when(mockSecurityProfile.getOwner()).thenReturn(mockUser);
 
-    assertNull(ld.getSecurityProfile());
+    assertNotEquals(mockSecurityProfile, ld.getSecurityProfile());
     ld.inheritPermissions(parent);
-    assertNotNull(ld.getSecurityProfile());
+    assertEquals(mockSecurityProfile, ld.getSecurityProfile());
   }
 
   @Test(expected = SecurityException.class)
