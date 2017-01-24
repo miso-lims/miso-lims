@@ -88,6 +88,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.event.Alert;
+import uk.ac.bbsrc.tgac.miso.core.event.manager.PoolAlertManager;
+import uk.ac.bbsrc.tgac.miso.core.event.manager.ProjectAlertManager;
+import uk.ac.bbsrc.tgac.miso.core.event.manager.RunAlertManager;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunQcException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
@@ -110,12 +113,12 @@ import uk.ac.bbsrc.tgac.miso.core.store.RunQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
+import uk.ac.bbsrc.tgac.miso.core.store.SecurityProfileStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerReferenceStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerServiceRecordStore;
 import uk.ac.bbsrc.tgac.miso.core.store.StatusStore;
-import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.core.store.StudyStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SubmissionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.TargetedSequencingStore;
@@ -163,7 +166,7 @@ public class MisoRequestManager implements RequestManager {
   @Autowired
   private SampleQcStore sampleQcStore;
   @Autowired
-  private Store<SecurityProfile> securityProfileStore;
+  private SecurityProfileStore securityProfileStore;
   @Autowired
   private SequencerPartitionContainerStore sequencerPartitionContainerStore;
   @Autowired
@@ -188,6 +191,12 @@ public class MisoRequestManager implements RequestManager {
   private LibraryDesignCodeDao libraryDesignCodeDao;
   @Autowired
   private NamingScheme namingScheme;
+  @Autowired
+  private PoolAlertManager poolAlertManager;
+  @Autowired
+  private RunAlertManager runAlertManager;
+  @Autowired
+  private ProjectAlertManager projectAlertManager;
 
   public void setSecurityStore(SecurityStore securityStore) {
     this.securityStore = securityStore;
@@ -257,7 +266,7 @@ public class MisoRequestManager implements RequestManager {
     this.sampleQcStore = sampleQcStore;
   }
 
-  public void setSecurityProfileStore(Store<SecurityProfile> securityProfileStore) {
+  public void setSecurityProfileStore(SecurityProfileStore securityProfileStore) {
     this.securityProfileStore = securityProfileStore;
   }
 
@@ -1137,7 +1146,9 @@ public class MisoRequestManager implements RequestManager {
         }
         project = original;
       }
-      return projectStore.save(project);
+      long id = projectStore.save(project);
+      if (projectAlertManager != null) projectAlertManager.update(project);
+      return id;
     } else {
       throw new IOException("No projectStore available. Check that it has been declared in the Spring config.");
     }
@@ -1202,6 +1213,7 @@ public class MisoRequestManager implements RequestManager {
         managed.setNotes(run.getNotes());
         managed.setSequencingParameters(run.getSequencingParameters());
         runStore.save(managed);
+        if (runAlertManager != null) runAlertManager.update(run);
         return run.getId();
       }
     } else {
@@ -1221,7 +1233,9 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public long saveRunQC(RunQC runQC) throws IOException {
     if (runQcStore != null) {
-      return runQcStore.save(runQC);
+      long id = runQcStore.save(runQC);
+      if (runAlertManager != null) runAlertManager.update(runQC.getRun());
+      return id;
     } else {
       throw new IOException("No runQcStore available. Check that it has been declared in the Spring config.");
     }
@@ -1299,7 +1313,9 @@ public class MisoRequestManager implements RequestManager {
       if (autoGenerateIdBarcodes && pool.getId() == PoolImpl.UNSAVED_ID) {
         LimsUtils.generateAndSetIdBarcode(pool);
       }
-      return poolStore.save(pool);
+      long id = poolStore.save(pool);
+      if (poolAlertManager != null) poolAlertManager.update(pool);
+      return id;
     } else {
       throw new IOException("No poolStore available. Check that it has been declared in the Spring config.");
     }
@@ -2287,32 +2303,38 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public void addRunWatcher(Run run, User watcher) throws IOException {
     runStore.addWatcher(run, watcher);
+    if (runAlertManager != null) runAlertManager.addWatcher(run, watcher);
   }
 
   @Override
   public void removeRunWatcher(Run run, User watcher) throws IOException {
     runStore.removeWatcher(run, watcher);
+    if (runAlertManager != null) runAlertManager.addWatcher(run, watcher);
   }
 
   @Override
   public void addProjectWatcher(Project project, User watcher) throws IOException {
     projectStore.addWatcher(project, watcher);
+    if (projectAlertManager != null) projectAlertManager.addWatcher(project, watcher);
   }
 
   @Override
   public void removeProjectWatcher(Project project, User watcher) throws IOException {
     projectStore.removeWatcher(project, watcher);
+    if (projectAlertManager != null) projectAlertManager.removeWatcher(project, watcher);
   }
 
   @Override
   public void addPoolWatcher(Pool pool, User watcher) throws IOException {
     poolStore.addWatcher(pool, watcher);
-
+    if (poolAlertManager != null)
+    poolAlertManager.addWatcher(pool, watcher);
   }
 
   @Override
   public void removePoolWatcher(Pool pool, User watcher) throws IOException {
     poolStore.removeWatcher(pool, watcher);
+    if (poolAlertManager != null) poolAlertManager.removeWatcher(pool, watcher);
   }
 
   public void autoGenerateIdBarcode(Pool pool) {

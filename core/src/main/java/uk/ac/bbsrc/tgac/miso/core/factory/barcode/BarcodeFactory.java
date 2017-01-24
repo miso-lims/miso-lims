@@ -92,7 +92,7 @@ public class BarcodeFactory {
   private String outputType = "png";
   private float pointPixels = 4.0f;
 
-  private static final Map<String, BarcodeGenerator> generators = new HashMap<String, BarcodeGenerator>();
+  private static final Map<String, BarcodeGenerator> generators = new HashMap<>();
 
   public BarcodeFactory() {
     generators.put("CODABAR", CODABAR);

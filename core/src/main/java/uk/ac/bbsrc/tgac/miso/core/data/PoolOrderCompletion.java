@@ -11,6 +11,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingParametersImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 
@@ -32,7 +33,7 @@ public class PoolOrderCompletion implements Serializable {
   @JoinColumn(name = "parametersId", nullable = false)
   private SequencingParameters parameters;
   @Id
-  @ManyToOne
+  @ManyToOne(targetEntity = PoolImpl.class)
   @JoinColumn(name = "poolId")
   private Pool pool;
 

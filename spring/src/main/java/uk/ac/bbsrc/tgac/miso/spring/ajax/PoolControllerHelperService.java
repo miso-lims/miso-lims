@@ -101,8 +101,6 @@ public class PoolControllerHelperService {
   @Autowired
   private MisoFilesManager misoFileManager;
   @Autowired
-  private BarcodeFactory barcodeFactory;
-  @Autowired
   private PrinterService printerService;
   @Autowired
   private ExperimentService experimentService;
@@ -322,6 +320,7 @@ public class PoolControllerHelperService {
     File temploc = getBarcodeFileLocation(session);
     try {
       Pool pool = requestManager.getPoolById(poolId);
+      BarcodeFactory barcodeFactory = new BarcodeFactory();
       barcodeFactory.setPointPixels(1.5f);
       barcodeFactory.setBitmapResolution(600);
 
@@ -715,10 +714,6 @@ public class PoolControllerHelperService {
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
-  }
-
-  public void setBarcodeFactory(BarcodeFactory barcodeFactory) {
-    this.barcodeFactory = barcodeFactory;
   }
 
   public void setMisoFileManager(MisoFilesManager misoFileManager) {

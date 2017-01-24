@@ -39,11 +39,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 
-import uk.ac.bbsrc.tgac.miso.core.store.Store;
+import uk.ac.bbsrc.tgac.miso.core.store.SecurityProfileStore;
 
 @Transactional(rollbackFor = Exception.class)
 @Repository
-public class HibernateSecurityProfileDao implements Store<SecurityProfile> {
+public class HibernateSecurityProfileDao implements SecurityProfileStore {
   protected static final Logger log = LoggerFactory.getLogger(HibernateSecurityProfileDao.class);
 
   @Autowired
