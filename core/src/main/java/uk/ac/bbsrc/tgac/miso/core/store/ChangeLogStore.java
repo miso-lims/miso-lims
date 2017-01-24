@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.core.store;
 
+import java.io.IOException;
 import java.util.Collection;
 
 import com.eaglegenomics.simlims.core.User;
@@ -28,8 +29,9 @@ public interface ChangeLogStore {
    * @param type The change log type derived from {@link HibernateChangeLogDao.ChangeLogType ChangeLogType}
    * @param entityId The id of the entity the change log is associated with. (Not the id of the change log.)
    * @return A collection of change logs.
+   * @throws IOException
    */
-  public Collection<ChangeLog> listAllById(String type, long entityId);
+  public Collection<ChangeLog> listAllById(String type, long entityId) throws IOException;
   
   /**
    * Delete all change logs of a specified type associated with the id of a specific entity.

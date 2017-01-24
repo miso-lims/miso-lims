@@ -18,6 +18,7 @@ import javax.persistence.PrimaryKeyJoinColumn;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxDerivedInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.BoxChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
@@ -44,6 +45,10 @@ public abstract class AbstractBox implements Box {
   @OneToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "lastModifier", nullable = false)
   private User lastModifier;
+
+  @OneToOne
+  @PrimaryKeyJoinColumn
+  private BoxDerivedInfo derivedInfo;
 
   @ManyToOne
   @JoinColumn(name = "boxSizeId")
@@ -190,12 +195,8 @@ public abstract class AbstractBox implements Box {
   }
 
   @Override
-  public Date getLastUpdated() {
-    return lastUpdated;
+  public Date getLastModified() {
+    return (derivedInfo == null ? null : derivedInfo.getLastModified());
   }
 
-  @Override
-  public void setLastUpdated(Date lastUpdated) {
-    this.lastUpdated = lastUpdated;
-  }
 }

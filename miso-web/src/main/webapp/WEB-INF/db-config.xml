@@ -59,6 +59,7 @@
         <value>uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletion</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.StudyType</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.BoxDerivedInfo</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.ContainerDerivedInfo</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl</value>

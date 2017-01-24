@@ -57,6 +57,7 @@
         <value>uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.Printer</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.BoxDerivedInfo</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.ContainerDerivedInfo</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl</value>
@@ -144,8 +145,6 @@
   </bean>
   <bean name="interfaceTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
     <property name="dataSource" ref="dataSource"/>
-  </bean>
-  <bean name="dataObjectFactory" class="uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory">
   </bean>
   <bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
     <property name="sessionFactory" ref="sessionFactory"/>

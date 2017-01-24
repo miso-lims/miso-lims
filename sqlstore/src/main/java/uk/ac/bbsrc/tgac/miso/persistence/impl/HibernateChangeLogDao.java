@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
@@ -7,6 +8,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -50,12 +52,47 @@ public class HibernateChangeLogDao implements ChangeLogStore {
     return results;
   }
 
+  private Criterion idForAnyType(Criteria criteria, ChangeLogType changeLogType, long id) throws IOException {
+    Criterion idByType;
+    switch (changeLogType) {
+    case BOX:
+      idByType = Restrictions.eq("boxChangeLogId", id);
+      break;
+    case EXPERIMENT:
+      idByType = Restrictions.eq("experimentChangeLogId", id);
+      break;
+    case KITDESCRIPTOR:
+      idByType = Restrictions.eq("kitDescriptorChangeLogId", id);
+      break;
+    case LIBRARY:
+      idByType = Restrictions.eq("libraryChangeLogId", id);
+      break;
+    case POOL:
+      idByType = Restrictions.eq("poolChangeLogId", id);
+      break;
+    case RUN:
+      idByType = Restrictions.eq("runChangeLogId", id);
+      break;
+    case SAMPLE:
+      idByType = Restrictions.eq("sampleChangeLogId", id);
+      break;
+    case SEQUENCERPARTITIONCONTAINER:
+      idByType = Restrictions.eq("containerChangeLogId", id);
+      break;
+    case STUDY:
+      idByType = Restrictions.eq("studyChangeLogId", id);
+      break;
+    default:
+      throw new IOException("Invalid changelog type");
+    }
+    return idByType;
+  }
+
   @Override
-  public List<ChangeLog> listAllById(String type, long id) {
+  public List<ChangeLog> listAllById(String type, long id) throws IOException {
     ChangeLogType changeLogType = ChangeLogType.get(type);
     Criteria criteria = currentSession().createCriteria(changeLogType.getClazz());
-    criteria.createAlias("changeLog", "changeLog");
-    criteria.add(Restrictions.eq("changeLog.id", id));
+    criteria.add(idForAnyType(criteria, changeLogType, id));
     @SuppressWarnings("unchecked")
     List<ChangeLog> results = criteria.list();
     return results;

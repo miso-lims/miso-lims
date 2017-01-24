@@ -60,7 +60,7 @@ public class SQLAlertDAOTest extends AbstractDAOTest {
     MockitoAnnotations.initMocks(this);
     dao.setJdbcTemplate(template);
     dao.setSessionFactory(sessionFactory);
-    User mockUser = Mockito.mock(User.class);
+    User mockUser = Mockito.mock(UserImpl.class);
     when(mockUser.getUserId()).thenReturn(1L);
     when(securityManager.getUserById(anyLong())).thenReturn(mockUser);
 

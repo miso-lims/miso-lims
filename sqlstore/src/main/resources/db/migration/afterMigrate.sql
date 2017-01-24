@@ -750,3 +750,6 @@ CREATE OR REPLACE VIEW PoolDerivedInfo AS
 
 CREATE OR REPLACE VIEW LibraryDerivedInfo AS
   SELECT libraryId, MAX(changeTime) AS lastModified FROM LibraryChangeLog GROUP BY libraryId;
+  
+CREATE OR REPLACE VIEW BoxDerivedInfo AS
+  SELECT boxId, MAX(changeTime) AS lastModified FROM BoxChangeLog GROUP BY boxId;

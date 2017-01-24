@@ -247,9 +247,7 @@ public interface Box extends SecurableByProfile, Barcodable, Locatable, Deletabl
   @Override
   public void setLocationBarcode(String barcode);
 
-  Date getLastUpdated();
-
-  void setLastUpdated(Date lastUpdated);
+  Date getLastModified();
 
   /**
    * Returns the change logs of this Box object.

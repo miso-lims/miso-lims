@@ -33,6 +33,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
@@ -205,7 +206,7 @@ public class SQLStudyDAOTest extends AbstractDAOTest {
 
   private Study makeStudy() {
     SecurityProfile profile = Mockito.mock(SecurityProfile.class);
-    User user = Mockito.mock(User.class);
+    User user = Mockito.mock(UserImpl.class);
     Mockito.when(user.getUserId()).thenReturn(1L);
     Project project = Mockito.mock(Project.class);
     Mockito.when(project.getProjectId()).thenReturn(1L);

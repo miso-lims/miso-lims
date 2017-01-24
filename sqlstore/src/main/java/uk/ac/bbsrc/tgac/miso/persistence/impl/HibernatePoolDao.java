@@ -271,6 +271,7 @@ public class HibernatePoolDao implements PoolStore {
   private String updateSortCol(String sortCol) {
     sortCol = sortCol.replaceAll("[^\\w]", "");
     if ("id".equals(sortCol)) sortCol = "poolId";
+    if ("lastModified".equals(sortCol)) sortCol = "derivedInfo.lastModified";
     return sortCol;
   }
 
@@ -284,6 +285,9 @@ public class HibernatePoolDao implements PoolStore {
     }
 
     final Criteria criteria = createCriteria();
+    // required to sort by 'derivedInfo.lastModified', which is the field on which we
+    // want to sort most List X pages
+    criteria.createAlias("derivedInfo", "derivedInfo");
     if ("asc".equalsIgnoreCase(sortDir)) {
       criteria.addOrder(Order.asc(sortCol));
     } else if ("desc".equalsIgnoreCase(sortDir)) {

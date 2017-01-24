@@ -63,7 +63,6 @@ public class SQLBoxDAOTest extends AbstractDAOTest {
   private JdbcTemplate jdbcTemplate;
 
   @Autowired
-  @Spy
   private SessionFactory sessionFactory;
 
   @InjectMocks
@@ -119,7 +118,7 @@ public class SQLBoxDAOTest extends AbstractDAOTest {
   @Test
   public void testListAll() throws Exception {
     Collection<Box> boxes = dao.listAll();
-    assertTrue(boxes.size() == 2);
+    assertEquals(2, boxes.size());
 
     Iterator<Box> iterator = boxes.iterator();
 
