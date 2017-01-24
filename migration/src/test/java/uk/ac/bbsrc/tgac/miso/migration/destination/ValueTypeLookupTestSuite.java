@@ -37,6 +37,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SamplePurposeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
@@ -62,6 +63,7 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryQCDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLSampleQCDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLSequencerReferenceDAO;
+import uk.ac.bbsrc.tgac.miso.sqlstore.SQLTargetedSequencingDAO;
 
 public class ValueTypeLookupTestSuite {
 
@@ -191,6 +193,12 @@ public class ValueTypeLookupTestSuite {
     referenceGenomes.add(makeReferenceGenome(VALID_LONG, VALID_STRING));
     Mockito.when(referenceGenomeService.listAllReferenceGenomeTypes()).thenReturn(referenceGenomes);
     Mockito.when(mgr.getReferenceGenomeService()).thenReturn(referenceGenomeService);
+
+    SQLTargetedSequencingDAO tarSeqDao = Mockito.mock(SQLTargetedSequencingDAO.class);
+    List<TargetedSequencing> tarSeqs = Lists.newArrayList();
+    tarSeqs.add(makeTargetedSequencing(VALID_LONG, VALID_STRING));
+    Mockito.when(tarSeqDao.listAll()).thenReturn(tarSeqs);
+    Mockito.when(mgr.getTargetedSequencingDao()).thenReturn(tarSeqDao);
 
     sut = new ValueTypeLookup(mgr);
   }
@@ -538,6 +546,21 @@ public class ValueTypeLookupTestSuite {
     referenceGenome.setId(id);
     referenceGenome.setAlias(alias);
     return referenceGenome;
+  }
+
+  @Test
+  public void testResolveTargetedSequencing() throws Exception {
+    assertNotNull(sut.resolve(makeTargetedSequencing(VALID_LONG, VALID_STRING)));
+    assertNotNull(sut.resolve(makeTargetedSequencing(null, VALID_STRING)));
+    assertNull(sut.resolve(makeTargetedSequencing(null, INVALID_STRING)));
+    assertNull(sut.resolve(makeTargetedSequencing(null, null)));
+  }
+
+  private TargetedSequencing makeTargetedSequencing(Long id, String alias) {
+    TargetedSequencing tarSeq = new TargetedSequencing();
+    tarSeq.setTargetedSequencingId(id);
+    tarSeq.setAlias(alias);
+    return tarSeq;
   }
 
 }
