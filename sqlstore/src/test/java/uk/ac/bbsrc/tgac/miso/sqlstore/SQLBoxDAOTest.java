@@ -186,7 +186,8 @@ public class SQLBoxDAOTest extends AbstractDAOTest {
   @Test
   public void testRemoveBoxableFromBox() throws Exception {
     Pool pool = new PoolImpl(new UserImpl());
-
+    Box box = dao.get(1);
+    box.setBoxable("A01", pool);
     dao.removeBoxableFromBox(pool);
   }
 

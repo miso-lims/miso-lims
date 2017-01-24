@@ -408,16 +408,12 @@ public class ERASubmissionManager implements SubmissionManager {
       studyDescriptor.appendChild(studyTitle);
 
       Element studyType = xml.getOwnerDocument().createElementNS(null, "STUDY_TYPE");
-      studyType.setAttribute("existing_study_type", s.getStudyType());
+      studyType.setAttribute("existing_study_type", s.getStudyType().getName());
       studyDescriptor.appendChild(studyType);
 
       Element centerProjectName = xml.getOwnerDocument().createElementNS(null, "CENTER_PROJECT_NAME");
       centerProjectName.setTextContent(s.getProject().getAlias());
       studyDescriptor.appendChild(centerProjectName);
-
-      Element studyAbstract = xml.getOwnerDocument().createElementNS(null, "STUDY_ABSTRACT");
-      studyAbstract.setTextContent(s.getAbstract());
-      studyDescriptor.appendChild(studyAbstract);
 
       Element studyDescription = xml.getOwnerDocument().createElementNS(null, "STUDY_DESCRIPTION");
       studyDescription.setTextContent(s.getDescription());

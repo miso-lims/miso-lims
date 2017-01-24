@@ -56,6 +56,8 @@
         <value>uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.Printer</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletion</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.StudyType</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.BoxDerivedInfo</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.ContainerDerivedInfo</value>

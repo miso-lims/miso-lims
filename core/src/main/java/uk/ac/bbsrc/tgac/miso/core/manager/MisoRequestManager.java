@@ -1341,6 +1341,7 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public long saveStudy(Study study) throws IOException {
     if (studyStore != null) {
+      // TODO: when moved to Service: get Hibernate-managed StudyType from db by name
       return studyStore.save(study);
     } else {
       throw new IOException("No studyStore available. Check that it has been declared in the Spring config.");

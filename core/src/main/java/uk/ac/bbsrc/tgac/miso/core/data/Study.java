@@ -44,7 +44,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 @JsonIgnoreProperties({ "securityProfile" })
-public interface Study extends SecurableByProfile, Comparable, Deletable, Nameable {
+public interface Study extends SecurableByProfile, Comparable<Study>, Deletable, Nameable {
 
   /** Field PREFIX */
   public static final String PREFIX = "STU";
@@ -121,26 +121,11 @@ public interface Study extends SecurableByProfile, Comparable, Deletable, Nameab
   public void setAlias(String alias);
 
   /**
-   * Returns the abstract of this Study object.
-   * 
-   * @return String abstract.
-   */
-  public String getAbstract();
-
-  /**
-   * Sets the abstract of this Study object.
-   * 
-   * @param abs
-   *          abs.
-   */
-  public void setAbstract(String abs);
-
-  /**
    * Returns the studyType of this Study object.
    * 
-   * @return String studyType.
+   * @return StudyType studyType.
    */
-  public String getStudyType();
+  public StudyType getStudyType();
 
   /**
    * Sets the studyType of this Study object.
@@ -148,7 +133,7 @@ public interface Study extends SecurableByProfile, Comparable, Deletable, Nameab
    * @param studyType
    *          studyType.
    */
-  public void setStudyType(String studyType);
+  public void setStudyType(StudyType studyType);
 
   /**
    * Registers an Experiment that will be undertaken as part of this Study

@@ -50,8 +50,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
  * @since 0.0.2
  */
 @Entity
-@Table(name = "`Status`")
+@Table(name = "Status")
 public class StatusImpl implements Status, Serializable {
+  private static final long serialVersionUID = 1L;
+
   public static final Long UNSAVED_ID = 0L;
 
   @Id

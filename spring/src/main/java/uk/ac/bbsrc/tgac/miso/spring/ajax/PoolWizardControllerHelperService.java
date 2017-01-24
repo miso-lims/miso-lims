@@ -53,6 +53,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
+import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolQCImpl;
@@ -235,7 +236,9 @@ public class PoolWizardControllerHelperService {
       s.setAlias(p.getAlias());
       s.setDescription(studyDescription);
       s.setSecurityProfile(p.getSecurityProfile());
-      s.setStudyType(studyType);
+      StudyType sType = new StudyType();
+      sType.setName(studyType);
+      s.setStudyType(sType);
 
       s.setLastModifier(user);
       requestManager.saveStudy(s);

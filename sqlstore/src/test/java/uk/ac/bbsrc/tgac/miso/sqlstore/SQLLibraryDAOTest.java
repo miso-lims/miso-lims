@@ -2,7 +2,7 @@ package uk.ac.bbsrc.tgac.miso.sqlstore;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -87,8 +87,8 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
     LibraryStrategyType libraryStrategyType = new LibraryStrategyType();
     libraryStrategyType.setId(1L);
     library.setLibraryStrategyType(libraryStrategyType);
-    User mockUser = mock(UserImpl.class);
-    when(mockUser.getUserId()).thenReturn(1L);
+    User mockUser = new UserImpl();
+    mockUser.setUserId(1L);
     library.setLastModifier(mockUser);
 
     when(namingScheme.validateName(anyString())).thenReturn(ValidationResult.success());
@@ -279,8 +279,8 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
     library.setLibraryType(dao.getLibraryTypeById(1L));
     library.setLibrarySelectionType(dao.getLibrarySelectionTypeById(1L));
     library.setLibraryStrategyType(dao.getLibraryStrategyTypeById(1L));
-    User mockUser = Mockito.mock(UserImpl.class);
-    when(mockUser.getUserId()).thenReturn(1L);
+    User mockUser = new UserImpl();
+    mockUser.setUserId(1L);
     library.setLastModifier(mockUser);
 
     when(namingScheme.generateNameFor(library)).thenReturn(libraryName);

@@ -42,6 +42,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
@@ -177,7 +178,7 @@ public class SQLSampleQCDAOTest extends AbstractDAOTest {
   @Test
   public void testSaveNew() throws IOException, MalformedSampleException {
     SampleQC newSampleQC = new SampleQCImpl();
-    newSampleQC.setSample(Mockito.mock(Sample.class));
+    newSampleQC.setSample(Mockito.mock(SampleImpl.class));
     newSampleQC.setQcCreator("admin");
     newSampleQC.setQcType(Mockito.mock(QcType.class));
     long id = dao.save(newSampleQC);
