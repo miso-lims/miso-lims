@@ -9,6 +9,9 @@ UPDATE Study SET studyTypeId = (SELECT typeId FROM StudyType WHERE name = studyT
 ALTER TABLE Study ADD CONSTRAINT study_studyTypeId FOREIGN KEY (studyTypeId) REFERENCES StudyType(typeId);
 ALTER TABLE Study DROP COLUMN studyType;
 ALTER TABLE Study CHANGE COLUMN studyTypeId studyTypeId bigint(20) NOT NULL;
+ALTER TABLE Study ADD CONSTRAINT fk_study_securityProfile FOREIGN KEY (securityProfile_profileId) REFERENCES SecurityProfile (profileId);
+ALTER TABLE Study ADD CONSTRAINT fk_study_project FOREIGN KEY (project_projectId) REFERENCES Project (projectId);
+ALTER TABLE Study ADD CONSTRAINT fk_study_lastModifier_user FOREIGN KEY (lastModifier) REFERENCES User (userId);
 
 ALTER TABLE ProjectOverview ADD COLUMN project_projectId bigint(20);
 UPDATE ProjectOverview SET project_projectId = (SELECT project_projectId FROM Project_ProjectOverview WHERE overviews_overviewId = overviewId);
@@ -30,6 +33,9 @@ DROP TABLE EntityGroup_Elements;
 DROP TABLE EntityGroup;
 
 UPDATE Pool SET platformType = UPPER(platformType);
+ALTER TABLE Pool ADD CONSTRAINT fk_pool_securityProfile FOREIGN KEY (securityProfile_profileId) REFERENCES SecurityProfile (profileId);
+ALTER TABLE Pool ADD CONSTRAINT fk_pool_experimentId FOREIGN KEY (experiment_experimentId) REFERENCES Experiment (experimentId);
+ALTER TABLE Pool ADD CONSTRAINT fk_pool_lastModifier_user FOREIGN KEY (lastModifier) REFERENCES User (userId);
 
 CREATE TABLE `Pool_Dilution` (
   `pool_poolId` bigint(20) NOT NULL,
@@ -70,6 +76,7 @@ UPDATE SequencerReference SET ip = INET_NTOA(ipAddress);
 ALTER TABLE SequencerReference DROP COLUMN available;
 ALTER TABLE SequencerReference DROP COLUMN ipAddress;
 ALTER TABLE SequencerReference ADD CONSTRAINT upgraded_SR_UK UNIQUE (upgradedSequencerReferenceId);
+ALTER TABLE SequencerReference ADD CONSTRAINT fk_sequencerReference_platform FOREIGN KEY (platformId) REFERENCES Platform (platformId);
 
 DROP TABLE Request;
 DROP TABLE Request_Note;
@@ -78,6 +85,11 @@ ALTER TABLE Run_Note ADD CONSTRAINT RunNote_Run_FK FOREIGN KEY (run_runId) REFER
 ALTER TABLE Run_Note ADD CONSTRAINT RunNote_Note_FK FOREIGN KEY (notes_noteId) REFERENCES Note (noteId);
 
 UPDATE Run SET platformType = UPPER(platformType);
+ALTER TABLE Run ADD CONSTRAINT fk_run_securityProfile FOREIGN KEY (securityProfile_profileId) REFERENCES SecurityProfile (profileId);
+ALTER TABLE Run ADD CONSTRAINT fk_run_status FOREIGN KEY (status_statusId) REFERENCES Status (statusId);
+ALTER TABLE Run ADD CONSTRAINT fk_run_sequencerReference FOREIGN KEY (sequencerReference_sequencerReferenceId) REFERENCES SequencerReference (referenceId);
+ALTER TABLE Run ADD CONSTRAINT fk_run_lastModifier_user FOREIGN KEY (lastModifier) REFERENCES User (userId);
+ALTER TABLE Run ADD CONSTRAINT fk_run_sequencingParameters FOREIGN KEY (sequencingParameters_parametersId) REFERENCES SequencingParameters (parametersId);
 
 ALTER TABLE RunQC_Partition ADD COLUMN partition_partitionId BIGINT(20) NOT NULL;
 -- StartNoTest
@@ -97,6 +109,8 @@ ALTER TABLE RunQC_Partition ADD CONSTRAINT RunQCPartition_Partition_FK FOREIGN K
 ALTER TABLE RunQC_Partition ADD CONSTRAINT RunQCPartition_RunQC_FK FOREIGN KEY (runQc_runQcId) REFERENCES `RunQC` (qcId);
 ALTER TABLE RunQC_Partition DROP COLUMN partitionNumber;
 ALTER TABLE RunQC_Partition DROP COLUMN containers_containerId;
+
+ALTER TABLE _Partition ADD CONSTRAINT fk_partition_securityProfile FOREIGN KEY (securityProfile_profileId) REFERENCES SecurityProfile (profileId);
 
 CREATE TABLE Project_Watcher (
   projectId bigint(20) NOT NULL,
@@ -472,11 +486,17 @@ UPDATE LibraryType SET platformType = UPPER(platformType);
 ALTER TABLE Library ADD CONSTRAINT fk_library_libraryType FOREIGN KEY (libraryType) REFERENCES LibraryType (libraryTypeId);
 ALTER TABLE Library ADD CONSTRAINT fk_library_librarySelectionType FOREIGN KEY (librarySelectionType) REFERENCES LibrarySelectionType (librarySelectionTypeId);
 ALTER TABLE Library ADD CONSTRAINT fk_library_libraryStrategyType FOREIGN KEY (libraryStrategyType) REFERENCES LibraryStrategyType (libraryStrategyTypeId);
+ALTER TABLE Library ADD CONSTRAINT fk_library_sample FOREIGN KEY (sample_sampleId) REFERENCES Sample (sampleId);
+ALTER TABLE Library DROP CONSTRAINT `library_user_userid_fkey`;
+ALTER TABLE Library ADD CONSTRAINT fk_library_lastModifier_user FOREIGN KEY (lastModifier) REFERENCES User (userId);
+ALTER TABLE Library ADD CONSTRAINT fk_library_securityProfile FOREIGN KEY (securityProfile_profileId) REFERENCES SecurityProfile (profileId);
 
 ALTER TABLE LibraryDilution ADD COLUMN lastModifier bigint(20);
 UPDATE LibraryDilution SET lastModifier = (SELECT lastModifier FROM Library l WHERE l.libraryId = library_libraryId);
 ALTER TABLE LibraryDilution CHANGE COLUMN lastModifier lastModifier bigint(20) NOT NULL;
 ALTER TABLE LibraryDilution ADD CONSTRAINT fk_libraryDilution_lastModifier_user FOREIGN KEY (lastModifier) REFERENCES User (userId);
+ALTER TABLE LibraryDilution ADD CONSTRAINT fk_libraryDilution_library FOREIGN KEY (library_libraryId) REFERENCES Library (libraryId);
+ALTER TABLE LibraryDilution ADD CONSTRAINT fk_libraryDilution_targetedSequencing FOREIGN KEY (targetedSequencingId) REFERENCES TargetedSequencing (targetedSequencingId);
 
 ALTER TABLE LibraryAdditionalInfo RENAME TO DetailedLibrary;
 ALTER TABLE DetailedLibrary DROP FOREIGN KEY `libraryAdditionalInfo_createUser_fkey`;
@@ -485,3 +505,16 @@ ALTER TABLE DetailedLibrary DROP COLUMN creationDate;
 ALTER TABLE DetailedLibrary DROP FOREIGN KEY `libraryAdditionalInfo_updateUser_fkey`;
 ALTER TABLE DetailedLibrary DROP COLUMN updatedBy;
 ALTER TABLE DetailedLibrary DROP COLUMN lastUpdated;
+
+UPDATE Project SET progress = UPPER(progress);
+ALTER TABLE Project ADD CONSTRAINT fk_project_securityProfile FOREIGN KEY (securityProfile_profileId) REFERENCES SecurityProfile (profileId);
+
+ALTER TABLE Sample ADD CONSTRAINT fk_sample_securityProfile FOREIGN KEY (securityProfile_profileId) REFERENCES SecurityProfile (profileId);
+ALTER TABLE Sample ADD CONSTRAINT fk_sample_project FOREIGN KEY (project_projectId) REFERENCES Project (projectId);
+ALTER TABLE Sample ADD CONSTRAINT fk_sample_lastModifier_user FOREIGN KEY (lastModifier) REFERENCES User (userId);
+
+ALTER TABLE Box ADD CONSTRAINT fk_box_boxSize FOREIGN KEY (boxSizeId) REFERENCES BoxSize (boxSizeId);
+ALTER TABLE Box ADD CONSTRAINT fk_box_boxUse FOREIGN KEY (boxUseId) REFERENCES BoxUse (boxUseId);
+ALTER TABLE Box ADD CONSTRAINT fk_box_lastModifier_user FOREIGN KEY (lastModifier) REFERENCES User (userId);
+
+DROP TABLE Study_Experiment;

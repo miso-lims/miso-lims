@@ -97,9 +97,62 @@ VALUES
     (62,'N702','CGTACTAG',3),
     (61,'N701','TAAGGCGA',3);
 
-DELETE FROM `_Partition`;
-INSERT INTO `_Partition` (`partitionId`, `partitionNumber`, `pool_poolId`, `securityProfile_profileId`)
-VALUES (1,1,1,1);
+DELETE FROM QCType;
+INSERT INTO `QCType` (`qcTypeId`, `name`, `description`, `qcTarget`, `units`)
+VALUES
+    (2,'Bioanalyzer','Chip-based capillary electrophoresis machine to analyse RNA, DNA, and protein, manufactured by Agilent','Library','nM'),
+    (7,'QuBit','Quantitation of DNA, RNA and protein, manufacturered by Invitrogen','Sample','ng/&#181;l'),
+    (3,'Bioanalyser','Chip-based capillary electrophoresis machine to analyse RNA, DNA, and protein, manufactured by Agilent','Sample','ng/&#181;l'),
+    (4,'QuBit','Quantitation of DNA, RNA and protein, manufacturered by Invitrogen','Library','ng/&#181;l'),
+    (6,'SeqInfo QC','Post-run completion run QC step, undertaken by the SeqInfo team, as part of the primary analysis stage.','Run',''),
+    (5,'SeqOps QC','Post-run completion run QC step, undertaken by the SeqOps team, to move a run through to the primary analysis stage.','Run',''),
+    (1,'qPCR','Quantitative PCR','Library','mol/&#181;l'),
+    (8,'poolQcType1', 'qc 1 for pools', 'Pool', 'nM'),
+  (9,'poolQcType2', 'qc 2 for pools', 'Pool', 'nM'),
+  (10,'poolQcType3', 'qc 3 for pools', 'Pool', 'nM'),
+  (11,'poolQcType4', 'qc 4 for pools', 'Pool', 'nM');
+
+DELETE FROM `Printer`;
+INSERT INTO Printer(printerId, name, backend, configuration, driver, enabled) VALUES (1, 'foo', 'CUPS', '{}', 'BRADY_1D', 1);
+    
+DELETE FROM `ReferenceGenome`;
+INSERT INTO `ReferenceGenome` (`referenceGenomeId`, `alias`) VALUES (1, 'Human hg19 random');
+INSERT INTO `ReferenceGenome` (`referenceGenomeId`, `alias`) VALUES (2, 'Human hg19');
+INSERT INTO `ReferenceGenome` (`referenceGenomeId`, `alias`) VALUES (3, 'Human hg18 random');
+
+INSERT INTO `User` (`userId`, `active`, `admin`, `external`, `fullName`, `internal`, `loginName`, `password`, `email`)
+VALUES (3,1,0,0,'user',1,'user','user','user@user.user');
+
+INSERT INTO `User_Group` (`users_userId`, `groups_groupId`)
+VALUES (3,1),(3,2),(1,1);
+
+DELETE FROM `SecurityProfile`;
+DELETE FROM `SecurityProfile_ReadGroup`;
+DELETE FROM `SecurityProfile_WriteGroup`;
+DELETE FROM `SecurityProfile_ReadUser`;
+DELETE FROM `SecurityProfile_WriteUser`;
+INSERT INTO `SecurityProfile`(`profileId`, `allowAllInternal`, `owner_userId`) 
+VALUES (1,1,1),(2,1,1),(3,1,1),(4,1,1),(5,1,1),(6,1,1),(7,1,1),(8,1,1),(9,1,1),(10,1,1),(11,1,1),(12,1,NULL),(13,1,NULL),(14,1,NULL),(15,1,NULL);
+
+INSERT INTO SecurityProfile_ReadUser(SecurityProfile_profileId, readUser_userId) VALUES (1, 1);
+INSERT INTO SecurityProfile_WriteUser(SecurityProfile_profileId, writeUser_userId) VALUES (2, 1);
+INSERT INTO SecurityProfile_ReadGroup(SecurityProfile_profileId, readGroup_groupId) VALUES (3, 2);
+INSERT INTO SecurityProfile_WriteGroup(SecurityProfile_profileId, writeGroup_groupId) VALUES (4, 2);
+
+DELETE FROM `Project`;
+INSERT INTO `Project`(`projectId`, `creationDate`, `description`, `name`, `securityProfile_profileId`, `progress`, `alias`, `lastUpdated`, `referenceGenomeId`)
+VALUES (1,'2015-08-27 15:40:15','Test project','PRO1',1,'ACTIVE','TEST','2015-08-27 19:40:40', 1);
+INSERT INTO `Project`(`projectId`, `creationDate`, `description`, `name`, `securityProfile_profileId`, `progress`, `alias`, `lastUpdated`, `referenceGenomeId`)
+VALUES (2,'2013-11-27 12:20:15','Test project2','PRO2',1,'ACTIVE','TEST','2015-11-30 15:23:18', 1);
+INSERT INTO `Project`(`projectId`, `creationDate`, `description`, `name`, `securityProfile_profileId`, `progress`, `alias`, `lastUpdated`, `referenceGenomeId`)
+VALUES (3,'2016-01-27 11:11:15','Test project3','PRO3',1,'ACTIVE','TEST','2016-02-22 10:43:18', 2);
+
+DELETE FROM `Study`;
+INSERT INTO `Study`(`studyId`, `name`, `description`, `accession`, `securityProfile_profileId`, `project_projectId`, `studyTypeId`, `alias`, `lastModifier`)
+VALUES (1,'STU1','Test study1',NULL,1,1,(SELECT typeId FROM StudyType WHERE name = 'Other'),'Test Study1',1),
+(2,'STU2','Test study2',NULL,1,1,(SELECT typeId FROM StudyType WHERE name = 'Other'),'Test Study2',1),
+(3,'STU3','OICR',NULL,1,1,(SELECT typeId FROM StudyType WHERE name = 'Other'),'Test Study3',1),
+(4,'STU4','OICR',NULL,1,1,(SELECT typeId FROM StudyType WHERE name = 'Other'),'Test Study4',1);
 
 DELETE FROM `Experiment`;
 INSERT INTO `Experiment`(`experimentId`, `name`, `description`, `accession`, `title`, `securityProfile_profileId`, `study_studyId`, `alias`, `platform_platformId`,`lastModifier`) 
@@ -135,6 +188,64 @@ VALUES (1,'EXP1','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EX
 (30,'EXP30','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_30',16,1),
 (31,'EXP31','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_31',16,1),
 (32,'EXP32','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_32',16,1);
+
+DELETE FROM `Sample`;
+INSERT INTO `Sample`(`sampleId`, `accession`, `name`, `description`, `securityProfile_profileId`, `identificationBarcode`, `locationBarcode`, `sampleType`, `receivedDate`, `qcPassed`, `alias`, `project_projectId`, `scientificName`, `taxonIdentifier`, `lastModifier`) 
+VALUES (1,NULL,'SAM1','Inherited from TEST_0001',1,'SAM1::TEST_0001_Bn_P_nn_1-1_D_1','Freezer1_1','GENOMIC','2015-01-27','true','TEST_0001_Bn_P_nn_1-1_D_1',1,'Homo sapiens',NULL,1),
+(2,NULL,'SAM2','Inherited from TEST_0001',1,'SAM2::TEST_0001_Bn_R_nn_1-1_D_1','Freezer1_2','GENOMIC','2005-01-27','true','TEST_0001_Bn_R_nn_1-1_D_1',1,'Homo sapiens',NULL,1),
+(3,NULL,'SAM3','Inherited from TEST_0002',1,'SAM3::TEST_0002_Bn_P_nn_1-1_D_1','Freezer1_3','GENOMIC','2014-01-17','true','TEST_0002_Bn_P_nn_1-1_D_1',1,'Homo sapiens',NULL,1),
+(4,NULL,'SAM4','Inherited from TEST_0002',1,'SAM4::TEST_0002_Bn_R_nn_1-1_D_1','Freezer1_4','GENOMIC','2015-01-27','true','TEST_0002_Bn_R_nn_1-1_D_1',1,'Homo sapiens',NULL,1),
+(5,NULL,'SAM5','Inherited from TEST_0003',1,'SAM5::TEST_0003_Bn_P_nn_1-1_D_1','Freezer1_5','GENOMIC','2015-01-27','true','TEST_0003_Bn_P_nn_1-1_D_1',1,'Homo sapiens',NULL,1),
+(6,NULL,'SAM6','Inherited from TEST_0003',1,'SAM6::TEST_0003_Bn_R_nn_1-1_D_1','Freezer1_6','GENOMIC','2016-01-03','true','TEST_0003_Bn_R_nn_1-1_D_1',1,'Homo sapiens',NULL,1),
+(7,NULL,'SAM7','Inherited from TEST_0004',1,'SAM7::TEST_0004_Bn_P_nn_1-1_D_1','Freezer1_7','GENOMIC','2015-02-27','true','TEST_0004_Bn_P_nn_1-1_D_1',1,'Homo sapiens',NULL,1),
+(8,NULL,'SAM8','Inherited from TEST_0004',1,'SAM8::TEST_0004_Bn_R_nn_1-1_D_1','Freezer1_8','GENOMIC','2015-01-07','true','TEST_0004_Bn_R_nn_1-1_D_1',1,'Homo sapiens',NULL,1),
+(9,NULL,'SAM9','Inherited from TEST_0005',1,'SAM9::TEST_0005_Bn_P_nn_1-1_D_1','Freezer1_9','GENOMIC','2015-01-22','true','TEST_0005_Bn_P_nn_1-1_D_1',1,'Homo sapiens',NULL,1),
+(10,NULL,'SAM10','Inherited from TEST_0005',1,'SAM10::TEST_0005_Bn_R_nn_1-1_D_1','Freezer1_10','GENOMIC','2015-01-27','true','TEST_0005_Bn_R_nn_1-1_D_1',1,'Homo sapiens',NULL,1),
+(11,NULL,'SAM11','Inherited from TEST_0006',1,'SAM11::TEST_0006_Bn_P_nn_1-1_D_1','Freezer1_11','GENOMIC','2015-01-27','true','TEST_0006_Bn_P_nn_1-1_D_1',1,'Homo sapiens',NULL,1),
+(12,NULL,'SAM12','Inherited from TEST_0006',1,'SAM12::TEST_0006_Bn_R_nn_1-1_D_1','Freezer1_12','GENOMIC','2015-01-27','true','TEST_0006_Bn_R_nn_1-1_D_1',1,'Homo sapiens',NULL,1),
+(13,NULL,'SAM13','Inherited from TEST_0007',1,'SAM13::TEST_0007_Bn_P_nn_1-1_D_1','Freezer1_13','GENOMIC','2015-01-27','true','TEST_0007_Bn_P_nn_1-1_D_1',1,'Homo sapiens',NULL,1),
+(14,NULL,'SAM14','Inherited from TEST_0007',1,'SAM14::TEST_0007_Bn_R_nn_1-1_D_1','Freezer1_14','GENOMIC','2015-01-27','true','TEST_0007_Bn_R_nn_1-1_D_1',1,'Homo sapiens',NULL,1),
+(15,NULL,'SAM15','identity1',1,'SAM15::TEST_0001_IDENTITY_1','Freezer1_1','GENOMIC','2016-04-05','true','TEST_0001_IDENTITY_1',1,'Homo sapiens',NULL,1),
+(16,NULL,'SAM16','tissue1',1,'SAM16::TEST_0001_TISSUE_1','Freezer1_1','GENOMIC','2016-04-05','true','TEST_0001_TISSUE_1',1,'Homo sapiens',NULL,1),
+(17,NULL,'SAM17','tissue2',1,'SAM17::TEST_0001_TISSUE_2','Freezer1_1','GENOMIC','2016-04-05','true','TEST_0001_TISSUE_2',1,'Homo sapiens',NULL,1);
+
+DELETE FROM `SampleQC`;
+INSERT INTO `SampleQC`(`sample_sampleId`, `qcUserName`, `qcDate`, `qcMethod`, `results`) 
+VALUES (1,'admin','2015-08-27',1,5),
+(2,'admin','2015-08-27',1,5),
+(3,'admin','2015-08-27',1,5),
+(4,'admin','2015-08-27',1,5),
+(5,'admin','2015-08-27',1,5),
+(6,'admin','2015-08-27',1,5),
+(7,'admin','2015-08-27',1,5),
+(8,'admin','2015-08-27',1,5),
+(9,'admin','2015-08-27',1,5),
+(10,'admin','2015-08-27',1,5),
+(11,'admin','2015-08-27',1,5),
+(12,'admin','2015-08-27',1,5),
+(13,'admin','2015-08-27',1,5),
+(14,'admin','2015-08-27',1,5),
+(15,'admin','2015-08-27',1,5);
+
+INSERT INTO `SampleChangeLog`(`sampleId`, `columnsChanged`, `userId`, `message`, `changeTime`)
+VALUES (1, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:47'),
+(1, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:49'),
+(2, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:51'),
+(3, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:53'),
+(4, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:55'),
+(5, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:57'),
+(6, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:59'),
+(7, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:01'),
+(8, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:03'),
+(9, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:05'),
+(10, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:07'),
+(11, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:09'),
+(12, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:11'),
+(13, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:13'),
+(14, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:15'),
+(15, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:17'),
+(16, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:19'),
+(17, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:21');
 
 DELETE FROM `Library`;
 INSERT INTO `Library`(`libraryId`, `name`, `description`, `accession`, `securityProfile_profileId`, `sample_sampleId`, `identificationBarcode`, `locationBarcode`, `libraryType`, `concentration`, `creationDate`, `platformName`, `alias`, `paired`, `librarySelectionType`, `libraryStrategyType`, `qcPassed`, `lastModifier`)
@@ -278,23 +389,23 @@ VALUES (1, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:49'),
 (9, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:05'),
 (10, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:07');
 
-DELETE FROM `ReferenceGenome`;
-INSERT INTO `ReferenceGenome` (`referenceGenomeId`, `alias`) VALUES (1, 'Human hg19 random');
-INSERT INTO `ReferenceGenome` (`referenceGenomeId`, `alias`) VALUES (2, 'Human hg19');
-INSERT INTO `ReferenceGenome` (`referenceGenomeId`, `alias`) VALUES (3, 'Human hg18 random');
-
-DELETE FROM `Project`;
-INSERT INTO `Project`(`projectId`, `creationDate`, `description`, `name`, `securityProfile_profileId`, `progress`, `alias`, `lastUpdated`, `referenceGenomeId`)
-VALUES (1,'2015-08-27 15:40:15','Test project','PRO1',1,'Active','TEST','2015-08-27 19:40:40', 1);
-INSERT INTO `Project`(`projectId`, `creationDate`, `description`, `name`, `securityProfile_profileId`, `progress`, `alias`, `lastUpdated`, `referenceGenomeId`)
-VALUES (2,'2013-11-27 12:20:15','Test project2','PRO2',1,'Active','TEST','2015-11-30 15:23:18', 1);
-INSERT INTO `Project`(`projectId`, `creationDate`, `description`, `name`, `securityProfile_profileId`, `progress`, `alias`, `lastUpdated`, `referenceGenomeId`)
-VALUES (3,'2016-01-27 11:11:15','Test project3','PRO3',1,'Active','TEST','2016-02-22 10:43:18', 2);
-
 DELETE FROM `SequencerReference`;
 INSERT INTO `SequencerReference`(`referenceId`, `name`, `ip`, `platformId`)
 VALUES (1,'SN7001179','localhost',16),
 (2,'h1180','localhost',16);
+
+DELETE FROM `SequencerServiceRecord`;
+INSERT INTO `SequencerServiceRecord`(`recordId`, `sequencerReferenceId`, `title`, `details`, `servicedBy`, `referenceNumber`, `serviceDate`, `shutdownTime`, `restoredTime`)
+VALUES (1,1,'Seq1_Rec1','Test service','Service Person','12345','2016-01-01', '2016-01-01 07:30:00', '2016-01-01 09:00:00'),
+(2,1,'Seq1_Rec2',NULL,'Service Person',NULL,'2016-01-21',NULL,NULL),
+(3,2,'Seq2_Rec1',NULL,'Service Person',NULL,'2016-01-21',NULL,NULL);
+
+DELETE FROM `Status`;
+INSERT INTO `Status`(`statusId`, `health`, `completionDate`, `startDate`, `instrumentName`, `lastUpdated`, `runName`, `xml`) 
+VALUES (1,'Completed','2012-03-31','2012-03-23','SN7001179','2015-08-28 18:32:29','120323_h1179_0070_BC0JHTACXX',RAWTOHEX('<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!--Illumina RTA Status Report-->\n<Status>\n  <Software>Illumina RTA 1.12.4.2</Software>\n  <RunName>120323_h1179_0070_BC0JHTACXX</RunName>\n  <InstrumentName>H1179</InstrumentName>\n  <RunStarted>Tuesday, March 27, 2012 5:22 PM</RunStarted>\n  <NumCycles>202</NumCycles>\n  <ImgCycle>202</ImgCycle>\n  <ScoreCycle>202</ScoreCycle>\n  <CallCycle>202</CallCycle>\n  <InputDir>E:\\Illumina\\HiSeqTemp\\120323_h1179_0070_BC0JHTACXX</InputDir>\n  <OutputDir>\\\\storage4.stg.oicr.on.ca\\bas005\\archive\\h1179\\120323_h1179_0070_BC0JHTACXX</OutputDir>\n  <Configuration>\n    <CopyAllFiles>true</CopyAllFiles>\n    <CopyImages>False</CopyImages>\n    <DeleteImages>True</DeleteImages>\n    <RunInfoExists>True</RunInfoExists>\n    <IsPairedEndRun>True</IsPairedEndRun>\n    <NumberOfReads>2</NumberOfReads>\n    <NumberOfLanes>8</NumberOfLanes>\n    <TilesPerLane>48</TilesPerLane>\n    <ControlLane>8</ControlLane>\n  </Configuration>\n</Status>\n')),
+(2,'Unknown','2012-04-04','2012-04-04','SN7001179','2015-08-28 18:32:31','120404_h1179_0072_AD0VJ9ACXX',RAWTOHEX('<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!--Illumina RTA Status Report-->\n<Status>\n  <Software>Illumina RTA 1.12.4.2</Software>\n  <RunName>120404_h1179_0072_AD0VJ9ACXX</RunName>\n  <InstrumentName>H1179</InstrumentName>\n  <RunStarted>Sunday, April 08, 2012 10:55 AM</RunStarted>\n  <NumCycles>202</NumCycles>\n  <ImgCycle>101</ImgCycle>\n  <ScoreCycle>101</ScoreCycle>\n  <CallCycle>101</CallCycle>\n  <InputDir>D:\\Illumina\\HiSeqTemp\\120404_h1179_0072_AD0VJ9ACXX</InputDir>\n  <OutputDir>\\\\storage4.stg.oicr.on.ca\\bas005\\archive\\h1179\\120404_h1179_0072_AD0VJ9ACXX</OutputDir>\n  <Configuration>\n    <CopyAllFiles>true</CopyAllFiles>\n    <CopyImages>False</CopyImages>\n    <DeleteImages>True</DeleteImages>\n    <RunInfoExists>True</RunInfoExists>\n    <IsPairedEndRun>True</IsPairedEndRun>\n    <NumberOfReads>2</NumberOfReads>\n    <NumberOfLanes>8</NumberOfLanes>\n    <TilesPerLane>48</TilesPerLane>\n    <ControlLane>0</ControlLane>\n  </Configuration>\n</Status>\n')),
+(3,'Completed','2012-04-20','2012-04-12','SN7001179','2015-08-28 18:32:35','120412_h1179_0073_BC075RACXX',RAWTOHEX('<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!--Illumina RTA Status Report-->\n<Status>\n  <Software>Illumina RTA 1.12.4.2</Software>\n  <RunName>120412_h1179_0073_BC075RACXX</RunName>\n  <InstrumentName>H1179</InstrumentName>\n  <RunStarted>Tuesday, April 17, 2012 5:36 PM</RunStarted>\n  <NumCycles>209</NumCycles>\n  <ImgCycle>209</ImgCycle>\n  <ScoreCycle>209</ScoreCycle>\n  <CallCycle>209</CallCycle>\n  <InputDir>E:\\Illumina\\HiSeqTemp\\120412_h1179_0073_BC075RACXX</InputDir>\n  <OutputDir>\\\\storage4.stg.oicr.on.ca\\bas005\\archive\\h1179\\120412_h1179_0073_BC075RACXX</OutputDir>\n  <Configuration>\n    <CopyAllFiles>true</CopyAllFiles>\n    <CopyImages>False</CopyImages>\n    <DeleteImages>True</DeleteImages>\n    <RunInfoExists>True</RunInfoExists>\n    <IsPairedEndRun>True</IsPairedEndRun>\n    <NumberOfReads>3</NumberOfReads>\n    <NumberOfLanes>8</NumberOfLanes>\n    <TilesPerLane>48</TilesPerLane>\n    <ControlLane>0</ControlLane>\n  </Configuration>\n</Status>\n')),
+(4,'Completed','2012-03-23','2012-03-14','SN7001179','2015-08-28 18:32:35','120314_h1179_0068_AC0KY7ACXX',RAWTOHEX('<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!--Illumina RTA Status Report-->\n<Status>\n  <Software>Illumina RTA 1.12.4.2</Software>\n  <RunName>120314_h1179_0068_AC0KY7ACXX</RunName>\n  <InstrumentName>H1179</InstrumentName>\n  <RunStarted>Sunday, March 18, 2012 3:37 PM</RunStarted>\n  <NumCycles>209</NumCycles>\n  <ImgCycle>209</ImgCycle>\n  <ScoreCycle>209</ScoreCycle>\n  <CallCycle>209</CallCycle>\n  <InputDir>D:\\Illumina\\HiSeqTemp\\120314_h1179_0068_AC0KY7ACXX</InputDir>\n  <OutputDir>\\\\storage4.stg.oicr.on.ca\\bas005\\archive\\h1179\\120314_h1179_0068_AC0KY7ACXX</OutputDir>\n  <Configuration>\n    <CopyAllFiles>true</CopyAllFiles>\n    <CopyImages>False</CopyImages>\n    <DeleteImages>True</DeleteImages>\n    <RunInfoExists>True</RunInfoExists>\n    <IsPairedEndRun>True</IsPairedEndRun>\n    <NumberOfReads>3</NumberOfReads>\n    <NumberOfLanes>8</NumberOfLanes>\n    <TilesPerLane>48</TilesPerLane>\n    <ControlLane>0</ControlLane>\n  </Configuration>\n</Status>\n'));
 
 DELETE FROM `Run`;
 INSERT INTO `Run`(`runId`, `name`, `description`, `accession`, `platformRunId`, `pairedEnd`, `cycles`, `filePath`, `securityProfile_profileId`, `platformType`, `status_statusId`, `alias`, `sequencerReference_sequencerReferenceId`, `lastModifier`) 
@@ -315,99 +426,9 @@ VALUES ( 1, 'username1', '2016-01-26', 1, 'information1', 1),
 ( 2, 'username2', '2016-02-26', 2, 'information2', 0),
 ( 3, 'username3', '2015-03-26', 3, 'information3', 1);
 
-DELETE FROM RunQC_Partition;
-INSERT INTO `RunQC_Partition`(`runQc_runQcId`, `partition_partitionId`)
-VALUES (1, 1);
-
-DELETE FROM `Run_SequencerPartitionContainer`;
-INSERT INTO `Run_SequencerPartitionContainer`(`Run_runId`, `containers_containerId`) 
-VALUES (1,1),(2,2),(3,3),(4,4);
-
-DELETE FROM `Sample`;
-INSERT INTO `Sample`(`sampleId`, `accession`, `name`, `description`, `securityProfile_profileId`, `identificationBarcode`, `locationBarcode`, `sampleType`, `receivedDate`, `qcPassed`, `alias`, `project_projectId`, `scientificName`, `taxonIdentifier`, `lastModifier`) 
-VALUES (1,NULL,'SAM1','Inherited from TEST_0001',1,'SAM1::TEST_0001_Bn_P_nn_1-1_D_1','Freezer1_1','GENOMIC','2015-01-27','true','TEST_0001_Bn_P_nn_1-1_D_1',1,'Homo sapiens',NULL,1),
-(2,NULL,'SAM2','Inherited from TEST_0001',1,'SAM2::TEST_0001_Bn_R_nn_1-1_D_1','Freezer1_2','GENOMIC','2005-01-27','true','TEST_0001_Bn_R_nn_1-1_D_1',1,'Homo sapiens',NULL,1),
-(3,NULL,'SAM3','Inherited from TEST_0002',1,'SAM3::TEST_0002_Bn_P_nn_1-1_D_1','Freezer1_3','GENOMIC','2014-01-17','true','TEST_0002_Bn_P_nn_1-1_D_1',1,'Homo sapiens',NULL,1),
-(4,NULL,'SAM4','Inherited from TEST_0002',1,'SAM4::TEST_0002_Bn_R_nn_1-1_D_1','Freezer1_4','GENOMIC','2015-01-27','true','TEST_0002_Bn_R_nn_1-1_D_1',1,'Homo sapiens',NULL,1),
-(5,NULL,'SAM5','Inherited from TEST_0003',1,'SAM5::TEST_0003_Bn_P_nn_1-1_D_1','Freezer1_5','GENOMIC','2015-01-27','true','TEST_0003_Bn_P_nn_1-1_D_1',1,'Homo sapiens',NULL,1),
-(6,NULL,'SAM6','Inherited from TEST_0003',1,'SAM6::TEST_0003_Bn_R_nn_1-1_D_1','Freezer1_6','GENOMIC','2016-01-03','true','TEST_0003_Bn_R_nn_1-1_D_1',1,'Homo sapiens',NULL,1),
-(7,NULL,'SAM7','Inherited from TEST_0004',1,'SAM7::TEST_0004_Bn_P_nn_1-1_D_1','Freezer1_7','GENOMIC','2015-02-27','true','TEST_0004_Bn_P_nn_1-1_D_1',1,'Homo sapiens',NULL,1),
-(8,NULL,'SAM8','Inherited from TEST_0004',1,'SAM8::TEST_0004_Bn_R_nn_1-1_D_1','Freezer1_8','GENOMIC','2015-01-07','true','TEST_0004_Bn_R_nn_1-1_D_1',1,'Homo sapiens',NULL,1),
-(9,NULL,'SAM9','Inherited from TEST_0005',1,'SAM9::TEST_0005_Bn_P_nn_1-1_D_1','Freezer1_9','GENOMIC','2015-01-22','true','TEST_0005_Bn_P_nn_1-1_D_1',1,'Homo sapiens',NULL,1),
-(10,NULL,'SAM10','Inherited from TEST_0005',1,'SAM10::TEST_0005_Bn_R_nn_1-1_D_1','Freezer1_10','GENOMIC','2015-01-27','true','TEST_0005_Bn_R_nn_1-1_D_1',1,'Homo sapiens',NULL,1),
-(11,NULL,'SAM11','Inherited from TEST_0006',1,'SAM11::TEST_0006_Bn_P_nn_1-1_D_1','Freezer1_11','GENOMIC','2015-01-27','true','TEST_0006_Bn_P_nn_1-1_D_1',1,'Homo sapiens',NULL,1),
-(12,NULL,'SAM12','Inherited from TEST_0006',1,'SAM12::TEST_0006_Bn_R_nn_1-1_D_1','Freezer1_12','GENOMIC','2015-01-27','true','TEST_0006_Bn_R_nn_1-1_D_1',1,'Homo sapiens',NULL,1),
-(13,NULL,'SAM13','Inherited from TEST_0007',1,'SAM13::TEST_0007_Bn_P_nn_1-1_D_1','Freezer1_13','GENOMIC','2015-01-27','true','TEST_0007_Bn_P_nn_1-1_D_1',1,'Homo sapiens',NULL,1),
-(14,NULL,'SAM14','Inherited from TEST_0007',1,'SAM14::TEST_0007_Bn_R_nn_1-1_D_1','Freezer1_14','GENOMIC','2015-01-27','true','TEST_0007_Bn_R_nn_1-1_D_1',1,'Homo sapiens',NULL,1);
-
-INSERT INTO `Sample`(`sampleId`, `accession`, `name`, `description`, `securityProfile_profileId`, `identificationBarcode`, `locationBarcode`, `sampleType`, `receivedDate`, `qcPassed`, `alias`, `project_projectId`, `scientificName`, `taxonIdentifier`, `lastModifier`) 
-VALUES (15,NULL,'SAM15','identity1',1,'SAM15::TEST_0001_IDENTITY_1','Freezer1_1','GENOMIC','2016-04-05','true','TEST_0001_IDENTITY_1',1,'Homo sapiens',NULL,1),
-(16,NULL,'SAM16','tissue1',1,'SAM16::TEST_0001_TISSUE_1','Freezer1_1','GENOMIC','2016-04-05','true','TEST_0001_TISSUE_1',1,'Homo sapiens',NULL,1),
-(17,NULL,'SAM17','tissue2',1,'SAM17::TEST_0001_TISSUE_2','Freezer1_1','GENOMIC','2016-04-05','true','TEST_0001_TISSUE_2',1,'Homo sapiens',NULL,1);
-
-INSERT INTO `SampleChangeLog`(`sampleId`, `columnsChanged`, `userId`, `message`, `changeTime`)
-VALUES (1, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:47'),
-(1, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:49'),
-(2, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:51'),
-(3, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:53'),
-(4, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:55'),
-(5, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:57'),
-(6, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:59'),
-(7, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:01'),
-(8, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:03'),
-(9, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:05'),
-(10, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:07'),
-(11, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:09'),
-(12, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:11'),
-(13, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:13'),
-(14, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:15'),
-(15, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:17'),
-(16, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:19'),
-(17, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:21');
-
-INSERT INTO `SampleClass`(`sampleClassId`, `alias`, `sampleCategory`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
-VALUES (1,'Identity','Identity',1,'2016-04-05 14:57:00',1,'2016-04-05 14:57:00'),
-(2,'Primary Tumor Tissue','Tissue',1,'2016-04-05 14:57:00',1,'2016-04-05 14:57:00');
-
-DELETE FROM `LibraryDesignCode`;
-INSERT INTO `LibraryDesignCode`(`code`,`description`) 
-VALUES ('TT', 'TEST');
-
-DELETE FROM `LibraryDesign`;
-INSERT INTO `LibraryDesign`(`libraryDesignId`, `name`, `sampleClassId`, `librarySelectionType`, `libraryStrategyType`, `libraryDesignCodeId`)
-VALUES (1, 'DESIGN1', 1, 1, 1, 1), 
-(2, 'DESIGN2', 2, 1, 1, 1);
-
-INSERT INTO `DetailedSample`(`sampleId`, `sampleClassId`, `archived`, `parentId`)
-VALUES (15,1,0,NULL),
-(16,2,0,15),
-(17,2,0,15);
-
-DELETE FROM `Identity`;
-INSERT INTO `Identity` (`sampleId`, `externalName`,`donorSex`)
-VALUES (15, '15_EXT15,EXT15','UNKNOWN');
-
-INSERT INTO `SampleTissue`(`sampleId`)
-VALUES (16),
-(17);
-
-DELETE FROM `SampleQC`;
-INSERT INTO `SampleQC`(`sample_sampleId`, `qcUserName`, `qcDate`, `qcMethod`, `results`) 
-VALUES (1,'admin','2015-08-27',1,5),
-(2,'admin','2015-08-27',1,5),
-(3,'admin','2015-08-27',1,5),
-(4,'admin','2015-08-27',1,5),
-(5,'admin','2015-08-27',1,5),
-(6,'admin','2015-08-27',1,5),
-(7,'admin','2015-08-27',1,5),
-(8,'admin','2015-08-27',1,5),
-(9,'admin','2015-08-27',1,5),
-(10,'admin','2015-08-27',1,5),
-(11,'admin','2015-08-27',1,5),
-(12,'admin','2015-08-27',1,5),
-(13,'admin','2015-08-27',1,5),
-(14,'admin','2015-08-27',1,5),
-(15,'admin','2015-08-27',1,5);
+DELETE FROM `_Partition`;
+INSERT INTO `_Partition` (`partitionId`, `partitionNumber`, `pool_poolId`, `securityProfile_profileId`)
+VALUES (1,1,1,1);
 
 DELETE FROM `SequencerPartitionContainer`;
 INSERT INTO `SequencerPartitionContainer`(`containerId`, `securityProfile_profileId`, `identificationBarcode`, `locationBarcode`, `platform`, `validationBarcode`, `lastModifier`) 
@@ -419,69 +440,18 @@ VALUES (1, 'validationBarcode', 1, 'NULL -> real', '2016-07-07 13:30:47'),
 (3, 'validationBarcode', 1, 'NULL -> real', '2016-07-07 13:30:51'),
 (4, 'validationBarcode', 1, 'NULL -> real', '2016-07-07 13:30:53');
 
-DELETE FROM `SequencingParameters`;
-DELETE FROM `Platform`;
-INSERT INTO `Platform`(`platformId`, `name`, `instrumentModel`, `description`, `numContainers`) 
-VALUES (16,'ILLUMINA','Illumina HiSeq 2000','4-channel flowgram',1),(17,'ILLUMINA','Illumina MiSeq','Tiny Seq',1),(18,'PACBIO','PacBio RS','Long Seq',1);
-
 DELETE FROM `SequencerPartitionContainer_Partition`;
 INSERT INTO `SequencerPartitionContainer_Partition`(`container_containerId`, `partitions_partitionId`) 
 VALUES (1,1),(1,2),(1,3),(1,4),(1,5),(1,6),(1,7),(1,8),(2,9),(2,10),(2,11),(2,12),(2,13),(2,14),(2,15),(2,16),(3,17),(3,18),(3,19),
 (3,20),(3,21),(3,22),(3,23),(3,24),(4,25),(4,26),(4,27),(4,28),(4,29),(4,30),(4,31),(4,32);
 
-DELETE FROM `SequencerReference`;
-INSERT INTO `SequencerReference`(`referenceId`, `name`, `ip`, `platformId`)
-VALUES (1,'h1179','127.0.0.1',16),
-(2,'h1180','127.0.0.1',16);
+DELETE FROM RunQC_Partition;
+INSERT INTO `RunQC_Partition`(`runQc_runQcId`, `partition_partitionId`)
+VALUES (1, 1);
 
-DELETE FROM `SequencerServiceRecord`;
-INSERT INTO `SequencerServiceRecord`(`recordId`, `sequencerReferenceId`, `title`, `details`, `servicedBy`, `referenceNumber`, `serviceDate`, `shutdownTime`, `restoredTime`)
-VALUES (1,1,'Seq1_Rec1','Test service','Service Person','12345','2016-01-01', '2016-01-01 07:30:00', '2016-01-01 09:00:00'),
-(2,1,'Seq1_Rec2',NULL,'Service Person',NULL,'2016-01-21',NULL,NULL),
-(3,2,'Seq2_Rec1',NULL,'Service Person',NULL,'2016-01-21',NULL,NULL);
-
-DELETE FROM `Status`;
-INSERT INTO `Status`(`statusId`, `health`, `completionDate`, `startDate`, `instrumentName`, `lastUpdated`, `runName`, `xml`) 
-VALUES (1,'Completed','2012-03-31','2012-03-23','SN7001179','2015-08-28 18:32:29','120323_h1179_0070_BC0JHTACXX',RAWTOHEX('<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!--Illumina RTA Status Report-->\n<Status>\n  <Software>Illumina RTA 1.12.4.2</Software>\n  <RunName>120323_h1179_0070_BC0JHTACXX</RunName>\n  <InstrumentName>H1179</InstrumentName>\n  <RunStarted>Tuesday, March 27, 2012 5:22 PM</RunStarted>\n  <NumCycles>202</NumCycles>\n  <ImgCycle>202</ImgCycle>\n  <ScoreCycle>202</ScoreCycle>\n  <CallCycle>202</CallCycle>\n  <InputDir>E:\\Illumina\\HiSeqTemp\\120323_h1179_0070_BC0JHTACXX</InputDir>\n  <OutputDir>\\\\storage4.stg.oicr.on.ca\\bas005\\archive\\h1179\\120323_h1179_0070_BC0JHTACXX</OutputDir>\n  <Configuration>\n    <CopyAllFiles>true</CopyAllFiles>\n    <CopyImages>False</CopyImages>\n    <DeleteImages>True</DeleteImages>\n    <RunInfoExists>True</RunInfoExists>\n    <IsPairedEndRun>True</IsPairedEndRun>\n    <NumberOfReads>2</NumberOfReads>\n    <NumberOfLanes>8</NumberOfLanes>\n    <TilesPerLane>48</TilesPerLane>\n    <ControlLane>8</ControlLane>\n  </Configuration>\n</Status>\n')),
-(2,'Unknown','2012-04-04','2012-04-04','SN7001179','2015-08-28 18:32:31','120404_h1179_0072_AD0VJ9ACXX',RAWTOHEX('<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!--Illumina RTA Status Report-->\n<Status>\n  <Software>Illumina RTA 1.12.4.2</Software>\n  <RunName>120404_h1179_0072_AD0VJ9ACXX</RunName>\n  <InstrumentName>H1179</InstrumentName>\n  <RunStarted>Sunday, April 08, 2012 10:55 AM</RunStarted>\n  <NumCycles>202</NumCycles>\n  <ImgCycle>101</ImgCycle>\n  <ScoreCycle>101</ScoreCycle>\n  <CallCycle>101</CallCycle>\n  <InputDir>D:\\Illumina\\HiSeqTemp\\120404_h1179_0072_AD0VJ9ACXX</InputDir>\n  <OutputDir>\\\\storage4.stg.oicr.on.ca\\bas005\\archive\\h1179\\120404_h1179_0072_AD0VJ9ACXX</OutputDir>\n  <Configuration>\n    <CopyAllFiles>true</CopyAllFiles>\n    <CopyImages>False</CopyImages>\n    <DeleteImages>True</DeleteImages>\n    <RunInfoExists>True</RunInfoExists>\n    <IsPairedEndRun>True</IsPairedEndRun>\n    <NumberOfReads>2</NumberOfReads>\n    <NumberOfLanes>8</NumberOfLanes>\n    <TilesPerLane>48</TilesPerLane>\n    <ControlLane>0</ControlLane>\n  </Configuration>\n</Status>\n')),
-(3,'Completed','2012-04-20','2012-04-12','SN7001179','2015-08-28 18:32:35','120412_h1179_0073_BC075RACXX',RAWTOHEX('<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!--Illumina RTA Status Report-->\n<Status>\n  <Software>Illumina RTA 1.12.4.2</Software>\n  <RunName>120412_h1179_0073_BC075RACXX</RunName>\n  <InstrumentName>H1179</InstrumentName>\n  <RunStarted>Tuesday, April 17, 2012 5:36 PM</RunStarted>\n  <NumCycles>209</NumCycles>\n  <ImgCycle>209</ImgCycle>\n  <ScoreCycle>209</ScoreCycle>\n  <CallCycle>209</CallCycle>\n  <InputDir>E:\\Illumina\\HiSeqTemp\\120412_h1179_0073_BC075RACXX</InputDir>\n  <OutputDir>\\\\storage4.stg.oicr.on.ca\\bas005\\archive\\h1179\\120412_h1179_0073_BC075RACXX</OutputDir>\n  <Configuration>\n    <CopyAllFiles>true</CopyAllFiles>\n    <CopyImages>False</CopyImages>\n    <DeleteImages>True</DeleteImages>\n    <RunInfoExists>True</RunInfoExists>\n    <IsPairedEndRun>True</IsPairedEndRun>\n    <NumberOfReads>3</NumberOfReads>\n    <NumberOfLanes>8</NumberOfLanes>\n    <TilesPerLane>48</TilesPerLane>\n    <ControlLane>0</ControlLane>\n  </Configuration>\n</Status>\n')),
-(4,'Completed','2012-03-23','2012-03-14','SN7001179','2015-08-28 18:32:35','120314_h1179_0068_AC0KY7ACXX',RAWTOHEX('<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!--Illumina RTA Status Report-->\n<Status>\n  <Software>Illumina RTA 1.12.4.2</Software>\n  <RunName>120314_h1179_0068_AC0KY7ACXX</RunName>\n  <InstrumentName>H1179</InstrumentName>\n  <RunStarted>Sunday, March 18, 2012 3:37 PM</RunStarted>\n  <NumCycles>209</NumCycles>\n  <ImgCycle>209</ImgCycle>\n  <ScoreCycle>209</ScoreCycle>\n  <CallCycle>209</CallCycle>\n  <InputDir>D:\\Illumina\\HiSeqTemp\\120314_h1179_0068_AC0KY7ACXX</InputDir>\n  <OutputDir>\\\\storage4.stg.oicr.on.ca\\bas005\\archive\\h1179\\120314_h1179_0068_AC0KY7ACXX</OutputDir>\n  <Configuration>\n    <CopyAllFiles>true</CopyAllFiles>\n    <CopyImages>False</CopyImages>\n    <DeleteImages>True</DeleteImages>\n    <RunInfoExists>True</RunInfoExists>\n    <IsPairedEndRun>True</IsPairedEndRun>\n    <NumberOfReads>3</NumberOfReads>\n    <NumberOfLanes>8</NumberOfLanes>\n    <TilesPerLane>48</TilesPerLane>\n    <ControlLane>0</ControlLane>\n  </Configuration>\n</Status>\n'));
-
-DELETE FROM `Study`;
-INSERT INTO `Study`(`studyId`, `name`, `description`, `accession`, `securityProfile_profileId`, `project_projectId`, `studyTypeId`, `alias`, `lastModifier`)
-VALUES (1,'STU1','Test study1',NULL,1,1,(SELECT typeId FROM StudyType WHERE name = 'Other'),'Test Study1',1),
-(2,'STU2','Test study2',NULL,1,1,(SELECT typeId FROM StudyType WHERE name = 'Other'),'Test Study2',1),
-(3,'STU3','OICR',NULL,1,1,(SELECT typeId FROM StudyType WHERE name = 'Other'),'Test Study3',1),
-(4,'STU4','OICR',NULL,1,1,(SELECT typeId FROM StudyType WHERE name = 'Other'),'Test Study4',1);
-
-DELETE FROM `SecurityProfile`;
-DELETE FROM `SecurityProfile_ReadGroup`;
-DELETE FROM `SecurityProfile_WriteGroup`;
-DELETE FROM `SecurityProfile_ReadUser`;
-DELETE FROM `SecurityProfile_WriteUser`;
-INSERT INTO `SecurityProfile`(`profileId`, `allowAllInternal`, `owner_userId`) 
-VALUES (1,1,1),(2,1,1),(3,1,1),(4,1,1),(5,1,1),(6,1,1),(7,1,1),(8,1,1),(9,1,1),(10,1,1),(11,1,1),(12,1,NULL),(13,1,NULL),(14,1,NULL),(15,1,NULL);
-
-INSERT INTO SecurityProfile_ReadUser(SecurityProfile_profileId, readUser_userId) VALUES (1, 1);
-INSERT INTO SecurityProfile_WriteUser(SecurityProfile_profileId, writeUser_userId) VALUES (2, 1);
-INSERT INTO SecurityProfile_ReadGroup(SecurityProfile_profileId, readGroup_groupId) VALUES (3, 2);
-INSERT INTO SecurityProfile_WriteGroup(SecurityProfile_profileId, writeGroup_groupId) VALUES (4, 2);
-
-DELETE FROM `Institute`;
-INSERT INTO `Institute`(`instituteId`, `alias`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
-VALUES (1,'Institute A',1,'2016-01-28 14:32:00',1,'2016-01-28 14:32:00'),(2,'Institute B',1,'2016-01-29 09:32:00',1,'2016-01-29 09:32:00');
-
-DELETE FROM `Lab`;
-INSERT INTO `Lab`(`labId`, `instituteId`, `alias`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
-VALUES (1,1,'Lab A1',1,'2016-02-10 15:35:00',1,'2016-02-10 15:35:00'),(2,1,'Lab A2',1,'2016-02-10 15:35:00',1,'2016-02-10 15:35:00'),
-(3,1,'Lab B1',1,'2016-02-10 15:35:00',1,'2016-02-10 15:35:00'),(4,1,'Lab B2',1,'2016-02-10 15:35:00',1,'2016-02-10 15:35:00');
-
-INSERT INTO `SampleNumberPerProject`
-(`sampleNumberPerProjectId`, `projectId`, `highestSampleNumber`, `padding`, `createdBy`, `updatedBy`, `creationDate`, `lastUpdated`)
-VALUES ('1', '1', '1', '4', '1', '1', '2016-01-28 14:32:00', '2016-01-28 14:32:00');
-INSERT INTO `SampleNumberPerProject`
-(`sampleNumberPerProjectId`, `projectId`, `highestSampleNumber`, `padding`, `createdBy`, `updatedBy`, `creationDate`, `lastUpdated`)
-VALUES ('2', '3', '9999', '4', '1', '1', '2016-01-28 14:32:00', '2016-01-28 14:32:00');
+DELETE FROM `Run_SequencerPartitionContainer`;
+INSERT INTO `Run_SequencerPartitionContainer`(`Run_runId`, `containers_containerId`) 
+VALUES (1,1),(2,2),(3,3),(4,4);
 
 DELETE FROM `BoxSize`;
 INSERT INTO `BoxSize` (`boxSizeId`, `rows`, `columns`, `scannable`)
@@ -514,7 +484,9 @@ VALUES
 (3, '2012-04-20', '2012-04-20', 0, 'test description 3', 'name 3', 'title 3', 'accession 3', 'alias 3', 0);
 
 DELETE FROM Submission_Partition_Dilution;
-INSERT INTO Submission_Partition_Dilution(submission_submissionId, partition_partitionId, dilution_dilutionId) VALUES (3, 1, 1);
+INSERT INTO Submission_Partition_Dilution(submission_submissionId, partition_partitionId, dilution_dilutionId) 
+VALUES
+(3, 1, 1);
 
 DELETE FROM Submission_Experiment;
 INSERT INTO `Submission_Experiment` (`submission_submissionId`, `experiments_experimentId`)
@@ -522,21 +494,6 @@ VALUES
 (1, 1),
 (2, 1),
 (3, 2);
-
-DELETE FROM QCType;
-INSERT INTO `QCType` (`qcTypeId`, `name`, `description`, `qcTarget`, `units`)
-VALUES
-    (2,'Bioanalyzer','Chip-based capillary electrophoresis machine to analyse RNA, DNA, and protein, manufactured by Agilent','Library','nM'),
-    (7,'QuBit','Quantitation of DNA, RNA and protein, manufacturered by Invitrogen','Sample','ng/&#181;l'),
-    (3,'Bioanalyser','Chip-based capillary electrophoresis machine to analyse RNA, DNA, and protein, manufactured by Agilent','Sample','ng/&#181;l'),
-    (4,'QuBit','Quantitation of DNA, RNA and protein, manufacturered by Invitrogen','Library','ng/&#181;l'),
-    (6,'SeqInfo QC','Post-run completion run QC step, undertaken by the SeqInfo team, as part of the primary analysis stage.','Run',''),
-    (5,'SeqOps QC','Post-run completion run QC step, undertaken by the SeqOps team, to move a run through to the primary analysis stage.','Run',''),
-    (1,'qPCR','Quantitative PCR','Library','mol/&#181;l'),
-    (8,'poolQcType1', 'qc 1 for pools', 'Pool', 'nM'),
-	(9,'poolQcType2', 'qc 2 for pools', 'Pool', 'nM'),
-	(10,'poolQcType3', 'qc 3 for pools', 'Pool', 'nM'),
-	(11,'poolQcType4', 'qc 4 for pools', 'Pool', 'nM');
 
 DELETE FROM Alert;
 INSERT INTO `Alert` (
@@ -583,19 +540,49 @@ VALUES (3, 1);
 DELETE FROM `Pool_Note`;
 INSERT INTO `Pool_Note`(`pool_poolId`, `notes_noteId`)
 VALUES (33, 2);
-	
-DELETE FROM `emPCR`;
-INSERT INTO `emPCR` (`pcrId`, `concentration`, `dilution_dilutionId`, `creationDate`, `pcrUserName`, `name`, `securityProfile_profileId`)
-VALUES 
-(1, 10.00, 1, '2016-03-19', 'Bobby Davro', 'Mr emPCR', 1),
-(2, 30.01, 1, '2016-03-19', 'Bobby Charlton', 'Mrs emPCR', 1),
-(3, 30.11, 1, '2016-03-19', 'Bobby Dazzler', 'Professor emPCR', 1);
 
-INSERT INTO `User` (`userId`, `active`, `admin`, `external`, `fullName`, `internal`, `loginName`, `password`, `email`)
-VALUES (3,1,0,0,'user',1,'user','user','user@user.user');
+-- DetailedSample and DetailedLibrary values
+INSERT INTO `SampleClass`(`sampleClassId`, `alias`, `sampleCategory`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
+VALUES (1,'Identity','Identity',1,'2016-04-05 14:57:00',1,'2016-04-05 14:57:00'),
+(2,'Primary Tumor Tissue','Tissue',1,'2016-04-05 14:57:00',1,'2016-04-05 14:57:00');
 
-INSERT INTO `User_Group` (`users_userId`, `groups_groupId`)
-VALUES (3,1),(3,2),(1,1);
+DELETE FROM `LibraryDesignCode`;
+INSERT INTO `LibraryDesignCode`(`code`,`description`) 
+VALUES ('TT', 'TEST');
+
+DELETE FROM `LibraryDesign`;
+INSERT INTO `LibraryDesign`(`libraryDesignId`, `name`, `sampleClassId`, `librarySelectionType`, `libraryStrategyType`, `libraryDesignCodeId`)
+VALUES (1, 'DESIGN1', 1, 1, 1, 1), 
+(2, 'DESIGN2', 2, 1, 1, 1);
+
+INSERT INTO `DetailedSample`(`sampleId`, `sampleClassId`, `archived`, `parentId`)
+VALUES (15,1,0,NULL),
+(16,2,0,15),
+(17,2,0,15);
+
+DELETE FROM `Identity`;
+INSERT INTO `Identity` (`sampleId`, `externalName`,`donorSex`)
+VALUES (15, '15_EXT15,EXT15','UNKNOWN');
+
+INSERT INTO `SampleTissue`(`sampleId`)
+VALUES (16),
+(17);
+
+DELETE FROM `Institute`;
+INSERT INTO `Institute`(`instituteId`, `alias`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
+VALUES (1,'Institute A',1,'2016-01-28 14:32:00',1,'2016-01-28 14:32:00'),(2,'Institute B',1,'2016-01-29 09:32:00',1,'2016-01-29 09:32:00');
+
+DELETE FROM `Lab`;
+INSERT INTO `Lab`(`labId`, `instituteId`, `alias`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
+VALUES (1,1,'Lab A1',1,'2016-02-10 15:35:00',1,'2016-02-10 15:35:00'),(2,1,'Lab A2',1,'2016-02-10 15:35:00',1,'2016-02-10 15:35:00'),
+(3,1,'Lab B1',1,'2016-02-10 15:35:00',1,'2016-02-10 15:35:00'),(4,1,'Lab B2',1,'2016-02-10 15:35:00',1,'2016-02-10 15:35:00');
+
+INSERT INTO `SampleNumberPerProject`
+(`sampleNumberPerProjectId`, `projectId`, `highestSampleNumber`, `padding`, `createdBy`, `updatedBy`, `creationDate`, `lastUpdated`)
+VALUES ('1', '1', '1', '4', '1', '1', '2016-01-28 14:32:00', '2016-01-28 14:32:00');
+INSERT INTO `SampleNumberPerProject`
+(`sampleNumberPerProjectId`, `projectId`, `highestSampleNumber`, `padding`, `createdBy`, `updatedBy`, `creationDate`, `lastUpdated`)
+VALUES ('2', '3', '9999', '4', '1', '1', '2016-01-28 14:32:00', '2016-01-28 14:32:00');
 
 DELETE FROM `TissueOrigin`;
 INSERT INTO `TissueOrigin`(`tissueOriginId`, `alias`, `description`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
@@ -608,6 +595,3 @@ VALUES (1,'Test Type','for testing',1,'2016-02-19 11:28:00',1,'2016-02-19 11:28:
 DELETE FROM `DetailedLibrary`;
 INSERT INTO `DetailedLibrary`(`libraryId`, `kitDescriptorId`, `libraryDesignCodeId`)
 VALUES (1,1,1);
-
-DELETE FROM `Printer`;
-INSERT INTO Printer(printerId, name, backend, configuration, driver, enabled) VALUES (1, 'foo', 'CUPS', '{}', 'BRADY_1D', 1);
