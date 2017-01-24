@@ -167,14 +167,14 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @OneToMany(targetEntity = LibraryChangeLog.class, mappedBy = "library")
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
-  @OneToOne(targetEntity = LibraryDerivedInfo.class)
+  @OneToOne
   @PrimaryKeyJoinColumn
   private LibraryDerivedInfo derivedInfo;
 
   @ManyToOne(targetEntity = BoxImpl.class)
-  @JoinFormula("(SELECT boxId FROM BoxPosition WHERE targetId = id AND targetType = 'L')")
+  @JoinFormula("(SELECT bp.boxId FROM BoxPosition bp WHERE bp.targetId = libraryId AND bp.targetType = 'L')")
   private Box box;
-  @Formula("(SELECT position FROM BoxPosition WHERE targetId = id AND targetType = 'L')")
+  @Formula("(SELECT bp.position FROM BoxPosition bp WHERE bp.targetId = libraryId AND bp.targetType = 'L')")
   private String position;
 
   @Override

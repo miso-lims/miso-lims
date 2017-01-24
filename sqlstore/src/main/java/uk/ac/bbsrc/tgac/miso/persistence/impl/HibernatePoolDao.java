@@ -115,6 +115,15 @@ public class HibernatePoolDao implements PoolStore {
   @Autowired
   private ChangeLogStore changeLogStore;
 
+  @Autowired
+  private SecurityStore securityStore;
+  
+  @Autowired
+  private JdbcTemplate template;
+  
+  @Autowired
+  private WatchManager watchManager;
+
   @Override
   public Pool get(long poolId) throws IOException {
     return withWatcherGroup((PoolImpl) currentSession().get(PoolImpl.class, poolId));
@@ -205,9 +214,6 @@ public class HibernatePoolDao implements PoolStore {
     return securityStore.getGroupByName("PoolWatchers");
   }
 
-  @Autowired
-  private SecurityStore securityStore;
-
   private Pool withWatcherGroup(Pool pool) throws IOException {
     if (pool != null) {
       pool.setWatchGroup(getPoolWatcherGroup());
@@ -261,9 +267,6 @@ public class HibernatePoolDao implements PoolStore {
   public Map<String, Integer> getPoolColumnSizes() throws IOException {
     return DbUtils.getColumnSizes(template, TABLE_NAME);
   }
-
-  @Autowired
-  private JdbcTemplate template;
 
   private String updateSortCol(String sortCol) {
     sortCol = sortCol.replaceAll("[^\\w]", "");
@@ -354,9 +357,6 @@ public class HibernatePoolDao implements PoolStore {
   public void setTemplate(JdbcTemplate template) {
     this.template = template;
   }
-
-  @Autowired
-  private WatchManager watchManager;
 
   @Override
   public void removeWatcher(Pool pool, User watcher) {

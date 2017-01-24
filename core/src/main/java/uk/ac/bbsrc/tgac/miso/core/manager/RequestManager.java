@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.eaglegenomics.simlims.core.Note;
-import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
@@ -106,8 +105,6 @@ public interface RequestManager {
   public long savePlatform(Platform platform) throws IOException;
 
   public long saveStatus(Status status) throws IOException;
-
-  public long saveSecurityProfile(SecurityProfile profile) throws IOException;
 
   public long saveSubmission(Submission submission) throws IOException;
 

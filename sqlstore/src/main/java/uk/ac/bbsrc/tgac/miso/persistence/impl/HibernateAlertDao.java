@@ -51,7 +51,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.AlertStore;
  *
  * @author Heather Armstrong
  */
-@Repository
+@Repository("alertStore")
 @Transactional(rollbackFor = Exception.class)
 public class HibernateAlertDao implements AlertStore {
 

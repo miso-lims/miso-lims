@@ -25,22 +25,19 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
  */
 @Entity
 @Table(name = "_Group")
-public class Group implements Serializable, Comparable {
+public class Group implements Serializable, Comparable<Group> {
 
   private static final long serialVersionUID = 1L;
-
-  /**
-   * The ID for unsaved groups.
-   */
-  public static final Long UNSAVED_ID = null;
+  public static final Long UNSAVED_ID = 0L;
 
   private String description = "";
   private String name = "";
   @ManyToMany(targetEntity = UserImpl.class)
-  @JoinTable(name = "User_Group", joinColumns = { @JoinColumn(name = "users_userId") }, inverseJoinColumns = {
-      @JoinColumn(name = "groups_groupId")
+  @JoinTable(name = "User_Group", joinColumns = { @JoinColumn(name = "groups_groupId") }, inverseJoinColumns = {
+      @JoinColumn(name = "users_userId")
   })
   private Collection<User> users = new HashSet<>();
+
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long groupId = Group.UNSAVED_ID;
@@ -109,7 +106,7 @@ public class Group implements Serializable, Comparable {
   }
 
   @Override
-  public int compareTo(Object o) {
-    return this.equals(o) ? 0 : 1;
+  public int compareTo(Group t) {
+    return this.equals(t) ? 0 : 1;
   }
 }

@@ -32,6 +32,8 @@ import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 @Table(name = "Box")
 public class BoxImpl extends AbstractBox implements Serializable {
 
+  private static final long serialVersionUID = 1L;
+
   protected static final Logger log = LoggerFactory.getLogger(BoxImpl.class);
 
   // The contents of the Box

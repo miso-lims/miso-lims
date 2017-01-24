@@ -35,9 +35,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
+import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,8 +57,8 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
  * @since 0.0.2
  */
 @Entity
-@Table(name = "`User`")
-public class UserImpl implements User, Serializable, Comparable {
+@Table(name = "User")
+public class UserImpl implements User, Serializable {
   protected static final Logger log = LoggerFactory.getLogger(UserImpl.class);
 
   private static final long serialVersionUID = 1L;
@@ -84,8 +84,9 @@ public class UserImpl implements User, Serializable, Comparable {
   @JoinTable(name = "User_Group", inverseJoinColumns = { @JoinColumn(name = "groups_groupId") }, joinColumns = {
       @JoinColumn(name = "users_userId") })
   private Collection<Group> groups = new HashSet<>();
-  @Transient
-  private String[] roles = new String[0];
+
+  @Lob
+  private String roles = new String();
 
   @Override
   public boolean isActive() {
@@ -147,13 +148,13 @@ public class UserImpl implements User, Serializable, Comparable {
 
   @Override
   public String[] getRoles() {
-    return roles;
+    return roles.split(",");
   }
 
   @Override
   public Collection<GrantedAuthority> getRolesAsAuthorities() {
     List<GrantedAuthority> auths = new ArrayList<>();
-    for (String s : roles) {
+    for (String s : getRoles()) {
       auths.add(new GrantedAuthorityImpl(s));
     }
     return auths;
@@ -229,7 +230,11 @@ public class UserImpl implements User, Serializable, Comparable {
 
   @Override
   public void setRoles(String[] roles) {
-    this.roles = roles;
+    StringBuilder roleString = new StringBuilder();
+    for (String role : roles) {
+      if (!LimsUtils.isStringEmptyOrNull(role)) roleString.append(role);
+    }
+    this.roles = roleString.toString();
   }
 
   /**
@@ -251,7 +256,7 @@ public class UserImpl implements User, Serializable, Comparable {
   @Override
   public int hashCode() {
     if (getId() != UserImpl.UNSAVED_ID) {
-      return (int) getId();
+      return ((Long) getId()).intValue();
     } else {
       int hashcode = 1;
       if (getLoginName() != null) hashcode = 37 * hashcode + getLoginName().hashCode();
@@ -278,8 +283,7 @@ public class UserImpl implements User, Serializable, Comparable {
   }
 
   @Override
-  public int compareTo(Object o) {
-    User t = (User) o;
+  public int compareTo(User t) {
     if (getId() < t.getUserId()) return -1;
     if (getId() > t.getUserId()) return 1;
     return 0;

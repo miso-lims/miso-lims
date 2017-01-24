@@ -35,7 +35,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -72,10 +71,7 @@ public class StudyImpl implements Study, Serializable {
   @JoinColumn(name = "project_projectId")
   private Project project = null;
 
-  @OneToMany(targetEntity = ExperimentImpl.class)
-  @JoinTable(name = "Study_Experiment", joinColumns = {
-      @JoinColumn(name = "Study_studyId", nullable = false, updatable = false) }, inverseJoinColumns = {
-          @JoinColumn(name = "experiments_experimentId", nullable = false, updatable = false) })
+  @OneToMany(targetEntity = ExperimentImpl.class, mappedBy = "study")
   private Collection<Experiment> experiments = new HashSet<>();
 
   @Id

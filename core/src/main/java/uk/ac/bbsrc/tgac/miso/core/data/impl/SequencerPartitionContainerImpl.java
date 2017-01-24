@@ -32,6 +32,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,6 +65,7 @@ public class SequencerPartitionContainerImpl extends AbstractSequencerPartitionC
           @JoinColumn(name = "partitions_partitionId", updatable = false) })
   private List<SequencerPoolPartition> partitions = new AutoPopulatingList<SequencerPoolPartition>(PartitionImpl.class);
 
+  @Transient
   private int partitionLimit = 8;
 
   /**

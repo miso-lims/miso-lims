@@ -297,7 +297,6 @@ public class MisoServiceManager {
   }
 
   private void updateSecurityManagerDependencies() {
-    if (runDao != null) runDao.setSecurityManager(securityManager);
   }
 
   public HibernateProjectDao getProjectDao() {
@@ -660,7 +659,6 @@ public class MisoServiceManager {
   public void setDefaultRunDao() {
     HibernateRunDao dao = new HibernateRunDao();
     dao.setJdbcTemplate(jdbcTemplate);
-    dao.setSecurityManager(securityManager);
     dao.setSessionFactory(sessionFactory);
     setRunDao(dao);
   }
