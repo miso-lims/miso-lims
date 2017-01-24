@@ -70,6 +70,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ExperimentImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
@@ -666,7 +667,7 @@ public class PoolControllerHelperService {
       if (!pool.userCanWrite(user)) {
         return JSONUtils.SimpleJSONError("Not authorized to modify pool.");
       }
-      Dilution target = dilutionService.get(dilutionId);
+      LibraryDilution target = dilutionService.get(dilutionId);
       if (target == null) {
         return JSONUtils.SimpleJSONError("No such element.");
       }

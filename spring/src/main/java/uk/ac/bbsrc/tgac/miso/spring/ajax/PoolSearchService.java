@@ -47,6 +47,7 @@ import net.sourceforge.fluxion.ajax.util.JSONUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -191,8 +192,8 @@ public class PoolSearchService {
       b.append("<div style=\"float:left\"><b>" + p.getName() + " (" + p.getAlias() + ") : " + p.getCreationDate() + "</b><br/>");
     }
 
-    Collection<Dilution> ds = p.getPoolableElements();
-    for (Dilution d : ds) {
+    Collection<LibraryDilution> ds = p.getPoolableElements();
+    for (LibraryDilution d : ds) {
       b.append("<span" + (d.getLibrary().isLowQuality() ? " class='lowquality'" : "") + ">" + d.getName() + " ("
           + d.getLibrary().getSample().getProject().getAlias() + ") : " + d.getConcentration() + " "
           + d.getUnits() + "</span><br/>");

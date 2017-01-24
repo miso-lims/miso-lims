@@ -3330,7 +3330,7 @@ public class FormUtils {
                 library.setDescription(s.getDescription());
               }
               library.setCreationDate(new Date());
-              library.setPlatformName(pt.name());
+              library.setPlatformType(pt.name());
               library.setLibraryType(lt);
               library.setLibrarySelectionType(ls);
               library.setLibraryStrategyType(lst);
@@ -3841,7 +3841,7 @@ public class FormUtils {
         library.setDescription(s.getDescription());
       }
       library.setCreationDate(new Date());
-      library.setPlatformName(pt.name());
+      library.setPlatformType(pt.name());
       library.setLibraryType(lt);
       library.setLibrarySelectionType(ls);
       library.setLibraryStrategyType(lst);

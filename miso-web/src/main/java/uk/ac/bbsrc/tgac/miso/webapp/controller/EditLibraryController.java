@@ -301,13 +301,13 @@ public class EditLibraryController {
   }
 
   public void populateAvailableIndexFamilies(Library library, ModelMap model) throws IOException {
-    if (isStringEmptyOrNull(library.getPlatformName())) {
+    if (isStringEmptyOrNull(library.getPlatformType().getKey())) {
       model.put("indexFamiliesJSON", "[]");
       model.put("indexFamilies", Collections.singleton(INDEX_FAMILY_NEEDS_PLATFORM));
     } else {
       List<IndexFamily> visbileFamilies = new ArrayList<>();
       visbileFamilies.add(IndexFamily.NULL);
-      visbileFamilies.addAll(indexService.getIndexFamiliesByPlatform(PlatformType.get(library.getPlatformName())));
+      visbileFamilies.addAll(indexService.getIndexFamiliesByPlatform(library.getPlatformType()));
       MisoWebUtils.populateListAndJson(model, "indexFamilies", visbileFamilies, "family");
     }
   }
@@ -626,7 +626,7 @@ public class EditLibraryController {
       model.put("formObj", library);
       model.put("library", library);
 
-      model.put("platformNames", populatePlatformNames(Arrays.asList(library.getPlatformName())));
+      model.put("platformNames", populatePlatformNames(Arrays.asList(library.getPlatformType().getKey())));
       populateAvailableIndexFamilies(library, model);
       addAdjacentLibraries(library, model);
 
@@ -717,7 +717,7 @@ public class EditLibraryController {
 
       model.put("formObj", library);
       model.put("library", library);
-      model.put("platformNames", populatePlatformNames(Arrays.asList(library.getPlatformName())));
+      model.put("platformNames", populatePlatformNames(Arrays.asList(library.getPlatformType().getKey())));
       populateAvailableIndexFamilies(library, model);
 
       addAdjacentLibraries(library, model);
@@ -812,7 +812,7 @@ public class EditLibraryController {
       List<String> currentPlatforms = new ArrayList<>();
       for (Library library : libraryService.getAllByIdList(idList)) {
         libraryDtos.add(Dtos.asDto(library));
-        currentPlatforms.add(library.getPlatformName());
+        currentPlatforms.add(library.getPlatformType().getKey());
         if (!isDetailedSampleEnabled()) {
           // Do nothing about sample classes.
         } else if (sampleClass == null) {

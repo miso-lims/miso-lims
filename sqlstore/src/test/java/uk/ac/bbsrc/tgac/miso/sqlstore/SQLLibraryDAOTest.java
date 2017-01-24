@@ -328,7 +328,7 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
     LibraryType libraryTypeById = dao.getLibraryTypeById(5);
 
     assertEquals(Long.valueOf(5), libraryTypeById.getId());
-    assertEquals("LS454", libraryTypeById.getPlatformType());
+    assertEquals(PlatformType.LS454, libraryTypeById.getPlatformType());
     assertEquals("Rapid Shotgun", libraryTypeById.getDescription());
 
   }
@@ -336,17 +336,15 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
   @Test
   public void testGetLibraryTypeByDescription() throws Exception {
     LibraryType libraryTypeByDescription = dao.getLibraryTypeByDescriptionAndPlatform("Mate Pair", PlatformType.ILLUMINA);
-    assertEquals("Illumina", libraryTypeByDescription.getPlatformType());
+    assertEquals(PlatformType.ILLUMINA, libraryTypeByDescription.getPlatformType());
     assertEquals(Long.valueOf(2), libraryTypeByDescription.getId());
-    assertEquals("Illumina", libraryTypeByDescription.getPlatformType());
-
   }
 
   @Test
   public void testGetLibraryTypeByDescriptionAndPlatform() throws Exception {
     LibraryType libraryTypeByDescriptionAndPlatform = dao.getLibraryTypeByDescriptionAndPlatform("8kbp Paired End", PlatformType.LS454);
     assertEquals(Long.valueOf(8), libraryTypeByDescriptionAndPlatform.getId());
-    assertEquals("LS454", libraryTypeByDescriptionAndPlatform.getPlatformType());
+    assertEquals(PlatformType.LS454, libraryTypeByDescriptionAndPlatform.getPlatformType());
     assertEquals("8kbp Paired End", libraryTypeByDescriptionAndPlatform.getDescription());
   }
 

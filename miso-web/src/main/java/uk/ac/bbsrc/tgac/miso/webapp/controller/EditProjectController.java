@@ -76,7 +76,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryQcException;
 import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
@@ -257,7 +256,7 @@ public class EditProjectController {
 
   public boolean existsAnyEmPcrLibrary(Collection<LibraryDilution> projectLibraryDilutions) throws IOException {
     for (LibraryDilution dil : projectLibraryDilutions) {
-      if (PlatformType.valueOf(dil.getLibrary().getPlatformName().toUpperCase()).usesEmPCR()) {
+      if (dil.getLibrary().getPlatformType().usesEmPCR()) {
         return true;
       }
     }

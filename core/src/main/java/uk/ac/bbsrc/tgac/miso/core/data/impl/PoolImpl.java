@@ -213,7 +213,7 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
   }
 
   @Override
-  public void addPoolableElement(Dilution dilution) throws MalformedDilutionException {
+  public void addPoolableElement(LibraryDilution dilution) throws MalformedDilutionException {
     pooledElements.add(dilution);
   }
 
@@ -358,7 +358,7 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
   }
 
   @Override
-  public Set<Dilution> getPoolableElements() {
+  public Set<LibraryDilution> getPoolableElements() {
     return this.pooledElements;
   }
 
@@ -515,7 +515,7 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
 
   @Override
   @JsonDeserialize(using = PooledElementDeserializer.class)
-  public void setPoolableElements(Set<Dilution> dilutions) {
+  public void setPoolableElements(Set<LibraryDilution> dilutions) {
     if (dilutions == null) {
       if (this.pooledElements == null) {
         this.pooledElements = Collections.emptySet();

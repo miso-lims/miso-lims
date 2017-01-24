@@ -107,8 +107,8 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   private String locationBarcode;
 
   @Enumerated(EnumType.STRING)
-  @Column(nullable = false)
-  private PlatformType platformName;
+  @Column(name = "platformName", nullable = false)
+  private PlatformType platformType;
 
   private Boolean qcPassed;
 
@@ -374,13 +374,18 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   }
 
   @Override
-  public String getPlatformName() {
-    return platformName == null ? null : platformName.getKey();
+  public PlatformType getPlatformType() {
+    return platformType;
   }
 
   @Override
-  public void setPlatformName(String platformName) {
-    this.platformName = PlatformType.get(platformName);
+  public void setPlatformType(PlatformType platformType) {
+    this.platformType = platformType;
+  }
+
+  @Override
+  public void setPlatformType(String platformName) {
+    this.platformType = PlatformType.get(platformName);
   }
 
   @Override
@@ -551,7 +556,7 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
         .append(locationBarcode)
         .append(lowQuality)
         .append(paired)
-        .append(platformName)
+        .append(platformType)
         .append(qcPassed)
         .toHashCode();
   }
@@ -576,7 +581,7 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
         .append(locationBarcode, other.locationBarcode)
         .append(lowQuality, other.lowQuality)
         .append(paired, other.paired)
-        .append(platformName, other.platformName)
+        .append(platformType, other.platformType)
         .append(qcPassed, other.qcPassed)
         .isEquals();
   }

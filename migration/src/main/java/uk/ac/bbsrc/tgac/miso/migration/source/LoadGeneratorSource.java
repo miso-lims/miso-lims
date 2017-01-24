@@ -13,7 +13,6 @@ import org.springframework.format.datetime.DateFormatter;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
-import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
@@ -346,7 +345,7 @@ public class LoadGeneratorSource implements MigrationSource {
     LibraryType lt = new LibraryType();
     lt.setId(libraryTypeId);
     lib.setLibraryType(lt);
-    lib.setPlatformName("Illumina");
+    lib.setPlatformType("Illumina");
     lib.setPaired(true);
     lib.setQcPassed(true);
 
@@ -400,7 +399,7 @@ public class LoadGeneratorSource implements MigrationSource {
       List<Pool> pools = new ArrayList<>();
       List<LibraryDilution> libraryDilutions = getLibraryDilutions();
       for (int poolNum = 1, libNum = 0; poolNum <= poolCount; poolNum++) {
-        Set<Dilution> ldis = new HashSet<>();
+        Set<LibraryDilution> ldis = new HashSet<>();
         while (ldis.size() < poolSize) {
           ldis.add(libraryDilutions.get(libNum));
           libNum++;
@@ -414,7 +413,7 @@ public class LoadGeneratorSource implements MigrationSource {
     return this.pools;
   }
 
-  private Pool createPool(Set<Dilution> libraryDilutions, int poolNum) {
+  private Pool createPool(Set<LibraryDilution> libraryDilutions, int poolNum) {
     Pool p = new PoolImpl();
     p.setAlias("Test_Pool_" + poolNum);
     p.setPoolableElements(libraryDilutions);

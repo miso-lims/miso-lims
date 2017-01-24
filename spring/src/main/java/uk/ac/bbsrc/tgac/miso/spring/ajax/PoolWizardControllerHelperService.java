@@ -113,7 +113,7 @@ public class PoolWizardControllerHelperService {
       try {
         User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
 
-        List<Dilution> dils = new ArrayList<>();
+        List<LibraryDilution> dils = new ArrayList<>();
         for (Integer id : ids) {
           dils.add(dilutionService.get(id.longValue()));
         }
@@ -147,7 +147,7 @@ public class PoolWizardControllerHelperService {
           pool.setPlatformType(platformType);
           pool.setReadyToRun(true);
 
-          for (Dilution d : dils) {
+          for (LibraryDilution d : dils) {
             try {
               pool.addPoolableElement(d);
             } catch (MalformedDilutionException dle) {

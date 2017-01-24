@@ -62,6 +62,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ExperimentImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
@@ -477,7 +478,7 @@ public class ContainerControllerHelperService {
 
       if (p.getExperiments().size() != 0) {
         // check if each poolable has been in a study for this pool already
-        Collection<Dilution> ds = p.getPoolableElements();
+        Collection<LibraryDilution> ds = p.getPoolableElements();
         for (Dilution d : ds) {
           pooledProjects.add(d.getLibrary().getSample().getProject());
         }
@@ -489,8 +490,8 @@ public class ContainerControllerHelperService {
           }
         }
       } else {
-        Collection<Dilution> ds = p.getPoolableElements();
-        for (Dilution d : ds) {
+        Collection<LibraryDilution> ds = p.getPoolableElements();
+        for (LibraryDilution d : ds) {
           pooledProjects.add(d.getLibrary().getSample().getProject());
         }
       }
@@ -534,9 +535,9 @@ public class ContainerControllerHelperService {
         b.append("<div style=\"float:left\"><b>" + p.getName() + " (" + p.getAlias() + ") : " + p.getCreationDate() + "</b><br/>");
       }
 
-      Collection<Dilution> ds = p.getPoolableElements();
+      Collection<LibraryDilution> ds = p.getPoolableElements();
       Set<Project> pooledProjects = new HashSet<>();
-      for (Dilution d : ds) {
+      for (LibraryDilution d : ds) {
         pooledProjects.add(d.getLibrary().getSample().getProject());
         b.append("<span>" + d.getName() + " (" + d.getLibrary().getSample().getProject().getAlias() + ") : "
             + d.getConcentration() + " " + d.getUnits() + "</span><br/>");

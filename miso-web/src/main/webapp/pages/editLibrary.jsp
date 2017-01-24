@@ -264,7 +264,7 @@
         or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_TECH')}">
       <td>Platform - Library Type:</td>
       <td>
-        <form:select id="platformNames" path="platformName" items="${platformNames}"
+        <form:select id="platformNames" path="platformType" items="${platformNames}"
                      onchange="Library.ui.changePlatformName(null);" class="validateable"/>
         <form:select id="libraryTypes" path="libraryType"/>
       </td>
@@ -279,7 +279,7 @@
     </c:when>
     <c:otherwise>
       <td>Platform - Library Type</td>
-      <td>${library.platformName} - ${library.libraryType.description}</td>
+      <td>${library.platformType} - ${library.libraryType.description}</td>
     </c:otherwise>
   </c:choose>
 </tr>
@@ -642,7 +642,7 @@
                         </a>
 
                         <div id="dil${dil.id}IdBarcodeMenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
-                          <a href="javascript:void(0);" onclick="Library.barcode.printDilutionBarcode(${dil.id}, '${library.platformName}');">Print</a>
+                          <a href="javascript:void(0);" onclick="Library.barcode.printDilutionBarcode(${dil.id}, '${library.platformType}');">Print</a>
                         </div>
                       </li>
                     </ul>
