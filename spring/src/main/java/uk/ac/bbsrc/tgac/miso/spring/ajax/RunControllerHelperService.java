@@ -66,6 +66,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
@@ -973,8 +974,8 @@ public class RunControllerHelperService {
 
       if (p.getExperiments().size() != 0) {
         // check if each poolable has been in a study for this pool already
-        Collection<Dilution> ds = p.getPoolableElements();
-        for (Dilution d : ds) {
+        Collection<LibraryDilution> ds = p.getPoolableElements();
+        for (LibraryDilution d : ds) {
           pooledProjects.add(d.getLibrary().getSample().getProject());
         }
 
@@ -985,7 +986,7 @@ public class RunControllerHelperService {
           }
         }
       } else {
-        for (Dilution d : p.getPoolableElements()) {
+        for (LibraryDilution d : p.getPoolableElements()) {
           pooledProjects.add(d.getLibrary().getSample().getProject());
         }
       }
@@ -1025,8 +1026,8 @@ public class RunControllerHelperService {
           "<div style='position:relative' onMouseOver='this.className=\"dashboardhighlight\"' onMouseOut='this.className=\"dashboard\"' class='dashboard'>");
       b.append("<div style=\"float:left\"><b>" + p.getName() + " (" + LimsUtils.getDateAsString(p.getCreationDate()) + ")</b><br/>");
 
-      Collection<Dilution> ds = p.getPoolableElements();
-      for (Dilution d : ds) {
+      Collection<LibraryDilution> ds = p.getPoolableElements();
+      for (LibraryDilution d : ds) {
         b.append("<span>" + d.getName() + " (" + d.getLibrary().getSample().getProject().getAlias() + ")</span><br/>");
       }
 

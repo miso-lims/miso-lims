@@ -38,7 +38,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolderStrategy;
 
 import com.eaglegenomics.simlims.core.Note;
-import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
@@ -1142,15 +1141,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
       return backingManager.saveStatus(status);
     } else {
       throw new IOException("User " + getCurrentUser().getFullName() + " cannot write to this Status");
-    }
-  }
-
-  @Override
-  public long saveSecurityProfile(SecurityProfile profile) throws IOException {
-    if (getCurrentUser().isAdmin()) {
-      return backingManager.saveSecurityProfile(profile);
-    } else {
-      throw new IOException("User " + getCurrentUser().getFullName() + " cannot write to this SecurityProfile");
     }
   }
 

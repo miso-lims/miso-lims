@@ -108,7 +108,7 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
   public static final Long UNSAVED_ID = 0L;
 
   @ManyToOne(targetEntity = BoxImpl.class)
-  @JoinFormula("(SELECT boxId FROM BoxPosition WHERE targetId = id AND targetType = 'P')")
+  @JoinFormula("(SELECT bp.boxId FROM BoxPosition bp WHERE bp.targetId = poolId AND bp.targetType = 'P')")
   private Box box;
   @OneToMany(targetEntity = PoolChangeLog.class, mappedBy = "pool")
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
@@ -131,6 +131,7 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
   private String identificationBarcode;
 
   @ManyToOne(targetEntity = UserImpl.class)
+  @JoinColumn(name = "lastModifier", nullable = false)
   private User lastModifier;
 
   // listeners
@@ -150,9 +151,10 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
   private PlatformType platformType;
 
   @ManyToMany(targetEntity = LibraryDilution.class)
-  @JoinTable(name = "Pool_Dilution", joinColumns = { @JoinColumn(name = "pool_poolId") }, inverseJoinColumns = {
-      @JoinColumn(name = "dilution_dilutionId") })
-  private Set<Dilution> pooledElements = new HashSet<>();
+  @JoinTable(name = "Pool_Dilution", joinColumns = {
+      @JoinColumn(name = "pool_poolId") }, inverseJoinColumns = {
+          @JoinColumn(name = "dilution_dilutionId") })
+  private Set<LibraryDilution> pooledElements = new HashSet<>();
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -161,7 +163,7 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
   @OneToMany(targetEntity = PoolQCImpl.class, mappedBy = "pool")
   private final Collection<PoolQC> poolQCs = new TreeSet<>();
 
-  @Formula("(SELECT position FROM BoxPosition WHERE targetId = id AND targetType = 'P')")
+  @Formula("(SELECT bp.position FROM BoxPosition bp WHERE bp.targetId = poolId AND bp.targetType = 'P')")
   private String position;
 
   private Boolean qcPassed;
@@ -170,6 +172,7 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
   private boolean readyToRun = false;
 
   @OneToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "securityProfile_profileId")
   private SecurityProfile securityProfile;
 
   @Transient
@@ -210,7 +213,7 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
   }
 
   @Override
-  public void addPoolableElement(Dilution dilution) throws MalformedDilutionException {
+  public void addPoolableElement(LibraryDilution dilution) throws MalformedDilutionException {
     pooledElements.add(dilution);
   }
 
@@ -355,7 +358,7 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
   }
 
   @Override
-  public Set<Dilution> getPoolableElements() {
+  public Set<LibraryDilution> getPoolableElements() {
     return this.pooledElements;
   }
 
@@ -512,7 +515,7 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
 
   @Override
   @JsonDeserialize(using = PooledElementDeserializer.class)
-  public void setPoolableElements(Set<Dilution> dilutions) {
+  public void setPoolableElements(Set<LibraryDilution> dilutions) {
     if (dilutions == null) {
       if (this.pooledElements == null) {
         this.pooledElements = Collections.emptySet();

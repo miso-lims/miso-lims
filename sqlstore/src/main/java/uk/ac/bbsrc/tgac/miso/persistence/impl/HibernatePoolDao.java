@@ -115,6 +115,15 @@ public class HibernatePoolDao implements PoolStore {
   @Autowired
   private ChangeLogStore changeLogStore;
 
+  @Autowired
+  private SecurityStore securityStore;
+  
+  @Autowired
+  private JdbcTemplate template;
+  
+  @Autowired
+  private WatchManager watchManager;
+
   @Override
   public Pool get(long poolId) throws IOException {
     return withWatcherGroup((PoolImpl) currentSession().get(PoolImpl.class, poolId));
@@ -205,9 +214,6 @@ public class HibernatePoolDao implements PoolStore {
     return securityStore.getGroupByName("PoolWatchers");
   }
 
-  @Autowired
-  private SecurityStore securityStore;
-
   private Pool withWatcherGroup(Pool pool) throws IOException {
     if (pool != null) {
       pool.setWatchGroup(getPoolWatcherGroup());
@@ -262,12 +268,10 @@ public class HibernatePoolDao implements PoolStore {
     return DbUtils.getColumnSizes(template, TABLE_NAME);
   }
 
-  @Autowired
-  private JdbcTemplate template;
-
   private String updateSortCol(String sortCol) {
     sortCol = sortCol.replaceAll("[^\\w]", "");
     if ("id".equals(sortCol)) sortCol = "poolId";
+    if ("lastModified".equals(sortCol)) sortCol = "derivedInfo.lastModified";
     return sortCol;
   }
 
@@ -281,6 +285,9 @@ public class HibernatePoolDao implements PoolStore {
     }
 
     final Criteria criteria = createCriteria();
+    // required to sort by 'derivedInfo.lastModified', which is the field on which we
+    // want to sort most List X pages
+    criteria.createAlias("derivedInfo", "derivedInfo");
     if ("asc".equalsIgnoreCase(sortDir)) {
       criteria.addOrder(Order.asc(sortCol));
     } else if ("desc".equalsIgnoreCase(sortDir)) {
@@ -354,9 +361,6 @@ public class HibernatePoolDao implements PoolStore {
   public void setTemplate(JdbcTemplate template) {
     this.template = template;
   }
-
-  @Autowired
-  private WatchManager watchManager;
 
   @Override
   public void removeWatcher(Pool pool, User watcher) {

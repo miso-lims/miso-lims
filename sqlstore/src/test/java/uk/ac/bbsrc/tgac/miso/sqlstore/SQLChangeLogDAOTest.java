@@ -7,9 +7,11 @@ import static org.mockito.Mockito.when;
 import java.util.Collection;
 import java.util.Date;
 
+import org.hibernate.SessionFactory;
 import org.joda.time.format.ISODateTimeFormat;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,16 +22,18 @@ import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.BoxChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateChangeLogDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSecurityDao;
 
 public class SQLChangeLogDAOTest extends AbstractDAOTest {
 
   @Mock
   private HibernateSecurityDao securityDAO;
-
   @Autowired
-  private ChangeLogStore sut;
+  private SessionFactory sessionFactory;
+
+  @InjectMocks
+  private HibernateChangeLogDao sut;
 
   User user = new UserImpl();
 
@@ -38,6 +42,7 @@ public class SQLChangeLogDAOTest extends AbstractDAOTest {
     MockitoAnnotations.initMocks(this);
     user.setUserId(1L);
     when(securityDAO.getUserById(anyLong())).thenReturn(user);
+    sut.setSessionFactory(sessionFactory);
   }
 
   @Test

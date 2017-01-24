@@ -107,8 +107,8 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   private String locationBarcode;
 
   @Enumerated(EnumType.STRING)
-  @Column(nullable = false)
-  private PlatformType platformName;
+  @Column(name = "platformName", nullable = false)
+  private PlatformType platformType;
 
   private Boolean qcPassed;
 
@@ -167,14 +167,14 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @OneToMany(targetEntity = LibraryChangeLog.class, mappedBy = "library")
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
-  @OneToOne(targetEntity = LibraryDerivedInfo.class)
+  @OneToOne
   @PrimaryKeyJoinColumn
   private LibraryDerivedInfo derivedInfo;
 
   @ManyToOne(targetEntity = BoxImpl.class)
-  @JoinFormula("(SELECT boxId FROM BoxPosition WHERE targetId = id AND targetType = 'L')")
+  @JoinFormula("(SELECT bp.boxId FROM BoxPosition bp WHERE bp.targetId = libraryId AND bp.targetType = 'L')")
   private Box box;
-  @Formula("(SELECT position FROM BoxPosition WHERE targetId = id AND targetType = 'L')")
+  @Formula("(SELECT bp.position FROM BoxPosition bp WHERE bp.targetId = libraryId AND bp.targetType = 'L')")
   private String position;
 
   @Override
@@ -374,13 +374,18 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   }
 
   @Override
-  public String getPlatformName() {
-    return platformName == null ? null : platformName.getKey();
+  public PlatformType getPlatformType() {
+    return platformType;
   }
 
   @Override
-  public void setPlatformName(String platformName) {
-    this.platformName = PlatformType.get(platformName);
+  public void setPlatformType(PlatformType platformType) {
+    this.platformType = platformType;
+  }
+
+  @Override
+  public void setPlatformType(String platformName) {
+    this.platformType = PlatformType.get(platformName);
   }
 
   @Override
@@ -551,7 +556,7 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
         .append(locationBarcode)
         .append(lowQuality)
         .append(paired)
-        .append(platformName)
+        .append(platformType)
         .append(qcPassed)
         .toHashCode();
   }
@@ -576,7 +581,7 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
         .append(locationBarcode, other.locationBarcode)
         .append(lowQuality, other.lowQuality)
         .append(paired, other.paired)
-        .append(platformName, other.platformName)
+        .append(platformType, other.platformType)
         .append(qcPassed, other.qcPassed)
         .isEquals();
   }

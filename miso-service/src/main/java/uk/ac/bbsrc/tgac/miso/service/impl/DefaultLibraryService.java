@@ -452,7 +452,7 @@ public class DefaultLibraryService implements LibraryService {
     target.setIdentificationBarcode(source.getIdentificationBarcode());
     target.setLocationBarcode(source.getLocationBarcode());
     target.setInitialConcentration(source.getInitialConcentration());
-    target.setPlatformName(source.getPlatformName());
+    target.setPlatformType(source.getPlatformType());
     target.setAlias(source.getAlias());
     target.setPaired(source.getPaired());
     target.setLowQuality(source.isLowQuality());

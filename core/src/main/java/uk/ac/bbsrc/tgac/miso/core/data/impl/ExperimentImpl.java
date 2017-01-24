@@ -68,6 +68,9 @@ import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 @Entity
 @Table(name = "Experiment")
 public class ExperimentImpl implements Experiment, Serializable {
+
+  private static final long serialVersionUID = 1L;
+
   public static final Long UNSAVED_ID = 0L;
 
   private String accession;
@@ -89,7 +92,7 @@ public class ExperimentImpl implements Experiment, Serializable {
   private Collection<Kit> kits = new HashSet<>();
 
   @ManyToOne(targetEntity = UserImpl.class)
-  @JoinColumn
+  @JoinColumn(name = "lastModifier")
   private User lastModifier;
 
   @Column(nullable = false)
@@ -116,7 +119,7 @@ public class ExperimentImpl implements Experiment, Serializable {
 
   @ManyToOne(targetEntity = StudyImpl.class)
   @JoinColumn(name = "study_studyId")
-  private Study study = null;
+  private Study study;
   @Column(nullable = false)
   private String title;
 

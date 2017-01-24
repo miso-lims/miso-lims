@@ -28,7 +28,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
  * @since 0.0.1
  */
 @Entity
-@Table(name = "`SecurityProfile`")
+@Table(name = "SecurityProfile")
 public class SecurityProfile implements Serializable {
 
   private static final long serialVersionUID = 1L;

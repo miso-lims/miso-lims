@@ -1,9 +1,9 @@
 package com.eaglegenomics.simlims.core;
 
-import org.springframework.security.core.GrantedAuthority;
-
 import java.io.Serializable;
 import java.util.Collection;
+
+import org.springframework.security.core.GrantedAuthority;
 
 /**
  * com.eaglegenomics.simlims.core
@@ -13,7 +13,7 @@ import java.util.Collection;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface User extends Serializable, Comparable {
+public interface User extends Serializable, Comparable<User> {
   boolean isActive();
 
   void setActive(boolean active);

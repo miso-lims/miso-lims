@@ -4,16 +4,22 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
+import javax.persistence.CascadeType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxDerivedInfo;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.BoxChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
@@ -23,6 +29,8 @@ public abstract class AbstractBox implements Box {
 
   public static final Long UNSAVED_ID = 0L;
 
+  @ManyToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "securityProfile_profileId")
   private SecurityProfile securityProfile;
 
   @Id
@@ -33,12 +41,20 @@ public abstract class AbstractBox implements Box {
   private String description;
   private String identificationBarcode;
   private String locationBarcode;
+
+  @ManyToOne(targetEntity = UserImpl.class)
+  @JoinColumn(name = "lastModifier", nullable = false)
   private User lastModifier;
-  private Date lastUpdated;
+
+  @OneToOne
+  @PrimaryKeyJoinColumn
+  private BoxDerivedInfo derivedInfo;
 
   @ManyToOne
+  @JoinColumn(name = "boxSizeId")
   private BoxSize size;
   @ManyToOne
+  @JoinColumn(name = "boxUseId")
   private BoxUse use;
 
   @OneToMany(targetEntity = BoxChangeLog.class, mappedBy = "box")
@@ -179,12 +195,8 @@ public abstract class AbstractBox implements Box {
   }
 
   @Override
-  public Date getLastUpdated() {
-    return lastUpdated;
+  public Date getLastModified() {
+    return (derivedInfo == null ? null : derivedInfo.getLastModified());
   }
 
-  @Override
-  public void setLastUpdated(Date lastUpdated) {
-    this.lastUpdated = lastUpdated;
-  }
 }

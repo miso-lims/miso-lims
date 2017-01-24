@@ -38,6 +38,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedDilutionException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryQcException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
@@ -251,20 +252,26 @@ public interface Library extends SecurableByProfile, Comparable<Library>, Barcod
   public void setIndices(List<Index> indices);
 
   /**
-   * Returns the platformName of this Library object.
+   * Returns the platformType of this Library object.
    * 
-   * @return String platformName.
+   * @return PlatformType platformType.
    */
-  public String getPlatformName();
+  public PlatformType getPlatformType();
 
   /**
-   * Sets the platformName of this Library object.
+   * Sets the platformType of this Library object.
    * 
-   * @param platformName
-   *          platformName.
+   * @param PlatformType platformType.
    * 
    */
-  public void setPlatformName(String platformName);
+  public void setPlatformType(PlatformType platformType);
+
+  /**
+   * Sets the platformType of this Library object.
+   * 
+   * @param String platformType
+   */
+  public void setPlatformType(String platformName);
 
   /**
    * Returns the initialConcentration of this Library object.

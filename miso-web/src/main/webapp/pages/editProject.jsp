@@ -985,7 +985,7 @@
               <td>${library.creationDate}</td>
               <td>${library.description}</td>
               <td>${library.libraryType.description}</td>
-              <td>${library.platformName}</td>
+              <td>${library.platformType}</td>
               <td><c:if test="${not empty library.indices}">
                 <c:forEach items="${library.indices}" varStatus="status" var="index">
                   <c:if test="${status.index gt 0}"><br/></c:if>
@@ -1085,7 +1085,7 @@
                   <td>${grouplib.creationDate}</td>
                   <td>${grouplib.description}</td>
                   <td>${grouplib.libraryType.description}</td>
-                  <td>${grouplib.platformName}</td>
+                  <td>${grouplib.platformType}</td>
                   <td><c:if test="${not empty grouplib.indices}">
                     <c:forEach items="${grouplib.indices}" varStatus="status" var="index">
                        <c:if test="${status.index gt 0}"><br/></c:if>
@@ -1191,7 +1191,7 @@
           </td>
           <td>${dil.dilutionCreator}</td>
           <td>${dil.creationDate}</td>
-          <td>${dil.library.platformName}</td>
+          <td>${dil.library.platformType}</td>
           <td>${dil.concentration}</td>
           <sec:authorize access="hasRole('ROLE_ADMIN')">
             <td class="misoicon" onclick="Library.dilution.deleteLibraryDilution(${dil.id}, Utils.page.pageReload);">

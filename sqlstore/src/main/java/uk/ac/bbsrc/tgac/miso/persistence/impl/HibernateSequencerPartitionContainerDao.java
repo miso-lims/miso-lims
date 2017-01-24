@@ -22,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
@@ -107,7 +106,7 @@ public class HibernateSequencerPartitionContainerDao implements SequencerPartiti
   public List<SequencerPartitionContainer<SequencerPoolPartition>> listAllSequencerPartitionContainersByRunId(long runId)
       throws IOException {
     Criteria criteria = currentSession().createCriteria(SequencerPartitionContainerImpl.class);
-    criteria.add(Restrictions.eq("run.id", runId));
+    criteria.add(Restrictions.eq("runs.id", runId));
     @SuppressWarnings("unchecked")
     List<SequencerPartitionContainer<SequencerPoolPartition>> records = criteria.list();
     return records;
@@ -148,7 +147,7 @@ public class HibernateSequencerPartitionContainerDao implements SequencerPartiti
       String sortDir, String sortCol) throws IOException {
     if (offset < 0 || limit < 0) throw new IOException("Limit and Offset must not be less than zero");
     if ("lastModified".equals(sortCol)) sortCol = "derivedInfo.lastModified";
-    Criteria criteria = currentSession().createCriteria(SampleImpl.class);
+    Criteria criteria = currentSession().createCriteria(SequencerPartitionContainerImpl.class);
     criteria.add(DbUtils.searchRestrictions(querystr, "platform", "identificationBarcode"));
     // required to sort by 'derivedInfo.lastModifier'
     criteria.createAlias("derivedInfo", "derivedInfo");
@@ -162,7 +161,7 @@ public class HibernateSequencerPartitionContainerDao implements SequencerPartiti
       return Collections.emptyList();
     }
     // We do this in two steps to make a smaller query that that the database can optimise
-    Criteria query = currentSession().createCriteria(SampleImpl.class);
+    Criteria query = currentSession().createCriteria(SequencerPartitionContainerImpl.class);
     query.add(Restrictions.in("id", ids));
     query.addOrder("asc".equalsIgnoreCase(sortDir) ? Order.asc(sortCol) : Order.desc(sortCol));
     query.createAlias("derivedInfo", "derivedInfo");
@@ -176,7 +175,7 @@ public class HibernateSequencerPartitionContainerDao implements SequencerPartiti
       String sortCol) throws IOException {
     if (offset < 0 || limit < 0) throw new IOException("Limit and Offset must not be less than zero");
     if ("lastModified".equals(sortCol)) sortCol = "derivedInfo.lastModified";
-    Criteria criteria = currentSession().createCriteria(SampleImpl.class);
+    Criteria criteria = currentSession().createCriteria(SequencerPartitionContainerImpl.class);
     // I don't know why this alias is required, but without it, you can't sort by 'derivedInfo.lastModifier', which is the field on which we
     // want to sort most List X pages
     criteria.createAlias("derivedInfo", "derivedInfo");

@@ -41,7 +41,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import com.eaglegenomics.simlims.core.Note;
-import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Lists;
 
@@ -1401,15 +1400,6 @@ public class MisoRequestManager implements RequestManager {
       return statusStore.save(status);
     } else {
       throw new IOException("No statusStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public long saveSecurityProfile(SecurityProfile profile) throws IOException {
-    if (securityProfileStore != null) {
-      return securityProfileStore.save(profile);
-    } else {
-      throw new IOException("No securityProfileStore available. Check that it has been declared in the Spring config.");
     }
   }
 

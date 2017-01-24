@@ -63,6 +63,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubmissionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.SubmissionActionType;
 import uk.ac.bbsrc.tgac.miso.core.exception.SubmissionException;
@@ -460,7 +461,7 @@ public class SubmissionControllerHelperService {
 
                     // creates HTML for list of library dilutions and corresponding datafiles.
                     // gets all the dilutions in that partition's pool.
-                    List<Dilution> poolables = new ArrayList<>(part.getPool().getPoolableElements());
+                    List<LibraryDilution> poolables = new ArrayList<>(part.getPool().getPoolableElements());
                     Collections.sort(poolables);
 
                     FilePathGenerator fpg = filePathGeneratorResolverService.getFilePathGenerator(r.getPlatformType());

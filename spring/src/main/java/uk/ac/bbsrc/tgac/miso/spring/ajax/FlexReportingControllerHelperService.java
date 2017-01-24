@@ -685,7 +685,7 @@ public class FlexReportingControllerHelperService {
     }
     return "['<input class=\"chkboxlibraries\" id=\"" + library.getId() + "\" type=\"checkbox\" name=\"libraryIds\" value=\""
         + library.getId() + "\" id=\"" + library.getId() + "\"/>','" + library.getName() + "','" + library.getAlias() + "','"
-        + library.getDescription() + "','" + library.getPlatformName() + "','" + library.getLibraryType().getDescription() + "','" + qc
+        + library.getDescription() + "','" + library.getPlatformType() + "','" + library.getLibraryType().getDescription() + "','" + qc
         + "']";
   }
 
@@ -709,7 +709,7 @@ public class FlexReportingControllerHelperService {
       }
 
       for (Library library : libraries) {
-        if ((platform.equals("all") || platform.equals(library.getPlatformName()))
+        if ((platform.equals("all") || platform.equals(library.getPlatformType()))
             && (qc.equals("all") || qc.equals(library.getQcPassed().toString()))) {
 
           if (!isStringEmptyOrNull(from) && !isStringEmptyOrNull(to) && library.getCreationDate() != null) {
@@ -758,9 +758,9 @@ public class FlexReportingControllerHelperService {
             count++;
             typeMap.put(l.getLibraryType().getDescription(), count);
 
-            int countPlatform = platformMap.containsKey(l.getPlatformName()) ? platformMap.get(l.getPlatformName()) : 0;
+            int countPlatform = platformMap.containsKey(l.getPlatformType()) ? platformMap.get(l.getPlatformType()) : 0;
             countPlatform++;
-            platformMap.put(l.getPlatformName(), countPlatform);
+            platformMap.put(l.getPlatformType().getKey(), countPlatform);
           }
         }
       }
@@ -781,7 +781,7 @@ public class FlexReportingControllerHelperService {
           Integer libqcpassed = 0;
           Integer libqcfailed = 0;
           for (Library l : libraries) {
-            if (l.getLibraryType().getDescription().equals(libraryType) && l.getPlatformName().equals(platform)) {
+            if (l.getLibraryType().getDescription().equals(libraryType) && l.getPlatformType().equals(platform)) {
               if (l.getQcPassed() != null) {
                 if (l.getQcPassed()) {
                   libqcpassed++;
@@ -830,7 +830,7 @@ public class FlexReportingControllerHelperService {
           JsonSanitizer.sanitize(
               "[\"" + (library.getName().replace("+", "-")).replace("'", "\\'") + "\",\""
                   + (library.getAlias().replace("+", "-")).replace("'", "\\'") + "\",\""
-                  + (library.getDescription().replace("+", "-")).replace("'", "\\'") + "\",\"" + library.getPlatformName() + "\",\""
+                  + (library.getDescription().replace("+", "-")).replace("'", "\\'") + "\",\"" + library.getPlatformType() + "\",\""
                   + library.getLibraryType().getDescription() + "\",\"" + qc + "\"]"));
     }
     return jsonArray;
@@ -854,7 +854,7 @@ public class FlexReportingControllerHelperService {
 
       jsonArray.add(
           "['" + library.getSample().getProject().getName() + "','" + library.getName() + "','" + library.getAlias() + "','"
-              + library.getDescription() + "','" + library.getPlatformName() + "','" + library.getLibraryType().getDescription() + "','"
+              + library.getDescription() + "','" + library.getPlatformType() + "','" + library.getLibraryType().getDescription() + "','"
               + qc + "','" + LimsUtils.getDateAsString(library.getCreationDate()) + "','" + library.getSample().getName() + "','" + sampleQC
               + "','" + scientificName + "']");
     }

@@ -409,12 +409,13 @@ public class LibraryControllerHelperService {
               library.setAlias(libAlias);
               library.setSecurityProfile(sp);
               library.setDescription(descr);
-              library.setPlatformName(platform);
+              library.setPlatformType(platform);
               library.setCreationDate(new Date());
               library.setLocationBarcode(locationBarcode);
               library.setQcPassed(false);
               library
-                  .setLibraryType(libraryService.getLibraryTypeByDescriptionAndPlatform(type, PlatformType.get(library.getPlatformName())));
+                  .setLibraryType(
+                      libraryService.getLibraryTypeByDescriptionAndPlatform(type, library.getPlatformType()));
               library.setLibrarySelectionType(libraryService.getLibrarySelectionTypeByName(selectionType));
               library.setLibraryStrategyType(libraryService.getLibraryStrategyTypeByName(strategyType));
               library.setLastModifier(user);
@@ -735,7 +736,7 @@ public class LibraryControllerHelperService {
           sb.append("<th>Targeted Sequencing</th>");
         }
         sb.append("<th>ID barcode</th>");
-        if (!library.getPlatformName().equals("Illumina")) {
+        if (!library.getPlatformType().equals("Illumina")) {
           sb.append("<th>Add emPCR</th>");
         }
         sb.append("</tr>");
@@ -776,7 +777,7 @@ public class LibraryControllerHelperService {
           }
           sb.append("</td>");
 
-          if (!library.getPlatformName().equals("Illumina")) {
+          if (!library.getPlatformType().equals("Illumina")) {
             sb.append("<td><a href='javascript:void(0);' onclick='Library.empcr.insertEmPcrRow(" + dil.getId() + ");'>Add emPCR</a></td>");
           } else {
             sb.append(

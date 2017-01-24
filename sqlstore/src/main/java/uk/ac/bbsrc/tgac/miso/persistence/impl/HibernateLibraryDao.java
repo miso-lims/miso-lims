@@ -297,9 +297,9 @@ public class HibernateLibraryDao implements LibraryStore {
   }
 
   @Override
-  public List<LibraryType> listLibraryTypesByPlatform(PlatformType platformName) throws IOException {
+  public List<LibraryType> listLibraryTypesByPlatform(PlatformType platformType) throws IOException {
     Criteria criteria = currentSession().createCriteria(LibraryType.class);
-    criteria.add(Restrictions.eq("platformType", platformName));
+    criteria.add(Restrictions.eq("platformType", platformType));
     @SuppressWarnings("unchecked")
     List<LibraryType> records = criteria.list();
     return records;

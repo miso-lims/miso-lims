@@ -35,6 +35,7 @@ import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedDilutionException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
@@ -91,22 +92,22 @@ public interface Pool extends SecurableByProfile, Comparable, Barcodable, Watcha
   public void setAlias(String alias);
 
   /**
-   * Adds a dilution to this Pool
+   * Adds a library dilution to this Pool
    * 
    * @param poolable element of type P
-   * @throws MalformedDilutionException when the Dilution added is not valid
+   * @throws MalformedDilutionException when the LibraryDilution added is not valid
    */
-  public void addPoolableElement(Dilution poolable) throws MalformedDilutionException;
+  public void addPoolableElement(LibraryDilution poolable) throws MalformedDilutionException;
 
   /**
    * Sets the elements of this Pool object.
    */
-  public void setPoolableElements(Set<Dilution> dilutions);
+  public void setPoolableElements(Set<LibraryDilution> dilutions);
 
   /**
    * Returns the elements of this Pool object.
    */
-  public Set<Dilution> getPoolableElements();
+  public Set<LibraryDilution> getPoolableElements();
 
   /**
    * Registers an Experiment to this Pool

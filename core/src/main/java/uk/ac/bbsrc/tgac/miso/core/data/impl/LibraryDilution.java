@@ -96,7 +96,7 @@ public class LibraryDilution implements Dilution, Serializable {
   private Set<Pool> pools;
 
   @ManyToOne(targetEntity = UserImpl.class)
-  @JoinColumn
+  @JoinColumn(name = "lastModifier")
   private User lastModifier;
 
   @Transient

@@ -47,7 +47,6 @@ public class HibernateRunDao implements RunStore {
   private SecurityStore securityStore;
 
   private JdbcTemplate template;
-  private com.eaglegenomics.simlims.core.manager.SecurityManager securityManager;
 
   private Session currentSession() {
     return getSessionFactory().getCurrentSession();
@@ -315,14 +314,6 @@ public class HibernateRunDao implements RunStore {
 
   public void setRunAlertManager(RunAlertManager runAlertManager) {
     this.runAlertManager = runAlertManager;
-  }
-
-  public com.eaglegenomics.simlims.core.manager.SecurityManager getSecurityManager() {
-    return securityManager;
-  }
-
-  public void setSecurityManager(com.eaglegenomics.simlims.core.manager.SecurityManager securityManager) {
-    this.securityManager = securityManager;
   }
 
   public WatchManager getWatchManager() {

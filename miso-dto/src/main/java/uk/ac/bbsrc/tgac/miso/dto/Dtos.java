@@ -982,8 +982,8 @@ public class Dtos {
     dto.setQcPassed(from.getQcPassed());
     dto.setLowQuality(from.isLowQuality());
     dto.setPaired(from.getPaired());
-    if (from.getPlatformName() != null) {
-      dto.setPlatformName(from.getPlatformName());
+    if (from.getPlatformType() != null) {
+      dto.setPlatformName(from.getPlatformType().getKey());
     }
     if (from.getLastModified() != null) {
       dto.setLastModified(getDateAsString(from.getLastModified()));
@@ -1027,7 +1027,7 @@ public class Dtos {
     to.setInitialConcentration(from.getConcentration());
     to.setLowQuality(from.getLowQuality());
     to.setPaired(from.getPaired());
-    to.setPlatformName(from.getPlatformName());
+    to.setPlatformType(PlatformType.get(from.getPlatformName()));
     if (from.getLibrarySelectionTypeId() != null) {
       LibrarySelectionType sel = new LibrarySelectionType();
       sel.setId(from.getLibrarySelectionTypeId());

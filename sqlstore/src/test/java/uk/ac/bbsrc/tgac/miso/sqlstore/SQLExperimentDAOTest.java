@@ -31,6 +31,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ExperimentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PlatformImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateExperimentDao;
@@ -75,7 +76,7 @@ public class SQLExperimentDAOTest extends AbstractDAOTest {
     Experiment experiment = new ExperimentImpl();
     experiment.setPlatform(new PlatformImpl());
     experiment.setStudy(new StudyImpl());
-    User mockUser = Mockito.mock(User.class);
+    User mockUser = Mockito.mock(UserImpl.class);
     when(mockUser.getUserId()).thenReturn(1L);
 
     experiment.setLastModifier(mockUser);

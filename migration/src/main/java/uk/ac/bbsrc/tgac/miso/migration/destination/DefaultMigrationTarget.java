@@ -30,7 +30,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
-import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -544,8 +543,8 @@ public class DefaultMigrationTarget implements MigrationTarget {
               if (!mergeRunPools) throw new IOException("A pool already exists for lane " + toPartition.getPartitionNumber());
               Pool toPool = toPartition.getPool();
               // Merge pools
-              Collection<Dilution> fromPoolables = fromPartition.getPool().getPoolableElements();
-              Collection<Dilution> toPoolables = toPool.getPoolableElements();
+              Collection<LibraryDilution> fromPoolables = fromPartition.getPool().getPoolableElements();
+              Collection<LibraryDilution> toPoolables = toPool.getPoolableElements();
               toPoolables.addAll(fromPoolables);
               setPoolModifiedDetails(toPool);
               serviceManager.getPoolDao().save(toPool);

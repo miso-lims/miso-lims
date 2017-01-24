@@ -49,7 +49,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PlatformImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateChangeLogDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSequencerPartitionContainerDao;
 
@@ -155,13 +157,13 @@ public class SQLSequencerPartitionContainerDAOTest extends AbstractDAOTest {
     SecurityProfile profile = Mockito.mock(SecurityProfile.class);
     spc.setSecurityProfile(profile);
     Mockito.when(profile.getProfileId()).thenReturn(1L);
-    Platform platform = Mockito.mock(Platform.class);
+    Platform platform = Mockito.mock(PlatformImpl.class);
     spc.setPlatform(platform);
     Mockito.when(platform.getId()).thenReturn(1L);
-    User user = Mockito.mock(User.class);
+    User user = Mockito.mock(UserImpl.class);
     Mockito.when(user.getUserId()).thenReturn(1L);
     spc.setLastModifier(user);
-    Run run = Mockito.mock(Run.class);
+    Run run = Mockito.mock(RunImpl.class);
     Mockito.when(run.getId()).thenReturn(1L);
     spc.setIdentificationBarcode("ABCDEFXX");
     spc.setRun(run);
@@ -196,8 +198,8 @@ public class SQLSequencerPartitionContainerDAOTest extends AbstractDAOTest {
     SequencerPartitionContainer<SequencerPoolPartition> spc = new SequencerPartitionContainerImpl();
     String spcIDBC = "ABCDEFXX";
     spc.setIdentificationBarcode(spcIDBC);
-    spc.setPlatform(Mockito.mock(Platform.class));
-    User mockUser = Mockito.mock(User.class);
+    spc.setPlatform(Mockito.mock(PlatformImpl.class));
+    User mockUser = Mockito.mock(UserImpl.class);
     when(mockUser.getUserId()).thenReturn(1L);
     spc.setLastModifier(mockUser);
 
@@ -228,7 +230,7 @@ public class SQLSequencerPartitionContainerDAOTest extends AbstractDAOTest {
 
   private SequencerPartitionContainer<SequencerPoolPartition> makeSPC(String identificationBarcode) throws IOException {
     SecurityProfile profile = Mockito.mock(SecurityProfile.class);
-    User user = Mockito.mock(User.class);
+    User user = Mockito.mock(UserImpl.class);
     Mockito.when(user.getUserId()).thenReturn(1L);
     SequencerPartitionContainer<SequencerPoolPartition> pc = new SequencerPartitionContainerImpl();
     pc.setSecurityProfile(profile);
