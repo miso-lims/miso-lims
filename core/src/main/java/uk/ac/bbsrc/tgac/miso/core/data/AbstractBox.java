@@ -42,7 +42,7 @@ public abstract class AbstractBox implements Box {
   private String identificationBarcode;
   private String locationBarcode;
 
-  @OneToOne(targetEntity = UserImpl.class)
+  @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "lastModifier", nullable = false)
   private User lastModifier;
 
