@@ -35,6 +35,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
@@ -89,6 +91,7 @@ public class ValueTypeLookup {
   private Map<Long, DetailedQcStatus> detailedQcStatusById;
   private Map<String, DetailedQcStatus> detailedQcStatusByDescription;
   private Map<String, ReferenceGenome> referenceGenomeByAlias;
+  private Map<String, TargetedSequencing> targetedSequencingByAlias;
   
   /**
    * Create a ValueTypeLookup loaded with data from the provided MisoServiceManager
@@ -116,6 +119,7 @@ public class ValueTypeLookup {
     setSubprojects(misoServiceManager.getSubprojectDao().getSubproject());
     setDetailedQcStatuses(misoServiceManager.getDetailedQcStatusDao().getDetailedQcStatus());
     setReferenceGenomes(misoServiceManager.getReferenceGenomeService().listAllReferenceGenomeTypes());
+    setTargetedSequencings(misoServiceManager.getTargetedSequencingDao().listAll());
   }
 
   private void setSampleClasses(Collection<SampleClass> sampleClasses) {
@@ -355,6 +359,14 @@ public class ValueTypeLookup {
       mapByAlias.put(referenceGenome.getAlias(), referenceGenome);
     }
     this.referenceGenomeByAlias = mapByAlias;
+  }
+
+  private void setTargetedSequencings(Collection<TargetedSequencing> targetedSequencings) {
+    Map<String, TargetedSequencing> mapByAlias = new UniqueKeyHashMap<>();
+    for (TargetedSequencing tarSeq : targetedSequencings) {
+      mapByAlias.put(tarSeq.getAlias(), tarSeq);
+    }
+    this.targetedSequencingByAlias = mapByAlias;
   }
 
   /**
@@ -721,6 +733,13 @@ public class ValueTypeLookup {
     return detailedQcStatusByDescription.containsKey(description);
   }
 
+  @VisibleForTesting
+  TargetedSequencing resolve(TargetedSequencing targetedSequencing) {
+    if (targetedSequencing == null) return null;
+    if (targetedSequencing.getAlias() != null) return targetedSequencingByAlias.get(targetedSequencing.getAlias());
+    return null;
+  }
+
   /**
    * Resolves all value type entities for a Sample
    * 
@@ -892,6 +911,16 @@ public class ValueTypeLookup {
       LibraryDesignCode ldc = resolve(lai.getLibraryDesignCode());
       if (ldc == null) throw new IOException(String.format("LibraryDesignCode %s not found", lai.getLibraryDesignCode().getCode()));
       lai.setLibraryDesignCode(ldc);
+    }
+  }
+
+  public void resolveAll(LibraryDilution dilution) throws IOException {
+    if (dilution.getTargetedSequencing() != null) { // optional field
+      TargetedSequencing tarSeq = resolve(dilution.getTargetedSequencing());
+      if (tarSeq == null) {
+        throw new IOException(String.format("TargetedSequencing not found (alias=%s)", dilution.getTargetedSequencing().getAlias()));
+      }
+      dilution.setTargetedSequencing(tarSeq);
     }
   }
 

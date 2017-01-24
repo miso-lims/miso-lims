@@ -429,7 +429,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
     log.info("Migrating library dilutions...");
     for (LibraryDilution ldi : libraryDilutions) {
       try {
-        saveLibraryDilutions(ldi);
+        saveLibraryDilution(ldi);
       } catch (Exception e) {
         handleException(e);
       }
@@ -437,7 +437,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
     log.info(libraryDilutions.size() + " library dilutions migrated.");
   }
 
-  public void saveLibraryDilutions(LibraryDilution ldi) throws IOException {
+  private void saveLibraryDilution(LibraryDilution ldi) throws IOException {
     String friendlyName = " of " + ldi.getLibrary().getAlias();
     if (ldi.getPreMigrationId() != null) {
       friendlyName += " with pre-migration id " + ldi.getPreMigrationId();
@@ -460,7 +460,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
         throw new IOException("No Library found with pre-migration ID " + preMigrationId);
       }
     }
-
+    valueTypeLookup.resolveAll(ldi);
     ldi.setId(serviceManager.getDilutionDao().save(ldi));
     log.debug("Saved library dilution " + friendlyName);
   }

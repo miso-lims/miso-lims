@@ -37,6 +37,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SamplePurposeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
@@ -59,6 +60,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSamplePurposeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleQcDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSequencerReferenceDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSubprojectDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTargetedSequencingDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueMaterialDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueOriginDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueTypeDao;
@@ -192,6 +194,12 @@ public class ValueTypeLookupTestSuite {
     referenceGenomes.add(makeReferenceGenome(VALID_LONG, VALID_STRING));
     Mockito.when(referenceGenomeService.listAllReferenceGenomeTypes()).thenReturn(referenceGenomes);
     Mockito.when(mgr.getReferenceGenomeService()).thenReturn(referenceGenomeService);
+
+    HibernateTargetedSequencingDao tarSeqDao = Mockito.mock(HibernateTargetedSequencingDao.class);
+    List<TargetedSequencing> tarSeqs = Lists.newArrayList();
+    tarSeqs.add(makeTargetedSequencing(VALID_LONG, VALID_STRING));
+    Mockito.when(tarSeqDao.listAll()).thenReturn(tarSeqs);
+    Mockito.when(mgr.getTargetedSequencingDao()).thenReturn(tarSeqDao);
 
     sut = new ValueTypeLookup(mgr);
   }
@@ -539,6 +547,21 @@ public class ValueTypeLookupTestSuite {
     referenceGenome.setId(id);
     referenceGenome.setAlias(alias);
     return referenceGenome;
+  }
+
+  @Test
+  public void testResolveTargetedSequencing() throws Exception {
+    assertNotNull(sut.resolve(makeTargetedSequencing(VALID_LONG, VALID_STRING)));
+    assertNotNull(sut.resolve(makeTargetedSequencing(null, VALID_STRING)));
+    assertNull(sut.resolve(makeTargetedSequencing(null, INVALID_STRING)));
+    assertNull(sut.resolve(makeTargetedSequencing(null, null)));
+  }
+
+  private TargetedSequencing makeTargetedSequencing(Long id, String alias) {
+    TargetedSequencing tarSeq = new TargetedSequencing();
+    tarSeq.setId(id);
+    tarSeq.setAlias(alias);
+    return tarSeq;
   }
 
 }
