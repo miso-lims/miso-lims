@@ -51,7 +51,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 @JsonIgnoreProperties({ "securityProfile", "container" })
 @Entity
-@Table(name = "`_Partition`")
+@Table(name = "_Partition")
 public class PartitionImpl extends AbstractPartition implements SequencerPoolPartition, Serializable {
 
   private static final long serialVersionUID = 1L;

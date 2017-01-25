@@ -27,7 +27,6 @@ import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -46,9 +45,8 @@ import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
-import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateBoxDao;
@@ -118,12 +116,9 @@ public class SQLBoxDAOTest extends AbstractDAOTest {
   @Test
   public void testListAll() throws Exception {
     Collection<Box> boxes = dao.listAll();
-    assertEquals(2, boxes.size());
+    assertTrue(boxes.size() > 0);
 
-    Iterator<Box> iterator = boxes.iterator();
-
-    assertEquals(1, iterator.next().getId());
-    assertEquals(2, iterator.next().getId());
+    assertEquals(boxes.size(), dao.count());
   }
 
   @Test
@@ -166,9 +161,9 @@ public class SQLBoxDAOTest extends AbstractDAOTest {
   public void testEmptyAllTubes() throws Exception {
     Box box = dao.get(1);
 
-    assertTrue("precondition failed", box.getBoxables().values().size() > 0);
+    assertTrue("precondition failed", box.getBoxables().size() > 0);
     dao.discardAllTubes(box);
-    assertTrue(box.getBoxables().values().size() == 0);
+    assertTrue(box.getBoxables().size() == 0);
 
   }
 
@@ -185,10 +180,12 @@ public class SQLBoxDAOTest extends AbstractDAOTest {
 
   @Test
   public void testRemoveBoxableFromBox() throws Exception {
-    Pool pool = new PoolImpl(new UserImpl());
     Box box = dao.get(1);
-    box.setBoxable("A01", pool);
-    dao.removeBoxableFromBox(pool);
+    Boxable item = box.getBoxables().values().iterator().next();
+
+    dao.removeBoxableFromBox(item);
+    Box again = dao.get(1);
+    assertFalse(again.getBoxables().values().contains(item));
   }
 
   @Test

@@ -33,7 +33,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 import com.eaglegenomics.simlims.core.User;
 
-import uk.ac.bbsrc.tgac.miso.core.data.impl.Lane;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
@@ -106,7 +106,7 @@ public interface SequencerPartitionContainer<T extends Partition>
   void setPartitionLimit(int partitionLimit);
 
   /**
-   * Initialise this container with empty {@link Lane} objects of type T up to the specified partition limit
+   * Initialise this container with empty {@link PartitionImpl} objects of type T up to the specified partition limit
    */
   void initEmptyPartitions();
 

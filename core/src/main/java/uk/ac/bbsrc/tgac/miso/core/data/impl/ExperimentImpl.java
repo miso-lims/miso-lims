@@ -115,6 +115,7 @@ public class ExperimentImpl implements Experiment, Serializable {
   private Run run;
 
   @ManyToOne(cascade = CascadeType.ALL)
+  @JoinColumn
   private SecurityProfile securityProfile = new SecurityProfile();
 
   @ManyToOne(targetEntity = StudyImpl.class)

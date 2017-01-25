@@ -73,6 +73,7 @@ public class SQLExperimentDAOTest extends AbstractDAOTest {
   @Test
   public void testSave() throws IOException, MisoNamingException {
     Experiment experiment = new ExperimentImpl();
+    experiment.setName("TEMPORARY_XXX");
     experiment.setPlatform(new PlatformImpl());
     experiment.setStudy(new StudyImpl());
     User mockUser = Mockito.mock(UserImpl.class);
