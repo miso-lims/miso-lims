@@ -50,6 +50,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
+import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.StudyChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
@@ -61,7 +62,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  * @since 0.0.2
  */
 @Entity
-@Table(name = "`Study`")
+@Table(name = "Study")
 public class StudyImpl implements Study, Serializable {
   public static final Long UNSAVED_ID = 0L;
 
@@ -91,14 +92,16 @@ public class StudyImpl implements Study, Serializable {
   private String description;
   @Column(name = "accession")
   private String accession;
-  @Column(name = "abstract")
-  private String abs;
-  @Column(name = "studyType")
-  private String studyType;
+  @ManyToOne
+  @JoinColumn(name = "studyTypeId")
+  private StudyType studyType;
   @Column(name = "alias")
   private String alias;
   @OneToMany(targetEntity = StudyChangeLog.class, mappedBy = "study")
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
+
+  @ManyToOne(targetEntity = UserImpl.class)
+  @JoinColumn(name = "lastModifier")
   private User lastModifier;
 
   /**
@@ -146,8 +149,7 @@ public class StudyImpl implements Study, Serializable {
   }
 
   @Override
-  public int compareTo(Object o) {
-    Study t = (Study) o;
+  public int compareTo(Study t) {
     if (getId() < t.getId()) return -1;
     if (getId() > t.getId()) return 1;
     return 0;
@@ -173,11 +175,6 @@ public class StudyImpl implements Study, Serializable {
     } else {
       return this.getId() == them.getId();
     }
-  }
-
-  @Override
-  public String getAbstract() {
-    return abs;
   }
 
   @Override
@@ -231,7 +228,7 @@ public class StudyImpl implements Study, Serializable {
   }
 
   @Override
-  public String getStudyType() {
+  public StudyType getStudyType() {
     return studyType;
   }
 
@@ -260,11 +257,6 @@ public class StudyImpl implements Study, Serializable {
   @Override
   public boolean isDeletable() {
     return getId() != StudyImpl.UNSAVED_ID && getExperiments().isEmpty();
-  }
-
-  @Override
-  public void setAbstract(String abs) {
-    this.abs = abs;
   }
 
   @Override
@@ -313,7 +305,7 @@ public class StudyImpl implements Study, Serializable {
   }
 
   @Override
-  public void setStudyType(String studyType) {
+  public void setStudyType(StudyType studyType) {
     this.studyType = studyType;
   }
 

@@ -274,7 +274,7 @@ public class HibernateBoxDao implements BoxStore {
 
   @Override
   public void removeBoxableFromBox(Boxable boxable) throws IOException {
-    Box box = boxable.getBox();
+    Box box = get(boxable.getBox().getId());
     box.removeBoxable(boxable);
     currentSession().save(box);
   }

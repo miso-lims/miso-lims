@@ -1,9 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -13,6 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -43,6 +41,8 @@ public class SQLSecurityDAOTest extends AbstractDAOTest {
   @Autowired
   @Spy
   private JdbcTemplate jdbcTemplate;
+  @Autowired
+  private SessionFactory sessionFactory;
   
   @Mock
   private Store<SecurityProfile> securityProfileDAO;
@@ -57,6 +57,7 @@ public class SQLSecurityDAOTest extends AbstractDAOTest {
   public void setUp() {
     MockitoAnnotations.initMocks(this);
     dao.setJdbcTemplate(jdbcTemplate);
+    dao.setSessionFactory(sessionFactory);
   }
   
   private void mockAutoIncrement(long value) {

@@ -40,6 +40,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
+import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
@@ -162,7 +163,9 @@ public class DefaultMigrationTarget implements MigrationTarget {
         Study study = new StudyImpl();
         study.setAlias((project.getShortName() == null ? project.getAlias() : project.getShortName()) + " study");
         study.setDescription("");
-        study.setStudyType("Other");
+        StudyType sType = new StudyType();
+        sType.setName("Other");
+        study.setStudyType(sType);
         study.setLastModifier(migrationUser);
         project.getStudies().add(study);
       }

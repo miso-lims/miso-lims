@@ -225,7 +225,7 @@ VALUES (1,'admin','2015-08-27',1,5),
 (12,'admin','2015-08-27',1,5),
 (13,'admin','2015-08-27',1,5),
 (14,'admin','2015-08-27',1,5),
-(15,'admin','2015-08-27',1,5);
+(14,'admin','2015-08-27',1,5);
 
 INSERT INTO `SampleChangeLog`(`sampleId`, `columnsChanged`, `userId`, `message`, `changeTime`)
 VALUES (1, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:47'),

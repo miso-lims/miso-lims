@@ -94,6 +94,7 @@
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleNumberPerProjectImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SamplePurposeImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleQCImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleStockImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueProcessingImpl</value>

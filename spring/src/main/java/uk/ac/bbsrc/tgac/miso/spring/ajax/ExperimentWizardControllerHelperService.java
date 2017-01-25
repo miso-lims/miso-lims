@@ -123,7 +123,9 @@ public class ExperimentWizardControllerHelperService {
       s.setAlias(p.getAlias());
       s.setDescription(p.getDescription());
       s.setSecurityProfile(p.getSecurityProfile());
-      s.setStudyType(studyType);
+      StudyType sType = new StudyType();
+      sType.setName(studyType);
+      s.setStudyType(sType);
       s.setLastModifier(securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName()));
       requestManager.saveStudy(s);
 

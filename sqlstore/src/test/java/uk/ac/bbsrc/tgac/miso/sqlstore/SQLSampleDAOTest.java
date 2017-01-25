@@ -9,9 +9,7 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.hibernate.SessionFactory;
 import org.junit.Before;
@@ -88,7 +86,6 @@ public class SQLSampleDAOTest extends AbstractDAOTest {
     user.setUserId(1L);
     sample.setLastModifier(user);
 
-    mockAutoIncrement();
     when(namingScheme.generateNameFor(any(Sample.class))).thenReturn(sampleName);
     when(namingScheme.validateName(anyString())).thenReturn(ValidationResult.success());
     when(namingScheme.validateSampleAlias(anyString())).thenReturn(ValidationResult.success());
@@ -346,19 +343,6 @@ public class SQLSampleDAOTest extends AbstractDAOTest {
     DetailedSample detailed = (DetailedSample) sample;
     assertNotNull(detailed.getParent());
     assertEquals(15L, detailed.getParent().getId());
-  }
-
-  private void mockAutoIncrement() throws IOException {
-    Collection<Sample> samples = dao.listAll();
-    long max = 0;
-    for (Sample sample : samples) {
-      if (sample.getId() > max) {
-        max = sample.getId();
-      }
-    }
-    max++;
-    Map<String, Object> rs = new HashMap<>();
-    rs.put("Auto_increment", max);
   }
 
   @Test

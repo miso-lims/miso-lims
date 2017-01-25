@@ -7,9 +7,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.hibernate.SessionFactory;
 import org.junit.Before;
@@ -32,6 +30,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.ExperimentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PlatformImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateExperimentDao;
@@ -41,8 +40,6 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateExperimentDao;
  *
  */
 public class SQLExperimentDAOTest extends AbstractDAOTest {
-
-  private static long nextAutoIncrementId = 33L;
 
   @Autowired
   @Spy
@@ -67,12 +64,14 @@ public class SQLExperimentDAOTest extends AbstractDAOTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateExperimentDao#save(uk.ac.bbsrc.tgac.miso.core.data.Experiment)} .
+   * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateExperimentDao#save(uk.ac.bbsrc.tgac.miso.core.data.Experiment)}
+   * .
    * 
    * @throws IOException
+   * @throws MisoNamingException
    */
   @Test
-  public void testSave() throws IOException {
+  public void testSave() throws IOException, MisoNamingException {
     Experiment experiment = new ExperimentImpl();
     experiment.setPlatform(new PlatformImpl());
     experiment.setStudy(new StudyImpl());
@@ -80,17 +79,9 @@ public class SQLExperimentDAOTest extends AbstractDAOTest {
     when(mockUser.getUserId()).thenReturn(1L);
 
     experiment.setLastModifier(mockUser);
-    long autoIncrementId = nextAutoIncrementId;
-    mockAutoIncrement(autoIncrementId);
-
+    experiment.setName(namingScheme.generateNameFor(experiment));
+    experiment.setTitle("Title");
     dao.save(experiment);
-    nextAutoIncrementId += 1;
-  }
-
-  private void mockAutoIncrement(long value) {
-    Map<String, Object> rs = new HashMap<>();
-    rs.put("Auto_increment", value);
-    Mockito.doReturn(rs).when(jdbcTemplate).queryForMap(Matchers.anyString());
   }
 
   /**
