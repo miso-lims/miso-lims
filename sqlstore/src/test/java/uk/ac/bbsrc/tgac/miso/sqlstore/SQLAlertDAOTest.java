@@ -20,7 +20,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -40,7 +39,6 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateAlertDao;
 public class SQLAlertDAOTest extends AbstractDAOTest {
 
   @Autowired
-  @Spy
   private JdbcTemplate template;
 
   @Mock
