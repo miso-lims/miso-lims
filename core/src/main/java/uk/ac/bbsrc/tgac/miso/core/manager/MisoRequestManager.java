@@ -2273,15 +2273,6 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Project lazyGetProjectById(long projectId) throws IOException {
-    if (projectStore != null) {
-      return projectStore.lazyGet(projectId);
-    } else {
-      throw new IOException("No projectStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
   public List<Run> getRunsByPool(Pool pool) throws IOException {
     return runStore.listByPoolId(pool.getId());
   }

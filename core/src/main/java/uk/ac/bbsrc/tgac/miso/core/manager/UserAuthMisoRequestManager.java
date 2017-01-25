@@ -1749,13 +1749,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Project lazyGetProjectById(long projectId) throws IOException {
-    Project o = backingManager.lazyGetProjectById(projectId);
-    if (readCheck(o)) return o;
-    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Project " + projectId);
-  }
-
-  @Override
   public List<Run> getRunsByPool(Pool pool) throws IOException {
     List<Run> runs = backingManager.getRunsByPool(pool);
     List<Run> authorizedRuns = new ArrayList<>();

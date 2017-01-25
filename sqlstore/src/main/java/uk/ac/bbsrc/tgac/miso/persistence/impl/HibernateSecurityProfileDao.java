@@ -70,11 +70,6 @@ public class HibernateSecurityProfileDao implements SecurityProfileStore {
   }
 
   @Override
-  public SecurityProfile lazyGet(long id) throws IOException {
-    return get(id);
-  }
-
-  @Override
   public Collection<SecurityProfile> listAll() throws IOException {
     Criteria critiera = currentSession().createCriteria(SecurityProfile.class);
     @SuppressWarnings("unchecked")

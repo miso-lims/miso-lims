@@ -43,7 +43,7 @@ public class DefaultSubprojectService implements SubprojectService {
   public Long create(Subproject subproject, Long parentProjectId) throws IOException {
     authorizationManager.throwIfNonAdmin();
     User user = authorizationManager.getCurrentUser();
-    Project parentProject = projectStore.lazyGet(parentProjectId);
+    Project parentProject = projectStore.get(parentProjectId);
     subproject.setCreatedBy(user);
     subproject.setUpdatedBy(user);
     subproject.setParentProject(parentProject);

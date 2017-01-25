@@ -670,7 +670,7 @@ public class EditSampleController {
         model.put("title", "New Sample");
 
         if (projectId != null) {
-          Project project = requestManager.lazyGetProjectById(projectId);
+          Project project = requestManager.getProjectById(projectId);
           if (project == null) throw new SecurityException("No such project.");
           model.addAttribute("project", project);
           sample.setProject(project);
@@ -696,7 +696,7 @@ public class EditSampleController {
         model.put("title", "Sample " + sampleId);
 
         if (projectId != null) {
-          Project project = requestManager.lazyGetProjectById(projectId);
+          Project project = requestManager.getProjectById(projectId);
           if (project == null) throw new SecurityException("No such project.");
           model.addAttribute("project", project);
           sample.setProject(project);

@@ -153,12 +153,6 @@ public class SQLPlatformDAOTest extends AbstractDAOTest {
   }
 
   @Test
-  public void testLazyGet() throws IOException {
-    Platform platform = dao.lazyGet(16L);
-    assertNotNull(platform);
-  }
-
-  @Test
   public void testSaveEdit() throws IOException {
     Platform oldPlatform = dao.get(16L);
 

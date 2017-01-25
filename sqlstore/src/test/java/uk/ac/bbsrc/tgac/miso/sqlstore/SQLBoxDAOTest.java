@@ -103,17 +103,6 @@ public class SQLBoxDAOTest extends AbstractDAOTest {
   }
 
   @Test
-  public void testLazyGet() throws Exception {
-    Box box = dao.lazyGet(2);
-    assertEquals("box2alias", box.getAlias());
-    assertEquals("box2", box.getName());
-    assertEquals(2, box.getId());
-    assertEquals("barcode2", box.getIdentificationBarcode());
-    assertEquals(4, box.getSize().getRows());
-    assertEquals("boxuse2", box.getUse().getAlias());
-  }
-
-  @Test
   public void testListAll() throws Exception {
     Collection<Box> boxes = dao.listAll();
     assertTrue(boxes.size() > 0);

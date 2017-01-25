@@ -475,8 +475,6 @@ public interface RequestManager {
 
   public Long countContainersBySearch(String querystr) throws IOException;
 
-  public Project lazyGetProjectById(long projectId) throws IOException;
-
   public List<Run> getRunsByPool(Pool pool) throws IOException;
 
   public void addRunWatcher(Run run, User watcher) throws IOException;

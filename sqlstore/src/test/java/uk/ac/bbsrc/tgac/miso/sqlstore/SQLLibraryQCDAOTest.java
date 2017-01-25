@@ -76,18 +76,6 @@ public class SQLLibraryQCDAOTest extends AbstractDAOTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryQCDAO#lazyGet(long)}.
-   * 
-   * @throws IOException
-   */
-  @Test
-  public void testLazyGet() throws IOException {
-    LibraryQC qc = dao.lazyGet(1L);
-    assertNotNull(qc);
-    assertEquals("admin", qc.getQcCreator());
-  }
-
-  /**
    * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryQCDAO#listByLibraryId(long)}.
    * 
    * @throws IOException

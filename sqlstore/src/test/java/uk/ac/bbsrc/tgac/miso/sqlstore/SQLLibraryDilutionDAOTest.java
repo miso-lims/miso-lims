@@ -72,18 +72,6 @@ public class SQLLibraryDilutionDAOTest extends AbstractDAOTest {
   }
 
   @Test
-  public void testLazyGet() throws IOException {
-    final LibraryDilution ld = dao.lazyGet(1L);
-    assertNotNull(ld);
-    assertEquals(1L, ld.getId());
-  }
-
-  @Test
-  public void testGetLazyNone() throws IOException {
-    assertNull(dao.lazyGet(100L));
-  }
-
-  @Test
   public void testCount() throws IOException {
     assertEquals(14, dao.count());
   }

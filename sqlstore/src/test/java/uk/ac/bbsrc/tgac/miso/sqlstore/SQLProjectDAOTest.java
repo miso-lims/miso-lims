@@ -232,17 +232,6 @@ public class SQLProjectDAOTest extends AbstractDAOTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateProjectDao#lazyGet(long)}.
-   * 
-   * @throws IOException
-   */
-  @Test
-  public void testLazyGet() throws IOException {
-    Project p = projectDAO.lazyGet(1);
-    assertNotNull(p);
-  }
-
-  /**
    * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateProjectDao#listBySearch(java.lang.String)} .
    */
   @Ignore

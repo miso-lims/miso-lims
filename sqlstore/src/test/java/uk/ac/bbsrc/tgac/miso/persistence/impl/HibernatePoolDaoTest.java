@@ -475,17 +475,6 @@ public class HibernatePoolDaoTest extends AbstractDAOTest {
   }
 
   @Test
-  public void testLazyGet() throws IOException {
-    Pool pool = dao.lazyGet(1L);
-    assertNotNull(pool);
-    assertEquals(1L, pool.getId());
-  }
-
-  @Test
-  public void testLazyGetNone() throws IOException {
-    assertNull(dao.lazyGet(100L));
-  }
-  @Test
   public void testListAllByPlatformAndSearchNoneForPlatformType() throws IOException {
     assertEquals(0, dao.listAllByCriteria(PlatformType.SOLID, "", null, false).size());
   }

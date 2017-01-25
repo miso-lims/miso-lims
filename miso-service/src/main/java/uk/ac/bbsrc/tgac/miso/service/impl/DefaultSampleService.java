@@ -469,7 +469,7 @@ public class DefaultSampleService implements SampleService {
    */
   private void loadChildEntities(Sample sample) throws IOException {
     if (sample.getProject() != null) {
-      sample.setProject(projectStore.lazyGet(sample.getProject().getId()));
+      sample.setProject(projectStore.get(sample.getProject().getId()));
     }
     if (isDetailedSample(sample)) {
       DetailedSample sai = (DetailedSample) sample;

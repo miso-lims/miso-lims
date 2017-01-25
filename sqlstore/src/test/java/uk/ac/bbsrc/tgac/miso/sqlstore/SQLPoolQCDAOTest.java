@@ -73,27 +73,6 @@ public class SQLPoolQCDAOTest extends AbstractDAOTest {
   }
   
   @Test
-  public void testLazyGet() throws IOException {
-    PoolQC qc = dao.lazyGet(1L);
-    assertNotNull(qc);
-    assertEquals(1L, qc.getId());
-    assertEquals("person", qc.getQcCreator());
-    assertEquals(Double.valueOf(12.3D), qc.getResults());
-    Calendar cal = Calendar.getInstance(); 
-    cal.set(2016, 2, 18, 0, 0, 0);
-    Calendar qcCal = Calendar.getInstance();
-    qcCal.setTime(qc.getQcDate());
-    assertEquals(cal.get(Calendar.YEAR), qcCal.get(Calendar.YEAR));
-    assertEquals(cal.get(Calendar.MONTH), qcCal.get(Calendar.MONTH));
-    assertEquals(cal.get(Calendar.DAY_OF_MONTH), qcCal.get(Calendar.DAY_OF_MONTH));
-  }
-  
-  @Test
-  public void testLazyGetNone() throws IOException {
-    assertNull(dao.lazyGet(100L));
-  }
-  
-  @Test
   public void testListAll() throws IOException {
     assertEquals(3, dao.listAll().size());
   }

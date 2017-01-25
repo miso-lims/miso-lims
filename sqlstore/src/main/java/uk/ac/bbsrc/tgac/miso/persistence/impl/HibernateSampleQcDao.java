@@ -52,11 +52,6 @@ public class HibernateSampleQcDao implements SampleQcStore {
   }
 
   @Override
-  public SampleQC lazyGet(long id) throws IOException {
-    return get(id);
-  }
-
-  @Override
   public Collection<SampleQC> listAll() throws IOException {
     Criteria criteria = currentSession().createCriteria(SampleQCImpl.class);
     @SuppressWarnings("unchecked")

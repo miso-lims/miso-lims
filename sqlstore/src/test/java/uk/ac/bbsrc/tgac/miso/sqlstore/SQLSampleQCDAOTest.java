@@ -145,18 +145,6 @@ public class SQLSampleQCDAOTest extends AbstractDAOTest {
   }
   
   @Test
-  public void testLazyGet() throws IOException {
-    SampleQC sampleQC = dao.lazyGet(1L);
-    assertNotNull(sampleQC);
-    assertEquals("admin", sampleQC.getQcCreator());
-  }
-  
-  @Test
-  public void testLazyGetNone() throws IOException {
-    assertNull(dao.get(9999L));
-  }
-  
-  @Test
   public void testSaveEdit() throws IOException, MalformedSampleException {
     SampleQC sampleQC = dao.get(1L);
     

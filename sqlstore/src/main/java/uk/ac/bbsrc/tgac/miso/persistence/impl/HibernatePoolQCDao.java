@@ -90,11 +90,6 @@ public class HibernatePoolQCDao implements PoolQcStore {
   }
 
   @Override
-  public PoolQC lazyGet(long qcId) throws IOException {
-    return get(qcId);
-  }
-
-  @Override
   public Collection<PoolQC> listAll() throws IOException {
     Criteria criteria = currentSession().createCriteria(PoolQCImpl.class);
     @SuppressWarnings("unchecked")

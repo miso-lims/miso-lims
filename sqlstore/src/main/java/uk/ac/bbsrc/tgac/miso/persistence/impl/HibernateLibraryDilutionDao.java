@@ -54,11 +54,6 @@ public class HibernateLibraryDilutionDao implements LibraryDilutionStore {
   }
 
   @Override
-  public LibraryDilution lazyGet(long id) throws IOException {
-    return get(id);
-  }
-
-  @Override
   public Collection<LibraryDilution> listAll() throws IOException {
     Criteria criteria = currentSession().createCriteria(LibraryDilution.class);
     @SuppressWarnings("unchecked")

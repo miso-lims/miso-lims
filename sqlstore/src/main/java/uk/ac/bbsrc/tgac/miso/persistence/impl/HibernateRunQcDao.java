@@ -52,11 +52,6 @@ public class HibernateRunQcDao implements RunQcStore {
   }
 
   @Override
-  public RunQC lazyGet(long id) throws IOException {
-    return get(id);
-  }
-
-  @Override
   public Collection<RunQC> listAll() throws IOException {
     Criteria criteria = currentSession().createCriteria(RunQCImpl.class);
     @SuppressWarnings("unchecked")

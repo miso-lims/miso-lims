@@ -77,11 +77,6 @@ public class HibernatePlatformDao implements PlatformStore {
   }
 
   @Override
-  public Platform lazyGet(long id) throws IOException {
-    return get(id);
-  }
-
-  @Override
   public List<Platform> listAll() throws IOException {
     Criteria criteria = currentSession().createCriteria(PlatformImpl.class);
     @SuppressWarnings("unchecked")
