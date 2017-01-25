@@ -68,6 +68,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.service.StudyService;
 
 /**
  * Created by IntelliJ IDEA. User: davey Date: 25-May-2010 Time: 16:39:52
@@ -81,6 +82,8 @@ public class ContainerControllerHelperService {
   private RequestManager requestManager;
   @Autowired
   private ExperimentService experimentService;
+  @Autowired
+  private StudyService studyService;
 
   public JSONObject getPlatformTypes(HttpSession session, JSONObject json) throws IOException {
     StringBuilder b = new StringBuilder();
@@ -500,7 +503,7 @@ public class ContainerControllerHelperService {
         sb.append("<div id='studySelectDiv" + partition + "_" + project.getProjectId() + "'>");
         sb.append(project.getAlias() + ": <select name='poolStudies" + partition + "_" + project.getProjectId() + "' id='poolStudies"
             + partition + "_" + project.getProjectId() + "'>");
-        Collection<Study> studies = requestManager.listAllStudiesByProjectId(project.getProjectId());
+        Collection<Study> studies = studyService.listByProjectId(project.getProjectId());
         if (studies.isEmpty()) {
           return JSONUtils.SimpleJSONError("No studies available on project " + project.getName()
               + ". At least one study must be available for each project associated with this Pool.");
@@ -557,7 +560,7 @@ public class ContainerControllerHelperService {
           b.append("<div id='studySelectDiv" + partition + "_" + project.getProjectId() + "'>");
           b.append(project.getAlias() + ": <select name='poolStudies" + partition + "_" + project.getProjectId() + "' id='poolStudies"
               + partition + "_" + project.getProjectId() + "'>");
-          Collection<Study> studies = requestManager.listAllStudiesByProjectId(project.getProjectId());
+          Collection<Study> studies = studyService.listByProjectId(project.getProjectId());
           if (studies.isEmpty()) {
             throw new Exception("No studies available on project " + project.getName()
                 + ". At least one study must be available for each project associated with this Pool.");
@@ -599,7 +602,7 @@ public class ContainerControllerHelperService {
       }
 
       Long studyId = json.getLong("studyId");
-      Study s = requestManager.getStudyById(studyId);
+      Study s = studyService.get(studyId);
       if (s == null) {
         throw new Exception("Could not retrieve study: " + studyId);
       }

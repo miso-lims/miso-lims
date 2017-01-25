@@ -92,6 +92,7 @@ import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.ReferenceGenomeService;
+import uk.ac.bbsrc.tgac.miso.service.StudyService;
 
 /**
  * Class that binds all the MISO model datatypes to the Spring form path types
@@ -121,6 +122,8 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
   private ExperimentService experimentService;
   @Autowired
   private IndexService indexService;
+  @Autowired
+  private StudyService studyService;
   @Autowired
   private LibraryService libraryService;
   @Autowired
@@ -419,7 +422,7 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
     new BindingConverterByPrefixedId<Study>(Study.class, Study.PREFIX) {
       @Override
       public Study resolveById(long id) throws Exception {
-        return requestManager.getStudyById(id);
+        return studyService.get(id);
       }
     }.register(binder, "study").register(binder, Set.class, "studies");
 

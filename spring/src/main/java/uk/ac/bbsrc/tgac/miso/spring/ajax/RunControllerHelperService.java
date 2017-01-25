@@ -80,6 +80,7 @@ import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.RunProcessingUtils;
+import uk.ac.bbsrc.tgac.miso.service.StudyService;
 
 /**
  * uk.ac.bbsrc.tgac.miso.spring.ajax
@@ -98,6 +99,8 @@ public class RunControllerHelperService {
   private RequestManager requestManager;
   @Autowired
   private MisoFilesManager misoFileManager;
+  @Autowired
+  private StudyService studyService;
 
   public void setMisoFileManager(MisoFilesManager misoFileManager) {
     this.misoFileManager = misoFileManager;
@@ -995,7 +998,7 @@ public class RunControllerHelperService {
         sb.append("<div id='studySelectDiv" + partition + "_" + project.getProjectId() + "'>");
         sb.append(project.getAlias() + ": <select name='poolStudies" + partition + "_" + project.getProjectId() + "' id='poolStudies"
             + partition + "_" + project.getProjectId() + "'>");
-        Collection<Study> studies = requestManager.listAllStudiesByProjectId(project.getProjectId());
+        Collection<Study> studies = studyService.listByProjectId(project.getProjectId());
         if (studies.isEmpty()) {
           return JSONUtils.SimpleJSONError("No studies available on project " + project.getName()
               + ". At least one study must be available for each project associated with this Pool.");
@@ -1050,7 +1053,7 @@ public class RunControllerHelperService {
           b.append("<div id='studySelectDiv" + partition + "_" + project.getProjectId() + "'>");
           b.append(project.getAlias() + ": <select name='poolStudies" + partition + "_" + project.getProjectId() + "' id='poolStudies"
               + partition + "_" + project.getProjectId() + "'>");
-          Collection<Study> studies = requestManager.listAllStudiesByProjectId(project.getProjectId());
+          Collection<Study> studies = studyService.listByProjectId(project.getProjectId());
           if (studies.isEmpty()) {
             throw new Exception("No studies available on project " + project.getName()
                 + ". At least one study must be available for each project associated with this Pool. Double click to add a different pool");

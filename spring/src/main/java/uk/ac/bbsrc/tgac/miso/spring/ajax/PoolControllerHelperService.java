@@ -81,6 +81,7 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.PrinterService;
+import uk.ac.bbsrc.tgac.miso.service.StudyService;
 import uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils;
 import uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils.BarcodePrintAssister;
 
@@ -107,6 +108,8 @@ public class PoolControllerHelperService {
   private ExperimentService experimentService;
   @Autowired
   private LibraryDilutionService dilutionService;
+  @Autowired
+  private StudyService studyService;
 
   public JSONObject getPoolQcTypes(HttpSession session, JSONObject json) {
     try {
@@ -466,7 +469,7 @@ public class PoolControllerHelperService {
       Pool p = requestManager.getPoolById(poolId);
 
       Long studyId = json.getLong("studyId");
-      Study s = requestManager.getStudyById(studyId);
+      Study s = studyService.get(studyId);
 
       if (json.has("runId") && json.get("runId") != null) {
         Long runId = json.getLong("runId");

@@ -42,8 +42,6 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
-import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.StudyStore;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
@@ -68,20 +66,12 @@ public class HibernateStudyDao implements StudyStore {
   @Autowired
   private SessionFactory sessionFactory;
 
-  @Autowired
-  private NamingScheme namingScheme;
-
   public SessionFactory getSessionFactory() {
     return sessionFactory;
   }
 
   public void setSessionFactory(SessionFactory sessionFactory) {
     this.sessionFactory = sessionFactory;
-  }
-
-  @Override
-  public void setNamingScheme(NamingScheme namingScheme) {
-    this.namingScheme = namingScheme;
   }
 
   @CoverageIgnore
@@ -101,12 +91,7 @@ public class HibernateStudyDao implements StudyStore {
   public long save(Study study) throws IOException {
     long id;
     if (study.getId() == StudyImpl.UNSAVED_ID) {
-      try {
-      namingScheme.generateNameFor(study);
       id = (Long) currentSession().save(study);
-      } catch (MisoNamingException e) {
-        throw new IOException(e);
-      }
     } else {
       currentSession().update(study);
       id = study.getId();
@@ -176,5 +161,10 @@ public class HibernateStudyDao implements StudyStore {
   @Override
   public Map<String, Integer> getStudyColumnSizes() throws IOException {
     return DbUtils.getColumnSizes(template, TABLE_NAME);
+  }
+
+  @Override
+  public StudyType getType(long id) {
+    return (StudyType) currentSession().get(StudyType.class, id);
   }
 }

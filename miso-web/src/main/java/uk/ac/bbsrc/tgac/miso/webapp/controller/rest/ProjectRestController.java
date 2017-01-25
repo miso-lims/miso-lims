@@ -63,6 +63,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.jackson.UserInfoMixin;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.SampleGroupService;
+import uk.ac.bbsrc.tgac.miso.service.StudyService;
 
 /**
  * A controller to handle all REST requests for Projects
@@ -85,6 +86,8 @@ public class ProjectRestController extends RestController {
   private SampleGroupService sampleGroupService;
   @Autowired
   private LibraryDilutionService dilutionService;
+  @Autowired
+  private StudyService studyService;
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
@@ -174,7 +177,7 @@ public class ProjectRestController extends RestController {
     Collection<Project> lp = requestManager.listAllProjects();
     for (Project p : lp) {
       p.setSamples(requestManager.listAllSamplesByProjectId(p.getProjectId()));
-      p.setStudies(requestManager.listAllStudiesByProjectId(p.getProjectId()));
+      p.setStudies(studyService.listByProjectId(p.getProjectId()));
     }
 
     ObjectMapper mapper = new ObjectMapper();

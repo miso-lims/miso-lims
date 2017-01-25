@@ -49,6 +49,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.service.StudyService;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.EditProjectController;
 
 /**
@@ -67,6 +68,8 @@ public class ProjectD3GraphController {
   private ExperimentService experimentService;
   @Autowired
   private LibraryService libraryService;
+  @Autowired
+  private StudyService studyService;
 
   @RequestMapping(value = "{projectId}", method = RequestMethod.GET)
   public @ResponseBody JSONObject d3graphRest(@PathVariable Long projectId) throws IOException {
@@ -80,7 +83,7 @@ public class ProjectD3GraphController {
       JSONArray projectChildrenArray = new JSONArray();
       Collection<Sample> samples = requestManager.listAllSamplesByProjectId(p.getProjectId());
       Collection<Run> runs = requestManager.listAllRunsByProjectId(p.getProjectId());
-      Collection<Study> studies = requestManager.listAllStudiesByProjectId(p.getProjectId());
+      Collection<Study> studies = studyService.listByProjectId(p.getProjectId());
 
       JSONObject runJSON = new JSONObject();
       JSONArray runsArray = new JSONArray();

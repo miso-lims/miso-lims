@@ -52,6 +52,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.service.StudyService;
 
 @Controller
 @RequestMapping("/experimentwizard")
@@ -68,6 +69,10 @@ public class ExperimentWizardController {
   @Autowired
   private ExperimentService experimentService;
 
+  @Autowired
+  private StudyService studyService;
+
+
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
   }
@@ -78,7 +83,7 @@ public class ExperimentWizardController {
 
   @ModelAttribute("studyTypes")
   public Collection<StudyType> populateStudyTypes() throws IOException {
-    return requestManager.listAllStudyTypes();
+    return studyService.listTypes();
   }
 
   @ModelAttribute("maxLengths")
@@ -118,7 +123,7 @@ public class ExperimentWizardController {
         a.append("<option value=\"" + platform.getId() + "\">" + platform.getNameAndModel() + "</option>");
       }
 
-      for (StudyType st : requestManager.listAllStudyTypes()) {
+      for (StudyType st : studyService.listTypes()) {
         b.append("<option value=\"" + st.getId() + "\">" + st.getName() + "</option>");
       }
 

@@ -36,10 +36,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
-
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.service.StudyService;
 
 /**
  * com.eaglegenomics.miso.web
@@ -54,18 +52,7 @@ public class ListStudiesController {
   protected static final Logger log = LoggerFactory.getLogger(ListStudiesController.class);
 
   @Autowired
-  private SecurityManager securityManager;
-
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
-
-  @Autowired
-  private RequestManager requestManager;
-
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
+  private StudyService studyService;
 
   @ModelAttribute("title")
   public String title() {
@@ -74,7 +61,7 @@ public class ListStudiesController {
 
   @RequestMapping(value = "/studies/rest/", method = RequestMethod.GET)
   public @ResponseBody Collection<Study> jsonRest() throws IOException {
-    return requestManager.listAllStudies();
+    return studyService.list();
   }
 
   @RequestMapping("/studies")

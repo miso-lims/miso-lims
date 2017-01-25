@@ -71,8 +71,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
-import uk.ac.bbsrc.tgac.miso.core.data.Study;
-import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
@@ -117,7 +115,6 @@ import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerReferenceStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerServiceRecordStore;
 import uk.ac.bbsrc.tgac.miso.core.store.StatusStore;
-import uk.ac.bbsrc.tgac.miso.core.store.StudyStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SubmissionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.TargetedSequencingStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -173,8 +170,6 @@ public class MisoRequestManager implements RequestManager {
   private SequencerServiceRecordStore sequencerServiceRecordStore;
   @Autowired
   private StatusStore statusStore;
-  @Autowired
-  private StudyStore studyStore;
   @Autowired
   private SubmissionStore submissionStore;
   @Autowired
@@ -282,10 +277,6 @@ public class MisoRequestManager implements RequestManager {
 
   public void setStatusStore(StatusStore statusStore) {
     this.statusStore = statusStore;
-  }
-
-  public void setStudyStore(StudyStore studyStore) {
-    this.studyStore = studyStore;
   }
 
   public void setSubmissionStore(SubmissionStore submissionStore) {
@@ -656,42 +647,6 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Study> listAllStudies() throws IOException {
-    if (studyStore != null) {
-      return studyStore.listAll();
-    } else {
-      throw new IOException("No studyStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<Study> listAllStudiesWithLimit(long limit) throws IOException {
-    if (studyStore != null) {
-      return studyStore.listAllWithLimit(limit);
-    } else {
-      throw new IOException("No studyStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<Study> listAllStudiesBySearch(String query) throws IOException {
-    if (studyStore != null) {
-      return studyStore.listBySearch(query);
-    } else {
-      throw new IOException("No studyStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<Study> listAllStudiesByProjectId(long projectId) throws IOException {
-    if (studyStore != null) {
-      return studyStore.listByProjectId(projectId);
-    } else {
-      throw new IOException("No studyStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
   public Collection<SequencerPartitionContainer<SequencerPoolPartition>> listSequencerPartitionContainersByRunId(long runId)
       throws IOException {
     if (sequencerPartitionContainerStore != null) {
@@ -762,15 +717,6 @@ public class MisoRequestManager implements RequestManager {
       return platforms;
     } else {
       throw new IOException("No platformStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<StudyType> listAllStudyTypes() throws IOException {
-    if (studyStore != null) {
-      return studyStore.listAllStudyTypes();
-    } else {
-      throw new IOException("No studyStore available. Check that it has been declared in the Spring config.");
     }
   }
 
@@ -892,17 +838,6 @@ public class MisoRequestManager implements RequestManager {
   }
 
   // DELETES
-
-  @Override
-  public void deleteStudy(Study study) throws IOException {
-    if (studyStore != null) {
-      if (!studyStore.remove(study)) {
-        throw new IOException("Unable to delete Study. Make sure the study has no child entitites.");
-      }
-    } else {
-      throw new IOException("No studyStore available. Check that it has been declared in the Spring config.");
-    }
-  }
 
   @Override
   public void deleteSample(Sample sample) throws IOException {
@@ -1311,16 +1246,6 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public long saveStudy(Study study) throws IOException {
-    if (studyStore != null) {
-      // TODO: when moved to Service: get Hibernate-managed StudyType from db by name
-      return studyStore.save(study);
-    } else {
-      throw new IOException("No studyStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
   public long saveSequencerPartitionContainer(SequencerPartitionContainer<SequencerPoolPartition> container) throws IOException {
     if (sequencerPartitionContainerStore != null) {
       if (container.getId() == AbstractSequencerPartitionContainer.UNSAVED_ID) {
@@ -1578,15 +1503,6 @@ public class MisoRequestManager implements RequestManager {
       return poolStore.getByBarcode(barcode);
     } else {
       throw new IOException("No poolStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Study getStudyById(long studyId) throws IOException {
-    if (studyStore != null) {
-      return studyStore.get(studyId);
-    } else {
-      throw new IOException("No studyStore available. Check that it has been declared in the Spring config.");
     }
   }
 
@@ -2029,15 +1945,6 @@ public class MisoRequestManager implements RequestManager {
       return sampleStore.getSampleColumnSizes();
     } else {
       throw new IOException("No sampleStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Map<String, Integer> getStudyColumnSizes() throws IOException {
-    if (studyStore != null) {
-      return studyStore.getStudyColumnSizes();
-    } else {
-      throw new IOException("No studyStore available. Check that it has been declared in the Spring config.");
     }
   }
 

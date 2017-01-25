@@ -154,6 +154,16 @@ public class DefaultMigrationTarget implements MigrationTarget {
 
   public void saveProjects(Collection<Project> projects) throws IOException {
     log.info("Migrating projects...");
+    StudyType other = null;
+    for (StudyType st : serviceManager.getStudyDao().listAllStudyTypes()) {
+      if (st.getName().equals("Other")) {
+        other = st;
+        break;
+      }
+    }
+    if (other == null) {
+      throw new IllegalStateException("Cannot find “other” study type.");
+    }
     for (Project project : projects) {
       project.setSecurityProfile(new SecurityProfile(migrationUser));
       valueTypeLookup.resolveAll(project);
@@ -163,9 +173,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
         Study study = new StudyImpl();
         study.setAlias((project.getShortName() == null ? project.getAlias() : project.getShortName()) + " study");
         study.setDescription("");
-        StudyType sType = new StudyType();
-        sType.setName("Other");
-        study.setStudyType(sType);
+        study.setStudyType(other);
         study.setLastModifier(migrationUser);
         project.getStudies().add(study);
       }

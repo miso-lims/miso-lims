@@ -54,8 +54,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
-import uk.ac.bbsrc.tgac.miso.core.data.Study;
-import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
@@ -96,8 +94,6 @@ public interface RequestManager {
   public long savePoolQC(PoolQC poolQC) throws IOException;
 
   public void savePoolNote(Pool pool, Note note) throws IOException;
-
-  public long saveStudy(Study study) throws IOException;
 
   public long saveSequencerPartitionContainer(SequencerPartitionContainer<SequencerPoolPartition> container) throws IOException;
 
@@ -158,8 +154,6 @@ public interface RequestManager {
 
   public Status getStatusByRunName(String runName) throws IOException;
 
-  public Study getStudyById(long studyId) throws IOException;
-
   public Submission getSubmissionById(long submissionId) throws IOException;
 
   public SequencerReference getSequencerReferenceById(long referenceId) throws IOException;
@@ -215,12 +209,6 @@ public interface RequestManager {
   public Collection<Project> listAllProjectsBySearch(String query) throws IOException;
 
   public Collection<ProjectOverview> listAllOverviewsByProjectId(long projectId) throws IOException;
-
-  public Collection<Study> listAllStudies() throws IOException;
-
-  public Collection<Study> listAllStudiesWithLimit(long limit) throws IOException;
-
-  public Collection<Study> listAllStudiesBySearch(String query) throws IOException;
 
   public Collection<Box> listAllBoxes() throws IOException;
 
@@ -303,11 +291,6 @@ public interface RequestManager {
   public Collection<Pool> listPoolsByLibraryId(long libraryId) throws IOException;
 
   /**
-   * Obtain a list of all the Studys the user has access to. Access is defined as either read or write access.
-   */
-  public Collection<Study> listAllStudiesByProjectId(long projectId) throws IOException;
-
-  /**
    * Obtain a list of all the Platforms
    */
   public Collection<Platform> listAllPlatforms() throws IOException;
@@ -330,10 +313,6 @@ public interface RequestManager {
 
   public Collection<BoxSize> listAllBoxSizes() throws IOException;
 
-  /**
-   * Obtain a list of all the StudyTypes
-   */
-  public Collection<StudyType> listAllStudyTypes() throws IOException;
 
   public Collection<Submission> listAllSubmissions() throws IOException;
 
@@ -375,7 +354,6 @@ public interface RequestManager {
   public void discardAllTubes(Box box) throws IOException;
 
   // DELETES
-  public void deleteStudy(Study study) throws IOException;
 
   public void deleteSample(Sample sample) throws IOException;
 
@@ -419,8 +397,6 @@ public interface RequestManager {
   public Map<String, Integer> getRunColumnSizes() throws IOException;
 
   public Map<String, Integer> getSampleColumnSizes() throws IOException;
-
-  public Map<String, Integer> getStudyColumnSizes() throws IOException;
 
   public Map<String, Integer> getSequencerReferenceColumnSizes() throws IOException;
 

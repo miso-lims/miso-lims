@@ -502,34 +502,7 @@ public class UserAuthMisoRequestManagerTestSuite {
     verify(backingManager, never()).savePoolQC(poolQC);
   }
 
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveStudy(uk.ac.bbsrc.tgac.miso.core.data.Study)}
-   * .
-   */
-  @Test
-  public void testSaveStudy() throws IOException {
-    final long expectedReturn = 1L;
-    when(study.userCanWrite(any(User.class))).thenReturn(true);
-    when(backingManager.saveStudy(study)).thenReturn(expectedReturn);
 
-    assertEquals(expectedReturn, userAuthMisoRequestManager.saveStudy(study));
-    verify(backingManager).saveStudy(study);
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveStudy(uk.ac.bbsrc.tgac.miso.core.data.Study)}
-   * .
-   */
-  @Test
-  public void testSaveStudyThrows() throws IOException {
-    when(study.userCanWrite(any(User.class))).thenReturn(false);
-
-    thrown.expect(IOException.class);
-    thrown.expectMessage("User null cannot write to this Study");
-    userAuthMisoRequestManager.saveStudy(study);
-
-    verify(backingManager, never()).saveStudy(study);
-  }
 
   /**
    * Test method for
@@ -1172,36 +1145,6 @@ public class UserAuthMisoRequestManagerTestSuite {
     verify(backingManager).getStatusByRunName(runName);
   }
 
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getStudyById(long)} .
-   */
-  @Test
-  public void testGetStudyById() throws IOException {
-    long id = 1L;
-    when(backingManager.getStudyById(id)).thenReturn(study);
-    when(study.userCanRead(any(User.class))).thenReturn(true);
-
-    assertEquals(study, userAuthMisoRequestManager.getStudyById(id));
-
-    verify(backingManager).getStudyById(id);
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getStudyById(long)} .
-   */
-  @Test
-  public void testGetStudyByIdThrows() throws IOException {
-    long id = 1L;
-    when(backingManager.getStudyById(id)).thenReturn(study);
-    when(study.userCanRead(any(User.class))).thenReturn(false);
-
-    thrown.expect(IOException.class);
-    thrown.expectMessage("User null cannot read Study " + id);
-
-    userAuthMisoRequestManager.getStudyById(id);
-
-    verify(backingManager).getStudyById(id);
-  }
 
   /**
    * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getSubmissionById(long)} .
