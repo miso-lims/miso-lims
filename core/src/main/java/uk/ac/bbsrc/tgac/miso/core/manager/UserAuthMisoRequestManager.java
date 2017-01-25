@@ -78,7 +78,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
-import uk.ac.bbsrc.tgac.miso.core.event.Alert;
 import uk.ac.bbsrc.tgac.miso.core.exception.AuthorizationIOException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
@@ -1172,15 +1171,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public long saveAlert(Alert alert) throws IOException {
-    if (getCurrentUser().isInternal()) {
-      return backingManager.saveAlert(alert);
-    } else {
-      throw new IOException("User " + getCurrentUser().getFullName() + " cannot write to this Alert");
-    }
-  }
-
-  @Override
   public long saveBox(Box box) throws IOException {
     if (writeCheck(box)) {
       return backingManager.saveBox(box);
@@ -1298,11 +1288,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   @Override
   public QcType getPoolQcTypeByName(String qcName) throws IOException {
     return backingManager.getPoolQcTypeByName(qcName);
-  }
-
-  @Override
-  public Alert getAlertById(long alertId) throws IOException {
-    return backingManager.getAlertById(alertId);
   }
 
   @Override
@@ -1459,24 +1444,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   @Override
   public Collection<Status> listAllStatusBySequencerName(String sequencerName) throws IOException {
     return backingManager.listAllStatusBySequencerName(sequencerName);
-  }
-
-  @Override
-  public Collection<Alert> listUnreadAlertsByUserId(long userId) throws IOException {
-    if (getCurrentUser().getUserId() == userId || getCurrentUser().isInternal()) return backingManager.listUnreadAlertsByUserId(userId);
-    else return null;
-  }
-
-  @Override
-  public Collection<Alert> listAlertsByUserId(long userId) throws IOException {
-    if (getCurrentUser().getUserId() == userId || getCurrentUser().isInternal()) return backingManager.listAlertsByUserId(userId);
-    else return null;
-  }
-
-  @Override
-  public Collection<Alert> listAlertsByUserId(long userId, long limit) throws IOException {
-    if (getCurrentUser().getUserId() == userId || getCurrentUser().isInternal()) return backingManager.listAlertsByUserId(userId, limit);
-    else return null;
   }
 
   @Override

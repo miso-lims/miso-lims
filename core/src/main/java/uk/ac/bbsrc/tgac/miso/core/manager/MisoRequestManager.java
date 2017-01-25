@@ -86,7 +86,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
-import uk.ac.bbsrc.tgac.miso.core.event.Alert;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.PoolAlertManager;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.ProjectAlertManager;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.RunAlertManager;
@@ -892,33 +891,6 @@ public class MisoRequestManager implements RequestManager {
     }
   }
 
-  @Override
-  public Collection<Alert> listUnreadAlertsByUserId(long userId) throws IOException {
-    if (alertStore != null) {
-      return alertStore.listUnreadByUserId(userId);
-    } else {
-      throw new IOException("No alertStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<Alert> listAlertsByUserId(long userId) throws IOException {
-    if (alertStore != null) {
-      return alertStore.listByUserId(userId);
-    } else {
-      throw new IOException("No alertStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<Alert> listAlertsByUserId(long userId, long limit) throws IOException {
-    if (alertStore != null) {
-      return alertStore.listByUserId(userId, limit);
-    } else {
-      throw new IOException("No alertStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
   // DELETES
 
   @Override
@@ -1440,15 +1412,6 @@ public class MisoRequestManager implements RequestManager {
     }
   }
 
-  @Override
-  public long saveAlert(Alert alert) throws IOException {
-    if (alertStore != null) {
-      return alertStore.save(alert);
-    } else {
-      throw new IOException("No alertStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
   // GETS
   @Override
   public Project getProjectById(long projectId) throws IOException {
@@ -1822,15 +1785,6 @@ public class MisoRequestManager implements RequestManager {
       return poolQcStore.getPoolQcTypeByName(qcName);
     } else {
       throw new IOException("No poolQcStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Alert getAlertById(long alertId) throws IOException {
-    if (alertStore != null) {
-      return alertStore.get(alertId);
-    } else {
-      throw new IOException("No alertStore available. Check that it has been declared in the Spring config.");
     }
   }
 

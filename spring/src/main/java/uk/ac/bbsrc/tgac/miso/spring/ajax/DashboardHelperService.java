@@ -64,9 +64,11 @@ import uk.ac.bbsrc.tgac.miso.core.event.type.AlertLevel;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.MisoAuthority;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.service.AlertService;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationException;
 
 /**
  * uk.ac.bbsrc.tgac.miso.miso.spring.ajax
@@ -84,6 +86,8 @@ public class DashboardHelperService {
   private SecurityManager securityManager;
   @Autowired
   private RequestManager requestManager;
+  @Autowired
+  private AlertService alertService;
   @Autowired
   private ExperimentService experimentService;
   @Autowired
@@ -422,7 +426,7 @@ public class DashboardHelperService {
     JSONObject response = new JSONObject();
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      if (!requestManager.listUnreadAlertsByUserId(user.getUserId()).isEmpty()) {
+      if (!alertService.listUnreadByUserId(user.getUserId()).isEmpty()) {
         response.put("newAlerts", true);
       }
     } catch (IOException e) {
@@ -439,9 +443,9 @@ public class DashboardHelperService {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       List<Alert> alerts;
       if (json.has("showReadAlerts") && json.getBoolean("showReadAlerts")) {
-        alerts = new ArrayList<>(requestManager.listAlertsByUserId(user.getUserId()));
+        alerts = new ArrayList<>(alertService.listByUserId(user.getUserId()));
       } else {
-        alerts = new ArrayList<>(requestManager.listUnreadAlertsByUserId(user.getUserId()));
+        alerts = new ArrayList<>(alertService.listUnreadByUserId(user.getUserId()));
       }
       Collections.sort(alerts);
       for (Alert a : alerts) {
@@ -475,7 +479,7 @@ public class DashboardHelperService {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       if (user.isAdmin()) {
-        List<Alert> alerts = new ArrayList<>(requestManager.listAlertsByUserId(0L, limit));
+        List<Alert> alerts = new ArrayList<>(alertService.listByUserId(0L, limit));
         Collections.sort(alerts);
         Collections.reverse(alerts);
         for (Alert a : alerts) {
@@ -504,12 +508,11 @@ public class DashboardHelperService {
   public JSONObject setAlertAsRead(HttpSession session, JSONObject json) {
     Long alertId = json.getLong("alertId");
     try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Alert a = requestManager.getAlertById(alertId);
-      if (a.getAlertUser().equals(user)) {
+      Alert a = alertService.get(alertId);
+      try {
         a.setAlertRead(true);
-        requestManager.saveAlert(a);
-      } else {
+        alertService.save(a);
+      } catch (AuthorizationException e) {
         return JSONUtils.SimpleJSONError("You do not have the rights to set this alert as read");
       }
     } catch (IOException e) {
@@ -523,12 +526,12 @@ public class DashboardHelperService {
 
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      List<Alert> alerts = new ArrayList<>(requestManager.listUnreadAlertsByUserId(user.getUserId()));
+      List<Alert> alerts = new ArrayList<>(alertService.listUnreadByUserId(user.getUserId()));
       for (Alert a : alerts) {
-        if (a.getAlertUser().equals(user)) {
+        try {
           a.setAlertRead(true);
-          requestManager.saveAlert(a);
-        } else {
+          alertService.save(a);
+        } catch (AuthorizationException e) {
           return JSONUtils.SimpleJSONError("You do not have the rights to set this alert as read");
         }
       }

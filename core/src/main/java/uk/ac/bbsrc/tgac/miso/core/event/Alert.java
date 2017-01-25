@@ -68,6 +68,8 @@ public interface Alert extends Comparable<Alert>, Deletable {
 
   public User getAlertUser();
 
+  public void setAlertUser(User user);
+
   public Date getAlertDate();
 
   public void setAlertDate(Date date);
