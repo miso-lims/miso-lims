@@ -296,7 +296,7 @@ public class FlexReportingControllerHelperService {
           }
 
         }
-        for (Library library : libraryService.getAllByProjectId(project.getProjectId())) {
+        for (Library library : libraryService.listByProjectId(project.getProjectId())) {
           if (!librariesInRun.contains(library)) {
             Sample sample = library.getSample();
             jsonArray.add("['" + project.getName() + "','" + sample.getName() + "','" + library.getName() + "','NA','NA','NA']");
@@ -706,7 +706,7 @@ public class FlexReportingControllerHelperService {
       Date startDate = df.parse(from);
       Date endDate = df.parse(to);
       if (!isStringEmptyOrNull(searchStr)) {
-        libraries = libraryService.getAllBySearch(searchStr);
+        libraries = libraryService.listBySearch(searchStr);
       } else {
         libraries = libraryService.searchByCreationDate(startDate, endDate);
       }
@@ -1141,7 +1141,7 @@ public class FlexReportingControllerHelperService {
       sampleJSON.put("name", "Samples");
       sampleJSON.put("description", "");
       for (Sample sample : samples) {
-        Collection<Library> libraries = libraryService.getAllBySampleId(sample.getId());
+        Collection<Library> libraries = libraryService.listBySampleId(sample.getId());
         if (libraries.size() == 0) {
           if (sample.getQcPassed()) {
             samplesArray

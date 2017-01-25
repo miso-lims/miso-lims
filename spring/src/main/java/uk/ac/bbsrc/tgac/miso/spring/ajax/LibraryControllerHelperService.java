@@ -137,7 +137,7 @@ public class LibraryControllerHelperService {
 
     @Override
     public Iterable<LibraryDilution> fetchAll(long projectId) throws IOException {
-      return dilutionService.getAllByProjectId(projectId);
+      return dilutionService.listByProjectId(projectId);
     }
   }
 
@@ -171,7 +171,7 @@ public class LibraryControllerHelperService {
 
     @Override
     public Iterable<Library> fetchAll(long projectId) throws IOException {
-      return libraryService.getAllByProjectId(projectId);
+      return libraryService.listByProjectId(projectId);
     }
   }
 
@@ -493,7 +493,7 @@ public class LibraryControllerHelperService {
 
         StringBuilder libsb = new StringBuilder();
         List<LibraryType> types = new ArrayList<>();
-        for (LibraryType type : libraryService.getAllLibraryTypesByPlatform(PlatformType.get(platform))) {
+        for (LibraryType type : libraryService.listLibraryTypesByPlatform(PlatformType.get(platform))) {
           if (!type.getArchived() || type.getId() == originalLibraryTypeId) {
             types.add(type);
           }
@@ -550,7 +550,7 @@ public class LibraryControllerHelperService {
   public JSONObject getLibraryQcTypes(HttpSession session, JSONObject json) {
     try {
       StringBuilder sb = new StringBuilder();
-      Collection<QcType> types = libraryService.getAllLibraryQcTypes();
+      Collection<QcType> types = libraryService.listLibraryQcTypes();
       for (QcType s : types) {
         sb.append("<option units='" + s.getUnits() + "' value='" + s.getQcTypeId() + "'>" + s.getName() + "</option>");
       }

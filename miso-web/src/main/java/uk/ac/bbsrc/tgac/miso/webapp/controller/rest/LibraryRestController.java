@@ -112,7 +112,7 @@ public class LibraryRestController extends RestController {
 
   @RequestMapping(method = RequestMethod.GET, produces = "application/json")
   public @ResponseBody String listAllLibraries() throws IOException {
-    Collection<Library> libraries = libraryService.getAll();
+    Collection<Library> libraries = libraryService.list();
     ObjectMapper mapper = new ObjectMapper();
     mapper.getSerializationConfig().addMixInAnnotations(Project.class, ProjectSampleRecursionAvoidanceMixin.class);
     mapper.getSerializationConfig().addMixInAnnotations(Sample.class, SampleRecursionAvoidanceMixin.class);
@@ -182,10 +182,10 @@ public class LibraryRestController extends RestController {
       Long numMatches;
 
       if (!isStringEmptyOrNull(sSearch)) {
-        librarySubset = libraryService.getAllByPageSizeAndSearch(iDisplayStart, iDisplayLength, sSearch, sSortDir, sortCol);
+        librarySubset = libraryService.listByPageSizeAndSearch(iDisplayStart, iDisplayLength, sSearch, sSortDir, sortCol);
         numMatches = Long.valueOf(libraryService.countBySearch(sSearch));
       } else {
-        librarySubset = libraryService.getAllByPageAndSize(iDisplayStart, iDisplayLength, sSortDir, sortCol);
+        librarySubset = libraryService.listByPageAndSize(iDisplayStart, iDisplayLength, sSortDir, sortCol);
         numMatches = numLibraries;
       }
       List<LibraryDto> libraryDtos = Dtos.asLibraryDtos(librarySubset);

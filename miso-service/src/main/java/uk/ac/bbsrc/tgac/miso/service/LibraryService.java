@@ -30,33 +30,33 @@ public interface LibraryService {
 
   long countBySearch(String querystr) throws IOException;
 
-  List<Library> getAll() throws IOException;
+  List<Library> list() throws IOException;
 
-  List<Library> getAllByPageAndSize(int offset, int size, String sortDir, String sortCol) throws IOException;
+  List<Library> listByPageAndSize(int offset, int size, String sortDir, String sortCol) throws IOException;
 
-  List<Library> getAllByPageSizeAndSearch(int offset, int size, String querystr, String sortDir, String sortCol) throws IOException;
+  List<Library> listByPageSizeAndSearch(int offset, int size, String querystr, String sortDir, String sortCol) throws IOException;
 
   Library getAdjacentLibrary(long libraryId, boolean before) throws IOException;
 
   Library getByBarcode(String barcode) throws IOException;
 
-  List<Library> getAllByBarcodeList(List<String> barcodeList) throws IOException;
+  List<Library> listByBarcodeList(List<String> barcodeList) throws IOException;
 
-  List<Library> getAllByIdList(List<Long> idList) throws IOException;
+  List<Library> listByIdList(List<Long> idList) throws IOException;
 
   Library getByPositionId(long positionId) throws IOException;
 
-  List<Library> getAllBySearch(String querystr) throws IOException;
+  List<Library> listBySearch(String querystr) throws IOException;
 
-  List<Library> getAllByAlias(String alias) throws IOException;
+  List<Library> listByAlias(String alias) throws IOException;
 
-  List<Library> getAllWithLimit(long limit) throws IOException;
+  List<Library> listWithLimit(long limit) throws IOException;
 
   List<Library> searchByCreationDate(Date from, Date to) throws IOException;
 
-  List<Library> getAllBySampleId(long sampleId) throws IOException;
+  List<Library> listBySampleId(long sampleId) throws IOException;
 
-  List<Library> getAllByProjectId(long projectId) throws IOException;
+  List<Library> listByProjectId(long projectId) throws IOException;
 
   Map<String, Integer> getLibraryColumnSizes() throws IOException;
 
@@ -64,27 +64,27 @@ public interface LibraryService {
 
   LibraryType getLibraryTypeByDescriptionAndPlatform(String description, PlatformType platformType) throws IOException;
 
-  Collection<LibraryType> getAllLibraryTypes() throws IOException;
+  Collection<LibraryType> listLibraryTypes() throws IOException;
 
-  Collection<LibraryType> getAllLibraryTypesByPlatform(PlatformType platformType) throws IOException;
+  Collection<LibraryType> listLibraryTypesByPlatform(PlatformType platformType) throws IOException;
 
   LibrarySelectionType getLibrarySelectionTypeById(Long librarySelectionTypeId) throws IOException;
 
   LibrarySelectionType getLibrarySelectionTypeByName(String name) throws IOException;
 
-  Collection<LibrarySelectionType> getAllLibrarySelectionTypes() throws IOException;
+  Collection<LibrarySelectionType> listLibrarySelectionTypes() throws IOException;
 
   LibraryStrategyType getLibraryStrategyTypeById(long libraryStrategyTypeId) throws IOException;
 
   LibraryStrategyType getLibraryStrategyTypeByName(String name) throws IOException;
 
-  Collection<LibraryStrategyType> getAllLibraryStrategyTypes() throws IOException;
+  Collection<LibraryStrategyType> listLibraryStrategyTypes() throws IOException;
 
   void addNote(Library library, Note note) throws IOException;
 
   void deleteNote(Library library, Long noteId) throws IOException;
 
-  Collection<QcType> getAllLibraryQcTypes() throws IOException;
+  Collection<QcType> listLibraryQcTypes() throws IOException;
 
   void addQc(Library library, LibraryQC qc) throws IOException;
 

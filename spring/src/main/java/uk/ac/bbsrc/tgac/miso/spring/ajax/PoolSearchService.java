@@ -149,11 +149,11 @@ public class PoolSearchService {
       if (searchStr.length() > 1) {
         StringBuilder b = new StringBuilder();
         List<? extends Dilution> dilutions = new ArrayList<>(
-            dilutionService.getAllBySearchAndPlatform(searchStr, PlatformType.valueOf(platformType)));
+            dilutionService.listBySearchAndPlatform(searchStr, PlatformType.valueOf(platformType)));
         if (dilutions.isEmpty()) {
           // Base64-encoded string, most likely a barcode image beeped in. decode and search
           dilutions = new ArrayList<>(dilutionService
-              .getAllBySearchAndPlatform(new String(Base64.decodeBase64(searchStr)), PlatformType.valueOf(platformType)));
+              .listBySearchAndPlatform(new String(Base64.decodeBase64(searchStr)), PlatformType.valueOf(platformType)));
 
         }
         int numMatches = 0;

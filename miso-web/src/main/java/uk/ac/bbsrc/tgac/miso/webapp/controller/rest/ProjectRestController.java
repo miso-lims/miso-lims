@@ -119,7 +119,7 @@ public class ProjectRestController extends RestController {
     }
     for (Sample s : project.getSamples()) {
       if (s.getLibraries().isEmpty()) {
-        for (Library l : libraryService.getAllBySampleId(s.getId())) {
+        for (Library l : libraryService.listBySampleId(s.getId())) {
           try {
             s.addLibrary(l);
           } catch (MalformedLibraryException e) {
@@ -146,9 +146,9 @@ public class ProjectRestController extends RestController {
 
   @RequestMapping(value = "{projectId}/libraries", method = RequestMethod.GET, produces = "application/json")
   public @ResponseBody String getProjectLibraries(@PathVariable Long projectId) throws IOException {
-    Collection<Library> lp = libraryService.getAllByProjectId(projectId);
+    Collection<Library> lp = libraryService.listByProjectId(projectId);
     for (Library l : lp) {
-      for (LibraryDilution dil : dilutionService.getAllByLibraryId(l.getId())) {
+      for (LibraryDilution dil : dilutionService.listByLibraryId(l.getId())) {
         try {
           l.addDilution(dil);
         } catch (MalformedDilutionException e) {

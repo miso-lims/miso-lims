@@ -441,7 +441,7 @@ public class ProjectControllerHelperService {
 
   private String checkLibraries(Long projectId) throws IOException {
     int pass = 0;
-    final Collection<Library> libs = libraryService.getAllByProjectId(projectId);
+    final Collection<Library> libs = libraryService.listByProjectId(projectId);
     if (libs.size() > 0) {
       for (final Library l : libs) {
         if (l.getLibraryQCs().size() > 0) {
