@@ -35,12 +35,10 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.mockito.InjectMocks;
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -75,7 +73,6 @@ public class SQLRunDAOTest extends AbstractDAOTest {
   public final ExpectedException exception = ExpectedException.none();
 
   @Autowired
-  @Spy
   private JdbcTemplate jdbcTemplate;
 
   @Autowired
@@ -94,7 +91,6 @@ public class SQLRunDAOTest extends AbstractDAOTest {
   @Mock
   private HibernateChangeLogDao changeLogDAO;
 
-  @InjectMocks
   private HibernateRunDao dao;
 
   @Before

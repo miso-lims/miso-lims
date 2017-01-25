@@ -40,8 +40,6 @@ public class HibernateRunDao implements RunStore {
   @Autowired
   private SessionFactory sessionFactory;
   @Autowired
-  private RunAlertManager runAlertManager;
-  @Autowired
   private WatchManager watchManager;
   @Autowired
   private SecurityStore securityStore;
@@ -301,14 +299,6 @@ public class HibernateRunDao implements RunStore {
 
   public void setSessionFactory(SessionFactory sessionFactory) {
     this.sessionFactory = sessionFactory;
-  }
-
-  public RunAlertManager getRunAlertManager() {
-    return runAlertManager;
-  }
-
-  public void setRunAlertManager(RunAlertManager runAlertManager) {
-    this.runAlertManager = runAlertManager;
   }
 
   public WatchManager getWatchManager() {

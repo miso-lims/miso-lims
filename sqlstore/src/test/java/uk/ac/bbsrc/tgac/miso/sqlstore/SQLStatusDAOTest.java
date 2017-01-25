@@ -128,18 +128,6 @@ public class SQLStatusDAOTest extends AbstractDAOTest {
 
   }
 
-  // testListAllByInstrumentName() deleted because method is never called
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLStatusDAO#listByHealth(java.lang.String)}.
-   */
-  @Test
-  public void testListByHealth() {
-    List<Status> stats = dao.listByHealth("Completed");
-    assertNotNull(stats);
-    assertEquals(3, stats.size());
-  }
-
   /**
    * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLStatusDAO#get(long)}.
    * 
