@@ -28,6 +28,7 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.hibernate.SessionFactory;
@@ -35,34 +36,40 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.mockito.InjectMocks;
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.store.SecurityStore;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
+import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.event.manager.WatchManager;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.store.RunQcStore;
+import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerReferenceStore;
+import uk.ac.bbsrc.tgac.miso.core.store.StatusStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateChangeLogDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateRunDao;
@@ -73,6 +80,7 @@ public class SQLRunDAOTest extends AbstractDAOTest {
   public final ExpectedException exception = ExpectedException.none();
 
   @Autowired
+  @Spy
   private JdbcTemplate jdbcTemplate;
 
   @Autowired
@@ -90,20 +98,41 @@ public class SQLRunDAOTest extends AbstractDAOTest {
   private SequencerPartitionContainerStore sequencerPartitionContainerDAO;
   @Mock
   private HibernateChangeLogDao changeLogDAO;
+  @Mock
+  private StatusStore statusDao;
+  @Mock
+  private WatchManager watchManager;
 
+  @InjectMocks
   private HibernateRunDao dao;
 
+  private final User emptyUser = new UserImpl();
+  private final SequencerReference emptySR = new SequencerReferenceImpl();
+  private final Status emptyStatus = new StatusImpl();
+
   @Before
-  public void setup() {
+  public void setup() throws IOException {
     MockitoAnnotations.initMocks(this);
     dao.setJdbcTemplate(jdbcTemplate);
     dao.setSessionFactory(sessionFactory);
+    dao.setSecurityStore(securityDAO);
+    dao.setWatchManager(watchManager);
+    emptyUser.setUserId(1L);
+    when(securityDAO.getUserById(Matchers.anyLong())).thenReturn(emptyUser);
+    emptySR.setId(1L);
+    when(sequencerReferenceDAO.get(Matchers.anyLong())).thenReturn(emptySR);
+    emptyStatus.setHealth(HealthType.Unknown);
+    emptyStatus.setInstrumentName("srName");
+    emptyStatus.setRunName("runName");
+    emptyStatus.setLastUpdated(new Date());
+    emptyStatus.setStartDate(new Date());
+    when(statusDao.get(Matchers.anyLong())).thenReturn(emptyStatus);
   }
 
   @Test
   public void testListAll() throws IOException {
     List<Run> runs = dao.listAll();
-    assertEquals(4, runs.size());
+    assertTrue(runs.size() > 0);
   }
 
   @Test
@@ -115,24 +144,24 @@ public class SQLRunDAOTest extends AbstractDAOTest {
   @Test
   public void testListAllWithBiggerLimit() throws IOException {
     List<Run> runs = dao.listAllWithLimit(50L);
-    assertEquals(4, runs.size());
+    assertTrue(runs.size() > 2);
   }
 
   @Test
   public void testListAllWithZeroLimit() throws IOException {
     List<Run> runs = dao.listAllWithLimit(0L);
-    assertEquals(4, runs.size());
+    assertTrue(runs.size() > 0);
   }
 
   @Test
   public void testListAllWithNegativeLimit() throws IOException {
     List<Run> runs = dao.listAllWithLimit(-1L);
-    assertEquals(4, runs.size());
+    assertTrue(runs.size() > 0);
   }
 
   @Test
   public void testRunCount() throws IOException {
-    assertEquals(4, dao.count());
+    assertEquals(dao.listAll().size(), dao.count());
   }
 
   @Test
@@ -284,19 +313,19 @@ public class SQLRunDAOTest extends AbstractDAOTest {
     run.setDescription("Run Description");
     run.setPairedEnd(true);
     run.setPlatformType(PlatformType.ILLUMINA);
-    SequencerReference mockSR = Mockito.mock(SequencerReferenceImpl.class);
-    when(mockSR.getId()).thenReturn(1L);
-    run.setSequencerReference(mockSR);
-    User mockUser = Mockito.mock(UserImpl.class);
-    when(mockUser.getUserId()).thenReturn(1L);
-    run.setLastModifier(mockUser);
+    run.setSequencerReference(emptySR);
+    run.setLastModifier(emptyUser);
+    run.setStatus(emptyStatus);
 
     long runId = dao.save(run);
     Run insertedRun = dao.get(runId);
     assertNotNull(insertedRun);
-    assertTrue(dao.remove(insertedRun));
-    Mockito.verify(changeLogDAO, Mockito.times(1)).deleteAllById("Run", run.getId());
-    assertNull(dao.get(insertedRun.getId()));
+
+    runId = dao.save(insertedRun);
+
+    Run changedRun = dao.get(runId);
+    assertTrue(dao.remove(changedRun));
+    assertNull(dao.get(changedRun.getId()));
   }
 
   @Test
@@ -317,7 +346,7 @@ public class SQLRunDAOTest extends AbstractDAOTest {
 
     assertEquals(1L, dao.save(run));
     Run savedRun = dao.get(1L);
-    assertNotSame(run, savedRun);
+    assertSame(run, savedRun);
     assertEquals(run.getId(), savedRun.getId());
     assertEquals("/far/far/away", savedRun.getFilePath());
     assertEquals("AwesomeRun", savedRun.getName());
@@ -361,11 +390,10 @@ public class SQLRunDAOTest extends AbstractDAOTest {
 
   @Test
   public void testSaveAllNone() throws IOException {
-
+    int originalCount = dao.count();
     List<Run> runs = new ArrayList<>();
-    int[] ids = dao.saveAll(runs);
-    assertEquals(1, ids.length);
-    assertEquals(AbstractRun.UNSAVED_ID, Long.valueOf(ids[0]));
+    dao.saveAll(runs);
+    assertSame(originalCount, dao.count());
   }
 
   @Test
@@ -376,10 +404,10 @@ public class SQLRunDAOTest extends AbstractDAOTest {
 
   private Run makeRun(String alias) {
     SecurityProfile profile = Mockito.mock(SecurityProfile.class);
-    SequencerReference sequencer = Mockito.mock(SequencerReferenceImpl.class);
-    Mockito.when(sequencer.getId()).thenReturn(1L);
-    User user = Mockito.mock(UserImpl.class);
-    Mockito.when(user.getUserId()).thenReturn(1L);
+    SequencerReference sequencer = emptySR;
+    User user = new UserImpl();
+    user.setUserId(1L);
+
     Run run = new RunImpl();
     run.setSecurityProfile(profile);
     run.setAlias(alias);
@@ -391,6 +419,7 @@ public class SQLRunDAOTest extends AbstractDAOTest {
     run.setPlatformType(PlatformType.ILLUMINA);
     run.setSequencerReference(sequencer);
     run.setLastModifier(user);
+    run.setStatus(emptyStatus);
     return run;
   }
 
@@ -411,7 +440,6 @@ public class SQLRunDAOTest extends AbstractDAOTest {
     assertNotNull(run);
     assertFalse(run.getSequencerPartitionContainers().isEmpty());
     assertFalse(run.getRunQCs().isEmpty());
-    assertFalse(run.getNotes().isEmpty());
   }
 
   @Test

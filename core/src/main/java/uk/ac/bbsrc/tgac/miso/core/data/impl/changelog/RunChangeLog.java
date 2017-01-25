@@ -7,16 +7,14 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-
-import org.hibernate.annotations.Index;
-import org.hibernate.annotations.Table;
+import javax.persistence.Table;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 
 @Entity
-@Table(appliesTo = "RunChangeLog", indexes = { @Index(name = "RunChangeLog_runId_changeTime", columnNames = { "runId", "changeTime" }) })
+@Table(name = "RunChangeLog")
 public class RunChangeLog extends AbstractChangeLog {
 
   @Id

@@ -1020,7 +1020,7 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public int[] saveRuns(Collection<Run> runs) throws IOException {
+  public void saveRuns(Collection<Run> runs) throws IOException {
     User user = getCurrentUser();
     for (Run run : runs) {
       if (!writeCheck(run)) {
@@ -1035,7 +1035,7 @@ public class UserAuthMisoRequestManager implements RequestManager {
         }
       }
     }
-    return backingManager.saveRuns(runs);
+    backingManager.saveRuns(runs);
   }
 
   @Override

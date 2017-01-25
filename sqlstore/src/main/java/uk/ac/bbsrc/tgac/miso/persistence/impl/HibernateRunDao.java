@@ -1,7 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +24,7 @@ import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
-import uk.ac.bbsrc.tgac.miso.core.event.manager.RunAlertManager;
+import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.WatchManager;
 import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
@@ -75,7 +74,7 @@ public class HibernateRunDao implements RunStore {
   }
 
   private Run withWatcherGroup(Run run) throws IOException {
-    run.setWatchGroup(getRunWatcherGroup());
+    if (run != null) run.setWatchGroup(getRunWatcherGroup());
     return run;
   }
 
@@ -117,8 +116,8 @@ public class HibernateRunDao implements RunStore {
 
   @Override
   public Run getLatestStartDateRunBySequencerPartitionContainerId(long containerId) throws IOException {
-    Criteria criteria = currentSession().createCriteria(RunImpl.class);
-    criteria.createAlias("containers", "spc");
+    Criteria criteria = currentSession().createCriteria(RunImpl.class, "r");
+    criteria.createAlias("r.containers", "spc").createAlias("r.status", "status");
     criteria.add(Restrictions.eq("spc.id", containerId));
     criteria.addOrder(Order.desc("status.startDate"));
     criteria.setMaxResults(1);
@@ -130,7 +129,7 @@ public class HibernateRunDao implements RunStore {
     Criteria criteria = currentSession().createCriteria(RunImpl.class);
     criteria.createAlias("containers", "spc");
     criteria.add(Restrictions.eq("spc.id", containerId));
-    criteria.addOrder(Order.desc("run.id"));
+    criteria.addOrder(Order.desc("id"));
     criteria.setMaxResults(1);
     return withWatcherGroup((Run) criteria.uniqueResult());
   }
@@ -154,9 +153,9 @@ public class HibernateRunDao implements RunStore {
   @Override
   public List<Run> listByPoolId(long poolId) throws IOException {
     Criteria criteria = currentSession().createCriteria(RunImpl.class);
-    criteria.createAlias("containers", "spc");
-    criteria.createAlias("spc.partitions", "partition");
-    criteria.add(Restrictions.eq("partition.pool.id", poolId));
+    criteria.createAlias("containers", "spc").createAlias("spc.partitions", "partition");
+    criteria.createAlias("partition.pool", "pool");
+    criteria.add(Restrictions.eq("pool.id", poolId));
     @SuppressWarnings("unchecked")
     List<Run> records = criteria.list();
     return withWatcherGroup(records);
@@ -174,10 +173,13 @@ public class HibernateRunDao implements RunStore {
 
   @Override
   public List<Run> listByProjectId(long projectId) throws IOException {
-    Criteria criteria = currentSession().createCriteria(RunImpl.class);
-    criteria.createAlias("containers.partitions", "partition");
-    criteria.createAlias("partition.pool.libraries", "library");
-    criteria.add(Restrictions.eq("library.sample.project.id", projectId));
+    Criteria criteria = currentSession().createCriteria(RunImpl.class, "r");
+    criteria.createAlias("r.containers", "container").createAlias("container.partitions", "partition");
+    criteria.createAlias("partition.pool", "pool").createAlias("pool.pooledElements", "dilution");
+    criteria.createAlias("dilution.library", "library").createAlias("library.sample", "sample");
+    criteria.createAlias("sample.project", "project");
+    criteria.add(Restrictions.eq("project.id", projectId));
+    criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
     @SuppressWarnings("unchecked")
     List<Run> records = criteria.list();
     return withWatcherGroup(records);
@@ -185,8 +187,9 @@ public class HibernateRunDao implements RunStore {
 
   @Override
   public List<Run> listByPlatformId(long platformId) throws IOException {
-    Criteria criteria = currentSession().createCriteria(RunImpl.class);
-    criteria.add(Restrictions.eq("sequencerReference.platform.id", platformId));
+    Criteria criteria = currentSession().createCriteria(RunImpl.class, "r");
+    criteria.createAlias("r.sequencerReference", "sr");
+    criteria.add(Restrictions.eq("sr.platform.id", platformId));
     @SuppressWarnings("unchecked")
     List<Run> records = criteria.list();
     return withWatcherGroup(records);
@@ -194,8 +197,9 @@ public class HibernateRunDao implements RunStore {
 
   @Override
   public List<Run> listByStatus(String health) throws IOException {
-    Criteria criteria = currentSession().createCriteria(RunImpl.class);
-    criteria.add(Restrictions.eq("status.health", health));
+    Criteria criteria = currentSession().createCriteria(RunImpl.class, "r");
+    criteria.createAlias("r.status", "status");
+    criteria.add(Restrictions.eq("status.health", HealthType.get(health)));
     @SuppressWarnings("unchecked")
     List<Run> records = criteria.list();
     return withWatcherGroup(records);
@@ -221,19 +225,12 @@ public class HibernateRunDao implements RunStore {
   }
 
   @Override
-  public int[] saveAll(Collection<Run> runs) throws IOException {
-    List<Long> rows = new ArrayList<>();
+  public void saveAll(Collection<Run> runs) throws IOException {
     log.debug(">>> Entering saveAll with " + runs.size() + " runs");
     for (Run run : runs) {
       Long runId = save(run);
-      if (runId != null) rows.add(runId);
     }
     log.debug("<<< Exiting saveAll");
-    int[] retval = new int[rows.size()];
-    for (int i = 0; i < rows.size(); i++) {
-      retval[i] = rows.get(i).intValue();
-    }
-    return retval;
   }
 
   @Override
@@ -307,6 +304,10 @@ public class HibernateRunDao implements RunStore {
 
   public void setWatchManager(WatchManager watchManager) {
     this.watchManager = watchManager;
+  }
+
+  public void setSecurityStore(SecurityStore securityStore) {
+    this.securityStore = securityStore;
   }
 
   @Override

@@ -51,6 +51,7 @@ public abstract class AbstractPartition implements Partition {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
+  @Column(name = "partitionId")
   private long id = AbstractPartition.UNSAVED_ID;
 
   @ManyToOne(targetEntity = SecurityProfile.class, cascade = CascadeType.ALL)
