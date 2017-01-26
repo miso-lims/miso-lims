@@ -54,11 +54,6 @@ public class HibernateStatusDao implements StatusStore {
   }
 
   @Override
-  public Status lazyGet(long id) throws IOException {
-    return get(id);
-  }
-
-  @Override
   public List<Status> listAll() throws IOException {
     Criteria criteria = currentSession().createCriteria(StatusImpl.class);
     @SuppressWarnings("unchecked")

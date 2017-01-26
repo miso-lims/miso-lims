@@ -87,11 +87,6 @@ public class HibernateExperimentDao implements ExperimentStore {
   }
 
   @Override
-  public Experiment lazyGet(long experimentId) throws IOException {
-    return get(experimentId);
-  }
-
-  @Override
   public List<Experiment> listAll() {
     Criteria criteria = currentSession().createCriteria(ExperimentImpl.class);
     @SuppressWarnings("unchecked")

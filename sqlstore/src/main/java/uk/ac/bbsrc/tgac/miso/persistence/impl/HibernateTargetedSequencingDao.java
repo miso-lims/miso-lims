@@ -36,11 +36,6 @@ public class HibernateTargetedSequencingDao implements TargetedSequencingStore {
   }
 
   @Override
-  public TargetedSequencing lazyGet(long id) throws IOException {
-    return get(id);
-  }
-
-  @Override
   public Collection<TargetedSequencing> listAll() throws IOException {
     Criteria criteria = currentSession().createCriteria(TargetedSequencing.class);
     @SuppressWarnings("unchecked")

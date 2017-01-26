@@ -149,14 +149,6 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
     return (Long) criteria.setProjection(Projections.rowCount()).uniqueResult();
   }
 
-  /**
-   * Pull a Sample without following all of the links. At the present time, this means just loading the object from Hibernate.
-   */
-  @Override
-  public Sample lazyGet(long id) throws IOException {
-    return (Sample) currentSession().get(SampleImpl.class, id);
-  }
-
   @Override
   public Collection<Sample> listAll() throws IOException {
     return getSamples();

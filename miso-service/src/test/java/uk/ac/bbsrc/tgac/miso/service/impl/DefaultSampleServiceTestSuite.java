@@ -630,7 +630,6 @@ public class DefaultSampleServiceTestSuite {
     project.setSecurityProfile(new SecurityProfile(mockUser()));
     project.getSecurityProfile().setOwner(mockUser());
     Mockito.when(projectStore.get(shell.getId())).thenReturn(project);
-    Mockito.when(projectStore.lazyGet(shell.getId())).thenReturn(project);
     return project;
   }
 

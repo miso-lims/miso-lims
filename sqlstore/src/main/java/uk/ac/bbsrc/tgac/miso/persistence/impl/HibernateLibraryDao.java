@@ -135,11 +135,6 @@ public class HibernateLibraryDao implements LibraryStore {
   }
 
   @Override
-  public Library lazyGet(long id) throws IOException {
-    return get(id);
-  }
-
-  @Override
   public List<Library> listAll() throws IOException {
     Criteria criteria = currentSession().createCriteria(LibraryImpl.class);
     @SuppressWarnings("unchecked")

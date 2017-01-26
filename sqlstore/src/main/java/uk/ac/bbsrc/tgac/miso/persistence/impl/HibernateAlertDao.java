@@ -160,11 +160,6 @@ public class HibernateAlertDao implements AlertStore {
   }
 
   @Override
-  public Alert lazyGet(long id) throws IOException {
-    return get(id);
-  }
-
-  @Override
   public int count() throws IOException {
     long c = (Long) currentSession().createCriteria(DefaultAlert.class).setProjection(Projections.rowCount()).uniqueResult();
     return (int) c;

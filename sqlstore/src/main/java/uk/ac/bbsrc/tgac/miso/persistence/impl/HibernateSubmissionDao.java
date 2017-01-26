@@ -92,11 +92,6 @@ public class HibernateSubmissionDao implements SubmissionStore {
   }
 
   @Override
-  public Submission lazyGet(long id) throws IOException {
-    return get(id);
-  }
-
-  @Override
   public Collection<Submission> listAll() throws IOException {
     Criteria criteria = currentSession().createCriteria(SubmissionImpl.class);
     @SuppressWarnings("unchecked")

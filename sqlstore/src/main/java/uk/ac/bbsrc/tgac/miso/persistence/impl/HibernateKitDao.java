@@ -45,7 +45,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.KitImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
-import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 @Repository
@@ -83,12 +82,6 @@ public class HibernateKitDao implements KitStore {
   @Override
   public Kit get(long id) throws IOException {
     return (Kit) currentSession().get(KitImpl.class, id);
-  }
-
-  @CoverageIgnore
-  @Override
-  public Kit lazyGet(long id) throws IOException {
-    return get(id);
   }
 
   @Override

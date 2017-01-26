@@ -155,12 +155,6 @@ public class HibernateStudyDao implements StudyStore {
     return (Study) currentSession().get(StudyImpl.class, studyId);
   }
 
-  @CoverageIgnore
-  @Override
-  public Study lazyGet(long studyId) throws IOException {
-    return get(studyId);
-  }
-
   @Override
   public List<Study> listByProjectId(long projectId) throws IOException {
     Criteria criteria = currentSession().createCriteria(StudyType.class);

@@ -217,11 +217,6 @@ public class HibernateBoxDao implements BoxStore {
   }
 
   @Override
-  public Box lazyGet(long boxId) throws IOException {
-    return get(boxId);
-  }
-
-  @Override
   public Collection<Box> listAll() throws IOException {
     Criteria criteria = currentSession().createCriteria(BoxImpl.class);
     @SuppressWarnings("unchecked")

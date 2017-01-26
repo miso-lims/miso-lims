@@ -149,27 +149,13 @@ public class SQLExperimentDAOTest extends AbstractDAOTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateExperimentDao#lazyGet(long)}.
-   * 
-   * @throws IOException
-   */
-  @Test
-  public void testLazyGet() throws IOException {
-    Experiment experiment = dao.lazyGet(1L);
-    assertNotNull(experiment);
-    assertEquals("EXP1", experiment.getName());
-    assertEquals("TEST", experiment.getDescription());
-    assertEquals("PRO1 Illumina Other experiment (Auto-gen)", experiment.getTitle());
-  }
-
-  /**
    * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateExperimentDao#remove(uk.ac.bbsrc.tgac.miso.core.data.Experiment)} .
    * 
    * @throws IOException
    */
   @Test
   public void testRemove() throws IOException {
-    Experiment experiment = dao.lazyGet(1L);
+    Experiment experiment = dao.get(1L);
     dao.remove(experiment);
     assertEquals(31, dao.listAll().size());
   }

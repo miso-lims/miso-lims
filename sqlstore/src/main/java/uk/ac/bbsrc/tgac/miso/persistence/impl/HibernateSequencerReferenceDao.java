@@ -95,11 +95,6 @@ public class HibernateSequencerReferenceDao implements SequencerReferenceStore {
     return (SequencerReference) currentSession().get(SequencerReferenceImpl.class, id);
   }
 
-  @Override
-  public SequencerReference lazyGet(long id) throws IOException {
-    return (SequencerReference) currentSession().get(SequencerReferenceImpl.class, id);
-  }
-
   @SuppressWarnings("unchecked")
   @Override
   public Collection<SequencerReference> listAll() throws IOException {

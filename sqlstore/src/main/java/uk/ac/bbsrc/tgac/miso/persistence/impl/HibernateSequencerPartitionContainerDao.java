@@ -58,11 +58,6 @@ public class HibernateSequencerPartitionContainerDao implements SequencerPartiti
   }
 
   @Override
-  public SequencerPartitionContainer<SequencerPoolPartition> lazyGet(long id) throws IOException {
-    return get(id);
-  }
-
-  @Override
   public Collection<SequencerPartitionContainer<SequencerPoolPartition>> listAll() throws IOException {
     Criteria criteria = currentSession().createCriteria(SequencerPartitionContainerImpl.class);
     @SuppressWarnings("unchecked")

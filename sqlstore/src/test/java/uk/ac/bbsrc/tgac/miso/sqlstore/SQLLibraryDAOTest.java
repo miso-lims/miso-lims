@@ -1,3 +1,4 @@
+
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
 import static org.junit.Assert.*;
@@ -140,17 +141,6 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
     assertNotNull(byAlias);
     assertEquals(1, byAlias.size());
     assertEquals("alias name does not match", alias, byAlias.iterator().next().getAlias());
-  }
-
-  @Test
-  public void testGetByPositionId() throws Exception {
-  }
-
-  @Test
-  public void testLazyGet() throws Exception {
-    Library library = dao.lazyGet(13);
-    assertEquals(13, library.getId());
-    assertEquals("Inherited from TEST_0007", library.getDescription());
   }
 
   @Test

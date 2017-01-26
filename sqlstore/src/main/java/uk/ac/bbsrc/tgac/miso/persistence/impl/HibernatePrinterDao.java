@@ -68,11 +68,6 @@ public class HibernatePrinterDao implements PrinterStore {
   }
 
   @Override
-  public Printer lazyGet(long id) throws IOException {
-    return get(id);
-  }
-
-  @Override
   public Collection<Printer> listAll() throws IOException {
     Criteria criteria = currentSession().createCriteria(Printer.class);
     @SuppressWarnings("unchecked")

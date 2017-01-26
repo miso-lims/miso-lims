@@ -87,15 +87,6 @@ public class SQLRunQCDAOTest extends AbstractDAOTest {
   }
 
   @Test
-  public void testLazyGet() throws Exception {
-    RunQC runQC = dao.lazyGet(3);
-    assertEquals(3, runQC.getId());
-    assertEquals("information3", runQC.getInformation());
-    assertEquals("username3", runQC.getQcCreator());
-    assertTrue(runQC.getDoNotProcess());
-  }
-
-  @Test
   public void testListByRunId() throws Exception {
     Collection<RunQC> runQCs = dao.listByRunId(2);
     RunQC runQC = runQCs.iterator().next();

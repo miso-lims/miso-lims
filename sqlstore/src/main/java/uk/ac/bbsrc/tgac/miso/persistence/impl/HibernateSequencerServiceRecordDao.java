@@ -60,11 +60,6 @@ public class HibernateSequencerServiceRecordDao implements SequencerServiceRecor
   }
 
   @Override
-  public SequencerServiceRecord lazyGet(long id) throws IOException {
-    return get(id);
-  }
-
-  @Override
   public List<SequencerServiceRecord> listAll() throws IOException {
     Criteria criteria = currentSession().createCriteria(SequencerServiceRecordImpl.class);
     @SuppressWarnings("unchecked")

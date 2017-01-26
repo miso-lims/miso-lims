@@ -280,23 +280,6 @@ public class SQLRunDAOTest extends AbstractDAOTest {
   }
 
   @Test
-  public void testLazyGet() throws IOException {
-    mockNonLazyThings();
-    Run run = dao.lazyGet(1L);
-    assertNotNull(run);
-    assertTrue(run.getSequencerPartitionContainers().isEmpty());
-    assertTrue(run.getRunQCs().isEmpty());
-    assertTrue(run.getNotes().isEmpty());
-  }
-
-  @Test
-  public void testLazyGetNone() throws IOException {
-    mockNonLazyThings();
-    Run run = dao.lazyGet(-9999L);
-    assertNull(run);
-  }
-
-  @Test
   public void testRemove() throws IOException, MisoNamingException {
     Run run = new RunImpl();
     String runName = "RUN111";

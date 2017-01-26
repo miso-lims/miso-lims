@@ -40,7 +40,6 @@ import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
-import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateChangeLogDao.ChangeLogType;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
@@ -155,12 +154,6 @@ public class HibernatePoolDao implements PoolStore {
 
   public SessionFactory getSessionFactory() {
     return sessionFactory;
-  }
-
-  @Override
-  @CoverageIgnore
-  public Pool lazyGet(long poolId) throws IOException {
-    return get(poolId);
   }
 
   @Override

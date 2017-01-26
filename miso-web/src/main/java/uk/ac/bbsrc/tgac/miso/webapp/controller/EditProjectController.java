@@ -145,7 +145,7 @@ public class EditProjectController {
 
   public Map<Integer, String> populateProjectFiles(Long projectId) throws IOException {
     if (projectId != AbstractProject.UNSAVED_ID) {
-      Project p = requestManager.lazyGetProjectById(projectId);
+      Project p = requestManager.getProjectById(projectId);
       if (p != null) {
         Map<Integer, String> fileMap = new HashMap<>();
         for (String s : filesManager.getFileNames(Project.class, projectId.toString())) {

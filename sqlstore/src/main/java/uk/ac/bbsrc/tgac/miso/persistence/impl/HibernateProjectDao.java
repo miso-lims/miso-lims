@@ -142,11 +142,6 @@ public class HibernateProjectDao implements ProjectStore {
     currentSession().update(project);
   }
 
-  @Override
-  public Project lazyGet(long projectId) throws IOException {
-    return get(projectId);
-  }
-
   public ProjectOverview lazyGetProjectOverviewById(long overviewId) throws IOException {
     return getProjectOverviewById(overviewId);
   }

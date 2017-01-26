@@ -138,19 +138,6 @@ public class SQLSequencerPartitionContainerDAOTest extends AbstractDAOTest {
   }
 
   @Test
-  public void testLazyGet() throws IOException {
-    SequencerPartitionContainer<SequencerPoolPartition> spc = dao.lazyGet(1L);
-    assertNotNull(spc);
-    assertEquals(1, spc.getPartitions().size());
-  }
-
-  @Test
-  public void testLazyGetNone() throws IOException {
-    SequencerPartitionContainer<SequencerPoolPartition> spc = dao.lazyGet(-9999L);
-    assertNull(spc);
-  }
-
-  @Test
   public void testSaveEdit() throws IOException {
     SequencerPartitionContainer<SequencerPoolPartition> spc = dao.get(4L);
 

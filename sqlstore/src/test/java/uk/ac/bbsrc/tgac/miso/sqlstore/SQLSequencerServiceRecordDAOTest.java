@@ -135,19 +135,6 @@ public class SQLSequencerServiceRecordDAOTest extends AbstractDAOTest {
   }
 
   @Test
-  public void testLazyGet() throws IOException {
-    SequencerServiceRecord rec = dao.lazyGet(1L);
-    assertNotNull(rec);
-    assertEquals(1L, rec.getId());
-  }
-  
-  @Test
-  public void testLazyGetNone() throws IOException {
-    SequencerServiceRecord rec = dao.lazyGet(100L);
-    assertNull(rec);
-  }
-
-  @Test
   public void testListAll() throws IOException {
     List<SequencerServiceRecord> list = dao.listAll();
     assertEquals(3, list.size());

@@ -52,11 +52,6 @@ public class HibernateLibraryQcDao implements LibraryQcStore {
   }
 
   @Override
-  public LibraryQC lazyGet(long id) throws IOException {
-    return get(id);
-  }
-
-  @Override
   public Collection<LibraryQC> listAll() throws IOException {
     Criteria criteria = currentSession().createCriteria(LibraryQCImpl.class);
     @SuppressWarnings("unchecked")

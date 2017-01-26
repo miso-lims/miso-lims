@@ -90,11 +90,6 @@ public class HibernateRunDao implements RunStore {
   }
 
   @Override
-  public Run lazyGet(long id) throws IOException {
-    return get(id);
-  }
-
-  @Override
   public List<Run> listAll() throws IOException {
     Criteria criteria = currentSession().createCriteria(RunImpl.class);
     @SuppressWarnings("unchecked")
