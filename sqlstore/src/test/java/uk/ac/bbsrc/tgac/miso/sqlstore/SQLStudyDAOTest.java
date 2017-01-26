@@ -1,46 +1,34 @@
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
-import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.junit.Assert.*;
-import static org.junit.matchers.JUnitMatchers.hasItem;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.InjectMocks;
-import org.mockito.Matchers;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.store.SecurityStore;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
-import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
-import uk.ac.bbsrc.tgac.miso.core.store.ExperimentStore;
-import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
-import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateStudyDao;
 
 public class SQLStudyDAOTest extends AbstractDAOTest {
@@ -49,37 +37,19 @@ public class SQLStudyDAOTest extends AbstractDAOTest {
   public final ExpectedException exception = ExpectedException.none();
 
   @Autowired
-  @Spy
   private JdbcTemplate jdbcTemplate;
 
-  @Mock
-  private Store<SecurityProfile> securityProfileDAO;
-
-  @Mock
-  private ProjectStore projectStore;
-
-  @Mock
-  private SecurityStore securityDAO;
-
-  @Mock
-  private ChangeLogStore changeLogDAO;
-
-  @Mock
-  private ExperimentStore experimentDAO;
-
-  @Mock
-  private NamingScheme namingScheme;
+  @Autowired
+  private SessionFactory sessionFactory;
 
   @InjectMocks
   private HibernateStudyDao dao;
-
-  // Auto-increment sequence doesn't roll back with transactions, so must be tracked
-  private static long nextAutoIncrementId = 5L;
 
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
     dao.setJdbcTemplate(jdbcTemplate);
+    dao.setSessionFactory(sessionFactory);
   }
 
   @Test
@@ -90,16 +60,11 @@ public class SQLStudyDAOTest extends AbstractDAOTest {
 
   @Test
   public void testSaveNew() throws IOException, MisoNamingException {
-    long autoIncrementId = nextAutoIncrementId;
     Study newStudy = makeStudy();
-    mockAutoIncrement(autoIncrementId);
-    Mockito.when(namingScheme.validateName(Matchers.anyString())).thenReturn(ValidationResult.success());
+    long id = dao.save(newStudy);
 
-    assertEquals(autoIncrementId, dao.save(newStudy));
-
-    Study savedRun = dao.get(autoIncrementId);
+    Study savedRun = dao.get(id);
     assertEquals(newStudy.getAlias(), savedRun.getAlias());
-    nextAutoIncrementId += 1;
   }
 
   @Test
@@ -152,13 +117,13 @@ public class SQLStudyDAOTest extends AbstractDAOTest {
   @Test
   public void testListBySearchEmpty() {
     List<Study> studies = dao.listBySearch("");
-    assertEquals(4, studies.size());
+    assertTrue(studies.size() > 0);
   }
 
   @Test
   public void testListByProjectId() throws IOException {
     List<Study> studies = dao.listByProjectId(1L);
-    assertEquals(1, studies.size());
+    assertTrue(studies.size() > 0);
   }
 
   @Test
@@ -170,7 +135,7 @@ public class SQLStudyDAOTest extends AbstractDAOTest {
   @Test
   public void testListAllWithNegativeLimit() throws IOException {
     List<Study> studies = dao.listAllWithLimit(-1L);
-    assertEquals(4, studies.size());
+    assertTrue(studies.size() > 0);
   }
 
   @Test
@@ -181,36 +146,38 @@ public class SQLStudyDAOTest extends AbstractDAOTest {
 
   @Test
   public void testListAllStudyTypes() throws Exception {
-    List<String> names = new ArrayList<>();
+    boolean hasCancerGenomics = false;
     for (StudyType type : dao.listAllStudyTypes()) {
-      names.add(type.getName());
+      if (type.getName().equals("Cancer Genomics")) {
+        hasCancerGenomics = true;
+        break;
+      }
     }
-    assertThat(names, hasItem("Cancer Genomics"));
-  }
-
-  private void mockAutoIncrement(long value) {
-    Map<String, Object> rs = new HashMap<>();
-    rs.put("Auto_increment", value);
-    Mockito.doReturn(rs).when(jdbcTemplate).queryForMap(Matchers.anyString());
+    assertTrue(hasCancerGenomics);
   }
 
   @Test
   public void testRemove() throws Exception {
-    Study study = dao.get(1);
-    assertNotNull(study);
+    int count = dao.count();
+    Study study = dao.get(2);
 
     assertTrue(dao.remove(study));
-    assertNull(dao.get(1L));
-    assertThat(dao.count(), is(3));
+    assertNull(dao.get(2));
+    assertEquals(count - 1, dao.count());
   }
 
   private Study makeStudy() {
     SecurityProfile profile = Mockito.mock(SecurityProfile.class);
-    User user = Mockito.mock(UserImpl.class);
-    Mockito.when(user.getUserId()).thenReturn(1L);
-    Project project = Mockito.mock(Project.class);
-    Mockito.when(project.getProjectId()).thenReturn(1L);
+    User user = new UserImpl();
+    user.setUserId(1L);
+    Project project = new ProjectImpl();
+    project.setProjectId(1L);
+    StudyType studyType = new StudyType();
+    studyType.setId(1L);
     Study s = new StudyImpl(project, user);
+    s.setName("STU999");
+    s.setStudyType(studyType);
+    s.setDescription("foo");
     s.setSecurityProfile(profile);
     s.setProject(project);
     s.setLastModifier(user);

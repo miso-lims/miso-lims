@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -108,6 +109,7 @@ public class HibernateStudyDao implements StudyStore {
   @SuppressWarnings("unchecked")
   @Override
   public List<Study> listAllWithLimit(long limit) throws IOException {
+    if (limit == 0) return Collections.emptyList();
     return currentSession().createCriteria(StudyImpl.class).setMaxResults((int) limit).list();
   }
 
@@ -119,7 +121,7 @@ public class HibernateStudyDao implements StudyStore {
 
   @Override
   public List<Study> listBySearch(String query) {
-    Criteria criteria = currentSession().createCriteria(StudyType.class);
+    Criteria criteria = currentSession().createCriteria(StudyImpl.class);
     criteria.add(DbUtils.searchRestrictions(query, "alias", "name", "description"));
     @SuppressWarnings("unchecked")
     List<Study> results = criteria.list();
@@ -142,7 +144,7 @@ public class HibernateStudyDao implements StudyStore {
 
   @Override
   public List<Study> listByProjectId(long projectId) throws IOException {
-    Criteria criteria = currentSession().createCriteria(StudyType.class);
+    Criteria criteria = currentSession().createCriteria(StudyImpl.class);
     criteria.createAlias("project", "project");
     criteria.add(Restrictions.eq("project.id", projectId));
     @SuppressWarnings("unchecked")

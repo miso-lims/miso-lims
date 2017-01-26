@@ -37,7 +37,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -82,7 +81,7 @@ public class StudyImpl implements Study, Serializable {
   @Transient
   public Document submissionDocument;
 
-  @OneToOne(cascade = CascadeType.ALL)
+  @ManyToOne(cascade = CascadeType.PERSIST)
   @JoinColumn(name = "securityProfile_profileId")
   private SecurityProfile securityProfile = null;
 

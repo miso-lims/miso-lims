@@ -122,9 +122,7 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
   @Column(length = DESCRIPTION_LENGTH)
   private String description;
 
-  @ManyToMany(targetEntity = ExperimentImpl.class)
-  @JoinTable(name = "Pool_Experiment", joinColumns = { @JoinColumn(name = "pool_poolId") }, inverseJoinColumns = {
-      @JoinColumn(name = "experiments_experimentId") })
+  @OneToMany(targetEntity = ExperimentImpl.class, mappedBy = "pool")
   private Collection<Experiment> experiments = new HashSet<>();
 
   @Column(length = ID_BARCODE_LENGTH)

@@ -104,8 +104,7 @@ public class ExperimentImpl implements Experiment, Serializable {
 
   // defines a pool on which this experiment will operate. This contains one or more dilutions of a sample
   @ManyToOne(targetEntity = PoolImpl.class)
-  @JoinTable(name = "Pool_Experiment", inverseJoinColumns = { @JoinColumn(name = "pool_poolId") }, joinColumns = {
-      @JoinColumn(name = "experiments_experimentId") })
+  @JoinColumn(name = "pool_poolId")
   private Pool pool;
 
   // defines the parent run which processes this experiment
@@ -115,7 +114,7 @@ public class ExperimentImpl implements Experiment, Serializable {
   private Run run;
 
   @ManyToOne(cascade = CascadeType.ALL)
-  @JoinColumn
+  @JoinColumn(name = "securityProfile_profileId")
   private SecurityProfile securityProfile = new SecurityProfile();
 
   @ManyToOne(targetEntity = StudyImpl.class)

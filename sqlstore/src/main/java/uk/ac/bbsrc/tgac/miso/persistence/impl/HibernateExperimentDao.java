@@ -55,6 +55,7 @@ public class HibernateExperimentDao implements ExperimentStore {
   @Autowired
   private SessionFactory sessionFactory;
 
+  @Autowired
   private JdbcTemplate template;
 
   @Override
