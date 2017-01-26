@@ -313,9 +313,9 @@
         <version>${prometheus.version}</version>
       </dependency>
       <dependency>
-        <groupId>javassist</groupId>
+        <groupId>org.javassist</groupId>
         <artifactId>javassist</artifactId>
-        <version>3.8.0.GA</version>
+        <version>3.21.0-GA</version>
       </dependency>
       <dependency>
         <groupId>javax.mail</groupId>
@@ -468,6 +468,12 @@
         <groupId>org.hibernate</groupId>
         <artifactId>hibernate-core</artifactId>
         <version>${hibernate.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.javassist</groupId>
+            <artifactId>javassist</artifactId>            
+          </exclusion>
+        </exclusions>        
       </dependency>
       <dependency>
         <groupId>org.hibernate.javax.persistence</groupId>
@@ -505,11 +511,6 @@
         <groupId>org.odftoolkit</groupId>
         <artifactId>odfdom-java</artifactId>
         <version>0.8.7</version>
-      </dependency>
-      <dependency>
-        <groupId>org.reflections</groupId>
-        <artifactId>reflections</artifactId>
-        <version>0.9.5</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
