@@ -130,9 +130,6 @@ public class DefaultAuthorizationManager implements AuthorizationManager {
     return filtered;
   }
 
-  /**
-   * Does not throw if owner is null (editable by anyone).
-   */
   @Override
   public void throwIfNonAdminOrMatchingOwner(User owner) throws IOException, AuthorizationException {
     if (owner == null) {

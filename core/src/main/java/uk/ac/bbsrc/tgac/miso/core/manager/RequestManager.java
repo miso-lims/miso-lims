@@ -67,7 +67,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
-import uk.ac.bbsrc.tgac.miso.core.event.Alert;
 
 public interface RequestManager {
 
@@ -115,8 +114,6 @@ public interface RequestManager {
   public long saveKit(Kit kit) throws IOException;
 
   public long saveKitDescriptor(KitDescriptor kitDescriptor) throws IOException;
-
-  public long saveAlert(Alert alert) throws IOException;
 
   public long saveBox(Box box) throws IOException;
 
@@ -198,8 +195,6 @@ public interface RequestManager {
   public QcType getPoolQcTypeById(long qcTypeId) throws IOException;
 
   public QcType getPoolQcTypeByName(String qcName) throws IOException;
-
-  public Alert getAlertById(long alertId) throws IOException;
 
   public Box getBoxById(long boxId) throws IOException;
 
@@ -374,12 +369,6 @@ public interface RequestManager {
   public Collection<Status> listAllStatus() throws IOException;
 
   public Collection<Status> listAllStatusBySequencerName(String sequencerName) throws IOException;
-
-  public Collection<Alert> listUnreadAlertsByUserId(long userId) throws IOException;
-
-  public Collection<Alert> listAlertsByUserId(long userId) throws IOException;
-
-  public Collection<Alert> listAlertsByUserId(long userId, long limit) throws IOException;
 
   public void discardSingleTube(Box box, String position) throws IOException;
 

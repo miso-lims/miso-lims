@@ -135,6 +135,11 @@ public class DefaultAlert implements Alert, Serializable {
   }
 
   @Override
+  public void setAlertUser(User user) {
+    this.user = user;
+  }
+
+  @Override
   public Date getAlertDate() {
     return alertDate;
   }
