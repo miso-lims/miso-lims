@@ -25,7 +25,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.AbstractRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
-import uk.ac.bbsrc.tgac.miso.core.event.manager.WatchManager;
 import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
@@ -38,8 +37,6 @@ public class HibernateRunDao implements RunStore {
 
   @Autowired
   private SessionFactory sessionFactory;
-  @Autowired
-  private WatchManager watchManager;
   @Autowired
   private SecurityStore securityStore;
 
@@ -298,27 +295,21 @@ public class HibernateRunDao implements RunStore {
     this.sessionFactory = sessionFactory;
   }
 
-  public WatchManager getWatchManager() {
-    return watchManager;
-  }
-
-  public void setWatchManager(WatchManager watchManager) {
-    this.watchManager = watchManager;
-  }
-
   public void setSecurityStore(SecurityStore securityStore) {
     this.securityStore = securityStore;
   }
 
   @Override
   public void addWatcher(Run run, User watcher) {
-    watchManager.watch(run, watcher);
+    log.debug("Adding watcher " + watcher.getLoginName() + " to " + run.getName() + " via WatchManager");
+    run.addWatcher(watcher);
     currentSession().update(run);
   }
 
   @Override
   public void removeWatcher(Run run, User watcher) {
-    watchManager.unwatch(run, watcher);
+    log.debug("Removing watcher " + watcher.getLoginName() + " from " + run.getWatchableIdentifier() + " via WatchManager");
+    run.removeWatcher(watcher);
     currentSession().update(run);
   }
 

@@ -21,6 +21,8 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.type.Type;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -35,7 +37,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.event.manager.WatchManager;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
@@ -46,6 +47,9 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 @Transactional(rollbackFor = Exception.class)
 @Repository
 public class HibernatePoolDao implements PoolStore {
+
+  protected static final Logger log = LoggerFactory.getLogger(HibernatePoolDao.class);
+
   private static final String TABLE_NAME = "Pool";
 
   private static class ChangeLogEntry {
@@ -119,9 +123,6 @@ public class HibernatePoolDao implements PoolStore {
   
   @Autowired
   private JdbcTemplate template;
-  
-  @Autowired
-  private WatchManager watchManager;
 
   @Override
   public Pool get(long poolId) throws IOException {
@@ -357,24 +358,19 @@ public class HibernatePoolDao implements PoolStore {
 
   @Override
   public void removeWatcher(Pool pool, User watcher) {
-    watchManager.unwatch(pool, watcher);
+    log.debug("Removing watcher " + watcher.getLoginName() + " from " + pool.getWatchableIdentifier() + " via WatchManager");
+    pool.removeWatcher(watcher);
     currentSession().update(pool);
 
   }
 
   @Override
   public void addWatcher(Pool pool, User watcher) {
-    watchManager.watch(pool, watcher);
+    log.debug("Adding watcher " + watcher.getLoginName() + " to " + pool.getName() + " via WatchManager");
+    pool.addWatcher(watcher);
     currentSession().update(pool);
   }
 
-  public WatchManager getWatchManager() {
-    return watchManager;
-  }
-
-  public void setWatchManager(WatchManager watchManager) {
-    this.watchManager = watchManager;
-  }
 
   public BoxStore getBoxDAO() {
     return boxDAO;

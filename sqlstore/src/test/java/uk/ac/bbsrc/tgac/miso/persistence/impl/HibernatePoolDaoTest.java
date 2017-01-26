@@ -32,7 +32,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.event.manager.WatchManager;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 
@@ -113,9 +112,6 @@ public class HibernatePoolDaoTest extends AbstractDAOTest {
 
   @Autowired
   private SessionFactory sessionFactory;
-
-  @Mock
-  final WatchManager watchManager = Mockito.mock(WatchManager.class);
 
   @Before
   public void setup() {

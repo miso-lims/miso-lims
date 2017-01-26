@@ -12,7 +12,6 @@ import org.springframework.security.core.context.SecurityContextImpl;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.LocalSecurityManager;
 
-import uk.ac.bbsrc.tgac.miso.core.event.manager.WatchManager;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.migration.util.OicrMigrationNamingScheme;
 import uk.ac.bbsrc.tgac.miso.persistence.HibernateSampleClassDao;
@@ -121,7 +120,6 @@ public class MisoServiceManager {
   private HibernateIndexDao indexDao;
   private HibernateSequencingParametersDao sequencingParametersDao;
   private HibernateReferenceGenomeDao referenceGenomeDao;
-  private final WatchManager watchManager;
 
   /**
    * Constructs a new MisoServiceManager with no services initialized
@@ -132,7 +130,6 @@ public class MisoServiceManager {
   public MisoServiceManager(JdbcTemplate jdbcTemplate, SessionFactory sessionFactory) {
     this.jdbcTemplate = jdbcTemplate;
     this.sessionFactory = sessionFactory;
-    watchManager = new WatchManager();
   }
 
   /**
@@ -562,7 +559,6 @@ public class MisoServiceManager {
     dao.setBoxDAO(boxDao);
     dao.setSecurityStore(securityStore);
     dao.setSessionFactory(sessionFactory);
-    dao.setWatchManager(watchManager);
     setPoolDao(dao);
   }
 

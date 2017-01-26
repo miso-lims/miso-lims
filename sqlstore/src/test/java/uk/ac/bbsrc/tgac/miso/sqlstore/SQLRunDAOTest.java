@@ -63,7 +63,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.event.manager.WatchManager;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.store.RunQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
@@ -100,8 +99,6 @@ public class SQLRunDAOTest extends AbstractDAOTest {
   private HibernateChangeLogDao changeLogDAO;
   @Mock
   private StatusStore statusDao;
-  @Mock
-  private WatchManager watchManager;
 
   @InjectMocks
   private HibernateRunDao dao;
@@ -116,7 +113,6 @@ public class SQLRunDAOTest extends AbstractDAOTest {
     dao.setJdbcTemplate(jdbcTemplate);
     dao.setSessionFactory(sessionFactory);
     dao.setSecurityStore(securityDAO);
-    dao.setWatchManager(watchManager);
     emptyUser.setUserId(1L);
     when(securityDAO.getUserById(Matchers.anyLong())).thenReturn(emptyUser);
     emptySR.setId(1L);

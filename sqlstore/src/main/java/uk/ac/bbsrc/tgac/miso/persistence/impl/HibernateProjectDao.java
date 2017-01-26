@@ -32,6 +32,8 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -45,7 +47,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.ProjectAlertManager;
-import uk.ac.bbsrc.tgac.miso.core.event.manager.WatchManager;
 import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
@@ -54,6 +55,9 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 @Transactional(rollbackFor = Exception.class)
 @Repository
 public class HibernateProjectDao implements ProjectStore {
+
+  protected static final Logger log = LoggerFactory.getLogger(HibernateProjectDao.class);
+
   private static final String[] SEARCH_PROPERTIES = new String[] { "name", "alias",
       "description", "shortName" };
   private static final String TABLE_NAME = "Project";
@@ -123,22 +127,17 @@ public class HibernateProjectDao implements ProjectStore {
     return securityStore;
   }
 
-  public void setWatchManager(WatchManager watchManager) {
-    this.watchManager = watchManager;
-  }
-
   @Override
   public void addWatcher(Project project, User watcher) {
-    watchManager.watch(project, watcher);
+    log.debug("Adding watcher " + watcher.getLoginName() + " to " + project.getName() + " via WatchManager");
+    project.addWatcher(watcher);
     currentSession().update(project);
   }
 
-  @Autowired
-  private WatchManager watchManager;
-
   @Override
   public void removeWatcher(Project project, User watcher) {
-    watchManager.unwatch(project, watcher);
+    log.debug("Removing watcher " + watcher.getLoginName() + " from " + project.getWatchableIdentifier() + " via WatchManager");
+    project.removeWatcher(watcher);
     currentSession().update(project);
   }
 

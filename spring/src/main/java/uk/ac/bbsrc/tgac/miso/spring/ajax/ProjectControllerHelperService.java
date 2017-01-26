@@ -57,7 +57,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
-import uk.ac.bbsrc.tgac.miso.core.event.manager.WatchManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
@@ -93,8 +92,6 @@ public class ProjectControllerHelperService {
   @Autowired
   private MisoFilesManager misoFileManager;
   @Autowired
-  private WatchManager watchManager;
-  @Autowired
   private NamingScheme namingScheme;
   @Autowired
   private LibraryService libraryService;
@@ -125,10 +122,6 @@ public class ProjectControllerHelperService {
 
   public void setPrinterService(PrinterService printerService) {
     this.printerService = printerService;
-  }
-
-  public void setWatchManager(WatchManager watchManager) {
-    this.watchManager = watchManager;
   }
 
   public void setLibraryService(LibraryService libraryService) {
