@@ -23,7 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.core.manager;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.generateTemporaryName;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -1382,27 +1382,8 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Pool getPoolByBarcode(String barcode, PlatformType platformType) throws IOException {
-    if (poolStore != null) {
-      return poolStore.getPoolByBarcode(barcode, platformType);
-    } else {
-      throw new IOException("No poolStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
   public Pool getPoolByBarcode(String barcode) throws IOException {
-    String[] s = barcode.split("::");
-    if (s.length > 1) {
-      String platformKey = s[1];
-      if (!isStringEmptyOrNull(platformKey)) {
-        PlatformType pt = PlatformType.get(platformKey);
-        if (pt != null) {
-          return getPoolByBarcode(barcode, pt);
-        }
-      }
-    }
-    return null;
+    return getPoolByBarcode(barcode);
   }
 
   @Override

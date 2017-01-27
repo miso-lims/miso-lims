@@ -576,45 +576,6 @@ public class UserAuthMisoRequestManagerTestSuite {
   }
 
   /**
-   * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getPoolByBarcode(java.lang.String, uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType)}
-   * .
-   */
-  @Test
-  public void testGetPoolByBarcodeStringPlatformType() throws IOException {
-    String barcode = "";
-    PlatformType platformType = PlatformType.ILLUMINA;
-    when(backingManager.getPoolByBarcode(barcode, platformType)).thenReturn(pool);
-    when(pool.userCanRead(any(User.class))).thenReturn(true);
-
-    assertEquals(pool, userAuthMisoRequestManager.getPoolByBarcode(barcode, platformType));
-
-    verify(backingManager).getPoolByBarcode(barcode, platformType);
-  }
-
-  /**
-   * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getPoolByBarcode(java.lang.String, uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType)}
-   * .
-   */
-  @Test
-  public void testGetPoolByBarcodeStringPlatformTypeThrows() throws IOException {
-    String barcode = "barcode";
-    PlatformType platformType = PlatformType.ILLUMINA;
-    when(backingManager.getPoolByBarcode(barcode, platformType)).thenReturn(pool);
-    when(pool.userCanRead(any(User.class))).thenReturn(false);
-    Long poolId = 1L;
-    when(pool.getId()).thenReturn(poolId);
-
-    thrown.expect(IOException.class);
-    thrown.expectMessage("User null cannot read Pool " + poolId);
-
-    userAuthMisoRequestManager.getPoolByBarcode(barcode, platformType);
-
-    verify(backingManager).getPoolByBarcode(barcode, platformType);
-  }
-
-  /**
    * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getPoolByIdBarcode(java.lang.String)} .
    */
   @Test
