@@ -33,6 +33,7 @@
 
 
   <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+    <property name="entityInterceptor" ref="collectionLoggingInterceptor"/>
     <property name="dataSource" ref="dataSource" />
     <property name="annotatedClasses">
       <list>
@@ -135,6 +136,8 @@
       </props>
     </property>
   </bean>
+
+  <bean id="collectionLoggingInterceptor" name="collectionLoggingInterceptor" class="uk.ac.bbsrc.tgac.miso.persistence.impl.CollectionLoggingInterceptor" />
 
   <tx:annotation-driven/>
   <bean id="jpaDialect"

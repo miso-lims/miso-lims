@@ -29,7 +29,7 @@ public abstract class AbstractBox implements Box {
 
   public static final Long UNSAVED_ID = 0L;
 
-  @ManyToOne(cascade = CascadeType.ALL)
+  @ManyToOne(cascade = CascadeType.PERSIST)
   @JoinColumn(name = "securityProfile_profileId")
   private SecurityProfile securityProfile;
 

@@ -362,7 +362,7 @@ public class BoxControllerHelperService {
         .SimpleJSONError(boxable.getName() + " (" + boxable.getAlias() + ") has been discarded, and can not be added to the box.");
 
     // if the selected item is already in the box, remove it here and add it to the correct position in next step
-    if (box.boxableExists(boxable)) box.removeBoxable(boxable);
+    if (box.boxableExists(boxable)) box.removeBoxable(boxable.getBoxPosition());
 
     // if an item already exists at this position, its location will be set to unknown.
     box.setBoxable(position, boxable);
@@ -414,7 +414,7 @@ public class BoxControllerHelperService {
     String position = json.getString("position");
     if (!box.isValidPosition(position)) return JSONUtils.SimpleJSONError("Invalid position given!");
 
-    box.removeBoxable(box.getBoxable(position));
+    box.removeBoxable(position);
 
     try {
       box.setLastModifier(authorizationManager.getCurrentUser());

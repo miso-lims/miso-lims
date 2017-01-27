@@ -160,10 +160,13 @@ public class SQLBoxDAOTest extends AbstractDAOTest {
   public void testEmptySingleTube() throws Exception {
 
     Box box = dao.get(1);
+    int count = box.getBoxables().size();
 
-    assertTrue("precondition failed", box.getBoxables().values().size() > 0);
+    assertTrue("precondition failed", box.getBoxables().size() > 0);
+    assertTrue(box.getBoxables().containsKey("B02"));
     dao.discardSingleTube(box, "B02");
-    assertTrue(box.getBoxables().values().size() == 0);
+    Box fetchedBox = dao.get(1);
+    assertEquals(count - 1, fetchedBox.getBoxables().size());
 
   }
 
@@ -171,10 +174,11 @@ public class SQLBoxDAOTest extends AbstractDAOTest {
   public void testRemoveBoxableFromBox() throws Exception {
     Box box = dao.get(1);
     Boxable item = box.getBoxables().values().iterator().next();
+    assertNotNull(item);
 
     dao.removeBoxableFromBox(item);
     Box again = dao.get(1);
-    assertFalse(again.getBoxables().values().contains(item));
+    assertFalse(again.getBoxables().containsValue(item));
   }
 
   @Test
