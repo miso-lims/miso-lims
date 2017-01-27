@@ -12,11 +12,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
@@ -33,10 +30,6 @@ public class SQLPoolQCDAOTest extends AbstractDAOTest {
   public ExpectedException expectedException = ExpectedException.none();
   
   @Autowired
-  @Spy
-  private JdbcTemplate jdbcTemplate;
-  
-  @Mock
   private SessionFactory sessionFactory;
   
   @InjectMocks

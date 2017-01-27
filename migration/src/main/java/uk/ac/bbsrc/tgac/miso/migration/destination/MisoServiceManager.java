@@ -555,7 +555,7 @@ public class MisoServiceManager {
 
   public void setDefaultPoolDao() {
     HibernatePoolDao dao = new HibernatePoolDao();
-    dao.setBoxDAO(boxDao);
+    dao.setBoxStore(boxDao);
     dao.setSecurityStore(securityStore);
     dao.setSessionFactory(sessionFactory);
     setPoolDao(dao);
@@ -752,7 +752,7 @@ public class MisoServiceManager {
   }
 
   private void updateBoxDaoDependencies() {
-    if (poolDao != null) poolDao.setBoxDAO(boxDao);
+    if (poolDao != null) poolDao.setBoxStore(boxDao);
   }
 
   public DefaultLabService getLabService() {

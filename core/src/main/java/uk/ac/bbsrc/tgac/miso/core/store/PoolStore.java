@@ -40,18 +40,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
  * @since 0.0.2
  */
 public interface PoolStore extends Store<Pool>, Remover<Pool> {
-  /**
-   * Get a Pool given a barcode and its platform
-   *
-   * @param barcode
-   *          of type String
-   * @param platformType
-   *          of type PlatformType
-   * @return Pool
-   * @throws IOException
-   *           when
-   */
-  Pool getPoolByBarcode(String barcode, PlatformType platformType) throws IOException;
 
   /**
    * List all Pools that are related to a given {@link uk.ac.bbsrc.tgac.miso.core.data.Library} by means of that Library's

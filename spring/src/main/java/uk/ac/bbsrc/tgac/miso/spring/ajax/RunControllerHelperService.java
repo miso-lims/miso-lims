@@ -941,14 +941,17 @@ public class RunControllerHelperService {
       PlatformType pt = json.has("platform") && !isStringEmptyOrNull(json.getString("platform"))
           ? PlatformType.get(json.getString("platform")) : r.getPlatformType();
 
-      Pool p = requestManager.getPoolByBarcode(barcode, pt);
+      Pool p = requestManager.getPoolByBarcode(barcode);
       // Base64-encoded string, most likely a barcode image beeped in. decode and search
       if (p == null) {
-        p = requestManager.getPoolByBarcode(new String(Base64.decodeBase64(barcode)), pt);
+        p = requestManager.getPoolByBarcode(new String(Base64.decodeBase64(barcode)));
       }
       // if pool still can't be found, return error
       if (p == null) {
         return JSONUtils.SimpleJSONError("Cannot find a pool with barcode " + barcode);
+      }
+      if (p.getPlatformType() != pt) {
+        return JSONUtils.SimpleJSONError("Pool with that barcode is " + p.getPlatformType().getKey() + " and not " + pt.getKey());
       }
       List<SequencerPartitionContainer> fs = new ArrayList<SequencerPartitionContainer>(r.getSequencerPartitionContainers());
       if (!fs.isEmpty()) {

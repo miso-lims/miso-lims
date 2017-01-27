@@ -141,8 +141,8 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
 
   @OneToMany(targetEntity = Note.class, cascade = CascadeType.ALL)
   @JoinTable(name = "Pool_Note", joinColumns = {
-      @JoinColumn(name = "pool_poolId", nullable = false, updatable = false) }, inverseJoinColumns = {
-          @JoinColumn(name = "notes_noteId", nullable = false, updatable = false) })
+      @JoinColumn(name = "pool_poolId") }, inverseJoinColumns = {
+          @JoinColumn(name = "notes_noteId") })
   private Collection<Note> notes = new HashSet<>();
 
   @Enumerated(EnumType.STRING)
@@ -188,6 +188,7 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
   public PoolImpl() {
     setSecurityProfile(new SecurityProfile());
   }
+
   public PoolImpl(User user) {
     setSecurityProfile(new SecurityProfile(user));
   }

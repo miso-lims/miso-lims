@@ -287,13 +287,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Pool getPoolByBarcode(String barcode, PlatformType platformType) throws IOException {
-    Pool o = backingManager.getPoolByBarcode(barcode, platformType);
-    if (readCheck(o)) return o;
-    else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Pool " + o.getId());
-  }
-
-  @Override
   public Pool getPoolByIdBarcode(String barcode) throws IOException {
     Pool o = backingManager.getPoolByIdBarcode(barcode);
     if (readCheck(o)) return o;
