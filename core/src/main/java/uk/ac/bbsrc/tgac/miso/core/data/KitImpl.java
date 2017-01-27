@@ -34,8 +34,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import com.eaglegenomics.simlims.core.Note;
@@ -59,10 +59,10 @@ public class KitImpl implements Kit {
   private String identificationBarcode;
   private String locationBarcode;
 
-  @OneToMany(targetEntity = Note.class, cascade = CascadeType.ALL)
+  @ManyToMany(targetEntity = Note.class, cascade = CascadeType.ALL)
   @JoinTable(name = "Kit_Note", joinColumns = {
-      @JoinColumn(name = "kit_kitId", nullable = false, updatable = false) }, inverseJoinColumns = {
-          @JoinColumn(name = "notes_noteId", nullable = false, updatable = false) })
+      @JoinColumn(name = "kit_kitId") }, inverseJoinColumns = {
+          @JoinColumn(name = "notes_noteId") })
   private Collection<Note> notes = new HashSet<>();
   private String lotNumber;
   private Date kitDate;

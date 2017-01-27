@@ -153,7 +153,7 @@ public class HibernatePoolDao implements PoolStore {
   }
 
   public Session currentSession() {
-    return sessionFactory.withOptions().interceptor(interceptor).openSession();
+    return sessionFactory.getCurrentSession();
   }
 
   @Override

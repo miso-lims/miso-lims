@@ -158,10 +158,10 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @JoinColumn(name = "lastModifier", nullable = false)
   private User lastModifier;
 
-  @OneToMany(targetEntity = Note.class, cascade = CascadeType.ALL)
+  @ManyToMany(targetEntity = Note.class, cascade = CascadeType.ALL)
   @JoinTable(name = "Library_Note", joinColumns = {
-      @JoinColumn(name = "library_libraryId", nullable = false, updatable = false) }, inverseJoinColumns = {
-      @JoinColumn(name = "notes_noteId", nullable = false, updatable = false) })
+      @JoinColumn(name = "library_libraryId") }, inverseJoinColumns = {
+          @JoinColumn(name = "notes_noteId") })
   private Collection<Note> notes = new HashSet<>();
 
   @OneToMany(targetEntity = LibraryChangeLog.class, mappedBy = "library")

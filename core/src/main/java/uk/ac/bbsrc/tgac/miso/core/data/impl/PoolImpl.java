@@ -139,7 +139,7 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
   @Column(length = NAME_LENGTH)
   private String name;
 
-  @OneToMany(targetEntity = Note.class, cascade = CascadeType.ALL)
+  @ManyToMany(targetEntity = Note.class, cascade = CascadeType.ALL)
   @JoinTable(name = "Pool_Note", joinColumns = {
       @JoinColumn(name = "pool_poolId") }, inverseJoinColumns = {
           @JoinColumn(name = "notes_noteId") })

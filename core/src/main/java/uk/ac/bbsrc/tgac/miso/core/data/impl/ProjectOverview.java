@@ -108,8 +108,8 @@ public class ProjectOverview implements Watchable, Alertable, Nameable, Serializ
   private boolean locked;
   @OneToMany(targetEntity = Note.class, cascade = CascadeType.ALL)
   @JoinTable(name = "ProjectOverview_Note", joinColumns = {
-      @JoinColumn(name = "overview_overviewId", nullable = false, updatable = false) }, inverseJoinColumns = {
-          @JoinColumn(name = "notes_noteId", nullable = false, updatable = false) })
+      @JoinColumn(name = "overview_overviewId") }, inverseJoinColumns = {
+          @JoinColumn(name = "notes_noteId") })
   private Collection<Note> notes = new HashSet<>();
   private Integer numProposedSamples;
   @Id
@@ -133,8 +133,8 @@ public class ProjectOverview implements Watchable, Alertable, Nameable, Serializ
   private Group watchGroup;
 
   @ManyToMany(targetEntity = UserImpl.class)
-  @JoinTable(name = "ProjectOverview_Watcher", joinColumns = { @JoinColumn(name = "overviewId") },
-      inverseJoinColumns = { @JoinColumn(name = "userId") })
+  @JoinTable(name = "ProjectOverview_Watcher", joinColumns = { @JoinColumn(name = "overviewId") }, inverseJoinColumns = {
+      @JoinColumn(name = "userId") })
   private Set<User> watchUsers = new HashSet<>();
 
   @Override
