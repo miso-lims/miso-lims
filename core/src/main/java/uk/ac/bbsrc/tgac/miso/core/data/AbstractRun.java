@@ -115,10 +115,10 @@ public abstract class AbstractRun implements Run {
   @OneToMany(targetEntity = RunQCImpl.class, mappedBy = "run", cascade = CascadeType.ALL, orphanRemoval = true)
   private Collection<RunQC> runQCs = new TreeSet<>();
 
-  @OneToMany(targetEntity = Note.class, cascade = CascadeType.ALL, orphanRemoval = true)
+  @ManyToMany(targetEntity = Note.class, cascade = CascadeType.ALL)
   @JoinTable(name = "Run_Note", joinColumns = {
-      @JoinColumn(name = "run_runId", nullable = false, updatable = false) }, inverseJoinColumns = {
-          @JoinColumn(name = "notes_noteId", nullable = false, updatable = false) })
+      @JoinColumn(name = "run_runId") }, inverseJoinColumns = {
+          @JoinColumn(name = "notes_noteId") })
   private Collection<Note> notes = new HashSet<>();
 
   @Enumerated(EnumType.STRING)

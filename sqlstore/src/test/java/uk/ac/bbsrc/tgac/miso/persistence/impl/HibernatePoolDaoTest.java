@@ -59,9 +59,10 @@ public class HibernatePoolDaoTest extends AbstractDAOTest {
     assertEquals(expected.getNotes().size(), actual.getNotes().size());
   }
 
-  private static PoolImpl getATestPool(int counter, Date creationDate, boolean discarded, int notes) {
+  final SecurityProfile mockSecurityProfile = new SecurityProfile();
+
+  private PoolImpl getATestPool(int counter, Date creationDate, boolean discarded, int notes) {
     final PoolImpl rtn = new PoolImpl();
-    final SecurityProfile mockSecurityProfile = new SecurityProfile();
     final User mockUser = new UserImpl();
 
     mockSecurityProfile.setProfileId(1L);

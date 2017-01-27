@@ -1,7 +1,9 @@
 package com.eaglegenomics.simlims.core;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,9 +11,22 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Kit;
+import uk.ac.bbsrc.tgac.miso.core.data.KitImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 
 /**
@@ -25,9 +40,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 @Entity
 @Table(name = "Note")
 public class Note implements Serializable, Comparable<Note> {
-
-  private static final long serialVersionUID = 1L;
-
   /**
    * Use this ID to indicate that a note has not yet been saved, and therefore
    * does not yet have a unique ID.
@@ -38,18 +50,54 @@ public class Note implements Serializable, Comparable<Note> {
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long noteId = Note.UNSAVED_ID;
 
-  @Column(nullable = false, updatable = false)
+  @Column(nullable = false)
   private Date creationDate = new Date();
 
-  @Column(nullable = false, updatable = false)
+  @Column(nullable = false)
   private String text = "";
 
   @ManyToOne(targetEntity = UserImpl.class)
-  @JoinColumn(name = "owner_userId", nullable = false, updatable = false)
+  @JoinColumn(name = "owner_userId", nullable = false)
   private User owner = null;
 
-  @Column(nullable = false, updatable = false)
+  @Column(nullable = false)
   private boolean internalOnly = false;
+
+  @ManyToMany(targetEntity = PoolImpl.class)
+  @JoinTable(name = "Pool_Note", inverseJoinColumns = {
+      @JoinColumn(name = "pool_poolId") }, joinColumns = {
+          @JoinColumn(name = "notes_noteId") })
+  private final Collection<Pool> pools = new HashSet<>();
+
+  @ManyToMany(targetEntity = RunImpl.class)
+  @JoinTable(name = "Run_Note", inverseJoinColumns = {
+      @JoinColumn(name = "run_runId") }, joinColumns = {
+          @JoinColumn(name = "notes_noteId") })
+  private final Collection<Run> runs = new HashSet<>();
+
+  @ManyToMany(targetEntity = KitImpl.class)
+  @JoinTable(name = "Kit_Note", inverseJoinColumns = {
+      @JoinColumn(name = "kit_kitId") }, joinColumns = {
+          @JoinColumn(name = "notes_noteId") })
+  private final Collection<Kit> kits = new HashSet<>();
+
+  @ManyToMany(targetEntity = SampleImpl.class)
+  @JoinTable(name = "Sample_Note", inverseJoinColumns = {
+      @JoinColumn(name = "sample_sampleId") }, joinColumns = {
+          @JoinColumn(name = "notes_noteId") })
+  private final Collection<Sample> samples = new HashSet<>();
+
+  @ManyToMany(targetEntity = LibraryImpl.class)
+  @JoinTable(name = "Library_Note", inverseJoinColumns = {
+      @JoinColumn(name = "library_libraryId") }, joinColumns = {
+          @JoinColumn(name = "notes_noteId") })
+  private final Collection<Library> libraries = new HashSet<>();
+
+  @ManyToMany(targetEntity = ProjectOverview.class)
+  @JoinTable(name = "ProjectOverview_Note", inverseJoinColumns = {
+      @JoinColumn(name = "overview_overviewId") }, joinColumns = {
+          @JoinColumn(name = "notes_noteId") })
+  private final Collection<ProjectOverview> overviews = new HashSet<>();
 
   public Note() {
   }

@@ -88,8 +88,23 @@ ALTER TABLE SequencerReference ADD CONSTRAINT fk_sequencerReference_platform FOR
 DROP TABLE Request;
 DROP TABLE Request_Note;
 
+ALTER TABLE ProjectOverview_Note ADD CONSTRAINT ProjectOverviewNote_ProjectOverview_FK FOREIGN KEY (overview_overviewId) REFERENCES ProjectOverview (overviewId);
+ALTER TABLE ProjectOverview_Note ADD CONSTRAINT ProjectOverviewNote_Note_FK FOREIGN KEY (notes_noteId) REFERENCES Note (noteId);
+
 ALTER TABLE Run_Note ADD CONSTRAINT RunNote_Run_FK FOREIGN KEY (run_runId) REFERENCES Run (runId);
 ALTER TABLE Run_Note ADD CONSTRAINT RunNote_Note_FK FOREIGN KEY (notes_noteId) REFERENCES Note (noteId);
+
+ALTER TABLE Pool_Note ADD CONSTRAINT PoolNote_Pool_FK FOREIGN KEY (pool_poolId) REFERENCES Pool (poolId);
+ALTER TABLE Pool_Note ADD CONSTRAINT PoolNote_Note_FK FOREIGN KEY (notes_noteId) REFERENCES Note (noteId);
+
+ALTER TABLE Sample_Note ADD CONSTRAINT SampleNote_Sample_FK FOREIGN KEY (sample_sampleId) REFERENCES Sample (sampleId);
+ALTER TABLE Sample_Note ADD CONSTRAINT SampleNote_Note_FK FOREIGN KEY (notes_noteId) REFERENCES Note (noteId);
+
+ALTER TABLE Library_Note ADD CONSTRAINT LibraryNote_Library_FK FOREIGN KEY (library_libraryId) REFERENCES Library (libraryId);
+ALTER TABLE Library_Note ADD CONSTRAINT LibraryNote_Note_FK FOREIGN KEY (notes_noteId) REFERENCES Note (noteId);
+
+ALTER TABLE Kit_Note ADD CONSTRAINT KitNote_Kit_FK FOREIGN KEY (kit_kitId) REFERENCES Kit (kitId);
+ALTER TABLE Kit_Note ADD CONSTRAINT KitNote_Note_FK FOREIGN KEY (notes_noteId) REFERENCES Note (noteId);
 
 UPDATE Run SET platformType = UPPER(platformType);
 ALTER TABLE Run ADD CONSTRAINT fk_run_securityProfile FOREIGN KEY (securityProfile_profileId) REFERENCES SecurityProfile (profileId);

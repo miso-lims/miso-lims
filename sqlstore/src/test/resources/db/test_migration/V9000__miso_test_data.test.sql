@@ -520,29 +520,16 @@ VALUES
 (3, '2016-03-11', 0, 'third note', 1);
 
 DELETE FROM `ProjectOverview_note`;
-INSERT INTO `ProjectOverview_note`(`overview_overviewId`, `notes_noteId`)
-VALUES (33, 2);
-
 
 DELETE FROM `Kit_Note`;
-INSERT INTO `Kit_Note`(`kit_kitId`, `notes_noteId`)
-VALUES (33, 1);
 
 DELETE FROM `Sample_Note`;
-INSERT INTO `Sample_Note`(`sample_sampleId`, `notes_noteId`)
-VALUES (33, 2);
 
 DELETE FROM `Library_Note`;
-INSERT INTO `Library_Note`(`library_libraryId`, `notes_noteId`)
-VALUES (33, 3);
 
 DELETE FROM `Run_Note`;
-INSERT INTO `Run_Note`(`run_runId`, `notes_noteId`)
-VALUES (3, 1);
 
 DELETE FROM `Pool_Note`;
-INSERT INTO `Pool_Note`(`pool_poolId`, `notes_noteId`)
-VALUES (33, 2);
 
 -- DetailedSample and DetailedLibrary values
 INSERT INTO `SampleClass`(`sampleClassId`, `alias`, `sampleCategory`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
