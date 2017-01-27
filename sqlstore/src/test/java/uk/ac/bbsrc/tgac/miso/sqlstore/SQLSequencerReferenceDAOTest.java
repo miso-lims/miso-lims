@@ -101,7 +101,7 @@ public class SQLSequencerReferenceDAOTest extends AbstractDAOTest {
   public void testGet() throws Exception {
     SequencerReference seqref = dao.get(1);
     assertNotNull(seqref);
-    assertEquals("seqref name does not match", "h1179", seqref.getName());
+    assertEquals("seqref name does not match", "SN7001179", seqref.getName());
     assertNull("seqref date commissioned is not null", seqref.getDateCommissioned());
     assertNull("seqref date decommissioned is not null", seqref.getDateDecommissioned());
   }
