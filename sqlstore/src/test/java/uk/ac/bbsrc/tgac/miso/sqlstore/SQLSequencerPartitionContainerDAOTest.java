@@ -208,10 +208,7 @@ public class SQLSequencerPartitionContainerDAOTest extends AbstractDAOTest {
     if (removeTarget != null) {
       fetchedSPC.getRuns().remove(removeTarget);
       dao.save(fetchedSPC);
-      sessionFactory.getCurrentSession().flush();
     }
-    SequencerPartitionContainer<SequencerPoolPartition> refetchedSPC = dao.get(fetchedSPC.getId());
-    List<SequencerPartitionContainer<SequencerPoolPartition>> reSpcByRunId = dao.listAllSequencerPartitionContainersByRunId(runId);
     assertEquals(0, dao.listAllSequencerPartitionContainersByRunId(runId).size());
   }
 

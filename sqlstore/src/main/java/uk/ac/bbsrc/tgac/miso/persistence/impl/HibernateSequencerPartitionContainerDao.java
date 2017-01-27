@@ -97,6 +97,10 @@ public class HibernateSequencerPartitionContainerDao implements SequencerPartiti
   @Override
   public SequencerPartitionContainer<SequencerPoolPartition> getSequencerPartitionContainerByPartitionId(long partitionId)
       throws IOException {
+    // flush here because if Hibernate has not persisted recent changes to container-partition relationships, unexpected associations may
+    // show up
+    currentSession().flush();
+
     Criteria criteria = currentSession().createCriteria(SequencerPartitionContainerImpl.class, "spc");
     criteria.createAlias("spc.partitions", "ps");
     criteria.add(Restrictions.eq("ps.id", partitionId));
@@ -109,6 +113,10 @@ public class HibernateSequencerPartitionContainerDao implements SequencerPartiti
   @Override
   public List<SequencerPartitionContainer<SequencerPoolPartition>> listAllSequencerPartitionContainersByRunId(long runId)
       throws IOException {
+    // flush here because if Hibernate has not persisted recent changes to container-partition relationships, unexpected associations may
+    // show up
+    currentSession().flush();
+
     Criteria criteria = currentSession().createCriteria(SequencerPartitionContainerImpl.class);
     criteria.createAlias("runs", "run");
     criteria.add(Restrictions.eq("run.id", runId));
@@ -129,6 +137,10 @@ public class HibernateSequencerPartitionContainerDao implements SequencerPartiti
 
   @Override
   public Collection<? extends SequencerPoolPartition> listPartitionsByContainerId(long sequencerPartitionContainerId) throws IOException {
+    // flush here because if Hibernate has not persisted recent changes to container-partition relationships, unexpected associations may
+    // show up
+    currentSession().flush();
+
     Criteria criteria = currentSession().createCriteria(PartitionImpl.class);
     criteria.add(Restrictions.eq("sequencerPartitionContainer.id", sequencerPartitionContainerId));
     @SuppressWarnings("unchecked")

@@ -113,6 +113,10 @@ public class HibernateRunDao implements RunStore {
 
   @Override
   public Run getLatestStartDateRunBySequencerPartitionContainerId(long containerId) throws IOException {
+    // flush here because if Hibernate has not persisted recent changes to container-run relationships, unexpected associations may
+    // show up
+    currentSession().flush();
+
     Criteria criteria = currentSession().createCriteria(RunImpl.class, "r");
     criteria.createAlias("r.containers", "spc").createAlias("r.status", "status");
     criteria.add(Restrictions.eq("spc.id", containerId));
@@ -123,6 +127,10 @@ public class HibernateRunDao implements RunStore {
 
   @Override
   public Run getLatestRunIdRunBySequencerPartitionContainerId(long containerId) throws IOException {
+    // flush here because if Hibernate has not persisted recent changes to container-run relationships, unexpected associations may
+    // show up
+    currentSession().flush();
+
     Criteria criteria = currentSession().createCriteria(RunImpl.class);
     criteria.createAlias("containers", "spc");
     criteria.add(Restrictions.eq("spc.id", containerId));
@@ -160,6 +168,10 @@ public class HibernateRunDao implements RunStore {
 
   @Override
   public List<Run> listBySequencerPartitionContainerId(long containerId) throws IOException {
+    // flush here because if Hibernate has not persisted recent changes to container-run relationships, unexpected associations may
+    // show up
+    currentSession().flush();
+
     Criteria criteria = currentSession().createCriteria(RunImpl.class);
     criteria.createAlias("containers", "spc");
     criteria.add(Restrictions.eq("spc.id", containerId));
