@@ -86,6 +86,7 @@ public class SQLSecurityDAOTest extends AbstractDAOTest {
   
   @Test
   public void testGetUserByIdNull() throws IOException {
+    exception.expect(Exception.class);
     assertNull(dao.getUserById(null));
   }
   
@@ -210,7 +211,7 @@ public class SQLSecurityDAOTest extends AbstractDAOTest {
   
   @Test
   public void testGetGroupByIdNull() throws IOException {
-    exception.expect(NullPointerException.class);
+    exception.expect(Exception.class);
     dao.getGroupById(null);
   }
   
