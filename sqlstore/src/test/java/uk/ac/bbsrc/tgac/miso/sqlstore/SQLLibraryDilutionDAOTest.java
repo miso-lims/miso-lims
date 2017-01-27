@@ -4,9 +4,8 @@ import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import org.hibernate.SessionFactory;
 import org.junit.Before;
@@ -14,21 +13,19 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
+import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDilutionDao;
 
 public class SQLLibraryDilutionDAOTest extends AbstractDAOTest {
@@ -38,25 +35,17 @@ public class SQLLibraryDilutionDAOTest extends AbstractDAOTest {
 
   @Autowired
   private SessionFactory sessionFactory;
-  @Mock
-  private NamingScheme namingScheme;
 
   @InjectMocks
   private HibernateLibraryDilutionDao dao;
 
-  // Auto-increment sequence doesn't roll back with transactions, so must be tracked
-  private static long nextAutoIncrementId = 15L;
+  private final User emptyUser = new UserImpl();
 
   @Before
   public void setUp() throws MisoNamingException {
     MockitoAnnotations.initMocks(this);
     dao.setSessionFactory(sessionFactory);
-    Mockito.when(namingScheme.validateName(Mockito.anyString())).thenReturn(ValidationResult.success());
-  }
-
-  private void mockAutoIncrement(long value) {
-    final Map<String, Object> rs = new HashMap<>();
-    rs.put("Auto_increment", value);
+    emptyUser.setUserId(1L);
   }
 
   @Test
@@ -90,7 +79,7 @@ public class SQLLibraryDilutionDAOTest extends AbstractDAOTest {
 
   @Test
   public void testGetLibraryDilutionByBarcodeNull() throws IOException {
-    expectedException.expect(NullPointerException.class);
+    expectedException.expect(IOException.class);
     dao.getLibraryDilutionByBarcode(null);
   }
 
@@ -104,7 +93,6 @@ public class SQLLibraryDilutionDAOTest extends AbstractDAOTest {
     assertEquals(14, dao.listAllWithLimit(9999).size());
     assertEquals(10, dao.listAllWithLimit(10L).size());
     assertEquals(5, dao.listAllWithLimit(5L).size());
-    assertEquals(0, dao.listAllWithLimit(0L).size());
     assertEquals(14, dao.listAllWithLimit(-1L).size());
   }
 
@@ -187,7 +175,8 @@ public class SQLLibraryDilutionDAOTest extends AbstractDAOTest {
   @Test
   public void testListAllLibraryDilutionsByPlatformNull() throws IOException {
     expectedException.expect(NullPointerException.class);
-    dao.listAllLibraryDilutionsByPlatform(null);
+    Collection<LibraryDilution> mystery = dao.listAllLibraryDilutionsByPlatform(null);
+    assertTrue(mystery.size() > 0);
   }
 
   @Test
@@ -231,20 +220,19 @@ public class SQLLibraryDilutionDAOTest extends AbstractDAOTest {
 
   @Test
   public void testSaveNew() throws IOException {
-    final long autoIncrementId = nextAutoIncrementId;
-    assertNull(dao.get(autoIncrementId));
 
     final LibraryDilution ld = new LibraryDilution();
     final Library lib = new LibraryImpl();
     lib.setId(1L);
     ld.setLibrary(lib);
     ld.setConcentration(12.5D);
-    mockAutoIncrement(autoIncrementId);
-    assertEquals(autoIncrementId, dao.save(ld));
-    final LibraryDilution saved = dao.get(autoIncrementId);
+    ld.setCreationDate(new Date());
+    ld.setDilutionCreator("moi");
+    ld.setName("nom de plume");
+    Long newId = dao.save(ld);
+    final LibraryDilution saved = dao.get(newId);
     assertNotNull(saved);
     assertEquals(Double.valueOf(12.5D), saved.getConcentration());
-    nextAutoIncrementId++;
   }
 
   @Test

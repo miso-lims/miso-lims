@@ -487,8 +487,10 @@ DROP TABLE Chamber;
 DROP TABLE Lane;
 DROP TABLE Flowcell;
 
-UPDATE Library SET platformName = UPPER(platformName);
 UPDATE LibraryType SET platformType = UPPER(platformType);
+
+UPDATE Library SET platformName = UPPER(platformName);
+ALTER TABLE Library CHANGE COLUMN platformName platformType varchar(255) DEFAULT NULL;
 ALTER TABLE Library ADD CONSTRAINT fk_library_libraryType FOREIGN KEY (libraryType) REFERENCES LibraryType (libraryTypeId);
 ALTER TABLE Library ADD CONSTRAINT fk_library_librarySelectionType FOREIGN KEY (librarySelectionType) REFERENCES LibrarySelectionType (librarySelectionTypeId);
 ALTER TABLE Library ADD CONSTRAINT fk_library_libraryStrategyType FOREIGN KEY (libraryStrategyType) REFERENCES LibraryStrategyType (libraryStrategyTypeId);
