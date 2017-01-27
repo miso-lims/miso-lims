@@ -10,6 +10,7 @@ import java.util.List;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -23,6 +24,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
@@ -37,6 +39,13 @@ public class HibernateSequencerPartitionContainerDao implements SequencerPartiti
 
   private Session currentSession() {
     return getSessionFactory().getCurrentSession();
+  }
+
+  private Criterion searchRestrictions(String querystr) {
+    String sanitizedQuery = DbUtils.convertStringToSearchQuery(querystr);
+    Criterion criteria = Restrictions.or(Restrictions.eq("spc.platform", PlatformType.get(sanitizedQuery)),
+        Restrictions.ilike("spc.identificationBarcode", sanitizedQuery));
+    return criteria;
   }
 
   @Override
@@ -88,8 +97,8 @@ public class HibernateSequencerPartitionContainerDao implements SequencerPartiti
   @Override
   public SequencerPartitionContainer<SequencerPoolPartition> getSequencerPartitionContainerByPartitionId(long partitionId)
       throws IOException {
-    Criteria criteria = currentSession().createCriteria(SequencerPartitionContainerImpl.class);
-    criteria.createAlias("partitions", "ps");
+    Criteria criteria = currentSession().createCriteria(SequencerPartitionContainerImpl.class, "spc");
+    criteria.createAlias("spc.partitions", "ps");
     criteria.add(Restrictions.eq("ps.id", partitionId));
     @SuppressWarnings("unchecked")
     SequencerPartitionContainer<SequencerPoolPartition> record = (SequencerPartitionContainer<SequencerPoolPartition>) criteria
@@ -101,7 +110,8 @@ public class HibernateSequencerPartitionContainerDao implements SequencerPartiti
   public List<SequencerPartitionContainer<SequencerPoolPartition>> listAllSequencerPartitionContainersByRunId(long runId)
       throws IOException {
     Criteria criteria = currentSession().createCriteria(SequencerPartitionContainerImpl.class);
-    criteria.add(Restrictions.eq("runs.id", runId));
+    criteria.createAlias("runs", "run");
+    criteria.add(Restrictions.eq("run.id", runId));
     @SuppressWarnings("unchecked")
     List<SequencerPartitionContainer<SequencerPoolPartition>> records = criteria.list();
     return records;
@@ -131,8 +141,8 @@ public class HibernateSequencerPartitionContainerDao implements SequencerPartiti
     if (isStringEmptyOrNull(querystr)) {
       return count();
     } else {
-      Criteria criteria = currentSession().createCriteria(SequencerPartitionContainerImpl.class);
-      criteria.add(DbUtils.searchRestrictions(querystr, "platform", "identificationBarcode"));
+      Criteria criteria = currentSession().createCriteria(SequencerPartitionContainerImpl.class, "spc");
+      criteria.add(searchRestrictions(querystr));
       return (Long) criteria.setProjection(Projections.rowCount()).uniqueResult();
     }
   }
@@ -142,8 +152,8 @@ public class HibernateSequencerPartitionContainerDao implements SequencerPartiti
       String sortDir, String sortCol) throws IOException {
     if (offset < 0 || limit < 0) throw new IOException("Limit and Offset must not be less than zero");
     if ("lastModified".equals(sortCol)) sortCol = "derivedInfo.lastModified";
-    Criteria criteria = currentSession().createCriteria(SequencerPartitionContainerImpl.class);
-    criteria.add(DbUtils.searchRestrictions(querystr, "platform", "identificationBarcode"));
+    Criteria criteria = currentSession().createCriteria(SequencerPartitionContainerImpl.class, "spc");
+    criteria.add(searchRestrictions(querystr));
     // required to sort by 'derivedInfo.lastModifier'
     criteria.createAlias("derivedInfo", "derivedInfo");
     criteria.setFirstResult(offset);

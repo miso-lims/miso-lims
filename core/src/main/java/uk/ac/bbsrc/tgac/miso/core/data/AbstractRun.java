@@ -108,14 +108,14 @@ public abstract class AbstractRun implements Run {
   private Integer cycles;
   private String filePath;
 
-  @OneToOne(targetEntity = StatusImpl.class, cascade = CascadeType.ALL)
+  @OneToOne(targetEntity = StatusImpl.class, cascade = CascadeType.ALL, orphanRemoval = true)
   @JoinColumn(name = "status_statusId")
   private Status status = new StatusImpl();
 
-  @OneToMany(targetEntity = RunQCImpl.class, mappedBy = "run", cascade = CascadeType.ALL)
+  @OneToMany(targetEntity = RunQCImpl.class, mappedBy = "run", cascade = CascadeType.ALL, orphanRemoval = true)
   private Collection<RunQC> runQCs = new TreeSet<>();
 
-  @OneToMany(targetEntity = Note.class, cascade = CascadeType.ALL)
+  @OneToMany(targetEntity = Note.class, cascade = CascadeType.ALL, orphanRemoval = true)
   @JoinTable(name = "Run_Note", joinColumns = {
       @JoinColumn(name = "run_runId", nullable = false, updatable = false) }, inverseJoinColumns = {
           @JoinColumn(name = "notes_noteId", nullable = false, updatable = false) })

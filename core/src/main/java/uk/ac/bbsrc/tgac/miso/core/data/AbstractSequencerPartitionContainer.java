@@ -71,8 +71,8 @@ public abstract class AbstractSequencerPartitionContainer<T extends Partition> i
 
   @ManyToMany(targetEntity = RunImpl.class)
   @JoinTable(name = "Run_SequencerPartitionContainer", joinColumns = {
-      @JoinColumn(name = "containers_containerId", nullable = false, updatable = false) }, inverseJoinColumns = {
-          @JoinColumn(name = "Run_runId", nullable = false, updatable = false) })
+      @JoinColumn(name = "containers_containerId") }, inverseJoinColumns = {
+          @JoinColumn(name = "Run_runId") })
   private Collection<Run> runs = null;
 
   @ManyToOne(targetEntity = SecurityProfile.class, cascade = CascadeType.ALL)
