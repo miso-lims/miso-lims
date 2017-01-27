@@ -39,6 +39,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SampleChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.StrStatus;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
@@ -919,6 +920,16 @@ public class DetailedSampleBuilder
     tissue.setTissueMaterial(tissueMaterial);
     tissue.setRegion(region);
     return tissue;
+  }
+
+  @Override
+  public ChangeLog createChangeLog(String summary, String columnsChanged, User user) {
+    SampleChangeLog changeLog = new SampleChangeLog();
+    changeLog.setSample(this);
+    changeLog.setSummary(summary);
+    changeLog.setColumnsChanged(columnsChanged);
+    changeLog.setUser(user);
+    return changeLog;
   }
 
 }

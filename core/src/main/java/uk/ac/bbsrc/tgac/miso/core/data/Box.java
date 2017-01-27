@@ -29,7 +29,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
 @JsonIgnoreProperties({ "securityProfile", "2DArray", "lastModifier", "changeLog", "positionCount", "freeCount", "tubeCount" })
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public interface Box extends SecurableByProfile, Barcodable, Locatable, Deletable {
+public interface Box extends SecurableByProfile, Barcodable, Locatable, Deletable, ChangeLoggable {
   public static class BoxablesSerializer extends JsonSerializer<Map<String, Boxable>> {
     @Override
     public void serialize(Map<String, Boxable> map, JsonGenerator jgen, SerializerProvider provider)

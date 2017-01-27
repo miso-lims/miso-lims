@@ -25,6 +25,11 @@ public class AbstractLibraryTestSuite {
   @Before
   public void setUp() throws Exception {
     al = new AbstractLibrary() {
+
+      @Override
+      public ChangeLog createChangeLog(String summary, String columnsChanged, User user) {
+        return null;
+      }
     };
     mapper = new ObjectMapper();
   }

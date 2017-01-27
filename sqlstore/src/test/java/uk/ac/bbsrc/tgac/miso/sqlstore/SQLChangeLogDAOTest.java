@@ -20,9 +20,10 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.BoxChangeLog;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateChangeLogDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSecurityDao;
 
 public class SQLChangeLogDAOTest extends AbstractDAOTest {
@@ -35,6 +36,9 @@ public class SQLChangeLogDAOTest extends AbstractDAOTest {
   @InjectMocks
   private HibernateChangeLogDao sut;
 
+  @InjectMocks
+  private HibernateLibraryDao libraryDao;
+
   User user = new UserImpl();
 
   @Before
@@ -43,25 +47,26 @@ public class SQLChangeLogDAOTest extends AbstractDAOTest {
     user.setUserId(1L);
     when(securityDAO.getUserById(anyLong())).thenReturn(user);
     sut.setSessionFactory(sessionFactory);
+    libraryDao.setSessionFactory(sessionFactory);
   }
 
   @Test
   public void testListAll() throws Exception {
     Collection<ChangeLog> list = sut.listAll("sample");
     assertNotNull(list);
-    assertEquals(18, list.size());
+    assertEquals(19, list.size());
   }
 
   @Test
   public void testListAllById() throws Exception {
     Collection<ChangeLog> list = sut.listAllById("sample", 1L);
     assertNotNull(list);
-    assertEquals(2, list.size());
+    assertEquals(3, list.size());
   }
 
   @Test
   public void testDeleteAllById() throws Exception {
-    assertEquals(2, sut.listAllById("sample", 1L).size());
+    assertEquals(3, sut.listAllById("sample", 1L).size());
     sut.deleteAllById("sample", 1L);
     Collection<ChangeLog> list = sut.listAllById("sample", 1L);
     assertNotNull(list);
@@ -70,20 +75,17 @@ public class SQLChangeLogDAOTest extends AbstractDAOTest {
 
   @Test
   public void testCreate() throws Exception {
-    Collection<ChangeLog> list = sut.listAllById("sample", 1L);
+    Collection<ChangeLog> list = sut.listAllById("library", 1L);
     assertNotNull(list);
-    assertEquals(2, list.size());
+    assertEquals(1, list.size());
 
-    ChangeLog cl = new BoxChangeLog();
-    cl.setColumnsChanged("cols");
-    cl.setSummary("things changed");
-    cl.setUser(user);
-    cl.setTime(new Date());
+    Library library = libraryDao.get(1L);
+    ChangeLog changeLog = library.createChangeLog("Things have changed.", "Columns that have changed.", user);
 
-    sut.create("sample", 1L, cl);
-    Collection<ChangeLog> newList = sut.listAllById("sample", 1L);
+    sut.create(changeLog);
+    Collection<ChangeLog> newList = sut.listAllById("library", 1L);
     assertNotNull(newList);
-    assertEquals(3, newList.size());
+    assertEquals(2, newList.size());
   }
 
   @Test

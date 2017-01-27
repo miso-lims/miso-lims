@@ -41,4 +41,12 @@ public class BoxChangeLog extends AbstractChangeLog {
     return boxChangeLogId;
   }
 
+  public Box getBox() {
+    return box;
+  }
+
+  public void setBox(Box box) {
+    this.box = box;
+  }
+
 }

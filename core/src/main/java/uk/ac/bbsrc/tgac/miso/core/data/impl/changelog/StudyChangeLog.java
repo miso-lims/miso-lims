@@ -42,4 +42,12 @@ public class StudyChangeLog extends AbstractChangeLog {
     return studyChangeLogId;
   }
 
+  public Study getStudy() {
+    return study;
+  }
+
+  public void setStudy(Study study) {
+    this.study = study;
+  }
+
 }

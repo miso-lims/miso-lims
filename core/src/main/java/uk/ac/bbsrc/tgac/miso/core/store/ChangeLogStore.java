@@ -3,8 +3,6 @@ package uk.ac.bbsrc.tgac.miso.core.store;
 import java.io.IOException;
 import java.util.Collection;
 
-import com.eaglegenomics.simlims.core.User;
-
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 
 /**
@@ -14,7 +12,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
  * 
  */
 public interface ChangeLogStore {
-  
+
   /**
    * List all change logs of a specified type.
    * 
@@ -32,7 +30,7 @@ public interface ChangeLogStore {
    * @throws IOException
    */
   public Collection<ChangeLog> listAllById(String type, long entityId) throws IOException;
-  
+
   /**
    * Delete all change logs of a specified type associated with the id of a specific entity.
    * 
@@ -40,19 +38,13 @@ public interface ChangeLogStore {
    * @param entityId The id of the entity the change log is associated with. (Not the id of the change log.)
    */
   public void deleteAllById(String type, long entityId);
-  
-  /**
-   * Create a change log of a specified type for an entity specified by entityId. The details of the change log message are copied from the
-   * specified {@link ChangeLog} argument.
-   * 
-   * @param type The change log type derived from {@link HibernateChangeLogDao.ChangeLogType ChangeLogType}
-   * @param entityId The id of the entity the change log is associated with. (Not the id of the change log.)
-   * @param changeLog The change log details are copied from this object. It is only necessary to provide the columnsChanged, summary and
-   *          user values. All other properties are ignored.
-   * @return The id of newly created change log.
-   */
-  public Long create(String type, long entityId, ChangeLog changeLog);
 
-  public Long create(String type, long entityId, String columnsChanged, String summary, User user);
-  
+  /**
+   * Persist the give change log.
+   * 
+   * @param changeLog The change log to persist.
+   * @return The id of the newly persisted change log.
+   */
+  public Long create(ChangeLog changeLog);
+
 }

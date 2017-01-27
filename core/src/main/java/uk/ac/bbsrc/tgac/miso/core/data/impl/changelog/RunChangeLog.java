@@ -39,4 +39,12 @@ public class RunChangeLog extends AbstractChangeLog {
     return runChangeLogId;
   }
 
+  public Run getRun() {
+    return run;
+  }
+
+  public void setRun(Run run) {
+    this.run = run;
+  }
+
 }

@@ -37,7 +37,9 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary;
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryChangeLog;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.data.impl
@@ -77,5 +79,15 @@ public class LibraryImpl extends AbstractLibrary implements Serializable {
     } else {
       setSecurityProfile(new SecurityProfile(user));
     }
+  }
+
+  @Override
+  public ChangeLog createChangeLog(String summary, String columnsChanged, User user) {
+    LibraryChangeLog changeLog = new LibraryChangeLog();
+    changeLog.setLibrary(this);
+    changeLog.setSummary(summary);
+    changeLog.setColumnsChanged(columnsChanged);
+    changeLog.setUser(user);
+    return changeLog;
   }
 }

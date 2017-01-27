@@ -31,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
@@ -41,7 +42,6 @@ import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateChangeLogDao.ChangeLogType;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 @Transactional(rollbackFor = Exception.class)
@@ -239,7 +239,8 @@ public class HibernatePoolDao implements PoolStore {
       currentSession().flush();
       ChangeLogEntry log;
       while ((log = changeLogQueue.poll()) != null) {
-        changeLogStore.create(ChangeLogType.POOL.name(), log.pool.getId(), "contents", log.summary, log.pool.getLastModifier());
+        ChangeLog changeLog = pool.createChangeLog(log.summary, "contents", log.pool.getLastModifier());
+        changeLogStore.create(changeLog);
       }
     }
 

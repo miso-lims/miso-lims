@@ -41,4 +41,13 @@ public class PoolChangeLog extends AbstractChangeLog {
   public Long getPoolChangeLogId() {
     return poolChangeLogId;
   }
+
+  public Pool getPool() {
+    return pool;
+  }
+
+  public void setPool(Pool pool) {
+    this.pool = pool;
+  }
+
 }

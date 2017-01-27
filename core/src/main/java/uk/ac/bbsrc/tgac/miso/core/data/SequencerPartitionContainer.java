@@ -47,7 +47,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 @JsonIgnoreProperties({ "securityProfile", "run" })
 public interface SequencerPartitionContainer<T extends Partition>
-    extends SecurableByProfile, Deletable, Comparable<SequencerPartitionContainer<?>>, Barcodable, Locatable
+    extends SecurableByProfile, Deletable, Comparable<SequencerPartitionContainer<?>>, Barcodable, Locatable, ChangeLoggable
 {
 
   public void setId(long id);

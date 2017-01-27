@@ -34,7 +34,9 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SampleChangeLog;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.data.impl
@@ -94,5 +96,15 @@ public class SampleImpl extends AbstractSample implements Serializable {
   @Override
   public void buildReport() {
 
+  }
+
+  @Override
+  public ChangeLog createChangeLog(String summary, String columnsChanged, User user) {
+    SampleChangeLog changeLog = new SampleChangeLog();
+    changeLog.setSample(this);
+    changeLog.setSummary(summary);
+    changeLog.setColumnsChanged(columnsChanged);
+    changeLog.setUser(user);
+    return changeLog;
   }
 }

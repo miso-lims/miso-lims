@@ -41,9 +41,9 @@ public class DefaultChangeLogService implements ChangeLogService {
   }
 
   @Override
-  public Long create(String type, long entityId, ChangeLog changeLog) throws IOException {
+  public Long create(ChangeLog changeLog) throws IOException {
     authorizationManager.throwIfUnauthenticated();
-    return changeLogDao.create(type, entityId, changeLog);
+    return changeLogDao.create(changeLog);
   }
 
 }

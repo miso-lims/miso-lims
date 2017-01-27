@@ -44,7 +44,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 @JsonIgnoreProperties({ "securityProfile" })
-public interface Study extends SecurableByProfile, Comparable<Study>, Deletable, Nameable {
+public interface Study extends SecurableByProfile, Comparable<Study>, Deletable, Nameable, ChangeLoggable {
 
   /** Field PREFIX */
   public static final String PREFIX = "STU";

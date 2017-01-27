@@ -44,4 +44,8 @@ public class SequencerPartitionContainerChangeLog extends AbstractChangeLog {
     return sequencerPartitionContainerChangeLogId;
   }
 
+  public void setSequencerPartitionContainer(SequencerPartitionContainer sequencerPartitionContainer) {
+    this.sequencerPartitionContainer = sequencerPartitionContainer;
+  }
+
 }

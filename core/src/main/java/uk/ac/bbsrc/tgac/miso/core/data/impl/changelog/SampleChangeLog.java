@@ -42,4 +42,12 @@ public class SampleChangeLog extends AbstractChangeLog {
     return sampleChangeLogId;
   }
 
+  public Sample getSample() {
+    return sample;
+  }
+
+  public void setSample(Sample sample) {
+    this.sample = sample;
+  }
+
 }

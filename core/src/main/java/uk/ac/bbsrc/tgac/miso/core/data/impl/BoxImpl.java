@@ -26,6 +26,8 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBox;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.BoxChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 
 @Entity
@@ -182,5 +184,15 @@ public class BoxImpl extends AbstractBox implements Serializable {
     } catch (IOException ex) {
       return "";
     }
+  }
+
+  @Override
+  public ChangeLog createChangeLog(String summary, String columnsChanged, User user) {
+    BoxChangeLog changeLog = new BoxChangeLog();
+    changeLog.setBox(this);
+    changeLog.setSummary(summary);
+    changeLog.setColumnsChanged(columnsChanged);
+    changeLog.setUser(user);
+    return changeLog;
   }
 }
