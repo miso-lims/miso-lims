@@ -16,7 +16,6 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Matchers;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,10 +75,10 @@ public class SQLExperimentDAOTest extends AbstractDAOTest {
     experiment.setName("TEMPORARY_XXX");
     experiment.setPlatform(new PlatformImpl());
     experiment.setStudy(new StudyImpl());
-    User mockUser = Mockito.mock(UserImpl.class);
-    when(mockUser.getUserId()).thenReturn(1L);
+    User user = new UserImpl();
+    user.setUserId(1L);
 
-    experiment.setLastModifier(mockUser);
+    experiment.setLastModifier(user);
     experiment.setName(namingScheme.generateNameFor(experiment));
     experiment.setTitle("Title");
     dao.save(experiment);
