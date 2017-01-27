@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -89,6 +90,7 @@ public class ProjectOverview implements Watchable, Alertable, Nameable, Serializ
 
   public static final Long UNSAVED_ID = 0L;
 
+  @Column(name = "allLibraryQcPassed")
   private boolean allLibrariesQcPassed;
 
   private boolean allPoolsConstructed;
