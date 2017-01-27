@@ -86,9 +86,7 @@ public class BoxImpl extends AbstractBox implements Serializable {
     if (!position.matches("[A-Z][0-9][0-9]")) throw new IllegalArgumentException("Position must match [A-Z][0-9][0-9]");
     if (BoxUtils.fromRowChar(position.charAt(0)) >= getSize().getRows()) throw new IndexOutOfBoundsException("Row letter too large!");
     int col = BoxUtils.tryParseInt(position.substring(1, 3));
-    if (col <= 0 || col > getSize().getColumns()) throw new IndexOutOfBoundsException("Column value too large!"); // columns are
-                                                                                                                  // zero-indexed in
-                                                                                                                  // database
+    if (col <= 0 || col > getSize().getColumns()) throw new IndexOutOfBoundsException("Column value too large!");
   }
   
   @Override
@@ -142,12 +140,7 @@ public class BoxImpl extends AbstractBox implements Serializable {
   @Override
   public void removeBoxable(String position) {
     validate(position);
-    removeBoxable(getBoxable(position));
-  }
-
-  @Override
-  public void removeBoxable(Boxable boxable) {
-    boxableItems.values().remove(boxable);
+    boxableItems.remove(position);
   }
 
   @Override

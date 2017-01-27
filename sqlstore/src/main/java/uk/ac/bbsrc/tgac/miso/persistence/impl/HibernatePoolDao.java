@@ -3,25 +3,19 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.hibernate.Criteria;
-import org.hibernate.EmptyInterceptor;
-import org.hibernate.Interceptor;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.type.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.User;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
@@ -62,56 +55,6 @@ public class HibernatePoolDao implements PoolStore {
   private BoxStore boxStore;
 
   private final Queue<ChangeLogEntry> changeLogQueue = new ConcurrentLinkedQueue<>();
-
-  private final Interceptor interceptor = new EmptyInterceptor() {
-    private static final long serialVersionUID = 1303535328531024816L;
-
-    private String buildElementString(Set<Dilution> dilutionss) {
-      StringBuilder names = new StringBuilder();
-      for (Dilution dilution : dilutionss) {
-        if (names.length() > 0) {
-          names.append(", ");
-        }
-        names.append(dilution.getName());
-      }
-      return names.toString();
-    }
-
-    @Override
-    public boolean onFlushDirty(Object entity, Serializable id, Object[] currentState, Object[] previousState, String[] propertyNames,
-        Type[] types) {
-
-      if (entity instanceof Pool) {
-        Pool pool = (Pool) entity;
-        for (int i = 0; i < propertyNames.length; i++) {
-          if (!propertyNames[i].equals("pooledElements")) continue;
-          @SuppressWarnings("unchecked")
-          Set<Dilution> original = (Set<Dilution>) previousState[i];
-          @SuppressWarnings("unchecked")
-          Set<Dilution> updated = (Set<Dilution>) currentState[i];
-
-          Set<Dilution> added = new HashSet<>(updated);
-          added.removeAll(original);
-          Set<Dilution> removed = new HashSet<>(original);
-          removed.removeAll(updated);
-
-          if (!added.isEmpty() || !removed.isEmpty()) {
-
-            String message = pool.getLastModifier().getLoginName() + (removed.isEmpty() ? "" : (" Removed: " + buildElementString(removed)))
-                + (added.isEmpty() ? "" : (" Added: " + buildElementString(removed)));
-            final ChangeLogEntry changeLog = new ChangeLogEntry();
-            changeLog.pool = pool;
-            changeLog.summary = message.toString();
-            changeLogQueue.add(changeLog);
-            System.out.println(message.toString());
-          }
-
-        }
-      }
-      return super.onFlushDirty(entity, id, currentState, previousState, propertyNames, types);
-
-    }
-  };
 
   @Autowired
   private JdbcTemplate jdbcTemplate;

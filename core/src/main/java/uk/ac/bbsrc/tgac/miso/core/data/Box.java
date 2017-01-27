@@ -147,14 +147,6 @@ public interface Box extends SecurableByProfile, Barcodable, Locatable, Deletabl
   public void removeBoxable(String position);
 
   /**
-   * Removes a given Boxable item from the Box
-   * 
-   * @param Boxable
-   *          boxable
-   */
-  public void removeBoxable(Boxable boxable);
-
-  /**
    * Removes ALL Boxable items from the Box
    * 
    */

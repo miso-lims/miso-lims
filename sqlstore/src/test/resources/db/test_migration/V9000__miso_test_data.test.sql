@@ -476,7 +476,7 @@ VALUES
 DELETE FROM BoxPosition;
 INSERT INTO `BoxPosition` (`boxId`, `position`, `targetType`, `targetId`)
 VALUES
-('1', 'A01', 'S', 1),
+('1', 'B02', 'S', 1),
 ('2', 'A02', 'S', 2);
 
 DELETE FROM Submission;
