@@ -113,7 +113,7 @@ public class ExperimentImpl implements Experiment, Serializable {
       @JoinColumn(name = "Experiment_experimentId") })
   private Run run;
 
-  @ManyToOne(cascade = CascadeType.ALL)
+  @ManyToOne(cascade = CascadeType.PERSIST)
   @JoinColumn(name = "securityProfile_profileId")
   private SecurityProfile securityProfile = new SecurityProfile();
 
