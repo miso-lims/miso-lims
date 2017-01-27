@@ -202,20 +202,11 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public long saveRunQC(RunQC runQC) throws IOException {
+  public void saveRunQC(RunQC runQC) throws IOException {
     if (writeCheck(runQC.getRun())) {
-      return backingManager.saveRunQC(runQC);
+      backingManager.saveRunQC(runQC);
     } else {
       throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot write to the parent Run");
-    }
-  }
-
-  @Override
-  public long saveSample(Sample sample) throws IOException {
-    if (writeCheck(sample)) {
-      return backingManager.saveSample(sample);
-    } else {
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot write to this Sample");
     }
   }
 
@@ -975,15 +966,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   @Override
   public void saveKitNote(Kit kit, Note note) throws IOException {
     backingManager.saveKitNote(kit, note);
-  }
-
-  @Override
-  public long savePlatform(Platform platform) throws IOException {
-    if (getCurrentUser().isAdmin()) {
-      return backingManager.savePlatform(platform);
-    } else {
-      throw new IOException("User " + getCurrentUser().getFullName() + " cannot write to this Platform");
-    }
   }
 
   @Override

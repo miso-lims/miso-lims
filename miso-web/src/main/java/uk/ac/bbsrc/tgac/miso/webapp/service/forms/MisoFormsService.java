@@ -39,6 +39,7 @@ import com.eaglegenomics.simlims.core.Note;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.TaxonomyUtils;
+import uk.ac.bbsrc.tgac.miso.service.SampleService;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.service.forms
@@ -54,13 +55,19 @@ public class MisoFormsService {
 
   @Autowired
   private RequestManager requestManager;
+  @Autowired
+  private SampleService sampleService;
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
   }
 
+  public void setSampleService(SampleService sampleService) {
+    this.sampleService = sampleService;
+  }
+
   public void importSampleDeliveryFormSamples(List<Sample> samples, boolean checkTaxon) throws IOException {
-    Map<String, String> foundTaxons = new HashMap<String, String>();
+    Map<String, String> foundTaxons = new HashMap<>();
     if (importSampleDeliveryFormSamplesValidation(samples)) {
       log.info("Samples valid. Importing...");
       for (Sample s : samples) {
@@ -96,7 +103,7 @@ public class MisoFormsService {
               ms.setNotes(s.getNotes());
             }
 
-            requestManager.saveSample(ms);
+            sampleService.update(ms);
           }
         } else {
           throw new IOException("No such sample " + s.getAlias() + " with barcode: " + s.getIdentificationBarcode());

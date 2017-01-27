@@ -297,12 +297,8 @@ public class UserAuthMisoRequestManagerTestSuite {
    */
   @Test
   public void testSaveRunQC() throws IOException {
-    final long expectedReturn = 1L;
     when(runQC.getRun()).thenReturn(run);
     when(run.userCanWrite(any(User.class))).thenReturn(true);
-    when(backingManager.saveRunQC(runQC)).thenReturn(expectedReturn);
-
-    assertEquals(expectedReturn, userAuthMisoRequestManager.saveRunQC(runQC));
 
     verify(backingManager).saveRunQC(runQC);
   }
@@ -323,40 +319,6 @@ public class UserAuthMisoRequestManagerTestSuite {
     userAuthMisoRequestManager.saveRunQC(runQC);
 
     verify(backingManager, never()).saveRunQC(runQC);
-  }
-
-  /**
-   * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveSample(uk.ac.bbsrc.tgac.miso.core.data.Sample)} .
-   * 
-   * @throws IOException
-   */
-  @Test
-  public void testSaveSample() throws IOException {
-    final long expectedReturn = 1L;
-    when(sample.userCanWrite(any(User.class))).thenReturn(true);
-    when(backingManager.saveSample(sample)).thenReturn(expectedReturn);
-
-    assertEquals(expectedReturn, userAuthMisoRequestManager.saveSample(sample));
-
-    verify(backingManager).saveSample(sample);
-  }
-
-  /**
-   * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveSample(uk.ac.bbsrc.tgac.miso.core.data.Sample)} .
-   * 
-   * @throws IOException
-   */
-  @Test
-  public void testSaveSampleThrows() throws IOException {
-    when(sample.userCanWrite(any(User.class))).thenReturn(false);
-
-    thrown.expect(IOException.class);
-    thrown.expectMessage("User null cannot write to this Sample");
-    userAuthMisoRequestManager.saveSample(sample);
-
-    verify(backingManager, never()).saveSample(sample);
   }
 
   /**
