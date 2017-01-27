@@ -46,6 +46,9 @@ public class HibernateSequencerServiceRecordDao implements SequencerServiceRecor
   public long save(SequencerServiceRecord ssr) throws IOException {
     long id;
     if (ssr.getId() == AbstractSequencerServiceRecord.UNSAVED_ID) {
+      if (ssr.getSequencerReference().getDateDecommissioned() != null)
+        throw new IOException("Cannot add service records to a retired sequencer!");
+
       id = (long) currentSession().save(ssr);
     } else {
       currentSession().update(ssr);
@@ -128,16 +131,8 @@ public class HibernateSequencerServiceRecordDao implements SequencerServiceRecor
     this.sessionFactory = sessionFactory;
   }
 
-  public JdbcTemplate getTemplate() {
-    return template;
-  }
-
   public void setTemplate(JdbcTemplate template) {
     this.template = template;
-  }
-
-  public MisoFilesManager getMisoFilesManager() {
-    return misoFilesManager;
   }
 
   public void setMisoFilesManager(MisoFilesManager misoFilesManager) {

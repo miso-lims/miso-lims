@@ -635,7 +635,6 @@ public class MisoServiceManager {
   public void setDefaultStudyDao() {
     HibernateStudyDao dao = new HibernateStudyDao();
     dao.setJdbcTemplate(jdbcTemplate);
-    dao.setNamingScheme(getNamingScheme());
     dao.setSessionFactory(sessionFactory);
     setStudyDao(dao);
   }
