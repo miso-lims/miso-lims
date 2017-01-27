@@ -56,6 +56,7 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
+import uk.ac.bbsrc.tgac.miso.service.StudyService;
 
 @Controller
 @RequestMapping("/study")
@@ -71,6 +72,8 @@ public class EditStudyController {
 
   @Autowired
   private ChangeLogService changeLogService;
+  @Autowired
+  private StudyService studyService;
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
@@ -98,12 +101,12 @@ public class EditStudyController {
 
   @ModelAttribute("maxLengths")
   public Map<String, Integer> maxLengths() throws IOException {
-    return requestManager.getStudyColumnSizes();
+    return studyService.getColumnSizes();
   }
 
   @ModelAttribute("studyTypes")
   public Collection<StudyType> populateStudyTypes() throws IOException {
-    return requestManager.listAllStudyTypes();
+    return studyService.listTypes();
   }
 
   @RequestMapping(value = "/new/{projectId}", method = RequestMethod.GET)
@@ -113,14 +116,14 @@ public class EditStudyController {
 
   @RequestMapping(value = "/rest/{studyId}", method = RequestMethod.GET)
   public @ResponseBody Study jsonRest(@PathVariable Long studyId) throws IOException {
-    return requestManager.getStudyById(studyId);
+    return studyService.get(studyId);
   }
 
   @RequestMapping(value = "/{studyId}", method = RequestMethod.GET)
   public ModelAndView setupForm(@PathVariable Long studyId, ModelMap model) throws IOException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Study study = requestManager.getStudyById(studyId);
+      Study study = studyService.get(studyId);
       Project project;
       if (study != null) {
         if (!study.userCanRead(user)) {
@@ -155,7 +158,7 @@ public class EditStudyController {
         study = new StudyImpl(user);
         model.put("title", "New Study");
       } else {
-        study = requestManager.getStudyById(studyId);
+        study = studyService.get(studyId);
         model.put("title", "Study " + studyId);
       }
 
@@ -196,7 +199,7 @@ public class EditStudyController {
         throw new SecurityException("Permission denied.");
       }
       study.setLastModifier(user);
-      requestManager.saveStudy(study);
+      studyService.save(study);
       session.setComplete();
       model.clear();
       return "redirect:/miso/study/" + study.getId();

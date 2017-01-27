@@ -34,7 +34,6 @@ DROP TABLE EntityGroup;
 
 UPDATE Pool SET platformType = UPPER(platformType);
 ALTER TABLE Pool ADD CONSTRAINT fk_pool_securityProfile FOREIGN KEY (securityProfile_profileId) REFERENCES SecurityProfile (profileId);
-ALTER TABLE Pool ADD CONSTRAINT fk_pool_experimentId FOREIGN KEY (experiment_experimentId) REFERENCES Experiment (experimentId);
 ALTER TABLE Pool ADD CONSTRAINT fk_pool_lastModifier_user FOREIGN KEY (lastModifier) REFERENCES User (userId);
 
 CREATE TABLE `Pool_Dilution` (
@@ -54,6 +53,13 @@ INSERT INTO Pool_Dilution(pool_poolId, dilution_dilutionId) SELECT DISTINCT
   JOIN emPCR ON emPCR.pcrId = emPCRDilution.emPCR_pcrId
   WHERE elementType = 'uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution'
   AND NOT EXISTS (SELECT * FROM Pool_Dilution WHERE Pool_Dilution.pool_poolId = Pool_Elements.pool_poolId AND Pool_Dilution.dilution_dilutionId = emPCR.dilution_dilutionId);
+
+INSERT INTO Pool_Experiment(pool_poolId, experiments_experimentId) SELECT poolId, experiment_experimentId FROM Pool WHERE NOT EXISTS(SELECT * FROM Pool_Experiment WHERE poolId = pool_poolId AND experiment_experimentId = experiments_experimentId) AND experiment_experimentId IS NOT NULL;
+ALTER TABLE Pool DROP COLUMN experiment_experimentId;
+ALTER TABLE Experiment ADD COLUMN pool_poolId bigint(20);
+UPDATE Experiment SET pool_poolId = (SELECT pool_poolId FROM Pool_Experiment WHERE experiments_experimentId = experimentId);
+ALTER TABLE Experiment ADD CONSTRAINT fk_experiment_pool_poolId FOREIGN KEY (pool_poolId) REFERENCES Pool (poolId);
+DROP TABLE Pool_Experiment;
 
 INSERT INTO PoolChangeLog(poolId, userId, message) SELECT
   pool_poolId, (SELECT userId FROM `User` WHERE loginName = 'admin'),

@@ -64,8 +64,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
-import uk.ac.bbsrc.tgac.miso.core.data.Study;
-import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
@@ -291,15 +289,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public long saveStudy(Study study) throws IOException {
-    if (writeCheck(study)) {
-      return backingManager.saveStudy(study);
-    } else {
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot write to this Study");
-    }
-  }
-
-  @Override
   public long saveSequencerPartitionContainer(SequencerPartitionContainer container) throws IOException {
     if (writeCheck(container)) {
       container.setLastModifier(getCurrentUser());
@@ -446,13 +435,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
     Run o = backingManager.getRunByAlias(runName);
     if (readCheck(o)) return backingManager.getStatusByRunName(runName);
     else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read parent Run " + o.getId() + " for Status");
-  }
-
-  @Override
-  public Study getStudyById(long studyId) throws IOException {
-    Study o = backingManager.getStudyById(studyId);
-    if (readCheck(o)) return o;
-    else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Study " + studyId);
   }
 
   @Override
@@ -904,54 +886,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Study> listAllStudies() throws IOException {
-    User user = getCurrentUser();
-    Collection<Study> accessibles = new HashSet<>();
-    for (Study study : backingManager.listAllStudies()) {
-      if (study.userCanRead(user)) {
-        accessibles.add(study);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Collection<Study> listAllStudiesWithLimit(long limit) throws IOException {
-    User user = getCurrentUser();
-    Collection<Study> accessibles = new HashSet<>();
-    for (Study study : backingManager.listAllStudiesWithLimit(limit)) {
-      if (study.userCanRead(user)) {
-        accessibles.add(study);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Collection<Study> listAllStudiesBySearch(String query) throws IOException {
-    User user = getCurrentUser();
-    Collection<Study> accessibles = new HashSet<>();
-    for (Study study : backingManager.listAllStudiesBySearch(query)) {
-      if (study.userCanRead(user)) {
-        accessibles.add(study);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Collection<Study> listAllStudiesByProjectId(long projectId) throws IOException {
-    User user = getCurrentUser();
-    Collection<Study> accessibles = new HashSet<>();
-    for (Study study : backingManager.listAllStudiesByProjectId(projectId)) {
-      if (study.userCanRead(user)) {
-        accessibles.add(study);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
   public Collection<SequencerPartitionContainer<SequencerPoolPartition>> listAllSequencerPartitionContainers() throws IOException {
     User user = getCurrentUser();
     Collection<SequencerPartitionContainer<SequencerPoolPartition>> accessibles = new HashSet<>();
@@ -985,13 +919,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   /* deletes */
-
-  @Override
-  public void deleteStudy(Study study) throws IOException {
-    if (getCurrentUser().isAdmin()) {
-      backingManager.deleteStudy(study);
-    }
-  }
 
   @Override
   public void deleteSample(Sample sample) throws IOException {
@@ -1382,11 +1309,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<StudyType> listAllStudyTypes() throws IOException {
-    return backingManager.listAllStudyTypes();
-  }
-
-  @Override
   public Collection<Boxable> getBoxablesFromBarcodeList(List<String> barcodeList) throws IOException {
     return backingManager.getBoxablesFromBarcodeList(barcodeList);
   }
@@ -1528,11 +1450,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   @Override
   public Map<String, Integer> getSampleColumnSizes() throws IOException {
     return backingManager.getSampleColumnSizes();
-  }
-
-  @Override
-  public Map<String, Integer> getStudyColumnSizes() throws IOException {
-    return backingManager.getStudyColumnSizes();
   }
 
   @Override

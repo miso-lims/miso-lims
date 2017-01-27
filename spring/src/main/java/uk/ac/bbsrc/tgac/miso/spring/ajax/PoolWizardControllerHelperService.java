@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -64,6 +64,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolQcException;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
+import uk.ac.bbsrc.tgac.miso.service.StudyService;
 
 /**
  * Created by IntelliJ IDEA. User: bianx Date: 18-Aug-2011 Time: 16:44:32 To change this template use File | Settings | File Templates.
@@ -77,6 +78,8 @@ public class PoolWizardControllerHelperService {
   private RequestManager requestManager;
   @Autowired
   private LibraryDilutionService dilutionService;
+  @Autowired
+  private StudyService studyService;
 
   public JSONObject addPool(HttpSession session, JSONObject json) {
     JSONObject response = new JSONObject();
@@ -212,22 +215,23 @@ public class PoolWizardControllerHelperService {
   }
 
   public JSONObject addStudy(HttpSession session, JSONObject json) {
-    String studyType = null;
+    StudyType studyType = null;
     Long projectId = json.getLong("projectId");
     String studyDescription = null;
 
     StringBuilder sb = new StringBuilder();
 
-    JSONArray a = JSONArray.fromObject(json.get("form"));
-    for (JSONObject j : (Iterable<JSONObject>) a) {
-
-      if (j.getString("name").equals("studyDescription")) {
-        studyDescription = j.getString("value");
-      } else if (j.getString("name").equals("studyType")) {
-        studyType = j.getString("value");
-      }
-    }
     try {
+      JSONArray a = JSONArray.fromObject(json.get("form"));
+      for (JSONObject j : (Iterable<JSONObject>) a) {
+
+        if (j.getString("name").equals("studyDescription")) {
+          studyDescription = j.getString("value");
+        } else if (j.getString("name").equals("studyType")) {
+          studyType = studyService.getType(j.getLong("value"));
+
+        }
+      }
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
 
       Project p = requestManager.getProjectById(projectId);
@@ -236,12 +240,10 @@ public class PoolWizardControllerHelperService {
       s.setAlias(p.getAlias());
       s.setDescription(studyDescription);
       s.setSecurityProfile(p.getSecurityProfile());
-      StudyType sType = new StudyType();
-      sType.setName(studyType);
-      s.setStudyType(sType);
+      s.setStudyType(studyType);
 
       s.setLastModifier(user);
-      requestManager.saveStudy(s);
+      studyService.save(s);
 
       sb.append(
           "<a  class=\"dashboardresult\" href='/miso/study/" + s.getId()

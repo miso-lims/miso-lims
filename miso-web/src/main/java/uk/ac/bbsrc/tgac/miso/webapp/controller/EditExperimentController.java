@@ -63,6 +63,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.service.StudyService;
 
 @Controller
 @RequestMapping("/experiment")
@@ -81,6 +82,9 @@ public class EditExperimentController {
 
   @Autowired
   private ChangeLogService changeLogService;
+
+  @Autowired
+  private StudyService studyService;
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
@@ -185,7 +189,7 @@ public class EditExperimentController {
       }
 
       if (studyId != null) {
-        Study study = requestManager.getStudyById(studyId);
+        Study study = studyService.get(studyId);
         model.addAttribute("study", study);
         experiment.setStudy(study);
         if (Arrays.asList(user.getRoles()).contains("ROLE_TECH")) {

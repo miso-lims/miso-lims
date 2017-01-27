@@ -30,7 +30,6 @@ import java.util.Map;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
 
 /**
  * Defines a DAO interface for storing Studies
@@ -38,7 +37,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
  * @author Rob Davey
  * @since version
  */
-public interface StudyStore extends Store<Study>, Remover<Study>, NamingSchemeAware {
+public interface StudyStore extends Store<Study>, Remover<Study> {
   /**
    * List all Studies that match a search criteria
    * 
@@ -85,4 +84,6 @@ public interface StudyStore extends Store<Study>, Remover<Study>, NamingSchemeAw
    * @throws IOException
    */
   public Map<String, Integer> getStudyColumnSizes() throws IOException;
+
+  public StudyType getType(long id);
 }

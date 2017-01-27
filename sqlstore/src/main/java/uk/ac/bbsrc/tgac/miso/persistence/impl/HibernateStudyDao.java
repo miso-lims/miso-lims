@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -42,8 +43,6 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
-import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.StudyStore;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
@@ -68,20 +67,12 @@ public class HibernateStudyDao implements StudyStore {
   @Autowired
   private SessionFactory sessionFactory;
 
-  @Autowired
-  private NamingScheme namingScheme;
-
   public SessionFactory getSessionFactory() {
     return sessionFactory;
   }
 
   public void setSessionFactory(SessionFactory sessionFactory) {
     this.sessionFactory = sessionFactory;
-  }
-
-  @Override
-  public void setNamingScheme(NamingScheme namingScheme) {
-    this.namingScheme = namingScheme;
   }
 
   @CoverageIgnore
@@ -101,12 +92,7 @@ public class HibernateStudyDao implements StudyStore {
   public long save(Study study) throws IOException {
     long id;
     if (study.getId() == StudyImpl.UNSAVED_ID) {
-      try {
-      namingScheme.generateNameFor(study);
       id = (Long) currentSession().save(study);
-      } catch (MisoNamingException e) {
-        throw new IOException(e);
-      }
     } else {
       currentSession().update(study);
       id = study.getId();
@@ -123,6 +109,7 @@ public class HibernateStudyDao implements StudyStore {
   @SuppressWarnings("unchecked")
   @Override
   public List<Study> listAllWithLimit(long limit) throws IOException {
+    if (limit == 0) return Collections.emptyList();
     return currentSession().createCriteria(StudyImpl.class).setMaxResults((int) limit).list();
   }
 
@@ -134,7 +121,7 @@ public class HibernateStudyDao implements StudyStore {
 
   @Override
   public List<Study> listBySearch(String query) {
-    Criteria criteria = currentSession().createCriteria(StudyType.class);
+    Criteria criteria = currentSession().createCriteria(StudyImpl.class);
     criteria.add(DbUtils.searchRestrictions(query, "alias", "name", "description"));
     @SuppressWarnings("unchecked")
     List<Study> results = criteria.list();
@@ -157,7 +144,7 @@ public class HibernateStudyDao implements StudyStore {
 
   @Override
   public List<Study> listByProjectId(long projectId) throws IOException {
-    Criteria criteria = currentSession().createCriteria(StudyType.class);
+    Criteria criteria = currentSession().createCriteria(StudyImpl.class);
     criteria.createAlias("project", "project");
     criteria.add(Restrictions.eq("project.id", projectId));
     @SuppressWarnings("unchecked")
@@ -176,5 +163,10 @@ public class HibernateStudyDao implements StudyStore {
   @Override
   public Map<String, Integer> getStudyColumnSizes() throws IOException {
     return DbUtils.getColumnSizes(template, TABLE_NAME);
+  }
+
+  @Override
+  public StudyType getType(long id) {
+    return (StudyType) currentSession().get(StudyType.class, id);
   }
 }

@@ -87,6 +87,7 @@ import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.ReferenceGenomeService;
+import uk.ac.bbsrc.tgac.miso.service.StudyService;
 
 @Controller
 @RequestMapping("/project")
@@ -112,6 +113,8 @@ public class EditProjectController {
   private LibraryService libraryService;
   @Autowired
   private LibraryDilutionService dilutionService;
+  @Autowired
+  private StudyService studyService;
 
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
@@ -293,7 +296,7 @@ public class EditProjectController {
     try {
       Collection<Sample> samples = requestManager.listAllSamplesByProjectId(projectId);
       Collection<Run> runs = requestManager.listAllRunsByProjectId(projectId);
-      Collection<Study> studies = requestManager.listAllStudiesByProjectId(projectId);
+      Collection<Study> studies = studyService.listByProjectId(projectId);
 
       JSONObject runsJSON = new JSONObject();
       JSONObject studiesJSON = new JSONObject();

@@ -71,6 +71,7 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.service.StudyService;
 
 /**
  * uk.ac.bbsrc.tgac.miso.spring.ajax
@@ -94,6 +95,8 @@ public class FlexReportingControllerHelperService {
   private ExperimentService experimentService;
   @Autowired
   private LibraryService libraryService;
+  @Autowired
+  private StudyService studyService;
 
   public void setInterfaceTemplate(JdbcTemplate interfaceTemplate) {
     this.interfaceTemplate = interfaceTemplate;
@@ -1079,7 +1082,7 @@ public class FlexReportingControllerHelperService {
       JSONArray projectChildrenArray = new JSONArray();
       Collection<Sample> samples = requestManager.listAllSamplesByProjectId(p.getProjectId());
       Collection<Run> runs = requestManager.listAllRunsByProjectId(p.getProjectId());
-      Collection<Study> studies = requestManager.listAllStudiesByProjectId(p.getProjectId());
+      Collection<Study> studies = studyService.listByProjectId(p.getProjectId());
 
       JSONObject runJSON = new JSONObject();
       JSONArray runsArray = new JSONArray();

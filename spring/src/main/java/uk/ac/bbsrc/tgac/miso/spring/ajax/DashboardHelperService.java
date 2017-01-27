@@ -68,6 +68,7 @@ import uk.ac.bbsrc.tgac.miso.service.AlertService;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.service.StudyService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationException;
 
 /**
@@ -94,6 +95,8 @@ public class DashboardHelperService {
   private LibraryService libraryService;
   @Autowired
   private LibraryDilutionService dilutionService;
+  @Autowired
+  private StudyService studyService;
 
   public JSONObject checkUser(HttpSession session, JSONObject json) {
     String username = json.getString("username");
@@ -231,9 +234,9 @@ public class DashboardHelperService {
       List<Study> studies;
       StringBuilder b = new StringBuilder();
       if (!isStringEmptyOrNull(searchStr)) {
-        studies = new ArrayList<>(requestManager.listAllStudiesBySearch(searchStr));
+        studies = new ArrayList<>(studyService.listBySearch(searchStr));
       } else {
-        studies = new ArrayList<>(requestManager.listAllStudiesWithLimit(50));
+        studies = new ArrayList<>(studyService.listWithLimit(50));
       }
 
       if (studies.size() > 0) {

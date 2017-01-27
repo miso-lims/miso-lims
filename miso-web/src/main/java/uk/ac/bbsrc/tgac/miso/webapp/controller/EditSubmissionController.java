@@ -58,6 +58,7 @@ import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.SubmissionManager;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.service.StudyService;
 
 @Controller
 @RequestMapping("/submission")
@@ -70,6 +71,8 @@ public class EditSubmissionController {
 
   @Autowired
   private RequestManager requestManager;
+  @Autowired
+  private StudyService studyService;
 
   @Autowired
   private FilesManager misoFileManager;
@@ -110,7 +113,7 @@ public class EditSubmissionController {
 
   @ModelAttribute("studies")
   public Collection<Study> populateStudies() throws IOException {
-    return requestManager.listAllStudies();
+    return studyService.list();
   }
 
   @ModelAttribute("samples")

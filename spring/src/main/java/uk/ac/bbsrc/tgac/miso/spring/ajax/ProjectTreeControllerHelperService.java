@@ -46,6 +46,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.service.StudyService;
 
 /**
  * uk.ac.bbsrc.tgac.miso.spring.ajax
@@ -64,6 +65,8 @@ public class ProjectTreeControllerHelperService {
   private ExperimentService experimentService;
   @Autowired
   private LibraryService libraryService;
+  @Autowired
+  private StudyService studyService;
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
@@ -90,7 +93,7 @@ public class ProjectTreeControllerHelperService {
         projectJSON.put("description", p.getAlias());
         Collection<Sample> samples = requestManager.listAllSamplesByProjectId(p.getProjectId());
         Collection<Run> runs = requestManager.listAllRunsByProjectId(p.getProjectId());
-        Collection<Study> studies = requestManager.listAllStudiesByProjectId(p.getProjectId());
+        Collection<Study> studies = studyService.listByProjectId(p.getProjectId());
         int subs = samples.size() + runs.size() + studies.size();
         projectJSON.put("subs", subs);
         projectsArray.add(projectJSON);
@@ -137,7 +140,7 @@ public class ProjectTreeControllerHelperService {
         childArray.add(child);
       }
 
-      Collection<Study> studies = requestManager.listAllStudiesByProjectId(projectId);
+      Collection<Study> studies = studyService.listByProjectId(projectId);
 
       if (studies.size() > 0) {
         JSONObject child = new JSONObject();
@@ -275,7 +278,7 @@ public class ProjectTreeControllerHelperService {
 
       JSONArray childArray = new JSONArray();
 
-      Collection<Study> studies = requestManager.listAllStudiesByProjectId(projectId);
+      Collection<Study> studies = studyService.listByProjectId(projectId);
       JSONObject studyJSON = new JSONObject();
 
       studyJSON.put("name", "Studies");
