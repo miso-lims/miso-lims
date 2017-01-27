@@ -62,7 +62,7 @@ public class ListDilutionsController {
   @RequestMapping("/dilutions")
   public ModelAndView listDilutions(ModelMap model) throws IOException {
     try {
-      model.addAttribute("libDilutions", dilutionService.getAll());
+      model.addAttribute("libDilutions", dilutionService.list());
       return new ModelAndView("/pages/listDilutions.jsp", model);
     } catch (IOException ex) {
       if (log.isDebugEnabled()) {

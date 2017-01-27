@@ -207,7 +207,7 @@ public class ProjectTreeControllerHelperService {
       Collection<Sample> samples = requestManager.listAllSamplesByProjectId(projectId);
 
       for (Sample sample : samples) {
-        Collection<Library> libraries = libraryService.getAllBySampleId(sample.getId());
+        Collection<Library> libraries = libraryService.listBySampleId(sample.getId());
         if (libraries.size() == 0) {
 
           String sampleQC = "0";
@@ -248,7 +248,7 @@ public class ProjectTreeControllerHelperService {
 
       JSONObject miso = new JSONObject();
 
-      Collection<Library> libraries = libraryService.getAllBySampleId(sampleId);
+      Collection<Library> libraries = libraryService.listBySampleId(sampleId);
       JSONArray librariesArray = new JSONArray();
 
       for (Library library : libraries) {

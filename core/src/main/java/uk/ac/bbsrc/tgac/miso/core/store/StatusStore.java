@@ -25,7 +25,6 @@ package uk.ac.bbsrc.tgac.miso.core.store;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
 
@@ -36,14 +35,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Status;
  * @since 0.0.2
  */
 public interface StatusStore extends Store<Status> {
-  /**
-   * List all Statuses by their {@link uk.ac.bbsrc.tgac.miso.core.data.type.HealthType} given a string representing a HealthType key
-   * 
-   * @param health
-   *          of type String
-   * @return List<Status>
-   */
-  public List<Status> listByHealth(String health);
 
   /**
    * Get a Status object by a unique {@link uk.ac.bbsrc.tgac.miso.core.data.Run} name, i.e. run.getName()

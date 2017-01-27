@@ -127,49 +127,49 @@ public class DefaultLibraryDilutionService implements LibraryDilutionService {
   }
 
   @Override
-  public List<LibraryDilution> getAll() throws IOException {
+  public List<LibraryDilution> list() throws IOException {
     Collection<LibraryDilution> allDilutions = dilutionDao.listAll();
     return authorizationManager.filterUnreadable(allDilutions);
   }
 
   @Override
-  public List<LibraryDilution> getAllBySearchAndPlatform(String querystr, PlatformType platform) throws IOException {
+  public List<LibraryDilution> listBySearchAndPlatform(String querystr, PlatformType platform) throws IOException {
     Collection<LibraryDilution> allDilutions = dilutionDao.listAllLibraryDilutionsBySearchAndPlatform(querystr, platform);
     return authorizationManager.filterUnreadable(allDilutions);
   }
 
   @Override
-  public List<LibraryDilution> getAllBySearch(String querystr) throws IOException {
+  public List<LibraryDilution> listBySearch(String querystr) throws IOException {
     Collection<LibraryDilution> allDilutions = dilutionDao.listAllLibraryDilutionsBySearchOnly(querystr);
     return authorizationManager.filterUnreadable(allDilutions);
   }
 
   @Override
-  public List<LibraryDilution> getAllByLibraryId(Long libraryId) throws IOException {
+  public List<LibraryDilution> listByLibraryId(Long libraryId) throws IOException {
     Collection<LibraryDilution> allDilutions = dilutionDao.listByLibraryId(libraryId);
     return authorizationManager.filterUnreadable(allDilutions);
   }
 
   @Override
-  public List<LibraryDilution> getAllWithLimit(long limit) throws IOException {
+  public List<LibraryDilution> listWithLimit(long limit) throws IOException {
     Collection<LibraryDilution> allDilutions = dilutionDao.listAllWithLimit(limit);
     return authorizationManager.filterUnreadable(allDilutions);
   }
 
   @Override
-  public List<LibraryDilution> getAllByPlatform(PlatformType platform) throws IOException {
+  public List<LibraryDilution> listByPlatform(PlatformType platform) throws IOException {
     Collection<LibraryDilution> allDilutions = dilutionDao.listAllLibraryDilutionsByPlatform(platform);
     return authorizationManager.filterUnreadable(allDilutions);
   }
 
   @Override
-  public List<LibraryDilution> getAllByProjectId(Long projectId) throws IOException {
+  public List<LibraryDilution> listByProjectId(Long projectId) throws IOException {
     Collection<LibraryDilution> allDilutions = dilutionDao.listAllLibraryDilutionsByProjectId(projectId);
     return authorizationManager.filterUnreadable(allDilutions);
   }
 
   @Override
-  public List<LibraryDilution> getAllByProjectIdAndPlatform(Long projectId, PlatformType platform) throws IOException {
+  public List<LibraryDilution> listByProjectIdAndPlatform(Long projectId, PlatformType platform) throws IOException {
     Collection<LibraryDilution> allDilutions = dilutionDao.listAllLibraryDilutionsByProjectAndPlatform(projectId, platform);
     return authorizationManager.filterUnreadable(allDilutions);
   }
@@ -181,7 +181,7 @@ public class DefaultLibraryDilutionService implements LibraryDilutionService {
   }
 
   @Override
-  public List<LibraryDilution> getAllByPageSizeSearchAndPlatform(int offset, int size, String querystr, PlatformType platform,
+  public List<LibraryDilution> listByPageSizeSearchAndPlatform(int offset, int size, String querystr, PlatformType platform,
       String sortDir, String sortCol) throws IOException {
     Collection<LibraryDilution> allDilutions = dilutionDao.listBySearchOffsetAndNumResultsAndPlatform(offset, size, querystr, sortDir,
         sortCol, platform);

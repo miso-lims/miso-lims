@@ -138,7 +138,7 @@ public interface RunStore extends Store<Run>, Remover<Run> {
    */
   Collection<Run> listAllWithLimit(long limit) throws IOException;
 
-  int[] saveAll(Collection<Run> runs) throws IOException;
+  void saveAll(Collection<Run> runs) throws IOException;
 
   /**
    * @return a map containing all column names and max lengths from the Run table

@@ -217,7 +217,7 @@ public class EditProjectController {
   }
 
   public Collection<Library> populateProjectLibraries(long projectId) throws IOException {
-    List<Library> libraries = new ArrayList<>(libraryService.getAllByProjectId(projectId));
+    List<Library> libraries = new ArrayList<>(libraryService.listByProjectId(projectId));
     try {
       Collections.sort(libraries, new AliasComparator(Library.class));
       for (Library l : libraries) {
@@ -239,14 +239,14 @@ public class EditProjectController {
   public Collection<LibraryDilution> populateProjectLibraryDilutions(Collection<Library> projectLibraries) throws IOException {
     List<LibraryDilution> dilutions = new ArrayList<>();
     for (Library l : projectLibraries) {
-      dilutions.addAll(dilutionService.getAllByLibraryId(l.getId()));
+      dilutions.addAll(dilutionService.listByLibraryId(l.getId()));
     }
     Collections.sort(dilutions);
     return dilutions;
   }
 
   public Collection<LibraryDilution> populateProjectLibraryDilutions(long projectId) throws IOException {
-    List<LibraryDilution> dilutions = new ArrayList<>(dilutionService.getAllByProjectId(projectId));
+    List<LibraryDilution> dilutions = new ArrayList<>(dilutionService.listByProjectId(projectId));
     Collections.sort(dilutions);
     return dilutions;
   }
@@ -324,7 +324,7 @@ public class EditProjectController {
       }
 
       for (Sample sample : samples) {
-        Collection<Library> libraries = libraryService.getAllBySampleId(sample.getId());
+        Collection<Library> libraries = libraryService.listBySampleId(sample.getId());
         if (libraries.size() == 0) {
           if (sample.getQcPassed()) {
             samplesJSON.put(sample.getName(), "1");
@@ -334,7 +334,7 @@ public class EditProjectController {
         } else {
           JSONObject librariesJSON = new JSONObject();
           for (Library library : libraries) {
-            Collection<LibraryDilution> lds = dilutionService.getAllByLibraryId(library.getId());
+            Collection<LibraryDilution> lds = dilutionService.listByLibraryId(library.getId());
             if (lds.size() > 0) {
               JSONObject dilutionsJSON = new JSONObject();
               for (LibraryDilution ld : lds) {

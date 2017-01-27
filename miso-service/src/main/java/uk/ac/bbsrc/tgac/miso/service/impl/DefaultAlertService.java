@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.Collection;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.event.Alert;
@@ -13,6 +15,8 @@ import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
 import uk.ac.bbsrc.tgac.miso.service.AlertService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
+@Transactional(rollbackFor = Exception.class)
+@Service
 public class DefaultAlertService implements AlertService {
 
   @Autowired

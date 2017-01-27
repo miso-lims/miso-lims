@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.store.StatusStore;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
@@ -65,15 +64,6 @@ public class HibernateStatusDao implements StatusStore {
   public int count() throws IOException {
     Criteria criteria = currentSession().createCriteria(StatusImpl.class);
     return ((Long) criteria.setProjection(Projections.rowCount()).uniqueResult()).intValue();
-  }
-
-  @Override
-  public List<Status> listByHealth(String health) {
-    Criteria criteria = currentSession().createCriteria(StatusImpl.class);
-    criteria.add(Restrictions.eq("health", HealthType.get(health)));
-    @SuppressWarnings("unchecked")
-    List<Status> records = criteria.list();
-    return records;
   }
 
   @Override

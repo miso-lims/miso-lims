@@ -104,7 +104,7 @@ public class EditIlluminaPoolController {
 
   private List<? extends Dilution> populateAvailableDilutions(Pool pool) throws IOException {
     ArrayList<LibraryDilution> libs = new ArrayList<>();
-    for (Dilution l : dilutionService.getAllByPlatform(PlatformType.ILLUMINA)) {
+    for (Dilution l : dilutionService.listByPlatform(PlatformType.ILLUMINA)) {
       if (!pool.getPoolableElements().contains(l)) {
         libs.add((LibraryDilution) l);
       }

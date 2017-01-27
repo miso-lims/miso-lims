@@ -92,7 +92,7 @@ public abstract class AbstractRun implements Run {
   @Transient
   public Document submissionDocument;
 
-  @ManyToOne(targetEntity = SecurityProfile.class, cascade = CascadeType.ALL)
+  @ManyToOne(targetEntity = SecurityProfile.class, cascade = CascadeType.PERSIST)
   @JoinColumn(name = "securityProfile_profileId")
   private SecurityProfile securityProfile = new SecurityProfile();
 
@@ -167,8 +167,8 @@ public abstract class AbstractRun implements Run {
     return (derivedInfo == null ? null : derivedInfo.getLastModified());
   }
 
-  @OneToMany(targetEntity = RunChangeLog.class, mappedBy = "run")
-  private final Collection<ChangeLog> changeLog = new ArrayList<>();
+  @OneToMany(targetEntity = RunChangeLog.class, mappedBy = "run", cascade = CascadeType.ALL)
+  private final Collection<ChangeLog> changeLogs = new ArrayList<>();
 
   @Override
   public long getId() {
@@ -567,7 +567,7 @@ public abstract class AbstractRun implements Run {
   }
 
   @Override
-  public Collection<ChangeLog> getChangeLog() {
-    return changeLog;
+  public Collection<ChangeLog> getChangeLogs() {
+    return changeLogs;
   }
 }

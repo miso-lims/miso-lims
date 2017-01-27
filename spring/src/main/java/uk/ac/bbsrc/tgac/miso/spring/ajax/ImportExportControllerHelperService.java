@@ -317,7 +317,7 @@ public class ImportExportControllerHelperService {
             if ("A".equals(proceedKey) || "L".equals(proceedKey)) {
               library.setAlias(jsonArrayElement.getString(3));
             } else if ("U".equals(proceedKey) || "P".equals(proceedKey)) {
-              Collection<Library> byAlias = libraryService.getAllByAlias(jsonArrayElement.getString(3));
+              Collection<Library> byAlias = libraryService.listByAlias(jsonArrayElement.getString(3));
               if (byAlias.size() == 1) {
                 library = byAlias.iterator().next();
               } else {
@@ -535,7 +535,7 @@ public class ImportExportControllerHelperService {
   }
 
   public Collection<LibraryStrategyType> populateLibraryStrategyTypes() throws IOException {
-    List<LibraryStrategyType> types = new ArrayList<>(libraryService.getAllLibraryStrategyTypes());
+    List<LibraryStrategyType> types = new ArrayList<>(libraryService.listLibraryStrategyTypes());
     Collections.sort(types);
     return types;
   }
@@ -549,7 +549,7 @@ public class ImportExportControllerHelperService {
   }
 
   public Collection<LibrarySelectionType> populateLibrarySelectionTypes() throws IOException {
-    List<LibrarySelectionType> types = new ArrayList<>(libraryService.getAllLibrarySelectionTypes());
+    List<LibrarySelectionType> types = new ArrayList<>(libraryService.listLibrarySelectionTypes());
     Collections.sort(types);
     return types;
   }
@@ -569,7 +569,7 @@ public class ImportExportControllerHelperService {
         Map<String, Object> map = new HashMap<>();
 
         StringBuilder libsb = new StringBuilder();
-        List<LibraryType> types = new ArrayList<>(libraryService.getAllLibraryTypesByPlatform(PlatformType.get(platform)));
+        List<LibraryType> types = new ArrayList<>(libraryService.listLibraryTypesByPlatform(PlatformType.get(platform)));
         Collections.sort(types);
         for (LibraryType s : types) {
           libsb.append("<option>" + platform + "-" + s.getDescription() + "</option>");

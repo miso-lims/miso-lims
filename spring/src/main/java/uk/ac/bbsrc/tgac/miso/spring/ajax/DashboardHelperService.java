@@ -327,9 +327,9 @@ public class DashboardHelperService {
       List<LibraryDilution> libraryDilutions;
       StringBuilder b = new StringBuilder();
       if (!isStringEmptyOrNull(searchStr)) {
-        libraryDilutions = new ArrayList<>(dilutionService.getAllBySearch(searchStr));
+        libraryDilutions = new ArrayList<>(dilutionService.listBySearch(searchStr));
       } else {
-        libraryDilutions = new ArrayList<>(dilutionService.getAllWithLimit(50));
+        libraryDilutions = new ArrayList<>(dilutionService.listWithLimit(50));
       }
 
       if (libraryDilutions.size() > 0) {
@@ -362,13 +362,13 @@ public class DashboardHelperService {
       List<Library> libraries;
       StringBuilder b = new StringBuilder();
       if (!isStringEmptyOrNull(searchStr)) {
-        libraries = new ArrayList<>(libraryService.getAllBySearch(searchStr));
+        libraries = new ArrayList<>(libraryService.listBySearch(searchStr));
         if (libraries.isEmpty()) {
           // Base64-encoded string, most likely a barcode image beeped in. decode and search
-          libraries = new ArrayList<>(libraryService.getAllBySearch(new String(Base64.decodeBase64(searchStr))));
+          libraries = new ArrayList<>(libraryService.listBySearch(new String(Base64.decodeBase64(searchStr))));
         }
       } else {
-        libraries = new ArrayList<>(libraryService.getAllWithLimit(50));
+        libraries = new ArrayList<>(libraryService.listWithLimit(50));
       }
 
       if (libraries.size() > 0) {

@@ -243,7 +243,7 @@ public class EditPoolController {
     JSONObject rtn = new JSONObject();
     JSONArray data = new JSONArray();
 
-    List<LibraryDilution> dils = dilutionService.getAllByPageSizeSearchAndPlatform(start, length, search, platformType, sSortDir_0,
+    List<LibraryDilution> dils = dilutionService.listByPageSizeSearchAndPlatform(start, length, search, platformType, sSortDir_0,
         sortCol);
     int allDilutionsCount = dilutionService.countByPlatform(PlatformType.ILLUMINA);
 

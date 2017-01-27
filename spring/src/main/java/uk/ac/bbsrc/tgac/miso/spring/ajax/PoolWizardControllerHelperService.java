@@ -266,7 +266,7 @@ public class PoolWizardControllerHelperService {
       StringBuilder b = new StringBuilder();
 
       JSONArray a = new JSONArray();
-      List<LibraryDilution> dls = new ArrayList<>(dilutionService.getAllByProjectIdAndPlatform(projectId, platformType));
+      List<LibraryDilution> dls = new ArrayList<>(dilutionService.listByProjectIdAndPlatform(projectId, platformType));
       Collections.sort(dls);
       for (Dilution dl : dls) {
         if (dl.getLibrary().getQcPassed() != null) {

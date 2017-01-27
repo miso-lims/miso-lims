@@ -20,25 +20,25 @@ public interface LibraryDilutionService {
 
   int countBySearchAndPlatform(String querystr, PlatformType platform) throws IOException;
 
-  List<LibraryDilution> getAllBySearchAndPlatform(String querystr, PlatformType platform) throws IOException;
+  List<LibraryDilution> listBySearchAndPlatform(String querystr, PlatformType platform) throws IOException;
 
-  List<LibraryDilution> getAllBySearch(String querystr) throws IOException;
+  List<LibraryDilution> listBySearch(String querystr) throws IOException;
 
-  List<LibraryDilution> getAllByLibraryId(Long libraryId) throws IOException;
+  List<LibraryDilution> listByLibraryId(Long libraryId) throws IOException;
 
-  List<LibraryDilution> getAll() throws IOException;
+  List<LibraryDilution> list() throws IOException;
 
-  List<LibraryDilution> getAllWithLimit(long limit) throws IOException;
+  List<LibraryDilution> listWithLimit(long limit) throws IOException;
 
-  List<LibraryDilution> getAllByPlatform(PlatformType platform) throws IOException;
+  List<LibraryDilution> listByPlatform(PlatformType platform) throws IOException;
 
-  List<LibraryDilution> getAllByProjectId(Long projectId) throws IOException;
+  List<LibraryDilution> listByProjectId(Long projectId) throws IOException;
 
-  List<LibraryDilution> getAllByProjectIdAndPlatform(Long projectId, PlatformType platform) throws IOException;
+  List<LibraryDilution> listByProjectIdAndPlatform(Long projectId, PlatformType platform) throws IOException;
 
   LibraryDilution getByBarcode(String barcode) throws IOException;
 
-  List<LibraryDilution> getAllByPageSizeSearchAndPlatform(int offset, int size, String querystr, PlatformType platform, String sortDir,
+  List<LibraryDilution> listByPageSizeSearchAndPlatform(int offset, int size, String querystr, PlatformType platform, String sortDir,
       String sortCol) throws IOException;
 
   boolean delete(LibraryDilution dilution) throws IOException;

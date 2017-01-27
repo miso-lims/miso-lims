@@ -53,6 +53,7 @@ import org.w3c.dom.Element;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
@@ -98,7 +99,7 @@ public class LS454NotificationMessageConsumerMechanism
     RequestManager requestManager = message.getHeaders().get("handler", RequestManager.class);
     Assert.notNull(requestManager, "Cannot consume MISO notification messages without a RequestManager.");
     Map<String, List<String>> statuses = message.getPayload();
-    Set<Run> output = new HashSet<Run>();
+    Set<Run> output = new HashSet<>();
     for (String key : statuses.keySet()) {
       HealthType ht = HealthType.valueOf(key);
       JSONArray runs = (JSONArray) JSONArray.fromObject(statuses.get(key)).get(0);
@@ -111,8 +112,8 @@ public class LS454NotificationMessageConsumerMechanism
   }
 
   private Map<String, Run> processRunJSON(HealthType ht, JSONArray runs, RequestManager requestManager) {
-    Map<String, Run> updatedRuns = new HashMap<String, Run>();
-    List<Run> runsToSave = new ArrayList<Run>();
+    Map<String, Run> updatedRuns = new HashMap<>();
+    List<Run> runsToSave = new ArrayList<>();
 
     DateFormat gsLogDateFormat = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy");
     DateFormat startDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
@@ -345,8 +346,8 @@ public class LS454NotificationMessageConsumerMechanism
 
     try {
       if (runsToSave.size() > 0) {
-        int[] saved = requestManager.saveRuns(runsToSave);
-        log.info("Batch saved " + saved.length + " / " + runs.size() + " runs");
+        requestManager.saveRuns(runsToSave);
+        log.info("Batch saved " + runsToSave.size() + " runs");
       }
     } catch (IOException e) {
       log.error("Couldn't save run batch", e);

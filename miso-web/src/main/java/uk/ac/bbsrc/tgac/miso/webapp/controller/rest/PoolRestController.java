@@ -164,7 +164,7 @@ public class PoolRestController extends RestController {
 
   @RequestMapping(value = "/wizard/librarydilutions", method = RequestMethod.GET, produces = "application/json")
   public @ResponseBody JSONObject ldRest() throws IOException {
-    Collection<LibraryDilution> lds = dilutionService.getAll();
+    Collection<LibraryDilution> lds = dilutionService.list();
 
     List<String> types = new ArrayList<>(requestManager.listDistinctPlatformNames());
     Collections.sort(types);

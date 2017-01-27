@@ -170,19 +170,19 @@ public class DefaultLibraryService implements LibraryService {
   }
 
   @Override
-  public List<Library> getAll() throws IOException {
+  public List<Library> list() throws IOException {
     Collection<Library> allLibraries = libraryDao.listAll();
     return authorizationManager.filterUnreadable(allLibraries);
   }
 
   @Override
-  public List<Library> getAllByPageAndSize(int offset, int size, String sortDir, String sortCol) throws IOException {
+  public List<Library> listByPageAndSize(int offset, int size, String sortDir, String sortCol) throws IOException {
     Collection<Library> libraries = libraryDao.listByOffsetAndNumResults(offset, size, sortDir, sortCol);
     return authorizationManager.filterUnreadable(libraries);
   }
 
   @Override
-  public List<Library> getAllByPageSizeAndSearch(int offset, int size, String querystr, String sortDir, String sortCol)
+  public List<Library> listByPageSizeAndSearch(int offset, int size, String querystr, String sortDir, String sortCol)
       throws IOException {
     Collection<Library> libraries = libraryDao.listBySearchOffsetAndNumResults(offset, size, querystr, sortDir, sortCol);
     return authorizationManager.filterUnreadable(libraries);
@@ -202,13 +202,13 @@ public class DefaultLibraryService implements LibraryService {
   }
 
   @Override
-  public List<Library> getAllByBarcodeList(List<String> barcodeList) throws IOException {
+  public List<Library> listByBarcodeList(List<String> barcodeList) throws IOException {
     Collection<Library> libraries = libraryDao.getByBarcodeList(barcodeList);
     return authorizationManager.filterUnreadable(libraries);
   }
 
   @Override
-  public List<Library> getAllByIdList(List<Long> idList) throws IOException {
+  public List<Library> listByIdList(List<Long> idList) throws IOException {
     Collection<Library> libraries = libraryDao.getByIdList(idList);
     return authorizationManager.filterUnreadable(libraries);
   }
@@ -220,19 +220,19 @@ public class DefaultLibraryService implements LibraryService {
   }
 
   @Override
-  public List<Library> getAllBySearch(String querystr) throws IOException {
+  public List<Library> listBySearch(String querystr) throws IOException {
     Collection<Library> libraries = libraryDao.listBySearch(querystr);
     return authorizationManager.filterUnreadable(libraries);
   }
 
   @Override
-  public List<Library> getAllByAlias(String alias) throws IOException {
+  public List<Library> listByAlias(String alias) throws IOException {
     Collection<Library> libraries = libraryDao.listByAlias(alias);
     return authorizationManager.filterUnreadable(libraries);
   }
 
   @Override
-  public List<Library> getAllWithLimit(long limit) throws IOException {
+  public List<Library> listWithLimit(long limit) throws IOException {
     Collection<Library> libraries = libraryDao.listAllWithLimit(limit);
     return authorizationManager.filterUnreadable(libraries);
   }
@@ -244,13 +244,13 @@ public class DefaultLibraryService implements LibraryService {
   }
 
   @Override
-  public List<Library> getAllBySampleId(long sampleId) throws IOException {
+  public List<Library> listBySampleId(long sampleId) throws IOException {
     Collection<Library> libraries = libraryDao.listBySampleId(sampleId);
     return authorizationManager.filterUnreadable(libraries);
   }
 
   @Override
-  public List<Library> getAllByProjectId(long projectId) throws IOException {
+  public List<Library> listByProjectId(long projectId) throws IOException {
     Collection<Library> libraries = libraryDao.listByProjectId(projectId);
     return authorizationManager.filterUnreadable(libraries);
   }
@@ -271,12 +271,12 @@ public class DefaultLibraryService implements LibraryService {
   }
 
   @Override
-  public Collection<LibraryType> getAllLibraryTypes() throws IOException {
+  public Collection<LibraryType> listLibraryTypes() throws IOException {
     return libraryDao.listAllLibraryTypes();
   }
 
   @Override
-  public Collection<LibraryType> getAllLibraryTypesByPlatform(PlatformType platform) throws IOException {
+  public Collection<LibraryType> listLibraryTypesByPlatform(PlatformType platform) throws IOException {
     return libraryDao.listLibraryTypesByPlatform(platform);
   }
 
@@ -291,7 +291,7 @@ public class DefaultLibraryService implements LibraryService {
   }
 
   @Override
-  public Collection<LibrarySelectionType> getAllLibrarySelectionTypes() throws IOException {
+  public Collection<LibrarySelectionType> listLibrarySelectionTypes() throws IOException {
     return libraryDao.listAllLibrarySelectionTypes();
   }
 
@@ -306,12 +306,12 @@ public class DefaultLibraryService implements LibraryService {
   }
 
   @Override
-  public Collection<LibraryStrategyType> getAllLibraryStrategyTypes() throws IOException {
+  public Collection<LibraryStrategyType> listLibraryStrategyTypes() throws IOException {
     return libraryDao.listAllLibraryStrategyTypes();
   }
 
   @Override
-  public Collection<QcType> getAllLibraryQcTypes() throws IOException {
+  public Collection<QcType> listLibraryQcTypes() throws IOException {
     return libraryQcDao.listAllLibraryQcTypes();
   }
 
@@ -537,7 +537,7 @@ public class DefaultLibraryService implements LibraryService {
   }
 
   private void validateAliasUniqueness(Library library) throws IOException {
-    if (!namingScheme.duplicateLibraryAliasAllowed() && !getAllByAlias(library.getAlias()).isEmpty()) {
+    if (!namingScheme.duplicateLibraryAliasAllowed() && !listByAlias(library.getAlias()).isEmpty()) {
       if (LimsUtils.isDetailedLibrary(library) && ((DetailedLibrary) library).hasNonStandardAlias()) {
         // do nothing; nonstandard alias means duplicates are acceptable
       } else {
