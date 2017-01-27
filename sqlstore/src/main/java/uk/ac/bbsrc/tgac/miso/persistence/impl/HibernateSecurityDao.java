@@ -79,6 +79,7 @@ public class HibernateSecurityDao implements SecurityStore {
   }
   @Override
   public Group getGroupByName(String groupName) throws IOException {
+    if (groupName == null) throw new NullPointerException("Can not get by null group name");
     Criteria criteria = currentSession().createCriteria(Group.class);
     criteria.add(Restrictions.eq("name", groupName));
     return (Group) criteria.uniqueResult();
@@ -154,7 +155,7 @@ public class HibernateSecurityDao implements SecurityStore {
 
   public Collection<Group> listGroupsByUserId(Long userId) throws IOException {
     Criteria criteria = currentSession().createCriteria(Group.class);
-    criteria.createAlias("user", "user");
+    criteria.createAlias("users", "user");
     criteria.add(Restrictions.eq("user.id", userId));
     @SuppressWarnings("unchecked")
     List<Group> results = criteria.list();
@@ -165,7 +166,7 @@ public class HibernateSecurityDao implements SecurityStore {
   public Collection<User> listUsersByGroupName(String name) throws IOException {
     if (name == null) throw new NullPointerException("Can not search by null group name");
     Criteria criteria = currentSession().createCriteria(UserImpl.class);
-    criteria.createAlias("group", "group");
+    criteria.createAlias("groups", "group");
     criteria.add(Restrictions.eq("group.name", name));
     @SuppressWarnings("unchecked")
     List<User> results = criteria.list();
