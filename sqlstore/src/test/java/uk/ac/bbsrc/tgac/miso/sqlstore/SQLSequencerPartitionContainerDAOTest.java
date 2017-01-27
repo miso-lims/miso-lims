@@ -35,6 +35,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.InjectMocks;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -52,7 +53,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.PlatformImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateChangeLogDao;
+import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSequencerPartitionContainerDao;
 
 public class SQLSequencerPartitionContainerDAOTest extends AbstractDAOTest {
@@ -64,18 +65,20 @@ public class SQLSequencerPartitionContainerDAOTest extends AbstractDAOTest {
   private SessionFactory sessionFactory;
 
   @Mock
-  private HibernateChangeLogDao changeLogDAO;
+  private SecurityStore securityDao;
 
   @InjectMocks
   private HibernateSequencerPartitionContainerDao dao;
 
-  // Auto-increment sequence doesn't roll back with transactions, so must be tracked
-  private static long nextAutoIncrementId = 5L;
+  private final User emptyUser = new UserImpl();
 
   @Before
   public void setup() throws IOException {
     MockitoAnnotations.initMocks(this);
     dao.setSessionFactory(sessionFactory);
+
+    emptyUser.setUserId(1L);
+    when(securityDao.getUserById(Matchers.anyLong())).thenReturn(emptyUser);
   }
 
   @Test
@@ -147,9 +150,7 @@ public class SQLSequencerPartitionContainerDAOTest extends AbstractDAOTest {
     Platform platform = Mockito.mock(PlatformImpl.class);
     spc.setPlatform(platform);
     Mockito.when(platform.getId()).thenReturn(1L);
-    User user = Mockito.mock(UserImpl.class);
-    Mockito.when(user.getUserId()).thenReturn(1L);
-    spc.setLastModifier(user);
+    spc.setLastModifier(emptyUser);
     Run run = Mockito.mock(RunImpl.class);
     Mockito.when(run.getId()).thenReturn(1L);
     spc.setIdentificationBarcode("ABCDEFXX");
@@ -157,7 +158,6 @@ public class SQLSequencerPartitionContainerDAOTest extends AbstractDAOTest {
 
     assertEquals(4L, dao.save(spc));
     SequencerPartitionContainer<SequencerPoolPartition> savedSPC = dao.get(4L);
-    assertNotSame(spc, savedSPC);
     assertEquals(spc.getId(), savedSPC.getId());
     assertEquals("ABCDEFXX", savedSPC.getIdentificationBarcode());
   }
@@ -170,14 +170,13 @@ public class SQLSequencerPartitionContainerDAOTest extends AbstractDAOTest {
 
   @Test
   public void testSaveNew() throws IOException {
-    long autoIncrementId = nextAutoIncrementId;
     SequencerPartitionContainer<SequencerPoolPartition> newSPC = makeSPC("ABCDEFXX");
 
-    assertEquals(autoIncrementId, dao.save(newSPC));
+    Long newId = dao.save(newSPC);
+    assertNotNull(newId);
 
-    SequencerPartitionContainer<SequencerPoolPartition> savedSPC = dao.get(autoIncrementId);
+    SequencerPartitionContainer<SequencerPoolPartition> savedSPC = dao.get(newId);
     assertEquals(newSPC.getIdentificationBarcode(), savedSPC.getIdentificationBarcode());
-    nextAutoIncrementId += 1;
   }
 
   @Test
@@ -186,25 +185,31 @@ public class SQLSequencerPartitionContainerDAOTest extends AbstractDAOTest {
     String spcIDBC = "ABCDEFXX";
     spc.setIdentificationBarcode(spcIDBC);
     spc.setPlatform(Mockito.mock(PlatformImpl.class));
-    User mockUser = Mockito.mock(UserImpl.class);
-    when(mockUser.getUserId()).thenReturn(1L);
-    spc.setLastModifier(mockUser);
+    spc.setLastModifier(emptyUser);
 
     long spcId = dao.save(spc);
     SequencerPartitionContainer<SequencerPoolPartition> insertedSpc = dao.get(spcId);
     assertNotNull(insertedSpc);
     assertTrue(dao.remove(spc));
-    Mockito.verify(changeLogDAO, Mockito.times(1)).deleteAllById("SequencerPartitionContainer", spc.getId());
     assertNull(dao.get(insertedSpc.getId()));
-    nextAutoIncrementId++;
   }
 
   @Test
   public void testRemoveContainerFromRun() throws IOException {
-    assertEquals(1, dao.listAllSequencerPartitionContainersByRunId(1L).size());
+    Long runId = 1L;
+    List<SequencerPartitionContainer<SequencerPoolPartition>> spcByRunId = dao.listAllSequencerPartitionContainersByRunId(runId);
+    assertEquals(1, spcByRunId.size());
 
-    SequencerPartitionContainer<SequencerPoolPartition> spc = dao.get(1L);
-    assertEquals(0, dao.listAllSequencerPartitionContainersByRunId(1L).size());
+    SequencerPartitionContainer<SequencerPoolPartition> fetchedSPC = spcByRunId.iterator().next();
+    Run removeTarget = null;
+    for (Run run : fetchedSPC.getRuns()) {
+      if (run.getId() == runId) removeTarget = run;
+    }
+    if (removeTarget != null) {
+      fetchedSPC.getRuns().remove(removeTarget);
+      dao.save(fetchedSPC);
+    }
+    assertEquals(0, dao.listAllSequencerPartitionContainersByRunId(runId).size());
   }
 
   @Test
@@ -212,13 +217,13 @@ public class SQLSequencerPartitionContainerDAOTest extends AbstractDAOTest {
     assertEquals(1, dao.listAllSequencerPartitionContainersByRunId(1L).size());
 
     SequencerPartitionContainer<SequencerPoolPartition> spc = dao.get(2L);
+    spc.setRun(null);
+    dao.save(spc);
     assertEquals(1, dao.listAllSequencerPartitionContainersByRunId(1L).size());
   }
 
   private SequencerPartitionContainer<SequencerPoolPartition> makeSPC(String identificationBarcode) throws IOException {
     SecurityProfile profile = Mockito.mock(SecurityProfile.class);
-    User user = Mockito.mock(UserImpl.class);
-    Mockito.when(user.getUserId()).thenReturn(1L);
     SequencerPartitionContainer<SequencerPoolPartition> pc = new SequencerPartitionContainerImpl();
     pc.setSecurityProfile(profile);
     pc.setIdentificationBarcode(identificationBarcode);
@@ -226,7 +231,7 @@ public class SQLSequencerPartitionContainerDAOTest extends AbstractDAOTest {
     Platform platform = new PlatformImpl();
     platform.setId(1L);
     pc.setPlatform(platform);
-    pc.setLastModifier(user);
+    pc.setLastModifier(emptyUser);
     return pc;
   }
 

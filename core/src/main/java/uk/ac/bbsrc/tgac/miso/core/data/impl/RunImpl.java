@@ -61,8 +61,8 @@ public class RunImpl extends AbstractRun implements Serializable {
 
   @ManyToMany(targetEntity = SequencerPartitionContainerImpl.class, cascade = CascadeType.ALL)
   @JoinTable(name = "Run_SequencerPartitionContainer", joinColumns = {
-      @JoinColumn(name = "Run_runId", nullable = false, updatable = false) }, inverseJoinColumns = {
-          @JoinColumn(name = "containers_containerId", nullable = false, updatable = false) })
+      @JoinColumn(name = "Run_runId") }, inverseJoinColumns = {
+          @JoinColumn(name = "containers_containerId") })
   private List<SequencerPartitionContainer<SequencerPoolPartition>> containers = new AutoPopulatingList<SequencerPartitionContainer<SequencerPoolPartition>>(
       SequencerPartitionContainerImpl.class);
 

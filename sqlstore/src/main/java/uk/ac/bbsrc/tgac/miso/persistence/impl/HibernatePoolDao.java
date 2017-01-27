@@ -174,6 +174,10 @@ public class HibernatePoolDao implements PoolStore {
 
   @Override
   public List<Pool> listByLibraryId(long libraryId) throws IOException {
+    // flush here because if Hibernate has not persisted recent changes to libraryDilution-pool relationships, unexpected associations may
+    // show up
+    currentSession().flush();
+
     Criteria idCriteria = currentSession().createCriteria(LibraryImpl.class);
     idCriteria.add(Restrictions.eq("id", libraryId));
     idCriteria.createAlias("libraryDilutions.pools.id", "poolIds");
@@ -190,6 +194,10 @@ public class HibernatePoolDao implements PoolStore {
 
   @Override
   public List<Pool> listByProjectId(long projectId) throws IOException {
+    // flush here because if Hibernate has not persisted recent changes to libraryDilution-pool relationships, unexpected associations may
+    // show up
+    currentSession().flush();
+
     Criteria idCriteria = currentSession().createCriteria(SampleImpl.class);
     idCriteria.createAlias("project", "project");
     idCriteria.add(Restrictions.eq("project.id", projectId));
