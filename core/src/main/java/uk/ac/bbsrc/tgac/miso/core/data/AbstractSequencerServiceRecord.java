@@ -25,6 +25,7 @@ public abstract class AbstractSequencerServiceRecord implements SequencerService
   @JoinColumn(name = "sequencerReferenceId")
   private SequencerReference sequencerReference;
 
+  @Column(nullable = false)
   private String title;
   private String details;
 

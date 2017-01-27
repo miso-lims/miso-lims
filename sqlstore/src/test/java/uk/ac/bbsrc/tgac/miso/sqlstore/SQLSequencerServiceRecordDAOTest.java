@@ -27,6 +27,7 @@ import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import org.hibernate.SessionFactory;
@@ -35,6 +36,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.InjectMocks;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -44,8 +46,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerServiceRecordImpl;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
+import uk.ac.bbsrc.tgac.miso.core.store.SequencerReferenceStore;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSequencerServiceRecordDao;
 
 public class SQLSequencerServiceRecordDAOTest extends AbstractDAOTest {
@@ -61,37 +65,36 @@ public class SQLSequencerServiceRecordDAOTest extends AbstractDAOTest {
   
   @Mock
   private MisoFilesManager misoFilesManager;
+  @Mock
+  private SequencerReferenceStore sequencerReferenceDao;
+  private final SequencerReference emptySR = new SequencerReferenceImpl();
   
   @InjectMocks
   private HibernateSequencerServiceRecordDao dao;
   
-  //Auto-increment sequence doesn't roll back with transactions, so must be tracked
-  private static long nextAutoIncrementId = 4L;
-  
   @Before
-  public void setup() {
+  public void setup() throws IOException {
     MockitoAnnotations.initMocks(this);
     dao.setTemplate(jdbcTemplate);
     dao.setSessionFactory(sessionFactory);
+
+    emptySR.setId(2L);
+    Mockito.when(sequencerReferenceDao.get(Matchers.anyLong())).thenReturn(emptySR);
   }
   
   @Test
   public void testSaveNew() throws IOException {
     String title = "New Record 1";
-    assertEquals(nextAutoIncrementId, dao.save(makeServiceRecord(title)));
+    Long newId = dao.save(makeServiceRecord(title));
     
-    SequencerServiceRecord savedRec = dao.get(nextAutoIncrementId);
+    SequencerServiceRecord savedRec = dao.get(newId);
     assertEquals(title, savedRec.getTitle());
-    nextAutoIncrementId++;
   }
   
   private SequencerServiceRecord makeServiceRecord(String title) {
-    SequencerReference sr = Mockito.mock(SequencerReference.class);
-    Mockito.when(sr.getId()).thenReturn(2L);
-    
     SequencerServiceRecord rec = new SequencerServiceRecordImpl();
     rec.setTitle(title);
-    rec.setSequencerReference(sr);
+    rec.setSequencerReference(emptySR);
     rec.setServiceDate(new java.util.Date());
     rec.setServicedByName("Test Person");
     return rec;
@@ -115,7 +118,7 @@ public class SQLSequencerServiceRecordDAOTest extends AbstractDAOTest {
   @Test
   public void testSaveDecommissioned() throws IOException {
     SequencerServiceRecord newRec = makeServiceRecord("New Record 2");
-    Mockito.when(newRec.getSequencerReference().getDateDecommissioned()).thenReturn(new java.util.Date());
+    newRec.getSequencerReference().setDateDecommissioned(new Date());
     
     exception.expect(IOException.class);
     dao.save(newRec);
