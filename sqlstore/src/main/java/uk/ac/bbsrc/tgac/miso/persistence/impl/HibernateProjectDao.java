@@ -71,7 +71,15 @@ public class HibernateProjectDao implements ProjectStore {
   @Autowired
   private SessionFactory sessionFactory;
 
+  @Autowired
   private JdbcTemplate template;
+
+  @Override
+  public void addWatcher(Project project, User watcher) {
+    log.debug("Adding watcher " + watcher.getLoginName() + " to " + project.getName() + " via WatchManager");
+    project.addWatcher(watcher);
+    currentSession().update(project);
+  }
 
   @Override
   public int count() throws IOException {
@@ -109,10 +117,16 @@ public class HibernateProjectDao implements ProjectStore {
   public JdbcTemplate getJdbcTemplate() {
     return template;
   }
+
+  public ProjectAlertManager getProjectAlertManager() {
+    return projectAlertManager;
+  }
+
   @Override
   public Map<String, Integer> getProjectColumnSizes() throws IOException {
     return DbUtils.getColumnSizes(template, TABLE_NAME);
   }
+
   @Override
   @CoverageIgnore
   public ProjectOverview getProjectOverviewById(long overviewId) throws IOException {
@@ -127,23 +141,14 @@ public class HibernateProjectDao implements ProjectStore {
     return securityStore;
   }
 
-  @Override
-  public void addWatcher(Project project, User watcher) {
-    log.debug("Adding watcher " + watcher.getLoginName() + " to " + project.getName() + " via WatchManager");
-    project.addWatcher(watcher);
-    currentSession().update(project);
-  }
-
-  @Override
-  public void removeWatcher(Project project, User watcher) {
-    log.debug("Removing watcher " + watcher.getLoginName() + " from " + project.getWatchableIdentifier() + " via WatchManager");
-    project.removeWatcher(watcher);
-    currentSession().update(project);
+  public SessionFactory getSessionFactory() {
+    return sessionFactory;
   }
 
   public ProjectOverview lazyGetProjectOverviewById(long overviewId) throws IOException {
     return getProjectOverviewById(overviewId);
   }
+
   @Override
   public List<Project> listAll() throws IOException {
     Criteria criteria = currentSession().createCriteria(ProjectImpl.class);
@@ -151,7 +156,6 @@ public class HibernateProjectDao implements ProjectStore {
     List<Project> results = criteria.list();
     return withWatcherGroup(results);
   }
-
   @Override
   public List<Project> listAllWithLimit(long limit) throws IOException {
     Criteria criteria = currentSession().createCriteria(ProjectImpl.class);
@@ -190,6 +194,13 @@ public class HibernateProjectDao implements ProjectStore {
   }
 
   @Override
+  public void removeWatcher(Project project, User watcher) {
+    log.debug("Removing watcher " + watcher.getLoginName() + " from " + project.getWatchableIdentifier() + " via WatchManager");
+    project.removeWatcher(watcher);
+    currentSession().update(project);
+  }
+
+  @Override
   public long save(Project project) throws IOException {
     if (project.getId() == AbstractProject.UNSAVED_ID) {
       return (Long) currentSession().save(project);
@@ -225,17 +236,8 @@ public class HibernateProjectDao implements ProjectStore {
     this.securityStore = securityStore;
   }
 
-  private List<Project> withWatcherGroup(List<Project> projects) throws IOException {
-    Group group = getProjectWatcherGroup();
-    for (Project project : projects) {
-      project.setWatchGroup(group);
-    }
-    return projects;
-  }
-
-  private Project withWatcherGroup(Project project) throws IOException {
-    project.setWatchGroup(getProjectWatcherGroup());
-    return project;
+  public void setSessionFactory(SessionFactory sessionFactory) {
+    this.sessionFactory = sessionFactory;
   }
 
   private List<ProjectOverview> withOverviewWatcherGroup(List<ProjectOverview> projectoverviews) throws IOException {
@@ -246,8 +248,25 @@ public class HibernateProjectDao implements ProjectStore {
     return projectoverviews;
   }
 
-  private ProjectOverview withWatcherGroup(ProjectOverview projectoverviews) throws IOException {
-    projectoverviews.setWatchGroup(getProjectWatcherGroup());
-    return projectoverviews;
+  private List<Project> withWatcherGroup(List<Project> projects) throws IOException {
+    Group group = getProjectWatcherGroup();
+    for (Project project : projects) {
+      project.setWatchGroup(group);
+    }
+    return projects;
+  }
+
+  private Project withWatcherGroup(Project project) throws IOException {
+    if (project != null) {
+      project.setWatchGroup(getProjectWatcherGroup());
+    }
+    return project;
+  }
+
+  private ProjectOverview withWatcherGroup(ProjectOverview projectoverview) throws IOException {
+    if (projectoverview != null) {
+      projectoverview.setWatchGroup(getProjectWatcherGroup());
+    }
+    return projectoverview;
   }
 }
