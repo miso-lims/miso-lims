@@ -113,7 +113,7 @@ public class HibernateSequencerPartitionContainerDao implements SequencerPartiti
   @Override
   public List<SequencerPartitionContainer<SequencerPoolPartition>> listAllSequencerPartitionContainersByRunId(long runId)
       throws IOException {
-    // flush here because if Hibernate has not persisted recent changes to container-partition relationships, unexpected associations may
+    // flush here because if Hibernate has not persisted recent changes to container-run relationships, unexpected associations may
     // show up
     currentSession().flush();
 
