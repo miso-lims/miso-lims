@@ -36,7 +36,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
-import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
@@ -60,9 +59,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
-import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
-import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
-import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 
@@ -263,9 +259,6 @@ public interface RequestManager {
 
   public Collection<SampleQC> listAllSampleQCsBySampleId(long sampleId) throws IOException;
 
-  @Deprecated // massively detremental to performance.
-  public Collection<Library> listAllLibraries() throws IOException;
-
   public Collection<LibraryQC> listAllLibraryQCsByLibraryId(long libraryId) throws IOException;
 
   public Collection<TargetedSequencing> listAllTargetedSequencing() throws IOException;
@@ -455,46 +448,10 @@ public interface RequestManager {
   public void removePoolWatcher(Pool pool, User watcher) throws IOException;
 
   /**
-   * @Deprecated in v0.28. Use libraryService.save() instead
-   */
-  @Deprecated
-  long saveLibrary(Library library) throws IOException;
-
-  /**
-   * @Deprecated in v0.28. Use libraryService.addQc() instead
-   */
-  @Deprecated
-  long saveLibraryQC(LibraryQC libraryQc) throws IOException;
-
-  /**
-   * @Deprecated in v0.28. Use libraryService.getLibraryTypeByDescriptionAndPlatform() instead
-   */
-  @Deprecated
-  public LibraryType getLibraryTypeByDescriptionAndPlatform(String description, PlatformType platformType) throws IOException;
-
-  /**
-   * @Deprecated in v0.28. Use libraryService.getLibrarySelectionTypeByName() instead
-   */
-  @Deprecated
-  public LibrarySelectionType getLibrarySelectionTypeByName(String name) throws IOException;
-
-  /**
-   * @Deprecated in v0.28. Use libraryService.getLibraryStrategyTypeByName() instead
-   */
-  @Deprecated
-  public LibraryStrategyType getLibraryStrategyTypeByName(String name) throws IOException;
-
-  /**
    * @Deprecated in v0.28. Use dilutionService.save() instead
    */
   @Deprecated
   public long saveLibraryDilution(LibraryDilution libraryDilution) throws IOException;
-
-  /**
-   * @Deprecated in v0.28. Use libraryService.listBySampleId() instead
-   */
-  @Deprecated
-  public Collection<Library> listAllLibrariesBySampleId(long sampleId) throws IOException;
 
   /**
    * @Deprecated in v0.28. Use dilutionService.list() instead

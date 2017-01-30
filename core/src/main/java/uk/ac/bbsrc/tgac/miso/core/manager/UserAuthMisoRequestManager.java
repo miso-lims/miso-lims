@@ -46,7 +46,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
-import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
@@ -71,9 +70,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
-import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
-import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
-import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.exception.AuthorizationIOException;
@@ -234,29 +230,11 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public long saveLibrary(Library library) throws IOException {
-    if (writeCheck(library)) {
-      return backingManager.saveLibrary(library);
-    } else {
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot write to this Library");
-    }
-  }
-
-  @Override
   public long saveLibraryDilution(LibraryDilution libraryDilution) throws IOException {
     if (writeCheck(libraryDilution)) {
       return backingManager.saveLibraryDilution(libraryDilution);
     } else {
       throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot write to this LibraryDilution");
-    }
-  }
-
-  @Override
-  public long saveLibraryQC(LibraryQC libraryQC) throws IOException {
-    if (writeCheck(libraryQC.getLibrary())) {
-      return backingManager.saveLibraryQC(libraryQC);
-    } else {
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot write to this Library");
     }
   }
 
@@ -758,30 +736,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Library> listAllLibraries() throws IOException {
-    User user = getCurrentUser();
-    Collection<Library> accessibles = new HashSet<>();
-    for (Library library : backingManager.listAllLibraries()) {
-      if (library.userCanRead(user)) {
-        accessibles.add(library);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Collection<Library> listAllLibrariesBySampleId(long sampleId) throws IOException {
-    User user = getCurrentUser();
-    Collection<Library> accessibles = new HashSet<>();
-    for (Library library : backingManager.listAllLibrariesBySampleId(sampleId)) {
-      if (library.userCanRead(user)) {
-        accessibles.add(library);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
   public Collection<LibraryQC> listAllLibraryQCsByLibraryId(long libraryId) throws IOException {
     User user = getCurrentUser();
     Collection<LibraryQC> accessibles = new HashSet<>();
@@ -1104,21 +1058,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
     } else {
       throw new IOException("User " + getCurrentUser().getFullName() + " cannot write to this Box");
     }
-  }
-
-  @Override
-  public LibraryType getLibraryTypeByDescriptionAndPlatform(String description, PlatformType platformType) throws IOException {
-    return backingManager.getLibraryTypeByDescriptionAndPlatform(description, platformType);
-  }
-
-  @Override
-  public LibrarySelectionType getLibrarySelectionTypeByName(String name) throws IOException {
-    return backingManager.getLibrarySelectionTypeByName(name);
-  }
-
-  @Override
-  public LibraryStrategyType getLibraryStrategyTypeByName(String name) throws IOException {
-    return backingManager.getLibraryStrategyTypeByName(name);
   }
 
   @Override

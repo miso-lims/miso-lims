@@ -36,15 +36,15 @@ import java.lang.reflect.Method;
  * @date 01/12/11
  * @since 0.1.3
  */
-public class AliasComparator extends AlphanumericComparator {
-  private Method method;
-  private boolean isAscending = true;
-  private boolean isNullsLast = true;
+public class AliasComparator<T> extends AlphanumericComparator<T> {
+  private final Method method;
+  private final boolean isAscending = true;
+  private final boolean isNullsLast = true;
   private static final Object[] EMPTY_OBJECT_ARRAY = new Object[] {};
 
-  public AliasComparator(Class c) throws NoSuchMethodException, IllegalArgumentException {
+  public AliasComparator(Class<T> c) throws NoSuchMethodException, IllegalArgumentException {
     method = c.getMethod("getAlias");
-    Class returnClass = method.getReturnType();
+    Class<?> returnClass = method.getReturnType();
     if (returnClass.getName().equals("void")) {
       String message = method.getName() + " has a void return type";
       throw new IllegalArgumentException(message);

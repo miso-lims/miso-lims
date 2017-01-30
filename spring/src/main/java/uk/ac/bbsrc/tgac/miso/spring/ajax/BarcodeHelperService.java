@@ -42,13 +42,21 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 
 @Ajaxified
 public class BarcodeHelperService {
   protected static final Logger log = LoggerFactory.getLogger(BarcodeHelperService.class);
 
   @Autowired
+  private LibraryService libraryService;
+
+  @Autowired
   private RequestManager requestManager;
+
+  public void setLibraryService(LibraryService libraryService) {
+    this.libraryService = libraryService;
+  }
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
@@ -68,9 +76,9 @@ public class BarcodeHelperService {
         }
       }
 
-      for (Library l : requestManager.listAllLibraries()) {
+      for (Library l : libraryService.list()) {
         if (isStringEmptyOrNull(l.getIdentificationBarcode())) {
-          requestManager.saveLibrary(l);
+          libraryService.update(l);
         }
       }
 

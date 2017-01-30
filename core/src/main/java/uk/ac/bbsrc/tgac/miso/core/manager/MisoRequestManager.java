@@ -79,9 +79,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
-import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
-import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
-import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.PoolAlertManager;
@@ -528,24 +525,6 @@ public class MisoRequestManager implements RequestManager {
       return sampleQcStore.listBySampleId(sampleId);
     } else {
       throw new IOException("No sampleStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<Library> listAllLibraries() throws IOException {
-    if (libraryStore != null) {
-      return libraryStore.listAll();
-    } else {
-      throw new IOException("No libraryStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<Library> listAllLibrariesBySampleId(long sampleId) throws IOException {
-    if (libraryStore != null) {
-      return libraryStore.listBySampleId(sampleId);
-    } else {
-      throw new IOException("No libraryStore available. Check that it has been declared in the Spring config.");
     }
   }
 
@@ -1184,29 +1163,11 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public long saveLibrary(Library library) throws IOException {
-    if (libraryStore != null) {
-      return libraryStore.save(library);
-    } else {
-      throw new IOException("No libraryStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
   public long saveLibraryDilution(LibraryDilution libraryDilution) throws IOException {
     if (libraryDilutionStore != null) {
       return libraryDilutionStore.save(libraryDilution);
     } else {
       throw new IOException("No libraryDilutionStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public long saveLibraryQC(LibraryQC libraryQc) throws IOException {
-    if (libraryQcStore != null) {
-      return libraryQcStore.save(libraryQc);
-    } else {
-      throw new IOException("No libraryQcStore available. Check that it has been declared in the Spring config.");
     }
   }
 
@@ -1425,33 +1386,6 @@ public class MisoRequestManager implements RequestManager {
       return libraryQcStore.get(libraryQcId);
     } else {
       throw new IOException("No libraryQcStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public LibraryType getLibraryTypeByDescriptionAndPlatform(String description, PlatformType platformType) throws IOException {
-    if (libraryStore != null) {
-      return libraryStore.getLibraryTypeByDescriptionAndPlatform(description, platformType);
-    } else {
-      throw new IOException("No libraryStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public LibrarySelectionType getLibrarySelectionTypeByName(String name) throws IOException {
-    if (libraryStore != null) {
-      return libraryStore.getLibrarySelectionTypeByName(name);
-    } else {
-      throw new IOException("No libraryStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public LibraryStrategyType getLibraryStrategyTypeByName(String name) throws IOException {
-    if (libraryStore != null) {
-      return libraryStore.getLibraryStrategyTypeByName(name);
-    } else {
-      throw new IOException("No libraryStore available. Check that it has been declared in the Spring config.");
     }
   }
 

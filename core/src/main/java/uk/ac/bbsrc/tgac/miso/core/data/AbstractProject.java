@@ -23,7 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -57,6 +56,7 @@ import org.slf4j.LoggerFactory;
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
+import com.google.common.collect.Lists;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl;
@@ -233,7 +233,7 @@ public abstract class AbstractProject implements Project {
   public void setSamples(Collection<Sample> samples) {
     this.samples = samples;
     try {
-      Collections.sort(Arrays.asList(this.samples), new AliasComparator(Sample.class));
+      Collections.sort(Lists.newArrayList(this.samples), new AliasComparator<Sample>(Sample.class));
     } catch (NoSuchMethodException e) {
       log.error("set samples", e);
     }
@@ -243,7 +243,7 @@ public abstract class AbstractProject implements Project {
   public void addSample(Sample sample) {
     this.samples.add(sample);
     try {
-      Collections.sort(Arrays.asList(this.samples), new AliasComparator(Sample.class));
+      Collections.sort(Lists.newArrayList(this.samples), new AliasComparator<Sample>(Sample.class));
     } catch (NoSuchMethodException e) {
       log.error("set sample", e);
     }
@@ -253,7 +253,7 @@ public abstract class AbstractProject implements Project {
   public void setStudies(Collection<Study> studies) {
     this.studies = studies;
     try {
-      Collections.sort(Arrays.asList(this.studies), new AliasComparator(Study.class));
+      Collections.sort(Lists.newArrayList(this.studies), new AliasComparator<Study>(Study.class));
     } catch (NoSuchMethodException e) {
       log.error("set studies", e);
     }
