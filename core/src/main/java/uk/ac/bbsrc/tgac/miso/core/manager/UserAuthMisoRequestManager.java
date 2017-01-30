@@ -64,7 +64,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
@@ -226,15 +225,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
       return backingManager.saveSampleQC(sampleQC);
     } else {
       throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot write to the parent Sample ");
-    }
-  }
-
-  @Override
-  public long saveLibraryDilution(LibraryDilution libraryDilution) throws IOException {
-    if (writeCheck(libraryDilution)) {
-      return backingManager.saveLibraryDilution(libraryDilution);
-    } else {
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot write to this LibraryDilution");
     }
   }
 
@@ -742,18 +732,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
     for (LibraryQC libraryQc : backingManager.listAllLibraryQCsByLibraryId(libraryId)) {
       if (libraryQc.userCanRead(user)) {
         accessibles.add(libraryQc);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Collection<LibraryDilution> listAllLibraryDilutions() throws IOException {
-    User user = getCurrentUser();
-    Collection<LibraryDilution> accessibles = new HashSet<>();
-    for (LibraryDilution dilution : backingManager.listAllLibraryDilutions()) {
-      if (dilution.userCanRead(user)) {
-        accessibles.add(dilution);
       }
     }
     return accessibles;

@@ -44,7 +44,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.AuthorizationIOException;
@@ -91,8 +90,6 @@ public class UserAuthMisoRequestManagerTestSuite {
   private Library library;
   @Mock
   private LibraryQC libraryQC;
-  @Mock
-  private LibraryDilution libraryDilution;
   @Mock
   private Pool pool;
   @Mock
@@ -396,42 +393,6 @@ public class UserAuthMisoRequestManagerTestSuite {
     userAuthMisoRequestManager.saveSampleQC(sampleQC);
 
     verify(backingManager, never()).saveSampleQC(sampleQC);
-  }
-
-  /**
-   * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveLibraryDilution(uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution)}
-   * .
-   * 
-   * @throws IOException
-   */
-  @Test
-  public void testSaveLibraryDilution() throws IOException {
-    final long expectedReturn = 1L;
-    when(libraryDilution.userCanWrite(any(User.class))).thenReturn(true);
-    when(backingManager.saveLibraryDilution(libraryDilution)).thenReturn(expectedReturn);
-
-    assertEquals(expectedReturn, userAuthMisoRequestManager.saveLibraryDilution(libraryDilution));
-
-    verify(backingManager).saveLibraryDilution(libraryDilution);
-  }
-
-  /**
-   * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveLibraryDilution(uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution)}
-   * .
-   * 
-   * @throws IOException
-   */
-  @Test
-  public void testSaveLibraryDilutionThrows() throws IOException {
-    when(libraryDilution.userCanWrite(any(User.class))).thenReturn(false);
-
-    thrown.expect(IOException.class);
-    thrown.expectMessage("User null cannot write to this LibraryDilution");
-    userAuthMisoRequestManager.saveLibraryDilution(libraryDilution);
-
-    verify(backingManager, never()).saveLibraryDilution(libraryDilution);
   }
 
   /**

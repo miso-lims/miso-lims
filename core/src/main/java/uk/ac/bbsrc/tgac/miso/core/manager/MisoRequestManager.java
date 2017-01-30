@@ -72,7 +72,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
@@ -94,7 +93,6 @@ import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignCodeDao;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignDao;
-import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PlatformStore;
@@ -129,8 +127,6 @@ public class MisoRequestManager implements RequestManager {
   private Boolean autoGenerateIdBarcodes;
   @Autowired
   private AlertStore alertStore;
-  @Autowired
-  private LibraryDilutionStore libraryDilutionStore;
   @Autowired
   private KitStore kitStore;
   @Autowired
@@ -198,10 +194,6 @@ public class MisoRequestManager implements RequestManager {
 
   public void setAlertStore(AlertStore alertStore) {
     this.alertStore = alertStore;
-  }
-
-  public void setLibraryDilutionStore(LibraryDilutionStore libraryDilutionStore) {
-    this.libraryDilutionStore = libraryDilutionStore;
   }
 
   public void setKitStore(KitStore kitStore) {
@@ -613,15 +605,6 @@ public class MisoRequestManager implements RequestManager {
       return poolStore.listByLibraryId(libraryId);
     } else {
       throw new IOException("No poolStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<LibraryDilution> listAllLibraryDilutions() throws IOException {
-    if (libraryDilutionStore != null) {
-      return libraryDilutionStore.listAll();
-    } else {
-      throw new IOException("No libraryDilutionStore available. Check that it has been declared in the Spring config.");
     }
   }
 
@@ -1159,15 +1142,6 @@ public class MisoRequestManager implements RequestManager {
       return sampleQcStore.save(sampleQc);
     } else {
       throw new IOException("No sampleQcStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public long saveLibraryDilution(LibraryDilution libraryDilution) throws IOException {
-    if (libraryDilutionStore != null) {
-      return libraryDilutionStore.save(libraryDilution);
-    } else {
-      throw new IOException("No libraryDilutionStore available. Check that it has been declared in the Spring config.");
     }
   }
 

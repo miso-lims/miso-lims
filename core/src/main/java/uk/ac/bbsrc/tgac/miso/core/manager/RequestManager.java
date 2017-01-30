@@ -54,7 +54,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
@@ -447,15 +446,4 @@ public interface RequestManager {
 
   public void removePoolWatcher(Pool pool, User watcher) throws IOException;
 
-  /**
-   * @Deprecated in v0.28. Use dilutionService.save() instead
-   */
-  @Deprecated
-  public long saveLibraryDilution(LibraryDilution libraryDilution) throws IOException;
-
-  /**
-   * @Deprecated in v0.28. Use dilutionService.list() instead
-   */
-  @Deprecated
-  public Collection<LibraryDilution> listAllLibraryDilutions() throws IOException;
 }
