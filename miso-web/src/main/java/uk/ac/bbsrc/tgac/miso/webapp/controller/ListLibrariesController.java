@@ -37,7 +37,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 
 /**
  * Controller for listing libraries
@@ -50,10 +50,10 @@ public class ListLibrariesController {
   protected static final Logger log = LoggerFactory.getLogger(ListLibrariesController.class);
 
   @Autowired
-  private RequestManager requestManager;
+  private LibraryService libraryService;
 
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
+  public void setLibraryService(LibraryService libraryService) {
+    this.libraryService = libraryService;
   }
 
   @ModelAttribute("title")
@@ -64,7 +64,7 @@ public class ListLibrariesController {
   @Deprecated
   @RequestMapping(value = "/libraries/rest/", method = RequestMethod.GET)
   public @ResponseBody Collection<Library> jsonRest() throws IOException {
-    return requestManager.listAllLibraries();
+    return libraryService.list();
   }
 
   @RequestMapping("/libraries")

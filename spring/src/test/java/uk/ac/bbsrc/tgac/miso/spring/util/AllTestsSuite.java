@@ -21,7 +21,7 @@
  * *********************************************************************
  */
 
-package uk.ac.bbsrc.tgac.miso.core.test;
+package uk.ac.bbsrc.tgac.miso.spring.util;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

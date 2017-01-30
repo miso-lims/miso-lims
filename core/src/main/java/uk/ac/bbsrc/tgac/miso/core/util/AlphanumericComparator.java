@@ -34,7 +34,7 @@ import java.util.Comparator;
  * @date 01/12/11
  * @since 0.1.3
  */
-public class AlphanumericComparator implements Comparator {
+public class AlphanumericComparator<T> implements Comparator<T> {
   @Override
   public int compare(Object firstObjToCompare, Object secondObjToCompare) {
     String firstString = firstObjToCompare.toString();

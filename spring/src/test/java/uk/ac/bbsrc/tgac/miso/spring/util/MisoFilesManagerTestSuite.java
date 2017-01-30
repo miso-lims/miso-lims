@@ -1,4 +1,4 @@
-package uk.ac.bbsrc.tgac.miso.core.test;
+package uk.ac.bbsrc.tgac.miso.spring.util;
 
 import static org.junit.Assert.assertTrue;
 

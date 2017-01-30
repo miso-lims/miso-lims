@@ -61,9 +61,12 @@ import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
-import uk.ac.bbsrc.tgac.miso.core.util.FormUtils;
+import uk.ac.bbsrc.tgac.miso.core.store.LibraryQcStore;
+import uk.ac.bbsrc.tgac.miso.core.store.SampleQcStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.service.SampleService;
+import uk.ac.bbsrc.tgac.miso.spring.util.FormUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.service.forms.MisoFormsService;
 
 @Controller
@@ -86,6 +89,12 @@ public class UploadController {
   private IndexService tagBarcodeService;
   @Autowired
   private LibraryService libraryService;
+  @Autowired
+  private SampleService sampleService;
+  @Autowired
+  private SampleQcStore sampleQcStore;
+  @Autowired
+  private LibraryQcStore libraryQcStore;
 
   public void setTagBarcodeService(IndexService tagBarcodeService) {
     this.tagBarcodeService = tagBarcodeService;
@@ -117,6 +126,18 @@ public class UploadController {
 
   public void setLibraryService(LibraryService libraryService) {
     this.libraryService = libraryService;
+  }
+
+  public void setSampleService(SampleService sampleService) {
+    this.sampleService = sampleService;
+  }
+
+  public void setSampleQcStore(SampleQcStore sampleQcStore) {
+    this.sampleQcStore = sampleQcStore;
+  }
+
+  public void setLibraryQcStore(LibraryQcStore libraryQcStore) {
+    this.libraryQcStore = libraryQcStore;
   }
 
   public void uploadFile(Class<?> type, String qualifier, MultipartFile fileItem) throws IOException {
@@ -188,7 +209,9 @@ public class UploadController {
         uploadFile(Project.class, projectId, fileItem);
         File f = filesManager.getFile(Project.class, projectId, fileItem.getOriginalFilename().replaceAll("\\s+", "_"));
         User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-        List<Sample> samples = FormUtils.importSampleInputSpreadsheet(f, user, requestManager, namingScheme, tagBarcodeService);
+        List<Sample> samples = FormUtils.importSampleInputSpreadsheet(f, user, sampleService, libraryService, sampleQcStore,
+            libraryQcStore,
+            namingScheme, tagBarcodeService);
 
         ObjectMapper mapper = new ObjectMapper();
 
@@ -215,7 +238,7 @@ public class UploadController {
         uploadFile(Sample.class, "forms", fileItem);
         File f = filesManager.getFile(Sample.class, "forms", fileItem.getOriginalFilename().replaceAll("\\s+", "_"));
         User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-        jsonArray = FormUtils.preProcessSampleSheetImport(f, user, requestManager);
+        jsonArray = FormUtils.preProcessSampleSheetImport(f, user, sampleService);
       }
       response.setContentType("text/html");
       PrintWriter out = response.getWriter();
@@ -233,7 +256,7 @@ public class UploadController {
         uploadFile(Library.class, "forms", fileItem);
         File f = filesManager.getFile(Library.class, "forms", fileItem.getOriginalFilename().replaceAll("\\s+", "_"));
         User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-        result = FormUtils.preProcessLibraryPoolSheetImport(f, user, requestManager);
+        result = FormUtils.preProcessLibraryPoolSheetImport(f, user, sampleService);
       }
 
       response.setContentType("text/html");
