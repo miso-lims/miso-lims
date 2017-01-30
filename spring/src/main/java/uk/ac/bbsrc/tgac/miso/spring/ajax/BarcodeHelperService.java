@@ -42,6 +42,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 
 @Ajaxified
@@ -53,6 +54,9 @@ public class BarcodeHelperService {
 
   @Autowired
   private RequestManager requestManager;
+  
+  @Autowired
+  private LibraryDilutionService libraryDilutionService;
 
   public void setLibraryService(LibraryService libraryService) {
     this.libraryService = libraryService;
@@ -60,6 +64,10 @@ public class BarcodeHelperService {
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
+  }
+
+  public void setLibraryDilutionService(LibraryDilutionService libraryDilutionService) {
+    this.libraryDilutionService = libraryDilutionService;
   }
 
   public JSONObject regenerateAllBarcodes(HttpSession session, JSONObject json) {
@@ -70,9 +78,9 @@ public class BarcodeHelperService {
         }
       }
 
-      for (LibraryDilution ld : requestManager.listAllLibraryDilutions()) {
+      for (LibraryDilution ld : libraryDilutionService.list()) {
         if (isStringEmptyOrNull(ld.getIdentificationBarcode())) {
-          requestManager.saveLibraryDilution(ld);
+          libraryDilutionService.update(ld);
         }
       }
 
