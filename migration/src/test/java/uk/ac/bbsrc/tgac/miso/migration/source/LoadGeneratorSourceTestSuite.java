@@ -31,22 +31,22 @@ public class LoadGeneratorSourceTestSuite {
     MigrationData data = sut.getMigrationData();
     assertNotNull(data.getProjects());
     assertEquals(5, data.getProjects().size());
-    
+
     assertNotNull(data.getSamples());
     assertEquals(100, data.getSamples().size());
-    
+
     assertNotNull(data.getLibraries());
     assertEquals(100, data.getLibraries().size());
-    
+
     assertNotNull(data.getDilutions());
     assertEquals(100, data.getDilutions().size());
-    
+
     assertNotNull(data.getPools());
     assertEquals(100, data.getPools().size());
     Pool p = data.getPools().iterator().next();
     assertNotNull(p.getPoolableElements());
     assertEquals(5, p.getPoolableElements().size());
-    
+
     assertNotNull(data.getRuns());
     assertEquals(100, data.getRuns().size());
     Run r = data.getRuns().iterator().next();

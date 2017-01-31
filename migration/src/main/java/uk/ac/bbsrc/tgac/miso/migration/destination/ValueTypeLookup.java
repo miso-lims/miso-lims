@@ -73,7 +73,7 @@ public class ValueTypeLookup {
   private Map<Long, LibraryStrategyType> libraryStrategiesById;
   private Map<String, LibraryStrategyType> libraryStrategiesByName;
   private Map<Long, LibraryType> libraryTypeById;
-  private Map<String, Map<String, LibraryType>> libraryTypeByPlatformAndDescription;
+  private Map<PlatformType, Map<String, LibraryType>> libraryTypeByPlatformAndDescription;
   private Map<Long, LibraryDesign> libraryDesignById;
   private Map<String, Map<String, LibraryDesign>> libraryDesignBySampleClassAliasAndName;
   private Map<Long, LibraryDesignCode> libraryDesignCodeById;
@@ -232,10 +232,10 @@ public class ValueTypeLookup {
 
   private void setLibraryTypes(Collection<LibraryType> libraryTypes) {
     Map<Long, LibraryType> mapById = new UniqueKeyHashMap<>();
-    Map<String, Map<String, LibraryType>> mapByPlatformAndDesc = new UniqueKeyHashMap<>();
+    Map<PlatformType, Map<String, LibraryType>> mapByPlatformAndDesc = new UniqueKeyHashMap<>();
     for (LibraryType lt : libraryTypes) {
       if (!mapByPlatformAndDesc.containsKey(lt.getPlatformType())) {
-        mapByPlatformAndDesc.put(lt.getPlatformType().getKey(), new UniqueKeyHashMap<String, LibraryType>());
+        mapByPlatformAndDesc.put(lt.getPlatformType(), new UniqueKeyHashMap<String, LibraryType>());
       }
       mapByPlatformAndDesc.get(lt.getPlatformType()).put(lt.getDescription(), lt);
       mapById.put(lt.getId(), lt);
