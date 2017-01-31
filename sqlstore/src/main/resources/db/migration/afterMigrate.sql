@@ -846,3 +846,16 @@ CREATE OR REPLACE VIEW SampleDerivedInfo AS
   
 CREATE OR REPLACE VIEW RunDerivedInfo AS
   SELECT runId, MAX(changeTime) as lastModified FROM RunChangeLog GROUP BY runId;
+
+CREATE OR REPLACE VIEW ContainerDerivedInfo AS
+  SELECT containerId, MAX(changeTime) as lastModified FROM SequencerPartitionContainerChangeLog GROUP BY containerId;
+
+CREATE OR REPLACE VIEW PoolDerivedInfo AS
+  SELECT poolId, MAX(changeTime) as lastModified FROM PoolChangeLog GROUP BY poolId;
+
+CREATE OR REPLACE VIEW LibraryDerivedInfo AS
+  SELECT libraryId, MAX(changeTime) AS lastModified FROM LibraryChangeLog GROUP BY libraryId;
+  
+CREATE OR REPLACE VIEW BoxDerivedInfo AS
+  SELECT boxId, MAX(changeTime) AS lastModified FROM BoxChangeLog GROUP BY boxId;
+
