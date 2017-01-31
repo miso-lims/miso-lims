@@ -158,7 +158,7 @@ public class SQLSampleQCDAOTest extends AbstractDAOTest {
     
     assertEquals(1L, dao.save(sampleQC));
     SampleQC savedSampleQC = dao.get(1L);
-    assertNotSame(sampleQC, savedSampleQC);
+    assertSame(sampleQC, savedSampleQC);
     assertEquals(sampleQC.getId(), savedSampleQC.getId());
     assertEquals("admin", savedSampleQC.getQcCreator());
   }
@@ -166,7 +166,7 @@ public class SQLSampleQCDAOTest extends AbstractDAOTest {
   @Test
   public void testSaveNew() throws IOException, MalformedSampleException {
     SampleQC newSampleQC = new SampleQCImpl();
-    newSampleQC.setSample(Mockito.mock(SampleImpl.class));
+    newSampleQC.setSample(new SampleImpl());
     newSampleQC.setQcCreator("admin");
     newSampleQC.setQcType(Mockito.mock(QcType.class));
     long id = dao.save(newSampleQC);

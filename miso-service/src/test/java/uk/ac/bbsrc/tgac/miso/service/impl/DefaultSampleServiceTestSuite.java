@@ -131,6 +131,7 @@ public class DefaultSampleServiceTestSuite {
     sut.setAutoGenerateIdBarcodes(false);
     relationships = new HashSet<>();
     Mockito.when(namingScheme.validateSampleAlias(Matchers.anyString())).thenReturn(ValidationResult.success());
+    Mockito.when(namingScheme.validateName(Matchers.anyString())).thenReturn(ValidationResult.success());
   }
 
   @Test

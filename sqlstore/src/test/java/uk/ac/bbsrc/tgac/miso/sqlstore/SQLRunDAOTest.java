@@ -399,7 +399,8 @@ public class SQLRunDAOTest extends AbstractDAOTest {
   }
 
   private Run makeRun(String alias) {
-    SecurityProfile profile = Mockito.mock(SecurityProfile.class);
+    SecurityProfile profile = new SecurityProfile();
+    profile.setProfileId(3L);
     SequencerReference sequencer = emptySR;
     User user = new UserImpl();
     user.setUserId(1L);

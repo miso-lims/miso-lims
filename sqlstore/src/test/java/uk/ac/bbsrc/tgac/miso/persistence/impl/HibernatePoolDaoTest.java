@@ -119,9 +119,7 @@ public class HibernatePoolDaoTest extends AbstractDAOTest {
 
   @Test
   public void testChangeLogFunctionality() throws Exception {
-    User newModifier = Mockito.mock(User.class);
     PoolImpl testPool = getATestPool(1, new Date(), false, 0);
-    Mockito.when(newModifier.getLoginName()).thenReturn("Nick Cage");
 
     dao.save(testPool);
 
@@ -129,16 +127,18 @@ public class HibernatePoolDaoTest extends AbstractDAOTest {
     testPool.setName("Test Pool xxx");
     testPool.setIdentificationBarcode("Foob");
     testPool.setCreationDate(new Date());
-    testPool.setSecurityProfile(Mockito.mock(SecurityProfile.class));
     testPool.setExperiments(new ArrayList<Experiment>());
     testPool.setPlatformType(PlatformType.IONTORRENT);
     testPool.setReadyToRun(false);
     testPool.setAlias("Alias changed");
-    testPool.setLastModifier(newModifier);
     testPool.setDiscarded(true);
     testPool.setVolume(10D);
     testPool.setQcPassed(true);
     testPool.setDescription("Description changed");
+    
+    User user = new UserImpl();
+    user.setUserId(1L);
+    testPool.setLastModifier(user);
     dao.save(testPool);
   }
 
