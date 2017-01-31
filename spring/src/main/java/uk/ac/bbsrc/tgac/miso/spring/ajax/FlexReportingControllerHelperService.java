@@ -833,7 +833,7 @@ public class FlexReportingControllerHelperService {
       row.add(library.getName());
       row.add(library.getAlias());
       row.add(library.getDescription() == null ? "" : library.getDescription());
-      row.add(library.getPlatformName());
+      row.add(library.getPlatformType().getKey());
       row.add(library.getLibraryType().getDescription());
       row.add(qc);
       jsonArray.add(row);

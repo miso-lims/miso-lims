@@ -637,7 +637,6 @@ public class SampleControllerHelperService {
       sample.setIdentificationBarcode(idBarcode);
       sample.setLastModifier(user);
       sampleService.update(sample);
-
     } catch (IOException e) {
       log.debug("Could not change Sample identificationBarcode: " + e.getMessage());
       return JSONUtils.SimpleJSONError(e.getMessage());

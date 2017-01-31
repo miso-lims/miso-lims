@@ -402,6 +402,8 @@ public class BoxControllerHelperServiceTestSuite {
     sample.setAlias("sample");
     sample.setIdentificationBarcode("1111");
     sample.setDiscarded(false);
+    Box box = makeEmptyBox();
+    box.setBoxable("A10", sample);
     return sample;
   }
   
@@ -417,6 +419,7 @@ public class BoxControllerHelperServiceTestSuite {
   private Box makeEmptyBox() {
     Box box = new BoxImpl();
     box.setId(1L);
+    box.setAlias("box");
     BoxSize size = new BoxSize();
     size.setRows(8);
     size.setColumns(12);

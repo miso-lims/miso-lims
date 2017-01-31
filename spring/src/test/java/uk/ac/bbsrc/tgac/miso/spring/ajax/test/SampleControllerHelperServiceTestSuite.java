@@ -4,10 +4,14 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
+import java.util.HashSet;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
+import org.mockito.Matchers;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,8 +22,10 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import net.sf.json.JSONObject;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
+import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.spring.ajax.SampleControllerHelperService;
 
@@ -38,6 +44,8 @@ public class SampleControllerHelperServiceTestSuite {
   private Authentication authentication;
   @Mock
   private MisoFilesManager misoFileManager;
+  @Mock
+  private RequestManager requestManager;
   @Mock
   private SampleService sampleService;
 
@@ -60,6 +68,8 @@ public class SampleControllerHelperServiceTestSuite {
     final JSONObject json = new JSONObject();
     json.put("sampleId", id);
     json.put("identificationBarcode", idBarcode);
+
+    Mockito.when(requestManager.getBoxablesFromBarcodeList(Matchers.anyListOf(String.class))).thenReturn(new HashSet<Boxable>());
 
     final JSONObject response = sampleControllerHelperService.changeSampleIdBarcode(null, json);
 
@@ -84,11 +94,8 @@ public class SampleControllerHelperServiceTestSuite {
     json.put("sampleId", id);
     json.put("identificationBarcode", idBarcode);
 
-    final JSONObject response = sampleControllerHelperService.changeSampleIdBarcode(null, json);
+    sampleControllerHelperService.changeSampleIdBarcode(null, json);
 
-    verify(sample, never()).setIdentificationBarcode(idBarcode);
-    verify(sampleService, never()).update(sample);
-
-    assertEquals("New+identification+barcode+not+recognized", response.get("error"));
+    verify(sampleService).update(sample);
   }
 }

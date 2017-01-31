@@ -237,7 +237,7 @@ public class HibernateRunDao implements RunStore {
   public void saveAll(Collection<Run> runs) throws IOException {
     log.debug(">>> Entering saveAll with " + runs.size() + " runs");
     for (Run run : runs) {
-      Long runId = save(run);
+      save(run);
     }
     log.debug("<<< Exiting saveAll");
   }

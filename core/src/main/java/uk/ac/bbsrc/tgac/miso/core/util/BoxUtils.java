@@ -160,10 +160,10 @@ public class BoxUtils {
   public static String makeLocationLabel(Boxable b) {
     if (b.isDiscarded()) {
       return "EMPTY";
-    } else if (!isStringEmptyOrNull(b.getBox().getAlias()) && !isStringEmptyOrNull(b.getBoxPosition())
+    } else if (b.getBox() != null && !isStringEmptyOrNull(b.getBox().getAlias()) && !isStringEmptyOrNull(b.getBoxPosition())
         && !isStringEmptyOrNull(b.getBox().getLocationBarcode())) {
       return b.getBox().getAlias() + " - " + b.getBoxPosition() + " (" + b.getBox().getLocationBarcode() + ")";
-    } else if (!isStringEmptyOrNull(b.getBox().getAlias()) && !isStringEmptyOrNull(b.getBoxPosition())) {
+    } else if (b.getBox() != null && !isStringEmptyOrNull(b.getBox().getAlias()) && !isStringEmptyOrNull(b.getBoxPosition())) {
       return b.getBox().getAlias() + " - " + b.getBoxPosition();
     } else if (!isStringEmptyOrNull(b.getLocationBarcode())) {
       return b.getLocationBarcode();
