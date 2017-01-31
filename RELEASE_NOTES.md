@@ -1,3 +1,10 @@
+# 0.2.48
+
+Changes:
+
+ * Allow library editor to edit dilutions (#647)
+ * Update Dilution changelog entries to include dilution name (#622)
+
 # 0.2.47
 
 Changes:
