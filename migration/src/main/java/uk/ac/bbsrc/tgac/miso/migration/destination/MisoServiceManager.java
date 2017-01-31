@@ -453,7 +453,6 @@ public class MisoServiceManager {
 
   public void setDefaultLibraryDao() {
     HibernateLibraryDao dao = new HibernateLibraryDao();
-    dao.setNamingScheme(namingScheme);
     dao.setSessionFactory(sessionFactory);
     dao.setBoxDao(boxDao);
     setLibraryDao(dao);

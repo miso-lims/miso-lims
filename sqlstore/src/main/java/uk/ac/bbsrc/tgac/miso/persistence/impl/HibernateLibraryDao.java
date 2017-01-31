@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.Criteria;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Criterion;
@@ -17,8 +16,6 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
-import org.hibernate.type.LongType;
-import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +32,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
@@ -97,8 +93,6 @@ public class HibernateLibraryDao implements LibraryStore {
   private SessionFactory sessionFactory;
   @Autowired
   private JdbcTemplate template;
-  @Autowired
-  private NamingScheme namingScheme;
   @Autowired
   private BoxStore boxDao;
   @Value("${miso.detailed.sample.enabled:false}")
@@ -197,7 +191,8 @@ public class HibernateLibraryDao implements LibraryStore {
   @Override
   public List<Library> listByProjectId(long projectId) throws IOException {
     Criteria criteria = currentSession().createCriteria(LibraryImpl.class);
-    criteria.add(Restrictions.eq("sample.project.id", projectId));
+    criteria.createAlias("sample.project", "project");
+    criteria.add(Restrictions.eq("project.id", projectId));
     @SuppressWarnings("unchecked")
     List<Library> records = criteria.list();
     return records;
@@ -208,10 +203,10 @@ public class HibernateLibraryDao implements LibraryStore {
     if (idList.isEmpty()) {
       return Collections.emptyList();
     }
-    Query query = currentSession().createQuery("from LibraryImpl where libraryId in (:ids)");
-    query.setParameterList("ids", idList, LongType.INSTANCE);
+    Criteria criteria = currentSession().createCriteria(LibraryImpl.class);
+    criteria.add(Restrictions.in("id", idList));
     @SuppressWarnings("unchecked")
-    List<Library> records = query.list();
+    List<Library> records = criteria.list();
     return records;
   }
 
@@ -233,10 +228,10 @@ public class HibernateLibraryDao implements LibraryStore {
 
   @Override
   public List<Library> getByBarcodeList(List<String> barcodeList) throws IOException {
-    Query query = currentSession().createQuery("from LibraryImpl where identificationBarcode in (:barcodes)");
-    query.setParameterList("barcodes", barcodeList, StringType.INSTANCE);
+    Criteria criteria = currentSession().createCriteria(LibraryImpl.class);
+    criteria.add(Restrictions.in("identificationBarcode", barcodeList));
     @SuppressWarnings("unchecked")
-    List<Library> records = query.list();
+    List<Library> records = criteria.list();
     return records;
   }
 
@@ -250,8 +245,7 @@ public class HibernateLibraryDao implements LibraryStore {
   @Override
   public LibraryType getLibraryTypeByDescriptionAndPlatform(String description, PlatformType platformType) throws IOException {
     Criteria criteria = currentSession().createCriteria(LibraryType.class);
-    criteria.add(Restrictions.eq("description", description));
-    criteria.add(Restrictions.ilike("platformType", platformType));
+    criteria.add(Restrictions.and(Restrictions.eq("description", description), Restrictions.eq("platformType", platformType)));
     return (LibraryType) criteria.uniqueResult();
   }
 
@@ -434,10 +428,6 @@ public class HibernateLibraryDao implements LibraryStore {
   @CoverageIgnore
   public void setTemplate(JdbcTemplate template) {
     this.template = template;
-  }
-
-  public void setNamingScheme(NamingScheme namingScheme) {
-    this.namingScheme = namingScheme;
   }
 
   public BoxStore getBoxDao() {

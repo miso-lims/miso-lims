@@ -2,8 +2,6 @@
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -15,7 +13,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,8 +31,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.IndexStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
@@ -49,8 +44,6 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
   private JdbcTemplate jdbcTemplate;
   @Autowired
   private SessionFactory sessionFactory;
-  @Mock
-  private NamingScheme namingScheme;
   @Mock
   private IndexStore indexStore;
   @Mock
@@ -76,6 +69,7 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
     library.setName(libraryName);
     library.setAlias("theAlias");
     library.setDescription("a description");
+    library.setPlatformType(PlatformType.ILLUMINA);
     Sample sample = new SampleImpl();
     sample.setId(4);
     library.setSample(sample);
@@ -91,10 +85,6 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
     User mockUser = new UserImpl();
     mockUser.setUserId(1L);
     library.setLastModifier(mockUser);
-
-    when(namingScheme.validateName(anyString())).thenReturn(ValidationResult.success());
-    when(namingScheme.generateNameFor(library)).thenReturn(libraryName);
-    when(namingScheme.validateLibraryAlias(anyString())).thenReturn(ValidationResult.success());
 
     long libraryId = dao.save(library);
     Library insertedLibrary = dao.get(libraryId);
@@ -265,24 +255,21 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
     library.setAlias("libraryAlias");
     library.setDescription("test");
     library.setSample(new SampleImpl());
+    library.getSample().setId(1L);
     library.setPaired(true);
+    library.setPlatformType(PlatformType.ILLUMINA);
     library.setLibraryType(dao.getLibraryTypeById(1L));
     library.setLibrarySelectionType(dao.getLibrarySelectionTypeById(1L));
     library.setLibraryStrategyType(dao.getLibraryStrategyTypeById(1L));
-    User mockUser = new UserImpl();
-    mockUser.setUserId(1L);
-    library.setLastModifier(mockUser);
-
-    when(namingScheme.generateNameFor(library)).thenReturn(libraryName);
-    when(namingScheme.validateName(library.getName())).thenReturn(ValidationResult.success());
-    when(namingScheme.validateLibraryAlias(library.getAlias())).thenReturn(ValidationResult.success());
+    User emptyUser = new UserImpl();
+    emptyUser.setUserId(1L);
+    library.setLastModifier(emptyUser);
 
     long libraryId = dao.save(library);
     Library insertedLibrary = dao.get(libraryId);
 
     assertNotNull(insertedLibrary);
     assertTrue(dao.remove(insertedLibrary));
-    Mockito.verify(changeLogDAO, Mockito.times(1)).deleteAllById("Library", insertedLibrary.getId());
   }
 
   @Test
@@ -293,13 +280,6 @@ public class SQLLibraryDAOTest extends AbstractDAOTest {
     assertEquals(PlatformType.LS454, libraryTypeById.getPlatformType());
     assertEquals("Rapid Shotgun", libraryTypeById.getDescription());
 
-  }
-
-  @Test
-  public void testGetLibraryTypeByDescription() throws Exception {
-    LibraryType libraryTypeByDescription = dao.getLibraryTypeByDescriptionAndPlatform("Mate Pair", PlatformType.ILLUMINA);
-    assertEquals(PlatformType.ILLUMINA, libraryTypeByDescription.getPlatformType());
-    assertEquals(Long.valueOf(2), libraryTypeByDescription.getId());
   }
 
   @Test

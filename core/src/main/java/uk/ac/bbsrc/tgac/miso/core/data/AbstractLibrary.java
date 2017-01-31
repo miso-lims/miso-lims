@@ -107,7 +107,7 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   private String locationBarcode;
 
   @Enumerated(EnumType.STRING)
-  @Column(name = "platformName", nullable = false)
+  @Column(name = "platformType", nullable = false)
   private PlatformType platformType;
 
   private Boolean qcPassed;
