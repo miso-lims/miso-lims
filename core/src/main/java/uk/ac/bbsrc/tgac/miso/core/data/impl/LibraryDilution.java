@@ -303,35 +303,52 @@ public class LibraryDilution implements Dilution, Serializable {
     if (obj == null) return false;
     if (obj == this) return true;
     if (!(obj instanceof Dilution)) return false;
-    final Dilution them = (Dilution) obj;
+    final LibraryDilution them = (LibraryDilution) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
     if (LibraryDilution.UNSAVED_ID == getId() || LibraryDilution.UNSAVED_ID == them.getId()) {
       if (name == null) {
         if (them.getName() != null)
           return false;
-      } else if (!name.equals(them.getName()))
+      } else if (!name.equals(them.getName())) {
         return false;
+      }
       if (identificationBarcode == null) {
         if (them.getIdentificationBarcode() != null)
           return false;
-      } else if (!identificationBarcode.equals(them.getIdentificationBarcode()))
+      } else if (!identificationBarcode.equals(them.getIdentificationBarcode())) {
         return false;
+      }
       if (concentration == null) {
         if (them.getConcentration() != null)
           return false;
-      } else if (!concentration.equals(them.getConcentration()))
+      } else if (!concentration.equals(them.getConcentration())) {
         return false;
+      }
       if (creationDate == null) {
         if (them.getCreationDate() != null)
           return false;
-      } else if (!creationDate.equals(them.getCreationDate()))
+      } else if (!creationDate.equals(them.getCreationDate())) {
         return false;
+      }
       if (dilutionCreator == null) {
         if (them.getDilutionCreator() != null)
           return false;
-      } else if (!dilutionCreator.equals(them.getDilutionCreator()))
+      } else if (!dilutionCreator.equals(them.getDilutionCreator())) {
         return false;
+      }
+      if (library == null) {
+        if (them.getLibrary() != null)
+          return false;
+      } else if (!library.equals(them.getLibrary())) {
+        return false;
+      }
+      if (targetedSequencing == null) {
+        if (them.getTargetedSequencing() != null)
+          return false;
+      } else if (!targetedSequencing.equals(them.getTargetedSequencing())) {
+        return false;
+      }
       return true;
     } else {
       return getId() == them.getId();
