@@ -138,10 +138,7 @@ public class HibernatePoolDaoTest extends AbstractDAOTest {
     
     User user = new UserImpl();
     user.setUserId(1L);
-    SecurityProfile profile = new SecurityProfile();
-    profile.setProfileId(1L);
     testPool.setLastModifier(user);
-    testPool.setSecurityProfile(profile);
     dao.save(testPool);
   }
 
