@@ -17,8 +17,8 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
-import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
@@ -55,8 +55,9 @@ public class SQLLibraryQCDAOTest extends AbstractDAOTest {
   @Test
   public void testSave() throws IOException, MalformedLibraryException {
     LibraryQC qc = new LibraryQCImpl();
-    qc.setLibrary(Mockito.mock(Library.class));
+    qc.setLibrary(new LibraryImpl());
     qc.setQcType(Mockito.mock(QcType.class));
+    qc.setInsertSize(300);
     long id = dao.save(qc);
 
     LibraryQC saved = dao.get(id);
