@@ -312,7 +312,6 @@ FOR EACH ROW
   SET log_message = CONCAT_WS(', ',
         CASE WHEN (NEW.alias IS NULL) <> (OLD.alias IS NULL) OR NEW.alias <> OLD.alias THEN CONCAT('alias: ', COALESCE(OLD.alias, 'n/a'), ' → ', COALESCE(NEW.alias, 'n/a')) END,
         CASE WHEN NEW.concentration <> OLD.concentration THEN CONCAT('concentration: ', OLD.concentration, ' → ', NEW.concentration) END,
-        CASE WHEN (NEW.experiment_experimentId IS NULL) <> (OLD.experiment_experimentId IS NULL) OR NEW.experiment_experimentId <> OLD.experiment_experimentId THEN CONCAT('experiment: ', COALESCE((SELECT name FROM Experiment WHERE experimentId = OLD.experiment_experimentId), 'n/a'), ' → ', COALESCE((SELECT name FROM Experiment WHERE experimentId = NEW.experiment_experimentId), 'n/a')) END,
         CASE WHEN (NEW.identificationBarcode IS NULL) <> (OLD.identificationBarcode IS NULL) OR NEW.identificationBarcode <> OLD.identificationBarcode THEN CONCAT('identification-barcode: ', COALESCE(OLD.identificationBarcode, 'n/a'), ' → ', COALESCE(NEW.identificationBarcode, 'n/a')) END,
         CASE WHEN NEW.name <> OLD.name THEN CONCAT('name: ', OLD.name, ' → ', NEW.name) END,
         CASE WHEN NEW.platformType <> OLD.platformType THEN CONCAT('platform-type: ', OLD.platformType, ' → ', NEW.platformType) END,
@@ -324,7 +323,6 @@ FOR EACH ROW
       COALESCE(CONCAT_WS(',',
         CASE WHEN (NEW.alias IS NULL) <> (OLD.alias IS NULL) OR NEW.alias <> OLD.alias THEN 'alias' END,
         CASE WHEN NEW.concentration <> OLD.concentration THEN 'concentration' END,
-        CASE WHEN (NEW.experiment_experimentId IS NULL) <> (OLD.experiment_experimentId IS NULL) OR NEW.experiment_experimentId <> OLD.experiment_experimentId THEN 'experiment_experimentId' END,
         CASE WHEN (NEW.identificationBarcode IS NULL) <> (OLD.identificationBarcode IS NULL) OR NEW.identificationBarcode <> OLD.identificationBarcode THEN 'identificationBarcode' END,
         CASE WHEN NEW.name <> OLD.name THEN 'name' END,
         CASE WHEN NEW.platformType <> OLD.platformType THEN 'platformType' END,
@@ -446,7 +444,7 @@ FOR EACH ROW
         CASE WHEN (NEW.locationBarcode IS NULL) <> (OLD.locationBarcode IS NULL) OR NEW.locationBarcode <> OLD.locationBarcode THEN CONCAT('location barcode: ', COALESCE(OLD.locationBarcode, 'n/a'), ' → ', COALESCE(NEW.locationBarcode, 'n/a')) END,
         CASE WHEN NEW.name <> OLD.name THEN CONCAT('name: ', OLD.name, ' → ', NEW.name) END,
         CASE WHEN NEW.paired <> OLD.paired THEN CONCAT('end: ', CASE WHEN OLD.paired THEN 'paired' ELSE 'singled' END, ' → ', CASE WHEN NEW.paired THEN 'paired' ELSE 'single' END) END,
-        CASE WHEN (NEW.platformName IS NULL) <> (OLD.platformName IS NULL) OR NEW.platformName <> OLD.platformName THEN CONCAT('platform: ', COALESCE(OLD.platformName, 'n/a'), ' → ', COALESCE(NEW.platformName, 'n/a')) END,
+        CASE WHEN (NEW.platformType IS NULL) <> (OLD.platformType IS NULL) OR NEW.platformType <> OLD.platformType THEN CONCAT('platform: ', COALESCE(OLD.platformType, 'n/a'), ' → ', COALESCE(NEW.platformType, 'n/a')) END,
         CASE WHEN (NEW.qcPassed IS NULL) <> (OLD.qcPassed IS NULL) OR NEW.qcPassed <> OLD.qcPassed THEN CONCAT('QC passed: ', COALESCE(OLD.qcPassed, 'n/a'), ' → ', COALESCE(NEW.qcPassed, 'n/a')) END,
         CASE WHEN NEW.discarded <> OLD.discarded THEN CONCAT('discarded: ', OLD.discarded, ' → ', NEW.discarded) END,
         CASE WHEN (NEW.volume IS NULL) <> (OLD.volume IS NULL) OR NEW.volume <> OLD.volume THEN CONCAT('volume: ', COALESCE(OLD.volume, 'n/a'), ' → ', COALESCE(NEW.volume, 'n/a')) END);
@@ -465,7 +463,7 @@ FOR EACH ROW
         CASE WHEN (NEW.locationBarcode IS NULL) <> (OLD.locationBarcode IS NULL) OR NEW.locationBarcode <> OLD.locationBarcode THEN 'locationBarcode' END,
         CASE WHEN NEW.name <> OLD.name THEN 'name' END,
         CASE WHEN NEW.paired <> OLD.paired THEN 'paired' END,
-        CASE WHEN (NEW.platformName IS NULL) <> (OLD.platformName IS NULL) OR NEW.platformName <> OLD.platformName THEN 'platformName' END,
+        CASE WHEN (NEW.platformType IS NULL) <> (OLD.platformType IS NULL) OR NEW.platformType <> OLD.platformType THEN 'platformType' END,
         CASE WHEN (NEW.qcPassed IS NULL) <> (OLD.qcPassed IS NULL) OR NEW.qcPassed <> OLD.qcPassed THEN 'qcPassed' END,
         CASE WHEN NEW.sample_sampleId <> OLD.sample_sampleId THEN 'sample_sampleId' END,
         CASE WHEN NEW.discarded <> OLD.discarded THEN 'discarded' END,
@@ -556,7 +554,7 @@ FOR EACH ROW
         CASE WHEN NEW.description <> OLD.description THEN CONCAT('description: ', OLD.description, ' → ', NEW.description) END,
         CASE WHEN NEW.name <> OLD.name THEN CONCAT('name: ', OLD.name, ' → ', NEW.name) END,
         CASE WHEN NEW.project_projectId <> OLD.project_projectId THEN CONCAT('project: ', COALESCE((SELECT name FROM Project WHERE projectId = OLD.project_projectId), 'n/a'), ' → ', COALESCE((SELECT name FROM Project WHERE projectId = NEW.project_projectId), 'n/a')) END,
-        CASE WHEN NEW.studyType <> OLD.studyType THEN CONCAT('type: ', COALESCE((SELECT name FROM StudyType WHERE typeId = OLD.studyType), 'n/a'), ' → ', COALESCE((SELECT name FROM StudyType WHERE typeId = NEW.studyType), 'n/a')) END);
+        CASE WHEN NEW.studyTypeId <> OLD.studyTypeId THEN CONCAT('type: ', COALESCE((SELECT name FROM StudyType WHERE typeId = OLD.studyTypeId), 'n/a'), ' → ', COALESCE((SELECT name FROM StudyType WHERE typeId = NEW.studyTypeId), 'n/a')) END);
   IF log_message IS NOT NULL AND log_message <> '' THEN
     INSERT INTO StudyChangeLog(studyId, columnsChanged, userId, message) VALUES (
       NEW.studyId,
@@ -566,7 +564,7 @@ FOR EACH ROW
         CASE WHEN NEW.description <> OLD.description THEN 'description' END,
         CASE WHEN NEW.name <> OLD.name THEN 'name' END,
         CASE WHEN NEW.project_projectId <> OLD.project_projectId THEN 'project_projectId' END,
-        CASE WHEN NEW.studyType <> OLD.studyType THEN 'studyType' END), ''),
+        CASE WHEN NEW.studyTypeId <> OLD.studyTypeId THEN 'studyTypeId' END), ''),
       NEW.lastModifier,
       log_message
       );
