@@ -1120,10 +1120,11 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public void saveRunQC(RunQC runQC) throws IOException {
+  public long saveRunQC(RunQC runQC) throws IOException {
     if (runQcStore != null) {
-      runQcStore.save(runQC);
+      Long runQcId = runQcStore.save(runQC);
       if (runAlertManager != null) runAlertManager.update(runQC.getRun());
+      return runQcId;
     } else {
       throw new IOException("No runQcStore available. Check that it has been declared in the Spring config.");
     }

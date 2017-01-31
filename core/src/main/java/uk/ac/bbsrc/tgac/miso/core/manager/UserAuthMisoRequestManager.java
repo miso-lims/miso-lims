@@ -202,9 +202,9 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public void saveRunQC(RunQC runQC) throws IOException {
+  public long saveRunQC(RunQC runQC) throws IOException {
     if (writeCheck(runQC.getRun())) {
-      backingManager.saveRunQC(runQC);
+      return backingManager.saveRunQC(runQC);
     } else {
       throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot write to the parent Run");
     }

@@ -297,8 +297,12 @@ public class UserAuthMisoRequestManagerTestSuite {
    */
   @Test
   public void testSaveRunQC() throws IOException {
+    final long expectedReturn = 1L;
     when(runQC.getRun()).thenReturn(run);
     when(run.userCanWrite(any(User.class))).thenReturn(true);
+    when(backingManager.saveRunQC(runQC)).thenReturn(expectedReturn);
+
+    assertEquals(expectedReturn, userAuthMisoRequestManager.saveRunQC(runQC));
 
     verify(backingManager).saveRunQC(runQC);
   }

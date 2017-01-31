@@ -74,7 +74,7 @@ public interface RequestManager {
 
   public void saveRuns(Collection<Run> runs) throws IOException;
 
-  public void saveRunQC(RunQC runQC) throws IOException;
+  public long saveRunQC(RunQC runQC) throws IOException;
 
   public void saveRunNote(Run run, Note note) throws IOException;
 
