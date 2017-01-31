@@ -98,9 +98,11 @@ import uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils.BarcodePrintAss
 public class SampleControllerHelperService {
   public static final class SampleBarcodeAssister implements BarcodePrintAssister<Sample> {
     private final RequestManager requestManager;
+    private final SampleService sampleService;
 
-    public SampleBarcodeAssister(RequestManager requestManager) {
+    public SampleBarcodeAssister(RequestManager requestManager, SampleService sampleService) {
       this.requestManager = requestManager;
+      this.sampleService = sampleService;
     }
 
     @Override
@@ -110,12 +112,12 @@ public class SampleControllerHelperService {
 
     @Override
     public Sample fetch(long id) throws IOException {
-      return requestManager.getSampleById(id);
+      return sampleService.get(id);
     }
 
     @Override
     public void store(Sample item) throws IOException {
-      requestManager.saveSample(item);
+      sampleService.update(item);
     }
 
     @Override
@@ -233,7 +235,7 @@ public class SampleControllerHelperService {
           }
         }
 
-        Set<Sample> samples = new HashSet<>(requestManager.listAllSamples());
+        Set<Sample> samples = new HashSet<>(sampleService.getAll());
         // relative complement to find objects that aren't already persisted
         Set<Sample> complement = LimsUtils.relativeComplementByProperty(Sample.class, "getAlias", saveSet, samples);
 
@@ -255,7 +257,7 @@ public class SampleControllerHelperService {
 
             try {
               sample.setLastModifier(user);
-              requestManager.saveSample(sample);
+              sampleService.create(sample);
               savedSamples.add(sample.getAlias());
               log.info("Saved: " + sample.getAlias());
             } catch (IOException e) {
@@ -292,7 +294,7 @@ public class SampleControllerHelperService {
 
       if (json.has("sampleId") && !isStringEmptyOrNull(json.getString("sampleId"))) {
         Long sampleId = Long.parseLong(json.getString("sampleId"));
-        Sample sample = requestManager.getSampleById(sampleId);
+        Sample sample = sampleService.get(sampleId);
 
         Project p = sample.getProject();
         if (p.userCanRead(user)) {
@@ -345,7 +347,7 @@ public class SampleControllerHelperService {
       }
       if (json.has("sampleId") && !isStringEmptyOrNull(json.getString("sampleId"))) {
         Long sampleId = Long.parseLong(json.getString("sampleId"));
-        Sample sample = requestManager.getSampleById(sampleId);
+        Sample sample = sampleService.get(sampleId);
         if (json.get("qcPassed") != null) {
           if ("true".equals(json.getString("qcPassed"))) {
             sample.setQcPassed(true);
@@ -482,7 +484,7 @@ public class SampleControllerHelperService {
     Long noteId = json.getLong("noteId");
 
     try {
-      Sample sample = requestManager.getSampleById(sampleId);
+      Sample sample = sampleService.get(sampleId);
       sampleService.deleteNote(sample, noteId);
       return JSONUtils.SimpleJSONResponse("OK");
     } catch (IOException e) {
@@ -496,10 +498,10 @@ public class SampleControllerHelperService {
     String barcode = json.getString("barcode");
 
     try {
-      Sample sample = requestManager.getSampleByBarcode(barcode);
+      Sample sample = sampleService.getByBarcode(barcode);
       // Base64-encoded string, most likely a barcode image beeped in. decode and search
       if (sample == null) {
-        sample = requestManager.getSampleByBarcode(new String(Base64.decodeBase64(barcode)));
+        sample = sampleService.getByBarcode(new String(Base64.decodeBase64(barcode)));
       }
       if (sample.getReceivedDate() == null) {
         response.put("name", sample.getName());
@@ -525,10 +527,10 @@ public class SampleControllerHelperService {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       for (JSONObject s : (Iterable<JSONObject>) ss) {
         Long sampleId = s.getLong("sampleId");
-        Sample sample = requestManager.getSampleById(sampleId);
+        Sample sample = sampleService.get(sampleId);
         sample.setReceivedDate(new Date());
         sample.setLastModifier(user);
-        requestManager.saveSample(sample);
+        sampleService.update(sample);
       }
       response.put("result", "Samples received date saved");
       return response;
@@ -542,7 +544,7 @@ public class SampleControllerHelperService {
     Long sampleId = json.getLong("sampleId");
     File temploc = getBarcodeFileLocation(session);
     try {
-      Sample sample = requestManager.getSampleById(sampleId);
+      Sample sample = sampleService.get(sampleId);
       BarcodeFactory barcodeFactory = new BarcodeFactory();
       barcodeFactory.setPointPixels(1.5f);
       barcodeFactory.setBitmapResolution(600);
@@ -579,7 +581,7 @@ public class SampleControllerHelperService {
   }
 
   public JSONObject printSampleBarcodes(HttpSession session, JSONObject json) {
-    return ControllerHelperServiceUtils.printBarcodes(printerService, json, new SampleBarcodeAssister(requestManager));
+    return ControllerHelperServiceUtils.printBarcodes(printerService, json, new SampleBarcodeAssister(requestManager, sampleService));
   }
 
   public JSONObject changeSampleLocation(HttpSession session, JSONObject json) {
@@ -590,7 +592,7 @@ public class SampleControllerHelperService {
       String newLocation = LimsUtils.lookupLocation(locationBarcode);
       if (newLocation != null) {
         User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-        Sample sample = requestManager.getSampleById(sampleId);
+        Sample sample = sampleService.get(sampleId);
         String oldLocation = sample.getLocationBarcode();
         sample.setLocationBarcode(newLocation);
 
@@ -627,10 +629,10 @@ public class SampleControllerHelperService {
           return JSONUtils.SimpleJSONError(error);
         }
         User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-        Sample sample = requestManager.getSampleById(sampleId);
+        Sample sample = sampleService.get(sampleId);
         sample.setIdentificationBarcode(idBarcode);
         sample.setLastModifier(user);
-        requestManager.saveSample(sample);
+        sampleService.update(sample);
       } else {
         return JSONUtils.SimpleJSONError("New identification barcode not recognized");
       }
@@ -665,7 +667,7 @@ public class SampleControllerHelperService {
       if (json.has("sampleId")) {
         Long sampleId = json.getLong("sampleId");
         try {
-          requestManager.deleteSample(requestManager.getSampleById(sampleId));
+          sampleService.delete(sampleId);
           return JSONUtils.SimpleJSONResponse("Sample deleted");
         } catch (IOException e) {
           log.error("delete sample", e);
@@ -694,7 +696,7 @@ public class SampleControllerHelperService {
         Long overviewId = json.getLong("overviewId");
         try {
           ProjectOverview overview = requestManager.getProjectOverviewById(overviewId);
-          Sample s = requestManager.getSampleById(sampleId);
+          Sample s = sampleService.get(sampleId);
           if (overview.getSamples().contains(s)) {
             if (overview.getSamples().remove(s)) {
               requestManager.saveProjectOverview(overview);

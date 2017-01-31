@@ -90,33 +90,40 @@ public class ProjectOverview implements Watchable, Alertable, Nameable, Serializ
 
   public static final Long UNSAVED_ID = 0L;
 
-  @Column(name = "allLibraryQcPassed")
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private long overviewId = ProjectOverview.UNSAVED_ID;
+
+  @Column(name = "allLibraryQcPassed", nullable = false)
   private boolean allLibrariesQcPassed;
-
+  @Column(nullable = false)
   private boolean allPoolsConstructed;
-
+  @Column(nullable = false)
   private boolean allRunsCompleted;
+  @Column(nullable = false)
+  private boolean locked;
+  @Column(nullable = false)
+  private boolean primaryAnalysisCompleted;
+  @Column(nullable = false)
+  private String principalInvestigator;
+  @Column(nullable = false)
+  private Date lastUpdated;
 
+  private Date startDate;
+  private Date endDate;
+  private Integer numProposedSamples;
   private boolean allSampleQcPassed;
 
-  private Date endDate;
-
-  private Date lastUpdated;
+  @Transient
   private boolean libraryPreparationComplete;
   @Transient
   private final Set<MisoListener> listeners = new HashSet<>();
-  private boolean locked;
   @OneToMany(targetEntity = Note.class, cascade = CascadeType.ALL)
   @JoinTable(name = "ProjectOverview_Note", joinColumns = {
       @JoinColumn(name = "overview_overviewId") }, inverseJoinColumns = {
           @JoinColumn(name = "notes_noteId") })
   private Collection<Note> notes = new HashSet<>();
-  private Integer numProposedSamples;
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  private long overviewId = ProjectOverview.UNSAVED_ID;
-  private boolean primaryAnalysisCompleted;
-  private String principalInvestigator;
+
   @ManyToOne(targetEntity = ProjectImpl.class)
   @JoinColumn(name = "project_projectId")
   private Project project;
@@ -125,8 +132,6 @@ public class ProjectOverview implements Watchable, Alertable, Nameable, Serializ
   @JoinTable(name = "ProjectOverview_Sample", joinColumns = { @JoinColumn(name = "projectOverview_overviewId") }, inverseJoinColumns = {
       @JoinColumn(name = "sample_sampleId") })
   private Set<Sample> sampleGroup;
-
-  private Date startDate;
 
   @Transient
   // not Hibernate-managed

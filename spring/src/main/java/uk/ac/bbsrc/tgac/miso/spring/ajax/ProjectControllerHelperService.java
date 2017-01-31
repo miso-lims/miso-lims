@@ -495,12 +495,12 @@ public class ProjectControllerHelperService {
 
   public JSONObject printAllSampleBarcodes(HttpSession session, JSONObject json) {
     return ControllerHelperServiceUtils.printAllBarcodes(printerService, json,
-        new SampleControllerHelperService.SampleBarcodeAssister(requestManager));
+        new SampleControllerHelperService.SampleBarcodeAssister(requestManager, sampleService));
   }
 
   public JSONObject printSelectedSampleBarcodes(HttpSession session, JSONObject json) {
     return ControllerHelperServiceUtils.printBarcodes(printerService, json,
-        new SampleControllerHelperService.SampleBarcodeAssister(requestManager));
+        new SampleControllerHelperService.SampleBarcodeAssister(requestManager, sampleService));
   }
 
   public JSONObject printAllLibraryBarcodes(HttpSession session, JSONObject json) {

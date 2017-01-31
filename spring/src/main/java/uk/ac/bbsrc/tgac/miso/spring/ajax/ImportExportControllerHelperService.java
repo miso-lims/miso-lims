@@ -115,7 +115,7 @@ public class ImportExportControllerHelperService {
       List<Sample> samples;
       StringBuilder b = new StringBuilder();
       if (!isStringEmptyOrNull(searchStr)) {
-        samples = new ArrayList<>(requestManager.listAllSamplesBySearch(searchStr));
+        samples = new ArrayList<>(sampleService.getBySearch(searchStr));
       } else {
         samples = new ArrayList<>(requestManager.listAllSamplesWithLimit(250));
       }
@@ -226,12 +226,12 @@ public class ImportExportControllerHelperService {
             if (!s.getSampleQCs().contains(sqc)) {
               s.addQc(sqc);
               requestManager.saveSampleQC(sqc);
-              requestManager.saveSample(s);
+              sampleService.update(s);
               log.info("Added sample QC: " + sqc.toString());
             }
             if (jsonArrayElement.get(7) != null && !isStringEmptyOrNull(jsonArrayElement.getString(7))) {
               s.setQcPassed(Boolean.parseBoolean(jsonArrayElement.getString(7)));
-              requestManager.saveSample(s);
+              sampleService.update(s);
             }
             if (jsonArrayElement.get(8) != null && !isStringEmptyOrNull(jsonArrayElement.getString(8))) {
               List<String> notesList = Arrays.asList((jsonArrayElement.getString(8)).split(";"));
@@ -289,7 +289,7 @@ public class ImportExportControllerHelperService {
         Sample s = null;
         if (jsonArrayElement.get(1) != null && !isStringEmptyOrNull(jsonArrayElement.getString(1))) {
           String salias = jsonArrayElement.getString(1);
-          Collection<Sample> ss = requestManager.listSamplesByAlias(salias);
+          Collection<Sample> ss = sampleService.getByAlias(salias);
           if (!ss.isEmpty()) {
             if (ss.size() == 1) {
               s = ss.iterator().next();

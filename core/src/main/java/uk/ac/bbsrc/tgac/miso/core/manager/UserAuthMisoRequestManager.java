@@ -211,15 +211,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public long saveSample(Sample sample) throws IOException {
-    if (writeCheck(sample)) {
-      return backingManager.saveSample(sample);
-    } else {
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot write to this Sample");
-    }
-  }
-
-  @Override
   public long saveSampleQC(SampleQC sampleQC) throws IOException {
     if (writeCheck(sampleQC.getSample())) {
       return backingManager.saveSampleQC(sampleQC);
@@ -975,15 +966,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   @Override
   public void saveKitNote(Kit kit, Note note) throws IOException {
     backingManager.saveKitNote(kit, note);
-  }
-
-  @Override
-  public long savePlatform(Platform platform) throws IOException {
-    if (getCurrentUser().isAdmin()) {
-      return backingManager.savePlatform(platform);
-    } else {
-      throw new IOException("User " + getCurrentUser().getFullName() + " cannot write to this Platform");
-    }
   }
 
   @Override

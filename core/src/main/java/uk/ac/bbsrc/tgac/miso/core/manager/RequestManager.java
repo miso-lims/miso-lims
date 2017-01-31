@@ -80,8 +80,6 @@ public interface RequestManager {
 
   public void saveKitNote(Kit kit, Note note) throws IOException;
 
-  public long saveSample(Sample sample) throws IOException;
-
   public long saveSampleQC(SampleQC sampleQC) throws IOException;
 
   public long savePool(Pool pool) throws IOException;
@@ -91,8 +89,6 @@ public interface RequestManager {
   public void savePoolNote(Pool pool, Note note) throws IOException;
 
   public long saveSequencerPartitionContainer(SequencerPartitionContainer<SequencerPoolPartition> container) throws IOException;
-
-  public long savePlatform(Platform platform) throws IOException;
 
   public long saveStatus(Status status) throws IOException;
 

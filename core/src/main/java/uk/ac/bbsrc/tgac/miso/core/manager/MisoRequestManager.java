@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
 
 import org.slf4j.Logger;
@@ -47,6 +48,7 @@ import com.google.common.collect.Lists;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBox;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractRun;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
@@ -72,9 +74,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
@@ -87,12 +91,12 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunQcException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
-import uk.ac.bbsrc.tgac.miso.core.store.AlertStore;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignCodeDao;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignDao;
+import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PlatformStore;
@@ -104,7 +108,6 @@ import uk.ac.bbsrc.tgac.miso.core.store.RunQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
-import uk.ac.bbsrc.tgac.miso.core.store.SecurityProfileStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerReferenceStore;
@@ -126,11 +129,11 @@ public class MisoRequestManager implements RequestManager {
   @Value("${miso.autoGenerateIdentificationBarcodes}")
   private Boolean autoGenerateIdBarcodes;
   @Autowired
-  private AlertStore alertStore;
-  @Autowired
   private KitStore kitStore;
   @Autowired
   private LibraryStore libraryStore;
+  @Autowired
+  private LibraryDilutionStore libraryDilutionStore;
   @Autowired
   private LibraryQcStore libraryQcStore;
   @Autowired
@@ -153,8 +156,6 @@ public class MisoRequestManager implements RequestManager {
   private TargetedSequencingStore targetedSequencingStore;
   @Autowired
   private SampleQcStore sampleQcStore;
-  @Autowired
-  private SecurityProfileStore securityProfileStore;
   @Autowired
   private SequencerPartitionContainerStore sequencerPartitionContainerStore;
   @Autowired
@@ -192,9 +193,6 @@ public class MisoRequestManager implements RequestManager {
     this.boxStore = boxStore;
   }
 
-  public void setAlertStore(AlertStore alertStore) {
-    this.alertStore = alertStore;
-  }
 
   public void setKitStore(KitStore kitStore) {
     this.kitStore = kitStore;
@@ -246,10 +244,6 @@ public class MisoRequestManager implements RequestManager {
 
   public void setSampleQcStore(SampleQcStore sampleQcStore) {
     this.sampleQcStore = sampleQcStore;
-  }
-
-  public void setSecurityProfileStore(SecurityProfileStore securityProfileStore) {
-    this.securityProfileStore = securityProfileStore;
   }
 
   public void setSequencerPartitionContainerStore(SequencerPartitionContainerStore sequencerPartitionContainerStore) {
@@ -1025,6 +1019,21 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public long saveProjectOverview(ProjectOverview overview) throws IOException {
     if (projectStore != null) {
+      if (overview.getId() != ProjectOverview.UNSAVED_ID) {
+        ProjectOverview original = projectStore.getProjectOverviewById(overview.getId());
+        original.setAllLibrariesQcPassed(overview.getAllLibrariesQcPassed());
+        original.setAllPoolsConstructed(overview.getAllPoolsConstructed());
+        original.setAllRunsCompleted(overview.getAllRunsCompleted());
+        original.setLocked(overview.getLocked());
+        original.setPrimaryAnalysisCompleted(overview.getPrimaryAnalysisCompleted());
+        original.setPrincipalInvestigator(overview.getPrincipalInvestigator());
+        original.setStartDate(overview.getStartDate());
+        original.setEndDate(overview.getEndDate());
+        original.setNumProposedSamples(overview.getNumProposedSamples());
+        original.setAllSampleQcPassed(overview.getAllSampleQcPassed());
+        original.setLastUpdated(new Date());
+        overview = original;
+      }
       return projectStore.saveOverview(overview);
     } else {
       throw new IOException("No projectStore available. Check that it has been declared in the Spring config.");
@@ -1081,7 +1090,7 @@ public class MisoRequestManager implements RequestManager {
         managed.setNotes(run.getNotes());
         managed.setSequencingParameters(run.getSequencingParameters());
         runStore.save(managed);
-        if (runAlertManager != null) runAlertManager.update(run);
+        if (runAlertManager != null) runAlertManager.update(managed);
         return run.getId();
       }
     } else {
@@ -1092,7 +1101,19 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public void saveRuns(Collection<Run> runs) throws IOException {
     if (runStore != null) {
-      runStore.saveAll(runs);
+      List<Run> newRuns = new ArrayList<>();
+      List<Run> savedRuns = new ArrayList<>();
+      for (Run run : runs) {
+        if (run.getId() == AbstractRun.UNSAVED_ID) {
+          newRuns.add(run);
+        } else {
+          savedRuns.add(run);
+        }
+      }
+      runStore.saveAll(newRuns);
+      for (Run run : savedRuns) {
+        saveRun(run);
+      }
     } else {
       throw new IOException("No runStore available. Check that it has been declared in the Spring config.");
     }
@@ -1101,9 +1122,9 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public long saveRunQC(RunQC runQC) throws IOException {
     if (runQcStore != null) {
-      long id = runQcStore.save(runQC);
+      Long runQcId = runQcStore.save(runQC);
       if (runAlertManager != null) runAlertManager.update(runQC.getRun());
-      return id;
+      return runQcId;
     } else {
       throw new IOException("No runQcStore available. Check that it has been declared in the Spring config.");
     }
@@ -1128,15 +1149,6 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public long saveSample(Sample sample) throws IOException {
-    if (sampleStore != null) {
-      return sampleStore.save(sample);
-    } else {
-      throw new IOException("No sampleStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
   public long saveSampleQC(SampleQC sampleQc) throws IOException {
     if (sampleQcStore != null) {
       return sampleQcStore.save(sampleQc);
@@ -1151,8 +1163,35 @@ public class MisoRequestManager implements RequestManager {
       if (pool.isDiscarded()) {
         pool.setVolume(0.0);
       }
-      if (autoGenerateIdBarcodes && pool.getId() == PoolImpl.UNSAVED_ID) {
-        LimsUtils.generateAndSetIdBarcode(pool);
+
+      if (pool.getId() == PoolImpl.UNSAVED_ID) {
+        pool.setName(generateTemporaryName());
+        poolStore.save(pool);
+
+        if (autoGenerateIdBarcodes) {
+          LimsUtils.generateAndSetIdBarcode(pool);
+        }
+        try {
+          pool.setName(namingScheme.generateNameFor(pool));
+          validateNameOrThrow(pool, namingScheme);
+        } catch (MisoNamingException e) {
+          throw new IOException("Invalid name for pool", e);
+        }
+      } else {
+        Pool original = poolStore.get(pool.getId());
+        original.setAlias(pool.getAlias());
+        original.setConcentration(pool.getConcentration());
+        original.setDescription(pool.getDescription());
+        original.setIdentificationBarcode(pool.getIdentificationBarcode());
+        original.setPlatformType(pool.getPlatformType());
+        original.setQcPassed(pool.getQcPassed());
+        original.setReadyToRun(pool.getReadyToRun());
+        Set<LibraryDilution> pooledElements = new HashSet<>();
+        for (LibraryDilution dilution : pool.getPoolableElements()) {
+          pooledElements.add(libraryDilutionStore.get(dilution.getId()));
+        }
+        original.setPoolableElements(pooledElements);
+        pool = original;
       }
       long id = poolStore.save(pool);
       if (poolAlertManager != null) poolAlertManager.update(pool);
@@ -1165,6 +1204,11 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public long savePoolQC(PoolQC poolQC) throws IOException {
     if (poolQcStore != null) {
+      if (poolQC.getId() != PoolImpl.UNSAVED_ID) {
+        PoolQC original = getPoolQCById(poolQC.getId());
+        original.setResults(poolQC.getResults());
+        poolQC = original;
+      }
       return poolQcStore.save(poolQC);
     } else {
       throw new IOException("No poolQcStore available. Check that it has been declared in the Spring config.");
@@ -1219,17 +1263,16 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public long savePlatform(Platform platform) throws IOException {
-    if (platformStore != null) {
-      return platformStore.save(platform);
-    } else {
-      throw new IOException("No platformStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
   public long saveStatus(Status status) throws IOException {
     if (statusStore != null) {
+      if (status.getId() != StatusImpl.UNSAVED_ID) {
+        Status original = getStatusById(status.getId());
+        original.setHealth(status.getHealth());
+        original.setCompletionDate(status.getCompletionDate());
+        original.setXml(status.getXml());
+        original.setRunName(status.getRunName());
+        status = original;
+      }
       return statusStore.save(status);
     } else {
       throw new IOException("No statusStore available. Check that it has been declared in the Spring config.");
@@ -1248,6 +1291,16 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public long saveSequencerReference(SequencerReference sequencerReference) throws IOException {
     if (sequencerReferenceStore != null) {
+      if (sequencerReference.getId() != AbstractSequencerReference.UNSAVED_ID) {
+        SequencerReference original = getSequencerReferenceById(sequencerReference.getId());
+        original.setPlatform(sequencerReference.getPlatform());
+        original.setIpAddress(sequencerReference.getIpAddress());
+        original.setSerialNumber(sequencerReference.getSerialNumber());
+        original.setDateCommissioned(sequencerReference.getDateCommissioned());
+        original.setDateDecommissioned(sequencerReference.getDateDecommissioned());
+        original.setUpgradedSequencerReference(getSequencerReferenceById(sequencerReference.getUpgradedSequencerReference().getId()));
+        sequencerReference = original;
+      }
       return sequencerReferenceStore.save(sequencerReference);
     } else {
       throw new IOException("No sequencerReferenceStore available. Check that it has been declared in the Spring config.");
@@ -1266,6 +1319,15 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public long saveKitDescriptor(KitDescriptor kitDescriptor) throws IOException {
     if (kitStore != null) {
+      if (kitDescriptor.getId() != KitDescriptor.UNSAVED_ID) {
+        KitDescriptor original = getKitDescriptorById(kitDescriptor.getId());
+        original.setVersion(kitDescriptor.getVersion());
+        original.setManufacturer(kitDescriptor.getManufacturer());
+        original.setPartNumber(kitDescriptor.getPartNumber());
+        original.setStockLevel(kitDescriptor.getStockLevel());
+        original.setDescription(kitDescriptor.getDescription());
+        kitDescriptor = original;
+      }
       return kitStore.saveKitDescriptor(kitDescriptor);
     } else {
       throw new IOException("No kitStore available. Check that it has been declared in the Spring config.");
@@ -1606,12 +1668,13 @@ public class MisoRequestManager implements RequestManager {
     if (boxStore != null) {
       if (box.getId() == AbstractBox.UNSAVED_ID) {
         try {
+          box.setName(generateTemporaryName());
           boxStore.save(box);
 
           if (autoGenerateIdBarcodes) {
             box.setIdentificationBarcode(box.getName() + "::" + box.getAlias());
           }
-          namingScheme.generateNameFor(box);
+          box.setName(namingScheme.generateNameFor(box));
           validateNameOrThrow(box, namingScheme);
           return boxStore.save(box);
         } catch (MisoNamingException e) {
