@@ -110,6 +110,15 @@ public interface AuthorizationManager {
   public void throwIfNonAdminOrMatchingOwner(User owner) throws IOException, AuthorizationException;
 
   /**
+   * Verifies that the current user is an internal user
+   * 
+   * @throws AuthorizationException if the current user is not an internal user
+   * @throws IOException if there is an error while looking up the current user. This does not indicate whether
+   *           the user exists or is authenticated, but represents other errors occurring while checking these conditions
+   */
+  public void throwIfNotInternal() throws IOException, AuthorizationException;
+
+  /**
    * Determines which items in an unfiltered collection are readable by the current user
    * 
    * @param unfiltered the items to check permissions for

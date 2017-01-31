@@ -53,7 +53,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
-import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
@@ -80,8 +79,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
-import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.PoolAlertManager;
@@ -93,7 +90,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
-import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignCodeDao;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignDao;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
@@ -128,8 +124,6 @@ public class MisoRequestManager implements RequestManager {
 
   @Value("${miso.autoGenerateIdentificationBarcodes}")
   private Boolean autoGenerateIdBarcodes;
-  @Autowired
-  private KitStore kitStore;
   @Autowired
   private LibraryStore libraryStore;
   @Autowired
@@ -191,11 +185,6 @@ public class MisoRequestManager implements RequestManager {
 
   public void setBoxStore(BoxStore boxStore) {
     this.boxStore = boxStore;
-  }
-
-
-  public void setKitStore(KitStore kitStore) {
-    this.kitStore = kitStore;
   }
 
   public void setLibraryDesignCodeDao(LibraryDesignCodeDao libraryDesignCodeDao) {
@@ -717,33 +706,6 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Kit> listAllKits() throws IOException {
-    if (kitStore != null) {
-      return kitStore.listAll();
-    } else {
-      throw new IOException("No kitStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<KitDescriptor> listAllKitDescriptors() throws IOException {
-    if (kitStore != null) {
-      return kitStore.listAllKitDescriptors();
-    } else {
-      throw new IOException("No kitStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<KitDescriptor> listKitDescriptorsByType(KitType kitType) throws IOException {
-    if (kitStore != null) {
-      return kitStore.listKitDescriptorsByType(kitType);
-    } else {
-      throw new IOException("No kitStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
   public Collection<QcType> listAllSampleQcTypes() throws IOException {
     if (sampleQcStore != null) {
       return sampleQcStore.listAllSampleQcTypes();
@@ -916,26 +878,6 @@ public class MisoRequestManager implements RequestManager {
     }
     managed.getNotes().remove(deleteNote);
     runStore.save(managed);
-  }
-
-  @Override
-  public void deleteKitNote(Kit kit, Long noteId) throws IOException {
-    if (noteId == null || noteId.equals(Note.UNSAVED_ID)) {
-      throw new IllegalArgumentException("Cannot delete an unsaved Note");
-    }
-    Kit managed = kitStore.get(kit.getId());
-    Note deleteNote = null;
-    for (Note note : managed.getNotes()) {
-      if (note.getNoteId().equals(noteId)) {
-        deleteNote = note;
-        break;
-      }
-    }
-    if (deleteNote == null) {
-      throw new IOException("Note " + noteId + " not found for Kit " + kit.getId());
-    }
-    managed.getNotes().remove(deleteNote);
-    kitStore.save(managed);
   }
 
   @Override
@@ -1142,15 +1084,6 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public void saveKitNote(Kit kit, Note note) throws IOException {
-    Kit managed = kitStore.get(kit.getId());
-    note.setCreationDate(new Date());
-    // TODO: when moved to Service: note.setOwner(authorizationManager.getCurrentUser());
-    managed.addNote(note);
-    kitStore.save(managed);
-  }
-
-  @Override
   public long saveSampleQC(SampleQC sampleQc) throws IOException {
     if (sampleQcStore != null) {
       return sampleQcStore.save(sampleQc);
@@ -1305,33 +1238,6 @@ public class MisoRequestManager implements RequestManager {
       return sequencerReferenceStore.save(sequencerReference);
     } else {
       throw new IOException("No sequencerReferenceStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public long saveKit(Kit kit) throws IOException {
-    if (kitStore != null) {
-      return kitStore.save(kit);
-    } else {
-      throw new IOException("No kitStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public long saveKitDescriptor(KitDescriptor kitDescriptor) throws IOException {
-    if (kitStore != null) {
-      if (kitDescriptor.getId() != KitDescriptor.UNSAVED_ID) {
-        KitDescriptor original = getKitDescriptorById(kitDescriptor.getId());
-        original.setVersion(kitDescriptor.getVersion());
-        original.setManufacturer(kitDescriptor.getManufacturer());
-        original.setPartNumber(kitDescriptor.getPartNumber());
-        original.setStockLevel(kitDescriptor.getStockLevel());
-        original.setDescription(kitDescriptor.getDescription());
-        kitDescriptor = original;
-      }
-      return kitStore.saveKitDescriptor(kitDescriptor);
-    } else {
-      throw new IOException("No kitStore available. Check that it has been declared in the Spring config.");
     }
   }
 
@@ -1536,51 +1442,6 @@ public class MisoRequestManager implements RequestManager {
       return sequencerReferenceStore.getByUpgradedReference(upgradedReferenceId);
     } else {
       throw new IOException("No sequencerReferenceStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Kit getKitById(long kitId) throws IOException {
-    if (kitStore != null) {
-      return kitStore.get(kitId);
-    } else {
-      throw new IOException("No kitStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Kit getKitByIdentificationBarcode(String barcode) throws IOException {
-    if (kitStore != null) {
-      return kitStore.getKitByIdentificationBarcode(barcode);
-    } else {
-      throw new IOException("No kitStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Kit getKitByLotNumber(String lotNumber) throws IOException {
-    if (kitStore != null) {
-      return kitStore.getKitByLotNumber(lotNumber);
-    } else {
-      throw new IOException("No kitStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public KitDescriptor getKitDescriptorById(long kitDescriptorId) throws IOException {
-    if (kitStore != null) {
-      return kitStore.getKitDescriptorById(kitDescriptorId);
-    } else {
-      throw new IOException("No kitStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public KitDescriptor getKitDescriptorByPartNumber(String partNumber) throws IOException {
-    if (kitStore != null) {
-      return kitStore.getKitDescriptorByPartNumber(partNumber);
-    } else {
-      throw new IOException("No kitStore available. Check that it has been declared in the Spring config.");
     }
   }
 
@@ -1862,15 +1723,6 @@ public class MisoRequestManager implements RequestManager {
       return sequencerServiceRecordStore.getServiceRecordColumnSizes();
     } else {
       throw new IOException("No sequencerServiceRecordStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Map<String, Integer> getKitDescriptorColumnSizes() throws IOException {
-    if (kitStore != null) {
-      return kitStore.getKitDescriptorColumnSizes();
-    } else {
-      throw new IOException("No kitStore available. Check that it has been declared in the Spring config.");
     }
   }
 

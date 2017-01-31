@@ -35,7 +35,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
-import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
@@ -56,8 +55,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
-import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 
@@ -78,8 +75,6 @@ public interface RequestManager {
 
   public void saveRunNote(Run run, Note note) throws IOException;
 
-  public void saveKitNote(Kit kit, Note note) throws IOException;
-
   public long saveSampleQC(SampleQC sampleQC) throws IOException;
 
   public long savePool(Pool pool) throws IOException;
@@ -97,10 +92,6 @@ public interface RequestManager {
   public long saveSequencerReference(SequencerReference sequencerReference) throws IOException;
 
   public long saveSequencerServiceRecord(SequencerServiceRecord record) throws IOException;
-
-  public long saveKit(Kit kit) throws IOException;
-
-  public long saveKitDescriptor(KitDescriptor kitDescriptor) throws IOException;
 
   public long saveBox(Box box) throws IOException;
 
@@ -152,16 +143,6 @@ public interface RequestManager {
   public SequencerReference getSequencerReferenceByUpgradedReferenceId(long upgradedReferenceId) throws IOException;
 
   public SequencerServiceRecord getSequencerServiceRecordById(long id) throws IOException;
-
-  public Kit getKitById(long kitId) throws IOException;
-
-  public Kit getKitByIdentificationBarcode(String barcode) throws IOException;
-
-  public Kit getKitByLotNumber(String lotNumber) throws IOException;
-
-  public KitDescriptor getKitDescriptorById(long kitDescriptorId) throws IOException;
-
-  public KitDescriptor getKitDescriptorByPartNumber(String partNumber) throws IOException;
 
   public QcType getSampleQcTypeById(long qcTypeId) throws IOException;
 
@@ -317,12 +298,6 @@ public interface RequestManager {
 
   public Collection<SequencerServiceRecord> listSequencerServiceRecordsBySequencerId(long referenceId) throws IOException;
 
-  public Collection<Kit> listAllKits() throws IOException;
-
-  public Collection<KitDescriptor> listKitDescriptorsByType(KitType kitType) throws IOException;
-
-  public Collection<KitDescriptor> listAllKitDescriptors() throws IOException;
-
   public Collection<QcType> listAllSampleQcTypes() throws IOException;
 
   public Collection<QcType> listAllLibraryQcTypes() throws IOException;
@@ -362,8 +337,6 @@ public interface RequestManager {
 
   public void deleteRunNote(Run run, Long noteId) throws IOException;
 
-  public void deleteKitNote(Kit kit, Long noteId) throws IOException;
-
   public void deletePoolNote(Pool pool, Long noteId) throws IOException;
 
   public void deleteProjectOverviewNote(ProjectOverview projectOverview, Long noteId) throws IOException;
@@ -375,8 +348,6 @@ public interface RequestManager {
   public Map<String, Integer> getBoxColumnSizes() throws IOException;
 
   public Map<String, Integer> getPoolColumnSizes() throws IOException;
-
-  public Map<String, Integer> getKitDescriptorColumnSizes() throws IOException;
 
   public Map<String, Integer> getProjectColumnSizes() throws IOException;
 

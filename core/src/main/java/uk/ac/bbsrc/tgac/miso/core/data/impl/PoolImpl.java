@@ -232,8 +232,7 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
   }
 
   @Override
-  public int compareTo(Object o) {
-    Pool t = (Pool) o;
+  public int compareTo(Pool t) {
     if (getId() < t.getId()) return -1;
     if (getId() > t.getId()) return 1;
     return 0;

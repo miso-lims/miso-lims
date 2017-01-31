@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,8 +18,6 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 public class DefaultAuthorizationManager implements AuthorizationManager {
-  
-  private static final Logger log = LoggerFactory.getLogger(DefaultAuthorizationManager.class);
   
   public static final String UNKNOWN_USER = "Unknown";
   
@@ -128,6 +124,11 @@ public class DefaultAuthorizationManager implements AuthorizationManager {
       }
     }
     return filtered;
+  }
+
+  @Override
+  public void throwIfNotInternal() throws IOException, AuthorizationException {
+    if (!getCurrentUser().isInternal()) throw new AuthorizationException("Current user is not an internal user");
   }
 
   @Override

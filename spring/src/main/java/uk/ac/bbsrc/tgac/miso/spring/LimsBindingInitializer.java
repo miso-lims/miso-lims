@@ -89,6 +89,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignCodeDao;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SequencingParametersDao;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.service.KitService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.ReferenceGenomeService;
@@ -128,11 +129,15 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
   private LibraryService libraryService;
   @Autowired
   private ReferenceGenomeService referenceGenomeService;
+  @Autowired
+  private KitService kitService;
 
   @Autowired
   private SequencingParametersDao sequencingParametersDao;
 
-
+  public void setKitService(KitService kitService) {
+    this.kitService = kitService;
+  }
 
   /**
    * Simplified interface to convert form data to fields.
@@ -581,14 +586,14 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
     new BindingConverterById<Kit>(Kit.class) {
       @Override
       public Kit resolveById(long id) throws Exception {
-        return requestManager.getKitById(id);
+        return kitService.getKitById(id);
       }
     }.register(binder).register(binder, Set.class, "kits");
 
     new BindingConverterById<KitDescriptor>(KitDescriptor.class) {
       @Override
       public KitDescriptor resolveById(long id) throws Exception {
-        return requestManager.getKitDescriptorById(id);
+        return kitService.getKitDescriptorById(id);
       }
     }.register(binder).register(binder, Set.class, "kitDescriptors");
 

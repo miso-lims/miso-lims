@@ -45,7 +45,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
-import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
@@ -67,8 +66,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
-import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.exception.AuthorizationIOException;
@@ -909,12 +906,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public void deleteKitNote(Kit kit, Long noteId) throws IOException {
-    // TODO: when Hibernatized, should call authorizationManager.throwIfNonAdminOrMatchingOwner(note.getOwner())
-    backingManager.deleteKitNote(kit, noteId);
-  }
-
-  @Override
   public void deletePoolNote(Pool pool, Long noteId) throws IOException {
     if (getCurrentUser().isAdmin()) { // should use authorizationManager.throwIfNonAdminOrMatchingOwner(note.getOwner())
       backingManager.deletePoolNote(pool, noteId);
@@ -962,11 +953,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public void saveKitNote(Kit kit, Note note) throws IOException {
-    backingManager.saveKitNote(kit, note);
-  }
-
-  @Override
   public long saveStatus(Status status) throws IOException {
     if (getCurrentUser().isInternal()) {
       return backingManager.saveStatus(status);
@@ -981,24 +967,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
       return backingManager.saveSequencerReference(sequencerReference);
     } else {
       throw new IOException("User " + getCurrentUser().getFullName() + " cannot write to this SequencerReference");
-    }
-  }
-
-  @Override
-  public long saveKit(Kit kit) throws IOException {
-    if (getCurrentUser().isInternal()) {
-      return backingManager.saveKit(kit);
-    } else {
-      throw new IOException("User " + getCurrentUser().getFullName() + " cannot write to this Kit");
-    }
-  }
-
-  @Override
-  public long saveKitDescriptor(KitDescriptor kitDescriptor) throws IOException {
-    if (getCurrentUser().isInternal()) {
-      return backingManager.saveKitDescriptor(kitDescriptor);
-    } else {
-      throw new IOException("User " + getCurrentUser().getFullName() + " cannot write to this KitDescriptor");
     }
   }
 
@@ -1034,37 +1002,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   @Override
   public SequencerReference getSequencerReferenceByUpgradedReferenceId(long upgradedReferenceId) throws IOException {
     return backingManager.getSequencerReferenceByUpgradedReferenceId(upgradedReferenceId);
-  }
-
-  @Override
-  public Kit getKitById(long kitId) throws IOException {
-    Kit o = backingManager.getKitById(kitId);
-    if (getCurrentUser().isInternal()) return o;
-    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Kit " + kitId);
-  }
-
-  @Override
-  public Kit getKitByIdentificationBarcode(String barcode) throws IOException {
-    Kit o = backingManager.getKitByIdentificationBarcode(barcode);
-    if (getCurrentUser().isInternal()) return o;
-    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Kit " + barcode);
-  }
-
-  @Override
-  public Kit getKitByLotNumber(String lotNumber) throws IOException {
-    Kit o = backingManager.getKitByLotNumber(lotNumber);
-    if (getCurrentUser().isInternal()) return o;
-    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Kit " + lotNumber);
-  }
-
-  @Override
-  public KitDescriptor getKitDescriptorById(long kitDescriptorId) throws IOException {
-    return backingManager.getKitDescriptorById(kitDescriptorId);
-  }
-
-  @Override
-  public KitDescriptor getKitDescriptorByPartNumber(String partNumber) throws IOException {
-    return backingManager.getKitDescriptorByPartNumber(partNumber);
   }
 
   @Override
@@ -1214,21 +1151,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Kit> listAllKits() throws IOException {
-    return backingManager.listAllKits();
-  }
-
-  @Override
-  public Collection<KitDescriptor> listKitDescriptorsByType(KitType kitType) throws IOException {
-    return backingManager.listKitDescriptorsByType(kitType);
-  }
-
-  @Override
-  public Collection<KitDescriptor> listAllKitDescriptors() throws IOException {
-    return backingManager.listAllKitDescriptors();
-  }
-
-  @Override
   public Collection<QcType> listAllSampleQcTypes() throws IOException {
     return backingManager.listAllSampleQcTypes();
   }
@@ -1320,11 +1242,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   @Override
   public Map<String, Integer> getPoolColumnSizes() throws IOException {
     return backingManager.getPoolColumnSizes();
-  }
-
-  @Override
-  public Map<String, Integer> getKitDescriptorColumnSizes() throws IOException {
-    return backingManager.getKitDescriptorColumnSizes();
   }
 
   @Override

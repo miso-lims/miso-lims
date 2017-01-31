@@ -52,8 +52,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.KitImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.service.KitService;
 
 /**
  * uk.ac.bbsrc.tgac.miso.spring.ajax
@@ -69,7 +69,7 @@ public class ExperimentControllerHelperService {
   @Autowired
   private SecurityManager securityManager;
   @Autowired
-  private RequestManager requestManager;
+  private KitService kitService;
   @Autowired
   private ExperimentService experimentService;
 
@@ -77,7 +77,7 @@ public class ExperimentControllerHelperService {
     try {
       if (json.has("barcode")) {
         String barcode = json.getString("barcode");
-        Kit kit = requestManager.getKitByIdentificationBarcode(barcode);
+        Kit kit = kitService.getKitByIdentificationBarcode(barcode);
         if (kit != null) {
           return JSONUtils.SimpleJSONResponse(kit.toString());
         } else {
@@ -109,7 +109,7 @@ public class ExperimentControllerHelperService {
     try {
       if (json.has("lotNumber")) {
         String lotNumber = json.getString("lotNumber");
-        Kit kit = requestManager.getKitByLotNumber(lotNumber);
+        Kit kit = kitService.getKitByLotNumber(lotNumber);
         if (kit != null) {
           return JSONUtils.SimpleJSONResponse(kit.toString());
         } else {
@@ -174,7 +174,7 @@ public class ExperimentControllerHelperService {
           return null;
         }
 
-        KitDescriptor kitDescriptor = requestManager.getKitDescriptorByPartNumber(partNumber);
+        KitDescriptor kitDescriptor = kitService.getKitDescriptorByPartNumber(partNumber);
         if (kitDescriptor != null) {
           Map<String, Object> m = new HashMap<>();
           m.put("id", kitDescriptor.getId());
@@ -197,7 +197,7 @@ public class ExperimentControllerHelperService {
         String multiplexed = json.getString("multiplexed");
         Experiment e = experimentService.get(new Long(experimentId));
 
-        Collection<KitDescriptor> kits = requestManager.listKitDescriptorsByType(KitType.LIBRARY);
+        Collection<KitDescriptor> kits = kitService.listKitDescriptorsByType(KitType.LIBRARY);
         StringBuilder lkits = new StringBuilder();
         lkits.append("[");
         int count = 0;
@@ -213,7 +213,7 @@ public class ExperimentControllerHelperService {
         StringBuilder mkits = null;
         if (multiplexed.equals("true")) {
           mkits = new StringBuilder();
-          Collection<KitDescriptor> mkitds = requestManager.listKitDescriptorsByType(KitType.MULTIPLEXING);
+          Collection<KitDescriptor> mkitds = kitService.listKitDescriptorsByType(KitType.MULTIPLEXING);
           mkits.append("[");
           count = 0;
           for (KitDescriptor k : mkitds) {
@@ -254,7 +254,7 @@ public class ExperimentControllerHelperService {
         String experimentId = json.getString("experimentId");
         Experiment e = experimentService.get(new Long(experimentId));
 
-        Collection<KitDescriptor> kits = requestManager.listKitDescriptorsByType(KitType.EMPCR);
+        Collection<KitDescriptor> kits = kitService.listKitDescriptorsByType(KitType.EMPCR);
         StringBuilder sb = new StringBuilder();
         sb.append("[");
         int count = 0;
@@ -290,7 +290,7 @@ public class ExperimentControllerHelperService {
         String experimentId = json.getString("experimentId");
         Experiment e = experimentService.get(new Long(experimentId));
 
-        Collection<KitDescriptor> kits = requestManager.listKitDescriptorsByType(KitType.CLUSTERING);
+        Collection<KitDescriptor> kits = kitService.listKitDescriptorsByType(KitType.CLUSTERING);
         StringBuilder sb = new StringBuilder();
         sb.append("[");
         int count = 0;
@@ -328,7 +328,7 @@ public class ExperimentControllerHelperService {
         String lotNumber = json.getString("lotNumber");
 
         Kit lk = new KitImpl();
-        KitDescriptor kd = requestManager.getKitDescriptorById(new Long(kitDescriptor));
+        KitDescriptor kd = kitService.getKitDescriptorById(new Long(kitDescriptor));
         if (kd.getKitType() != type) {
           return JSONUtils.SimpleJSONError("Not a " + type.getKey() + " kit");
         }
@@ -344,7 +344,7 @@ public class ExperimentControllerHelperService {
         experimentService.save(e);
         Integer newStock = kd.getStockLevel() - 1;
         kd.setStockLevel(newStock);
-        requestManager.saveKitDescriptor(kd);
+        kitService.saveKitDescriptor(kd);
       }
       return JSONUtils.SimpleJSONResponse("Saved kit!");
     } catch (IOException e) {
@@ -361,7 +361,7 @@ public class ExperimentControllerHelperService {
         String experimentId = json.getString("experimentId");
         Experiment e = experimentService.get(new Long(experimentId));
 
-        Collection<KitDescriptor> kits = requestManager.listKitDescriptorsByType(KitType.SEQUENCING);
+        Collection<KitDescriptor> kits = kitService.listKitDescriptorsByType(KitType.SEQUENCING);
         StringBuilder sb = new StringBuilder();
         sb.append("[");
         int count = 0;
@@ -415,7 +415,8 @@ public class ExperimentControllerHelperService {
     this.securityManager = securityManager;
   }
 
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
+  public void setKitService(KitService kitService) {
+    this.kitService = kitService;
   }
+
 }
