@@ -313,14 +313,14 @@ public class HibernateRunDao implements RunStore {
 
   @Override
   public void addWatcher(Run run, User watcher) {
-    log.debug("Adding watcher " + watcher.getLoginName() + " to " + run.getName() + " via WatchManager");
+    log.debug("Adding watcher " + watcher.getLoginName() + " to " + run.getName());
     run.addWatcher(watcher);
     currentSession().update(run);
   }
 
   @Override
   public void removeWatcher(Run run, User watcher) {
-    log.debug("Removing watcher " + watcher.getLoginName() + " from " + run.getWatchableIdentifier() + " via WatchManager");
+    log.debug("Removing watcher " + watcher.getLoginName() + " from " + run.getWatchableIdentifier());
     run.removeWatcher(watcher);
     currentSession().update(run);
   }
