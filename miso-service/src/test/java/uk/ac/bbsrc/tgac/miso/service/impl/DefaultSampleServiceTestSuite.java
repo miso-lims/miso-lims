@@ -44,6 +44,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleStockImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleValidRelationshipImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
@@ -126,12 +127,13 @@ public class DefaultSampleServiceTestSuite {
   private Set<SampleValidRelationship> relationships;
 
   @Before
-  public void setUp() {
+  public void setUp() throws MisoNamingException {
     MockitoAnnotations.initMocks(this);
     sut.setAutoGenerateIdBarcodes(false);
     relationships = new HashSet<>();
     Mockito.when(namingScheme.validateSampleAlias(Matchers.anyString())).thenReturn(ValidationResult.success());
     Mockito.when(namingScheme.validateName(Matchers.anyString())).thenReturn(ValidationResult.success());
+    Mockito.when(namingScheme.generateNameFor(Matchers.any(Sample.class))).thenReturn("SAM1");
   }
 
   @Test
@@ -213,6 +215,7 @@ public class DefaultSampleServiceTestSuite {
   @Test
   public void testPlainSampleIdentificationBarcodeGeneration() throws Exception {
     Sample sample = new SampleImpl();
+    sample.setAlias("alias");
     mockShellProjectWithRealLookup(sample);
     assertNull("identificationBarcode should be null before save for test", sample.getIdentificationBarcode());
     sut.setAutoGenerateIdBarcodes(true);

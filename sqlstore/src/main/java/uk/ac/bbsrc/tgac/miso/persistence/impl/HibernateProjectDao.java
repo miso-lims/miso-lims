@@ -76,7 +76,7 @@ public class HibernateProjectDao implements ProjectStore {
 
   @Override
   public void addWatcher(Project project, User watcher) {
-    log.debug("Adding watcher " + watcher.getLoginName() + " to " + project.getName() + " via WatchManager");
+    log.debug("Adding watcher " + watcher.getLoginName() + " to " + project.getName());
     project.addWatcher(watcher);
     currentSession().update(project);
   }
@@ -195,7 +195,7 @@ public class HibernateProjectDao implements ProjectStore {
 
   @Override
   public void removeWatcher(Project project, User watcher) {
-    log.debug("Removing watcher " + watcher.getLoginName() + " from " + project.getWatchableIdentifier() + " via WatchManager");
+    log.debug("Removing watcher " + watcher.getLoginName() + " from " + project.getWatchableIdentifier());
     project.removeWatcher(watcher);
     currentSession().update(project);
   }

@@ -37,7 +37,6 @@ public class PoolControllerHelperServiceTestSuite {
   @Mock
   private User user;
 
-  @SuppressWarnings("rawtypes")
   @Mock
   private Pool pool;
   @Mock
@@ -50,7 +49,6 @@ public class PoolControllerHelperServiceTestSuite {
     MockitoAnnotations.initMocks(this);
   }
 
-  @SuppressWarnings("unchecked")
   @Test
   public final void testChangePoolIdBarcode() throws Exception {
     final long id = 1L;
@@ -74,7 +72,6 @@ public class PoolControllerHelperServiceTestSuite {
     assertEquals("New+identification+barcode+successfully+assigned.", response.get("response"));
   }
 
-  @SuppressWarnings("unchecked")
   @Test
   public final void testChangePoolIdBarcodeBlankBarcode() throws Exception {
     final long id = 1L;
@@ -90,7 +87,7 @@ public class PoolControllerHelperServiceTestSuite {
     json.put("poolId", id);
     json.put("identificationBarcode", idBarcode);
 
-    final JSONObject response = poolControllerHelperService.changePoolIdBarcode(null, json);
+    JSONObject response = poolControllerHelperService.changePoolIdBarcode(null, json);
 
     verify(pool).setIdentificationBarcode(null);
     verify(requestManager).savePool(pool);
@@ -98,7 +95,6 @@ public class PoolControllerHelperServiceTestSuite {
     assertEquals("New+identification+barcode+successfully+assigned.", response.get("response"));
   }
 
-  @SuppressWarnings("unchecked")
   @Test
   public final void testChangePoolIdBarcodeReturnsError() throws Exception {
     final long id = 1L;

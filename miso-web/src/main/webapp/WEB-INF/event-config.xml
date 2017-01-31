@@ -39,8 +39,6 @@
       </property>
    </bean>
 
-  <bean name="watchManager" class="uk.ac.bbsrc.tgac.miso.core.event.manager.WatchManager" />
-
   <!-- ALERTERS -->
   <bean name="daoAlerterService" class="uk.ac.bbsrc.tgac.miso.core.event.alerter.DaoAlerterService">
   </bean>

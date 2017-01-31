@@ -511,7 +511,6 @@ ALTER TABLE Library ADD CONSTRAINT fk_library_libraryType FOREIGN KEY (libraryTy
 ALTER TABLE Library ADD CONSTRAINT fk_library_librarySelectionType FOREIGN KEY (librarySelectionType) REFERENCES LibrarySelectionType (librarySelectionTypeId);
 ALTER TABLE Library ADD CONSTRAINT fk_library_libraryStrategyType FOREIGN KEY (libraryStrategyType) REFERENCES LibraryStrategyType (libraryStrategyTypeId);
 ALTER TABLE Library ADD CONSTRAINT fk_library_sample FOREIGN KEY (sample_sampleId) REFERENCES Sample (sampleId);
-ALTER TABLE Library DROP CONSTRAINT `library_user_userid_fkey`;
 ALTER TABLE Library ADD CONSTRAINT fk_library_lastModifier_user FOREIGN KEY (lastModifier) REFERENCES User (userId);
 ALTER TABLE Library ADD CONSTRAINT fk_library_securityProfile FOREIGN KEY (securityProfile_profileId) REFERENCES SecurityProfile (profileId);
 

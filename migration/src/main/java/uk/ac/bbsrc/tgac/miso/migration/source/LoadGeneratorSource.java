@@ -130,7 +130,7 @@ public class LoadGeneratorSource implements MigrationSource {
    * Creates a LoadGeneratorSource using the configuration found in properties.
    * 
    * @param properties contains options which include numbers of objects to generate, foreign key IDs from the migration target, and other
-   * settings
+   *          settings
    * @throws IllegalArgumentException if any of the required properties are missing
    */
   public LoadGeneratorSource(MigrationProperties properties) {
@@ -398,6 +398,10 @@ public class LoadGeneratorSource implements MigrationSource {
       log.info("Generating " + poolCount + " pools, each containing " + poolSize + " dilutions...");
       List<Pool> pools = new ArrayList<>();
       List<LibraryDilution> libraryDilutions = getLibraryDilutions();
+      if (libraryDilutions.size() < poolSize) {
+        throw new IllegalStateException(
+            "The pools need to have " + poolSize + " elements, but only " + libraryDilutions.size() + " dilutions are available.");
+      }
       for (int poolNum = 1, libNum = 0; poolNum <= poolCount; poolNum++) {
         Set<LibraryDilution> ldis = new HashSet<>();
         while (ldis.size() < poolSize) {

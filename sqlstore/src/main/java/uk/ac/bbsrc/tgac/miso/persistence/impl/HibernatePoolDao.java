@@ -67,7 +67,7 @@ public class HibernatePoolDao implements PoolStore {
 
   @Override
   public void addWatcher(Pool pool, User watcher) {
-    log.debug("Adding watcher " + watcher.getLoginName() + " to " + pool.getName() + " via WatchManager");
+    log.debug("Adding watcher " + watcher.getLoginName() + " to " + pool.getName());
     pool.addWatcher(watcher);
     currentSession().update(pool);
   }
@@ -247,7 +247,7 @@ public class HibernatePoolDao implements PoolStore {
 
   @Override
   public void removeWatcher(Pool pool, User watcher) {
-    log.debug("Removing watcher " + watcher.getLoginName() + " from " + pool.getWatchableIdentifier() + " via WatchManager");
+    log.debug("Removing watcher " + watcher.getLoginName() + " from " + pool.getWatchableIdentifier());
     pool.removeWatcher(watcher);
     currentSession().update(pool);
 

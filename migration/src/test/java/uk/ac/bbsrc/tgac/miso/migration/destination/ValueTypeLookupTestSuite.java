@@ -138,7 +138,7 @@ public class ValueTypeLookupTestSuite {
     Mockito.when(mgr.getLibraryDao()).thenReturn(libDao);
 
     List<LibraryType> lts = new ArrayList<>();
-    lts.add(makeLibraryType(VALID_LONG, VALID_STRING, VALID_STRING));
+    lts.add(makeLibraryType(VALID_LONG, "Illumina", VALID_STRING));
     Mockito.when(libDao.listAllLibraryTypes()).thenReturn(lts);
 
     HibernateLibraryDesignDao ldDao = Mockito.mock(HibernateLibraryDesignDao.class);
@@ -176,19 +176,19 @@ public class ValueTypeLookupTestSuite {
     seqRefs.add(makeSequencer(VALID_LONG, VALID_STRING));
     Mockito.when(seqRefDao.listAll()).thenReturn(seqRefs);
     Mockito.when(mgr.getSequencerReferenceDao()).thenReturn(seqRefDao);
-    
+
     HibernateDetailedQcStatusDao detQcStatusDao = Mockito.mock(HibernateDetailedQcStatusDao.class);
     List<DetailedQcStatus> qcStatuses = new ArrayList<>();
     qcStatuses.add(makeDetailedQcStatus(VALID_LONG, VALID_STRING));
     Mockito.when(detQcStatusDao.getDetailedQcStatus()).thenReturn(qcStatuses);
     Mockito.when(mgr.getDetailedQcStatusDao()).thenReturn(detQcStatusDao);
-    
+
     HibernateSubprojectDao subProjDao = Mockito.mock(HibernateSubprojectDao.class);
     List<Subproject> subprojs = new ArrayList<>();
     subprojs.add(makeSubproject(VALID_LONG, VALID_STRING));
     Mockito.when(subProjDao.getSubproject()).thenReturn(subprojs);
     Mockito.when(mgr.getSubprojectDao()).thenReturn(subProjDao);
-    
+
     DefaultReferenceGenomeService referenceGenomeService = Mockito.mock(DefaultReferenceGenomeService.class);
     List<ReferenceGenome> referenceGenomes = Lists.newArrayList();
     referenceGenomes.add(makeReferenceGenome(VALID_LONG, VALID_STRING));
@@ -383,12 +383,12 @@ public class ValueTypeLookupTestSuite {
   @Test
   public void testResolveLibraryType() {
     assertNotNull(sut.resolve(makeLibraryType(VALID_LONG, null, null)));
-    assertNotNull(sut.resolve(makeLibraryType(null, VALID_STRING, VALID_STRING)));
+    assertNotNull(sut.resolve(makeLibraryType(null, "Illumina", VALID_STRING)));
     assertNull(sut.resolve((LibraryType) null));
     assertNull(sut.resolve(makeLibraryType(null, null, null)));
     assertNull(sut.resolve(makeLibraryType(INVALID_LONG, null, null)));
     assertNull(sut.resolve(makeLibraryType(null, INVALID_STRING, INVALID_STRING)));
-    assertNull(sut.resolve(makeLibraryType(null, VALID_STRING, null)));
+    assertNull(sut.resolve(makeLibraryType(null, "Illumina", null)));
     assertNull(sut.resolve(makeLibraryType(null, null, VALID_STRING)));
   }
 
@@ -498,7 +498,7 @@ public class ValueTypeLookupTestSuite {
     seq.setId(id == null ? AbstractSequencerReference.UNSAVED_ID : id);
     return seq;
   }
-  
+
   @Test
   public void testResolveDetailedQcStatus() {
     assertNotNull(sut.resolve(makeDetailedQcStatus(VALID_LONG, null)));
@@ -508,14 +508,14 @@ public class ValueTypeLookupTestSuite {
     assertNull(sut.resolve(makeDetailedQcStatus(INVALID_LONG, null)));
     assertNull(sut.resolve(makeDetailedQcStatus(null, INVALID_STRING)));
   }
-  
+
   private DetailedQcStatus makeDetailedQcStatus(Long id, String description) {
     DetailedQcStatus qcDet = new DetailedQcStatusImpl();
     qcDet.setId(id);
     qcDet.setDescription(description);
     return qcDet;
   }
-  
+
   @Test
   public void testResolveSubproject() {
     assertNotNull(sut.resolve(makeSubproject(VALID_LONG, null)));
@@ -525,14 +525,14 @@ public class ValueTypeLookupTestSuite {
     assertNull(sut.resolve(makeSubproject(INVALID_LONG, null)));
     assertNull(sut.resolve(makeSubproject(null, INVALID_STRING)));
   }
-  
+
   private Subproject makeSubproject(Long id, String alias) {
     Subproject sp = new SubprojectImpl();
     sp.setId(id);
     sp.setAlias(alias);
     return sp;
   }
-  
+
   @Test
   public void testResolveReferenceGenome() throws Exception {
     assertThat("ref with valid alias", sut.resolve(makeReferenceGenome(VALID_LONG, VALID_STRING)), is(notNullValue()));

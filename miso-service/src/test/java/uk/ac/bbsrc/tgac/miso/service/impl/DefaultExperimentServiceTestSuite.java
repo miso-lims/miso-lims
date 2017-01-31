@@ -11,15 +11,17 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.InjectMocks;
+import org.mockito.Matchers;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-import com.eaglegenomics.simlims.core.User;
-
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.ExperimentStore;
 import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PlatformStore;
@@ -50,12 +52,15 @@ public class DefaultExperimentServiceTestSuite {
   private KitStore kitStore;
   @Mock
   private AuthorizationManager authorizationManager;
+  @Mock
+  private NamingScheme namingScheme;
   @InjectMocks
   private DefaultExperimentService sut;
 
   @Before
   public void setUp() {
     MockitoAnnotations.initMocks(this);
+    Mockito.when(namingScheme.validateName(Matchers.anyString())).thenReturn(ValidationResult.success());
   }
 
   /**
@@ -76,7 +81,7 @@ public class DefaultExperimentServiceTestSuite {
     when(experimentStore.save(experiment)).thenReturn(expectedReturn);
 
     assertEquals(expectedReturn, sut.save(experiment));
-    verify(experimentStore).save(experiment);
+    verify(experimentStore, times(2)).save(experiment);
   }
 
   /**
@@ -85,10 +90,9 @@ public class DefaultExperimentServiceTestSuite {
    */
   @Test
   public void testSaveExperimentThrows() throws IOException {
-    when(experiment.userCanWrite(any(User.class))).thenReturn(false);
+    doThrow(new IOException()).when(authorizationManager).throwIfNotWritable(any(Experiment.class));
 
     thrown.expect(IOException.class);
-    thrown.expectMessage("User null cannot write to this Experiment");
     sut.save(experiment);
 
     verify(experimentStore, never()).save(experiment);
@@ -124,7 +128,6 @@ public class DefaultExperimentServiceTestSuite {
     doThrow(IOException.class).when(authorizationManager).throwIfNotReadable(any(SecurableByProfile.class));
 
     thrown.expect(IOException.class);
-    thrown.expectMessage("User null cannot read Experiment " + inputId);
 
     sut.get(inputId);
 

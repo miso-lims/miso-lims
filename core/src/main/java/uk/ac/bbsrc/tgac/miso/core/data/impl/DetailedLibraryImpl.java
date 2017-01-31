@@ -121,6 +121,7 @@ public class DetailedLibraryImpl extends LibraryImpl implements DetailedLibrary 
     if (getClass() != obj.getClass()) return false;
     DetailedLibraryImpl other = (DetailedLibraryImpl) obj;
     return new EqualsBuilder()
+        .appendSuper(super.equals(obj))
         .append(archived, other.archived)
         .append(libraryDesign, other.libraryDesign)
         .append(libraryDesignCode, other.libraryDesignCode)
