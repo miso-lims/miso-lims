@@ -18,7 +18,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,8 +74,11 @@ public class SQLSampleDAOTest extends AbstractDAOTest {
 
   @Test
   public void testSaveNew() throws Exception {
+    SecurityProfile profile = new SecurityProfile();
+    profile.setProfileId(1L);
 
     Sample sample = new SampleImpl();
+    sample.setSecurityProfile(profile);
     String sampleName = "latestSample32";
     sample.setName(sampleName);
     sample.setAlias("alias32LK");
@@ -102,7 +104,8 @@ public class SQLSampleDAOTest extends AbstractDAOTest {
 
     Sample sample = dao.get(8);
 
-    SecurityProfile profile = Mockito.mock(SecurityProfile.class);
+    SecurityProfile profile = new SecurityProfile();
+    profile.setProfileId(1L);
     sample.setSecurityProfile(profile);
 
     Project project = new ProjectImpl();
