@@ -89,7 +89,7 @@ CREATE PROCEDURE addInstitute(
   THEN
     SET createUser = getAdminUserId();
     INSERT INTO Institute(alias, createdBy, creationDate, updatedBy, lastUpdated)
-    VALUES (iAlias, createUser, createDate, createUser, createDate);
+    VALUES (iAlias, createUser, createTime, createUser, createTime);
   END IF;
 END//
 
@@ -128,7 +128,7 @@ CREATE PROCEDURE addLab(
     SET errorMessage = CONCAT('Institute ''', iInstituteAlias, ''' not found.');
     SIGNAL SQLSTATE '45000' SET message_text = errorMessage;
   ELSE
-    IF NOT EXISTS (SELECT 1 FROM Lab WHERE institutionId = instId AND alias = iLabAlias) THEN
+    IF NOT EXISTS (SELECT 1 FROM Lab WHERE instituteId = instId AND alias = iLabAlias) THEN
       SET createUser = getAdminUserId();
       INSERT INTO Lab(instituteId, alias, createdBy, creationDate, updatedBy, lastUpdated)
       VALUES (instId, iLabAlias, createUser, createTime, createUser, createTime);
