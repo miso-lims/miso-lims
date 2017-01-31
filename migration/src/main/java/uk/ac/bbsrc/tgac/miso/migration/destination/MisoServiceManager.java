@@ -674,6 +674,7 @@ public class MisoServiceManager {
     SQLTargetedSequencingDAO dao = new SQLTargetedSequencingDAO();
     dao.setJdbcTemplate(jdbcTemplate);
     dao.setSecurityDAO(securityStore);
+    dao.setKitStore(kitDao);
     setTargetedSequencingDao(dao);
   }
 
@@ -766,6 +767,7 @@ public class MisoServiceManager {
   private void updateKitDaoDependencies() {
     if (experimentDao != null) experimentDao.setKitDAO(kitDao);
     if (libraryAdditionalInfoDao != null) libraryAdditionalInfoDao.setKitStore(kitDao);
+    if (targetedSequencingDao != null) targetedSequencingDao.setKitStore(kitDao);
   }
 
   public SQLPlatformDAO getPlatformDao() {

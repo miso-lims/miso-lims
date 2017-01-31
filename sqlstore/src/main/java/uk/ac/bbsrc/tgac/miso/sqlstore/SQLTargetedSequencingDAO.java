@@ -25,7 +25,6 @@ import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
 import uk.ac.bbsrc.tgac.miso.core.store.TargetedSequencingStore;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
@@ -56,9 +55,6 @@ public class SQLTargetedSequencingDAO implements TargetedSequencingStore {
   private CacheManager cacheManager;
 
   @Autowired
-  private DataObjectFactory dataObjectFactory;
-
-  @Autowired
   private SecurityManager securityManager;
 
   @CoverageIgnore
@@ -67,13 +63,12 @@ public class SQLTargetedSequencingDAO implements TargetedSequencingStore {
   }
 
   @CoverageIgnore
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
-  }
-
-  @CoverageIgnore
   public void setSecurityDAO(SecurityStore securityDAO) {
     this.securityDAO = securityDAO;
+  }
+
+  public void setKitStore(KitStore kitStore) {
+    this.kitStore = kitStore;
   }
 
   @CoverageIgnore
@@ -157,7 +152,7 @@ public class SQLTargetedSequencingDAO implements TargetedSequencingStore {
         }
       }
 
-      TargetedSequencing targetedSequencing = dataObjectFactory.getTargetedSequencing();
+      TargetedSequencing targetedSequencing = new TargetedSequencing();
       targetedSequencing.setTargetedSequencingId(id);
       targetedSequencing.setAlias(rs.getString("alias"));
       targetedSequencing.setDescription(rs.getString("description"));

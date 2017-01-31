@@ -115,7 +115,7 @@
 
 <div class="barcodes">
   <div class="barcodeArea ui-corner-all">
-    <span style="float: left; font-size: 24px; font-weight: bold; color:#BBBBBB">ID</span>
+    <span style="float: left; font-size: 24px; font-weight: bold; color:#BBBBBB">Barcode</span>
     <c:if test="${library.id != 0}">
       <ul class="barcode-ddm">
         <li>
@@ -602,11 +602,7 @@
           <th>Targeted Sequencing</th>
         </c:if>
         <th>ID Barcode</th>
-          <%-- <th>Location Barcode</th> --%>
-        <c:if test="${(dil.dilutionCreator eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
-                    or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-          <th align="center">Edit</th>
-        </c:if>
+        <th align="center">Edit</th>
       </tr>
       </thead>
       <tbody>
@@ -668,14 +664,11 @@
 
               </c:if>
             </td>
-            <c:if test="${(sample.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
-                        or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-              <td id="edit${dil.id}" align="center">
-                <a href="javascript:void(0);" onclick="Library.dilution.changeLibraryDilutionRow('${dil.id}',${autoGenerateIdBarcodes}, ${detailedSample})">
-                  <span class="ui-icon ui-icon-pencil"></span>
-                </a>
-              </td>
-            </c:if>
+            <td id="edit${dil.id}" align="center">
+              <a href="javascript:void(0);" onclick="Library.dilution.changeLibraryDilutionRow('${dil.id}',${autoGenerateIdBarcodes}, ${detailedSample})">
+                <span class="ui-icon ui-icon-pencil"></span>
+              </a>
+            </td>
             <td>
               <c:if test="${library.platformName eq 'LS454' or library.platformName eq 'Solid'}">
                 <a href="javascript:void(0);" onclick="Library.empcr.insertEmPcrRow(${dil.id});">Add emPCR</a> 

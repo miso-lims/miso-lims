@@ -16,16 +16,12 @@ import org.springframework.security.core.Authentication;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
 
 public class SQLTargetedSequencingDAOTest extends AbstractDAOTest {
 
   @Autowired
   private JdbcTemplate template;
-
-  @Autowired
-  private DataObjectFactory dataObjectFactory;
 
   @Mock
   private Authentication authenticationMock;
@@ -43,7 +39,6 @@ public class SQLTargetedSequencingDAOTest extends AbstractDAOTest {
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
     dao.setJdbcTemplate(template);
-    dao.setDataObjectFactory(dataObjectFactory);
   }
 
   @Test
