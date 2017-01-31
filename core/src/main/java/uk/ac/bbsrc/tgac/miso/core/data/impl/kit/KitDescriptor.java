@@ -44,6 +44,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLoggable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.KitDescriptorChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
@@ -58,7 +59,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
  */
 @Entity
 @Table(name = "KitDescriptor")
-public class KitDescriptor implements Serializable {
+public class KitDescriptor implements Serializable, ChangeLoggable {
 
   private static final long serialVersionUID = 1L;
 
@@ -324,5 +325,15 @@ public class KitDescriptor implements Serializable {
         .append(platformType, other.platformType)
         .append(version, other.version)
         .isEquals();
+  }
+
+  @Override
+  public ChangeLog createChangeLog(String summary, String columnsChanged, User user) {
+    KitDescriptorChangeLog changeLog = new KitDescriptorChangeLog();
+    changeLog.setKitDescriptor(this);
+    changeLog.setSummary(summary);
+    changeLog.setColumnsChanged(columnsChanged);
+    changeLog.setUser(user);
+    return changeLog;
   }
 }

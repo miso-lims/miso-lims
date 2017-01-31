@@ -41,4 +41,12 @@ public class KitDescriptorChangeLog extends AbstractChangeLog {
     return kitDescriptorChangeLogId;
   }
 
+  public KitDescriptor getKitDescriptor() {
+    return kitDescriptor;
+  }
+
+  public void setKitDescriptor(KitDescriptor kitDescriptor) {
+    this.kitDescriptor = kitDescriptor;
+  }
+
 }

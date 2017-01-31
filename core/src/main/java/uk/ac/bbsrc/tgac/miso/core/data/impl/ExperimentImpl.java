@@ -404,4 +404,14 @@ public class ExperimentImpl implements Experiment, Serializable {
   public boolean userCanWrite(User user) {
     return securityProfile.userCanWrite(user);
   }
+
+  @Override
+  public ChangeLog createChangeLog(String summary, String columnsChanged, User user) {
+    ExperimentChangeLog changeLog = new ExperimentChangeLog();
+    changeLog.setExperiment(this);
+    changeLog.setSummary(summary);
+    changeLog.setColumnsChanged(columnsChanged);
+    changeLog.setUser(user);
+    return changeLog;
+  }
 }

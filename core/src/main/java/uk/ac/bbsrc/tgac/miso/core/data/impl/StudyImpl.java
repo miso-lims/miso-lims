@@ -336,4 +336,14 @@ public class StudyImpl implements Study, Serializable {
   public boolean userCanWrite(User user) {
     return securityProfile.userCanWrite(user);
   }
+
+  @Override
+  public ChangeLog createChangeLog(String summary, String columnsChanged, User user) {
+    StudyChangeLog changeLog = new StudyChangeLog();
+    changeLog.setStudy(this);
+    changeLog.setSummary(summary);
+    changeLog.setColumnsChanged(columnsChanged);
+    changeLog.setUser(user);
+    return changeLog;
+  }
 }

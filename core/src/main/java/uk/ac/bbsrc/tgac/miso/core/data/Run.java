@@ -52,7 +52,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 @JsonIgnoreProperties({ "securityProfile", "submissionDocument" })
 public interface Run
-    extends SecurableByProfile, Comparable<Run>, Reportable, Watchable, Deletable, Nameable, Alertable {
+    extends SecurableByProfile, Comparable<Run>, Reportable, Watchable, Deletable, Nameable, Alertable, ChangeLoggable {
   /** Field PREFIX */
   public static final String PREFIX = "RUN";
 

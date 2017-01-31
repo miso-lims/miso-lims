@@ -306,8 +306,8 @@ public class DefaultMigrationTarget implements MigrationTarget {
     if (changes == null || changes.isEmpty()) throw new IOException("Cannot save sample due to missing changelogs");
     serviceManager.getChangeLogDao().deleteAllById("sample", sample.getId());
     for (ChangeLog change : changes) {
-      change.setUser(migrationUser);
-      serviceManager.getChangeLogDao().create("sample", sample.getId(), change);
+      ChangeLog newChangeLog = sample.createChangeLog(change.getSummary(), change.getColumnsChanged(), migrationUser);
+      serviceManager.getChangeLogDao().create(newChangeLog);
     }
   }
 
@@ -412,8 +412,8 @@ public class DefaultMigrationTarget implements MigrationTarget {
     if (changes == null || changes.isEmpty()) throw new IOException("Cannot save library due to missing changelogs");
     serviceManager.getChangeLogDao().deleteAllById("library", library.getId());
     for (ChangeLog change : changes) {
-      change.setUser(migrationUser);
-      serviceManager.getChangeLogDao().create("library", library.getId(), change);
+      ChangeLog newChangeLog = library.createChangeLog(change.getSummary(), change.getColumnsChanged(), migrationUser);
+      serviceManager.getChangeLogDao().create(newChangeLog);
     }
   }
 

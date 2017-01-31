@@ -34,10 +34,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateChangeLogDao.ChangeLogType;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 @Transactional(rollbackFor = Exception.class)
@@ -283,7 +283,8 @@ public class HibernateBoxDao implements BoxStore {
       currentSession().flush();
       ChangeLogEntry log;
       while ((log = changeLogQueue.poll()) != null) {
-        changeLogStore.create(ChangeLogType.BOX.name(), log.box.getId(), "contents", log.summary, log.box.getLastModifier());
+        ChangeLog changeLog = box.createChangeLog(log.summary, "contents", log.box.getLastModifier());
+        changeLogStore.create(changeLog);
       }
 
       return box.getId();

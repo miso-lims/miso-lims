@@ -42,4 +42,12 @@ public class ExperimentChangeLog extends AbstractChangeLog {
     return experimentChangeLogId;
   }
 
+  public Experiment getExperiment() {
+    return experiment;
+  }
+
+  public void setExperiment(Experiment experiment) {
+    this.experiment = experiment;
+  }
+
 }

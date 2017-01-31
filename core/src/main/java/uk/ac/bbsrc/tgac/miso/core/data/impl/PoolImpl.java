@@ -579,4 +579,14 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
     return securityProfile.userCanWrite(user);
   }
 
+  @Override
+  public ChangeLog createChangeLog(String summary, String columnsChanged, User user) {
+    PoolChangeLog changeLog = new PoolChangeLog();
+    changeLog.setPool(this);
+    changeLog.setSummary(summary);
+    changeLog.setColumnsChanged(columnsChanged);
+    changeLog.setUser(user);
+    return changeLog;
+  }
+
 }

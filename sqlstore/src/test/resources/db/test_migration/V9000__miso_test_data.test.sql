@@ -194,25 +194,26 @@ VALUES (1,'admin','2015-08-27',1,5),
 (14,'admin','2015-08-27',1,5),
 (14,'admin','2015-08-28',1,55);
 
-INSERT INTO `SampleChangeLog`(`sampleId`, `columnsChanged`, `userId`, `message`, `changeTime`)
-VALUES (1, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:47'),
-(1, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:49'),
-(2, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:51'),
-(3, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:53'),
-(4, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:55'),
-(5, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:57'),
-(6, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:59'),
-(7, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:01'),
-(8, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:03'),
-(9, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:05'),
-(10, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:07'),
-(11, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:09'),
-(12, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:11'),
-(13, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:13'),
-(14, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:15'),
-(15, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:17'),
-(16, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:19'),
-(17, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:21');
+INSERT INTO `SampleChangeLog`(`sampleChangeLogId`, `sampleId`, `columnsChanged`, `userId`, `message`, `changeTime`)
+VALUES (1, 1, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:47'),
+(2, 1, 'name', 1, 'TGAC -> Earlham', '2016-07-07 13:30:48'),
+(3, 1, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:49'),
+(4, 2, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:51'),
+(5, 3, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:53'),
+(6, 4, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:55'),
+(7, 5, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:57'),
+(8, 6, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:59'),
+(9, 7, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:01'),
+(10, 8, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:03'),
+(11, 9, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:05'),
+(12, 10, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:07'),
+(13, 11, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:09'),
+(14, 12, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:11'),
+(15, 13, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:13'),
+(16, 14, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:15'),
+(17, 15, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:17'),
+(18, 16, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:19'),
+(19, 17, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:21');
 
 DELETE FROM `Library`;
 INSERT INTO `Library`(`libraryId`, `name`, `description`, `accession`, `securityProfile_profileId`, `sample_sampleId`, `identificationBarcode`, `locationBarcode`, `libraryType`, `concentration`, `creationDate`, `platformName`, `alias`, `paired`, `librarySelectionType`, `libraryStrategyType`, `qcPassed`, `lastModifier`)

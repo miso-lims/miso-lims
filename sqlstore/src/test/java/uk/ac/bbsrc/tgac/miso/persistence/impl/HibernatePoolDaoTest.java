@@ -28,6 +28,7 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
@@ -147,7 +148,7 @@ public class HibernatePoolDaoTest extends AbstractDAOTest {
     testPool.setDescription("Description changed");
     dao.save(testPool);
     // there are changes
-    Mockito.verify(changeLogDao).create("Pool", Matchers.anyLong(), Matchers.anyString(), Matchers.anyString(), Matchers.any(User.class));
+    Mockito.verify(changeLogDao).create(Matchers.any(ChangeLog.class));
     // TODO: a more in depth test in HibernateChangeLogDaoTest
   }
 

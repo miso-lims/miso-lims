@@ -52,7 +52,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
 @JsonTypeName("sample")
 @JsonIgnoreProperties({ "securityProfile", "submissionDocument", "children", "parent" })
-public interface Sample extends SecurableByProfile, Locatable, Reportable, Comparable<Sample>, Deletable, Boxable {
+public interface Sample extends SecurableByProfile, Locatable, Reportable, Comparable<Sample>, Deletable, Boxable, ChangeLoggable {
 
   /** Field UNSAVED_ID */
   public static final Long UNSAVED_ID = 0L;

@@ -57,7 +57,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL) // , using = LibrarySerializer.class)
 @JsonTypeName("library")
 @JsonIgnoreProperties({ "securityProfile" })
-public interface Library extends SecurableByProfile, Comparable<Library>, Barcodable, Locatable, Deletable, Boxable {
+public interface Library extends SecurableByProfile, Comparable<Library>, Barcodable, Locatable, Deletable, Boxable, ChangeLoggable {
 
   /** Field UNSAVED_ID */
   public static final Long UNSAVED_ID = 0L;

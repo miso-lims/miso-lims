@@ -42,7 +42,9 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SequencerPartitionContainerChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 /**
@@ -153,5 +155,15 @@ public class SequencerPartitionContainerImpl extends AbstractSequencerPartitionC
       sb.append("!!!!! NULL PARTITIONS !!!!!");
     }
     return sb.toString();
+  }
+
+  @Override
+  public ChangeLog createChangeLog(String summary, String columnsChanged, User user) {
+    SequencerPartitionContainerChangeLog changeLog = new SequencerPartitionContainerChangeLog();
+    changeLog.setSequencerPartitionContainer(this);
+    changeLog.setSummary(summary);
+    changeLog.setColumnsChanged(columnsChanged);
+    changeLog.setUser(user);
+    return changeLog;
   }
 }
