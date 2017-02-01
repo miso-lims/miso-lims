@@ -696,7 +696,7 @@ public class EditLibraryController {
         }
 
         List<Sample> projectSamples = new ArrayList<>(requestManager.listAllSamplesByProjectId(sample.getProject().getProjectId()));
-        Collections.sort(projectSamples, new AliasComparator<Sample>(Sample.class));
+        Collections.sort(projectSamples, new AliasComparator<>());
         model.put("projectSamples", projectSamples);
 
         String regex = "([A-z0-9]+)_S([A-z0-9]+)_(.*)";
@@ -748,11 +748,6 @@ public class EditLibraryController {
         log.debug("Failed to show library", ex);
       }
       throw ex;
-    } catch (NoSuchMethodException e) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to sort project samples", e);
-      }
-      throw new IOException(e);
     }
   }
 

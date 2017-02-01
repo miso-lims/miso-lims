@@ -459,7 +459,7 @@ public class LibraryControllerHelperService {
 
         try {
           List<Library> sortedList = new ArrayList<>(saveSet);
-          Collections.sort(sortedList, new AliasComparator(Library.class));
+          Collections.sort(sortedList, new AliasComparator<>());
           for (Library library : sortedList) {
             libraryService.create(library);
           }

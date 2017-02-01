@@ -235,31 +235,19 @@ public abstract class AbstractProject implements Project {
   @Override
   public void setSamples(Collection<Sample> samples) {
     this.samples = samples;
-    try {
-      Collections.sort(Lists.newArrayList(this.samples), new AliasComparator<>(Sample.class));
-    } catch (NoSuchMethodException e) {
-      log.error("set samples", e);
-    }
+      Collections.sort(Lists.newArrayList(this.samples), new AliasComparator<Sample>());
   }
 
   @Override
   public void addSample(Sample sample) {
     this.samples.add(sample);
-    try {
-      Collections.sort(Lists.newArrayList(this.samples), new AliasComparator<>(Sample.class));
-    } catch (NoSuchMethodException e) {
-      log.error("set sample", e);
-    }
+      Collections.sort(Lists.newArrayList(this.samples), new AliasComparator<Sample>());
   }
 
   @Override
   public void setStudies(Collection<Study> studies) {
     this.studies = studies;
-    try {
-      Collections.sort(Lists.newArrayList(this.studies), new AliasComparator<>(Study.class));
-    } catch (NoSuchMethodException e) {
-      log.error("set studies", e);
-    }
+      Collections.sort(Lists.newArrayList(this.studies), new AliasComparator<Study>());
   }
 
   @Override
