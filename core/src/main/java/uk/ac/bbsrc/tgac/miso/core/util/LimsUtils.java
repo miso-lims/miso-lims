@@ -250,19 +250,6 @@ public class LimsUtils {
   }
 
   /**
-   * Computes the relative complement of two sets, i.e. those elements that are in A but not in B
-   * 
-   * @param needles of type Set
-   * @param haystack of type Set
-   * @return Set
-   */
-  public static Set relativeComplement(Set needles, Set haystack) {
-    Set diff = (Set) ((HashSet) needles).clone();
-    diff.removeAll(haystack);
-    return diff;
-  }
-
-  /**
    * SLOWLY computes the relative complement of two sets, i.e. those elements that are in A but not in B, based on an object's given
    * accessor to a property.
    * <p/>

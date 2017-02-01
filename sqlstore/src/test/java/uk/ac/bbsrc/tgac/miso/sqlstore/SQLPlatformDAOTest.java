@@ -79,7 +79,7 @@ public class SQLPlatformDAOTest extends AbstractDAOTest {
 
   @Test
   public void testListDistinctPlatformNames() throws IOException {
-    List<String> distinctPlatformNames = dao.listDistinctPlatformNames();
+    List<PlatformType> distinctPlatformNames = dao.listDistinctPlatformNames();
     assertTrue(distinctPlatformNames.size() > 0);
   }
 

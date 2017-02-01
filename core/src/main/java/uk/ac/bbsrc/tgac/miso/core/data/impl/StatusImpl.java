@@ -105,7 +105,7 @@ public class StatusImpl implements Status, Serializable {
 
   @Override
   public String getXml() throws UnsupportedEncodingException {
-    if (xml.length > 0) {
+    if (xml != null && xml.length > 0) {
       return new String(xml, "UTF-8");
     } else {
       return null;

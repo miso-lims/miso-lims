@@ -109,8 +109,8 @@ public class HibernateLibraryDilutionDao implements LibraryDilutionStore {
   @Override
   public Collection<LibraryDilution> listAllLibraryDilutionsByPlatform(PlatformType platformType) throws IOException {
     if (platformType == null) throw new NullPointerException("Cannot look up library dilutions by null platform");
-    Criteria criteria = currentSession().createCriteria(LibraryDilution.class, "ld");
-    criteria.createAlias("ld.library", "library");
+    Criteria criteria = currentSession().createCriteria(LibraryDilution.class);
+    criteria.createAlias("library", "library");
     criteria.add(Restrictions.eq("library.platformType", platformType));
     @SuppressWarnings("unchecked")
     List<LibraryDilution> records = criteria.list();
@@ -152,8 +152,8 @@ public class HibernateLibraryDilutionDao implements LibraryDilutionStore {
   public Collection<LibraryDilution> listAllLibraryDilutionsByProjectAndPlatform(long projectId, PlatformType platformType)
       throws IOException {
     if (platformType == null) throw new NullPointerException("Cannot look up library dilutions by null platform");
-    Criteria criteria = currentSession().createCriteria(LibraryDilution.class, "ld");
-    criteria.createAlias("ld.library", "library").createAlias("library.sample", "sample").createAlias("sample.project", "project");
+    Criteria criteria = currentSession().createCriteria(LibraryDilution.class);
+    criteria.createAlias("library", "library").createAlias("library.sample", "sample").createAlias("sample.project", "project");
     criteria.add(Restrictions.and(Restrictions.eq("project.id", projectId), Restrictions.eq("library.platformType", platformType)));
     @SuppressWarnings("unchecked")
     List<LibraryDilution> records = criteria.list();
