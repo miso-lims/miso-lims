@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.core.manager;
 
 import java.io.IOException;
+import java.util.Properties;
 
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.spi.Spi;
@@ -48,11 +49,13 @@ public interface IssueTrackerManager {
 
   String getBaseTrackerUrl();
 
+  void setConfiguration(Properties properties);
+
   public enum TrackerType {
     JIRA("jira"), RT("RT");
 
     /** Field key */
-    private String key;
+    private final String key;
 
     /**
      * Constructs a TrackerType based on a given key

@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -25,6 +25,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.service.integration.jira;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Properties;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
@@ -41,6 +42,7 @@ import com.sun.jersey.oauth.signature.OAuthSecrets;
 
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.spi.ServiceProvider;
+
 import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
 import uk.ac.bbsrc.tgac.miso.core.util.jira.IssueJsonConverter;
 
@@ -70,26 +72,6 @@ public class JiraIssueManager implements IssueTrackerManager {
   public final String jiraIssueSuffix = restApiUrl + jiraRestApiVersion + "/issue/";
 
   public Client client;
-
-  public void setOAuthConsumerKey(String oAuthConsumerKey) {
-    this.oAuthConsumerKey = oAuthConsumerKey;
-  }
-
-  public void setOAuthConsumerSecret(String oAuthConsumerSecret) {
-    this.oAuthConsumerSecret = oAuthConsumerSecret;
-  }
-
-  public void setOAuthSignatureMethod(String oAuthSignatureMethod) {
-    this.oAuthSignatureMethod = oAuthSignatureMethod;
-  }
-
-  public void setHttpBasicAuthUsername(String httpBasicAuthUsername) {
-    this.httpBasicAuthUsername = httpBasicAuthUsername;
-  }
-
-  public void setHttpBasicAuthPassword(String httpBasicAuthPassword) {
-    this.httpBasicAuthPassword = httpBasicAuthPassword;
-  }
 
   @Override
   public String getBaseTrackerUrl() {
@@ -156,5 +138,67 @@ public class JiraIssueManager implements IssueTrackerManager {
       }
     }
     return wr;
+  }
+
+  private abstract class ConfigValue {
+    private final String name;
+
+    protected ConfigValue(String name) {
+      this.name = "miso.issuetracker.jira." + name;
+    }
+
+    protected abstract void set(String value);
+
+    public void configure(Properties properties) {
+
+      if (properties.containsKey(name)) {
+        set(properties.getProperty(name));
+      }
+    }
+  }
+
+  @Override
+  public void setConfiguration(Properties properties) {
+    for (ConfigValue value : new ConfigValue[] {
+        new ConfigValue("oAuthConsumerKey") {
+
+          @Override
+          protected void set(String value) {
+            oAuthConsumerKey = value;
+          }
+
+        }, new ConfigValue("oAuthConsumerSecret") {
+
+          @Override
+          protected void set(String value) {
+            oAuthConsumerSecret = value;
+          }
+
+        }, new ConfigValue("oAuthSignatureMethod") {
+
+          @Override
+          protected void set(String value) {
+            oAuthSignatureMethod = value;
+          }
+
+        }, new ConfigValue("httpBasicAuthUsername") {
+
+          @Override
+          protected void set(String value) {
+            httpBasicAuthUsername = value;
+          }
+
+        }, new ConfigValue("httpBasicAuthPassword") {
+
+          @Override
+          protected void set(String value) {
+            httpBasicAuthPassword = value;
+          }
+
+        }
+
+    }) {
+      value.configure(properties);
+    }
   }
 }
