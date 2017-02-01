@@ -38,8 +38,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -49,11 +47,8 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ConcurrentModificationException;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
@@ -201,64 +196,6 @@ public class LimsUtils {
     return buffer.toString();
   }
 
-  /**
-   * SLOWLY computes the relative complement of two sets, i.e. those elements that are in A but not in B, based on an object's given
-   * accessor to a property.
-   * <p/>
-   * This is distinctly less efficient than {@link uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.relativeComplement()} (this method uses
-   * reflection) but can avoid comparing objects by hashcode. This is useful when trying to compare objects that have been persisted, and
-   * therefore have unique IDs and Names, to objects that haven't, and hence have no ID or Name.
-   * <p/>
-   * If an exception occurs, null is returned.
-   * 
-   * @param c of type Class
-   * @param needles of type Set
-   * @param haystack of type Set
-   * @return Set
-   */
-  public static <T> Set<T> relativeComplementByProperty(Class<T> c, String methodName, HashSet<T> needles, Set<T> haystack) {
-    try {
-      Method m = c.getMethod(methodName);
-      @SuppressWarnings("unchecked")
-      Set<T> diff = (Set<T>) (needles).clone();
-
-      if (diff.size() > haystack.size()) {
-        for (Iterator<?> i = haystack.iterator(); i.hasNext();) {
-          Object h = i.next();
-          String hProp = (String) m.invoke(h);
-          for (Iterator<?> j = diff.iterator(); j.hasNext();) {
-            Object n = j.next();
-            String nProp = (String) m.invoke(n);
-            if (nProp.equals(hProp)) {
-              j.remove();
-            }
-          }
-        }
-      } else {
-        for (Iterator<?> i = diff.iterator(); i.hasNext();) {
-          Object n = i.next();
-          String nProp = (String) m.invoke(n);
-          for (Iterator<?> j = haystack.iterator(); j.hasNext();) {
-            Object h = j.next();
-            String hProp = (String) m.invoke(h);
-            if (nProp.equals(hProp)) {
-              i.remove();
-            }
-          }
-        }
-      }
-      return diff;
-    } catch (ConcurrentModificationException e) {
-      log.error("Backing set modification outside iterator.", e);
-    } catch (NoSuchMethodException e) {
-      log.error("Class " + c.getName() + " doesn't declare a " + methodName + " method.", e);
-    } catch (InvocationTargetException e) {
-      log.error("Cannot invoke " + methodName + " on class " + c.getName(), e);
-    } catch (IllegalAccessException e) {
-      log.error("Cannot invoke " + methodName + " on class " + c.getName(), e);
-    }
-    return null;
-  }
 
   public static String findHyperlinks(String text) {
     if (!LimsUtils.isStringEmptyOrNull(text)) {
