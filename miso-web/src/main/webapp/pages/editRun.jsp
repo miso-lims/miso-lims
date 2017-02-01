@@ -762,7 +762,6 @@
 
 <br/>
 </form:form>
-</div>
 <c:if test="${not empty run.changeLogs}">
   <br/>
   <h1>Changes</h1>
@@ -787,6 +786,7 @@
     </table>
   </div>
 </c:if>
+</div>
 </div>
 
 <%@ include file="adminsub.jsp" %>
