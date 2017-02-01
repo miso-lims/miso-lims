@@ -901,11 +901,10 @@ public class UserAuthMisoRequestManager implements RequestManager {
 
   @Override
   public void deleteRunNote(Run run, Long noteId) throws IOException {
-    if (writeCheck(run)) {
-      // TODO: when Hibernatized, should call authorizationManager.throwIfNonAdminOrMatchingOwner(note.getOwner()) too
+    if (getCurrentUser().isAdmin()) { // should use authorizationManager.throwIfNonAdminOrMatchingOwner(note.getOwner())
       backingManager.deleteRunNote(run, noteId);
     } else {
-      throw new IOException("User " + getCurrentUser().getFullName() + " cannot write to this Run");
+      throw new IOException("User " + getCurrentUser().getFullName() + " cannot delete this note");
     }
   }
 
@@ -917,21 +916,19 @@ public class UserAuthMisoRequestManager implements RequestManager {
 
   @Override
   public void deletePoolNote(Pool pool, Long noteId) throws IOException {
-    if (writeCheck(pool)) {
-      // TODO: when Hibernatized, should call authorizationManager.throwIfNonAdminOrMatchingOwner(note.getOwner()) too
+    if (getCurrentUser().isAdmin()) { // should use authorizationManager.throwIfNonAdminOrMatchingOwner(note.getOwner())
       backingManager.deletePoolNote(pool, noteId);
     } else {
-      throw new IOException("User " + getCurrentUser().getFullName() + " cannot write to this Pool");
+      throw new IOException("User " + getCurrentUser().getFullName() + " cannot delete this note");
     }
   }
 
   @Override
   public void deleteProjectOverviewNote(ProjectOverview projectOverview, Long noteId) throws IOException {
-    if (writeCheck(projectOverview.getProject())) {
-      // TODO: when Hibernatized, should call authorizationManager.throwIfNonAdminOrMatchingOwner(note.getOwner()) too
+    if (getCurrentUser().isAdmin()) { // should use authorizationManager.throwIfNonAdminOrMatchingOwner(note.getOwner())
       backingManager.deleteProjectOverviewNote(projectOverview, noteId);
     } else {
-      throw new IOException("User " + getCurrentUser().getFullName() + " cannot write to the parent Project");
+      throw new IOException("User " + getCurrentUser().getFullName() + " cannot delete this note");
     }
   }
 
@@ -957,6 +954,7 @@ public class UserAuthMisoRequestManager implements RequestManager {
   @Override
   public void saveRunNote(Run run, Note note) throws IOException {
     if (writeCheck(run)) {
+      note.setOwner(getCurrentUser());
       backingManager.saveRunNote(run, note);
     } else {
       throw new IOException("User " + getCurrentUser().getFullName() + " cannot write to this Run");

@@ -1048,7 +1048,6 @@ public class MisoRequestManager implements RequestManager {
   public void saveProjectOverviewNote(ProjectOverview overview, Note note) throws IOException {
     ProjectOverview managed = projectStore.getProjectOverviewById(overview.getId());
     note.setCreationDate(new Date());
-    // TODO: when moved to Service: note.setOwner(authorizationManager.getCurrentUser());
     managed.getNotes().add(note);
     projectStore.saveOverview(managed);
   }
@@ -1138,7 +1137,6 @@ public class MisoRequestManager implements RequestManager {
   public void saveRunNote(Run run, Note note) throws IOException {
     Run managed = runStore.get(run.getId());
     note.setCreationDate(new Date());
-    // TODO: when moved to Service: note.setOwner(authorizationManager.getCurrentUser());
     managed.addNote(note);
     runStore.save(managed);
   }
@@ -1223,7 +1221,6 @@ public class MisoRequestManager implements RequestManager {
   public void savePoolNote(Pool pool, Note note) throws IOException {
     Pool managed = poolStore.get(pool.getId());
     note.setCreationDate(new Date());
-    // TODO: when moved to Service: note.setOwner(authorizationManager.getCurrentUser());
     managed.addNote(note);
     poolStore.save(managed);
   }
