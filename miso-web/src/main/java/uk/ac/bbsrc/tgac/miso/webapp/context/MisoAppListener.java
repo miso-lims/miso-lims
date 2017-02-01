@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -25,8 +25,6 @@ package uk.ac.bbsrc.tgac.miso.webapp.context;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.Map;
 
@@ -120,28 +118,12 @@ public class MisoAppListener implements ServletContextListener {
     if ("true".equals(misoProperties.get("miso.issuetracker.enabled"))) {
       String trackerType = misoProperties.get("miso.issuetracker.tracker");
       if (!isStringEmptyOrNull(trackerType)) {
-        try {
-          IssueTrackerManager manager = IssueTrackerFactory.newInstance().getTrackerManager(trackerType);
-          if (manager != null) {
-            for (String key : misoProperties.keySet()) {
-              if (key.startsWith("miso.issuetracker." + trackerType)) {
-                String prop = key.substring(key.lastIndexOf(".") + 1);
-                String methodName = "set" + LimsUtils.capitalise(prop); // prop.substring(0,1).toUpperCase() + prop.substring(1);
-                Method m = manager.getClass().getDeclaredMethod(methodName, String.class);
-                m.invoke(manager, misoProperties.get(key));
-              }
-            }
-            ((DefaultListableBeanFactory) context.getBeanFactory()).removeBeanDefinition("issueTrackerManager");
-            context.getBeanFactory().registerSingleton("issueTrackerManager", manager);
-          } else {
-            log.error("No such issue tracker available with given type: " + trackerType);
-          }
-        } catch (NoSuchMethodException e) {
-          log.error("Unable to start the defined issuetracker " + trackerType, e);
-        } catch (InvocationTargetException e) {
-          log.error("Unable to start the defined issuetracker " + trackerType, e);
-        } catch (IllegalAccessException e) {
-          log.error("Unable to start the defined issuetracker " + trackerType, e);
+        IssueTrackerManager manager = IssueTrackerFactory.newInstance().getTrackerManager(trackerType);
+        if (manager != null) {
+          ((DefaultListableBeanFactory) context.getBeanFactory()).removeBeanDefinition("issueTrackerManager");
+          context.getBeanFactory().registerSingleton("issueTrackerManager", manager);
+        } else {
+          log.error("No such issue tracker available with given type: " + trackerType);
         }
       }
     }
