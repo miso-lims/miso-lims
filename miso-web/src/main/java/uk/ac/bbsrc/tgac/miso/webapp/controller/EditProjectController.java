@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -203,34 +203,26 @@ public class EditProjectController {
 
   public Collection<Run> populateProjectRuns(long projectId) throws IOException {
     List<Run> runs = new ArrayList<>(requestManager.listAllRunsByProjectId(projectId));
-    try {
-      Collections.sort(runs, new AliasComparator(Run.class));
+    Collections.sort(runs, new AliasComparator<>());
       for (Run r : runs) {
         RunImpl ri = (RunImpl) r;
         ri.setSequencerPartitionContainers(new ArrayList<>(
             requestManager.listSequencerPartitionContainersByRunId(r.getId())));
       }
       return runs;
-    } catch (NoSuchMethodException e) {
-      throw new IOException(e);
-    }
   }
 
   public Collection<Library> populateProjectLibraries(long projectId) throws IOException {
     List<Library> libraries = new ArrayList<>(libraryService.listByProjectId(projectId));
-    try {
-      Collections.sort(libraries, new AliasComparator(Library.class));
-      for (Library l : libraries) {
-        for (LibraryQC qc : requestManager.listAllLibraryQCsByLibraryId(l.getId())) {
-          try {
-            l.addQc(qc);
-          } catch (MalformedLibraryQcException e) {
-            throw new IOException(e);
-          }
+    Collections.sort(libraries, new AliasComparator<>());
+    for (Library l : libraries) {
+      for (LibraryQC qc : requestManager.listAllLibraryQCsByLibraryId(l.getId())) {
+        try {
+          l.addQc(qc);
+        } catch (MalformedLibraryQcException e) {
+          throw new IOException(e);
         }
       }
-    } catch (NoSuchMethodException e) {
-      throw new IOException(e);
     }
 
     return libraries;

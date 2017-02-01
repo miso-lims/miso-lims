@@ -103,7 +103,7 @@ public class FormUtils {
   private static final Pattern samplePattern = Pattern.compile("([A-z0-9]+)_S([A-z0-9]+)_(.*)");
 
   public static void createSampleInputSpreadsheet(Collection<Sample> samples, File outpath) throws Exception {
-    Collections.sort(new ArrayList<>(samples), new AliasComparator<Sample>(Sample.class));
+    Collections.sort(new ArrayList<>(samples), new AliasComparator<>());
 
     InputStream in = null;
     if (outpath.getName().endsWith(".xlsx")) {
@@ -1060,7 +1060,7 @@ public class FormUtils {
   }
 
   public static OdfTextDocument createSampleDeliveryForm(List<Sample> samples, File outpath, Boolean plate) throws Exception {
-    Collections.sort(samples, new AliasComparator<Sample>(Sample.class));
+    Collections.sort(samples, new AliasComparator<>());
 
     InputStream in = FormUtils.class.getResourceAsStream("/forms/odt/sampleDeliveryForm.odt");
 
