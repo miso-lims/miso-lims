@@ -39,7 +39,7 @@ public class HibernateRunDao implements RunStore {
   private SessionFactory sessionFactory;
   @Autowired
   private SecurityStore securityStore;
-
+  @Autowired
   private JdbcTemplate template;
 
   private Session currentSession() {
@@ -258,9 +258,13 @@ public class HibernateRunDao implements RunStore {
       throws IOException {
     if (offset < 0 || limit < 0) throw new IOException("Limit and Offset must not be less than zero");
     if ("lastModified".equals(sortCol)) sortCol = "derivedInfo.lastModified";
+    if ("lastUpdated".equals(sortCol)) sortCol = "status.lastUpdated";
     Criteria criteria = currentSession().createCriteria(RunImpl.class);
-    criteria.add(DbUtils.searchRestrictions(querystr, "name", "alias", "description"));
+    if (querystr != null) {
+      criteria.add(DbUtils.searchRestrictions(querystr, "name", "alias", "description"));
+    }
     criteria.createAlias("derivedInfo", "derivedInfo");
+    criteria.createAlias("status", "status");
     criteria.setFirstResult(offset);
     criteria.setMaxResults(limit);
     criteria.addOrder("asc".equalsIgnoreCase(sortDir) ? Order.asc(sortCol) : Order.desc(sortCol));
@@ -271,16 +275,7 @@ public class HibernateRunDao implements RunStore {
 
   @Override
   public List<Run> listByOffsetAndNumResults(int offset, int limit, String sortDir, String sortCol) throws IOException {
-    if (offset < 0 || limit < 0) throw new IOException("Limit and Offset must not be less than zero");
-    if ("lastModified".equals(sortCol)) sortCol = "derivedInfo.lastModified";
-    Criteria criteria = currentSession().createCriteria(RunImpl.class);
-    criteria.createAlias("derivedInfo", "derivedInfo");
-    criteria.setFirstResult(offset);
-    criteria.setMaxResults(limit);
-    criteria.addOrder("asc".equalsIgnoreCase(sortDir) ? Order.asc(sortCol) : Order.desc(sortCol));
-    @SuppressWarnings("unchecked")
-    List<Run> runs = criteria.list();
-    return withWatcherGroup(runs);
+    return listBySearchOffsetAndNumResults(offset, limit, null, sortDir, sortCol);
   }
 
   @Override

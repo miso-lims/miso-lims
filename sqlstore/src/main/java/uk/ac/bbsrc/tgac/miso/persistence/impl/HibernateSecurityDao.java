@@ -67,6 +67,7 @@ public class HibernateSecurityDao implements SecurityStore {
   @Autowired
   private SessionFactory sessionFactory;
 
+  @Autowired
   private JdbcTemplate template;
 
   private Session currentSession() {

@@ -655,7 +655,11 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public Collection<String> listDistinctPlatformNames() throws IOException {
     if (platformStore != null) {
-      return platformStore.listDistinctPlatformNames();
+      List<String> names = new ArrayList<>();
+      for (PlatformType type : platformStore.listDistinctPlatformNames() ) {
+        names.add(type.getKey());
+      }
+      return names;
     } else {
       throw new IOException("No platformStore available. Check that it has been declared in the Spring config.");
     }

@@ -107,11 +107,11 @@ public class HibernatePlatformDao implements PlatformStore {
   }
 
   @Override
-  public List<String> listDistinctPlatformNames() throws IOException {
+  public List<PlatformType> listDistinctPlatformNames() throws IOException {
     Criteria criteria = currentSession().createCriteria(PlatformImpl.class);
     criteria.setProjection(Projections.distinct(Projections.property("platformType")));
     @SuppressWarnings("unchecked")
-    List<String> records = criteria.list();
+    List<PlatformType> records = criteria.list();
     return records;
   }
 

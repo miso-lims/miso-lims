@@ -133,6 +133,7 @@
       <props>
         <prop key="hibernate.dialect">org.hibernate.dialect.MySQL5InnoDBDialect</prop>
         <prop key="hibernate.show_sql">true</prop>
+        <prop key="hibernate.enable_lazy_load_no_trans">true</prop>
       </props>
     </property>
   </bean>

@@ -385,8 +385,8 @@
 <tr>
   <td class="h">Location:</td>
   <td>
-    <c:if test="${!empty library.boxLocation}">${library.boxLocation},</c:if>
-    <c:if test="${!empty library.boxPosition}"><a href='<c:url value="/miso/box/${library.boxId}"/>'>${library.boxAlias}, ${library.boxPosition}</a></c:if>
+    <c:if test="${!empty library.box.locationBarcode}">${ library.box.locationBarcode},</c:if>
+    <c:if test="${!empty library.boxPosition}"><a href='<c:url value="/miso/box/${library.box.id}"/>'>${library.box.alias}, ${library.boxPosition}</a></c:if>
   </td>
 </tr>
 </table>

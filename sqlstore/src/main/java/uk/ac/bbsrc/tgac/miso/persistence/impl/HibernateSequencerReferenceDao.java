@@ -119,6 +119,7 @@ public class HibernateSequencerReferenceDao implements SequencerReferenceStore {
   @Override
   public Collection<SequencerReference> listByPlatformType(PlatformType platformType) throws IOException {
     Criteria criteria = currentSession().createCriteria(SequencerReferenceImpl.class);
+    criteria.createAlias("platform", "platform");
     criteria.add(Restrictions.eq("platform.platformType", platformType));
     return criteria.list();
   }
