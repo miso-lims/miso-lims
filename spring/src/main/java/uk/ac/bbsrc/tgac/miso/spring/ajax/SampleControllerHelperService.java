@@ -29,8 +29,6 @@ import static uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils.getBarco
 import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,7 +40,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpSession;
@@ -56,7 +53,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.eaglegenomics.simlims.core.Note;
-import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
@@ -70,7 +66,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeFactory;
@@ -78,7 +73,6 @@ import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
-import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.TaxonomyUtils;
 import uk.ac.bbsrc.tgac.miso.service.PrinterService;
@@ -166,123 +160,6 @@ public class SampleControllerHelperService {
     } catch (Exception e) {
       log.error("Exception in validateSampleAlias", e);
       throw e;
-    }
-  }
-
-  public JSONObject bulkSaveSamples(HttpSession session, JSONObject json) {
-    if (json.has("samples")) {
-      try {
-        User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-        Project p = requestManager.getProjectById(json.getLong("projectId"));
-        SecurityProfile sp = p.getSecurityProfile();
-        JSONArray a = JSONArray.fromObject(json.get("samples"));
-        HashSet<Sample> saveSet = new HashSet<>();
-
-        for (JSONObject j : (Iterable<JSONObject>) a) {
-          try {
-            String alias = j.getString("alias");
-
-            ValidationResult aliasValidation = namingScheme.validateSampleAlias(alias);
-            if (aliasValidation.isValid()) {
-              String descr = j.getString("description");
-              String scientificName = j.getString("scientificName");
-              DateFormat df = new SimpleDateFormat("yyyy-mm-dd");
-              String type = j.getString("sampleType");
-
-              Sample news = new SampleImpl();
-              news.setProject(p);
-              news.setAlias(alias);
-              news.setDescription(descr);
-              news.setScientificName(scientificName);
-              news.setSecurityProfile(sp);
-              news.setSampleType(type);
-              news.setLastModifier(user);
-
-              if (j.has("receivedDate") && !isStringEmptyOrNull(j.getString("receivedDate"))) {
-                Date date = df.parse(j.getString("receivedDate"));
-                news.setReceivedDate(date);
-              }
-
-              if (j.has("note") && !isStringEmptyOrNull(j.getString("note"))) {
-                Note note = new Note();
-                note.setOwner(sp.getOwner());
-                note.setText(j.getString("note"));
-                note.setInternalOnly(true);
-
-                if (j.has("receivedDate") && !isStringEmptyOrNull(j.getString("receivedDate"))) {
-                  Date date = df.parse(j.getString("receivedDate"));
-                  note.setCreationDate(date);
-                } else {
-                  note.setCreationDate(new Date());
-                }
-
-                if (j.has("identificationBarcode") && !isStringEmptyOrNull(j.getString("identificationBarcode"))) {
-                  String idBarcode = j.getString("identificationBarcode");
-                  news.setIdentificationBarcode(idBarcode);
-                }
-
-                news.setNotes(Arrays.asList(note));
-              }
-
-              saveSet.add(news);
-            } else {
-              return JSONUtils.SimpleJSONError("The following sample alias doesn't conform to the chosen naming scheme ("
-                  + aliasValidation.getMessage() + ") or already exists: " + j.getString("alias"));
-            }
-          } catch (ParseException e) {
-            log.error("Cannot parse date for sample", e);
-            return JSONUtils.SimpleJSONError("Cannot parse date for sample " + j.getString("alias"));
-          }
-        }
-
-        Set<Sample> samples = new HashSet<>(sampleService.getAll());
-        // relative complement to find objects that aren't already persisted
-        Set<Sample> complement = LimsUtils.relativeComplementByProperty(Sample.class, "getAlias", saveSet, samples);
-
-        if (complement != null && !complement.isEmpty()) {
-          List<Sample> sortedList = new ArrayList<>(complement);
-          List<String> savedSamples = new ArrayList<>();
-          List<String> taxonErrorSamples = new ArrayList<>();
-          Collections.sort(sortedList, new AliasComparator(Sample.class));
-
-          for (Sample sample : sortedList) {
-            if ((Boolean) session.getServletContext().getAttribute("taxonLookupEnabled")) {
-              log.info("Checking taxon: " + sample.getScientificName());
-              String taxon = TaxonomyUtils.checkScientificNameAtNCBI(sample.getScientificName());
-              if (taxon != null) {
-                sample.setTaxonIdentifier(taxon);
-                taxonErrorSamples.add(sample.getAlias());
-              }
-            }
-
-            try {
-              sample.setLastModifier(user);
-              sampleService.create(sample);
-              savedSamples.add(sample.getAlias());
-              log.info("Saved: " + sample.getAlias());
-            } catch (IOException e) {
-              log.error("Couldn't save: " + sample.getAlias(), e);
-            }
-          }
-
-          Map<String, Object> response = new HashMap<>();
-          response.put("savedSamples", JSONArray.fromObject(savedSamples));
-          response.put("taxonErrorSamples", JSONArray.fromObject(taxonErrorSamples));
-
-          return JSONUtils.JSONObjectResponse(response);
-        } else {
-          return JSONUtils
-              .SimpleJSONError("Error in saving samples - perhaps samples specified already exist in the database with a given alias?");
-        }
-      } catch (NoSuchMethodException e) {
-        log.error("Cannot save samples for project", e);
-        return JSONUtils.SimpleJSONError("Cannot save samples for project " + json.getLong("projectId") + ": " + e.getMessage());
-      } catch (IOException e) {
-        log.error("Cannot save samples for project", e);
-        return JSONUtils.SimpleJSONError("Cannot save samples for project " + json.getLong("projectId") + ": " + e.getMessage());
-      }
-    } else {
-      return JSONUtils.SimpleJSONError("No samples specified");
     }
   }
 
