@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
  * system encoding.
  */
 public class UnicodeReader extends Reader {
-  protected static final Logger log = LoggerFactory.getLogger(UnicodeReader.class);
+  private static final Logger log = LoggerFactory.getLogger(UnicodeReader.class);
   PushbackInputStream internalIn;
   InputStreamReader internalIn2 = null;
   String defaultEnc;

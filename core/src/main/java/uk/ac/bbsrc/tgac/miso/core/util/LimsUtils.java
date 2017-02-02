@@ -26,7 +26,6 @@ package uk.ac.bbsrc.tgac.miso.core.util;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.File;
@@ -37,11 +36,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
@@ -51,19 +47,13 @@ import java.net.URL;
 import java.nio.CharBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.AbstractList;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
@@ -115,7 +105,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 public class LimsUtils {
   public static final long SYSTEM_USER_ID = 0;
 
-  protected static final Logger log = LoggerFactory.getLogger(LimsUtils.class);
+  private static final Logger log = LoggerFactory.getLogger(LimsUtils.class);
 
   public static String unicodeify(String barcode) {
     log.debug("ORIGINAL :: " + barcode);
@@ -176,17 +166,19 @@ public class LimsUtils {
    * @return String
    * @throws IllegalArgumentException
    */
-  public static String join(Collection s, String delimiter) throws IllegalArgumentException {
+  public static String join(Iterable<?> s, String delimiter) throws IllegalArgumentException {
     if (s == null) {
       throw new IllegalArgumentException("Collection to join must not be null");
     }
     StringBuffer buffer = new StringBuffer();
-    Iterator iter = s.iterator();
-    while (iter.hasNext()) {
-      buffer.append(iter.next());
-      if (iter.hasNext() && delimiter != null) {
+    boolean first = true;
+    for (Object o : s) {
+      if (first) {
+        first = false;
+      } else {
         buffer.append(delimiter);
       }
+      buffer.append(o);
     }
     return buffer.toString();
   }
@@ -207,46 +199,6 @@ public class LimsUtils {
       }
     }
     return buffer.toString();
-  }
-
-  public static <T> List<List<T>> partition(List<T> list, int size) {
-
-    if (list == null) throw new NullPointerException("'list' must not be null");
-    if (!(size > 0)) throw new IllegalArgumentException("'size' must be greater than 0");
-
-    return new Partition<>(list, size);
-  }
-
-  private static class Partition<T> extends AbstractList<List<T>> {
-
-    final List<T> list;
-    final int size;
-
-    Partition(List<T> list, int size) {
-      this.list = list;
-      this.size = size;
-    }
-
-    @Override
-    public List<T> get(int index) {
-      int listSize = size();
-      if (listSize < 0) throw new IllegalArgumentException("negative size: " + listSize);
-      if (index < 0) throw new IndexOutOfBoundsException("index " + index + " must not be negative");
-      if (index >= listSize) throw new IndexOutOfBoundsException("index " + index + " must be less than size " + listSize);
-      int start = index * size;
-      int end = Math.min(start + size, list.size());
-      return list.subList(start, end);
-    }
-
-    @Override
-    public int size() {
-      return (list.size() + size - 1) / size;
-    }
-
-    @Override
-    public boolean isEmpty() {
-      return list.isEmpty();
-    }
   }
 
   /**
@@ -331,10 +283,6 @@ public class LimsUtils {
      * if (locationBarcode is valid) { retrieve text representation of location and return } else { return null; }
      */
     return locationBarcode;
-  }
-
-  public static void unzipFile(File source) {
-    unzipFile(source, null);
   }
 
   public static boolean unzipFile(File source, File destination) {
@@ -492,7 +440,7 @@ public class LimsUtils {
    * @return Map<String, String>
    * @throws IOException when
    */
-  public static Map<String, String> checkPipes(Process process) throws IOException {
+  static Map<String, String> checkPipes(Process process) throws IOException {
     HashMap<String, String> r = new HashMap<>();
     String error = LimsUtils.processStdErr(process);
     if (isStringEmptyOrNull(error)) {
@@ -504,19 +452,6 @@ public class LimsUtils {
       r.put("error", error);
     }
     return r;
-  }
-
-  public static byte[] objectToByteArray(Object o) throws IOException {
-    ByteArrayOutputStream bout = new ByteArrayOutputStream();
-    ObjectOutputStream oos = new ObjectOutputStream(bout);
-    oos.writeObject(o);
-    return bout.toByteArray();
-  }
-
-  public static Object byteArrayToObject(byte[] bytes) throws IOException, ClassNotFoundException {
-    ByteArrayInputStream bin = new ByteArrayInputStream(bytes);
-    ObjectInputStream ois = new ObjectInputStream(bin);
-    return ois.readObject();
   }
 
   /**
@@ -550,6 +485,7 @@ public class LimsUtils {
     while ((line = br.readLine()) != null) {
       sb.append(line);
     }
+    br.close();
     return sb.toString();
   }
 
@@ -558,24 +494,6 @@ public class LimsUtils {
     p.println(s);
     safeClose(p);
     return f;
-  }
-
-  /**
-   * Reads the contents of an InputStream into a byte[]
-   * 
-   * @param in of type InputStream
-   * @return byte[]
-   * @throws IOException when
-   */
-  public static byte[] inputStreamToByteArray(InputStream in) throws IOException {
-    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-    int nRead;
-    byte[] data = new byte[16384];
-    while ((nRead = in.read(data, 0, data.length)) != -1) {
-      buffer.write(data, 0, nRead);
-    }
-    buffer.flush();
-    return buffer.toByteArray();
   }
 
   /**
@@ -613,9 +531,9 @@ public class LimsUtils {
     return df.format(date);
   }
 
-  public static final Pattern linePattern = Pattern.compile(".*\r?\n");
+  private static final Pattern linePattern = Pattern.compile(".*\r?\n");
 
-  public static Matcher grep(CharBuffer cb, Pattern pattern) {
+  private static Matcher grep(CharBuffer cb, Pattern pattern) {
     Matcher lm = linePattern.matcher(cb); // Line matcher
     Matcher pm = null; // Pattern matcher
     while (lm.find()) {
@@ -632,30 +550,7 @@ public class LimsUtils {
     return null;
   }
 
-  public static Matcher grep(File f, Pattern p) throws IOException {
-    // Charset and decoder for ISO-8859-15
-    Charset charset = Charset.forName("ISO-8859-15");
-    CharsetDecoder decoder = charset.newDecoder();
 
-    // Open the file and then get a channel from the stream
-    FileInputStream fis = new FileInputStream(f);
-    FileChannel fc = fis.getChannel();
-
-    // Get the file's size and then map it into memory
-    int sz = (int) fc.size();
-    MappedByteBuffer bb = fc.map(FileChannel.MapMode.READ_ONLY, 0, sz);
-
-    // Decode the file into a char buffer
-    CharBuffer cb = decoder.decode(bb);
-
-    // Perform the search
-    Matcher m = grep(cb, p);
-
-    // Close the channel and the stream
-    fc.close();
-
-    return m;
-  }
 
   public static Matcher tailGrep(File f, Pattern p, int lines) throws IOException, FileNotFoundException {
     // Open the file and then get a channel from the stream
@@ -698,26 +593,6 @@ public class LimsUtils {
     }
   }
 
-  public static String reflectString(Object o) {
-    StringBuilder result = new StringBuilder();
-    try {
-      result.append(o.getClass().getName());
-      result.append("\n————————————\n");
-      Class c = o.getClass();
-      Field fieldList[] = c.getDeclaredFields();
-      for (Field entry : fieldList) {
-        result.append(entry.getName());
-        result.append(":");
-        result.append(entry.get(o));
-        result.append("\n");
-      }
-    } catch (Exception e) {
-      log.error("reflect string", e);
-      result.append("\n\nERROR: " + e.getMessage() + "\n\n");
-    }
-    return result.toString();
-  }
-
   // put this anywhere you like in your common code.
   public static void safeClose(Closeable c) {
     try {
@@ -729,34 +604,6 @@ public class LimsUtils {
 
   public static String capitalise(String s) {
     return Character.toUpperCase(s.charAt(0)) + s.substring(1);
-  }
-
-  public static String noddyCamelCaseify(String s) {
-    return Character.toLowerCase(s.charAt(0)) + s.substring(1);
-  }
-
-  public static List<Class<?>> getAllInterfaces(Class<?> cls) {
-    if (cls == null) {
-      return null;
-    }
-    List<Class<?>> list = new ArrayList<>();
-    while (cls != null) {
-      Class[] interfaces = cls.getInterfaces();
-      for (int i = 0; i < interfaces.length; i++) {
-        if (!list.contains(interfaces[i])) {
-          list.add(interfaces[i]);
-        }
-        List superInterfaces = getAllInterfaces(interfaces[i]);
-        for (Iterator it = superInterfaces.iterator(); it.hasNext();) {
-          Class intface = (Class) it.next();
-          if (!list.contains(intface)) {
-            list.add(intface);
-          }
-        }
-      }
-      cls = cls.getSuperclass();
-    }
-    return list;
   }
 
   public static void inheritUsersAndGroups(SecurableByProfile child, SecurityProfile parentProfile) {
@@ -785,7 +632,7 @@ public class LimsUtils {
         ((DetailedSample) child).getSampleClass());
   }
 
-  public static boolean isValidRelationship(Iterable<SampleValidRelationship> relations, SampleClass parent, SampleClass child) {
+  private static boolean isValidRelationship(Iterable<SampleValidRelationship> relations, SampleClass parent, SampleClass child) {
     for (SampleValidRelationship relation : relations) {
       if (relation.getParent().getId() == parent.getId() && relation.getChild().getId() == child.getId()) {
         return true;
@@ -909,7 +756,7 @@ public class LimsUtils {
    * universal temporary name prefix. TODO: these same methods are in sqlstore DbUtils;
    * use those when refactoring away the RequestManager.
    */
-  static final public String TEMPORARY_NAME_PREFIX = "TEMPORARY_";
+  static final private String TEMPORARY_NAME_PREFIX = "TEMPORARY_";
 
   /**
    * Generate a temporary name using a UUID.

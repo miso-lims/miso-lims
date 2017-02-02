@@ -48,7 +48,7 @@ public class SQLRunQCDAOTest extends AbstractDAOTest {
     MockitoAnnotations.initMocks(this);
     dao.setSessionFactory(sessionFactory);
     SequencerPartitionContainer spp = new SequencerPartitionContainerImpl();
-    List<Partition> partitionList = new ArrayList();
+    List<Partition> partitionList = new ArrayList<>();
     Partition partition = new PartitionImpl();
     partition.setPartitionNumber(new Integer(3));
     partitionList.add(partition);

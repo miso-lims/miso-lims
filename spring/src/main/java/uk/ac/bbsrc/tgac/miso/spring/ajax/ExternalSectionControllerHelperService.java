@@ -224,7 +224,7 @@ public class ExternalSectionControllerHelperService {
       for (Sample sample : requestManager.listAllSamplesByProjectId(projectId)) {
         String sampleQubit = "not available";
         if (requestManager.listAllSampleQCsBySampleId(sample.getId()).size() > 0) {
-          ArrayList<SampleQC> sampleQcList = new ArrayList(requestManager.listAllSampleQCsBySampleId(sample.getId()));
+          ArrayList<SampleQC> sampleQcList = new ArrayList<>(requestManager.listAllSampleQCsBySampleId(sample.getId()));
           SampleQC lastQc = sampleQcList.get(sampleQcList.size() - 1);
           sampleQubit = (lastQc.getResults() != null ? lastQc.getResults().toString() + " ng/µl" : "not available");
         }

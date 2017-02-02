@@ -55,7 +55,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.ReportingException;
  * @since 0.0.2
  */
 public class ITextProjectDecorator extends AbstractReportDecorator<Document> {
-  protected static final Logger log = LoggerFactory.getLogger(ITextProjectDecorator.class);
+  private static final Logger log = LoggerFactory.getLogger(ITextProjectDecorator.class);
 
   protected OutputStream stream;
 
@@ -68,7 +68,7 @@ public class ITextProjectDecorator extends AbstractReportDecorator<Document> {
   @Override
   public void buildReport() throws ReportingException {
     if (reportables.size() == 1) {
-      List reportableslist = new ArrayList<Reportable>(reportables);
+      List reportableslist = new ArrayList<>(reportables);
       Reportable reportable = (Reportable) reportableslist.get(0);
       reportable.buildReport();
       Project project = (Project) reportable;

@@ -58,7 +58,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.UnicodeReader;
 @Entity
 @DiscriminatorValue("Solid")
 public class SolidRun extends RunImpl {
-  protected static final Logger log = LoggerFactory.getLogger(SolidRun.class);
+  private static final Logger log = LoggerFactory.getLogger(SolidRun.class);
 
   public SolidRun() {
     setPlatformType(PlatformType.SOLID);

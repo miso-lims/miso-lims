@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.sf.json.JSONObject;
+
 import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationException;
 import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationUtils;
 
@@ -15,7 +16,7 @@ import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationUtils;
  * @since 0.2.1-SNAPSHOT
  */
 public class NotificationQueryService {
-  protected static final Logger log = LoggerFactory.getLogger(NotificationQueryService.class);
+  private static final Logger log = LoggerFactory.getLogger(NotificationQueryService.class);
 
   private String notificationServerHost;
   private int notificationServerPort;

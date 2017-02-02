@@ -48,7 +48,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
 @Entity
 @Table(name = "SampleQC")
 public class SampleQCImpl extends AbstractSampleQC implements Serializable {
-  protected static final Logger log = LoggerFactory.getLogger(SampleQCImpl.class);
+  private static final Logger log = LoggerFactory.getLogger(SampleQCImpl.class);
   /**
    * Construct a new SampleQCImpl
    */

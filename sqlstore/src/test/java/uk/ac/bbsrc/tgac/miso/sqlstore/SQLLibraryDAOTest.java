@@ -14,8 +14,6 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -37,8 +35,6 @@ import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDao;
 
 public class SQLLibraryDAOTest extends AbstractDAOTest {
-
-  private static final Logger log = LoggerFactory.getLogger(SQLLibraryDAOTest.class);
 
   @Autowired
   private JdbcTemplate jdbcTemplate;

@@ -58,7 +58,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.UnicodeReader;
 @Entity
 @DiscriminatorValue("Illumina")
 public class IlluminaRun extends RunImpl {
-  protected static final Logger log = LoggerFactory.getLogger(IlluminaRun.class);
+  private static final Logger log = LoggerFactory.getLogger(IlluminaRun.class);
 
   public IlluminaRun() {
     setPlatformType(PlatformType.ILLUMINA);

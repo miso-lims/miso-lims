@@ -101,7 +101,7 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
   public static final String CONCENTRATION_UNITS = "nM";
   private static final int DESCRIPTION_LENGTH = 255;
   private static final int ID_BARCODE_LENGTH = 255;
-  protected static final Logger log = LoggerFactory.getLogger(PoolImpl.class);
+  private static final Logger log = LoggerFactory.getLogger(PoolImpl.class);
   private static final int NAME_LENGTH = 255;
   public static final String PREFIX = "IPO";
   private static final long serialVersionUID = 1L;

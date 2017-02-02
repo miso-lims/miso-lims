@@ -42,6 +42,7 @@ import org.w3c.dom.Document;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.spi.ServiceProvider;
+
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl;
@@ -69,7 +70,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.UnicodeReader;
 @ServiceProvider
 public class IlluminaSequencerInterrogationStrategy implements SequencerInterrogationStrategy {
   /** Field log */
-  protected static final Logger log = LoggerFactory.getLogger(IlluminaSequencerInterrogationStrategy.class);
+  private static final Logger log = LoggerFactory.getLogger(IlluminaSequencerInterrogationStrategy.class);
 
   private static final MisoPerlDaemonQuery statusQuery = new MisoPerlDaemonQuery("Illumina", "status");
   private static final MisoPerlDaemonQuery completeRunsQuery = new MisoPerlDaemonQuery("Illumina", "complete");
@@ -82,7 +83,7 @@ public class IlluminaSequencerInterrogationStrategy implements SequencerInterrog
 
   @Override
   public List<Status> listAllStatus(SequencerReference sr) throws InterrogationException {
-    List<Status> s = new ArrayList<Status>();
+    List<Status> s = new ArrayList<>();
     JSONObject response = JSONObject.fromObject(doQuery(sr, new MisoPerlDaemonInterrogationMechanism(), statusQuery).parseResult());
     if (response != null && response.has("response")) {
       JSONArray a = response.getJSONArray("response");
@@ -121,7 +122,7 @@ public class IlluminaSequencerInterrogationStrategy implements SequencerInterrog
 
   @Override
   public List<Status> listAllStatusBySequencerName(SequencerReference sr, String name) throws InterrogationException {
-    List<Status> sts = new ArrayList<Status>();
+    List<Status> sts = new ArrayList<>();
     String regex = ".*/([\\d]+_" + name + "_[\\d]+_[A-z0-9_]*)/.*";
     Pattern p = Pattern.compile(regex);
     for (Status s : listAllStatus(sr)) {
@@ -137,7 +138,7 @@ public class IlluminaSequencerInterrogationStrategy implements SequencerInterrog
   public List<String> listRunsByHealthType(SequencerReference sr, HealthType healthType) throws InterrogationException {
     String response = doQuery(sr, new MisoPerlDaemonInterrogationMechanism(),
         new MisoPerlDaemonQuery("Illumina", healthType.getKey().toLowerCase())).parseResult();
-    List<String> s = new ArrayList<String>();
+    List<String> s = new ArrayList<>();
     if (response != null) {
       String[] ss = response.split(",");
       for (String sss : ss) {
@@ -156,7 +157,7 @@ public class IlluminaSequencerInterrogationStrategy implements SequencerInterrog
   @Override
   public List<String> listAllCompleteRuns(SequencerReference sr) throws InterrogationException {
     String response = doQuery(sr, new MisoPerlDaemonInterrogationMechanism(), completeRunsQuery).parseResult();
-    List<String> s = new ArrayList<String>();
+    List<String> s = new ArrayList<>();
     if (response != null) {
       String[] ss = response.split(",");
       for (String sss : ss) {
@@ -175,7 +176,7 @@ public class IlluminaSequencerInterrogationStrategy implements SequencerInterrog
   @Override
   public List<String> listAllIncompleteRuns(SequencerReference sr) throws InterrogationException {
     String response = doQuery(sr, new MisoPerlDaemonInterrogationMechanism(), incompleteRunsQuery).parseResult();
-    List<String> s = new ArrayList<String>();
+    List<String> s = new ArrayList<>();
     if (response != null) {
       String[] ss = response.split(",");
       for (String sss : ss) {

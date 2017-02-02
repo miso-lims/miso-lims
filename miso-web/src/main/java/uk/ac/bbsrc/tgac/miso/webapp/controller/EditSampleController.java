@@ -133,7 +133,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.ui.SampleOptionsController;
 @RequestMapping("/sample")
 @SessionAttributes("sample")
 public class EditSampleController {
-  protected static final Logger log = LoggerFactory.getLogger(EditSampleController.class);
+  private static final Logger log = LoggerFactory.getLogger(EditSampleController.class);
 
   private final ObjectMapper mapper = new ObjectMapper();
 

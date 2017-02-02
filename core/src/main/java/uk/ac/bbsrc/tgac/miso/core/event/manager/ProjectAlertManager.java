@@ -54,7 +54,7 @@ import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
  */
 @Service
 public class ProjectAlertManager {
-  protected static final Logger log = LoggerFactory.getLogger(ProjectAlertManager.class);
+  private static final Logger log = LoggerFactory.getLogger(ProjectAlertManager.class);
   final Map<Long, Project> projects = new HashMap<>();
 
   @Value("${miso.alerting.enabled}")

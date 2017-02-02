@@ -48,7 +48,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunException;
 @Entity
 @Table(name = "RunQC")
 public class RunQCImpl extends AbstractRunQC implements Serializable {
-  protected static final Logger log = LoggerFactory.getLogger(RunQCImpl.class);
+  private static final Logger log = LoggerFactory.getLogger(RunQCImpl.class);
   /**
    * Construct a new RunQCImpl
    */

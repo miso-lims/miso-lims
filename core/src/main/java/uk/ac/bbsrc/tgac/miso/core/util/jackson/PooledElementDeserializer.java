@@ -26,9 +26,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
  * @since 0.1.9
  */
 public class PooledElementDeserializer extends JsonDeserializer<Set<Dilution>> {
-  protected static final Logger log = LoggerFactory.getLogger(PooledElementDeserializer.class);
+  private static final Logger log = LoggerFactory.getLogger(PooledElementDeserializer.class);
 
-  static final TypeReference<Dilution> type = new TypeReference<Dilution>() {
+  private static final TypeReference<Dilution> type = new TypeReference<Dilution>() {
   };
 
   @Override

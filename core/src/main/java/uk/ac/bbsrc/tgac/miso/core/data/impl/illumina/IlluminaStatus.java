@@ -51,7 +51,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.UnicodeReader;
  * @since 0.0.2
  */
 public class IlluminaStatus extends StatusImpl {
-  protected static final Logger log = LoggerFactory.getLogger(IlluminaStatus.class);
+  private static final Logger log = LoggerFactory.getLogger(IlluminaStatus.class);
   String statusXml = null;
 
   public IlluminaStatus() {

@@ -50,7 +50,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolException;
 @Entity
 @Table(name = "PoolQC")
 public class PoolQCImpl extends AbstractQC implements PoolQC, Serializable {
-  protected static final Logger log = LoggerFactory.getLogger(PoolQCImpl.class);
+  private static final Logger log = LoggerFactory.getLogger(PoolQCImpl.class);
   public static final String UNITS = "nM";
 
   @ManyToOne(targetEntity = PoolImpl.class)

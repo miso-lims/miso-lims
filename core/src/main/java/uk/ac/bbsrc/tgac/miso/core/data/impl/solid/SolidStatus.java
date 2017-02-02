@@ -53,7 +53,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.UnicodeReader;
  * @since 0.0.3
  */
 public class SolidStatus extends StatusImpl {
-  protected static final Logger log = LoggerFactory.getLogger(SolidStatus.class);
+  private static final Logger log = LoggerFactory.getLogger(SolidStatus.class);
   String statusXml = null;
 
   public SolidStatus() {

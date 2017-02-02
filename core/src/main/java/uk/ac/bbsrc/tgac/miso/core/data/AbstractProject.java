@@ -76,7 +76,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
  */
 @MappedSuperclass
 public abstract class AbstractProject implements Project {
-  protected static final Logger log = LoggerFactory.getLogger(AbstractProject.class);
+  private static final Logger log = LoggerFactory.getLogger(AbstractProject.class);
   private static final long serialVersionUID = 1L;
 
   /**
@@ -233,7 +233,7 @@ public abstract class AbstractProject implements Project {
   public void setSamples(Collection<Sample> samples) {
     this.samples = samples;
     try {
-      Collections.sort(Lists.newArrayList(this.samples), new AliasComparator<Sample>(Sample.class));
+      Collections.sort(Lists.newArrayList(this.samples), new AliasComparator<>(Sample.class));
     } catch (NoSuchMethodException e) {
       log.error("set samples", e);
     }
@@ -243,7 +243,7 @@ public abstract class AbstractProject implements Project {
   public void addSample(Sample sample) {
     this.samples.add(sample);
     try {
-      Collections.sort(Lists.newArrayList(this.samples), new AliasComparator<Sample>(Sample.class));
+      Collections.sort(Lists.newArrayList(this.samples), new AliasComparator<>(Sample.class));
     } catch (NoSuchMethodException e) {
       log.error("set sample", e);
     }
@@ -253,7 +253,7 @@ public abstract class AbstractProject implements Project {
   public void setStudies(Collection<Study> studies) {
     this.studies = studies;
     try {
-      Collections.sort(Lists.newArrayList(this.studies), new AliasComparator<Study>(Study.class));
+      Collections.sort(Lists.newArrayList(this.studies), new AliasComparator<>(Study.class));
     } catch (NoSuchMethodException e) {
       log.error("set studies", e);
     }

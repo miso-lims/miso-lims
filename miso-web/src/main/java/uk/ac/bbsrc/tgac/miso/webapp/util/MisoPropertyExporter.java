@@ -59,7 +59,7 @@ import org.springframework.util.CollectionUtils;
  * @since 0.0.2
  */
 public class MisoPropertyExporter extends PropertyPlaceholderConfigurer {
-  protected static final Logger log = LoggerFactory.getLogger(MisoPropertyExporter.class);
+  private static final Logger log = LoggerFactory.getLogger(MisoPropertyExporter.class);
 
   private Map<String, String> resolvedProperties;
 
@@ -110,7 +110,7 @@ public class MisoPropertyExporter extends PropertyPlaceholderConfigurer {
       }
 
       super.processProperties(beanFactoryToProcess, misoProps);
-      resolvedProperties = new HashMap<String, String>();
+      resolvedProperties = new HashMap<>();
       for (Object key : misoProps.keySet()) {
         String keyStr = key.toString();
 

@@ -51,7 +51,7 @@ import org.slf4j.LoggerFactory;
  * @since 0.0.3
  */
 public class TransmissionUtils {
-  protected static final Logger log = LoggerFactory.getLogger(TransmissionUtils.class);
+  private static final Logger log = LoggerFactory.getLogger(TransmissionUtils.class);
 
   public static FTPClient ftpConnect(String host, String username, String password) throws IOException {
     FTPClient ftp = new FTPClient();

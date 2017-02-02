@@ -43,7 +43,7 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 public class PacBioService {
-  protected static final Logger log = LoggerFactory.getLogger(PacBioService.class);
+  private static final Logger log = LoggerFactory.getLogger(PacBioService.class);
   private final HttpClient httpclient = new DefaultHttpClient();
   private final URI baseRestUri;
   private final DateFormat startDateFormat = new SimpleDateFormat("yyyy-MM-dd");

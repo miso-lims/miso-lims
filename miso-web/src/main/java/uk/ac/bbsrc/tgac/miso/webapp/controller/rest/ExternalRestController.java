@@ -152,7 +152,7 @@ public class ExternalRestController extends RestController {
         si++;
         String sampleQubit = "not available";
         if (requestManager.listAllSampleQCsBySampleId(sample.getId()).size() > 0) {
-          ArrayList<SampleQC> sampleQcList = new ArrayList(requestManager.listAllSampleQCsBySampleId(sample.getId()));
+          ArrayList<SampleQC> sampleQcList = new ArrayList<>(requestManager.listAllSampleQCsBySampleId(sample.getId()));
           SampleQC lastQc = sampleQcList.get(sampleQcList.size() - 1);
           sampleQubit = (lastQc.getResults() != null ? lastQc.getResults().toString() : "");
         }
@@ -186,7 +186,7 @@ public class ExternalRestController extends RestController {
       for (Run run : runs) {
         ri++;
         if (!run.getStatus().getHealth().getKey().equals("Failed")) {
-          ArrayList<String> runSamples = new ArrayList();
+          ArrayList<String> runSamples = new ArrayList<>();
           Collection<SequencerPartitionContainer<SequencerPoolPartition>> spcs = requestManager
               .listSequencerPartitionContainersByRunId(run.getId());
           if (spcs.size() > 0) {

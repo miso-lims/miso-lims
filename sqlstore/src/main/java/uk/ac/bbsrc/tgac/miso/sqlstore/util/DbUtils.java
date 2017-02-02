@@ -131,7 +131,7 @@ public class DbUtils {
     @Override
     public Object processMetaData(DatabaseMetaData dbmd) throws SQLException {
       ResultSet rs = dbmd.getTables(catalog, null, null, new String[] { "TABLE" });
-      ArrayList l = new ArrayList();
+      ArrayList<String> l = new ArrayList<>();
       while (rs.next()) {
         l.add(rs.getString(3));
       }
@@ -154,7 +154,7 @@ public class DbUtils {
     @Override
     public Object processMetaData(DatabaseMetaData dbmd) throws SQLException {
       ResultSet rs = dbmd.getColumns(catalog, null, table, null);
-      ArrayList l = new ArrayList();
+      ArrayList<String> l = new ArrayList<>();
       while (rs.next()) {
         l.add(rs.getString("COLUMN_NAME"));
       }
