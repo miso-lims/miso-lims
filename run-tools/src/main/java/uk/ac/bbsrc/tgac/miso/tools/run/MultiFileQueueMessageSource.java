@@ -32,8 +32,6 @@ import java.util.concurrent.PriorityBlockingQueue;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.integration.Message;
-import org.springframework.integration.MessagingException;
 import org.springframework.integration.context.IntegrationObjectSupport;
 import org.springframework.integration.core.MessageSource;
 import org.springframework.integration.file.DefaultDirectoryScanner;
@@ -42,6 +40,8 @@ import org.springframework.integration.file.FileLocker;
 import org.springframework.integration.file.HeadDirectoryScanner;
 import org.springframework.integration.file.filters.FileListFilter;
 import org.springframework.integration.support.MessageBuilder;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.MessagingException;
 import org.springframework.util.Assert;
 
 /**
@@ -132,7 +132,7 @@ public class MultiFileQueueMessageSource extends IntegrationObjectSupport implem
    *          the comparator to be used to order the files in the internal queue
    */
   public MultiFileQueueMessageSource(Comparator<File> receptionOrderComparator) {
-    this.toBeReceived = new PriorityBlockingQueue<File>(DEFAULT_INTERNAL_QUEUE_CAPACITY, receptionOrderComparator);
+    this.toBeReceived = new PriorityBlockingQueue<>(DEFAULT_INTERNAL_QUEUE_CAPACITY, receptionOrderComparator);
   }
 
   /**
@@ -243,7 +243,7 @@ public class MultiFileQueueMessageSource extends IntegrationObjectSupport implem
     }
 
     // instead of doing a poll() for a single files, drain the whole queue into a set
-    Set<File> files = new HashSet<File>();
+    Set<File> files = new HashSet<>();
     toBeReceived.drainTo(files);
 
     for (File file : files) {
@@ -264,7 +264,7 @@ public class MultiFileQueueMessageSource extends IntegrationObjectSupport implem
   private void scanInputDirectories() {
     for (File directory : directories) {
       List<File> filteredFiles = scanner.listFiles(directory);
-      Set<File> freshFiles = new HashSet<File>(filteredFiles);
+      Set<File> freshFiles = new HashSet<>(filteredFiles);
       if (!freshFiles.isEmpty()) {
         toBeReceived.addAll(freshFiles);
         if (logger.isDebugEnabled()) {
@@ -278,7 +278,7 @@ public class MultiFileQueueMessageSource extends IntegrationObjectSupport implem
    * Adds the failed message back to the 'toBeReceived' queue if there is room.
    * 
    * @param failedMessage
-   *          the {@link org.springframework.integration.Message} that failed
+   *          the {@link org.springframework.messaging.Message} that failed
    */
   public void onFailure(Message<File> failedMessage) {
     if (logger.isWarnEnabled()) {

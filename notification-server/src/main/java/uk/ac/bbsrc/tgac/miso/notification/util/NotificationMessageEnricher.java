@@ -28,10 +28,11 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.integration.Message;
-import org.springframework.integration.MessagingException;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.integration.transformer.HeaderEnricher;
+import org.springframework.integration.transformer.support.HeaderValueMessageProcessor;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.MessagingException;
 
 /**
  * uk.ac.bbsrc.tgac.miso.notification.util
@@ -54,7 +55,7 @@ public class NotificationMessageEnricher extends HeaderEnricher {
   @Override
   public Message<?> transform(Message<?> message) {
     try {
-      Map<String, Object> headerMap = new HashMap<String, Object>(message.getHeaders());
+      Map<String, Object> headerMap = new HashMap<>(message.getHeaders());
       log.debug("CURRENT HEADERS: " + headerMap.toString());
       for (Map.Entry<String, ? extends HeaderValueMessageProcessor<?>> entry : this.newHeadersToAdd.entrySet()) {
         String key = entry.getKey();

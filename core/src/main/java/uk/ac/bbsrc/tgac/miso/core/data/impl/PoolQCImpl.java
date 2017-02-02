@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.eaglegenomics.simlims.core.User;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
@@ -50,11 +51,13 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolException;
 @Entity
 @Table(name = "PoolQC")
 public class PoolQCImpl extends AbstractQC implements PoolQC, Serializable {
+  private static final long serialVersionUID = 1L;
   private static final Logger log = LoggerFactory.getLogger(PoolQCImpl.class);
   public static final String UNITS = "nM";
 
   @ManyToOne(targetEntity = PoolImpl.class)
   @JoinColumn(name = "pool_poolId")
+  @JsonBackReference
   private Pool pool;
 
   private Double results;

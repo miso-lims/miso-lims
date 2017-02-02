@@ -28,6 +28,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
 
@@ -49,6 +51,7 @@ public abstract class AbstractLibraryQC extends AbstractQC implements LibraryQC 
 
   @ManyToOne(targetEntity = LibraryImpl.class)
   @JoinColumn(name = "library_libraryId")
+  @JsonBackReference
   private Library library;
 
   @Override

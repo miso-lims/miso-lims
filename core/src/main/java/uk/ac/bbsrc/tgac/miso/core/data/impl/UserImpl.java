@@ -42,10 +42,11 @@ import javax.persistence.Table;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.GrantedAuthorityImpl;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import uk.ac.bbsrc.tgac.miso.core.security.MisoAuthority;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -152,10 +153,11 @@ public class UserImpl implements User, Serializable {
   }
 
   @Override
+  @JsonIgnore
   public Collection<GrantedAuthority> getRolesAsAuthorities() {
     List<GrantedAuthority> auths = new ArrayList<>();
     for (String s : getRoles()) {
-      auths.add(new GrantedAuthorityImpl(s));
+      auths.add(new SimpleGrantedAuthority(s));
     }
     return auths;
   }

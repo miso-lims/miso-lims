@@ -34,7 +34,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
 
-import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,14 +49,13 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.RunProcessingUtils;
-import uk.ac.bbsrc.tgac.miso.core.util.jackson.ContainerRecursionAvoidanceMixin;
-import uk.ac.bbsrc.tgac.miso.core.util.jackson.UserInfoMixin;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.RunDto;
@@ -95,16 +93,12 @@ public class RunRestController extends RestController {
     if (r == null) {
       throw new RestException("No run found with ID: " + runId, Status.NOT_FOUND);
     }
-    mapper.getSerializationConfig().addMixInAnnotations(SequencerPartitionContainer.class, ContainerRecursionAvoidanceMixin.class);
-    mapper.getSerializationConfig().addMixInAnnotations(User.class, UserInfoMixin.class);
     return mapper.writeValueAsString(r);
   }
 
   @RequestMapping(value = "/alias/{runAlias}", method = RequestMethod.GET, produces = "application/json")
   public @ResponseBody String getRunByAlias(@PathVariable String runAlias) throws IOException {
     ObjectMapper mapper = new ObjectMapper();
-    mapper.getSerializationConfig().addMixInAnnotations(SequencerPartitionContainer.class, ContainerRecursionAvoidanceMixin.class);
-    mapper.getSerializationConfig().addMixInAnnotations(User.class, UserInfoMixin.class);
     Run r = requestManager.getRunByAlias(runAlias);
     if (r == null) {
       throw new RestException("No run found with alias: " + runAlias, Status.NOT_FOUND);
@@ -130,8 +124,6 @@ public class RunRestController extends RestController {
   public @ResponseBody String listAllRuns() throws IOException {
     Collection<Run> lr = requestManager.listAllRuns();
     ObjectMapper mapper = new ObjectMapper();
-    mapper.getSerializationConfig().addMixInAnnotations(SequencerPartitionContainer.class, ContainerRecursionAvoidanceMixin.class);
-    mapper.getSerializationConfig().addMixInAnnotations(User.class, UserInfoMixin.class);
     return mapper.writeValueAsString(lr);
   }
 
@@ -166,7 +158,7 @@ public class RunRestController extends RestController {
         runDto.setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/run/{id}").buildAndExpand(runDto.getId()).toUriString());
       }
 
-      DataTablesResponseDto<RunDto> dtResponse = new DataTablesResponseDto<RunDto>();
+      DataTablesResponseDto<RunDto> dtResponse = new DataTablesResponseDto<>();
       dtResponse.setITotalRecords(numRuns);
       dtResponse.setITotalDisplayRecords(numMatches);
       dtResponse.setAaData(runDtos);

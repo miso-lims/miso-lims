@@ -23,8 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.core.service.integration.strategy;
 
-import org.springframework.integration.Message;
 import org.springframework.integration.annotation.Gateway;
+import org.springframework.messaging.Message;
 
 /**
  * An interface that defines how a Spring Integration {@link Message} can be consumed with parameters mapped via a {@link Gateway}, with the

@@ -2,9 +2,9 @@ package uk.ac.bbsrc.tgac.miso.dto;
 
 import java.util.Set;
 
-import org.codehaus.jackson.map.annotate.JsonSerialize;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
-@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class SampleOptionsDto {
 
   private Set<SubprojectDto> subprojects;

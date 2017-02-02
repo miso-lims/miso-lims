@@ -16,6 +16,8 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.KitImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -67,36 +69,42 @@ public class Note implements Serializable, Comparable<Note> {
   @JoinTable(name = "Pool_Note", inverseJoinColumns = {
       @JoinColumn(name = "pool_poolId") }, joinColumns = {
           @JoinColumn(name = "notes_noteId") })
+  @JsonBackReference
   private final Collection<Pool> pools = new HashSet<>();
 
   @ManyToMany(targetEntity = RunImpl.class)
   @JoinTable(name = "Run_Note", inverseJoinColumns = {
       @JoinColumn(name = "run_runId") }, joinColumns = {
           @JoinColumn(name = "notes_noteId") })
+  @JsonBackReference
   private final Collection<Run> runs = new HashSet<>();
 
   @ManyToMany(targetEntity = KitImpl.class)
   @JoinTable(name = "Kit_Note", inverseJoinColumns = {
       @JoinColumn(name = "kit_kitId") }, joinColumns = {
           @JoinColumn(name = "notes_noteId") })
+  @JsonBackReference
   private final Collection<Kit> kits = new HashSet<>();
 
   @ManyToMany(targetEntity = SampleImpl.class)
   @JoinTable(name = "Sample_Note", inverseJoinColumns = {
       @JoinColumn(name = "sample_sampleId") }, joinColumns = {
           @JoinColumn(name = "notes_noteId") })
+  @JsonBackReference
   private final Collection<Sample> samples = new HashSet<>();
 
   @ManyToMany(targetEntity = LibraryImpl.class)
   @JoinTable(name = "Library_Note", inverseJoinColumns = {
       @JoinColumn(name = "library_libraryId") }, joinColumns = {
           @JoinColumn(name = "notes_noteId") })
+  @JsonBackReference
   private final Collection<Library> libraries = new HashSet<>();
 
   @ManyToMany(targetEntity = ProjectOverview.class)
   @JoinTable(name = "ProjectOverview_Note", inverseJoinColumns = {
       @JoinColumn(name = "overview_overviewId") }, joinColumns = {
           @JoinColumn(name = "notes_noteId") })
+  @JsonBackReference
   private final Collection<ProjectOverview> overviews = new HashSet<>();
 
   public Note() {

@@ -1,11 +1,11 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
-import org.codehaus.jackson.annotate.JsonTypeName;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 
-@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonTypeName(value = SampleStock.CATEGORY_NAME)
 public class SampleStockDto extends SampleTissueDto {
 

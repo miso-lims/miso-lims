@@ -30,13 +30,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+
 import uk.ac.bbsrc.tgac.miso.notification.service.IlluminaTransformer;
 import uk.ac.bbsrc.tgac.miso.tools.run.RunFolderScanner;
 import uk.ac.bbsrc.tgac.miso.tools.run.util.FileSetTransformer;
@@ -52,7 +52,6 @@ import uk.ac.bbsrc.tgac.miso.tools.run.util.FileSetTransformer;
  */
 public class NotificationRequestManager {
   protected static final Logger log = LoggerFactory.getLogger(NotificationRequestManager.class);
-  private ObjectMapper mapper = new ObjectMapper();
 
   private ClassPathXmlApplicationContext context;
   private Map<String, Set<File>> dataPaths;

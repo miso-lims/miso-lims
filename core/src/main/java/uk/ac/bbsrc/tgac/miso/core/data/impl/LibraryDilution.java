@@ -42,6 +42,8 @@ import javax.persistence.Transient;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -81,6 +83,7 @@ public class LibraryDilution implements Dilution, Serializable {
 
   @ManyToOne(targetEntity = LibraryImpl.class)
   @JoinColumn(name = "library_libraryId")
+  @JsonBackReference
   private Library library;
 
   @ManyToOne(cascade = CascadeType.ALL)
@@ -93,6 +96,7 @@ public class LibraryDilution implements Dilution, Serializable {
   @ManyToMany(targetEntity = PoolImpl.class)
   @JoinTable(name = "Pool_Dilution", joinColumns = { @JoinColumn(name = "dilution_dilutionId") }, inverseJoinColumns = {
       @JoinColumn(name = "pool_poolId") })
+  @JsonManagedReference
   private Set<Pool> pools;
 
   @ManyToOne(targetEntity = UserImpl.class)

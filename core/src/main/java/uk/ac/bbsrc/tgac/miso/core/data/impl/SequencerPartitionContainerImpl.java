@@ -40,6 +40,7 @@ import org.springframework.util.AutoPopulatingList;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
@@ -65,6 +66,7 @@ public class SequencerPartitionContainerImpl extends AbstractSequencerPartitionC
   @JoinTable(name = "SequencerPartitionContainer_Partition", joinColumns = {
       @JoinColumn(name = "container_containerId", updatable = false) }, inverseJoinColumns = {
           @JoinColumn(name = "partitions_partitionId", updatable = false) })
+  @JsonIgnore
   private List<SequencerPoolPartition> partitions = new AutoPopulatingList<SequencerPoolPartition>(PartitionImpl.class);
 
   @Transient

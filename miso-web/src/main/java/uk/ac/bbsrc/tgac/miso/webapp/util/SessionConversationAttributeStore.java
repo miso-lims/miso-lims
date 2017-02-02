@@ -60,12 +60,11 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
  */
 public class SessionConversationAttributeStore implements SessionAttributeStore, InitializingBean {
 
-  private Logger _logger = Logger.getLogger(SessionConversationAttributeStore.class.getName());
+  private final Logger _logger = Logger.getLogger(SessionConversationAttributeStore.class.getName());
 
   private int _numConversationsToKeep = 10;
 
   @Autowired
-  // 3.0.x -> 3.1.x change required - private AnnotationMethodHandlerAdapter annotationMethodHandlerAdapter;
   private RequestMappingHandlerAdapter requestMappingHandlerAdapter;
 
   @Override
@@ -196,7 +195,7 @@ public class SessionConversationAttributeStore implements SessionAttributeStore,
 
     // create the map if it does not exist.
     if (conversationQueueMap == null) {
-      conversationQueueMap = new HashMap<String, Queue<String>>();
+      conversationQueueMap = new HashMap<>();
 
       // store the map on the session.
       request.setAttribute("_sessionConversations", conversationQueueMap, RequestAttributes.SCOPE_SESSION);
@@ -223,7 +222,7 @@ public class SessionConversationAttributeStore implements SessionAttributeStore,
       // create queue if necessary.
       if (queue == null) {
         // create new queue if needed.
-        queue = new LinkedList<String>();
+        queue = new LinkedList<>();
         conversationQueueMap.put(attributeName, queue);
       }
 

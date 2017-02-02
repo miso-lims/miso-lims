@@ -33,7 +33,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
 
-import org.codehaus.jackson.map.ObjectMapper;
 import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,21 +50,13 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.eaglegenomics.simlims.core.User;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.Project;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
-import uk.ac.bbsrc.tgac.miso.core.util.jackson.ProjectSampleRecursionAvoidanceMixin;
-import uk.ac.bbsrc.tgac.miso.core.util.jackson.SampleRecursionAvoidanceMixin;
-import uk.ac.bbsrc.tgac.miso.core.util.jackson.UserInfoMixin;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
-import uk.ac.bbsrc.tgac.miso.service.SampleService;
-import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 /**
  * A controller to handle all REST requests for Libraries
@@ -81,20 +72,10 @@ public class LibraryRestController extends RestController {
   private static final Logger log = LoggerFactory.getLogger(LibraryRestController.class);
 
   @Autowired
-  private AuthorizationManager authorizationManager;
-  @Autowired
-  private IndexService indexService;
-  @Autowired
   private LibraryService libraryService;
-  @Autowired
-  private SampleService sampleService;
 
   public void setLibraryService(LibraryService libraryService) {
     this.libraryService = libraryService;
-  }
-
-  public void setSampleService(SampleService sampleService) {
-    this.sampleService = sampleService;
   }
 
   @RequestMapping(value = "{libraryId}", method = RequestMethod.GET, produces = "application/json")
@@ -104,9 +85,6 @@ public class LibraryRestController extends RestController {
     if (l == null) {
       throw new RestException("No library found with ID: " + libraryId, Status.NOT_FOUND);
     }
-    mapper.getSerializationConfig().addMixInAnnotations(Project.class, ProjectSampleRecursionAvoidanceMixin.class);
-    mapper.getSerializationConfig().addMixInAnnotations(Sample.class, SampleRecursionAvoidanceMixin.class);
-    mapper.getSerializationConfig().addMixInAnnotations(User.class, UserInfoMixin.class);
     return mapper.writeValueAsString(l);
   }
 
@@ -114,9 +92,6 @@ public class LibraryRestController extends RestController {
   public @ResponseBody String listAllLibraries() throws IOException {
     Collection<Library> libraries = libraryService.list();
     ObjectMapper mapper = new ObjectMapper();
-    mapper.getSerializationConfig().addMixInAnnotations(Project.class, ProjectSampleRecursionAvoidanceMixin.class);
-    mapper.getSerializationConfig().addMixInAnnotations(Sample.class, SampleRecursionAvoidanceMixin.class);
-    mapper.getSerializationConfig().addMixInAnnotations(User.class, UserInfoMixin.class);
     return mapper.writeValueAsString(libraries);
   }
 

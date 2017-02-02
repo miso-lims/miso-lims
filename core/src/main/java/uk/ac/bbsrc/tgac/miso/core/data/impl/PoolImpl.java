@@ -55,9 +55,6 @@ import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.map.annotate.JsonDeserialize;
 import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.JoinFormula;
 import org.slf4j.Logger;
@@ -67,6 +64,8 @@ import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
@@ -86,7 +85,6 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolQcException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
-import uk.ac.bbsrc.tgac.miso.core.util.jackson.PooledElementDeserializer;
 
 /**
  * Info
@@ -94,7 +92,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.jackson.PooledElementDeserializer;
  * @author Rob Davey
  * @since 0.0.2
  */
-@JsonIgnoreProperties({ "lastModifier", "hasLowQualityMembers" })
 @Entity
 @Table(name = "Pool")
 @DiscriminatorValue("P")
@@ -111,6 +108,7 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
 
   @ManyToOne(targetEntity = BoxImpl.class)
   @JoinFormula("(SELECT bp.boxId FROM BoxPosition bp WHERE bp.targetId = poolId AND bp.targetType = 'Pool')")
+  @JsonBackReference
   private Box box;
   @OneToMany(targetEntity = PoolChangeLog.class, mappedBy = "pool")
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
@@ -125,6 +123,7 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
   private String description;
 
   @OneToMany(targetEntity = ExperimentImpl.class, mappedBy = "pool")
+  @JsonManagedReference
   private Collection<Experiment> experiments = new HashSet<>();
 
   @Column(length = ID_BARCODE_LENGTH)
@@ -154,6 +153,7 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
   @JoinTable(name = "Pool_Dilution", joinColumns = {
       @JoinColumn(name = "pool_poolId") }, inverseJoinColumns = {
           @JoinColumn(name = "dilution_dilutionId") })
+  @JsonBackReference
   private Set<LibraryDilution> pooledElements = new HashSet<>();
 
   @Id
@@ -161,6 +161,7 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
   private long poolId = PoolImpl.UNSAVED_ID;
 
   @OneToMany(targetEntity = PoolQCImpl.class, mappedBy = "pool")
+  @JsonManagedReference
   private final Collection<PoolQC> poolQCs = new TreeSet<>();
 
   @Formula("(SELECT bp.position FROM BoxPosition bp WHERE bp.targetId = poolId AND bp.targetType = 'P')")
@@ -235,8 +236,14 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
 
   @Override
   public int compareTo(Pool t) {
-    if (getId() < t.getId()) return -1;
-    if (getId() > t.getId()) return 1;
+    if (getId() != 0L && t.getId() != 0L) {
+      if (getId() < t.getId()) return -1;
+      if (getId() > t.getId()) return 1;
+    } else if (getName() != null && t.getName() != null) {
+      return getName().compareTo(t.getName());
+    } else if (getAlias() != null && t.getAlias() != null) {
+      return getAlias().compareTo(t.getAlias());
+    }
     return 0;
   }
 
@@ -297,7 +304,6 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
   }
 
   @Override
-  @JsonIgnore
   public boolean getHasLowQualityMembers() {
     for (Dilution d : getPoolableElements()) {
       if (d.getLibrary().isLowQuality()) {
@@ -514,7 +520,6 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
   }
 
   @Override
-  @JsonDeserialize(using = PooledElementDeserializer.class)
   public void setPoolableElements(Set<LibraryDilution> dilutions) {
     if (dilutions == null) {
       if (this.pooledElements == null) {

@@ -3,7 +3,6 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import javax.persistence.Column;
@@ -14,7 +13,6 @@ import javax.persistence.MapKeyClass;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.Table;
 
-import org.codehaus.jackson.map.ObjectMapper;
 import org.hibernate.annotations.AnyMetaDef;
 import org.hibernate.annotations.ManyToAny;
 import org.hibernate.annotations.MetaValue;
@@ -23,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBox;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
@@ -153,12 +152,7 @@ public class BoxImpl extends AbstractBox implements Serializable {
 
   @Override
   public void removeAllBoxables() {
-    Iterator<Boxable> i = boxableItems.values().iterator();
-    while (i.hasNext()) {
-      Boxable box = i.next();
-      // box.setLocationBarcode(""); // TODO: GLT-219
-      i.remove();
-    }
+    boxableItems.clear();
   }
 
   @Override

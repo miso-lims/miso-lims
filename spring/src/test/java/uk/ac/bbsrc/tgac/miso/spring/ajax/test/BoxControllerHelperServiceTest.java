@@ -90,6 +90,8 @@ public class BoxControllerHelperServiceTest {
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
+    mockUser = new UserImpl();
+    mockUser.setUserId(1L);
     when(authorizationManager.getCurrentUser()).thenReturn(mockUser);
   }
   
@@ -428,6 +430,9 @@ public class BoxControllerHelperServiceTest {
     use.setAlias("use");
     box.setUse(use);
     box.setLocationBarcode("freezer");
+    User user = new UserImpl();
+    user.setUserId(1L);
+    box.setLastModifier(user);
     return box;
   }
 }
