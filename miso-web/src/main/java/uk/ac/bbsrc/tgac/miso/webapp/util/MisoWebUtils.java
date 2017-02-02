@@ -35,8 +35,7 @@ import org.springframework.ui.ModelMap;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JsonConfig;
-import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
+
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 /**
@@ -49,7 +48,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
  * @since 0.0.2
  */
 public class MisoWebUtils {
-  protected static final Logger log = LoggerFactory.getLogger(MisoWebUtils.class);
+  private static final Logger log = LoggerFactory.getLogger(MisoWebUtils.class);
 
   public static String generateErrorDivMessage(String errorMessage) {
     return "<div id='errordiv' class='flasherror'>" + errorMessage + "</div>";
@@ -60,7 +59,7 @@ public class MisoWebUtils {
   }
 
   public static Map<String, String> checkStorageDirectories(String baseStoragePath) {
-    Map<String, String> checks = new HashMap<String, String>();
+    Map<String, String> checks = new HashMap<>();
     if (baseStoragePath.endsWith("/")) {
       try {
         File misoDir = new File(baseStoragePath);
@@ -85,7 +84,7 @@ public class MisoWebUtils {
   }
 
   public static Map<String, String> checkCorePropertiesFiles(String baseStoragePath) {
-    Map<String, String> checks = new HashMap<String, String>();
+    Map<String, String> checks = new HashMap<>();
     if (baseStoragePath.endsWith("/")) {
       try {
         LimsUtils.checkFile(new File(baseStoragePath, "issuetracker.properties"));

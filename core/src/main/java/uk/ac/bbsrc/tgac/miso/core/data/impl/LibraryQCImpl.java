@@ -47,7 +47,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
 @Entity
 @Table(name = "LibraryQC")
 public class LibraryQCImpl extends AbstractLibraryQC implements Serializable {
-  protected static final Logger log = LoggerFactory.getLogger(LibraryQCImpl.class);
+  private static final Logger log = LoggerFactory.getLogger(LibraryQCImpl.class);
   /**
    * Construct a new LibraryQC
    */

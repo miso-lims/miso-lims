@@ -40,7 +40,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.TransmissionUtils;
  * Created by IntelliJ IDEA. User: collesa Date: 26/03/12 Time: 13:10 To change this template use File | Settings | File Templates.
  */
 public class FTPTransferMethod implements TransferMethod {
-  protected static final Logger log = LoggerFactory.getLogger(TransmissionUtils.class);
+  private static final Logger log = LoggerFactory.getLogger(TransmissionUtils.class);
 
   private String username;
   private String password;

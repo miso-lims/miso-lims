@@ -52,7 +52,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
  */
 @MappedSuperclass
 public abstract class AbstractSequencerReference implements SequencerReference {
-  protected static final Logger log = LoggerFactory.getLogger(AbstractSequencerReference.class);
+  private static final Logger log = LoggerFactory.getLogger(AbstractSequencerReference.class);
 
   public static final Long UNSAVED_ID = 0L;
 

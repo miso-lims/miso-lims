@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  */
 public class RestExceptionHandler {
   
-  protected static final Logger log = LoggerFactory.getLogger(RestExceptionHandler.class);
+  private static final Logger log = LoggerFactory.getLogger(RestExceptionHandler.class);
   
   private RestExceptionHandler() {
     throw new AssertionError("Instantiability not intended");

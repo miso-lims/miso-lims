@@ -74,7 +74,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 @RequestMapping("/stats")
 @SessionAttributes("sequencerReference")
 public class StatsController {
-  protected static final Logger log = LoggerFactory.getLogger(StatsController.class);
+  private static final Logger log = LoggerFactory.getLogger(StatsController.class);
   
   private enum ModelKeys {
     SEQUENCER("sequencerReference"),

@@ -44,7 +44,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.AlertStore;
  * @since 0.1.2
  */
 public class DaoAlerterService implements AlerterService {
-  protected static final Logger log = LoggerFactory.getLogger(DaoAlerterService.class);
+  private static final Logger log = LoggerFactory.getLogger(DaoAlerterService.class);
 
   @Autowired
   private AlertStore alertStore;

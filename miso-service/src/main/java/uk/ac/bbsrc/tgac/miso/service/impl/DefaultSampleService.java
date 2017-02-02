@@ -61,7 +61,7 @@ import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 @Service
 public class DefaultSampleService implements SampleService {
 
-  protected static final Logger log = LoggerFactory.getLogger(DefaultSampleService.class);
+  private static final Logger log = LoggerFactory.getLogger(DefaultSampleService.class);
 
   @Autowired
   private SampleDao sampleDao;

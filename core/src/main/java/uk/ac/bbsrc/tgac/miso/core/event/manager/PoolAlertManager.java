@@ -53,7 +53,7 @@ import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
  */
 @Service
 public class PoolAlertManager {
-  protected static final Logger log = LoggerFactory.getLogger(PoolAlertManager.class);
+  private static final Logger log = LoggerFactory.getLogger(PoolAlertManager.class);
   final Map<Long, Pool> pools = new HashMap<>();
   final Set<User> poolWatchers = new HashSet<>();
 

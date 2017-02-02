@@ -54,7 +54,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunQcException;
  */
 @Service
 public class RunAlertManager {
-  protected static final Logger log = LoggerFactory.getLogger(RunAlertManager.class);
+  private static final Logger log = LoggerFactory.getLogger(RunAlertManager.class);
   Map<Long, Run> runs = new HashMap<>();
 
   @Value("${miso.alerting.enabled}")

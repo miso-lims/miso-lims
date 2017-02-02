@@ -93,7 +93,7 @@ import uk.ac.bbsrc.tgac.miso.service.StudyService;
 @RequestMapping("/project")
 @SessionAttributes("project")
 public class EditProjectController {
-  protected static final Logger log = LoggerFactory.getLogger(EditProjectController.class);
+  private static final Logger log = LoggerFactory.getLogger(EditProjectController.class);
 
   @Autowired
   private SecurityManager securityManager;

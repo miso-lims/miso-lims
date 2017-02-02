@@ -86,7 +86,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 @MappedSuperclass
 public abstract class AbstractLibrary extends AbstractBoxable implements Library {
 
-  protected static final Logger log = LoggerFactory.getLogger(AbstractLibrary.class);
+  private static final Logger log = LoggerFactory.getLogger(AbstractLibrary.class);
 
   public static final String UNITS = "nM";
 

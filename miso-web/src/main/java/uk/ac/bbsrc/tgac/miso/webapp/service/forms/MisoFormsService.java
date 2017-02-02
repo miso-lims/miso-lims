@@ -51,7 +51,7 @@ import uk.ac.bbsrc.tgac.miso.service.SampleService;
  * @since 0.1.1
  */
 public class MisoFormsService {
-  protected static final Logger log = LoggerFactory.getLogger(MisoFormsService.class);
+  private static final Logger log = LoggerFactory.getLogger(MisoFormsService.class);
 
   @Autowired
   private RequestManager requestManager;

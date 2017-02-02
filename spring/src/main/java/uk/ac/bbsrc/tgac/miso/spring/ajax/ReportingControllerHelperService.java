@@ -46,6 +46,7 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Reportable;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
@@ -405,8 +406,8 @@ public class ReportingControllerHelperService {
     String type = null;
     String html = null;
     JSONArray a = JSONArray.fromObject(json.get("form"));
-    List<Reportable> reportables = new ArrayList<Reportable>();
-    List<String> options = new ArrayList();
+    List<Reportable> reportables = new ArrayList<>();
+    List<String> options = new ArrayList<>();
 
     for (JSONObject j : (Iterable<JSONObject>) a) {
       if (j.getString("name").equals("incChart")) {

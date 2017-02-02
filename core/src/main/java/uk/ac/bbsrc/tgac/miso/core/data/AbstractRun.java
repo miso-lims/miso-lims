@@ -50,7 +50,6 @@ import javax.persistence.Transient;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
 
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.Note;
@@ -81,16 +80,13 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  */
 @MappedSuperclass
 public abstract class AbstractRun implements Run {
-  protected static final Logger log = LoggerFactory.getLogger(AbstractRun.class);
+  private static final Logger log = LoggerFactory.getLogger(AbstractRun.class);
 
   public static final Long UNSAVED_ID = 0L;
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long runId = AbstractRun.UNSAVED_ID;
-
-  @Transient
-  public Document submissionDocument;
 
   @ManyToOne(targetEntity = SecurityProfile.class, cascade = CascadeType.PERSIST)
   @JoinColumn(name = "securityProfile_profileId")
@@ -357,10 +353,6 @@ public abstract class AbstractRun implements Run {
   @Override
   public void setSequencingParameters(SequencingParameters parameters) {
     this.sequencingParameters = parameters;
-  }
-
-  public Document getSubmissionData() {
-    return submissionDocument;
   }
 
   @Override

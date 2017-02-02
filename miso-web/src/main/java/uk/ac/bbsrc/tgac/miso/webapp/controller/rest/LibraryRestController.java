@@ -78,7 +78,7 @@ import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 @RequestMapping("/rest/library")
 @SessionAttributes("library")
 public class LibraryRestController extends RestController {
-  protected static final Logger log = LoggerFactory.getLogger(LibraryRestController.class);
+  private static final Logger log = LoggerFactory.getLogger(LibraryRestController.class);
 
   @Autowired
   private AuthorizationManager authorizationManager;

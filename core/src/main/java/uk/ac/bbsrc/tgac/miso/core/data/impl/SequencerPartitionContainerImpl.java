@@ -59,7 +59,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 @Entity
 @Table(name = "SequencerPartitionContainer")
 public class SequencerPartitionContainerImpl extends AbstractSequencerPartitionContainer<SequencerPoolPartition> implements Serializable {
-  protected static final Logger log = LoggerFactory.getLogger(SequencerPartitionContainerImpl.class);
+  private static final Logger log = LoggerFactory.getLogger(SequencerPartitionContainerImpl.class);
 
   @OneToMany(targetEntity = PartitionImpl.class, cascade = CascadeType.ALL)
   @JoinTable(name = "SequencerPartitionContainer_Partition", joinColumns = {

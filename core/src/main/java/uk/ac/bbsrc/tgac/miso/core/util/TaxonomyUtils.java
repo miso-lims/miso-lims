@@ -53,7 +53,7 @@ import org.w3c.dom.NodeList;
  * @since 0.1.4
  */
 public class TaxonomyUtils {
-  protected static final Logger log = LoggerFactory.getLogger(TaxonomyUtils.class);
+  private static final Logger log = LoggerFactory.getLogger(TaxonomyUtils.class);
 
   private static final String ncbiEntrezUtilsURL = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?";
 
