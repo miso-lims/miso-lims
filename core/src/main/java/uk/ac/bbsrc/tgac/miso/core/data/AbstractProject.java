@@ -97,10 +97,13 @@ public abstract class AbstractProject implements Project {
 
   @OneToMany(targetEntity = SampleImpl.class, fetch = FetchType.LAZY, mappedBy = "project")
   private Collection<Sample> samples = new HashSet<>();
+
   @OneToMany(targetEntity = StudyImpl.class, fetch = FetchType.LAZY, mappedBy = "project")
   private Collection<Study> studies = new HashSet<>();
+
   @OneToMany(targetEntity = ProjectOverview.class, mappedBy = "project", cascade = CascadeType.ALL)
   private Collection<ProjectOverview> overviews = new HashSet<>();
+
   @ElementCollection
   @CollectionTable(name = "Project_Issues", joinColumns = { @JoinColumn(name = "project_projectId") })
   @Column(name = "issueKey")

@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -202,7 +203,10 @@ public class HibernateProjectDao implements ProjectStore {
 
   @Override
   public long save(Project project) throws IOException {
+    Date timestamp = new Date();
+    project.setLastUpdated(timestamp);
     if (project.getId() == AbstractProject.UNSAVED_ID) {
+      project.setCreationDate(timestamp);
       return (Long) currentSession().save(project);
     } else {
       currentSession().update(project);

@@ -29,7 +29,6 @@ import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
@@ -193,17 +192,13 @@ public class HibernatePoolDao implements PoolStore {
 
   @Override
   public List<Pool> listByProjectId(long projectId) throws IOException {
-    Criteria idCriteria = currentSession().createCriteria(SampleImpl.class);
-    idCriteria.createAlias("project", "project");
-    idCriteria.add(Restrictions.eq("project.id", projectId));
-    idCriteria.createAlias("libraries", "libraries");
-    idCriteria.createAlias("libraries.libraryDilutions", "libraryDilutions");
-    idCriteria.createAlias("libraryDilutions.pools", "pools");
-    idCriteria.setProjection(Projections.distinct(Projections.property("pools.id")));
-    @SuppressWarnings("unchecked")
-    List<Long> ids = idCriteria.list();
-    Criteria criteria = createCriteria();
-    criteria.add(Restrictions.in("id", ids));
+    Criteria criteria = currentSession().createCriteria(PoolImpl.class);
+    criteria.createAlias("pooledElements", "dilution");
+    criteria.createAlias("dilution.library", "library");
+    criteria.createAlias("library.sample", "sample");
+    criteria.createAlias("sample.project", "project");
+    criteria.add(Restrictions.eq("project.id", projectId));
+    criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
     @SuppressWarnings("unchecked")
     List<Pool> results = criteria.list();
     return results;
