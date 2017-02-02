@@ -27,7 +27,7 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.spring.ajax.LibraryControllerHelperService;
 
-public class LibraryControllerHelperServiceTestSuite {
+public class LibraryControllerHelperServiceTest {
 
   @InjectMocks
   private LibraryControllerHelperService libraryControllerHelperService;

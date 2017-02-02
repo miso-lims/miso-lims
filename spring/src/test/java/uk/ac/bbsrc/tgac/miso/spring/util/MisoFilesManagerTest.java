@@ -12,7 +12,7 @@ import org.junit.Test;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 
-public class MisoFilesManagerTestSuite {
+public class MisoFilesManagerTest {
 
   MisoFilesManager filesManager;
 

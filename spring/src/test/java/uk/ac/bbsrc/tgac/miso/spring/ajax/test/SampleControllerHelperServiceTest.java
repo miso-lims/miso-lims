@@ -29,7 +29,7 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.spring.ajax.SampleControllerHelperService;
 
-public class SampleControllerHelperServiceTestSuite {
+public class SampleControllerHelperServiceTest {
 
   @InjectMocks
   private SampleControllerHelperService sampleControllerHelperService;

@@ -9,7 +9,7 @@ import org.mockito.MockitoAnnotations;
 
 import uk.ac.bbsrc.tgac.miso.spring.ajax.RunControllerHelperService;
 
-public class RunControllerHelperServiceTestSuite {
+public class RunControllerHelperServiceTest {
 
   @InjectMocks
   private RunControllerHelperService runCHS;

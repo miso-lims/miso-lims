@@ -33,7 +33,7 @@ import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.spring.ajax.ProjectControllerHelperService;
 
-public class ProjectControllerHelperServiceTestSuite {
+public class ProjectControllerHelperServiceTest {
 
   @InjectMocks
   private ProjectControllerHelperService projectControllerHelperService;

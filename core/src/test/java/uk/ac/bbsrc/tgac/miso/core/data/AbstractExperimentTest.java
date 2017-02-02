@@ -19,7 +19,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
-public class AbstractExperimentTestSuite {
+public class AbstractExperimentTest {
   private ExperimentImpl ae;
 
   @Before

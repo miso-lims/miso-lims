@@ -25,7 +25,7 @@ import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.spring.ajax.PoolControllerHelperService;
 
-public class PoolControllerHelperServiceTestSuite {
+public class PoolControllerHelperServiceTest {
 
   @InjectMocks
   private PoolControllerHelperService poolControllerHelperService;

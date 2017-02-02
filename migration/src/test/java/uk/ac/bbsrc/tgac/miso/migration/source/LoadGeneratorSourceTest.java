@@ -15,7 +15,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.migration.MigrationData;
 import uk.ac.bbsrc.tgac.miso.migration.MigrationProperties;
 
-public class LoadGeneratorSourceTestSuite {
+public class LoadGeneratorSourceTest {
 
   private static final String testProperties = "target/test-classes/LoadGeneratorTest.properties";
   

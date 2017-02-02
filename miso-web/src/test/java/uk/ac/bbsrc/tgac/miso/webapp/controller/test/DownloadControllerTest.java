@@ -3,7 +3,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.test;
 import org.junit.Ignore;
 import org.junit.Test;
 
-public class DownloadControllerTestSuite {
+public class DownloadControllerTest {
 
   // TODO: Controller tests as per below
 

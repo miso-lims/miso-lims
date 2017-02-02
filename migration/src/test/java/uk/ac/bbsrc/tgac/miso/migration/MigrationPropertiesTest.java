@@ -10,7 +10,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class MigrationPropertiesTestSuite {
+public class MigrationPropertiesTest {
 
   private static final String testProperties = "target/test-classes/MigrationPropertiesTest.properties";
   
