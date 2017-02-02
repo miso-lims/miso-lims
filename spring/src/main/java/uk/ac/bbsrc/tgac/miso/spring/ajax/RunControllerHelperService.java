@@ -70,9 +70,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.illumina.IlluminaRun;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ls454.LS454Run;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.pacbio.PacBioRun;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.solid.SolidRun;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
@@ -263,7 +260,7 @@ public class RunControllerHelperService {
 
   public JSONObject changeIlluminaContainer(HttpSession session, JSONObject json) {
     StringBuilder b = new StringBuilder();
-    IlluminaRun run = (IlluminaRun) session.getAttribute("run_" + json.getString("run_cId"));
+    Run run = (Run) session.getAttribute("run_" + json.getString("run_cId"));
     run.getSequencerPartitionContainers().clear();
     String instrumentModel = run.getSequencerReference().getPlatform().getInstrumentModel();
     if ("Illumina MiSeq".equals(instrumentModel) || "Illumina NextSeq 500".equals(instrumentModel)) {
@@ -345,7 +342,7 @@ public class RunControllerHelperService {
     b.append("<th>" + PlatformType.ILLUMINA.getPartitionName() + " No.</th>");
     b.append("<th>Pool</th>");
 
-    IlluminaRun run = (IlluminaRun) session.getAttribute("run_" + json.getString("run_cId"));
+    Run run = (Run) session.getAttribute("run_" + json.getString("run_cId"));
     SequencerPartitionContainer<SequencerPoolPartition> f = run.getSequencerPartitionContainers().get(container);
     f.setPlatform(run.getSequencerReference().getPlatform());
     f.setPartitionLimit(numLanes);
@@ -360,7 +357,7 @@ public class RunControllerHelperService {
   public JSONObject changeLS454Container(HttpSession session, JSONObject json) {
     StringBuilder b = new StringBuilder();
     int numContainers = json.getInt("numContainers");
-    LS454Run run = (LS454Run) session.getAttribute("run_" + json.getString("run_cId"));
+    Run run = (Run) session.getAttribute("run_" + json.getString("run_cId"));
     run.getSequencerPartitionContainers().clear();
 
     for (int i = 0; i < numContainers; i++) {
@@ -404,7 +401,7 @@ public class RunControllerHelperService {
     b.append("<th>" + PlatformType.LS454.getPartitionName() + " No.</th>");
     b.append("<th>Pool</th>");
 
-    LS454Run run = (LS454Run) session.getAttribute("run_" + json.getString("run_cId"));
+    Run run = (Run) session.getAttribute("run_" + json.getString("run_cId"));
     SequencerPartitionContainer<SequencerPoolPartition> f = run.getSequencerPartitionContainers().get(container);
     f.setPlatform(run.getSequencerReference().getPlatform());
     f.setPartitionLimit(numChambers);
@@ -477,7 +474,7 @@ public class RunControllerHelperService {
   public JSONObject changePacBioContainer(HttpSession session, JSONObject json) {
     int numContainers = json.getInt("numContainers");
     StringBuilder b = new StringBuilder();
-    PacBioRun run = (PacBioRun) session.getAttribute("run_" + json.getString("run_cId"));
+    Run run = (Run) session.getAttribute("run_" + json.getString("run_cId"));
     run.getSequencerPartitionContainers().clear();
 
     for (int i = 0; i < numContainers; i++) {
@@ -512,7 +509,7 @@ public class RunControllerHelperService {
     int numChambers = json.getInt("numChambers");
     int container = json.getInt("container");
 
-    PacBioRun run = (PacBioRun) session.getAttribute("run_" + json.getString("run_cId"));
+    Run run = (Run) session.getAttribute("run_" + json.getString("run_cId"));
     SequencerPartitionContainer<SequencerPoolPartition> f = run.getSequencerPartitionContainers().get(container);
     f.setPlatform(run.getSequencerReference().getPlatform());
     f.setPartitionLimit(numChambers);
@@ -770,7 +767,7 @@ public class RunControllerHelperService {
 
   public JSONObject generateIlluminaDemultiplexCSV(HttpSession session, JSONObject json) throws IOException {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    IlluminaRun r = (IlluminaRun) requestManager.getRunById(json.getLong("runId"));
+    Run r = requestManager.getRunById(json.getLong("runId"));
     SequencerPartitionContainer<SequencerPoolPartition> f = requestManager.getSequencerPartitionContainerById(json.getLong("containerId"));
     if (r != null && f != null) {
       String casavaVersion = "1.8.2";
