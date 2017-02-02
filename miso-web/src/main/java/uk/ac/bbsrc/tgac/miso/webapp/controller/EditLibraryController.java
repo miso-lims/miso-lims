@@ -100,6 +100,7 @@ import uk.ac.bbsrc.tgac.miso.dto.DetailedLibraryDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
+import uk.ac.bbsrc.tgac.miso.service.KitService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
@@ -140,6 +141,9 @@ public class EditLibraryController {
   @Autowired
   private ChangeLogService changeLogService;
 
+  @Autowired
+  private KitService kitService;
+
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
   }
@@ -158,6 +162,10 @@ public class EditLibraryController {
 
   public void setSampleService(SampleService sampleService) {
     this.sampleService = sampleService;
+  }
+
+  public void setKitService(KitService kitService) {
+    this.kitService = kitService;
   }
 
   @Value("${miso.notification.interop.enabled}")
@@ -334,7 +342,7 @@ public class EditLibraryController {
 
   @ModelAttribute("prepKits")
   public List<KitDescriptor> getPrepKits() throws IOException {
-    List<KitDescriptor> list = new ArrayList<>(requestManager.listKitDescriptorsByType(KitType.LIBRARY));
+    List<KitDescriptor> list = new ArrayList<>(kitService.listKitDescriptorsByType(KitType.LIBRARY));
     Collections.sort(list, new Comparator<KitDescriptor>() {
       @Override
       public int compare(KitDescriptor kd1, KitDescriptor kd2) {
@@ -688,7 +696,7 @@ public class EditLibraryController {
         }
 
         List<Sample> projectSamples = new ArrayList<>(requestManager.listAllSamplesByProjectId(sample.getProject().getProjectId()));
-        Collections.sort(projectSamples, new AliasComparator(Sample.class));
+        Collections.sort(projectSamples, new AliasComparator<Sample>(Sample.class));
         model.put("projectSamples", projectSamples);
 
         String regex = "([A-z0-9]+)_S([A-z0-9]+)_(.*)";

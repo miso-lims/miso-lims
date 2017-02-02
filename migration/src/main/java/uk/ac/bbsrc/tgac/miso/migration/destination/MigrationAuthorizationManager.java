@@ -93,4 +93,9 @@ public class MigrationAuthorizationManager implements AuthorizationManager {
     // auth disabled in this manager; do nothing
   }
 
+  @Override
+  public void throwIfNotInternal() throws IOException, AuthorizationException {
+    // auth disabled in this manager; do nothing
+  }
+
 }
