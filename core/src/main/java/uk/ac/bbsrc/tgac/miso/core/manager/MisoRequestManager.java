@@ -1043,12 +1043,18 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public long saveRun(Run run) throws IOException {
     if (runStore != null) {
+      run.getStatus().setInstrumentName(run.getSequencerReference().getName());
+
       if (run.getId() == AbstractRun.UNSAVED_ID) {
+        run.getStatus().setLastUpdated(new Date());
+
         run.setName(generateTemporaryName());
+        run.getStatus().setRunName(run.getName());
         run.setId(runStore.save(run));
         try {
           String name = namingScheme.generateNameFor(run);
           run.setName(name);
+          run.getStatus().setRunName(run.getName());
 
           validateNameOrThrow(run, namingScheme);
           return runStore.save(run);
@@ -1067,7 +1073,7 @@ public class MisoRequestManager implements RequestManager {
         managed.getStatus().setStartDate(run.getStatus().getStartDate());
         managed.getStatus().setCompletionDate(run.getStatus().getCompletionDate());
         managed.getStatus().setInstrumentName(run.getStatus().getInstrumentName());
-        managed.getStatus().setRunName(run.getStatus().getRunName());
+        managed.getStatus().setRunName(managed.getName());
         managed.getStatus().setXml(run.getStatus().getXml());
         for (RunQC runQc : run.getRunQCs()) {
           if (!managed.getRunQCs().contains(runQc)) {

@@ -114,7 +114,7 @@ public class StatusImpl implements Status, Serializable {
 
   @Override
   public void setXml(String xml) throws UnsupportedEncodingException {
-    this.xml = xml.getBytes("UTF-8");
+    this.xml = xml == null ? null : xml.getBytes("UTF-8");
   }
 
   @Override
