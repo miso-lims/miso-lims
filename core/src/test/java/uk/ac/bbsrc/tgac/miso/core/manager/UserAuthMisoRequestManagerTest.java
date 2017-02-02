@@ -53,7 +53,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.AuthorizationIOException;
  *
  */
 @RunWith(MockitoJUnitRunner.class)
-public class UserAuthMisoRequestManagerTestSuite {
+public class UserAuthMisoRequestManagerTest {
 
   @Rule
   public ExpectedException thrown = ExpectedException.none();

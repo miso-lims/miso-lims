@@ -47,7 +47,7 @@ import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.spring.ajax.BoxControllerHelperService;
 
-public class BoxControllerHelperServiceTestSuite {
+public class BoxControllerHelperServiceTest {
 
   @InjectMocks
   private BoxControllerHelperService boxControllerHelperService;

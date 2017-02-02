@@ -21,7 +21,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 @Ignore
-public class IlluminaTransformerTestSuite {
+public class IlluminaTransformerTest {
 
   private static final String h1080_84_raw = "/runs/raw/Completed/111110_h1080_0084_AC08UPACXX";
   private static final String h1080_84_gzip = "/runs/gzipped/Completed/111110_h1080_0084_AC08UPACXX";

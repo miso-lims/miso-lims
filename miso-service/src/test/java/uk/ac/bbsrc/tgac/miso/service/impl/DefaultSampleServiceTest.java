@@ -65,7 +65,7 @@ import uk.ac.bbsrc.tgac.miso.service.SampleNumberPerProjectService;
 import uk.ac.bbsrc.tgac.miso.service.SampleValidRelationshipService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
-public class DefaultSampleServiceTestSuite {
+public class DefaultSampleServiceTest {
 
   @Rule
   public final ExpectedException exception = ExpectedException.none();

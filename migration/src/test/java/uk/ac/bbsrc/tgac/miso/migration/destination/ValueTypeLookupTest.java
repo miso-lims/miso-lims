@@ -66,7 +66,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueOriginDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueTypeDao;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultReferenceGenomeService;
 
-public class ValueTypeLookupTestSuite {
+public class ValueTypeLookupTest {
 
   private static final Long VALID_LONG = 1L;
   private static final String VALID_STRING = "real thing";

@@ -22,7 +22,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
 import uk.ac.bbsrc.tgac.miso.core.store.StudyStore;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
-public class DefaultStudyServiceTestSuite {
+public class DefaultStudyServiceTest {
 
   @Rule
   public final ExpectedException thrown = ExpectedException.none();

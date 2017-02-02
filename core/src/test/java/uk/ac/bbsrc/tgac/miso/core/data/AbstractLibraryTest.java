@@ -1,11 +1,10 @@
-/**
- *
- */
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
+import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -13,36 +12,26 @@ import org.mockito.Mockito;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
-/**
- * @author saltc
- * 
- */
-public class LibraryDilutionTestSuite {
+public class AbstractLibraryTest {
 
-  /**
-   * @throws java.lang.Exception
-   */
-  LibraryDilution ld;
+  AbstractLibrary al;
+
+  protected ObjectMapper mapper;
 
   @Before
   public void setUp() throws Exception {
-    ld = new LibraryDilution() {
-      private static final long serialVersionUID = 1L;
+    al = new AbstractLibrary() {
 
       @Override
-      public String getUnits() {
-        return null;
-      }
-
-      @Override
-      public Library getLibrary() {
+      public ChangeLog createChangeLog(String summary, String columnsChanged, User user) {
         return null;
       }
     };
-    ld.setName("MyLibraryDilution");
+    mapper = new ObjectMapper();
   }
 
   @Test
@@ -53,9 +42,9 @@ public class LibraryDilutionTestSuite {
     when(parent.getSecurityProfile()).thenReturn(mockSecurityProfile);
     when(mockSecurityProfile.getOwner()).thenReturn(mockUser);
 
-    assertNotEquals(mockSecurityProfile, ld.getSecurityProfile());
-    ld.inheritPermissions(parent);
-    assertEquals(mockSecurityProfile, ld.getSecurityProfile());
+    assertNull(al.getSecurityProfile());
+    al.inheritPermissions(parent);
+    assertNotNull(al.getSecurityProfile());
   }
 
   @Test(expected = SecurityException.class)
@@ -63,7 +52,16 @@ public class LibraryDilutionTestSuite {
     final SecurableByProfile parent = Mockito.mock(SecurableByProfile.class);
     final SecurityProfile mockSecurityProfile = Mockito.mock(SecurityProfile.class);
     when(parent.getSecurityProfile()).thenReturn(mockSecurityProfile);
-    ld.inheritPermissions(parent);
+    al.inheritPermissions(parent);
   }
 
+  @Test
+  public final void testLibrarySerialization() throws Exception {
+    Sample sample = new SampleImpl();
+    Library library = new LibraryImpl();
+    library.setSample(sample);
+    library.setAlias("TestLib");
+    String mappedLib = mapper.writer().writeValueAsString(library);
+    assertThat(mappedLib, containsString("TestLib"));
+  }
 }

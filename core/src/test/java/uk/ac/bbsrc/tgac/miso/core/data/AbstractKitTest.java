@@ -5,7 +5,7 @@ import static org.junit.Assert.assertNotNull;
 import org.junit.Before;
 import org.junit.Test;
 
-public class AbstractKitTestSuite {
+public class AbstractKitTest {
 
   @Before
   public void setUp() throws Exception {

@@ -26,7 +26,7 @@ import uk.ac.bbsrc.tgac.miso.spring.ajax.ServiceRecordControllerHelperService;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
-public class ServiceRecordControllerHelperServiceTestSuite {
+public class ServiceRecordControllerHelperServiceTest {
   
   @Mock
   private SecurityManager securityManager;
