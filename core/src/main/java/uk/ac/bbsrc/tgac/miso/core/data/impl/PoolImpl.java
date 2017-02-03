@@ -36,6 +36,7 @@ import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -96,6 +97,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.jackson.PooledElementDeserializer;
 @JsonIgnoreProperties({ "lastModifier", "hasLowQualityMembers" })
 @Entity
 @Table(name = "Pool")
+@DiscriminatorValue("P")
 public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
   private static final int CONCENTRATION_LENGTH = 17;
   public static final String CONCENTRATION_UNITS = "nM";
@@ -108,7 +110,7 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
   public static final Long UNSAVED_ID = 0L;
 
   @ManyToOne(targetEntity = BoxImpl.class)
-  @JoinFormula("(SELECT bp.boxId FROM BoxPosition bp WHERE bp.targetId = poolId AND bp.targetType = 'P')")
+  @JoinFormula("(SELECT bp.boxId FROM BoxPosition bp WHERE bp.targetId = poolId AND bp.targetType = 'Pool')")
   private Box box;
   @OneToMany(targetEntity = PoolChangeLog.class, mappedBy = "pool")
   private final Collection<ChangeLog> changeLog = new ArrayList<>();

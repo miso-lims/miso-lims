@@ -362,7 +362,8 @@ public class BoxControllerHelperService {
         .SimpleJSONError(boxable.getName() + " (" + boxable.getAlias() + ") has been discarded, and can not be added to the box.");
 
     // if the selected item is already in the box, remove it here and add it to the correct position in next step
-    if (box.boxableExists(boxable)) box.removeBoxable(boxable.getBoxPosition());
+    if (boxable.getBox() != null && boxable.getBox().getId() == box.getId())
+      box.removeBoxable(boxable.getBoxPosition());
 
     // if an item already exists at this position, its location will be set to unknown.
     box.setBoxable(position, boxable);
@@ -374,7 +375,7 @@ public class BoxControllerHelperService {
       requestManager.saveBox(box);
 
       ObjectMapper mapper = new ObjectMapper();
-      response.put("boxJSON", mapper.writer().writeValueAsString(box));
+      response.put("boxJSON", mapper.writer().writeValueAsString(Dtos.asDto(requestManager.getBoxById(box.getId()))));
       response.put("addedToBox", boxable.getName() + " was successfully added to position " + position);
     } catch (IOException e) {
       log.debug("Error updating one boxable item", e);
@@ -422,7 +423,7 @@ public class BoxControllerHelperService {
 
       Map<String, Object> response = new HashMap<>();
       ObjectMapper mapper = new ObjectMapper();
-      response.put("boxJSON", mapper.writer().writeValueAsString(box));
+      response.put("boxJSON", mapper.writer().writeValueAsString(Dtos.asDto(requestManager.getBoxById(box.getId()))));
       return JSONUtils.JSONObjectResponse(response);
     } catch (IOException e) {
       log.debug("Error removing one boxable item", e);
@@ -473,7 +474,7 @@ public class BoxControllerHelperService {
           requestManager.discardSingleTube(box, position);
           box = requestManager.getBoxById(boxId);
           ObjectMapper mapper = new ObjectMapper();
-          response.put("boxJSON", mapper.writer().writeValueAsString(box));
+          response.put("boxJSON", mapper.writer().writeValueAsString(Dtos.asDto(requestManager.getBoxById(box.getId()))));
         } catch (IOException e) {
           log.debug("Failed to discard single tube", e);
           return JSONUtils.SimpleJSONError("Failed to discard single tube: " + e.getMessage());
@@ -521,7 +522,7 @@ public class BoxControllerHelperService {
           requestManager.discardAllTubes(box); // box save is performed as part of this method
           box = requestManager.getBoxById(boxId);
           ObjectMapper mapper = new ObjectMapper();
-          response.put("boxJSON", mapper.writer().writeValueAsString(box));
+          response.put("boxJSON", mapper.writer().writeValueAsString(Dtos.asDto(requestManager.getBoxById(box.getId()))));
           return response;
         } catch (IOException e) {
           log.debug("Error discarding box", e);
@@ -852,7 +853,7 @@ public class BoxControllerHelperService {
         }
 
         ObjectMapper mapper = new ObjectMapper();
-        scanResults.put("boxJSON", mapper.writer().writeValueAsString(box));
+        scanResults.put("boxJSON", mapper.writer().writeValueAsString(Dtos.asDto(requestManager.getBoxById(box.getId()))));
       } catch (IntegrationException e) {
         log.info(e.getMessage());
         return JSONUtils.SimpleJSONError("Error scanning box: " + e.getMessage());

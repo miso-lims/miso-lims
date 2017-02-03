@@ -42,12 +42,20 @@ public class BoxImpl extends AbstractBox implements Serializable {
   @ManyToAny(metaColumn = @Column(name = "targetType"))
   @MapKeyColumn(name = "position", unique = true)
   @MapKeyClass(String.class)
-  @JoinTable(name = "BoxPosition", joinColumns = { @JoinColumn(name = "targetId") }, inverseJoinColumns = {
-      @JoinColumn(name = "boxId") })
+  @JoinTable(name = "BoxPosition", joinColumns = { @JoinColumn(name = "boxId") }, inverseJoinColumns = {
+      @JoinColumn(name = "targetId") })
   @AnyMetaDef(idType = "long", metaType = "string", metaValues = {
-      @MetaValue(targetEntity = LibraryImpl.class, value = "L"),
-      @MetaValue(targetEntity = PoolImpl.class, value = "P"),
-      @MetaValue(targetEntity = SampleImpl.class, value = "S")
+      @MetaValue(targetEntity = LibraryImpl.class, value = "Library"),
+      @MetaValue(targetEntity = DetailedLibraryImpl.class, value = "LibraryDetailed"),
+      @MetaValue(targetEntity = PoolImpl.class, value = "Pool"),
+      @MetaValue(targetEntity = SampleImpl.class, value = "Sample"),
+      @MetaValue(targetEntity = SampleAliquotImpl.class, value = "SampleAliquot"),
+      @MetaValue(targetEntity = IdentityImpl.class, value = "SampleIdentity"),
+      @MetaValue(targetEntity = SampleStockImpl.class, value = "SampleStock"),
+      @MetaValue(targetEntity = SampleTissueImpl.class, value = "SampleTissue"),
+      @MetaValue(targetEntity = SampleTissueProcessingImpl.class, value = "SampleProcessing"),
+      @MetaValue(targetEntity = SampleCVSlideImpl.class, value = "SampleCV"),
+      @MetaValue(targetEntity = SampleLCMTubeImpl.class, value = "SampleLCM"),
   })
   private Map<String, Boxable> boxableItems = new HashMap<>();
 

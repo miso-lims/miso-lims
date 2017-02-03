@@ -32,6 +32,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.integration.BoxScanner;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 
@@ -131,7 +132,7 @@ public class EditBoxController {
 
       // add JSON
       ObjectMapper mapper = new ObjectMapper();
-      model.put("boxJSON", mapper.writer().writeValueAsString(box));
+      model.put("boxJSON", mapper.writer().writeValueAsString(Dtos.asDto(box)));
 
       return new ModelAndView("/pages/editBox.jsp", model);
     } catch (IOException ex) {

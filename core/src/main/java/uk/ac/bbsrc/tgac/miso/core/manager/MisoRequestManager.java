@@ -85,6 +85,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.BoxChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.PoolChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
@@ -1657,7 +1658,11 @@ public class MisoRequestManager implements RequestManager {
         original.setIdentificationBarcode(box.getIdentificationBarcode());
         original.setSize(boxStore.getSizeById(box.getSize().getId()));
         original.setUse(boxStore.getUseById(box.getUse().getId()));
+        StringBuilder message = new StringBuilder();
+
         Map<String, Boxable> contents = new HashMap<>();
+        Set<String> newNames = new HashSet<>();
+        boolean relocationFlush = false;
         for (Map.Entry<String, Boxable> entry : box.getBoxables().entrySet()) {
           Boxable item;
           if (entry.getValue() instanceof Pool) {
@@ -1669,9 +1674,69 @@ public class MisoRequestManager implements RequestManager {
           } else {
             throw new IllegalArgumentException("Unknown boxable: " + entry.getValue().getClass().getName());
           }
+          if (item.getBox() != null && item.getBox().getId() != box.getId()) {
+            Box theftBox = item.getBox();
+            BoxChangeLog theftChangeLog = new BoxChangeLog();
+            theftChangeLog.setBox(theftBox);
+            theftChangeLog.setTime(new Date());
+            theftChangeLog.setColumnsChanged("contents");
+            theftChangeLog.setUser(getCurrentUser());
+            theftChangeLog.setSummary(
+                "Moved " + item.getAlias() + " (" + item.getName() + ") to " + original.getAlias() + " (" + original.getName() + ")");
+            theftBox.removeBoxable(item.getBoxPosition());
+            changeLogStore.create(theftChangeLog);
+            boxStore.save(theftBox);
+
+            if (message.length() > 0) {
+              message.append("\n");
+            }
+            message.append("Moved " + item.getAlias()).append(" (").append(item.getName()).append(") from ");
+            message.append(theftBox.getAlias()).append(" (").append(theftBox.getName()).append(") to ").append(entry.getKey());
+          } else if (item.getBox() != null && item.getBox().getId() == box.getId() && !item.getBoxPosition().equals(entry.getKey())) {
+            if (message.length() > 0) {
+              message.append("\n");
+            }
+            message.append("Relocated ").append(item.getAlias()).append(" (").append(item.getName()).append(") from ");
+            message.append(item.getBoxPosition()).append(" to ").append(entry.getKey());
+            original.removeBoxable(item.getBoxPosition());
+            relocationFlush = true;
+          }
+          if (item.getBox() == null) {
+            message.append("Added ").append(item.getAlias()).append(" (").append(item.getName()).append(") to").append(entry.getKey());
+          }
+          newNames.add(item.getName());
           contents.put(entry.getKey(), item);
         }
+        boolean removedAny = false;
+        for (Boxable oldItem : original.getBoxables().values()) {
+          if (!newNames.contains(oldItem.getName())) {
+            if (removedAny) {
+              message.append(", ");
+            } else {
+              if (message.length() > 0) {
+                message.append("\n");
+              }
+              message.append("Removed: ");
+              removedAny = true;
+            }
+            message.append(oldItem.getAlias()).append(" (").append(oldItem.getName()).append(")");
+          }
+        }
+        if (relocationFlush) {
+          // Because of constraints, we have to flush the original object having removed all the items that we intend to relocate in the
+          // same box.
+          boxStore.save(original);
+        }
         original.setBoxables(contents);
+        if (message.length() > 0) {
+          BoxChangeLog changeLog = new BoxChangeLog();
+          changeLog.setBox(original);
+          changeLog.setTime(new Date());
+          changeLog.setColumnsChanged("contents");
+          changeLog.setUser(getCurrentUser());
+          changeLog.setSummary(message.toString());
+          changeLogStore.create(changeLog);
+        }
         return boxStore.save(box);
       }
     } else {

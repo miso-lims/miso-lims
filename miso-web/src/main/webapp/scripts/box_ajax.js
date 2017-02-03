@@ -6,8 +6,8 @@ var Box = Box || {
 
   // Start the scanning process
   initScan: function() {
-    Box.dialogWidth = Box.boxJSON.size.columns * 40 + 150;
-    Box.dialogHeight = Box.boxJSON.size.rows * 40 + 300;
+    Box.dialogWidth = Box.boxJSON.cols * 40 + 150;
+    Box.dialogHeight = Box.boxJSON.rows * 40 + 300;
     Box.scanDialog = Box.ScanDialog();
     Box.prepareScannerDialog = Box.PrepareScannerDialog();
     Box.scanDiff = Box.ScanDiff();
@@ -25,10 +25,10 @@ var Box = Box || {
     Box.visual.create({
       div: '#boxContentsTable',
       size: {
-        rows: Box.boxJSON.size.rows,
-        cols: Box.boxJSON.size.columns
+        rows: Box.boxJSON.rows,
+        cols: Box.boxJSON.cols
       },
-      data: Box.boxJSON.boxables
+      data: Box.boxJSON.items
     });
     if (selected) {
       Box.visual.click(selected.row, selected.col);
@@ -172,10 +172,10 @@ Box.scan = {
           jQuery('#dialogDialog').dialog('close');
           Box.scanDialog.show({
             size: {
-              rows: Box.boxJSON.size.rows,
-              cols: Box.boxJSON.size.columns
+              rows: Box.boxJSON.rows,
+              cols: Box.boxJSON.cols
             },
-            data: Box.boxJSON.boxables
+            data: Box.boxJSON.items
           });
         },
         'doOnError': function() {
@@ -205,20 +205,20 @@ Box.scan = {
             scanErrors.show({
                 scan: scan,
               size: {
-                rows: Box.boxJSON.size.rows,
-                cols: Box.boxJSON.size.columns
+                rows: Box.boxJSON.rows,
+                cols: Box.boxJSON.cols
               },
-              data: Box.boxJSON.boxables
+              data: Box.boxJSON.items
             });
           } else {
             console.log("scan JSON from AJAX call was successful");
             Box.scanDiff.show({
               scan: scan.boxJSON,
               size: {
-                rows: Box.boxJSON.size.rows,
-                cols: Box.boxJSON.size.columns
+                rows: Box.boxJSON.rows,
+                cols: Box.boxJSON.cols
               },
-              data: Box.boxJSON.boxables
+              data: Box.boxJSON.items
             });
           }
         },
@@ -283,17 +283,11 @@ Box.ui = {
   //creates the table of the box contents
   createListingBoxablesTable: function(box) {
     jQuery('#listingBoxablesTable').empty();
-    var array = [];
-    for (var pos in box.boxables) {
-      if (box.boxables.hasOwnProperty(pos)) {
-        var row = [];
-        row.push(pos);
-        row.push(Box.utils.hyperlinkifyBoxable(box.boxables[pos].name, box.boxables[pos].id, box.boxables[pos].name));
-        row.push(Box.utils.hyperlinkifyBoxable(box.boxables[pos].name, box.boxables[pos].id, box.boxables[pos].alias));
-        array.push(row);
-      }
-    }
-
+    var array = box.items.map(function(item) { return [
+      item.coordinates,
+      Box.utils.hyperlinkifyBoxable(item.name, item.id, item.name),
+      Box.utils.hyperlinkifyBoxable(item.name, item.id, item.alias)
+    ]; });
     jQuery('#listingBoxablesTable').dataTable({
       "aaData" : array,
       "aoColumns" : [
@@ -303,9 +297,9 @@ Box.ui = {
       ],
       "bJQueryUI" : true,
       "bDestroy": true,
-      "aLengthMenu": [[Box.boxJSON.size.columns*Box.boxJSON.size.rows, 50, 25, 10],
-                      [Box.boxJSON.size.columns*Box.boxJSON.size.rows, 50, 25, 10]],
-      "iDisplayLength": Box.boxJSON.size.columns*Box.boxJSON.size.rows,
+      "aLengthMenu": [[Box.boxJSON.cols*Box.boxJSON.rows, 50, 25, 10],
+                      [Box.boxJSON.cols*Box.boxJSON.rows, 50, 25, 10]],
+      "iDisplayLength": Box.boxJSON.cols*Box.boxJSON.rows,
       "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>',
       "aaSorting": [
         [0, "asc"]
@@ -441,6 +435,11 @@ Box.ui = {
       }
     );
   },
+
+  getItemAtPosition: function(coordinates) {
+    var selected = Box.boxJSON.items.filter(function(item) { return item.coordinates == coordinates; });
+    return selected.length == 1 ? selected[0] : null;
+  },
   
   addItemToBox: function() {
     var barcode = jQuery('#selectedBarcode').val();
@@ -453,11 +452,12 @@ Box.ui = {
     } else {
       var selectedBarcode = jQuery('#selectedBarcode').val().trim();
       var selectedPosition = Box.utils.getPositionString(Box.visual.selected.row, Box.visual.selected.col);
+      var selectedItem = Box.ui.getItemAtPosition(selectedPosition);
       // if selectedPosition is already filled, confirm before deleting that position
-      if (Box.boxJSON.boxables[selectedPosition] && Box.boxJSON.boxables[selectedPosition].identificationBarcode != selectedBarcode) {
-        var sampleInfo = Box.boxJSON.boxables[selectedPosition].name +"::"+ Box.boxJSON.boxables[selectedPosition].alias;
+      if (selectedItem && selectedItem.identificationBarcode != selectedBarcode) {
+        var sampleInfo = selectedItem.name +"::"+ selectedItem.alias;
         if(confirm(sampleInfo + " is already located at position " + selectedPosition + ". Are you sure you wish to remove it from the box?")) {
-          delete Box.boxJSON.boxables[selectedPosition];
+          Box.boxJSON.items = Box.boxJSON.items.filter(function(item) { return item.coordinates != selectedPosition; });
         } else {
           return null;
         }
@@ -483,7 +483,7 @@ Box.ui = {
         },
           'doOnError': function (json) {
             alert(json.error);
-            jQuery('#selectedBarcode').val(Box.boxJSON.boxables[selectedPosition].identificationBarcode);
+            jQuery('#selectedBarcode').val(selectedItem.identificationBarcode);
           }
         }
       );  
@@ -492,8 +492,9 @@ Box.ui = {
   
   removeOneItem: function() {
     var selectedPosition = Box.utils.getPositionString(Box.visual.selected.row, Box.visual.selected.col);
+    var selectedItem = Box.ui.getItemAtPosition(selectedPosition);
   
-    if (confirm("Are you sure you wish to set location to unknown for " + Box.boxJSON.boxables[selectedPosition].name + "? You should re-home it as soon as possible")) {
+    if (confirm("Are you sure you wish to set location to unknown for " + selectedItem.name + "? You should re-home it as soon as possible")) {
       jQuery('#updateSelected, #emptySelected, #removeSelected').prop('disabled', true).addClass('disabled');
       
       Fluxion.doAjax(
@@ -509,7 +510,7 @@ Box.ui = {
           'doOnError': function (json) {
             alert(json.error);
             jQuery('#updateSelected, #emptySelected, #removeSelected').prop('disabled', false).removeClass('disabled');
-            jQuery('#selectedBarcode').val(Box.boxJSON.boxables[selectedPosition].identificationBarcode);
+            jQuery('#selectedBarcode').val(selectedItem.identificationBarcode);
           }
         }
       );  

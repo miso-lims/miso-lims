@@ -128,10 +128,10 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   private SampleDerivedInfo derivedInfo;
 
   @ManyToOne(targetEntity = BoxImpl.class)
-  @JoinFormula("(SELECT bp.boxId FROM BoxPosition bp WHERE bp.targetId = sampleId AND bp.targetType = 'S')")
+  @JoinFormula("(SELECT bp.boxId FROM BoxPosition bp WHERE bp.targetId = sampleId AND bp.targetType LIKE 'Sample%')")
   private Box box;
 
-  @Formula("(SELECT bp.position FROM BoxPosition bp WHERE bp.targetId = sampleId AND bp.targetType = 'S')")
+  @Formula("(SELECT bp.position FROM BoxPosition bp WHERE bp.targetId = sampleId AND bp.targetType LIKE 'Sample%')")
   private String position;
 
   @Override

@@ -172,9 +172,9 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   private LibraryDerivedInfo derivedInfo;
 
   @ManyToOne(targetEntity = BoxImpl.class)
-  @JoinFormula("(SELECT bp.boxId FROM BoxPosition bp WHERE bp.targetId = libraryId AND bp.targetType = 'L')")
+  @JoinFormula("(SELECT bp.boxId FROM BoxPosition bp WHERE bp.targetId = libraryId AND bp.targetType LIKE 'Library%')")
   private Box box;
-  @Formula("(SELECT bp.position FROM BoxPosition bp WHERE bp.targetId = libraryId AND bp.targetType = 'L')")
+  @Formula("(SELECT bp.position FROM BoxPosition bp WHERE bp.targetId = libraryId AND bp.targetType LIKE 'Library%')")
   private String position;
 
   @Override
