@@ -41,7 +41,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
+import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.Note;
+import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Lists;
 
@@ -104,6 +106,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.RunQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
+import uk.ac.bbsrc.tgac.miso.core.store.SecurityProfileStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerReferenceStore;
@@ -166,6 +169,8 @@ public class MisoRequestManager implements RequestManager {
   private BoxStore boxStore;
   @Autowired
   private SecurityStore securityStore;
+  @Autowired
+  private SecurityProfileStore securityProfileStore;
   @Autowired
   private LibraryDesignDao libraryDesignDao;
   @Autowired
@@ -930,6 +935,7 @@ public class MisoRequestManager implements RequestManager {
         throw new IOException("Cannot save project - invalid shortName: " + shortNameValidation.getMessage());
       }
       if (project.getId() == ProjectImpl.UNSAVED_ID) {
+        resolveMembers(project.getSecurityProfile());
         project.setName(generateTemporaryName());
         projectStore.save(project);
         try {
@@ -952,14 +958,54 @@ public class MisoRequestManager implements RequestManager {
             original.getOverviews().add(po);
           }
         }
+        // TODO: allow securityProfile updates?
         project = original;
       }
+      project.getSecurityProfile().setProfileId(saveSecurityProfile(project.getSecurityProfile()));
       long id = projectStore.save(project);
       if (projectAlertManager != null) projectAlertManager.update(project);
       return id;
     } else {
       throw new IOException("No projectStore available. Check that it has been declared in the Spring config.");
     }
+  }
+
+  private long saveSecurityProfile(SecurityProfile sp) throws IOException {
+    return securityProfileStore.save(sp);
+  }
+
+  private long resolveMembers(SecurityProfile sp) throws IOException {
+    if (sp == null) throw new NullPointerException("null SecurityProfile");
+    sp.setOwner(securityStore.getUserById(sp.getOwner().getUserId()));
+    sp.setReadUsers(resolveUsers(sp.getReadUsers()));
+    sp.setReadGroups(resolveGroups(sp.getReadGroups()));
+    sp.setWriteUsers(resolveUsers(sp.getWriteUsers()));
+    sp.setWriteGroups(resolveGroups(sp.getWriteGroups()));
+    return securityProfileStore.save(sp);
+  }
+
+  private Collection<User> resolveUsers(Collection<User> users) throws IOException {
+    List<User> resolved = Lists.newArrayList();
+    if (users != null) {
+      for (User user : users) {
+        User u = securityStore.getUserById(user.getUserId());
+        if (u == null) throw new IllegalArgumentException("User " + user.getUserId() + " does not exist");
+        resolved.add(u);
+      }
+    }
+    return resolved;
+  }
+
+  private Collection<Group> resolveGroups(Collection<Group> groups) throws IOException {
+    List<Group> resolved = Lists.newArrayList();
+    if (groups != null) {
+      for (Group group : groups) {
+        Group g = securityStore.getGroupById(group.getGroupId());
+        if (g == null) throw new IllegalArgumentException("Group " + group.getGroupId() + " does not exist");
+        resolved.add(g);
+      }
+    }
+    return resolved;
   }
 
   @Override
