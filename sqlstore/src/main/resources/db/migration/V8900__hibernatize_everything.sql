@@ -458,14 +458,14 @@ WHERE studyChangeLogId IN (
 ALTER TABLE StudyChangeLog ADD FOREIGN KEY (studyId) REFERENCES Study(studyId);
 
 ALTER TABLE BoxPosition ADD COLUMN targetId bigint(20) NOT NULL;
-ALTER TABLE BoxPosition ADD COLUMN targetType varchar(1) NOT NULL;
+ALTER TABLE BoxPosition ADD COLUMN targetType varchar(50) NOT NULL;
 ALTER TABLE BoxPosition ADD COLUMN position varchar(3) NOT NULL;
 -- StartNoTest
 ALTER TABLE BoxPosition CHANGE COLUMN targetId targetId bigint(20);
 ALTER TABLE BoxPosition CHANGE COLUMN targetType targetType varchar(1);
 ALTER TABLE BoxPosition CHANGE COLUMN position position varchar(3);
 UPDATE BoxPosition SET
-  position = CONCAT(CHAR(65 + `column`), LPAD(row, 2, '0')),
+  position = CONCAT(CHAR(65 + `column`), LPAD(row + 1, 2, '0')),
   targetType = (
     SELECT 'S' FROM Sample WHERE Sample.boxPositionId = BoxPosition.boxPositionId UNION
     SELECT 'L' FROM Library WHERE Library.boxPositionId = BoxPosition.boxPositionId UNION

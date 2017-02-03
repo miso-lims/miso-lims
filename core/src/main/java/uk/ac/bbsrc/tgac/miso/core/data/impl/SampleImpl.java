@@ -25,6 +25,7 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.io.Serializable;
 
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
@@ -49,6 +50,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SampleChangeLog;
 @Entity
 @Table(name = "Sample")
 @Inheritance(strategy = InheritanceType.JOINED)
+@DiscriminatorValue("S")
 public class SampleImpl extends AbstractSample implements Serializable {
 
   private static final long serialVersionUID = 1L;

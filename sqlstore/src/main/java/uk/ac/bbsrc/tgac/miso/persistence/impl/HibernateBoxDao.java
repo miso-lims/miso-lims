@@ -183,7 +183,7 @@ public class HibernateBoxDao implements BoxStore {
       return (long) currentSession().save(box);
     } else {
       currentSession().update(box);
-      currentSession().flush();
+      currentSession().flush(); // This is required to make it possible to move items with in a box without creating constraint violations
       return box.getId();
     }
   }

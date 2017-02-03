@@ -1093,6 +1093,7 @@ public class Dtos {
     if (from.getBox() != null) {
       dto.setBoxAlias(from.getBox().getAlias());
       dto.setBoxPosition(BoxUtils.makeLocationLabel(from));
+      dto.setCoordinates(from.getBoxPosition());
     }
     dto.setDiscarded(from.isDiscarded());
     dto.setIdentificationBarcode(from.getIdentificationBarcode());
