@@ -84,6 +84,7 @@ public class HibernateLibraryDilutionDao implements LibraryDilutionStore {
   public int countByPlatform(PlatformType platform) throws IOException {
     if (platform == null) throw new NullPointerException("Cannot look up library dilutions by null platform");
     Criteria criteria = currentSession().createCriteria(LibraryDilution.class);
+    criteria.createAlias("library", "library");
     criteria.add(Restrictions.eq("library.platformType", platform));
     return ((Long) criteria.setProjection(Projections.rowCount()).uniqueResult()).intValue();
   }
@@ -120,7 +121,9 @@ public class HibernateLibraryDilutionDao implements LibraryDilutionStore {
   @Override
   public Collection<LibraryDilution> listAllLibraryDilutionsByProjectId(long projectId) throws IOException {
     Criteria criteria = currentSession().createCriteria(LibraryDilution.class);
-    criteria.createAlias("library.sample", "sample").createAlias("sample.project", "project");
+    criteria.createAlias("library", "library");
+    criteria.createAlias("library.sample", "sample");
+    criteria.createAlias("sample.project", "project");
     criteria.add(Restrictions.eq("project.id", projectId));
     @SuppressWarnings("unchecked")
     List<LibraryDilution> records = criteria.list();

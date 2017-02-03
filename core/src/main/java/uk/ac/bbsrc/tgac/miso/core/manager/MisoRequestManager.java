@@ -40,11 +40,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import com.google.common.collect.Lists;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBox;
@@ -81,6 +84,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.PoolChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.PoolAlertManager;
@@ -1143,12 +1148,38 @@ public class MisoRequestManager implements RequestManager {
     }
   }
 
+  private Set<String> extractDilutionNames(Set<LibraryDilution> dilutions) {
+    Set<String> original = new HashSet<>();
+    for (LibraryDilution dilution : dilutions) {
+      original.add(dilution.getName());
+    }
+    return original;
+  }
+
+  @Autowired
+  private SecurityManager securityManager;
+
+  public User getCurrentUser() throws IOException {
+    Authentication auth = SecurityContextHolder.getContextHolderStrategy().getContext().getAuthentication();
+    if (auth == null) {
+      return null;
+    }
+    User user = securityManager.getUserByLoginName(auth.getName());
+    if (user == null && auth.isAuthenticated()) {
+      user = new UserImpl();
+      user.setAdmin(true);
+      user.setActive(true);
+    }
+    return user;
+  }
+
   @Override
   public long savePool(Pool pool) throws IOException {
     if (poolStore != null) {
       if (pool.isDiscarded()) {
         pool.setVolume(0.0);
       }
+      pool.setLastModifier(getCurrentUser());
 
       if (pool.getId() == PoolImpl.UNSAVED_ID) {
         pool.setName(generateTemporaryName());
@@ -1172,11 +1203,36 @@ public class MisoRequestManager implements RequestManager {
         original.setPlatformType(pool.getPlatformType());
         original.setQcPassed(pool.getQcPassed());
         original.setReadyToRun(pool.getReadyToRun());
+
+        Set<String> originalItems = extractDilutionNames(original.getPoolableElements());
+
         Set<LibraryDilution> pooledElements = new HashSet<>();
         for (LibraryDilution dilution : pool.getPoolableElements()) {
           pooledElements.add(libraryDilutionStore.get(dilution.getId()));
         }
         original.setPoolableElements(pooledElements);
+
+        Set<String> updatedItems = extractDilutionNames(pooledElements);
+
+        Set<String> added = new TreeSet<>(updatedItems);
+        added.removeAll(originalItems);
+        Set<String> removed = new TreeSet<>(originalItems);
+        removed.removeAll(updatedItems);
+
+        if (!added.isEmpty() || !removed.isEmpty()) {
+          StringBuilder message = new StringBuilder();
+          message.append("Items");
+          LimsUtils.appendSet(message, added, "added");
+          LimsUtils.appendSet(message, removed, "removed");
+
+          PoolChangeLog changeLog = new PoolChangeLog();
+          changeLog.setPool(pool);
+          changeLog.setColumnsChanged("contents");
+          changeLog.setSummary(message.toString());
+          changeLog.setTime(new Date());
+          changeLog.setUser(pool.getLastModifier());
+          changeLogStore.create(changeLog);
+        }
         pool = original;
       }
       long id = poolStore.save(pool);

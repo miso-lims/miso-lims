@@ -749,4 +749,21 @@ public class LimsUtils {
       throw new IOException("Error generating barcode");
     }
   }
+
+  public static void appendSet(StringBuilder target, Set<String> items, String prefix) {
+    if (items.isEmpty()) return;
+    target.append(" ");
+    target.append(prefix);
+    target.append(": ");
+    boolean first = true;
+    for (String item : items) {
+      if (first) {
+        first = false;
+      } else {
+        target.append(", ");
+      }
+      target.append(item);
+    }
+  }
+
 }
