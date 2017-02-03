@@ -72,7 +72,8 @@
 
   <bean id="namingSchemeResolverService" name="namingSchemeResolverService" class="uk.ac.bbsrc.tgac.miso.core.service.naming.resolvers.StaticMappedNamingSchemeResolverService" />
 
-  <bean id="namingScheme" name="namingScheme" class="uk.ac.bbsrc.tgac.miso.core.service.naming.DefaultNamingScheme"/>
+  <!-- further naming scheme config happens in MisoAppListener -->
+  <bean id="namingScheme" name="namingScheme" class="uk.ac.bbsrc.tgac.miso.core.service.naming.DelegatingNamingScheme"/>
 
   <bean id="filePathGeneratorResolverService" name="filePathGeneratorResolverService" class="uk.ac.bbsrc.tgac.miso.core.service.submission.MisoFilePathGeneratorResolverService" />
 

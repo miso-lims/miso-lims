@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.webapp.context;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+import io.prometheus.client.hotspot.DefaultExports;
 
 import java.util.Date;
 import java.util.Map;
@@ -51,6 +52,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.factory.issuetracker.IssueTrackerFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.DelegatingNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.generation.NameGenerator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.resolvers.NamingSchemeResolverService;
@@ -59,8 +61,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.runstats.client.manager.RunStatsManager;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoPropertyExporter;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
-
-import io.prometheus.client.hotspot.DefaultExports;
 
 /**
  * The custom MISO context listener class. On webapp context init, we can do some startup checks, e.g. checking the existence of required
@@ -162,15 +162,15 @@ public class MisoAppListener implements ServletContextListener {
         .getBean("namingSchemeResolverService");
 
     String currentPropertyValue = null;
-    NamingScheme scheme = (NamingScheme) context.getBeanFactory().getBean("namingScheme");
-    if ((currentPropertyValue = getStringPropertyOrNull("miso.naming.scheme", misoProperties)) != null) {
-      scheme = resolver.getNamingScheme(currentPropertyValue);
-      if (scheme == null) throw new IllegalArgumentException("Failed to load naming scheme '" + currentPropertyValue + "'");
-      SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(scheme);
-      log.info("Replacing default namingScheme with " + scheme.getClass().getSimpleName());
-      ((DefaultListableBeanFactory) context.getBeanFactory()).removeBeanDefinition("namingScheme");
-      context.getBeanFactory().registerSingleton("namingScheme", scheme);
+    DelegatingNamingScheme schemeHolder = (DelegatingNamingScheme) context.getBeanFactory().getBean("namingScheme");
+    if ((currentPropertyValue = getStringPropertyOrNull("miso.naming.scheme", misoProperties)) == null) {
+      throw new IllegalArgumentException("No naming scheme configured");
     }
+    NamingScheme scheme = resolver.getNamingScheme(currentPropertyValue);
+    if (scheme == null) throw new IllegalArgumentException("Failed to load naming scheme '" + currentPropertyValue + "'");
+    SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(scheme);
+    log.info("Replacing default namingScheme with " + scheme.getClass().getSimpleName());
+    schemeHolder.setActualNamingScheme(scheme);
 
     if ((currentPropertyValue = getStringPropertyOrNull("miso.naming.generator.nameable.name", misoProperties)) != null) {
       NameGenerator<Nameable> generator = resolver.getNameGenerator(currentPropertyValue);
