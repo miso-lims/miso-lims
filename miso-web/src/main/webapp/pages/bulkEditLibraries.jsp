@@ -88,7 +88,7 @@
       Library.hot.librariesJSON = ${librariesJSON};
       Library.hot.librariesJSON = Hot.sortByProperty(Library.hot.librariesJSON, 'parentSampleAlias');
       Hot.dropdownRef = ${referenceDataJSON};
-      Hot.dropdownRef.platformNames = ${platformNames};
+      Hot.dropdownRef.platformTypes = ${platformTypes};
       Hot.dropdownRef.indices = ${indices};
       Hot.dropdownRef.indexFamilies = {};
       Hot.detailedSample = JSON.parse(document.getElementById('HOTbulkForm').dataset.detailedSample);
@@ -111,8 +111,8 @@
         // source for index family column depends on mandatory platform
         var datalen = Hot.startData.length;
         for (var i = 0; i < datalen; i++) {
-          Library.hot.updateIndexFamilyCellsSources(i, Hot.startData[i].platformName);
-          Library.hot.updateIndexCellsSources(i, Hot.startData[i].platformName, Hot.startData[i].indexFamilyName);
+          Library.hot.updateIndexFamilyCellsSources(i, Hot.startData[i].platformType);
+          Library.hot.updateIndexCellsSources(i, Hot.startData[i].platformType, Hot.startData[i].indexFamilyName);
         }
       };
 

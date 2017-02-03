@@ -107,7 +107,7 @@ Library.hot = {
     Library.hot.ifamIndex = Hot.getColIndex('indexFamilyName');
     Library.hot.index1ColIndex = Hot.getColIndex('index1Label');
     Library.hot.index2ColIndex = Hot.getColIndex('index2Label');
-    Library.hot.pfIndex = Hot.getColIndex('platformName');
+    Library.hot.pfIndex = Hot.getColIndex('platformType');
     
     var aliasColIndex = Hot.getColIndex('alias');
     Hot.startData.forEach(function (library, index) {
@@ -121,7 +121,7 @@ Library.hot = {
       if (library.libraryDesignAlias) {
         Library.hot.changeDesign(index, 'libraryDesignAlias', null, library.libraryDesignAlias);
       } else {
-        Hot.hotTable.setCellMeta(index, Library.hot.ltIndex, 'source', Library.hot.libraryTypeAliases[library.platformName]);
+        Hot.hotTable.setCellMeta(index, Library.hot.ltIndex, 'source', Library.hot.libraryTypeAliases[library.platformType]);
       }
     });
     Hot.hotTable.render();
@@ -149,7 +149,7 @@ Library.hot = {
             continue;
           }
           switch (changes[i][1]) {
-            case 'platformName':
+            case 'platformType':
               Library.hot.changePlatform(changes[i][0], changes[i][1], changes[i][2], changes[i][3]);
               break;
             case 'indexFamilyName':
@@ -185,7 +185,7 @@ Library.hot = {
     libraryTypeId: null,
     libraryTypeAlias: '',
     lowQuality: null,
-    platformName: '',
+    platformType: '',
     indexFamilyName: '',
     index1Label: '',
     index2Label: '',
@@ -199,7 +199,7 @@ Library.hot = {
    * Gets array of platform names
    */
   getPlatforms: function () {
-    return Hot.dropdownRef['platformNames'];
+    return Hot.dropdownRef['platformTypes'];
   },
   
   /**
@@ -304,7 +304,7 @@ Library.hot = {
       },
       {
         header: 'Platform',
-        data: 'platformName',
+        data: 'platformType',
         type: 'dropdown',
         trimDropdown: false,
         source: Library.hot.getPlatforms(),
@@ -449,7 +449,7 @@ Library.hot = {
   changePlatform: function (row, col, from, to) {
     // update library types
     Hot.startData[row].libraryTypeAlias = '';
-    Hot.hotTable.setCellMeta(row, Library.hot.ltIndex, 'source', Library.hot.libraryTypeAliases[to]);
+    Hot.hotTable.setCellMeta(row, Library.hot.ltIndex, 'source', Library.hot.libraryTypeAliases[to.toUpperCase()]);
     Hot.hotTable.setCellMeta(row, Library.hot.ltIndex, 'renderer', Hot.requiredAutocompleteRenderer);
 
     Library.hot.updateIndexFamilyCellsSources(row, to);
@@ -463,19 +463,19 @@ Library.hot = {
   /**
    * Updates Index Family column source (usually triggered by Platform change)
    */
-  updateIndexFamilyCellsSources: function (row, platformName) {
+  updateIndexFamilyCellsSources: function (row, platformType) {
     // update index family
     // use stored index family if it has already been retrieved.
     Hot.hotTable.setCellMeta(row, Library.hot.index1ColIndex, 'source', [""]);
     Hot.hotTable.setCellMeta(row, Library.hot.index2ColIndex, 'source', [""]);
-    if (Hot.dropdownRef.indexFamilies[platformName]) {
-      Hot.hotTable.setCellMeta(row, Library.hot.ifamIndex, 'source', Object.keys(Hot.dropdownRef.indices[platformName]));
-    } else if (platformName) {
-      jQuery.get('../../indexFamiliesJson', {platform: platformName},
+    if (Hot.dropdownRef.indexFamilies[platformType]) {
+      Hot.hotTable.setCellMeta(row, Library.hot.ifamIndex, 'source', Object.keys(Hot.dropdownRef.indices[platformType]));
+    } else if (platformType) {
+      jQuery.get('../../indexFamiliesJson', {platform: platformType},
         function (data) {
           Hot.hotTable.setCellMeta(row, Library.hot.ifamIndex, 'source', data['indexFamilies']);
-          Hot.dropdownRef.indexFamilies[platformName] = {};
-          Hot.dropdownRef.indexFamilies[platformName] = data['indexFamilies'];
+          Hot.dropdownRef.indexFamilies[platformType] = {};
+          Hot.dropdownRef.indexFamilies[platformType] = data['indexFamilies'];
         }    
       );
     }
@@ -484,9 +484,9 @@ Library.hot = {
   /**
    * Updates the source arrays for index1Label and index2Label columns (usually triggered by Index Family change)
    */
-  updateIndexCellsSources: function (row, platformName, ifam) {
-    function setIndexSource (platformName, ifam, pos, len) {
-      var indexLabels = Library.hot.getIndexLabels(Hot.dropdownRef.indices[platformName][ifam][pos]);
+  updateIndexCellsSources: function (row, platformType, ifam) {
+    function setIndexSource (platformType, ifam, pos, len) {
+      var indexLabels = Library.hot.getIndexLabels(Hot.dropdownRef.indices[platformType][ifam][pos]);
       if (pos == 2) indexLabels.push('');
       Hot.hotTable.setCellMeta(row, Library.hot['index' + pos + 'ColIndex'], 'source', indexLabels);
       Hot.hotTable.setCellMeta(row, Library.hot['index' + pos + 'ColIndex'], 'readOnly', false);
@@ -496,23 +496,23 @@ Library.hot = {
         Hot.hotTable.setCellMeta(row, Library.hot['index2ColIndex'], 'readOnly', true);
       }
     }
-    if (Hot.dropdownRef.indices[platformName] && Hot.dropdownRef.indices[platformName][ifam] && Hot.dropdownRef.indices[platformName][ifam]['1']) {
+    if (Hot.dropdownRef.indices[platformType] && Hot.dropdownRef.indices[platformType][ifam] && Hot.dropdownRef.indices[platformType][ifam]['1']) {
       // if indices for this indexFamily are already stored locally, use these
-      var ifamKeysLength = Object.keys(Hot.dropdownRef.indices[platformName][ifam]).length;
+      var ifamKeysLength = Object.keys(Hot.dropdownRef.indices[platformType][ifam]).length;
       for (var posn = 1; posn <= ifamKeysLength; posn++) {
-        setIndexSource(platformName, ifam, posn, ifamKeysLength);
+        setIndexSource(platformType, ifam, posn, ifamKeysLength);
       }
-    } else if (ifam != 'No index' && ifam && platformName) {
+    } else if (ifam != 'No index' && ifam && platformType) {
       // get indices from server
       jQuery.get("../../library/indexPositionsJson", {indexFamily: ifam},
         function(posData) {
           for (var pos = 1; pos < posData['numApplicableIndices']; pos++) {
             // set indices in stored object
-            Hot.dropdownRef.indices[platformName][ifam] = {};
+            Hot.dropdownRef.indices[platformType][ifam] = {};
             jQuery.get('../../library/indicesJson', {indexFamily: ifam, position: pos},
               function (json) {
-                Hot.dropdownRef.indices[platformName][ifam][pos] = json.indices;
-                setIndexSource(platformName, ifam, pos, posData['numApplicableIndices']);
+                Hot.dropdownRef.indices[platformType][ifam][pos] = json.indices;
+                setIndexSource(platformType, ifam, pos, posData['numApplicableIndices']);
               }
             );
           }
@@ -542,11 +542,11 @@ Library.hot = {
   /**
    * Gets index families data from server
    */
-  getIndexFamiliesOnly: function (platformName) {
-    jQuery.get('../../indexFamiliesJson', {platform: platformName},
+  getIndexFamiliesOnly: function (platformType) {
+    jQuery.get('../../indexFamiliesJson', {platform: platformType},
       function (data) {
-        Hot.dropdownRef.indexFamilies[platformName] = {};
-        Hot.dropdownRef.indexFamilies[platformName] = data['indexFamilies'];
+        Hot.dropdownRef.indexFamilies[platformType] = {};
+        Hot.dropdownRef.indexFamilies[platformType] = data['indexFamilies'];
       }    
     );
   },
@@ -592,14 +592,14 @@ Library.hot = {
       // add basic library attributes
       lib.description = obj.description;
       lib.parentSampleId = obj.parentSampleId;
-      if (obj.initialConcentration) {
+      if (obj.concentration) {
         lib.concentration = obj.concentration;
       }
       if (obj.identificationBarcode) {
         lib.identificationBarcode = obj.identificationBarcode;
       }
 
-      lib.platformName = obj.platformName;
+      lib.platformType = obj.platformType;
 
       if (obj.librarySelectionTypeAlias == '(None)') {
         lib.librarySelectionTypeId = undefined;
@@ -623,12 +623,12 @@ Library.hot = {
         var ifam = obj.indexFamilyName;
         lib.indexFamilyName = ifam;
         if (obj.index1Label) {
-          lib.index1Id = Library.hot.getIdFromIndexLabel(obj.index1Label, Hot.dropdownRef.indices[lib.platformName][ifam]['1']);
+          lib.index1Id = Library.hot.getIdFromIndexLabel(obj.index1Label, Hot.dropdownRef.indices[lib.platformType][ifam]['1']);
         } else {
           lib.index1Id = undefined;
         }
         if (obj.index2Label) {
-          lib.index2Id = Library.hot.getIdFromIndexLabel(obj.index2Label, Hot.dropdownRef.indices[lib.platformName][ifam]['2']);
+          lib.index2Id = Library.hot.getIdFromIndexLabel(obj.index2Label, Hot.dropdownRef.indices[lib.platformType][ifam]['2']);
         } else {
           lib.index2Id = undefined;
         }
@@ -637,6 +637,8 @@ Library.hot = {
       lib.volume = obj.volume;
 
       if (Hot.detailedSample) {
+        lib.type = 'Detailed';
+        
         if (obj.kitDescriptorName) {
           lib.kitDescriptorId = Hot.maybeGetProperty(Hot.findFirstOrNull(Hot.namePredicate(obj.kitDescriptorName), Hot.sampleOptions.kitDescriptorsDtos), 'id');
         }
@@ -652,9 +654,15 @@ Library.hot = {
           lib.libraryDesignId = Hot.maybeGetProperty(Hot.findFirstOrNull(Hot.namePredicate(obj.libraryDesignAlias), Library.designs), 'id');
         }
         lib.libraryDesignCodeId = Hot.maybeGetProperty(Hot.findFirstOrNull(function (ldCode) { return ldCode.code == obj.libraryDesignCode; }, Hot.dropdownRef.libraryDesignCodes), 'id');
+      } else {
+        lib.type = 'Plain';
       }
 
-      lib.qcPassed = (obj.qcPassed && obj.qcPassed != 'unknown' ? obj.qcPassed : '') || '';
+      if (obj.qcPassed === 'true') {
+        lib.qcPassed = true;
+      } else if (obj.qcPassed === 'false') {
+        lib.qcPassed = false;
+      }
 
       // TODO: add qcCols
     } catch (e) {

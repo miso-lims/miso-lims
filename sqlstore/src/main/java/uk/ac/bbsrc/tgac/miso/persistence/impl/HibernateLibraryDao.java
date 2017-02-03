@@ -15,7 +15,6 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.sql.JoinType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,8 +43,6 @@ public class HibernateLibraryDao implements LibraryStore {
   private interface AdjacencySelector {
     Criterion generateCriterion(String associationPath, Long libraryId);
 
-    Criterion generateCriterion(String associationPathOne, String associationPathTwo);
-
     Order getOrder(String associationPath);
   }
 
@@ -61,11 +58,6 @@ public class HibernateLibraryDao implements LibraryStore {
       return Order.desc(associationPath);
     }
 
-    @Override
-    public Criterion generateCriterion(String associationPathOne, String associationPathTwo) {
-      return Restrictions.ltProperty(associationPathOne, associationPathTwo);
-    }
-
   };
 
   private static final AdjacencySelector AFTER = new AdjacencySelector() {
@@ -78,11 +70,6 @@ public class HibernateLibraryDao implements LibraryStore {
     @Override
     public Order getOrder(String associationPath) {
       return Order.asc(associationPath);
-    }
-
-    @Override
-    public Criterion generateCriterion(String associationPathOne, String associationPathTwo) {
-      return Restrictions.gtProperty(associationPathOne, associationPathTwo);
     }
 
   };
@@ -375,10 +362,14 @@ public class HibernateLibraryDao implements LibraryStore {
   public Library getAdjacentLibrary(long libraryId, boolean before) throws IOException {
     AdjacencySelector selector = before ? BEFORE : AFTER;
 
+    Library lib = get(libraryId);
+    if (lib == null) throw new IOException("Library not found");
+
     // get library siblings
     Criteria criteria = currentSession().createCriteria(LibraryImpl.class);
-    criteria.createAlias("sample.libraries", "targetLibrary", JoinType.INNER_JOIN);
-    criteria.add(selector.generateCriterion("targetLibrary.id", libraryId));
+    criteria.createAlias("sample", "sample");
+    criteria.add(Restrictions.eq("sample.id", lib.getSample().getId()));
+    criteria.add(selector.generateCriterion("id", libraryId));
     criteria.addOrder(selector.getOrder("id"));
     criteria.setMaxResults(1);
     Library library = (Library) criteria.uniqueResult();
@@ -386,18 +377,16 @@ public class HibernateLibraryDao implements LibraryStore {
 
     // get library cousins
     criteria = currentSession().createCriteria(LibraryImpl.class);
-    criteria.createAlias("sample.project.samples", "targetSample", JoinType.INNER_JOIN);
-    criteria.add(Restrictions.eq("targetSample.libraries.id", libraryId));
-    criteria.add(selector.generateCriterion("targetSample.id", "sample.id"));
+    criteria.createAlias("sample", "sample");
+    criteria.createAlias("sample.project", "project");
+    criteria.add(Restrictions.eq("project.id", lib.getSample().getProject().getId()));
+    criteria.add(selector.generateCriterion("id", lib.getId()));
     criteria.addOrder(selector.getOrder("sample.id"));
     criteria.addOrder(selector.getOrder("id"));
     criteria.setMaxResults(1);
-
     library = (Library) criteria.uniqueResult();
     return library;
   }
-
-  
 
   @Override
   public List<Library> searchByCreationDate(Date from, Date to) throws IOException {

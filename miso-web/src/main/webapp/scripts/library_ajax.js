@@ -721,9 +721,9 @@ Library.barcode = {
 };
 
 Library.ui = {
-  changePlatformName: function (originalLibraryTypeId, callback) {
+  changePlatformType: function (originalLibraryTypeId, callback) {
     var self = this;
-    var platform = jQuery('#platformNames').val();
+    var platform = jQuery('#platformTypes').val();
     Fluxion.doAjax(
       'libraryControllerHelperService',
       'changePlatformName',
