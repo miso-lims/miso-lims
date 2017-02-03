@@ -1,13 +1,10 @@
 package uk.ac.bbsrc.tgac.miso.core.service.naming;
 
-import javax.swing.Box;
-
-import org.jfree.base.Library;
-
-import com.eaglegenomics.simlims.core.Project;
-
+import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
