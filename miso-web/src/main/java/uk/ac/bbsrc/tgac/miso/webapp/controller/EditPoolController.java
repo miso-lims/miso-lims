@@ -227,10 +227,10 @@ public class EditPoolController {
     switch (sortColIndex) {
     case 0:
       // sorting directly on name doesn't make sense in the UI
-      sortCol = "ld.dilutionId";
+      sortCol = "dilutionId";
       break;
     case 1:
-      sortCol = "ld.concentration";
+      sortCol = "concentration";
       break;
     default:
       throw new IOException("Unexpected value in elementSelectDataTable sortCol " + sortColIndex);
