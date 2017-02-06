@@ -54,22 +54,24 @@ public class DefaultPrinterService implements PrinterService {
 
   @Override
   public void remove(Printer printer) throws IOException {
+    authorizationManager.throwIfNonAdmin();
     Printer original = printerStore.get(printer.getId());
     if (original == null) {
       return;
     }
-    printerStore.remove(printer);
+    printerStore.remove(original);
   }
 
   @Override
   public long update(Printer printer) throws IOException {
+    authorizationManager.throwIfNotInternal();
     Printer original = printerStore.get(printer.getId());
     original.setBackend(printer.getBackend());
     original.setConfiguration(printer.getConfiguration());
     original.setDriver(printer.getDriver());
     original.setEnabled(printer.isEnabled());
     original.setName(printer.getName());
-    return printerStore.save(printer);
+    return printerStore.save(original);
   }
 
 }
