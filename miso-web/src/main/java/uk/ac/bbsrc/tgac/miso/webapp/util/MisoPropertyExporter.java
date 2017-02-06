@@ -103,12 +103,6 @@ public class MisoPropertyExporter extends PropertyPlaceholderConfigurer {
         }
       }
 
-      // override any config file security.method property with that from the system env
-      if (System.getenv("security.method") != null) {
-        misoProps.put("security.method", System.getenv("security.method"));
-        log.debug("Set security.method to " + misoProps.get("security.method"));
-      }
-
       super.processProperties(beanFactoryToProcess, misoProps);
       resolvedProperties = new HashMap<>();
       for (Object key : misoProps.keySet()) {

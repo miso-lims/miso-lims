@@ -49,4 +49,8 @@ public interface SecurityManager {
   public Group getGroupByName(String groupName) throws IOException;
 
   public SecurityProfile getSecurityProfileById(Long profileId) throws IOException;
+
+  public boolean isPasswordMutable();
+
+  public boolean canCreateNewUser();
 }

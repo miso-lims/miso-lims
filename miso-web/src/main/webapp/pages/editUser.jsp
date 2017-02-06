@@ -26,7 +26,7 @@
 <div id="maincontent">
   <div id="contentcolumn">
     <c:choose>
-      <c:when test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+      <c:when test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN') and (user.loginName ne SPRING_SECURITY_CONTEXT.authentication.principal.username)}">
         <form:form id="user-form" data-parsley-validation="" action="/miso/admin/user" method="POST" commandName="user" autocomplete="off">
           <sessionConversation:insertSessionConversationId attributeName="user"/>
           <h1><c:choose><c:when
@@ -87,11 +87,7 @@
             </tr>
             <sec:authorize access="hasRole('ROLE_ADMIN')">
               <c:choose>
-                <c:when test="${securityMethod eq 'jdbc'}">
-                  <tr>
-                    <td>Current Password:</td>
-                    <td><form:password path="password"/></td>
-                  </tr>
+                <c:when test="${mutablePassword}">
                   <tr>
                     <td>New Password:</td>
                     <td><input type="password" name="newpassword" id="newpassword"/></td>
@@ -104,8 +100,7 @@
                 <c:otherwise>
                   <tr>
                     <td>Password:</td>
-                    <td><i>Password change support only available for the 'jdbc' security method. If using LDAP, please change
-                      the user password in your LDAP server.</i></td>
+                    <td><i>Change password using the method specified by IT.</i></td>
                   </tr>
                 </c:otherwise>
               </c:choose>
@@ -176,7 +171,7 @@
               </td>
             </tr>
             <c:choose>
-              <c:when test="${securityMethod eq 'jdbc'}">
+              <c:when test="${mutablePassword}">
                 <tr>
                   <td>Current Password:</td>
                   <td><form:password path="password"/></td>
@@ -193,8 +188,7 @@
               <c:otherwise>
                 <tr>
                   <td>Password:</td>
-                  <td><i>Password change support only available for the 'jdbc' security method. If using LDAP, please change
-                    the user password in your LDAP server.</i></td>
+                  <td><i>Change password using the method specified by IT.</i></td>
                 </tr>
               </c:otherwise>
             </c:choose>
