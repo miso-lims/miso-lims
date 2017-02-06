@@ -10,7 +10,7 @@ public class DefaultNameGenerator implements NameGenerator<Nameable> {
   public String generate(Nameable nameable) throws MisoNamingException {
     DefaultMisoEntityPrefix selected = null;
     for (DefaultMisoEntityPrefix prefix : DefaultMisoEntityPrefix.values()) {
-      if (prefix.getClass().isAssignableFrom(nameable.getClass())) {
+      if (prefix.getTargetClass().isAssignableFrom(nameable.getClass())) {
         if (selected != null) {
           throw new MisoNamingException("Multiple prefixes are available for object of type: " + nameable.getClass().getSimpleName());
         }
