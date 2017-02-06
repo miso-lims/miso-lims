@@ -24,15 +24,15 @@
 var Print = Print || {};
 
 Print.ui = {
-  changeBackend : function() {
-    var backend = document.getElementById('backend').value;
+  changeBackend: function() {
+    var backend = parseInt(document.getElementById('backend').value);
     jQuery('#backendConfiguration').html(
       Print.backends.filter(function(b) { return b.id == backend; })[0].configurationKeys.map(function (k) {
         return k + ": <input id='cfg" + k + "'/>";
       }).join("<br/>"));
   },
 
-  showAddPrinter : function() {
+  showAddPrinter: function() {
     Print.ui.dialog = jQuery('#add-printer-dialog').dialog({
         autoOpen: true,
         height: 400,
@@ -40,13 +40,13 @@ Print.ui = {
         modal: true,
         buttons: {
           "Save": function() {
-            var backend = document.getElementById('backend').value;
+            var backend = parseInt(document.getElementById('backend').value);
             var configuration = {};
             Print.backends.filter(function(b) { return b.id == backend; })[0].configurationKeys.forEach(function (k) {
              configuration[k] = document.getElementById('cfg' + k).value;
             });
 
-            Print.service.addPrinterService(
+            Print.service.addPrinter(
               document.getElementById('addName').value,
               document.getElementById('driver').value,
               backend,
@@ -61,10 +61,10 @@ Print.ui = {
 };
 
 Print.service = {
-  addPrinterService : function(name, driver, backend, configuration) {
+  addPrinter: function(name, driver, backend, configuration) {
     Fluxion.doAjax(
       'printerControllerHelperService',
-      'addPrintService',
+      'addPrinter',
       {
         'name':name,
         'driver':driver,
@@ -79,10 +79,10 @@ Print.service = {
     );
   },
 
-  setPrinterEnabled : function(printerId, state) {
+  setPrinterState: function(printerId, state) {
     Fluxion.doAjax(
     'printerControllerHelperService',
-    'setPrinterEnabled',
+    'setPrinterState',
     {
       'printerId':printerId,
       'state':state,
@@ -92,10 +92,10 @@ Print.service = {
     });
   },
 
-  removePrinter : function(printerId) {
+  deletePrinter: function(printerId) {
     Fluxion.doAjax(
     'printerControllerHelperService',
-    'removePrinter',
+    'deletePrinter',
     {
       'printerId':printerId,
       'url':ajaxurl},

@@ -44,10 +44,12 @@
          <th>Printer</th>
          <th>Driver</th>
          <th>Backend</th>
-         <th>Enabled</th>
-         <c:if test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+         <sec:authorize access="hasRole('ROLE_INTERNAL')">
+           <th>Availability</th>
+         </sec:authorize>
+         <sec:authorize access="hasRole('ROLE_ADMIN')">
            <th>Delete</th>
-         </c:if>
+         </sec:authorize>
        </tr>
        </thead>
        <tbody>
@@ -58,22 +60,23 @@
            <td>${printer.driver}</td>
            <td>${printer.backend}</td>
 
-           <td>
-              <span class="miso-button ui-state-default ui-corner-all ui-icon ui-icon-check"
-                           onclick="Print.service.setPrinterEnabled(${printer.id}, !${printer.enabled});">
-                <c:choose>
-                  <c:when test="${printer.enabled}">Disable</c:when>
-                  <c:otherwise>Enable</c:otherwise>
-                </c:choose>
-             </span>
-           </td>
-           <c:if test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+           <sec:authorize access="hasRole('ROLE_INTERNAL')">
+             <td>
+               <a href='javascript:void(0);' onclick="Print.service.setPrinterState(${printer.id}, !${printer.enabled});">
+                 <c:choose>
+                   <c:when test="${printer.enabled}">Disable</c:when>
+                   <c:otherwise>Enable</c:otherwise>
+                 </c:choose>
+               </a>
+             </td>
+           </sec:authorize>
+           <sec:authorize access="hasRole('ROLE_ADMIN')">
              <td id='edit-${service.name}' class="misoicon"/>
              <a href='javascript:void(0);'
-                onclick="Print.ui.deletePrinter(${service.id});"><span
+                onclick="if (confirm('Delete printer ${printer.name}?')) { Print.service.deletePrinter(${printer.id}); } return false;"><span
                  class="ui-icon ui-icon-circle-close"/></a>
              </td>
-           </c:if>
+           </sec:authorize>
          </tr>
        </c:forEach>
 
@@ -83,7 +86,7 @@
 <div id="add-printer-dialog" title="Add Printer" hidden="true">
 Name: <input type="text" id="addName" /><br/>
 Driver: <select id="driver"><c:forEach items="${drivers}" var="driver"><option value="${driver.ordinal()}">${driver.name()}</option></c:forEach></select><br/>
-Backend: <select id="backend" onchange="Printer.ui.changeBackend()"><c:forEach items="${backends}" var="backend"><option value="${backend.ordinal()}">${backend.name()}</option></c:forEach></select><br/>
+Backend: <select id="backend" onchange="Print.ui.changeBackend()"><c:forEach items="${backends}" var="backend"><option value="${backend.ordinal()}">${backend.name()}</option></c:forEach></select><br/>
 <div id="backendConfiguration">
 </div>
 </div>

@@ -76,7 +76,7 @@ public class PrinterControllerHelperService {
       if (!json.has("printerId")) {
         return JSONUtils.SimpleJSONError("No printer name supplied.");
       }
-      Printer printer = printerService.get(json.getLong("serviceId"));
+      Printer printer = printerService.get(json.getLong("printerId"));
       if (printer == null) {
         return JSONUtils.SimpleJSONError("No such printer.");
       }
