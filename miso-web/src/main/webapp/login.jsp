@@ -39,7 +39,7 @@
           <td align="left"><input type="text" name="username" id="username"/></td>
         </tr>
         <tr>    
-          <td align="right"><label for="jpassword">Password</label></td>
+          <td align="right"><label for="password">Password</label></td>
           <td align="left"><input type="password" name="password" id="password"/></td>
         </tr>
 
