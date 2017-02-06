@@ -94,8 +94,6 @@ public class MisoAppListener implements ServletContextListener {
     MisoPropertyExporter exporter = (MisoPropertyExporter) context.getBean("propertyConfigurer");
     Map<String, String> misoProperties = exporter.getResolvedProperties();
 
-    context.getServletContext().setAttribute("security.method", misoProperties.get("security.method"));
-
     log.info("Checking MISO storage paths...");
     String baseStoragePath = misoProperties.get("miso.baseDirectory");
     context.getServletContext().setAttribute("miso.baseDirectory", baseStoragePath);
