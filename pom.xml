@@ -323,20 +323,30 @@
         <version>1.4.1</version>
       </dependency>
       <dependency>
-        <groupId>javax.servlet</groupId>
-        <artifactId>jsp-api</artifactId>
-        <version>2.0</version>
+        <groupId>javax.servlet.jsp</groupId>
+        <artifactId>javax.servlet.jsp-api</artifactId>
+        <version>2.3.1</version>
         <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>javax.servlet</groupId>
         <artifactId>jstl</artifactId>
         <version>1.2</version>
+        <exclusions>
+          <exclusion>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>javax.servlet.jsp</groupId>
+            <artifactId>javax.servlet.jsp-api</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>javax.servlet</groupId>
-        <artifactId>servlet-api</artifactId>
-        <version>2.5</version>
+        <artifactId>javax.servlet-api</artifactId>
+        <version>3.1.0</version>
         <scope>provided</scope>
       </dependency>
       <dependency>
@@ -378,7 +388,7 @@
       <dependency>
         <groupId>mysql</groupId>
         <artifactId>mysql-connector-java</artifactId>
-        <version>5.1.13</version>
+        <version>5.1.32</version>
       </dependency>
       <dependency>
         <groupId>net.sf.barcode4j</groupId>

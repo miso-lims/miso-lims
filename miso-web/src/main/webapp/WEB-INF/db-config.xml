@@ -26,11 +26,11 @@
   xmlns:jee="http://www.springframework.org/schema/jee"
   xmlns:context="http://www.springframework.org/schema/context"
   xsi:schemaLocation="http://www.springframework.org/schema/beans 
-                      http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+                      http://www.springframework.org/schema/beans/spring-beans.xsd
                       http://www.springframework.org/schema/tx 
-                      http://www.springframework.org/schema/tx/spring-tx-4.3.xsd
+                      http://www.springframework.org/schema/tx/spring-tx.xsd
                       http://www.springframework.org/schema/jee 
-                      http://www.springframework.org/schema/jee/spring-jee-4.3.xsd
+                      http://www.springframework.org/schema/jee/spring-jee.xsd
                       http://www.springframework.org/schema/context 
                       http://www.springframework.org/schema/context/spring-context.xsd"
   default-autowire="byName">

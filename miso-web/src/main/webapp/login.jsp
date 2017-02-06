@@ -31,7 +31,7 @@
 </c:if>
 
 <div id="login-form">
-    <form action="login" method="POST">
+    <form action="/login" method="POST">
     <div style="margin:0;padding:0;display:inline">
       <table>
         <tr>
@@ -60,7 +60,7 @@
       </table>
     </div>
     <script type="text/javascript">
-      Form.Element.focus('j_username');
+      Form.Element.focus('username');
     </script>
     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
   </form>

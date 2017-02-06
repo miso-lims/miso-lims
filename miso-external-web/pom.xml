@@ -42,13 +42,13 @@
       <artifactId>commons-codec</artifactId>
     </dependency>
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>jsp-api</artifactId>
+      <groupId>javax.servlet.jsp</groupId>
+      <artifactId>javax.servlet.jsp-api</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
+      <artifactId>javax.servlet-api</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>

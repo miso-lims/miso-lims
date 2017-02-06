@@ -69,7 +69,7 @@ public class SessionConversationAttributeStore implements SessionAttributeStore,
 
   @Override
   public void afterPropertiesSet() throws Exception {
-    requestMappingHandlerAdapter.setSessionAttributeStore(this);
+    // requestMappingHandlerAdapter.setSessionAttributeStore(this);
   }
 
   /*
