@@ -42,7 +42,6 @@ public class WebConfig extends WebMvcConfigurationSupport {
   public RequestMappingHandlerAdapter requestMappingHandlerAdapter() {
     RequestMappingHandlerAdapter adapter = super.requestMappingHandlerAdapter();
     adapter.setWebBindingInitializer(bindingInitializer());
-    // adapter.setSessionAttributeStore(sessionAttributeStore());
     return adapter;
   }
 }
