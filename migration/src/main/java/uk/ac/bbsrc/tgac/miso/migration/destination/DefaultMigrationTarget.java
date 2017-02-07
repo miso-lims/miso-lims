@@ -438,7 +438,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
   }
 
   private void saveLibraryDilution(LibraryDilution ldi) throws IOException {
-    String friendlyName = " of " + ldi.getLibrary().getAlias();
+    String friendlyName = "of " + ldi.getLibrary().getAlias();
     if (ldi.getPreMigrationId() != null) {
       friendlyName += " with pre-migration id " + ldi.getPreMigrationId();
     }
@@ -452,8 +452,10 @@ public class DefaultMigrationTarget implements MigrationTarget {
       ldi.setLastModified(timeStamp);
     }
 
+    Collection<ChangeLog> ghostChangeLog = null;
     if (ldi.getLibrary().getId() == LibraryDilution.UNSAVED_ID && ldi.getLibrary() instanceof DetailedLibrary
         && ((DetailedLibrary) ldi.getLibrary()).getPreMigrationId() != null) {
+      ghostChangeLog = ldi.getLibrary().getChangeLog();
       Long preMigrationId = ((DetailedLibrary) ldi.getLibrary()).getPreMigrationId();
       ldi.setLibrary(serviceManager.getLibraryDao().getByPreMigrationId(preMigrationId));
       if (ldi.getLibrary() == null) {
@@ -462,7 +464,24 @@ public class DefaultMigrationTarget implements MigrationTarget {
     }
     valueTypeLookup.resolveAll(ldi);
     ldi.setId(serviceManager.getDilutionDao().save(ldi));
+    fixDilutionChangeLog(ldi, ghostChangeLog);
     log.debug("Saved library dilution " + friendlyName);
+  }
+
+  private void fixDilutionChangeLog(LibraryDilution ldi, Collection<ChangeLog> ghostChangeLog) throws IOException {
+    Library lib = ldi.getLibrary();
+    Collection<ChangeLog> changes = lib.getChangeLog();
+    if (ghostChangeLog != null) {
+      changes.addAll(ghostChangeLog);
+    }
+    String gsleTag = "GSLE" + ldi.getPreMigrationId();
+    String misoTag = ldi.getName() != null ? ldi.getName() : "LDI" + ldi.getId();
+    for (ChangeLog change : changes) {
+      if (change.getSummary().matches("^" + gsleTag + ".*")) {
+        change.setSummary(change.getSummary().replaceFirst(gsleTag, misoTag));
+      }
+    }
+    saveLibraryChangeLog(lib, changes);
   }
 
   /**
