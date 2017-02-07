@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -471,7 +471,6 @@ public class MisoRequestManager implements RequestManager {
     }
   }
 
-
   @Override
   public Collection<Sample> listSamplesByAlias(String alias) throws IOException {
     if (sampleStore != null) {
@@ -650,7 +649,7 @@ public class MisoRequestManager implements RequestManager {
   public Collection<String> listDistinctPlatformNames() throws IOException {
     if (platformStore != null) {
       List<String> names = new ArrayList<>();
-      for (PlatformType type : platformStore.listDistinctPlatformNames() ) {
+      for (PlatformType type : platformStore.listDistinctPlatformNames()) {
         names.add(type.getKey());
       }
       return names;
@@ -1284,7 +1283,8 @@ public class MisoRequestManager implements RequestManager {
         original.setSerialNumber(sequencerReference.getSerialNumber());
         original.setDateCommissioned(sequencerReference.getDateCommissioned());
         original.setDateDecommissioned(sequencerReference.getDateDecommissioned());
-        original.setUpgradedSequencerReference(getSequencerReferenceById(sequencerReference.getUpgradedSequencerReference().getId()));
+        original.setUpgradedSequencerReference(sequencerReference.getUpgradedSequencerReference() == null ? null
+            : getSequencerReferenceById(sequencerReference.getUpgradedSequencerReference().getId()));
         sequencerReference = original;
       }
       return sequencerReferenceStore.save(sequencerReference);
@@ -2028,7 +2028,7 @@ public class MisoRequestManager implements RequestManager {
   public void addPoolWatcher(Pool pool, User watcher) throws IOException {
     poolStore.addWatcher(pool, watcher);
     if (poolAlertManager != null)
-    poolAlertManager.addWatcher(pool, watcher);
+      poolAlertManager.addWatcher(pool, watcher);
   }
 
   @Override

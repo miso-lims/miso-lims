@@ -185,11 +185,11 @@ public abstract class AbstractSequencerReference implements SequencerReference {
   public String toString() {
     return "AbstractSequencerReference [id=" + id
         + ", name=" + name
-        + ", platform=" + String.valueOf(platform.getId())
+        + ", platform=" + platform.getId()
         + ", ip=" + ip
         + ", serialNumber=" + serialNumber
-        + ", dateCommissioned=" + String.valueOf(dateCommissioned)
-        + ", dateDecommissioned=" + String.valueOf(dateDecommissioned)
+        + ", dateCommissioned=" + dateCommissioned
+        + ", dateDecommissioned=" + dateDecommissioned
         + ", upgradedSequencerReference=" + (upgradedSequencerReference == null ? null : upgradedSequencerReference.getId()) + "]";
   }
   
