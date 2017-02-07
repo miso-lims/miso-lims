@@ -282,6 +282,8 @@ Library.dilution = {
       'dilutionCreator': f.libraryDilutionCreator,
       'dilutionDate': f.libraryDilutionDate,
       'results': f.libraryDilutionResults,
+      'autoGenerateIdBarcodes': autoGenerateIdBarcodes,
+      'detailedSample': Hot.detailedSample,
       'url': ajaxurl
     };
  	  if (Hot.detailedSample) {
@@ -1281,7 +1283,7 @@ Library.ui = {
     if (designSelect == null || designSelect.value == -1) {
       selection.disabled = false;
       strategy.disabled = false;
-      code.disabled = false;
+      if (code) { code.disabled = false; }
       if (typeof callback == 'function') callback();
     } else {
       var matchedDesigns = Library.designs.filter(function (rule) { return rule.id == designSelect.value; });
@@ -1290,8 +1292,10 @@ Library.ui = {
         selection.disabled = true;
         strategy.value = matchedDesigns[0].libraryStrategyType.id;
         strategy.disabled = true;
-        code.value = matchedDesigns[0].libraryDesignCode.id;
-        code.disabled = true;
+        if (code) {
+          code.value = matchedDesigns[0].libraryDesignCode.id;
+          code.disabled = true;
+        }
       }
     }
   }

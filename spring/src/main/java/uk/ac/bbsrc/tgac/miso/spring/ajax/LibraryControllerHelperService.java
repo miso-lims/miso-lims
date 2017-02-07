@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -710,6 +710,8 @@ public class LibraryControllerHelperService {
         }
       }
       if (json.has("libraryId") && !isStringEmptyOrNull(json.getString("libraryId"))) {
+        boolean autoGenerateIdBarcodes = json.getBoolean("autoGenerateIdBarcodes");
+        boolean detailedSample = json.getBoolean("detailedSample");
         Long libraryId = Long.parseLong(json.getString("libraryId"));
         Library library = libraryService.get(libraryId);
         LibraryDilution newDilution = new LibraryDilution();
@@ -736,9 +738,6 @@ public class LibraryControllerHelperService {
           sb.append("<th>Targeted Sequencing</th>");
         }
         sb.append("<th>ID barcode</th>");
-        if (!library.getPlatformType().equals("Illumina")) {
-          sb.append("<th>Add emPCR</th>");
-        }
         sb.append("</tr>");
 
         File temploc = getBarcodeFileLocation(session);
@@ -776,13 +775,14 @@ public class LibraryControllerHelperService {
             log.error("Error generating library dilution barcode", e);
           }
           sb.append("</td>");
+          sb.append("<td id='edit").append(dil.getId()).append("' align='center'>");
+          sb.append("<a href='javascript:void(0);' onclick='Library.dilution.changeLibraryDilutionRow(");
+          sb.append(dil.getId()).append(", ").append(autoGenerateIdBarcodes).append(", ");
+          sb.append(detailedSample).append(")'>");
+          sb.append("<span class='ui-icon ui-icon-pencil'></span></a></td>");
 
-          if (!library.getPlatformType().equals("Illumina")) {
-            sb.append("<td><a href='javascript:void(0);' onclick='Library.empcr.insertEmPcrRow(" + dil.getId() + ");'>Add emPCR</a></td>");
-          } else {
-            sb.append(
-                "<td><a href='/miso/poolwizard/new/" + library.getSample().getProject().getProjectId() + "'>Construct New Pool</a></td>");
-          }
+          sb.append(
+              "<td><a href='/miso/poolwizard/new/" + library.getSample().getProject().getProjectId() + "'>Construct New Pool</a></td>");
 
           sb.append("</tr>");
         }
