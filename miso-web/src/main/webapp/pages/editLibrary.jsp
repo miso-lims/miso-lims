@@ -419,12 +419,10 @@
     <td><form:checkbox id="archived" path="archived"/></td>
   </tr>
 </table>
-<script type="text/javascript">
- jQuery(document).ready(function () {
-   Hot.detailedSample = ${detailedSample};
- });
-</script>
 </c:if>
+<script type="text/javascript">
+  Hot.detailedSample = ${detailedSample};
+</script>
 
 <c:choose>
   <c:when
@@ -579,7 +577,7 @@
     </a>
 
     <div id="ldmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
-      <a href='javascript:void(0);' class="add" onclick="Library.dilution.insertLibraryDilutionRow(${library.id}, ${libraryPrepKitId}, ${autoGenerateIdBarcodes}); return false;">
+      <a href='javascript:void(0);' class="add" onclick="Library.dilution.insertLibraryDilutionRow(${library.id}, <c:out value="${library.kitDescriptor.id}" default="0"/>, ${autoGenerateIdBarcodes}); return false;">
         Add Library Dilution
       </a>
       <c:if test="${not empty library.libraryDilutions}">
@@ -603,6 +601,7 @@
         </c:if>
         <th>ID Barcode</th>
         <th align="center">Edit</th>
+        <th align="center">Pool</th>
       </tr>
       </thead>
       <tbody>
