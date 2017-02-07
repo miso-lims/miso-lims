@@ -1,4 +1,4 @@
-FROM misolims/miso-base
+FROM misolims/miso-base:0.2
 
 ARG     version
 
