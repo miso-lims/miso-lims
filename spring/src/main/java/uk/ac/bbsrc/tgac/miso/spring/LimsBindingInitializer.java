@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -26,7 +26,6 @@ package uk.ac.bbsrc.tgac.miso.spring;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringBlankOrNull;
 
 import java.beans.PropertyEditorSupport;
-import java.io.IOException;
 import java.net.InetAddress;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
@@ -35,8 +34,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -288,73 +285,6 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
     }
   }
 
-  public static interface Resolver<T> {
-    public abstract String getPrefix();
-
-    public abstract T resolve(long id) throws Exception;
-  }
-
-  private static final Pattern DISPATCH_PREFIX = Pattern.compile("^([A-Za-z]*)([0-9]*)");
-
-  /**
-   * Convert a collection of IDs with different prefixes.
-   */
-  public class BindingConverterByPrefixDispatch<T> extends BindingConverter<T> {
-    private final Map<String, Resolver<? extends T>> resolvers = new HashMap<>();
-
-    public BindingConverterByPrefixDispatch(Class<T> clazz) {
-      super(clazz);
-    }
-
-    public BindingConverterByPrefixDispatch<T> add(Resolver<? extends T> resolver) {
-      resolvers.put(resolver.getPrefix(), resolver);
-      return this;
-    }
-
-    @Override
-    public T resolve(String element) throws Exception {
-      if (isStringBlankOrNull(element)) {
-        return null;
-      }
-      Matcher matcher = DISPATCH_PREFIX.matcher(element);
-      if (matcher.matches()) {
-        String prefix = matcher.group(1);
-        long id = Long.parseLong(matcher.group(2));
-        return resolvers.get(prefix).resolve(id);
-      } else {
-        throw new IllegalArgumentException();
-      }
-    }
-
-  }
-
-  public interface IdWriteable {
-    public void setId(Long id);
-  }
-
-  /**
-   * Create an empty shell object with an ID such that the service layer can reload it at will.
-   */
-  public static abstract class InstantiatingConverter<T extends I, I extends IdWriteable> extends BindingConverterById<I> {
-    private final Class<T> reified;
-
-    public InstantiatingConverter(Class<T> reified, Class<I> iface) {
-      super(iface);
-      this.reified = reified;
-    }
-
-    @Override
-    public I resolveById(long id) {
-      try {
-        T instance = reified.newInstance();
-        instance.setId(id);
-        return instance;
-      } catch (InstantiationException | IllegalAccessException e) {
-        log.error("Failed to instantiate empty shell object", e);
-        return null;
-      }
-    }
-  }
 
   /**
    * Sets the requestManager of this LimsBindingInitializer object.
@@ -501,22 +431,15 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
     }.register(binder).register(binder, Set.class, "libraries");
 
-    Resolver<LibraryDilution> ldiResolver = new Resolver<LibraryDilution>() {
+    new BindingConverterByPrefixedId<Dilution>(Dilution.class, "LDI") {
 
       @Override
-      public String getPrefix() {
-        return "LDI";
-      }
-
-      @Override
-      public LibraryDilution resolve(long id) throws Exception {
+      public Dilution resolveById(long id) throws Exception {
         return dilutionService.get(id);
       }
-
-    };
-
-    new BindingConverterByPrefixDispatch<>(Dilution.class).add(ldiResolver).register(binder).register(binder,
-        Set.class, "dilutions");
+    }.register(binder).register(binder,
+        Set.class, "dilutions").register(binder, Set.class,
+            "poolableElements");
 
     new BindingConverterById<LibraryDilution>(LibraryDilution.class) {
       @Override
@@ -614,71 +537,37 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
       }
     }.register(binder).register(binder, Set.class, "referenceGenomes");
 
-    new BindingConverterByPrefixDispatch<>(Dilution.class).add(ldiResolver).register(binder, Set.class,
-        "poolableElements");
-
-
-    binder.registerCustomEditor(LibraryDesign.class, new PropertyEditorSupport() {
+    new BindingConverterById<LibraryDesign>(LibraryDesign.class) {
       @Override
-      public void setAsText(String element) throws IllegalArgumentException {
-        long id = Long.parseLong(element);
-        if (id == -1) {
-          setValue(null);
-        } else {
-          try {
-            setValue(libraryDesignDao.getLibraryDesign(id));
-          } catch (IOException e) {
-            log.error("Fetching LibraryDesign " + id, e);
-            throw new IllegalArgumentException("Cannot find library design with id " + element);
-          }
-        }
+      public LibraryDesign resolveById(long id) throws Exception {
+        return id == -1 ? null : libraryDesignDao.getLibraryDesign(id);
       }
 
-    });
+    }.register(binder);
 
-    binder.registerCustomEditor(LibraryDesignCode.class, new PropertyEditorSupport() {
+    new BindingConverterById<LibraryDesignCode>(LibraryDesignCode.class) {
+
       @Override
-      public void setAsText(String element) throws IllegalArgumentException {
-        long id = Long.parseLong(element);
-        if (id == -1) {
-          setValue(null);
-        } else {
-          try {
-            setValue(libraryDesignCodeDao.getLibraryDesignCode(id));
-          } catch (IOException e) {
-            log.error("Fetching LibraryDesignCode " + id, e);
-            throw new IllegalArgumentException("Cannot find library design code with id " + element);
-          }
-        }
+      public LibraryDesignCode resolveById(long id) throws Exception {
+        return id == -1 ? null : libraryDesignCodeDao.getLibraryDesignCode(id);
       }
-    });
+    }.register(binder);
 
-    binder.registerCustomEditor(BoxUse.class, new PropertyEditorSupport() {
+    new BindingConverterById<BoxUse>(BoxUse.class) {
       @Override
-      public void setAsText(String element) throws IllegalArgumentException {
-        long id = Long.parseLong(element);
-        try {
-          setValue(sqlBoxDAO.getUseById(id));
-        } catch (IOException e) {
-          log.error("Fetching box use " + id, e);
-          throw new IllegalArgumentException("Cannot find box use with id " + element);
-        }
+      public BoxUse resolveById(long id) throws Exception {
+        return sqlBoxDAO.getUseById(id);
       }
 
-    });
-    binder.registerCustomEditor(BoxSize.class, new PropertyEditorSupport() {
+    }.register(binder);
+    new BindingConverterById<BoxSize>(BoxSize.class) {
+
       @Override
-      public void setAsText(String element) throws IllegalArgumentException {
-        long id = Long.parseLong(element);
-        try {
-          setValue(sqlBoxDAO.getSizeById(id));
-        } catch (IOException e) {
-          log.error("Fetching box size " + id, e);
-          throw new IllegalArgumentException("Cannot find box size with id " + element);
-        }
+      public BoxSize resolveById(long id) throws Exception {
+        return sqlBoxDAO.getSizeById(id);
       }
 
-    });
+    }.register(binder);
   }
 
   public void setLibraryService(LibraryService libraryService) {
