@@ -896,7 +896,7 @@ public class Dtos {
     ldCode.setId(from.getLibraryDesignCodeId());
     to.setLibraryDesignCode(ldCode);
 
-    to.setArchived(from.getArchived());
+    if (from.getArchived() != null) to.setArchived(from.getArchived());
     to.setNonStandardAlias(from.getNonStandardAlias());
     return to;
   }
@@ -983,7 +983,7 @@ public class Dtos {
     dto.setLowQuality(from.isLowQuality());
     dto.setPaired(from.getPaired());
     if (from.getPlatformType() != null) {
-      dto.setPlatformName(from.getPlatformType().getKey());
+      dto.setPlatformType(from.getPlatformType().getKey());
     }
     if (from.getLastModified() != null) {
       dto.setLastModified(getDateAsString(from.getLastModified()));
@@ -1027,7 +1027,11 @@ public class Dtos {
     to.setInitialConcentration(from.getConcentration());
     to.setLowQuality(from.getLowQuality());
     to.setPaired(from.getPaired());
-    to.setPlatformType(PlatformType.get(from.getPlatformName()));
+    to.setPlatformType(PlatformType.get(from.getPlatformType()));
+    if (from.getParentSampleId() != null) {
+      to.setSample(new SampleImpl());
+      to.getSample().setId(from.getParentSampleId());
+    }
     if (from.getLibrarySelectionTypeId() != null) {
       LibrarySelectionType sel = new LibrarySelectionType();
       sel.setId(from.getLibrarySelectionTypeId());

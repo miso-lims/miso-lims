@@ -1,8 +1,10 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
+import org.codehaus.jackson.annotate.JsonTypeName;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
+@JsonTypeName(value = "Detailed")
 public class DetailedLibraryDto extends LibraryDto {
 
   private Long kitDescriptorId;

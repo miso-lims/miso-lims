@@ -264,13 +264,13 @@
         or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_TECH')}">
       <td>Platform - Library Type:</td>
       <td>
-        <form:select id="platformNames" path="platformType" items="${platformNames}"
-                     onchange="Library.ui.changePlatformName(null);" class="validateable"/>
+        <form:select id="platformTypes" path="platformType" items="${platformTypes}"
+                     onchange="Library.ui.changePlatformType(null);" class="validateable"/>
         <form:select id="libraryTypes" path="libraryType"/>
       </td>
       <script type="text/javascript">
         jQuery(document).ready(function () {
-          Library.ui.changePlatformName(<c:out value="${library.libraryType.id}" default="0"/>, function() {
+          Library.ui.changePlatformType(<c:out value="${library.libraryType.id}" default="0"/>, function() {
             <c:if test="${not empty library.libraryType}">jQuery('#libraryTypes').val('${library.libraryType.id}');</c:if>
             Library.setOriginalIndices();
           });
@@ -1092,7 +1092,7 @@ function setEditables(datatable) {
     return value;
   },
   {
-    data: '{${platformNamesString}}',
+    data: '{${platformTypesString}}',
     type: 'select',
     onblur: 'submit',
     placeholder: '',

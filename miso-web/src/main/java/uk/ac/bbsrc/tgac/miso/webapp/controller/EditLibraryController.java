@@ -239,7 +239,7 @@ public class EditLibraryController {
     return libraryService.getLibraryColumnSizes();
   }
 
-  private Collection<String> populatePlatformNames(List<String> current) throws IOException {
+  private Collection<String> populatePlatformTypes(List<String> current) throws IOException {
     Collection<PlatformType> base = requestManager.listActivePlatformTypes();
     if (base.isEmpty()) {
       base = Arrays.asList(PlatformType.values());
@@ -254,10 +254,10 @@ public class EditLibraryController {
     return types;
   }
 
-  @ModelAttribute("platformNamesString")
-  public String platformNamesString() throws IOException {
+  @ModelAttribute("platformTypesString")
+  public String platformTypesString() throws IOException {
     List<String> names = new ArrayList<>();
-    List<String> pn = new ArrayList<>(populatePlatformNames(Collections.<String> emptyList()));
+    List<String> pn = new ArrayList<>(populatePlatformTypes(Collections.<String> emptyList()));
     for (String name : pn) {
       names.add("\"" + name + "\"" + ":" + "\"" + name + "\"");
     }
@@ -634,7 +634,7 @@ public class EditLibraryController {
       model.put("formObj", library);
       model.put("library", library);
 
-      model.put("platformNames", populatePlatformNames(Arrays.asList(library.getPlatformType().getKey())));
+      model.put("platformTypes", populatePlatformTypes(Arrays.asList(library.getPlatformType().getKey())));
       populateAvailableIndexFamilies(library, model);
       addAdjacentLibraries(library, model);
 
@@ -725,7 +725,7 @@ public class EditLibraryController {
 
       model.put("formObj", library);
       model.put("library", library);
-      model.put("platformNames", populatePlatformNames(Arrays.asList(library.getPlatformType().getKey())));
+      model.put("platformTypes", populatePlatformTypes(Arrays.asList(library.getPlatformType().getKey())));
       populateAvailableIndexFamilies(library, model);
 
       addAdjacentLibraries(library, model);
@@ -773,7 +773,7 @@ public class EditLibraryController {
         } else {
           hasPlain = true;
         }
-        LibraryDto library = new LibraryDto();
+        LibraryDto library = isDetailedSampleEnabled() ? new DetailedLibraryDto() : new LibraryDto();
         library.setParentSampleId(sample.getId());
         library.setParentSampleAlias(sample.getAlias());
 
@@ -788,7 +788,7 @@ public class EditLibraryController {
 
       model.put("title", "Bulk Create Libraries");
       model.put("librariesJSON", mapper.writeValueAsString(libraryDtos));
-      model.put("platformNames", mapper.writeValueAsString(populatePlatformNames(Collections.<String> emptyList())));
+      model.put("platformTypes", mapper.writeValueAsString(populatePlatformTypes(Collections.<String> emptyList())));
       JSONArray libraryDesigns = new JSONArray();
       libraryDesigns.addAll(requestManager.listLibraryDesignByClass(sampleClass));
       model.put("libraryDesignsJSON", libraryDesigns.toString());
@@ -836,7 +836,7 @@ public class EditLibraryController {
       JSONArray libraryDesignCodes = new JSONArray();
       libraryDesignCodes.addAll(requestManager.listLibraryDesignCodes());
       model.put("libraryDesignCodesJSON", libraryDesignCodes.toString());
-      model.put("platformNames", mapper.writeValueAsString(populatePlatformNames(currentPlatforms)));
+      model.put("platformTypes", mapper.writeValueAsString(populatePlatformTypes(currentPlatforms)));
 
       return new ModelAndView("/pages/bulkEditLibraries.jsp", model);
     } catch (IOException ex) {

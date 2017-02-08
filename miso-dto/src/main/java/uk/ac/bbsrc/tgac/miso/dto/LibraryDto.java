@@ -2,10 +2,18 @@ package uk.ac.bbsrc.tgac.miso.dto;
 
 import java.net.URI;
 
+import org.codehaus.jackson.annotate.JsonSubTypes;
+import org.codehaus.jackson.annotate.JsonTypeInfo;
+import org.codehaus.jackson.annotate.JsonTypeName;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonSubTypes({
+    @JsonSubTypes.Type(value = DetailedLibraryDto.class, name = "Detailed"),
+    @JsonSubTypes.Type(value = LibraryDto.class, name = "Plain") })
+@JsonTypeName(value = "Plain")
 public class LibraryDto {
 
   private String alias;
@@ -14,7 +22,7 @@ public class LibraryDto {
   private String description;
   private String identificationBarcode;
   private String lastModified;
-  private Long libraryId;
+  private Long id;
   private Long librarySelectionTypeId;
   private Long libraryStrategyTypeId;
   private Long libraryTypeId;
@@ -26,7 +34,7 @@ public class LibraryDto {
   private String parentSampleAlias;
   private Long parentSampleId;
   private Long parentSampleClassId;
-  private String platformName;
+  private String platformType;
   private Boolean qcPassed;
   private Long index1Id;
   private Long index2Id;
@@ -53,7 +61,7 @@ public class LibraryDto {
   }
 
   public Long getId() {
-    return libraryId;
+    return id;
   }
 
   public String getIdentificationBarcode() {
@@ -104,8 +112,8 @@ public class LibraryDto {
     return parentSampleId;
   }
 
-  public String getPlatformName() {
-    return platformName;
+  public String getPlatformType() {
+    return platformType;
   }
 
   public Boolean getQcPassed() {
@@ -157,7 +165,7 @@ public class LibraryDto {
   }
 
   public void setId(Long libraryId) {
-    this.libraryId = libraryId;
+    this.id = libraryId;
   }
 
   @JsonSerialize(include = JsonSerialize.Inclusion.ALWAYS)
@@ -219,8 +227,8 @@ public class LibraryDto {
     this.parentSampleClassId = parentSampleClassId;
   }
 
-  public void setPlatformName(String platformName) {
-    this.platformName = platformName;
+  public void setPlatformType(String platformType) {
+    this.platformType = platformType;
   }
 
   @JsonSerialize(include = JsonSerialize.Inclusion.ALWAYS)

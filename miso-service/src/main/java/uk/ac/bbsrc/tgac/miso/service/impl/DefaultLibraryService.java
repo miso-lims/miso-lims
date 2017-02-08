@@ -22,6 +22,7 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
@@ -466,6 +467,7 @@ public class DefaultLibraryService implements LibraryService {
     target.getLibrarySelectionType().setId(source.getLibrarySelectionType().getId());
     target.getLibraryStrategyType().setId(source.getLibraryStrategyType().getId());
     target.setQcPassed(source.getQcPassed());
+    target.setIndices(source.getIndices());
     if (isDetailedLibrary(target)) {
       DetailedLibrary dSource = (DetailedLibrary) source;
       DetailedLibrary dTarget = (DetailedLibrary) target;
@@ -497,23 +499,24 @@ public class DefaultLibraryService implements LibraryService {
     if (!isDetailedLibrary(library)) {
       throw new IOException("A library design can only be applied to a detailed sample.");
     }
-    LibraryDesign design = ((DetailedLibrary) library).getLibraryDesign();
-    if (((DetailedSample) library.getSample()).getSampleClass().getId() != design.getSampleClass().getId()) {
+    DetailedLibrary detailed = (DetailedLibrary) library;
+    LibraryDesign design = detailed.getLibraryDesign();
+    if (((DetailedSample) detailed.getSample()).getSampleClass().getId() != design.getSampleClass().getId()) {
       throw new IOException(
-          "This library design is not valid for sample " + library.getSample().getName() + " because the class is not compatible.");
+          "This library design is not valid for sample " + detailed.getSample().getName() + " because the class is not compatible.");
     }
     LibrarySelectionType selection = design.getLibrarySelectionType();
     LibraryStrategyType strategy = design.getLibraryStrategyType();
-    if (library.getLibrarySelectionType() != null && library.getLibrarySelectionType().getId() != selection.getId()) {
+    if (detailed.getLibrarySelectionType() != null && detailed.getLibrarySelectionType().getId() != selection.getId()) {
       throw new IOException("Library selection doesn't match library design.");
     }
-    if (library.getLibraryStrategyType() != null && library.getLibraryStrategyType().getId() != strategy.getId()) {
+    if (detailed.getLibraryStrategyType() != null && detailed.getLibraryStrategyType().getId() != strategy.getId()) {
       throw new IOException("Library strategy doesn't match library design.");
     }
-    if (((DetailedLibrary) library).getLibraryDesignCode().getId() != null
-        && ((DetailedLibrary) library).getLibraryDesign().getId() != null
-        && ((DetailedLibrary) library).getLibraryDesignCode().getId() != null
-        && ((DetailedLibrary) library).getLibraryDesign().getLibraryDesignCode().getId() != null) {
+    if (detailed.getLibraryDesignCode().getId() != null
+        && detailed.getLibraryDesign().getId() != null
+        && detailed.getLibraryDesign().getLibraryDesignCode().getId() != null
+        && !detailed.getLibraryDesignCode().getId().equals(detailed.getLibraryDesign().getLibraryDesignCode().getId())) {
       throw new IOException("Selected library design code does not match library design code for selected library design.");
     }
   }
@@ -537,11 +540,15 @@ public class DefaultLibraryService implements LibraryService {
   }
 
   private void validateAliasUniqueness(Library library) throws IOException {
-    if (!namingScheme.duplicateLibraryAliasAllowed() && !listByAlias(library.getAlias()).isEmpty()) {
-      if (LimsUtils.isDetailedLibrary(library) && ((DetailedLibrary) library).hasNonStandardAlias()) {
-        // do nothing; nonstandard alias means duplicates are acceptable
-      } else {
-        // throw if duplicate aliases are not allowed (and in the case of a DetailedLibrary, if it has a standard alias
+    // duplicate aliases may be allowed via naming scheme, or with nonStandardAlias=true in the case of a DetailedLibrary
+    if (namingScheme.duplicateLibraryAliasAllowed()
+        || (LimsUtils.isDetailedLibrary(library) && ((DetailedLibrary) library).hasNonStandardAlias())) {
+      return;
+    }
+    List<Library> potentialDupes = listByAlias(library.getAlias());
+    for (Library potentialDupe : potentialDupes) {
+      if (library.getId() == AbstractLibrary.UNSAVED_ID || library.getId() != potentialDupe.getId()) {
+        // an existing DIFFERENT library already has this alias
         throw new IllegalArgumentException("NEW: A library with this alias already exists in the database");
       }
     }

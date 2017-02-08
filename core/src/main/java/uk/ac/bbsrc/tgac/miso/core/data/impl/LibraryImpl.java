@@ -53,6 +53,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryChangeLog;
 @Table(name = "Library")
 @Inheritance(strategy = InheritanceType.JOINED)
 public class LibraryImpl extends AbstractLibrary implements Serializable {
+
+  private static final long serialVersionUID = 1L;
+
   protected static final Logger log = LoggerFactory.getLogger(LibraryImpl.class);
 
   /**
