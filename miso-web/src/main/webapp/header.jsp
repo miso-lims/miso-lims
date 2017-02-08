@@ -160,11 +160,7 @@
 
 <sec:authorize access="isAuthenticated()">
   <div id="loggedInBanner" style="display:inline-block">Logged in as:
-    <b id="currentUser"><sec:authentication property="principal.username"/></b>  
-    <form class="form-inline" action="logout" method="POST">
-      <input type="submit" value="Logout" />
-      <input type="hidden" name="${_csrf.parameterName}" value="${csrf.token}" />
-    </form>
+    <b id="currentUser"><sec:authentication property="principal.username"/></b>  | <a href="<c:url value="/logout"/>">Logout</a>
   </div>
 </sec:authorize>
 
