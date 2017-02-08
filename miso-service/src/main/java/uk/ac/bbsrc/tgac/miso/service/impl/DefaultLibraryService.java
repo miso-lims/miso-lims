@@ -30,6 +30,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
@@ -420,13 +421,21 @@ public class DefaultLibraryService implements LibraryService {
       if (lai.getKitDescriptor() != null) {
         lai.setKitDescriptor(kitDescriptorDao.getKitDescriptorById(lai.getKitDescriptor().getId()));
       }
-      if (lai.getLibraryDesign() != null) {
-        lai.setLibraryDesign(libraryDesignDao.getLibraryDesign(lai.getLibraryDesign().getId()));
-      }
       if (lai.getLibraryDesignCode() != null) {
         lai.setLibraryDesignCode(libraryDesignCodeDao.getLibraryDesignCode(lai.getLibraryDesignCode().getId()));
       }
-      validateLibraryDesignValues(library);
+      if (lai.getLibraryDesign() != null) {
+        LibraryDesign design = libraryDesignDao.getLibraryDesign(lai.getLibraryDesign().getId());
+        lai.setLibraryDesign(design);
+        lai.setLibrarySelectionType(design.getLibrarySelectionType());
+        lai.setLibraryStrategyType(design.getLibraryStrategyType());
+        lai.setLibraryDesignCode(design.getLibraryDesignCode());
+        SampleClass sampleClass = ((DetailedSample) library.getSample()).getSampleClass();
+        if (!sampleClass.getId().equals(design.getSampleClass().getId())) {
+          throw new IllegalArgumentException(
+              "Cannot use design " + design.getName() + " for a library from a sample of type " + sampleClass.getAlias());
+        }
+      }
     }
   }
 
@@ -463,9 +472,9 @@ public class DefaultLibraryService implements LibraryService {
     } else {
       target.setVolume(source.getVolume());
     }
-    target.getLibraryType().setId(source.getLibraryType().getId());
-    target.getLibrarySelectionType().setId(source.getLibrarySelectionType().getId());
-    target.getLibraryStrategyType().setId(source.getLibraryStrategyType().getId());
+    target.setLibraryType(source.getLibraryType());
+    target.setLibrarySelectionType(source.getLibrarySelectionType());
+    target.setLibraryStrategyType(source.getLibraryStrategyType());
     target.setQcPassed(source.getQcPassed());
     target.setIndices(source.getIndices());
     if (isDetailedLibrary(target)) {
@@ -474,50 +483,17 @@ public class DefaultLibraryService implements LibraryService {
       dTarget.setPreMigrationId(dSource.getPreMigrationId());
       dTarget.setNonStandardAlias(dSource.hasNonStandardAlias());
       dTarget.setArchived(dSource.getArchived());
-      dTarget.getLibraryDesignCode().setId(dSource.getLibraryDesignCode().getId());
+      dTarget.setLibraryDesignCode(dSource.getLibraryDesignCode());
       if (dSource.getLibraryDesign() != null) {
-        dTarget.getLibraryDesign().setId(dSource.getLibraryDesign().getId());
+        dTarget.setLibraryDesign(dSource.getLibraryDesign());
       } else {
-        dTarget.getLibraryDesign().setId(null);
+        dTarget.setLibraryDesign(null);
       }
       if (dSource.getKitDescriptor() != null) {
-      dTarget.getKitDescriptor().setId(dSource.getKitDescriptor().getId());
+        dTarget.setKitDescriptor(dSource.getKitDescriptor());
       } else {
-        dTarget.getKitDescriptor().setId(null);
+        dTarget.setKitDescriptor(null);
       }
-    }
-  }
-
-  /**
-   * Confirms that when a Library Design is selected (detailed library only), the corresponding
-   * LibraryDesignCode, LibrarySelection and LibraryStrategy all match the values for the selected LibraryDesign.
-   *
-   * @param library the Library with desired selection, strategy, and libraryDesignCode set.
-   * @throws IOException when the library's values don't match the values of the LibraryDesign
-   */
-  private void validateLibraryDesignValues(Library library) throws IOException {
-    if (!isDetailedLibrary(library)) {
-      throw new IOException("A library design can only be applied to a detailed sample.");
-    }
-    DetailedLibrary detailed = (DetailedLibrary) library;
-    LibraryDesign design = detailed.getLibraryDesign();
-    if (((DetailedSample) detailed.getSample()).getSampleClass().getId() != design.getSampleClass().getId()) {
-      throw new IOException(
-          "This library design is not valid for sample " + detailed.getSample().getName() + " because the class is not compatible.");
-    }
-    LibrarySelectionType selection = design.getLibrarySelectionType();
-    LibraryStrategyType strategy = design.getLibraryStrategyType();
-    if (detailed.getLibrarySelectionType() != null && detailed.getLibrarySelectionType().getId() != selection.getId()) {
-      throw new IOException("Library selection doesn't match library design.");
-    }
-    if (detailed.getLibraryStrategyType() != null && detailed.getLibraryStrategyType().getId() != strategy.getId()) {
-      throw new IOException("Library strategy doesn't match library design.");
-    }
-    if (detailed.getLibraryDesignCode().getId() != null
-        && detailed.getLibraryDesign().getId() != null
-        && detailed.getLibraryDesign().getLibraryDesignCode().getId() != null
-        && !detailed.getLibraryDesignCode().getId().equals(detailed.getLibraryDesign().getLibraryDesignCode().getId())) {
-      throw new IOException("Selected library design code does not match library design code for selected library design.");
     }
   }
 
