@@ -151,8 +151,8 @@
 </div>
 <sec:authorize access="isAuthenticated()">
     <div id="loggedInBanner">Logged in as:
-        <b id="currentUser"><sec:authentication property="principal.username"/></b> | <a
-                href="<c:url value="/j_spring_security_logout"/>">Logout</a></div>
+        <b id="currentUser"><sec:authentication property="principal.username"/></b> | <a href="<c:url value="/logout" />">Logout</a>
+    </div>
 </sec:authorize>
 
 <div id="content">
