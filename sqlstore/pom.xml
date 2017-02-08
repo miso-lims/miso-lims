@@ -186,14 +186,6 @@
         </configuration>
       </plugin>
       <plugin>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <includes>
-            <include>**/*Suite.java</include>
-          </includes>
-        </configuration>
-      </plugin>
-      <plugin>
         <groupId>org.codehaus.gmaven</groupId>
         <artifactId>groovy-maven-plugin</artifactId>
         <executions>
@@ -231,34 +223,4 @@
       </plugin>
     </plugins>
   </build>
-  <profiles>
-    <profile>
-      <id>sqlstore-tests</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-        <property>
-          <name>sqlTests</name>
-          <value>true</value>
-        </property>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <skip>false</skip>
-              <includes>
-                <include>**/*Suite.java</include>
-              </includes>
-              <reportFormat>brief</reportFormat>
-              <useFile>false</useFile>
-              <forkMode>once</forkMode>
-              <!-- ENABLE THIS IF TIMING TESTS -->
-              <!-- <argLine>-ea -Xmx768m -javaagent:target/dependency/aspectjweaver-1.6.8.jar</argLine> -->
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
 </project>
