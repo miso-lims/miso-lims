@@ -32,8 +32,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.integration.Message;
 import org.springframework.integration.support.MessageBuilder;
+import org.springframework.messaging.Message;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -94,9 +94,9 @@ public class MessageConsumerController {
 
   private MultiValueMap<String, String> exposeRequest(HttpServletRequest request) {
     log.debug("Request size: " + request.getContentLength());
-    Map<String, Object> map = request.getParameterMap();
+    Map<String, String[]> map = request.getParameterMap();
     log.debug("RAW MAP: " + map.toString());
-    MultiValueMap<String, String> message = new LinkedMultiValueMap<String, String>();
+    MultiValueMap<String, String> message = new LinkedMultiValueMap<>();
     for (String s : map.keySet()) {
       log.debug("EXPOSING PARAM '" + s + "': " + LimsUtils.join(request.getParameterValues(s), ","));
       message.put(s, Arrays.asList(request.getParameterValues(s)));

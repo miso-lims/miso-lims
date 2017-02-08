@@ -160,8 +160,7 @@ public class KitImpl implements Kit {
 
   @CoverageIgnore
   @Override
-  public int compareTo(Object o) {
-    final Kit t = (Kit) o;
+  public int compareTo(Kit t) {
     if (getId() < t.getId()) return -1;
     if (getId() > t.getId()) return 1;
     return 0;

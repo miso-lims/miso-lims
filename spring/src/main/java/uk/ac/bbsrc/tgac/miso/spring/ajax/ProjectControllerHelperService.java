@@ -35,7 +35,6 @@ import java.util.Set;
 
 import javax.servlet.http.HttpSession;
 
-import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +43,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -723,7 +723,7 @@ public class ProjectControllerHelperService {
         }
       }
 
-      overview.setSamples(samples);
+      overview.setSampleGroup(samples);
 
       requestManager.saveProjectOverview(overview);
       requestManager.saveProject(overview.getProject());

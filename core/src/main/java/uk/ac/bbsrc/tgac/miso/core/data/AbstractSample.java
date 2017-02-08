@@ -46,7 +46,6 @@ import javax.persistence.PrimaryKeyJoinColumn;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.codehaus.jackson.annotate.JsonManagedReference;
 import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.JoinFormula;
 import org.slf4j.Logger;
@@ -55,6 +54,8 @@ import org.slf4j.LoggerFactory;
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
@@ -86,6 +87,7 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
 
   @ManyToOne(targetEntity = ProjectImpl.class)
   @JoinColumn(name = "project_projectId")
+  @JsonBackReference
   private Project project;
 
   @OneToMany(targetEntity = LibraryImpl.class, mappedBy = "sample")
@@ -93,6 +95,7 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   private final Collection<Library> libraries = new HashSet<>();
 
   @OneToMany(targetEntity = SampleQCImpl.class, mappedBy = "sample", cascade = CascadeType.ALL)
+  @JsonManagedReference
   private Collection<SampleQC> sampleQCs = new TreeSet<>();
 
   @ManyToMany(targetEntity = Note.class, cascade = CascadeType.ALL)
@@ -121,6 +124,7 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
 
   @OneToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "lastModifier", nullable = false)
+  @JsonBackReference
   private User lastModifier;
 
   @OneToOne(targetEntity = SampleDerivedInfo.class)

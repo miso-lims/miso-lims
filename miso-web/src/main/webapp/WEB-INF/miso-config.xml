@@ -24,9 +24,12 @@
 
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns:context="http://www.springframework.org/schema/context"
-  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
-                        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
-                        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans 
+                      http://www.springframework.org/schema/beans/spring-beans.xsd
+                      http://www.springframework.org/schema/tx 
+                      http://www.springframework.org/schema/tx/spring-tx.xsd
+                      http://www.springframework.org/schema/context 
+                      http://www.springframework.org/schema/context/spring-context.xsd"
   default-autowire="byName">
 
   <bean id="jspViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
@@ -59,7 +62,6 @@
   </bean>
 
   <bean id="submissionManager" class="uk.ac.bbsrc.tgac.miso.core.manager.ERASubmissionManager">
-    <property name="submissionProperties" value="#{propertyConfigurer.getPropertiesAsProperties()}" />
     <property name="centreName" value="${submission.centreName}" />
     <property name="accountName" value="${submission.accountName}" />
     <property name="dropBox" value="${submission.dropBox}" />

@@ -47,15 +47,17 @@ import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonTypeInfo;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Alertable;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
@@ -75,7 +77,8 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
  * @author Rob Davey
  * @since 0.0.2
  */
-@JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
+@JsonSerialize(typing = JsonSerialize.Typing.STATIC)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 @JsonIgnoreProperties({ "project", "samples", "libraries", "runs", "qcPassedSamples" })
 @Entity
@@ -126,6 +129,7 @@ public class ProjectOverview implements Watchable, Alertable, Nameable, Serializ
 
   @ManyToOne(targetEntity = ProjectImpl.class)
   @JoinColumn(name = "project_projectId")
+  @JsonBackReference
   private Project project;
 
   @ManyToMany(targetEntity = SampleImpl.class)
@@ -473,6 +477,7 @@ public class ProjectOverview implements Watchable, Alertable, Nameable, Serializ
   }
 
   public void setSampleGroup(Set<Sample> sampleGroup) {
+    this.sampleGroup = sampleGroup;
   }
 
   @Deprecated

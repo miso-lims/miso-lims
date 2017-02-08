@@ -33,7 +33,6 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +43,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
@@ -102,10 +103,10 @@ public class ContainerRestController extends RestController {
           // experiments
           sb.append("\"experiments\":[");
           int ie = 0;
+          ObjectMapper mapper = new ObjectMapper();
           for (Experiment experiment : partition.getPool().getExperiments()) {
             ie++;
-            ObjectMapper mappere = new ObjectMapper();
-            sb.append(mappere.writeValueAsString(experiment));
+            sb.append(mapper.writeValueAsString(experiment));
             if (ie < partition.getPool().getExperiments().size()) {
               sb.append(",");
             }
@@ -117,8 +118,7 @@ public class ContainerRestController extends RestController {
           int id = 0;
           for (Dilution poolable : partition.getPool().getPoolableElements()) {
             id++;
-            ObjectMapper mapperd = new ObjectMapper();
-            sb.append(mapperd.writeValueAsString(poolable));
+            sb.append(mapper.writeValueAsString(poolable));
             if (id < partition.getPool().getPoolableElements().size()) {
               sb.append(",");
             }

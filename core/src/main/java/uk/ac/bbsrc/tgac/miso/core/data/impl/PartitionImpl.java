@@ -30,9 +30,11 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonTypeInfo;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
@@ -47,7 +49,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
  * @date 03-Aug-2011
  * @since 0.0.3
  */
-@JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
+@JsonSerialize(typing = JsonSerialize.Typing.STATIC)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 @JsonIgnoreProperties({ "securityProfile", "container" })
 @Entity
@@ -58,6 +61,7 @@ public class PartitionImpl extends AbstractPartition implements SequencerPoolPar
 
   @ManyToOne(targetEntity = PoolImpl.class)
   @JoinColumn(name = "pool_poolId")
+  @JsonBackReference
   Pool pool = null;
 
   public PartitionImpl() {

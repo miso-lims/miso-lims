@@ -159,9 +159,13 @@
 </div>
 
 <sec:authorize access="isAuthenticated()">
-  <div id="loggedInBanner">Logged in as:
-    <b id="currentUser"><sec:authentication property="principal.username"/></b> | <a
-        href="<c:url value="/j_spring_security_logout"/>">Logout</a></div>
+  <div id="loggedInBanner" style="display:inline-block">Logged in as:
+    <b id="currentUser"><sec:authentication property="principal.username"/></b>  
+    <form class="form-inline" action="logout" method="POST">
+      <input type="submit" value="Logout" />
+      <input type="hidden" name="${_csrf.parameterName}" value="${csrf.token}" />
+    </form>
+  </div>
 </sec:authorize>
 
 <div id="content">

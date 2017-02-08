@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.context;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Collection;
 import java.util.Locale;
 
 import javax.servlet.FilterChain;
@@ -15,9 +16,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.web.filter.GenericFilterBean;
 
+import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
+
 import io.prometheus.client.Counter;
 import io.prometheus.client.Histogram;
-import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 
 /**
  * Collect per-URL performance statistics and export them to Prometheus
@@ -201,10 +203,35 @@ public class PrometheusCollectionFilter extends GenericFilterBean {
 
     @Override
     @CoverageIgnore
-    @SuppressWarnings("deprecation")
     public void setStatus(int arg0, String arg1) {
       status = arg0;
-      backingResponse.setStatus(arg0, arg1);
+      backingResponse.setStatus(arg0);
+    }
+
+    @Override
+    public void setContentLengthLong(long arg0) {
+      backingResponse.setContentLengthLong(arg0);
+
+    }
+
+    @Override
+    public String getHeader(String arg0) {
+      return backingResponse.getHeader(arg0);
+    }
+
+    @Override
+    public Collection<String> getHeaderNames() {
+      return backingResponse.getHeaderNames();
+    }
+
+    @Override
+    public Collection<String> getHeaders(String arg0) {
+      return backingResponse.getHeaders(arg0);
+    }
+
+    @Override
+    public int getStatus() {
+      return backingResponse.getStatus();
     }
 
   }

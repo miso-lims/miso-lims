@@ -27,6 +27,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
 
@@ -45,6 +47,7 @@ public abstract class AbstractSampleQC extends AbstractQC implements SampleQC {
 
   @ManyToOne(targetEntity = SampleImpl.class)
   @JoinColumn(name = "sample_sampleId")
+  @JsonBackReference
   private Sample sample;
 
   @Override

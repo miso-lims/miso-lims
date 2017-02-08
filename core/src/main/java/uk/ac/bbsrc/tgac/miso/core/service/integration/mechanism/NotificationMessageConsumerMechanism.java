@@ -25,7 +25,7 @@ package uk.ac.bbsrc.tgac.miso.core.service.integration.mechanism;
 
 import java.util.Set;
 
-import org.springframework.integration.Message;
+import org.springframework.messaging.Message;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 

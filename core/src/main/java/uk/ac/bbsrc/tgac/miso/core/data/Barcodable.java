@@ -23,7 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * This interface simply describes an object that can be barcoded to denote its identity, i.e. have an identification String that represents

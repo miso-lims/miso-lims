@@ -43,8 +43,6 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
-
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
@@ -54,7 +52,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubmissionImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunException;
 import uk.ac.bbsrc.tgac.miso.core.exception.SubmissionException;
-import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.SubmissionManager;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
@@ -67,15 +64,9 @@ public class EditSubmissionController {
   protected static final Logger log = LoggerFactory.getLogger(EditSubmissionController.class);
 
   @Autowired
-  private SecurityManager securityManager;
-
-  @Autowired
   private RequestManager requestManager;
   @Autowired
   private StudyService studyService;
-
-  @Autowired
-  private FilesManager misoFileManager;
 
   @Autowired
   private SubmissionManager submissionManager;
@@ -85,14 +76,6 @@ public class EditSubmissionController {
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
-  }
-
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
-
-  public void setMisoFileManager(FilesManager misoFileManager) {
-    this.misoFileManager = misoFileManager;
   }
 
   public void setSubmissionManager(SubmissionManager submissionManager) {

@@ -58,6 +58,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.SubmissionActionType;
 @Entity
 @Table(name = "Submission")
 public class SubmissionImpl implements Submission, Serializable {
+
+  private static final long serialVersionUID = 1L;
+
   protected static final Logger log = LoggerFactory.getLogger(SubmissionImpl.class);
 
   public static final Long UNSAVED_ID = 0L;
@@ -97,8 +100,7 @@ public class SubmissionImpl implements Submission, Serializable {
   private boolean verified;
 
   @Override
-  public int compareTo(Object o) {
-    Submission t = (Submission) o;
+  public int compareTo(Submission t) {
     if (getId() < t.getId()) return -1;
     if (getId() > t.getId()) return 1;
     return 0;

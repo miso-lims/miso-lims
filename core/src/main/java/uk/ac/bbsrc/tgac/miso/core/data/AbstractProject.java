@@ -56,6 +56,7 @@ import org.slf4j.LoggerFactory;
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.google.common.collect.Lists;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
@@ -96,12 +97,15 @@ public abstract class AbstractProject implements Project {
   private long projectId = AbstractProject.UNSAVED_ID;
 
   @OneToMany(targetEntity = SampleImpl.class, fetch = FetchType.LAZY, mappedBy = "project")
+  @JsonManagedReference
   private Collection<Sample> samples = new HashSet<>();
 
   @OneToMany(targetEntity = StudyImpl.class, fetch = FetchType.LAZY, mappedBy = "project")
+  @JsonManagedReference
   private Collection<Study> studies = new HashSet<>();
 
   @OneToMany(targetEntity = ProjectOverview.class, mappedBy = "project", cascade = CascadeType.ALL)
+  @JsonManagedReference
   private Collection<ProjectOverview> overviews = new HashSet<>();
 
   @ElementCollection

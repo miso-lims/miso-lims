@@ -35,6 +35,7 @@ import javax.persistence.MappedSuperclass;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
@@ -65,6 +66,7 @@ public abstract class AbstractPartition implements Partition {
   @JoinTable(name = "SequencerPartitionContainer_Partition", joinColumns = {
       @JoinColumn(name = "partitions_partitionId") }, inverseJoinColumns = {
           @JoinColumn(name = "container_containerId") })
+  @JsonBackReference
   private SequencerPartitionContainer sequencerPartitionContainer = null;
 
   @Override

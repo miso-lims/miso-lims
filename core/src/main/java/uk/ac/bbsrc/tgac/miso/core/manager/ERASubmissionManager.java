@@ -67,6 +67,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -101,7 +102,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
  * @since 0.0.2
  */
 public class ERASubmissionManager implements SubmissionManager {
-  @Autowired
+  @Value("#{ beanFactory.getBean(T(uk.ac.bbsrc.tgac.miso.webapp.util.MisoPropertyExporter)).getPropertiesAsProperties() }")
   private Properties submissionProperties;
 
   public void setSubmissionProperties(Properties submissionProperties) {

@@ -45,6 +45,7 @@ import javax.persistence.Table;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
@@ -105,6 +106,7 @@ public class ExperimentImpl implements Experiment, Serializable {
   // defines a pool on which this experiment will operate. This contains one or more dilutions of a sample
   @ManyToOne(targetEntity = PoolImpl.class)
   @JoinColumn(name = "pool_poolId")
+  @JsonBackReference
   private Pool pool;
 
   // defines the parent run which processes this experiment
@@ -119,6 +121,7 @@ public class ExperimentImpl implements Experiment, Serializable {
 
   @ManyToOne(targetEntity = StudyImpl.class)
   @JoinColumn(name = "study_studyId")
+  @JsonBackReference
   private Study study;
   @Column(nullable = false)
   private String title;
@@ -165,8 +168,7 @@ public class ExperimentImpl implements Experiment, Serializable {
 
   @CoverageIgnore
   @Override
-  public int compareTo(Object o) {
-    final Experiment t = (Experiment) o;
+  public int compareTo(Experiment t) {
     if (getId() < t.getId()) return -1;
     if (getId() > t.getId()) return 1;
     return 0;
