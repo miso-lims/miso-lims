@@ -1072,13 +1072,19 @@ public class Dtos {
     dto.setAlias(from.getAlias());
     dto.setDescription(from.getDescription());
     dto.setIdentificationBarcode(from.getIdentificationBarcode());
-    dto.setUseId(from.getUse().getId());
-    dto.setUseAlias(from.getUse().getAlias());
-    dto.setSizeId(from.getSize().getId());
-    dto.setRows(from.getSize().getRows());
-    dto.setCols(from.getSize().getColumns());
-    dto.setScannable(from.getSize().getScannable());
-    dto.setItems(asBoxablesDtos(from.getBoxables()));
+    if (from.getUse() != null) {
+      dto.setUseId(from.getUse().getId());
+      dto.setUseAlias(from.getUse().getAlias());
+    }
+    if (from.getSize() != null) {
+      dto.setSizeId(from.getSize().getId());
+      dto.setRows(from.getSize().getRows());
+      dto.setCols(from.getSize().getColumns());
+      dto.setScannable(from.getSize().getScannable());
+    }
+    if (from.getBoxables() != null) {
+      dto.setItems(asBoxablesDtos(from.getBoxables()));
+    }
     return dto;
   }
 

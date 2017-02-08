@@ -1640,6 +1640,7 @@ public class MisoRequestManager implements RequestManager {
       if (box.getId() == AbstractBox.UNSAVED_ID) {
         try {
           box.setName(generateTemporaryName());
+          box.setSecurityProfile(securityProfileStore.get(securityProfileStore.save(box.getSecurityProfile())));
           boxStore.save(box);
 
           if (autoGenerateIdBarcodes) {
