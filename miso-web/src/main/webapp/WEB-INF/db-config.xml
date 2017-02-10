@@ -37,6 +37,7 @@
 
 
   <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+    <property name="entityInterceptor" ref="timeShiftInterceptor" />
     <property name="dataSource" ref="dataSource" />
     <property name="annotatedClasses">
       <list>
@@ -156,6 +157,12 @@
   <bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
     <property name="sessionFactory" ref="sessionFactory" />
     <property name="dataSource" ref="dataSource"/>
+  </bean>
+  
+  <bean id="timeShiftInterceptor" class = "uk.ac.bbsrc.tgac.miso.persistence.impl.util.TimeShiftingInterceptor">
+    <!-- Defaults to UTC/UTC, which will not make any adjustments -->
+    <constructor-arg name="dbZone" value="${miso.timeCorrection.dbZone:UTC}" />
+    <constructor-arg name="uiZone" value="${miso.timeCorrection.uiZone:UTC}" />
   </bean>
   
   <context:component-scan base-package="uk.ac.bbsrc.tgac.miso.persistence" /> 

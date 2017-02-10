@@ -10,6 +10,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
 
 import com.eaglegenomics.simlims.core.User;
@@ -38,6 +40,7 @@ public class SampleValidRelationshipImpl implements SampleValidRelationship {
   private User createdBy;
 
   @Column(nullable = false)
+  @Temporal(TemporalType.TIMESTAMP)
   private Date creationDate;
 
   @OneToOne(targetEntity = UserImpl.class)
@@ -45,6 +48,7 @@ public class SampleValidRelationshipImpl implements SampleValidRelationship {
   private User updatedBy;
 
   @Column(nullable = false)
+  @Temporal(TemporalType.TIMESTAMP)
   private Date lastUpdated;
 
   @Column(nullable = false)

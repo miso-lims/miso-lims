@@ -15,6 +15,8 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
@@ -42,6 +44,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 @Entity
 @Table(name = "Note")
 public class Note implements Serializable, Comparable<Note> {
+
+  private static final long serialVersionUID = 1L;
+
   /**
    * Use this ID to indicate that a note has not yet been saved, and therefore
    * does not yet have a unique ID.
@@ -53,6 +58,7 @@ public class Note implements Serializable, Comparable<Note> {
   private Long noteId = Note.UNSAVED_ID;
 
   @Column(nullable = false)
+  @Temporal(TemporalType.DATE)
   private Date creationDate = new Date();
 
   @Column(nullable = false)

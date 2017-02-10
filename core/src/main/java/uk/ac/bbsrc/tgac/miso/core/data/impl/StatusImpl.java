@@ -35,6 +35,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -63,7 +65,9 @@ public class StatusImpl implements Status, Serializable {
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   private HealthType health;
+  @Temporal(TemporalType.DATE)
   private Date startDate;
+  @Temporal(TemporalType.DATE)
   private Date completionDate;
   @Column(nullable = false)
   private String instrumentName;
@@ -71,6 +75,7 @@ public class StatusImpl implements Status, Serializable {
   @Column(nullable = false)
   private String runName;
   @Column(nullable = false)
+  @Temporal(TemporalType.TIMESTAMP)
   private Date lastUpdated;
 
   /**

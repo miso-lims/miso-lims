@@ -441,7 +441,7 @@ public class ImportExportControllerHelperService {
                   ldi.setSecurityProfile(library.getSecurityProfile());
                   ldi.setConcentration(Double.valueOf(jsonArrayElement.getString(11)));
                   ldi.setCreationDate(new Date());
-                  ldi.setLastModified(ldi.getCreationDate());
+                  ldi.setLastUpdated(ldi.getCreationDate());
                   ldi.setDilutionCreator(user.getLoginName());
                   if (!library.getLibraryDilutions().contains(ldi)) {
                     library.addDilution(ldi);

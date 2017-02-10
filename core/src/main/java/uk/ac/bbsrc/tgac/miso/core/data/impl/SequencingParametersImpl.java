@@ -12,6 +12,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
@@ -34,19 +36,28 @@ public class SequencingParametersImpl implements SequencingParameters, Serializa
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long parametersId;
+
   @Column(nullable = false)
   private String name;
+
   private String xpath;
+
   @OneToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "createdBy", nullable = false)
   private User createdBy;
+
   @Column(nullable = false)
+  @Temporal(TemporalType.TIMESTAMP)
   private Date creationDate;
+
   @OneToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "updatedBy", nullable = false)
   private User updatedBy;
+
   @Column(nullable = false)
+  @Temporal(TemporalType.TIMESTAMP)
   private Date lastUpdated;
+
   @Transient
   private XPathExpression expression;
 

@@ -43,6 +43,8 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -117,6 +119,8 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   private String scientificName;
   private String taxonIdentifier;
   private String sampleType;
+
+  @Temporal(TemporalType.DATE)
   private Date receivedDate;
   private Boolean qcPassed;
   private String identificationBarcode;

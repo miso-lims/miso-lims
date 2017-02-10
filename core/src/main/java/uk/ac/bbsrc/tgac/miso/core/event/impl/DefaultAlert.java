@@ -36,6 +36,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -76,6 +78,7 @@ public class DefaultAlert implements Alert, Serializable {
   private User user;
 
   @Column(name = "date", nullable = false)
+  @Temporal(TemporalType.DATE)
   private Date alertDate;
 
   @Column(name = "isRead", nullable = false)

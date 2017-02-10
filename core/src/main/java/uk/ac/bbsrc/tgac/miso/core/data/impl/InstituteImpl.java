@@ -10,10 +10,12 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-
-import uk.ac.bbsrc.tgac.miso.core.data.Institute;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import com.eaglegenomics.simlims.core.User;
+
+import uk.ac.bbsrc.tgac.miso.core.data.Institute;
 
 @Entity
 @Table(name = "Institute")
@@ -32,6 +34,7 @@ public class InstituteImpl implements Institute {
   private User createdBy;
   
   @Column(nullable = false)
+  @Temporal(TemporalType.TIMESTAMP)
   private Date creationDate;
   
   @OneToOne(targetEntity = UserImpl.class)
@@ -39,6 +42,7 @@ public class InstituteImpl implements Institute {
   private User updatedBy;
   
   @Column(nullable = false)
+  @Temporal(TemporalType.TIMESTAMP)
   private Date lastUpdated;
 
   @Override

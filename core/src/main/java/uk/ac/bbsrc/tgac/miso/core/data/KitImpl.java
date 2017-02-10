@@ -37,6 +37,8 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import com.eaglegenomics.simlims.core.Note;
 
@@ -64,8 +66,12 @@ public class KitImpl implements Kit {
       @JoinColumn(name = "kit_kitId") }, inverseJoinColumns = {
           @JoinColumn(name = "notes_noteId") })
   private Collection<Note> notes = new HashSet<>();
+
   private String lotNumber;
+
+  @Temporal(TemporalType.DATE)
   private Date kitDate;
+
   @ManyToOne(targetEntity = KitDescriptor.class)
   @JoinColumn(name = "kitDescriptorId", nullable = false)
   private KitDescriptor kitDescriptor;

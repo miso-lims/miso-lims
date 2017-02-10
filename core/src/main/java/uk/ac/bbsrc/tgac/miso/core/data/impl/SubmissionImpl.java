@@ -36,6 +36,8 @@ import javax.persistence.ManyToMany;
 import javax.persistence.MapKeyClass;
 import javax.persistence.MapKeyJoinColumn;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
 import org.slf4j.Logger;
@@ -68,24 +70,32 @@ public class SubmissionImpl implements Submission, Serializable {
   private String accession;
   private String alias;
   private boolean completed;
+
+  @Temporal(TemporalType.DATE)
   private Date creationDate;
+
   private String description;
+
   @ManyToMany(targetEntity = PartitionImpl.class)
   @JoinTable(name = "Submission_Partition_Dilution", joinColumns = { @JoinColumn(name = "submission_submissionId") }, inverseJoinColumns = {
       @JoinColumn(name = "partition_partitionId") })
   @MapKeyJoinColumn(name = "dilution_dilutionId")
   @MapKeyClass(LibraryDilution.class)
   private Map<Dilution, SequencerPoolPartition> dilutions;
+
   @ManyToMany(targetEntity = ExperimentImpl.class)
   @JoinTable(name = "Submission_Experiment", joinColumns = {
       @JoinColumn(name = "submission_submissionId") }, inverseJoinColumns = {
           @JoinColumn(name = "experiments_experimentId") })
   private Set<Experiment> experiments;
+
   private String name;
+
   @ManyToMany(targetEntity = SampleImpl.class)
   @JoinTable(name = "Submission_Sample", joinColumns = { @JoinColumn(name = "submission_submissionId") }, inverseJoinColumns = {
       @JoinColumn(name = "samples_sampleId") })
   private Set<Sample> samples;
+
   @ManyToMany(targetEntity = StudyImpl.class)
   @JoinTable(name = "Submission_Study", joinColumns = { @JoinColumn(name = "submission_submissionId") }, inverseJoinColumns = {
       @JoinColumn(name = "studies_studyId") })
@@ -93,9 +103,13 @@ public class SubmissionImpl implements Submission, Serializable {
 
   @Transient
   private SubmissionActionType submissionActionType;
+
   @Id
   private long submissionId = UNSAVED_ID;
+
+  @Temporal(TemporalType.DATE)
   private Date submittedDate;
+
   private String title;
   private boolean verified;
 

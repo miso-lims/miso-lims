@@ -10,6 +10,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -22,22 +24,31 @@ public class PoolOrderImpl implements PoolOrder {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long poolOrderId;
+
   @Column(nullable = false)
   private Long poolId;
+
   @Column(nullable = false)
   private Integer partitions;
+
   @OneToOne(targetEntity = SequencingParametersImpl.class)
   @JoinColumn(name = "parametersId", nullable = true)
   private SequencingParameters parameters;
+
   @OneToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "createdBy", nullable = false)
   private User createdBy;
+
   @Column(nullable = false)
+  @Temporal(TemporalType.TIMESTAMP)
   private Date creationDate;
+
   @OneToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "updatedBy", nullable = false)
   private User updatedBy;
+
   @Column(nullable = false)
+  @Temporal(TemporalType.TIMESTAMP)
   private Date lastUpdated;
 
   @Override
