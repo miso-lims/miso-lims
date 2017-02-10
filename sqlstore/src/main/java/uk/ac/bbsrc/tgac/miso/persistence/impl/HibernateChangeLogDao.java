@@ -76,10 +76,7 @@ public class HibernateChangeLogDao implements ChangeLogStore {
   public Long create(ChangeLog changeLog) {
     checkNotNull(changeLog.getId(), "The entity this change log applies to must have an id.");
     checkNotNull(changeLog.getUser(), "The change log must be associated with a user.");
-    checkNotNull(changeLog.getSummary(), "The change log must have a summary.");
-    checkNotNull(changeLog.getColumnsChanged(), "The change log must have columns changed.");
     checkArgument(!LimsUtils.isStringEmptyOrNull(changeLog.getSummary()), "The change log summary must not be empty.");
-    checkArgument(!LimsUtils.isStringEmptyOrNull(changeLog.getColumnsChanged()), "The change log columns changed must not be empty");
     if (changeLog.getTime() == null) {
       // Set the change log time stamp to the current time if it hasn't already been set. In the case of migration the time stamp
       // will be set to a historical time to accurately represent the time when the even occurred.

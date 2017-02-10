@@ -65,7 +65,7 @@ public class RunImpl extends AbstractRun implements Serializable {
   @JoinTable(name = "Run_SequencerPartitionContainer", joinColumns = {
       @JoinColumn(name = "Run_runId") }, inverseJoinColumns = {
           @JoinColumn(name = "containers_containerId") })
-  private List<SequencerPartitionContainer<SequencerPoolPartition>> containers = new AutoPopulatingList<SequencerPartitionContainer<SequencerPoolPartition>>(
+  private List<SequencerPartitionContainer<SequencerPoolPartition>> containers = new AutoPopulatingList<>(
       SequencerPartitionContainerImpl.class);
 
   /**

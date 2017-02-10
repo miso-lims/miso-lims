@@ -23,9 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data.impl.pacbio;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
@@ -40,8 +37,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
  * @author Rob Davey
  * @since 0.0.2
  */
-@Entity
-@DiscriminatorValue("PACBIO")
 public class PacBioRun extends RunImpl {
 
   public PacBioRun() {

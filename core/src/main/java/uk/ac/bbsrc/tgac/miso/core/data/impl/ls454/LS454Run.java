@@ -23,9 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data.impl.ls454;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
@@ -41,8 +38,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
  * @author Rob Davey
  * @since 0.0.2
  */
-@Entity
-@DiscriminatorValue("LS454")
 public class LS454Run extends RunImpl {
 
   public LS454Run() {

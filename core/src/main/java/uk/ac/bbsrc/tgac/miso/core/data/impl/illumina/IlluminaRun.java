@@ -28,8 +28,6 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
@@ -55,8 +53,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.UnicodeReader;
  * @author Rob Davey
  * @since 0.0.2
  */
-@Entity
-@DiscriminatorValue("Illumina")
 public class IlluminaRun extends RunImpl {
   private static final Logger log = LoggerFactory.getLogger(IlluminaRun.class);
 
